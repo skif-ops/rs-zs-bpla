@@ -20,22 +20,44 @@ jobs:
         run: ctest --test-dir firmware/build --output-on-failure
 
   server:
-    if: ${{ false }} # enabled when server source tree lands in develop
     name: Server pytest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Extract server v0.3 source
+        run: tar -xzf artifacts/server_source_v0_3.tar.gz
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r server/requirements.txt
-      - working-directory: server
+          cache: pip
+          cache-dependency-path: server/requirements.txt
+      - name: System audio dependencies
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg libsndfile1
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r server/requirements.txt
+      - name: Pytest
+        working-directory: server
         run: python -m pytest -q
 
   protocol-e2e:
-    if: ${{ false }} # enabled together with server job
     name: Firmware CBOR -> Server
     runs-on: ubuntu-latest
+    needs: [firmware]
     steps:
       - uses: actions/checkout@v4
-      - run: echo "server source pending in develop"
+      - name: Extract server v0.3 source
+        run: tar -xzf artifacts/server_source_v0_3.tar.gz
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install protocol dependencies
+        run: pip install 'pydantic>=2.7' 'cbor2>=5.6.4'
+      - name: Build firmware packet emitter
+        run: |
+          cmake -S firmware -B firmware/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build firmware/build --parallel --target zs_emit_detection
+      - name: Verify compact CBOR contract
+        working-directory: server
+        run: python tools/test_firmware_packet.py
