@@ -16,8 +16,8 @@
 #define ZS_ARCHIVE_POST_CHANNELS 4u
 #define ZS_ARCHIVE_PRE_SECONDS 30u
 #define ZS_ARCHIVE_POST_SECONDS 30u
-#define ZS_ARCHIVE_PRE_ADPCM_BYTES_PER_SAMPLE_NUM 1u
-#define ZS_ARCHIVE_PRE_ADPCM_BYTES_PER_SAMPLE_DEN 2u
+#define ZS_ARCHIVE_PRE_ADPCM_BLOCK_SECONDS 1u
+#define ZS_ARCHIVE_PRE_ADPCM_BLOCK_HEADER_BYTES 4u
 
 typedef enum {
   ZS_ARCHIVE_CODEC_UNKNOWN = 0,
@@ -82,9 +82,10 @@ uint32_t zs_archive_align_up(uint32_t value, uint32_t alignment);
 uint32_t zs_archive_crc32_update(uint32_t crc, const uint8_t *data, size_t len);
 
 /*
- * Builds the recommended 64 MiB-class layout for 30 s mono IMA-ADPCM
- * prehistory, 30 s original 4-channel PCM16 after trigger, and 3 event slots.
- * prehistory_ring_bytes is a separate continuously wear-levelled region.
+ * Builds the recommended 64 MiB-class layout for 30 s mono IMA ADPCM
+ * prehistory as independent 1-second blocks, 30 s original 4-channel PCM16
+ * after trigger, and 3 event slots. prehistory_ring_bytes is a separate
+ * continuously wear-levelled region.
  */
 bool zs_archive_make_default_layout(uint32_t base_address,
                                     uint32_t total_bytes,
