@@ -3,7 +3,8 @@ project(zs_bpla_firmware_core C)
 set(CMAKE_C_STANDARD 11)
 
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
+  # Release gate: every compiler warning in project C code is a build failure.
+  add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
 
 add_library(zs_core
@@ -35,6 +36,14 @@ add_test(NAME drivers COMMAND zs_driver_tests)
 add_executable(zs_archive_tests tests/test_archive.c)
 target_link_libraries(zs_archive_tests zs_core m)
 add_test(NAME archive COMMAND zs_archive_tests)
+
+# C assert() checks are part of these host tests and must remain active even
+# when CI configures CMake with CMAKE_BUILD_TYPE=Release.
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(zs_core_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_driver_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_archive_tests PRIVATE -UNDEBUG)
+endif()
 
 add_executable(zs_emit_detection tools/emit_detection.c)
 target_link_libraries(zs_emit_detection PRIVATE zs_core m)
