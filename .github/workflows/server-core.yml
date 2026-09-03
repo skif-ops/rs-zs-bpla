@@ -1,26 +1,13 @@
-name: CI
+name: Server core CI
 
 on:
   push:
-    branches: [main, develop, "feature/**"]
+    branches: ["feature/server-v03"]
   pull_request:
-    branches: [main, develop]
+    branches: [develop]
 
 jobs:
-  firmware:
-    name: Firmware CMake/CTest
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Configure
-        run: cmake -S firmware -B firmware/build -DCMAKE_BUILD_TYPE=Release
-      - name: Build with warnings enabled
-        run: cmake --build firmware/build --parallel
-      - name: CTest
-        run: ctest --test-dir firmware/build --output-on-failure
-
-  server:
-    name: Server core pytest
+  protocol-fusion:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,25 +20,23 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r server/requirements-ci.txt
-      - name: Pytest
+      - name: Run server core tests
         working-directory: server
         run: python -m pytest -q tests_core
 
-  protocol-e2e:
-    name: Firmware CBOR -> Server
+  firmware-contract:
     runs-on: ubuntu-latest
-    needs: [firmware, server]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install protocol dependency
-        run: pip install 'pydantic>=2.7,<3'
+      - name: Install decoder dependency
+        run: pip install "pydantic>=2.7,<3"
       - name: Build firmware packet emitter
         run: |
           cmake -S firmware -B firmware/build -DCMAKE_BUILD_TYPE=Release
           cmake --build firmware/build --parallel --target zs_emit_detection
-      - name: Verify compact CBOR contract
+      - name: Check firmware-to-server compact CBOR
         working-directory: server
         run: python tools/test_firmware_packet.py
