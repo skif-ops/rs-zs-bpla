@@ -1,0 +1,42 @@
+name: Server core CI
+
+on:
+  push:
+    branches: ["feature/server-v03"]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  protocol-fusion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: server/requirements-ci.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r server/requirements-ci.txt
+      - name: Run server core tests
+        working-directory: server
+        run: python -m pytest -q tests_core
+
+  firmware-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install decoder dependency
+        run: pip install "pydantic>=2.7,<3"
+      - name: Build firmware packet emitter
+        run: |
+          cmake -S firmware -B firmware/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build firmware/build --parallel --target zs_emit_detection
+      - name: Check firmware-to-server compact CBOR
+        working-directory: server
+        run: python tools/test_firmware_packet.py
