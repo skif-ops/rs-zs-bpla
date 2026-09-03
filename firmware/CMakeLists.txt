@@ -1,19 +1,38 @@
 cmake_minimum_required(VERSION 3.16)
 project(zs_bpla_firmware_core C)
 set(CMAKE_C_STANDARD 11)
-add_library(zs_core src/zs_cbor.c src/zs_protocol.c src/zs_mesh.c src/zs_time.c src/zs_classifier.c src/zs_fft.c src/zs_dsp.c src/zs_bg95.c src/zs_gnss.c src/zs_sx1262.c src/zs_audio.c)
+add_library(zs_core
+  src/zs_cbor.c
+  src/zs_protocol.c
+  src/zs_mesh.c
+  src/zs_time.c
+  src/zs_classifier.c
+  src/zs_fft.c
+  src/zs_dsp.c
+  src/zs_bg95.c
+  src/zs_gnss.c
+  src/zs_sx1262.c
+  src/zs_audio.c
+  src/zs_archive.c
+)
 target_include_directories(zs_core PUBLIC include generated)
 target_link_libraries(zs_core m)
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_core PRIVATE -Wall -Wextra -Wpedantic)
 endif()
+
 add_executable(zs_core_tests tests/test_core.c)
 target_link_libraries(zs_core_tests zs_core m)
 enable_testing()
 add_test(NAME core COMMAND zs_core_tests)
+
 add_executable(zs_driver_tests tests/test_drivers.c)
 target_link_libraries(zs_driver_tests zs_core m)
 add_test(NAME drivers COMMAND zs_driver_tests)
+
+add_executable(zs_archive_tests tests/test_archive.c)
+target_link_libraries(zs_archive_tests zs_core m)
+add_test(NAME archive COMMAND zs_archive_tests)
 
 add_executable(zs_emit_detection tools/emit_detection.c)
 target_link_libraries(zs_emit_detection PRIVATE zs_core m)
