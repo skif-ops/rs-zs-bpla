@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 import subprocess
+import sys
 from pathlib import Path
+
+SERVER_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = SERVER_ROOT.parent
+if str(SERVER_ROOT) not in sys.path:
+    sys.path.insert(0, str(SERVER_ROOT))
+
 from station.cbor_codec import decode_detection_cbor
 
-ROOT = Path(__file__).resolve().parents[2]
-exe = ROOT / "firmware" / "build" / "zs_emit_detection"
+exe = REPO_ROOT / "firmware" / "build" / "zs_emit_detection"
 raw = subprocess.check_output([str(exe)])
 msg = decode_detection_cbor(raw)
 assert msg.station_id == 424242
