@@ -36,7 +36,7 @@ static void kvb(zs_cbor_t *c, uint64_t k, bool v) {
   zs_cbor_bool(c, v);
 }
 
-size_t zs_protocol_encode_detection(const zs_detection_t *m, uint8_t *out, size_t cap) {
+static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_t cap, bool include_features) {
   if (!m || !out || cap == 0) {
     return 0;
   }
@@ -44,8 +44,8 @@ size_t zs_protocol_encode_detection(const zs_detection_t *m, uint8_t *out, size_
   zs_cbor_t c;
   zs_cbor_init(&c, out, cap);
 
-  /* Keys 0..11 are protocol v1.1 compatible. Keys 12 and 13 are v1.2 extensions. */
-  zs_cbor_map(&c, 14);
+  /* v1.1 keys remain unchanged. v1.2 adds keys 12 and 13. */
+  zs_cbor_map(&c, include_features ? 14 : 13);
   kvu(&c, 0, m->schema_ver);
   kvu(&c, 1, 2);
   kvu(&c, 2, m->station_id);
@@ -72,12 +72,14 @@ size_t zs_protocol_encode_detection(const zs_detection_t *m, uint8_t *out, size_
   kvu(&c, 10, m->detector_profile);
   kvu(&c, 11, m->sample_rate_hz);
 
-  zs_cbor_uint(&c, 9);
-  uint16_t f16[ZS_FEATURE_COUNT];
-  for (unsigned i = 0; i < ZS_FEATURE_COUNT; i++) {
-    f16[i] = zs_float_to_f16(m->features[i]);
+  if (include_features) {
+    zs_cbor_uint(&c, 9);
+    uint16_t f16[ZS_FEATURE_COUNT];
+    for (unsigned i = 0; i < ZS_FEATURE_COUNT; i++) {
+      f16[i] = zs_float_to_f16(m->features[i]);
+    }
+    zs_cbor_bytes(&c, f16, sizeof(f16));
   }
-  zs_cbor_bytes(&c, f16, sizeof(f16));
 
   zs_cbor_uint(&c, 10);
   zs_cbor_map(&c, 9);
@@ -118,4 +120,12 @@ size_t zs_protocol_encode_detection(const zs_detection_t *m, uint8_t *out, size_
   kvu(&c, 6, m->single_station.motion_hint);
 
   return c.error ? 0 : c.len;
+}
+
+size_t zs_protocol_encode_detection(const zs_detection_t *m, uint8_t *out, size_t cap) {
+  return encode_detection_impl(m, out, cap, true);
+}
+
+size_t zs_protocol_encode_detection_summary(const zs_detection_t *m, uint8_t *out, size_t cap) {
+  return encode_detection_impl(m, out, cap, false);
 }
