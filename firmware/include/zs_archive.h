@@ -76,13 +76,6 @@ typedef struct {
   uint32_t post_written;
   uint32_t pre_crc32;
   uint32_t post_crc32;
-  uint32_t pre_duration_ms;
-  uint32_t post_duration_ms;
-  uint8_t pre_codec;
-  uint8_t post_codec;
-  uint8_t post_channels;
-  uint32_t pre_sample_rate;
-  uint32_t post_sample_rate;
 } zs_archive_t;
 
 uint32_t zs_archive_align_up(uint32_t value, uint32_t alignment);
@@ -102,6 +95,10 @@ bool zs_archive_init(zs_archive_t *archive,
                      const zs_archive_storage_t *storage,
                      const zs_archive_layout_t *layout);
 
+/* Erase the fixed event slot during idle/maintenance, never on the detector critical path. */
+bool zs_archive_prepare_slot(zs_archive_t *archive, uint8_t slot_index);
+
+/* Begin assumes the selected slot has already been erased by zs_archive_prepare_slot(). */
 bool zs_archive_begin(zs_archive_t *archive,
                       uint8_t slot_index,
                       uint64_t event_id,
