@@ -16,12 +16,17 @@ typedef struct {
   uint32_t ms;
   uint32_t program_commands;
   uint32_t erase_commands;
-  uint32_t last_address;
-  uint8_t last_address_bytes;
+  uint32_t last_memory_address;
+  uint8_t last_memory_address_bytes;
 } mock_nor_t;
 
 static uint32_t mock_millis(void *ctx) { return ((mock_nor_t *)ctx)->ms; }
 static void mock_delay(void *ctx, uint32_t ms) { ((mock_nor_t *)ctx)->ms += ms; }
+
+static void remember_memory_command(mock_nor_t *m, uint32_t address, uint8_t address_bytes) {
+  m->last_memory_address = address;
+  m->last_memory_address_bytes = address_bytes;
+}
 
 static int mock_command(void *ctx,
                         uint8_t opcode,
@@ -32,8 +37,6 @@ static int mock_command(void *ctx,
                         uint8_t *rx,
                         size_t rx_len) {
   mock_nor_t *m = (mock_nor_t *)ctx;
-  m->last_address = address;
-  m->last_address_bytes = address_bytes;
   if (opcode == 0x9fu) {
     if (!rx || rx_len != 3u) return -1;
     rx[0] = 0xc2u; rx[1] = 0x20u; rx[2] = 0x1au;
@@ -49,11 +52,13 @@ static int mock_command(void *ctx,
     return 0;
   }
   if (opcode == 0x13u) {
+    remember_memory_command(m, address, address_bytes);
     if (address_bytes != 4u || !rx || (uint64_t)address + rx_len > m->size) return -1;
     memcpy(rx, &m->mem[address], rx_len);
     return 0;
   }
   if (opcode == 0x12u) {
+    remember_memory_command(m, address, address_bytes);
     if (address_bytes != 4u || !tx || tx_len == 0u || tx_len > 256u) return -1;
     if ((m->status & 0x02u) == 0u) return -1;
     if ((address / 256u) != ((address + (uint32_t)tx_len - 1u) / 256u)) return -1;
@@ -64,6 +69,7 @@ static int mock_command(void *ctx,
     return 0;
   }
   if (opcode == 0x21u) {
+    remember_memory_command(m, address, address_bytes);
     if (address_bytes != 4u || (m->status & 0x02u) == 0u) return -1;
     if ((address % 4096u) != 0u || (uint64_t)address + 4096u > m->size) return -1;
     memset(&m->mem[address], 0xff, 4096u);
@@ -98,9 +104,12 @@ static void test_id_and_addressing(mock_nor_t *mock, zs_nor_t *nor) {
   uint8_t dst[32];
   for (unsigned i = 0; i < sizeof(src); ++i) src[i] = (uint8_t)(0xa0u + i);
   assert(zs_nor_program(nor, address, src, sizeof(src)));
-  assert(mock->last_address_bytes == 4u);
+  assert(mock->last_memory_address == address);
+  assert(mock->last_memory_address_bytes == 4u);
   memset(dst, 0, sizeof(dst));
   assert(zs_nor_read(nor, address, dst, sizeof(dst)));
+  assert(mock->last_memory_address == address);
+  assert(mock->last_memory_address_bytes == 4u);
   assert(memcmp(src, dst, sizeof(src)) == 0);
 }
 
