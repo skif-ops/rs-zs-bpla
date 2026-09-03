@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int main(void) {
+int main(int argc, char **argv) {
   zs_detection_t m;
   memset(&m, 0, sizeof(m));
 
@@ -59,7 +59,9 @@ int main(void) {
   m.doa.sigma_cdeg = 600;
 
   unsigned char b[512];
-  size_t n = zs_protocol_encode_detection(&m, b, sizeof(b));
+  const bool summary = argc > 1 && strcmp(argv[1], "--summary") == 0;
+  size_t n = summary ? zs_protocol_encode_detection_summary(&m, b, sizeof(b))
+                     : zs_protocol_encode_detection(&m, b, sizeof(b));
   if (!n) {
     return 2;
   }
