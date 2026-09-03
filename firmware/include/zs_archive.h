@@ -18,6 +18,9 @@
 #define ZS_ARCHIVE_POST_SECONDS 30u
 #define ZS_ARCHIVE_PRE_ADPCM_BLOCK_SECONDS 1u
 #define ZS_ARCHIVE_PRE_ADPCM_BLOCK_HEADER_BYTES 4u
+/* Effective bytes/sample including one 4-byte IMA block header per 32000 samples. */
+#define ZS_ARCHIVE_PRE_ADPCM_BYTES_PER_SAMPLE_NUM 4001u
+#define ZS_ARCHIVE_PRE_ADPCM_BYTES_PER_SAMPLE_DEN 8000u
 
 typedef enum {
   ZS_ARCHIVE_CODEC_UNKNOWN = 0,
