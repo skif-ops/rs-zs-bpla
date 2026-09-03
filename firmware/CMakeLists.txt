@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
 project(zs_bpla_firmware_core C)
 set(CMAKE_C_STANDARD 11)
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
 add_library(zs_core
   src/zs_cbor.c
   src/zs_protocol.c
@@ -17,9 +22,6 @@ add_library(zs_core
 )
 target_include_directories(zs_core PUBLIC include generated)
 target_link_libraries(zs_core m)
-if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-  target_compile_options(zs_core PRIVATE -Wall -Wextra -Wpedantic)
-endif()
 
 add_executable(zs_core_tests tests/test_core.c)
 target_link_libraries(zs_core_tests zs_core m)
