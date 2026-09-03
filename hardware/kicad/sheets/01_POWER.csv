@@ -1,0 +1,6 @@
+Sheet,Item,Requirement
+01_POWER,SOLAR_IN,"Fuse + reverse protection + TVS; panel cold Voc below 28 V working input"
+01_POWER,U9 BQ24650,"MPPT input set by resistor; battery float/current resistor options populated per selected pack"
+01_POWER,V_CELL,"TPS62135-class 4 A buck; bulk capacitors adjacent to BG95; star return"
+01_POWER,V3V3,"low-Iq buck; separate ferrite/load switch options for RF/noisy domains"
+01_POWER,BAT1,"replaceable 10-16.8 V operating pack interface, temp sense, fuse"

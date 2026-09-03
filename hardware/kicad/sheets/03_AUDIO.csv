@@ -1,0 +1,4 @@
+Sheet,Item,Requirement
+03_AUDIO,MIC1-4,"TDK T5838 at 1.8 V; common PE9 MDF1_CCK0; PE4/PE7/PE10/PE12 independent data"
+03_AUDIO,AAD,"MIC1 designated wake microphone; active/AAD mode straps/control per datasheet"
+03_AUDIO,Ground,"quiet local plane and mechanical isolation from cellular DC/DC and modem"

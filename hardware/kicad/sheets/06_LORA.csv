@@ -1,0 +1,3 @@
+Sheet,Item,Requirement
+06_LORA,U3,"SX1262 reference matching; RU868; no normal channel centered at 869.000 MHz"
+06_LORA,RF,"50 ohm controlled route, PI matching pads, conducted test point/connector"

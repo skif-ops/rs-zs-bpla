@@ -1,0 +1,3 @@
+Sheet,Item,Requirement
+04_GNSS,U4,"MAX-M10S TXD/RXD/TIMEPULSE; V_IO 3.3 V; backup supply option"
+04_GNSS,RF,"50 ohm feed, ESD, active/passive antenna option per u-blox reference"

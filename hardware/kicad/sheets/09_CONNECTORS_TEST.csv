@@ -1,0 +1,3 @@
+Sheet,Item,Requirement
+09_CONNECTORS_TEST,TP,"VBAT, V_CELL, V3V3, V_MIC, PPS, PDM clock, UARTs, SPI DIO1, SWD"
+09_CONNECTORS_TEST,Service,"local service button PC4 enables BLE; sealed access method to mechanical design"

@@ -1,0 +1,33 @@
+# Build outputs
+firmware/build*/
+**/__pycache__/
+**/.pytest_cache/
+*.pyc
+*.pyo
+*.o
+*.a
+*.elf
+*.bin
+*.hex
+
+# Runtime data
+server/data/*.sqlite3
+server/output/
+server/uploads/
+.env
+
+# Large/raw datasets kept outside normal Git history
+server/dataset/raw/
+server/dataset/raw_reference/
+server/tools/golden/pcm16le/
+
+# Office binaries / generated renderings are release artifacts, not source history
+rkd/**/*.docx
+rkd/**/*.xlsx
+rkd/figures/*.png
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

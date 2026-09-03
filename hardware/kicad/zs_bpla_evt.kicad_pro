@@ -1,0 +1,16 @@
+{
+  "board": {},
+  "boards": [],
+  "cvpcb": {},
+  "erc": {},
+  "libraries": {},
+  "meta": {"filename": "zs_bpla_evt.kicad_pro", "version": 1},
+  "net_settings": {"classes": [], "meta": {"version": 3}},
+  "pcbnew": {},
+  "schematic": {},
+  "text_variables": {
+    "PROJECT": "ZS-BPLA EVT",
+    "REV": "0.3",
+    "MCU": "STM32U585ZIT6Q"
+  }
+}

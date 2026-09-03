@@ -1,0 +1,2 @@
+Sheet,Item,Requirement
+07_BLE,U5,"nRF52832-class certified/module preferred; UART PB10/PB11; wake/reset; Android MVP"

@@ -1,0 +1,4 @@
+Sheet,Item,Requirement
+08_STORAGE_SENSORS,U6,"64 MB serial NOR on OCTOSPI P1 candidate pin group; final AF validated in CubeMX"
+08_STORAGE_SENSORS,U7/U8,"LIS2DW12 + TMP117 on I2C1 PB6/PB7; PC5 accelerometer wake"
+08_STORAGE_SENSORS,Tamper,"PC13 Hall/reed wake input"

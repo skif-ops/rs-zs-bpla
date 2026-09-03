@@ -1,0 +1,20 @@
+Ref,Value,Part,Sheet,Footprint_status,Notes
+U1,MCU,STM32U585ZIT6Q,02_MCU,Use ST LQFP144 verified footprint,160 MHz M33 2MB/786KB
+U2,Cellular,Quectel BG95-M3,05_CELLULAR,Use Quectel recommended LGA,Cat M1/NB2/EGPRS
+U3,LoRa,SX1262IMLTRT,06_LORA,Semtech QFN reference,RU868
+U4,GNSS,MAX-M10S,04_GNSS,u-blox recommended land pattern,TIMEPULSE
+U5,BLE,MDBT42Q-512KV2-class,07_BLE,Module land pattern,Android service OTA
+U6,NOR,MX25L51245G-class,08_STORAGE_SENSORS,8-WSON/SOP per selected order code,64 MB
+U7,Accel,LIS2DW12TR,08_STORAGE_SENSORS,LGA,wake-on-motion
+U8,Temp,TMP117,08_STORAGE_SENSORS,WSON,temperature only
+U9,Solar charger,BQ24650RVA,01_POWER,VQFN16,5-28 V solar input MPPT controller
+U12,V_CELL buck,TPS62135,01_POWER,QFN,4 A 3-17 V buck set to BG95 design voltage
+U13,V3V3 buck,TPS62135,01_POWER,QFN,low-Iq 3.3 V system rail; current can be down-selected after EVT
+U14,V_MIC LDO,Low-noise 1.8 V LDO,03_AUDIO,TBD,select after microphone noise bench
+U15,BG95 level translator,TXS0108E-class,05_CELLULAR,VSSOP/QFN,3.3 V to 1.8 V UART/control reference; verify loading
+MIC1,T5838,TDK T5838,03_AUDIO,TDK land pattern,AAD-capable PDM
+MIC2,T5838,TDK T5838,03_AUDIO,TDK land pattern,PDM
+MIC3,T5838,TDK T5838,03_AUDIO,TDK land pattern,PDM
+MIC4,T5838,TDK T5838,03_AUDIO,TDK land pattern,PDM
+BAT1,Replaceable battery,10-16.8 V operating pack,01_POWER,Connector TBD,Chemistry selected by -40 C energy/volume tests
+PV1,Solar panel,60-80 W external,01_POWER,External connector,Cold Voc < charger maximum
