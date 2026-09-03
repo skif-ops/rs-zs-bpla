@@ -19,6 +19,8 @@ add_library(zs_core
   src/zs_sx1262.c
   src/zs_audio.c
   src/zs_archive.c
+  src/zs_nor.c
+  src/zs_nor_archive.c
 )
 target_include_directories(zs_core PUBLIC include generated)
 target_link_libraries(zs_core m)
@@ -29,6 +31,8 @@ add_executable(zs_driver_tests tests/test_drivers.c)
 target_link_libraries(zs_driver_tests zs_core m)
 add_executable(zs_archive_tests tests/test_archive.c)
 target_link_libraries(zs_archive_tests zs_core m)
+add_executable(zs_nor_tests tests/test_nor.c)
+target_link_libraries(zs_nor_tests zs_core m)
 
 # Release configuration defines NDEBUG globally. Tests must keep assert() active,
 # otherwise validation expressions disappear and can hide both test failures and warnings.
@@ -36,12 +40,14 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_core_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_driver_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_archive_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_nor_tests PRIVATE -UNDEBUG)
 endif()
 
 enable_testing()
 add_test(NAME core COMMAND zs_core_tests)
 add_test(NAME drivers COMMAND zs_driver_tests)
 add_test(NAME archive COMMAND zs_archive_tests)
+add_test(NAME nor COMMAND zs_nor_tests)
 
 add_executable(zs_emit_detection tools/emit_detection.c)
 target_link_libraries(zs_emit_detection PRIVATE zs_core m)
