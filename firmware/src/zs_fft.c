@@ -1,0 +1,4 @@
+#include "zs_fft.h"
+#include <math.h>
+static bool fft(zs_complex_t*x,size_t n,bool inv){if(!x||n<2||(n&(n-1)))return false;for(size_t i=1,j=0;i<n;i++){size_t b=n>>1;for(;j&b;b>>=1)j^=b;j^=b;if(i<j){zs_complex_t t=x[i];x[i]=x[j];x[j]=t;}}for(size_t len=2;len<=n;len<<=1){float a=(inv?2.0f:-2.0f)*(float)M_PI/(float)len;float wr0=cosf(a),wi0=sinf(a);for(size_t i=0;i<n;i+=len){float wr=1,wi=0;for(size_t j=0;j<len/2;j++){zs_complex_t u=x[i+j],v=x[i+j+len/2];float vr=v.re*wr-v.im*wi,vi=v.re*wi+v.im*wr;x[i+j].re=u.re+vr;x[i+j].im=u.im+vi;x[i+j+len/2].re=u.re-vr;x[i+j+len/2].im=u.im-vi;float nw=wr*wr0-wi*wi0;wi=wr*wi0+wi*wr0;wr=nw;}}}if(inv)for(size_t i=0;i<n;i++){x[i].re/=n;x[i].im/=n;}return true;}
+bool zs_fft_radix2(zs_complex_t*x,size_t n){return fft(x,n,false);}bool zs_ifft_radix2(zs_complex_t*x,size_t n){return fft(x,n,true);}

@@ -1,0 +1,7 @@
+#include "zs_audio.h"
+#include <string.h>
+void zs_audio_ring_init(zs_audio_ring_t*r,int16_t*s,size_t cap,uint32_t sr){if(r)*r=(zs_audio_ring_t){.storage=s,.frames_capacity=cap,.sample_rate=sr};if(s&&cap)memset(s,0,cap*ZS_AUDIO_CHANNELS*sizeof(int16_t));}
+void zs_audio_ring_push(zs_audio_ring_t*r,const int16_t f[ZS_AUDIO_CHANNELS]){if(!r||!r->storage||!r->frames_capacity||!f)return;memcpy(&r->storage[r->write_frame*ZS_AUDIO_CHANNELS],f,ZS_AUDIO_CHANNELS*sizeof(int16_t));r->write_frame=(r->write_frame+1)%r->frames_capacity;r->total_frames++;}
+static bool range_ok(const zs_audio_ring_t*r,uint64_t end,uint32_t count){if(!r||!r->storage||count>r->frames_capacity||end>r->total_frames||end<count)return false;return (r->total_frames-end)<=r->frames_capacity;}
+bool zs_audio_ring_copy_mono(const zs_audio_ring_t*r,uint64_t end,uint32_t count,int16_t*out,unsigned ch){if(ch>=ZS_AUDIO_CHANNELS||!out||!range_ok(r,end,count))return false;uint64_t start=end-count;for(uint32_t i=0;i<count;i++){size_t idx=(size_t)((start+i)%r->frames_capacity);out[i]=r->storage[idx*ZS_AUDIO_CHANNELS+ch];}return true;}
+bool zs_audio_ring_copy_average(const zs_audio_ring_t*r,uint64_t end,uint32_t count,int16_t*out){if(!out||!range_ok(r,end,count))return false;uint64_t start=end-count;for(uint32_t i=0;i<count;i++){size_t idx=(size_t)((start+i)%r->frames_capacity);int32_t s=0;for(unsigned c=0;c<ZS_AUDIO_CHANNELS;c++)s+=r->storage[idx*ZS_AUDIO_CHANNELS+c];out[i]=(int16_t)(s/4);}return true;}
