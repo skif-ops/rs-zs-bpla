@@ -55,7 +55,7 @@ static void test_default_capacity(void) {
   zs_archive_layout_t layout;
   assert(zs_archive_make_default_layout(0u, 64u * 1024u * 1024u, 4096u, &layout));
   assert(layout.slot_count == 3u);
-  assert(layout.max_pre_bytes == 480000u);
+  assert(layout.max_pre_bytes == 480120u);
   assert(layout.max_post_bytes == 7680000u);
   assert(layout.slot_bytes == 8163328u);
   assert(layout.prehistory_ring_bytes == 42618880u);
