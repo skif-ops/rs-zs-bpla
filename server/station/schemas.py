@@ -1,4 +1,4 @@
-"""Pydantic schemas for ZS-BPLA station protocol v1.2."""
+"""Pydantic schemas for ZS-BPLA station protocol v1.3."""
 from __future__ import annotations
 
 from enum import IntEnum
@@ -154,6 +154,37 @@ class DoaEstimate(BaseModel):
         return max(self.sigma_cdeg / 100.0, 0.1)
 
 
+class SpatialInfo(BaseModel):
+    """Optional 3+1 array diagnostics.
+
+    TDOA values are signed microseconds using pair order 12,13,14,23,24,34.
+    DOA itself remains in the existing `doa` block for backward compatibility.
+    """
+    tdoa_us: list[int] = Field(default_factory=list)
+    confidence_u8: int = Field(default=0, ge=0, le=255)
+    geometry_quality_u8: int = Field(default=0, ge=0, le=255)
+    valid: bool = False
+    upper_hemisphere: bool = False
+
+    @field_validator("tdoa_us")
+    @classmethod
+    def validate_tdoa(cls, value: list[int]) -> list[int]:
+        if value and len(value) != 6:
+            raise ValueError("tdoa_us must contain exactly six pair delays")
+        out = [int(v) for v in value]
+        if any(v < -32768 or v > 32767 for v in out):
+            raise ValueError("tdoa_us values must fit signed int16")
+        return out
+
+    @property
+    def confidence(self) -> float:
+        return self.confidence_u8 / 255.0
+
+    @property
+    def geometry_quality(self) -> float:
+        return self.geometry_quality_u8 / 255.0
+
+
 class PowerStatus(BaseModel):
     battery_pct: int = Field(default=0, ge=0, le=100)
     battery_mv: int = 0
@@ -194,6 +225,7 @@ class DetectionMessage(BaseModel):
     single_station_estimate: SingleStationEstimate = Field(default_factory=SingleStationEstimate)
     features: list[float] = Field(default_factory=list)
     doa: DoaEstimate = Field(default_factory=DoaEstimate)
+    spatial: SpatialInfo = Field(default_factory=SpatialInfo)
     power: PowerStatus = Field(default_factory=PowerStatus)
     route: RouteStatus = Field(default_factory=RouteStatus)
     audio_ref: AudioReference | None = None

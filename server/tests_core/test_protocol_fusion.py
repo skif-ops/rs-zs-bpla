@@ -35,21 +35,24 @@ def _enc(value):
     raise TypeError(type(value))
 
 
-def _packet():
+def _packet(include_spatial=True):
     feats = [i / 10.0 for i in range(43)]
     obj = {
-        0: 1, 1: 2, 2: 7001, 3: 17, 4: 4, 5: 0x11223344,
+        0: 3, 1: 2, 2: 7001, 3: 17, 4: 4, 5: 0x11223344,
         6: 1_780_000_000_000_000, 7: 0,
         8: {0: 557550000, 1: 376150000, 2: 1800, 3: True, 4: 1, 5: 230, 6: 3, 7: 18, 8: 85, 9: 80, 10: 1, 11: 32000},
         9: struct.pack("<" + "e" * 43, *feats),
         10: {0: 77, 1: 12600, 2: 18800, 3: -55, 4: 0, 5: 0, 6: -71, 7: 95, 8: 0},
         11: {0: 1234, 1: 550, 2: 900, 3: True},
     }
+    if include_spatial:
+        obj[14] = {0: -172, 1: -83, 2: 91, 3: 89, 4: 263, 5: 174, 6: 188, 7: 224, 8: 3}
     return _enc(obj)
 
 
 def test_compact_decoder_contract():
     msg = decode_detection_cbor(_packet())
+    assert msg.schema_ver == 3
     assert msg.station_id == 7001
     assert msg.station.alt_m == 180.0
     assert msg.gnss.pps_ok
@@ -60,6 +63,17 @@ def test_compact_decoder_contract():
     assert msg.route.transport == "LTE"
     assert msg.power.temperature_c == -5.5
     assert msg.doa.valid
+    assert msg.spatial.valid
+    assert msg.spatial.upper_hemisphere
+    assert msg.spatial.tdoa_us == [-172, -83, 91, 89, 263, 174]
+    assert msg.spatial.confidence_u8 == 188
+    assert msg.spatial.geometry_quality_u8 == 224
+
+
+def test_v12_packet_without_spatial_still_decodes():
+    msg = decode_detection_cbor(_packet(include_spatial=False))
+    assert not msg.spatial.valid
+    assert msg.spatial.tdoa_us == []
 
 
 def test_feature_count_rejected():
