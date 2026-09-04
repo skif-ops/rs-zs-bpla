@@ -6,7 +6,7 @@ int main(int argc, char **argv) {
   zs_detection_t m;
   memset(&m, 0, sizeof(m));
 
-  m.schema_ver = 2;
+  m.schema_ver = 3;
   m.station_id = 424242;
   m.seq_no = 7;
   m.boot_id = 9;
@@ -53,10 +53,19 @@ int main(int argc, char **argv) {
   m.route.rssi_dbm = -91;
   m.route.snr_db10 = 75;
   m.route.gateway_id = 77;
+
   m.doa.valid = true;
   m.doa.azimuth_cdeg = 27123;
   m.doa.elevation_cdeg = 850;
   m.doa.sigma_cdeg = 600;
+
+  const int16_t tdoa_us[ZS_SPATIAL_TDOA_COUNT] = {-172, -83, 91, 89, 263, 174};
+  for (unsigned i = 0; i < ZS_SPATIAL_TDOA_COUNT; i++) {
+    m.spatial.tdoa_us[i] = tdoa_us[i];
+  }
+  m.spatial.confidence_u8 = 188;
+  m.spatial.geometry_quality_u8 = 224;
+  m.spatial.flags = 0x03u;
 
   unsigned char b[512];
   const bool summary = argc > 1 && strcmp(argv[1], "--summary") == 0;
