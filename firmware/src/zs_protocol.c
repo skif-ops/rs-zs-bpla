@@ -44,8 +44,8 @@ static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_
   zs_cbor_t c;
   zs_cbor_init(&c, out, cap);
 
-  /* v1.1 keys remain unchanged. v1.2 adds keys 12 and 13. */
-  zs_cbor_map(&c, include_features ? 14 : 13);
+  /* v1.1 keys remain unchanged. v1.2 adds 12/13. v1.3 adds 14. */
+  zs_cbor_map(&c, include_features ? 15 : 14);
   kvu(&c, 0, m->schema_ver);
   kvu(&c, 1, 2);
   kvu(&c, 2, m->station_id);
@@ -118,6 +118,16 @@ static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_
   kvu(&c, 4, m->single_station.confidence_u8);
   kvu(&c, 5, m->single_station.valid_flags);
   kvu(&c, 6, m->single_station.motion_hint);
+
+  zs_cbor_uint(&c, 14);
+  zs_cbor_map(&c, 7);
+  kvi(&c, 0, m->spatial.tdoa12_us);
+  kvi(&c, 1, m->spatial.tdoa13_us);
+  kvi(&c, 2, m->spatial.tdoa14_us);
+  kvu(&c, 3, m->spatial.residual_us);
+  kvu(&c, 4, m->spatial.confidence_u8);
+  kvu(&c, 5, m->spatial.geometry_id);
+  kvu(&c, 6, m->spatial.valid_flags);
 
   return c.error ? 0 : c.len;
 }
