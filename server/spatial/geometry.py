@@ -1,4 +1,4 @@
-"""Geometry and far-field TDOA solver for the approved 3+1 array.
+"""Geometry, calibration and far-field TDOA solver for the approved 3+1 array.
 
 Coordinate convention:
 - x: east/right on the station drawing;
@@ -10,6 +10,17 @@ Coordinate convention:
 
 The default geometry is an equilateral 120 mm horizontal triangle centered at
 (0, 0, 0), with microphone 4 located 150 mm above its centroid.
+
+Calibration convention:
+``channel_delay_us[i]`` is the additional fixed electronic/acquisition delay of
+channel i. Therefore a measured reference delay contains both propagation and
+channel skew::
+
+    tau_1j_measured = tau_1j_geometry + delay_j - delay_1
+
+The direction solver itself consumes calibrated propagation TDOAs. Use
+``calibrate_reference_tdoas_us`` before solving measured hardware TDOAs. Fixed
+channel skew must not be hidden by changing microphone XYZ coordinates.
 """
 from __future__ import annotations
 
@@ -33,6 +44,8 @@ class SpatialGeometry:
         p = np.asarray(self.positions_m, dtype=float)
         if p.shape != (4, 3):
             raise ValueError("positions_m must be shaped (4, 3)")
+        if not np.all(np.isfinite(p)):
+            raise ValueError("positions_m must be finite")
         if np.linalg.matrix_rank(p[1:] - p[0]) < 3:
             raise ValueError("3+1 geometry must be non-coplanar")
         object.__setattr__(self, "positions_m", p)
@@ -66,6 +79,64 @@ DEFAULT_GEOMETRY_3P1 = _default_geometry()
 
 
 @dataclass(frozen=True)
+class SpatialCalibration:
+    """Per-channel fixed acquisition delay calibration in microseconds.
+
+    Only relative channel delays affect TDOA. A common offset added to all four
+    values is intentionally irrelevant. ``calibration_id`` is a local/config
+    revision identifier and is not added to every protocol v1.3 event.
+    """
+
+    channel_delay_us: np.ndarray
+    calibration_id: int = 0
+    name: str = "zero"
+
+    def __post_init__(self) -> None:
+        d = np.asarray(self.channel_delay_us, dtype=float)
+        if d.shape != (4,):
+            raise ValueError("channel_delay_us must contain four values")
+        if not np.all(np.isfinite(d)):
+            raise ValueError("channel_delay_us must be finite")
+        if not 0 <= int(self.calibration_id) <= 0xFFFFFFFF:
+            raise ValueError("calibration_id must fit uint32")
+        object.__setattr__(self, "channel_delay_us", d)
+
+    @property
+    def reference_skew_us(self) -> tuple[float, float, float]:
+        d = self.channel_delay_us
+        return (float(d[1] - d[0]), float(d[2] - d[0]), float(d[3] - d[0]))
+
+
+ZERO_SPATIAL_CALIBRATION = SpatialCalibration(np.zeros(4, dtype=float))
+
+
+def calibrate_reference_tdoas_us(
+    measured_tdoas_us: tuple[float, float, float] | list[float] | np.ndarray,
+    calibration: SpatialCalibration = ZERO_SPATIAL_CALIBRATION,
+) -> tuple[float, float, float]:
+    """Remove fixed channel skew from measured (tau12, tau13, tau14)."""
+    measured = np.asarray(measured_tdoas_us, dtype=float)
+    if measured.shape != (3,) or not np.all(np.isfinite(measured)):
+        raise ValueError("measured_tdoas_us must contain three finite values")
+    skew = np.asarray(calibration.reference_skew_us, dtype=float)
+    corrected = measured - skew
+    return tuple(float(v) for v in corrected)
+
+
+def add_calibration_skew_to_reference_tdoas_us(
+    propagation_tdoas_us: tuple[float, float, float] | list[float] | np.ndarray,
+    calibration: SpatialCalibration,
+) -> tuple[float, float, float]:
+    """Add channel skew to ideal propagation TDOAs, primarily for simulation/tests."""
+    propagation = np.asarray(propagation_tdoas_us, dtype=float)
+    if propagation.shape != (3,) or not np.all(np.isfinite(propagation)):
+        raise ValueError("propagation_tdoas_us must contain three finite values")
+    skew = np.asarray(calibration.reference_skew_us, dtype=float)
+    measured = propagation + skew
+    return tuple(float(v) for v in measured)
+
+
+@dataclass(frozen=True)
 class SpatialSolution:
     azimuth_deg: float
     elevation_deg: float
@@ -90,10 +161,10 @@ def reference_tdoas_us_from_direction(
     geometry: SpatialGeometry = DEFAULT_GEOMETRY_3P1,
     temperature_c: float = 20.0,
 ) -> tuple[float, float, float]:
-    """Return (tau12, tau13, tau14) in microseconds.
+    """Return ideal propagation (tau12, tau13, tau14) in microseconds.
 
     tau1j is t_j - t_1. For a source above the array, mic 4 is closer, so
-    tau14 is negative.
+    tau14 is negative. Electronic/acquisition delays are deliberately excluded.
     """
     u = direction_unit_vector(azimuth_deg, elevation_deg)
     c = speed_of_sound_mps(temperature_c)
@@ -123,7 +194,7 @@ def direction_from_reference_tdoas_us(
     temperature_c: float = 20.0,
     max_residual_us: float = 35.0,
 ) -> SpatialSolution:
-    """Solve far-field direction from the three independent TDOAs.
+    """Solve far-field direction from calibrated propagation TDOAs.
 
     The unnormalized solution should have norm close to one for physically
     consistent far-field measurements. It is normalized before azimuth and
@@ -170,4 +241,24 @@ def direction_from_reference_tdoas_us(
         valid=valid,
         unit_vector_enu=(float(u[0]), float(u[1]), float(u[2])),
         raw_vector_norm=raw_norm,
+    )
+
+
+def direction_from_measured_reference_tdoas_us(
+    tdoa12_us: float,
+    tdoa13_us: float,
+    tdoa14_us: float,
+    *,
+    calibration: SpatialCalibration = ZERO_SPATIAL_CALIBRATION,
+    geometry: SpatialGeometry = DEFAULT_GEOMETRY_3P1,
+    temperature_c: float = 20.0,
+    max_residual_us: float = 35.0,
+) -> SpatialSolution:
+    """Calibrate measured TDOAs, then solve the far-field direction."""
+    corrected = calibrate_reference_tdoas_us((tdoa12_us, tdoa13_us, tdoa14_us), calibration)
+    return direction_from_reference_tdoas_us(
+        *corrected,
+        geometry=geometry,
+        temperature_c=temperature_c,
+        max_residual_us=max_residual_us,
     )
