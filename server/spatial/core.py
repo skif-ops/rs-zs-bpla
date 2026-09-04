@@ -35,11 +35,7 @@ class SpatialEstimate:
 
 def default_geometry_3plus1(horizontal_side_m: float = 0.12,
                             vertical_m: float = 0.15) -> np.ndarray:
-    """Return a symmetric 3+1 array centered at the origin.
-
-    Microphones 0..2 are an equilateral triangle in z=0.
-    Microphone 3 is above the triangle center.
-    """
+    """Return a symmetric 3+1 array centered at the origin."""
     if not (0.05 <= horizontal_side_m <= 0.30):
         raise ValueError("horizontal_side_m outside supported design range")
     if not (0.05 <= vertical_m <= 0.40):
@@ -71,7 +67,6 @@ def direction_to_pair_tdoa(geometry_m: np.ndarray,
     u = _unit_from_angles(azimuth_deg, elevation_deg)
     out: dict[Pair, float] = {}
     for i, j in combinations(range(g.shape[0]), 2):
-        # Plane wave propagation: t_j - t_i = -dot(r_j-r_i, u)/c.
         out[(i, j)] = -float(np.dot(g[j] - g[i], u)) / speed_of_sound_mps
     return out
 
@@ -82,19 +77,13 @@ def estimate_direction_from_tdoa(geometry_m: np.ndarray,
                                  max_residual_us: float = 80.0,
                                  min_direction_norm: float = 0.65,
                                  max_direction_norm: float = 1.35) -> SpatialEstimate:
-    """Estimate far-field azimuth/elevation from pair TDOAs.
-
-    Uses all available independent pair equations in a least-squares solve.
-    A result is invalid when geometry is rank deficient, TDOAs are physically
-    inconsistent, or residual exceeds the configured gate.
-    """
+    """Estimate far-field azimuth/elevation from pair TDOAs."""
     g = _validate_geometry(geometry_m)
     if speed_of_sound_mps <= 250.0 or speed_of_sound_mps >= 400.0:
         raise ValueError("speed_of_sound_mps outside supported range")
 
     rows: list[np.ndarray] = []
     rhs: list[float] = []
-    used_pairs: list[Pair] = []
     for pair, tau in pair_tdoa_s.items():
         if len(pair) != 2:
             continue
@@ -103,11 +92,8 @@ def estimate_direction_from_tdoa(geometry_m: np.ndarray,
             continue
         if not np.isfinite(tau):
             continue
-        # Normalize pair orientation to the supplied direction. Both i<j and
-        # arbitrary pairs are accepted; tau is always t_j - t_i.
         rows.append(g[j] - g[i])
         rhs.append(-speed_of_sound_mps * float(tau))
-        used_pairs.append((i, j))
 
     if len(rows) < 3:
         return SpatialEstimate(False, None, None, float("inf"), 0.0,
@@ -115,8 +101,7 @@ def estimate_direction_from_tdoa(geometry_m: np.ndarray,
 
     a = np.vstack(rows)
     b = np.asarray(rhs, dtype=float)
-    rank = int(np.linalg.matrix_rank(a, tol=1e-9))
-    if rank < 3:
+    if int(np.linalg.matrix_rank(a, tol=1e-9)) < 3:
         return SpatialEstimate(False, None, None, float("inf"), 0.0,
                                float("inf"), 0.0, "rank_deficient_geometry")
 
@@ -127,8 +112,7 @@ def estimate_direction_from_tdoa(geometry_m: np.ndarray,
                                float("inf"), 0.0, "degenerate_solution")
 
     condition = float(singular[0] / singular[-1]) if singular[-1] > 0 else float("inf")
-    predicted = a @ u_raw
-    residual_s = (predicted - b) / speed_of_sound_mps
+    residual_s = (a @ u_raw - b) / speed_of_sound_mps
     residual_us = float(np.sqrt(np.mean(np.square(residual_s))) * 1e6)
 
     if norm < min_direction_norm or norm > max_direction_norm:
@@ -148,7 +132,6 @@ def estimate_direction_from_tdoa(geometry_m: np.ndarray,
     condition_score = 1.0 / (1.0 + max(0.0, condition - 1.0) / 8.0)
     confidence = float(np.clip(0.55 * residual_score + 0.30 * norm_score +
                                0.15 * condition_score, 0.0, 1.0))
-
     return SpatialEstimate(True, azimuth, elevation, residual_us, norm,
                            condition, confidence, "ok")
 
@@ -159,10 +142,11 @@ def gcc_phat_pair_tdoa(channel_i: Sequence[float],
                        max_tau_s: float,
                        band_hz: tuple[float, float] = (80.0, 5000.0),
                        interp: int = 8) -> float:
-    """Estimate t_j - t_i using GCC-PHAT.
+    """Estimate t_j - t_i using band-limited GCC-PHAT.
 
-    Input channels must be synchronous and equal length. The search interval
-    is constrained by the physical microphone separation supplied by caller.
+    Interpolation is applied to the correlation function, not by computing the
+    source spectra on a longer zero-padded grid. This preserves the physical
+    lag scale while providing sub-sample peak resolution.
     """
     xi = np.asarray(channel_i, dtype=float)
     xj = np.asarray(channel_j, dtype=float)
@@ -179,36 +163,31 @@ def gcc_phat_pair_tdoa(channel_i: Sequence[float],
     xi *= window
     xj *= window
 
-    nfft = 1
-    target = len(xi) * 2
-    while nfft < target:
-        nfft <<= 1
-    nfft *= interp
+    base_nfft = 1
+    while base_nfft < len(xi) * 2:
+        base_nfft <<= 1
 
-    fi = np.fft.rfft(xi, n=nfft)
-    fj = np.fft.rfft(xj, n=nfft)
-    freq = np.fft.rfftfreq(nfft, d=1.0 / sample_rate_hz)
+    fi = np.fft.rfft(xi, n=base_nfft)
+    fj = np.fft.rfft(xj, n=base_nfft)
+    freq = np.fft.rfftfreq(base_nfft, d=1.0 / sample_rate_hz)
     lo, hi = band_hz
     if lo < 0 or hi <= lo or hi > sample_rate_hz / 2:
         raise ValueError("invalid band_hz")
-    mask = (freq >= lo) & (freq <= hi)
 
     cross = fi * np.conj(fj)
     denom = np.abs(cross)
+    good = (freq >= lo) & (freq <= hi) & (denom > 1e-12)
     phat = np.zeros_like(cross)
-    good = mask & (denom > 1e-12)
     phat[good] = cross[good] / denom[good]
 
-    cc = np.fft.irfft(phat, n=nfft)
+    corr_n = base_nfft * interp
+    cc = np.fft.irfft(phat, n=corr_n)
     max_shift = int(round(max_tau_s * sample_rate_hz * interp))
-    max_shift = min(max_shift, nfft // 2 - 1)
+    max_shift = min(max_shift, corr_n // 2 - 1)
     if max_shift < 1:
         raise ValueError("max_tau_s too small")
     search = np.concatenate((cc[-max_shift:], cc[:max_shift + 1]))
     shift = int(np.argmax(np.abs(search))) - max_shift
-
-    # The spectral convention above produces the lag of channel_i relative to
-    # channel_j. Protocol convention is t_j - t_i, hence the minus sign.
     return -float(shift) / (sample_rate_hz * interp)
 
 
@@ -218,7 +197,7 @@ def pairwise_gcc_phat(channels: Sequence[Sequence[float]],
                       speed_of_sound_mps: float = 343.0,
                       band_hz: tuple[float, float] = (80.0, 5000.0),
                       interp: int = 8) -> dict[Pair, float]:
-    """Compute six pair TDOAs for a four-channel 3+1 array."""
+    """Compute all pair TDOAs for the configured array."""
     g = _validate_geometry(geometry_m)
     if len(channels) != len(g):
         raise ValueError("number of channels must match geometry")
