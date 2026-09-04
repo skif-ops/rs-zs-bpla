@@ -20,7 +20,7 @@ summary_raw = subprocess.check_output([str(exe), "--summary"])
 summary = decode_detection_cbor(summary_raw)
 
 for msg in (full, summary):
-    assert msg.schema_ver == 2
+    assert msg.schema_ver == 3
     assert msg.station_id == 424242
     assert msg.event_id == 0x0102030405060708
     assert msg.gnss.pps_ok and msg.gnss.expected_time_error_us == 65
@@ -39,6 +39,15 @@ for msg in (full, summary):
     assert abs(single.speed_mps - 12.5) < 1e-6
     assert abs(single.speed_sigma_mps - 4.5) < 1e-6
     assert single.motion_hint == "APPROACH"
+    spatial = msg.spatial
+    assert spatial.tdoa_valid and spatial.direction_valid
+    assert spatial.geometry_id == 1
+    assert spatial.tdoa12_us == -117
+    assert spatial.tdoa13_us == 46
+    assert spatial.tdoa14_us == -311
+    assert spatial.residual_us == 7
+    assert spatial.confidence_u8 == 209
+    assert spatial.pair_tdoas_us["tdoa24_us"] == -194
 
 assert len(full.features) == 43 and abs(full.features[42] - 5.25) < 0.01
 assert summary.features == []
@@ -46,6 +55,6 @@ assert len(summary_raw) < 220, f"P0 LoRa summary too large: {len(summary_raw)} b
 assert len(full_raw) > len(summary_raw)
 
 print(
-    "firmware->server protocol v1.2 compact CBOR OK, "
+    "firmware->server protocol v1.3 compact CBOR OK, "
     f"P0 summary={len(summary_raw)} bytes, full={len(full_raw)} bytes"
 )
