@@ -107,6 +107,16 @@ typedef struct {
 } zs_doa_t;
 
 typedef struct {
+  int16_t tdoa12_us;
+  int16_t tdoa13_us;
+  int16_t tdoa14_us;
+  uint16_t residual_us;
+  uint8_t confidence_u8;
+  uint8_t geometry_id;
+  uint8_t valid_flags; /* bit0 reference TDOAs valid, bit1 direction valid */
+} zs_spatial_info_t;
+
+typedef struct {
   uint8_t battery_pct;
   uint16_t battery_mv, solar_mv;
   int16_t temperature_c10;
@@ -131,6 +141,7 @@ typedef struct {
   zs_single_station_estimate_t single_station;
   float features[ZS_FEATURE_COUNT];
   zs_doa_t doa;
+  zs_spatial_info_t spatial;
   zs_power_t power;
   zs_route_status_t route;
   uint16_t sample_rate_hz;
