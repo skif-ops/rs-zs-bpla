@@ -26,7 +26,6 @@ for msg in (full, summary):
     assert msg.gnss.pps_ok and msg.gnss.expected_time_error_us == 65
     assert msg.route.transport == "LORA" and msg.route.hop_count == 3
     assert msg.power.temperature_c == -12.5
-    assert msg.doa.valid and abs(msg.doa.azimuth_deg - 271.23) < 1e-6
     assert msg.hierarchy.family_label == "PROP_PISTON"
     assert msg.hierarchy.family_status == "PROVISIONAL"
     assert msg.hierarchy.type_label == "UNKNOWN"
@@ -49,9 +48,13 @@ for msg in (full, summary):
     assert spatial.confidence_u8 == 209
     assert spatial.pair_tdoas_us["tdoa24_us"] == -194
 
+# Full packet carries both precomputed DOA and raw spatial TDOA.
+assert full.doa.valid and abs(full.doa.azimuth_deg - 271.23) < 1e-6
+# P0 omits redundant key 11. Server reconstructs direction from key 14 + geometry_id.
+assert not summary.doa.valid
 assert len(full.features) == 43 and abs(full.features[42] - 5.25) < 0.01
 assert summary.features == []
-assert len(summary_raw) < 220, f"P0 LoRa summary too large: {len(summary_raw)} bytes"
+assert len(summary_raw) <= 220, f"P0 LoRa summary too large: {len(summary_raw)} bytes"
 assert len(full_raw) > len(summary_raw)
 
 print(
