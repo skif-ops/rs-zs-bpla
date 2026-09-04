@@ -7,6 +7,7 @@
 #define ZS_FEATURE_COUNT 43u
 #define ZS_MAX_LORA_HOPS 5u
 #define ZS_MODEL_MAX_CLASSES 16u
+#define ZS_SPATIAL_TDOA_COUNT 6u
 
 typedef enum {
   ZS_CLASS_UNKNOWN = 0,
@@ -107,6 +108,13 @@ typedef struct {
 } zs_doa_t;
 
 typedef struct {
+  int16_t tdoa_us[ZS_SPATIAL_TDOA_COUNT]; /* 12,13,14,23,24,34 */
+  uint8_t confidence_u8;
+  uint8_t geometry_quality_u8;
+  uint8_t flags; /* bit0 valid, bit1 upper hemisphere */
+} zs_spatial_info_t;
+
+typedef struct {
   uint8_t battery_pct;
   uint16_t battery_mv, solar_mv;
   int16_t temperature_c10;
@@ -131,6 +139,7 @@ typedef struct {
   zs_single_station_estimate_t single_station;
   float features[ZS_FEATURE_COUNT];
   zs_doa_t doa;
+  zs_spatial_info_t spatial;
   zs_power_t power;
   zs_route_status_t route;
   uint16_t sample_rate_hz;
