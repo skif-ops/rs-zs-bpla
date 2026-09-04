@@ -13,6 +13,7 @@ from station.schemas import (
     PowerStatus,
     RouteStatus,
     SingleStationEstimate,
+    SpatialInfo,
     StationPosition,
 )
 
@@ -124,6 +125,7 @@ def decode_detection_obj(obj: Any) -> DetectionMessage:
     doa = _as_map(obj.get(11))
     hierarchy = _as_map(obj.get(12))
     single = _as_map(obj.get(13))
+    spatial = _as_map(obj.get(14))
 
     raw_features = obj.get(9, b"")
     if raw_features and not isinstance(raw_features, (bytes, bytearray)):
@@ -139,6 +141,7 @@ def decode_detection_obj(obj: Any) -> DetectionMessage:
     family_id = int(hierarchy.get(0, 0))
     type_id = int(hierarchy.get(2, 0))
     valid_flags = int(single.get(5, 0))
+    spatial_flags = int(spatial.get(6, 0))
 
     return DetectionMessage(
         schema_ver=int(obj.get(0, 1)),
@@ -195,6 +198,16 @@ def decode_detection_obj(obj: Any) -> DetectionMessage:
             elevation_cdeg=int(doa.get(1, 0)),
             sigma_cdeg=int(doa.get(2, 18000)),
             valid=bool(doa.get(3, False)),
+        ),
+        spatial=SpatialInfo(
+            tdoa12_us=int(spatial.get(0, 0)),
+            tdoa13_us=int(spatial.get(1, 0)),
+            tdoa14_us=int(spatial.get(2, 0)),
+            residual_us=int(spatial.get(3, 0)),
+            confidence_u8=int(spatial.get(4, 0)),
+            geometry_id=int(spatial.get(5, 0)),
+            tdoa_valid=bool(spatial_flags & 0x01),
+            direction_valid=bool(spatial_flags & 0x02),
         ),
         power=PowerStatus(
             battery_pct=int(status.get(0, 0)),
