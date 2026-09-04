@@ -6,7 +6,7 @@ int main(int argc, char **argv) {
   zs_detection_t m;
   memset(&m, 0, sizeof(m));
 
-  m.schema_ver = 2;
+  m.schema_ver = 3;
   m.station_id = 424242;
   m.seq_no = 7;
   m.boot_id = 9;
@@ -57,6 +57,14 @@ int main(int argc, char **argv) {
   m.doa.azimuth_cdeg = 27123;
   m.doa.elevation_cdeg = 850;
   m.doa.sigma_cdeg = 600;
+
+  m.spatial.tdoa12_us = -117;
+  m.spatial.tdoa13_us = 46;
+  m.spatial.tdoa14_us = -311;
+  m.spatial.residual_us = 7;
+  m.spatial.confidence_u8 = 209;
+  m.spatial.geometry_id = 1;
+  m.spatial.valid_flags = 0x03u;
 
   unsigned char b[512];
   const bool summary = argc > 1 && strcmp(argv[1], "--summary") == 0;
