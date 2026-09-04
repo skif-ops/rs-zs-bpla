@@ -1,4 +1,4 @@
-"""Pydantic schemas for ZS-BPLA station protocol v1.2."""
+"""Pydantic schemas for ZS-BPLA station protocol v1.3."""
 from __future__ import annotations
 
 from enum import IntEnum
@@ -154,6 +154,39 @@ class DoaEstimate(BaseModel):
         return max(self.sigma_cdeg / 100.0, 0.1)
 
 
+class SpatialInfo(BaseModel):
+    """Compact 3+1 spatial payload.
+
+    TDOA convention is tau_1j = t_j - t_1 in microseconds. The three
+    independent reference delays are enough to solve a non-coplanar 3+1
+    geometry. The remaining pair delays are derived exactly on the server.
+    """
+
+    tdoa12_us: int = 0
+    tdoa13_us: int = 0
+    tdoa14_us: int = 0
+    residual_us: int = Field(default=0, ge=0)
+    confidence_u8: int = Field(default=0, ge=0, le=255)
+    geometry_id: int = Field(default=0, ge=0, le=255)
+    tdoa_valid: bool = False
+    direction_valid: bool = False
+
+    @property
+    def confidence(self) -> float:
+        return self.confidence_u8 / 255.0
+
+    @property
+    def pair_tdoas_us(self) -> dict[str, int]:
+        return {
+            "tdoa12_us": self.tdoa12_us,
+            "tdoa13_us": self.tdoa13_us,
+            "tdoa14_us": self.tdoa14_us,
+            "tdoa23_us": self.tdoa13_us - self.tdoa12_us,
+            "tdoa24_us": self.tdoa14_us - self.tdoa12_us,
+            "tdoa34_us": self.tdoa14_us - self.tdoa13_us,
+        }
+
+
 class PowerStatus(BaseModel):
     battery_pct: int = Field(default=0, ge=0, le=100)
     battery_mv: int = 0
@@ -194,6 +227,7 @@ class DetectionMessage(BaseModel):
     single_station_estimate: SingleStationEstimate = Field(default_factory=SingleStationEstimate)
     features: list[float] = Field(default_factory=list)
     doa: DoaEstimate = Field(default_factory=DoaEstimate)
+    spatial: SpatialInfo = Field(default_factory=SpatialInfo)
     power: PowerStatus = Field(default_factory=PowerStatus)
     route: RouteStatus = Field(default_factory=RouteStatus)
     audio_ref: AudioReference | None = None
