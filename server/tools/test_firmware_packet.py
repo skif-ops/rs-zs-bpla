@@ -20,7 +20,7 @@ summary_raw = subprocess.check_output([str(exe), "--summary"])
 summary = decode_detection_cbor(summary_raw)
 
 for msg in (full, summary):
-    assert msg.schema_ver == 2
+    assert msg.schema_ver == 3
     assert msg.station_id == 424242
     assert msg.event_id == 0x0102030405060708
     assert msg.gnss.pps_ok and msg.gnss.expected_time_error_us == 65
@@ -41,11 +41,18 @@ for msg in (full, summary):
     assert single.motion_hint == "APPROACH"
 
 assert len(full.features) == 43 and abs(full.features[42] - 5.25) < 0.01
+assert full.spatial.valid and full.spatial.upper_hemisphere
+assert full.spatial.tdoa_us == [-172, -83, 91, 89, 263, 174]
+assert full.spatial.confidence_u8 == 188
+assert full.spatial.geometry_quality_u8 == 224
+
+# P0 LoRa deliberately omits both 43 features and spatial diagnostics.
 assert summary.features == []
+assert summary.spatial.tdoa_us == [] and not summary.spatial.valid
 assert len(summary_raw) < 220, f"P0 LoRa summary too large: {len(summary_raw)} bytes"
 assert len(full_raw) > len(summary_raw)
 
 print(
-    "firmware->server protocol v1.2 compact CBOR OK, "
+    "firmware->server protocol v1.3 compact CBOR OK, "
     f"P0 summary={len(summary_raw)} bytes, full={len(full_raw)} bytes"
 )
