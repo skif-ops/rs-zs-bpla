@@ -29,8 +29,12 @@ def _geometry_mode(dets: list[DetectionMessage], frame: EnuFrame) -> tuple[str, 
     return 'FULL_3D','good' if ratio >= 0.25 else 'acceptable'
 
 def _tdoa_allowed(d: DetectionMessage) -> bool:
-    if d.time_status.quality != 'INVALID':
-        return d.time_status.tdoa_allowed and d.time_status.uncertainty_us <= 1000
+    # The approved wire schema 3 carries PPS state and expected time error in
+    # payload key 8.  Newer in-memory messages may also expose time_status.
+    # Keep both representations compatible during the EVT transition.
+    time_status = getattr(d, 'time_status', None)
+    if time_status is not None and time_status.quality != 'INVALID':
+        return time_status.tdoa_allowed and time_status.uncertainty_us <= 1000
     return d.gnss.pps_ok and d.gnss.expected_time_error_us <= 1000
 
 def _doa_point(dets: list[DetectionMessage], frame: EnuFrame):
