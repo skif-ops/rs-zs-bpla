@@ -1,9 +1,0 @@
-Model,Qty per station,Material,Orientation,Supports,Notes
-evt_electronics_base,1,ASA,floor on bed,No,"4 walls, 30% gyroid"
-evt_electronics_lid,1,ASA,outer face on bed,No,Use 3 mm gasket cord
-evt_battery_base,1,ASA,floor on bed,No,"4 walls, 30% gyroid"
-evt_battery_lid,1,ASA,outer face on bed,No,Use 3 mm gasket cord
-mic_pod_i2s_adjustable,4,ASA,floor on bed,No,Print 5 per station including one spare; port upward
-mic_array_base_120,1,ASA,flat,No,Triangle side 120 mm
-mic_upper_mast_150,1,ASA,mast vertical,"Yes, build plate only",Upper mic +150 mm
-pole_mount_half_40_60,2,ASA,flat face on bed,No,Use rubber shim and M6 hardware
