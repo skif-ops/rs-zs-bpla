@@ -1,0 +1,80 @@
+﻿Разъём;Контакт;Сигнал;Направление относительно carrier;Провод;Примечание
+J1;1;3V3;out;0,20-0,22 мм²;питание микрофона
+J1;2;GND;power;0,20-0,22 мм²;витая пара с 3V3
+J1;3;BCLK;out;0,20-0,22 мм²;витая пара с GND
+J1;4;GND;power;0,20-0,22 мм²;возврат BCLK
+J1;5;WS;out;0,20-0,22 мм²;витая пара с GND
+J1;6;GND;power;0,20-0,22 мм²;возврат WS
+J1;7;DATA_A;in;0,20-0,22 мм²;I2S, strap L/R=LEFT
+J1;8;GND/SHIELD;power;0,20-0,22 мм²;экран со стороны carrier
+J2;1;3V3;out;0,20-0,22 мм²;питание микрофона
+J2;2;GND;power;0,20-0,22 мм²;витая пара с 3V3
+J2;3;BCLK;out;0,20-0,22 мм²;витая пара с GND
+J2;4;GND;power;0,20-0,22 мм²;возврат BCLK
+J2;5;WS;out;0,20-0,22 мм²;витая пара с GND
+J2;6;GND;power;0,20-0,22 мм²;возврат WS
+J2;7;DATA_A;in;0,20-0,22 мм²;I2S, strap L/R=RIGHT
+J2;8;GND/SHIELD;power;0,20-0,22 мм²;экран со стороны carrier
+J3;1;3V3;out;0,20-0,22 мм²;питание микрофона
+J3;2;GND;power;0,20-0,22 мм²;витая пара с 3V3
+J3;3;BCLK;out;0,20-0,22 мм²;витая пара с GND
+J3;4;GND;power;0,20-0,22 мм²;возврат BCLK
+J3;5;WS;out;0,20-0,22 мм²;витая пара с GND
+J3;6;GND;power;0,20-0,22 мм²;возврат WS
+J3;7;DATA_B;in;0,20-0,22 мм²;I2S, strap L/R=LEFT
+J3;8;GND/SHIELD;power;0,20-0,22 мм²;экран со стороны carrier
+J4;1;3V3;out;0,20-0,22 мм²;питание микрофона
+J4;2;GND;power;0,20-0,22 мм²;витая пара с 3V3
+J4;3;BCLK;out;0,20-0,22 мм²;витая пара с GND
+J4;4;GND;power;0,20-0,22 мм²;возврат BCLK
+J4;5;WS;out;0,20-0,22 мм²;витая пара с GND
+J4;6;GND;power;0,20-0,22 мм²;возврат WS
+J4;7;DATA_B;in;0,20-0,22 мм²;I2S, strap L/R=RIGHT
+J4;8;GND/SHIELD;power;0,20-0,22 мм²;экран со стороны carrier
+J5;1;3V3;out;0,12-0,20 мм²;GNSS
+J5;2;GND;power;0,12-0,20 мм²;GNSS
+J5;3;GNSS_RX;out;0,12-0,20 мм²;PA2 → RX модуля
+J5;4;GNSS_TX;in;0,12-0,20 мм²;TX модуля → PA3
+J5;5;PPS;in;0,12-0,20 мм²;→ PB3/TIM2_CH2
+J5;6;NC/SHIELD;-;0,12-0,20 мм²;не соединять без проверки модуля
+J6;1;3V3;out;0,12-0,20 мм²;SX1262
+J6;2;GND;power;0,12-0,20 мм²;SX1262
+J6;3;SCK;out;0,12-0,20 мм²;PA5
+J6;4;MISO;in;0,12-0,20 мм²;PA6
+J6;5;MOSI;out;0,12-0,20 мм²;PA7
+J6;6;NSS;out;0,12-0,20 мм²;PB0
+J6;7;DIO1;in;0,12-0,20 мм²;PB2
+J6;8;BUSY;in;0,12-0,20 мм²;PB8
+J6;9;RESET;out;0,12-0,20 мм²;PB9
+J6;10;GND;power;0,12-0,20 мм²;возврат
+J7;1;3V3;out;0,12-0,20 мм²;microSD
+J7;2;GND;power;0,12-0,20 мм²;microSD
+J7;3;SCK;out;0,12-0,20 мм²;PA5
+J7;4;MISO;in;0,12-0,20 мм²;PA6
+J7;5;MOSI;out;0,12-0,20 мм²;PA7
+J7;6;CS;out;0,12-0,20 мм²;PA4
+J8;1;3V3;out;0,12-0,20 мм²;BLE
+J8;2;GND;power;0,12-0,20 мм²;BLE
+J8;3;BLE_RX;out;0,12-0,20 мм²;PB10 → RX модуля
+J8;4;BLE_TX;in;0,12-0,20 мм²;TX модуля → PB11
+J9;1;3V3;out;0,12-0,20 мм²;I2C
+J9;2;GND;power;0,12-0,20 мм²;I2C
+J9;3;SCL;bidirectional;0,12-0,20 мм²;PB13, pull-up 4,7 кОм
+J9;4;SDA;bidirectional;0,12-0,20 мм²;PB14, pull-up 4,7 кОм
+J10;1;GND;power;0,12-0,20 мм²;общая логическая земля
+J10;2;1V8_REF;in;0,12-0,20 мм²;опорный уровень EVB
+J10;3;BG95_RX;out;0,12-0,20 мм²;PB6 через U2 → MAIN_RXD
+J10;4;BG95_TX;in;0,12-0,20 мм²;MAIN_TXD через U2 → PB7
+J10;5;PWRKEY;open-drain;0,12-0,20 мм²;PB1 через Q1
+J10;6;RESET_N;open-drain;0,12-0,20 мм²;PB4 через Q2
+J10;7;STATUS;in;0,12-0,20 мм²;→ PB15, проверить уровень
+J10;8;DTR;out;0,12-0,20 мм²;PB12, сон/пробуждение
+J11;1;+5V;in;0,35 мм²;питание carrier/WeAct
+J11;2;GND;power;0,35 мм²;звездная земля
+J12;1;VTREF_3V3;out;0,08-0,12 мм²;ST-Link
+J12;2;SWDIO;bidirectional;0,08-0,12 мм²;PA13
+J12;3;GND;power;0,08-0,12 мм²;ST-Link
+J12;4;SWCLK;in;0,08-0,12 мм²;PA14
+J12;5;NRST;bidirectional;0,08-0,12 мм²;NRST
+J13;1;TAMPER;in;0,12-0,20 мм²;PC13/вход по принятой BSP карте
+J13;2;GND;power;0,12-0,20 мм²;геркон
