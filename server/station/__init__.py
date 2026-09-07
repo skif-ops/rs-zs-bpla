@@ -1,1 +1,1 @@
-"""ZS-BPLA station live-ingress package."""
+"""Network-station ingestion and event fusion for ZS-BPLA."""

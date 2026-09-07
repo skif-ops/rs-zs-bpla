@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "labels": {
+    "Лютый": {
+      "label": "Лютый",
+      "category": "drone",
+      "is_drone": true,
+      "image_path": null,
+      "description": "Предварительная обучающая выборка: используется при обучении модели, но не считается эталонной и исключена из контрольной валидации до накопления релевантной независимой выборки.",
+      "last_metadata": {
+        "category": "drone",
+        "is_drone": true,
+        "distance_min_m": null,
+        "distance_max_m": null,
+        "background": "полевой/городской пользовательский материал",
+        "flight_mode": "пролёт",
+        "notes": "Материалы пользователя используются в обучении как provisional-класс; не являются эталоном и не учитываются в контрольной accuracy/LOFO до dataset freeze.",
+        "dataset_role": "training_provisional"
+      },
+      "status": "training_provisional"
+    }
+  }
+}

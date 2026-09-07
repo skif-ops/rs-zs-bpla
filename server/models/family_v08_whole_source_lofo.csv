@@ -1,0 +1,25 @@
+source_file,label,expected_family,predicted_family,confidence,margin,correct
+uploads/981a53c2-2afc-493b-9bfd-81d8f5c713ee/______.mp3,FP-1,PROP_PISTON,PROP_PISTON,1.0,1.0,True
+dataset/raw/стрельба из бронетранспортера/fbc3a3f2-2261-429b-8562-c9bc4f77f71e/strelba-iz-bronetransportera.wav,стрельба,IMPULSE_BACKGROUND,UNKNOWN,0.449192,0.040346,False
+dataset/raw/городской транспорт/aa46862f-6fd2-412e-aace-5c3f61f4fb19/shum-gorodskogo-transporta.wav,городской транспорт,GROUND_ENGINE,UNKNOWN,0.341829,0.096733,False
+dataset/raw/цикады и насекомые/12d68760-dfb6-4f15-ab46-b3e1e3744391/elektronnyy-zvuk---atmosfera-s-cikadami.wav,цикады и насекомые,BIOLOGICAL_BACKGROUND,PROP_PISTON,0.506546,0.154027,False
+dataset/raw/трактор/5b92561d-c9b6-4b96-a5b6-e5668754e9e9/gusenichnyy-traktor-v-dvijenii.wav,трактор,GROUND_ENGINE,UNKNOWN,0.402051,0.081245,False
+dataset/raw/цикады и насекомые/c13c1f78-3cf4-477b-81ba-c2d7c4070200/inoplanetnaya-cikada-loop.wav,цикады и насекомые,BIOLOGICAL_BACKGROUND,PROP_PISTON,0.732639,0.534276,False
+dataset/raw/птицы/7a52d709-22f1-4581-acc4-6f3bed92f574/ivolga-severnaya-poet-oriole.wav,птицы,BIOLOGICAL_BACKGROUND,UNKNOWN,0.470856,0.121431,False
+dataset/raw/птицы/1c8e4815-0374-433a-ba9b-ca6000f0e256/ivolga.wav,птицы,BIOLOGICAL_BACKGROUND,UNKNOWN,0.386875,0.063134,False
+dataset/raw/птицы/46c34d73-566d-4db2-9dc4-973f78849f57/solovey-i-zaryanka-u-lesnogo-ruchya.wav,птицы,BIOLOGICAL_BACKGROUND,UNKNOWN,0.466308,0.138272,False
+dataset/raw/трактор/d16cbb7c-7af9-4141-931c-4889bcf5fcd9/staryy-traktor.wav,трактор,GROUND_ENGINE,UNKNOWN,0.416712,0.076151,False
+dataset/raw/стрельба/fc178a66-0a76-4bf4-8a22-b4cf6aa7ae6b/strelba-broneboynym-snaryadom.wav,стрельба,IMPULSE_BACKGROUND,UNKNOWN,0.465199,0.044405,False
+dataset/raw/природный фон/13777251-2b02-47df-8328-c426c5211132/derevenskaya-atmosfera-s-pticami-i-nasekomymi.wav,природный фон,BIOLOGICAL_BACKGROUND,UNKNOWN,0.447919,0.119585,False
+dataset/raw/птицы/d7543cb6-2179-4bd5-81f4-1a3958c7bf29/derevenskaya-atmosfera-s-raznymi-pticami-2.wav,птицы,BIOLOGICAL_BACKGROUND,BIOLOGICAL_BACKGROUND,0.520994,0.187133,True
+dataset/raw/птицы/97c3d208-bec6-4fb1-be0d-2b670ec47dd9/derevenskaya-atmosfera-s-raznymi-pticami.wav,птицы,BIOLOGICAL_BACKGROUND,UNKNOWN,0.422553,0.10287,False
+dataset/raw/DJI Mini 3 Pro/a22fef89-2716-44d5-abfb-733bd4c6b86b/dji_mini_3pro.wav,DJI Mini 3 Pro,ROTOR_ELECTRIC,NOT_EVALUABLE,0.0,0.0,
+dataset/raw/Лютый/lutyi_city_pass/lutyi_city_pass_0_10p5.wav,Лютый,PROP_PISTON,PROP_PISTON,1.0,1.0,True
+dataset/raw/Лютый/lutyi_daylight_pass/lutyi_daylight_pass_0_10.wav,Лютый,PROP_PISTON,PROP_PISTON,1.0,1.0,True
+dataset/raw/Лютый/lutyi_audio14/lutyi_audio14_full.wav,Лютый,PROP_PISTON,PROP_PISTON,1.0,1.0,True
+dataset/raw/Лютый/v06_user_sources/Лютый 3/Лютый 3.wav,Лютый,PROP_PISTON,PROP_PISTON,1.0,1.0,True
+dataset/raw/Лютый/v06_user_sources/Лютый 4/Лютый 4.wav,Лютый,PROP_PISTON,PROP_PISTON,1.0,1.0,True
+dataset/raw/Лютый/v06_user_sources/Лютый 5/Лютый 5.wav,Лютый,PROP_PISTON,PROP_PISTON,1.0,1.0,True
+dataset/raw/FP-1/v06_user_sources/FP-1/FP-1.wav,FP-1,PROP_PISTON,PROP_PISTON,1.0,1.0,True
+dataset/raw/FP-1/v06_user_sources/FP-1 (2)/FP-1 (2).wav,FP-1,PROP_PISTON,PROP_PISTON,1.0,1.0,True
+dataset/raw/FP-1/v06_user_sources/FP-1 3/FP-1 3.wav,FP-1,PROP_PISTON,PROP_PISTON,1.0,1.0,True

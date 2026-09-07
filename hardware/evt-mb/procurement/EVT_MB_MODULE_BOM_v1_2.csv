@@ -1,0 +1,18 @@
+﻿Поз.;Наименование;Кол-во;Поставщик;Требование;Наличие;Срок;Запрет замены;URL
+A1;WeAct STM32U585Cx Core Board, STM32U585CIU6;5;WeAct/маркетплейс;Точная маркировка MCU и одна ревизия;Проверить;≤7 дней целевой;Не заменять U575 без решения;https://github.com/WeActStudio/WeActStudio.STM32U585Cx_CoreBoard
+A2;I2S mic module: ICS-43434 HP или SPH0645LM4H-B, единая партия;20;Москва/маркетплейс;"I2S, 24 bit, SNR ≥65 dBA; один тип и одна ревизия на все станции";"Карточки обоих вариантов найдены; количество проверить";≤7 дней целевой;"Смешивание запрещено; INMP441 61 dBA неэквивалентен";https://market.yandex.ru/card/mems-mikrofonnyy-modul-ics-43434-i2s-33v/5649014618
+A3;Waveshare L76K Multi-GNSS module;5;Амперка/Амперкот Москва;GPS+GLONASS+BeiDou+QZSS, UART, 1PPS;Карточка найдена;≤7 дней проверить;GNSS без PPS запрещён;https://amperkot.ru/products/gnss_modul_waveshare_l76k_gps_beidou_glonass_i_qzss/40119505.html
+A4;Waveshare BG95-M3 Zero;5 (1+4);Ozon/Амперкот;"LTE Cat M1+NB2+EGPRS+GNSS; одна модель и ревизия";"1 шт. для станции №001; ещё 4 точных платы докупить";"первая ≤7 дней; остаток допускается позже";BG96/SIM7080 не подставлять;https://www.ozon.ru/product/plata-razrabotki-bg95-m3-zero-podderzhivaet-pozitsionirovanie-lte-egprs-i-gnss-dlya-iot-quecpython-5339846781/
+A5;SX1262 868 MHz SPI module with SMA/u.FL;5;ChipDip/московский поставщик;SX1262, 850–930 MHz, SPI, DIO1/BUSY/RESET;Проверить;≤7 дней;LLCC68/UART-модуль не эквивалентен;https://www.semtech.com/products/wireless-rf/lora-connect/sx1262
+A6;ESP32-C3 module/dev board as UART BLE 5.x coprocessor;5;ChipDip/Москва;BLE 5.x, UART 3,3 В, отключаемое питание;Проверить;≤7 дней;BLE 4.x не принимать;https://www.espressif.com/en/products/socs/esp32-c3
+A7;microSD SPI module 3,3 V + industrial 32 GB card;5;ChipDip/Москва;SPI, 3,3 V logic, FAT32;Проверить;≤7 дней;Не использовать модуль с 5 В divider на высокой скорости;
+A8;INA226 current/power monitor module;10;ChipDip/Москва;"I2C, шунт по ветви; 2 на станцию +2 запас";Проверить;≤7 дней;INA219 допустим только при том же диапазоне/точности;https://www.ti.com/product/INA226
+A9;Digital temperature sensor ±0,5 °C or better;5;ChipDip/Москва;I2C, −40…+85 °C минимум;Проверить;≤7 дней;DHTxx не эквивалентен;
+A10;Двусторонняя макетная плата с металлизацией ≥90×70 мм;5;ChipDip/Москва;Шаг 2,54 мм, FR-4;Проверить;≤7 дней;Беспаечная breadboard запрещена;
+P1;LiFePO4 pack 4S2P 12,8 V 12 Ah with BMS;4;Москва/аккумуляторный поставщик;"готовый pack; BMS balancing; charge inhibit <0 °C";Требует КП;≤7 дней желательно;Самостоятельная пайка банок запрещена;
+P2;Солнечная панель 10 W, Vmp 17–18 V;4;Москва;"наружная; кабель/MC4";Проверить;≤7 дней;Не входит в доказательство no-sun;
+P3;Solar charge controller for 4S LiFePO4;4;Москва;"12,8 V LiFePO4 profile; panel 18 V; ≥1 A; low-temp inhibit";"ОТКРЫТЫЙ ПОЛЕВОЙ GATE; первый bench EVT разрешён без solar";≤7 дней к полевому EVT;Контроллер только для 1S запрещён;
+P4;DC/DC buck 12,8→5,0 V ≥5 A;5;ChipDip/Москва;"пик ≥5 A; регулировка; КПД измерить";SY8205 module найден;склад Москва;Отдельная ветвь BG95;
+P5;DC/DC/LDO 5→3,3 V ≥1 A low-noise;5;ChipDip/Москва;ripple ≤30 mV under audio load;Проверить;≤7 дней;AMS1117 только после проверки шума;
+P6;Fuse 3 A + inline holder;5;ChipDip/Москва;на BAT+ у аккумулятора;Проверить;≤7 дней;4 рабочих +1 запас;
+M1;Комплект FDM деталей ASA;4 sets;собственная печать;FlashForge Adventurer 5M Pro;Модели выпущены;локально;IP65 только после испытания;

@@ -1,9 +1,9 @@
-"""Pydantic schemas for ZS-BPLA station protocol v1.1."""
+"""Pydantic schemas for ZS-BPLA station protocol v1.4."""
 from __future__ import annotations
 
 from enum import IntEnum
 from typing import Literal
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 FEATURE_COUNT = 43
 
@@ -67,6 +67,23 @@ class DoaEstimate(BaseModel):
     @property
     def sigma_deg(self) -> float: return max(self.sigma_cdeg / 100.0, 0.1)
 
+class TimeStatus(BaseModel):
+    source: Literal["NONE", "GNSS_PPS", "HOLDOVER", "NTP", "NITZ"] = "NONE"
+    quality: Literal["INVALID", "LOW", "MID", "HIGH"] = "INVALID"
+    uncertainty_us: int = Field(default=1_000_000, ge=0)
+
+    @property
+    def tdoa_allowed(self) -> bool:
+        return self.quality == "HIGH"
+
+class SpatialEstimate(BaseModel):
+    azimuth_cdeg: int = 0
+    elevation_cdeg: int = 0
+    sigma_azimuth_cdeg: int = 18000
+    sigma_elevation_cdeg: int = 18000
+    mic_health_mask: int = Field(default=0, ge=0, le=15)
+    valid: bool = False
+
 class PowerStatus(BaseModel):
     battery_pct: int = Field(default=0, ge=0, le=100)
     battery_mv: int = 0
@@ -101,6 +118,8 @@ class DetectionMessage(BaseModel):
     classification: Classification = Field(default_factory=Classification)
     features: list[float] = Field(default_factory=list)
     doa: DoaEstimate = Field(default_factory=DoaEstimate)
+    spatial: SpatialEstimate = Field(default_factory=SpatialEstimate)
+    time_status: TimeStatus = Field(default_factory=TimeStatus)
     power: PowerStatus = Field(default_factory=PowerStatus)
     route: RouteStatus = Field(default_factory=RouteStatus)
     audio_ref: AudioReference | None = None
@@ -116,6 +135,42 @@ class DetectionMessage(BaseModel):
         if value and len(value) != FEATURE_COUNT:
             raise ValueError(f"features must contain exactly {FEATURE_COUNT} values")
         return [float(v) for v in value]
+
+class FeatureUpdateMessage(BaseModel):
+    """MSG_FEATURES-equivalent update during one acoustic event/track."""
+
+    schema_ver: int = 1
+    station_id: int
+    seq_no: int
+    boot_id: int = 0
+    event_id: int
+    event_time_us: int
+    features: list[float]
+    acoustic_snr_db: float | None = None
+    detector_profile: Literal["piston", "reactive", "generic"] = "generic"
+    model_ver: str = "unknown"
+
+    @field_validator("features")
+    @classmethod
+    def validate_feature_update(cls, value: list[float]) -> list[float]:
+        if len(value) != FEATURE_COUNT:
+            raise ValueError(f"features must contain exactly {FEATURE_COUNT} values")
+        return [float(v) for v in value]
+
+
+class OnlineTypeStatusMessage(BaseModel):
+    station_id: int
+    event_id: int
+    elapsed_seconds: float = 0.0
+    best_label: str = "UNKNOWN"
+    confidence: float = 0.0
+    margin: float = 0.0
+    status: Literal["warming_up", "unknown", "provisional_candidate", "weak_candidate", "research_stable"] = "warming_up"
+    type_lock_allowed: bool = False
+    first_type_hypothesis_seconds: float | None = None
+    research_stable_seconds: float | None = None
+    model_version: str = "unknown"
+
 
 class HeartbeatMessage(BaseModel):
     station_id: int
@@ -167,6 +222,8 @@ class TargetEstimate(BaseModel):
     horizontal_error_m: float | None = None
     vertical_error_m: float | None = None
     localization_method: str = "insufficient_geometry"
+    localization_mode: Literal["SINGLE_DOA", "TWO_STATION_COARSE", "HYBRID_3_2D5D", "FULL_3D", "CORRIDOR"] = "SINGLE_DOA"
+    geometry_quality: Literal["invalid", "poor", "acceptable", "good"] = "invalid"
     quality: Literal["invalid", "low", "medium", "high"] = "invalid"
 
 class SystemEvent(BaseModel):

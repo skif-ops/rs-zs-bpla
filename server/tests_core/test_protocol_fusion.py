@@ -44,6 +44,7 @@ def _packet():
         9: struct.pack("<" + "e" * 43, *feats),
         10: {0: 77, 1: 12600, 2: 18800, 3: -55, 4: 0, 5: 0, 6: -71, 7: 95, 8: 0},
         11: {0: 1234, 1: 550, 2: 900, 3: True},
+        14: {0: -120, 1: 45, 2: -310, 3: 6, 4: 210, 5: 1, 6: 3},
     }
     return _enc(obj)
 
@@ -60,6 +61,11 @@ def test_compact_decoder_contract():
     assert msg.route.transport == "LTE"
     assert msg.power.temperature_c == -5.5
     assert msg.doa.valid
+    assert msg.spatial.tdoa_valid
+    assert msg.spatial.direction_valid
+    assert msg.spatial.geometry_id == 1
+    assert msg.spatial.tdoa14_us == -310
+    assert msg.spatial.pair_tdoas_us["tdoa24_us"] == -190
 
 
 def test_feature_count_rejected():

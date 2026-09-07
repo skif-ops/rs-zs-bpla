@@ -1,0 +1,33 @@
+{
+  "evaluable_sources": 23,
+  "correct_sources": 11,
+  "accuracy": 0.4782608695652174,
+  "unknown_sources": 10,
+  "not_evaluable_sources": 1,
+  "by_family": {
+    "BIOLOGICAL_BACKGROUND": {
+      "sources": 8,
+      "correct": 1,
+      "accuracy": 0.125,
+      "unknown": 5
+    },
+    "GROUND_ENGINE": {
+      "sources": 3,
+      "correct": 0,
+      "accuracy": 0.0,
+      "unknown": 3
+    },
+    "IMPULSE_BACKGROUND": {
+      "sources": 2,
+      "correct": 0,
+      "accuracy": 0.0,
+      "unknown": 2
+    },
+    "PROP_PISTON": {
+      "sources": 10,
+      "correct": 10,
+      "accuracy": 1.0,
+      "unknown": 0
+    }
+  }
+}

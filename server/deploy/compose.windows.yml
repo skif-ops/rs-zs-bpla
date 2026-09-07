@@ -1,0 +1,35 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto:2.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.dev.conf:/mosquitto/config/mosquitto.conf:ro
+  server:
+    build:
+      context: ..
+    restart: unless-stopped
+    environment:
+      ZS_MQTT_HOST: mqtt
+      ZS_MQTT_PORT: "1883"
+      ZS_TENANT: ${ZS_TENANT:-evt}
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ../data:/app/data
+      - ../output:/app/output
+    depends_on:
+      - mqtt
+  mqtt_bridge:
+    build:
+      context: ..
+    restart: unless-stopped
+    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "1883"]
+    environment:
+      ZS_TENANT: ${ZS_TENANT:-evt}
+    volumes:
+      - ../data:/app/data
+    depends_on:
+      - mqtt
+      - server

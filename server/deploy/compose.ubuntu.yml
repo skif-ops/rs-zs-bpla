@@ -1,0 +1,45 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto:2.0
+    restart: unless-stopped
+    ports:
+      - "8883:8883"
+    volumes:
+      - ./mosquitto/mosquitto.ubuntu.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/station_acl.conf:/mosquitto/config/station_acl.conf:ro
+      - ./tls:/mosquitto/certs:ro
+      - mqtt_data:/mosquitto/data
+  server:
+    build:
+      context: ..
+    restart: unless-stopped
+    environment:
+      ZS_MQTT_HOST: mqtt
+      ZS_MQTT_PORT: "8883"
+      ZS_MQTT_CA: /run/tls/ca.crt
+      ZS_MQTT_CERT: /run/tls/bridge.crt
+      ZS_MQTT_KEY: /run/tls/bridge.key
+      ZS_TENANT: ${ZS_TENANT:-evt}
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ../data:/app/data
+      - ../output:/app/output
+      - ./tls:/run/tls:ro
+    depends_on:
+      - mqtt
+  mqtt_bridge:
+    build:
+      context: ..
+    restart: unless-stopped
+    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--ca", "/run/tls/ca.crt", "--cert", "/run/tls/bridge.crt", "--key", "/run/tls/bridge.key"]
+    environment:
+      ZS_TENANT: ${ZS_TENANT:-evt}
+    volumes:
+      - ../data:/app/data
+      - ./tls:/run/tls:ro
+    depends_on:
+      - mqtt
+      - server
+volumes:
+  mqtt_data:

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Мухоед - главная{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>Мухоед</h1>
+  <p>Локальная офлайн-система анализа акустики БПЛА, классификации и TDOA-локализации.</p>
+</section>
+
+<div class="row g-4 action-grid">
+  <div class="col-md-6 col-xl-4">
+    <a class="action-card" href="/single">
+      <span class="action-title">Анализ одного файла</span>
+      <span class="action-text">WAV/MP3/M4A, FFT, спектрограмма, гармоники, акустический паспорт и JSON.</span>
+    </a>
+  </div>
+  <div class="col-md-6 col-xl-4">
+    <a class="action-card" href="/localization">
+      <span class="action-title">Локализация по нескольким микрофонам</span>
+      <span class="action-text">GCC-PHAT, TDOA, координаты источника, траектория, CSV и PNG.</span>
+    </a>
+  </div>
+  <div class="col-md-6 col-xl-4">
+    <a class="action-card" href="/dataset">
+      <span class="action-title">База звуков</span>
+      <span class="action-text">Размеченные записи, оконные признаки, обучение локальной модели классов.</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+Peripheral,Mode,Parameters,DMA,Interrupt
+RCC,HSE+LSE,HSE=25MHz;LSE=32768Hz,,
+SYS,Serial Wire,Debug=SWD,,
+SAI1_A,Master RX,32kHz;stereo;32-bit slots;24-bit data,DMA circular,Half+complete
+SAI1_B,Synchronous Slave RX,Sync to SAI1_A;stereo;32-bit slots;24-bit data,DMA circular,Half+complete
+TIM2,Input Capture CH2,PB3 rising edge;32-bit counter,DMA optional,CC2
+USART1,Asynchronous,115200 8N1 no flow control,RX circular,IDLE
+USART2,Asynchronous,9600 8N1,RX circular,IDLE
+USART3,Asynchronous,115200 8N1,RX circular,IDLE
+SPI1,Full Duplex Master,<=8MHz mode0,DMA TX/RX,optional
+I2C2,I2C,400kHz,,event+error
+USB_OTG_FS,Device only,CDC service console,,USB
+FATFS,User-defined,microSD over SPI1,,
+RTC,LSE,UTC holdover,,alarm

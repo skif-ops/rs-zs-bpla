@@ -1,0 +1,9 @@
+﻿Артикул;Назначение;Поставщик;Остаток;Срок;Статус;URL
+SXH-001T-P0.6;контакт JST XH;ChipDip;5268 шт. Москва;склад;PASS;https://www.chipdip.ru/product/sxh-001t-p0.6-kontakt-dlya-rozetok-xhp-jst-320005067
+МГТФ 0,12 мм²;монтажный провод;ChipDip;"карточка найдена; остаток проверить";≤7 дней целевой;CHECK;https://www.chipdip.ru/product/mgtf-0.12-kv-mm-provod-montazhnyy-za-1m-2-28604
+B6B-XH-A;header JST XH 6P;ChipDip;карточка найдена;≤7 дней целевой;CHECK;https://www.chipdip.ru/product/b6b-xh-a-vilka-pryamaya-na-platu-2.5mm-jst-9000018991
+BG95-M3 Zero;cellular EVB;Амперкот;1 шт. Москва по последней проверке;быстро, но недостаточно;FAIL QTY;https://amperkot.ru/products/plata_razrabotki_waveshare_bg95m3_zero_lte___egprs_gnss_pozitsionirovanie/41128767.html
+BG95-M3 Zero;cellular EVB;Ozon;карточка доступна;срок зависит от адреса;CHECK QTY/ETA;https://www.ozon.ru/product/plata-razrabotki-bg95-m3-zero-podderzhivaet-pozitsionirovanie-lte-egprs-i-gnss-dlya-iot-quecpython-5339846781/
+GY-SPH0645LM4H;I2S mic module;Амперкот;"5 шт. Санкт-Петербург; Москва нет";перемещение проверить;FAIL QTY;https://amperkot.ru/products/miniatyurnyiy_mems_mikrofon_gysph0645lm4h_i2s/39385789.html
+ICS-43434 module;I2S mic module;Яндекс Маркет;карточка Москва, быстрая доставка;количество проверить;CHECK QTY/REV;https://market.yandex.ru/card/mems-mikrofonnyy-modul-ics-43434-i2s-33v/5649014618
+L76K Multi-GNSS;GNSS UART+PPS;Амперкот;карточка Москва;≤7 дней проверить;CHECK QTY;https://amperkot.ru/products/gnss_modul_waveshare_l76k_gps_beidou_glonass_i_qzss/40119505.html

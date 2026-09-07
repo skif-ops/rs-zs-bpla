@@ -1,1 +1,1 @@
-"""Station-network fusion and tracking primitives."""
+"""Geodetic fusion and tracking for distributed ZS-BPLA stations."""

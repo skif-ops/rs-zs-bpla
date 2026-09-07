@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "policy": "v0.7",
+  "sources": {
+    "dataset/raw/Лютый/v06_user_sources/Лютый 3/Лютый 3.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "medium",
+      "recording_quality_score": 0.78,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "user_video_audio",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/v06_user_sources/Лютый 4/Лютый 4.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "medium",
+      "recording_quality_score": 0.776,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "user_video_audio",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/v06_user_sources/Лютый 5/Лютый 5.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "medium",
+      "recording_quality_score": 0.78,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "user_video_audio",
+      "validation_eligible": false
+    },
+    "dataset/raw/FP-1/v06_user_sources/FP-1/FP-1.wav": {
+      "label": "FP-1",
+      "dataset_role": "training_provisional_weak",
+      "recording_quality": "medium",
+      "recording_quality_score": 0.761,
+      "label_confidence": "weak",
+      "label_confidence_score": 0.4,
+      "source_origin": "user_video_audio",
+      "validation_eligible": false
+    },
+    "dataset/raw/FP-1/v06_user_sources/FP-1 (2)/FP-1 (2).wav": {
+      "label": "FP-1",
+      "dataset_role": "training_provisional_weak",
+      "recording_quality": "medium",
+      "recording_quality_score": 0.78,
+      "label_confidence": "weak",
+      "label_confidence_score": 0.4,
+      "source_origin": "user_video_audio",
+      "validation_eligible": false
+    },
+    "dataset/raw/FP-1/v06_user_sources/FP-1 3/FP-1 3.wav": {
+      "label": "FP-1",
+      "dataset_role": "training_provisional_weak",
+      "recording_quality": "medium",
+      "recording_quality_score": 0.78,
+      "label_confidence": "weak",
+      "label_confidence_score": 0.4,
+      "source_origin": "user_video_audio",
+      "validation_eligible": false
+    },
+    "uploads/981a53c2-2afc-493b-9bfd-81d8f5c713ee/______.mp3": {
+      "label": "FP-1",
+      "dataset_role": "training_provisional_weak",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "weak",
+      "label_confidence_score": 0.4,
+      "source_origin": "pre_v06_dataset",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/lutyi_audio14/lutyi_audio14_full.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "pre_v06_dataset",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/lutyi_city_pass/lutyi_city_pass_0_10p5.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "pre_v06_dataset",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/lutyi_daylight_pass/lutyi_daylight_pass_0_10.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "pre_v06_dataset",
+      "validation_eligible": false
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "config_schema_version": 14,
+  "device_serial": "DIO-EVP-001",
+  "station_id": 1,
+  "geometry_id": "G3P1-120-150-R01",
+  "audio": {
+    "sample_rate_hz": 32000,
+    "bits_per_sample": 24,
+    "channels": 4,
+    "frame_ms": 20
+  },
+  "gnss": {
+    "uart_baud": 9600,
+    "pps_required_for_high_time_quality": true
+  },
+  "bg95": {
+    "uart_baud": 115200,
+    "hardware_flow_control": false,
+    "apn": "CHANGE_ME",
+    "mqtt_host": "CHANGE_ME",
+    "mqtt_port": 8883,
+    "mqtt_tenant": "evt",
+    "mqtt_topic_up": "zs/v1/evt/1/up",
+    "mqtt_topic_status": "zs/v1/evt/1/status",
+    "mqtt_topic_down": "zs/v1/evt/1/down",
+    "tls_verify_server": true,
+    "tls_ca_file": "UFS:ca.crt",
+    "tls_client_cert_file": "UFS:station01.crt",
+    "tls_client_key_file": "UFS:station01.key"
+  },
+  "lora": {
+    "frequency_hz": 868100000,
+    "bandwidth_hz": 125000,
+    "spreading_factor": 9,
+    "tx_power_dbm": 14
+  },
+  "storage": {
+    "type": "microSD",
+    "max_event_files": 1000
+  }
+}

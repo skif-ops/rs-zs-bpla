@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Мухоед - результат локализации{% endblock %}
+{% block content %}
+<section class="page-header compact">
+  <h1>Результат локализации</h1>
+  <p>Анализ {{ report.analysis_id }}</p>
+</section>
+
+{% if report.warnings %}
+<div class="alert alert-warning">
+  {% for warning in report.warnings %}
+    <div>{{ warning }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="metrics-grid">
+  <div class="metric"><span>X</span><strong>{{ "%.2f"|format(report.position.x) }} м</strong></div>
+  <div class="metric"><span>Y</span><strong>{{ "%.2f"|format(report.position.y) }} м</strong></div>
+  <div class="metric"><span>Z</span><strong>{{ report.position.z if report.position.z is not none else "2D" }}</strong></div>
+  <div class="metric"><span>Confidence</span><strong>{{ "%.2f"|format(report.position.confidence) }}</strong></div>
+  <div class="metric"><span>Средняя скорость</span><strong>{{ report.summary.average_speed_mps }} м/с</strong></div>
+  <div class="metric"><span>Точек трека</span><strong>{{ report.summary.track_points }}</strong></div>
+</div>
+
+<div class="download-row">
+  <a class="btn btn-outline-primary" href="{{ download_url(report.report_json) }}">JSON</a>
+  <a class="btn btn-outline-primary" href="{{ download_url(report.track_json) }}">Track JSON</a>
+  <a class="btn btn-outline-primary" href="{{ download_url(report.track_csv) }}">CSV</a>
+  <a class="btn btn-outline-primary" href="{{ download_url(report.track_png) }}">PNG</a>
+</div>
+
+<div class="row g-4 mt-1">
+  <div class="col-lg-6">
+    <div class="card plot-card">
+      <div class="card-body">
+        <h2>Карта микрофонов</h2>
+        <img src="{{ artifact_url(report.plots.microphone_map) }}" alt="Карта микрофонов">
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card plot-card">
+      <div class="card-body">
+        <h2>Траектория</h2>
+        <img src="{{ artifact_url(report.plots.track) }}" alt="Траектория">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-body">
+    <h2>Интерактивный график</h2>
+    <iframe class="plot-frame" src="{{ artifact_url(report.plots.trajectory_html) }}" title="Trajectory"></iframe>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-body">
+    <h2>TDOA</h2>
+    <table class="table">
+      <thead>
+        <tr><th>Reference</th><th>Mic</th><th>Delay, s</th><th>Delta, m</th><th>Confidence</th></tr>
+      </thead>
+      <tbody>
+        {% for row in report.position.tdoa %}
+        <tr>
+          <td>{{ row.reference_mic_id }}</td>
+          <td>{{ row.microphone_id }}</td>
+          <td>{{ "%.6f"|format(row.delay_seconds) }}</td>
+          <td>{{ "%.3f"|format(row.distance_delta_m) }}</td>
+          <td>{{ "%.2f"|format(row.confidence) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card mt-4">
+  <div class="card-body">
+    <h2>Трек</h2>
+    <table class="table">
+      <thead>
+        <tr><th>t, s</th><th>x</th><th>y</th><th>speed</th><th>course</th><th>confidence</th></tr>
+      </thead>
+      <tbody>
+        {% for point in report.track[:30] %}
+        <tr>
+          <td>{{ point.time_seconds }}</td>
+          <td>{{ "%.2f"|format(point.x) }}</td>
+          <td>{{ "%.2f"|format(point.y) }}</td>
+          <td>{{ point.speed_mps if point.speed_mps is not none else "" }}</td>
+          <td>{{ point.course_deg if point.course_deg is not none else "" }}</td>
+          <td>{{ "%.2f"|format(point.confidence) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

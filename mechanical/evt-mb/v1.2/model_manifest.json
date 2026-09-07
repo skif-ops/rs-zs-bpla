@@ -1,0 +1,106 @@
+{
+  "printer": "FlashForge Adventurer 5M Pro",
+  "build_volume_mm": [
+    220,
+    220,
+    220
+  ],
+  "models": [
+    {
+      "name": "evt_electronics_base",
+      "triangles": 1108,
+      "bounds_mm": [
+        180,
+        140,
+        66.0
+      ],
+      "fits_ad5m_pro": true,
+      "stl": "evt_electronics_base.stl",
+      "3mf": "evt_electronics_base.3mf"
+    },
+    {
+      "name": "evt_electronics_lid",
+      "triangles": 60,
+      "bounds_mm": [
+        180,
+        140,
+        5.0
+      ],
+      "fits_ad5m_pro": true,
+      "stl": "evt_electronics_lid.stl",
+      "3mf": "evt_electronics_lid.3mf"
+    },
+    {
+      "name": "evt_battery_base",
+      "triangles": 1108,
+      "bounds_mm": [
+        180,
+        125,
+        108.0
+      ],
+      "fits_ad5m_pro": true,
+      "stl": "evt_battery_base.stl",
+      "3mf": "evt_battery_base.3mf"
+    },
+    {
+      "name": "evt_battery_lid",
+      "triangles": 60,
+      "bounds_mm": [
+        180,
+        125,
+        5.0
+      ],
+      "fits_ad5m_pro": true,
+      "stl": "evt_battery_lid.stl",
+      "3mf": "evt_battery_lid.3mf"
+    },
+    {
+      "name": "mic_pod_i2s_adjustable",
+      "triangles": 72,
+      "bounds_mm": [
+        28.0,
+        24.0,
+        8.0
+      ],
+      "fits_ad5m_pro": true,
+      "stl": "mic_pod_i2s_adjustable.stl",
+      "3mf": "mic_pod_i2s_adjustable.3mf"
+    },
+    {
+      "name": "mic_array_base_120",
+      "triangles": 892,
+      "bounds_mm": [
+        148.0,
+        127.92304845413267,
+        13.0
+      ],
+      "fits_ad5m_pro": true,
+      "stl": "mic_array_base_120.stl",
+      "3mf": "mic_array_base_120.3mf"
+    },
+    {
+      "name": "mic_upper_mast_150",
+      "triangles": 468,
+      "bounds_mm": [
+        28,
+        28,
+        163.0
+      ],
+      "fits_ad5m_pro": true,
+      "stl": "mic_upper_mast_150.stl",
+      "3mf": "mic_upper_mast_150.3mf"
+    },
+    {
+      "name": "pole_mount_half_40_60",
+      "triangles": 548,
+      "bounds_mm": [
+        80,
+        68.0,
+        12
+      ],
+      "fits_ad5m_pro": true,
+      "stl": "pole_mount_half_40_60.stl",
+      "3mf": "pole_mount_half_40_60.3mf"
+    }
+  ]
+}

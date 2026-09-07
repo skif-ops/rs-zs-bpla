@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% block title %}Мухоед - результат анализа{% endblock %}
+{% block content %}
+<section class="page-header compact">
+  <h1>Результат анализа</h1>
+  <p>{{ report.source_file.original_name }}</p>
+</section>
+
+{% if report.quality.warnings %}
+<div class="alert alert-warning">
+  {% for warning in report.quality.warnings %}
+    <div>{{ warning }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="metrics-grid">
+  <div class="metric">
+    <span>Вердикт</span>
+    <strong>{{ report.decision.display_label if report.decision else report.classification.best_match }}</strong>
+  </div>
+  <div class="metric">
+    <span>Уверенность</span>
+    <strong>{{ "%.1f"|format((report.decision.confidence if report.decision else report.classification.confidence) * 100) }}%</strong>
+  </div>
+  {% set sep = report.separation %}
+  {% if report.decision and report.decision.drone_present and sep and sep.fundamental_hz > 0 %}
+  <div class="metric"><span>Основная частота (blade-pass)</span><strong>{{ "%.1f"|format(sep.fundamental_hz) }} Гц</strong></div>
+  <div class="metric"><span>Гармоники</span><strong>{{ sep.harmonic_count }}</strong></div>
+  <div class="metric"><span>Шаг гармоник</span><strong>{{ "%.1f"|format(sep.fundamental_hz) }} Гц</strong></div>
+  <div class="metric"><span>Стабильность</span><strong>{{ "%.2f"|format(1 - sep.steadiness_cv) }}</strong></div>
+  {% else %}
+  <div class="metric"><span>Основная частота</span><strong>{{ "%.1f"|format(report.features.fundamental_hz) }} Гц</strong></div>
+  <div class="metric"><span>Гармоники</span><strong>{{ report.features.harmonic_count }}</strong></div>
+  <div class="metric"><span>Шаг гармоник</span><strong>{{ "%.1f"|format(report.features.harmonic_step_hz) }} Гц</strong></div>
+  <div class="metric"><span>Стабильность</span><strong>{{ "%.2f"|format(report.features.harmonic_stability) }}</strong></div>
+  {% endif %}
+</div>
+
+<div class="card mt-4">
+  <div class="card-body">
+    <h2>Текстовое объяснение</h2>
+    <p>{{ report.decision.explanation if report.decision else report.classification.explanation }}</p>
+    <a class="btn btn-outline-primary" href="{{ download_url(report.report_json) }}">Скачать JSON</a>
+  </div>
+</div>
+
+{% if report.separation %}
+<div class="card mt-4">
+  <div class="card-body">
+    <h2>Разделение источников (БПЛА / шум)</h2>
+    {% if report.decision and report.decision.drone_present %}
+      {% if report.decision.conflict %}
+      <div class="alert alert-warning">
+        <strong>Обнаружен фоновый БПЛА под громким фоном.</strong>
+        Передний план: {{ report.decision.dominant_source }}
+        ({{ "%.0f"|format(report.decision.dominant_confidence * 100) }}%).
+        Громкий фон не подавляет детекцию дрона — требуется проверка оператором.
+      </div>
+      {% else %}
+      <div class="alert alert-warning"><strong>БПЛА обнаружен в записи.</strong></div>
+      {% endif %}
+    {% else %}
+      <p class="text-muted">Устойчивый гармонический источник под шумом не выделен.</p>
+    {% endif %}
+    <div class="metrics-grid">
+      <div class="metric"><span>Дрон в записи</span><strong>{{ "да" if report.separation.drone_present else "нет" }}</strong></div>
+      <div class="metric"><span>Уверенность</span><strong>{{ "%.0f"|format(report.separation.confidence * 100) }}%</strong></div>
+      <div class="metric"><span>F0 (гребёнка)</span><strong>{{ "%.1f"|format(report.separation.fundamental_hz) }} Гц</strong></div>
+      <div class="metric"><span>Громкая линия</span><strong>{{ "%.1f"|format(report.separation.dominant_harmonic_hz) }} Гц</strong></div>
+      <div class="metric"><span>Присутствие</span><strong>{{ "%.0f"|format(report.separation.persistence * 100) }}% окон</strong></div>
+      <div class="metric"><span>Гарм. SNR</span><strong>{{ "%.1f"|format(report.separation.harmonic_snr_db) }} дБ</strong></div>
+      <div class="metric"><span>Стабильность (CV)</span><strong>{{ "%.1f"|format(report.separation.steadiness_cv * 100) }}%</strong></div>
+      <div class="metric"><span>Разделение</span><strong>{{ "%.1f"|format(report.separation.separation_gain_db) }} дБ</strong></div>
+    </div>
+    <p class="mt-3">{{ report.separation.explanation }}</p>
+    <p class="text-muted">Гипотеза источника (подсказка, не вердикт): {{ report.separation.likely_source }}.</p>
+    {% if report.separation.construction %}
+    <h3 class="mt-4">Признаки конструкции (к распознаванию типа)</h3>
+    <div class="metrics-grid">
+      <div class="metric"><span>Привод</span><strong>
+        {%- if report.separation.construction.propulsion == "electric" %}электро
+        {%- elif report.separation.construction.propulsion == "combustion" %}ДВС
+        {%- else %}неясно{% endif %}
+        ({{ "%.0f"|format(report.separation.construction.propulsion_confidence * 100) }}%)</strong></div>
+      <div class="metric"><span>Blade-pass</span><strong>{{ "%.1f"|format(report.separation.construction.blade_pass_hz) }} Гц</strong></div>
+      <div class="metric"><span>Обороты</span><strong>~{{ "%.0f"|format(report.separation.construction.rotor_rpm) }} об/мин</strong></div>
+      <div class="metric"><span>Роторов (оценка)</span><strong>~{{ report.separation.construction.rotor_count_estimate }}</strong></div>
+      <div class="metric"><span>Лопастей (оценка)</span><strong>{{ report.separation.construction.blade_count_estimate or "—" }}</strong></div>
+      <div class="metric"><span>Полу-порядки</span><strong>{{ "%.2f"|format(report.separation.construction.half_order_ratio) }}</strong></div>
+    </div>
+    <p class="text-muted mt-2">{{ report.separation.construction.summary }} Это предварительные акустические признаки, не итоговая модель дрона.</p>
+    {% endif %}
+    {% if report.separation.isolated_audio %}
+    <div class="row g-4 mt-1">
+      <div class="col-lg-6">
+        <h3>Выделенный звук дрона</h3>
+        <audio controls preload="none" style="width: 100%">
+          <source src="{{ artifact_url(report.separation.isolated_audio) }}" type="audio/wav">
+        </audio>
+        <a class="btn btn-outline-primary mt-2" href="{{ download_url(report.separation.isolated_audio) }}">Скачать</a>
+      </div>
+      <div class="col-lg-6">
+        <h3>Остаток (шум)</h3>
+        <audio controls preload="none" style="width: 100%">
+          <source src="{{ artifact_url(report.separation.residual_audio) }}" type="audio/wav">
+        </audio>
+        <a class="btn btn-outline-primary mt-2" href="{{ download_url(report.separation.residual_audio) }}">Скачать</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% if report.ml_classification %}
+<div class="card mt-4">
+  <div class="card-body">
+    <h2>Локальная модель</h2>
+    <div class="metrics-grid">
+      <div class="metric"><span>Класс</span><strong>{{ report.ml_classification.best_label }}</strong></div>
+      <div class="metric"><span>Уверенность</span><strong>{{ "%.1f"|format(report.ml_classification.confidence * 100) }}%</strong></div>
+      <div class="metric"><span>Классы модели</span><strong>{{ report.ml_classification.labels_total }}</strong></div>
+      <div class="metric"><span>Окна модели</span><strong>{{ report.ml_classification.samples_total }}</strong></div>
+    </div>
+    <p class="mt-3">{{ report.ml_classification.explanation }}</p>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Кластер</th>
+          <th>Балл</th>
+          <th>Дистанция</th>
+          <th>Окон</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for score in report.ml_classification.scores %}
+        <tr>
+          <td>{{ score.label }}</td>
+          <td>{{ "%.3f"|format(score.score) }}</td>
+          <td>{{ "%.2f"|format(score.distance) }}</td>
+          <td>{{ score.samples }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if report.plots %}
+<div class="row g-4 mt-1">
+  <div class="col-lg-6">
+    <div class="card plot-card">
+      <div class="card-body">
+        <h2>Спектрограмма</h2>
+        <img src="{{ artifact_url(report.plots.spectrogram) }}" alt="Спектрограмма">
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card plot-card">
+      <div class="card-body">
+        <h2>FFT</h2>
+        <img src="{{ artifact_url(report.plots.fft) }}" alt="FFT">
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card plot-card">
+      <div class="card-body">
+        <h2>Гармоники</h2>
+        <img src="{{ artifact_url(report.plots.harmonics) }}" alt="Гармоники">
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card plot-card">
+      <div class="card-body">
+        <h2>F0 во времени</h2>
+        <img src="{{ artifact_url(report.plots.fundamental_track) }}" alt="F0">
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if not report.decision or not report.decision.suppress_drone_profile %}
+<div class="card mt-4">
+  <div class="card-body">
+    <h2>Акустический паспорт</h2>
+    <table class="table">
+      <tbody>
+        <tr><th>Тип</th><td>{{ report.passport.drone_type }}</td></tr>
+        <tr><th>Основная частота</th><td>{{ report.passport.fundamental_hz }} Гц</td></tr>
+        <tr><th>Количество гармоник</th><td>{{ report.passport.harmonic_count }}</td></tr>
+        <tr><th>Средний шаг</th><td>{{ report.passport.harmonic_step_hz }} Гц</td></tr>
+        <tr><th>Стабильность</th><td>{{ report.passport.stability }}</td></tr>
+        <tr><th>Шум 6-10 кГц</th><td>{{ report.passport.high_band_noise }}</td></tr>
+        <tr><th>FM</th><td>{{ report.passport.frequency_modulation }}</td></tr>
+        <tr><th>Доплер</th><td>{{ report.passport.doppler }}</td></tr>
+        <tr><th>Вероятность</th><td>{{ report.passport.probability_percent }}%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

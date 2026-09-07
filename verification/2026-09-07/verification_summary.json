@@ -1,0 +1,22 @@
+{
+  "date": "2026-09-07",
+  "project": "Dioneya / RS ZS-BPLA",
+  "status": "OPEN",
+  "checks": {
+    "evt_mb_structural": {"passed": 44, "failed": 0},
+    "firmware_c11_strict_build": "PASS",
+    "firmware_host_test": "PASS",
+    "firmware_packet_bytes": 240,
+    "firmware_packet_limit_bytes": 272,
+    "server_compileall": "PASS",
+    "server_dependency_light_tests": {"passed": 37, "failed": 0},
+    "server_full_pytest": "BLOCKED_MISSING_PYTEST_AND_HTTPX2",
+    "audio_verified_uav_files": 3,
+    "audio_true_positive_files": 3,
+    "audio_positive_windows": 15,
+    "audio_total_windows": 15,
+    "operational_type": "UNKNOWN"
+  },
+  "hardware_not_run": ["PDM_I2S", "GNSS_PPS", "BG95_TLS", "RF", "ENERGY_S0_S4"]
+}
+

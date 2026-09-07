@@ -8,13 +8,11 @@ class ConstantVelocityKalman3D:
         self.p: np.ndarray | None = None
         self.t: float | None = None
         self.q_accel = float(process_accel_sigma) ** 2
-
     def _predict_matrices(self, dt: float):
         f=np.eye(6); f[0,3]=dt; f[1,4]=dt; f[2,5]=dt
         g=np.array([[0.5*dt*dt,0,0],[0,0.5*dt*dt,0],[0,0,0.5*dt*dt],[dt,0,0],[0,dt,0],[0,0,dt]],float)
         q=g @ (np.eye(3)*self.q_accel) @ g.T
         return f,q
-
     def update(self, pos_enu: np.ndarray, t_seconds: float, sigma_m: float = 80.0) -> np.ndarray:
         z=np.asarray(pos_enu,dtype=float).reshape(3)
         if self.x is None:
@@ -26,7 +24,6 @@ class ConstantVelocityKalman3D:
         y=z-h@self.x; s=h@self.p@h.T+r; k=self.p@h.T@np.linalg.inv(s)
         self.x=self.x+k@y; self.p=(np.eye(6)-k@h)@self.p
         return self.x.copy()
-
     def predict(self, t_seconds: float) -> np.ndarray | None:
         if self.x is None or self.t is None: return None
         dt=max(t_seconds-self.t,0.0); f,_=self._predict_matrices(dt); return f@self.x

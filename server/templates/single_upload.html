@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Мухоед - анализ аудио{% endblock %}
+{% block content %}
+<section class="page-header compact">
+  <h1>Анализ одного файла</h1>
+  <p>Загрузите запись БПЛА или контрольный аудиофайл для построения акустического профиля.</p>
+</section>
+
+<form class="upload-panel" action="/single/analyze" method="post" enctype="multipart/form-data">
+  <label class="form-label" for="wav_file">WAV, MP3 или M4A файл</label>
+  <input class="form-control form-control-lg" id="wav_file" name="wav_file" type="file" accept=".wav,.mp3,.m4a,.aac,audio/wav,audio/mpeg,audio/mp4,audio/aac" required>
+  <button class="btn btn-primary btn-lg mt-3" type="submit">Анализировать</button>
+</form>
+{% endblock %}

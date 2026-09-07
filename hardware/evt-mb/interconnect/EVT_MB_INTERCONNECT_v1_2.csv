@@ -1,0 +1,28 @@
+﻿ID;Сигнал;Источник;Назначение;Домен;Монтаж;Приёмка
+N001;MIC_BCLK;PA8;J-MIC1..4/3;3,3 В;22–33 Ω у PA8;осциллограмма 2,048 МГц
+N002;MIC_WS;PA9;J-MIC1..4/5;3,3 В;общий WS 32 кГц;4 канала синхронны
+N003;MIC_DATA_A;PA10;J-MIC1,2/7;3,3 В;"MIC1 L; MIC2 R";каналы 0/1 различимы
+N004;MIC_DATA_B;PB5;J-MIC3,4/7;3,3 В;"MIC3 L; MIC4 R";каналы 2/3 различимы
+N005;GNSS_TX;PA2;J-GNSS/3 RX;3,3 В;UART;команды приняты
+N006;GNSS_RX;PA3;J-GNSS/4 TX;3,3 В;UART;NMEA/binary stream
+N007;GNSS_PPS;PB3;J-GNSS/5 PPS;3,3 В;TIM2_CH2;capture без пропусков
+N008;BG95_TX;PB6;J-BG95/3 RX;3,3↔1,8 В;translator;AT/data PASS
+N009;BG95_RX;PB7;J-BG95/4 TX;1,8↔3,3 В;translator;AT/data PASS
+N010;BG95_PWRKEY;PB1;J-BG95/5;OD;N-MOS/transistor;power cycle
+N011;BG95_RESET;PB4;J-BG95/6;OD;N-MOS/transistor;reset
+N012;BG95_STATUS;PB15;J-BG95/7;verify;divider/translator if needed;state log
+N013;BG95_DTR;PB12;J-BG95/8;verify;sleep line;sleep/wake
+N014;BLE_TX;PB10;J-BLE/3;3,3 В;UART;GATT bridge
+N015;BLE_RX;PB11;J-BLE/4;3,3 В;UART;GATT bridge
+N016;SPI_SCK;PA5;"J-LORA/3; J-SD/3";3,3 В;≤8 МГц;readback
+N017;SPI_MISO;PA6;"J-LORA/4; J-SD/4";3,3 В;shared;readback
+N018;SPI_MOSI;PA7;"J-LORA/5; J-SD/5";3,3 В;shared;write
+N019;LORA_NSS;PB0;J-LORA/6;3,3 В;отдельный CS;RU868 packet
+N020;LORA_DIO1;PB2;J-LORA/7;3,3 В;EXTI;IRQ
+N021;LORA_BUSY;PB8;J-LORA/8;3,3 В;input;timeout
+N022;LORA_RESET;PB9;J-LORA/9;3,3 В;output;reset
+N023;SD_NSS;PA4;J-SD/6;3,3 В;отдельный CS;FAT32 R/W
+N024;I2C_SCL;PB13;J-I2C/3;3,3 В;pull-up;scan
+N025;I2C_SDA;PB14;J-I2C/4;3,3 В;pull-up;scan
+N026;BAT+;BAT/BMS+;F1→XT30→PWR-IN;12,8 В;"0,75 мм²; F1=3 A";полярность/падение
+N027;MODEM_5V;DC/DC 5 В;XT30→BG95 PWR;5 В;"0,75 мм²; ≤150 мм";просадка ≥2 A pulse
