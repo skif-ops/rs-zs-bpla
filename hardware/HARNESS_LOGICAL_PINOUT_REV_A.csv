@@ -1,24 +1,28 @@
 Interface,Connector_Ref,Pin,Net,Direction_at_MAIN,Nominal_voltage,Current_class,Wire_rule,Shield_pair_rule,Keying_requirement,Release_status,Notes
-MIC1,J_MIC1,1,1V8_MIC,OUT,1.8V,LOW,AWG28_or_larger,Route_with_GND,KEYED,LOGICAL_FROZEN,Same 5-pin physical order on all MIC connectors
-MIC1,J_MIC1,2,GND,RETURN,0V,LOW,AWG28_or_larger,Return_for_1V8_PDM_WAKE,KEYED,LOGICAL_FROZEN,
+MIC1,J_MIC1,1,1V8_MIC,OUT,1.8V,LOW,AWG28_or_larger,Route_with_GND,KEYED,LOGICAL_FROZEN,Same 6-pin physical order on all MIC connectors
+MIC1,J_MIC1,2,GND,RETURN,0V,LOW,AWG28_or_larger,Return_for_1V8_PDM_WAKE_CFG,KEYED,LOGICAL_FROZEN,
 MIC1,J_MIC1,3,PDM_CLK,OUT,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,Series damping footprint at source
 MIC1,J_MIC1,4,PDM_DATA1,IN,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
 AAD_WAKE1,J_MIC1,5,MIC_WAKE1,IN,1.8V_logic,LOW,AWG28_or_larger,Route_with_GND_avoid_PDM_clk_crosstalk,KEYED,LOGICAL_FROZEN,T5838 AAD WAKE output preserved for low-power acoustic wake
+AAD_CFG1,J_MIC1,6,AAD_CFG,OUT,1.8V_one_wire,LOW,AWG28_or_larger,Route_with_GND_avoid_PDM_clk_crosstalk,KEYED,LOGICAL_FROZEN,Common T5838 THSEL one-wire configuration bus; same write applied to all four microphones
 MIC2,J_MIC2,1,1V8_MIC,OUT,1.8V,LOW,AWG28_or_larger,Route_with_GND,KEYED,LOGICAL_FROZEN,
-MIC2,J_MIC2,2,GND,RETURN,0V,LOW,AWG28_or_larger,Return_for_1V8_PDM_WAKE,KEYED,LOGICAL_FROZEN,
+MIC2,J_MIC2,2,GND,RETURN,0V,LOW,AWG28_or_larger,Return_for_1V8_PDM_WAKE_CFG,KEYED,LOGICAL_FROZEN,
 MIC2,J_MIC2,3,PDM_CLK,OUT,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
 MIC2,J_MIC2,4,PDM_DATA2,IN,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
 AAD_WAKE2,J_MIC2,5,MIC_WAKE2,IN,1.8V_logic,LOW,AWG28_or_larger,Route_with_GND_avoid_PDM_clk_crosstalk,KEYED,LOGICAL_FROZEN,T5838 AAD WAKE output
+AAD_CFG2,J_MIC2,6,AAD_CFG,OUT,1.8V_one_wire,LOW,AWG28_or_larger,Route_with_GND_avoid_PDM_clk_crosstalk,KEYED,LOGICAL_FROZEN,Common T5838 THSEL one-wire configuration bus
 MIC3,J_MIC3,1,1V8_MIC,OUT,1.8V,LOW,AWG28_or_larger,Route_with_GND,KEYED,LOGICAL_FROZEN,
-MIC3,J_MIC3,2,GND,RETURN,0V,LOW,AWG28_or_larger,Return_for_1V8_PDM_WAKE,KEYED,LOGICAL_FROZEN,
+MIC3,J_MIC3,2,GND,RETURN,0V,LOW,AWG28_or_larger,Return_for_1V8_PDM_WAKE_CFG,KEYED,LOGICAL_FROZEN,
 MIC3,J_MIC3,3,PDM_CLK,OUT,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
 MIC3,J_MIC3,4,PDM_DATA3,IN,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
 AAD_WAKE3,J_MIC3,5,MIC_WAKE3,IN,1.8V_logic,LOW,AWG28_or_larger,Route_with_GND_avoid_PDM_clk_crosstalk,KEYED,LOGICAL_FROZEN,T5838 AAD WAKE output
+AAD_CFG3,J_MIC3,6,AAD_CFG,OUT,1.8V_one_wire,LOW,AWG28_or_larger,Route_with_GND_avoid_PDM_clk_crosstalk,KEYED,LOGICAL_FROZEN,Common T5838 THSEL one-wire configuration bus
 MIC4,J_MIC4,1,1V8_MIC,OUT,1.8V,LOW,AWG28_or_larger,Route_with_GND,KEYED,LOGICAL_FROZEN,
-MIC4,J_MIC4,2,GND,RETURN,0V,LOW,AWG28_or_larger,Return_for_1V8_PDM_WAKE,KEYED,LOGICAL_FROZEN,
+MIC4,J_MIC4,2,GND,RETURN,0V,LOW,AWG28_or_larger,Return_for_1V8_PDM_WAKE_CFG,KEYED,LOGICAL_FROZEN,
 MIC4,J_MIC4,3,PDM_CLK,OUT,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
 MIC4,J_MIC4,4,PDM_DATA4,IN,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
 AAD_WAKE4,J_MIC4,5,MIC_WAKE4,IN,1.8V_logic,LOW,AWG28_or_larger,Route_with_GND_avoid_PDM_clk_crosstalk,KEYED,LOGICAL_FROZEN,T5838 AAD WAKE output
+AAD_CFG4,J_MIC4,6,AAD_CFG,OUT,1.8V_one_wire,LOW,AWG28_or_larger,Route_with_GND_avoid_PDM_clk_crosstalk,KEYED,LOGICAL_FROZEN,Common T5838 THSEL one-wire configuration bus
 MAIN_PWR,J_PWR,1,3V8_MODEM,IN,3.8V,HIGH,AWG20_or_larger,Dedicated_return_pin_2,KEYED_LATCH,LOGICAL_FROZEN,Final gauge from measured burst current and length
 MAIN_PWR,J_PWR,2,GND_MODEM,RETURN,0V,HIGH,AWG20_or_larger,Dedicated_return_for_3V8,KEYED_LATCH,LOGICAL_FROZEN,
 MAIN_PWR,J_PWR,3,3V3_DIGITAL,IN,3.3V,MEDIUM,AWG22_or_larger,Dedicated_return_pin_4,KEYED_LATCH,LOGICAL_FROZEN,
