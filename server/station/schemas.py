@@ -1,4 +1,4 @@
-"""Pydantic schemas for ZS-BPLA station protocol v1.3."""
+"""Pydantic schemas for ZS-BPLA station protocol v1.4."""
 from __future__ import annotations
 
 from enum import IntEnum
@@ -42,6 +42,21 @@ class SpecificType(IntEnum):
 
 DecisionStatus = Literal["UNKNOWN", "CANDIDATE", "PROVISIONAL", "STABLE", "UNSUPPORTED"]
 MotionHint = Literal["UNKNOWN", "APPROACH", "PASSING", "RECEDING"]
+PositionSource = Literal["gnss_live", "configured_install"]
+PositionTrustState = Literal[
+    "UNCONFIGURED",
+    "CONFIGURED_OK",
+    "CONFIGURED_WARN",
+    "CONFIGURED_SUSPECT",
+    "REVALIDATION_REQUIRED",
+]
+TimeTrustState = Literal[
+    "UNKNOWN",
+    "GNSS_TIME_TRUSTED",
+    "HOLDOVER",
+    "GNSS_TIME_SUSPECT",
+    "UNSYNCED",
+]
 
 
 class StationPosition(BaseModel):
@@ -50,6 +65,7 @@ class StationPosition(BaseModel):
     alt_dm: int
     pos_accuracy_m: float = 20.0
     altitude_source: Literal["gnss_msl", "configured_msl", "unknown"] = "gnss_msl"
+    position_source: PositionSource = "gnss_live"
 
     @property
     def lat(self) -> float:
@@ -72,6 +88,13 @@ class GnssStatus(BaseModel):
     expected_time_error_us: int = 1_000_000
     jam: bool = False
     spoof: bool = False
+    position_delta_m: int = Field(default=0, ge=0)
+    position_warn: bool = False
+    position_suspect: bool = False
+    time_suspect: bool = False
+    time_holdover: bool = False
+    position_trust: PositionTrustState = "UNCONFIGURED"
+    time_trust: TimeTrustState = "UNKNOWN"
 
 
 class Classification(BaseModel):
@@ -282,6 +305,7 @@ class HeartbeatMessage(BaseModel):
     time_us: int
     station: StationPosition
     gnss: GnssStatus = Field(default_factory=GnssStatus)
+    gnss_observed: StationPosition | None = None
     power: PowerStatus = Field(default_factory=PowerStatus)
     route: RouteStatus = Field(default_factory=RouteStatus)
     firmware_ver: str = "0.0.0"
@@ -299,7 +323,17 @@ class SecurityEventMessage(BaseModel):
     event_id: int
     event_time_us: int
     station: StationPosition
-    reason: Literal["case_open", "movement", "tilt", "power_loss", "other"]
+    reason: Literal[
+        "case_open",
+        "movement",
+        "tilt",
+        "power_loss",
+        "gnss_spoof",
+        "gnss_jam",
+        "position_drift",
+        "time_integrity",
+        "other",
+    ]
     power: PowerStatus = Field(default_factory=PowerStatus)
     route: RouteStatus = Field(default_factory=RouteStatus)
 
