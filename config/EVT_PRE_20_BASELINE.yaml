@@ -9,8 +9,12 @@ source_commit: 2ec1d6dc81e3a16b7c127f1bbfe03f3945a72c45
 lot:
   quantity: 20
   serial_prefix: DIO-EVT-
-  serial_range: [001, 020]
-  allocation_status: TO_BE_DEFINED_IN_EVT_PLAN
+  serial_range: ["001", "020"]
+  allocation_status: PROPOSED_NOT_FROZEN
+  proposed_lora_allocation:
+    RU868: ["001", "010"]
+    EU868: ["011", "020"]
+  allocation_freeze_required: true
 
 electronics:
   architecture: custom_pcb

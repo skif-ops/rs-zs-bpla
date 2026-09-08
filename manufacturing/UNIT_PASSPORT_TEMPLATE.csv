@@ -1,0 +1,19 @@
+Field,Required,Source,Value,Acceptance
+Serial,YES,LOT_SERIAL_REGISTER,,Unique DIO-EVT-NNN
+Configuration_ID,YES,Baseline,EVT-PRE-20,Exact match
+PCB_MAIN_SN_and_Rev,YES,Traveller,,Traceable
+PCB_PWR_SN_and_Rev,YES,Traveller,,Traceable
+PCB_MIC1_to_MIC4_SN_and_Rev,YES,Traveller,,Four traceable identical revisions
+Housing_Technology_and_Rev,YES,Traveller,,Released 3d_print vacuum_casting or injection_molding
+Battery_MPN_SN_Lot,YES,Incoming record,,Traceable selected pack
+MPPT_MPN_SN_Lot,YES,Incoming record,,Traceable selected controller
+Modem_IMEI,YES,Module and provisioning,,Matches secure registry
+SIM_ICCID_Reference,YES,Controlled SIM registry,,Reference only; no PIN PUK or credentials
+LoRa_Profile,YES,Provisioning and label,,RU868 or EU868 locked
+FW_Boot_App_BLE_Versions,YES,Release manifest,,Exact hashes resolve
+Calibration_Set_and_Hash,YES,Calibration record,,MIC and timing mapping matches serial
+Provisioning_Receipt,YES,Controlled records,,Challenge-response PASS
+EOL_Record_and_Hash,YES,EOL bundle,,Overall PASS
+Deviation_List,YES,NCR register,,Closed accepted or none
+Assembly_Date_and_Operator,YES,Traveller,,Complete
+Release_Reviewer_and_Date,YES,Lot review,,Independent approval

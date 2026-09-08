@@ -1,9 +1,9 @@
 ID,Раздел,Поставочный объект,Формат,Критичность,Статус,QG-1 полнота,QG-2 техника,Критерий выпуска
 CM-001,Управление,Ведомость документов,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Все позиции реестра имеют владельца версию статус и путь
 CM-002,Управление,Конфигурационная база EVT-PRE-20,YAML+DOCX,P0,DRAFT,OPEN,OPEN,Решения партии однозначны и трассируются
-CM-003,Управление,Матрица требований и трассировки,XLSX+CSV,P0,PLANNED,OPEN,OPEN,Каждое требование связано с проверкой и evidence
-CM-004,Управление,Журнал решений и изменений,XLSX+CSV,P1,PLANNED,OPEN,OPEN,Все изменения имеют основание и влияние
-CM-005,Управление,Реестр рисков и отклонений,XLSX+CSV,P0,PLANNED,OPEN,OPEN,Блокирующие риски имеют владельца и действие
+CM-003,Управление,Матрица требований и трассировки,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Каждое требование связано с проверкой и evidence
+CM-004,Управление,Журнал решений и изменений,XLSX+CSV,P1,DRAFT,OPEN,OPEN,Все изменения имеют основание и влияние
+CM-005,Управление,Реестр рисков и отклонений,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Блокирующие риски имеют владельца и действие
 CM-006,Управление,Манифест SHA-256,TXT+CSV,P0,PLANNED,OPEN,OPEN,Покрыты все поставочные файлы
 SYS-001,Требования,ТЗ предсерийного EVT,DOCX+PDF,P0,PLANNED,OPEN,OPEN,Согласовано для 20 изделий и двух радиовариантов
 SYS-002,Архитектура,Архитектура изделия и системы,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Нет конфликтов hardware firmware server Android
@@ -31,7 +31,7 @@ HW-C-003,Кабели,Таблица разъёмов и mating parts,XLSX+CSV,P
 PROC-001,Закупка,Сводный BOM на 20 изделий и запас,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Расчёт qty закупки и стоимости формульный
 PROC-002,Закупка,China sourcing snapshot,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Поставщик ссылка дата MOQ lead time stock
 PROC-003,Закупка,Approved vendor list и аналоги,XLSX+CSV,P0,PLANNED,OPEN,OPEN,Аналоги не снижают функциональность
-PROC-004,Закупка,План входного контроля,DOCX+forms,P0,PLANNED,OPEN,OPEN,Counterfeit ESD MSL functional sampling
+PROC-004,Закупка,План входного контроля,DOCX+forms,P0,DRAFT,OPEN,OPEN,Counterfeit ESD MSL functional sampling
 MECH-3D-001,Корпус 3D,Параметрическая сборка корпуса,FCSTD_or_BLEND+STEP,P0,PLANNED,OPEN,OPEN,Сборка без пересечений и с сервисным доступом
 MECH-3D-002,Корпус 3D,Детали для печати,STL+3MF,P0,PLANNED,OPEN,OPEN,Manifold размеры ориентация проверены
 MECH-3D-003,Корпус 3D,Профиль FlashForge 5M Pro,3MF+DOCX,P1,PLANNED,OPEN,OPEN,Пробная печать и fit check PASS
@@ -59,15 +59,15 @@ PR-003,Протоколы,LoRa P2P mesh store-and-forward,DOCX+CBOR schema,P0,DR
 PR-004,Протоколы,BLE GATT configuration OTA,DOCX+schema,P0,DRAFT,OPEN,OPEN,Android-station compatibility PASS
 PR-005,Протоколы,GNSS PPS time quality,DOCX,P0,PLANNED,OPEN,OPEN,Holdover and timestamp error measured
 PR-006,Протоколы,Cellular SIM APN profile,DOCX+YAML,P0,DRAFT,OPEN,OPEN,Consumer/M2M SIM pilot test PASS
-MFG-001,Производство,Маршрут сборки 20 изделий,DOCX+XLSX,P0,PLANNED,OPEN,OPEN,Все операции критерии и evidence указаны
+MFG-001,Производство,Маршрут сборки 20 изделий,DOCX+XLSX,P0,DRAFT,OPEN,OPEN,Все операции критерии и evidence указаны
 MFG-002,Производство,Stencil paste reflow profile,DOCX+CSV,P0,PLANNED,OPEN,OPEN,Профиль записан термопарами
-MFG-003,Производство,Программирование и provisioning,DOCX+SCRIPTS,P0,PLANNED,OPEN,OPEN,Уникальные ID и ключи без утечки
-MFG-004,Производство,EOL fixture и тестовая программа,CAD+SCRIPTS+DOCX,P0,PLANNED,OPEN,OPEN,Golden unit и self-test coverage PASS
+MFG-003,Производство,Программирование и provisioning,DOCX+SCRIPTS,P0,DRAFT,OPEN,OPEN,Уникальные ID и ключи без утечки
+MFG-004,Производство,EOL fixture и тестовая программа,CAD+SCRIPTS+DOCX,P0,DRAFT,OPEN,OPEN,Golden unit и self-test coverage PASS
 MFG-005,Производство,Калибровка микрофонов и задержек,DOCX+CSV,P0,PLANNED,OPEN,OPEN,Разброс и задержка не более 1 отсчёта
-MFG-006,Производство,Маркировка и паспорт изделия,DOCX+LABEL,P0,PLANNED,OPEN,OPEN,Serial HW FW region ICCID refs однозначны
+MFG-006,Производство,Маркировка и паспорт изделия,DOCX+LABEL,P0,DRAFT,OPEN,OPEN,Serial HW FW region ICCID refs однозначны
 MFG-007,Производство,Упаковка транспорт хранение,DOCX,P1,PLANNED,OPEN,OPEN,ESD moisture battery transport требования учтены
-EVT-001,Испытания,ПМИ предсерийной партии,DOCX+PDF,P0,PLANNED,OPEN,OPEN,Матрица 20 изделий и выборки утверждены
-EVT-002,Испытания,Формы протоколов на 20 изделий,DOCX+XLSX+CSV,P0,PLANNED,OPEN,OPEN,Serial и evidence links обязательны
+EVT-001,Испытания,ПМИ предсерийной партии,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Матрица 20 изделий и выборки утверждены
+EVT-002,Испытания,Формы протоколов на 20 изделий,DOCX+XLSX+CSV,P0,DRAFT,OPEN,OPEN,Serial и evidence links обязательны
 EVT-003,Испытания,Аудио DSP классификация,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Pd FAR и negative set определены
 EVT-004,Испытания,GNSS PPS TDOA,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Raw PPS and synchronized audio stored
 EVT-005,Испытания,GSM LTE LoRa BLE,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Оба LoRa variants и SIM profiles проверены
