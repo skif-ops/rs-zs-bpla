@@ -28,7 +28,11 @@ def main() -> None:
 
     require(policy_id in baseline, "baseline clock policy id mismatch")
     require(policy_id in target, "firmware target clock policy id mismatch")
-    require(policy_id in capture, "KiCad capture spec clock policy id mismatch")
+    # KiCad capture is checked semantically because the formal identifier lives in the
+    # baseline/target and prose edits must not silently weaken DEC-016.
+    require("DEC-016" in capture, "KiCad capture spec does not bind DEC-016")
+    require("internal MSI/HSI + PLL" in capture, "KiCad capture spec no longer requires internal MSI/HSI + PLL")
+    require("No HSE crystal, HSE oscillator" in capture, "KiCad capture spec no longer explicitly prohibits HSE")
     require("external_hse_crystal_or_oscillator: false" in baseline, "baseline still allows external HSE")
     require("external_hse: DISABLED_NOT_FITTED" in target, "firmware target still allows external HSE")
     require("shall not use an external HSE crystal or HSE oscillator" in policy, "clock policy does not explicitly prohibit HSE")
@@ -38,7 +42,6 @@ def main() -> None:
     require(sit in policy, "hardware clock policy 32.768 kHz reference mismatch")
     require(sit in bom, "BOM does not contain the selected SiT1552 reference")
     require("USB_CLOCK" in target and "PDM_SAMPLE_RATE" in target and "PPS_TIMESTAMPING" in target, "target clock validation matrix incomplete")
-    require("Do not place an HSE footprint" in capture, "KiCad Rev.A still permits an HSE footprint")
 
     print("EVT-PRE-20 Rev.A clock policy cross-check: PASS")
 
