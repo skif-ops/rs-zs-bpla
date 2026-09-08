@@ -6,6 +6,7 @@ This specification is the bridge between the approved EVT-PRE-20 system architec
 
 Authoritative MCU/net assignment: `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv`.
 Authoritative clock policy: `hardware/CLOCKING_REV_A.md` / `DEC-016`.
+Authoritative fixed-position policy: `protocols/POSITION_TIME_TRUST_REV_A.md` / `DEC-018`.
 
 ## 1. PCB-MAIN functional blocks
 
@@ -32,7 +33,7 @@ Authoritative clock policy: `hardware/CLOCKING_REV_A.md` / `DEC-016`.
 - GNSS: PA2/PA3=`USART2 TX/RX`, PA0=`TIM2_CH1` PPS input capture.
 - LoRa: PA4..PA7=`SPI1 NSS/SCK/MISO/MOSI`, PD8=`DIO1`, PD9=`BUSY`, PD10=`RESET_N`.
 - BG95 main UART: PB6/PB7=`USART1 TX/RX`; PD11..PD15 are cellular control/status GPIOs as defined in the pin-map CSV.
-- BLE: PB10/PB11=`USART3 TX/RX`; PE6=`BLE_EN`; PB2=`BLE_BOOT` open-drain request.
+- BLE: PB10/PB11=`USART3 TX/RX`; PE6=`BLE_EN`; PB2=`BLE_DFU_REQ` open-drain request.
 - Sensor/power I2C: PB13/PB14=`I2C2 SCL/SDA`.
 - Power interface: PD0=`PWR_GOOD`, PD1=`PWR_FAULT`, PD4=`EN_MODEM`, PD5=`EN_AUX`.
 - Production LPUART: PC0=`RX`, PC1=`TX`.
@@ -73,12 +74,15 @@ Authoritative clock policy: `hardware/CLOCKING_REV_A.md` / `DEC-016`.
 - Switching while the modem USIM interface is powered is prohibited by the hardware/software design rule.
 - Low-capacitance ESD must be located adjacent to each external SIM connector.
 
-### GNSS/PPS
+### GNSS/PPS and fixed station position
 - Candidate: u-blox `MAX-M10S` class.
-- Main role: continuous timing/position independent of cellular operation.
+- Main role: continuous timing/position monitoring independent of cellular operation.
 - UART: PA2/PA3 USART2; `GNSS_PPS`/TIMEPULSE on PA0/TIM2_CH1 input capture.
 - Use the module in a 3.3 V-compatible I/O configuration; verify VIO/VIO_SEL and backup-supply wiring against the exact ordered MAX-M10S revision.
 - RF: dedicated GNSS connector/path with antenna bias/ESD as required by the selected active antenna.
+- After commissioning, configured installation coordinates are authoritative. GNSS position is used for integrity comparison and diagnostics, not for silently moving station geometry.
+- Receiver spoof/jamming monitoring shall be enabled/read by firmware; position trust and time trust are separate states.
+- PPS/time integrity must be allowed to degrade independently while configured station coordinates remain stable.
 
 ### LoRa RU868
 - Candidate module: Ebyte `E22-900M22S` / SX1262 class.
@@ -88,12 +92,16 @@ Authoritative clock policy: `hardware/CLOCKING_REV_A.md` / `DEC-016`.
 - Default boot state shall not transmit until a valid RU868 profile is loaded.
 
 ### BLE commissioning/OTA
-- Candidate: `ESP32-C3-MINI-1-N4`.
-- MCU-to-BLE service link: PB10/PB11 USART3 TX/RX to ESP32-C3 UART0-class service pins.
-- PE6 controls module EN/reset. PB2 requests download boot by pulling ESP GPIO9 low through an open-drain arrangement; default bias keeps normal SPI boot.
-- Respect ESP32-C3 strapping timing; GPIO2/GPIO8/GPIO9 strap states and any external pull resistors must be reviewed before capture release.
-- Provide independent manufacturing recovery pads for EN, boot strap, TX, RX, 3V3 and GND.
-- BLE module shall be disabled or low-power outside commissioning/OTA windows according to firmware policy.
+- Primary module: Raytac `MDBT50Q-P1MV2` based on Nordic `nRF52840`, integrated PCB antenna.
+- `ESP32-C3-MINI-1-N4` is superseded and must not appear in active Rev.A schematic/BOM.
+- MCU-to-BLE service link: PB10/PB11 USART3 TX/RX to selected nRF52840 UARTE GPIOs.
+- PE6 is `BLE_EN`: it controls the approved module power-enable/reset-request implementation.
+- PB2 is `BLE_DFU_REQ`: application-level open-drain request to a selected nRF52840 GPIO. It is not an ESP-style boot strap.
+- Provide separate nRF52840 SWDIO/SWCLK/RESET/VREF/GND fixture pads for manufacturing and recovery. These pads do not consume STM32 GPIOs.
+- BLE requirements: 2M, 1M and Coded/Long Range PHY, authenticated commissioning, diagnostics and signed OTA. Wi-Fi is not required.
+- Place the integrated antenna at the PCB edge exactly per Raytac keepout recommendations. No copper, battery, shielding, cable bundle or enclosure insert may violate the keepout.
+- Validate RSSI, connection stability and OTA throughput in the actual vacuum-cast housing and the full-lot 3D fallback housing.
+- If integrated antenna margin is insufficient, a formally approved same-family external-antenna module variant may be used without changing the logical BLE architecture.
 
 ### NOR and microSD
 - NOR: `W25Q512JVFIQ`-class 64 MB device on OCTOSPI1/QSPI using PE10..PE15; include local decoupling and damping footprints.
@@ -107,6 +115,7 @@ Authoritative clock policy: `hardware/CLOCKING_REV_A.md` / `DEC-016`.
 - INA226-class current/voltage monitors as applicable.
 - PB13/PB14 I2C2 bus; verify every selected device address and power domain before schematic freeze.
 - PC7 is reserved for enclosure tamper input.
+- Accelerometer/tamper state participates in relocation detection: movement of a commissioned fixed station causes `REVALIDATION_REQUIRED`, but does not automatically rewrite installation coordinates.
 
 ### USB-C service, production UART and SWD
 - USB-C USB2 device/service port: PA9 VBUS sense, PA11 D-, PA12 D+, CC1, CC2, GND and shield; correct device-mode Rd configuration and ESD required.
@@ -162,10 +171,11 @@ The exact connector manufacturer/MPN may be frozen after mechanical review, but 
 - Keep SIM traces short and away from RF/high-current switching nodes; preserve the 1.8 V USIM domain.
 - USB D+/D- differential routing must maintain a continuous return path.
 - Preserve manufacturer antenna/RF keepouts for module candidates.
+- Respect Raytac MDBT50Q-P1MV2 2.4 GHz antenna edge/keepout and keep metal/cables/battery away from the antenna volume.
 - Provide ground stitching around RF transitions/connectors and enclosure boundaries where appropriate.
 - Route PDM clock/data away from modem DC/DC and RF feed lines; preserve comparable harness electrical length for MIC1..4.
 - Keep the PDM translator close to the MCU/fanout origin and keep its 1.8 V and 3.3 V decoupling local.
-- Provide explicit test points for all regulated rails, reset, SWD, production UART, PPS and power-state signals.
+- Provide explicit test points for all regulated rails, reset, both SWD domains, production UART, PPS and power-state signals.
 - Do not place an HSE footprint or route an HSE resonator loop on Rev.A; this is a locked architecture decision, not a DNP option.
 
 ## 6. Capture completion criteria
@@ -178,7 +188,8 @@ Capture is complete only when:
 5. the CubeMX clock tree implements `REV_A_INTERNAL_HSI_MSI_PLL_NO_HSE` and the SiT1552 low-frequency configuration is reviewed explicitly;
 6. connector net order matches `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
 7. all BG95 1.8 V crossings and the T5838 1.8 V PDM crossing are explicit in the schematic;
-8. ERC passes with no unexplained error;
-9. Review A from `hardware/PCB_DOUBLE_REVIEW_GATE.md` is complete.
+8. active BLE module is `MDBT50Q-P1MV2/nRF52840` with reviewed antenna keepout and separate SWD recovery pads;
+9. ERC passes with no unexplained error;
+10. Review A from `hardware/PCB_DOUBLE_REVIEW_GATE.md` is complete.
 
 Only then may PCB placement/routing be treated as a release candidate.
