@@ -6,7 +6,7 @@ CM-004,Управление,Журнал решений и изменений,XL
 CM-005,Управление,Реестр рисков и отклонений,XLSX+CSV,P0,PLANNED,OPEN,OPEN,Блокирующие риски имеют владельца и действие
 CM-006,Управление,Манифест SHA-256,TXT+CSV,P0,PLANNED,OPEN,OPEN,Покрыты все поставочные файлы
 SYS-001,Требования,ТЗ предсерийного EVT,DOCX+PDF,P0,PLANNED,OPEN,OPEN,Согласовано для 20 изделий и двух радиовариантов
-SYS-002,Архитектура,Архитектура изделия и системы,DOCX+PDF,P0,PLANNED,OPEN,OPEN,Нет конфликтов hardware firmware server Android
+SYS-002,Архитектура,Архитектура изделия и системы,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Нет конфликтов hardware firmware server Android
 SYS-003,Архитектура,ICD станция-сервер,DOCX+CBOR schema,P0,PLANNED,OPEN,OPEN,Совместимость schema подтверждена тестами
 SYS-004,Архитектура,Энергобаланс 40-60 Ач и 60-80 Вт,XLSX+DOCX,P0,PLANNED,OPEN,OPEN,Расчёт и измерение S0-S4 согласованы
 SYS-005,Архитектура,Threat model и управление ключами,DOCX,P0,PLANNED,OPEN,OPEN,Ключи не включены в пакет; процессы provisioning описаны
@@ -16,7 +16,7 @@ HW-M-003,PCB main,Gerber и сверловка,GERBER+DRILL,P0,PLANNED,OPEN,OPEN
 HW-M-004,PCB main,IPC netlist и тестовые точки,IPC356+CSV,P0,PLANNED,OPEN,OPEN,Netlist совпадает; coverage тестов подтверждён
 HW-M-005,PCB main,Сборочные чертежи TOP/BOTTOM,PDF+SVG,P0,PLANNED,OPEN,OPEN,Полярность pin-1 и DNP видимы
 HW-M-006,PCB main,Pick-and-place и centroid,CSV,P0,PLANNED,OPEN,OPEN,Origin rotation и side подтверждены
-HW-M-007,PCB main,Производственный BOM и AVL,XLSX+CSV,P0,PLANNED,OPEN,OPEN,MPN package qty alternates и lifecycle проверены
+HW-M-007,PCB main,Производственный BOM и AVL,XLSX+CSV,P0,DRAFT,OPEN,OPEN,MPN package qty alternates и lifecycle проверены
 HW-M-008,PCB main,Stackup и fabrication notes,PDF+TXT,P0,PLANNED,OPEN,OPEN,Согласовано с фабрикой и impedance notes
 HW-M-009,PCB main,ERC DRC DFM отчёт,HTML+PDF,P0,PLANNED,OPEN,OPEN,Нет открытых blocker/critical
 HW-A-001,PCB microphones,Схема и PCB микрофонного leaf,KICAD+PDF+STEP,P0,PLANNED,OPEN,OPEN,4 одинаковых платы; phase path review
@@ -24,12 +24,12 @@ HW-A-002,PCB microphones,Gerber drill PnP BOM,ZIP+CSV,P0,PLANNED,OPEN,OPEN,CAM �
 HW-A-003,PCB microphones,Оснастка позиционирования 3+1,STEP+STL+DRAWING,P0,PLANNED,OPEN,OPEN,120 мм и +150 мм подтверждены CMM/шаблоном
 HW-P-001,Power,Схема power interface,KICAD_SCH+PDF,P0,PLANNED,OPEN,OPEN,Reverse surge fuse TVS cold-Voc review
 HW-P-002,Power,PCB power interface и производство,KICAD+GERBER+PnP+BOM,P0,PLANNED,OPEN,OPEN,DRC thermal/current DFM PASS
-HW-P-003,Power,Спецификация MPPT и батареи,DOCX+XLSX,P0,PLANNED,OPEN,OPEN,Совместимость LiFePO4 Voc current temperature
+HW-P-003,Power,Спецификация MPPT и батареи,DOCX+XLSX,P0,DRAFT,OPEN,OPEN,Совместимость LiFePO4 Voc current temperature
 HW-C-001,Кабели,Схема соединения всех элементов,DOCX+PDF,P0,PLANNED,OPEN,OPEN,Каждый pin связан с net fuse wire gauge connector
 HW-C-002,Кабели,Чертежи жгутов и распайка,DOCX+CSV,P0,PLANNED,OPEN,OPEN,Длина сечение цвет контакт обжим указаны
 HW-C-003,Кабели,Таблица разъёмов и mating parts,XLSX+CSV,P1,PLANNED,OPEN,OPEN,Разъёмы съёмные; пары и инструменты указаны
-PROC-001,Закупка,Сводный BOM на 20 изделий и запас,XLSX+CSV,P0,PLANNED,OPEN,OPEN,Расчёт qty закупки и стоимости формульный
-PROC-002,Закупка,China sourcing snapshot,XLSX+CSV,P0,PLANNED,OPEN,OPEN,Поставщик ссылка дата MOQ lead time stock
+PROC-001,Закупка,Сводный BOM на 20 изделий и запас,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Расчёт qty закупки и стоимости формульный
+PROC-002,Закупка,China sourcing snapshot,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Поставщик ссылка дата MOQ lead time stock
 PROC-003,Закупка,Approved vendor list и аналоги,XLSX+CSV,P0,PLANNED,OPEN,OPEN,Аналоги не снижают функциональность
 PROC-004,Закупка,План входного контроля,DOCX+forms,P0,PLANNED,OPEN,OPEN,Counterfeit ESD MSL functional sampling
 MECH-3D-001,Корпус 3D,Параметрическая сборка корпуса,FCSTD_or_BLEND+STEP,P0,PLANNED,OPEN,OPEN,Сборка без пересечений и с сервисным доступом
@@ -43,7 +43,7 @@ MECH-IM-002,ТПА,Требования к пресс-форме и матери
 FW-001,Firmware,Исходники target STM32U585,C+IOC+CMAKE,P0,PLANNED,OPEN,OPEN,Reproducible target build PASS
 FW-002,Firmware,Bootloader secure boot A/B,C+BIN+ELF+MAP,P0,PLANNED,OPEN,OPEN,Подпись rollback power-loss tests PASS
 FW-003,Firmware,Station application,C+BIN+ELF+MAP,P0,PLANNED,OPEN,OPEN,Unit integration HIL tests PASS
-FW-004,Firmware,Профили RU868 и EU868,YAML+BIN fragment,P0,PLANNED,OPEN,OPEN,Региональные пределы и RF test PASS
+FW-004,Firmware,Профили RU868 и EU868,YAML+BIN fragment,P0,DRAFT,OPEN,OPEN,Региональные пределы и RF test PASS
 FW-005,Firmware,Modem profiles ordinary/public APN,YAML+DOCX,P0,DRAFT,OPEN,OPEN,Attach TLS recovery 24h PASS
 FW-006,Firmware,BLE service и OTA,GATT schema+C,P0,PLANNED,OPEN,OPEN,Auth signed image rollback tests PASS
 FW-007,Firmware,Инструкция прошивки и восстановления,DOCX,P0,PLANNED,OPEN,OPEN,Повторена на чистом рабочем месте

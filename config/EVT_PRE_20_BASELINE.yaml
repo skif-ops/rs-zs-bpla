@@ -16,7 +16,8 @@ electronics:
   architecture: custom_pcb
   dev_board_in_product: false
   mcu_family: STM32U585
-  mcu_exact_mpn: OPEN_UNTIL_SCH_FREEZE
+  mcu_exact_mpn: STM32U585VIT6Q
+  mcu_selection_status: SELECTED_PENDING_SCHEMATIC_AND_SAMPLE
   mcu_package_policy: prefer_inspectable_non_BGA_for_20_unit_EVT
   microphone_count: 4
   microphone_matching: same_mpn_same_lot_preferred
@@ -34,7 +35,8 @@ power:
   battery_nominal_voltage_v: 12.8
   battery_capacity_ah_range: [40, 60]
   solar_panel_w_range: [60, 80]
-  mppt_architecture: EXTERNAL_OR_DEDICATED_POWER_ASSEMBLY_PENDING_FREEZE
+  mppt_architecture: EXTERNAL_10A_LIFEPO4_MPPT_PLUS_CUSTOM_PROTECTED_INTERFACE
+  mppt_exact_mpn: RFQ_REQUIRED
   no_sun_autonomy_target_days: 30
 
 communications:

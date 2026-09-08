@@ -1,0 +1,15 @@
+RFQ_ID,Category,Manufacturer,MPN_or_spec,Required_qty,Preferred_channel,Quote_date,Supplier,URL,MOQ,Lead_time_days,Stock_claim,Traceability_required,Sample_required,Status,Blocking_check
+RFQ-001,MCU,STMicroelectronics,STM32U585VIT6Q,25,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Package marking ID readout and CubeMX pin freeze
+RFQ-002,Microphone,TDK InvenSense,T5838 same lot,96,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Acoustic sensitivity noise and phase matching
+RFQ-003,Cellular,Quectel,BG95 regional variant,25,Quectel authorized channel,,,,,,,Yes,Yes,RFQ_REQUIRED,Operator bands firmware IMEI attach and TLS
+RFQ-004,GNSS,u-blox,MAX-M10S-00B,25,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Fix sensitivity PPS and antenna interface
+RFQ-005,LoRa,Ebyte,E22-900M22S,26,Ebyte official or authorized,,,,,,,Yes,Yes,RFQ_REQUIRED,Conducted RF RU868 EU868 and sleep current
+RFQ-006,BLE,Espressif,ESP32-C3-MINI-1-N4,25,Espressif authorized channel,,,,,,,Yes,Yes,RFQ_REQUIRED,BLE pairing OTA and current
+RFQ-007,QSPI NOR,Winbond,W25Q512JVFIQ,25,Authorized or traceable tier-1,,,,,,,Yes,Yes,RFQ_REQUIRED,JEDEC ID full read write erase soak
+RFQ-008,Battery,TBD,12.8 V 40-60 Ah LiFePO4 with BMS,21,Cell or pack manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,UN38.3 MSDS capacity DCIR thresholds low-temp inhibit
+RFQ-009,Solar,TBD,60-80 W outdoor panel,21,Panel manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,Voc Isc Pmax insulation weathering evidence
+RFQ-010,MPPT,TBD,10 A LiFePO4 sealed MPPT,21,Controller manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,Charge profile cold Voc low-temp reverse current quiescent
+RFQ-011,PCBA main,TBD,4-layer assembled main PCB,22,Qualified CM with AOI,,,,,,,Yes,Yes,RFQ_REQUIRED,DFM stencil traceability test coverage
+RFQ-012,PCBA mic,TBD,2-layer assembled microphone PCB,88,Qualified CM with AOI,,,,,,,Yes,Yes,RFQ_REQUIRED,Acoustic port contamination and lot control
+RFQ-013,PCBA power,TBD,2-layer 2 oz power PCB,22,Qualified CM with thermal process,,,,,,,Yes,Yes,RFQ_REQUIRED,Current thermal copper and functional test
+RFQ-014,Harness,TBD,Labeled station harness set,22,Qualified harness factory,,,,,,,Yes,Yes,RFQ_REQUIRED,Crimp tooling pull force and 100 percent continuity
