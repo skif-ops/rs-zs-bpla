@@ -13,9 +13,9 @@
 | Центральный MCU | STM32U585VIT6Q, LQFP100 | SELECTED_PENDING_SCHEMATIC_AND_SAMPLE |
 | Акустика | 4 x T5838, один MPN и предпочтительно одна производственная партия | SELECTED_PENDING_SAMPLE |
 | Геометрия | 3 нижних микрофона, равносторонний треугольник 120 мм; MIC4 над центром +150 мм | LOCKED |
-| Cellular | BG95-класс, Cat M1/NB2/EGPRS, исходящее MQTT/TLS или HTTPS | SELECTED_PENDING_OPERATOR_TEST |
+| Cellular | BG95-класс, Cat M1/NB2/EGPRS, два nano-SIM через внешний 2:1 mux, исходящее MQTT/TLS или HTTPS | SELECTED_PENDING_OPERATOR_AND_DUAL_SIM_TEST |
 | GNSS/PPS | отдельный MAX-M10S-класс | SELECTED_PENDING_SAMPLE |
-| LoRa | E22-900M22S/SX1262-класс, общая PCB, отдельные RU868 и EU868 профили | SELECTED_PENDING_RF_AND_REGULATORY_TEST |
+| LoRa | E22-900M22S/SX1262-класс, RU868 на всех 20 пилотных изделиях; окна 864-865 и 868.7-869.2 МГц | SELECTED_PENDING_RF_AND_REGULATORY_TEST |
 | BLE | отдельный BLE-сервисный модуль, кандидат ESP32-C3-MINI-1-N4 | CANDIDATE_PENDING_SAMPLE |
 | Локальное хранилище | QSPI NOR не менее 64 MB плюс industrial microSD для EVT-данных | SELECTED_PENDING_MEDIA_TEST |
 | Питание | 12.8 V LiFePO4 40-60 Ah, панель 60-80 W | LOCKED |
@@ -40,6 +40,8 @@
 | PCB-PWR | PCB-MAIN | 3.8 V modem, 3.3 V digital, 1.8 V microphone | ripple, startup, brownout, LTE burst |
 | PCB-MAIN | PCB-MIC x4 | 1.8 V, GND, PDM_CLK, PDM_DATA[n] | задержка, EMI, channel mapping, одинаковая длина |
 | MCU | BG95 | UART + PWRKEY + RESET + STATUS + DTR | уровни 1.8/3.3 V, attach/recovery |
+| BG95 | SIM mux | 1.8 V USIM_VDD/RST/CLK/DATA | signal integrity, ESD, high-Z, safe switch |
+| SIM mux | nano-SIM 1/2 | один активный слот, два отдельных DET | ICCID mapping, 100 switch cycles |
 | MCU | MAX-M10S | UART/I2C + TIMEPULSE | PPS capture, holdover, antenna fault |
 | MCU | LoRa | SPI + NSS + DIO1 + BUSY + RESET | RF region, conducted output, sleep current |
 | MCU | BLE module | UART + enable/reset | pairing, access control, signed OTA |
@@ -54,6 +56,8 @@ BG95 поддерживает GNSS, но его WWAN и GNSS использую�
 ## 5. SIM без API оператора
 
 Обычная SIM с публичным APN допустима для пилота. Станция сама инициирует MQTT/TLS или HTTPS-сессию, работает за CGNAT и получает команды через уже установленное защищённое соединение. Не требуются статический публичный IP, входящие порты и API оператора. До закупки 20 SIM обязательны тест одной SIM каждого оператора, 24-часовая сессия, reconnect и восстановление очереди.
+
+На PCB устанавливаются два физических nano-SIM слота. BG95 имеет один внешний 1.8 В USIM-интерфейс, поэтому применяется внешний 2:1 мультиплексор и режим Dual SIM Single Standby. Переключение выполняется только после штатного выключения BG95. Public/private APN являются программными профилями и не требуют изменения PCB.
 
 ## 6. Неподтверждённые позиции
 
@@ -76,4 +80,3 @@ BG95 поддерживает GNSS, но его WWAN и GNSS использую�
 - TDK T5838: https://www.invensense.tdk.com/en-us/products/microphone/t5838
 - Ebyte E22-900M22S: https://www.ebyte.com/product/435.html
 - LoRaWAN Regional Parameters RP002-1.0.5: https://resources.lora-alliance.org/document/rp002-1-0-5-lorawan-regional-parameters
-

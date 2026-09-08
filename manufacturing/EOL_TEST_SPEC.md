@@ -16,9 +16,10 @@ EOL выполняется для 20 из 20 изделий после полн�
 | EOL-AUD-01 | 4 канала | Все каналы присутствуют, без clipping/dropout; gain/phase limits OPEN до fixture MSA |
 | EOL-AUD-02 | Геометрия и calibration | MIC1-MIC3/MIC4 mapping однозначен; calibration hash совпадает |
 | EOL-TIM-01 | GNSS и PPS | Получены fix/timepulse и time quality; точностной предел замораживается в ПМИ |
-| EOL-CELL-01 | SIM и attach | ICCID ref/IMEI читаются, attach проходит на утверждённой тестовой SIM |
+| EOL-CELL-01 | SIM и attach | IMEI и оба ICCID ref читаются, slot mapping однозначен, attach проходит на утверждённой тестовой SIM |
 | EOL-CELL-02 | MQTT/TLS | Проверка CA и hostname обязательна; publish, ACK и reconnect проходят |
 | EOL-CELL-03 | Store-and-forward | Буфер сохраняется без сети и передаётся один раз после восстановления |
+| EOL-CELL-04 | Dual SIM/APN failover | Только один слот активен; штатное переключение, public/private APN и восстановление очереди проходят |
 | EOL-LORA-01 | Module and region lock | Модуль отвечает; профиль соответствует label; TX только в conducted/shielded setup до RF release |
 | EOL-LORA-02 | Packet integrity | Framing, authentication, counter, dedup и retry проходят на test peer |
 | EOL-BLE-01 | Service mode | Вход требует физического действия; неавторизованное чтение/запись отклонены |
@@ -35,4 +36,3 @@ EOL выполняется для 20 из 20 изделий после полн�
 ## Fixture gate
 
 До запуска партии EOL fixture проходит MSA на golden unit и known-fault samples: перепутанный MIC, отсутствующая антенная нагрузка, неверный регион, повреждённый storage, недействительная TLS chain и рассинхронизация serial. CAD, schematic, wiring и software fixture входят в MFG-004.
-

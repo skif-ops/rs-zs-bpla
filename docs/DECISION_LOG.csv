@@ -7,3 +7,8 @@ DEC-005,2026-09-08,Lock microphone geometry at triangle 120 mm and MIC4 plus 150
 DEC-006,2026-09-08,Maintain independent 3D print vacuum casting and injection molding tracks,Processes need different geometry rules and evidence,No direct conversion of one CAD into released other process,LOCKED,Project baseline
 DEC-007,2026-09-08,Keep Android as separate release track,Application has independent lifecycle security and compatibility,Separate version SBOM APK and acceptance gates,LOCKED,Customer request
 DEC-008,2026-09-08,Create dedicated branch evt-pre-20,Prevent mixing EVT-MB and pre-series evidence,Selective inheritance only,IMPLEMENTED,Customer request
+DEC-009,2026-09-08,Assign all 20 pilot units to RU868,Customer selected RU868 for pilot,EU868 remains future compatibility only and is not provisioned in EVT-PRE-20,LOCKED,Customer answer
+DEC-010,2026-09-08,Keep both vacuum casting and injection molding enclosure tracks,Customer requested both casting variants,Each process requires separate CAD DFM BOM and evidence; 3D print remains independent,LOCKED,Customer answer
+DEC-011,2026-09-08,Use two physical nano-SIM slots with one BG95,Customer requested two SIM cards,Requires external 2 to 1 mux and Dual SIM Single Standby safe-switch sequence,LOCKED,Customer answer
+DEC-012,2026-09-08,Support public and private APN profiles per SIM,Customer requested selectable APN modes,Private APN requires operator service but no hardware change,LOCKED,Customer answer
+DEC-013,2026-09-08,Test MTS MegaFon Beeline T2 Tele2 and GLONASS supplied SIM candidates,Customer defined pilot candidates,Exact carrier tariff APN and RAT remain per-SIM inputs,LOCKED,Customer answer

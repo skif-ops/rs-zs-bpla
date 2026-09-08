@@ -1,0 +1,59 @@
+profile_id: DIONEA-DUAL-SIM-SS-v0.1
+status: DRAFT_HARDWARE_AND_OPERATOR_VALIDATION_REQUIRED
+modem: Quectel_BG95_M3_candidate
+sim_architecture:
+  mode: dual_sim_single_standby
+  physical_slots: [1, 2]
+  simultaneously_active_slots: 1
+  usim_voltage_v: 1.8
+  switch_candidate: TI_TS3A27518E
+  switch_final_mpn_status: OPEN_SCHEMATIC_SAMPLE_AND_SI_VALIDATION
+  slot_detect_to_mcu: [SIM1_DET, SIM2_DET]
+  hot_switch_allowed: false
+pilot_operator_candidates:
+  - id: MTS
+    exact_sim_tariff_and_apn: TO_BE_PROVIDED
+  - id: MegaFon
+    exact_sim_tariff_and_apn: TO_BE_PROVIDED
+  - id: Beeline
+    exact_sim_tariff_and_apn: TO_BE_PROVIDED
+  - id: T2_Tele2
+    exact_sim_tariff_and_apn: TO_BE_PROVIDED
+  - id: GLONASS_supplied_SIM
+    underlying_carrier_and_apn: TO_BE_PROVIDED
+apn_modes:
+  public:
+    allowed: true
+    operator_api_required: false
+    static_public_ip_required: false
+    outbound_only: true
+  private:
+    allowed: true
+    operator_subscription_required: true
+    credentials_from_secure_store: true
+    operator_api_required: false
+profile_selection:
+  order_per_slot: TO_BE_PROVISIONED
+  automatic_failover_enabled: true
+  failure_triggers: [attach_timeout, pdp_failure, dns_failure, tls_failure, sustained_link_loss]
+  manual_override: authenticated_BLE_or_mTLS_server_command
+  minimum_hold_time_s: 900
+  maximum_attempts_per_profile: 3
+  preserve_store_and_forward_queue: true
+safe_slot_switch_sequence:
+  - stop_new_application_traffic
+  - persist_queue_and_session_state
+  - close_mqtt_https_and_detach
+  - gracefully_power_off_BG95
+  - disable_sim_mux_to_high_impedance
+  - select_target_slot
+  - enable_sim_mux
+  - power_on_BG95
+  - verify_iccid_matches_provisioned_slot
+  - attach_and_validate_dns_tls_endpoint
+  - resume_queue_with_existing_event_ids
+security:
+  pin_puk_and_apn_passwords_in_repository: false
+  iccid_storage: redacted_reference_only
+  profile_changes_require_authentication: true
+  profile_changes_audited: true

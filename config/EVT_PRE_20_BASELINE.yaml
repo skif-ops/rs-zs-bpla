@@ -10,11 +10,11 @@ lot:
   quantity: 20
   serial_prefix: DIO-EVT-
   serial_range: ["001", "020"]
-  allocation_status: PROPOSED_NOT_FROZEN
-  proposed_lora_allocation:
-    RU868: ["001", "010"]
-    EU868: ["011", "020"]
-  allocation_freeze_required: true
+  allocation_status: LOCKED_CUSTOMER_RU868_ALL_20
+  lora_allocation:
+    RU868: ["001", "020"]
+    EU868: []
+  allocation_freeze_required: false
 
 electronics:
   architecture: custom_pcb
@@ -52,17 +52,25 @@ communications:
     fallback_transport: https_tls
     ordinary_sim_allowed_for_evt: true
     public_apn_allowed_for_evt: true
+    private_apn_profile_supported: true
+    apn_mode_switch_supported: true
+    sim_architecture: dual_sim_single_standby
+    physical_nano_sim_slots: 2
+    simultaneously_active_sim_count: 1
+    pilot_operator_candidates: [MTS, MegaFon, Beeline, T2_Tele2, GLONASS_supplied_SIM]
     static_public_ip_required: false
     inbound_station_connection_required: false
     store_and_forward_required: true
   lora:
     role: backup_event_transport
     common_pcb: true
+    pilot_profile: RU868
+    pilot_frequency_windows_mhz: [[864.0, 865.0], [868.7, 869.2]]
     variants:
       - id: RU868
         profile_status: OPEN_REGULATORY_AND_RF_VALIDATION
       - id: EU868
-        profile_status: OPEN_REGULATORY_AND_RF_VALIDATION
+        profile_status: FUTURE_COMPATIBILITY_NOT_IN_PILOT
   ble:
     role: local_service_configuration_diagnostics_ota
 

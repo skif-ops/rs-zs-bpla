@@ -3,7 +3,7 @@ RFQ-001,MCU,STMicroelectronics,STM32U585VIT6Q,25,Authorized distributor,,,,,,,Ye
 RFQ-002,Microphone,TDK InvenSense,T5838 same lot,96,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Acoustic sensitivity noise and phase matching
 RFQ-003,Cellular,Quectel,BG95 regional variant,25,Quectel authorized channel,,,,,,,Yes,Yes,RFQ_REQUIRED,Operator bands firmware IMEI attach and TLS
 RFQ-004,GNSS,u-blox,MAX-M10S-00B,25,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Fix sensitivity PPS and antenna interface
-RFQ-005,LoRa,Ebyte,E22-900M22S,26,Ebyte official or authorized,,,,,,,Yes,Yes,RFQ_REQUIRED,Conducted RF RU868 EU868 and sleep current
+RFQ-005,LoRa,Ebyte,E22-900M22S,26,Ebyte official or authorized,,,,,,,Yes,Yes,RFQ_REQUIRED,Conducted RF RU868 windows 864-865 and 868.7-869.2 MHz plus sleep current
 RFQ-006,BLE,Espressif,ESP32-C3-MINI-1-N4,25,Espressif authorized channel,,,,,,,Yes,Yes,RFQ_REQUIRED,BLE pairing OTA and current
 RFQ-007,QSPI NOR,Winbond,W25Q512JVFIQ,25,Authorized or traceable tier-1,,,,,,,Yes,Yes,RFQ_REQUIRED,JEDEC ID full read write erase soak
 RFQ-008,Battery,TBD,12.8 V 40-60 Ah LiFePO4 with BMS,21,Cell or pack manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,UN38.3 MSDS capacity DCIR thresholds low-temp inhibit
@@ -13,3 +13,5 @@ RFQ-011,PCBA main,TBD,4-layer assembled main PCB,22,Qualified CM with AOI,,,,,,,
 RFQ-012,PCBA mic,TBD,2-layer assembled microphone PCB,88,Qualified CM with AOI,,,,,,,Yes,Yes,RFQ_REQUIRED,Acoustic port contamination and lot control
 RFQ-013,PCBA power,TBD,2-layer 2 oz power PCB,22,Qualified CM with thermal process,,,,,,,Yes,Yes,RFQ_REQUIRED,Current thermal copper and functional test
 RFQ-014,Harness,TBD,Labeled station harness set,22,Qualified harness factory,,,,,,,Yes,Yes,RFQ_REQUIRED,Crimp tooling pull force and 100 percent continuity
+RFQ-015,SIM switch,Texas Instruments,TS3A27518EPWR candidate,25,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Supply leakage Ron capacitance ESD and BG95 signal integrity
+RFQ-016,SIM connector,TBD,Nano-SIM push-push with card detect,50,Approved connector manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,Footprint mating cycles coplanarity card detect and service access

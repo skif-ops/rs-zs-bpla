@@ -9,10 +9,9 @@ DIM-007,MPPT,module envelope terminals heat and mounting,mm,Selected 10 A SKU,PR
 DIM-008,Solar,panel dimensions mass cable and bracket loads,mm_kg,Selected 60-80 W SKU,PROCUREMENT,OPEN,External bracket
 DIM-009,RF,three antenna connectors cable bend radius and separation,mm,Selected antenna set,RF,OPEN,Electronics enclosure
 DIM-010,Cable glands,thread cable OD and wrench clearance,mm,Selected IP gland MPN,ME,OPEN,All enclosure variants
-DIM-011,Service,USB-C SIM microSD SWD access,mm,Connector freeze and workflow,EE_ME,OPEN,Service cover
+DIM-011,Service,USB-C dual SIM microSD SWD access,mm,Connector freeze and workflow,EE_ME,OPEN,Service cover
 DIM-012,Acoustics,membrane stack and compression,mm,Selected membrane plus acoustic test,ACOUSTICS,OPEN,Mic pods
 DIM-013,Mast,mount diameter and wind load,mm_N,Customer installation input,SYSTEM,OPEN,Mast clamps
 DIM-014,Environment,operating and storage temperature,C,Customer requirement,SYSTEM,OPEN,Material and sealing
 DIM-015,Environment,UV salt fog chemical exposure,class,Customer site requirement,SYSTEM,OPEN,Material and coating
 DIM-016,Labels,serial region QR plate envelope,mm,Label technology and content,CM,OPEN,External surfaces
-

@@ -1,6 +1,8 @@
 profile_id: PILOT-PUBLIC-APN-EXAMPLE
 status: TEMPLATE_NO_CREDENTIALS
 sim_slot: 1
+apn_mode: PUBLIC
+profile_priority: TO_BE_PROVISIONED
 operator: TO_BE_FILLED_ON_DEVICE
 apn: TO_BE_FILLED_ON_DEVICE
 authentication: none
@@ -31,4 +33,3 @@ security:
   ca_bundle_ref: provisioned_secure_store
   client_key_ref: secure_device_store
   credentials_in_repository: false
-

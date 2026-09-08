@@ -18,6 +18,10 @@
 - AND-F-012: экспортировать redacted diagnostic report и commissioning record.
 - AND-F-013: не позволять пользователю менять manufacturing region RU868/EU868.
 - AND-F-014: выдавать пошаговую инструкцию USB-C recovery без хранения recovery secrets.
+- AND-F-015: показывать наличие SIM1/SIM2, redacted ICCID, активный слот, оператора, RAT и результат последнего attach.
+- AND-F-016: настраивать упорядоченные public/private APN profiles и preferred SIM slot без экспорта PIN/PUK/APN password.
+- AND-F-017: разрешать ручное переключение SIM/APN только авторизованной роли, с явным предупреждением о разрыве связи и сохранением audit record.
+- AND-F-018: показывать причину автоматического failover, предыдущий и новый профиль, число попыток и состояние store-and-forward.
 
 ## Нефункциональные требования
 
@@ -38,10 +42,10 @@
 - облачная учётная запись пользователя;
 - изменение классификационных моделей отдельно от подписанного release bundle;
 - доступ к API оператора;
+- одновременная работа двух SIM;
 - ручная установка RF frequency/power;
 - извлечение private keys станции.
 
 ## Gate
 
 Требования получают `LOCKED` после утверждения UX двух ролей, GATT prototype, security review, проверки минимум на трёх смартфонах включая устройство Huawei без GMS и совместного теста с target firmware.
-

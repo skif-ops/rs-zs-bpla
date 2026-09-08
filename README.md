@@ -10,8 +10,10 @@
 - акустическая геометрия: четыре одинаковых микрофона, схема 3+1, база 120 мм, верхний микрофон +150 мм;
 - питание: LiFePO4 12,8 В, 40–60 А·ч; солнечная панель 60–80 Вт;
 - основной канал: GSM/LTE через исходящее MQTT/TLS, резерв HTTPS/TLS;
-- пилот допускает обычную SIM и публичный APN; публичный IP и входящее соединение к станции не требуются;
-- резервный канал: LoRa, две комплектации `RU868` и `EU868` на общей PCB;
+- пилот использует обычные SIM МТС, МегаФон, Билайн, T2/Tele2 либо SIM, предоставленную оператором ГЛОНАСС; публичный IP и API оператора не требуются;
+- PCB содержит два nano-SIM слота с режимом Dual SIM Single Standby и программными профилями `public APN` / `private APN`;
+- резервный канал: LoRa `RU868` на всех 20 изделиях; допустимые окна пилота 864-865 и 868,7-869,2 МГц;
+- общая PCB сохраняет возможность будущего профиля `EU868`, но он не входит в пилотную партию;
 - BLE: локальная настройка, диагностика и безопасное обновление;
 - корпус: отдельные комплекты для 3D-печати, вакуумного литья и ТПА;
 - сервер: «Мухоед», развёртывание на Windows 11 и Ubuntu 24.04;
@@ -39,6 +41,8 @@ Gerber, прошивки, бинарники, корпуса и серверны
 - [`docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv`](docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv) — полный реестр комплекта и gates.
 - [`docs/OPEN_INPUTS_FOR_FREEZE.csv`](docs/OPEN_INPUTS_FOR_FREEZE.csv) - входные данные заказчика, блокирующие финальный выпуск.
 - [`protocols/CELLULAR_CONNECTIVITY_BASELINE.md`](protocols/CELLULAR_CONNECTIVITY_BASELINE.md) — SIM/APN и исходящая связь.
+- [`hardware/DUAL_SIM_SINGLE_STANDBY.md`](hardware/DUAL_SIM_SINGLE_STANDBY.md) - двух-SIMная аппаратная архитектура и безопасное переключение.
+- [`config/cellular/dual_sim_apn_profiles.yaml`](config/cellular/dual_sim_apn_profiles.yaml) - машинно-читаемая политика SIM/APN failover.
 - [`manufacturing/README.md`](manufacturing/README.md) — маршрут партии, traceability, provisioning и EOL.
 - [`tests/EVT_MASTER_PLAN.md`](tests/EVT_MASTER_PLAN.md) — последовательность и правила принятия EVT.
 - [`docs/REQUIREMENTS_TRACEABILITY.csv`](docs/REQUIREMENTS_TRACEABILITY.csv) — требования, проверки и evidence.

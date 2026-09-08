@@ -9,7 +9,8 @@
 - Целевая зона: ориентировочно до 100 x 80 мм, окончательно после компоновки корпуса.
 - Разделение зон: RF cellular, RF GNSS, RF LoRa, quiet digital/audio, modem power, service/debug.
 - Антенны внешние, отдельные разъёмы cellular/GNSS/LoRa. Межпортовая развязка проверяется на макете корпуса.
-- Обязательные интерфейсы: SWD, USB-C service, SIM, microSD, battery/power, 4 x MIC, cellular antenna, GNSS antenna, LoRa antenna, tamper/service.
+- Обязательные интерфейсы: SWD, USB-C service, два nano-SIM через 2:1 mux, microSD, battery/power, 4 x MIC, cellular antenna, GNSS antenna, LoRa antenna, tamper/service.
+- Dual SIM работает только в режиме Single Standby. Оба слота и мультиплексор входят в STEP, schematic, BOM, DFT и EOL coverage.
 
 ## PCB-MIC x4
 
@@ -45,4 +46,3 @@
 ## Производственный release gate
 
 Каждая плата должна иметь исходники KiCad, PDF схемы, Gerber, drill, IPC-356, pick-and-place, BOM/AVL, assembly drawing TOP/BOTTOM, fabrication notes, 3D STEP, ERC/DRC отчёты и письменный DFM review фабрики. Gerber сверяется отдельным CAM viewer со схемой и исходной PCB.
-

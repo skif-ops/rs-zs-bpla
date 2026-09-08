@@ -8,8 +8,11 @@ Housing_Technology_and_Rev,YES,Traveller,,Released 3d_print vacuum_casting or in
 Battery_MPN_SN_Lot,YES,Incoming record,,Traceable selected pack
 MPPT_MPN_SN_Lot,YES,Incoming record,,Traceable selected controller
 Modem_IMEI,YES,Module and provisioning,,Matches secure registry
-SIM_ICCID_Reference,YES,Controlled SIM registry,,Reference only; no PIN PUK or credentials
-LoRa_Profile,YES,Provisioning and label,,RU868 or EU868 locked
+SIM1_ICCID_Reference,YES,Controlled SIM registry,,Reference only; no PIN PUK or credentials
+SIM2_ICCID_Reference,YES,Controlled SIM registry,,Reference only; no PIN PUK or credentials
+Preferred_SIM_Slot,YES,Provisioning receipt,,Slot 1 or 2 and read-back ICCID match
+APN_Mode_and_Profile_Hash,YES,Provisioning receipt,,PUBLIC or PRIVATE allowlist and exact profile hash
+LoRa_Profile,YES,Provisioning and label,RU868_LOCKED,All EVT-PRE-20 units exact match
 FW_Boot_App_BLE_Versions,YES,Release manifest,,Exact hashes resolve
 Calibration_Set_and_Hash,YES,Calibration record,,MIC and timing mapping matches serial
 Provisioning_Receipt,YES,Controlled records,,Challenge-response PASS

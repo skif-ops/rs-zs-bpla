@@ -3,6 +3,7 @@ Microphone PDM clock,1,MDF/SAI,PE9 candidate,1.8V through controlled interface,4
 Microphone PDM data,4,MDF/ADF,"PE4;PE7;PE10;PE12 candidates",1.8V through controlled interface,4x T5838,OPEN_CUBEMX,Four simultaneous filters and AF mapping
 Cellular UART,2,USART1,"PB6;PB7 candidates",MCU 3.3V / modem 1.8V,BG95,OPEN_CUBEMX,AF mapping and directional level translator
 Cellular control,4,GPIO,"PB1;PB4;PB12;PB15 candidates",mixed,BG95,OPEN_SCHEMATIC,PWRKEY RESET STATUS DTR voltage levels
+Dual SIM control,4,GPIO,TBD,3.3V to 1.8V compatible control,"TS3A27518E;SIM1_DET;SIM2_DET",OPEN_CUBEMX,"SIM_MUX_SEL SIM_MUX_EN and two independent detect inputs; wake pin review"
 GNSS UART,2,USART2,"PA2;PA3 candidates",3.3V,MAX-M10S,OPEN_CUBEMX,AF mapping and boot mode conflict
 GNSS PPS,1,TIM input capture,PB3 candidate,3.3V,MAX-M10S,OPEN_CUBEMX,Timer channel timestamp latency
 BLE UART,2,USART3,"PB10;PB11 candidates",3.3V,BLE module,OPEN_CUBEMX,AF mapping and boot logs
@@ -17,4 +18,3 @@ USB service,2,USB FS,"PA11;PA12 candidate",3.3V,USB-C,OPEN_CUBEMX,USB AF VBUS ES
 SWD,2,SWD,"PA13;PA14",3.3V,programmer,RESERVED,Keep accessible after enclosure assembly
 Revision straps,2,GPIO,TBD,3.3V,resistors,OPEN_SCHEMATIC,No boot or debug pin conflict
 Test points,12,GPIO/rails,TBD,mixed,EOL fixture,OPEN_DFT,Boundary and functional coverage
-

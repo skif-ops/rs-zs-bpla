@@ -22,7 +22,10 @@ PCB-MAIN-010,PCB_MAIN,RF,Coexistence spacing clocks and enclosure cable routing 
 PCB-MAIN-011,PCB_MAIN,Storage,QSPI boot and SD signals meet SI pull and power sequencing,SI review and fault tests,EE_FW,QG2,OPEN
 PCB-MAIN-012,PCB_MAIN,Service,USB-C CC ESD current limit and recovery path verified,USB checklist and enumeration log,EE_FW,QG2,OPEN
 PCB-MAIN-013,PCB_MAIN,Security,SWD and boot access lifecycle states are defined,Provisioning and debug lock procedure,FW_SECURITY,QG2,OPEN
-PCB-MAIN-014,PCB_MAIN,Mechanics,All connectors SIM SD and test pads remain accessible in STEP assembly,STEP interference and service review,ME_EE,QG2,OPEN
+PCB-MAIN-014,PCB_MAIN,Mechanics,All connectors dual SIM SD and test pads remain accessible in STEP assembly,STEP interference and service review,ME_EE,QG2,OPEN
+PCB-MAIN-015,PCB_MAIN,Cellular,Dual SIM mux is boot-safe and cannot switch while BG95 is powered,Truth table reset brownout and firmware interlock tests,EE_FW,QG2,OPEN
+PCB-MAIN-016,PCB_MAIN,Cellular,Both 1.8V USIM paths meet leakage capacitance edge ESD and length requirements,Annotated layout scope captures and ESD report,EE_CELLULAR,QG2,OPEN
+PCB-MAIN-017,PCB_MAIN,Cellular,SIM1 and SIM2 card detect and ICCID mapping are independent,100-cycle slot mapping log,FW_TEST,QG2,OPEN
 PCB-PWR-001,PCB_PWR,Protection,Input fuse reverse polarity TVS and surge energy are coordinated,Calculation and test waveforms,POWER,QG2,OPEN
 PCB-PWR-002,PCB_PWR,Power,3.8V 3.3V 1.8V AON rails meet efficiency ripple startup and thermal limits,Power tree report,POWER,QG2,OPEN
 PCB-PWR-003,PCB_PWR,Power,Shunts and monitors cover sleep and peak ranges with acceptable error,Range and calibration analysis,POWER_FW,QG2,OPEN

@@ -10,10 +10,11 @@ CON-008,PCB_MAIN,MIC4,"1V8;GND;CLK;DATA4",4,Low_current_high_integrity,Internal_
 CON-009,PCB_MAIN,Cellular_RF,RF_CELL,1,50_ohm,Internal_to_bulkhead,RF_keyed,TBD,TBD,Low_loss_coax,OPEN,Antenna selection and layout
 CON-010,PCB_MAIN,GNSS_RF,RF_GNSS,1,50_ohm,Internal_to_bulkhead,RF_keyed,TBD,TBD,Low_loss_coax,OPEN,Antenna active passive decision
 CON-011,PCB_MAIN,LoRa_RF,RF_LORA,1,50_ohm,Internal_to_bulkhead,RF_keyed,TBD,TBD,Low_loss_coax,OPEN,Antenna selection and layout
-CON-012,PCB_MAIN,Nano_SIM,"SIM_IO;CLK;RST;VCC;DET;GND",6_minimum,Low_current,Under_service_cover,Card_orientation,TBD,Nano_SIM,None,OPEN,Mechanical service access
+CON-012,PCB_MAIN,Nano_SIM_slot_1,"SIM1_IO;SIM1_CLK;SIM1_RST;SIM1_VCC;SIM1_DET;GND",6_minimum,Low_current,Under_service_cover,Card_orientation,TBD,Nano_SIM,None,OPEN,Mechanical service access and U13 placement
 CON-013,PCB_MAIN,microSD,"CLK;CMD;D0-D3;DET;VCC;GND",9_minimum,Low_current,Under_service_cover,Card_orientation,TBD,microSD,None,OPEN,Mechanical service access
 CON-014,PCB_MAIN,USB_C_service,"VBUS;D+;D-;CC1;CC2;GND;SHIELD",USB_C_USB2,5V_current_limited,Sealed_service_cover,Reversible,TBD,USB_C_cable,None,OPEN,Recovery and enclosure access
 CON-015,PCB_MAIN,SWD_fixture,"SWDIO;SWCLK;NRST;VTREF;GND",5,Low_current,Internal_test_only,Fixture_keyed,Test_pads,Pogo_fixture,None,OPEN,DFT placement
 CON-016,PCB_MAIN,EOL_aux,Test_signals,TBD,Protected_test_only,Internal_test_only,Fixture_keyed,Test_pads,Pogo_fixture,None,OPEN,EOL coverage
 CON-017,Housing,Pressure_equalization_vent,Air_path,1,Not_electrical,Outdoor_IP67_target,Orientation_control,TBD,TBD,None,OPEN,Selected vent and airflow
 CON-018,Housing,Acoustic_membrane_x4,Acoustic_path,1_each,Not_electrical,Outdoor_IP67_target,Orientation_and_compression,TBD,TBD,None,OPEN,Acoustic and ingress test
+CON-019,PCB_MAIN,Nano_SIM_slot_2,"SIM2_IO;SIM2_CLK;SIM2_RST;SIM2_VCC;SIM2_DET;GND",6_minimum,Low_current,Under_service_cover,Card_orientation,TBD,Nano_SIM,None,OPEN,Mechanical service access and U13 placement

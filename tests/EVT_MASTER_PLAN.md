@@ -9,7 +9,7 @@
 ## Популяция
 
 - все 20 изделий: идентификация, визуальный контроль, EOL, питание S0-S4, четыре аудиоканала, GNSS/PPS, BLE, LTE attach/TLS/store-and-forward и базовый LoRa test;
-- RU868 и EU868 оцениваются раздельно после freeze распределения;
+- все 20 изделий испытываются с заблокированным профилем RU868; EU868 в пилот не прошивается и остаётся будущим TX-disabled шаблоном;
 - корпусные технологии имеют раздельные отчёты и не объединяются в один PASS;
 - разрушительные и длительные тесты назначаются после freeze корпуса и customer usage profile;
 - образец, использованный в разрушительном тесте, не возвращается в обычный полевой пул без disposition.
@@ -35,5 +35,4 @@
 
 ## Открытые входы
 
-Exact countries/operators, final RU868/EU868 split, station deployment spacing, acoustic target set and negative set, environmental ranges, mast/wind conditions, enclosure allocation, transport route and acceptance thresholds must be frozen before QG-2.
-
+Exact site, SIM tariffs and APN values for the selected operators, station deployment spacing, acoustic target set and negative set, environmental ranges, mast/wind conditions, enclosure allocation, transport route and acceptance thresholds must be frozen before QG-2. RU868 allocation is already locked for all 20 units.
