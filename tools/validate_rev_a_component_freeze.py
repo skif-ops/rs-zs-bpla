@@ -26,6 +26,8 @@ def main() -> None:
     power = {r["Component_ID"]: r for r in rows("hardware/POWER_COMPONENT_FREEZE_REV_A.csv")}
     main_parts = {r["RefDes"]: r for r in rows("hardware/MAIN_COMPONENT_FREEZE_REV_A.csv")}
     connectors = {r["Connector_ID"]: r for r in rows("hardware/CONNECTOR_FREEZE_REV_A.csv")}
+    pinmap = {r["Net"]: r for r in rows("hardware/EVT_PRE_20_PIN_MAP_REV_A.csv")}
+    harness = rows("hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv")
 
     expected_power = {
         "PWR-REV-CTL": "LM74700QDBVRQ1",
@@ -50,6 +52,8 @@ def main() -> None:
         "U14": "ESDALC6V1-5P6",
         "U15": "ESDALC6V1-5P6",
         "U16": "SN74AXC8T245PWR",
+        "U17": "SN74LVC32APWR",
+        "U18": "SN74AXC1T45DRLR",
         "X1": "SiT1552AI-JE-DCC-32.768D",
     }
     for ref, mpn in expected_main.items():
@@ -57,6 +61,9 @@ def main() -> None:
         require(main_parts[ref]["MPN"] == mpn, f"{ref} MPN mismatch")
 
     require("nRF52840" in main_parts["U11"]["Package_or_Module"], "U11 is not identified as nRF52840")
+    require("-40..85" in main_parts["U1"]["Temperature_C"], "exact STM32U585VIT6Q +85 C limit is not recorded")
+    require("ENVIRONMENT" in main_parts["U1"]["Status"], "MCU environment gate was lost")
+
     text = "\n".join((ROOT / p).read_text(encoding="utf-8") for p in (
         "hardware/POWER_COMPONENT_FREEZE_REV_A.csv",
         "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
@@ -64,9 +71,24 @@ def main() -> None:
     ))
     require("ESP32-C3" not in text, "ESP32-C3 reappeared in active Rev.A freeze tables")
 
-    require(connectors["CON-MIC"]["Board_MPN"].startswith("JST_BM04B-GHS-TBT"), "MIC connector is not JST GH")
-    require(connectors["CON-MIC"]["Mating_Housing_MPN"] == "JST_GHR-04V-S", "MIC mating housing mismatch")
+    require(connectors["CON-MIC"]["Board_MPN"].startswith("JST_BM05B-GHS-TBT"), "MIC connector is not 5-pin JST GH")
+    require(connectors["CON-MIC"]["Mating_Housing_MPN"] == "JST_GHR-05V-S", "MIC 5-pin mating housing mismatch")
     require(connectors["CON-MIC"]["Terminal_MPN"] == "JST_SSHL-002T-P0.2", "MIC terminal mismatch")
+    require(connectors["CON-MIC"]["Positions"] == "5", "MIC connector does not preserve AAD WAKE contact")
+
+    # Every physical MIC connector must have exactly 5 logical contacts and pin 5 is WAKE.
+    for idx in range(1, 5):
+        ref = f"J_MIC{idx}"
+        physical = [r for r in harness if r["Connector_Ref"] == ref]
+        require([r["Pin"] for r in physical] == ["1", "2", "3", "4", "5"], f"{ref} is not a complete 5-pin harness")
+        require(physical[4]["Net"] == f"MIC_WAKE{idx}", f"{ref} pin 5 does not carry T5838 WAKE")
+        require(physical[4]["Interface"] == f"AAD_WAKE{idx}", f"{ref} WAKE subinterface mismatch")
+
+    require("MIC_WAKE" in pinmap, "aggregated microphone wake MCU net missing")
+    require(pinmap["MIC_WAKE"]["MCU_Pin"] == "PA8", "MIC_WAKE must use PA8")
+    require(pinmap["MIC_WAKE"]["LQFP100_Pin"] == "67", "MIC_WAKE PA8 physical pin must be 67")
+    require(pinmap["MIC_WAKE"]["Direction_at_MCU"] == "IN", "MIC_WAKE must be an MCU input")
+
     require(connectors["CON-003"]["Board_MPN"] == "Molex_430450213", "battery input header mismatch")
     require(connectors["CON-003"]["Mating_Housing_MPN"] == "Molex_430250200", "battery input housing mismatch")
     for key in ("CON-RF-CELL", "CON-RF-GNSS", "CON-RF-LORA"):
@@ -82,6 +104,7 @@ def main() -> None:
     inputs = {r["Input_ID"]: r for r in rows("docs/OPEN_INPUTS_FOR_FREEZE.csv")}
     if inputs.get("IN-006", {}).get("Status") == "OPEN":
         for status in (
+            main_parts["U1"]["Status"],
             main_parts["U11"]["Status"],
             main_parts["U13"]["Status"],
             connectors["CON-USB"]["Status"],
@@ -89,7 +112,7 @@ def main() -> None:
         ):
             require("PENDING" in status or "RISK" in status, "85 C-limited part incorrectly appears fully released")
 
-    print("EVT-PRE-20 Rev.A component/connector freeze consistency: PASS")
+    print("EVT-PRE-20 Rev.A component/connector/AAD-wake freeze consistency: PASS")
 
 
 if __name__ == "__main__":
