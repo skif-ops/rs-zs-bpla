@@ -51,6 +51,33 @@ power:
   mppt_exact_mpn: RFQ_REQUIRED
   no_sun_autonomy_target_days: 30
 
+positioning:
+  station_type: fixed
+  authoritative_position_source: configured_installation_coordinates
+  installation_coordinates_required_before_field_ready: true
+  allowed_commissioning_sources: [manual, phone_location, station_gnss_snapshot, surveyed]
+  phone_location_requires_google_services: false
+  wifi_positioning_required: false
+  gnss_position_role: integrity_monitor_and_diagnostic_not_authoritative_after_commissioning
+  server_tdoa_station_position_source: configured_installation_coordinates
+  coordinate_change_policy: physical_service_mode_plus_authorized_role_plus_audit
+  configured_position_defaults:
+    warning_distance_m: 25
+    suspect_distance_m: 75
+    gross_jump_distance_m: 250
+    warning_consecutive_fixes: 3
+    suspect_consecutive_fixes: 10
+  integrity:
+    use_receiver_spoof_flag: true
+    use_receiver_jam_flag: true
+    compare_gnss_to_configured_position: true
+    accelerometer_movement_requires_revalidation: true
+  time_trust:
+    independent_from_position_trust: true
+    gnss_pps_primary_only_when_time_trusted: true
+    holdover_reference: SiT1552AI-JE-DCC-32.768D
+    holdover_release_limit: MEASURED_DURING_EVT
+
 communications:
   cellular:
     role: primary
@@ -113,7 +140,7 @@ software:
   server_name: Mukhoyed
   server_targets: [Windows_11, Ubuntu_24_04]
   android_track: separate
-  android_minimum_goal: offline_ble_setup_and_signed_ota
+  android_minimum_goal: offline_ble_setup_signed_ota_and_installation_position_commissioning
 
 release_policy:
   qg1_completeness_required: true
