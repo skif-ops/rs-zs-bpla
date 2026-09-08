@@ -5,6 +5,7 @@ Status: `CAPTURE_INPUT / BLOCKING`
 This specification is the bridge between the approved EVT-PRE-20 system architecture and native KiCad schematic capture. It is not a substitute for manufacturer datasheets or reference designs.
 
 Authoritative MCU/net assignment: `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv`.
+Authoritative clock policy: `hardware/CLOCKING_REV_A.md` / `DEC-016`.
 
 ## 1. PCB-MAIN functional blocks
 
@@ -16,6 +17,13 @@ Authoritative MCU/net assignment: `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv`.
 - Mandatory support: all VDD/VSS/VDDA/VSSA/VREF/VDDUSB/VDD11/SMPS-related pins according to selected supply mode; local decoupling at every supply group; NRST; BOOT0; SWDIO/SWCLK.
 - Exact-package guard: `PB12`, `PE1`, `PC4`, and `PC5` are absent from `STM32U585VITxQ/LQFP100` and are forbidden in Rev.A even though generic STM32U585 package tables may show them for other variants.
 - The Rev.A CSV map is checked by CI for duplicate use and required peripheral mapping. Final alternate-function initialization remains blocked until a CubeMX `.ioc` for this exact package is generated and reviewed.
+
+### Clocking Rev.A
+- High-speed policy is locked by `DEC-016`: internal STM32 MSI/HSI sources plus PLL; no external HSE crystal or HSE oscillator is fitted on PCB-MAIN Rev.A.
+- Do not place an HSE crystal, oscillator, HSE load capacitors or tuning network in the Rev.A production BOM unless a formal configuration revision supersedes `DEC-016`.
+- Low-frequency reference remains `SiT1552AI-JE-DCC-32.768D`, 32.768 kHz, for low-frequency/timebase support only.
+- PC14/PC15 remain reserved for the reviewed LSE/external-clock implementation. The final SiT1552 connection must use the exact STM32 LSE bypass/external-clock mode generated in CubeMX; do not copy crystal-mode wiring by assumption.
+- Firmware must prove USB FS operation, four-channel 32 kHz PDM sample-rate accuracy, GNSS PPS timestamping, low-power wake/restore and MSI/HSI/PLL transition recovery on real target hardware before release.
 
 ### Frozen Rev.A peripheral map
 - MDF/PDM: PE9=`MDF1_CCK0`; PB1=`MDF1_SDI0`; PD6=`MDF1_SDI1`; PE7=`MDF1_SDI2`; PE4=`MDF1_SDI3`.
@@ -158,6 +166,7 @@ The exact connector manufacturer/MPN may be frozen after mechanical review, but 
 - Route PDM clock/data away from modem DC/DC and RF feed lines; preserve comparable harness electrical length for MIC1..4.
 - Keep the PDM translator close to the MCU/fanout origin and keep its 1.8 V and 3.3 V decoupling local.
 - Provide explicit test points for all regulated rails, reset, SWD, production UART, PPS and power-state signals.
+- Do not place an HSE footprint or route an HSE resonator loop on Rev.A; this is a locked architecture decision, not a DNP option.
 
 ## 6. Capture completion criteria
 
@@ -166,9 +175,10 @@ Capture is complete only when:
 2. exact symbols/footprints are assigned and datasheet-checked;
 3. the exact-package pin map matches `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv`;
 4. a CubeMX `.ioc` for `STM32U585VITxQ/LQFP100` is committed and cross-checked against the CSV map;
-5. connector net order matches `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
-6. all BG95 1.8 V crossings and the T5838 1.8 V PDM crossing are explicit in the schematic;
-7. ERC passes with no unexplained error;
-8. Review A from `hardware/PCB_DOUBLE_REVIEW_GATE.md` is complete.
+5. the CubeMX clock tree implements `REV_A_INTERNAL_HSI_MSI_PLL_NO_HSE` and the SiT1552 low-frequency configuration is reviewed explicitly;
+6. connector net order matches `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
+7. all BG95 1.8 V crossings and the T5838 1.8 V PDM crossing are explicit in the schematic;
+8. ERC passes with no unexplained error;
+9. Review A from `hardware/PCB_DOUBLE_REVIEW_GATE.md` is complete.
 
 Only then may PCB placement/routing be treated as a release candidate.
