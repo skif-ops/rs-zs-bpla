@@ -5,6 +5,14 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class StationModelsTest {
+    private fun validPosition() = InstallationPosition(
+        latE7 = 557_550_000,
+        lonE7 = 376_150_000,
+        altDm = 1800,
+        accuracyM = 5,
+        source = CoordinateSource.MANUAL,
+    )
+
     @Test
     fun acceptsLotSerialBoundaries() {
         for (serial in listOf("DIO-EVT-001", "DIO-EVT-020")) {
@@ -28,10 +36,41 @@ class StationModelsTest {
     @Test
     fun requiresTlsEndpoints() {
         val errors = ConfigurationValidator.validate(
-            StationConfiguration("internet", "mqtt://example", "http://example", "pilot-ca"),
+            StationConfiguration(
+                "internet",
+                "mqtt://example",
+                "http://example",
+                "pilot-ca",
+                installationPosition = validPosition(),
+            ),
         )
         assertTrue("mqtt_tls_required" in errors)
         assertTrue("https_tls_required" in errors)
+    }
+
+    @Test
+    fun requiresInstallationPositionForFieldConfiguration() {
+        val errors = ConfigurationValidator.validate(
+            StationConfiguration("internet", "mqtts://example", null, "pilot-ca"),
+        )
+        assertTrue("missing_installation_position" in errors)
+    }
+
+    @Test
+    fun rejectsInvalidInstallationCoordinates() {
+        val bad = InstallationPosition(
+            latE7 = 1_000_000_000,
+            lonE7 = 0,
+            altDm = 0,
+            accuracyM = 5,
+            source = CoordinateSource.PHONE_LOCATION,
+        )
+        assertTrue("invalid_installation_latitude" in bad.validate())
+    }
+
+    @Test
+    fun acceptsDefaultPositionTrustPolicy() {
+        assertTrue(PositionTrustPolicy().validate().isEmpty())
     }
 
     @Test
@@ -49,6 +88,7 @@ class StationModelsTest {
             httpsFallbackEndpoint = "https://pilot.example",
             caReference = "pilot-ca",
             dualSim = dualSim,
+            installationPosition = validPosition(),
         )
         assertTrue(ConfigurationValidator.validate(configuration).isEmpty())
     }
@@ -63,7 +103,14 @@ class StationModelsTest {
             ),
         )
         val errors = ConfigurationValidator.validate(
-            StationConfiguration("internet.mts.ru", "mqtts://pilot.example", null, "pilot-ca", dualSim),
+            StationConfiguration(
+                "internet.mts.ru",
+                "mqtts://pilot.example",
+                null,
+                "pilot-ca",
+                dualSim,
+                validPosition(),
+            ),
         )
         assertTrue("private_apn_not_allowed_in_pilot" in errors)
     }
