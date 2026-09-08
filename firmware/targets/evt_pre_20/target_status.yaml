@@ -23,6 +23,30 @@ audio:
   geometry_id: 1
   base_triangle_side_mm: 120
   upper_offset_mm: 150
+ble:
+  soc: nRF52840
+  module: Raytac_MDBT50Q-P1MV2
+  interface: USART3_plus_enable_plus_dfu_request
+  wifi: NOT_REQUIRED
+  required_phy: [BLE_2M, BLE_1M, BLE_CODED_LONG_RANGE]
+  firmware_port: MISSING_BLOCKER
+  swd_recovery: REQUIRED_ON_FIXTURE
+  enclosure_rf_validation: REQUIRED
+positioning:
+  station_type: fixed
+  authoritative_source: configured_installation_coordinates
+  firmware_module: zs_position_trust
+  wifi_positioning: NOT_REQUIRED
+  installation_position_storage: MISSING_BLOCKER
+  installation_position_ble_commissioning: MISSING_BLOCKER
+  configured_position_required_for_field_ready: true
+  default_warning_distance_m: 25
+  default_suspect_distance_m: 75
+  default_gross_jump_distance_m: 250
+  receiver_spoof_and_jam_monitoring: REQUIRED
+  accelerometer_relocation_revalidation: REQUIRED
+  time_trust_independent: true
+  holdover_limit: MEASURE_DURING_EVT
 pinmap:
   source: hardware/EVT_PRE_20_PIN_MAP_REV_A.csv
   status: DATASHEET_VERIFIED_CUBEMX_PENDING
