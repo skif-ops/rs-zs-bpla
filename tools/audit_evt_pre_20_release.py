@@ -28,6 +28,8 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "hardware/kicad/REV_A_CAPTURE_SPEC.md",
         "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
         "hardware/ENVIRONMENT_REV_A.md",
+        "hardware/T5838_AAD_INTERFACE_REV_A.md",
+        "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
         "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
         "hardware/POWER_COMPONENT_FREEZE_REV_A.csv",
         "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -152,23 +154,34 @@ def audit() -> dict[str, object]:
     bom = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
     if bom.is_file():
         bom_text = bom.read_text(encoding="utf-8")
-        for forbidden in ("ESP32-C3", "JST_BM05B", "GHR-05V-S"):
+        for forbidden in ("ESP32-C3", "JST_BM05B", "GHR-05V-S", "5040500591", "5040510501"):
             if forbidden in bom_text:
                 blockers.append(f"generated Rev.A BOM contains forbidden/superseded token: {forbidden}")
-        for required in ("MDBT50Q-P1MV2", "5040500591", "SN74LVC32APWR", "SN74AXC1T45DRLR", "LMR604403SRAKR"):
+        for required in ("MDBT50Q-P1MV2", "5040500691", "SN74LVC32APWR", "SN74AXC1T45DRLR", "LMR604403SRAKR"):
             if required not in bom_text:
                 blockers.append(f"generated Rev.A BOM missing locked item: {required}")
+        if "AAD_CFG" not in bom_text:
+            blockers.append("generated Rev.A BOM does not document THSEL/AAD_CFG on MIC connector")
 
     addendum = ROOT / "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md"
     if addendum.is_file():
         addendum_text = addendum.read_text(encoding="utf-8")
-        if "5040500591" not in addendum_text or "5040510501" not in addendum_text:
-            blockers.append("capture addendum does not lock the -40 C MIC connector set")
+        if "5040500691" not in addendum_text or "5040510601" not in addendum_text or "AAD_CFG" not in addendum_text:
+            blockers.append("capture addendum does not lock the 6-pin THSEL-capable MIC connector set")
+
+    aad_doc = ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md"
+    if aad_doc.is_file():
+        aad_text = aad_doc.read_text(encoding="utf-8")
+        for required in ("PA15", "THSEL", "PA8", "WAKE", "5040500691"):
+            if required not in aad_text:
+                blockers.append(f"T5838 AAD interface document missing: {required}")
 
     manifest_inputs = [
         ROOT / "config/EVT_PRE_20_BASELINE.yaml",
         ROOT / "docs/DECISION_LOG.csv",
         ROOT / "hardware/ENVIRONMENT_REV_A.md",
+        ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md",
+        ROOT / "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
         ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv",
         ROOT / "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
         ROOT / "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
