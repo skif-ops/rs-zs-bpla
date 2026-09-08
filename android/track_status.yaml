@@ -10,7 +10,7 @@ service_recovery_transport: USB_C
 roles: [installer, service_engineer]
 candidate_os_support:
   minimum_android: Android_9
-  release_target_sdk: API_37
+  release_target_sdk: API_36
   required_architecture: arm64_v8a
 required_features:
   - qr_identity_import
