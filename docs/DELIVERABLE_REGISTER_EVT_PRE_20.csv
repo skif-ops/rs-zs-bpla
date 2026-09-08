@@ -25,9 +25,9 @@ HW-A-003,PCB microphones,Оснастка позиционирования 3+1,S
 HW-P-001,Power,Схема power interface,KICAD_SCH+PDF,P0,PLANNED,OPEN,OPEN,Reverse surge fuse TVS cold-Voc review
 HW-P-002,Power,PCB power interface и производство,KICAD+GERBER+PnP+BOM,P0,PLANNED,OPEN,OPEN,DRC thermal/current DFM PASS
 HW-P-003,Power,Спецификация MPPT и батареи,DOCX+XLSX,P0,DRAFT,OPEN,OPEN,Совместимость LiFePO4 Voc current temperature
-HW-C-001,Кабели,Схема соединения всех элементов,DOCX+PDF,P0,PLANNED,OPEN,OPEN,Каждый pin связан с net fuse wire gauge connector
+HW-C-001,Кабели,Схема соединения всех элементов,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Каждый pin связан с net fuse wire gauge connector
 HW-C-002,Кабели,Чертежи жгутов и распайка,DOCX+CSV,P0,PLANNED,OPEN,OPEN,Длина сечение цвет контакт обжим указаны
-HW-C-003,Кабели,Таблица разъёмов и mating parts,XLSX+CSV,P1,PLANNED,OPEN,OPEN,Разъёмы съёмные; пары и инструменты указаны
+HW-C-003,Кабели,Таблица разъёмов и mating parts,XLSX+CSV,P1,DRAFT,OPEN,OPEN,Разъёмы съёмные; пары и инструменты указаны
 PROC-001,Закупка,Сводный BOM на 20 изделий и запас,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Расчёт qty закупки и стоимости формульный
 PROC-002,Закупка,China sourcing snapshot,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Поставщик ссылка дата MOQ lead time stock
 PROC-003,Закупка,Approved vendor list и аналоги,XLSX+CSV,P0,PLANNED,OPEN,OPEN,Аналоги не снижают функциональность
@@ -75,7 +75,7 @@ EVT-006,Испытания,Энергетика S0-S4 solar battery,TEMPLATES+SC
 EVT-007,Испытания,Механика IP климат UV,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Отдельно по технологии корпуса
 EVT-008,Испытания,Сводный отчёт и deviation closure,DOCX+XLSX,P0,PLANNED,OPEN,OPEN,Нет незакрытых blocker deviations
 AND-001,Android,Требования и UX flow,DOCX+FIGMA_or_SVG,P0,DRAFT,OPEN,OPEN,Сценарии монтажника и сервис-инженера приняты
-AND-002,Android,Исходный проект Kotlin/Android,KOTLIN+GRADLE,P0,PLANNED,OPEN,OPEN,Reproducible build and tests PASS
+AND-002,Android,Исходный проект Kotlin/Android,KOTLIN+GRADLE,P0,DRAFT,OPEN,OPEN,Reproducible build and tests PASS
 AND-003,Android,BLE configuration client,KOTLIN,P0,PLANNED,OPEN,OPEN,Schema validation and auth PASS
 AND-004,Android,Signed OTA client,KOTLIN,P0,PLANNED,OPEN,OPEN,Power loss resume hash signature rollback PASS
 AND-005,Android,APK arm64 и test APK,APK+SHA256+SIG,P0,PLANNED,OPEN,OPEN,Install Huawei/no GMS smoke PASS

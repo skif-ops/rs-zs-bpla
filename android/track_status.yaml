@@ -1,7 +1,12 @@
 track_id: dioneya_android_commissioning
 status: SOURCE_BASELINE
 source_status: SKELETON_WITH_VALIDATORS_AND_TESTS
-apk_status: NOT_BUILT
+apk_status: RELEASE_NOT_BUILT
+debug_ci_build:
+  status: PASS
+  source_commit: 6e561637c03856b6bfb963a5b16a481888925991
+  workflow_run: 34240158982
+  artifact_retained: false
 distribution: enterprise_sideload_or_customer_mdm
 google_play_services_required: false
 internet_required_for_commissioning: false

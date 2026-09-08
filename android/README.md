@@ -16,6 +16,8 @@
 
 В каталоге `app` находится минимальный Kotlin/Android проект с unit tests, но он не является commissioning APK: BLE UUID, authenticated pairing и формат OTA signature ещё не заморожены.
 
+Debug source baseline успешно собран CI на commit `6e561637c03856b6bfb963a5b16a481888925991`, workflow run `34240158982`. APK не публиковался и не разрешён к установке на производстве.
+
 Документы:
 
 - `APP_ARCHITECTURE_v0_1.md`;
