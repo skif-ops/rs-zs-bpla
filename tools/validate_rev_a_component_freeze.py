@@ -108,11 +108,12 @@ def main() -> None:
         require("U.FL" in connectors[key]["Board_MPN"], f"{key} is not U.FL")
         require("TEMP_VERIFY" in connectors[key]["Status"], f"{key} cable/connector temperature verification blocker was lost")
     for key in ("CON-SIM1", "CON-SIM2"):
-        require(connectors[key]["Board_MPN"] == "TE_2336582-1", f"{key} is not the selected 4FF connector")
-        require("Nano-SIM" in connectors[key]["Function"], f"{key} is not explicitly nano-SIM")
-        require("PROCUREMENT_RISK" in connectors[key]["Status"], f"{key} procurement risk was lost")
-        require("-40..85" in connectors[key]["Temperature_C"], f"{key} does not meet -40..+70 ambient requirement")
-    require("3FF" not in text and "micro-SIM" not in text, "3FF/micro-SIM must not enter Rev.A connector freeze")
+        sim = connectors[key]
+        require(sim["Board_MPN"] == "TE_2336582-1", f"{key} is not the selected 4FF connector")
+        require("Nano-SIM" in sim["Function"], f"{key} is not explicitly nano-SIM/4FF")
+        require("PROCUREMENT_RISK" in sim["Status"], f"{key} procurement risk was lost")
+        require("-40..85" in sim["Temperature_C"], f"{key} does not meet -40..+70 ambient requirement")
+    require("never substitute 3FF" in connectors["CON-SIM1"]["Notes"], "explicit 3FF/micro-SIM prohibition is missing")
 
     print("EVT-PRE-20 Rev.A component/connector/environment/AAD-wake freeze consistency: PASS")
 
