@@ -32,12 +32,18 @@ jobs:
             fi
           done
           echo "any_ready=$any" >> "$GITHUB_OUTPUT"
-      - name: Install KiCad CLI when at least one native board exists
-        if: steps.native.outputs.any_ready == 'true'
+      - name: Install and identify KiCad toolchain
         run: |
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y kicad
           kicad-cli version
+          /usr/bin/python3 - <<'PY'
+          try:
+              import pcbnew
+              print("PCBNEW_PYTHON_AVAILABLE", pcbnew.GetBuildVersion())
+          except Exception as exc:
+              print("PCBNEW_PYTHON_UNAVAILABLE", repr(exc))
+          PY
       - name: ERC DRC and fabrication export for every complete board
         if: steps.native.outputs.any_ready == 'true'
         run: python tools/kicad_native_gate.py --run-cli
