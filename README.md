@@ -37,6 +37,7 @@ Gerber, прошивки, бинарники, корпуса и серверны
 - [`BRANCH_SCOPE.md`](BRANCH_SCOPE.md) — границы ветки.
 - [`config/EVT_PRE_20_BASELINE.yaml`](config/EVT_PRE_20_BASELINE.yaml) — машинно-читаемая конфигурационная база.
 - [`docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv`](docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv) — полный реестр комплекта и gates.
+- [`docs/OPEN_INPUTS_FOR_FREEZE.csv`](docs/OPEN_INPUTS_FOR_FREEZE.csv) - входные данные заказчика, блокирующие финальный выпуск.
 - [`protocols/CELLULAR_CONNECTIVITY_BASELINE.md`](protocols/CELLULAR_CONNECTIVITY_BASELINE.md) — SIM/APN и исходящая связь.
 - [`manufacturing/README.md`](manufacturing/README.md) — маршрут партии, traceability, provisioning и EOL.
 - [`tests/EVT_MASTER_PLAN.md`](tests/EVT_MASTER_PLAN.md) — последовательность и правила принятия EVT.

@@ -1,0 +1,21 @@
+Input_ID,Area,Required_Input,Why_Required,Blocks,Recommended_Default,Owner,Status
+IN-001,Pilot,Country and exact site type per unit,Determines radio operator environment and mechanical loads,RF_PROFILE_AND_EVT_PLAN,Russia as primary pilot if customer confirms,CUSTOMER,OPEN
+IN-002,Cellular,Mobile operators SIM types APN and roaming policy,Required for BG95 regional variant and attach matrix,BG_MODEM_SKU_AND_CELLULAR_EVT,Test at least two candidate operators,CUSTOMER,OPEN
+IN-003,LoRa,Final RU868 and EU868 unit allocation,Required for labels provisioning and RF evidence,LOT_CONFIGURATION,10 RU868 plus 10 EU868,CUSTOMER,OPEN
+IN-004,Mechanics,Second housing process for the 20-unit lot,Distinguishes vacuum casting from injection tooling,HOUSING_BOM_CAD_AND_ALLOCATION,Vacuum casting for EVT; TPA as separate DFM track,CUSTOMER,OPEN
+IN-005,Mechanics,Number of units per housing technology,Required for purchasing fixtures and test sample assignment,LOT_CONFIGURATION,10 printed plus 10 vacuum cast,CUSTOMER,OPEN
+IN-006,Environment,Operating and storage temperature ranges,Controls components battery charging materials and tests,COMPONENT_AND_TEST_LIMITS,TBD by customer site,CUSTOMER,OPEN
+IN-007,Environment,Humidity UV salt fog dust chemical and icing exposure,Controls enclosure material coating and environmental EVT,MECHANICAL_RELEASE,TBD by customer site,CUSTOMER,OPEN
+IN-008,Installation,Mast diameter height attachment orientation and service access,Controls brackets wind load cable lengths and RF placement,MECHANICAL_RELEASE,TBD by customer installation,CUSTOMER,OPEN
+IN-009,Installation,Maximum wind and ice load,Required for structural and solar bracket calculation,MECHANICAL_RELEASE,TBD by customer site,CUSTOMER,OPEN
+IN-010,Power,Approved battery candidate SKUs or dimensional limit,Required for enclosure safety BMS charge and transport,POWER_AND_MECHANICAL_RELEASE,Request two 12.8V 40-60Ah samples with low-temperature protection,PROCUREMENT_CUSTOMER,OPEN
+IN-011,Power,Approved MPPT candidate SKUs,Required for interfaces charge profile and quiescent current,POWER_RELEASE,Request two traceable 10A LiFePO4 samples,PROCUREMENT,OPEN
+IN-012,Power,Approved 60-80W panel candidate SKUs and mounting constraints,Required for cold Voc cable bracket and transport,POWER_AND_MECHANICAL_RELEASE,Freeze after IV and mechanical sample check,PROCUREMENT_CUSTOMER,OPEN
+IN-013,RF,Preferred antenna form and installation constraints,Required for connectors coax enclosure and coexistence,PCB_AND_MECHANICAL_RELEASE,Three separate external antennas,RF_CUSTOMER,OPEN
+IN-014,Server,Hosting owner OS FQDN certificates backup destination and network boundary,Required for hardened Mukhoyed deployment,SERVER_RELEASE,Ubuntu 24.04 primary and Windows 11 service copy,CUSTOMER_IT,OPEN
+IN-015,Security,Device certificate authority owner and credential lifecycle,Required for provisioning revocation and TLS auth,PROVISIONING_AND_DEPLOYMENT,Project-owned offline CA or approved enterprise PKI,CUSTOMER_IT_SECURITY,OPEN
+IN-016,Operations,Station identifiers tenant names and commissioning roles,Required for registry QR ACL and Android workflow,PROVISIONING_AND_ANDROID,One pilot tenant and two roles as baseline,CUSTOMER,OPEN
+IN-017,Acceptance,Detection targets distances Pd FAR latency and negative set,Required for objective audio EVT result,ACOUSTIC_EVT_PASS,TBD by customer mission,CUSTOMER_ACOUSTICS,OPEN
+IN-018,Acceptance,Timing localization accuracy and station geometry at site,Required for GNSS PPS TDOA criteria,TIMING_AND_SYSTEM_EVT_PASS,TBD by customer deployment,CUSTOMER_SYSTEM,OPEN
+IN-019,Data,Retention privacy export and ownership rules,Required for server storage diagnostics and field evidence,SERVER_AND_ANDROID_RELEASE,No analytics and minimal redacted export,CUSTOMER_LEGAL_IT,OPEN
+IN-020,Logistics,China supplier restrictions destination carrier and desired build date,Required for RFQ transport documents and schedule,PROCUREMENT_RELEASE,TBD by customer,PROCUREMENT_CUSTOMER,OPEN
