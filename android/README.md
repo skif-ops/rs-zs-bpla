@@ -12,7 +12,9 @@
 - поддерживает resume, A/B status и rollback report;
 - USB-C используется как отдельный сервисный recovery path.
 
-Статус: `REQUIREMENTS_DRAFT / SOURCE_NOT_STARTED / APK_NOT_BUILT`.
+Статус: `SOURCE_BASELINE / BLE_NOT_IMPLEMENTED / RELEASE_APK_NOT_BUILT`.
+
+В каталоге `app` находится минимальный Kotlin/Android проект с unit tests, но он не является commissioning APK: BLE UUID, authenticated pairing и формат OTA signature ещё не заморожены.
 
 Документы:
 

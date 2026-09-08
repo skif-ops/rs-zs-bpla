@@ -1,6 +1,6 @@
 # Android commissioning app - архитектура v0.1
 
-Статус: `DRAFT / SOURCE NOT STARTED`
+Статус: `DRAFT / SOURCE BASELINE STARTED / BLE NOT IMPLEMENTED`
 
 ## Модули
 
@@ -15,7 +15,7 @@
 | `diagnostics` | health snapshot, guided checks, redacted export |
 | `storage` | encrypted local records without station private keys |
 
-Реализация: Kotlin, Android framework BLE API, без обязательных Google libraries. UI toolkit и точные Gradle/SDK versions замораживаются перед началом source baseline.
+Реализация: Kotlin, Android framework BLE API, без обязательных Google libraries. Toolchain зафиксирован в `TOOLCHAIN.md`. Первый baseline содержит state machine, identity/config validation и OTA preflight; BLE transport и cryptographic signature verifier остаются fail-closed до freeze ICD.
 
 ## Поток commissioning
 
@@ -40,4 +40,3 @@
 `IDLE -> SCANNING -> CONNECTING -> AUTHENTICATING -> READY -> CONFIGURING/DIAGNOSTICS/OTA -> VERIFYING -> REBOOT_WAIT -> CONFIRMED/ROLLED_BACK/FAILED`.
 
 Каждый переход имеет timeout, cancel и безопасное повторение. Потеря Bluetooth не должна оставлять конфигурацию частично применённой или образ активированным без проверки.
-
