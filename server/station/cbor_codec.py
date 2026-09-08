@@ -39,6 +39,20 @@ _FAMILY_LABEL = {0: "UNKNOWN", 1: "PROP_PISTON", 2: "ROTOR_ELECTRIC", 3: "TURBIN
 _TYPE_LABEL = {0: "UNKNOWN", 1: "LUTYI", 2: "FP1", 3: "FP2", 254: "OTHER"}
 _DECISION_STATUS = {0: "UNKNOWN", 1: "CANDIDATE", 2: "PROVISIONAL", 3: "STABLE", 4: "UNSUPPORTED"}
 _MOTION_HINT = {0: "UNKNOWN", 1: "APPROACH", 2: "PASSING", 3: "RECEDING"}
+_POSITION_TRUST = {
+    0: "UNCONFIGURED",
+    1: "CONFIGURED_OK",
+    2: "CONFIGURED_WARN",
+    3: "CONFIGURED_SUSPECT",
+    4: "REVALIDATION_REQUIRED",
+}
+_TIME_TRUST = {
+    0: "UNKNOWN",
+    1: "GNSS_TIME_TRUSTED",
+    2: "HOLDOVER",
+    3: "GNSS_TIME_SUSPECT",
+    4: "UNSYNCED",
+}
 
 
 class _CborReader:
@@ -137,11 +151,14 @@ def decode_detection_obj(obj: Any) -> DetectionMessage:
     class_id = int(payload.get(4, 0))
     confidence = int(payload.get(5, 0))
     flags = int(obj.get(7, 0))
+    configured_position = bool(flags & 0x04)
 
     family_id = int(hierarchy.get(0, 0))
     type_id = int(hierarchy.get(2, 0))
     valid_flags = int(single.get(5, 0))
     spatial_flags = int(spatial.get(6, 0))
+    position_trust_id = int(payload.get(13, 1 if configured_position else 0))
+    time_trust_id = int(payload.get(14, 0))
 
     return DetectionMessage(
         schema_ver=int(obj.get(0, 1)),
@@ -154,8 +171,9 @@ def decode_detection_obj(obj: Any) -> DetectionMessage:
             lat_e7=int(payload.get(0, 0)),
             lon_e7=int(payload.get(1, 0)),
             alt_dm=int(payload.get(2, 0)),
-            pos_accuracy_m=20.0,
-            altitude_source="gnss_msl",
+            pos_accuracy_m=float(payload.get(15, 20)),
+            altitude_source="configured_msl" if configured_position else "gnss_msl",
+            position_source="configured_install" if configured_position else "gnss_live",
         ),
         gnss=GnssStatus(
             fix_type=int(payload.get(6, 0)),
@@ -163,8 +181,15 @@ def decode_detection_obj(obj: Any) -> DetectionMessage:
             hdop_x100=int(payload.get(8, 9999)),
             pps_ok=bool(payload.get(3, False)),
             expected_time_error_us=int(payload.get(9, 1_000_000)),
-            jam=bool(flags & 1),
-            spoof=bool(flags & 2),
+            jam=bool(flags & 0x01),
+            spoof=bool(flags & 0x02),
+            position_delta_m=int(payload.get(12, 0)),
+            position_warn=bool(flags & 0x08),
+            position_suspect=bool(flags & 0x10),
+            time_suspect=bool(flags & 0x20),
+            time_holdover=bool(flags & 0x40),
+            position_trust=_POSITION_TRUST.get(position_trust_id, "UNCONFIGURED"),
+            time_trust=_TIME_TRUST.get(time_trust_id, "UNKNOWN"),
         ),
         classification=Classification(
             class_id=class_id,
