@@ -23,23 +23,20 @@ jobs:
           python-version: "3.12"
       - name: Engineering preflight
         run: python tools/kicad_native_gate.py
-      - name: Install and identify KiCad toolchain
+      - name: Install official KiCad 9 stable toolchain
         run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
+          sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y kicad
           kicad-cli version
-          echo '--- pcb drc support ---'
-          kicad-cli pcb drc --help || true
-          echo '--- sch erc support ---'
-          kicad-cli sch erc --help || true
-          echo '--- sch upgrade support ---'
-          kicad-cli sch upgrade --help || true
+          kicad-cli pcb drc --help
+          kicad-cli sch erc --help
+          kicad-cli sch upgrade --help
           /usr/bin/python3 - <<'PY'
-          try:
-              import pcbnew
-              print("PCBNEW_PYTHON_AVAILABLE", pcbnew.GetBuildVersion())
-          except Exception as exc:
-              print("PCBNEW_PYTHON_UNAVAILABLE", repr(exc))
+          import pcbnew
+          print("PCBNEW_PYTHON_AVAILABLE", pcbnew.GetBuildVersion())
           PY
       - name: Import PCB-MIC secondary reference CAD
         run: |
