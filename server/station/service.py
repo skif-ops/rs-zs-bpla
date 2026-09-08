@@ -30,7 +30,22 @@ class StationFusionService:
         if a.classification.class_id==b.classification.class_id: return True
         # Both UAV families may correlate during uncertain first-stage classification.
         return a.classification.class_id in (1,2,3) and b.classification.class_id in (1,2,3)
+    def _enforce_configured_station_position(self,d:DetectionMessage)->DetectionMessage:
+        hb=self.store.get_station_heartbeat(d.station_id)
+        if hb is None or hb.station.position_source!='configured_install': return d
+        trusted=hb.station
+        same=(d.station.lat_e7==trusted.lat_e7 and d.station.lon_e7==trusted.lon_e7 and d.station.alt_dm==trusted.alt_dm)
+        if d.station.position_source=='configured_install' and same: return d
+        # A live-GNSS or mismatched position may be retained in diagnostics elsewhere,
+        # but must not silently alter fusion/TDOA station geometry.
+        gnss=d.gnss.model_copy(update={
+            'position_warn':True,
+            'position_suspect':True,
+            'position_trust':'CONFIGURED_SUSPECT',
+        })
+        return d.model_copy(update={'station':trusted,'gnss':gnss})
     def ingest(self,d:DetectionMessage)->SystemEvent:
+        d=self._enforce_configured_station_position(d)
         self.store.save_detection(d)
         candidates=[x for x in self.store.recent_detections(d.event_time_us,self.window_us) if self._compatible(d,x)]
         # One best detection per station, closest to current event time.
