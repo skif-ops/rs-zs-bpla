@@ -1,0 +1,84 @@
+project: Dioneya_ZS_BPLA
+configuration_id: EVT-PRE-20
+baseline_version: 0.1
+baseline_date: 2026-09-08
+status: OPEN_NOT_RUN
+source_branch: evt
+source_commit: 2ec1d6dc81e3a16b7c127f1bbfe03f3945a72c45
+
+lot:
+  quantity: 20
+  serial_prefix: DIO-EVT-
+  serial_range: [001, 020]
+  allocation_status: TO_BE_DEFINED_IN_EVT_PLAN
+
+electronics:
+  architecture: custom_pcb
+  dev_board_in_product: false
+  mcu_family: STM32U585
+  mcu_exact_mpn: OPEN_UNTIL_SCH_FREEZE
+  mcu_package_policy: prefer_inspectable_non_BGA_for_20_unit_EVT
+  microphone_count: 4
+  microphone_matching: same_mpn_same_lot_preferred
+  microphone_geometry:
+    type: 3_plus_1
+    base_triangle_side_mm: 120
+    upper_offset_mm: 150
+  pcb_set:
+    - main_controller
+    - microphone_leaf_x4
+    - power_interface
+
+power:
+  battery_chemistry: LiFePO4
+  battery_nominal_voltage_v: 12.8
+  battery_capacity_ah_range: [40, 60]
+  solar_panel_w_range: [60, 80]
+  mppt_architecture: EXTERNAL_OR_DEDICATED_POWER_ASSEMBLY_PENDING_FREEZE
+  no_sun_autonomy_target_days: 30
+
+communications:
+  cellular:
+    role: primary
+    station_connection_direction: outbound_only
+    preferred_transport: mqtt_tls
+    preferred_ports: [443, 8883]
+    fallback_transport: https_tls
+    ordinary_sim_allowed_for_evt: true
+    public_apn_allowed_for_evt: true
+    static_public_ip_required: false
+    inbound_station_connection_required: false
+    store_and_forward_required: true
+  lora:
+    role: backup_event_transport
+    common_pcb: true
+    variants:
+      - id: RU868
+        profile_status: OPEN_REGULATORY_AND_RF_VALIDATION
+      - id: EU868
+        profile_status: OPEN_REGULATORY_AND_RF_VALIDATION
+  ble:
+    role: local_service_configuration_diagnostics_ota
+
+mechanics:
+  acoustic_head_geometry_locked: true
+  variants:
+    - 3d_print
+    - vacuum_casting
+    - injection_molding
+  primary_evt_print_platform: FlashForge_Adventurer_5M_Pro
+
+software:
+  station_firmware_status: TARGET_PORT_REQUIRED
+  server_name: Mukhoyed
+  server_targets: [Windows_11, Ubuntu_24_04]
+  android_track: separate
+  android_minimum_goal: offline_ble_setup_and_signed_ota
+
+release_policy:
+  qg1_completeness_required: true
+  qg2_technical_required: true
+  no_hardware_pass_without_evidence: true
+  sha256_manifest_required: true
+  sbom_required: true
+  credentials_in_repository: false
