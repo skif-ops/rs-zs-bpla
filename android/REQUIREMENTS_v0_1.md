@@ -19,7 +19,7 @@
 - AND-F-013: не позволять пользователю менять manufacturing region RU868/EU868.
 - AND-F-014: выдавать пошаговую инструкцию USB-C recovery без хранения recovery secrets.
 - AND-F-015: показывать наличие SIM1/SIM2, redacted ICCID, активный слот, оператора, RAT и результат последнего attach.
-- AND-F-016: настраивать упорядоченные public/private APN profiles и preferred SIM slot без экспорта PIN/PUK/APN password.
+- AND-F-016: настраивать упорядоченные публичные APN profiles и preferred SIM slot без экспорта PIN/PUK/APN password; private APN для EVT-PRE-20 отклонять.
 - AND-F-017: разрешать ручное переключение SIM/APN только авторизованной роли, с явным предупреждением о разрыве связи и сохранением audit record.
 - AND-F-018: показывать причину автоматического failover, предыдущий и новый профиль, число попыток и состояние store-and-forward.
 

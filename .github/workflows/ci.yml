@@ -8,6 +8,17 @@ on:
     branches: [main, develop, evt, evt-mb, evt-pre-20]
 
 jobs:
+  evt-pre-20-config:
+    name: EVT-PRE-20 configuration consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate locked pilot decisions
+        run: python tools/validate_evt_pre_20.py
+
   firmware:
     name: Firmware CMake/CTest
     runs-on: ubuntu-latest
@@ -83,7 +94,7 @@ jobs:
   protocol-e2e:
     name: Firmware CBOR to Server
     runs-on: ubuntu-latest
-    needs: [firmware, server-core, server-full, android]
+    needs: [evt-pre-20-config, firmware, server-core, server-full, android]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

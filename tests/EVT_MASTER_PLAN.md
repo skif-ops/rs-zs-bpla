@@ -35,4 +35,4 @@
 
 ## Открытые входы
 
-Exact site, SIM tariffs and APN values for the selected operators, station deployment spacing, acoustic target set and negative set, environmental ranges, mast/wind conditions, enclosure allocation, transport route and acceptance thresholds must be frozen before QG-2. RU868 allocation is already locked for all 20 units.
+Exact site, public APN and RAT values for the selected SIMs, station deployment spacing, acoustic target set and negative set, environmental ranges, mast/wind conditions, transport route and acceptance thresholds must be frozen before QG-2. Tariff is not an EVT input. RU868 and the primary allocation of 20 vacuum-cast housings are locked; full-lot 3D printing is the controlled fallback and injection molding is source-data-only for the pilot.

@@ -52,8 +52,10 @@ communications:
     fallback_transport: https_tls
     ordinary_sim_allowed_for_evt: true
     public_apn_allowed_for_evt: true
-    private_apn_profile_supported: true
-    apn_mode_switch_supported: true
+    pilot_apn_policy: public_only
+    private_apn_profile_supported_in_pilot: false
+    apn_mode_switch_supported_in_pilot: false
+    tariff_is_evt_acceptance_input: false
     sim_architecture: dual_sim_single_standby
     physical_nano_sim_slots: 2
     simultaneously_active_sim_count: 1
@@ -81,6 +83,13 @@ mechanics:
     - vacuum_casting
     - injection_molding
   primary_evt_print_platform: FlashForge_Adventurer_5M_Pro
+  pilot_housing_allocation_status: LOCKED_CUSTOMER
+  pilot_primary_process: vacuum_casting
+  pilot_primary_quantity: 20
+  pilot_fallback_process: 3d_print
+  pilot_fallback_quantity_if_activated: 20
+  fallback_activation: customer_approved_if_vacuum_casting_unavailable
+  injection_molding_scope: source_data_and_dfm_only_no_pilot_tooling
 
 software:
   station_firmware_status: TARGET_PORT_REQUIRED

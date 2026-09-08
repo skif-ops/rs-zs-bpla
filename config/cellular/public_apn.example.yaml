@@ -2,6 +2,8 @@ profile_id: PILOT-PUBLIC-APN-EXAMPLE
 status: TEMPLATE_NO_CREDENTIALS
 sim_slot: 1
 apn_mode: PUBLIC
+pilot_policy: PUBLIC_ONLY
+tariff_is_evt_acceptance_input: false
 profile_priority: TO_BE_PROVISIONED
 operator: TO_BE_FILLED_ON_DEVICE
 apn: TO_BE_FILLED_ON_DEVICE

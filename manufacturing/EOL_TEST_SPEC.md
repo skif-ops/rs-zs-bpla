@@ -19,7 +19,7 @@ EOL выполняется для 20 из 20 изделий после полн�
 | EOL-CELL-01 | SIM и attach | IMEI и оба ICCID ref читаются, slot mapping однозначен, attach проходит на утверждённой тестовой SIM |
 | EOL-CELL-02 | MQTT/TLS | Проверка CA и hostname обязательна; publish, ACK и reconnect проходят |
 | EOL-CELL-03 | Store-and-forward | Буфер сохраняется без сети и передаётся один раз после восстановления |
-| EOL-CELL-04 | Dual SIM/APN failover | Только один слот активен; штатное переключение, public/private APN и восстановление очереди проходят |
+| EOL-CELL-04 | Dual SIM/APN failover | Только один слот активен; штатное переключение публичных APN и восстановление очереди проходят; private APN отклоняется |
 | EOL-LORA-01 | Module and region lock | Модуль отвечает; профиль соответствует label; TX только в conducted/shielded setup до RF release |
 | EOL-LORA-02 | Packet integrity | Framing, authentication, counter, dedup и retry проходят на test peer |
 | EOL-BLE-01 | Service mode | Вход требует физического действия; неавторизованное чтение/запись отклонены |

@@ -1,7 +1,7 @@
 Step,Gate,Operation,Applies_To,Prerequisite,Equipment_or_Document,Acceptance,Evidence,Rework_or_Hold,Status
 MFG-010,QG0,Verify released manufacturing bundle,LOT,SHA256 manifest available,Release index and verifier,All hashes match and no OPEN blocker authorized for build,Verification log,HOLD,OPEN
 MFG-020,QG0,Verify materials and deviations,LOT,Incoming inspection completed,BOM AVL IC records NCR log,All items accepted or deviation signed,Material release record,HOLD,OPEN
-MFG-030,QG0,Assign serials and travellers,20_units,Serial register blank and controlled,LOT_SERIAL_REGISTER and traveller,Exactly DIO-EVT-001 through 020 no duplicates,Serial register,HOLD,OPEN
+MFG-030,QG0,Assign serials travellers and housing plan,20_units,Serial and housing registers controlled,LOT_SERIAL_REGISTER HOUSING_LOT_PLAN and traveller,Exactly DIO-EVT-001 through 020 no duplicates; all primary housings vacuum cast; 3D fallback controlled,Serial and housing registers,HOLD,OPEN
 MFG-040,QG1,Stencil paste placement and reflow,PCB_MAIN_PCB_PWR_PCB_MIC,Released Gerber PnP BOM stencil and profile,Printer placer oven thermocouples,Profile within frozen paste limits and traceable batch,Reflow profile plus machine exports,Approved rework only,OPEN
 MFG-050,QG1,AOI visual and X-ray,ALL_PCBA,Reflow complete,AOI microscope X-ray plan,IC-004 and IC-005 accepted,Images and defect log,Rework then repeat inspection,OPEN
 MFG-060,QG1,Bare power resistance check,ALL_PCBA,Inspection accepted,DMM current-limited supply,No rail-to-ground short against released limits,Measurements,HOLD and diagnose,OPEN

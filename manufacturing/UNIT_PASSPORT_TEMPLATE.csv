@@ -4,14 +4,14 @@ Configuration_ID,YES,Baseline,EVT-PRE-20,Exact match
 PCB_MAIN_SN_and_Rev,YES,Traveller,,Traceable
 PCB_PWR_SN_and_Rev,YES,Traveller,,Traceable
 PCB_MIC1_to_MIC4_SN_and_Rev,YES,Traveller,,Four traceable identical revisions
-Housing_Technology_and_Rev,YES,Traveller,,Released 3d_print vacuum_casting or injection_molding
+Housing_Technology_and_Rev,YES,Traveller,,VACUUM_CASTING_PRIMARY or approved 3D_PRINT_FALLBACK; injection molding is not a pilot build
 Battery_MPN_SN_Lot,YES,Incoming record,,Traceable selected pack
 MPPT_MPN_SN_Lot,YES,Incoming record,,Traceable selected controller
 Modem_IMEI,YES,Module and provisioning,,Matches secure registry
 SIM1_ICCID_Reference,YES,Controlled SIM registry,,Reference only; no PIN PUK or credentials
 SIM2_ICCID_Reference,YES,Controlled SIM registry,,Reference only; no PIN PUK or credentials
 Preferred_SIM_Slot,YES,Provisioning receipt,,Slot 1 or 2 and read-back ICCID match
-APN_Mode_and_Profile_Hash,YES,Provisioning receipt,,PUBLIC or PRIVATE allowlist and exact profile hash
+APN_Mode_and_Profile_Hash,YES,Provisioning receipt,,PUBLIC only and exact profile hash; private APN rejected
 LoRa_Profile,YES,Provisioning and label,RU868_LOCKED,All EVT-PRE-20 units exact match
 FW_Boot_App_BLE_Versions,YES,Release manifest,,Exact hashes resolve
 Calibration_Set_and_Hash,YES,Calibration record,,MIC and timing mapping matches serial

@@ -35,17 +35,17 @@ PROC-003,Закупка,Approved vendor list и аналоги,XLSX+CSV,P0,PLANN
 PROC-004,Закупка,План входного контроля,DOCX+forms,P0,DRAFT,OPEN,OPEN,Counterfeit ESD MSL functional sampling
 MECH-3D-001,Корпус 3D,Параметрическая сборка корпуса,FCSTD_or_BLEND+STEP,P0,PLANNED,OPEN,OPEN,Сборка без пересечений и с сервисным доступом
 MECH-3D-002,Корпус 3D,Детали для печати,STL+3MF,P0,PLANNED,OPEN,OPEN,Manifold размеры ориентация проверены
-MECH-3D-003,Корпус 3D,Профиль FlashForge 5M Pro,3MF+DOCX,P1,PLANNED,OPEN,OPEN,Пробная печать и fit check PASS
+MECH-3D-003,Корпус 3D,Профиль FlashForge 5M Pro,3MF+DOCX,P0,PLANNED,OPEN,OPEN,Пробная печать и fit check PASS; готовность выпуска 20 изделий при активации резерва
 MECH-3D-004,Корпус 3D,Сборочный чертёж и крепёж,DOCX+PDF,P0,PLANNED,OPEN,OPEN,Крепёж уплотнения гермовводы и моменты указаны
 MECH-VC-001,Вакуумное литьё,Master и разъём формы,STEP+DRAWING,P0,PLANNED,OPEN,OPEN,Усадка литники вентиляция и допуски проверены
-MECH-VC-002,Вакуумное литьё,Материал и технологические требования,DOCX,P1,PLANNED,OPEN,OPEN,UV температура герметичность согласованы
+MECH-VC-002,Вакуумное литьё,Материал и технологические требования,DOCX,P0,PLANNED,OPEN,OPEN,Материал UV температура герметичность и выпуск 20 корпусов согласованы
 MECH-IM-001,ТПА,Литьевая конструкция корпуса,STEP+DRAWING,P0,PLANNED,OPEN,OPEN,Draft ribs bosses wall thickness DFM PASS
-MECH-IM-002,ТПА,Требования к пресс-форме и материалу,DOCX,P1,PLANNED,OPEN,OPEN,Parting ejector inserts texture shrinkage указаны
+MECH-IM-002,ТПА,Требования к пресс-форме и материалу,DOCX,P1,PLANNED,OPEN,OPEN,Parting ejector inserts texture shrinkage указаны; изготовление оснастки не входит в пилот
 FW-001,Firmware,Исходники target STM32U585,C+IOC+CMAKE,P0,DRAFT,OPEN,OPEN,Reproducible target build PASS
 FW-002,Firmware,Bootloader secure boot A/B,C+BIN+ELF+MAP,P0,PLANNED,OPEN,OPEN,Подпись rollback power-loss tests PASS
 FW-003,Firmware,Station application,C+BIN+ELF+MAP,P0,PLANNED,OPEN,OPEN,Unit integration HIL tests PASS
 FW-004,Firmware,RU868 pilot profile и EU868 future-disabled template,YAML+BIN fragment,P0,DRAFT,OPEN,OPEN,RU868 окна мощность duty cycle и RF test PASS
-FW-005,Firmware,Dual SIM и public/private APN profiles,YAML+DOCX,P0,DRAFT,OPEN,OPEN,Safe switch attach TLS recovery and 24h PASS
+FW-005,Firmware,Dual SIM и public APN profiles,YAML+DOCX,P0,DRAFT,OPEN,OPEN,Safe switch public-only policy attach TLS recovery and 24h PASS
 FW-006,Firmware,BLE service и OTA,GATT schema+C,P0,PLANNED,OPEN,OPEN,Auth signed image rollback tests PASS
 FW-007,Firmware,Инструкция прошивки и восстановления,DOCX,P0,PLANNED,OPEN,OPEN,Повторена на чистом рабочем месте
 FW-008,Firmware,Release manifest и подписи,JSON+SHA256+SIG,P0,PLANNED,OPEN,OPEN,Версии commit toolchain hash согласованы
@@ -59,7 +59,7 @@ PR-002,Протоколы,HTTPS fallback API,OPENAPI+DOCX,P0,PLANNED,OPEN,OPEN,C
 PR-003,Протоколы,LoRa P2P mesh store-and-forward,DOCX+CBOR schema,P0,DRAFT,OPEN,OPEN,Link loss relay dedup tests PASS
 PR-004,Протоколы,BLE GATT configuration OTA,DOCX+schema,P0,DRAFT,OPEN,OPEN,Android-station compatibility PASS
 PR-005,Протоколы,GNSS PPS time quality,DOCX,P0,PLANNED,OPEN,OPEN,Holdover and timestamp error measured
-PR-006,Протоколы,Dual SIM и public/private APN failover,DOCX+YAML,P0,DRAFT,OPEN,OPEN,Обычные SIM операторская матрица 100 switches и recovery PASS
+PR-006,Протоколы,Dual SIM и public APN failover,DOCX+YAML,P0,DRAFT,OPEN,OPEN,Обычные SIM публичные APN операторская матрица 100 switches и recovery PASS
 MFG-001,Производство,Маршрут сборки 20 изделий,DOCX+XLSX,P0,DRAFT,OPEN,OPEN,Все операции критерии и evidence указаны
 MFG-002,Производство,Stencil paste reflow profile,DOCX+CSV,P0,PLANNED,OPEN,OPEN,Профиль записан термопарами
 MFG-003,Производство,Программирование и provisioning,DOCX+SCRIPTS,P0,DRAFT,OPEN,OPEN,Уникальные ID и ключи без утечки
@@ -67,13 +67,15 @@ MFG-004,Производство,EOL fixture и тестовая програм�
 MFG-005,Производство,Калибровка микрофонов и задержек,DOCX+CSV,P0,PLANNED,OPEN,OPEN,Разброс и задержка не более 1 отсчёта
 MFG-006,Производство,Маркировка и паспорт изделия,DOCX+LABEL,P0,DRAFT,OPEN,OPEN,Serial HW FW RU868 и обе ICCID refs однозначны
 MFG-007,Производство,Упаковка транспорт хранение,DOCX,P1,PLANNED,OPEN,OPEN,ESD moisture battery transport требования учтены
+MFG-008,Производство,План технологии корпусов по 20 серийным номерам,CSV,P0,DRAFT,OPEN,OPEN,20 вакуумных основных позиций и 20 условных 3D резервов согласованы; ТПА только исходные данные
+MFG-008,Производство,План корпусов партии 20 изделий,CSV+DOCX,P0,DRAFT,OPEN,OPEN,20 вакуумных корпусов назначены по serial; 3D резерв всей партии; ТПА без пилотной оснастки
 EVT-001,Испытания,ПМИ предсерийной партии,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Матрица 20 изделий и выборки утверждены
 EVT-002,Испытания,Формы протоколов на 20 изделий,DOCX+XLSX+CSV,P0,DRAFT,OPEN,OPEN,Serial и evidence links обязательны
 EVT-003,Испытания,Аудио DSP классификация,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Pd FAR и negative set определены
 EVT-004,Испытания,GNSS PPS TDOA,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Raw PPS and synchronized audio stored
-EVT-005,Испытания,GSM LTE LoRa BLE,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,RU868 на 20 изделиях dual SIM public/private APN и BLE проверены
+EVT-005,Испытания,GSM LTE LoRa BLE,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,RU868 на 20 изделиях dual SIM public APN и BLE проверены; private APN отклонён
 EVT-006,Испытания,Энергетика S0-S4 solar battery,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Токи температура MPPT автономность evidence
-EVT-007,Испытания,Механика IP климат UV,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Отдельно по технологии корпуса
+EVT-007,Испытания,Механика IP климат UV,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,20 вакуумных корпусов; 3D как утверждённый резерв; ТПА только аудит исходных данных
 EVT-008,Испытания,Сводный отчёт и deviation closure,DOCX+XLSX,P0,PLANNED,OPEN,OPEN,Нет незакрытых blocker deviations
 AND-001,Android,Требования и UX flow,DOCX+FIGMA_or_SVG,P0,DRAFT,OPEN,OPEN,Сценарии монтажника и сервис-инженера приняты
 AND-002,Android,Исходный проект Kotlin/Android,KOTLIN+GRADLE,P0,DRAFT,OPEN,OPEN,Reproducible build and tests PASS

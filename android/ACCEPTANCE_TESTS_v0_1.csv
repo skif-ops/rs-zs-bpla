@@ -27,4 +27,4 @@ AND-T-025,Supply chain,Clean build environment,Build release twice,APK inputs ve
 AND-T-026,Cellular config,Two provisioned SIM slots,Read station state,"Both redacted ICCID references slot mapping active slot operator RAT and APN mode are correct",app_and_station_log,P0,NOT_RUN
 AND-T-027,Cellular config,Authorized service role and queued offline events,Request SIM1 to SIM2 switch,"Warning shown; queue preserved; BG95 performs safe shutdown; new ICCID is verified; TLS reconnects",app_modem_server_logs,P0,NOT_RUN
 AND-T-028,Cellular security,Unauthorized or stale BLE session,Request SIM or APN switch,Command rejected and active connection unchanged,app_and_station_security_log,P0,NOT_RUN
-AND-T-029,Cellular failover,Private APN not provisioned,Trigger profile failover,Private profile is skipped and approved public APN or second SIM is used,modem_and_station_log,P0,NOT_RUN
+AND-T-029,Cellular policy,Private APN profile supplied to application,Attempt validation and write,Profile is rejected before station configuration and active public profile is unchanged,app_and_station_log,P0,NOT_RUN

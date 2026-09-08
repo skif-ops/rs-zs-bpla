@@ -8,7 +8,7 @@
 - не требует API мобильного оператора;
 - не содержит product signing key, ключи станций или общие заводские пароли;
 - не позволяет менять зафиксированный RU868 после manufacturing provisioning;
-- показывает два SIM-слота и управляет только разрешёнными public/private APN profiles;
+- показывает два SIM-слота и управляет только разрешёнными публичными APN; private APN в пилоте отклоняется;
 - импортирует только подписанный firmware package;
 - поддерживает resume, A/B status и rollback report;
 - USB-C используется как отдельный сервисный recovery path.

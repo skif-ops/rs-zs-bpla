@@ -95,8 +95,8 @@ object ConfigurationValidator {
             if (!identifierPattern.matches(profile.profileId)) add("invalid_cellular_profile_id")
             if (!identifierPattern.matches(profile.operatorId)) add("invalid_operator_id")
             if (!apnPattern.matches(profile.apn)) add("invalid_profile_apn")
-            if (profile.mode == ApnMode.PRIVATE && !profile.provisioned) {
-                add("unprovisioned_private_profile")
+            if (profile.mode == ApnMode.PRIVATE) {
+                add("private_apn_not_allowed_in_pilot")
             }
             if (profile.credentialReference != null && !identifierPattern.matches(profile.credentialReference)) {
                 add("invalid_credential_reference")

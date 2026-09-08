@@ -1,4 +1,4 @@
-profile_id: DIONEA-DUAL-SIM-SS-v0.1
+profile_id: DIONEA-DUAL-SIM-SS-v0.2
 status: DRAFT_HARDWARE_AND_OPERATOR_VALIDATION_REQUIRED
 modem: Quectel_BG95_M3_candidate
 sim_architecture:
@@ -12,15 +12,17 @@ sim_architecture:
   hot_switch_allowed: false
 pilot_operator_candidates:
   - id: MTS
-    exact_sim_tariff_and_apn: TO_BE_PROVIDED
+    exact_public_apn: TO_BE_PROVISIONED
   - id: MegaFon
-    exact_sim_tariff_and_apn: TO_BE_PROVIDED
+    exact_public_apn: TO_BE_PROVISIONED
   - id: Beeline
-    exact_sim_tariff_and_apn: TO_BE_PROVIDED
+    exact_public_apn: TO_BE_PROVISIONED
   - id: T2_Tele2
-    exact_sim_tariff_and_apn: TO_BE_PROVIDED
+    exact_public_apn: TO_BE_PROVISIONED
   - id: GLONASS_supplied_SIM
-    underlying_carrier_and_apn: TO_BE_PROVIDED
+    underlying_carrier_and_public_apn: TO_BE_PROVISIONED
+pilot_apn_policy: public_only
+tariff_is_evt_acceptance_input: false
 apn_modes:
   public:
     allowed: true
@@ -28,12 +30,10 @@ apn_modes:
     static_public_ip_required: false
     outbound_only: true
   private:
-    allowed: true
-    operator_subscription_required: true
-    credentials_from_secure_store: true
-    operator_api_required: false
+    allowed_in_pilot: false
+    status: FUTURE_NOT_PROVISIONED
 profile_selection:
-  order_per_slot: TO_BE_PROVISIONED
+  order_per_slot: PUBLIC_PROFILES_ONLY_TO_BE_PROVISIONED
   automatic_failover_enabled: true
   failure_triggers: [attach_timeout, pdp_failure, dns_failure, tls_failure, sustained_link_loss]
   manual_override: authenticated_BLE_or_mTLS_server_command

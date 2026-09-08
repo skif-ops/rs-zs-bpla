@@ -13,7 +13,7 @@
 - hardware revision и PCB serials;
 - locked LoRa region profile `RU868`;
 - modem IMEI, две ссылки ICCID, slot mapping и preferred slot в контролируемом реестре;
-- разрешённые public/private APN profile IDs и hashes без открытых секретов;
+- разрешённые public APN profile IDs и hashes без открытых секретов;
 - station client certificate и private key либо эквивалентная уникальная credential;
 - BLE service pairing secret или PAKE verifier;
 - LoRa device keys, если они требуются выбранным режимом;
@@ -34,9 +34,9 @@
 
 ## SIM без операторского API
 
-Обычные SIM допускаются. В provisioning хранится ordered APN profile set без PIN/PUK и открытых секретов. Станция инициирует исходящий MQTT/TLS или HTTPS/TLS сеанс через публичный APN/CGNAT. Private APN активируется только при наличии услуги оператора. Управление SIM через API оператора не является условием пилота.
+Обычные SIM допускаются. В provisioning хранится ordered public APN profile set без PIN/PUK и открытых секретов. Станция инициирует исходящий MQTT/TLS или HTTPS/TLS сеанс через публичный APN/CGNAT. Private APN запрещён политикой пилота. Управление SIM через API оператора не является условием пилота.
 
-Два физических слота работают как Dual SIM Single Standby. В provisioning обязательны локальный учёт двух ICCID/IMEI, preferred slot, public/private APN allowlist, контроль баланса/тарифа организационным способом и безопасный сценарий замены SIM.
+Два физических слота работают как Dual SIM Single Standby. В provisioning обязательны локальный учёт двух ICCID/IMEI, preferred slot, public APN allowlist и безопасный сценарий замены SIM. Тариф и баланс не входят в критерии EVT.
 
 ## Release gate
 

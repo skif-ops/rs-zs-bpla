@@ -1,9 +1,9 @@
 Input_ID,Area,Required_Input,Why_Required,Blocks,Recommended_Default,Owner,Status
 IN-001,Pilot,Country and exact site type per unit,Determines radio operator environment and mechanical loads,RF_PROFILE_AND_EVT_PLAN,Russia as primary pilot if customer confirms,CUSTOMER,OPEN
-IN-002,Cellular,Exact SIM tariff APN RAT and underlying carrier per supplied ICCID,Operator candidates are locked but technical profiles are still required,BG_MODEM_SKU_AND_CELLULAR_EVT,MTS MegaFon Beeline T2 Tele2 and GLONASS supplied SIM,CUSTOMER,PARTIALLY_RESOLVED
+IN-002,Cellular,Exact public APN RAT and underlying carrier per supplied ICCID,Public-only policy is locked but technical profiles are still required at provisioning,BG_MODEM_SKU_AND_CELLULAR_EVT,MTS MegaFon Beeline T2 Tele2 and GLONASS supplied SIM; tariff is not an EVT input,INTEGRATION,PARTIALLY_RESOLVED
 IN-003,LoRa,All 20 pilot units use RU868 windows 864-865 and 868.7-869.2 MHz,Required for labels provisioning and RF evidence,LOT_CONFIGURATION,EU868 retained only as future compatibility,CUSTOMER,LOCKED
-IN-004,Mechanics,Both vacuum casting and injection molding tracks are required,Each process requires independent CAD DFM BOM and evidence,HOUSING_BOM_CAD_AND_ALLOCATION,Keep 3D printing as a separate third track,CUSTOMER,LOCKED
-IN-005,Mechanics,Number of units per housing technology,Required for purchasing fixtures and test sample assignment,LOT_CONFIGURATION,10 printed plus 10 vacuum cast,CUSTOMER,OPEN
+IN-004,Mechanics,Independent source packages are required for 3D printing vacuum casting and injection molding,Each process requires independent CAD DFM BOM and evidence,HOUSING_BOM_CAD,TPA is source data and DFM only unless separately authorized,CUSTOMER,LOCKED
+IN-005,Mechanics,Pilot housing allocation is 20 vacuum cast with full-lot 3D fallback,Required for purchasing fixtures and test sample assignment,LOT_CONFIGURATION,20 vacuum cast; 20 printed only if fallback is approved; zero injection molded pilot units,CUSTOMER,LOCKED
 IN-006,Environment,Operating and storage temperature ranges,Controls components battery charging materials and tests,COMPONENT_AND_TEST_LIMITS,TBD by customer site,CUSTOMER,OPEN
 IN-007,Environment,Humidity UV salt fog dust chemical and icing exposure,Controls enclosure material coating and environmental EVT,MECHANICAL_RELEASE,TBD by customer site,CUSTOMER,OPEN
 IN-008,Installation,Mast diameter height attachment orientation and service access,Controls brackets wind load cable lengths and RF placement,MECHANICAL_RELEASE,TBD by customer installation,CUSTOMER,OPEN

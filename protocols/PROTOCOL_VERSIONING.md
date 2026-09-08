@@ -11,7 +11,7 @@
 | Detection compact CBOR `schema_ver` | 3 | Значение ключа 0 внутри detection payload |
 | Message type detection | 2 | Значение ключа 1 внутри compact CBOR |
 | LoRa regional profile | v0.1 | RU868 для всех 20 пилотных изделий; EU868 future template; TX disabled до RF gate |
-| Cellular SIM/APN policy | v0.1 | Dual SIM Single Standby; public/private APN allowlist и bounded failover |
+| Cellular SIM/APN policy | v0.2 | Dual SIM Single Standby; только публичные APN и bounded failover между двумя SIM |
 | BLE GATT | v0.1 | Черновой сервис конфигурации/OTA |
 
 Названия `protocol v1.3` в комментариях старого compact-CBOR кода обозначают историческую редакцию payload и не меняют фактический `schema_ver=3`. Серверный `/api/v1/health` корректно сообщает interface release `1.4`.

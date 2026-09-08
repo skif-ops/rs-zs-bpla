@@ -11,11 +11,11 @@
 - питание: LiFePO4 12,8 В, 40–60 А·ч; солнечная панель 60–80 Вт;
 - основной канал: GSM/LTE через исходящее MQTT/TLS, резерв HTTPS/TLS;
 - пилот использует обычные SIM МТС, МегаФон, Билайн, T2/Tele2 либо SIM, предоставленную оператором ГЛОНАСС; публичный IP и API оператора не требуются;
-- PCB содержит два nano-SIM слота с режимом Dual SIM Single Standby и программными профилями `public APN` / `private APN`;
+- PCB содержит два nano-SIM слота с режимом Dual SIM Single Standby; пилот использует только профили `public APN`;
 - резервный канал: LoRa `RU868` на всех 20 изделиях; допустимые окна пилота 864-865 и 868,7-869,2 МГц;
 - общая PCB сохраняет возможность будущего профиля `EU868`, но он не входит в пилотную партию;
 - BLE: локальная настройка, диагностика и безопасное обновление;
-- корпус: отдельные комплекты для 3D-печати, вакуумного литья и ТПА;
+- корпус: для расчёта и партии приняты 20 изделий вакуумного литья; 3D-печать является резервом на всю партию, а для ТПА готовится отдельный комплект исходных данных без изготовления пилотной оснастки;
 - сервер: «Мухоед», развёртывание на Windows 11 и Ubuntu 24.04;
 - Android: отдельный трек, не смешанный с firmware станции.
 
@@ -44,6 +44,7 @@ Gerber, прошивки, бинарники, корпуса и серверны
 - [`hardware/DUAL_SIM_SINGLE_STANDBY.md`](hardware/DUAL_SIM_SINGLE_STANDBY.md) - двух-SIMная аппаратная архитектура и безопасное переключение.
 - [`config/cellular/dual_sim_apn_profiles.yaml`](config/cellular/dual_sim_apn_profiles.yaml) - машинно-читаемая политика SIM/APN failover.
 - [`manufacturing/README.md`](manufacturing/README.md) — маршрут партии, traceability, provisioning и EOL.
+- [`manufacturing/HOUSING_LOT_PLAN.csv`](manufacturing/HOUSING_LOT_PLAN.csv) - основной и резервный корпус для каждого из 20 серийных номеров.
 - [`tests/EVT_MASTER_PLAN.md`](tests/EVT_MASTER_PLAN.md) — последовательность и правила принятия EVT.
 - [`docs/REQUIREMENTS_TRACEABILITY.csv`](docs/REQUIREMENTS_TRACEABILITY.csv) — требования, проверки и evidence.
 - [`android/README.md`](android/README.md) — отдельный Android-трек.
