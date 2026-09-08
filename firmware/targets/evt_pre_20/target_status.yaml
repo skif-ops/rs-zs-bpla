@@ -34,18 +34,26 @@ audio:
   aad_configuration_lqfp100_pin: 77
   aad_configuration_direction: MCU_TO_U7_TO_1V8_TO_ALL_4_THSEL
   aad_configuration_cubemx: GPIO_OUTPUT_PENDING
+  aad_configuration_clock_requirement_hz_min: 50000
+  aad_configuration_sequence:
+    - ENABLE_1V8_MIC
+    - ENABLE_PDM_CLOCK_ABOVE_50KHZ
+    - WRITE_THSEL_ONE_WIRE_PROFILE
+    - COMPLETE_STOP_SYMBOL_AND_SETTLE
+    - DISABLE_PDM_CLOCK_FOR_AAD_D2
+    - ARM_MIC_WAKE_EXTI
+  aad_configuration_profile_verify: READBACK_NOT_AVAILABLE_USE_TIMING_AND_WAKE_SELFTEST
+  aad_threshold_profile: EVT_TUNE_REQUIRED
+  aad_false_wake_test: REQUIRED
+  aad_wake_latency_test: REQUIRED
+  aad_s0_current_measurement: REQUIRED
+  aad_cold_hot_test: REQUIRED_AT_MINUS40_AND_PLUS70
   aad_wake_inputs: [MIC_WAKE1, MIC_WAKE2, MIC_WAKE3, MIC_WAKE4]
   aad_wake_or: SN74LVC32APWR_at_1V8
   aad_wake_translator: SN74AXC1T45DRLR_1V8_to_3V3
   aad_wake_mcu_pin: PA8
   aad_wake_lqfp100_pin: 67
   aad_wake_cubemx: GPIO_EXTI_STOP_WAKE_PENDING
-  aad_configuration_sequence: MISSING_BLOCKER
-  aad_threshold_profile: EVT_TUNE_REQUIRED
-  aad_false_wake_test: REQUIRED
-  aad_wake_latency_test: REQUIRED
-  aad_s0_current_measurement: REQUIRED
-  aad_cold_hot_test: REQUIRED_AT_MINUS40_AND_PLUS70
 ble:
   soc: nRF52840
   module: Raytac_MDBT50Q-P1MV2
