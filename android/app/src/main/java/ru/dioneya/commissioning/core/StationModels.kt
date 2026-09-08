@@ -15,6 +15,29 @@ enum class ApnMode {
     PRIVATE,
 }
 
+enum class CoordinateSource {
+    MANUAL,
+    PHONE_LOCATION,
+    STATION_GNSS,
+    SURVEYED,
+}
+
+enum class PositionTrustState {
+    UNCONFIGURED,
+    CONFIGURED_OK,
+    CONFIGURED_WARN,
+    CONFIGURED_SUSPECT,
+    REVALIDATION_REQUIRED,
+}
+
+enum class TimeTrustState {
+    UNKNOWN,
+    GNSS_TIME_TRUSTED,
+    HOLDOVER,
+    GNSS_TIME_SUSPECT,
+    UNSYNCED,
+}
+
 data class StationIdentity(
     val serial: String,
     val stationId: Long,
@@ -37,12 +60,72 @@ data class StationIdentity(
     }
 }
 
+data class InstallationPosition(
+    val latE7: Int,
+    val lonE7: Int,
+    val altDm: Int,
+    val accuracyM: Int,
+    val source: CoordinateSource,
+    val version: Long = 1,
+    val locked: Boolean = true,
+) {
+    fun validate(): List<String> = buildList {
+        if (latE7 !in -900_000_000..900_000_000) add("invalid_installation_latitude")
+        if (lonE7 !in -1_800_000_000..1_800_000_000) add("invalid_installation_longitude")
+        if (altDm !in -50_000..100_000) add("invalid_installation_altitude")
+        if (accuracyM !in 1..1000) add("invalid_installation_accuracy")
+        if (version <= 0) add("invalid_installation_position_version")
+        if (!locked) add("installation_position_not_locked")
+    }
+}
+
+data class PositionTrustPolicy(
+    val warningDistanceM: Int = 25,
+    val suspectDistanceM: Int = 75,
+    val grossJumpDistanceM: Int = 250,
+    val warningConsecutiveFixes: Int = 3,
+    val suspectConsecutiveFixes: Int = 10,
+) {
+    fun validate(): List<String> = buildList {
+        if (warningDistanceM !in 5..500) add("invalid_position_warning_distance")
+        if (suspectDistanceM <= warningDistanceM || suspectDistanceM > 2000) {
+            add("invalid_position_suspect_distance")
+        }
+        if (grossJumpDistanceM <= suspectDistanceM || grossJumpDistanceM > 5000) {
+            add("invalid_position_gross_jump_distance")
+        }
+        if (warningConsecutiveFixes !in 1..60) add("invalid_position_warning_persistence")
+        if (suspectConsecutiveFixes < warningConsecutiveFixes || suspectConsecutiveFixes > 120) {
+            add("invalid_position_suspect_persistence")
+        }
+    }
+}
+
+data class GnssIntegritySnapshot(
+    val observedLatE7: Int?,
+    val observedLonE7: Int?,
+    val observedAltDm: Int?,
+    val reportedAccuracyM: Int?,
+    val distanceFromInstallationM: Int?,
+    val fixType: Int,
+    val satellites: Int,
+    val hdopX100: Int,
+    val jam: Boolean,
+    val spoof: Boolean,
+    val positionTrust: PositionTrustState,
+    val timeTrust: TimeTrustState,
+    val ppsOk: Boolean,
+    val expectedTimeErrorUs: Long,
+)
+
 data class StationConfiguration(
     val apn: String,
     val mqttEndpoint: String,
     val httpsFallbackEndpoint: String?,
     val caReference: String,
     val dualSim: DualSimConfiguration? = null,
+    val installationPosition: InstallationPosition? = null,
+    val positionTrustPolicy: PositionTrustPolicy = PositionTrustPolicy(),
 )
 
 data class CellularProfile(
@@ -74,6 +157,14 @@ object ConfigurationValidator {
         configuration.dualSim?.let { dualSim ->
             validateDualSim(dualSim).forEach { error -> add(error) }
         }
+
+        val position = configuration.installationPosition
+        if (position == null) {
+            add("missing_installation_position")
+        } else {
+            position.validate().forEach { error -> add(error) }
+        }
+        configuration.positionTrustPolicy.validate().forEach { error -> add(error) }
     }
 
     private fun validateDualSim(configuration: DualSimConfiguration): List<String> = buildList {
