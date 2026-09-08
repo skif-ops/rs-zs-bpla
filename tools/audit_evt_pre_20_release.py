@@ -1,0 +1,181 @@
+#!/usr/bin/env python3
+"""Second-pass EVT-PRE-20 release completeness audit.
+
+Default mode reports blockers without failing CI. Use --strict for the actual release gate.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+REQUIRED_GROUPS: dict[str, list[str]] = {
+    "configuration": [
+        "config/EVT_PRE_20_BASELINE.yaml",
+        "docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv",
+        "docs/REQUIREMENTS_TRACEABILITY.csv",
+        "docs/RISK_REGISTER.csv",
+    ],
+    "pcb_source": [
+        "hardware/kicad/README.md",
+        "hardware/kicad/REV_A_CAPTURE_SPEC.md",
+        "hardware/PCB_DOUBLE_REVIEW_GATE.md",
+        "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+    ],
+    "firmware_source": [
+        "firmware/CMakeLists.txt",
+        "firmware/targets/evt_pre_20/target_status.yaml",
+    ],
+    "android_source": [
+        "android/app/build.gradle.kts",
+        "android/app/src/main/AndroidManifest.xml",
+    ],
+    "server_windows_ubuntu": [
+        "server/deploy/compose.windows.yml",
+        "server/deploy/compose.ubuntu.yml",
+        "server/deploy/scripts/start_windows.ps1",
+        "server/deploy/scripts/start_ubuntu.sh",
+    ],
+    "mechanics_source": [
+        "mechanics/common/ACOUSTIC_GEOMETRY.csv",
+        "mechanics/3d_print/DESIGN_RULES.md",
+        "mechanics/vacuum_casting/DESIGN_RULES.md",
+        "mechanics/injection_molding/DESIGN_RULES.md",
+    ],
+    "evt_methods": [
+        "tests/EVT_MASTER_PLAN.md",
+        "tests/EVT_MATRIX.csv",
+        "tests/DEVIATION_LOG.csv",
+        "manufacturing/EOL_TEST_SPEC.md",
+        "manufacturing/EOL_RESULT_REGISTER.csv",
+    ],
+}
+
+STRICT_PRODUCTION_PATTERNS: dict[str, list[str]] = {
+    "pcb_main_native": [
+        "hardware/kicad/pcb_main/*.kicad_sch",
+        "hardware/kicad/pcb_main/*.kicad_pcb",
+        "hardware/kicad/pcb_main/gerber/*",
+        "hardware/kicad/pcb_main/*bom*.csv",
+        "hardware/kicad/pcb_main/*pos*.csv",
+    ],
+    "pcb_mic_native": [
+        "hardware/kicad/pcb_mic/*.kicad_sch",
+        "hardware/kicad/pcb_mic/*.kicad_pcb",
+        "hardware/kicad/pcb_mic/gerber/*",
+    ],
+    "pcb_pwr_native": [
+        "hardware/kicad/pcb_pwr/*.kicad_sch",
+        "hardware/kicad/pcb_pwr/*.kicad_pcb",
+        "hardware/kicad/pcb_pwr/gerber/*",
+    ],
+    "firmware_target": [
+        "firmware/targets/evt_pre_20/output/*.elf",
+        "firmware/targets/evt_pre_20/output/*.map",
+        "firmware/targets/evt_pre_20/output/*.bin",
+        "firmware/targets/evt_pre_20/output/*.hex",
+        "firmware/targets/evt_pre_20/output/SHA256SUMS.txt",
+    ],
+    "android_apk": [
+        "android/release/*.apk",
+        "android/release/SHA256SUMS.txt",
+    ],
+    "mechanics_3d": [
+        "mechanics/3d_print/*.step",
+        "mechanics/3d_print/*.stl",
+        "mechanics/3d_print/*.3mf",
+        "mechanics/vacuum_casting/*.step",
+        "mechanics/injection_molding/*.step",
+    ],
+    "release_docs": [
+        "releases/evt-pre-20/*.zip",
+        "releases/evt-pre-20/SHA256SUMS.txt",
+    ],
+}
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def audit() -> dict[str, object]:
+    groups: dict[str, object] = {}
+    blockers: list[str] = []
+
+    for group, names in REQUIRED_GROUPS.items():
+        missing = [name for name in names if not (ROOT / name).is_file()]
+        groups[group] = {"required": names, "missing": missing, "pass": not missing}
+        blockers.extend(f"missing required source: {name}" for name in missing)
+
+    production: dict[str, object] = {}
+    for group, patterns in STRICT_PRODUCTION_PATTERNS.items():
+        pattern_results = []
+        group_pass = True
+        for pattern in patterns:
+            matches = sorted(str(path.relative_to(ROOT)) for path in ROOT.glob(pattern) if path.is_file())
+            if not matches:
+                group_pass = False
+            pattern_results.append({"pattern": pattern, "matches": matches})
+        production[group] = {"patterns": pattern_results, "pass": group_pass}
+        if not group_pass:
+            blockers.append(f"production output incomplete: {group}")
+
+    target_status = (ROOT / "firmware/targets/evt_pre_20/target_status.yaml").read_text(encoding="utf-8")
+    if "do_not_release: true" in target_status:
+        blockers.append("firmware target explicitly marked do_not_release")
+    if "TARGET_PORT_REQUIRED" in target_status:
+        blockers.append("firmware STM32 target port is not complete")
+
+    manifest_inputs = [
+        ROOT / "config/EVT_PRE_20_BASELINE.yaml",
+        ROOT / "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+        ROOT / "hardware/kicad/REV_A_CAPTURE_SPEC.md",
+        ROOT / "hardware/PCB_DOUBLE_REVIEW_GATE.md",
+    ]
+    hashes = {
+        str(path.relative_to(ROOT)): sha256(path)
+        for path in manifest_inputs
+        if path.is_file()
+    }
+
+    return {
+        "configuration": "EVT-PRE-20",
+        "source_complete": all(bool(item["pass"]) for item in groups.values()),
+        "production_complete": all(bool(item["pass"]) for item in production.values()),
+        "release_ready": not blockers,
+        "source_groups": groups,
+        "production_groups": production,
+        "baseline_hashes": hashes,
+        "blockers": blockers,
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--strict", action="store_true", help="return non-zero while any release blocker remains")
+    parser.add_argument("--output", default="artifacts/evt_pre_20_release_audit.json")
+    args = parser.parse_args()
+
+    result = audit()
+    output = ROOT / args.output
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    print(f"EVT-PRE-20 second-pass release audit: {'PASS' if result['release_ready'] else 'BLOCKED'}")
+    for blocker in result["blockers"]:
+        print(f"- {blocker}")
+    print(f"report: {output.relative_to(ROOT)}")
+
+    return 1 if args.strict and not result["release_ready"] else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
