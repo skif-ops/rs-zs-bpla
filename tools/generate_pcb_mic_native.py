@@ -124,7 +124,7 @@ def main() -> int:
 
     # Datasheet pin mapping: 1 DATA, 2 SELECT, 3 GND, 4 WAKE, 5 THSEL, 6 CLK, 7 VDD.
     assign(mic, "1", nets["PDM_DATA_MIC"])
-    assign(mic, "2", nets["GND"])  # SELECT fixed low: same PDM edge for all four independent channels.
+    assign(mic, "2", nets["GND"])
     assign(mic, "3", nets["GND"])
     assign(mic, "4", nets["MIC_WAKE"])
     assign(mic, "5", nets["AAD_CFG"])
@@ -141,7 +141,6 @@ def main() -> int:
         "1": "1V8_MIC", "2": "GND", "3": "PDM_CLK", "4": "PDM_DATA", "5": "MIC_WAKE", "6": "AAD_CFG"
     }.items():
         assign(j1, number, nets[netname])
-    # Pads 7/8 are mechanical hold-down pads and intentionally have no electrical net.
 
     caplib = Path("/usr/share/kicad/footprints/Capacitor_SMD.pretty")
     c1 = pcbnew.FootprintLoad(str(caplib), "C_0402_1005Metric")
@@ -154,9 +153,6 @@ def main() -> int:
     assign(c1, "1", nets["1V8_MIC"])
     assign(c1, "2", nets["GND"])
 
-    # R1 is an EVT signal-integrity tuning footprint at the microphone data source.
-    # Rev.A starts at 0 ohm so no unmeasured attenuation/delay is introduced. After
-    # harness SI measurements the fitted value may be revised under controlled BOM/ECO.
     rlib = Path("/usr/share/kicad/footprints/Resistor_SMD.pretty")
     r1 = pcbnew.FootprintLoad(str(rlib), "R_0402_1005Metric")
     if r1 is None:
@@ -169,11 +165,9 @@ def main() -> int:
     assign(r1, "1", nets["PDM_DATA"])
     assign(r1, "2", nets["PDM_DATA_MIC"])
 
-    # Provisional 24 x 18 mm electrical outline. Mechanics remains a release blocker.
     for a, b in [((0, 0), (24, 0)), ((24, 0), (24, 18)), ((24, 18), (0, 18)), ((0, 18), (0, 0))]:
         add_edge(board, a, b)
 
-    # Route from connector. Connector is rotated 180° to minimize crossover.
     jp = {str(i): pos(one_pad(j1, str(i))) for i in range(1, 7)}
     mp = {str(i): pos(one_pad(mic, str(i))) for i in (1, 2, 4, 5, 6, 7)}
     rp1, rp2 = pos(one_pad(r1, "1")), pos(one_pad(r1, "2"))
@@ -191,14 +185,13 @@ def main() -> int:
     add_track(board, nets["MIC_WAKE"], [jp["5"], (9.75, 10.5), mp["4"]])
     add_track(board, nets["AAD_CFG"], [jp["6"], (8.25, 14.8), (10.0, 14.8), mp["5"]])
 
-    # Add explicit board note on fabrication layer so provisional outline cannot be mistaken for frozen mechanics.
     txt = pcbnew.PCB_TEXT(board)
     txt.SetText("PCB-MIC Rev.A ELECTRICAL CANDIDATE - OUTLINE/FASTENING PROVISIONAL")
     txt.SetPosition(v(12.0, 17.2))
     txt.SetLayer(pcbnew.F_Fab)
     txt.SetTextHeight(pcbnew.FromMM(0.8))
     txt.SetTextWidth(pcbnew.FromMM(0.8))
-    txt.SetThickness(pcbnew.FromMM(0.12))
+    txt.SetTextThickness(pcbnew.FromMM(0.12))
     board.Add(txt)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
