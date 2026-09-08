@@ -29,7 +29,7 @@
 После стабилизации изделия при −40 °C проверяются:
 
 - cold boot и повторные power cycles;
-- AAD wake от T5838 и переход в полный PDM capture;
+- программирование T5838 AAD через `AAD_CFG/THSEL`, AAD wake и переход в полный PDM capture;
 - GNSS cold start/PPS и time-trust;
 - cellular attach/recovery, если RF fixture позволяет;
 - LoRa;
@@ -49,8 +49,10 @@
 
 ## 5. Разъемы и кабели
 
-- Старый JST GH MIC connector исключен из Rev.A из-за несоответствия нижней температурной границе проекта.
-- MIC Rev.A: Molex Pico-Lock 1.50 mm, 5 circuits: header `5040500591`, housing `5040510501`, terminal `5040520098`, nominal operating range −40…+105 °C.
+- JST GH MIC connector исключен из Rev.A из-за несоответствия нижней температурной границе проекта.
+- Первоначальный 5-contact Pico-Lock также superseded после выявления обязательного T5838 `THSEL` one-wire AAD configuration input.
+- MIC Rev.A: Molex Pico-Lock 1.50 mm, **6 circuits**: header `5040500691`, housing `5040510601`, terminal `5040520098`, nominal operating range −40…+105 °C.
+- MIC pin 5 = `MIC_WAKE`; pin 6 = shared `AAD_CFG/THSEL`.
 - MAIN↔PWR Micro-Fit 3.0 остается допустимым по температуре, но требует pull/current/thermal validation.
 - U.FL и готовые coax assemblies выпускаются только после проверки температурного диапазона **всей кабельной сборки**, не только board receptacle.
 
@@ -74,6 +76,6 @@ Environmental gate считается закрытым только когда:
 1. BOM/AVL не содержит деталей с неподходящим температурным диапазоном;
 2. `EVT-ENV-COLD`, `EVT-ENV-HOT`, `EVT-ENV-CYCLE`, `EVT-ENV-BATT-COLD` имеют PASS;
 3. thermal report содержит реальные температуры и режимы нагрузки;
-4. холодный отчет содержит cold-start и connector/harness evidence;
+4. холодный отчет содержит cold-start, `AAD_CFG/THSEL`, WAKE и connector/harness evidence;
 5. выбранная батарея/BMS/MPPT имеет подтвержденные температурные правила;
 6. изменение компонента, корпуса, кабеля или firmware power profile, влияющее на температуру, инициирует соответствующий retest.
