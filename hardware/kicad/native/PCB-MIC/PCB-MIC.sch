@@ -46,6 +46,17 @@ F 3 "" H 7300 3350 50 0001 C CNN
 	1    7300 3350
 	1    0    0    -1
 $EndComp
+$Comp
+L Device:R R1
+U 1 1 65000004
+P 4300 3400
+F 0 "R1" V 4093 3400 50 0000 C CNN
+F 1 "0R EVT_SI_TUNE" V 4184 3400 50 0000 C CNN
+F 2 "Resistor_SMD:R_0402_1005Metric" V 4230 3400 50 0001 C CNN
+F 3 "" H 4300 3400 50 0001 C CNN
+	1    4300 3400
+	0    1    1    0
+$EndComp
 Text Label 3100 3100 0 50 ~ 0
 1V8_MIC
 Text Label 3100 3200 0 50 ~ 0
@@ -65,13 +76,17 @@ Wire Wire Line
 Wire Wire Line
 	2900 3300 3500 3300
 Wire Wire Line
-	2900 3400 3500 3400
+	2900 3400 4150 3400
 Wire Wire Line
 	2900 3500 3500 3500
 Wire Wire Line
 	2900 3600 3500 3600
+Text Label 4600 3400 0 50 ~ 0
+PDM_DATA_MIC
+Wire Wire Line
+	4450 3400 5000 3400
 Text Label 5550 3050 2 50 ~ 0
-PDM_DATA
+PDM_DATA_MIC
 Text Label 5550 3150 2 50 ~ 0
 GND
 Text Label 5550 3250 2 50 ~ 0
@@ -110,4 +125,6 @@ Text Notes 2450 4050 0 50 ~ 0
 J1 pinout: 1=1V8_MIC 2=GND 3=PDM_CLK 4=PDM_DATA 5=MIC_WAKE 6=AAD_CFG/THSEL
 Text Notes 5250 4050 0 50 ~ 0
 T5838 SELECT fixed GND. THSEL programmable through AAD_CFG; WAKE preserved.
+Text Notes 3600 3650 0 50 ~ 0
+R1 = 0R for initial EVT; footprint retained for controlled data-line SI tuning after harness measurements.
 $EndSCHEMATC
