@@ -1,195 +1,243 @@
 # EVT-PRE-20 Rev.A native KiCad capture specification
 
-Status: `CAPTURE_INPUT / BLOCKING`
+Status: `CAPTURE_INPUT / BLOCKING / NOT FOR MANUFACTURE`
 
-This specification is the bridge between the approved EVT-PRE-20 system architecture and native KiCad schematic capture. It is not a substitute for manufacturer datasheets or reference designs.
+This document is the authoritative bridge from the locked EVT-PRE-20 system baseline to native KiCad capture. Native `.kicad_sch/.kicad_pcb` files, ERC/DRC and Review A/B remain mandatory before any Gerber may be released.
 
-Authoritative MCU/net assignment: `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv`.
-Authoritative clock policy: `hardware/CLOCKING_REV_A.md` / `DEC-016`.
-Authoritative fixed-position policy: `protocols/POSITION_TIME_TRUST_REV_A.md` / `DEC-018`.
+Authoritative inputs:
+- `config/EVT_PRE_20_BASELINE.yaml`;
+- `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv`;
+- `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
+- `hardware/MAIN_COMPONENT_FREEZE_REV_A.csv`;
+- `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`;
+- `hardware/CONNECTOR_FREEZE_REV_A.csv`;
+- `hardware/CLOCKING_REV_A.md` / `DEC-016`;
+- `protocols/POSITION_TIME_TRUST_REV_A.md` / `DEC-018`;
+- `hardware/PCB_DOUBLE_REVIEW_GATE.md`.
 
-## 1. PCB-MAIN functional blocks
+## 1. PCB-MAIN Rev.A
 
-### U1 - MCU
-- MPN: `STM32U585VIT6Q`.
-- Exact ST pin-database identity: `STM32U585VITxQ`.
-- Package: LQFP100 14x14 mm with SMPS pins.
-- Required peripherals: 4-channel PDM/MDF capture, UART for BG95, UART for GNSS, SPI for LoRa, UART for BLE coprocessor, OCTOSPI/QSPI NOR, SDMMC1 4-bit for microSD, I2C2 sensors/power monitoring, USB FS, SWD, timer input capture for GNSS PPS.
-- Mandatory support: all VDD/VSS/VDDA/VSSA/VREF/VDDUSB/VDD11/SMPS-related pins according to selected supply mode; local decoupling at every supply group; NRST; BOOT0; SWDIO/SWCLK.
-- Exact-package guard: `PB12`, `PE1`, `PC4`, and `PC5` are absent from `STM32U585VITxQ/LQFP100` and are forbidden in Rev.A even though generic STM32U585 package tables may show them for other variants.
-- The Rev.A CSV map is checked by CI for duplicate use and required peripheral mapping. Final alternate-function initialization remains blocked until a CubeMX `.ioc` for this exact package is generated and reviewed.
+### 1.1 MCU
 
-### Clocking Rev.A
-- High-speed policy is locked by `DEC-016`: internal STM32 MSI/HSI sources plus PLL; no external HSE crystal or HSE oscillator is fitted on PCB-MAIN Rev.A.
-- Do not place an HSE crystal, oscillator, HSE load capacitors or tuning network in the Rev.A production BOM unless a formal configuration revision supersedes `DEC-016`.
-- Low-frequency reference remains `SiT1552AI-JE-DCC-32.768D`, 32.768 kHz, for low-frequency/timebase support only.
-- PC14/PC15 remain reserved for the reviewed LSE/external-clock implementation. The final SiT1552 connection must use the exact STM32 LSE bypass/external-clock mode generated in CubeMX; do not copy crystal-mode wiring by assumption.
-- Firmware must prove USB FS operation, four-channel 32 kHz PDM sample-rate accuracy, GNSS PPS timestamping, low-power wake/restore and MSI/HSI/PLL transition recovery on real target hardware before release.
+- `U1`: ST `STM32U585VIT6Q`.
+- Exact device/pin database: `STM32U585VITxQ`.
+- Package: LQFP100 14x14 mm, SMPS-capable package.
+- Exact selected orderable part is treated as a `-40..+85 °C` item until an alternative exact MPN is formally selected; environmental release therefore remains blocked by IN-006.
+- `PB12`, `PE1`, `PC4`, `PC5` are absent from the exact Q-package and forbidden.
+- All VDD/VSS/VDDA/VSSA/VREF/VDDUSB/VDD11/SMPS pins, NRST, BOOT0 and SWD are captured exactly per the selected supply mode and ST reference documentation.
 
-### Frozen Rev.A peripheral map
-- MDF/PDM: PE9=`MDF1_CCK0`; PB1=`MDF1_SDI0`; PD6=`MDF1_SDI1`; PE7=`MDF1_SDI2`; PE4=`MDF1_SDI3`.
-- OCTOSPI1 NOR: PE10=`CLK`, PE11=`NCS`, PE12..PE15=`IO0..IO3`.
-- SDMMC1: PC8..PC11=`D0..D3`, PC12=`CK`, PD2=`CMD`, PC13=`SD_DET` GPIO.
-- GNSS: PA2/PA3=`USART2 TX/RX`, PA0=`TIM2_CH1` PPS input capture.
-- LoRa: PA4..PA7=`SPI1 NSS/SCK/MISO/MOSI`, PD8=`DIO1`, PD9=`BUSY`, PD10=`RESET_N`.
-- BG95 main UART: PB6/PB7=`USART1 TX/RX`; PD11..PD15 are cellular control/status GPIOs as defined in the pin-map CSV.
-- BLE: PB10/PB11=`USART3 TX/RX`; PE6=`BLE_EN`; PB2=`BLE_DFU_REQ` open-drain request.
-- Sensor/power I2C: PB13/PB14=`I2C2 SCL/SDA`.
-- Power interface: PD0=`PWR_GOOD`, PD1=`PWR_FAULT`, PD4=`EN_MODEM`, PD5=`EN_AUX`.
-- Production LPUART: PC0=`RX`, PC1=`TX`.
-- USB FS: PA9=`VBUS sense`, PA11=`DM`, PA12=`DP`.
-- SWD: PA13=`SWDIO`, PA14=`SWCLK`.
-- Hardware straps: PB8/PB9 revision straps, PH3 BOOT0.
-- 32.768 kHz domain: PC14/PC15 reserved for the LSE/external-oscillator implementation.
+### 1.2 Clocking
 
-### Audio/PDM interface
-- Four external PCB-MIC leaves; one TDK/InvenSense `T5838` per leaf.
-- Common PDM clock net: `PDM_CLK`.
-- Independent data nets: `PDM_DATA1..4`.
-- Microphone supply: `1V8_MIC`, nominal 1.8 V, with common reference `GND`.
-- Four board connectors `J_MIC1..J_MIC4` use identical logical pin numbering.
-- Rev.A level translation candidate: `SN74AXC8T245PWR`, TSSOP-24, with VCCA/VCCB arranged so one four-bit direction group carries the MCU-to-microphone clock and the other group carries the four microphone-to-MCU data channels. Unused bits in the clock-direction group are not routed to external connectors.
-- Do not use an uncontrolled auto-direction translator for the PDM path.
-- Provide direction/OE default states that keep microphones isolated during incomplete power sequencing. Translator isolation/partial-power-down behavior shall be verified in Review A.
-- Series damping footprints shall be provided at the PDM clock source/fanout; population value is frozen after bench/SI validation.
-- Channel-to-channel data-path skew shall be characterized; the design goal is ≤1 audio sample equivalent after calibration.
+- Locked policy `DEC-016`: internal MSI/HSI + PLL for high-speed clocks.
+- No HSE crystal, HSE oscillator, HSE load capacitors or DNP HSE footprint in Rev.A.
+- `X1`: `SiT1552AI-JE-DCC-32.768D`, 32.768 kHz low-frequency reference.
+- PC14/PC15 implementation must match the exact CubeMX LSE/external-clock/bypass mode; do not assume crystal wiring.
+- Target validation must prove USB FS, PDM sample-rate accuracy, PPS capture, low-power wake and clock-transition recovery.
 
-### Cellular
-- Candidate modem: Quectel `BG95-M3`, LGA module, fitted as U8 after regional-band/operator confirmation.
-- Power rail: `3V8_MODEM`; design for the BG95-M3 3.3–4.3 V supply range and burst-current voltage drop with local bulk/high-frequency decoupling.
-- Main UART and related BG95 digital interfaces are a **1.8 V domain**. PB6/PB7 must not be wired directly as 3.3 V UART to the module.
-- MCU interface: translated UART TX/RX plus PWRKEY, RESET_N, STATUS, DTR and RI control/status paths.
-- PWRKEY/RESET controls use a reference-design-compatible open-drain/transistor or other approved 1.8 V-domain interface; direct 3.3 V drive is forbidden.
-- Cellular RF uses a dedicated 50-ohm path to external connector with reference-design matching/ESD footprints.
+### 1.3 Frozen STM32 peripheral map
 
-### Dual nano-SIM
-- Two physical nano-SIM connectors, `J_SIM1` and `J_SIM2`.
-- BG95 supports a 1.8 V USIM/SIM interface; both slots and the mux/ESD network must preserve this domain.
-- One modem USIM interface through an approved 2:1 mux.
-- Current mux candidate: TI `TS3A27518E` family; exact suffix/footprint remains subject to final USIM signal-integrity review.
-- Nets from modem: `USIM_VDD`, `USIM_RST`, `USIM_CLK`, `USIM_DATA`, `USIM_GND`.
-- Per-slot nets: `SIM1_*`, `SIM2_*` plus `SIM1_DET`, `SIM2_DET`.
-- MCU control: PE0=`SIM_MUX_SEL`, PE2=`SIM_MUX_EN`, PE3=`SIM1_DET`, PE5=`SIM2_DET`.
-- Safe reset state: mux disabled or SIM1 selected according to the final mux truth table; no uncontrolled slot switching.
-- Switching while the modem USIM interface is powered is prohibited by the hardware/software design rule.
-- Low-capacitance ESD must be located adjacent to each external SIM connector.
+- PDM/MDF: PE9 `MDF1_CCK0`; PB1 `MDF1_SDI0`; PD6 `MDF1_SDI1`; PE7 `MDF1_SDI2`; PE4 `MDF1_SDI3`.
+- AAD aggregate wake: PA8, physical LQFP100 pin 67, GPIO/EXTI wake input `MIC_WAKE`.
+- OCTOSPI1 NOR: PE10 CLK; PE11 NCS; PE12..PE15 IO0..IO3.
+- SDMMC1: PC8..PC11 D0..D3; PC12 CK; PD2 CMD; PC13 DET.
+- GNSS: PA2/PA3 USART2 TX/RX; PA0 TIM2_CH1 PPS.
+- LoRa: PA4..PA7 SPI1 NSS/SCK/MISO/MOSI; PD8 DIO1; PD9 BUSY; PD10 RESET_N.
+- BG95 UART: PB6/PB7 USART1 TX/RX; PD11..PD15 control/status.
+- BLE: PB10/PB11 USART3 TX/RX; PE6 BLE_EN; PB2 BLE_DFU_REQ.
+- I2C2: PB13/PB14.
+- PCB-PWR: PD0 PWR_GOOD; PD1 PWR_FAULT; PD4 EN_MODEM; PD5 EN_AUX.
+- Production LPUART: PC0 RX; PC1 TX.
+- USB FS: PA9 VBUS; PA11 DM; PA12 DP.
+- SWD: PA13 SWDIO; PA14 SWCLK.
+- revision straps PB8/PB9; BOOT0 PH3.
+- PC14/PC15 reserved for 32.768 kHz domain.
 
-### GNSS/PPS and fixed station position
-- Candidate: u-blox `MAX-M10S` class.
-- Main role: continuous timing/position monitoring independent of cellular operation.
-- UART: PA2/PA3 USART2; `GNSS_PPS`/TIMEPULSE on PA0/TIM2_CH1 input capture.
-- Use the module in a 3.3 V-compatible I/O configuration; verify VIO/VIO_SEL and backup-supply wiring against the exact ordered MAX-M10S revision.
-- RF: dedicated GNSS connector/path with antenna bias/ESD as required by the selected active antenna.
-- After commissioning, configured installation coordinates are authoritative. GNSS position is used for integrity comparison and diagnostics, not for silently moving station geometry.
-- Receiver spoof/jamming monitoring shall be enabled/read by firmware; position trust and time trust are separate states.
-- PPS/time integrity must be allowed to degrade independently while configured station coordinates remain stable.
+The CSV pin map remains the machine-checkable authority if this prose and the CSV ever differ.
 
-### LoRa RU868
-- Candidate module: Ebyte `E22-900M22S` / SX1262 class.
-- SPI1: PA4 NSS, PA5 SCK, PA6 MISO, PA7 MOSI; PD8 DIO1, PD9 BUSY, PD10 RESET_N.
-- Power: 3.3 V domain with separately measurable/controllable consumption where practical.
-- RF: dedicated 868 MHz path/connector with matching footprint and ESD strategy.
-- Default boot state shall not transmit until a valid RU868 profile is loaded.
+### 1.4 T5838 PDM and Acoustic Activity Detect
 
-### BLE commissioning/OTA
-- Primary module: Raytac `MDBT50Q-P1MV2` based on Nordic `nRF52840`, integrated PCB antenna.
-- `ESP32-C3-MINI-1-N4` is superseded and must not appear in active Rev.A schematic/BOM.
-- MCU-to-BLE service link: PB10/PB11 USART3 TX/RX to selected nRF52840 UARTE GPIOs.
-- PE6 is `BLE_EN`: it controls the approved module power-enable/reset-request implementation.
-- PB2 is `BLE_DFU_REQ`: application-level open-drain request to a selected nRF52840 GPIO. It is not an ESP-style boot strap.
-- Provide separate nRF52840 SWDIO/SWCLK/RESET/VREF/GND fixture pads for manufacturing and recovery. These pads do not consume STM32 GPIOs.
-- BLE requirements: 2M, 1M and Coded/Long Range PHY, authenticated commissioning, diagnostics and signed OTA. Wi-Fi is not required.
-- Place the integrated antenna at the PCB edge exactly per Raytac keepout recommendations. No copper, battery, shielding, cable bundle or enclosure insert may violate the keepout.
-- Validate RSSI, connection stability and OTA throughput in the actual vacuum-cast housing and the full-lot 3D fallback housing.
-- If integrated antenna margin is insufficient, a formally approved same-family external-antenna module variant may be used without changing the logical BLE architecture.
+Each station has four identical external `PCB-MIC` leaves with one TDK/InvenSense `T5838` each.
 
-### NOR and microSD
-- NOR: `W25Q512JVFIQ`-class 64 MB device on OCTOSPI1/QSPI using PE10..PE15; include local decoupling and damping footprints.
-- microSD: industrial card socket with detect on SDMMC1 4-bit bus using PC8..PC12 + PD2, with PC13 card detect.
-- SPI fallback for microSD is not part of Rev.A unless an explicit configuration revision is approved.
-- Both storage paths require power-loss recovery testing.
+PDM:
+- common `PDM_CLK`;
+- independent `PDM_DATA1..4`;
+- `1V8_MIC` supply;
+- `U7` `SN74AXC8T245PWR` provides explicit 3.3 V / 1.8 V translation;
+- one direction group drives common PDM clock toward the microphones;
+- the opposite direction group receives four PDM data channels;
+- OE/DIR default states must isolate the microphone domain during partial power sequencing and AAD-only sleep.
 
-### Sensors/power monitor
-- LIS2DW12 accelerometer with interrupt on PC6.
-- Temperature sensor candidate STTS22H or approved package-compatible alternative.
-- INA226-class current/voltage monitors as applicable.
-- PB13/PB14 I2C2 bus; verify every selected device address and power domain before schematic freeze.
-- PC7 is reserved for enclosure tamper input.
-- Accelerometer/tamper state participates in relocation detection: movement of a commissioned fixed station causes `REVALIDATION_REQUIRED`, but does not automatically rewrite installation coordinates.
+AAD wake:
+- T5838 `WAKE` is preserved on every leaf; it is not tied off;
+- physical MIC connector is **5 contacts**, not 4;
+- J_MIC1..J_MIC4 physical order: 1=`1V8_MIC`, 2=`GND`, 3=`PDM_CLK`, 4=`PDM_DATAn`, 5=`MIC_WAKEn`;
+- connector family: JST GH; board header `BM05B-GHS-TBT (LF)(SN)` class, cable housing `GHR-05V-S`, contact `SSHL-002T-P0.2`;
+- `MIC_WAKE1..4` remain separate through the four harnesses;
+- `U17` `SN74LVC32APWR` is powered from 1.8 V; three internal OR gates form a four-input OR; unused fourth gate inputs are tied to defined states;
+- `U18` `SN74AXC1T45DRLR` translates the aggregate wake from 1.8 V to 3.3 V;
+- U18 output is `MIC_WAKE` to STM32 PA8/pin 67;
+- the wake path remains powered while AAD monitoring is armed;
+- the PDM translator may be disabled/high-Z during AAD-only S0.
 
-### USB-C service, production UART and SWD
-- USB-C USB2 device/service port: PA9 VBUS sense, PA11 D-, PA12 D+, CC1, CC2, GND and shield; correct device-mode Rd configuration and ESD required.
-- PC0/PC1 LPUART1 is production/EOL diagnostic UART and shall not be exposed as a general field console without authentication policy.
-- SWD production/recovery access: PA13 SWDIO, PA14 SWCLK, NRST, VTREF, GND.
-- Test points must remain accessible to the fixture independent of USB condition.
+T5838 leaf-local control:
+- `SELECT` is set by a resistor-option strap because each leaf has an independent data line; no runtime cable is allocated to SELECT;
+- `THSEL` gets local configurable resistor/test-pad footprints and is frozen only after the AAD threshold profile is validated;
+- no production Rev.A leaf may permanently remove the ability to configure/validate AAD before that profile is frozen;
+- local VDD decoupling is placed immediately at T5838;
+- bottom acoustic port, solder mask, adhesive, membrane and enclosure stack preserve the acoustic opening.
+
+Required AAD tests before release:
+- entry/configuration sequence;
+- missed-wake and false-wake tests;
+- wake edge level and latency at PA8;
+- Stop-mode wake;
+- PDM restart after AAD wake;
+- all four individual WAKE paths;
+- measured S0 current with four microphones, OR gate, translator, LDO, MCU and timing source strategy.
+
+### 1.5 Cellular and dual SIM
+
+- `U8`: Quectel `BG95-M3` candidate pending exact regional/orderable variant and operator validation.
+- dedicated `3V8_MODEM` supply, burst-capable with local bulk/HF decoupling.
+- BG95 UART/status domain is 1.8 V; direct STM32 3.3 V connection is forbidden.
+- `U16`: `SN74AXC8T245PWR` for selected UART/status translation.
+- PWRKEY and RESET_N use approved open-drain/transistor interfaces, not ordinary translated push-pull outputs.
+- two physical nano-SIM/4FF slots, Single Standby only.
+- `U13`: `TS3A27518EPWR` candidate pending USIM SI/powered-off isolation review.
+- `U14/U15`: `ESDALC6V1-5P6` close to the two SIM connectors.
+- provisional slot MPN `TE 2336582-1`; procurement risk is explicit and an electrically/mechanically validated second source is required before lot release.
+- no SIM switching while the BG95 USIM interface is powered.
+
+### 1.6 GNSS / trusted fixed position
+
+- `U9`: u-blox `MAX-M10S-00B`.
+- GNSS UART PA2/PA3; TIMEPULSE/PPS PA0/TIM2_CH1.
+- dedicated U.FL RF path; final active antenna/bias verified against exact antenna.
+- configured installation coordinates are authoritative after commissioning; GNSS position is an integrity/diagnostic channel and must not silently move network/TDOA geometry.
+- receiver jam/spoof flags are read by firmware.
+- position-trust and time-trust are independent; loss of GNSS position trust does not alter configured coordinates, while PPS/time suspicion affects TDOA validity/holdover separately.
+
+### 1.7 LoRa RU868
+
+- `U10`: `E22-900M22S` / SX1262 class.
+- SPI1 pins per frozen map.
+- dedicated U.FL, matching/ESD footprint and uninterrupted RF ground.
+- all 20 EVT-PRE-20 units use RU868 profile; no transmit before a valid region profile is loaded.
+
+### 1.8 BLE commissioning / diagnostics / OTA
+
+- `U11`: Raytac `MDBT50Q-P1MV2`, nRF52840, integrated PCB antenna.
+- ESP32-C3 is superseded and forbidden in active Rev.A schematic/BOM.
+- STM32 service link PB10/PB11 USART3 plus PE6 BLE_EN and PB2 BLE_DFU_REQ.
+- separate nRF52840 SWDIO/SWCLK/VREF/GND recovery fixture pads; these do not consume STM32 GPIOs.
+- integrated antenna is placed at the PCB edge with Raytac keepout; no copper/battery/shield/cable bundle in the antenna volume.
+- final housing RF validation is mandatory; same-family external-antenna module may be adopted only by formal change if margin is insufficient.
+
+### 1.9 Storage, sensors, USB and DFT
+
+- NOR `W25Q512JVFIQ` on OCTOSPI1.
+- industrial microSD on 4-bit SDMMC1; SPI fallback is not part of Rev.A without revision approval.
+- LIS2DW12 orientation explicitly marked; INT to PC6.
+- STTS22H remains a WLCSP assembly-risk candidate.
+- INA226-class monitoring on I2C2 with shunt/range frozen by power calculation.
+- PC7 tamper input.
+- USB-C USB2 service: PA9/PA11/PA12, device-mode Rd, ESD and shield strategy.
+- STM32 SWD, nRF SWD and EOL UART/test pads remain fixture-accessible after assembly.
 
 ## 2. PCB-MIC Rev.A
 
-Per board:
-- `MK1` T5838 bottom-port PDM MEMS microphone.
-- `J1` 4-position keyed locking connector.
-- Logical pinout: 1=`1V8_MIC`, 2=`GND`, 3=`PDM_CLK`, 4=`PDM_DATA`.
-- Local decoupling adjacent to microphone supply pins.
-- Acoustic port keepout through PCB and enclosure stack.
-- No copper, solder mask contamination, adhesive or conformal coat may block the acoustic port.
-- All four leaves use identical PCB and BOM revision and preferably the same microphone lot.
+One identical leaf is used four times.
+
+Components/functions:
+- `MK1`: T5838 bottom-port PDM MEMS microphone;
+- J1: 5-position JST GH SMT board header;
+- C1 local 0.1 uF X7R decoupling close to microphone VDD plus any additional datasheet-required local bypass;
+- SELECT resistor-option strap with defined production default;
+- THSEL resistor/test option for AAD threshold/profile validation;
+- WAKE routed to J1 pin 5;
+- PDM DATA routed to J1 pin 4;
+- CLK J1 pin 3, GND pin 2, 1V8 pin 1.
+
+Mechanical/acoustic:
+- bottom-port PCB hole and keepout follow T5838 land pattern/reference guidance;
+- no copper/mask/adhesive/coating blocks acoustic port;
+- microphone port, membrane, drain/water strategy and enclosure pod stack are reviewed as one acoustic assembly;
+- all four leaves share one PCB/BOM revision and preferably one microphone lot.
 
 ## 3. PCB-PWR Rev.A
 
-Input: protected battery bus from LiFePO4/BMS/external MPPT assembly.
+Input: protected battery bus from LiFePO4/BMS/external MPPT. No MPPT charger is integrated on PCB-PWR.
 
-Required functions:
-- input fuse coordination / service disconnect interface;
-- reverse-polarity protection;
-- transient/TVS protection;
-- input voltage/current monitoring;
-- controlled load switching where required;
-- `3V8_MODEM` regulator sized for modem burst current and verified against a worst-case load transient;
-- `3V3_DIGITAL` regulator;
-- `3V3_AON` if separated from the main digital rail;
-- `1V8_MIC` low-noise regulator;
-- `PWR_GOOD` and `FAULT` outputs to PCB-MAIN;
-- `EN_MODEM` and `EN_AUX` inputs from PCB-MAIN.
+Selected capture baseline:
+- reverse/reverse-current controller `LM74700QDBVRQ1` plus `CSD18540Q5B` 60 V N-MOSFET;
+- transient clamp `SMBJ18A` candidate pending measured transient envelope;
+- PCB fuse `0451005.MRL` candidate pending fuse coordination;
+- `3V8_MODEM`: `LMR604403SRAKR`, 4 A adjustable synchronous buck;
+- `3V3_DIGITAL`: second `LMR604403SRAKR`, 4 A;
+- no separate 3V3_AON regulator in Rev.A unless measured S0 requires a configuration change;
+- `1V8_MIC`: `TPS7A2018PDBVR` 1.8 V LDO, kept active during AAD monitoring;
+- INA226 monitor, final shunt and Kelvin routing pending current-range calculation.
 
-No solar MPPT charger is implemented on PCB-PWR; the LiFePO4 MPPT remains an external assembly.
+MAIN/PWR 10-contact electrical contract:
+1. 3V8_MODEM
+2. GND_MODEM
+3. 3V3_DIGITAL
+4. GND_DIGITAL
+5. 1V8_MIC
+6. GND_MIC
+7. PWR_GOOD
+8. FAULT
+9. EN_MODEM
+10. EN_AUX
 
-## 4. Logical connector contracts
+Micro-Fit 3.0 family is selected electrically; exact board orientation remains mechanical-freeze input.
 
-The exact connector manufacturer/MPN may be frozen after mechanical review, but electrical order below is the baseline contract and must not change without an ICD revision.
+## 4. PCB layout constraints
 
-- `J_MIC1..4`: 4 pins: 1V8_MIC, GND, PDM_CLK, PDM_DATAn.
-- `J_PWR` MAIN side: 10 pins: 3V8_MODEM, GND_MODEM, 3V3_DIGITAL, GND_DIGITAL, 1V8_MIC, GND_MIC, PWR_GOOD, FAULT, EN_MODEM, EN_AUX.
-- `J_SWD`: 5 pins: VTREF, SWDIO, SWCLK, NRST, GND.
-- `J_USB`: standard USB-C USB2 device mapping according to USB requirements.
-- Full electrical order and preliminary wire-gauge rules are in `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`.
+- separate cellular, GNSS, LoRa and BLE RF zones;
+- uninterrupted reference ground under RF and digital high-speed return paths as appropriate;
+- no DC/DC switching node beneath/adjacent to GNSS RF or microphone/PDM/wake fanout;
+- short/wide BG95 power path and reference-design decoupling;
+- short SIM traces; 1.8 V USIM integrity; ESD at connector;
+- USB D+/D- controlled differential routing with continuous return;
+- Raytac integrated antenna edge/keepout strictly preserved;
+- PDM CLK/DATA routed away from DC/DC and RF; comparable harness lengths for MIC1..4;
+- WAKE lines kept away from PDM clock and switching nodes; no floating OR-gate inputs;
+- U7, U17, U18 1.8/3.3 V decoupling local;
+- test points for regulated rails, reset, PPS, production UART, power state, STM32 SWD and nRF SWD;
+- no HSE footprint/routing.
 
-## 5. Layout constraints to capture as PCB rules/notes
+## 5. Native capture and manufacturing gate
 
-- Keep cellular, GNSS and LoRa RF zones physically separated with uninterrupted reference ground.
-- No high-current switching node under/adjacent to GNSS RF input or microphone signal fanout.
-- Keep BG95 supply path short/wide; place bulk/high-frequency decoupling according to Quectel reference design.
-- Keep SIM traces short and away from RF/high-current switching nodes; preserve the 1.8 V USIM domain.
-- USB D+/D- differential routing must maintain a continuous return path.
-- Preserve manufacturer antenna/RF keepouts for module candidates.
-- Respect Raytac MDBT50Q-P1MV2 2.4 GHz antenna edge/keepout and keep metal/cables/battery away from the antenna volume.
-- Provide ground stitching around RF transitions/connectors and enclosure boundaries where appropriate.
-- Route PDM clock/data away from modem DC/DC and RF feed lines; preserve comparable harness electrical length for MIC1..4.
-- Keep the PDM translator close to the MCU/fanout origin and keep its 1.8 V and 3.3 V decoupling local.
-- Provide explicit test points for all regulated rails, reset, both SWD domains, production UART, PPS and power-state signals.
-- Do not place an HSE footprint or route an HSE resonator loop on Rev.A; this is a locked architecture decision, not a DNP option.
-
-## 6. Capture completion criteria
+Native directory contract:
+- `hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch/.kicad_pcb/.kicad_pro`;
+- `hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch/.kicad_pcb/.kicad_pro`;
+- `hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch/.kicad_pcb/.kicad_pro`.
 
 Capture is complete only when:
-1. three native schematic projects exist (MAIN/MIC/PWR);
-2. exact symbols/footprints are assigned and datasheet-checked;
-3. the exact-package pin map matches `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv`;
-4. a CubeMX `.ioc` for `STM32U585VITxQ/LQFP100` is committed and cross-checked against the CSV map;
-5. the CubeMX clock tree implements `REV_A_INTERNAL_HSI_MSI_PLL_NO_HSE` and the SiT1552 low-frequency configuration is reviewed explicitly;
-6. connector net order matches `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
-7. all BG95 1.8 V crossings and the T5838 1.8 V PDM crossing are explicit in the schematic;
-8. active BLE module is `MDBT50Q-P1MV2/nRF52840` with reviewed antenna keepout and separate SWD recovery pads;
-9. ERC passes with no unexplained error;
-10. Review A from `hardware/PCB_DOUBLE_REVIEW_GATE.md` is complete.
+1. exact symbols and footprints are assigned and datasheet-reviewed;
+2. exact STM32 pin map and CubeMX `.ioc` agree;
+3. clock policy agrees with DEC-016;
+4. all four 5-contact MIC harnesses and PA8 AAD wake path agree with the harness/interconnect files;
+5. all 1.8/3.3 V crossings are explicit;
+6. power passives/feedback/shunt/fuse/TVS calculations are frozen;
+7. ERC has no unexplained violations;
+8. Review A passes.
 
-Only then may PCB placement/routing be treated as a release candidate.
+PCB release candidate requires:
+- DRC no blocker/critical violations;
+- fabrication/stackup/impedance review;
+- independent CAM review;
+- Gerber + Excellon;
+- IPC-356 where supported;
+- PnP/centroid;
+- production BOM/AVL;
+- TOP/BOTTOM assembly drawings;
+- STEP and fabrication notes;
+- DFM response from PCB/PCBA manufacturer;
+- Review B passes;
+- SHA-256 release manifest.
+
+`tools/kicad_native_gate.py --strict --run-cli` is the machine gate for native source, ERC/DRC and fabrication export. Passing that CLI gate does **not** waive Review A or Review B.
+
+Until all conditions are met the state remains `NOT FOR MANUFACTURE`.
