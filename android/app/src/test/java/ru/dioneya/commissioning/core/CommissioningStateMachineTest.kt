@@ -16,10 +16,28 @@ class CommissioningStateMachineTest {
     }
 
     @Test
+    fun positionCommissioningCanReachFieldReady() {
+        val machine = CommissioningStateMachine(CommissioningState.READY)
+        machine.transition(CommissioningState.POSITIONING)
+        machine.transition(CommissioningState.POSITION_VERIFYING)
+        machine.transition(CommissioningState.DIAGNOSTICS)
+        machine.transition(CommissioningState.FIELD_READY)
+        assertEquals(CommissioningState.FIELD_READY, machine.state)
+    }
+
+    @Test
     fun cannotSkipAuthentication() {
         val machine = CommissioningStateMachine()
         assertThrows(IllegalArgumentException::class.java) {
             machine.transition(CommissioningState.READY)
+        }
+    }
+
+    @Test
+    fun cannotDeclareFieldReadyDirectlyFromReady() {
+        val machine = CommissioningStateMachine(CommissioningState.READY)
+        assertThrows(IllegalArgumentException::class.java) {
+            machine.transition(CommissioningState.FIELD_READY)
         }
     }
 }
