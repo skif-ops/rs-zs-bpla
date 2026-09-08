@@ -7,7 +7,7 @@ CM-005,Управление,Реестр рисков и отклонений,XL
 CM-006,Управление,Манифест SHA-256,TXT+CSV,P0,PLANNED,OPEN,OPEN,Покрыты все поставочные файлы
 SYS-001,Требования,ТЗ предсерийного EVT,DOCX+PDF,P0,PLANNED,OPEN,OPEN,Согласовано для 20 изделий и двух радиовариантов
 SYS-002,Архитектура,Архитектура изделия и системы,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Нет конфликтов hardware firmware server Android
-SYS-003,Архитектура,ICD станция-сервер,DOCX+CBOR schema,P0,PLANNED,OPEN,OPEN,Совместимость schema подтверждена тестами
+SYS-003,Архитектура,ICD станция-сервер,DOCX+CBOR schema,P0,DRAFT,OPEN,OPEN,Совместимость schema подтверждена тестами
 SYS-004,Архитектура,Энергобаланс 40-60 Ач и 60-80 Вт,XLSX+DOCX,P0,PLANNED,OPEN,OPEN,Расчёт и измерение S0-S4 согласованы
 SYS-005,Архитектура,Threat model и управление ключами,DOCX,P0,PLANNED,OPEN,OPEN,Ключи не включены в пакет; процессы provisioning описаны
 HW-M-001,PCB main,Схема электрическая принципиальная,KICAD_SCH+PDF,P0,PLANNED,OPEN,OPEN,ERC PASS и ручная datasheet review
@@ -40,7 +40,7 @@ MECH-VC-001,Вакуумное литьё,Master и разъём формы,STEP
 MECH-VC-002,Вакуумное литьё,Материал и технологические требования,DOCX,P1,PLANNED,OPEN,OPEN,UV температура герметичность согласованы
 MECH-IM-001,ТПА,Литьевая конструкция корпуса,STEP+DRAWING,P0,PLANNED,OPEN,OPEN,Draft ribs bosses wall thickness DFM PASS
 MECH-IM-002,ТПА,Требования к пресс-форме и материалу,DOCX,P1,PLANNED,OPEN,OPEN,Parting ejector inserts texture shrinkage указаны
-FW-001,Firmware,Исходники target STM32U585,C+IOC+CMAKE,P0,PLANNED,OPEN,OPEN,Reproducible target build PASS
+FW-001,Firmware,Исходники target STM32U585,C+IOC+CMAKE,P0,DRAFT,OPEN,OPEN,Reproducible target build PASS
 FW-002,Firmware,Bootloader secure boot A/B,C+BIN+ELF+MAP,P0,PLANNED,OPEN,OPEN,Подпись rollback power-loss tests PASS
 FW-003,Firmware,Station application,C+BIN+ELF+MAP,P0,PLANNED,OPEN,OPEN,Unit integration HIL tests PASS
 FW-004,Firmware,Профили RU868 и EU868,YAML+BIN fragment,P0,DRAFT,OPEN,OPEN,Региональные пределы и RF test PASS
@@ -48,15 +48,15 @@ FW-005,Firmware,Modem profiles ordinary/public APN,YAML+DOCX,P0,DRAFT,OPEN,OPEN,
 FW-006,Firmware,BLE service и OTA,GATT schema+C,P0,PLANNED,OPEN,OPEN,Auth signed image rollback tests PASS
 FW-007,Firmware,Инструкция прошивки и восстановления,DOCX,P0,PLANNED,OPEN,OPEN,Повторена на чистом рабочем месте
 FW-008,Firmware,Release manifest и подписи,JSON+SHA256+SIG,P0,PLANNED,OPEN,OPEN,Версии commit toolchain hash согласованы
-SRV-001,Мухоед,Крайний исходный релиз сервера,PYTHON+LOCKFILE,P0,PLANNED,OPEN,OPEN,Полный pytest и compileall PASS
+SRV-001,Мухоед,Крайний исходный релиз сервера,PYTHON+LOCKFILE,P0,DRAFT,OPEN,OPEN,Полный pytest и compileall PASS
 SRV-002,Мухоед,Deployment Windows 11,DOCX+SCRIPTS,P0,PLANNED,OPEN,OPEN,Развёрнуто с нуля и smoke test PASS
 SRV-003,Мухоед,Deployment Ubuntu 24.04,DOCX+CONTAINER,P0,PLANNED,OPEN,OPEN,Развёрнуто с нуля backup restore PASS
 SRV-004,Мухоед,MQTT HTTPS ingress и device registry,PYTHON+DOCX,P0,PLANNED,OPEN,OPEN,20 станций load/reconnect/dedup PASS
 SRV-005,Мухоед,OTA repository и rollout control,PYTHON+DOCX,P0,PLANNED,OPEN,OPEN,Canary pause rollback audit PASS
-PR-001,Протоколы,MQTT topics QoS sessions,DOCX+YAML,P0,PLANNED,OPEN,OPEN,Packet captures и integration test
+PR-001,Протоколы,MQTT topics QoS sessions,DOCX+YAML,P0,DRAFT,OPEN,OPEN,Packet captures и integration test
 PR-002,Протоколы,HTTPS fallback API,OPENAPI+DOCX,P0,PLANNED,OPEN,OPEN,Contract tests PASS
-PR-003,Протоколы,LoRa P2P mesh store-and-forward,DOCX+CBOR schema,P0,PLANNED,OPEN,OPEN,Link loss relay dedup tests PASS
-PR-004,Протоколы,BLE GATT configuration OTA,DOCX+schema,P0,PLANNED,OPEN,OPEN,Android-station compatibility PASS
+PR-003,Протоколы,LoRa P2P mesh store-and-forward,DOCX+CBOR schema,P0,DRAFT,OPEN,OPEN,Link loss relay dedup tests PASS
+PR-004,Протоколы,BLE GATT configuration OTA,DOCX+schema,P0,DRAFT,OPEN,OPEN,Android-station compatibility PASS
 PR-005,Протоколы,GNSS PPS time quality,DOCX,P0,PLANNED,OPEN,OPEN,Holdover and timestamp error measured
 PR-006,Протоколы,Cellular SIM APN profile,DOCX+YAML,P0,DRAFT,OPEN,OPEN,Consumer/M2M SIM pilot test PASS
 MFG-001,Производство,Маршрут сборки 20 изделий,DOCX+XLSX,P0,PLANNED,OPEN,OPEN,Все операции критерии и evidence указаны

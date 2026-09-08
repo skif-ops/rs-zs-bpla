@@ -1,10 +1,29 @@
-# ЗС-БПЛА firmware development baseline
+# ЗС-БПЛА firmware, EVT-PRE-20
 
-This is the platform-neutral production core for the station firmware. It freezes event types, CBOR encoding, LoRa power-state behavior, PPS-to-audio time mapping, feature ordering and the first-level centroid classifier exported from the current server model.
+Текущий каталог содержит переносимое C11-ядро: типы событий, compact CBOR, DSP, архивирование, state machines BG95/LoRa, GNSS parsing и host-тесты.
 
-The hardware-specific STM32Cube project must bind the frozen APIs to STM32U585ZI HAL/LL/CMSIS-DSP. Production FFT/YIN/MFCC must pass the golden-vector acceptance test.
+Целевой контроллер предсерии: `STM32U585VIT6Q`, LQFP100. Упоминания STM32U585ZI и платы WeAct относятся к предыдущим этапам и не являются target EVT-PRE-20.
 
-Build host verification:
+## Что уже проверяется
+
 ```sh
-cmake -S . -B build && cmake --build build && ctest --test-dir build --output-on-failure
+cmake -S firmware -B firmware/build -DCMAKE_BUILD_TYPE=Release
+cmake --build firmware/build --parallel
+ctest --test-dir firmware/build --output-on-failure
 ```
+
+Host PASS не означает готовую прошивку изделия.
+
+## Что отсутствует до target build
+
+- STM32CubeMX `.ioc` для STM32U585VIT6Q;
+- подтверждённая карта выводов собственной PCB;
+- startup, linker script и HAL/LL bindings;
+- драйвер PDM/MDF для четырёх T5838 на фактической плате;
+- production TLS/MQTT, защищённый downstream и provisioning;
+- два валидированных региональных LoRa-профиля;
+- secure boot, A/B OTA, rollback и подписанный release;
+- измерение памяти, CPU, тока и времени на target.
+
+До закрытия этих пунктов статус firmware: `TARGET_PORT_REQUIRED / OPEN / NOT RUN`. BIN/HEX из host-сборки запрещено маркировать как прошивку станции.
+

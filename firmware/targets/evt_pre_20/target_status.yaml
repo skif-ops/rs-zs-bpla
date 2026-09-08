@@ -1,0 +1,33 @@
+target_id: dioneya_evt_pre_20_rev_a
+status: TARGET_PORT_REQUIRED
+mcu: STM32U585VIT6Q
+package: LQFP100_14x14
+board: custom_pcb
+host_core_source: ../..
+wire_interface_release: "1.4"
+detection_schema_version: 3
+audio:
+  microphones: 4
+  microphone_mpn: T5838
+  sample_rate_hz: 32000
+  geometry_id: 1
+  base_triangle_side_mm: 120
+  upper_offset_mm: 150
+required_target_files:
+  cubemx_ioc: MISSING_BLOCKER
+  startup: MISSING_BLOCKER
+  linker_script: MISSING_BLOCKER
+  hal_ll_bindings: MISSING_BLOCKER
+  board_pins: OPEN_CUBEMX
+  secure_boot: MISSING_BLOCKER
+  ota_ab: MISSING_BLOCKER
+  production_build_manifest: MISSING_BLOCKER
+release_outputs:
+  elf: NOT_BUILT
+  map: NOT_BUILT
+  bin: NOT_BUILT
+  hex: NOT_BUILT
+  sha256: NOT_BUILT
+  signature: NOT_BUILT
+do_not_release: true
+
