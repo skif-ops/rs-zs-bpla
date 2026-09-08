@@ -16,6 +16,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Generate unified Rev.A BOM
+        run: python tools/generate_evt_pre_20_bom_rev_a.py
       - name: First-pass configuration and hardware baseline validation
         run: python tools/validate_evt_pre_20.py
       - name: Cross-check locked Rev.A clock policy
@@ -24,11 +26,13 @@ jobs:
         run: python tools/validate_rev_a_component_freeze.py
       - name: Second-pass release completeness audit
         run: python tools/audit_evt_pre_20_release.py
-      - name: Upload second-pass audit report
+      - name: Upload audit and generated Rev.A BOM
         uses: actions/upload-artifact@v4
         with:
           name: evt-pre-20-release-audit
-          path: artifacts/evt_pre_20_release_audit.json
+          path: |
+            artifacts/evt_pre_20_release_audit.json
+            hardware/EVT_PRE_20_BOM_REV_A.csv
           if-no-files-found: error
 
   firmware:
@@ -137,6 +141,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Generate unified Rev.A BOM
+        run: python tools/generate_evt_pre_20_bom_rev_a.py
       - name: Build reproducible current-state archives
         run: python tools/build_evt_pre_20_packages.py
       - name: Upload engineering and separate PMI/report archives
