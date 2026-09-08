@@ -1,0 +1,34 @@
+Interface,Connector_Ref,Pin,Net,Direction_at_MAIN,Nominal_voltage,Current_class,Wire_rule,Shield_pair_rule,Keying_requirement,Release_status,Notes
+MIC1,J_MIC1,1,1V8_MIC,OUT,1.8V,LOW,AWG28_or_larger,Route_with_GND,KEYED,LOGICAL_FROZEN,Same pin order on all MIC connectors
+MIC1,J_MIC1,2,GND,RETURN,0V,LOW,AWG28_or_larger,Return_for_1V8_and_PDM,KEYED,LOGICAL_FROZEN,
+MIC1,J_MIC1,3,PDM_CLK,OUT,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,Series damping footprint at source
+MIC1,J_MIC1,4,PDM_DATA1,IN,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
+MIC2,J_MIC2,1,1V8_MIC,OUT,1.8V,LOW,AWG28_or_larger,Route_with_GND,KEYED,LOGICAL_FROZEN,
+MIC2,J_MIC2,2,GND,RETURN,0V,LOW,AWG28_or_larger,Return_for_1V8_and_PDM,KEYED,LOGICAL_FROZEN,
+MIC2,J_MIC2,3,PDM_CLK,OUT,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
+MIC2,J_MIC2,4,PDM_DATA2,IN,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
+MIC3,J_MIC3,1,1V8_MIC,OUT,1.8V,LOW,AWG28_or_larger,Route_with_GND,KEYED,LOGICAL_FROZEN,
+MIC3,J_MIC3,2,GND,RETURN,0V,LOW,AWG28_or_larger,Return_for_1V8_and_PDM,KEYED,LOGICAL_FROZEN,
+MIC3,J_MIC3,3,PDM_CLK,OUT,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
+MIC3,J_MIC3,4,PDM_DATA3,IN,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
+MIC4,J_MIC4,1,1V8_MIC,OUT,1.8V,LOW,AWG28_or_larger,Route_with_GND,KEYED,LOGICAL_FROZEN,
+MIC4,J_MIC4,2,GND,RETURN,0V,LOW,AWG28_or_larger,Return_for_1V8_and_PDM,KEYED,LOGICAL_FROZEN,
+MIC4,J_MIC4,3,PDM_CLK,OUT,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
+MIC4,J_MIC4,4,PDM_DATA4,IN,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
+MAIN_PWR,J_PWR,1,3V8_MODEM,IN,3.8V,HIGH,AWG20_or_larger,Dedicated_return_pin_2,KEYED_LATCH,LOGICAL_FROZEN,Final gauge from measured burst current and length
+MAIN_PWR,J_PWR,2,GND_MODEM,RETURN,0V,HIGH,AWG20_or_larger,Dedicated_return_for_3V8,KEYED_LATCH,LOGICAL_FROZEN,
+MAIN_PWR,J_PWR,3,3V3_DIGITAL,IN,3.3V,MEDIUM,AWG22_or_larger,Dedicated_return_pin_4,KEYED_LATCH,LOGICAL_FROZEN,
+MAIN_PWR,J_PWR,4,GND_DIGITAL,RETURN,0V,MEDIUM,AWG22_or_larger,Dedicated_return_for_3V3,KEYED_LATCH,LOGICAL_FROZEN,
+MAIN_PWR,J_PWR,5,1V8_MIC,IN,1.8V,LOW,AWG26_or_larger,Dedicated_return_pin_6,KEYED_LATCH,LOGICAL_FROZEN,
+MAIN_PWR,J_PWR,6,GND_MIC,RETURN,0V,LOW,AWG26_or_larger,Dedicated_return_for_1V8,KEYED_LATCH,LOGICAL_FROZEN,
+MAIN_PWR,J_PWR,7,PWR_GOOD,IN,3.3V_logic,LOW,AWG28_or_larger,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,
+MAIN_PWR,J_PWR,8,FAULT,IN,3.3V_logic,LOW,AWG28_or_larger,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,
+MAIN_PWR,J_PWR,9,EN_MODEM,OUT,3.3V_logic,LOW,AWG28_or_larger,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,Default safe OFF
+MAIN_PWR,J_PWR,10,EN_AUX,OUT,3.3V_logic,LOW,AWG28_or_larger,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,May be split to EN_RF and EN_MIC in Rev.B only by ICD change
+SWD,J_SWD,1,VTREF,IN,3.3V,LOW,Fixture_pogo_or_AWG28,No_shield,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
+SWD,J_SWD,2,SWDIO,BIDIR,3.3V_logic,LOW,Fixture_pogo_or_AWG28,Short,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
+SWD,J_SWD,3,SWCLK,IN,3.3V_logic,LOW,Fixture_pogo_or_AWG28,Short,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
+SWD,J_SWD,4,NRST,IN,3.3V_logic,LOW,Fixture_pogo_or_AWG28,Short,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
+SWD,J_SWD,5,GND,RETURN,0V,LOW,Fixture_pogo_or_AWG28,Reference,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
+PWR_INPUT,J_PWR_IN,1,VBAT_PLUS,IN,10_to_15V,HIGH,AWG16_or_larger,Dedicated_return_pin_2,KEYED_HIGH_CURRENT,LOGICAL_FROZEN,Final gauge and connector MPN after 10A fault/thermal review
+PWR_INPUT,J_PWR_IN,2,VBAT_MINUS,RETURN,0V,HIGH,AWG16_or_larger,Dedicated_return_for_VBAT,KEYED_HIGH_CURRENT,LOGICAL_FROZEN,
