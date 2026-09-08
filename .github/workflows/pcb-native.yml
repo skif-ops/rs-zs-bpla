@@ -8,6 +8,7 @@ on:
       - "hardware/kicad/**"
       - "hardware/*FREEZE_REV_A.csv"
       - "tools/kicad_native_gate.py"
+      - "tools/generate_pcb_mic_native.py"
       - ".github/workflows/pcb-native.yml"
 
 jobs:
@@ -37,6 +38,10 @@ jobs:
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y kicad
           kicad-cli version
+          echo '--- pcb drc support ---'
+          kicad-cli pcb drc --help || true
+          echo '--- sch erc support ---'
+          kicad-cli sch erc --help || true
           /usr/bin/python3 - <<'PY'
           try:
               import pcbnew
@@ -48,9 +53,10 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check easyeda2kicad
           mkdir -p artifacts/kicad-reference/PCB-MIC
-          easyeda2kicad --full --lcsc_id=C7230692 --output artifacts/kicad-reference/PCB-MIC/t5838_ref --project-relative
-          easyeda2kicad --full --lcsc_id=C563981 --output artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref --project-relative
-          find artifacts/kicad-reference/PCB-MIC -maxdepth 3 -type f -print | sort
+          ROOT="$PWD/artifacts/kicad-reference/PCB-MIC"
+          easyeda2kicad --full --lcsc_id=C7230692 --output "$ROOT/t5838_ref" --project-relative
+          easyeda2kicad --full --lcsc_id=C563981 --output "$ROOT/molex_5040500691_ref" --project-relative
+          find artifacts/kicad-reference/PCB-MIC -maxdepth 4 -type f -print | sort
           printf '%s\n' 'REFERENCE_ONLY_NOT_RELEASED: EasyEDA/LCSC CAD must be checked against TDK/Molex manufacturer data before use.' > artifacts/kicad-reference/PCB-MIC/REFERENCE_STATUS.txt
       - name: ERC DRC and fabrication export for every complete board
         if: steps.native.outputs.any_ready == 'true'
