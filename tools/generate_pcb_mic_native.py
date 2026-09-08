@@ -154,12 +154,15 @@ def main() -> int:
     assign(c1, "1", nets["1V8_MIC"])
     assign(c1, "2", nets["GND"])
 
+    # R1 is an EVT signal-integrity tuning footprint at the microphone data source.
+    # Rev.A starts at 0 ohm so no unmeasured attenuation/delay is introduced. After
+    # harness SI measurements the fitted value may be revised under controlled BOM/ECO.
     rlib = Path("/usr/share/kicad/footprints/Resistor_SMD.pretty")
     r1 = pcbnew.FootprintLoad(str(rlib), "R_0402_1005Metric")
     if r1 is None:
         raise RuntimeError("KiCad R_0402_1005Metric footprint unavailable")
     r1.SetReference("R1")
-    r1.SetValue("50R")
+    r1.SetValue("0R EVT_SI_TUNE")
     r1.SetOrientationDegrees(90.0)
     r1.SetPosition(v(12.0, 9.1))
     board.Add(r1)
@@ -201,7 +204,7 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     pcbnew.SaveBoard(str(args.output), board)
     print(f"saved {args.output}")
-    print("ratsnest", len(board.GetTracks()), "tracks; footprints", len(list(board.GetFootprints())))
+    print("tracks", len(board.GetTracks()), "footprints", len(list(board.GetFootprints())))
     return 0
 
 
