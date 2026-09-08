@@ -23,6 +23,7 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "docs/OPEN_INPUTS_FOR_FREEZE.csv",
     ],
     "pcb_source": [
+        "hardware/EVT_PRE_20_BOM_REV_A.csv",
         "hardware/kicad/README.md",
         "hardware/kicad/REV_A_CAPTURE_SPEC.md",
         "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
@@ -148,7 +149,17 @@ def audit() -> dict[str, object]:
     if "electronic_component_minimum_rating_c: [-40, 85]" not in baseline:
         blockers.append("electronic component temperature derating rule missing")
 
-    addendum = (ROOT / "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md")
+    bom = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
+    if bom.is_file():
+        bom_text = bom.read_text(encoding="utf-8")
+        for forbidden in ("ESP32-C3", "JST_BM05B", "GHR-05V-S"):
+            if forbidden in bom_text:
+                blockers.append(f"generated Rev.A BOM contains forbidden/superseded token: {forbidden}")
+        for required in ("MDBT50Q-P1MV2", "5040500591", "SN74LVC32APWR", "SN74AXC1T45DRLR", "LMR604403SRAKR"):
+            if required not in bom_text:
+                blockers.append(f"generated Rev.A BOM missing locked item: {required}")
+
+    addendum = ROOT / "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md"
     if addendum.is_file():
         addendum_text = addendum.read_text(encoding="utf-8")
         if "5040500591" not in addendum_text or "5040510501" not in addendum_text:
@@ -158,6 +169,7 @@ def audit() -> dict[str, object]:
         ROOT / "config/EVT_PRE_20_BASELINE.yaml",
         ROOT / "docs/DECISION_LOG.csv",
         ROOT / "hardware/ENVIRONMENT_REV_A.md",
+        ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv",
         ROOT / "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
         ROOT / "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
         ROOT / "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
