@@ -76,8 +76,8 @@ def validate_procurement() -> None:
 
 def validate_decisions_and_tests() -> None:
     decisions = {row["Decision_ID"]: row for row in read_csv("docs/DECISION_LOG.csv")}
-    require(decisions["DEC-014"]["Status"] == "LOCKED", "housing decision is not locked")
-    require(decisions["DEC-015"]["Status"] == "LOCKED", "public APN decision is not locked")
+    for decision_id in ("DEC-014", "DEC-015", "DEC-016", "DEC-017", "DEC-018"):
+        require(decisions[decision_id]["Status"] == "LOCKED", f"{decision_id} is not locked")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
 
@@ -149,6 +149,10 @@ def validate_pinmap() -> None:
     require(all(row["External_Domain"] == "1V8" for row in pdm), "PDM external voltage domain must be 1V8")
     require(by_net["CELL_TX"]["External_Domain"] == "1V8", "BG95 main UART must remain a 1V8 external domain")
     require(by_net["CELL_RX"]["External_Domain"] == "1V8", "BG95 main UART must remain a 1V8 external domain")
+    require("nRF52840" in by_net["BLE_TX"]["External_Device"], "BLE TX is not bound to nRF52840 module")
+    require("nRF52840" in by_net["BLE_RX"]["External_Device"], "BLE RX is not bound to nRF52840 module")
+    require("BLE_DFU_REQ" in by_net, "nRF52840 DFU request line missing")
+    require(not any("ESP32-C3" in row["External_Device"] for row in pinmap), "ESP32-C3 remains active in Rev.A pin map")
 
     target = (ROOT / "firmware/targets/evt_pre_20/target_status.yaml").read_text(encoding="utf-8")
     require("source: hardware/EVT_PRE_20_PIN_MAP_REV_A.csv" in target, "firmware target does not bind Rev.A pin map")
@@ -167,9 +171,9 @@ def validate_hardware_baseline() -> None:
     require("package: LQFP100_14x14" in target, "firmware target package does not match baseline")
     require("exact_pin_database_ref: STM32U585VITxQ" in target, "exact Q-package pin database ref missing")
     require("MCU: `STM32U585VIT6Q`" in kicad_readme, "KiCad active MCU is not explicit")
-    require("BLE commissioning/OTA coprocessor: `ESP32-C3-MINI-1-N4`" in kicad_readme, "KiCad active BLE candidate is not explicit")
+    require("MDBT50Q-P1MV2" in kicad_readme and "nRF52840" in kicad_readme, "KiCad active BLE module is not nRF52840")
+    require("ESP32-C3-MINI-1-N4` is superseded" in kicad_readme, "superseded ESP32-C3 history is not documented")
     require("STM32U585CIU6" in kicad_readme and "superseded" in kicad_readme, "superseded 48-pin MCU history is not documented")
-    require("nRF52832-class references are superseded" in kicad_readme, "superseded BLE history is not documented")
     require("Do not reintroduce" in kicad_readme and "BQ24650/CN3791" in kicad_readme, "obsolete charger prohibition is missing")
     require("STM32U585VIT6Q" in capture_spec, "capture spec missing current MCU")
     require("Review A" in gate and "Review B" in gate, "double-review PCB gate is incomplete")
@@ -177,7 +181,8 @@ def validate_hardware_baseline() -> None:
 
     bom = {row["Item_ID"]: row for row in read_csv("hardware/EVT_PRE_20_BOM_DRAFT.csv")}
     require(bom["U1"]["MPN"] == "STM32U585VIT6Q", "BOM MCU does not match baseline")
-    require(bom["U11"]["MPN"] == "ESP32-C3-MINI-1-N4", "BOM BLE candidate does not match baseline")
+    require(bom["U11"]["MPN"] == "MDBT50Q-P1MV2", "BOM BLE module does not match locked nRF52840 module")
+    require("nRF52840" in bom["U11"]["Package"], "BOM BLE module package does not identify nRF52840")
     require(bom["MK1"]["MPN"] == "T5838", "BOM microphone does not match baseline")
 
     harness = read_csv("hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv")
@@ -196,15 +201,24 @@ def validate_policy_text() -> None:
     require("pilot_apn_policy: public_only" in baseline, "baseline public-only APN policy missing")
     require("pilot_primary_quantity: 20" in baseline, "baseline vacuum quantity missing")
     require("pilot_fallback_quantity_if_activated: 20" in baseline, "baseline 3D fallback quantity missing")
+    require("authoritative_position_source: configured_installation_coordinates" in baseline, "configured installation coordinates are not authoritative")
+    require("wifi_positioning_required: false" in baseline, "Wi-Fi positioning unexpectedly required")
+    require("server_tdoa_station_position_source: configured_installation_coordinates" in baseline, "TDOA position source is not configured installation position")
+    require("module_primary: Raytac_MDBT50Q-P1MV2" in baseline, "nRF52840 BLE module not locked in baseline")
+    require("esp32_c3_status: SUPERSEDED_NOT_IN_REV_A" in baseline, "ESP32-C3 is not explicitly superseded")
 
     cellular = (ROOT / "config/cellular/dual_sim_apn_profiles.yaml").read_text(encoding="utf-8")
     require("pilot_apn_policy: public_only" in cellular, "cellular public-only policy missing")
     require("allowed_in_pilot: false" in cellular, "private APN is not explicitly disabled")
 
-    android = (
-        ROOT / "android/app/src/main/java/ru/dioneya/commissioning/core/StationModels.kt"
-    ).read_text(encoding="utf-8")
+    android = (ROOT / "android/app/src/main/java/ru/dioneya/commissioning/core/StationModels.kt").read_text(encoding="utf-8")
     require("private_apn_not_allowed_in_pilot" in android, "Android private APN rejection missing")
+    require("missing_installation_position" in android, "Android does not require installation position")
+    require("PositionTrustPolicy" in android, "Android position trust policy model missing")
+
+    position_doc = (ROOT / "protocols/POSITION_TIME_TRUST_REV_A.md").read_text(encoding="utf-8")
+    require("installation_position" in position_doc, "position trust architecture missing installation position")
+    require("GNSS_TIME_SUSPECT" in position_doc, "time trust is not separated from position trust")
 
     operational_files = [
         ROOT / "README.md",
