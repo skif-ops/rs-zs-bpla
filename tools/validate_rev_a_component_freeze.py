@@ -2,7 +2,7 @@
 """Cross-check EVT-PRE-20 Rev.A component/connector freeze tables.
 
 This gate validates internal consistency only. It does not turn pending parts into a
-manufacturing release and intentionally preserves environment/procurement/RF blockers.
+manufacturing release and preserves procurement/RF/SI/mechanical blockers.
 """
 from __future__ import annotations
 
@@ -28,6 +28,15 @@ def main() -> None:
     connectors = {r["Connector_ID"]: r for r in rows("hardware/CONNECTOR_FREEZE_REV_A.csv")}
     pinmap = {r["Net"]: r for r in rows("hardware/EVT_PRE_20_PIN_MAP_REV_A.csv")}
     harness = rows("hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv")
+    inputs = {r["Input_ID"]: r for r in rows("docs/OPEN_INPUTS_FOR_FREEZE.csv")}
+    decisions = {r["Decision_ID"]: r for r in rows("docs/DECISION_LOG.csv")}
+    baseline = (ROOT / "config/EVT_PRE_20_BASELINE.yaml").read_text(encoding="utf-8")
+
+    require(inputs["IN-006"]["Status"] == "LOCKED", "operating temperature input IN-006 is not locked")
+    require(decisions["DEC-019"]["Status"] == "LOCKED", "DEC-019 operating range decision is not locked")
+    require("operating_ambient_c: [-40, 70]" in baseline, "baseline operating range is not -40..+70 C")
+    require("electronic_component_minimum_rating_c: [-40, 85]" in baseline, "component temperature derating rule missing")
+    require("lifepo4_charge_below_0c: PROHIBITED" in baseline, "low-temperature LiFePO4 charge prohibition missing")
 
     expected_power = {
         "PWR-REV-CTL": "LM74700QDBVRQ1",
@@ -62,7 +71,8 @@ def main() -> None:
 
     require("nRF52840" in main_parts["U11"]["Package_or_Module"], "U11 is not identified as nRF52840")
     require("-40..85" in main_parts["U1"]["Temperature_C"], "exact STM32U585VIT6Q +85 C limit is not recorded")
-    require("ENVIRONMENT" in main_parts["U1"]["Status"], "MCU environment gate was lost")
+    require("ENVIRONMENT" not in main_parts["U1"]["Status"], "resolved MCU environment blocker remains active")
+    require("ENV" not in main_parts["U11"]["Status"], "resolved BLE environment blocker remains active")
 
     text = "\n".join((ROOT / p).read_text(encoding="utf-8") for p in (
         "hardware/POWER_COMPONENT_FREEZE_REV_A.csv",
@@ -70,11 +80,13 @@ def main() -> None:
         "hardware/CONNECTOR_FREEZE_REV_A.csv",
     ))
     require("ESP32-C3" not in text, "ESP32-C3 reappeared in active Rev.A freeze tables")
+    require("JST_BM05B" not in text and "JST_GHR-05V" not in text, "-25 C JST GH reappeared after DEC-019")
 
-    require(connectors["CON-MIC"]["Board_MPN"].startswith("JST_BM05B-GHS-TBT"), "MIC connector is not 5-pin JST GH")
-    require(connectors["CON-MIC"]["Mating_Housing_MPN"] == "JST_GHR-05V-S", "MIC 5-pin mating housing mismatch")
-    require(connectors["CON-MIC"]["Terminal_MPN"] == "JST_SSHL-002T-P0.2", "MIC terminal mismatch")
+    require(connectors["CON-MIC"]["Board_MPN"] == "Molex_5040500591", "MIC header is not 5-pin Molex Pico-Lock")
+    require(connectors["CON-MIC"]["Mating_Housing_MPN"] == "Molex_5040510501", "MIC mating housing mismatch")
+    require(connectors["CON-MIC"]["Terminal_MPN"] == "Molex_5040520098", "MIC crimp terminal mismatch")
     require(connectors["CON-MIC"]["Positions"] == "5", "MIC connector does not preserve AAD WAKE contact")
+    require("-40..105" in connectors["CON-MIC"]["Temperature_C"], "MIC connector does not meet -40 C requirement")
 
     # Every physical MIC connector must have exactly 5 logical contacts and pin 5 is WAKE.
     for idx in range(1, 5):
@@ -91,28 +103,18 @@ def main() -> None:
 
     require(connectors["CON-003"]["Board_MPN"] == "Molex_430450213", "battery input header mismatch")
     require(connectors["CON-003"]["Mating_Housing_MPN"] == "Molex_430250200", "battery input housing mismatch")
+    require("-40..85" in connectors["CON-USB"]["Temperature_C"], "USB-C connector does not meet operating range")
     for key in ("CON-RF-CELL", "CON-RF-GNSS", "CON-RF-LORA"):
         require("U.FL" in connectors[key]["Board_MPN"], f"{key} is not U.FL")
+        require("TEMP_VERIFY" in connectors[key]["Status"], f"{key} cable/connector temperature verification blocker was lost")
     for key in ("CON-SIM1", "CON-SIM2"):
         require(connectors[key]["Board_MPN"] == "TE_2336582-1", f"{key} is not the selected 4FF connector")
         require("Nano-SIM" in connectors[key]["Function"], f"{key} is not explicitly nano-SIM")
         require("PROCUREMENT_RISK" in connectors[key]["Status"], f"{key} procurement risk was lost")
+        require("-40..85" in connectors[key]["Temperature_C"], f"{key} does not meet -40..+70 ambient requirement")
     require("3FF" not in text and "micro-SIM" not in text, "3FF/micro-SIM must not enter Rev.A connector freeze")
 
-    # Environmental range IN-006 is still open. Parts limited to +85 C must remain
-    # explicitly blocked/pending rather than appearing as fully released.
-    inputs = {r["Input_ID"]: r for r in rows("docs/OPEN_INPUTS_FOR_FREEZE.csv")}
-    if inputs.get("IN-006", {}).get("Status") == "OPEN":
-        for status in (
-            main_parts["U1"]["Status"],
-            main_parts["U11"]["Status"],
-            main_parts["U13"]["Status"],
-            connectors["CON-USB"]["Status"],
-            connectors["CON-SIM1"]["Status"],
-        ):
-            require("PENDING" in status or "RISK" in status, "85 C-limited part incorrectly appears fully released")
-
-    print("EVT-PRE-20 Rev.A component/connector/AAD-wake freeze consistency: PASS")
+    print("EVT-PRE-20 Rev.A component/connector/environment/AAD-wake freeze consistency: PASS")
 
 
 if __name__ == "__main__":
