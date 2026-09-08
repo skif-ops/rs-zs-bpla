@@ -101,8 +101,11 @@ def validate_hardware_baseline() -> None:
     require("mcu_exact_mpn: STM32U585VIT6Q" in baseline, "baseline MCU is not STM32U585VIT6Q")
     require("mcu: STM32U585VIT6Q" in target, "firmware target MCU does not match baseline")
     require("package: LQFP100_14x14" in target, "firmware target package does not match baseline")
-    require("STM32U585VIT6Q" in kicad_readme, "KiCad package missing current MCU")
-    require("ESP32-C3-MINI-1-N4" in kicad_readme, "KiCad package missing current BLE candidate")
+    require("MCU: `STM32U585VIT6Q`" in kicad_readme, "KiCad active MCU is not explicit")
+    require("BLE commissioning/OTA coprocessor: `ESP32-C3-MINI-1-N4`" in kicad_readme, "KiCad active BLE candidate is not explicit")
+    require("STM32U585CIU6" in kicad_readme and "superseded" in kicad_readme, "superseded 48-pin MCU history is not documented")
+    require("nRF52832-class references are superseded" in kicad_readme, "superseded BLE history is not documented")
+    require("Do not reintroduce" in kicad_readme and "BQ24650/CN3791" in kicad_readme, "obsolete charger prohibition is missing")
     require("STM32U585VIT6Q" in capture_spec, "capture spec missing current MCU")
     require("Review A" in gate and "Review B" in gate, "double-review PCB gate is incomplete")
     require("FOR_MANUFACTURE" in gate, "PCB release state is not defined")
@@ -121,10 +124,6 @@ def validate_hardware_baseline() -> None:
         require(rows[0]["Net"] == "1V8_MIC" and rows[1]["Net"] == "GND", f"MIC{index} power pinout mismatch")
         require(rows[2]["Net"] == "PDM_CLK", f"MIC{index} clock pinout mismatch")
         require(rows[3]["Net"] == f"PDM_DATA{index}", f"MIC{index} data pinout mismatch")
-
-    stale_operational_tokens = ["STM32U585ZIT6Q", "nRF52832-class", "BQ24650"]
-    for token in stale_operational_tokens:
-        require(token not in kicad_readme, f"stale KiCad baseline token remains: {token}")
 
 
 def validate_policy_text() -> None:
