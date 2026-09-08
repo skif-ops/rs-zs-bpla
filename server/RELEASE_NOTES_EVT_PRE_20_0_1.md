@@ -9,5 +9,7 @@
 - Добавлены regression tests точной длины features и безопасных значений UNKNOWN/false.
 - В `TargetEstimate` восстановлены поля `localization_mode` и `geometry_quality`, которые уже формировал solver.
 - Full CI восстанавливает `dataset/features.csv` из версионированного `features.csv.gz` штатным скриптом до pytest.
+- MQTT bridge переведён в fail-closed TLS mode: без CA, client certificate и key запуск отклоняется.
+- Plaintext MQTT оставлен только для изолированного стенда с явным `--insecure-bench`; добавлены отрицательные тесты конфигурации.
 
 Изменение не закрывает security/deployment blockers из `EVT_PRE_20_RELEASE_AUDIT.md` и не является разрешением на internet-facing deployment.

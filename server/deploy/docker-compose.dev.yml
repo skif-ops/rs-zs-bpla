@@ -25,7 +25,7 @@ services:
     build:
       context: ..
     restart: unless-stopped
-    command: ["python","-m","station.mqtt_bridge","--host","mqtt","--port","1883"]
+    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "1883", "--insecure-bench"]
     environment:
       ZS_TENANT: default
     volumes:
@@ -33,3 +33,4 @@ services:
     depends_on:
       - mqtt
       - server
+

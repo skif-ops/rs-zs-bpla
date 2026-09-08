@@ -20,13 +20,14 @@
 
 ## Блокеры предсерийного deployment
 
-1. MQTT bridge может стартовать без CA, то есть TLS не является fail-closed.
-2. FastAPI station endpoints не имеют законченной взаимной аутентификации/authorization для internet-facing deployment.
-3. MQTT downstream/ACK не реализован; server commands сейчас выдаются HTTP polling.
-4. Requirements используют диапазоны версий, lockfile/SBOM отсутствуют.
-5. Нет подтверждённого clean deployment и backup/restore на Windows 11 и Ubuntu 24.04.
-6. Нет load/reconnect/dedup теста для 20 реальных станций.
-7. Нет OTA repository, canary rollout, pause и rollback audit.
+1. FastAPI station endpoints не имеют законченной взаимной аутентификации/authorization для internet-facing deployment.
+2. MQTT downstream/ACK не реализован; server commands сейчас выдаются HTTP polling.
+3. Requirements используют диапазоны версий, lockfile/SBOM отсутствуют.
+4. Нет подтверждённого clean deployment и backup/restore на Windows 11 и Ubuntu 24.04.
+5. Нет load/reconnect/dedup теста для 20 реальных станций.
+6. Нет OTA repository, canary rollout, pause и rollback audit.
+
+Закрыто в исходном baseline EVT-PRE-20: MQTT bridge теперь fail-closed и требует CA, client certificate и key. Plaintext разрешён только явным флагом `--insecure-bench`, который используется в отдельном development compose и проверяется отрицательными тестами.
 
 До закрытия пунктов сервер разрешён только для разработки или изолированного стенда. Публикация напрямую в интернет запрещена.
 
@@ -42,4 +43,3 @@
 - broker mTLS/ACL и API auth tests;
 - 20-station soak не менее 24 часов;
 - backup/restore и журнал отката OTA.
-
