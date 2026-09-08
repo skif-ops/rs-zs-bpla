@@ -62,7 +62,6 @@ def main() -> None:
             notes=f"Rev.A freeze source MAIN_COMPONENT_FREEZE_REV_A.csv; blockers: {p['Release_Blockers']}",
         )
 
-    # Two identical SIM ESD devices are represented as one quantity-2 BOM line.
     require(main_parts["U14"]["MPN"] == main_parts["U15"]["MPN"], "SIM ESD MPNs differ")
     p14 = main_parts["U14"]
     update_existing(
@@ -81,10 +80,13 @@ def main() -> None:
         )
 
     mic = connectors["CON-MIC"]
+    require(mic["Positions"] == "6", "Rev.A MIC connector must be 6 positions")
     update_existing(
         "J-MIC", manufacturer="Molex", mpn=mic["Board_MPN"].removeprefix("Molex_"),
-        package="Pico-Lock 1.50 mm 5-circuit right-angle SMT", status=mic["Status"],
-        notes=f"Mating housing {mic['Mating_Housing_MPN'].removeprefix('Molex_')}; terminal {mic['Terminal_MPN'].removeprefix('Molex_')}; pinout 1V8/GND/CLK/DATA/WAKE; -40..105 C",
+        package="Pico-Lock 1.50 mm 6-circuit right-angle SMT", status=mic["Status"],
+        notes=(f"Mating housing {mic['Mating_Housing_MPN'].removeprefix('Molex_')}; "
+               f"terminal {mic['Terminal_MPN'].removeprefix('Molex_')}; "
+               "pinout 1V8/GND/CLK/DATA/WAKE/AAD_CFG(THSEL); -40..105 C"),
     )
 
     for item_id, cid in {"J-SIM1": "CON-SIM1", "J-SIM2": "CON-SIM2"}.items():
@@ -158,12 +160,11 @@ def main() -> None:
             notes=f"Mating {c['Mating_Housing_MPN']}; terminal {c['Terminal_MPN']}; blockers: {c['Release_Blockers']}",
         )
 
-    # Assertions against the most damaging stale states.
     full_text = "\n".join(",".join(r.get(f, "") for f in fields) for r in rows)
-    require("ESP32-C3" not in full_text, "superseded ESP32-C3 remains in generated BOM")
-    require("JST_BM05B" not in full_text and "GHR-05V-S" not in full_text, "rejected JST GH remains in generated BOM")
-    require(by_id["J-MIC"]["MPN"] == "5040500591", "generated MIC connector MPN mismatch")
-    require(by_id["J-MIC"]["Description"] if "Description" in by_id["J-MIC"] else True, "MIC BOM line missing")
+    for forbidden in ("ESP32-C3", "JST_BM05B", "GHR-05V-S", "5040500591", "5040510501"):
+        require(forbidden not in full_text, f"superseded token remains in generated BOM: {forbidden}")
+    require(by_id["J-MIC"]["MPN"] == "5040500691", "generated 6-pin MIC connector MPN mismatch")
+    require("AAD_CFG" in by_id["J-MIC"]["Notes"], "generated MIC connector BOM line omits THSEL/AAD_CFG")
     for key in ("U16", "U17", "U18", "PWR-REV-CTL", "PWR-REV-FET"):
         require(key in by_id, f"generated BOM missing {key}")
 
