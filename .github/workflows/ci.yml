@@ -18,6 +18,8 @@ jobs:
           python-version: "3.12"
       - name: First-pass configuration and hardware baseline validation
         run: python tools/validate_evt_pre_20.py
+      - name: Cross-check locked Rev.A clock policy
+        run: python tools/validate_clock_policy.py
       - name: Second-pass release completeness audit
         run: python tools/audit_evt_pre_20_release.py
       - name: Upload second-pass audit report
