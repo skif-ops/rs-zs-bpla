@@ -24,9 +24,16 @@ audio:
   base_triangle_side_mm: 120
   upper_offset_mm: 150
   low_power_detector: T5838_AAD
-  mic_harness_contacts: 5
-  mic_harness_nets: [1V8_MIC, GND, PDM_CLK, PDM_DATA_N, MIC_WAKE_N]
-  local_leaf_straps: [SELECT, THSEL]
+  aad_interface_baseline: hardware/T5838_AAD_INTERFACE_REV_A.md
+  mic_harness_contacts: 6
+  mic_harness_nets: [1V8_MIC, GND, PDM_CLK, PDM_DATA_N, MIC_WAKE_N, AAD_CFG]
+  local_leaf_straps: [SELECT]
+  aad_configuration_pin_name: THSEL
+  aad_configuration_bus: AAD_CFG_SHARED_1V8
+  aad_configuration_mcu_pin: PA15
+  aad_configuration_lqfp100_pin: 77
+  aad_configuration_direction: MCU_TO_U7_TO_1V8_TO_ALL_4_THSEL
+  aad_configuration_cubemx: GPIO_OUTPUT_PENDING
   aad_wake_inputs: [MIC_WAKE1, MIC_WAKE2, MIC_WAKE3, MIC_WAKE4]
   aad_wake_or: SN74LVC32APWR_at_1V8
   aad_wake_translator: SN74AXC1T45DRLR_1V8_to_3V3
@@ -38,6 +45,7 @@ audio:
   aad_false_wake_test: REQUIRED
   aad_wake_latency_test: REQUIRED
   aad_s0_current_measurement: REQUIRED
+  aad_cold_hot_test: REQUIRED_AT_MINUS40_AND_PLUS70
 ble:
   soc: nRF52840
   module: Raytac_MDBT50Q-P1MV2
@@ -64,15 +72,16 @@ positioning:
   holdover_limit: MEASURE_DURING_EVT
 pinmap:
   source: hardware/EVT_PRE_20_PIN_MAP_REV_A.csv
+  addenda: [hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv]
   status: DATASHEET_VERIFIED_CUBEMX_PENDING
   forbidden_absent_gpio: [PB12, PE1, PC4, PC5]
-  notes: exact Q-package mapping; PA8 pin 67 now reserved for aggregated T5838 AAD wake
+  notes: exact Q-package mapping; PA8 pin67 aggregated T5838 WAKE input; PA15 pin77 shared THSEL/AAD_CFG output
 required_target_files:
   cubemx_ioc: MISSING_BLOCKER
   startup: MISSING_BLOCKER
   linker_script: MISSING_BLOCKER
   hal_ll_bindings: MISSING_BLOCKER
-  board_pins: REV_A_EXACT_PACKAGE_MAP_CREATED_CUBEMX_PENDING
+  board_pins: REV_A_EXACT_PACKAGE_MAP_PLUS_AAD_CFG_ADDENDUM_CUBEMX_PENDING
   secure_boot: MISSING_BLOCKER
   ota_ab: MISSING_BLOCKER
   production_build_manifest: MISSING_BLOCKER
