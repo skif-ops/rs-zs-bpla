@@ -1,0 +1,30 @@
+track_id: dioneya_android_commissioning
+status: REQUIREMENTS_DRAFT
+source_status: NOT_STARTED
+apk_status: NOT_BUILT
+distribution: enterprise_sideload_or_customer_mdm
+google_play_services_required: false
+internet_required_for_commissioning: false
+primary_transport: BLE
+service_recovery_transport: USB_C
+roles: [installer, service_engineer]
+candidate_os_support:
+  minimum_android: Android_9
+  release_target_sdk: FREEZE_AT_BUILD_START
+  required_architecture: arm64_v8a
+required_features:
+  - qr_identity_import
+  - authenticated_ble_pairing
+  - identity_and_diagnostics
+  - validated_station_configuration
+  - public_apn_configuration
+  - server_endpoint_and_ca_configuration
+  - signed_resumable_ota
+  - ab_status_and_rollback_report
+  - redacted_log_export
+security:
+  product_signing_private_key_in_app: false
+  station_private_key_in_app: false
+  region_change_allowed: false
+  analytics_enabled: false
+  secrets_in_repository: false

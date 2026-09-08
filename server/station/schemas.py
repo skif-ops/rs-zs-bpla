@@ -245,6 +245,38 @@ class DetectionMessage(BaseModel):
         return [float(v) for v in value]
 
 
+class FeatureUpdateMessage(BaseModel):
+    schema_ver: int = 1
+    station_id: int
+    seq_no: int
+    boot_id: int = 0
+    event_id: int
+    event_time_us: int
+    features: list[float]
+    detector_profile: Literal["piston", "reactive", "generic"] = "generic"
+
+    @field_validator("features")
+    @classmethod
+    def validate_features(cls, value: list[float]) -> list[float]:
+        if len(value) != FEATURE_COUNT:
+            raise ValueError(f"features must contain exactly {FEATURE_COUNT} values")
+        return [float(v) for v in value]
+
+
+class OnlineTypeStatusMessage(BaseModel):
+    station_id: int
+    event_id: int
+    elapsed_seconds: float = Field(default=0.0, ge=0.0)
+    best_label: str = "UNKNOWN"
+    confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    margin: float = 0.0
+    status: str = "unknown"
+    type_lock_allowed: bool = False
+    first_type_hypothesis_seconds: float | None = None
+    research_stable_seconds: float | None = None
+    model_version: str = "unknown"
+
+
 class HeartbeatMessage(BaseModel):
     station_id: int
     time_us: int
@@ -314,3 +346,4 @@ class SystemEvent(BaseModel):
     target: TargetEstimate = Field(default_factory=TargetEstimate)
     route_summary: list[str] = Field(default_factory=list)
     status: Literal["active", "closed"] = "active"
+

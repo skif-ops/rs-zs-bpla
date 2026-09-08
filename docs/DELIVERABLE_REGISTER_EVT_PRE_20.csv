@@ -74,9 +74,9 @@ EVT-005,Испытания,GSM LTE LoRa BLE,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OP
 EVT-006,Испытания,Энергетика S0-S4 solar battery,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Токи температура MPPT автономность evidence
 EVT-007,Испытания,Механика IP климат UV,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Отдельно по технологии корпуса
 EVT-008,Испытания,Сводный отчёт и deviation closure,DOCX+XLSX,P0,PLANNED,OPEN,OPEN,Нет незакрытых blocker deviations
-AND-001,Android,Требования и UX flow,DOCX+FIGMA_or_SVG,P0,PLANNED,OPEN,OPEN,Сценарии монтажника и сервис-инженера приняты
+AND-001,Android,Требования и UX flow,DOCX+FIGMA_or_SVG,P0,DRAFT,OPEN,OPEN,Сценарии монтажника и сервис-инженера приняты
 AND-002,Android,Исходный проект Kotlin/Android,KOTLIN+GRADLE,P0,PLANNED,OPEN,OPEN,Reproducible build and tests PASS
 AND-003,Android,BLE configuration client,KOTLIN,P0,PLANNED,OPEN,OPEN,Schema validation and auth PASS
 AND-004,Android,Signed OTA client,KOTLIN,P0,PLANNED,OPEN,OPEN,Power loss resume hash signature rollback PASS
 AND-005,Android,APK arm64 и test APK,APK+SHA256+SIG,P0,PLANNED,OPEN,OPEN,Install Huawei/no GMS smoke PASS
-AND-006,Android,SBOM privacy security test,JSON+DOCX,P0,PLANNED,OPEN,OPEN,Нет secrets critical vulnerabilities data leaks
+AND-006,Android,SBOM privacy security test,JSON+DOCX,P0,DRAFT,OPEN,OPEN,Нет secrets critical vulnerabilities data leaks
