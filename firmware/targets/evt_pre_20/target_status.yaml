@@ -2,6 +2,7 @@ target_id: dioneya_evt_pre_20_rev_a
 status: TARGET_PORT_REQUIRED
 mcu: STM32U585VIT6Q
 package: LQFP100_14x14
+exact_pin_database_ref: STM32U585VITxQ
 board: custom_pcb
 host_core_source: ../..
 wire_interface_release: "1.4"
@@ -13,12 +14,17 @@ audio:
   geometry_id: 1
   base_triangle_side_mm: 120
   upper_offset_mm: 150
+pinmap:
+  source: hardware/EVT_PRE_20_PIN_MAP_REV_A.csv
+  status: DATASHEET_VERIFIED_CUBEMX_PENDING
+  forbidden_absent_gpio: [PB12, PE1, PC4, PC5]
+  notes: exact Q-package mapping; do not regenerate from generic non-Q LQFP100 table
 required_target_files:
   cubemx_ioc: MISSING_BLOCKER
   startup: MISSING_BLOCKER
   linker_script: MISSING_BLOCKER
   hal_ll_bindings: MISSING_BLOCKER
-  board_pins: OPEN_CUBEMX
+  board_pins: REV_A_EXACT_PACKAGE_MAP_CREATED_CUBEMX_PENDING
   secure_boot: MISSING_BLOCKER
   ota_ab: MISSING_BLOCKER
   production_build_manifest: MISSING_BLOCKER
@@ -30,4 +36,3 @@ release_outputs:
   sha256: NOT_BUILT
   signature: NOT_BUILT
 do_not_release: true
-
