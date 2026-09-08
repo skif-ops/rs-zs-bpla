@@ -1,0 +1,49 @@
+name: PCB Native Gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [evt-pre-20]
+    paths:
+      - "hardware/kicad/**"
+      - "hardware/*FREEZE_REV_A.csv"
+      - "tools/kicad_native_gate.py"
+      - ".github/workflows/pcb-native.yml"
+
+jobs:
+  native-kicad:
+    name: Native KiCad ERC DRC and fabrication export
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Engineering preflight
+        id: native
+        shell: bash
+        run: |
+          python tools/kicad_native_gate.py
+          if [ -f hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch ] && \
+             [ -f hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch ] && \
+             [ -f hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install KiCad CLI only when native capture exists
+        if: steps.native.outputs.ready == 'true'
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y kicad
+          kicad-cli version
+      - name: Strict ERC DRC and fabrication export
+        if: steps.native.outputs.ready == 'true'
+        run: python tools/kicad_native_gate.py --strict --run-cli
+      - name: Upload native gate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evt-pre-20-kicad-native-gate
+          path: artifacts/kicad-native/
+          if-no-files-found: error
