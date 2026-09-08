@@ -31,7 +31,7 @@ def main() -> None:
     require(policy_id in capture, "KiCad capture spec clock policy id mismatch")
     require("external_hse_crystal_or_oscillator: false" in baseline, "baseline still allows external HSE")
     require("external_hse: DISABLED_NOT_FITTED" in target, "firmware target still allows external HSE")
-    require("no external HSE crystal or HSE oscillator" in policy, "clock policy does not explicitly prohibit HSE")
+    require("shall not use an external HSE crystal or HSE oscillator" in policy, "clock policy does not explicitly prohibit HSE")
     require("DEC-016" in decisions and "MSI HSI and PLL" in decisions and ",LOCKED," in decisions, "DEC-016 clock decision is missing or not locked")
     require(sit in baseline, "baseline 32.768 kHz reference mismatch")
     require(sit in target, "firmware target 32.768 kHz reference mismatch")
