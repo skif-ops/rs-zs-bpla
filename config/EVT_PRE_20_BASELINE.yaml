@@ -23,6 +23,14 @@ electronics:
   mcu_exact_mpn: STM32U585VIT6Q
   mcu_selection_status: SELECTED_PENDING_SCHEMATIC_AND_SAMPLE
   mcu_package_policy: prefer_inspectable_non_BGA_for_20_unit_EVT
+  clocking:
+    policy_id: REV_A_INTERNAL_HSI_MSI_PLL_NO_HSE
+    high_speed_sources: [MSI, HSI, PLL]
+    external_hse_crystal_or_oscillator: false
+    low_speed_reference_mpn: SiT1552AI-JE-DCC-32.768D
+    low_speed_reference_hz: 32768
+    low_speed_reference_role: low_frequency_timebase_only
+    lse_exact_bypass_wiring_status: CUBEMX_AND_SCHEMATIC_REVIEW_REQUIRED
   microphone_count: 4
   microphone_matching: same_mpn_same_lot_preferred
   microphone_geometry:
