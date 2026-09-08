@@ -7,6 +7,15 @@ board: custom_pcb
 host_core_source: ../..
 wire_interface_release: "1.4"
 detection_schema_version: 3
+clocking:
+  policy_id: REV_A_INTERNAL_HSI_MSI_PLL_NO_HSE
+  external_hse: DISABLED_NOT_FITTED
+  high_speed_sources: [MSI, HSI, PLL]
+  low_speed_reference: SiT1552AI-JE-DCC-32.768D
+  low_speed_reference_hz: 32768
+  lse_bypass_configuration: CUBEMX_PENDING_BLOCKER
+  runtime_clock_profiles: TO_DEFINE_AND_MEASURE
+  required_validation: [USB_CLOCK, PDM_SAMPLE_RATE, PPS_TIMESTAMPING, LOW_POWER_WAKE, PLL_SWITCH_RECOVERY]
 audio:
   microphones: 4
   microphone_mpn: T5838
