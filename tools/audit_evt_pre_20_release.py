@@ -19,12 +19,20 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv",
         "docs/REQUIREMENTS_TRACEABILITY.csv",
         "docs/RISK_REGISTER.csv",
+        "docs/DECISION_LOG.csv",
+        "docs/OPEN_INPUTS_FOR_FREEZE.csv",
     ],
     "pcb_source": [
         "hardware/kicad/README.md",
         "hardware/kicad/REV_A_CAPTURE_SPEC.md",
+        "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
+        "hardware/ENVIRONMENT_REV_A.md",
+        "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
+        "hardware/POWER_COMPONENT_FREEZE_REV_A.csv",
+        "hardware/CONNECTOR_FREEZE_REV_A.csv",
         "hardware/PCB_DOUBLE_REVIEW_GATE.md",
         "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+        "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
     ],
     "firmware_source": [
         "firmware/CMakeLists.txt",
@@ -134,10 +142,29 @@ def audit() -> dict[str, object]:
     if "TARGET_PORT_REQUIRED" in target_status:
         blockers.append("firmware STM32 target port is not complete")
 
+    baseline = (ROOT / "config/EVT_PRE_20_BASELINE.yaml").read_text(encoding="utf-8")
+    if "operating_ambient_c: [-40, 70]" not in baseline:
+        blockers.append("environment operating range is not locked to -40..+70 C")
+    if "electronic_component_minimum_rating_c: [-40, 85]" not in baseline:
+        blockers.append("electronic component temperature derating rule missing")
+
+    addendum = (ROOT / "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md")
+    if addendum.is_file():
+        addendum_text = addendum.read_text(encoding="utf-8")
+        if "5040500591" not in addendum_text or "5040510501" not in addendum_text:
+            blockers.append("capture addendum does not lock the -40 C MIC connector set")
+
     manifest_inputs = [
         ROOT / "config/EVT_PRE_20_BASELINE.yaml",
+        ROOT / "docs/DECISION_LOG.csv",
+        ROOT / "hardware/ENVIRONMENT_REV_A.md",
         ROOT / "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+        ROOT / "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
+        ROOT / "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
+        ROOT / "hardware/POWER_COMPONENT_FREEZE_REV_A.csv",
+        ROOT / "hardware/CONNECTOR_FREEZE_REV_A.csv",
         ROOT / "hardware/kicad/REV_A_CAPTURE_SPEC.md",
+        ROOT / "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
         ROOT / "hardware/PCB_DOUBLE_REVIEW_GATE.md",
     ]
     hashes = {
