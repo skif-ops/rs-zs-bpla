@@ -23,6 +23,21 @@ audio:
   geometry_id: 1
   base_triangle_side_mm: 120
   upper_offset_mm: 150
+  low_power_detector: T5838_AAD
+  mic_harness_contacts: 5
+  mic_harness_nets: [1V8_MIC, GND, PDM_CLK, PDM_DATA_N, MIC_WAKE_N]
+  local_leaf_straps: [SELECT, THSEL]
+  aad_wake_inputs: [MIC_WAKE1, MIC_WAKE2, MIC_WAKE3, MIC_WAKE4]
+  aad_wake_or: SN74LVC32APWR_at_1V8
+  aad_wake_translator: SN74AXC1T45DRLR_1V8_to_3V3
+  aad_wake_mcu_pin: PA8
+  aad_wake_lqfp100_pin: 67
+  aad_wake_cubemx: GPIO_EXTI_STOP_WAKE_PENDING
+  aad_configuration_sequence: MISSING_BLOCKER
+  aad_threshold_profile: EVT_TUNE_REQUIRED
+  aad_false_wake_test: REQUIRED
+  aad_wake_latency_test: REQUIRED
+  aad_s0_current_measurement: REQUIRED
 ble:
   soc: nRF52840
   module: Raytac_MDBT50Q-P1MV2
@@ -51,7 +66,7 @@ pinmap:
   source: hardware/EVT_PRE_20_PIN_MAP_REV_A.csv
   status: DATASHEET_VERIFIED_CUBEMX_PENDING
   forbidden_absent_gpio: [PB12, PE1, PC4, PC5]
-  notes: exact Q-package mapping; do not regenerate from generic non-Q LQFP100 table
+  notes: exact Q-package mapping; PA8 pin 67 now reserved for aggregated T5838 AAD wake
 required_target_files:
   cubemx_ioc: MISSING_BLOCKER
   startup: MISSING_BLOCKER
