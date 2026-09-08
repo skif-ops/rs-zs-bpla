@@ -91,6 +91,70 @@ def validate_decisions_and_tests() -> None:
     require("reject private APN" in tests["EVT-CELL-04"]["Method"], "private APN rejection test missing")
 
 
+def validate_pinmap() -> None:
+    pinmap = read_csv("hardware/EVT_PRE_20_PIN_MAP_REV_A.csv")
+    require(len(pinmap) >= 50, "Rev.A pin map is unexpectedly incomplete")
+
+    mcu_pins = [row["MCU_Pin"] for row in pinmap]
+    duplicates = sorted({pin for pin in mcu_pins if mcu_pins.count(pin) > 1})
+    require(not duplicates, f"MCU pins are assigned more than once: {duplicates}")
+
+    forbidden_absent = {"PB12", "PE1", "PC4", "PC5"}
+    used_forbidden = sorted(forbidden_absent.intersection(mcu_pins))
+    require(not used_forbidden, f"pins absent from STM32U585VITxQ Q-package are used: {used_forbidden}")
+
+    by_net = {row["Net"]: row for row in pinmap}
+    expected = {
+        "PDM_CLK": ("PE9", "MDF1_CCK0"),
+        "PDM_DATA1": ("PB1", "MDF1_SDI0"),
+        "PDM_DATA2": ("PD6", "MDF1_SDI1"),
+        "PDM_DATA3": ("PE7", "MDF1_SDI2"),
+        "PDM_DATA4": ("PE4", "MDF1_SDI3"),
+        "NOR_CLK": ("PE10", "OCTOSPIM_P1_CLK"),
+        "NOR_NCS": ("PE11", "OCTOSPIM_P1_NCS"),
+        "NOR_IO0": ("PE12", "OCTOSPIM_P1_IO0"),
+        "NOR_IO1": ("PE13", "OCTOSPIM_P1_IO1"),
+        "NOR_IO2": ("PE14", "OCTOSPIM_P1_IO2"),
+        "NOR_IO3": ("PE15", "OCTOSPIM_P1_IO3"),
+        "SD_D0": ("PC8", "SDMMC1_D0"),
+        "SD_D1": ("PC9", "SDMMC1_D1"),
+        "SD_D2": ("PC10", "SDMMC1_D2"),
+        "SD_D3": ("PC11", "SDMMC1_D3"),
+        "SD_CK": ("PC12", "SDMMC1_CK"),
+        "SD_CMD": ("PD2", "SDMMC1_CMD"),
+        "GNSS_TX": ("PA2", "USART2_TX"),
+        "GNSS_RX": ("PA3", "USART2_RX"),
+        "GNSS_PPS": ("PA0", "TIM2_CH1"),
+        "LORA_NSS": ("PA4", "SPI1_NSS"),
+        "LORA_SCK": ("PA5", "SPI1_SCK"),
+        "LORA_MISO": ("PA6", "SPI1_MISO"),
+        "LORA_MOSI": ("PA7", "SPI1_MOSI"),
+        "CELL_TX": ("PB6", "USART1_TX"),
+        "CELL_RX": ("PB7", "USART1_RX"),
+        "BLE_TX": ("PB10", "USART3_TX"),
+        "BLE_RX": ("PB11", "USART3_RX"),
+        "I2C2_SCL": ("PB13", "I2C2_SCL"),
+        "I2C2_SDA": ("PB14", "I2C2_SDA"),
+        "USB_DM": ("PA11", "USB_OTG_FS_DM"),
+        "USB_DP": ("PA12", "USB_OTG_FS_DP"),
+        "SWDIO": ("PA13", "DEBUG_JTMS-SWDIO"),
+        "SWCLK": ("PA14", "DEBUG_JTCK-SWCLK"),
+    }
+    for net, (pin, signal) in expected.items():
+        require(net in by_net, f"required net missing from Rev.A pin map: {net}")
+        require(by_net[net]["MCU_Pin"] == pin, f"{net} expected on {pin}, got {by_net[net]['MCU_Pin']}")
+        require(by_net[net]["CubeMX_Signal"] == signal, f"{net} signal mismatch")
+
+    pdm = [by_net["PDM_CLK"], *(by_net[f"PDM_DATA{i}"] for i in range(1, 5))]
+    require(all(row["External_Domain"] == "1V8" for row in pdm), "PDM external voltage domain must be 1V8")
+    require(by_net["CELL_TX"]["External_Domain"] == "1V8", "BG95 main UART must remain a 1V8 external domain")
+    require(by_net["CELL_RX"]["External_Domain"] == "1V8", "BG95 main UART must remain a 1V8 external domain")
+
+    target = (ROOT / "firmware/targets/evt_pre_20/target_status.yaml").read_text(encoding="utf-8")
+    require("source: hardware/EVT_PRE_20_PIN_MAP_REV_A.csv" in target, "firmware target does not bind Rev.A pin map")
+    require("forbidden_absent_gpio: [PB12, PE1, PC4, PC5]" in target, "exact-package absent GPIO guard is missing")
+
+
 def validate_hardware_baseline() -> None:
     baseline = (ROOT / "config/EVT_PRE_20_BASELINE.yaml").read_text(encoding="utf-8")
     target = (ROOT / "firmware/targets/evt_pre_20/target_status.yaml").read_text(encoding="utf-8")
@@ -101,6 +165,7 @@ def validate_hardware_baseline() -> None:
     require("mcu_exact_mpn: STM32U585VIT6Q" in baseline, "baseline MCU is not STM32U585VIT6Q")
     require("mcu: STM32U585VIT6Q" in target, "firmware target MCU does not match baseline")
     require("package: LQFP100_14x14" in target, "firmware target package does not match baseline")
+    require("exact_pin_database_ref: STM32U585VITxQ" in target, "exact Q-package pin database ref missing")
     require("MCU: `STM32U585VIT6Q`" in kicad_readme, "KiCad active MCU is not explicit")
     require("BLE commissioning/OTA coprocessor: `ESP32-C3-MINI-1-N4`" in kicad_readme, "KiCad active BLE candidate is not explicit")
     require("STM32U585CIU6" in kicad_readme and "superseded" in kicad_readme, "superseded 48-pin MCU history is not documented")
@@ -163,9 +228,10 @@ def main() -> None:
     validate_lot()
     validate_procurement()
     validate_decisions_and_tests()
+    validate_pinmap()
     validate_hardware_baseline()
     validate_policy_text()
-    print("EVT-PRE-20 configuration + hardware baseline: PASS")
+    print("EVT-PRE-20 configuration + exact-package hardware baseline: PASS")
 
 
 if __name__ == "__main__":
