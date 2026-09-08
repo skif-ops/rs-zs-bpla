@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate locked EVT-PRE-20 lot decisions using only the Python standard library."""
+"""Validate locked EVT-PRE-20 configuration and hardware baseline using stdlib only."""
 
 from __future__ import annotations
 
@@ -91,6 +91,42 @@ def validate_decisions_and_tests() -> None:
     require("reject private APN" in tests["EVT-CELL-04"]["Method"], "private APN rejection test missing")
 
 
+def validate_hardware_baseline() -> None:
+    baseline = (ROOT / "config/EVT_PRE_20_BASELINE.yaml").read_text(encoding="utf-8")
+    target = (ROOT / "firmware/targets/evt_pre_20/target_status.yaml").read_text(encoding="utf-8")
+    kicad_readme = (ROOT / "hardware/kicad/README.md").read_text(encoding="utf-8")
+    capture_spec = (ROOT / "hardware/kicad/REV_A_CAPTURE_SPEC.md").read_text(encoding="utf-8")
+    gate = (ROOT / "hardware/PCB_DOUBLE_REVIEW_GATE.md").read_text(encoding="utf-8")
+
+    require("mcu_exact_mpn: STM32U585VIT6Q" in baseline, "baseline MCU is not STM32U585VIT6Q")
+    require("mcu: STM32U585VIT6Q" in target, "firmware target MCU does not match baseline")
+    require("package: LQFP100_14x14" in target, "firmware target package does not match baseline")
+    require("STM32U585VIT6Q" in kicad_readme, "KiCad package missing current MCU")
+    require("ESP32-C3-MINI-1-N4" in kicad_readme, "KiCad package missing current BLE candidate")
+    require("STM32U585VIT6Q" in capture_spec, "capture spec missing current MCU")
+    require("Review A" in gate and "Review B" in gate, "double-review PCB gate is incomplete")
+    require("FOR_MANUFACTURE" in gate, "PCB release state is not defined")
+
+    bom = {row["Item_ID"]: row for row in read_csv("hardware/EVT_PRE_20_BOM_DRAFT.csv")}
+    require(bom["U1"]["MPN"] == "STM32U585VIT6Q", "BOM MCU does not match baseline")
+    require(bom["U11"]["MPN"] == "ESP32-C3-MINI-1-N4", "BOM BLE candidate does not match baseline")
+    require(bom["MK1"]["MPN"] == "T5838", "BOM microphone does not match baseline")
+
+    harness = read_csv("hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv")
+    mic_rows = [row for row in harness if row["Interface"].startswith("MIC")]
+    require(len(mic_rows) == 16, "logical microphone harness must contain 4x4 pins")
+    for index in range(1, 5):
+        rows = [row for row in harness if row["Interface"] == f"MIC{index}"]
+        require([row["Pin"] for row in rows] == ["1", "2", "3", "4"], f"MIC{index} pin order mismatch")
+        require(rows[0]["Net"] == "1V8_MIC" and rows[1]["Net"] == "GND", f"MIC{index} power pinout mismatch")
+        require(rows[2]["Net"] == "PDM_CLK", f"MIC{index} clock pinout mismatch")
+        require(rows[3]["Net"] == f"PDM_DATA{index}", f"MIC{index} data pinout mismatch")
+
+    stale_operational_tokens = ["STM32U585ZIT6Q", "nRF52832-class", "BQ24650"]
+    for token in stale_operational_tokens:
+        require(token not in kicad_readme, f"stale KiCad baseline token remains: {token}")
+
+
 def validate_policy_text() -> None:
     baseline = (ROOT / "config/EVT_PRE_20_BASELINE.yaml").read_text(encoding="utf-8")
     require("pilot_apn_policy: public_only" in baseline, "baseline public-only APN policy missing")
@@ -128,8 +164,9 @@ def main() -> None:
     validate_lot()
     validate_procurement()
     validate_decisions_and_tests()
+    validate_hardware_baseline()
     validate_policy_text()
-    print("EVT-PRE-20 configuration consistency: PASS")
+    print("EVT-PRE-20 configuration + hardware baseline: PASS")
 
 
 if __name__ == "__main__":
