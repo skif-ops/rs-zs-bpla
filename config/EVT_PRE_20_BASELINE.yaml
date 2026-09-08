@@ -16,6 +16,18 @@ lot:
     EU868: []
   allocation_freeze_required: false
 
+environment:
+  operating_ambient_c: [-40, 70]
+  operating_range_status: LOCKED_CUSTOMER
+  electronic_component_minimum_rating_c: [-40, 85]
+  thermal_derating_required: true
+  hot_test_ambient_c: 70
+  cold_test_ambient_c: -40
+  storage_minimum_project_range_c: [-40, 70]
+  storage_final_limits_follow_selected_battery_and_material_datasheets: true
+  lifepo4_charge_below_0c: PROHIBITED_UNLESS_APPROVED_HEATER_OR_LOW_TEMP_CHARGE_SYSTEM
+  environmental_profile_id: EVT_PRE_20_ENV_40_70
+
 electronics:
   architecture: custom_pcb
   dev_board_in_product: false
@@ -50,6 +62,7 @@ power:
   mppt_architecture: EXTERNAL_10A_LIFEPO4_MPPT_PLUS_CUSTOM_PROTECTED_INTERFACE
   mppt_exact_mpn: RFQ_REQUIRED
   no_sun_autonomy_target_days: 30
+  low_temperature_charge_policy: inhibit_below_0c_unless_approved_heater_or_battery_system
 
 positioning:
   station_type: fixed
