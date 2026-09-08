@@ -83,6 +83,15 @@ communications:
         profile_status: FUTURE_COMPATIBILITY_NOT_IN_PILOT
   ble:
     role: local_service_configuration_diagnostics_ota
+    soc: nRF52840
+    module_primary: Raytac_MDBT50Q-P1MV2
+    antenna: integrated_pcb
+    wifi_required: false
+    phy_required: [BLE_2M, BLE_1M, BLE_CODED_LONG_RANGE]
+    max_tx_power_dbm: 8
+    service_range_requirement: local_commissioning_and_ota
+    module_temperature_limit_c: 85
+    esp32_c3_status: SUPERSEDED_NOT_IN_REV_A
 
 mechanics:
   acoustic_head_geometry_locked: true
