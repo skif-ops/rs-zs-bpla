@@ -12,7 +12,7 @@ on:
 
 jobs:
   native-kicad:
-    name: Native KiCad ERC DRC and fabrication export
+    name: Native KiCad per-board ERC DRC and fabrication export
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,22 +24,23 @@ jobs:
         shell: bash
         run: |
           python tools/kicad_native_gate.py
-          if [ -f hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch ] && \
-             [ -f hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch ] && \
-             [ -f hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Install KiCad CLI only when native capture exists
-        if: steps.native.outputs.ready == 'true'
+          any=false
+          for b in PCB-MAIN PCB-MIC PCB-PWR; do
+            base="hardware/kicad/native/$b/$b"
+            if [ -f "$base.kicad_sch" ] && [ -f "$base.kicad_pcb" ] && [ -f "$base.kicad_pro" ]; then
+              any=true
+            fi
+          done
+          echo "any_ready=$any" >> "$GITHUB_OUTPUT"
+      - name: Install KiCad CLI when at least one native board exists
+        if: steps.native.outputs.any_ready == 'true'
         run: |
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y kicad
           kicad-cli version
-      - name: Strict ERC DRC and fabrication export
-        if: steps.native.outputs.ready == 'true'
-        run: python tools/kicad_native_gate.py --strict --run-cli
+      - name: ERC DRC and fabrication export for every complete board
+        if: steps.native.outputs.any_ready == 'true'
+        run: python tools/kicad_native_gate.py --run-cli
       - name: Upload native gate evidence
         if: always()
         uses: actions/upload-artifact@v4
