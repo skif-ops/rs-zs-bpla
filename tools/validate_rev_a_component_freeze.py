@@ -27,6 +27,7 @@ def main() -> None:
     main_parts = {r["RefDes"]: r for r in rows("hardware/MAIN_COMPONENT_FREEZE_REV_A.csv")}
     connectors = {r["Connector_ID"]: r for r in rows("hardware/CONNECTOR_FREEZE_REV_A.csv")}
     pinmap = {r["Net"]: r for r in rows("hardware/EVT_PRE_20_PIN_MAP_REV_A.csv")}
+    aad_cfg = {r["Net"]: r for r in rows("hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv")}
     harness = rows("hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv")
     inputs = {r["Input_ID"]: r for r in rows("docs/OPEN_INPUTS_FOR_FREEZE.csv")}
     decisions = {r["Decision_ID"]: r for r in rows("docs/DECISION_LOG.csv")}
@@ -82,24 +83,35 @@ def main() -> None:
     require("ESP32-C3" not in text, "ESP32-C3 reappeared in active Rev.A freeze tables")
     require("JST_BM05B" not in text and "JST_GHR-05V" not in text, "-25 C JST GH reappeared after DEC-019")
 
-    require(connectors["CON-MIC"]["Board_MPN"] == "Molex_5040500591", "MIC header is not 5-pin Molex Pico-Lock")
-    require(connectors["CON-MIC"]["Mating_Housing_MPN"] == "Molex_5040510501", "MIC mating housing mismatch")
-    require(connectors["CON-MIC"]["Terminal_MPN"] == "Molex_5040520098", "MIC crimp terminal mismatch")
-    require(connectors["CON-MIC"]["Positions"] == "5", "MIC connector does not preserve AAD WAKE contact")
-    require("-40..105" in connectors["CON-MIC"]["Temperature_C"], "MIC connector does not meet -40 C requirement")
+    mic = connectors["CON-MIC"]
+    require(mic["Board_MPN"] == "Molex_5040500691", "MIC header is not 6-pin Molex Pico-Lock")
+    require(mic["Mating_Housing_MPN"] == "Molex_5040510601", "MIC 6-pin mating housing mismatch")
+    require(mic["Terminal_MPN"] == "Molex_5040520098", "MIC crimp terminal mismatch")
+    require(mic["Positions"] == "6", "MIC connector does not preserve WAKE+THSEL contacts")
+    require("-40..105" in mic["Temperature_C"], "MIC connector does not meet -40 C requirement")
+    require("AAD_CFG" in mic["Function"], "MIC connector contract does not expose T5838 THSEL/AAD_CFG")
 
-    # Every physical MIC connector must have exactly 5 logical contacts and pin 5 is WAKE.
+    # Every physical MIC connector must have 6 contacts: WAKE on 5 and shared THSEL/AAD_CFG on 6.
     for idx in range(1, 5):
         ref = f"J_MIC{idx}"
         physical = [r for r in harness if r["Connector_Ref"] == ref]
-        require([r["Pin"] for r in physical] == ["1", "2", "3", "4", "5"], f"{ref} is not a complete 5-pin harness")
+        require([r["Pin"] for r in physical] == ["1", "2", "3", "4", "5", "6"], f"{ref} is not a complete 6-pin harness")
         require(physical[4]["Net"] == f"MIC_WAKE{idx}", f"{ref} pin 5 does not carry T5838 WAKE")
         require(physical[4]["Interface"] == f"AAD_WAKE{idx}", f"{ref} WAKE subinterface mismatch")
+        require(physical[5]["Net"] == "AAD_CFG", f"{ref} pin 6 does not carry shared T5838 THSEL/AAD_CFG")
+        require(physical[5]["Interface"] == f"AAD_CFG{idx}", f"{ref} AAD configuration subinterface mismatch")
 
     require("MIC_WAKE" in pinmap, "aggregated microphone wake MCU net missing")
     require(pinmap["MIC_WAKE"]["MCU_Pin"] == "PA8", "MIC_WAKE must use PA8")
     require(pinmap["MIC_WAKE"]["LQFP100_Pin"] == "67", "MIC_WAKE PA8 physical pin must be 67")
     require(pinmap["MIC_WAKE"]["Direction_at_MCU"] == "IN", "MIC_WAKE must be an MCU input")
+
+    require("AAD_CFG" in aad_cfg, "T5838 THSEL/AAD_CFG MCU addendum missing")
+    require(aad_cfg["AAD_CFG"]["MCU_Pin"] == "PA15", "AAD_CFG must use PA15")
+    require(aad_cfg["AAD_CFG"]["LQFP100_Pin"] == "77", "AAD_CFG PA15 physical pin must be 77")
+    require(aad_cfg["AAD_CFG"]["Direction_at_MCU"] == "OUT", "AAD_CFG must be an MCU output")
+    used_base_pins = {r["MCU_Pin"] for r in rows("hardware/EVT_PRE_20_PIN_MAP_REV_A.csv")}
+    require("PA15" not in used_base_pins, "PA15/AAD_CFG collides with an existing Rev.A pin assignment")
 
     require(connectors["CON-003"]["Board_MPN"] == "Molex_430450213", "battery input header mismatch")
     require(connectors["CON-003"]["Mating_Housing_MPN"] == "Molex_430250200", "battery input housing mismatch")
@@ -115,7 +127,7 @@ def main() -> None:
         require("-40..85" in sim["Temperature_C"], f"{key} does not meet -40..+70 ambient requirement")
     require("never substitute 3FF" in connectors["CON-SIM1"]["Notes"], "explicit 3FF/micro-SIM prohibition is missing")
 
-    print("EVT-PRE-20 Rev.A component/connector/environment/AAD-wake freeze consistency: PASS")
+    print("EVT-PRE-20 Rev.A component/connector/environment/T5838-AAD freeze consistency: PASS")
 
 
 if __name__ == "__main__":
