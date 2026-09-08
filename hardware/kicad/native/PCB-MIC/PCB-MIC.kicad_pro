@@ -1,0 +1,16 @@
+{
+  "board": {},
+  "boards": [],
+  "cvpcb": {},
+  "erc": {},
+  "libraries": {},
+  "meta": {"filename": "PCB-MIC.kicad_pro", "version": 1},
+  "net_settings": {"classes": [], "meta": {"version": 3}},
+  "pcbnew": {},
+  "schematic": {},
+  "text_variables": {
+    "PROJECT": "Dioneya EVT-PRE-20",
+    "REV": "A",
+    "BOARD": "PCB-MIC"
+  }
+}
