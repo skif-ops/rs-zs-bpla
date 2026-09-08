@@ -1,0 +1,2 @@
+Net,Function,MCU_Pin,LQFP100_Pin,CubeMX_Signal,AF,Direction_at_MCU,MCU_Domain,External_Domain,External_Device,Status,Evidence,Notes
+AAD_CFG,T5838 shared THSEL one-wire configuration,PA15,77,GPIO,GPIO,OUT,3V3,1V8,"U7 SN74AXC8T245 -> THSEL on 4x T5838",DATASHEET_VERIFIED_CUBEMX_PENDING,"ST DS13086 Rev10 Table 27/Figure LQFP100_SMPS + TDK T5838 DS-000383 v1.2","PA15 is otherwise unused in Rev.A; U7 MCU-to-mic direction bank carries both PDM_CLK and AAD_CFG; configuration writes are broadcast to all four identical microphones"
