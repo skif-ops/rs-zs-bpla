@@ -331,6 +331,14 @@ class TargetEstimate(BaseModel):
     horizontal_error_m: float | None = None
     vertical_error_m: float | None = None
     localization_method: str = "insufficient_geometry"
+    localization_mode: Literal[
+        "SINGLE_DOA",
+        "TWO_STATION_COARSE",
+        "HYBRID_3_2D5D",
+        "FULL_3D",
+        "CORRIDOR",
+    ] = "SINGLE_DOA"
+    geometry_quality: Literal["invalid", "poor", "acceptable", "good"] = "invalid"
     quality: Literal["invalid", "low", "medium", "high"] = "invalid"
 
 
@@ -346,4 +354,3 @@ class SystemEvent(BaseModel):
     target: TargetEstimate = Field(default_factory=TargetEstimate)
     route_summary: list[str] = Field(default_factory=list)
     status: Literal["active", "closed"] = "active"
-

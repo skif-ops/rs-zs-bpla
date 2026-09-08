@@ -55,6 +55,9 @@ jobs:
       - name: Compile Python sources
         working-directory: server
         run: python -m compileall -q .
+      - name: Materialize versioned test assets
+        working-directory: server
+        run: python tools/materialize_assets.py
       - name: Full pytest
         working-directory: server
         run: python -m pytest -q tests
@@ -77,4 +80,3 @@ jobs:
       - name: Verify compact CBOR contract
         working-directory: server
         run: python tools/test_firmware_packet.py
-
