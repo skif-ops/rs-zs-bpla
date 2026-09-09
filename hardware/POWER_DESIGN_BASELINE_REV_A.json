@@ -78,6 +78,9 @@
   },
   "current_monitor": {
     "mpn": "INA226AIDGSR",
+    "location": "PCB-PWR",
+    "measurement_scope": "total_protected_battery_input_before_rail_branching",
+    "supply_v": 3.3,
     "bus_voltage_max_v": 36.0,
     "shunt_input_abs_max_v": 0.08192,
     "shunt_ohm": 0.01,
@@ -85,7 +88,26 @@
     "expected_current_max_a": 5.0,
     "current_lsb_a": 0.0002,
     "calibration_register": 2560,
-    "power_lsb_w": 0.005
+    "power_lsb_w": 0.005,
+    "i2c_bus": "I2C2",
+    "i2c_address_7bit_hex": "0x40",
+    "i2c_speed_hz_initial": 100000,
+    "mcu_scl": "PB13",
+    "mcu_sda": "PB14",
+    "main_pwr_connector_positions": 12,
+    "main_pwr_scl_pin": 11,
+    "main_pwr_sda_pin": 12,
+    "pullup_location": "PCB-MAIN",
+    "pwr_side_pullup_default": "DNP",
+    "alert_policy": "may_contribute_to_aggregate_FAULT_but_never_replaces_I2C_telemetry"
+  },
+  "main_pwr_interface": {
+    "positions": 12,
+    "board_header_mpn": "Molex 43045-1202",
+    "cable_housing_mpn": "Molex 43025-1200",
+    "power_contact_mpn": "Molex 43030-0038",
+    "control_i2c_contact_mpn": "Molex 43030-0001",
+    "electrical_freeze": "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
   },
   "release_open_items": [
     "battery_bms_voltage_limits",
@@ -95,11 +117,13 @@
     "inductor_exact_mpn_and_thermal_margin",
     "mlcc_and_bulk_exact_mpn_with_dc_bias_and_cold_esr",
     "shunt_exact_mpn_and_kelvin_layout",
+    "i2c_final_harness_capacitance_and_pullup_value",
     "reverse_mosfet_soa_and_gate_transient_review",
     "plus70c_thermal_test",
     "minus40c_cold_start_test",
     "load_step_and_bg95_pulse_test",
     "standby_s0_measurement",
+    "ina226_reference_meter_calibration_test",
     "emc_emi_evidence",
     "review_a",
     "review_b"
@@ -110,6 +134,7 @@
     "Texas Instruments CSD18540Q5B datasheet Rev.B",
     "Texas Instruments TPS7A20 datasheet Rev.H",
     "Texas Instruments INA226 datasheet and calibration equations",
-    "Quectel BG95 series compatible hardware design, BG95-M3 supply and peak-current table"
+    "Quectel BG95 series compatible hardware design, BG95-M3 supply and peak-current table",
+    "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
   ]
 }
