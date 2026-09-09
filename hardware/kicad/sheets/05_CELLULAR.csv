@@ -1,4 +1,4 @@
 Sheet,Item,Requirement
-05_CELLULAR,U2,"BG95-M3 recommended decoupling and VBAT layout; main UART through 1.8/3.3 translator"
-05_CELLULAR,SIM,"physical Nano-SIM + MFF2 eSIM; selection/mux circuit to be finalized after SI review"
+05_CELLULAR,U8,"BG95-M3 recommended decoupling and VBAT layout; UART/status through SN74AXC8T245 1.8/3.3 V translator; PWRKEY and RESET_N use open-drain interfaces"
+05_CELLULAR,SIM,"two physical nano-SIM/4FF slots, Single Standby; TS3A27518E mux and one ESDALC6V1-5P6 per slot; switching only while USIM is unpowered"
 05_CELLULAR,RF,"50 ohm LTE route; antenna keepout; conducted test connector option"

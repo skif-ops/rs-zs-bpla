@@ -75,9 +75,9 @@ PDM:
 
 AAD wake:
 - T5838 `WAKE` is preserved on every leaf; it is not tied off;
-- physical MIC connector is **5 contacts**, not 4;
-- J_MIC1..J_MIC4 physical order: 1=`1V8_MIC`, 2=`GND`, 3=`PDM_CLK`, 4=`PDM_DATAn`, 5=`MIC_WAKEn`;
-- connector family: JST GH; board header `BM05B-GHS-TBT (LF)(SN)` class, cable housing `GHR-05V-S`, contact `SSHL-002T-P0.2`;
+- physical MIC connector is 6 contacts;
+- J_MIC1..J_MIC4 physical order: 1=`1V8_MIC`, 2=`GND`, 3=`PDM_CLK`, 4=`PDM_DATAn`, 5=`MIC_WAKEn`, 6=`AAD_CFG`;
+- connector family: Molex Pico-Lock 1.50 mm; board header `5040500691`, cable housing `5040510601`, terminal `5040520098`;
 - `MIC_WAKE1..4` remain separate through the four harnesses;
 - `U17` `SN74LVC32APWR` is powered from 1.8 V; three internal OR gates form a four-input OR; unused fourth gate inputs are tied to defined states;
 - `U18` `SN74AXC1T45DRLR` translates the aggregate wake from 1.8 V to 3.3 V;
@@ -87,8 +87,8 @@ AAD wake:
 
 T5838 leaf-local control:
 - `SELECT` is set by a resistor-option strap because each leaf has an independent data line; no runtime cable is allocated to SELECT;
-- `THSEL` gets local configurable resistor/test-pad footprints and is frozen only after the AAD threshold profile is validated;
-- no production Rev.A leaf may permanently remove the ability to configure/validate AAD before that profile is frozen;
+- `THSEL` is routed as `AAD_CFG` on J1 pin 6 and is driven through U7 from STM32 PA15;
+- all four identical leaves receive the shared `AAD_CFG` write; firmware must use one common validated AAD threshold profile;
 - local VDD decoupling is placed immediately at T5838;
 - bottom acoustic port, solder mask, adhesive, membrane and enclosure stack preserve the acoustic opening.
 
@@ -156,10 +156,11 @@ One identical leaf is used four times.
 
 Components/functions:
 - `MK1`: T5838 bottom-port PDM MEMS microphone;
-- J1: 5-position JST GH SMT board header;
-- C1 local 0.1 uF X7R decoupling close to microphone VDD plus any additional datasheet-required local bypass;
-- SELECT resistor-option strap with defined production default;
-- THSEL resistor/test option for AAD threshold/profile validation;
+- `J1`: Molex `5040500691` 6-position Pico-Lock SMT board header;
+- `C1`: local 0.1 uF X7R decoupling close to microphone VDD;
+- `R1`: 0 ohm PDM DATA source-termination/tuning footprint, populated baseline;
+- T5838 `SELECT` is tied to GND in the current native capture, which is the production default for independent data lines;
+- `THSEL/AAD_CFG` is routed to J1 pin 6 for the shared runtime threshold configuration;
 - WAKE routed to J1 pin 5;
 - PDM DATA routed to J1 pin 4;
 - CLK J1 pin 3, GND pin 2, 1V8 pin 1.
@@ -184,7 +185,7 @@ Selected capture baseline:
 - `1V8_MIC`: `TPS7A2018PDBVR` 1.8 V LDO, kept active during AAD monitoring;
 - INA226 monitor, final shunt and Kelvin routing pending current-range calculation.
 
-MAIN/PWR 10-contact electrical contract:
+MAIN/PWR 12-contact electrical contract:
 1. 3V8_MODEM
 2. GND_MODEM
 3. 3V3_DIGITAL
@@ -195,8 +196,10 @@ MAIN/PWR 10-contact electrical contract:
 8. FAULT
 9. EN_MODEM
 10. EN_AUX
+11. I2C2_SCL
+12. I2C2_SDA
 
-Micro-Fit 3.0 family is selected electrically; exact board orientation remains mechanical-freeze input.
+Molex Micro-Fit 3.0 board header `43045-1202`, mating housing `43025-1200`, power contact `43030-0038` and control/I2C contact `43030-0001` are selected electrically; exact board orientation remains a mechanical-freeze input.
 
 ## 4. PCB layout constraints
 
@@ -224,7 +227,7 @@ Capture is complete only when:
 1. exact symbols and footprints are assigned and datasheet-reviewed;
 2. exact STM32 pin map and CubeMX `.ioc` agree;
 3. clock policy agrees with DEC-016;
-4. all four 5-contact MIC harnesses and PA8 AAD wake path agree with the harness/interconnect files;
+4. all four 6-contact MIC harnesses, PA8 AAD wake and PA15 AAD_CFG paths agree with the harness/interconnect files;
 5. all 1.8/3.3 V crossings are explicit;
 6. power passives/feedback/shunt/fuse/TVS calculations are frozen;
 7. ERC has no unexplained violations;

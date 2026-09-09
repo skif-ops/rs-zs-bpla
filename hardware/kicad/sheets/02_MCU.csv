@@ -1,5 +1,5 @@
 Sheet,Item,Requirement
-02_MCU,U1,"STM32U585ZIT6Q LQFP144; all VDD/VSS pins; 100 nF per supply pin group + bulk"
+02_MCU,U1,"STM32U585VIT6Q LQFP100 14x14 mm; exact STM32U585VITxQ device database; all supply and ground pins captured per selected SMPS-capable package; 100 nF per supply group plus bulk"
 02_MCU,SWD,"PA13 SWDIO, PA14 SWCLK, NRST and GND accessible to fixture"
-02_MCU,PPS,"PA5 TIM2_CH1 input capture"
-02_MCU,Clock,"HSE/LSE population options; final timing architecture verified against PPS holdover test"
+02_MCU,PPS,"PA0 TIM2_CH1 input capture from MAX-M10S TIMEPULSE"
+02_MCU,Clock,"No HSE population or footprint; internal MSI/HSI plus PLL; SiT1552 32.768 kHz source on PC14/PC15 per exact CubeMX bypass wiring; verify PPS holdover"
