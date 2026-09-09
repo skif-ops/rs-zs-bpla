@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-MAIN",
+  "release_state": "CAPTURE_INPUT",
+  "manufacturing_release": false,
+  "source_control": {
+    "authoritative_inputs": [
+      "config/EVT_PRE_20_BASELINE.yaml",
+      "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
+      "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
+      "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+      "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
+      "hardware/CONNECTOR_FREEZE_REV_A.csv",
+      "hardware/CLOCKING_REV_A.md",
+      "hardware/kicad/REV_A_CAPTURE_SPEC.md",
+      "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc"
+    ],
+    "superseded_do_not_use": [
+      "hardware/kicad/components.csv",
+      "hardware/kicad/nets.csv"
+    ]
+  },
+  "mcu_contract": {
+    "refdes": "U1",
+    "mpn": "STM32U585VIT6Q",
+    "package": "LQFP100_14x14",
+    "functional_assignment_count": 65,
+    "external_hse_allowed": false,
+    "low_speed_reference_mpn": "SiT1552AI-JE-DCC-32.768D"
+  },
+  "interface_contracts": {
+    "main_power": {
+      "connector": "J_PWR",
+      "positions": 12,
+      "status": "LOGICAL_FROZEN"
+    },
+    "microphones": {
+      "connectors": [
+        "J_MIC1",
+        "J_MIC2",
+        "J_MIC3",
+        "J_MIC4"
+      ],
+      "positions_each": 6,
+      "status": "LOGICAL_FROZEN"
+    },
+    "stm32_swd": {
+      "connector": "J_SWD",
+      "positions": 5,
+      "status": "LOGICAL_FROZEN"
+    }
+  },
+  "native_schematic": {
+    "path": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch",
+    "status": "ABSENT",
+    "schematic_derived_bom": false
+  },
+  "capture_readiness": {
+    "complete": false,
+    "open_authorities": [
+      {
+        "id": "MAIN-AUTH-001",
+        "scope": "U1 complete 100-pin power, ground, SMPS, reference, reset, boot, functional, reserved and NC disposition",
+        "blocks": [
+          "native_schematic",
+          "review_a",
+          "production_bom"
+        ]
+      },
+      {
+        "id": "MAIN-AUTH-002",
+        "scope": "U2 NOR, U3 accelerometer and U4 temperature-sensor exact device-pad maps, decoupling and bus straps",
+        "blocks": [
+          "native_schematic",
+          "review_a",
+          "production_bom"
+        ]
+      },
+      {
+        "id": "MAIN-AUTH-003",
+        "scope": "U7, U17 and U18 microphone level-translation, AAD aggregation, safe-state and unused-channel pin maps",
+        "blocks": [
+          "native_schematic",
+          "review_a",
+          "production_bom"
+        ]
+      },
+      {
+        "id": "MAIN-AUTH-004",
+        "scope": "U8 BG95-M3 and U16 translator exact pads, open-drain controls, power sequencing and burst decoupling",
+        "blocks": [
+          "native_schematic",
+          "review_a",
+          "production_bom"
+        ]
+      },
+      {
+        "id": "MAIN-AUTH-005",
+        "scope": "U13 dual-SIM mux, U14/U15 ESD arrays and both nano-SIM socket exact pin maps and powered-off policy",
+        "blocks": [
+          "native_schematic",
+          "review_a",
+          "production_bom"
+        ]
+      },
+      {
+        "id": "MAIN-AUTH-006",
+        "scope": "U9 GNSS exact module pads, backup/bias network, TIMEPULSE and dedicated RF path",
+        "blocks": [
+          "native_schematic",
+          "review_a",
+          "production_bom"
+        ]
+      },
+      {
+        "id": "MAIN-AUTH-007",
+        "scope": "U10 E22-900M22S exact module pads, safe defaults and RU868 RF matching/protection path",
+        "blocks": [
+          "native_schematic",
+          "review_a",
+          "production_bom"
+        ]
+      },
+      {
+        "id": "MAIN-AUTH-008",
+        "scope": "U11 MDBT50Q-P1MV2 exact module pads, boot/reset, separate nRF SWD and antenna keepout",
+        "blocks": [
+          "native_schematic",
+          "review_a",
+          "production_bom"
+        ]
+      },
+      {
+        "id": "MAIN-AUTH-009",
+        "scope": "microSD socket/card, USB-C, RF receptacles, tamper and production/EOL fixture exact endpoints",
+        "blocks": [
+          "native_schematic",
+          "review_a",
+          "production_bom"
+        ]
+      },
+      {
+        "id": "MAIN-AUTH-010",
+        "scope": "complete PCB-MAIN passive, protection, pull, strap, termination, filtering and decoupling RefDes/MPN set",
+        "blocks": [
+          "native_schematic",
+          "review_a",
+          "production_bom"
+        ]
+      },
+      {
+        "id": "MAIN-AUTH-011",
+        "scope": "PCB outline, connector orientation, RF zones, keepouts and production test-point placement",
+        "blocks": [
+          "layout_review",
+          "review_b",
+          "production_bom"
+        ]
+      }
+    ]
+  },
+  "review_a": {
+    "complete": false,
+    "status": "BLOCKED_CAPTURE_AUTHORITY_INCOMPLETE",
+    "reviewer": null,
+    "date": null,
+    "commit_sha": null,
+    "evidence": {
+      "signed_checklist": null,
+      "schematic_pdf": null,
+      "cubemx_pin_report": null,
+      "erc_report": null,
+      "bom_diff": null,
+      "net_name_diff": null
+    }
+  },
+  "review_b": {
+    "complete": false,
+    "status": "BLOCKED_REVIEW_A_NOT_COMPLETE",
+    "reviewer": null,
+    "date": null,
+    "commit_sha": null,
+    "evidence": {}
+  }
+}

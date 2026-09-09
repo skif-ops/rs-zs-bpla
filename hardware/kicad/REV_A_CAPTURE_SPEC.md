@@ -15,6 +15,13 @@ Authoritative inputs:
 - `protocols/POSITION_TIME_TRUST_REV_A.md` / `DEC-018`;
 - `hardware/PCB_DOUBLE_REVIEW_GATE.md`.
 
+Capture-control status is recorded in
+`hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json` and independently checked by
+`tools/audit_pcb_main_capture_authority_rev_a.py`. A PASS from that audit means
+only that the current input set and open-authority register are controlled. It
+does not mean that native capture, Review A, Review B or the production BOM has
+passed.
+
 ## 1. PCB-MAIN Rev.A
 
 ### 1.1 MCU
@@ -45,8 +52,10 @@ Authoritative inputs:
 - `MIC_WAKE` remains PA8/EXTI8. `LORA_DIO1` was moved from PD8/EXTI8 to
   PC2/EXTI2 by DEC-022 because STM32U5 permits only one GPIO port source per
   EXTI line. This pin-map change invalidates prior PCB-MAIN Review A/B evidence.
-- `hardware/kicad/nets.csv` is a superseded placeholder and must not be used as
-  a pin authority or capture source; regenerate the native PCB-MAIN netlist from
+- `hardware/kicad/components.csv` and `hardware/kicad/nets.csv` are superseded
+  placeholders and must not be used as component, pin or capture authorities.
+  They remain only as historical drift fixtures. Regenerate the native PCB-MAIN
+  component/net input from the active freeze registers,
   `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv` and the reviewed addenda.
 - BG95 UART: PB6/PB7 USART1 TX/RX; PD11..PD15 control/status.
 - BLE: PB10/PB11 USART3 TX/RX; PE6 BLE_EN; PB2 BLE_DFU_REQ.

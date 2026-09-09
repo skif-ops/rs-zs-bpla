@@ -129,9 +129,74 @@ def main() -> int:
     check("power_cap_bank_native_expansion", not bank_rows,
           "PCB-PWR capacitor bank symbols still require individual native RefDes: " + ", ".join(bank_rows) if bank_rows else "all power capacitors have individual native RefDes")
 
-    main_native = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch"
-    check("main_native_schematic_source", main_native.is_file(),
-          "native PCB-MAIN schematic is absent; a complete schematic-derived production BOM cannot be proven")
+    main_status_path = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+    main_status: dict[str, object] = {}
+    main_status_error = ""
+    try:
+        main_status = json.loads(main_status_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        main_status_error = str(exc)
+    control_ok = (
+        not main_status_error
+        and main_status.get("schema_version") == 1
+        and main_status.get("configuration") == "EVT-PRE-20 Rev.A"
+        and main_status.get("assembly") == "PCB-MAIN"
+        and main_status.get("manufacturing_release") is False
+    )
+    check("main_capture_status_control", control_ok,
+          f"PCB-MAIN capture status is missing or invalid: {main_status_error or 'identity/release-state mismatch'}" if not control_ok else "PCB-MAIN capture status is explicit and release-blocked")
+
+    readiness = main_status.get("capture_readiness", {}) if isinstance(main_status, dict) else {}
+    open_authorities = readiness.get("open_authorities", []) if isinstance(readiness, dict) else []
+    readiness_ok = (
+        isinstance(readiness, dict)
+        and readiness.get("complete") is True
+        and not open_authorities
+    )
+    open_authority_ids = [item.get("id", "UNIDENTIFIED") for item in open_authorities if isinstance(item, dict)]
+    check("main_capture_authority_complete", readiness_ok,
+          "PCB-MAIN pad/net/mechanical authorities remain open: " + ", ".join(open_authority_ids) if open_authority_ids else "PCB-MAIN capture authority is complete")
+
+    native_record = main_status.get("native_schematic", {}) if isinstance(main_status, dict) else {}
+    native_relative = native_record.get("path", "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch") if isinstance(native_record, dict) else "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch"
+    main_native = ROOT / str(native_relative)
+    native_text = main_native.read_text(encoding="utf-8", errors="replace") if main_native.is_file() else ""
+    pin_rows = read(ROOT / "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv") + read(ROOT / "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv")
+    required_native_tokens = {
+        "(kicad_sch",
+        *(row["MPN"] for row in main_freeze),
+        *(row["Net"] for row in pin_rows),
+    }
+    native_tokens_missing = sorted(token for token in required_native_tokens if token not in native_text)
+    native_ok = (
+        main_native.is_file()
+        and isinstance(native_record, dict)
+        and native_record.get("status") in {"PRESENT_REVIEW_PENDING", "REVIEW_A_PASS", "REVIEW_B_PASS"}
+        and native_record.get("schematic_derived_bom") is True
+        and not native_tokens_missing
+    )
+    check("main_native_schematic_source", native_ok,
+          "native PCB-MAIN schematic, all frozen MPN/net tokens and declared schematic-derived BOM provenance are not all present" if not native_ok else "native PCB-MAIN source contains all frozen MPN/net tokens and schematic-derived BOM provenance")
+
+    review_a = main_status.get("review_a", {}) if isinstance(main_status, dict) else {}
+    required_review_a_evidence = {
+        "signed_checklist", "schematic_pdf", "cubemx_pin_report", "erc_report",
+        "bom_diff", "net_name_diff",
+    }
+    review_a_evidence = review_a.get("evidence", {}) if isinstance(review_a, dict) else {}
+    review_a_evidence_paths = {
+        name: ROOT / str(path) for name, path in review_a_evidence.items() if path
+    } if isinstance(review_a_evidence, dict) else {}
+    review_a_ok = (
+        isinstance(review_a, dict)
+        and review_a.get("complete") is True
+        and review_a.get("status") == "PASS"
+        and all(review_a.get(field) for field in ("reviewer", "date", "commit_sha"))
+        and set(review_a_evidence_paths) == required_review_a_evidence
+        and all(path.is_file() and path.stat().st_size > 0 for path in review_a_evidence_paths.values())
+    )
+    check("main_review_a_complete", review_a_ok,
+          "PCB-MAIN Review A is not complete with signed identity, commit and all required evidence" if not review_a_ok else "PCB-MAIN Review A complete with required evidence")
 
     system_open = [
         row["Item_ID"] for row in rows

@@ -8,6 +8,9 @@ on:
       - "hardware/kicad/**"
       - "hardware/*FREEZE_REV_A.csv"
       - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
+      - "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv"
+      - "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv"
+      - "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
       - "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
       - "hardware/PCB_PWR_PIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
@@ -16,6 +19,7 @@ on:
       - "hardware/POWER_DESIGN_CALC_REV_A.md"
       - "mechanics/common/OPEN_DIMENSIONS.csv"
       - "tools/kicad_native_gate.py"
+      - "tools/audit_pcb_main_capture_authority_rev_a.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
@@ -50,6 +54,10 @@ jobs:
           python-version: "3.12"
       - name: Engineering preflight
         run: python tools/kicad_native_gate.py
+      - name: Independent PCB-MAIN capture-authority audit
+        run: |
+          python tools/audit_pcb_main_capture_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/capture_authority_audit.json
       - name: Independent PCB-PWR design and Review-A authority audits
         run: |
           python tools/audit_pcb_pwr_design_rev_a.py \
@@ -192,4 +200,5 @@ jobs:
             hardware/kicad/native/PCB-MIC/fp-lib-table
             hardware/kicad/native/PCB-MIC/libs/
             hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md
+            hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json
           if-no-files-found: warn
