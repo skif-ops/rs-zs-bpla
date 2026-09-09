@@ -116,13 +116,19 @@ def make_instance(
 
 
 def endpoint(inst: SchematicSymbol, symbol: Symbol, pin_number: str) -> Position:
+    """Return KiCad sheet-space pin endpoint for a zero-degree library symbol.
+
+    KiCad symbol-library coordinates use +Y upward while schematic sheet coordinates
+    use +Y downward. X is translated directly; Y must therefore be subtracted. This
+    transform is independently checked by KiCad ERC in the native gate.
+    """
     if inst.position.angle not in (None, 0):
         raise RuntimeError("PCB-MIC schematic generator currently permits only zero-degree symbols")
     pins = selected_pins(symbol, inst.unit or 1)
     pin = pins[str(pin_number)]
     return Position(
         X=round(inst.position.X + pin.position.X, 4),
-        Y=round(inst.position.Y + pin.position.Y, 4),
+        Y=round(inst.position.Y - pin.position.Y, 4),
         angle=0,
     )
 
@@ -182,33 +188,35 @@ def main() -> int:
     # Embedded library symbols make the native schematic self-contained.
     sch.libSymbols.extend([t5838, molex, resistor, capacitor])
 
+    # All instances are placed on the 1.27 mm (50 mil) schematic grid. This is a
+    # deliberate ERC constraint, not a cosmetic alignment choice.
     j1 = make_instance(
         sch, molex,
         reference="J1", value="5040500691",
         footprint="CONN-SMD_6P-P1.50_A1501WRB-S-6P",
         datasheet="Molex 504050 series",
-        x=35.0, y=70.0,
+        x=35.56, y=69.85,
     )
     mk1 = make_instance(
         sch, t5838,
         reference="MK1", value="MMICT5838-00-012",
         footprint="MIC-SMD_7P-L3.5-W2.7_MMICT5837-00-012",
         datasheet="TDK DS-000383 v1.2",
-        x=120.0, y=70.0,
+        x=120.65, y=69.85,
     )
     r1 = make_instance(
         sch, resistor,
         reference="R1", value="0R EVT_SI_TUNE",
         footprint="Resistor_SMD:R_0402_1005Metric",
         datasheet="~",
-        x=82.0, y=64.0,
+        x=81.28, y=63.50,
     )
     c1 = make_instance(
         sch, capacitor,
         reference="C1", value="100nF X7R",
         footprint="Capacitor_SMD:C_0402_1005Metric",
         datasheet="~",
-        x=92.0, y=92.0,
+        x=91.44, y=91.44,
     )
     sch.schematicSymbols.extend([j1, mk1, r1, c1])
 
