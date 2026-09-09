@@ -3,8 +3,8 @@
 
 This is an ERC-modeling layer only. It does not alter any reviewed electrical net:
 - physical connector power contacts are passive interconnect pins, not regulator outputs;
-- VBAT_SYS and GND_PWR receive explicit KiCad PWR_FLAG symbols because their source is
-  external and reaches those nets through passive/protection/current-sense elements.
+- VBAT_SYS and GND_PWR receive explicit one-pin project-local ERC source symbols because
+  their source is external and reaches those nets through passive/protection/current-sense elements.
 
 Regulator and monitor power pins retain the meaningful types applied by
 finalize_pcb_pwr_symbol_types_rev_a.py.
@@ -45,19 +45,18 @@ def controlled_by_entry(sch):
     return {str(s.entryName): s for s in sch.libSymbols if s.libraryNickname == "DioneyaPWR"}
 
 
-def load_power_flag(path: Path):
+def load_erc_source(path: Path):
     lib = SymbolLib.from_file(str(path), encoding="utf-8")
-    matches = [s for s in lib.symbols if str(s.entryName) == "PWR_FLAG"]
+    matches = [s for s in lib.symbols if str(s.entryName) == "Conn_01x01"]
     if len(matches) != 1:
-        raise RuntimeError(f"expected one PWR_FLAG in {path}, found {len(matches)}")
+        raise RuntimeError(f"expected one Conn_01x01 in {path}, found {len(matches)}")
     symbol = copy.deepcopy(matches[0])
-    symbol.libraryNickname = "power"
+    symbol.libraryNickname = "DioneyaPWR"
+    symbol.entryName = "ERC_SOURCE_FLAG"
     pins = selected_pins(symbol)
     if set(pins) != {"1"}:
-        raise RuntimeError(f"KiCad PWR_FLAG must expose only pin 1, got {sorted(pins)}")
-    # KiCad/kiutils versions do not serialize the library pin type consistently here.
-    # Normalize the controlled copy explicitly; post-write round-trip verification below
-    # guarantees the ERC source pin is actually power_out in our native schematic.
+        raise RuntimeError(f"ERC source must expose only pin 1, got {sorted(pins)}")
+    pins["1"].name = "PWR_SOURCE"
     pins["1"].electricalType = "power_out"
     return symbol
 
@@ -84,7 +83,7 @@ def make_flag(sch, symbol, reference: str, net: str, x: float, y: float):
     inst.uuid = uid()
     inst.properties = [
         prop("Reference", reference, 0, x, y - 5.0, hide=True),
-        prop("Value", "PWR_FLAG", 1, x, y + 5.0),
+        prop("Value", "ERC_SOURCE_FLAG", 1, x, y + 5.0),
         prop("Footprint", "", 2, x, y + 7.0, hide=True),
         prop("Datasheet", "~", 3, x, y + 9.0, hide=True),
     ]
@@ -98,7 +97,7 @@ def make_flag(sch, symbol, reference: str, net: str, x: float, y: float):
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--schematic", type=Path, required=True)
-    ap.add_argument("--power-symbols", type=Path, default=Path("/usr/share/kicad/symbols/power.kicad_sym"))
+    ap.add_argument("--connector-symbols", type=Path, default=Path("/usr/share/kicad/symbols/Connector_Generic.kicad_sym"))
     args = ap.parse_args()
 
     sch = Schematic.from_file(str(args.schematic), encoding="utf-8")
@@ -119,7 +118,7 @@ def main() -> int:
     if "#FLG01" in refs or "#FLG02" in refs:
         raise RuntimeError("PCB-PWR ERC flags already exist before finalization")
 
-    flag = load_power_flag(args.power_symbols)
+    flag = load_erc_source(args.connector_symbols)
     sch.libSymbols.append(flag)
     make_flag(sch, flag, "#FLG01", "VBAT_SYS", 22.86, 73.66)
     make_flag(sch, flag, "#FLG02", "GND_PWR", 35.56, 73.66)
@@ -134,13 +133,13 @@ def main() -> int:
 
     refs2 = {next((p.value for p in s.properties if p.key == "Reference"), ""): s for s in reread.schematicSymbols}
     if not {"#FLG01", "#FLG02"}.issubset(refs2):
-        raise RuntimeError("PWR_FLAG instances lost on round-trip")
-    flag_syms = [s for s in reread.libSymbols if s.libraryNickname == "power" and str(s.entryName) == "PWR_FLAG"]
+        raise RuntimeError("ERC source flag instances lost on round-trip")
+    flag_syms = [s for s in reread.libSymbols if s.libraryNickname == "DioneyaPWR" and str(s.entryName) == "ERC_SOURCE_FLAG"]
     if len(flag_syms) != 1 or str(selected_pins(flag_syms[0])["1"].electricalType) != "power_out":
-        raise RuntimeError("PWR_FLAG library symbol invalid after round-trip")
+        raise RuntimeError("project-local ERC source symbol invalid after round-trip")
 
     print("PCB-PWR ERC power-source model finalization PASS")
-    print("J1/J2 physical power contacts passive; PWR_FLAG on VBAT_SYS and GND_PWR")
+    print("J1/J2 physical power contacts passive; project-local power_out flags on VBAT_SYS and GND_PWR")
     return 0
 
 
