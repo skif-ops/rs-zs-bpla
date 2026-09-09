@@ -45,11 +45,18 @@ def main() -> None:
         "U-PWR1": "LMR604403SRAKR",
         "U-PWR2": "LMR604403SRAKR",
         "U-PWR3": "TPS7A2018PDBVR",
+        "U-MON-01": "INA226AIDGSR",
     }
     for key, mpn in expected_power.items():
         require(key in power, f"missing power component {key}")
         require(power[key]["MPN"] == mpn, f"{key} MPN mismatch")
         require("OPEN" not in power[key]["Status"], f"{key} unexpectedly OPEN")
+
+    monitor = power["U-MON-01"]
+    require("Total battery" in monitor["Function"], "INA226 is not defined as the total battery monitor")
+    require("0x40" in monitor["Electrical_Baseline"], "INA226 Rev.A address 0x40 missing")
+    require("I2C" in monitor["Electrical_Baseline"], "INA226 I2C baseline missing")
+    require("pins 11/12" in monitor["Notes"], "INA226 is not bound to MAIN-PWR pins 11/12")
 
     expected_main = {
         "U1": "STM32U585VIT6Q",
@@ -115,6 +122,19 @@ def main() -> None:
 
     require(connectors["CON-003"]["Board_MPN"] == "Molex_430450213", "battery input header mismatch")
     require(connectors["CON-003"]["Mating_Housing_MPN"] == "Molex_430250200", "battery input housing mismatch")
+
+    for key in ("CON-004A", "CON-004B"):
+        pwr = connectors[key]
+        require(pwr["Board_MPN"] == "Molex_430451202", f"{key} board header is not frozen 12-pin Micro-Fit")
+        require(pwr["Mating_Housing_MPN"] == "Molex_430251200", f"{key} housing is not frozen 12-pin Micro-Fit")
+        require(pwr["Positions"] == "12", f"{key} is not 12 positions")
+        require("I2C" in pwr["Function"], f"{key} does not expose INA226 I2C")
+
+    main_pwr = [r for r in harness if r["Interface"] == "MAIN_PWR"]
+    require([r["Pin"] for r in main_pwr] == [str(i) for i in range(1, 13)], "MAIN-PWR logical harness is not 12-pin")
+    require(main_pwr[10]["Net"] == "I2C2_SCL", "MAIN-PWR pin 11 is not I2C2_SCL")
+    require(main_pwr[11]["Net"] == "I2C2_SDA", "MAIN-PWR pin 12 is not I2C2_SDA")
+
     require("-40..85" in connectors["CON-USB"]["Temperature_C"], "USB-C connector does not meet operating range")
     for key in ("CON-RF-CELL", "CON-RF-GNSS", "CON-RF-LORA"):
         require("U.FL" in connectors[key]["Board_MPN"], f"{key} is not U.FL")
@@ -127,7 +147,7 @@ def main() -> None:
         require("-40..85" in sim["Temperature_C"], f"{key} does not meet -40..+70 ambient requirement")
     require("never substitute 3FF" in connectors["CON-SIM1"]["Notes"], "explicit 3FF/micro-SIM prohibition is missing")
 
-    print("EVT-PRE-20 Rev.A component/connector/environment/T5838-AAD freeze consistency: PASS")
+    print("EVT-PRE-20 Rev.A component/connector/environment/T5838-AAD/PWR12-INA226 freeze consistency: PASS")
 
 
 if __name__ == "__main__":

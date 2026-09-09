@@ -164,6 +164,7 @@ def validate_hardware_baseline() -> None:
     target = (ROOT / "firmware/targets/evt_pre_20/target_status.yaml").read_text(encoding="utf-8")
     kicad_readme = (ROOT / "hardware/kicad/README.md").read_text(encoding="utf-8")
     capture_spec = (ROOT / "hardware/kicad/REV_A_CAPTURE_SPEC.md").read_text(encoding="utf-8")
+    pwr_addendum = (ROOT / "hardware/kicad/REV_A_CAPTURE_ADDENDUM_002_PWR12_INA226.md").read_text(encoding="utf-8")
     gate = (ROOT / "hardware/PCB_DOUBLE_REVIEW_GATE.md").read_text(encoding="utf-8")
 
     require("mcu_exact_mpn: STM32U585VIT6Q" in baseline, "baseline MCU is not STM32U585VIT6Q")
@@ -176,6 +177,7 @@ def validate_hardware_baseline() -> None:
     require("STM32U585CIU6" in kicad_readme and "superseded" in kicad_readme, "superseded 48-pin MCU history is not documented")
     require("Do not reintroduce" in kicad_readme and "BQ24650/CN3791" in kicad_readme, "obsolete charger prohibition is missing")
     require("STM32U585VIT6Q" in capture_spec, "capture spec missing current MCU")
+    require("12-pin" in pwr_addendum and "INA226" in pwr_addendum, "Rev.A 12-pin/INA226 capture addendum missing")
     require("Review A" in gate and "Review B" in gate, "double-review PCB gate is incomplete")
     require("FOR_MANUFACTURE" in gate, "PCB release state is not defined")
 
@@ -184,16 +186,26 @@ def validate_hardware_baseline() -> None:
     require(bom["U11"]["MPN"] == "MDBT50Q-P1MV2", "BOM BLE module does not match locked nRF52840 module")
     require("nRF52840" in bom["U11"]["Package"], "BOM BLE module package does not identify nRF52840")
     require(bom["MK1"]["MPN"] == "T5838", "BOM microphone does not match baseline")
+    require(bom["U-MON-01"]["MPN"] == "INA226AIDGSR", "BOM total battery monitor is not INA226AIDGSR")
+    require(bom["J-PWR-MAIN"]["MPN"] == "43045-1202", "PCB-MAIN PWR connector is not 12-pin Micro-Fit")
+    require(bom["J-PWR-PWR"]["MPN"] == "43045-1202", "PCB-PWR MAIN connector is not 12-pin Micro-Fit")
 
     harness = read_csv("hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv")
-    mic_rows = [row for row in harness if row["Interface"].startswith("MIC")]
-    require(len(mic_rows) == 16, "logical microphone harness must contain 4x4 pins")
     for index in range(1, 5):
-        rows = [row for row in harness if row["Interface"] == f"MIC{index}"]
-        require([row["Pin"] for row in rows] == ["1", "2", "3", "4"], f"MIC{index} pin order mismatch")
-        require(rows[0]["Net"] == "1V8_MIC" and rows[1]["Net"] == "GND", f"MIC{index} power pinout mismatch")
-        require(rows[2]["Net"] == "PDM_CLK", f"MIC{index} clock pinout mismatch")
-        require(rows[3]["Net"] == f"PDM_DATA{index}", f"MIC{index} data pinout mismatch")
+        ref = f"J_MIC{index}"
+        rows = [row for row in harness if row["Connector_Ref"] == ref]
+        require([row["Pin"] for row in rows] == ["1", "2", "3", "4", "5", "6"], f"{ref} pin order mismatch")
+        require(rows[0]["Net"] == "1V8_MIC" and rows[1]["Net"] == "GND", f"{ref} power pinout mismatch")
+        require(rows[2]["Net"] == "PDM_CLK", f"{ref} clock pinout mismatch")
+        require(rows[3]["Net"] == f"PDM_DATA{index}", f"{ref} data pinout mismatch")
+        require(rows[4]["Net"] == f"MIC_WAKE{index}", f"{ref} AAD WAKE pinout mismatch")
+        require(rows[5]["Net"] == "AAD_CFG", f"{ref} shared AAD_CFG/THSEL pinout mismatch")
+
+    main_pwr = [row for row in harness if row["Interface"] == "MAIN_PWR"]
+    require([row["Pin"] for row in main_pwr] == [str(i) for i in range(1, 13)], "MAIN-PWR is not the frozen 12-pin contract")
+    require(main_pwr[10]["Net"] == "I2C2_SCL", "MAIN-PWR pin 11 must be I2C2_SCL")
+    require(main_pwr[11]["Net"] == "I2C2_SDA", "MAIN-PWR pin 12 must be I2C2_SDA")
+    require("INA226" in main_pwr[10]["Notes"] and "INA226" in main_pwr[11]["Notes"], "MAIN-PWR I2C rows are not bound to INA226")
 
 
 def validate_policy_text() -> None:
