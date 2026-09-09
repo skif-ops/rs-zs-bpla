@@ -23,20 +23,20 @@ MIC4,J_MIC4,3,PDM_CLK,OUT,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_
 MIC4,J_MIC4,4,PDM_DATA4,IN,1.8V_logic,LOW,AWG28_or_larger,Twist_or_pair_with_GND_if_harness_long,KEYED,LOGICAL_FROZEN,
 AAD_WAKE4,J_MIC4,5,MIC_WAKE4,IN,1.8V_logic,LOW,AWG28_or_larger,Route_with_GND_avoid_PDM_clk_crosstalk,KEYED,LOGICAL_FROZEN,T5838 AAD WAKE output
 AAD_CFG4,J_MIC4,6,AAD_CFG,OUT,1.8V_one_wire,LOW,AWG28_or_larger,Route_with_GND_avoid_PDM_clk_crosstalk,KEYED,LOGICAL_FROZEN,Common T5838 THSEL one-wire configuration bus
-MAIN_PWR,J_PWR,1,3V8_MODEM,IN,3.8V,HIGH,AWG20_or_larger,Dedicated_return_pin_2,KEYED_LATCH,LOGICAL_FROZEN,Final gauge from measured burst current and length
-MAIN_PWR,J_PWR,2,GND_MODEM,RETURN,0V,HIGH,AWG20_or_larger,Dedicated_return_for_3V8,KEYED_LATCH,LOGICAL_FROZEN,
-MAIN_PWR,J_PWR,3,3V3_DIGITAL,IN,3.3V,MEDIUM,AWG22_or_larger,Dedicated_return_pin_4,KEYED_LATCH,LOGICAL_FROZEN,
-MAIN_PWR,J_PWR,4,GND_DIGITAL,RETURN,0V,MEDIUM,AWG22_or_larger,Dedicated_return_for_3V3,KEYED_LATCH,LOGICAL_FROZEN,
-MAIN_PWR,J_PWR,5,1V8_MIC,IN,1.8V,LOW,AWG26_or_larger,Dedicated_return_pin_6,KEYED_LATCH,LOGICAL_FROZEN,Remain powered while T5838 AAD monitoring is armed
-MAIN_PWR,J_PWR,6,GND_MIC,RETURN,0V,LOW,AWG26_or_larger,Dedicated_return_for_1V8,KEYED_LATCH,LOGICAL_FROZEN,
-MAIN_PWR,J_PWR,7,PWR_GOOD,IN,3.3V_logic,LOW,AWG28_or_larger,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,
-MAIN_PWR,J_PWR,8,FAULT,IN,3.3V_logic,LOW,AWG28_or_larger,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,
-MAIN_PWR,J_PWR,9,EN_MODEM,OUT,3.3V_logic,LOW,AWG28_or_larger,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,Default safe OFF
-MAIN_PWR,J_PWR,10,EN_AUX,OUT,3.3V_logic,LOW,AWG28_or_larger,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,Controls auxiliary rails policy; AAD monitoring requires 1V8_MIC available
+MAIN_PWR,J_PWR,1,3V8_MODEM,IN,3.8V,HIGH,AWG18_0.75mm2_Molex430300038,Dedicated_return_pin_2,KEYED_LATCH,LOGICAL_FROZEN,Exact selected Micro-Fit power terminal; validate burst current and harness temperature
+MAIN_PWR,J_PWR,2,GND_MODEM,RETURN,0V,HIGH,AWG18_0.75mm2_Molex430300038,Dedicated_return_for_3V8,KEYED_LATCH,LOGICAL_FROZEN,Exact selected Micro-Fit power terminal
+MAIN_PWR,J_PWR,3,3V3_DIGITAL,IN,3.3V,MEDIUM,AWG18_0.75mm2_Molex430300038,Dedicated_return_pin_4,KEYED_LATCH,LOGICAL_FROZEN,Exact selected Micro-Fit power terminal; conservative common harness standard
+MAIN_PWR,J_PWR,4,GND_DIGITAL,RETURN,0V,MEDIUM,AWG18_0.75mm2_Molex430300038,Dedicated_return_for_3V3,KEYED_LATCH,LOGICAL_FROZEN,Exact selected Micro-Fit power terminal
+MAIN_PWR,J_PWR,5,1V8_MIC,IN,1.8V,LOW,AWG18_0.75mm2_Molex430300038,Dedicated_return_pin_6,KEYED_LATCH,LOGICAL_FROZEN,Remain powered while T5838 AAD monitoring is armed; exact selected Micro-Fit power terminal
+MAIN_PWR,J_PWR,6,GND_MIC,RETURN,0V,LOW,AWG18_0.75mm2_Molex430300038,Dedicated_return_for_1V8,KEYED_LATCH,LOGICAL_FROZEN,Exact selected Micro-Fit power terminal
+MAIN_PWR,J_PWR,7,PWR_GOOD,IN,3.3V_logic,LOW,AWG20_to_24_Molex430300001,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,Control terminal 430300001; power-side output to MAIN
+MAIN_PWR,J_PWR,8,FAULT,IN,3.3V_logic,LOW,AWG20_to_24_Molex430300001,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,Control terminal 430300001; power-side output to MAIN
+MAIN_PWR,J_PWR,9,EN_MODEM,OUT,3.3V_logic,LOW,AWG20_to_24_Molex430300001,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,Control terminal 430300001; default safe OFF
+MAIN_PWR,J_PWR,10,EN_AUX,OUT,3.3V_logic,LOW,AWG20_to_24_Molex430300001,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,Control terminal 430300001; controls auxiliary rails policy while AAD requires 1V8_MIC available
 SWD,J_SWD,1,VTREF,IN,3.3V,LOW,Fixture_pogo_or_AWG28,No_shield,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
 SWD,J_SWD,2,SWDIO,BIDIR,3.3V_logic,LOW,Fixture_pogo_or_AWG28,Short,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
 SWD,J_SWD,3,SWCLK,IN,3.3V_logic,LOW,Fixture_pogo_or_AWG28,Short,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
 SWD,J_SWD,4,NRST,IN,3.3V_logic,LOW,Fixture_pogo_or_AWG28,Short,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
 SWD,J_SWD,5,GND,RETURN,0V,LOW,Fixture_pogo_or_AWG28,Reference,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
-PWR_INPUT,J_PWR_IN,1,VBAT_PLUS,IN,10_to_15V,HIGH,AWG16_or_larger,Dedicated_return_pin_2,KEYED_HIGH_CURRENT,LOGICAL_FROZEN,Final gauge and connector MPN after fault/thermal review
-PWR_INPUT,J_PWR_IN,2,VBAT_MINUS,RETURN,0V,HIGH,AWG16_or_larger,Dedicated_return_for_VBAT,KEYED_HIGH_CURRENT,LOGICAL_FROZEN,
+PWR_INPUT,J_PWR_IN,1,VBAT_PLUS,IN,10.0_to_14.6V_provisional,HIGH,AWG18_0.75mm2_Molex430300038,Dedicated_return_pin_2,KEYED_HIGH_CURRENT,LOGICAL_FROZEN,Selected Micro-Fit terminal is 18 AWG only; 5 A capture envelope and final thermal/fault review required
+PWR_INPUT,J_PWR_IN,2,VBAT_MINUS,RETURN,0V,HIGH,AWG18_0.75mm2_Molex430300038,Dedicated_return_for_VBAT,KEYED_HIGH_CURRENT,LOGICAL_FROZEN,Selected Micro-Fit terminal is 18 AWG only; final connector thermal test required
