@@ -3,7 +3,7 @@
 
 This audit is intentionally separate from the numeric power-design audit. It verifies
 that the human/machine capture sheet expresses the current architecture and explicitly
-rejects superseded integrated-MPPT and legacy-buck concepts.
+rejects superseded integrated-MPPT, legacy-buck and 10-contact MAIN/PWR concepts.
 """
 from __future__ import annotations
 
@@ -53,9 +53,15 @@ def main() -> int:
         "4.7 uH",
         "TPS7A2018PDBVR",
         "INA226AIDGSR",
+        "address 0x40",
         "10 mOhm",
         "CAL 2560",
-        "10-contact MAIN/PWR contract",
+        "12-contact MAIN/PWR contract",
+        "43045-1202",
+        "11 I2C2_SCL",
+        "12 I2C2_SDA",
+        "100 kHz",
+        "pull-ups are on PCB-MAIN",
         "NOT FOR MANUFACTURE",
     ]
     forbidden = [
@@ -65,6 +71,8 @@ def main() -> int:
         "battery float/current resistor options",
         "MPPT input set by resistor",
         "10-16.8 V operating pack",
+        "10-contact MAIN/PWR contract",
+        "10-pin MAIN/PWR",
     ]
 
     missing = [token for token in required if token not in text]
@@ -81,7 +89,7 @@ def main() -> int:
     result = {
         "configuration": "EVT-PRE-20 Rev.A",
         "audit": "PCB-PWR independent pre-schematic drift audit",
-        "status": "PASS_CURRENT_ARCHITECTURE_ONLY",
+        "status": "PASS_CURRENT_12PIN_INA226_ARCHITECTURE_ONLY",
         "sheet": str(args.sheet.relative_to(ROOT)),
         "row_count": len(rows),
         "required_tokens_verified": required,
@@ -90,7 +98,7 @@ def main() -> int:
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2), encoding="utf-8")
-    print("PCB-PWR pre-schematic drift audit PASS")
+    print("PCB-PWR pre-schematic drift audit PASS: 12-pin + INA226 I2C authority")
     print(f"rows={len(rows)}; legacy forbidden tokens absent={len(forbidden)}")
     print(args.output)
     return 0
