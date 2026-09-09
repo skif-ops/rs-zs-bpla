@@ -278,14 +278,21 @@ def main() -> int:
     add_track(board,nets["GND"],[(12.70,gy),gnd_m],width=0.30)
     add_track(board,nets["GND"],[mp["2"],(11.70,16.05)],width=0.16)
 
-    # Explicit B.Cu star/backbone is the first-control connectivity path. The B.Cu
-    # zone remains present for the final low-impedance reference plane and is checked
-    # separately by KiCad. This prevents a false PASS caused by assuming an unfilled
-    # zone electrically connects the three GND vias.
+    # Explicit B.Cu star/backbone is the first-control connectivity path. It must also
+    # respect the T5838 acoustic keepout: the backbone detours below the microphone
+    # instead of crossing the 0.8 mm NPTH at (12.0, 16.65). The B.Cu zone remains for
+    # the final low-impedance reference plane and is independently checked by KiCad.
     gnd_spine_x=9.0
-    add_track(board,nets["GND"],[gnd_j,(gnd_spine_x,6.70),(gnd_spine_x,16.65),gnd_m],width=0.50,layer=pcbnew.B_Cu)
+    gnd_detour_y=18.10
+    add_track(board,nets["GND"],[
+        gnd_j,
+        (gnd_spine_x,6.70),
+        (gnd_spine_x,gnd_detour_y),
+        (gnd_m[0],gnd_detour_y),
+        gnd_m,
+    ],width=0.50,layer=pcbnew.B_Cu)
     add_track(board,nets["GND"],[(gnd_spine_x,cp2[1]),gnd_c],width=0.50,layer=pcbnew.B_Cu)
-    print("explicit B.Cu GND backbone added", flush=True)
+    print("explicit B.Cu GND backbone added with acoustic-hole detour", flush=True)
 
     add_ground_zone(board,nets["GND"],bw,bh)
     print("before zone fill", flush=True)
