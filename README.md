@@ -42,6 +42,7 @@ Gerber, прошивки, бинарники, корпуса и серверны
 - [`docs/OPEN_INPUTS_FOR_FREEZE.csv`](docs/OPEN_INPUTS_FOR_FREEZE.csv) - входные данные заказчика, блокирующие финальный выпуск.
 - [`protocols/CELLULAR_CONNECTIVITY_BASELINE.md`](protocols/CELLULAR_CONNECTIVITY_BASELINE.md) — SIM/APN и исходящая связь.
 - [`hardware/DUAL_SIM_SINGLE_STANDBY.md`](hardware/DUAL_SIM_SINGLE_STANDBY.md) - двух-SIMная аппаратная архитектура и безопасное переключение.
+- [`hardware/EVT_PRE_20_BOM_POLICY_REV_A.md`](hardware/EVT_PRE_20_BOM_POLICY_REV_A.md) - правила производственного BOM, формулы количества и двойной контроль QG-1/QG-2.
 - [`config/cellular/dual_sim_apn_profiles.yaml`](config/cellular/dual_sim_apn_profiles.yaml) - машинно-читаемая политика SIM/APN failover.
 - [`manufacturing/README.md`](manufacturing/README.md) — маршрут партии, traceability, provisioning и EOL.
 - [`manufacturing/HOUSING_LOT_PLAN.csv`](manufacturing/HOUSING_LOT_PLAN.csv) - основной и резервный корпус для каждого из 20 серийных номеров.

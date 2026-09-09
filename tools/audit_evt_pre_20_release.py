@@ -24,6 +24,7 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
     ],
     "pcb_source": [
         "hardware/EVT_PRE_20_BOM_REV_A.csv",
+        "hardware/EVT_PRE_20_BOM_POLICY_REV_A.md",
         "hardware/kicad/README.md",
         "hardware/kicad/REV_A_CAPTURE_SPEC.md",
         "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
@@ -36,6 +37,9 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "hardware/PCB_DOUBLE_REVIEW_GATE.md",
         "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
         "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
+        "tools/generate_evt_pre_20_bom_rev_a.py",
+        "tools/validate_evt_pre_20_bom_qg1.py",
+        "tools/audit_evt_pre_20_bom_qg2.py",
     ],
     "firmware_source": [
         "firmware/CMakeLists.txt",
@@ -187,6 +191,14 @@ def audit() -> dict[str, object]:
         if "AAD_CFG" not in bom_text:
             blockers.append("generated Rev.A BOM does not document THSEL/AAD_CFG on MIC connector")
 
+    bom_qg2 = ROOT / "artifacts/evt_pre_20_bom_qg2.json"
+    if bom_qg2.is_file():
+        qg2 = json.loads(bom_qg2.read_text(encoding="utf-8"))
+        if not qg2.get("production_bom_complete"):
+            blockers.append("production BOM QG-2 remains BLOCKED; see artifacts/evt_pre_20_bom_qg2.json")
+    else:
+        blockers.append("production BOM QG-2 report is missing")
+
     addendum = ROOT / "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md"
     if addendum.is_file():
         addendum_text = addendum.read_text(encoding="utf-8")
@@ -207,11 +219,15 @@ def audit() -> dict[str, object]:
         ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md",
         ROOT / "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
         ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv",
+        ROOT / "hardware/EVT_PRE_20_BOM_POLICY_REV_A.md",
         ROOT / "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
         ROOT / "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
         ROOT / "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
         ROOT / "hardware/POWER_COMPONENT_FREEZE_REV_A.csv",
         ROOT / "hardware/CONNECTOR_FREEZE_REV_A.csv",
+        ROOT / "tools/generate_evt_pre_20_bom_rev_a.py",
+        ROOT / "tools/validate_evt_pre_20_bom_qg1.py",
+        ROOT / "tools/audit_evt_pre_20_bom_qg2.py",
         ROOT / "hardware/kicad/REV_A_CAPTURE_SPEC.md",
         ROOT / "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
         ROOT / "hardware/PCB_DOUBLE_REVIEW_GATE.md",
