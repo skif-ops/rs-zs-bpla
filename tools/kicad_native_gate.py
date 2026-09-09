@@ -6,12 +6,19 @@ engineering iterations the gate collects BOTH DRC and ERC reports before failing
 PCB violation cannot hide a schematic violation (or vice versa). Fabrication exports
 are generated only after the corresponding DRC passes.
 
+For PCB-MIC the KiCad 9 SWIG stackup descriptor is intentionally not used to write the
+surface finish because that API is opaque on supported Linux builds. Instead, controlled
+fabrication_metadata.json is verified against KiCad output and its standard Revision and
+Finish values are written into the generated Gerber job metadata after the geometric
+Gerbers have been produced. Gerber geometry is never rewritten by this step.
+
 The overall release remains BLOCKED until MAIN/MIC/PWR each have SCH/PCB/PRO, all CLI
 checks pass, and project Review A/B are complete.
 """
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import shutil
@@ -66,6 +73,90 @@ def validate_schematic(cli: str, name: str, sch: Path) -> tuple[bool, str]:
     return False, f"CLI_ERC_FAIL_rc{rc}_PDF_rc{pdf_rc}"
 
 
+def apply_fabrication_metadata(name: str, pcb: Path, out: Path, gerber: Path) -> None:
+    metadata_path = pcb.parent / "fabrication_metadata.json"
+    if not metadata_path.is_file():
+        raise RuntimeError(f"{name}: missing controlled fabrication metadata: {metadata_path}")
+
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    required = {
+        "board", "revision", "material", "surface_finish", "board_thickness_mm",
+        "copper_layers", "status", "authority",
+    }
+    missing = sorted(required - set(metadata))
+    if missing:
+        raise RuntimeError(f"{name}: fabrication metadata fields missing: {missing}")
+    if metadata["board"] != name:
+        raise RuntimeError(f"{name}: fabrication metadata board mismatch: {metadata['board']}")
+
+    job_path = gerber / f"{name}-job.gbrjob"
+    if not job_path.is_file():
+        raise RuntimeError(f"{name}: KiCad Gerber job file missing: {job_path}")
+    job = json.loads(job_path.read_text(encoding="utf-8"))
+    specs = job.get("GeneralSpecs", {})
+
+    actual_thickness = float(specs.get("BoardThickness", -1.0))
+    expected_thickness = float(metadata["board_thickness_mm"])
+    if abs(actual_thickness - expected_thickness) > 0.001:
+        raise RuntimeError(
+            f"{name}: Gerber-job thickness {actual_thickness} != controlled {expected_thickness} mm"
+        )
+    actual_layers = int(specs.get("LayerNumber", -1))
+    expected_layers = int(metadata["copper_layers"])
+    if actual_layers != expected_layers:
+        raise RuntimeError(
+            f"{name}: Gerber-job copper layers {actual_layers} != controlled {expected_layers}"
+        )
+
+    wanted_material = str(metadata["material"]).replace("-", "").lower()
+    dielectric_materials = [
+        str(item.get("Material", "")).replace("-", "").lower()
+        for item in job.get("MaterialStackup", [])
+        if item.get("Type") == "Dielectric"
+    ]
+    if wanted_material and not any(wanted_material in value for value in dielectric_materials):
+        raise RuntimeError(
+            f"{name}: controlled dielectric {metadata['material']} absent from KiCad Gerber stackup {dielectric_materials}"
+        )
+
+    project_id = specs.setdefault("ProjectId", {})
+    project_id["Revision"] = str(metadata["revision"])
+    specs["Finish"] = str(metadata["surface_finish"])
+    job["GeneralSpecs"] = specs
+    job_path.write_text(json.dumps(job, indent=2) + "\n", encoding="utf-8")
+
+    reread = json.loads(job_path.read_text(encoding="utf-8"))
+    reread_specs = reread["GeneralSpecs"]
+    if reread_specs["ProjectId"].get("Revision") != str(metadata["revision"]):
+        raise RuntimeError(f"{name}: Gerber-job revision verification failed")
+    if reread_specs.get("Finish") != str(metadata["surface_finish"]):
+        raise RuntimeError(f"{name}: Gerber-job finish verification failed")
+
+    controlled_copy = out / f"{name}_fabrication_metadata.json"
+    shutil.copy2(metadata_path, controlled_copy)
+    print(
+        f"{name}: fabrication metadata PASS: Rev {metadata['revision']}, "
+        f"{metadata['surface_finish']}, {expected_thickness:.3f} mm, "
+        f"{expected_layers} layers, {metadata['material']}"
+    )
+
+
+def validate_position_export(name: str, pos_path: Path) -> None:
+    with pos_path.open(encoding="utf-8-sig", newline="") as f:
+        records = list(csv.DictReader(f))
+    refs = [row.get("Ref", "") for row in records]
+    if name == "PCB-MIC":
+        expected = {"C1", "J1", "MK1", "R1"}
+        actual = set(refs)
+        if actual != expected:
+            raise RuntimeError(
+                f"PCB-MIC PnP reference set mismatch: expected {sorted(expected)}, got {sorted(actual)}"
+            )
+        if "H1" in actual or "H2" in actual:
+            raise RuntimeError("PCB-MIC mechanical mounting holes leaked into PnP")
+    print(f"{name}: PnP export verification PASS: refs={refs}")
+
+
 def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
     out = ART / name
     out.mkdir(parents=True, exist_ok=True)
@@ -81,15 +172,16 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
     gerber.mkdir(exist_ok=True)
     drill = out / "drill"
     drill.mkdir(exist_ok=True)
+    pos_path = out / f"{name}_pos.csv"
 
     # STEP is intentionally board-only at this gate. Controlled component 3D-model
     # links are a separate Review-B item; exporting a board-only STEP is sufficient for
-    # mic-pod fit/tolerance work without pretending secondary reference CAD is released.
+    # mechanical fit/tolerance work without pretending secondary reference CAD is released.
     export_commands = [
         [cli, "pcb", "export", "gerbers", "-o", str(gerber), "--board-plot-params", str(pcb)],
         [cli, "pcb", "export", "drill", "-o", str(drill), "--format", "excellon", "--generate-map", str(pcb)],
         [cli, "pcb", "export", "pos", "--format", "csv", "--units", "mm", "--side", "both",
-         "-o", str(out / f"{name}_pos.csv"), str(pcb)],
+         "-o", str(pos_path), str(pcb)],
         [cli, "pcb", "export", "ipcd356", "-o", str(out / f"{name}.d356"), str(pcb)],
         [cli, "pcb", "export", "step", "--board-only", "--force",
          "-o", str(out / f"{name}_board.step"), str(pcb)],
@@ -97,7 +189,15 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
     export_rcs = [run(cmd, check=False) for cmd in export_commands]
     if any(export_rcs):
         return False, f"CLI_DRC_PASS_EXPORT_FAIL_{export_rcs}"
-    return True, "CLI_DRC_FAB_EXPORT_PASS_REVIEW_B_PENDING"
+
+    try:
+        apply_fabrication_metadata(name, pcb, out, gerber)
+        validate_position_export(name, pos_path)
+    except Exception as exc:
+        print(f"{name}: fabrication metadata/PnP verification failure: {exc}", flush=True)
+        return False, f"CLI_DRC_EXPORT_METADATA_FAIL_{type(exc).__name__}"
+
+    return True, "CLI_DRC_FAB_EXPORT_METADATA_PASS_REVIEW_B_PENDING"
 
 
 def artifact_files() -> list[Path]:
