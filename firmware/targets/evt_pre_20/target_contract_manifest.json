@@ -22,7 +22,7 @@
     },
     {
       "path": "firmware/targets/evt_pre_20/target_status.yaml",
-      "sha256": "f1bcff22b91e1d0188c75c16131c9cf9434d8a655680112eadb1861693c48287"
+      "sha256": "eda6b621d5e86d7260dc1af94da1ebd202ae8c6d834b640486bd9757a7cc5e3c"
     }
   ],
   "generated_outputs": [

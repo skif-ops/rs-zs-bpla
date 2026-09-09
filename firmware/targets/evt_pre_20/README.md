@@ -10,14 +10,24 @@ Regenerate and run both quality gates from the repository root:
 python tools/generate_evt_pre_20_target_contract.py
 python tools/validate_evt_pre_20_target_contract.py
 python tools/audit_evt_pre_20_target_technical.py
+python tools/import_evt_pre_20_stm32_vendor.py --check
+python tools/validate_evt_pre_20_stm32_scaffold.py
+python tools/audit_evt_pre_20_stm32_scaffold_technical.py
 ```
 
 QG-1 checks completeness, ordering and SHA-256 traceability. QG-2 separately
 checks package-pin uniqueness, critical peripheral mappings, voltage-domain
-bindings and the clock-policy invariants.
+bindings and the clock-policy invariants. The second gate pair checks the pinned
+STM32CubeU5/CMSIS provenance, the exact 142-entry STM32U585 vector table and the
+engineering memory layout independently.
 
-The target remains non-releasable. The committed contract is an input to the
-exact CubeMX project; it is not a substitute for the missing `.ioc`, startup,
-linker, HAL/LL integration, secure boot, A/B OTA, production target build or
-hardware validation evidence. Runtime clock frequencies are intentionally not
-declared until the reviewed CubeMX configuration is measured on Rev.A hardware.
+The GCC startup and CMSIS system template are byte-for-byte imports from the
+CMSIS commit pinned by STM32CubeU5 v1.9.0. The linker covers the full 2 MiB flash,
+the contiguous 768 KiB SRAM1-3 and the separate 16 KiB SRAM4 retained section,
+but is restricted to TrustZone-disabled engineering bring-up. SRAM4 placement
+does not claim low-power retention until PWR configuration is measured.
+
+The target remains non-releasable. The CubeMX generation contract is an input to
+the exact `.ioc`; it is not a substitute for opening and regenerating that file
+with STM32CubeMX 6.12.0. HAL/LL integration, measured clocks, secure boot, A/B
+OTA, production target build and hardware evidence remain blockers.

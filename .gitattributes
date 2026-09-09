@@ -1,0 +1,2 @@
+# Preserve byte-exact upstream CMSIS snapshots, including upstream whitespace.
+/firmware/targets/evt_pre_20/vendor/cmsis_device_u5/** -whitespace

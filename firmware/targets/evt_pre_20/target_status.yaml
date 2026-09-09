@@ -93,10 +93,27 @@ target_contract:
   qg1_completeness: tools/validate_evt_pre_20_target_contract.py
   qg2_technical: tools/audit_evt_pre_20_target_technical.py
   release_effect: NONE_TARGET_PORT_STILL_REQUIRED
+stm32_scaffold:
+  status: PINNED_STARTUP_ENGINEERING_LINKER_QG1_QG2_PASS
+  manifest: firmware/targets/evt_pre_20/stm32_scaffold_manifest.json
+  stm32cubeu5_release: v1.9.0
+  stm32cubeu5_commit: d88042df24f16799957c24f00c2b234c9e306188
+  cmsis_device_u5_commit: 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8
+  startup: firmware/targets/evt_pre_20/vendor/cmsis_device_u5/startup_stm32u585xx.s
+  system: firmware/targets/evt_pre_20/vendor/cmsis_device_u5/system_stm32u5xx.c
+  linker: firmware/targets/evt_pre_20/ld/STM32U585VITXQ_ENGINEERING_FLASH.ld
+  security_scope: TRUSTZONE_DISABLED_ENGINEERING_BRINGUP_ONLY
+  qg1_completeness: tools/validate_evt_pre_20_stm32_scaffold.py
+  qg2_technical: tools/audit_evt_pre_20_stm32_scaffold_technical.py
+cubemx_preflight:
+  status: INPUT_COMPLETE_GENERATION_AND_IMPORT_PENDING
+  tool_version: 6.12.0
+  contract: firmware/targets/evt_pre_20/cubemx_generation_contract.json
+  exact_ioc: MISSING_BLOCKER
 required_target_files:
-  cubemx_ioc: MISSING_BLOCKER
-  startup: MISSING_BLOCKER
-  linker_script: MISSING_BLOCKER
+  cubemx_ioc: MISSING_BLOCKER_PREFLIGHT_CONTRACT_READY
+  startup: PINNED_OFFICIAL_CMSIS_QG1_QG2_PASS
+  linker_script: ENGINEERING_FULL_FLASH_QG1_QG2_PASS_PRODUCTION_PARTITION_BLOCKER
   hal_ll_bindings: MISSING_BLOCKER
   board_pins: GENERATED_EXACT_REV_A_CONTRACT_QG1_QG2_PASS_CUBEMX_PENDING
   secure_boot: MISSING_BLOCKER

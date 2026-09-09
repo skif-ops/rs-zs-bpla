@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20",
+  "status": "INPUT_COMPLETE_CUBEMX_GENERATION_AND_IMPORT_PENDING",
+  "output_ioc": "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc",
+  "tool": {
+    "name": "STM32CubeMX",
+    "version": "6.12.0",
+    "evidence": "STM32CubeU5 v1.9.0 Release_Notes.html"
+  },
+  "device": {
+    "cpn": "STM32U585VIT6Q",
+    "name": "STM32U585VITxQ",
+    "family": "STM32U5",
+    "package": "LQFP100_14x14",
+    "context": "TrustZoneDisabled",
+    "context_scope": "ENGINEERING_BRINGUP_ONLY"
+  },
+  "pin_assignment_count": 65,
+  "inputs": [
+    "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
+    "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
+    "hardware/CLOCKING_REV_A.md",
+    "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h",
+    "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h"
+  ],
+  "required_ips": [
+    "CORTEX_M33_NS",
+    "GPIO",
+    "RCC",
+    "PWR",
+    "SYS",
+    "MDF1",
+    "OCTOSPI1",
+    "OCTOSPIM",
+    "SDMMC1",
+    "USART1",
+    "USART2",
+    "USART3",
+    "LPUART1",
+    "SPI1",
+    "I2C2",
+    "TIM2",
+    "USB_OTG_FS"
+  ],
+  "clock_invariants": {
+    "external_hse": "DISABLED_NOT_FITTED",
+    "approved_high_speed_sources": ["MSI", "HSI", "PLL"],
+    "low_speed_reference": "SiT1552AI-JE-DCC-32.768D",
+    "low_speed_reference_hz": 32768,
+    "lse_mode": "BYPASS_CONFIGURATION_REVIEW_REQUIRED",
+    "runtime_frequencies": "NOT_RELEASED_MEASUREMENT_REQUIRED"
+  },
+  "acceptance": [
+    "CubeMX opens the exact CPN without migration or package substitution",
+    "all 65 source pin assignments import without conflict",
+    "generated GPIO alternate functions match the committed target contract",
+    "external HSE remains disabled",
+    "LSE bypass treatment is reviewed against the SiT1552 oscillator output",
+    "generated startup and linker selections match the pinned target scaffold"
+  ],
+  "release_gate": {
+    "status": "BLOCKED",
+    "reason": "The .ioc has not been generated, opened and regenerated with the locked CubeMX version"
+  }
+}

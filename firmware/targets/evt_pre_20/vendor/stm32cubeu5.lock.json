@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "stm32cubeu5": {
+    "repository": "https://github.com/STMicroelectronics/STM32CubeU5",
+    "release": "v1.9.0",
+    "tag_object": "cc4bc19d869b4cde166eb6e485d23cb41823339c",
+    "commit": "d88042df24f16799957c24f00c2b234c9e306188",
+    "tag_signature_status": "UNSIGNED_PINNED_BY_OBJECT_AND_COMMIT_SHA",
+    "release_date": "2026-06-03"
+  },
+  "cmsis_device_u5": {
+    "repository": "https://github.com/STMicroelectronics/cmsis-device-u5",
+    "submodule_path": "Drivers/CMSIS/Device/ST/STM32U5xx",
+    "commit": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8",
+    "license": "Apache-2.0"
+  },
+  "files": [
+    {
+      "source_path": "Source/Templates/gcc/startup_stm32u585xx.s",
+      "destination": "firmware/targets/evt_pre_20/vendor/cmsis_device_u5/startup_stm32u585xx.s",
+      "sha256": "4ae0cd22ada97562acab345fd37495c9129742ed01212402620e8054cdf8cda3"
+    },
+    {
+      "source_path": "Source/Templates/system_stm32u5xx.c",
+      "destination": "firmware/targets/evt_pre_20/vendor/cmsis_device_u5/system_stm32u5xx.c",
+      "sha256": "28d00434c85c76af756649577d6b2096f3810e2adb137203b5ebe4c33020622f"
+    },
+    {
+      "source_path": "LICENSE.md",
+      "destination": "firmware/targets/evt_pre_20/vendor/cmsis_device_u5/LICENSE.md",
+      "sha256": "fdb37bec600bb3784d8c5fffdddf225f9d4ee8cc225320a01394f5da01e7efc1"
+    }
+  ],
+  "official_linker_reference": {
+    "path": "Projects/B-U585I-IOT02A/Examples/GPIO/GPIO_IOToggle/STM32CubeIDE/STM32U585AIIXQ_FLASH.ld",
+    "sha256": "710216b0f0c98461e167a5e7acc0d26668102af8b8cd9aaaa042cd3be2454eb2"
+  }
+}
