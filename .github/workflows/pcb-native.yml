@@ -8,8 +8,7 @@ on:
       - "hardware/kicad/**"
       - "hardware/*FREEZE_REV_A.csv"
       - "tools/kicad_native_gate.py"
-      - "tools/generate_pcb_mic_native.py"
-      - "tools/run_pcb_mic_native_kicad9.py"
+      - "tools/generate_pcb_mic_clean_rev_a.py"
       - "tools/generate_pcb_mic_schematic.py"
       - "tools/inspect_pcb_mic_reference_cad.py"
       - ".github/workflows/pcb-native.yml"
@@ -59,7 +58,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p hardware/kicad/native/PCB-MIC
-          /usr/bin/python3 tools/run_pcb_mic_native_kicad9.py \
+          /usr/bin/python3 tools/generate_pcb_mic_clean_rev_a.py \
             --t5838-root artifacts/kicad-reference/PCB-MIC/t5838_ref.pretty \
             --molex-root artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.pretty \
             --reference-report artifacts/kicad-reference/PCB-MIC/reference_geometry_report.json \
