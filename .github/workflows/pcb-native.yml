@@ -7,12 +7,18 @@ on:
     paths:
       - "hardware/kicad/**"
       - "hardware/*FREEZE_REV_A.csv"
+      - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
+      - "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
+      - "hardware/PCB_PWR_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
+      - "hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md"
       - "hardware/POWER_DESIGN_BASELINE_REV_A.json"
       - "hardware/POWER_DESIGN_CALC_REV_A.md"
       - "mechanics/common/OPEN_DIMENSIONS.csv"
       - "tools/kicad_native_gate.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
+      - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
       - "tools/generate_pcb_mic_clean_rev_a.py"
       - "tools/run_pcb_mic_no_zonefill.py"
       - "tools/finalize_pcb_mic_mechanical_rev_a.py"
@@ -37,12 +43,13 @@ jobs:
           python-version: "3.12"
       - name: Engineering preflight
         run: python tools/kicad_native_gate.py
-      - name: Independent PCB-PWR design audits
+      - name: Independent PCB-PWR design and Review-A authority audits
         run: |
           python tools/audit_pcb_pwr_design_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/design_audit.json
           python tools/audit_pcb_pwr_preschematic_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/preschematic_audit.json
+          python tools/audit_pcb_pwr_capture_authority_rev_a.py
       - name: Install official KiCad 9 stable toolchain
         shell: bash
         run: |
@@ -151,4 +158,5 @@ jobs:
             hardware/kicad/native/PCB-MIC/sym-lib-table
             hardware/kicad/native/PCB-MIC/fp-lib-table
             hardware/kicad/native/PCB-MIC/libs/
+            hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md
           if-no-files-found: warn
