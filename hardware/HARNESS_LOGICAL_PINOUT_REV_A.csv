@@ -30,9 +30,11 @@ MAIN_PWR,J_PWR,4,GND_DIGITAL,RETURN,0V,MEDIUM,AWG18_0.75mm2_Molex430300038,Dedic
 MAIN_PWR,J_PWR,5,1V8_MIC,IN,1.8V,LOW,AWG18_0.75mm2_Molex430300038,Dedicated_return_pin_6,KEYED_LATCH,LOGICAL_FROZEN,Remain powered while T5838 AAD monitoring is armed; exact selected Micro-Fit power terminal
 MAIN_PWR,J_PWR,6,GND_MIC,RETURN,0V,LOW,AWG18_0.75mm2_Molex430300038,Dedicated_return_for_1V8,KEYED_LATCH,LOGICAL_FROZEN,Exact selected Micro-Fit power terminal
 MAIN_PWR,J_PWR,7,PWR_GOOD,IN,3.3V_logic,LOW,AWG20_to_24_Molex430300001,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,Control terminal 430300001; power-side output to MAIN
-MAIN_PWR,J_PWR,8,FAULT,IN,3.3V_logic,LOW,AWG20_to_24_Molex430300001,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,Control terminal 430300001; power-side output to MAIN
+MAIN_PWR,J_PWR,8,FAULT,IN,3.3V_logic,LOW,AWG20_to_24_Molex430300001,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,Control terminal 430300001; aggregate power-side fault/alert output to MAIN
 MAIN_PWR,J_PWR,9,EN_MODEM,OUT,3.3V_logic,LOW,AWG20_to_24_Molex430300001,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,Control terminal 430300001; default safe OFF
 MAIN_PWR,J_PWR,10,EN_AUX,OUT,3.3V_logic,LOW,AWG20_to_24_Molex430300001,Pair_with_logic_ground_if_needed,KEYED_LATCH,LOGICAL_FROZEN,Control terminal 430300001; controls auxiliary rails policy while AAD requires 1V8_MIC available
+MAIN_PWR,J_PWR,11,I2C2_SCL,BIDIR_OD,3.3V_logic,LOW,AWG20_to_24_Molex430300001,Route_with_GND_DIGITAL_keep_short,KEYED_LATCH,LOGICAL_FROZEN,100 kHz Rev.A power/sensor I2C; pull-ups are on PCB-MAIN; INA226 is on PCB-PWR
+MAIN_PWR,J_PWR,12,I2C2_SDA,BIDIR_OD,3.3V_logic,LOW,AWG20_to_24_Molex430300001,Route_with_GND_DIGITAL_keep_short,KEYED_LATCH,LOGICAL_FROZEN,100 kHz Rev.A power/sensor I2C; pull-ups are on PCB-MAIN; INA226 address 0x40
 SWD,J_SWD,1,VTREF,IN,3.3V,LOW,Fixture_pogo_or_AWG28,No_shield,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
 SWD,J_SWD,2,SWDIO,BIDIR,3.3V_logic,LOW,Fixture_pogo_or_AWG28,Short,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
 SWD,J_SWD,3,SWCLK,IN,3.3V_logic,LOW,Fixture_pogo_or_AWG28,Short,KEYED_OR_FIXTURE,LOGICAL_FROZEN,
