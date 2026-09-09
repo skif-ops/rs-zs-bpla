@@ -51,47 +51,45 @@ def main() -> None:
         row["Spares"] = str(spares)
         row["Procure_qty"] = str(qty * 20 + spares)
 
-    def update_existing(
-        item_id: str, *, manufacturer: str, mpn: str, package: str,
-        status: str, notes: str, refdes: str | None = None,
-        description: str | None = None, qty: int | None = None,
-        spares: int | None = None, value: str | None = None,
-    ) -> None:
+    def update_existing(item_id: str, *, manufacturer: str, mpn: str, package: str,
+                        status: str, notes: str, refdes: str | None = None,
+                        description: str | None = None, qty: int | None = None,
+                        spares: int | None = None, value: str | None = None) -> None:
         require(item_id in by_id, f"draft BOM item missing: {item_id}")
-        row = by_id[item_id]
-        row["Manufacturer"] = manufacturer
-        row["MPN"] = mpn
-        row["Package"] = package
-        row["Status"] = status
-        row["Notes"] = notes
+        r = by_id[item_id]
+        r["Manufacturer"] = manufacturer
+        r["MPN"] = mpn
+        r["Package"] = package
+        r["Status"] = status
+        r["Notes"] = notes
         if refdes is not None:
-            row["RefDes"] = refdes
+            r["RefDes"] = refdes
         if description is not None:
-            row["Description"] = description
+            r["Description"] = description
         if value is not None:
-            row["Value"] = value
+            r["Value"] = value
         if qty is not None:
-            set_quantities(row, qty, int(row["Spares"] if spares is None else spares))
+            set_quantities(r, qty, int(r["Spares"] if spares is None else spares))
 
     for item_id, ref in {
         "U1": "U1", "U2": "U2", "U3": "U3", "U4": "U4", "U7": "U7",
         "U8": "U8", "U9": "U9", "U10": "U10", "U11": "U11", "U13": "U13", "X1": "X1",
     }.items():
-        part = main_parts[ref]
+        p = main_parts[ref]
         update_existing(
             item_id,
-            manufacturer=part["Manufacturer"],
-            mpn=part["MPN"],
-            package=part["Package_or_Module"],
-            status=part["Status"],
-            notes=f"Rev.A freeze source MAIN_COMPONENT_FREEZE_REV_A.csv; blockers: {part['Release_Blockers']}",
+            manufacturer=p["Manufacturer"],
+            mpn=p["MPN"],
+            package=p["Package_or_Module"],
+            status=p["Status"],
+            notes=f"Rev.A freeze source MAIN_COMPONENT_FREEZE_REV_A.csv; blockers: {p['Release_Blockers']}",
         )
 
     require(main_parts["U14"]["MPN"] == main_parts["U15"]["MPN"], "SIM ESD MPNs differ")
-    part14 = main_parts["U14"]
+    p14 = main_parts["U14"]
     update_existing(
         "U14-U15",
-        manufacturer=part14["Manufacturer"], mpn=part14["MPN"], package=part14["Package_or_Module"],
+        manufacturer=p14["Manufacturer"], mpn=p14["MPN"], package=p14["Package_or_Module"],
         status="SELECTED_PENDING_SIM_REVIEW",
         notes="Two identical low-capacitance SIM ESD arrays; Rev.A freeze source MAIN_COMPONENT_FREEZE_REV_A.csv",
     )
@@ -106,12 +104,12 @@ def main() -> None:
         ("PWR-TVS-01", "PWR-TVS-01", "D1"),
         ("PWR-FUSE-01", "PWR-FUSE-01", "F1"),
     ):
-        part = power_parts[comp_id]
+        p = power_parts[comp_id]
         update_existing(
             item_id,
-            manufacturer=part["Manufacturer"], mpn=part["MPN"], package=part["Package"],
-            status=part["Status"], refdes=refdes,
-            notes=f"Rev.A freeze source POWER_COMPONENT_FREEZE_REV_A.csv; {part['Electrical_Baseline']}; blockers: {part['Release_Blockers']}",
+            manufacturer=p["Manufacturer"], mpn=p["MPN"], package=p["Package"], status=p["Status"],
+            refdes=refdes,
+            notes=f"Rev.A freeze source POWER_COMPONENT_FREEZE_REV_A.csv; {p['Electrical_Baseline']}; blockers: {p['Release_Blockers']}",
         )
 
     update_existing(
@@ -128,40 +126,33 @@ def main() -> None:
         package="Pico-Lock 1.50 mm 6-circuit right-angle SMT", status=mic["Status"],
         refdes="PCB-MIC:J1 x4", description="6-position microphone leaf board header",
         qty=4, spares=12,
-        notes=(
-            f"Mating housing {mic['Mating_Housing_MPN'].removeprefix('Molex_')}; "
-            f"terminal {mic['Terminal_MPN'].removeprefix('Molex_')}; "
-            "pinout 1V8/GND/CLK/DATA/WAKE/AAD_CFG(THSEL); -40..105 C"
-        ),
+        notes=(f"Mating housing {mic['Mating_Housing_MPN'].removeprefix('Molex_')}; "
+               f"terminal {mic['Terminal_MPN'].removeprefix('Molex_')}; "
+               "pinout 1V8/GND/CLK/DATA/WAKE/AAD_CFG(THSEL); -40..105 C"),
     )
 
     for item_id, cid in {"J-SIM1": "CON-SIM1", "J-SIM2": "CON-SIM2"}.items():
-        connector = connectors[cid]
+        c = connectors[cid]
         update_existing(
-            item_id, manufacturer="TE Connectivity", mpn=connector["Board_MPN"].removeprefix("TE_"),
-            package="Nano-SIM 4FF connector with DET", status=connector["Status"],
-            notes=f"Rev.A connector freeze; blockers: {connector['Release_Blockers']}",
+            item_id, manufacturer="TE Connectivity", mpn=c["Board_MPN"].removeprefix("TE_"),
+            package="Nano-SIM 4FF connector with DET", status=c["Status"],
+            notes=f"Rev.A connector freeze; blockers: {c['Release_Blockers']}",
         )
 
-    for item_id, cid in {
-        "J-RF-CELL": "CON-RF-CELL", "J-RF-GNSS": "CON-RF-GNSS", "J-RF-LORA": "CON-RF-LORA"
-    }.items():
-        connector = connectors[cid]
+    for item_id, cid in {"J-RF-CELL": "CON-RF-CELL", "J-RF-GNSS": "CON-RF-GNSS", "J-RF-LORA": "CON-RF-LORA"}.items():
+        c = connectors[cid]
         update_existing(
             item_id, manufacturer="Hirose", mpn="U.FL-R-SMT-1(60)", package="U.FL SMT receptacle",
-            status=connector["Status"],
-            notes=f"Rev.A connector freeze; exact coax assembly temperature/RF validation remains blocking: {connector['Release_Blockers']}",
+            status=c["Status"], notes=f"Rev.A connector freeze; exact coax assembly temperature/RF validation remains blocking: {c['Release_Blockers']}",
         )
 
-    def append_item(
-        *, item_id: str, assembly: str, refdes: str, category: str, description: str,
-        manufacturer: str, mpn: str, package: str, qty: int, spares: int,
-        status: str, notes: str, variant: str = "COMMON",
-        source_policy: str = "Authorized or traceable tier-1 channel",
-        incoming_control: str = "Marking MPN package orientation electrical functional sample",
-        value: str = "", line_class: str = "", population: str = "",
-        temperature: str = "", disposition: str = "",
-    ) -> None:
+    def append_item(*, item_id: str, assembly: str, refdes: str, category: str, description: str,
+                    manufacturer: str, mpn: str, package: str, qty: int, spares: int,
+                    status: str, notes: str, variant: str = "COMMON",
+                    source_policy: str = "Authorized or traceable tier-1 channel",
+                    incoming_control: str = "Marking MPN package orientation electrical functional sample",
+                    value: str = "", line_class: str = "", population: str = "",
+                    temperature: str = "", disposition: str = "") -> None:
         if item_id in by_id:
             return
         row = {field: "" for field in fields}
@@ -171,20 +162,22 @@ def main() -> None:
             "Value": value,
             "Qty_per_station": str(qty), "Qty_20": str(qty * 20), "Spares": str(spares),
             "Procure_qty": str(qty * 20 + spares), "Variant": variant, "Status": status,
-            "China_source_policy": source_policy, "Incoming_control": incoming_control,
-            "Notes": notes, "Line_class": line_class, "Population": population,
+            "China_source_policy": source_policy,
+            "Incoming_control": incoming_control,
+            "Notes": notes,
+            "Line_class": line_class, "Population": population,
             "Temperature_C": temperature, "BOM_disposition": disposition,
         })
         rows.append(row)
         by_id[item_id] = row
 
     for ref in ("U16", "U17", "U18"):
-        part = main_parts[ref]
+        p = main_parts[ref]
         append_item(
             item_id=ref, assembly="PCB-MAIN", refdes=ref, category="Logic",
-            description=part["Function"], manufacturer=part["Manufacturer"], mpn=part["MPN"],
-            package=part["Package_or_Module"], qty=1, spares=5, status=part["Status"],
-            notes=f"Rev.A MAIN freeze; blockers: {part['Release_Blockers']}",
+            description=p["Function"], manufacturer=p["Manufacturer"], mpn=p["MPN"],
+            package=p["Package_or_Module"], qty=1, spares=5, status=p["Status"],
+            notes=f"Rev.A MAIN freeze; blockers: {p['Release_Blockers']}",
         )
 
     for item_id, cid, assembly, refdes in (
@@ -193,25 +186,25 @@ def main() -> None:
         ("J-PWR-PWR", "CON-004A", "PCB-PWR", "J2"),
         ("J-PWR-MAIN", "CON-004B", "PCB-MAIN", "J_PWR"),
     ):
-        connector = connectors[cid]
-        manufacturer = "Molex" if connector["Board_MPN"].startswith("Molex_") else "GCT"
+        c = connectors[cid]
+        manufacturer = "Molex" if c["Board_MPN"].startswith("Molex_") else "GCT"
         kwargs = dict(
             manufacturer=manufacturer,
-            mpn=connector["Board_MPN"].split("_", 1)[1] if "_" in connector["Board_MPN"] else connector["Board_MPN"],
-            package=f"{connector['Positions']} positions", status=connector["Status"],
-            notes=f"Mating {connector['Mating_Housing_MPN']}; terminal {connector['Terminal_MPN']}; blockers: {connector['Release_Blockers']}",
+            mpn=c["Board_MPN"].split("_", 1)[1] if "_" in c["Board_MPN"] else c["Board_MPN"],
+            package=f"{c['Positions']} positions", status=c["Status"],
+            notes=f"Mating {c['Mating_Housing_MPN']}; terminal {c['Terminal_MPN']}; blockers: {c['Release_Blockers']}",
         )
         if item_id in by_id:
-            update_existing(
-                item_id, refdes=refdes, description=connector["Function"],
-                qty=1, spares=5, **kwargs,
-            )
+            update_existing(item_id, refdes=refdes, description=c["Function"], qty=1, spares=5, **kwargs)
         else:
             append_item(
                 item_id=item_id, assembly=assembly, refdes=refdes, category="Connector",
-                description=connector["Function"], qty=1, spares=5, **kwargs,
+                description=c["Function"], qty=1, spares=5, **kwargs,
             )
 
+    # One connector is fitted on each end of each of the four MIC harnesses. The old
+    # aggregate line counted only the leaf-board ends and under-reported board headers,
+    # housings and crimp terminals.
     append_item(
         item_id="J-MIC-MAIN", assembly="PCB-MAIN", refdes="J_MIC1;J_MIC2;J_MIC3;J_MIC4",
         category="Connector", description="Four 6-position microphone MAIN board headers",
@@ -220,8 +213,7 @@ def main() -> None:
         status=mic["Status"], notes="MAIN-side mates of four PCB-MIC harnesses; same header MPN and pin order as every leaf",
     )
     append_item(
-        item_id="H-MIC", assembly="HARNESS-MIC",
-        refdes="H_MIC1:A/B;H_MIC2:A/B;H_MIC3:A/B;H_MIC4:A/B",
+        item_id="H-MIC", assembly="HARNESS-MIC", refdes="H_MIC1:A/B;H_MIC2:A/B;H_MIC3:A/B;H_MIC4:A/B",
         category="Housing", description="Pico-Lock 6-position cable housings, two per MIC harness",
         manufacturer="Molex", mpn="5040510601", package="Pico-Lock 1.50 mm 6-circuit housing",
         qty=8, spares=16, status="SELECTED_PENDING_HARNESS_LENGTH_PULL_TEST",
@@ -256,6 +248,7 @@ def main() -> None:
         notes="Pins 7-12 x two cable ends; includes I2C2 SCL/SDA on pins 11/12",
     )
 
+    # PCB-MIC native schematic contains exactly C1 and R1 per leaf.
     update_existing(
         "C-MIC", manufacturer="TDK", mpn="CGA2B3X7R1E104K050BB",
         package="0402 1005 metric", status="SELECTED_PENDING_SAMPLE",
@@ -267,10 +260,13 @@ def main() -> None:
         item_id="R-MIC", assembly="PCB-MIC", refdes="PCB-MIC:R1 x4", category="Passive",
         description="0 ohm PDM DATA source-termination/tuning link", manufacturer="Panasonic Industry",
         mpn="ERJ-2GE0R00X", package="0402 1005 metric", qty=4, spares=40,
-        status="SELECTED_POPULATED_BASELINE_PENDING_SI", value="0 ohm",
-        notes="One populated R1 per PCB-MIC leaf; any DNP/value change requires SI review and BOM revision",
+        status="SELECTED_POPULATED_BASELINE_PENDING_SI",
+        notes="One populated R1 per PCB-MIC leaf; any DNP/value change requires SI review and BOM revision", value="0 ohm",
     )
 
+    # PCB-PWR schematic parts. Output banks retain the current C3/C5 bank symbols in
+    # the native schematic; physical reference expansion is explicitly blocked below
+    # until those bank symbols become individual native references.
     pwr_lines = [
         ("PWR-C-100N", "C1;C2;C4;C6", "100 nF 25 V X7R", "TDK", "CGA2B3X7R1E104K050BB", "0402", 4, "FITTED"),
         ("PWR-C-LDO", "C7;C8", "2.2 uF 10 V X7R", "TDK", "CGA3E1X7R1A225K080AC", "0603", 2, "FITTED"),
@@ -300,11 +296,9 @@ def main() -> None:
         else:
             spares = 40
         append_item(
-            item_id=item_id, assembly="PCB-PWR", refdes=refdes,
-            category="PCB feature" if item_id == "PWR-NET-TIE" else "Passive",
+            item_id=item_id, assembly="PCB-PWR", refdes=refdes, category="Passive" if not item_id.endswith("NET-TIE") else "PCB feature",
             description=f"PCB-PWR {value}", manufacturer=manufacturer, mpn=mpn, package=package,
-            qty=qty, spares=spares,
-            status="SELECTED_PENDING_NATIVE_FOOTPRINT_DERATING",
+            qty=qty, spares=spares, status="SELECTED_PENDING_NATIVE_FOOTPRINT_DERATING",
             notes="Exact candidate identity frozen for BOM control; native footprint, DC-bias/thermal margin and Review B remain blocking",
             value=value, population=population,
             line_class="PCB_FEATURE" if population == "PCB_FEATURE" else "ELECTRICAL_COMPONENT",
@@ -312,7 +306,7 @@ def main() -> None:
             disposition="CONTROLLED_PENDING_VERIFICATION" if selected else "CONTROLLED_DNP",
         )
 
-    full_text = "\n".join(",".join(row.get(field, "") for field in fields) for row in rows)
+    full_text = "\n".join(",".join(r.get(f, "") for f in fields) for r in rows)
     for forbidden in ("ESP32-C3", "JST_BM05B", "GHR-05V-S", "5040500591", "5040510501"):
         require(forbidden not in full_text, f"superseded token remains in generated BOM: {forbidden}")
     require(by_id["J-MIC"]["MPN"] == "5040500691", "generated 6-pin MIC connector MPN mismatch")
@@ -329,28 +323,30 @@ def main() -> None:
     for item_id, refdes in expected_refdes.items():
         require(by_id[item_id]["RefDes"] == refdes, f"{item_id} native PCB-PWR RefDes mismatch")
 
-    for row in rows:
-        qty = int(row["Qty_per_station"])
-        qty20 = int(row["Qty_20"])
-        spares = int(row["Spares"])
-        procure = int(row["Procure_qty"])
-        require(qty20 == qty * 20, f"{row['Item_ID']}: Qty_20 formula mismatch")
-        require(procure == qty20 + spares, f"{row['Item_ID']}: Procure_qty formula mismatch")
+    for r in rows:
+        qty = int(r["Qty_per_station"])
+        qty20 = int(r["Qty_20"])
+        spares = int(r["Spares"])
+        procure = int(r["Procure_qty"])
+        require(qty20 == qty * 20, f"{r['Item_ID']}: Qty_20 formula mismatch")
+        require(procure == qty20 + spares, f"{r['Item_ID']}: Procure_qty formula mismatch")
     require(by_id["J-MIC"]["Qty_per_station"] == "4", "leaf MIC header quantity mismatch")
     require(by_id["J-MIC-MAIN"]["Qty_per_station"] == "4", "MAIN MIC header quantity mismatch")
     require(by_id["H-MIC"]["Qty_per_station"] == "8", "MIC housing quantity must be 8 per station")
     require(by_id["T-MIC"]["Qty_per_station"] == "48", "MIC terminal quantity must be 48 per station")
 
-    main_temp = {part["MPN"]: part["Temperature_C"] for part in main_parts.values()}
-    power_temp = {part["MPN"]: part["Temperature_C"] for part in power_parts.values()}
+    main_temp = {p["MPN"]: p["Temperature_C"] for p in main_parts.values()}
+    power_temp = {p["MPN"]: p["Temperature_C"] for p in power_parts.values()}
     connector_temp = {
-        connector["Board_MPN"].split("_", 1)[-1]: connector["Temperature_C"]
-        for connector in connectors.values() if connector["Board_MPN"] not in ("", "TEST_PADS")
+        c["Board_MPN"].split("_", 1)[-1]: c["Temperature_C"]
+        for c in connectors.values() if c["Board_MPN"] not in ("", "TEST_PADS")
     }
     known_temp = {
         "WSK2512R0100FEA": "-65..170",
         "CGA2B3X7R1E104K050BB": "-55..125",
         "ERJ-2GE0R00X": "-55..155",
+        "MMICT5838-00-012": "-40..85",
+        "U.FL-R-SMT-1(60)": "-40..90",
         "5040510601": "-40..105",
         "5040520098": "-40..105",
         "43025-1200": "-40..105",
@@ -401,8 +397,8 @@ def main() -> None:
             row["BOM_disposition"] = "CONTROLLED"
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    with OUT.open("w", encoding="utf-8", newline="") as output:
-        writer = csv.DictWriter(output, fieldnames=fields, lineterminator="\n")
+    with OUT.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 

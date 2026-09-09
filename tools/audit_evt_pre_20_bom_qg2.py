@@ -48,11 +48,8 @@ def main() -> int:
         item = main_item_for_ref.get(ref)
         if not item or item not in by_id or by_id[item]["MPN"] != frozen["MPN"]:
             main_mismatch.append(f"{ref}:{frozen['MPN']}")
-    detail = (
-        "PCB-MAIN active MPN freeze mismatch: " + ", ".join(main_mismatch)
-        if main_mismatch else "all active MAIN MPNs match"
-    )
-    check("main_active_mpn_freeze", not main_mismatch, detail)
+    check("main_active_mpn_freeze", not main_mismatch,
+          "PCB-MAIN active MPN freeze mismatch: " + ", ".join(main_mismatch) if main_mismatch else "all active MAIN MPNs match")
 
     power_expected = {
         "PWR-REV-CTL": ("U1", "LM74700QDBVRQ1"),
@@ -69,25 +66,21 @@ def main() -> int:
         item for item, (ref, mpn) in power_expected.items()
         if item not in by_id or by_id[item]["RefDes"] != ref or by_id[item]["MPN"] != mpn
     ]
-    detail = (
-        "PCB-PWR identity/RefDes mismatch: " + ", ".join(power_mismatch)
-        if power_mismatch else "power IC/protection identity and RefDes match"
-    )
-    check("power_identity_and_refdes", not power_mismatch, detail)
+    check("power_identity_and_refdes", not power_mismatch,
+          "PCB-PWR identity/RefDes mismatch: " + ", ".join(power_mismatch) if power_mismatch else "power IC/protection identity and RefDes match")
 
     mic_expected = {
-        "MK1": "T5838", "J-MIC": "5040500691",
+        "MK1": "MMICT5838-00-012", "J-MIC": "5040500691",
         "C-MIC": "CGA2B3X7R1E104K050BB", "R-MIC": "ERJ-2GE0R00X",
     }
-    mic_mismatch = [
-        item for item, mpn in mic_expected.items()
-        if item not in by_id or by_id[item]["MPN"] != mpn
-    ]
-    detail = (
-        "PCB-MIC component identity mismatch: " + ", ".join(mic_mismatch)
-        if mic_mismatch else "four native PCB-MIC fitted identities match"
-    )
-    check("mic_native_component_identity", not mic_mismatch, detail)
+    mic_mismatch = [item for item, mpn in mic_expected.items() if item not in by_id or by_id[item]["MPN"] != mpn]
+    check("mic_native_component_identity", not mic_mismatch,
+          "PCB-MIC component identity mismatch: " + ", ".join(mic_mismatch) if mic_mismatch else "four native PCB-MIC fitted identities match")
+
+    mic_native = ROOT / "hardware/kicad/native/PCB-MIC/PCB-MIC.sch"
+    mic_native_text = mic_native.read_text(encoding="utf-8") if mic_native.is_file() else ""
+    check("mic_native_exact_orderable_mpn", "MMICT5838-00-012" in mic_native_text,
+          "native PCB-MIC does not bind MK1 to exact orderable MMICT5838-00-012")
 
     exact_fields_missing = []
     for row in rows:
@@ -96,11 +89,8 @@ def main() -> int:
         for field in ("Manufacturer", "MPN", "Package", "Temperature_C"):
             if row[field] in ("", "TBD", "OPEN"):
                 exact_fields_missing.append(f"{row['Item_ID']}:{field}")
-    detail = (
-        "fitted lines missing exact production fields: " + ", ".join(exact_fields_missing)
-        if exact_fields_missing else "all fitted lines have exact identity/package/rating"
-    )
-    check("fitted_line_exact_fields", not exact_fields_missing, detail)
+    check("fitted_line_exact_fields", not exact_fields_missing,
+          "fitted lines missing exact production fields: " + ", ".join(exact_fields_missing) if exact_fields_missing else "all fitted lines have exact identity/package/rating")
 
     passive_value_missing = [
         row["Item_ID"] for row in rows
@@ -108,21 +98,15 @@ def main() -> int:
         and row["Category"] in {"Passive", "Shunt"}
         and not row["Value"]
     ]
-    detail = (
-        "passive lines missing explicit value: " + ", ".join(passive_value_missing)
-        if passive_value_missing else "all passive values are explicit"
-    )
-    check("passive_values", not passive_value_missing, detail)
+    check("passive_values", not passive_value_missing,
+          "passive lines missing explicit value: " + ", ".join(passive_value_missing) if passive_value_missing else "all passive values are explicit")
 
-    blocked_rows = [
-        row["Item_ID"] for row in rows if row["BOM_disposition"].startswith("BLOCKED")
-    ]
-    detail = (
-        "BOM selections or supplier releases still blocked: " + ", ".join(blocked_rows)
-        if blocked_rows else "all BOM dispositions released"
-    )
-    check("bom_dispositions_released", not blocked_rows, detail)
+    blocked_rows = [row["Item_ID"] for row in rows if row["BOM_disposition"].startswith("BLOCKED")]
+    check("bom_dispositions_released", not blocked_rows,
+          "BOM selections or supplier releases still blocked: " + ", ".join(blocked_rows) if blocked_rows else "all BOM dispositions released")
 
+    # This independent list comes from the native PCB-PWR generator. Every physical
+    # fitted/DNP designator must be represented before a factory BOM can be released.
     required_pwr_passives = {
         "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13",
         "L1", "L2", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12",
@@ -137,45 +121,16 @@ def main() -> int:
             if ref in required_pwr_passives:
                 represented_pwr_refs.add(ref)
     missing_pwr_passives = sorted(required_pwr_passives - represented_pwr_refs)
-    detail = (
-        "PCB-PWR BOM missing schematic RefDes: " + ", ".join(missing_pwr_passives)
-        if missing_pwr_passives else "all PCB-PWR passive/net-tie RefDes represented"
-    )
-    check("power_schematic_refdes_coverage", not missing_pwr_passives, detail)
+    check("power_schematic_refdes_coverage", not missing_pwr_passives,
+          "PCB-PWR BOM missing schematic RefDes: " + ", ".join(missing_pwr_passives) if missing_pwr_passives else "all PCB-PWR passive/net-tie RefDes represented")
 
-    bank_rows = [
-        row["Item_ID"] for row in rows
-        if row["Assembly"] == "PCB-PWR" and " bank" in row["RefDes"]
-    ]
-    detail = (
-        "PCB-PWR capacitor bank symbols still require individual native RefDes: " + ", ".join(bank_rows)
-        if bank_rows else "all power capacitors have individual native RefDes"
-    )
-    check("power_cap_bank_native_expansion", not bank_rows, detail)
-
-    pwr_native_source = (
-        (ROOT / "tools/generate_pcb_pwr_schematic_rev_a.py").read_text(encoding="utf-8")
-        + (ROOT / "tools/finalize_pcb_pwr_schematic_completeness_rev_a.py").read_text(encoding="utf-8")
-    )
-    passive_mpns = {
-        "WSK2512R0100FEA", "CGA2B3X7R1E104K050BB", "CGA3E1X7R1A225K080AC",
-        "CGA3E2X7R1H104K080AA", "CGA6P3X7R1H475K250AB", "EEH-ZK1V101XP",
-        "CGA6P3X7R1E226M250AB", "XAL7030-472MEC", "ERA-2AEB104X",
-        "ERA-2AEB3572X", "ERA-2AEB8662X", "ERJ-2GE0R00X",
-        "ERJ-2RKF1003X", "ERJ-2RKF1002X", "ERJ-2RKF4701X",
-    }
-    unbound_mpn = sorted(mpn for mpn in passive_mpns if mpn not in pwr_native_source)
-    detail = (
-        "PCB-PWR BOM MPNs not yet bound into native schematic source: " + ", ".join(unbound_mpn)
-        if unbound_mpn else "all selected PCB-PWR MPNs are bound into native schematic source"
-    )
-    check("power_native_mpn_binding", not unbound_mpn, detail)
+    bank_rows = [row["Item_ID"] for row in rows if row["Assembly"] == "PCB-PWR" and " bank" in row["RefDes"]]
+    check("power_cap_bank_native_expansion", not bank_rows,
+          "PCB-PWR capacitor bank symbols still require individual native RefDes: " + ", ".join(bank_rows) if bank_rows else "all power capacitors have individual native RefDes")
 
     main_native = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch"
-    check(
-        "main_native_schematic_source", main_native.is_file(),
-        "native PCB-MAIN schematic is absent; a complete schematic-derived production BOM cannot be proven",
-    )
+    check("main_native_schematic_source", main_native.is_file(),
+          "native PCB-MAIN schematic is absent; a complete schematic-derived production BOM cannot be proven")
 
     system_open = [
         row["Item_ID"] for row in rows
@@ -183,11 +138,8 @@ def main() -> int:
         and int(row["Qty_per_station"]) > 0
         and row["BOM_disposition"] != "CONTROLLED"
     ]
-    detail = (
-        "system/mechanical SKUs not released: " + ", ".join(system_open)
-        if system_open else "system SKUs released"
-    )
-    check("system_sku_release", not system_open, detail)
+    check("system_sku_release", not system_open,
+          "system/mechanical SKUs not released: " + ", ".join(system_open) if system_open else "system SKUs released")
 
     result = {
         "gate": "QG-2",

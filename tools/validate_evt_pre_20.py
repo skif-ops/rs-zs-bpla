@@ -189,7 +189,7 @@ def validate_hardware_baseline() -> None:
     require(bom["U1"]["MPN"] == "STM32U585VIT6Q", "BOM MCU does not match baseline")
     require(bom["U11"]["MPN"] == "MDBT50Q-P1MV2", "BOM BLE module does not match locked nRF52840 module")
     require("nRF52840" in bom["U11"]["Package"], "BOM BLE module package does not identify nRF52840")
-    require(bom["MK1"]["MPN"] == "T5838", "BOM microphone does not match baseline")
+    require(bom["MK1"]["MPN"] == "MMICT5838-00-012", "BOM microphone does not match exact orderable baseline")
     require(bom["U-MON-01"]["MPN"] == "INA226AIDGSR", "BOM total battery monitor is not INA226AIDGSR")
     require(bom["J-PWR-MAIN"]["MPN"] == "43045-1202", "PCB-MAIN PWR connector is not 12-pin Micro-Fit")
     require(bom["J-PWR-PWR"]["MPN"] == "43045-1202", "PCB-PWR MAIN connector is not 12-pin Micro-Fit")

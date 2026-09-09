@@ -144,7 +144,7 @@ Required AAD tests before release:
 - NOR `W25Q512JVFIQ` on OCTOSPI1.
 - industrial microSD on 4-bit SDMMC1; SPI fallback is not part of Rev.A without revision approval.
 - LIS2DW12 orientation explicitly marked; INT to PC6.
-- STTS22H remains a WLCSP assembly-risk candidate.
+- `U4` is the exact orderable `STTS22HTR` in `UDFN-6L 2.0 x 2.0 mm`; the earlier `WLCSP-4` description is superseded.
 - INA226-class monitoring on I2C2 with shunt/range frozen by power calculation.
 - PC7 tamper input.
 - USB-C USB2 service: PA9/PA11/PA12, device-mode Rd, ESD and shield strategy.

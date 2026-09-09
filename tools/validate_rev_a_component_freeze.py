@@ -60,6 +60,7 @@ def main() -> None:
 
     expected_main = {
         "U1": "STM32U585VIT6Q",
+        "U4": "STTS22HTR",
         "U7": "SN74AXC8T245PWR",
         "U8": "BG95-M3",
         "U9": "MAX-M10S-00B",
@@ -78,6 +79,8 @@ def main() -> None:
         require(main_parts[ref]["MPN"] == mpn, f"{ref} MPN mismatch")
 
     require("nRF52840" in main_parts["U11"]["Package_or_Module"], "U11 is not identified as nRF52840")
+    require(main_parts["U4"]["Package_or_Module"] == "UDFN-6L_2x2mm", "U4 package is not exact STTS22H UDFN-6L")
+    require(main_parts["U4"]["Temperature_C"] == "-40..125", "U4 temperature range is not frozen")
     require("-40..85" in main_parts["U1"]["Temperature_C"], "exact STM32U585VIT6Q +85 C limit is not recorded")
     require("ENVIRONMENT" not in main_parts["U1"]["Status"], "resolved MCU environment blocker remains active")
     require("ENV" not in main_parts["U11"]["Status"], "resolved BLE environment blocker remains active")
