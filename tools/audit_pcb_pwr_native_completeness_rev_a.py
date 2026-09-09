@@ -85,7 +85,7 @@ def main() -> int:
     libs = {s.libId: s for s in sch.libSymbols}
     labels = labels_by_point(sch)
 
-    required = {"D1", *CAP_NETS, *TP_NETS, "#FLG01", "#FLG02"}
+    required = {"D1", *CAP_NETS, *TP_NETS, "#FLG01", "#FLG02", "#FLG03"}
     missing = sorted(required - set(refs))
     if missing:
         raise RuntimeError(f"PCB-PWR completeness refs missing: {missing}")
@@ -132,7 +132,11 @@ def main() -> int:
             raise RuntimeError(f"{ref}: expected {net}, got {pin_net(labels, inst, sym, '1')}")
 
     # ERC source flags are schematic-only and must never enter BOM/board placement.
-    for ref, net in {"#FLG01":"VBAT_SYS", "#FLG02":"GND_PWR"}.items():
+    for ref, net in {
+        "#FLG01":"VBAT_SYS",
+        "#FLG02":"GND_PWR",
+        "#FLG03":"3V3_DIGITAL",
+    }.items():
         inst = refs[ref]
         sym = libs[inst.libId]
         if str(sym.entryName) != "ERC_SOURCE_FLAG":

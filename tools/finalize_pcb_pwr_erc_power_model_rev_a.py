@@ -4,7 +4,9 @@
 This is an ERC-modeling layer only. It does not alter any reviewed electrical net:
 - physical connector power contacts are passive interconnect pins, not regulator outputs;
 - VBAT_SYS and GND_PWR receive explicit one-pin project-local ERC source symbols because
-  their source is external and reaches those nets through passive/protection/current-sense elements.
+  their source is external and reaches those nets through passive/protection/current-sense elements;
+- 3V3_DIGITAL receives an ERC source symbol because U4's switching output reaches the
+  regulated rail through L2, which intentionally separates SW_3V3 from 3V3_DIGITAL.
 
 Regulator and monitor power pins retain the meaningful types applied by
 finalize_pcb_pwr_symbol_types_rev_a.py.
@@ -45,6 +47,15 @@ def controlled_by_entry(sch):
     return {str(s.entryName): s for s in sch.libSymbols if s.libraryNickname == "DioneyaPWR"}
 
 
+def rename_symbol_tree(symbol, old_entry: str, new_entry: str) -> None:
+    """Keep KiCad unit/style child names consistent with a renamed symbol."""
+    for child in symbol.units:
+        child_name = str(child.entryName)
+        if child_name == old_entry or child_name.startswith(f"{old_entry}_"):
+            child.entryName = f"{new_entry}{child_name[len(old_entry):]}"
+        rename_symbol_tree(child, old_entry, new_entry)
+
+
 def load_erc_source(path: Path):
     lib = SymbolLib.from_file(str(path), encoding="utf-8")
     matches = [s for s in lib.symbols if str(s.entryName) == "Conn_01x01"]
@@ -52,6 +63,7 @@ def load_erc_source(path: Path):
         raise RuntimeError(f"expected one Conn_01x01 in {path}, found {len(matches)}")
     symbol = copy.deepcopy(matches[0])
     symbol.libraryNickname = "DioneyaPWR"
+    rename_symbol_tree(symbol, "Conn_01x01", "ERC_SOURCE_FLAG")
     symbol.entryName = "ERC_SOURCE_FLAG"
     pins = selected_pins(symbol)
     if set(pins) != {"1"}:
@@ -115,13 +127,14 @@ def main() -> int:
         j2pins[n].electricalType = "passive"
 
     refs = {next((p.value for p in s.properties if p.key == "Reference"), ""): s for s in sch.schematicSymbols}
-    if "#FLG01" in refs or "#FLG02" in refs:
+    if {"#FLG01", "#FLG02", "#FLG03"} & set(refs):
         raise RuntimeError("PCB-PWR ERC flags already exist before finalization")
 
     flag = load_erc_source(args.connector_symbols)
     sch.libSymbols.append(flag)
     make_flag(sch, flag, "#FLG01", "VBAT_SYS", 22.86, 73.66)
     make_flag(sch, flag, "#FLG02", "GND_PWR", 35.56, 73.66)
+    make_flag(sch, flag, "#FLG03", "3V3_DIGITAL", 48.26, 73.66)
 
     sch.to_file(str(args.schematic), encoding="utf-8")
     reread = Schematic.from_file(str(args.schematic), encoding="utf-8")
@@ -132,14 +145,14 @@ def main() -> int:
         raise RuntimeError("J2 power/return connector pins are not passive after round-trip")
 
     refs2 = {next((p.value for p in s.properties if p.key == "Reference"), ""): s for s in reread.schematicSymbols}
-    if not {"#FLG01", "#FLG02"}.issubset(refs2):
+    if not {"#FLG01", "#FLG02", "#FLG03"}.issubset(refs2):
         raise RuntimeError("ERC source flag instances lost on round-trip")
     flag_syms = [s for s in reread.libSymbols if s.libraryNickname == "DioneyaPWR" and str(s.entryName) == "ERC_SOURCE_FLAG"]
     if len(flag_syms) != 1 or str(selected_pins(flag_syms[0])["1"].electricalType) != "power_out":
         raise RuntimeError("project-local ERC source symbol invalid after round-trip")
 
     print("PCB-PWR ERC power-source model finalization PASS")
-    print("J1/J2 physical power contacts passive; project-local power_out flags on VBAT_SYS and GND_PWR")
+    print("J1/J2 physical power contacts passive; project-local power_out flags on VBAT_SYS, GND_PWR and 3V3_DIGITAL")
     return 0
 
 

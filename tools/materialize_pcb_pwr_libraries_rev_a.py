@@ -61,6 +61,17 @@ def write_tables(project_dir: Path) -> None:
     (project_dir / "fp-lib-table").write_text(fp, encoding="utf-8")
 
 
+def verify_unit_names(symbol) -> None:
+    root = str(symbol.entryName)
+    for child in symbol.units:
+        child_name = str(child.entryName)
+        if child_name != root and not child_name.startswith(f"{root}_"):
+            raise RuntimeError(
+                f"{root}: KiCad child symbol name {child_name!r} is inconsistent with renamed root"
+            )
+        verify_unit_names(child)
+
+
 def export_custom_symbols(schematic: Schematic, connector_lib: Path, output: Path) -> None:
     custom = [s for s in schematic.libSymbols if s.libraryNickname == "DioneyaPWR"]
     entries = [str(s.entryName) for s in custom]
@@ -75,6 +86,7 @@ def export_custom_symbols(schematic: Schematic, connector_lib: Path, output: Pat
     for symbol in custom:
         exported = copy.deepcopy(symbol)
         exported.libraryNickname = None
+        verify_unit_names(exported)
         combined.symbols.append(exported)
     combined.to_file(str(output), encoding="utf-8")
 

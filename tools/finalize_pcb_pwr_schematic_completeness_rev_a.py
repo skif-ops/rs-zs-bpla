@@ -51,6 +51,15 @@ def load_symbol(path: Path, entry: str, nickname: str):
     return symbol
 
 
+def rename_symbol_tree(symbol, old_entry: str, new_entry: str) -> None:
+    """Keep KiCad unit/style child names consistent with a renamed symbol."""
+    for child in symbol.units:
+        child_name = str(child.entryName)
+        if child_name == old_entry or child_name.startswith(f"{old_entry}_"):
+            child.entryName = f"{new_entry}{child_name[len(old_entry):]}"
+        rename_symbol_tree(child, old_entry, new_entry)
+
+
 def ref_of(inst) -> str:
     return next((p.value for p in inst.properties if p.key == "Reference"), "")
 
@@ -173,6 +182,7 @@ def main() -> int:
     # Explicit DFT access required by the PWR/I2C/Kelvin EVT plan. Footprint remains
     # blank until DFT pad geometry/fixture review; the schematic requirement is locked now.
     tp = load_symbol(args.connector_symbols, "Conn_01x01", "DioneyaPWR")
+    rename_symbol_tree(tp, "Conn_01x01", "TESTPOINT")
     tp.entryName = "TESTPOINT"
     tppins = selected_pins(tp)
     if set(tppins) != {"1"}:
