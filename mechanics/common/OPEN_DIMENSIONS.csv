@@ -12,6 +12,7 @@ DIM-010,Cable glands,thread cable OD and wrench clearance,mm,Selected IP gland M
 DIM-011,Service,USB-C dual SIM microSD SWD access,mm,Connector freeze and workflow,EE_ME,OPEN,Service cover
 DIM-012,Acoustics,membrane stack and compression,mm,Selected membrane plus acoustic test,ACOUSTICS,OPEN,Mic pods
 DIM-013,Mast,mount diameter and wind load,mm_N,Customer installation input,SYSTEM,OPEN,Mast clamps
-DIM-014,Environment,operating and storage temperature,C,Customer requirement,SYSTEM,OPEN,Material and sealing
+DIM-014,Environment,operating ambient temperature,C,"DEC-019: -40..+70 C",SYSTEM,CLOSED,Material component and thermal qualification
+DIM-014S,Environment,storage and transport temperature,C,Selected battery materials seals and transport requirement,SYSTEM,OPEN,Storage transport qualification
 DIM-015,Environment,UV salt fog chemical exposure,class,Customer site requirement,SYSTEM,OPEN,Material and coating
 DIM-016,Labels,serial region QR plate envelope,mm,Label technology and content,CM,OPEN,External surfaces
