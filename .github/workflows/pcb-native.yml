@@ -7,7 +7,10 @@ on:
     paths:
       - "hardware/kicad/**"
       - "hardware/*FREEZE_REV_A.csv"
+      - "hardware/POWER_DESIGN_BASELINE_REV_A.json"
+      - "hardware/POWER_DESIGN_CALC_REV_A.md"
       - "tools/kicad_native_gate.py"
+      - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/generate_pcb_mic_clean_rev_a.py"
       - "tools/run_pcb_mic_no_zonefill.py"
       - "tools/generate_pcb_mic_schematic.py"
@@ -28,6 +31,10 @@ jobs:
           python-version: "3.12"
       - name: Engineering preflight
         run: python tools/kicad_native_gate.py
+      - name: Independent PCB-PWR design audit
+        run: |
+          python tools/audit_pcb_pwr_design_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/design_audit.json
       - name: Install official KiCad 9 stable toolchain
         run: |
           sudo apt-get update
