@@ -1,8 +1,8 @@
 # ICD GSM/LTE - MQTT/TLS и HTTPS fallback v0.1
 
 Статус: `DRAFT / OPEN / NOT RUN`  
-Interface release: `1.4`  
-Detection schema: `3`
+Interface release: `1.5`  
+Detection schema: `4`
 
 ## 1. Сетевая модель
 
@@ -23,7 +23,7 @@ Client ID: `dioneya-{station_id}-{boot_id}`. Clean start запрещён пос
 
 | Key | Назначение |
 |---:|---|
-| 0 | `schema_ver`, сейчас 3 |
+| 0 | `schema_ver`, сейчас 4 |
 | 1 | message type, detection = 2 |
 | 2 | station_id |
 | 3 | seq_no |
@@ -33,13 +33,35 @@ Client ID: `dioneya-{station_id}-{boot_id}`. Clean start запрещён пос
 | 7 | GNSS/security flags |
 | 8 | position, GNSS, classification, detector profile, sample rate |
 | 9 | 43 float16 features, только full packet |
-| 10 | power and route status |
+| 10 | power and route status; INA226 extension described below |
 | 11 | DOA block, только full packet |
 | 12 | hierarchical classification |
 | 13 | single-station estimate |
 | 14 | 3+1 spatial block, `geometry_id=1` |
 
-P0 summary должен оставаться не более 220 bytes до LoRa framing. Full packet имеет release target не более 272 bytes, но gate закрывается только worst-case тестом в CI.
+### 3.1 Key 10 power/route sub-map
+
+Keys 0..8 remain compatible with schema 3:
+
+| Sub-key | Field | Presence |
+|---:|---|---|
+| 0 | battery_pct | summary + full |
+| 1 | battery_mv | summary + full; for Rev.A source shall be the measured/validated battery bus value when INA226 is healthy |
+| 2 | solar_mv | summary + full |
+| 3 | temperature_c10 | summary + full |
+| 4 | transport | summary + full |
+| 5 | hop_count | summary + full |
+| 6 | rssi_dbm | summary + full |
+| 7 | snr_db10 | summary + full |
+| 8 | gateway_id | summary + full |
+| 9 | battery_bus_mv | full only, INA226 |
+| 10 | battery_current_ma | full only, signed, INA226 |
+| 11 | battery_power_mw | full only, INA226 |
+| 12 | power_monitor_status | full only; 0 means valid, nonzero is firmware monitor/error bitmask |
+
+The INA226 extension is deliberately excluded from P0 summary so the LoRa worst-case limit is not increased. Current and power are delivered through LTE/full packet and shall also be included in the station heartbeat implementation.
+
+P0 summary должен оставаться не более 220 bytes до LoRa framing. Full packet size is monitored in CI and is not a LoRa payload contract.
 
 ## 4. TLS и идентификация
 
@@ -63,5 +85,4 @@ P0 summary должен оставаться не более 220 bytes до LoRa
 
 ## 7. Gate
 
-Требуются modem log, broker log, packet capture без секретов, 24 часа MQTT, потеря сети/питания, CGNAT, DNS failure, certificate failure, повторная доставка, 20 одновременных станций и store-and-forward recovery.
-
+Требуются modem log, broker log, packet capture без секретов, 24 часа MQTT, потеря сети/питания, CGNAT, DNS failure, certificate failure, повторная доставка, 20 одновременных станций и store-and-forward recovery. Для Rev.A дополнительно требуется проверка end-to-end декодирования INA226 voltage/current/power/status и отсутствие роста P0 summary выше 220 bytes.

@@ -27,8 +27,9 @@ static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_
   zs_cbor_t c;
   zs_cbor_init(&c, out, cap);
 
-  /* v1.4 P0 summary omits feature key 9 and redundant DOA key 11.
-     Direction is recoverable from spatial key 14 + geometry_id. */
+  /* v1.5/schema 4: P0 summary keeps the established compact power/route map
+     so the worst-case LoRa payload stays <=220 bytes. INA226 current/power/status
+     are additive full-packet fields only. */
   zs_cbor_map(&c, full ? 15 : 13);
   kvu(&c, 0, m->schema_ver);
   kvu(&c, 1, 2);
@@ -76,7 +77,7 @@ static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_
   }
 
   zs_cbor_uint(&c, 10);
-  zs_cbor_map(&c, 9);
+  zs_cbor_map(&c, full ? 13 : 9);
   kvu(&c, 0, m->power.battery_pct);
   kvu(&c, 1, m->power.battery_mv);
   kvu(&c, 2, m->power.solar_mv);
@@ -86,6 +87,12 @@ static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_
   kvi(&c, 6, m->route.rssi_dbm);
   kvi(&c, 7, m->route.snr_db10);
   kvu(&c, 8, m->route.gateway_id);
+  if (full) {
+    kvu(&c, 9, m->power.battery_bus_mv);
+    kvi(&c, 10, m->power.battery_current_ma);
+    kvu(&c, 11, m->power.battery_power_mw);
+    kvu(&c, 12, m->power.monitor_status);
+  }
 
   if (full) {
     zs_cbor_uint(&c, 11);

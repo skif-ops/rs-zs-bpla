@@ -10,7 +10,7 @@ int main(void) {
   zs_detection_t m;
   memset(&m, 0, sizeof(m));
 
-  m.schema_ver = 3u;
+  m.schema_ver = 4u;
   m.station_id = UINT32_MAX;
   m.seq_no = UINT32_MAX;
   m.boot_id = UINT32_MAX;
@@ -38,6 +38,10 @@ int main(void) {
   m.power.battery_mv = UINT16_MAX;
   m.power.solar_mv = UINT16_MAX;
   m.power.temperature_c10 = INT16_MIN;
+  m.power.battery_bus_mv = UINT16_MAX;
+  m.power.battery_current_ma = INT16_MIN;
+  m.power.battery_power_mw = UINT32_MAX;
+  m.power.monitor_status = UINT8_MAX;
   m.route.transport = ZS_ROUTE_LORA;
   m.route.hop_count = 15u;
   m.route.rssi_dbm = INT16_MIN;

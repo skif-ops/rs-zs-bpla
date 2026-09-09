@@ -6,7 +6,7 @@ int main(int argc, char **argv) {
   zs_detection_t m;
   memset(&m, 0, sizeof(m));
 
-  m.schema_ver = 3;
+  m.schema_ver = 4;
   m.station_id = 424242;
   m.seq_no = 7;
   m.boot_id = 9;
@@ -48,6 +48,10 @@ int main(int argc, char **argv) {
   m.power.battery_mv = 12750;
   m.power.solar_mv = 18200;
   m.power.temperature_c10 = -125;
+  m.power.battery_bus_mv = 12750;
+  m.power.battery_current_ma = 1000;
+  m.power.battery_power_mw = 12750;
+  m.power.monitor_status = 0;
   m.route.transport = ZS_ROUTE_LORA;
   m.route.hop_count = 3;
   m.route.rssi_dbm = -91;

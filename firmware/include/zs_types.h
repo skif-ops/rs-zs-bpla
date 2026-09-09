@@ -147,6 +147,10 @@ typedef struct {
   uint8_t battery_pct;
   uint16_t battery_mv, solar_mv;
   int16_t temperature_c10;
+  uint16_t battery_bus_mv;
+  int16_t battery_current_ma;
+  uint32_t battery_power_mw;
+  uint8_t monitor_status; /* 0 = valid INA226; nonzero = driver/status flags */
 } zs_power_t;
 
 typedef struct {
