@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""Apply the frozen EVT-PRE-20 Rev.A mechanical/release metadata to PCB-MIC.
+"""Apply the frozen EVT-PRE-20 Rev.A mechanical metadata to PCB-MIC.
 
 Electrical routing and component placement remain owned by the electrical generator.
-This stage owns the frozen leaf outline/thickness, mounting holes, board-finish metadata
-and board title block. It does not release the board for manufacture; Review A/B, DFM
-and acoustic validation remain mandatory.
+This stage owns the frozen leaf outline/thickness, mounting holes and board title block.
+Surface-finish metadata is intentionally NOT written through KiCad 9's deprecated SWIG
+stackup API: GetStackupDescriptor() is opaque on supported Linux builds. ENIG is carried
+by the versioned fabrication_metadata.json and independently asserted in the generated
+Gerber job by kicad_native_gate.py.
+
+This stage does not release the board for manufacture; Review A/B, DFM and acoustic
+validation remain mandatory.
 """
 from __future__ import annotations
 
@@ -16,7 +21,6 @@ import pcbnew
 BOARD_W_MM = 24.0
 BOARD_H_MM = 22.0
 BOARD_THICKNESS_MM = 1.0
-BOARD_FINISH = "ENIG"
 MOUNT_HOLE_MM = 2.2
 MOUNTS = (
     ("H1", 4.0, 16.65),
@@ -63,15 +67,9 @@ def add_mount_hole(board, reference: str, x: float, y: float) -> None:
     fp.Add(pad)
 
 
-def set_release_metadata(board) -> None:
+def set_mechanical_metadata(board) -> None:
     settings = board.GetDesignSettings()
     settings.SetBoardThickness(mm(BOARD_THICKNESS_MM))
-
-    stackup = settings.GetStackupDescriptor()
-    # Materialize a normal two-layer stackup so Gerber job metadata carries the
-    # intentional Rev.A finish instead of the KiCad default "None".
-    stackup.BuildDefaultStackupList(settings, settings.GetCopperLayerCount())
-    stackup.m_FinishType = BOARD_FINISH
 
     title = board.GetTitleBlock()
     title.SetTitle("Dioneya EVT-PRE-20 PCB-MIC")
@@ -95,7 +93,7 @@ def main() -> int:
         if ref in existing:
             raise RuntimeError(f"mounting reference {ref} already exists; refusing duplicate mechanical finalization")
 
-    set_release_metadata(board)
+    set_mechanical_metadata(board)
     for ref, x, y in MOUNTS:
         add_mount_hole(board, ref, x, y)
 
@@ -121,7 +119,8 @@ def main() -> int:
     pcbnew.SaveBoard(str(args.board), board)
     print(
         f"PCB-MIC finalization applied: {BOARD_W_MM:.1f}x{BOARD_H_MM:.1f}x{BOARD_THICKNESS_MM:.1f} mm; "
-        f"finish={BOARD_FINISH}; H1/H2 NPTH {MOUNT_HOLE_MM:.1f} mm; mounting refs excluded from BOM/PnP"
+        f"H1/H2 NPTH {MOUNT_HOLE_MM:.1f} mm; mounting refs excluded from BOM/PnP; "
+        "surface finish controlled by fabrication_metadata.json"
     )
     return 0
 
