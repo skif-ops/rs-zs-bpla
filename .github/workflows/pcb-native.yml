@@ -16,12 +16,14 @@ on:
       - "tools/generate_pcb_mic_clean_rev_a.py"
       - "tools/run_pcb_mic_no_zonefill.py"
       - "tools/finalize_pcb_mic_mechanical_rev_a.py"
+      - "tools/finalize_pcb_mic_molex_rev_a.py"
       - "tools/generate_pcb_mic_schematic.py"
       - "tools/inspect_pcb_mic_reference_cad.py"
       - "tools/materialize_pcb_mic_libraries.py"
       - "tools/export_pcb_mic_footprints.py"
       - "tools/audit_pcb_mic_native_geometry.py"
       - "tools/audit_pcb_mic_mechanical_rev_a.py"
+      - "tools/audit_pcb_mic_molex_rev_a.py"
       - ".github/workflows/pcb-native.yml"
 
 jobs:
@@ -100,6 +102,8 @@ jobs:
             --output hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
           /usr/bin/python3 tools/finalize_pcb_mic_mechanical_rev_a.py \
             --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          /usr/bin/python3 tools/finalize_pcb_mic_molex_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
           python tools/generate_pcb_mic_schematic.py \
             --t5838-symbol artifacts/kicad-reference/PCB-MIC/t5838_ref.kicad_sym \
             --molex-symbol artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.kicad_sym \
@@ -121,6 +125,10 @@ jobs:
       - name: Independent PCB-MIC native geometry audit
         run: |
           /usr/bin/python3 tools/audit_pcb_mic_native_geometry.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+      - name: Independent PCB-MIC Molex manufacturer-pattern audit
+        run: |
+          /usr/bin/python3 tools/audit_pcb_mic_molex_rev_a.py \
             --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
       - name: Independent PCB-MIC mechanical audit
         run: |
