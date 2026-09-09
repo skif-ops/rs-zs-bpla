@@ -1,18 +1,23 @@
 #!/usr/bin/env python3
 """Materialize project-local symbol libraries and links for PCB-MIC Rev.A.
 
-This script intentionally uses only kiutils and runs in the same Python environment as
-schematic generation. Footprint export is handled separately by the system-Python
-pcbnew tool. Keeping those environments separate avoids hidden dependency on the CI
-runner while preserving the two-control gate.
+The external Dioneya symbol library is rebuilt from the already materialized schematic
+library definitions, not from the raw reference CAD. This is required because the
+schematic generator intentionally corrects electrical pin types for ERC. A second
+structural comparison verifies that the exported library retains the same controlled
+pin types before KiCad CLI is allowed to run.
 """
 from __future__ import annotations
 
 import argparse
+import copy
 from pathlib import Path
 
 from kiutils.schematic import Schematic
 from kiutils.symbol import SymbolLib
+
+
+CUSTOM_ENTRIES = {"MMICT5838-00-012", "5040500691"}
 
 
 def write_tables(project_dir: Path) -> None:
@@ -33,15 +38,81 @@ def write_tables(project_dir: Path) -> None:
     (project_dir / "fp-lib-table").write_text(fp, encoding="utf-8")
 
 
-def merge_custom_symbols(t5838_path: Path, molex_path: Path, output: Path) -> None:
+def pin_signature(symbol) -> list[tuple[str, str, str, float, float]]:
+    """Return a stable recursive pin signature without importing generator helpers."""
+    result: list[tuple[str, str, str, float, float]] = []
+
+    def visit(node) -> None:
+        for pin in node.pins:
+            result.append((
+                str(pin.number),
+                str(pin.name),
+                str(pin.electricalType),
+                float(pin.position.X),
+                float(pin.position.Y),
+            ))
+        for child in node.units:
+            visit(child)
+
+    visit(symbol)
+    return sorted(result)
+
+
+def reference_entry_names(t5838_path: Path, molex_path: Path) -> set[str]:
+    """Use the independent reference files only to prove expected source identities exist."""
+    names: set[str] = set()
+    for path in (t5838_path, molex_path):
+        lib = SymbolLib.from_file(str(path), encoding="utf-8")
+        names.update(str(s.entryName) for s in lib.symbols)
+    return names
+
+
+def materialize_custom_symbols_from_schematic(
+    schematic_path: Path,
+    t5838_path: Path,
+    molex_path: Path,
+    output: Path,
+) -> None:
+    source_names = reference_entry_names(t5838_path, molex_path)
+    if not CUSTOM_ENTRIES.issubset(source_names):
+        raise RuntimeError(
+            f"reference CAD identities incomplete: expected {sorted(CUSTOM_ENTRIES)}, got {sorted(source_names)}"
+        )
+
+    sch = Schematic.from_file(str(schematic_path), encoding="utf-8")
+    embedded = {
+        str(s.entryName): s
+        for s in sch.libSymbols
+        if str(s.entryName) in CUSTOM_ENTRIES and s.libraryNickname == "Dioneya"
+    }
+    if set(embedded) != CUSTOM_ENTRIES:
+        raise RuntimeError(f"controlled embedded symbols incomplete: {sorted(embedded)}")
+
+    # Preserve a known-good symbol-library header/version from the T5838 reference,
+    # but replace its symbol payload entirely with the controlled embedded definitions.
     combined = SymbolLib.from_file(str(t5838_path), encoding="utf-8")
-    molex = SymbolLib.from_file(str(molex_path), encoding="utf-8")
-    names = {s.entryName for s in combined.symbols}
-    for symbol in molex.symbols:
-        if symbol.entryName not in names:
-            combined.symbols.append(symbol)
-            names.add(symbol.entryName)
+    combined.symbols = []
+    for name in sorted(CUSTOM_ENTRIES):
+        exported = copy.deepcopy(embedded[name])
+        # Library files contain entry names; the nickname is supplied by sym-lib-table.
+        exported.libraryNickname = None
+        combined.symbols.append(exported)
     combined.to_file(str(output), encoding="utf-8")
+
+    # Independent round-trip comparison. The library must reproduce every controlled
+    # pin number, name, electrical type and position from the schematic definition.
+    reread = SymbolLib.from_file(str(output), encoding="utf-8")
+    external = {str(s.entryName): s for s in reread.symbols if str(s.entryName) in CUSTOM_ENTRIES}
+    if set(external) != CUSTOM_ENTRIES:
+        raise RuntimeError(f"round-trip Dioneya library incomplete: {sorted(external)}")
+    for name in sorted(CUSTOM_ENTRIES):
+        embedded_sig = pin_signature(embedded[name])
+        external_sig = pin_signature(external[name])
+        if external_sig != embedded_sig:
+            raise RuntimeError(
+                f"Dioneya symbol mismatch before KiCad ERC for {name}: "
+                f"embedded={embedded_sig} external={external_sig}"
+            )
 
 
 def link_schematic_footprints(schematic_path: Path) -> None:
@@ -74,8 +145,13 @@ def main() -> int:
     libs = project_dir / "libs"
     libs.mkdir(parents=True, exist_ok=True)
 
-    merge_custom_symbols(args.t5838_symbol, args.molex_symbol, libs / "Dioneya.kicad_sym")
     link_schematic_footprints(args.schematic)
+    materialize_custom_symbols_from_schematic(
+        args.schematic,
+        args.t5838_symbol,
+        args.molex_symbol,
+        libs / "Dioneya.kicad_sym",
+    )
     write_tables(project_dir)
 
     required = [
@@ -101,6 +177,7 @@ def main() -> int:
 
     print("PCB-MIC project-local symbol library materialization PASS")
     print("custom links", custom_links)
+    print("controlled entries", sorted(CUSTOM_ENTRIES))
     for p in required:
         print(p)
     return 0
