@@ -57,6 +57,11 @@ def main() -> None:
             numbers["Procure_qty"] == numbers["Qty_20"] + numbers["Spares"],
             f"{item}: Procure_qty does not equal Qty_20 + Spares",
         )
+        if row["Population"] in {"DNP", "PCB_FEATURE"}:
+            require(
+                numbers["Spares"] == 0,
+                f"{item}: {row['Population']} line must not carry procurement spares",
+            )
 
     expected_pwr_refs = {
         "PWR-REV-CTL": "U1", "PWR-REV-FET": "Q1", "U-MON-01": "U2",
@@ -93,6 +98,7 @@ def main() -> None:
     )
     require(by_id["H-MIC"]["MPN"] == "5040510601", "MIC housing MPN mismatch")
     require(by_id["T-MIC"]["MPN"] == "5040520098", "MIC terminal MPN mismatch")
+    require(by_id["PWR-L"]["Spares"] == "10", "PCB-PWR inductor spare policy mismatch")
 
     serialized = "\n".join(",".join(row.values()) for row in rows)
     for forbidden in ("ESP32-C3", "JST_BM05B", "GHR-05V-S", "5040500591", "5040510501"):
