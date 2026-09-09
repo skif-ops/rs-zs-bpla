@@ -2,8 +2,8 @@
 """KiCad 9 compatibility entry point for PCB-MIC native generation.
 
 The base generator remains the single source for placement/routing. This shim replaces
-only the T5838 custom central land builder so KiCad 9 uses the current PAD::AddPrimitive
-API with explicit PCB_SHAPE circle primitives.
+only the T5838 custom central land builder so KiCad 9 bypasses the legacy AddPrimitive
+dispatch and calls AddPrimitiveCircle explicitly.
 
 Remove this shim after the helper is folded back into generate_pcb_mic_native.py and the
 same KiCad 9 DRC/Review evidence is retained.
@@ -15,18 +15,15 @@ import pcbnew
 import generate_pcb_mic_native as base
 
 
-def _add_circle_primitive(pad, storage_layer, radius_mm: float, width_mm: float) -> None:
-    shape = pcbnew.PCB_SHAPE(pad)
-    shape.SetShape(pcbnew.SHAPE_T_CIRCLE)
-    shape.SetStart(base.v(0.0, 0.0))
-    shape.SetEnd(base.v(radius_mm, 0.0))
-    shape.SetWidth(base.mm(width_mm))
-    shape.SetLayer(storage_layer)
-    pad.AddPrimitive(storage_layer, shape)
+def _add_circle_primitive(pad, radius_mm: float, width_mm: float) -> None:
+    # KiCad 9's Python compatibility wrapper for AddPrimitive(*args) incorrectly
+    # routes three-argument calls to AddPrimitiveSegment. Call the explicit circle
+    # primitive API so the TDK annulus is represented as an annulus, not a segment.
+    pad.AddPrimitiveCircle(base.v(0.0, 0.0), base.mm(radius_mm), base.mm(width_mm))
 
 
 def rebuild_t5838_manufacturer_land_kicad9(mic) -> None:
-    """Build TDK Figure 36/37 center land using the KiCad 9 custom-pad API."""
+    """Build TDK Figure 36/37 center land using the explicit KiCad circle API."""
     for pad in list(mic.Pads()):
         if str(pad.GetNumber()) in ("3", ""):
             mic.RemoveNative(pad)
@@ -43,13 +40,13 @@ def rebuild_t5838_manufacturer_land_kicad9(mic) -> None:
         ring.SetAnchorPadShape(pcbnew.F_Cu, pcbnew.PAD_SHAPE_CIRCLE)
     except TypeError:
         ring.SetAnchorPadShape(pcbnew.PAD_SHAPE_CIRCLE)
-    _add_circle_primitive(ring, pcbnew.F_Cu, 0.6625, 0.300)
+    _add_circle_primitive(ring, 0.6625, 0.300)
     mic.Add(ring)
 
     # Paste-only aperture: Figure 37, outer phi1.625 / inner phi1.125.
-    # KiCad derives the technical-layer aperture from the front padstack geometry,
-    # therefore the custom primitive is stored on F.Cu while the pad layer set is
-    # paste-only. There is intentionally no copper layer enabled on this pad.
+    # This pad intentionally has only F.Paste enabled. The custom primitive geometry
+    # itself is layer-independent in the legacy SWIG API and is emitted on enabled
+    # technical layers by the pad layer set.
     paste = pcbnew.PAD(mic)
     paste.SetNumber("")
     paste.SetShape(pcbnew.PAD_SHAPE_CUSTOM)
@@ -58,10 +55,10 @@ def rebuild_t5838_manufacturer_land_kicad9(mic) -> None:
     paste.SetSize(base.v(0.01, 0.01))
     base.set_rel(paste, -0.65, 0.0)
     try:
-        paste.SetAnchorPadShape(pcbnew.F_Cu, pcbnew.PAD_SHAPE_CIRCLE)
-    except TypeError:
         paste.SetAnchorPadShape(pcbnew.PAD_SHAPE_CIRCLE)
-    _add_circle_primitive(paste, pcbnew.F_Cu, 0.6875, 0.250)
+    except TypeError:
+        paste.SetAnchorPadShape(pcbnew.F_Cu, pcbnew.PAD_SHAPE_CIRCLE)
+    _add_circle_primitive(paste, 0.6875, 0.250)
     mic.Add(paste)
 
     # Acoustic opening: unplated 0.8 mm, inside TDK 0.5..1.0 mm recommendation.
