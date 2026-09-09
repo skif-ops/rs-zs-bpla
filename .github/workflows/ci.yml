@@ -30,6 +30,8 @@ jobs:
         run: python tools/verify_pcb_main_mcu_pin_authority_rev_a.py
       - name: Second independent PCB-MAIN storage and sensor control
         run: python tools/verify_pcb_main_storage_sensor_authority_rev_a.py
+      - name: Second independent PCB-MAIN audio and AAD logic control
+        run: python tools/verify_pcb_main_audio_logic_authority_rev_a.py
       - name: First-pass configuration and hardware baseline validation
         run: python tools/validate_evt_pre_20.py
       - name: Cross-check locked Rev.A clock policy
@@ -65,6 +67,7 @@ jobs:
             artifacts/pcb_main_capture_authority_rev_a.json
             artifacts/pcb_main_mcu_pin_authority_rev_a.json
             artifacts/pcb_main_storage_sensor_authority_rev_a.json
+            artifacts/pcb_main_audio_logic_authority_rev_a.json
             hardware/EVT_PRE_20_BOM_REV_A.csv
             hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json
             firmware/targets/evt_pre_20/target_contract_manifest.json

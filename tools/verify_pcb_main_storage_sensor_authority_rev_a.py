@@ -116,8 +116,8 @@ def main() -> None:
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     closed = {item["id"] for item in status["capture_readiness"]["closed_authorities"]}
     open_ids = {item["id"] for item in status["capture_readiness"]["open_authorities"]}
-    require(closed == {"MAIN-AUTH-001", "MAIN-AUTH-002"}, "closed authority set mismatch")
-    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(3, 12)}, "remaining authority set mismatch")
+    require(closed == {"MAIN-AUTH-001", "MAIN-AUTH-002", "MAIN-AUTH-003"}, "closed authority set mismatch")
+    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(4, 12)}, "remaining authority set mismatch")
     require(status["manufacturing_release"] is False, "manufacturing release asserted with open authorities")
 
     result = {
@@ -140,7 +140,7 @@ def main() -> None:
     print("PCB-MAIN U2/U3/U4 second independent control: PASS_DEVICE_AUTHORITY_ONLY")
     print("- 35 physical pins or pads and all OCTOSPI/I2C/interrupt endpoints verified")
     print("- I2C2 addresses 0x18, 0x3F and 0x40 are unique; pull-up ownership verified")
-    print("- production BOM remains BLOCKED by 9 open PCB-MAIN authorities")
+    print("- production BOM remains BLOCKED by 8 open PCB-MAIN authorities")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

@@ -39,7 +39,7 @@ The four `MIC_WAKEn` lines remain independent through their harnesses and are OR
 
 `AAD_CFG` is a shared 1.8 V one-wire fanout to all four T5838 THSEL pins. STM32 source is `PA15/pin77`, translated through a free MCU-to-1.8 V channel of U7 `SN74AXC8T245PWR`.
 
-Authoritative AAD design: `hardware/T5838_AAD_INTERFACE_REV_A.md` and `hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv`.
+Authoritative AAD design: `hardware/T5838_AAD_INTERFACE_REV_A.md`, `hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv`, `hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv`, and `hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md`.
 
 ## C. MIC connector — active Rev.A selection
 

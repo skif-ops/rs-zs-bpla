@@ -13,6 +13,8 @@
       "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md",
       "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv",
       "hardware/PCB_MAIN_STORAGE_SENSOR_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md",
       "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
       "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
       "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -78,18 +80,17 @@
           "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv",
           "hardware/PCB_MAIN_STORAGE_SENSOR_AUTHORITY_REV_A.md"
         ]
-      }
-    ],
-    "open_authorities": [
+      },
       {
         "id": "MAIN-AUTH-003",
         "scope": "U7, U17 and U18 microphone level-translation, AAD aggregation, safe-state and unused-channel pin maps",
-        "blocks": [
-          "native_schematic",
-          "review_a",
-          "production_bom"
+        "evidence": [
+          "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md"
         ]
-      },
+      }
+    ],
+    "open_authorities": [
       {
         "id": "MAIN-AUTH-004",
         "scope": "U8 BG95-M3 and U16 translator exact pads, open-drain controls, power sequencing and burst decoupling",

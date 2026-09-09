@@ -1,0 +1,45 @@
+RefDes,MPN,Package,Pin,Pin_Name,Direction,RevA_Net,Disposition,Required_Network,Authority,Notes
+U7,SN74AXC8T245PWR,TSSOP-24_PW,1,VCCA,POWER,1V8_MIC,SUPPLY_LOCKED,100 nF local bypass to GND,TI_SCES875C_RevC,Port A and all control thresholds track 1V8_MIC
+U7,SN74AXC8T245PWR,TSSOP-24_PW,2,DIR1,INPUT,1V8_MIC,STRAP_DIRECT_HIGH,Direct tie to 1V8_MIC,TI_SCES875C_RevC,DIR1 HIGH fixes channels 1 through 4 from A to B
+U7,SN74AXC8T245PWR,TSSOP-24_PW,3,A1,INPUT,PDM_DATA1_1V8,FUNCTION_LOCKED,Direct from J_MIC1 pin 4 with no external pull,TI_SCES875C_RevC_plus_TDK_DS-000383_v1.2,Logical harness net PDM_DATA1; T5838 DATA tri-states during the opposite PDM half-frame
+U7,SN74AXC8T245PWR,TSSOP-24_PW,4,A2,INPUT,PDM_DATA2_1V8,FUNCTION_LOCKED,Direct from J_MIC2 pin 4 with no external pull,TI_SCES875C_RevC_plus_TDK_DS-000383_v1.2,Logical harness net PDM_DATA2; T5838 DATA tri-states during the opposite PDM half-frame
+U7,SN74AXC8T245PWR,TSSOP-24_PW,5,A3,INPUT,PDM_DATA3_1V8,FUNCTION_LOCKED,Direct from J_MIC3 pin 4 with no external pull,TI_SCES875C_RevC_plus_TDK_DS-000383_v1.2,Logical harness net PDM_DATA3; T5838 DATA tri-states during the opposite PDM half-frame
+U7,SN74AXC8T245PWR,TSSOP-24_PW,6,A4,INPUT,PDM_DATA4_1V8,FUNCTION_LOCKED,Direct from J_MIC4 pin 4 with no external pull,TI_SCES875C_RevC_plus_TDK_DS-000383_v1.2,Logical harness net PDM_DATA4; T5838 DATA tri-states during the opposite PDM half-frame
+U7,SN74AXC8T245PWR,TSSOP-24_PW,7,A5,OUTPUT,PDM_CLK_1V8,FUNCTION_LOCKED,Common fanout through source-termination network to J_MIC1 through J_MIC4 pin 3,TI_SCES875C_RevC,Logical harness net PDM_CLK; exact passive RefDes and value are controlled by MAIN-AUTH-010 and final-harness SI
+U7,SN74AXC8T245PWR,TSSOP-24_PW,8,A6,OUTPUT,AAD_CFG_1V8,FUNCTION_LOCKED,Common fanout to J_MIC1 through J_MIC4 pin 6,TI_SCES875C_RevC_plus_TDK_DS-000383_v1.2,Logical harness net AAD_CFG; THSEL one-wire rise time and write timing remain Review A tests
+U7,SN74AXC8T245PWR,TSSOP-24_PW,9,A7,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,TI_SCES875C_RevC,Unused channel output for fixed B7-to-A7 direction
+U7,SN74AXC8T245PWR,TSSOP-24_PW,10,A8,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,TI_SCES875C_RevC,Unused channel output for fixed B8-to-A8 direction
+U7,SN74AXC8T245PWR,TSSOP-24_PW,11,DIR2,INPUT,GND,STRAP_DIRECT_LOW,Direct tie to GND,TI_SCES875C_RevC,DIR2 LOW fixes channels 5 through 8 from B to A
+U7,SN74AXC8T245PWR,TSSOP-24_PW,12,GND,POWER,GND,GROUND_LOCKED,Direct ground connection,TI_SCES875C_RevC,Ground pin 12
+U7,SN74AXC8T245PWR,TSSOP-24_PW,13,GND,POWER,GND,GROUND_LOCKED,Direct ground connection,TI_SCES875C_RevC,Ground pin 13
+U7,SN74AXC8T245PWR,TSSOP-24_PW,14,B8,INPUT,GND,UNUSED_INPUT_DIRECT_LOW,Direct tie to GND,TI_SCES875C_RevC,Defines unused input and A8 output low
+U7,SN74AXC8T245PWR,TSSOP-24_PW,15,B7,INPUT,GND,UNUSED_INPUT_DIRECT_LOW,Direct tie to GND,TI_SCES875C_RevC,Defines unused input and A7 output low
+U7,SN74AXC8T245PWR,TSSOP-24_PW,16,B6,INPUT,AAD_CFG,FUNCTION_LOCKED,Direct from STM32 PA15 pin 77,TI_SCES875C_RevC,AAD_CFG is held low outside one-wire writes
+U7,SN74AXC8T245PWR,TSSOP-24_PW,17,B5,INPUT,PDM_CLK,FUNCTION_LOCKED,Direct from STM32 PE9 pin 37,TI_SCES875C_RevC,PDM_CLK is held low in AAD A and AAD D2 monitoring
+U7,SN74AXC8T245PWR,TSSOP-24_PW,18,B4,OUTPUT,PDM_DATA4,FUNCTION_LOCKED,Direct to STM32 PE4 pin 3,TI_SCES875C_RevC,Translated PDM channel 4 at 3V3_DIGITAL domain
+U7,SN74AXC8T245PWR,TSSOP-24_PW,19,B3,OUTPUT,PDM_DATA3,FUNCTION_LOCKED,Direct to STM32 PE7 pin 35,TI_SCES875C_RevC,Translated PDM channel 3 at 3V3_DIGITAL domain
+U7,SN74AXC8T245PWR,TSSOP-24_PW,20,B2,OUTPUT,PDM_DATA2,FUNCTION_LOCKED,Direct to STM32 PD6 pin 87,TI_SCES875C_RevC,Translated PDM channel 2 at 3V3_DIGITAL domain
+U7,SN74AXC8T245PWR,TSSOP-24_PW,21,B1,OUTPUT,PDM_DATA1,FUNCTION_LOCKED,Direct to STM32 PB1 pin 33,TI_SCES875C_RevC,Translated PDM channel 1 at 3V3_DIGITAL domain
+U7,SN74AXC8T245PWR,TSSOP-24_PW,22,OE,INPUT,GND,STRAP_DIRECT_LOW,Direct tie to GND,TI_SCES875C_RevC,Always enabled when both rails are valid; VCC isolation and Ioff cover partial-power conditions; S0 current must be measured
+U7,SN74AXC8T245PWR,TSSOP-24_PW,23,VCCB,POWER,3V3_DIGITAL,SUPPLY_LOCKED,100 nF local bypass at pin 23 to GND,TI_SCES875C_RevC,Tie both VCCB pins to the same 3V3_DIGITAL rail
+U7,SN74AXC8T245PWR,TSSOP-24_PW,24,VCCB,POWER,3V3_DIGITAL,SUPPLY_LOCKED,100 nF local bypass at pin 24 to GND,TI_SCES875C_RevC,Tie both VCCB pins to the same 3V3_DIGITAL rail
+U17,SN74LVC32APWR,TSSOP-14_PW,1,1A,INPUT,MIC_WAKE1,FUNCTION_LOCKED,100 kOhm pull-down to GND and Review A test point,TI_SCAS286U_RevU_plus_TDK_DS-000383_v1.2,Pull-down defines inactive LOW if J_MIC1 is absent; T5838 WAKE is active-high push-pull
+U17,SN74LVC32APWR,TSSOP-14_PW,2,1B,INPUT,MIC_WAKE2,FUNCTION_LOCKED,100 kOhm pull-down to GND and Review A test point,TI_SCAS286U_RevU_plus_TDK_DS-000383_v1.2,Pull-down defines inactive LOW if J_MIC2 is absent; T5838 WAKE is active-high push-pull
+U17,SN74LVC32APWR,TSSOP-14_PW,3,1Y,OUTPUT,MIC_WAKE12_OR_1V8,FUNCTION_LOCKED,Direct to U17 pin 9,TI_SCAS286U_RevU,First-stage OR of MIC_WAKE1 and MIC_WAKE2
+U17,SN74LVC32APWR,TSSOP-14_PW,4,2A,INPUT,MIC_WAKE3,FUNCTION_LOCKED,100 kOhm pull-down to GND and Review A test point,TI_SCAS286U_RevU_plus_TDK_DS-000383_v1.2,Pull-down defines inactive LOW if J_MIC3 is absent; T5838 WAKE is active-high push-pull
+U17,SN74LVC32APWR,TSSOP-14_PW,5,2B,INPUT,MIC_WAKE4,FUNCTION_LOCKED,100 kOhm pull-down to GND and Review A test point,TI_SCAS286U_RevU_plus_TDK_DS-000383_v1.2,Pull-down defines inactive LOW if J_MIC4 is absent; T5838 WAKE is active-high push-pull
+U17,SN74LVC32APWR,TSSOP-14_PW,6,2Y,OUTPUT,MIC_WAKE34_OR_1V8,FUNCTION_LOCKED,Direct to U17 pin 10,TI_SCAS286U_RevU,First-stage OR of MIC_WAKE3 and MIC_WAKE4
+U17,SN74LVC32APWR,TSSOP-14_PW,7,GND,POWER,GND,GROUND_LOCKED,Direct ground connection,TI_SCAS286U_RevU,Ground
+U17,SN74LVC32APWR,TSSOP-14_PW,8,3Y,OUTPUT,MIC_WAKE_OR_1V8,FUNCTION_LOCKED,Direct to U18 pin 3 A,TI_SCAS286U_RevU,Second-stage aggregate OR output
+U17,SN74LVC32APWR,TSSOP-14_PW,9,3A,INPUT,MIC_WAKE12_OR_1V8,FUNCTION_LOCKED,Direct from U17 pin 3,TI_SCAS286U_RevU,First aggregate input
+U17,SN74LVC32APWR,TSSOP-14_PW,10,3B,INPUT,MIC_WAKE34_OR_1V8,FUNCTION_LOCKED,Direct from U17 pin 6,TI_SCAS286U_RevU,Second aggregate input
+U17,SN74LVC32APWR,TSSOP-14_PW,11,4Y,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,TI_SCAS286U_RevU,Unused fourth OR-gate output
+U17,SN74LVC32APWR,TSSOP-14_PW,12,4A,INPUT,GND,UNUSED_INPUT_DIRECT_LOW,Direct tie to GND,TI_SCAS286U_RevU,Unused gate input must not float
+U17,SN74LVC32APWR,TSSOP-14_PW,13,4B,INPUT,GND,UNUSED_INPUT_DIRECT_LOW,Direct tie to GND,TI_SCAS286U_RevU,Unused gate input must not float
+U17,SN74LVC32APWR,TSSOP-14_PW,14,VCC,POWER,1V8_MIC,SUPPLY_LOCKED,100 nF local bypass to GND,TI_SCAS286U_RevU,Shared rail with T5838 WAKE outputs and U18 port A
+U18,SN74AXC1T45DRLR,SOT-5X3-6_DRL,1,VCCA,POWER,1V8_MIC,SUPPLY_LOCKED,100 nF local bypass to GND,TI_SCES882E_RevE,Port A and DIR thresholds track 1V8_MIC
+U18,SN74AXC1T45DRLR,SOT-5X3-6_DRL,2,GND,POWER,GND,GROUND_LOCKED,Direct ground connection,TI_SCES882E_RevE,Ground
+U18,SN74AXC1T45DRLR,SOT-5X3-6_DRL,3,A,INPUT,MIC_WAKE_OR_1V8,FUNCTION_LOCKED,Direct from U17 pin 8 3Y,TI_SCES882E_RevE,Active-high aggregate wake input
+U18,SN74AXC1T45DRLR,SOT-5X3-6_DRL,4,B,OUTPUT,MIC_WAKE,FUNCTION_LOCKED,100 kOhm pull-down to GND at MCU-side net,TI_SCES882E_RevE,Drives STM32 PA8 pin 67; pull-down keeps PA8 inactive if U18 is high-Z
+U18,SN74AXC1T45DRLR,SOT-5X3-6_DRL,5,DIR,INPUT,1V8_MIC,STRAP_DIRECT_HIGH,Direct tie to 1V8_MIC,TI_SCES882E_RevE,DIR HIGH fixes translation from A at 1.8 V to B at 3.3 V
+U18,SN74AXC1T45DRLR,SOT-5X3-6_DRL,6,VCCB,POWER,3V3_DIGITAL,SUPPLY_LOCKED,100 nF local bypass to GND,TI_SCES882E_RevE,MCU-side supply; VCC isolation and Ioff prevent partial-power backfeed

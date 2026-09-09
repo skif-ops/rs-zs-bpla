@@ -10,6 +10,7 @@ Authoritative inputs:
 - `hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv`;
 - `hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv` and its independent review record;
+- `hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
 - `hardware/MAIN_COMPONENT_FREEZE_REV_A.csv`;
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`;
@@ -82,9 +83,13 @@ PDM:
 - independent `PDM_DATA1..4`;
 - `1V8_MIC` supply;
 - `U7` `SN74AXC8T245PWR` provides explicit 3.3 V / 1.8 V translation;
-- one direction group drives common PDM clock toward the microphones;
-- the opposite direction group receives four PDM data channels;
-- OE/DIR default states must isolate the microphone domain during partial power sequencing and AAD-only sleep.
+- U7 VCCA pin 1 is `1V8_MIC`; VCCB pins 23 and 24 are `3V3_DIGITAL`; GND pins 12 and 13 are grounded;
+- U7 DIR1 pin 2 is tied high to `1V8_MIC`, so A1..A4 pins 3..6 receive `PDM_DATA1_1V8`..`PDM_DATA4_1V8` and B1..B4 pins 21..18 drive the corresponding 3.3 V MCU nets;
+- U7 DIR2 pin 11 is tied low to GND, so B5 pin 17 receives `PDM_CLK` and A5 pin 7 drives `PDM_CLK_1V8`; B6 pin 16 receives `AAD_CFG` and A6 pin 8 drives `AAD_CFG_1V8`;
+- U7 unused B7/B8 inputs on pins 15/14 are tied directly to GND; unused A7/A8 outputs on pins 9/10 are NC;
+- U7 active-low OE pin 22 is tied directly to GND. The translator remains enabled whenever both rails are valid; MCU `PDM_CLK` and `AAD_CFG` are held low in S0;
+- U7 VCC isolation and Ioff cover fully unpowered-domain backfeed. Its maximum static current is included in the measured S0 budget;
+- no external pull-up or pull-down is allowed on `PDM_DATA1_1V8`..`PDM_DATA4_1V8`; final-harness PDM SI and source termination remain Review A measurements.
 
 AAD wake:
 - T5838 `WAKE` is preserved on every leaf; it is not tied off;
@@ -92,14 +97,17 @@ AAD wake:
 - J_MIC1..J_MIC4 physical order: 1=`1V8_MIC`, 2=`GND`, 3=`PDM_CLK`, 4=`PDM_DATAn`, 5=`MIC_WAKEn`, 6=`AAD_CFG`;
 - connector family: Molex Pico-Lock 1.50 mm; board header `5040500691`, cable housing `5040510601`, terminal `5040520098`;
 - `MIC_WAKE1..4` remain separate through the four harnesses;
-- `U17` `SN74LVC32APWR` is powered from 1.8 V; three internal OR gates form a four-input OR; unused fourth gate inputs are tied to defined states;
-- `U18` `SN74AXC1T45DRLR` translates the aggregate wake from 1.8 V to 3.3 V;
+- each `MIC_WAKEn` has a 100 kOhm pull-down to GND and an individual Review A test point before aggregation;
+- `U17` `SN74LVC32APWR` is powered from `1V8_MIC`; gate 1 forms `MIC_WAKE1 OR MIC_WAKE2`, gate 2 forms `MIC_WAKE3 OR MIC_WAKE4`, and gate 3 forms the final `MIC_WAKE_OR_1V8`;
+- U17 unused gate inputs pins 12 and 13 are tied directly to GND; unused output pin 11 is NC;
+- `U18` `SN74AXC1T45DRLR` has VCCA=`1V8_MIC`, VCCB=`3V3_DIGITAL`, and DIR tied to `1V8_MIC`; it translates `MIC_WAKE_OR_1V8` from A pin 3 to B pin 4;
 - U18 output is `MIC_WAKE` to STM32 PA8/pin 67;
+- `MIC_WAKE` has a 100 kOhm pull-down to GND at the MCU side so PA8 remains inactive when U18 is high impedance;
 - the wake path remains powered while AAD monitoring is armed;
-- the PDM translator may be disabled/high-Z during AAD-only S0.
+- exact physical pins and required networks are authoritative in `hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv`.
 
 T5838 leaf-local control:
-- `SELECT` is set by a resistor-option strap because each leaf has an independent data line; no runtime cable is allocated to SELECT;
+- `SELECT` is tied directly to GND on every leaf, fixing identical right-channel timing; each leaf has an independent data line and no runtime cable is allocated to SELECT;
 - `THSEL` is routed as `AAD_CFG` on J1 pin 6 and is driven through U7 from STM32 PA15;
 - all four identical leaves receive the shared `AAD_CFG` write; firmware must use one common validated AAD threshold profile;
 - local VDD decoupling is placed immediately at T5838;

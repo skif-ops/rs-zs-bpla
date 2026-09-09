@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 from pathlib import Path
 
@@ -25,6 +26,10 @@ MCU_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv"
 MCU_PIN_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md"
 STORAGE_SENSOR_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv"
 STORAGE_SENSOR_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_STORAGE_SENSOR_AUTHORITY_REV_A.md"
+AUDIO_LOGIC_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv"
+AUDIO_LOGIC_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md"
+AUDIO_INTERFACE_PATH = ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md"
+POWER_ARCHITECTURE_PATH = ROOT / "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
 
 EXPECTED_AUTHORITATIVE_INPUTS = {
     "config/EVT_PRE_20_BASELINE.yaml",
@@ -34,6 +39,8 @@ EXPECTED_AUTHORITATIVE_INPUTS = {
     "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md",
     "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_STORAGE_SENSOR_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -84,8 +91,8 @@ EXPECTED_SWD = {
     "4": "NRST",
     "5": "GND",
 }
-EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(3, 12)}
-EXPECTED_CLOSED_AUTHORITY_IDS = {"MAIN-AUTH-001", "MAIN-AUTH-002"}
+EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(4, 12)}
+EXPECTED_CLOSED_AUTHORITY_IDS = {"MAIN-AUTH-001", "MAIN-AUTH-002", "MAIN-AUTH-003"}
 EXPECTED_DEVICE_METADATA = {
     "U2": ("W25Q512JVFIQ", "SOIC-16_300mil_F"),
     "U3": ("LIS2DW12TR", "LGA-12_2x2mm"),
@@ -134,6 +141,64 @@ EXPECTED_DEVICE_PIN_MAP = {
         "EP": ("Exposed pad", "NC", "MECHANICAL_PAD_NO_NET"),
     },
 }
+EXPECTED_AUDIO_METADATA = {
+    "U7": ("SN74AXC8T245PWR", "TSSOP-24_PW"),
+    "U17": ("SN74LVC32APWR", "TSSOP-14_PW"),
+    "U18": ("SN74AXC1T45DRLR", "SOT-5X3-6_DRL"),
+}
+EXPECTED_AUDIO_PIN_MAP = {
+    "U7": {
+        "1": ("VCCA", "POWER", "1V8_MIC", "SUPPLY_LOCKED"),
+        "2": ("DIR1", "INPUT", "1V8_MIC", "STRAP_DIRECT_HIGH"),
+        "3": ("A1", "INPUT", "PDM_DATA1_1V8", "FUNCTION_LOCKED"),
+        "4": ("A2", "INPUT", "PDM_DATA2_1V8", "FUNCTION_LOCKED"),
+        "5": ("A3", "INPUT", "PDM_DATA3_1V8", "FUNCTION_LOCKED"),
+        "6": ("A4", "INPUT", "PDM_DATA4_1V8", "FUNCTION_LOCKED"),
+        "7": ("A5", "OUTPUT", "PDM_CLK_1V8", "FUNCTION_LOCKED"),
+        "8": ("A6", "OUTPUT", "AAD_CFG_1V8", "FUNCTION_LOCKED"),
+        "9": ("A7", "OUTPUT", "NC", "UNUSED_OUTPUT_NC"),
+        "10": ("A8", "OUTPUT", "NC", "UNUSED_OUTPUT_NC"),
+        "11": ("DIR2", "INPUT", "GND", "STRAP_DIRECT_LOW"),
+        "12": ("GND", "POWER", "GND", "GROUND_LOCKED"),
+        "13": ("GND", "POWER", "GND", "GROUND_LOCKED"),
+        "14": ("B8", "INPUT", "GND", "UNUSED_INPUT_DIRECT_LOW"),
+        "15": ("B7", "INPUT", "GND", "UNUSED_INPUT_DIRECT_LOW"),
+        "16": ("B6", "INPUT", "AAD_CFG", "FUNCTION_LOCKED"),
+        "17": ("B5", "INPUT", "PDM_CLK", "FUNCTION_LOCKED"),
+        "18": ("B4", "OUTPUT", "PDM_DATA4", "FUNCTION_LOCKED"),
+        "19": ("B3", "OUTPUT", "PDM_DATA3", "FUNCTION_LOCKED"),
+        "20": ("B2", "OUTPUT", "PDM_DATA2", "FUNCTION_LOCKED"),
+        "21": ("B1", "OUTPUT", "PDM_DATA1", "FUNCTION_LOCKED"),
+        "22": ("OE", "INPUT", "GND", "STRAP_DIRECT_LOW"),
+        "23": ("VCCB", "POWER", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        "24": ("VCCB", "POWER", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+    },
+    "U17": {
+        "1": ("1A", "INPUT", "MIC_WAKE1", "FUNCTION_LOCKED"),
+        "2": ("1B", "INPUT", "MIC_WAKE2", "FUNCTION_LOCKED"),
+        "3": ("1Y", "OUTPUT", "MIC_WAKE12_OR_1V8", "FUNCTION_LOCKED"),
+        "4": ("2A", "INPUT", "MIC_WAKE3", "FUNCTION_LOCKED"),
+        "5": ("2B", "INPUT", "MIC_WAKE4", "FUNCTION_LOCKED"),
+        "6": ("2Y", "OUTPUT", "MIC_WAKE34_OR_1V8", "FUNCTION_LOCKED"),
+        "7": ("GND", "POWER", "GND", "GROUND_LOCKED"),
+        "8": ("3Y", "OUTPUT", "MIC_WAKE_OR_1V8", "FUNCTION_LOCKED"),
+        "9": ("3A", "INPUT", "MIC_WAKE12_OR_1V8", "FUNCTION_LOCKED"),
+        "10": ("3B", "INPUT", "MIC_WAKE34_OR_1V8", "FUNCTION_LOCKED"),
+        "11": ("4Y", "OUTPUT", "NC", "UNUSED_OUTPUT_NC"),
+        "12": ("4A", "INPUT", "GND", "UNUSED_INPUT_DIRECT_LOW"),
+        "13": ("4B", "INPUT", "GND", "UNUSED_INPUT_DIRECT_LOW"),
+        "14": ("VCC", "POWER", "1V8_MIC", "SUPPLY_LOCKED"),
+    },
+    "U18": {
+        "1": ("VCCA", "POWER", "1V8_MIC", "SUPPLY_LOCKED"),
+        "2": ("GND", "POWER", "GND", "GROUND_LOCKED"),
+        "3": ("A", "INPUT", "MIC_WAKE_OR_1V8", "FUNCTION_LOCKED"),
+        "4": ("B", "OUTPUT", "MIC_WAKE", "FUNCTION_LOCKED"),
+        "5": ("DIR", "INPUT", "1V8_MIC", "STRAP_DIRECT_HIGH"),
+        "6": ("VCCB", "POWER", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+    },
+}
+
 EXPECTED_PACKAGE_PIN_NAMES = {
     index: name
     for index, name in enumerate(
@@ -524,6 +589,102 @@ def main() -> None:
     for marker in device_review_markers:
         require(marker in device_review, f"U2/U3/U4 authority review record missing marker: {marker}")
 
+    audio_rows = rows(AUDIO_LOGIC_PIN_AUTHORITY_PATH)
+    audio_columns = {
+        "RefDes", "MPN", "Package", "Pin", "Pin_Name", "Direction",
+        "RevA_Net", "Disposition", "Required_Network", "Authority", "Notes",
+    }
+    require(len(audio_rows) == 44, f"expected 44 U7/U17/U18 physical pins, got {len(audio_rows)}")
+    require(all(set(row) == audio_columns for row in audio_rows), "U7/U17/U18 pin-authority schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in audio_columns) for row in audio_rows),
+        "U7/U17/U18 pin-authority row contains an empty field",
+    )
+    audio_by_key: dict[tuple[str, str], dict[str, str]] = {}
+    for row in audio_rows:
+        key = (row["RefDes"], row["Pin"])
+        require(key not in audio_by_key, f"duplicate audio pin-authority row: {key[0]}.{key[1]}")
+        audio_by_key[key] = row
+    expected_audio_keys = {
+        (ref, pin)
+        for ref, pin_map in EXPECTED_AUDIO_PIN_MAP.items()
+        for pin in pin_map
+    }
+    require(set(audio_by_key) == expected_audio_keys, "U7/U17/U18 physical pin set drift")
+    for ref, expected_pin_map in EXPECTED_AUDIO_PIN_MAP.items():
+        expected_mpn, expected_package = EXPECTED_AUDIO_METADATA[ref]
+        for pin, expected in expected_pin_map.items():
+            row = audio_by_key[(ref, pin)]
+            require((row["MPN"], row["Package"]) == (expected_mpn, expected_package), f"{ref}.{pin} identity/package mismatch")
+            actual = (row["Pin_Name"], row["Direction"], row["RevA_Net"], row["Disposition"])
+            require(actual == expected, f"{ref}.{pin} pin/direction/net/disposition mismatch")
+
+    for index, a_pin, b_pin in ((1, "3", "21"), (2, "4", "20"), (3, "5", "19"), (4, "6", "18")):
+        require(audio_by_key[("U7", a_pin)]["RevA_Net"] == f"PDM_DATA{index}_1V8", f"U7 PDM data {index} A-port mismatch")
+        require(audio_by_key[("U7", b_pin)]["RevA_Net"] == f"PDM_DATA{index}", f"U7 PDM data {index} B-port mismatch")
+        require("no external pull" in audio_by_key[("U7", a_pin)]["Required_Network"], f"U7 PDM data {index} external-pull prohibition missing")
+    require(audio_by_key[("U7", "2")]["Required_Network"] == "Direct tie to 1V8_MIC", "U7 DIR1 strap mismatch")
+    require(audio_by_key[("U7", "11")]["Required_Network"] == "Direct tie to GND", "U7 DIR2 strap mismatch")
+    require(audio_by_key[("U7", "22")]["Required_Network"] == "Direct tie to GND", "U7 OE strap mismatch")
+    require({audio_by_key[("U7", pin)]["RevA_Net"] for pin in ("14", "15")} == {"GND"}, "U7 unused input state mismatch")
+    require({audio_by_key[("U7", pin)]["RevA_Net"] for pin in ("9", "10")} == {"NC"}, "U7 unused output state mismatch")
+    for ref, pin in (("U7", "1"), ("U7", "23"), ("U7", "24"), ("U17", "14"), ("U18", "1"), ("U18", "6")):
+        require("100 nF" in audio_by_key[(ref, pin)]["Required_Network"], f"{ref}.{pin} local bypass contract missing")
+
+    wake_inputs = {"1": "MIC_WAKE1", "2": "MIC_WAKE2", "4": "MIC_WAKE3", "5": "MIC_WAKE4"}
+    for pin, net in wake_inputs.items():
+        row = audio_by_key[("U17", pin)]
+        require(row["RevA_Net"] == net, f"U17 input {pin} wake-net mismatch")
+        require("100 kOhm pull-down" in row["Required_Network"] and "test point" in row["Required_Network"], f"U17 input {pin} safe-state/test-point network mismatch")
+    require(
+        audio_by_key[("U17", "3")]["RevA_Net"] == audio_by_key[("U17", "9")]["RevA_Net"] == "MIC_WAKE12_OR_1V8",
+        "U17 first pair OR interconnect mismatch",
+    )
+    require(
+        audio_by_key[("U17", "6")]["RevA_Net"] == audio_by_key[("U17", "10")]["RevA_Net"] == "MIC_WAKE34_OR_1V8",
+        "U17 second pair OR interconnect mismatch",
+    )
+    require(
+        audio_by_key[("U17", "8")]["RevA_Net"] == audio_by_key[("U18", "3")]["RevA_Net"] == "MIC_WAKE_OR_1V8",
+        "U17-to-U18 aggregate wake interconnect mismatch",
+    )
+    require({audio_by_key[("U17", pin)]["RevA_Net"] for pin in ("12", "13")} == {"GND"}, "U17 unused inputs are not grounded")
+    require(audio_by_key[("U17", "11")]["RevA_Net"] == "NC", "U17 unused output is not NC")
+    require(audio_by_key[("U18", "5")]["Required_Network"] == "Direct tie to 1V8_MIC", "U18 DIR strap mismatch")
+    require("100 kOhm pull-down" in audio_by_key[("U18", "4")]["Required_Network"], "U18 MCU-side wake pull-down missing")
+    require(
+        {audio_by_key[("U7", pin)]["RevA_Net"] for pin in ("16", "17", "18", "19", "20", "21")}
+        == {"AAD_CFG", "PDM_CLK", "PDM_DATA1", "PDM_DATA2", "PDM_DATA3", "PDM_DATA4"},
+        "U7 MCU-side endpoint set mismatch",
+    )
+    require(audio_by_key[("U18", "4")]["RevA_Net"] == "MIC_WAKE", "U18 MCU-side wake endpoint mismatch")
+
+    audio_review = AUDIO_LOGIC_REVIEW_PATH.read_text(encoding="utf-8")
+    authority_sha256 = hashlib.sha256(AUDIO_LOGIC_PIN_AUTHORITY_PATH.read_bytes()).hexdigest()
+    audio_review_markers = {
+        "AUDIO_LOGIC_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        authority_sha256,
+        "6cf4003c438c0546fb86f0932613896197dd19a75bdb307f385eb6e75535126e",
+        "807f6fff7977736035c2a3144d530be7ad737a163b2f0fd11002a45953b47230",
+        "41e03bd8f0740ae8bbdf92309e7c82bac1359a768556cbe68de41b0273e49f12",
+        "5befb710bfe7a415cdc1aba41ebc18b484d7f9fc320ce15a7481507531cf58a4",
+        "DIR1=HIGH",
+        "DIR2=LOW",
+        "OE=LOW",
+        "288 kOhm",
+        "No external pull-up or pull-down",
+        "100 kOhm pull-down",
+        "does not release native PCB-MAIN capture",
+    }
+    for marker in audio_review_markers:
+        require(marker in audio_review, f"U7/U17/U18 authority review record missing marker: {marker}")
+    audio_interface = AUDIO_INTERFACE_PATH.read_text(encoding="utf-8")
+    power_architecture = POWER_ARCHITECTURE_PATH.read_text(encoding="utf-8")
+    for marker in ("DIR1=HIGH", "DIR2=LOW", "OE=LOW", "44-pin", "no external pull-up or pull-down"):
+        require(marker in audio_interface, f"T5838 interface document missing frozen audio-logic marker: {marker}")
+    require("disabled/high-Z state" not in power_architecture, "power architecture still requires U7 disable in S0")
+    require("фиксированном `OE=LOW`" in power_architecture, "power architecture lacks frozen U7 S0 state")
+
     harness = rows(HARNESS_PATH)
     main_power = interface(harness, "MAIN_PWR")
     require(pin_contract(main_power) == EXPECTED_MAIN_POWER, "12-pin MAIN/PWR harness contract mismatch")
@@ -607,6 +768,14 @@ def main() -> None:
         },
         "MAIN-AUTH-002 evidence set mismatch",
     )
+    require(
+        closed_evidence["MAIN-AUTH-003"]
+        == {
+            "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-003 evidence set mismatch",
+    )
     require(closed_ids.isdisjoint(open_ids), "authority is both open and closed")
     require(open_ids == EXPECTED_OPEN_AUTHORITY_IDS, "PCB-MAIN open authority register drift")
     require(len(open_ids) == len(open_items), "duplicate PCB-MAIN open authority ID")
@@ -630,6 +799,7 @@ def main() -> None:
         "mcu_assignments_verified": len(pins),
         "mcu_package_pins_verified": len(authority_rows),
         "storage_sensor_pads_verified": len(device_rows),
+        "audio_logic_pins_verified": len(audio_rows),
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
@@ -643,6 +813,7 @@ def main() -> None:
     print("PCB-MAIN Rev.A pre-schematic authority audit: PASS_CAPTURE_INPUT_CONTROLLED")
     print(f"- all {len(authority_rows)} U1 package positions and {len(pins)} functional assignments verified")
     print(f"- all {len(device_rows)} U2/U3/U4 physical pins or pads and three unique I2C2 addresses verified")
+    print(f"- all {len(audio_rows)} U7/U17/U18 physical pins, dual-direction PDM translation and active-high AAD wake path verified")
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(f"- {len(open_items)} missing pad/mechanical authorities remain explicit production blockers")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")

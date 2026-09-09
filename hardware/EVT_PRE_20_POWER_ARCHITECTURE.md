@@ -38,7 +38,7 @@
 - STM32U585 в согласованном Stop mode с PA8 как wake-capable `MIC_WAKE` input;
 - четыре T5838 остаются на `1V8_MIC` в AAD mode;
 - PDM clock выключен после входа T5838 в AAD;
-- основной PDM translator `SN74AXC8T245` переводится в disabled/high-Z state;
+- U7 `SN74AXC8T245PWR` остаётся включённым при фиксированном `OE=LOW`; `PDM_CLK` и `AAD_CFG` удерживаются в LOW, поэтому микрофонный clock и THSEL transitions отсутствуют; его гарантированный worst-case static current входит в измеряемый S0 budget;
 - `MIC_WAKE1..4` объединяются на 1.8 V через `SN74LVC32APWR`, затем `SN74AXC1T45DRLR` переводит aggregate wake на PA8/3.3 V;
 - BG95, LoRa TX, SD high-power operations и BLE выключены/усыплены согласно state machine;
 - MAX-M10S duty/continuous-time mode определяется timing requirement и измеренным holdover budget.
