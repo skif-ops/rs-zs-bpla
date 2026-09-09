@@ -144,6 +144,7 @@
     "standby_s0_measurement",
     "ina226_reference_meter_calibration_test",
     "emc_emi_evidence",
+    "review_a",
     "review_b"
   ],
   "source_evidence": [
@@ -155,6 +156,7 @@
     "Quectel BG95 series compatible hardware design, BG95-M3 supply and peak-current table",
     "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md",
     "hardware/PCB_PWR_PIN_AUTHORITY_REV_A.csv",
-    "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
+    "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv",
+    "hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md"
   ]
 }
