@@ -26,9 +26,10 @@ The PCB-MIC DATA source-termination footprint `R1` is evaluated with:
 - 0 ohm baseline;
 - 22 ohm;
 - 33 ohm;
-- 47 ohm.
+- 47 ohm;
+- 50/49.9 ohm reference point, matching the TDK T5838 flexible evaluation-board architecture.
 
-Only one value may be frozen in the production BOM after evidence review. Do not choose a value solely from simulation.
+The TDK value is a reference datum, not an automatic production choice because our harness length, level translator, connector set, temperature range and EMC environment differ from the flex evaluation board. Only one value may be frozen in the production BOM after evidence review. Do not choose a value solely from simulation or by copying the reference board.
 
 ## 3. Environmental / aggressor conditions
 
@@ -126,4 +127,4 @@ Release evidence package must contain:
 - failure/deviation log;
 - signed Review A SI decision.
 
-`PCB-MIC` remains `NOT FOR MANUFACTURE` while this gate is open if the final mechanical harness exceeds the already validated configuration.
+`PCB-MIC` remains `NOT FOR_MANUFACTURE` while this gate is open if the final mechanical harness exceeds the already validated configuration.
