@@ -9,6 +9,7 @@ Authoritative inputs:
 - `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv`;
 - `hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv`;
 - `hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv` and its independent review record;
+- `hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
 - `hardware/MAIN_COMPONENT_FREEZE_REV_A.csv`;
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`;
@@ -154,9 +155,13 @@ Required AAD tests before release:
 ### 1.9 Storage, sensors, USB and DFT
 
 - NOR `W25Q512JVFIQ` on OCTOSPI1.
+- U2 uses the exact 16-pin SOIC package-F map: IO3/IO1/IO2/IO0 on pins 1/8/9/15, `/CS` on pin 7 with 10 kOhm pull-up, dedicated `/RESET` pin 3 tied high, and all seven N/C-DNU pins left unconnected.
+- U2 VCC has local 100 nF plus 1 uF decoupling; firmware uses 4-byte addressing for the full 512-Mbit array.
 - industrial microSD on 4-bit SDMMC1; SPI fallback is not part of Rev.A without revision approval.
-- LIS2DW12 orientation explicitly marked; INT to PC6.
+- LIS2DW12 is hard-strapped to I2C mode and address `0x18`; INT1 routes to PC6 `ACCEL_INT`, INT2 is NC, VDD has 100 nF plus 10 uF, and VDD_IO has 100 nF.
 - `U4` is the exact orderable `STTS22HTR` in `UDFN-6L 2.0 x 2.0 mm`; the earlier `WLCSP-4` description is superseded.
+- STTS22HTR is strapped to address `0x3F`; ALERT/INT is NC and VDD has 100 nF. Its unnumbered exposed pad has no electrical net and follows the ST land pattern.
+- I2C2 addresses are fixed as U3 `0x18`, U4 `0x3F`, and PCB-PWR INA226 `0x40`. The only populated pull-ups are 2.2 kOhm 1% on PCB-MAIN; initial speed is 100 kHz and final-harness rise time is a Review-A measurement.
 - INA226-class monitoring on I2C2 with shunt/range frozen by power calculation.
 - PC7 tamper input.
 - USB-C USB2 service: PA9/PA11/PA12, device-mode Rd, ESD and shield strategy.

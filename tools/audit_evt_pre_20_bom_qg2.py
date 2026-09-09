@@ -162,10 +162,12 @@ def main() -> int:
     main_native = ROOT / str(native_relative)
     native_text = main_native.read_text(encoding="utf-8", errors="replace") if main_native.is_file() else ""
     pin_rows = read(ROOT / "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv")
+    device_pin_rows = read(ROOT / "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv")
     required_native_tokens = {
         "(kicad_sch",
         *(row["MPN"] for row in main_freeze),
         *(row["RevA_Net"] for row in pin_rows if row["RevA_Net"] != "NC"),
+        *(row["RevA_Net"] for row in device_pin_rows if row["RevA_Net"] != "NC"),
     }
     native_tokens_missing = sorted(token for token in required_native_tokens if token not in native_text)
     native_ok = (

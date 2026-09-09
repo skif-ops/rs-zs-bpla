@@ -1,0 +1,36 @@
+RefDes,MPN,Package,Pin,Pin_Name,Direction,RevA_Net,Disposition,Required_Network,Authority,Notes
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,1,/HOLD or /RESET (IO3),BIDIR,NOR_IO3,FUNCTION_LOCKED,Direct OCTOSPI data connection,Winbond_W25Q512JV_RevB_IQ,IQ ordering option has factory default QE=1 and pin operates as IO3 in Quad mode
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,2,VCC,POWER,3V3_DIGITAL,SUPPLY_LOCKED,100 nF plus 1 uF local decoupling,Winbond_W25Q512JV_RevB,Place both capacitors adjacent to VCC and GND
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,3,/RESET,INPUT,3V3_DIGITAL,STRAP_DIRECT_HIGH,Direct tie to 3V3_DIGITAL,Winbond_W25Q512JV_RevB,Dedicated reset is unused; software reset remains available
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,4,N/C,NC,NC,DNU_NO_CONNECT,No copper except solder pad,Winbond_W25Q512JV_RevB,Manufacturer marks pin N/C and DNU
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,5,N/C,NC,NC,DNU_NO_CONNECT,No copper except solder pad,Winbond_W25Q512JV_RevB,Manufacturer marks pin N/C and DNU
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,6,N/C,NC,NC,DNU_NO_CONNECT,No copper except solder pad,Winbond_W25Q512JV_RevB,Manufacturer marks pin N/C and DNU
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,7,/CS,INPUT,NOR_NCS,FUNCTION_LOCKED,10 kOhm pull-up to 3V3_DIGITAL,Winbond_W25Q512JV_RevB,Pull-up keeps flash deselected while MCU pins are not driven
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,8,DO (IO1),BIDIR,NOR_IO1,FUNCTION_LOCKED,Direct OCTOSPI data connection,Winbond_W25Q512JV_RevB,Quad data bit 1
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,9,/WP (IO2),BIDIR,NOR_IO2,FUNCTION_LOCKED,Direct OCTOSPI data connection,Winbond_W25Q512JV_RevB_IQ,IQ ordering option has factory default QE=1 and pin operates as IO2 in Quad mode
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,10,GND,POWER,GND,GROUND_LOCKED,Direct ground connection,Winbond_W25Q512JV_RevB,Return for local VCC decoupling
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,11,N/C,NC,NC,DNU_NO_CONNECT,No copper except solder pad,Winbond_W25Q512JV_RevB,Manufacturer marks pin N/C and DNU
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,12,N/C,NC,NC,DNU_NO_CONNECT,No copper except solder pad,Winbond_W25Q512JV_RevB,Manufacturer marks pin N/C and DNU
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,13,N/C,NC,NC,DNU_NO_CONNECT,No copper except solder pad,Winbond_W25Q512JV_RevB,Manufacturer marks pin N/C and DNU
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,14,N/C,NC,NC,DNU_NO_CONNECT,No copper except solder pad,Winbond_W25Q512JV_RevB,Manufacturer marks pin N/C and DNU
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,15,DI (IO0),BIDIR,NOR_IO0,FUNCTION_LOCKED,Direct OCTOSPI data connection,Winbond_W25Q512JV_RevB,Quad data bit 0
+U2,W25Q512JVFIQ,SOIC-16_300mil_F,16,CLK,INPUT,NOR_CLK,FUNCTION_LOCKED,Direct OCTOSPI clock connection,Winbond_W25Q512JV_RevB,Source damping controlled by MAIN-AUTH-010 and layout validation
+U3,LIS2DW12TR,LGA-12_2x2mm,1,SCL/SPC,INPUT,I2C2_SCL,FUNCTION_LOCKED,Shared Rev.A I2C2 bus,ST_DS11811_Rev9,I2C clock at initial 100 kHz
+U3,LIS2DW12TR,LGA-12_2x2mm,2,CS,INPUT,3V3_DIGITAL,STRAP_DIRECT_HIGH,Direct tie to VDD_IO,ST_DS11811_Rev9,Selects I2C mode
+U3,LIS2DW12TR,LGA-12_2x2mm,3,SDO/SA0,INPUT,GND,STRAP_DIRECT_LOW,Direct tie to GND,ST_DS11811_Rev9,Fixes 7-bit I2C address at 0x18
+U3,LIS2DW12TR,LGA-12_2x2mm,4,SDA/SDI/SDO,BIDIR,I2C2_SDA,FUNCTION_LOCKED,Shared Rev.A I2C2 bus,ST_DS11811_Rev9,I2C data
+U3,LIS2DW12TR,LGA-12_2x2mm,5,NC,NC,NC,NO_CONNECT,No electrical connection,ST_DS11811_Rev9,Internally not connected
+U3,LIS2DW12TR,LGA-12_2x2mm,6,GND,POWER,GND,GROUND_LOCKED,Direct ground connection,ST_DS11811_Rev9,Ground
+U3,LIS2DW12TR,LGA-12_2x2mm,7,RES,INPUT,GND,RESERVED_DIRECT_LOW,Direct tie to GND,ST_DS11811_Rev9,Manufacturer requires connection to GND
+U3,LIS2DW12TR,LGA-12_2x2mm,8,GND,POWER,GND,GROUND_LOCKED,Direct ground connection,ST_DS11811_Rev9,Ground
+U3,LIS2DW12TR,LGA-12_2x2mm,9,VDD,POWER,3V3_DIGITAL,SUPPLY_LOCKED,100 nF plus 10 uF local decoupling,ST_DS11811_Rev9,Place capacitors near pin 9
+U3,LIS2DW12TR,LGA-12_2x2mm,10,VDD_IO,POWER,3V3_DIGITAL,SUPPLY_LOCKED,100 nF local decoupling,ST_DS11811_Rev9,All supplies and grounds present together in Rev.A
+U3,LIS2DW12TR,LGA-12_2x2mm,11,INT2,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,ST_DS11811_Rev9,Second interrupt output unused
+U3,LIS2DW12TR,LGA-12_2x2mm,12,INT1,OUTPUT,ACCEL_INT,FUNCTION_LOCKED,Direct connection to STM32 PC6,ST_DS11811_Rev9,Primary programmable accelerometer interrupt
+U4,STTS22HTR,UDFN-6L_2x2mm,1,SCL,INPUT,I2C2_SCL,FUNCTION_LOCKED,Shared Rev.A I2C2 bus,ST_DS12606_Rev8,I2C clock at initial 100 kHz
+U4,STTS22HTR,UDFN-6L_2x2mm,2,ALERT / INT,OUTPUT_OD,NC,UNUSED_OUTPUT_NC,No electrical connection,ST_DS12606_Rev8,Temperature is polled in Rev.A
+U4,STTS22HTR,UDFN-6L_2x2mm,3,VDD,POWER,3V3_DIGITAL,SUPPLY_LOCKED,100 nF local decoupling,ST_DS12606_Rev8,Place capacitor adjacent to VDD and GND
+U4,STTS22HTR,UDFN-6L_2x2mm,4,Addr,INPUT,GND,STRAP_DIRECT_LOW,Direct tie to GND,ST_DS12606_Rev8,Fixes 7-bit I2C address at 0x3F
+U4,STTS22HTR,UDFN-6L_2x2mm,5,GND,POWER,GND,GROUND_LOCKED,Direct ground connection,ST_DS12606_Rev8,Ground
+U4,STTS22HTR,UDFN-6L_2x2mm,6,SDA,BIDIR,I2C2_SDA,FUNCTION_LOCKED,Shared Rev.A I2C2 bus,ST_DS12606_Rev8,I2C data
+U4,STTS22HTR,UDFN-6L_2x2mm,EP,Exposed pad,MECHANICAL,NC,MECHANICAL_PAD_NO_NET,Solder per ST land pattern with no electrical net,ST_DS12606_Rev8,Unnumbered exposed pad improves thermal coupling; keep away from local heat sources

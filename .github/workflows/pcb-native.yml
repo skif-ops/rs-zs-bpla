@@ -11,6 +11,8 @@ on:
       - "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv"
       - "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_STORAGE_SENSOR_AUTHORITY_REV_A.md"
       - "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv"
       - "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
       - "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
@@ -23,6 +25,7 @@ on:
       - "tools/kicad_native_gate.py"
       - "tools/audit_pcb_main_capture_authority_rev_a.py"
       - "tools/verify_pcb_main_mcu_pin_authority_rev_a.py"
+      - "tools/verify_pcb_main_storage_sensor_authority_rev_a.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
@@ -65,6 +68,10 @@ jobs:
         run: |
           python tools/verify_pcb_main_mcu_pin_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/mcu_pin_authority_verification.json
+      - name: Second independent PCB-MAIN storage and sensor control
+        run: |
+          python tools/verify_pcb_main_storage_sensor_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/storage_sensor_authority_verification.json
       - name: Independent PCB-PWR design and Review-A authority audits
         run: |
           python tools/audit_pcb_pwr_design_rev_a.py \

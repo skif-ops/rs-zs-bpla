@@ -23,6 +23,8 @@ CONNECTOR_FREEZE_PATH = ROOT / "hardware/CONNECTOR_FREEZE_REV_A.csv"
 CAPTURE_SPEC_PATH = ROOT / "hardware/kicad/REV_A_CAPTURE_SPEC.md"
 MCU_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv"
 MCU_PIN_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md"
+STORAGE_SENSOR_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv"
+STORAGE_SENSOR_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_STORAGE_SENSOR_AUTHORITY_REV_A.md"
 
 EXPECTED_AUTHORITATIVE_INPUTS = {
     "config/EVT_PRE_20_BASELINE.yaml",
@@ -30,6 +32,8 @@ EXPECTED_AUTHORITATIVE_INPUTS = {
     "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
     "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_STORAGE_SENSOR_AUTHORITY_REV_A.md",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -80,8 +84,56 @@ EXPECTED_SWD = {
     "4": "NRST",
     "5": "GND",
 }
-EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(2, 12)}
-EXPECTED_CLOSED_AUTHORITY_IDS = {"MAIN-AUTH-001"}
+EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(3, 12)}
+EXPECTED_CLOSED_AUTHORITY_IDS = {"MAIN-AUTH-001", "MAIN-AUTH-002"}
+EXPECTED_DEVICE_METADATA = {
+    "U2": ("W25Q512JVFIQ", "SOIC-16_300mil_F"),
+    "U3": ("LIS2DW12TR", "LGA-12_2x2mm"),
+    "U4": ("STTS22HTR", "UDFN-6L_2x2mm"),
+}
+EXPECTED_DEVICE_PIN_MAP = {
+    "U2": {
+        "1": ("/HOLD or /RESET (IO3)", "NOR_IO3", "FUNCTION_LOCKED"),
+        "2": ("VCC", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        "3": ("/RESET", "3V3_DIGITAL", "STRAP_DIRECT_HIGH"),
+        "4": ("N/C", "NC", "DNU_NO_CONNECT"),
+        "5": ("N/C", "NC", "DNU_NO_CONNECT"),
+        "6": ("N/C", "NC", "DNU_NO_CONNECT"),
+        "7": ("/CS", "NOR_NCS", "FUNCTION_LOCKED"),
+        "8": ("DO (IO1)", "NOR_IO1", "FUNCTION_LOCKED"),
+        "9": ("/WP (IO2)", "NOR_IO2", "FUNCTION_LOCKED"),
+        "10": ("GND", "GND", "GROUND_LOCKED"),
+        "11": ("N/C", "NC", "DNU_NO_CONNECT"),
+        "12": ("N/C", "NC", "DNU_NO_CONNECT"),
+        "13": ("N/C", "NC", "DNU_NO_CONNECT"),
+        "14": ("N/C", "NC", "DNU_NO_CONNECT"),
+        "15": ("DI (IO0)", "NOR_IO0", "FUNCTION_LOCKED"),
+        "16": ("CLK", "NOR_CLK", "FUNCTION_LOCKED"),
+    },
+    "U3": {
+        "1": ("SCL/SPC", "I2C2_SCL", "FUNCTION_LOCKED"),
+        "2": ("CS", "3V3_DIGITAL", "STRAP_DIRECT_HIGH"),
+        "3": ("SDO/SA0", "GND", "STRAP_DIRECT_LOW"),
+        "4": ("SDA/SDI/SDO", "I2C2_SDA", "FUNCTION_LOCKED"),
+        "5": ("NC", "NC", "NO_CONNECT"),
+        "6": ("GND", "GND", "GROUND_LOCKED"),
+        "7": ("RES", "GND", "RESERVED_DIRECT_LOW"),
+        "8": ("GND", "GND", "GROUND_LOCKED"),
+        "9": ("VDD", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        "10": ("VDD_IO", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        "11": ("INT2", "NC", "UNUSED_OUTPUT_NC"),
+        "12": ("INT1", "ACCEL_INT", "FUNCTION_LOCKED"),
+    },
+    "U4": {
+        "1": ("SCL", "I2C2_SCL", "FUNCTION_LOCKED"),
+        "2": ("ALERT / INT", "NC", "UNUSED_OUTPUT_NC"),
+        "3": ("VDD", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        "4": ("Addr", "GND", "STRAP_DIRECT_LOW"),
+        "5": ("GND", "GND", "GROUND_LOCKED"),
+        "6": ("SDA", "I2C2_SDA", "FUNCTION_LOCKED"),
+        "EP": ("Exposed pad", "NC", "MECHANICAL_PAD_NO_NET"),
+    },
+}
 EXPECTED_PACKAGE_PIN_NAMES = {
     index: name
     for index, name in enumerate(
@@ -399,6 +451,79 @@ def main() -> None:
     for marker in review_markers:
         require(marker in pin_review, f"U1 pin-authority review record missing marker: {marker}")
 
+    device_rows = rows(STORAGE_SENSOR_PIN_AUTHORITY_PATH)
+    device_columns = {
+        "RefDes", "MPN", "Package", "Pin", "Pin_Name", "Direction",
+        "RevA_Net", "Disposition", "Required_Network", "Authority", "Notes",
+    }
+    require(len(device_rows) == 35, f"expected 35 U2/U3/U4 physical pin or pad rows, got {len(device_rows)}")
+    require(all(set(row) == device_columns for row in device_rows), "U2/U3/U4 pin-authority schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in device_columns) for row in device_rows),
+        "U2/U3/U4 pin-authority row contains an empty field",
+    )
+    device_by_key: dict[tuple[str, str], dict[str, str]] = {}
+    for row in device_rows:
+        key = (row["RefDes"], row["Pin"])
+        require(key not in device_by_key, f"duplicate device pin-authority row: {key[0]}.{key[1]}")
+        device_by_key[key] = row
+    expected_device_keys = {
+        (ref, pin)
+        for ref, pin_map in EXPECTED_DEVICE_PIN_MAP.items()
+        for pin in pin_map
+    }
+    require(set(device_by_key) == expected_device_keys, "U2/U3/U4 physical pin set drift")
+    for ref, expected_pin_map in EXPECTED_DEVICE_PIN_MAP.items():
+        expected_mpn, expected_package = EXPECTED_DEVICE_METADATA[ref]
+        for pin, expected in expected_pin_map.items():
+            row = device_by_key[(ref, pin)]
+            require((row["MPN"], row["Package"]) == (expected_mpn, expected_package), f"{ref}.{pin} identity/package mismatch")
+            require((row["Pin_Name"], row["RevA_Net"], row["Disposition"]) == expected, f"{ref}.{pin} pin/net/disposition mismatch")
+
+    required_nor_nets = {"NOR_CLK", "NOR_NCS", "NOR_IO0", "NOR_IO1", "NOR_IO2", "NOR_IO3"}
+    require(required_nor_nets.issubset(by_net), "MCU functional map lacks the complete U2 OCTOSPI bus")
+    require(
+        {row["RevA_Net"] for row in device_rows if row["RefDes"] == "U2"} - {"NC", "3V3_DIGITAL", "GND"}
+        == required_nor_nets,
+        "U2 OCTOSPI endpoint set mismatch",
+    )
+    require(device_by_key[("U2", "2")]["Required_Network"] == "100 nF plus 1 uF local decoupling", "U2 decoupling contract mismatch")
+    require("10 kOhm pull-up" in device_by_key[("U2", "7")]["Required_Network"], "U2 chip-select power-transition pull-up missing")
+    require(device_by_key[("U2", "3")]["Required_Network"] == "Direct tie to 3V3_DIGITAL", "U2 dedicated reset strap mismatch")
+
+    require({"I2C2_SCL", "I2C2_SDA", "ACCEL_INT"}.issubset(by_net), "MCU functional map lacks sensor endpoints")
+    require("0x18" in device_by_key[("U3", "3")]["Notes"], "U3 address 0x18 evidence missing")
+    require(device_by_key[("U3", "2")]["RevA_Net"] == "3V3_DIGITAL", "U3 is not hard-strapped to I2C mode")
+    require(device_by_key[("U3", "7")]["RevA_Net"] == "GND", "U3 reserved pin is not grounded")
+    require("100 nF plus 10 uF" in device_by_key[("U3", "9")]["Required_Network"], "U3 VDD decoupling mismatch")
+    require("100 nF" in device_by_key[("U3", "10")]["Required_Network"], "U3 VDD_IO decoupling mismatch")
+    require("0x3F" in device_by_key[("U4", "4")]["Notes"], "U4 address 0x3F evidence missing")
+    require("100 nF" in device_by_key[("U4", "3")]["Required_Network"], "U4 VDD decoupling mismatch")
+    require(device_by_key[("U4", "EP")]["RevA_Net"] == "NC", "U4 unnumbered exposed pad unexpectedly has an electrical net")
+    i2c_addresses = {"LIS2DW12": 0x18, "STTS22H": 0x3F, "INA226": 0x40}
+    require(len(i2c_addresses.values()) == len(set(i2c_addresses.values())), "Rev.A I2C2 address collision")
+
+    device_review = STORAGE_SENSOR_REVIEW_PATH.read_text(encoding="utf-8")
+    device_review_markers = {
+        "DEVICE_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        "a898962af314ca90719eadba732e7f5fd42a1c48c4bfd283062c403d1c27bfd0",
+        "5208623aa91c63a33be0e930518c20f5210c4eb76932350f35369687ae1d0dd5",
+        "3f6937595517c4f738021037942e7d19d5b7c84cfe4e9b7e8635fcc06ff783fe",
+        "factory default `QE=1`",
+        "4-byte addressing mode",
+        "0x18",
+        "0x3F",
+        "0x40",
+        "2.2 kOhm, 1%",
+        "0.746 us",
+        "1.32 mA",
+        "22 Ohm series-damping",
+        "Initial bus speed is 100 kHz",
+        "does not release the native PCB-MAIN schematic",
+    }
+    for marker in device_review_markers:
+        require(marker in device_review, f"U2/U3/U4 authority review record missing marker: {marker}")
+
     harness = rows(HARNESS_PATH)
     main_power = interface(harness, "MAIN_PWR")
     require(pin_contract(main_power) == EXPECTED_MAIN_POWER, "12-pin MAIN/PWR harness contract mismatch")
@@ -474,6 +599,14 @@ def main() -> None:
         },
         "MAIN-AUTH-001 evidence set mismatch",
     )
+    require(
+        closed_evidence["MAIN-AUTH-002"]
+        == {
+            "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_STORAGE_SENSOR_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-002 evidence set mismatch",
+    )
     require(closed_ids.isdisjoint(open_ids), "authority is both open and closed")
     require(open_ids == EXPECTED_OPEN_AUTHORITY_IDS, "PCB-MAIN open authority register drift")
     require(len(open_ids) == len(open_items), "duplicate PCB-MAIN open authority ID")
@@ -496,6 +629,7 @@ def main() -> None:
         "status": "PASS_CAPTURE_INPUT_CONTROLLED",
         "mcu_assignments_verified": len(pins),
         "mcu_package_pins_verified": len(authority_rows),
+        "storage_sensor_pads_verified": len(device_rows),
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
@@ -508,6 +642,7 @@ def main() -> None:
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print("PCB-MAIN Rev.A pre-schematic authority audit: PASS_CAPTURE_INPUT_CONTROLLED")
     print(f"- all {len(authority_rows)} U1 package positions and {len(pins)} functional assignments verified")
+    print(f"- all {len(device_rows)} U2/U3/U4 physical pins or pads and three unique I2C2 addresses verified")
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(f"- {len(open_items)} missing pad/mechanical authorities remain explicit production blockers")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
