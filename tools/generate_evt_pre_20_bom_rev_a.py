@@ -293,11 +293,17 @@ def main() -> None:
     ]
     for item_id, refdes, value, manufacturer, mpn, package, qty, population in pwr_lines:
         selected = population != "DNP"
+        if population in {"DNP", "PCB_FEATURE"}:
+            spares = 0
+        elif item_id == "PWR-L":
+            spares = 10
+        else:
+            spares = 40
         append_item(
             item_id=item_id, assembly="PCB-PWR", refdes=refdes,
             category="PCB feature" if item_id == "PWR-NET-TIE" else "Passive",
             description=f"PCB-PWR {value}", manufacturer=manufacturer, mpn=mpn, package=package,
-            qty=qty, spares=(40 if selected else 0),
+            qty=qty, spares=spares,
             status="SELECTED_PENDING_NATIVE_FOOTPRINT_DERATING",
             notes="Exact candidate identity frozen for BOM control; native footprint, DC-bias/thermal margin and Review B remain blocking",
             value=value, population=population,
