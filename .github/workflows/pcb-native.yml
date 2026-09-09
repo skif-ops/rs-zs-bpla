@@ -12,6 +12,8 @@ on:
       - "tools/run_pcb_mic_no_zonefill.py"
       - "tools/generate_pcb_mic_schematic.py"
       - "tools/inspect_pcb_mic_reference_cad.py"
+      - "tools/materialize_pcb_mic_libraries.py"
+      - "tools/export_pcb_mic_footprints.py"
       - ".github/workflows/pcb-native.yml"
 
 jobs:
@@ -68,11 +70,19 @@ jobs:
             --t5838-symbol artifacts/kicad-reference/PCB-MIC/t5838_ref.kicad_sym \
             --molex-symbol artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.kicad_sym \
             --output hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
+          /usr/bin/python3 tools/export_pcb_mic_footprints.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          python tools/materialize_pcb_mic_libraries.py \
+            --schematic hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch \
+            --t5838-symbol artifacts/kicad-reference/PCB-MIC/t5838_ref.kicad_sym \
+            --molex-symbol artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.kicad_sym
           echo '--- materialized native source set ---'
-          find hardware/kicad/native/PCB-MIC -maxdepth 1 -type f -print -exec file {} \; | sort
+          find hardware/kicad/native/PCB-MIC -maxdepth 3 -type f -print -exec file {} \; | sort
           test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
           test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
           test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
+          test -s hardware/kicad/native/PCB-MIC/sym-lib-table
+          test -s hardware/kicad/native/PCB-MIC/fp-lib-table
       - name: ERC DRC and fabrication export for every available board
         run: python tools/kicad_native_gate.py --run-cli
       - name: Upload native gate reference and generated source evidence
@@ -86,4 +96,7 @@ jobs:
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
+            hardware/kicad/native/PCB-MIC/sym-lib-table
+            hardware/kicad/native/PCB-MIC/fp-lib-table
+            hardware/kicad/native/PCB-MIC/libs/
           if-no-files-found: warn
