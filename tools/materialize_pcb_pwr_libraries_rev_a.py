@@ -25,6 +25,11 @@ UNRESOLVED_FOOTPRINT_REFS = {
     "J2",   # 43045-1202 land pattern/orientation pending mechanical review
 }
 
+BASE_CONTROLLED_ENTRIES = {
+    "Conn_01x02", "Conn_01x12", "Conn_01x06", "Conn_01x08",
+    "Conn_01x10", "Conn_01x09", "Conn_01x05", "Conn_01x04",
+}
+
 
 def ref_of(symbol) -> str:
     return next((p.value for p in symbol.properties if p.key == "Reference"), "")
@@ -58,8 +63,12 @@ def write_tables(project_dir: Path) -> None:
 
 def export_custom_symbols(schematic: Schematic, connector_lib: Path, output: Path) -> None:
     custom = [s for s in schematic.libSymbols if s.libraryNickname == "DioneyaPWR"]
-    if len(custom) != 8:
-        raise RuntimeError(f"expected 8 controlled DioneyaPWR embedded symbols, found {len(custom)}")
+    entries = [str(s.entryName) for s in custom]
+    if len(entries) != len(set(entries)):
+        raise RuntimeError(f"duplicate DioneyaPWR symbol entries: {entries}")
+    missing = BASE_CONTROLLED_ENTRIES - set(entries)
+    if missing:
+        raise RuntimeError(f"required controlled DioneyaPWR embedded symbols missing: {sorted(missing)}")
 
     combined = SymbolLib.from_file(str(connector_lib), encoding="utf-8")
     combined.symbols = []
@@ -70,7 +79,7 @@ def export_custom_symbols(schematic: Schematic, connector_lib: Path, output: Pat
     combined.to_file(str(output), encoding="utf-8")
 
     reread = SymbolLib.from_file(str(output), encoding="utf-8")
-    expected = sorted(str(s.entryName) for s in custom)
+    expected = sorted(entries)
     actual = sorted(str(s.entryName) for s in reread.symbols)
     if actual != expected:
         raise RuntimeError(f"DioneyaPWR local symbol library round-trip mismatch: {actual} != {expected}")
@@ -121,9 +130,10 @@ def main() -> int:
     if absent:
         raise RuntimeError(f"PCB-PWR local library materialization incomplete: {absent}")
 
+    count = len([s for s in reread.libSymbols if s.libraryNickname == "DioneyaPWR"])
     print("PCB-PWR project-local library materialization PASS")
     print("unresolved production footprints intentionally blank:", sorted(cleared))
-    print("controlled DioneyaPWR symbols:", len([s for s in reread.libSymbols if s.libraryNickname == 'DioneyaPWR']))
+    print("controlled DioneyaPWR symbols:", count)
     return 0
 
 
