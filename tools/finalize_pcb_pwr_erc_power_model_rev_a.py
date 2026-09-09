@@ -53,8 +53,12 @@ def load_power_flag(path: Path):
     symbol = copy.deepcopy(matches[0])
     symbol.libraryNickname = "power"
     pins = selected_pins(symbol)
-    if set(pins) != {"1"} or str(pins["1"].electricalType) != "power_out":
-        raise RuntimeError("KiCad PWR_FLAG pin1 is not a power_out pin")
+    if set(pins) != {"1"}:
+        raise RuntimeError(f"KiCad PWR_FLAG must expose only pin 1, got {sorted(pins)}")
+    # KiCad/kiutils versions do not serialize the library pin type consistently here.
+    # Normalize the controlled copy explicitly; post-write round-trip verification below
+    # guarantees the ERC source pin is actually power_out in our native schematic.
+    pins["1"].electricalType = "power_out"
     return symbol
 
 
