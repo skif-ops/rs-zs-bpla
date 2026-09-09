@@ -167,7 +167,7 @@ def build_t5838(board, center=(12.0, 16.0)):
 
     # Figure 36 GND land: outer phi1.625 / inner phi1.025 => radial 0.300 mm.
     # Create 32 ordinary SMD pads, all pin 3, attached to an already board-owned fp.
-    gx, gy = cx, cy + 0.65   # rotated center from source (-0.65,0)
+    gx, gy = cx, cy + 0.65
     ro, ri = 1.625/2.0, 1.025/2.0
     rm, radial = (ro+ri)/2.0, ro-ri
     segments = 32
@@ -201,7 +201,6 @@ def build_t5838(board, center=(12.0, 16.0)):
     print("MK1 acoustic NPTH added", flush=True)
 
     # Simple manufacturer body reference on F.Fab. Body 3.50 x 2.65 mm.
-    # Rotated Rev.A body envelope is 2.65 x 3.50 mm.
     x0,x1 = cx-2.65/2, cx+2.65/2
     y0,y1 = cy-3.50/2, cy+3.50/2
     for a,b in (((x0,y0),(x1,y0)),((x1,y0),(x1,y1)),((x1,y1),(x0,y1)),((x0,y1),(x0,y0))):
@@ -236,7 +235,6 @@ def main() -> int:
 
     j1=load_one(args.molex_root); j1.SetReference("J1"); j1.SetValue("5040500691")
     j1.SetOrientationDegrees(180.0); j1.SetPosition(v(12.0,5.0)); hide_fields(j1); board.Add(j1)
-    # Reference CAD numbers the two mechanical hold-down pads 7/8. They are not circuits.
     for p in list(j1.Pads()):
         if str(p.GetNumber()) in ("7","8"):
             p.SetNumber("")
@@ -268,11 +266,26 @@ def main() -> int:
     add_track(board,nets["1V8_MIC"],[vdd_in,(20.0,8.5),(20.0,11.6),vdd_local],width=0.40,layer=pcbnew.B_Cu)
     add_track(board,nets["1V8_MIC"],[vdd_local,cp1,mp["7"]],width=0.30)
 
+    # GND fanout is deliberately kept clear of the J1 PDM_CLK escape. The previous
+    # via at (14.25, 8.65) physically intersected the clock route and was caught by
+    # independent KiCad DRC. Rev.A moves the via above the connector and provides an
+    # explicit B.Cu return backbone so connectivity does not depend on an unfilled zone.
     gx,gy=12.0,16.65
-    gnd_j=(jp["2"][0],8.65); gnd_c=(15.25,cp2[1]); gnd_m=(15.0,gy)
+    gnd_j=(14.50,6.70); gnd_c=(15.25,cp2[1]); gnd_m=(15.0,gy)
     add_via(board,nets["GND"],gnd_j); add_via(board,nets["GND"],gnd_c); add_via(board,nets["GND"],gnd_m)
-    add_track(board,nets["GND"],[jp["2"],gnd_j],width=0.35); add_track(board,nets["GND"],[cp2,gnd_c],width=0.30)
-    add_track(board,nets["GND"],[(12.70,gy),gnd_m],width=0.30); add_track(board,nets["GND"],[mp["2"],(11.70,16.05)],width=0.16)
+    add_track(board,nets["GND"],[jp["2"],gnd_j],width=0.35)
+    add_track(board,nets["GND"],[cp2,gnd_c],width=0.30)
+    add_track(board,nets["GND"],[(12.70,gy),gnd_m],width=0.30)
+    add_track(board,nets["GND"],[mp["2"],(11.70,16.05)],width=0.16)
+
+    # Explicit B.Cu star/backbone is the first-control connectivity path. The B.Cu
+    # zone remains present for the final low-impedance reference plane and is checked
+    # separately by KiCad. This prevents a false PASS caused by assuming an unfilled
+    # zone electrically connects the three GND vias.
+    gnd_spine_x=9.0
+    add_track(board,nets["GND"],[gnd_j,(gnd_spine_x,6.70),(gnd_spine_x,16.65),gnd_m],width=0.50,layer=pcbnew.B_Cu)
+    add_track(board,nets["GND"],[(gnd_spine_x,cp2[1]),gnd_c],width=0.50,layer=pcbnew.B_Cu)
+    print("explicit B.Cu GND backbone added", flush=True)
 
     add_ground_zone(board,nets["GND"],bw,bh)
     print("before zone fill", flush=True)
