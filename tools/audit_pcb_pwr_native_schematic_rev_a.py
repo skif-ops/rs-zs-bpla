@@ -113,6 +113,23 @@ def main() -> int:
     u5 = instances["U5"]; u5sym = lib_by_id[u5.libId]
     require("EN_AUX" in labels.get(endpoint(u5,u5sym,"3"), set()), "U5 EN must be controlled by EN_AUX")
 
+    # Output capacitance is eight physical, individually referenced 1210 MLCCs.
+    cap_banks = {
+        "3V8_MODEM": ("C3", "C14", "C15", "C16"),
+        "3V3_DIGITAL": ("C5", "C17", "C18", "C19"),
+    }
+    for rail, cap_refs in cap_banks.items():
+        for ref in cap_refs:
+            require(ref in instances, f"native PCB-PWR missing physical output capacitor {ref}")
+            inst = instances[ref]
+            sym = lib_by_id[inst.libId]
+            value = next((p.value for p in inst.properties if p.key == "Value"), "")
+            footprint = next((p.value for p in inst.properties if p.key == "Footprint"), "")
+            require("CGA6P3X7R1E226M250AB" in value, f"{ref}: output capacitor MPN is not bound")
+            require(footprint == "Capacitor_SMD:C_1210_3225Metric", f"{ref}: 1210 footprint is not bound")
+            require(rail in labels.get(endpoint(inst, sym, "1"), set()), f"{ref}.1 is not on {rail}")
+            require("GND_PWR" in labels.get(endpoint(inst, sym, "2"), set()), f"{ref}.2 is not on GND_PWR")
+
     # Explicit ground-return net ties, never implicit plane aliases.
     ties = {
         "NT1": ("GND_MODEM", "GND_PWR"),

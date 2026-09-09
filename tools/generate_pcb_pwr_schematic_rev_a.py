@@ -191,8 +191,14 @@ def main() -> int:
                        footprint="DioneyaPWR:LMR60440_RAK9", datasheet="TI LMR60440 SNAS877", x=55.88, y=101.60)
     L1 = make_instance(sch, inductor, reference="L1", value="4.7uH >=6A MPN_TBD",
                        footprint="DioneyaPWR:L_PWR_TBD", datasheet="~", x=81.28, y=96.52)
-    C3 = make_instance(sch, capacitor, reference="C3", value=">=54uF effective 3V8 bank",
-                       footprint="DioneyaPWR:COUT_BANK_TBD", datasheet="~", x=96.52, y=111.76)
+    C3 = make_instance(sch, capacitor, reference="C3", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
+                       footprint="Capacitor_SMD:C_1210_3225Metric", datasheet="TDK CGA6P3X7R1E226M250AB", x=91.44, y=111.76)
+    C14 = make_instance(sch, capacitor, reference="C14", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
+                        footprint="Capacitor_SMD:C_1210_3225Metric", datasheet="TDK CGA6P3X7R1E226M250AB", x=96.52, y=111.76)
+    C15 = make_instance(sch, capacitor, reference="C15", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
+                        footprint="Capacitor_SMD:C_1210_3225Metric", datasheet="TDK CGA6P3X7R1E226M250AB", x=101.60, y=111.76)
+    C16 = make_instance(sch, capacitor, reference="C16", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
+                        footprint="Capacitor_SMD:C_1210_3225Metric", datasheet="TDK CGA6P3X7R1E226M250AB", x=106.68, y=111.76)
     C4 = make_instance(sch, capacitor, reference="C4", value="100nF BOOT_3V8",
                        footprint="Capacitor_SMD:C_0402_1005Metric", datasheet="~", x=68.58, y=83.82)
     R1 = make_instance(sch, resistor, reference="R1", value="100k 0.1% RFBT",
@@ -212,8 +218,14 @@ def main() -> int:
                        footprint="DioneyaPWR:LMR60440_RAK9", datasheet="TI LMR60440 SNAS877", x=121.92, y=101.60)
     L2 = make_instance(sch, inductor, reference="L2", value="4.7uH >=6A MPN_TBD",
                        footprint="DioneyaPWR:L_PWR_TBD", datasheet="~", x=147.32, y=96.52)
-    C5 = make_instance(sch, capacitor, reference="C5", value=">=54uF effective 3V3 bank",
-                       footprint="DioneyaPWR:COUT_BANK_TBD", datasheet="~", x=162.56, y=111.76)
+    C5 = make_instance(sch, capacitor, reference="C5", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
+                       footprint="Capacitor_SMD:C_1210_3225Metric", datasheet="TDK CGA6P3X7R1E226M250AB", x=152.40, y=111.76)
+    C17 = make_instance(sch, capacitor, reference="C17", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
+                        footprint="Capacitor_SMD:C_1210_3225Metric", datasheet="TDK CGA6P3X7R1E226M250AB", x=157.48, y=111.76)
+    C18 = make_instance(sch, capacitor, reference="C18", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
+                        footprint="Capacitor_SMD:C_1210_3225Metric", datasheet="TDK CGA6P3X7R1E226M250AB", x=162.56, y=111.76)
+    C19 = make_instance(sch, capacitor, reference="C19", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
+                        footprint="Capacitor_SMD:C_1210_3225Metric", datasheet="TDK CGA6P3X7R1E226M250AB", x=167.64, y=111.76)
     C6 = make_instance(sch, capacitor, reference="C6", value="100nF BOOT_3V3",
                        footprint="Capacitor_SMD:C_0402_1005Metric", datasheet="~", x=134.62, y=83.82)
     R7 = make_instance(sch, resistor, reference="R7", value="86.6k RT",
@@ -253,8 +265,8 @@ def main() -> int:
     J2 = make_instance(sch, j2sym, reference="J2", value="MAIN_PWR_43045-1202_12PIN",
                        footprint="DioneyaPWR:Molex_43045-1202", datasheet="Molex 43045-1202", x=198.12, y=109.22)
 
-    sch.schematicSymbols.extend([J1,F1,D1,U1,Q1,C1,RSH1,U2,C2,U3,L1,C3,C4,R1,R2,R3,R4,R5,R6,
-                                 U4,L2,C5,C6,R7,R8,R9,R10,U5,C7,C8,R11,R12,R13,R14,R15,NT1,NT2,NT3,J2])
+    sch.schematicSymbols.extend([J1,F1,D1,U1,Q1,C1,RSH1,U2,C2,U3,L1,C3,C14,C15,C16,C4,R1,R2,R3,R4,R5,R6,
+                                 U4,L2,C5,C17,C18,C19,C6,R7,R8,R9,R10,U5,C7,C8,R11,R12,R13,R14,R15,NT1,NT2,NT3,J2])
 
     # Functional net labels - no hidden generator-inferred wiring.
     label_pins(sch, J1, j1sym, {"1":"VBAT_RAW","2":"GND_PWR"})
@@ -272,7 +284,8 @@ def main() -> int:
     label_pins(sch, U3, u34sym, {"1":"VBAT_SYS","2":"GND_PWR","3":"SW_3V8","4":"BOOT_3V8","5":"PG_3V8",
                                    "6":"FB_3V8","7":"MODE_3V8","8":"RT_3V8","9":"EN_MODEM"})
     label_pins(sch, L1, inductor, {"1":"SW_3V8","2":"3V8_MODEM"})
-    label_pins(sch, C3, capacitor, {"1":"3V8_MODEM","2":"GND_PWR"})
+    for cap in (C3, C14, C15, C16):
+        label_pins(sch, cap, capacitor, {"1":"3V8_MODEM","2":"GND_PWR"})
     label_pins(sch, C4, capacitor, {"1":"BOOT_3V8","2":"SW_3V8"})
     label_pins(sch, R1, resistor, {"1":"3V8_MODEM","2":"FB_3V8"})
     label_pins(sch, R2, resistor, {"1":"FB_3V8","2":"GND_PWR"})
@@ -285,7 +298,8 @@ def main() -> int:
     label_pins(sch, U4, u34sym, {"1":"VBAT_SYS","2":"GND_PWR","3":"SW_3V3","4":"BOOT_3V3","5":"PWR_GOOD",
                                    "6":"3V3_DIGITAL","7":"MODE_3V3","8":"RT_3V3","9":"VBAT_SYS"})
     label_pins(sch, L2, inductor, {"1":"SW_3V3","2":"3V3_DIGITAL"})
-    label_pins(sch, C5, capacitor, {"1":"3V3_DIGITAL","2":"GND_PWR"})
+    for cap in (C5, C17, C18, C19):
+        label_pins(sch, cap, capacitor, {"1":"3V3_DIGITAL","2":"GND_PWR"})
     label_pins(sch, C6, capacitor, {"1":"BOOT_3V3","2":"SW_3V3"})
     label_pins(sch, R7, resistor, {"1":"RT_3V3","2":"GND_PWR"})
     label_pins(sch, R8, resistor, {"1":"MODE_3V3","2":"GND_PWR"})
@@ -315,7 +329,8 @@ def main() -> int:
 
     reread = Schematic.from_file(str(args.output), encoding="utf-8")
     refs = sorted(next((p.value for p in s.properties if p.key == "Reference"), "") for s in reread.schematicSymbols)
-    required = {"J1","J2","F1","D1","U1","Q1","RSH1","U2","U3","U4","U5","NT1","NT2","NT3"}
+    required = {"J1","J2","F1","D1","U1","Q1","RSH1","U2","U3","U4","U5",
+                "C3","C5","C14","C15","C16","C17","C18","C19","NT1","NT2","NT3"}
     if not required.issubset(refs):
         raise RuntimeError(f"round-trip required references missing: {sorted(required - set(refs))}")
     if len(reread.noConnects) != 1:

@@ -20,8 +20,7 @@ UNRESOLVED_FOOTPRINT_REFS = {
     "Q1",   # CSD18540Q5B DNK manufacturer footprint to be controlled before layout
     "RSH1", # exact four-terminal shunt MPN/land pattern not frozen
     "U3", "U4", # LMR60440 RAK-9 manufacturer land pattern review pending
-    "L1", "L2", # exact inductor MPN not frozen
-    "C3", "C5", # effective COUT bank exact technology/MPNs not frozen
+    "L1", "L2", # exact inductor land pattern remains under Review B
     "J2",   # 43045-1202 land pattern/orientation pending mechanical review
 }
 

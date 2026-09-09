@@ -264,17 +264,16 @@ def main() -> None:
         notes="One populated R1 per PCB-MIC leaf; any DNP/value change requires SI review and BOM revision", value="0 ohm",
     )
 
-    # PCB-PWR schematic parts. Output banks retain the current C3/C5 bank symbols in
-    # the native schematic; physical reference expansion is explicitly blocked below
-    # until those bank symbols become individual native references.
+    # PCB-PWR schematic parts. Each output bank is expanded to four individually
+    # referenced physical MLCCs in the native schematic.
     pwr_lines = [
         ("PWR-C-100N", "C1;C2;C4;C6", "100 nF 25 V X7R", "TDK", "CGA2B3X7R1E104K050BB", "0402", 4, "FITTED"),
         ("PWR-C-LDO", "C7;C8", "2.2 uF 10 V X7R", "TDK", "CGA3E1X7R1A225K080AC", "0603", 2, "FITTED"),
         ("PWR-C-CIN-HF", "C9", "100 nF 50 V X7R", "TDK", "CGA3E2X7R1H104K080AA", "0603", 1, "FITTED"),
         ("PWR-C-INPUT", "C10;C11;C12", "4.7 uF 50 V X7R", "TDK", "CGA6P3X7R1H475K250AB", "1210", 3, "FITTED"),
         ("PWR-C-BULK", "C13", "100 uF 35 V hybrid", "Panasonic Industry", "EEH-ZK1V101XP", "SMD can 6.3x8.0 mm", 1, "FITTED"),
-        ("PWR-COUT-3V8", "C3 bank", "22 uF 25 V X7R", "TDK", "CGA6P3X7R1E226M250AB", "1210", 4, "FITTED"),
-        ("PWR-COUT-3V3", "C5 bank", "22 uF 25 V X7R", "TDK", "CGA6P3X7R1E226M250AB", "1210", 4, "FITTED"),
+        ("PWR-COUT-3V8", "C3;C14;C15;C16", "22 uF 25 V X7R", "TDK", "CGA6P3X7R1E226M250AB", "1210", 4, "FITTED"),
+        ("PWR-COUT-3V3", "C5;C17;C18;C19", "22 uF 25 V X7R", "TDK", "CGA6P3X7R1E226M250AB", "1210", 4, "FITTED"),
         ("PWR-L", "L1;L2", "4.7 uH +/-20%", "Coilcraft", "XAL7030-472MEC", "XAL7030 7.5x7.2 mm", 2, "FITTED"),
         ("PWR-R-100K-01", "R1", "100 kOhm 0.1%", "Panasonic Industry", "ERA-2AEB104X", "0402", 1, "FITTED"),
         ("PWR-R-35K7", "R2", "35.7 kOhm 0.1%", "Panasonic Industry", "ERA-2AEB3572X", "0402", 1, "FITTED"),
