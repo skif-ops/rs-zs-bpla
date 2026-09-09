@@ -19,6 +19,8 @@ on:
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
+      - "tools/generate_pcb_pwr_schematic_rev_a.py"
+      - "tools/audit_pcb_pwr_native_schematic_rev_a.py"
       - "tools/generate_pcb_mic_clean_rev_a.py"
       - "tools/run_pcb_mic_no_zonefill.py"
       - "tools/finalize_pcb_mic_mechanical_rev_a.py"
@@ -97,6 +99,14 @@ jobs:
             --t5838-root artifacts/kicad-reference/PCB-MIC/t5838_ref.pretty \
             --molex-root artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.pretty \
             --output artifacts/kicad-reference/PCB-MIC/reference_geometry_report.json
+      - name: Materialize native PCB-PWR schematic
+        run: |
+          python tools/generate_pcb_pwr_schematic_rev_a.py \
+            --output hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
+          python tools/audit_pcb_pwr_native_schematic_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
       - name: Materialize native PCB-MIC board and schematic
         shell: bash
         run: |
@@ -151,6 +161,8 @@ jobs:
           path: |
             artifacts/kicad-native/
             artifacts/kicad-reference/
+            hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+            hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
