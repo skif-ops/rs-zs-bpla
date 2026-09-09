@@ -2,6 +2,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "status": "CAPTURE_BASELINE_NOT_FOR_MANUFACTURE",
   "verified_date": "2026-09-09",
+  "review_a_pin_net_status": "PASS",
   "input": {
     "working_min_v": 10.0,
     "working_max_v": 14.6,
@@ -18,7 +19,8 @@
     "mosfet_vds_v": 60.0,
     "mosfet_rds_on_max_mohm_at_10v": 2.2,
     "mosfet_temp_min_c": -55,
-    "mosfet_temp_max_c": 175
+    "mosfet_temp_max_c": 175,
+    "enable_policy": "always_on_EN_tied_to_ANODE_VBAT_FUSED"
   },
   "buck_3v8": {
     "mpn": "LMR604403SRAKR",
@@ -40,7 +42,9 @@
     "cout_effective_min_f": 0.000054,
     "cin_min_f": 0.0000047,
     "cboot_f": 1e-7,
-    "cboot_voltage_min_v": 10.0
+    "cboot_voltage_min_v": 10.0,
+    "enable_net": "EN_MODEM",
+    "enable_default": "OFF_100k_pulldown"
   },
   "buck_3v3": {
     "mpn": "LMR604403SRAKR",
@@ -51,7 +55,12 @@
     "cout_effective_min_f": 0.000054,
     "cin_min_f": 0.0000047,
     "cboot_f": 1e-7,
-    "cboot_voltage_min_v": 10.0
+    "cboot_voltage_min_v": 10.0,
+    "role": "always_on_MAIN_AON_bootstrap_rail",
+    "enable_net": "VBAT_SYS",
+    "enable_policy": "EN_tied_directly_to_VIN_per_TI",
+    "must_not_be_gated_by": "EN_AUX",
+    "review_a_reason": "PCB-MAIN is powered from 3V3_DIGITAL; gating U4 from MAIN would create a startup deadlock"
   },
   "modem": {
     "mpn": "BG95-M3",
@@ -74,7 +83,10 @@
     "cin_effective_min_f": 0.000001,
     "cout_effective_min_f": 0.000001,
     "temp_min_c": -40,
-    "temp_max_c": 125
+    "temp_max_c": 125,
+    "enable_net": "EN_AUX",
+    "enable_default": "OFF_100k_external_pulldown_plus_internal_pulldown",
+    "aad_policy": "firmware_keeps_EN_AUX_asserted_whenever_T5838_AAD_is_armed"
   },
   "current_monitor": {
     "mpn": "INA226AIDGSR",
@@ -101,6 +113,13 @@
     "pwr_side_pullup_default": "DNP",
     "alert_policy": "may_contribute_to_aggregate_FAULT_but_never_replaces_I2C_telemetry"
   },
+  "ground_return_policy": {
+    "GND_MODEM": "explicit_net_tie_to_GND_PWR",
+    "GND_DIGITAL": "explicit_net_tie_to_GND_PWR",
+    "GND_MIC": "explicit_net_tie_to_GND_PWR",
+    "join_region": "controlled_low_impedance_source_region",
+    "ambiguous_NET_TIE_OR_PLANE_policy": "prohibited"
+  },
   "main_pwr_interface": {
     "positions": 12,
     "board_header_mpn": "Molex 43045-1202",
@@ -125,16 +144,17 @@
     "standby_s0_measurement",
     "ina226_reference_meter_calibration_test",
     "emc_emi_evidence",
-    "review_a",
     "review_b"
   ],
   "source_evidence": [
-    "Texas Instruments LMR60440 SNAS877, device comparison and application design tables",
+    "Texas Instruments LMR60440 SNAS877, device comparison, pin functions, EN policy and application design tables",
     "Texas Instruments LM74700-Q1 datasheet Rev.G",
     "Texas Instruments CSD18540Q5B datasheet Rev.B",
     "Texas Instruments TPS7A20 datasheet Rev.H",
-    "Texas Instruments INA226 datasheet and calibration equations",
+    "Texas Instruments INA226 datasheet Rev.C, August 2026",
     "Quectel BG95 series compatible hardware design, BG95-M3 supply and peak-current table",
-    "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
+    "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md",
+    "hardware/PCB_PWR_PIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
   ]
 }
