@@ -1,0 +1,114 @@
+name: PCB-PWR Schematic Gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [evt-pre-20]
+    paths:
+      - "hardware/PCB_PWR_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
+      - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
+      - "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
+      - "hardware/POWER_DESIGN_BASELINE_REV_A.json"
+      - "hardware/POWER_COMPONENT_FREEZE_REV_A.csv"
+      - "hardware/POWER_DESIGN_CALC_REV_A.md"
+      - "hardware/kicad/sheets/01_POWER.csv"
+      - "tools/audit_pcb_pwr_design_rev_a.py"
+      - "tools/audit_pcb_pwr_preschematic_rev_a.py"
+      - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
+      - "tools/generate_pcb_pwr_schematic_rev_a.py"
+      - "tools/materialize_pcb_pwr_libraries_rev_a.py"
+      - "tools/audit_pcb_pwr_native_schematic_rev_a.py"
+      - ".github/workflows/pcb-pwr-schematic.yml"
+
+jobs:
+  pwr-schematic:
+    name: PCB-PWR Rev.A native schematic ERC
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Review-A authorities
+        run: |
+          python tools/audit_pcb_pwr_design_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/design_audit.json
+          python tools/audit_pcb_pwr_preschematic_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/preschematic_audit.json
+          python tools/audit_pcb_pwr_capture_authority_rev_a.py
+
+      - name: Install KiCad 9 and kiutils
+        shell: bash
+        run: |
+          set -euo pipefail
+          retry() {
+            local max=3
+            local attempt=1
+            while true; do
+              if "$@"; then return 0; fi
+              if [ "$attempt" -ge "$max" ]; then return 1; fi
+              echo "transient package/repository failure; retry $attempt/$max: $*" >&2
+              sleep $((attempt * 15))
+              attempt=$((attempt + 1))
+            done
+          }
+          retry sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
+          retry sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
+          retry sudo apt-get update
+          retry sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
+          python -m pip install --disable-pip-version-check kiutils
+          kicad-cli version
+
+      - name: Materialize PCB-PWR native schematic
+        run: |
+          python tools/generate_pcb_pwr_schematic_rev_a.py \
+            --output hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/materialize_pcb_pwr_libraries_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_native_schematic_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
+          test -s hardware/kicad/native/PCB-PWR/sym-lib-table
+          test -s hardware/kicad/native/PCB-PWR/fp-lib-table
+          test -s hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.kicad_sym
+
+      - name: KiCad ERC and PDF
+        run: |
+          mkdir -p artifacts/kicad-native/PCB-PWR
+          kicad-cli sch erc --format json --severity-all --exit-code-violations \
+            -o artifacts/kicad-native/PCB-PWR/erc.json \
+            hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          kicad-cli sch export pdf \
+            -o artifacts/kicad-native/PCB-PWR/PCB-PWR_schematic.pdf \
+            hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+
+      - name: Verify ERC report has zero violations
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('artifacts/kicad-native/PCB-PWR/erc.json')
+          d = json.loads(p.read_text(encoding='utf-8'))
+          violations = [v for s in d.get('sheets', []) for v in s.get('violations', [])]
+          if violations:
+              raise SystemExit(f'PCB-PWR ERC still has {len(violations)} violations: ' + ', '.join(sorted({v.get("type", "unknown") for v in violations})))
+          print('PCB-PWR KiCad ERC PASS: 0 violations')
+          PY
+
+      - name: Upload PCB-PWR schematic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evt-pre-20-pcb-pwr-schematic
+          path: |
+            artifacts/kicad-native/PCB-PWR/
+            hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+            hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
+            hardware/kicad/native/PCB-PWR/sym-lib-table
+            hardware/kicad/native/PCB-PWR/fp-lib-table
+            hardware/kicad/native/PCB-PWR/libs/
+          if-no-files-found: error
