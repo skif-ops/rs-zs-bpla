@@ -90,6 +90,10 @@ def main() -> None:
     require(main_parts["U8"]["Package_or_Module"] == "LGA-102_23.6x19.9mm", "U8 exact LGA package is not frozen")
     require("PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv" in main_parts["U8"]["Notes"], "U8 freeze does not cite cellular authority")
     require("PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv" in main_parts["U16"]["Notes"], "U16 freeze does not cite cellular authority")
+    require(main_parts["U9"]["Package_or_Module"] == "LCC-18_9.7x10.1mm", "U9 exact LCC-18 package is not frozen")
+    require("GNSS_RF_TIMING" in main_parts["U9"]["Status"], "U9 GNSS RF/timing sample blocker was lost")
+    require("PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv" in main_parts["U9"]["Notes"], "U9 freeze does not cite GNSS authority")
+    require("V_BCKP NC" in main_parts["U9"]["Notes"], "U9 no-backup choice is not frozen")
     for ref in ("Q1", "Q2", "Q3"):
         require(main_parts[ref]["Package_or_Module"] == "SOT23", f"{ref} package is not SOT23")
         require(main_parts[ref]["Temperature_C"] == "-65..150", f"{ref} temperature range drift")
@@ -162,6 +166,8 @@ def main() -> None:
         require("RF_LAYOUT" in connectors[key]["Status"], f"{key} RF layout blocker was lost")
         require("-40..90 board receptacle" in connectors[key]["Temperature_C"], f"{key} board receptacle rating is not frozen")
         require("exact cable assembly temperature" in connectors[key]["Release_Blockers"], f"{key} cable temperature blocker was lost")
+    require("PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv" in connectors["CON-RF-GNSS"]["Notes"], "GNSS connector freeze lacks authority citation")
+    require("exact active antenna and cable" in connectors["CON-RF-GNSS"]["Release_Blockers"], "GNSS external antenna/cable blocker was lost")
     for key in ("CON-SIM1", "CON-SIM2"):
         sim = connectors[key]
         require(sim["Board_MPN"] == "TE_2336582-1", f"{key} is not the selected 4FF connector")

@@ -409,7 +409,8 @@ def main() -> None:
         },
         "MAIN-AUTH-005 evidence set mismatch",
     )
-    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(6, 12)}, "remaining open authority set mismatch")
+    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 7)}, "closed authority set mismatch")
+    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(7, 12)}, "remaining open authority set mismatch")
     require(readiness["complete"] is False and status["manufacturing_release"] is False, "cellular authority prematurely released manufacturing")
 
     result = {

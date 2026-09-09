@@ -26,7 +26,7 @@
 |---|---|---|
 | `VBAT_PROTECTED` | вход DC/DC | 10-15 V рабочий диапазон; `LM74700QDBVRQ1` + внешний 60 V MOSFET `CSD18540Q5B`; TVS и fuse окончательно после fault/surge profile |
 | `3V8_MODEM` | BG95 | `LMR604403SRAKR`, 4 A; dedicated rail; LTE/2G burst load-step обязателен |
-| `3V3_DIGITAL` | STM32, GNSS, LoRa, nRF52840, SD | `LMR604403SRAKR`, 4 A; low-Iq; отдельный `3V3_AON` в Rev.A не ставится |
+| `3V3_DIGITAL` | STM32, GNSS, LoRa, nRF52840, SD | `LMR604403SRAKR`, 4 A; low-Iq; MAX-M10S VCC/V_IO common 3.3 V feed supports 100 mA startup inrush with no more than 0.2 Ohm series resistance; отдельный `3V3_AON` в Rev.A не ставится |
 | `1V8_MIC` | 4 x T5838 + low-voltage wake/PDM logic | `TPS7A2018PDBVR`, 300 mA low-noise LDO; остаётся активной при AAD monitoring |
 
 Точные passives, inductors, feedback values, current shunt и TVS/fuse coordination остаются блокерами принципиальной схемы и рассчитываются до Review A.
@@ -41,7 +41,7 @@
 - U7 `SN74AXC8T245PWR` остаётся включённым при фиксированном `OE=LOW`; `PDM_CLK` и `AAD_CFG` удерживаются в LOW, поэтому микрофонный clock и THSEL transitions отсутствуют; его гарантированный worst-case static current входит в измеряемый S0 budget;
 - `MIC_WAKE1..4` объединяются на 1.8 V через `SN74LVC32APWR`, затем `SN74AXC1T45DRLR` переводит aggregate wake на PA8/3.3 V;
 - BG95 `3V8_MODEM` выключена через `EN_MODEM=LOW`; U16 VCCA от BG95 `VDD_EXT` отсутствует, поэтому TI VCC isolation и Ioff отделяют постоянно доступную сторону `3V3_DIGITAL`;
-- MAX-M10S duty/continuous-time mode определяется timing requirement и измеренным holdover budget.
+- MAX-M10S uses no V_BCKP source or capacitor-only substitute; duty/continuous-time mode определяется timing requirement и измеренным holdover budget, а полная потеря питания приводит к детерминированному cold restart.
 
 До выпуска измеряется полный ток S0 на реальной PCB, включая LDO Iq, T5838 AAD, wake logic, MCU Stop, GNSS timing strategy и leakage всех отключённых доменов.
 

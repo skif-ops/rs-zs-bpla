@@ -1,3 +1,7 @@
 Sheet,Item,Requirement
-04_GNSS,U9,"MAX-M10S-00B TXD/RXD on PA3/PA2 and TIMEPULSE on PA0/TIM2_CH1; V_IO 3.3 V; backup supply option"
-04_GNSS,RF,"50 ohm feed, ESD, active/passive antenna option per u-blox reference"
+04_GNSS,AUTHORITY,"Use all 20 U9/J9 rows from PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv; no pin renumbering or implicit power pins"
+04_GNSS,U9,"Exact MAX-M10S-00B LCC-18; VCC and V_IO on 3V3_DIGITAL; VIO_SEL V_BCKP RESET_N EXTINT SAFEBOOT_N NC; VCC local 100 nF plus 10 uF and feed resistance at most 0.2 Ohm"
+04_GNSS,UART_PPS,"U9 TXD to GNSS_RX/PA3; U9 RXD from GNSS_TX/PA2; TIMEPULSE to GNSS_PPS/PA0 TIM2_CH1; populated 22 Ohm series positions; PPS high-impedance TP and no startup-low load"
+04_GNSS,ANT_SUPERVISOR,"u-blox Figure 38 three-pin topology: PIO7 GNSS_ANT_OFF_N switch control; PIO2 GNSS_ANT_DETECT open; PIO3 GNSS_ANT_SHORT_N short; I2C disabled; fault power-down and auto-recovery enabled"
+04_GNSS,RF,"J9 U.FL-R-SMT-1(60) center to ultra-low-C ESD to biased node to 47 pF C0G DC block to populated wideband GNSS L1 SAW to U9 RF_IN; 50 Ohm route; VCC_RF bias supervision per authority"
+04_GNSS,BLOCKERS,"Exact support RefDes/MPNs remain MAIN-AUTH-010; exact active antenna/cable RF layout and measured sensitivity/coexistence remain production blockers"

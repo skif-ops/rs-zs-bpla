@@ -167,6 +167,7 @@ def main() -> int:
     audio_logic_pin_rows = read(ROOT / "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv")
     cellular_pin_rows = read(ROOT / "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv")
     dual_sim_pin_rows = read(ROOT / "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv")
+    gnss_pin_rows = read(ROOT / "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv")
     required_native_tokens = {
         "(kicad_sch",
         *(row["MPN"] for row in main_freeze),
@@ -175,6 +176,7 @@ def main() -> int:
         *(row["RevA_Net"] for row in audio_logic_pin_rows if row["RevA_Net"] != "NC"),
         *(row["RevA_Net"] for row in cellular_pin_rows if row["RevA_Net"] != "NC"),
         *(row["RevA_Net"] for row in dual_sim_pin_rows if row["RevA_Net"] != "NC"),
+        *(row["RevA_Net"] for row in gnss_pin_rows if row["RevA_Net"] != "NC"),
     }
     native_tokens_missing = sorted(token for token in required_native_tokens if token not in native_text)
     native_ok = (

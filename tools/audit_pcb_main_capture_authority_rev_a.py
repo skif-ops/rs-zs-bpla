@@ -32,6 +32,8 @@ CELLULAR_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_R
 CELLULAR_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md"
 DUAL_SIM_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv"
 DUAL_SIM_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md"
+GNSS_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv"
+GNSS_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md"
 DUAL_SIM_POLICY_PATH = ROOT / "hardware/DUAL_SIM_SINGLE_STANDBY.md"
 AUDIO_INTERFACE_PATH = ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md"
 POWER_ARCHITECTURE_PATH = ROOT / "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
@@ -50,6 +52,8 @@ EXPECTED_AUTHORITATIVE_INPUTS = {
     "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md",
     "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -103,8 +107,8 @@ EXPECTED_SWD = {
     "4": "NRST",
     "5": "GND",
 }
-EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(6, 12)}
-EXPECTED_CLOSED_AUTHORITY_IDS = {"MAIN-AUTH-001", "MAIN-AUTH-002", "MAIN-AUTH-003", "MAIN-AUTH-004", "MAIN-AUTH-005"}
+EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(7, 12)}
+EXPECTED_CLOSED_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(1, 7)}
 EXPECTED_DEVICE_METADATA = {
     "U2": ("W25Q512JVFIQ", "SOIC-16_300mil_F"),
     "U3": ("LIS2DW12TR", "LGA-12_2x2mm"),
@@ -912,6 +916,107 @@ def main() -> None:
     for marker in ("TS3A27518EPWR", "TE `2336582-1`", "SIM_MUX_EN=HIGH", "U13_EN_N=HIGH", "2.54 Ом", "не менее 20 ms"):
         require(marker in dual_sim_policy, f"dual-SIM policy missing frozen marker: {marker}")
 
+    gnss_rows = rows(GNSS_PIN_AUTHORITY_PATH)
+    require(len(gnss_rows) == 20, f"expected 20 U9/J9 authority rows, got {len(gnss_rows)}")
+    require(all(set(row) == cellular_columns for row in gnss_rows), "GNSS pin-authority schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in cellular_columns) for row in gnss_rows),
+        "GNSS pin-authority row contains an empty field",
+    )
+    gnss_by_key = {(row["RefDes"], row["Pin"]): row for row in gnss_rows}
+    require(len(gnss_by_key) == len(gnss_rows), "duplicate GNSS RefDes/pin key")
+    require({row["RefDes"] for row in gnss_rows} == {"U9", "J9"}, "GNSS authority RefDes set drift")
+    require(
+        {row["Pin"] for row in gnss_rows if row["RefDes"] == "U9"} == {str(index) for index in range(1, 19)},
+        "U9 package positions are not exactly 1..18",
+    )
+    require(
+        {row["Pin"] for row in gnss_rows if row["RefDes"] == "J9"} == {"1", "SHIELD"},
+        "J9 electrical contact set mismatch",
+    )
+    require(
+        all(
+            (row["MPN"], row["Package"]) == ("MAX-M10S-00B", "LCC-18_9.7x10.1mm")
+            for row in gnss_rows if row["RefDes"] == "U9"
+        ),
+        "U9 GNSS identity/package mismatch",
+    )
+    require(
+        all(
+            (row["MPN"], row["Package"]) == ("U.FL-R-SMT-1(60)", "U.FL_SMT")
+            for row in gnss_rows if row["RefDes"] == "J9"
+        ),
+        "J9 identity/package mismatch",
+    )
+    expected_u9 = {
+        1: ("GND", "GND", "GROUND_LOCKED"),
+        2: ("TXD", "GNSS_RX", "FUNCTION_LOCKED"),
+        3: ("RXD", "GNSS_TX", "FUNCTION_LOCKED"),
+        4: ("TIMEPULSE", "GNSS_PPS", "FUNCTION_LOCKED"),
+        5: ("EXTINT", "NC", "UNUSED_INPUT_NC"),
+        6: ("V_BCKP", "NC", "OPTIONAL_BACKUP_NC"),
+        7: ("V_IO", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        8: ("VCC", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        9: ("RESET_N", "NC", "UNUSED_RESET_NC"),
+        10: ("GND", "GND", "GROUND_LOCKED"),
+        11: ("RF_IN", "GNSS_RF_FILTERED", "RF_INPUT_LOCKED"),
+        12: ("GND", "GND", "GROUND_LOCKED"),
+        13: ("LNA_EN", "GNSS_ANT_OFF_N", "ANTENNA_SUPERVISOR_LOCKED"),
+        14: ("VCC_RF", "GNSS_ANT_BIAS_RAW", "RF_SUPPLY_OUTPUT_LOCKED"),
+        15: ("VIO_SEL", "NC", "STRAP_OPEN_3V3"),
+        16: ("SDA", "GNSS_ANT_DETECT", "ANTENNA_SUPERVISOR_LOCKED"),
+        17: ("SCL", "GNSS_ANT_SHORT_N", "ANTENNA_SUPERVISOR_LOCKED"),
+        18: ("SAFEBOOT_N", "NC", "UNUSED_SERVICE_NC"),
+    }
+    for pin, expected in expected_u9.items():
+        row = gnss_by_key[("U9", str(pin))]
+        require((row["Pin_Name"], row["RevA_Net"], row["Disposition"]) == expected, f"U9 pin {pin} mapping mismatch")
+    require("100 nF plus 10 uF" in gnss_by_key[("U9", "8")]["Required_Network"], "U9 VCC local decoupling mismatch")
+    require("0.2 Ohm" in gnss_by_key[("U9", "8")]["Required_Network"], "U9 VCC feed-resistance limit missing")
+    require("100 mA startup inrush" in gnss_by_key[("U9", "8")]["Required_Network"], "U9 startup-inrush contract missing")
+    require("50 mA" in gnss_by_key[("U9", "14")]["Required_Network"], "U9 VCC_RF limit missing")
+    require("1 kOhm" in gnss_by_key[("U9", "18")]["Notes"], "U9 SAFEBOOT/TIMEPULSE coupling warning missing")
+    require("I2C disabled" in gnss_by_key[("U9", "16")]["Required_Network"], "GNSS open-detect PIO reassignment missing")
+    require("I2C disabled" in gnss_by_key[("U9", "17")]["Required_Network"], "GNSS short-detect PIO reassignment missing")
+    j9_signal = gnss_by_key[("J9", "1")]
+    require(
+        (j9_signal["Pin_Name"], j9_signal["RevA_Net"], j9_signal["Disposition"])
+        == ("SIGNAL", "GNSS_RF_ANT_BIASED", "RF_CONTACT_LOCKED"),
+        "J9 center-contact map mismatch",
+    )
+    for marker in ("ultra-low-capacitance ESD", "27 nH", "47 pF", "wideband GNSS SAW"):
+        require(marker in j9_signal["Required_Network"], f"J9 RF/bias chain lacks {marker}")
+    require(
+        (gnss_by_key[("J9", "SHIELD")]["RevA_Net"], gnss_by_key[("J9", "SHIELD")]["Disposition"])
+        == ("GND", "SHIELD_GROUND_LOCKED"),
+        "J9 shell ground mismatch",
+    )
+    for net, expected in {"GNSS_TX": ("PA2", "24"), "GNSS_RX": ("PA3", "25"), "GNSS_PPS": ("PA0", "22")}.items():
+        require(net in by_net, f"GNSS MCU net missing: {net}")
+        require((by_net[net]["MCU_Pin"], by_net[net]["LQFP100_Pin"]) == expected, f"{net} MCU pin mismatch")
+
+    gnss_review = GNSS_REVIEW_PATH.read_text(encoding="utf-8")
+    gnss_sha256 = hashlib.sha256(GNSS_PIN_AUTHORITY_PATH.read_bytes()).hexdigest()
+    for marker in {
+        "GNSS_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        gnss_sha256,
+        "MAX-M10S-00B-01", "V_BCKP", "SAFEBOOT_N", "Figure 38", "CFG-I2C-ENABLED=0",
+        "10 Ohm, 5%, 0.25 W", "27 nH, 5%", "47 pF 5% 25 V C0G",
+        "does not release the exact support-component MPN set",
+    }:
+        require(marker in gnss_review, f"GNSS authority review missing marker: {marker}")
+    for path, markers in {
+        CAPTURE_SPEC_PATH: ("PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv", "MAX-M10S-00B", "Figure 38", "MAIN-AUTH-010"),
+        ROOT / "hardware/kicad/sheets/04_GNSS.csv": ("all 20 U9/J9 rows", "GNSS_ANT_SHORT_N", "wideband GNSS L1 SAW"),
+        POWER_ARCHITECTURE_PATH: ("MAX-M10S VCC/V_IO", "100 mA startup inrush", "no V_BCKP source"),
+    }.items():
+        content = path.read_text(encoding="utf-8")
+        for marker in markers:
+            require(marker in content, f"{path.name} lacks frozen GNSS marker: {marker}")
+
+    require(by_ref["U9"]["Package_or_Module"] == "LCC-18_9.7x10.1mm", "U9 freeze package mismatch")
+    require("PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv" in by_ref["U9"]["Notes"], "U9 freeze lacks GNSS authority citation")
+
     harness = rows(HARNESS_PATH)
     main_power = interface(harness, "MAIN_PWR")
     require(pin_contract(main_power) == EXPECTED_MAIN_POWER, "12-pin MAIN/PWR harness contract mismatch")
@@ -957,6 +1062,11 @@ def main() -> None:
         require(connector_id in connectors, f"connector freeze missing {connector_id}")
         require(connectors[connector_id]["Board_MPN"] == mpn, f"{connector_id} MPN mismatch")
         require(connectors[connector_id]["Status"] not in {"RELEASED", "CONTROLLED"}, f"{connector_id} unexpectedly released")
+    require(
+        "PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv" in connectors["CON-RF-GNSS"]["Notes"]
+        and "J9 center" in connectors["CON-RF-GNSS"]["Notes"],
+        "GNSS connector freeze lacks J9 authority citation",
+    )
 
     mcu = status["mcu_contract"]
     require((mcu["refdes"], mcu["mpn"], mcu["package"]) == ("U1", "STM32U585VIT6Q", "LQFP100_14x14"), "status MCU contract mismatch")
@@ -1019,6 +1129,14 @@ def main() -> None:
         },
         "MAIN-AUTH-005 evidence set mismatch",
     )
+    require(
+        closed_evidence["MAIN-AUTH-006"]
+        == {
+            "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-006 evidence set mismatch",
+    )
     require(closed_ids.isdisjoint(open_ids), "authority is both open and closed")
     require(open_ids == EXPECTED_OPEN_AUTHORITY_IDS, "PCB-MAIN open authority register drift")
     require(len(open_ids) == len(open_items), "duplicate PCB-MAIN open authority ID")
@@ -1045,6 +1163,7 @@ def main() -> None:
         "audio_logic_pins_verified": len(audio_rows),
         "cellular_pins_verified": len(cellular_rows),
         "dual_sim_pins_verified": len(dual_sim_rows),
+        "gnss_contacts_verified": len(gnss_rows),
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
@@ -1061,6 +1180,7 @@ def main() -> None:
     print(f"- all {len(audio_rows)} U7/U17/U18 physical pins, dual-direction PDM translation and active-high AAD wake path verified")
     print(f"- all {len(cellular_rows)} U8/U16/Q1/Q2 physical pins, power banks, translation and controls verified")
     print(f"- all {len(dual_sim_rows)} U13/U14/U15/J6/J7/Q3 physical contacts, safe-state controls and slot paths verified")
+    print(f"- all {len(gnss_rows)} U9/J9 physical contacts, supply choices, supervisor signals and RF/bias topology verified")
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(f"- {len(open_items)} missing pad/mechanical authorities remain explicit production blockers")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")

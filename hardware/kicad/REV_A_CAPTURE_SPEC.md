@@ -13,6 +13,7 @@ Authoritative inputs:
 - `hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv` and its independent review record;
+- `hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
 - `hardware/MAIN_COMPONENT_FREEZE_REV_A.csv`;
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`;
@@ -158,9 +159,14 @@ Required AAD tests before release:
 
 ### 1.6 GNSS / trusted fixed position
 
-- `U9`: u-blox `MAX-M10S-00B`.
-- GNSS UART PA2/PA3; TIMEPULSE/PPS PA0/TIM2_CH1.
-- dedicated U.FL RF path; final active antenna/bias verified against exact antenna.
+- `U9`: exact u-blox `MAX-M10S-00B`, LCC-18 9.7 x 10.1 mm. The complete module-pad and J9 contact authority is `hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv`; it closes only `MAIN-AUTH-006`.
+- VCC and V_IO use `3V3_DIGITAL`; VIO_SEL is NC/open. V_BCKP, RESET_N, EXTINT and SAFEBOOT_N are NC. U9 VCC has local 100 nF plus 10 uF, no more than 0.2 Ohm total feed resistance, and capacity for 100 mA startup inrush.
+- U9 TXD drives `GNSS_RX` at PA3/USART2_RX; U9 RXD receives `GNSS_TX` from PA2/USART2_TX. TIMEPULSE drives `GNSS_PPS` at PA0/TIM2_CH1. Each line has a populated 22 Ohm series position.
+- TIMEPULSE has only a high-impedance test point and no external pull or startup-low load. SAFEBOOT_N has no trace or test pad because the module couples it internally to TIMEPULSE through 1 kOhm.
+- The active antenna uses the u-blox Figure 38 three-pin supervisor: PIO7/LNA_EN controls power, PIO2/SDA reports open, and PIO3/SCL reports short. I2C is disabled before PIO2/PIO3 reassignment. Voltage control, open/short detection, power-down on fault and automatic recovery are enabled.
+- `J9` is exact Hirose `U.FL-R-SMT-1(60)`. The populated RF path is `J9 -> ultra-low-C ESD -> biased node -> 47 pF C0G DC block -> wideband GNSS L1 SAW -> U9 RF_IN`; it is a 50 Ohm dedicated route.
+- The VCC_RF supervisor network includes the Figure 38 switch/comparator topology, 10 Ohm 5% 0.25 W sensing, 27 nH 5% bias injection with more than 500 Ohm impedance at GNSS L1 and more than 300 mA rating, and 10 nF 10% 16 V X7R sensing filter. Exact support-device and passive RefDes/MPNs remain `MAIN-AUTH-010`.
+- The external active antenna and cable are separate unreleased system BOM lines and must be qualified with the supervisor, SAW loss and cellular/RU868 coexistence.
 - configured installation coordinates are authoritative after commissioning; GNSS position is an integrity/diagnostic channel and must not silently move network/TDOA geometry.
 - receiver jam/spoof flags are read by firmware.
 - position-trust and time-trust are independent; loss of GNSS position trust does not alter configured coordinates, while PPS/time suspicion affects TDOA validity/holdover separately.
