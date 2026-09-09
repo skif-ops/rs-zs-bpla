@@ -97,12 +97,57 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
     return True, "CLI_DRC_EXPORT_PASS_REVIEW_B_PENDING"
 
 
+def artifact_files() -> list[Path]:
+    return [
+        p for p in sorted(ART.rglob("*"))
+        if p.is_file() and p.name != "sha256_manifest.json"
+    ]
+
+
 def write_manifest() -> None:
-    manifest = []
-    for p in sorted(ART.rglob("*")):
-        if p.is_file() and p.name != "sha256_manifest.json":
-            manifest.append({"path": str(p.relative_to(ART)), "sha256": sha256(p), "bytes": p.stat().st_size})
-    (ART / "sha256_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    manifest = [
+        {
+            "path": str(p.relative_to(ART)),
+            "sha256": sha256(p),
+            "bytes": p.stat().st_size,
+        }
+        for p in artifact_files()
+    ]
+    (ART / "sha256_manifest.json").write_text(
+        json.dumps(manifest, indent=2), encoding="utf-8"
+    )
+
+
+def verify_manifest() -> None:
+    """Immediately re-read and verify the final artifact manifest before CI can pass."""
+    manifest_path = ART / "sha256_manifest.json"
+    records = json.loads(manifest_path.read_text(encoding="utf-8"))
+    by_path = {str(rec["path"]): rec for rec in records}
+    actual = {str(p.relative_to(ART)): p for p in artifact_files()}
+
+    if set(by_path) != set(actual):
+        missing = sorted(set(actual) - set(by_path))
+        stale = sorted(set(by_path) - set(actual))
+        raise RuntimeError(
+            f"artifact manifest file-set mismatch: missing_records={missing} stale_records={stale}"
+        )
+
+    failures = []
+    for rel, p in actual.items():
+        rec = by_path[rel]
+        current_hash = sha256(p)
+        current_bytes = p.stat().st_size
+        if rec.get("sha256") != current_hash or rec.get("bytes") != current_bytes:
+            failures.append({
+                "path": rel,
+                "manifest_sha256": rec.get("sha256"),
+                "actual_sha256": current_hash,
+                "manifest_bytes": rec.get("bytes"),
+                "actual_bytes": current_bytes,
+            })
+    if failures:
+        raise RuntimeError(f"artifact SHA256 manifest verification failed: {failures}")
+    print(f"SHA256 artifact manifest verification PASS: {len(actual)} files")
 
 
 def main() -> int:
@@ -153,7 +198,6 @@ def main() -> int:
                 report["boards"][name]["sch_state"] = state
                 if not ok:
                     cli_failures.append(f"{name}: {state}")
-        write_manifest()
 
     if not all_missing and not cli_failures:
         report["release"] = "ALL_NATIVE_SOURCES_AND_CLI_PASS_REVIEW_A_B_STILL_REQUIRED"
@@ -163,7 +207,13 @@ def main() -> int:
         if cli_failures:
             report["cli_failures"] = cli_failures
 
+    # The gate report is final before hashing. The previous ordering wrote the manifest
+    # first and then changed native_gate.json, which the independent post-run audit caught.
     (ART / "native_gate.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    if args.run_cli:
+        write_manifest()
+        verify_manifest()
+
     print("Complete native sets:", ", ".join(complete_sets) if complete_sets else "none")
     print(f"Overall release gate remains BLOCKED; {len(all_missing)} required source files missing")
     if cli_failures:
