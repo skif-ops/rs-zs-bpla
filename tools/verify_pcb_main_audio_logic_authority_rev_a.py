@@ -245,8 +245,8 @@ def main() -> None:
     open_items = status["capture_readiness"]["open_authorities"]
     closed = {item["id"] for item in closed_items}
     open_ids = {item["id"] for item in open_items}
-    require(closed == {"MAIN-AUTH-001", "MAIN-AUTH-002", "MAIN-AUTH-003"}, "closed authority identity mismatch")
-    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(4, 12)}, "remaining authority set mismatch")
+    require(closed == {"MAIN-AUTH-001", "MAIN-AUTH-002", "MAIN-AUTH-003", "MAIN-AUTH-004"}, "closed authority identity mismatch")
+    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(5, 12)}, "remaining authority set mismatch")
     evidence = {item["id"]: set(item["evidence"]) for item in closed_items}
     require(
         evidence["MAIN-AUTH-003"]
@@ -286,7 +286,7 @@ def main() -> None:
     print("PCB-MAIN U7/U17/U18 second independent control: PASS_AUDIO_LOGIC_AUTHORITY_ONLY")
     print("- 44 physical pins, six used U7 translation channels, two defined unused channels")
     print("- four active-high wake inputs, two-stage OR, U18 up-translation and guaranteed logic margins verified")
-    print("- production BOM remains BLOCKED by 8 open PCB-MAIN authorities")
+    print(f"- production BOM remains BLOCKED by {len(open_ids)} open PCB-MAIN authorities")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

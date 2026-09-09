@@ -84,6 +84,8 @@ def main() -> None:
         "T-PWR-MAIN-CTL": 12,
         "C-MIC": 4,
         "R-MIC": 4,
+        "Q-MODEM-PWRKEY": 1,
+        "Q-MODEM-RESET": 1,
     }
     for item, qty in expected_quantities.items():
         require(item in by_id, f"missing quantity-controlled BOM item {item}")
@@ -98,6 +100,8 @@ def main() -> None:
     )
     require(by_id["H-MIC"]["MPN"] == "5040510601", "MIC housing MPN mismatch")
     require(by_id["T-MIC"]["MPN"] == "5040520098", "MIC terminal MPN mismatch")
+    require(by_id["Q-MODEM-PWRKEY"]["MPN"] == "MMBT3904,215", "BG95 PWRKEY driver MPN mismatch")
+    require(by_id["Q-MODEM-RESET"]["MPN"] == "MMBT3904,215", "BG95 RESET_N driver MPN mismatch")
     require(by_id["PWR-L"]["Spares"] == "10", "PCB-PWR inductor spare policy mismatch")
 
     serialized = "\n".join(",".join(row.values()) for row in rows)

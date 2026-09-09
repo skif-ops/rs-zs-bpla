@@ -72,6 +72,8 @@ def main() -> None:
         "U16": "SN74AXC8T245PWR",
         "U17": "SN74LVC32APWR",
         "U18": "SN74AXC1T45DRLR",
+        "Q1": "MMBT3904,215",
+        "Q2": "MMBT3904,215",
         "X1": "SiT1552AI-JE-DCC-32.768D",
     }
     for ref, mpn in expected_main.items():
@@ -84,6 +86,13 @@ def main() -> None:
     require("-40..85" in main_parts["U1"]["Temperature_C"], "exact STM32U585VIT6Q +85 C limit is not recorded")
     require("ENVIRONMENT" not in main_parts["U1"]["Status"], "resolved MCU environment blocker remains active")
     require("ENV" not in main_parts["U11"]["Status"], "resolved BLE environment blocker remains active")
+    require(main_parts["U8"]["Package_or_Module"] == "LGA-102_23.6x19.9mm", "U8 exact LGA package is not frozen")
+    require("PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv" in main_parts["U8"]["Notes"], "U8 freeze does not cite cellular authority")
+    require("PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv" in main_parts["U16"]["Notes"], "U16 freeze does not cite cellular authority")
+    for ref in ("Q1", "Q2"):
+        require(main_parts[ref]["Package_or_Module"] == "SOT23", f"{ref} package is not SOT23")
+        require(main_parts[ref]["Temperature_C"] == "-65..150", f"{ref} temperature range drift")
+        require("PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv" in main_parts[ref]["Notes"], f"{ref} freeze does not cite cellular authority")
 
     text = "\n".join((ROOT / p).read_text(encoding="utf-8") for p in (
         "hardware/POWER_COMPONENT_FREEZE_REV_A.csv",

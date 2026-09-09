@@ -11,6 +11,7 @@ Authoritative inputs:
 - `hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv` and its independent review record;
+- `hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
 - `hardware/MAIN_COMPONENT_FREEZE_REV_A.csv`;
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`;
@@ -124,11 +125,23 @@ Required AAD tests before release:
 
 ### 1.5 Cellular and dual SIM
 
-- `U8`: Quectel `BG95-M3` candidate pending exact regional/orderable variant and operator validation.
-- dedicated `3V8_MODEM` supply, burst-capable with local bulk/HF decoupling.
-- BG95 UART/status domain is 1.8 V; direct STM32 3.3 V connection is forbidden.
-- `U16`: `SN74AXC8T245PWR` for selected UART/status translation.
-- PWRKEY and RESET_N use approved open-drain/transistor interfaces, not ordinary translated push-pull outputs.
+- `U8`: Quectel `BG95-M3` in the 102-pad 23.6 x 19.9 mm LGA; exact ordered firmware/region identity and operator validation remain release blockers.
+- The complete U8 pad disposition is frozen in `hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv`; it closes only `MAIN-AUTH-004` together with U16 and Q1/Q2.
+- U8 pins 32/33 `VBAT_BB` use `3V8_MODEM_BB`; pins 52/53 `VBAT_RF` use `3V8_MODEM_RF`; both branches originate from the single `3V8_MODEM` star point.
+- The BB branch requires 100 uF low-ESR plus 220 nF, 47 nF, 150 pF, 100 pF, 68 pF, 33 pF, and 10 pF with a ferrite bead adjacent to U8. BB copper is at least 0.6 mm equivalent width.
+- The RF branch requires 100 uF low-ESR plus 100 nF, 33 pF, and 10 pF with a 0 Ohm link adjacent to U8. RF copper is at least 2.7 mm equivalent width with no neck-down.
+- Both branches must remain at or above 3.3 V at all four U8 VBAT pads during representative LTE and EGPRS bursts.
+- U8 pin 29 `VDD_EXT` powers U16 VCCA and the local 1.8 V pull-ups. U16 VCCB uses `3V3_DIGITAL`; U16 GND and control LOW straps use `GND_MODEM`.
+- U16 DIR1 is high: `MAIN_TXD`, `STATUS`, and `MAIN_RI` translate from the U8 A side to MCU-side `CELL_RX`, `CELL_STATUS`, and `CELL_RI`.
+- U16 DIR2 is low: MCU-side `CELL_TX` and `CELL_DTR` translate from B to U8 `MAIN_RXD` and `MAIN_DTR`.
+- U16 OE is tied low. A4, B7, and B8 are tied to `GND_MODEM`; B4, A7, and A8 are NC.
+- BG95 UART/status domain is 1.8 V; direct STM32 3.3 V connection is forbidden. U16 VCC isolation and Ioff protect the unpowered modem domain.
+- Q1 and Q2 are `MMBT3904,215` SOT23 open-collector drivers. Each uses 4.7 kOhm base series and 47 kOhm base-emitter pull-down. Q1 drives U8 PWRKEY; Q2 drives U8 RESET_N.
+- PWRKEY and RESET_N are not routed through U16 and are never driven push-pull. PWRKEY has 10 nF to `GND_MODEM`; RESET_N has no large capacitance.
+- Power-on uses a selected 700 ms PWRKEY pulse after `3V8_MODEM` is stable for at least 30 ms. Normal power-off uses `AT+QPOWD`, waits for `CELL_STATUS=LOW`, and only then removes `EN_MODEM`.
+- The fallback PWRKEY shutdown pulse is 650-1500 ms. The emergency RESET_N pulse is 2-3.8 s. PWRKEY and RESET_N commands never overlap.
+- Firmware masks RI and ignores UART until `CELL_STATUS=HIGH`. `CELL_DTR` defaults LOW to keep the modem awake until deliberate sleep entry.
+- Review A must prove less than 75 mV peak `GND_MODEM` to `GND_DIGITAL` offset plus noise at U16 under the worst 2G burst.
 - two physical nano-SIM/4FF slots, Single Standby only.
 - `U13`: `TS3A27518EPWR` candidate pending USIM SI/powered-off isolation review.
 - `U14/U15`: `ESDALC6V1-5P6` close to the two SIM connectors.

@@ -15,6 +15,8 @@
       "hardware/PCB_MAIN_STORAGE_SENSOR_AUTHORITY_REV_A.md",
       "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv",
       "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md",
       "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
       "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
       "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -88,18 +90,17 @@
           "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv",
           "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md"
         ]
+      },
+      {
+        "id": "MAIN-AUTH-004",
+        "scope": "U8 BG95-M3 and U16 exact pads, Q1/Q2 open-collector controls, power sequencing and burst decoupling",
+        "evidence": [
+          "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md"
+        ]
       }
     ],
     "open_authorities": [
-      {
-        "id": "MAIN-AUTH-004",
-        "scope": "U8 BG95-M3 and U16 translator exact pads, open-drain controls, power sequencing and burst decoupling",
-        "blocks": [
-          "native_schematic",
-          "review_a",
-          "production_bom"
-        ]
-      },
       {
         "id": "MAIN-AUTH-005",
         "scope": "U13 dual-SIM mux, U14/U15 ESD arrays and both nano-SIM socket exact pin maps and powered-off policy",

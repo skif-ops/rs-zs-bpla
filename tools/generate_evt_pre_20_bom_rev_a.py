@@ -180,6 +180,15 @@ def main() -> None:
             notes=f"Rev.A MAIN freeze; blockers: {p['Release_Blockers']}",
         )
 
+    for item_id, ref in (("Q-MODEM-PWRKEY", "Q1"), ("Q-MODEM-RESET", "Q2")):
+        p = main_parts[ref]
+        append_item(
+            item_id=item_id, assembly="PCB-MAIN", refdes=ref, category="Transistor",
+            description=p["Function"], manufacturer=p["Manufacturer"], mpn=p["MPN"],
+            package=p["Package_or_Module"], qty=1, spares=5, status=p["Status"],
+            notes=f"Rev.A MAIN freeze; blockers: {p['Release_Blockers']}",
+        )
+
     for item_id, cid, assembly, refdes in (
         ("J-USB", "CON-USB", "PCB-MAIN", "J_USB"),
         ("J-PWR-IN", "CON-003", "PCB-PWR", "J1"),

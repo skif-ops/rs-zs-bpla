@@ -28,6 +28,8 @@ STORAGE_SENSOR_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_STORAGE_SENSOR_PIN
 STORAGE_SENSOR_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_STORAGE_SENSOR_AUTHORITY_REV_A.md"
 AUDIO_LOGIC_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv"
 AUDIO_LOGIC_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md"
+CELLULAR_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv"
+CELLULAR_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md"
 AUDIO_INTERFACE_PATH = ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md"
 POWER_ARCHITECTURE_PATH = ROOT / "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
 
@@ -41,6 +43,8 @@ EXPECTED_AUTHORITATIVE_INPUTS = {
     "hardware/PCB_MAIN_STORAGE_SENSOR_AUTHORITY_REV_A.md",
     "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -68,6 +72,8 @@ EXPECTED_MAIN_MPNS = {
     "U16": "SN74AXC8T245PWR",
     "U17": "SN74LVC32APWR",
     "U18": "SN74AXC1T45DRLR",
+    "Q1": "MMBT3904,215",
+    "Q2": "MMBT3904,215",
     "X1": "SiT1552AI-JE-DCC-32.768D",
 }
 EXPECTED_MAIN_POWER = {
@@ -91,8 +97,8 @@ EXPECTED_SWD = {
     "4": "NRST",
     "5": "GND",
 }
-EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(4, 12)}
-EXPECTED_CLOSED_AUTHORITY_IDS = {"MAIN-AUTH-001", "MAIN-AUTH-002", "MAIN-AUTH-003"}
+EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(5, 12)}
+EXPECTED_CLOSED_AUTHORITY_IDS = {"MAIN-AUTH-001", "MAIN-AUTH-002", "MAIN-AUTH-003", "MAIN-AUTH-004"}
 EXPECTED_DEVICE_METADATA = {
     "U2": ("W25Q512JVFIQ", "SOIC-16_300mil_F"),
     "U3": ("LIS2DW12TR", "LGA-12_2x2mm"),
@@ -685,6 +691,107 @@ def main() -> None:
     require("disabled/high-Z state" not in power_architecture, "power architecture still requires U7 disable in S0")
     require("фиксированном `OE=LOW`" in power_architecture, "power architecture lacks frozen U7 S0 state")
 
+    cellular_rows = rows(CELLULAR_PIN_AUTHORITY_PATH)
+    cellular_columns = {
+        "RefDes", "MPN", "Package", "Pin", "Pin_Name", "Direction",
+        "RevA_Net", "Disposition", "Required_Network", "Authority", "Notes",
+    }
+    require(len(cellular_rows) == 132, f"expected 132 U8/U16/Q1/Q2 physical pins, got {len(cellular_rows)}")
+    require(all(set(row) == cellular_columns for row in cellular_rows), "cellular pin-authority schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in cellular_columns) for row in cellular_rows),
+        "cellular pin-authority row contains an empty field",
+    )
+    cellular_by_key: dict[tuple[str, str], dict[str, str]] = {}
+    for row in cellular_rows:
+        key = (row["RefDes"], row["Pin"])
+        require(key not in cellular_by_key, f"duplicate cellular pin-authority row: {key[0]}.{key[1]}")
+        cellular_by_key[key] = row
+    cellular_identity = {
+        "U8": ("BG95-M3", "LGA-102_23.6x19.9mm", {str(index) for index in range(1, 103)}),
+        "U16": ("SN74AXC8T245PWR", "TSSOP-24_PW", {str(index) for index in range(1, 25)}),
+        "Q1": ("MMBT3904,215", "SOT23", {"1", "2", "3"}),
+        "Q2": ("MMBT3904,215", "SOT23", {"1", "2", "3"}),
+    }
+    for ref, (mpn, package, expected_pins) in cellular_identity.items():
+        actual = [row for row in cellular_rows if row["RefDes"] == ref]
+        require({row["Pin"] for row in actual} == expected_pins, f"{ref} cellular package-position set drift")
+        require(all((row["MPN"], row["Package"]) == (mpn, package) for row in actual), f"{ref} cellular identity/package mismatch")
+
+    u8 = {index: cellular_by_key[("U8", str(index))] for index in range(1, 103)}
+    expected_u8_ground_pins = {
+        3, 31, 48, 50, 54, 55, 58, 59, 61, 62,
+        *range(67, 75), *range(79, 83), *range(89, 92), *range(100, 103),
+    }
+    require({index for index, row in u8.items() if row["Pin_Name"] == "GND"} == expected_u8_ground_pins, "U8 ground-pad set drift")
+    require(
+        all((u8[index]["RevA_Net"], u8[index]["Disposition"]) == ("GND_MODEM", "GROUND_LOCKED") for index in expected_u8_ground_pins),
+        "U8 ground-pad net/disposition mismatch",
+    )
+    expected_u8_critical = {
+        15: ("PWRKEY", "U8_PWRKEY_N", "FUNCTION_LOCKED"),
+        17: ("RESET_N", "U8_RESET_N", "FUNCTION_LOCKED"),
+        20: ("STATUS", "U8_STATUS_1V8", "FUNCTION_LOCKED"),
+        29: ("VDD_EXT", "U8_VDD_EXT_1V8", "SUPPLY_OUTPUT_LOCKED"),
+        30: ("MAIN_DTR", "U8_MAIN_DTR_1V8", "FUNCTION_LOCKED"),
+        32: ("VBAT_BB", "3V8_MODEM_BB", "SUPPLY_LOCKED"),
+        33: ("VBAT_BB", "3V8_MODEM_BB", "SUPPLY_LOCKED"),
+        34: ("MAIN_RXD", "U8_MAIN_RXD_1V8", "FUNCTION_LOCKED"),
+        35: ("MAIN_TXD", "U8_MAIN_TXD_1V8", "FUNCTION_LOCKED"),
+        39: ("MAIN_RI", "U8_MAIN_RI_1V8", "FUNCTION_LOCKED"),
+        52: ("VBAT_RF", "3V8_MODEM_RF", "SUPPLY_LOCKED"),
+        53: ("VBAT_RF", "3V8_MODEM_RF", "SUPPLY_LOCKED"),
+    }
+    for pin, expected in expected_u8_critical.items():
+        require((u8[pin]["Pin_Name"], u8[pin]["RevA_Net"], u8[pin]["Disposition"]) == expected, f"U8 pad {pin} critical mapping mismatch")
+    for pin in (11, 12, 13, 14, 16, 57, 63, 76, 77, 78, 92, 93, 94, 95, 97, 98, 99):
+        require((u8[pin]["RevA_Net"], u8[pin]["Disposition"]) == ("NC", "RESERVED_DNU_NC"), f"U8 reserved pad {pin} is not DNU/NC")
+    for pin in range(42, 48):
+        require(u8[pin]["Disposition"] == "DEFERRED_MAIN_AUTH_005", f"U8 dual-SIM pad {pin} ownership mismatch")
+    for pin in (8, 9, 10, 22, 23, 60, 75):
+        require(u8[pin]["Disposition"] == "DEFERRED_MAIN_AUTH_009", f"U8 recovery/RF pad {pin} ownership mismatch")
+    for token in ("100 uF", "220 nF", "47 nF", "150 pF", "68 pF", "33 pF", "10 pF", "ferrite bead"):
+        require(token in u8[32]["Required_Network"], f"U8 VBAT_BB authority lacks {token}")
+    for token in ("100 uF", "100 nF", "33 pF", "10 pF", "0 Ohm link"):
+        require(token in u8[52]["Required_Network"], f"U8 VBAT_RF authority lacks {token}")
+
+    u16 = {index: cellular_by_key[("U16", str(index))] for index in range(1, 25)}
+    expected_u16 = {
+        1: ("U8_VDD_EXT_1V8", "SUPPLY_LOCKED"), 2: ("U8_VDD_EXT_1V8", "STRAP_DIRECT_HIGH"),
+        3: ("U8_MAIN_TXD_1V8", "FUNCTION_LOCKED"), 4: ("U8_STATUS_1V8", "FUNCTION_LOCKED"),
+        5: ("U8_MAIN_RI_1V8", "FUNCTION_LOCKED"), 6: ("GND_MODEM", "UNUSED_INPUT_DIRECT_LOW"),
+        7: ("U8_MAIN_RXD_1V8", "FUNCTION_LOCKED"), 8: ("U8_MAIN_DTR_1V8", "FUNCTION_LOCKED"),
+        9: ("NC", "UNUSED_OUTPUT_NC"), 10: ("NC", "UNUSED_OUTPUT_NC"),
+        11: ("GND_MODEM", "STRAP_DIRECT_LOW"), 12: ("GND_MODEM", "GROUND_LOCKED"),
+        13: ("GND_MODEM", "GROUND_LOCKED"), 14: ("GND_MODEM", "UNUSED_INPUT_DIRECT_LOW"),
+        15: ("GND_MODEM", "UNUSED_INPUT_DIRECT_LOW"), 16: ("CELL_DTR", "FUNCTION_LOCKED"),
+        17: ("CELL_TX", "FUNCTION_LOCKED"), 18: ("NC", "UNUSED_OUTPUT_NC"),
+        19: ("CELL_RI", "FUNCTION_LOCKED"), 20: ("CELL_STATUS", "FUNCTION_LOCKED"),
+        21: ("CELL_RX", "FUNCTION_LOCKED"), 22: ("GND_MODEM", "STRAP_DIRECT_LOW"),
+        23: ("3V3_DIGITAL", "SUPPLY_LOCKED"), 24: ("3V3_DIGITAL", "SUPPLY_LOCKED"),
+    }
+    for pin, expected in expected_u16.items():
+        require((u16[pin]["RevA_Net"], u16[pin]["Disposition"]) == expected, f"U16 pin {pin} net/disposition mismatch")
+    require(all("100 nF" in u16[pin]["Required_Network"] for pin in (1, 23, 24)), "U16 bypass contract incomplete")
+
+    for ref, command, collector in (("Q1", "CELL_PWRKEY_CMD", "U8_PWRKEY_N"), ("Q2", "CELL_RESET_N_CMD", "U8_RESET_N")):
+        q = {pin: cellular_by_key[(ref, str(pin))] for pin in range(1, 4)}
+        require((q[1]["Pin_Name"], q[2]["Pin_Name"], q[3]["Pin_Name"]) == ("B", "E", "C"), f"{ref} SOT23 pin order mismatch")
+        require(command in q[1]["Required_Network"] and "4.7 kOhm" in q[1]["Required_Network"] and "47 kOhm" in q[1]["Required_Network"], f"{ref} base-drive network mismatch")
+        require(q[2]["RevA_Net"] == "GND_MODEM" and q[3]["RevA_Net"] == collector, f"{ref} open-collector mapping mismatch")
+
+    cellular_review = CELLULAR_REVIEW_PATH.read_text(encoding="utf-8")
+    cellular_authority_sha256 = hashlib.sha256(CELLULAR_PIN_AUTHORITY_PATH.read_bytes()).hexdigest()
+    for marker in {
+        "CELLULAR_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        cellular_authority_sha256,
+        "6ff03aa31577971d02dc15eac11adee4d52b80077ae3fa3503978c1b12496e81",
+        "6cf4003c438c0546fb86f0932613896197dd19a75bdb307f385eb6e75535126e",
+        "500-1000 ms", "650-1500 ms", "2-3.8 s", "AT+QPOWD", "150 mV", "below 75 mV",
+        "does not close the dual-SIM network",
+    }:
+        require(marker in cellular_review, f"cellular authority review record missing marker: {marker}")
+
     harness = rows(HARNESS_PATH)
     main_power = interface(harness, "MAIN_PWR")
     require(pin_contract(main_power) == EXPECTED_MAIN_POWER, "12-pin MAIN/PWR harness contract mismatch")
@@ -776,6 +883,14 @@ def main() -> None:
         },
         "MAIN-AUTH-003 evidence set mismatch",
     )
+    require(
+        closed_evidence["MAIN-AUTH-004"]
+        == {
+            "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-004 evidence set mismatch",
+    )
     require(closed_ids.isdisjoint(open_ids), "authority is both open and closed")
     require(open_ids == EXPECTED_OPEN_AUTHORITY_IDS, "PCB-MAIN open authority register drift")
     require(len(open_ids) == len(open_items), "duplicate PCB-MAIN open authority ID")
@@ -800,6 +915,7 @@ def main() -> None:
         "mcu_package_pins_verified": len(authority_rows),
         "storage_sensor_pads_verified": len(device_rows),
         "audio_logic_pins_verified": len(audio_rows),
+        "cellular_pins_verified": len(cellular_rows),
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
@@ -814,6 +930,7 @@ def main() -> None:
     print(f"- all {len(authority_rows)} U1 package positions and {len(pins)} functional assignments verified")
     print(f"- all {len(device_rows)} U2/U3/U4 physical pins or pads and three unique I2C2 addresses verified")
     print(f"- all {len(audio_rows)} U7/U17/U18 physical pins, dual-direction PDM translation and active-high AAD wake path verified")
+    print(f"- all {len(cellular_rows)} U8/U16/Q1/Q2 physical pins, power banks, translation and controls verified")
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(f"- {len(open_items)} missing pad/mechanical authorities remain explicit production blockers")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")

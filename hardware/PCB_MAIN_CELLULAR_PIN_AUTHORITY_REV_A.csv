@@ -1,0 +1,133 @@
+RefDes,MPN,Package,Pin,Pin_Name,Direction,RevA_Net,Disposition,Required_Network,Authority,Notes
+U8,BG95-M3,LGA-102_23.6x19.9mm,1,PSM_IND,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,PSM indication is not consumed in Rev.A
+U8,BG95-M3,LGA-102_23.6x19.9mm,2,ADC1,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,ADC1 is unused and must not be used with ADC0
+U8,BG95-M3,LGA-102_23.6x19.9mm,3,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,One of twenty-eight module ground pads
+U8,BG95-M3,LGA-102_23.6x19.9mm,4,PCM_CLK,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Voice PCM is unused
+U8,BG95-M3,LGA-102_23.6x19.9mm,5,PCM_SYNC,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Voice PCM is unused
+U8,BG95-M3,LGA-102_23.6x19.9mm,6,PCM_DIN,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Voice PCM is unused
+U8,BG95-M3,LGA-102_23.6x19.9mm,7,PCM_DOUT,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Voice PCM is unused
+U8,BG95-M3,LGA-102_23.6x19.9mm,8,USB_VBUS,INPUT,CELL_USB_VBUS,DEFERRED_MAIN_AUTH_009,Recovery endpoint and protection are owned by MAIN-AUTH-009,Quectel_BG95_HW_Design_v1.6,Exact U8 USB VBUS pad is reserved for modem recovery
+U8,BG95-M3,LGA-102_23.6x19.9mm,9,USB_DP,BIDIR,CELL_USB_DP,DEFERRED_MAIN_AUTH_009,90 Ohm differential recovery pair owned by MAIN-AUTH-009,Quectel_BG95_HW_Design_v1.6,Exact U8 USB D+ pad is reserved for modem recovery
+U8,BG95-M3,LGA-102_23.6x19.9mm,10,USB_DM,BIDIR,CELL_USB_DM,DEFERRED_MAIN_AUTH_009,90 Ohm differential recovery pair owned by MAIN-AUTH-009,Quectel_BG95_HW_Design_v1.6,Exact U8 USB D- pad is reserved for modem recovery
+U8,BG95-M3,LGA-102_23.6x19.9mm,11,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,12,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,13,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,14,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,15,PWRKEY,INPUT,U8_PWRKEY_N,FUNCTION_LOCKED,Open-collector Q1 plus 10 nF to GND_MODEM and Review A test point,Quectel_BG95_HW_Design_v1.6,Active LOW; 500-1000 ms power-on pulse; never hold LOW permanently
+U8,BG95-M3,LGA-102_23.6x19.9mm,16,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,17,RESET_N,INPUT,U8_RESET_N,FUNCTION_LOCKED,Open-collector Q2 and Review A test point; no large capacitance,Quectel_BG95_HW_Design_v1.6,Active LOW 2-3.8 s emergency reset; internally connected to PWRKEY
+U8,BG95-M3,LGA-102_23.6x19.9mm,18,W_DISABLE#,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Airplane-mode pin is unused and left open
+U8,BG95-M3,LGA-102_23.6x19.9mm,19,AP_READY,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,AP sleep handshake is unused
+U8,BG95-M3,LGA-102_23.6x19.9mm,20,STATUS,OUTPUT,U8_STATUS_1V8,FUNCTION_LOCKED,Direct to U16 A2 pin 4; no external pull-up,Quectel_BG95_HW_Design_v1.6,High only after module power-up; governs safe rail removal
+U8,BG95-M3,LGA-102_23.6x19.9mm,21,NET_STATUS,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Network LED output is unused
+U8,BG95-M3,LGA-102_23.6x19.9mm,22,DBG_RXD,INPUT,CELL_DBG_RXD_1V8,DEFERRED_MAIN_AUTH_009,Recovery test endpoint owned by MAIN-AUTH-009,Quectel_BG95_HW_Design_v1.6,Exact debug receive pad is reserved for recovery fixture decision
+U8,BG95-M3,LGA-102_23.6x19.9mm,23,DBG_TXD,OUTPUT,CELL_DBG_TXD_1V8,DEFERRED_MAIN_AUTH_009,Recovery test endpoint owned by MAIN-AUTH-009,Quectel_BG95_HW_Design_v1.6,Exact debug transmit pad is reserved for recovery fixture decision
+U8,BG95-M3,LGA-102_23.6x19.9mm,24,ADC0,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,ADC0 is unused
+U8,BG95-M3,LGA-102_23.6x19.9mm,25,GPIO1,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Fast shutdown is disabled; normal shutdown remains mandatory
+U8,BG95-M3,LGA-102_23.6x19.9mm,26,GPIO2,BIDIR,NC,UNUSED_IO_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Unused GPIO
+U8,BG95-M3,LGA-102_23.6x19.9mm,27,GNSS_TXD,OUTPUT,NC,UNUSED_BOOT_CONFIG_NC,No pull-up and no electrical connection,Quectel_BG95_HW_Design_v1.6,BOOT_CONFIG pad must remain open before startup; independent U9 GNSS is used
+U8,BG95-M3,LGA-102_23.6x19.9mm,28,GNSS_RXD,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Independent U9 GNSS is used
+U8,BG95-M3,LGA-102_23.6x19.9mm,29,VDD_EXT,POWER_OUT,U8_VDD_EXT_1V8,SUPPLY_OUTPUT_LOCKED,100 nF local bypass at U16 VCCA; total external load below 50 mA,Quectel_BG95_HW_Design_v1.6,Module-derived 1.8 V powers U16 VCCA and its 1.8 V pull-ups
+U8,BG95-M3,LGA-102_23.6x19.9mm,30,MAIN_DTR,INPUT,U8_MAIN_DTR_1V8,FUNCTION_LOCKED,Direct from U16 A6 pin 8,Quectel_BG95_HW_Design_v1.6,HIGH permits UART sleep after AT+QSCLK=1; LOW wakes and is reset-safe default
+U8,BG95-M3,LGA-102_23.6x19.9mm,31,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module ground
+U8,BG95-M3,LGA-102_23.6x19.9mm,32,VBAT_BB,POWER,3V8_MODEM_BB,SUPPLY_LOCKED,Common star source; 100 uF low-ESR plus 220 nF 47 nF 150 pF 100 pF 68 pF 33 pF 10 pF bank; ferrite bead adjacent to pins,Quectel_BG95_HW_Design_v1.6,Both VBAT_BB pads share a plane; never below 3.3 V at BG95-M3
+U8,BG95-M3,LGA-102_23.6x19.9mm,33,VBAT_BB,POWER,3V8_MODEM_BB,SUPPLY_LOCKED,Join pin 32 with at least 0.6 mm equivalent copper and no neck-down,Quectel_BG95_HW_Design_v1.6,Baseband supply second pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,34,MAIN_RXD,INPUT,U8_MAIN_RXD_1V8,FUNCTION_LOCKED,Direct from U16 A5 pin 7,Quectel_BG95_HW_Design_v1.6,Module RX input; MCU CELL_TX has 10 kOhm idle-HIGH bias before U16
+U8,BG95-M3,LGA-102_23.6x19.9mm,35,MAIN_TXD,OUTPUT,U8_MAIN_TXD_1V8,FUNCTION_LOCKED,10 kOhm pull-up to U8_VDD_EXT_1V8 and direct to U16 A1 pin 3,Quectel_BG95_HW_Design_v1.6,Module TX output and UART idle-HIGH safe state
+U8,BG95-M3,LGA-102_23.6x19.9mm,36,MAIN_CTS,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Hardware flow control is not used in Rev.A
+U8,BG95-M3,LGA-102_23.6x19.9mm,37,MAIN_RTS,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Hardware flow control is not used in Rev.A
+U8,BG95-M3,LGA-102_23.6x19.9mm,38,MAIN_DCD,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Carrier detect is unused
+U8,BG95-M3,LGA-102_23.6x19.9mm,39,MAIN_RI,OUTPUT,U8_MAIN_RI_1V8,FUNCTION_LOCKED,10 kOhm pull-up to U8_VDD_EXT_1V8 and direct to U16 A3 pin 5,Quectel_BG95_HW_Design_v1.6,Idle HIGH; configured URC pulse is active LOW for 120 ms
+U8,BG95-M3,LGA-102_23.6x19.9mm,40,I2C_SCL,OPEN_DRAIN,NC,UNUSED_OD_NC,No electrical connection and no pull-up,Quectel_BG95_HW_Design_v1.6,Voice-codec I2C is unused
+U8,BG95-M3,LGA-102_23.6x19.9mm,41,I2C_SDA,OPEN_DRAIN,NC,UNUSED_OD_NC,No electrical connection and no pull-up,Quectel_BG95_HW_Design_v1.6,Voice-codec I2C is unused
+U8,BG95-M3,LGA-102_23.6x19.9mm,42,USIM_DET,INPUT,CELL_USIM_DET_1V8,DEFERRED_MAIN_AUTH_005,Dual-SIM powered-off and hot-plug policy is owned by MAIN-AUTH-005,Quectel_BG95_HW_Design_v1.6,Exact U8 USIM detect pad is reserved for the dual-SIM authority
+U8,BG95-M3,LGA-102_23.6x19.9mm,43,USIM_VDD,POWER_OUT,CELL_USIM_VDD_1V8,DEFERRED_MAIN_AUTH_005,Dual-SIM power routing and local capacitance are owned by MAIN-AUTH-005,Quectel_BG95_HW_Design_v1.6,BG95-M3 supports 1.8 V USIM only
+U8,BG95-M3,LGA-102_23.6x19.9mm,44,USIM_RST,OUTPUT,CELL_USIM_RST_1V8,DEFERRED_MAIN_AUTH_005,Dual-SIM series and ESD network owned by MAIN-AUTH-005,Quectel_BG95_HW_Design_v1.6,Exact U8 USIM reset pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,45,USIM_DATA,BIDIR,CELL_USIM_DATA_1V8,DEFERRED_MAIN_AUTH_005,Dual-SIM pull-up series and ESD network owned by MAIN-AUTH-005,Quectel_BG95_HW_Design_v1.6,Exact U8 USIM data pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,46,USIM_CLK,OUTPUT,CELL_USIM_CLK_1V8,DEFERRED_MAIN_AUTH_005,Dual-SIM series and ESD network owned by MAIN-AUTH-005,Quectel_BG95_HW_Design_v1.6,Exact U8 USIM clock pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,47,USIM_GND,POWER,CELL_USIM_GND,DEFERRED_MAIN_AUTH_005,Dual-SIM ground topology owned by MAIN-AUTH-005,Quectel_BG95_HW_Design_v1.6,Specified USIM ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,48,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module ground adjacent to GNSS antenna pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,49,ANT_GNSS,INPUT,NC,UNUSED_RF_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Independent U9 GNSS is authoritative
+U8,BG95-M3,LGA-102_23.6x19.9mm,50,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module RF ground
+U8,BG95-M3,LGA-102_23.6x19.9mm,51,GNSS_LNA_EN,OUTPUT,NC,UNSUPPORTED_VARIANT_NC,No pull-up and no electrical connection,Quectel_BG95_HW_Design_v1.6,Unsupported on BG95-M3 and BOOT_CONFIG on supported variants
+U8,BG95-M3,LGA-102_23.6x19.9mm,52,VBAT_RF,POWER,3V8_MODEM_RF,SUPPLY_LOCKED,Common star source; 100 uF low-ESR plus 100 nF 33 pF 10 pF bank; 0 Ohm link adjacent to pins,Quectel_BG95_HW_Design_v1.6,Both VBAT_RF pads share at least 2.7 mm equivalent copper; never below 3.3 V
+U8,BG95-M3,LGA-102_23.6x19.9mm,53,VBAT_RF,POWER,3V8_MODEM_RF,SUPPLY_LOCKED,Join pin 52 without neck-down and keep the RF burst loop local,Quectel_BG95_HW_Design_v1.6,RF supply second pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,54,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module RF ground
+U8,BG95-M3,LGA-102_23.6x19.9mm,55,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module RF ground
+U8,BG95-M3,LGA-102_23.6x19.9mm,56,ANT_WIFI,INPUT,NC,UNSUPPORTED_VARIANT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Only BG95-MF supports ANT_WIFI
+U8,BG95-M3,LGA-102_23.6x19.9mm,57,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,58,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module ground
+U8,BG95-M3,LGA-102_23.6x19.9mm,59,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module ground
+U8,BG95-M3,LGA-102_23.6x19.9mm,60,ANT_MAIN,BIDIR,CELL_RF,DEFERRED_MAIN_AUTH_009,50 Ohm RF endpoint matching ESD and U.FL are owned by MAIN-AUTH-009 and MAIN-AUTH-011,Quectel_BG95_HW_Design_v1.6,Exact cellular RF source pad is fixed
+U8,BG95-M3,LGA-102_23.6x19.9mm,61,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module RF ground
+U8,BG95-M3,LGA-102_23.6x19.9mm,62,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module RF ground
+U8,BG95-M3,LGA-102_23.6x19.9mm,63,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,64,GPIO3,BIDIR,NC,UNUSED_IO_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Unused GPIO
+U8,BG95-M3,LGA-102_23.6x19.9mm,65,GPIO4,BIDIR,NC,UNUSED_IO_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Unused GPIO
+U8,BG95-M3,LGA-102_23.6x19.9mm,66,GPIO5,BIDIR,NC,UNUSED_IO_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Unused GPIO
+U8,BG95-M3,LGA-102_23.6x19.9mm,67,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,68,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,69,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,70,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,71,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,72,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,73,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,74,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,75,USB_BOOT,INPUT,CELL_USB_BOOT_1V8,DEFERRED_MAIN_AUTH_009,Normal-state LOW bias and recovery fixture endpoint are owned by MAIN-AUTH-009,Quectel_BG95_HW_Design_v1.6,BOOT_CONFIG pad must never be pulled high unintentionally before startup
+U8,BG95-M3,LGA-102_23.6x19.9mm,76,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,77,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,78,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,79,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,80,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,81,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,82,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,83,GRFC1,OUTPUT,NC,UNUSED_BOOT_CONTROL_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Unused generic RF controller output
+U8,BG95-M3,LGA-102_23.6x19.9mm,84,GRFC2,OUTPUT,NC,UNUSED_BOOT_CONFIG_NC,No pull-up and no electrical connection,Quectel_BG95_HW_Design_v1.6,BOOT_CONFIG pad must remain open before startup
+U8,BG95-M3,LGA-102_23.6x19.9mm,85,GPIO6,BIDIR,NC,UNUSED_IO_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Unused GPIO
+U8,BG95-M3,LGA-102_23.6x19.9mm,86,GPIO7,BIDIR,NC,UNUSED_IO_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Unused GPIO
+U8,BG95-M3,LGA-102_23.6x19.9mm,87,GPIO8,BIDIR,NC,UNUSED_IO_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Unused GPIO
+U8,BG95-M3,LGA-102_23.6x19.9mm,88,GPIO9,BIDIR,NC,UNUSED_IO_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Unused GPIO
+U8,BG95-M3,LGA-102_23.6x19.9mm,89,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,90,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,91,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,92,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,93,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,94,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,95,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,96,PON_TRIG,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,PSM wake uses PWRKEY in Rev.A
+U8,BG95-M3,LGA-102_23.6x19.9mm,97,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,98,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,99,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,100,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,101,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,102,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
+U16,SN74AXC8T245PWR,TSSOP-24_PW,1,VCCA,POWER,U8_VDD_EXT_1V8,SUPPLY_LOCKED,100 nF local bypass to GND_MODEM,TI_SCES875C_RevC,Translator powers down with the BG95 1.8 V domain
+U16,SN74AXC8T245PWR,TSSOP-24_PW,2,DIR1,INPUT,U8_VDD_EXT_1V8,STRAP_DIRECT_HIGH,Direct tie to U8_VDD_EXT_1V8,TI_SCES875C_RevC,Channels 1 through 4 translate from module A to MCU B
+U16,SN74AXC8T245PWR,TSSOP-24_PW,3,A1,INPUT,U8_MAIN_TXD_1V8,FUNCTION_LOCKED,10 kOhm pull-up to U8_VDD_EXT_1V8,TI_SCES875C_RevC,Module TX to MCU CELL_RX; pull-up defines UART idle HIGH
+U16,SN74AXC8T245PWR,TSSOP-24_PW,4,A2,INPUT,U8_STATUS_1V8,FUNCTION_LOCKED,Direct from U8 pin 20,TI_SCES875C_RevC,Module power status to MCU CELL_STATUS
+U16,SN74AXC8T245PWR,TSSOP-24_PW,5,A3,INPUT,U8_MAIN_RI_1V8,FUNCTION_LOCKED,10 kOhm pull-up to U8_VDD_EXT_1V8,TI_SCES875C_RevC,Module active-LOW ring indication to MCU
+U16,SN74AXC8T245PWR,TSSOP-24_PW,6,A4,INPUT,GND_MODEM,UNUSED_INPUT_DIRECT_LOW,Direct tie to GND_MODEM,TI_SCES875C_RevC,Unused module-to-MCU source channel
+U16,SN74AXC8T245PWR,TSSOP-24_PW,7,A5,OUTPUT,U8_MAIN_RXD_1V8,FUNCTION_LOCKED,Direct to U8 pin 34,TI_SCES875C_RevC,MCU CELL_TX to module MAIN_RXD
+U16,SN74AXC8T245PWR,TSSOP-24_PW,8,A6,OUTPUT,U8_MAIN_DTR_1V8,FUNCTION_LOCKED,Direct to U8 pin 30,TI_SCES875C_RevC,MCU CELL_DTR to module MAIN_DTR
+U16,SN74AXC8T245PWR,TSSOP-24_PW,9,A7,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,TI_SCES875C_RevC,Unused output
+U16,SN74AXC8T245PWR,TSSOP-24_PW,10,A8,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,TI_SCES875C_RevC,Unused output
+U16,SN74AXC8T245PWR,TSSOP-24_PW,11,DIR2,INPUT,GND_MODEM,STRAP_DIRECT_LOW,Direct tie to GND_MODEM,TI_SCES875C_RevC,Channels 5 through 8 translate from MCU B to module A
+U16,SN74AXC8T245PWR,TSSOP-24_PW,12,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct ground connection,TI_SCES875C_RevC,Translator is placed adjacent to U8 and references module ground
+U16,SN74AXC8T245PWR,TSSOP-24_PW,13,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct ground connection,TI_SCES875C_RevC,Translator is placed adjacent to U8 and references module ground
+U16,SN74AXC8T245PWR,TSSOP-24_PW,14,B8,INPUT,GND_MODEM,UNUSED_INPUT_DIRECT_LOW,Direct tie to GND_MODEM,TI_SCES875C_RevC,Unused MCU-to-module source channel
+U16,SN74AXC8T245PWR,TSSOP-24_PW,15,B7,INPUT,GND_MODEM,UNUSED_INPUT_DIRECT_LOW,Direct tie to GND_MODEM,TI_SCES875C_RevC,Unused MCU-to-module source channel
+U16,SN74AXC8T245PWR,TSSOP-24_PW,16,B6,INPUT,CELL_DTR,FUNCTION_LOCKED,100 kOhm pull-down to GND_MODEM at U16,TI_SCES875C_RevC,Reset-safe LOW keeps modem awake until firmware deliberately requests sleep
+U16,SN74AXC8T245PWR,TSSOP-24_PW,17,B5,INPUT,CELL_TX,FUNCTION_LOCKED,10 kOhm pull-up to 3V3_DIGITAL at U16,TI_SCES875C_RevC,STM32 PB6 USART1_TX; pull-up overcomes internal weak pull-down and holds UART idle HIGH
+U16,SN74AXC8T245PWR,TSSOP-24_PW,18,B4,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,TI_SCES875C_RevC,Unused output
+U16,SN74AXC8T245PWR,TSSOP-24_PW,19,B3,OUTPUT,CELL_RI,FUNCTION_LOCKED,100 kOhm pull-up to 3V3_DIGITAL at MCU-side net,TI_SCES875C_RevC,STM32 PD15 input; firmware masks RI until CELL_STATUS is HIGH
+U16,SN74AXC8T245PWR,TSSOP-24_PW,20,B2,OUTPUT,CELL_STATUS,FUNCTION_LOCKED,100 kOhm pull-down to GND_MODEM at MCU-side net,TI_SCES875C_RevC,STM32 PD13 input; LOW is modem-off safe state
+U16,SN74AXC8T245PWR,TSSOP-24_PW,21,B1,OUTPUT,CELL_RX,FUNCTION_LOCKED,100 kOhm pull-up to 3V3_DIGITAL at MCU-side net,TI_SCES875C_RevC,STM32 PB7 USART1_RX; firmware ignores UART until CELL_STATUS is HIGH
+U16,SN74AXC8T245PWR,TSSOP-24_PW,22,OE,INPUT,GND_MODEM,STRAP_DIRECT_LOW,Direct tie to GND_MODEM,TI_SCES875C_RevC,Always enabled when both rails are valid; VCC isolation applies when VDD_EXT is off
+U16,SN74AXC8T245PWR,TSSOP-24_PW,23,VCCB,POWER,3V3_DIGITAL,SUPPLY_LOCKED,100 nF local bypass to GND_MODEM,TI_SCES875C_RevC,MCU-side supply; verify local voltage and ground offset during 2G burst
+U16,SN74AXC8T245PWR,TSSOP-24_PW,24,VCCB,POWER,3V3_DIGITAL,SUPPLY_LOCKED,100 nF local bypass to GND_MODEM,TI_SCES875C_RevC,Second VCCB pin on the same 3V3_DIGITAL plane
+Q1,"MMBT3904,215",SOT23,1,B,INPUT,CELL_PWRKEY_B,FUNCTION_LOCKED,4.7 kOhm series from CELL_PWRKEY_CMD plus 47 kOhm base-emitter pull-down,Nexperia_MMBT3904_v5,STM32 PD11 HIGH asserts the active-LOW U8 PWRKEY collector
+Q1,"MMBT3904,215",SOT23,2,E,POWER,GND_MODEM,GROUND_LOCKED,Direct to GND_MODEM,Nexperia_MMBT3904_v5,Emitter references the BG95 control domain
+Q1,"MMBT3904,215",SOT23,3,C,OPEN_COLLECTOR,U8_PWRKEY_N,FUNCTION_LOCKED,Direct to U8 pin 15 plus 10 nF to GND_MODEM and test point,Nexperia_MMBT3904_v5,Collector saturation must remain below Quectel VILmax 0.45 V
+Q2,"MMBT3904,215",SOT23,1,B,INPUT,CELL_RESET_B,FUNCTION_LOCKED,4.7 kOhm series from CELL_RESET_N_CMD plus 47 kOhm base-emitter pull-down,Nexperia_MMBT3904_v5,STM32 PD12 HIGH asserts the active-LOW U8 RESET_N collector
+Q2,"MMBT3904,215",SOT23,2,E,POWER,GND_MODEM,GROUND_LOCKED,Direct to GND_MODEM,Nexperia_MMBT3904_v5,Emitter references the BG95 control domain
+Q2,"MMBT3904,215",SOT23,3,C,OPEN_COLLECTOR,U8_RESET_N,FUNCTION_LOCKED,Direct to U8 pin 17 and test point with no large capacitance,Nexperia_MMBT3904_v5,Emergency reset collector; PWRKEY and RESET_N commands must never overlap
