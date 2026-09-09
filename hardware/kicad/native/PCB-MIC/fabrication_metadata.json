@@ -1,0 +1,16 @@
+{
+  "schema": "dioneya-fabrication-metadata-v1",
+  "board": "PCB-MIC",
+  "revision": "A",
+  "material": "FR-4",
+  "surface_finish": "ENIG",
+  "board_thickness_mm": 1.0,
+  "copper_layers": 2,
+  "status": "NOT_FOR_MANUFACTURE",
+  "authority": "hardware/PCB_MIC_MECHANICAL_FREEZE_REV_A.md",
+  "release_notes": [
+    "Review A and Review B remain mandatory",
+    "Fabricator DFM remains mandatory",
+    "Acoustic membrane and assembled-port validation remain mandatory"
+  ]
+}
