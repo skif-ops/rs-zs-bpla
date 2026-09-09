@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Apply the frozen EVT-PRE-20 Rev.A mechanical contract to PCB-MIC.
+"""Apply the frozen EVT-PRE-20 Rev.A mechanical/release metadata to PCB-MIC.
 
-The electrical generator intentionally owns routing and component placement. This
-second stage owns the now-frozen leaf outline/thickness and mounting holes so the
-mechanical contract can be audited independently. It does not release the board for
-manufacture; KiCad ERC/DRC, Review A/B, DFM and acoustic validation remain mandatory.
+Electrical routing and component placement remain owned by the electrical generator.
+This stage owns the frozen leaf outline/thickness, mounting holes, board-finish metadata
+and board title block. It does not release the board for manufacture; Review A/B, DFM
+and acoustic validation remain mandatory.
 """
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ import pcbnew
 BOARD_W_MM = 24.0
 BOARD_H_MM = 22.0
 BOARD_THICKNESS_MM = 1.0
+BOARD_FINISH = "ENIG"
 MOUNT_HOLE_MM = 2.2
 MOUNTS = (
     ("H1", 4.0, 16.65),
@@ -44,6 +45,10 @@ def add_mount_hole(board, reference: str, x: float, y: float) -> None:
     fp.SetReference(reference)
     fp.SetValue("M2_CLEARANCE_NPTH_2.2")
     fp.SetPosition(v(x, y))
+    fp.SetBoardOnly(True)
+    fp.SetExcludedFromBOM(True)
+    fp.SetExcludedFromPosFiles(True)
+    fp.SetAllowMissingCourtyard(True)
     board.Add(fp)
     hide_fields(fp)
 
@@ -56,6 +61,24 @@ def add_mount_hole(board, reference: str, x: float, y: float) -> None:
     pad.SetDrillSize(v(MOUNT_HOLE_MM, MOUNT_HOLE_MM))
     pad.SetPosition(v(x, y))
     fp.Add(pad)
+
+
+def set_release_metadata(board) -> None:
+    settings = board.GetDesignSettings()
+    settings.SetBoardThickness(mm(BOARD_THICKNESS_MM))
+
+    stackup = settings.GetStackupDescriptor()
+    # Materialize a normal two-layer stackup so Gerber job metadata carries the
+    # intentional Rev.A finish instead of the KiCad default "None".
+    stackup.BuildDefaultStackupList(settings, settings.GetCopperLayerCount())
+    stackup.m_FinishType = BOARD_FINISH
+
+    title = board.GetTitleBlock()
+    title.SetTitle("Dioneya EVT-PRE-20 PCB-MIC")
+    title.SetRevision("A")
+    title.SetCompany("Dioneya / ZS-BPLA")
+    title.SetDate("2026-09-09")
+    title.SetComment(0, "NOT FOR MANUFACTURE until Review A/B and DFM close")
 
 
 def main() -> int:
@@ -72,7 +95,7 @@ def main() -> int:
         if ref in existing:
             raise RuntimeError(f"mounting reference {ref} already exists; refusing duplicate mechanical finalization")
 
-    board.GetDesignSettings().SetBoardThickness(mm(BOARD_THICKNESS_MM))
+    set_release_metadata(board)
     for ref, x, y in MOUNTS:
         add_mount_hole(board, ref, x, y)
 
@@ -97,8 +120,8 @@ def main() -> int:
 
     pcbnew.SaveBoard(str(args.board), board)
     print(
-        f"PCB-MIC mechanical finalization applied: {BOARD_W_MM:.1f}x{BOARD_H_MM:.1f}x{BOARD_THICKNESS_MM:.1f} mm; "
-        f"H1/H2 NPTH {MOUNT_HOLE_MM:.1f} mm"
+        f"PCB-MIC finalization applied: {BOARD_W_MM:.1f}x{BOARD_H_MM:.1f}x{BOARD_THICKNESS_MM:.1f} mm; "
+        f"finish={BOARD_FINISH}; H1/H2 NPTH {MOUNT_HOLE_MM:.1f} mm; mounting refs excluded from BOM/PnP"
     )
     return 0
 

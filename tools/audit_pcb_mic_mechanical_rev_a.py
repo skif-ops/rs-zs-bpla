@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent mechanical audit for EVT-PRE-20 PCB-MIC Rev.A native board."""
+"""Independent mechanical/release-metadata audit for EVT-PRE-20 PCB-MIC Rev.A."""
 from __future__ import annotations
 
 import argparse
@@ -10,6 +10,8 @@ import pcbnew
 EXPECTED_W = 24.0
 EXPECTED_H = 22.0
 EXPECTED_THICKNESS = 1.0
+EXPECTED_FINISH = "ENIG"
+EXPECTED_REV = "A"
 EXPECTED_MOUNTS = {
     "H1": (4.0, 16.65),
     "H2": (20.0, 16.65),
@@ -70,14 +72,31 @@ def main() -> int:
     close(x1 - x0, EXPECTED_W, 0.01, "outline width")
     close(y1 - y0, EXPECTED_H, 0.01, "outline height")
 
-    thickness = to_mm(board.GetDesignSettings().GetBoardThickness())
+    settings = board.GetDesignSettings()
+    thickness = to_mm(settings.GetBoardThickness())
     close(thickness, EXPECTED_THICKNESS, 0.01, "board thickness")
+    finish = str(settings.GetStackupDescriptor().m_FinishType)
+    if finish != EXPECTED_FINISH:
+        raise RuntimeError(f"board finish: {finish!r} != {EXPECTED_FINISH!r}")
+
+    title = board.GetTitleBlock()
+    if str(title.GetRevision()) != EXPECTED_REV:
+        raise RuntimeError(f"title block revision: {title.GetRevision()!r} != {EXPECTED_REV!r}")
+    if "PCB-MIC" not in str(title.GetTitle()):
+        raise RuntimeError(f"title block does not identify PCB-MIC: {title.GetTitle()!r}")
 
     refs = {fp.GetReference(): fp for fp in board.GetFootprints()}
     for ref, expected_xy in EXPECTED_MOUNTS.items():
         if ref not in refs:
             raise RuntimeError(f"missing mounting hole {ref}")
-        hole = one_npth(refs[ref], ref)
+        fp = refs[ref]
+        if not fp.IsBoardOnly():
+            raise RuntimeError(f"{ref}: mechanical footprint is not board-only")
+        if not fp.IsExcludedFromBOM():
+            raise RuntimeError(f"{ref}: mechanical footprint is not excluded from BOM")
+        if not fp.IsExcludedFromPosFiles():
+            raise RuntimeError(f"{ref}: mechanical footprint is not excluded from position files")
+        hole = one_npth(fp, ref)
         x, y = pos_mm(hole)
         close(x, expected_xy[0], 0.01, f"{ref} X")
         close(y, expected_xy[1], 0.01, f"{ref} Y")
@@ -104,9 +123,9 @@ def main() -> int:
     if stale:
         raise RuntimeError(f"stale DIM-004 OPEN fabrication note remains: {stale}")
 
-    print("PCB-MIC Rev.A mechanical audit PASS")
-    print("outline 24.0 x 22.0 mm; thickness 1.0 mm")
-    print("H1/H2: NPTH 2.2 mm at (4.0,16.65)/(20.0,16.65)")
+    print("PCB-MIC Rev.A mechanical/release metadata audit PASS")
+    print("outline 24.0 x 22.0 mm; thickness 1.0 mm; finish ENIG; revision A")
+    print("H1/H2: NPTH 2.2 mm and excluded from BOM/PnP")
     print("acoustic port: NPTH 0.8 mm at (12.0,16.65)")
     return 0
 

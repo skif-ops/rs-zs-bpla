@@ -57,8 +57,6 @@ def validate_schematic(cli: str, name: str, sch: Path) -> tuple[bool, str]:
          "-o", str(out / "erc.json"), str(sch)],
         check=False,
     )
-    # A PDF is useful Review-A evidence even while ERC is being repaired, provided the
-    # native schematic parses. PDF export failure is independently blocking.
     pdf_rc = run(
         [cli, "sch", "export", "pdf", "-o", str(out / f"{name}_schematic.pdf"), str(sch)],
         check=False,
@@ -77,7 +75,6 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
         check=False,
     )
     if rc != 0:
-        # Never create a fabrication-looking package from a board with DRC violations.
         return False, f"CLI_DRC_FAIL_rc{rc}_NO_FAB_EXPORT"
 
     gerber = out / "gerber"
@@ -85,16 +82,22 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
     drill = out / "drill"
     drill.mkdir(exist_ok=True)
 
+    # STEP is intentionally board-only at this gate. Controlled component 3D-model
+    # links are a separate Review-B item; exporting a board-only STEP is sufficient for
+    # mic-pod fit/tolerance work without pretending secondary reference CAD is released.
     export_commands = [
         [cli, "pcb", "export", "gerbers", "-o", str(gerber), "--board-plot-params", str(pcb)],
         [cli, "pcb", "export", "drill", "-o", str(drill), "--format", "excellon", "--generate-map", str(pcb)],
         [cli, "pcb", "export", "pos", "--format", "csv", "--units", "mm", "--side", "both",
          "-o", str(out / f"{name}_pos.csv"), str(pcb)],
+        [cli, "pcb", "export", "ipcd356", "-o", str(out / f"{name}.d356"), str(pcb)],
+        [cli, "pcb", "export", "step", "--board-only", "--force",
+         "-o", str(out / f"{name}_board.step"), str(pcb)],
     ]
     export_rcs = [run(cmd, check=False) for cmd in export_commands]
     if any(export_rcs):
         return False, f"CLI_DRC_PASS_EXPORT_FAIL_{export_rcs}"
-    return True, "CLI_DRC_EXPORT_PASS_REVIEW_B_PENDING"
+    return True, "CLI_DRC_FAB_EXPORT_PASS_REVIEW_B_PENDING"
 
 
 def artifact_files() -> list[Path]:
@@ -119,7 +122,6 @@ def write_manifest() -> None:
 
 
 def verify_manifest() -> None:
-    """Immediately re-read and verify the final artifact manifest before CI can pass."""
     manifest_path = ART / "sha256_manifest.json"
     records = json.loads(manifest_path.read_text(encoding="utf-8"))
     by_path = {str(rec["path"]): rec for rec in records}
@@ -187,7 +189,6 @@ def main() -> int:
         run([cli, "version"])
         for name in BOARDS:
             p = paths(name)
-            # Deliberately run PCB and SCH independently and collect both results.
             if p["pcb"].is_file():
                 ok, state = validate_pcb(cli, name, p["pcb"])
                 report["boards"][name]["pcb_state"] = state
@@ -207,8 +208,6 @@ def main() -> int:
         if cli_failures:
             report["cli_failures"] = cli_failures
 
-    # The gate report is final before hashing. The previous ordering wrote the manifest
-    # first and then changed native_gate.json, which the independent post-run audit caught.
     (ART / "native_gate.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     if args.run_cli:
         write_manifest()
