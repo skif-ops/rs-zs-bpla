@@ -18,9 +18,9 @@ on:
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
       - "tools/generate_pcb_pwr_schematic_rev_a.py"
       - "tools/finalize_pcb_pwr_symbol_types_rev_a.py"
+      - "tools/finalize_pcb_pwr_schematic_completeness_rev_a.py"
       - "tools/finalize_pcb_pwr_erc_power_model_rev_a.py"
       - "tools/materialize_pcb_pwr_libraries_rev_a.py"
-      - "tools/ensure_pcb_pwr_power_lib_table_rev_a.py"
       - "tools/audit_pcb_pwr_native_schematic_rev_a.py"
       - ".github/workflows/pcb-pwr-schematic.yml"
 
@@ -65,18 +65,18 @@ jobs:
           python -m pip install --disable-pip-version-check kiutils
           kicad-cli version
 
-      - name: Materialize PCB-PWR native schematic
+      - name: Materialize complete PCB-PWR native schematic
         run: |
           python tools/generate_pcb_pwr_schematic_rev_a.py \
             --output hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/finalize_pcb_pwr_symbol_types_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/finalize_pcb_pwr_schematic_completeness_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/finalize_pcb_pwr_erc_power_model_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/materialize_pcb_pwr_libraries_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
-          python tools/ensure_pcb_pwr_power_lib_table_rev_a.py \
-            --table hardware/kicad/native/PCB-PWR/sym-lib-table
           python tools/audit_pcb_pwr_native_schematic_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
