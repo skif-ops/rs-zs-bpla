@@ -20,6 +20,8 @@ CRITICAL = {
     "PDM_DATA4": ("PE4", "MDF1_SDI3"),
     "MIC_WAKE": ("PA8", "GPXTI8"),
     "LORA_DIO1": ("PC2", "GPXTI2"),
+    "LORA_TXEN": ("PB15", "GPIO_Output"),
+    "LORA_RXEN": ("PD8", "GPIO_Output"),
     "GNSS_PPS": ("PA0", "S_TIM2_CH1"),
     "I2C2_SCL": ("PB13", "I2C2_SCL"),
     "I2C2_SDA": ("PB14", "I2C2_SDA"),
@@ -112,7 +114,7 @@ def main() -> None:
     for key, label in values.items():
         if key.endswith(".GPIO_Label"):
             label_to_pin[label] = normalize_pin_key(key.removesuffix(".GPIO_Label"))
-    require(len(label_to_pin) == 65, f"expected 65 labeled physical pins, got {len(label_to_pin)}")
+    require(len(label_to_pin) == 67, f"expected 67 labeled physical pins, got {len(label_to_pin)}")
 
     for net, (pin, signal) in CRITICAL.items():
         require(label_to_pin.get(net) == pin, f"critical IOC pin mismatch for {net}")
@@ -129,7 +131,10 @@ def main() -> None:
         exti[net] = int(match.group(1))
     require(exti == {"LORA_DIO1": 2, "ACCEL_INT": 6, "TAMPER_IN": 7, "MIC_WAKE": 8}, f"EXTI mapping mismatch: {exti}")
     require(len(set(exti.values())) == len(exti), "multiple GPIO ports compete for one EXTI line")
-    require("PD8" not in label_to_pin.values(), "superseded LORA_DIO1 PD8 assignment remains active")
+    require(label_to_pin["LORA_TXEN"] == "PB15", "LoRa TXEN output mapping drift")
+    require(label_to_pin["LORA_RXEN"] == "PD8", "LoRa RXEN output mapping drift")
+    require(values["PB15.PinState"] == "GPIO_PIN_RESET", "LoRa TXEN does not initialize LOW")
+    require(values["PD8.PinState"] == "GPIO_PIN_RESET", "LoRa RXEN does not initialize LOW")
 
     require(values["PC14-OSC32_IN\\ (PC14).Mode"] == "LSE-External-Clock-Source", "LSE bypass source mode missing")
     require(values["PC15-OSC32_OUT\\ (PC15).Signal"] == "RCC_OSC32_OUT", "LSE output pin is not reserved")
@@ -159,9 +164,14 @@ def main() -> None:
     require("CUBEMX_OPEN_REGENERATE_BLOCKER" in status, "target status lost CubeMX validation blocker")
     decisions = (ROOT / "docs/DECISION_LOG.csv").read_text(encoding="utf-8")
     require("DEC-022" in decisions and "PD8 to PC2" in decisions, "EXTI conflict decision is not traceable")
+    require(
+        "DEC-023" in decisions and "PB15 pin54 drives active-HIGH LORA_TXEN" in decisions
+        and "PD8 pin55 drives active-HIGH LORA_RXEN" in decisions,
+        "separate fail-closed LoRa RF-switch decision is not traceable",
+    )
 
     print("EVT-PRE-20 CubeMX IOC QG-2 independent technical audit: PASS")
-    print("- 65 pins, 17 IPs, unique EXTI2/6/7/8 sources, no HSE and unreleased PWR/clock settings verified")
+    print("- 67 pins, fail-closed LoRa TXEN/RXEN, 17 IPs, unique EXTI2/6/7/8 sources, no HSE and unreleased PWR/clock settings verified")
 
 
 if __name__ == "__main__":

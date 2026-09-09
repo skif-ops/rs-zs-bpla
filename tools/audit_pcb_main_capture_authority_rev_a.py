@@ -34,6 +34,8 @@ DUAL_SIM_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_R
 DUAL_SIM_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md"
 GNSS_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv"
 GNSS_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md"
+LORA_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv"
+LORA_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md"
 DUAL_SIM_POLICY_PATH = ROOT / "hardware/DUAL_SIM_SINGLE_STANDBY.md"
 AUDIO_INTERFACE_PATH = ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md"
 POWER_ARCHITECTURE_PATH = ROOT / "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
@@ -54,6 +56,8 @@ EXPECTED_AUTHORITATIVE_INPUTS = {
     "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md",
     "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -107,8 +111,8 @@ EXPECTED_SWD = {
     "4": "NRST",
     "5": "GND",
 }
-EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(7, 12)}
-EXPECTED_CLOSED_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(1, 7)}
+EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(8, 12)}
+EXPECTED_CLOSED_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(1, 8)}
 EXPECTED_DEVICE_METADATA = {
     "U2": ("W25Q512JVFIQ", "SOIC-16_300mil_F"),
     "U3": ("LIS2DW12TR", "LGA-12_2x2mm"),
@@ -350,8 +354,6 @@ EXPECTED_UNUSED_IO = {
     23: "UNUSED_GPIO_NC",
     32: "UNUSED_GPIO_NC",
     36: "UNUSED_GPIO_NC",
-    54: "UNUSED_GPIO_NC",
-    55: "UNUSED_GPIO_NC",
     69: "UNUSED_GPIO_NC",
     84: "UNUSED_GPIO_NC",
     88: "UNUSED_GPIO_NC",
@@ -428,10 +430,10 @@ def main() -> None:
 
     base = rows(PIN_MAP_PATH)
     addendum = rows(ADDENDUM_PATH)
-    require(len(base) == 64, f"expected 64 base MCU assignments, got {len(base)}")
+    require(len(base) == 66, f"expected 66 base MCU assignments, got {len(base)}")
     require(len(addendum) == 1 and addendum[0]["Net"] == "AAD_CFG", "AAD_CFG addendum mismatch")
     pins = base + addendum
-    require(len(pins) == status["mcu_contract"]["functional_assignment_count"] == 65, "MCU assignment count mismatch")
+    require(len(pins) == status["mcu_contract"]["functional_assignment_count"] == 67, "MCU assignment count mismatch")
     for field in ("Net", "MCU_Pin", "LQFP100_Pin"):
         values = [row[field] for row in pins]
         require(len(values) == len(set(values)), f"MCU pin authority has duplicate {field}")
@@ -441,6 +443,8 @@ def main() -> None:
         "MIC_WAKE": ("PA8", "67"),
         "AAD_CFG": ("PA15", "77"),
         "LORA_DIO1": ("PC2", "17"),
+        "LORA_TXEN": ("PB15", "54"),
+        "LORA_RXEN": ("PD8", "55"),
         "I2C2_SCL": ("PB13", "52"),
         "I2C2_SDA": ("PB14", "53"),
         "USB_DM": ("PA11", "70"),
@@ -480,7 +484,7 @@ def main() -> None:
         require(row["Pin_Type"] == expected_type, f"U1 position {position} pin-type mismatch")
 
     functional_by_position = {int(row["LQFP100_Pin"]): row for row in pins}
-    require(len(functional_by_position) == 65, "functional U1 position count mismatch")
+    require(len(functional_by_position) == 67, "functional U1 position count mismatch")
     for position, source_row in functional_by_position.items():
         authority_row = authority_by_pin[position]
         if position == 9:
@@ -524,6 +528,9 @@ def main() -> None:
         "4349055dfd06e6eb2dce1a440c44a995ad7c924e28435ede119a7d4bb10f556d",
         "No HSE is fitted",
         "VREFBUF disabled",
+        "67 locked functional assignments",
+        "PB15 / package pin 54",
+        "PD8 / package pin 55",
         "2.2 uH",
         "2 x 2.2 uF",
         "10 uF",
@@ -1017,6 +1024,113 @@ def main() -> None:
     require(by_ref["U9"]["Package_or_Module"] == "LCC-18_9.7x10.1mm", "U9 freeze package mismatch")
     require("PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv" in by_ref["U9"]["Notes"], "U9 freeze lacks GNSS authority citation")
 
+    lora_rows = rows(LORA_PIN_AUTHORITY_PATH)
+    require(len(lora_rows) == 24, f"expected 24 U10/J10 authority rows, got {len(lora_rows)}")
+    require(all(set(row) == cellular_columns for row in lora_rows), "LoRa pin-authority schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in cellular_columns) for row in lora_rows),
+        "LoRa pin-authority row contains an empty field",
+    )
+    lora_by_key = {(row["RefDes"], row["Pin"]): row for row in lora_rows}
+    require(len(lora_by_key) == len(lora_rows), "duplicate LoRa RefDes/pin key")
+    require({row["RefDes"] for row in lora_rows} == {"U10", "J10"}, "LoRa authority RefDes set drift")
+    require(
+        {row["Pin"] for row in lora_rows if row["RefDes"] == "U10"} == {str(index) for index in range(1, 23)},
+        "U10 package positions are not exactly 1..22",
+    )
+    require(
+        {row["Pin"] for row in lora_rows if row["RefDes"] == "J10"} == {"1", "SHIELD"},
+        "J10 electrical contact set mismatch",
+    )
+    require(
+        all(
+            (row["MPN"], row["Package"]) == ("E22-900M22S", "SMD_20x14_22P_1.27mm")
+            for row in lora_rows if row["RefDes"] == "U10"
+        ),
+        "U10 LoRa identity/package mismatch",
+    )
+    expected_u10 = {
+        1: ("GND", "POWER", "GND", "GROUND_LOCKED"),
+        2: ("GND", "POWER", "GND", "GROUND_LOCKED"),
+        3: ("GND", "POWER", "GND", "GROUND_LOCKED"),
+        4: ("GND", "POWER", "GND", "GROUND_LOCKED"),
+        5: ("GND", "POWER", "GND", "GROUND_LOCKED"),
+        6: ("RXEN", "INPUT", "LORA_RXEN", "RF_SWITCH_CONTROL_LOCKED"),
+        7: ("TXEN", "INPUT", "LORA_TXEN", "RF_SWITCH_CONTROL_LOCKED"),
+        8: ("DIO2", "BIDIR", "NC", "UNUSED_IO_NC"),
+        9: ("VCC", "POWER", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        10: ("GND", "POWER", "GND", "GROUND_LOCKED"),
+        11: ("GND", "POWER", "GND", "GROUND_LOCKED"),
+        12: ("GND", "POWER", "GND", "GROUND_LOCKED"),
+        13: ("DIO1", "OUTPUT", "LORA_DIO1", "FUNCTION_LOCKED"),
+        14: ("BUSY", "OUTPUT", "LORA_BUSY", "FUNCTION_LOCKED"),
+        15: ("NRST", "INPUT", "LORA_RESET_N", "RESET_LOCKED"),
+        16: ("MISO", "OUTPUT", "LORA_MISO", "FUNCTION_LOCKED"),
+        17: ("MOSI", "INPUT", "LORA_MOSI", "FUNCTION_LOCKED"),
+        18: ("SCK", "INPUT", "LORA_SCK", "FUNCTION_LOCKED"),
+        19: ("NSS", "INPUT", "LORA_NSS", "FUNCTION_LOCKED"),
+        20: ("GND", "POWER", "GND", "RF_GROUND_LOCKED"),
+        21: ("ANT", "RF_BIDIR", "LORA_RF_MODULE", "RF_CONTACT_LOCKED"),
+        22: ("GND", "POWER", "GND", "RF_GROUND_LOCKED"),
+    }
+    for pin, expected in expected_u10.items():
+        row = lora_by_key[("U10", str(pin))]
+        actual = (row["Pin_Name"], row["Direction"], row["RevA_Net"], row["Disposition"])
+        require(actual == expected, f"U10 pin {pin} mapping mismatch")
+    for pin in ("6", "7"):
+        require("100 kOhm pull-down" in lora_by_key[("U10", pin)]["Required_Network"], f"U10 pin {pin} safe pull-down missing")
+        require("initializes LOW" in lora_by_key[("U10", pin)]["Required_Network"], f"U10 pin {pin} LOW startup missing")
+    require("182 mA" in lora_by_key[("U10", "9")]["Required_Network"], "U10 supply headroom requirement missing")
+    require("100 nF plus 10 uF" in lora_by_key[("U10", "9")]["Required_Network"], "U10 local decoupling mismatch")
+    require("10 kOhm pull-up" in lora_by_key[("U10", "15")]["Required_Network"], "U10 NRST pull-up missing")
+    require("100 nF" in lora_by_key[("U10", "15")]["Required_Network"], "U10 NRST capacitor missing")
+    require("10 kOhm pull-up" in lora_by_key[("U10", "19")]["Required_Network"], "U10 NSS deselect pull-up missing")
+    require("DIO2-to-TXEN short is forbidden" in lora_by_key[("U10", "8")]["Notes"], "U10 DIO2 separate-control rule missing")
+    j10_signal = lora_by_key[("J10", "1")]
+    require(
+        (j10_signal["Pin_Name"], j10_signal["RevA_Net"], j10_signal["Disposition"])
+        == ("SIGNAL", "LORA_RF_ANT", "RF_CONTACT_LOCKED"),
+        "J10 center-contact map mismatch",
+    )
+    for marker in ("ultra-low-capacitance ESD", "50 Ohm", "0 Ohm series baseline", "both shunts DNP"):
+        require(marker in j10_signal["Required_Network"], f"J10 RF chain lacks {marker}")
+    require("no tee test point" in j10_signal["Notes"], "J10 no-stub conducted-port rule missing")
+    require(
+        (lora_by_key[("J10", "SHIELD")]["RevA_Net"], lora_by_key[("J10", "SHIELD")]["Disposition"])
+        == ("GND", "SHIELD_GROUND_LOCKED"),
+        "J10 shell ground mismatch",
+    )
+    for net, expected in {
+        "LORA_TXEN": ("PB15", "54"), "LORA_RXEN": ("PD8", "55"),
+        "LORA_DIO1": ("PC2", "17"), "LORA_BUSY": ("PD9", "56"),
+        "LORA_RESET_N": ("PD10", "57"),
+    }.items():
+        require(net in by_net, f"LoRa MCU net missing: {net}")
+        require((by_net[net]["MCU_Pin"], by_net[net]["LQFP100_Pin"]) == expected, f"{net} MCU pin mismatch")
+    require(authority_by_pin[54]["RevA_Net"] == "LORA_TXEN", "U1 PB15 LoRa TXEN authority mismatch")
+    require(authority_by_pin[55]["RevA_Net"] == "LORA_RXEN", "U1 PD8 LoRa RXEN authority mismatch")
+
+    lora_review = LORA_REVIEW_PATH.read_text(encoding="utf-8")
+    lora_sha256 = hashlib.sha256(LORA_PIN_AUTHORITY_PATH.read_bytes()).hexdigest()
+    for marker in {
+        "LORA_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        lora_sha256, "c66665745ef6f4a04de77201026d92841066b69575f62a717fe02bc363df62bf",
+        "E22-900MM22S", "182 mA", "TXEN=1/RXEN=0", "DIO3 TCXO supply to 2.2 V",
+        "castellated-ANT option", "does not release exact support-component MPNs",
+    }:
+        require(marker in lora_review, f"LoRa authority review missing marker: {marker}")
+    for path, markers in {
+        CAPTURE_SPEC_PATH: ("PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv", "LORA_TXEN", "DIO2 is NC", "MAIN-AUTH-010"),
+        ROOT / "hardware/kicad/sheets/06_LORA.csv": ("all 24 U10/J10 rows", "100 kOhm pull-downs", "no-stub route"),
+        ROOT / "config/lora/RU868.yaml": ("tx_enabled: false", "signed_manufacturing_profile_only", "Do not copy EU868"),
+    }.items():
+        content = path.read_text(encoding="utf-8")
+        for marker in markers:
+            require(marker in content, f"{path.name} lacks frozen LoRa marker: {marker}")
+    require(by_ref["U10"]["Package_or_Module"] == "SMD_20x14_22P_1.27mm", "U10 freeze package mismatch")
+    require("PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv" in by_ref["U10"]["Notes"], "U10 freeze lacks LoRa authority citation")
+    require("CASTELLATED_OPTION" in by_ref["U10"]["Status"], "U10 supplier antenna-option blocker missing")
+
     harness = rows(HARNESS_PATH)
     main_power = interface(harness, "MAIN_PWR")
     require(pin_contract(main_power) == EXPECTED_MAIN_POWER, "12-pin MAIN/PWR harness contract mismatch")
@@ -1066,6 +1180,12 @@ def main() -> None:
         "PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv" in connectors["CON-RF-GNSS"]["Notes"]
         and "J9 center" in connectors["CON-RF-GNSS"]["Notes"],
         "GNSS connector freeze lacks J9 authority citation",
+    )
+    require(
+        "PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv" in connectors["CON-RF-LORA"]["Notes"]
+        and "J10 center" in connectors["CON-RF-LORA"]["Notes"]
+        and "no-stub" in connectors["CON-RF-LORA"]["Notes"],
+        "LoRa connector freeze lacks J10 authority/no-stub citation",
     )
 
     mcu = status["mcu_contract"]
@@ -1137,6 +1257,14 @@ def main() -> None:
         },
         "MAIN-AUTH-006 evidence set mismatch",
     )
+    require(
+        closed_evidence["MAIN-AUTH-007"]
+        == {
+            "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-007 evidence set mismatch",
+    )
     require(closed_ids.isdisjoint(open_ids), "authority is both open and closed")
     require(open_ids == EXPECTED_OPEN_AUTHORITY_IDS, "PCB-MAIN open authority register drift")
     require(len(open_ids) == len(open_items), "duplicate PCB-MAIN open authority ID")
@@ -1181,6 +1309,7 @@ def main() -> None:
     print(f"- all {len(cellular_rows)} U8/U16/Q1/Q2 physical pins, power banks, translation and controls verified")
     print(f"- all {len(dual_sim_rows)} U13/U14/U15/J6/J7/Q3 physical contacts, safe-state controls and slot paths verified")
     print(f"- all {len(gnss_rows)} U9/J9 physical contacts, supply choices, supervisor signals and RF/bias topology verified")
+    print(f"- all {len(lora_rows)} U10/J10 physical contacts, fail-closed RF-switch controls and no-stub RF path verified")
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(f"- {len(open_items)} missing pad/mechanical authorities remain explicit production blockers")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")

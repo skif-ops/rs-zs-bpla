@@ -9,7 +9,7 @@
 #define EVT_PRE_20_MCU_MPN "STM32U585VIT6Q"
 #define EVT_PRE_20_MCU_PACKAGE "LQFP100_14x14"
 #define EVT_PRE_20_PIN_DATABASE "STM32U585VITxQ"
-#define EVT_PRE_20_PIN_ASSIGNMENT_COUNT 65u
+#define EVT_PRE_20_PIN_ASSIGNMENT_COUNT 67u
 #define EVT_PRE_20_AF_GPIO (-1)
 #define EVT_PRE_20_AF_RCC (-2)
 #define EVT_PRE_20_AF_SYS (-3)
@@ -61,6 +61,8 @@ static const evt_pre_20_pin_contract_t evt_pre_20_pin_contract[] = {
   {"LORA_MISO", "LoRa SPI MISO", 'A', 6u, 30u, "SPI1_MISO", 5, EVT_PRE_20_DIRECTION_IN},
   {"LORA_MOSI", "LoRa SPI MOSI", 'A', 7u, 31u, "SPI1_MOSI", 5, EVT_PRE_20_DIRECTION_OUT},
   {"LORA_DIO1", "LoRa interrupt", 'C', 2u, 17u, "GPIO", -1, EVT_PRE_20_DIRECTION_IN},
+  {"LORA_TXEN", "LoRa RF switch transmit enable", 'B', 15u, 54u, "GPIO", -1, EVT_PRE_20_DIRECTION_OUT},
+  {"LORA_RXEN", "LoRa RF switch receive enable", 'D', 8u, 55u, "GPIO", -1, EVT_PRE_20_DIRECTION_OUT},
   {"LORA_BUSY", "LoRa busy", 'D', 9u, 56u, "GPIO", -1, EVT_PRE_20_DIRECTION_IN},
   {"LORA_RESET_N", "LoRa reset", 'D', 10u, 57u, "GPIO", -1, EVT_PRE_20_DIRECTION_OUT},
   {"CELL_TX", "Cellular main UART transmit", 'B', 6u, 92u, "USART1_TX", 7, EVT_PRE_20_DIRECTION_OUT},

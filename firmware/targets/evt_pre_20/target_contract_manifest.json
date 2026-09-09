@@ -10,7 +10,7 @@
   "source_inputs": [
     {
       "path": "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
-      "sha256": "9ff0b9005db18591eac9b19233d7d261edf598a9df7af5d8f80ab6759a58e32f"
+      "sha256": "d2032c65e3164b58350eb5fb06a601113732214dc519c536d509fec789d7ece1"
     },
     {
       "path": "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
@@ -22,11 +22,11 @@
     },
     {
       "path": "firmware/targets/evt_pre_20/target_status.yaml",
-      "sha256": "a412461e46b515dfb7ccb9bc478e1f421fc0016c29c9814a4296ff6d9603f8f0"
+      "sha256": "f1b2fbc1612ac8efc4918157f1413e30df5f8fa5a237f007d40be83c749f05a9"
     },
     {
       "path": "firmware/targets/evt_pre_20/cubemx_generation_contract.json",
-      "sha256": "5bc828cafa5822fcc83e02f7013a11149b5b2ff6bbb7f82456e9b2c1ec3b70b5"
+      "sha256": "70328b8fe5139d48b2c7cbaafb4c432d62278ece8d80350a288df03704e5af49"
     },
     {
       "path": "firmware/targets/evt_pre_20/vendor/stm32cubemx_db.lock.json",
@@ -36,7 +36,7 @@
   "generated_outputs": [
     {
       "path": "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h",
-      "sha256": "9fc187a133fc170f92fc1b15c7c77bf7b7909c29b697b86d9718899367788886"
+      "sha256": "17b6c0185d3a66f54ce4cfbde4a65b664794018bf49ff258f21991995dfd345e"
     },
     {
       "path": "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h",
@@ -44,10 +44,10 @@
     },
     {
       "path": "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc",
-      "sha256": "9b54345269fb9444edd7ada6433792ab96d9b74e3cca8412870743222d3e9f0c"
+      "sha256": "6dce44100349acda6c33c495aeddebb595a01274439a9e24846f4d13668ceca4"
     }
   ],
-  "pin_assignment_count": 65,
+  "pin_assignment_count": 67,
   "clock_policy": {
     "policy_id": "REV_A_INTERNAL_HSI_MSI_PLL_NO_HSE",
     "external_hse_allowed": false,

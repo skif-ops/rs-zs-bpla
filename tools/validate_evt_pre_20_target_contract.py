@@ -98,7 +98,7 @@ def main() -> None:
     source = source_rows()
     board_text = (ROOT / BOARD_HEADER).read_text(encoding="utf-8")
     generated = generated_rows(board_text)
-    require(len(source) == 65, f"source pin assignment count is {len(source)}, expected 65")
+    require(len(source) == 67, f"source pin assignment count is {len(source)}, expected 67")
     require(len(generated) == len(source), "generated header does not contain every source assignment")
     require(generated == [expected_row(row) for row in source], "generated pin order or content differs from sources")
 
@@ -141,7 +141,7 @@ def main() -> None:
     require("board_pins: GENERATED_EXACT_REV_A_CONTRACT_QG1_QG2_PASS_CUBEMX_OPEN_PENDING" in status, "board-pin gate status mismatch")
 
     print("EVT-PRE-20 target contract QG-1 completeness/traceability: PASS")
-    print(f"- 65/65 source assignments represented; {len(manifest_sources)} inputs hash-bound")
+    print(f"- 67/67 source assignments represented; {len(manifest_sources)} inputs hash-bound")
 
 
 if __name__ == "__main__":

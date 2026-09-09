@@ -52,6 +52,8 @@ CRITICAL_ASSIGNMENTS = {
     "LORA_MISO": ("PA6", 30, "SPI1_MISO", "AF5", "IN"),
     "LORA_MOSI": ("PA7", 31, "SPI1_MOSI", "AF5", "OUT"),
     "LORA_DIO1": ("PC2", 17, "GPIO", "GPIO", "IN"),
+    "LORA_TXEN": ("PB15", 54, "GPIO", "GPIO", "OUT"),
+    "LORA_RXEN": ("PD8", 55, "GPIO", "GPIO", "OUT"),
     "CELL_TX": ("PB6", 92, "USART1_TX", "AF7", "OUT"),
     "CELL_RX": ("PB7", 93, "USART1_RX", "AF7", "IN"),
     "BLE_TX": ("PB10", 44, "USART3_TX", "AF7", "OUT"),
@@ -85,15 +87,15 @@ def load_csv(path: Path) -> list[dict[str, str]]:
 def main() -> None:
     base_rows = load_csv(BASE_PINMAP)
     addendum_rows = load_csv(ADDENDUM)
-    require(len(base_rows) == 64, f"base pin map expected 64 rows, got {len(base_rows)}")
+    require(len(base_rows) == 66, f"base pin map expected 66 rows, got {len(base_rows)}")
     require(len(addendum_rows) == 1, f"AAD addendum expected one row, got {len(addendum_rows)}")
     require(addendum_rows[0]["Net"] == "AAD_CFG", "AAD addendum no longer defines AAD_CFG")
 
     rows = base_rows + addendum_rows
     by_net = {row["Net"]: row for row in rows}
-    require(len(by_net) == 65, "net names are not unique")
-    require(len({row["MCU_Pin"] for row in rows}) == 65, "MCU GPIO assignments overlap")
-    require(len({row["LQFP100_Pin"] for row in rows}) == 65, "LQFP100 package pins overlap")
+    require(len(by_net) == 67, "net names are not unique")
+    require(len({row["MCU_Pin"] for row in rows}) == 67, "MCU GPIO assignments overlap")
+    require(len({row["LQFP100_Pin"] for row in rows}) == 67, "LQFP100 package pins overlap")
 
     for row in rows:
         gpio_match = re.fullmatch(r"P([A-H])(\d{1,2})", row["MCU_Pin"])
@@ -133,9 +135,9 @@ def main() -> None:
     clock = CLOCK_HEADER.read_text(encoding="utf-8")
     require('#define EVT_PRE_20_MCU_MPN "STM32U585VIT6Q"' in board, "generated MCU identity mismatch")
     require('#define EVT_PRE_20_MCU_PACKAGE "LQFP100_14x14"' in board, "generated package identity mismatch")
-    require("#define EVT_PRE_20_PIN_ASSIGNMENT_COUNT 65u" in board, "generated pin count mismatch")
+    require("#define EVT_PRE_20_PIN_ASSIGNMENT_COUNT 67u" in board, "generated pin count mismatch")
     generated = {match.group("net"): match.groupdict() for match in GENERATED_ROW_PATTERN.finditer(board)}
-    require(len(generated) == 65, f"generated technical rows expected 65, got {len(generated)}")
+    require(len(generated) == 67, f"generated technical rows expected 67, got {len(generated)}")
     for row in rows:
         net = row["Net"]
         require(net in generated, f"generated contract lost net {net}")

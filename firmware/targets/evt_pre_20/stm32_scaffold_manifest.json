@@ -46,7 +46,7 @@
     },
     {
       "path": "firmware/targets/evt_pre_20/cubemx_generation_contract.json",
-      "sha256": "5bc828cafa5822fcc83e02f7013a11149b5b2ff6bbb7f82456e9b2c1ec3b70b5",
+      "sha256": "70328b8fe5139d48b2c7cbaafb4c432d62278ece8d80350a288df03704e5af49",
       "role": "CUBEMX_PREFLIGHT"
     },
     {
@@ -56,7 +56,7 @@
     },
     {
       "path": "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc",
-      "sha256": "9b54345269fb9444edd7ada6433792ab96d9b74e3cca8412870743222d3e9f0c",
+      "sha256": "6dce44100349acda6c33c495aeddebb595a01274439a9e24846f4d13668ceca4",
       "role": "CUBEMX_PINOUT_IOC"
     }
   ],

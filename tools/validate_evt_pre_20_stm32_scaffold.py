@@ -75,7 +75,7 @@ def main() -> None:
     cubemx = load_json(TARGET / "cubemx_generation_contract.json")
     require(cubemx["status"] == "PINOUT_IOC_GENERATED_CUBEMX_OPEN_REGENERATE_PENDING", "CubeMX status overclaims readiness")
     require(cubemx["tool"]["version"] == "6.12.0", "CubeMX version is not locked")
-    require(cubemx["pin_assignment_count"] == 65, "CubeMX contract pin count mismatch")
+    require(cubemx["pin_assignment_count"] == 67, "CubeMX contract pin count mismatch")
     require((ROOT / cubemx["output_ioc"]).is_file(), "generated CubeMX pinout .ioc missing")
     require(cubemx["release_gate"]["status"] == "BLOCKED", "CubeMX preflight release gate missing")
 

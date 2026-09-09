@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-_Static_assert(EVT_PRE_20_PIN_ASSIGNMENT_COUNT == 65u, "unexpected target pin count");
+_Static_assert(EVT_PRE_20_PIN_ASSIGNMENT_COUNT == 67u, "unexpected target pin count");
 _Static_assert(EVT_PRE_20_EXTERNAL_HSE_ALLOWED == 0, "external HSE is forbidden");
 _Static_assert(EVT_PRE_20_LOW_SPEED_REFERENCE_HZ == UINT32_C(32768),
                "low-speed reference mismatch");
@@ -55,6 +55,10 @@ int main(void) {
              EVT_PRE_20_DIRECTION_OUT);
   assert_pin("LORA_DIO1", 'C', 2u, 17u, "GPIO", EVT_PRE_20_AF_GPIO,
              EVT_PRE_20_DIRECTION_IN);
+  assert_pin("LORA_TXEN", 'B', 15u, 54u, "GPIO", EVT_PRE_20_AF_GPIO,
+             EVT_PRE_20_DIRECTION_OUT);
+  assert_pin("LORA_RXEN", 'D', 8u, 55u, "GPIO", EVT_PRE_20_AF_GPIO,
+             EVT_PRE_20_DIRECTION_OUT);
   assert_pin("I2C2_SCL", 'B', 13u, 52u, "I2C2_SCL", 4,
              EVT_PRE_20_DIRECTION_BIDIR_OD);
   assert_pin("I2C2_SDA", 'B', 14u, 53u, "I2C2_SDA", 4,

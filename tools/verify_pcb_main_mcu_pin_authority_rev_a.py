@@ -42,7 +42,7 @@ SUPPLY_PINS = {
     99: ("VSS", "GND"),
     100: ("VDD", "3V3_DIGITAL"),
 }
-UNUSED_IO_PINS = {12, 13, 18, 23, 32, 36, 54, 55, 69, 84, 88, 89, 90, 91}
+UNUSED_IO_PINS = {12, 13, 18, 23, 32, 36, 69, 84, 88, 89, 90, 91}
 ALL_EXTERNAL_NC_PINS = UNUSED_IO_PINS | {9}
 
 
@@ -72,7 +72,7 @@ def main() -> None:
 
     source_rows = read_csv(PIN_MAP) + read_csv(ADDENDUM)
     source_by_position = {int(row["LQFP100_Pin"]): row for row in source_rows}
-    require(len(source_rows) == len(source_by_position) == 65, "functional-source position set is not exactly 65 unique rows")
+    require(len(source_rows) == len(source_by_position) == 67, "functional-source position set is not exactly 67 unique rows")
     for position, source in source_by_position.items():
         expected_net = "NC" if position == 9 else source["Net"]
         require(by_position[position]["RevA_Net"] == expected_net, f"functional-source mismatch at U1 pin {position}")
@@ -84,7 +84,16 @@ def main() -> None:
         by_position[12]["Disposition"] == by_position[13]["Disposition"] == "HSE_FORBIDDEN_NC",
         "HSE-capable pins are not explicitly forbidden and NC",
     )
-    require(by_position[55]["Pin_Name"] == "PD8", "retired PD8 LoRa mapping is not explicitly controlled")
+    require(
+        (by_position[54]["Pin_Name"], by_position[54]["RevA_Net"], by_position[54]["Disposition"])
+        == ("PB15", "LORA_TXEN", "FUNCTION_LOCKED"),
+        "PB15 LoRa TXEN authority mismatch",
+    )
+    require(
+        (by_position[55]["Pin_Name"], by_position[55]["RevA_Net"], by_position[55]["Disposition"])
+        == ("PD8", "LORA_RXEN", "FUNCTION_LOCKED"),
+        "PD8 LoRa RXEN authority mismatch",
+    )
 
     for position, expected in SUPPLY_PINS.items():
         row = by_position[position]
@@ -115,8 +124,8 @@ def main() -> None:
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     closed = {item["id"] for item in status["capture_readiness"]["closed_authorities"]}
     open_ids = {item["id"] for item in status["capture_readiness"]["open_authorities"]}
-    require(closed == {f"MAIN-AUTH-{index:03d}" for index in range(1, 7)}, "closed authority identity mismatch")
-    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(7, 12)}, "remaining authority set mismatch")
+    require(closed == {f"MAIN-AUTH-{index:03d}" for index in range(1, 8)}, "closed authority identity mismatch")
+    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(8, 12)}, "remaining authority set mismatch")
     require(status["manufacturing_release"] is False, "manufacturing release asserted before remaining authorities close")
 
     covered = set(source_by_position) | UNUSED_IO_PINS | set(SUPPLY_PINS) | {14}
@@ -138,7 +147,7 @@ def main() -> None:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print("PCB-MAIN U1 second independent electrical control: PASS_PIN_AUTHORITY_ONLY")
-    print("- 100 package positions: 65 functional, 14 unused I/O, NRST and 20 supply/reference/ground")
+    print("- 100 package positions: 67 functional, 12 unused I/O, NRST and 20 supply/reference/ground")
     print("- HSE forbidden, PC15 external NC, SWD/NRST fixture and SMPS rails verified")
     print(f"- production BOM remains BLOCKED by {len(open_ids)} open PCB-MAIN authorities")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")

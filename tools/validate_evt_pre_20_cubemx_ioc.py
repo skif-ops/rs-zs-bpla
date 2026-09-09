@@ -87,7 +87,7 @@ def main() -> None:
         require(path.is_file(), f"required CubeMX contract file missing: {path.relative_to(ROOT)}")
 
     rows = load_rows()
-    require(len(rows) == 65, f"expected 65 source pin assignments, got {len(rows)}")
+    require(len(rows) == 67, f"expected 67 source pin assignments, got {len(rows)}")
     values, duplicates = parse_ioc(IOC)
     require(not duplicates, f"duplicate IOC keys: {duplicates}")
 
@@ -106,7 +106,7 @@ def main() -> None:
         )
     ]
     require(int(values["Mcu.PinsNb"]) == len(mcu_pins), "IOC Mcu.PinsNb mismatch")
-    require(len(mcu_pins) == 69, f"expected 65 physical and 4 virtual pins, got {len(mcu_pins)}")
+    require(len(mcu_pins) == 71, f"expected 67 physical and 4 virtual pins, got {len(mcu_pins)}")
     require(len(set(mcu_pins)) == len(mcu_pins), "IOC Mcu.Pin list contains duplicates")
 
     for row in rows:
@@ -138,7 +138,7 @@ def main() -> None:
     require(manifest["release_gate"]["status"] == "BLOCKED", "generated IOC removed release block")
 
     print("EVT-PRE-20 CubeMX IOC QG-1 completeness/provenance: PASS")
-    print("- 65/65 source assignments represented; CubeMX 6.12.0 DB.6.0.120 provenance hash-bound")
+    print("- 67/67 source assignments represented; CubeMX 6.12.0 DB.6.0.120 provenance hash-bound")
 
 
 if __name__ == "__main__":

@@ -94,6 +94,9 @@ def main() -> None:
     require("GNSS_RF_TIMING" in main_parts["U9"]["Status"], "U9 GNSS RF/timing sample blocker was lost")
     require("PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv" in main_parts["U9"]["Notes"], "U9 freeze does not cite GNSS authority")
     require("V_BCKP NC" in main_parts["U9"]["Notes"], "U9 no-backup choice is not frozen")
+    require(main_parts["U10"]["Package_or_Module"] == "SMD_20x14_22P_1.27mm", "U10 exact 22-pad package is not frozen")
+    require("CASTELLATED_OPTION" in main_parts["U10"]["Status"], "U10 castellated antenna-option blocker was lost")
+    require("PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv" in main_parts["U10"]["Notes"], "U10 freeze does not cite LoRa authority")
     for ref in ("Q1", "Q2", "Q3"):
         require(main_parts[ref]["Package_or_Module"] == "SOT23", f"{ref} package is not SOT23")
         require(main_parts[ref]["Temperature_C"] == "-65..150", f"{ref} temperature range drift")
@@ -168,6 +171,8 @@ def main() -> None:
         require("exact cable assembly temperature" in connectors[key]["Release_Blockers"], f"{key} cable temperature blocker was lost")
     require("PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv" in connectors["CON-RF-GNSS"]["Notes"], "GNSS connector freeze lacks authority citation")
     require("exact active antenna and cable" in connectors["CON-RF-GNSS"]["Release_Blockers"], "GNSS external antenna/cable blocker was lost")
+    require("PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv" in connectors["CON-RF-LORA"]["Notes"], "LoRa connector freeze lacks authority citation")
+    require("no-stub" in connectors["CON-RF-LORA"]["Notes"], "LoRa connector no-stub rule was lost")
     for key in ("CON-SIM1", "CON-SIM2"):
         sim = connectors[key]
         require(sim["Board_MPN"] == "TE_2336582-1", f"{key} is not the selected 4FF connector")

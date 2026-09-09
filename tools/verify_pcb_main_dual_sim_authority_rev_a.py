@@ -230,7 +230,7 @@ def main() -> None:
     readiness = status["capture_readiness"]
     closed = {item["id"]: item for item in readiness["closed_authorities"]}
     open_ids = {item["id"] for item in readiness["open_authorities"]}
-    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 7)}, "closed authority set mismatch")
+    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 8)}, "closed authority set mismatch")
     require(
         set(closed["MAIN-AUTH-005"]["evidence"])
         == {
@@ -239,7 +239,7 @@ def main() -> None:
         },
         "MAIN-AUTH-005 evidence set mismatch",
     )
-    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(7, 12)}, "remaining open authority set mismatch")
+    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(8, 12)}, "remaining open authority set mismatch")
     require(readiness["complete"] is False and status["manufacturing_release"] is False, "dual-SIM authority prematurely released manufacturing")
 
     result = {

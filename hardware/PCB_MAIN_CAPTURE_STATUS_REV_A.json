@@ -21,6 +21,8 @@
       "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md",
       "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv",
       "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md",
       "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
       "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
       "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -37,7 +39,7 @@
     "refdes": "U1",
     "mpn": "STM32U585VIT6Q",
     "package": "LQFP100_14x14",
-    "functional_assignment_count": 65,
+    "functional_assignment_count": 67,
     "external_hse_allowed": false,
     "low_speed_reference_mpn": "SiT1552AI-JE-DCC-32.768D"
   },
@@ -118,18 +120,17 @@
           "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv",
           "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md"
         ]
+      },
+      {
+        "id": "MAIN-AUTH-007",
+        "scope": "U10 E22-900M22S exact module pads, separate fail-closed TXEN/RXEN controls, J10 contacts and RU868 RF matching/protection path",
+        "evidence": [
+          "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md"
+        ]
       }
     ],
     "open_authorities": [
-      {
-        "id": "MAIN-AUTH-007",
-        "scope": "U10 E22-900M22S exact module pads, safe defaults and RU868 RF matching/protection path",
-        "blocks": [
-          "native_schematic",
-          "review_a",
-          "production_bom"
-        ]
-      },
       {
         "id": "MAIN-AUTH-008",
         "scope": "U11 MDBT50Q-P1MV2 exact module pads, boot/reset, separate nRF SWD and antenna keepout",

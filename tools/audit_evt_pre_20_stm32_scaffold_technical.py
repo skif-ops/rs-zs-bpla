@@ -122,7 +122,7 @@ def main() -> None:
     require(cubemx["device"]["cpn"] == "STM32U585VIT6Q", "CubeMX CPN mismatch")
     require(cubemx["device"]["name"] == "STM32U585VITxQ", "CubeMX database device mismatch")
     require(cubemx["device"]["package"] == "LQFP100_14x14", "CubeMX package mismatch")
-    require(cubemx["pin_assignment_count"] == 65, "CubeMX technical pin count mismatch")
+    require(cubemx["pin_assignment_count"] == 67, "CubeMX technical pin count mismatch")
     required_ips = {"MDF1", "OCTOSPI1", "OCTOSPIM", "SDMMC1", "USART1", "USART2", "USART3", "LPUART1", "SPI1", "I2C2", "TIM2", "USB_OTG_FS"}
     require(required_ips.issubset(cubemx["required_ips"]), "CubeMX peripheral set incomplete")
     clock = cubemx["clock_invariants"]

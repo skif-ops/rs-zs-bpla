@@ -12,7 +12,9 @@ This record closes only `MAIN-AUTH-001`. It establishes the complete package-pin
 - ST hardware-development application note: AN5373 Rev 7, `https://www.st.com/resource/en/application_note/an5373-getting-started-with-stm32u5-mcu-hardware-development-stmicroelectronics.pdf`.
 - Project functional map: `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv` plus `hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv`.
 
-The 100 package positions are accounted for as 65 locked functional assignments, 14 explicit unused I/O positions, one NRST position, and 20 power, reference, SMPS, or ground positions.
+The 100 package positions are accounted for as 67 locked functional assignments, 12 explicit unused I/O positions, one NRST position, and 20 power, reference, SMPS, or ground positions.
+
+The LoRa RF-switch controls are part of the locked functional set: PB15 / package pin 54 drives active-HIGH `LORA_TXEN`, and PD8 / package pin 55 drives active-HIGH `LORA_RXEN`. Both nets have external pull-downs and CubeMX LOW startup states. They must never be asserted at the same time. `LORA_DIO1` remains PC2 / EXTI2.
 
 ## Power and reference implementation contract
 

@@ -23,7 +23,7 @@
     "context": "TrustZoneDisabled",
     "context_scope": "ENGINEERING_BRINGUP_ONLY"
   },
-  "pin_assignment_count": 65,
+  "pin_assignment_count": 67,
   "exti_assignments": {
     "LORA_DIO1": "PC2/EXTI2",
     "ACCEL_INT": "PC6/EXTI6",
@@ -66,7 +66,8 @@
   },
   "acceptance": [
     "CubeMX opens the exact CPN without migration or package substitution",
-    "all 65 source pin assignments import without conflict",
+    "all 67 source pin assignments import without conflict",
+    "LORA_TXEN on PB15 and LORA_RXEN on PD8 both initialize LOW",
     "GPIO EXTI lines 2, 6, 7 and 8 have unique port sources",
     "generated GPIO alternate functions match the committed target contract",
     "external HSE remains disabled",

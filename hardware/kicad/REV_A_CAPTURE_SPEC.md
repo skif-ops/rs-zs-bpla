@@ -14,6 +14,7 @@ Authoritative inputs:
 - `hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv` and its independent review record;
+- `hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
 - `hardware/MAIN_COMPONENT_FREEZE_REV_A.csv`;
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`;
@@ -56,7 +57,7 @@ passed.
 - OCTOSPI1 NOR: PE10 CLK; PE11 NCS; PE12..PE15 IO0..IO3.
 - SDMMC1: PC8..PC11 D0..D3; PC12 CK; PD2 CMD; PC13 DET.
 - GNSS: PA2/PA3 USART2 TX/RX; PA0 TIM2_CH1 PPS.
-- LoRa: PA4..PA7 SPI1 NSS/SCK/MISO/MOSI; PC2 DIO1/EXTI2; PD9 BUSY; PD10 RESET_N.
+- LoRa: PA4..PA7 SPI1 NSS/SCK/MISO/MOSI; PC2 DIO1/EXTI2; PB15 TXEN; PD8 RXEN; PD9 BUSY; PD10 RESET_N.
 - `MIC_WAKE` remains PA8/EXTI8. `LORA_DIO1` was moved from PD8/EXTI8 to
   PC2/EXTI2 by DEC-022 because STM32U5 permits only one GPIO port source per
   EXTI line. This pin-map change invalidates prior PCB-MAIN Review A/B evidence.
@@ -173,10 +174,14 @@ Required AAD tests before release:
 
 ### 1.7 LoRa RU868
 
-- `U10`: `E22-900M22S` / SX1262 class.
-- SPI1 pins per frozen map.
-- dedicated U.FL, matching/ESD footprint and uninterrupted RF ground.
-- all 20 EVT-PRE-20 units use RU868 profile; no transmit before a valid region profile is loaded.
+- `U10`: exact Ebyte `E22-900M22S`, 20 x 14 mm, 22 pads, SX1262, 850 to 930 MHz and 22 dBm. The complete U10/J10 electrical authority is `hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv`; it closes only `MAIN-AUTH-007`.
+- VCC is `3V3_DIGITAL` with local 100 nF plus 10 uF. The branch supports at least 182 mA, derived from the current Ebyte 140 mA upper TX-current value plus 30 percent margin.
+- PA4..PA7 provide SPI1 NSS/SCK/MISO/MOSI; NSS has 10 kOhm pull-up. PB15/pin54 drives active-HIGH `LORA_TXEN`, and PD8/pin55 drives active-HIGH `LORA_RXEN`; both have 100 kOhm pull-downs and initialize LOW. PC2/EXTI2 receives DIO1, PD9 receives BUSY, and PD10 drives active-LOW NRST with 10 kOhm pull-up plus 100 nF.
+- TXEN/RXEN truth table is TX=1/0, RX=0/1 and CLOSE=0/0. State 1/1 is forbidden. U10 DIO2 is NC and must not be shorted to TXEN in Rev.A.
+- The exact 20 x 14 mm module uses its internal TCXO; firmware configures DIO3 for 2.2 V before RF operation.
+- Rev.A procures the castellated-ANT form with no module-side IPEX fitted. Because Ebyte publishes the same model name for IPEX-1 and castellated forms, supplier configuration evidence remains a production-release blocker.
+- The RF path is U10 pin21 to a pi network with populated 0 Ohm series baseline and two DNP shunts, then connector-side ultra-low-C ESD and exact J10 `U.FL-R-SMT-1(60)`. It is a dedicated 50 Ohm no-stub route over uninterrupted RF ground; J10 is also the conducted-test port.
+- All 20 EVT-PRE-20 units use RU868 profile; no transmit before a valid signed region profile is loaded. External cable/antenna, exact support-component MPNs, RF layout and regulatory evidence remain blocked.
 
 ### 1.8 BLE commissioning / diagnostics / OTA
 

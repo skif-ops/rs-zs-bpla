@@ -83,7 +83,7 @@ pinmap:
   addenda: [hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv]
   status: SOURCE_AND_GENERATED_IOC_QG1_QG2_PASS_CUBEMX_OPEN_PENDING
   forbidden_absent_gpio: [PB12, PE1, PC4, PC5]
-  notes: exact Q-package mapping; PA8 pin67/EXTI8 aggregated T5838 WAKE; PC2 pin17/EXTI2 LoRa DIO1 per DEC-022; PA15 pin77 shared THSEL/AAD_CFG output
+  notes: exact Q-package mapping; PA8 pin67/EXTI8 aggregated T5838 WAKE; PC2 pin17/EXTI2 LoRa DIO1 per DEC-022; PB15 pin54 LORA_TXEN and PD8 pin55 LORA_RXEN fail closed LOW per DEC-023; PA15 pin77 shared THSEL/AAD_CFG output
   exti_unique_sources: [PC2_EXTI2_LORA_DIO1, PC6_EXTI6_ACCEL_INT, PC7_EXTI7_TAMPER_IN, PA8_EXTI8_MIC_WAKE]
 target_contract:
   status: GENERATED_SOURCE_CONTRACT_QG1_QG2_PASS

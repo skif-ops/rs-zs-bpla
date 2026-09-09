@@ -64,6 +64,8 @@ EXTI_NETS = {
 }
 
 SAFE_PIN_STATES = {
+    "LORA_TXEN": "GPIO_PIN_RESET",
+    "LORA_RXEN": "GPIO_PIN_RESET",
     "LORA_RESET_N": "GPIO_PIN_SET",
     "EN_MODEM": "GPIO_PIN_RESET",
     "EN_AUX": "GPIO_PIN_RESET",
@@ -140,8 +142,8 @@ def validate_inputs(rows: list[dict[str, str]]) -> None:
         "AF",
         "Direction_at_MCU",
     }
-    if len(rows) != 65:
-        raise ValueError(f"expected 65 locked pin assignments, got {len(rows)}")
+    if len(rows) != 67:
+        raise ValueError(f"expected 67 locked pin assignments, got {len(rows)}")
     for column in required_columns:
         if any(not row.get(column) for row in rows):
             raise ValueError(f"missing required pin-map value: {column}")
@@ -514,7 +516,7 @@ def render_manifest(board_header: bytes, clock_header: bytes, ioc: bytes) -> str
             {"path": CLOCK_HEADER_PATH, "sha256": sha256_bytes(clock_header)},
             {"path": IOC_PATH, "sha256": sha256_bytes(ioc)},
         ],
-        "pin_assignment_count": 65,
+        "pin_assignment_count": 67,
         "clock_policy": {
             "policy_id": CLOCK_POLICY,
             "external_hse_allowed": False,
