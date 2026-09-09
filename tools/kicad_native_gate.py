@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """Preflight and execute native KiCad checks for EVT-PRE-20 Rev.A.
 
-PCB and schematic are checked independently as soon as each native file exists. The
-overall release remains BLOCKED until MAIN/MIC/PWR each have SCH/PCB/PRO, both CLI
+PCB and schematic are checked independently as soon as each native file exists. During
+engineering iterations the gate collects BOTH DRC and ERC reports before failing, so a
+PCB violation cannot hide a schematic violation (or vice versa). Fabrication exports
+are generated only after the corresponding DRC passes.
+
+The overall release remains BLOCKED until MAIN/MIC/PWR each have SCH/PCB/PRO, all CLI
 checks pass, and project Review A/B are complete.
 """
 from __future__ import annotations
@@ -28,9 +32,12 @@ def sha256(path: Path) -> str:
     return h.hexdigest()
 
 
-def run(cmd: list[str]) -> None:
-    print("+", " ".join(cmd))
-    subprocess.run(cmd, check=True, cwd=ROOT)
+def run(cmd: list[str], *, check: bool = True) -> int:
+    print("+", " ".join(cmd), flush=True)
+    completed = subprocess.run(cmd, check=False, cwd=ROOT)
+    if check and completed.returncode:
+        raise subprocess.CalledProcessError(completed.returncode, cmd)
+    return completed.returncode
 
 
 def paths(name: str) -> dict[str, Path]:
@@ -42,27 +49,52 @@ def paths(name: str) -> dict[str, Path]:
     }
 
 
-def validate_schematic(cli: str, name: str, sch: Path) -> None:
+def validate_schematic(cli: str, name: str, sch: Path) -> tuple[bool, str]:
     out = ART / name
     out.mkdir(parents=True, exist_ok=True)
-    run([cli, "sch", "erc", "--format", "json", "--severity-all", "--exit-code-violations",
-         "-o", str(out / "erc.json"), str(sch)])
-    run([cli, "sch", "export", "pdf", "-o", str(out / f"{name}_schematic.pdf"), str(sch)])
+    rc = run(
+        [cli, "sch", "erc", "--format", "json", "--severity-all", "--exit-code-violations",
+         "-o", str(out / "erc.json"), str(sch)],
+        check=False,
+    )
+    # A PDF is useful Review-A evidence even while ERC is being repaired, provided the
+    # native schematic parses. PDF export failure is independently blocking.
+    pdf_rc = run(
+        [cli, "sch", "export", "pdf", "-o", str(out / f"{name}_schematic.pdf"), str(sch)],
+        check=False,
+    )
+    if rc == 0 and pdf_rc == 0:
+        return True, "CLI_ERC_PDF_PASS_REVIEW_A_PENDING"
+    return False, f"CLI_ERC_FAIL_rc{rc}_PDF_rc{pdf_rc}"
 
 
-def validate_pcb(cli: str, name: str, pcb: Path) -> None:
+def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
     out = ART / name
     out.mkdir(parents=True, exist_ok=True)
-    run([cli, "pcb", "drc", "--format", "json", "--severity-all", "--exit-code-violations",
-         "-o", str(out / "drc.json"), str(pcb)])
+    rc = run(
+        [cli, "pcb", "drc", "--format", "json", "--severity-all", "--exit-code-violations",
+         "-o", str(out / "drc.json"), str(pcb)],
+        check=False,
+    )
+    if rc != 0:
+        # Never create a fabrication-looking package from a board with DRC violations.
+        return False, f"CLI_DRC_FAIL_rc{rc}_NO_FAB_EXPORT"
+
     gerber = out / "gerber"
     gerber.mkdir(exist_ok=True)
-    run([cli, "pcb", "export", "gerbers", "-o", str(gerber), "--board-plot-params", str(pcb)])
     drill = out / "drill"
     drill.mkdir(exist_ok=True)
-    run([cli, "pcb", "export", "drill", "-o", str(drill), "--format", "excellon", "--generate-map", str(pcb)])
-    run([cli, "pcb", "export", "pos", "--format", "csv", "--units", "mm", "--side", "both",
-         "-o", str(out / f"{name}_pos.csv"), str(pcb)])
+
+    export_commands = [
+        [cli, "pcb", "export", "gerbers", "-o", str(gerber), "--board-plot-params", str(pcb)],
+        [cli, "pcb", "export", "drill", "-o", str(drill), "--format", "excellon", "--generate-map", str(pcb)],
+        [cli, "pcb", "export", "pos", "--format", "csv", "--units", "mm", "--side", "both",
+         "-o", str(out / f"{name}_pos.csv"), str(pcb)],
+    ]
+    export_rcs = [run(cmd, check=False) for cmd in export_commands]
+    if any(export_rcs):
+        return False, f"CLI_DRC_PASS_EXPORT_FAIL_{export_rcs}"
+    return True, "CLI_DRC_EXPORT_PASS_REVIEW_B_PENDING"
 
 
 def write_manifest() -> None:
@@ -87,6 +119,7 @@ def main() -> int:
     }
     all_missing: list[str] = []
     complete_sets: list[str] = []
+    cli_failures: list[str] = []
 
     for name in BOARDS:
         p = paths(name)
@@ -109,23 +142,37 @@ def main() -> int:
         run([cli, "version"])
         for name in BOARDS:
             p = paths(name)
+            # Deliberately run PCB and SCH independently and collect both results.
             if p["pcb"].is_file():
-                validate_pcb(cli, name, p["pcb"])
-                report["boards"][name]["pcb_state"] = "CLI_DRC_EXPORT_PASS_REVIEW_B_PENDING"
+                ok, state = validate_pcb(cli, name, p["pcb"])
+                report["boards"][name]["pcb_state"] = state
+                if not ok:
+                    cli_failures.append(f"{name}: {state}")
             if p["sch"].is_file():
-                validate_schematic(cli, name, p["sch"])
-                report["boards"][name]["sch_state"] = "CLI_ERC_PDF_PASS_REVIEW_A_PENDING"
+                ok, state = validate_schematic(cli, name, p["sch"])
+                report["boards"][name]["sch_state"] = state
+                if not ok:
+                    cli_failures.append(f"{name}: {state}")
         write_manifest()
 
-    if not all_missing:
-        report["release"] = "ALL_NATIVE_SOURCES_PRESENT_REVIEW_A_B_STILL_REQUIRED"
+    if not all_missing and not cli_failures:
+        report["release"] = "ALL_NATIVE_SOURCES_AND_CLI_PASS_REVIEW_A_B_STILL_REQUIRED"
     else:
-        report["missing"] = all_missing
+        if all_missing:
+            report["missing"] = all_missing
+        if cli_failures:
+            report["cli_failures"] = cli_failures
 
     (ART / "native_gate.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     print("Complete native sets:", ", ".join(complete_sets) if complete_sets else "none")
     print(f"Overall release gate remains BLOCKED; {len(all_missing)} required source files missing")
+    if cli_failures:
+        print("Native CLI failures:")
+        for failure in cli_failures:
+            print("-", failure)
 
+    if cli_failures:
+        return 5
     if args.strict and all_missing:
         return 2
     return 0
