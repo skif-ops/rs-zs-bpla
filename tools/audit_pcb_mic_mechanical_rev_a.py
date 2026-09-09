@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
-"""Independent mechanical/release-metadata audit for EVT-PRE-20 PCB-MIC Rev.A."""
+"""Independent mechanical/release-metadata audit for EVT-PRE-20 PCB-MIC Rev.A.
+
+Mechanical geometry and board thickness are read directly from native KiCad PCB data.
+Surface finish is checked from the versioned fabrication_metadata.json because KiCad 9
+SWIG exposes GetStackupDescriptor() as an opaque object on supported Linux builds.
+The Gerber-job copy of that metadata is independently checked later by kicad_native_gate.py.
+"""
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 import pcbnew
@@ -10,6 +17,7 @@ import pcbnew
 EXPECTED_W = 24.0
 EXPECTED_H = 22.0
 EXPECTED_THICKNESS = 1.0
+EXPECTED_MATERIAL = "FR-4"
 EXPECTED_FINISH = "ENIG"
 EXPECTED_REV = "A"
 EXPECTED_MOUNTS = {
@@ -57,6 +65,31 @@ def one_npth(fp, reference: str):
     return npths[0]
 
 
+def load_fabrication_metadata(board_path: Path) -> dict:
+    path = board_path.parent / "fabrication_metadata.json"
+    if not path.is_file():
+        raise RuntimeError(f"controlled fabrication metadata missing: {path}")
+    metadata = json.loads(path.read_text(encoding="utf-8"))
+    if metadata.get("board") != "PCB-MIC":
+        raise RuntimeError(f"fabrication metadata board mismatch: {metadata.get('board')!r}")
+    if metadata.get("revision") != EXPECTED_REV:
+        raise RuntimeError(f"fabrication metadata revision: {metadata.get('revision')!r} != {EXPECTED_REV!r}")
+    if metadata.get("surface_finish") != EXPECTED_FINISH:
+        raise RuntimeError(
+            f"fabrication metadata finish: {metadata.get('surface_finish')!r} != {EXPECTED_FINISH!r}"
+        )
+    if metadata.get("material") != EXPECTED_MATERIAL:
+        raise RuntimeError(
+            f"fabrication metadata material: {metadata.get('material')!r} != {EXPECTED_MATERIAL!r}"
+        )
+    close(float(metadata.get("board_thickness_mm", -1.0)), EXPECTED_THICKNESS, 0.001, "metadata board thickness")
+    if int(metadata.get("copper_layers", -1)) != 2:
+        raise RuntimeError(f"fabrication metadata copper layers: {metadata.get('copper_layers')!r} != 2")
+    if metadata.get("status") != "NOT_FOR_MANUFACTURE":
+        raise RuntimeError(f"unexpected PCB-MIC release state: {metadata.get('status')!r}")
+    return metadata
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--board", type=Path, required=True)
@@ -65,6 +98,7 @@ def main() -> int:
     board = pcbnew.LoadBoard(str(args.board))
     if board is None:
         raise RuntimeError(f"cannot load board {args.board}")
+    metadata = load_fabrication_metadata(args.board)
 
     x0, y0, x1, y1 = edge_extents(board)
     close(x0, 0.0, 0.01, "outline X min")
@@ -74,10 +108,7 @@ def main() -> int:
 
     settings = board.GetDesignSettings()
     thickness = to_mm(settings.GetBoardThickness())
-    close(thickness, EXPECTED_THICKNESS, 0.01, "board thickness")
-    finish = str(settings.GetStackupDescriptor().m_FinishType)
-    if finish != EXPECTED_FINISH:
-        raise RuntimeError(f"board finish: {finish!r} != {EXPECTED_FINISH!r}")
+    close(thickness, EXPECTED_THICKNESS, 0.01, "native board thickness")
 
     title = board.GetTitleBlock()
     if str(title.GetRevision()) != EXPECTED_REV:
@@ -124,7 +155,10 @@ def main() -> int:
         raise RuntimeError(f"stale DIM-004 OPEN fabrication note remains: {stale}")
 
     print("PCB-MIC Rev.A mechanical/release metadata audit PASS")
-    print("outline 24.0 x 22.0 mm; thickness 1.0 mm; finish ENIG; revision A")
+    print(
+        f"outline {EXPECTED_W:.1f} x {EXPECTED_H:.1f} mm; native thickness {thickness:.1f} mm; "
+        f"controlled finish {metadata['surface_finish']}; revision {metadata['revision']}"
+    )
     print("H1/H2: NPTH 2.2 mm and excluded from BOM/PnP")
     print("acoustic port: NPTH 0.8 mm at (12.0,16.65)")
     return 0
