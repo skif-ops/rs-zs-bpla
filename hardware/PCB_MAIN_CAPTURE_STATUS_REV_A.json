@@ -9,6 +9,8 @@
       "config/EVT_PRE_20_BASELINE.yaml",
       "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
       "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
+      "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md",
       "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
       "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
       "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -58,16 +60,17 @@
   },
   "capture_readiness": {
     "complete": false,
-    "open_authorities": [
+    "closed_authorities": [
       {
         "id": "MAIN-AUTH-001",
         "scope": "U1 complete 100-pin power, ground, SMPS, reference, reset, boot, functional, reserved and NC disposition",
-        "blocks": [
-          "native_schematic",
-          "review_a",
-          "production_bom"
+        "evidence": [
+          "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md"
         ]
-      },
+      }
+    ],
+    "open_authorities": [
       {
         "id": "MAIN-AUTH-002",
         "scope": "U2 NOR, U3 accelerometer and U4 temperature-sensor exact device-pad maps, decoupling and bus straps",

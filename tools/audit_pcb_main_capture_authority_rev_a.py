@@ -21,11 +21,15 @@ HARNESS_PATH = ROOT / "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
 MAIN_FREEZE_PATH = ROOT / "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv"
 CONNECTOR_FREEZE_PATH = ROOT / "hardware/CONNECTOR_FREEZE_REV_A.csv"
 CAPTURE_SPEC_PATH = ROOT / "hardware/kicad/REV_A_CAPTURE_SPEC.md"
+MCU_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv"
+MCU_PIN_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md"
 
 EXPECTED_AUTHORITATIVE_INPUTS = {
     "config/EVT_PRE_20_BASELINE.yaml",
     "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
     "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
+    "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -76,7 +80,152 @@ EXPECTED_SWD = {
     "4": "NRST",
     "5": "GND",
 }
-EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(1, 12)}
+EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(2, 12)}
+EXPECTED_CLOSED_AUTHORITY_IDS = {"MAIN-AUTH-001"}
+EXPECTED_PACKAGE_PIN_NAMES = {
+    index: name
+    for index, name in enumerate(
+        """PE2
+PE3
+PE4
+PE5
+PE6
+VBAT
+PC13
+PC14-OSC32_IN (PC14)
+PC15-OSC32_OUT (PC15)
+VSS
+VDD
+PH0-OSC_IN (PH0)
+PH1-OSC_OUT (PH1)
+NRST
+PC0
+PC1
+PC2
+PC3
+VSSA
+VREF+
+VDDA
+PA0
+PA1
+PA2
+PA3
+VSS
+VDD
+PA4
+PA5
+PA6
+PA7
+PB0
+PB1
+PB2
+PE7
+PE8
+PE9
+PE10
+PE11
+PE12
+PE13
+PE14
+PE15
+PB10
+PB11
+VLXSMPS
+VDDSMPS
+VSSSMPS
+VDD11
+VSS
+VDD
+PB13
+PB14
+PB15
+PD8
+PD9
+PD10
+PD11
+PD12
+PD13
+PD14
+PD15
+PC6
+PC7
+PC8
+PC9
+PA8
+PA9
+PA10
+PA11
+PA12
+PA13 (JTMS/SWDIO)
+VDDUSB
+VSS
+VDD
+PA14 (JTCK/SWCLK)
+PA15 (JTDI)
+PC10
+PC11
+PC12
+PD0
+PD1
+PD2
+PD3
+PD4
+PD5
+PD6
+PD7
+PB3 (JTDO/TRACESWO)
+PB4 (NJTRST)
+PB5
+PB6
+PB7
+PH3-BOOT0
+PB8
+PB9
+PE0
+VDD11
+VSS
+VDD""".splitlines(),
+        start=1,
+    )
+}
+EXPECTED_POWER_PINS = {
+    6: ("POWER_IN", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+    10: ("GROUND", "GND", "GROUND_LOCKED"),
+    11: ("POWER_IN", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+    19: ("GROUND", "GND", "GROUND_LOCKED"),
+    20: ("REFERENCE_IN", "3V3_DIGITAL", "REFERENCE_LOCKED"),
+    21: ("POWER_IN", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+    26: ("GROUND", "GND", "GROUND_LOCKED"),
+    27: ("POWER_IN", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+    46: ("POWER_SWITCH", "SMPS_SW", "SMPS_LOCKED"),
+    47: ("POWER_IN", "3V3_DIGITAL", "SMPS_LOCKED"),
+    48: ("GROUND", "GND", "GROUND_LOCKED"),
+    49: ("POWER_OUT", "VCORE_1V1", "SMPS_LOCKED"),
+    50: ("GROUND", "GND", "GROUND_LOCKED"),
+    51: ("POWER_IN", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+    73: ("POWER_IN", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+    74: ("GROUND", "GND", "GROUND_LOCKED"),
+    75: ("POWER_IN", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+    98: ("POWER_OUT", "VCORE_1V1", "SMPS_LOCKED"),
+    99: ("GROUND", "GND", "GROUND_LOCKED"),
+    100: ("POWER_IN", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+}
+EXPECTED_UNUSED_IO = {
+    12: "HSE_FORBIDDEN_NC",
+    13: "HSE_FORBIDDEN_NC",
+    18: "UNUSED_GPIO_NC",
+    23: "UNUSED_GPIO_NC",
+    32: "UNUSED_GPIO_NC",
+    36: "UNUSED_GPIO_NC",
+    54: "UNUSED_GPIO_NC",
+    55: "UNUSED_GPIO_NC",
+    69: "UNUSED_GPIO_NC",
+    84: "UNUSED_GPIO_NC",
+    88: "UNUSED_GPIO_NC",
+    89: "JTAG_TRACE_UNUSED_NC",
+    90: "JTAG_UNUSED_NC",
+    91: "UNUSED_GPIO_NC",
+}
 
 
 def rows(path: Path) -> list[dict[str, str]]:
@@ -172,6 +321,84 @@ def main() -> None:
     require({by_net[f"PDM_DATA{i}"]["MCU_Pin"] for i in range(1, 5)} == {"PB1", "PD6", "PE7", "PE4"}, "four-channel PDM map mismatch")
     require({"PB12", "PE1", "PC4", "PC5"}.isdisjoint(row["MCU_Pin"] for row in pins), "absent Q-package pin used")
 
+    # Independent full-package control. The expected package list is copied from
+    # the pinned ST CubeMX STM32U585VITxQ LQFP100_SMPS definition rather than
+    # derived from this CSV, so a shifted or omitted position is detectable.
+    authority_rows = rows(MCU_PIN_AUTHORITY_PATH)
+    expected_columns = {
+        "LQFP100_Pin", "Pin_Name", "Pin_Type", "RevA_Net",
+        "Disposition", "Authority", "Notes",
+    }
+    require(len(authority_rows) == 100, f"expected 100 U1 package positions, got {len(authority_rows)}")
+    require(all(set(row) == expected_columns for row in authority_rows), "U1 pin-authority schema drift")
+    authority_by_pin: dict[int, dict[str, str]] = {}
+    for row in authority_rows:
+        try:
+            position = int(row["LQFP100_Pin"])
+        except ValueError as exc:
+            raise AssertionError(f"non-numeric U1 package position: {row['LQFP100_Pin']}") from exc
+        require(position not in authority_by_pin, f"duplicate U1 package position: {position}")
+        authority_by_pin[position] = row
+    require(set(authority_by_pin) == set(range(1, 101)), "U1 package positions are not exactly 1..100")
+    for position, expected_name in EXPECTED_PACKAGE_PIN_NAMES.items():
+        row = authority_by_pin[position]
+        require(row["Pin_Name"] == expected_name, f"U1 position {position} pin-name mismatch")
+        expected_type = EXPECTED_POWER_PINS.get(position, ("RESET" if position == 14 else "IO", "", ""))[0]
+        require(row["Pin_Type"] == expected_type, f"U1 position {position} pin-type mismatch")
+
+    functional_by_position = {int(row["LQFP100_Pin"]): row for row in pins}
+    require(len(functional_by_position) == 65, "functional U1 position count mismatch")
+    for position, source_row in functional_by_position.items():
+        authority_row = authority_by_pin[position]
+        if position == 9:
+            require(source_row["Net"] == "LSE_OUT", "source PC15 role drift")
+            require(
+                authority_row["RevA_Net"] == "NC"
+                and authority_row["Disposition"] == "FUNCTION_RESERVED_EXTERNAL_NC",
+                "PC15 must be reserved by RCC but externally NC",
+            )
+        else:
+            require(authority_row["RevA_Net"] == source_row["Net"], f"U1 position {position} functional-net mismatch")
+            require(authority_row["Disposition"] == "FUNCTION_LOCKED", f"U1 position {position} functional disposition mismatch")
+
+    actual_unused = {
+        position: row["Disposition"]
+        for position, row in authority_by_pin.items()
+        if row["RevA_Net"] == "NC" and position != 9
+    }
+    require(actual_unused == EXPECTED_UNUSED_IO, "U1 explicit unused-I/O disposition mismatch")
+    for position, expected in EXPECTED_POWER_PINS.items():
+        row = authority_by_pin[position]
+        require(
+            (row["Pin_Type"], row["RevA_Net"], row["Disposition"]) == expected,
+            f"U1 position {position} power/reference disposition mismatch",
+        )
+    require(
+        (authority_by_pin[14]["RevA_Net"], authority_by_pin[14]["Disposition"])
+        == ("NRST", "RESET_LOCKED"),
+        "U1 NRST disposition mismatch",
+    )
+    covered_positions = set(functional_by_position) | set(EXPECTED_UNUSED_IO) | {14} | set(EXPECTED_POWER_PINS)
+    require(covered_positions == set(range(1, 101)), "U1 package-accounting categories do not cover exactly 100 positions")
+    require(sum(row["Pin_Name"] == "VDD" for row in authority_rows) == 5, "U1 VDD pin count mismatch")
+    require(sum(row["Pin_Name"] == "VSS" for row in authority_rows) == 5, "U1 VSS pin count mismatch")
+    require(sum(row["Pin_Name"] == "VDD11" for row in authority_rows) == 2, "U1 VDD11 pin count mismatch")
+
+    pin_review = MCU_PIN_REVIEW_PATH.read_text(encoding="utf-8")
+    review_markers = {
+        "PIN_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        "f4ec11f00e762e37ffc4020f6d4f20d225bc061d",
+        "4349055dfd06e6eb2dce1a440c44a995ad7c924e28435ede119a7d4bb10f556d",
+        "No HSE is fitted",
+        "VREFBUF disabled",
+        "2.2 uH",
+        "2 x 2.2 uF",
+        "10 uF",
+        "does not release the native PCB-MAIN schematic",
+    }
+    for marker in review_markers:
+        require(marker in pin_review, f"U1 pin-authority review record missing marker: {marker}")
+
     harness = rows(HARNESS_PATH)
     main_power = interface(harness, "MAIN_PWR")
     require(pin_contract(main_power) == EXPECTED_MAIN_POWER, "12-pin MAIN/PWR harness contract mismatch")
@@ -231,9 +458,23 @@ def main() -> None:
     require(native["schematic_derived_bom"] is False, "schematic-derived BOM claimed without native source")
 
     readiness = status["capture_readiness"]
+    closed_items = readiness["closed_authorities"]
     open_items = readiness["open_authorities"]
+    closed_ids = {item["id"] for item in closed_items}
     open_ids = {item["id"] for item in open_items}
     require(readiness["complete"] is False, "capture readiness released with open authorities")
+    require(closed_ids == EXPECTED_CLOSED_AUTHORITY_IDS, "PCB-MAIN closed authority register drift")
+    require(len(closed_ids) == len(closed_items), "duplicate PCB-MAIN closed authority ID")
+    closed_evidence = {item["id"]: set(item["evidence"]) for item in closed_items}
+    require(
+        closed_evidence["MAIN-AUTH-001"]
+        == {
+            "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-001 evidence set mismatch",
+    )
+    require(closed_ids.isdisjoint(open_ids), "authority is both open and closed")
     require(open_ids == EXPECTED_OPEN_AUTHORITY_IDS, "PCB-MAIN open authority register drift")
     require(len(open_ids) == len(open_items), "duplicate PCB-MAIN open authority ID")
     require(all("production_bom" in item["blocks"] for item in open_items), "open authority does not block production BOM")
@@ -254,6 +495,7 @@ def main() -> None:
         "audit": "PCB-MAIN independent pre-schematic authority audit",
         "status": "PASS_CAPTURE_INPUT_CONTROLLED",
         "mcu_assignments_verified": len(pins),
+        "mcu_package_pins_verified": len(authority_rows),
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
@@ -265,7 +507,8 @@ def main() -> None:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print("PCB-MAIN Rev.A pre-schematic authority audit: PASS_CAPTURE_INPUT_CONTROLLED")
-    print(f"- 65 MCU assignments, {len(freeze)} active MPNs and 41 logical harness pins verified")
+    print(f"- all {len(authority_rows)} U1 package positions and {len(pins)} functional assignments verified")
+    print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(f"- {len(open_items)} missing pad/mechanical authorities remain explicit production blockers")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 

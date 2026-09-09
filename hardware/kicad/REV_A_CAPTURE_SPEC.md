@@ -7,6 +7,8 @@ This document is the authoritative bridge from the locked EVT-PRE-20 system base
 Authoritative inputs:
 - `config/EVT_PRE_20_BASELINE.yaml`;
 - `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv`;
+- `hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv`;
+- `hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
 - `hardware/MAIN_COMPONENT_FREEZE_REV_A.csv`;
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`;
@@ -29,6 +31,7 @@ passed.
 - `U1`: ST `STM32U585VIT6Q`.
 - Exact device/pin database: `STM32U585VITxQ`.
 - Package: LQFP100 14x14 mm, SMPS-capable package.
+- The complete 100-position package disposition is frozen in `hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv`; it closes only `MAIN-AUTH-001`.
 - Exact selected orderable part is treated as a `-40..+85 °C` item until an alternative exact MPN is formally selected; environmental release therefore remains blocked by IN-006.
 - `PB12`, `PE1`, `PC4`, `PC5` are absent from the exact Q-package and forbidden.
 - All VDD/VSS/VDDA/VSSA/VREF/VDDUSB/VDD11/SMPS pins, NRST, BOOT0 and SWD are captured exactly per the selected supply mode and ST reference documentation.
@@ -38,7 +41,7 @@ passed.
 - Locked policy `DEC-016`: internal MSI/HSI + PLL for high-speed clocks.
 - No HSE crystal, HSE oscillator, HSE load capacitors or DNP HSE footprint in Rev.A.
 - `X1`: `SiT1552AI-JE-DCC-32.768D`, 32.768 kHz low-frequency reference.
-- PC14/PC15 implementation must match the exact CubeMX LSE/external-clock/bypass mode; do not assume crystal wiring.
+- SiT1552 drives PC14/OSC32_IN in external-clock mode. PC15/OSC32_OUT is reserved by RCC but externally NC; there is no crystal wiring.
 - Target validation must prove USB FS, PDM sample-rate accuracy, PPS capture, low-power wake and clock-transition recovery.
 
 ### 1.3 Frozen STM32 peripheral map
@@ -65,9 +68,9 @@ passed.
 - USB FS: PA9 VBUS; PA11 DM; PA12 DP.
 - SWD: PA13 SWDIO; PA14 SWCLK.
 - revision straps PB8/PB9; BOOT0 PH3.
-- PC14/PC15 reserved for 32.768 kHz domain.
+- PC14 is `LSE_IN`; PC15 is reserved by RCC and externally NC.
 
-The CSV pin map remains the machine-checkable authority if this prose and the CSV ever differ.
+The 100-position MCU pin-authority CSV is the machine-checkable package authority if this prose and the CSV ever differ. The functional pin map and AAD addendum remain its upstream functional sources.
 
 ### 1.4 T5838 PDM and Acoustic Activity Detect
 

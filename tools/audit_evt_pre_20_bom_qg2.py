@@ -161,11 +161,11 @@ def main() -> int:
     native_relative = native_record.get("path", "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch") if isinstance(native_record, dict) else "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch"
     main_native = ROOT / str(native_relative)
     native_text = main_native.read_text(encoding="utf-8", errors="replace") if main_native.is_file() else ""
-    pin_rows = read(ROOT / "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv") + read(ROOT / "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv")
+    pin_rows = read(ROOT / "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv")
     required_native_tokens = {
         "(kicad_sch",
         *(row["MPN"] for row in main_freeze),
-        *(row["Net"] for row in pin_rows),
+        *(row["RevA_Net"] for row in pin_rows if row["RevA_Net"] != "NC"),
     }
     native_tokens_missing = sorted(token for token in required_native_tokens if token not in native_text)
     native_ok = (
