@@ -42,12 +42,30 @@ jobs:
           python tools/audit_pcb_pwr_preschematic_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/preschematic_audit.json
       - name: Install official KiCad 9 stable toolchain
+        shell: bash
         run: |
-          sudo apt-get update
+          set -euo pipefail
+          retry() {
+            local max=3
+            local attempt=1
+            while true; do
+              if "$@"; then
+                return 0
+              fi
+              if [ "$attempt" -ge "$max" ]; then
+                echo "command failed after $attempt attempts: $*" >&2
+                return 1
+              fi
+              echo "transient package/repository failure; retry $attempt/$max for: $*" >&2
+              sleep $((attempt * 15))
+              attempt=$((attempt + 1))
+            done
+          }
+          retry sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
-          sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
-          sudo apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
+          retry sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
+          retry sudo apt-get update
+          retry sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
           kicad-cli version
           kicad-cli pcb drc --help
           kicad-cli sch erc --help
@@ -97,6 +115,7 @@ jobs:
           test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
           test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
           test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
+          test -s hardware/kicad/native/PCB-MIC/fabrication_metadata.json
           test -s hardware/kicad/native/PCB-MIC/sym-lib-table
           test -s hardware/kicad/native/PCB-MIC/fp-lib-table
       - name: Independent PCB-MIC native geometry audit
@@ -120,6 +139,7 @@ jobs:
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
+            hardware/kicad/native/PCB-MIC/fabrication_metadata.json
             hardware/kicad/native/PCB-MIC/sym-lib-table
             hardware/kicad/native/PCB-MIC/fp-lib-table
             hardware/kicad/native/PCB-MIC/libs/
