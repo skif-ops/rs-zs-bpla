@@ -9,6 +9,7 @@ on:
       - "hardware/*FREEZE_REV_A.csv"
       - "tools/kicad_native_gate.py"
       - "tools/generate_pcb_mic_native.py"
+      - "tools/generate_pcb_mic_schematic.py"
       - "tools/inspect_pcb_mic_reference_cad.py"
       - ".github/workflows/pcb-native.yml"
 
@@ -33,14 +34,13 @@ jobs:
           kicad-cli version
           kicad-cli pcb drc --help
           kicad-cli sch erc --help
-          kicad-cli sch upgrade --help
           /usr/bin/python3 - <<'PY'
           import pcbnew
           print("PCBNEW_PYTHON_AVAILABLE", pcbnew.GetBuildVersion())
           PY
       - name: Import PCB-MIC secondary reference CAD
         run: |
-          python -m pip install --disable-pip-version-check easyeda2kicad
+          python -m pip install --disable-pip-version-check easyeda2kicad kiutils
           mkdir -p artifacts/kicad-reference/PCB-MIC
           ROOT="$PWD/artifacts/kicad-reference/PCB-MIC"
           easyeda2kicad --full --lcsc_id=C7230692 --output "$ROOT/t5838_ref" --project-relative
@@ -63,13 +63,10 @@ jobs:
             --molex-root artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.pretty \
             --reference-report artifacts/kicad-reference/PCB-MIC/reference_geometry_report.json \
             --output hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
-          kicad-cli pcb upgrade --force hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
-          kicad-cli sch upgrade --force hardware/kicad/native/PCB-MIC/PCB-MIC.sch
-          if [ ! -f hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch ]; then
-            if grep -q '^(kicad_sch' hardware/kicad/native/PCB-MIC/PCB-MIC.sch; then
-              cp hardware/kicad/native/PCB-MIC/PCB-MIC.sch hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
-            fi
-          fi
+          python tools/generate_pcb_mic_schematic.py \
+            --t5838-symbol artifacts/kicad-reference/PCB-MIC/t5838_ref.kicad_sym \
+            --molex-symbol artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.kicad_sym \
+            --output hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
           echo '--- materialized native source set ---'
           find hardware/kicad/native/PCB-MIC -maxdepth 1 -type f -print -exec file {} \; | sort
           test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
