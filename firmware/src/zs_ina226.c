@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 
+#define INA226_REG_CONFIG 0x00u
 #define INA226_REG_BUS_V 0x02u
 #define INA226_REG_POWER 0x03u
 #define INA226_REG_CURRENT 0x04u
@@ -31,6 +32,7 @@ void zs_ina226_init(zs_ina226_t *dev, const zs_hal_port_t *io, unsigned bus, uin
   dev->io = io;
   dev->bus = bus;
   dev->address = address;
+  dev->configuration = ZS_INA226_CONFIG_REV_A;
   dev->calibration = ZS_INA226_CAL_REV_A;
   dev->configured = false;
 }
@@ -51,15 +53,24 @@ uint8_t zs_ina226_probe_and_configure(zs_ina226_t *dev) {
     return ZS_INA226_STATUS_ID;
   }
 
-  if (write_reg(dev, INA226_REG_CAL, dev->calibration) != 0) {
+  /* Do not rely on power-on defaults: Rev.A writes and verifies both the ADC
+     operating mode and the current/power calibration after every monitor init. */
+  if (write_reg(dev, INA226_REG_CONFIG, dev->configuration) != 0 ||
+      write_reg(dev, INA226_REG_CAL, dev->calibration) != 0) {
     dev->configured = false;
     return ZS_INA226_STATUS_IO;
   }
 
+  uint16_t configuration = 0u;
   uint16_t calibration = 0u;
-  if (read_reg(dev, INA226_REG_CAL, &calibration) != 0) {
+  if (read_reg(dev, INA226_REG_CONFIG, &configuration) != 0 ||
+      read_reg(dev, INA226_REG_CAL, &calibration) != 0) {
     dev->configured = false;
     return ZS_INA226_STATUS_IO;
+  }
+  if (configuration != dev->configuration) {
+    dev->configured = false;
+    return ZS_INA226_STATUS_CONFIG;
   }
   if (calibration != dev->calibration || calibration == 0u) {
     dev->configured = false;
@@ -86,12 +97,19 @@ uint8_t zs_ina226_read(zs_ina226_t *dev, zs_ina226_measurement_t *out) {
   uint16_t bus_raw = 0u;
   uint16_t current_raw_u = 0u;
   uint16_t power_raw = 0u;
+  uint16_t config_raw = 0u;
   uint16_t cal_raw = 0u;
-  if (read_reg(dev, INA226_REG_CAL, &cal_raw) != 0 ||
+  if (read_reg(dev, INA226_REG_CONFIG, &config_raw) != 0 ||
+      read_reg(dev, INA226_REG_CAL, &cal_raw) != 0 ||
       read_reg(dev, INA226_REG_BUS_V, &bus_raw) != 0 ||
       read_reg(dev, INA226_REG_CURRENT, &current_raw_u) != 0 ||
       read_reg(dev, INA226_REG_POWER, &power_raw) != 0) {
     out->status = ZS_INA226_STATUS_IO;
+    return out->status;
+  }
+  if (config_raw != dev->configuration) {
+    dev->configured = false;
+    out->status = ZS_INA226_STATUS_CONFIG;
     return out->status;
   }
   if (cal_raw != dev->calibration || cal_raw == 0u) {

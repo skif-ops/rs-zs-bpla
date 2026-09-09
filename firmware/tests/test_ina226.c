@@ -43,6 +43,7 @@ int main(void) {
   zs_ina226_init(&dev, &io, 2u, ZS_INA226_ADDR_REV_A);
   assert(zs_ina226_probe_and_configure(&dev) == ZS_INA226_STATUS_OK);
   assert(dev.configured);
+  assert(m.regs[0x00] == ZS_INA226_CONFIG_REV_A);
   assert(m.regs[0x05] == ZS_INA226_CAL_REV_A);
   assert(m.last_addr == 0x40u && m.last_bus == 2u);
 
@@ -62,6 +63,13 @@ int main(void) {
   assert(zs_ina226_read(&dev, &x) == ZS_INA226_STATUS_OK);
   assert(x.current_ua == -500000);
 
+  m.regs[0x00] = 0u;
+  assert(zs_ina226_read(&dev, &x) == ZS_INA226_STATUS_CONFIG);
+  assert(!x.valid && !dev.configured);
+
+  m.regs[0x00] = ZS_INA226_CONFIG_REV_A;
+  m.regs[0x05] = ZS_INA226_CAL_REV_A;
+  dev.configured = true;
   m.regs[0x05] = 0u;
   assert(zs_ina226_read(&dev, &x) == ZS_INA226_STATUS_CAL);
   assert(!x.valid && !dev.configured);

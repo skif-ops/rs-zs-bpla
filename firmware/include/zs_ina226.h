@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #define ZS_INA226_ADDR_REV_A 0x40u
+#define ZS_INA226_CONFIG_REV_A 0x4127u
 #define ZS_INA226_CAL_REV_A 2560u
 #define ZS_INA226_CURRENT_LSB_UA 200
 #define ZS_INA226_POWER_LSB_MW 5u
@@ -15,13 +16,15 @@ typedef enum {
   ZS_INA226_STATUS_IO = 1u << 0,
   ZS_INA226_STATUS_ID = 1u << 1,
   ZS_INA226_STATUS_CAL = 1u << 2,
-  ZS_INA226_STATUS_DATA = 1u << 3
+  ZS_INA226_STATUS_DATA = 1u << 3,
+  ZS_INA226_STATUS_CONFIG = 1u << 4
 } zs_ina226_status_t;
 
 typedef struct {
   const zs_hal_port_t *io;
   unsigned bus;
   uint8_t address;
+  uint16_t configuration;
   uint16_t calibration;
   bool configured;
 } zs_ina226_t;

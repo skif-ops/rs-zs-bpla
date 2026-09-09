@@ -1,4 +1,4 @@
-"""Pydantic schemas for ZS-BPLA station protocol v1.4."""
+"""Pydantic schemas for ZS-BPLA station protocol v1.5."""
 from __future__ import annotations
 
 from enum import IntEnum
@@ -215,10 +215,30 @@ class PowerStatus(BaseModel):
     battery_mv: int = 0
     solar_mv: int = 0
     temperature_c10: int = 200
+    battery_bus_mv: int | None = None
+    battery_current_ma: int | None = None
+    battery_power_mw: int | None = None
+    monitor_status: int | None = Field(default=None, ge=0, le=255)
 
     @property
     def temperature_c(self) -> float:
         return self.temperature_c10 / 10.0
+
+    @property
+    def battery_bus_v(self) -> float | None:
+        return None if self.battery_bus_mv is None else self.battery_bus_mv / 1000.0
+
+    @property
+    def battery_current_a(self) -> float | None:
+        return None if self.battery_current_ma is None else self.battery_current_ma / 1000.0
+
+    @property
+    def battery_power_w(self) -> float | None:
+        return None if self.battery_power_mw is None else self.battery_power_mw / 1000.0
+
+    @property
+    def monitor_valid(self) -> bool:
+        return self.monitor_status == 0
 
 
 class RouteStatus(BaseModel):

@@ -239,6 +239,10 @@ def decode_detection_obj(obj: Any) -> DetectionMessage:
             battery_mv=int(status.get(1, 0)),
             solar_mv=int(status.get(2, 0)),
             temperature_c10=int(status.get(3, 200)),
+            battery_bus_mv=int(status[9]) if 9 in status else None,
+            battery_current_ma=int(status[10]) if 10 in status else None,
+            battery_power_mw=int(status[11]) if 11 in status else None,
+            monitor_status=int(status[12]) if 12 in status else None,
         ),
         route=RouteStatus(
             transport=_ROUTE.get(int(status.get(4, 5)), "TEST"),
