@@ -141,7 +141,9 @@ def main() -> None:
     require("-40..85" in connectors["CON-USB"]["Temperature_C"], "USB-C connector does not meet operating range")
     for key in ("CON-RF-CELL", "CON-RF-GNSS", "CON-RF-LORA"):
         require("U.FL" in connectors[key]["Board_MPN"], f"{key} is not U.FL")
-        require("TEMP_VERIFY" in connectors[key]["Status"], f"{key} cable/connector temperature verification blocker was lost")
+        require("RF_LAYOUT" in connectors[key]["Status"], f"{key} RF layout blocker was lost")
+        require("-40..90 board receptacle" in connectors[key]["Temperature_C"], f"{key} board receptacle rating is not frozen")
+        require("exact cable assembly temperature" in connectors[key]["Release_Blockers"], f"{key} cable temperature blocker was lost")
     for key in ("CON-SIM1", "CON-SIM2"):
         sim = connectors[key]
         require(sim["Board_MPN"] == "TE_2336582-1", f"{key} is not the selected 4FF connector")
