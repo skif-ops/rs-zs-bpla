@@ -46,10 +46,12 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h",
         "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h",
         "firmware/targets/evt_pre_20/cubemx_generation_contract.json",
+        "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc",
         "firmware/targets/evt_pre_20/stm32_memory_contract.json",
         "firmware/targets/evt_pre_20/stm32_scaffold_manifest.json",
         "firmware/targets/evt_pre_20/ld/STM32U585VITXQ_ENGINEERING_FLASH.ld",
         "firmware/targets/evt_pre_20/vendor/stm32cubeu5.lock.json",
+        "firmware/targets/evt_pre_20/vendor/stm32cubemx_db.lock.json",
         "firmware/targets/evt_pre_20/vendor/cmsis_device_u5/LICENSE.md",
         "firmware/targets/evt_pre_20/vendor/cmsis_device_u5/startup_stm32u585xx.s",
         "firmware/targets/evt_pre_20/vendor/cmsis_device_u5/system_stm32u5xx.c",
@@ -58,6 +60,8 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "tools/generate_evt_pre_20_target_contract.py",
         "tools/validate_evt_pre_20_target_contract.py",
         "tools/audit_evt_pre_20_target_technical.py",
+        "tools/validate_evt_pre_20_cubemx_ioc.py",
+        "tools/audit_evt_pre_20_cubemx_ioc_technical.py",
         "tools/validate_evt_pre_20_stm32_scaffold.py",
         "tools/audit_evt_pre_20_stm32_scaffold_technical.py",
     ],
@@ -217,8 +221,10 @@ def audit() -> dict[str, object]:
         ROOT / "firmware/targets/evt_pre_20/stm32_scaffold_manifest.json",
         ROOT / "firmware/targets/evt_pre_20/stm32_memory_contract.json",
         ROOT / "firmware/targets/evt_pre_20/cubemx_generation_contract.json",
+        ROOT / "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc",
         ROOT / "firmware/targets/evt_pre_20/ld/STM32U585VITXQ_ENGINEERING_FLASH.ld",
         ROOT / "firmware/targets/evt_pre_20/vendor/stm32cubeu5.lock.json",
+        ROOT / "firmware/targets/evt_pre_20/vendor/stm32cubemx_db.lock.json",
     ]
     hashes = {
         str(path.relative_to(ROOT)): sha256(path)

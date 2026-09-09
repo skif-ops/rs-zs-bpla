@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/STMicroelectronics/STM32_open_pin_data",
+  "tag": "STM32CubeMX-DB.6.0.120",
+  "commit": "f4ec11f00e762e37ffc4020f6d4f20d225bc061d",
+  "license": "BSD-3-Clause",
+  "device_file": "mcu/STM32U585VITxQ.xml",
+  "device_file_sha256": "4349055dfd06e6eb2dce1a440c44a995ad7c924e28435ede119a7d4bb10f556d",
+  "device": "STM32U585VITxQ",
+  "package": "LQFP100",
+  "cubemx_version": "6.12.0"
+}

@@ -13,7 +13,7 @@ clocking:
   high_speed_sources: [MSI, HSI, PLL]
   low_speed_reference: SiT1552AI-JE-DCC-32.768D
   low_speed_reference_hz: 32768
-  lse_bypass_configuration: CUBEMX_PENDING_BLOCKER
+  lse_bypass_configuration: IOC_EXTERNAL_CLOCK_SOURCE_CUBEMX_OPEN_CHECK_PENDING
   runtime_clock_profiles: TO_DEFINE_AND_MEASURE
   required_validation: [USB_CLOCK, PDM_SAMPLE_RATE, PPS_TIMESTAMPING, LOW_POWER_WAKE, PLL_SWITCH_RECOVERY]
 audio:
@@ -81,9 +81,10 @@ positioning:
 pinmap:
   source: hardware/EVT_PRE_20_PIN_MAP_REV_A.csv
   addenda: [hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv]
-  status: DATASHEET_VERIFIED_CUBEMX_PENDING
+  status: SOURCE_AND_GENERATED_IOC_QG1_QG2_PASS_CUBEMX_OPEN_PENDING
   forbidden_absent_gpio: [PB12, PE1, PC4, PC5]
-  notes: exact Q-package mapping; PA8 pin67 aggregated T5838 WAKE input; PA15 pin77 shared THSEL/AAD_CFG output
+  notes: exact Q-package mapping; PA8 pin67/EXTI8 aggregated T5838 WAKE; PC2 pin17/EXTI2 LoRa DIO1 per DEC-022; PA15 pin77 shared THSEL/AAD_CFG output
+  exti_unique_sources: [PC2_EXTI2_LORA_DIO1, PC6_EXTI6_ACCEL_INT, PC7_EXTI7_TAMPER_IN, PA8_EXTI8_MIC_WAKE]
 target_contract:
   status: GENERATED_SOURCE_CONTRACT_QG1_QG2_PASS
   generator: tools/generate_evt_pre_20_target_contract.py
@@ -106,16 +107,21 @@ stm32_scaffold:
   qg1_completeness: tools/validate_evt_pre_20_stm32_scaffold.py
   qg2_technical: tools/audit_evt_pre_20_stm32_scaffold_technical.py
 cubemx_preflight:
-  status: INPUT_COMPLETE_GENERATION_AND_IMPORT_PENDING
+  status: GENERATED_PINOUT_IOC_QG1_QG2_PASS_CUBEMX_OPEN_REGENERATE_REQUIRED
   tool_version: 6.12.0
+  database_tag: STM32CubeMX-DB.6.0.120
+  database_commit: f4ec11f00e762e37ffc4020f6d4f20d225bc061d
   contract: firmware/targets/evt_pre_20/cubemx_generation_contract.json
-  exact_ioc: MISSING_BLOCKER
+  exact_ioc: firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc
+  qg1_completeness: tools/validate_evt_pre_20_cubemx_ioc.py
+  qg2_technical: tools/audit_evt_pre_20_cubemx_ioc_technical.py
+  release_effect: NONE_UNTIL_OPENED_AND_REGENERATED_WITH_LOCKED_CUBEMX
 required_target_files:
-  cubemx_ioc: MISSING_BLOCKER_PREFLIGHT_CONTRACT_READY
+  cubemx_ioc: GENERATED_FROM_LOCKED_CONTRACT_CUBEMX_OPEN_REGENERATE_BLOCKER
   startup: PINNED_OFFICIAL_CMSIS_QG1_QG2_PASS
   linker_script: ENGINEERING_FULL_FLASH_QG1_QG2_PASS_PRODUCTION_PARTITION_BLOCKER
   hal_ll_bindings: MISSING_BLOCKER
-  board_pins: GENERATED_EXACT_REV_A_CONTRACT_QG1_QG2_PASS_CUBEMX_PENDING
+  board_pins: GENERATED_EXACT_REV_A_CONTRACT_QG1_QG2_PASS_CUBEMX_OPEN_PENDING
   secure_boot: MISSING_BLOCKER
   ota_ab: MISSING_BLOCKER
   production_build_manifest: MISSING_BLOCKER

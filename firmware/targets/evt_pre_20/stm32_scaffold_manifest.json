@@ -9,7 +9,9 @@
   "upstream": {
     "stm32cubeu5_release": "v1.9.0",
     "stm32cubeu5_commit": "d88042df24f16799957c24f00c2b234c9e306188",
-    "cmsis_device_u5_commit": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8"
+    "cmsis_device_u5_commit": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8",
+    "stm32cubemx_db_tag": "STM32CubeMX-DB.6.0.120",
+    "stm32cubemx_db_commit": "f4ec11f00e762e37ffc4020f6d4f20d225bc061d"
   },
   "files": [
     {
@@ -44,8 +46,18 @@
     },
     {
       "path": "firmware/targets/evt_pre_20/cubemx_generation_contract.json",
-      "sha256": "563f04de9dd33460752a3603832ec7e35c0c854d174dcd3ba4adb4595f314e17",
+      "sha256": "5bc828cafa5822fcc83e02f7013a11149b5b2ff6bbb7f82456e9b2c1ec3b70b5",
       "role": "CUBEMX_PREFLIGHT"
+    },
+    {
+      "path": "firmware/targets/evt_pre_20/vendor/stm32cubemx_db.lock.json",
+      "sha256": "686c3094f2d2ed08db8d21d0f1088b486985f24688578e05d41ddec4cbcce139",
+      "role": "CUBEMX_DB_LOCK"
+    },
+    {
+      "path": "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc",
+      "sha256": "9b54345269fb9444edd7ada6433792ab96d9b74e3cca8412870743222d3e9f0c",
+      "role": "CUBEMX_PINOUT_IOC"
     }
   ],
   "quality_gates": {
@@ -55,7 +67,8 @@
   "release_gate": {
     "status": "BLOCKED",
     "remaining_blockers": [
-      "CUBEMX_IOC_NOT_GENERATED_OR_OPENED",
+      "CUBEMX_IOC_NOT_OPENED_OR_REGENERATED",
+      "CLOCK_PWR_PERIPHERAL_RUNTIME_REVIEW_MISSING",
       "HAL_LL_BINDINGS_MISSING",
       "RUNTIME_CLOCK_PROFILES_NOT_MEASURED",
       "SECURE_BOOT_PARTITION_NOT_DEFINED",

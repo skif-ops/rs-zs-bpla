@@ -41,7 +41,13 @@ Authoritative inputs:
 - OCTOSPI1 NOR: PE10 CLK; PE11 NCS; PE12..PE15 IO0..IO3.
 - SDMMC1: PC8..PC11 D0..D3; PC12 CK; PD2 CMD; PC13 DET.
 - GNSS: PA2/PA3 USART2 TX/RX; PA0 TIM2_CH1 PPS.
-- LoRa: PA4..PA7 SPI1 NSS/SCK/MISO/MOSI; PD8 DIO1; PD9 BUSY; PD10 RESET_N.
+- LoRa: PA4..PA7 SPI1 NSS/SCK/MISO/MOSI; PC2 DIO1/EXTI2; PD9 BUSY; PD10 RESET_N.
+- `MIC_WAKE` remains PA8/EXTI8. `LORA_DIO1` was moved from PD8/EXTI8 to
+  PC2/EXTI2 by DEC-022 because STM32U5 permits only one GPIO port source per
+  EXTI line. This pin-map change invalidates prior PCB-MAIN Review A/B evidence.
+- `hardware/kicad/nets.csv` is a superseded placeholder and must not be used as
+  a pin authority or capture source; regenerate the native PCB-MAIN netlist from
+  `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv` and the reviewed addenda.
 - BG95 UART: PB6/PB7 USART1 TX/RX; PD11..PD15 control/status.
 - BLE: PB10/PB11 USART3 TX/RX; PE6 BLE_EN; PB2 BLE_DFU_REQ.
 - I2C2: PB13/PB14.

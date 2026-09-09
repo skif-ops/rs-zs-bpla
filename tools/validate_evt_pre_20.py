@@ -129,6 +129,7 @@ def validate_pinmap() -> None:
         "LORA_SCK": ("PA5", "SPI1_SCK"),
         "LORA_MISO": ("PA6", "SPI1_MISO"),
         "LORA_MOSI": ("PA7", "SPI1_MOSI"),
+        "LORA_DIO1": ("PC2", "GPIO"),
         "CELL_TX": ("PB6", "USART1_TX"),
         "CELL_RX": ("PB7", "USART1_RX"),
         "BLE_TX": ("PB10", "USART3_TX"),
@@ -153,6 +154,9 @@ def validate_pinmap() -> None:
     require("nRF52840" in by_net["BLE_RX"]["External_Device"], "BLE RX is not bound to nRF52840 module")
     require("BLE_DFU_REQ" in by_net, "nRF52840 DFU request line missing")
     require(not any("ESP32-C3" in row["External_Device"] for row in pinmap), "ESP32-C3 remains active in Rev.A pin map")
+    require(by_net["MIC_WAKE"]["MCU_Pin"] == "PA8", "MIC_WAKE must remain on PA8/EXTI8")
+    require(by_net["LORA_DIO1"]["LQFP100_Pin"] == "17", "LORA_DIO1 PC2 package pin mismatch")
+    require(by_net["MIC_WAKE"]["MCU_Pin"][2:] != by_net["LORA_DIO1"]["MCU_Pin"][2:], "MIC_WAKE and LORA_DIO1 share an EXTI line")
 
     target = (ROOT / "firmware/targets/evt_pre_20/target_status.yaml").read_text(encoding="utf-8")
     require("source: hardware/EVT_PRE_20_PIN_MAP_REV_A.csv" in target, "firmware target does not bind Rev.A pin map")

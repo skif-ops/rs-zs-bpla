@@ -17,6 +17,7 @@ PIN_SOURCES = (
 )
 BOARD_HEADER = "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h"
 CLOCK_HEADER = "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h"
+IOC = "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc"
 MANIFEST = "firmware/targets/evt_pre_20/target_contract_manifest.json"
 
 ROW_PATTERN = re.compile(
@@ -91,7 +92,7 @@ def generated_rows(text: str) -> list[tuple[object, ...]]:
 
 
 def main() -> None:
-    for relative in (BOARD_HEADER, CLOCK_HEADER, MANIFEST):
+    for relative in (BOARD_HEADER, CLOCK_HEADER, IOC, MANIFEST):
         require((ROOT / relative).is_file(), f"target contract file missing: {relative}")
 
     source = source_rows()
@@ -112,12 +113,14 @@ def main() -> None:
         *PIN_SOURCES,
         "hardware/CLOCKING_REV_A.md",
         "firmware/targets/evt_pre_20/target_status.yaml",
+        "firmware/targets/evt_pre_20/cubemx_generation_contract.json",
+        "firmware/targets/evt_pre_20/vendor/stm32cubemx_db.lock.json",
     ):
         require(relative in manifest_sources, f"manifest source missing: {relative}")
         require(manifest_sources[relative] == sha256(ROOT / relative), f"manifest source hash mismatch: {relative}")
 
     manifest_outputs = {item["path"]: item["sha256"] for item in manifest["generated_outputs"]}
-    for relative in (BOARD_HEADER, CLOCK_HEADER):
+    for relative in (BOARD_HEADER, CLOCK_HEADER, IOC):
         require(relative in manifest_outputs, f"manifest output missing: {relative}")
         require(manifest_outputs[relative] == sha256(ROOT / relative), f"manifest output hash mismatch: {relative}")
 
@@ -125,14 +128,17 @@ def main() -> None:
     require(gates["qg1_completeness"] == "tools/validate_evt_pre_20_target_contract.py", "QG-1 path mismatch")
     require(gates["qg2_technical"] == "tools/audit_evt_pre_20_target_technical.py", "QG-2 path mismatch")
     require(manifest["release_gate"]["status"] == "BLOCKED", "incomplete target must remain blocked")
-    require(len(manifest["release_gate"]["blockers"]) >= 8, "target blocker list is incomplete")
+    require(len(manifest["release_gate"]["blockers"]) >= 7, "target blocker list is incomplete")
+    require("CUBEMX_OPEN_REGENERATE_MISSING" in manifest["release_gate"]["blockers"], "CubeMX open/regenerate blocker missing")
+    require("STARTUP_MISSING" not in manifest["release_gate"]["blockers"], "pinned startup is incorrectly marked missing")
+    require("LINKER_SCRIPT_MISSING" not in manifest["release_gate"]["blockers"], "engineering linker is incorrectly marked missing")
 
     status = (ROOT / "firmware/targets/evt_pre_20/target_status.yaml").read_text(encoding="utf-8")
     require("status: TARGET_PORT_REQUIRED" in status, "target status prematurely claims completion")
     require("do_not_release: true" in status, "target release block is missing")
     require("target_contract_manifest.json" in status, "target status does not reference contract manifest")
     require("status: GENERATED_SOURCE_CONTRACT_QG1_QG2_PASS" in status, "target contract gate status mismatch")
-    require("board_pins: GENERATED_EXACT_REV_A_CONTRACT_QG1_QG2_PASS_CUBEMX_PENDING" in status, "board-pin gate status mismatch")
+    require("board_pins: GENERATED_EXACT_REV_A_CONTRACT_QG1_QG2_PASS_CUBEMX_OPEN_PENDING" in status, "board-pin gate status mismatch")
 
     print("EVT-PRE-20 target contract QG-1 completeness/traceability: PASS")
     print(f"- 65/65 source assignments represented; {len(manifest_sources)} inputs hash-bound")

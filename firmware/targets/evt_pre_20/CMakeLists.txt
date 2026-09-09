@@ -14,5 +14,7 @@ add_custom_target(
     ld/STM32U585VITXQ_ENGINEERING_FLASH.ld
     stm32_memory_contract.json
     cubemx_generation_contract.json
+    dioneya_evt_pre_20_rev_a.ioc
     stm32_scaffold_manifest.json
+    vendor/stm32cubemx_db.lock.json
 )

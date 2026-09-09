@@ -60,7 +60,7 @@ static const evt_pre_20_pin_contract_t evt_pre_20_pin_contract[] = {
   {"LORA_SCK", "LoRa SPI clock", 'A', 5u, 29u, "SPI1_SCK", 5, EVT_PRE_20_DIRECTION_OUT},
   {"LORA_MISO", "LoRa SPI MISO", 'A', 6u, 30u, "SPI1_MISO", 5, EVT_PRE_20_DIRECTION_IN},
   {"LORA_MOSI", "LoRa SPI MOSI", 'A', 7u, 31u, "SPI1_MOSI", 5, EVT_PRE_20_DIRECTION_OUT},
-  {"LORA_DIO1", "LoRa interrupt", 'D', 8u, 55u, "GPIO", -1, EVT_PRE_20_DIRECTION_IN},
+  {"LORA_DIO1", "LoRa interrupt", 'C', 2u, 17u, "GPIO", -1, EVT_PRE_20_DIRECTION_IN},
   {"LORA_BUSY", "LoRa busy", 'D', 9u, 56u, "GPIO", -1, EVT_PRE_20_DIRECTION_IN},
   {"LORA_RESET_N", "LoRa reset", 'D', 10u, 57u, "GPIO", -1, EVT_PRE_20_DIRECTION_OUT},
   {"CELL_TX", "Cellular main UART transmit", 'B', 6u, 92u, "USART1_TX", 7, EVT_PRE_20_DIRECTION_OUT},

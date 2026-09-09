@@ -30,6 +30,10 @@ jobs:
         run: python tools/validate_evt_pre_20_target_contract.py
       - name: QG-2 independent target technical audit
         run: python tools/audit_evt_pre_20_target_technical.py
+      - name: QG-1 generated CubeMX IOC completeness and provenance
+        run: python tools/validate_evt_pre_20_cubemx_ioc.py
+      - name: QG-2 independent CubeMX pin and EXTI audit
+        run: python tools/audit_evt_pre_20_cubemx_ioc_technical.py
       - name: Verify pinned STM32 CMSIS vendor files
         run: python tools/import_evt_pre_20_stm32_vendor.py --check
       - name: QG-1 STM32 scaffold completeness and provenance
@@ -49,6 +53,7 @@ jobs:
             hardware/EVT_PRE_20_BOM_REV_A.csv
             firmware/targets/evt_pre_20/target_contract_manifest.json
             firmware/targets/evt_pre_20/stm32_scaffold_manifest.json
+            firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc
           if-no-files-found: error
 
   firmware:

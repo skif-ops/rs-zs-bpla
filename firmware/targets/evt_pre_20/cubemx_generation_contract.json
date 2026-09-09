@@ -1,12 +1,19 @@
 {
   "schema_version": 1,
   "configuration": "EVT-PRE-20",
-  "status": "INPUT_COMPLETE_CUBEMX_GENERATION_AND_IMPORT_PENDING",
+  "status": "PINOUT_IOC_GENERATED_CUBEMX_OPEN_REGENERATE_PENDING",
   "output_ioc": "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc",
   "tool": {
     "name": "STM32CubeMX",
     "version": "6.12.0",
     "evidence": "STM32CubeU5 v1.9.0 Release_Notes.html"
+  },
+  "database": {
+    "repository": "https://github.com/STMicroelectronics/STM32_open_pin_data",
+    "tag": "STM32CubeMX-DB.6.0.120",
+    "commit": "f4ec11f00e762e37ffc4020f6d4f20d225bc061d",
+    "device_file": "mcu/STM32U585VITxQ.xml",
+    "device_file_sha256": "4349055dfd06e6eb2dce1a440c44a995ad7c924e28435ede119a7d4bb10f556d"
   },
   "device": {
     "cpn": "STM32U585VIT6Q",
@@ -17,6 +24,12 @@
     "context_scope": "ENGINEERING_BRINGUP_ONLY"
   },
   "pin_assignment_count": 65,
+  "exti_assignments": {
+    "LORA_DIO1": "PC2/EXTI2",
+    "ACCEL_INT": "PC6/EXTI6",
+    "TAMPER_IN": "PC7/EXTI7",
+    "MIC_WAKE": "PA8/EXTI8"
+  },
   "inputs": [
     "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
     "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
@@ -54,6 +67,7 @@
   "acceptance": [
     "CubeMX opens the exact CPN without migration or package substitution",
     "all 65 source pin assignments import without conflict",
+    "GPIO EXTI lines 2, 6, 7 and 8 have unique port sources",
     "generated GPIO alternate functions match the committed target contract",
     "external HSE remains disabled",
     "LSE bypass treatment is reviewed against the SiT1552 oscillator output",
@@ -61,6 +75,6 @@
   ],
   "release_gate": {
     "status": "BLOCKED",
-    "reason": "The .ioc has not been generated, opened and regenerated with the locked CubeMX version"
+    "reason": "The generated pinout .ioc has not yet been opened and regenerated with STM32CubeMX 6.12.0; clock, PWR and peripheral runtime parameters are not released"
   }
 }

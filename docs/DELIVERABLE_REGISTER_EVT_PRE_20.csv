@@ -41,7 +41,7 @@ MECH-VC-001,Вакуумное литьё,Master и разъём формы,STEP
 MECH-VC-002,Вакуумное литьё,Материал и технологические требования,DOCX,P0,PLANNED,OPEN,OPEN,Материал UV температура герметичность и выпуск 20 корпусов согласованы
 MECH-IM-001,ТПА,Литьевая конструкция корпуса,STEP+DRAWING,P0,PLANNED,OPEN,OPEN,Draft ribs bosses wall thickness DFM PASS
 MECH-IM-002,ТПА,Требования к пресс-форме и материалу,DOCX,P1,PLANNED,OPEN,OPEN,Parting ejector inserts texture shrinkage указаны; изготовление оснастки не входит в пилот
-FW-001,Firmware,Исходники target STM32U585,C+IOC+CMAKE,P0,DRAFT,PARTIAL_PASS_STARTUP_LINKER_SCAFFOLD,PARTIAL_PASS_STARTUP_LINKER_SCAFFOLD,Reproducible target build PASS
+FW-001,Firmware,Исходники target STM32U585,C+IOC+CMAKE,P0,DRAFT,PARTIAL_PASS_GENERATED_IOC_STARTUP_LINKER,PARTIAL_PASS_GENERATED_IOC_EXTI_AUDIT,Reproducible target build PASS
 FW-002,Firmware,Bootloader secure boot A/B,C+BIN+ELF+MAP,P0,PLANNED,OPEN,OPEN,Подпись rollback power-loss tests PASS
 FW-003,Firmware,Station application,C+BIN+ELF+MAP,P0,PLANNED,OPEN,OPEN,Unit integration HIL tests PASS
 FW-004,Firmware,RU868 pilot profile и EU868 future-disabled template,YAML+BIN fragment,P0,DRAFT,OPEN,OPEN,RU868 окна мощность duty cycle и RF test PASS

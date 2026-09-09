@@ -18,7 +18,10 @@ PIN_SOURCES = (
 )
 HEADER_PATH = "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h"
 CLOCK_HEADER_PATH = "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h"
+IOC_PATH = "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc"
 MANIFEST_PATH = "firmware/targets/evt_pre_20/target_contract_manifest.json"
+CUBEMX_CONTRACT_PATH = "firmware/targets/evt_pre_20/cubemx_generation_contract.json"
+CUBEMX_DB_LOCK_PATH = "firmware/targets/evt_pre_20/vendor/stm32cubemx_db.lock.json"
 
 TARGET_ID = "dioneya_evt_pre_20_rev_a"
 MCU = "STM32U585VIT6Q"
@@ -27,6 +30,56 @@ PIN_DATABASE = "STM32U585VITxQ"
 CLOCK_POLICY = "REV_A_INTERNAL_HSI_MSI_PLL_NO_HSE"
 LOW_SPEED_REFERENCE = "SiT1552AI-JE-DCC-32.768D"
 LOW_SPEED_REFERENCE_HZ = 32768
+CUBEMX_VERSION = "6.12.0"
+CUBEMX_DB_VERSION = "DB.6.0.120"
+CUBEMX_DB_TAG = "STM32CubeMX-DB.6.0.120"
+CUBEMX_DB_COMMIT = "f4ec11f00e762e37ffc4020f6d4f20d225bc061d"
+CUBEMX_DB_DEVICE_SHA256 = "4349055dfd06e6eb2dce1a440c44a995ad7c924e28435ede119a7d4bb10f556d"
+
+CUBEMX_IPS = (
+    "CORTEX_M33_NS",
+    "I2C2",
+    "LPUART1",
+    "MDF1",
+    "NVIC",
+    "OCTOSPI1",
+    "OCTOSPIM",
+    "PWR",
+    "RCC",
+    "SDMMC1",
+    "SPI1",
+    "SYS",
+    "TIM2",
+    "USART1",
+    "USART2",
+    "USART3",
+    "USB_OTG_FS",
+)
+
+EXTI_NETS = {
+    "LORA_DIO1": 2,
+    "ACCEL_INT": 6,
+    "TAMPER_IN": 7,
+    "MIC_WAKE": 8,
+}
+
+SAFE_PIN_STATES = {
+    "LORA_RESET_N": "GPIO_PIN_SET",
+    "EN_MODEM": "GPIO_PIN_RESET",
+    "EN_AUX": "GPIO_PIN_RESET",
+    "SIM_MUX_EN": "GPIO_PIN_RESET",
+    "BLE_EN": "GPIO_PIN_RESET",
+    "BLE_DFU_REQ": "GPIO_PIN_SET",
+}
+
+PIN_NAME_OVERRIDES = {
+    "PC14": "PC14-OSC32_IN (PC14)",
+    "PC15": "PC15-OSC32_OUT (PC15)",
+    "PA13": "PA13 (JTMS/SWDIO)",
+    "PA14": "PA14 (JTCK/SWCLK)",
+    "PA15": "PA15 (JTDI)",
+    "PH3": "PH3-BOOT0",
+}
 
 DIRECTION_ENUM = {
     "IN": "EVT_PRE_20_DIRECTION_IN",
@@ -203,7 +256,240 @@ _Static_assert(EVT_PRE_20_LOW_SPEED_REFERENCE_HZ == UINT32_C(32768),
 """
 
 
-def render_manifest(board_header: bytes, clock_header: bytes) -> str:
+def cubemx_pin_name(mcu_pin: str) -> str:
+    return PIN_NAME_OVERRIDES.get(mcu_pin, mcu_pin)
+
+
+def cubemx_key(pin_name: str) -> str:
+    return pin_name.replace(" ", r"\ ")
+
+
+def cubemx_signal(row: dict[str, str]) -> str:
+    if row["Net"] in EXTI_NETS:
+        return f"GPXTI{EXTI_NETS[row['Net']]}"
+    if row["CubeMX_Signal"] == "GPIO":
+        return "GPIO_Input" if row["Direction_at_MCU"] == "IN" else "GPIO_Output"
+    if row["CubeMX_Signal"] == "TIM2_CH1":
+        return "S_TIM2_CH1"
+    return row["CubeMX_Signal"]
+
+
+def cubemx_mode(row: dict[str, str]) -> str | None:
+    signal = row["CubeMX_Signal"]
+    if signal == "MDF1_CCK0":
+        return "MOD_MDF_CCK0"
+    if signal.startswith("OCTOSPIM_P1_"):
+        return "O1_P1_" + signal.removeprefix("OCTOSPIM_P1_")
+    if signal.startswith("SDMMC1_"):
+        return "SD_4_bits_Wide_bus"
+    if signal.startswith(("USART1_", "USART2_", "USART3_", "LPUART1_")):
+        return "Asynchronous"
+    if signal == "SPI1_NSS":
+        return "NSS_Signal_Hard_Output"
+    if signal.startswith("SPI1_"):
+        return "Full_Duplex_Master"
+    if signal.startswith("I2C2_"):
+        return "I2C"
+    if signal == "TIM2_CH1":
+        return "Input_Capture1_from_TI1"
+    if signal.startswith("USB_OTG_FS_"):
+        return "Device_Only"
+    if signal.startswith("DEBUG_"):
+        return "Trace_Asynchronous_SW"
+    if signal == "RCC_OSC32_IN":
+        return "LSE-External-Clock-Source"
+    return None
+
+
+def render_ioc(rows: list[dict[str, str]]) -> str:
+    ordered = sorted(rows, key=lambda row: int(row["LQFP100_Pin"]))
+    virtual_pins = (
+        "VP_PWR_VS_DBSignals",
+        "VP_PWR_VS_LPOM",
+        "VP_PWR_VS_SECSignals",
+        "VP_SYS_VS_Systick",
+    )
+    output = [
+        "#MicroXplorer Configuration settings - do not modify",
+        "CAD.formats=",
+        "CAD.pinconfig=",
+        "CAD.provider=",
+        "CORTEX_M33_NS.userName=CORTEX_M33",
+        "File.Version=6",
+        "GPIO.groupedBy=Group By Peripherals",
+        "KeepUserPlacement=false",
+        f"Mcu.CPN={MCU}",
+        "Mcu.ContextProject=TrustZoneDisabled",
+        "Mcu.Family=STM32U5",
+    ]
+    output.extend(f"Mcu.IP{index}={name}" for index, name in enumerate(CUBEMX_IPS))
+    output.extend(
+        [
+            f"Mcu.IPNb={len(CUBEMX_IPS)}",
+            f"Mcu.Name={PIN_DATABASE}",
+            "Mcu.Package=LQFP100",
+        ]
+    )
+    all_pins = [cubemx_pin_name(row["MCU_Pin"]) for row in ordered] + list(virtual_pins)
+    output.extend(f"Mcu.Pin{index}={name}" for index, name in enumerate(all_pins))
+    output.extend(
+        [
+            f"Mcu.PinsNb={len(all_pins)}",
+            "Mcu.ThirdPartyNb=0",
+            "Mcu.UserConstants=",
+            f"Mcu.UserName={PIN_DATABASE}",
+            f"MxCube.Version={CUBEMX_VERSION}",
+            f"MxDb.Version={CUBEMX_DB_VERSION}",
+        ]
+    )
+
+    irq_names = (
+        "EXTI2_IRQn",
+        "EXTI6_IRQn",
+        "EXTI7_IRQn",
+        "EXTI8_IRQn",
+        "I2C2_ER_IRQn",
+        "I2C2_EV_IRQn",
+        "LPUART1_IRQn",
+        "MDF1_FLT0_IRQn",
+        "MDF1_FLT1_IRQn",
+        "MDF1_FLT2_IRQn",
+        "MDF1_FLT3_IRQn",
+        "OCTOSPI1_IRQn",
+        "OTG_FS_IRQn",
+        "SDMMC1_IRQn",
+        "SPI1_IRQn",
+        "TIM2_IRQn",
+        "USART1_IRQn",
+        "USART2_IRQn",
+        "USART3_IRQn",
+    )
+    output.extend(
+        f"NVIC.{irq}=true\\:0\\:0\\:false\\:false\\:true\\:false\\:true\\:true"
+        for irq in irq_names
+    )
+    output.extend(
+        [
+            "NVIC.ForceEnableDMAVector=true",
+            "NVIC.PriorityGroup=NVIC_PRIORITYGROUP_4",
+        ]
+    )
+
+    for row in ordered:
+        pin_key = cubemx_key(cubemx_pin_name(row["MCU_Pin"]))
+        parameters = ["GPIO_Label"]
+        if row["Net"] in SAFE_PIN_STATES:
+            parameters.append("PinState")
+        if row["Direction_at_MCU"] == "OUT_OD":
+            parameters.append("GPIO_OType")
+        output.append(f"{pin_key}.GPIOParameters={','.join(parameters)}")
+        output.append(f"{pin_key}.GPIO_Label={row['Net']}")
+        if row["Net"] in SAFE_PIN_STATES:
+            output.append(f"{pin_key}.PinState={SAFE_PIN_STATES[row['Net']]}")
+        if row["Direction_at_MCU"] == "OUT_OD":
+            output.append(f"{pin_key}.GPIO_OType=GPIO_MODE_OUTPUT_OD")
+        output.append(f"{pin_key}.Locked=true")
+        mode = cubemx_mode(row)
+        if mode is not None:
+            output.append(f"{pin_key}.Mode={mode}")
+        output.append(f"{pin_key}.Signal={cubemx_signal(row)}")
+
+    output.extend(
+        [
+            "PinOutPanel.RotationAngle=0",
+            "ProjectManager.AskForMigrate=false",
+            "ProjectManager.BackupPrevious=true",
+            "ProjectManager.CompilerLinker=GCC",
+            "ProjectManager.CompilerOptimize=6",
+            "ProjectManager.ComputerToolchain=false",
+            "ProjectManager.CoupleFile=false",
+            "ProjectManager.DeletePrevious=false",
+            f"ProjectManager.DeviceId={PIN_DATABASE}",
+            "ProjectManager.FreePins=false",
+            "ProjectManager.HalAssertFull=false",
+            "ProjectManager.HeapSize=0x400",
+            "ProjectManager.KeepUserCode=true",
+            "ProjectManager.LastFirmware=false",
+            "ProjectManager.LibraryCopy=1",
+            "ProjectManager.MainLocation=Core/Src",
+            "ProjectManager.NoMain=false",
+            "ProjectManager.ProjectBuild=false",
+            f"ProjectManager.ProjectFileName={Path(IOC_PATH).name}",
+            f"ProjectManager.ProjectName={TARGET_ID}",
+            "ProjectManager.RegisterCallBack=",
+            "ProjectManager.StackSize=0x2000",
+            "ProjectManager.TargetToolchain=STM32CubeIDE",
+            "ProjectManager.UnderRoot=true",
+            (
+                "ProjectManager.functionlistsort="
+                "1-MX_GPIO_Init-GPIO-false-HAL-true,"
+                "2-SystemClock_Config-RCC-false-HAL-false,"
+                "3-MX_MDF1_Init-MDF1-false-HAL-true,"
+                "4-MX_OCTOSPI1_Init-OCTOSPI1-false-HAL-true,"
+                "5-MX_SDMMC1_SD_Init-SDMMC1-false-HAL-true,"
+                "6-MX_SPI1_Init-SPI1-false-HAL-true,"
+                "7-MX_I2C2_Init-I2C2-false-HAL-true,"
+                "8-MX_TIM2_Init-TIM2-false-HAL-true,"
+                "9-MX_USART1_UART_Init-USART1-false-HAL-true,"
+                "10-MX_USART2_UART_Init-USART2-false-HAL-true,"
+                "11-MX_USART3_UART_Init-USART3-false-HAL-true,"
+                "12-MX_LPUART1_UART_Init-LPUART1-false-HAL-true,"
+                "13-MX_USB_OTG_FS_PCD_Init-USB_OTG_FS-false-HAL-true"
+            ),
+            "RCC.AHBFreq_Value=4000000",
+            "RCC.APB1Freq_Value=4000000",
+            "RCC.APB2Freq_Value=4000000",
+            "RCC.APB3Freq_Value=4000000",
+            "RCC.CortexFreq_Value=4000000",
+            "RCC.HCLKFreq_Value=4000000",
+            "RCC.LSE_VALUE=32768",
+            "RCC.MSI_VALUE=4000000",
+            "RCC.SYSCLKFreq_VALUE=4000000",
+            "RCC.SYSCLKSource=RCC_SYSCLKSOURCE_MSI",
+        ]
+    )
+    for net, exti_line in EXTI_NETS.items():
+        output.append(f"SH.GPXTI{exti_line}.0=GPIO_EXTI{exti_line}")
+        output.append(f"SH.GPXTI{exti_line}.ConfNb=1")
+    output.extend(
+        [
+            "SH.S_TIM2_CH1.0=TIM2_CH1,Input_Capture1_from_TI1",
+            "SH.S_TIM2_CH1.ConfNb=1",
+            "I2C2.IPParameters=",
+            "LPUART1.IPParameters=VirtualMode-Asynchronous",
+            "LPUART1.VirtualMode-Asynchronous=VM_ASYNC",
+            "SPI1.DataSize=SPI_DATASIZE_8BIT",
+            "SPI1.Direction=SPI_DIRECTION_2LINES",
+            "SPI1.IPParameters=VirtualType,Mode,Direction,DataSize,VirtualNSS",
+            "SPI1.Mode=SPI_MODE_MASTER",
+            "SPI1.VirtualNSS=VM_NSSHARD",
+            "SPI1.VirtualType=VM_MASTER",
+            "TIM2.Channel-Input_Capture1_from_TI1=TIM_CHANNEL_1",
+            "TIM2.IPParameters=Channel-Input_Capture1_from_TI1",
+            "USART1.IPParameters=VirtualMode-Asynchronous",
+            "USART1.VirtualMode-Asynchronous=VM_ASYNC",
+            "USART2.IPParameters=VirtualMode-Asynchronous",
+            "USART2.VirtualMode-Asynchronous=VM_ASYNC",
+            "USART3.IPParameters=VirtualMode-Asynchronous",
+            "USART3.VirtualMode-Asynchronous=VM_ASYNC",
+            "USB_OTG_FS.IPParameters=VirtualMode",
+            "USB_OTG_FS.VirtualMode=Device_Only",
+            "VP_PWR_VS_DBSignals.Mode=DisableDeadBatterySignals",
+            "VP_PWR_VS_DBSignals.Signal=PWR_VS_DBSignals",
+            "VP_PWR_VS_LPOM.Mode=PowerOptimisation",
+            "VP_PWR_VS_LPOM.Signal=PWR_VS_LPOM",
+            "VP_PWR_VS_SECSignals.Mode=Security/Privilege",
+            "VP_PWR_VS_SECSignals.Signal=PWR_VS_SECSignals",
+            "VP_SYS_VS_Systick.Mode=SysTick",
+            "VP_SYS_VS_Systick.Signal=SYS_VS_Systick",
+            "board=custom",
+            "",
+        ]
+    )
+    return "\n".join(output)
+
+
+def render_manifest(board_header: bytes, clock_header: bytes, ioc: bytes) -> str:
     manifest = {
         "schema_version": 1,
         "configuration": "EVT-PRE-20",
@@ -219,11 +505,14 @@ def render_manifest(board_header: bytes, clock_header: bytes) -> str:
                 *PIN_SOURCES,
                 "hardware/CLOCKING_REV_A.md",
                 "firmware/targets/evt_pre_20/target_status.yaml",
+                CUBEMX_CONTRACT_PATH,
+                CUBEMX_DB_LOCK_PATH,
             )
         ],
         "generated_outputs": [
             {"path": HEADER_PATH, "sha256": sha256_bytes(board_header)},
             {"path": CLOCK_HEADER_PATH, "sha256": sha256_bytes(clock_header)},
+            {"path": IOC_PATH, "sha256": sha256_bytes(ioc)},
         ],
         "pin_assignment_count": 65,
         "clock_policy": {
@@ -233,6 +522,20 @@ def render_manifest(board_header: bytes, clock_header: bytes) -> str:
             "low_speed_reference_hz": LOW_SPEED_REFERENCE_HZ,
             "runtime_frequencies_released": False,
         },
+        "cubemx": {
+            "status": "GENERATED_PINOUT_CANDIDATE_OPEN_REGENERATE_REQUIRED",
+            "tool_version": CUBEMX_VERSION,
+            "database_version": CUBEMX_DB_VERSION,
+            "database_tag": CUBEMX_DB_TAG,
+            "database_commit": CUBEMX_DB_COMMIT,
+            "database_device_sha256": CUBEMX_DB_DEVICE_SHA256,
+            "exti_assignments": {
+                "LORA_DIO1": "PC2/EXTI2",
+                "ACCEL_INT": "PC6/EXTI6",
+                "TAMPER_IN": "PC7/EXTI7",
+                "MIC_WAKE": "PA8/EXTI8",
+            },
+        },
         "quality_gates": {
             "qg1_completeness": "tools/validate_evt_pre_20_target_contract.py",
             "qg2_technical": "tools/audit_evt_pre_20_target_technical.py",
@@ -240,9 +543,8 @@ def render_manifest(board_header: bytes, clock_header: bytes) -> str:
         "release_gate": {
             "status": "BLOCKED",
             "blockers": [
-                "CUBEMX_IOC_MISSING",
-                "STARTUP_MISSING",
-                "LINKER_SCRIPT_MISSING",
+                "CUBEMX_OPEN_REGENERATE_MISSING",
+                "CLOCK_PWR_PERIPHERAL_RUNTIME_REVIEW_MISSING",
                 "HAL_LL_BINDINGS_MISSING",
                 "SECURE_BOOT_MISSING",
                 "OTA_AB_MISSING",
@@ -259,10 +561,12 @@ def expected_outputs() -> dict[str, str]:
     validate_inputs(rows)
     board = render_board_header(rows).encode("utf-8")
     clock = render_clock_header().encode("utf-8")
+    ioc = render_ioc(rows).encode("utf-8")
     return {
         HEADER_PATH: board.decode("utf-8"),
         CLOCK_HEADER_PATH: clock.decode("utf-8"),
-        MANIFEST_PATH: render_manifest(board, clock),
+        IOC_PATH: ioc.decode("utf-8"),
+        MANIFEST_PATH: render_manifest(board, clock, ioc),
     }
 
 

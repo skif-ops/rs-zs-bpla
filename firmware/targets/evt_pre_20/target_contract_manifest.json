@@ -10,7 +10,7 @@
   "source_inputs": [
     {
       "path": "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
-      "sha256": "87eb26a123e4b69c4d76226acc63dc65316d02a6ecbc32fabe532c54b875fc70"
+      "sha256": "9ff0b9005db18591eac9b19233d7d261edf598a9df7af5d8f80ab6759a58e32f"
     },
     {
       "path": "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
@@ -22,17 +22,29 @@
     },
     {
       "path": "firmware/targets/evt_pre_20/target_status.yaml",
-      "sha256": "eda6b621d5e86d7260dc1af94da1ebd202ae8c6d834b640486bd9757a7cc5e3c"
+      "sha256": "a412461e46b515dfb7ccb9bc478e1f421fc0016c29c9814a4296ff6d9603f8f0"
+    },
+    {
+      "path": "firmware/targets/evt_pre_20/cubemx_generation_contract.json",
+      "sha256": "5bc828cafa5822fcc83e02f7013a11149b5b2ff6bbb7f82456e9b2c1ec3b70b5"
+    },
+    {
+      "path": "firmware/targets/evt_pre_20/vendor/stm32cubemx_db.lock.json",
+      "sha256": "686c3094f2d2ed08db8d21d0f1088b486985f24688578e05d41ddec4cbcce139"
     }
   ],
   "generated_outputs": [
     {
       "path": "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h",
-      "sha256": "83a277cc261c20605b5c65b329926f7223355e5234176249d1c0efded39e975c"
+      "sha256": "9fc187a133fc170f92fc1b15c7c77bf7b7909c29b697b86d9718899367788886"
     },
     {
       "path": "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h",
       "sha256": "8de2d3fe853528115660ebea25981845a687397592ffbca6f6d62abca2e9271f"
+    },
+    {
+      "path": "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc",
+      "sha256": "9b54345269fb9444edd7ada6433792ab96d9b74e3cca8412870743222d3e9f0c"
     }
   ],
   "pin_assignment_count": 65,
@@ -43,6 +55,20 @@
     "low_speed_reference_hz": 32768,
     "runtime_frequencies_released": false
   },
+  "cubemx": {
+    "status": "GENERATED_PINOUT_CANDIDATE_OPEN_REGENERATE_REQUIRED",
+    "tool_version": "6.12.0",
+    "database_version": "DB.6.0.120",
+    "database_tag": "STM32CubeMX-DB.6.0.120",
+    "database_commit": "f4ec11f00e762e37ffc4020f6d4f20d225bc061d",
+    "database_device_sha256": "4349055dfd06e6eb2dce1a440c44a995ad7c924e28435ede119a7d4bb10f556d",
+    "exti_assignments": {
+      "LORA_DIO1": "PC2/EXTI2",
+      "ACCEL_INT": "PC6/EXTI6",
+      "TAMPER_IN": "PC7/EXTI7",
+      "MIC_WAKE": "PA8/EXTI8"
+    }
+  },
   "quality_gates": {
     "qg1_completeness": "tools/validate_evt_pre_20_target_contract.py",
     "qg2_technical": "tools/audit_evt_pre_20_target_technical.py"
@@ -50,9 +76,8 @@
   "release_gate": {
     "status": "BLOCKED",
     "blockers": [
-      "CUBEMX_IOC_MISSING",
-      "STARTUP_MISSING",
-      "LINKER_SCRIPT_MISSING",
+      "CUBEMX_OPEN_REGENERATE_MISSING",
+      "CLOCK_PWR_PERIPHERAL_RUNTIME_REVIEW_MISSING",
       "HAL_LL_BINDINGS_MISSING",
       "SECURE_BOOT_MISSING",
       "OTA_AB_MISSING",

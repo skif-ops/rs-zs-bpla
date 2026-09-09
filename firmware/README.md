@@ -16,8 +16,7 @@ Host PASS не означает готовую прошивку изделия.
 
 ## Что отсутствует до target build
 
-- STM32CubeMX `.ioc` для STM32U585VIT6Q;
-- импорт и регенерация точного CubeMX pin/clock проекта;
+- открытие, проверка и регенерация подготовленного STM32CubeMX `.ioc` версией 6.12.0;
 - production linker с secure boot/A/B и HAL/LL bindings;
 - драйвер PDM/MDF для четырёх T5838 на фактической плате;
 - production TLS/MQTT, защищённый downstream и provisioning;
@@ -38,3 +37,9 @@ profiles. Контракт генерируется воспроизводимо
 768 KiB SRAM1-3 и 16 KiB SRAM4. Этот linker предназначен только для первичного
 запуска без TrustZone; он не заменяет production-разметку secure boot/A/B и не
 снимает общий `TARGET_PORT_REQUIRED`.
+
+Третий target-инкремент формирует воспроизводимый pinout `.ioc` для
+STM32CubeMX 6.12.0 / DB.6.0.120. В нём сохранены 65 назначений и устранён
+конфликт EXTI8: `LORA_DIO1` перенесён на `PC2/EXTI2`, а `MIC_WAKE` оставлен на
+`PA8/EXTI8`. До открытия и регенерации в зафиксированной версии CubeMX файл не
+считается подтверждённым target build.

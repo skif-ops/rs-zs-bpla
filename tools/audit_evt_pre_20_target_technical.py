@@ -51,6 +51,7 @@ CRITICAL_ASSIGNMENTS = {
     "LORA_SCK": ("PA5", 29, "SPI1_SCK", "AF5", "OUT"),
     "LORA_MISO": ("PA6", 30, "SPI1_MISO", "AF5", "IN"),
     "LORA_MOSI": ("PA7", 31, "SPI1_MOSI", "AF5", "OUT"),
+    "LORA_DIO1": ("PC2", 17, "GPIO", "GPIO", "IN"),
     "CELL_TX": ("PB6", 92, "USART1_TX", "AF7", "OUT"),
     "CELL_RX": ("PB7", 93, "USART1_RX", "AF7", "IN"),
     "BLE_TX": ("PB10", 44, "USART3_TX", "AF7", "OUT"),
@@ -124,6 +125,9 @@ def main() -> None:
     require("THSEL" in by_net["AAD_CFG"]["Function"], "AAD_CFG is not bound to T5838 THSEL")
     require("INA226" in by_net["I2C2_SCL"]["External_Device"], "I2C2 SCL lost INA226 binding")
     require("INA226" in by_net["I2C2_SDA"]["External_Device"], "I2C2 SDA lost INA226 binding")
+    exti_nets = ("LORA_DIO1", "ACCEL_INT", "TAMPER_IN", "MIC_WAKE")
+    exti_lines = [int(by_net[net]["MCU_Pin"][2:]) for net in exti_nets]
+    require(len(set(exti_lines)) == len(exti_lines), f"planned EXTI GPIO lines collide: {exti_lines}")
 
     board = BOARD_HEADER.read_text(encoding="utf-8")
     clock = CLOCK_HEADER.read_text(encoding="utf-8")
@@ -172,7 +176,7 @@ def main() -> None:
         require(forbidden not in combined, f"foreign/superseded target marker leaked into contract: {forbidden}")
 
     print("EVT-PRE-20 target contract QG-2 independent technical audit: PASS")
-    print("- package pins, peripheral groups, I2C power binding and no-HSE clock policy verified")
+    print("- package pins, unique EXTI sources, peripheral groups, I2C power binding and no-HSE clock policy verified")
 
 
 if __name__ == "__main__":

@@ -53,6 +53,8 @@ def main() -> None:
         "ENGINEERING_LINKER",
         "MEMORY_EVIDENCE",
         "CUBEMX_PREFLIGHT",
+        "CUBEMX_PINOUT_IOC",
+        "CUBEMX_DB_LOCK",
     }
     require({item["role"] for item in manifest["files"]} == required_roles, "scaffold role coverage mismatch")
 
@@ -71,10 +73,10 @@ def main() -> None:
         require(sha256(destination) == item["sha256"], f"vendor lock hash mismatch: {item['destination']}")
 
     cubemx = load_json(TARGET / "cubemx_generation_contract.json")
-    require(cubemx["status"] == "INPUT_COMPLETE_CUBEMX_GENERATION_AND_IMPORT_PENDING", "CubeMX status overclaims readiness")
+    require(cubemx["status"] == "PINOUT_IOC_GENERATED_CUBEMX_OPEN_REGENERATE_PENDING", "CubeMX status overclaims readiness")
     require(cubemx["tool"]["version"] == "6.12.0", "CubeMX version is not locked")
     require(cubemx["pin_assignment_count"] == 65, "CubeMX contract pin count mismatch")
-    require(not (ROOT / cubemx["output_ioc"]).exists(), "unvalidated CubeMX .ioc must not be committed as ready")
+    require((ROOT / cubemx["output_ioc"]).is_file(), "generated CubeMX pinout .ioc missing")
     require(cubemx["release_gate"]["status"] == "BLOCKED", "CubeMX preflight release gate missing")
 
     memory = load_json(TARGET / "stm32_memory_contract.json")
@@ -85,7 +87,7 @@ def main() -> None:
     require(gates["qg1_completeness"] == "tools/validate_evt_pre_20_stm32_scaffold.py", "QG-1 path mismatch")
     require(gates["qg2_technical"] == "tools/audit_evt_pre_20_stm32_scaffold_technical.py", "QG-2 path mismatch")
     require(manifest["release_gate"]["status"] == "BLOCKED", "incomplete STM32 target must remain blocked")
-    require(len(manifest["release_gate"]["remaining_blockers"]) == 7, "remaining blocker list is incomplete")
+    require(len(manifest["release_gate"]["remaining_blockers"]) == 8, "remaining blocker list is incomplete")
 
     status = (TARGET / "target_status.yaml").read_text(encoding="utf-8")
     require("status: TARGET_PORT_REQUIRED" in status, "target prematurely claims completion")
