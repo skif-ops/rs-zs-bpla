@@ -99,6 +99,10 @@ jobs:
               attempt=$((attempt + 1))
             done
           }
+          chrome_source=/etc/apt/sources.list.d/google-chrome.list
+          if [ -f "$chrome_source" ]; then
+            sudo mv "$chrome_source" "${chrome_source}.disabled"
+          fi
           retry sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
           retry sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
