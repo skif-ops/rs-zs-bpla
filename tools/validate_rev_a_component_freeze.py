@@ -74,6 +74,7 @@ def main() -> None:
         "U18": "SN74AXC1T45DRLR",
         "Q1": "MMBT3904,215",
         "Q2": "MMBT3904,215",
+        "Q3": "MMBT3904,215",
         "X1": "SiT1552AI-JE-DCC-32.768D",
     }
     for ref, mpn in expected_main.items():
@@ -89,10 +90,18 @@ def main() -> None:
     require(main_parts["U8"]["Package_or_Module"] == "LGA-102_23.6x19.9mm", "U8 exact LGA package is not frozen")
     require("PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv" in main_parts["U8"]["Notes"], "U8 freeze does not cite cellular authority")
     require("PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv" in main_parts["U16"]["Notes"], "U16 freeze does not cite cellular authority")
-    for ref in ("Q1", "Q2"):
+    for ref in ("Q1", "Q2", "Q3"):
         require(main_parts[ref]["Package_or_Module"] == "SOT23", f"{ref} package is not SOT23")
         require(main_parts[ref]["Temperature_C"] == "-65..150", f"{ref} temperature range drift")
+    for ref in ("Q1", "Q2"):
         require("PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv" in main_parts[ref]["Notes"], f"{ref} freeze does not cite cellular authority")
+    require("PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv" in main_parts["Q3"]["Notes"], "Q3 freeze does not cite dual-SIM authority")
+    require(main_parts["U13"]["Package_or_Module"] == "TSSOP-24_PW", "U13 exact PW package is not frozen")
+    require("PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv" in main_parts["U13"]["Notes"], "U13 freeze does not cite dual-SIM authority")
+    for ref in ("U14", "U15"):
+        require(main_parts[ref]["Package_or_Module"] == "SOT666_1.6x1.6mm", f"{ref} exact SOT666 package is not frozen")
+        require(main_parts[ref]["Temperature_C"] == "-40..125", f"{ref} temperature range drift")
+        require("PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv" in main_parts[ref]["Notes"], f"{ref} freeze does not cite dual-SIM authority")
 
     text = "\n".join((ROOT / p).read_text(encoding="utf-8") for p in (
         "hardware/POWER_COMPONENT_FREEZE_REV_A.csv",

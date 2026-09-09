@@ -59,11 +59,11 @@ AAD wake переводит STM32 в активное состояние, зап
 
 Для cellular применяется фиксированная последовательность `MAIN-AUTH-004`:
 
-1. Q1 PWRKEY и Q2 RESET_N отключены; `CELL_DTR=LOW`.
-2. Включить `EN_MODEM`, дождаться стабильного `PWR_GOOD`, затем выдержать не менее 30 ms.
-3. Подать на Q1 команду HIGH на 700 ms, что формирует активный LOW на U8 PWRKEY в допустимом окне 500-1000 ms.
+1. Q1 PWRKEY, Q2 RESET_N и Q3 SIM mux enable отключены; U13 удерживается в High-Z; `CELL_DTR=LOW`.
+2. При U13 High-Z выбрать слот через `SIM_MUX_SEL`, включить `EN_MODEM`, дождаться стабильного `PWR_GOOD`, затем выдержать не менее 30 ms.
+3. Установить `SIM_MUX_EN=HIGH`, проверить active-LOW `U13_EN_N`, затем подать на Q1 команду HIGH на 700 ms, что формирует активный LOW на U8 PWRKEY в допустимом окне 500-1000 ms.
 4. Не использовать UART и RI до `CELL_STATUS=HIGH`.
-5. Для штатного выключения остановить трафик, сохранить очередь, выполнить `AT+QPOWD`, дождаться `CELL_STATUS=LOW` и только затем снять `EN_MODEM`.
+5. Для штатного выключения остановить трафик, сохранить очередь, выполнить `AT+QPOWD`, дождаться `CELL_STATUS=LOW`, установить `SIM_MUX_EN=LOW`, проверить U13 High-Z и только затем снять `EN_MODEM`.
 6. При отказе AT shutdown допускается PWRKEY pulse 650-1500 ms с тем же обязательным ожиданием `CELL_STATUS=LOW`.
 
 Узел U8 получает два локальных ответвления от одной `3V8_MODEM` star point: `3V8_MODEM_BB` через ferrite bead и `3V8_MODEM_RF` через 0 Ohm link. Во время EGPRS burst напряжение на каждом из четырёх VBAT pads U8 не должно опускаться ниже 3.3 V. Полная топология зафиксирована в `hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md`; точные MPN пассивов остаются блокером `MAIN-AUTH-010`.

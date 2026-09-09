@@ -145,13 +145,13 @@ U8_FUNCTION_NETS = {
     35: "U8_MAIN_TXD_1V8",
     39: "U8_MAIN_RI_1V8",
 }
-U8_DEFERRED_005 = {
-    42: "CELL_USIM_DET_1V8",
-    43: "CELL_USIM_VDD_1V8",
-    44: "CELL_USIM_RST_1V8",
-    45: "CELL_USIM_DATA_1V8",
-    46: "CELL_USIM_CLK_1V8",
-    47: "CELL_USIM_GND",
+U8_DUAL_SIM_MAP = {
+    42: ("NC", "UNUSED_INPUT_NC"),
+    43: ("CELL_USIM_VDD_1V8", "FUNCTION_LOCKED"),
+    44: ("CELL_USIM_RST_1V8", "FUNCTION_LOCKED"),
+    45: ("CELL_USIM_DATA_1V8", "FUNCTION_LOCKED"),
+    46: ("CELL_USIM_CLK_1V8", "FUNCTION_LOCKED"),
+    47: ("GND_MODEM", "GROUND_LOCKED"),
 }
 U8_DEFERRED_009 = {
     8: "CELL_USB_VBUS",
@@ -218,10 +218,10 @@ def main() -> None:
         )
     for index, net in U8_FUNCTION_NETS.items():
         require(u8[index]["RevA_Net"] == net, f"U8 functional pad {index} net mismatch")
-    for index, net in U8_DEFERRED_005.items():
+    for index, expected in U8_DUAL_SIM_MAP.items():
         require(
-            (u8[index]["RevA_Net"], u8[index]["Disposition"]) == (net, "DEFERRED_MAIN_AUTH_005"),
-            f"U8 pad {index} dual-SIM ownership mismatch",
+            (u8[index]["RevA_Net"], u8[index]["Disposition"]) == expected,
+            f"U8 pad {index} closed dual-SIM mapping mismatch",
         )
     for index, net in U8_DEFERRED_009.items():
         require(
@@ -365,7 +365,7 @@ def main() -> None:
         "CELL_STATUS=LOW",
         "150 mV",
         "below 75 mV",
-        "does not close the dual-SIM network",
+        "controlled separately by `PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv`",
     }
     for marker in review_markers:
         require(marker in review, f"cellular authority review missing marker: {marker}")
@@ -400,7 +400,16 @@ def main() -> None:
         },
         "MAIN-AUTH-004 evidence set mismatch",
     )
-    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(5, 12)}, "remaining open authority set mismatch")
+    require("MAIN-AUTH-005" in closed, "MAIN-AUTH-005 is not closed")
+    require(
+        set(closed["MAIN-AUTH-005"]["evidence"])
+        == {
+            "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-005 evidence set mismatch",
+    )
+    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(6, 12)}, "remaining open authority set mismatch")
     require(readiness["complete"] is False and status["manufacturing_release"] is False, "cellular authority prematurely released manufacturing")
 
     result = {

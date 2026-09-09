@@ -116,8 +116,8 @@ def main() -> None:
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     closed = {item["id"] for item in status["capture_readiness"]["closed_authorities"]}
     open_ids = {item["id"] for item in status["capture_readiness"]["open_authorities"]}
-    require(closed == {"MAIN-AUTH-001", "MAIN-AUTH-002", "MAIN-AUTH-003", "MAIN-AUTH-004"}, "closed authority set mismatch")
-    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(5, 12)}, "remaining authority set mismatch")
+    require(closed == {"MAIN-AUTH-001", "MAIN-AUTH-002", "MAIN-AUTH-003", "MAIN-AUTH-004", "MAIN-AUTH-005"}, "closed authority set mismatch")
+    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(6, 12)}, "remaining authority set mismatch")
     require(status["manufacturing_release"] is False, "manufacturing release asserted with open authorities")
 
     result = {

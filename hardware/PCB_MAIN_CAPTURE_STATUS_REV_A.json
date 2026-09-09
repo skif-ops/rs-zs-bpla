@@ -17,6 +17,8 @@
       "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md",
       "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv",
       "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md",
       "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
       "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
       "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -98,18 +100,17 @@
           "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv",
           "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md"
         ]
+      },
+      {
+        "id": "MAIN-AUTH-005",
+        "scope": "U13 dual-SIM mux, U14/U15 ESD arrays, Q3 boot-safe enable and both nano-SIM socket electrical pin maps and powered-off policy",
+        "evidence": [
+          "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md"
+        ]
       }
     ],
     "open_authorities": [
-      {
-        "id": "MAIN-AUTH-005",
-        "scope": "U13 dual-SIM mux, U14/U15 ESD arrays and both nano-SIM socket exact pin maps and powered-off policy",
-        "blocks": [
-          "native_schematic",
-          "review_a",
-          "production_bom"
-        ]
-      },
       {
         "id": "MAIN-AUTH-006",
         "scope": "U9 GNSS exact module pads, backup/bias network, TIMEPULSE and dedicated RF path",

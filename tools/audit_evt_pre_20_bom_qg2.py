@@ -41,7 +41,7 @@ def main() -> int:
     main_item_for_ref = {
         **{f"U{i}": f"U{i}" for i in (1, 2, 3, 4, 7, 8, 9, 10, 11, 13, 16, 17, 18)},
         "U14": "U14-U15", "U15": "U14-U15", "Q1": "Q-MODEM-PWRKEY",
-        "Q2": "Q-MODEM-RESET", "X1": "X1",
+        "Q2": "Q-MODEM-RESET", "Q3": "Q-SIM-MUX-EN", "X1": "X1",
     }
     main_mismatch = []
     for frozen in main_freeze:
@@ -166,6 +166,7 @@ def main() -> int:
     device_pin_rows = read(ROOT / "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv")
     audio_logic_pin_rows = read(ROOT / "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv")
     cellular_pin_rows = read(ROOT / "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv")
+    dual_sim_pin_rows = read(ROOT / "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv")
     required_native_tokens = {
         "(kicad_sch",
         *(row["MPN"] for row in main_freeze),
@@ -173,6 +174,7 @@ def main() -> int:
         *(row["RevA_Net"] for row in device_pin_rows if row["RevA_Net"] != "NC"),
         *(row["RevA_Net"] for row in audio_logic_pin_rows if row["RevA_Net"] != "NC"),
         *(row["RevA_Net"] for row in cellular_pin_rows if row["RevA_Net"] != "NC"),
+        *(row["RevA_Net"] for row in dual_sim_pin_rows if row["RevA_Net"] != "NC"),
     }
     native_tokens_missing = sorted(token for token in required_native_tokens if token not in native_text)
     native_ok = (

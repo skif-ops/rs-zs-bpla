@@ -2,11 +2,11 @@
 
 Status: `CELLULAR_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE`
 
-This record closes only `MAIN-AUTH-004`. It freezes the exact U8 BG95-M3 and U16 translator pads, the two open-collector control stages, deterministic reset states, modem power sequencing, and the required local burst network. It does not close the dual-SIM network in `MAIN-AUTH-005`, the cellular RF endpoint and recovery fixture in `MAIN-AUTH-009`, the exact passive set in `MAIN-AUTH-010`, layout authority in `MAIN-AUTH-011`, native capture, PCB Review A, PCB Review B, or the production BOM.
+This record closes only `MAIN-AUTH-004`. It freezes the exact U8 BG95-M3 and U16 translator pads, the two open-collector control stages, deterministic reset states, modem power sequencing, and the required local burst network. The dual-SIM network is controlled separately by `PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv` under `MAIN-AUTH-005`. This record does not close the cellular RF endpoint and recovery fixture in `MAIN-AUTH-009`, the exact passive set in `MAIN-AUTH-010`, layout authority in `MAIN-AUTH-011`, native capture, PCB Review A, PCB Review B, or the production BOM.
 
 Machine authority: `hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv`.
 
-Authority CSV SHA-256: `f7aee6022ad4d74a8cc7cca9626a1f3d009ed5c461702edf44c30887b34e0c3a`.
+Authority CSV SHA-256: `dafa5598e8d10fed0f2facc1f9ef4e949159850364445b28d4d2eded373a604f`.
 
 ## Primary evidence
 
@@ -17,7 +17,7 @@ Authority CSV SHA-256: `f7aee6022ad4d74a8cc7cca9626a1f3d009ed5c461702edf44c30887
 
 ## U8 BG95-M3 pad contract
 
-The selected module is the 102-pad `BG95-M3` in the 23.6 x 19.9 mm LGA form. Every physical pad is accounted for in the machine authority. The accounting includes 28 ground pads, four VBAT pads, one VDD_EXT output, seven locally closed functional signals, six dual-SIM pads owned by `MAIN-AUTH-005`, seven RF/recovery pads owned by `MAIN-AUTH-009`, and all unused, unsupported, and reserved pads.
+The selected module is the 102-pad `BG95-M3` in the 23.6 x 19.9 mm LGA form. Every physical pad is accounted for in the machine authority. The accounting includes 28 ground pads, four VBAT pads, one VDD_EXT output, seven locally closed functional signals, the resolved six-pad dual-SIM interface controlled by `MAIN-AUTH-005`, seven RF/recovery pads owned by `MAIN-AUTH-009`, and all unused, unsupported, and reserved pads.
 
 The following locally closed signals are exact:
 
@@ -37,7 +37,7 @@ The following locally closed signals are exact:
 - The BG95-M3 input range is 3.3 to 4.3 V with 3.8 V nominal. The rail must never fall below 3.3 V at any U8 VBAT pad.
 - All 28 module GND pads connect to the low-impedance `GND_MODEM` plane with ground vias placed according to the Quectel land pattern.
 - Pad 60 `ANT_MAIN` is fixed as the `CELL_RF` source, but its 50 Ohm route, matching, protection, U.FL endpoint, and layout acceptance remain owned by `MAIN-AUTH-009` and `MAIN-AUTH-011`.
-- Pads 42 through 47 are explicitly owned by `MAIN-AUTH-005`; their presence in this map fixes the U8 pad identities but does not release the dual-SIM circuit.
+- Pad 42 `USIM_DET` is NC because independent J6/J7 card-detect switches terminate at the MCU. Pads 43 through 46 terminate at U13, and pad 47 connects directly to `GND_MODEM`; the exact dual-SIM endpoints are controlled by `PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv`.
 - Pads 8 through 10, 22, 23, and 75 remain owned by `MAIN-AUTH-009` for modem firmware-recovery and production-fixture decisions.
 - All reserved pads remain NC. Unsupported `ANT_WIFI` pad 56 and `GNSS_LNA_EN` pad 51 remain NC for BG95-M3. Unused BOOT_CONFIG pads have no pull-up.
 
@@ -94,11 +94,11 @@ Exact 4.7 kOhm, 47 kOhm, and 10 nF passive MPNs remain `MAIN-AUTH-010`, but thei
 
 | Operation | Required sequence |
 |---|---|
-| Cold OFF | `EN_MODEM=LOW`; Q1 and Q2 off; U16 VCCA absent; U16 I/O isolated; `CELL_STATUS=LOW` |
-| Power on | Set both commands LOW and `CELL_DTR=LOW`; assert `EN_MODEM`; wait for stable `PWR_GOOD`; wait at least 30 ms; assert `CELL_PWRKEY_CMD=HIGH` for the selected 700 ms pulse inside the Quectel 500-1000 ms window; release LOW |
+| Cold OFF | `EN_MODEM=LOW`; Q1, Q2, and Q3 off; U13 High-Z; U16 VCCA absent; U16 I/O isolated; `CELL_STATUS=LOW` |
+| Power on | With U13 High-Z select SIM1 or SIM2; assert `EN_MODEM`; wait for stable `PWR_GOOD` and at least 30 ms; set `SIM_MUX_EN=HIGH` to connect the selected slot; assert `CELL_PWRKEY_CMD=HIGH` for the selected 700 ms pulse inside the Quectel 500-1000 ms window; release LOW |
 | Ready | Wait for `CELL_STATUS=HIGH`; do not trust UART or RI before this state; then synchronize AT commands |
 | UART sleep | After `AT+QSCLK=1`, set `CELL_DTR=HIGH`; drive it LOW before sending AT data |
-| Normal shutdown | Stop traffic; persist queues; issue `AT+QPOWD`; keep Q1 off; wait for `CELL_STATUS=LOW`; only then deassert `EN_MODEM` |
+| Normal shutdown | Stop traffic; persist queues; issue `AT+QPOWD`; keep Q1 off; wait for `CELL_STATUS=LOW`; set `SIM_MUX_EN=LOW` to make U13 High-Z; only then deassert `EN_MODEM` |
 | Shutdown fallback | If AT shutdown fails, pulse Q1 for 650-1500 ms; wait for `CELL_STATUS=LOW`; only then remove the rail |
 | Emergency reset | With the rail on, assert Q2 for 2-3.8 s and then release; do not assert Q1 simultaneously |
 
@@ -113,4 +113,4 @@ The rail must not be cut while `CELL_STATUS=HIGH`. Fast shutdown on U8 pad 25 is
 - Verify U16 partial-power isolation with `3V3_DIGITAL` present and `3V8_MODEM` absent.
 - Verify all four U8 VBAT pads remain at or above 3.3 V during representative LTE and EGPRS bursts.
 - Measure `GND_MODEM` to `GND_DIGITAL` offset and noise at U16; the peak must remain below 75 mV.
-- Complete dual-SIM, modem recovery, cellular RF, exact passive, layout, native ERC, BOM-from-schematic, and independent PCB reviews before any manufacturing release.
+- Complete dual-SIM SI and connector procurement evidence, modem recovery, cellular RF, exact passive, layout, native ERC, BOM-from-schematic, and independent PCB reviews before any manufacturing release.

@@ -30,6 +30,9 @@ AUDIO_LOGIC_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHO
 AUDIO_LOGIC_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md"
 CELLULAR_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv"
 CELLULAR_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md"
+DUAL_SIM_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv"
+DUAL_SIM_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md"
+DUAL_SIM_POLICY_PATH = ROOT / "hardware/DUAL_SIM_SINGLE_STANDBY.md"
 AUDIO_INTERFACE_PATH = ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md"
 POWER_ARCHITECTURE_PATH = ROOT / "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
 
@@ -45,6 +48,8 @@ EXPECTED_AUTHORITATIVE_INPUTS = {
     "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md",
     "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -74,6 +79,7 @@ EXPECTED_MAIN_MPNS = {
     "U18": "SN74AXC1T45DRLR",
     "Q1": "MMBT3904,215",
     "Q2": "MMBT3904,215",
+    "Q3": "MMBT3904,215",
     "X1": "SiT1552AI-JE-DCC-32.768D",
 }
 EXPECTED_MAIN_POWER = {
@@ -97,8 +103,8 @@ EXPECTED_SWD = {
     "4": "NRST",
     "5": "GND",
 }
-EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(5, 12)}
-EXPECTED_CLOSED_AUTHORITY_IDS = {"MAIN-AUTH-001", "MAIN-AUTH-002", "MAIN-AUTH-003", "MAIN-AUTH-004"}
+EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(6, 12)}
+EXPECTED_CLOSED_AUTHORITY_IDS = {"MAIN-AUTH-001", "MAIN-AUTH-002", "MAIN-AUTH-003", "MAIN-AUTH-004", "MAIN-AUTH-005"}
 EXPECTED_DEVICE_METADATA = {
     "U2": ("W25Q512JVFIQ", "SOIC-16_300mil_F"),
     "U3": ("LIS2DW12TR", "LGA-12_2x2mm"),
@@ -739,6 +745,11 @@ def main() -> None:
         34: ("MAIN_RXD", "U8_MAIN_RXD_1V8", "FUNCTION_LOCKED"),
         35: ("MAIN_TXD", "U8_MAIN_TXD_1V8", "FUNCTION_LOCKED"),
         39: ("MAIN_RI", "U8_MAIN_RI_1V8", "FUNCTION_LOCKED"),
+        43: ("USIM_VDD", "CELL_USIM_VDD_1V8", "FUNCTION_LOCKED"),
+        44: ("USIM_RST", "CELL_USIM_RST_1V8", "FUNCTION_LOCKED"),
+        45: ("USIM_DATA", "CELL_USIM_DATA_1V8", "FUNCTION_LOCKED"),
+        46: ("USIM_CLK", "CELL_USIM_CLK_1V8", "FUNCTION_LOCKED"),
+        47: ("USIM_GND", "GND_MODEM", "GROUND_LOCKED"),
         52: ("VBAT_RF", "3V8_MODEM_RF", "SUPPLY_LOCKED"),
         53: ("VBAT_RF", "3V8_MODEM_RF", "SUPPLY_LOCKED"),
     }
@@ -746,8 +757,7 @@ def main() -> None:
         require((u8[pin]["Pin_Name"], u8[pin]["RevA_Net"], u8[pin]["Disposition"]) == expected, f"U8 pad {pin} critical mapping mismatch")
     for pin in (11, 12, 13, 14, 16, 57, 63, 76, 77, 78, 92, 93, 94, 95, 97, 98, 99):
         require((u8[pin]["RevA_Net"], u8[pin]["Disposition"]) == ("NC", "RESERVED_DNU_NC"), f"U8 reserved pad {pin} is not DNU/NC")
-    for pin in range(42, 48):
-        require(u8[pin]["Disposition"] == "DEFERRED_MAIN_AUTH_005", f"U8 dual-SIM pad {pin} ownership mismatch")
+    require((u8[42]["RevA_Net"], u8[42]["Disposition"]) == ("NC", "UNUSED_INPUT_NC"), "U8 module-level USIM_DET must remain NC")
     for pin in (8, 9, 10, 22, 23, 60, 75):
         require(u8[pin]["Disposition"] == "DEFERRED_MAIN_AUTH_009", f"U8 recovery/RF pad {pin} ownership mismatch")
     for token in ("100 uF", "220 nF", "47 nF", "150 pF", "68 pF", "33 pF", "10 pF", "ferrite bead"):
@@ -788,9 +798,119 @@ def main() -> None:
         "6ff03aa31577971d02dc15eac11adee4d52b80077ae3fa3503978c1b12496e81",
         "6cf4003c438c0546fb86f0932613896197dd19a75bdb307f385eb6e75535126e",
         "500-1000 ms", "650-1500 ms", "2-3.8 s", "AT+QPOWD", "150 mV", "below 75 mV",
-        "does not close the dual-SIM network",
+        "controlled separately by `PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv`",
     }:
         require(marker in cellular_review, f"cellular authority review record missing marker: {marker}")
+
+    dual_sim_rows = rows(DUAL_SIM_PIN_AUTHORITY_PATH)
+    require(len(dual_sim_rows) == 55, f"expected 55 U13/U14/U15/J6/J7/Q3 authority rows, got {len(dual_sim_rows)}")
+    require(all(set(row) == cellular_columns for row in dual_sim_rows), "dual-SIM pin-authority schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in cellular_columns) for row in dual_sim_rows),
+        "dual-SIM pin-authority row contains an empty field",
+    )
+    dual_sim_by_key: dict[tuple[str, str], dict[str, str]] = {}
+    for row in dual_sim_rows:
+        key = (row["RefDes"], row["Pin"])
+        require(key not in dual_sim_by_key, f"duplicate dual-SIM pin-authority row: {key[0]}.{key[1]}")
+        dual_sim_by_key[key] = row
+    dual_sim_identity = {
+        "U13": ("TS3A27518EPWR", "TSSOP-24_PW", {str(index) for index in range(1, 25)}),
+        "U14": ("ESDALC6V1-5P6", "SOT666_1.6x1.6mm", {str(index) for index in range(1, 7)}),
+        "U15": ("ESDALC6V1-5P6", "SOT666_1.6x1.6mm", {str(index) for index in range(1, 7)}),
+        "J6": ("2336582-1", "TE_NanoSIM_H1.37", {str(index) for index in range(1, 8)} | {"SHIELD"}),
+        "J7": ("2336582-1", "TE_NanoSIM_H1.37", {str(index) for index in range(1, 8)} | {"SHIELD"}),
+        "Q3": ("MMBT3904,215", "SOT23", {"1", "2", "3"}),
+    }
+    for ref, (mpn, package, expected_pins) in dual_sim_identity.items():
+        actual = [row for row in dual_sim_rows if row["RefDes"] == ref]
+        require({row["Pin"] for row in actual} == expected_pins, f"{ref} dual-SIM package-position set drift")
+        require(all((row["MPN"], row["Package"]) == (mpn, package) for row in actual), f"{ref} dual-SIM identity/package mismatch")
+
+    expected_u13 = {
+        1: ("NC2", "SIM1_RST_1V8", "FUNCTION_LOCKED"),
+        2: ("NC1", "SIM1_VDD_1V8", "FUNCTION_LOCKED"),
+        3: ("N.C.", "NC", "DNU_NO_CONNECT"),
+        4: ("COM1", "CELL_USIM_VDD_1V8", "FUNCTION_LOCKED"),
+        5: ("GND", "GND_MODEM", "GROUND_LOCKED"),
+        6: ("COM2", "CELL_USIM_RST_1V8", "FUNCTION_LOCKED"),
+        7: ("COM3", "CELL_USIM_CLK_1V8", "FUNCTION_LOCKED"),
+        8: ("VCC", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        9: ("COM4", "CELL_USIM_VDD_1V8", "FUNCTION_LOCKED"),
+        10: ("COM5", "CELL_USIM_DATA_1V8", "FUNCTION_LOCKED"),
+        11: ("NO1", "SIM2_VDD_1V8", "FUNCTION_LOCKED"),
+        12: ("COM6", "CELL_USIM_VDD_1V8", "FUNCTION_LOCKED"),
+        13: ("NO2", "SIM2_RST_1V8", "FUNCTION_LOCKED"),
+        14: ("IN2", "SIM_MUX_SEL", "CONTROL_LOCKED"),
+        15: ("NO3", "SIM2_CLK_1V8", "FUNCTION_LOCKED"),
+        16: ("NO6", "SIM2_VDD_1V8", "FUNCTION_LOCKED"),
+        17: ("NO4", "SIM2_VDD_1V8", "FUNCTION_LOCKED"),
+        18: ("NO5", "SIM2_DATA_1V8", "FUNCTION_LOCKED"),
+        19: ("NC5", "SIM1_DATA_1V8", "FUNCTION_LOCKED"),
+        20: ("EN", "U13_EN_N", "CONTROL_ACTIVE_LOW"),
+        21: ("NC4", "SIM1_VDD_1V8", "FUNCTION_LOCKED"),
+        22: ("NC6", "SIM1_VDD_1V8", "FUNCTION_LOCKED"),
+        23: ("NC3", "SIM1_CLK_1V8", "FUNCTION_LOCKED"),
+        24: ("IN1", "SIM_MUX_SEL", "CONTROL_LOCKED"),
+    }
+    u13 = {pin: dual_sim_by_key[("U13", str(pin))] for pin in range(1, 25)}
+    for pin, expected in expected_u13.items():
+        require((u13[pin]["Pin_Name"], u13[pin]["RevA_Net"], u13[pin]["Disposition"]) == expected, f"U13 pin {pin} mapping mismatch")
+    require(sum(row["RevA_Net"] == "CELL_USIM_VDD_1V8" for row in u13.values()) == 3, "U13 common VDD path is not three channels wide")
+    require(sum(row["RevA_Net"] == "SIM1_VDD_1V8" for row in u13.values()) == 3, "U13 SIM1 VDD path is not three channels wide")
+    require(sum(row["RevA_Net"] == "SIM2_VDD_1V8" for row in u13.values()) == 3, "U13 SIM2 VDD path is not three channels wide")
+    require(all("100 kOhm pull-down" in u13[pin]["Required_Network"] for pin in (14, 24)), "U13 select default is not locked LOW")
+    require("47 kOhm pull-up" in u13[20]["Required_Network"], "U13 EN boot-safe pull-up missing")
+    require("100 nF" in u13[8]["Required_Network"], "U13 local bypass missing")
+
+    for ref, slot in (("U14", "SIM1"), ("U15", "SIM2")):
+        expected_esd_nets = {
+            "1": f"{slot}_VDD_1V8", "2": "GND_MODEM", "3": f"{slot}_RST_1V8",
+            "4": f"{slot}_CLK_1V8", "5": f"{slot}_DATA_1V8", "6": f"{slot}_DET",
+        }
+        for pin, net in expected_esd_nets.items():
+            row = dual_sim_by_key[(ref, pin)]
+            require(row["RevA_Net"] == net, f"{ref} pin {pin} protected-net mismatch")
+        require(dual_sim_by_key[(ref, "2")]["Disposition"] == "GROUND_LOCKED", f"{ref} ground return is not locked")
+
+    connector_pin_names = {"1": "C1_VCC", "2": "C2_RST", "3": "C3_CLK", "4": "C5_GND", "5": "C6_VPP", "6": "C7_IO", "7": "CD", "SHIELD": "SHELL"}
+    connector_suffixes = {"1": "VDD_1V8", "2": "RST_1V8", "3": "CLK_1V8", "6": "DATA_1V8", "7": "DET"}
+    for ref, slot in (("J6", "SIM1"), ("J7", "SIM2")):
+        for pin, pin_name in connector_pin_names.items():
+            require(dual_sim_by_key[(ref, pin)]["Pin_Name"] == pin_name, f"{ref} contact {pin} name mismatch")
+        for pin, suffix in connector_suffixes.items():
+            require(dual_sim_by_key[(ref, pin)]["RevA_Net"] == f"{slot}_{suffix}", f"{ref} contact {pin} net mismatch")
+        require(dual_sim_by_key[(ref, "4")]["RevA_Net"] == "GND_MODEM", f"{ref} card ground is not direct")
+        require(dual_sim_by_key[(ref, "5")]["RevA_Net"] == "NC", f"{ref} VPP must remain NC")
+        require(dual_sim_by_key[(ref, "SHIELD")]["RevA_Net"] == "GND_MODEM", f"{ref} shell is not direct ground")
+        require("10 kOhm pull-up" in dual_sim_by_key[(ref, "7")]["Required_Network"], f"{ref} detect pull-up missing")
+        require("10 nF" in dual_sim_by_key[(ref, "7")]["Required_Network"], f"{ref} detect filter missing")
+
+    q3 = {pin: dual_sim_by_key[("Q3", str(pin))] for pin in range(1, 4)}
+    require((q3[1]["Pin_Name"], q3[2]["Pin_Name"], q3[3]["Pin_Name"]) == ("B", "E", "C"), "Q3 SOT23 pin order mismatch")
+    require(q3[1]["RevA_Net"] == "SIM_MUX_EN_B" and "10 kOhm" in q3[1]["Required_Network"] and "100 kOhm" in q3[1]["Required_Network"], "Q3 base network mismatch")
+    require(q3[2]["RevA_Net"] == "GND_MODEM" and q3[3]["RevA_Net"] == "U13_EN_N", "Q3 open-collector mapping mismatch")
+    for net, expected in {"SIM_MUX_SEL": ("PE0", "97"), "SIM_MUX_EN": ("PE2", "1"), "SIM1_DET": ("PE3", "2"), "SIM2_DET": ("PE5", "4")}.items():
+        require(net in by_net, f"dual-SIM MCU net missing: {net}")
+        require((by_net[net]["MCU_Pin"], by_net[net]["LQFP100_Pin"]) == expected, f"{net} MCU pin mismatch")
+
+    require(7.6 / 3 < 2.54, "three-channel U13 VDD resistance bound failed")
+    require(0.2 < 0.65, "Q3 saturation voltage does not guarantee U13 LOW")
+    dual_sim_review = DUAL_SIM_REVIEW_PATH.read_text(encoding="utf-8")
+    dual_sim_sha256 = hashlib.sha256(DUAL_SIM_PIN_AUTHORITY_PATH.read_bytes()).hexdigest()
+    for marker in {
+        "DUAL_SIM_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        dual_sim_sha256,
+        "d87c216911176dca84cc9cee5efb6f45b18021977f94a97c7fae989484a73392",
+        "ea14ac3604fa4887d91b9fbc55ab9d04a23ba6597b22a817e64185d519fb9e28",
+        "2bcf8b28017d5716a1659ad5ad401d6158b272458de43ed4b325a80c7f70d6fe",
+        "Three channels are paralleled", "at most 2.54 Ohm", "at least 1.62 V",
+        "active but not currently available", "does not release the exact passive MPN set",
+    }:
+        require(marker in dual_sim_review, f"dual-SIM authority review missing marker: {marker}")
+    dual_sim_policy = DUAL_SIM_POLICY_PATH.read_text(encoding="utf-8")
+    for marker in ("TS3A27518EPWR", "TE `2336582-1`", "SIM_MUX_EN=HIGH", "U13_EN_N=HIGH", "2.54 Ом", "не менее 20 ms"):
+        require(marker in dual_sim_policy, f"dual-SIM policy missing frozen marker: {marker}")
 
     harness = rows(HARNESS_PATH)
     main_power = interface(harness, "MAIN_PWR")
@@ -891,6 +1011,14 @@ def main() -> None:
         },
         "MAIN-AUTH-004 evidence set mismatch",
     )
+    require(
+        closed_evidence["MAIN-AUTH-005"]
+        == {
+            "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-005 evidence set mismatch",
+    )
     require(closed_ids.isdisjoint(open_ids), "authority is both open and closed")
     require(open_ids == EXPECTED_OPEN_AUTHORITY_IDS, "PCB-MAIN open authority register drift")
     require(len(open_ids) == len(open_items), "duplicate PCB-MAIN open authority ID")
@@ -916,6 +1044,7 @@ def main() -> None:
         "storage_sensor_pads_verified": len(device_rows),
         "audio_logic_pins_verified": len(audio_rows),
         "cellular_pins_verified": len(cellular_rows),
+        "dual_sim_pins_verified": len(dual_sim_rows),
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
@@ -931,6 +1060,7 @@ def main() -> None:
     print(f"- all {len(device_rows)} U2/U3/U4 physical pins or pads and three unique I2C2 addresses verified")
     print(f"- all {len(audio_rows)} U7/U17/U18 physical pins, dual-direction PDM translation and active-high AAD wake path verified")
     print(f"- all {len(cellular_rows)} U8/U16/Q1/Q2 physical pins, power banks, translation and controls verified")
+    print(f"- all {len(dual_sim_rows)} U13/U14/U15/J6/J7/Q3 physical contacts, safe-state controls and slot paths verified")
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(f"- {len(open_items)} missing pad/mechanical authorities remain explicit production blockers")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")

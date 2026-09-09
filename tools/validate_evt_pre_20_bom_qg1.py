@@ -86,6 +86,7 @@ def main() -> None:
         "R-MIC": 4,
         "Q-MODEM-PWRKEY": 1,
         "Q-MODEM-RESET": 1,
+        "Q-SIM-MUX-EN": 1,
     }
     for item, qty in expected_quantities.items():
         require(item in by_id, f"missing quantity-controlled BOM item {item}")
@@ -102,6 +103,10 @@ def main() -> None:
     require(by_id["T-MIC"]["MPN"] == "5040520098", "MIC terminal MPN mismatch")
     require(by_id["Q-MODEM-PWRKEY"]["MPN"] == "MMBT3904,215", "BG95 PWRKEY driver MPN mismatch")
     require(by_id["Q-MODEM-RESET"]["MPN"] == "MMBT3904,215", "BG95 RESET_N driver MPN mismatch")
+    require(by_id["Q-SIM-MUX-EN"]["MPN"] == "MMBT3904,215", "SIM mux enable inverter MPN mismatch")
+    require(by_id["U13"]["MPN"] == "TS3A27518EPWR", "dual-SIM mux MPN mismatch")
+    require(by_id["U14-U15"]["MPN"] == "ESDALC6V1-5P6", "dual-SIM ESD MPN mismatch")
+    require(by_id["J-SIM1"]["MPN"] == by_id["J-SIM2"]["MPN"] == "2336582-1", "dual-SIM connector MPN mismatch")
     require(by_id["PWR-L"]["Spares"] == "10", "PCB-PWR inductor spare policy mismatch")
 
     serialized = "\n".join(",".join(row.values()) for row in rows)

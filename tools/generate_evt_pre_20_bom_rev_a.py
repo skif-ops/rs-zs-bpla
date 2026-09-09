@@ -90,8 +90,8 @@ def main() -> None:
     update_existing(
         "U14-U15",
         manufacturer=p14["Manufacturer"], mpn=p14["MPN"], package=p14["Package_or_Module"],
-        status="SELECTED_PENDING_SIM_REVIEW",
-        notes="Two identical low-capacitance SIM ESD arrays; Rev.A freeze source MAIN_COMPONENT_FREEZE_REV_A.csv",
+        status=p14["Status"],
+        notes="Two identical five-line SIM ESD arrays; exact maps in PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv",
     )
 
     for item_id, comp_id, refdes in (
@@ -180,7 +180,11 @@ def main() -> None:
             notes=f"Rev.A MAIN freeze; blockers: {p['Release_Blockers']}",
         )
 
-    for item_id, ref in (("Q-MODEM-PWRKEY", "Q1"), ("Q-MODEM-RESET", "Q2")):
+    for item_id, ref in (
+        ("Q-MODEM-PWRKEY", "Q1"),
+        ("Q-MODEM-RESET", "Q2"),
+        ("Q-SIM-MUX-EN", "Q3"),
+    ):
         p = main_parts[ref]
         append_item(
             item_id=item_id, assembly="PCB-MAIN", refdes=ref, category="Transistor",

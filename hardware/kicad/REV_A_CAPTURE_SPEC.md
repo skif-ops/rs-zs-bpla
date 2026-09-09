@@ -12,6 +12,7 @@ Authoritative inputs:
 - `hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv` and its independent review record;
+- `hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
 - `hardware/MAIN_COMPONENT_FREEZE_REV_A.csv`;
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`;
@@ -138,15 +139,22 @@ Required AAD tests before release:
 - BG95 UART/status domain is 1.8 V; direct STM32 3.3 V connection is forbidden. U16 VCC isolation and Ioff protect the unpowered modem domain.
 - Q1 and Q2 are `MMBT3904,215` SOT23 open-collector drivers. Each uses 4.7 kOhm base series and 47 kOhm base-emitter pull-down. Q1 drives U8 PWRKEY; Q2 drives U8 RESET_N.
 - PWRKEY and RESET_N are not routed through U16 and are never driven push-pull. PWRKEY has 10 nF to `GND_MODEM`; RESET_N has no large capacitance.
-- Power-on uses a selected 700 ms PWRKEY pulse after `3V8_MODEM` is stable for at least 30 ms. Normal power-off uses `AT+QPOWD`, waits for `CELL_STATUS=LOW`, and only then removes `EN_MODEM`.
+- Power-on selects a slot with U13 High-Z, waits at least 30 ms after stable `3V8_MODEM`, enables the selected slot through Q3, and then uses a selected 700 ms PWRKEY pulse. Normal power-off uses `AT+QPOWD`, waits for `CELL_STATUS=LOW`, disables U13, and only then removes `EN_MODEM`.
 - The fallback PWRKEY shutdown pulse is 650-1500 ms. The emergency RESET_N pulse is 2-3.8 s. PWRKEY and RESET_N commands never overlap.
 - Firmware masks RI and ignores UART until `CELL_STATUS=HIGH`. `CELL_DTR` defaults LOW to keep the modem awake until deliberate sleep entry.
 - Review A must prove less than 75 mV peak `GND_MODEM` to `GND_DIGITAL` offset plus noise at U16 under the worst 2G burst.
-- two physical nano-SIM/4FF slots, Single Standby only.
-- `U13`: `TS3A27518EPWR` candidate pending USIM SI/powered-off isolation review.
-- `U14/U15`: `ESDALC6V1-5P6` close to the two SIM connectors.
-- provisional slot MPN `TE 2336582-1`; procurement risk is explicit and an electrically/mechanically validated second source is required before lot release.
-- no SIM switching while the BG95 USIM interface is powered.
+- The complete 55-row U13/U14/U15/J6/J7/Q3 electrical map is frozen in `hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv`; it closes only `MAIN-AUTH-005`.
+- Two physical nano-SIM/4FF slots operate in Single Standby only. J6 and J7 are exact TE `2336582-1` push-push connectors with independent active-HIGH card-present inputs.
+- U13 is exact `TS3A27518EPWR`, powered from `3V3_DIGITAL`. Channels 1, 4, and 6 are paralleled for selected-card VDD; channels 2, 3, and 5 switch RST, CLK, and DATA.
+- U13 IN1 and IN2 are tied to `SIM_MUX_SEL`: LOW selects the SIM1 NC paths and HIGH selects the SIM2 NO paths.
+- Q3 `MMBT3904,215` preserves active-HIGH MCU `SIM_MUX_EN`: reset/default LOW leaves Q3 off and the 47 kOhm U13 EN pull-up holds all paths High-Z.
+- U14/U15 are exact `ESDALC6V1-5P6` arrays at J6/J7. Pin 2 is `GND_MODEM`; the other pins protect VDD, RST, CLK, DATA, and DET.
+- Each slot has 100 nF local VDD bypass, populated 0 Ohm series tuning positions on RST/CLK/DATA, and DNP 33 pF shunt tuning positions. Exact passive RefDes/MPNs and final shunt population remain `MAIN-AUTH-010`.
+- U8 `USIM_DET` remains NC. J6/J7 DET switches go independently to MCU PE3/PE5 with 10 kOhm pull-ups, 10 nF filters, and at least 20 ms debounce.
+- J6/J7 card and shell grounds connect directly to `GND_MODEM`; SIM ground is never switched through U13.
+- Selected card VDD must measure at least 1.62 V. The unselected slot must remain isolated through reset, brownout, and every slot transition.
+- TE procurement risk is explicit because `2336582-1` is active but not currently available; a validated common second source is required before lot release.
+- No SIM selection change is allowed unless U13 is High-Z and `CELL_STATUS=LOW`.
 
 ### 1.6 GNSS / trusted fixed position
 

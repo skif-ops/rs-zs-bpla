@@ -40,12 +40,12 @@ U8,BG95-M3,LGA-102_23.6x19.9mm,38,MAIN_DCD,OUTPUT,NC,UNUSED_OUTPUT_NC,No electri
 U8,BG95-M3,LGA-102_23.6x19.9mm,39,MAIN_RI,OUTPUT,U8_MAIN_RI_1V8,FUNCTION_LOCKED,10 kOhm pull-up to U8_VDD_EXT_1V8 and direct to U16 A3 pin 5,Quectel_BG95_HW_Design_v1.6,Idle HIGH; configured URC pulse is active LOW for 120 ms
 U8,BG95-M3,LGA-102_23.6x19.9mm,40,I2C_SCL,OPEN_DRAIN,NC,UNUSED_OD_NC,No electrical connection and no pull-up,Quectel_BG95_HW_Design_v1.6,Voice-codec I2C is unused
 U8,BG95-M3,LGA-102_23.6x19.9mm,41,I2C_SDA,OPEN_DRAIN,NC,UNUSED_OD_NC,No electrical connection and no pull-up,Quectel_BG95_HW_Design_v1.6,Voice-codec I2C is unused
-U8,BG95-M3,LGA-102_23.6x19.9mm,42,USIM_DET,INPUT,CELL_USIM_DET_1V8,DEFERRED_MAIN_AUTH_005,Dual-SIM powered-off and hot-plug policy is owned by MAIN-AUTH-005,Quectel_BG95_HW_Design_v1.6,Exact U8 USIM detect pad is reserved for the dual-SIM authority
-U8,BG95-M3,LGA-102_23.6x19.9mm,43,USIM_VDD,POWER_OUT,CELL_USIM_VDD_1V8,DEFERRED_MAIN_AUTH_005,Dual-SIM power routing and local capacitance are owned by MAIN-AUTH-005,Quectel_BG95_HW_Design_v1.6,BG95-M3 supports 1.8 V USIM only
-U8,BG95-M3,LGA-102_23.6x19.9mm,44,USIM_RST,OUTPUT,CELL_USIM_RST_1V8,DEFERRED_MAIN_AUTH_005,Dual-SIM series and ESD network owned by MAIN-AUTH-005,Quectel_BG95_HW_Design_v1.6,Exact U8 USIM reset pad
-U8,BG95-M3,LGA-102_23.6x19.9mm,45,USIM_DATA,BIDIR,CELL_USIM_DATA_1V8,DEFERRED_MAIN_AUTH_005,Dual-SIM pull-up series and ESD network owned by MAIN-AUTH-005,Quectel_BG95_HW_Design_v1.6,Exact U8 USIM data pad
-U8,BG95-M3,LGA-102_23.6x19.9mm,46,USIM_CLK,OUTPUT,CELL_USIM_CLK_1V8,DEFERRED_MAIN_AUTH_005,Dual-SIM series and ESD network owned by MAIN-AUTH-005,Quectel_BG95_HW_Design_v1.6,Exact U8 USIM clock pad
-U8,BG95-M3,LGA-102_23.6x19.9mm,47,USIM_GND,POWER,CELL_USIM_GND,DEFERRED_MAIN_AUTH_005,Dual-SIM ground topology owned by MAIN-AUTH-005,Quectel_BG95_HW_Design_v1.6,Specified USIM ground pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,42,USIM_DET,INPUT,NC,UNUSED_INPUT_NC,No electrical connection; independent slot detection is handled by STM32,Quectel_BG95_HW_Design_v1.6,AT+QSIMDET remains disabled and Quectel permits USIM_DET to remain open
+U8,BG95-M3,LGA-102_23.6x19.9mm,43,USIM_VDD,POWER_OUT,CELL_USIM_VDD_1V8,FUNCTION_LOCKED,Route to U13 COM1 COM4 and COM6 three-channel parallel VDD input,PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A,BG95-M3 supports 1.8 V USIM only
+U8,BG95-M3,LGA-102_23.6x19.9mm,44,USIM_RST,OUTPUT,CELL_USIM_RST_1V8,FUNCTION_LOCKED,Route to U13 COM2; selected slot has 0 Ohm tuning and connector-side ESD,PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A,Exact U8 USIM reset pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,45,USIM_DATA,BIDIR,CELL_USIM_DATA_1V8,FUNCTION_LOCKED,Route to U13 COM5; selected slot has 0 Ohm tuning and connector-side ESD,PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A,Exact U8 bidirectional USIM data pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,46,USIM_CLK,OUTPUT,CELL_USIM_CLK_1V8,FUNCTION_LOCKED,Route to U13 COM3; selected slot has 0 Ohm tuning and connector-side ESD,PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A,Exact U8 USIM clock pad
+U8,BG95-M3,LGA-102_23.6x19.9mm,47,USIM_GND,POWER,GND_MODEM,GROUND_LOCKED,Direct wide GND_MODEM connection shared with both card grounds,PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A,Specified USIM ground is never routed through U13
 U8,BG95-M3,LGA-102_23.6x19.9mm,48,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module ground adjacent to GNSS antenna pad
 U8,BG95-M3,LGA-102_23.6x19.9mm,49,ANT_GNSS,INPUT,NC,UNUSED_RF_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Independent U9 GNSS is authoritative
 U8,BG95-M3,LGA-102_23.6x19.9mm,50,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module RF ground

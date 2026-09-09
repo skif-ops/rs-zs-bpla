@@ -17,6 +17,9 @@ on:
       - "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md"
       - "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md"
+      - "hardware/DUAL_SIM_SINGLE_STANDBY.md"
       - "hardware/T5838_AAD_INTERFACE_REV_A.md"
       - "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
       - "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv"
@@ -34,6 +37,7 @@ on:
       - "tools/verify_pcb_main_storage_sensor_authority_rev_a.py"
       - "tools/verify_pcb_main_audio_logic_authority_rev_a.py"
       - "tools/verify_pcb_main_cellular_authority_rev_a.py"
+      - "tools/verify_pcb_main_dual_sim_authority_rev_a.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
@@ -88,6 +92,10 @@ jobs:
         run: |
           python tools/verify_pcb_main_cellular_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/cellular_authority_verification.json
+      - name: Second independent PCB-MAIN dual-SIM control
+        run: |
+          python tools/verify_pcb_main_dual_sim_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/dual_sim_authority_verification.json
       - name: Independent PCB-PWR design and Review-A authority audits
         run: |
           python tools/audit_pcb_pwr_design_rev_a.py \

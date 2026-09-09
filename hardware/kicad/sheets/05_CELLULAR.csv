@@ -1,6 +1,6 @@
 Sheet,Item,Requirement
 05_CELLULAR,U8,"BG95-M3 exact 102-pad map is controlled by PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv; VBAT_BB pins 32/33 and VBAT_RF pins 52/53 use separate local branches from one 3V8_MODEM star and must remain at least 3.3 V during LTE and EGPRS bursts"
 05_CELLULAR,U16,"SN74AXC8T245PWR VCCA=BG95 VDD_EXT and VCCB=3V3_DIGITAL; DIR1 high maps MAIN_TXD STATUS RI A-to-B; DIR2 low maps MAIN_RXD DTR B-to-A; OE low; unused source inputs grounded and unused outputs NC"
-05_CELLULAR,CONTROL,"Q1/Q2 MMBT3904 open-collector stages drive PWRKEY/RESET_N; 4.7 kOhm base series and 47 kOhm base-emitter pulls; 700 ms turn-on; AT+QPOWD then STATUS LOW before rail removal; exact control authority in PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv"
-05_CELLULAR,SIM,"two physical nano-SIM/4FF slots, Single Standby; TS3A27518E mux and one ESDALC6V1-5P6 per slot; switching only while USIM is unpowered"
+05_CELLULAR,CONTROL,"Q1/Q2 MMBT3904 open-collector stages drive PWRKEY/RESET_N; Q3 MMBT3904 makes existing SIM_MUX_EN active HIGH while U13 EN defaults HIGH/High-Z; 700 ms turn-on; AT+QPOWD then STATUS LOW and U13 disable before rail removal"
+05_CELLULAR,SIM,"exact 55-row U13/U14/U15/J6/J7/Q3 authority is PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv; U13 at 3V3 uses three parallel selected-card VDD paths plus RST CLK DATA; U14/U15 protect five lines per slot; J6/J7 are TE 2336582-1 with independent detect"
 05_CELLULAR,RF,"50 ohm LTE route; antenna keepout; conducted test connector option"
