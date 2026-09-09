@@ -1,4 +1,4 @@
-# Deployment v1.2 EVT-MB
+# Deployment 1.2.0 source baseline for EVT-PRE-20
 
 ## Development smoke environment
 
@@ -12,7 +12,7 @@ The development broker listens only on localhost and allows anonymous clients fo
 
 ## Production requirements
 
-- Private APN/VPN where available.
+- Public APN/CGNAT is the EVT-PRE-20 baseline; the station opens outbound connections only.
 - MQTT over TLS 1.2+ on port 8883.
 - Per-station credentials or client certificates.
 - Server-side `station_id` authorization, rate limiting and replay protection.

@@ -1,8 +1,9 @@
 # Мухоед EVT-PRE-20 source baseline 0.1
 
-Статус: `CI PENDING / NOT DEPLOYED`
+Статус: `CI PASS / NOT DEPLOYED`
 
 - Сохранена фактическая база Мухоед 1.2.0, interface release 1.4.
+- Runtime-идентификатор ветки: `1.2.0-evt-pre-20.1`; маркировка EVT-MB исключена.
 - В CI добавлены полный pytest и compileall.
 - Устранён collection blocker: `router.py` и `online_type_service.py` импортировали отсутствующие `FeatureUpdateMessage` и `OnlineTypeStatusMessage`.
 - Добавлены Pydantic schemas для 43-feature update и fail-safe online type status.

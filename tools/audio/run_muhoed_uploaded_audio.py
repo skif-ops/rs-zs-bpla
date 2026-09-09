@@ -13,11 +13,7 @@ import numpy as np
 
 
 BASE = Path(__file__).resolve().parent
-SERVER = (
-    BASE
-    / "evt_refresh_work_v13/full/РС_Дионея_EVT_MB_v1_2_ASSEMBLY_RELEASE_OPEN"
-    / "06_ПО_Мухоед/server_muhoed_v1_2"
-)
+SERVER = BASE.parents[1] / "server"
 INPUT = BASE / "audio_run_20260907/wav"
 OUTPUT = BASE / "audio_run_20260907/results"
 

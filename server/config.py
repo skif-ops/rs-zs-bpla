@@ -11,7 +11,7 @@ class Settings:
     """Runtime settings used by the application and DSP modules."""
 
     app_name: str = "Мухоед"
-    app_version: str = "1.2.0-evt-mb"
+    app_version: str = "1.2.0-evt-pre-20.1"
     base_dir: Path = field(default_factory=lambda: Path(__file__).resolve().parent)
     min_sample_rate_hz: int = 20_000
     target_analysis_sample_rate_hz: int | None = None

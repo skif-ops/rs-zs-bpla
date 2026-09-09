@@ -5,6 +5,12 @@ baseline_date: 2026-09-08
 status: OPEN_NOT_RUN
 source_branch: evt
 source_commit: 2ec1d6dc81e3a16b7c127f1bbfe03f3945a72c45
+working_branch: evt-pre-20
+branch_isolation:
+  forbidden_direct_sources: [evt-mb]
+  forbidden_operations: [merge, cherry_pick, release_file_copy]
+  allowed_promotion_targets: [develop, main]
+  promotion_rule: reviewed_common_changes_only
 
 lot:
   quantity: 20

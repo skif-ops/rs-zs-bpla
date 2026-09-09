@@ -3,9 +3,9 @@ name: CI
 on:
   workflow_dispatch:
   push:
-    branches: [main, develop, evt, evt-mb, evt-pre-20, "feature/**"]
+    branches: [evt-pre-20]
   pull_request:
-    branches: [main, develop, evt, evt-mb, evt-pre-20]
+    branches: [evt-pre-20]
 
 jobs:
   evt-pre-20-config:
@@ -16,6 +16,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Enforce EVT branch isolation
+        run: python tools/audit_evt_branch_isolation.py --branch evt-pre-20
       - name: Generate unified Rev.A BOM
         run: python tools/generate_evt_pre_20_bom_rev_a.py
       - name: First-pass configuration and hardware baseline validation
