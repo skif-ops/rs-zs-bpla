@@ -84,12 +84,21 @@ pinmap:
   status: DATASHEET_VERIFIED_CUBEMX_PENDING
   forbidden_absent_gpio: [PB12, PE1, PC4, PC5]
   notes: exact Q-package mapping; PA8 pin67 aggregated T5838 WAKE input; PA15 pin77 shared THSEL/AAD_CFG output
+target_contract:
+  status: GENERATED_SOURCE_CONTRACT_QG1_QG2_PASS
+  generator: tools/generate_evt_pre_20_target_contract.py
+  board_header: firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h
+  clock_header: firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h
+  manifest: firmware/targets/evt_pre_20/target_contract_manifest.json
+  qg1_completeness: tools/validate_evt_pre_20_target_contract.py
+  qg2_technical: tools/audit_evt_pre_20_target_technical.py
+  release_effect: NONE_TARGET_PORT_STILL_REQUIRED
 required_target_files:
   cubemx_ioc: MISSING_BLOCKER
   startup: MISSING_BLOCKER
   linker_script: MISSING_BLOCKER
   hal_ll_bindings: MISSING_BLOCKER
-  board_pins: REV_A_EXACT_PACKAGE_MAP_PLUS_AAD_CFG_ADDENDUM_CUBEMX_PENDING
+  board_pins: GENERATED_EXACT_REV_A_CONTRACT_QG1_QG2_PASS_CUBEMX_PENDING
   secure_boot: MISSING_BLOCKER
   ota_ab: MISSING_BLOCKER
   production_build_manifest: MISSING_BLOCKER

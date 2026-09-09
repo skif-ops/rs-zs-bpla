@@ -24,6 +24,12 @@ jobs:
         run: python tools/validate_evt_pre_20.py
       - name: Cross-check locked Rev.A clock policy
         run: python tools/validate_clock_policy.py
+      - name: Verify generated STM32 target contract is current
+        run: python tools/generate_evt_pre_20_target_contract.py --check
+      - name: QG-1 target contract completeness and traceability
+        run: python tools/validate_evt_pre_20_target_contract.py
+      - name: QG-2 independent target technical audit
+        run: python tools/audit_evt_pre_20_target_technical.py
       - name: Cross-check Rev.A component and connector freeze
         run: python tools/validate_rev_a_component_freeze.py
       - name: Second-pass release completeness audit
@@ -35,6 +41,7 @@ jobs:
           path: |
             artifacts/evt_pre_20_release_audit.json
             hardware/EVT_PRE_20_BOM_REV_A.csv
+            firmware/targets/evt_pre_20/target_contract_manifest.json
           if-no-files-found: error
 
   firmware:

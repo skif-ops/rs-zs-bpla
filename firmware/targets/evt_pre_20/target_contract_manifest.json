@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20",
+  "target": {
+    "target_id": "dioneya_evt_pre_20_rev_a",
+    "mcu": "STM32U585VIT6Q",
+    "package": "LQFP100_14x14",
+    "exact_pin_database_ref": "STM32U585VITxQ"
+  },
+  "source_inputs": [
+    {
+      "path": "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
+      "sha256": "87eb26a123e4b69c4d76226acc63dc65316d02a6ecbc32fabe532c54b875fc70"
+    },
+    {
+      "path": "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
+      "sha256": "3c8dba68addde20c0e9e9efd8bfddccf6c16464866dc012b32b84f9b68d061fa"
+    },
+    {
+      "path": "hardware/CLOCKING_REV_A.md",
+      "sha256": "2e70506ec12e3117048a4aa8afb240825fd30f696a584a0d7f802bfcfaa25157"
+    },
+    {
+      "path": "firmware/targets/evt_pre_20/target_status.yaml",
+      "sha256": "f1bcff22b91e1d0188c75c16131c9cf9434d8a655680112eadb1861693c48287"
+    }
+  ],
+  "generated_outputs": [
+    {
+      "path": "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h",
+      "sha256": "83a277cc261c20605b5c65b329926f7223355e5234176249d1c0efded39e975c"
+    },
+    {
+      "path": "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h",
+      "sha256": "8de2d3fe853528115660ebea25981845a687397592ffbca6f6d62abca2e9271f"
+    }
+  ],
+  "pin_assignment_count": 65,
+  "clock_policy": {
+    "policy_id": "REV_A_INTERNAL_HSI_MSI_PLL_NO_HSE",
+    "external_hse_allowed": false,
+    "low_speed_reference": "SiT1552AI-JE-DCC-32.768D",
+    "low_speed_reference_hz": 32768,
+    "runtime_frequencies_released": false
+  },
+  "quality_gates": {
+    "qg1_completeness": "tools/validate_evt_pre_20_target_contract.py",
+    "qg2_technical": "tools/audit_evt_pre_20_target_technical.py"
+  },
+  "release_gate": {
+    "status": "BLOCKED",
+    "blockers": [
+      "CUBEMX_IOC_MISSING",
+      "STARTUP_MISSING",
+      "LINKER_SCRIPT_MISSING",
+      "HAL_LL_BINDINGS_MISSING",
+      "SECURE_BOOT_MISSING",
+      "OTA_AB_MISSING",
+      "PRODUCTION_BUILD_MANIFEST_MISSING",
+      "TARGET_HARDWARE_VALIDATION_MISSING"
+    ]
+  }
+}

@@ -39,7 +39,16 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
     ],
     "firmware_source": [
         "firmware/CMakeLists.txt",
+        "firmware/targets/evt_pre_20/CMakeLists.txt",
+        "firmware/targets/evt_pre_20/README.md",
         "firmware/targets/evt_pre_20/target_status.yaml",
+        "firmware/targets/evt_pre_20/target_contract_manifest.json",
+        "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h",
+        "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h",
+        "firmware/tests/test_evt_pre_20_target_contract.c",
+        "tools/generate_evt_pre_20_target_contract.py",
+        "tools/validate_evt_pre_20_target_contract.py",
+        "tools/audit_evt_pre_20_target_technical.py",
     ],
     "android_source": [
         "android/app/build.gradle.kts",
@@ -191,6 +200,9 @@ def audit() -> dict[str, object]:
         ROOT / "hardware/kicad/REV_A_CAPTURE_SPEC.md",
         ROOT / "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
         ROOT / "hardware/PCB_DOUBLE_REVIEW_GATE.md",
+        ROOT / "firmware/targets/evt_pre_20/target_contract_manifest.json",
+        ROOT / "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h",
+        ROOT / "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h",
     ]
     hashes = {
         str(path.relative_to(ROOT)): sha256(path)
