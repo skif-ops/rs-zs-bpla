@@ -1,0 +1,11 @@
+(version 1)
+
+# The T5838 manufacturer land pattern is finer than the generic board defaults.
+# These limits apply only to items belonging to MK1. They are NOT a blanket DRC
+# exclusion. Review A/B and PCB-fabricator DFM must confirm the 0.125 mm copper
+# and 0.10 mm NPTH-to-copper capability before FOR_MANUFACTURE.
+(rule "T5838 manufacturer land clearance"
+  (condition "A.memberOfFootprint('MK1') || B.memberOfFootprint('MK1')")
+  (constraint clearance (min 0.125mm))
+  (constraint hole_clearance (min 0.10mm))
+)
