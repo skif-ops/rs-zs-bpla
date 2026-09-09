@@ -20,7 +20,12 @@ on:
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
       - "tools/generate_pcb_pwr_schematic_rev_a.py"
+      - "tools/finalize_pcb_pwr_symbol_types_rev_a.py"
+      - "tools/finalize_pcb_pwr_schematic_completeness_rev_a.py"
+      - "tools/finalize_pcb_pwr_erc_power_model_rev_a.py"
+      - "tools/materialize_pcb_pwr_libraries_rev_a.py"
       - "tools/audit_pcb_pwr_native_schematic_rev_a.py"
+      - "tools/audit_pcb_pwr_native_completeness_rev_a.py"
       - "tools/generate_pcb_mic_clean_rev_a.py"
       - "tools/run_pcb_mic_no_zonefill.py"
       - "tools/finalize_pcb_mic_mechanical_rev_a.py"
@@ -103,9 +108,22 @@ jobs:
         run: |
           python tools/generate_pcb_pwr_schematic_rev_a.py \
             --output hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/finalize_pcb_pwr_symbol_types_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/finalize_pcb_pwr_schematic_completeness_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/finalize_pcb_pwr_erc_power_model_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/materialize_pcb_pwr_libraries_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
+          test -s hardware/kicad/native/PCB-PWR/sym-lib-table
+          test -s hardware/kicad/native/PCB-PWR/fp-lib-table
+          test -s hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.kicad_sym
           python tools/audit_pcb_pwr_native_schematic_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_native_completeness_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
       - name: Materialize native PCB-MIC board and schematic
         shell: bash
@@ -163,6 +181,9 @@ jobs:
             artifacts/kicad-reference/
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
+            hardware/kicad/native/PCB-PWR/sym-lib-table
+            hardware/kicad/native/PCB-PWR/fp-lib-table
+            hardware/kicad/native/PCB-PWR/libs/
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
