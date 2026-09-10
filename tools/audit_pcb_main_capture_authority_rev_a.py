@@ -417,7 +417,7 @@ def main() -> None:
     require(status["schema_version"] == 1, "PCB-MAIN status schema mismatch")
     require(status["configuration"] == "EVT-PRE-20 Rev.A", "configuration mismatch")
     require(status["assembly"] == "PCB-MAIN", "assembly mismatch")
-    require(status["release_state"] in {"CAPTURE_INPUT", "SCHEMATIC_REVIEW"},
+    require(status["release_state"] in {"CAPTURE_INPUT", "SCHEMATIC_REVIEW", "REVIEW_A_PASS"},
             "invalid PCB-MAIN capture/review state")
     require(status["manufacturing_release"] is False, "PCB-MAIN must remain blocked")
 
@@ -1514,9 +1514,10 @@ def main() -> None:
     native_project = ROOT / native.get("project", "")
     native_manifest = ROOT / native.get("manifest", "")
     native_generator = ROOT / native.get("generator", "")
-    native_present = status["release_state"] == "SCHEMATIC_REVIEW"
+    native_present = status["release_state"] in {"SCHEMATIC_REVIEW", "REVIEW_A_PASS", "LAYOUT_REVIEW", "REVIEW_B_PASS", "FOR_MANUFACTURE"}
     if native_present:
-        require(native["status"] == "PRESENT_REVIEW_PENDING", "native schematic status mismatch")
+        require(native["status"] in {"PRESENT_REVIEW_PENDING", "REVIEW_A_PASS", "REVIEW_B_PASS"},
+                "native schematic status mismatch")
         require(all(path.is_file() for path in (native_path, native_project, native_manifest, native_generator)),
                 "controlled native schematic source set is incomplete")
         require(native["schematic_derived_bom"] is True,
@@ -1637,19 +1638,40 @@ def main() -> None:
     require(all("production_bom" in item["blocks"] for item in open_items), "open authority does not block production BOM")
     review_a = status["review_a"]
     review_b = status["review_b"]
-    expected_review_a_status = (
-        "NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING"
-        if native_present else "BLOCKED_NATIVE_SCHEMATIC_ABSENT"
-    )
-    require(review_a["complete"] is False and review_a["status"] == expected_review_a_status,
-            "Review A status does not match native-source state")
-    require(review_b["complete"] is False and review_b["status"] == "BLOCKED_REVIEW_A_NOT_COMPLETE", "Review B must remain blocked")
+    if review_a["complete"] is True:
+        require(status["release_state"] == "REVIEW_A_PASS" and native["status"] == "REVIEW_A_PASS",
+                "Review A PASS release state mismatch")
+        require(review_a["status"] == "PASS", "completed Review A must have PASS status")
+        require(all(review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
+                "completed Review A lacks reviewer/date/commit SHA")
+        require(review_b["complete"] is False and review_b["status"] == "OPEN_LAYOUT_AND_EVIDENCE_PENDING",
+                "Review B must be open but incomplete after Review A PASS")
+    else:
+        expected_review_a_status = (
+            "NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING"
+            if native_present else "BLOCKED_NATIVE_SCHEMATIC_ABSENT"
+        )
+        require(review_a["status"] == expected_review_a_status,
+                "Review A status does not match native-source state")
+        require(review_b["complete"] is False and review_b["status"] == "BLOCKED_REVIEW_A_NOT_COMPLETE",
+                "Review B must remain blocked before Review A completion")
     expected_review_a_evidence = {
         "checklist_template", "signed_checklist", "schematic_pdf", "cubemx_pin_report", "erc_report",
         "bom_diff", "net_name_diff",
     }
     require(set(review_a["evidence"]) == expected_review_a_evidence, "Review A evidence schema mismatch")
-    if native_present:
+    if review_a["complete"] is True:
+        require(review_a["evidence"]["checklist_template"] is None,
+                "completed Review A must use signed checklist, not a template")
+        signed_checklist = ROOT / review_a["evidence"]["signed_checklist"]
+        require(signed_checklist.is_file() and signed_checklist.stat().st_size > 0,
+                "signed Review A checklist is missing")
+        for evidence_name in ("schematic_pdf", "cubemx_pin_report", "erc_report", "bom_diff", "net_name_diff"):
+            require(str(review_a["evidence"][evidence_name]).startswith("https://github.com/skif-ops/rs-zs-bpla/actions/runs/"),
+                    f"Review A {evidence_name} is not a commit-traceable GitHub Actions reference")
+        require(review_b["evidence"].get("carried_findings") == ["RA-003"],
+                "Review B must carry forward Review A finding RA-003")
+    elif native_present:
         require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
                 "human Review A identity/date/SHA claimed before sign-off")
         require(review_a["evidence"]["signed_checklist"] is None,
@@ -1668,7 +1690,8 @@ def main() -> None:
     else:
         require(not any(review_a["evidence"].values()),
                 "review evidence present without native source")
-    require(not review_b["evidence"], "Review B evidence present before Review A completion")
+    if review_a["complete"] is False:
+        require(not review_b["evidence"], "Review B evidence present before Review A completion")
 
     result = {
         "configuration": status["configuration"],
@@ -1714,7 +1737,7 @@ def main() -> None:
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(
         "- all 11 capture authorities closed; native schematic source is present; "
-        "Reviews A/B remain production blockers"
+        "Review A is signed PASS; Review B and production evidence remain blockers"
     )
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 

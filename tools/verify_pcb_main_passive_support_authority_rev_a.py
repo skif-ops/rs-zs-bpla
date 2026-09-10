@@ -192,10 +192,10 @@ def main() -> None:
             "machine authority missing from status inputs")
     require("hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md" in inputs,
             "review authority missing from status inputs")
-    require(status["native_schematic"]["status"] == "PRESENT_REVIEW_PENDING",
+    require(status["native_schematic"]["status"] in {"PRESENT_REVIEW_PENDING", "REVIEW_A_PASS"},
             "native schematic state mismatch")
-    require(status["review_a"]["status"] ==
-            "NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING",
+    require(status["review_a"]["status"] in
+            {"NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING", "PASS"},
             "Review A state mismatch")
 
     capture_spec = CAPTURE_SPEC_PATH.read_text(encoding="utf-8")
@@ -216,7 +216,7 @@ def main() -> None:
         "category_counts": dict(sorted(Counter(row["Category"] for row in rows).items())),
         "authority_sha256": digest,
         "open_authorities": sorted(opened),
-        "native_schematic": "PRESENT_REVIEW_PENDING",
+        "native_schematic": status["native_schematic"]["status"],
         "physical_tests": "NOT_RUN",
         "production_bom": "BLOCKED",
     }
@@ -226,7 +226,7 @@ def main() -> None:
     print(
         "PCB-MAIN MAIN-AUTH-010 passive/support verification: PASS "
         "(211 unique components; 196 fitted; 15 DNP; physical pins complete; "
-        "Reviews A/B remain blocking)"
+        "Review A is signed PASS; Review B remains blocking)"
     )
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 

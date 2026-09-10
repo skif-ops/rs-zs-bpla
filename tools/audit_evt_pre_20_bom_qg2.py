@@ -255,16 +255,23 @@ def main() -> int:
         "bom_diff", "net_name_diff",
     }
     review_a_evidence = review_a.get("evidence", {}) if isinstance(review_a, dict) else {}
-    review_a_evidence_paths = {
-        name: ROOT / str(path) for name, path in review_a_evidence.items() if path
+    review_a_evidence_refs = {
+        name: str(ref) for name, ref in review_a_evidence.items()
+        if name in required_review_a_evidence and ref
     } if isinstance(review_a_evidence, dict) else {}
+    evidence_available = all(
+        ((ROOT / ref).is_file() and (ROOT / ref).stat().st_size > 0)
+        if name == "signed_checklist"
+        else ref.startswith("https://github.com/skif-ops/rs-zs-bpla/actions/runs/")
+        for name, ref in review_a_evidence_refs.items()
+    )
     review_a_ok = (
         isinstance(review_a, dict)
         and review_a.get("complete") is True
         and review_a.get("status") == "PASS"
         and all(review_a.get(field) for field in ("reviewer", "date", "commit_sha"))
-        and set(review_a_evidence_paths) == required_review_a_evidence
-        and all(path.is_file() and path.stat().st_size > 0 for path in review_a_evidence_paths.values())
+        and set(review_a_evidence_refs) == required_review_a_evidence
+        and evidence_available
     )
     check("main_review_a_complete", review_a_ok,
           "PCB-MAIN Review A is not complete with signed identity, commit and all required evidence" if not review_a_ok else "PCB-MAIN Review A complete with required evidence")

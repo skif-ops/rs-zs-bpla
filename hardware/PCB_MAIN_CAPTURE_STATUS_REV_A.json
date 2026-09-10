@@ -2,7 +2,7 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-MAIN",
-  "release_state": "SCHEMATIC_REVIEW",
+  "release_state": "REVIEW_A_PASS",
   "manufacturing_release": false,
   "source_control": {
     "authoritative_inputs": [
@@ -84,7 +84,7 @@
     "footprint_library_table": "hardware/kicad/native/PCB-MAIN/fp-lib-table",
     "manifest": "hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json",
     "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-    "status": "PRESENT_REVIEW_PENDING",
+    "status": "REVIEW_A_PASS",
     "erc_status": "PASS_KICAD_9_ZERO_VIOLATIONS",
     "schematic_derived_bom": true,
     "custom_footprint_status": "UNRESOLVED_FIELDS_BLANK_REVIEW_A_REVIEW_B_PENDING",
@@ -190,27 +190,31 @@
     "open_authorities": []
   },
   "review_a": {
-    "complete": false,
-    "status": "NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING",
-    "reviewer": null,
-    "date": null,
-    "commit_sha": null,
+    "complete": true,
+    "status": "PASS",
+    "reviewer": "Скиф",
+    "date": "2026-09-10",
+    "commit_sha": "5c68a2da43c834c9a1e1eaac31ccbc07d8a7be80",
     "evidence": {
-      "checklist_template": "hardware/reviews/PCB_MAIN_REVIEW_A_CHECKLIST_REV_A.md",
-      "signed_checklist": null,
-      "schematic_pdf": "CI artifact: artifacts/kicad-native/PCB-MAIN/PCB-MAIN_schematic.pdf",
-      "cubemx_pin_report": null,
-      "erc_report": "CI artifact: artifacts/kicad-native/PCB-MAIN/erc.json",
-      "bom_diff": "CI artifact: artifacts/kicad-native/PCB-MAIN/native_schematic_bom.csv",
-      "net_name_diff": "CI artifact: artifacts/kicad-native/PCB-MAIN/native_schematic_audit.json"
+      "checklist_template": null,
+      "signed_checklist": "hardware/reviews/PCB_MAIN_REVIEW_A_CHECKLIST_REV_A.md",
+      "schematic_pdf": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34515812116#artifact-evt-pre-20-kicad-native-gate:artifacts/kicad-native/PCB-MAIN/PCB-MAIN_schematic.pdf",
+      "cubemx_pin_report": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34515812070#artifact-evt-pre-20-release-audit:firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc; IOC QG-1/QG-2 job logs",
+      "erc_report": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34515812116#artifact-evt-pre-20-kicad-native-gate:artifacts/kicad-native/PCB-MAIN/erc.json",
+      "bom_diff": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34515812116#artifact-evt-pre-20-kicad-native-gate:artifacts/kicad-native/PCB-MAIN/native_schematic_bom.csv",
+      "net_name_diff": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34515812116#artifact-evt-pre-20-kicad-native-gate:artifacts/kicad-native/PCB-MAIN/native_schematic_audit.json"
     }
   },
   "review_b": {
     "complete": false,
-    "status": "BLOCKED_REVIEW_A_NOT_COMPLETE",
+    "status": "OPEN_LAYOUT_AND_EVIDENCE_PENDING",
     "reviewer": null,
     "date": null,
     "commit_sha": null,
-    "evidence": {}
+    "evidence": {
+      "carried_findings": [
+        "RA-003"
+      ]
+    }
   }
 }

@@ -295,10 +295,10 @@ def main() -> None:
     }, "MAIN-AUTH-011 evidence set mismatch")
     require(readiness["complete"] is True and not readiness["open_authorities"], "capture authority is not complete")
     require(status["manufacturing_release"] is False, "mechanical authority prematurely released manufacturing")
-    require(status["native_schematic"]["status"] == "PRESENT_REVIEW_PENDING",
+    require(status["native_schematic"]["status"] in {"PRESENT_REVIEW_PENDING", "REVIEW_A_PASS"},
             "native schematic state mismatch")
-    require(status["review_a"]["status"] ==
-            "NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING",
+    require(status["review_a"]["status"] in
+            {"NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING", "PASS"},
             "Review A state mismatch")
 
     connector_freeze = {row["Connector_ID"]: row for row in read_rows(CONNECTOR_FREEZE_PATH)}
@@ -354,7 +354,7 @@ def main() -> None:
     print(
         "PCB-MAIN MAIN-AUTH-011 mechanical placement verification: PASS "
         "(110 x 75 x 1.6 mm; four holes; 13 connectors; four RF zones; "
-        "31 pogo pads; Reviews A/B remain blocking)"
+        "31 pogo pads; Review A is signed PASS; Review B remains blocking)"
     )
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
