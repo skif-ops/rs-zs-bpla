@@ -66,7 +66,7 @@ AAD wake переводит STM32 в активное состояние, зап
 5. Для штатного выключения остановить трафик, сохранить очередь, выполнить `AT+QPOWD`, дождаться `CELL_STATUS=LOW`, установить `SIM_MUX_EN=LOW`, проверить U13 High-Z и только затем снять `EN_MODEM`.
 6. При отказе AT shutdown допускается PWRKEY pulse 650-1500 ms с тем же обязательным ожиданием `CELL_STATUS=LOW`.
 
-Узел U8 получает два локальных ответвления от одной `3V8_MODEM` star point: `3V8_MODEM_BB` через ferrite bead и `3V8_MODEM_RF` через 0 Ohm link. Во время EGPRS burst напряжение на каждом из четырёх VBAT pads U8 не должно опускаться ниже 3.3 V. Полная топология зафиксирована в `hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md`; точные MPN пассивов остаются блокером `MAIN-AUTH-010`.
+Узел U8 получает два локальных ответвления от одной `3V8_MODEM` star point: `3V8_MODEM_BB` через FB1 `BLM31KN601SN1L` и `3V8_MODEM_RF` через R43 0 Ohm. Во время EGPRS burst напряжение на каждом из четырёх VBAT pads U8 не должно опускаться ниже 3.3 V. Полная топология зафиксирована в `hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md`, а точные MPN, RefDes, population и физические цепи пассивов зафиксированы `MAIN-AUTH-010`. Частотная характеристика FB1 и запас по току остаются обязательной проверкой Review A.
 
 ### S4 - service/OTA/test
 

@@ -252,7 +252,7 @@ def main() -> None:
     readiness = status["capture_readiness"]
     closed = {item["id"]: item for item in readiness["closed_authorities"]}
     open_ids = {item["id"] for item in readiness["open_authorities"]}
-    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 10)}, "closed authority set mismatch")
+    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 11)}, "closed authority set mismatch")
     require(
         set(closed["MAIN-AUTH-009"]["evidence"])
         == {
@@ -261,7 +261,7 @@ def main() -> None:
         },
         "MAIN-AUTH-009 evidence set mismatch",
     )
-    require(open_ids == {"MAIN-AUTH-010", "MAIN-AUTH-011"}, "remaining open authority set mismatch")
+    require(open_ids == {"MAIN-AUTH-011"}, "remaining open authority set mismatch")
     require(readiness["complete"] is False and status["manufacturing_release"] is False, "connector/fixture authority prematurely released manufacturing")
 
     result = {
@@ -281,7 +281,7 @@ def main() -> None:
     print("PCB-MAIN connector/fixture second independent control: PASS_CONNECTOR_FIXTURE_AUTHORITY_ONLY")
     print("- all 70 microSD/USB/RF/tamper/STM32/EOL/BG95 contacts verified")
     print("- STM32 USB, BG95 USB, nRF USB and both SWD domains remain isolated")
-    print("- two remaining authorities keep native capture and production BOM blocked")
+    print("- one remaining authority keeps native capture and production BOM blocked")
 
 
 if __name__ == "__main__":

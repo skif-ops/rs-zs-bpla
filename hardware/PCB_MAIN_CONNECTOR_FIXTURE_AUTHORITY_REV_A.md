@@ -26,7 +26,7 @@ Authority CSV SHA-256: `b94cd4723efeffbdea7f1c6ba82f977da9c83c556967316630461af6
 
 `U12` is the 32 GB Kingston `SDCIT2/32GB` industrial microSD card. `J12` is GCT `MEM2052-00-195-00-A`. Contacts 1 through 8 follow the standard microSD `DAT2`, `CD/DAT3`, `CMD`, `VDD`, `CLK`, `VSS`, `DAT0`, `DAT1` order and terminate at the already frozen four-bit STM32 SDMMC1 endpoints. SPI fallback is not part of Rev.A.
 
-The normally-open J12 detect contact closes `SD_DET` to ground only when a card is fully inserted. PC13 therefore uses a pull-up and reports an open or absent card as inactive. Exact pull, debounce, source damping, ESD and decoupling RefDes/MPNs remain `MAIN-AUTH-010`; access, insertion direction and retention clearance remain `MAIN-AUTH-011`.
+The normally-open J12 detect contact closes `SD_DET` to ground only when a card is fully inserted. PC13 therefore uses a pull-up and reports an open or absent card as inactive. Exact pull, debounce, source damping, ESD and decoupling RefDes/MPNs are frozen by `MAIN-AUTH-010`; access, insertion direction and retention clearance remain `MAIN-AUTH-011`.
 
 ### USB-C service port
 
@@ -38,11 +38,11 @@ J11 is never connected to U11 nRF USB or U8 BG95 USB. `USB_SHIELD` is distinct f
 
 `J8`, `J9` and `J10` are exact Hirose `U.FL-R-SMT-1(60)` receptacles with center contact 1 and grounded shell group. J8 center is `CELL_RF_ANT` and reaches U8 pad 60 `CELL_RF` only through its no-stub 50 Ohm matching/protection path. J9 and J10 rows intentionally restate the already closed GNSS and LoRa receptacle identities and nets; the verifier cross-checks them against `MAIN-AUTH-006` and `MAIN-AUTH-007` so this authority cannot silently diverge.
 
-Exact RF protection and matching RefDes/MPNs remain `MAIN-AUTH-010`. Trace geometry, zones, via fences, receptacle orientation, cable clearance, conducted validation and final antenna-system acceptance remain `MAIN-AUTH-011` and physical EVT evidence.
+Exact RF protection and matching RefDes/MPNs are frozen by `MAIN-AUTH-010`. Trace geometry, zones, via fences, receptacle orientation, cable clearance, conducted validation and final antenna-system acceptance remain `MAIN-AUTH-011` and physical EVT evidence.
 
 ### Tamper
 
-`J13` is Molex Pico-Lock `504050-0291`, mated by `504051-0201` with `504052-0098` terminals. A normally-closed external loop connects PC7/EXTI7 `TAMPER_IN` to ground while the enclosure is secure. Cover opening, cable break or unmated connector opens the circuit and is treated as an alarm. Exact pull-up, filter, debounce and ESD parts remain `MAIN-AUTH-010`.
+`J13` is Molex Pico-Lock `504050-0291`, mated by `504051-0201` with `504052-0098` terminals. A normally-closed external loop connects PC7/EXTI7 `TAMPER_IN` to ground while the enclosure is secure. Cover opening, cable break or unmated connector opens the circuit and is treated as an alarm. Exact pull-up, filter, debounce and ESD parts are frozen by `MAIN-AUTH-010`.
 
 ### Production and recovery fixtures
 
@@ -58,7 +58,7 @@ The fixture contact groups are electrically separate:
 
 VTREF and rail-sense contacts never source station power. Fixture outputs remain high impedance until their referenced DUT domain is valid. The two USB interfaces do not share data, VBUS or test contacts. STM32 and nRF SWD contacts do not share debug nets. BG95 debug is 1.8 V only; `USB_BOOT` is normally LOW and may be driven HIGH only by the current-limited recovery fixture during the documented recovery power-on sequence.
 
-The EOL fixture uses the production LPUART with directions named at the DUT: PC1 is `TEST_UART_TX`, PC0 is `TEST_UART_RX`. I2C2 test access is open-drain and enables direct INA226 calibration/readback without adding an uncontrolled pull-up. `BOOT0` may be driven only while reset is asserted. Exact passive/protection parts remain `MAIN-AUTH-010`; pogo geometry and coordinates remain `MAIN-AUTH-011`.
+The EOL fixture uses the production LPUART with directions named at the DUT: PC1 is `TEST_UART_TX`, PC0 is `TEST_UART_RX`. I2C2 test access is open-drain and enables direct INA226 calibration/readback without adding an uncontrolled pull-up. `BOOT0` may be driven only while reset is asserted. Exact passive/protection parts are frozen by `MAIN-AUTH-010`; pogo geometry and coordinates remain `MAIN-AUTH-011`.
 
 ## Gates still open
 

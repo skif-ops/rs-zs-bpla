@@ -27,6 +27,8 @@
       "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md",
       "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv",
       "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md",
       "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
       "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
       "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -148,18 +150,17 @@
           "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv",
           "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md"
         ]
-      }
-    ],
-    "open_authorities": [
+      },
       {
         "id": "MAIN-AUTH-010",
         "scope": "complete PCB-MAIN passive, support, protection, pull, strap, termination, filtering and decoupling RefDes/MPN and physical-pin set",
-        "blocks": [
-          "native_schematic",
-          "review_a",
-          "production_bom"
+        "evidence": [
+          "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md"
         ]
-      },
+      }
+    ],
+    "open_authorities": [
       {
         "id": "MAIN-AUTH-011",
         "scope": "PCB outline, connector orientation, RF zones, keepouts and production test-point placement",
@@ -173,7 +174,7 @@
   },
   "review_a": {
     "complete": false,
-    "status": "BLOCKED_CAPTURE_AUTHORITY_INCOMPLETE",
+    "status": "BLOCKED_NATIVE_SCHEMATIC_ABSENT",
     "reviewer": null,
     "date": null,
     "commit_sha": null,

@@ -2,3 +2,4 @@ Sheet,Item,Requirement
 03_AUDIO,MIC1-4,"Four identical TDK T5838 leaves at 1.8 V; common PE9 MDF1_CCK0; PB1/PD6/PE7/PE4 independent data; Molex 5040500691 six-pin headers"
 03_AUDIO,AAD,"All four WAKE outputs combine through SN74LVC32A at 1.8 V and SN74AXC1T45 to PA8; shared THSEL/AAD_CFG from PA15 through SN74AXC8T245; every harness carries WAKE on pin 5 and AAD_CFG on pin 6"
 03_AUDIO,Ground,"quiet local plane and mechanical isolation from cellular DC/DC and modem"
+03_AUDIO,PASSIVE_SUPPORT,"Use PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv for C27-C32 R17-R23 and U19-U22 exact MPN population and physical pins"

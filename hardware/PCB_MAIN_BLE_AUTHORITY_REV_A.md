@@ -19,7 +19,7 @@ Raytac Version L identifies the selected PCB-antenna module as the 10.5 x 15.5 x
 
 ## Supply and clock contract
 
-Rev.A supplies both U11 pad 28 `VDD` and pad 30 `VDDH` from `3V3_DIGITAL`. This is the Raytac normal-voltage configuration for a highest input below 3.6 V. Pad 31 `DCCH` remains NC because Reg0 DC/DC is disabled. U11 pad 28 has local 100 nF plus 10 uF ceramic decoupling. Exact capacitor MPNs and RefDes remain `MAIN-AUTH-010`; Review A and EVT must verify rail ramp, RF-current transient, reset current and sleep current over temperature.
+Rev.A supplies both U11 pad 28 `VDD` and pad 30 `VDDH` from `3V3_DIGITAL`. This is the Raytac normal-voltage configuration for a highest input below 3.6 V. Pad 31 `DCCH` remains NC because Reg0 DC/DC is disabled. U11 pad 28 has local 100 nF plus 10 uF ceramic decoupling. Exact capacitor MPNs and RefDes are frozen by `MAIN-AUTH-010`; Review A and EVT must verify rail ramp, RF-current transient, reset current and sleep current over temperature.
 
 U11 is not connected to USB in Rev.A. Pad 32 `VBUS`, pad 34 `D-` and pad 35 `D+` are explicit NC. The PCB-MAIN USB-C service interface is owned by the STM32 endpoint under `MAIN-AUTH-009`, so connecting it to U11 is forbidden without reopening both authorities.
 
@@ -34,9 +34,9 @@ The nRF firmware uses its calibrated internal low-frequency RC source. Pads 17 `
 | DFU request | 39 | `P0.15` GPIO input | PB2 / package pin 34 `BLE_DFU_REQ` open-drain | HIGH through 10 kOhm; request is LOW |
 | module reset/run | 40 | `P0.18/nRESET` | PE6 / package pin 5 `BLE_EN` through reset buffer | reset asserted while `BLE_EN` is LOW or high-impedance |
 
-The UART is 3.3 V point-to-point with no RTS/CTS. A populated 22 Ohm source-series tuning position is located at the driver end of each line. The exact resistor RefDes/MPN and measured edge-integrity acceptance remain `MAIN-AUTH-010` and Review A.
+The UART is 3.3 V point-to-point with no RTS/CTS. A populated 22 Ohm source-series tuning position is located at the driver end of each line. The exact resistor RefDes/MPN are frozen by `MAIN-AUTH-010`; measured edge-integrity acceptance remains Review A evidence.
 
-`BLE_EN` is an active-HIGH run request, not a switched U11 power rail. It drives the input of a 3.3 V non-inverting open-drain reset buffer. A 100 kOhm pull-down holds the buffer input LOW while the STM32 is reset or high-impedance; the buffer then holds `NRF_RESET_N` LOW. When PE6 drives HIGH, the buffer releases its output and a 10 kOhm pull-up releases U11 pad 40. The exact buffer MPN and passive RefDes remain `MAIN-AUTH-010`, but inversion, default state and active levels are frozen here.
+`BLE_EN` is an active-HIGH run request, not a switched U11 power rail. It drives the input of a 3.3 V non-inverting open-drain reset buffer. A 100 kOhm pull-down holds the buffer input LOW while the STM32 is reset or high-impedance; the buffer then holds `NRF_RESET_N` LOW. When PE6 drives HIGH, the buffer releases its output and a 10 kOhm pull-up releases U11 pad 40. The exact buffer MPN and passive RefDes are frozen by `MAIN-AUTH-010`; inversion, default state and active levels are frozen here.
 
 The production image must configure nRF UICR `PSELRESET[0]` and `PSELRESET[1]` for `P0.18`, then read back the setting before the unit leaves programming. Until that configuration and the reset test pass, `BLE_EN` cannot be credited as a recovery path.
 

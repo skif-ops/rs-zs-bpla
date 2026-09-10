@@ -21,7 +21,7 @@ The selected BOM MPN is the professional-grade global ordering code `MAX-M10S-00
 
 U9 `VCC` and `V_IO` both use `3V3_DIGITAL`. `VIO_SEL` is intentionally open, selecting the 2.7 to 3.6 V I/O range. `V_IO` must never exceed `VCC + 0.3 V`.
 
-U9 VCC has local 100 nF plus 10 uF and a total feed resistance no greater than 0.2 Ohm. The 3.3 V rail and local network must support the specified startup inrush of up to 100 mA. Exact capacitor MPNs remain `MAIN-AUTH-010`.
+U9 VCC has local 100 nF plus 10 uF and a total feed resistance no greater than 0.2 Ohm. The 3.3 V rail and local network must support the specified startup inrush of up to 100 mA. Exact capacitor MPNs and RefDes are frozen by `MAIN-AUTH-010`.
 
 `V_BCKP` is NC in Rev.A. No coin cell, supercapacitor, diode feed, or capacitor-only substitute is fitted. The station normally maintains `3V3_DIGITAL`; after a total power loss, U9 performs a cold restart and may receive trusted host time/orbit assistance. This avoids an unqualified energy store and makes the backup state deterministic.
 
@@ -59,7 +59,7 @@ The controlled RF chain is:
 
 `J9 center -> ultra-low-capacitance ESD -> biased antenna node -> 47 pF 5% 25 V C0G DC block -> populated external wideband GNSS SAW -> U9 pin 11 RF_IN`.
 
-The external SAW is mandatory in Rev.A because the unit contains nearby cellular and RU868 transmitters. Its passband must cover every enabled L1 constellation, including GLONASS L1OF. The exact SAW, ESD, comparator, P/N switch, resistors, capacitors, inductor, their RefDes, and their physical pin maps remain part of `MAIN-AUTH-010`; changing the topology or active levels requires reopening `MAIN-AUTH-006`.
+The external SAW is mandatory in Rev.A because the unit contains nearby cellular and RU868 transmitters. Its passband must cover every enabled L1 constellation, including GLONASS L1OF. The exact SAW, ESD, comparator, P/N switch, resistors, capacitors, inductor, their RefDes, and their physical pin maps are frozen by `MAIN-AUTH-010`; changing the topology or active levels requires reopening `MAIN-AUTH-006` and `MAIN-AUTH-010`.
 
 J9 is exact Hirose `U.FL-R-SMT-1(60)`. Center contact 1 carries `GNSS_RF_ANT_BIASED`; both ground terminals and shell connect to uninterrupted RF ground. The external cable and active antenna remain separate unreleased system BOM lines.
 

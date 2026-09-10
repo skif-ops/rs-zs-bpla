@@ -90,6 +90,16 @@ production_fixture:
   bg95_debug: TP_CELL_DBG_5P_1V8_VREF_GATED
   nrf_swd: TP_BLE_SWD_4P_SEPARATE_AUTHORITY
   fixture_power_policy: DUT_RAILS_SENSE_ONLY_EXCEPT_CONTROLLED_BG95_USB_VBUS
+pcb_main_capture:
+  authority_status: MAIN_AUTH_001_THROUGH_010_CLOSED_MAIN_AUTH_011_OPEN
+  passive_support_authority: hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv
+  passive_support_components: 211
+  fitted_components: 196
+  dnp_components: 15
+  native_schematic: ABSENT_BLOCKER
+  review_a: BLOCKED_NATIVE_SCHEMATIC_ABSENT
+  review_b: BLOCKED_REVIEW_A_NOT_COMPLETE
+  production_bom: BLOCKED
 positioning:
   station_type: fixed
   authoritative_source: configured_installation_coordinates

@@ -52,6 +52,35 @@ def main() -> int:
     check("main_active_mpn_freeze", not main_mismatch,
           "PCB-MAIN active MPN freeze mismatch: " + ", ".join(main_mismatch) if main_mismatch else "all active MAIN MPNs match")
 
+    passive_support = read(ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv")
+    passive_support_mismatch = []
+    for frozen in passive_support:
+        ref = frozen["RefDes"]
+        item = "X1" if ref == "X1" else f"MAIN-010-{ref}"
+        row = by_id.get(item)
+        expected_qty = "1" if frozen["Population"] == "FITTED" else "0"
+        if (
+            row is None
+            or row["Assembly"] != "PCB-MAIN"
+            or row["RefDes"] != ref
+            or row["Manufacturer"] != frozen["Manufacturer"]
+            or row["MPN"] != frozen["MPN"]
+            or row["Package"] != frozen["Package"]
+            or row["Value"] != frozen["Value"]
+            or row["Population"] != frozen["Population"]
+            or row["Temperature_C"] != frozen["Temperature_C"]
+            or row["Qty_per_station"] != expected_qty
+            or frozen["Pin_Map"] not in row["Notes"]
+        ):
+            passive_support_mismatch.append(ref)
+    check(
+        "main_passive_support_authority_bom",
+        len(passive_support) == 211 and not passive_support_mismatch,
+        "PCB-MAIN MAIN-AUTH-010 BOM mismatch: " + ", ".join(passive_support_mismatch)
+        if passive_support_mismatch
+        else "all 211 MAIN-AUTH-010 identities values populations ratings and physical pins are represented",
+    )
+
     power_expected = {
         "PWR-REV-CTL": ("U1", "LM74700QDBVRQ1"),
         "PWR-REV-FET": ("Q1", "CSD18540Q5B"),
@@ -156,7 +185,7 @@ def main() -> int:
     )
     open_authority_ids = [item.get("id", "UNIDENTIFIED") for item in open_authorities if isinstance(item, dict)]
     check("main_capture_authority_complete", readiness_ok,
-          "PCB-MAIN pad/net/mechanical authorities remain open: " + ", ".join(open_authority_ids) if open_authority_ids else "PCB-MAIN capture authority is complete")
+          "PCB-MAIN mechanical authority remains open: " + ", ".join(open_authority_ids) if open_authority_ids else "PCB-MAIN capture authority is complete")
 
     native_record = main_status.get("native_schematic", {}) if isinstance(main_status, dict) else {}
     native_relative = native_record.get("path", "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch") if isinstance(native_record, dict) else "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch"
@@ -171,9 +200,17 @@ def main() -> int:
     lora_pin_rows = read(ROOT / "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv")
     ble_pin_rows = read(ROOT / "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv")
     connector_fixture_pin_rows = read(ROOT / "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv")
+    passive_support_pin_nets = {
+        assignment.split("=", 1)[1]
+        for row in passive_support
+        for assignment in row["Pin_Map"].split(";")
+        if "=" in assignment and assignment.split("=", 1)[1] != "NC"
+    }
     required_native_tokens = {
         "(kicad_sch",
         *(row["MPN"] for row in main_freeze),
+        *(row["MPN"] for row in passive_support),
+        *passive_support_pin_nets,
         *(row["RevA_Net"] for row in pin_rows if row["RevA_Net"] != "NC"),
         *(row["RevA_Net"] for row in device_pin_rows if row["RevA_Net"] != "NC"),
         *(row["RevA_Net"] for row in audio_logic_pin_rows if row["RevA_Net"] != "NC"),

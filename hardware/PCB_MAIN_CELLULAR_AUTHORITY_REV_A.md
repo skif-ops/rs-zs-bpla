@@ -36,7 +36,7 @@ The following locally closed signals are exact:
 - Pads 52 and 53 are both `VBAT_RF` and connect to `3V8_MODEM_RF`.
 - The BG95-M3 input range is 3.3 to 4.3 V with 3.8 V nominal. The rail must never fall below 3.3 V at any U8 VBAT pad.
 - All 28 module GND pads connect to the low-impedance `GND_MODEM` plane with ground vias placed according to the Quectel land pattern.
-- Pad 60 `ANT_MAIN` is fixed as the `CELL_RF` source and terminates only at J8 through the no-stub 50 Ohm matching/protection path controlled by `MAIN-AUTH-009`; exact parts remain `MAIN-AUTH-010` and layout acceptance remains `MAIN-AUTH-011`.
+- Pad 60 `ANT_MAIN` is fixed as the `CELL_RF` source and terminates only at J8 through the no-stub 50 Ohm matching/protection path controlled by `MAIN-AUTH-009`; exact parts are frozen by `MAIN-AUTH-010` and layout acceptance remains `MAIN-AUTH-011`.
 - Pad 42 `USIM_DET` is NC because independent J6/J7 card-detect switches terminate at the MCU. Pads 43 through 46 terminate at U13, and pad 47 connects directly to `GND_MODEM`; the exact dual-SIM endpoints are controlled by `PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv`.
 - Pads 8 through 10 terminate only at `TP_CELL_USB`; pads 22, 23 and 75 terminate only at `TP_CELL_DBG`. Their exact fixture contacts and domain-isolation rules are controlled by the closed `MAIN-AUTH-009`.
 - All reserved pads remain NC. Unsupported `ANT_WIFI` pad 56 and `GNSS_LNA_EN` pad 51 remain NC for BG95-M3. Unused BOOT_CONFIG pads have no pull-up.
@@ -50,8 +50,8 @@ The external source is the single `3V8_MODEM` rail from PCB-PWR. It splits at a 
 | `3V8_MODEM_BB` | 100 uF low-ESR bulk plus 220 nF, 47 nF, 150 pF, 100 pF, 68 pF, 33 pF, and 10 pF; ferrite bead immediately before U8 | at least 0.6 mm equivalent width and wider for longer routes |
 | `3V8_MODEM_RF` | 100 uF low-ESR bulk plus 100 nF, 33 pF, and 10 pF; 0 Ohm link immediately before U8 | at least 2.7 mm equivalent width and no neck-down |
 
-- The ferrite bead must be rated at least 600 mA, have low DC resistance, and provide at least 800 Ohm impedance in the 700 to 960 MHz range. Its exact MPN remains `MAIN-AUTH-010`.
-- The two low-leakage TVS positions recommended by Quectel and all exact capacitor, ferrite, and 0 Ohm MPNs remain `MAIN-AUTH-010` items.
+- FB1 is frozen by `MAIN-AUTH-010` as Murata `BLM31KN601SN1L`; Review A must verify the required current margin, low DC resistance and at least 800 Ohm impedance in the 700 to 960 MHz range.
+- The two low-leakage TVS positions recommended by Quectel and all exact capacitor, ferrite, and 0 Ohm MPNs are frozen by `MAIN-AUTH-010`.
 - The 4 A PCB-PWR source remains mandatory because BG95-M3 supports EGPRS and Quectel requires a supply capability above 2.7 A when LTE Cat M1, Cat NB2, and EGPRS are enabled.
 - Review A must probe the rail at all four U8 VBAT pads. Load-step and representative 2G burst tests must prove `VBAT_BB >= 3.3 V` and `VBAT_RF >= 3.3 V` at the module.
 
@@ -69,7 +69,7 @@ U16 uses the BG95 `VDD_EXT` output for VCCA. It therefore powers down with the m
 - DIR1 is tied directly to `U8_VDD_EXT_1V8`, so channels 1 through 4 translate A to B.
 - DIR2 is tied directly to `GND_MODEM`, so channels 5 through 8 translate B to A.
 - OE is tied directly to `GND_MODEM`; the translator is enabled only while both rails are valid and is isolated when `VDD_EXT` is absent.
-- Place 100 nF at U16 VCCA and at each VCCB pin. Exact capacitor RefDes and MPNs remain `MAIN-AUTH-010`.
+- Place 100 nF at U16 VCCA and at each VCCB pin. Exact capacitor RefDes and MPNs are frozen by `MAIN-AUTH-010`.
 - `CELL_TX` has 10 kOhm to `3V3_DIGITAL` so the modem RX input defaults to UART idle HIGH.
 - `CELL_DTR` has 100 kOhm to `GND_MODEM` so the modem remains awake until firmware deliberately requests sleep.
 - `U8_MAIN_TXD_1V8` and `U8_MAIN_RI_1V8` each have 10 kOhm to `U8_VDD_EXT_1V8`. This overcomes U16's 288 kOhm typical weak pull-down and defines the required inactive HIGH state.
@@ -88,7 +88,7 @@ Q1 and Q2 are Nexperia `MMBT3904,215` in SOT23. The exact pin order is 1 base, 2
 - MCU command HIGH asserts the corresponding active-LOW U8 input. MCU reset or command LOW leaves the transistor off.
 - The Q1 and Q2 commands must never overlap. Quectel states that RESET_N connects internally to PWRKEY.
 
-Exact 4.7 kOhm, 47 kOhm, and 10 nF passive MPNs remain `MAIN-AUTH-010`, but their values and topology are fixed by this authority.
+Exact 4.7 kOhm, 47 kOhm, and 10 nF passive MPNs are frozen by `MAIN-AUTH-010`; their values and topology are fixed by this authority.
 
 ## Deterministic power sequence
 

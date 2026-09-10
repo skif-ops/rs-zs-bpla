@@ -22,8 +22,8 @@
 
 ## Действующий срез
 
-- интеграционная версия: `DIONEA-INTEGRATION-v0.10`;
+- интеграционная версия: `DIONEA-INTEGRATION-v0.11`;
 - EVT-MB: `v1.3`, статус `OPEN`;
 - EVT-PRE-20: Rev.A от `b2fe734fe024d5e80573e85c23de3f0fc86c602a`, статус `OPEN`;
-- PCB-MAIN: `MAIN-AUTH-001…009` закрыты, `MAIN-AUTH-010…011` открыты;
+- PCB-MAIN: `MAIN-AUTH-001…010` закрыты, `MAIN-AUTH-011` открыт;
 - аппаратный EVT: `NOT RUN`.

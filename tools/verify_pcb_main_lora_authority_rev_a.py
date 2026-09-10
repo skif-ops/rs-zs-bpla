@@ -198,7 +198,7 @@ def main() -> None:
     readiness = status["capture_readiness"]
     closed = {item["id"]: item for item in readiness["closed_authorities"]}
     open_ids = {item["id"] for item in readiness["open_authorities"]}
-    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 10)}, "closed authority set mismatch")
+    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 11)}, "closed authority set mismatch")
     require(
         set(closed["MAIN-AUTH-007"]["evidence"])
         == {
@@ -207,7 +207,7 @@ def main() -> None:
         },
         "MAIN-AUTH-007 evidence set mismatch",
     )
-    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(10, 12)}, "remaining open authority set mismatch")
+    require(open_ids == {"MAIN-AUTH-011"}, "remaining open authority set mismatch")
     require(readiness["complete"] is False and status["manufacturing_release"] is False, "LoRa authority prematurely released manufacturing")
 
     tx_current_ma = 140.0

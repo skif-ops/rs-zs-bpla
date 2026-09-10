@@ -15,6 +15,9 @@ Authoritative inputs:
 - `hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv` and its independent review record;
+- `hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv` and its independent review record;
+- `hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv` and its independent review record;
+- `hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
 - `hardware/MAIN_COMPONENT_FREEZE_REV_A.csv`;
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`;
@@ -151,7 +154,7 @@ Required AAD tests before release:
 - U13 IN1 and IN2 are tied to `SIM_MUX_SEL`: LOW selects the SIM1 NC paths and HIGH selects the SIM2 NO paths.
 - Q3 `MMBT3904,215` preserves active-HIGH MCU `SIM_MUX_EN`: reset/default LOW leaves Q3 off and the 47 kOhm U13 EN pull-up holds all paths High-Z.
 - U14/U15 are exact `ESDALC6V1-5P6` arrays at J6/J7. Pin 2 is `GND_MODEM`; the other pins protect VDD, RST, CLK, DATA, and DET.
-- Each slot has 100 nF local VDD bypass, populated 0 Ohm series tuning positions on RST/CLK/DATA, and DNP 33 pF shunt tuning positions. Exact passive RefDes/MPNs and final shunt population remain `MAIN-AUTH-010`.
+- Each slot has 100 nF local VDD bypass, populated 0 Ohm series tuning positions on RST/CLK/DATA, and DNP 33 pF shunt tuning positions. Exact passive RefDes/MPNs and the DNP shunt population are frozen by `MAIN-AUTH-010`.
 - U8 `USIM_DET` remains NC. J6/J7 DET switches go independently to MCU PE3/PE5 with 10 kOhm pull-ups, 10 nF filters, and at least 20 ms debounce.
 - J6/J7 card and shell grounds connect directly to `GND_MODEM`; SIM ground is never switched through U13.
 - Selected card VDD must measure at least 1.62 V. The unselected slot must remain isolated through reset, brownout, and every slot transition.
@@ -166,7 +169,7 @@ Required AAD tests before release:
 - TIMEPULSE has only a high-impedance test point and no external pull or startup-low load. SAFEBOOT_N has no trace or test pad because the module couples it internally to TIMEPULSE through 1 kOhm.
 - The active antenna uses the u-blox Figure 38 three-pin supervisor: PIO7/LNA_EN controls power, PIO2/SDA reports open, and PIO3/SCL reports short. I2C is disabled before PIO2/PIO3 reassignment. Voltage control, open/short detection, power-down on fault and automatic recovery are enabled.
 - `J9` is exact Hirose `U.FL-R-SMT-1(60)`. The populated RF path is `J9 -> ultra-low-C ESD -> biased node -> 47 pF C0G DC block -> wideband GNSS L1 SAW -> U9 RF_IN`; it is a 50 Ohm dedicated route.
-- The VCC_RF supervisor network includes the Figure 38 switch/comparator topology, 10 Ohm 5% 0.25 W sensing, 27 nH 5% bias injection with more than 500 Ohm impedance at GNSS L1 and more than 300 mA rating, and 10 nF 10% 16 V X7R sensing filter. Exact support-device and passive RefDes/MPNs remain `MAIN-AUTH-010`.
+- The VCC_RF supervisor network includes the Figure 38 switch/comparator topology, 10 Ohm 5% 0.25 W sensing, 27 nH 5% bias injection with more than 500 Ohm impedance at GNSS L1 and more than 300 mA rating, and 10 nF 10% 16 V X7R sensing filter. `MAIN-AUTH-010` freezes the exact U5/Q4/R59-R62/L2/C63-C65/FL1/D4 MPNs and physical pins.
 - The external active antenna and cable are separate unreleased system BOM lines and must be qualified with the supervisor, SAW loss and cellular/RU868 coexistence.
 - configured installation coordinates are authoritative after commissioning; GNSS position is an integrity/diagnostic channel and must not silently move network/TDOA geometry.
 - receiver jam/spoof flags are read by firmware.
@@ -194,7 +197,7 @@ Required AAD tests before release:
 - U11 pads 28 `VDD` and 30 `VDDH` tie to `3V3_DIGITAL` for normal-voltage mode, with local 100 nF plus 10 uF. Pad 31 `DCCH`, pad 32 `VBUS`, pads 34/35 USB data, and every unused GPIO are explicit NC.
 - nRF firmware uses the calibrated internal LFRC; U11 pads 17/18 are NC and no 32.768 kHz crystal is fitted.
 - integrated antenna is placed at the PCB edge with the Raytac all-layer no-ground/copper region at least 10.5 mm wide by 3.8 mm deep and extended wider where possible; no component, battery, shield, conductive label, standoff or cable bundle occupies the antenna volume.
-- Exact reset-buffer/passive RefDes and MPNs remain `MAIN-AUTH-010`; exact placement coordinates and mechanical exclusion remain `MAIN-AUTH-011`.
+- Exact reset-buffer/passive RefDes and MPNs are frozen by `MAIN-AUTH-010`; exact placement coordinates and mechanical exclusion remain `MAIN-AUTH-011`.
 - final housing RF validation is mandatory; same-family external-antenna module may be adopted only by formal change if margin is insufficient.
 
 ### 1.9 Storage, sensors, USB and DFT
@@ -212,7 +215,19 @@ Required AAD tests before release:
 - `J11` is GCT `USB4105-GF-A-120`, USB2 device-only for STM32 service/recovery: A6/B6 join to PA12 `USB_DP`, A7/B7 join to PA11 `USB_DM`, VBUS is protected sense-only to PA9, CC1/CC2 have independent device Rd endpoints, SBU is NC, and `USB_SHIELD` has a controlled bond. J11 never connects to U11 or U8 USB.
 - `J8/J9/J10` are exact Hirose `U.FL-R-SMT-1(60)` receptacles. Their center/shell endpoints are controlled by `PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv` and cross-checked against the GNSS/LoRa authorities.
 - `TP_MCU_SWD` is an independent five-contact STM32 SWD group; `TP_EOL` is an exact 13-contact production group; `TP_CELL_USB` and `TP_CELL_DBG` are isolated BG95 recovery groups. `TP_BLE_SWD` remains independently controlled by `MAIN-AUTH-008` and shares no SWD contacts.
-- Connector/card identities and all contact endpoints close `MAIN-AUTH-009`. Exact support/protection/passive RefDes and MPNs remain `MAIN-AUTH-010`; connector orientation and fixture-pad coordinates remain `MAIN-AUTH-011`.
+- Connector/card identities and all contact endpoints close `MAIN-AUTH-009`. Exact support/protection/passive RefDes and MPNs are frozen by `MAIN-AUTH-010`; connector orientation and fixture-pad coordinates remain `MAIN-AUTH-011`.
+
+### 1.10 Complete passive and support capture
+
+- `hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv` is the machine authority for `MAIN-AUTH-010` and contains 211 unique physical components: 196 fitted and 15 DNP.
+- Every row freezes one PCB-MAIN RefDes with manufacturer, exact MPN, package, value/function, population, temperature range, full physical-pin set, endpoint-qualified net path and disposition.
+- `C1..C80`, `R1..R103`, `L1/L2`, `FB1`, `FL1`, `U5/U6/U19..U27`, `Q4`, `D1..D11`, and `X1` are the complete Rev.A set governed by this authority. X1 is restated to close its complete four-pad map without creating a duplicate BOM item.
+- Endpoint suffixes such as `_U1`, `_U9`, `_U10`, `_U11`, `_U16`, `_CARD`, `_CONN`, `_MUX` and `_TP` distinguish the two physical nets around a series component. The unsuffixed names in earlier device authorities remain logical interface names; the `MAIN-AUTH-010` endpoint map governs native capture around the series element.
+- The GNSS supervisor is the exact u-blox Figure 38 topology with `LT6000IDCB#TRMPBF`, `Si1016X-T1-GE3`, `LQW15AN27NJ00D` and `ABSES5AF-L100KM`. The J9 RF protector is unidirectional because that RF node carries positive DC antenna bias.
+- Rev.A hardware revision encoding is fixed as `HW_REV[1:0]=00`: R3/R5 fitted pull-downs and R4/R6 DNP alternate pull-ups.
+- STM32/nRF SWD and guarded I2C fixture contacts remain direct by design. There is no board-side protection or series element on those controlled internal test contacts.
+- The authority closes component selection only. DC-bias capacitance, SMPS stability, FB1 frequency response, modem burst droop, GNSS thresholds, USB/SIM signal integrity and RF tuning remain Review A/EVT evidence.
+- `MAIN-AUTH-011`, native capture, Reviews A/B and physical tests remain open. This capture input is `NOT FOR MANUFACTURE` and cannot release a production BOM or fabrication data.
 
 ## 2. PCB-MIC Rev.A
 
