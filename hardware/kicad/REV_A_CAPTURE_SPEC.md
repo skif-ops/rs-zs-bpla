@@ -202,15 +202,17 @@ Required AAD tests before release:
 - NOR `W25Q512JVFIQ` on OCTOSPI1.
 - U2 uses the exact 16-pin SOIC package-F map: IO3/IO1/IO2/IO0 on pins 1/8/9/15, `/CS` on pin 7 with 10 kOhm pull-up, dedicated `/RESET` pin 3 tied high, and all seven N/C-DNU pins left unconnected.
 - U2 VCC has local 100 nF plus 1 uF decoupling; firmware uses 4-byte addressing for the full 512-Mbit array.
-- industrial microSD on 4-bit SDMMC1; SPI fallback is not part of Rev.A without revision approval.
+- `U12` is Kingston industrial microSD `SDCIT2/32GB` in exact `J12` GCT `MEM2052-00-195-00-A`; contacts 1..8 are `DAT2/CD-DAT3/CMD/VDD/CLK/VSS/DAT0/DAT1`, and the normally-open detect switch grounds `SD_DET` only with a fully inserted card. The complete electrical map is `hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv`. Four-bit SDMMC1 is mandatory; SPI fallback is not part of Rev.A without revision approval.
 - LIS2DW12 is hard-strapped to I2C mode and address `0x18`; INT1 routes to PC6 `ACCEL_INT`, INT2 is NC, VDD has 100 nF plus 10 uF, and VDD_IO has 100 nF.
 - `U4` is the exact orderable `STTS22HTR` in `UDFN-6L 2.0 x 2.0 mm`; the earlier `WLCSP-4` description is superseded.
 - STTS22HTR is strapped to address `0x3F`; ALERT/INT is NC and VDD has 100 nF. Its unnumbered exposed pad has no electrical net and follows the ST land pattern.
 - I2C2 addresses are fixed as U3 `0x18`, U4 `0x3F`, and PCB-PWR INA226 `0x40`. The only populated pull-ups are 2.2 kOhm 1% on PCB-MAIN; initial speed is 100 kHz and final-harness rise time is a Review-A measurement.
 - INA226-class monitoring on I2C2 with shunt/range frozen by power calculation.
-- PC7 tamper input.
-- USB-C USB2 service: PA9/PA11/PA12, device-mode Rd, ESD and shield strategy.
-- STM32 SWD, nRF SWD and EOL UART/test pads remain fixture-accessible after assembly.
+- `J13` is the two-contact Molex `504050-0291` normally-closed tamper loop: pin 1 is PC7/EXTI7 `TAMPER_IN`, pin 2 is GND, and an open loop is an alarm or cable fault.
+- `J11` is GCT `USB4105-GF-A-120`, USB2 device-only for STM32 service/recovery: A6/B6 join to PA12 `USB_DP`, A7/B7 join to PA11 `USB_DM`, VBUS is protected sense-only to PA9, CC1/CC2 have independent device Rd endpoints, SBU is NC, and `USB_SHIELD` has a controlled bond. J11 never connects to U11 or U8 USB.
+- `J8/J9/J10` are exact Hirose `U.FL-R-SMT-1(60)` receptacles. Their center/shell endpoints are controlled by `PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv` and cross-checked against the GNSS/LoRa authorities.
+- `TP_MCU_SWD` is an independent five-contact STM32 SWD group; `TP_EOL` is an exact 13-contact production group; `TP_CELL_USB` and `TP_CELL_DBG` are isolated BG95 recovery groups. `TP_BLE_SWD` remains independently controlled by `MAIN-AUTH-008` and shares no SWD contacts.
+- Connector/card identities and all contact endpoints close `MAIN-AUTH-009`. Exact support/protection/passive RefDes and MPNs remain `MAIN-AUTH-010`; connector orientation and fixture-pad coordinates remain `MAIN-AUTH-011`.
 
 ## 2. PCB-MIC Rev.A
 

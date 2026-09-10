@@ -25,6 +25,8 @@
       "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md",
       "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
       "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md",
       "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
       "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
       "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -138,18 +140,17 @@
           "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
           "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md"
         ]
+      },
+      {
+        "id": "MAIN-AUTH-009",
+        "scope": "microSD socket/card, USB-C, all three RF receptacles, tamper and STM32/EOL/BG95 production-recovery fixture exact endpoints",
+        "evidence": [
+          "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md"
+        ]
       }
     ],
     "open_authorities": [
-      {
-        "id": "MAIN-AUTH-009",
-        "scope": "microSD socket/card, USB-C, RF receptacles, tamper and production/EOL fixture exact endpoints",
-        "blocks": [
-          "native_schematic",
-          "review_a",
-          "production_bom"
-        ]
-      },
       {
         "id": "MAIN-AUTH-010",
         "scope": "complete PCB-MAIN passive, support, protection, pull, strap, termination, filtering and decoupling RefDes/MPN and physical-pin set",

@@ -2,11 +2,11 @@
 
 Status: `CELLULAR_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE`
 
-This record closes only `MAIN-AUTH-004`. It freezes the exact U8 BG95-M3 and U16 translator pads, the two open-collector control stages, deterministic reset states, modem power sequencing, and the required local burst network. The dual-SIM network is controlled separately by `PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv` under `MAIN-AUTH-005`. This record does not close the cellular RF endpoint and recovery fixture in `MAIN-AUTH-009`, the exact passive set in `MAIN-AUTH-010`, layout authority in `MAIN-AUTH-011`, native capture, PCB Review A, PCB Review B, or the production BOM.
+This record closes only `MAIN-AUTH-004`. It freezes the exact U8 BG95-M3 and U16 translator pads, the two open-collector control stages, deterministic reset states, modem power sequencing, and the required local burst network. The dual-SIM network is controlled separately by `PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv` under `MAIN-AUTH-005`. The cellular RF and recovery fixture endpoints are now controlled by `PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv` under `MAIN-AUTH-009`. This record does not close the exact passive set in `MAIN-AUTH-010`, layout authority in `MAIN-AUTH-011`, native capture, PCB Review A, PCB Review B, or the production BOM.
 
 Machine authority: `hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv`.
 
-Authority CSV SHA-256: `dafa5598e8d10fed0f2facc1f9ef4e949159850364445b28d4d2eded373a604f`.
+Authority CSV SHA-256: `3431c903eb9a1138e9976a0d95479c4269e2c0d25d72c98bbe5dc6e7785c6579`.
 
 ## Primary evidence
 
@@ -17,7 +17,7 @@ Authority CSV SHA-256: `dafa5598e8d10fed0f2facc1f9ef4e949159850364445b28d4d2eded
 
 ## U8 BG95-M3 pad contract
 
-The selected module is the 102-pad `BG95-M3` in the 23.6 x 19.9 mm LGA form. Every physical pad is accounted for in the machine authority. The accounting includes 28 ground pads, four VBAT pads, one VDD_EXT output, seven locally closed functional signals, the resolved six-pad dual-SIM interface controlled by `MAIN-AUTH-005`, seven RF/recovery pads owned by `MAIN-AUTH-009`, and all unused, unsupported, and reserved pads.
+The selected module is the 102-pad `BG95-M3` in the 23.6 x 19.9 mm LGA form. Every physical pad is accounted for in the machine authority. The accounting includes 28 ground pads, four VBAT pads, one VDD_EXT output, seven locally closed functional signals, the resolved six-pad dual-SIM interface controlled by `MAIN-AUTH-005`, seven RF/recovery pads controlled by the closed `MAIN-AUTH-009`, and all unused, unsupported, and reserved pads.
 
 The following locally closed signals are exact:
 
@@ -36,9 +36,9 @@ The following locally closed signals are exact:
 - Pads 52 and 53 are both `VBAT_RF` and connect to `3V8_MODEM_RF`.
 - The BG95-M3 input range is 3.3 to 4.3 V with 3.8 V nominal. The rail must never fall below 3.3 V at any U8 VBAT pad.
 - All 28 module GND pads connect to the low-impedance `GND_MODEM` plane with ground vias placed according to the Quectel land pattern.
-- Pad 60 `ANT_MAIN` is fixed as the `CELL_RF` source, but its 50 Ohm route, matching, protection, U.FL endpoint, and layout acceptance remain owned by `MAIN-AUTH-009` and `MAIN-AUTH-011`.
+- Pad 60 `ANT_MAIN` is fixed as the `CELL_RF` source and terminates only at J8 through the no-stub 50 Ohm matching/protection path controlled by `MAIN-AUTH-009`; exact parts remain `MAIN-AUTH-010` and layout acceptance remains `MAIN-AUTH-011`.
 - Pad 42 `USIM_DET` is NC because independent J6/J7 card-detect switches terminate at the MCU. Pads 43 through 46 terminate at U13, and pad 47 connects directly to `GND_MODEM`; the exact dual-SIM endpoints are controlled by `PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv`.
-- Pads 8 through 10, 22, 23, and 75 remain owned by `MAIN-AUTH-009` for modem firmware-recovery and production-fixture decisions.
+- Pads 8 through 10 terminate only at `TP_CELL_USB`; pads 22, 23 and 75 terminate only at `TP_CELL_DBG`. Their exact fixture contacts and domain-isolation rules are controlled by the closed `MAIN-AUTH-009`.
 - All reserved pads remain NC. Unsupported `ANT_WIFI` pad 56 and `GNSS_LNA_EN` pad 51 remain NC for BG95-M3. Unused BOOT_CONFIG pads have no pull-up.
 
 ## Burst-current supply network

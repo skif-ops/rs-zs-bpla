@@ -180,7 +180,7 @@ def main() -> None:
     readiness = status["capture_readiness"]
     closed = {item["id"]: item for item in readiness["closed_authorities"]}
     open_ids = {item["id"] for item in readiness["open_authorities"]}
-    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 9)}, "closed authority set mismatch")
+    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 10)}, "closed authority set mismatch")
     require(
         set(closed["MAIN-AUTH-006"]["evidence"])
         == {
@@ -189,7 +189,7 @@ def main() -> None:
         },
         "MAIN-AUTH-006 evidence set mismatch",
     )
-    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(9, 12)}, "remaining open authority set mismatch")
+    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(10, 12)}, "remaining open authority set mismatch")
     require(readiness["complete"] is False and status["manufacturing_release"] is False, "GNSS authority prematurely released manufacturing")
 
     supply_margin_v = round(3.3 - 2.7, 3)

@@ -73,7 +73,7 @@ def main() -> None:
 
     for item_id, ref in {
         "U1": "U1", "U2": "U2", "U3": "U3", "U4": "U4", "U7": "U7",
-        "U8": "U8", "U9": "U9", "U10": "U10", "U11": "U11", "U13": "U13", "X1": "X1",
+        "U8": "U8", "U9": "U9", "U10": "U10", "U11": "U11", "U12": "U12", "U13": "U13", "X1": "X1",
     }.items():
         p = main_parts[ref]
         update_existing(
@@ -139,6 +139,18 @@ def main() -> None:
             notes=f"Rev.A connector freeze; blockers: {c['Release_Blockers']}",
         )
 
+    for item_id, cid, refdes, manufacturer, package in (
+        ("J-SD1", "CON-SD", "J12", "GCT", "microSD push-push SMT 1.95 mm with detect"),
+        ("J-TAMPER", "CON-TAMPER", "J13", "Molex", "Pico-Lock 1.50 mm 2-circuit right-angle SMT"),
+    ):
+        c = connectors[cid]
+        update_existing(
+            item_id, manufacturer=manufacturer,
+            mpn=c["Board_MPN"].split("_", 1)[1] if "_" in c["Board_MPN"] else c["Board_MPN"],
+            package=package, status=c["Status"], refdes=refdes,
+            notes=f"Rev.A connector freeze; exact electrical map in PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv; blockers: {c['Release_Blockers']}",
+        )
+
     for item_id, cid in {"J-RF-CELL": "CON-RF-CELL", "J-RF-GNSS": "CON-RF-GNSS", "J-RF-LORA": "CON-RF-LORA"}.items():
         c = connectors[cid]
         update_existing(
@@ -194,7 +206,7 @@ def main() -> None:
         )
 
     for item_id, cid, assembly, refdes in (
-        ("J-USB", "CON-USB", "PCB-MAIN", "J_USB"),
+        ("J-USB", "CON-USB", "PCB-MAIN", "J11"),
         ("J-PWR-IN", "CON-003", "PCB-PWR", "J1"),
         ("J-PWR-PWR", "CON-004A", "PCB-PWR", "J2"),
         ("J-PWR-MAIN", "CON-004B", "PCB-MAIN", "J_PWR"),

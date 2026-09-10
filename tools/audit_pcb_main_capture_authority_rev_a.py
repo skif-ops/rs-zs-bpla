@@ -38,6 +38,8 @@ LORA_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv
 LORA_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md"
 BLE_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv"
 BLE_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md"
+CONNECTOR_FIXTURE_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv"
+CONNECTOR_FIXTURE_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md"
 DUAL_SIM_POLICY_PATH = ROOT / "hardware/DUAL_SIM_SINGLE_STANDBY.md"
 AUDIO_INTERFACE_PATH = ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md"
 POWER_ARCHITECTURE_PATH = ROOT / "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
@@ -62,6 +64,8 @@ EXPECTED_AUTHORITATIVE_INPUTS = {
     "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md",
     "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -83,6 +87,7 @@ EXPECTED_MAIN_MPNS = {
     "U9": "MAX-M10S-00B",
     "U10": "E22-900M22S",
     "U11": "MDBT50Q-P1MV2",
+    "U12": "SDCIT2/32GB",
     "U13": "TS3A27518EPWR",
     "U14": "ESDALC6V1-5P6",
     "U15": "ESDALC6V1-5P6",
@@ -115,8 +120,8 @@ EXPECTED_SWD = {
     "4": "NRST",
     "5": "GND",
 }
-EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(9, 12)}
-EXPECTED_CLOSED_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(1, 9)}
+EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(10, 12)}
+EXPECTED_CLOSED_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(1, 10)}
 EXPECTED_DEVICE_METADATA = {
     "U2": ("W25Q512JVFIQ", "SOIC-16_300mil_F"),
     "U3": ("LIS2DW12TR", "LGA-12_2x2mm"),
@@ -777,8 +782,9 @@ def main() -> None:
     for pin in (11, 12, 13, 14, 16, 57, 63, 76, 77, 78, 92, 93, 94, 95, 97, 98, 99):
         require((u8[pin]["RevA_Net"], u8[pin]["Disposition"]) == ("NC", "RESERVED_DNU_NC"), f"U8 reserved pad {pin} is not DNU/NC")
     require((u8[42]["RevA_Net"], u8[42]["Disposition"]) == ("NC", "UNUSED_INPUT_NC"), "U8 module-level USIM_DET must remain NC")
-    for pin in (8, 9, 10, 22, 23, 60, 75):
-        require(u8[pin]["Disposition"] == "DEFERRED_MAIN_AUTH_009", f"U8 recovery/RF pad {pin} ownership mismatch")
+    for pin in (8, 9, 10, 22, 23, 75):
+        require(u8[pin]["Disposition"] == "FIXTURE_ENDPOINT_LOCKED", f"U8 recovery pad {pin} endpoint mismatch")
+    require(u8[60]["Disposition"] == "RF_ENDPOINT_LOCKED", "U8 cellular RF endpoint mismatch")
     for token in ("100 uF", "220 nF", "47 nF", "150 pF", "68 pF", "33 pF", "10 pF", "ferrite bead"):
         require(token in u8[32]["Required_Network"], f"U8 VBAT_BB authority lacks {token}")
     for token in ("100 uF", "100 nF", "33 pF", "10 pF", "0 Ohm link"):
@@ -1227,6 +1233,78 @@ def main() -> None:
     require(by_ref["U11"]["Package_or_Module"] == ble_package, "U11 freeze package mismatch")
     require("PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv" in by_ref["U11"]["Notes"], "U11 freeze lacks BLE authority citation")
 
+    connector_fixture_rows = rows(CONNECTOR_FIXTURE_PIN_AUTHORITY_PATH)
+    require(len(connector_fixture_rows) == 70, f"expected 70 connector/fixture authority rows, got {len(connector_fixture_rows)}")
+    require(all(set(row) == cellular_columns for row in connector_fixture_rows), "connector/fixture authority schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in cellular_columns) for row in connector_fixture_rows),
+        "connector/fixture authority row contains an empty field",
+    )
+    connector_fixture_by_key = {(row["RefDes"], row["Pin"]): row for row in connector_fixture_rows}
+    require(len(connector_fixture_by_key) == len(connector_fixture_rows), "duplicate connector/fixture RefDes/pin key")
+    expected_connector_counts = {
+        "U12": 8, "J12": 10, "J11": 17, "J8": 2, "J9": 2, "J10": 2,
+        "J13": 2, "TP_MCU_SWD": 5, "TP_EOL": 13, "TP_CELL_USB": 4, "TP_CELL_DBG": 5,
+    }
+    for ref, count in expected_connector_counts.items():
+        require(sum(row["RefDes"] == ref for row in connector_fixture_rows) == count, f"{ref} contact count mismatch")
+    require(
+        {row["RefDes"] for row in connector_fixture_rows} == set(expected_connector_counts),
+        "connector/fixture authority RefDes set drift",
+    )
+    card_map = {
+        "1": ("DAT2", "SD_D2"), "2": ("CD/DAT3", "SD_D3"), "3": ("CMD", "SD_CMD"),
+        "4": ("VDD", "3V3_DIGITAL"), "5": ("CLK", "SD_CK"), "6": ("VSS", "GND"),
+        "7": ("DAT0", "SD_D0"), "8": ("DAT1", "SD_D1"),
+    }
+    for ref in ("U12", "J12"):
+        for pin, expected in card_map.items():
+            row = connector_fixture_by_key[(ref, pin)]
+            require((row["Pin_Name"], row["RevA_Net"]) == expected, f"{ref}.{pin} microSD map mismatch")
+    require(connector_fixture_by_key[("J12", "CD")]["RevA_Net"] == "SD_DET", "J12 detect endpoint mismatch")
+    usb_map = {
+        "A1": "GND", "A4": "USB_VBUS_CONN", "A5": "USB_CC1", "A6": "USB_DP", "A7": "USB_DM",
+        "A8": "NC", "A9": "USB_VBUS_CONN", "A12": "GND", "B1": "GND", "B4": "USB_VBUS_CONN",
+        "B5": "USB_CC2", "B6": "USB_DP", "B7": "USB_DM", "B8": "NC", "B9": "USB_VBUS_CONN",
+        "B12": "GND", "SHIELD": "USB_SHIELD",
+    }
+    for pin, net in usb_map.items():
+        require(connector_fixture_by_key[("J11", pin)]["RevA_Net"] == net, f"J11.{pin} USB contact mismatch")
+    for source_rows, ref in ((gnss_rows, "J9"), (lora_rows, "J10")):
+        source_by_key = {(row["RefDes"], row["Pin"]): row for row in source_rows}
+        for pin in ("1", "SHIELD"):
+            require(connector_fixture_by_key[(ref, pin)] == source_by_key[(ref, pin)], f"{ref}.{pin} diverges from closed RF authority")
+    require(
+        (connector_fixture_by_key[("J13", "1")]["RevA_Net"], connector_fixture_by_key[("J13", "2")]["RevA_Net"])
+        == ("TAMPER_IN", "GND"),
+        "J13 tamper map mismatch",
+    )
+    require(
+        {connector_fixture_by_key[("TP_MCU_SWD", pin)]["RevA_Net"] for pin in ("2", "3")}
+        == {"SWDIO", "SWCLK"},
+        "STM32 SWD fixture map mismatch",
+    )
+    require(
+        {connector_fixture_by_key[("TP_CELL_USB", pin)]["RevA_Net"] for pin in ("1", "2", "3")}
+        == {"CELL_USB_VBUS", "CELL_USB_DP", "CELL_USB_DM"},
+        "BG95 USB fixture map mismatch",
+    )
+    require(
+        {connector_fixture_by_key[("TP_CELL_DBG", pin)]["RevA_Net"] for pin in ("1", "2", "3", "4")}
+        == {"U8_VDD_EXT_1V8", "CELL_DBG_TXD_1V8", "CELL_DBG_RXD_1V8", "CELL_USB_BOOT_1V8"},
+        "BG95 debug fixture map mismatch",
+    )
+    connector_fixture_review = CONNECTOR_FIXTURE_REVIEW_PATH.read_text(encoding="utf-8")
+    connector_fixture_sha256 = hashlib.sha256(CONNECTOR_FIXTURE_PIN_AUTHORITY_PATH.read_bytes()).hexdigest()
+    for marker in {
+        "CONNECTOR_FIXTURE_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        connector_fixture_sha256, "SDCIT2/32GB", "USB4105-GF-A-120", "MEM2052-00-195-00-A",
+        "504050-0291", "TP_EOL", "TP_CELL_USB", "TP_CELL_DBG", "MAIN-AUTH-010", "MAIN-AUTH-011",
+    }:
+        require(marker in connector_fixture_review, f"connector/fixture review missing marker: {marker}")
+    require(by_ref["U12"]["MPN"] == "SDCIT2/32GB", "U12 freeze identity mismatch")
+    require("PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv" in by_ref["U12"]["Notes"], "U12 freeze lacks connector authority citation")
+
     harness = rows(HARNESS_PATH)
     main_power = interface(harness, "MAIN_PWR")
     require(pin_contract(main_power) == EXPECTED_MAIN_POWER, "12-pin MAIN/PWR harness contract mismatch")
@@ -1263,10 +1341,15 @@ def main() -> None:
         "CON-RF-GNSS": "Hirose_U.FL-R-SMT-1_60",
         "CON-RF-LORA": "Hirose_U.FL-R-SMT-1_60",
         "CON-USB": "GCT_USB4105-GF-A-120",
+        "CON-SD": "GCT_MEM2052-00-195-00-A",
+        "CON-TAMPER": "Molex_5040500291",
         "CON-SIM1": "TE_2336582-1",
         "CON-SIM2": "TE_2336582-1",
         "CON-SWD-MCU": "TEST_PADS",
         "CON-SWD-BLE": "TEST_PADS",
+        "CON-EOL": "TEST_PADS",
+        "CON-CELL-USB": "TEST_PADS",
+        "CON-CELL-DBG": "TEST_PADS",
     }
     for connector_id, mpn in expected_connectors.items():
         require(connector_id in connectors, f"connector freeze missing {connector_id}")
@@ -1375,6 +1458,14 @@ def main() -> None:
         },
         "MAIN-AUTH-008 evidence set mismatch",
     )
+    require(
+        closed_evidence["MAIN-AUTH-009"]
+        == {
+            "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-009 evidence set mismatch",
+    )
     require(closed_ids.isdisjoint(open_ids), "authority is both open and closed")
     require(open_ids == EXPECTED_OPEN_AUTHORITY_IDS, "PCB-MAIN open authority register drift")
     require(len(open_ids) == len(open_items), "duplicate PCB-MAIN open authority ID")
@@ -1403,6 +1494,7 @@ def main() -> None:
         "dual_sim_pins_verified": len(dual_sim_rows),
         "gnss_contacts_verified": len(gnss_rows),
         "ble_contacts_verified": len(ble_rows),
+        "connector_fixture_contacts_verified": len(connector_fixture_rows),
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
@@ -1422,6 +1514,7 @@ def main() -> None:
     print(f"- all {len(gnss_rows)} U9/J9 physical contacts, supply choices, supervisor signals and RF/bias topology verified")
     print(f"- all {len(lora_rows)} U10/J10 physical contacts, fail-closed RF-switch controls and no-stub RF path verified")
     print(f"- all {len(ble_rows)} U11/TP_BLE_SWD contacts, fail-closed boot/reset, independent SWD and antenna keepout inputs verified")
+    print(f"- all {len(connector_fixture_rows)} connector/card/RF/tamper/fixture contacts and domain-isolation rules verified")
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(f"- {len(open_items)} missing pad/mechanical authorities remain explicit production blockers")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")

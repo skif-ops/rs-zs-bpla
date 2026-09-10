@@ -23,6 +23,10 @@ on:
       - "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md"
       - "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md"
       - "hardware/DUAL_SIM_SINGLE_STANDBY.md"
       - "hardware/T5838_AAD_INTERFACE_REV_A.md"
       - "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
@@ -45,6 +49,7 @@ on:
       - "tools/verify_pcb_main_gnss_authority_rev_a.py"
       - "tools/verify_pcb_main_lora_authority_rev_a.py"
       - "tools/verify_pcb_main_ble_authority_rev_a.py"
+      - "tools/verify_pcb_main_connector_fixture_authority_rev_a.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
@@ -132,6 +137,10 @@ jobs:
         run: |
           python tools/verify_pcb_main_ble_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/ble_authority_verification.json
+      - name: Second independent PCB-MAIN connector and fixture control
+        run: |
+          python tools/verify_pcb_main_connector_fixture_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/connector_fixture_authority_verification.json
       - name: Independent PCB-PWR design and Review-A authority audits
         run: |
           python tools/audit_pcb_pwr_design_rev_a.py \

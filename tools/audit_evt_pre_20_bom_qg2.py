@@ -39,7 +39,7 @@ def main() -> int:
 
     main_freeze = read(ROOT / "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv")
     main_item_for_ref = {
-        **{f"U{i}": f"U{i}" for i in (1, 2, 3, 4, 7, 8, 9, 10, 11, 13, 16, 17, 18)},
+        **{f"U{i}": f"U{i}" for i in (1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18)},
         "U14": "U14-U15", "U15": "U14-U15", "Q1": "Q-MODEM-PWRKEY",
         "Q2": "Q-MODEM-RESET", "Q3": "Q-SIM-MUX-EN", "X1": "X1",
     }
@@ -170,6 +170,7 @@ def main() -> int:
     gnss_pin_rows = read(ROOT / "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv")
     lora_pin_rows = read(ROOT / "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv")
     ble_pin_rows = read(ROOT / "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv")
+    connector_fixture_pin_rows = read(ROOT / "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv")
     required_native_tokens = {
         "(kicad_sch",
         *(row["MPN"] for row in main_freeze),
@@ -181,6 +182,7 @@ def main() -> int:
         *(row["RevA_Net"] for row in gnss_pin_rows if row["RevA_Net"] != "NC"),
         *(row["RevA_Net"] for row in lora_pin_rows if row["RevA_Net"] != "NC"),
         *(row["RevA_Net"] for row in ble_pin_rows if row["RevA_Net"] != "NC"),
+        *(row["RevA_Net"] for row in connector_fixture_pin_rows if row["RevA_Net"] != "NC"),
     }
     native_tokens_missing = sorted(token for token in required_native_tokens if token not in native_text)
     native_ok = (

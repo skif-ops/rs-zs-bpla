@@ -68,6 +68,28 @@ ble:
   firmware_port: MISSING_BLOCKER
   swd_recovery: REQUIRED_ON_FIXTURE
   enclosure_rf_validation: REQUIRED
+storage:
+  card: Kingston_SDCIT2_32GB
+  socket: GCT_MEM2052_00_195_00_A
+  interface: SDMMC1_4BIT_ONLY
+  contact_order: [DAT2, CD_DAT3, CMD, VDD, CLK, VSS, DAT0, DAT1]
+  card_detect: PC13_EXTI13_ACTIVE_LOW_CARD_PRESENT
+  required_validation: [CID, CAPACITY, FULL_WRITE_READBACK, POWER_LOSS_RECOVERY, TEMPERATURE]
+service_interfaces:
+  usb_c: GCT_USB4105_GF_A_120
+  usb_mode: STM32_USB2_DEVICE_ONLY_SERVICE_AND_SYSTEM_MEMORY_RECOVERY
+  usb_data: PA11_DM_PA12_DP
+  usb_vbus: PA9_PROTECTED_HIGH_IMPEDANCE_SENSE_ONLY
+  usb_power_policy: NO_STATION_SOURCE_OR_SINK_POWER
+  tamper: PC7_EXTI7_NORMALLY_CLOSED_TO_GND_OPEN_IS_ALARM
+production_fixture:
+  authority: hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+  stm32_swd: TP_MCU_SWD_5P_VTREF_SWDIO_SWCLK_NRST_GND
+  eol: TP_EOL_13P_RAIL_SENSE_UART_POWER_STATE_BOOT0_REV_STRAPS_I2C2
+  bg95_usb: TP_CELL_USB_4P_ISOLATED_FROM_STM32_USB
+  bg95_debug: TP_CELL_DBG_5P_1V8_VREF_GATED
+  nrf_swd: TP_BLE_SWD_4P_SEPARATE_AUTHORITY
+  fixture_power_policy: DUT_RAILS_SENSE_ONLY_EXCEPT_CONTROLLED_BG95_USB_VBUS
 positioning:
   station_type: fixed
   authoritative_source: configured_installation_coordinates
