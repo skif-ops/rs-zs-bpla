@@ -386,7 +386,7 @@ def make_symbol(spec: ComponentSpec) -> tuple[Symbol, dict[str, SymbolPin], floa
 
 
 def instance_property(key: str, value: str, ident: int, x: float, y: float, hide: bool = False) -> Property:
-    return Property(key=key, value=value, id=ident, position=Position(X=x, Y=y),
+    return Property(key=key, value=value, id=ident, position=Position(X=x, Y=y, angle=0),
                     effects=Effects(font=Font(width=1.0, height=1.0), hide=hide))
 
 

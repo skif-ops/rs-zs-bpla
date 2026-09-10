@@ -3,7 +3,7 @@
   "board": "PCB-MAIN",
   "state": "SCHEMATIC_REVIEW_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "ba78230f616c4dc819ce3e6cdf6b1f9ddbb5738b347e40a339fc173e8b1b4134",
+  "generator_sha256": "d40844eb833b62662a7737a95ec1731a67fcb65d8ce80d27005f1c4b70c5eae0",
   "inputs": [
     {
       "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
@@ -78,7 +78,7 @@
   "fitted_count": 233,
   "dnp_count": 15,
   "pin_count": 1074,
-  "schematic_sha256": "1b1b89d87433923d266a626e3f089884b64d8491a33bcff49cc6054d4a17a5bb",
+  "schematic_sha256": "89939e78391292d00be797448ef17d629511c32d0ceef6743ca08e00c8c729b3",
   "project_sha256": "23cdb485eeaafd122b08c540da925235a1778926199cfbec969da396cd8c7ed0",
   "review_a": "AUTOMATED_SOURCE_NET_AUDIT_GATED_KICAD_ERC_AND_HUMAN_SIGNOFF_PENDING",
   "review_b": "BLOCKED_LAYOUT_ABSENT"

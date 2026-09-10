@@ -259,6 +259,11 @@ def main() -> int:
     nc_count = 0
     for ref, component in expected.items():
         instance = instances[ref]
+        require(instance.position.angle is not None,
+                f"{ref}: symbol position is missing the KiCad rotation field")
+        for prop in instance.properties:
+            require(prop.position.angle is not None,
+                    f"{ref}.{prop.key}: property position is missing the KiCad rotation field")
         require(instance.libId in lib_by_id, f"{ref}: missing embedded library symbol")
         symbol = lib_by_id[instance.libId]
         native_pins = selected_pins(symbol, instance.unit or 1)
