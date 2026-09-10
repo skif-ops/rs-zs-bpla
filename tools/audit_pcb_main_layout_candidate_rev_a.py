@@ -51,7 +51,9 @@ def main() -> int:
 
     for ref in expected_on_board:
         fp = footprints[ref]
-        pads = {pad.number: pad for pad in fp.pads}
+        # Unnumbered pads are permitted only as mechanical/paste features and
+        # do not participate in the schematic pin contract.
+        pads = {pad.number: pad for pad in fp.pads if pad.number}
         wanted = expected[ref]["pins"]
         require(set(pads) == set(wanted), f"{ref}: pad-number set mismatch")
         for number, pin in wanted.items():
@@ -77,10 +79,18 @@ def main() -> int:
     provisional = sorted(ref for ref, fp in footprints.items()
                          if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                          "PROVISIONAL_REQUIRES_MANUFACTURER_DRAWING")
+    library_pending = sorted(ref for ref, fp in footprints.items()
+                             if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
+                             "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
     require(provisional, "candidate incorrectly claims every footprint is production-approved")
+    require(len(provisional) == 32, f"unexpected provisional-footprint count: {len(provisional)}")
+    require(len(library_pending) == 31,
+            f"unexpected KiCad-library review count: {len(library_pending)}")
     print("PCB-MAIN layout-candidate audit: PASS")
     print(f"components={len(expected_on_board)} holes=4 nets={len(expected_nets)} layers=6")
-    print(f"provisional_footprints={len(provisional)} routing=ABSENT review_b=BLOCKED")
+    print(f"provisional_footprints={len(provisional)} "
+          f"kicad_library_review_pending={len(library_pending)} "
+          "routing=ABSENT review_b=BLOCKED")
     return 0
 
 

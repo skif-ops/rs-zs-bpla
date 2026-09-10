@@ -335,6 +335,7 @@ jobs:
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md
             hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md
+            hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md
             hardware/reviews/PCB_MAIN_REVIEW_B_CHECKLIST_REV_A.md
             hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv
             hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md

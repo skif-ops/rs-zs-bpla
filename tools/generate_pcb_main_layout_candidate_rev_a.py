@@ -34,9 +34,18 @@ STANDARD = {
     "TSSOP-14_PW": ("Package_SO.pretty", "TSSOP-14_4.4x5mm_P0.65mm"),
     "SOT23": ("Package_TO_SOT_SMD.pretty", "SOT-23"),
     "SOT-563_SC-89": ("Package_TO_SOT_SMD.pretty", "SOT-563"),
-    "SOD882": ("Diode_SMD.pretty", "D_SOD-882"),
+    "SOD882": ("Diode_SMD.pretty", "D_SOD-882", {}),
     "SOIC-16_300mil_F": ("Package_SO.pretty", "SOIC-16W_7.5x10.3mm_P1.27mm"),
-    "U.FL_SMT": ("Connector_Coaxial.pretty", "U.FL_Hirose_U.FL-R-SMT-1_Vertical"),
+    "U.FL_SMT": ("Connector_Coaxial.pretty", "U.FL_Hirose_U.FL-R-SMT-1_Vertical", {"2": "SHIELD"}),
+    "USB-C_16P_horizontal_top_mount_1.20mm_stake": (
+        "Connector_USB.pretty", "USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal",
+        {"S1": "SHIELD"},
+    ),
+    "SOT666_1.6x1.6mm": ("Package_TO_SOT_SMD.pretty", "SOT-666", {}),
+    "SOD-523_DYA": ("Diode_SMD.pretty", "D_SOD-523", {}),
+    "SOT-9X3_DRT": ("Package_TO_SOT_SMD.pretty", "Texas_DRT-3", {}),
+    "SOT-5X3-6_DRL": ("Package_TO_SOT_SMD.pretty", "Texas_R-PDSO-N6_DRL-6", {}),
+    "7343-31": ("Capacitor_Tantalum_SMD.pretty", "CP_EIA-7343-31_Kemet-D", {}),
     "0402": None,
     "0603": None,
     "0805": None,
@@ -142,10 +151,20 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
         return passive_footprint(board, package)
     entry = STANDARD.get(package)
     if entry:
-        directory, name = entry
+        # Older entries intentionally remain two-tuples for compatibility.
+        directory, name, aliases = (*entry, {}) if len(entry) == 2 else entry
         fp = pcbnew.FootprintLoad(str(KICAD_FP / directory), name)
-        if fp is not None and {p.GetNumber() for p in fp.Pads()} == set(pins):
-            return fp
+        if fp is not None:
+            for pad in fp.Pads():
+                if pad.GetNumber() in aliases:
+                    pad.SetNumber(aliases[pad.GetNumber()])
+            # Empty-number pads are mechanical/paste apertures and are not
+            # logical pins.  Duplicate shell pads deliberately share a name.
+            logical = {p.GetNumber() for p in fp.Pads() if p.GetNumber()}
+            if logical == set(pins):
+                fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
+                fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", f"KiCad:{directory}/{name}")
+                return fp
     return generic_footprint(board, pins, package)
 
 
@@ -237,7 +256,7 @@ def main() -> int:
         fp.SetProperty("DIONEA_POPULATION", component["population"])
         if component["population"] == "DNP":
             fp.SetExcludedFromPosFiles(True)
-        by_number = {pad.GetNumber(): pad for pad in fp.Pads()}
+        by_number = {pad.GetNumber(): pad for pad in fp.Pads() if pad.GetNumber()}
         if set(by_number) != set(pin_numbers):
             raise RuntimeError(f"{ref}: footprint pin mismatch {sorted(by_number)} != {sorted(pin_numbers)}")
         for number, pin in component["pins"].items():
