@@ -24,7 +24,16 @@ class EventStore:
         with self._conn() as c: c.executescript(SCHEMA)
     def _conn(self):
         c=sqlite3.connect(self.path,timeout=10); c.row_factory=sqlite3.Row; return c
+    def get_station_heartbeat(self,station_id:int)->HeartbeatMessage|None:
+        with self._conn() as c:
+            row=c.execute("SELECT payload FROM stations WHERE station_id=?",(station_id,)).fetchone()
+        return HeartbeatMessage.model_validate_json(row['payload']) if row else None
     def upsert_station(self, hb: HeartbeatMessage):
+        existing=self.get_station_heartbeat(hb.station_id)
+        # Once a configured installation position is known, a later live-GNSS-only
+        # heartbeat must not silently move the server-side station geometry.
+        if existing is not None and existing.station.position_source=='configured_install' and hb.station.position_source!='configured_install':
+            hb=hb.model_copy(update={'gnss_observed':hb.station,'station':existing.station})
         payload=hb.model_dump_json()
         with self.lock,self._conn() as c: c.execute("INSERT OR REPLACE INTO stations VALUES(?,?,?)",(hb.station_id,hb.time_us,payload))
     def save_detection(self,d:DetectionMessage):

@@ -1,0 +1,30 @@
+Test_ID,Area,Precondition,Action,Expected_result,Evidence,Priority,Status
+AND-T-001,Install,Clean Huawei device without GMS,Install signed APK,Application starts without Google services,screen_record plus apk_hash,P0,NOT_RUN
+AND-T-002,Install,Offline Android device,Start all commissioning screens,No internet dependency or blocking request,screen_record plus network_capture,P0,NOT_RUN
+AND-T-003,BLE,Station outside service mode,Scan for station,Station is not configurable,ble_log,P0,NOT_RUN
+AND-T-004,BLE,Service button held 5 seconds,Scan and connect,Correct serial is discovered within timeout,ble_log,P0,NOT_RUN
+AND-T-005,Identity,Wrong QR for nearby station,Attempt pairing,Pairing is rejected before configuration,app_log_redacted,P0,NOT_RUN
+AND-T-006,Identity,Correct unused QR,Pair once,Authenticated session opens and secret becomes unusable,station_log,P0,NOT_RUN
+AND-T-007,Identity,Expired bootstrap secret,Attempt pair,Pairing rejected with recoverable instruction,station_log,P0,NOT_RUN
+AND-T-008,Config,Valid public APN profile,Write and read back,Version/hash match and config is atomic,config_export_redacted,P0,NOT_RUN
+AND-T-009,Config,Invalid APN or endpoint,Attempt write,Client and station reject without partial change,app_and_station_log,P0,NOT_RUN
+AND-T-010,Config,Configured RU868 device,Attempt region change,Operation unavailable and protocol request rejected,app_and_station_log,P0,NOT_RUN
+AND-T-011,Diagnostics,Station ready,Run power/GNSS/storage/mic/modem self-test,Per-subsystem result and evidence are shown,diagnostic_report,P0,NOT_RUN
+AND-T-012,Cellular,Ordinary SIM behind CGNAT,Run attach/TLS test,Outbound connection succeeds without operator API,modem_and_server_log,P0,NOT_RUN
+AND-T-013,OTA,Valid signed compatible bundle,Transfer and install,Hash/signature pass and new slot confirms,ota_log plus hashes,P0,NOT_RUN
+AND-T-014,OTA,Corrupted bundle,Import bundle,Rejected before station activation,app_log_redacted,P0,NOT_RUN
+AND-T-015,OTA,Wrong hardware revision,Import bundle,Rejected with expected/actual revision,app_log_redacted,P0,NOT_RUN
+AND-T-016,OTA,Older anti-rollback counter,Import bundle,Downgrade rejected,app_and_station_log,P0,NOT_RUN
+AND-T-017,OTA,Transfer at 30 percent,Disable Bluetooth,Resume continues from confirmed offset,ota_log,P0,NOT_RUN
+AND-T-018,OTA,Image fully received,Cut station power before activation,Old slot remains bootable,power_cut_video plus boot_log,P0,NOT_RUN
+AND-T-019,OTA,Trial image fails health,Wait for watchdog,Automatic rollback is reported,boot_and_app_log,P0,NOT_RUN
+AND-T-020,Security,Modified application sends raw region command,Send request,Station rejects command,station_security_log,P0,NOT_RUN
+AND-T-021,Privacy,Configuration contains credentials,Export diagnostics,No secret full ICCID IMSI or password present,redaction_test_output,P0,NOT_RUN
+AND-T-022,Recovery,Main application unbootable,Follow USB-C guide,Station restored using authorized package,recovery_log,P0,NOT_RUN
+AND-T-023,Robustness,Screen rotation/background during OTA,Resume application,State and progress recover without duplicate activation,app_log,P1,NOT_RUN
+AND-T-024,Compatibility,Three approved Android models,Run complete commissioning,All critical tests pass per model,device_matrix,P0,NOT_RUN
+AND-T-025,Supply chain,Clean build environment,Build release twice,APK inputs versions SBOM hashes and signature recorded,build_manifest,P0,NOT_RUN
+AND-T-026,Cellular config,Two provisioned SIM slots,Read station state,"Both redacted ICCID references slot mapping active slot operator RAT and APN mode are correct",app_and_station_log,P0,NOT_RUN
+AND-T-027,Cellular config,Authorized service role and queued offline events,Request SIM1 to SIM2 switch,"Warning shown; queue preserved; BG95 performs safe shutdown; new ICCID is verified; TLS reconnects",app_modem_server_logs,P0,NOT_RUN
+AND-T-028,Cellular security,Unauthorized or stale BLE session,Request SIM or APN switch,Command rejected and active connection unchanged,app_and_station_security_log,P0,NOT_RUN
+AND-T-029,Cellular policy,Private APN profile supplied to application,Attempt validation and write,Profile is rejected before station configuration and active public profile is unchanged,app_and_station_log,P0,NOT_RUN

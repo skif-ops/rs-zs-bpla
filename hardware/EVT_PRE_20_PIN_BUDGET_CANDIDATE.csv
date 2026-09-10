@@ -1,0 +1,2 @@
+Function,Signal_count,Preferred_peripheral,Candidate_pins,Voltage_domain,Connected_device,Status,Required_check
+SUPERSEDED,0,-,-,-,-,SUPERSEDED_BY_EVT_PRE_20_PIN_MAP_REV_A,"Do not use this early candidate for schematic capture; authoritative mapping is hardware/EVT_PRE_20_PIN_MAP_REV_A.csv. Exact STM32U585VITxQ/LQFP100 review found PB12 PE1 PC4 PC5 absent and removed earlier conflicts."

@@ -1,0 +1,170 @@
+project: Dioneya_ZS_BPLA
+configuration_id: EVT-PRE-20
+baseline_version: 0.1
+baseline_date: 2026-09-08
+status: OPEN_NOT_RUN
+source_branch: evt
+source_commit: 2ec1d6dc81e3a16b7c127f1bbfe03f3945a72c45
+working_branch: evt-pre-20
+branch_isolation:
+  forbidden_direct_sources: [evt-mb]
+  forbidden_operations: [merge, cherry_pick, release_file_copy]
+  allowed_promotion_targets: [develop, main]
+  promotion_rule: reviewed_common_changes_only
+
+lot:
+  quantity: 20
+  serial_prefix: DIO-EVT-
+  serial_range: ["001", "020"]
+  allocation_status: LOCKED_CUSTOMER_RU868_ALL_20
+  lora_allocation:
+    RU868: ["001", "020"]
+    EU868: []
+  allocation_freeze_required: false
+
+environment:
+  operating_ambient_c: [-40, 70]
+  operating_range_status: LOCKED_CUSTOMER
+  electronic_component_minimum_rating_c: [-40, 85]
+  thermal_derating_required: true
+  hot_test_ambient_c: 70
+  cold_test_ambient_c: -40
+  storage_minimum_project_range_c: [-40, 70]
+  storage_final_limits_follow_selected_battery_and_material_datasheets: true
+  lifepo4_charge_below_0c: PROHIBITED_UNLESS_APPROVED_HEATER_OR_LOW_TEMP_CHARGE_SYSTEM
+  environmental_profile_id: EVT_PRE_20_ENV_40_70
+
+electronics:
+  architecture: custom_pcb
+  dev_board_in_product: false
+  mcu_family: STM32U585
+  mcu_exact_mpn: STM32U585VIT6Q
+  mcu_selection_status: SELECTED_PENDING_SCHEMATIC_AND_SAMPLE
+  mcu_package_policy: prefer_inspectable_non_BGA_for_20_unit_EVT
+  clocking:
+    policy_id: REV_A_INTERNAL_HSI_MSI_PLL_NO_HSE
+    high_speed_sources: [MSI, HSI, PLL]
+    external_hse_crystal_or_oscillator: false
+    low_speed_reference_mpn: SiT1552AI-JE-DCC-32.768D
+    low_speed_reference_hz: 32768
+    low_speed_reference_role: low_frequency_timebase_only
+    lse_exact_bypass_wiring_status: CUBEMX_AND_SCHEMATIC_REVIEW_REQUIRED
+  microphone_count: 4
+  microphone_matching: same_mpn_same_lot_preferred
+  microphone_geometry:
+    type: 3_plus_1
+    base_triangle_side_mm: 120
+    upper_offset_mm: 150
+  pcb_set:
+    - main_controller
+    - microphone_leaf_x4
+    - power_interface
+
+power:
+  battery_chemistry: LiFePO4
+  battery_nominal_voltage_v: 12.8
+  battery_capacity_ah_range: [40, 60]
+  solar_panel_w_range: [60, 80]
+  mppt_architecture: EXTERNAL_10A_LIFEPO4_MPPT_PLUS_CUSTOM_PROTECTED_INTERFACE
+  mppt_exact_mpn: RFQ_REQUIRED
+  no_sun_autonomy_target_days: 30
+  low_temperature_charge_policy: inhibit_below_0c_unless_approved_heater_or_battery_system
+
+positioning:
+  station_type: fixed
+  authoritative_position_source: configured_installation_coordinates
+  installation_coordinates_required_before_field_ready: true
+  allowed_commissioning_sources: [manual, phone_location, station_gnss_snapshot, surveyed]
+  phone_location_requires_google_services: false
+  wifi_positioning_required: false
+  gnss_position_role: integrity_monitor_and_diagnostic_not_authoritative_after_commissioning
+  server_tdoa_station_position_source: configured_installation_coordinates
+  coordinate_change_policy: physical_service_mode_plus_authorized_role_plus_audit
+  configured_position_defaults:
+    warning_distance_m: 25
+    suspect_distance_m: 75
+    gross_jump_distance_m: 250
+    warning_consecutive_fixes: 3
+    suspect_consecutive_fixes: 10
+  integrity:
+    use_receiver_spoof_flag: true
+    use_receiver_jam_flag: true
+    compare_gnss_to_configured_position: true
+    accelerometer_movement_requires_revalidation: true
+  time_trust:
+    independent_from_position_trust: true
+    gnss_pps_primary_only_when_time_trusted: true
+    holdover_reference: SiT1552AI-JE-DCC-32.768D
+    holdover_release_limit: MEASURED_DURING_EVT
+
+communications:
+  cellular:
+    role: primary
+    station_connection_direction: outbound_only
+    preferred_transport: mqtt_tls
+    preferred_ports: [443, 8883]
+    fallback_transport: https_tls
+    ordinary_sim_allowed_for_evt: true
+    public_apn_allowed_for_evt: true
+    pilot_apn_policy: public_only
+    private_apn_profile_supported_in_pilot: false
+    apn_mode_switch_supported_in_pilot: false
+    tariff_is_evt_acceptance_input: false
+    sim_architecture: dual_sim_single_standby
+    physical_nano_sim_slots: 2
+    simultaneously_active_sim_count: 1
+    pilot_operator_candidates: [MTS, MegaFon, Beeline, T2_Tele2, GLONASS_supplied_SIM]
+    static_public_ip_required: false
+    inbound_station_connection_required: false
+    store_and_forward_required: true
+  lora:
+    role: backup_event_transport
+    common_pcb: true
+    pilot_profile: RU868
+    pilot_frequency_windows_mhz: [[864.0, 865.0], [868.7, 869.2]]
+    variants:
+      - id: RU868
+        profile_status: OPEN_REGULATORY_AND_RF_VALIDATION
+      - id: EU868
+        profile_status: FUTURE_COMPATIBILITY_NOT_IN_PILOT
+  ble:
+    role: local_service_configuration_diagnostics_ota
+    soc: nRF52840
+    module_primary: Raytac_MDBT50Q-P1MV2
+    antenna: integrated_pcb
+    wifi_required: false
+    phy_required: [BLE_2M, BLE_1M, BLE_CODED_LONG_RANGE]
+    max_tx_power_dbm: 8
+    service_range_requirement: local_commissioning_and_ota
+    module_temperature_limit_c: 85
+    esp32_c3_status: SUPERSEDED_NOT_IN_REV_A
+
+mechanics:
+  acoustic_head_geometry_locked: true
+  variants:
+    - 3d_print
+    - vacuum_casting
+    - injection_molding
+  primary_evt_print_platform: FlashForge_Adventurer_5M_Pro
+  pilot_housing_allocation_status: LOCKED_CUSTOMER
+  pilot_primary_process: vacuum_casting
+  pilot_primary_quantity: 20
+  pilot_fallback_process: 3d_print
+  pilot_fallback_quantity_if_activated: 20
+  fallback_activation: customer_approved_if_vacuum_casting_unavailable
+  injection_molding_scope: source_data_and_dfm_only_no_pilot_tooling
+
+software:
+  station_firmware_status: TARGET_PORT_REQUIRED
+  server_name: Mukhoyed
+  server_targets: [Windows_11, Ubuntu_24_04]
+  android_track: separate
+  android_minimum_goal: offline_ble_setup_signed_ota_and_installation_position_commissioning
+
+release_policy:
+  qg1_completeness_required: true
+  qg2_technical_required: true
+  no_hardware_pass_without_evidence: true
+  sha256_manifest_required: true
+  sbom_required: true
+  credentials_in_repository: false

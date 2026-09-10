@@ -1,0 +1,37 @@
+profile_id: PILOT-PUBLIC-APN-EXAMPLE
+status: TEMPLATE_NO_CREDENTIALS
+sim_slot: 1
+apn_mode: PUBLIC
+pilot_policy: PUBLIC_ONLY
+tariff_is_evt_acceptance_input: false
+profile_priority: TO_BE_PROVISIONED
+operator: TO_BE_FILLED_ON_DEVICE
+apn: TO_BE_FILLED_ON_DEVICE
+authentication: none
+username_secret_ref: null
+password_secret_ref: null
+pin_secret_ref: null
+preferred_rat_order: [cat_m1, nb_iot, egprs]
+roaming_allowed: false
+attach_timeout_s: 180
+retry_backoff_s: [5, 15, 30, 60, 300, 900]
+transport:
+  primary: mqtt_tls
+  mqtt_port: 443
+  alternate_mqtt_port: 8883
+  fallback: https_tls
+  https_port: 443
+network_model:
+  outbound_only: true
+  cg_nat_supported: true
+  static_public_ip_required: false
+  operator_api_required: false
+store_and_forward:
+  enabled: true
+  preserve_event_id: true
+  preserve_sequence: true
+security:
+  tls_minimum: TLS_1_2
+  ca_bundle_ref: provisioned_secure_store
+  client_key_ref: secure_device_store
+  credentials_in_repository: false

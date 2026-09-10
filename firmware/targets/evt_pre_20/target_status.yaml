@@ -1,0 +1,135 @@
+target_id: dioneya_evt_pre_20_rev_a
+status: TARGET_PORT_REQUIRED
+mcu: STM32U585VIT6Q
+package: LQFP100_14x14
+exact_pin_database_ref: STM32U585VITxQ
+board: custom_pcb
+host_core_source: ../..
+wire_interface_release: "1.4"
+detection_schema_version: 3
+clocking:
+  policy_id: REV_A_INTERNAL_HSI_MSI_PLL_NO_HSE
+  external_hse: DISABLED_NOT_FITTED
+  high_speed_sources: [MSI, HSI, PLL]
+  low_speed_reference: SiT1552AI-JE-DCC-32.768D
+  low_speed_reference_hz: 32768
+  lse_bypass_configuration: IOC_EXTERNAL_CLOCK_SOURCE_CUBEMX_OPEN_CHECK_PENDING
+  runtime_clock_profiles: TO_DEFINE_AND_MEASURE
+  required_validation: [USB_CLOCK, PDM_SAMPLE_RATE, PPS_TIMESTAMPING, LOW_POWER_WAKE, PLL_SWITCH_RECOVERY]
+audio:
+  microphones: 4
+  microphone_mpn: T5838
+  sample_rate_hz: 32000
+  geometry_id: 1
+  base_triangle_side_mm: 120
+  upper_offset_mm: 150
+  low_power_detector: T5838_AAD
+  aad_interface_baseline: hardware/T5838_AAD_INTERFACE_REV_A.md
+  mic_harness_contacts: 6
+  mic_harness_nets: [1V8_MIC, GND, PDM_CLK, PDM_DATA_N, MIC_WAKE_N, AAD_CFG]
+  local_leaf_straps: [SELECT]
+  aad_configuration_pin_name: THSEL
+  aad_configuration_bus: AAD_CFG_SHARED_1V8
+  aad_configuration_mcu_pin: PA15
+  aad_configuration_lqfp100_pin: 77
+  aad_configuration_direction: MCU_TO_U7_TO_1V8_TO_ALL_4_THSEL
+  aad_configuration_cubemx: GPIO_OUTPUT_PENDING
+  aad_configuration_clock_requirement_hz_min: 50000
+  aad_configuration_sequence:
+    - ENABLE_1V8_MIC
+    - ENABLE_PDM_CLOCK_ABOVE_50KHZ
+    - WRITE_THSEL_ONE_WIRE_PROFILE
+    - COMPLETE_STOP_SYMBOL_AND_SETTLE
+    - DISABLE_PDM_CLOCK_FOR_AAD_D2
+    - ARM_MIC_WAKE_EXTI
+  aad_configuration_profile_verify: READBACK_NOT_AVAILABLE_USE_TIMING_AND_WAKE_SELFTEST
+  aad_threshold_profile: EVT_TUNE_REQUIRED
+  aad_false_wake_test: REQUIRED
+  aad_wake_latency_test: REQUIRED
+  aad_s0_current_measurement: REQUIRED
+  aad_cold_hot_test: REQUIRED_AT_MINUS40_AND_PLUS70
+  aad_wake_inputs: [MIC_WAKE1, MIC_WAKE2, MIC_WAKE3, MIC_WAKE4]
+  aad_wake_or: SN74LVC32APWR_at_1V8
+  aad_wake_translator: SN74AXC1T45DRLR_1V8_to_3V3
+  aad_wake_mcu_pin: PA8
+  aad_wake_lqfp100_pin: 67
+  aad_wake_cubemx: GPIO_EXTI_STOP_WAKE_PENDING
+ble:
+  soc: nRF52840
+  module: Raytac_MDBT50Q-P1MV2
+  interface: USART3_plus_enable_plus_dfu_request
+  wifi: NOT_REQUIRED
+  required_phy: [BLE_2M, BLE_1M, BLE_CODED_LONG_RANGE]
+  firmware_port: MISSING_BLOCKER
+  swd_recovery: REQUIRED_ON_FIXTURE
+  enclosure_rf_validation: REQUIRED
+positioning:
+  station_type: fixed
+  authoritative_source: configured_installation_coordinates
+  firmware_module: zs_position_trust
+  wifi_positioning: NOT_REQUIRED
+  installation_position_storage: MISSING_BLOCKER
+  installation_position_ble_commissioning: MISSING_BLOCKER
+  configured_position_required_for_field_ready: true
+  default_warning_distance_m: 25
+  default_suspect_distance_m: 75
+  default_gross_jump_distance_m: 250
+  receiver_spoof_and_jam_monitoring: REQUIRED
+  accelerometer_relocation_revalidation: REQUIRED
+  time_trust_independent: true
+  holdover_limit: MEASURE_DURING_EVT
+pinmap:
+  source: hardware/EVT_PRE_20_PIN_MAP_REV_A.csv
+  addenda: [hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv]
+  status: SOURCE_AND_GENERATED_IOC_QG1_QG2_PASS_CUBEMX_OPEN_PENDING
+  forbidden_absent_gpio: [PB12, PE1, PC4, PC5]
+  notes: exact Q-package mapping; PA8 pin67/EXTI8 aggregated T5838 WAKE; PC2 pin17/EXTI2 LoRa DIO1 per DEC-022; PB15 pin54 LORA_TXEN and PD8 pin55 LORA_RXEN fail closed LOW per DEC-023; PA15 pin77 shared THSEL/AAD_CFG output
+  exti_unique_sources: [PC2_EXTI2_LORA_DIO1, PC6_EXTI6_ACCEL_INT, PC7_EXTI7_TAMPER_IN, PA8_EXTI8_MIC_WAKE]
+target_contract:
+  status: GENERATED_SOURCE_CONTRACT_QG1_QG2_PASS
+  generator: tools/generate_evt_pre_20_target_contract.py
+  board_header: firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h
+  clock_header: firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h
+  manifest: firmware/targets/evt_pre_20/target_contract_manifest.json
+  qg1_completeness: tools/validate_evt_pre_20_target_contract.py
+  qg2_technical: tools/audit_evt_pre_20_target_technical.py
+  release_effect: NONE_TARGET_PORT_STILL_REQUIRED
+stm32_scaffold:
+  status: PINNED_STARTUP_ENGINEERING_LINKER_QG1_QG2_PASS
+  manifest: firmware/targets/evt_pre_20/stm32_scaffold_manifest.json
+  stm32cubeu5_release: v1.9.0
+  stm32cubeu5_commit: d88042df24f16799957c24f00c2b234c9e306188
+  cmsis_device_u5_commit: 624374fa1e21ca195d6f2102ac0caaa50d0ea4c8
+  startup: firmware/targets/evt_pre_20/vendor/cmsis_device_u5/startup_stm32u585xx.s
+  system: firmware/targets/evt_pre_20/vendor/cmsis_device_u5/system_stm32u5xx.c
+  linker: firmware/targets/evt_pre_20/ld/STM32U585VITXQ_ENGINEERING_FLASH.ld
+  security_scope: TRUSTZONE_DISABLED_ENGINEERING_BRINGUP_ONLY
+  qg1_completeness: tools/validate_evt_pre_20_stm32_scaffold.py
+  qg2_technical: tools/audit_evt_pre_20_stm32_scaffold_technical.py
+cubemx_preflight:
+  status: GENERATED_PINOUT_IOC_QG1_QG2_PASS_CUBEMX_OPEN_REGENERATE_REQUIRED
+  tool_version: 6.12.0
+  database_tag: STM32CubeMX-DB.6.0.120
+  database_commit: f4ec11f00e762e37ffc4020f6d4f20d225bc061d
+  contract: firmware/targets/evt_pre_20/cubemx_generation_contract.json
+  exact_ioc: firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc
+  qg1_completeness: tools/validate_evt_pre_20_cubemx_ioc.py
+  qg2_technical: tools/audit_evt_pre_20_cubemx_ioc_technical.py
+  release_effect: NONE_UNTIL_OPENED_AND_REGENERATED_WITH_LOCKED_CUBEMX
+required_target_files:
+  cubemx_ioc: GENERATED_FROM_LOCKED_CONTRACT_CUBEMX_OPEN_REGENERATE_BLOCKER
+  startup: PINNED_OFFICIAL_CMSIS_QG1_QG2_PASS
+  linker_script: ENGINEERING_FULL_FLASH_QG1_QG2_PASS_PRODUCTION_PARTITION_BLOCKER
+  hal_ll_bindings: MISSING_BLOCKER
+  board_pins: GENERATED_EXACT_REV_A_CONTRACT_QG1_QG2_PASS_CUBEMX_OPEN_PENDING
+  secure_boot: MISSING_BLOCKER
+  ota_ab: MISSING_BLOCKER
+  production_build_manifest: MISSING_BLOCKER
+release_outputs:
+  elf: NOT_BUILT
+  map: NOT_BUILT
+  bin: NOT_BUILT
+  hex: NOT_BUILT
+  sha256: NOT_BUILT
+  signature: NOT_BUILT
+do_not_release: true

@@ -1,0 +1,130 @@
+EESchema Schematic File Version 4
+LIBS:PCB-MIC-cache
+LIBS:device
+LIBS:connector_generic
+EELAYER 29 0
+EELAYER END
+$Descr A4 11693 8268
+Sheet 1 1
+Title "Dioneya EVT-PRE-20 PCB-MIC Rev.A"
+Date "2026-09-09"
+Rev "A"
+Comp "Dioneya / ZS-BPLA"
+Comment1 "T5838 PDM + AAD WAKE + THSEL"
+Comment2 "NOT FOR MANUFACTURE until Review A/B"
+$EndDescr
+$Comp
+L T5838 MK1
+U 1 1 65000001
+P 6000 3300
+F 0 "MK1" H 6000 3750 50 0000 C CNN
+F 1 "MMICT5838-00-012" H 6000 2850 50 0000 C CNN
+F 2 "Dioneya:T5838_MMICT5838-00-012" H 6000 2750 50 0001 C CNN
+F 3 "DS-000383" H 6000 2650 50 0001 C CNN
+	1    6000 3300
+	1    0    0    -1
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x06 J1
+U 1 1 65000002
+P 2700 3300
+F 0 "J1" H 2618 3717 50 0000 C CNN
+F 1 "Molex 5040500691" H 2618 3626 50 0000 C CNN
+F 2 "Dioneya:Molex_5040500691_PicoLock_1.50mm_1x06_RA" H 2700 3300 50 0001 C CNN
+F 3 "Molex 504050 series" H 2700 3300 50 0001 C CNN
+	1    2700 3300
+	-1   0    0    -1
+$EndComp
+$Comp
+L Device:C C1
+U 1 1 65000003
+P 7300 3350
+F 0 "C1" H 7415 3396 50 0000 L CNN
+F 1 "100nF X7R" H 7415 3305 50 0000 L CNN
+F 2 "Capacitor_SMD:C_0402_1005Metric" H 7338 3200 50 0001 C CNN
+F 3 "" H 7300 3350 50 0001 C CNN
+	1    7300 3350
+	1    0    0    -1
+$EndComp
+$Comp
+L Device:R R1
+U 1 1 65000004
+P 4300 3400
+F 0 "R1" V 4093 3400 50 0000 C CNN
+F 1 "0R EVT_SI_TUNE" V 4184 3400 50 0000 C CNN
+F 2 "Resistor_SMD:R_0402_1005Metric" V 4230 3400 50 0001 C CNN
+F 3 "" H 4300 3400 50 0001 C CNN
+	1    4300 3400
+	0    1    1    0
+$EndComp
+Text Label 3100 3100 0 50 ~ 0
+1V8_MIC
+Text Label 3100 3200 0 50 ~ 0
+GND
+Text Label 3100 3300 0 50 ~ 0
+PDM_CLK
+Text Label 3100 3400 0 50 ~ 0
+PDM_DATA
+Text Label 3100 3500 0 50 ~ 0
+MIC_WAKE
+Text Label 3100 3600 0 50 ~ 0
+AAD_CFG
+Wire Wire Line
+	2900 3100 3500 3100
+Wire Wire Line
+	2900 3200 3500 3200
+Wire Wire Line
+	2900 3300 3500 3300
+Wire Wire Line
+	2900 3400 4150 3400
+Wire Wire Line
+	2900 3500 3500 3500
+Wire Wire Line
+	2900 3600 3500 3600
+Text Label 4600 3400 0 50 ~ 0
+PDM_DATA_MIC
+Wire Wire Line
+	4450 3400 5000 3400
+Text Label 5550 3050 2 50 ~ 0
+PDM_DATA_MIC
+Text Label 5550 3150 2 50 ~ 0
+GND
+Text Label 5550 3250 2 50 ~ 0
+GND
+Text Label 5550 3350 2 50 ~ 0
+MIC_WAKE
+Text Label 5550 3450 2 50 ~ 0
+AAD_CFG
+Text Label 5550 3550 2 50 ~ 0
+PDM_CLK
+Text Label 6550 3050 0 50 ~ 0
+1V8_MIC
+Wire Wire Line
+	5650 3050 5550 3050
+Wire Wire Line
+	5650 3150 5550 3150
+Wire Wire Line
+	5650 3250 5550 3250
+Wire Wire Line
+	5650 3350 5550 3350
+Wire Wire Line
+	5650 3450 5550 3450
+Wire Wire Line
+	5650 3550 5550 3550
+Wire Wire Line
+	6350 3050 6550 3050
+Text Label 7300 3100 1 50 ~ 0
+1V8_MIC
+Text Label 7300 3600 3 50 ~ 0
+GND
+Wire Wire Line
+	7300 3200 7300 3100
+Wire Wire Line
+	7300 3500 7300 3600
+Text Notes 2450 4050 0 50 ~ 0
+J1 pinout: 1=1V8_MIC 2=GND 3=PDM_CLK 4=PDM_DATA 5=MIC_WAKE 6=AAD_CFG/THSEL
+Text Notes 5250 4050 0 50 ~ 0
+T5838 SELECT fixed GND. THSEL programmable through AAD_CFG; WAKE preserved.
+Text Notes 3600 3650 0 50 ~ 0
+R1 = 0R for initial EVT; footprint retained for controlled data-line SI tuning after harness measurements.
+$EndSCHEMATC

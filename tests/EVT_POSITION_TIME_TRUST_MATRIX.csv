@@ -1,0 +1,19 @@
+Test_ID,Area,Population,Method,Pass_Criteria,Evidence,Status
+EVT-POS-001,Commissioning,20_of_20,Set installation coordinates manually over authenticated BLE then read back,Coordinates version source accuracy and lock match commissioning record,app log + station config dump + record,PLANNED
+EVT-POS-002,Commissioning,3_phones,Set coordinates from Android framework location without Google Play Services,Valid coordinates written and read back on Huawei/no-GMS and two reference phones,screen/log + record,PLANNED
+EVT-POS-003,Commissioning,5_units,Set coordinates from station GNSS snapshot then explicitly confirm,Configured coordinates freeze and no longer follow live GNSS,config dump + telemetry,PLANNED
+EVT-POS-004,Validation,20_of_20,Attempt invalid latitude longitude altitude accuracy and unlocked position,All invalid writes rejected atomically and old configuration retained,BLE trace + app log,PLANNED
+EVT-POS-005,Persistence,20_of_20,Power cycle after coordinate lock,Installation coordinates version/hash/lock retained exactly,before-after dump,PLANNED
+EVT-POS-006,GNSS_drift,5_units,Inject/simulate GNSS offset below 25 m,Position trust remains CONFIGURED_OK and effective position remains configured,telemetry + server record,PLANNED
+EVT-POS-007,GNSS_drift,5_units,Sustain GNSS offset above dynamic warning threshold for required persistence,CONFIGURED_WARN asserted; effective position remains configured,telemetry + server record,PLANNED
+EVT-POS-008,GNSS_drift,5_units,Sustain GNSS offset above dynamic suspect threshold for required persistence,CONFIGURED_SUSPECT asserted; effective position remains configured,telemetry + server record,PLANNED
+EVT-POS-009,GNSS_jump,5_units,Inject single GNSS position jump above 250 m,Immediate CONFIGURED_SUSPECT without geometry change,telemetry + server record,PLANNED
+EVT-POS-010,Spoof_flag,5_units,Inject receiver spoof indication,Immediate position suspect and security event; configured position remains effective,UBX trace + telemetry,PLANNED
+EVT-POS-011,Jamming,5_units,Inject/ simulate jamming or RF interference state,Jam/RF integrity fault recorded without automatic coordinate rewrite,UBX-MON-RF + telemetry,PLANNED
+EVT-POS-012,Movement,5_units,Physically move/tilt commissioned unit enough to trigger movement/tamper,REVALIDATION_REQUIRED and old configured coordinates retained until re-commission,sensor log + telemetry,PLANNED
+EVT-POS-013,Access_control,5_units,Attempt coordinate change by remote MQTT/HTTPS command,Command rejected; coordinates unchanged; audit/security event recorded,server + station logs,PLANNED
+EVT-POS-014,Recommission,5_units,Enter physical service mode and authorized role then change coordinates,New version/hash created and self-test required before FIELD_READY,app + station + server audit,PLANNED
+EVT-TIME-001,Time_integrity,5_units,Inject GNSS time jump/spoof while position remains plausible,TIME_SUSPECT asserted independently of position trust,PPS/raw time log,PLANNED
+EVT-TIME-002,Holdover,5_units,Remove trusted GNSS/PPS after stable discipline,Station enters HOLDOVER using SiT1552 and records elapsed holdover,PPS/RTC trace,PLANNED
+EVT-TIME-003,TDOA_gate,3_stations,Run synchronized event while one station exceeds measured holdover release limit,TDOA excludes/degrades untrusted-time station while detection/classification continues,server fusion evidence,PLANNED
+EVT-POS-015,Server_geometry,3_stations,Drift observed GNSS positions while keeping configured installation coordinates fixed,Mukhoyed fusion/TDOA uses configured station coordinates exclusively,server registry + localization trace,PLANNED

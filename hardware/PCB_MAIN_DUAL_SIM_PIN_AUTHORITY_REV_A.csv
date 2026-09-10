@@ -1,0 +1,56 @@
+RefDes,MPN,Package,Pin,Pin_Name,Direction,RevA_Net,Disposition,Required_Network,Authority,Notes
+U13,TS3A27518EPWR,TSSOP-24_PW,1,NC2,BIDIR,SIM1_RST_1V8,FUNCTION_LOCKED,Slot-1 reset branch with populated 0 Ohm series tuning position and U14 protection,TI_SCDS260F_RevF,IN1 LOW selects this NC path
+U13,TS3A27518EPWR,TSSOP-24_PW,2,NC1,BIDIR,SIM1_VDD_1V8,FUNCTION_LOCKED,One of three matched parallel slot-1 VDD paths; join at U13 and connector endpoints,TI_SCDS260F_RevF,Three parallel channels reduce worst-case path resistance
+U13,TS3A27518EPWR,TSSOP-24_PW,3,N.C.,NC,NC,DNU_NO_CONNECT,No electrical connection,TI_SCDS260F_RevF,TI permits this package pin to remain open
+U13,TS3A27518EPWR,TSSOP-24_PW,4,COM1,BIDIR,CELL_USIM_VDD_1V8,FUNCTION_LOCKED,One of three matched parallel U8 USIM_VDD paths; join at U8 endpoint,TI_SCDS260F_RevF,Channel 1 is the first VDD path
+U13,TS3A27518EPWR,TSSOP-24_PW,5,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance connection to GND_MODEM,TI_SCDS260F_RevF,Common reference for U13 and both SIM cards
+U13,TS3A27518EPWR,TSSOP-24_PW,6,COM2,BIDIR,CELL_USIM_RST_1V8,FUNCTION_LOCKED,Common reset path from U8 pin 44,TI_SCDS260F_RevF,Channel 2 switches RST
+U13,TS3A27518EPWR,TSSOP-24_PW,7,COM3,BIDIR,CELL_USIM_CLK_1V8,FUNCTION_LOCKED,Common clock path from U8 pin 46,TI_SCDS260F_RevF,Channel 3 switches CLK
+U13,TS3A27518EPWR,TSSOP-24_PW,8,VCC,POWER,3V3_DIGITAL,SUPPLY_LOCKED,100 nF local bypass to GND_MODEM adjacent to pin 8,TI_SCDS260F_RevF,3.3 V supply minimizes switch resistance and precedes modem analog signals
+U13,TS3A27518EPWR,TSSOP-24_PW,9,COM4,BIDIR,CELL_USIM_VDD_1V8,FUNCTION_LOCKED,One of three matched parallel U8 USIM_VDD paths; join at U8 endpoint,TI_SCDS260F_RevF,Channel 4 is the second VDD path
+U13,TS3A27518EPWR,TSSOP-24_PW,10,COM5,BIDIR,CELL_USIM_DATA_1V8,FUNCTION_LOCKED,Common bidirectional data path from U8 pin 45,TI_SCDS260F_RevF,Channel 5 switches DATA
+U13,TS3A27518EPWR,TSSOP-24_PW,11,NO1,BIDIR,SIM2_VDD_1V8,FUNCTION_LOCKED,One of three matched parallel slot-2 VDD paths; join at U13 and connector endpoints,TI_SCDS260F_RevF,IN1 HIGH selects this NO path
+U13,TS3A27518EPWR,TSSOP-24_PW,12,COM6,BIDIR,CELL_USIM_VDD_1V8,FUNCTION_LOCKED,One of three matched parallel U8 USIM_VDD paths; join at U8 endpoint,TI_SCDS260F_RevF,Channel 6 is the third VDD path
+U13,TS3A27518EPWR,TSSOP-24_PW,13,NO2,BIDIR,SIM2_RST_1V8,FUNCTION_LOCKED,Slot-2 reset branch with populated 0 Ohm series tuning position and U15 protection,TI_SCDS260F_RevF,IN1 HIGH selects this NO path
+U13,TS3A27518EPWR,TSSOP-24_PW,14,IN2,INPUT,SIM_MUX_SEL,CONTROL_LOCKED,Direct tie to pin 24 IN1 plus 100 kOhm pull-down to GND_MODEM,TI_SCDS260F_RevF,Controls channels 4 through 6; LOW selects SIM1 and HIGH selects SIM2
+U13,TS3A27518EPWR,TSSOP-24_PW,15,NO3,BIDIR,SIM2_CLK_1V8,FUNCTION_LOCKED,Slot-2 clock branch with populated 0 Ohm series tuning position and U15 protection,TI_SCDS260F_RevF,IN1 HIGH selects this NO path
+U13,TS3A27518EPWR,TSSOP-24_PW,16,NO6,BIDIR,SIM2_VDD_1V8,FUNCTION_LOCKED,One of three matched parallel slot-2 VDD paths; join at U13 and connector endpoints,TI_SCDS260F_RevF,IN2 HIGH selects this NO path
+U13,TS3A27518EPWR,TSSOP-24_PW,17,NO4,BIDIR,SIM2_VDD_1V8,FUNCTION_LOCKED,One of three matched parallel slot-2 VDD paths; join at U13 and connector endpoints,TI_SCDS260F_RevF,IN2 HIGH selects this NO path
+U13,TS3A27518EPWR,TSSOP-24_PW,18,NO5,BIDIR,SIM2_DATA_1V8,FUNCTION_LOCKED,Slot-2 data branch with populated 0 Ohm series tuning position and U15 protection,TI_SCDS260F_RevF,IN2 HIGH selects this NO path
+U13,TS3A27518EPWR,TSSOP-24_PW,19,NC5,BIDIR,SIM1_DATA_1V8,FUNCTION_LOCKED,Slot-1 data branch with populated 0 Ohm series tuning position and U14 protection,TI_SCDS260F_RevF,IN2 LOW selects this NC path
+U13,TS3A27518EPWR,TSSOP-24_PW,20,EN,INPUT,U13_EN_N,CONTROL_ACTIVE_LOW,47 kOhm pull-up to 3V3_DIGITAL; Q3 open collector pulls LOW only for explicit enable,TI_SCDS260F_RevF,HIGH places every switch path in High-Z
+U13,TS3A27518EPWR,TSSOP-24_PW,21,NC4,BIDIR,SIM1_VDD_1V8,FUNCTION_LOCKED,One of three matched parallel slot-1 VDD paths; join at U13 and connector endpoints,TI_SCDS260F_RevF,IN2 LOW selects this NC path
+U13,TS3A27518EPWR,TSSOP-24_PW,22,NC6,BIDIR,SIM1_VDD_1V8,FUNCTION_LOCKED,One of three matched parallel slot-1 VDD paths; join at U13 and connector endpoints,TI_SCDS260F_RevF,IN2 LOW selects this NC path
+U13,TS3A27518EPWR,TSSOP-24_PW,23,NC3,BIDIR,SIM1_CLK_1V8,FUNCTION_LOCKED,Slot-1 clock branch with populated 0 Ohm series tuning position and U14 protection,TI_SCDS260F_RevF,IN1 LOW selects this NC path
+U13,TS3A27518EPWR,TSSOP-24_PW,24,IN1,INPUT,SIM_MUX_SEL,CONTROL_LOCKED,Direct tie to pin 14 IN2 plus 100 kOhm pull-down to GND_MODEM,TI_SCDS260F_RevF,Controls channels 1 through 3; LOW selects SIM1 and HIGH selects SIM2
+U14,ESDALC6V1-5P6,SOT666_1.6x1.6mm,1,I/O1,BIDIR,SIM1_VDD_1V8,ESD_PROTECTION_LOCKED,Place connector-side with shortest return to pin 2 GND_MODEM,ST_ESDALC6V1-5P6_Rev3,5 V standoff and 15 pF maximum capacitance
+U14,ESDALC6V1-5P6,SOT666_1.6x1.6mm,2,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-inductance ground return with adjacent via,ST_ESDALC6V1-5P6_Rev3,Common anode for all five protected lines
+U14,ESDALC6V1-5P6,SOT666_1.6x1.6mm,3,I/O2,BIDIR,SIM1_RST_1V8,ESD_PROTECTION_LOCKED,Place connector-side after the series tuning position,ST_ESDALC6V1-5P6_Rev3,Slot-1 reset protection
+U14,ESDALC6V1-5P6,SOT666_1.6x1.6mm,4,I/O3,BIDIR,SIM1_CLK_1V8,ESD_PROTECTION_LOCKED,Place connector-side after the series tuning position,ST_ESDALC6V1-5P6_Rev3,Slot-1 clock protection
+U14,ESDALC6V1-5P6,SOT666_1.6x1.6mm,5,I/O4,BIDIR,SIM1_DATA_1V8,ESD_PROTECTION_LOCKED,Place connector-side after the series tuning position,ST_ESDALC6V1-5P6_Rev3,Slot-1 data protection
+U14,ESDALC6V1-5P6,SOT666_1.6x1.6mm,6,I/O5,INPUT,SIM1_DET,ESD_PROTECTION_LOCKED,Place connector-side before the MCU detect filter,ST_ESDALC6V1-5P6_Rev3,Slot-1 card-detect protection
+U15,ESDALC6V1-5P6,SOT666_1.6x1.6mm,1,I/O1,BIDIR,SIM2_VDD_1V8,ESD_PROTECTION_LOCKED,Place connector-side with shortest return to pin 2 GND_MODEM,ST_ESDALC6V1-5P6_Rev3,5 V standoff and 15 pF maximum capacitance
+U15,ESDALC6V1-5P6,SOT666_1.6x1.6mm,2,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-inductance ground return with adjacent via,ST_ESDALC6V1-5P6_Rev3,Common anode for all five protected lines
+U15,ESDALC6V1-5P6,SOT666_1.6x1.6mm,3,I/O2,BIDIR,SIM2_RST_1V8,ESD_PROTECTION_LOCKED,Place connector-side after the series tuning position,ST_ESDALC6V1-5P6_Rev3,Slot-2 reset protection
+U15,ESDALC6V1-5P6,SOT666_1.6x1.6mm,4,I/O3,BIDIR,SIM2_CLK_1V8,ESD_PROTECTION_LOCKED,Place connector-side after the series tuning position,ST_ESDALC6V1-5P6_Rev3,Slot-2 clock protection
+U15,ESDALC6V1-5P6,SOT666_1.6x1.6mm,5,I/O4,BIDIR,SIM2_DATA_1V8,ESD_PROTECTION_LOCKED,Place connector-side after the series tuning position,ST_ESDALC6V1-5P6_Rev3,Slot-2 data protection
+U15,ESDALC6V1-5P6,SOT666_1.6x1.6mm,6,I/O5,INPUT,SIM2_DET,ESD_PROTECTION_LOCKED,Place connector-side before the MCU detect filter,ST_ESDALC6V1-5P6_Rev3,Slot-2 card-detect protection
+J6,2336582-1,TE_NanoSIM_H1.37,1,C1_VCC,POWER,SIM1_VDD_1V8,CONTACT_LOCKED,100 nF local bypass to GND_MODEM at connector; three U13 VDD channels converge before this contact,TE_C-2336582_A2,4FF contact C1
+J6,2336582-1,TE_NanoSIM_H1.37,2,C2_RST,BIDIR,SIM1_RST_1V8,CONTACT_LOCKED,Protected by U14 with populated 0 Ohm series tuning position,TE_C-2336582_A2,4FF contact C2
+J6,2336582-1,TE_NanoSIM_H1.37,3,C3_CLK,INPUT,SIM1_CLK_1V8,CONTACT_LOCKED,Protected by U14 with populated 0 Ohm series tuning position,TE_C-2336582_A2,4FF contact C3
+J6,2336582-1,TE_NanoSIM_H1.37,4,C5_GND,POWER,GND_MODEM,GROUND_LOCKED,Direct wide ground connection at least 0.5 mm equivalent width,TE_C-2336582_A2,4FF contact C5; card ground is never switched
+J6,2336582-1,TE_NanoSIM_H1.37,5,C6_VPP,NC,NC,DNU_NO_CONNECT,No electrical connection,TE_C-2336582_A2,4FF contact C6 VPP is unused
+J6,2336582-1,TE_NanoSIM_H1.37,6,C7_IO,BIDIR,SIM1_DATA_1V8,CONTACT_LOCKED,Protected by U14 with populated 0 Ohm series tuning position,TE_C-2336582_A2,4FF contact C7
+J6,2336582-1,TE_NanoSIM_H1.37,7,CD,CONTACT,SIM1_DET,CONTACT_LOCKED,10 kOhm pull-up to 3V3_DIGITAL plus 10 nF to GND_MODEM; firmware debounce at least 20 ms,TE_C-2336582_A2,No card is LOW because CD is shorted to grounded shell; inserted card opens switch and reads HIGH
+J6,2336582-1,TE_NanoSIM_H1.37,SHIELD,SHELL,GND,GND_MODEM,SHIELD_GROUND_LOCKED,All shell and card-detect return solder features connect directly to GND_MODEM,TE_C-2336582_A2,Exact anchor geometry and service orientation remain MAIN-AUTH-011
+J7,2336582-1,TE_NanoSIM_H1.37,1,C1_VCC,POWER,SIM2_VDD_1V8,CONTACT_LOCKED,100 nF local bypass to GND_MODEM at connector; three U13 VDD channels converge before this contact,TE_C-2336582_A2,4FF contact C1
+J7,2336582-1,TE_NanoSIM_H1.37,2,C2_RST,BIDIR,SIM2_RST_1V8,CONTACT_LOCKED,Protected by U15 with populated 0 Ohm series tuning position,TE_C-2336582_A2,4FF contact C2
+J7,2336582-1,TE_NanoSIM_H1.37,3,C3_CLK,INPUT,SIM2_CLK_1V8,CONTACT_LOCKED,Protected by U15 with populated 0 Ohm series tuning position,TE_C-2336582_A2,4FF contact C3
+J7,2336582-1,TE_NanoSIM_H1.37,4,C5_GND,POWER,GND_MODEM,GROUND_LOCKED,Direct wide ground connection at least 0.5 mm equivalent width,TE_C-2336582_A2,4FF contact C5; card ground is never switched
+J7,2336582-1,TE_NanoSIM_H1.37,5,C6_VPP,NC,NC,DNU_NO_CONNECT,No electrical connection,TE_C-2336582_A2,4FF contact C6 VPP is unused
+J7,2336582-1,TE_NanoSIM_H1.37,6,C7_IO,BIDIR,SIM2_DATA_1V8,CONTACT_LOCKED,Protected by U15 with populated 0 Ohm series tuning position,TE_C-2336582_A2,4FF contact C7
+J7,2336582-1,TE_NanoSIM_H1.37,7,CD,CONTACT,SIM2_DET,CONTACT_LOCKED,10 kOhm pull-up to 3V3_DIGITAL plus 10 nF to GND_MODEM; firmware debounce at least 20 ms,TE_C-2336582_A2,No card is LOW because CD is shorted to grounded shell; inserted card opens switch and reads HIGH
+J7,2336582-1,TE_NanoSIM_H1.37,SHIELD,SHELL,GND,GND_MODEM,SHIELD_GROUND_LOCKED,All shell and card-detect return solder features connect directly to GND_MODEM,TE_C-2336582_A2,Exact anchor geometry and service orientation remain MAIN-AUTH-011
+Q3,"MMBT3904,215",SOT23,1,B,INPUT,SIM_MUX_EN_B,FUNCTION_LOCKED,10 kOhm series from SIM_MUX_EN plus 100 kOhm base-emitter pull-down,Nexperia_MMBT3904_v5,STM32 PE2 HIGH requests U13 enable
+Q3,"MMBT3904,215",SOT23,2,E,POWER,GND_MODEM,GROUND_LOCKED,Direct to GND_MODEM,Nexperia_MMBT3904_v5,Emitter references U13 control ground
+Q3,"MMBT3904,215",SOT23,3,C,OPEN_COLLECTOR,U13_EN_N,FUNCTION_LOCKED,Direct to U13 pin 20 with 47 kOhm pull-up to 3V3_DIGITAL and test point,Nexperia_MMBT3904_v5,Q3 off makes EN HIGH and all U13 channels High-Z; Q3 on makes EN LOW and enables selected paths

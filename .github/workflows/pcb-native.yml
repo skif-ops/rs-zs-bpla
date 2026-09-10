@@ -1,0 +1,276 @@
+name: PCB Native Gate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, develop, evt-pre-20, "integration/**"]
+    paths:
+      - "hardware/kicad/**"
+      - "hardware/*FREEZE_REV_A.csv"
+      - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
+      - "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv"
+      - "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_STORAGE_SENSOR_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_CELLULAR_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_DUAL_SIM_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md"
+      - "hardware/DUAL_SIM_SINGLE_STANDBY.md"
+      - "hardware/T5838_AAD_INTERFACE_REV_A.md"
+      - "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
+      - "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv"
+      - "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+      - "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
+      - "hardware/PCB_PWR_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
+      - "hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md"
+      - "hardware/POWER_DESIGN_BASELINE_REV_A.json"
+      - "hardware/POWER_DESIGN_CALC_REV_A.md"
+      - "mechanics/common/OPEN_DIMENSIONS.csv"
+      - "tools/kicad_native_gate.py"
+      - "tools/audit_pcb_main_capture_authority_rev_a.py"
+      - "tools/verify_pcb_main_mcu_pin_authority_rev_a.py"
+      - "tools/verify_pcb_main_storage_sensor_authority_rev_a.py"
+      - "tools/verify_pcb_main_audio_logic_authority_rev_a.py"
+      - "tools/verify_pcb_main_cellular_authority_rev_a.py"
+      - "tools/verify_pcb_main_dual_sim_authority_rev_a.py"
+      - "tools/verify_pcb_main_gnss_authority_rev_a.py"
+      - "tools/verify_pcb_main_lora_authority_rev_a.py"
+      - "tools/audit_pcb_pwr_design_rev_a.py"
+      - "tools/audit_pcb_pwr_preschematic_rev_a.py"
+      - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
+      - "tools/generate_pcb_pwr_schematic_rev_a.py"
+      - "tools/finalize_pcb_pwr_symbol_types_rev_a.py"
+      - "tools/finalize_pcb_pwr_schematic_completeness_rev_a.py"
+      - "tools/finalize_pcb_pwr_erc_power_model_rev_a.py"
+      - "tools/materialize_pcb_pwr_libraries_rev_a.py"
+      - "tools/audit_pcb_pwr_native_schematic_rev_a.py"
+      - "tools/audit_pcb_pwr_native_completeness_rev_a.py"
+      - "tools/generate_pcb_mic_clean_rev_a.py"
+      - "tools/run_pcb_mic_no_zonefill.py"
+      - "tools/finalize_pcb_mic_mechanical_rev_a.py"
+      - "tools/finalize_pcb_mic_molex_rev_a.py"
+      - "tools/generate_pcb_mic_schematic.py"
+      - "tools/inspect_pcb_mic_reference_cad.py"
+      - "tools/materialize_pcb_mic_libraries.py"
+      - "tools/export_pcb_mic_footprints.py"
+      - "tools/audit_pcb_mic_native_geometry.py"
+      - "tools/audit_pcb_mic_mechanical_rev_a.py"
+      - "tools/audit_pcb_mic_molex_rev_a.py"
+      - ".github/workflows/pcb-native.yml"
+  pull_request:
+    branches: [main, develop, evt-pre-20]
+    paths:
+      - "hardware/kicad/**"
+      - "hardware/*FREEZE_REV_A.csv"
+      - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
+      - "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv"
+      - "hardware/PCB_MAIN_*AUTHORITY_REV_A.*"
+      - "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+      - "hardware/PCB_PWR_*.csv"
+      - "hardware/PCB_PWR_*.md"
+      - "hardware/POWER_*.json"
+      - "hardware/POWER_*.md"
+      - "mechanics/common/OPEN_DIMENSIONS.csv"
+      - "tools/*pcb*_rev_a.py"
+      - "tools/kicad_native_gate.py"
+      - ".github/workflows/pcb-native.yml"
+
+jobs:
+  native-kicad:
+    name: Native KiCad per-board ERC DRC and fabrication export
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Engineering preflight
+        run: python tools/kicad_native_gate.py
+      - name: Independent PCB-MAIN capture-authority audit
+        run: |
+          python tools/audit_pcb_main_capture_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/capture_authority_audit.json
+      - name: Second independent PCB-MAIN U1 electrical control
+        run: |
+          python tools/verify_pcb_main_mcu_pin_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/mcu_pin_authority_verification.json
+      - name: Second independent PCB-MAIN storage and sensor control
+        run: |
+          python tools/verify_pcb_main_storage_sensor_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/storage_sensor_authority_verification.json
+      - name: Second independent PCB-MAIN audio and AAD logic control
+        run: |
+          python tools/verify_pcb_main_audio_logic_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/audio_logic_authority_verification.json
+      - name: Second independent PCB-MAIN cellular modem control
+        run: |
+          python tools/verify_pcb_main_cellular_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/cellular_authority_verification.json
+      - name: Second independent PCB-MAIN dual-SIM control
+        run: |
+          python tools/verify_pcb_main_dual_sim_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/dual_sim_authority_verification.json
+      - name: Second independent PCB-MAIN GNSS control
+        run: |
+          python tools/verify_pcb_main_gnss_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/gnss_authority_verification.json
+      - name: Second independent PCB-MAIN LoRa control
+        run: |
+          python tools/verify_pcb_main_lora_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/lora_authority_verification.json
+      - name: Independent PCB-PWR design and Review-A authority audits
+        run: |
+          python tools/audit_pcb_pwr_design_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/design_audit.json
+          python tools/audit_pcb_pwr_preschematic_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/preschematic_audit.json
+          python tools/audit_pcb_pwr_capture_authority_rev_a.py
+      - name: Install official KiCad 9 stable toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          retry() {
+            local max=3
+            local attempt=1
+            while true; do
+              if "$@"; then
+                return 0
+              fi
+              if [ "$attempt" -ge "$max" ]; then
+                echo "command failed after $attempt attempts: $*" >&2
+                return 1
+              fi
+              echo "transient package/repository failure; retry $attempt/$max for: $*" >&2
+              sleep $((attempt * 15))
+              attempt=$((attempt + 1))
+            done
+          }
+          while IFS= read -r chrome_source; do
+            sudo mv "$chrome_source" "${chrome_source}.disabled"
+          done < <(grep -Rsl 'dl.google.com/linux/chrome-stable' /etc/apt/sources.list.d || true)
+          retry sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
+          retry sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
+          retry sudo apt-get update
+          retry sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
+          kicad-cli version
+          kicad-cli pcb drc --help
+          kicad-cli sch erc --help
+          /usr/bin/python3 - <<'PY'
+          import pcbnew
+          print("PCBNEW_PYTHON_AVAILABLE", pcbnew.GetBuildVersion())
+          PY
+      - name: Import PCB-MIC secondary reference CAD
+        run: |
+          python -m pip install --disable-pip-version-check easyeda2kicad kiutils
+          mkdir -p artifacts/kicad-reference/PCB-MIC
+          ROOT="$PWD/artifacts/kicad-reference/PCB-MIC"
+          easyeda2kicad --full --lcsc_id=C7230692 --output "$ROOT/t5838_ref" --project-relative
+          easyeda2kicad --full --lcsc_id=C563981 --output "$ROOT/molex_5040500691_ref" --project-relative
+          find artifacts/kicad-reference/PCB-MIC -maxdepth 4 -type f -print | sort
+          printf '%s\n' 'REFERENCE_ONLY_NOT_RELEASED: EasyEDA/LCSC CAD must be checked against TDK/Molex manufacturer data before use.' > artifacts/kicad-reference/PCB-MIC/REFERENCE_STATUS.txt
+      - name: Inspect secondary reference footprints
+        run: |
+          /usr/bin/python3 tools/inspect_pcb_mic_reference_cad.py \
+            --t5838-root artifacts/kicad-reference/PCB-MIC/t5838_ref.pretty \
+            --molex-root artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.pretty \
+            --output artifacts/kicad-reference/PCB-MIC/reference_geometry_report.json
+      - name: Materialize native PCB-PWR schematic
+        run: |
+          python tools/generate_pcb_pwr_schematic_rev_a.py \
+            --output hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/finalize_pcb_pwr_symbol_types_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/finalize_pcb_pwr_schematic_completeness_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/finalize_pcb_pwr_erc_power_model_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/materialize_pcb_pwr_libraries_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
+          test -s hardware/kicad/native/PCB-PWR/sym-lib-table
+          test -s hardware/kicad/native/PCB-PWR/fp-lib-table
+          test -s hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.kicad_sym
+          python tools/audit_pcb_pwr_native_schematic_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_native_completeness_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+      - name: Materialize native PCB-MIC board and schematic
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p hardware/kicad/native/PCB-MIC
+          /usr/bin/python3 tools/run_pcb_mic_no_zonefill.py \
+            --t5838-root artifacts/kicad-reference/PCB-MIC/t5838_ref.pretty \
+            --molex-root artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.pretty \
+            --reference-report artifacts/kicad-reference/PCB-MIC/reference_geometry_report.json \
+            --output hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          /usr/bin/python3 tools/finalize_pcb_mic_mechanical_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          /usr/bin/python3 tools/finalize_pcb_mic_molex_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          python tools/generate_pcb_mic_schematic.py \
+            --t5838-symbol artifacts/kicad-reference/PCB-MIC/t5838_ref.kicad_sym \
+            --molex-symbol artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.kicad_sym \
+            --output hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
+          /usr/bin/python3 tools/export_pcb_mic_footprints.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          python tools/materialize_pcb_mic_libraries.py \
+            --schematic hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch \
+            --t5838-symbol artifacts/kicad-reference/PCB-MIC/t5838_ref.kicad_sym \
+            --molex-symbol artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.kicad_sym
+          echo '--- materialized native source set ---'
+          find hardware/kicad/native/PCB-MIC -maxdepth 3 -type f -print -exec file {} \; | sort
+          test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
+          test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
+          test -s hardware/kicad/native/PCB-MIC/fabrication_metadata.json
+          test -s hardware/kicad/native/PCB-MIC/sym-lib-table
+          test -s hardware/kicad/native/PCB-MIC/fp-lib-table
+      - name: Independent PCB-MIC native geometry audit
+        run: |
+          /usr/bin/python3 tools/audit_pcb_mic_native_geometry.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+      - name: Independent PCB-MIC Molex manufacturer-pattern audit
+        run: |
+          /usr/bin/python3 tools/audit_pcb_mic_molex_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+      - name: Independent PCB-MIC mechanical audit
+        run: |
+          /usr/bin/python3 tools/audit_pcb_mic_mechanical_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+      - name: ERC DRC and fabrication export for every available board
+        run: python tools/kicad_native_gate.py --run-cli
+      - name: Upload native gate reference and generated source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evt-pre-20-kicad-native-gate
+          path: |
+            artifacts/kicad-native/
+            artifacts/kicad-reference/
+            hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+            hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
+            hardware/kicad/native/PCB-PWR/sym-lib-table
+            hardware/kicad/native/PCB-PWR/fp-lib-table
+            hardware/kicad/native/PCB-PWR/libs/
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
+            hardware/kicad/native/PCB-MIC/fabrication_metadata.json
+            hardware/kicad/native/PCB-MIC/sym-lib-table
+            hardware/kicad/native/PCB-MIC/fp-lib-table
+            hardware/kicad/native/PCB-MIC/libs/
+            hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md
+            hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json
+          if-no-files-found: warn

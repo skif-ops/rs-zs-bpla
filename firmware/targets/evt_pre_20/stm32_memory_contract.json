@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20",
+  "target": "STM32U585VIT6Q",
+  "package": "LQFP100_14x14",
+  "security_profile": "TRUSTZONE_DISABLED_ENGINEERING_BRINGUP_ONLY",
+  "source_evidence": [
+    {
+      "document": "ST DS13086 Rev 10",
+      "url": "https://www.st.com/resource/en/datasheet/stm32u585ai.pdf"
+    },
+    {
+      "repository": "STMicroelectronics/STM32CubeU5",
+      "release": "v1.9.0",
+      "commit": "d88042df24f16799957c24f00c2b234c9e306188"
+    },
+    {
+      "repository": "STMicroelectronics/cmsis-device-u5",
+      "commit": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8",
+      "header": "Include/stm32u585xx.h"
+    }
+  ],
+  "regions": [
+    {"name": "FLASH", "origin": "0x08000000", "length_bytes": 2097152, "use": "ENGINEERING_SINGLE_IMAGE"},
+    {"name": "SRAM1", "origin": "0x20000000", "length_bytes": 196608, "use": "RAM123_LINK_REGION"},
+    {"name": "SRAM2", "origin": "0x20030000", "length_bytes": 65536, "use": "RAM123_LINK_REGION"},
+    {"name": "SRAM3", "origin": "0x20040000", "length_bytes": 524288, "use": "RAM123_LINK_REGION"},
+    {"name": "SRAM4", "origin": "0x28000000", "length_bytes": 16384, "use": "EXPLICIT_RETAINED_SECTION"},
+    {"name": "BKPSRAM", "length_bytes": 2048, "use": "NOT_LINKED_RESERVED_FOR_RTC_BACKUP"}
+  ],
+  "combined_link_regions": [
+    {"name": "RAM123", "origin": "0x20000000", "length_bytes": 786432},
+    {"name": "SRAM4", "origin": "0x28000000", "length_bytes": 16384}
+  ],
+  "release_gate": {
+    "status": "BLOCKED",
+    "reason": "Engineering full-flash layout must be replaced by reviewed secure boot and A/B partitions"
+  }
+}

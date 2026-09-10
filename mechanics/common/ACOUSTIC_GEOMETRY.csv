@@ -1,0 +1,5 @@
+Mic_ID,X_mm,Y_mm,Z_mm,Role,Status,Note
+MIC1,0.000000,69.282032,0.000000,lower_reference,LOCKED,Circumradius 120 divided by sqrt 3
+MIC2,-60.000000,-34.641016,0.000000,lower,LOCKED,Distance to MIC1 and MIC3 equals 120 mm
+MIC3,60.000000,-34.641016,0.000000,lower,LOCKED,Distance to MIC1 and MIC2 equals 120 mm
+MIC4,0.000000,0.000000,150.000000,upper,LOCKED,150 mm above lower triangle center

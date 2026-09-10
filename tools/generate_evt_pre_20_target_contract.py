@@ -1,0 +1,602 @@
+#!/usr/bin/env python3
+"""Generate the EVT-PRE-20 STM32 target contract from locked Rev.A inputs."""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import hashlib
+import json
+import re
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+PIN_SOURCES = (
+    "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
+    "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
+)
+HEADER_PATH = "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h"
+CLOCK_HEADER_PATH = "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h"
+IOC_PATH = "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc"
+MANIFEST_PATH = "firmware/targets/evt_pre_20/target_contract_manifest.json"
+CUBEMX_CONTRACT_PATH = "firmware/targets/evt_pre_20/cubemx_generation_contract.json"
+CUBEMX_DB_LOCK_PATH = "firmware/targets/evt_pre_20/vendor/stm32cubemx_db.lock.json"
+
+TARGET_ID = "dioneya_evt_pre_20_rev_a"
+MCU = "STM32U585VIT6Q"
+PACKAGE = "LQFP100_14x14"
+PIN_DATABASE = "STM32U585VITxQ"
+CLOCK_POLICY = "REV_A_INTERNAL_HSI_MSI_PLL_NO_HSE"
+LOW_SPEED_REFERENCE = "SiT1552AI-JE-DCC-32.768D"
+LOW_SPEED_REFERENCE_HZ = 32768
+CUBEMX_VERSION = "6.12.0"
+CUBEMX_DB_VERSION = "DB.6.0.120"
+CUBEMX_DB_TAG = "STM32CubeMX-DB.6.0.120"
+CUBEMX_DB_COMMIT = "f4ec11f00e762e37ffc4020f6d4f20d225bc061d"
+CUBEMX_DB_DEVICE_SHA256 = "4349055dfd06e6eb2dce1a440c44a995ad7c924e28435ede119a7d4bb10f556d"
+
+CUBEMX_IPS = (
+    "CORTEX_M33_NS",
+    "I2C2",
+    "LPUART1",
+    "MDF1",
+    "NVIC",
+    "OCTOSPI1",
+    "OCTOSPIM",
+    "PWR",
+    "RCC",
+    "SDMMC1",
+    "SPI1",
+    "SYS",
+    "TIM2",
+    "USART1",
+    "USART2",
+    "USART3",
+    "USB_OTG_FS",
+)
+
+EXTI_NETS = {
+    "LORA_DIO1": 2,
+    "ACCEL_INT": 6,
+    "TAMPER_IN": 7,
+    "MIC_WAKE": 8,
+}
+
+SAFE_PIN_STATES = {
+    "LORA_TXEN": "GPIO_PIN_RESET",
+    "LORA_RXEN": "GPIO_PIN_RESET",
+    "LORA_RESET_N": "GPIO_PIN_SET",
+    "EN_MODEM": "GPIO_PIN_RESET",
+    "EN_AUX": "GPIO_PIN_RESET",
+    "SIM_MUX_EN": "GPIO_PIN_RESET",
+    "BLE_EN": "GPIO_PIN_RESET",
+    "BLE_DFU_REQ": "GPIO_PIN_SET",
+}
+
+PIN_NAME_OVERRIDES = {
+    "PC14": "PC14-OSC32_IN (PC14)",
+    "PC15": "PC15-OSC32_OUT (PC15)",
+    "PA13": "PA13 (JTMS/SWDIO)",
+    "PA14": "PA14 (JTCK/SWCLK)",
+    "PA15": "PA15 (JTDI)",
+    "PH3": "PH3-BOOT0",
+}
+
+DIRECTION_ENUM = {
+    "IN": "EVT_PRE_20_DIRECTION_IN",
+    "OUT": "EVT_PRE_20_DIRECTION_OUT",
+    "BIDIR": "EVT_PRE_20_DIRECTION_BIDIR",
+    "OUT_OD": "EVT_PRE_20_DIRECTION_OUT_OD",
+    "BIDIR_OD": "EVT_PRE_20_DIRECTION_BIDIR_OD",
+}
+SPECIAL_AF = {"GPIO": -1, "RCC": -2, "SYS": -3}
+
+
+def sha256_bytes(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
+
+
+def sha256_file(relative: str) -> str:
+    return sha256_bytes((ROOT / relative).read_bytes())
+
+
+def c_string(value: str) -> str:
+    return json.dumps(value, ensure_ascii=False)
+
+
+def read_rows() -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    for relative in PIN_SOURCES:
+        with (ROOT / relative).open(encoding="utf-8-sig", newline="") as source:
+            rows.extend(csv.DictReader(source))
+    return rows
+
+
+def parse_gpio(value: str) -> tuple[str, int]:
+    match = re.fullmatch(r"P([A-H])(\d{1,2})", value)
+    if not match:
+        raise ValueError(f"invalid MCU GPIO: {value}")
+    pin = int(match.group(2))
+    if pin > 15:
+        raise ValueError(f"invalid MCU GPIO index: {value}")
+    return match.group(1), pin
+
+
+def parse_af(value: str) -> int:
+    match = re.fullmatch(r"AF(\d{1,2})", value)
+    if match:
+        return int(match.group(1))
+    if value in SPECIAL_AF:
+        return SPECIAL_AF[value]
+    raise ValueError(f"invalid alternate-function marker: {value}")
+
+
+def validate_inputs(rows: list[dict[str, str]]) -> None:
+    required_columns = {
+        "Net",
+        "Function",
+        "MCU_Pin",
+        "LQFP100_Pin",
+        "CubeMX_Signal",
+        "AF",
+        "Direction_at_MCU",
+    }
+    if len(rows) != 67:
+        raise ValueError(f"expected 67 locked pin assignments, got {len(rows)}")
+    for column in required_columns:
+        if any(not row.get(column) for row in rows):
+            raise ValueError(f"missing required pin-map value: {column}")
+    for key in ("Net", "MCU_Pin", "LQFP100_Pin"):
+        values = [row[key] for row in rows]
+        duplicates = sorted({value for value in values if values.count(value) > 1})
+        if duplicates:
+            raise ValueError(f"duplicate {key}: {duplicates}")
+    for row in rows:
+        parse_gpio(row["MCU_Pin"])
+        package_pin = int(row["LQFP100_Pin"])
+        if not 1 <= package_pin <= 100:
+            raise ValueError(f"invalid LQFP100 pin: {package_pin}")
+        parse_af(row["AF"])
+        if row["Direction_at_MCU"] not in DIRECTION_ENUM:
+            raise ValueError(f"invalid direction: {row['Direction_at_MCU']}")
+
+
+def render_board_header(rows: list[dict[str, str]]) -> str:
+    output = [
+        "/* Generated by tools/generate_evt_pre_20_target_contract.py; do not edit. */",
+        "#ifndef EVT_PRE_20_BOARD_PINS_H",
+        "#define EVT_PRE_20_BOARD_PINS_H",
+        "",
+        "#include <stddef.h>",
+        "#include <stdint.h>",
+        "",
+        f"#define EVT_PRE_20_TARGET_ID {c_string(TARGET_ID)}",
+        f"#define EVT_PRE_20_MCU_MPN {c_string(MCU)}",
+        f"#define EVT_PRE_20_MCU_PACKAGE {c_string(PACKAGE)}",
+        f"#define EVT_PRE_20_PIN_DATABASE {c_string(PIN_DATABASE)}",
+        f"#define EVT_PRE_20_PIN_ASSIGNMENT_COUNT {len(rows)}u",
+        "#define EVT_PRE_20_AF_GPIO (-1)",
+        "#define EVT_PRE_20_AF_RCC (-2)",
+        "#define EVT_PRE_20_AF_SYS (-3)",
+        "",
+        "typedef enum {",
+        "  EVT_PRE_20_DIRECTION_IN = 0,",
+        "  EVT_PRE_20_DIRECTION_OUT,",
+        "  EVT_PRE_20_DIRECTION_BIDIR,",
+        "  EVT_PRE_20_DIRECTION_OUT_OD,",
+        "  EVT_PRE_20_DIRECTION_BIDIR_OD",
+        "} evt_pre_20_pin_direction_t;",
+        "",
+        "typedef struct {",
+        "  const char *net;",
+        "  const char *function;",
+        "  char gpio_port;",
+        "  uint8_t gpio_pin;",
+        "  uint8_t lqfp100_pin;",
+        "  const char *cubemx_signal;",
+        "  int8_t alternate_function;",
+        "  evt_pre_20_pin_direction_t direction;",
+        "} evt_pre_20_pin_contract_t;",
+        "",
+        "static const evt_pre_20_pin_contract_t evt_pre_20_pin_contract[] = {",
+    ]
+    for row in rows:
+        port, gpio_pin = parse_gpio(row["MCU_Pin"])
+        alternate_function = parse_af(row["AF"])
+        output.append(
+            "  {"
+            f"{c_string(row['Net'])}, {c_string(row['Function'])}, '{port}', {gpio_pin}u, "
+            f"{int(row['LQFP100_Pin'])}u, {c_string(row['CubeMX_Signal'])}, "
+            f"{alternate_function}, {DIRECTION_ENUM[row['Direction_at_MCU']]}"
+            "},"
+        )
+    output.extend(
+        [
+            "};",
+            "",
+            "_Static_assert(",
+            "    sizeof(evt_pre_20_pin_contract) / sizeof(evt_pre_20_pin_contract[0]) ==",
+            "        EVT_PRE_20_PIN_ASSIGNMENT_COUNT,",
+            '    "EVT-PRE-20 pin contract count mismatch");',
+            "",
+            "#endif",
+            "",
+        ]
+    )
+    return "\n".join(output)
+
+
+def render_clock_header() -> str:
+    return f"""/* Generated by tools/generate_evt_pre_20_target_contract.py; do not edit. */
+#ifndef EVT_PRE_20_CLOCK_POLICY_H
+#define EVT_PRE_20_CLOCK_POLICY_H
+
+#include <stdint.h>
+
+#define EVT_PRE_20_CLOCK_POLICY_ID {c_string(CLOCK_POLICY)}
+#define EVT_PRE_20_EXTERNAL_HSE_ALLOWED 0
+#define EVT_PRE_20_LOW_SPEED_REFERENCE {c_string(LOW_SPEED_REFERENCE)}
+#define EVT_PRE_20_LOW_SPEED_REFERENCE_HZ UINT32_C({LOW_SPEED_REFERENCE_HZ})
+#define EVT_PRE_20_RUNTIME_CLOCK_FREQUENCIES_RELEASED 0
+#define EVT_PRE_20_RUNTIME_CLOCK_PROFILE_COUNT 5u
+
+typedef enum {{
+  EVT_PRE_20_CLOCK_PROFILE_S0_SLEEP = 0,
+  EVT_PRE_20_CLOCK_PROFILE_S1_LISTEN,
+  EVT_PRE_20_CLOCK_PROFILE_S2_DSP,
+  EVT_PRE_20_CLOCK_PROFILE_S3_COMMS,
+  EVT_PRE_20_CLOCK_PROFILE_S4_SERVICE
+}} evt_pre_20_clock_profile_t;
+
+_Static_assert(EVT_PRE_20_EXTERNAL_HSE_ALLOWED == 0,
+               "EVT-PRE-20 Rev.A must not depend on external HSE");
+_Static_assert(EVT_PRE_20_LOW_SPEED_REFERENCE_HZ == UINT32_C(32768),
+               "EVT-PRE-20 low-speed reference mismatch");
+
+#endif
+"""
+
+
+def cubemx_pin_name(mcu_pin: str) -> str:
+    return PIN_NAME_OVERRIDES.get(mcu_pin, mcu_pin)
+
+
+def cubemx_key(pin_name: str) -> str:
+    return pin_name.replace(" ", r"\ ")
+
+
+def cubemx_signal(row: dict[str, str]) -> str:
+    if row["Net"] in EXTI_NETS:
+        return f"GPXTI{EXTI_NETS[row['Net']]}"
+    if row["CubeMX_Signal"] == "GPIO":
+        return "GPIO_Input" if row["Direction_at_MCU"] == "IN" else "GPIO_Output"
+    if row["CubeMX_Signal"] == "TIM2_CH1":
+        return "S_TIM2_CH1"
+    return row["CubeMX_Signal"]
+
+
+def cubemx_mode(row: dict[str, str]) -> str | None:
+    signal = row["CubeMX_Signal"]
+    if signal == "MDF1_CCK0":
+        return "MOD_MDF_CCK0"
+    if signal.startswith("OCTOSPIM_P1_"):
+        return "O1_P1_" + signal.removeprefix("OCTOSPIM_P1_")
+    if signal.startswith("SDMMC1_"):
+        return "SD_4_bits_Wide_bus"
+    if signal.startswith(("USART1_", "USART2_", "USART3_", "LPUART1_")):
+        return "Asynchronous"
+    if signal == "SPI1_NSS":
+        return "NSS_Signal_Hard_Output"
+    if signal.startswith("SPI1_"):
+        return "Full_Duplex_Master"
+    if signal.startswith("I2C2_"):
+        return "I2C"
+    if signal == "TIM2_CH1":
+        return "Input_Capture1_from_TI1"
+    if signal.startswith("USB_OTG_FS_"):
+        return "Device_Only"
+    if signal.startswith("DEBUG_"):
+        return "Trace_Asynchronous_SW"
+    if signal == "RCC_OSC32_IN":
+        return "LSE-External-Clock-Source"
+    return None
+
+
+def render_ioc(rows: list[dict[str, str]]) -> str:
+    ordered = sorted(rows, key=lambda row: int(row["LQFP100_Pin"]))
+    virtual_pins = (
+        "VP_PWR_VS_DBSignals",
+        "VP_PWR_VS_LPOM",
+        "VP_PWR_VS_SECSignals",
+        "VP_SYS_VS_Systick",
+    )
+    output = [
+        "#MicroXplorer Configuration settings - do not modify",
+        "CAD.formats=",
+        "CAD.pinconfig=",
+        "CAD.provider=",
+        "CORTEX_M33_NS.userName=CORTEX_M33",
+        "File.Version=6",
+        "GPIO.groupedBy=Group By Peripherals",
+        "KeepUserPlacement=false",
+        f"Mcu.CPN={MCU}",
+        "Mcu.ContextProject=TrustZoneDisabled",
+        "Mcu.Family=STM32U5",
+    ]
+    output.extend(f"Mcu.IP{index}={name}" for index, name in enumerate(CUBEMX_IPS))
+    output.extend(
+        [
+            f"Mcu.IPNb={len(CUBEMX_IPS)}",
+            f"Mcu.Name={PIN_DATABASE}",
+            "Mcu.Package=LQFP100",
+        ]
+    )
+    all_pins = [cubemx_pin_name(row["MCU_Pin"]) for row in ordered] + list(virtual_pins)
+    output.extend(f"Mcu.Pin{index}={name}" for index, name in enumerate(all_pins))
+    output.extend(
+        [
+            f"Mcu.PinsNb={len(all_pins)}",
+            "Mcu.ThirdPartyNb=0",
+            "Mcu.UserConstants=",
+            f"Mcu.UserName={PIN_DATABASE}",
+            f"MxCube.Version={CUBEMX_VERSION}",
+            f"MxDb.Version={CUBEMX_DB_VERSION}",
+        ]
+    )
+
+    irq_names = (
+        "EXTI2_IRQn",
+        "EXTI6_IRQn",
+        "EXTI7_IRQn",
+        "EXTI8_IRQn",
+        "I2C2_ER_IRQn",
+        "I2C2_EV_IRQn",
+        "LPUART1_IRQn",
+        "MDF1_FLT0_IRQn",
+        "MDF1_FLT1_IRQn",
+        "MDF1_FLT2_IRQn",
+        "MDF1_FLT3_IRQn",
+        "OCTOSPI1_IRQn",
+        "OTG_FS_IRQn",
+        "SDMMC1_IRQn",
+        "SPI1_IRQn",
+        "TIM2_IRQn",
+        "USART1_IRQn",
+        "USART2_IRQn",
+        "USART3_IRQn",
+    )
+    output.extend(
+        f"NVIC.{irq}=true\\:0\\:0\\:false\\:false\\:true\\:false\\:true\\:true"
+        for irq in irq_names
+    )
+    output.extend(
+        [
+            "NVIC.ForceEnableDMAVector=true",
+            "NVIC.PriorityGroup=NVIC_PRIORITYGROUP_4",
+        ]
+    )
+
+    for row in ordered:
+        pin_key = cubemx_key(cubemx_pin_name(row["MCU_Pin"]))
+        parameters = ["GPIO_Label"]
+        if row["Net"] in SAFE_PIN_STATES:
+            parameters.append("PinState")
+        if row["Direction_at_MCU"] == "OUT_OD":
+            parameters.append("GPIO_OType")
+        output.append(f"{pin_key}.GPIOParameters={','.join(parameters)}")
+        output.append(f"{pin_key}.GPIO_Label={row['Net']}")
+        if row["Net"] in SAFE_PIN_STATES:
+            output.append(f"{pin_key}.PinState={SAFE_PIN_STATES[row['Net']]}")
+        if row["Direction_at_MCU"] == "OUT_OD":
+            output.append(f"{pin_key}.GPIO_OType=GPIO_MODE_OUTPUT_OD")
+        output.append(f"{pin_key}.Locked=true")
+        mode = cubemx_mode(row)
+        if mode is not None:
+            output.append(f"{pin_key}.Mode={mode}")
+        output.append(f"{pin_key}.Signal={cubemx_signal(row)}")
+
+    output.extend(
+        [
+            "PinOutPanel.RotationAngle=0",
+            "ProjectManager.AskForMigrate=false",
+            "ProjectManager.BackupPrevious=true",
+            "ProjectManager.CompilerLinker=GCC",
+            "ProjectManager.CompilerOptimize=6",
+            "ProjectManager.ComputerToolchain=false",
+            "ProjectManager.CoupleFile=false",
+            "ProjectManager.DeletePrevious=false",
+            f"ProjectManager.DeviceId={PIN_DATABASE}",
+            "ProjectManager.FreePins=false",
+            "ProjectManager.HalAssertFull=false",
+            "ProjectManager.HeapSize=0x400",
+            "ProjectManager.KeepUserCode=true",
+            "ProjectManager.LastFirmware=false",
+            "ProjectManager.LibraryCopy=1",
+            "ProjectManager.MainLocation=Core/Src",
+            "ProjectManager.NoMain=false",
+            "ProjectManager.ProjectBuild=false",
+            f"ProjectManager.ProjectFileName={Path(IOC_PATH).name}",
+            f"ProjectManager.ProjectName={TARGET_ID}",
+            "ProjectManager.RegisterCallBack=",
+            "ProjectManager.StackSize=0x2000",
+            "ProjectManager.TargetToolchain=STM32CubeIDE",
+            "ProjectManager.UnderRoot=true",
+            (
+                "ProjectManager.functionlistsort="
+                "1-MX_GPIO_Init-GPIO-false-HAL-true,"
+                "2-SystemClock_Config-RCC-false-HAL-false,"
+                "3-MX_MDF1_Init-MDF1-false-HAL-true,"
+                "4-MX_OCTOSPI1_Init-OCTOSPI1-false-HAL-true,"
+                "5-MX_SDMMC1_SD_Init-SDMMC1-false-HAL-true,"
+                "6-MX_SPI1_Init-SPI1-false-HAL-true,"
+                "7-MX_I2C2_Init-I2C2-false-HAL-true,"
+                "8-MX_TIM2_Init-TIM2-false-HAL-true,"
+                "9-MX_USART1_UART_Init-USART1-false-HAL-true,"
+                "10-MX_USART2_UART_Init-USART2-false-HAL-true,"
+                "11-MX_USART3_UART_Init-USART3-false-HAL-true,"
+                "12-MX_LPUART1_UART_Init-LPUART1-false-HAL-true,"
+                "13-MX_USB_OTG_FS_PCD_Init-USB_OTG_FS-false-HAL-true"
+            ),
+            "RCC.AHBFreq_Value=4000000",
+            "RCC.APB1Freq_Value=4000000",
+            "RCC.APB2Freq_Value=4000000",
+            "RCC.APB3Freq_Value=4000000",
+            "RCC.CortexFreq_Value=4000000",
+            "RCC.HCLKFreq_Value=4000000",
+            "RCC.LSE_VALUE=32768",
+            "RCC.MSI_VALUE=4000000",
+            "RCC.SYSCLKFreq_VALUE=4000000",
+            "RCC.SYSCLKSource=RCC_SYSCLKSOURCE_MSI",
+        ]
+    )
+    for net, exti_line in EXTI_NETS.items():
+        output.append(f"SH.GPXTI{exti_line}.0=GPIO_EXTI{exti_line}")
+        output.append(f"SH.GPXTI{exti_line}.ConfNb=1")
+    output.extend(
+        [
+            "SH.S_TIM2_CH1.0=TIM2_CH1,Input_Capture1_from_TI1",
+            "SH.S_TIM2_CH1.ConfNb=1",
+            "I2C2.IPParameters=",
+            "LPUART1.IPParameters=VirtualMode-Asynchronous",
+            "LPUART1.VirtualMode-Asynchronous=VM_ASYNC",
+            "SPI1.DataSize=SPI_DATASIZE_8BIT",
+            "SPI1.Direction=SPI_DIRECTION_2LINES",
+            "SPI1.IPParameters=VirtualType,Mode,Direction,DataSize,VirtualNSS",
+            "SPI1.Mode=SPI_MODE_MASTER",
+            "SPI1.VirtualNSS=VM_NSSHARD",
+            "SPI1.VirtualType=VM_MASTER",
+            "TIM2.Channel-Input_Capture1_from_TI1=TIM_CHANNEL_1",
+            "TIM2.IPParameters=Channel-Input_Capture1_from_TI1",
+            "USART1.IPParameters=VirtualMode-Asynchronous",
+            "USART1.VirtualMode-Asynchronous=VM_ASYNC",
+            "USART2.IPParameters=VirtualMode-Asynchronous",
+            "USART2.VirtualMode-Asynchronous=VM_ASYNC",
+            "USART3.IPParameters=VirtualMode-Asynchronous",
+            "USART3.VirtualMode-Asynchronous=VM_ASYNC",
+            "USB_OTG_FS.IPParameters=VirtualMode",
+            "USB_OTG_FS.VirtualMode=Device_Only",
+            "VP_PWR_VS_DBSignals.Mode=DisableDeadBatterySignals",
+            "VP_PWR_VS_DBSignals.Signal=PWR_VS_DBSignals",
+            "VP_PWR_VS_LPOM.Mode=PowerOptimisation",
+            "VP_PWR_VS_LPOM.Signal=PWR_VS_LPOM",
+            "VP_PWR_VS_SECSignals.Mode=Security/Privilege",
+            "VP_PWR_VS_SECSignals.Signal=PWR_VS_SECSignals",
+            "VP_SYS_VS_Systick.Mode=SysTick",
+            "VP_SYS_VS_Systick.Signal=SYS_VS_Systick",
+            "board=custom",
+            "",
+        ]
+    )
+    return "\n".join(output)
+
+
+def render_manifest(board_header: bytes, clock_header: bytes, ioc: bytes) -> str:
+    manifest = {
+        "schema_version": 1,
+        "configuration": "EVT-PRE-20",
+        "target": {
+            "target_id": TARGET_ID,
+            "mcu": MCU,
+            "package": PACKAGE,
+            "exact_pin_database_ref": PIN_DATABASE,
+        },
+        "source_inputs": [
+            {"path": relative, "sha256": sha256_file(relative)}
+            for relative in (
+                *PIN_SOURCES,
+                "hardware/CLOCKING_REV_A.md",
+                "firmware/targets/evt_pre_20/target_status.yaml",
+                CUBEMX_CONTRACT_PATH,
+                CUBEMX_DB_LOCK_PATH,
+            )
+        ],
+        "generated_outputs": [
+            {"path": HEADER_PATH, "sha256": sha256_bytes(board_header)},
+            {"path": CLOCK_HEADER_PATH, "sha256": sha256_bytes(clock_header)},
+            {"path": IOC_PATH, "sha256": sha256_bytes(ioc)},
+        ],
+        "pin_assignment_count": 67,
+        "clock_policy": {
+            "policy_id": CLOCK_POLICY,
+            "external_hse_allowed": False,
+            "low_speed_reference": LOW_SPEED_REFERENCE,
+            "low_speed_reference_hz": LOW_SPEED_REFERENCE_HZ,
+            "runtime_frequencies_released": False,
+        },
+        "cubemx": {
+            "status": "GENERATED_PINOUT_CANDIDATE_OPEN_REGENERATE_REQUIRED",
+            "tool_version": CUBEMX_VERSION,
+            "database_version": CUBEMX_DB_VERSION,
+            "database_tag": CUBEMX_DB_TAG,
+            "database_commit": CUBEMX_DB_COMMIT,
+            "database_device_sha256": CUBEMX_DB_DEVICE_SHA256,
+            "exti_assignments": {
+                "LORA_DIO1": "PC2/EXTI2",
+                "ACCEL_INT": "PC6/EXTI6",
+                "TAMPER_IN": "PC7/EXTI7",
+                "MIC_WAKE": "PA8/EXTI8",
+            },
+        },
+        "quality_gates": {
+            "qg1_completeness": "tools/validate_evt_pre_20_target_contract.py",
+            "qg2_technical": "tools/audit_evt_pre_20_target_technical.py",
+        },
+        "release_gate": {
+            "status": "BLOCKED",
+            "blockers": [
+                "CUBEMX_OPEN_REGENERATE_MISSING",
+                "CLOCK_PWR_PERIPHERAL_RUNTIME_REVIEW_MISSING",
+                "HAL_LL_BINDINGS_MISSING",
+                "SECURE_BOOT_MISSING",
+                "OTA_AB_MISSING",
+                "PRODUCTION_BUILD_MANIFEST_MISSING",
+                "TARGET_HARDWARE_VALIDATION_MISSING",
+            ],
+        },
+    }
+    return json.dumps(manifest, indent=2, ensure_ascii=False) + "\n"
+
+
+def expected_outputs() -> dict[str, str]:
+    rows = read_rows()
+    validate_inputs(rows)
+    board = render_board_header(rows).encode("utf-8")
+    clock = render_clock_header().encode("utf-8")
+    ioc = render_ioc(rows).encode("utf-8")
+    return {
+        HEADER_PATH: board.decode("utf-8"),
+        CLOCK_HEADER_PATH: clock.decode("utf-8"),
+        IOC_PATH: ioc.decode("utf-8"),
+        MANIFEST_PATH: render_manifest(board, clock, ioc),
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--check", action="store_true", help="fail if committed outputs are stale")
+    args = parser.parse_args()
+
+    outputs = expected_outputs()
+    stale: list[str] = []
+    for relative, expected in outputs.items():
+        path = ROOT / relative
+        if args.check:
+            if not path.is_file() or path.read_text(encoding="utf-8") != expected:
+                stale.append(relative)
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(expected, encoding="utf-8")
+
+    if stale:
+        print("EVT-PRE-20 target contract generation check: FAIL")
+        for relative in stale:
+            print(f"- stale or missing: {relative}")
+        return 1
+    action = "check" if args.check else "generation"
+    print(f"EVT-PRE-20 target contract {action}: PASS ({len(read_rows())} pin assignments)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

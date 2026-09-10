@@ -1,0 +1,18 @@
+ID,Subsystem,Parameter,Unit,Required_input,Owner,Status,Blocks
+DIM-001,PCB-MAIN,assembled envelope LxWxH,mm,Frozen PCB STEP,EE,OPEN,All enclosure variants
+DIM-002,PCB-MAIN,mounting holes and keepouts,mm,Frozen PCB drawing,EE,OPEN,Standoffs and service cover
+DIM-003,PCB-PWR,assembled envelope and terminal zones,mm,Frozen PCB STEP,EE,OPEN,Power enclosure
+DIM-004,PCB-MIC,outline port and mounting pattern,mm,"Rev.A 24x22x1.0; acoustic NPTH D0.8 at X12.0 Y16.65; H1/H2 NPTH D2.2 at X4.0/X20.0 Y16.65",EE_ME,CLOSED,Mic pods
+DIM-005,Battery,pack envelope and mass,mm_kg,Selected 40-60 Ah SKU,PROCUREMENT,OPEN,Power enclosure and mast load
+DIM-006,Battery,BMS leads fuse and service clearance,mm,Pack drawing plus sample,EE_ME,OPEN,Power enclosure
+DIM-007,MPPT,module envelope terminals heat and mounting,mm,Selected 10 A SKU,PROCUREMENT,OPEN,Power enclosure
+DIM-008,Solar,panel dimensions mass cable and bracket loads,mm_kg,Selected 60-80 W SKU,PROCUREMENT,OPEN,External bracket
+DIM-009,RF,three antenna connectors cable bend radius and separation,mm,Selected antenna set,RF,OPEN,Electronics enclosure
+DIM-010,Cable glands,thread cable OD and wrench clearance,mm,Selected IP gland MPN,ME,OPEN,All enclosure variants
+DIM-011,Service,USB-C dual SIM microSD SWD access,mm,Connector freeze and workflow,EE_ME,OPEN,Service cover
+DIM-012,Acoustics,membrane stack and compression,mm,Selected membrane plus acoustic test,ACOUSTICS,OPEN,Mic pods
+DIM-013,Mast,mount diameter and wind load,mm_N,Customer installation input,SYSTEM,OPEN,Mast clamps
+DIM-014,Environment,operating ambient temperature,C,"DEC-019: -40..+70 C",SYSTEM,CLOSED,Material component and thermal qualification
+DIM-014S,Environment,storage and transport temperature,C,Selected battery materials seals and transport requirement,SYSTEM,OPEN,Storage transport qualification
+DIM-015,Environment,UV salt fog chemical exposure,class,Customer site requirement,SYSTEM,OPEN,Material and coating
+DIM-016,Labels,serial region QR plate envelope,mm,Label technology and content,CM,OPEN,External surfaces

@@ -1,4 +1,4 @@
-"""Pydantic schemas for ZS-BPLA station protocol v1.3."""
+"""Pydantic schemas for ZS-BPLA station protocol v1.5."""
 from __future__ import annotations
 
 from enum import IntEnum
@@ -42,6 +42,21 @@ class SpecificType(IntEnum):
 
 DecisionStatus = Literal["UNKNOWN", "CANDIDATE", "PROVISIONAL", "STABLE", "UNSUPPORTED"]
 MotionHint = Literal["UNKNOWN", "APPROACH", "PASSING", "RECEDING"]
+PositionSource = Literal["gnss_live", "configured_install"]
+PositionTrustState = Literal[
+    "UNCONFIGURED",
+    "CONFIGURED_OK",
+    "CONFIGURED_WARN",
+    "CONFIGURED_SUSPECT",
+    "REVALIDATION_REQUIRED",
+]
+TimeTrustState = Literal[
+    "UNKNOWN",
+    "GNSS_TIME_TRUSTED",
+    "HOLDOVER",
+    "GNSS_TIME_SUSPECT",
+    "UNSYNCED",
+]
 
 
 class StationPosition(BaseModel):
@@ -50,6 +65,7 @@ class StationPosition(BaseModel):
     alt_dm: int
     pos_accuracy_m: float = 20.0
     altitude_source: Literal["gnss_msl", "configured_msl", "unknown"] = "gnss_msl"
+    position_source: PositionSource = "gnss_live"
 
     @property
     def lat(self) -> float:
@@ -72,6 +88,13 @@ class GnssStatus(BaseModel):
     expected_time_error_us: int = 1_000_000
     jam: bool = False
     spoof: bool = False
+    position_delta_m: int = Field(default=0, ge=0)
+    position_warn: bool = False
+    position_suspect: bool = False
+    time_suspect: bool = False
+    time_holdover: bool = False
+    position_trust: PositionTrustState = "UNCONFIGURED"
+    time_trust: TimeTrustState = "UNKNOWN"
 
 
 class Classification(BaseModel):
@@ -192,10 +215,30 @@ class PowerStatus(BaseModel):
     battery_mv: int = 0
     solar_mv: int = 0
     temperature_c10: int = 200
+    battery_bus_mv: int | None = None
+    battery_current_ma: int | None = None
+    battery_power_mw: int | None = None
+    monitor_status: int | None = Field(default=None, ge=0, le=255)
 
     @property
     def temperature_c(self) -> float:
         return self.temperature_c10 / 10.0
+
+    @property
+    def battery_bus_v(self) -> float | None:
+        return None if self.battery_bus_mv is None else self.battery_bus_mv / 1000.0
+
+    @property
+    def battery_current_a(self) -> float | None:
+        return None if self.battery_current_ma is None else self.battery_current_ma / 1000.0
+
+    @property
+    def battery_power_w(self) -> float | None:
+        return None if self.battery_power_mw is None else self.battery_power_mw / 1000.0
+
+    @property
+    def monitor_valid(self) -> bool:
+        return self.monitor_status == 0
 
 
 class RouteStatus(BaseModel):
@@ -245,11 +288,44 @@ class DetectionMessage(BaseModel):
         return [float(v) for v in value]
 
 
+class FeatureUpdateMessage(BaseModel):
+    schema_ver: int = 1
+    station_id: int
+    seq_no: int
+    boot_id: int = 0
+    event_id: int
+    event_time_us: int
+    features: list[float]
+    detector_profile: Literal["piston", "reactive", "generic"] = "generic"
+
+    @field_validator("features")
+    @classmethod
+    def validate_features(cls, value: list[float]) -> list[float]:
+        if len(value) != FEATURE_COUNT:
+            raise ValueError(f"features must contain exactly {FEATURE_COUNT} values")
+        return [float(v) for v in value]
+
+
+class OnlineTypeStatusMessage(BaseModel):
+    station_id: int
+    event_id: int
+    elapsed_seconds: float = Field(default=0.0, ge=0.0)
+    best_label: str = "UNKNOWN"
+    confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    margin: float = 0.0
+    status: str = "unknown"
+    type_lock_allowed: bool = False
+    first_type_hypothesis_seconds: float | None = None
+    research_stable_seconds: float | None = None
+    model_version: str = "unknown"
+
+
 class HeartbeatMessage(BaseModel):
     station_id: int
     time_us: int
     station: StationPosition
     gnss: GnssStatus = Field(default_factory=GnssStatus)
+    gnss_observed: StationPosition | None = None
     power: PowerStatus = Field(default_factory=PowerStatus)
     route: RouteStatus = Field(default_factory=RouteStatus)
     firmware_ver: str = "0.0.0"
@@ -267,7 +343,17 @@ class SecurityEventMessage(BaseModel):
     event_id: int
     event_time_us: int
     station: StationPosition
-    reason: Literal["case_open", "movement", "tilt", "power_loss", "other"]
+    reason: Literal[
+        "case_open",
+        "movement",
+        "tilt",
+        "power_loss",
+        "gnss_spoof",
+        "gnss_jam",
+        "position_drift",
+        "time_integrity",
+        "other",
+    ]
     power: PowerStatus = Field(default_factory=PowerStatus)
     route: RouteStatus = Field(default_factory=RouteStatus)
 
@@ -299,6 +385,14 @@ class TargetEstimate(BaseModel):
     horizontal_error_m: float | None = None
     vertical_error_m: float | None = None
     localization_method: str = "insufficient_geometry"
+    localization_mode: Literal[
+        "SINGLE_DOA",
+        "TWO_STATION_COARSE",
+        "HYBRID_3_2D5D",
+        "FULL_3D",
+        "CORRIDOR",
+    ] = "SINGLE_DOA"
+    geometry_quality: Literal["invalid", "poor", "acceptable", "good"] = "invalid"
     quality: Literal["invalid", "low", "medium", "high"] = "invalid"
 
 

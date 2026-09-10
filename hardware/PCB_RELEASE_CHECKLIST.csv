@@ -1,0 +1,40 @@
+Check_ID,Board,Discipline,Check,Required_Evidence,Owner,Gate,Status
+PCB-GEN-001,ALL,Configuration,Part number revision and source commit agree across SCH PCB BOM drawings and outputs,Release index plus hashes,CM,QG1,OPEN
+PCB-GEN-002,ALL,Configuration,DNP and variant rules are explicit,BOM and assembly notes,EE,QG1,OPEN
+PCB-GEN-003,ALL,Schematic,ERC passes with every waiver reviewed,ERC report and waiver log,EE,QG2,OPEN
+PCB-GEN-004,ALL,Layout,DRC passes with every waiver reviewed,DRC report and waiver log,LAYOUT,QG2,OPEN
+PCB-GEN-005,ALL,Manufacturing,Independent CAM view matches source layers drills outline and polarity,CAM screenshots and checklist,CM,QG2,OPEN
+PCB-GEN-006,ALL,Manufacturing,IPC-356 netlist matches fabricated data,Netlist compare report,CM,QG2,OPEN
+PCB-GEN-007,ALL,Manufacturing,Pick-place origin rotation side and fiducials verified,PnP review report,CM,QG2,OPEN
+PCB-GEN-008,ALL,Supply,BOM MPN package quantity lifecycle and alternates reviewed,Signed BOM AVL review,PROCUREMENT,QG2,OPEN
+PCB-GEN-009,ALL,DFM,Fabricator and assembler DFM comments closed,DFM report and dispositions,CM,QG2,OPEN
+PCB-GEN-010,ALL,DFT,Test-point coverage mapped to EOL faults,DFT coverage matrix,TEST,QG2,OPEN
+PCB-MAIN-001,PCB_MAIN,MCU,CubeMX alternate functions and pin conflicts resolved,IOC export and pin report,FW_EE,QG2,OPEN
+PCB-MAIN-002,PCB_MAIN,Power,MCU rails decoupling reset boot and backup domains match datasheet,Power checklist and annotated SCH,EE,QG2,OPEN
+PCB-MAIN-003,PCB_MAIN,Power,BG95 supply handles burst load without brownout,Load transient simulation and bench result,POWER,QG2,OPEN
+PCB-MAIN-004,PCB_MAIN,Power,Every load default enable state is safe during reset,Reset timing and truth table,EE_FW,QG2,OPEN
+PCB-MAIN-005,PCB_MAIN,Audio,Four PDM channels and common clock support simultaneous capture,Peripheral mapping and timing analysis,EE_FW,QG2,OPEN
+PCB-MAIN-006,PCB_MAIN,Audio,1.8V translation direction leakage and power-off behavior verified,Level translator review and measurements,EE,QG2,OPEN
+PCB-MAIN-007,PCB_MAIN,Timing,GNSS TIMEPULSE reaches timer capture without conflict,Pin timing and interrupt latency evidence,EE_FW,QG2,OPEN
+PCB-MAIN-008,PCB_MAIN,RF,Cellular GNSS LoRa RF paths are 50 ohm and independently reviewable,Stackup field solve and layout review,RF,QG2,OPEN
+PCB-MAIN-009,PCB_MAIN,RF,Antenna ports have ESD matching ground and no-load policy,Annotated layout and BOM,RF,QG2,OPEN
+PCB-MAIN-010,PCB_MAIN,RF,Coexistence spacing clocks and enclosure cable routing reviewed,RF coexistence report,RF_ME,QG2,OPEN
+PCB-MAIN-011,PCB_MAIN,Storage,QSPI boot and SD signals meet SI pull and power sequencing,SI review and fault tests,EE_FW,QG2,OPEN
+PCB-MAIN-012,PCB_MAIN,Service,USB-C CC ESD current limit and recovery path verified,USB checklist and enumeration log,EE_FW,QG2,OPEN
+PCB-MAIN-013,PCB_MAIN,Security,SWD and boot access lifecycle states are defined,Provisioning and debug lock procedure,FW_SECURITY,QG2,OPEN
+PCB-MAIN-014,PCB_MAIN,Mechanics,All connectors dual SIM SD and test pads remain accessible in STEP assembly,STEP interference and service review,ME_EE,QG2,OPEN
+PCB-MAIN-015,PCB_MAIN,Cellular,Dual SIM mux is boot-safe and cannot switch while BG95 is powered,Truth table reset brownout and firmware interlock tests,EE_FW,QG2,OPEN
+PCB-MAIN-016,PCB_MAIN,Cellular,Both 1.8V USIM paths meet leakage capacitance edge ESD and length requirements,Annotated layout scope captures and ESD report,EE_CELLULAR,QG2,OPEN
+PCB-MAIN-017,PCB_MAIN,Cellular,SIM1 and SIM2 card detect and ICCID mapping are independent,100-cycle slot mapping log,FW_TEST,QG2,OPEN
+PCB-PWR-001,PCB_PWR,Protection,Input fuse reverse polarity TVS and surge energy are coordinated,Calculation and test waveforms,POWER,QG2,OPEN
+PCB-PWR-002,PCB_PWR,Power,3.8V 3.3V 1.8V AON rails meet efficiency ripple startup and thermal limits,Power tree report,POWER,QG2,OPEN
+PCB-PWR-003,PCB_PWR,Power,Shunts and monitors cover sleep and peak ranges with acceptable error,Range and calibration analysis,POWER_FW,QG2,OPEN
+PCB-PWR-004,PCB_PWR,Thermal,Copper thickness vias connectors and terminals meet current derating,Thermal and current-density report,POWER_LAYOUT,QG2,OPEN
+PCB-PWR-005,PCB_PWR,Safety,Fault outputs and load disconnect fail to defined safe states,Fault injection report,POWER_FW,QG2,OPEN
+PCB-PWR-006,PCB_PWR,Mechanics,High-current terminals maintain clearance and tool access,STEP and assembly review,ME_EE,QG2,OPEN
+PCB-MIC-001,PCB_MIC,Audio,Bottom acoustic port has no paste debris mask obstruction or cavity mismatch,Assembly drawing and microscope criteria,ACOUSTICS_CM,QG2,OPEN
+PCB-MIC-002,PCB_MIC,Audio,Decoupling and return path follow microphone datasheet,Annotated layout review,EE_ACOUSTICS,QG2,OPEN
+PCB-MIC-003,PCB_MIC,Audio,Four boards are one revision and mapping depends only on harness position,Configuration rule and EOL test,CM_TEST,QG2,OPEN
+PCB-MIC-004,PCB_MIC,Mechanics,Port to membrane stack tolerance is controlled,Stack drawing and tolerance report,ME_ACOUSTICS,QG2,OPEN
+PCB-MIC-005,PCB_MIC,Manufacturing,Panelization tooling rails and depanel method protect microphone,Panel drawing and sample inspection,CM,QG2,OPEN
+PCB-MIC-006,PCB_MIC,Calibration,Sensitivity noise phase and delay record is produced per board,Calibration fixture MSA and CSV,ACOUSTICS_TEST,QG2,OPEN

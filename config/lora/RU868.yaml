@@ -1,0 +1,32 @@
+profile_id: DIONEA-RU868-v0.1
+region: RU868
+hardware: E22-900M22S
+radio_ic: SX1262
+status: OPEN_REGULATORY_AND_RF_VALIDATION
+tx_enabled: false
+frequency_plan:
+  customer_authorized_windows_hz:
+    - [864000000, 865000000]
+    - [868700000, 869200000]
+  candidate_channels_hz:
+    - 864100000
+    - 864300000
+    - 864500000
+    - 864700000
+    - 864900000
+    - 868900000
+    - 869100000
+  lorawan_mandatory_default_channels_hz: [868900000, 869100000]
+  channel_bandwidth_hz: 125000
+  max_eirp_dbm: null
+  duty_cycle: null
+  source: Customer_windows_plus_LoRa_Alliance_RP002_1.0.5_local_regulation_review_required
+activation_guard:
+  required_region_label: RU868
+  required_checks: [regulatory_review, conducted_rf, occupied_bandwidth, spurious_emissions, antenna_vswr]
+  unlock_method: signed_manufacturing_profile_only
+notes:
+  - Candidate frequencies do not authorize transmission. Firmware must fail closed until power duty cycle and channel mask are signed and approved.
+  - The two LoRaWAN default channels are inside the customer window 868.7-869.2 MHz.
+  - All 20 EVT-PRE-20 pilot units use this profile.
+  - Do not copy EU868 parameters into this profile.

@@ -1,4 +1,5 @@
 Sheet,Item,Requirement
-08_STORAGE_SENSORS,U6,"64 MB serial NOR on OCTOSPI P1 candidate pin group; final AF validated in CubeMX"
-08_STORAGE_SENSORS,U7/U8,"LIS2DW12 + TMP117 on I2C1 PB6/PB7; PC5 accelerometer wake"
-08_STORAGE_SENSORS,Tamper,"PC13 Hall/reed wake input"
+08_STORAGE_SENSORS,U2,"W25Q512JVFIQ 64 MB NOR on OCTOSPI1 PE10/PE11/PE12/PE13/PE14/PE15; exact AF validated by generated CubeMX IOC"
+08_STORAGE_SENSORS,U3/U4,"LIS2DW12TR plus exact STTS22HTR UDFN-6L on I2C2 PB13/PB14; PC6 accelerometer interrupt"
+08_STORAGE_SENSORS,microSD,"four-bit SDMMC1 PC8/PC9/PC10/PC11/PC12 and PD2; PC13 card detect"
+08_STORAGE_SENSORS,Tamper,"PC7 protected and debounced enclosure tamper input"

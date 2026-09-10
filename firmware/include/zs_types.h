@@ -63,16 +63,43 @@ typedef enum {
   ZS_ROUTE_TEST = 5
 } zs_route_t;
 
+typedef enum {
+  ZS_POSITION_SOURCE_GNSS_LIVE = 0,
+  ZS_POSITION_SOURCE_CONFIGURED_INSTALL = 1
+} zs_position_source_t;
+
+typedef enum {
+  ZS_POSITION_TRUST_UNCONFIGURED = 0,
+  ZS_POSITION_TRUST_CONFIGURED_OK = 1,
+  ZS_POSITION_TRUST_CONFIGURED_WARN = 2,
+  ZS_POSITION_TRUST_CONFIGURED_SUSPECT = 3,
+  ZS_POSITION_TRUST_REVALIDATION_REQUIRED = 4
+} zs_position_trust_t;
+
+typedef enum {
+  ZS_TIME_TRUST_UNKNOWN = 0,
+  ZS_TIME_TRUST_GNSS_TRUSTED = 1,
+  ZS_TIME_TRUST_HOLDOVER = 2,
+  ZS_TIME_TRUST_GNSS_SUSPECT = 3,
+  ZS_TIME_TRUST_UNSYNCED = 4
+} zs_time_trust_t;
+
 typedef struct {
   int32_t lat_e7, lon_e7, alt_dm;
   uint16_t pos_accuracy_m;
   uint8_t altitude_source;
+  uint8_t position_source;
 } zs_position_t;
 
 typedef struct {
   uint8_t fix_type, satellites;
   uint16_t hdop_x100;
   bool pps_ok, jam, spoof;
+  bool position_warn, position_suspect;
+  bool time_suspect, time_holdover;
+  uint16_t position_delta_m;
+  uint8_t position_trust;
+  uint8_t time_trust;
   uint32_t expected_time_error_us;
 } zs_gnss_t;
 
@@ -120,6 +147,10 @@ typedef struct {
   uint8_t battery_pct;
   uint16_t battery_mv, solar_mv;
   int16_t temperature_c10;
+  uint16_t battery_bus_mv;
+  int16_t battery_current_ma;
+  uint32_t battery_power_mw;
+  uint8_t monitor_status; /* 0 = valid INA226; nonzero = driver/status flags */
 } zs_power_t;
 
 typedef struct {

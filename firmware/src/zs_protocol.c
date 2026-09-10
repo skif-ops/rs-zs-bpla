@@ -27,8 +27,9 @@ static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_
   zs_cbor_t c;
   zs_cbor_init(&c, out, cap);
 
-  /* v1.3 P0 summary omits feature key 9 and redundant DOA key 11.
-     Direction is recoverable from spatial key 14 + geometry_id. */
+  /* v1.5/schema 4: P0 summary keeps the established compact power/route map
+     so the worst-case LoRa payload stays <=220 bytes. INA226 current/power/status
+     are additive full-packet fields only. */
   zs_cbor_map(&c, full ? 15 : 13);
   kvu(&c, 0, m->schema_ver);
   kvu(&c, 1, 2);
@@ -38,11 +39,19 @@ static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_
   kvu(&c, 5, m->event_id);
   kvi(&c, 6, m->event_time_us);
 
-  const uint16_t flags = (m->gnss.jam ? 1u : 0u) | (m->gnss.spoof ? 2u : 0u);
+  const uint16_t flags =
+      (m->gnss.jam ? 1u : 0u) |
+      (m->gnss.spoof ? 2u : 0u) |
+      (m->station.position_source == ZS_POSITION_SOURCE_CONFIGURED_INSTALL ? 4u : 0u) |
+      (m->gnss.position_warn ? 8u : 0u) |
+      (m->gnss.position_suspect ? 16u : 0u) |
+      (m->gnss.time_suspect ? 32u : 0u) |
+      (m->gnss.time_holdover ? 64u : 0u) |
+      (m->gnss.position_trust == ZS_POSITION_TRUST_REVALIDATION_REQUIRED ? 128u : 0u);
   kvu(&c, 7, flags);
 
   zs_cbor_uint(&c, 8);
-  zs_cbor_map(&c, 12);
+  zs_cbor_map(&c, 16);
   kvi(&c, 0, m->station.lat_e7);
   kvi(&c, 1, m->station.lon_e7);
   kvi(&c, 2, m->station.alt_dm);
@@ -55,6 +64,10 @@ static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_
   kvu(&c, 9, m->gnss.expected_time_error_us);
   kvu(&c, 10, m->detector_profile);
   kvu(&c, 11, m->sample_rate_hz);
+  kvu(&c, 12, m->gnss.position_delta_m);
+  kvu(&c, 13, m->gnss.position_trust);
+  kvu(&c, 14, m->gnss.time_trust);
+  kvu(&c, 15, m->station.pos_accuracy_m);
 
   if (full) {
     zs_cbor_uint(&c, 9);
@@ -64,7 +77,7 @@ static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_
   }
 
   zs_cbor_uint(&c, 10);
-  zs_cbor_map(&c, 9);
+  zs_cbor_map(&c, full ? 13 : 9);
   kvu(&c, 0, m->power.battery_pct);
   kvu(&c, 1, m->power.battery_mv);
   kvu(&c, 2, m->power.solar_mv);
@@ -74,6 +87,12 @@ static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_
   kvi(&c, 6, m->route.rssi_dbm);
   kvi(&c, 7, m->route.snr_db10);
   kvu(&c, 8, m->route.gateway_id);
+  if (full) {
+    kvu(&c, 9, m->power.battery_bus_mv);
+    kvi(&c, 10, m->power.battery_current_ma);
+    kvu(&c, 11, m->power.battery_power_mw);
+    kvu(&c, 12, m->power.monitor_status);
+  }
 
   if (full) {
     zs_cbor_uint(&c, 11);

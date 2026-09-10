@@ -1,2 +1,2 @@
 Sheet,Item,Requirement
-07_BLE,U5,"nRF52832-class certified/module preferred; UART PB10/PB11; wake/reset; Android MVP"
+07_BLE,U11,"Raytac MDBT50Q-P1MV2 nRF52840 module with integrated antenna; UART PB10/PB11; PE6 enable/reset request; PB2 open-drain DFU request; separate nRF SWD fixture pads"

@@ -1,0 +1,20 @@
+Connector_ID,Assembly,Function,Signals,Pins,Current_or_RF,Environmental,Keying,Board_MPN,Mating_MPN,Wire_or_Coax,Status,Freeze_Input
+CON-001,External,Panel_to_MPPT,"PV+;PV-",2,Selected_panel_Isc_with_derating,Outdoor_IP67_target,Polarized,TBD,TBD,TBD,OPEN,Panel MPPT and gland selection
+CON-002,External,Battery_to_MPPT,"BAT+;BAT-",2,10A_class_with_fault_derating,Protected_battery_compartment,Polarized,TBD,TBD,TBD,OPEN,Battery and MPPT terminal set
+CON-003,PCB_PWR,Battery_input,"VBAT+;VBAT-",2,Peak_fault_and_continuous_load_TBD,Internal_IP_compartment,Polarized_latching,TBD,TBD,TBD,OPEN,Power calculation and housing
+CON-004,PCB_PWR_to_MAIN,Power_control_and_INA226_I2C,"3V8_MODEM;GND_MODEM;3V3_DIGITAL;GND_DIGITAL;1V8_MIC;GND_MIC;PWR_GOOD;FAULT;EN_MODEM;EN_AUX;I2C2_SCL;I2C2_SDA",12,Per_pin_derating_and_I2C_capacitance_validation,Internal,Polarized_latching,Molex_430451202,Molex_430251200,"18AWG power/grounds; 20-24AWG control/I2C",ELECTRICAL_FROZEN_MECHANICS_PENDING,HARNESS_LOGICAL_PINOUT_REV_A.csv
+CON-005,PCB_MAIN,MIC1,"1V8;GND;CLK;DATA1",4,Low_current_high_integrity,Internal_or_mic_pod,Unique_label,TBD,TBD,Matched_harness,OPEN,SI EMI and mechanical routing
+CON-006,PCB_MAIN,MIC2,"1V8;GND;CLK;DATA2",4,Low_current_high_integrity,Internal_or_mic_pod,Unique_label,TBD,TBD,Matched_harness,OPEN,SI EMI and mechanical routing
+CON-007,PCB_MAIN,MIC3,"1V8;GND;CLK;DATA3",4,Low_current_high_integrity,Internal_or_mic_pod,Unique_label,TBD,TBD,Matched_harness,OPEN,SI EMI and mechanical routing
+CON-008,PCB_MAIN,MIC4,"1V8;GND;CLK;DATA4",4,Low_current_high_integrity,Internal_or_mic_pod,Unique_label,TBD,TBD,Matched_harness,OPEN,SI EMI and mechanical routing
+CON-009,PCB_MAIN,Cellular_RF,RF_CELL,1,50_ohm,Internal_to_bulkhead,RF_keyed,TBD,TBD,Low_loss_coax,OPEN,Antenna selection and layout
+CON-010,PCB_MAIN,GNSS_RF,RF_GNSS,1,50_ohm,Internal_to_bulkhead,RF_keyed,TBD,TBD,Low_loss_coax,OPEN,Antenna active passive decision
+CON-011,PCB_MAIN,LoRa_RF,RF_LORA,1,50_ohm,Internal_to_bulkhead,RF_keyed,TBD,TBD,Low_loss_coax,OPEN,Antenna selection and layout
+CON-012,PCB_MAIN,Nano_SIM_slot_1,"SIM1_IO;SIM1_CLK;SIM1_RST;SIM1_VCC;SIM1_DET;GND",6_minimum,Low_current,Under_service_cover,Card_orientation,TBD,Nano_SIM,None,OPEN,Mechanical service access and U13 placement
+CON-013,PCB_MAIN,microSD,"CLK;CMD;D0-D3;DET;VCC;GND",9_minimum,Low_current,Under_service_cover,Card_orientation,TBD,microSD,None,OPEN,Mechanical service access
+CON-014,PCB_MAIN,USB_C_service,"VBUS;D+;D-;CC1;CC2;GND;SHIELD",USB_C_USB2,5V_current_limited,Sealed_service_cover,Reversible,TBD,USB_C_cable,None,OPEN,Recovery and enclosure access
+CON-015,PCB_MAIN,SWD_fixture,"SWDIO;SWCLK;NRST;VTREF;GND",5,Low_current,Internal_test_only,Fixture_keyed,Test_pads,Pogo_fixture,None,OPEN,DFT placement
+CON-016,PCB_MAIN,EOL_aux,Test_signals,TBD,Protected_test_only,Internal_test_only,Fixture_keyed,Test_pads,Pogo_fixture,None,OPEN,EOL coverage
+CON-017,Housing,Pressure_equalization_vent,Air_path,1,Not_electrical,Outdoor_IP67_target,Orientation_control,TBD,TBD,None,OPEN,Selected vent and airflow
+CON-018,Housing,Acoustic_membrane_x4,Acoustic_path,1_each,Not_electrical,Outdoor_IP67_target,Orientation_and_compression,TBD,TBD,None,OPEN,Acoustic and ingress test
+CON-019,PCB_MAIN,Nano_SIM_slot_2,"SIM2_IO;SIM2_CLK;SIM2_RST;SIM2_VCC;SIM2_DET;GND",6_minimum,Low_current,Under_service_cover,Card_orientation,TBD,Nano_SIM,None,OPEN,Mechanical service access and U13 placement

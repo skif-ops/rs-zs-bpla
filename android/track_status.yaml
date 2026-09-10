@@ -1,0 +1,41 @@
+track_id: dioneya_android_commissioning
+status: SOURCE_BASELINE
+source_status: SKELETON_WITH_VALIDATORS_AND_TESTS
+apk_status: RELEASE_NOT_BUILT
+debug_ci_build:
+  status: PASS
+  source_commit: 6e561637c03856b6bfb963a5b16a481888925991
+  workflow_run: 34240158982
+  artifact_retained: false
+distribution: enterprise_sideload_or_customer_mdm
+google_play_services_required: false
+internet_required_for_commissioning: false
+primary_transport: BLE
+service_recovery_transport: USB_C
+roles: [installer, service_engineer]
+candidate_os_support:
+  minimum_android: Android_9
+  release_target_sdk: API_36
+  required_architecture: arm64_v8a
+required_features:
+  - qr_identity_import
+  - authenticated_ble_pairing
+  - identity_and_diagnostics
+  - validated_station_configuration
+  - public_apn_configuration
+  - server_endpoint_and_ca_configuration
+  - signed_resumable_ota
+  - ab_status_and_rollback_report
+  - redacted_log_export
+open_blockers:
+  - ble_service_characteristic_uuids
+  - qr_bootstrap_and_pairing_protocol
+  - ota_manifest_canonicalization_and_signature_algorithm
+  - station_gatt_prototype
+  - release_signing_and_sbom
+security:
+  product_signing_private_key_in_app: false
+  station_private_key_in_app: false
+  region_change_allowed: false
+  analytics_enabled: false
+  secrets_in_repository: false

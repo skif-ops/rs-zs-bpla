@@ -1,0 +1,18 @@
+profile_id: DIONEA-EU868-v0.1
+region: EU868
+hardware: E22-900M22S
+radio_ic: SX1262
+status: OPEN_REGULATORY_AND_RF_VALIDATION
+tx_enabled: false
+frequency_plan:
+  channels_hz: []
+  max_eirp_dbm: null
+  duty_cycle: null
+  source: LoRa_Alliance_RP002_1.0.5_and_local_regulation_review_required
+activation_guard:
+  required_region_label: EU868
+  required_checks: [regulatory_review, conducted_rf, occupied_bandwidth, spurious_emissions, antenna_vswr]
+  unlock_method: signed_manufacturing_profile_only
+notes:
+  - Empty values are intentional. Firmware must fail closed and refuse TX.
+  - Do not copy RU868 parameters into this profile.

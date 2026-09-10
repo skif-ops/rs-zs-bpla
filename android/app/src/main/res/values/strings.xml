@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Дионея: настройка</string>
+    <string name="baseline_title">Инженерный baseline Android</string>
+    <string name="baseline_status">BLE-подключение отключено до заморозки UUID, аутентификации и формата OTA-подписи.</string>
+</resources>

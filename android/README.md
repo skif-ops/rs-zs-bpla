@@ -1,0 +1,28 @@
+# Android track - Dioneya commissioning
+
+Этот каталог отделён от firmware станции. Приложение предназначено для монтажника и сервис-инженера: локальная BLE-настройка, диагностика и доставка подписанного OTA-пакета.
+
+Принципы:
+
+- работает без Google Play Services и без интернета;
+- не требует API мобильного оператора;
+- не содержит product signing key, ключи станций или общие заводские пароли;
+- не позволяет менять зафиксированный RU868 после manufacturing provisioning;
+- показывает два SIM-слота и управляет только разрешёнными публичными APN; private APN в пилоте отклоняется;
+- импортирует только подписанный firmware package;
+- поддерживает resume, A/B status и rollback report;
+- USB-C используется как отдельный сервисный recovery path.
+
+Статус: `SOURCE_BASELINE / BLE_NOT_IMPLEMENTED / RELEASE_APK_NOT_BUILT`.
+
+В каталоге `app` находится минимальный Kotlin/Android проект с unit tests, но он не является commissioning APK: BLE UUID, authenticated pairing и формат OTA signature ещё не заморожены.
+
+Debug source baseline успешно собран CI на commit `6e561637c03856b6bfb963a5b16a481888925991`, workflow run `34240158982`. APK не публиковался и не разрешён к установке на производстве.
+
+Документы:
+
+- `APP_ARCHITECTURE_v0_1.md`;
+- `REQUIREMENTS_v0_1.md`;
+- `SECURITY_MODEL_v0_1.md`;
+- `ACCEPTANCE_TESTS_v0_1.csv`;
+- `track_status.yaml`.

@@ -1,12 +1,101 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
-    branches: [main, develop, evt, evt-mb, "feature/**"]
+    branches: [main, develop, evt, evt-mb, evt-pre-20, "feature/**", "integration/**"]
   pull_request:
-    branches: [main, develop, evt, evt-mb]
+    branches: [main, develop, evt, evt-mb, evt-pre-20]
 
 jobs:
+  evt-pre-20-config:
+    name: EVT-PRE-20 configuration and release audit
+    if: >-
+      github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/develop' ||
+      github.ref == 'refs/heads/evt-pre-20' ||
+      startsWith(github.ref, 'refs/heads/integration/') ||
+      github.base_ref == 'main' ||
+      github.base_ref == 'develop' ||
+      github.base_ref == 'evt-pre-20'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Enforce EVT branch isolation
+        if: github.ref == 'refs/heads/evt-pre-20' || github.base_ref == 'evt-pre-20'
+        run: python tools/audit_evt_branch_isolation.py --branch evt-pre-20
+      - name: Generate unified Rev.A BOM
+        run: python tools/generate_evt_pre_20_bom_rev_a.py
+      - name: QG-1 production BOM structure and quantity audit
+        run: python tools/validate_evt_pre_20_bom_qg1.py
+      - name: QG-2 independent production BOM technical audit
+        run: python tools/audit_evt_pre_20_bom_qg2.py
+      - name: Independent PCB-MAIN capture-authority audit
+        run: python tools/audit_pcb_main_capture_authority_rev_a.py
+      - name: Second independent PCB-MAIN U1 electrical control
+        run: python tools/verify_pcb_main_mcu_pin_authority_rev_a.py
+      - name: Second independent PCB-MAIN storage and sensor control
+        run: python tools/verify_pcb_main_storage_sensor_authority_rev_a.py
+      - name: Second independent PCB-MAIN audio and AAD logic control
+        run: python tools/verify_pcb_main_audio_logic_authority_rev_a.py
+      - name: Second independent PCB-MAIN cellular modem control
+        run: python tools/verify_pcb_main_cellular_authority_rev_a.py
+      - name: Second independent PCB-MAIN dual-SIM control
+        run: python tools/verify_pcb_main_dual_sim_authority_rev_a.py
+      - name: Second independent PCB-MAIN GNSS control
+        run: python tools/verify_pcb_main_gnss_authority_rev_a.py
+      - name: Second independent PCB-MAIN LoRa control
+        run: python tools/verify_pcb_main_lora_authority_rev_a.py
+      - name: First-pass configuration and hardware baseline validation
+        run: python tools/validate_evt_pre_20.py
+      - name: Cross-check locked Rev.A clock policy
+        run: python tools/validate_clock_policy.py
+      - name: Verify generated STM32 target contract is current
+        run: python tools/generate_evt_pre_20_target_contract.py --check
+      - name: QG-1 target contract completeness and traceability
+        run: python tools/validate_evt_pre_20_target_contract.py
+      - name: QG-2 independent target technical audit
+        run: python tools/audit_evt_pre_20_target_technical.py
+      - name: QG-1 generated CubeMX IOC completeness and provenance
+        run: python tools/validate_evt_pre_20_cubemx_ioc.py
+      - name: QG-2 independent CubeMX pin and EXTI audit
+        run: python tools/audit_evt_pre_20_cubemx_ioc_technical.py
+      - name: Verify pinned STM32 CMSIS vendor files
+        run: python tools/import_evt_pre_20_stm32_vendor.py --check
+      - name: QG-1 STM32 scaffold completeness and provenance
+        run: python tools/validate_evt_pre_20_stm32_scaffold.py
+      - name: QG-2 independent STM32 startup and memory audit
+        run: python tools/audit_evt_pre_20_stm32_scaffold_technical.py
+      - name: Cross-check Rev.A component and connector freeze
+        run: python tools/validate_rev_a_component_freeze.py
+      - name: Second-pass release completeness audit
+        run: python tools/audit_evt_pre_20_release.py
+      - name: Upload audit and generated Rev.A BOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: evt-pre-20-release-audit
+          path: |
+            artifacts/evt_pre_20_release_audit.json
+            artifacts/evt_pre_20_bom_qg1.json
+            artifacts/evt_pre_20_bom_qg2.json
+            artifacts/pcb_main_capture_authority_rev_a.json
+            artifacts/pcb_main_mcu_pin_authority_rev_a.json
+            artifacts/pcb_main_storage_sensor_authority_rev_a.json
+            artifacts/pcb_main_audio_logic_authority_rev_a.json
+            artifacts/pcb_main_cellular_authority_rev_a.json
+            artifacts/pcb_main_dual_sim_authority_rev_a.json
+            artifacts/pcb_main_gnss_authority_rev_a.json
+            artifacts/pcb_main_lora_authority_rev_a.json
+            hardware/EVT_PRE_20_BOM_REV_A.csv
+            hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json
+            firmware/targets/evt_pre_20/target_contract_manifest.json
+            firmware/targets/evt_pre_20/stm32_scaffold_manifest.json
+            firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc
+          if-no-files-found: error
+
   firmware:
     name: Firmware CMake/CTest
     runs-on: ubuntu-latest
@@ -19,7 +108,7 @@ jobs:
       - name: CTest
         run: ctest --test-dir firmware/build --output-on-failure
 
-  server:
+  server-core:
     name: Server core pytest
     runs-on: ubuntu-latest
     steps:
@@ -29,18 +118,66 @@ jobs:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: server/requirements-ci.txt
-      - name: Install dependencies
+      - name: Install core dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r server/requirements-ci.txt
-      - name: Pytest
+      - name: Core pytest
         working-directory: server
         run: python -m pytest -q tests_core
 
-  protocol-e2e:
-    name: Firmware CBOR -> Server
+  server-full:
+    name: Server full pytest and compileall
     runs-on: ubuntu-latest
-    needs: [firmware, server]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: server/requirements.txt
+      - name: Install full dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r server/requirements.txt
+      - name: Compile Python sources
+        working-directory: server
+        run: python -m compileall -q .
+      - name: Materialize versioned test assets
+        working-directory: server
+        run: python tools/materialize_assets.py
+      - name: Full pytest
+        working-directory: server
+        run: python -m pytest -q tests
+
+  android:
+    name: Android unit tests and debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.6.0"
+      - name: Unit tests and debug build
+        run: gradle --no-daemon --stacktrace -p android testDebugUnitTest assembleDebug
+      - name: Upload installable EVT commissioning APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: dioneya-commissioning-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+  protocol-e2e:
+    name: Firmware CBOR to Server
+    runs-on: ubuntu-latest
+    needs: [firmware, server-core, server-full, android]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -55,3 +192,24 @@ jobs:
       - name: Verify compact CBOR contract
         working-directory: server
         run: python tools/test_firmware_packet.py
+
+  package-current:
+    name: Build current EVT-PRE-20 engineering and PMI archives
+    if: github.ref == 'refs/heads/evt-pre-20' || github.base_ref == 'evt-pre-20'
+    runs-on: ubuntu-latest
+    needs: [evt-pre-20-config, protocol-e2e]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate unified Rev.A BOM
+        run: python tools/generate_evt_pre_20_bom_rev_a.py
+      - name: Build reproducible current-state archives
+        run: python tools/build_evt_pre_20_packages.py
+      - name: Upload engineering and separate PMI/report archives
+        uses: actions/upload-artifact@v4
+        with:
+          name: evt-pre-20-current-packages
+          path: artifacts/evt-pre-20-current/
+          if-no-files-found: error
