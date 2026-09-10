@@ -6,6 +6,7 @@ on:
     branches: [evt-pre-20]
     paths:
       - "hardware/kicad/**"
+      - "hardware/reviews/**"
       - "hardware/*FREEZE_REV_A.csv"
       - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
       - "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv"
@@ -87,6 +88,7 @@ on:
     branches: [evt-pre-20]
     paths:
       - "hardware/kicad/**"
+      - "hardware/reviews/**"
       - "hardware/*FREEZE_REV_A.csv"
       - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
       - "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv"
