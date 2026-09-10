@@ -140,7 +140,7 @@ def main() -> None:
     print("PCB-MAIN U2/U3/U4 second independent control: PASS_DEVICE_AUTHORITY_ONLY")
     print("- 35 physical pins or pads and all OCTOSPI/I2C/interrupt endpoints verified")
     print("- I2C2 addresses 0x18, 0x3F and 0x40 are unique; pull-up ownership verified")
-    print("- production BOM remains BLOCKED by native capture and Reviews A/B")
+    print("- production BOM remains BLOCKED by Reviews A/B")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

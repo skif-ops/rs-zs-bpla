@@ -149,7 +149,7 @@ def main() -> None:
     print("PCB-MAIN U1 second independent electrical control: PASS_PIN_AUTHORITY_ONLY")
     print("- 100 package positions: 67 functional, 12 unused I/O, NRST and 20 supply/reference/ground")
     print("- HSE forbidden, PC15 external NC, SWD/NRST fixture and SMPS rails verified")
-    print("- production BOM remains BLOCKED by native capture and Reviews A/B")
+    print("- production BOM remains BLOCKED by Reviews A/B")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

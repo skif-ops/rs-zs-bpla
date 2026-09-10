@@ -221,6 +221,14 @@ def main() -> int:
         *(row["RevA_Net"] for row in ble_pin_rows if row["RevA_Net"] != "NC"),
         *(row["RevA_Net"] for row in connector_fixture_pin_rows if row["RevA_Net"] != "NC"),
     }
+    native_overlay_rows = read(ROOT / "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv")
+    overlay_logical_nets = {row["Logical_Net"] for row in native_overlay_rows}
+    required_native_tokens.difference_update(overlay_logical_nets)
+    required_native_tokens.update(row["Native_Net"] for row in native_overlay_rows)
+    # Pre-capture authorities use generic GND outside the modem domain. Native
+    # capture resolves it through the controlled ground-domain authority.
+    required_native_tokens.discard("GND")
+    required_native_tokens.update({"GND_MODEM", "GND_DIGITAL", "GND_MIC"})
     native_tokens_missing = sorted(token for token in required_native_tokens if token not in native_text)
     native_ok = (
         main_native.is_file()
@@ -229,8 +237,17 @@ def main() -> int:
         and native_record.get("schematic_derived_bom") is True
         and not native_tokens_missing
     )
-    check("main_native_schematic_source", native_ok,
-          "native PCB-MAIN schematic, all frozen MPN/net tokens and declared schematic-derived BOM provenance are not all present" if not native_ok else "native PCB-MAIN source contains all frozen MPN/net tokens and schematic-derived BOM provenance")
+    check(
+        "main_native_schematic_source",
+        native_ok,
+        (
+            "native PCB-MAIN schematic, physical overlay/ground-domain tokens or declared "
+            "schematic-derived BOM provenance are incomplete: " + ", ".join(native_tokens_missing)
+        ) if not native_ok else (
+            "native PCB-MAIN source contains all frozen MPNs, controlled physical-net overlay, "
+            "three ground domains and schematic-derived BOM provenance"
+        ),
+    )
 
     review_a = main_status.get("review_a", {}) if isinstance(main_status, dict) else {}
     required_review_a_evidence = {

@@ -257,7 +257,7 @@ def main() -> None:
     print("- all 61 U11 pads and four independent nRF SWD contacts verified")
     print("- UART, fail-closed reset, active-LOW DFU and normal-voltage supply contracts verified")
     print("- all-layer 10.5 mm by 3.8 mm minimum antenna no-ground rule verified")
-    print("- native capture and Reviews A/B keep the production BOM blocked")
+    print("- Reviews A/B keep the production BOM blocked")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

@@ -286,7 +286,7 @@ def main() -> None:
     print("PCB-MAIN U7/U17/U18 second independent control: PASS_AUDIO_LOGIC_AUTHORITY_ONLY")
     print("- 44 physical pins, six used U7 translation channels, two defined unused channels")
     print("- four active-high wake inputs, two-stage OR, U18 up-translation and guaranteed logic margins verified")
-    print("- production BOM remains BLOCKED by native capture and Reviews A/B")
+    print("- production BOM remains BLOCKED by Reviews A/B")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

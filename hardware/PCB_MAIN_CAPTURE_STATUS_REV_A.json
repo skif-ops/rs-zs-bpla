@@ -2,7 +2,7 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-MAIN",
-  "release_state": "CAPTURE_INPUT",
+  "release_state": "SCHEMATIC_REVIEW",
   "manufacturing_release": false,
   "source_control": {
     "authoritative_inputs": [
@@ -31,6 +31,9 @@
       "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md",
       "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
       "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv",
       "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
       "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
       "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -75,8 +78,17 @@
   },
   "native_schematic": {
     "path": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch",
-    "status": "ABSENT",
-    "schematic_derived_bom": false
+    "project": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro",
+    "manifest": "hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json",
+    "generator": "tools/generate_pcb_main_schematic_rev_a.py",
+    "status": "PRESENT_REVIEW_PENDING",
+    "schematic_derived_bom": true,
+    "ground_domains": {
+      "GND_MODEM": "J_PWR pin 2; joins GND_PWR only at PCB-PWR NT1",
+      "GND_DIGITAL": "J_PWR pin 4; joins GND_PWR only at PCB-PWR NT2",
+      "GND_MIC": "J_PWR pin 6; joins GND_PWR only at PCB-PWR NT3",
+      "pcb_main_ground_net_ties": 0
+    }
   },
   "capture_readiness": {
     "complete": true,
@@ -174,17 +186,17 @@
   },
   "review_a": {
     "complete": false,
-    "status": "BLOCKED_NATIVE_SCHEMATIC_ABSENT",
+    "status": "NATIVE_SOURCE_AND_AUTOMATED_NET_AUDIT_GATED_HUMAN_REVIEW_PENDING",
     "reviewer": null,
     "date": null,
     "commit_sha": null,
     "evidence": {
       "signed_checklist": null,
-      "schematic_pdf": null,
+      "schematic_pdf": "CI artifact: artifacts/kicad-native/PCB-MAIN/PCB-MAIN_schematic.pdf",
       "cubemx_pin_report": null,
-      "erc_report": null,
-      "bom_diff": null,
-      "net_name_diff": null
+      "erc_report": "CI artifact: artifacts/kicad-native/PCB-MAIN/erc.json",
+      "bom_diff": "CI artifact: artifacts/kicad-native/PCB-MAIN/native_schematic_bom.csv",
+      "net_name_diff": "CI artifact: artifacts/kicad-native/PCB-MAIN/native_schematic_audit.json"
     }
   },
   "review_b": {

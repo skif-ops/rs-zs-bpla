@@ -1,0 +1,85 @@
+{
+  "configuration": "EVT-PRE-20 Rev.A",
+  "board": "PCB-MAIN",
+  "state": "SCHEMATIC_REVIEW_NOT_FOR_MANUFACTURE",
+  "generator": "tools/generate_pcb_main_schematic_rev_a.py",
+  "generator_sha256": "ba78230f616c4dc819ce3e6cdf6b1f9ddbb5738b347e40a339fc173e8b1b4134",
+  "inputs": [
+    {
+      "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "e766dedaee8ba2ba664b9392770ab59f5f96464af60121fb6ff8310d3bd0ef0b"
+    },
+    {
+      "path": "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "481d38fcd9b946a222542521bdb90de84ae85b651b2250cd46494c79b47a167b"
+    },
+    {
+      "path": "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "ff84acbcc8ecc104cbc6691d5a2eaed652adfab082c510518bd0ab487da68267"
+    },
+    {
+      "path": "hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "3431c903eb9a1138e9976a0d95479c4269e2c0d25d72c98bbe5dc6e7785c6579"
+    },
+    {
+      "path": "hardware/PCB_MAIN_DUAL_SIM_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "5709e9d3ae8af4f77865891e5db8104d3f66e597f38194af0f95280d234fc814"
+    },
+    {
+      "path": "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "72b0604e6010d98761857a9aaacd86d21a0935bd01a9365050a3392db3d4cd6e"
+    },
+    {
+      "path": "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "efb075342ac159d3c96a8d84cbd464d592156c6f3ad53e57875efcc5c7dd5d2a"
+    },
+    {
+      "path": "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "9dc9bc2f57d722bd4cb6ae9f6de251cffe22c883c68dc9f25ee55a2eb577dbe3"
+    },
+    {
+      "path": "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv",
+      "sha256": "b94cd4723efeffbdea7f1c6ba82f977da9c83c556967316630461af6048eaf12"
+    },
+    {
+      "path": "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv",
+      "sha256": "0b2abb5e967526590b02f069992579a2606d05d485f8ce3917472a3dbfbcd2b6"
+    },
+    {
+      "path": "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+      "sha256": "421b833fa809b099b310302fd942c2678d98f27da33a41d6e7b25176dfbab17d"
+    },
+    {
+      "path": "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
+      "sha256": "fa79c1176939501874f18fa0a277ee12313bfaa673e7d31e0a0798912d48d9be"
+    },
+    {
+      "path": "hardware/CONNECTOR_FREEZE_REV_A.csv",
+      "sha256": "06978f227e106a46b7d773ae8cb3adc2547fb88bac89bcf6debb408b3f08ceda"
+    },
+    {
+      "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
+      "sha256": "6c39b4a1a328db63919dcf6638d1cc06971273a1f7458e723007a71681ae486b"
+    },
+    {
+      "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+      "sha256": "2ea8da3b8469f616c469eb342127afd2e75b3b0ad04f3ab75154560211f353c9"
+    },
+    {
+      "path": "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv",
+      "sha256": "7925cbdf1e8665384971c71923e2d946d1f6735ab4e9bfe67e5b5d12807b6f92"
+    },
+    {
+      "path": "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv",
+      "sha256": "6a118b05bf08d1f1ac58bed00ed3d55fae40ba325cd177605673376073e7a3ad"
+    }
+  ],
+  "component_count": 248,
+  "fitted_count": 233,
+  "dnp_count": 15,
+  "pin_count": 1074,
+  "schematic_sha256": "1b1b89d87433923d266a626e3f089884b64d8491a33bcff49cc6054d4a17a5bb",
+  "project_sha256": "23cdb485eeaafd122b08c540da925235a1778926199cfbec969da396cd8c7ed0",
+  "review_a": "AUTOMATED_SOURCE_NET_AUDIT_GATED_KICAD_ERC_AND_HUMAN_SIGNOFF_PENDING",
+  "review_b": "BLOCKED_LAYOUT_ABSENT"
+}

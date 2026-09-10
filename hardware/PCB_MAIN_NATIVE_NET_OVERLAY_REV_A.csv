@@ -1,0 +1,136 @@
+RefDes,Pin,Logical_Net,Native_Net,Source_Element,Reason
+U1,15,TEST_UART_RX,TEST_UART_RX_U1,R102,MCU side of production UART RX series link
+U1,16,TEST_UART_TX,TEST_UART_TX_U1,R101,MCU side of production UART TX series link
+U1,22,GNSS_PPS,GNSS_PPS_U1,R58,MCU side of GNSS TIMEPULSE series link
+U1,24,GNSS_TX,GNSS_TX_U1,R57,MCU side of GNSS RX series link
+U1,25,GNSS_RX,GNSS_RX_U1,R56,MCU side of GNSS TX series link
+U1,28,LORA_NSS,LORA_NSS_U1,R69,MCU side of LoRa NSS series link
+U1,29,LORA_SCK,LORA_SCK_U1,R70,MCU side of LoRa SCK series link
+U1,30,LORA_MISO,LORA_MISO_U1,R72,MCU side of LoRa MISO series link
+U1,31,LORA_MOSI,LORA_MOSI_U1,R71,MCU side of LoRa MOSI series link
+U1,38,NOR_CLK,NOR_CLK_U1,R8,MCU side of OCTOSPI clock series link
+U1,39,NOR_NCS,NOR_NCS_U2,R7,Direct NOR chip-select net with device-side pull-up
+U1,40,NOR_IO0,NOR_IO0_U1,R9,MCU side of OCTOSPI IO0 series link
+U1,41,NOR_IO1,NOR_IO1_U1,R10,MCU side of OCTOSPI IO1 series link
+U1,42,NOR_IO2,NOR_IO2_U1,R11,MCU side of OCTOSPI IO2 series link
+U1,43,NOR_IO3,NOR_IO3_U1,R12,MCU side of OCTOSPI IO3 series link
+U1,44,BLE_TX,BLE_TX_U1,R75,MCU side of BLE UART TX series link
+U1,45,BLE_RX,BLE_RX_U1,R74,MCU side of BLE UART RX series link
+U1,52,I2C2_SCL,I2C2_SCL_U1,R15,MCU side of I2C2 SCL damping resistor
+U1,53,I2C2_SDA,I2C2_SDA_U1,R16,MCU side of I2C2 SDA damping resistor
+U1,60,CELL_STATUS,CELL_STATUS_U16,R34,Shared MCU-side modem status net at U16
+U1,61,CELL_DTR,CELL_DTR_U16,R29,Shared MCU-side modem DTR net at U16
+U1,62,CELL_RI,CELL_RI_U16,R33,Shared MCU-side modem RI net at U16
+U1,64,TAMPER_IN,TAMPER_IN_U1,R100,MCU side of tamper series resistor
+U1,65,SD_D0,SD_D0_U1,R81,MCU side of SD D0 series link
+U1,66,SD_D1,SD_D1_U1,R82,MCU side of SD D1 series link
+U1,68,USB_VBUS,USB_VBUS_SENSE,R95,Divided USB VBUS sense at MCU
+U1,70,USB_DM,USB_DM_U1,R92,MCU side of USB DM series link
+U1,71,USB_DP,USB_DP_U1,R91,MCU side of USB DP series link
+U1,78,SD_D2,SD_D2_U1,R83,MCU side of SD D2 series link
+U1,79,SD_D3,SD_D3_U1,R84,MCU side of SD D3 series link
+U1,80,SD_CK,SD_CK_U1,R79,MCU side of SD clock series link
+U1,83,SD_CMD,SD_CMD_U1,R80,MCU side of SD command series link
+U1,92,CELL_TX,CELL_TX_U16,R28,Shared MCU-side modem TX net at U16
+U1,93,CELL_RX,CELL_RX_U16,R32,Shared MCU-side modem RX net at U16
+U2,1,NOR_IO3,NOR_IO3_U2,R12,NOR side of OCTOSPI IO3 series link
+U2,7,NOR_NCS,NOR_NCS_U2,R7,Direct NOR chip-select net with device-side pull-up
+U2,8,NOR_IO1,NOR_IO1_U2,R10,NOR side of OCTOSPI IO1 series link
+U2,9,NOR_IO2,NOR_IO2_U2,R11,NOR side of OCTOSPI IO2 series link
+U2,15,NOR_IO0,NOR_IO0_U2,R9,NOR side of OCTOSPI IO0 series link
+U2,16,NOR_CLK,NOR_CLK_U2,R8,NOR side of OCTOSPI clock series link
+U3,1,I2C2_SCL,I2C2_SCL_BUS,R15,Shared sensor and PCB-PWR I2C2 bus
+U3,4,I2C2_SDA,I2C2_SDA_BUS,R16,Shared sensor and PCB-PWR I2C2 bus
+U4,1,I2C2_SCL,I2C2_SCL_BUS,R15,Shared sensor and PCB-PWR I2C2 bus
+U4,6,I2C2_SDA,I2C2_SDA_BUS,R16,Shared sensor and PCB-PWR I2C2 bus
+U7,7,PDM_CLK_1V8,PDM_CLK_1V8_U7,R17,Translator side of microphone clock damping resistor
+U7,8,AAD_CFG_1V8,AAD_CFG_1V8_U7,R18,Translator side of AAD configuration damping resistor
+U8,9,CELL_USB_DP,CELL_USB_DP_U8,R39,BG95 side of isolated USB DP series link
+U8,10,CELL_USB_DM,CELL_USB_DM_U8,R40,BG95 side of isolated USB DM series link
+U8,22,CELL_DBG_RXD_1V8,CELL_DBG_RXD_U8,R37,BG95 side of debug RX series link
+U8,23,CELL_DBG_TXD_1V8,CELL_DBG_TXD_U8,R36,BG95 side of debug TX series link
+U16,16,CELL_DTR,CELL_DTR_U16,R29,Shared MCU-side modem DTR net
+U16,17,CELL_TX,CELL_TX_U16,R28,Shared MCU-side modem TX net
+U16,19,CELL_RI,CELL_RI_U16,R33,Shared MCU-side modem RI net
+U16,20,CELL_STATUS,CELL_STATUS_U16,R34,Shared MCU-side modem status net
+U16,21,CELL_RX,CELL_RX_U16,R32,Shared MCU-side modem RX net
+Q1,1,CELL_PWRKEY_B,Q1_BASE,R24,Transistor side of PWRKEY base resistor
+Q2,1,CELL_RESET_B,Q2_BASE,R26,Transistor side of reset base resistor
+U13,1,SIM1_RST_1V8,SIM1_RST_MUX,R50,Mux side of SIM1 reset tuning link
+U13,2,SIM1_VDD_1V8,SIM1_VDD_CONN,C50,Selected SIM1 VDD after mux resistance
+U13,11,SIM2_VDD_1V8,SIM2_VDD_CONN,C51,Selected SIM2 VDD after mux resistance
+U13,13,SIM2_RST_1V8,SIM2_RST_MUX,R53,Mux side of SIM2 reset tuning link
+U13,15,SIM2_CLK_1V8,SIM2_CLK_MUX,R54,Mux side of SIM2 clock tuning link
+U13,16,SIM2_VDD_1V8,SIM2_VDD_CONN,C51,Selected SIM2 VDD after mux resistance
+U13,17,SIM2_VDD_1V8,SIM2_VDD_CONN,C51,Selected SIM2 VDD after mux resistance
+U13,18,SIM2_DATA_1V8,SIM2_DATA_MUX,R55,Mux side of SIM2 data tuning link
+U13,19,SIM1_DATA_1V8,SIM1_DATA_MUX,R52,Mux side of SIM1 data tuning link
+U13,21,SIM1_VDD_1V8,SIM1_VDD_CONN,C50,Selected SIM1 VDD after mux resistance
+U13,22,SIM1_VDD_1V8,SIM1_VDD_CONN,C50,Selected SIM1 VDD after mux resistance
+U13,23,SIM1_CLK_1V8,SIM1_CLK_MUX,R51,Mux side of SIM1 clock tuning link
+U14,1,SIM1_VDD_1V8,SIM1_VDD_CONN,C50,Connector-side SIM1 supply protection
+U14,3,SIM1_RST_1V8,SIM1_RST_CONN,R50,Connector-side SIM1 reset protection
+U14,4,SIM1_CLK_1V8,SIM1_CLK_CONN,R51,Connector-side SIM1 clock protection
+U14,5,SIM1_DATA_1V8,SIM1_DATA_CONN,R52,Connector-side SIM1 data protection
+U15,1,SIM2_VDD_1V8,SIM2_VDD_CONN,C51,Connector-side SIM2 supply protection
+U15,3,SIM2_RST_1V8,SIM2_RST_CONN,R53,Connector-side SIM2 reset protection
+U15,4,SIM2_CLK_1V8,SIM2_CLK_CONN,R54,Connector-side SIM2 clock protection
+U15,5,SIM2_DATA_1V8,SIM2_DATA_CONN,R55,Connector-side SIM2 data protection
+J6,1,SIM1_VDD_1V8,SIM1_VDD_CONN,C50,SIM1 connector supply node
+J6,2,SIM1_RST_1V8,SIM1_RST_CONN,R50,SIM1 connector reset node
+J6,3,SIM1_CLK_1V8,SIM1_CLK_CONN,R51,SIM1 connector clock node
+J6,6,SIM1_DATA_1V8,SIM1_DATA_CONN,R52,SIM1 connector data node
+J7,1,SIM2_VDD_1V8,SIM2_VDD_CONN,C51,SIM2 connector supply node
+J7,2,SIM2_RST_1V8,SIM2_RST_CONN,R53,SIM2 connector reset node
+J7,3,SIM2_CLK_1V8,SIM2_CLK_CONN,R54,SIM2 connector clock node
+J7,6,SIM2_DATA_1V8,SIM2_DATA_CONN,R55,SIM2 connector data node
+Q3,1,SIM_MUX_EN_B,Q3_BASE,R46,Transistor side of SIM mux enable base resistor
+U9,2,GNSS_RX,GNSS_RX_U9,R56,GNSS side of UART TX series link
+U9,3,GNSS_TX,GNSS_TX_U9,R57,GNSS side of UART RX series link
+U9,4,GNSS_PPS,GNSS_PPS_U9,R58,GNSS side of TIMEPULSE series link
+U10,16,LORA_MISO,LORA_MISO_U10,R72,Radio side of LoRa MISO series link
+U10,17,LORA_MOSI,LORA_MOSI_U10,R71,Radio side of LoRa MOSI series link
+U10,18,LORA_SCK,LORA_SCK_U10,R70,Radio side of LoRa SCK series link
+U10,19,LORA_NSS,LORA_NSS_U10,R69,Radio side of LoRa NSS series link
+U11,22,BLE_RX,BLE_RX_U11,R74,BLE module side of UART RX series link
+U11,24,BLE_TX,BLE_TX_U11,R75,BLE module side of UART TX series link
+U12,1,SD_D2,SD_D2_CARD,R83,Card side of SD D2 series link
+U12,2,SD_D3,SD_D3_CARD,R84,Card side of SD D3 series link
+U12,3,SD_CMD,SD_CMD_CARD,R80,Card side of SD command series link
+U12,5,SD_CK,SD_CK_CARD,R79,Card side of SD clock series link
+U12,7,SD_D0,SD_D0_CARD,R81,Card side of SD D0 series link
+U12,8,SD_D1,SD_D1_CARD,R82,Card side of SD D1 series link
+J12,1,SD_D2,SD_D2_CARD,R83,Socket side of SD D2 series link
+J12,2,SD_D3,SD_D3_CARD,R84,Socket side of SD D3 series link
+J12,3,SD_CMD,SD_CMD_CARD,R80,Socket side of SD command series link
+J12,5,SD_CK,SD_CK_CARD,R79,Socket side of SD clock series link
+J12,7,SD_D0,SD_D0_CARD,R81,Socket side of SD D0 series link
+J12,8,SD_D1,SD_D1_CARD,R82,Socket side of SD D1 series link
+J11,A6,USB_DP,USB_DP_CONN,R91,Connector side of USB DP series link
+J11,A7,USB_DM,USB_DM_CONN,R92,Connector side of USB DM series link
+J11,B6,USB_DP,USB_DP_CONN,R91,Connector side of USB DP series link
+J11,B7,USB_DM,USB_DM_CONN,R92,Connector side of USB DM series link
+J13,1,TAMPER_IN,TAMPER_IN_CONN,R100,Connector side of tamper series resistor
+TP_EOL,5,TEST_UART_TX,TEST_UART_TX_TP,R101,Fixture side of production UART TX series link
+TP_EOL,6,TEST_UART_RX,TEST_UART_RX_TP,R102,Fixture side of production UART RX series link
+TP_EOL,12,I2C2_SCL,I2C2_SCL_BUS,R15,Fixture access to shared I2C2 bus
+TP_EOL,13,I2C2_SDA,I2C2_SDA_BUS,R16,Fixture access to shared I2C2 bus
+TP_CELL_USB,2,CELL_USB_DP,CELL_USB_DP_TP,R39,Fixture side of BG95 USB DP series link
+TP_CELL_USB,3,CELL_USB_DM,CELL_USB_DM_TP,R40,Fixture side of BG95 USB DM series link
+TP_CELL_DBG,2,CELL_DBG_TXD_1V8,CELL_DBG_TXD_TP,R36,Fixture side of BG95 debug TX series link
+TP_CELL_DBG,3,CELL_DBG_RXD_1V8,CELL_DBG_RXD_TP,R37,Fixture side of BG95 debug RX series link
+TP_CELL_DBG,4,CELL_USB_BOOT_1V8,CELL_USB_BOOT_TP,R38,Fixture side of BG95 boot series link
+J_MIC1,3,PDM_CLK,PDM_CLK_1V8_FANOUT,R17,Microphone-side shared 1.8 V clock net
+J_MIC1,4,PDM_DATA1,PDM_DATA1_1V8,U19,Microphone-side PDM data net
+J_MIC1,6,AAD_CFG,AAD_CFG_1V8_FANOUT,R18,Microphone-side shared AAD configuration net
+J_MIC2,3,PDM_CLK,PDM_CLK_1V8_FANOUT,R17,Microphone-side shared 1.8 V clock net
+J_MIC2,4,PDM_DATA2,PDM_DATA2_1V8,U20,Microphone-side PDM data net
+J_MIC2,6,AAD_CFG,AAD_CFG_1V8_FANOUT,R18,Microphone-side shared AAD configuration net
+J_MIC3,3,PDM_CLK,PDM_CLK_1V8_FANOUT,R17,Microphone-side shared 1.8 V clock net
+J_MIC3,4,PDM_DATA3,PDM_DATA3_1V8,U21,Microphone-side PDM data net
+J_MIC3,6,AAD_CFG,AAD_CFG_1V8_FANOUT,R18,Microphone-side shared AAD configuration net
+J_MIC4,3,PDM_CLK,PDM_CLK_1V8_FANOUT,R17,Microphone-side shared 1.8 V clock net
+J_MIC4,4,PDM_DATA4,PDM_DATA4_1V8,U22,Microphone-side PDM data net
+J_MIC4,6,AAD_CFG,AAD_CFG_1V8_FANOUT,R18,Microphone-side shared AAD configuration net
+J_PWR,11,I2C2_SCL,I2C2_SCL_BUS,R15,PCB-PWR connection to shared I2C2 bus
+J_PWR,12,I2C2_SDA,I2C2_SDA_BUS,R16,PCB-PWR connection to shared I2C2 bus

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent pre-schematic authority audit for EVT-PRE-20 PCB-MAIN Rev.A.
+"""Independent capture-input authority audit for EVT-PRE-20 PCB-MAIN Rev.A.
 
 This gate proves that the complete pre-schematic capture inputs are internally
 consistent. It does not claim
@@ -47,6 +47,9 @@ MECHANICAL_PLACEMENT_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMEN
 DUAL_SIM_POLICY_PATH = ROOT / "hardware/DUAL_SIM_SINGLE_STANDBY.md"
 AUDIO_INTERFACE_PATH = ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md"
 POWER_ARCHITECTURE_PATH = ROOT / "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
+GROUND_DOMAIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv"
+GROUND_DOMAIN_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md"
+NATIVE_NET_OVERLAY_PATH = ROOT / "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv"
 
 EXPECTED_AUTHORITATIVE_INPUTS = {
     "config/EVT_PRE_20_BASELINE.yaml",
@@ -74,6 +77,9 @@ EXPECTED_AUTHORITATIVE_INPUTS = {
     "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md",
     "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -411,7 +417,8 @@ def main() -> None:
     require(status["schema_version"] == 1, "PCB-MAIN status schema mismatch")
     require(status["configuration"] == "EVT-PRE-20 Rev.A", "configuration mismatch")
     require(status["assembly"] == "PCB-MAIN", "assembly mismatch")
-    require(status["release_state"] == "CAPTURE_INPUT", "premature PCB-MAIN release state")
+    require(status["release_state"] in {"CAPTURE_INPUT", "SCHEMATIC_REVIEW"},
+            "invalid PCB-MAIN capture/review state")
     require(status["manufacturing_release"] is False, "PCB-MAIN must remain blocked")
 
     source_control = status["source_control"]
@@ -1504,8 +1511,28 @@ def main() -> None:
 
     native = status["native_schematic"]
     native_path = ROOT / native["path"]
-    require(native["status"] == "ABSENT" and not native_path.exists(), "native schematic filesystem/status mismatch")
-    require(native["schematic_derived_bom"] is False, "schematic-derived BOM claimed without native source")
+    native_project = ROOT / native.get("project", "")
+    native_manifest = ROOT / native.get("manifest", "")
+    native_generator = ROOT / native.get("generator", "")
+    native_present = status["release_state"] == "SCHEMATIC_REVIEW"
+    if native_present:
+        require(native["status"] == "PRESENT_REVIEW_PENDING", "native schematic status mismatch")
+        require(all(path.is_file() for path in (native_path, native_project, native_manifest, native_generator)),
+                "controlled native schematic source set is incomplete")
+        require(native["schematic_derived_bom"] is True,
+                "native schematic BOM provenance is not declared")
+        native_manifest_data = json.loads(native_manifest.read_text(encoding="utf-8"))
+        require(native_manifest_data["schematic_sha256"] == hashlib.sha256(native_path.read_bytes()).hexdigest(),
+                "native schematic manifest hash mismatch")
+        require(native_manifest_data["project_sha256"] == hashlib.sha256(native_project.read_bytes()).hexdigest(),
+                "native project manifest hash mismatch")
+        require(native_manifest_data["generator_sha256"] == hashlib.sha256(native_generator.read_bytes()).hexdigest(),
+                "native generator manifest hash mismatch")
+    else:
+        require(native["status"] == "ABSENT" and not native_path.exists(),
+                "native schematic filesystem/status mismatch")
+        require(native["schematic_derived_bom"] is False,
+                "schematic-derived BOM claimed without native source")
 
     readiness = status["capture_readiness"]
     closed_items = readiness["closed_authorities"]
@@ -1610,20 +1637,41 @@ def main() -> None:
     require(all("production_bom" in item["blocks"] for item in open_items), "open authority does not block production BOM")
     review_a = status["review_a"]
     review_b = status["review_b"]
-    require(review_a["complete"] is False and review_a["status"] == "BLOCKED_NATIVE_SCHEMATIC_ABSENT", "Review A must remain blocked on native schematic")
+    expected_review_a_status = (
+        "NATIVE_SOURCE_AND_AUTOMATED_NET_AUDIT_GATED_HUMAN_REVIEW_PENDING"
+        if native_present else "BLOCKED_NATIVE_SCHEMATIC_ABSENT"
+    )
+    require(review_a["complete"] is False and review_a["status"] == expected_review_a_status,
+            "Review A status does not match native-source state")
     require(review_b["complete"] is False and review_b["status"] == "BLOCKED_REVIEW_A_NOT_COMPLETE", "Review B must remain blocked")
     expected_review_a_evidence = {
         "signed_checklist", "schematic_pdf", "cubemx_pin_report", "erc_report",
         "bom_diff", "net_name_diff",
     }
     require(set(review_a["evidence"]) == expected_review_a_evidence, "Review A evidence schema mismatch")
-    require(not any(review_a["evidence"].values()) and not review_b["evidence"], "review evidence present while review is incomplete")
+    if native_present:
+        require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
+                "human Review A identity/date/SHA claimed before sign-off")
+        require(review_a["evidence"]["signed_checklist"] is None,
+                "signed Review A checklist claimed before sign-off")
+        require(str(review_a["evidence"]["bom_diff"]).startswith("CI artifact: "),
+                "schematic-derived BOM is not declared as CI evidence")
+        require(str(review_a["evidence"]["schematic_pdf"]).startswith("CI artifact: "),
+                "schematic PDF is not declared as CI evidence")
+        require(str(review_a["evidence"]["erc_report"]).startswith("CI artifact: "),
+                "ERC report is not declared as CI evidence")
+        require(str(review_a["evidence"]["net_name_diff"]).startswith("CI artifact: "),
+                "net audit is not declared as CI evidence")
+    else:
+        require(not any(review_a["evidence"].values()),
+                "review evidence present without native source")
+    require(not review_b["evidence"], "Review B evidence present before Review A completion")
 
     result = {
         "configuration": status["configuration"],
         "assembly": status["assembly"],
-        "audit": "PCB-MAIN independent pre-schematic authority audit",
-        "status": "PASS_CAPTURE_INPUT_CONTROLLED",
+        "audit": "PCB-MAIN independent capture-input authority audit",
+        "status": "PASS_SCHEMATIC_REVIEW_INPUT_CONTROLLED" if native_present else "PASS_CAPTURE_INPUT_CONTROLLED",
         "mcu_assignments_verified": len(mcu_pins),
         "mcu_package_pins_verified": len(authority_rows),
         "storage_sensor_pads_verified": len(device_rows),
@@ -1638,14 +1686,17 @@ def main() -> None:
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
-        "native_schematic": "ABSENT",
-        "review_a": "BLOCKED",
+        "native_schematic": "PRESENT_REVIEW_PENDING" if native_present else "ABSENT",
+        "review_a": "PENDING" if native_present else "BLOCKED",
         "review_b": "BLOCKED",
         "production_bom": "BLOCKED",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
-    print("PCB-MAIN Rev.A pre-schematic authority audit: PASS_CAPTURE_INPUT_CONTROLLED")
+    print(
+        "PCB-MAIN Rev.A capture authority audit: "
+        + ("PASS_SCHEMATIC_REVIEW_INPUT_CONTROLLED" if native_present else "PASS_CAPTURE_INPUT_CONTROLLED")
+    )
     print(f"- all {len(authority_rows)} U1 package positions and {len(mcu_pins)} functional assignments verified")
     print(f"- all {len(device_rows)} U2/U3/U4 physical pins or pads and three unique I2C2 addresses verified")
     print(f"- all {len(audio_rows)} U7/U17/U18 physical pins, dual-direction PDM translation and active-high AAD wake path verified")
@@ -1658,7 +1709,10 @@ def main() -> None:
     print(f"- all {len(passive_support_rows)} passive/support RefDes, MPNs, populations and physical pin sets verified")
     print(f"- all {len(mechanical_rows)} outline, placement, zone, keepout and production fixture records verified")
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
-    print("- all 11 capture authorities closed; native schematic and Reviews A/B remain production blockers")
+    print(
+        "- all 11 capture authorities closed; native schematic source is present; "
+        "Reviews A/B remain production blockers"
+    )
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

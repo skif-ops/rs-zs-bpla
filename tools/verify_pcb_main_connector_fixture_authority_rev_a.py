@@ -272,7 +272,7 @@ def main() -> None:
         "physical_contacts_verified": len(rows),
         "contact_groups_verified": EXPECTED_COUNTS,
         "open_authorities": sorted(open_ids),
-        "native_schematic": "ABSENT",
+        "native_schematic": "PRESENT_REVIEW_PENDING",
         "physical_tests": "NOT_RUN",
         "production_bom": "BLOCKED",
     }
@@ -281,7 +281,7 @@ def main() -> None:
     print("PCB-MAIN connector/fixture second independent control: PASS_CONNECTOR_FIXTURE_AUTHORITY_ONLY")
     print("- all 70 microSD/USB/RF/tamper/STM32/EOL/BG95 contacts verified")
     print("- STM32 USB, BG95 USB, nRF USB and both SWD domains remain isolated")
-    print("- native capture and Reviews A/B keep the production BOM blocked")
+    print("- Reviews A/B keep the production BOM blocked")
 
 
 if __name__ == "__main__":

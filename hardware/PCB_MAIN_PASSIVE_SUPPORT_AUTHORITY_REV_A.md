@@ -6,7 +6,7 @@ This record closes `MAIN-AUTH-010`. It freezes every PCB-MAIN passive, support d
 
 Machine authority: `hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv`.
 
-Authority CSV SHA-256: `ed314382e2491f7d981c9deb670ffe9b3a8a4dbf7d0fb98c9a5b7c4e93073fb0`.
+Authority CSV SHA-256: `0b2abb5e967526590b02f069992579a2606d05d485f8ce3917472a3dbfbcd2b6`.
 
 The registry contains 211 unique physical components: 80 capacitors, 103 resistors, two inductors, one ferrite bead, one SAW filter, two support ICs, one complementary MOSFET, seven four-channel ESD arrays, two USB ESD arrays, six single-line ESD diodes, two supply TVS devices, three RF ESD devices and the already-selected X1 TCXO. There are 196 fitted and 15 DNP positions. Every row has an exact manufacturer, orderable MPN, package, value/function, population state, temperature range, logical net, full physical-pin map, electrical path and disposition.
 
@@ -59,4 +59,4 @@ D4 is unidirectional `TPD1E05U06DYAR`, rather than the bidirectional RF part use
 
 Closing `MAIN-AUTH-010` means the native schematic can be captured without selecting any missing PCB-MAIN passive or support MPN. It does not prove placement-dependent performance. Review A must still verify every row and pin map against the rendered native schematic and schematic-derived BOM, plus DC-bias capacitance, U1 SMPS stability, the FB1 700-960 MHz impedance requirement, modem burst droop, SIM voltage, GNSS supervisor thresholds, USB signal integrity and RF tuning evidence.
 
-At the `MAIN-AUTH-010` checkpoint, `MAIN-AUTH-011` remained open for outline, connector orientation, RF zones, keepouts and exact production test-point placement; it is now separately closed by the mechanical placement authority. Native capture is absent, Reviews A/B are incomplete and all physical tests remain `NOT RUN`. Production Gerbers and the production BOM remain blocked.
+At the `MAIN-AUTH-010` checkpoint, `MAIN-AUTH-011` remained open for outline, connector orientation, RF zones, keepouts and exact production test-point placement; it is now separately closed by the mechanical placement authority. Native capture has advanced to `SCHEMATIC_REVIEW`; Reviews A/B are incomplete and all physical tests remain `NOT RUN`. Production Gerbers and the production BOM remain blocked.

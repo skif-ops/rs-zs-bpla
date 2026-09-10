@@ -1,0 +1,23 @@
+Rule_ID,Rule_Type,RefDes,Pin,Logical_Net,Native_Net,Domain,Reason
+GND-DIGITAL-DEFAULT,DEFAULT,*,*,GND,GND_DIGITAL,DIGITAL_RETURN,Every generic PCB-MAIN GND endpoint not explicitly assigned below returns through J_PWR pin 4; no PCB-MAIN net-tie is permitted
+GND-MIC-001,ENDPOINT,C20,2,GND,GND_MIC,MIC_RETURN,PCB-MAIN 1V8_MIC entry bulk return
+GND-MIC-002,ENDPOINT,C30,2,GND,GND_MIC,MIC_RETURN,U17 1V8 microphone wake logic bypass return
+GND-MIC-003,ENDPOINT,J_MIC1,2,GND,GND_MIC,MIC_RETURN,MIC1 harness return to J_PWR pin 6
+GND-MIC-004,ENDPOINT,J_MIC2,2,GND,GND_MIC,MIC_RETURN,MIC2 harness return to J_PWR pin 6
+GND-MIC-005,ENDPOINT,J_MIC3,2,GND,GND_MIC,MIC_RETURN,MIC3 harness return to J_PWR pin 6
+GND-MIC-006,ENDPOINT,J_MIC4,2,GND,GND_MIC,MIC_RETURN,MIC4 harness return to J_PWR pin 6
+GND-MIC-007,ENDPOINT,R19,2,GND,GND_MIC,MIC_RETURN,MIC1 WAKE connector-side inactive-state pull-down
+GND-MIC-008,ENDPOINT,R20,2,GND,GND_MIC,MIC_RETURN,MIC2 WAKE connector-side inactive-state pull-down
+GND-MIC-009,ENDPOINT,R21,2,GND,GND_MIC,MIC_RETURN,MIC3 WAKE connector-side inactive-state pull-down
+GND-MIC-010,ENDPOINT,R22,2,GND,GND_MIC,MIC_RETURN,MIC4 WAKE connector-side inactive-state pull-down
+GND-MIC-011,ENDPOINT,U17,7,GND,GND_MIC,MIC_RETURN,U17 microphone wake OR logic ground
+GND-MIC-012,ENDPOINT,U17,12,GND,GND_MIC,MIC_RETURN,U17 unused microphone-domain input strap
+GND-MIC-013,ENDPOINT,U17,13,GND,GND_MIC,MIC_RETURN,U17 unused microphone-domain input strap
+GND-MIC-014,ENDPOINT,U19,3,GND,GND_MIC,MIC_RETURN,J_MIC1 signal ESD primary ground
+GND-MIC-015,ENDPOINT,U19,8,GND,GND_MIC,MIC_RETURN,J_MIC1 signal ESD secondary ground
+GND-MIC-016,ENDPOINT,U20,3,GND,GND_MIC,MIC_RETURN,J_MIC2 signal ESD primary ground
+GND-MIC-017,ENDPOINT,U20,8,GND,GND_MIC,MIC_RETURN,J_MIC2 signal ESD secondary ground
+GND-MIC-018,ENDPOINT,U21,3,GND,GND_MIC,MIC_RETURN,J_MIC3 signal ESD primary ground
+GND-MIC-019,ENDPOINT,U21,8,GND,GND_MIC,MIC_RETURN,J_MIC3 signal ESD secondary ground
+GND-MIC-020,ENDPOINT,U22,3,GND,GND_MIC,MIC_RETURN,J_MIC4 signal ESD primary ground
+GND-MIC-021,ENDPOINT,U22,8,GND,GND_MIC,MIC_RETURN,J_MIC4 signal ESD secondary ground

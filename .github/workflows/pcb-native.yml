@@ -31,6 +31,9 @@ on:
       - "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md"
       - "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
       - "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv"
       - "hardware/DUAL_SIM_SINGLE_STANDBY.md"
       - "hardware/T5838_AAD_INTERFACE_REV_A.md"
       - "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
@@ -56,6 +59,8 @@ on:
       - "tools/verify_pcb_main_connector_fixture_authority_rev_a.py"
       - "tools/verify_pcb_main_passive_support_authority_rev_a.py"
       - "tools/verify_pcb_main_mechanical_placement_authority_rev_a.py"
+      - "tools/generate_pcb_main_schematic_rev_a.py"
+      - "tools/audit_pcb_main_native_schematic_rev_a.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
@@ -199,7 +204,7 @@ jobs:
           PY
       - name: Import PCB-MIC secondary reference CAD
         run: |
-          python -m pip install --disable-pip-version-check easyeda2kicad kiutils
+          python -m pip install --disable-pip-version-check easyeda2kicad 'kiutils==1.4.8'
           mkdir -p artifacts/kicad-reference/PCB-MIC
           ROOT="$PWD/artifacts/kicad-reference/PCB-MIC"
           easyeda2kicad --full --lcsc_id=C7230692 --output "$ROOT/t5838_ref" --project-relative
@@ -212,6 +217,16 @@ jobs:
             --t5838-root artifacts/kicad-reference/PCB-MIC/t5838_ref.pretty \
             --molex-root artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.pretty \
             --output artifacts/kicad-reference/PCB-MIC/reference_geometry_report.json
+      - name: Verify committed native PCB-MAIN schematic
+        run: |
+          test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch
+          test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro
+          test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json
+          python tools/generate_pcb_main_schematic_rev_a.py --check
+          python tools/audit_pcb_main_native_schematic_rev_a.py \
+            --schematic hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch \
+            --output artifacts/kicad-native/PCB-MAIN/native_schematic_audit.json \
+            --bom-output artifacts/kicad-native/PCB-MAIN/native_schematic_bom.csv
       - name: Materialize native PCB-PWR schematic
         run: |
           python tools/generate_pcb_pwr_schematic_rev_a.py \
@@ -287,6 +302,9 @@ jobs:
           path: |
             artifacts/kicad-native/
             artifacts/kicad-reference/
+            hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch
+            hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro
+            hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
             hardware/kicad/native/PCB-PWR/sym-lib-table
@@ -305,4 +323,7 @@ jobs:
             hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md
+            hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv
+            hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md
+            hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv
           if-no-files-found: warn

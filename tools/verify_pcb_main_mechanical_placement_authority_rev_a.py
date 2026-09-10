@@ -295,8 +295,11 @@ def main() -> None:
     }, "MAIN-AUTH-011 evidence set mismatch")
     require(readiness["complete"] is True and not readiness["open_authorities"], "capture authority is not complete")
     require(status["manufacturing_release"] is False, "mechanical authority prematurely released manufacturing")
-    require(status["native_schematic"]["status"] == "ABSENT", "native schematic state unexpectedly changed")
-    require(status["review_a"]["status"] == "BLOCKED_NATIVE_SCHEMATIC_ABSENT", "Review A blocker changed incorrectly")
+    require(status["native_schematic"]["status"] == "PRESENT_REVIEW_PENDING",
+            "native schematic state mismatch")
+    require(status["review_a"]["status"] ==
+            "NATIVE_SOURCE_AND_AUTOMATED_NET_AUDIT_GATED_HUMAN_REVIEW_PENDING",
+            "Review A state mismatch")
 
     connector_freeze = {row["Connector_ID"]: row for row in read_rows(CONNECTOR_FREEZE_PATH)}
     pcb_main_connector_ids = {
@@ -341,7 +344,7 @@ def main() -> None:
         "fixture_fiducials_verified": len(fiducials),
         "authority_sha256": digest,
         "open_authorities": [],
-        "native_schematic": "ABSENT",
+        "native_schematic": "PRESENT_REVIEW_PENDING",
         "physical_tests": "NOT_RUN",
         "production_bom": "BLOCKED",
     }
@@ -351,7 +354,7 @@ def main() -> None:
     print(
         "PCB-MAIN MAIN-AUTH-011 mechanical placement verification: PASS "
         "(110 x 75 x 1.6 mm; four holes; 13 connectors; four RF zones; "
-        "31 pogo pads; native capture/reviews remain blocking)"
+        "31 pogo pads; Reviews A/B remain blocking)"
     )
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 

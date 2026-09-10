@@ -1,8 +1,8 @@
 # EVT-PRE-20 Rev.A native KiCad capture specification
 
-Status: `CAPTURE_INPUT / BLOCKING / NOT FOR MANUFACTURE`
+Status: `SCHEMATIC_REVIEW / BLOCKING / NOT FOR MANUFACTURE`
 
-This document is the authoritative bridge from the locked EVT-PRE-20 system baseline to native KiCad capture. Native `.kicad_sch/.kicad_pcb` files, ERC/DRC and Review A/B remain mandatory before any Gerber may be released.
+This document is the authoritative bridge from the locked EVT-PRE-20 system baseline to native KiCad capture. Native PCB-MAIN `.kicad_sch` is present; KiCad ERC, human Review A, `.kicad_pcb`, DRC and Review B remain mandatory before any Gerber may be released.
 
 Authoritative inputs:
 - `config/EVT_PRE_20_BASELINE.yaml`;
@@ -19,6 +19,8 @@ Authoritative inputs:
 - `hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv` and its independent review record;
+- `hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv`;
+- `hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
 - `hardware/MAIN_COMPONENT_FREEZE_REV_A.csv`;
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`;
@@ -30,9 +32,9 @@ Authoritative inputs:
 Capture-control status is recorded in
 `hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json` and independently checked by
 `tools/audit_pcb_main_capture_authority_rev_a.py`. A PASS from that audit means
-only that the current input set and open-authority register are controlled. It
-does not mean that native capture, Review A, Review B or the production BOM has
-passed.
+only that the current input set, native-source state and open-authority register
+are controlled. It does not mean that Review A, Review B or the production BOM
+has passed.
 
 ## 1. PCB-MAIN Rev.A
 
@@ -224,11 +226,13 @@ Required AAD tests before release:
 - Every row freezes one PCB-MAIN RefDes with manufacturer, exact MPN, package, value/function, population, temperature range, full physical-pin set, endpoint-qualified net path and disposition.
 - `C1..C80`, `R1..R103`, `L1/L2`, `FB1`, `FL1`, `U5/U6/U19..U27`, `Q4`, `D1..D11`, and `X1` are the complete Rev.A set governed by this authority. X1 is restated to close its complete four-pad map without creating a duplicate BOM item.
 - Endpoint suffixes such as `_U1`, `_U9`, `_U10`, `_U11`, `_U16`, `_CARD`, `_CONN`, `_MUX` and `_TP` distinguish the two physical nets around a series component. The unsuffixed names in earlier device authorities remain logical interface names; the `MAIN-AUTH-010` endpoint map governs native capture around the series element.
+- `hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv` is the exact endpoint bridge from those logical interface names to physical native nets.
+- Generic pre-capture `GND` resolves through `hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv`: 21 microphone endpoints use `GND_MIC`, every remaining generic ground endpoint uses `GND_DIGITAL`, and existing `GND_MODEM` endpoints remain unchanged. PCB-MAIN contains no ground-domain net-tie; the only joins to `GND_PWR` remain NT1/NT2/NT3 on PCB-PWR.
 - The GNSS supervisor is the exact u-blox Figure 38 topology with `LT6000IDCB#TRMPBF`, `Si1016X-T1-GE3`, `LQW15AN27NJ00D` and `ABSES5AF-L100KM`. The J9 RF protector is unidirectional because that RF node carries positive DC antenna bias.
 - Rev.A hardware revision encoding is fixed as `HW_REV[1:0]=00`: R3/R5 fitted pull-downs and R4/R6 DNP alternate pull-ups.
 - STM32/nRF SWD and guarded I2C fixture contacts remain direct by design. There is no board-side protection or series element on those controlled internal test contacts.
 - The authority closes component selection only. DC-bias capacitance, SMPS stability, FB1 frequency response, modem burst droop, GNSS thresholds, USB/SIM signal integrity and RF tuning remain Review A/EVT evidence.
-- Placement-dependent performance remains Review A/Review B and physical evidence. Native capture, Reviews A/B and physical tests remain open. This capture input is `NOT FOR MANUFACTURE` and cannot release a production BOM or fabrication data.
+- Placement-dependent performance remains Review A/Review B and physical evidence. Native schematic capture is present and independently source/net-audited; KiCad ERC, human Review A, layout, Review B and physical tests remain open. This capture is `NOT FOR MANUFACTURE` and cannot release a production BOM or fabrication data.
 
 ### 1.11 Mechanical placement and DFT geometry
 
@@ -239,7 +243,7 @@ Required AAD tests before release:
 - U8/J8, U9/J9, U10/J10 and U11 occupy separate cellular, GNSS, RU868 and BLE zones. The U11 antenna end is flush to the east edge with a 3.8 x 10.5 mm all-layer board keepout and a larger enclosure exclusion.
 - The GNSS upper-view mechanical exclusion prohibits solar, metal and cable bundles above its reserved route. Final active antenna and coax geometry remain separate system inputs.
 - All 31 production pogo pads are fixed on the bottom side as 1.70 mm copper pads with 2.10 mm mask openings, no paste and 2.54 mm intra-group pitch. Three bottom fixture fiducials and a component-free fixture window are fixed with them.
-- Closing `MAIN-AUTH-011` means the capture-authority input set is complete. It does not create native CAD, pass either review, validate the 110 x 75 x 12 mm envelope against STEP, or release the BOM or fabrication data.
+- Closing `MAIN-AUTH-011` means the capture-authority input set is complete. It does not create the native PCB layout, pass either review, validate the 110 x 75 x 12 mm envelope against STEP, or release the BOM or fabrication data.
 
 ## 2. PCB-MIC Rev.A
 

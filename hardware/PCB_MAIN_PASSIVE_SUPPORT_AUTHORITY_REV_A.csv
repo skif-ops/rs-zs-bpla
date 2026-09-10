@@ -104,7 +104,7 @@ R22,Resistor,Panasonic,ERJ-2RKF1003X,0402,100 kOhm 1%,FITTED,-55..155,MIC_WAKE4,
 R23,Resistor,Panasonic,ERJ-2RKF1003X,0402,100 kOhm 1%,FITTED,-55..155,MIC_WAKE,1=MIC_WAKE;2=GND,U18 MCU-side inactive-state pull-down,LOCKED_FITTED,TI_SCES882E_RevE,Keeps PA8 low during partial power
 R24,Resistor,Panasonic,ERJ-2RKF4701X,0402,4.7 kOhm 1%,FITTED,-55..155,CELL_PWRKEY_CMD,1=CELL_PWRKEY_CMD;2=Q1_BASE,Q1 base current limiter,LOCKED_FITTED,Quectel_BG95_HW_Design_v1.6,Q1 pin 1 endpoint
 R25,Resistor,Panasonic,ERJ-2RKF4702X,0402,47 kOhm 1%,FITTED,-55..155,Q1_BASE,1=Q1_BASE;2=GND_MODEM,Q1 base-emitter off-state pull,LOCKED_FITTED,Quectel_BG95_HW_Design_v1.6,Prevents unintended PWRKEY assertion
-R26,Resistor,Panasonic,ERJ-2RKF4701X,0402,4.7 kOhm 1%,FITTED,-55..155,CELL_RESET_CMD,1=CELL_RESET_CMD;2=Q2_BASE,Q2 base current limiter,LOCKED_FITTED,Quectel_BG95_HW_Design_v1.6,Q2 pin 1 endpoint
+R26,Resistor,Panasonic,ERJ-2RKF4701X,0402,4.7 kOhm 1%,FITTED,-55..155,CELL_RESET_N_CMD,1=CELL_RESET_N_CMD;2=Q2_BASE,Q2 base current limiter,LOCKED_FITTED,Quectel_BG95_HW_Design_v1.6,Q2 pin 1 endpoint
 R27,Resistor,Panasonic,ERJ-2RKF4702X,0402,47 kOhm 1%,FITTED,-55..155,Q2_BASE,1=Q2_BASE;2=GND_MODEM,Q2 base-emitter off-state pull,LOCKED_FITTED,Quectel_BG95_HW_Design_v1.6,Prevents unintended RESET_N assertion
 R28,Resistor,Panasonic,ERJ-2RKF1002X,0402,10 kOhm 1%,FITTED,-55..155,CELL_TX_U16,1=3V3_DIGITAL;2=CELL_TX_U16,Modem receive path idle-HIGH pull-up,LOCKED_FITTED,Quectel_BG95_HW_Design_v1.6,U16 B5 side
 R29,Resistor,Panasonic,ERJ-2RKF1003X,0402,100 kOhm 1%,FITTED,-55..155,CELL_DTR_U16,1=CELL_DTR_U16;2=GND_MODEM,Modem DTR default-awake pull-down,LOCKED_FITTED,Quectel_BG95_HW_Design_v1.6,U16 B6 side
