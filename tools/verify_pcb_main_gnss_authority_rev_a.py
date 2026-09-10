@@ -180,7 +180,7 @@ def main() -> None:
     readiness = status["capture_readiness"]
     closed = {item["id"]: item for item in readiness["closed_authorities"]}
     open_ids = {item["id"] for item in readiness["open_authorities"]}
-    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 11)}, "closed authority set mismatch")
+    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 12)}, "closed authority set mismatch")
     require(
         set(closed["MAIN-AUTH-006"]["evidence"])
         == {
@@ -189,8 +189,8 @@ def main() -> None:
         },
         "MAIN-AUTH-006 evidence set mismatch",
     )
-    require(open_ids == {"MAIN-AUTH-011"}, "remaining open authority set mismatch")
-    require(readiness["complete"] is False and status["manufacturing_release"] is False, "GNSS authority prematurely released manufacturing")
+    require(open_ids == set(), "open authority set mismatch")
+    require(readiness["complete"] is True and status["manufacturing_release"] is False, "capture/manufacturing state mismatch")
 
     supply_margin_v = round(3.3 - 2.7, 3)
     vcc_io_margin_v = round((3.3 + 0.3) - 3.3, 3)
@@ -221,7 +221,7 @@ def main() -> None:
     print("- all 20 physical contacts and independent module/connector maps verified")
     print("- supply choices, UART/PPS, SAFEBOOT and active-antenna supervisor verified")
     print("- RF/bias topology and controlled calculations verified")
-    print(f"- {len(open_ids)} remaining authorities keep the production BOM blocked")
+    print("- native capture and Reviews A/B keep the production BOM blocked")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

@@ -18,6 +18,7 @@ Authoritative inputs:
 - `hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv` and its independent review record;
+- `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
 - `hardware/MAIN_COMPONENT_FREEZE_REV_A.csv`;
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`;
@@ -197,7 +198,7 @@ Required AAD tests before release:
 - U11 pads 28 `VDD` and 30 `VDDH` tie to `3V3_DIGITAL` for normal-voltage mode, with local 100 nF plus 10 uF. Pad 31 `DCCH`, pad 32 `VBUS`, pads 34/35 USB data, and every unused GPIO are explicit NC.
 - nRF firmware uses the calibrated internal LFRC; U11 pads 17/18 are NC and no 32.768 kHz crystal is fitted.
 - integrated antenna is placed at the PCB edge with the Raytac all-layer no-ground/copper region at least 10.5 mm wide by 3.8 mm deep and extended wider where possible; no component, battery, shield, conductive label, standoff or cable bundle occupies the antenna volume.
-- Exact reset-buffer/passive RefDes and MPNs are frozen by `MAIN-AUTH-010`; exact placement coordinates and mechanical exclusion remain `MAIN-AUTH-011`.
+- Exact reset-buffer/passive RefDes and MPNs are frozen by `MAIN-AUTH-010`; exact placement coordinates and mechanical exclusion are frozen by `MAIN-AUTH-011`.
 - final housing RF validation is mandatory; same-family external-antenna module may be adopted only by formal change if margin is insufficient.
 
 ### 1.9 Storage, sensors, USB and DFT
@@ -215,7 +216,7 @@ Required AAD tests before release:
 - `J11` is GCT `USB4105-GF-A-120`, USB2 device-only for STM32 service/recovery: A6/B6 join to PA12 `USB_DP`, A7/B7 join to PA11 `USB_DM`, VBUS is protected sense-only to PA9, CC1/CC2 have independent device Rd endpoints, SBU is NC, and `USB_SHIELD` has a controlled bond. J11 never connects to U11 or U8 USB.
 - `J8/J9/J10` are exact Hirose `U.FL-R-SMT-1(60)` receptacles. Their center/shell endpoints are controlled by `PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv` and cross-checked against the GNSS/LoRa authorities.
 - `TP_MCU_SWD` is an independent five-contact STM32 SWD group; `TP_EOL` is an exact 13-contact production group; `TP_CELL_USB` and `TP_CELL_DBG` are isolated BG95 recovery groups. `TP_BLE_SWD` remains independently controlled by `MAIN-AUTH-008` and shares no SWD contacts.
-- Connector/card identities and all contact endpoints close `MAIN-AUTH-009`. Exact support/protection/passive RefDes and MPNs are frozen by `MAIN-AUTH-010`; connector orientation and fixture-pad coordinates remain `MAIN-AUTH-011`.
+- Connector/card identities and all contact endpoints close `MAIN-AUTH-009`. Exact support/protection/passive RefDes and MPNs are frozen by `MAIN-AUTH-010`; connector orientation and fixture-pad coordinates are frozen by `MAIN-AUTH-011`.
 
 ### 1.10 Complete passive and support capture
 
@@ -227,7 +228,18 @@ Required AAD tests before release:
 - Rev.A hardware revision encoding is fixed as `HW_REV[1:0]=00`: R3/R5 fitted pull-downs and R4/R6 DNP alternate pull-ups.
 - STM32/nRF SWD and guarded I2C fixture contacts remain direct by design. There is no board-side protection or series element on those controlled internal test contacts.
 - The authority closes component selection only. DC-bias capacitance, SMPS stability, FB1 frequency response, modem burst droop, GNSS thresholds, USB/SIM signal integrity and RF tuning remain Review A/EVT evidence.
-- `MAIN-AUTH-011`, native capture, Reviews A/B and physical tests remain open. This capture input is `NOT FOR MANUFACTURE` and cannot release a production BOM or fabrication data.
+- Placement-dependent performance remains Review A/Review B and physical evidence. Native capture, Reviews A/B and physical tests remain open. This capture input is `NOT FOR MANUFACTURE` and cannot release a production BOM or fabrication data.
+
+### 1.11 Mechanical placement and DFT geometry
+
+- `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv` is the machine authority for `MAIN-AUTH-011` and contains 70 exact geometry records.
+- The Rev.A PCB outline is 110 x 75 mm with R3 corners, nominal 1.60 mm thickness and four D3.20 mm M3-clearance NPTHs at `(5,5)`, `(105,5)`, `(105,70)` and `(5,70)` mm.
+- The EVT target remains six layers. Trace widths for 50 Ohm cellular, GNSS and RU868 paths are calculated only from the selected fabricator stackup; this authority does not guess them.
+- J6/J7/J11/J12 use the south service edge; J_PWR exits west, J13 east, and the four microphone harnesses use controlled west/north/east pull corridors.
+- U8/J8, U9/J9, U10/J10 and U11 occupy separate cellular, GNSS, RU868 and BLE zones. The U11 antenna end is flush to the east edge with a 3.8 x 10.5 mm all-layer board keepout and a larger enclosure exclusion.
+- The GNSS upper-view mechanical exclusion prohibits solar, metal and cable bundles above its reserved route. Final active antenna and coax geometry remain separate system inputs.
+- All 31 production pogo pads are fixed on the bottom side as 1.70 mm copper pads with 2.10 mm mask openings, no paste and 2.54 mm intra-group pitch. Three bottom fixture fiducials and a component-free fixture window are fixed with them.
+- Closing `MAIN-AUTH-011` means the capture-authority input set is complete. It does not create native CAD, pass either review, validate the 110 x 75 x 12 mm envelope against STEP, or release the BOM or fabrication data.
 
 ## 2. PCB-MIC Rev.A
 
@@ -282,6 +294,7 @@ Molex Micro-Fit 3.0 board header `43045-1202`, mating housing `43025-1200`, powe
 
 ## 4. PCB layout constraints
 
+- outline, mounting holes, connector/module anchors, RF regions, enclosure exclusions and production fixture coordinates exactly follow `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv`;
 - separate cellular, GNSS, LoRa and BLE RF zones;
 - uninterrupted reference ground under RF and digital high-speed return paths as appropriate;
 - no DC/DC switching node beneath/adjacent to GNSS RF or microphone/PDM/wake fanout;

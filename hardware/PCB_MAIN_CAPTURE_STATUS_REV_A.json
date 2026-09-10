@@ -29,6 +29,8 @@
       "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md",
       "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv",
       "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md",
       "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
       "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
       "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -77,7 +79,7 @@
     "schematic_derived_bom": false
   },
   "capture_readiness": {
-    "complete": false,
+    "complete": true,
     "closed_authorities": [
       {
         "id": "MAIN-AUTH-001",
@@ -158,19 +160,17 @@
           "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv",
           "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md"
         ]
-      }
-    ],
-    "open_authorities": [
+      },
       {
         "id": "MAIN-AUTH-011",
-        "scope": "PCB outline, connector orientation, RF zones, keepouts and production test-point placement",
-        "blocks": [
-          "layout_review",
-          "review_b",
-          "production_bom"
+        "scope": "PCB outline, mounting pattern, connector orientation, service access, RF zones, keepouts and exact production test-point placement",
+        "evidence": [
+          "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md"
         ]
       }
-    ]
+    ],
+    "open_authorities": []
   },
   "review_a": {
     "complete": false,

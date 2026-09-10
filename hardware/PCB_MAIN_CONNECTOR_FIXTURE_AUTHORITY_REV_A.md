@@ -26,19 +26,19 @@ Authority CSV SHA-256: `b94cd4723efeffbdea7f1c6ba82f977da9c83c556967316630461af6
 
 `U12` is the 32 GB Kingston `SDCIT2/32GB` industrial microSD card. `J12` is GCT `MEM2052-00-195-00-A`. Contacts 1 through 8 follow the standard microSD `DAT2`, `CD/DAT3`, `CMD`, `VDD`, `CLK`, `VSS`, `DAT0`, `DAT1` order and terminate at the already frozen four-bit STM32 SDMMC1 endpoints. SPI fallback is not part of Rev.A.
 
-The normally-open J12 detect contact closes `SD_DET` to ground only when a card is fully inserted. PC13 therefore uses a pull-up and reports an open or absent card as inactive. Exact pull, debounce, source damping, ESD and decoupling RefDes/MPNs are frozen by `MAIN-AUTH-010`; access, insertion direction and retention clearance remain `MAIN-AUTH-011`.
+The normally-open J12 detect contact closes `SD_DET` to ground only when a card is fully inserted. PC13 therefore uses a pull-up and reports an open or absent card as inactive. Exact pull, debounce, source damping, ESD and decoupling RefDes/MPNs are frozen by `MAIN-AUTH-010`; southward access and insertion direction are frozen by `MAIN-AUTH-011`, while retention remains a physical test.
 
 ### USB-C service port
 
 `J11` is exact GCT `USB4105-GF-A-120`. It is a USB 2.0 device-only service and STM32 system-memory recovery port. A6/B6 join locally as `USB_DP` to PA12, A7/B7 join locally as `USB_DM` to PA11, and all VBUS contacts join only to `USB_VBUS_CONN`, from which PA9 receives protected high-impedance sense. The station neither sources nor consumes operating power through J11. CC1 and CC2 are separate device-mode Rd endpoints; SBU1 and SBU2 are NC.
 
-J11 is never connected to U11 nRF USB or U8 BG95 USB. `USB_SHIELD` is distinct from signal ground at the connector and requires the controlled bond network selected under `MAIN-AUTH-010`. Board-edge geometry, 1.20 mm stake fit and sealed service-cover integration remain `MAIN-AUTH-011`.
+J11 is never connected to U11 nRF USB or U8 BG95 USB. `USB_SHIELD` is distinct from signal ground at the connector and requires the controlled bond network selected under `MAIN-AUTH-010`. South-edge geometry, 1.20 mm stake selection and plug-service allocation are frozen by `MAIN-AUTH-011`; sealed-cover fit remains a mechanical validation.
 
 ### RF receptacles
 
 `J8`, `J9` and `J10` are exact Hirose `U.FL-R-SMT-1(60)` receptacles with center contact 1 and grounded shell group. J8 center is `CELL_RF_ANT` and reaches U8 pad 60 `CELL_RF` only through its no-stub 50 Ohm matching/protection path. J9 and J10 rows intentionally restate the already closed GNSS and LoRa receptacle identities and nets; the verifier cross-checks them against `MAIN-AUTH-006` and `MAIN-AUTH-007` so this authority cannot silently diverge.
 
-Exact RF protection and matching RefDes/MPNs are frozen by `MAIN-AUTH-010`. Trace geometry, zones, via fences, receptacle orientation, cable clearance, conducted validation and final antenna-system acceptance remain `MAIN-AUTH-011` and physical EVT evidence.
+Exact RF protection and matching RefDes/MPNs are frozen by `MAIN-AUTH-010`. Zones, receptacle coordinates, tool clearance and enclosure exclusions are frozen by `MAIN-AUTH-011`. Stackup-derived trace geometry, via fences, cable fit, conducted validation and final antenna-system acceptance remain Review-B and physical EVT evidence.
 
 ### Tamper
 
@@ -58,12 +58,11 @@ The fixture contact groups are electrically separate:
 
 VTREF and rail-sense contacts never source station power. Fixture outputs remain high impedance until their referenced DUT domain is valid. The two USB interfaces do not share data, VBUS or test contacts. STM32 and nRF SWD contacts do not share debug nets. BG95 debug is 1.8 V only; `USB_BOOT` is normally LOW and may be driven HIGH only by the current-limited recovery fixture during the documented recovery power-on sequence.
 
-The EOL fixture uses the production LPUART with directions named at the DUT: PC1 is `TEST_UART_TX`, PC0 is `TEST_UART_RX`. I2C2 test access is open-drain and enables direct INA226 calibration/readback without adding an uncontrolled pull-up. `BOOT0` may be driven only while reset is asserted. Exact passive/protection parts are frozen by `MAIN-AUTH-010`; pogo geometry and coordinates remain `MAIN-AUTH-011`.
+The EOL fixture uses the production LPUART with directions named at the DUT: PC1 is `TEST_UART_TX`, PC0 is `TEST_UART_RX`. I2C2 test access is open-drain and enables direct INA226 calibration/readback without adding an uncontrolled pull-up. `BOOT0` may be driven only while reset is asserted. Exact passive/protection parts are frozen by `MAIN-AUTH-010`; bottom-side pogo geometry and coordinates are frozen by `MAIN-AUTH-011`.
 
-## Gates still open
+## Checkpoint boundary and current gates
 
-- `MAIN-AUTH-010`: every PCB-MAIN passive, support, protection, pull, strap, termination, filter and decoupling RefDes/MPN/physical-pin set.
-- `MAIN-AUTH-011`: outline, connector orientation, service access, RF zones/keepouts and exact production-test-pad placement.
+- At the `MAIN-AUTH-009` checkpoint, `MAIN-AUTH-010` and `MAIN-AUTH-011` were still open. They are now separately closed by their own machine authorities and independent checks.
 - Native PCB-MAIN schematic is absent. PCB Review A and Review B have not started.
 - Connector samples, card endurance/power-loss behavior, USB enumeration/recovery, tamper fault coverage, fixture MSA/programming, RF/VNA tests and environmental verification are `NOT RUN`.
 - The production BOM and any `FOR_MANUFACTURE` release remain blocked.

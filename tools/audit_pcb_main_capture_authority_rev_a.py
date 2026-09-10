@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Independent pre-schematic authority audit for EVT-PRE-20 PCB-MAIN Rev.A.
 
-This gate proves that the current capture inputs are internally consistent and that
-known missing device-pad authorities remain explicit blockers. It does not claim
+This gate proves that the complete pre-schematic capture inputs are internally
+consistent. It does not claim
 that Review A, Review B or the production BOM has passed.
 """
 from __future__ import annotations
@@ -42,6 +42,8 @@ CONNECTOR_FIXTURE_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_CONNECTOR_FIXTU
 CONNECTOR_FIXTURE_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md"
 PASSIVE_SUPPORT_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
 PASSIVE_SUPPORT_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md"
+MECHANICAL_PLACEMENT_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
+MECHANICAL_PLACEMENT_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md"
 DUAL_SIM_POLICY_PATH = ROOT / "hardware/DUAL_SIM_SINGLE_STANDBY.md"
 AUDIO_INTERFACE_PATH = ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md"
 POWER_ARCHITECTURE_PATH = ROOT / "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
@@ -70,6 +72,8 @@ EXPECTED_AUTHORITATIVE_INPUTS = {
     "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md",
     "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -124,8 +128,8 @@ EXPECTED_SWD = {
     "4": "NRST",
     "5": "GND",
 }
-EXPECTED_OPEN_AUTHORITY_IDS = {"MAIN-AUTH-011"}
-EXPECTED_CLOSED_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(1, 11)}
+EXPECTED_OPEN_AUTHORITY_IDS: set[str] = set()
+EXPECTED_CLOSED_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(1, 12)}
 EXPECTED_DEVICE_METADATA = {
     "U2": ("W25Q512JVFIQ", "SOIC-16_300mil_F"),
     "U3": ("LIS2DW12TR", "LGA-12_2x2mm"),
@@ -445,12 +449,12 @@ def main() -> None:
     addendum = rows(ADDENDUM_PATH)
     require(len(base) == 66, f"expected 66 base MCU assignments, got {len(base)}")
     require(len(addendum) == 1 and addendum[0]["Net"] == "AAD_CFG", "AAD_CFG addendum mismatch")
-    pins = base + addendum
-    require(len(pins) == status["mcu_contract"]["functional_assignment_count"] == 67, "MCU assignment count mismatch")
+    mcu_pins = base + addendum
+    require(len(mcu_pins) == status["mcu_contract"]["functional_assignment_count"] == 67, "MCU assignment count mismatch")
     for field in ("Net", "MCU_Pin", "LQFP100_Pin"):
-        values = [row[field] for row in pins]
+        values = [row[field] for row in mcu_pins]
         require(len(values) == len(set(values)), f"MCU pin authority has duplicate {field}")
-    by_net = {row["Net"]: row for row in pins}
+    by_net = {row["Net"]: row for row in mcu_pins}
     critical = {
         "PDM_CLK": ("PE9", "37"),
         "MIC_WAKE": ("PA8", "67"),
@@ -473,7 +477,7 @@ def main() -> None:
         require(net in by_net, f"critical MCU net missing: {net}")
         require((by_net[net]["MCU_Pin"], by_net[net]["LQFP100_Pin"]) == expected, f"{net} pin mismatch")
     require({by_net[f"PDM_DATA{i}"]["MCU_Pin"] for i in range(1, 5)} == {"PB1", "PD6", "PE7", "PE4"}, "four-channel PDM map mismatch")
-    require({"PB12", "PE1", "PC4", "PC5"}.isdisjoint(row["MCU_Pin"] for row in pins), "absent Q-package pin used")
+    require({"PB12", "PE1", "PC4", "PC5"}.isdisjoint(row["MCU_Pin"] for row in mcu_pins), "absent Q-package pin used")
 
     # Independent full-package control. The expected package list is copied from
     # the pinned ST CubeMX STM32U585VITxQ LQFP100_SMPS definition rather than
@@ -500,7 +504,7 @@ def main() -> None:
         expected_type = EXPECTED_POWER_PINS.get(position, ("RESET" if position == 14 else "IO", "", ""))[0]
         require(row["Pin_Type"] == expected_type, f"U1 position {position} pin-type mismatch")
 
-    functional_by_position = {int(row["LQFP100_Pin"]): row for row in pins}
+    functional_by_position = {int(row["LQFP100_Pin"]): row for row in mcu_pins}
     require(len(functional_by_position) == 67, "functional U1 position count mismatch")
     for position, source_row in functional_by_position.items():
         authority_row = authority_by_pin[position]
@@ -1360,6 +1364,69 @@ def main() -> None:
     }:
         require(marker in passive_support_review, f"passive/support review missing marker: {marker}")
 
+    mechanical_rows = rows(MECHANICAL_PLACEMENT_AUTHORITY_PATH)
+    mechanical_columns = {
+        "Record_ID", "Feature_Type", "RefDes", "Contact", "Side",
+        "Anchor_Definition", "X_mm", "Y_mm", "Rotation_deg", "Geometry",
+        "Extent_X_mm", "Extent_Y_mm", "Z_Min_mm", "Z_Max_mm",
+        "Access_Direction", "Layer_Scope", "Clearance_Rule", "Disposition",
+        "Authority", "Notes",
+    }
+    require(len(mechanical_rows) == 70, "expected 70 mechanical placement authority rows")
+    require(all(set(row) == mechanical_columns for row in mechanical_rows), "mechanical placement schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in mechanical_columns)
+            for row in mechanical_rows),
+        "mechanical placement authority row contains an empty field",
+    )
+    mechanical_by_id = {row["Record_ID"]: row for row in mechanical_rows}
+    require(len(mechanical_by_id) == len(mechanical_rows), "duplicate mechanical placement Record_ID")
+    require(set(mechanical_by_id) == {f"MECH-{index:03d}" for index in range(1, 71)}, "mechanical Record_ID set drift")
+    require(all(row["Authority"] == "MAIN-AUTH-011" for row in mechanical_rows), "mechanical authority ID drift")
+    outline = mechanical_by_id["MECH-001"]
+    require(
+        (outline["Geometry"], outline["Extent_X_mm"], outline["Extent_Y_mm"], outline["Z_Max_mm"])
+        == ("ROUNDED_RECT_R3", "110.00", "75.00", "1.60"),
+        "PCB-MAIN outline or thickness mismatch",
+    )
+    holes = [row for row in mechanical_rows if row["Feature_Type"] == "MOUNTING_HOLE"]
+    require(
+        {(row["RefDes"], row["X_mm"], row["Y_mm"]) for row in holes}
+        == {("H1", "5.00", "5.00"), ("H2", "105.00", "5.00"),
+            ("H3", "105.00", "70.00"), ("H4", "5.00", "70.00")},
+        "PCB-MAIN mounting pattern mismatch",
+    )
+    connector_placements = [row for row in mechanical_rows if row["Feature_Type"] == "CONNECTOR_PLACEMENT"]
+    require(
+        {row["RefDes"] for row in connector_placements}
+        == {"J_PWR", "J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4", "J6", "J7",
+            "J8", "J9", "J10", "J11", "J12", "J13"},
+        "mechanical connector placement set mismatch",
+    )
+    module_placements = [row for row in mechanical_rows if row["Feature_Type"] == "MODULE_PLACEMENT"]
+    require({row["RefDes"] for row in module_placements} == {"U8", "U9", "U10", "U11"}, "RF module placement set mismatch")
+    test_pads = [row for row in mechanical_rows if row["Feature_Type"] == "TEST_PAD"]
+    require(len(test_pads) == 31, "production pogo-pad count mismatch")
+    require(
+        all(row["Side"] == "BOTTOM" and row["Geometry"] == "CIRCLE_D1.7"
+            and row["Clearance_Rule"] == "NO_PASTE_MASK_OPEN_D2.1" for row in test_pads),
+        "production pogo-pad geometry mismatch",
+    )
+    require(
+        (mechanical_by_id["MECH-028"]["X_mm"], mechanical_by_id["MECH-028"]["Extent_X_mm"],
+         mechanical_by_id["MECH-028"]["Extent_Y_mm"], mechanical_by_id["MECH-028"]["Layer_Scope"])
+        == ("106.20", "3.80", "10.50", "ALL_LAYERS"),
+        "BLE all-layer antenna keepout mismatch",
+    )
+    mechanical_review = MECHANICAL_PLACEMENT_REVIEW_PATH.read_text(encoding="utf-8")
+    mechanical_sha256 = hashlib.sha256(MECHANICAL_PLACEMENT_AUTHORITY_PATH.read_bytes()).hexdigest()
+    for marker in {
+        "MECHANICAL_PLACEMENT_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        mechanical_sha256, "70 records", "110 x 75 x 1.60 mm", "31 individual pogo pads",
+        "CONTROLLED_PENDING_NATIVE_STEP", "All physical tests remain `NOT RUN`",
+    }:
+        require(marker in mechanical_review, f"mechanical placement review missing marker: {marker}")
+
     harness = rows(HARNESS_PATH)
     main_power = interface(harness, "MAIN_PWR")
     require(pin_contract(main_power) == EXPECTED_MAIN_POWER, "12-pin MAIN/PWR harness contract mismatch")
@@ -1445,7 +1512,7 @@ def main() -> None:
     open_items = readiness["open_authorities"]
     closed_ids = {item["id"] for item in closed_items}
     open_ids = {item["id"] for item in open_items}
-    require(readiness["complete"] is False, "capture readiness released with open authorities")
+    require(readiness["complete"] is True, "capture readiness is not complete after all eleven authorities closed")
     require(closed_ids == EXPECTED_CLOSED_AUTHORITY_IDS, "PCB-MAIN closed authority register drift")
     require(len(closed_ids) == len(closed_items), "duplicate PCB-MAIN closed authority ID")
     closed_evidence = {item["id"]: set(item["evidence"]) for item in closed_items}
@@ -1529,6 +1596,14 @@ def main() -> None:
         },
         "MAIN-AUTH-010 evidence set mismatch",
     )
+    require(
+        closed_evidence["MAIN-AUTH-011"]
+        == {
+            "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-011 evidence set mismatch",
+    )
     require(closed_ids.isdisjoint(open_ids), "authority is both open and closed")
     require(open_ids == EXPECTED_OPEN_AUTHORITY_IDS, "PCB-MAIN open authority register drift")
     require(len(open_ids) == len(open_items), "duplicate PCB-MAIN open authority ID")
@@ -1549,7 +1624,7 @@ def main() -> None:
         "assembly": status["assembly"],
         "audit": "PCB-MAIN independent pre-schematic authority audit",
         "status": "PASS_CAPTURE_INPUT_CONTROLLED",
-        "mcu_assignments_verified": len(pins),
+        "mcu_assignments_verified": len(mcu_pins),
         "mcu_package_pins_verified": len(authority_rows),
         "storage_sensor_pads_verified": len(device_rows),
         "audio_logic_pins_verified": len(audio_rows),
@@ -1559,6 +1634,7 @@ def main() -> None:
         "ble_contacts_verified": len(ble_rows),
         "connector_fixture_contacts_verified": len(connector_fixture_rows),
         "passive_support_components_verified": len(passive_support_rows),
+        "mechanical_placement_records_verified": len(mechanical_rows),
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
@@ -1570,7 +1646,7 @@ def main() -> None:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print("PCB-MAIN Rev.A pre-schematic authority audit: PASS_CAPTURE_INPUT_CONTROLLED")
-    print(f"- all {len(authority_rows)} U1 package positions and {len(pins)} functional assignments verified")
+    print(f"- all {len(authority_rows)} U1 package positions and {len(mcu_pins)} functional assignments verified")
     print(f"- all {len(device_rows)} U2/U3/U4 physical pins or pads and three unique I2C2 addresses verified")
     print(f"- all {len(audio_rows)} U7/U17/U18 physical pins, dual-direction PDM translation and active-high AAD wake path verified")
     print(f"- all {len(cellular_rows)} U8/U16/Q1/Q2 physical pins, power banks, translation and controls verified")
@@ -1580,8 +1656,9 @@ def main() -> None:
     print(f"- all {len(ble_rows)} U11/TP_BLE_SWD contacts, fail-closed boot/reset, independent SWD and antenna keepout inputs verified")
     print(f"- all {len(connector_fixture_rows)} connector/card/RF/tamper/fixture contacts and domain-isolation rules verified")
     print(f"- all {len(passive_support_rows)} passive/support RefDes, MPNs, populations and physical pin sets verified")
+    print(f"- all {len(mechanical_rows)} outline, placement, zone, keepout and production fixture records verified")
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
-    print(f"- {len(open_items)} mechanical authority remains an explicit production blocker")
+    print("- all 11 capture authorities closed; native schematic and Reviews A/B remain production blockers")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

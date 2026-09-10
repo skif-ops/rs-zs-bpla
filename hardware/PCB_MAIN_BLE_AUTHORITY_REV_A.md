@@ -51,13 +51,13 @@ U11 pad 51 `SWDIO` and pad 53 `SWDCLK` route only to the dedicated four-contact 
 3. `NRF_SWCLK` connects to U11 pad 53.
 4. `GND` is the adjacent debug reference.
 
-The nRF contacts must not share nets, pads or fixture switching paths with STM32 `J_SWD`. Exact pad coordinates and fixture envelope remain `MAIN-AUTH-011`, but all four contacts must remain accessible after assembly. EOL must prove identify, erase/recover, program, verify, UICR readback and reset operation using this interface.
+The nRF contacts must not share nets, pads or fixture switching paths with STM32 `J_SWD`. Exact pad coordinates and the fixture envelope are now frozen by `MAIN-AUTH-011`; all four contacts must remain accessible after assembly. EOL must still prove identify, erase/recover, program, verify, UICR readback and reset operation using this interface.
 
 ## PCB-antenna keepout
 
 The PCB-antenna end of U11 is placed at the PCB edge. The Raytac Version L minimum illustrated antenna no-ground depth is 3.8 mm across the full 10.5 mm module width, and Raytac requires this no-ground region to be made wider wherever the board outline permits. The corresponding antenna region contains no copper pours, ground pads, planes, traces or vias on any layer.
 
-No component, test pad, screw, standoff, shield wall, battery, conductive label, cable or cable bundle may occupy or cross the antenna volume. No digital or switching trace is routed beneath the module antenna end. The precise edge coordinates, board outline and mechanical exclusion volume remain `MAIN-AUTH-011`; any smaller or obstructed keepout reopens `MAIN-AUTH-008`.
+No component, test pad, screw, standoff, shield wall, battery, conductive label, cable or cable bundle may occupy or cross the antenna volume. No digital or switching trace is routed beneath the module antenna end. The precise east-edge coordinates, board outline and mechanical exclusion volume are now frozen by `MAIN-AUTH-011`; any smaller or obstructed keepout reopens `MAIN-AUTH-008` and `MAIN-AUTH-011`.
 
 Pads marked by Raytac as standard-drive, low-frequency-only near the radio are left NC in Rev.A. UART, reset, DFU and SWD use only the explicitly frozen pads in the machine authority. No unused U11 GPIO is exposed as an informal test point.
 

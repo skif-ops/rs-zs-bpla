@@ -6,4 +6,4 @@ Sheet,Item,Requirement
 07_BLE,SWD_LFCLK,"Dedicated TP_BLE_SWD contacts VTREF NRF_SWDIO NRF_SWCLK GND from U11 pads 51/53; never share STM32 SWD; internal calibrated LFRC and pads 17/18 NC"
 07_BLE,ANTENNA,"MDBT50Q-P1MV2 antenna at PCB edge; all-layer no-ground/copper region at least 10.5 mm wide by 3.8 mm deep and extended wider where possible; no component battery shield label standoff or cable bundle in antenna volume"
 07_BLE,PASSIVE_SUPPORT,"MAIN-AUTH-010 freezes C71-C73 R74-R78 and U6 SN74LVC1G07DBVR physical pins; reset remains fail-closed"
-07_BLE,BLOCKERS,"MAIN-AUTH-010 is closed; final coordinates and mechanical exclusion remain MAIN-AUTH-011; signed nRF firmware SWD/DFU/reset evidence and final-housing BLE 2M 1M coded-PHY RF/coexistence tests remain production blockers"
+07_BLE,BLOCKERS,"MAIN-AUTH-010/011 are closed; final coordinates and mechanical exclusion are frozen; signed nRF firmware SWD/DFU/reset evidence and final-housing BLE 2M 1M coded-PHY RF/coexistence tests remain production blockers"

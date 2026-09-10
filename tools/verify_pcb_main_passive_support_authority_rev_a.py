@@ -183,9 +183,10 @@ def main() -> None:
     status = json.loads(STATUS_PATH.read_text(encoding="utf-8"))
     closed = {item["id"] for item in status["capture_readiness"]["closed_authorities"]}
     opened = {item["id"] for item in status["capture_readiness"]["open_authorities"]}
-    require(closed == {f"MAIN-AUTH-{i:03d}" for i in range(1, 11)},
+    require(closed == {f"MAIN-AUTH-{i:03d}" for i in range(1, 12)},
             "closed authority set mismatch")
-    require(opened == {"MAIN-AUTH-011"}, "remaining open authority set mismatch")
+    require(opened == set() and status["capture_readiness"]["complete"] is True,
+            "capture authority completion mismatch")
     inputs = set(status["source_control"]["authoritative_inputs"])
     require("hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv" in inputs,
             "machine authority missing from status inputs")
@@ -222,7 +223,7 @@ def main() -> None:
     print(
         "PCB-MAIN MAIN-AUTH-010 passive/support verification: PASS "
         "(211 unique components; 196 fitted; 15 DNP; physical pins complete; "
-        "MAIN-AUTH-011/native capture/reviews remain blocking)"
+        "native capture/reviews remain blocking)"
     )
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 

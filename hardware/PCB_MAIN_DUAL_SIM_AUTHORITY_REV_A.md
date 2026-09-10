@@ -82,7 +82,7 @@ The TE card-detect switch is normally shorted to the grounded shell with no card
 
 Each socket has 100 nF from its selected VDD contact to `GND_MODEM`. RST, CLK, and DATA retain populated 0 Ohm series tuning positions and DNP 33 pF shunt tuning positions. Their exact RefDes, orderable passive MPNs, physical paths and shunt population are frozen by `MAIN-AUTH-010`. U14 and U15 are placed at the connector side of these paths.
 
-All shell and card-detect return solder features connect directly to `GND_MODEM`. Exact anchor geometry, card insertion direction, cover clearance, and service orientation remain `MAIN-AUTH-011`.
+All shell and card-detect return solder features connect directly to `GND_MODEM`. Exact J6/J7 anchor geometry and southward card insertion direction are now frozen by `MAIN-AUTH-011`; service-cover fit and physical card-clearance validation remain open.
 
 ## Deterministic slot sequence
 

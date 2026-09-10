@@ -84,6 +84,11 @@ service_interfaces:
   tamper: PC7_EXTI7_NORMALLY_CLOSED_TO_GND_OPEN_IS_ALARM
 production_fixture:
   authority: hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+  geometry_authority: hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv
+  side: BOTTOM
+  pogo_pad_diameter_mm: 1.70
+  pogo_pitch_mm: 2.54
+  fixture_fiducials: 3
   stm32_swd: TP_MCU_SWD_5P_VTREF_SWDIO_SWCLK_NRST_GND
   eol: TP_EOL_13P_RAIL_SENSE_UART_POWER_STATE_BOOT0_REV_STRAPS_I2C2
   bg95_usb: TP_CELL_USB_4P_ISOLATED_FROM_STM32_USB
@@ -91,8 +96,15 @@ production_fixture:
   nrf_swd: TP_BLE_SWD_4P_SEPARATE_AUTHORITY
   fixture_power_policy: DUT_RAILS_SENSE_ONLY_EXCEPT_CONTROLLED_BG95_USB_VBUS
 pcb_main_capture:
-  authority_status: MAIN_AUTH_001_THROUGH_010_CLOSED_MAIN_AUTH_011_OPEN
+  authority_status: MAIN_AUTH_001_THROUGH_011_CLOSED
   passive_support_authority: hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv
+  mechanical_placement_authority: hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv
+  outline_mm: [110, 75]
+  thickness_mm: 1.6
+  layer_target: 6
+  mounting_holes: 4x_M3_CLEARANCE_NPTH_D3.2
+  production_pogo_pads: 31
+  capture_readiness: COMPLETE
   passive_support_components: 211
   fitted_components: 196
   dnp_components: 15

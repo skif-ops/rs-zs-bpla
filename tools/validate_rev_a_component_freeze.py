@@ -179,7 +179,8 @@ def main() -> None:
         require("PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv" in connectors[key]["Notes"], f"{key} lacks connector authority citation")
     for key in ("CON-RF-CELL", "CON-RF-GNSS", "CON-RF-LORA"):
         require("U.FL" in connectors[key]["Board_MPN"], f"{key} is not U.FL")
-        require("RF_LAYOUT" in connectors[key]["Status"], f"{key} RF layout blocker was lost")
+        require(connectors[key]["Status"] == "LAYOUT_ZONE_FROZEN_PENDING_RF_VALIDATION",
+                f"{key} RF-zone/validation status mismatch")
         require("-40..90 board receptacle" in connectors[key]["Temperature_C"], f"{key} board receptacle rating is not frozen")
         require("exact cable assembly temperature" in connectors[key]["Release_Blockers"], f"{key} cable temperature blocker was lost")
     require("PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv" in connectors["CON-RF-GNSS"]["Notes"], "GNSS connector freeze lacks authority citation")
