@@ -16,8 +16,8 @@ authority_sync:
   integration_source_commit: f3411e51938aa1423fdbaeeef9585aeea385c239
   synchronized_blocks: [MAIN-AUTH-008, MAIN-AUTH-009, MAIN-AUTH-010, MAIN-AUTH-011]
   complete_set: MAIN-AUTH-001_THROUGH_011_CLOSED
-  native_pcb_main: ABSENT_BLOCKER
-  review_a: BLOCKED_NATIVE_SCHEMATIC_ABSENT
+  native_pcb_main: PRESENT_SCHEMATIC_ERC_PASS_REVIEW_A_PENDING
+  review_a: NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING
   review_b: BLOCKED_REVIEW_A_NOT_COMPLETE
   production_bom: BLOCKED
 

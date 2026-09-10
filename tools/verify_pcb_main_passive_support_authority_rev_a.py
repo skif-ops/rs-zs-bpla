@@ -195,7 +195,7 @@ def main() -> None:
     require(status["native_schematic"]["status"] == "PRESENT_REVIEW_PENDING",
             "native schematic state mismatch")
     require(status["review_a"]["status"] ==
-            "NATIVE_SOURCE_AND_AUTOMATED_NET_AUDIT_GATED_HUMAN_REVIEW_PENDING",
+            "NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING",
             "Review A state mismatch")
 
     capture_spec = CAPTURE_SPEC_PATH.read_text(encoding="utf-8")

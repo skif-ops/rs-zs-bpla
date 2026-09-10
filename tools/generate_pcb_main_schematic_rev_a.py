@@ -587,7 +587,7 @@ def build(output: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
         "symbol_library_sha256": sha256(symbol_library),
         "symbol_library_table_sha256": sha256(sym_table),
         "footprint_library_table_sha256": sha256(fp_table),
-        "review_a": "AUTOMATED_SOURCE_NET_AUDIT_GATED_KICAD_ERC_AND_HUMAN_SIGNOFF_PENDING",
+        "review_a": "AUTOMATED_SOURCE_NET_AUDIT_AND_KICAD_ERC_PASS_HUMAN_SIGNOFF_PENDING",
         "review_b": "BLOCKED_LAYOUT_ABSENT",
     }
     manifest.write_text(json.dumps(manifest_payload, indent=2) + "\n", encoding="utf-8")

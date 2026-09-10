@@ -1638,14 +1638,14 @@ def main() -> None:
     review_a = status["review_a"]
     review_b = status["review_b"]
     expected_review_a_status = (
-        "NATIVE_SOURCE_AND_AUTOMATED_NET_AUDIT_GATED_HUMAN_REVIEW_PENDING"
+        "NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING"
         if native_present else "BLOCKED_NATIVE_SCHEMATIC_ABSENT"
     )
     require(review_a["complete"] is False and review_a["status"] == expected_review_a_status,
             "Review A status does not match native-source state")
     require(review_b["complete"] is False and review_b["status"] == "BLOCKED_REVIEW_A_NOT_COMPLETE", "Review B must remain blocked")
     expected_review_a_evidence = {
-        "signed_checklist", "schematic_pdf", "cubemx_pin_report", "erc_report",
+        "checklist_template", "signed_checklist", "schematic_pdf", "cubemx_pin_report", "erc_report",
         "bom_diff", "net_name_diff",
     }
     require(set(review_a["evidence"]) == expected_review_a_evidence, "Review A evidence schema mismatch")
@@ -1654,6 +1654,9 @@ def main() -> None:
                 "human Review A identity/date/SHA claimed before sign-off")
         require(review_a["evidence"]["signed_checklist"] is None,
                 "signed Review A checklist claimed before sign-off")
+        checklist_template = ROOT / review_a["evidence"]["checklist_template"]
+        require(checklist_template.is_file() and checklist_template.stat().st_size > 0,
+                "Review A checklist template is missing")
         require(str(review_a["evidence"]["bom_diff"]).startswith("CI artifact: "),
                 "schematic-derived BOM is not declared as CI evidence")
         require(str(review_a["evidence"]["schematic_pdf"]).startswith("CI artifact: "),

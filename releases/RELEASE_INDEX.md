@@ -6,7 +6,8 @@
 - дата среза: 10.09.2026;
 - источник синхронизированных authority: `f3411e51938aa1423fdbaeeef9585aeea385c239`;
 - `MAIN-AUTH-001…011`: `CLOSED / VERIFIED`;
-- native PCB-MAIN, Review A, Review B и производственный BOM: `BLOCKED`;
+- native PCB-MAIN schematic и KiCad 9 ERC: `PASS / REVIEW INPUT`;
+- human Review A, PCB-MAIN layout, Review B и производственный BOM: `BLOCKED`;
 - аппаратный EVT: `NOT RUN`;
 - общий статус: `OPEN / NOT FOR MANUFACTURE`.
 

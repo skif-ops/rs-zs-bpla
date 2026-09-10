@@ -298,7 +298,7 @@ def main() -> None:
     require(status["native_schematic"]["status"] == "PRESENT_REVIEW_PENDING",
             "native schematic state mismatch")
     require(status["review_a"]["status"] ==
-            "NATIVE_SOURCE_AND_AUTOMATED_NET_AUDIT_GATED_HUMAN_REVIEW_PENDING",
+            "NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING",
             "Review A state mismatch")
 
     connector_freeze = {row["Connector_ID"]: row for row in read_rows(CONNECTOR_FREEZE_PATH)}

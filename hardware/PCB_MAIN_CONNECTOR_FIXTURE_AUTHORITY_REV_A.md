@@ -63,6 +63,6 @@ The EOL fixture uses the production LPUART with directions named at the DUT: PC1
 ## Checkpoint boundary and current gates
 
 - At the `MAIN-AUTH-009` checkpoint, `MAIN-AUTH-010` and `MAIN-AUTH-011` were still open. They are now separately closed by their own machine authorities and independent checks.
-- Native PCB-MAIN schematic is absent. PCB Review A and Review B have not started.
+- Native PCB-MAIN schematic is present and KiCad 9 ERC passes with zero violations. Human PCB Review A has not been signed; Review B remains blocked by Review A and layout.
 - Connector samples, card endurance/power-loss behavior, USB enumeration/recovery, tamper fault coverage, fixture MSA/programming, RF/VNA tests and environmental verification are `NOT RUN`.
 - The production BOM and any `FOR_MANUFACTURE` release remain blocked.

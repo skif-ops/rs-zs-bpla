@@ -108,8 +108,8 @@ pcb_main_capture:
   passive_support_components: 211
   fitted_components: 196
   dnp_components: 15
-  native_schematic: ABSENT_BLOCKER
-  review_a: BLOCKED_NATIVE_SCHEMATIC_ABSENT
+  native_schematic: PRESENT_ERC_PASS_REVIEW_A_PENDING
+  review_a: NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING
   review_b: BLOCKED_REVIEW_A_NOT_COMPLETE
   production_bom: BLOCKED
 positioning:

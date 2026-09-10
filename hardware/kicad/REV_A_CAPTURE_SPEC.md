@@ -2,7 +2,7 @@
 
 Status: `SCHEMATIC_REVIEW / BLOCKING / NOT FOR MANUFACTURE`
 
-This document is the authoritative bridge from the locked EVT-PRE-20 system baseline to native KiCad capture. Native PCB-MAIN `.kicad_sch` is present; KiCad ERC, human Review A, `.kicad_pcb`, DRC and Review B remain mandatory before any Gerber may be released.
+This document is the authoritative bridge from the locked EVT-PRE-20 system baseline to native KiCad capture. Native PCB-MAIN `.kicad_sch` is present and KiCad 9 ERC passes with zero violations; human Review A, `.kicad_pcb`, DRC and Review B remain mandatory before any Gerber may be released.
 
 Authoritative inputs:
 - `config/EVT_PRE_20_BASELINE.yaml`;
@@ -232,7 +232,7 @@ Required AAD tests before release:
 - Rev.A hardware revision encoding is fixed as `HW_REV[1:0]=00`: R3/R5 fitted pull-downs and R4/R6 DNP alternate pull-ups.
 - STM32/nRF SWD and guarded I2C fixture contacts remain direct by design. There is no board-side protection or series element on those controlled internal test contacts.
 - The authority closes component selection only. DC-bias capacitance, SMPS stability, FB1 frequency response, modem burst droop, GNSS thresholds, USB/SIM signal integrity and RF tuning remain Review A/EVT evidence.
-- Placement-dependent performance remains Review A/Review B and physical evidence. Native schematic capture is present and independently source/net-audited; KiCad ERC, human Review A, layout, Review B and physical tests remain open. This capture is `NOT FOR MANUFACTURE` and cannot release a production BOM or fabrication data.
+- Placement-dependent performance remains Review A/Review B and physical evidence. Native schematic capture is present, independently source/net-audited and passes KiCad 9 ERC with zero violations; human Review A, layout, Review B and physical tests remain open. This capture is `NOT FOR MANUFACTURE` and cannot release a production BOM or fabrication data.
 
 ### 1.11 Mechanical placement and DFT geometry
 
