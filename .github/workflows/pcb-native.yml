@@ -5,6 +5,8 @@ on:
   push:
     branches: [evt-pre-20]
     paths:
+      - ".github/workflows/ci.yml"
+      - ".github/workflows/pcb-native.yml"
       - "hardware/kicad/**"
       - "hardware/reviews/**"
       - "hardware/*FREEZE_REV_A.csv"
