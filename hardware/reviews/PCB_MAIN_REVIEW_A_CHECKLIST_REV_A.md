@@ -83,7 +83,7 @@ Open findings or required changes:
 
 | ID | Severity | Finding | Owner | Disposition / evidence |
 |---|---|---|---|---|
-| RA-001 |  |  |  |  |
+| RA-001 | Major | Recorded commit `ac10cded` has no commit-matched `PCB Native Gate` run because its only changed path was outside the workflow path filter. | Automation | OPEN: create a traceability commit under `hardware/**`, obtain successful commit-matched CI and Native Gate runs, then verify the evidence ZIP manifest, expected SHA-256 values and `erc.json`. |
 
 ## 8. Sign-off
 
