@@ -12,4 +12,3 @@
 - T0/T1 samples проходят CMM, material confirmation, assembly, IP, UV/climate, RF и acoustic verification до запуска партии.
 
 Поставочный комплект: parametric CAD, STEP, 2D drawing with GD&T, mold-flow/DFM report, tool specification, control plan, first article report и отдельный корпусной BOM.
-

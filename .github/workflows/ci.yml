@@ -10,6 +10,7 @@ on:
 jobs:
   evt-pre-20-config:
     name: EVT-PRE-20 configuration and release audit
+    if: github.ref == 'refs/heads/evt-pre-20' || github.base_ref == 'evt-pre-20'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +18,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Enforce EVT branch isolation
+        if: github.ref == 'refs/heads/evt-pre-20' || github.base_ref == 'evt-pre-20'
         run: python tools/audit_evt_branch_isolation.py --branch evt-pre-20
       - name: Generate unified Rev.A BOM
         run: python tools/generate_evt_pre_20_bom_rev_a.py
@@ -40,6 +42,14 @@ jobs:
         run: python tools/verify_pcb_main_gnss_authority_rev_a.py
       - name: Second independent PCB-MAIN LoRa control
         run: python tools/verify_pcb_main_lora_authority_rev_a.py
+      - name: Second independent PCB-MAIN BLE control
+        run: python tools/verify_pcb_main_ble_authority_rev_a.py
+      - name: Second independent PCB-MAIN connector and fixture control
+        run: python tools/verify_pcb_main_connector_fixture_authority_rev_a.py
+      - name: Second independent PCB-MAIN passive and support control
+        run: python tools/verify_pcb_main_passive_support_authority_rev_a.py
+      - name: Second independent PCB-MAIN mechanical placement control
+        run: python tools/verify_pcb_main_mechanical_placement_authority_rev_a.py
       - name: First-pass configuration and hardware baseline validation
         run: python tools/validate_evt_pre_20.py
       - name: Cross-check locked Rev.A clock policy
@@ -80,7 +90,15 @@ jobs:
             artifacts/pcb_main_dual_sim_authority_rev_a.json
             artifacts/pcb_main_gnss_authority_rev_a.json
             artifacts/pcb_main_lora_authority_rev_a.json
+            artifacts/pcb_main_ble_authority_rev_a.json
+            artifacts/pcb_main_connector_fixture_authority_rev_a.json
+            artifacts/pcb_main_passive_support_authority_rev_a.json
+            artifacts/pcb_main_mechanical_placement_authority_rev_a.json
             hardware/EVT_PRE_20_BOM_REV_A.csv
+            hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv
+            hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md
+            hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv
+            hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md
             hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json
             firmware/targets/evt_pre_20/target_contract_manifest.json
             firmware/targets/evt_pre_20/stm32_scaffold_manifest.json
@@ -168,7 +186,7 @@ jobs:
   protocol-e2e:
     name: Firmware CBOR to Server
     runs-on: ubuntu-latest
-    needs: [evt-pre-20-config, firmware, server-core, server-full, android]
+    needs: [firmware, server-core, server-full, android]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -185,9 +203,10 @@ jobs:
         run: python tools/test_firmware_packet.py
 
   package-current:
-    name: Build current engineering and PMI archives
+    name: Build current EVT-PRE-20 engineering and PMI archives
+    if: github.ref == 'refs/heads/evt-pre-20' || github.base_ref == 'evt-pre-20'
     runs-on: ubuntu-latest
-    needs: [protocol-e2e]
+    needs: [evt-pre-20-config, protocol-e2e]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

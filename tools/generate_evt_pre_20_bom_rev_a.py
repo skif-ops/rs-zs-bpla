@@ -15,6 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DRAFT = ROOT / "hardware/EVT_PRE_20_BOM_DRAFT.csv"
 OUT = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
+MAIN_PASSIVE_SUPPORT = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -44,6 +45,9 @@ def main() -> None:
     main_parts = freeze_map("hardware/MAIN_COMPONENT_FREEZE_REV_A.csv", "RefDes")
     power_parts = freeze_map("hardware/POWER_COMPONENT_FREEZE_REV_A.csv", "Component_ID")
     connectors = freeze_map("hardware/CONNECTOR_FREEZE_REV_A.csv", "Connector_ID")
+    main_passive_support = freeze_map(
+        "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv", "RefDes"
+    )
 
     def set_quantities(row: dict[str, str], qty: int, spares: int) -> None:
         row["Qty_per_station"] = str(qty)
@@ -73,7 +77,7 @@ def main() -> None:
 
     for item_id, ref in {
         "U1": "U1", "U2": "U2", "U3": "U3", "U4": "U4", "U7": "U7",
-        "U8": "U8", "U9": "U9", "U10": "U10", "U11": "U11", "U13": "U13", "X1": "X1",
+        "U8": "U8", "U9": "U9", "U10": "U10", "U11": "U11", "U12": "U12", "U13": "U13", "X1": "X1",
     }.items():
         p = main_parts[ref]
         update_existing(
@@ -139,6 +143,18 @@ def main() -> None:
             notes=f"Rev.A connector freeze; blockers: {c['Release_Blockers']}",
         )
 
+    for item_id, cid, refdes, manufacturer, package in (
+        ("J-SD1", "CON-SD", "J12", "GCT", "microSD push-push SMT 1.95 mm with detect"),
+        ("J-TAMPER", "CON-TAMPER", "J13", "Molex", "Pico-Lock 1.50 mm 2-circuit right-angle SMT"),
+    ):
+        c = connectors[cid]
+        update_existing(
+            item_id, manufacturer=manufacturer,
+            mpn=c["Board_MPN"].split("_", 1)[1] if "_" in c["Board_MPN"] else c["Board_MPN"],
+            package=package, status=c["Status"], refdes=refdes,
+            notes=f"Rev.A connector freeze; exact electrical map in PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv; blockers: {c['Release_Blockers']}",
+        )
+
     for item_id, cid in {"J-RF-CELL": "CON-RF-CELL", "J-RF-GNSS": "CON-RF-GNSS", "J-RF-LORA": "CON-RF-LORA"}.items():
         c = connectors[cid]
         update_existing(
@@ -193,8 +209,42 @@ def main() -> None:
             notes=f"Rev.A MAIN freeze; blockers: {p['Release_Blockers']}",
         )
 
+    # MAIN-AUTH-010 is normalized one physical PCB-MAIN component per line so the
+    # controlled BOM can be compared directly with future schematic-derived RefDes.
+    x1_support = main_passive_support["X1"]
+    require(by_id["X1"]["MPN"] == x1_support["MPN"], "X1 authority MPN divergence")
+    by_id["X1"].update({
+        "Value": x1_support["Value"],
+        "Line_class": "ELECTRICAL_COMPONENT",
+        "Population": x1_support["Population"],
+        "Temperature_C": x1_support["Temperature_C"],
+        "BOM_disposition": "CONTROLLED_PENDING_VERIFICATION",
+    })
+    by_id["X1"]["Notes"] += (
+        "; complete physical pins and no-external-bypass decision in "
+        "PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv; physical pins: "
+        f"{x1_support['Pin_Map']}"
+    )
+
+    for refdes, part in main_passive_support.items():
+        if refdes == "X1":
+            continue
+        fitted = part["Population"] == "FITTED"
+        append_item(
+            item_id=f"MAIN-010-{refdes}", assembly="PCB-MAIN", refdes=refdes,
+            category=part["Category"], description=part["Electrical_Path"],
+            manufacturer=part["Manufacturer"], mpn=part["MPN"], package=part["Package"],
+            qty=1 if fitted else 0, spares=0,
+            status="SELECTED_PENDING_REVIEW_A" if fitted else "CONTROLLED_DNP",
+            notes=("MAIN-AUTH-010 exact capture authority; physical pins: "
+                   f"{part['Pin_Map']}; {part['Notes']}"),
+            value=part["Value"], line_class="ELECTRICAL_COMPONENT",
+            population=part["Population"], temperature=part["Temperature_C"],
+            disposition="CONTROLLED_PENDING_VERIFICATION" if fitted else "CONTROLLED_DNP",
+        )
+
     for item_id, cid, assembly, refdes in (
-        ("J-USB", "CON-USB", "PCB-MAIN", "J_USB"),
+        ("J-USB", "CON-USB", "PCB-MAIN", "J11"),
         ("J-PWR-IN", "CON-003", "PCB-PWR", "J1"),
         ("J-PWR-PWR", "CON-004A", "PCB-PWR", "J2"),
         ("J-PWR-MAIN", "CON-004B", "PCB-MAIN", "J_PWR"),
@@ -323,8 +373,17 @@ def main() -> None:
         require(forbidden not in full_text, f"superseded token remains in generated BOM: {forbidden}")
     require(by_id["J-MIC"]["MPN"] == "5040500691", "generated 6-pin MIC connector MPN mismatch")
     require("AAD_CFG" in by_id["J-MIC"]["Notes"], "generated MIC connector BOM line omits THSEL/AAD_CFG")
-    for key in ("U16", "U17", "U18", "PWR-REV-CTL", "PWR-REV-FET", "J-MIC-MAIN", "H-MIC", "T-MIC"):
+    for key in ("U16", "U17", "U18", "PWR-REV-CTL", "PWR-REV-FET", "J-MIC-MAIN", "H-MIC", "T-MIC", "MAIN-010-C1", "MAIN-010-R103", "MAIN-010-D11"):
         require(key in by_id, f"generated BOM missing {key}")
+    require(sum(item.startswith("MAIN-010-") for item in by_id) == 210,
+            "generated BOM must contain 210 new MAIN-AUTH-010 physical lines plus existing X1")
+    for refdes, part in main_passive_support.items():
+        item_id = "X1" if refdes == "X1" else f"MAIN-010-{refdes}"
+        row = by_id[item_id]
+        require(row["RefDes"] == refdes and row["MPN"] == part["MPN"],
+                f"{refdes}: MAIN-AUTH-010 BOM identity mismatch")
+        require(row["Value"] == part["Value"] and row["Population"] == part["Population"],
+                f"{refdes}: MAIN-AUTH-010 BOM value/population mismatch")
 
     expected_refdes = {
         "PWR-REV-CTL": "U1", "PWR-REV-FET": "Q1", "U-MON-01": "U2",

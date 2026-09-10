@@ -38,4 +38,3 @@ marker(mic1, "MIC1");
 marker(mic2, "MIC2");
 marker(mic3, "MIC3");
 marker(mic4, "MIC4");
-

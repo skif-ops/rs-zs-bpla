@@ -1,3 +1,8 @@
 Sheet,Item,Requirement
-09_CONNECTORS_TEST,TP,"VBAT protected and shunt Kelvin nodes, 3V8, 3V3, 1V8, power-good/fault, I2C2, PPS, PDM clock, production UART and both SWD interfaces"
-09_CONNECTORS_TEST,Service,"USB-C USB2 service on PA9/PA11/PA12 and production LPUART on PC0/PC1; sealed access method remains a mechanical design input"
+09_CONNECTORS_TEST,AUTHORITY,"Use all 70 rows from PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv; no implicit connector contacts; cross-check J9/J10 against their existing authorities"
+09_CONNECTORS_TEST,TP_MCU_SWD,"Exact five contacts VTREF/SWDIO/SWCLK/NRST/GND; VTREF sense only; independent from four-contact TP_BLE_SWD"
+09_CONNECTORS_TEST,TP_EOL,"Exact 13 contacts GND/3V3 sense/3V8 sense/1V8 sense/DUT TX/DUT RX/PWR_GOOD/FAULT/BOOT0/REV0/REV1/I2C2 SCL/I2C2 SDA; no fixture rail sourcing"
+09_CONNECTORS_TEST,TP_CELL,"TP_CELL_USB exact four contacts for isolated BG95 USB; TP_CELL_DBG exact five contacts for 1.8 V reference/debug/USB_BOOT; never share J11 STM32 USB"
+09_CONNECTORS_TEST,Service,"J11 GCT USB4105-GF-A-120 USB2 device-only on PA9/PA11/PA12; sense-only VBUS; separate CC Rd; SBU NC; controlled USB_SHIELD; R91-R98 C77 U25 D6-D8 are frozen by MAIN-AUTH-010 and south-edge access/orientation by MAIN-AUTH-011; sealed-cover validation remains open"
+09_CONNECTORS_TEST,RF,"J8/J9/J10 exact Hirose U.FL-R-SMT-1(60) center/shell maps; matching and ESD part identities are frozen by MAIN-AUTH-010; zones/placement are frozen by MAIN-AUTH-011; 50 Ohm geometry awaits the final stackup"
+09_CONNECTORS_TEST,PASSIVE_SUPPORT,"Use PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv for all exact connector/fixture support RefDes MPN population and endpoint-qualified physical paths; SWD contacts remain direct"

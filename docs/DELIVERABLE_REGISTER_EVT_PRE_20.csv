@@ -10,6 +10,7 @@ SYS-002,Архитектура,Архитектура изделия и сист
 SYS-003,Архитектура,ICD станция-сервер,DOCX+CBOR schema,P0,DRAFT,OPEN,OPEN,Совместимость schema подтверждена тестами
 SYS-004,Архитектура,Энергобаланс 40-60 Ач и 60-80 Вт,XLSX+DOCX,P0,PLANNED,OPEN,OPEN,Расчёт и измерение S0-S4 согласованы
 SYS-005,Архитектура,Threat model и управление ключами,DOCX,P0,PLANNED,OPEN,OPEN,Ключи не включены в пакет; процессы provisioning описаны
+HW-M-000,PCB main,Комплект входных authority MAIN-AUTH-001..011,CSV+MD+JSON,P0,CONTROLLED,PASS,PASS,Основной аудит и 11 независимых проверок подтверждают полный capture input без разрешения производства
 HW-M-001,PCB main,Схема электрическая принципиальная,KICAD_SCH+PDF,P0,PLANNED,OPEN,OPEN,ERC PASS и ручная datasheet review
 HW-M-002,PCB main,Разводка основной платы,KICAD_PCB+STEP,P0,PLANNED,OPEN,OPEN,DRC PASS; RF/power/layout review
 HW-M-003,PCB main,Gerber и сверловка,GERBER+DRILL,P0,PLANNED,OPEN,OPEN,Сверены с source и просмотрены CAM

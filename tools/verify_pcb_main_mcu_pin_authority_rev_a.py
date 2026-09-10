@@ -124,8 +124,8 @@ def main() -> None:
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     closed = {item["id"] for item in status["capture_readiness"]["closed_authorities"]}
     open_ids = {item["id"] for item in status["capture_readiness"]["open_authorities"]}
-    require(closed == {f"MAIN-AUTH-{index:03d}" for index in range(1, 8)}, "closed authority identity mismatch")
-    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(8, 12)}, "remaining authority set mismatch")
+    require(closed == {f"MAIN-AUTH-{index:03d}" for index in range(1, 12)}, "closed authority identity mismatch")
+    require(open_ids == set() and status["capture_readiness"]["complete"] is True, "capture authority completion mismatch")
     require(status["manufacturing_release"] is False, "manufacturing release asserted before remaining authorities close")
 
     covered = set(source_by_position) | UNUSED_IO_PINS | set(SUPPLY_PINS) | {14}
@@ -149,7 +149,7 @@ def main() -> None:
     print("PCB-MAIN U1 second independent electrical control: PASS_PIN_AUTHORITY_ONLY")
     print("- 100 package positions: 67 functional, 12 unused I/O, NRST and 20 supply/reference/ground")
     print("- HSE forbidden, PC15 external NC, SWD/NRST fixture and SMPS rails verified")
-    print(f"- production BOM remains BLOCKED by {len(open_ids)} open PCB-MAIN authorities")
+    print("- production BOM remains BLOCKED by native capture and Reviews A/B")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

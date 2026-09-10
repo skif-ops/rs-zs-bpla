@@ -66,6 +66,7 @@ def main() -> None:
         "U9": "MAX-M10S-00B",
         "U10": "E22-900M22S",
         "U11": "MDBT50Q-P1MV2",
+        "U12": "SDCIT2/32GB",
         "U13": "TS3A27518EPWR",
         "U14": "ESDALC6V1-5P6",
         "U15": "ESDALC6V1-5P6",
@@ -82,6 +83,8 @@ def main() -> None:
         require(main_parts[ref]["MPN"] == mpn, f"{ref} MPN mismatch")
 
     require("nRF52840" in main_parts["U11"]["Package_or_Module"], "U11 is not identified as nRF52840")
+    require(main_parts["U12"]["Package_or_Module"] == "microSD_card_8_contact", "U12 package/contact form mismatch")
+    require("PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv" in main_parts["U12"]["Notes"], "U12 freeze does not cite connector authority")
     require(main_parts["U4"]["Package_or_Module"] == "UDFN-6L_2x2mm", "U4 package is not exact STTS22H UDFN-6L")
     require(main_parts["U4"]["Temperature_C"] == "-40..125", "U4 temperature range is not frozen")
     require("-40..85" in main_parts["U1"]["Temperature_C"], "exact STM32U585VIT6Q +85 C limit is not recorded")
@@ -164,9 +167,20 @@ def main() -> None:
     require(main_pwr[11]["Net"] == "I2C2_SDA", "MAIN-PWR pin 12 is not I2C2_SDA")
 
     require("-40..85" in connectors["CON-USB"]["Temperature_C"], "USB-C connector does not meet operating range")
+    require(connectors["CON-USB"]["Board_MPN"] == "GCT_USB4105-GF-A-120", "USB-C exact MPN mismatch")
+    require(connectors["CON-SD"]["Board_MPN"] == "GCT_MEM2052-00-195-00-A", "microSD socket exact MPN mismatch")
+    require(connectors["CON-SD"]["Positions"] == "9", "microSD socket must expose eight card contacts plus detect")
+    require(connectors["CON-TAMPER"]["Board_MPN"] == "Molex_5040500291", "tamper header exact MPN mismatch")
+    require(connectors["CON-TAMPER"]["Mating_Housing_MPN"] == "Molex_5040510201", "tamper housing MPN mismatch")
+    require(connectors["CON-TAMPER"]["Terminal_MPN"] == "Molex_5040520098", "tamper terminal MPN mismatch")
+    for key, positions in (("CON-SWD-MCU", "5"), ("CON-EOL", "13"), ("CON-CELL-USB", "4"), ("CON-CELL-DBG", "5")):
+        require(connectors[key]["Board_MPN"] == "TEST_PADS", f"{key} is not a test-pad group")
+        require(connectors[key]["Positions"] == positions, f"{key} contact count mismatch")
+        require("PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv" in connectors[key]["Notes"], f"{key} lacks connector authority citation")
     for key in ("CON-RF-CELL", "CON-RF-GNSS", "CON-RF-LORA"):
         require("U.FL" in connectors[key]["Board_MPN"], f"{key} is not U.FL")
-        require("RF_LAYOUT" in connectors[key]["Status"], f"{key} RF layout blocker was lost")
+        require(connectors[key]["Status"] == "LAYOUT_ZONE_FROZEN_PENDING_RF_VALIDATION",
+                f"{key} RF-zone/validation status mismatch")
         require("-40..90 board receptacle" in connectors[key]["Temperature_C"], f"{key} board receptacle rating is not frozen")
         require("exact cable assembly temperature" in connectors[key]["Release_Blockers"], f"{key} cable temperature blocker was lost")
     require("PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv" in connectors["CON-RF-GNSS"]["Notes"], "GNSS connector freeze lacks authority citation")

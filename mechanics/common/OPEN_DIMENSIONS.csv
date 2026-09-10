@@ -1,6 +1,6 @@
 ID,Subsystem,Parameter,Unit,Required_input,Owner,Status,Blocks
-DIM-001,PCB-MAIN,assembled envelope LxWxH,mm,Frozen PCB STEP,EE,OPEN,All enclosure variants
-DIM-002,PCB-MAIN,mounting holes and keepouts,mm,Frozen PCB drawing,EE,OPEN,Standoffs and service cover
+DIM-001,PCB-MAIN,assembled envelope LxWxH,mm,"Rev.A authority allocation 110x75x12; confirm against generated native PCB STEP and service sweeps",EE_ME,CONTROLLED_PENDING_NATIVE_STEP,All enclosure variants remain blocked until STEP comparison
+DIM-002,PCB-MAIN,mounting holes and keepouts,mm,"Rev.A 110x75x1.6 R3; H1-H4 NPTH D3.2 at X5/105 Y5/70; authority CSV and interface record",EE_ME,CLOSED_AUTHORITY_INPUT,Standoffs and service cover must be checked against native PCB and full assembly STEP
 DIM-003,PCB-PWR,assembled envelope and terminal zones,mm,Frozen PCB STEP,EE,OPEN,Power enclosure
 DIM-004,PCB-MIC,outline port and mounting pattern,mm,"Rev.A 24x22x1.0; acoustic NPTH D0.8 at X12.0 Y16.65; H1/H2 NPTH D2.2 at X4.0/X20.0 Y16.65",EE_ME,CLOSED,Mic pods
 DIM-005,Battery,pack envelope and mass,mm_kg,Selected 40-60 Ah SKU,PROCUREMENT,OPEN,Power enclosure and mast load

@@ -80,9 +80,9 @@ J6 and J7 are identical TE `2336582-1` push-push 4FF sockets. Each electrical co
 
 The TE card-detect switch is normally shorted to the grounded shell with no card and opens when a card is inserted. Therefore `SIM1_DET` and `SIM2_DET` each use 10 kOhm to `3V3_DIGITAL`, read LOW with no card, and read HIGH with a card inserted. Each input also uses 10 nF to `GND_MODEM` and at least 20 ms firmware debounce.
 
-Each socket has 100 nF from its selected VDD contact to `GND_MODEM`. RST, CLK, and DATA retain populated 0 Ohm series tuning positions and DNP 33 pF shunt tuning positions. Their exact RefDes, orderable passive MPNs, and final shunt population remain `MAIN-AUTH-010` work. U14 and U15 are placed at the connector side of these paths.
+Each socket has 100 nF from its selected VDD contact to `GND_MODEM`. RST, CLK, and DATA retain populated 0 Ohm series tuning positions and DNP 33 pF shunt tuning positions. Their exact RefDes, orderable passive MPNs, physical paths and shunt population are frozen by `MAIN-AUTH-010`. U14 and U15 are placed at the connector side of these paths.
 
-All shell and card-detect return solder features connect directly to `GND_MODEM`. Exact anchor geometry, card insertion direction, cover clearance, and service orientation remain `MAIN-AUTH-011`.
+All shell and card-detect return solder features connect directly to `GND_MODEM`. Exact J6/J7 anchor geometry and southward card insertion direction are now frozen by `MAIN-AUTH-011`; service-cover fit and physical card-clearance validation remain open.
 
 ## Deterministic slot sequence
 

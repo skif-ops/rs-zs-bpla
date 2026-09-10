@@ -50,4 +50,3 @@ LoRa является резервным транспортом событий P
 Оба профиля проверяются отдельно: частота, EIRP, occupied bandwidth, spurious emissions, duty cycle/LBT при применимости, чувствительность, packet error rate, sleep current, работа relay, replay rejection, dedup, потеря фрагмента и восстановление после перезапуска.
 
 Источник региональных параметров: https://resources.lora-alliance.org/document/rp002-1-0-5-lorawan-regional-parameters
-

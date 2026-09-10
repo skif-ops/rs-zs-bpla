@@ -23,6 +23,14 @@
       "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md",
       "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv",
       "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md",
       "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
       "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
       "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -71,7 +79,7 @@
     "schematic_derived_bom": false
   },
   "capture_readiness": {
-    "complete": false,
+    "complete": true,
     "closed_authorities": [
       {
         "id": "MAIN-AUTH-001",
@@ -128,50 +136,45 @@
           "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv",
           "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md"
         ]
-      }
-    ],
-    "open_authorities": [
+      },
       {
         "id": "MAIN-AUTH-008",
-        "scope": "U11 MDBT50Q-P1MV2 exact module pads, boot/reset, separate nRF SWD and antenna keepout",
-        "blocks": [
-          "native_schematic",
-          "review_a",
-          "production_bom"
+        "scope": "U11 MDBT50Q-P1MV2 exact 61-pad map, fail-closed boot/reset, separate four-contact nRF SWD and all-layer PCB-antenna keepout",
+        "evidence": [
+          "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md"
         ]
       },
       {
         "id": "MAIN-AUTH-009",
-        "scope": "microSD socket/card, USB-C, RF receptacles, tamper and production/EOL fixture exact endpoints",
-        "blocks": [
-          "native_schematic",
-          "review_a",
-          "production_bom"
+        "scope": "microSD socket/card, USB-C, all three RF receptacles, tamper and STM32/EOL/BG95 production-recovery fixture exact endpoints",
+        "evidence": [
+          "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md"
         ]
       },
       {
         "id": "MAIN-AUTH-010",
         "scope": "complete PCB-MAIN passive, support, protection, pull, strap, termination, filtering and decoupling RefDes/MPN and physical-pin set",
-        "blocks": [
-          "native_schematic",
-          "review_a",
-          "production_bom"
+        "evidence": [
+          "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md"
         ]
       },
       {
         "id": "MAIN-AUTH-011",
-        "scope": "PCB outline, connector orientation, RF zones, keepouts and production test-point placement",
-        "blocks": [
-          "layout_review",
-          "review_b",
-          "production_bom"
+        "scope": "PCB outline, mounting pattern, connector orientation, service access, RF zones, keepouts and exact production test-point placement",
+        "evidence": [
+          "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md"
         ]
       }
-    ]
+    ],
+    "open_authorities": []
   },
   "review_a": {
     "complete": false,
-    "status": "BLOCKED_CAPTURE_AUTHORITY_INCOMPLETE",
+    "status": "BLOCKED_NATIVE_SCHEMATIC_ABSENT",
     "reviewer": null,
     "date": null,
     "commit_sha": null,

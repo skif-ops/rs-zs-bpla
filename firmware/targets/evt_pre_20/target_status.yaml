@@ -58,11 +58,60 @@ ble:
   soc: nRF52840
   module: Raytac_MDBT50Q-P1MV2
   interface: USART3_plus_enable_plus_dfu_request
+  uart_map: P0.06_TX_to_PB11_RX_and_P0.08_RX_from_PB10_TX
+  dfu_request: P0.15_active_low_open_drain
+  reset: P0.18_nRESET_via_fail_closed_BLE_EN_buffer
+  lfclk: INTERNAL_RC_CALIBRATED
+  swd_map: dedicated_VTREF_NRF_SWDIO_NRF_SWCLK_GND
   wifi: NOT_REQUIRED
   required_phy: [BLE_2M, BLE_1M, BLE_CODED_LONG_RANGE]
   firmware_port: MISSING_BLOCKER
   swd_recovery: REQUIRED_ON_FIXTURE
   enclosure_rf_validation: REQUIRED
+storage:
+  card: Kingston_SDCIT2_32GB
+  socket: GCT_MEM2052_00_195_00_A
+  interface: SDMMC1_4BIT_ONLY
+  contact_order: [DAT2, CD_DAT3, CMD, VDD, CLK, VSS, DAT0, DAT1]
+  card_detect: PC13_EXTI13_ACTIVE_LOW_CARD_PRESENT
+  required_validation: [CID, CAPACITY, FULL_WRITE_READBACK, POWER_LOSS_RECOVERY, TEMPERATURE]
+service_interfaces:
+  usb_c: GCT_USB4105_GF_A_120
+  usb_mode: STM32_USB2_DEVICE_ONLY_SERVICE_AND_SYSTEM_MEMORY_RECOVERY
+  usb_data: PA11_DM_PA12_DP
+  usb_vbus: PA9_PROTECTED_HIGH_IMPEDANCE_SENSE_ONLY
+  usb_power_policy: NO_STATION_SOURCE_OR_SINK_POWER
+  tamper: PC7_EXTI7_NORMALLY_CLOSED_TO_GND_OPEN_IS_ALARM
+production_fixture:
+  authority: hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv
+  geometry_authority: hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv
+  side: BOTTOM
+  pogo_pad_diameter_mm: 1.70
+  pogo_pitch_mm: 2.54
+  fixture_fiducials: 3
+  stm32_swd: TP_MCU_SWD_5P_VTREF_SWDIO_SWCLK_NRST_GND
+  eol: TP_EOL_13P_RAIL_SENSE_UART_POWER_STATE_BOOT0_REV_STRAPS_I2C2
+  bg95_usb: TP_CELL_USB_4P_ISOLATED_FROM_STM32_USB
+  bg95_debug: TP_CELL_DBG_5P_1V8_VREF_GATED
+  nrf_swd: TP_BLE_SWD_4P_SEPARATE_AUTHORITY
+  fixture_power_policy: DUT_RAILS_SENSE_ONLY_EXCEPT_CONTROLLED_BG95_USB_VBUS
+pcb_main_capture:
+  authority_status: MAIN_AUTH_001_THROUGH_011_CLOSED
+  passive_support_authority: hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv
+  mechanical_placement_authority: hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv
+  outline_mm: [110, 75]
+  thickness_mm: 1.6
+  layer_target: 6
+  mounting_holes: 4x_M3_CLEARANCE_NPTH_D3.2
+  production_pogo_pads: 31
+  capture_readiness: COMPLETE
+  passive_support_components: 211
+  fitted_components: 196
+  dnp_components: 15
+  native_schematic: ABSENT_BLOCKER
+  review_a: BLOCKED_NATIVE_SCHEMATIC_ABSENT
+  review_b: BLOCKED_REVIEW_A_NOT_COMPLETE
+  production_bom: BLOCKED
 positioning:
   station_type: fixed
   authoritative_source: configured_installation_coordinates

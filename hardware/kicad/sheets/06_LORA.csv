@@ -4,4 +4,5 @@ Sheet,Item,Requirement
 06_LORA,CONTROL,"SPI1 PA4/PA5/PA6/PA7; DIO1 PC2/EXTI2; TXEN PB15 and RXEN PD8 with 100 kOhm pull-downs and LOW startup; BUSY PD9; RESET_N PD10 with 10 kOhm pull-up plus 100 nF; DIO2 NC"
 06_LORA,RF,"U10 pin21 through pi network with 0 Ohm series baseline and two DNP shunts to connector-side ultra-low-C ESD and J10 U.FL-R-SMT-1(60); 50 Ohm no-stub route; J10 is the conducted-test port"
 06_LORA,FIRMWARE,"Configure internal TCXO through SX1262 DIO3 at 2.2 V; TXEN/RXEN truth table TX=1/0 RX=0/1 CLOSE=0/0 and 1/1 forbidden; RU868 signed profile required; no normal channel centered at 869.000 MHz"
-06_LORA,BLOCKERS,"Exact support RefDes/MPNs remain MAIN-AUTH-010; supplier castellated/no-IPEX confirmation external cable/antenna RF layout conducted/radiated regulatory and coexistence evidence remain production blockers"
+06_LORA,PASSIVE_SUPPORT,"MAIN-AUTH-010 freezes C66-C70 R63-R73 and D5; use exact MPN population and physical paths from PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
+06_LORA,BLOCKERS,"MAIN-AUTH-010 is closed; supplier castellated/no-IPEX confirmation external cable/antenna RF layout conducted/radiated regulatory and coexistence evidence remain production blockers"

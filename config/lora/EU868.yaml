@@ -16,4 +16,3 @@ activation_guard:
 notes:
   - Empty values are intentional. Firmware must fail closed and refuse TX.
   - Do not copy RU868 parameters into this profile.
-

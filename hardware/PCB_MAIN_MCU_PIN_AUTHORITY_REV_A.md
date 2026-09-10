@@ -32,7 +32,7 @@ The LoRa RF-switch controls are part of the locked functional set: PB15 / packag
 | VDD11 pins 49 and 98 | `VCORE_1V1` | Joined only to the SMPS/LDO core node; 2 x 2.2 uF to VSSSMPS plus one optional 100 nF at each pin |
 | VSSSMPS pin 48 | `GND` | Direct SMPS power-ground connection |
 
-`VCORE_1V1` must never power external circuitry. The final capacitor and inductor MPNs, RefDes allocation, placement, ESR, and DC-bias verification remain controlled by `MAIN-AUTH-010`.
+`VCORE_1V1` must never power external circuitry. The capacitor and inductor MPNs, RefDes allocation and electrical paths are frozen by `MAIN-AUTH-010`; placement, ESR and DC-bias verification remain Review A work.
 
 ## Clock and debug dispositions
 

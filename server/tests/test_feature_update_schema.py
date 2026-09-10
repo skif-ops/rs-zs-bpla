@@ -32,4 +32,3 @@ def test_online_type_status_has_fail_safe_defaults():
     assert status.status == "unknown"
     assert status.type_lock_allowed is False
     assert status.confidence == 0.0
-

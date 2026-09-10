@@ -12,4 +12,3 @@
 - Каждая деталь получает part number, material, revision, mass, print time, orientation и post-processing.
 
 Поставочный комплект: parametric source, STEP, STL, 3MF, printer profile, drawing, assembly BOM, print matrix, inspection form и контрольный STL mesh report.
-

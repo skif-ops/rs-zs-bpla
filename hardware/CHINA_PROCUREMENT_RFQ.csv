@@ -9,7 +9,7 @@ RFQ-007,QSPI NOR,Winbond,W25Q512JVFIQ,25,Authorized or traceable tier-1,,,,,,,Ye
 RFQ-008,Battery,TBD,12.8 V 40-60 Ah LiFePO4 with BMS,21,Cell or pack manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,UN38.3 MSDS capacity DCIR thresholds low-temp inhibit
 RFQ-009,Solar,TBD,60-80 W outdoor panel,21,Panel manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,Voc Isc Pmax insulation weathering evidence
 RFQ-010,MPPT,TBD,10 A LiFePO4 sealed MPPT,21,Controller manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,Charge profile cold Voc low-temp reverse current quiescent
-RFQ-011,PCBA main,TBD,4-layer assembled main PCB,22,Qualified CM with AOI,,,,,,,Yes,Yes,RFQ_REQUIRED,DFM stencil traceability test coverage
+RFQ-011,PCBA main,TBD,6-layer assembled main PCB 110x75x1.6 mm,22,Qualified CM with AOI,,,,,,,Yes,Yes,RFQ_REQUIRED,"final stackup and 50 Ohm coupon; DFM stencil traceability test coverage; MAIN-AUTH-011 outline/keepout compliance"
 RFQ-012,PCBA mic,TBD,2-layer assembled microphone PCB,88,Qualified CM with AOI,,,,,,,Yes,Yes,RFQ_REQUIRED,Acoustic port contamination and lot control
 RFQ-013,PCBA power,TBD,2-layer 2 oz power PCB,22,Qualified CM with thermal process,,,,,,,Yes,Yes,RFQ_REQUIRED,Current thermal copper and functional test
 RFQ-014,Harness,TBD,Labeled station harness set,22,Qualified harness factory,,,,,,,Yes,Yes,RFQ_REQUIRED,Crimp tooling pull force and 100 percent continuity

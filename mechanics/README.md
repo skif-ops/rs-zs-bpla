@@ -17,6 +17,7 @@ STL/STEP прежнего EVT-MB не являются корпусом пред
 ## Общая компоновка
 
 - верхний акустический/электронный модуль: четыре mic leaf, PCB-MAIN, антенны, service cover;
+- capture-allocation PCB-MAIN: 110 x 75 x 1,6 мм, четыре NPTH и 110 x 75 x 12 мм unmated PCBA envelope по `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv`; native STEP и полная сборочная проверка ещё не выполнены;
 - отдельный нижний силовой модуль: батарея 40-60 Ah, BMS, MPPT и PCB-PWR;
 - панель 60-80 W устанавливается отдельным кронштейном;
 - кабель между модулями съёмный, поляризованный, защищённый предохранителем;

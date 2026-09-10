@@ -34,3 +34,13 @@
   EVT-линии в другую;
 - региональные варианты LoRa различаются BOM/profile/label, но используют общую PCB;
 - Android-релиз имеет независимую версию и журнал совместимости с firmware/protocol schema.
+
+## Текущий контрольный срез
+
+- версия ветки: `EVT-PRE-20 Rev.A v0.2` от 10.09.2026;
+- `MAIN-AUTH-001…011` закрыты и проходят основной и независимые authority-аудиты;
+- native `PCB-MAIN.kicad_sch/.kicad_pcb` отсутствуют;
+- Review A и Review B не выполнены;
+- производственный BOM, Gerber и статус `FOR_MANUFACTURE` заблокированы;
+- firmware имеет статус `TARGET_PORT_REQUIRED`;
+- аппаратный EVT имеет статус `NOT RUN`.

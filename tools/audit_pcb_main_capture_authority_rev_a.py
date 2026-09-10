@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Independent pre-schematic authority audit for EVT-PRE-20 PCB-MAIN Rev.A.
 
-This gate proves that the current capture inputs are internally consistent and that
-known missing device-pad authorities remain explicit blockers. It does not claim
+This gate proves that the complete pre-schematic capture inputs are internally
+consistent. It does not claim
 that Review A, Review B or the production BOM has passed.
 """
 from __future__ import annotations
@@ -36,6 +36,14 @@ GNSS_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv
 GNSS_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md"
 LORA_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv"
 LORA_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md"
+BLE_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv"
+BLE_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md"
+CONNECTOR_FIXTURE_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv"
+CONNECTOR_FIXTURE_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md"
+PASSIVE_SUPPORT_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
+PASSIVE_SUPPORT_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md"
+MECHANICAL_PLACEMENT_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
+MECHANICAL_PLACEMENT_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md"
 DUAL_SIM_POLICY_PATH = ROOT / "hardware/DUAL_SIM_SINGLE_STANDBY.md"
 AUDIO_INTERFACE_PATH = ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md"
 POWER_ARCHITECTURE_PATH = ROOT / "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
@@ -58,6 +66,14 @@ EXPECTED_AUTHORITATIVE_INPUTS = {
     "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md",
     "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -79,6 +95,7 @@ EXPECTED_MAIN_MPNS = {
     "U9": "MAX-M10S-00B",
     "U10": "E22-900M22S",
     "U11": "MDBT50Q-P1MV2",
+    "U12": "SDCIT2/32GB",
     "U13": "TS3A27518EPWR",
     "U14": "ESDALC6V1-5P6",
     "U15": "ESDALC6V1-5P6",
@@ -111,8 +128,8 @@ EXPECTED_SWD = {
     "4": "NRST",
     "5": "GND",
 }
-EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(8, 12)}
-EXPECTED_CLOSED_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(1, 8)}
+EXPECTED_OPEN_AUTHORITY_IDS: set[str] = set()
+EXPECTED_CLOSED_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(1, 12)}
 EXPECTED_DEVICE_METADATA = {
     "U2": ("W25Q512JVFIQ", "SOIC-16_300mil_F"),
     "U3": ("LIS2DW12TR", "LGA-12_2x2mm"),
@@ -432,12 +449,12 @@ def main() -> None:
     addendum = rows(ADDENDUM_PATH)
     require(len(base) == 66, f"expected 66 base MCU assignments, got {len(base)}")
     require(len(addendum) == 1 and addendum[0]["Net"] == "AAD_CFG", "AAD_CFG addendum mismatch")
-    pins = base + addendum
-    require(len(pins) == status["mcu_contract"]["functional_assignment_count"] == 67, "MCU assignment count mismatch")
+    mcu_pins = base + addendum
+    require(len(mcu_pins) == status["mcu_contract"]["functional_assignment_count"] == 67, "MCU assignment count mismatch")
     for field in ("Net", "MCU_Pin", "LQFP100_Pin"):
-        values = [row[field] for row in pins]
+        values = [row[field] for row in mcu_pins]
         require(len(values) == len(set(values)), f"MCU pin authority has duplicate {field}")
-    by_net = {row["Net"]: row for row in pins}
+    by_net = {row["Net"]: row for row in mcu_pins}
     critical = {
         "PDM_CLK": ("PE9", "37"),
         "MIC_WAKE": ("PA8", "67"),
@@ -445,6 +462,10 @@ def main() -> None:
         "LORA_DIO1": ("PC2", "17"),
         "LORA_TXEN": ("PB15", "54"),
         "LORA_RXEN": ("PD8", "55"),
+        "BLE_TX": ("PB10", "44"),
+        "BLE_RX": ("PB11", "45"),
+        "BLE_EN": ("PE6", "5"),
+        "BLE_DFU_REQ": ("PB2", "34"),
         "I2C2_SCL": ("PB13", "52"),
         "I2C2_SDA": ("PB14", "53"),
         "USB_DM": ("PA11", "70"),
@@ -456,7 +477,7 @@ def main() -> None:
         require(net in by_net, f"critical MCU net missing: {net}")
         require((by_net[net]["MCU_Pin"], by_net[net]["LQFP100_Pin"]) == expected, f"{net} pin mismatch")
     require({by_net[f"PDM_DATA{i}"]["MCU_Pin"] for i in range(1, 5)} == {"PB1", "PD6", "PE7", "PE4"}, "four-channel PDM map mismatch")
-    require({"PB12", "PE1", "PC4", "PC5"}.isdisjoint(row["MCU_Pin"] for row in pins), "absent Q-package pin used")
+    require({"PB12", "PE1", "PC4", "PC5"}.isdisjoint(row["MCU_Pin"] for row in mcu_pins), "absent Q-package pin used")
 
     # Independent full-package control. The expected package list is copied from
     # the pinned ST CubeMX STM32U585VITxQ LQFP100_SMPS definition rather than
@@ -483,7 +504,7 @@ def main() -> None:
         expected_type = EXPECTED_POWER_PINS.get(position, ("RESET" if position == 14 else "IO", "", ""))[0]
         require(row["Pin_Type"] == expected_type, f"U1 position {position} pin-type mismatch")
 
-    functional_by_position = {int(row["LQFP100_Pin"]): row for row in pins}
+    functional_by_position = {int(row["LQFP100_Pin"]): row for row in mcu_pins}
     require(len(functional_by_position) == 67, "functional U1 position count mismatch")
     for position, source_row in functional_by_position.items():
         authority_row = authority_by_pin[position]
@@ -769,8 +790,9 @@ def main() -> None:
     for pin in (11, 12, 13, 14, 16, 57, 63, 76, 77, 78, 92, 93, 94, 95, 97, 98, 99):
         require((u8[pin]["RevA_Net"], u8[pin]["Disposition"]) == ("NC", "RESERVED_DNU_NC"), f"U8 reserved pad {pin} is not DNU/NC")
     require((u8[42]["RevA_Net"], u8[42]["Disposition"]) == ("NC", "UNUSED_INPUT_NC"), "U8 module-level USIM_DET must remain NC")
-    for pin in (8, 9, 10, 22, 23, 60, 75):
-        require(u8[pin]["Disposition"] == "DEFERRED_MAIN_AUTH_009", f"U8 recovery/RF pad {pin} ownership mismatch")
+    for pin in (8, 9, 10, 22, 23, 75):
+        require(u8[pin]["Disposition"] == "FIXTURE_ENDPOINT_LOCKED", f"U8 recovery pad {pin} endpoint mismatch")
+    require(u8[60]["Disposition"] == "RF_ENDPOINT_LOCKED", "U8 cellular RF endpoint mismatch")
     for token in ("100 uF", "220 nF", "47 nF", "150 pF", "68 pF", "33 pF", "10 pF", "ferrite bead"):
         require(token in u8[32]["Required_Network"], f"U8 VBAT_BB authority lacks {token}")
     for token in ("100 uF", "100 nF", "33 pF", "10 pF", "0 Ohm link"):
@@ -1131,6 +1153,280 @@ def main() -> None:
     require("PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv" in by_ref["U10"]["Notes"], "U10 freeze lacks LoRa authority citation")
     require("CASTELLATED_OPTION" in by_ref["U10"]["Status"], "U10 supplier antenna-option blocker missing")
 
+    ble_rows = rows(BLE_PIN_AUTHORITY_PATH)
+    require(len(ble_rows) == 65, f"expected 65 U11/TP_BLE_SWD authority rows, got {len(ble_rows)}")
+    require(all(set(row) == cellular_columns for row in ble_rows), "BLE pin-authority schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in cellular_columns) for row in ble_rows),
+        "BLE pin-authority row contains an empty field",
+    )
+    ble_by_key = {(row["RefDes"], row["Pin"]): row for row in ble_rows}
+    require(len(ble_by_key) == len(ble_rows), "duplicate BLE RefDes/pin key")
+    require({row["RefDes"] for row in ble_rows} == {"U11", "TP_BLE_SWD"}, "BLE authority RefDes set drift")
+    u11_rows = [row for row in ble_rows if row["RefDes"] == "U11"]
+    require({row["Pin"] for row in u11_rows} == {str(index) for index in range(1, 62)}, "U11 package positions are not exactly 1..61")
+    ble_package = "nRF52840_SMD_10.5x15.5_61P_PCB_antenna"
+    require(
+        all((row["MPN"], row["Package"]) == ("MDBT50Q-P1MV2", ble_package) for row in u11_rows),
+        "U11 BLE identity/package mismatch",
+    )
+    expected_u11_special = {
+        22: ("P0.06", "OUTPUT", "BLE_RX", "FUNCTION_LOCKED"),
+        24: ("P0.08", "INPUT", "BLE_TX", "FUNCTION_LOCKED"),
+        28: ("VDD", "POWER", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        30: ("VDDH", "POWER", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        31: ("DCCH", "POWER_OUTPUT", "NC", "REG0_OUTPUT_NC"),
+        32: ("VBUS", "POWER_INPUT", "NC", "USB_INPUT_NC"),
+        34: ("D-", "USB_BIDIR", "NC", "USB_DATA_NC"),
+        35: ("D+", "USB_BIDIR", "NC", "USB_DATA_NC"),
+        39: ("P0.15", "INPUT", "BLE_DFU_REQ", "BOOT_REQUEST_LOCKED"),
+        40: ("P0.18/nRESET", "INPUT", "NRF_RESET_N", "RESET_LOCKED"),
+        51: ("SWDIO", "DEBUG_BIDIR", "NRF_SWDIO", "DEBUG_LOCKED"),
+        53: ("SWDCLK", "DEBUG_INPUT", "NRF_SWCLK", "DEBUG_LOCKED"),
+    }
+    for pin, expected in expected_u11_special.items():
+        row = ble_by_key[("U11", str(pin))]
+        require((row["Pin_Name"], row["Direction"], row["RevA_Net"], row["Disposition"]) == expected, f"U11 pad {pin} mapping mismatch")
+    for pin in (1, 2, 15, 33, 55):
+        row = ble_by_key[("U11", str(pin))]
+        require((row["Pin_Name"], row["RevA_Net"], row["Disposition"]) == ("GND", "GND", "GROUND_LOCKED"), f"U11 ground pad {pin} mismatch")
+    non_nc_pins = {1, 2, 15, 22, 24, 28, 30, 33, 39, 40, 51, 53, 55}
+    require(
+        {int(row["Pin"]) for row in u11_rows if row["RevA_Net"] != "NC"} == non_nc_pins,
+        "U11 used/unused pad set mismatch",
+    )
+    require("100 nF plus 10 uF" in ble_by_key[("U11", "28")]["Required_Network"], "U11 local decoupling mismatch")
+    require("Reg0 DC/DC is disabled" in ble_by_key[("U11", "31")]["Required_Network"], "U11 Reg0 state missing")
+    require("10 kOhm pull-up" in ble_by_key[("U11", "39")]["Required_Network"], "U11 DFU pull-up missing")
+    require("PB2 open-drain" in ble_by_key[("U11", "39")]["Required_Network"], "U11 DFU open-drain control missing")
+    for marker in ("10 kOhm pull-up", "non-inverting open-drain", "100 kOhm pull-down"):
+        require(marker in ble_by_key[("U11", "40")]["Required_Network"], f"U11 reset network lacks {marker}")
+    require(
+        {row["Pin"] for row in ble_rows if row["RefDes"] == "TP_BLE_SWD"} == {"1", "2", "3", "4"},
+        "TP_BLE_SWD contact set mismatch",
+    )
+    expected_ble_swd = {
+        "1": ("VTREF", "3V3_DIGITAL", "FIXTURE_CONTACT_LOCKED"),
+        "2": ("SWDIO", "NRF_SWDIO", "FIXTURE_CONTACT_LOCKED"),
+        "3": ("SWDCLK", "NRF_SWCLK", "FIXTURE_CONTACT_LOCKED"),
+        "4": ("GND", "GND", "FIXTURE_GROUND_LOCKED"),
+    }
+    for pin, expected in expected_ble_swd.items():
+        row = ble_by_key[("TP_BLE_SWD", pin)]
+        require((row["Pin_Name"], row["RevA_Net"], row["Disposition"]) == expected, f"TP_BLE_SWD contact {pin} mismatch")
+    for net, expected in {
+        "BLE_TX": ("PB10", "44"), "BLE_RX": ("PB11", "45"),
+        "BLE_EN": ("PE6", "5"), "BLE_DFU_REQ": ("PB2", "34"),
+    }.items():
+        require(net in by_net, f"BLE MCU net missing: {net}")
+        require((by_net[net]["MCU_Pin"], by_net[net]["LQFP100_Pin"]) == expected, f"{net} MCU pin mismatch")
+
+    ble_review = BLE_REVIEW_PATH.read_text(encoding="utf-8")
+    ble_sha256 = hashlib.sha256(BLE_PIN_AUTHORITY_PATH.read_bytes()).hexdigest()
+    for marker in {
+        "BLE_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        ble_sha256, "61fec8c0c9f8c33175be2237a8ebba73c6cfc0a3572fe3835fd341079c103d03",
+        "61-pad", "PSELRESET[0]", "application-defined", "10.5 mm by 3.8 mm",
+        "does not release exact support-component MPNs",
+    }:
+        require(marker in ble_review, f"BLE authority review missing marker: {marker}")
+    for path, markers in {
+        CAPTURE_SPEC_PATH: ("PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv", "P0.06", "P0.08", "P0.15", "P0.18/nRESET", "3.8 mm", "MAIN-AUTH-010"),
+        ROOT / "hardware/kicad/sheets/07_BLE.csv": ("all 65 U11/TP_BLE_SWD rows", "NRF_SWDIO", "NRF_SWCLK", "3.8 mm"),
+        ROOT / "firmware/targets/evt_pre_20/target_status.yaml": ("P0.06_TX_to_PB11_RX", "P0.08_RX_from_PB10_TX", "P0.15_active_low_open_drain", "P0.18_nRESET", "INTERNAL_RC_CALIBRATED"),
+    }.items():
+        content = path.read_text(encoding="utf-8")
+        for marker in markers:
+            require(marker in content, f"{path.name} lacks frozen BLE marker: {marker}")
+    require(by_ref["U11"]["Package_or_Module"] == ble_package, "U11 freeze package mismatch")
+    require("PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv" in by_ref["U11"]["Notes"], "U11 freeze lacks BLE authority citation")
+
+    connector_fixture_rows = rows(CONNECTOR_FIXTURE_PIN_AUTHORITY_PATH)
+    require(len(connector_fixture_rows) == 70, f"expected 70 connector/fixture authority rows, got {len(connector_fixture_rows)}")
+    require(all(set(row) == cellular_columns for row in connector_fixture_rows), "connector/fixture authority schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in cellular_columns) for row in connector_fixture_rows),
+        "connector/fixture authority row contains an empty field",
+    )
+    connector_fixture_by_key = {(row["RefDes"], row["Pin"]): row for row in connector_fixture_rows}
+    require(len(connector_fixture_by_key) == len(connector_fixture_rows), "duplicate connector/fixture RefDes/pin key")
+    expected_connector_counts = {
+        "U12": 8, "J12": 10, "J11": 17, "J8": 2, "J9": 2, "J10": 2,
+        "J13": 2, "TP_MCU_SWD": 5, "TP_EOL": 13, "TP_CELL_USB": 4, "TP_CELL_DBG": 5,
+    }
+    for ref, count in expected_connector_counts.items():
+        require(sum(row["RefDes"] == ref for row in connector_fixture_rows) == count, f"{ref} contact count mismatch")
+    require(
+        {row["RefDes"] for row in connector_fixture_rows} == set(expected_connector_counts),
+        "connector/fixture authority RefDes set drift",
+    )
+    card_map = {
+        "1": ("DAT2", "SD_D2"), "2": ("CD/DAT3", "SD_D3"), "3": ("CMD", "SD_CMD"),
+        "4": ("VDD", "3V3_DIGITAL"), "5": ("CLK", "SD_CK"), "6": ("VSS", "GND"),
+        "7": ("DAT0", "SD_D0"), "8": ("DAT1", "SD_D1"),
+    }
+    for ref in ("U12", "J12"):
+        for pin, expected in card_map.items():
+            row = connector_fixture_by_key[(ref, pin)]
+            require((row["Pin_Name"], row["RevA_Net"]) == expected, f"{ref}.{pin} microSD map mismatch")
+    require(connector_fixture_by_key[("J12", "CD")]["RevA_Net"] == "SD_DET", "J12 detect endpoint mismatch")
+    usb_map = {
+        "A1": "GND", "A4": "USB_VBUS_CONN", "A5": "USB_CC1", "A6": "USB_DP", "A7": "USB_DM",
+        "A8": "NC", "A9": "USB_VBUS_CONN", "A12": "GND", "B1": "GND", "B4": "USB_VBUS_CONN",
+        "B5": "USB_CC2", "B6": "USB_DP", "B7": "USB_DM", "B8": "NC", "B9": "USB_VBUS_CONN",
+        "B12": "GND", "SHIELD": "USB_SHIELD",
+    }
+    for pin, net in usb_map.items():
+        require(connector_fixture_by_key[("J11", pin)]["RevA_Net"] == net, f"J11.{pin} USB contact mismatch")
+    for source_rows, ref in ((gnss_rows, "J9"), (lora_rows, "J10")):
+        source_by_key = {(row["RefDes"], row["Pin"]): row for row in source_rows}
+        for pin in ("1", "SHIELD"):
+            require(connector_fixture_by_key[(ref, pin)] == source_by_key[(ref, pin)], f"{ref}.{pin} diverges from closed RF authority")
+    require(
+        (connector_fixture_by_key[("J13", "1")]["RevA_Net"], connector_fixture_by_key[("J13", "2")]["RevA_Net"])
+        == ("TAMPER_IN", "GND"),
+        "J13 tamper map mismatch",
+    )
+    require(
+        {connector_fixture_by_key[("TP_MCU_SWD", pin)]["RevA_Net"] for pin in ("2", "3")}
+        == {"SWDIO", "SWCLK"},
+        "STM32 SWD fixture map mismatch",
+    )
+    require(
+        {connector_fixture_by_key[("TP_CELL_USB", pin)]["RevA_Net"] for pin in ("1", "2", "3")}
+        == {"CELL_USB_VBUS", "CELL_USB_DP", "CELL_USB_DM"},
+        "BG95 USB fixture map mismatch",
+    )
+    require(
+        {connector_fixture_by_key[("TP_CELL_DBG", pin)]["RevA_Net"] for pin in ("1", "2", "3", "4")}
+        == {"U8_VDD_EXT_1V8", "CELL_DBG_TXD_1V8", "CELL_DBG_RXD_1V8", "CELL_USB_BOOT_1V8"},
+        "BG95 debug fixture map mismatch",
+    )
+    connector_fixture_review = CONNECTOR_FIXTURE_REVIEW_PATH.read_text(encoding="utf-8")
+    connector_fixture_sha256 = hashlib.sha256(CONNECTOR_FIXTURE_PIN_AUTHORITY_PATH.read_bytes()).hexdigest()
+    for marker in {
+        "CONNECTOR_FIXTURE_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        connector_fixture_sha256, "SDCIT2/32GB", "USB4105-GF-A-120", "MEM2052-00-195-00-A",
+        "504050-0291", "TP_EOL", "TP_CELL_USB", "TP_CELL_DBG", "MAIN-AUTH-010", "MAIN-AUTH-011",
+    }:
+        require(marker in connector_fixture_review, f"connector/fixture review missing marker: {marker}")
+    require(by_ref["U12"]["MPN"] == "SDCIT2/32GB", "U12 freeze identity mismatch")
+    require("PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv" in by_ref["U12"]["Notes"], "U12 freeze lacks connector authority citation")
+
+    passive_support_rows = rows(PASSIVE_SUPPORT_AUTHORITY_PATH)
+    passive_columns = {
+        "RefDes", "Category", "Manufacturer", "MPN", "Package", "Value",
+        "Population", "Temperature_C", "Logical_Net", "Pin_Map",
+        "Electrical_Path", "Disposition", "Authority", "Notes",
+    }
+    require(len(passive_support_rows) == 211, "expected 211 passive/support authority rows")
+    require(all(set(row) == passive_columns for row in passive_support_rows), "passive/support schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in passive_columns)
+            for row in passive_support_rows),
+        "passive/support authority row contains an empty field",
+    )
+    passive_by_ref = {row["RefDes"]: row for row in passive_support_rows}
+    require(len(passive_by_ref) == len(passive_support_rows), "duplicate passive/support RefDes")
+    expected_passive_refs = (
+        {f"C{i}" for i in range(1, 81)} | {f"R{i}" for i in range(1, 104)}
+        | {"L1", "L2", "FB1", "FL1", "U5", "U6", "Q4", "X1"}
+        | {f"U{i}" for i in range(19, 28)} | {f"D{i}" for i in range(1, 12)}
+    )
+    require(set(passive_by_ref) == expected_passive_refs, "passive/support RefDes set drift")
+    require(
+        sum(row["Population"] == "FITTED" for row in passive_support_rows) == 196
+        and sum(row["Population"] == "DNP" for row in passive_support_rows) == 15,
+        "passive/support population count mismatch",
+    )
+    for row in passive_support_rows:
+        assignments = row["Pin_Map"].split(";")
+        require(all(item.count("=") == 1 for item in assignments),
+                f"{row['RefDes']} malformed passive/support physical pin map")
+        pins = [item.split("=", 1)[0] for item in assignments]
+        require(all(pins) and len(pins) == len(set(pins)),
+                f"{row['RefDes']} duplicate or blank passive/support pin")
+    for refdes, mpn in {
+        "L1": "LQH32PN2R2NN0L", "L2": "LQW15AN27NJ00D",
+        "FB1": "BLM31KN601SN1L", "FL1": "ABSES5AF-L100KM",
+        "U5": "LT6000IDCB#TRMPBF", "U6": "SN74LVC1G07DBVR",
+        "Q4": "Si1016X-T1-GE3", "D4": "TPD1E05U06DYAR",
+        "X1": "SiT1552AI-JE-DCC-32.768D",
+    }.items():
+        require(passive_by_ref[refdes]["MPN"] == mpn, f"{refdes} passive/support MPN mismatch")
+    passive_support_review = PASSIVE_SUPPORT_REVIEW_PATH.read_text(encoding="utf-8")
+    passive_support_sha256 = hashlib.sha256(PASSIVE_SUPPORT_AUTHORITY_PATH.read_bytes()).hexdigest()
+    for marker in {
+        "PASSIVE_SUPPORT_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        passive_support_sha256, "211 unique physical components", "196 fitted and 15 DNP",
+        "LT6000IDCB#TRMPBF", "Si1016X-T1-GE3", "ABSES5AF-L100KM",
+        "MAIN-AUTH-011", "physical tests remain `NOT RUN`",
+    }:
+        require(marker in passive_support_review, f"passive/support review missing marker: {marker}")
+
+    mechanical_rows = rows(MECHANICAL_PLACEMENT_AUTHORITY_PATH)
+    mechanical_columns = {
+        "Record_ID", "Feature_Type", "RefDes", "Contact", "Side",
+        "Anchor_Definition", "X_mm", "Y_mm", "Rotation_deg", "Geometry",
+        "Extent_X_mm", "Extent_Y_mm", "Z_Min_mm", "Z_Max_mm",
+        "Access_Direction", "Layer_Scope", "Clearance_Rule", "Disposition",
+        "Authority", "Notes",
+    }
+    require(len(mechanical_rows) == 70, "expected 70 mechanical placement authority rows")
+    require(all(set(row) == mechanical_columns for row in mechanical_rows), "mechanical placement schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in mechanical_columns)
+            for row in mechanical_rows),
+        "mechanical placement authority row contains an empty field",
+    )
+    mechanical_by_id = {row["Record_ID"]: row for row in mechanical_rows}
+    require(len(mechanical_by_id) == len(mechanical_rows), "duplicate mechanical placement Record_ID")
+    require(set(mechanical_by_id) == {f"MECH-{index:03d}" for index in range(1, 71)}, "mechanical Record_ID set drift")
+    require(all(row["Authority"] == "MAIN-AUTH-011" for row in mechanical_rows), "mechanical authority ID drift")
+    outline = mechanical_by_id["MECH-001"]
+    require(
+        (outline["Geometry"], outline["Extent_X_mm"], outline["Extent_Y_mm"], outline["Z_Max_mm"])
+        == ("ROUNDED_RECT_R3", "110.00", "75.00", "1.60"),
+        "PCB-MAIN outline or thickness mismatch",
+    )
+    holes = [row for row in mechanical_rows if row["Feature_Type"] == "MOUNTING_HOLE"]
+    require(
+        {(row["RefDes"], row["X_mm"], row["Y_mm"]) for row in holes}
+        == {("H1", "5.00", "5.00"), ("H2", "105.00", "5.00"),
+            ("H3", "105.00", "70.00"), ("H4", "5.00", "70.00")},
+        "PCB-MAIN mounting pattern mismatch",
+    )
+    connector_placements = [row for row in mechanical_rows if row["Feature_Type"] == "CONNECTOR_PLACEMENT"]
+    require(
+        {row["RefDes"] for row in connector_placements}
+        == {"J_PWR", "J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4", "J6", "J7",
+            "J8", "J9", "J10", "J11", "J12", "J13"},
+        "mechanical connector placement set mismatch",
+    )
+    module_placements = [row for row in mechanical_rows if row["Feature_Type"] == "MODULE_PLACEMENT"]
+    require({row["RefDes"] for row in module_placements} == {"U8", "U9", "U10", "U11"}, "RF module placement set mismatch")
+    test_pads = [row for row in mechanical_rows if row["Feature_Type"] == "TEST_PAD"]
+    require(len(test_pads) == 31, "production pogo-pad count mismatch")
+    require(
+        all(row["Side"] == "BOTTOM" and row["Geometry"] == "CIRCLE_D1.7"
+            and row["Clearance_Rule"] == "NO_PASTE_MASK_OPEN_D2.1" for row in test_pads),
+        "production pogo-pad geometry mismatch",
+    )
+    require(
+        (mechanical_by_id["MECH-028"]["X_mm"], mechanical_by_id["MECH-028"]["Extent_X_mm"],
+         mechanical_by_id["MECH-028"]["Extent_Y_mm"], mechanical_by_id["MECH-028"]["Layer_Scope"])
+        == ("106.20", "3.80", "10.50", "ALL_LAYERS"),
+        "BLE all-layer antenna keepout mismatch",
+    )
+    mechanical_review = MECHANICAL_PLACEMENT_REVIEW_PATH.read_text(encoding="utf-8")
+    mechanical_sha256 = hashlib.sha256(MECHANICAL_PLACEMENT_AUTHORITY_PATH.read_bytes()).hexdigest()
+    for marker in {
+        "MECHANICAL_PLACEMENT_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        mechanical_sha256, "70 records", "110 x 75 x 1.60 mm", "31 individual pogo pads",
+        "CONTROLLED_PENDING_NATIVE_STEP", "All physical tests remain `NOT RUN`",
+    }:
+        require(marker in mechanical_review, f"mechanical placement review missing marker: {marker}")
+
     harness = rows(HARNESS_PATH)
     main_power = interface(harness, "MAIN_PWR")
     require(pin_contract(main_power) == EXPECTED_MAIN_POWER, "12-pin MAIN/PWR harness contract mismatch")
@@ -1167,10 +1463,15 @@ def main() -> None:
         "CON-RF-GNSS": "Hirose_U.FL-R-SMT-1_60",
         "CON-RF-LORA": "Hirose_U.FL-R-SMT-1_60",
         "CON-USB": "GCT_USB4105-GF-A-120",
+        "CON-SD": "GCT_MEM2052-00-195-00-A",
+        "CON-TAMPER": "Molex_5040500291",
         "CON-SIM1": "TE_2336582-1",
         "CON-SIM2": "TE_2336582-1",
         "CON-SWD-MCU": "TEST_PADS",
         "CON-SWD-BLE": "TEST_PADS",
+        "CON-EOL": "TEST_PADS",
+        "CON-CELL-USB": "TEST_PADS",
+        "CON-CELL-DBG": "TEST_PADS",
     }
     for connector_id, mpn in expected_connectors.items():
         require(connector_id in connectors, f"connector freeze missing {connector_id}")
@@ -1186,6 +1487,12 @@ def main() -> None:
         and "J10 center" in connectors["CON-RF-LORA"]["Notes"]
         and "no-stub" in connectors["CON-RF-LORA"]["Notes"],
         "LoRa connector freeze lacks J10 authority/no-stub citation",
+    )
+    require(
+        "PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv" in connectors["CON-SWD-BLE"]["Notes"]
+        and all(token in connectors["CON-SWD-BLE"]["Notes"] for token in ("VTREF", "NRF_SWDIO", "NRF_SWCLK", "GND"))
+        and connectors["CON-SWD-BLE"]["Positions"] == "4",
+        "BLE connector freeze lacks the separate four-contact nRF SWD authority",
     )
 
     mcu = status["mcu_contract"]
@@ -1205,7 +1512,7 @@ def main() -> None:
     open_items = readiness["open_authorities"]
     closed_ids = {item["id"] for item in closed_items}
     open_ids = {item["id"] for item in open_items}
-    require(readiness["complete"] is False, "capture readiness released with open authorities")
+    require(readiness["complete"] is True, "capture readiness is not complete after all eleven authorities closed")
     require(closed_ids == EXPECTED_CLOSED_AUTHORITY_IDS, "PCB-MAIN closed authority register drift")
     require(len(closed_ids) == len(closed_items), "duplicate PCB-MAIN closed authority ID")
     closed_evidence = {item["id"]: set(item["evidence"]) for item in closed_items}
@@ -1265,13 +1572,45 @@ def main() -> None:
         },
         "MAIN-AUTH-007 evidence set mismatch",
     )
+    require(
+        closed_evidence["MAIN-AUTH-008"]
+        == {
+            "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-008 evidence set mismatch",
+    )
+    require(
+        closed_evidence["MAIN-AUTH-009"]
+        == {
+            "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-009 evidence set mismatch",
+    )
+    require(
+        closed_evidence["MAIN-AUTH-010"]
+        == {
+            "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-010 evidence set mismatch",
+    )
+    require(
+        closed_evidence["MAIN-AUTH-011"]
+        == {
+            "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-011 evidence set mismatch",
+    )
     require(closed_ids.isdisjoint(open_ids), "authority is both open and closed")
     require(open_ids == EXPECTED_OPEN_AUTHORITY_IDS, "PCB-MAIN open authority register drift")
     require(len(open_ids) == len(open_items), "duplicate PCB-MAIN open authority ID")
     require(all("production_bom" in item["blocks"] for item in open_items), "open authority does not block production BOM")
     review_a = status["review_a"]
     review_b = status["review_b"]
-    require(review_a["complete"] is False and review_a["status"] == "BLOCKED_CAPTURE_AUTHORITY_INCOMPLETE", "Review A must remain blocked")
+    require(review_a["complete"] is False and review_a["status"] == "BLOCKED_NATIVE_SCHEMATIC_ABSENT", "Review A must remain blocked on native schematic")
     require(review_b["complete"] is False and review_b["status"] == "BLOCKED_REVIEW_A_NOT_COMPLETE", "Review B must remain blocked")
     expected_review_a_evidence = {
         "signed_checklist", "schematic_pdf", "cubemx_pin_report", "erc_report",
@@ -1285,13 +1624,17 @@ def main() -> None:
         "assembly": status["assembly"],
         "audit": "PCB-MAIN independent pre-schematic authority audit",
         "status": "PASS_CAPTURE_INPUT_CONTROLLED",
-        "mcu_assignments_verified": len(pins),
+        "mcu_assignments_verified": len(mcu_pins),
         "mcu_package_pins_verified": len(authority_rows),
         "storage_sensor_pads_verified": len(device_rows),
         "audio_logic_pins_verified": len(audio_rows),
         "cellular_pins_verified": len(cellular_rows),
         "dual_sim_pins_verified": len(dual_sim_rows),
         "gnss_contacts_verified": len(gnss_rows),
+        "ble_contacts_verified": len(ble_rows),
+        "connector_fixture_contacts_verified": len(connector_fixture_rows),
+        "passive_support_components_verified": len(passive_support_rows),
+        "mechanical_placement_records_verified": len(mechanical_rows),
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
@@ -1303,15 +1646,19 @@ def main() -> None:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print("PCB-MAIN Rev.A pre-schematic authority audit: PASS_CAPTURE_INPUT_CONTROLLED")
-    print(f"- all {len(authority_rows)} U1 package positions and {len(pins)} functional assignments verified")
+    print(f"- all {len(authority_rows)} U1 package positions and {len(mcu_pins)} functional assignments verified")
     print(f"- all {len(device_rows)} U2/U3/U4 physical pins or pads and three unique I2C2 addresses verified")
     print(f"- all {len(audio_rows)} U7/U17/U18 physical pins, dual-direction PDM translation and active-high AAD wake path verified")
     print(f"- all {len(cellular_rows)} U8/U16/Q1/Q2 physical pins, power banks, translation and controls verified")
     print(f"- all {len(dual_sim_rows)} U13/U14/U15/J6/J7/Q3 physical contacts, safe-state controls and slot paths verified")
     print(f"- all {len(gnss_rows)} U9/J9 physical contacts, supply choices, supervisor signals and RF/bias topology verified")
     print(f"- all {len(lora_rows)} U10/J10 physical contacts, fail-closed RF-switch controls and no-stub RF path verified")
+    print(f"- all {len(ble_rows)} U11/TP_BLE_SWD contacts, fail-closed boot/reset, independent SWD and antenna keepout inputs verified")
+    print(f"- all {len(connector_fixture_rows)} connector/card/RF/tamper/fixture contacts and domain-isolation rules verified")
+    print(f"- all {len(passive_support_rows)} passive/support RefDes, MPNs, populations and physical pin sets verified")
+    print(f"- all {len(mechanical_rows)} outline, placement, zone, keepout and production fixture records verified")
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
-    print(f"- {len(open_items)} missing pad/mechanical authorities remain explicit production blockers")
+    print("- all 11 capture authorities closed; native schematic and Reviews A/B remain production blockers")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

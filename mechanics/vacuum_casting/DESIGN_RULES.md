@@ -11,4 +11,3 @@
 - Первый master и первые три отливки проходят размерный отчёт, сборку, IP и acoustic channel match.
 
 Поставочный комплект: master STEP, split/parting drawing, material datasheet, shrink table, inserts, trimming jig, inspection drawing, sample report и отдельный корпусной BOM.
-

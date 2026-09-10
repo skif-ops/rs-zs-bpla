@@ -230,7 +230,7 @@ def main() -> None:
     readiness = status["capture_readiness"]
     closed = {item["id"]: item for item in readiness["closed_authorities"]}
     open_ids = {item["id"] for item in readiness["open_authorities"]}
-    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 8)}, "closed authority set mismatch")
+    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 12)}, "closed authority set mismatch")
     require(
         set(closed["MAIN-AUTH-005"]["evidence"])
         == {
@@ -239,8 +239,8 @@ def main() -> None:
         },
         "MAIN-AUTH-005 evidence set mismatch",
     )
-    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(8, 12)}, "remaining open authority set mismatch")
-    require(readiness["complete"] is False and status["manufacturing_release"] is False, "dual-SIM authority prematurely released manufacturing")
+    require(open_ids == set(), "open authority set mismatch")
+    require(readiness["complete"] is True and status["manufacturing_release"] is False, "capture/manufacturing state mismatch")
 
     result = {
         "configuration": "EVT-PRE-20 Rev.A",
@@ -267,7 +267,7 @@ def main() -> None:
     print("- all 55 physical contacts and independent TI/ST/TE pin maps verified")
     print("- six switch routes, three-channel VDD path and boot-safe Q3 inversion verified")
     print("- both protected socket maps, card-detect filters and MCU endpoints verified")
-    print(f"- {len(open_ids)} remaining authorities keep the production BOM blocked")
+    print("- native capture and Reviews A/B keep the production BOM blocked")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

@@ -153,14 +153,14 @@ U8_DUAL_SIM_MAP = {
     46: ("CELL_USIM_CLK_1V8", "FUNCTION_LOCKED"),
     47: ("GND_MODEM", "GROUND_LOCKED"),
 }
-U8_DEFERRED_009 = {
-    8: "CELL_USB_VBUS",
-    9: "CELL_USB_DP",
-    10: "CELL_USB_DM",
-    22: "CELL_DBG_RXD_1V8",
-    23: "CELL_DBG_TXD_1V8",
-    60: "CELL_RF",
-    75: "CELL_USB_BOOT_1V8",
+U8_RESOLVED_009 = {
+    8: ("CELL_USB_VBUS", "FIXTURE_ENDPOINT_LOCKED"),
+    9: ("CELL_USB_DP", "FIXTURE_ENDPOINT_LOCKED"),
+    10: ("CELL_USB_DM", "FIXTURE_ENDPOINT_LOCKED"),
+    22: ("CELL_DBG_RXD_1V8", "FIXTURE_ENDPOINT_LOCKED"),
+    23: ("CELL_DBG_TXD_1V8", "FIXTURE_ENDPOINT_LOCKED"),
+    60: ("CELL_RF", "RF_ENDPOINT_LOCKED"),
+    75: ("CELL_USB_BOOT_1V8", "FIXTURE_ENDPOINT_LOCKED"),
 }
 
 
@@ -223,10 +223,10 @@ def main() -> None:
             (u8[index]["RevA_Net"], u8[index]["Disposition"]) == expected,
             f"U8 pad {index} closed dual-SIM mapping mismatch",
         )
-    for index, net in U8_DEFERRED_009.items():
+    for index, expected in U8_RESOLVED_009.items():
         require(
-            (u8[index]["RevA_Net"], u8[index]["Disposition"]) == (net, "DEFERRED_MAIN_AUTH_009"),
-            f"U8 pad {index} recovery/RF ownership mismatch",
+            (u8[index]["RevA_Net"], u8[index]["Disposition"]) == expected,
+            f"U8 pad {index} recovery/RF endpoint mismatch",
         )
     require(u8[51]["Disposition"] == u8[56]["Disposition"] == "UNSUPPORTED_VARIANT_NC", "U8 unsupported-variant pads are not NC")
     require(u8[27]["Disposition"] == u8[84]["Disposition"] == "UNUSED_BOOT_CONFIG_NC", "U8 unused BOOT_CONFIG pads are not safe NC")
@@ -409,9 +409,9 @@ def main() -> None:
         },
         "MAIN-AUTH-005 evidence set mismatch",
     )
-    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 8)}, "closed authority set mismatch")
-    require(open_ids == {f"MAIN-AUTH-{index:03d}" for index in range(8, 12)}, "remaining open authority set mismatch")
-    require(readiness["complete"] is False and status["manufacturing_release"] is False, "cellular authority prematurely released manufacturing")
+    require(set(closed) == {f"MAIN-AUTH-{index:03d}" for index in range(1, 12)}, "closed authority set mismatch")
+    require(open_ids == set(), "open authority set mismatch")
+    require(readiness["complete"] is True and status["manufacturing_release"] is False, "capture/manufacturing state mismatch")
 
     result = {
         "configuration": "EVT-PRE-20 Rev.A",
@@ -439,7 +439,7 @@ def main() -> None:
     print("- 24 U16 pins with two fixed direction groups and partial-power isolation verified")
     print("- two exact MMBT3904 open-collector stages and mandatory pulse windows verified")
     print("- guaranteed 1.8 V-domain margins and burst-power requirements verified")
-    print(f"- {len(open_ids)} remaining authorities keep the production BOM blocked")
+    print("- native capture and Reviews A/B keep the production BOM blocked")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

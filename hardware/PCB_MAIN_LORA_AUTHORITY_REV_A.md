@@ -20,7 +20,7 @@ The current Ebyte v1.2 family manual explicitly lists the exact 20 x 14 mm `E22-
 
 U10 VCC is `3V3_DIGITAL`. Ebyte specifies 1.8 to 3.7 V for the 22 dBm family and recommends at least 3.0 V for full output. The current manual gives 100 to 140 mA transmit current at 22 dBm, approximately 7 mA receive current, and approximately 0.18 uA software shutdown current. Applying Ebyte's 30 percent supply-headroom rule to 140 mA gives a minimum U10 branch capability of 182 mA.
 
-U10 pin 9 has local 100 nF plus 10 uF ceramic decoupling. Review A and EVT must verify the final 3.3 V rail allocation, RF-burst droop, current and temperature rise. Exact capacitor MPNs and RefDes remain `MAIN-AUTH-010`.
+U10 pin 9 has local 100 nF plus 10 uF ceramic decoupling. Review A and EVT must verify the final 3.3 V rail allocation, RF-burst droop, current and temperature rise. Exact capacitor MPNs and RefDes are frozen by `MAIN-AUTH-010`.
 
 The exact 20 x 14 mm module uses an internal 32 MHz TCXO. Firmware must configure the SX1262 DIO3 TCXO supply to 2.2 V before radio operation. The passive-crystal exception in the current Ebyte manual applies to `E22-900MM22S`, not the selected `E22-900M22S`.
 
@@ -48,7 +48,7 @@ The controlled board RF chain is:
 
 `U10 pin 21 LORA_RF_MODULE -> pi network with populated 0 Ohm series baseline and two DNP shunts -> connector-side ultra-low-capacitance ESD -> J10 center LORA_RF_ANT`.
 
-The route is 50 Ohm controlled impedance over uninterrupted RF ground. U10 pads 20 and 22, all other module grounds and the J10 shell use dense ground stitching. J10 is exact Hirose `U.FL-R-SMT-1(60)` and doubles as the conducted-test port; a tee test point or other RF stub is forbidden. Exact pi/ESD MPNs and RefDes remain `MAIN-AUTH-010`. The cable and antenna remain separate unreleased system BOM lines.
+The route is 50 Ohm controlled impedance over uninterrupted RF ground. U10 pads 20 and 22, all other module grounds and the J10 shell use dense ground stitching. J10 is exact Hirose `U.FL-R-SMT-1(60)` and doubles as the conducted-test port; a tee test point or other RF stub is forbidden. Exact pi/ESD MPNs and RefDes are frozen by `MAIN-AUTH-010`. The cable and antenna remain separate unreleased system BOM lines.
 
 All 20 pilot units use only the signed RU868 profile. Power, duty cycle, occupied bandwidth and channel mask remain fail-closed; no transmission is authorized merely by this electrical authority.
 

@@ -6,9 +6,9 @@ U8,BG95-M3,LGA-102_23.6x19.9mm,4,PCM_CLK,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrica
 U8,BG95-M3,LGA-102_23.6x19.9mm,5,PCM_SYNC,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Voice PCM is unused
 U8,BG95-M3,LGA-102_23.6x19.9mm,6,PCM_DIN,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Voice PCM is unused
 U8,BG95-M3,LGA-102_23.6x19.9mm,7,PCM_DOUT,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Voice PCM is unused
-U8,BG95-M3,LGA-102_23.6x19.9mm,8,USB_VBUS,INPUT,CELL_USB_VBUS,DEFERRED_MAIN_AUTH_009,Recovery endpoint and protection are owned by MAIN-AUTH-009,Quectel_BG95_HW_Design_v1.6,Exact U8 USB VBUS pad is reserved for modem recovery
-U8,BG95-M3,LGA-102_23.6x19.9mm,9,USB_DP,BIDIR,CELL_USB_DP,DEFERRED_MAIN_AUTH_009,90 Ohm differential recovery pair owned by MAIN-AUTH-009,Quectel_BG95_HW_Design_v1.6,Exact U8 USB D+ pad is reserved for modem recovery
-U8,BG95-M3,LGA-102_23.6x19.9mm,10,USB_DM,BIDIR,CELL_USB_DM,DEFERRED_MAIN_AUTH_009,90 Ohm differential recovery pair owned by MAIN-AUTH-009,Quectel_BG95_HW_Design_v1.6,Exact U8 USB D- pad is reserved for modem recovery
+U8,BG95-M3,LGA-102_23.6x19.9mm,8,USB_VBUS,INPUT,CELL_USB_VBUS,FIXTURE_ENDPOINT_LOCKED,Direct only to TP_CELL_USB contact 1; never join J11 USB_VBUS_CONN or a station rail; exact protection remains MAIN-AUTH-010,PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A,Exact U8 USB VBUS recovery endpoint is fixed by MAIN-AUTH-009
+U8,BG95-M3,LGA-102_23.6x19.9mm,9,USB_DP,BIDIR,CELL_USB_DP,FIXTURE_ENDPOINT_LOCKED,90 Ohm differential pair only to TP_CELL_USB contact 2; never join J11 USB_DP; exact protection remains MAIN-AUTH-010,PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A,Exact U8 USB D+ recovery endpoint is fixed by MAIN-AUTH-009
+U8,BG95-M3,LGA-102_23.6x19.9mm,10,USB_DM,BIDIR,CELL_USB_DM,FIXTURE_ENDPOINT_LOCKED,90 Ohm differential pair only to TP_CELL_USB contact 3; never join J11 USB_DM; exact protection remains MAIN-AUTH-010,PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A,Exact U8 USB D- recovery endpoint is fixed by MAIN-AUTH-009
 U8,BG95-M3,LGA-102_23.6x19.9mm,11,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
 U8,BG95-M3,LGA-102_23.6x19.9mm,12,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
 U8,BG95-M3,LGA-102_23.6x19.9mm,13,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
@@ -20,8 +20,8 @@ U8,BG95-M3,LGA-102_23.6x19.9mm,18,W_DISABLE#,INPUT,NC,UNUSED_INPUT_NC,No electri
 U8,BG95-M3,LGA-102_23.6x19.9mm,19,AP_READY,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,AP sleep handshake is unused
 U8,BG95-M3,LGA-102_23.6x19.9mm,20,STATUS,OUTPUT,U8_STATUS_1V8,FUNCTION_LOCKED,Direct to U16 A2 pin 4; no external pull-up,Quectel_BG95_HW_Design_v1.6,High only after module power-up; governs safe rail removal
 U8,BG95-M3,LGA-102_23.6x19.9mm,21,NET_STATUS,OUTPUT,NC,UNUSED_OUTPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Network LED output is unused
-U8,BG95-M3,LGA-102_23.6x19.9mm,22,DBG_RXD,INPUT,CELL_DBG_RXD_1V8,DEFERRED_MAIN_AUTH_009,Recovery test endpoint owned by MAIN-AUTH-009,Quectel_BG95_HW_Design_v1.6,Exact debug receive pad is reserved for recovery fixture decision
-U8,BG95-M3,LGA-102_23.6x19.9mm,23,DBG_TXD,OUTPUT,CELL_DBG_TXD_1V8,DEFERRED_MAIN_AUTH_009,Recovery test endpoint owned by MAIN-AUTH-009,Quectel_BG95_HW_Design_v1.6,Exact debug transmit pad is reserved for recovery fixture decision
+U8,BG95-M3,LGA-102_23.6x19.9mm,22,DBG_RXD,INPUT,CELL_DBG_RXD_1V8,FIXTURE_ENDPOINT_LOCKED,Direct only to TP_CELL_DBG contact 3 and a 1.8 V tolerant high-impedance fixture output; exact protection remains MAIN-AUTH-010,PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A,Exact debug receive recovery endpoint is fixed by MAIN-AUTH-009
+U8,BG95-M3,LGA-102_23.6x19.9mm,23,DBG_TXD,OUTPUT,CELL_DBG_TXD_1V8,FIXTURE_ENDPOINT_LOCKED,Direct only to TP_CELL_DBG contact 2 and a 1.8 V tolerant fixture input; exact protection remains MAIN-AUTH-010,PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A,Exact debug transmit recovery endpoint is fixed by MAIN-AUTH-009
 U8,BG95-M3,LGA-102_23.6x19.9mm,24,ADC0,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,ADC0 is unused
 U8,BG95-M3,LGA-102_23.6x19.9mm,25,GPIO1,INPUT,NC,UNUSED_INPUT_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Fast shutdown is disabled; normal shutdown remains mandatory
 U8,BG95-M3,LGA-102_23.6x19.9mm,26,GPIO2,BIDIR,NC,UNUSED_IO_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Unused GPIO
@@ -58,7 +58,7 @@ U8,BG95-M3,LGA-102_23.6x19.9mm,56,ANT_WIFI,INPUT,NC,UNSUPPORTED_VARIANT_NC,No el
 U8,BG95-M3,LGA-102_23.6x19.9mm,57,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
 U8,BG95-M3,LGA-102_23.6x19.9mm,58,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module ground
 U8,BG95-M3,LGA-102_23.6x19.9mm,59,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module ground
-U8,BG95-M3,LGA-102_23.6x19.9mm,60,ANT_MAIN,BIDIR,CELL_RF,DEFERRED_MAIN_AUTH_009,50 Ohm RF endpoint matching ESD and U.FL are owned by MAIN-AUTH-009 and MAIN-AUTH-011,Quectel_BG95_HW_Design_v1.6,Exact cellular RF source pad is fixed
+U8,BG95-M3,LGA-102_23.6x19.9mm,60,ANT_MAIN,BIDIR,CELL_RF,RF_ENDPOINT_LOCKED,50 Ohm no-stub matching and protection path only to J8 contact 1 CELL_RF_ANT; exact parts remain MAIN-AUTH-010 and geometry remains MAIN-AUTH-011,PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A,Exact cellular RF source and U.FL endpoint are fixed by MAIN-AUTH-009
 U8,BG95-M3,LGA-102_23.6x19.9mm,61,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module RF ground
 U8,BG95-M3,LGA-102_23.6x19.9mm,62,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Module RF ground
 U8,BG95-M3,LGA-102_23.6x19.9mm,63,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
@@ -73,7 +73,7 @@ U8,BG95-M3,LGA-102_23.6x19.9mm,71,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-i
 U8,BG95-M3,LGA-102_23.6x19.9mm,72,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
 U8,BG95-M3,LGA-102_23.6x19.9mm,73,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
 U8,BG95-M3,LGA-102_23.6x19.9mm,74,GND,POWER,GND_MODEM,GROUND_LOCKED,Direct low-impedance ground-plane connection,Quectel_BG95_HW_Design_v1.6,Central thermal and RF ground pad
-U8,BG95-M3,LGA-102_23.6x19.9mm,75,USB_BOOT,INPUT,CELL_USB_BOOT_1V8,DEFERRED_MAIN_AUTH_009,Normal-state LOW bias and recovery fixture endpoint are owned by MAIN-AUTH-009,Quectel_BG95_HW_Design_v1.6,BOOT_CONFIG pad must never be pulled high unintentionally before startup
+U8,BG95-M3,LGA-102_23.6x19.9mm,75,USB_BOOT,INPUT,CELL_USB_BOOT_1V8,FIXTURE_ENDPOINT_LOCKED,Normally held LOW by board network; TP_CELL_DBG contact 4 may apply current-limited 1.8 V HIGH only during documented recovery power-on; exact pull remains MAIN-AUTH-010,PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A,BOOT_CONFIG pad must never be pulled high unintentionally before startup
 U8,BG95-M3,LGA-102_23.6x19.9mm,76,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
 U8,BG95-M3,LGA-102_23.6x19.9mm,77,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open
 U8,BG95-M3,LGA-102_23.6x19.9mm,78,RESERVED,NC,NC,RESERVED_DNU_NC,No electrical connection,Quectel_BG95_HW_Design_v1.6,Reserved pad must remain open

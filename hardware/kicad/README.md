@@ -40,6 +40,7 @@ This directory is the authoritative electrical-CAD input package for the EVT-PRE
 
 ## Required CAD gates before Gerber release
 
+- Pre-schematic PCB-MAIN authorities `MAIN-AUTH-001…011` are closed; the 110 x 75 mm outline, connector/module anchors, RF/keepout regions and 31 production pogo-pad coordinates are frozen by `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv`.
 - Freeze CubeMX pin/peripheral assignment for STM32U585VIT6Q; no unresolved AF conflicts.
 - Complete native `.kicad_sch` and `.kicad_pcb` for MAIN, MIC and PWR.
 - Datasheet/reference-design review for STM32U585, T5838, BG95, MAX-M10S, E22/SX1262, nRF52840/Raytac module and all power ICs.

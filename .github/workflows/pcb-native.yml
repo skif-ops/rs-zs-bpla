@@ -23,6 +23,14 @@ on:
       - "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md"
       - "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_CONNECTOR_FIXTURE_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md"
       - "hardware/DUAL_SIM_SINGLE_STANDBY.md"
       - "hardware/T5838_AAD_INTERFACE_REV_A.md"
       - "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
@@ -44,6 +52,10 @@ on:
       - "tools/verify_pcb_main_dual_sim_authority_rev_a.py"
       - "tools/verify_pcb_main_gnss_authority_rev_a.py"
       - "tools/verify_pcb_main_lora_authority_rev_a.py"
+      - "tools/verify_pcb_main_ble_authority_rev_a.py"
+      - "tools/verify_pcb_main_connector_fixture_authority_rev_a.py"
+      - "tools/verify_pcb_main_passive_support_authority_rev_a.py"
+      - "tools/verify_pcb_main_mechanical_placement_authority_rev_a.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
@@ -65,6 +77,23 @@ on:
       - "tools/audit_pcb_mic_native_geometry.py"
       - "tools/audit_pcb_mic_mechanical_rev_a.py"
       - "tools/audit_pcb_mic_molex_rev_a.py"
+      - ".github/workflows/pcb-native.yml"
+  pull_request:
+    branches: [evt-pre-20]
+    paths:
+      - "hardware/kicad/**"
+      - "hardware/*FREEZE_REV_A.csv"
+      - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
+      - "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv"
+      - "hardware/PCB_MAIN_*AUTHORITY_REV_A.*"
+      - "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+      - "hardware/PCB_PWR_*.csv"
+      - "hardware/PCB_PWR_*.md"
+      - "hardware/POWER_*.json"
+      - "hardware/POWER_*.md"
+      - "mechanics/common/OPEN_DIMENSIONS.csv"
+      - "tools/*pcb*_rev_a.py"
+      - "tools/kicad_native_gate.py"
       - ".github/workflows/pcb-native.yml"
 
 jobs:
@@ -110,6 +139,22 @@ jobs:
         run: |
           python tools/verify_pcb_main_lora_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/lora_authority_verification.json
+      - name: Second independent PCB-MAIN BLE control
+        run: |
+          python tools/verify_pcb_main_ble_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/ble_authority_verification.json
+      - name: Second independent PCB-MAIN connector and fixture control
+        run: |
+          python tools/verify_pcb_main_connector_fixture_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/connector_fixture_authority_verification.json
+      - name: Second independent PCB-MAIN passive and support control
+        run: |
+          python tools/verify_pcb_main_passive_support_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/passive_support_authority_verification.json
+      - name: Second independent PCB-MAIN mechanical placement control
+        run: |
+          python tools/verify_pcb_main_mechanical_placement_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/mechanical_placement_authority_verification.json
       - name: Independent PCB-PWR design and Review-A authority audits
         run: |
           python tools/audit_pcb_pwr_design_rev_a.py \
@@ -256,4 +301,8 @@ jobs:
             hardware/kicad/native/PCB-MIC/libs/
             hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md
             hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json
+            hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv
+            hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md
+            hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv
+            hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md
           if-no-files-found: warn

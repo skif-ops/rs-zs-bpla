@@ -66,4 +66,3 @@ def test_insecure_bench_requires_explicit_clean_mode():
     assert validate_transport(args(insecure_bench=True)) is False
     with pytest.raises(ValueError, match="cannot be combined"):
         validate_transport(args(ca="ca.crt", insecure_bench=True))
-

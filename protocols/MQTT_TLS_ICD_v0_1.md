@@ -1,7 +1,7 @@
 # ICD GSM/LTE - MQTT/TLS и HTTPS fallback v0.1
 
-Статус: `DRAFT / OPEN / NOT RUN`  
-Interface release: `1.5`  
+Статус: `DRAFT / OPEN / NOT RUN`
+Interface release: `1.5`
 Detection schema: `4`
 
 ## 1. Сетевая модель

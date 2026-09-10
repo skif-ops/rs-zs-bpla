@@ -1,7 +1,7 @@
 project: Dioneya_ZS_BPLA
 configuration_id: EVT-PRE-20
-baseline_version: 0.1
-baseline_date: 2026-09-08
+baseline_version: 0.2
+baseline_date: 2026-09-10
 status: OPEN_NOT_RUN
 source_branch: evt
 source_commit: 2ec1d6dc81e3a16b7c127f1bbfe03f3945a72c45
@@ -11,6 +11,15 @@ branch_isolation:
   forbidden_operations: [merge, cherry_pick, release_file_copy]
   allowed_promotion_targets: [develop, main]
   promotion_rule: reviewed_common_changes_only
+
+authority_sync:
+  integration_source_commit: f3411e51938aa1423fdbaeeef9585aeea385c239
+  synchronized_blocks: [MAIN-AUTH-008, MAIN-AUTH-009, MAIN-AUTH-010, MAIN-AUTH-011]
+  complete_set: MAIN-AUTH-001_THROUGH_011_CLOSED
+  native_pcb_main: ABSENT_BLOCKER
+  review_a: BLOCKED_NATIVE_SCHEMATIC_ABSENT
+  review_b: BLOCKED_REVIEW_A_NOT_COMPLETE
+  production_bom: BLOCKED
 
 lot:
   quantity: 20
