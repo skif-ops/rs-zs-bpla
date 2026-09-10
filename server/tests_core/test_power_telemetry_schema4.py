@@ -1,4 +1,5 @@
 from station.cbor_codec import decode_detection_obj
+import pytest
 
 
 def _base(status: dict[int, int]) -> dict:
@@ -53,9 +54,9 @@ def test_schema4_full_decodes_ina226_fields():
 
 
 def test_summary_remains_backward_compatible_without_ina226_extension():
-    msg = decode_detection_obj(
-        _base({0: 81, 1: 12_750, 2: 18_100, 3: 245, 4: 3, 5: 2, 6: -95, 7: 40, 8: 17})
-    )
+    obj = _base({0: 81, 1: 12_750, 2: 18_100, 3: 245, 4: 3, 5: 2, 6: -95, 7: 40, 8: 17})
+    obj[0] = 3
+    msg = decode_detection_obj(obj)
 
     assert msg.power.battery_mv == 12_750
     assert msg.power.battery_bus_mv is None
@@ -63,3 +64,11 @@ def test_summary_remains_backward_compatible_without_ina226_extension():
     assert msg.power.battery_power_mw is None
     assert msg.power.monitor_status is None
     assert not msg.power.monitor_valid
+
+
+@pytest.mark.parametrize("schema_ver", [0, 2, 5, 255])
+def test_unsupported_detection_schema_is_rejected(schema_ver: int):
+    obj = _base({})
+    obj[0] = schema_ver
+    with pytest.raises(ValueError, match="unsupported compact detection schema"):
+        decode_detection_obj(obj)

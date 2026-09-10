@@ -18,6 +18,7 @@ from station.schemas import (
 )
 
 _MSG_DETECTION = 2
+_SUPPORTED_DETECTION_SCHEMAS = frozenset({1, 3, 4})
 _ROUTE = {0: "LTE", 1: "NB_IOT", 2: "2G", 3: "LORA", 4: "BLE", 5: "TEST"}
 _PROFILE = {0: "generic", 1: "piston", 2: "reactive"}
 _CLASS_LABEL = {
@@ -131,6 +132,9 @@ def _f16_le_bytes(raw: bytes) -> list[float]:
 def decode_detection_obj(obj: Any) -> DetectionMessage:
     if not isinstance(obj, dict):
         raise ValueError("compact detection must be a CBOR map")
+    schema_ver = int(obj.get(0, -1))
+    if schema_ver not in _SUPPORTED_DETECTION_SCHEMAS:
+        raise ValueError(f"unsupported compact detection schema: {schema_ver}")
     if int(obj.get(1, -1)) != _MSG_DETECTION:
         raise ValueError("unsupported compact message type")
 
@@ -161,7 +165,7 @@ def decode_detection_obj(obj: Any) -> DetectionMessage:
     time_trust_id = int(payload.get(14, 0))
 
     return DetectionMessage(
-        schema_ver=int(obj.get(0, 1)),
+        schema_ver=schema_ver,
         station_id=int(obj.get(2, 0)),
         seq_no=int(obj.get(3, 0)),
         boot_id=int(obj.get(4, 0)),

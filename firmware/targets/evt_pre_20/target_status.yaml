@@ -6,7 +6,7 @@ exact_pin_database_ref: STM32U585VITxQ
 board: custom_pcb
 host_core_source: ../..
 wire_interface_release: "1.4"
-detection_schema_version: 3
+detection_schema_version: 4
 clocking:
   policy_id: REV_A_INTERNAL_HSI_MSI_PLL_NO_HSE
   external_hse: DISABLED_NOT_FITTED
@@ -108,9 +108,9 @@ pcb_main_capture:
   passive_support_components: 211
   fitted_components: 196
   dnp_components: 15
-  native_schematic: PRESENT_ERC_PASS_REVIEW_A_PENDING
-  review_a: NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING
-  review_b: BLOCKED_REVIEW_A_NOT_COMPLETE
+  native_schematic: PRESENT_ERC_PASS_REVIEW_A_PASS
+  review_a: PASS_SIGNED_COMMIT_35C9ED91
+  review_b: OPEN_LAYOUT_AND_EVIDENCE_PENDING
   production_bom: BLOCKED
 positioning:
   station_type: fixed
@@ -127,6 +127,20 @@ positioning:
   accelerometer_relocation_revalidation: REQUIRED
   time_trust_independent: true
   holdover_limit: MEASURE_DURING_EVT
+  distance_calculation: DOUBLE_PRECISION_FROM_INTEGER_E7
+time_sync:
+  rmc_utc_date_and_epoch: IMPLEMENTED_HOST_TESTED
+  pps_loss_detection: IMPLEMENTED_HOST_TESTED
+  holdover_error_degradation: IMPLEMENTED_HOST_TESTED_1MS_PER_SECOND_CONSERVATIVE
+  holdover_to_unsynced_limit_s: 120
+  target_timer_capture_binding: MISSING_BLOCKER
+  measured_holdover_limit: EVT_REQUIRED
+lora_ru868:
+  candidate_channels_hz: [864100000, 864300000, 864500000, 864700000, 864900000, 868900000, 869100000]
+  legacy_868_1_to_868_7_plan: REMOVED_REJECTED_BY_FIRMWARE
+  tx_enabled: false
+  signed_profile_loader: MISSING_BLOCKER
+  regulatory_and_rf_validation: REQUIRED
 pinmap:
   source: hardware/EVT_PRE_20_PIN_MAP_REV_A.csv
   addenda: [hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv]

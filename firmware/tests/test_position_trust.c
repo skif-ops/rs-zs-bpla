@@ -38,6 +38,9 @@ int main(void) {
   zs_position_trust_init(&state);
   zs_position_trust_config_t cfg = default_config();
 
+  zs_position_t submeter = gnss_offset_lat(50); /* about 0.56 m */
+  assert(zs_position_distance_m(&cfg.installation, &submeter) == 1u);
+
   zs_position_t near = gnss_offset_lat(500); /* about 5.6 m */
   zs_position_trust_result_t r = zs_position_trust_update(&cfg, &state, &near, 5, false, false);
   assert(r.trust == ZS_POSITION_TRUST_CONFIGURED_OK);
