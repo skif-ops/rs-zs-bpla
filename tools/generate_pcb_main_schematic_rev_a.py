@@ -2,11 +2,12 @@
 """Generate the controlled native KiCad PCB-MAIN Rev.A schematic.
 
 The eleven closed PCB-MAIN capture authorities are the source of truth.  This
-generator deliberately uses embedded, controlled pin bodies rather than silently
-depending on workstation-specific symbol libraries.  Every authority pin is either
-bound to its frozen Rev.A net or marked explicit NC.  Every MAIN-AUTH-010 support
-component and every PCB-MAIN harness connector is materialized with exact RefDes,
-MPN, package, population and pin-to-net data.
+generator deliberately uses embedded, controlled pin bodies plus a reproducible
+project-local symbol library rather than silently depending on workstation-specific
+symbols.  Every authority pin is either bound to its frozen Rev.A net or marked
+explicit NC.  Every MAIN-AUTH-010 support component and every PCB-MAIN harness
+connector is materialized with exact RefDes, MPN, package, population and pin-to-net
+data.  Unreviewed custom land patterns remain blank instead of using placeholders.
 
 The output is a schematic-review input.  It is NOT FOR MANUFACTURE: PCB layout,
 Review-B, factory DFM and physical EVT remain separate gates.
@@ -14,6 +15,7 @@ Review-B, factory DFM and physical EVT remain separate gates.
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
 import hashlib
 import json
@@ -27,7 +29,7 @@ from kiutils.items.common import Effects, Fill, Font, PageSettings, Position, Pr
 from kiutils.items.schitems import LocalLabel, NoConnect, SchematicSymbol, SymbolProjectInstance, SymbolProjectPath
 from kiutils.items.syitems import SyRect
 from kiutils.schematic import Schematic
-from kiutils.symbol import Symbol, SymbolPin
+from kiutils.symbol import Symbol, SymbolLib, SymbolPin
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,6 +62,7 @@ INPUTS = (*PIN_AUTHORITIES, SUPPORT_AUTHORITY, HARNESS_AUTHORITY, MAIN_FREEZE,
 
 EXPECTED_GENERIC_GROUND_ENDPOINTS = 157
 EXPECTED_MIC_GROUND_ENDPOINTS = 21
+CONNECTION_GRID_MM = 1.27
 
 
 @dataclass(frozen=True)
@@ -102,6 +105,11 @@ def natural(value: str) -> tuple[object, ...]:
 
 def stable_uuid(key: str) -> str:
     return str(uuid.uuid5(UUID_NAMESPACE, key))
+
+
+def connection_grid(value: float) -> float:
+    """Snap schematic connection points to KiCad's 50 mil electrical grid."""
+    return round(round(value / CONNECTION_GRID_MM) * CONNECTION_GRID_MM, 4)
 
 
 def sanitize(value: str) -> str:
@@ -319,7 +327,9 @@ def footprint_for(spec: ComponentSpec) -> str:
         return prefix + metric[package]
     if spec.ref == "U12":
         return ""
-    return f"DioneyaMain:{sanitize(package)}"
+    # Exact manufacturer land patterns remain a Review-A/Review-B deliverable.
+    # Do not put synthetic package-shaped placeholders into the native source.
+    return ""
 
 
 def electrical_type(direction: str, net: str) -> str:
@@ -341,6 +351,24 @@ def electrical_type(direction: str, net: str) -> str:
     return "passive"
 
 
+def native_electrical_type(spec: ComponentSpec, pin: PinSpec) -> str:
+    """Translate authority directions into an ERC-honest KiCad pin model."""
+    if spec.ref.startswith("TP_"):
+        # Fixture contacts are passive copper even when the station sees a signal
+        # as an input, output or sense line.
+        return "passive"
+    if (spec.ref, pin.number) == ("U8", "17"):
+        # BG95 RESET_N is internally biased and intentionally pulled low only by
+        # the open-collector Q2 stage; modelling it as a passive control node
+        # avoids inventing a push-pull source on the modem domain.
+        return "passive"
+    if (spec.ref, pin.number) == ("U1", "98"):
+        # The two VDD11 balls are one internal regulator output. Keep pin 49 as
+        # the ERC source and the second bonded output contact passive.
+        return "passive"
+    return electrical_type(pin.direction, pin.net)
+
+
 def make_symbol(spec: ComponentSpec) -> tuple[Symbol, dict[str, SymbolPin], float]:
     entry = sanitize(f"{spec.ref}_{spec.mpn}")
     root = Symbol.create_new(
@@ -356,7 +384,7 @@ def make_symbol(spec: ComponentSpec) -> tuple[Symbol, dict[str, SymbolPin], floa
     rows = max(left_count, right_count, 1)
     pitch = 2.54
     half_height = max(5.08, (rows + 1) * pitch / 2)
-    half_width = 14.0 if count > 16 else 10.16
+    half_width = 13.97 if count > 16 else 10.16
     unit.graphicItems.append(SyRect(
         start=Position(X=-half_width, Y=half_height),
         end=Position(X=half_width, Y=-half_height),
@@ -374,7 +402,7 @@ def make_symbol(spec: ComponentSpec) -> tuple[Symbol, dict[str, SymbolPin], floa
             position = Position(X=half_width + 2.54,
                                 Y=(right_count - 1) * pitch / 2 - row * pitch, angle=180)
         pin = SymbolPin(
-            electricalType=electrical_type(spec_pin.direction, spec_pin.net),
+            electricalType=native_electrical_type(spec, spec_pin),
             graphicalStyle="line", position=position, length=2.54,
             name=spec_pin.name, number=spec_pin.number,
             nameEffects=pin_effect, numberEffects=pin_effect,
@@ -450,7 +478,7 @@ def place_components(specs: list[ComponentSpec], symbol_data: dict[str, tuple[Sy
         column = min(range(len(column_x)), key=lambda idx: column_y[idx])
         half_height = symbol_data[spec.ref][2]
         y = column_y[column] + half_height
-        positions[spec.ref] = (column_x[column], y)
+        positions[spec.ref] = (connection_grid(column_x[column]), connection_grid(y))
         column_y[column] = y + half_height + 18.0
 
     # MAIN-AUTH-010 two-pin support network is dense but still readable on one A0 sheet.
@@ -458,9 +486,43 @@ def place_components(specs: list[ComponentSpec], symbol_data: dict[str, tuple[Sy
     x0, y0 = 48.0, 585.0
     x_pitch, y_pitch = 68.0, 18.0
     for index, spec in enumerate(sorted(simple, key=lambda item: natural(item.ref))):
-        positions[spec.ref] = (x0 + (index % cols) * x_pitch,
-                               y0 + (index // cols) * y_pitch)
+        positions[spec.ref] = (
+            connection_grid(x0 + (index % cols) * x_pitch),
+            connection_grid(y0 + (index // cols) * y_pitch),
+        )
     return positions
+
+
+def write_project_libraries(schematic: Schematic, project_dir: Path) -> tuple[Path, Path, Path]:
+    libs = project_dir / "libs"
+    libs.mkdir(parents=True, exist_ok=True)
+    symbol_library = libs / "DioneyaMain.kicad_sym"
+
+    exported = []
+    for symbol in schematic.libSymbols:
+        item = copy.deepcopy(symbol)
+        item.libraryNickname = None
+        exported.append(item)
+    SymbolLib(version="20231120", generator="kiutils", symbols=exported).to_file(
+        str(symbol_library), encoding="utf-8"
+    )
+
+    sym_table = project_dir / "sym-lib-table"
+    sym_table.write_text('''(sym_lib_table
+  (version 7)
+  (lib (name "DioneyaMain")(type "KiCad")(uri "${KIPRJMOD}/libs/DioneyaMain.kicad_sym")(options "")(descr "Dioneya PCB-MAIN controlled Review-A symbols"))
+)
+''', encoding="utf-8")
+
+    fp_table = project_dir / "fp-lib-table"
+    fp_table.write_text('''(fp_lib_table
+  (version 7)
+  (lib (name "Capacitor_SMD")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Capacitor_SMD.pretty")(options "")(descr "KiCad capacitor SMD footprints"))
+  (lib (name "Inductor_SMD")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Inductor_SMD.pretty")(options "")(descr "KiCad inductor SMD footprints"))
+  (lib (name "Resistor_SMD")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Resistor_SMD.pretty")(options "")(descr "KiCad resistor SMD footprints"))
+)
+''', encoding="utf-8")
+    return symbol_library, sym_table, fp_table
 
 
 def project_payload() -> dict[str, object]:
@@ -476,7 +538,7 @@ def project_payload() -> dict[str, object]:
     }
 
 
-def build(output: Path) -> tuple[Path, Path, Path]:
+def build(output: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
     specs = load_component_specs()
     schematic = Schematic.create_new()
     schematic.version = "20231120"
@@ -507,6 +569,7 @@ def build(output: Path) -> tuple[Path, Path, Path]:
     schematic.to_file(str(output))
     project = output.with_suffix(".kicad_pro")
     project.write_text(json.dumps(project_payload(), indent=2) + "\n", encoding="utf-8")
+    symbol_library, sym_table, fp_table = write_project_libraries(schematic, output.parent)
     manifest = output.parent / "PCB-MAIN_capture_manifest.json"
     manifest_payload = {
         "configuration": "EVT-PRE-20 Rev.A",
@@ -521,11 +584,14 @@ def build(output: Path) -> tuple[Path, Path, Path]:
         "pin_count": sum(len(spec.pins) for spec in specs),
         "schematic_sha256": sha256(output),
         "project_sha256": sha256(project),
+        "symbol_library_sha256": sha256(symbol_library),
+        "symbol_library_table_sha256": sha256(sym_table),
+        "footprint_library_table_sha256": sha256(fp_table),
         "review_a": "AUTOMATED_SOURCE_NET_AUDIT_GATED_KICAD_ERC_AND_HUMAN_SIGNOFF_PENDING",
         "review_b": "BLOCKED_LAYOUT_ABSENT",
     }
     manifest.write_text(json.dumps(manifest_payload, indent=2) + "\n", encoding="utf-8")
-    return output, project, manifest
+    return output, project, symbol_library, sym_table, fp_table, manifest
 
 
 def main() -> int:
@@ -536,8 +602,14 @@ def main() -> int:
     output = args.output.resolve()
 
     if args.check:
-        expected = (output, output.with_suffix(".kicad_pro"),
-                    output.parent / "PCB-MAIN_capture_manifest.json")
+        expected = (
+            output,
+            output.with_suffix(".kicad_pro"),
+            output.parent / "libs" / "DioneyaMain.kicad_sym",
+            output.parent / "sym-lib-table",
+            output.parent / "fp-lib-table",
+            output.parent / "PCB-MAIN_capture_manifest.json",
+        )
         with tempfile.TemporaryDirectory(prefix="pcb-main-capture-check-") as tmp:
             actual = build(Path(tmp) / "PCB-MAIN.kicad_sch")
             for generated, committed in zip(actual, expected):

@@ -79,10 +79,14 @@
   "native_schematic": {
     "path": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch",
     "project": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro",
+    "symbol_library": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.kicad_sym",
+    "symbol_library_table": "hardware/kicad/native/PCB-MAIN/sym-lib-table",
+    "footprint_library_table": "hardware/kicad/native/PCB-MAIN/fp-lib-table",
     "manifest": "hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json",
     "generator": "tools/generate_pcb_main_schematic_rev_a.py",
     "status": "PRESENT_REVIEW_PENDING",
     "schematic_derived_bom": true,
+    "custom_footprint_status": "UNRESOLVED_FIELDS_BLANK_REVIEW_A_REVIEW_B_PENDING",
     "ground_domains": {
       "GND_MODEM": "J_PWR pin 2; joins GND_PWR only at PCB-PWR NT1",
       "GND_DIGITAL": "J_PWR pin 4; joins GND_PWR only at PCB-PWR NT2",

@@ -319,6 +319,12 @@ Native directory contract:
 - `hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch/.kicad_pcb/.kicad_pro`;
 - `hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch/.kicad_pcb/.kicad_pro`.
 
+PCB-MAIN schematic-review source also carries a deterministic project-local
+`DioneyaMain.kicad_sym`, `sym-lib-table` and `fp-lib-table`. Exact package and MPN
+authority remains in the component properties. Custom footprint fields stay blank
+until the corresponding manufacturer land patterns pass Review A/Review B; synthetic
+placeholder land patterns are prohibited.
+
 Capture is complete only when:
 1. exact symbols and footprints are assigned and datasheet-reviewed;
 2. exact STM32 pin map and CubeMX `.ioc` agree;

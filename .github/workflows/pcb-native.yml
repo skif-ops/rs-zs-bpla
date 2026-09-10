@@ -222,6 +222,9 @@ jobs:
           test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch
           test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro
           test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json
+          test -s hardware/kicad/native/PCB-MAIN/sym-lib-table
+          test -s hardware/kicad/native/PCB-MAIN/fp-lib-table
+          test -s hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.kicad_sym
           python tools/generate_pcb_main_schematic_rev_a.py --check
           python tools/audit_pcb_main_native_schematic_rev_a.py \
             --schematic hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch \
@@ -305,6 +308,9 @@ jobs:
             hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch
             hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro
             hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json
+            hardware/kicad/native/PCB-MAIN/sym-lib-table
+            hardware/kicad/native/PCB-MAIN/fp-lib-table
+            hardware/kicad/native/PCB-MAIN/libs/
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
             hardware/kicad/native/PCB-PWR/sym-lib-table

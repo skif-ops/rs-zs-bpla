@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "DioneyaMain")(type "KiCad")(uri "${KIPRJMOD}/libs/DioneyaMain.kicad_sym")(options "")(descr "Dioneya PCB-MAIN controlled Review-A symbols"))
+)
