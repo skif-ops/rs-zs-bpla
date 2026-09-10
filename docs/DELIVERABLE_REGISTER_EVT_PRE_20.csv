@@ -11,8 +11,8 @@ SYS-003,Архитектура,ICD станция-сервер,DOCX+CBOR schema,
 SYS-004,Архитектура,Энергобаланс 40-60 Ач и 60-80 Вт,XLSX+DOCX,P0,PLANNED,OPEN,OPEN,Расчёт и измерение S0-S4 согласованы
 SYS-005,Архитектура,Threat model и управление ключами,DOCX,P0,PLANNED,OPEN,OPEN,Ключи не включены в пакет; процессы provisioning описаны
 HW-M-000,PCB main,Комплект входных authority MAIN-AUTH-001..011,CSV+MD+JSON,P0,CONTROLLED,PASS,PASS,Основной аудит и 11 независимых проверок подтверждают полный capture input без разрешения производства
-HW-M-001,PCB main,Схема электрическая принципиальная,KICAD_SCH+PDF,P0,PLANNED,OPEN,OPEN,ERC PASS и ручная datasheet review
-HW-M-002,PCB main,Разводка основной платы,KICAD_PCB+STEP,P0,PLANNED,OPEN,OPEN,DRC PASS; RF/power/layout review
+HW-M-001,PCB main,Схема электрическая принципиальная,KICAD_SCH+PDF,P0,CONTROLLED,PASS,PASS,Native schematic and signed Review A PASS; commit-matched KiCad 9 ERC zero violations
+HW-M-002,PCB main,Разводка основной платы,KICAD_PCB+STEP,P0,DRAFT,PASS,OPEN,Six-layer placement candidate present and structurally audited; 52 provisional instances routing DRC STEP and Review B remain open
 HW-M-003,PCB main,Gerber и сверловка,GERBER+DRILL,P0,PLANNED,OPEN,OPEN,Сверены с source и просмотрены CAM
 HW-M-004,PCB main,IPC netlist и тестовые точки,IPC356+CSV,P0,PLANNED,OPEN,OPEN,Netlist совпадает; coverage тестов подтверждён
 HW-M-005,PCB main,Сборочные чертежи TOP/BOTTOM,PDF+SVG,P0,PLANNED,OPEN,OPEN,Полярность pin-1 и DNP видимы

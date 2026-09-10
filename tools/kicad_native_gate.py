@@ -29,6 +29,15 @@ ROOT = Path(__file__).resolve().parents[1]
 NATIVE = ROOT / "hardware" / "kicad" / "native"
 ART = ROOT / "artifacts" / "kicad-native"
 BOARDS = ("PCB-MAIN", "PCB-MIC", "PCB-PWR")
+PCB_MAIN_STATUS = ROOT / "hardware" / "PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+
+
+def pcb_main_is_placement_candidate() -> bool:
+    if not PCB_MAIN_STATUS.is_file():
+        return False
+    status = json.loads(PCB_MAIN_STATUS.read_text(encoding="utf-8"))
+    return status.get("review_b", {}).get("status") == \
+        "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING"
 
 
 def sha256(path: Path) -> str:
@@ -290,10 +299,15 @@ def main() -> int:
         for name in BOARDS:
             p = paths(name)
             if p["pcb"].is_file():
-                ok, state = validate_pcb(cli, name, p["pcb"])
-                report["boards"][name]["pcb_state"] = state
-                if not ok:
-                    cli_failures.append(f"{name}: {state}")
+                if name == "PCB-MAIN" and pcb_main_is_placement_candidate():
+                    run(["python", "tools/audit_pcb_main_layout_candidate_rev_a.py"])
+                    report["boards"][name]["pcb_state"] = \
+                        "PLACEMENT_CANDIDATE_AUDIT_PASS_DRC_AND_FAB_EXPORT_PROHIBITED"
+                else:
+                    ok, state = validate_pcb(cli, name, p["pcb"])
+                    report["boards"][name]["pcb_state"] = state
+                    if not ok:
+                        cli_failures.append(f"{name}: {state}")
             if p["sch"].is_file():
                 ok, state = validate_schematic(cli, name, p["sch"])
                 report["boards"][name]["sch_state"] = state

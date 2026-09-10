@@ -207,14 +207,25 @@
   },
   "review_b": {
     "complete": false,
-    "status": "OPEN_LAYOUT_AND_EVIDENCE_PENDING",
+    "status": "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
     "reviewer": null,
     "date": null,
     "commit_sha": null,
     "evidence": {
       "carried_findings": [
         "RA-003"
-      ]
+      ],
+      "native_layout_candidate": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+      "layout_generator": "tools/generate_pcb_main_layout_candidate_rev_a.py",
+      "layout_independent_audit": "tools/audit_pcb_main_layout_candidate_rev_a.py",
+      "review_b_checklist": "hardware/reviews/PCB_MAIN_REVIEW_B_CHECKLIST_REV_A.md",
+      "ra_003_calculation": "hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md",
+      "ra_003_status": {
+        "calculation": "CLOSED",
+        "layout": "OPEN",
+        "measurement": "OPEN",
+        "overall": "OPEN"
+      }
     }
   }
 }

@@ -50,6 +50,8 @@ jobs:
         run: python tools/verify_pcb_main_passive_support_authority_rev_a.py
       - name: Second independent PCB-MAIN mechanical placement control
         run: python tools/verify_pcb_main_mechanical_placement_authority_rev_a.py
+      - name: Audit PCB-MAIN native placement candidate and fabrication interlock
+        run: python tools/audit_pcb_main_layout_candidate_rev_a.py
       - name: First-pass configuration and hardware baseline validation
         run: python tools/validate_evt_pre_20.py
       - name: Cross-check locked Rev.A clock policy

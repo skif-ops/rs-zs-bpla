@@ -308,6 +308,7 @@ jobs:
             artifacts/kicad-native/
             artifacts/kicad-reference/
             hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch
+            hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb
             hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro
             hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json
             hardware/kicad/native/PCB-MAIN/sym-lib-table
@@ -331,6 +332,8 @@ jobs:
             hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md
+            hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md
+            hardware/reviews/PCB_MAIN_REVIEW_B_CHECKLIST_REV_A.md
             hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv
             hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md
             hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv

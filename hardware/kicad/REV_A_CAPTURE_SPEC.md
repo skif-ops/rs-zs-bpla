@@ -2,7 +2,7 @@
 
 Status: `SCHEMATIC_REVIEW / BLOCKING / NOT FOR MANUFACTURE`
 
-This document is the authoritative bridge from the locked EVT-PRE-20 system baseline to native KiCad capture. Native PCB-MAIN `.kicad_sch` is present and KiCad 9 ERC passes with zero violations; human Review A, `.kicad_pcb`, DRC and Review B remain mandatory before any Gerber may be released.
+This document is the authoritative bridge from the locked EVT-PRE-20 system baseline to native KiCad capture. Native PCB-MAIN `.kicad_sch` is present and KiCad 9 ERC passes with zero violations; Review A is signed PASS. A placement-stage `.kicad_pcb` candidate is present, but routing, production-footprint approval, KiCad 9 DRC and Review B remain mandatory before any Gerber may be released.
 
 Authoritative inputs:
 - `config/EVT_PRE_20_BASELINE.yaml`;

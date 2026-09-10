@@ -1,0 +1,266 @@
+#!/usr/bin/env python3
+"""Generate the controlled PCB-MAIN Rev.A placement-stage native layout.
+
+The output is deliberately an engineering layout candidate, not fabrication data.
+It contains the locked six-layer outline, mounting holes, mechanical anchors, all
+schematic components and all native nets.  Routing and manufacturer approval of
+project-local footprints remain Review-B gates and are never inferred here.
+
+Run with the pcbnew Python module supplied by KiCad 7+; CI validates the resulting
+file with KiCad 9.
+"""
+from __future__ import annotations
+
+import csv
+import os
+import sys
+import uuid
+from pathlib import Path
+
+import pcbnew
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
+from audit_pcb_main_native_schematic_rev_a import expected_components  # noqa: E402
+
+OUT = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+MECH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
+KICAD_FP = Path(os.environ.get("DIONEYA_KICAD_FOOTPRINT_DIR", "/usr/share/kicad/footprints"))
+
+STANDARD = {
+    "LQFP100_14x14": ("Package_QFP.pretty", "LQFP-100_14x14mm_P0.5mm"),
+    "LGA-12_2x2mm": ("Package_LGA.pretty", "LGA-12_2x2mm_P0.5mm"),
+    "TSSOP-24_PW": ("Package_SO.pretty", "TSSOP-24_4.4x6.5mm_P0.5mm"),
+    "TSSOP-14_PW": ("Package_SO.pretty", "TSSOP-14_4.4x5mm_P0.65mm"),
+    "SOT23": ("Package_TO_SOT_SMD.pretty", "SOT-23"),
+    "SOT-563_SC-89": ("Package_TO_SOT_SMD.pretty", "SOT-563"),
+    "SOD882": ("Diode_SMD.pretty", "D_SOD-882"),
+    "SOIC-16_300mil_F": ("Package_SO.pretty", "SOIC-16W_7.5x10.3mm_P1.27mm"),
+    "U.FL_SMT": ("Connector_Coaxial.pretty", "U.FL_Hirose_U.FL-R-SMT-1_Vertical"),
+    "0402": None,
+    "0603": None,
+    "0805": None,
+    "1206": None,
+    "1210": None,
+}
+
+BODY = {
+    "LGA-102_23.6x19.9mm": (23.6, 19.9),
+    "LCC-18_9.7x10.1mm": (9.7, 10.1),
+    "SMD_20x14_22P_1.27mm": (20.0, 14.0),
+    "nRF52840_SMD_10.5x15.5_61P_PCB_antenna": (15.5, 10.5),
+    "TE_NanoSIM_H1.37": (16.0, 14.0),
+    "Micro-Fit_3.0_2x06_Right_Angle": (18.0, 10.0),
+    "Pico-Lock_1.5_1x06_Right_Angle": (10.0, 5.0),
+    "Pico-Lock_1.5mm_2P_RA_SMT": (5.0, 4.0),
+    "microSD_push-push_1.95mm_8P_CD": (14.5, 14.0),
+    "USB-C_16P_horizontal_top_mount_1.20mm_stake": (9.5, 7.5),
+    "7343-31": (7.3, 4.3),
+}
+
+
+def mm(x: float, y: float) -> pcbnew.VECTOR2I:
+    return pcbnew.VECTOR2I_MM(float(x), float(y))
+
+
+def props(symbol: dict) -> tuple[str, str]:
+    return str(symbol["mpn"]), str(symbol["package"])
+
+
+def anchors() -> dict[str, tuple[float, float, float]]:
+    result: dict[str, tuple[float, float, float]] = {}
+    with MECH.open(encoding="utf-8", newline="") as stream:
+        for row in csv.DictReader(stream):
+            if row["Feature_Type"] in {"CONNECTOR_PLACEMENT", "MODULE_PLACEMENT"}:
+                result[row["RefDes"]] = (
+                    float(row["X_mm"]), float(row["Y_mm"]), float(row["Rotation_deg"])
+                )
+    return result
+
+
+def passive_footprint(board: pcbnew.BOARD, package: str) -> pcbnew.FOOTPRINT:
+    dims = {
+        "0402": (1.0, 0.5, 0.55), "0603": (1.6, 0.8, 0.9),
+        "0805": (2.0, 1.25, 1.05), "1206": (3.2, 1.6, 1.55),
+        "1210": (3.2, 2.5, 1.55),
+    }
+    length, width, pitch = dims[package]
+    fp = pcbnew.FOOTPRINT(board)
+    for number, x in (("1", -pitch / 2), ("2", pitch / 2)):
+        pad = pcbnew.PAD(fp)
+        pad.SetNumber(number)
+        pad.SetAttribute(pcbnew.PAD_ATTRIB_SMD)
+        pad.SetShape(pcbnew.PAD_SHAPE_ROUNDRECT)
+        pad.SetRoundRectRadiusRatio(0.2)
+        pad.SetSize(mm(max(0.55, length / 2), width))
+        pad.SetPosition(mm(x, 0))
+        layers = pcbnew.LSET()
+        for layer in (pcbnew.F_Cu, pcbnew.F_Paste, pcbnew.F_Mask):
+            layers.AddLayer(layer)
+        pad.SetLayerSet(layers)
+        fp.Add(pad)
+    return fp
+
+
+def generic_footprint(board: pcbnew.BOARD, pin_numbers: list[str], package: str) -> pcbnew.FOOTPRINT:
+    """Create a visibly provisional project-local land pattern.
+
+    These footprints permit placement/mechanical iteration only.  Their custom
+    property is audited so they cannot silently become production-approved.
+    """
+    width, height = BODY.get(package, (max(2.0, min(12.0, len(pin_numbers) * 0.35)), 3.0))
+    fp = pcbnew.FOOTPRINT(board)
+    fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "PROVISIONAL_REQUIRES_MANUFACTURER_DRAWING")
+    count = len(pin_numbers)
+    sides = max(1, (count + 3) // 4)
+    coords: list[tuple[float, float]] = []
+    for i in range(sides):
+        t = (i + 0.5) / sides
+        coords.extend([(-width / 2, -height / 2 + t * height),
+                       (-width / 2 + t * width, height / 2),
+                       (width / 2, height / 2 - t * height),
+                       (width / 2 - t * width, -height / 2)])
+    for number, (x, y) in zip(pin_numbers, coords):
+        pad = pcbnew.PAD(fp)
+        pad.SetNumber(str(number))
+        pad.SetAttribute(pcbnew.PAD_ATTRIB_SMD)
+        pad.SetShape(pcbnew.PAD_SHAPE_RECT if str(number) == "1" else pcbnew.PAD_SHAPE_ROUNDRECT)
+        if str(number) != "1":
+            pad.SetRoundRectRadiusRatio(0.2)
+        pad.SetSize(mm(0.55, 0.9))
+        pad.SetPosition(mm(x, y))
+        layers = pcbnew.LSET()
+        for layer in (pcbnew.F_Cu, pcbnew.F_Paste, pcbnew.F_Mask):
+            layers.AddLayer(layer)
+        pad.SetLayerSet(layers)
+        fp.Add(pad)
+    return fp
+
+
+def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew.FOOTPRINT:
+    if package in {"0402", "0603", "0805", "1206", "1210"}:
+        return passive_footprint(board, package)
+    entry = STANDARD.get(package)
+    if entry:
+        directory, name = entry
+        fp = pcbnew.FootprintLoad(str(KICAD_FP / directory), name)
+        if fp is not None and {p.GetNumber() for p in fp.Pads()} == set(pins):
+            return fp
+    return generic_footprint(board, pins, package)
+
+
+def add_outline(board: pcbnew.BOARD) -> None:
+    # Locked 110 x 75 mm outline with tangent R3 corners.
+    for a, b in [((3, 0), (107, 0)), ((110, 3), (110, 72)),
+                 ((107, 75), (3, 75)), ((0, 72), (0, 3))]:
+        shape = pcbnew.PCB_SHAPE(board)
+        shape.SetShape(pcbnew.SHAPE_T_SEGMENT)
+        shape.SetStart(mm(*a)); shape.SetEnd(mm(*b))
+        shape.SetLayer(pcbnew.Edge_Cuts); shape.SetWidth(pcbnew.FromMM(0.1))
+        board.Add(shape)
+    for start, mid, end in [
+        ((3, 0), (0.879, 0.879), (0, 3)), ((110, 3), (109.121, 0.879), (107, 0)),
+        ((107, 75), (109.121, 74.121), (110, 72)), ((0, 72), (0.879, 74.121), (3, 75)),
+    ]:
+        shape = pcbnew.PCB_SHAPE(board)
+        shape.SetShape(pcbnew.SHAPE_T_ARC)
+        shape.SetArcGeometry(mm(*start), mm(*mid), mm(*end))
+        shape.SetLayer(pcbnew.Edge_Cuts); shape.SetWidth(pcbnew.FromMM(0.1))
+        board.Add(shape)
+
+
+def add_mounting_hole(board: pcbnew.BOARD, ref: str, x: float, y: float) -> None:
+    fp = pcbnew.FOOTPRINT(board); fp.SetReference(ref); fp.SetValue("M3_NPTH")
+    pad = pcbnew.PAD(fp); pad.SetNumber(""); pad.SetAttribute(pcbnew.PAD_ATTRIB_NPTH)
+    pad.SetShape(pcbnew.PAD_SHAPE_CIRCLE); pad.SetSize(mm(3.2, 3.2)); pad.SetDrillSize(mm(3.2, 3.2))
+    pad.SetPosition(mm(0, 0)); pad.SetLayerSet(pcbnew.LSET.AllCuMask()); fp.Add(pad)
+    fp.SetPosition(mm(x, y)); normalize_text(fp); board.Add(fp)
+
+
+def placement_slots(occupied: list[tuple[float, float, float, float]]) -> list[tuple[float, float]]:
+    slots = []
+    for y in [8 + 2.8 * i for i in range(16)]:
+        for x in [10 + 2.8 * i for i in range(33)]:
+            if any(x0 - 1.5 <= x <= x1 + 1.5 and y0 - 1.5 <= y <= y1 + 1.5
+                   for x0, y0, x1, y1 in occupied):
+                continue
+            slots.append((x, y))
+    return slots
+
+
+def normalize_text(fp: pcbnew.FOOTPRINT) -> None:
+    """Keep the placement plot readable; values stay available in properties/BOM."""
+    fp.Value().SetVisible(False)
+    fp.Reference().SetVisible(True)
+    fp.Reference().SetTextSize(mm(0.8, 0.8))
+    fp.Reference().SetTextThickness(pcbnew.FromMM(0.12))
+    fp.Reference().SetPosition(fp.GetPosition() + mm(0, -1.2))
+
+
+def main() -> int:
+    components = expected_components()
+    board = pcbnew.BOARD(); board.SetCopperLayerCount(6)
+    board.GetDesignSettings().SetBoardThickness(pcbnew.FromMM(1.6))
+    add_outline(board)
+    for ref, x, y in (("H1", 5, 5), ("H2", 105, 5), ("H3", 105, 70), ("H4", 5, 70)):
+        add_mounting_hole(board, ref, x, y)
+
+    nets = sorted({p["native"] for c in components.values() for p in c["pins"].values()
+                   if p["native"] != "NC"})
+    net_items: dict[str, pcbnew.NETINFO_ITEM] = {}
+    for name in nets:
+        item = pcbnew.NETINFO_ITEM(board, name); board.Add(item); net_items[name] = item
+
+    fixed = anchors()
+    occupied = [(10, 42, 36, 72), (44, 51, 63, 72), (64, 46, 85.5, 72),
+                (94.5, 30, 110, 59), (35, 31, 70, 51), (0, 0, 8, 75),
+                (100, 0, 110, 75), (10, 0, 95, 6)]
+    slots = placement_slots(occupied)
+    slot_index = 0
+    preferred = {"U1": (52, 34, 0), "U2": (77, 34, 0), "U3": (70, 41, 0),
+                 "U4": (75, 41, 0), "U5": (41, 41, 0), "U6": (46, 41, 0),
+                 "U7": (61, 42, 0), "U13": (38, 18, 0), "U14": (25, 12, 0),
+                 "U15": (70, 12, 0), "U16": (35, 48, 0), "U17": (52, 47, 0),
+                 "U18": (59, 47, 0), "U19": (18, 15, 0), "U20": (25, 15, 0),
+                 "U21": (68, 15, 0), "U22": (75, 15, 0), "U23": (84, 8, 0),
+                 "U24": (90, 8, 0), "U25": (40, 8, 0), "U26": (40, 54, 0),
+                 "U27": (105, 13, 0)}
+
+    for ref in sorted(components):
+        component = components[ref]
+        if not component["on_board"]:
+            continue
+        pin_numbers = list(component["pins"])
+        mpn, package = props(component)
+        fp = load_footprint(board, package, pin_numbers)
+        fp.SetReference(ref); fp.SetValue(mpn); fp.SetProperty("DIONEA_PACKAGE", package)
+        fp.SetProperty("DIONEA_POPULATION", component["population"])
+        if component["population"] == "DNP":
+            fp.SetExcludedFromPosFiles(True)
+        by_number = {pad.GetNumber(): pad for pad in fp.Pads()}
+        if set(by_number) != set(pin_numbers):
+            raise RuntimeError(f"{ref}: footprint pin mismatch {sorted(by_number)} != {sorted(pin_numbers)}")
+        for number, pin in component["pins"].items():
+            if pin["native"] != "NC":
+                by_number[number].SetNet(net_items[pin["native"]])
+        if ref in fixed:
+            x, y, angle = fixed[ref]
+        elif ref in preferred:
+            x, y, angle = preferred[ref]
+        else:
+            if slot_index >= len(slots):
+                raise RuntimeError("placement grid exhausted")
+            x, y = slots[slot_index]; angle = 0; slot_index += 1
+        fp.SetPosition(mm(x, y)); fp.SetOrientationDegrees(angle); normalize_text(fp); board.Add(fp)
+
+    board.BuildListOfNets()
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    pcbnew.SaveBoard(str(OUT), board)
+    print(f"PCB-MAIN placement candidate: {OUT.relative_to(ROOT)}")
+    print(f"components={len(list(board.GetFootprints())) - 4} holes=4 nets={len(nets)} copper_layers=6")
+    print("status=LAYOUT_ENGINEERING_CANDIDATE / NOT FOR MANUFACTURE")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

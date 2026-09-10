@@ -110,7 +110,14 @@ pcb_main_capture:
   dnp_components: 15
   native_schematic: PRESENT_ERC_PASS_REVIEW_A_PASS
   review_a: PASS_SIGNED_COMMIT_35C9ED91
-  review_b: OPEN_LAYOUT_AND_EVIDENCE_PENDING
+  native_layout: PLACEMENT_ENGINEERING_CANDIDATE_ROUTING_ABSENT
+  provisional_footprints: 52
+  review_b: OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING
+  ra_003:
+    calculation: CLOSED
+    layout: OPEN
+    measurement: OPEN
+    overall: OPEN
   production_bom: BLOCKED
 positioning:
   station_type: fixed

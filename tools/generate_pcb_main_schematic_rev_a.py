@@ -533,7 +533,7 @@ def project_payload() -> dict[str, object]:
         "pcbnew": {}, "schematic": {},
         "text_variables": {
             "PROJECT": "Dioneya EVT-PRE-20", "REV": "A", "BOARD": "PCB-MAIN",
-            "STATUS": "SCHEMATIC_REVIEW_NOT_FOR_MANUFACTURE",
+            "STATUS": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
         },
     }
 
@@ -574,7 +574,7 @@ def build(output: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
     manifest_payload = {
         "configuration": "EVT-PRE-20 Rev.A",
         "board": "PCB-MAIN",
-        "state": "SCHEMATIC_REVIEW_NOT_FOR_MANUFACTURE",
+        "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
         "generator": str(Path(__file__).relative_to(ROOT)),
         "generator_sha256": sha256(Path(__file__)),
         "inputs": [{"path": str(path.relative_to(ROOT)), "sha256": sha256(path)} for path in INPUTS],
@@ -588,7 +588,7 @@ def build(output: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
         "symbol_library_table_sha256": sha256(sym_table),
         "footprint_library_table_sha256": sha256(fp_table),
         "review_a": "AUTOMATED_SOURCE_NET_AUDIT_AND_KICAD_ERC_PASS_HUMAN_SIGNOFF_PENDING",
-        "review_b": "BLOCKED_LAYOUT_ABSENT",
+        "review_b": "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
     }
     manifest.write_text(json.dumps(manifest_payload, indent=2) + "\n", encoding="utf-8")
     return output, project, symbol_library, sym_table, fp_table, manifest

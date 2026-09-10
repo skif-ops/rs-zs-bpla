@@ -1644,7 +1644,10 @@ def main() -> None:
         require(review_a["status"] == "PASS", "completed Review A must have PASS status")
         require(all(review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
                 "completed Review A lacks reviewer/date/commit SHA")
-        require(review_b["complete"] is False and review_b["status"] == "OPEN_LAYOUT_AND_EVIDENCE_PENDING",
+        require(review_b["complete"] is False and review_b["status"] in {
+                    "OPEN_LAYOUT_AND_EVIDENCE_PENDING",
+                    "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
+                },
                 "Review B must be open but incomplete after Review A PASS")
     else:
         expected_review_a_status = (
@@ -1671,6 +1674,21 @@ def main() -> None:
                     f"Review A {evidence_name} is not a commit-traceable GitHub Actions reference")
         require(review_b["evidence"].get("carried_findings") == ["RA-003"],
                 "Review B must carry forward Review A finding RA-003")
+        if review_b["status"] == "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING":
+            required_layout_evidence = {
+                "native_layout_candidate", "layout_generator", "layout_independent_audit",
+                "review_b_checklist", "ra_003_calculation", "ra_003_status",
+            }
+            require(required_layout_evidence <= set(review_b["evidence"]),
+                    "placement-candidate Review B evidence schema incomplete")
+            for evidence_name in required_layout_evidence - {"ra_003_status"}:
+                evidence_path = ROOT / review_b["evidence"][evidence_name]
+                require(evidence_path.is_file() and evidence_path.stat().st_size > 0,
+                        f"Review B placement evidence missing: {evidence_name}")
+            require(review_b["evidence"]["ra_003_status"] == {
+                        "calculation": "CLOSED", "layout": "OPEN",
+                        "measurement": "OPEN", "overall": "OPEN",
+                    }, "RA-003 split disposition drift")
     elif native_present:
         require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
                 "human Review A identity/date/SHA claimed before sign-off")
