@@ -23,6 +23,8 @@
       "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md",
       "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv",
       "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md",
+      "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
+      "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md",
       "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
       "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
       "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -128,18 +130,17 @@
           "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv",
           "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md"
         ]
+      },
+      {
+        "id": "MAIN-AUTH-008",
+        "scope": "U11 MDBT50Q-P1MV2 exact 61-pad map, fail-closed boot/reset, separate four-contact nRF SWD and all-layer PCB-antenna keepout",
+        "evidence": [
+          "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
+          "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md"
+        ]
       }
     ],
     "open_authorities": [
-      {
-        "id": "MAIN-AUTH-008",
-        "scope": "U11 MDBT50Q-P1MV2 exact module pads, boot/reset, separate nRF SWD and antenna keepout",
-        "blocks": [
-          "native_schematic",
-          "review_a",
-          "production_bom"
-        ]
-      },
       {
         "id": "MAIN-AUTH-009",
         "scope": "microSD socket/card, USB-C, RF receptacles, tamper and production/EOL fixture exact endpoints",

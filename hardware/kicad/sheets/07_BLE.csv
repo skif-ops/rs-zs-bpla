@@ -1,2 +1,8 @@
 Sheet,Item,Requirement
-07_BLE,U11,"Raytac MDBT50Q-P1MV2 nRF52840 module with integrated antenna; UART PB10/PB11; PE6 enable/reset request; PB2 open-drain DFU request; separate nRF SWD fixture pads"
+07_BLE,AUTHORITY,"Use all 65 U11/TP_BLE_SWD rows from PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv; U11 has exactly 61 physical pads and no implicit power pins"
+07_BLE,U11,"Exact Raytac MDBT50Q-P1MV2 10.5x15.5 mm PCB-antenna module; VDD pad28 and VDDH pad30 on 3V3_DIGITAL; DCCH VBUS D- D+ and unused GPIO explicit NC; local 100 nF plus 10 uF"
+07_BLE,UART,"U11 P0.06 pad22 UARTE TX to BLE_RX/PB11; BLE_TX/PB10 to U11 P0.08 pad24 UARTE RX; populated 22 Ohm source-series tuning positions; no RTS/CTS"
+07_BLE,RESET_DFU,"BLE_EN/PE6 active-HIGH run request through fail-closed non-inverting open-drain buffer to U11 P0.18/nRESET pad40; BLE_DFU_REQ/PB2 open-drain active-LOW to P0.15 pad39; 10 kOhm pull-ups; reset-buffer input 100 kOhm pull-down"
+07_BLE,SWD_LFCLK,"Dedicated TP_BLE_SWD contacts VTREF NRF_SWDIO NRF_SWCLK GND from U11 pads 51/53; never share STM32 SWD; internal calibrated LFRC and pads 17/18 NC"
+07_BLE,ANTENNA,"MDBT50Q-P1MV2 antenna at PCB edge; all-layer no-ground/copper region at least 10.5 mm wide by 3.8 mm deep and extended wider where possible; no component battery shield label standoff or cable bundle in antenna volume"
+07_BLE,BLOCKERS,"Exact reset buffer/passive RefDes/MPNs remain MAIN-AUTH-010; final coordinates and mechanical exclusion remain MAIN-AUTH-011; signed nRF firmware SWD/DFU/reset evidence and final-housing BLE 2M 1M coded-PHY RF/coexistence tests remain production blockers"

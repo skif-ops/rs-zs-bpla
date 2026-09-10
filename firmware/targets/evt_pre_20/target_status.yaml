@@ -58,6 +58,11 @@ ble:
   soc: nRF52840
   module: Raytac_MDBT50Q-P1MV2
   interface: USART3_plus_enable_plus_dfu_request
+  uart_map: P0.06_TX_to_PB11_RX_and_P0.08_RX_from_PB10_TX
+  dfu_request: P0.15_active_low_open_drain
+  reset: P0.18_nRESET_via_fail_closed_BLE_EN_buffer
+  lfclk: INTERNAL_RC_CALIBRATED
+  swd_map: dedicated_VTREF_NRF_SWDIO_NRF_SWCLK_GND
   wifi: NOT_REQUIRED
   required_phy: [BLE_2M, BLE_1M, BLE_CODED_LONG_RANGE]
   firmware_port: MISSING_BLOCKER

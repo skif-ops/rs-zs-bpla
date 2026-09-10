@@ -36,6 +36,8 @@ GNSS_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv
 GNSS_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md"
 LORA_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv"
 LORA_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md"
+BLE_PIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv"
+BLE_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md"
 DUAL_SIM_POLICY_PATH = ROOT / "hardware/DUAL_SIM_SINGLE_STANDBY.md"
 AUDIO_INTERFACE_PATH = ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md"
 POWER_ARCHITECTURE_PATH = ROOT / "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
@@ -58,6 +60,8 @@ EXPECTED_AUTHORITATIVE_INPUTS = {
     "hardware/PCB_MAIN_GNSS_AUTHORITY_REV_A.md",
     "hardware/PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_LORA_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -111,8 +115,8 @@ EXPECTED_SWD = {
     "4": "NRST",
     "5": "GND",
 }
-EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(8, 12)}
-EXPECTED_CLOSED_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(1, 8)}
+EXPECTED_OPEN_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(9, 12)}
+EXPECTED_CLOSED_AUTHORITY_IDS = {f"MAIN-AUTH-{index:03d}" for index in range(1, 9)}
 EXPECTED_DEVICE_METADATA = {
     "U2": ("W25Q512JVFIQ", "SOIC-16_300mil_F"),
     "U3": ("LIS2DW12TR", "LGA-12_2x2mm"),
@@ -445,6 +449,10 @@ def main() -> None:
         "LORA_DIO1": ("PC2", "17"),
         "LORA_TXEN": ("PB15", "54"),
         "LORA_RXEN": ("PD8", "55"),
+        "BLE_TX": ("PB10", "44"),
+        "BLE_RX": ("PB11", "45"),
+        "BLE_EN": ("PE6", "5"),
+        "BLE_DFU_REQ": ("PB2", "34"),
         "I2C2_SCL": ("PB13", "52"),
         "I2C2_SDA": ("PB14", "53"),
         "USB_DM": ("PA11", "70"),
@@ -1131,6 +1139,94 @@ def main() -> None:
     require("PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv" in by_ref["U10"]["Notes"], "U10 freeze lacks LoRa authority citation")
     require("CASTELLATED_OPTION" in by_ref["U10"]["Status"], "U10 supplier antenna-option blocker missing")
 
+    ble_rows = rows(BLE_PIN_AUTHORITY_PATH)
+    require(len(ble_rows) == 65, f"expected 65 U11/TP_BLE_SWD authority rows, got {len(ble_rows)}")
+    require(all(set(row) == cellular_columns for row in ble_rows), "BLE pin-authority schema drift")
+    require(
+        all(all(row[column] is not None and row[column] != "" for column in cellular_columns) for row in ble_rows),
+        "BLE pin-authority row contains an empty field",
+    )
+    ble_by_key = {(row["RefDes"], row["Pin"]): row for row in ble_rows}
+    require(len(ble_by_key) == len(ble_rows), "duplicate BLE RefDes/pin key")
+    require({row["RefDes"] for row in ble_rows} == {"U11", "TP_BLE_SWD"}, "BLE authority RefDes set drift")
+    u11_rows = [row for row in ble_rows if row["RefDes"] == "U11"]
+    require({row["Pin"] for row in u11_rows} == {str(index) for index in range(1, 62)}, "U11 package positions are not exactly 1..61")
+    ble_package = "nRF52840_SMD_10.5x15.5_61P_PCB_antenna"
+    require(
+        all((row["MPN"], row["Package"]) == ("MDBT50Q-P1MV2", ble_package) for row in u11_rows),
+        "U11 BLE identity/package mismatch",
+    )
+    expected_u11_special = {
+        22: ("P0.06", "OUTPUT", "BLE_RX", "FUNCTION_LOCKED"),
+        24: ("P0.08", "INPUT", "BLE_TX", "FUNCTION_LOCKED"),
+        28: ("VDD", "POWER", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        30: ("VDDH", "POWER", "3V3_DIGITAL", "SUPPLY_LOCKED"),
+        31: ("DCCH", "POWER_OUTPUT", "NC", "REG0_OUTPUT_NC"),
+        32: ("VBUS", "POWER_INPUT", "NC", "USB_INPUT_NC"),
+        34: ("D-", "USB_BIDIR", "NC", "USB_DATA_NC"),
+        35: ("D+", "USB_BIDIR", "NC", "USB_DATA_NC"),
+        39: ("P0.15", "INPUT", "BLE_DFU_REQ", "BOOT_REQUEST_LOCKED"),
+        40: ("P0.18/nRESET", "INPUT", "NRF_RESET_N", "RESET_LOCKED"),
+        51: ("SWDIO", "DEBUG_BIDIR", "NRF_SWDIO", "DEBUG_LOCKED"),
+        53: ("SWDCLK", "DEBUG_INPUT", "NRF_SWCLK", "DEBUG_LOCKED"),
+    }
+    for pin, expected in expected_u11_special.items():
+        row = ble_by_key[("U11", str(pin))]
+        require((row["Pin_Name"], row["Direction"], row["RevA_Net"], row["Disposition"]) == expected, f"U11 pad {pin} mapping mismatch")
+    for pin in (1, 2, 15, 33, 55):
+        row = ble_by_key[("U11", str(pin))]
+        require((row["Pin_Name"], row["RevA_Net"], row["Disposition"]) == ("GND", "GND", "GROUND_LOCKED"), f"U11 ground pad {pin} mismatch")
+    non_nc_pins = {1, 2, 15, 22, 24, 28, 30, 33, 39, 40, 51, 53, 55}
+    require(
+        {int(row["Pin"]) for row in u11_rows if row["RevA_Net"] != "NC"} == non_nc_pins,
+        "U11 used/unused pad set mismatch",
+    )
+    require("100 nF plus 10 uF" in ble_by_key[("U11", "28")]["Required_Network"], "U11 local decoupling mismatch")
+    require("Reg0 DC/DC is disabled" in ble_by_key[("U11", "31")]["Required_Network"], "U11 Reg0 state missing")
+    require("10 kOhm pull-up" in ble_by_key[("U11", "39")]["Required_Network"], "U11 DFU pull-up missing")
+    require("PB2 open-drain" in ble_by_key[("U11", "39")]["Required_Network"], "U11 DFU open-drain control missing")
+    for marker in ("10 kOhm pull-up", "non-inverting open-drain", "100 kOhm pull-down"):
+        require(marker in ble_by_key[("U11", "40")]["Required_Network"], f"U11 reset network lacks {marker}")
+    require(
+        {row["Pin"] for row in ble_rows if row["RefDes"] == "TP_BLE_SWD"} == {"1", "2", "3", "4"},
+        "TP_BLE_SWD contact set mismatch",
+    )
+    expected_ble_swd = {
+        "1": ("VTREF", "3V3_DIGITAL", "FIXTURE_CONTACT_LOCKED"),
+        "2": ("SWDIO", "NRF_SWDIO", "FIXTURE_CONTACT_LOCKED"),
+        "3": ("SWDCLK", "NRF_SWCLK", "FIXTURE_CONTACT_LOCKED"),
+        "4": ("GND", "GND", "FIXTURE_GROUND_LOCKED"),
+    }
+    for pin, expected in expected_ble_swd.items():
+        row = ble_by_key[("TP_BLE_SWD", pin)]
+        require((row["Pin_Name"], row["RevA_Net"], row["Disposition"]) == expected, f"TP_BLE_SWD contact {pin} mismatch")
+    for net, expected in {
+        "BLE_TX": ("PB10", "44"), "BLE_RX": ("PB11", "45"),
+        "BLE_EN": ("PE6", "5"), "BLE_DFU_REQ": ("PB2", "34"),
+    }.items():
+        require(net in by_net, f"BLE MCU net missing: {net}")
+        require((by_net[net]["MCU_Pin"], by_net[net]["LQFP100_Pin"]) == expected, f"{net} MCU pin mismatch")
+
+    ble_review = BLE_REVIEW_PATH.read_text(encoding="utf-8")
+    ble_sha256 = hashlib.sha256(BLE_PIN_AUTHORITY_PATH.read_bytes()).hexdigest()
+    for marker in {
+        "BLE_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        ble_sha256, "61fec8c0c9f8c33175be2237a8ebba73c6cfc0a3572fe3835fd341079c103d03",
+        "61-pad", "PSELRESET[0]", "application-defined", "10.5 mm by 3.8 mm",
+        "does not release exact support-component MPNs",
+    }:
+        require(marker in ble_review, f"BLE authority review missing marker: {marker}")
+    for path, markers in {
+        CAPTURE_SPEC_PATH: ("PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv", "P0.06", "P0.08", "P0.15", "P0.18/nRESET", "3.8 mm", "MAIN-AUTH-010"),
+        ROOT / "hardware/kicad/sheets/07_BLE.csv": ("all 65 U11/TP_BLE_SWD rows", "NRF_SWDIO", "NRF_SWCLK", "3.8 mm"),
+        ROOT / "firmware/targets/evt_pre_20/target_status.yaml": ("P0.06_TX_to_PB11_RX", "P0.08_RX_from_PB10_TX", "P0.15_active_low_open_drain", "P0.18_nRESET", "INTERNAL_RC_CALIBRATED"),
+    }.items():
+        content = path.read_text(encoding="utf-8")
+        for marker in markers:
+            require(marker in content, f"{path.name} lacks frozen BLE marker: {marker}")
+    require(by_ref["U11"]["Package_or_Module"] == ble_package, "U11 freeze package mismatch")
+    require("PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv" in by_ref["U11"]["Notes"], "U11 freeze lacks BLE authority citation")
+
     harness = rows(HARNESS_PATH)
     main_power = interface(harness, "MAIN_PWR")
     require(pin_contract(main_power) == EXPECTED_MAIN_POWER, "12-pin MAIN/PWR harness contract mismatch")
@@ -1186,6 +1282,12 @@ def main() -> None:
         and "J10 center" in connectors["CON-RF-LORA"]["Notes"]
         and "no-stub" in connectors["CON-RF-LORA"]["Notes"],
         "LoRa connector freeze lacks J10 authority/no-stub citation",
+    )
+    require(
+        "PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv" in connectors["CON-SWD-BLE"]["Notes"]
+        and all(token in connectors["CON-SWD-BLE"]["Notes"] for token in ("VTREF", "NRF_SWDIO", "NRF_SWCLK", "GND"))
+        and connectors["CON-SWD-BLE"]["Positions"] == "4",
+        "BLE connector freeze lacks the separate four-contact nRF SWD authority",
     )
 
     mcu = status["mcu_contract"]
@@ -1265,6 +1367,14 @@ def main() -> None:
         },
         "MAIN-AUTH-007 evidence set mismatch",
     )
+    require(
+        closed_evidence["MAIN-AUTH-008"]
+        == {
+            "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv",
+            "hardware/PCB_MAIN_BLE_AUTHORITY_REV_A.md",
+        },
+        "MAIN-AUTH-008 evidence set mismatch",
+    )
     require(closed_ids.isdisjoint(open_ids), "authority is both open and closed")
     require(open_ids == EXPECTED_OPEN_AUTHORITY_IDS, "PCB-MAIN open authority register drift")
     require(len(open_ids) == len(open_items), "duplicate PCB-MAIN open authority ID")
@@ -1292,6 +1402,7 @@ def main() -> None:
         "cellular_pins_verified": len(cellular_rows),
         "dual_sim_pins_verified": len(dual_sim_rows),
         "gnss_contacts_verified": len(gnss_rows),
+        "ble_contacts_verified": len(ble_rows),
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
@@ -1310,6 +1421,7 @@ def main() -> None:
     print(f"- all {len(dual_sim_rows)} U13/U14/U15/J6/J7/Q3 physical contacts, safe-state controls and slot paths verified")
     print(f"- all {len(gnss_rows)} U9/J9 physical contacts, supply choices, supervisor signals and RF/bias topology verified")
     print(f"- all {len(lora_rows)} U10/J10 physical contacts, fail-closed RF-switch controls and no-stub RF path verified")
+    print(f"- all {len(ble_rows)} U11/TP_BLE_SWD contacts, fail-closed boot/reset, independent SWD and antenna keepout inputs verified")
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(f"- {len(open_items)} missing pad/mechanical authorities remain explicit production blockers")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")

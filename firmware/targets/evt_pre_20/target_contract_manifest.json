@@ -10,7 +10,7 @@
   "source_inputs": [
     {
       "path": "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
-      "sha256": "d2032c65e3164b58350eb5fb06a601113732214dc519c536d509fec789d7ece1"
+      "sha256": "8188ad33998bc97ee7b165f0ff47560772346cff71f3dc433aa36211098ba915"
     },
     {
       "path": "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
@@ -22,7 +22,7 @@
     },
     {
       "path": "firmware/targets/evt_pre_20/target_status.yaml",
-      "sha256": "f1b2fbc1612ac8efc4918157f1413e30df5f8fa5a237f007d40be83c749f05a9"
+      "sha256": "a6a3e59f38c8ca6fd489682c86135eb70a62919d76ab4bf8e76c0855970b5dac"
     },
     {
       "path": "firmware/targets/evt_pre_20/cubemx_generation_contract.json",
@@ -36,7 +36,7 @@
   "generated_outputs": [
     {
       "path": "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h",
-      "sha256": "17b6c0185d3a66f54ce4cfbde4a65b664794018bf49ff258f21991995dfd345e"
+      "sha256": "4996c33902d339c2f881a834bfbd80ba4c15d9704778167b521212accef02206"
     },
     {
       "path": "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h",

@@ -185,11 +185,16 @@ Required AAD tests before release:
 
 ### 1.8 BLE commissioning / diagnostics / OTA
 
-- `U11`: Raytac `MDBT50Q-P1MV2`, nRF52840, integrated PCB antenna.
+- `U11`: exact Raytac `MDBT50Q-P1MV2`, nRF52840 Revision 2, 10.5 x 15.5 mm, 61 physical pads and integrated PCB antenna. The complete module-pad and four-contact recovery interface is `hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv`; it closes only `MAIN-AUTH-008`.
 - ESP32-C3 is superseded and forbidden in active Rev.A schematic/BOM.
-- STM32 service link PB10/PB11 USART3 plus PE6 BLE_EN and PB2 BLE_DFU_REQ.
-- separate nRF52840 SWDIO/SWCLK/VREF/GND recovery fixture pads; these do not consume STM32 GPIOs.
-- integrated antenna is placed at the PCB edge with Raytac keepout; no copper/battery/shield/cable bundle in the antenna volume.
+- U11 pad 22 `P0.06` UARTE TX drives `BLE_RX` at STM32 PB11; STM32 PB10 `BLE_TX` drives U11 pad 24 `P0.08` UARTE RX. Each line has a populated 22 Ohm source-series tuning position at its driver; RTS/CTS are not used.
+- PE6 `BLE_EN` is an active-HIGH run request into a non-inverting open-drain reset buffer. A 100 kOhm input pull-down asserts reset by default; the buffer drives U11 pad 40 `P0.18/nRESET`, which has a 10 kOhm pull-up. nRF UICR `PSELRESET[0]` and `PSELRESET[1]` must be programmed and read back.
+- PB2 `BLE_DFU_REQ` is open-drain active-LOW to U11 pad 39 `P0.15`, with a 10 kOhm U11-side pull-up. The signed bootloader samples it only during controlled reset release; STM32 never drives the net HIGH.
+- separate `TP_BLE_SWD` contacts are fixed as VREF/`NRF_SWDIO`/`NRF_SWCLK`/GND from U11 pads 51/53; they never share STM32 SWD nets or fixture switching paths and do not consume STM32 GPIOs.
+- U11 pads 28 `VDD` and 30 `VDDH` tie to `3V3_DIGITAL` for normal-voltage mode, with local 100 nF plus 10 uF. Pad 31 `DCCH`, pad 32 `VBUS`, pads 34/35 USB data, and every unused GPIO are explicit NC.
+- nRF firmware uses the calibrated internal LFRC; U11 pads 17/18 are NC and no 32.768 kHz crystal is fitted.
+- integrated antenna is placed at the PCB edge with the Raytac all-layer no-ground/copper region at least 10.5 mm wide by 3.8 mm deep and extended wider where possible; no component, battery, shield, conductive label, standoff or cable bundle occupies the antenna volume.
+- Exact reset-buffer/passive RefDes and MPNs remain `MAIN-AUTH-010`; exact placement coordinates and mechanical exclusion remain `MAIN-AUTH-011`.
 - final housing RF validation is mandatory; same-family external-antenna module may be adopted only by formal change if margin is insufficient.
 
 ### 1.9 Storage, sensors, USB and DFT
