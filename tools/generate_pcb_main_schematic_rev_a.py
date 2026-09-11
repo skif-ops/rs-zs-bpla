@@ -45,6 +45,8 @@ CONTROLLED_FOOTPRINTS = (
     "DioneyaMain.pretty" / "SiT1552_JE_CSP-4.kicad_mod",
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "u-blox_MAX-M10S_LCC-18.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "Ebyte_E22-M22S_Castellated-22.kicad_mod",
 )
 UUID_NAMESPACE = uuid.UUID("224f8048-0668-5a9f-98cb-43f39e0d8d3e")
 

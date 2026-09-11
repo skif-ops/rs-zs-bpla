@@ -112,10 +112,10 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(provisional, "candidate incorrectly claims every footprint is production-approved")
-    require(len(provisional) == 8, f"unexpected provisional-footprint count: {len(provisional)}")
+    require(len(provisional) == 7, f"unexpected provisional-footprint count: {len(provisional)}")
     require(len(library_pending) == 44,
             f"unexpected KiCad-library review count: {len(library_pending)}")
-    require(manufacturer_controlled == ["D3", "D5", "U4", "U5", "U9", "X1"],
+    require(manufacturer_controlled == ["D3", "D5", "U10", "U4", "U5", "U9", "X1"],
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
     for ref in ("D3", "D5"):
         pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
@@ -173,6 +173,22 @@ def main() -> int:
     require(u9["1"].position.X < u9["9"].position.X and
             u9["10"].position.X > u9["18"].position.X,
             "U9: pin order differs from u-blox Figure 30")
+    u10 = {pad.number: pad for pad in footprints["U10"].pads if pad.number}
+    require(set(u10) == {str(n) for n in range(1, 23)}, "U10: castellated pad set")
+    for number, pad in u10.items():
+        require(abs(pad.size.X - 0.90) < 0.002 and abs(pad.size.Y - 0.80) < 0.002,
+                f"U10.{number}: bottom land differs from Ebyte section 3.2")
+    require(abs(u10["1"].position.X - 7.45) < 0.002 and
+            abs(u10["22"].position.X + 7.45) < 0.002,
+            "U10: row position differs from 14 mm module and 0.9 mm bottom pad")
+    require(abs(u10["1"].position.Y - 9.00) < 0.002 and
+            abs(u10["11"].position.Y + 8.00) < 0.002,
+            "U10: end offsets differ from Ebyte section 3.2")
+    require(abs(abs(u10["1"].position.Y - u10["2"].position.Y) - 1.27) < 0.002 and
+            abs(abs(u10["3"].position.Y - u10["4"].position.Y) - 5.57) < 0.002,
+            "U10: 1.27/5.57 mm pitch contract drift")
+    require(u10["21"].position.X < 0 and abs(u10["21"].position.Y - 7.73) < 0.002,
+            "U10: ANT pad 21 position differs from Ebyte section 3.2")
     print("PCB-MAIN layout-candidate audit: PASS")
     print(f"components={len(expected_on_board)} holes=4 nets={len(expected_nets)} layers=6")
     print(f"provisional_footprints={len(provisional)} "

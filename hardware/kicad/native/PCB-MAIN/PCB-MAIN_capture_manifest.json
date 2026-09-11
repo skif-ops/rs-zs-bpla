@@ -3,7 +3,7 @@
   "board": "PCB-MAIN",
   "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "11ae2aa5bd8bf74cce2b4aa4d835a24a2e0e346588b8849b74591a028362024c",
+  "generator_sha256": "58af7df9715d9414ef69969496284c3b9149ab413dc23a071acf6c0cadcb2826",
   "inputs": [
     {
       "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
@@ -103,6 +103,10 @@
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/u-blox_MAX-M10S_LCC-18.kicad_mod",
       "sha256": "9c38091a434fb82f84dac437901e0d544c8b2be6e5aa4ee0cfced36c6aa95d87"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Ebyte_E22-M22S_Castellated-22.kicad_mod",
+      "sha256": "e701867e072a198f83a737d541de6424eff3c309688a0cbbad7d68150309c6e7"
     }
   ],
   "review_a": "AUTOMATED_SOURCE_NET_AUDIT_AND_KICAD_ERC_PASS_HUMAN_SIGNOFF_PENDING",
