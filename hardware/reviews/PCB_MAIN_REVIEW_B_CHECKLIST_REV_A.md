@@ -14,8 +14,9 @@ signed and contains no manufacturing release assertion.
 - Population represented: 247 on-board components plus four mounting holes; 186 native nets.
 - Routing/copper zones: absent.
 - Provisional manufacturer-specific footprints: 0 instances (reduced from 52).
-- Manufacturer-drawing controlled project-local footprints: 14 instances (`D3`, `D5`, `FL1`, `J6`, `J7`, `J12`, `J13`, `J_PWR`, `U4`, `U5`, `U8`, `U9`, `U10`, `X1`).
-- KiCad library patterns pending drawing review: 44 instances.
+- Manufacturer-drawing controlled project-local footprints: 17 instances (`D3`, `D5`, `FL1`, `J6`, `J7`, `J8`, `J9`, `J10`, `J12`, `J13`, `J_PWR`, `U4`, `U5`, `U8`, `U9`, `U10`, `X1`).
+- Drawing-verified KiCad library patterns: 5 instances (`J11`, `J_MIC1..J_MIC4`).
+- KiCad library patterns pending drawing review: 36 instances.
 - Production pogo groups: 5 controlled footprints, 31 bottom pads verified from MAIN-AUTH-011.
 - Footprint disposition register: `hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md`.
 
@@ -27,7 +28,7 @@ signed and contains no manufacturing release assertion.
 - [x] Six-layer count, thickness, outline and mounting pattern are represented.
 - [x] All manufacturer-specific instances are controlled from manufacturer drawings; provisional count is zero.
 - [ ] U9 paste stencil is adapted and approved for the selected assembly process.
-- [ ] All 44 KiCad-derived instances are approved against the applicable component drawings.
+- [ ] All remaining 36 KiCad-derived instances are approved against the applicable component drawings.
 - [ ] Placement is collision-free and every courtyard/height/service zone passes.
 - [ ] RF, power, PDM, USB and SIM routing is complete.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.

@@ -14,6 +14,7 @@ from audit_pcb_main_native_schematic_rev_a import expected_components  # noqa: E
 
 PCB = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 MECH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
+FOOTPRINT_REVIEW = ROOT / "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv"
 
 
 def require(value: bool, message: str) -> None:
@@ -108,15 +109,144 @@ def main() -> int:
     library_pending = sorted(ref for ref, fp in footprints.items()
                              if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                              "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
+    library_verified = sorted(ref for ref, fp in footprints.items()
+                              if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
+                              "KICAD_LIBRARY_PATTERN_DRAWING_VERIFIED")
     manufacturer_controlled = sorted(ref for ref, fp in footprints.items()
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(not provisional, f"manufacturer-specific provisional footprints remain: {provisional}")
-    require(len(library_pending) == 44,
+    require(len(library_pending) == 36,
             f"unexpected KiCad-library review count: {len(library_pending)}")
-    require(manufacturer_controlled == ["D3", "D5", "FL1", "J12", "J13", "J6", "J7",
-                                        "J_PWR", "U10", "U4", "U5", "U8", "U9", "X1"],
+    require(library_verified == ["J11", "J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4"],
+            f"unexpected drawing-verified KiCad set: {library_verified}")
+    require(manufacturer_controlled == ["D3", "D5", "FL1", "J10", "J12", "J13", "J6",
+                                        "J7", "J8", "J9", "J_PWR", "U10", "U4", "U5",
+                                        "U8", "U9", "X1"],
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
+
+    register_rows = list(csv.DictReader(FOOTPRINT_REVIEW.open(encoding="utf-8", newline="")))
+    require(len(register_rows) == 19, "KiCad footprint-review register must contain 19 patterns")
+    registered: set[str] = set()
+    registered_by_status: dict[str, set[str]] = {}
+    for row in register_rows:
+        refs = {ref for ref in row["References"].split(";") if ref}
+        require(len(refs) == int(row["Instances"]),
+                f"{row['Library_Source']}: register instance count mismatch")
+        require(not registered.intersection(refs),
+                f"duplicate references in footprint-review register: {sorted(registered.intersection(refs))}")
+        registered.update(refs)
+        registered_by_status.setdefault(row["Review_Status"], set()).update(refs)
+        expected_status = {
+            "PENDING": "KICAD_LIBRARY_PATTERN_REVIEW_PENDING",
+            "DRAWING_VERIFIED": "KICAD_LIBRARY_PATTERN_DRAWING_VERIFIED",
+            "REPLACED_PROJECT_CONTROLLED": "MANUFACTURER_DRAWING_PATTERN_CONTROLLED",
+        }.get(row["Review_Status"])
+        require(expected_status is not None,
+                f"{row['Library_Source']}: unknown register status")
+        for ref in refs:
+            require(footprints[ref].properties.get("DIONEA_FOOTPRINT_STATUS") == expected_status,
+                    f"{ref}: board/register footprint status mismatch")
+            require(footprints[ref].properties.get("DIONEA_FOOTPRINT_SOURCE") == row["Board_Source"],
+                    f"{ref}: board/register footprint source mismatch")
+    require(len(registered) == 44, "footprint-review register must cover 44 original instances")
+    require(registered_by_status.get("PENDING", set()) == set(library_pending),
+            "register pending references differ from board")
+    require(registered_by_status.get("DRAWING_VERIFIED", set()) == set(library_verified),
+            "register verified references differ from board")
+    require(registered_by_status.get("REPLACED_PROJECT_CONTROLLED", set()) == {"J8", "J9", "J10"},
+            "register project-controlled replacement set differs from board")
+
+    # U.FL copper matches the Hirose mounting pattern.  The manufacturer metal
+    # mask is smaller than the KiCad-library paste, so three separate paste-only
+    # apertures are required in the controlled local footprint.
+    for ref in ("J8", "J9", "J10"):
+        pads = footprints[ref].pads
+        copper = [pad for pad in pads if pad.number]
+        paste = [pad for pad in pads if not pad.number]
+        actual_copper = {
+            (pad.number, round(pad.position.X, 3), round(pad.position.Y, 3),
+             round(pad.size.X, 3), round(pad.size.Y, 3), tuple(pad.layers))
+            for pad in copper
+        }
+        expected_copper = {
+            ("1", -1.050, 0.000, 1.050, 1.000, ("F.Cu", "F.Mask")),
+            ("SHIELD", 0.475, -1.475, 2.200, 1.050, ("F.Cu", "F.Mask")),
+            ("SHIELD", 0.475, 1.475, 2.200, 1.050, ("F.Cu", "F.Mask")),
+        }
+        require(actual_copper == expected_copper,
+                f"{ref}: copper differs from Hirose recommended PCB pattern")
+        actual_paste = {
+            (round(pad.position.X, 3), round(pad.position.Y, 3),
+             round(pad.size.X, 3), round(pad.size.Y, 3), tuple(pad.layers))
+            for pad in paste
+        }
+        expected_paste = {
+            (-1.050, 0.000, 0.850, 0.800, ("F.Paste",)),
+            (0.475, -1.475, 2.000, 0.900, ("F.Paste",)),
+            (0.475, 1.475, 2.000, 0.900, ("F.Paste",)),
+        }
+        require(actual_paste == expected_paste,
+                f"{ref}: apertures differ from Hirose recommended metal mask")
+
+    for ref in ("J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4"):
+        logical = {pad.number: pad for pad in footprints[ref].pads if pad.number}
+        require(set(logical) == {str(number) for number in range(1, 7)},
+                f"{ref}: Pico-Lock six-contact pad set")
+        for number, expected_x in enumerate((-3.75, -2.25, -0.75, 0.75, 2.25, 3.75), 1):
+            pad = logical[str(number)]
+            require(abs(pad.position.X - expected_x) < 0.002 and
+                    abs(pad.position.Y + 2.795) < 0.002 and
+                    abs(pad.size.X - 0.60) < 0.002 and abs(pad.size.Y - 1.00) < 0.002 and
+                    pad.layers == ["F.Cu", "F.Paste", "F.Mask"],
+                    f"{ref}.{number}: land differs from Molex 504050-0691 pattern")
+        shell = [pad for pad in footprints[ref].pads if not pad.number]
+        require(len(shell) == 2 and
+                {round(pad.position.X, 3) for pad in shell} == {-6.355, 6.355} and
+                all(abs(pad.position.Y - 2.395) < 0.002 and
+                    abs(pad.size.X - 1.25) < 0.002 and abs(pad.size.Y - 1.80) < 0.002 and
+                    pad.layers == ["F.Cu", "F.Paste", "F.Mask"] for pad in shell),
+                f"{ref}: shell lands differ from Molex 504050-0691 pattern")
+
+    j11_pads = [pad for pad in footprints["J11"].pads if pad.number]
+    j11_contacts = {pad.number: pad for pad in j11_pads if pad.number != "SHIELD"}
+    expected_j11 = {
+        "A1": (-3.20, 0.60), "A4": (-2.40, 0.60), "A5": (-1.25, 0.30),
+        "A6": (-0.25, 0.30), "A7": (0.25, 0.30), "A8": (1.25, 0.30),
+        "A9": (2.40, 0.60), "A12": (3.20, 0.60), "B1": (3.20, 0.60),
+        "B4": (2.40, 0.60), "B5": (1.75, 0.30), "B6": (0.75, 0.30),
+        "B7": (-0.75, 0.30), "B8": (-1.75, 0.30), "B9": (-2.40, 0.60),
+        "B12": (-3.20, 0.60),
+    }
+    require(set(j11_contacts) == set(expected_j11), "J11: USB4105 contact pad set")
+    for number, (x, width) in expected_j11.items():
+        pad = j11_contacts[number]
+        require(abs(pad.position.X - x) < 0.002 and abs(pad.position.Y + 3.68) < 0.002 and
+                abs(pad.size.X - width) < 0.002 and abs(pad.size.Y - 1.15) < 0.002 and
+                pad.layers == ["F.Cu", "F.Paste", "F.Mask"],
+                f"J11.{number}: land differs from GCT USB4105 Rev B4")
+    j11_shell = [pad for pad in j11_pads if pad.number == "SHIELD"]
+    actual_j11_shell = {
+        (round(pad.position.X, 2), round(pad.position.Y, 3),
+         round(pad.size.X, 2), round(pad.size.Y, 2),
+         round(pad.drill.diameter, 2), round(pad.drill.width, 2))
+        for pad in j11_shell
+    }
+    expected_j11_shell = {
+        (-4.32, -3.105, 1.00, 2.10, 0.60, 1.70),
+        (-4.32, 1.075, 1.00, 1.80, 0.60, 1.40),
+        (4.32, -3.105, 1.00, 2.10, 0.60, 1.70),
+        (4.32, 1.075, 1.00, 1.80, 0.60, 1.40),
+    }
+    require(actual_j11_shell == expected_j11_shell,
+            "J11: shell lands/slots differ from GCT USB4105 Rev B4")
+    j11_holes = [pad for pad in footprints["J11"].pads if not pad.number]
+    require(len(j11_holes) == 2 and
+            {(round(pad.position.X, 2), round(pad.position.Y, 3)) for pad in j11_holes} ==
+            {(-2.89, -2.605), (2.89, -2.605)} and
+            all(pad.type == "np_thru_hole" and pad.drill is not None and
+                abs(pad.drill.diameter - 0.65) < 0.002 for pad in j11_holes),
+            "J11: locating holes differ from GCT USB4105 Rev B4")
     for ref in ("D3", "D5"):
         pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
         require(set(pads) == {"1", "2"}, f"{ref}: SOD962 pad set")
@@ -343,6 +473,7 @@ def main() -> int:
     print(f"components={len(expected_on_board)} holes=4 nets={len(expected_nets)} layers=6")
     print(f"provisional_footprints={len(provisional)} "
           f"kicad_library_review_pending={len(library_pending)} "
+          f"kicad_library_drawing_verified={len(library_verified)} "
           f"manufacturer_controlled={len(manufacturer_controlled)} "
           "routing=ABSENT review_b=BLOCKED")
     return 0

@@ -40,8 +40,10 @@ CAPTURE_STATUS = ROOT / "hardware" / "PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 MECHANICAL = ROOT / "hardware" / "PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 NET_OVERLAY = ROOT / "hardware" / "PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv"
 GROUND_AUTHORITY = ROOT / "hardware" / "PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv"
+FOOTPRINT_REVIEW = ROOT / "hardware" / "reviews" / "PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv"
 SOURCE_INPUTS = (*PIN_AUTHORITIES, SUPPORT, HARNESS, MAIN_FREEZE, CONNECTOR_FREEZE,
-                 CAPTURE_STATUS, MECHANICAL, NET_OVERLAY, GROUND_AUTHORITY)
+                 CAPTURE_STATUS, MECHANICAL, NET_OVERLAY, GROUND_AUTHORITY,
+                 FOOTPRINT_REVIEW)
 
 EXPECTED_COMPONENTS = 248
 EXPECTED_FITTED = 233
@@ -455,6 +457,9 @@ def main() -> int:
         bom_sha256 = sha256(args.bom_output)
 
     capture_status = json.loads(CAPTURE_STATUS.read_text(encoding="utf-8"))
+    require(capture_status["native_schematic"]["footprint_review_register"] ==
+            str(FOOTPRINT_REVIEW.relative_to(ROOT)),
+            "capture status footprint-review register path mismatch")
     review_a = capture_status["review_a"]
     require(review_a["complete"] is True and review_a["status"] == "PASS",
             "capture status does not record signed Review A PASS")

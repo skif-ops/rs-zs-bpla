@@ -56,6 +56,7 @@ jobs:
         run: |
           python tools/generate_pcb_main_manufacturer_footprints_rev_a.py --check
           python tools/materialize_pcb_main_manufacturer_footprints_rev_a.py --check
+          python tools/materialize_pcb_main_verified_library_footprints_rev_a.py --check
           python tools/audit_pcb_main_layout_candidate_rev_a.py
       - name: First-pass configuration and hardware baseline validation
         run: python tools/validate_evt_pre_20.py

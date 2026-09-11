@@ -28,6 +28,17 @@ MECH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 KICAD_FP = Path(os.environ.get("DIONEYA_KICAD_FOOTPRINT_DIR", "/usr/share/kicad/footprints"))
 PROJECT_FP = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
 
+KICAD_DRAWING_VERIFIED = {
+    (
+        "Connector_Molex.pretty",
+        "Molex_Pico-Lock_504050-0691_1x06-1MP_P1.50mm_Horizontal",
+    ): "Molex_5040500000-SD_PSD000_RevB_RecommendedPattern",
+    (
+        "Connector_USB.pretty",
+        "USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal",
+    ): "GCT_USB4105_RevB4_2023-12-18_RecommendedPCBLayout",
+}
+
 STANDARD = {
     "LQFP100_14x14": ("Package_QFP.pretty", "LQFP-100_14x14mm_P0.5mm"),
     "LGA-12_2x2mm": ("Package_LGA.pretty", "LGA-12_2x2mm_P0.5mm"),
@@ -37,7 +48,7 @@ STANDARD = {
     "SOT-563_SC-89": ("Package_TO_SOT_SMD.pretty", "SOT-563"),
     "SOD882": ("Diode_SMD.pretty", "D_SOD-882", {}),
     "SOIC-16_300mil_F": ("Package_SO.pretty", "SOIC-16W_7.5x10.3mm_P1.27mm"),
-    "U.FL_SMT": ("Connector_Coaxial.pretty", "U.FL_Hirose_U.FL-R-SMT-1_Vertical", {"2": "SHIELD"}),
+    "U.FL_SMT": ("PROJECT", "Hirose_U.FL-R-SMT-1", {}),
     "USB-C_16P_horizontal_top_mount_1.20mm_stake": (
         "Connector_USB.pretty", "USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal",
         {"S1": "SHIELD"},
@@ -232,8 +243,12 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                         "Molex_43045-1202_MicroFit-12_RA": "Molex_SD-43045-001_PSD001_RevH1_PCBLayout",
                         "Molex_504050-0291_PicoLock-2": "Molex_5040500000-SD_PSD001_RevB_RecommendedPattern",
                         "GCT_MEM2052-00-195-00-A": "GCT_MEM2052_RevA3_RecommendedPCBLayout",
+                        "Hirose_U.FL-R-SMT-1": "Hirose_U.FL_CAT_2026-08-01_PCB_and_MetalMask",
                     }
                     fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", sources[name])
+                elif (directory, name) in KICAD_DRAWING_VERIFIED:
+                    fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_DRAWING_VERIFIED")
+                    fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", KICAD_DRAWING_VERIFIED[(directory, name)])
                 else:
                     fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
                     fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", f"KiCad:{directory}/{name}")

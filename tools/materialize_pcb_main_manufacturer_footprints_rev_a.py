@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Replace the last four PCB-MAIN placeholders with controlled footprints.
+"""Materialize PCB-MAIN manufacturer-controlled footprints.
 
 This pure-kiutils materializer is usable outside KiCad.  It preserves each
 component's locked placement, schematic nets, RefDes/value text and population
@@ -24,6 +24,18 @@ LIB = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
+    "J8": (
+        "Hirose_U.FL-R-SMT-1.kicad_mod",
+        "Hirose_U.FL_CAT_2026-08-01_PCB_and_MetalMask",
+    ),
+    "J9": (
+        "Hirose_U.FL-R-SMT-1.kicad_mod",
+        "Hirose_U.FL_CAT_2026-08-01_PCB_and_MetalMask",
+    ),
+    "J10": (
+        "Hirose_U.FL-R-SMT-1.kicad_mod",
+        "Hirose_U.FL_CAT_2026-08-01_PCB_and_MetalMask",
+    ),
     "J12": (
         "GCT_MEM2052-00-195-00-A.kicad_mod",
         "GCT_MEM2052_RevA3_RecommendedPCBLayout",

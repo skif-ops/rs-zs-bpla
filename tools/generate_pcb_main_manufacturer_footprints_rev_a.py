@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the four PCB-MAIN Rev.A manufacturer-specific land patterns.
+"""Generate the PCB-MAIN Rev.A manufacturer-specific land patterns.
 
 The dimensions below are transcribed from the cited manufacturer drawings.  The
 files are deliberately generated from compact coordinate contracts so review and
@@ -44,6 +44,44 @@ def smd(lines: list[str], number: str, x: float, y: float, sx: float, sy: float,
         f'  (pad "{number}" smd {shape} (at {x:g} {y:g}) (size {sx:g} {sy:g}) '
         f'(layers "F.Cu" "F.Paste" "F.Mask"){extra})'
     )
+
+
+def ufl() -> str:
+    name = "Hirose_U.FL-R-SMT-1"
+    lines = header(
+        name,
+        "Hirose U.FL-R-SMT-1 vertical receptacle; U.FL catalog 2026-08-01 recommended PCB and metal-mask patterns",
+        "Hirose U.FL-R-SMT-1 coaxial vertical",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -2.7) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 2.7) (layer "F.Fab") hide'
+    # The footprint origin and orientation retain the KiCad-library convention.
+    # Copper/mask dimensions match the recommended PCB mounting pattern.
+    rect(lines, -1.825, -2.25, 2.275, 2.25, "F.CrtYd", 0.05)
+    rect(lines, -1.075, -1.55, 2.025, 1.55, "F.Fab", 0.10)
+    for number, x, y, sx, sy in [
+        ("1", -1.05, 0.0, 1.05, 1.00),
+        ("SHIELD", 0.475, -1.475, 2.20, 1.05),
+        ("SHIELD", 0.475, 1.475, 2.20, 1.05),
+    ]:
+        lines.append(
+            f'  (pad "{number}" smd rect (at {x:g} {y:g}) (size {sx:g} {sy:g}) '
+            '(layers "F.Cu" "F.Mask"))'
+        )
+    # Hirose specifies smaller metal-mask apertures than the copper.  Separate
+    # paste-only pads prevent the KiCad-library copper-sized paste from leaking
+    # back into a regenerated board.
+    for x, y, sx, sy in [
+        (-1.05, 0.0, 0.85, 0.80),
+        (0.475, -1.475, 2.00, 0.90),
+        (0.475, 1.475, 2.00, 0.90),
+    ]:
+        lines.append(
+            f'  (pad "" smd rect (at {x:g} {y:g}) (size {sx:g} {sy:g}) '
+            '(layers "F.Paste"))'
+        )
+    lines.append(")")
+    return "\n".join(lines) + "\n"
 
 
 def bg95() -> str:
@@ -167,6 +205,7 @@ def microfit() -> str:
 
 
 GENERATORS = {
+    "Hirose_U.FL-R-SMT-1.kicad_mod": ufl,
     "Quectel_BG95-M3_LGA-102.kicad_mod": bg95,
     "GCT_MEM2052-00-195-00-A.kicad_mod": microsd,
     "Molex_504050-0291_PicoLock-2.kicad_mod": picolock,

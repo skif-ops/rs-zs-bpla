@@ -1,0 +1,20 @@
+Library_Source,References,Instances,Review_Status,Board_Source,Drawing_Revision,Official_Source,Disposition
+KiCad:Capacitor_Tantalum_SMD.pretty/CP_EIA-7343-31_Kemet-D,C36;C44,2,PENDING,KiCad:Capacitor_Tantalum_SMD.pretty/CP_EIA-7343-31_Kemet-D,,,Drawing-to-pattern review pending
+KiCad:Connector_Coaxial.pretty/U.FL_Hirose_U.FL-R-SMT-1_Vertical,J8;J9;J10,3,REPLACED_PROJECT_CONTROLLED,Hirose_U.FL_CAT_2026-08-01_PCB_and_MetalMask,2026-08-01,https://www.hirose.com/en/product/document?clcode=&productname=&series=U.FL&documenttype=Catalog&lang=en&documentid=ed_U.FL_CAT,Copper retained; manufacturer metal-mask apertures corrected locally
+KiCad:Connector_Molex.pretty/Molex_Pico-Lock_504050-0691_1x06-1MP_P1.50mm_Horizontal,J_MIC1;J_MIC2;J_MIC3;J_MIC4,4,DRAWING_VERIFIED,Molex_5040500000-SD_PSD000_RevB_RecommendedPattern,5040500000-SD PSD 000 Rev B,https://www.molex.com/pdm_docs/sd/5040500691_sd.pdf,Copper and 100-percent stencil aperture match recommended pattern
+KiCad:Connector_USB.pretty/USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal,J11,1,DRAWING_VERIFIED,GCT_USB4105_RevB4_2023-12-18_RecommendedPCBLayout,USB4105 Rev B4 2023-12-18,https://gct.co/files/drawings/usb4105.pdf,Copper and drill geometry match; paste remains assembly-process controlled
+KiCad:Diode_SMD.pretty/D_SOD-523,D4;D6;D7;D8;D9;D10;D11,7,PENDING,KiCad:Diode_SMD.pretty/D_SOD-523,,,Drawing-to-pattern review pending
+KiCad:Diode_SMD.pretty/D_SOD-882,D1;D2,2,PENDING,KiCad:Diode_SMD.pretty/D_SOD-882,,,Drawing-to-pattern review pending
+KiCad:Package_LGA.pretty/LGA-12_2x2mm_P0.5mm,U3,1,PENDING,KiCad:Package_LGA.pretty/LGA-12_2x2mm_P0.5mm,,,Drawing-to-pattern review pending
+KiCad:Package_QFP.pretty/LQFP-100_14x14mm_P0.5mm,U1,1,PENDING,KiCad:Package_QFP.pretty/LQFP-100_14x14mm_P0.5mm,,,Drawing-to-pattern review pending
+KiCad:Package_SO.pretty/SOIC-16W_7.5x10.3mm_P1.27mm,U2,1,PENDING,KiCad:Package_SO.pretty/SOIC-16W_7.5x10.3mm_P1.27mm,,,Drawing-to-pattern review pending
+KiCad:Package_SO.pretty/TSSOP-14_4.4x5mm_P0.65mm,U17,1,PENDING,KiCad:Package_SO.pretty/TSSOP-14_4.4x5mm_P0.65mm,,,Drawing-to-pattern review pending
+KiCad:Package_SO.pretty/TSSOP-24_4.4x6.5mm_P0.5mm,U7;U13;U16,3,PENDING,KiCad:Package_SO.pretty/TSSOP-24_4.4x6.5mm_P0.5mm,,,Drawing-to-pattern review pending
+KiCad:Package_SON.pretty/USON-10_2.5x1.0mm_P0.5mm,U19;U20;U21;U22;U23;U24;U27,7,PENDING,KiCad:Package_SON.pretty/USON-10_2.5x1.0mm_P0.5mm,,,Drawing-to-pattern review pending
+KiCad:Package_TO_SOT_SMD.pretty/SOT-23,Q1;Q2;Q3,3,PENDING,KiCad:Package_TO_SOT_SMD.pretty/SOT-23,,,Drawing-to-pattern review pending
+KiCad:Package_TO_SOT_SMD.pretty/SOT-23-5,U6,1,PENDING,KiCad:Package_TO_SOT_SMD.pretty/SOT-23-5,,,Drawing-to-pattern review pending
+KiCad:Package_TO_SOT_SMD.pretty/SOT-563,Q4,1,PENDING,KiCad:Package_TO_SOT_SMD.pretty/SOT-563,,,Drawing-to-pattern review pending
+KiCad:Package_TO_SOT_SMD.pretty/SOT-666,U14;U15,2,PENDING,KiCad:Package_TO_SOT_SMD.pretty/SOT-666,,,Drawing-to-pattern review pending
+KiCad:Package_TO_SOT_SMD.pretty/Texas_DRT-3,U25;U26,2,PENDING,KiCad:Package_TO_SOT_SMD.pretty/Texas_DRT-3,,,Drawing-to-pattern review pending
+KiCad:Package_TO_SOT_SMD.pretty/Texas_R-PDSO-N6_DRL-6,U18,1,PENDING,KiCad:Package_TO_SOT_SMD.pretty/Texas_R-PDSO-N6_DRL-6,,,Drawing-to-pattern review pending
+KiCad:RF_Module.pretty/Raytac_MDBT50Q,U11,1,PENDING,KiCad:RF_Module.pretty/Raytac_MDBT50Q,,,Drawing-to-pattern review pending

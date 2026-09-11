@@ -36,6 +36,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "PCB-MAIN.kicad_sch"
 CONTROLLED_FOOTPRINTS = (
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "Hirose_U.FL-R-SMT-1.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "PESD5V0C1BSF_SOD962-2.kicad_mod",
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "STTS22H_UDFN-6L.kicad_mod",
@@ -81,10 +83,11 @@ CAPTURE_STATUS = ROOT / "hardware" / "PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 MECHANICAL_AUTHORITY = ROOT / "hardware" / "PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 NET_OVERLAY = ROOT / "hardware" / "PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv"
 GROUND_AUTHORITY = ROOT / "hardware" / "PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv"
+FOOTPRINT_REVIEW = ROOT / "hardware" / "reviews" / "PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv"
 
 INPUTS = (*PIN_AUTHORITIES, SUPPORT_AUTHORITY, HARNESS_AUTHORITY, MAIN_FREEZE,
           CONNECTOR_FREEZE, CAPTURE_STATUS, MECHANICAL_AUTHORITY, NET_OVERLAY,
-          GROUND_AUTHORITY)
+          GROUND_AUTHORITY, FOOTPRINT_REVIEW)
 
 EXPECTED_GENERIC_GROUND_ENDPOINTS = 157
 EXPECTED_MIC_GROUND_ENDPOINTS = 21

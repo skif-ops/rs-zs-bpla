@@ -65,6 +65,7 @@ on:
       - "tools/generate_pcb_main_schematic_rev_a.py"
       - "tools/generate_pcb_main_manufacturer_footprints_rev_a.py"
       - "tools/materialize_pcb_main_manufacturer_footprints_rev_a.py"
+      - "tools/materialize_pcb_main_verified_library_footprints_rev_a.py"
       - "tools/audit_pcb_main_layout_candidate_rev_a.py"
       - "tools/audit_pcb_main_native_schematic_rev_a.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
@@ -234,6 +235,7 @@ jobs:
           test -s hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.kicad_sym
           python tools/generate_pcb_main_manufacturer_footprints_rev_a.py --check
           python tools/materialize_pcb_main_manufacturer_footprints_rev_a.py --check
+          python tools/materialize_pcb_main_verified_library_footprints_rev_a.py --check
           python tools/audit_pcb_main_layout_candidate_rev_a.py
           python tools/generate_pcb_main_schematic_rev_a.py --check
           python tools/audit_pcb_main_native_schematic_rev_a.py \
@@ -252,6 +254,7 @@ jobs:
           assert len(board.GetFootprints()) == 251, "unexpected PCB-MAIN footprint count"
           assert board.GetCopperLayerCount() == 6, "unexpected PCB-MAIN copper-layer count"
           expected = {
+              "Hirose_U.FL-R-SMT-1": 6,
               "Quectel_BG95-M3_LGA-102": 102,
               "GCT_MEM2052-00-195-00-A": 13,
               "Molex_504050-0291_PicoLock-2": 4,

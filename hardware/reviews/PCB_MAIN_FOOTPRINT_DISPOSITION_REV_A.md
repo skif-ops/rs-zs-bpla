@@ -2,19 +2,22 @@
 
 Status: `OPEN / NOT FOR MANUFACTURE`
 
-This register separates geometry already embedded from the KiCad standard
-library from geometry that is still a placement-only placeholder.  A library
-match is not manufacturing approval: every `KICAD_LIBRARY_PATTERN_REVIEW_PENDING`
-item still requires drawing-to-land-pattern review before Review B can pass.
+This register separates manufacturer-controlled geometry, drawing-verified
+KiCad-library geometry and patterns still awaiting review. A library match is
+not manufacturing approval: every `KICAD_LIBRARY_PATTERN_REVIEW_PENDING` item
+still requires drawing-to-land-pattern review before Review B can pass. The
+machine-readable 19-pattern inventory is
+`hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv`.
 
 ## Current controlled result
 
 | Class | Instances | Disposition |
 |---|---:|---|
-| Project-generated chip passives and mechanical holes | 183 | Placement use only; passive geometry remains subject to assembly-house rules |
+| Project-generated chip passives and mechanical holes | 188 | Placement use only; passive geometry remains subject to assembly-house rules |
 | MAIN-AUTH-011 controlled pogo groups | 5 | 31 bottom pads verified by coordinate, diameter, mask and layer |
-| Manufacturer-drawing controlled patterns | 14 | Nexperia SOD962-2, ST UDFN-6L, ADI DCB, SiTime JE CSP, u-blox MAX-M10S, Ebyte E22-M22S, Abracon 1109-5, two TE 2336582-1 instances, Quectel BG95-M3, GCT MEM2052, Molex 504050-0291 and Molex 43045-1202 controlled locally |
-| KiCad library patterns | 44 | Exact pad-number contract passes; drawing review remains open |
+| Manufacturer-drawing controlled patterns | 17 | Fourteen previously controlled instances plus three Hirose U.FL instances controlled locally |
+| Drawing-verified KiCad library patterns | 5 | Four Molex 504050-0691 instances and one GCT USB4105 instance have exact audited geometry |
+| KiCad library patterns pending drawing review | 36 | Exact pad-number contract passes; drawing review remains open |
 | Provisional manufacturer-specific patterns | 0 | Closed for the current component set; any substitution reopens this gate |
 
 Earlier controlled updates reduced the provisional set from 52 to 4 instances by
@@ -62,6 +65,26 @@ and [Molex 43045-1202 drawing](https://www.molex.com/pdm_docs/sd/430451202_sd.pd
 Their complete pad coordinates, sizes, drill diameters and logical pad sets are
 asserted independently by the layout audit.
 
+The first KiCad-library review tranche covers eight connector instances. The
+four `J_MIC1..J_MIC4` Molex 504050-0691 patterns match customer drawing
+`5040500000-SD`, PSD 000 Rev B: six 0.60 x 1.00 mm contacts on 1.50 mm pitch,
+two 1.25 x 1.80 mm shell lands and 100% stencil apertures. `J11` matches GCT
+USB4105 Rev B4 for all sixteen contact lands, two 0.65 mm NPTH locating holes
+and four plated oval shell stakes. GCT does not define stencil apertures in that
+drawing, so paste remains an assembly-process/DFM gate even though copper and
+drill geometry are drawing-verified.
+
+The three `J8..J10` Hirose U.FL patterns exposed a real library discrepancy:
+KiCad's copper agrees with the recommended mounting pattern, but its paste
+copies the copper while Hirose specifies smaller metal-mask apertures. They are
+therefore replaced by the project-local `Hirose_U.FL-R-SMT-1` pattern. It keeps
+the 1.05 x 1.00 mm signal land and two 2.20 x 1.05 mm ground lands, while using
+separate 0.85 x 0.80 mm signal and 2.00 x 0.90 mm ground paste apertures from
+the official [Hirose U.FL catalog](https://www.hirose.com/en/product/document?clcode=&productname=&series=U.FL&documenttype=Catalog&lang=en&documentid=ed_U.FL_CAT),
+dated 2026-08-01. The other reviewed sources are the official
+[Molex 504050-0691 drawing](https://www.molex.com/pdm_docs/sd/5040500691_sd.pdf)
+and [GCT USB4105 drawing](https://gct.co/files/drawings/usb4105.pdf).
+
 ## Remaining provisional references
 
 None.
@@ -72,7 +95,7 @@ Review B remains `OPEN`. No Gerber, drill, paste, pick-and-place, IPC-356 or
 STEP output from this candidate may be released until:
 
 1. the zero-provisional footprint state remains true for the release commit;
-2. the 44 KiCad-derived instances pass drawing-to-pattern review;
+2. the remaining 36 KiCad-derived instances pass drawing-to-pattern review;
 3. placement and routing audits pass in KiCad 9;
 4. DRC reports zero blocker/critical and zero unrouted items;
 5. RA-003 layout evidence is complete; physical droop and ripple measurement

@@ -87,8 +87,9 @@
     "status": "REVIEW_A_PASS",
     "erc_status": "PASS_KICAD_9_ZERO_VIOLATIONS",
     "schematic_derived_bom": true,
-    "custom_footprint_status": "0_PROVISIONAL_44_KICAD_LIBRARY_DRAWING_REVIEW_PENDING_14_MANUFACTURER_PATTERN_5_POGO_GROUPS_CONTROLLED",
+    "custom_footprint_status": "0_PROVISIONAL_36_KICAD_LIBRARY_DRAWING_REVIEW_PENDING_5_KICAD_LIBRARY_DRAWING_VERIFIED_17_MANUFACTURER_PATTERN_5_POGO_GROUPS_CONTROLLED",
     "footprint_disposition": "hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md",
+    "footprint_review_register": "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv",
     "ground_domains": {
       "GND_MODEM": "J_PWR pin 2; joins GND_PWR only at PCB-PWR NT1",
       "GND_DIGITAL": "J_PWR pin 4; joins GND_PWR only at PCB-PWR NT2",
