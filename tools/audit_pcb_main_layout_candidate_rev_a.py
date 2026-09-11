@@ -112,10 +112,10 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(provisional, "candidate incorrectly claims every footprint is production-approved")
-    require(len(provisional) == 10, f"unexpected provisional-footprint count: {len(provisional)}")
+    require(len(provisional) == 9, f"unexpected provisional-footprint count: {len(provisional)}")
     require(len(library_pending) == 44,
             f"unexpected KiCad-library review count: {len(library_pending)}")
-    require(manufacturer_controlled == ["D3", "D5", "U4", "U5"],
+    require(manufacturer_controlled == ["D3", "D5", "U4", "U5", "X1"],
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
     for ref in ("D3", "D5"):
         pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
@@ -142,6 +142,21 @@ def main() -> int:
             "U5: exposed pad differs from LTC drawing 05-08-1715")
     require(abs(abs(u5["1"].position.Y - u5["6"].position.Y) - 2.85) < 0.002,
             "U5: row spacing differs from LTC drawing 05-08-1715")
+    x1 = {pad.number: pad for pad in footprints["X1"].pads if pad.number}
+    require(set(x1) == {"1", "2", "3", "4"}, "X1: CSP pad set")
+    for pad in x1.values():
+        require(abs(pad.size.X - 0.25) < 0.002 and abs(pad.size.Y - 0.25) < 0.002,
+                "X1: NSMD land diameter differs from SiTime POD-35 Rev A")
+        require(abs(float(pad.solderMaskMargin or 0.0) - 0.05) < 0.002,
+                "X1: solder-mask opening must be 0.35 mm")
+    require(abs(abs(x1["1"].position.X - x1["2"].position.X) - 1.00) < 0.002,
+            "X1: column pitch differs from SiTime POD-35 Rev A")
+    require(abs(abs(x1["1"].position.Y - x1["4"].position.Y) - 0.41) < 0.002,
+            "X1: row pitch differs from SiTime POD-35 Rev A")
+    require(x1["1"].position.X < x1["2"].position.X and
+            x1["4"].position.X < x1["3"].position.X and
+            x1["4"].position.Y < x1["1"].position.Y,
+            "X1: bottom-view pin order differs from SiTime POD-35 Rev A")
     print("PCB-MAIN layout-candidate audit: PASS")
     print(f"components={len(expected_on_board)} holes=4 nets={len(expected_nets)} layers=6")
     print(f"provisional_footprints={len(provisional)} "

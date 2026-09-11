@@ -3,7 +3,7 @@
   "board": "PCB-MAIN",
   "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "23069a2dd5d452505f7d78b09cf3bdf8731c1c99cf0f83954abd75962f69fa73",
+  "generator_sha256": "6ec87c20cbdd19684f6febff52eb723b03b26758b96e72e34372bd5c9c2f08cd",
   "inputs": [
     {
       "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
@@ -95,6 +95,10 @@
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/LT6000_DCB-7.kicad_mod",
       "sha256": "6284c99e8302bd671a8eb20d1e732ed009c708e85892703b54c51b839532e497"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/SiT1552_JE_CSP-4.kicad_mod",
+      "sha256": "f89d41dc8b07610954dff6672c3566eb27c37fe08c90b22b5e6c00c0961d34df"
     }
   ],
   "review_a": "AUTOMATED_SOURCE_NET_AUDIT_AND_KICAD_ERC_PASS_HUMAN_SIGNOFF_PENDING",

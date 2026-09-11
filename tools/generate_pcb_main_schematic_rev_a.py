@@ -41,6 +41,8 @@ CONTROLLED_FOOTPRINTS = (
     "DioneyaMain.pretty" / "STTS22H_UDFN-6L.kicad_mod",
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "LT6000_DCB-7.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "SiT1552_JE_CSP-4.kicad_mod",
 )
 UUID_NAMESPACE = uuid.UUID("224f8048-0668-5a9f-98cb-43f39e0d8d3e")
 
