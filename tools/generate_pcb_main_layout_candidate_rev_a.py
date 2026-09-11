@@ -57,6 +57,8 @@ STANDARD = {
     "USON-10_DQA": ("Package_SON.pretty", "USON-10_2.5x1.0mm_P0.5mm", {}),
     "SOT-23-5_DBV": ("Package_TO_SOT_SMD.pretty", "SOT-23-5", {}),
     "SOD962-2": ("PROJECT", "PESD5V0C1BSF_SOD962-2", {}),
+    "UDFN-6L_2x2mm": ("PROJECT", "STTS22H_UDFN-6L", {}),
+    "DFN-6_DCB_2x3mm": ("PROJECT", "LT6000_DCB-7", {}),
     "0402": None,
     "0603": None,
     "0805": None,
@@ -208,7 +210,12 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
             if logical == set(pins):
                 if directory == "PROJECT":
                     fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
-                    fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", "Nexperia_PESD5V0C1BSF_v3_Fig14")
+                    sources = {
+                        "PESD5V0C1BSF_SOD962-2": "Nexperia_PESD5V0C1BSF_v3_Fig14",
+                        "STTS22H_UDFN-6L": "ST_DS12606_Rev8_Fig10_11",
+                        "LT6000_DCB-7": "ADI_LT6000_600012fa_LTC_DWG_05-08-1715",
+                    }
+                    fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", sources[name])
                 else:
                     fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
                     fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", f"KiCad:{directory}/{name}")

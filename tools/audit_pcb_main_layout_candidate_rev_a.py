@@ -112,12 +112,12 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(provisional, "candidate incorrectly claims every footprint is production-approved")
-    require(len(provisional) == 12, f"unexpected provisional-footprint count: {len(provisional)}")
+    require(len(provisional) == 10, f"unexpected provisional-footprint count: {len(provisional)}")
     require(len(library_pending) == 44,
             f"unexpected KiCad-library review count: {len(library_pending)}")
-    require(manufacturer_controlled == ["D3", "D5"],
+    require(manufacturer_controlled == ["D3", "D5", "U4", "U5"],
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
-    for ref in manufacturer_controlled:
+    for ref in ("D3", "D5"):
         pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
         require(set(pads) == {"1", "2"}, f"{ref}: SOD962 pad set")
         require(abs(pads["1"].position.X + 0.2) < 0.002 and
@@ -126,6 +126,22 @@ def main() -> int:
         for pad in pads.values():
             require(abs(pad.size.X - 0.256) < 0.002 and abs(pad.size.Y - 0.2) < 0.002,
                     f"{ref}: SOD962 land differs from Nexperia Figure 14")
+    u4 = {pad.number: pad for pad in footprints["U4"].pads if pad.number}
+    require(set(u4) == {"1", "2", "3", "4", "5", "6", "EP"}, "U4: UDFN pad set")
+    require(abs(u4["1"].size.X - 0.27) < 0.002 and abs(u4["1"].size.Y - 0.70) < 0.002,
+            "U4: lead land differs from ST Figure 10")
+    require(abs(u4["EP"].size.X - 1.45) < 0.002 and abs(u4["EP"].size.Y - 0.65) < 0.002,
+            "U4: exposed pad differs from ST Figure 10")
+    require(abs(abs(u4["1"].position.Y - u4["6"].position.Y) - 1.08) < 0.002,
+            "U4: row spacing differs from ST Figure 10")
+    u5 = {pad.number: pad for pad in footprints["U5"].pads if pad.number}
+    require(set(u5) == {"1", "2", "3", "4", "5", "6", "EP"}, "U5: DCB pad set")
+    require(abs(u5["1"].size.X - 0.25) < 0.002 and abs(u5["1"].size.Y - 0.70) < 0.002,
+            "U5: lead land differs from LTC drawing 05-08-1715")
+    require(abs(u5["EP"].size.X - 1.35) < 0.002 and abs(u5["EP"].size.Y - 1.65) < 0.002,
+            "U5: exposed pad differs from LTC drawing 05-08-1715")
+    require(abs(abs(u5["1"].position.Y - u5["6"].position.Y) - 2.85) < 0.002,
+            "U5: row spacing differs from LTC drawing 05-08-1715")
     print("PCB-MAIN layout-candidate audit: PASS")
     print(f"components={len(expected_on_board)} holes=4 nets={len(expected_nets)} layers=6")
     print(f"provisional_footprints={len(provisional)} "

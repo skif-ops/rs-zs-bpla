@@ -13,8 +13,8 @@ signed and contains no manufacturing release assertion.
 - Board: 110 x 75 x 1.6 mm, six copper layers, rounded R3 outline, four M3 NPTH holes.
 - Population represented: 247 on-board components plus four mounting holes; 186 native nets.
 - Routing/copper zones: absent.
-- Provisional manufacturer-specific footprints: 12 instances (reduced from 52).
-- Manufacturer-drawing controlled project-local footprints: 2 instances (`D3`, `D5`).
+- Provisional manufacturer-specific footprints: 10 instances (reduced from 52).
+- Manufacturer-drawing controlled project-local footprints: 4 instances (`D3`, `D5`, `U4`, `U5`).
 - KiCad library patterns pending drawing review: 44 instances.
 - Production pogo groups: 5 controlled footprints, 31 bottom pads verified from MAIN-AUTH-011.
 - Footprint disposition register: `hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md`.
@@ -25,7 +25,7 @@ signed and contains no manufacturing release assertion.
 - [x] Component and net sets match the reviewed schematic authority.
 - [x] Locked connector/module anchors and rotations match MAIN-AUTH-011.
 - [x] Six-layer count, thickness, outline and mounting pattern are represented.
-- [ ] All 12 provisional instances are replaced from controlled manufacturer drawings.
+- [ ] All 10 provisional instances are replaced from controlled manufacturer drawings.
 - [ ] All 44 KiCad-derived instances are approved against the applicable component drawings.
 - [ ] Placement is collision-free and every courtyard/height/service zone passes.
 - [ ] RF, power, PDM, USB and SIM routing is complete.

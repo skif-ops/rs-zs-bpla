@@ -3,7 +3,7 @@
   "board": "PCB-MAIN",
   "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "0c7058367d7e520a6fdf12e98371d69d709de6e81312eee1773ae5bbe195e7cf",
+  "generator_sha256": "23069a2dd5d452505f7d78b09cf3bdf8731c1c99cf0f83954abd75962f69fa73",
   "inputs": [
     {
       "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
@@ -59,7 +59,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "07c2fad67d34ceb14c414a9bd05c8d6dd7951848696af44e58845e1fa48e43e3"
+      "sha256": "495d5c7f4f760468e5949c41089e0037fc0babad1637acc71f6911c1d4788d48"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -87,6 +87,14 @@
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/PESD5V0C1BSF_SOD962-2.kicad_mod",
       "sha256": "eee737e3ea2c4b9af01d0d022f2a7bf5a66c0a080513965dc11ccfc078d3a112"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/STTS22H_UDFN-6L.kicad_mod",
+      "sha256": "d3421087f45b39626defa0608f8fd269f02033f4c4b7ff15bb708af18b573a93"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/LT6000_DCB-7.kicad_mod",
+      "sha256": "6284c99e8302bd671a8eb20d1e732ed009c708e85892703b54c51b839532e497"
     }
   ],
   "review_a": "AUTOMATED_SOURCE_NET_AUDIT_AND_KICAD_ERC_PASS_HUMAN_SIGNOFF_PENDING",
