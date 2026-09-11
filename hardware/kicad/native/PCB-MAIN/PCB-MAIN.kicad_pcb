@@ -940,7 +940,7 @@
         )
       )
     )
-    (zone (net 0) (net_name "") (layer "*.Cu") (tstamp ae51edde-d9d8-56a1-9161-ca429181410d) (hatch full 0.508)
+    (zone (net 0) (net_name "") (layers "*.Cu") (tstamp ae51edde-d9d8-56a1-9161-ca429181410d) (hatch full 0.508)
       (connect_pads (clearance 0))
       (min_thickness 0.254) (filled_areas_thickness no)
       (keepout (tracks not_allowed) (vias not_allowed) (pads not_allowed ) (copperpour not_allowed) (footprints not_allowed))

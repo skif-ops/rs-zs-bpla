@@ -185,7 +185,15 @@ def materialize(source: Path, destination: Path) -> None:
             filename, drawing = CONTROLLED[ref]
             footprint = replace(footprint, ref, filename, drawing)
             found.add(ref)
-            rendered[ref] = footprint.to_sexpr(indent=2, layerInFirstLine=True).rstrip("\n")
+            rendered_footprint = footprint.to_sexpr(
+                indent=2, layerInFirstLine=True
+            ).rstrip("\n")
+            # kiutils serializes a one-item wildcard layer list as singular
+            # ``(layer "*.Cu")``.  KiCad requires the plural ``layers`` form
+            # for wildcard zone scopes even when the list has one token.
+            rendered[ref] = rendered_footprint.replace(
+                '(layer "*.Cu")', '(layers "*.Cu")'
+            )
     if found != set(CONTROLLED):
         raise RuntimeError(f"controlled reference set mismatch: {sorted(found)}")
     spans = [span for span in footprint_spans(board_text) if span[2] in CONTROLLED]
