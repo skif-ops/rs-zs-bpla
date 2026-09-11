@@ -3,7 +3,7 @@
   "board": "PCB-MAIN",
   "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "6dd92c7d12ac7b2c7cad7f308488b320672d1d57e01683899567fc68ccbb4f3f",
+  "generator_sha256": "d1a4c8a0bdf81a1243fbfa10d369ec0f8cbdad21f611c1bbf862079551e1172c",
   "inputs": [
     {
       "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
@@ -59,7 +59,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "89758918f6c7e96089e97efc0c96127e13fcf0f91db5b497f7afd68b66b58c00"
+      "sha256": "d95883230904eaacb9648564aa3312bc8da04f511245a549eeb570d17f8e9edf"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -75,7 +75,7 @@
     },
     {
       "path": "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv",
-      "sha256": "cd46488781a249239f66b26b02f08390be08c07128d9432b646c72d71e485579"
+      "sha256": "4c59bec888aca4ffd9babb1aaf326ba76a33617a029c6357994c6a32c7bfd7ac"
     }
   ],
   "component_count": 248,
@@ -91,6 +91,14 @@
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Hirose_U.FL-R-SMT-1.kicad_mod",
       "sha256": "3a5029441591fb1ea9974d5450449593fb8f374d88dd749d9dce0e5d28ff32ae"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/ST_LIS2DW12_LGA-12L.kicad_mod",
+      "sha256": "71613d02186e56ce03941c394acbea3404e705758c56bee149b452e70d701be8"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Raytac_MDBT50Q-P1MV2.kicad_mod",
+      "sha256": "f19787598f9c1d2e892b3d3850804f5e56ba25dde8daccbba842bab4854bca44"
     },
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/PESD5V0C1BSF_SOD962-2.kicad_mod",

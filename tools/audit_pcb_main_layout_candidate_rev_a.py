@@ -116,13 +116,13 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(not provisional, f"manufacturer-specific provisional footprints remain: {provisional}")
-    require(len(library_pending) == 36,
+    require(len(library_pending) == 34,
             f"unexpected KiCad-library review count: {len(library_pending)}")
     require(library_verified == ["J11", "J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4"],
             f"unexpected drawing-verified KiCad set: {library_verified}")
     require(manufacturer_controlled == ["D3", "D5", "FL1", "J10", "J12", "J13", "J6",
-                                        "J7", "J8", "J9", "J_PWR", "U10", "U4", "U5",
-                                        "U8", "U9", "X1"],
+                                        "J7", "J8", "J9", "J_PWR", "U10", "U11", "U3",
+                                        "U4", "U5", "U8", "U9", "X1"],
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
 
     register_rows = list(csv.DictReader(FOOTPRINT_REVIEW.open(encoding="utf-8", newline="")))
@@ -154,7 +154,8 @@ def main() -> int:
             "register pending references differ from board")
     require(registered_by_status.get("DRAWING_VERIFIED", set()) == set(library_verified),
             "register verified references differ from board")
-    require(registered_by_status.get("REPLACED_PROJECT_CONTROLLED", set()) == {"J8", "J9", "J10"},
+    require(registered_by_status.get("REPLACED_PROJECT_CONTROLLED", set()) ==
+            {"J8", "J9", "J10", "U3", "U11"},
             "register project-controlled replacement set differs from board")
 
     # U.FL copper matches the Hirose mounting pattern.  The manufacturer metal
@@ -188,6 +189,97 @@ def main() -> int:
         }
         require(actual_paste == expected_paste,
                 f"{ref}: apertures differ from Hirose recommended metal mask")
+
+    # LIS2DW12 DS11811 Rev 9 defines 0.275 x 0.250 mm package pads on
+    # 0.5 mm pitch.  TN0018 Rev 8 adds 0.1 mm to each PCB-land dimension,
+    # 0.1 mm to each mask-opening dimension, and allows 70-90% paste area.
+    expected_u3 = {
+        "1": (-0.7625, -0.75, 0.375, 0.350),
+        "2": (-0.7625, -0.25, 0.375, 0.350),
+        "3": (-0.7625, 0.25, 0.375, 0.350),
+        "4": (-0.7625, 0.75, 0.375, 0.350),
+        "5": (-0.25, 0.7625, 0.350, 0.375),
+        "6": (0.25, 0.7625, 0.350, 0.375),
+        "7": (0.7625, 0.75, 0.375, 0.350),
+        "8": (0.7625, 0.25, 0.375, 0.350),
+        "9": (0.7625, -0.25, 0.375, 0.350),
+        "10": (0.7625, -0.75, 0.375, 0.350),
+        "11": (0.25, -0.7625, 0.350, 0.375),
+        "12": (-0.25, -0.7625, 0.350, 0.375),
+    }
+    u3 = {pad.number: pad for pad in footprints["U3"].pads if pad.number}
+    require(set(u3) == set(expected_u3), "U3: LIS2DW12 LGA-12L pad set")
+    for number, (x, y, sx, sy) in expected_u3.items():
+        pad = u3[number]
+        require(abs(pad.position.X - x) < 0.002 and abs(pad.position.Y - y) < 0.002 and
+                abs(pad.size.X - sx) < 0.002 and abs(pad.size.Y - sy) < 0.002,
+                f"U3.{number}: copper differs from DS11811/TN0018 land rule")
+        require(pad.layers == ["F.Cu", "F.Paste", "F.Mask"] and
+                abs(float(pad.solderMaskMargin or 0.0) - 0.05) < 0.002 and
+                abs(float(pad.solderPasteMarginRatio or 0.0) + 0.10) < 0.002,
+                f"U3.{number}: mask/stencil differs from TN0018 Rev 8")
+
+    # Raytac's 230606 Eagle library and solder-pad drawing define all 61
+    # 0.6 x 0.4 mm lands.  Rotated lands are normalized by swapping stored
+    # X/Y sizes; the independent coordinates below do not import the generator.
+    expected_u11 = {
+        1: (-4.65, -3.75, .6, .4), 2: (-4.65, -2.65, .6, .4),
+        3: (-4.65, -1.85, .6, .4), 4: (-4.65, -.25, .6, .4),
+        5: (-3.75, .15, .6, .4), 6: (-4.65, .55, .6, .4),
+        7: (-3.75, .95, .6, .4), 8: (-4.65, 1.35, .6, .4),
+        9: (-3.75, 1.75, .6, .4), 10: (-4.65, 2.15, .6, .4),
+        11: (-3.75, 2.55, .6, .4), 12: (-4.65, 2.95, .6, .4),
+        13: (-3.75, 3.35, .6, .4), 14: (-4.65, 3.75, .6, .4),
+        34: (4.65, 6.15, .6, .4), 35: (4.65, 5.35, .6, .4),
+        36: (3.75, 4.95, .6, .4), 37: (4.65, 4.55, .6, .4),
+        38: (3.75, 4.15, .6, .4), 39: (4.65, 3.75, .6, .4),
+        40: (3.75, 3.35, .6, .4), 41: (4.65, 2.95, .6, .4),
+        42: (3.75, 2.55, .6, .4), 43: (3.75, 1.75, .6, .4),
+        44: (4.65, 1.35, .6, .4), 45: (3.75, .95, .6, .4),
+        46: (4.65, .55, .6, .4), 47: (3.75, .15, .6, .4),
+        48: (4.65, -.25, .6, .4), 49: (3.75, -.65, .6, .4),
+        50: (3.75, -1.45, .6, .4), 51: (4.65, -1.85, .6, .4),
+        52: (3.75, -2.25, .6, .4), 53: (4.65, -2.65, .6, .4),
+        54: (3.75, -3.05, .6, .4), 55: (4.65, -3.75, .6, .4),
+    }
+    for number, x in zip((15, 16, 17, 18, 20, 22, 24, 26, 28, 30, 31, 32, 33),
+                         (-4.8, -4.0, -3.2, -2.4, -1.6, -.8, 0, .8, 1.6, 2.4, 3.2, 4.0, 4.8)):
+        expected_u11[number] = (x, 7.15, .4, .6)
+    for number, x in zip((19, 21, 23, 25, 27, 29), (-2.0, -1.2, -.4, .4, 1.2, 2.0)):
+        expected_u11[number] = (x, 6.25, .4, .6)
+    for number, x in zip(range(56, 62), (-2.0, -1.2, -.4, .4, 1.2, 2.0)):
+        expected_u11[number] = (x, .55, .4, .6)
+    u11 = {int(pad.number): pad for pad in footprints["U11"].pads if pad.number}
+    require(set(u11) == set(range(1, 62)), "U11: MDBT50Q 61-pad set")
+    for number, (x, y, sx, sy) in expected_u11.items():
+        pad = u11[number]
+        require(abs(pad.position.X - x) < 0.002 and abs(pad.position.Y - y) < 0.002 and
+                abs(pad.size.X - sx) < 0.002 and abs(pad.size.Y - sy) < 0.002 and
+                pad.layers == ["F.Cu", "F.Paste", "F.Mask"],
+                f"U11.{number}: land differs from Raytac 230606 pattern")
+
+    def zone_bounds(zone) -> tuple[float, float, float, float]:
+        points = zone.polygons[0].coordinates
+        return (round(min(point.X for point in points), 3),
+                round(min(point.Y for point in points), 3),
+                round(max(point.X for point in points), 3),
+                round(max(point.Y for point in points), 3))
+
+    u11_zones = footprints["U11"].zones
+    require(len(u11_zones) == 2, "U11: expected feed and antenna keepouts")
+    u11_by_layers = {tuple(zone.layers): zone for zone in u11_zones}
+    require(set(u11_by_layers) == {("F.Cu",), ("*.Cu",)},
+            "U11: keepout layer scopes differ from Raytac control")
+    require(zone_bounds(u11_by_layers[("F.Cu",)]) == (105.0, 32.95, 106.2, 34.55),
+            "U11: top-layer feed keepout differs from Raytac layout")
+    require(zone_bounds(u11_by_layers[("*.Cu",)]) == (106.2, 30.0, 110.0, 40.5),
+            "U11: all-layer 3.8 x 10.5 mm antenna keepout differs from Raytac layout")
+    for zone in u11_zones:
+        settings = zone.keepoutSettings
+        require(settings is not None and
+                {settings.tracks, settings.vias, settings.pads,
+                 settings.copperpour, settings.footprints} == {"not_allowed"},
+                "U11: antenna rule area permits copper or components")
 
     for ref in ("J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4"):
         logical = {pad.number: pad for pad in footprints[ref].pads if pad.number}

@@ -41,7 +41,7 @@ KICAD_DRAWING_VERIFIED = {
 
 STANDARD = {
     "LQFP100_14x14": ("Package_QFP.pretty", "LQFP-100_14x14mm_P0.5mm"),
-    "LGA-12_2x2mm": ("Package_LGA.pretty", "LGA-12_2x2mm_P0.5mm"),
+    "LGA-12_2x2mm": ("PROJECT", "ST_LIS2DW12_LGA-12L", {}),
     "TSSOP-24_PW": ("Package_SO.pretty", "TSSOP-24_4.4x6.5mm_P0.5mm"),
     "TSSOP-14_PW": ("Package_SO.pretty", "TSSOP-14_4.4x5mm_P0.65mm"),
     "SOT23": ("Package_TO_SOT_SMD.pretty", "SOT-23"),
@@ -63,7 +63,7 @@ STANDARD = {
         {"MP": ""},
     ),
     "nRF52840_SMD_10.5x15.5_61P_PCB_antenna": (
-        "RF_Module.pretty", "Raytac_MDBT50Q", {},
+        "PROJECT", "Raytac_MDBT50Q-P1MV2", {},
     ),
     "USON-10_DQA": ("Package_SON.pretty", "USON-10_2.5x1.0mm_P0.5mm", {}),
     "SOT-23-5_DBV": ("Package_TO_SOT_SMD.pretty", "SOT-23-5", {}),
@@ -244,6 +244,8 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                         "Molex_504050-0291_PicoLock-2": "Molex_5040500000-SD_PSD001_RevB_RecommendedPattern",
                         "GCT_MEM2052-00-195-00-A": "GCT_MEM2052_RevA3_RecommendedPCBLayout",
                         "Hirose_U.FL-R-SMT-1": "Hirose_U.FL_CAT_2026-08-01_PCB_and_MetalMask",
+                        "ST_LIS2DW12_LGA-12L": "ST_DS11811_Rev9_and_TN0018_Rev8_LGA-12L_Pattern",
+                        "Raytac_MDBT50Q-P1MV2": "Raytac_MDBT50Q_Footprint_Design_Guide_230606",
                     }
                     fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", sources[name])
                 elif (directory, name) in KICAD_DRAWING_VERIFIED:

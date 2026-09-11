@@ -38,12 +38,35 @@ def rect(lines: list[str], x1: float, y1: float, x2: float, y2: float,
 
 
 def smd(lines: list[str], number: str, x: float, y: float, sx: float, sy: float,
-        shape: str = "rect") -> None:
+        shape: str = "rect", mask_margin: float | None = None,
+        paste_ratio: float | None = None) -> None:
     extra = " (roundrect_rratio 0.2)" if shape == "roundrect" else ""
+    if mask_margin is not None:
+        extra += f" (solder_mask_margin {mask_margin:g})"
+    if paste_ratio is not None:
+        extra += f" (solder_paste_margin_ratio {paste_ratio:g})"
     lines.append(
         f'  (pad "{number}" smd {shape} (at {x:g} {y:g}) (size {sx:g} {sy:g}) '
         f'(layers "F.Cu" "F.Paste" "F.Mask"){extra})'
     )
+
+
+def keepout(lines: list[str], layers: str,
+            points: list[tuple[float, float]]) -> None:
+    layer_token = f'(layer "{layers}")' if layers == "F.Cu" else f'(layers "{layers}")'
+    lines.extend([
+        f'  (zone (net 0) (net_name "") {layer_token} (hatch full 0.508)',
+        '    (connect_pads (clearance 0))',
+        '    (min_thickness 0.254) (filled_areas_thickness no)',
+        '    (keepout (tracks not_allowed) (vias not_allowed) (pads not_allowed) '
+        '(copperpour not_allowed) (footprints not_allowed))',
+        '    (fill (thermal_gap 0.508) (thermal_bridge_width 0.508))',
+        '    (polygon',
+        '      (pts',
+    ])
+    for x, y in points:
+        lines.append(f'        (xy {x:g} {y:g})')
+    lines.extend(['      )', '    )', '  )'])
 
 
 def ufl() -> str:
@@ -80,6 +103,100 @@ def ufl() -> str:
             f'  (pad "" smd rect (at {x:g} {y:g}) (size {sx:g} {sy:g}) '
             '(layers "F.Paste"))'
         )
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
+def lis2dw12() -> str:
+    name = "ST_LIS2DW12_LGA-12L"
+    lines = header(
+        name,
+        "ST LIS2DW12 LGA-12L; DS11811 Rev 9 package geometry and TN0018 Rev 8 PCB/stencil rules",
+        "ST LIS2DW12 LGA-12L 2x2mm 0.5mm",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -1.6) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 1.6) (layer "F.Fab") hide'
+    rect(lines, -1.25, -1.25, 1.25, 1.25, "F.CrtYd", 0.05)
+    rect(lines, -1.00, -1.00, 1.00, 1.00, "F.Fab", 0.10)
+
+    # DS11811 defines 0.275 x 0.250 mm package pads on 0.5 mm pitch.
+    # TN0018 adds 0.1 mm to both PCB-land dimensions because the package-pad
+    # spacing is greater than 0.2 mm.  A 0.05 mm mask margin gives the required
+    # land + 0.1 mm opening; -10% per stencil dimension gives 81% land area,
+    # inside ST's 70-90% recommendation.
+    pads = {
+        "1": (-0.7625, -0.75, 0.375, 0.350),
+        "2": (-0.7625, -0.25, 0.375, 0.350),
+        "3": (-0.7625, 0.25, 0.375, 0.350),
+        "4": (-0.7625, 0.75, 0.375, 0.350),
+        "5": (-0.25, 0.7625, 0.350, 0.375),
+        "6": (0.25, 0.7625, 0.350, 0.375),
+        "7": (0.7625, 0.75, 0.375, 0.350),
+        "8": (0.7625, 0.25, 0.375, 0.350),
+        "9": (0.7625, -0.25, 0.375, 0.350),
+        "10": (0.7625, -0.75, 0.375, 0.350),
+        "11": (0.25, -0.7625, 0.350, 0.375),
+        "12": (-0.25, -0.7625, 0.350, 0.375),
+    }
+    for number, (x, y, sx, sy) in pads.items():
+        smd(lines, number, x, y, sx, sy, mask_margin=0.05, paste_ratio=-0.10)
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
+def raytac_mdbt50q_p1mv2() -> str:
+    name = "Raytac_MDBT50Q-P1MV2"
+    lines = header(
+        name,
+        "Raytac MDBT50Q-P1MV2; Footprint Design Guide 230606 solder-pad and RF-layout control",
+        "Raytac MDBT50Q-P1MV2 nRF52840 PCB antenna",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at -6 0 270) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 8.95) (layer "F.Fab") hide'
+    rect(lines, -5.75, -8.25, 5.75, 8.25, "F.CrtYd", 0.05)
+    rect(lines, -5.25, -7.75, 5.25, 7.75, "F.Fab", 0.10)
+
+    # Manufacturer Eagle library 230606, normalized to KiCad's mirrored-Y
+    # local convention.  Rotated package-edge lands are represented by swapped
+    # X/Y sizes so the pure-kiutils materializer need not retain local angles.
+    pads: dict[int, tuple[float, float, float, float]] = {
+        1: (-4.65, -3.75, .6, .4), 2: (-4.65, -2.65, .6, .4),
+        3: (-4.65, -1.85, .6, .4), 4: (-4.65, -.25, .6, .4),
+        5: (-3.75, .15, .6, .4), 6: (-4.65, .55, .6, .4),
+        7: (-3.75, .95, .6, .4), 8: (-4.65, 1.35, .6, .4),
+        9: (-3.75, 1.75, .6, .4), 10: (-4.65, 2.15, .6, .4),
+        11: (-3.75, 2.55, .6, .4), 12: (-4.65, 2.95, .6, .4),
+        13: (-3.75, 3.35, .6, .4), 14: (-4.65, 3.75, .6, .4),
+        34: (4.65, 6.15, .6, .4), 35: (4.65, 5.35, .6, .4),
+        36: (3.75, 4.95, .6, .4), 37: (4.65, 4.55, .6, .4),
+        38: (3.75, 4.15, .6, .4), 39: (4.65, 3.75, .6, .4),
+        40: (3.75, 3.35, .6, .4), 41: (4.65, 2.95, .6, .4),
+        42: (3.75, 2.55, .6, .4), 43: (3.75, 1.75, .6, .4),
+        44: (4.65, 1.35, .6, .4), 45: (3.75, .95, .6, .4),
+        46: (4.65, .55, .6, .4), 47: (3.75, .15, .6, .4),
+        48: (4.65, -.25, .6, .4), 49: (3.75, -.65, .6, .4),
+        50: (3.75, -1.45, .6, .4), 51: (4.65, -1.85, .6, .4),
+        52: (3.75, -2.25, .6, .4), 53: (4.65, -2.65, .6, .4),
+        54: (3.75, -3.05, .6, .4), 55: (4.65, -3.75, .6, .4),
+    }
+    for number, x in zip((15, 16, 17, 18, 20, 22, 24, 26, 28, 30, 31, 32, 33),
+                         (-4.8, -4.0, -3.2, -2.4, -1.6, -.8, 0, .8, 1.6, 2.4, 3.2, 4.0, 4.8)):
+        pads[number] = (x, 7.15, .4, .6)
+    for number, x in zip((19, 21, 23, 25, 27, 29), (-2.0, -1.2, -.4, .4, 1.2, 2.0)):
+        pads[number] = (x, 6.25, .4, .6)
+    for number, x in zip(range(56, 62), (-2.0, -1.2, -.4, .4, 1.2, 2.0)):
+        pads[number] = (x, .55, .4, .6)
+    if set(pads) != set(range(1, 62)):
+        raise RuntimeError("Raytac coordinate contract must define exactly 61 pads")
+    for number in range(1, 62):
+        smd(lines, str(number), *pads[number])
+
+    # The 1.6 x 1.2 mm top-layer feed keepout and the minimum 10.5 x 3.8 mm
+    # all-copper antenna keepout are taken from the Raytac RF layout.  U11's
+    # locked -90 degree placement maps the latter to board x=106.20..110.00,
+    # y=30.00..40.50 mm.
+    keepout(lines, "F.Cu", [(-2.3, -3.95), (-.7, -3.95), (-.7, -2.75), (-2.3, -2.75)])
+    keepout(lines, "*.Cu", [(-5.25, -7.75), (5.25, -7.75), (5.25, -3.95), (-5.25, -3.95)])
     lines.append(")")
     return "\n".join(lines) + "\n"
 
@@ -206,6 +323,8 @@ def microfit() -> str:
 
 GENERATORS = {
     "Hirose_U.FL-R-SMT-1.kicad_mod": ufl,
+    "ST_LIS2DW12_LGA-12L.kicad_mod": lis2dw12,
+    "Raytac_MDBT50Q-P1MV2.kicad_mod": raytac_mdbt50q_p1mv2,
     "Quectel_BG95-M3_LGA-102.kicad_mod": bg95,
     "GCT_MEM2052-00-195-00-A.kicad_mod": microsd,
     "Molex_504050-0291_PicoLock-2.kicad_mod": picolock,

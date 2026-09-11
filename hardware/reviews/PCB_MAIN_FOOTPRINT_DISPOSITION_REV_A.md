@@ -15,9 +15,9 @@ machine-readable 19-pattern inventory is
 |---|---:|---|
 | Project-generated chip passives and mechanical holes | 188 | Placement use only; passive geometry remains subject to assembly-house rules |
 | MAIN-AUTH-011 controlled pogo groups | 5 | 31 bottom pads verified by coordinate, diameter, mask and layer |
-| Manufacturer-drawing controlled patterns | 17 | Fourteen previously controlled instances plus three Hirose U.FL instances controlled locally |
+| Manufacturer-drawing controlled patterns | 19 | Fourteen previously controlled instances plus five reviewed instances controlled locally |
 | Drawing-verified KiCad library patterns | 5 | Four Molex 504050-0691 instances and one GCT USB4105 instance have exact audited geometry |
-| KiCad library patterns pending drawing review | 36 | Exact pad-number contract passes; drawing review remains open |
+| KiCad library patterns pending drawing review | 34 | Exact pad-number contract passes; drawing review remains open |
 | Provisional manufacturer-specific patterns | 0 | Closed for the current component set; any substitution reopens this gate |
 
 Earlier controlled updates reduced the provisional set from 52 to 4 instances by
@@ -85,6 +85,28 @@ dated 2026-08-01. The other reviewed sources are the official
 [Molex 504050-0691 drawing](https://www.molex.com/pdm_docs/sd/5040500691_sd.pdf)
 and [GCT USB4105 drawing](https://gct.co/files/drawings/usb4105.pdf).
 
+The second KiCad-library review tranche closes `U3` and `U11` as project-local
+manufacturer-controlled patterns. For `U3`, the KiCad copper already matches
+the `LIS2DW12` LGA-12L package and ST's land rule: 0.275 x 0.250 mm package
+pads become 0.375 x 0.350 mm PCB lands at 0.5 mm pitch. The library footprint
+did not implement TN0018's larger solder-mask opening or its 70-90% stencil-area
+rule. The local pattern therefore uses a 0.05 mm mask expansion and -10% paste
+ratio per dimension, yielding 81% paste area. Sources are
+[DS11811 Rev 9](https://www.st.com/resource/en/datasheet/lis2dw12.pdf), SHA-256
+`5208623aa91c63a33be0e930518c20f5210c4eb76932350f35369687ae1d0dd5`, and
+[TN0018 Rev 8](https://www.st.com/resource/en/technical_note/tn0018-surface-mounting-guidelines-for-mems-sensors-in-an-lga-package-stmicroelectronics.pdf),
+SHA-256 `4dc419fabe93f7f0b1ee5730967ed74573aa0dc91188cf88749ce10d5ab4a34e`.
+
+For `U11`, all 61 KiCad copper/paste/mask lands match Raytac's 230606 Eagle
+library and solder-pad drawing. The embedded library rule area, however, began
+at board X=106.25 mm, 0.05 mm inside the frozen X=106.20 mm antenna boundary.
+The local `Raytac_MDBT50Q-P1MV2` pattern corrects the all-layer no-copper/no-via/
+no-pad/no-component region to exactly 3.80 x 10.50 mm through the east board
+edge, while retaining the 1.60 x 1.20 mm F.Cu feed keepout. The official
+[Footprint Design Guide 230606](https://www.raytac.com/document/act.php?act=1&index_id=30)
+archive is SHA-256
+`7ff6f11d0185a9db73c7140a4fe7e70b31615539916e60d5c27af8178f9f9fc2`.
+
 ## Remaining provisional references
 
 None.
@@ -95,7 +117,7 @@ Review B remains `OPEN`. No Gerber, drill, paste, pick-and-place, IPC-356 or
 STEP output from this candidate may be released until:
 
 1. the zero-provisional footprint state remains true for the release commit;
-2. the remaining 36 KiCad-derived instances pass drawing-to-pattern review;
+2. the remaining 34 KiCad-derived instances pass drawing-to-pattern review;
 3. placement and routing audits pass in KiCad 9;
 4. DRC reports zero blocker/critical and zero unrouted items;
 5. RA-003 layout evidence is complete; physical droop and ripple measurement

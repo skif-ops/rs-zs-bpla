@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import math
 import re
 import tempfile
 import uuid
@@ -51,6 +52,14 @@ CONTROLLED = {
     "U8": (
         "Quectel_BG95-M3_LGA-102.kicad_mod",
         "Quectel_BG95_HW_Design_V1.8_Figure46",
+    ),
+    "U3": (
+        "ST_LIS2DW12_LGA-12L.kicad_mod",
+        "ST_DS11811_Rev9_and_TN0018_Rev8_LGA-12L_Pattern",
+    ),
+    "U11": (
+        "Raytac_MDBT50Q-P1MV2.kicad_mod",
+        "Raytac_MDBT50Q_Footprint_Design_Guide_230606",
     ),
 }
 
@@ -114,6 +123,18 @@ def replace(old: Footprint, ref: str, filename: str, source: str) -> Footprint:
             pad.net = copy.deepcopy(authority.net)
             pad.pinFunction = authority.pinFunction
             pad.pinType = authority.pinType
+    # Footprint-file rule areas use local coordinates, while the KiCad board
+    # syntax stores their polygon points in board coordinates.  Transform them
+    # explicitly so the pure-kiutils materializer matches pcbnew placement.
+    angle = math.radians(float(new.position.angle or 0.0))
+    cosine, sine = math.cos(angle), math.sin(angle)
+    for zone_index, zone in enumerate(new.zones):
+        zone.tstamp = str(uuid.uuid5(UUID_NAMESPACE, f"PCB-MAIN:{ref}:zone:{zone_index}"))
+        for polygon in [*zone.polygons, *zone.filledPolygons]:
+            for point in polygon.coordinates:
+                local_x, local_y = point.X, point.Y
+                point.X = round(new.position.X + local_x * cosine + local_y * sine, 6)
+                point.Y = round(new.position.Y - local_x * sine + local_y * cosine, 6)
     return new
 
 

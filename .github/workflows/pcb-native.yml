@@ -255,6 +255,8 @@ jobs:
           assert board.GetCopperLayerCount() == 6, "unexpected PCB-MAIN copper-layer count"
           expected = {
               "Hirose_U.FL-R-SMT-1": 6,
+              "ST_LIS2DW12_LGA-12L": 12,
+              "Raytac_MDBT50Q-P1MV2": 61,
               "Quectel_BG95-M3_LGA-102": 102,
               "GCT_MEM2052-00-195-00-A": 13,
               "Molex_504050-0291_PicoLock-2": 4,

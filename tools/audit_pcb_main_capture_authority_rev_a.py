@@ -624,6 +624,7 @@ def main() -> None:
         "DEVICE_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
         "a898962af314ca90719eadba732e7f5fd42a1c48c4bfd283062c403d1c27bfd0",
         "5208623aa91c63a33be0e930518c20f5210c4eb76932350f35369687ae1d0dd5",
+        "4dc419fabe93f7f0b1ee5730967ed74573aa0dc91188cf88749ce10d5ab4a34e",
         "3f6937595517c4f738021037942e7d19d5b7c84cfe4e9b7e8635fcc06ff783fe",
         "factory default `QE=1`",
         "4-byte addressing mode",
