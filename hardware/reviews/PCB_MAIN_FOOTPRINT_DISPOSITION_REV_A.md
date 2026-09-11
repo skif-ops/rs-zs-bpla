@@ -13,11 +13,11 @@ item still requires drawing-to-land-pattern review before Review B can pass.
 |---|---:|---|
 | Project-generated chip passives and mechanical holes | 183 | Placement use only; passive geometry remains subject to assembly-house rules |
 | MAIN-AUTH-011 controlled pogo groups | 5 | 31 bottom pads verified by coordinate, diameter, mask and layer |
-| Manufacturer-drawing controlled patterns | 8 | Nexperia SOD962-2, ST UDFN-6L, ADI DCB, SiTime JE CSP, u-blox MAX-M10S, Ebyte E22-M22S and Abracon 1109-5 geometry controlled locally |
+| Manufacturer-drawing controlled patterns | 10 | Nexperia SOD962-2, ST UDFN-6L, ADI DCB, SiTime JE CSP, u-blox MAX-M10S, Ebyte E22-M22S, Abracon 1109-5 and two TE 2336582-1 instances controlled locally |
 | KiCad library patterns | 44 | Exact pad-number contract passes; drawing review remains open |
-| Provisional manufacturer-specific patterns | 6 | Blocker; replace from controlled manufacturer drawing |
+| Provisional manufacturer-specific patterns | 4 | Blocker; replace from controlled manufacturer drawing |
 
-The controlled updates reduced the provisional set from 52 to 6 instances by
+The controlled updates reduced the provisional set from 52 to 4 instances by
 using existing KiCad patterns for U.FL, USB4105, SOT-666, SOD-523, DRT-3,
 DRL-6, KEMET 7343-31, Raytac MDBT50Q, Molex 504050-0691, TI DQA USON-10
 and TI DBV SOT-23-5. The five pogo
@@ -44,17 +44,22 @@ electrical authority for this build.
 `FL1` is controlled from the Abracon ABSES5AF-L100KM data sheet revised
 2025-09-16. Its five 0.30 x 0.25 mm lands retain the asymmetric A/B/C/D/E
 orientation and 0.375/0.250 mm coordinate contract of the recommended pattern.
+`J6` and `J7` share one project-local pattern controlled from TE customer drawing
+C-2336582 Rev A2. The six SIM contacts retain the drawing's 1.27 mm pitch and
+0.80 x 1.14 mm lands; card detect, two shell lands and six 1.20 mm NPTH locating
+holes are represented separately. Logical pin aliases follow the signed dual-SIM
+authority without altering the manufacturer geometry.
 
 ## Remaining provisional references
 
-`J12`, `J13`, `J6`, `J7`, `J_PWR`, `U8`.
+`J12`, `J13`, `J_PWR`, `U8`.
 
 ## Release rule
 
 Review B remains `OPEN`. No Gerber, drill, paste, pick-and-place, IPC-356 or
 STEP output from this candidate may be released until:
 
-1. all 6 provisional instances are replaced by controlled land patterns;
+1. all 4 provisional instances are replaced by controlled land patterns;
 2. the 44 KiCad-derived instances pass drawing-to-pattern review;
 3. placement and routing audits pass in KiCad 9;
 4. DRC reports zero blocker/critical and zero unrouted items;

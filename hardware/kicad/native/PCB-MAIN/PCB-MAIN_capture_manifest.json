@@ -3,7 +3,7 @@
   "board": "PCB-MAIN",
   "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "20d6c31db8b90f8ef8949636d08d61b29931f2ff2d828f6f9702a51418104bdb",
+  "generator_sha256": "12219d164cd73015ff1278f9234b658516cbc3682bab7dc088034d516c5c913f",
   "inputs": [
     {
       "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
@@ -111,6 +111,10 @@
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Abracon_ABSES5AF_1109-5.kicad_mod",
       "sha256": "23c81edc4a45c68fcea775040f042dc2101888c80a00e1a37e5a04b56f7ccc90"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/TE_2336582-1_NanoSIM.kicad_mod",
+      "sha256": "8457cd97b6a147c3a8f2a3968f407aa6fe8af41063b6f4ff6a0275817ac9e8e3"
     }
   ],
   "review_a": "AUTOMATED_SOURCE_NET_AUDIT_AND_KICAD_ERC_PASS_HUMAN_SIGNOFF_PENDING",

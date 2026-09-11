@@ -112,10 +112,10 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(provisional, "candidate incorrectly claims every footprint is production-approved")
-    require(len(provisional) == 6, f"unexpected provisional-footprint count: {len(provisional)}")
+    require(len(provisional) == 4, f"unexpected provisional-footprint count: {len(provisional)}")
     require(len(library_pending) == 44,
             f"unexpected KiCad-library review count: {len(library_pending)}")
-    require(manufacturer_controlled == ["D3", "D5", "FL1", "U10", "U4", "U5", "U9", "X1"],
+    require(manufacturer_controlled == ["D3", "D5", "FL1", "J6", "J7", "U10", "U4", "U5", "U9", "X1"],
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
     for ref in ("D3", "D5"):
         pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
@@ -202,6 +202,31 @@ def main() -> int:
         require(abs(fl1[number].position.X - x) < 0.002 and
                 abs(fl1[number].position.Y - y) < 0.002,
                 f"FL1.{number}: coordinate differs from Abracon recommended pattern")
+    for ref in ("J6", "J7"):
+        pads = [pad for pad in footprints[ref].pads if pad.number]
+        logical = {pad.number for pad in pads}
+        require(logical == {"1", "2", "3", "4", "5", "6", "7", "SHIELD"},
+                f"{ref}: TE 2336582-1 logical pad set")
+        contacts = {pad.number: pad for pad in pads if pad.number not in {"SHIELD"}}
+        expected_x = {"3": -3.175, "6": -1.905, "2": -0.635,
+                      "5": 0.635, "1": 1.905, "4": 3.175}
+        for number, x in expected_x.items():
+            pad = contacts[number]
+            require(abs(pad.position.X - x) < 0.002 and abs(pad.position.Y + 5.43) < 0.002,
+                    f"{ref}.{number}: contact coordinate differs from TE C-2336582 A2")
+            require(abs(pad.size.X - 0.80) < 0.002 and abs(pad.size.Y - 1.14) < 0.002,
+                    f"{ref}.{number}: contact land differs from TE C-2336582 A2")
+        cd = contacts["7"]
+        require(abs(cd.position.X - 4.125) < 0.002 and abs(cd.size.X - 0.95) < 0.002,
+                f"{ref}.7: card-detect land differs from TE C-2336582 A2")
+        shield = [pad for pad in pads if pad.number == "SHIELD"]
+        require(len(shield) == 2 and all(abs(pad.size.X - 1.50) < 0.002 and
+                                        abs(pad.size.Y - 2.10) < 0.002 for pad in shield),
+                f"{ref}: shell lands differ from TE C-2336582 A2")
+        holes = [pad for pad in footprints[ref].pads if not pad.number]
+        require(len(holes) == 6 and all(abs(pad.size.X - 1.20) < 0.002 and
+                                        abs(pad.size.Y - 1.20) < 0.002 for pad in holes),
+                f"{ref}: tooling-hole pattern differs from TE C-2336582 A2")
     print("PCB-MAIN layout-candidate audit: PASS")
     print(f"components={len(expected_on_board)} holes=4 nets={len(expected_nets)} layers=6")
     print(f"provisional_footprints={len(provisional)} "

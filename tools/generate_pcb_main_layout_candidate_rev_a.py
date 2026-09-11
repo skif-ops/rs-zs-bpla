@@ -63,6 +63,7 @@ STANDARD = {
     "LCC-18_9.7x10.1mm": ("PROJECT", "u-blox_MAX-M10S_LCC-18", {}),
     "SMD_20x14_22P_1.27mm": ("PROJECT", "Ebyte_E22-M22S_Castellated-22", {}),
     "1109-5": ("PROJECT", "Abracon_ABSES5AF_1109-5", {}),
+    "TE_NanoSIM_H1.37": ("PROJECT", "TE_2336582-1_NanoSIM", {}),
     "0402": None,
     "0603": None,
     "0805": None,
@@ -222,6 +223,7 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                         "u-blox_MAX-M10S_LCC-18": "u-blox_UBX-20053088_R05_Fig30_Table44",
                         "Ebyte_E22-M22S_Castellated-22": "Ebyte_E22-M_v1.2_2026-02-06_Section3.2",
                         "Abracon_ABSES5AF_1109-5": "Abracon_ABSES5AF-L100KM_2025-09-16_LandPattern",
+                        "TE_2336582-1_NanoSIM": "TE_C-2336582_RevA2_RecommendedPCBLayout",
                     }
                     fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", sources[name])
                 else:
