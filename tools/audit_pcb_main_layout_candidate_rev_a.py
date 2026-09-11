@@ -112,10 +112,10 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(provisional, "candidate incorrectly claims every footprint is production-approved")
-    require(len(provisional) == 7, f"unexpected provisional-footprint count: {len(provisional)}")
+    require(len(provisional) == 6, f"unexpected provisional-footprint count: {len(provisional)}")
     require(len(library_pending) == 44,
             f"unexpected KiCad-library review count: {len(library_pending)}")
-    require(manufacturer_controlled == ["D3", "D5", "U10", "U4", "U5", "U9", "X1"],
+    require(manufacturer_controlled == ["D3", "D5", "FL1", "U10", "U4", "U5", "U9", "X1"],
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
     for ref in ("D3", "D5"):
         pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
@@ -189,6 +189,19 @@ def main() -> int:
             "U10: 1.27/5.57 mm pitch contract drift")
     require(u10["21"].position.X < 0 and abs(u10["21"].position.Y - 7.73) < 0.002,
             "U10: ANT pad 21 position differs from Ebyte section 3.2")
+    fl1 = {pad.number: pad for pad in footprints["FL1"].pads if pad.number}
+    require(set(fl1) == {"A", "B", "C", "D", "E"}, "FL1: 1109-5 pad set")
+    for number, pad in fl1.items():
+        require(abs(pad.size.X - 0.300) < 0.002 and abs(pad.size.Y - 0.250) < 0.002,
+                f"FL1.{number}: land size differs from Abracon recommended pattern")
+    expected_fl1 = {
+        "A": (0.375, 0.250), "B": (0.000, 0.250), "C": (-0.375, 0.000),
+        "D": (0.000, -0.250), "E": (0.375, -0.250),
+    }
+    for number, (x, y) in expected_fl1.items():
+        require(abs(fl1[number].position.X - x) < 0.002 and
+                abs(fl1[number].position.Y - y) < 0.002,
+                f"FL1.{number}: coordinate differs from Abracon recommended pattern")
     print("PCB-MAIN layout-candidate audit: PASS")
     print(f"components={len(expected_on_board)} holes=4 nets={len(expected_nets)} layers=6")
     print(f"provisional_footprints={len(provisional)} "
