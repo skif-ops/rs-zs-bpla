@@ -46,6 +46,13 @@ STANDARD = {
     "SOT-9X3_DRT": ("Package_TO_SOT_SMD.pretty", "Texas_DRT-3", {}),
     "SOT-5X3-6_DRL": ("Package_TO_SOT_SMD.pretty", "Texas_R-PDSO-N6_DRL-6", {}),
     "7343-31": ("Capacitor_Tantalum_SMD.pretty", "CP_EIA-7343-31_Kemet-D", {}),
+    "Pico-Lock_1.5_1x06_Right_Angle": (
+        "Connector_Molex.pretty", "Molex_Pico-Lock_504050-0691_1x06-1MP_P1.50mm_Horizontal",
+        {"MP": ""},
+    ),
+    "nRF52840_SMD_10.5x15.5_61P_PCB_antenna": (
+        "RF_Module.pretty", "Raytac_MDBT50Q", {},
+    ),
     "0402": None,
     "0603": None,
     "0805": None,
@@ -102,7 +109,7 @@ def passive_footprint(board: pcbnew.BOARD, package: str) -> pcbnew.FOOTPRINT:
         pad.SetShape(pcbnew.PAD_SHAPE_ROUNDRECT)
         pad.SetRoundRectRadiusRatio(0.2)
         pad.SetSize(mm(max(0.55, length / 2), width))
-        pad.SetPosition(mm(x, 0))
+        pad.SetPosition(mm(x, 0)); pad.SetPos0(mm(x, 0))
         layers = pcbnew.LSET()
         for layer in (pcbnew.F_Cu, pcbnew.F_Paste, pcbnew.F_Mask):
             layers.AddLayer(layer)
@@ -137,13 +144,45 @@ def generic_footprint(board: pcbnew.BOARD, pin_numbers: list[str], package: str)
         if str(number) != "1":
             pad.SetRoundRectRadiusRatio(0.2)
         pad.SetSize(mm(0.55, 0.9))
-        pad.SetPosition(mm(x, y))
+        pad.SetPosition(mm(x, y)); pad.SetPos0(mm(x, y))
         layers = pcbnew.LSET()
         for layer in (pcbnew.F_Cu, pcbnew.F_Paste, pcbnew.F_Mask):
             layers.AddLayer(layer)
         pad.SetLayerSet(layers)
         fp.Add(pad)
     return fp
+
+
+def fixture_footprint(board: pcbnew.BOARD, ref: str, pins: list[str]) -> tuple[pcbnew.FOOTPRINT, tuple[float, float]]:
+    """Build the exact bottom-side pogo group frozen by MAIN-AUTH-011."""
+    rows = []
+    with MECH.open(encoding="utf-8", newline="") as stream:
+        for row in csv.DictReader(stream):
+            if row["Feature_Type"] == "TEST_PAD" and row["RefDes"] == ref:
+                rows.append(row)
+    rows.sort(key=lambda row: int(row["Contact"]))
+    if [row["Contact"] for row in rows] != pins:
+        raise RuntimeError(f"{ref}: MAIN-AUTH-011 pogo contact mismatch")
+    x0, y0 = float(rows[0]["X_mm"]), float(rows[0]["Y_mm"])
+    fp = pcbnew.FOOTPRINT(board)
+    fp.SetLayer(pcbnew.B_Cu)
+    fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "CONTROLLED_MAIN_AUTH_011_POGO_PATTERN")
+    fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", str(MECH.relative_to(ROOT)))
+    for row in rows:
+        pad = pcbnew.PAD(fp)
+        pad.SetNumber(row["Contact"])
+        pad.SetAttribute(pcbnew.PAD_ATTRIB_SMD)
+        pad.SetShape(pcbnew.PAD_SHAPE_CIRCLE)
+        pad.SetSize(mm(1.70, 1.70))
+        relative = mm(float(row["X_mm"]) - x0, float(row["Y_mm"]) - y0)
+        pad.SetPosition(relative); pad.SetPos0(relative)
+        pad.SetLocalSolderMaskMargin(pcbnew.FromMM(0.20))
+        layers = pcbnew.LSET()
+        for layer in (pcbnew.B_Cu, pcbnew.B_Mask):
+            layers.AddLayer(layer)
+        pad.SetLayerSet(layers)
+        fp.Add(pad)
+    return fp, (x0, y0)
 
 
 def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew.FOOTPRINT:
@@ -251,7 +290,11 @@ def main() -> int:
             continue
         pin_numbers = list(component["pins"])
         mpn, package = props(component)
-        fp = load_footprint(board, package, pin_numbers)
+        fixture_position = None
+        if package.startswith("POGO_FIXTURE_"):
+            fp, fixture_position = fixture_footprint(board, ref, pin_numbers)
+        else:
+            fp = load_footprint(board, package, pin_numbers)
         fp.SetReference(ref); fp.SetValue(mpn); fp.SetProperty("DIONEA_PACKAGE", package)
         fp.SetProperty("DIONEA_POPULATION", component["population"])
         if component["population"] == "DNP":
@@ -262,7 +305,9 @@ def main() -> int:
         for number, pin in component["pins"].items():
             if pin["native"] != "NC":
                 by_number[number].SetNet(net_items[pin["native"]])
-        if ref in fixed:
+        if fixture_position is not None:
+            x, y = fixture_position; angle = 0
+        elif ref in fixed:
             x, y, angle = fixed[ref]
         elif ref in preferred:
             x, y, angle = preferred[ref]

@@ -59,7 +59,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "ddea40f103bc1701122f4825ecd2998458a2639a98074562b65ec838457ae974"
+      "sha256": "0cb5097708f2d9627677062baf5c886ac3ee408036f8a752f948a512b948de3d"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",

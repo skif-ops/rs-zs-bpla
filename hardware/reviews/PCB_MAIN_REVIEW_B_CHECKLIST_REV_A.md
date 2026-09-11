@@ -13,8 +13,9 @@ signed and contains no manufacturing release assertion.
 - Board: 110 x 75 x 1.6 mm, six copper layers, rounded R3 outline, four M3 NPTH holes.
 - Population represented: 247 on-board components plus four mounting holes; 186 native nets.
 - Routing/copper zones: absent.
-- Provisional manufacturer-specific footprints: 32 instances (reduced from 52).
-- KiCad library patterns pending drawing review: 31 instances.
+- Provisional manufacturer-specific footprints: 22 instances (reduced from 52).
+- KiCad library patterns pending drawing review: 36 instances.
+- Production pogo groups: 5 controlled footprints, 31 bottom pads verified from MAIN-AUTH-011.
 - Footprint disposition register: `hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md`.
 
 ## 2. Review-B gate
@@ -23,8 +24,8 @@ signed and contains no manufacturing release assertion.
 - [x] Component and net sets match the reviewed schematic authority.
 - [x] Locked connector/module anchors and rotations match MAIN-AUTH-011.
 - [x] Six-layer count, thickness, outline and mounting pattern are represented.
-- [ ] All 32 provisional instances are replaced from controlled manufacturer drawings.
-- [ ] All 31 KiCad-derived instances are approved against the applicable component drawings.
+- [ ] All 22 provisional instances are replaced from controlled manufacturer drawings.
+- [ ] All 36 KiCad-derived instances are approved against the applicable component drawings.
 - [ ] Placement is collision-free and every courtyard/height/service zone passes.
 - [ ] RF, power, PDM, USB and SIM routing is complete.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.

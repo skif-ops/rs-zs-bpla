@@ -59,6 +59,9 @@ def main() -> int:
         for number, pin in wanted.items():
             actual = pads[number].net.name if pads[number].net is not None else "NC"
             require(actual == pin["native"], f"{ref}.{number}: {actual} != {pin['native']}")
+        if len(pads) > 1:
+            positions = {(round(pad.position.X, 4), round(pad.position.Y, 4)) for pad in pads.values()}
+            require(len(positions) > 1, f"{ref}: all logical pads collapse onto one point")
 
     locked: dict[str, tuple[float, float, float]] = {}
     with MECH.open(encoding="utf-8", newline="") as stream:
@@ -72,6 +75,29 @@ def main() -> int:
         actual_angle = float(fp.position.angle or 0.0) % 360.0
         require(abs(actual_angle - angle) < 0.01, f"{ref}: locked orientation drift")
 
+    pogo_rows: dict[str, list[dict[str, str]]] = {}
+    with MECH.open(encoding="utf-8", newline="") as stream:
+        for row in csv.DictReader(stream):
+            if row["Feature_Type"] == "TEST_PAD":
+                pogo_rows.setdefault(row["RefDes"], []).append(row)
+    for ref, rows in pogo_rows.items():
+        fp = footprints[ref]
+        require(fp.layer == "B.Cu", f"{ref}: fixture footprint is not bottom-side")
+        pads = {pad.number: pad for pad in fp.pads if pad.number}
+        for row in rows:
+            pad = pads[row["Contact"]]
+            actual_x = fp.position.X + pad.position.X
+            actual_y = fp.position.Y + pad.position.Y
+            require(abs(actual_x - float(row["X_mm"])) < 0.002 and
+                    abs(actual_y - float(row["Y_mm"])) < 0.002,
+                    f"{ref}.{row['Contact']}: pogo coordinate drift")
+            require(abs(pad.size.X - 1.70) < 0.002 and abs(pad.size.Y - 1.70) < 0.002,
+                    f"{ref}.{row['Contact']}: pogo copper must be 1.70 mm")
+            require(pad.layers == ["B.Cu", "B.Mask"],
+                    f"{ref}.{row['Contact']}: pogo layers must exclude paste")
+            require(abs(float(pad.solderMaskMargin or 0.0) - 0.20) < 0.002,
+                    f"{ref}.{row['Contact']}: pogo mask opening must be 2.10 mm")
+
     edge_items = [item for item in board.graphicItems if getattr(item, "layer", None) == "Edge.Cuts"]
     require(len(edge_items) == 8, f"rounded outline must contain 4 lines + 4 arcs, got {len(edge_items)}")
     require(len(board.traceItems) == 0 and len(board.zones) == 0,
@@ -83,8 +109,8 @@ def main() -> int:
                              if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                              "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
     require(provisional, "candidate incorrectly claims every footprint is production-approved")
-    require(len(provisional) == 32, f"unexpected provisional-footprint count: {len(provisional)}")
-    require(len(library_pending) == 31,
+    require(len(provisional) == 22, f"unexpected provisional-footprint count: {len(provisional)}")
+    require(len(library_pending) == 36,
             f"unexpected KiCad-library review count: {len(library_pending)}")
     print("PCB-MAIN layout-candidate audit: PASS")
     print(f"components={len(expected_on_board)} holes=4 nets={len(expected_nets)} layers=6")
