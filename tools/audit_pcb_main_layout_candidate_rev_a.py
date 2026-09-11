@@ -108,14 +108,29 @@ def main() -> int:
     library_pending = sorted(ref for ref, fp in footprints.items()
                              if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                              "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
+    manufacturer_controlled = sorted(ref for ref, fp in footprints.items()
+                                     if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
+                                     "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(provisional, "candidate incorrectly claims every footprint is production-approved")
-    require(len(provisional) == 14, f"unexpected provisional-footprint count: {len(provisional)}")
+    require(len(provisional) == 12, f"unexpected provisional-footprint count: {len(provisional)}")
     require(len(library_pending) == 44,
             f"unexpected KiCad-library review count: {len(library_pending)}")
+    require(manufacturer_controlled == ["D3", "D5"],
+            f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
+    for ref in manufacturer_controlled:
+        pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
+        require(set(pads) == {"1", "2"}, f"{ref}: SOD962 pad set")
+        require(abs(pads["1"].position.X + 0.2) < 0.002 and
+                abs(pads["2"].position.X - 0.2) < 0.002,
+                f"{ref}: SOD962 pitch must be 0.4 mm")
+        for pad in pads.values():
+            require(abs(pad.size.X - 0.256) < 0.002 and abs(pad.size.Y - 0.2) < 0.002,
+                    f"{ref}: SOD962 land differs from Nexperia Figure 14")
     print("PCB-MAIN layout-candidate audit: PASS")
     print(f"components={len(expected_on_board)} holes=4 nets={len(expected_nets)} layers=6")
     print(f"provisional_footprints={len(provisional)} "
           f"kicad_library_review_pending={len(library_pending)} "
+          f"manufacturer_controlled={len(manufacturer_controlled)} "
           "routing=ABSENT review_b=BLOCKED")
     return 0
 

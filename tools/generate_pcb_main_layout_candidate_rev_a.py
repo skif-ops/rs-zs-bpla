@@ -26,6 +26,7 @@ from audit_pcb_main_native_schematic_rev_a import expected_components  # noqa: E
 OUT = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 MECH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 KICAD_FP = Path(os.environ.get("DIONEYA_KICAD_FOOTPRINT_DIR", "/usr/share/kicad/footprints"))
+PROJECT_FP = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
 
 STANDARD = {
     "LQFP100_14x14": ("Package_QFP.pretty", "LQFP-100_14x14mm_P0.5mm"),
@@ -55,6 +56,7 @@ STANDARD = {
     ),
     "USON-10_DQA": ("Package_SON.pretty", "USON-10_2.5x1.0mm_P0.5mm", {}),
     "SOT-23-5_DBV": ("Package_TO_SOT_SMD.pretty", "SOT-23-5", {}),
+    "SOD962-2": ("PROJECT", "PESD5V0C1BSF_SOD962-2", {}),
     "0402": None,
     "0603": None,
     "0805": None,
@@ -194,7 +196,8 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
     if entry:
         # Older entries intentionally remain two-tuples for compatibility.
         directory, name, aliases = (*entry, {}) if len(entry) == 2 else entry
-        fp = pcbnew.FootprintLoad(str(KICAD_FP / directory), name)
+        source_dir = PROJECT_FP if directory == "PROJECT" else KICAD_FP / directory
+        fp = pcbnew.FootprintLoad(str(source_dir), name)
         if fp is not None:
             for pad in fp.Pads():
                 if pad.GetNumber() in aliases:
@@ -203,8 +206,12 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
             # logical pins.  Duplicate shell pads deliberately share a name.
             logical = {p.GetNumber() for p in fp.Pads() if p.GetNumber()}
             if logical == set(pins):
-                fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
-                fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", f"KiCad:{directory}/{name}")
+                if directory == "PROJECT":
+                    fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
+                    fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", "Nexperia_PESD5V0C1BSF_v3_Fig14")
+                else:
+                    fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
+                    fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", f"KiCad:{directory}/{name}")
                 return fp
     return generic_footprint(board, pins, package)
 

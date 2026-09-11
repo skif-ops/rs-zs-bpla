@@ -34,6 +34,10 @@ from kiutils.symbol import Symbol, SymbolLib, SymbolPin
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "PCB-MAIN.kicad_sch"
+CONTROLLED_FOOTPRINTS = (
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "PESD5V0C1BSF_SOD962-2.kicad_mod",
+)
 UUID_NAMESPACE = uuid.UUID("224f8048-0668-5a9f-98cb-43f39e0d8d3e")
 
 PIN_AUTHORITIES = (
@@ -517,6 +521,7 @@ def write_project_libraries(schematic: Schematic, project_dir: Path) -> tuple[Pa
     fp_table = project_dir / "fp-lib-table"
     fp_table.write_text('''(fp_lib_table
   (version 7)
+  (lib (name "DioneyaMain")(type "KiCad")(uri "${KIPRJMOD}/libs/DioneyaMain.pretty")(options "")(descr "Controlled PCB-MAIN manufacturer land patterns"))
   (lib (name "Capacitor_SMD")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Capacitor_SMD.pretty")(options "")(descr "KiCad capacitor SMD footprints"))
   (lib (name "Inductor_SMD")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Inductor_SMD.pretty")(options "")(descr "KiCad inductor SMD footprints"))
   (lib (name "Resistor_SMD")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Resistor_SMD.pretty")(options "")(descr "KiCad resistor SMD footprints"))
@@ -587,6 +592,10 @@ def build(output: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
         "symbol_library_sha256": sha256(symbol_library),
         "symbol_library_table_sha256": sha256(sym_table),
         "footprint_library_table_sha256": sha256(fp_table),
+        "controlled_footprints": [
+            {"path": str(path.relative_to(ROOT)), "sha256": sha256(path)}
+            for path in CONTROLLED_FOOTPRINTS
+        ],
         "review_a": "AUTOMATED_SOURCE_NET_AUDIT_AND_KICAD_ERC_PASS_HUMAN_SIGNOFF_PENDING",
         "review_b": "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
     }
