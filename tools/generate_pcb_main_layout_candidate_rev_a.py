@@ -60,6 +60,7 @@ STANDARD = {
     "UDFN-6L_2x2mm": ("PROJECT", "STTS22H_UDFN-6L", {}),
     "DFN-6_DCB_2x3mm": ("PROJECT", "LT6000_DCB-7", {}),
     "CSP-4_1.5x0.8mm": ("PROJECT", "SiT1552_JE_CSP-4", {}),
+    "LCC-18_9.7x10.1mm": ("PROJECT", "u-blox_MAX-M10S_LCC-18", {}),
     "0402": None,
     "0603": None,
     "0805": None,
@@ -216,6 +217,7 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                         "STTS22H_UDFN-6L": "ST_DS12606_Rev8_Fig10_11",
                         "LT6000_DCB-7": "ADI_LT6000_600012fa_LTC_DWG_05-08-1715",
                         "SiT1552_JE_CSP-4": "SiTime_SiT1552_Rev1.43_POD-35_RevA",
+                        "u-blox_MAX-M10S_LCC-18": "u-blox_UBX-20053088_R05_Fig30_Table44",
                     }
                     fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", sources[name])
                 else:

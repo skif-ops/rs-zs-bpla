@@ -112,10 +112,10 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(provisional, "candidate incorrectly claims every footprint is production-approved")
-    require(len(provisional) == 9, f"unexpected provisional-footprint count: {len(provisional)}")
+    require(len(provisional) == 8, f"unexpected provisional-footprint count: {len(provisional)}")
     require(len(library_pending) == 44,
             f"unexpected KiCad-library review count: {len(library_pending)}")
-    require(manufacturer_controlled == ["D3", "D5", "U4", "U5", "X1"],
+    require(manufacturer_controlled == ["D3", "D5", "U4", "U5", "U9", "X1"],
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
     for ref in ("D3", "D5"):
         pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
@@ -157,6 +157,22 @@ def main() -> int:
             x1["4"].position.X < x1["3"].position.X and
             x1["4"].position.Y < x1["1"].position.Y,
             "X1: bottom-view pin order differs from SiTime POD-35 Rev A")
+    u9 = {pad.number: pad for pad in footprints["U9"].pads if pad.number}
+    require(set(u9) == {str(n) for n in range(1, 19)}, "U9: LCC-18 pad set")
+    for number, pad in u9.items():
+        expected_width = 0.70 if number in {"1", "9", "10", "18"} else 0.80
+        require(abs(pad.size.X - expected_width) < 0.002 and abs(pad.size.Y - 1.80) < 0.002,
+                f"U9.{number}: copper land differs from u-blox Table 44")
+        require(pad.layers == ["F.Cu", "F.Mask"],
+                f"U9.{number}: copper/mask layers must leave process-specific paste open")
+    require(abs(u9["1"].position.Y - 4.75) < 0.002 and
+            abs(u9["10"].position.Y + 4.75) < 0.002,
+            "U9: row spacing differs from u-blox Figure 30")
+    require(all(abs(abs(u9[str(n)].position.X - u9[str(n + 1)].position.X) - 1.10) < 0.002
+                for n in range(1, 9)), "U9: lower-row pitch differs from u-blox Figure 30")
+    require(u9["1"].position.X < u9["9"].position.X and
+            u9["10"].position.X > u9["18"].position.X,
+            "U9: pin order differs from u-blox Figure 30")
     print("PCB-MAIN layout-candidate audit: PASS")
     print(f"components={len(expected_on_board)} holes=4 nets={len(expected_nets)} layers=6")
     print(f"provisional_footprints={len(provisional)} "
