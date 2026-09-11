@@ -51,6 +51,14 @@ CONTROLLED_FOOTPRINTS = (
     "DioneyaMain.pretty" / "Abracon_ABSES5AF_1109-5.kicad_mod",
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "TE_2336582-1_NanoSIM.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "Quectel_BG95-M3_LGA-102.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "GCT_MEM2052-00-195-00-A.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "Molex_504050-0291_PicoLock-2.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "Molex_43045-1202_MicroFit-12_RA.kicad_mod",
 )
 UUID_NAMESPACE = uuid.UUID("224f8048-0668-5a9f-98cb-43f39e0d8d3e")
 
@@ -590,6 +598,10 @@ def build(output: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
     project.write_text(json.dumps(project_payload(), indent=2) + "\n", encoding="utf-8")
     symbol_library, sym_table, fp_table = write_project_libraries(schematic, output.parent)
     manifest = output.parent / "PCB-MAIN_capture_manifest.json"
+    capture_status = json.loads(CAPTURE_STATUS.read_text(encoding="utf-8"))
+    review_a = capture_status["review_a"]
+    if not review_a["complete"] or review_a["status"] != "PASS":
+        raise RuntimeError("PCB-MAIN Review A status is not a signed PASS")
     manifest_payload = {
         "configuration": "EVT-PRE-20 Rev.A",
         "board": "PCB-MAIN",
@@ -610,7 +622,7 @@ def build(output: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
             {"path": str(path.relative_to(ROOT)), "sha256": sha256(path)}
             for path in CONTROLLED_FOOTPRINTS
         ],
-        "review_a": "AUTOMATED_SOURCE_NET_AUDIT_AND_KICAD_ERC_PASS_HUMAN_SIGNOFF_PENDING",
+        "review_a": "SIGNED_PASS_PER_hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
         "review_b": "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
     }
     manifest.write_text(json.dumps(manifest_payload, indent=2) + "\n", encoding="utf-8")

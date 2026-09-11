@@ -63,6 +63,9 @@ on:
       - "tools/verify_pcb_main_passive_support_authority_rev_a.py"
       - "tools/verify_pcb_main_mechanical_placement_authority_rev_a.py"
       - "tools/generate_pcb_main_schematic_rev_a.py"
+      - "tools/generate_pcb_main_manufacturer_footprints_rev_a.py"
+      - "tools/materialize_pcb_main_manufacturer_footprints_rev_a.py"
+      - "tools/audit_pcb_main_layout_candidate_rev_a.py"
       - "tools/audit_pcb_main_native_schematic_rev_a.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
@@ -229,11 +232,38 @@ jobs:
           test -s hardware/kicad/native/PCB-MAIN/sym-lib-table
           test -s hardware/kicad/native/PCB-MAIN/fp-lib-table
           test -s hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.kicad_sym
+          python tools/generate_pcb_main_manufacturer_footprints_rev_a.py --check
+          python tools/materialize_pcb_main_manufacturer_footprints_rev_a.py --check
+          python tools/audit_pcb_main_layout_candidate_rev_a.py
           python tools/generate_pcb_main_schematic_rev_a.py --check
           python tools/audit_pcb_main_native_schematic_rev_a.py \
             --schematic hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch \
             --output artifacts/kicad-native/PCB-MAIN/native_schematic_audit.json \
             --bom-output artifacts/kicad-native/PCB-MAIN/native_schematic_bom.csv
+      - name: Parse PCB-MAIN placement candidate and controlled footprints with KiCad 9
+        run: |
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import pcbnew
+
+          root = Path("hardware/kicad/native/PCB-MAIN")
+          board = pcbnew.LoadBoard(str(root / "PCB-MAIN.kicad_pcb"))
+          assert board is not None, "KiCad failed to parse PCB-MAIN"
+          assert len(board.GetFootprints()) == 251, "unexpected PCB-MAIN footprint count"
+          assert board.GetCopperLayerCount() == 6, "unexpected PCB-MAIN copper-layer count"
+          expected = {
+              "Quectel_BG95-M3_LGA-102": 102,
+              "GCT_MEM2052-00-195-00-A": 13,
+              "Molex_504050-0291_PicoLock-2": 4,
+              "Molex_43045-1202_MicroFit-12_RA": 14,
+          }
+          library = root / "libs/DioneyaMain.pretty"
+          for name, pad_count in expected.items():
+              footprint = pcbnew.FootprintLoad(str(library), name)
+              assert footprint is not None, f"KiCad failed to parse {name}"
+              assert footprint.GetPadCount() == pad_count, f"{name}: pad-count drift"
+          print("PCB-MAIN KiCad 9 native parse: PASS")
+          PY
       - name: Materialize native PCB-PWR schematic
         run: |
           python tools/generate_pcb_pwr_schematic_rev_a.py \

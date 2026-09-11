@@ -3,7 +3,7 @@
   "board": "PCB-MAIN",
   "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "12219d164cd73015ff1278f9234b658516cbc3682bab7dc088034d516c5c913f",
+  "generator_sha256": "7e79393fd7a0cf89aee55c0c2cede1cbf288186da018eb7484a439cb776c2493",
   "inputs": [
     {
       "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
@@ -59,7 +59,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "495d5c7f4f760468e5949c41089e0037fc0babad1637acc71f6911c1d4788d48"
+      "sha256": "da330814e955b8c7e6950e6ff6279d48d9e240373a09a4561acf1aaaa7a54be2"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -115,8 +115,24 @@
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/TE_2336582-1_NanoSIM.kicad_mod",
       "sha256": "8457cd97b6a147c3a8f2a3968f407aa6fe8af41063b6f4ff6a0275817ac9e8e3"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Quectel_BG95-M3_LGA-102.kicad_mod",
+      "sha256": "48780a92b91648b3cafe42922aef9853e85db8bd5e4763e3975a02968f0ff179"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/GCT_MEM2052-00-195-00-A.kicad_mod",
+      "sha256": "7f3368cfb98d68922679433b2c9e96ef129b8976b1fa233df531d60ac049f4bb"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Molex_504050-0291_PicoLock-2.kicad_mod",
+      "sha256": "c0143595ccb60dfca65b822bfb94248ab2b37fb98059d20daf9141034457ac56"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Molex_43045-1202_MicroFit-12_RA.kicad_mod",
+      "sha256": "b495c6001746670a5d37afbb3de9fcf49392fc18e0a72528feccc44b8d276cdb"
     }
   ],
-  "review_a": "AUTOMATED_SOURCE_NET_AUDIT_AND_KICAD_ERC_PASS_HUMAN_SIGNOFF_PENDING",
+  "review_a": "SIGNED_PASS_PER_hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
   "review_b": "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING"
 }

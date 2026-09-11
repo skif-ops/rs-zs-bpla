@@ -64,6 +64,10 @@ STANDARD = {
     "SMD_20x14_22P_1.27mm": ("PROJECT", "Ebyte_E22-M22S_Castellated-22", {}),
     "1109-5": ("PROJECT", "Abracon_ABSES5AF_1109-5", {}),
     "TE_NanoSIM_H1.37": ("PROJECT", "TE_2336582-1_NanoSIM", {}),
+    "LGA-102_23.6x19.9mm": ("PROJECT", "Quectel_BG95-M3_LGA-102", {}),
+    "Micro-Fit_3.0_2x06_Right_Angle": ("PROJECT", "Molex_43045-1202_MicroFit-12_RA", {}),
+    "Pico-Lock_1.5mm_2P_RA_SMT": ("PROJECT", "Molex_504050-0291_PicoLock-2", {}),
+    "microSD_push-push_1.95mm_8P_CD": ("PROJECT", "GCT_MEM2052-00-195-00-A", {}),
     "0402": None,
     "0603": None,
     "0805": None,
@@ -224,6 +228,10 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                         "Ebyte_E22-M22S_Castellated-22": "Ebyte_E22-M_v1.2_2026-02-06_Section3.2",
                         "Abracon_ABSES5AF_1109-5": "Abracon_ABSES5AF-L100KM_2025-09-16_LandPattern",
                         "TE_2336582-1_NanoSIM": "TE_C-2336582_RevA2_RecommendedPCBLayout",
+                        "Quectel_BG95-M3_LGA-102": "Quectel_BG95_HW_Design_V1.8_Figure46",
+                        "Molex_43045-1202_MicroFit-12_RA": "Molex_SD-43045-001_PSD001_RevH1_PCBLayout",
+                        "Molex_504050-0291_PicoLock-2": "Molex_5040500000-SD_PSD001_RevB_RecommendedPattern",
+                        "GCT_MEM2052-00-195-00-A": "GCT_MEM2052_RevA3_RecommendedPCBLayout",
                     }
                     fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", sources[name])
                 else:

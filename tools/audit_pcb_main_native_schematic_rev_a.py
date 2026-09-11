@@ -454,8 +454,14 @@ def main() -> int:
                 })
         bom_sha256 = sha256(args.bom_output)
 
+    capture_status = json.loads(CAPTURE_STATUS.read_text(encoding="utf-8"))
+    review_a = capture_status["review_a"]
+    require(review_a["complete"] is True and review_a["status"] == "PASS",
+            "capture status does not record signed Review A PASS")
+    require(bool(review_a["reviewer"]) and bool(review_a["date"]) and bool(review_a["commit_sha"]),
+            "signed Review A traceability is incomplete")
     report = {
-        "status": "PASS_NATIVE_SOURCE_AND_NET_AUDIT_REVIEW_A_HUMAN_SIGNOFF_PENDING",
+        "status": "PASS_NATIVE_SOURCE_AND_NET_AUDIT_REVIEW_A_SIGNED_PASS",
         "configuration": "EVT-PRE-20 Rev.A",
         "board": "PCB-MAIN",
         "schematic": str(schematic_path.relative_to(ROOT)),
@@ -480,7 +486,10 @@ def main() -> int:
             }
             if args.bom_output else None
         ),
-        "review_a_complete": False,
+        "review_a_complete": True,
+        "review_a_reviewer": review_a["reviewer"],
+        "review_a_date": review_a["date"],
+        "review_a_commit_sha": review_a["commit_sha"],
         "manufacturing_release": False,
     }
     if args.output:
@@ -504,7 +513,8 @@ def main() -> int:
     )
     if args.bom_output:
         print(f"schematic-derived BOM: {args.bom_output} rows={len(instances)} sha256={bom_sha256}")
-    print("Review A human sign-off, layout, Review B, DFM and physical EVT remain pending")
+    print(f"Review A signed PASS by {review_a['reviewer']} on {review_a['date']}; "
+          "layout, Review B, DFM and physical EVT remain pending")
     return 0
 
 

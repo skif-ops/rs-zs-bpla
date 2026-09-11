@@ -111,11 +111,11 @@ def main() -> int:
     manufacturer_controlled = sorted(ref for ref, fp in footprints.items()
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
-    require(provisional, "candidate incorrectly claims every footprint is production-approved")
-    require(len(provisional) == 4, f"unexpected provisional-footprint count: {len(provisional)}")
+    require(not provisional, f"manufacturer-specific provisional footprints remain: {provisional}")
     require(len(library_pending) == 44,
             f"unexpected KiCad-library review count: {len(library_pending)}")
-    require(manufacturer_controlled == ["D3", "D5", "FL1", "J6", "J7", "U10", "U4", "U5", "U9", "X1"],
+    require(manufacturer_controlled == ["D3", "D5", "FL1", "J12", "J13", "J6", "J7",
+                                        "J_PWR", "U10", "U4", "U5", "U8", "U9", "X1"],
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
     for ref in ("D3", "D5"):
         pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
@@ -227,6 +227,118 @@ def main() -> int:
         require(len(holes) == 6 and all(abs(pad.size.X - 1.20) < 0.002 and
                                         abs(pad.size.Y - 1.20) < 0.002 for pad in holes),
                 f"{ref}: tooling-hole pattern differs from TE C-2336582 A2")
+
+    j12_pads = [pad for pad in footprints["J12"].pads if pad.number]
+    require({pad.number for pad in j12_pads} ==
+            {"1", "2", "3", "4", "5", "6", "7", "8", "CD", "SHIELD"},
+            "J12: MEM2052 logical pad set")
+    j12_contacts = {pad.number: pad for pad in j12_pads if pad.number != "SHIELD"}
+    expected_j12 = {
+        "1": (1.905, 3.635, 0.80, 1.50), "2": (0.805, 3.235, 0.80, 1.50),
+        "3": (-0.295, 3.635, 0.80, 1.50), "4": (-1.395, 3.835, 0.80, 1.50),
+        "5": (-2.495, 3.635, 0.80, 1.50), "6": (-3.595, 3.835, 0.80, 1.50),
+        "7": (-4.695, 3.635, 0.80, 1.50), "8": (-5.795, 3.635, 0.80, 1.50),
+        "CD": (-3.585, -7.595, 1.00, 1.04),
+    }
+    for number, (x, y, sx, sy) in expected_j12.items():
+        pad = j12_contacts[number]
+        require(abs(pad.position.X - x) < 0.002 and abs(pad.position.Y - y) < 0.002 and
+                abs(pad.size.X - sx) < 0.002 and abs(pad.size.Y - sy) < 0.002,
+                f"J12.{number}: land differs from GCT MEM2052 drawing")
+    expected_j12_shield = {
+        (-6.575, 5.925, 1.40, 1.90), (-5.035, -7.225, 1.20, 1.40),
+        (0.715, -7.225, 1.30, 1.40), (6.575, 6.925, 1.40, 1.90),
+    }
+    actual_j12_shield = {
+        (round(pad.position.X, 3), round(pad.position.Y, 3),
+         round(pad.size.X, 2), round(pad.size.Y, 2))
+        for pad in j12_pads if pad.number == "SHIELD"
+    }
+    require(actual_j12_shield == expected_j12_shield,
+            "J12: shell lands differ from GCT MEM2052 drawing")
+
+    j13 = {pad.number: pad for pad in footprints["J13"].pads if pad.number}
+    require(set(j13) == {"1", "2"}, "J13: Pico-Lock logical pad set")
+    for number, x in {"1": -0.75, "2": 0.75}.items():
+        pad = j13[number]
+        require(abs(pad.position.X - x) < 0.002 and abs(pad.position.Y + 2.795) < 0.002 and
+                abs(pad.size.X - 0.60) < 0.002 and abs(pad.size.Y - 1.00) < 0.002,
+                f"J13.{number}: land differs from Molex 504050-0291 drawing")
+    j13_shell = [pad for pad in footprints["J13"].pads if not pad.number]
+    require(len(j13_shell) == 2 and
+            {round(pad.position.X, 3) for pad in j13_shell} == {-3.355, 3.355} and
+            all(abs(pad.position.Y - 2.395) < 0.002 and
+                abs(pad.size.X - 1.25) < 0.002 and abs(pad.size.Y - 1.80) < 0.002
+                for pad in j13_shell),
+            "J13: shell lands differ from Molex 504050-0291 drawing")
+
+    jpwr = {pad.number: pad for pad in footprints["J_PWR"].pads if pad.number}
+    require(set(jpwr) == {str(number) for number in range(1, 13)},
+            "J_PWR: Micro-Fit logical pad set")
+    for number in range(1, 13):
+        pad = jpwr[str(number)]
+        expected_x = 3.0 * ((number - 1) % 6)
+        expected_y = 0.0 if number <= 6 else 3.0
+        require(abs(pad.position.X - expected_x) < 0.002 and
+                abs(pad.position.Y - expected_y) < 0.002 and
+                abs(pad.size.X - 1.50) < 0.002 and abs(pad.size.Y - 1.50) < 0.002 and
+                pad.drill is not None and abs(pad.drill.diameter - 1.02) < 0.002,
+                f"J_PWR.{number}: hole/land differs from Molex 43045-1202 drawing")
+    jpwr_holes = [pad for pad in footprints["J_PWR"].pads if not pad.number]
+    require(len(jpwr_holes) == 2 and
+            {(round(pad.position.X, 2), round(pad.position.Y, 2)) for pad in jpwr_holes} ==
+            {(2.15, -4.32), (12.85, -4.32)} and
+            all(pad.type == "np_thru_hole" and pad.drill is not None and
+                abs(pad.drill.diameter - 3.00) < 0.002 for pad in jpwr_holes),
+            "J_PWR: locator holes differ from Molex 43045-1202 drawing")
+
+    u8 = {pad.number: pad for pad in footprints["U8"].pads if pad.number}
+    require(set(u8) == {str(number) for number in range(1, 103)}, "U8: BG95 pad set")
+    outer_expected: dict[int, tuple[float, float, float, float]] = {}
+    left_y = [-9.7 + 1.1 * index for index in range(10)] + [1.9 + 1.1 * index for index in range(8)]
+    outer_expected.update({number: (-9.15, y, 1.10, 0.70)
+                           for number, y in enumerate(left_y, 1)})
+    top_x = [-7.45 + 1.1 * index for index in range(6)] + [0.55 + 1.1 * index for index in range(7)]
+    outer_expected.update({number: (x, 11.00, 0.70, 1.10)
+                           for number, x in enumerate(top_x, 19)})
+    right_y = [9.6 - 1.1 * index for index in range(8)] + [0.2 - 1.1 * index for index in range(10)]
+    outer_expected.update({number: (9.15, y, 1.10, 0.70)
+                           for number, y in enumerate(right_y, 32)})
+    bottom_x = [7.15 - 1.1 * index for index in range(7)] + [-1.95 - 1.1 * index for index in range(6)]
+    outer_expected.update({number: (x, -11.00, 0.70, 1.10)
+                           for number, x in enumerate(bottom_x, 50)})
+    inner_expected = {
+        63: (-5.95, -4.25), 64: (-5.95, -2.55), 65: (-5.95, -0.85),
+        66: (-5.95, 0.85), 67: (-5.95, 2.55), 68: (-5.95, 4.25),
+        69: (-2.55, 7.65), 70: (-0.85, 7.65), 71: (0.85, 7.65), 72: (2.55, 7.65),
+        73: (5.95, 4.25), 74: (5.95, 2.55), 75: (5.95, 0.85),
+        76: (5.95, -0.85), 77: (5.95, -2.55), 78: (5.95, -4.25),
+        79: (2.55, -7.65), 80: (0.85, -7.65), 81: (-0.85, -7.65), 82: (-2.55, -7.65),
+        83: (-4.25, -4.25), 84: (-4.25, -2.55), 85: (-4.25, -0.85),
+        86: (-4.25, 0.85), 87: (-4.25, 2.55), 88: (-4.25, 4.25),
+        89: (-2.55, 5.95), 90: (-0.85, 5.95), 91: (0.85, 5.95), 92: (2.55, 5.95),
+        93: (4.25, 4.25), 94: (4.25, 2.55), 95: (4.25, 0.85),
+        96: (4.25, -0.85), 97: (4.25, -2.55), 98: (4.25, -4.25),
+        99: (2.55, -5.95), 100: (0.85, -5.95), 101: (-0.85, -5.95), 102: (-2.55, -5.95),
+    }
+    for number, (x, y, sx, sy) in outer_expected.items():
+        pad = u8[str(number)]
+        require(abs(pad.position.X - x) < 0.002 and abs(pad.position.Y - y) < 0.002 and
+                abs(pad.size.X - sx) < 0.002 and abs(pad.size.Y - sy) < 0.002,
+                f"U8.{number}: outer land differs from Quectel Figure 46")
+    for number, (x, y) in inner_expected.items():
+        pad = u8[str(number)]
+        require(abs(pad.position.X - x) < 0.002 and abs(pad.position.Y - y) < 0.002 and
+                abs(pad.size.X - 1.00) < 0.002 and abs(pad.size.Y - 1.00) < 0.002,
+                f"U8.{number}: inner land differs from Quectel Figure 46")
+    u8_courtyard = [item for item in footprints["U8"].graphicItems
+                    if getattr(item, "layer", None) == "F.CrtYd"]
+    require(len(u8_courtyard) == 1 and
+            abs(u8_courtyard[0].start.X + 12.95) < 0.002 and
+            abs(u8_courtyard[0].start.Y + 14.80) < 0.002 and
+            abs(u8_courtyard[0].end.X - 12.95) < 0.002 and
+            abs(u8_courtyard[0].end.Y - 14.80) < 0.002,
+            "U8: courtyard must retain Quectel's 3 mm adjacent-component clearance")
     print("PCB-MAIN layout-candidate audit: PASS")
     print(f"components={len(expected_on_board)} holes=4 nets={len(expected_nets)} layers=6")
     print(f"provisional_footprints={len(provisional)} "

@@ -13,11 +13,11 @@ item still requires drawing-to-land-pattern review before Review B can pass.
 |---|---:|---|
 | Project-generated chip passives and mechanical holes | 183 | Placement use only; passive geometry remains subject to assembly-house rules |
 | MAIN-AUTH-011 controlled pogo groups | 5 | 31 bottom pads verified by coordinate, diameter, mask and layer |
-| Manufacturer-drawing controlled patterns | 10 | Nexperia SOD962-2, ST UDFN-6L, ADI DCB, SiTime JE CSP, u-blox MAX-M10S, Ebyte E22-M22S, Abracon 1109-5 and two TE 2336582-1 instances controlled locally |
+| Manufacturer-drawing controlled patterns | 14 | Nexperia SOD962-2, ST UDFN-6L, ADI DCB, SiTime JE CSP, u-blox MAX-M10S, Ebyte E22-M22S, Abracon 1109-5, two TE 2336582-1 instances, Quectel BG95-M3, GCT MEM2052, Molex 504050-0291 and Molex 43045-1202 controlled locally |
 | KiCad library patterns | 44 | Exact pad-number contract passes; drawing review remains open |
-| Provisional manufacturer-specific patterns | 4 | Blocker; replace from controlled manufacturer drawing |
+| Provisional manufacturer-specific patterns | 0 | Closed for the current component set; any substitution reopens this gate |
 
-The controlled updates reduced the provisional set from 52 to 4 instances by
+Earlier controlled updates reduced the provisional set from 52 to 4 instances by
 using existing KiCad patterns for U.FL, USB4105, SOT-666, SOD-523, DRT-3,
 DRL-6, KEMET 7343-31, Raytac MDBT50Q, Molex 504050-0691, TI DQA USON-10
 and TI DBV SOT-23-5. The five pogo
@@ -50,16 +50,28 @@ C-2336582 Rev A2. The six SIM contacts retain the drawing's 1.27 mm pitch and
 holes are represented separately. Logical pin aliases follow the signed dual-SIM
 authority without altering the manufacturer geometry.
 
+The final four manufacturer-specific patterns are now locally controlled:
+`U8` follows Quectel BG95 Series Hardware Design V1.8 Figure 46; `J12`
+follows GCT MEM2052 drawing Rev A3; `J13` follows Molex customer drawing
+`5040500000-SD`, PSD 001 Rev B; and `J_PWR` follows Molex customer drawing
+`SD-43045-001`, PSD 001 Rev H1. The controlled sources are the official
+[Quectel V1.8 hardware design](https://www.quectel.com/content/uploads/2021/03/Quectel_BG95_Series_Hardware_Design_V1.8.pdf),
+[GCT MEM2052 drawing](https://gct.co/files/drawings/mem2052.pdf),
+[Molex 504050-0291 drawing](https://www.molex.com/pdm_docs/sd/5040500291_sd.pdf)
+and [Molex 43045-1202 drawing](https://www.molex.com/pdm_docs/sd/430451202_sd.pdf).
+Their complete pad coordinates, sizes, drill diameters and logical pad sets are
+asserted independently by the layout audit.
+
 ## Remaining provisional references
 
-`J12`, `J13`, `J_PWR`, `U8`.
+None.
 
 ## Release rule
 
 Review B remains `OPEN`. No Gerber, drill, paste, pick-and-place, IPC-356 or
 STEP output from this candidate may be released until:
 
-1. all 4 provisional instances are replaced by controlled land patterns;
+1. the zero-provisional footprint state remains true for the release commit;
 2. the 44 KiCad-derived instances pass drawing-to-pattern review;
 3. placement and routing audits pass in KiCad 9;
 4. DRC reports zero blocker/critical and zero unrouted items;
