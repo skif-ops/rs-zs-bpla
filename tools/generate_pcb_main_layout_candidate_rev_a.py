@@ -53,6 +53,8 @@ STANDARD = {
     "nRF52840_SMD_10.5x15.5_61P_PCB_antenna": (
         "RF_Module.pretty", "Raytac_MDBT50Q", {},
     ),
+    "USON-10_DQA": ("Package_SON.pretty", "USON-10_2.5x1.0mm_P0.5mm", {}),
+    "SOT-23-5_DBV": ("Package_TO_SOT_SMD.pretty", "SOT-23-5", {}),
     "0402": None,
     "0603": None,
     "0805": None,

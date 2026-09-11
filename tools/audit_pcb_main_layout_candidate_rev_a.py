@@ -109,8 +109,8 @@ def main() -> int:
                              if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                              "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
     require(provisional, "candidate incorrectly claims every footprint is production-approved")
-    require(len(provisional) == 22, f"unexpected provisional-footprint count: {len(provisional)}")
-    require(len(library_pending) == 36,
+    require(len(provisional) == 14, f"unexpected provisional-footprint count: {len(provisional)}")
+    require(len(library_pending) == 44,
             f"unexpected KiCad-library review count: {len(library_pending)}")
     print("PCB-MAIN layout-candidate audit: PASS")
     print(f"components={len(expected_on_board)} holes=4 nets={len(expected_nets)} layers=6")
