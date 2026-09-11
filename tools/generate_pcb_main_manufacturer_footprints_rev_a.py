@@ -37,6 +37,15 @@ def rect(lines: list[str], x1: float, y1: float, x2: float, y2: float,
     )
 
 
+def polygon(lines: list[str], points: list[tuple[float, float]],
+            layer: str, width: float, fill: str = "none") -> None:
+    coordinates = " ".join(f"(xy {x:g} {y:g})" for x, y in points)
+    lines.append(
+        f'  (fp_poly (pts {coordinates}) (stroke (width {width:g}) '
+        f'(type default)) (fill {fill}) (layer "{layer}"))'
+    )
+
+
 def smd(lines: list[str], number: str, x: float, y: float, sx: float, sy: float,
         shape: str = "rect", mask_margin: float | None = None,
         paste_ratio: float | None = None) -> None:
@@ -103,6 +112,36 @@ def ufl() -> str:
             f'  (pad "" smd rect (at {x:g} {y:g}) (size {sx:g} {sy:g}) '
             '(layers "F.Paste"))'
         )
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
+def stm32u585_lqfp100() -> str:
+    name = "ST_STM32U585_LQFP100_1L"
+    lines = header(
+        name,
+        "ST STM32U585 LQFP100 package 1L; DS13086 Rev 10 Figure 96 footprint example",
+        "ST STM32U585 LQFP100 14x14mm 0.5mm package 1L",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -9.2) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 9.2) (layer "F.Fab") hide'
+    # Figure 96 gives a 16.7 mm outer land span, a 14.3 mm inner span,
+    # 1.2 x 0.3 mm lands and 0.5 mm pitch.  The resulting land centers are
+    # therefore 7.75 mm from the package origin.  The 12.3 mm row span is
+    # independently reproduced by 25 lands across 24 pitches.
+    rect(lines, -8.60, -8.60, 8.60, 8.60, "F.CrtYd", 0.05)
+    polygon(lines, [(-7.0, -6.5), (-6.5, -7.0), (7.0, -7.0),
+                    (7.0, 7.0), (-7.0, 7.0)], "F.Fab", 0.10)
+    polygon(lines, [(-7.7375, -6.41), (-8.0775, -6.88),
+                    (-7.3975, -6.88)], "F.SilkS", 0.12, "solid")
+    for number in range(1, 26):
+        smd(lines, str(number), -7.75, -6.0 + (number - 1) * 0.5, 1.2, 0.3)
+    for number in range(26, 51):
+        smd(lines, str(number), -6.0 + (number - 26) * 0.5, 7.75, 0.3, 1.2)
+    for number in range(51, 76):
+        smd(lines, str(number), 7.75, 6.0 - (number - 51) * 0.5, 1.2, 0.3)
+    for number in range(76, 101):
+        smd(lines, str(number), 6.0 - (number - 76) * 0.5, -7.75, 0.3, 1.2)
     lines.append(")")
     return "\n".join(lines) + "\n"
 
@@ -323,6 +362,7 @@ def microfit() -> str:
 
 GENERATORS = {
     "Hirose_U.FL-R-SMT-1.kicad_mod": ufl,
+    "ST_STM32U585_LQFP100_1L.kicad_mod": stm32u585_lqfp100,
     "ST_LIS2DW12_LGA-12L.kicad_mod": lis2dw12,
     "Raytac_MDBT50Q-P1MV2.kicad_mod": raytac_mdbt50q_p1mv2,
     "Quectel_BG95-M3_LGA-102.kicad_mod": bg95,

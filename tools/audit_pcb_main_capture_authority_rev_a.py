@@ -554,6 +554,7 @@ def main() -> None:
         "PIN_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
         "f4ec11f00e762e37ffc4020f6d4f20d225bc061d",
         "4349055dfd06e6eb2dce1a440c44a995ad7c924e28435ede119a7d4bb10f556d",
+        "6483871075d4889d39356648a9c1f1fb34f48dce2ce3e8c5a8d73a73f7e935e3",
         "No HSE is fitted",
         "VREFBUF disabled",
         "67 locked functional assignments",

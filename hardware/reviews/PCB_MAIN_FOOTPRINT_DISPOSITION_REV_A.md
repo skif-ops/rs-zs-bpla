@@ -15,9 +15,9 @@ machine-readable 19-pattern inventory is
 |---|---:|---|
 | Project-generated chip passives and mechanical holes | 188 | Placement use only; passive geometry remains subject to assembly-house rules |
 | MAIN-AUTH-011 controlled pogo groups | 5 | 31 bottom pads verified by coordinate, diameter, mask and layer |
-| Manufacturer-drawing controlled patterns | 19 | Fourteen previously controlled instances plus five reviewed instances controlled locally |
+| Manufacturer-drawing controlled patterns | 20 | Fourteen previously controlled instances plus six reviewed instances controlled locally |
 | Drawing-verified KiCad library patterns | 5 | Four Molex 504050-0691 instances and one GCT USB4105 instance have exact audited geometry |
-| KiCad library patterns pending drawing review | 34 | Exact pad-number contract passes; drawing review remains open |
+| KiCad library patterns pending drawing review | 33 | Exact pad-number contract passes; drawing review remains open |
 | Provisional manufacturer-specific patterns | 0 | Closed for the current component set; any substitution reopens this gate |
 
 Earlier controlled updates reduced the provisional set from 52 to 4 instances by
@@ -107,6 +107,18 @@ edge, while retaining the 1.60 x 1.20 mm F.Cu feed keepout. The official
 archive is SHA-256
 `7ff6f11d0185a9db73c7140a4fe7e70b31615539916e60d5c27af8178f9f9fc2`.
 
+The third KiCad-library review tranche closes `U1`. ST DS13086 Rev 10 identifies
+the selected `STM32U585VIT6Q` package as LQFP100 code `1L` and Figure 96 gives
+the footprint example directly: 100 rectangular 1.20 x 0.30 mm lands at
+0.50 mm pitch, with 16.70 mm outer, 14.30 mm inner and 12.30 mm row spans.
+The KiCad IPC footprint instead used 1.60 x 0.30 mm round-rect lands at
+7.675 mm centers, so it was not marked drawing-verified. The project-local
+`ST_STM32U585_LQFP100_1L` pattern uses the exact ST copper geometry at
+7.750 mm centers; mask and stencil adaptation remain an assembly-process/DFM
+control. The official [DS13086 Rev 10](https://www.st.com/resource/en/datasheet/stm32u585ai.pdf)
+document is SHA-256
+`6483871075d4889d39356648a9c1f1fb34f48dce2ce3e8c5a8d73a73f7e935e3`.
+
 ## Remaining provisional references
 
 None.
@@ -117,7 +129,7 @@ Review B remains `OPEN`. No Gerber, drill, paste, pick-and-place, IPC-356 or
 STEP output from this candidate may be released until:
 
 1. the zero-provisional footprint state remains true for the release commit;
-2. the remaining 34 KiCad-derived instances pass drawing-to-pattern review;
+2. the remaining 33 KiCad-derived instances pass drawing-to-pattern review;
 3. placement and routing audits pass in KiCad 9;
 4. DRC reports zero blocker/critical and zero unrouted items;
 5. RA-003 layout evidence is complete; physical droop and ripple measurement

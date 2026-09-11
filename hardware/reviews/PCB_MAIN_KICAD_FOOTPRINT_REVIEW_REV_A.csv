@@ -6,7 +6,7 @@ KiCad:Connector_USB.pretty/USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizont
 KiCad:Diode_SMD.pretty/D_SOD-523,D4;D6;D7;D8;D9;D10;D11,7,PENDING,KiCad:Diode_SMD.pretty/D_SOD-523,,,Drawing-to-pattern review pending
 KiCad:Diode_SMD.pretty/D_SOD-882,D1;D2,2,PENDING,KiCad:Diode_SMD.pretty/D_SOD-882,,,Drawing-to-pattern review pending
 KiCad:Package_LGA.pretty/LGA-12_2x2mm_P0.5mm,U3,1,REPLACED_PROJECT_CONTROLLED,ST_DS11811_Rev9_and_TN0018_Rev8_LGA-12L_Pattern,"DS11811 Rev 9; TN0018 Rev 8","https://www.st.com/resource/en/datasheet/lis2dw12.pdf; https://www.st.com/resource/en/technical_note/tn0018-surface-mounting-guidelines-for-mems-sensors-in-an-lga-package-stmicroelectronics.pdf",Copper retained; mask opening and 81-percent stencil aperture controlled locally
-KiCad:Package_QFP.pretty/LQFP-100_14x14mm_P0.5mm,U1,1,PENDING,KiCad:Package_QFP.pretty/LQFP-100_14x14mm_P0.5mm,,,Drawing-to-pattern review pending
+KiCad:Package_QFP.pretty/LQFP-100_14x14mm_P0.5mm,U1,1,REPLACED_PROJECT_CONTROLLED,ST_DS13086_Rev10_Figure96_LQFP100_1L,DS13086 Rev 10 Figure 96,https://www.st.com/resource/en/datasheet/stm32u585ai.pdf,KiCad IPC lands replaced by exact ST 1L LQFP100 footprint example
 KiCad:Package_SO.pretty/SOIC-16W_7.5x10.3mm_P1.27mm,U2,1,PENDING,KiCad:Package_SO.pretty/SOIC-16W_7.5x10.3mm_P1.27mm,,,Drawing-to-pattern review pending
 KiCad:Package_SO.pretty/TSSOP-14_4.4x5mm_P0.65mm,U17,1,PENDING,KiCad:Package_SO.pretty/TSSOP-14_4.4x5mm_P0.65mm,,,Drawing-to-pattern review pending
 KiCad:Package_SO.pretty/TSSOP-24_4.4x6.5mm_P0.5mm,U7;U13;U16,3,PENDING,KiCad:Package_SO.pretty/TSSOP-24_4.4x6.5mm_P0.5mm,,,Drawing-to-pattern review pending

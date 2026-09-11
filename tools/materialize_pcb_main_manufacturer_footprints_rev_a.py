@@ -25,6 +25,10 @@ LIB = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
+    "U1": (
+        "ST_STM32U585_LQFP100_1L.kicad_mod",
+        "ST_DS13086_Rev10_Figure96_LQFP100_1L",
+    ),
     "J8": (
         "Hirose_U.FL-R-SMT-1.kicad_mod",
         "Hirose_U.FL_CAT_2026-08-01_PCB_and_MetalMask",
