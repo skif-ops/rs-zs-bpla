@@ -12,7 +12,9 @@ on:
       - "hardware/POWER_DESIGN_BASELINE_REV_A.json"
       - "hardware/POWER_COMPONENT_FREEZE_REV_A.csv"
       - "hardware/POWER_DESIGN_CALC_REV_A.md"
+      - "hardware/PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md"
       - "hardware/kicad/sheets/01_POWER.csv"
+      - "hardware/kicad/native/PCB-PWR/**"
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
@@ -24,6 +26,7 @@ on:
       - "tools/materialize_pcb_pwr_libraries_rev_a.py"
       - "tools/audit_pcb_pwr_native_schematic_rev_a.py"
       - "tools/audit_pcb_pwr_native_completeness_rev_a.py"
+      - "tools/audit_pcb_pwr_footprints_rev_a.py"
       - ".github/workflows/pcb-pwr-schematic.yml"
 
 jobs:
@@ -84,11 +87,20 @@ jobs:
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/audit_pcb_pwr_native_completeness_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_footprints_rev_a.py
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
           test -s hardware/kicad/native/PCB-PWR/sym-lib-table
           test -s hardware/kicad/native/PCB-PWR/fp-lib-table
           test -s hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.kicad_sym
+          python - <<'PY'
+          import pcbnew
+          root = "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty"
+          footprint = pcbnew.FootprintLoad(root, "CSD18540Q5B_DNK")
+          assert footprint is not None, "KiCad failed to parse CSD18540Q5B_DNK"
+          assert footprint.GetPadCount() == 27, "CSD18540Q5B_DNK pad/aperture count drift"
+          print("PCB-PWR CSD18540Q5B KiCad 9 native parse: PASS")
+          PY
 
       - name: KiCad ERC and PDF
         run: |

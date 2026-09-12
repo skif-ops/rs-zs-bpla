@@ -17,13 +17,14 @@ from kiutils.symbol import SymbolLib
 
 UNRESOLVED_FOOTPRINT_REFS = {
     "J1",   # exact Micro-Fit 2-pin board land pattern/orientation pending mechanical review
-    "Q1",   # CSD18540Q5B DNK manufacturer footprint to be controlled before layout
     "RSH1", # exact four-terminal shunt MPN/land pattern not frozen
     "U3", "U4", # LMR60440 RAK-9 manufacturer land pattern review pending
     "L1", "L2", # exact inductor land pattern remains under Review B
 }
 
 CONTROLLED_FOOTPRINTS = {
+    # TI SLPS488B sections 7.2/7.3 provide the exact PCB and stencil patterns.
+    "Q1": "DioneyaPWR:CSD18540Q5B_DNK",
     # The identical CON-004A/CON-004B board header uses the single audited
     # manufacturer pattern already controlled by PCB-MAIN.
     "J2": "DioneyaMain:Molex_43045-1202_MicroFit-12_RA",
@@ -59,6 +60,7 @@ def write_tables(project_dir: Path) -> None:
   (lib (name "Package_TO_SOT_SMD")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Package_TO_SOT_SMD.pretty")(options "")(descr "KiCad SOT footprints"))
   (lib (name "Package_SO")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Package_SO.pretty")(options "")(descr "KiCad SO/VSSOP footprints"))
   (lib (name "NetTie")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/NetTie.pretty")(options "")(descr "KiCad net-tie footprints"))
+  (lib (name "DioneyaPWR")(type "KiCad")(uri "${KIPRJMOD}/libs/DioneyaPWR.pretty")(options "")(descr "Dioneya PCB-PWR manufacturer-controlled footprints"))
   (lib (name "DioneyaMain")(type "KiCad")(uri "${KIPRJMOD}/../PCB-MAIN/libs/DioneyaMain.pretty")(options "")(descr "Shared manufacturer-controlled PCB-MAIN/PWR footprints"))
 )
 '''
@@ -151,6 +153,7 @@ def main() -> int:
         libs / "DioneyaPWR.kicad_sym",
         project_dir / "sym-lib-table",
         project_dir / "fp-lib-table",
+        libs / "DioneyaPWR.pretty" / "CSD18540Q5B_DNK.kicad_mod",
         project_dir.parent / "PCB-MAIN" / "libs" / "DioneyaMain.pretty" /
             "Molex_43045-1202_MicroFit-12_RA.kicad_mod",
     ]
@@ -161,7 +164,7 @@ def main() -> int:
     count = len([s for s in reread.libSymbols if s.libraryNickname == "DioneyaPWR"])
     print("PCB-PWR project-local library materialization PASS")
     print("unresolved production footprints intentionally blank:", sorted(cleared))
-    print("shared manufacturer-controlled footprints:", CONTROLLED_FOOTPRINTS)
+    print("manufacturer-controlled footprints:", CONTROLLED_FOOTPRINTS)
     print("controlled DioneyaPWR symbols:", count)
     return 0
 

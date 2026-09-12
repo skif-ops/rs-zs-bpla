@@ -169,6 +169,10 @@ The native schematic must fail Review A regression if it:
 
 ## 8. Open items outside this Review A scope
 
+- `Q1` copper and segmented stencil are now controlled by
+  `DioneyaPWR:CSD18540Q5B_DNK` from TI SLPS488B sections 7.2/7.3; solder-mask
+  expansion, drain thermal spreading/vias, placement, SOA and assembly validation
+  remain Review-B controls;
 - exact shunt MPN and Kelvin layout;
 - `J2` electrical footprint is shared with the manufacturer-controlled
   PCB-MAIN `Molex 43045-1202` pattern; its PCB-PWR placement, orientation and

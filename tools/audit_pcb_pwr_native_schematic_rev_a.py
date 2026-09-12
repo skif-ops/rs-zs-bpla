@@ -11,6 +11,11 @@ from kiutils.schematic import Schematic
 ROOT = Path(__file__).resolve().parents[1]
 PIN_AUTH = ROOT / "hardware" / "PCB_PWR_PIN_AUTHORITY_REV_A.csv"
 HARNESS = ROOT / "hardware" / "HARNESS_LOGICAL_PINOUT_REV_A.csv"
+Q1_FOOTPRINT = "DioneyaPWR:CSD18540Q5B_DNK"
+Q1_FOOTPRINT_FILE = (
+    ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty" /
+    "CSD18540Q5B_DNK.kicad_mod"
+)
 J2_FOOTPRINT = "DioneyaMain:Molex_43045-1202_MicroFit-12_RA"
 J2_FOOTPRINT_FILE = (
     ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty" /
@@ -91,6 +96,11 @@ def main() -> int:
         else:
             require(expected_net in labels.get(pos, set()),
                     f"{ref}.{pin_no} expected net {expected_net}, found labels {sorted(labels.get(pos, set()))}")
+
+    require(footprint_of(instances["Q1"]) == Q1_FOOTPRINT,
+            f"Q1 must use manufacturer-controlled footprint {Q1_FOOTPRINT}")
+    require(Q1_FOOTPRINT_FILE.is_file(),
+            f"Q1 controlled footprint file missing: {Q1_FOOTPRINT_FILE}")
 
     # Frozen 12-pin external contract.
     main_pwr = [r for r in rows(HARNESS) if r["Interface"] == "MAIN_PWR"]

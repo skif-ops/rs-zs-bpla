@@ -46,6 +46,7 @@ on:
       - "hardware/PCB_PWR_PIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
       - "hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md"
+      - "hardware/PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md"
       - "hardware/POWER_DESIGN_BASELINE_REV_A.json"
       - "hardware/POWER_DESIGN_CALC_REV_A.md"
       - "mechanics/common/OPEN_DIMENSIONS.csv"
@@ -78,6 +79,7 @@ on:
       - "tools/materialize_pcb_pwr_libraries_rev_a.py"
       - "tools/audit_pcb_pwr_native_schematic_rev_a.py"
       - "tools/audit_pcb_pwr_native_completeness_rev_a.py"
+      - "tools/audit_pcb_pwr_footprints_rev_a.py"
       - "tools/generate_pcb_mic_clean_rev_a.py"
       - "tools/run_pcb_mic_no_zonefill.py"
       - "tools/finalize_pcb_mic_mechanical_rev_a.py"
@@ -242,6 +244,7 @@ jobs:
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/audit_pcb_pwr_native_completeness_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_footprints_rev_a.py
           python tools/kicad_native_gate.py --run-cli
       - name: Verify committed native PCB-MAIN schematic
         run: |
@@ -320,6 +323,15 @@ jobs:
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/audit_pcb_pwr_native_completeness_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_footprints_rev_a.py
+          python - <<'PY'
+          import pcbnew
+          root = "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty"
+          footprint = pcbnew.FootprintLoad(root, "CSD18540Q5B_DNK")
+          assert footprint is not None, "KiCad failed to parse CSD18540Q5B_DNK"
+          assert footprint.GetPadCount() == 27, "CSD18540Q5B_DNK pad/aperture count drift"
+          print("PCB-PWR CSD18540Q5B KiCad 9 native parse: PASS")
+          PY
       - name: Materialize native PCB-MIC board and schematic
         shell: bash
         run: |
