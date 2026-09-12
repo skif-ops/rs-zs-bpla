@@ -1,6 +1,6 @@
 # EVT-PRE-20 Rev.A — доверенные координаты установки и GNSS integrity
 
-Статус: `LOCKED ARCHITECTURE / IMPLEMENTATION IN PROGRESS`
+Статус: `LOCKED ARCHITECTURE / PORTABLE STORE IMPLEMENTED / FLASH+BLE BINDING OPEN`
 
 Основание: `DEC-018`.
 
@@ -97,6 +97,25 @@ GNSS observed position передаётся только как diagnostic/integ
 10. Экспорт commissioning record с serial, координатами, источником, точностью, временем, версиями HW/FW/app и hash конфигурации.
 
 Повторное изменение координат допускается только после нового физического service mode и авторизованной роли. Оно создаёт отдельную audit запись и переводит станцию в `REVALIDATION_REQUIRED` до завершения self-test.
+
+### 6.1 Атомарное хранение на станции
+
+Portable firmware сохраняет запись в двух чередующихся слотах по 96 байт. Новая
+версия сначала записывается в стёртый неактивный слот с generation и CRC32, а
+commit-marker записывается последней операцией. После записи выполняются полный
+read-back, CRC и сравнение полей. При сбое питания до commit-marker предыдущий
+слот остаётся авторитетным.
+
+Первая запись и recommission разрешены только при одновременно активном
+физическом service mode и подтверждённой локальной роли. Для locked-записи
+recommission должен быть указан явно, а `version` обязан монотонно увеличиваться.
+Нулевой commissioning hash и невалидные координаты/thresholds отклоняются до
+операции erase.
+
+CRC не заменяет BLE Secure Connections, авторизацию роли или commissioning
+hash. Текущий модуль задаёт переносимый формат и power-loss-safe алгоритм;
+STM32 Flash binding, адреса страниц, endurance и fault-injection на целевой плате
+остаются открытыми до target port и аппаратного EVT.
 
 ## 7. BLE configuration objects
 

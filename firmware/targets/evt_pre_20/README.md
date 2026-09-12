@@ -15,6 +15,7 @@ python tools/audit_evt_pre_20_cubemx_ioc_technical.py
 python tools/import_evt_pre_20_stm32_vendor.py --check
 python tools/validate_evt_pre_20_stm32_scaffold.py
 python tools/audit_evt_pre_20_stm32_scaffold_technical.py
+python tools/validate_installation_store_contract.py
 ```
 
 QG-1 checks completeness, ordering and SHA-256 traceability. QG-2 separately
@@ -42,3 +43,8 @@ reviewed and regenerated with STM32CubeMX 6.12.0. Clock-tree, internal MCU power
 supply mode and peripheral runtime parameters are deliberately not released by
 the pinout generator. HAL/LL integration, measured clocks, secure boot, A/B OTA,
 production target build and hardware evidence remain blockers.
+
+The portable installation-position store now provides a two-slot atomic record,
+CRC, last-write commit marker, monotonic recommission version and read-back. Its
+QG-1/QG-2 host result does not define STM32 Flash page addresses or close target
+power-loss/endurance testing; that binding remains a target-port blocker.

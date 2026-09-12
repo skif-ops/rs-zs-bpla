@@ -53,3 +53,9 @@ STM32CubeMX 6.12.0 / DB.6.0.120. В нём сохранены 67 назначе�
 конфликт EXTI8: `LORA_DIO1` перенесён на `PC2/EXTI2`, а `MIC_WAKE` оставлен на
 `PA8/EXTI8`. До открытия и регенерации в зафиксированной версии CubeMX файл не
 считается подтверждённым target build.
+
+Portable слой хранения installation position реализует атомарное чередование
+двух слотов, CRC32, commit-marker, read-back, monotonic version и обязательные
+physical-service/authenticated-role gates. Host QG не закрывает привязку этих
+слотов к страницам STM32 Flash, ресурс перезаписи и power-loss fault injection
+на фактической плате.

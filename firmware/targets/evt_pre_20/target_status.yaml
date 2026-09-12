@@ -135,7 +135,7 @@ positioning:
   authoritative_source: configured_installation_coordinates
   firmware_module: zs_position_trust
   wifi_positioning: NOT_REQUIRED
-  installation_position_storage: MISSING_BLOCKER
+  installation_position_storage: PORTABLE_ATOMIC_DUAL_SLOT_QG1_QG2_PASS_FLASH_BINDING_PENDING
   installation_position_ble_commissioning: MISSING_BLOCKER
   configured_position_required_for_field_ready: true
   default_warning_distance_m: 25
@@ -202,6 +202,7 @@ required_target_files:
   startup: PINNED_OFFICIAL_CMSIS_QG1_QG2_PASS
   linker_script: ENGINEERING_FULL_FLASH_QG1_QG2_PASS_PRODUCTION_PARTITION_BLOCKER
   hal_ll_bindings: MISSING_BLOCKER
+  installation_position_flash_binding: MISSING_BLOCKER
   board_pins: GENERATED_EXACT_REV_A_CONTRACT_QG1_QG2_PASS_CUBEMX_OPEN_PENDING
   secure_boot: MISSING_BLOCKER
   ota_ab: MISSING_BLOCKER
