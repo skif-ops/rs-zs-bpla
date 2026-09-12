@@ -9,7 +9,10 @@ Configuration: `EVT-PRE-20 Rev.A`
 
 This Review A covers only component pin authority, named-net authority, inter-board pin contract, startup dependencies and controlled ground-return joins required before native KiCad schematic capture.
 
-It does not approve final passive MPNs, TVS/fuse coordination, thermal design, PCB layout, DFM, EMC/EMI, environmental qualification or manufacturing release. Those remain Review B / EVT / release items.
+It does not approve the controlled passive candidates for manufacture or close their
+derating, transient, thermal, assembly and load-step evidence. TVS/fuse coordination,
+PCB layout, DFM, EMC/EMI, environmental qualification and manufacturing release also
+remain Review B / EVT / release items.
 
 ## 2. Authoritative inputs reviewed
 
@@ -19,6 +22,7 @@ It does not approve final passive MPNs, TVS/fuse coordination, thermal design, P
 - `hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md`
 - `hardware/CONNECTOR_FREEZE_REV_A.csv`
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`
+- `hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv`
 - `hardware/POWER_DESIGN_BASELINE_REV_A.json`
 - `hardware/kicad/sheets/01_POWER.csv`
 - TI primary datasheets for LM74700-Q1, CSD18540Q5B, LMR60440, TPS7A20 and INA226.
@@ -190,7 +194,11 @@ The native schematic must fail Review A regression if it:
 - final TVS and fuse values and coordination;
 - `L1/L2` are frozen as `XAL7030-472MEC` with the manufacturer land pattern;
   hot-loop placement, temperature rise, load-step and EMI evidence remain open;
-- exact remaining capacitor/bulk MPN verification and derating;
+- all `C1-C19`, `R1-R15`, `NT1-NT3` and `TP1-TP10` now have exact candidate identity,
+  population, footprint and pin/net bindings in
+  `PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv`; capacitor DC-bias/cold-ESR/transient evidence,
+  C13 manufacturer land-pattern comparison, assembly review and DFT accessibility
+  remain open;
 - selected battery/BMS voltage limits;
 - MPPT/harness transient envelope;
 - I2C final harness capacitance and pull-up validation;

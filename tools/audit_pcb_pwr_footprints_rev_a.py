@@ -124,6 +124,13 @@ def audit_remaining_power_components(library: Path) -> None:
     audit_simple_ti_package(library / "Coilcraft_XAL7030_472.kicad_mod",
                             "Coilcraft_XAL7030_472", xal)
 
+    testpoint = {
+        ("1", "circle", 0.0, 0.0, 1.70, 1.70,
+         ("F.Cu", "F.Mask"), None, 0.20),
+    }
+    audit_simple_ti_package(library / "TestPoint_DFT_1.7mm_NoPaste.kicad_mod",
+                            "TestPoint_DFT_1.7mm_NoPaste", testpoint)
+
 
 def audit_lmr60440(library: Path) -> None:
     path = library / "LMR60440_RAK0009A.kicad_mod"
@@ -236,6 +243,7 @@ def main() -> int:
     print("U3/U4 LMR60440: TI SNAS877 RAK0009A copper/mask/stencil exact")
     print("U1/U2/U5: TI DBV0006A/DGS0010A/DBV0005A lands, mask and stencil exact")
     print("J1/RSH1/L1/L2: Molex/Vishay/Coilcraft manufacturer geometry exact")
+    print("TP1-TP10: project DFT target 1.70 mm copper / 2.10 mm mask / no paste exact")
     return 0
 
 

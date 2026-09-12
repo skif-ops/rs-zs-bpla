@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Generate the controlled EVT-PRE-20 Rev.A BOM from authoritative freezes.
 
-The draft keeps the system-level inventory. MAIN/POWER/CONNECTOR freeze tables are
-authoritative for selected MPNs and release blockers. This script deterministically
-merges them, fixes assembly reference/quantity mappings, expands connector consumables,
-and fails on known superseded parts. It is a controlled engineering BOM, not a release
-waiver: open and candidate rows remain visible until the strict BOM gates can pass.
+The draft keeps the system-level inventory. MAIN/POWER/CONNECTOR freeze tables and the
+PCB-PWR passive authority are authoritative for selected MPNs and release blockers.
+This script deterministically merges them, fixes assembly reference/quantity mappings,
+expands connector consumables, and fails on known superseded parts. It is a controlled
+engineering BOM, not a release waiver: open and candidate rows remain visible until
+the strict BOM gates can pass.
 """
 from __future__ import annotations
 
@@ -16,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DRAFT = ROOT / "hardware/EVT_PRE_20_BOM_DRAFT.csv"
 OUT = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
 MAIN_PASSIVE_SUPPORT = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
+PWR_PASSIVE_AUTHORITY = ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -48,6 +50,7 @@ def main() -> None:
     main_passive_support = freeze_map(
         "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv", "RefDes"
     )
+    pwr_passive_authority = read_csv(PWR_PASSIVE_AUTHORITY)
 
     def set_quantities(row: dict[str, str], qty: int, spares: int) -> None:
         row["Qty_per_station"] = str(qty)
@@ -329,55 +332,58 @@ def main() -> None:
         notes="One populated R1 per PCB-MIC leaf; any DNP/value change requires SI review and BOM revision", value="0 ohm",
     )
 
-    # PCB-PWR schematic parts. Each output bank is expanded to four individually
-    # referenced physical MLCCs in the native schematic.
-    pwr_l = power_parts["PWR-L"]
-    pwr_lines = [
-        ("PWR-C-100N", "C1;C2;C4;C6", "100 nF 25 V X7R", "TDK", "CGA2B3X7R1E104K050BB", "0402", 4, "FITTED"),
-        ("PWR-C-LDO", "C7;C8", "2.2 uF 10 V X7R", "TDK", "CGA3E1X7R1A225K080AC", "0603", 2, "FITTED"),
-        ("PWR-C-CIN-HF", "C9", "100 nF 50 V X7R", "TDK", "CGA3E2X7R1H104K080AA", "0603", 1, "FITTED"),
-        ("PWR-C-INPUT", "C10;C11;C12", "4.7 uF 50 V X7R", "TDK", "CGA6P3X7R1H475K250AB", "1210", 3, "FITTED"),
-        ("PWR-C-BULK", "C13", "100 uF 35 V hybrid", "Panasonic Industry", "EEH-ZK1V101XP", "SMD can 6.3x8.0 mm", 1, "FITTED"),
-        ("PWR-COUT-3V8", "C3;C14;C15;C16", "22 uF 25 V X7R", "TDK", "CGA6P3X7R1E226M250AB", "1210", 4, "FITTED"),
-        ("PWR-COUT-3V3", "C5;C17;C18;C19", "22 uF 25 V X7R", "TDK", "CGA6P3X7R1E226M250AB", "1210", 4, "FITTED"),
-        ("PWR-L", "L1;L2", "4.7 uH +/-20%", pwr_l["Manufacturer"], pwr_l["MPN"], pwr_l["Package"], 2, "FITTED"),
-        ("PWR-R-100K-01", "R1", "100 kOhm 0.1%", "Panasonic Industry", "ERA-2AEB104X", "0402", 1, "FITTED"),
-        ("PWR-R-35K7", "R2", "35.7 kOhm 0.1%", "Panasonic Industry", "ERA-2AEB3572X", "0402", 1, "FITTED"),
-        ("PWR-R-86K6", "R3;R7", "86.6 kOhm 0.1%", "Panasonic Industry", "ERA-2AEB8662X", "0402", 2, "FITTED"),
-        ("PWR-R-0R", "R4;R8", "0 ohm", "Panasonic Industry", "ERJ-2GE0R00X", "0402", 2, "FITTED"),
-        ("PWR-R-0R-DNP", "R5;R9", "0 ohm", "Panasonic Industry", "ERJ-2GE0R00X", "0402", 0, "DNP"),
-        ("PWR-R-100K", "R6;R11", "100 kOhm 1%", "Panasonic Industry", "ERJ-2RKF1003X", "0402", 2, "FITTED"),
-        ("PWR-R-10K", "R10;R12", "10 kOhm 1%", "Panasonic Industry", "ERJ-2RKF1002X", "0402", 2, "FITTED"),
-        ("PWR-R-4K7-DNP", "R13;R14", "4.7 kOhm 1%", "Panasonic Industry", "ERJ-2RKF4701X", "0402", 0, "DNP"),
-        ("PWR-R-10K-DNP", "R15", "10 kOhm 1%", "Panasonic Industry", "ERJ-2RKF1002X", "0402", 0, "DNP"),
-        ("PWR-NET-TIE", "NT1;NT2;NT3", "2-pad copper net tie", "PCB fabrication", "NET_TIE_COPPER_REV_A", "NetTie-2 SMD pad 0.5 mm", 3, "PCB_FEATURE"),
-    ]
-    for item_id, refdes, value, manufacturer, mpn, package, qty, population in pwr_lines:
+    # PCB-PWR passives come only from the per-reference authority. This prevents the
+    # generated BOM from silently outrunning schematic MPN, population or footprint
+    # control. DFT rows have no BOM_Item_ID and remain non-procured board features.
+    pwr_groups: dict[str, list[dict[str, str]]] = {}
+    for part in pwr_passive_authority:
+        item_id = part["BOM_Item_ID"]
+        if item_id:
+            pwr_groups.setdefault(item_id, []).append(part)
+    require(len(pwr_groups) == 17, "PCB-PWR passive authority group count drift")
+    for item_id, members in pwr_groups.items():
+        first = members[0]
+        invariant_fields = {
+            "Category", "Manufacturer", "MPN", "Package", "Value", "Population",
+            "Temperature_C", "Footprint",
+        }
+        for field in invariant_fields:
+            require(len({member[field] for member in members}) == 1,
+                    f"{item_id}: passive authority group {field} mismatch")
+        refdes = ";".join(member["RefDes"] for member in members)
+        population = first["Population"]
+        qty = 0 if population == "DNP" else len(members)
+        spares = 0 if population in {"DNP", "PCB_FEATURE"} else 40
         selected = population != "DNP"
-        if population in {"DNP", "PCB_FEATURE"}:
-            spares = 0
-        elif item_id == "PWR-L":
-            spares = 10
-        else:
-            spares = 40
-        status = pwr_l["Status"] if item_id == "PWR-L" else "SELECTED_PENDING_NATIVE_FOOTPRINT_DERATING"
+        statuses = sorted({member["Authority_Status"] for member in members})
+        status = statuses[0] if len(statuses) == 1 else "CONTROLLED_CANDIDATE_PENDING_MULTIPLE_REVIEWS"
+        release_blockers = sorted({member["Release_Blockers"] for member in members})
         notes = (
-            "Rev.A freeze source POWER_COMPONENT_FREEZE_REV_A.csv; exact land pattern controlled; "
-            f"blockers: {pwr_l['Release_Blockers']}"
-            if item_id == "PWR-L"
-            else "Exact candidate identity frozen for BOM control; native footprint, DC-bias/thermal margin and Review B remain blocking"
+            f"Rev.A source PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv; footprint {first['Footprint']}; "
+            f"blockers: {'; '.join(release_blockers)}"
         )
         append_item(
-            item_id=item_id, assembly="PCB-PWR", refdes=refdes, category="Passive" if not item_id.endswith("NET-TIE") else "PCB feature",
-            description=f"PCB-PWR {value}", manufacturer=manufacturer, mpn=mpn, package=package,
+            item_id=item_id, assembly="PCB-PWR", refdes=refdes, category=first["Category"],
+            description=f"PCB-PWR {first['Value']}", manufacturer=first["Manufacturer"],
+            mpn=first["MPN"], package=first["Package"],
             qty=qty, spares=spares, status=status, notes=notes,
-            value=value, population=population,
+            value=first["Value"], population=population,
             line_class="PCB_FEATURE" if population == "PCB_FEATURE" else "ELECTRICAL_COMPONENT",
-            temperature="N/A" if population == "PCB_FEATURE" else (
-                pwr_l["Temperature_C"] if item_id == "PWR-L" else "-55..125"
-            ),
+            temperature=first["Temperature_C"],
             disposition="CONTROLLED_PENDING_VERIFICATION" if selected else "CONTROLLED_DNP",
         )
+
+    pwr_l = power_parts["PWR-L"]
+    append_item(
+        item_id="PWR-L", assembly="PCB-PWR", refdes="L1;L2", category="Passive",
+        description="PCB-PWR 4.7 uH +/-20%", manufacturer=pwr_l["Manufacturer"],
+        mpn=pwr_l["MPN"], package=pwr_l["Package"], qty=2, spares=10,
+        status=pwr_l["Status"],
+        notes=("Rev.A freeze source POWER_COMPONENT_FREEZE_REV_A.csv; exact land pattern "
+               f"controlled; blockers: {pwr_l['Release_Blockers']}"),
+        value="4.7 uH +/-20%", population="FITTED", line_class="ELECTRICAL_COMPONENT",
+        temperature=pwr_l["Temperature_C"], disposition="CONTROLLED_PENDING_VERIFICATION",
+    )
 
     full_text = "\n".join(",".join(r.get(f, "") for f in fields) for r in rows)
     for forbidden in ("ESP32-C3", "JST_BM05B", "GHR-05V-S", "5040500591", "5040510501"):

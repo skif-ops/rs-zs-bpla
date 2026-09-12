@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import argparse
+import csv
 from pathlib import Path
 
 from kiutils.schematic import Schematic
+
+ROOT = Path(__file__).resolve().parents[1]
+PASSIVE_AUTHORITY = ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
 
 CAP_NETS = {
     "C9":  ("VBAT_FUSED", "GND_PWR", "CIN_REV"),
@@ -107,27 +111,34 @@ def main() -> int:
     if pin_net(labels, d1, d1sym, by_name["A"]) != "GND_PWR":
         raise RuntimeError("D1 anode must connect to GND_PWR")
 
-    # Missing passives from the first capture must now be explicit, while their exact
-    # footprint remains blank until MPN/derating freeze.
+    with PASSIVE_AUTHORITY.open(encoding="utf-8-sig", newline="") as source:
+        passive_authority = {row["RefDes"]: row for row in csv.DictReader(source)}
+
+    # Missing passives from the first capture must now be explicit and bound to the
+    # separately controlled candidate authority. Release blockers stay open there.
     for ref, (net1, net2, semantic) in CAP_NETS.items():
         inst = refs[ref]
         sym = libs[inst.libId]
-        if semantic not in value_of(inst):
+        authority = passive_authority[ref]
+        if value_of(inst) != f"{authority['Value']} {authority['MPN']}":
             raise RuntimeError(f"{ref} does not identify {semantic}: {value_of(inst)}")
-        if footprint_of(inst) != "":
-            raise RuntimeError(f"{ref} footprint must remain blank until passive MPN freeze")
+        if footprint_of(inst) != authority["Footprint"]:
+            raise RuntimeError(f"{ref} footprint differs from passive authority")
         if pin_net(labels, inst, sym, "1") != net1 or pin_net(labels, inst, sym, "2") != net2:
             raise RuntimeError(f"{ref} net mapping mismatch; expected {net1}/GND_PWR")
 
-    # DFT points are physical board requirements, but their exact pad geometry is a later
-    # DFT/layout freeze; no placeholder footprint is allowed at schematic Review A.
+    # DFT access uses one controlled no-paste probe target. Fixture access, wear and
+    # final side assignment remain layout/Review-B controls.
     for ref, net in TP_NETS.items():
         inst = refs[ref]
         sym = libs[inst.libId]
+        authority = passive_authority[ref]
         if str(sym.entryName) != "TESTPOINT":
             raise RuntimeError(f"{ref}: not using controlled TESTPOINT symbol")
-        if footprint_of(inst) != "":
-            raise RuntimeError(f"{ref}: testpoint footprint must stay blank until DFT geometry freeze")
+        if footprint_of(inst) != "DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste":
+            raise RuntimeError(f"{ref}: testpoint footprint authority drift")
+        if value_of(inst) != f"{authority['Value']} {authority['MPN']}":
+            raise RuntimeError(f"{ref}: testpoint identity authority drift")
         if pin_net(labels, inst, sym, "1") != net:
             raise RuntimeError(f"{ref}: expected {net}, got {pin_net(labels, inst, sym, '1')}")
 
@@ -150,7 +161,7 @@ def main() -> int:
             raise RuntimeError(f"{ref}: ERC source must be schematic-only")
 
     print("PCB-PWR Rev.A independent native completeness audit PASS")
-    print("unidirectional TVS, 5 missing passives, 10 DFT points and ERC-source semantics verified")
+    print("unidirectional TVS, 5 controlled passives, 10 controlled DFT points and ERC-source semantics verified")
     return 0
 
 

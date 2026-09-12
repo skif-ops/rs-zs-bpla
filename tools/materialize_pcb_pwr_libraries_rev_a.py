@@ -175,6 +175,7 @@ def main() -> int:
         libs / "DioneyaPWR.pretty" / "Molex_43045-0213_MicroFit-2_Vertical.kicad_mod",
         libs / "DioneyaPWR.pretty" / "Vishay_WSK2512_4T_T1.19mm.kicad_mod",
         libs / "DioneyaPWR.pretty" / "Coilcraft_XAL7030_472.kicad_mod",
+        libs / "DioneyaPWR.pretty" / "TestPoint_DFT_1.7mm_NoPaste.kicad_mod",
         project_dir.parent / "PCB-MAIN" / "libs" / "DioneyaMain.pretty" /
             "TI_DBV0005A_SOT23-5.kicad_mod",
         project_dir.parent / "PCB-MAIN" / "libs" / "DioneyaMain.pretty" /

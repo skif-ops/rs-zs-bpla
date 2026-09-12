@@ -45,6 +45,7 @@ on:
       - "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
       - "hardware/PCB_PWR_PIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
+      - "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
       - "hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md"
       - "hardware/PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md"
       - "hardware/POWER_DESIGN_BASELINE_REV_A.json"
@@ -72,9 +73,12 @@ on:
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
+      - "tools/audit_pcb_pwr_dft_authority_rev_a.py"
+      - "tools/audit_pcb_pwr_passive_authority_rev_a.py"
       - "tools/generate_pcb_pwr_schematic_rev_a.py"
       - "tools/finalize_pcb_pwr_symbol_types_rev_a.py"
       - "tools/finalize_pcb_pwr_schematic_completeness_rev_a.py"
+      - "tools/finalize_pcb_pwr_passive_authority_rev_a.py"
       - "tools/finalize_pcb_pwr_erc_power_model_rev_a.py"
       - "tools/materialize_pcb_pwr_libraries_rev_a.py"
       - "tools/audit_pcb_pwr_native_schematic_rev_a.py"
@@ -177,6 +181,7 @@ jobs:
           python tools/audit_pcb_pwr_preschematic_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/preschematic_audit.json
           python tools/audit_pcb_pwr_capture_authority_rev_a.py
+          python tools/audit_pcb_pwr_dft_authority_rev_a.py
       - name: Install official KiCad 9 stable toolchain
         shell: bash
         run: |
@@ -245,6 +250,8 @@ jobs:
           python tools/audit_pcb_pwr_native_completeness_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/audit_pcb_pwr_footprints_rev_a.py
+          python tools/audit_pcb_pwr_passive_authority_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/kicad_native_gate.py --run-cli
       - name: Verify committed native PCB-MAIN schematic
         run: |
@@ -310,6 +317,8 @@ jobs:
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/finalize_pcb_pwr_schematic_completeness_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/finalize_pcb_pwr_passive_authority_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/finalize_pcb_pwr_erc_power_model_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/materialize_pcb_pwr_libraries_rev_a.py \
@@ -324,6 +333,8 @@ jobs:
           python tools/audit_pcb_pwr_native_completeness_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/audit_pcb_pwr_footprints_rev_a.py
+          python tools/audit_pcb_pwr_passive_authority_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           /usr/bin/python3 - <<'PY'
           import pcbnew
           root = "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty"
@@ -335,6 +346,7 @@ jobs:
               "Molex_43045-0213_MicroFit-2_Vertical": 4,
               "Vishay_WSK2512_4T_T1.19mm": 4,
               "Coilcraft_XAL7030_472": 2,
+              "TestPoint_DFT_1.7mm_NoPaste": 1,
           }
           for name, pad_count in expected.items():
               footprint = pcbnew.FootprintLoad(root, name)

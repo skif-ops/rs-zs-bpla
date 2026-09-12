@@ -81,7 +81,10 @@ jobs:
       - name: QG-2 independent STM32 startup and memory audit
         run: python tools/audit_evt_pre_20_stm32_scaffold_technical.py
       - name: Cross-check Rev.A component and connector freeze
-        run: python tools/validate_rev_a_component_freeze.py
+        run: |
+          python tools/validate_rev_a_component_freeze.py
+          python tools/audit_pcb_pwr_passive_authority_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
       - name: Second-pass release completeness audit
         run: python tools/audit_evt_pre_20_release.py
       - name: Upload audit and generated Rev.A BOM

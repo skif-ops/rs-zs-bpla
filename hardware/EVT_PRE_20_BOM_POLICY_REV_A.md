@@ -35,13 +35,19 @@ must have zero quantity unless that variant is formally selected.
 Exact identity, package, and rating evidence normalized during BOM work is recorded in
 `hardware/EVT_PRE_20_BOM_EVIDENCE_REV_A.md`.
 
+PCB-PWR passive, net-tie and DFT physical references are sourced only from
+`hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv`. The generator groups its 17 procured
+or fabricated BOM item IDs from that per-reference authority; DFT points have no BOM
+item ID and must not leak into procurement quantities.
+
 ## Double control
 
 QG-1 (`tools/validate_evt_pre_20_bom_qg1.py`) checks schema, arithmetic, native PCB-PWR
 major RefDes mapping, connector MPNs and quantity invariants.
 
 QG-2 (`tools/audit_evt_pre_20_bom_qg2.py`) independently compares freeze tables,
-checks exact fitted-line fields, verifies schematic RefDes coverage and refuses a
+checks exact fitted-line fields, independently reconstructs the 17 PCB-PWR passive
+groups from the 47-row authority, verifies schematic RefDes coverage and refuses a
 production release while native schematic or system SKU evidence is incomplete.
 
 The actual factory gate is:

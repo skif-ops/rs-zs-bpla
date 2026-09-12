@@ -1,6 +1,6 @@
 # Дионея EVT-PRE-20 Rev.A — PCB-PWR footprint authority
 
-Status: `J1/U1/U2/Q1/RSH1/U3/U4/L1/L2/U5 MANUFACTURER LAND/HOLE/STENCIL VERIFIED / LAYOUT USE AUTHORIZED / NOT FOR MANUFACTURE`
+Status: `J1/U1/U2/Q1/RSH1/U3/U4/L1/L2/U5 MANUFACTURER LAND/HOLE/STENCIL VERIFIED / TP1-TP10 PROJECT DFT GEOMETRY VERIFIED / LAYOUT USE AUTHORIZED / NOT FOR MANUFACTURE`
 Date: 2026-09-12
 Board: `PCB-PWR`
 
@@ -194,6 +194,17 @@ calculated 4 A full-load peaks are about 4.75 A (3.8 V rail) and 4.68 A (3.3 V r
 both below the 10.1 A saturation rating. Maximum-DCR winding loss is 0.48 W at 4 A;
 placement, hot-loop geometry, +70 C thermal evidence, load-step and EMI remain open.
 
+## TP1-TP10 - project DFT probe target
+
+Controlled footprint: `DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste`
+
+Primary source: project PCB-PWR DFT authority. The footprint contains one circular
+`1.70 mm` copper target with `0.20 mm` radial solder-mask expansion, producing a
+`2.10 mm` opening. It deliberately has no paste aperture and is excluded from BOM and
+pick-and-place outputs. The ten schematic instances and their nets are controlled by
+`hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv`; final coordinates, fixture access and
+probe-wear validation remain layout/Review-B controls.
+
 ## Remaining controls
 
 - TI does not define a Q1 solder-mask expansion in the cited figures; its final mask
@@ -204,7 +215,7 @@ placement, hot-loop geometry, +70 C thermal evidence, load-step and EMI remain o
   remain assembly-house/DFM controls.
 - Drain thermal spreading, via field, current density, gate-loop placement and SOA are
   PCB-PWR layout/Review-B controls.
-- J1/U1/U2/Q1/RSH1/U3/U4/L1/L2/U5 placement is not authorized until `PCB-PWR.kicad_pcb` is created
-  from the reviewed board outline and mechanical authority.
+- J1/U1/U2/Q1/RSH1/U3/U4/L1/L2/U5 and TP1-TP10 placement is not authorized until
+  `PCB-PWR.kicad_pcb` is created from the reviewed board outline and mechanical authority.
 - Manufacturing release remains blocked until layout DRC, thermal/fault evidence, DFM
   and both review gates pass.

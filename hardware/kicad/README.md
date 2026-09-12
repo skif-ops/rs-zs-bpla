@@ -26,6 +26,11 @@ This directory is the authoritative electrical-CAD input package for the EVT-PRE
 2. `PCB-MIC`: one T5838 microphone leaf; four identical boards per station.
 3. `PCB-PWR`: protected battery interface and DC/DC rails for 3.8 V modem, 3.3 V digital/AON and 1.8 V microphone domains. External MPPT remains a separate assembly.
 
+PCB-PWR `C1-C19`, `R1-R15`, `NT1-NT3` and `TP1-TP10` are bound from
+`hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv`. This is a capture/placement input,
+not a manufacturing release; its electrical, package, fixture and environmental
+blockers remain explicit in the authority.
+
 ## Logical sheet plan
 
 1. `01_POWER` - protected input and regulated rails; no integrated solar MPPT.

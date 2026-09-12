@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -98,6 +99,46 @@ def main() -> int:
     ]
     check("power_identity_and_refdes", not power_mismatch,
           "PCB-PWR identity/RefDes mismatch: " + ", ".join(power_mismatch) if power_mismatch else "power IC/protection identity and RefDes match")
+
+    pwr_passive_authority = read(ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+    pwr_passive_groups: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for frozen in pwr_passive_authority:
+        if frozen["BOM_Item_ID"]:
+            pwr_passive_groups[frozen["BOM_Item_ID"]].append(frozen)
+    pwr_passive_mismatch = []
+    for item_id, frozen_rows in pwr_passive_groups.items():
+        first = frozen_rows[0]
+        row = by_id.get(item_id)
+        population = first["Population"]
+        expected_qty = "0" if population == "DNP" else str(len(frozen_rows))
+        expected_refs = ";".join(item["RefDes"] for item in frozen_rows)
+        if (
+            row is None
+            or row["Assembly"] != "PCB-PWR"
+            or row["RefDes"] != expected_refs
+            or row["Manufacturer"] != first["Manufacturer"]
+            or row["MPN"] != first["MPN"]
+            or row["Package"] != first["Package"]
+            or row["Value"] != first["Value"]
+            or row["Population"] != population
+            or row["Temperature_C"] != first["Temperature_C"]
+            or row["Qty_per_station"] != expected_qty
+            or first["Footprint"] not in row["Notes"]
+        ):
+            pwr_passive_mismatch.append(item_id)
+    dft_refs = {row["RefDes"] for row in pwr_passive_authority if not row["BOM_Item_ID"]}
+    leaked_dft = sorted(
+        ref for row in rows for ref in row["RefDes"].split(";") if ref in dft_refs
+    )
+    check(
+        "power_passive_authority_bom",
+        len(pwr_passive_authority) == 47 and len(pwr_passive_groups) == 17
+        and not pwr_passive_mismatch and not leaked_dft,
+        "PCB-PWR passive authority/BOM mismatch: "
+        + ", ".join(pwr_passive_mismatch + leaked_dft)
+        if pwr_passive_mismatch or leaked_dft
+        else "all 37 BOM passives/net-ties match authority; 10 DFT pads remain non-procured",
+    )
 
     mic_expected = {
         "MK1": "MMICT5838-00-012", "J-MIC": "5040500691",

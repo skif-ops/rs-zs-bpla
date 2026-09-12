@@ -123,7 +123,10 @@ Quectel requires approximately 100 uF low-ESR bypass near VBAT and reserves sepa
 - Quectel-recommended HF MLCC arrays adjacent to the appropriate modem pins;
 - star split from the common 3.8 V source into VBAT_BB and VBAT_RF.
 
-The exact capacitor technology/MPN is frozen only after cold-temperature ESR, load-step and layout review.
+Exact PCB-PWR capacitor candidates are controlled in
+`PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv` so schematic capture and the engineering BOM use
+one identity. They are not released for manufacture until cold-temperature ESR,
+DC-bias derating, transient/load-step and layout review are closed.
 
 ## 4. 3.3 V digital rail
 
@@ -249,7 +252,8 @@ Can proceed into native schematic capture now:
 Still open before `FOR_MANUFACTURE`:
 
 - in-application inductor thermal/load-step/EMI evidence;
-- exact MLCC/bulk capacitor MPNs after derating;
+- release of the controlled MLCC/bulk capacitor candidates after DC-bias,
+  cold-ESR, transient, load-step and package/assembly review;
 - TVS;
 - PCB fuse;
 - shunt Kelvin layout, temperature rise and reference-meter calibration;
