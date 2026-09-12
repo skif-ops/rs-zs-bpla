@@ -95,7 +95,7 @@ def temporal_vector(rows: pd.DataFrame) -> dict[str, float]:
 
 @dataclass(slots=True)
 class TemporalFeatureBuilder:
-    """Build 5 s / 10 s rolling vectors from a station feature stream."""
+    """Build configurable rolling vectors from a station feature stream."""
 
     hop_seconds: float = 1.0
 

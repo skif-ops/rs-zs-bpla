@@ -32,3 +32,8 @@ def test_online_type_status_has_fail_safe_defaults():
     assert status.status == "unknown"
     assert status.type_lock_allowed is False
     assert status.confidence == 0.0
+    assert status.evidence_windows == 0
+    assert status.required_windows == 4
+    assert status.max_windows == 8
+    assert status.family_label == "UNKNOWN"
+    assert status.hierarchical_label == "UNKNOWN"

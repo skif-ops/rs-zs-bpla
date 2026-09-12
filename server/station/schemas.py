@@ -297,6 +297,7 @@ class FeatureUpdateMessage(BaseModel):
     event_time_us: int
     features: list[float]
     detector_profile: Literal["piston", "reactive", "generic"] = "generic"
+    air_target_confirmed: bool = False
 
     @field_validator("features")
     @classmethod
@@ -310,7 +311,18 @@ class OnlineTypeStatusMessage(BaseModel):
     station_id: int
     event_id: int
     elapsed_seconds: float = Field(default=0.0, ge=0.0)
+    evidence_windows: int = Field(default=0, ge=0, le=8)
+    required_windows: int = 4
+    max_windows: int = 8
+    family_label: str = "UNKNOWN"
+    family_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    family_margin: float = 0.0
+    family_status: str = "unknown"
+    family_operational_validation_ready: bool = False
+    family_conditional_on_air_target: bool = False
+    family_model_version: str = "unknown"
     best_label: str = "UNKNOWN"
+    hierarchical_label: str = "UNKNOWN"
     confidence: float = Field(default=0.0, ge=0.0, le=1.0)
     margin: float = 0.0
     status: str = "unknown"

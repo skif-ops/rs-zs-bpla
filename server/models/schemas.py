@@ -108,6 +108,10 @@ class FamilyClassificationResult(BaseModel):
     status: str = "unknown"
     conditional_on_air_target: bool = False
     operational_validation_ready: bool = False
+    evidence_windows: int = 0
+    required_windows: int = 4
+    max_windows: int = 8
+    consensus_ratio: float = 0.0
     scores: list[FamilyClassificationScore] = Field(default_factory=list)
     model_version: str = "unknown"
     explanation: str = ""

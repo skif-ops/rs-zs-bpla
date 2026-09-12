@@ -19,6 +19,7 @@ REQ-REC-001,USB-C provides controlled service recovery,Project baseline,Boot rec
 REQ-SRV-001,Latest compatible Mukhoyed release is included,Customer,Server source release and lockfile,EVT-SRV-01,Every_release,OPEN,
 REQ-SRV-002,Mukhoyed deploys on Windows 11 and Ubuntu 24.04,Customer,Deployment bundles,Fresh-install and restore tests,Each_platform,OPEN,
 REQ-SRV-003,Server handles 20 stations,Project need,Authenticated ingress registry and storage,EVT-SRV-02,Simulation_plus_live,OPEN,
+REQ-CLS-001,Hierarchical family and type decisions use 4 to 8 unique feature windows,Customer,Portable firmware consensus plus bounded live server consensus and 4/6/8 temporal model,C unit API replay and field classification tests,Every_detection_series,PARTIAL_PASS_HOST,Host regression only; field validation remains open
 REQ-MECH-001,Separate full-lot fallback housing package exists for 3D printing,Customer,mechanics/3d_print release set,EVT-MECH-3D,Engineering_sample_and_20_if_fallback,OPEN,
 REQ-MECH-002,Primary pilot allocation is 20 vacuum-cast housings and TPA remains source-data-only,Customer,Independent vacuum and injection source releases with no pilot TPA tooling,EVT-MECH-VC and source audit EVT-MECH-IM,20_vacuum_plus_source_audit,OPEN,
 REQ-MECH-003,Enclosure minimum IP65 target IP67,Project baseline,Seals membranes vents and process control,Leak plus ingress campaign,20_primary_or_approved_fallback,OPEN,

@@ -14,6 +14,7 @@ add_library(zs_core
   src/zs_mesh.c
   src/zs_time.c
   src/zs_classifier.c
+  src/zs_classifier_consensus.c
   src/zs_fft.c
   src/zs_dsp.c
   src/zs_bg95.c
@@ -36,6 +37,8 @@ add_executable(zs_core_tests tests/test_core.c)
 target_link_libraries(zs_core_tests zs_core m)
 add_executable(zs_driver_tests tests/test_drivers.c)
 target_link_libraries(zs_driver_tests zs_core m)
+add_executable(zs_classifier_consensus_tests tests/test_classifier_consensus.c)
+target_link_libraries(zs_classifier_consensus_tests zs_core m)
 add_executable(zs_bg95_transport_tests tests/test_bg95_transport.c)
 target_link_libraries(zs_bg95_transport_tests zs_core m)
 add_executable(zs_heartbeat_telemetry_tests tests/test_heartbeat_telemetry.c)
@@ -62,6 +65,7 @@ target_link_libraries(evt_pre_20_target_contract_tests PRIVATE evt_pre_20_target
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_core_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_driver_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_classifier_consensus_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_bg95_transport_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_heartbeat_telemetry_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_archive_tests PRIVATE -UNDEBUG)
@@ -77,6 +81,7 @@ endif()
 enable_testing()
 add_test(NAME core COMMAND zs_core_tests)
 add_test(NAME drivers COMMAND zs_driver_tests)
+add_test(NAME classifier_consensus COMMAND zs_classifier_consensus_tests)
 add_test(NAME bg95_transport COMMAND zs_bg95_transport_tests)
 add_test(NAME heartbeat_telemetry COMMAND zs_heartbeat_telemetry_tests)
 add_test(NAME archive COMMAND zs_archive_tests)

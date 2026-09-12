@@ -18,6 +18,13 @@
 - WebSocket realtime event stream;
 - station command queue and audio request/upload;
 - optional MQTT/TLS bridge process;
+- hierarchical family/type updates use only the latest 4-8 unique feature
+  windows; fewer than four windows remain `warming_up`;
+- portable station firmware uses the same 4-8-window and 5/8 consensus rule
+  before filling the compact hierarchy fields;
+- known UAV families retain an explicit unknown-type branch:
+  `UNKNOWN_PROP_PISTON_UAV`, `UNKNOWN_TURBINE_JET_UAV` or
+  `UNKNOWN_ROTOR_ELECTRIC_UAV`;
 - 365-day retention cleanup hook.
 
 ## Run
@@ -37,7 +44,7 @@ OpenAPI: `http://localhost:8000/docs`
 pytest -q
 ```
 
-Current working branch: 89 tests PASS.
+Current working branch: 94 tests PASS.
 
 ## v0.8.1 field-recording corrections
 
@@ -47,7 +54,11 @@ Current working branch: 89 tests PASS.
 - unvalidated expert FP-1/GR2 hints remain research metadata and cannot become an operational type;
 - `httpx2` is pinned in runtime requirements so the complete API regression suite is reproducible.
 
-The four September 2026 field recordings are intentionally not added to the training set because their aircraft type and flight metadata have not yet been confirmed. Detection is usable; type remains `UNKNOWN` until labeled source material passes the dataset readiness gate.
+The four September 2026 field recordings are intentionally not added to the training set because their aircraft type and flight metadata have not yet been confirmed. Detection is usable; a family may remain visible after 4-8 agreeing windows, but the exact type stays `UNKNOWN` until labeled source material passes the dataset readiness gate.
+
+Live feature updates may set `air_target_confirmed=true` only when the event has
+already passed the independent AIR target gate. This flag restricts family
+competition to UAV propulsion families; it does not permit a hard type lock.
 
 ## MQTT bridge
 

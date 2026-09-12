@@ -67,15 +67,15 @@ def test_predict_window_preserves_raw_label_when_single_horizon_is_unknown(tmp_p
     frame=pd.DataFrame(rows)
     clf=OnlineTemporalTypeClassifier(model_path=tmp_path/"temporal.json")
     model=clf.train(frame)
-    temporal=clf.builder.build_one_source(frame[frame.source_file=="l0.wav"],5.0)
+    temporal=clf.builder.build_one_source(frame[frame.source_file=="l0.wav"],6.0)
     assert not temporal.empty
     vector={name: float(temporal.iloc[0][name]) for name in model["feature_columns"]}
-    pred=clf.predict_window(vector,5.0,model)
+    pred=clf.predict_window(vector,6.0,model)
     assert pred["raw_best_label"] in {"Лютый","FP-1"}
     assert "best_label" in pred
 
 
-def test_v07_model_exposes_type_readiness_and_starts_at_three_seconds(tmp_path):
+def test_v07_model_exposes_type_readiness_and_starts_at_four_windows(tmp_path):
     rows=[]
     for i in range(3):
         rows += _rows("Лютый",f"l{i}.wav","training_provisional",1.0,14.0)
@@ -89,5 +89,12 @@ def test_v07_model_exposes_type_readiness_and_starts_at_three_seconds(tmp_path):
     assert model["type_readiness"]["operational_validation_ready"] is False
     replay=clf.replay(frame[frame.source_file=="l0.wav"], source_file="l0.wav", candidate_detection_seconds=2.0, model=model)
     assert replay.snapshots
-    assert replay.snapshots[0].time_seconds == 3.0
+    assert replay.snapshots[0].time_seconds == 4.0
     assert replay.type_lock_allowed is False
+
+
+def test_checked_in_v07_model_matches_active_four_to_eight_window_policy():
+    model = OnlineTemporalTypeClassifier().load()
+    assert model is not None
+    assert set(model["horizons"]) == {"4.0", "6.0", "8.0"}
+    assert model["timing"]["evidence_window_range"] == [4, 8]

@@ -1,7 +1,8 @@
 """Conservative online UAV type classifier for 40-60 s acoustic fly-overs.
 
 v0.7 separates detection from type identity. Detection may trigger immediately;
-type identity uses rolling 5 s and 10 s aggregates of the existing 43 features.
+type identity uses rolling 4 s, 6 s and 8 s aggregates of the existing 43
+features, so no final hierarchy is inferred from a single acoustic window.
 Weakly labelled FP-1 data may shape a provisional prototype but can never create
 an operational type lock. Confirmed Lutyi recordings are also provisional until
 a separately frozen, representative validation set exists.
@@ -157,6 +158,10 @@ class OnlineTemporalTypeClassifier:
                 "candidate_target_seconds": settings.temporal_candidate_seconds,
                 "first_type_target_seconds": settings.temporal_first_type_target_seconds,
                 "stable_type_target_seconds": settings.temporal_stable_type_target_seconds,
+                "evidence_window_range": [
+                    settings.hierarchy_min_evidence_windows,
+                    settings.hierarchy_max_evidence_windows,
+                ],
                 "flyover_design_seconds": [40.0, 60.0],
             },
         }
@@ -168,6 +173,9 @@ class OnlineTemporalTypeClassifier:
             return None
         payload = json.loads(self.model_path.read_text(encoding="utf-8"))
         if tuple(payload.get("feature_columns", ())) != TEMPORAL_FEATURE_COLUMNS:
+            return None
+        expected_horizons = {str(float(value)) for value in settings.temporal_type_window_seconds}
+        if set(payload.get("horizons", {})) != expected_horizons:
             return None
         return payload
 
@@ -220,9 +228,9 @@ class OnlineTemporalTypeClassifier:
         margin = float(relative - runner)
         # A single temporal horizon is not allowed to create a type decision by
         # itself at low confidence.  Keep the raw nearest label nevertheless so
-        # the 5 s and 10 s horizons can be fused without destroying evidence.
-        # The operational decision remains gated later by combined confidence,
-        # margin, label policy and stability.
+        # the 4 s, 6 s and 8 s horizons can be fused without destroying evidence.
+        # The operational decision remains gated later by combined 4/6/8-window
+        # confidence, margin, label policy and stability.
         best_label = raw_best_label if confidence >= 0.50 else "UNKNOWN"
         return {
             "best_label": best_label,
@@ -254,13 +262,13 @@ class OnlineTemporalTypeClassifier:
         final_lock = False
         policy = model.get("label_policy", {})
 
-        horizon_weights = {3.0: 0.20, 5.0: 0.30, 10.0: 0.50}
+        horizon_total = max(sum(float(value) for value in settings.temporal_type_window_seconds), 1.0)
         start_time = min(settings.temporal_type_window_seconds)
         operational_ready = bool(model.get("type_readiness", {}).get("operational_validation_ready", False))
         for t in np.arange(start_time, end + 1e-9, settings.temporal_type_hop_seconds):
             predictions: list[tuple[float, dict[str, Any]]] = []
             for horizon in settings.temporal_type_window_seconds:
-                weight = horizon_weights.get(float(horizon), 1.0 / max(len(settings.temporal_type_window_seconds), 1))
+                weight = float(horizon) / horizon_total
                 if t + 1e-9 < horizon:
                     continue
                 start = t - horizon

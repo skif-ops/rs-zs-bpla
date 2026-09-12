@@ -35,6 +35,10 @@ def test_feature_update_warms_up_without_hard_type_lock():
     body=r.json()
     assert body['status']=='warming_up'
     assert body['type_lock_allowed'] is False
+    assert body['evidence_windows']==1
+    assert body['required_windows']==4
+    assert body['max_windows']==8
+    assert body['hierarchical_label']=='UNKNOWN'
 
 def test_http_heartbeat_rejects_full_cellular_identity():
     payload={
