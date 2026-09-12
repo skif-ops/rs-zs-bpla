@@ -2,9 +2,9 @@
 """Materialize project-local libraries for native PCB-PWR Rev.A schematic.
 
 Electrical pin/net content is not changed. This layer makes KiCad ERC deterministic by
-providing the local DioneyaPWR symbol library and standard library tables. Footprint
-properties are cleared only for references whose exact production land pattern is still
-an explicit Review-A/Review-B blocker; fake placeholder footprints are prohibited.
+providing the local DioneyaPWR symbol library and standard library tables. Exact
+manufacturer-controlled footprints are bound here; fake placeholder footprints are
+prohibited.
 """
 from __future__ import annotations
 
@@ -15,24 +15,28 @@ from pathlib import Path
 from kiutils.schematic import Schematic
 from kiutils.symbol import SymbolLib
 
-UNRESOLVED_FOOTPRINT_REFS = {
-    "J1",   # exact Micro-Fit 2-pin board land pattern/orientation pending mechanical review
-    "RSH1", # exact four-terminal shunt MPN/land pattern not frozen
-    "L1", "L2", # exact inductor land pattern remains under Review B
-}
+UNRESOLVED_FOOTPRINT_REFS: set[str] = set()
 
 CONTROLLED_FOOTPRINTS = {
+    # Molex SD-43045-005 Rev G1 defines the two contacts and both possible
+    # polarization-peg holes for the gold-plated 43045-0213 vertical header.
+    "J1": "DioneyaPWR:Molex_43045-0213_MicroFit-2_Vertical",
     # TI SNOSD17G package drawing DBV0006A 4214840/G defines exact lands,
     # solder-mask and equal stencil apertures for the six-pin SOT-23.
     "U1": "DioneyaPWR:TI_DBV0006A_SOT23-6",
     # TI SBOS547C package drawing DGS0010A 4221984/A defines exact lands,
     # solder-mask and equal stencil apertures for the ten-pin VSSOP.
     "U2": "DioneyaPWR:TI_DGS0010A_VSSOP10",
+    # Vishay document 30108 defines the four independent WSK2512 lands.
+    "RSH1": "DioneyaPWR:Vishay_WSK2512_4T_T1.19mm",
     # TI SLPS488B sections 7.2/7.3 provide the exact PCB and stencil patterns.
     "Q1": "DioneyaPWR:CSD18540Q5B_DNK",
     # TI SNAS877 RAK0009A drawing 4229353/J provides board and stencil patterns.
     "U3": "DioneyaPWR:LMR60440_RAK0009A",
     "U4": "DioneyaPWR:LMR60440_RAK0009A",
+    # Coilcraft document 863-2 defines the -472 terminal width and land pattern.
+    "L1": "DioneyaPWR:Coilcraft_XAL7030_472",
+    "L2": "DioneyaPWR:Coilcraft_XAL7030_472",
     # TPS7A20 SBVS338H carries the same TI DBV0005A 4214839/K pattern that
     # is already controlled and parsed in the shared PCB-MAIN library.
     "U5": "DioneyaMain:TI_DBV0005A_SOT23-5",
@@ -168,6 +172,9 @@ def main() -> int:
         libs / "DioneyaPWR.pretty" / "LMR60440_RAK0009A.kicad_mod",
         libs / "DioneyaPWR.pretty" / "TI_DBV0006A_SOT23-6.kicad_mod",
         libs / "DioneyaPWR.pretty" / "TI_DGS0010A_VSSOP10.kicad_mod",
+        libs / "DioneyaPWR.pretty" / "Molex_43045-0213_MicroFit-2_Vertical.kicad_mod",
+        libs / "DioneyaPWR.pretty" / "Vishay_WSK2512_4T_T1.19mm.kicad_mod",
+        libs / "DioneyaPWR.pretty" / "Coilcraft_XAL7030_472.kicad_mod",
         project_dir.parent / "PCB-MAIN" / "libs" / "DioneyaMain.pretty" /
             "TI_DBV0005A_SOT23-5.kicad_mod",
         project_dir.parent / "PCB-MAIN" / "libs" / "DioneyaMain.pretty" /

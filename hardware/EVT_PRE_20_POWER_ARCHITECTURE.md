@@ -29,7 +29,9 @@
 | `3V3_DIGITAL` | STM32, GNSS, LoRa, nRF52840, SD | `LMR604403SRAKR`, 4 A; low-Iq; MAX-M10S VCC/V_IO common 3.3 V feed supports 100 mA startup inrush with no more than 0.2 Ohm series resistance; отдельный `3V3_AON` в Rev.A не ставится |
 | `1V8_MIC` | 4 x T5838 + low-voltage wake/PDM logic | `TPS7A2018PDBVR`, 300 mA low-noise LDO; остаётся активной при AAD monitoring |
 
-Точные passives, inductors, feedback values, current shunt и TVS/fuse coordination остаются блокерами принципиальной схемы и рассчитываются до Review A.
+Точные `L1/L2` и current shunt уже выбраны и привязаны к контролируемым footprint.
+Окончательные пассивы, TVS/fuse coordination, физическая разводка, нагрев и EMI
+остаются блокерами производственного выпуска.
 
 ## 4. Режимы мощности Rev.A
 
@@ -81,7 +83,10 @@ AAD wake переводит STM32 в активное состояние, зап
 - MOSFET `CSD18540Q5B`;
 - `3V8_MODEM` и `3V3_DIGITAL`: `LMR604403SRAKR`;
 - `1V8_MIC`: `TPS7A2018PDBVR`;
-- current monitor: `INA226AIDGSR`, final shunt pending;
+- current monitor: `INA226AIDGSR` with selected four-terminal shunt below;
+- current shunt: Vishay Dale `WSK2512R0100FEA`, 10 mOhm, 1%, 1 W, four-terminal;
+- buck inductors L1/L2: Coilcraft `XAL7030-472MEC`, 4.7 uH, Isat 10.1 A,
+  Irms 6.9 A at 20 C rise;
 - TVS `SMBJ18A` и PCB fuse `0451005.MRL` остаются кандидатами до измеренного transient/fault profile.
 
 ## 6. Требования к MPPT/BMS до RFQ

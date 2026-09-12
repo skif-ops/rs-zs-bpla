@@ -41,6 +41,21 @@ J2_FOOTPRINT_FILE = (
     ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty" /
     "Molex_43045-1202_MicroFit-12_RA.kicad_mod"
 )
+J1_FOOTPRINT = "DioneyaPWR:Molex_43045-0213_MicroFit-2_Vertical"
+J1_FOOTPRINT_FILE = (
+    ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty" /
+    "Molex_43045-0213_MicroFit-2_Vertical.kicad_mod"
+)
+RSH1_FOOTPRINT = "DioneyaPWR:Vishay_WSK2512_4T_T1.19mm"
+RSH1_FOOTPRINT_FILE = (
+    ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty" /
+    "Vishay_WSK2512_4T_T1.19mm.kicad_mod"
+)
+L_FOOTPRINT = "DioneyaPWR:Coilcraft_XAL7030_472"
+L_FOOTPRINT_FILE = (
+    ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty" /
+    "Coilcraft_XAL7030_472.kicad_mod"
+)
 
 
 def rows(path: Path) -> list[dict[str, str]]:
@@ -74,6 +89,10 @@ def ref_of(inst) -> str:
 
 def footprint_of(inst) -> str:
     return next((p.value for p in inst.properties if p.key == "Footprint"), "")
+
+
+def value_of(inst) -> str:
+    return next((p.value for p in inst.properties if p.key == "Value"), "")
 
 
 def endpoint(inst, symbol, pin_number: str) -> tuple[float, float]:
@@ -156,11 +175,22 @@ def main() -> int:
     j1 = instances["J1"]; j1sym = lib_by_id[j1.libId]
     for pin, net in {"1":"VBAT_RAW", "2":"GND_PWR"}.items():
         require(net in labels.get(endpoint(j1,j1sym,pin), set()), f"J1.{pin} input mapping mismatch")
+    require(J1_FOOTPRINT_FILE.is_file(), f"J1 controlled footprint file missing: {J1_FOOTPRINT_FILE}")
+    require(footprint_of(j1) == J1_FOOTPRINT, f"J1 must use {J1_FOOTPRINT}")
+    require("43045-0213" in value_of(j1), "J1 exact gold-plated MPN is not bound")
     rsh = instances["RSH1"]; rshsym = lib_by_id[rsh.libId]
     rsh_expected = {"1":"VBAT_PROTECTED","2":"VBAT_SYS","3":"SHUNT_SOURCE_SENSE","4":"SHUNT_LOAD_SENSE"}
     require(set(selected_pins(rshsym)) == set(rsh_expected), "RSH1 must remain true 4-terminal symbol")
     for pin, net in rsh_expected.items():
         require(net in labels.get(endpoint(rsh,rshsym,pin), set()), f"RSH1.{pin} Kelvin/current mapping mismatch")
+    require(RSH1_FOOTPRINT_FILE.is_file(), f"RSH1 controlled footprint file missing: {RSH1_FOOTPRINT_FILE}")
+    require(footprint_of(rsh) == RSH1_FOOTPRINT, f"RSH1 must use {RSH1_FOOTPRINT}")
+    require("WSK2512R0100FEA" in value_of(rsh), "RSH1 exact MPN is not bound")
+
+    require(L_FOOTPRINT_FILE.is_file(), f"L1/L2 controlled footprint file missing: {L_FOOTPRINT_FILE}")
+    for ref in ("L1", "L2"):
+        require(footprint_of(instances[ref]) == L_FOOTPRINT, f"{ref} must use {L_FOOTPRINT}")
+        require("XAL7030-472MEC" in value_of(instances[ref]), f"{ref} exact MPN is not bound")
 
     # Startup deadlock regression: U4 must self-bootstrap from VBAT_SYS; EN_AUX gates U5 only.
     u4 = instances["U4"]; u4sym = lib_by_id[u4.libId]

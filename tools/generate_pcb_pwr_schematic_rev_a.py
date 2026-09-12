@@ -4,7 +4,7 @@
 The reviewed CSV pin/net authorities are the design authority. This generator only
 materializes them into a native KiCad schematic. Manufacturer IC symbols are represented
 with controlled generic multi-pin symbols whose pin numbers/names are rewritten from the
-Review-A authority; exact footprints remain capture candidates until layout/DFM review.
+Review-A authority; controlled footprints remain subject to layout/DFM review.
 
 Output remains NOT FOR MANUFACTURE. Full schematic Review A, exact passive MPN freeze,
 layout Review B and EVT evidence remain mandatory.
@@ -168,8 +168,8 @@ def main() -> int:
 
     # Main functional blocks. Coordinates are schematic-only and intentionally grid aligned.
     J1 = make_instance(sch, j1sym, reference="J1", value="PWR_INPUT_43045-0213",
-                       footprint="Connector_Molex:Molex_Micro-Fit_3.0_43045-0212_1x02_P3.00mm_Horizontal",
-                       datasheet="Molex Micro-Fit 3.0", x=25.40, y=38.10)
+                       footprint="DioneyaPWR:Molex_43045-0213_MicroFit-2_Vertical",
+                       datasheet="Molex SD-43045-005 Rev.G1", x=25.40, y=38.10)
     F1 = make_instance(sch, fuse, reference="F1", value="0451005.MRL CANDIDATE",
                        footprint="Fuse:Fuse_1206_3216Metric", datasheet="Littelfuse 0451", x=48.26, y=35.56)
     D1 = make_instance(sch, tvs, reference="D1", value="SMBJ18A CANDIDATE",
@@ -180,8 +180,9 @@ def main() -> int:
                        footprint="DioneyaPWR:CSD18540Q5B_DNK", datasheet="TI CSD18540Q5B Rev.B", x=109.22, y=38.10)
     C1 = make_instance(sch, capacitor, reference="C1", value="100nF VCAP",
                        footprint="Capacitor_SMD:C_0402_1005Metric", datasheet="~", x=83.82, y=58.42)
-    RSH1 = make_instance(sch, rshsym, reference="RSH1", value="10mOhm 4T >=1W MPN_TBD",
-                         footprint="DioneyaPWR:SHUNT_4T_TBD", datasheet="Review-A Kelvin authority", x=137.16, y=38.10)
+    RSH1 = make_instance(sch, rshsym, reference="RSH1", value="WSK2512R0100FEA 10mOhm 1% 1W 4T",
+                         footprint="DioneyaPWR:Vishay_WSK2512_4T_T1.19mm",
+                         datasheet="Vishay WSK2512 document 30108", x=137.16, y=38.10)
     U2 = make_instance(sch, u2sym, reference="U2", value="INA226AIDGSR",
                        footprint="DioneyaPWR:TI_DGS0010A_VSSOP10", datasheet="TI INA226 Rev.C", x=137.16, y=68.58)
     C2 = make_instance(sch, capacitor, reference="C2", value="100nF INA226",
@@ -189,8 +190,9 @@ def main() -> int:
 
     U3 = make_instance(sch, u34sym, reference="U3", value="LMR604403SRAKR 3V8",
                        footprint="DioneyaPWR:LMR60440_RAK0009A", datasheet="TI LMR60440 SNAS877", x=55.88, y=101.60)
-    L1 = make_instance(sch, inductor, reference="L1", value="4.7uH >=6A MPN_TBD",
-                       footprint="DioneyaPWR:L_PWR_TBD", datasheet="~", x=81.28, y=96.52)
+    L1 = make_instance(sch, inductor, reference="L1", value="XAL7030-472MEC 4.7uH",
+                       footprint="DioneyaPWR:Coilcraft_XAL7030_472",
+                       datasheet="Coilcraft XAL7030 document 863", x=81.28, y=96.52)
     C3 = make_instance(sch, capacitor, reference="C3", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
                        footprint="Capacitor_SMD:C_1210_3225Metric", datasheet="TDK CGA6P3X7R1E226M250AB", x=91.44, y=111.76)
     C14 = make_instance(sch, capacitor, reference="C14", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
@@ -216,8 +218,9 @@ def main() -> int:
 
     U4 = make_instance(sch, u34sym, reference="U4", value="LMR604403SRAKR 3V3 AON",
                        footprint="DioneyaPWR:LMR60440_RAK0009A", datasheet="TI LMR60440 SNAS877", x=121.92, y=101.60)
-    L2 = make_instance(sch, inductor, reference="L2", value="4.7uH >=6A MPN_TBD",
-                       footprint="DioneyaPWR:L_PWR_TBD", datasheet="~", x=147.32, y=96.52)
+    L2 = make_instance(sch, inductor, reference="L2", value="XAL7030-472MEC 4.7uH",
+                       footprint="DioneyaPWR:Coilcraft_XAL7030_472",
+                       datasheet="Coilcraft XAL7030 document 863", x=147.32, y=96.52)
     C5 = make_instance(sch, capacitor, reference="C5", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
                        footprint="Capacitor_SMD:C_1210_3225Metric", datasheet="TDK CGA6P3X7R1E226M250AB", x=152.40, y=111.76)
     C17 = make_instance(sch, capacitor, reference="C17", value="22uF 25V X7R CGA6P3X7R1E226M250AB",

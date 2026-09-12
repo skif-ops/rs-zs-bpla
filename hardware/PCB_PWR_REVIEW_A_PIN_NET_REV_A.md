@@ -180,12 +180,17 @@ The native schematic must fail Review A regression if it:
   `DioneyaPWR:LMR60440_RAK0009A` from TI SNAS877 package drawing
   4229353/J; optional thermal vias, power-loop placement, EMI/thermal evidence
   and assembly validation remain Review-B controls;
-- exact shunt MPN and Kelvin layout;
+- `RSH1` is frozen as `WSK2512R0100FEA` with the manufacturer land pattern;
+  Kelvin routing, current-density, thermal and reference-calibration evidence remain open;
+- `J1` is frozen as vertical gold-contact `Molex 43045-0213` with both possible
+  polarization-peg holes; orientation, service clearance and pull/thermal tests remain open;
 - `J2` electrical footprint is shared with the manufacturer-controlled
   PCB-MAIN `Molex 43045-1202` pattern; its PCB-PWR placement, orientation and
   service clearance remain open with `DIM-003`;
 - final TVS and fuse values and coordination;
-- exact inductor/capacitor/bulk MPNs and derating;
+- `L1/L2` are frozen as `XAL7030-472MEC` with the manufacturer land pattern;
+  hot-loop placement, temperature rise, load-step and EMI evidence remain open;
+- exact remaining capacitor/bulk MPN verification and derating;
 - selected battery/BMS voltage limits;
 - MPPT/harness transient envelope;
 - I2C final harness capacitance and pull-up validation;

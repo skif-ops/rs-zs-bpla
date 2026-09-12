@@ -75,7 +75,22 @@ Release inductor requirement:
 - low DCR;
 - -40...+125 C preferred.
 
-Exact MPN remains procurement/thermal/EMI gated.
+Selected for both rails: Coilcraft `XAL7030-472MEC`, 4.7 uH +/-20%,
+AEC-Q200, DCR 26.1 mOhm typical / 30.0 mOhm maximum, Isat 10.1 A and
+Irms 6.9 A for 20 C rise. The controlled footprint follows Coilcraft document
+863-2: two `1.58 x 6.50 mm` lands separated by a `2.94 mm` inner gap. Pad 1 is
+the marked start/short lead and must face the SW/high-dV/dt node.
+
+At the provisional maximum input of 14.6 V and 400 kHz:
+
+- 3.8 V rail ripple is about 1.50 A p-p, so the 4 A full-load peak is about
+  4.75 A and calculated RMS is about 4.02 A;
+- 3.3 V rail ripple is about 1.36 A p-p, so the 4 A full-load peak is about
+  4.68 A and calculated RMS is about 4.02 A;
+- maximum winding loss from the 30.0 mOhm DCR limit is 0.48 W at 4 A.
+
+The exact MPN and land pattern are therefore frozen. In-application +70 C
+temperature rise, load-step behaviour and EMI remain release gates.
 
 ### 3.2 Feedback divider for 3.8 V
 
@@ -151,13 +166,20 @@ TPS7A20 has low-noise/high-PSRR characteristics and low Iq, suitable for the mic
 
 Monitor: `INA226AIDGSR`.
 
-Capture shunt proposal:
+Capture shunt selection:
 
 - RSHUNT = `10 mOhm`;
 - 4-terminal/Kelvin construction required;
 - >=1 W rating target;
 - <=1% tolerance, 0.5% or 0.1% preferred;
 - low TCR, <=50 ppm/C target.
+
+Selected: Vishay Dale `WSK2512R0100FEA`, true four-terminal construction,
+10 mOhm +/-1%, 1 W at 70 C and +/-35 ppm/C TCR. Its controlled footprint uses
+the current Vishay document 30108 land-pattern values for the 0.005...0.2 Ohm
+range: `a=2.29`, `b=3.30`, `c=0.76`, `d=0.51`, `e=1.70`, `l=3.68 mm`.
+Pads 1/2 are source/load current lands; pads 3/4 are the corresponding
+source/load Kelvin sense lands.
 
 Reasoning:
 
@@ -167,6 +189,8 @@ At 5 A input current:
 - P = 0.25 W;
 
 which remains inside INA226 shunt measurement range while providing useful resolution.
+The 1 W rating is exactly four times the 0.25 W nominal dissipation at 5 A.
+Final Kelvin routing, thermal evidence and reference-meter calibration remain blocking.
 
 Firmware scaling baseline for max expected 5 A:
 
@@ -218,17 +242,17 @@ Can proceed into native schematic capture now:
 - LMR60440 x2;
 - 3.8 V feedback 100k / 35.7k;
 - 400 kHz baseline, RT 86.6k;
-- 4.7 uH topology;
+- Coilcraft XAL7030-472MEC 4.7 uH inductors with controlled land pattern;
 - TPS7A2018;
-- INA226 with 10 mOhm capture shunt.
+- INA226 with Vishay WSK2512R0100FEA 10 mOhm four-terminal shunt and controlled land pattern.
 
 Still open before `FOR_MANUFACTURE`:
 
-- exact inductors;
+- in-application inductor thermal/load-step/EMI evidence;
 - exact MLCC/bulk capacitor MPNs after derating;
 - TVS;
 - PCB fuse;
-- shunt exact MPN;
+- shunt Kelvin layout, temperature rise and reference-meter calibration;
 - selected battery/BMS voltage limits;
 - selected MPPT transient envelope;
 - thermal and load-step test evidence;

@@ -77,6 +77,54 @@ def audit_ti_support_ics(library: Path, shared_library: Path) -> None:
                             "TI_DGS0010A_VSSOP10", dgs10)
 
 
+def audit_remaining_power_components(library: Path) -> None:
+    j1_path = library / "Molex_43045-0213_MicroFit-2_Vertical.kicad_mod"
+    if not j1_path.is_file():
+        raise RuntimeError(f"controlled J1 footprint missing: {j1_path}")
+    j1 = Footprint.from_file(str(j1_path), encoding="utf-8")
+    if str(j1.entryName) != "Molex_43045-0213_MicroFit-2_Vertical":
+        raise RuntimeError(f"unexpected J1 footprint name: {j1.entryName}")
+    actual_j1 = {
+        (
+            str(p.number), str(p.type), str(p.shape),
+            round(float(p.position.X), 4), round(float(p.position.Y), 4),
+            round(float(p.size.X), 4), round(float(p.size.Y), 4),
+            round(float(p.drill.diameter), 4), tuple(str(layer) for layer in p.layers),
+        )
+        for p in j1.pads
+    }
+    expected_j1 = {
+        ("1", "thru_hole", "roundrect", 0.0, 3.0, 1.5, 1.5, 1.02, ("*.Cu", "*.Mask")),
+        ("2", "thru_hole", "circle", 0.0, 0.0, 1.5, 1.5, 1.02, ("*.Cu", "*.Mask")),
+        ("", "np_thru_hole", "circle", -3.0, 0.0, 0.94, 0.94, 0.94, ("*.Cu", "*.Mask")),
+        ("", "np_thru_hole", "circle", 3.0, 0.0, 0.94, 0.94, 0.94, ("*.Cu", "*.Mask")),
+    }
+    if actual_j1 != expected_j1 or len(j1.pads) != len(expected_j1):
+        raise RuntimeError(f"Molex 43045-0213 hole-field drift: {actual_j1}")
+
+    wsk = {
+        ("1", "rect", -2.985, -0.635, 2.29, 2.03,
+         ("F.Cu", "F.Paste", "F.Mask"), None, None),
+        ("2", "rect", 2.985, 0.635, 2.29, 2.03,
+         ("F.Cu", "F.Paste", "F.Mask"), None, None),
+        ("3", "rect", -3.28, 1.27, 1.70, 0.76,
+         ("F.Cu", "F.Paste", "F.Mask"), None, None),
+        ("4", "rect", 3.28, -1.27, 1.70, 0.76,
+         ("F.Cu", "F.Paste", "F.Mask"), None, None),
+    }
+    audit_simple_ti_package(library / "Vishay_WSK2512_4T_T1.19mm.kicad_mod",
+                            "Vishay_WSK2512_4T_T1.19mm", wsk)
+
+    xal = {
+        ("1", "rect", 2.26, 0.0, 1.58, 6.50,
+         ("F.Cu", "F.Paste", "F.Mask"), None, None),
+        ("2", "rect", -2.26, 0.0, 1.58, 6.50,
+         ("F.Cu", "F.Paste", "F.Mask"), None, None),
+    }
+    audit_simple_ti_package(library / "Coilcraft_XAL7030_472.kicad_mod",
+                            "Coilcraft_XAL7030_472", xal)
+
+
 def audit_lmr60440(library: Path) -> None:
     path = library / "LMR60440_RAK0009A.kicad_mod"
     if not path.is_file():
@@ -182,10 +230,12 @@ def main() -> int:
 
     audit_lmr60440(args.library)
     audit_ti_support_ics(args.library, args.shared_library)
+    audit_remaining_power_components(args.library)
     print("PCB-PWR manufacturer footprint audit PASS")
     print("Q1 CSD18540Q5B: TI SLPS488B copper + 16-aperture stencil exact")
     print("U3/U4 LMR60440: TI SNAS877 RAK0009A copper/mask/stencil exact")
     print("U1/U2/U5: TI DBV0006A/DGS0010A/DBV0005A lands, mask and stencil exact")
+    print("J1/RSH1/L1/L2: Molex/Vishay/Coilcraft manufacturer geometry exact")
     return 0
 
 

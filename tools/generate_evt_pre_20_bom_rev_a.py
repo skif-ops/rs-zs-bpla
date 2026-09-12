@@ -116,11 +116,13 @@ def main() -> None:
             notes=f"Rev.A freeze source POWER_COMPONENT_FREEZE_REV_A.csv; {p['Electrical_Baseline']}; blockers: {p['Release_Blockers']}",
         )
 
+    shunt = power_parts["R-SHUNT-01"]
     update_existing(
-        "R-SHUNT-01", manufacturer="Vishay Dale", mpn="WSK2512R0100FEA",
-        package="WSK2512 4-terminal 6432 metric", status="SELECTED_PENDING_KELVIN_LAYOUT_SAMPLE",
+        "R-SHUNT-01", manufacturer=shunt["Manufacturer"], mpn=shunt["MPN"],
+        package=shunt["Package"], status=shunt["Status"],
         refdes="RSH1", value="10 mOhm 1% 1 W",
-        notes="10 mOhm, 1%, 1 W, four-terminal current-sense resistor; exact land pattern and Kelvin layout remain Review B blockers",
+        notes=("Rev.A freeze source POWER_COMPONENT_FREEZE_REV_A.csv; exact four-terminal "
+               f"land pattern controlled; blockers: {shunt['Release_Blockers']}"),
     )
 
     mic = connectors["CON-MIC"]
@@ -329,6 +331,7 @@ def main() -> None:
 
     # PCB-PWR schematic parts. Each output bank is expanded to four individually
     # referenced physical MLCCs in the native schematic.
+    pwr_l = power_parts["PWR-L"]
     pwr_lines = [
         ("PWR-C-100N", "C1;C2;C4;C6", "100 nF 25 V X7R", "TDK", "CGA2B3X7R1E104K050BB", "0402", 4, "FITTED"),
         ("PWR-C-LDO", "C7;C8", "2.2 uF 10 V X7R", "TDK", "CGA3E1X7R1A225K080AC", "0603", 2, "FITTED"),
@@ -337,7 +340,7 @@ def main() -> None:
         ("PWR-C-BULK", "C13", "100 uF 35 V hybrid", "Panasonic Industry", "EEH-ZK1V101XP", "SMD can 6.3x8.0 mm", 1, "FITTED"),
         ("PWR-COUT-3V8", "C3;C14;C15;C16", "22 uF 25 V X7R", "TDK", "CGA6P3X7R1E226M250AB", "1210", 4, "FITTED"),
         ("PWR-COUT-3V3", "C5;C17;C18;C19", "22 uF 25 V X7R", "TDK", "CGA6P3X7R1E226M250AB", "1210", 4, "FITTED"),
-        ("PWR-L", "L1;L2", "4.7 uH +/-20%", "Coilcraft", "XAL7030-472MEC", "XAL7030 7.5x7.2 mm", 2, "FITTED"),
+        ("PWR-L", "L1;L2", "4.7 uH +/-20%", pwr_l["Manufacturer"], pwr_l["MPN"], pwr_l["Package"], 2, "FITTED"),
         ("PWR-R-100K-01", "R1", "100 kOhm 0.1%", "Panasonic Industry", "ERA-2AEB104X", "0402", 1, "FITTED"),
         ("PWR-R-35K7", "R2", "35.7 kOhm 0.1%", "Panasonic Industry", "ERA-2AEB3572X", "0402", 1, "FITTED"),
         ("PWR-R-86K6", "R3;R7", "86.6 kOhm 0.1%", "Panasonic Industry", "ERA-2AEB8662X", "0402", 2, "FITTED"),
@@ -357,14 +360,22 @@ def main() -> None:
             spares = 10
         else:
             spares = 40
+        status = pwr_l["Status"] if item_id == "PWR-L" else "SELECTED_PENDING_NATIVE_FOOTPRINT_DERATING"
+        notes = (
+            "Rev.A freeze source POWER_COMPONENT_FREEZE_REV_A.csv; exact land pattern controlled; "
+            f"blockers: {pwr_l['Release_Blockers']}"
+            if item_id == "PWR-L"
+            else "Exact candidate identity frozen for BOM control; native footprint, DC-bias/thermal margin and Review B remain blocking"
+        )
         append_item(
             item_id=item_id, assembly="PCB-PWR", refdes=refdes, category="Passive" if not item_id.endswith("NET-TIE") else "PCB feature",
             description=f"PCB-PWR {value}", manufacturer=manufacturer, mpn=mpn, package=package,
-            qty=qty, spares=spares, status="SELECTED_PENDING_NATIVE_FOOTPRINT_DERATING",
-            notes="Exact candidate identity frozen for BOM control; native footprint, DC-bias/thermal margin and Review B remain blocking",
+            qty=qty, spares=spares, status=status, notes=notes,
             value=value, population=population,
             line_class="PCB_FEATURE" if population == "PCB_FEATURE" else "ELECTRICAL_COMPONENT",
-            temperature="N/A" if population == "PCB_FEATURE" else "-55..125",
+            temperature="N/A" if population == "PCB_FEATURE" else (
+                pwr_l["Temperature_C"] if item_id == "PWR-L" else "-55..125"
+            ),
             disposition="CONTROLLED_PENDING_VERIFICATION" if selected else "CONTROLLED_DNP",
         )
 

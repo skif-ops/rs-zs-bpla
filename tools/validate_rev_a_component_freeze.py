@@ -46,6 +46,8 @@ def main() -> None:
         "U-PWR2": "LMR604403SRAKR",
         "U-PWR3": "TPS7A2018PDBVR",
         "U-MON-01": "INA226AIDGSR",
+        "PWR-L": "XAL7030-472MEC",
+        "R-SHUNT-01": "WSK2512R0100FEA",
     }
     for key, mpn in expected_power.items():
         require(key in power, f"missing power component {key}")
@@ -57,6 +59,9 @@ def main() -> None:
     require("0x40" in monitor["Electrical_Baseline"], "INA226 Rev.A address 0x40 missing")
     require("I2C" in monitor["Electrical_Baseline"], "INA226 I2C baseline missing")
     require("pins 11/12" in monitor["Notes"], "INA226 is not bound to MAIN-PWR pins 11/12")
+    require("10.1 A" in power["PWR-L"]["Electrical_Baseline"], "PWR-L Isat authority missing")
+    require("6.9 A" in power["PWR-L"]["Electrical_Baseline"], "PWR-L Irms authority missing")
+    require("four-terminal" in power["R-SHUNT-01"]["Electrical_Baseline"], "shunt Kelvin construction missing")
 
     expected_main = {
         "U1": "STM32U585VIT6Q",

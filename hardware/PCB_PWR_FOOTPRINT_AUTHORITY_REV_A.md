@@ -1,6 +1,6 @@
 # Дионея EVT-PRE-20 Rev.A — PCB-PWR footprint authority
 
-Status: `U1/U2/Q1/U3/U4/U5 MANUFACTURER LAND/STENCIL VERIFIED / LAYOUT USE AUTHORIZED / NOT FOR MANUFACTURE`
+Status: `J1/U1/U2/Q1/RSH1/U3/U4/L1/L2/U5 MANUFACTURER LAND/HOLE/STENCIL VERIFIED / LAYOUT USE AUTHORIZED / NOT FOR MANUFACTURE`
 Date: 2026-09-12
 Board: `PCB-PWR`
 
@@ -125,6 +125,75 @@ paste-free thermal copper land, one custom mask aperture and six explicit paste-
 apertures: 20 KiCad pad/aperture objects in total. Optional thermal vias shown by TI
 are deliberately excluded until placement and stack-up are fixed in PCB-PWR Review B.
 
+## J1 - Molex 43045-0213
+
+Controlled footprint: `DioneyaPWR:Molex_43045-0213_MicroFit-2_Vertical`
+
+Primary source: Molex customer drawing SD-43045-005 Rev.G1 dated 2016-08-23,
+`https://www.molex.com/content/dam/molex/molex-dot-com/products/automated/en-us/salesdrawingpdf/430/43045/430450213_sd.pdf`,
+retrieved SHA-256
+`85db6fbcbbd05643bfebded1b14e02911930151d0234b130d3711ee5fde78ec7`.
+
+The exact orderable 43045-0213 is the two-circuit, vertical, through-hole,
+gold-contact member of finish column B. The component-side hole field is:
+
+| Feature | Frozen geometry, mm |
+|---|---:|
+| Circuit 1 | center `(0, 3.00)`, drill `1.02` |
+| Circuit 2 | center `(0, 0)`, drill `1.02` |
+| Possible polarization pegs | centers `(-3.00, 0)` and `(+3.00, 0)`, NPTH drill `0.94` |
+| Contact copper lands | project annulus `1.50` diameter around the manufacturer drill |
+
+Both peg holes are mandatory because Molex note 2 permits assemblies with either one
+or both pegs. The manufacturer drawing controls the hole field and 1.57 mm recommended
+board thickness. The 1.50 mm contact land diameter is the project fabrication rule,
+not a Molex-specified annulus. Final connector orientation, service clearance and
+pull/thermal test remain under `DIM-003` and Review B.
+
+## RSH1 - Vishay Dale WSK2512R0100FEA
+
+Controlled footprint: `DioneyaPWR:Vishay_WSK2512_4T_T1.19mm`
+
+Primary source: Vishay WSK2512 data sheet document 30108 Rev. 11-Dec-2023,
+`https://www.vishay.com/doc/?30108=`, retrieved SHA-256
+`2ee8a9067539bd2cabb08845219bac55d506b1ca892a2dbaeed343dd1ed10cff`.
+
+The selected 10 mOhm part is a true four-terminal, 1 W, 1%, +/-35 ppm/C
+Power Metal Strip shunt. The footprint implements the current land-pattern row for
+0.005...0.2 Ohm: `a=2.29`, `b=3.30`, `c=0.76`, `d=0.51`, `e=1.70`, `l=3.68 mm`.
+
+| Project pad | Role | Center, mm | Size, mm |
+|---|---|---:|---:|
+| 1 | source current | `(-2.985, -0.635)` | `2.29 x 2.03` |
+| 2 | load current | `(+2.985, +0.635)` | `2.29 x 2.03` |
+| 3 | source Kelvin sense | `(-3.280, +1.270)` | `1.70 x 0.76` |
+| 4 | load Kelvin sense | `(+3.280, -1.270)` | `1.70 x 0.76` |
+
+At 5 A the shunt produces 50 mV and dissipates 0.25 W, so the 1 W rating provides
+the required 4x nominal power margin. Sense traces must leave pads 3/4 independently;
+Kelvin routing, copper current density, +70 C temperature rise and reference-meter
+calibration remain Review-B controls.
+
+## L1/L2 - Coilcraft XAL7030-472MEC
+
+Controlled footprint: `DioneyaPWR:Coilcraft_XAL7030_472`
+
+Primary source: Coilcraft XAL7030 data sheet document 863, document 863-2 revised
+02/25/26, `https://www.coilcraft.com/pdfs/xal7030.pdf`, retrieved SHA-256
+`c323552b4c1acd5ad94d13c32783d1d7db3f86ab70a1c58431673aebb96be9f6`.
+
+The selected AEC-Q200 shielded inductor is 4.7 uH +/-20%, DCR 26.1 mOhm typical /
+30.0 mOhm maximum, Isat 10.1 A and Irms 6.9 A for 20 C rise. For dash number
+`-472`, Coilcraft specifies a 1.40 mm terminal and a 1.58 mm land-pattern width.
+The recommended land pattern is two `1.58 x 6.50 mm` pads with `2.94 mm` inner gap,
+giving centers at `x=+/-2.26 mm`.
+
+Project pad 1 is the marked start/short lead and is bound to each LMR60440 SW node,
+following Coilcraft's lowest-EMI orientation guidance. At 14.6 V / 400 kHz, the
+calculated 4 A full-load peaks are about 4.75 A (3.8 V rail) and 4.68 A (3.3 V rail),
+both below the 10.1 A saturation rating. Maximum-DCR winding loss is 0.48 W at 4 A;
+placement, hot-loop geometry, +70 C thermal evidence, load-step and EMI remain open.
+
 ## Remaining controls
 
 - TI does not define a Q1 solder-mask expansion in the cited figures; its final mask
@@ -135,7 +204,7 @@ are deliberately excluded until placement and stack-up are fixed in PCB-PWR Revi
   remain assembly-house/DFM controls.
 - Drain thermal spreading, via field, current density, gate-loop placement and SOA are
   PCB-PWR layout/Review-B controls.
-- U1/U2/Q1/U3/U4/U5 placement is not authorized until `PCB-PWR.kicad_pcb` is created
+- J1/U1/U2/Q1/RSH1/U3/U4/L1/L2/U5 placement is not authorized until `PCB-PWR.kicad_pcb` is created
   from the reviewed board outline and mechanical authority.
 - Manufacturing release remains blocked until layout DRC, thermal/fault evidence, DFM
   and both review gates pass.
