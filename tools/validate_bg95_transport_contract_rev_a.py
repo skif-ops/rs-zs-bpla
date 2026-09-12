@@ -34,7 +34,8 @@ def main() -> int:
                   "ZS_BG95_ONLINE", "zs_bg95_apn_profile_t",
                   "zs_bg95_network_settings_t", "zs_bg95_configure_auto_network",
                   "zs_bg95_configure_mqtt_tls", "zs_bg95_start_mqtt",
-                  "zs_bg95_get_network_settings", "zs_bg95_online"):
+                  "zs_bg95_get_network_settings", "zs_bg95_export_cellular_telemetry",
+                  "zs_bg95_online"):
         require(token in header, f"BG95 interface missing {token}")
 
     for command in ('AT+QCCID', 'AT+CIMI', 'AT+COPS?', 'AT+CGNAPN',
@@ -49,7 +50,9 @@ def main() -> int:
         require(guard in source, f"BG95 fail-closed guard missing {guard}")
 
     for evidence in ("test_mqtt_tls_happy_path", "test_automatic_network_settings",
-                     "test_catalog_fallback_and_unknown_sim", "bytes_contain",
+                     "test_catalog_fallback_and_unknown_sim", "test_identity_query_fail_closed",
+                     "zs_bg95_export_cellular_telemetry", "250011234567890",
+                     "89701012345678901234",
                      "private.apn", "wrong.apn", "1883u", "pilot.example\\\"",
                      "+QMTOPEN: 0,3", "124000u"):
         require(evidence in test, f"BG95 QG-2 scenario missing {evidence}")
@@ -61,7 +64,8 @@ def main() -> int:
     require("pilot_apn_policy: public_only" in policy and
             "allowed_in_pilot: false" in policy and
             "unknown_imsi_prefix: FAIL_CLOSED" in policy and
-            "full_imsi_or_iccid_retention: FORBIDDEN" in policy,
+            "FULL_IMSI_AND_ICCID_REQUIRED_IN_MTLS_HEARTBEAT" in policy and
+            "mqtt_24h_evidence: DEFERRED_UNTIL_STATIONS_ASSEMBLED" in policy,
             "automatic public-only APN policy drift")
     require("apn_mode: PUBLIC" in template and "mqtt_port: 443" in template and
             "alternate_mqtt_port: 8883" in template and
@@ -70,11 +74,13 @@ def main() -> int:
             "MQTT/TLS ICD gate drift")
     require("MODEM AND END-TO-END EVIDENCE OPEN" in contract and
             "FW-005 remains draft" in contract, "contract overclaims readiness")
-    require("DEC-027" in decisions and "IMPLEMENTED_HOST_HARDWARE_PENDING" in decisions,
-            "automatic network settings decision is not recorded")
+    require("DEC-027" in decisions and "DEC-028" in decisions and
+            "IMPLEMENTED_HOST_HARDWARE_DEFERRED" in decisions,
+            "automatic network and protected identity decisions are not recorded")
 
     print("BG95 MQTT/TLS transport QG-1 PASS")
-    print("automatic public APN + settings readback + TLS contract traced; hardware evidence OPEN")
+    print("automatic public APN + full protected SIM identity + TLS contract traced")
+    print("operator and 24-hour hardware evidence DEFERRED_UNTIL_STATIONS_ASSEMBLED")
     return 0
 
 

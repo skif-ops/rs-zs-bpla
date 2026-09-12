@@ -35,3 +35,18 @@ def test_feature_update_warms_up_without_hard_type_lock():
     body=r.json()
     assert body['status']=='warming_up'
     assert body['type_lock_allowed'] is False
+
+def test_http_heartbeat_rejects_full_cellular_identity():
+    payload={
+        'station_id':9020,'time_us':1,
+        'station':{'lat_e7':0,'lon_e7':0,'alt_dm':0},
+        'cellular':{
+            'imsi':'250011234567890','iccid':'89701012345678901234',
+            'apn':'network.apn','local_address':'10.10.0.2',
+            'gateway':'10.10.0.1','primary_dns':'1.1.1.1',
+            'apn_source':'NETWORK','settings_valid':True,
+        },
+    }
+    response=client.post('/api/v1/stations/9020/heartbeat',json=payload)
+    assert response.status_code==400
+    assert 'mutual-TLS MQTT status' in response.json()['detail']

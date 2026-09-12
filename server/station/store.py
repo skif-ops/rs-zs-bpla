@@ -1,6 +1,6 @@
 """SQLite persistence for stations, detections, events and commands."""
 from __future__ import annotations
-import json, sqlite3, threading, time, uuid
+import json, os, sqlite3, threading, time, uuid
 from pathlib import Path
 from typing import Any
 from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, StationCommand, SystemEvent
@@ -22,6 +22,8 @@ class EventStore:
     def __init__(self, path: Path):
         self.path=path; path.parent.mkdir(parents=True,exist_ok=True); self.lock=threading.RLock()
         with self._conn() as c: c.executescript(SCHEMA)
+        try: os.chmod(path, 0o600)
+        except OSError: pass
     def _conn(self):
         c=sqlite3.connect(self.path,timeout=10); c.row_factory=sqlite3.Row; return c
     def get_station_heartbeat(self,station_id:int)->HeartbeatMessage|None:
@@ -30,6 +32,8 @@ class EventStore:
         return HeartbeatMessage.model_validate_json(row['payload']) if row else None
     def upsert_station(self, hb: HeartbeatMessage):
         existing=self.get_station_heartbeat(hb.station_id)
+        if existing is not None and existing.cellular is not None and hb.cellular is None:
+            hb=hb.model_copy(update={'cellular':existing.cellular})
         # Once a configured installation position is known, a later live-GNSS-only
         # heartbeat must not silently move the server-side station geometry.
         if existing is not None and existing.station.position_source=='configured_install' and hb.station.position_source!='configured_install':
@@ -57,7 +61,15 @@ class EventStore:
         return json.loads(r['payload']) if r else None
     def list_stations(self)->list[dict[str,Any]]:
         with self._conn() as c: rows=c.execute("SELECT payload FROM stations ORDER BY station_id").fetchall()
-        return [json.loads(r['payload']) for r in rows]
+        payloads=[json.loads(r['payload']) for r in rows]
+        for payload in payloads:
+            cellular=payload.get('cellular')
+            if cellular:
+                imsi=cellular.pop('imsi','')
+                iccid=cellular.pop('iccid','')
+                cellular['imsi_redacted']=f'{imsi[:3]}...{imsi[-4:]}' if len(imsi)>=7 else '***'
+                cellular['iccid_redacted']=f'{iccid[:4]}...{iccid[-4:]}' if len(iccid)>=8 else '***'
+        return payloads
     def create_command(self,station_id:int,command:str,payload:dict)->StationCommand:
         now=int(time.time()*1e6); cmd=StationCommand(command_id=str(uuid.uuid4()),station_id=station_id,command=command,payload=payload,created_time_us=now)
         with self.lock,self._conn() as c: c.execute("INSERT INTO commands(command_id,station_id,created_us,command,payload) VALUES(?,?,?,?,?)",(cmd.command_id,station_id,now,command,json.dumps(payload,ensure_ascii=False)))

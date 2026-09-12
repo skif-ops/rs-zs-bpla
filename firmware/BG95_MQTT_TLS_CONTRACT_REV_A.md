@@ -11,8 +11,8 @@ on hardware.
 
 1. wait for `CPIN READY` and the final command `OK` before issuing another AT
    command;
-2. query `QCCID`, retain only its last four digits, then query `CIMI` without
-   retaining the full IMSI;
+2. query `QCCID` and `CIMI`, retain the full ICCID and IMSI in volatile runtime
+   state for profile selection and protected telemetry;
 3. match the IMSI against the longest approved five- or six-digit prefix in the
    in-memory public-APN catalog;
 4. query `COPS?` for diagnostic operator/RAT metadata and `CGNAPN` for the
@@ -22,9 +22,24 @@ on hardware.
 6. reject an unknown IMSI prefix, missing APN, non-public profile, invalid APN or
    active-context APN mismatch.
 
-`QCCID` and `COPS?` are optional diagnostic queries: their command errors do not
-prevent the essential IMSI/profile/APN selection. `CIMI`, profile authorization,
+`COPS?` is an optional diagnostic query. `QCCID`, `CIMI`, profile authorization,
 PDP activation and active-context verification are mandatory and fail closed.
+
+## Protected identity telemetry
+
+After active-context verification the BG95 state can be exported into compact
+heartbeat schema 1. The LTE-only heartbeat carries the full IMSI and ICCID,
+home PLMN, registered operator, APN source, active APN, local address, gateway,
+DNS and access technology. It is published only to the station `status` topic
+over mutually authenticated TLS. It is never part of the LoRa/P0 detection
+summary.
+
+The server stores the full identifiers in the restricted station record. The
+general station-list API removes the full values and returns masked forms. The
+plain HTTP heartbeat route rejects a payload containing cellular identity, and
+the MQTT bridge rejects such a heartbeat in explicit insecure-bench mode.
+Firmware and server error logs must not include raw modem response lines or
+validation payloads containing IMSI/ICCID.
 
 ## Controlled sequence
 
@@ -47,22 +62,27 @@ and clear online/network-valid flags.
 ## Double control
 
 - QG-1: `tools/validate_bg95_transport_contract_rev_a.py` independently checks the
-  discovery policy, identity minimization, interface, command sequence, negative
+  discovery policy, protected identity handling, interface, command sequence, negative
   cases and CI binding.
 - QG-2: `firmware/tests/test_bg95_transport.c` executes the positive state sequence,
   network APN and catalog-fallback paths, unknown-SIM/APN-mismatch rejection,
-  identity minimization, public/private policy, TLS-only ports, timeout and modem
+  full-identity export, public/private policy, TLS-only ports, timeout and modem
   negative-result paths under the host build.
+- End-to-end QG-2: `server/tools/test_firmware_packet.py` decodes the actual
+  firmware heartbeat and verifies both full identifiers survive the CBOR boundary;
+  server tests verify validation, restricted persistence, API masking and mTLS
+  enforcement.
 
 ## Open evidence
 
 - exact PLMN permissions and public fallback APN values for each provisioned pilot SIM;
 - `QCCID`, `CIMI`, `COPS?`, `CGNAPN` and `CGCONTRDP` response compatibility on the
-  selected BG95 firmware revision and every pilot operator;
+  selected BG95 firmware revision and every pilot operator, after stations are assembled;
 - certificate upload/provisioning and BG95 firmware-version compatibility;
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
 - QoS 1 publish/subscribe, downstream signature validation and store-and-forward;
-- power-loss, network-loss, CGNAT, dual-SIM switching and 24-hour test logs;
+- power-loss, network-loss, CGNAT, dual-SIM switching and 24-hour test logs after
+  stations are assembled;
 - packet capture and broker/modem logs without secrets.
 
 Until these items pass, FW-005 remains draft with partial host evidence only.

@@ -17,11 +17,12 @@ type_service=OnlineTypeSessionService()
 router=APIRouter(prefix='/api/v1',tags=['ZS-BPLA stations'])
 
 @router.get('/health')
-async def health(): return {'status':'ok','protocol':'1.4','service':'zs-bpla'}
+async def health(): return {'status':'ok','protocol':'1.5','service':'zs-bpla'}
 
 @router.post('/stations/{station_id}/heartbeat')
 async def heartbeat(station_id:int,msg:HeartbeatMessage):
     if station_id!=msg.station_id: raise HTTPException(400,'station_id mismatch')
+    if msg.cellular is not None: raise HTTPException(400,'cellular identity is accepted only through mutual-TLS MQTT status')
     store.upsert_station(msg); service.bus.publish_nowait({'type':'station','data':msg.model_dump()}); return {'status':'ok'}
 
 @router.post('/stations/{station_id}/detection')

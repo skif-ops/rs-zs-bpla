@@ -155,6 +155,7 @@ static bool select_apn_profile(zs_bg95_t *m, const char *imsi) {
   }
   if (selected == BG95_NO_PROFILE) return false;
   m->selected_apn_profile = selected;
+  memcpy(m->network_settings.imsi, imsi, strlen(imsi) + 1u);
   memcpy(m->network_settings.home_plmn,
          m->apn_profiles[selected].imsi_prefix, best + 1u);
   return true;
@@ -177,27 +178,18 @@ static bool finish_apn_discovery(zs_bg95_t *m, uint32_t now_ms) {
   return begin_apn_configuration(m, now_ms);
 }
 
-static bool parse_iccid_suffix(zs_bg95_t *m, const char *line) {
+static bool parse_iccid(zs_bg95_t *m, const char *line) {
   const char *p = strchr(line, ':');
-  char suffix[4] = {0};
+  char iccid[sizeof(m->network_settings.iccid)];
   size_t n = 0u;
   if (!p) return false;
   ++p;
   while (*p && isspace((unsigned char)*p)) ++p;
   if (*p == '"') ++p;
-  while (isdigit((unsigned char)*p) && n <= 22u) {
-    if (n < 4u) {
-      suffix[n] = *p;
-    } else {
-      memmove(suffix, suffix + 1, 3u);
-      suffix[3] = *p;
-    }
-    ++n;
-    ++p;
-  }
-  if (n < 18u || n > 22u) return false;
-  memcpy(m->network_settings.iccid_suffix, suffix, 4u);
-  m->network_settings.iccid_suffix[4] = '\0';
+  while (isdigit((unsigned char)*p) && n + 1u < sizeof(iccid)) iccid[n++] = *p++;
+  iccid[n] = '\0';
+  if (n < 18u || n > 22u || isdigit((unsigned char)*p)) return false;
+  memcpy(m->network_settings.iccid, iccid, n + 1u);
   return true;
 }
 
@@ -330,20 +322,22 @@ static void on_ok(zs_bg95_t *m, uint32_t now_ms) {
     case ZS_BG95_SIM_CHECK:
       if (!m->sim_ready) {
         fail_transport(m);
-      } else if (m->auto_network) {
+      } else {
         m->state = ZS_BG95_SIM_ICCID_QUERY;
         if (!send_timed_cmd(m, "AT+QCCID", now_ms)) fail_transport(m);
-      } else {
-        m->apn_public_approved = true;
-        if (!begin_apn_configuration(m, now_ms)) fail_transport(m);
       }
       break;
     case ZS_BG95_SIM_ICCID_QUERY:
-      m->state = ZS_BG95_SIM_IMSI_QUERY;
-      if (!send_timed_cmd(m, "AT+CIMI", now_ms)) fail_transport(m);
+      if (!digits_only(m->network_settings.iccid, 18u, 22u)) {
+        fail_transport(m);
+      } else {
+        m->state = ZS_BG95_SIM_IMSI_QUERY;
+        if (!send_timed_cmd(m, "AT+CIMI", now_ms)) fail_transport(m);
+      }
       break;
     case ZS_BG95_SIM_IMSI_QUERY:
-      if (m->selected_apn_profile == BG95_NO_PROFILE) {
+      if (!digits_only(m->network_settings.imsi, 14u, 16u) ||
+          (m->auto_network && m->selected_apn_profile == BG95_NO_PROFILE)) {
         fail_transport(m);
       } else {
         m->state = ZS_BG95_OPERATOR_QUERY;
@@ -351,8 +345,13 @@ static void on_ok(zs_bg95_t *m, uint32_t now_ms) {
       }
       break;
     case ZS_BG95_OPERATOR_QUERY:
-      m->state = ZS_BG95_APN_DISCOVERING;
-      if (!send_timed_cmd(m, "AT+CGNAPN", now_ms)) fail_transport(m);
+      if (m->auto_network) {
+        m->state = ZS_BG95_APN_DISCOVERING;
+        if (!send_timed_cmd(m, "AT+CGNAPN", now_ms)) fail_transport(m);
+      } else {
+        m->apn_public_approved = true;
+        if (!begin_apn_configuration(m, now_ms)) fail_transport(m);
+      }
       break;
     case ZS_BG95_APN_DISCOVERING:
       if (!finish_apn_discovery(m, now_ms)) fail_transport(m);
@@ -394,12 +393,14 @@ static void on_ok(zs_bg95_t *m, uint32_t now_ms) {
 
 static void on_discovery_error(zs_bg95_t *m, uint32_t now_ms) {
   m->command_pending = false;
-  if (m->state == ZS_BG95_SIM_ICCID_QUERY) {
-    m->state = ZS_BG95_SIM_IMSI_QUERY;
-    if (!send_timed_cmd(m, "AT+CIMI", now_ms)) fail_transport(m);
-  } else if (m->state == ZS_BG95_OPERATOR_QUERY) {
-    m->state = ZS_BG95_APN_DISCOVERING;
-    if (!send_timed_cmd(m, "AT+CGNAPN", now_ms)) fail_transport(m);
+  if (m->state == ZS_BG95_OPERATOR_QUERY) {
+    if (m->auto_network) {
+      m->state = ZS_BG95_APN_DISCOVERING;
+      if (!send_timed_cmd(m, "AT+CGNAPN", now_ms)) fail_transport(m);
+    } else {
+      m->apn_public_approved = true;
+      if (!begin_apn_configuration(m, now_ms)) fail_transport(m);
+    }
   } else if (m->state == ZS_BG95_APN_DISCOVERING) {
     if (!finish_apn_discovery(m, now_ms)) fail_transport(m);
   } else {
@@ -417,11 +418,15 @@ void zs_bg95_on_line(zs_bg95_t *m, const char *line, uint32_t now_ms) {
     return;
   }
   if (m->state == ZS_BG95_SIM_ICCID_QUERY && strstr(line, "+QCCID:")) {
-    (void)parse_iccid_suffix(m, line);
+    if (!parse_iccid(m, line)) fail_transport(m);
     return;
   }
   if (m->state == ZS_BG95_SIM_IMSI_QUERY && digits_only(line, 14u, 16u)) {
-    if (!select_apn_profile(m, line)) fail_transport(m);
+    if (m->auto_network) {
+      if (!select_apn_profile(m, line)) fail_transport(m);
+    } else {
+      memcpy(m->network_settings.imsi, line, strlen(line) + 1u);
+    }
     return;
   }
   if (m->state == ZS_BG95_OPERATOR_QUERY && strstr(line, "+COPS:")) {
@@ -532,7 +537,9 @@ bool zs_bg95_configure_mqtt_tls(zs_bg95_t *m, const char *host, uint16_t port,
 bool zs_bg95_start_mqtt(zs_bg95_t *m, uint32_t now_ms) {
   if (!m || m->state != ZS_BG95_READY || !m->transport_configured ||
       !m->sim_ready || m->network == ZS_BG95_NET_NONE ||
-      !m->apn_public_approved || !valid_apn(m->apn)) return false;
+      !m->apn_public_approved || !valid_apn(m->apn) ||
+      !digits_only(m->network_settings.imsi, 14u, 16u) ||
+      !digits_only(m->network_settings.iccid, 18u, 22u)) return false;
   memset(m->network_settings.apn, 0, sizeof(m->network_settings.apn));
   memset(m->network_settings.local_address, 0, sizeof(m->network_settings.local_address));
   memset(m->network_settings.gateway, 0, sizeof(m->network_settings.gateway));
@@ -585,6 +592,36 @@ bool zs_bg95_online(const zs_bg95_t *m) {
 
 const zs_bg95_network_settings_t *zs_bg95_get_network_settings(const zs_bg95_t *m) {
   return m ? &m->network_settings : NULL;
+}
+
+bool zs_bg95_export_cellular_telemetry(const zs_bg95_t *m,
+                                       zs_cellular_telemetry_t *telemetry) {
+  if (!m || !telemetry || !m->network_settings.valid ||
+      !digits_only(m->network_settings.imsi, 14u, 16u) ||
+      !digits_only(m->network_settings.iccid, 18u, 22u)) return false;
+  memset(telemetry, 0, sizeof(*telemetry));
+  memcpy(telemetry->imsi, m->network_settings.imsi,
+         strlen(m->network_settings.imsi) + 1u);
+  memcpy(telemetry->iccid, m->network_settings.iccid,
+         strlen(m->network_settings.iccid) + 1u);
+  memcpy(telemetry->home_plmn, m->network_settings.home_plmn,
+         strlen(m->network_settings.home_plmn) + 1u);
+  memcpy(telemetry->registered_operator, m->network_settings.registered_operator,
+         strlen(m->network_settings.registered_operator) + 1u);
+  memcpy(telemetry->apn, m->network_settings.apn,
+         strlen(m->network_settings.apn) + 1u);
+  memcpy(telemetry->local_address, m->network_settings.local_address,
+         strlen(m->network_settings.local_address) + 1u);
+  memcpy(telemetry->gateway, m->network_settings.gateway,
+         strlen(m->network_settings.gateway) + 1u);
+  memcpy(telemetry->primary_dns, m->network_settings.primary_dns,
+         strlen(m->network_settings.primary_dns) + 1u);
+  memcpy(telemetry->secondary_dns, m->network_settings.secondary_dns,
+         strlen(m->network_settings.secondary_dns) + 1u);
+  telemetry->access_technology = m->network_settings.access_technology;
+  telemetry->apn_source = (uint8_t)m->network_settings.apn_source;
+  telemetry->settings_valid = true;
+  return true;
 }
 
 const char *zs_bg95_state_name(zs_bg95_state_t state) {

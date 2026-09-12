@@ -20,4 +20,6 @@ The development broker listens only on localhost and allows anonymous clients fo
 - Reverse proxy for the REST/WebSocket UI with HTTPS.
 - Telegram/mobile notification credentials injected as secrets, not committed.
 
-The station wire message remains compact CBOR. `station/cbor_codec.py` is the reference decoder for firmware protocol 1.4.
+The station wire messages remain compact CBOR. `station/cbor_codec.py` is the
+reference decoder for interface release 1.5, including detection schema 4 and
+protected cellular heartbeat schema 1.

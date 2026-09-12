@@ -320,6 +320,21 @@ class OnlineTypeStatusMessage(BaseModel):
     model_version: str = "unknown"
 
 
+class CellularTelemetry(BaseModel):
+    imsi: str = Field(pattern=r"^[0-9]{14,16}$")
+    iccid: str = Field(pattern=r"^[0-9]{18,22}$")
+    home_plmn: str = Field(default="", pattern=r"^(?:[0-9]{5,6})?$")
+    registered_operator: str = Field(default="", max_length=31)
+    apn: str = Field(min_length=1, max_length=63, pattern=r"^[A-Za-z0-9.-]+$")
+    local_address: str = Field(min_length=1, max_length=63)
+    gateway: str = Field(min_length=1, max_length=63)
+    primary_dns: str = Field(min_length=1, max_length=63)
+    secondary_dns: str = Field(default="", max_length=63)
+    access_technology: int = Field(default=0, ge=0, le=255)
+    apn_source: Literal["EXPLICIT", "NETWORK", "CATALOG"]
+    settings_valid: Literal[True]
+
+
 class HeartbeatMessage(BaseModel):
     station_id: int
     time_us: int
@@ -333,6 +348,7 @@ class HeartbeatMessage(BaseModel):
     hardware_rev: str = "EVT"
     self_test_ok: bool = True
     fault_flags: list[str] = Field(default_factory=list)
+    cellular: CellularTelemetry | None = None
 
 
 class SecurityEventMessage(BaseModel):

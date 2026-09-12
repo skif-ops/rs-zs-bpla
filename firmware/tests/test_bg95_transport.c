@@ -1,4 +1,5 @@
 #include "zs_bg95.h"
+#include "zs_protocol.h"
 
 #include <assert.h>
 #include <stdbool.h>
@@ -40,12 +41,11 @@ static void expect_last(const zs_bg95_t *modem, const char *command) {
   assert(modem->command_pending);
 }
 
-static bool bytes_contain(const void *object, size_t size, const char *text) {
-  const unsigned char *bytes = object;
-  size_t i, n = strlen(text);
-  if (n == 0u || n > size) return false;
-  for (i = 0u; i + n <= size; ++i) {
-    if (memcmp(bytes + i, text, n) == 0) return true;
+static bool contains_bytes(const uint8_t *data, size_t size, const char *text) {
+  size_t i, length = strlen(text);
+  if (length == 0u || length > size) return false;
+  for (i = 0u; i + length <= size; ++i) {
+    if (memcmp(data + i, text, length) == 0) return true;
   }
   return false;
 }
@@ -64,10 +64,19 @@ static void reach_registered(zs_bg95_t *modem, mock_t *mock, const char *apn) {
   zs_bg95_on_line(modem, "+CPIN: READY", 702u);
   expect_last(modem, "AT+CPIN?");
   zs_bg95_on_line(modem, "OK", 703u);
+  expect_last(modem, "AT+QCCID");
+  zs_bg95_on_line(modem, "+QCCID: 89701012345678901234", 704u);
+  zs_bg95_on_line(modem, "OK", 705u);
+  expect_last(modem, "AT+CIMI");
+  zs_bg95_on_line(modem, "250011234567890", 706u);
+  zs_bg95_on_line(modem, "OK", 707u);
+  expect_last(modem, "AT+COPS?");
+  zs_bg95_on_line(modem, "+COPS: 0,0,\"Test Operator\",7", 708u);
+  zs_bg95_on_line(modem, "OK", 709u);
   assert(strstr(modem->last_command, "AT+CGDCONT=1,\"IP\"") != NULL);
-  zs_bg95_on_line(modem, "OK", 704u);
+  zs_bg95_on_line(modem, "OK", 710u);
   expect_last(modem, "AT+CEREG?");
-  zs_bg95_on_line(modem, "+CEREG: 2,1,\"001A\",\"00BC1234\",8", 705u);
+  zs_bg95_on_line(modem, "+CEREG: 2,1,\"001A\",\"00BC1234\",8", 711u);
   assert(modem->state == ZS_BG95_READY);
 }
 
@@ -162,6 +171,10 @@ static void test_automatic_network_settings(void) {
   mock_t mock = {0};
   zs_bg95_t modem;
   const zs_bg95_network_settings_t *settings;
+  zs_cellular_telemetry_t telemetry;
+  zs_heartbeat_t heartbeat = {0};
+  uint8_t encoded[1024];
+  size_t encoded_size;
   const char *full_imsi = "250011234567890";
   const char *full_iccid = "89701012345678901234";
 
@@ -169,11 +182,10 @@ static void test_automatic_network_settings(void) {
   expect_last(&modem, "AT+CGDCONT=1,\"IP\",\"network.apn\"");
   assert(modem.network_settings.apn_source == ZS_BG95_APN_NETWORK);
   assert(strcmp(modem.network_settings.home_plmn, "25001") == 0);
-  assert(strcmp(modem.network_settings.iccid_suffix, "1234") == 0);
+  assert(strcmp(modem.network_settings.imsi, full_imsi) == 0);
+  assert(strcmp(modem.network_settings.iccid, full_iccid) == 0);
   assert(strcmp(modem.network_settings.registered_operator, "Test Operator") == 0);
   assert(modem.network_settings.access_technology == 7u);
-  assert(!bytes_contain(&modem, sizeof(modem), full_imsi));
-  assert(!bytes_contain(&modem, sizeof(modem), full_iccid));
 
   zs_bg95_on_line(&modem, "OK", 712u);
   expect_last(&modem, "AT+CEREG?");
@@ -183,6 +195,21 @@ static void test_automatic_network_settings(void) {
   settings = zs_bg95_get_network_settings(&modem);
   assert(settings && settings->valid);
   assert(settings->apn_source == ZS_BG95_APN_NETWORK);
+  assert(zs_bg95_export_cellular_telemetry(&modem, &telemetry));
+  assert(strcmp(telemetry.imsi, full_imsi) == 0);
+  assert(strcmp(telemetry.iccid, full_iccid) == 0);
+  assert(telemetry.settings_valid);
+
+  heartbeat.schema_ver = 1u;
+  heartbeat.station_id = 424242u;
+  heartbeat.cellular = telemetry;
+  strcpy(heartbeat.firmware_ver, "evt-pre-20-test");
+  strcpy(heartbeat.model_ver, "model-test");
+  strcpy(heartbeat.hardware_rev, "EVT-PRE-20-Rev.A");
+  encoded_size = zs_protocol_encode_heartbeat(&heartbeat, encoded, sizeof(encoded));
+  assert(encoded_size > 0u);
+  assert(contains_bytes(encoded, encoded_size, full_imsi));
+  assert(contains_bytes(encoded, encoded_size, full_iccid));
 }
 
 static void test_catalog_fallback_and_unknown_sim(void) {
@@ -202,14 +229,15 @@ static void test_catalog_fallback_and_unknown_sim(void) {
   zs_bg95_on_line(&modem, "+CPIN: READY", 702u);
   zs_bg95_on_line(&modem, "OK", 703u);
   expect_last(&modem, "AT+QCCID");
-  zs_bg95_on_line(&modem, "ERROR", 704u);
+  zs_bg95_on_line(&modem, "+QCCID: 89701012345678904321", 704u);
+  zs_bg95_on_line(&modem, "OK", 705u);
   expect_last(&modem, "AT+CIMI");
-  zs_bg95_on_line(&modem, "250021234567890", 705u);
-  zs_bg95_on_line(&modem, "OK", 706u);
+  zs_bg95_on_line(&modem, "250021234567890", 706u);
+  zs_bg95_on_line(&modem, "OK", 707u);
   expect_last(&modem, "AT+COPS?");
-  zs_bg95_on_line(&modem, "ERROR", 707u);
-  expect_last(&modem, "AT+CGNAPN");
   zs_bg95_on_line(&modem, "ERROR", 708u);
+  expect_last(&modem, "AT+CGNAPN");
+  zs_bg95_on_line(&modem, "ERROR", 709u);
   expect_last(&modem, "AT+CGDCONT=1,\"IP\",\"catalog.apn\"");
   assert(modem.network_settings.apn_source == ZS_BG95_APN_CATALOG);
 
@@ -223,8 +251,42 @@ static void test_catalog_fallback_and_unknown_sim(void) {
   zs_bg95_on_line(&modem, "OK", 701u);
   zs_bg95_on_line(&modem, "+CPIN: READY", 702u);
   zs_bg95_on_line(&modem, "OK", 703u);
+  zs_bg95_on_line(&modem, "+QCCID: 89701012345678904321", 704u);
+  zs_bg95_on_line(&modem, "OK", 705u);
+  zs_bg95_on_line(&modem, "999991234567890", 706u);
+  assert(modem.state == ZS_BG95_ERROR);
+}
+
+static void test_identity_query_fail_closed(void) {
+  static const zs_bg95_apn_profile_t profiles[] = {
+    {"25001", "internet", true, true}
+  };
+  mock_t mock = {0};
+  zs_bg95_t modem;
+  zs_hal_port_t io = port(&mock);
+  zs_bg95_init(&modem, &io, 1u, 2u, NULL);
+  assert(zs_bg95_configure_auto_network(&modem, profiles, 1u));
+  zs_bg95_power_on(&modem, 0u);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_on_line(&modem, "OK", 701u);
+  zs_bg95_on_line(&modem, "+CPIN: READY", 702u);
+  zs_bg95_on_line(&modem, "OK", 703u);
+  expect_last(&modem, "AT+QCCID");
   zs_bg95_on_line(&modem, "ERROR", 704u);
-  zs_bg95_on_line(&modem, "999991234567890", 705u);
+  assert(modem.state == ZS_BG95_ERROR);
+
+  memset(&mock, 0, sizeof(mock));
+  io = port(&mock);
+  zs_bg95_init(&modem, &io, 1u, 2u, NULL);
+  assert(zs_bg95_configure_auto_network(&modem, profiles, 1u));
+  zs_bg95_power_on(&modem, 0u);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_on_line(&modem, "OK", 701u);
+  zs_bg95_on_line(&modem, "+CPIN: READY", 702u);
+  zs_bg95_on_line(&modem, "OK", 703u);
+  zs_bg95_on_line(&modem, "+QCCID: 1234", 704u);
   assert(modem.state == ZS_BG95_ERROR);
 }
 
@@ -323,6 +385,7 @@ int main(void) {
   test_mqtt_tls_happy_path();
   test_automatic_network_settings();
   test_catalog_fallback_and_unknown_sim();
+  test_identity_query_fail_closed();
   test_fail_closed_policy_and_urc();
   test_timeout_and_negative_results();
   puts("zs_bg95_transport_tests: OK");

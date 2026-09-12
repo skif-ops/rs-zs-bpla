@@ -6,9 +6,11 @@ from typing import Any
 
 from station.schemas import (
     Classification,
+    CellularTelemetry,
     DetectionMessage,
     DoaEstimate,
     GnssStatus,
+    HeartbeatMessage,
     HierarchicalClassification,
     PowerStatus,
     RouteStatus,
@@ -18,7 +20,9 @@ from station.schemas import (
 )
 
 _MSG_DETECTION = 2
+_MSG_HEARTBEAT = 3
 _SUPPORTED_DETECTION_SCHEMAS = frozenset({1, 3, 4})
+_SUPPORTED_HEARTBEAT_SCHEMAS = frozenset({1})
 _ROUTE = {0: "LTE", 1: "NB_IOT", 2: "2G", 3: "LORA", 4: "BLE", 5: "TEST"}
 _PROFILE = {0: "generic", 1: "piston", 2: "reactive"}
 _CLASS_LABEL = {
@@ -54,6 +58,9 @@ _TIME_TRUST = {
     3: "GNSS_TIME_SUSPECT",
     4: "UNSYNCED",
 }
+_ALTITUDE_SOURCE = {0: "gnss_msl", 1: "configured_msl", 2: "unknown"}
+_POSITION_SOURCE = {0: "gnss_live", 1: "configured_install"}
+_APN_SOURCE = {1: "EXPLICIT", 2: "NETWORK", 3: "CATALOG"}
 
 
 class _CborReader:
@@ -121,6 +128,20 @@ def decode_cbor(raw: bytes):
 
 def _as_map(value: Any) -> dict:
     return value if isinstance(value, dict) else {}
+
+
+def _text_field(values: dict, key: int, name: str) -> str:
+    value = values.get(key, "")
+    if not isinstance(value, str):
+        raise ValueError(f"compact {name} must be text")
+    return value
+
+
+def _integer_field(values: dict, key: int, name: str) -> int:
+    value = values.get(key, 0)
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"compact {name} must be an integer")
+    return value
 
 
 def _f16_le_bytes(raw: bytes) -> list[float]:
@@ -260,5 +281,96 @@ def decode_detection_obj(obj: Any) -> DetectionMessage:
     )
 
 
+def decode_heartbeat_obj(obj: Any) -> HeartbeatMessage:
+    if not isinstance(obj, dict):
+        raise ValueError("compact heartbeat must be a CBOR map")
+    schema_ver = int(obj.get(0, -1))
+    if schema_ver not in _SUPPORTED_HEARTBEAT_SCHEMAS:
+        raise ValueError(f"unsupported compact heartbeat schema: {schema_ver}")
+    if int(obj.get(1, -1)) != _MSG_HEARTBEAT:
+        raise ValueError("unsupported compact heartbeat message type")
+
+    station = _as_map(obj.get(4))
+    gnss = _as_map(obj.get(5))
+    power = _as_map(obj.get(6))
+    route = _as_map(obj.get(7))
+    cellular = _as_map(obj.get(12))
+    if not cellular:
+        raise ValueError("compact heartbeat requires cellular telemetry")
+    if cellular.get(11) is not True:
+        raise ValueError("compact cellular settings must be valid")
+    apn_source = _APN_SOURCE.get(_integer_field(cellular, 10, "APN source"))
+    if apn_source is None:
+        raise ValueError("unsupported compact APN source")
+
+    return HeartbeatMessage(
+        station_id=int(obj.get(2, 0)),
+        time_us=int(obj.get(3, 0)),
+        station=StationPosition(
+            lat_e7=int(station.get(0, 0)),
+            lon_e7=int(station.get(1, 0)),
+            alt_dm=int(station.get(2, 0)),
+            pos_accuracy_m=float(station.get(3, 20)),
+            altitude_source=_ALTITUDE_SOURCE.get(int(station.get(4, 2)), "unknown"),
+            position_source=_POSITION_SOURCE.get(int(station.get(5, 0)), "gnss_live"),
+        ),
+        gnss=GnssStatus(
+            fix_type=int(gnss.get(0, 0)),
+            satellites=int(gnss.get(1, 0)),
+            hdop_x100=int(gnss.get(2, 9999)),
+            pps_ok=bool(gnss.get(3, False)),
+            expected_time_error_us=int(gnss.get(4, 1_000_000)),
+            jam=bool(gnss.get(5, False)),
+            spoof=bool(gnss.get(6, False)),
+            position_delta_m=int(gnss.get(7, 0)),
+            position_warn=bool(gnss.get(8, False)),
+            position_suspect=bool(gnss.get(9, False)),
+            time_suspect=bool(gnss.get(10, False)),
+            time_holdover=bool(gnss.get(11, False)),
+            position_trust=_POSITION_TRUST.get(int(gnss.get(12, 0)), "UNCONFIGURED"),
+            time_trust=_TIME_TRUST.get(int(gnss.get(13, 0)), "UNKNOWN"),
+        ),
+        power=PowerStatus(
+            battery_pct=int(power.get(0, 0)),
+            battery_mv=int(power.get(1, 0)),
+            solar_mv=int(power.get(2, 0)),
+            temperature_c10=int(power.get(3, 200)),
+            battery_bus_mv=int(power.get(4, 0)),
+            battery_current_ma=int(power.get(5, 0)),
+            battery_power_mw=int(power.get(6, 0)),
+            monitor_status=int(power.get(7, 255)),
+        ),
+        route=RouteStatus(
+            transport=_ROUTE.get(int(route.get(0, 5)), "TEST"),
+            hop_count=int(route.get(1, 0)),
+            rssi_dbm=int(route.get(2, 0)),
+            snr_db10=int(route.get(3, 0)),
+            gateway_id=int(route.get(4, 0)),
+        ),
+        firmware_ver=_text_field(obj, 8, "firmware version"),
+        model_ver=_text_field(obj, 9, "model version"),
+        hardware_rev=_text_field(obj, 10, "hardware revision"),
+        self_test_ok=bool(obj.get(11, False)),
+        cellular=CellularTelemetry(
+            imsi=_text_field(cellular, 0, "IMSI"),
+            iccid=_text_field(cellular, 1, "ICCID"),
+            home_plmn=_text_field(cellular, 2, "home PLMN"),
+            registered_operator=_text_field(cellular, 3, "registered operator"),
+            apn=_text_field(cellular, 4, "APN"),
+            local_address=_text_field(cellular, 5, "local address"),
+            gateway=_text_field(cellular, 6, "gateway"),
+            primary_dns=_text_field(cellular, 7, "primary DNS"),
+            secondary_dns=_text_field(cellular, 8, "secondary DNS"),
+            access_technology=_integer_field(cellular, 9, "access technology"),
+            apn_source=apn_source,
+            settings_valid=True,
+        ),
+    )
+
+
 def decode_detection_cbor(raw: bytes) -> DetectionMessage:
     return decode_detection_obj(decode_cbor(raw))
+
+
+def decode_heartbeat_cbor(raw: bytes) -> HeartbeatMessage:
+    return decode_heartbeat_obj(decode_cbor(raw))

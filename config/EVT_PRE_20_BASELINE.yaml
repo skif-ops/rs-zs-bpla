@@ -126,6 +126,12 @@ communications:
     static_public_ip_required: false
     inbound_station_connection_required: false
     store_and_forward_required: true
+    full_imsi_iccid_in_protected_heartbeat: required
+    cellular_identity_transport: mqtt_mutual_tls_only
+    cellular_identity_open_logs: forbidden
+    cellular_identity_general_api: redacted_only
+    operator_validation_timing: after_station_assembly
+    mqtt_24h_evt_timing: after_station_assembly
   lora:
     role: backup_event_transport
     common_pcb: true

@@ -34,9 +34,12 @@ automatic_network_discovery:
   active_context_apn_mismatch: FAIL_CLOSED
   required_post_activation_values: [apn, local_address, gateway, primary_dns]
   optional_post_activation_values: [secondary_dns, registered_operator, access_technology]
-  persistent_identity_policy: HOME_PLMN_AND_LAST_4_ICCID_ONLY
-  full_imsi_or_iccid_retention: FORBIDDEN
-  physical_sim_and_operator_evidence: OPEN_EVT_REQUIRED
+  station_identity_policy: FULL_IMSI_AND_ICCID_IN_VOLATILE_RUNTIME
+  protected_telemetry: FULL_IMSI_AND_ICCID_REQUIRED_IN_MTLS_HEARTBEAT
+  open_log_identity_policy: FORBIDDEN
+  server_general_api_identity_policy: REDACTED_ONLY
+  physical_sim_and_operator_evidence: DEFERRED_UNTIL_STATIONS_ASSEMBLED
+  mqtt_24h_evidence: DEFERRED_UNTIL_STATIONS_ASSEMBLED
 apn_modes:
   public:
     allowed: true
@@ -68,6 +71,10 @@ safe_slot_switch_sequence:
   - resume_queue_with_existing_event_ids
 security:
   pin_puk_and_apn_passwords_in_repository: false
-  iccid_storage: redacted_reference_only
+  imsi_iccid_station_storage: volatile_runtime_only
+  imsi_iccid_server_storage: restricted_station_record
+  imsi_iccid_transport: mutual_tls_status_telemetry_only
+  imsi_iccid_open_logs: forbidden
+  imsi_iccid_general_api: redacted_only
   profile_changes_require_authentication: true
   profile_changes_audited: true

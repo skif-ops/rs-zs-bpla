@@ -2,7 +2,7 @@ from argparse import Namespace
 
 import pytest
 
-from station.mqtt_bridge import station_id_from_topic, validate_transport
+from station.mqtt_bridge import decode_status_obj, station_id_from_topic, validate_transport
 
 
 def args(**overrides):
@@ -66,3 +66,26 @@ def test_insecure_bench_requires_explicit_clean_mode():
     assert validate_transport(args(insecure_bench=True)) is False
     with pytest.raises(ValueError, match="cannot be combined"):
         validate_transport(args(ca="ca.crt", insecure_bench=True))
+
+
+def test_full_cellular_identity_requires_mutual_tls():
+    heartbeat = {
+        "station_id": 17,
+        "time_us": 1,
+        "station": {"lat_e7": 0, "lon_e7": 0, "alt_dm": 0},
+        "cellular": {
+            "imsi": "250011234567890",
+            "iccid": "89701012345678901234",
+            "apn": "network.apn",
+            "local_address": "10.10.0.2",
+            "gateway": "10.10.0.1",
+            "primary_dns": "1.1.1.1",
+            "apn_source": "NETWORK",
+            "settings_valid": True,
+        },
+    }
+    with pytest.raises(ValueError, match="requires mutual TLS"):
+        decode_status_obj(heartbeat, tls_enabled=False)
+    decoded = decode_status_obj(heartbeat, tls_enabled=True)
+    assert decoded.cellular is not None
+    assert decoded.cellular.imsi == "250011234567890"

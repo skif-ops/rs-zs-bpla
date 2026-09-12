@@ -66,6 +66,8 @@ jobs:
         run: python tools/validate_ru868_firmware_profile.py
       - name: Cross-check BG95 public-APN MQTT TLS host contract
         run: python tools/validate_bg95_transport_contract_rev_a.py
+      - name: QG-1 protected cellular heartbeat traceability
+        run: python tools/validate_cellular_heartbeat_contract_rev_a.py
       - name: Verify generated STM32 target contract is current
         run: python tools/generate_evt_pre_20_target_contract.py --check
       - name: QG-1 target contract completeness and traceability
@@ -212,7 +214,7 @@ jobs:
       - name: Build firmware packet emitter
         run: |
           cmake -S firmware -B firmware/build -DCMAKE_BUILD_TYPE=Release
-          cmake --build firmware/build --parallel --target zs_emit_detection
+          cmake --build firmware/build --parallel --target zs_emit_detection zs_emit_heartbeat
       - name: Verify compact CBOR contract
         working-directory: server
         run: python tools/test_firmware_packet.py

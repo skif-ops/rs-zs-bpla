@@ -71,12 +71,14 @@ ble:
 cellular:
   modem: Quectel_BG95_M3_candidate
   auto_network_settings: IMPLEMENTED_HOST_TESTED_HARDWARE_VALIDATION_PENDING
-  discovery: [QCCID_REDACTED, CIMI_PLMN_ONLY, COPS_QUERY, CGNAPN]
+  discovery: [QCCID_FULL_RUNTIME, CIMI_FULL_RUNTIME, COPS_QUERY, CGNAPN]
   post_activation_readback: CGCONTRDP_APN_IP_GATEWAY_DNS_REQUIRED
   apn_policy: MATCHED_APPROVED_PUBLIC_PLMN_PROFILE_ONLY
   unknown_sim_or_apn_mismatch: FAIL_CLOSED
-  full_imsi_or_iccid_retention: FORBIDDEN
-  physical_sim_operator_and_24h_evidence: OPEN_EVT_REQUIRED
+  full_imsi_iccid_telemetry: IMPLEMENTED_COMPACT_HEARTBEAT_MTLS_REQUIRED
+  station_identity_storage: VOLATILE_RUNTIME_ONLY
+  server_general_api_identity_view: REDACTED_ONLY
+  physical_sim_operator_and_24h_evidence: DEFERRED_UNTIL_STATIONS_ASSEMBLED
 storage:
   card: Kingston_SDCIT2_32GB
   socket: GCT_MEM2052_00_195_00_A

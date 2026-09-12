@@ -13,7 +13,7 @@ Detection schema: `4`
 | Topic | Направление | QoS | Retain | Payload | Статус реализации |
 |---|---|---:|---:|---|---|
 | `zs/v1/{tenant}/{station_id}/up` | station -> server | 1 | false | detection compact CBOR | EXISTS |
-| `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | heartbeat CBOR | SERVER_DECODER_EXISTS; FIRMWARE_ENCODER_OPEN |
+| `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | MISSING_BLOCKER |
 | `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | MISSING_BLOCKER |
 
@@ -63,6 +63,50 @@ The INA226 extension is deliberately excluded from P0 summary so the LoRa worst-
 
 P0 summary должен оставаться не более 220 bytes до LoRa framing. Full packet size is monitored in CI and is not a LoRa payload contract.
 
+## 3.2 Compact heartbeat CBOR schema 1
+
+Heartbeat предназначен только для LTE/NB-IoT/2G транспорта и не включается в
+LoRa/P0. Верхний map использует message type `3` и следующие ключи:
+
+| Key | Назначение |
+|---:|---|
+| 0 | heartbeat schema, сейчас 1 |
+| 1 | message type, heartbeat = 3 |
+| 2 | station_id |
+| 3 | time_us |
+| 4 | configured station position |
+| 5 | GNSS/time trust status |
+| 6 | full INA226 power status |
+| 7 | route status |
+| 8 | firmware version |
+| 9 | model version |
+| 10 | hardware revision |
+| 11 | self-test result |
+| 12 | protected cellular telemetry |
+
+Cellular sub-map key 12:
+
+| Sub-key | Field | Требование |
+|---:|---|---|
+| 0 | full IMSI | 14..16 decimal digits; required |
+| 1 | full ICCID | 18..22 decimal digits; required |
+| 2 | home PLMN | approved 5/6-digit prefix or empty for legacy explicit APN |
+| 3 | registered operator | diagnostic |
+| 4 | active APN | required |
+| 5 | local address and subnet | required |
+| 6 | gateway | required |
+| 7 | primary DNS | required |
+| 8 | secondary DNS | optional |
+| 9 | access technology | modem numeric AcT |
+| 10 | APN source | 1 explicit, 2 network, 3 controlled catalog |
+| 11 | settings valid | must be true |
+
+Полные IMSI/ICCID разрешены только в `status` через MQTT с взаимным TLS. Plain
+HTTP heartbeat с cellular block и insecure-bench MQTT status с cellular block
+отклоняются. Сервер хранит полные значения во внутренней записи станции, но
+общий station-list API возвращает только маскированные идентификаторы. Raw modem
+lines и validation payload с IMSI/ICCID запрещено выводить в открытые логи.
+
 ## 4. TLS и идентификация
 
 - TLS 1.2 minimum, TLS 1.3 preferred;
@@ -73,7 +117,11 @@ P0 summary должен оставаться не более 220 bytes до LoRa
 - сертификат сервера проверяется по hostname и доверенному CA;
 - ротация credential выполняется через подписанную команду или сервисный BLE/USB режим.
 
-Текущий `mqtt_bridge.py` допускает работу без параметра CA и потому не готов к прямому размещению в интернете. Это `BLOCKER_SECURITY` для EVT deployment.
+Текущий `mqtt_bridge.py` запускается в производственном режиме только при наличии
+CA, клиентского сертификата и ключа. Явный `--insecure-bench` допускается только
+для изолированного стенда и отклоняет heartbeat с cellular identity. До полевого
+развёртывания остаются обязательными provisioning уникальных credentials и
+проверка broker ACL для каждого `station_id`.
 
 ## 5. HTTPS fallback
 
@@ -85,4 +133,10 @@ P0 summary должен оставаться не более 220 bytes до LoRa
 
 ## 7. Gate
 
-Требуются modem log, broker log, packet capture без секретов, 24 часа MQTT, потеря сети/питания, CGNAT, DNS failure, certificate failure, повторная доставка, 20 одновременных станций и store-and-forward recovery. Для Rev.A дополнительно требуется проверка end-to-end декодирования INA226 voltage/current/power/status и отсутствие роста P0 summary выше 220 bytes.
+После сборки станций требуются modem log с маскированием IMSI/ICCID, broker log,
+packet capture без идентификаторов/секретов, 24 часа MQTT, потеря сети/питания,
+CGNAT, DNS failure, certificate failure, повторная доставка, 20 одновременных
+станций и store-and-forward recovery. Для Rev.A дополнительно требуется проверка
+end-to-end декодирования INA226 и cellular heartbeat, а также отсутствие роста
+P0 summary выше 220 bytes. До сборки эти аппаратные пункты имеют статус
+`DEFERRED_UNTIL_STATIONS_ASSEMBLED`, а не PASS.

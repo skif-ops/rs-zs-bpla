@@ -10,9 +10,10 @@ REPO_ROOT = SERVER_ROOT.parent
 if str(SERVER_ROOT) not in sys.path:
     sys.path.insert(0, str(SERVER_ROOT))
 
-from station.cbor_codec import decode_detection_cbor
+from station.cbor_codec import decode_detection_cbor, decode_heartbeat_cbor
 
 exe = REPO_ROOT / "firmware" / "build" / "zs_emit_detection"
+heartbeat_exe = REPO_ROOT / "firmware" / "build" / "zs_emit_heartbeat"
 
 full_raw = subprocess.check_output([str(exe)])
 full = decode_detection_cbor(full_raw)
@@ -70,7 +71,20 @@ assert summary.features == []
 assert len(summary_raw) <= 220, f"P0 LoRa summary too large: {len(summary_raw)} bytes"
 assert len(full_raw) > len(summary_raw)
 
+heartbeat_raw = subprocess.check_output([str(heartbeat_exe)])
+heartbeat = decode_heartbeat_cbor(heartbeat_raw)
+assert heartbeat.station_id == 424242
+assert heartbeat.station.position_source == "configured_install"
+assert heartbeat.power.monitor_valid
+assert heartbeat.cellular is not None
+assert heartbeat.cellular.imsi == "250011234567890"
+assert heartbeat.cellular.iccid == "89701012345678901234"
+assert heartbeat.cellular.apn == "network.apn"
+assert heartbeat.cellular.apn_source == "NETWORK"
+assert heartbeat.cellular.settings_valid
+
 print(
     "firmware->server protocol v1.5 / schema 4 compact CBOR OK, "
-    f"P0 summary={len(summary_raw)} bytes, full={len(full_raw)} bytes"
+    f"P0 summary={len(summary_raw)} bytes, full={len(full_raw)} bytes, "
+    f"protected heartbeat={len(heartbeat_raw)} bytes"
 )

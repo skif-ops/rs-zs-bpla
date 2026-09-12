@@ -9,7 +9,7 @@ import sys
 
 import paho.mqtt.client as mqtt
 
-from station.cbor_codec import decode_cbor, decode_detection_obj
+from station.cbor_codec import decode_cbor, decode_detection_obj, decode_heartbeat_obj
 from station.router import service
 from station.schemas import HeartbeatMessage
 
@@ -68,6 +68,19 @@ def validate_transport(args: argparse.Namespace) -> bool:
     return True
 
 
+def decode_status_obj(obj, tls_enabled: bool) -> HeartbeatMessage:
+    try:
+        if isinstance(obj, dict) and obj.get(1) == 3:
+            heartbeat = decode_heartbeat_obj(obj)
+        else:
+            heartbeat = HeartbeatMessage.model_validate(obj)
+    except Exception:
+        raise ValueError("invalid protected heartbeat") from None
+    if heartbeat.cellular is not None and not tls_enabled:
+        raise ValueError("cellular identity telemetry requires mutual TLS")
+    return heartbeat
+
+
 def main(argv: list[str] | None = None) -> None:
     args = build_parser().parse_args(argv)
     tls_enabled = validate_transport(args)
@@ -90,7 +103,7 @@ def main(argv: list[str] | None = None) -> None:
             topic_station_id, kind = station_id_from_topic(message.topic, args.tenant)
             obj = decode_cbor(message.payload)
             if kind == "status":
-                heartbeat = HeartbeatMessage.model_validate(obj)
+                heartbeat = decode_status_obj(obj, tls_enabled)
                 if heartbeat.station_id != topic_station_id:
                     raise ValueError("station_id mismatch between topic and heartbeat")
                 from station.router import store

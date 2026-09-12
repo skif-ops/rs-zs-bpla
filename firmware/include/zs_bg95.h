@@ -2,6 +2,7 @@
 #define ZS_BG95_H
 
 #include "zs_hal_port.h"
+#include "zs_types.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -52,7 +53,8 @@ typedef struct {
 } zs_bg95_apn_profile_t;
 
 typedef struct {
-  char iccid_suffix[5];
+  char imsi[17];
+  char iccid[23];
   char home_plmn[7];
   char registered_operator[32];
   char apn[64];
@@ -114,6 +116,8 @@ bool zs_bg95_start_mqtt(zs_bg95_t *m, uint32_t now_ms);
 bool zs_bg95_ready(const zs_bg95_t *m);
 bool zs_bg95_online(const zs_bg95_t *m);
 const zs_bg95_network_settings_t *zs_bg95_get_network_settings(const zs_bg95_t *m);
+bool zs_bg95_export_cellular_telemetry(const zs_bg95_t *m,
+                                       zs_cellular_telemetry_t *telemetry);
 const char *zs_bg95_state_name(zs_bg95_state_t state);
 
 #endif

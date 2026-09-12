@@ -29,7 +29,7 @@ def _geometry_mode(dets: list[DetectionMessage], frame: EnuFrame) -> tuple[str, 
     return 'FULL_3D','good' if ratio >= 0.25 else 'acceptable'
 
 def _tdoa_allowed(d: DetectionMessage) -> bool:
-    # The approved wire schema 3 carries PPS state and expected time error in
+    # The approved detection wire schema 4 carries PPS state and expected time error in
     # payload key 8.  Newer in-memory messages may also expose time_status.
     # Keep both representations compatible during the EVT transition.
     time_status = getattr(d, 'time_status', None)

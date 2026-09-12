@@ -7,6 +7,8 @@
 - live station protocol under `/api/v1`;
 - JSON and CBOR detection ingestion;
 - station heartbeat and security events;
+- compact cellular heartbeat with full IMSI/ICCID accepted only over mutual-TLS
+  MQTT status transport; general station listing returns masked identifiers;
 - persistent SQLite WAL event store;
 - AIR_WARNING for one station and AIR_ALERT only for two or more stations;
 - WGS84/ECEF/ENU geodesy;
@@ -35,7 +37,7 @@ OpenAPI: `http://localhost:8000/docs`
 pytest -q
 ```
 
-Current working branch: 68 tests PASS.
+Current working branch: 89 tests PASS.
 
 ## v0.8.1 field-recording corrections
 
@@ -54,6 +56,10 @@ Run separately after configuring TLS credentials:
 ```bash
 python -m station.mqtt_bridge --host mqtt.example --port 8883 --tenant pilot
 ```
+
+Full IMSI/ICCID is stored in the restricted station record. Do not expose the
+SQLite database or raw status payloads through logs, backups, diagnostics or the
+general API. The JSON/HTTP heartbeat route deliberately rejects cellular identity.
 
 ## Data provenance note
 
