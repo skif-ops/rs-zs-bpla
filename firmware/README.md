@@ -19,12 +19,17 @@ Host PASS не означает готовую прошивку изделия.
 - открытие, проверка и регенерация подготовленного STM32CubeMX `.ioc` версией 6.12.0;
 - production linker с secure boot/A/B и HAL/LL bindings;
 - драйвер PDM/MDF для четырёх T5838 на фактической плате;
-- production TLS/MQTT, защищённый downstream и provisioning;
+- аппаратное и end-to-end подтверждение BG95 TLS/MQTT, защищённый downstream и provisioning;
 - два валидированных региональных LoRa-профиля;
 - secure boot, A/B OTA, rollback и подписанный release;
 - измерение памяти, CPU, тока и времени на target.
 
 До закрытия этих пунктов статус firmware: `TARGET_PORT_REQUIRED / OPEN / NOT RUN`. BIN/HEX из host-сборки запрещено маркировать как прошивку станции.
+
+Host-контракт BG95 теперь покрывает public-APN policy и последовательность
+PDP/TLS/MQTT с fail-closed обработкой ошибок. Его границы и открытые аппаратные
+доказательства зафиксированы в `BG95_MQTT_TLS_CONTRACT_REV_A.md`; это не снимает
+общий `TARGET_PORT_REQUIRED` и не является сетевым EVT PASS.
 
 Первый target-инкремент уже фиксирует точный исходный контракт
 `STM32U585VIT6Q/LQFP100`: 67 назначений из Rev.A pin map и AAD addendum,

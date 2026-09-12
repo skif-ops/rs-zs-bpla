@@ -64,6 +64,8 @@ jobs:
         run: python tools/validate_clock_policy.py
       - name: Cross-check fail-closed RU868 firmware profile
         run: python tools/validate_ru868_firmware_profile.py
+      - name: Cross-check BG95 public-APN MQTT TLS host contract
+        run: python tools/validate_bg95_transport_contract_rev_a.py
       - name: Verify generated STM32 target contract is current
         run: python tools/generate_evt_pre_20_target_contract.py --check
       - name: QG-1 target contract completeness and traceability

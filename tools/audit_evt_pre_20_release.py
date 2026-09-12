@@ -58,6 +58,10 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
     ],
     "firmware_source": [
         "firmware/CMakeLists.txt",
+        "firmware/BG95_MQTT_TLS_CONTRACT_REV_A.md",
+        "firmware/include/zs_bg95.h",
+        "firmware/src/zs_bg95.c",
+        "firmware/tests/test_bg95_transport.c",
         "firmware/targets/evt_pre_20/CMakeLists.txt",
         "firmware/targets/evt_pre_20/README.md",
         "firmware/targets/evt_pre_20/target_status.yaml",
@@ -83,6 +87,7 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "tools/audit_evt_pre_20_cubemx_ioc_technical.py",
         "tools/validate_evt_pre_20_stm32_scaffold.py",
         "tools/audit_evt_pre_20_stm32_scaffold_technical.py",
+        "tools/validate_bg95_transport_contract_rev_a.py",
     ],
     "android_source": [
         "android/app/build.gradle.kts",

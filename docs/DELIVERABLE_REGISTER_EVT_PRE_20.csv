@@ -46,7 +46,7 @@ FW-001,Firmware,Исходники target STM32U585,C+IOC+CMAKE,P0,DRAFT,PARTIAL
 FW-002,Firmware,Bootloader secure boot A/B,C+BIN+ELF+MAP,P0,PLANNED,OPEN,OPEN,Подпись rollback power-loss tests PASS
 FW-003,Firmware,Station application,C+BIN+ELF+MAP,P0,PLANNED,OPEN,OPEN,Unit integration HIL tests PASS
 FW-004,Firmware,RU868 pilot profile и EU868 future-disabled template,YAML+BIN fragment,P0,DRAFT,OPEN,OPEN,RU868 окна мощность duty cycle и RF test PASS
-FW-005,Firmware,Dual SIM и public APN profiles,YAML+DOCX,P0,DRAFT,OPEN,OPEN,Safe switch public-only policy attach TLS recovery and 24h PASS
+FW-005,Firmware,Dual SIM и public APN profiles,YAML+DOCX,P0,DRAFT,PASS,PARTIAL_PASS_HOST_CONTRACT,Public-only PDP TLS MQTT state contract passes host QG-1/QG-2; modem provisioning dual-SIM recovery and 24h evidence remain open
 FW-006,Firmware,BLE service и OTA,GATT schema+C,P0,PLANNED,OPEN,OPEN,Auth signed image rollback tests PASS
 FW-007,Firmware,Инструкция прошивки и восстановления,DOCX,P0,PLANNED,OPEN,OPEN,Повторена на чистом рабочем месте
 FW-008,Firmware,Release manifest и подписи,JSON+SHA256+SIG,P0,PLANNED,OPEN,OPEN,Версии commit toolchain hash согласованы
