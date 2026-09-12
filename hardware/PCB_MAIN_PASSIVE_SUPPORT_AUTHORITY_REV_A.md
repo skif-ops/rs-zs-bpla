@@ -31,9 +31,11 @@ official `TPD4E05U06` data sheet. It fixes 0.565 x 0.20 mm signal lands,
 0.07 mm preferred NSMD expansion and 0.565 x 0.36 mm GND stencil apertures.
 Source: `https://www.ti.com/lit/ds/symlink/tpd4e05u06.pdf`, SHA-256
 `c167cf1e72a5473a4d2c59b6a3c0251498701da05b7785919b9ceaae3b3e02c6`.
-The `TPD2EUSB30DRTR` devices `U25/U26` remain on the reviewed KiCad DRT-3
-pattern pending independent IPC/assembly control because TI `MPDS340` publishes
-only the package outline and no PCB land or stencil recommendation.
+The manufacturer-source review for `TPD2EUSB30DRTR` devices `U25/U26` is
+complete: TI `MPDS340` confirms the DRT0003A package outline but publishes no
+PCB land or stencil recommendation. The retained KiCad DRT-3 geometry therefore
+has package-only status and remains blocked for independent IPC/assembly control;
+it is not a production-approved land pattern.
 The seven `TPD1E05U06DYAR` devices `D4/D6..D11` use project-local
 `TI_DYA0002A_SOD523` geometry from drawing 4224978/B in the same Rev.O data
 sheet: two 0.67 x 0.40 mm R0.05 lands at 1.48 mm center spacing, equal-size

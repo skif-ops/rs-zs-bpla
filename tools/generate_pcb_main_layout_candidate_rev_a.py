@@ -39,6 +39,17 @@ KICAD_DRAWING_VERIFIED = {
     ): "GCT_USB4105_RevB4_2023-12-18_RecommendedPCBLayout",
 }
 
+KICAD_PACKAGE_ONLY_REVIEWED = {
+    (
+        "Package_SO.pretty",
+        "SOIC-16W_7.5x10.3mm_P1.27mm",
+    ): "Winbond_W25Q512JV_RevB_PackageF_NoManufacturerLandPattern",
+    (
+        "Package_TO_SOT_SMD.pretty",
+        "Texas_DRT-3",
+    ): "TI_DRT0003A_MPDS340_PackageOnly_NoManufacturerLandPattern",
+}
+
 STANDARD = {
     "LQFP100_14x14": ("PROJECT", "ST_STM32U585_LQFP100_1L", {}),
     "LGA-12_2x2mm": ("PROJECT", "ST_LIS2DW12_LGA-12L", {}),
@@ -263,6 +274,15 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                 elif (directory, name) in KICAD_DRAWING_VERIFIED:
                     fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_DRAWING_VERIFIED")
                     fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", KICAD_DRAWING_VERIFIED[(directory, name)])
+                elif (directory, name) in KICAD_PACKAGE_ONLY_REVIEWED:
+                    fp.SetProperty(
+                        "DIONEA_FOOTPRINT_STATUS",
+                        "PACKAGE_OUTLINE_VERIFIED_IPC_ASSEMBLY_CONTROL_REQUIRED",
+                    )
+                    fp.SetProperty(
+                        "DIONEA_FOOTPRINT_SOURCE",
+                        KICAD_PACKAGE_ONLY_REVIEWED[(directory, name)],
+                    )
                 else:
                     fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
                     fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", f"KiCad:{directory}/{name}")

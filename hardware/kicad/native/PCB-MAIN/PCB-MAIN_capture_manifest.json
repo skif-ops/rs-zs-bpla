@@ -59,7 +59,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "98a54ade0cac49ee9942cb7d49266abbddd0d963f4ff8d860a188a027b8b7304"
+      "sha256": "0ab1a45af3f087fd7378c6f3124d327b2f5e7ec8b88dd3b593538d3a1e2baf3c"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -75,7 +75,7 @@
     },
     {
       "path": "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv",
-      "sha256": "0ae13536e06862ec76a8562c21d0a277553791715c851ad10dd3bbd94c56db50"
+      "sha256": "e762dd9947350d689d7bb45992ceb1f03723142c71aaebf103f7fd9361ed2c26"
     }
   ],
   "component_count": 248,

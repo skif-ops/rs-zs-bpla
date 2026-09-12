@@ -3,10 +3,12 @@
 Status: `OPEN / NOT FOR MANUFACTURE`
 
 This register separates manufacturer-controlled geometry, drawing-verified
-KiCad-library geometry and patterns still awaiting review. A library match is
-not manufacturing approval: every `KICAD_LIBRARY_PATTERN_REVIEW_PENDING` item
-still requires drawing-to-land-pattern review before Review B can pass. The
-machine-readable 19-pattern inventory is
+KiCad-library geometry and package-outline-only dispositions. A completed
+manufacturer-source review is not manufacturing approval when the source omits
+a PCB land pattern: every
+`PACKAGE_OUTLINE_VERIFIED_IPC_ASSEMBLY_CONTROL_REQUIRED` item remains blocked
+until independent IPC/assembly control is complete. The machine-readable
+19-pattern inventory is
 `hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv`.
 
 ## Current controlled result
@@ -17,7 +19,8 @@ machine-readable 19-pattern inventory is
 | MAIN-AUTH-011 controlled pogo groups | 5 | 31 bottom pads verified by coordinate, diameter, mask and layer |
 | Manufacturer-drawing controlled patterns | 50 | Fourteen initially controlled instances plus thirty-six reviewed instances controlled locally |
 | Drawing-verified KiCad library patterns | 5 | Four Molex 504050-0691 instances and one GCT USB4105 instance have exact audited geometry |
-| KiCad library patterns pending drawing review | 3 | Manufacturer land patterns are unavailable; independent IPC/assembly control remains open |
+| KiCad library patterns pending drawing review | 0 | Manufacturer-source review is complete for every registered pattern |
+| Package-outline verified; IPC/assembly control required | 3 | `U2/U25/U26` retain library geometry only as a review snapshot, not as production approval |
 | Provisional manufacturer-specific patterns | 0 | Closed for the current component set; any substitution reopens this gate |
 
 Earlier controlled updates reduced the provisional set from 52 to 4 instances by
@@ -232,16 +235,18 @@ The same current document marks the T520 standard series as not recommended
 for new designs; procurement/lifecycle review of the exact frozen MPN remains
 separate, and this footprint pass does not infer a component substitution.
 
-`U2` was also reviewed but remains pending. Winbond W25Q512JV Rev B confirms
-the selected package `F`, its 1.27 mm pitch and full package tolerances, but
-does not publish a PCB land pattern for the 16-pin SOIC. The existing KiCad
-2.05 x 0.60 mm lands therefore cannot be promoted from a package-outline-only
-comparison; independent IPC/assembly-process control is still required.
+The manufacturer-source review for `U2` is complete. Winbond W25Q512JV Rev B
+confirms the selected package `F`, its 1.27 mm pitch and full package
+tolerances, but does not publish a PCB land pattern for the 16-pin SOIC. The
+existing KiCad 2.05 x 0.60 mm lands therefore receive package-only status, not
+production approval; independent IPC/assembly-process control is still
+required.
 
-`U25` and `U26` were reviewed against TI DRT0003A `MPDS340`. That document
-defines the package outline and lead tolerances but does not publish a PCB land
-pattern or stencil recommendation. The existing KiCad `Texas_DRT-3` geometry
-therefore remains pending independent IPC/assembly-process control.
+The manufacturer-source review for `U25` and `U26` is also complete against TI
+DRT0003A `MPDS340`. That document defines the package outline and lead
+tolerances but does not publish a PCB land pattern or stencil recommendation.
+The existing KiCad `Texas_DRT-3` geometry therefore receives package-only
+status and remains blocked for independent IPC/assembly-process control.
 
 ## Remaining provisional references
 
