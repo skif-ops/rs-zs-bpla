@@ -15,9 +15,9 @@ machine-readable 19-pattern inventory is
 |---|---:|---|
 | Project-generated chip passives and mechanical holes | 188 | Placement use only; passive geometry remains subject to assembly-house rules |
 | MAIN-AUTH-011 controlled pogo groups | 5 | 31 bottom pads verified by coordinate, diameter, mask and layer |
-| Manufacturer-drawing controlled patterns | 48 | Fourteen initially controlled instances plus thirty-four reviewed instances controlled locally |
+| Manufacturer-drawing controlled patterns | 50 | Fourteen initially controlled instances plus thirty-six reviewed instances controlled locally |
 | Drawing-verified KiCad library patterns | 5 | Four Molex 504050-0691 instances and one GCT USB4105 instance have exact audited geometry |
-| KiCad library patterns pending drawing review | 5 | Exact pad-number contract passes; drawing review remains open |
+| KiCad library patterns pending drawing review | 3 | Manufacturer land patterns are unavailable; independent IPC/assembly control remains open |
 | Provisional manufacturer-specific patterns | 0 | Closed for the current component set; any substitution reopens this gate |
 
 Earlier controlled updates reduced the provisional set from 52 to 4 instances by
@@ -216,6 +216,22 @@ remain explicit assembly-process/DFM controls. The official
 is SHA-256
 `5e561d2786874eb79c8c6e36e4eb4d9b0de774384005e72c4998ab3dcc2cf518`.
 
+The twelfth tranche closes `C36/C44` from KEMET/YAGEO document
+`T2076_T52X-530` dated 2026-08-20, Table 2. For the D / 7343-31 case, the
+selected Density Level B pattern is the manufacturer's nominal robust-reflow
+option: two rectangular 2.37 x 2.43 mm lands, a 3.87 mm inner gap, 6.24 mm
+center spacing and a 9.12 x 5.10 mm courtyard. The prior KiCad pattern used
+2.075 x 2.55 mm round-rect lands at 6.225 mm center spacing. Pad 1 remains the
+positive terminal and all nets are retained. KEMET does not specify solder-mask
+or stencil openings in Table 2, so those remain assembly-process/DFM controls.
+The official
+[T52X/T530 data sheet](https://content.kemet.com/datasheets/KEM_T2076_T52X-530.pdf)
+is SHA-256
+`ddaf1c0f41f55de0c9e1d2df5cdfbcc1b3f6b3e7658d2a493fe65d3f006db586`.
+The same current document marks the T520 standard series as not recommended
+for new designs; procurement/lifecycle review of the exact frozen MPN remains
+separate, and this footprint pass does not infer a component substitution.
+
 `U2` was also reviewed but remains pending. Winbond W25Q512JV Rev B confirms
 the selected package `F`, its 1.27 mm pitch and full package tolerances, but
 does not publish a PCB land pattern for the 16-pin SOIC. The existing KiCad
@@ -237,7 +253,9 @@ Review B remains `OPEN`. No Gerber, drill, paste, pick-and-place, IPC-356 or
 STEP output from this candidate may be released until:
 
 1. the zero-provisional footprint state remains true for the release commit;
-2. the remaining 5 KiCad-derived instances pass drawing-to-pattern review;
+2. the remaining 3 KiCad-derived instances receive independent IPC/assembly
+   land-pattern control because their manufacturers publish package outlines
+   but no PCB land pattern;
 3. placement and routing audits pass in KiCad 9;
 4. DRC reports zero blocker/critical and zero unrouted items;
 5. RA-003 layout evidence is complete; physical droop and ripple measurement

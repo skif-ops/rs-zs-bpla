@@ -3,7 +3,7 @@
   "board": "PCB-MAIN",
   "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "86f6dac0d152054947349a81227ad8a300a2266e2a60933a2dc842adf902b920",
+  "generator_sha256": "4322ad2d7f7a35bb988aea8a2795ceca8337cde15d83c4dba753992c1840d224",
   "inputs": [
     {
       "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
@@ -59,7 +59,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "21ad2920917dd477534b9b0aa552bff3845514a686afe1711100320724fcda19"
+      "sha256": "98a54ade0cac49ee9942cb7d49266abbddd0d963f4ff8d860a188a027b8b7304"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -75,7 +75,7 @@
     },
     {
       "path": "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv",
-      "sha256": "da284b2731ef90778acff1b30bfbcb76f2f98a3092915d3c351b0d34a87611c0"
+      "sha256": "0ae13536e06862ec76a8562c21d0a277553791715c851ad10dd3bbd94c56db50"
     }
   ],
   "component_count": 248,
@@ -88,6 +88,10 @@
   "symbol_library_table_sha256": "06b7072dc084b7bfabb1ae955f30bf4972df14ac56d471186bef75949aeb8f63",
   "footprint_library_table_sha256": "05c3409a193c26866ad34e8c3d4a34ccf8ab93719a0bf354e22db9954858c2fd",
   "controlled_footprints": [
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/KEMET_T52X_D_7343-31_DensityB.kicad_mod",
+      "sha256": "a5ee0ff5fdfd9b7ce2197f35333062d0023fcccd6320431719b5c84f946c39d7"
+    },
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Hirose_U.FL-R-SMT-1.kicad_mod",
       "sha256": "3a5029441591fb1ea9974d5450449593fb8f374d88dd749d9dce0e5d28ff32ae"

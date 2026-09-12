@@ -36,6 +36,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "PCB-MAIN.kicad_sch"
 CONTROLLED_FOOTPRINTS = (
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "KEMET_T52X_D_7343-31_DensityB.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "Hirose_U.FL-R-SMT-1.kicad_mod",
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "ST_STM32U585_LQFP100_1L.kicad_mod",

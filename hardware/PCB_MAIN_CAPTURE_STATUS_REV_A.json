@@ -87,7 +87,7 @@
     "status": "REVIEW_A_PASS",
     "erc_status": "PASS_KICAD_9_ZERO_VIOLATIONS",
     "schematic_derived_bom": true,
-    "custom_footprint_status": "0_PROVISIONAL_5_KICAD_LIBRARY_DRAWING_REVIEW_PENDING_5_KICAD_LIBRARY_DRAWING_VERIFIED_48_MANUFACTURER_PATTERN_5_POGO_GROUPS_CONTROLLED",
+    "custom_footprint_status": "0_PROVISIONAL_3_KICAD_LIBRARY_DRAWING_REVIEW_PENDING_5_KICAD_LIBRARY_DRAWING_VERIFIED_50_MANUFACTURER_PATTERN_5_POGO_GROUPS_CONTROLLED",
     "footprint_disposition": "hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md",
     "footprint_review_register": "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv",
     "ground_domains": {

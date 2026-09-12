@@ -25,6 +25,14 @@ LIB = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
+    "C36": (
+        "KEMET_T52X_D_7343-31_DensityB.kicad_mod",
+        "KEMET_T2076_T52X-530_2026-08-20_Table2_DensityB",
+    ),
+    "C44": (
+        "KEMET_T52X_D_7343-31_DensityB.kicad_mod",
+        "KEMET_T2076_T52X-530_2026-08-20_Table2_DensityB",
+    ),
     "D1": (
         "Nexperia_PESD5V0S1UL_SOD882.kicad_mod",
         "Nexperia_PESD5V0S1UL_v5_2025-12-01_Fig11_ReflowFootprint",

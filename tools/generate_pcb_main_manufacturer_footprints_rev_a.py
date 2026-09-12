@@ -417,6 +417,32 @@ def vishay_si1016x_sc89() -> str:
     return "\n".join(lines) + "\n"
 
 
+def kemet_t52x_d_7343_31_density_b() -> str:
+    name = "KEMET_T52X_D_7343-31_DensityB"
+    lines = header(
+        name,
+        "KEMET T52X/T530 D case 7343-31; T2076 Table 2 Density Level B land and courtyard",
+        "KEMET T52X T530 D 7343-31 EIA 2917 density B",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -3.15) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 3.15) (layer "F.Fab") hide'
+    # T2076 Table 2 gives the complete Density Level B courtyard directly.
+    rect(lines, -4.56, -2.55, 4.56, 2.55, "F.CrtYd", 0.05)
+    polygon(lines, [(-3.65, -1.65), (-3.15, -2.15), (3.65, -2.15),
+                    (3.65, 2.15), (-3.65, 2.15)], "F.Fab", 0.10)
+    polygon(lines, [(-4.42, -1.35), (-4.42, 1.35),
+                    (-3.92, 0.00)], "F.SilkS", 0.12, "solid")
+    # For D / 7343-31, Density Level B defines W=2.43, L=2.37 and
+    # S=3.87 mm.  The resulting land centers are +/-3.12 mm.  Pad 1 is
+    # the positive terminal, preserving the existing KiCad polarity.
+    # The table controls copper and courtyard but does not define solder-mask
+    # or stencil openings; those remain assembly-process/DFM controls.
+    smd(lines, "1", -3.12, 0.0, 2.37, 2.43)
+    smd(lines, "2", 3.12, 0.0, 2.37, 2.43)
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
 def ti_dqa0010a() -> str:
     name = "TI_DQA0010A_USON10"
     lines = header(
@@ -685,6 +711,7 @@ GENERATORS = {
     "Nexperia_MMBT3904_SOT23.kicad_mod": nexperia_mmbt3904_sot23,
     "ST_ESDALC6V1-5P6_SOT666.kicad_mod": st_esdalc6v1_5p6_sot666,
     "Vishay_Si1016X_SC-89.kicad_mod": vishay_si1016x_sc89,
+    "KEMET_T52X_D_7343-31_DensityB.kicad_mod": kemet_t52x_d_7343_31_density_b,
     "TI_DQA0010A_USON10.kicad_mod": ti_dqa0010a,
     "ST_LIS2DW12_LGA-12L.kicad_mod": lis2dw12,
     "Raytac_MDBT50Q-P1MV2.kicad_mod": raytac_mdbt50q_p1mv2,

@@ -116,11 +116,11 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(not provisional, f"manufacturer-specific provisional footprints remain: {provisional}")
-    require(len(library_pending) == 5,
+    require(len(library_pending) == 3,
             f"unexpected KiCad-library review count: {len(library_pending)}")
     require(library_verified == ["J11", "J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4"],
             f"unexpected drawing-verified KiCad set: {library_verified}")
-    require(manufacturer_controlled == ["D1", "D10", "D11", "D2", "D3", "D4", "D5", "D6", "D7",
+    require(manufacturer_controlled == ["C36", "C44", "D1", "D10", "D11", "D2", "D3", "D4", "D5", "D6", "D7",
                                         "D8", "D9", "FL1", "J10", "J12", "J13", "J6",
                                         "J7", "J8", "J9", "J_PWR", "Q1", "Q2", "Q3", "Q4",
                                         "U1", "U10", "U11", "U13", "U14", "U15", "U16",
@@ -162,8 +162,32 @@ def main() -> int:
             {"J8", "J9", "J10", "U1", "U3", "U7", "U11", "U13", "U14", "U15", "U16", "U17",
              "U18", "U19", "U20", "U21", "U22", "U23", "U24", "U27",
              "D1", "D2", "D4", "D6", "D7", "D8", "D9", "D10", "D11",
-             "Q1", "Q2", "Q3", "Q4", "U6"},
+             "Q1", "Q2", "Q3", "Q4", "U6", "C36", "C44"},
             "register project-controlled replacement set differs from board")
+
+    # KEMET/YAGEO T2076 Table 2 defines the D / 7343-31 Density Level B
+    # nominal robust-reflow pattern: W=2.43, L=2.37, S=3.87 mm and a
+    # 9.12 x 5.10 mm courtyard.  S + L yields 6.24 mm between land centers.
+    for ref in ("C36", "C44"):
+        pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
+        require(set(pads) == {"1", "2"}, f"{ref}: KEMET D-case pad set")
+        for number, x in (("1", -3.12), ("2", 3.12)):
+            pad = pads[number]
+            require(abs(pad.position.X - x) < 0.002 and
+                    abs(pad.position.Y) < 0.002 and
+                    abs(pad.size.X - 2.37) < 0.002 and
+                    abs(pad.size.Y - 2.43) < 0.002 and
+                    pad.shape == "rect" and
+                    pad.layers == ["F.Cu", "F.Paste", "F.Mask"],
+                    f"{ref}.{number}: land differs from KEMET T2076 Density B")
+        courtyard = [item for item in footprints[ref].graphicItems
+                     if getattr(item, "layer", None) == "F.CrtYd"]
+        require(len(courtyard) == 1 and
+                abs(courtyard[0].start.X + 4.56) < 0.002 and
+                abs(courtyard[0].start.Y + 2.55) < 0.002 and
+                abs(courtyard[0].end.X - 4.56) < 0.002 and
+                abs(courtyard[0].end.Y - 2.55) < 0.002,
+                f"{ref}: courtyard differs from KEMET T2076 Density B")
 
     # U.FL copper matches the Hirose mounting pattern.  The manufacturer metal
     # mask is smaller than the KiCad-library paste, so three separate paste-only

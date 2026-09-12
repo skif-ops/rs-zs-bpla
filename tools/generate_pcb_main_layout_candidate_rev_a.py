@@ -57,7 +57,7 @@ STANDARD = {
     "SOD-523_DYA": ("PROJECT", "TI_DYA0002A_SOD523", {}),
     "SOT-9X3_DRT": ("Package_TO_SOT_SMD.pretty", "Texas_DRT-3", {}),
     "SOT-5X3-6_DRL": ("PROJECT", "TI_DRL0006A_SOT6", {}),
-    "7343-31": ("Capacitor_Tantalum_SMD.pretty", "CP_EIA-7343-31_Kemet-D", {}),
+    "7343-31": ("PROJECT", "KEMET_T52X_D_7343-31_DensityB", {}),
     "Pico-Lock_1.5_1x06_Right_Angle": (
         "Connector_Molex.pretty", "Molex_Pico-Lock_504050-0691_1x06-1MP_P1.50mm_Horizontal",
         {"MP": ""},
@@ -236,6 +236,7 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                         "Nexperia_MMBT3904_SOT23": "Nexperia_MMBT3904_v5_2026-04-08_Fig8_ReflowFootprint",
                         "ST_ESDALC6V1-5P6_SOT666": "ST_ESDALC6V1-5P6_Rev3_Figure14_SOT666_Footprint",
                         "Vishay_Si1016X_SC-89": "Vishay_Si1016X_RevE_AN826_RecommendedMinimumPads",
+                        "KEMET_T52X_D_7343-31_DensityB": "KEMET_T2076_T52X-530_2026-08-20_Table2_DensityB",
                         "STTS22H_UDFN-6L": "ST_DS12606_Rev8_Fig10_11",
                         "LT6000_DCB-7": "ADI_LT6000_600012fa_LTC_DWG_05-08-1715",
                         "SiT1552_JE_CSP-4": "SiTime_SiT1552_Rev1.43_POD-35_RevA",

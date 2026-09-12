@@ -43,6 +43,16 @@ The two `PESD5V0S1UL` supply TVS devices `D1/D2` use project-local
 0.70 mm R0.05 copper, 0.50 x 0.80 mm solder-resist openings and separate
 0.30 x 0.60 mm R0.05 paste apertures at 0.70 mm center spacing. Source
 SHA-256: `8ddea76afa74f87de5d3662e4d9149bf7397761fa99dc29b44bfbe42872d447e`.
+The two `T520D107M006ATE015` modem bulk capacitors `C36/C44` use the
+project-local `KEMET_T52X_D_7343-31_DensityB` pattern from KEMET/YAGEO
+`T2076_T52X-530` Table 2. The D-case nominal robust-reflow option defines
+2.37 x 2.43 mm lands, a 3.87 mm inner gap, 6.24 mm center spacing and a
+9.12 x 5.10 mm courtyard. Mask and stencil remain assembly-process controls.
+The 2026-08-20 source is SHA-256
+`ddaf1c0f41f55de0c9e1d2df5cdfbcc1b3f6b3e7658d2a493fe65d3f006db586`.
+That current source marks T520 as not recommended for new designs, so the
+frozen exact MPN still requires procurement/lifecycle review; no substitution
+is authorized by this land-pattern closure.
 The `Si1016X-T1-GE3` antenna-switch MOSFET `Q4` uses project-local
 `Vishay_Si1016X_SC-89` copper from Application Note 826: six rectangular
 0.300 x 0.478 mm minimum pads at 0.500 mm pitch and a 0.798 mm inner gap.

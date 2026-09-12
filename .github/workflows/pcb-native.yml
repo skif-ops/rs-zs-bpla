@@ -254,6 +254,7 @@ jobs:
           assert len(board.GetFootprints()) == 251, "unexpected PCB-MAIN footprint count"
           assert board.GetCopperLayerCount() == 6, "unexpected PCB-MAIN copper-layer count"
           expected = {
+              "KEMET_T52X_D_7343-31_DensityB": 2,
               "Hirose_U.FL-R-SMT-1": 6,
               "ST_STM32U585_LQFP100_1L": 100,
               "TI_PW0014A_TSSOP14": 14,
