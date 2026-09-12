@@ -93,7 +93,7 @@ jobs:
           test -s hardware/kicad/native/PCB-PWR/sym-lib-table
           test -s hardware/kicad/native/PCB-PWR/fp-lib-table
           test -s hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.kicad_sym
-          python - <<'PY'
+          /usr/bin/python3 - <<'PY'
           import pcbnew
           root = "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty"
           footprint = pcbnew.FootprintLoad(root, "CSD18540Q5B_DNK")
