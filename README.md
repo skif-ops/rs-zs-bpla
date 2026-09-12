@@ -34,9 +34,9 @@ native-схема PCB-PWR также отслеживаются и провер�
 `PCB-PWR.kicad_pcb`. Это не разрешает производство: PCB-MAIN routing/Review B,
 PCB-MIC Review A/B и PCB-PWR layout/Review B остаются открыты, производственный
 BOM и Gerber заблокированы. Firmware сохраняет статус `TARGET_PORT_REQUIRED`.
-На PCB-PWR уже контролируются Q1 `CSD18540Q5B` (точные TI copper/stencil)
-и J2 `Molex 43045-1202`; незакрытыми footprint-целями остаются J1, RSH1,
-U3/U4 и L1/L2.
+На PCB-PWR уже контролируются Q1 `CSD18540Q5B`, U3/U4 `LMR60440`
+(точные TI copper/mask/stencil) и J2 `Molex 43045-1202`; незакрытыми
+footprint-целями остаются J1, RSH1 и L1/L2.
 
 ## Контроль выпуска
 

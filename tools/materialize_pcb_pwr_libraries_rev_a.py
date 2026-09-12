@@ -18,13 +18,15 @@ from kiutils.symbol import SymbolLib
 UNRESOLVED_FOOTPRINT_REFS = {
     "J1",   # exact Micro-Fit 2-pin board land pattern/orientation pending mechanical review
     "RSH1", # exact four-terminal shunt MPN/land pattern not frozen
-    "U3", "U4", # LMR60440 RAK-9 manufacturer land pattern review pending
     "L1", "L2", # exact inductor land pattern remains under Review B
 }
 
 CONTROLLED_FOOTPRINTS = {
     # TI SLPS488B sections 7.2/7.3 provide the exact PCB and stencil patterns.
     "Q1": "DioneyaPWR:CSD18540Q5B_DNK",
+    # TI SNAS877 RAK0009A drawing 4229353/J provides board and stencil patterns.
+    "U3": "DioneyaPWR:LMR60440_RAK0009A",
+    "U4": "DioneyaPWR:LMR60440_RAK0009A",
     # The identical CON-004A/CON-004B board header uses the single audited
     # manufacturer pattern already controlled by PCB-MAIN.
     "J2": "DioneyaMain:Molex_43045-1202_MicroFit-12_RA",
@@ -154,6 +156,7 @@ def main() -> int:
         project_dir / "sym-lib-table",
         project_dir / "fp-lib-table",
         libs / "DioneyaPWR.pretty" / "CSD18540Q5B_DNK.kicad_mod",
+        libs / "DioneyaPWR.pretty" / "LMR60440_RAK0009A.kicad_mod",
         project_dir.parent / "PCB-MAIN" / "libs" / "DioneyaMain.pretty" /
             "Molex_43045-1202_MicroFit-12_RA.kicad_mod",
     ]

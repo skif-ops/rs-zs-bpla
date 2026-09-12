@@ -16,6 +16,11 @@ Q1_FOOTPRINT_FILE = (
     ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty" /
     "CSD18540Q5B_DNK.kicad_mod"
 )
+LMR60440_FOOTPRINT = "DioneyaPWR:LMR60440_RAK0009A"
+LMR60440_FOOTPRINT_FILE = (
+    ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty" /
+    "LMR60440_RAK0009A.kicad_mod"
+)
 J2_FOOTPRINT = "DioneyaMain:Molex_43045-1202_MicroFit-12_RA"
 J2_FOOTPRINT_FILE = (
     ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty" /
@@ -101,6 +106,11 @@ def main() -> int:
             f"Q1 must use manufacturer-controlled footprint {Q1_FOOTPRINT}")
     require(Q1_FOOTPRINT_FILE.is_file(),
             f"Q1 controlled footprint file missing: {Q1_FOOTPRINT_FILE}")
+    require(LMR60440_FOOTPRINT_FILE.is_file(),
+            f"U3/U4 controlled footprint file missing: {LMR60440_FOOTPRINT_FILE}")
+    for ref in ("U3", "U4"):
+        require(footprint_of(instances[ref]) == LMR60440_FOOTPRINT,
+                f"{ref} must use manufacturer-controlled footprint {LMR60440_FOOTPRINT}")
 
     # Frozen 12-pin external contract.
     main_pwr = [r for r in rows(HARNESS) if r["Interface"] == "MAIN_PWR"]

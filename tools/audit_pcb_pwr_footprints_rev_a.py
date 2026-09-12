@@ -21,6 +21,79 @@ def rounded_pad(pad) -> tuple[str, float, float, float, float, tuple[str, ...]]:
     )
 
 
+def detailed_pad(pad) -> tuple[
+    str, str, float, float, float, float, tuple[str, ...], float | None, float | None
+]:
+    return (
+        str(pad.number), str(pad.shape),
+        round(float(pad.position.X), 4), round(float(pad.position.Y), 4),
+        round(float(pad.size.X), 4), round(float(pad.size.Y), 4),
+        tuple(str(layer) for layer in pad.layers),
+        None if pad.roundrectRatio is None else round(float(pad.roundrectRatio), 6),
+        None if pad.solderMaskMargin is None else round(float(pad.solderMaskMargin), 4),
+    )
+
+
+def audit_lmr60440(library: Path) -> None:
+    path = library / "LMR60440_RAK0009A.kicad_mod"
+    if not path.is_file():
+        raise RuntimeError(f"controlled LMR60440 footprint missing: {path}")
+    fp = Footprint.from_file(str(path), encoding="utf-8")
+    if str(fp.entryName) != "LMR60440_RAK0009A":
+        raise RuntimeError(f"unexpected LMR60440 footprint name: {fp.entryName}")
+    if len(fp.pads) != 20:
+        raise RuntimeError(f"LMR60440 pad/aperture count drift: {len(fp.pads)}")
+
+    copper = [detailed_pad(p) for p in fp.pads if "F.Cu" in p.layers]
+    expected_copper = {
+        ("1", "roundrect", -0.900, -0.9275, 0.600, 0.345, ("F.Cu", "F.Mask"), 0.289855, 0.05),
+        ("1", "roundrect", -0.725, -1.1025, 0.250, 0.695, ("F.Cu", "F.Mask"), 0.400000, 0.05),
+        ("3", "roundrect", -0.900, 0.9275, 0.600, 0.345, ("F.Cu", "F.Mask"), 0.289855, 0.05),
+        ("3", "roundrect", -0.725, 1.1025, 0.250, 0.695, ("F.Cu", "F.Mask"), 0.400000, 0.05),
+        ("9", "roundrect", -0.075, -1.125, 0.250, 0.650, ("F.Cu", "F.Paste", "F.Mask"), 0.400000, 0.05),
+        ("4", "roundrect", -0.075, 1.125, 0.250, 0.650, ("F.Cu", "F.Paste", "F.Mask"), 0.400000, 0.05),
+        ("8", "roundrect", 0.700, -1.175, 0.300, 0.550, ("F.Cu", "F.Paste", "F.Mask"), 0.333333, 0.05),
+        ("8", "roundrect", 0.900, -1.000, 0.700, 0.200, ("F.Cu", "F.Paste", "F.Mask"), 0.500000, 0.05),
+        ("5", "roundrect", 0.700, 1.175, 0.300, 0.550, ("F.Cu", "F.Paste", "F.Mask"), 0.333333, 0.05),
+        ("5", "roundrect", 0.900, 1.000, 0.700, 0.200, ("F.Cu", "F.Paste", "F.Mask"), 0.500000, 0.05),
+        ("7", "roundrect", 0.875, -0.525, 0.650, 0.250, ("F.Cu", "F.Paste", "F.Mask"), 0.400000, 0.05),
+        ("6", "roundrect", 0.875, 0.525, 0.650, 0.250, ("F.Cu", "F.Paste", "F.Mask"), 0.400000, 0.05),
+        ("2", "roundrect", 0.000, 0.000, 2.500, 0.550, ("F.Cu",), 0.363636, None),
+    }
+    if set(copper) != expected_copper or len(copper) != len(expected_copper):
+        raise RuntimeError(f"LMR60440 copper geometry drift: {copper}")
+    if Counter(p[0] for p in copper) != Counter(
+        {"1": 2, "2": 1, "3": 2, "4": 1, "5": 2, "6": 1, "7": 1, "8": 2, "9": 1}
+    ):
+        raise RuntimeError("LMR60440 electrical pad-number coverage drift")
+
+    paste = [detailed_pad(p) for p in fp.pads if p.layers == ["F.Paste"]]
+    expected_paste = {
+        ("", "roundrect", -0.920, -0.9275, 0.560, 0.345, ("F.Paste",), 0.289855, None),
+        ("", "roundrect", -0.745, -1.1025, 0.210, 0.695, ("F.Paste",), 0.476190, None),
+        ("", "roundrect", -0.920, 0.9275, 0.560, 0.345, ("F.Paste",), 0.289855, None),
+        ("", "roundrect", -0.745, 1.1025, 0.210, 0.695, ("F.Paste",), 0.476190, None),
+        ("", "roundrect", -0.650, 0.000, 1.100, 0.410, ("F.Paste",), 0.243902, None),
+        ("", "roundrect", 0.650, 0.000, 1.100, 0.300, ("F.Paste",), 0.333333, None),
+    }
+    if set(paste) != expected_paste or len(paste) != len(expected_paste):
+        raise RuntimeError(f"LMR60440 explicit stencil geometry drift: {paste}")
+
+    mask = [p for p in fp.pads if p.layers == ["F.Mask"]]
+    if len(mask) != 1 or mask[0].shape != "custom" or len(mask[0].customPadPrimitives) != 1:
+        raise RuntimeError("LMR60440 pad-2 solder-mask aperture is not one controlled custom polygon")
+    primitive = mask[0].customPadPrimitives[0]
+    actual_points = [(round(float(p.X), 3), round(float(p.Y), 3)) for p in primitive.coordinates]
+    expected_points = [
+        (-1.150, -0.225), (-0.059, -0.225), (-0.027, -0.214), (0.037, -0.161),
+        (0.069, -0.150), (1.150, -0.150), (1.200, -0.100), (1.200, 0.100),
+        (1.150, 0.150), (0.069, 0.150), (0.037, 0.161), (-0.027, 0.214),
+        (-0.059, 0.225), (-1.150, 0.225), (-1.200, 0.175), (-1.200, -0.175),
+    ]
+    if actual_points != expected_points or float(primitive.width) != 0 or primitive.fill != "yes":
+        raise RuntimeError(f"LMR60440 pad-2 solder-mask polygon drift: {actual_points}")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--library", type=Path, default=DEFAULT_LIBRARY)
@@ -63,8 +136,10 @@ def main() -> int:
     if set(paste) != expected_paste or len(paste) != 16:
         raise RuntimeError(f"CSD18540 stencil geometry drift: {paste}")
 
+    audit_lmr60440(args.library)
     print("PCB-PWR manufacturer footprint audit PASS")
     print("Q1 CSD18540Q5B: TI SLPS488B copper + 16-aperture stencil exact")
+    print("U3/U4 LMR60440: TI SNAS877 RAK0009A copper/mask/stencil exact")
     return 0
 
 

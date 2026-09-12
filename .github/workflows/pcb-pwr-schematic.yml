@@ -96,10 +96,12 @@ jobs:
           /usr/bin/python3 - <<'PY'
           import pcbnew
           root = "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty"
-          footprint = pcbnew.FootprintLoad(root, "CSD18540Q5B_DNK")
-          assert footprint is not None, "KiCad failed to parse CSD18540Q5B_DNK"
-          assert footprint.GetPadCount() == 27, "CSD18540Q5B_DNK pad/aperture count drift"
-          print("PCB-PWR CSD18540Q5B KiCad 9 native parse: PASS")
+          expected = {"CSD18540Q5B_DNK": 27, "LMR60440_RAK0009A": 20}
+          for name, pad_count in expected.items():
+              footprint = pcbnew.FootprintLoad(root, name)
+              assert footprint is not None, f"KiCad failed to parse {name}"
+              assert footprint.GetPadCount() == pad_count, f"{name}: pad/aperture count drift"
+          print("PCB-PWR controlled footprints KiCad 9 native parse: PASS")
           PY
 
       - name: KiCad ERC and PDF

@@ -173,6 +173,10 @@ The native schematic must fail Review A regression if it:
   `DioneyaPWR:CSD18540Q5B_DNK` from TI SLPS488B sections 7.2/7.3; solder-mask
   expansion, drain thermal spreading/vias, placement, SOA and assembly validation
   remain Review-B controls;
+- `U3/U4` copper, solder-mask opening and stencil are now controlled by
+  `DioneyaPWR:LMR60440_RAK0009A` from TI SNAS877 package drawing
+  4229353/J; optional thermal vias, power-loop placement, EMI/thermal evidence
+  and assembly validation remain Review-B controls;
 - exact shunt MPN and Kelvin layout;
 - `J2` electrical footprint is shared with the manufacturer-controlled
   PCB-MAIN `Molex 43045-1202` pattern; its PCB-PWR placement, orientation and

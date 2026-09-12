@@ -188,7 +188,7 @@ def main() -> int:
                        footprint="Capacitor_SMD:C_0402_1005Metric", datasheet="~", x=157.48, y=76.20)
 
     U3 = make_instance(sch, u34sym, reference="U3", value="LMR604403SRAKR 3V8",
-                       footprint="DioneyaPWR:LMR60440_RAK9", datasheet="TI LMR60440 SNAS877", x=55.88, y=101.60)
+                       footprint="DioneyaPWR:LMR60440_RAK0009A", datasheet="TI LMR60440 SNAS877", x=55.88, y=101.60)
     L1 = make_instance(sch, inductor, reference="L1", value="4.7uH >=6A MPN_TBD",
                        footprint="DioneyaPWR:L_PWR_TBD", datasheet="~", x=81.28, y=96.52)
     C3 = make_instance(sch, capacitor, reference="C3", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
@@ -215,7 +215,7 @@ def main() -> int:
                        footprint="Resistor_SMD:R_0402_1005Metric", datasheet="~", x=35.56, y=111.76)
 
     U4 = make_instance(sch, u34sym, reference="U4", value="LMR604403SRAKR 3V3 AON",
-                       footprint="DioneyaPWR:LMR60440_RAK9", datasheet="TI LMR60440 SNAS877", x=121.92, y=101.60)
+                       footprint="DioneyaPWR:LMR60440_RAK0009A", datasheet="TI LMR60440 SNAS877", x=121.92, y=101.60)
     L2 = make_instance(sch, inductor, reference="L2", value="4.7uH >=6A MPN_TBD",
                        footprint="DioneyaPWR:L_PWR_TBD", datasheet="~", x=147.32, y=96.52)
     C5 = make_instance(sch, capacitor, reference="C5", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
