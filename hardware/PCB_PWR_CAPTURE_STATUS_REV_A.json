@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-PWR",
+  "release_state": "REVIEW_A_PIN_NET_PASS_PLACEMENT_CANDIDATE",
+  "manufacturing_release": false,
+  "native_schematic": {
+    "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
+    "status": "REVIEW_A_PIN_NET_PASS",
+    "erc_status": "PASS_KICAD_9_ZERO_VIOLATIONS"
+  },
+  "native_layout": {
+    "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
+    "generator": "tools/generate_pcb_pwr_layout_candidate_rev_a.py",
+    "independent_audit": "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
+    "placement_authority": "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
+    "status": "PROVISIONAL_PLACEMENT_CANVAS_DIM_003_OPEN",
+    "outline_mm": [90.0, 60.0],
+    "outline_status": "PROVISIONAL_NOT_MECHANICALLY_FROZEN",
+    "copper_layers": 4,
+    "layer_count_status": "PROVISIONAL_STACKUP_OPEN",
+    "board_thickness_mm": 1.6,
+    "thickness_status": "PROVISIONAL_DIM_003_OPEN",
+    "mounting_holes": 0,
+    "mounting_status": "ABSENT_PENDING_DIM_003",
+    "routing_present": false,
+    "copper_zones_present": false,
+    "cam_export_authorized": false
+  },
+  "review_a": {
+    "complete": true,
+    "status": "PASS_PIN_NET_ONLY"
+  },
+  "review_b": {
+    "complete": false,
+    "status": "OPEN_PROVISIONAL_PLACEMENT_CANVAS_DIM_003_ROUTING_AND_EVIDENCE_PENDING",
+    "blockers": [
+      "DIM-003 assembled envelope terminal zones mounting pattern and frozen PCB STEP",
+      "stack-up and copper-weight authority",
+      "high-current Kelvin hot-loop and switch-node routing",
+      "thermal current-density transient load-step cold-start and EMI evidence",
+      "DFT side datum accessibility and probe-wear validation",
+      "DRC DFM and independent Review B"
+    ]
+  }
+}

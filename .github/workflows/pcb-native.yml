@@ -46,6 +46,9 @@ on:
       - "hardware/PCB_PWR_PIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
       - "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv"
+      - "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md"
+      - "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
       - "hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md"
       - "hardware/PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md"
       - "hardware/POWER_DESIGN_BASELINE_REV_A.json"
@@ -75,6 +78,8 @@ on:
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
       - "tools/audit_pcb_pwr_dft_authority_rev_a.py"
       - "tools/audit_pcb_pwr_passive_authority_rev_a.py"
+      - "tools/generate_pcb_pwr_layout_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_layout_candidate_rev_a.py"
       - "tools/generate_pcb_pwr_schematic_rev_a.py"
       - "tools/finalize_pcb_pwr_symbol_types_rev_a.py"
       - "tools/finalize_pcb_pwr_schematic_completeness_rev_a.py"
@@ -252,6 +257,9 @@ jobs:
           python tools/audit_pcb_pwr_footprints_rev_a.py
           python tools/audit_pcb_pwr_passive_authority_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          if test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb; then
+            python tools/audit_pcb_pwr_layout_candidate_rev_a.py
+          fi
           python tools/kicad_native_gate.py --run-cli
       - name: Verify committed native PCB-MAIN schematic
         run: |
@@ -335,6 +343,9 @@ jobs:
           python tools/audit_pcb_pwr_footprints_rev_a.py
           python tools/audit_pcb_pwr_passive_authority_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          /usr/bin/python3 tools/generate_pcb_pwr_layout_candidate_rev_a.py
+          python tools/audit_pcb_pwr_layout_candidate_rev_a.py
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
           /usr/bin/python3 - <<'PY'
           import pcbnew
           root = "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty"
@@ -356,6 +367,12 @@ jobs:
           footprint = pcbnew.FootprintLoad(shared_root, "TI_DBV0005A_SOT23-5")
           assert footprint is not None, "KiCad failed to parse shared TI_DBV0005A_SOT23-5"
           assert footprint.GetPadCount() == 5, "shared TI_DBV0005A_SOT23-5 pad-count drift"
+          board = pcbnew.LoadBoard("hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb")
+          assert board is not None, "KiCad failed to parse PCB-PWR placement candidate"
+          assert len(board.GetFootprints()) == 60, "unexpected PCB-PWR footprint count"
+          assert board.GetCopperLayerCount() == 4, "unexpected provisional PCB-PWR layer count"
+          assert len(list(board.GetTracks())) == 0, "PCB-PWR placement candidate contains routing"
+          assert len(list(board.Zones())) == 0, "PCB-PWR placement candidate contains zones"
           print("PCB-PWR controlled footprints KiCad 9 native parse: PASS")
           PY
       - name: Materialize native PCB-MIC board and schematic
@@ -420,10 +437,14 @@ jobs:
             hardware/kicad/native/PCB-MAIN/fp-lib-table
             hardware/kicad/native/PCB-MAIN/libs/
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+            hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
             hardware/kicad/native/PCB-PWR/sym-lib-table
             hardware/kicad/native/PCB-PWR/fp-lib-table
             hardware/kicad/native/PCB-PWR/libs/
+            hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv
+            hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md
+            hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro

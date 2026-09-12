@@ -30,14 +30,38 @@ NATIVE = ROOT / "hardware" / "kicad" / "native"
 ART = ROOT / "artifacts" / "kicad-native"
 BOARDS = ("PCB-MAIN", "PCB-MIC", "PCB-PWR")
 PCB_MAIN_STATUS = ROOT / "hardware" / "PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+PCB_PWR_STATUS = ROOT / "hardware" / "PCB_PWR_CAPTURE_STATUS_REV_A.json"
+
+
+def placement_candidate_audit(name: str) -> str | None:
+    controls = {
+        "PCB-MAIN": (
+            PCB_MAIN_STATUS,
+            "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
+            "tools/audit_pcb_main_layout_candidate_rev_a.py",
+        ),
+        "PCB-PWR": (
+            PCB_PWR_STATUS,
+            "OPEN_PROVISIONAL_PLACEMENT_CANVAS_DIM_003_ROUTING_AND_EVIDENCE_PENDING",
+            "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
+        ),
+    }
+    if name not in controls:
+        return None
+    status_path, expected, audit = controls[name]
+    if not status_path.is_file():
+        return None
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+    if status.get("review_b", {}).get("status") != expected:
+        return None
+    return audit
 
 
 def pcb_main_is_placement_candidate() -> bool:
+    """Compatibility helper retained for external callers."""
     if not PCB_MAIN_STATUS.is_file():
         return False
-    status = json.loads(PCB_MAIN_STATUS.read_text(encoding="utf-8"))
-    return status.get("review_b", {}).get("status") == \
-        "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING"
+    return placement_candidate_audit("PCB-MAIN") is not None
 
 
 def sha256(path: Path) -> str:
@@ -299,8 +323,9 @@ def main() -> int:
         for name in BOARDS:
             p = paths(name)
             if p["pcb"].is_file():
-                if name == "PCB-MAIN" and pcb_main_is_placement_candidate():
-                    run(["python", "tools/audit_pcb_main_layout_candidate_rev_a.py"])
+                placement_audit = placement_candidate_audit(name)
+                if placement_audit:
+                    run(["python", placement_audit])
                     report["boards"][name]["pcb_state"] = \
                         "PLACEMENT_CANDIDATE_AUDIT_PASS_DRC_AND_FAB_EXPORT_PROHIBITED"
                 else:
