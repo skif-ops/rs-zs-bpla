@@ -258,6 +258,37 @@ def ti_dya0002a() -> str:
     return "\n".join(lines) + "\n"
 
 
+def nexperia_pesd5v0s1ul_sod882() -> str:
+    name = "Nexperia_PESD5V0S1UL_SOD882"
+    lines = header(
+        name,
+        "Nexperia PESD5V0S1UL SOD882; data sheet v5 2025-12-01 Figure 11 reflow footprint",
+        "Nexperia PESD5V0S1UL DFN1006-2 SOD882",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -1.10) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 1.10) (layer "F.Fab") hide'
+    rect(lines, -0.65, -0.45, 0.65, 0.45, "F.CrtYd", 0.05)
+    polygon(lines, [(-0.5, -0.3), (0.5, -0.3), (0.5, 0.3),
+                    (-0.5, 0.3)], "F.Fab", 0.10)
+    polygon(lines, [(-0.58, -0.32), (-0.72, -0.46),
+                    (-0.44, -0.46)], "F.SilkS", 0.12, "solid")
+    # Nexperia Figure 11 defines 0.40 x 0.70 mm R0.05 copper lands,
+    # 0.50 x 0.80 mm solder-resist openings and 0.30 x 0.60 mm R0.05
+    # paste apertures at 0.70 mm center spacing.
+    for number, x in (("1", -0.35), ("2", 0.35)):
+        lines.append(
+            f'  (pad "{number}" smd roundrect (at {x:g} 0) (size 0.4 0.7) '
+            '(layers "F.Cu" "F.Mask") (roundrect_rratio 0.25) '
+            '(solder_mask_margin 0.05))'
+        )
+        lines.append(
+            f'  (pad "" smd roundrect (at {x:g} 0) (size 0.3 0.6) '
+            '(layers "F.Paste") (roundrect_rratio 0.333333))'
+        )
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
 def ti_dqa0010a() -> str:
     name = "TI_DQA0010A_USON10"
     lines = header(
@@ -521,6 +552,7 @@ GENERATORS = {
     "TI_PW0024A_TSSOP24.kicad_mod": ti_pw0024a,
     "TI_DRL0006A_SOT6.kicad_mod": ti_drl0006a,
     "TI_DYA0002A_SOD523.kicad_mod": ti_dya0002a,
+    "Nexperia_PESD5V0S1UL_SOD882.kicad_mod": nexperia_pesd5v0s1ul_sod882,
     "TI_DQA0010A_USON10.kicad_mod": ti_dqa0010a,
     "ST_LIS2DW12_LGA-12L.kicad_mod": lis2dw12,
     "Raytac_MDBT50Q-P1MV2.kicad_mod": raytac_mdbt50q_p1mv2,

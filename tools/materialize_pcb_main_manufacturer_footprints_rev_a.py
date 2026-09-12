@@ -25,6 +25,14 @@ LIB = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
+    "D1": (
+        "Nexperia_PESD5V0S1UL_SOD882.kicad_mod",
+        "Nexperia_PESD5V0S1UL_v5_2025-12-01_Fig11_ReflowFootprint",
+    ),
+    "D2": (
+        "Nexperia_PESD5V0S1UL_SOD882.kicad_mod",
+        "Nexperia_PESD5V0S1UL_v5_2025-12-01_Fig11_ReflowFootprint",
+    ),
     "D4": (
         "TI_DYA0002A_SOD523.kicad_mod",
         "TI_DYA0002A_4224978B_2021-09_RecommendedLandPattern",

@@ -46,7 +46,7 @@ STANDARD = {
     "TSSOP-14_PW": ("PROJECT", "TI_PW0014A_TSSOP14", {}),
     "SOT23": ("Package_TO_SOT_SMD.pretty", "SOT-23"),
     "SOT-563_SC-89": ("Package_TO_SOT_SMD.pretty", "SOT-563"),
-    "SOD882": ("Diode_SMD.pretty", "D_SOD-882", {}),
+    "SOD882": ("PROJECT", "Nexperia_PESD5V0S1UL_SOD882", {}),
     "SOIC-16_300mil_F": ("Package_SO.pretty", "SOIC-16W_7.5x10.3mm_P1.27mm"),
     "U.FL_SMT": ("PROJECT", "Hirose_U.FL-R-SMT-1", {}),
     "USB-C_16P_horizontal_top_mount_1.20mm_stake": (
@@ -232,6 +232,7 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                     fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
                     sources = {
                         "PESD5V0C1BSF_SOD962-2": "Nexperia_PESD5V0C1BSF_v3_Fig14",
+                        "Nexperia_PESD5V0S1UL_SOD882": "Nexperia_PESD5V0S1UL_v5_2025-12-01_Fig11_ReflowFootprint",
                         "STTS22H_UDFN-6L": "ST_DS12606_Rev8_Fig10_11",
                         "LT6000_DCB-7": "ADI_LT6000_600012fa_LTC_DWG_05-08-1715",
                         "SiT1552_JE_CSP-4": "SiTime_SiT1552_Rev1.43_POD-35_RevA",

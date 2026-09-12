@@ -38,6 +38,11 @@ The seven `TPD1E05U06DYAR` devices `D4/D6..D11` use project-local
 `TI_DYA0002A_SOD523` geometry from drawing 4224978/B in the same Rev.O data
 sheet: two 0.67 x 0.40 mm R0.05 lands at 1.48 mm center spacing, equal-size
 stencil apertures and 0.05 mm preferred NSMD expansion.
+The two `PESD5V0S1UL` supply TVS devices `D1/D2` use project-local
+`Nexperia_PESD5V0S1UL_SOD882` geometry from data-sheet v5 Figure 11: 0.40 x
+0.70 mm R0.05 copper, 0.50 x 0.80 mm solder-resist openings and separate
+0.30 x 0.60 mm R0.05 paste apertures at 0.70 mm center spacing. Source
+SHA-256: `8ddea76afa74f87de5d3662e4d9149bf7397761fa99dc29b44bfbe42872d447e`.
 
 ## Frozen cross-domain decisions
 

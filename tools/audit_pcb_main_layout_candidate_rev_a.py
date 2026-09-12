@@ -116,11 +116,11 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(not provisional, f"manufacturer-specific provisional footprints remain: {provisional}")
-    require(len(library_pending) == 14,
+    require(len(library_pending) == 12,
             f"unexpected KiCad-library review count: {len(library_pending)}")
     require(library_verified == ["J11", "J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4"],
             f"unexpected drawing-verified KiCad set: {library_verified}")
-    require(manufacturer_controlled == ["D10", "D11", "D3", "D4", "D5", "D6", "D7",
+    require(manufacturer_controlled == ["D1", "D10", "D11", "D2", "D3", "D4", "D5", "D6", "D7",
                                         "D8", "D9", "FL1", "J10", "J12", "J13", "J6",
                                         "J7", "J8", "J9", "J_PWR", "U1", "U10", "U11",
                                         "U13", "U16", "U17", "U18", "U19", "U20", "U21",
@@ -160,7 +160,7 @@ def main() -> int:
     require(registered_by_status.get("REPLACED_PROJECT_CONTROLLED", set()) ==
             {"J8", "J9", "J10", "U1", "U3", "U7", "U11", "U13", "U16", "U17",
              "U18", "U19", "U20", "U21", "U22", "U23", "U24", "U27",
-             "D4", "D6", "D7", "D8", "D9", "D10", "D11"},
+             "D1", "D2", "D4", "D6", "D7", "D8", "D9", "D10", "D11"},
             "register project-controlled replacement set differs from board")
 
     # U.FL copper matches the Hirose mounting pattern.  The manufacturer metal
@@ -330,6 +330,33 @@ def main() -> int:
                     pad.layers == ["F.Cu", "F.Paste", "F.Mask"] and
                     abs(float(pad.solderMaskMargin or 0.0) - 0.05) < 0.002,
                     f"{ref}.{number}: land differs from TI DYA0002A 4224978/B")
+
+    # Nexperia PESD5V0S1UL v5 Figure 11 defines 0.40 x 0.70 mm R0.05
+    # copper, 0.50 x 0.80 mm solder-resist openings and separate
+    # 0.30 x 0.60 mm R0.05 paste apertures at 0.70 mm center spacing.
+    for ref in ("D1", "D2"):
+        pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
+        require(set(pads) == {"1", "2"}, f"{ref}: Nexperia SOD882 pad set")
+        for number, x in (("1", -0.35), ("2", 0.35)):
+            pad = pads[number]
+            require(abs(pad.position.X - x) < 0.002 and
+                    abs(pad.position.Y) < 0.002 and
+                    abs(pad.size.X - 0.40) < 0.002 and
+                    abs(pad.size.Y - 0.70) < 0.002 and
+                    pad.shape == "roundrect" and
+                    abs(float(pad.roundrectRatio or 0.0) - 0.25) < 0.002 and
+                    pad.layers == ["F.Cu", "F.Mask"] and
+                    abs(float(pad.solderMaskMargin or 0.0) - 0.05) < 0.002,
+                    f"{ref}.{number}: copper/mask differs from PESD5V0S1UL Figure 11")
+        paste = [pad for pad in footprints[ref].pads if not pad.number]
+        require(len(paste) == 2 and
+                {(round(pad.position.X, 3), round(pad.position.Y, 3),
+                  round(pad.size.X, 3), round(pad.size.Y, 3),
+                  round(float(pad.roundrectRatio or 0.0), 3), tuple(pad.layers))
+                 for pad in paste} ==
+                {(-0.35, 0.0, 0.3, 0.6, 0.333, ("F.Paste",)),
+                 (0.35, 0.0, 0.3, 0.6, 0.333, ("F.Paste",))},
+                f"{ref}: stencil apertures differ from PESD5V0S1UL Figure 11")
 
     # LIS2DW12 DS11811 Rev 9 defines 0.275 x 0.250 mm package pads on
     # 0.5 mm pitch.  TN0018 Rev 8 adds 0.1 mm to each PCB-land dimension,
