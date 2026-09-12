@@ -19,6 +19,11 @@ Authority CSV SHA-256: `ff84acbcc8ecc104cbc6691d5a2eaed652adfab082c510518bd0ab48
 
 ## U7 SN74AXC8T245PWR contract
 
+The project-local `TI_PW0024A_TSSOP24` footprint follows TI 4220208/A: 24
+1.50 x 0.45 mm R0.05 lands at 0.65 mm pitch with 5.80 mm between row
+centers, equal-size stencil apertures, and 0.05 mm NSMD expansion. This
+replaces the incorrect 0.50 mm-pitch KiCad pattern previously assigned to U7.
+
 The exact PW package has 24 pins and two independent direction groups. This is not a single-direction eight-channel translator. With `VCCA=1V8_MIC`, `VCCB=3V3_DIGITAL`, `DIR1=HIGH`, and `DIR2=LOW`, channels 1 through 4 translate from A to B while channels 5 through 8 translate from B to A at the same time.
 
 | U7 group | Direction | 1.8 V port A | 3.3 V port B |
@@ -41,6 +46,10 @@ The exact PW package has 24 pins and two independent direction groups. This is n
 The harness-facing 1.8 V nets carry `_1V8` in native KiCad so they cannot be accidentally shorted across U7 to the same logical names on the 3.3 V MCU side. The logical MIC harness contract remains `PDM_CLK`, `PDM_DATAn`, and `AAD_CFG`; the CSV records the physical-domain mapping at U7.
 
 ## U17 SN74LVC32APWR contract
+
+The project-local `TI_PW0014A_TSSOP14` footprint follows TI 4220202/B: 14
+1.50 x 0.45 mm R0.05 lands at 0.65 mm pitch with 5.80 mm between row
+centers, equal-size stencil apertures, and 0.05 mm NSMD expansion.
 
 U17 operates from `1V8_MIC`. Its three used gates implement this exact active-high function:
 

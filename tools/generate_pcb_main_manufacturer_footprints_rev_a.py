@@ -48,8 +48,9 @@ def polygon(lines: list[str], points: list[tuple[float, float]],
 
 def smd(lines: list[str], number: str, x: float, y: float, sx: float, sy: float,
         shape: str = "rect", mask_margin: float | None = None,
-        paste_ratio: float | None = None) -> None:
-    extra = " (roundrect_rratio 0.2)" if shape == "roundrect" else ""
+        paste_ratio: float | None = None,
+        roundrect_ratio: float = 0.2) -> None:
+    extra = f" (roundrect_rratio {roundrect_ratio:g})" if shape == "roundrect" else ""
     if mask_margin is not None:
         extra += f" (solder_mask_margin {mask_margin:g})"
     if paste_ratio is not None:
@@ -142,6 +143,64 @@ def stm32u585_lqfp100() -> str:
         smd(lines, str(number), 7.75, 6.0 - (number - 51) * 0.5, 1.2, 0.3)
     for number in range(76, 101):
         smd(lines, str(number), 6.0 - (number - 76) * 0.5, -7.75, 0.3, 1.2)
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
+def ti_pw0014a() -> str:
+    name = "TI_PW0014A_TSSOP14"
+    lines = header(
+        name,
+        "TI PW0014A 14-pin TSSOP; 4220202/B 12/2023 example board layout",
+        "Texas Instruments PW0014A TSSOP-14 0.65mm",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -3.35) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 3.35) (layer "F.Fab") hide'
+    rect(lines, -3.90, -2.75, 3.90, 2.75, "F.CrtYd", 0.05)
+    polygon(lines, [(-2.2, -2.0), (-1.7, -2.5), (2.2, -2.5),
+                    (2.2, 2.5), (-2.2, 2.5)], "F.Fab", 0.10)
+    polygon(lines, [(-2.84, -2.10), (-3.16, -2.55),
+                    (-2.52, -2.55)], "F.SilkS", 0.12, "solid")
+    # TI 4220202/B defines 1.50 x 0.45 mm lands, R0.05 corners,
+    # 0.65 mm pitch and 5.80 mm row-center separation.  The example stencil
+    # uses the same apertures; the preferred NSMD opening is +0.05 mm/side.
+    for number in range(1, 8):
+        smd(lines, str(number), -2.90, round(-1.95 + (number - 1) * 0.65, 6),
+            1.50, 0.45, "roundrect", mask_margin=0.05,
+            roundrect_ratio=1 / 9)
+    for number in range(8, 15):
+        y = round(1.95 - (number - 8) * 0.65, 6)
+        smd(lines, str(number), 2.90, 0.0 if y == 0 else y,
+            1.50, 0.45, "roundrect", mask_margin=0.05,
+            roundrect_ratio=1 / 9)
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
+def ti_pw0024a() -> str:
+    name = "TI_PW0024A_TSSOP24"
+    lines = header(
+        name,
+        "TI PW0024A 24-pin TSSOP; 4220208/A 02/2017 example board layout",
+        "Texas Instruments PW0024A TSSOP-24 0.65mm",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -4.75) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 4.75) (layer "F.Fab") hide'
+    rect(lines, -3.90, -4.15, 3.90, 4.15, "F.CrtYd", 0.05)
+    polygon(lines, [(-2.2, -3.4), (-1.7, -3.9), (2.2, -3.9),
+                    (2.2, 3.9), (-2.2, 3.9)], "F.Fab", 0.10)
+    polygon(lines, [(-2.84, -3.73), (-3.16, -4.08),
+                    (-2.52, -4.08)], "F.SilkS", 0.12, "solid")
+    # TI 4220208/A defines the same 1.50 x 0.45 mm, R0.05 land and
+    # 5.80 mm row spacing as PW0014A, with 24 pins on 0.65 mm pitch.
+    for number in range(1, 13):
+        smd(lines, str(number), -2.90, round(-3.575 + (number - 1) * 0.65, 6),
+            1.50, 0.45, "roundrect", mask_margin=0.05,
+            roundrect_ratio=1 / 9)
+    for number in range(13, 25):
+        smd(lines, str(number), 2.90, round(3.575 - (number - 13) * 0.65, 6),
+            1.50, 0.45, "roundrect", mask_margin=0.05,
+            roundrect_ratio=1 / 9)
     lines.append(")")
     return "\n".join(lines) + "\n"
 
@@ -363,6 +422,8 @@ def microfit() -> str:
 GENERATORS = {
     "Hirose_U.FL-R-SMT-1.kicad_mod": ufl,
     "ST_STM32U585_LQFP100_1L.kicad_mod": stm32u585_lqfp100,
+    "TI_PW0014A_TSSOP14.kicad_mod": ti_pw0014a,
+    "TI_PW0024A_TSSOP24.kicad_mod": ti_pw0024a,
     "ST_LIS2DW12_LGA-12L.kicad_mod": lis2dw12,
     "Raytac_MDBT50Q-P1MV2.kicad_mod": raytac_mdbt50q_p1mv2,
     "Quectel_BG95-M3_LGA-102.kicad_mod": bg95,

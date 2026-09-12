@@ -29,6 +29,22 @@ CONTROLLED = {
         "ST_STM32U585_LQFP100_1L.kicad_mod",
         "ST_DS13086_Rev10_Figure96_LQFP100_1L",
     ),
+    "U7": (
+        "TI_PW0024A_TSSOP24.kicad_mod",
+        "TI_PW0024A_4220208A_2017-02_RecommendedLandPattern",
+    ),
+    "U13": (
+        "TI_PW0024A_TSSOP24.kicad_mod",
+        "TI_PW0024A_4220208A_2017-02_RecommendedLandPattern",
+    ),
+    "U16": (
+        "TI_PW0024A_TSSOP24.kicad_mod",
+        "TI_PW0024A_4220208A_2017-02_RecommendedLandPattern",
+    ),
+    "U17": (
+        "TI_PW0014A_TSSOP14.kicad_mod",
+        "TI_PW0014A_4220202B_2023-12_RecommendedLandPattern",
+    ),
     "J8": (
         "Hirose_U.FL-R-SMT-1.kicad_mod",
         "Hirose_U.FL_CAT_2026-08-01_PCB_and_MetalMask",

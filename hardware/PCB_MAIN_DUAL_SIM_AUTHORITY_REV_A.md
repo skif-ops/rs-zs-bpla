@@ -31,6 +31,11 @@ TE specification `108-115163` states that the controlled product drawing takes p
 
 ## U13 switch topology
 
+The project-local `TI_PW0024A_TSSOP24` footprint follows TI 4220208/A: 24
+1.50 x 0.45 mm R0.05 lands at 0.65 mm pitch with 5.80 mm between row
+centers, equal-size stencil apertures, and 0.05 mm NSMD expansion. It replaces
+the incorrect 0.50 mm-pitch KiCad pattern previously assigned to U13.
+
 U13 is the exact `TS3A27518EPWR` 24-pin TSSOP. It is powered from `3V3_DIGITAL`. This satisfies TI's VCC-first sequencing rule because the 3.3 V domain is established before U8 presents any USIM analog signal, and it reduces the guaranteed worst-case single-channel resistance to 7.6 Ohm over -40 to +85 C.
 
 Three channels are paralleled for the selected card's VDD path. The guaranteed worst-case equivalent resistance is therefore at most 2.54 Ohm before PCB resistance. Review A must measure the actual selected-card voltage and prove at least 1.62 V at the connector throughout card startup, attach, temperature, and brownout tests.

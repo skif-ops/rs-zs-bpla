@@ -256,6 +256,8 @@ jobs:
           expected = {
               "Hirose_U.FL-R-SMT-1": 6,
               "ST_STM32U585_LQFP100_1L": 100,
+              "TI_PW0014A_TSSOP14": 14,
+              "TI_PW0024A_TSSOP24": 24,
               "ST_LIS2DW12_LGA-12L": 12,
               "Raytac_MDBT50Q-P1MV2": 61,
               "Quectel_BG95-M3_LGA-102": 102,

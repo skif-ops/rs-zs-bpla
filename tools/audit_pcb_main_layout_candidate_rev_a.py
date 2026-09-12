@@ -116,13 +116,14 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(not provisional, f"manufacturer-specific provisional footprints remain: {provisional}")
-    require(len(library_pending) == 33,
+    require(len(library_pending) == 29,
             f"unexpected KiCad-library review count: {len(library_pending)}")
     require(library_verified == ["J11", "J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4"],
             f"unexpected drawing-verified KiCad set: {library_verified}")
     require(manufacturer_controlled == ["D3", "D5", "FL1", "J10", "J12", "J13", "J6",
                                         "J7", "J8", "J9", "J_PWR", "U1", "U10", "U11",
-                                        "U3", "U4", "U5", "U8", "U9", "X1"],
+                                        "U13", "U16", "U17", "U3", "U4", "U5", "U7",
+                                        "U8", "U9", "X1"],
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
 
     register_rows = list(csv.DictReader(FOOTPRINT_REVIEW.open(encoding="utf-8", newline="")))
@@ -155,7 +156,7 @@ def main() -> int:
     require(registered_by_status.get("DRAWING_VERIFIED", set()) == set(library_verified),
             "register verified references differ from board")
     require(registered_by_status.get("REPLACED_PROJECT_CONTROLLED", set()) ==
-            {"J8", "J9", "J10", "U1", "U3", "U11"},
+            {"J8", "J9", "J10", "U1", "U3", "U7", "U11", "U13", "U16", "U17"},
             "register project-controlled replacement set differs from board")
 
     # U.FL copper matches the Hirose mounting pattern.  The manufacturer metal
@@ -210,6 +211,45 @@ def main() -> int:
                 abs(pad.size.X - sx) < 0.002 and abs(pad.size.Y - sy) < 0.002 and
                 pad.shape == "rect" and pad.layers == ["F.Cu", "F.Paste", "F.Mask"],
                 f"U1.{number}: land differs from DS13086 Rev 10 Figure 96")
+
+    # TI PW0014A 4220202/B and PW0024A 4220208/A give the complete example
+    # board layouts: 1.50 x 0.45 mm R0.05 lands on 0.65 mm pitch, 5.80 mm
+    # between row centers, equal-size stencil apertures, and preferred NSMD
+    # openings up to 0.05 mm per side.
+    expected_u17: dict[str, tuple[float, float]] = {}
+    for number in range(1, 8):
+        expected_u17[str(number)] = (-2.90, -1.95 + (number - 1) * 0.65)
+    for number in range(8, 15):
+        expected_u17[str(number)] = (2.90, 1.95 - (number - 8) * 0.65)
+    u17 = {pad.number: pad for pad in footprints["U17"].pads if pad.number}
+    require(set(u17) == set(expected_u17), "U17: TI PW0014A pad set")
+    for number, (x, y) in expected_u17.items():
+        pad = u17[number]
+        require(abs(pad.position.X - x) < 0.002 and abs(pad.position.Y - y) < 0.002 and
+                abs(pad.size.X - 1.50) < 0.002 and abs(pad.size.Y - 0.45) < 0.002 and
+                pad.shape == "roundrect" and
+                pad.layers == ["F.Cu", "F.Paste", "F.Mask"] and
+                abs(float(pad.solderMaskMargin or 0.0) - 0.05) < 0.002,
+                f"U17.{number}: land differs from TI PW0014A 4220202/B")
+
+    expected_pw24: dict[str, tuple[float, float]] = {}
+    for number in range(1, 13):
+        expected_pw24[str(number)] = (-2.90, -3.575 + (number - 1) * 0.65)
+    for number in range(13, 25):
+        expected_pw24[str(number)] = (2.90, 3.575 - (number - 13) * 0.65)
+    for ref in ("U7", "U13", "U16"):
+        pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
+        require(set(pads) == set(expected_pw24), f"{ref}: TI PW0024A pad set")
+        for number, (x, y) in expected_pw24.items():
+            pad = pads[number]
+            require(abs(pad.position.X - x) < 0.002 and
+                    abs(pad.position.Y - y) < 0.002 and
+                    abs(pad.size.X - 1.50) < 0.002 and
+                    abs(pad.size.Y - 0.45) < 0.002 and
+                    pad.shape == "roundrect" and
+                    pad.layers == ["F.Cu", "F.Paste", "F.Mask"] and
+                    abs(float(pad.solderMaskMargin or 0.0) - 0.05) < 0.002,
+                    f"{ref}.{number}: land differs from TI PW0024A 4220208/A")
 
     # LIS2DW12 DS11811 Rev 9 defines 0.275 x 0.250 mm package pads on
     # 0.5 mm pitch.  TN0018 Rev 8 adds 0.1 mm to each PCB-land dimension,

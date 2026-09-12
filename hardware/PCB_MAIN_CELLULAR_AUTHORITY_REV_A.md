@@ -57,6 +57,11 @@ The external source is the single `3V8_MODEM` rail from PCB-PWR. It splits at a 
 
 ## U16 SN74AXC8T245PWR contract
 
+The project-local `TI_PW0024A_TSSOP24` footprint follows TI 4220208/A: 24
+1.50 x 0.45 mm R0.05 lands at 0.65 mm pitch with 5.80 mm between row
+centers, equal-size stencil apertures, and 0.05 mm NSMD expansion. It replaces
+the incorrect 0.50 mm-pitch KiCad pattern previously assigned to U16.
+
 U16 uses the BG95 `VDD_EXT` output for VCCA. It therefore powers down with the modem 1.8 V domain. VCCB uses `3V3_DIGITAL`, U16 GND uses `GND_MODEM`, and active-low OE is tied to `GND_MODEM`. TI VCC isolation and Ioff prevent a powered 3.3 V MCU domain from driving an unpowered modem domain.
 
 | U16 group | Direction | 1.8 V port A | 3.3 V port B |

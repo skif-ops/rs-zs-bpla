@@ -15,9 +15,9 @@ machine-readable 19-pattern inventory is
 |---|---:|---|
 | Project-generated chip passives and mechanical holes | 188 | Placement use only; passive geometry remains subject to assembly-house rules |
 | MAIN-AUTH-011 controlled pogo groups | 5 | 31 bottom pads verified by coordinate, diameter, mask and layer |
-| Manufacturer-drawing controlled patterns | 20 | Fourteen previously controlled instances plus six reviewed instances controlled locally |
+| Manufacturer-drawing controlled patterns | 24 | Fourteen previously controlled instances plus ten reviewed instances controlled locally |
 | Drawing-verified KiCad library patterns | 5 | Four Molex 504050-0691 instances and one GCT USB4105 instance have exact audited geometry |
-| KiCad library patterns pending drawing review | 33 | Exact pad-number contract passes; drawing review remains open |
+| KiCad library patterns pending drawing review | 29 | Exact pad-number contract passes; drawing review remains open |
 | Provisional manufacturer-specific patterns | 0 | Closed for the current component set; any substitution reopens this gate |
 
 Earlier controlled updates reduced the provisional set from 52 to 4 instances by
@@ -119,6 +119,29 @@ control. The official [DS13086 Rev 10](https://www.st.com/resource/en/datasheet/
 document is SHA-256
 `6483871075d4889d39356648a9c1f1fb34f48dce2ce3e8c5a8d73a73f7e935e3`.
 
+The fourth KiCad-library review tranche closes `U7`, `U13`, `U16`, and `U17`
+with project-local TI `PW` patterns. The review exposed a functional package
+error in the prior placement candidate: all three 24-pin devices used KiCad
+`TSSOP-24_4.4x6.5mm_P0.5mm`, but the selected TI `PWR` orderables use
+`PW0024A` with 0.65 mm pitch and a 7.7-7.9 mm body. TI drawing 4220208/A
+defines 24 lands of 1.50 x 0.45 mm, R0.05 corners, 0.65 mm pitch and 5.80 mm
+row-center spacing. `U17` already had the right 0.65 mm pitch, but its KiCad
+lands were 1.475 x 0.40 mm at 5.725 mm row spacing rather than the PW0014A
+4220202/B example. The two local footprints implement the exact TI copper,
+equal-size stencil apertures and preferred 0.05 mm NSMD expansion. Sources are
+[SN74AXC8T245 SCES875C](https://www.ti.com/lit/ds/symlink/sn74axc8t245.pdf),
+SHA-256 `6cf4003c438c0546fb86f0932613896197dd19a75bdb307f385eb6e75535126e`,
+[TS3A27518E SCDS260F](https://www.ti.com/lit/ds/symlink/ts3a27518e.pdf),
+SHA-256 `d87c216911176dca84cc9cee5efb6f45b18021977f94a97c7fae989484a73392`,
+and [SN74LVC32A SCAS286U](https://www.ti.com/lit/ds/symlink/sn74lvc32a.pdf),
+SHA-256 `807f6fff7977736035c2a3144d530be7ad737a163b2f0fd11002a45953b47230`.
+
+`U2` was also reviewed but remains pending. Winbond W25Q512JV Rev B confirms
+the selected package `F`, its 1.27 mm pitch and full package tolerances, but
+does not publish a PCB land pattern for the 16-pin SOIC. The existing KiCad
+2.05 x 0.60 mm lands therefore cannot be promoted from a package-outline-only
+comparison; independent IPC/assembly-process control is still required.
+
 ## Remaining provisional references
 
 None.
@@ -129,7 +152,7 @@ Review B remains `OPEN`. No Gerber, drill, paste, pick-and-place, IPC-356 or
 STEP output from this candidate may be released until:
 
 1. the zero-provisional footprint state remains true for the release commit;
-2. the remaining 33 KiCad-derived instances pass drawing-to-pattern review;
+2. the remaining 29 KiCad-derived instances pass drawing-to-pattern review;
 3. placement and routing audits pass in KiCad 9;
 4. DRC reports zero blocker/critical and zero unrouted items;
 5. RA-003 layout evidence is complete; physical droop and ripple measurement

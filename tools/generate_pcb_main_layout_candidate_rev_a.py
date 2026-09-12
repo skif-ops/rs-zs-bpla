@@ -42,8 +42,8 @@ KICAD_DRAWING_VERIFIED = {
 STANDARD = {
     "LQFP100_14x14": ("PROJECT", "ST_STM32U585_LQFP100_1L", {}),
     "LGA-12_2x2mm": ("PROJECT", "ST_LIS2DW12_LGA-12L", {}),
-    "TSSOP-24_PW": ("Package_SO.pretty", "TSSOP-24_4.4x6.5mm_P0.5mm"),
-    "TSSOP-14_PW": ("Package_SO.pretty", "TSSOP-14_4.4x5mm_P0.65mm"),
+    "TSSOP-24_PW": ("PROJECT", "TI_PW0024A_TSSOP24", {}),
+    "TSSOP-14_PW": ("PROJECT", "TI_PW0014A_TSSOP14", {}),
     "SOT23": ("Package_TO_SOT_SMD.pretty", "SOT-23"),
     "SOT-563_SC-89": ("Package_TO_SOT_SMD.pretty", "SOT-563"),
     "SOD882": ("Diode_SMD.pretty", "D_SOD-882", {}),
@@ -245,6 +245,8 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                         "GCT_MEM2052-00-195-00-A": "GCT_MEM2052_RevA3_RecommendedPCBLayout",
                         "Hirose_U.FL-R-SMT-1": "Hirose_U.FL_CAT_2026-08-01_PCB_and_MetalMask",
                         "ST_STM32U585_LQFP100_1L": "ST_DS13086_Rev10_Figure96_LQFP100_1L",
+                        "TI_PW0014A_TSSOP14": "TI_PW0014A_4220202B_2023-12_RecommendedLandPattern",
+                        "TI_PW0024A_TSSOP24": "TI_PW0024A_4220208A_2017-02_RecommendedLandPattern",
                         "ST_LIS2DW12_LGA-12L": "ST_DS11811_Rev9_and_TN0018_Rev8_LGA-12L_Pattern",
                         "Raytac_MDBT50Q-P1MV2": "Raytac_MDBT50Q_Footprint_Design_Guide_230606",
                     }

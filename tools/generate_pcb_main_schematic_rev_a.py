@@ -40,6 +40,10 @@ CONTROLLED_FOOTPRINTS = (
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "ST_STM32U585_LQFP100_1L.kicad_mod",
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "TI_PW0014A_TSSOP14.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "TI_PW0024A_TSSOP24.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "ST_LIS2DW12_LGA-12L.kicad_mod",
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "Raytac_MDBT50Q-P1MV2.kicad_mod",
