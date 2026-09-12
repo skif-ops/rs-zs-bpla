@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PCB = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 SCHEMATIC = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch"
 PLACEMENT = ROOT / "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv"
+PASSIVE_AUTHORITY = ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 OPEN_DIMENSIONS = ROOT / "mechanics/common/OPEN_DIMENSIONS.csv"
 
@@ -81,6 +82,8 @@ def main() -> int:
                 for row in placements), "placement state must stay provisional and top-side")
     require(Counter(row["Functional_Zone"] for row in placements) == EXPECTED_ZONE_COUNTS,
             "placement functional-zone allocation drift")
+    passive_population = {row["RefDes"]: row["Population"]
+                          for row in read_csv(PASSIVE_AUTHORITY)}
 
     schematic = Schematic.from_file(str(SCHEMATIC), encoding="utf-8")
     libraries = {item.libId: item for item in schematic.libSymbols}
@@ -124,17 +127,21 @@ def main() -> int:
         close(float(footprint.position.angle or 0.0) % 360.0,
               float(row["Rotation_deg"]) % 360.0, f"{ref} rotation", 0.01)
         require(footprint.layer == "F.Cu", f"{ref}: provisional placement must remain top-side")
-        require(footprint.properties.get("DIONEA_FOOTPRINT_BINDING") == wanted["footprint"],
+        require(footprint.libId == wanted["footprint"],
                 f"{ref}: footprint binding differs from native schematic")
-        require(footprint.properties.get("DIONEA_FUNCTIONAL_ZONE") == row["Functional_Zone"],
-                f"{ref}: functional zone drift")
-        require(footprint.properties.get("DIONEA_PLACEMENT_STATUS") == row["Placement_Status"],
-                f"{ref}: provisional status drift")
-        population = footprint.properties.get("DIONEA_POPULATION")
-        if wanted["population"] == "DNP":
-            require(population == "DNP", f"{ref}: DNP state drift")
-        else:
-            require(population in {"FITTED", "PCB_FEATURE"}, f"{ref}: population state drift")
+        population = passive_population.get(ref, "FITTED")
+        require(wanted["population"] == ("DNP" if population == "DNP" else "FITTED"),
+                f"{ref}: schematic population state differs from authority")
+        description = "|".join((
+            "DIONEA_PCB_PWR_REV_A",
+            f"population={population}",
+            f"zone={row['Functional_Zone']}",
+            f"placement={row['Placement_Status']}",
+            f"authority={row['Source_Authority']}",
+        ))
+        require(footprint.description == description, f"{ref}: placement metadata drift")
+        require(footprint.tags == "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN",
+                f"{ref}: provisional interlock tags drift")
 
         pads: dict[str, list[object]] = defaultdict(list)
         for pad in footprint.pads:

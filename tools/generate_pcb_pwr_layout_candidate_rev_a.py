@@ -128,6 +128,16 @@ def normalize_text(footprint: pcbnew.FOOTPRINT) -> None:
     footprint.Reference().SetPosition(footprint.GetPosition() + mm(0, -1.4))
 
 
+def authority_description(component: dict[str, object], row: dict[str, str]) -> str:
+    return "|".join((
+        "DIONEA_PCB_PWR_REV_A",
+        f"population={component['population']}",
+        f"zone={row['Functional_Zone']}",
+        f"placement={row['Placement_Status']}",
+        f"authority={row['Source_Authority']}",
+    ))
+
+
 def main() -> int:
     components = catalog()
     placements = read_csv(PLACEMENT)
@@ -155,13 +165,14 @@ def main() -> int:
         component = components[ref]
         footprint = load_footprint(str(component["footprint"]))
         footprint.SetReference(ref); footprint.SetValue(str(component["value"]))
-        footprint.SetProperty("DIONEA_FOOTPRINT_BINDING", str(component["footprint"]))
-        footprint.SetProperty("DIONEA_POPULATION", str(component["population"]))
-        footprint.SetProperty("DIONEA_FUNCTIONAL_ZONE", row["Functional_Zone"])
-        footprint.SetProperty("DIONEA_PLACEMENT_STATUS", row["Placement_Status"])
-        footprint.SetProperty("DIONEA_SOURCE_AUTHORITY", row["Source_Authority"])
+        footprint.SetFPIDAsString(str(component["footprint"]))
+        footprint.SetLibDescription(authority_description(component, row))
+        footprint.SetKeywords("DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
         if component["population"] in {"DNP", "PCB_FEATURE"}:
             footprint.SetExcludedFromPosFiles(True)
+            footprint.SetExcludedFromBOM(True)
+        if component["population"] == "DNP":
+            footprint.SetDNP(True)
 
         pads: dict[str, list[pcbnew.PAD]] = defaultdict(list)
         for pad in footprint.Pads():
