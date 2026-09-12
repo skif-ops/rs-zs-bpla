@@ -7,6 +7,11 @@ tariff_is_evt_acceptance_input: false
 profile_priority: TO_BE_PROVISIONED
 operator: TO_BE_FILLED_ON_DEVICE
 apn: TO_BE_FILLED_ON_DEVICE
+automatic_selection:
+  imsi_prefix_5_or_6_digits: TO_BE_PROVISIONED
+  allow_network_provided_apn: TO_BE_APPROVED_PER_OPERATOR_PROFILE
+  fallback_apn: TO_BE_PROVISIONED_OR_EMPTY_WHEN_NETWORK_APN_IS_APPROVED
+  unknown_imsi_prefix: FAIL_CLOSED
 authentication: none
 username_secret_ref: null
 password_secret_ref: null

@@ -68,6 +68,15 @@ ble:
   firmware_port: MISSING_BLOCKER
   swd_recovery: REQUIRED_ON_FIXTURE
   enclosure_rf_validation: REQUIRED
+cellular:
+  modem: Quectel_BG95_M3_candidate
+  auto_network_settings: IMPLEMENTED_HOST_TESTED_HARDWARE_VALIDATION_PENDING
+  discovery: [QCCID_REDACTED, CIMI_PLMN_ONLY, COPS_QUERY, CGNAPN]
+  post_activation_readback: CGCONTRDP_APN_IP_GATEWAY_DNS_REQUIRED
+  apn_policy: MATCHED_APPROVED_PUBLIC_PLMN_PROFILE_ONLY
+  unknown_sim_or_apn_mismatch: FAIL_CLOSED
+  full_imsi_or_iccid_retention: FORBIDDEN
+  physical_sim_operator_and_24h_evidence: OPEN_EVT_REQUIRED
 storage:
   card: Kingston_SDCIT2_32GB
   socket: GCT_MEM2052_00_195_00_A

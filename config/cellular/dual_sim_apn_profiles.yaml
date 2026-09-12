@@ -23,6 +23,20 @@ pilot_operator_candidates:
     underlying_carrier_and_public_apn: TO_BE_PROVISIONED
 pilot_apn_policy: public_only
 tariff_is_evt_acceptance_input: false
+automatic_network_discovery:
+  firmware_status: IMPLEMENTED_HOST_TESTED_HARDWARE_VALIDATION_PENDING
+  command_sequence: [QCCID, CIMI, COPS_QUERY, CGNAPN, CGDCONT, CEREG_QUERY, QIACT, CGCONTRDP]
+  profile_match_key: longest_approved_imsi_prefix_5_or_6_digits
+  network_provided_apn: ALLOWED_ONLY_BY_MATCHED_PUBLIC_PROFILE
+  catalog_fallback: APPROVED_PUBLIC_PROFILE_ONLY
+  unknown_imsi_prefix: FAIL_CLOSED
+  missing_apn: FAIL_CLOSED
+  active_context_apn_mismatch: FAIL_CLOSED
+  required_post_activation_values: [apn, local_address, gateway, primary_dns]
+  optional_post_activation_values: [secondary_dns, registered_operator, access_technology]
+  persistent_identity_policy: HOME_PLMN_AND_LAST_4_ICCID_ONLY
+  full_imsi_or_iccid_retention: FORBIDDEN
+  physical_sim_and_operator_evidence: OPEN_EVT_REQUIRED
 apn_modes:
   public:
     allowed: true
@@ -33,7 +47,7 @@ apn_modes:
     allowed_in_pilot: false
     status: FUTURE_NOT_PROVISIONED
 profile_selection:
-  order_per_slot: PUBLIC_PROFILES_ONLY_TO_BE_PROVISIONED
+  order_per_slot: APPROVED_PUBLIC_PLMN_PROFILES_ONLY_TO_BE_PROVISIONED
   automatic_failover_enabled: true
   failure_triggers: [attach_timeout, pdp_failure, dns_failure, tls_failure, sustained_link_loss]
   manual_override: authenticated_BLE_or_mTLS_server_command
