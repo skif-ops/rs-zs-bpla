@@ -33,6 +33,18 @@ CONTROLLED = {
         "Nexperia_PESD5V0S1UL_SOD882.kicad_mod",
         "Nexperia_PESD5V0S1UL_v5_2025-12-01_Fig11_ReflowFootprint",
     ),
+    "Q1": (
+        "Nexperia_MMBT3904_SOT23.kicad_mod",
+        "Nexperia_MMBT3904_v5_2026-04-08_Fig8_ReflowFootprint",
+    ),
+    "Q2": (
+        "Nexperia_MMBT3904_SOT23.kicad_mod",
+        "Nexperia_MMBT3904_v5_2026-04-08_Fig8_ReflowFootprint",
+    ),
+    "Q3": (
+        "Nexperia_MMBT3904_SOT23.kicad_mod",
+        "Nexperia_MMBT3904_v5_2026-04-08_Fig8_ReflowFootprint",
+    ),
     "D4": (
         "TI_DYA0002A_SOD523.kicad_mod",
         "TI_DYA0002A_4224978B_2021-09_RecommendedLandPattern",

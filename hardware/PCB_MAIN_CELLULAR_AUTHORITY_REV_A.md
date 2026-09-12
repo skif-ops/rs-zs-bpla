@@ -12,7 +12,7 @@ Authority CSV SHA-256: `3431c903eb9a1138e9976a0d95479c4269e2c0d25d72c98bbe5dc6e7
 
 - Quectel `BG95 Series Hardware Design`, version 1.6, 14 August 2023. The retrieved original Quectel document has SHA-256 `6ff03aa31577971d02dc15eac11adee4d52b80077ae3fa3503978c1b12496e81`. Public document copy: `https://raw.githubusercontent.com/jamesmarrs/farseer/fd4425f955fb3ebf50f330afe9228b8911a85a86/datasheets/quectel_bg95_series_hardware_design_v1-6.pdf`. Canonical product page: `https://www.quectel.com/product/lpwa-bg95-cat-m1-cat-nb2-egprs-series/`.
 - TI `SN74AXC8T245` datasheet SCES875C, Revision C, January 2024: `https://www.ti.com/lit/ds/symlink/sn74axc8t245.pdf`. Retrieved document SHA-256: `6cf4003c438c0546fb86f0932613896197dd19a75bdb307f385eb6e75535126e`.
-- Nexperia `MMBT3904` product data sheet, version 5, 8 April 2026: `https://assets.nexperia.com/documents/data-sheet/MMBT3904.pdf`.
+- Nexperia `MMBT3904` product data sheet, version 5, 8 April 2026: `https://assets.nexperia.com/documents/data-sheet/MMBT3904.pdf`. Retrieved document SHA-256: `ade27b408c77a94ea4448c8473a9e80096dd60da3e1914e004c52344e9cd8d00`.
 - Project sources: `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv`, `hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv`, `hardware/POWER_DESIGN_BASELINE_REV_A.json`, `hardware/POWER_DESIGN_CALC_REV_A.md`, and `hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md`.
 
 ## U8 BG95-M3 pad contract
@@ -85,6 +85,12 @@ At the minimum U16 VCCA value of 1.65 V, the guaranteed U16 output HIGH toward B
 ## Q1 and Q2 open-collector controls
 
 Q1 and Q2 are Nexperia `MMBT3904,215` in SOT23. The exact pin order is 1 base, 2 emitter, 3 collector.
+
+The project-local `Nexperia_MMBT3904_SOT23` footprint follows Figure 8:
+rectangular 0.60 x 0.70 mm copper lands, 0.50 x 0.60 mm stencil apertures,
+0.75 x 0.85 mm solder-resist openings, 1.90 mm lead pitch and 2.00 mm row
+spacing. It is rotated into the established board orientation while retaining
+the exact base/emitter/collector pin order.
 
 - Each base is driven through 4.7 kOhm from its STM32 command and has 47 kOhm from base to emitter.
 - Both emitters connect to `GND_MODEM`.

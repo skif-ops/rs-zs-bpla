@@ -289,6 +289,45 @@ def nexperia_pesd5v0s1ul_sod882() -> str:
     return "\n".join(lines) + "\n"
 
 
+def nexperia_mmbt3904_sot23() -> str:
+    name = "Nexperia_MMBT3904_SOT23"
+    lines = header(
+        name,
+        "Nexperia MMBT3904 SOT23; data sheet v5 2026-04-08 Figure 8 reflow footprint",
+        "Nexperia MMBT3904 SOT23 TO-236AB",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -2.20) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 2.20) (layer "F.Fab") hide'
+    # Figure 8's 3.3 x 3.0 mm occupied area is rotated with the land pattern
+    # into the project's established SOT23 orientation.
+    rect(lines, -1.50, -1.65, 1.50, 1.65, "F.CrtYd", 0.05)
+    polygon(lines, [(-0.65, -1.10), (-0.35, -1.45), (0.65, -1.45),
+                    (0.65, 1.45), (-0.65, 1.45)], "F.Fab", 0.10)
+    polygon(lines, [(-1.15, -1.43), (-1.35, -1.63),
+                    (-0.95, -1.63)], "F.SilkS", 0.12, "solid")
+    # Nexperia Figure 8 defines 0.60 x 0.70 mm rectangular copper lands,
+    # 0.50 x 0.60 mm stencil apertures, and 0.75 x 0.85 mm solder-resist
+    # openings at 1.90 mm lead pitch and 2.00 mm row spacing.  Rotating the
+    # pattern 90 degrees counter-clockwise preserves KiCad's existing SOT23
+    # pin orientation: pin 1 base, pin 2 emitter, pin 3 collector.
+    expected = {
+        "1": (-1.00, -0.95),
+        "2": (-1.00, 0.95),
+        "3": (1.00, 0.00),
+    }
+    for number, (x, y) in expected.items():
+        lines.append(
+            f'  (pad "{number}" smd rect (at {x:g} {y:g}) (size 0.7 0.6) '
+            '(layers "F.Cu" "F.Mask") (solder_mask_margin 0.075))'
+        )
+        lines.append(
+            f'  (pad "" smd rect (at {x:g} {y:g}) (size 0.6 0.5) '
+            '(layers "F.Paste"))'
+        )
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
 def ti_dqa0010a() -> str:
     name = "TI_DQA0010A_USON10"
     lines = header(
@@ -553,6 +592,7 @@ GENERATORS = {
     "TI_DRL0006A_SOT6.kicad_mod": ti_drl0006a,
     "TI_DYA0002A_SOD523.kicad_mod": ti_dya0002a,
     "Nexperia_PESD5V0S1UL_SOD882.kicad_mod": nexperia_pesd5v0s1ul_sod882,
+    "Nexperia_MMBT3904_SOT23.kicad_mod": nexperia_mmbt3904_sot23,
     "TI_DQA0010A_USON10.kicad_mod": ti_dqa0010a,
     "ST_LIS2DW12_LGA-12L.kicad_mod": lis2dw12,
     "Raytac_MDBT50Q-P1MV2.kicad_mod": raytac_mdbt50q_p1mv2,
