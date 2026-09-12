@@ -233,6 +233,31 @@ def ti_drl0006a() -> str:
     return "\n".join(lines) + "\n"
 
 
+def ti_dya0002a() -> str:
+    name = "TI_DYA0002A_SOD523"
+    lines = header(
+        name,
+        "TI DYA0002A 2-pin SOD-523; 4224978/B 09/2021 example board layout",
+        "Texas Instruments DYA0002A SOD-523 2-pin",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -1.20) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 1.20) (layer "F.Fab") hide'
+    rect(lines, -1.18, -0.65, 1.18, 0.65, "F.CrtYd", 0.05)
+    polygon(lines, [(-0.8, -0.4), (0.8, -0.4), (0.8, 0.4),
+                    (-0.8, 0.4)], "F.Fab", 0.10)
+    polygon(lines, [(-1.00, -0.46), (-1.18, -0.64),
+                    (-0.82, -0.64)], "F.SilkS", 0.12, "solid")
+    # TI 4224978/B defines two 0.67 x 0.40 mm R0.05 lands with 1.48 mm
+    # center spacing.  The example stencil uses equal apertures and the
+    # preferred NSMD opening is +0.05 mm/side.
+    smd(lines, "1", -0.74, 0.0, 0.67, 0.40, "roundrect",
+        mask_margin=0.05, roundrect_ratio=0.25)
+    smd(lines, "2", 0.74, 0.0, 0.67, 0.40, "roundrect",
+        mask_margin=0.05, roundrect_ratio=0.25)
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
 def ti_dqa0010a() -> str:
     name = "TI_DQA0010A_USON10"
     lines = header(
@@ -495,6 +520,7 @@ GENERATORS = {
     "TI_PW0014A_TSSOP14.kicad_mod": ti_pw0014a,
     "TI_PW0024A_TSSOP24.kicad_mod": ti_pw0024a,
     "TI_DRL0006A_SOT6.kicad_mod": ti_drl0006a,
+    "TI_DYA0002A_SOD523.kicad_mod": ti_dya0002a,
     "TI_DQA0010A_USON10.kicad_mod": ti_dqa0010a,
     "ST_LIS2DW12_LGA-12L.kicad_mod": lis2dw12,
     "Raytac_MDBT50Q-P1MV2.kicad_mod": raytac_mdbt50q_p1mv2,

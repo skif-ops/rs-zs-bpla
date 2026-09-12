@@ -25,6 +25,34 @@ LIB = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
+    "D4": (
+        "TI_DYA0002A_SOD523.kicad_mod",
+        "TI_DYA0002A_4224978B_2021-09_RecommendedLandPattern",
+    ),
+    "D6": (
+        "TI_DYA0002A_SOD523.kicad_mod",
+        "TI_DYA0002A_4224978B_2021-09_RecommendedLandPattern",
+    ),
+    "D7": (
+        "TI_DYA0002A_SOD523.kicad_mod",
+        "TI_DYA0002A_4224978B_2021-09_RecommendedLandPattern",
+    ),
+    "D8": (
+        "TI_DYA0002A_SOD523.kicad_mod",
+        "TI_DYA0002A_4224978B_2021-09_RecommendedLandPattern",
+    ),
+    "D9": (
+        "TI_DYA0002A_SOD523.kicad_mod",
+        "TI_DYA0002A_4224978B_2021-09_RecommendedLandPattern",
+    ),
+    "D10": (
+        "TI_DYA0002A_SOD523.kicad_mod",
+        "TI_DYA0002A_4224978B_2021-09_RecommendedLandPattern",
+    ),
+    "D11": (
+        "TI_DYA0002A_SOD523.kicad_mod",
+        "TI_DYA0002A_4224978B_2021-09_RecommendedLandPattern",
+    ),
     "U1": (
         "ST_STM32U585_LQFP100_1L.kicad_mod",
         "ST_DS13086_Rev10_Figure96_LQFP100_1L",

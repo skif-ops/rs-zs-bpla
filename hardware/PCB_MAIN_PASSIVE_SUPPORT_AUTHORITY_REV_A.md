@@ -34,6 +34,10 @@ Source: `https://www.ti.com/lit/ds/symlink/tpd4e05u06.pdf`, SHA-256
 The `TPD2EUSB30DRTR` devices `U25/U26` remain on the reviewed KiCad DRT-3
 pattern pending independent IPC/assembly control because TI `MPDS340` publishes
 only the package outline and no PCB land or stencil recommendation.
+The seven `TPD1E05U06DYAR` devices `D4/D6..D11` use project-local
+`TI_DYA0002A_SOD523` geometry from drawing 4224978/B in the same Rev.O data
+sheet: two 0.67 x 0.40 mm R0.05 lands at 1.48 mm center spacing, equal-size
+stencil apertures and 0.05 mm preferred NSMD expansion.
 
 ## Frozen cross-domain decisions
 

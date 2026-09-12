@@ -259,6 +259,7 @@ jobs:
               "TI_PW0014A_TSSOP14": 14,
               "TI_PW0024A_TSSOP24": 24,
               "TI_DRL0006A_SOT6": 6,
+              "TI_DYA0002A_SOD523": 2,
               "TI_DQA0010A_USON10": 12,
               "ST_LIS2DW12_LGA-12L": 12,
               "Raytac_MDBT50Q-P1MV2": 61,

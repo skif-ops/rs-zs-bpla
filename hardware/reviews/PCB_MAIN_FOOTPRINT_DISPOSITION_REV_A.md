@@ -15,9 +15,9 @@ machine-readable 19-pattern inventory is
 |---|---:|---|
 | Project-generated chip passives and mechanical holes | 188 | Placement use only; passive geometry remains subject to assembly-house rules |
 | MAIN-AUTH-011 controlled pogo groups | 5 | 31 bottom pads verified by coordinate, diameter, mask and layer |
-| Manufacturer-drawing controlled patterns | 32 | Fourteen initially controlled instances plus eighteen reviewed instances controlled locally |
+| Manufacturer-drawing controlled patterns | 39 | Fourteen initially controlled instances plus twenty-five reviewed instances controlled locally |
 | Drawing-verified KiCad library patterns | 5 | Four Molex 504050-0691 instances and one GCT USB4105 instance have exact audited geometry |
-| KiCad library patterns pending drawing review | 21 | Exact pad-number contract passes; drawing review remains open |
+| KiCad library patterns pending drawing review | 14 | Exact pad-number contract passes; drawing review remains open |
 | Provisional manufacturer-specific patterns | 0 | Closed for the current component set; any substitution reopens this gate |
 
 Earlier controlled updates reduced the provisional set from 52 to 4 instances by
@@ -151,6 +151,15 @@ pattern also implements the preferred 0.07 mm NSMD opening and separate
 and [TPD4E05U06 data sheet](https://www.ti.com/lit/ds/symlink/tpd4e05u06.pdf),
 SHA-256 `c167cf1e72a5473a4d2c59b6a3c0251498701da05b7785919b9ceaae3b3e02c6`.
 
+The sixth tranche closes the seven `TPD1E05U06DYAR` instances `D4` and
+`D6..D11` with project-local TI `DYA0002A` geometry. The KiCad SOD-523
+pattern used 0.60 x 0.70 mm lands at 1.40 mm center spacing. TI drawing
+4224978/B instead defines two 0.67 x 0.40 mm R0.05 lands at 1.48 mm center
+spacing, equal-size stencil apertures and a preferred 0.05 mm NSMD opening.
+The official [TPDxE05U06 Rev.O data sheet](https://www.ti.com/lit/ds/symlink/tpd1e05u06.pdf)
+is SHA-256
+`c167cf1e72a5473a4d2c59b6a3c0251498701da05b7785919b9ceaae3b3e02c6`.
+
 `U2` was also reviewed but remains pending. Winbond W25Q512JV Rev B confirms
 the selected package `F`, its 1.27 mm pitch and full package tolerances, but
 does not publish a PCB land pattern for the 16-pin SOIC. The existing KiCad
@@ -172,7 +181,7 @@ Review B remains `OPEN`. No Gerber, drill, paste, pick-and-place, IPC-356 or
 STEP output from this candidate may be released until:
 
 1. the zero-provisional footprint state remains true for the release commit;
-2. the remaining 21 KiCad-derived instances pass drawing-to-pattern review;
+2. the remaining 14 KiCad-derived instances pass drawing-to-pattern review;
 3. placement and routing audits pass in KiCad 9;
 4. DRC reports zero blocker/critical and zero unrouted items;
 5. RA-003 layout evidence is complete; physical droop and ripple measurement
