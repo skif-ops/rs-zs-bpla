@@ -263,7 +263,8 @@ def main() -> int:
                         footprint="NetTie:NetTie-2_SMD_Pad0.5mm", datasheet="~", x=162.56, y=157.48)
 
     J2 = make_instance(sch, j2sym, reference="J2", value="MAIN_PWR_43045-1202_12PIN",
-                       footprint="DioneyaPWR:Molex_43045-1202", datasheet="Molex 43045-1202", x=198.12, y=109.22)
+                       footprint="DioneyaMain:Molex_43045-1202_MicroFit-12_RA",
+                       datasheet="Molex 43045-1202", x=198.12, y=109.22)
 
     sch.schematicSymbols.extend([J1,F1,D1,U1,Q1,C1,RSH1,U2,C2,U3,L1,C3,C14,C15,C16,C4,R1,R2,R3,R4,R5,R6,
                                  U4,L2,C5,C17,C18,C19,C6,R7,R8,R9,R10,U5,C7,C8,R11,R12,R13,R14,R15,NT1,NT2,NT3,J2])

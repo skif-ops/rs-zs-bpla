@@ -21,7 +21,12 @@ UNRESOLVED_FOOTPRINT_REFS = {
     "RSH1", # exact four-terminal shunt MPN/land pattern not frozen
     "U3", "U4", # LMR60440 RAK-9 manufacturer land pattern review pending
     "L1", "L2", # exact inductor land pattern remains under Review B
-    "J2",   # 43045-1202 land pattern/orientation pending mechanical review
+}
+
+CONTROLLED_FOOTPRINTS = {
+    # The identical CON-004A/CON-004B board header uses the single audited
+    # manufacturer pattern already controlled by PCB-MAIN.
+    "J2": "DioneyaMain:Molex_43045-1202_MicroFit-12_RA",
 }
 
 BASE_CONTROLLED_ENTRIES = {
@@ -54,6 +59,7 @@ def write_tables(project_dir: Path) -> None:
   (lib (name "Package_TO_SOT_SMD")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Package_TO_SOT_SMD.pretty")(options "")(descr "KiCad SOT footprints"))
   (lib (name "Package_SO")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Package_SO.pretty")(options "")(descr "KiCad SO/VSSOP footprints"))
   (lib (name "NetTie")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/NetTie.pretty")(options "")(descr "KiCad net-tie footprints"))
+  (lib (name "DioneyaMain")(type "KiCad")(uri "${KIPRJMOD}/../PCB-MAIN/libs/DioneyaMain.pretty")(options "")(descr "Shared manufacturer-controlled PCB-MAIN/PWR footprints"))
 )
 '''
     (project_dir / "sym-lib-table").write_text(sym, encoding="utf-8")
@@ -108,7 +114,7 @@ def main() -> int:
 
     sch = Schematic.from_file(str(args.schematic), encoding="utf-8")
     refs = {ref_of(s): s for s in sch.schematicSymbols}
-    missing = UNRESOLVED_FOOTPRINT_REFS - set(refs)
+    missing = (UNRESOLVED_FOOTPRINT_REFS | set(CONTROLLED_FOOTPRINTS)) - set(refs)
     if missing:
         raise RuntimeError(f"unresolved-footprint authority references missing from schematic: {sorted(missing)}")
 
@@ -119,6 +125,11 @@ def main() -> int:
             raise RuntimeError(f"{ref}: Footprint property missing")
         fp.value = ""
         cleared.append(ref)
+    for ref, value in CONTROLLED_FOOTPRINTS.items():
+        fp = footprint_prop(refs[ref])
+        if fp is None:
+            raise RuntimeError(f"{ref}: Footprint property missing")
+        fp.value = value
 
     sch.to_file(str(args.schematic), encoding="utf-8")
     reread = Schematic.from_file(str(args.schematic), encoding="utf-8")
@@ -127,6 +138,10 @@ def main() -> int:
         fp = footprint_prop(reread_refs[ref])
         if fp is None or fp.value != "":
             raise RuntimeError(f"{ref}: unresolved footprint was not deterministically cleared")
+    for ref, value in CONTROLLED_FOOTPRINTS.items():
+        fp = footprint_prop(reread_refs[ref])
+        if fp is None or fp.value != value:
+            raise RuntimeError(f"{ref}: controlled footprint link was not materialized")
 
     export_custom_symbols(reread, args.connector_symbols, libs / "DioneyaPWR.kicad_sym")
     write_tables(project_dir)
@@ -136,6 +151,8 @@ def main() -> int:
         libs / "DioneyaPWR.kicad_sym",
         project_dir / "sym-lib-table",
         project_dir / "fp-lib-table",
+        project_dir.parent / "PCB-MAIN" / "libs" / "DioneyaMain.pretty" /
+            "Molex_43045-1202_MicroFit-12_RA.kicad_mod",
     ]
     absent = [str(p) for p in required if not p.is_file() or p.stat().st_size == 0]
     if absent:
@@ -144,6 +161,7 @@ def main() -> int:
     count = len([s for s in reread.libSymbols if s.libraryNickname == "DioneyaPWR"])
     print("PCB-PWR project-local library materialization PASS")
     print("unresolved production footprints intentionally blank:", sorted(cleared))
+    print("shared manufacturer-controlled footprints:", CONTROLLED_FOOTPRINTS)
     print("controlled DioneyaPWR symbols:", count)
     return 0
 

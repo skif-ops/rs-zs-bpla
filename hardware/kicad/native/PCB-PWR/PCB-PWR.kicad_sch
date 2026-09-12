@@ -2902,7 +2902,7 @@
     (property "Value" "MAIN_PWR_43045-1202_12PIN" (id 1) (at 198.12 118.22 0)
       (effects (font (size 1 1)))
     )
-    (property "Footprint" "" (id 2) (at 198.12 120.22 0)
+    (property "Footprint" "DioneyaMain:Molex_43045-1202_MicroFit-12_RA" (id 2) (at 198.12 120.22 0)
       (effects (font (size 1 1)) hide)
     )
     (property "Datasheet" "Molex 43045-1202" (id 3) (at 198.12 122.22 0)

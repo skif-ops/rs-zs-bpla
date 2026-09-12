@@ -170,6 +170,9 @@ The native schematic must fail Review A regression if it:
 ## 8. Open items outside this Review A scope
 
 - exact shunt MPN and Kelvin layout;
+- `J2` electrical footprint is shared with the manufacturer-controlled
+  PCB-MAIN `Molex 43045-1202` pattern; its PCB-PWR placement, orientation and
+  service clearance remain open with `DIM-003`;
 - final TVS and fuse values and coordination;
 - exact inductor/capacitor/bulk MPNs and derating;
 - selected battery/BMS voltage limits;

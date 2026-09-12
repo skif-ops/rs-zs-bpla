@@ -11,6 +11,11 @@ from kiutils.schematic import Schematic
 ROOT = Path(__file__).resolve().parents[1]
 PIN_AUTH = ROOT / "hardware" / "PCB_PWR_PIN_AUTHORITY_REV_A.csv"
 HARNESS = ROOT / "hardware" / "HARNESS_LOGICAL_PINOUT_REV_A.csv"
+J2_FOOTPRINT = "DioneyaMain:Molex_43045-1202_MicroFit-12_RA"
+J2_FOOTPRINT_FILE = (
+    ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty" /
+    "Molex_43045-1202_MicroFit-12_RA.kicad_mod"
+)
 
 
 def rows(path: Path) -> list[dict[str, str]]:
@@ -40,6 +45,10 @@ def selected_pins(symbol, unit: int = 1) -> dict[str, object]:
 
 def ref_of(inst) -> str:
     return next((p.value for p in inst.properties if p.key == "Reference"), "")
+
+
+def footprint_of(inst) -> str:
+    return next((p.value for p in inst.properties if p.key == "Footprint"), "")
 
 
 def endpoint(inst, symbol, pin_number: str) -> tuple[float, float]:
@@ -94,6 +103,10 @@ def main() -> int:
         require(row["Net"] in labels.get(pos, set()),
                 f"J2 pin {row['Pin']} must be {row['Net']}, got {sorted(labels.get(pos, set()))}")
     require(set(selected_pins(j2sym)) == {str(i) for i in range(1, 13)}, "J2 is not exactly 12 positions")
+    require(footprint_of(j2) == J2_FOOTPRINT,
+            f"J2 must use shared controlled footprint {J2_FOOTPRINT}")
+    require(J2_FOOTPRINT_FILE.is_file(),
+            f"J2 controlled footprint file missing: {J2_FOOTPRINT_FILE}")
 
     # Input connector and true 4-terminal shunt topology.
     require("J1" in instances and "RSH1" in instances, "J1/RSH1 missing")
