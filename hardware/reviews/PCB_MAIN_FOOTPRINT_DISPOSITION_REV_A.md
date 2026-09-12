@@ -15,9 +15,9 @@ machine-readable 19-pattern inventory is
 |---|---:|---|
 | Project-generated chip passives and mechanical holes | 188 | Placement use only; passive geometry remains subject to assembly-house rules |
 | MAIN-AUTH-011 controlled pogo groups | 5 | 31 bottom pads verified by coordinate, diameter, mask and layer |
-| Manufacturer-drawing controlled patterns | 47 | Fourteen initially controlled instances plus thirty-three reviewed instances controlled locally |
+| Manufacturer-drawing controlled patterns | 48 | Fourteen initially controlled instances plus thirty-four reviewed instances controlled locally |
 | Drawing-verified KiCad library patterns | 5 | Four Molex 504050-0691 instances and one GCT USB4105 instance have exact audited geometry |
-| KiCad library patterns pending drawing review | 6 | Exact pad-number contract passes; drawing review remains open |
+| KiCad library patterns pending drawing review | 5 | Exact pad-number contract passes; drawing review remains open |
 | Provisional manufacturer-specific patterns | 0 | Closed for the current component set; any substitution reopens this gate |
 
 Earlier controlled updates reduced the provisional set from 52 to 4 instances by
@@ -204,6 +204,18 @@ assembly-process/DFM controls. The official
 is SHA-256
 `ea14ac3604fa4887d91b9fbc55ab9d04a23ba6597b22a817e64185d519fb9e28`.
 
+The eleventh tranche closes `Q4` from Vishay `Si1016X` Rev E and the embedded
+Application Note 826 recommended minimum pads for the six-lead SC-89 package.
+Rotated into the established board orientation, the six rectangular 0.300 x
+0.478 mm pads become 0.478 x 0.300 mm at 0.500 mm lead pitch and 1.276 mm
+row-center separation. The prior KiCad IPC pattern used 0.70 x 0.34 mm
+round-rect lands and 1.50 mm row spacing. Pin numbering is retained. Vishay
+does not specify solder-mask or stencil geometry in the pad guideline, so those
+remain explicit assembly-process/DFM controls. The official
+[Si1016X Rev E data sheet and Application Note 826](https://www.vishay.com/docs/71168/si1016x.pdf)
+is SHA-256
+`5e561d2786874eb79c8c6e36e4eb4d9b0de774384005e72c4998ab3dcc2cf518`.
+
 `U2` was also reviewed but remains pending. Winbond W25Q512JV Rev B confirms
 the selected package `F`, its 1.27 mm pitch and full package tolerances, but
 does not publish a PCB land pattern for the 16-pin SOIC. The existing KiCad
@@ -225,7 +237,7 @@ Review B remains `OPEN`. No Gerber, drill, paste, pick-and-place, IPC-356 or
 STEP output from this candidate may be released until:
 
 1. the zero-provisional footprint state remains true for the release commit;
-2. the remaining 6 KiCad-derived instances pass drawing-to-pattern review;
+2. the remaining 5 KiCad-derived instances pass drawing-to-pattern review;
 3. placement and routing audits pass in KiCad 9;
 4. DRC reports zero blocker/critical and zero unrouted items;
 5. RA-003 layout evidence is complete; physical droop and ripple measurement

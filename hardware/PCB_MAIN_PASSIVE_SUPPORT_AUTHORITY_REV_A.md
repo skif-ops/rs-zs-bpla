@@ -43,6 +43,14 @@ The two `PESD5V0S1UL` supply TVS devices `D1/D2` use project-local
 0.70 mm R0.05 copper, 0.50 x 0.80 mm solder-resist openings and separate
 0.30 x 0.60 mm R0.05 paste apertures at 0.70 mm center spacing. Source
 SHA-256: `8ddea76afa74f87de5d3662e4d9149bf7397761fa99dc29b44bfbe42872d447e`.
+The `Si1016X-T1-GE3` antenna-switch MOSFET `Q4` uses project-local
+`Vishay_Si1016X_SC-89` copper from Application Note 826: six rectangular
+0.300 x 0.478 mm minimum pads at 0.500 mm pitch and a 0.798 mm inner gap.
+Rotated into the established board orientation, the lands are 0.478 x
+0.300 mm at 1.276 mm row-center spacing. Mask and stencil remain
+assembly-process controls because the Vishay guideline does not define them.
+The official Rev E data sheet embedding the application note is SHA-256
+`5e561d2786874eb79c8c6e36e4eb4d9b0de774384005e72c4998ab3dcc2cf518`.
 
 ## Frozen cross-domain decisions
 

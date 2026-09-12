@@ -386,6 +386,37 @@ def st_esdalc6v1_5p6_sot666() -> str:
     return "\n".join(lines) + "\n"
 
 
+def vishay_si1016x_sc89() -> str:
+    name = "Vishay_Si1016X_SC-89"
+    lines = header(
+        name,
+        "Vishay Si1016X SC-89 6-lead; Application Note 826 recommended minimum pads",
+        "Vishay Si1016X SC-89 SOT-563F 0.5mm",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -1.35) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 1.35) (layer "F.Fab") hide'
+    rect(lines, -1.15, -1.00, 1.15, 1.00, "F.CrtYd", 0.05)
+    polygon(lines, [(-0.60, -0.60), (-0.35, -0.85), (0.60, -0.85),
+                    (0.60, 0.85), (-0.60, 0.85)], "F.Fab", 0.10)
+    polygon(lines, [(-0.88, -0.57), (-1.08, -0.77),
+                    (-0.68, -0.77)], "F.SilkS", 0.12, "solid")
+    # Vishay Application Note 826 defines 0.300 x 0.478 mm rectangular
+    # minimum lands at 0.500 mm lead pitch with a 0.798 mm inner gap.
+    # Rotating the pattern into the board's established SOT-563 orientation
+    # gives 0.478 x 0.300 mm lands and 1.276 mm between row centers.
+    # The note does not define solder-mask or stencil geometry; those remain
+    # assembly-process/DFM controls while copper follows the published pads.
+    expected = {
+        "1": (-0.638, -0.50), "2": (-0.638, 0.00),
+        "3": (-0.638, 0.50), "4": (0.638, 0.50),
+        "5": (0.638, 0.00), "6": (0.638, -0.50),
+    }
+    for number, (x, y) in expected.items():
+        smd(lines, number, x, y, 0.478, 0.300)
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
 def ti_dqa0010a() -> str:
     name = "TI_DQA0010A_USON10"
     lines = header(
@@ -653,6 +684,7 @@ GENERATORS = {
     "Nexperia_PESD5V0S1UL_SOD882.kicad_mod": nexperia_pesd5v0s1ul_sod882,
     "Nexperia_MMBT3904_SOT23.kicad_mod": nexperia_mmbt3904_sot23,
     "ST_ESDALC6V1-5P6_SOT666.kicad_mod": st_esdalc6v1_5p6_sot666,
+    "Vishay_Si1016X_SC-89.kicad_mod": vishay_si1016x_sc89,
     "TI_DQA0010A_USON10.kicad_mod": ti_dqa0010a,
     "ST_LIS2DW12_LGA-12L.kicad_mod": lis2dw12,
     "Raytac_MDBT50Q-P1MV2.kicad_mod": raytac_mdbt50q_p1mv2,

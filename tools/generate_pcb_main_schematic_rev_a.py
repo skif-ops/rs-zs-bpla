@@ -64,6 +64,8 @@ CONTROLLED_FOOTPRINTS = (
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "ST_ESDALC6V1-5P6_SOT666.kicad_mod",
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "Vishay_Si1016X_SC-89.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "STTS22H_UDFN-6L.kicad_mod",
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "LT6000_DCB-7.kicad_mod",

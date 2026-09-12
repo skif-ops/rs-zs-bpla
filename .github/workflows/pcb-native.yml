@@ -265,6 +265,7 @@ jobs:
               "Nexperia_PESD5V0S1UL_SOD882": 4,
               "Nexperia_MMBT3904_SOT23": 6,
               "ST_ESDALC6V1-5P6_SOT666": 6,
+              "Vishay_Si1016X_SC-89": 6,
               "ST_LIS2DW12_LGA-12L": 12,
               "Raytac_MDBT50Q-P1MV2": 61,
               "Quectel_BG95-M3_LGA-102": 102,

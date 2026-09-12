@@ -116,13 +116,13 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(not provisional, f"manufacturer-specific provisional footprints remain: {provisional}")
-    require(len(library_pending) == 6,
+    require(len(library_pending) == 5,
             f"unexpected KiCad-library review count: {len(library_pending)}")
     require(library_verified == ["J11", "J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4"],
             f"unexpected drawing-verified KiCad set: {library_verified}")
     require(manufacturer_controlled == ["D1", "D10", "D11", "D2", "D3", "D4", "D5", "D6", "D7",
                                         "D8", "D9", "FL1", "J10", "J12", "J13", "J6",
-                                        "J7", "J8", "J9", "J_PWR", "Q1", "Q2", "Q3",
+                                        "J7", "J8", "J9", "J_PWR", "Q1", "Q2", "Q3", "Q4",
                                         "U1", "U10", "U11", "U13", "U14", "U15", "U16",
                                         "U17", "U18", "U19", "U20", "U21",
                                         "U22", "U23", "U24", "U27", "U3", "U4", "U5",
@@ -162,7 +162,7 @@ def main() -> int:
             {"J8", "J9", "J10", "U1", "U3", "U7", "U11", "U13", "U14", "U15", "U16", "U17",
              "U18", "U19", "U20", "U21", "U22", "U23", "U24", "U27",
              "D1", "D2", "D4", "D6", "D7", "D8", "D9", "D10", "D11",
-             "Q1", "Q2", "Q3", "U6"},
+             "Q1", "Q2", "Q3", "Q4", "U6"},
             "register project-controlled replacement set differs from board")
 
     # U.FL copper matches the Hirose mounting pattern.  The manufacturer metal
@@ -438,6 +438,27 @@ def main() -> int:
                     pad.shape == "rect" and
                     pad.layers == ["F.Cu", "F.Paste", "F.Mask"],
                     f"{ref}.{number}: copper differs from ST Rev 3 Figure 14")
+
+    # Vishay Application Note 826 defines the SC-89 six-lead minimum pads as
+    # rectangular 0.300 x 0.478 mm lands at 0.500 mm lead pitch with a
+    # 0.798 mm inner gap.  Rotating the pattern into the board's established
+    # pin orientation gives 0.478 x 0.300 mm lands and 1.276 mm row centers.
+    expected_si1016x = {
+        "1": (-0.638, -0.50), "2": (-0.638, 0.00),
+        "3": (-0.638, 0.50), "4": (0.638, 0.50),
+        "5": (0.638, 0.00), "6": (0.638, -0.50),
+    }
+    q4 = {pad.number: pad for pad in footprints["Q4"].pads}
+    require(set(q4) == set(expected_si1016x), "Q4: Vishay Si1016X SC-89 pad set")
+    for number, (x, y) in expected_si1016x.items():
+        pad = q4[number]
+        require(abs(pad.position.X - x) < 0.002 and
+                abs(pad.position.Y - y) < 0.002 and
+                abs(pad.size.X - 0.478) < 0.002 and
+                abs(pad.size.Y - 0.300) < 0.002 and
+                pad.shape == "rect" and
+                pad.layers == ["F.Cu", "F.Paste", "F.Mask"],
+                f"Q4.{number}: copper differs from Vishay Application Note 826")
 
     # LIS2DW12 DS11811 Rev 9 defines 0.275 x 0.250 mm package pads on
     # 0.5 mm pitch.  TN0018 Rev 8 adds 0.1 mm to each PCB-land dimension,

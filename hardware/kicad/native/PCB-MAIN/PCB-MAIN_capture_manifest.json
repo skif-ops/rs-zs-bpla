@@ -3,7 +3,7 @@
   "board": "PCB-MAIN",
   "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "39f813b75ffe7c6a55b33d2ee12548defab8460e9fa4d2efcaa2d034bb426e6f",
+  "generator_sha256": "86f6dac0d152054947349a81227ad8a300a2266e2a60933a2dc842adf902b920",
   "inputs": [
     {
       "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
@@ -59,7 +59,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "0b23e3dbee78b7514357fef1390011c6534e3908425e80ff96f5fcca9df6ebef"
+      "sha256": "21ad2920917dd477534b9b0aa552bff3845514a686afe1711100320724fcda19"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -75,7 +75,7 @@
     },
     {
       "path": "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv",
-      "sha256": "c2b8c56485e2daf107d88a2e6e2d3de324cfcd38a35e749979b7e04fa64c5c0d"
+      "sha256": "da284b2731ef90778acff1b30bfbcb76f2f98a3092915d3c351b0d34a87611c0"
     }
   ],
   "component_count": 248,
@@ -143,6 +143,10 @@
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/ST_ESDALC6V1-5P6_SOT666.kicad_mod",
       "sha256": "473a3f69b1daf6751a860187ed50d44f738bbc3f626f0edd6fe0f445fdd49ed2"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Vishay_Si1016X_SC-89.kicad_mod",
+      "sha256": "3256048c59e1758c1e36d1c545681406241c8f2f283997033a9ceabf20743e0c"
     },
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/STTS22H_UDFN-6L.kicad_mod",

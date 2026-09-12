@@ -45,6 +45,10 @@ CONTROLLED = {
         "Nexperia_MMBT3904_SOT23.kicad_mod",
         "Nexperia_MMBT3904_v5_2026-04-08_Fig8_ReflowFootprint",
     ),
+    "Q4": (
+        "Vishay_Si1016X_SC-89.kicad_mod",
+        "Vishay_Si1016X_RevE_AN826_RecommendedMinimumPads",
+    ),
     "D4": (
         "TI_DYA0002A_SOD523.kicad_mod",
         "TI_DYA0002A_4224978B_2021-09_RecommendedLandPattern",
