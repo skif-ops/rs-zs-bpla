@@ -175,7 +175,7 @@ def main() -> int:
     D1 = make_instance(sch, tvs, reference="D1", value="SMBJ18A CANDIDATE",
                        footprint="Diode_SMD:D_SMB", datasheet="Littelfuse SMBJ", x=60.96, y=50.80)
     U1 = make_instance(sch, u1sym, reference="U1", value="LM74700QDBVRQ1",
-                       footprint="Package_TO_SOT_SMD:SOT-23-6", datasheet="TI LM74700-Q1 Rev.G", x=83.82, y=38.10)
+                       footprint="DioneyaPWR:TI_DBV0006A_SOT23-6", datasheet="TI LM74700-Q1 Rev.G", x=83.82, y=38.10)
     Q1 = make_instance(sch, q1sym, reference="Q1", value="CSD18540Q5B",
                        footprint="DioneyaPWR:CSD18540Q5B_DNK", datasheet="TI CSD18540Q5B Rev.B", x=109.22, y=38.10)
     C1 = make_instance(sch, capacitor, reference="C1", value="100nF VCAP",
@@ -183,7 +183,7 @@ def main() -> int:
     RSH1 = make_instance(sch, rshsym, reference="RSH1", value="10mOhm 4T >=1W MPN_TBD",
                          footprint="DioneyaPWR:SHUNT_4T_TBD", datasheet="Review-A Kelvin authority", x=137.16, y=38.10)
     U2 = make_instance(sch, u2sym, reference="U2", value="INA226AIDGSR",
-                       footprint="Package_SO:VSSOP-10_3x3mm_P0.5mm", datasheet="TI INA226 Rev.C", x=137.16, y=68.58)
+                       footprint="DioneyaPWR:TI_DGS0010A_VSSOP10", datasheet="TI INA226 Rev.C", x=137.16, y=68.58)
     C2 = make_instance(sch, capacitor, reference="C2", value="100nF INA226",
                        footprint="Capacitor_SMD:C_0402_1005Metric", datasheet="~", x=157.48, y=76.20)
 
@@ -238,7 +238,7 @@ def main() -> int:
                         footprint="Resistor_SMD:R_0402_1005Metric", datasheet="~", x=157.48, y=88.90)
 
     U5 = make_instance(sch, u5sym, reference="U5", value="TPS7A2018PDBVR 1V8_MIC",
-                       footprint="Package_TO_SOT_SMD:SOT-23-5", datasheet="TI TPS7A20 Rev.H", x=68.58, y=157.48)
+                       footprint="DioneyaMain:TI_DBV0005A_SOT23-5", datasheet="TI TPS7A20 Rev.H", x=68.58, y=157.48)
     C7 = make_instance(sch, capacitor, reference="C7", value="2.2uF IN",
                        footprint="Capacitor_SMD:C_0603_1608Metric", datasheet="~", x=50.80, y=172.72)
     C8 = make_instance(sch, capacitor, reference="C8", value="2.2uF OUT",

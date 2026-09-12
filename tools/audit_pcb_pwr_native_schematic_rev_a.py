@@ -21,6 +21,21 @@ LMR60440_FOOTPRINT_FILE = (
     ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty" /
     "LMR60440_RAK0009A.kicad_mod"
 )
+U1_FOOTPRINT = "DioneyaPWR:TI_DBV0006A_SOT23-6"
+U1_FOOTPRINT_FILE = (
+    ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty" /
+    "TI_DBV0006A_SOT23-6.kicad_mod"
+)
+U2_FOOTPRINT = "DioneyaPWR:TI_DGS0010A_VSSOP10"
+U2_FOOTPRINT_FILE = (
+    ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty" /
+    "TI_DGS0010A_VSSOP10.kicad_mod"
+)
+U5_FOOTPRINT = "DioneyaMain:TI_DBV0005A_SOT23-5"
+U5_FOOTPRINT_FILE = (
+    ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty" /
+    "TI_DBV0005A_SOT23-5.kicad_mod"
+)
 J2_FOOTPRINT = "DioneyaMain:Molex_43045-1202_MicroFit-12_RA"
 J2_FOOTPRINT_FILE = (
     ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty" /
@@ -111,6 +126,14 @@ def main() -> int:
     for ref in ("U3", "U4"):
         require(footprint_of(instances[ref]) == LMR60440_FOOTPRINT,
                 f"{ref} must use manufacturer-controlled footprint {LMR60440_FOOTPRINT}")
+    for ref, footprint, path in (
+        ("U1", U1_FOOTPRINT, U1_FOOTPRINT_FILE),
+        ("U2", U2_FOOTPRINT, U2_FOOTPRINT_FILE),
+        ("U5", U5_FOOTPRINT, U5_FOOTPRINT_FILE),
+    ):
+        require(path.is_file(), f"{ref} controlled footprint file missing: {path}")
+        require(footprint_of(instances[ref]) == footprint,
+                f"{ref} must use manufacturer-controlled footprint {footprint}")
 
     # Frozen 12-pin external contract.
     main_pwr = [r for r in rows(HARNESS) if r["Interface"] == "MAIN_PWR"]

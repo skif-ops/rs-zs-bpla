@@ -96,11 +96,20 @@ jobs:
           /usr/bin/python3 - <<'PY'
           import pcbnew
           root = "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty"
-          expected = {"CSD18540Q5B_DNK": 27, "LMR60440_RAK0009A": 20}
+          expected = {
+              "CSD18540Q5B_DNK": 27,
+              "LMR60440_RAK0009A": 20,
+              "TI_DBV0006A_SOT23-6": 6,
+              "TI_DGS0010A_VSSOP10": 10,
+          }
           for name, pad_count in expected.items():
               footprint = pcbnew.FootprintLoad(root, name)
               assert footprint is not None, f"KiCad failed to parse {name}"
               assert footprint.GetPadCount() == pad_count, f"{name}: pad/aperture count drift"
+          shared_root = "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
+          footprint = pcbnew.FootprintLoad(shared_root, "TI_DBV0005A_SOT23-5")
+          assert footprint is not None, "KiCad failed to parse shared TI_DBV0005A_SOT23-5"
+          assert footprint.GetPadCount() == 5, "shared TI_DBV0005A_SOT23-5 pad-count drift"
           print("PCB-PWR controlled footprints KiCad 9 native parse: PASS")
           PY
 

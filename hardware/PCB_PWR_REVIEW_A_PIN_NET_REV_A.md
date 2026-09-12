@@ -169,6 +169,9 @@ The native schematic must fail Review A regression if it:
 
 ## 8. Open items outside this Review A scope
 
+- `U1`, `U2` and `U5` now use the exact TI DBV0006A, DGS0010A and DBV0005A
+  land/mask/stencil examples; their placement, local routing and assembly validation
+  remain Review-B controls;
 - `Q1` copper and segmented stencil are now controlled by
   `DioneyaPWR:CSD18540Q5B_DNK` from TI SLPS488B sections 7.2/7.3; solder-mask
   expansion, drain thermal spreading/vias, placement, SOA and assembly validation

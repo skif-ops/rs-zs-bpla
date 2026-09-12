@@ -10,6 +10,7 @@ from kiutils.footprint import Footprint
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_LIBRARY = ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty"
+DEFAULT_SHARED_LIBRARY = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
 
 
 def rounded_pad(pad) -> tuple[str, float, float, float, float, tuple[str, ...]]:
@@ -32,6 +33,48 @@ def detailed_pad(pad) -> tuple[
         None if pad.roundrectRatio is None else round(float(pad.roundrectRatio), 6),
         None if pad.solderMaskMargin is None else round(float(pad.solderMaskMargin), 4),
     )
+
+
+def audit_simple_ti_package(path: Path, expected_name: str, expected: set[tuple]) -> None:
+    if not path.is_file():
+        raise RuntimeError(f"controlled TI footprint missing: {path}")
+    fp = Footprint.from_file(str(path), encoding="utf-8")
+    if str(fp.entryName) != expected_name:
+        raise RuntimeError(f"unexpected controlled TI footprint name: {fp.entryName}")
+    actual = [detailed_pad(p) for p in fp.pads]
+    if set(actual) != expected or len(actual) != len(expected):
+        raise RuntimeError(f"{expected_name} manufacturer geometry drift: {actual}")
+
+
+def audit_ti_support_ics(library: Path, shared_library: Path) -> None:
+    dbv6 = {
+        ("1", "roundrect", -1.3, -0.95, 1.1, 0.6, ("F.Cu", "F.Paste", "F.Mask"), 0.166667, 0.07),
+        ("2", "roundrect", -1.3, 0.00, 1.1, 0.6, ("F.Cu", "F.Paste", "F.Mask"), 0.166667, 0.07),
+        ("3", "roundrect", -1.3, 0.95, 1.1, 0.6, ("F.Cu", "F.Paste", "F.Mask"), 0.166667, 0.07),
+        ("4", "roundrect", 1.3, 0.95, 1.1, 0.6, ("F.Cu", "F.Paste", "F.Mask"), 0.166667, 0.07),
+        ("5", "roundrect", 1.3, 0.00, 1.1, 0.6, ("F.Cu", "F.Paste", "F.Mask"), 0.166667, 0.07),
+        ("6", "roundrect", 1.3, -0.95, 1.1, 0.6, ("F.Cu", "F.Paste", "F.Mask"), 0.166667, 0.07),
+    }
+    audit_simple_ti_package(library / "TI_DBV0006A_SOT23-6.kicad_mod", "TI_DBV0006A_SOT23-6", dbv6)
+
+    dbv5 = dbv6 - {
+        ("5", "roundrect", 1.3, 0.00, 1.1, 0.6, ("F.Cu", "F.Paste", "F.Mask"), 0.166667, 0.07),
+        ("6", "roundrect", 1.3, -0.95, 1.1, 0.6, ("F.Cu", "F.Paste", "F.Mask"), 0.166667, 0.07),
+    }
+    dbv5.add(("5", "roundrect", 1.3, -0.95, 1.1, 0.6,
+              ("F.Cu", "F.Paste", "F.Mask"), 0.166667, 0.07))
+    audit_simple_ti_package(shared_library / "TI_DBV0005A_SOT23-5.kicad_mod",
+                            "TI_DBV0005A_SOT23-5", dbv5)
+
+    dgs10 = set()
+    for number, y in zip(("1", "2", "3", "4", "5"), (-1.0, -0.5, 0.0, 0.5, 1.0)):
+        dgs10.add((number, "roundrect", -2.2, y, 1.45, 0.3,
+                   ("F.Cu", "F.Paste", "F.Mask"), 0.333333, 0.05))
+    for number, y in zip(("10", "9", "8", "7", "6"), (-1.0, -0.5, 0.0, 0.5, 1.0)):
+        dgs10.add((number, "roundrect", 2.2, y, 1.45, 0.3,
+                   ("F.Cu", "F.Paste", "F.Mask"), 0.333333, 0.05))
+    audit_simple_ti_package(library / "TI_DGS0010A_VSSOP10.kicad_mod",
+                            "TI_DGS0010A_VSSOP10", dgs10)
 
 
 def audit_lmr60440(library: Path) -> None:
@@ -97,6 +140,7 @@ def audit_lmr60440(library: Path) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--library", type=Path, default=DEFAULT_LIBRARY)
+    ap.add_argument("--shared-library", type=Path, default=DEFAULT_SHARED_LIBRARY)
     args = ap.parse_args()
 
     path = args.library / "CSD18540Q5B_DNK.kicad_mod"
@@ -137,9 +181,11 @@ def main() -> int:
         raise RuntimeError(f"CSD18540 stencil geometry drift: {paste}")
 
     audit_lmr60440(args.library)
+    audit_ti_support_ics(args.library, args.shared_library)
     print("PCB-PWR manufacturer footprint audit PASS")
     print("Q1 CSD18540Q5B: TI SLPS488B copper + 16-aperture stencil exact")
     print("U3/U4 LMR60440: TI SNAS877 RAK0009A copper/mask/stencil exact")
+    print("U1/U2/U5: TI DBV0006A/DGS0010A/DBV0005A lands, mask and stencil exact")
     return 0
 
 

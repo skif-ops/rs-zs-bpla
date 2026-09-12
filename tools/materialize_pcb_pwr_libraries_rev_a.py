@@ -22,11 +22,20 @@ UNRESOLVED_FOOTPRINT_REFS = {
 }
 
 CONTROLLED_FOOTPRINTS = {
+    # TI SNOSD17G package drawing DBV0006A 4214840/G defines exact lands,
+    # solder-mask and equal stencil apertures for the six-pin SOT-23.
+    "U1": "DioneyaPWR:TI_DBV0006A_SOT23-6",
+    # TI SBOS547C package drawing DGS0010A 4221984/A defines exact lands,
+    # solder-mask and equal stencil apertures for the ten-pin VSSOP.
+    "U2": "DioneyaPWR:TI_DGS0010A_VSSOP10",
     # TI SLPS488B sections 7.2/7.3 provide the exact PCB and stencil patterns.
     "Q1": "DioneyaPWR:CSD18540Q5B_DNK",
     # TI SNAS877 RAK0009A drawing 4229353/J provides board and stencil patterns.
     "U3": "DioneyaPWR:LMR60440_RAK0009A",
     "U4": "DioneyaPWR:LMR60440_RAK0009A",
+    # TPS7A20 SBVS338H carries the same TI DBV0005A 4214839/K pattern that
+    # is already controlled and parsed in the shared PCB-MAIN library.
+    "U5": "DioneyaMain:TI_DBV0005A_SOT23-5",
     # The identical CON-004A/CON-004B board header uses the single audited
     # manufacturer pattern already controlled by PCB-MAIN.
     "J2": "DioneyaMain:Molex_43045-1202_MicroFit-12_RA",
@@ -157,6 +166,10 @@ def main() -> int:
         project_dir / "fp-lib-table",
         libs / "DioneyaPWR.pretty" / "CSD18540Q5B_DNK.kicad_mod",
         libs / "DioneyaPWR.pretty" / "LMR60440_RAK0009A.kicad_mod",
+        libs / "DioneyaPWR.pretty" / "TI_DBV0006A_SOT23-6.kicad_mod",
+        libs / "DioneyaPWR.pretty" / "TI_DGS0010A_VSSOP10.kicad_mod",
+        project_dir.parent / "PCB-MAIN" / "libs" / "DioneyaMain.pretty" /
+            "TI_DBV0005A_SOT23-5.kicad_mod",
         project_dir.parent / "PCB-MAIN" / "libs" / "DioneyaMain.pretty" /
             "Molex_43045-1202_MicroFit-12_RA.kicad_mod",
     ]
