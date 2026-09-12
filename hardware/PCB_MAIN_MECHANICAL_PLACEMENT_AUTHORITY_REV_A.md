@@ -71,6 +71,13 @@ The fixture must not source `3V3_DIGITAL`, `3V8_MODEM`, `1V8_MIC`, `U8_VDD_EXT_1
 
 ## Review and release boundary
 
-Closing `MAIN-AUTH-011` completes the controlled pre-schematic input set. Native `PCB-MAIN.kicad_sch` is present, independently net-audited and passes KiCad 9 ERC with zero violations; human Review A sign-off remains pending. Native `PCB-MAIN.kicad_pcb` is absent, so Review B remains blocked by Review A and layout. The 110 x 75 x 12 mm envelope is a locked capture allocation, but `mechanics/common/OPEN_DIMENSIONS.csv` keeps the enclosure interface in `CONTROLLED_PENDING_NATIVE_STEP` until the generated STEP and service sweeps are checked.
+Closing `MAIN-AUTH-011` completes the controlled pre-schematic input set. Native
+`PCB-MAIN.kicad_sch` is present, independently net-audited, passes KiCad 9 ERC
+with zero violations and has signed Review A. Native `PCB-MAIN.kicad_pcb` is
+present as an unrouted placement candidate, so Review B remains blocked by
+routing, DRC, DFM and physical evidence. The 110 x 75 x 12 mm envelope is a
+locked capture allocation, but `mechanics/common/OPEN_DIMENSIONS.csv` keeps the
+enclosure interface in `CONTROLLED_PENDING_NATIVE_STEP` until the generated STEP
+and service sweeps are checked.
 
 All physical tests remain `NOT RUN`. No RF tuning, BLE range, GNSS sensitivity, modem burst margin, fixture MSA, insertion/pull, enclosure fit, IP, thermal, vibration, or environmental result is inferred. Production Gerbers, the production BOM and any `FOR_MANUFACTURE` state remain blocked by native capture and the two independent PCB reviews.

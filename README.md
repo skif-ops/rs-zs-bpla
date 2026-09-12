@@ -26,7 +26,14 @@
 
 Создание ветки и документов не является аппаратным EVT. Статус `PASS` допускается только после изготовления, сборки и сохранения первичных измерений.
 
-Входной набор PCB-MAIN синхронизирован с проверенным authority-срезом: `MAIN-AUTH-001…011` закрыты. Это разрешает native capture, но не производство. Native `PCB-MAIN.kicad_sch/.kicad_pcb` отсутствуют, Review A и Review B не выполнены, производственный BOM и Gerber заблокированы. Firmware сохраняет статус `TARGET_PORT_REQUIRED`.
+Входной набор PCB-MAIN синхронизирован с проверенным authority-срезом:
+`MAIN-AUTH-001…011` закрыты, native-схема прошла Review A и присутствует
+неразведённый placement-кандидат платы. Полный native source set PCB-MIC и
+native-схема PCB-PWR также отслеживаются и проверяются в CI; из девяти
+обязательных `.kicad_sch/.kicad_pcb/.kicad_pro` файлов отсутствует только
+`PCB-PWR.kicad_pcb`. Это не разрешает производство: PCB-MAIN routing/Review B,
+PCB-MIC Review A/B и PCB-PWR layout/Review B остаются открыты, производственный
+BOM и Gerber заблокированы. Firmware сохраняет статус `TARGET_PORT_REQUIRED`.
 
 ## Контроль выпуска
 

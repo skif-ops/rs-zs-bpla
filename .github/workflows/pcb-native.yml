@@ -225,6 +225,24 @@ jobs:
             --t5838-root artifacts/kicad-reference/PCB-MIC/t5838_ref.pretty \
             --molex-root artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.pretty \
             --output artifacts/kicad-reference/PCB-MIC/reference_geometry_report.json
+      - name: Verify committed PCB-MIC and PCB-PWR native sources
+        run: |
+          test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
+          test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
+          /usr/bin/python3 tools/audit_pcb_mic_native_geometry.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          /usr/bin/python3 tools/audit_pcb_mic_molex_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          /usr/bin/python3 tools/audit_pcb_mic_mechanical_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          python tools/audit_pcb_pwr_native_schematic_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_native_completeness_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/kicad_native_gate.py --run-cli
       - name: Verify committed native PCB-MAIN schematic
         run: |
           test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch
