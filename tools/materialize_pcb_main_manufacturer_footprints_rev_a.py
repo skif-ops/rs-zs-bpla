@@ -97,6 +97,10 @@ CONTROLLED = {
         "TI_DRL0006A_SOT6.kicad_mod",
         "TI_DRL0006A_4223266F_2024-11_RecommendedLandPattern",
     ),
+    "U6": (
+        "TI_DBV0005A_SOT23-5.kicad_mod",
+        "TI_DBV0005A_4214839K_2024-08_RecommendedLandPattern",
+    ),
     "U19": (
         "TI_DQA0010A_USON10.kicad_mod",
         "TI_DQA0010A_4220328A_2015-12_RecommendedLandPattern",

@@ -116,7 +116,7 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(not provisional, f"manufacturer-specific provisional footprints remain: {provisional}")
-    require(len(library_pending) == 9,
+    require(len(library_pending) == 8,
             f"unexpected KiCad-library review count: {len(library_pending)}")
     require(library_verified == ["J11", "J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4"],
             f"unexpected drawing-verified KiCad set: {library_verified}")
@@ -126,7 +126,7 @@ def main() -> int:
                                         "U1", "U10", "U11",
                                         "U13", "U16", "U17", "U18", "U19", "U20", "U21",
                                         "U22", "U23", "U24", "U27", "U3", "U4", "U5",
-                                        "U7", "U8", "U9", "X1"],
+                                        "U6", "U7", "U8", "U9", "X1"],
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
 
     register_rows = list(csv.DictReader(FOOTPRINT_REVIEW.open(encoding="utf-8", newline="")))
@@ -162,7 +162,7 @@ def main() -> int:
             {"J8", "J9", "J10", "U1", "U3", "U7", "U11", "U13", "U16", "U17",
              "U18", "U19", "U20", "U21", "U22", "U23", "U24", "U27",
              "D1", "D2", "D4", "D6", "D7", "D8", "D9", "D10", "D11",
-             "Q1", "Q2", "Q3"},
+             "Q1", "Q2", "Q3", "U6"},
             "register project-controlled replacement set differs from board")
 
     # U.FL copper matches the Hirose mounting pattern.  The manufacturer metal
@@ -393,6 +393,28 @@ def main() -> int:
                  (-1.0, 0.95, 0.6, 0.5, "rect", ("F.Paste",)),
                  (1.0, 0.0, 0.6, 0.5, "rect", ("F.Paste",))},
                 f"{ref}: stencil apertures differ from MMBT3904 Figure 8")
+
+    # TI DBV0005A drawing 4214839/K defines 1.10 x 0.60 mm R0.05 lands
+    # and equal stencil apertures at 0.95 mm pitch and 2.60 mm row-center
+    # separation.  The controlled footprint uses the preferred NSMD detail's
+    # 0.07 mm maximum clearance around the exposed metal.
+    expected_u6 = {
+        "1": (-1.30, -0.95), "2": (-1.30, 0.00), "3": (-1.30, 0.95),
+        "4": (1.30, 0.95), "5": (1.30, -0.95),
+    }
+    u6 = {pad.number: pad for pad in footprints["U6"].pads}
+    require(set(u6) == set(expected_u6), "U6: TI DBV0005A pad set")
+    for number, (x, y) in expected_u6.items():
+        pad = u6[number]
+        require(abs(pad.position.X - x) < 0.002 and
+                abs(pad.position.Y - y) < 0.002 and
+                abs(pad.size.X - 1.10) < 0.002 and
+                abs(pad.size.Y - 0.60) < 0.002 and
+                pad.shape == "roundrect" and
+                abs(float(pad.roundrectRatio or 0.0) - 1 / 6) < 0.002 and
+                pad.layers == ["F.Cu", "F.Paste", "F.Mask"] and
+                abs(float(pad.solderMaskMargin or 0.0) - 0.07) < 0.002,
+                f"U6.{number}: copper/mask/stencil differs from TI 4214839/K")
 
     # LIS2DW12 DS11811 Rev 9 defines 0.275 x 0.250 mm package pads on
     # 0.5 mm pitch.  TN0018 Rev 8 adds 0.1 mm to each PCB-land dimension,

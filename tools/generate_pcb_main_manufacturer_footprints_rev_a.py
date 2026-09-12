@@ -233,6 +233,35 @@ def ti_drl0006a() -> str:
     return "\n".join(lines) + "\n"
 
 
+def ti_dbv0005a() -> str:
+    name = "TI_DBV0005A_SOT23-5"
+    lines = header(
+        name,
+        "TI DBV0005A 5-pin SOT-23; 4214839/K 08/2024 example board layout",
+        "Texas Instruments DBV0005A SOT-23-5 0.95mm",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -2.20) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 2.20) (layer "F.Fab") hide'
+    rect(lines, -2.10, -1.78, 2.10, 1.78, "F.CrtYd", 0.05)
+    polygon(lines, [(-0.8, -1.05), (-0.4, -1.45), (0.8, -1.45),
+                    (0.8, 1.45), (-0.8, 1.45)], "F.Fab", 0.10)
+    polygon(lines, [(-1.48, -1.08), (-1.68, -1.28),
+                    (-1.28, -1.28)], "F.SilkS", 0.12, "solid")
+    # TI 4214839/K defines 1.10 x 0.60 mm R0.05 lands and stencil
+    # apertures, 0.95 mm lead pitch and 2.60 mm row-center separation.
+    # The preferred NSMD detail permits up to 0.07 mm mask clearance
+    # around the exposed metal; this controlled pattern uses that value.
+    expected = {
+        "1": (-1.30, -0.95), "2": (-1.30, 0.00), "3": (-1.30, 0.95),
+        "4": (1.30, 0.95), "5": (1.30, -0.95),
+    }
+    for number, (x, y) in expected.items():
+        smd(lines, number, x, y, 1.10, 0.60, "roundrect",
+            mask_margin=0.07, roundrect_ratio=1 / 6)
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
 def ti_dya0002a() -> str:
     name = "TI_DYA0002A_SOD523"
     lines = header(
@@ -590,6 +619,7 @@ GENERATORS = {
     "TI_PW0014A_TSSOP14.kicad_mod": ti_pw0014a,
     "TI_PW0024A_TSSOP24.kicad_mod": ti_pw0024a,
     "TI_DRL0006A_SOT6.kicad_mod": ti_drl0006a,
+    "TI_DBV0005A_SOT23-5.kicad_mod": ti_dbv0005a,
     "TI_DYA0002A_SOD523.kicad_mod": ti_dya0002a,
     "Nexperia_PESD5V0S1UL_SOD882.kicad_mod": nexperia_pesd5v0s1ul_sod882,
     "Nexperia_MMBT3904_SOT23.kicad_mod": nexperia_mmbt3904_sot23,
