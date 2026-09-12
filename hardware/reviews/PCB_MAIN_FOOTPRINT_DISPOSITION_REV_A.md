@@ -15,9 +15,9 @@ machine-readable 19-pattern inventory is
 |---|---:|---|
 | Project-generated chip passives and mechanical holes | 188 | Placement use only; passive geometry remains subject to assembly-house rules |
 | MAIN-AUTH-011 controlled pogo groups | 5 | 31 bottom pads verified by coordinate, diameter, mask and layer |
-| Manufacturer-drawing controlled patterns | 24 | Fourteen previously controlled instances plus ten reviewed instances controlled locally |
+| Manufacturer-drawing controlled patterns | 32 | Fourteen initially controlled instances plus eighteen reviewed instances controlled locally |
 | Drawing-verified KiCad library patterns | 5 | Four Molex 504050-0691 instances and one GCT USB4105 instance have exact audited geometry |
-| KiCad library patterns pending drawing review | 29 | Exact pad-number contract passes; drawing review remains open |
+| KiCad library patterns pending drawing review | 21 | Exact pad-number contract passes; drawing review remains open |
 | Provisional manufacturer-specific patterns | 0 | Closed for the current component set; any substitution reopens this gate |
 
 Earlier controlled updates reduced the provisional set from 52 to 4 instances by
@@ -136,11 +136,31 @@ SHA-256 `d87c216911176dca84cc9cee5efb6f45b18021977f94a97c7fae989484a73392`,
 and [SN74LVC32A SCAS286U](https://www.ti.com/lit/ds/symlink/sn74lvc32a.pdf),
 SHA-256 `807f6fff7977736035c2a3144d530be7ad737a163b2f0fd11002a45953b47230`.
 
+The fifth KiCad-library review tranche closes `U18` and `U19..U24/U27` with
+project-local TI `DRL0006A` and `DQA0010A` patterns. `U18` already had the
+correct 0.67 x 0.30 mm copper at 0.50 mm pitch and 1.48 mm row spacing, but the
+local pattern additionally fixes R0.05 corners and the preferred 0.05 mm NSMD
+opening from TI drawing 4223266/F. The seven DQA instances required a copper
+correction: the KiCad pattern used 0.77 mm row spacing and uniform 0.55 x
+0.30 mm lands, while TI 4220328/A requires 0.835 mm row spacing, 0.565 x
+0.20 mm signal lands, and 0.565 x 0.40 mm GND lands 3/8. The local DQA
+pattern also implements the preferred 0.07 mm NSMD opening and separate
+0.565 x 0.36 mm stencil apertures on GND lands. Sources are the official
+[DRL0006A drawing](https://www.ti.com/lit/pdf/MPDS159I), SHA-256
+`588597e633a3f02cd4546fd98f6872ef98a6578e1285db325eda3bbb16a516ee`,
+and [TPD4E05U06 data sheet](https://www.ti.com/lit/ds/symlink/tpd4e05u06.pdf),
+SHA-256 `c167cf1e72a5473a4d2c59b6a3c0251498701da05b7785919b9ceaae3b3e02c6`.
+
 `U2` was also reviewed but remains pending. Winbond W25Q512JV Rev B confirms
 the selected package `F`, its 1.27 mm pitch and full package tolerances, but
 does not publish a PCB land pattern for the 16-pin SOIC. The existing KiCad
 2.05 x 0.60 mm lands therefore cannot be promoted from a package-outline-only
 comparison; independent IPC/assembly-process control is still required.
+
+`U25` and `U26` were reviewed against TI DRT0003A `MPDS340`. That document
+defines the package outline and lead tolerances but does not publish a PCB land
+pattern or stencil recommendation. The existing KiCad `Texas_DRT-3` geometry
+therefore remains pending independent IPC/assembly-process control.
 
 ## Remaining provisional references
 
@@ -152,7 +172,7 @@ Review B remains `OPEN`. No Gerber, drill, paste, pick-and-place, IPC-356 or
 STEP output from this candidate may be released until:
 
 1. the zero-provisional footprint state remains true for the release commit;
-2. the remaining 29 KiCad-derived instances pass drawing-to-pattern review;
+2. the remaining 21 KiCad-derived instances pass drawing-to-pattern review;
 3. placement and routing audits pass in KiCad 9;
 4. DRC reports zero blocker/critical and zero unrouted items;
 5. RA-003 layout evidence is complete; physical droop and ripple measurement

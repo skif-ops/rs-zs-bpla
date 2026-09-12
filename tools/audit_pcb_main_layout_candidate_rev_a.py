@@ -116,14 +116,15 @@ def main() -> int:
                                      if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                                      "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
     require(not provisional, f"manufacturer-specific provisional footprints remain: {provisional}")
-    require(len(library_pending) == 29,
+    require(len(library_pending) == 21,
             f"unexpected KiCad-library review count: {len(library_pending)}")
     require(library_verified == ["J11", "J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4"],
             f"unexpected drawing-verified KiCad set: {library_verified}")
     require(manufacturer_controlled == ["D3", "D5", "FL1", "J10", "J12", "J13", "J6",
                                         "J7", "J8", "J9", "J_PWR", "U1", "U10", "U11",
-                                        "U13", "U16", "U17", "U3", "U4", "U5", "U7",
-                                        "U8", "U9", "X1"],
+                                        "U13", "U16", "U17", "U18", "U19", "U20", "U21",
+                                        "U22", "U23", "U24", "U27", "U3", "U4", "U5",
+                                        "U7", "U8", "U9", "X1"],
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
 
     register_rows = list(csv.DictReader(FOOTPRINT_REVIEW.open(encoding="utf-8", newline="")))
@@ -156,7 +157,8 @@ def main() -> int:
     require(registered_by_status.get("DRAWING_VERIFIED", set()) == set(library_verified),
             "register verified references differ from board")
     require(registered_by_status.get("REPLACED_PROJECT_CONTROLLED", set()) ==
-            {"J8", "J9", "J10", "U1", "U3", "U7", "U11", "U13", "U16", "U17"},
+            {"J8", "J9", "J10", "U1", "U3", "U7", "U11", "U13", "U16", "U17",
+             "U18", "U19", "U20", "U21", "U22", "U23", "U24", "U27"},
             "register project-controlled replacement set differs from board")
 
     # U.FL copper matches the Hirose mounting pattern.  The manufacturer metal
@@ -250,6 +252,64 @@ def main() -> int:
                     pad.layers == ["F.Cu", "F.Paste", "F.Mask"] and
                     abs(float(pad.solderMaskMargin or 0.0) - 0.05) < 0.002,
                     f"{ref}.{number}: land differs from TI PW0024A 4220208/A")
+
+    # TI DRL0006A 4223266/F defines the complete board/stencil layout:
+    # 0.67 x 0.30 mm R0.05 lands, 0.50 mm pitch, 1.48 mm between row
+    # centers, equal-size apertures and a preferred +0.05 mm NSMD opening.
+    expected_u18 = {
+        "1": (-0.74, -0.50), "2": (-0.74, 0.00), "3": (-0.74, 0.50),
+        "4": (0.74, 0.50), "5": (0.74, 0.00), "6": (0.74, -0.50),
+    }
+    u18 = {pad.number: pad for pad in footprints["U18"].pads if pad.number}
+    require(set(u18) == set(expected_u18), "U18: TI DRL0006A pad set")
+    for number, (x, y) in expected_u18.items():
+        pad = u18[number]
+        require(abs(pad.position.X - x) < 0.002 and
+                abs(pad.position.Y - y) < 0.002 and
+                abs(pad.size.X - 0.67) < 0.002 and
+                abs(pad.size.Y - 0.30) < 0.002 and
+                pad.shape == "roundrect" and
+                abs(float(pad.roundrectRatio or 0.0) - (1 / 3)) < 0.002 and
+                pad.layers == ["F.Cu", "F.Paste", "F.Mask"] and
+                abs(float(pad.solderMaskMargin or 0.0) - 0.05) < 0.002,
+                f"U18.{number}: land differs from TI DRL0006A 4223266/F")
+
+    # TI DQA0010A 4220328/A defines 0.565 mm land length, 0.835 mm row
+    # separation and 0.50 mm pitch.  Signal lands are 0.20 mm wide; GND
+    # lands 3/8 are 0.40 mm wide with separate 0.36 mm stencil apertures.
+    expected_dqa = {
+        "1": (-0.4175, -1.00), "2": (-0.4175, -0.50),
+        "3": (-0.4175, 0.00), "4": (-0.4175, 0.50),
+        "5": (-0.4175, 1.00), "6": (0.4175, 1.00),
+        "7": (0.4175, 0.50), "8": (0.4175, 0.00),
+        "9": (0.4175, -0.50), "10": (0.4175, -1.00),
+    }
+    for ref in ("U19", "U20", "U21", "U22", "U23", "U24", "U27"):
+        pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
+        require(set(pads) == set(expected_dqa), f"{ref}: TI DQA0010A pad set")
+        for number, (x, y) in expected_dqa.items():
+            pad = pads[number]
+            ground = number in {"3", "8"}
+            expected_width = 0.40 if ground else 0.20
+            expected_layers = ["F.Cu", "F.Mask"] if ground else ["F.Cu", "F.Paste", "F.Mask"]
+            expected_ratio = 0.25 if ground else 0.50
+            require(abs(pad.position.X - x) < 0.002 and
+                    abs(pad.position.Y - y) < 0.002 and
+                    abs(pad.size.X - 0.565) < 0.002 and
+                    abs(pad.size.Y - expected_width) < 0.002 and
+                    pad.shape == "roundrect" and
+                    abs(float(pad.roundrectRatio or 0.0) - expected_ratio) < 0.002 and
+                    pad.layers == expected_layers and
+                    abs(float(pad.solderMaskMargin or 0.0) - 0.07) < 0.002,
+                    f"{ref}.{number}: land differs from TI DQA0010A 4220328/A")
+        paste = [pad for pad in footprints[ref].pads if not pad.number]
+        require(len(paste) == 2 and
+                {(round(pad.position.X, 4), round(pad.position.Y, 4),
+                  round(pad.size.X, 3), round(pad.size.Y, 3), tuple(pad.layers))
+                 for pad in paste} ==
+                {(-0.4175, 0.0, 0.565, 0.36, ("F.Paste",)),
+                 (0.4175, 0.0, 0.565, 0.36, ("F.Paste",))},
+                f"{ref}: GND stencil apertures differ from TI DQA0010A")
 
     # LIS2DW12 DS11811 Rev 9 defines 0.275 x 0.250 mm package pads on
     # 0.5 mm pitch.  TN0018 Rev 8 adds 0.1 mm to each PCB-land dimension,

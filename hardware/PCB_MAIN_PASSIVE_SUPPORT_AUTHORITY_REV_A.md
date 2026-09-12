@@ -24,6 +24,17 @@ The registry contains 211 unique physical components: 80 capacitors, 103 resisto
 
 The named document identities in the CSV are traceability labels. The exact MPN and physical-pin values are the capture contract. Supplier inventory, lot traceability and counterfeit screening remain procurement controls and are not inferred from this authority.
 
+The seven fitted `TPD4E05U06DQAR` devices `U19..U24/U27` use the project-local
+`TI_DQA0010A_USON10` footprint from the DQA0010A board/stencil layout in the
+official `TPD4E05U06` data sheet. It fixes 0.565 x 0.20 mm signal lands,
+0.565 x 0.40 mm GND lands 3/8, 0.50 mm pitch, 0.835 mm row-center spacing,
+0.07 mm preferred NSMD expansion and 0.565 x 0.36 mm GND stencil apertures.
+Source: `https://www.ti.com/lit/ds/symlink/tpd4e05u06.pdf`, SHA-256
+`c167cf1e72a5473a4d2c59b6a3c0251498701da05b7785919b9ceaae3b3e02c6`.
+The `TPD2EUSB30DRTR` devices `U25/U26` remain on the reviewed KiCad DRT-3
+pattern pending independent IPC/assembly control because TI `MPDS340` publishes
+only the package outline and no PCB land or stencil recommendation.
+
 ## Frozen cross-domain decisions
 
 | Domain | Frozen result |

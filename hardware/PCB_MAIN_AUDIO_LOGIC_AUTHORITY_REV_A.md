@@ -66,6 +66,13 @@ U17 operates from `1V8_MIC`. Its three used gates implement this exact active-hi
 
 ## U18 SN74AXC1T45DRLR contract
 
+The project-local `TI_DRL0006A_SOT6` footprint follows TI 4223266/F: six
+0.67 x 0.30 mm R0.05 lands at 0.50 mm pitch with 1.48 mm between row
+centers, equal-size stencil apertures, and 0.05 mm preferred NSMD expansion.
+The exact official package drawing is
+`https://www.ti.com/lit/pdf/MPDS159I`, SHA-256
+`588597e633a3f02cd4546fd98f6872ef98a6578e1285db325eda3bbb16a516ee`.
+
 - U18 DRL package pin 1 `VCCA` uses `1V8_MIC`; pin 6 `VCCB` uses `3V3_DIGITAL`; pin 2 is GND.
 - Pin 5 `DIR` is tied directly to `1V8_MIC`, fixing A-to-B translation.
 - Pin 3 A receives `MIC_WAKE_OR_1V8` from U17 pin 8. Pin 4 B drives STM32 `MIC_WAKE` at PA8, LQFP100 pin 67.

@@ -56,7 +56,7 @@ STANDARD = {
     "SOT666_1.6x1.6mm": ("Package_TO_SOT_SMD.pretty", "SOT-666", {}),
     "SOD-523_DYA": ("Diode_SMD.pretty", "D_SOD-523", {}),
     "SOT-9X3_DRT": ("Package_TO_SOT_SMD.pretty", "Texas_DRT-3", {}),
-    "SOT-5X3-6_DRL": ("Package_TO_SOT_SMD.pretty", "Texas_R-PDSO-N6_DRL-6", {}),
+    "SOT-5X3-6_DRL": ("PROJECT", "TI_DRL0006A_SOT6", {}),
     "7343-31": ("Capacitor_Tantalum_SMD.pretty", "CP_EIA-7343-31_Kemet-D", {}),
     "Pico-Lock_1.5_1x06_Right_Angle": (
         "Connector_Molex.pretty", "Molex_Pico-Lock_504050-0691_1x06-1MP_P1.50mm_Horizontal",
@@ -65,7 +65,7 @@ STANDARD = {
     "nRF52840_SMD_10.5x15.5_61P_PCB_antenna": (
         "PROJECT", "Raytac_MDBT50Q-P1MV2", {},
     ),
-    "USON-10_DQA": ("Package_SON.pretty", "USON-10_2.5x1.0mm_P0.5mm", {}),
+    "USON-10_DQA": ("PROJECT", "TI_DQA0010A_USON10", {}),
     "SOT-23-5_DBV": ("Package_TO_SOT_SMD.pretty", "SOT-23-5", {}),
     "SOD962-2": ("PROJECT", "PESD5V0C1BSF_SOD962-2", {}),
     "UDFN-6L_2x2mm": ("PROJECT", "STTS22H_UDFN-6L", {}),
@@ -247,6 +247,8 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                         "ST_STM32U585_LQFP100_1L": "ST_DS13086_Rev10_Figure96_LQFP100_1L",
                         "TI_PW0014A_TSSOP14": "TI_PW0014A_4220202B_2023-12_RecommendedLandPattern",
                         "TI_PW0024A_TSSOP24": "TI_PW0024A_4220208A_2017-02_RecommendedLandPattern",
+                        "TI_DRL0006A_SOT6": "TI_DRL0006A_4223266F_2024-11_RecommendedLandPattern",
+                        "TI_DQA0010A_USON10": "TI_DQA0010A_4220328A_2015-12_RecommendedLandPattern",
                         "ST_LIS2DW12_LGA-12L": "ST_DS11811_Rev9_and_TN0018_Rev8_LGA-12L_Pattern",
                         "Raytac_MDBT50Q-P1MV2": "Raytac_MDBT50Q_Footprint_Design_Guide_230606",
                     }

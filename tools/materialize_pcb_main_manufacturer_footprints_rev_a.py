@@ -45,6 +45,38 @@ CONTROLLED = {
         "TI_PW0014A_TSSOP14.kicad_mod",
         "TI_PW0014A_4220202B_2023-12_RecommendedLandPattern",
     ),
+    "U18": (
+        "TI_DRL0006A_SOT6.kicad_mod",
+        "TI_DRL0006A_4223266F_2024-11_RecommendedLandPattern",
+    ),
+    "U19": (
+        "TI_DQA0010A_USON10.kicad_mod",
+        "TI_DQA0010A_4220328A_2015-12_RecommendedLandPattern",
+    ),
+    "U20": (
+        "TI_DQA0010A_USON10.kicad_mod",
+        "TI_DQA0010A_4220328A_2015-12_RecommendedLandPattern",
+    ),
+    "U21": (
+        "TI_DQA0010A_USON10.kicad_mod",
+        "TI_DQA0010A_4220328A_2015-12_RecommendedLandPattern",
+    ),
+    "U22": (
+        "TI_DQA0010A_USON10.kicad_mod",
+        "TI_DQA0010A_4220328A_2015-12_RecommendedLandPattern",
+    ),
+    "U23": (
+        "TI_DQA0010A_USON10.kicad_mod",
+        "TI_DQA0010A_4220328A_2015-12_RecommendedLandPattern",
+    ),
+    "U24": (
+        "TI_DQA0010A_USON10.kicad_mod",
+        "TI_DQA0010A_4220328A_2015-12_RecommendedLandPattern",
+    ),
+    "U27": (
+        "TI_DQA0010A_USON10.kicad_mod",
+        "TI_DQA0010A_4220328A_2015-12_RecommendedLandPattern",
+    ),
     "J8": (
         "Hirose_U.FL-R-SMT-1.kicad_mod",
         "Hirose_U.FL_CAT_2026-08-01_PCB_and_MetalMask",

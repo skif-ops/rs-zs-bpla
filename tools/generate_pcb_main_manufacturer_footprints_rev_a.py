@@ -205,6 +205,76 @@ def ti_pw0024a() -> str:
     return "\n".join(lines) + "\n"
 
 
+def ti_drl0006a() -> str:
+    name = "TI_DRL0006A_SOT6"
+    lines = header(
+        name,
+        "TI DRL0006A 6-pin SOT-5X3; 4223266/F 11/2024 example board layout",
+        "Texas Instruments DRL0006A SOT-5X3-6 0.5mm",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -1.55) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 1.55) (layer "F.Fab") hide'
+    rect(lines, -1.33, -1.05, 1.33, 1.05, "F.CrtYd", 0.05)
+    polygon(lines, [(-0.8, -0.55), (-0.55, -0.8), (0.8, -0.8),
+                    (0.8, 0.8), (-0.8, 0.8)], "F.Fab", 0.10)
+    polygon(lines, [(-1.00, -0.67), (-1.20, -0.92),
+                    (-0.80, -0.92)], "F.SilkS", 0.12, "solid")
+    # TI 4223266/F defines 0.67 x 0.30 mm lands, R0.05 corners,
+    # 0.50 mm pitch and 1.48 mm row-center separation.  The example stencil
+    # uses equal apertures and the preferred NSMD opening is +0.05 mm/side.
+    expected = {
+        "1": (-0.74, -0.50), "2": (-0.74, 0.00), "3": (-0.74, 0.50),
+        "4": (0.74, 0.50), "5": (0.74, 0.00), "6": (0.74, -0.50),
+    }
+    for number, (x, y) in expected.items():
+        smd(lines, number, x, y, 0.67, 0.30, "roundrect",
+            mask_margin=0.05, roundrect_ratio=1 / 3)
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
+def ti_dqa0010a() -> str:
+    name = "TI_DQA0010A_USON10"
+    lines = header(
+        name,
+        "TI DQA0010A 10-pin USON; 4220328/A 12/2015 example board layout",
+        "Texas Instruments DQA0010A USON-10 2.5x1.0mm 0.5mm",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -1.85) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 1.85) (layer "F.Fab") hide'
+    rect(lines, -0.95, -1.50, 0.95, 1.50, "F.CrtYd", 0.05)
+    polygon(lines, [(-0.5, -1.0), (-0.25, -1.25), (0.5, -1.25),
+                    (0.5, 1.25), (-0.5, 1.25)], "F.Fab", 0.10)
+    polygon(lines, [(-0.68, -1.10), (-0.88, -1.35),
+                    (-0.48, -1.35)], "F.SilkS", 0.12, "solid")
+    # TI 4220328/A defines 0.565 mm land length and 0.835 mm between row
+    # centers.  Signal lands are 0.20 mm wide; the two GND lands (3 and 8)
+    # are 0.40 mm wide.  The preferred NSMD opening is +0.07 mm/side.
+    # The 0.1 mm stencil keeps signal apertures equal to copper while reducing
+    # GND apertures to 0.36 mm width (90% area under the package).
+    expected = {
+        "1": (-0.4175, -1.00), "2": (-0.4175, -0.50),
+        "4": (-0.4175, 0.50), "5": (-0.4175, 1.00),
+        "6": (0.4175, 1.00), "7": (0.4175, 0.50),
+        "9": (0.4175, -0.50), "10": (0.4175, -1.00),
+    }
+    for number, (x, y) in expected.items():
+        smd(lines, number, x, y, 0.565, 0.20, "roundrect",
+            mask_margin=0.07, roundrect_ratio=0.5)
+    for number, x in (("3", -0.4175), ("8", 0.4175)):
+        lines.append(
+            f'  (pad "{number}" smd roundrect (at {x:g} 0) (size 0.565 0.4) '
+            '(layers "F.Cu" "F.Mask") (roundrect_rratio 0.25) '
+            '(solder_mask_margin 0.07))'
+        )
+        lines.append(
+            f'  (pad "" smd roundrect (at {x:g} 0) (size 0.565 0.36) '
+            '(layers "F.Paste") (roundrect_rratio 0.277778))'
+        )
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
 def lis2dw12() -> str:
     name = "ST_LIS2DW12_LGA-12L"
     lines = header(
@@ -424,6 +494,8 @@ GENERATORS = {
     "ST_STM32U585_LQFP100_1L.kicad_mod": stm32u585_lqfp100,
     "TI_PW0014A_TSSOP14.kicad_mod": ti_pw0014a,
     "TI_PW0024A_TSSOP24.kicad_mod": ti_pw0024a,
+    "TI_DRL0006A_SOT6.kicad_mod": ti_drl0006a,
+    "TI_DQA0010A_USON10.kicad_mod": ti_dqa0010a,
     "ST_LIS2DW12_LGA-12L.kicad_mod": lis2dw12,
     "Raytac_MDBT50Q-P1MV2.kicad_mod": raytac_mdbt50q_p1mv2,
     "Quectel_BG95-M3_LGA-102.kicad_mod": bg95,
