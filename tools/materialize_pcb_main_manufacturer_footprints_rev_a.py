@@ -85,6 +85,14 @@ CONTROLLED = {
         "TI_PW0024A_TSSOP24.kicad_mod",
         "TI_PW0024A_4220208A_2017-02_RecommendedLandPattern",
     ),
+    "U14": (
+        "ST_ESDALC6V1-5P6_SOT666.kicad_mod",
+        "ST_ESDALC6V1-5P6_Rev3_Figure14_SOT666_Footprint",
+    ),
+    "U15": (
+        "ST_ESDALC6V1-5P6_SOT666.kicad_mod",
+        "ST_ESDALC6V1-5P6_Rev3_Figure14_SOT666_Footprint",
+    ),
     "U16": (
         "TI_PW0024A_TSSOP24.kicad_mod",
         "TI_PW0024A_4220208A_2017-02_RecommendedLandPattern",

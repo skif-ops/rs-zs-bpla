@@ -357,6 +357,35 @@ def nexperia_mmbt3904_sot23() -> str:
     return "\n".join(lines) + "\n"
 
 
+def st_esdalc6v1_5p6_sot666() -> str:
+    name = "ST_ESDALC6V1-5P6_SOT666"
+    lines = header(
+        name,
+        "ST ESDALC6V1-5P6 SOT666; data sheet Rev 3 Figure 14 footprint",
+        "ST ESDALC6V1-5P6 SOT666 0.5mm",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -1.45) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 1.45) (layer "F.Fab") hide'
+    rect(lines, -1.55, -1.10, 1.55, 1.10, "F.CrtYd", 0.05)
+    polygon(lines, [(-0.65, -0.53), (-0.33, -0.85), (0.65, -0.85),
+                    (0.65, 0.85), (-0.65, 0.85)], "F.Fab", 0.10)
+    polygon(lines, [(-1.28, -0.57), (-1.48, -0.77),
+                    (-1.08, -0.77)], "F.SilkS", 0.12, "solid")
+    # ST Rev 3 Figure 14 defines six rectangular 0.30 x 0.99 mm lands,
+    # 0.50 mm lead pitch, a 0.62 mm inner gap and a 2.60 mm outer span.
+    # Rotating the pattern 90 degrees preserves the board's established
+    # SOT666 pin orientation; the resulting row centers are 1.61 mm apart.
+    expected = {
+        "1": (-0.805, -0.50), "2": (-0.805, 0.00),
+        "3": (-0.805, 0.50), "4": (0.805, 0.50),
+        "5": (0.805, 0.00), "6": (0.805, -0.50),
+    }
+    for number, (x, y) in expected.items():
+        smd(lines, number, x, y, 0.99, 0.30)
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
 def ti_dqa0010a() -> str:
     name = "TI_DQA0010A_USON10"
     lines = header(
@@ -623,6 +652,7 @@ GENERATORS = {
     "TI_DYA0002A_SOD523.kicad_mod": ti_dya0002a,
     "Nexperia_PESD5V0S1UL_SOD882.kicad_mod": nexperia_pesd5v0s1ul_sod882,
     "Nexperia_MMBT3904_SOT23.kicad_mod": nexperia_mmbt3904_sot23,
+    "ST_ESDALC6V1-5P6_SOT666.kicad_mod": st_esdalc6v1_5p6_sot666,
     "TI_DQA0010A_USON10.kicad_mod": ti_dqa0010a,
     "ST_LIS2DW12_LGA-12L.kicad_mod": lis2dw12,
     "Raytac_MDBT50Q-P1MV2.kicad_mod": raytac_mdbt50q_p1mv2,

@@ -77,6 +77,12 @@ This inversion preserves the active-HIGH meaning of the existing MCU net and pre
 
 U14 protects J6 and U15 protects J7. Each exact `ESDALC6V1-5P6` uses pin 2 as the low-inductance `GND_MODEM` return and the other five pins for VDD, RST, CLK, DATA, and card detect. The device is rated -40 to +125 C, has 5 V reverse standoff, 70 nA maximum leakage at 3 V, 15 pF maximum capacitance, and IEC 61000-4-2 ratings of 8 kV contact and 15 kV air discharge.
 
+The project-local `ST_ESDALC6V1-5P6_SOT666` footprint follows Rev 3
+Figure 14: six rectangular 0.30 x 0.99 mm manufacturer lands at 0.50 mm
+pitch, with a 0.62 mm inner gap and 2.60 mm outer span. It is rotated into
+the established board orientation without changing pins 1 through 6. ST does
+not specify mask or stencil geometry in that figure; both remain DFM controls.
+
 J6 and J7 are identical TE `2336582-1` push-push 4FF sockets. Each electrical contact map is:
 
 | Authority position | TE contact | Rev.A net |
