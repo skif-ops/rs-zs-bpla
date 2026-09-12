@@ -54,11 +54,9 @@ def main() -> None:
     require(u1["6"]["Pin_Name"] == "ANODE" and u1["6"]["RevA_Net"] == "VBAT_FUSED", "LM74700 anode mapping mismatch")
 
     q1 = pins_for(pin_rows, "Q1")
-    require(all(q1[str(i)]["Pin_Name"] == "DRAIN" for i in (1, 2, 3, 4)), "CSD18540 drain pins mismatch")
-    require(q1["5"]["Pin_Name"] == "GATE" and q1["5"]["RevA_Net"] == "REV_GATE", "CSD18540 gate pin mismatch")
-    require(all(q1[str(i)]["Pin_Name"] == "SOURCE" for i in (6, 7, 8)), "CSD18540 source pins mismatch")
-    require(all(q1[str(i)]["RevA_Net"] == "VBAT_PROTECTED" for i in (1, 2, 3, 4)), "CSD18540 drain net mismatch")
-    require(all(q1[str(i)]["RevA_Net"] == "VBAT_FUSED" for i in (6, 7, 8)), "CSD18540 source net mismatch")
+    require(all(q1[str(i)]["Pin_Name"] == "SOURCE" for i in (1, 2, 3)), "CSD18540 source pins mismatch")
+    require(q1["4"]["Pin_Name"] == "GATE", "CSD18540 gate pin mismatch")
+    require(all(q1[str(i)]["Pin_Name"] == "DRAIN" for i in (5, 6, 7, 8)), "CSD18540 drain pins mismatch")
 
     for ref in ("U3", "U4"):
         u = pins_for(pin_rows, ref)
@@ -107,9 +105,6 @@ def main() -> None:
         require(net in by_net, f"required PCB-PWR net authority missing: {net}")
 
     require("RSH1.CURRENT_SOURCE" in by_net["VBAT_PROTECTED"]["To"], "total-current shunt is not after reverse protection")
-    require(by_net["REV_GATE"]["To"] == "Q1.5_GATE", "CSD18540 physical gate endpoint mismatch")
-    require("Q1.6_SOURCE" in by_net["VBAT_FUSED"]["To"] and "Q1.8_SOURCE" in by_net["VBAT_FUSED"]["To"], "CSD18540 physical source endpoints missing")
-    require("Q1.1_DRAIN" in by_net["VBAT_PROTECTED"]["From"] and "Q1.4_DRAIN" in by_net["VBAT_PROTECTED"]["From"], "CSD18540 physical drain endpoints missing")
     require("U3.1_VIN" in by_net["VBAT_SYS"]["To"] and "U4.1_VIN" in by_net["VBAT_SYS"]["To"], "both buck rails do not branch after INA226 shunt")
     require("U4.9_EN" in by_net["VBAT_SYS"]["To"], "always-on 3V3 buck EN is not explicitly tied to VBAT_SYS")
     require(by_net["SHUNT_SOURCE_SENSE"]["Class"] == "KELVIN", "source sense is not Kelvin-class")

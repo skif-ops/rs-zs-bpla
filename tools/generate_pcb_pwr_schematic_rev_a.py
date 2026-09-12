@@ -145,8 +145,8 @@ def main() -> int:
         "9": "EN_MODEM", "10": "EN_AUX", "11": "I2C2_SCL", "12": "I2C2_SDA",
     })
     customize_pins(u1sym, {"1": "VCAP", "2": "GND", "3": "EN", "4": "CATHODE", "5": "GATE", "6": "ANODE"})
-    customize_pins(q1sym, {"1": "DRAIN", "2": "DRAIN", "3": "DRAIN", "4": "DRAIN",
-                             "5": "GATE", "6": "SOURCE", "7": "SOURCE", "8": "SOURCE"})
+    customize_pins(q1sym, {"1": "SOURCE", "2": "SOURCE", "3": "SOURCE", "4": "GATE",
+                             "5": "DRAIN", "6": "DRAIN", "7": "DRAIN", "8": "DRAIN"})
     customize_pins(u2sym, {"1": "A1", "2": "A0", "3": "ALERT", "4": "SDA", "5": "SCL",
                              "6": "VS", "7": "GND", "8": "VBUS", "9": "IN-", "10": "IN+"})
     customize_pins(u34sym, {"1": "VIN", "2": "PGND", "3": "SW", "4": "BOOT", "5": "PG",
@@ -274,8 +274,8 @@ def main() -> int:
     label_pins(sch, F1, fuse, {"1":"VBAT_RAW","2":"VBAT_FUSED"})
     label_pins(sch, D1, tvs, {"1":"GND_PWR","2":"VBAT_FUSED"})
     label_pins(sch, U1, u1sym, {"1":"LM74700_VCAP","2":"GND_PWR","3":"VBAT_FUSED","4":"VBAT_PROTECTED","5":"REV_GATE","6":"VBAT_FUSED"})
-    label_pins(sch, Q1, q1sym, {"1":"VBAT_PROTECTED","2":"VBAT_PROTECTED","3":"VBAT_PROTECTED","4":"VBAT_PROTECTED",
-                                  "5":"REV_GATE","6":"VBAT_FUSED","7":"VBAT_FUSED","8":"VBAT_FUSED"})
+    label_pins(sch, Q1, q1sym, {"1":"VBAT_FUSED","2":"VBAT_FUSED","3":"VBAT_FUSED","4":"REV_GATE",
+                                  "5":"VBAT_PROTECTED","6":"VBAT_PROTECTED","7":"VBAT_PROTECTED","8":"VBAT_PROTECTED"})
     label_pins(sch, C1, capacitor, {"1":"LM74700_VCAP","2":"VBAT_FUSED"})
     label_pins(sch, RSH1, rshsym, {"1":"VBAT_PROTECTED","2":"VBAT_SYS","3":"SHUNT_SOURCE_SENSE","4":"SHUNT_LOAD_SENSE"})
     label_pins(sch, U2, u2sym, {"1":"GND_PWR","2":"GND_PWR","3":"FAULT","4":"I2C2_SDA","5":"I2C2_SCL",

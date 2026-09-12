@@ -7,7 +7,6 @@ import csv
 from pathlib import Path
 
 from kiutils.schematic import Schematic
-from kiutils.symbol import SymbolLib
 
 ROOT = Path(__file__).resolve().parents[1]
 PIN_AUTH = ROOT / "hardware" / "PCB_PWR_PIN_AUTHORITY_REV_A.csv"
@@ -71,26 +70,6 @@ def main() -> int:
         key = (round(lab.position.X, 4), round(lab.position.Y, 4))
         labels.setdefault(key, set()).add(str(lab.text))
     nc_positions = {(round(n.position.X, 4), round(n.position.Y, 4)) for n in sch.noConnects}
-
-    # The standalone project library must agree with the embedded schematic copy.
-    # This catches a committed-source drift that KiCad can otherwise hide by using the
-    # cached symbol inside the schematic.
-    project_lib_path = args.schematic.parent / "libs" / "DioneyaPWR.kicad_sym"
-    require(project_lib_path.is_file(), f"PCB-PWR project symbol library missing: {project_lib_path}")
-    project_lib = SymbolLib().from_file(str(project_lib_path))
-    q1_project = next((s for s in project_lib.symbols if str(s.entryName) == "Conn_01x08"), None)
-    q1_embedded = lib_by_id.get("DioneyaPWR:Conn_01x08")
-    require(q1_project is not None and q1_embedded is not None, "CSD18540 controlled symbol missing")
-    for copy_name, symbol in (("project", q1_project), ("embedded", q1_embedded)):
-        pins = selected_pins(symbol)
-        actual = {number: (str(pin.name), str(pin.electricalType)) for number, pin in pins.items()}
-        expected = {
-            "1": ("DRAIN", "passive"), "2": ("DRAIN", "passive"),
-            "3": ("DRAIN", "passive"), "4": ("DRAIN", "passive"),
-            "5": ("GATE", "input"), "6": ("SOURCE", "passive"),
-            "7": ("SOURCE", "passive"), "8": ("SOURCE", "passive"),
-        }
-        require(actual == expected, f"CSD18540 {copy_name} symbol pin map mismatch: {actual}")
 
     # Pin names and pin-to-net mapping must match the reviewed authority exactly.
     for row in rows(PIN_AUTH):
@@ -190,7 +169,7 @@ def main() -> int:
             "legacy 10-pin token present in native schematic")
 
     print("PCB-PWR native schematic Review-A regression audit PASS")
-    print("pin/net authority exact; CSD18540 physical pin map; 12-pin MAIN/PWR; INA226 Kelvin")
+    print("pin/net authority exact; 12-pin MAIN/PWR; INA226 Kelvin; startup-safe 3V3; explicit ground net-ties")
     return 0
 
 

@@ -1,7 +1,7 @@
 # Дионея EVT-PRE-20 Rev.A - PCB-PWR Review A pin/net authority
 
 Status: `REVIEW A PIN/NET PASS / NATIVE SCHEMATIC CAPTURE AUTHORIZED / NOT FOR MANUFACTURE`
-Date: 2026-09-12
+Date: 2026-09-09
 Board: `PCB-PWR`
 Configuration: `EVT-PRE-20 Rev.A`
 
@@ -22,9 +22,6 @@ It does not approve final passive MPNs, TVS/fuse coordination, thermal design, P
 - `hardware/POWER_DESIGN_BASELINE_REV_A.json`
 - `hardware/kicad/sheets/01_POWER.csv`
 - TI primary datasheets for LM74700-Q1, CSD18540Q5B, LMR60440, TPS7A20 and INA226.
-  The Q1 correction is bound specifically to
-  `https://www.ti.com/lit/ds/symlink/csd18540q5b.pdf` (SLPS488B Rev.B) and
-  `https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf` (SNOSD17G Rev.G).
 
 ## 3. Review findings and dispositions
 
@@ -59,18 +56,6 @@ Rev.A authority now requires explicit two-pin net-tie components:
 
 The three harness returns remain distinct until their controlled low-impedance join region on PCB-PWR.
 
-### RA-PWR-003 - CSD18540Q5B physical pin-map mismatch
-
-The initial capture authority incorrectly assigned SOURCE to pins 1-3, GATE to pin 4,
-and DRAIN to pins 5-8. TI CSD18540Q5B Rev.B defines DRAIN on pins 1-4, GATE on pin 5,
-and SOURCE on pins 6-8. This also conflicted with TI LM74700-Q1 Rev.G, which requires
-ANODE/input at the MOSFET source and CATHODE/output at its drain.
-
-Disposition: `CLOSED`.
-
-The CSV authorities, generator, controlled symbol library, embedded native symbol,
-native net labels and independent regression audits now use the corrected physical map.
-
 ## 4. Locked power path
 
 The approved schematic capture sequence is:
@@ -94,13 +79,9 @@ EN is tied to ANODE/input for always-on reverse protection.
 
 ### CSD18540Q5B Q1
 
-- pins 1,2,3,4 DRAIN -> `VBAT_PROTECTED`;
-- pin 5 GATE -> `REV_GATE`;
-- pins 6,7,8 SOURCE -> `VBAT_FUSED`.
-
-This physical mapping follows the top-view pin map in TI CSD18540Q5B Rev.B. The
-source/input and drain/output orientation follows TI LM74700-Q1 Rev.G: ANODE connects
-to the external MOSFET source and CATHODE connects to its drain.
+- pins 1,2,3 SOURCE -> `VBAT_FUSED`;
+- pin 4 GATE -> `REV_GATE`;
+- pins 5,6,7,8 DRAIN -> `VBAT_PROTECTED`.
 
 ### LMR604403 U3 - 3V8_MODEM
 

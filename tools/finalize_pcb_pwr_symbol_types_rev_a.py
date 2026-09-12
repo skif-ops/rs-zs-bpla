@@ -42,8 +42,8 @@ EXPECTED = {
         "1": "output", "2": "power_in", "3": "input", "4": "input", "5": "output", "6": "input",
     },
     "Conn_01x08": { # CSD18540Q5B
-        "1": "passive", "2": "passive", "3": "passive", "4": "passive",
-        "5": "input", "6": "passive", "7": "passive", "8": "passive",
+        "1": "passive", "2": "passive", "3": "passive", "4": "input",
+        "5": "passive", "6": "passive", "7": "passive", "8": "passive",
     },
     "Conn_01x10": { # INA226
         "1": "input", "2": "input", "3": "open_collector", "4": "bidirectional", "5": "input",
