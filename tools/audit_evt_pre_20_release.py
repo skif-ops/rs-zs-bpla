@@ -43,6 +43,7 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
         "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md",
         "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json",
+        "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
         "hardware/PCB_DOUBLE_REVIEW_GATE.md",
         "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
         "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",

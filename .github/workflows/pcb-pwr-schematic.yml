@@ -12,6 +12,9 @@ on:
       - "hardware/POWER_DESIGN_BASELINE_REV_A.json"
       - "hardware/POWER_COMPONENT_FREEZE_REV_A.csv"
       - "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv"
+      - "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md"
+      - "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
       - "hardware/POWER_DESIGN_CALC_REV_A.md"
       - "hardware/PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md"
       - "hardware/kicad/sheets/01_POWER.csv"
@@ -30,6 +33,8 @@ on:
       - "tools/audit_pcb_pwr_native_completeness_rev_a.py"
       - "tools/audit_pcb_pwr_footprints_rev_a.py"
       - "tools/audit_pcb_pwr_passive_authority_rev_a.py"
+      - "tools/audit_pcb_pwr_layout_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_layout_candidate_rev_a.py"
       - ".github/workflows/pcb-pwr-schematic.yml"
 
 jobs:
@@ -95,7 +100,9 @@ jobs:
           python tools/audit_pcb_pwr_footprints_rev_a.py
           python tools/audit_pcb_pwr_passive_authority_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_layout_candidate_rev_a.py
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
           test -s hardware/kicad/native/PCB-PWR/sym-lib-table
           test -s hardware/kicad/native/PCB-PWR/fp-lib-table
@@ -155,8 +162,12 @@ jobs:
           path: |
             artifacts/kicad-native/PCB-PWR/
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+            hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
             hardware/kicad/native/PCB-PWR/sym-lib-table
             hardware/kicad/native/PCB-PWR/fp-lib-table
             hardware/kicad/native/PCB-PWR/libs/
+            hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv
+            hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md
+            hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
           if-no-files-found: error

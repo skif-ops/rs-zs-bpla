@@ -243,6 +243,7 @@ jobs:
           test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
           test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
           /usr/bin/python3 tools/audit_pcb_mic_native_geometry.py \
             --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
@@ -257,9 +258,7 @@ jobs:
           python tools/audit_pcb_pwr_footprints_rev_a.py
           python tools/audit_pcb_pwr_passive_authority_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
-          if test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb; then
-            python tools/audit_pcb_pwr_layout_candidate_rev_a.py
-          fi
+          python tools/audit_pcb_pwr_layout_candidate_rev_a.py
           python tools/kicad_native_gate.py --run-cli
       - name: Verify committed native PCB-MAIN schematic
         run: |

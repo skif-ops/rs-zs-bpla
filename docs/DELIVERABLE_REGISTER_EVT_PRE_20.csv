@@ -24,8 +24,8 @@ HW-M-010,PCB main,Dual SIM Single Standby схема и отчёт,DOCX+PDF+CSV,
 HW-A-001,PCB microphones,Схема и PCB микрофонного leaf,KICAD+PDF+STEP,P0,PLANNED,OPEN,OPEN,4 одинаковых платы; phase path review
 HW-A-002,PCB microphones,Gerber drill PnP BOM,ZIP+CSV,P0,PLANNED,OPEN,OPEN,CAM и assembly review PASS
 HW-A-003,PCB microphones,Оснастка позиционирования 3+1,STEP+STL+DRAWING,P0,PLANNED,OPEN,OPEN,120 мм и +150 мм подтверждены CMM/шаблоном
-HW-P-001,Power,Схема power interface,KICAD_SCH+PDF,P0,PLANNED,OPEN,OPEN,Reverse surge fuse TVS cold-Voc review
-HW-P-002,Power,PCB power interface и производство,KICAD+GERBER+PnP+BOM,P0,PLANNED,OPEN,OPEN,DRC thermal/current DFM PASS
+HW-P-001,Power,Схема power interface,KICAD_SCH+PDF,P0,CONTROLLED,PASS,PASS,Native schematic and signed Review A PASS; commit-matched KiCad 9 ERC zero violations
+HW-P-002,Power,PCB power interface и производство,KICAD+GERBER+PnP+BOM,P0,DRAFT,PASS,OPEN,Unrouted 60-footprint provisional placement canvas present and independently audited; DIM-003 routing DRC thermal/current DFM CAM and Review B remain open
 HW-P-003,Power,Спецификация MPPT и батареи,DOCX+XLSX,P0,DRAFT,OPEN,OPEN,Совместимость LiFePO4 Voc current temperature
 HW-C-001,Кабели,Схема соединения всех элементов,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Каждый pin связан с net fuse wire gauge connector
 HW-C-002,Кабели,Чертежи жгутов и распайка,DOCX+CSV,P0,PLANNED,OPEN,OPEN,Длина сечение цвет контакт обжим указаны

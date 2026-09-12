@@ -1,10 +1,10 @@
 # ZS-BPLA EVT-PRE-20 KiCad package
 
-Status: `CAPTURE_INPUT / NOT FOR MANUFACTURE`
+Status: `NATIVE SOURCE CONTROLLED / NOT FOR MANUFACTURE`
 Configuration: `EVT-PRE-20 Rev.A`
 Authoritative branch: `evt-pre-20`
 
-This directory is the authoritative electrical-CAD input package for the EVT-PRE-20 custom-PCB build. It is intentionally blocked from manufacturing until native KiCad schematic/PCB capture, ERC/DRC, CAM and independent review are complete.
+This directory is the authoritative electrical-CAD source package for the EVT-PRE-20 custom-PCB build. All nine native schematic, board and project files are present. It remains blocked from manufacturing until each provisional board is completed and the required ERC/DRC, CAM, DFM and independent reviews are complete.
 
 ## Frozen baseline used for capture
 
@@ -31,6 +31,12 @@ PCB-PWR `C1-C19`, `R1-R15`, `NT1-NT3` and `TP1-TP10` are bound from
 not a manufacturing release; its electrical, package, fixture and environmental
 blockers remain explicit in the authority.
 
+PCB-PWR currently contains a native, unrouted 60-footprint electrical placement
+canvas. Its `90 x 60 mm`, four-layer and `1.6 mm` assumptions are provisional;
+mounting holes, routing and copper zones are deliberately absent while `DIM-003`
+remains open. `hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json` is the machine-readable
+release interlock for this state.
+
 ## Logical sheet plan
 
 1. `01_POWER` - protected input and regulated rails; no integrated solar MPPT.
@@ -47,7 +53,9 @@ blockers remain explicit in the authority.
 
 - Pre-schematic PCB-MAIN authorities `MAIN-AUTH-001…011` are closed; the 110 x 75 mm outline, connector/module anchors, RF/keepout regions and 31 production pogo-pad coordinates are frozen by `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv`.
 - Freeze CubeMX pin/peripheral assignment for STM32U585VIT6Q; no unresolved AF conflicts.
-- Complete native `.kicad_sch` and `.kicad_pcb` for MAIN, MIC and PWR.
+- Replace provisional MAIN/PWR placement candidates with mechanically frozen,
+  reviewed and routed boards; keep all native `.kicad_sch/.kicad_pcb/.kicad_pro`
+  sources under CI control.
 - Datasheet/reference-design review for STM32U585, T5838, BG95, MAX-M10S, E22/SX1262, nRF52840/Raytac module and all power ICs.
 - ERC: zero unexplained errors.
 - DRC: zero blocker/critical violations.

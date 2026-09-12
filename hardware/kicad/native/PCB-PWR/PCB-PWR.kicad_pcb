@@ -1,0 +1,8426 @@
+(kicad_pcb
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(general
+		(thickness 1.6)
+		(legacy_teardrops no)
+	)
+	(paper "A4")
+	(layers
+		(0 "F.Cu" signal)
+		(4 "In1.Cu" signal)
+		(6 "In2.Cu" signal)
+		(2 "B.Cu" signal)
+		(9 "F.Adhes" user "F.Adhesive")
+		(11 "B.Adhes" user "B.Adhesive")
+		(13 "F.Paste" user)
+		(15 "B.Paste" user)
+		(5 "F.SilkS" user "F.Silkscreen")
+		(7 "B.SilkS" user "B.Silkscreen")
+		(1 "F.Mask" user)
+		(3 "B.Mask" user)
+		(17 "Dwgs.User" user "User.Drawings")
+		(19 "Cmts.User" user "User.Comments")
+		(21 "Eco1.User" user "User.Eco1")
+		(23 "Eco2.User" user "User.Eco2")
+		(25 "Edge.Cuts" user)
+		(27 "Margin" user)
+		(31 "F.CrtYd" user "F.Courtyard")
+		(29 "B.CrtYd" user "B.Courtyard")
+		(35 "F.Fab" user)
+		(33 "B.Fab" user)
+		(39 "User.1" user)
+		(41 "User.2" user)
+		(43 "User.3" user)
+		(45 "User.4" user)
+	)
+	(setup
+		(pad_to_mask_clearance 0)
+		(allow_soldermask_bridges_in_footprints no)
+		(tenting front back)
+		(pcbplotparams
+			(layerselection 0x00000000_00000000_55555555_5755f5ff)
+			(plot_on_all_layers_selection 0x00000000_00000000_00000000_00000000)
+			(disableapertmacros no)
+			(usegerberextensions no)
+			(usegerberattributes yes)
+			(usegerberadvancedattributes yes)
+			(creategerberjobfile yes)
+			(dashed_line_dash_ratio 12.000000)
+			(dashed_line_gap_ratio 3.000000)
+			(svgprecision 4)
+			(plotframeref no)
+			(mode 1)
+			(useauxorigin no)
+			(hpglpennumber 1)
+			(hpglpenspeed 20)
+			(hpglpendiameter 15.000000)
+			(pdf_front_fp_property_popups yes)
+			(pdf_back_fp_property_popups yes)
+			(pdf_metadata yes)
+			(pdf_single_document no)
+			(dxfpolygonmode yes)
+			(dxfimperialunits yes)
+			(dxfusepcbnewfont yes)
+			(psnegative no)
+			(psa4output no)
+			(plot_black_and_white yes)
+			(sketchpadsonfab no)
+			(plotpadnumbers no)
+			(hidednponfab no)
+			(sketchdnponfab yes)
+			(crossoutdnponfab yes)
+			(subtractmaskfromsilk no)
+			(outputformat 1)
+			(mirror no)
+			(drillshape 1)
+			(scaleselection 1)
+			(outputdirectory "")
+		)
+	)
+	(net 0 "")
+	(net 1 "1V8_MIC")
+	(net 2 "3V3_DIGITAL")
+	(net 3 "3V8_MODEM")
+	(net 4 "BOOT_3V3")
+	(net 5 "BOOT_3V8")
+	(net 6 "EN_AUX")
+	(net 7 "EN_MODEM")
+	(net 8 "FAULT")
+	(net 9 "FB_3V8")
+	(net 10 "GND_DIGITAL")
+	(net 11 "GND_MIC")
+	(net 12 "GND_MODEM")
+	(net 13 "GND_PWR")
+	(net 14 "I2C2_SCL")
+	(net 15 "I2C2_SDA")
+	(net 16 "LM74700_VCAP")
+	(net 17 "MODE_3V3")
+	(net 18 "MODE_3V8")
+	(net 19 "PG_3V8")
+	(net 20 "PWR_GOOD")
+	(net 21 "REV_GATE")
+	(net 22 "RT_3V3")
+	(net 23 "RT_3V8")
+	(net 24 "SHUNT_LOAD_SENSE")
+	(net 25 "SHUNT_SOURCE_SENSE")
+	(net 26 "SW_3V3")
+	(net 27 "SW_3V8")
+	(net 28 "VBAT_FUSED")
+	(net 29 "VBAT_PROTECTED")
+	(net 30 "VBAT_RAW")
+	(net 31 "VBAT_SYS")
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "023b421b-3ad9-465a-8fd3-78cdbd04a265")
+		(at 48 18.5)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R6"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "7a2f7b53-9413-4140-a400-9606c6967053")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "100 kOhm 1% ERJ-2RKF1003X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "177b7fff-0a47-4310-89ab-e690d87845ee")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "386fd8e0-7a6c-4976-9d9d-547a5634cde5")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1ac89470-993a-4787-81ec-d842d21a8ad3")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "2488ad0c-e19c-4746-9d41-eddb5ef96b81")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "13e31d57-5caf-4087-8ca2-958f4fc80753")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "282e29df-ae37-4ee2-838d-dbbd9b56e7ef")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "e77eb805-13e8-40b3-a690-eabef68e3afa")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "57a10f6d-f8eb-48ac-bd1e-2d5849282ee1")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 7 "EN_MODEM")
+			(uuid "feea33e9-af1b-4dd8-bdf6-69846d51bf2c")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 13 "GND_PWR")
+			(uuid "725a7580-5aae-4115-90fa-50fd6b2c8a03")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_1210_3225Metric"
+		(layer "F.Cu")
+		(uuid "06fd5a22-1f6f-48fe-9566-760b27b0901e")
+		(at 50 42)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C12"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "a543ca13-6d9a-4f04-9c28-509d5038c830")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "4.7 uF 50 V X7R CGA6P3X7R1H475K250AB"
+			(at 0 2.3 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "db513d16-3342-4606-bafb-3118f830c91e")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "6408e8ef-bf01-4e8e-b743-3b96a4da9dfa")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "9bbb1c03-ef27-4d8e-8e62-e76129c1be8c")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "ce959dd6-1c39-4ea9-b70c-6405e7bb4bb7")
+		)
+		(fp_line
+			(start -0.711252 1.36)
+			(end 0.711252 1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "4c9e57b7-b65a-4c8e-9053-11bbca345c72")
+		)
+		(fp_rect
+			(start -2.3 -1.6)
+			(end 2.3 1.6)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "d7abf0fa-5526-4787-8a74-424cafe4ee02")
+		)
+		(fp_rect
+			(start -1.6 -1.25)
+			(end 1.6 1.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "06ff469e-a9f2-450c-9914-90d91dc93b46")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "bff5bc98-afe2-40b2-9abb-8dcb90c9cb88")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 31 "VBAT_SYS")
+			(uuid "a1810328-3b19-4839-8be5-d0b3a7ed9a85")
+		)
+		(pad "2" smd roundrect
+			(at 1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 13 "GND_PWR")
+			(uuid "1eb2ef6b-8f2d-45f2-87f9-31d19607a783")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_1210_3225Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "0ec0c0e8-4383-406d-890b-b9b3d4b09421")
+		(at 50 47)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_ANALOG_ROUTING_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R7"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "40cf144d-515d-4c12-941e-a9861290355a")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "86.6 kOhm 0.1% ERA-2AEB8662X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "e9003bfa-9059-44c5-973e-aa038fc969b5")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "941f77df-6c39-4019-891b-90adb1dff800")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "9309e565-fa26-422c-885c-b3bfd6f30e6a")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "6e50419e-0eb1-4335-94d0-db99add05cc7")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "1cbd1a05-d7fc-4963-ade4-7b36040a3f08")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "9f8a74d3-2766-4d64-b76b-d2314d2cb45c")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "5b307835-43a4-4e88-808c-bcd0cab0b774")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "61a74f16-f96e-462d-b8d4-c14f67df7094")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 22 "RT_3V3")
+			(uuid "e9496d3d-2ccb-49d9-8b53-8ce80a8b7707")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 13 "GND_PWR")
+			(uuid "2c4a7462-e9be-4899-a1f7-7e785f214b64")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "11fba8b4-3586-42d8-bef9-a706df43e217")
+		(at 20 26)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=INPUT_PROTECTION|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C1"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "a7f51633-26b4-4e37-acf1-cdeb59f4c9f0")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "100 nF 25 V X7R CGA2B3X7R1E104K050BB"
+			(at 0 1.16 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "adb3eb8c-3bd3-4404-8571-e4bdb8ab80da")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0feca271-dd13-435c-8d87-98b42865eac3")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "efe3eef5-8422-4bd0-b31b-71517d5d942c")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.107836 -0.36)
+			(end 0.107836 -0.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "1e2fb433-6f26-4282-93e3-b37192c8bca3")
+		)
+		(fp_line
+			(start -0.107836 0.36)
+			(end 0.107836 0.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "0cd79dc5-5b3b-40f8-9cf5-26330c433dfc")
+		)
+		(fp_rect
+			(start -0.91 -0.46)
+			(end 0.91 0.46)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "d10ab9b0-d49b-4d10-bea3-f56ee4ebb816")
+		)
+		(fp_rect
+			(start -0.5 -0.25)
+			(end 0.5 0.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "f8ac2d22-2aaf-4e09-b3f5-b2fa044e3b62")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "15bdb0a1-39b2-4cbb-bf13-6ea4dd557fd2")
+			(effects
+				(font
+					(size 0.25 0.25)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.48 0)
+			(size 0.56 0.62)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 16 "LM74700_VCAP")
+			(uuid "fa7a43f8-d69b-412c-bf29-e203e71b8c02")
+		)
+		(pad "2" smd roundrect
+			(at 0.48 0)
+			(size 0.56 0.62)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 28 "VBAT_FUSED")
+			(uuid "5845e557-4d9d-4a40-a30b-6e9e129de21c")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "13bb7723-9626-432d-a033-4a468ca183b5")
+		(at 53 10)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C4"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "b91ff3bf-c408-4bc6-89c2-19bb311e13e6")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "100 nF 25 V X7R CGA2B3X7R1E104K050BB"
+			(at 0 1.16 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "be55c3bf-4ba4-4397-9341-31235883065b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c59c8d56-2951-4b86-9450-e73faea7de5b")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f77b047c-1d8f-4525-bfd0-5ddd6c674850")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.107836 -0.36)
+			(end 0.107836 -0.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "74789f9e-a13f-496e-b50f-28b24349a16a")
+		)
+		(fp_line
+			(start -0.107836 0.36)
+			(end 0.107836 0.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "1decc6ea-739d-43a6-8f47-58be3816fb81")
+		)
+		(fp_rect
+			(start -0.91 -0.46)
+			(end 0.91 0.46)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "cc84ec90-288b-4610-9ef6-67ed0a4a9bdb")
+		)
+		(fp_rect
+			(start -0.5 -0.25)
+			(end 0.5 0.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "924d673c-22b9-4e03-bb90-f745c057d751")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "e3192ca1-5fc1-4520-a9a7-6f36ff0bc0ce")
+			(effects
+				(font
+					(size 0.25 0.25)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.48 0)
+			(size 0.56 0.62)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 5 "BOOT_3V8")
+			(uuid "38c29d3d-2529-4d0b-be7c-3fc0366ce491")
+		)
+		(pad "2" smd roundrect
+			(at 0.48 0)
+			(size 0.56 0.62)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 27 "SW_3V8")
+			(uuid "1bda650f-6f48-4455-bb86-711fc2b4e7e2")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste"
+		(layer "F.Cu")
+		(uuid "1f98715d-a70f-4968-9c93-b00269906a96")
+		(at 40.24 56)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "TP7"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "e1477abf-2079-4445-94a1-f01509296087")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "TP_1V8 DFT_PAD_1P70_NOPASTE_REV_A"
+			(at 0 1.65 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "b71ab70d-e8be-41af-bb6d-aefb5603bd74")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "a734efe7-7443-4107-b831-09627292c6e7")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "23b7aab9-fb78-4f01-8c9c-446da72f71cb")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom)
+		(fp_circle
+			(center 0 0)
+			(end 1.15 0)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "6474dcc0-0945-4568-ac86-66932ce354d8")
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 1.7 1.7)
+			(layers "F.Cu" "F.Mask")
+			(net 1 "1V8_MIC")
+			(solder_mask_margin 0.2)
+			(uuid "cd4baf4f-c825-4bf3-a07a-3498cd7228c7")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Capacitor_SMD:C_1210_3225Metric"
+		(layer "F.Cu")
+		(uuid "28057b3a-ccf4-41b7-8f4e-592a6fb41d93")
+		(at 73 17)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C16"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "9ec3c5c5-50b8-41a3-930d-85263e1c193a")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "22 uF 25 V X7R CGA6P3X7R1E226M250AB"
+			(at 0 2.3 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "71535180-9978-46f0-9a8f-80cbd1bf4504")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "18376267-18d4-4086-843c-15a61539fa51")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "3e4615f2-2950-47b2-8951-eee92dae313c")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "2ea2da8b-dba2-4b81-884e-466143a0b58d")
+		)
+		(fp_line
+			(start -0.711252 1.36)
+			(end 0.711252 1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "a106afe5-e9d4-4304-b42f-5a6e418ef009")
+		)
+		(fp_rect
+			(start -2.3 -1.6)
+			(end 2.3 1.6)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "e05e4256-b3f0-4edd-9843-710dc192ffd7")
+		)
+		(fp_rect
+			(start -1.6 -1.25)
+			(end 1.6 1.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "3a013f4c-5e6b-4e30-b08a-6d3b233a31ac")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "91a1da63-a185-4774-86e0-4faec94a056d")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 3 "3V8_MODEM")
+			(uuid "f01edb5c-4e20-41ee-9d3c-20e7930d60fb")
+		)
+		(pad "2" smd roundrect
+			(at 1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 13 "GND_PWR")
+			(uuid "2053cad8-7a31-4ae5-b4f2-13ce9ac38b70")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_1210_3225Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "295360c4-fe8a-42a3-846a-bac95ca509c2")
+		(at 53 38)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C6"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "caa1618d-0419-4f0e-a958-49f370fe226b")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "100 nF 25 V X7R CGA2B3X7R1E104K050BB"
+			(at 0 1.16 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "7c6e64f9-715a-424a-883e-d5c623adea55")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "440301cd-3ab0-4eeb-ae32-9373f4049124")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "7427e4be-cbbc-4bfa-8417-e0166073075a")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.107836 -0.36)
+			(end 0.107836 -0.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "1695dd7a-5f6b-4017-b7e5-6d3a8aaad46a")
+		)
+		(fp_line
+			(start -0.107836 0.36)
+			(end 0.107836 0.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "502ba516-2108-4f05-8bdb-a1dc0c361248")
+		)
+		(fp_rect
+			(start -0.91 -0.46)
+			(end 0.91 0.46)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "512b5c11-34d0-4b5a-8fe9-53f75d003b9e")
+		)
+		(fp_rect
+			(start -0.5 -0.25)
+			(end 0.5 0.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "411401a5-a455-4146-8de5-0a34079b030d")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "0c6f94f3-e280-4f38-bf97-207210aa8233")
+			(effects
+				(font
+					(size 0.25 0.25)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.48 0)
+			(size 0.56 0.62)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 4 "BOOT_3V3")
+			(uuid "9bc6bbe7-1dea-4cc2-982d-5a8129db563e")
+		)
+		(pad "2" smd roundrect
+			(at 0.48 0)
+			(size 0.56 0.62)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 26 "SW_3V3")
+			(uuid "12deb87d-a2f8-4efd-9a1f-7533afab9da1")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "295600b5-cda2-44a1-8728-7557d22123b3")
+		(at 58 47)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R10"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "fc4003f8-eef5-437c-9ba2-36483d0a8e38")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "10 kOhm 1% ERJ-2RKF1002X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f2313276-c178-442c-ba6a-049ab25bf1e6")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4158625c-15c8-407e-9ddb-8d7dd7291192")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0f4caec2-9698-4071-ad57-9ecd1fba7342")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "57b43a0d-df2a-49b4-9edb-9f9b5d3da951")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "553b6a3a-3fd4-471e-b86f-1fb87a700120")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "d0944d04-40e7-43f9-b59a-ace8b56e1f7b")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "224c84fc-0570-4790-a2f6-a5f74f90bf76")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "73a4a4ae-a3a2-4a75-9428-6612ff707936")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 2 "3V3_DIGITAL")
+			(uuid "82430a18-b6f1-45df-ac9c-85d621bff0d9")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 20 "PWR_GOOD")
+			(uuid "363ef5e5-8469-4574-ad9e-6cef2128eebd")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_0603_1608Metric"
+		(layer "F.Cu")
+		(uuid "2e0c12e4-2d99-47f0-b21f-a40636c9df4b")
+		(at 76 50)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=AUX_1V8|placement=PROVISIONAL_NOISE_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C7"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "d0c562b7-6a17-4a09-b4ba-2477a35d175a")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "2.2 uF 10 V X7R CGA3E1X7R1A225K080AC"
+			(at 0 1.43 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "a2b09c51-051e-4fbb-8719-5de95fa49629")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "3fa64546-f40c-40a5-b7f5-431d1e869f76")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "b48bbe5f-68cb-4fdf-a59f-bbaf06554d37")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.14058 -0.51)
+			(end 0.14058 -0.51)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "4a1e0b28-9422-45a2-b415-b134e73adbef")
+		)
+		(fp_line
+			(start -0.14058 0.51)
+			(end 0.14058 0.51)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "f750a7f3-86b0-492a-aadb-90b8a50be7f2")
+		)
+		(fp_rect
+			(start -1.48 -0.73)
+			(end 1.48 0.73)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "cdc6075e-ad7a-4cba-b84b-6ae96cc5ab48")
+		)
+		(fp_rect
+			(start -0.8 -0.4)
+			(end 0.8 0.4)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "1d81cf02-b4bd-4539-b92f-c332841b53cd")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "511cef28-4162-4560-8254-ac79dfd98dd3")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.775 0)
+			(size 0.9 0.95)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 2 "3V3_DIGITAL")
+			(uuid "b5eda095-7cfc-4f70-8cfb-375a8a68b251")
+		)
+		(pad "2" smd roundrect
+			(at 0.775 0)
+			(size 0.9 0.95)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 13 "GND_PWR")
+			(uuid "b63e0082-c46f-4508-a26b-293e8c99679c")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_0603_1608Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_1210_3225Metric"
+		(layer "F.Cu")
+		(uuid "303c7b33-1dc7-455b-83dd-b8014fbf51e7")
+		(at 34 26)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=CURRENT_SENSE|placement=PROVISIONAL_TRANSIENT_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C10"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "0cdea500-6e42-41b6-b4d7-2a953eb1ccf5")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "4.7 uF 50 V X7R CGA6P3X7R1H475K250AB"
+			(at 0 2.3 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "3bda3e6a-ecae-4bc4-aaf9-39b2fcdeb366")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "53edccaa-433f-46b8-9632-f3a24a1e7d23")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "d9835c14-8477-4d46-b927-e05588aa61d7")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "b73386f0-eae9-4a3d-b85f-c5d4ddefd93a")
+		)
+		(fp_line
+			(start -0.711252 1.36)
+			(end 0.711252 1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "7a90798e-7b56-484b-9da3-9bd5c02085e1")
+		)
+		(fp_rect
+			(start -2.3 -1.6)
+			(end 2.3 1.6)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "94527f9b-e0b5-463d-a739-78ed63ec0108")
+		)
+		(fp_rect
+			(start -1.6 -1.25)
+			(end 1.6 1.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "4e4d44e8-4848-450a-be1c-129e904aa073")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "549d5972-bb4d-43c1-b25a-ea0084f3a473")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 29 "VBAT_PROTECTED")
+			(uuid "89f0cff0-07a1-4845-958f-71fd83dc6fdb")
+		)
+		(pad "2" smd roundrect
+			(at 1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 13 "GND_PWR")
+			(uuid "d8625eb5-bff9-435f-bbd8-35f060e3ba72")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_1210_3225Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "42be065e-2ccb-4d6a-8337-727d6e6f0aca")
+		(at 50.5 19)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_ANALOG_ROUTING_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R3"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "b98f9385-d62d-4f06-8c11-e2fa9aabcb82")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "86.6 kOhm 0.1% ERA-2AEB8662X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c0e807a4-05b9-410a-9611-061cb94d1fa0")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "97e01fce-844e-4df1-9755-c96dec5e47db")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "6a45f014-b63f-431e-934f-bcd97b62fcda")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "338a242f-c280-4758-82bb-84d6bf52a0c2")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "de99bd39-d810-4636-ba2d-4d6d4a44e866")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "37482b58-e3d0-45d8-b2cd-41c6b1672006")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "b2065517-1609-4a83-b516-25cc61383098")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "556a5bc2-177a-41ca-8f65-a0a5a2cde119")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 23 "RT_3V8")
+			(uuid "1d2e3c19-ee44-4eab-839a-4c4f5b4dd94e")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 13 "GND_PWR")
+			(uuid "4234f79f-231d-4776-8343-e9041aef34fa")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_1210_3225Metric"
+		(layer "F.Cu")
+		(uuid "443c29b3-896b-4a31-8f41-39a6c6f6cb08")
+		(at 73 38)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C17"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "a7a07459-6906-4bcc-a102-28c7f668774c")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "22 uF 25 V X7R CGA6P3X7R1E226M250AB"
+			(at 0 2.3 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "b64cadb8-3bb7-47b9-b0c3-ffc43df94e6d")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "b17183c1-c11d-4739-9a95-af0cc69b4d63")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "01ecbbbf-fd8a-410e-b93f-ede132ee83b7")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "421a3c60-f225-4346-83ff-139e53f9aa9b")
+		)
+		(fp_line
+			(start -0.711252 1.36)
+			(end 0.711252 1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "c6f29075-7b62-4d2e-8ef8-2b3df57955dc")
+		)
+		(fp_rect
+			(start -2.3 -1.6)
+			(end 2.3 1.6)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "292de6a8-f80c-43e8-9835-77774cec89f4")
+		)
+		(fp_rect
+			(start -1.6 -1.25)
+			(end 1.6 1.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "da425e65-8dd0-416e-a81a-5b6d0c2f24ff")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "21f6a6f4-60ca-4eaf-b5da-5d84f8dc599f")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 2 "3V3_DIGITAL")
+			(uuid "9caa0bbe-dfec-45c3-b4aa-033373fbd7d5")
+		)
+		(pad "2" smd roundrect
+			(at 1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 13 "GND_PWR")
+			(uuid "94e49141-85c5-4ea3-a634-3d9ee4569160")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_1210_3225Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "DioneyaPWR:TI_DBV0006A_SOT23-6"
+		(layer "F.Cu")
+		(uuid "461c5536-f483-47a0-99cc-cf2025b624fc")
+		(at 20 30)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=INPUT_PROTECTION|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PIN_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "U1"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "e7d44ab0-8d3f-4062-9c10-8c5c95bb649d")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "LM74700QDBVRQ1"
+			(at 0 2.2 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "96441769-8c54-48bf-991a-71577ab367c6")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "44e8141d-17d2-44ac-bee6-b51403e1580d")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "470ff7f6-7dae-4292-814c-cea6fed42edb")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_poly
+			(pts
+				(xy -1.48 -1.08) (xy -1.68 -1.28) (xy -1.28 -1.28)
+			)
+			(stroke
+				(width 0.12)
+				(type default)
+			)
+			(fill yes)
+			(layer "F.SilkS")
+			(uuid "00022571-99ac-4c67-afa2-3332d20da20b")
+		)
+		(fp_rect
+			(start -2.1 -1.78)
+			(end 2.1 1.78)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "b610c062-32a8-44c5-8eb5-1c2757f9cb7c")
+		)
+		(fp_poly
+			(pts
+				(xy -0.8 -1.05) (xy -0.4 -1.45) (xy 0.8 -1.45) (xy 0.8 1.45) (xy -0.8 1.45)
+			)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "4f7a5699-eec1-404c-8166-ed326f508075")
+		)
+		(pad "1" smd roundrect
+			(at -1.3 -0.95)
+			(size 1.1 0.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.166667)
+			(net 16 "LM74700_VCAP")
+			(solder_mask_margin 0.07)
+			(uuid "2f2fa89e-92ee-4109-9c26-10a5505c0e14")
+		)
+		(pad "2" smd roundrect
+			(at -1.3 0)
+			(size 1.1 0.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.166667)
+			(net 13 "GND_PWR")
+			(solder_mask_margin 0.07)
+			(uuid "3de18827-f46d-4b7c-99f4-4dfbd1b5a3df")
+		)
+		(pad "3" smd roundrect
+			(at -1.3 0.95)
+			(size 1.1 0.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.166667)
+			(net 28 "VBAT_FUSED")
+			(solder_mask_margin 0.07)
+			(uuid "534df239-2b8f-4dbd-9f0b-475bf10cfeb9")
+		)
+		(pad "4" smd roundrect
+			(at 1.3 0.95)
+			(size 1.1 0.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.166667)
+			(net 29 "VBAT_PROTECTED")
+			(solder_mask_margin 0.07)
+			(uuid "371a18da-a729-4919-bdc5-7ea45095de84")
+		)
+		(pad "5" smd roundrect
+			(at 1.3 0)
+			(size 1.1 0.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.166667)
+			(net 21 "REV_GATE")
+			(solder_mask_margin 0.07)
+			(uuid "773ac078-2670-4a57-ad2c-303ed9589d14")
+		)
+		(pad "6" smd roundrect
+			(at 1.3 -0.95)
+			(size 1.1 0.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.166667)
+			(net 28 "VBAT_FUSED")
+			(solder_mask_margin 0.07)
+			(uuid "3379e070-d35e-4525-a93d-f31828ffd92d")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste"
+		(layer "F.Cu")
+		(uuid "4ebbc11e-daa0-4735-9079-9c9f64f1351f")
+		(at 37.7 56)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "TP6"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "00fac1e8-edb5-4d51-84cf-38431aac8466")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "TP_PWR_GOOD DFT_PAD_1P70_NOPASTE_REV_A"
+			(at 0 1.65 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f8f03574-52ca-4ee7-bb52-e88342d7e692")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "b679c30d-8c70-4a50-b90f-392ce4d5060e")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "d3608963-7186-4e4a-8d8d-b42a536c01ab")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom)
+		(fp_circle
+			(center 0 0)
+			(end 1.15 0)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "00ed1d99-8db0-41d5-89bc-8a1adbf3ced8")
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 1.7 1.7)
+			(layers "F.Cu" "F.Mask")
+			(net 20 "PWR_GOOD")
+			(solder_mask_margin 0.2)
+			(uuid "457b5fc4-40a9-4393-a51e-4c21183f14c5")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "DioneyaPWR:Molex_43045-0213_MicroFit-2_Vertical"
+		(layer "F.Cu")
+		(uuid "595f6fca-c8b1-418d-b4c0-2a4b526dc6a2")
+		(at 6 28)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=INPUT_PROTECTION|placement=PROVISIONAL_SERVICE_CLEARANCE_PENDING|authority=PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "J1"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "bdbab254-f6e8-4882-b043-5945b01e5e92")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "43045-0213"
+			(at 0 7.85 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f673f49a-280b-417c-85e0-7976f4242fcd")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "76a21196-1577-493e-85bb-e6c805c99455")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0a817142-4328-42fa-ade5-da9463a0256c")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr through_hole)
+		(fp_poly
+			(pts
+				(xy -0.75 3.95) (xy 0 4.7) (xy 0.75 3.95)
+			)
+			(stroke
+				(width 0.12)
+				(type default)
+			)
+			(fill no)
+			(layer "F.SilkS")
+			(uuid "4b08f374-7dbd-42c0-ab45-742cdf6a4606")
+		)
+		(fp_rect
+			(start -3.83 -3.8)
+			(end 3.83 7.3)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "e33c3875-741e-447e-9285-defd4fc05ef9")
+		)
+		(fp_rect
+			(start -3.325 -3.3)
+			(end 3.325 6.8)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "b300fb08-c80c-4602-8c4b-bbaf78499fc9")
+		)
+		(pad "" np_thru_hole circle
+			(at -3 0)
+			(size 0.94 0.94)
+			(drill 0.94)
+			(layers "*.Cu" "*.Mask")
+			(uuid "15a1a099-a73c-45a1-ab5a-bbb5f0b889e4")
+		)
+		(pad "" np_thru_hole circle
+			(at 3 0)
+			(size 0.94 0.94)
+			(drill 0.94)
+			(layers "*.Cu" "*.Mask")
+			(uuid "a73ca0cf-3da8-4ea6-bba6-bd49782f46b4")
+		)
+		(pad "1" thru_hole roundrect
+			(at 0 3)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(roundrect_rratio 0.2)
+			(net 30 "VBAT_RAW")
+			(uuid "cf9c2f33-caf1-49ea-9c3b-06baaef20da6")
+		)
+		(pad "2" thru_hole circle
+			(at 0 0)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(net 13 "GND_PWR")
+			(uuid "d13b0cf3-e430-4c80-ac4f-739e964df56b")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "5a4b3965-6c2f-42c2-9140-0299dd3fc7f6")
+		(at 58.5 19)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_ANALOG_ROUTING_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R2"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "72aeb604-5ab3-4de7-9659-7b273f81b9db")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "35.7 kOhm 0.1% ERA-2AEB3572X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "68f3c399-ee8c-41f8-b5e1-df881a5b04a9")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c325d049-ca18-4917-b883-b0972c4e44a7")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4e7c387e-637f-4e60-8c7b-51512224b830")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "afc3e97a-f6c5-4d0c-a724-a163cd03a656")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "6dada4e7-0897-4ce2-adb2-2686199a0e62")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "f748caf2-cd7e-4203-b2d2-90b0fd9ee043")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "f6cfeac4-9e49-4e7e-9a5d-194194a96e95")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "ec470e55-261c-4db0-91f2-113db806934a")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 9 "FB_3V8")
+			(uuid "a95e6058-7ef3-4da0-a330-44667ef2a9d7")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 13 "GND_PWR")
+			(uuid "883ad0c8-6936-49ad-a8f2-0333a2d461ae")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:CP_Elec_6.3x7.7"
+		(layer "F.Cu")
+		(uuid "5bf17283-cf63-4787-bd0a-f1593c0e6952")
+		(at 47 32)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=CURRENT_SENSE|placement=PROVISIONAL_PACKAGE_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C13"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "6c08c205-5c9b-45c2-a4a5-8de8017f4c48")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "100 uF 35 V hybrid EEH-ZK1V101XP"
+			(at 0 4.35 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "78840701-6a5c-4b26-81a3-cbac544242b9")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "ac60f7ce-14a7-4e2d-b291-d963d1561eab")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f9377d67-a823-4bbd-a604-cf26eab1faeb")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -4.4375 -1.8475)
+			(end -3.65 -1.8475)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "8d46aacf-8310-45d2-afdb-4ebb5af7508c")
+		)
+		(fp_line
+			(start -4.04375 -2.24125)
+			(end -4.04375 -1.45375)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "b3d08f36-5e18-484e-956f-1f4ec951edcc")
+		)
+		(fp_line
+			(start -3.41 -2.345563)
+			(end -3.41 -1.06)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "c3d1460d-31c3-4244-b39d-d207ee55f111")
+		)
+		(fp_line
+			(start -3.41 -2.345563)
+			(end -2.345563 -3.41)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "e1426086-9bdb-48ef-8926-dd7c2deba573")
+		)
+		(fp_line
+			(start -3.41 2.345563)
+			(end -3.41 1.06)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "262facaf-02d2-40a2-adad-318c0ffb7f24")
+		)
+		(fp_line
+			(start -3.41 2.345563)
+			(end -2.345563 3.41)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "20cc1513-9fd2-4eed-976d-80c1175c3b1a")
+		)
+		(fp_line
+			(start -2.345563 -3.41)
+			(end 3.41 -3.41)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "9d146046-bbdc-4ad3-ab5d-8059cb1c368d")
+		)
+		(fp_line
+			(start -2.345563 3.41)
+			(end 3.41 3.41)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "452097dc-ebdf-4baf-94cf-73456d67e787")
+		)
+		(fp_line
+			(start 3.41 -3.41)
+			(end 3.41 -1.06)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "ff678410-26a7-4eb7-8b25-afdd68d8acfb")
+		)
+		(fp_line
+			(start 3.41 3.41)
+			(end 3.41 1.06)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "a3347b93-1795-422f-824f-bcb2ea5c6f51")
+		)
+		(fp_line
+			(start -4.7 -1.05)
+			(end -4.7 1.05)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "b01c157a-a753-48ec-9f89-3a93651fd1e6")
+		)
+		(fp_line
+			(start -4.7 1.05)
+			(end -3.55 1.05)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "913ee6a2-bbe0-432c-988d-f05491b50597")
+		)
+		(fp_line
+			(start -3.55 -2.4)
+			(end -3.55 -1.05)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "ab5cd1d6-ca02-4820-b550-3d966877eda9")
+		)
+		(fp_line
+			(start -3.55 -2.4)
+			(end -2.4 -3.55)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "fc30754d-e56a-4dfa-9d59-2b6d4d6d1c32")
+		)
+		(fp_line
+			(start -3.55 -1.05)
+			(end -4.7 -1.05)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "e419e909-b752-4ec3-b19d-e1887582a8a3")
+		)
+		(fp_line
+			(start -3.55 1.05)
+			(end -3.55 2.4)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "d3d9edd8-6977-4933-b8c1-3e382f2a98d7")
+		)
+		(fp_line
+			(start -3.55 2.4)
+			(end -2.4 3.55)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "e005d590-eba7-478b-9e2b-54f814799eab")
+		)
+		(fp_line
+			(start -2.4 -3.55)
+			(end 3.55 -3.55)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "6f2e42e6-a99e-4686-a720-de14c80602a9")
+		)
+		(fp_line
+			(start -2.4 3.55)
+			(end 3.55 3.55)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "6f2f4e39-46f4-4aad-9ae2-f83e890040ff")
+		)
+		(fp_line
+			(start 3.55 -3.55)
+			(end 3.55 -1.05)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "b7177ebb-81fe-471e-9ec2-3bc6084a158f")
+		)
+		(fp_line
+			(start 3.55 -1.05)
+			(end 4.7 -1.05)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "7c49feea-fc84-4c60-8f52-b88c549cd40d")
+		)
+		(fp_line
+			(start 3.55 1.05)
+			(end 3.55 3.55)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "9e5e9f2c-0f75-474d-a515-d62c0d87f3a6")
+		)
+		(fp_line
+			(start 4.7 -1.05)
+			(end 4.7 1.05)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "d2f86842-9317-463c-8616-f67e12f311d5")
+		)
+		(fp_line
+			(start 4.7 1.05)
+			(end 3.55 1.05)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "05cf381b-0155-4385-bb97-1ce0b272a8a6")
+		)
+		(fp_line
+			(start -3.3 -2.3)
+			(end -3.3 2.3)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "9e8ea131-a9d9-4bdb-8c37-5d20f1d531c6")
+		)
+		(fp_line
+			(start -3.3 -2.3)
+			(end -2.3 -3.3)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "7c2fed97-ef90-4625-8625-3508d1fde3d4")
+		)
+		(fp_line
+			(start -3.3 2.3)
+			(end -2.3 3.3)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "1eb16b59-0085-4988-a862-08c442ef2e7a")
+		)
+		(fp_line
+			(start -2.704838 -1.33)
+			(end -2.074838 -1.33)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "2c72712b-936d-4b3d-922a-59fd94948bef")
+		)
+		(fp_line
+			(start -2.389838 -1.645)
+			(end -2.389838 -1.015)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "1748214a-c201-4c0f-81a8-587a19fa8013")
+		)
+		(fp_line
+			(start -2.3 -3.3)
+			(end 3.3 -3.3)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "dadfb473-eab0-4491-9144-3364e03c49c5")
+		)
+		(fp_line
+			(start -2.3 3.3)
+			(end 3.3 3.3)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "c4b46c72-4c2a-48d1-b543-ba808c1e6263")
+		)
+		(fp_line
+			(start 3.3 -3.3)
+			(end 3.3 3.3)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "8a36f83b-ef99-45ac-b056-b9bb6f028a67")
+		)
+		(fp_circle
+			(center 0 0)
+			(end 3.15 0)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "e0bcc840-64a4-4ab9-93f4-c43ded96ae15")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "fdde097a-3424-44b9-99a1-87897c5f6e81")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -2.7 0)
+			(size 3.5 1.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.15625)
+			(net 31 "VBAT_SYS")
+			(uuid "ad8eb2b9-f19f-406a-851b-63d3bd693c22")
+		)
+		(pad "2" smd roundrect
+			(at 2.7 0)
+			(size 3.5 1.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.15625)
+			(net 13 "GND_PWR")
+			(uuid "48384fe8-01d2-405c-ba95-538f20cb735b")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/CP_Elec_6.3x7.7.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste"
+		(layer "F.Cu")
+		(uuid "5f046fae-abb7-4686-9b25-bc65fde71e34")
+		(at 45.32 56)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "TP9"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "c00bd95b-4a6a-4d7c-b539-a25b3b905100")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "TP_SCL DFT_PAD_1P70_NOPASTE_REV_A"
+			(at 0 1.65 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "30e2f8be-a4bb-48d1-9284-7f81200a4d37")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "7d532cf8-a02c-4d68-86f5-f4cf977caa71")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "5ec7fefc-a324-49c0-bc2c-fccea6cc319a")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom)
+		(fp_circle
+			(center 0 0)
+			(end 1.15 0)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "79fb61df-a41e-48a8-92c3-2ec488a973d0")
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 1.7 1.7)
+			(layers "F.Cu" "F.Mask")
+			(net 14 "I2C2_SCL")
+			(solder_mask_margin 0.2)
+			(uuid "80698f64-d3ff-4cf5-8d1d-8ccf8371062b")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "NetTie:NetTie-2_SMD_Pad0.5mm"
+		(layer "F.Cu")
+		(uuid "612c7b75-60b8-4291-8192-0ff7a121a763")
+		(at 79 38)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=GROUND_JOIN|placement=PROVISIONAL_RETURN_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "NT1"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "8de50199-a48c-40bf-a02b-04572bf5acb7")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "2-pad copper net tie NET_TIE_COPPER_REV_A"
+			(at 0 1.2 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4ebf2e1d-0ac4-4006-9743-53730f2cca5a")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2c083463-17a0-45d2-a3ed-539e3dd7e40e")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "995dcf6b-b735-4d67-88fa-6200fc8d8b8f")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr exclude_from_pos_files exclude_from_bom allow_missing_courtyard)
+		(net_tie_pad_groups "1, 2")
+		(fp_poly
+			(pts
+				(xy -0.5 -0.25) (xy 0.5 -0.25) (xy 0.5 0.25) (xy -0.5 0.25)
+			)
+			(stroke
+				(width 0)
+				(type solid)
+			)
+			(fill yes)
+			(layer "F.Cu")
+			(uuid "889b1a4c-73dc-44ed-8591-a1dcc2ccd442")
+		)
+		(pad "1" smd circle
+			(at -0.5 0)
+			(size 0.5 0.5)
+			(layers "F.Cu")
+			(net 12 "GND_MODEM")
+			(uuid "a88c3f1e-9a00-4370-8bc4-f3a22c623f97")
+		)
+		(pad "2" smd circle
+			(at 0.5 0)
+			(size 0.5 0.5)
+			(layers "F.Cu")
+			(net 13 "GND_PWR")
+			(uuid "3b0d07e5-963e-42a2-8206-a8a6e06703dc")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste"
+		(layer "F.Cu")
+		(uuid "68ee0ce7-a9a5-436f-9d06-efe02c4d447b")
+		(at 42.78 56)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "TP8"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "9d889a66-96ed-4877-85e3-16517143ddca")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "TP_FAULT DFT_PAD_1P70_NOPASTE_REV_A"
+			(at 0 1.65 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "ba339817-3216-40d8-b3ed-5c0cb1490d5b")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "de6aef0a-b7ce-4b82-bd47-ca81115044a2")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "876e7ee9-2d50-4b39-b2ed-8ab0711510ba")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom)
+		(fp_circle
+			(center 0 0)
+			(end 1.15 0)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "f8f16d2d-3d05-4efe-a463-2a3b8d567fe4")
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 1.7 1.7)
+			(layers "F.Cu" "F.Mask")
+			(net 8 "FAULT")
+			(solder_mask_margin 0.2)
+			(uuid "3482a7f1-0d52-4dbb-83f8-ed51c9c6237e")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "73d079b9-0925-4565-a088-98d6709af50a")
+		(at 66 49)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=AUX_1V8|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R11"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "04ce4191-5230-45d9-85f5-7d3375e671b0")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "100 kOhm 1% ERJ-2RKF1003X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "d352dfc6-d49b-4117-884a-5cfa608426c6")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "75063afa-7bd1-489d-9ed3-f2289ab7fa86")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "cce31a36-4666-4c70-9f71-5de256513ffc")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "893d5d21-92f6-4499-a2d2-8badf9017cd5")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "c4c827d3-7d47-4d69-a8ea-32d00963506e")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "e20245ac-21b1-4484-9141-9204b61e727d")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "81455864-c4d8-4eb3-910e-f48b3efa2220")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "353dd7fd-9fe1-4c08-bdc0-f1cdaf95be66")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 6 "EN_AUX")
+			(uuid "8955f5ad-d9fc-417f-890f-0bc2235f0daa")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 13 "GND_PWR")
+			(uuid "75e4dbf3-30fa-4142-ac59-a26cf4780205")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "DioneyaPWR:CSD18540Q5B_DNK"
+		(layer "F.Cu")
+		(uuid "76789d20-d5c5-4cc6-8b63-8ce233d66dca")
+		(at 27 30)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=INPUT_PROTECTION|placement=PROVISIONAL_THERMAL_REVIEW_PENDING|authority=PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "Q1"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "2b194ba2-8720-4eab-84b6-5deb028c2dcc")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "CSD18540Q5B"
+			(at 0 3.45 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4a535cc3-07aa-410e-ba53-1c6489797244")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "7d6f12d4-912e-4f84-86ff-be71e0d996bc")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "10a0e097-f774-4df4-b73e-f9ebc9744753")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -3.12 -2.62)
+			(end 3.12 -2.62)
+			(stroke
+				(width 0.12)
+				(type default)
+			)
+			(layer "F.SilkS")
+			(uuid "2cb4a23c-0a20-408c-8ec5-cd8659eea786")
+		)
+		(fp_line
+			(start -3.12 2.62)
+			(end 2.45 2.62)
+			(stroke
+				(width 0.12)
+				(type default)
+			)
+			(layer "F.SilkS")
+			(uuid "d4f48422-b564-4a42-bde2-3e10957c5cdc")
+		)
+		(fp_poly
+			(pts
+				(xy 2.62 2.62) (xy 3.12 2.12) (xy 3.12 2.62)
+			)
+			(stroke
+				(width 0.12)
+				(type default)
+			)
+			(fill yes)
+			(layer "F.SilkS")
+			(uuid "b61229d5-5ac8-4d38-b1c4-6b7384244ccf")
+		)
+		(fp_rect
+			(start -3.706 -2.75)
+			(end 3.706 2.75)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "e5166eab-ea39-4852-83ca-5fb65f1dcd28")
+		)
+		(fp_poly
+			(pts
+				(xy -3 -2.5) (xy 3 -2.5) (xy 3 2.15) (xy 2.65 2.5) (xy -3 2.5)
+			)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "b8a57dd9-1f5c-47d8-bb0e-dd3277e7f6c4")
+		)
+		(pad "" smd rect
+			(at -2.91 -1.905)
+			(size 0.766 0.508)
+			(layers "F.Paste")
+			(uuid "ab31a10f-7b5d-46cc-b7f5-d87d3945e062")
+		)
+		(pad "" smd rect
+			(at -2.91 -0.635)
+			(size 0.766 0.508)
+			(layers "F.Paste")
+			(uuid "9d81a2c3-3988-4913-97de-1c77c8dca340")
+		)
+		(pad "" smd rect
+			(at -2.91 0.635)
+			(size 0.766 0.508)
+			(layers "F.Paste")
+			(uuid "e86092f6-208d-4d35-ac45-e71472e1edc2")
+		)
+		(pad "" smd rect
+			(at -2.91 1.905)
+			(size 0.766 0.508)
+			(layers "F.Paste")
+			(uuid "094fba01-e717-4890-9b94-10c51a3698ca")
+		)
+		(pad "" smd rect
+			(at -1.594 -1.569)
+			(size 1.294 0.746)
+			(layers "F.Paste")
+			(uuid "7634f628-f15f-4cb9-a2b7-fe1ed1365df1")
+		)
+		(pad "" smd rect
+			(at -1.594 -0.523)
+			(size 1.294 0.746)
+			(layers "F.Paste")
+			(uuid "3474dc52-b46c-4254-bf11-59fe7ad557e9")
+		)
+		(pad "" smd rect
+			(at -1.594 0.523)
+			(size 1.294 0.746)
+			(layers "F.Paste")
+			(uuid "53d51354-0fae-40a3-9763-c1e6a33aac96")
+		)
+		(pad "" smd rect
+			(at -1.594 1.569)
+			(size 1.294 0.746)
+			(layers "F.Paste")
+			(uuid "0a46f441-5fc5-4563-b467-5e59d2b0e9a4")
+		)
+		(pad "" smd rect
+			(at 0.05 -1.569)
+			(size 1.294 0.746)
+			(layers "F.Paste")
+			(uuid "10b79ce3-b93f-4fff-8bce-a8264fa119ea")
+		)
+		(pad "" smd rect
+			(at 0.05 -0.523)
+			(size 1.294 0.746)
+			(layers "F.Paste")
+			(uuid "e4bae0a3-9c5f-42fb-9b62-8255c1ffe2a3")
+		)
+		(pad "" smd rect
+			(at 0.05 0.523)
+			(size 1.294 0.746)
+			(layers "F.Paste")
+			(uuid "f44bdfeb-e8b4-4a7a-9e4a-5a198dba9ab7")
+		)
+		(pad "" smd rect
+			(at 0.05 1.569)
+			(size 1.294 0.746)
+			(layers "F.Paste")
+			(uuid "508de3a5-0689-4f58-b660-51bf9c569f84")
+		)
+		(pad "" smd rect
+			(at 2.758 -1.905)
+			(size 1.072 0.562)
+			(layers "F.Paste")
+			(uuid "ef10fef6-9935-4463-80a7-a3d55f2fc5c3")
+		)
+		(pad "" smd rect
+			(at 2.758 -0.635)
+			(size 1.072 0.562)
+			(layers "F.Paste")
+			(uuid "4931e51e-ddb9-4ad9-9a20-7916f730389e")
+		)
+		(pad "" smd rect
+			(at 2.758 0.635)
+			(size 1.072 0.562)
+			(layers "F.Paste")
+			(uuid "5c01574d-95dd-459e-b02a-190bbc8e014d")
+		)
+		(pad "" smd rect
+			(at 2.758 1.905)
+			(size 1.072 0.562)
+			(layers "F.Paste")
+			(uuid "a90fbe3f-ce02-4149-b5a4-a73851420798")
+		)
+		(pad "1" smd rect
+			(at 2.77 1.905)
+			(size 1.372 0.71)
+			(layers "F.Cu" "F.Mask")
+			(net 28 "VBAT_FUSED")
+			(uuid "fc17ffb3-dbd9-4d4e-acb2-78688c2eac9d")
+		)
+		(pad "2" smd rect
+			(at 2.77 0.635)
+			(size 1.372 0.71)
+			(layers "F.Cu" "F.Mask")
+			(net 28 "VBAT_FUSED")
+			(uuid "aab166bd-3369-498c-8b32-a06a322838e9")
+		)
+		(pad "3" smd rect
+			(at 2.77 -0.635)
+			(size 1.372 0.71)
+			(layers "F.Cu" "F.Mask")
+			(net 28 "VBAT_FUSED")
+			(uuid "79fdcdc2-c310-49d1-a46e-e2138e8465ce")
+		)
+		(pad "4" smd rect
+			(at 2.77 -1.905)
+			(size 1.372 0.71)
+			(layers "F.Cu" "F.Mask")
+			(net 21 "REV_GATE")
+			(uuid "560ac090-a895-4baa-9f2f-090c84668a6e")
+		)
+		(pad "5" smd rect
+			(at -1.236 -1.905)
+			(size 4.44 0.71)
+			(layers "F.Cu" "F.Mask")
+			(net 29 "VBAT_PROTECTED")
+			(uuid "b6be0a7c-8b76-4559-9efd-9b419f725b5a")
+		)
+		(pad "5" smd rect
+			(at -0.941 -1.27)
+			(size 3.85 0.56)
+			(layers "F.Cu" "F.Mask")
+			(net 29 "VBAT_PROTECTED")
+			(uuid "8e1b550f-e7d2-4139-9f3e-b4290fe3582f")
+		)
+		(pad "5" smd rect
+			(at -0.941 0)
+			(size 3.85 0.56)
+			(layers "F.Cu" "F.Mask")
+			(net 29 "VBAT_PROTECTED")
+			(uuid "e7efc729-06b7-4fb5-92ef-0fa8d30346ad")
+		)
+		(pad "5" smd rect
+			(at -0.941 1.27)
+			(size 3.85 0.56)
+			(layers "F.Cu" "F.Mask")
+			(net 29 "VBAT_PROTECTED")
+			(uuid "dce80b54-89dc-4b88-9b3c-bdf44b1f3737")
+		)
+		(pad "6" smd rect
+			(at -1.236 -0.635)
+			(size 4.44 0.71)
+			(layers "F.Cu" "F.Mask")
+			(net 29 "VBAT_PROTECTED")
+			(uuid "a3dd2e7a-3509-43a2-a735-85300bb187b4")
+		)
+		(pad "7" smd rect
+			(at -1.236 0.635)
+			(size 4.44 0.71)
+			(layers "F.Cu" "F.Mask")
+			(net 29 "VBAT_PROTECTED")
+			(uuid "8cc2bb7b-e161-4125-a33b-a5a0d3b0ae23")
+		)
+		(pad "8" smd rect
+			(at -1.236 1.905)
+			(size 4.44 0.71)
+			(layers "F.Cu" "F.Mask")
+			(net 29 "VBAT_PROTECTED")
+			(uuid "23e98392-adcf-4bc6-927f-9063c94079ac")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste"
+		(layer "F.Cu")
+		(uuid "76e14a08-4b71-41b0-9fbc-0ef9c020dd3d")
+		(at 27.54 56)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "TP2"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "dff544ec-bc08-4e38-8f15-11317bdc6293")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "TP_SHUNT_SRC DFT_PAD_1P70_NOPASTE_REV_A"
+			(at 0 1.65 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "fd05c7a5-b32f-48cd-8f8b-e5a58ebbe927")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "9b540f83-275c-409e-b4ce-bb22415e38ea")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "cbb3fc56-8356-4ad0-9b07-62afabd5d057")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom)
+		(fp_circle
+			(center 0 0)
+			(end 1.15 0)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "0e0146b1-23cf-486e-ac48-04202e48795d")
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 1.7 1.7)
+			(layers "F.Cu" "F.Mask")
+			(net 25 "SHUNT_SOURCE_SENSE")
+			(solder_mask_margin 0.2)
+			(uuid "57389900-769c-4e3e-bc68-80f6bb1d4432")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "NetTie:NetTie-2_SMD_Pad0.5mm"
+		(layer "F.Cu")
+		(uuid "779ac120-69ec-4d9e-836c-2d843c01d38c")
+		(at 79 41)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=GROUND_JOIN|placement=PROVISIONAL_RETURN_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "NT2"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "11d0dcd6-a1db-405b-8c5b-b1e9e51dcf4f")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "2-pad copper net tie NET_TIE_COPPER_REV_A"
+			(at 0 1.2 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4d62fb09-f459-4bd9-9536-56224d9ef037")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "7dd7c474-bc68-41a1-8868-536287e54d60")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4a94e746-563c-4995-906e-25e690e58b01")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr exclude_from_pos_files exclude_from_bom allow_missing_courtyard)
+		(net_tie_pad_groups "1, 2")
+		(fp_poly
+			(pts
+				(xy -0.5 -0.25) (xy 0.5 -0.25) (xy 0.5 0.25) (xy -0.5 0.25)
+			)
+			(stroke
+				(width 0)
+				(type solid)
+			)
+			(fill yes)
+			(layer "F.Cu")
+			(uuid "76df1065-b7df-4fec-a484-33ce71a902de")
+		)
+		(pad "1" smd circle
+			(at -0.5 0)
+			(size 0.5 0.5)
+			(layers "F.Cu")
+			(net 10 "GND_DIGITAL")
+			(uuid "4fa88c5b-a878-427b-940d-d26c71605e3f")
+		)
+		(pad "2" smd circle
+			(at 0.5 0)
+			(size 0.5 0.5)
+			(layers "F.Cu")
+			(net 13 "GND_PWR")
+			(uuid "89875ff2-2bef-465d-a41c-b10a7c55e266")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "DioneyaPWR:Vishay_WSK2512_4T_T1.19mm"
+		(layer "F.Cu")
+		(uuid "7ccbcef5-ad08-44d6-aa03-7260ae68fd3f")
+		(at 36.5 31)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=CURRENT_SENSE|placement=PROVISIONAL_KELVIN_REVIEW_PENDING|authority=PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "RSH1"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "7b21d9f0-044e-4989-a58f-4d20d006b8be")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "WSK2512R0100FEA"
+			(at 0 2.45 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "49ab0c74-3f4f-4514-a16b-3acf306ed42a")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "8d3d2a23-130d-46b5-84a6-f6fbebaed6e2")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "e3247c90-db00-4752-b831-e6f51c3a2228")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_poly
+			(pts
+				(xy -3.5 -1.75) (xy -3.8 -1.45) (xy -3.2 -1.45)
+			)
+			(stroke
+				(width 0.12)
+				(type default)
+			)
+			(fill yes)
+			(layer "F.SilkS")
+			(uuid "85cbe586-efc6-4128-8ce2-9fe5042efc5a")
+		)
+		(fp_rect
+			(start -4.38 -1.9)
+			(end 4.38 1.9)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "55f6cce0-7dc3-4364-b0df-d53a7560b523")
+		)
+		(fp_rect
+			(start -3.175 -1.59)
+			(end 3.175 1.59)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "f736d4ed-0131-44eb-b799-9e98dbf8474a")
+		)
+		(pad "1" smd rect
+			(at -2.985 -0.635)
+			(size 2.29 2.03)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(net 29 "VBAT_PROTECTED")
+			(uuid "0118ca51-ae57-49c8-925f-253f173c6063")
+		)
+		(pad "2" smd rect
+			(at 2.985 0.635)
+			(size 2.29 2.03)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(net 31 "VBAT_SYS")
+			(uuid "fb73400a-a92d-4748-89a0-1b8f6e7729c3")
+		)
+		(pad "3" smd rect
+			(at -3.28 1.27)
+			(size 1.7 0.76)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(net 25 "SHUNT_SOURCE_SENSE")
+			(uuid "cca10d00-d868-4d90-b3fe-1753d2589414")
+		)
+		(pad "4" smd rect
+			(at 3.28 -1.27)
+			(size 1.7 0.76)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(net 24 "SHUNT_LOAD_SENSE")
+			(uuid "af8161dd-f532-4512-a08e-26fffdfe8680")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Capacitor_SMD:C_1210_3225Metric"
+		(layer "F.Cu")
+		(uuid "7d890dde-36c1-41ff-95fd-f9eaf693e371")
+		(at 69 45)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C18"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "f0334249-9817-4f8e-b0a0-6b0d8ac6c719")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "22 uF 25 V X7R CGA6P3X7R1E226M250AB"
+			(at 0 2.3 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2489623c-0c8d-4a7e-8593-70287abbcc3f")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f58456e5-0be8-41cc-b334-6f126ed236b4")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "24301caf-6148-41f2-b8cc-25c3b52e4526")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "26c4af65-12b7-4291-9067-57b59d2195c3")
+		)
+		(fp_line
+			(start -0.711252 1.36)
+			(end 0.711252 1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "dd2c9415-e69e-4742-a8c6-44fee66693b3")
+		)
+		(fp_rect
+			(start -2.3 -1.6)
+			(end 2.3 1.6)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "66c93bfc-fa03-4433-8824-4fa59f592da2")
+		)
+		(fp_rect
+			(start -1.6 -1.25)
+			(end 1.6 1.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "c515927a-6672-44c7-8fdd-5db18eb22d3f")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "5c19bcb1-fd21-4502-89b0-f9eaf50a6287")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 2 "3V3_DIGITAL")
+			(uuid "cbb5ea53-f38c-4709-9674-4bf62916131c")
+		)
+		(pad "2" smd roundrect
+			(at 1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 13 "GND_PWR")
+			(uuid "be0ca70c-d22a-49c1-945f-e84a60982743")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_1210_3225Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "7e1b1de6-a763-4d61-99b4-9c5700fa9f7b")
+		(at 71 51)
+		(descr "DIONEA_PCB_PWR_REV_A|population=DNP|zone=CONTROL_INTERFACE|placement=PROVISIONAL_I2C_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R13"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "f9cab3f6-7654-44dc-a09b-fa0d2fe56aff")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "4.7 kOhm 1% ERJ-2RKF4701X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0f6d1851-f885-4da6-8237-1ea72165441b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "ac347cd9-9d1f-4d37-92c0-8b1974bdca80")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "d90819b8-8e64-42d7-b7c0-2a448903018d")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom dnp)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "5f2c97bf-573e-4e5f-a24b-c96400ef04cc")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "7f9f934c-9880-4912-86e3-0bea634210ab")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "641f4ff5-a603-494c-8398-8083db936082")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "03d17754-8495-4ac6-a9c5-0c5dd884ffb4")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "a75dce4e-03ea-4d2c-8ccb-75f2ea6c714a")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 2 "3V3_DIGITAL")
+			(uuid "bffc6082-d936-46c1-a996-14d9b8c7bd3d")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 14 "I2C2_SCL")
+			(uuid "07e81134-5372-4169-8f46-f72483c5deea")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "DioneyaPWR:LMR60440_RAK0009A"
+		(layer "F.Cu")
+		(uuid "9653d464-afad-4ea9-99e6-4b474376ac18")
+		(at 55 14)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PIN_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "U3"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "9f221151-1036-4186-9038-c26a80ae81d3")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "LMR604403SRAKR"
+			(at 0 2.05 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c2f986a5-a84c-4f26-8507-48aa959fec9c")
+			(effects
+				(font
+					(size 0.7 0.7)
+					(thickness 0.11)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c510c243-6de3-4027-93f8-02369a9dd0ac")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "7d0c59e1-c7f1-4824-954c-8ece3209370e")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -1 -1.38)
+			(end -0.9 -1.48)
+			(stroke
+				(width 0.12)
+				(type default)
+			)
+			(layer "F.SilkS")
+			(uuid "69614ddc-2fcc-42f6-aa46-0f555a57ba4c")
+		)
+		(fp_line
+			(start -0.9 -1.48)
+			(end -0.72 -1.48)
+			(stroke
+				(width 0.12)
+				(type default)
+			)
+			(layer "F.SilkS")
+			(uuid "d9c2280a-dc29-4789-87e6-05c555463c83")
+		)
+		(fp_rect
+			(start -1.5 -1.7)
+			(end 1.5 1.7)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "0aac5c0d-7653-4841-8ca2-f87b7569749f")
+		)
+		(fp_poly
+			(pts
+				(xy -0.9 -1.25) (xy 1 -1.25) (xy 1 1.25) (xy -1 1.25) (xy -1 -1.15)
+			)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "c5ccc4cb-b1b9-44f7-8b03-6071f737b14a")
+		)
+		(pad "" smd roundrect
+			(at -0.92 -0.9275)
+			(size 0.56 0.345)
+			(layers "F.Paste")
+			(roundrect_rratio 0.289855)
+			(uuid "63da1dee-1536-4a22-ac5f-bf2b29933b34")
+		)
+		(pad "" smd roundrect
+			(at -0.92 0.9275)
+			(size 0.56 0.345)
+			(layers "F.Paste")
+			(roundrect_rratio 0.289855)
+			(uuid "554e8f19-fa23-474c-b985-ac382ae0d8cd")
+		)
+		(pad "" smd roundrect
+			(at -0.745 -1.1025)
+			(size 0.21 0.695)
+			(layers "F.Paste")
+			(roundrect_rratio 0.47619)
+			(uuid "dbf4adfd-6d20-4131-a25c-34a0acbf87f0")
+		)
+		(pad "" smd roundrect
+			(at -0.745 1.1025)
+			(size 0.21 0.695)
+			(layers "F.Paste")
+			(roundrect_rratio 0.47619)
+			(uuid "e2b5cef4-6a75-4ed2-8d5e-8321852dc86a")
+		)
+		(pad "" smd roundrect
+			(at -0.65 0)
+			(size 1.1 0.41)
+			(layers "F.Paste")
+			(roundrect_rratio 0.243902)
+			(uuid "92245552-2e17-44b0-830b-dc84a1ad732b")
+		)
+		(pad "" smd custom
+			(at 0 0)
+			(size 0.01 0.01)
+			(layers "F.Mask")
+			(options
+				(clearance outline)
+				(anchor rect)
+			)
+			(primitives
+				(gr_poly
+					(pts
+						(xy -1.15 -0.225) (xy -0.059 -0.225) (xy -0.027 -0.214) (xy 0.037 -0.161) (xy 0.069 -0.15) (xy 1.15 -0.15)
+						(xy 1.2 -0.1) (xy 1.2 0.1) (xy 1.15 0.15) (xy 0.069 0.15) (xy 0.037 0.161) (xy -0.027 0.214) (xy -0.059 0.225)
+						(xy -1.15 0.225) (xy -1.2 0.175) (xy -1.2 -0.175)
+					)
+					(width 0)
+					(fill yes)
+				)
+			)
+			(uuid "ce2bdb96-2275-477d-804f-53f0b045f3b1")
+		)
+		(pad "" smd roundrect
+			(at 0.65 0)
+			(size 1.1 0.3)
+			(layers "F.Paste")
+			(roundrect_rratio 0.333333)
+			(uuid "25e59394-09a3-4f91-8688-bc76344edfd7")
+		)
+		(pad "1" smd roundrect
+			(at -0.9 -0.9275)
+			(size 0.6 0.345)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.289855)
+			(net 31 "VBAT_SYS")
+			(solder_mask_margin 0.05)
+			(uuid "fe882a30-cc3a-4d95-bdbf-5ab2c7a501bc")
+		)
+		(pad "1" smd roundrect
+			(at -0.725 -1.1025)
+			(size 0.25 0.695)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.4)
+			(net 31 "VBAT_SYS")
+			(solder_mask_margin 0.05)
+			(uuid "641dafa3-6db4-4b93-bfb3-cce129b6da73")
+		)
+		(pad "2" smd roundrect
+			(at 0 0)
+			(size 2.5 0.55)
+			(layers "F.Cu")
+			(roundrect_rratio 0.363636)
+			(net 13 "GND_PWR")
+			(uuid "f2aad849-63d5-4370-a9d8-64ea5c0299fc")
+		)
+		(pad "3" smd roundrect
+			(at -0.9 0.9275)
+			(size 0.6 0.345)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.289855)
+			(net 27 "SW_3V8")
+			(solder_mask_margin 0.05)
+			(uuid "fafc47df-6c73-435a-8738-1dd0f90daf23")
+		)
+		(pad "3" smd roundrect
+			(at -0.725 1.1025)
+			(size 0.25 0.695)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.4)
+			(net 27 "SW_3V8")
+			(solder_mask_margin 0.05)
+			(uuid "11195e50-78ea-45c3-8aa5-6464c276f6be")
+		)
+		(pad "4" smd roundrect
+			(at -0.075 1.125)
+			(size 0.25 0.65)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.4)
+			(net 5 "BOOT_3V8")
+			(solder_mask_margin 0.05)
+			(uuid "a6d9c252-a88d-4f26-887b-98b0019b0c97")
+		)
+		(pad "5" smd roundrect
+			(at 0.7 1.175)
+			(size 0.3 0.55)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 19 "PG_3V8")
+			(solder_mask_margin 0.05)
+			(uuid "55acc4ab-aa52-4e79-96d2-effcd3ebf913")
+		)
+		(pad "5" smd roundrect
+			(at 0.9 1)
+			(size 0.7 0.2)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.5)
+			(net 19 "PG_3V8")
+			(solder_mask_margin 0.05)
+			(uuid "3f430b56-cd39-4a29-9faa-e9fb35912428")
+		)
+		(pad "6" smd roundrect
+			(at 0.875 0.525)
+			(size 0.65 0.25)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.4)
+			(net 9 "FB_3V8")
+			(solder_mask_margin 0.05)
+			(uuid "bbe4acb5-3c94-42de-9bd8-12c9885842c5")
+		)
+		(pad "7" smd roundrect
+			(at 0.875 -0.525)
+			(size 0.65 0.25)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.4)
+			(net 18 "MODE_3V8")
+			(solder_mask_margin 0.05)
+			(uuid "472638c7-8ff6-4509-9510-32221f75894f")
+		)
+		(pad "8" smd roundrect
+			(at 0.7 -1.175)
+			(size 0.3 0.55)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 23 "RT_3V8")
+			(solder_mask_margin 0.05)
+			(uuid "b2bb6280-78a6-4a40-acfe-6401c437d284")
+		)
+		(pad "8" smd roundrect
+			(at 0.9 -1)
+			(size 0.7 0.2)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.5)
+			(net 23 "RT_3V8")
+			(solder_mask_margin 0.05)
+			(uuid "17912ba5-c200-43e6-8047-2f77ab39fa1b")
+		)
+		(pad "9" smd roundrect
+			(at -0.075 -1.125)
+			(size 0.25 0.65)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.4)
+			(net 7 "EN_MODEM")
+			(solder_mask_margin 0.05)
+			(uuid "34563f8f-9f8b-4fc1-a6c6-b7367d64784f")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "9a4fb099-7c90-4fe9-9d5b-88500d76db21")
+		(at 53 21)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R4"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "b2e71e05-cd61-4355-b145-5d95e2b37389")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "0 ohm ERJ-2GE0R00X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "15fbce20-eb77-430a-b5f8-44f238534139")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "da934b86-eec9-4134-b564-37a739109bf4")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "908bd418-eb25-453f-b47f-f86a2f041844")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "4c1c4b03-8315-4cbc-a0fb-59d8cb0cac11")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "f47990e2-4201-4550-bd26-4673c9a6d486")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "1574ab61-bc18-4ff6-a074-ac19a821ec33")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "3f5a07a2-5a84-4a91-a514-a587b4f4261d")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "ebe55b16-165c-4c80-a532-60751fd55fdc")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 18 "MODE_3V8")
+			(uuid "5fbd454c-f129-44fb-8dbe-d33002583069")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 13 "GND_PWR")
+			(uuid "1b23ea16-33d3-4247-af32-739a481aa5ee")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "DioneyaPWR:Coilcraft_XAL7030_472"
+		(layer "F.Cu")
+		(uuid "9dfb95c2-e64e-4d3e-a05d-d46c0f740220")
+		(at 62 42)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "L2"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "e86cf4cf-602a-4d1d-b79e-b099e913812f")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "XAL7030-472MEC"
+			(at 0 4.25 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2dc53e87-e27f-490a-8069-3ae97b7184d1")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "54e39ddb-413e-4c6d-86a2-03b030d612ff")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "cc892d8a-1b74-4164-b91f-bab2a87e2374")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_poly
+			(pts
+				(xy 3.3 -3.9) (xy 3.9 -3.9) (xy 3.9 -3.3)
+			)
+			(stroke
+				(width 0.15)
+				(type default)
+			)
+			(fill no)
+			(layer "F.SilkS")
+			(uuid "58da11eb-522b-4362-a189-b806921716f7")
+		)
+		(fp_rect
+			(start -4 -4)
+			(end 4 4)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "72af55a9-6637-4fde-a4ed-ef1fc85aae12")
+		)
+		(fp_rect
+			(start -3.75 -3.75)
+			(end 3.75 3.75)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "a486796a-5690-4307-9afc-7e957885b8e9")
+		)
+		(pad "1" smd rect
+			(at 2.26 0)
+			(size 1.58 6.5)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(net 26 "SW_3V3")
+			(uuid "e54b3038-2972-4b7c-ade8-9540d5529d88")
+		)
+		(pad "2" smd rect
+			(at -2.26 0)
+			(size 1.58 6.5)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(net 2 "3V3_DIGITAL")
+			(uuid "f5a41d08-65bf-450f-b695-0aa560833f3b")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "a302bc45-d7b7-4cab-91a6-4de269a209df")
+		(at 73.5 51)
+		(descr "DIONEA_PCB_PWR_REV_A|population=DNP|zone=CONTROL_INTERFACE|placement=PROVISIONAL_I2C_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R14"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "f5164eaa-3255-45ca-90cd-a7f7d2d0ed66")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "4.7 kOhm 1% ERJ-2RKF4701X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "ad769197-f5af-468b-86fb-fbb7b493a1c3")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "513d3d8d-3acf-4f06-916c-0a8ef5c79aee")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0785d118-a17f-4d9e-8e33-616a36cab1d4")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom dnp)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "bb232372-3a6b-407b-b646-8f0effd25449")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "1e420e78-067f-4e0d-b256-981d5a329b91")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "86124206-bfc0-4319-8782-caa3c2b63294")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "774c1ff8-5c89-413d-99ff-96e6b15f814b")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "766836ab-bc48-4282-8efe-b26a6ef4bbb2")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 2 "3V3_DIGITAL")
+			(uuid "f19dc8a1-713d-47d9-bc40-f0cd1e5261bc")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 15 "I2C2_SDA")
+			(uuid "9178d4b2-5ac9-46fc-8bd7-8817a3d3a33e")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "a6918d6a-ed2c-45b1-b14f-664ea484cd2d")
+		(at 55 49)
+		(descr "DIONEA_PCB_PWR_REV_A|population=DNP|zone=BUCK_3V3|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R9"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "60e25273-1237-470e-9d24-d02323ce3143")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "0 ohm ERJ-2GE0R00X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "68567b50-f23b-47d0-8c8c-ee020a0f00df")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "3c06693a-6028-42e8-af2d-7d9bc867266e")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0dbb91f5-c381-4019-a3be-41c2c5edfdcc")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom dnp)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "85655bc6-acc0-46df-ac49-f5f5b46c47ab")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "51a1792a-d49b-4eee-9649-86f83fda54aa")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "309d3263-e405-4035-af40-45505468af0c")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "dd17e227-ab02-4245-a067-54395a955be2")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "06d85c83-c4cc-429a-b0d8-9870659d1982")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 17 "MODE_3V3")
+			(uuid "ae127c05-b354-4c64-8919-8cf20cee9cac")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 22 "RT_3V3")
+			(uuid "96500bca-34a6-40bb-b2a9-5b2af55f80d7")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "DioneyaPWR:TI_DGS0010A_VSSOP10"
+		(layer "F.Cu")
+		(uuid "ab62f7bb-e30d-40ed-8b16-93207183f363")
+		(at 44 23)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=CURRENT_SENSE|placement=PROVISIONAL_KELVIN_REVIEW_PENDING|authority=PCB_PWR_PIN_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "U2"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "e045a526-102d-4532-9131-3b47fa5542f4")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "INA226AIDGSR"
+			(at 0 2 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "9c27214a-0444-481a-a09d-99754bf9b0ea")
+			(effects
+				(font
+					(size 0.7 0.7)
+					(thickness 0.11)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "5268103e-6a86-4add-9a12-48789cf030a8")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "7f412043-b810-47fd-86e3-7b1780f22247")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_poly
+			(pts
+				(xy -2.3 -1.18) (xy -2.5 -1.38) (xy -2.1 -1.38)
+			)
+			(stroke
+				(width 0.12)
+				(type default)
+			)
+			(fill yes)
+			(layer "F.SilkS")
+			(uuid "76e9aeaf-a669-4e04-9e1e-50d8acb3cdab")
+		)
+		(fp_rect
+			(start -3.18 -1.5)
+			(end 3.18 1.5)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "fbd72a57-1a83-44d9-b6d7-6163b6f34b3b")
+		)
+		(fp_poly
+			(pts
+				(xy -1.55 -1.1) (xy -1.25 -1.5) (xy 1.55 -1.5) (xy 1.55 1.5) (xy -1.55 1.5)
+			)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "8a3884b5-9533-4a4d-8db1-e5d4215698e7")
+		)
+		(pad "1" smd roundrect
+			(at -2.2 -1)
+			(size 1.45 0.3)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 13 "GND_PWR")
+			(solder_mask_margin 0.05)
+			(uuid "ecee993b-f763-450b-8ebb-dcde5c69826c")
+		)
+		(pad "2" smd roundrect
+			(at -2.2 -0.5)
+			(size 1.45 0.3)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 13 "GND_PWR")
+			(solder_mask_margin 0.05)
+			(uuid "fe39a7f4-0649-4496-956f-e074f9bed6d8")
+		)
+		(pad "3" smd roundrect
+			(at -2.2 0)
+			(size 1.45 0.3)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 8 "FAULT")
+			(solder_mask_margin 0.05)
+			(uuid "64924e9b-a6ad-41ca-bcc2-5a642c6ea22f")
+		)
+		(pad "4" smd roundrect
+			(at -2.2 0.5)
+			(size 1.45 0.3)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 15 "I2C2_SDA")
+			(solder_mask_margin 0.05)
+			(uuid "8e327695-e934-43e2-ba6d-d692a2860a90")
+		)
+		(pad "5" smd roundrect
+			(at -2.2 1)
+			(size 1.45 0.3)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 14 "I2C2_SCL")
+			(solder_mask_margin 0.05)
+			(uuid "85324c57-7ef0-45b1-a7d7-86d87cf8e384")
+		)
+		(pad "6" smd roundrect
+			(at 2.2 1)
+			(size 1.45 0.3)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 2 "3V3_DIGITAL")
+			(solder_mask_margin 0.05)
+			(uuid "8128b771-7aa2-46a7-a7ce-4c815c6956a7")
+		)
+		(pad "7" smd roundrect
+			(at 2.2 0.5)
+			(size 1.45 0.3)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 13 "GND_PWR")
+			(solder_mask_margin 0.05)
+			(uuid "defaa163-27a5-4621-a6a2-afb32bb6784b")
+		)
+		(pad "8" smd roundrect
+			(at 2.2 0)
+			(size 1.45 0.3)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 31 "VBAT_SYS")
+			(solder_mask_margin 0.05)
+			(uuid "1b2c19cf-2c84-414b-9ea1-cea603deecff")
+		)
+		(pad "9" smd roundrect
+			(at 2.2 -0.5)
+			(size 1.45 0.3)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 24 "SHUNT_LOAD_SENSE")
+			(solder_mask_margin 0.05)
+			(uuid "bd799a3b-625b-4683-a960-dd687973e783")
+		)
+		(pad "10" smd roundrect
+			(at 2.2 -1)
+			(size 1.45 0.3)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 25 "SHUNT_SOURCE_SENSE")
+			(solder_mask_margin 0.05)
+			(uuid "62b19fd5-3ac7-4322-816e-e43b777b9de9")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Capacitor_SMD:C_1210_3225Metric"
+		(layer "F.Cu")
+		(uuid "afadcc2d-5d75-4231-b4f2-0e81dfc9141b")
+		(at 69 38)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C5"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "97b46b04-dd20-448e-b10d-0cc662150ac5")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "22 uF 25 V X7R CGA6P3X7R1E226M250AB"
+			(at 0 2.3 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "fe8b0083-a740-4eb0-8391-e9a3761cde52")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "6cddf4ef-a21b-457a-92b3-f970b9924547")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "80ce53b0-a5f9-4ab5-a6e2-aca22884f6af")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "232c6157-fd40-4a2b-bf58-bfed18e7566a")
+		)
+		(fp_line
+			(start -0.711252 1.36)
+			(end 0.711252 1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "ecb43467-340f-475c-a1ac-7cb593534968")
+		)
+		(fp_rect
+			(start -2.3 -1.6)
+			(end 2.3 1.6)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "70c09d12-6659-4d38-ae31-2c6bb79b9302")
+		)
+		(fp_rect
+			(start -1.6 -1.25)
+			(end 1.6 1.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "67f5598c-dc2c-4d55-9059-be63c6aa9b4a")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "e2784298-6012-4399-a75d-619da0ef88dd")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 2 "3V3_DIGITAL")
+			(uuid "7cc79e36-a123-4395-9778-2089b8935135")
+		)
+		(pad "2" smd roundrect
+			(at 1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 13 "GND_PWR")
+			(uuid "178a11b7-b1f0-4afa-9b54-315402a1252b")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_1210_3225Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Fuse:Fuse_1206_3216Metric"
+		(layer "F.Cu")
+		(uuid "b2352f23-2459-42ef-a8e7-237f98683cbc")
+		(at 13 29)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=INPUT_PROTECTION|placement=PROVISIONAL_TRANSIENT_REVIEW_PENDING|authority=POWER_COMPONENT_FREEZE_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "F1"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "4111c1d5-e467-4c00-9089-1387851707be")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "0451005.MRL CANDIDATE"
+			(at 0 1.83 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f32cb964-c861-4574-9250-d3c2186d6fc3")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2b2c0064-7642-4edc-8603-aa58ed5637e7")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "33048ef7-76bd-44b9-8246-3c6897b487b2")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.602064 -0.91)
+			(end 0.602064 -0.91)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "3d548f4d-bbaa-41ed-832e-855bb932dc29")
+		)
+		(fp_line
+			(start -0.602064 0.91)
+			(end 0.602064 0.91)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "bacfdfda-53b7-494f-8d5b-8ae46ba80878")
+		)
+		(fp_rect
+			(start -2.28 -1.13)
+			(end 2.28 1.13)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "7df09f90-9d23-474f-9bec-8981b7cea9a0")
+		)
+		(fp_rect
+			(start -1.6 -0.8)
+			(end 1.6 0.8)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "af3c83d6-fa51-4fb7-890d-7713e3a6c781")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "0607db54-3083-4571-b9cd-26181d84036b")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.4 0)
+			(size 1.25 1.75)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.2)
+			(net 30 "VBAT_RAW")
+			(uuid "91e5607c-ca23-40e2-bd4e-e395ac9e01fc")
+		)
+		(pad "2" smd roundrect
+			(at 1.4 0)
+			(size 1.25 1.75)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.2)
+			(net 28 "VBAT_FUSED")
+			(uuid "e3f512f2-6972-40cd-af4e-25455ffe9372")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Fuse.3dshapes/Fuse_1206_3216Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_1210_3225Metric"
+		(layer "F.Cu")
+		(uuid "b5e717b9-9453-427b-b8e6-d78304f33115")
+		(at 69 10)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C3"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "3c5004fb-c661-4b8c-a809-e3517f4b76d1")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "22 uF 25 V X7R CGA6P3X7R1E226M250AB"
+			(at 0 2.3 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c5d8cbd5-0a66-4738-a370-846a0c6cdd7b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c668bf81-b2b8-4dd3-825d-45b4eed7ffd4")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "64ac0d1a-a061-40cc-8bab-882b3bf975ce")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "9e1a7576-1f95-481b-ac5b-d0b2ea6151ed")
+		)
+		(fp_line
+			(start -0.711252 1.36)
+			(end 0.711252 1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "ffac4255-e429-4969-8d84-1cc73c68a5ff")
+		)
+		(fp_rect
+			(start -2.3 -1.6)
+			(end 2.3 1.6)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "bc15882f-cdfe-40a8-8ee2-bdc8ba6c3039")
+		)
+		(fp_rect
+			(start -1.6 -1.25)
+			(end 1.6 1.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "c4fab228-7b7b-4828-be26-49d37859d945")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "67c03a10-2413-4c43-ba00-e631eab9aa5c")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 3 "3V8_MODEM")
+			(uuid "e085ac15-e76b-4892-b65c-3c784b8dd3b4")
+		)
+		(pad "2" smd roundrect
+			(at 1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 13 "GND_PWR")
+			(uuid "8ebfca15-6cb9-46de-b1dd-83a043eeae25")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_1210_3225Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "be28dc7f-6c4c-4d4a-8ec4-b742aa7a3e6b")
+		(at 48 22)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=CURRENT_SENSE|placement=PROVISIONAL_PLACEMENT_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C2"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "ee018cbb-56cd-425e-a2f3-70181c001356")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "100 nF 25 V X7R CGA2B3X7R1E104K050BB"
+			(at 0 1.16 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "36affb96-24f3-43b3-9745-e285f4f869e0")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "87882263-b4b0-4321-a176-39139ec8ae3a")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4afad0a5-1f0a-4aeb-ae06-6ea718a465bf")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.107836 -0.36)
+			(end 0.107836 -0.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "3b51e923-9ce8-499f-b115-270962a6ad42")
+		)
+		(fp_line
+			(start -0.107836 0.36)
+			(end 0.107836 0.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "2971a630-4485-4998-9965-cf4e1ad461e6")
+		)
+		(fp_rect
+			(start -0.91 -0.46)
+			(end 0.91 0.46)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "4548e0c6-51e7-4418-9c0c-8eef41bdb6a7")
+		)
+		(fp_rect
+			(start -0.5 -0.25)
+			(end 0.5 0.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "53c5d64b-587d-476c-be8e-0b6498d2d9e8")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "daa95e81-1728-4af1-9333-1fe7ff2c6f80")
+			(effects
+				(font
+					(size 0.25 0.25)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.48 0)
+			(size 0.56 0.62)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 2 "3V3_DIGITAL")
+			(uuid "27599666-a8cc-4c43-ad02-f8bb5756534e")
+		)
+		(pad "2" smd roundrect
+			(at 0.48 0)
+			(size 0.56 0.62)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 13 "GND_PWR")
+			(uuid "d0462d4d-ab13-41e1-99d2-05dd358d9af6")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "bef662b3-c2c9-460a-bf1b-d14e8df16b09")
+		(at 61 20.5)
+		(descr "DIONEA_PCB_PWR_REV_A|population=DNP|zone=BUCK_3V8|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R15"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "6a142b0d-3aa6-421e-acf0-4cd8c76db0e1")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "10 kOhm 1% ERJ-2RKF1002X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "5bab0890-516b-4633-877a-f76dbb037305")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "a496a5c1-cecb-4069-9e45-4ec6ca0f001e")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "6dc93863-ab60-4730-b5ac-62cc0a70dfa8")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom dnp)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "e73147ba-2141-405a-bebe-429a7dedb616")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "a831d96c-8ffb-435e-b998-908df544d2ec")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "209237f6-4d1c-4e78-8661-19c7a3a0f9e4")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "7a1f30dc-7831-48b2-a9b2-e7f898ce01f2")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "5676a388-2fdb-440e-a752-8dc726e4cb34")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 19 "PG_3V8")
+			(uuid "5d7ad86d-749a-4d3a-98ec-01da8a66ca80")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 2 "3V3_DIGITAL")
+			(uuid "72daec73-f82a-4f9e-a181-378266ac5f9b")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Diode_SMD:D_SMB"
+		(layer "F.Cu")
+		(uuid "c41ed018-0a4a-4830-b1f2-54bfc384205d")
+		(at 14.5 34 90)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=INPUT_PROTECTION|placement=PROVISIONAL_TRANSIENT_REVIEW_PENDING|authority=POWER_COMPONENT_FREEZE_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "D1"
+			(at 1.4 0 90)
+			(layer "F.SilkS")
+			(uuid "6756906e-a923-4bb3-87ec-173db8809190")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "SMBJ18A CANDIDATE"
+			(at 0 3.1 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4fa21ecd-d52d-4f5a-85a9-8d07c424ac9d")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "b6265814-7dc7-45f1-8ed5-1ecce80c5523")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 90)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "e1332e7a-2c63-4935-a722-87f2156401ef")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -3.66 -2.15)
+			(end 2.15 -2.15)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "0394bb8b-ab19-4ec0-b30c-d90938d5647f")
+		)
+		(fp_line
+			(start -3.66 -2.15)
+			(end -3.66 2.15)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "2fadb9c7-fed3-4eb0-84de-f5e53fd596b5")
+		)
+		(fp_line
+			(start -3.66 2.15)
+			(end 2.15 2.15)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "8010f33e-52c8-4163-97c5-2e7781ff942a")
+		)
+		(fp_line
+			(start 3.65 -2.25)
+			(end 3.65 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "303609c9-4569-4341-9afc-76cc7b0e4c8e")
+		)
+		(fp_line
+			(start -3.65 -2.25)
+			(end 3.65 -2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "37e18110-8725-4b96-8c87-f8ad5b26c303")
+		)
+		(fp_line
+			(start 3.65 2.25)
+			(end -3.65 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "35c6c9b2-be97-4255-8619-d376cb020613")
+		)
+		(fp_line
+			(start -3.65 2.25)
+			(end -3.65 -2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(layer "F.CrtYd")
+			(uuid "5bc79187-846c-4007-9ebc-950a665f1ca5")
+		)
+		(fp_line
+			(start 2.3 -2)
+			(end -2.3 -2)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "1526f77d-e871-4fac-8719-34ff82335769")
+		)
+		(fp_line
+			(start 2.3 -2)
+			(end 2.3 2)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "2f0dbf22-0561-4ed2-97b0-b69952b488cc")
+		)
+		(fp_line
+			(start -0.64944 -0.79908)
+			(end -0.64944 0.80112)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "88035ca1-c443-4e4f-b835-f5ab4ff16459")
+		)
+		(fp_line
+			(start 0.50118 0.00102)
+			(end 1.4994 0.00102)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "98b03564-6ef4-4ede-bada-9fb485ee3c92")
+		)
+		(fp_line
+			(start -0.64944 0.00102)
+			(end 0.50118 -0.79908)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "e2451a95-2cb6-47ab-a8b5-02c7227ffb38")
+		)
+		(fp_line
+			(start -0.64944 0.00102)
+			(end -1.55114 0.00102)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "27c5942f-4772-4099-9c84-5a8621dab214")
+		)
+		(fp_line
+			(start -0.64944 0.00102)
+			(end 0.50118 0.75032)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "5cb155cf-27bc-42cd-ad2e-29dd196ee13b")
+		)
+		(fp_line
+			(start 0.50118 0.75032)
+			(end 0.50118 -0.79908)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "093163d5-e011-450d-bd36-9818c441ee5e")
+		)
+		(fp_line
+			(start 2.3 2)
+			(end -2.3 2)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "dd642c04-47ed-4895-833f-67aabb3d3214")
+		)
+		(fp_line
+			(start -2.3 2)
+			(end -2.3 -2)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "c0c5a341-1e9b-4dc8-97b6-7d109d950841")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 -3 90)
+			(layer "F.Fab")
+			(uuid "3f803231-6299-4dba-b5ab-ba9039b1a5a6")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -2.15 0 90)
+			(size 2.5 2.3)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.1086956522)
+			(net 28 "VBAT_FUSED")
+			(uuid "689d32a0-c4a8-4487-a634-f0590c3c385b")
+		)
+		(pad "2" smd roundrect
+			(at 2.15 0 90)
+			(size 2.5 2.3)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.1086956522)
+			(net 13 "GND_PWR")
+			(uuid "285d7d11-a76d-4ea4-bf71-82c157826c4b")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Diode_SMD.3dshapes/D_SMB.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_1210_3225Metric"
+		(layer "F.Cu")
+		(uuid "c9c990dd-a045-4d29-8f37-5e158c18dafb")
+		(at 73 45)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C19"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "26cd85a5-a4e8-43ee-986b-8e7446a2a912")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "22 uF 25 V X7R CGA6P3X7R1E226M250AB"
+			(at 0 2.3 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "7749af43-dd19-4d77-aede-c883e5e10ef8")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "92517cb6-a0fa-49fc-a374-7311a7258255")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f072cbf7-5f84-40fa-8377-e86aa6b90347")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "473f854b-dbcf-420c-89fe-38e68ac3401d")
+		)
+		(fp_line
+			(start -0.711252 1.36)
+			(end 0.711252 1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "9fc51e4b-63bb-43a2-b1ce-dc906aa82f9a")
+		)
+		(fp_rect
+			(start -2.3 -1.6)
+			(end 2.3 1.6)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "cb4bba78-dec3-4f93-83d7-a5310011390d")
+		)
+		(fp_rect
+			(start -1.6 -1.25)
+			(end 1.6 1.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "6dad2974-023c-4f46-9618-c6e94cbef4ca")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "1de37c32-bf7d-4356-bf5d-183619324ae6")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 2 "3V3_DIGITAL")
+			(uuid "9a90a617-d0ab-46f3-a59a-0ca6117a64d4")
+		)
+		(pad "2" smd roundrect
+			(at 1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 13 "GND_PWR")
+			(uuid "ec2d6ba2-0776-45e1-a8f2-c12ca58eb966")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_1210_3225Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_1210_3225Metric"
+		(layer "F.Cu")
+		(uuid "ca871ed9-66af-4ea8-8ae5-4f3f394ba7e3")
+		(at 50 14)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C11"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "c229bd59-26f1-45a7-94b3-a7fc2a7822c5")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "4.7 uF 50 V X7R CGA6P3X7R1H475K250AB"
+			(at 0 2.3 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f8daa8ad-60b4-496a-b090-3e26f68a77ef")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "765b4b00-0e56-4d53-91ba-f6fd70b04e93")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "888fae33-3674-4f58-ac38-4535fa90c117")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "c273f8c8-96fe-413a-8834-6e36df2af444")
+		)
+		(fp_line
+			(start -0.711252 1.36)
+			(end 0.711252 1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "eb66c3fd-97c7-4b5e-8eba-c74303ecfc6a")
+		)
+		(fp_rect
+			(start -2.3 -1.6)
+			(end 2.3 1.6)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "ed7a922d-2912-4c18-bf8b-36cdce84ff67")
+		)
+		(fp_rect
+			(start -1.6 -1.25)
+			(end 1.6 1.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "a4142700-e2cf-4749-aaf7-e5eadd53077b")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "03362a91-034e-4b56-b9d4-4fcaf3a41c6c")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 31 "VBAT_SYS")
+			(uuid "6854e91c-80da-427c-8749-8e23fe1a9472")
+		)
+		(pad "2" smd roundrect
+			(at 1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 13 "GND_PWR")
+			(uuid "b3e52dad-2fce-4e37-bcb7-31e800774e21")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_1210_3225Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste"
+		(layer "F.Cu")
+		(uuid "cc80e382-865d-4f77-b5d6-1e2f497c21a4")
+		(at 25 56)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "TP1"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "bc373da5-f940-4297-8d74-2e3734ca7890")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "TP_VBAT_PROTECTED DFT_PAD_1P70_NOPASTE_REV_A"
+			(at 0 1.65 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "5a3d1fbb-c2d8-42b7-9e69-da4dcf2ffd5a")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1672be3b-5b89-474e-9418-5479e3a47c93")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1ce68996-3212-49a3-9731-85e8be8ba98b")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom)
+		(fp_circle
+			(center 0 0)
+			(end 1.15 0)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "084ffb51-896e-48d0-a712-cd22b98d1327")
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 1.7 1.7)
+			(layers "F.Cu" "F.Mask")
+			(net 29 "VBAT_PROTECTED")
+			(solder_mask_margin 0.2)
+			(uuid "0f26b012-9dc9-4ded-b4a3-660f055234be")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "ce2e5522-ed6d-4228-91ff-aec755dc3dd3")
+		(at 56 19)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_ANALOG_ROUTING_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R1"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "108580ac-7aad-422e-9aa3-9931e19fabb9")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "100 kOhm 0.1% ERA-2AEB104X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "720ce13b-814f-433b-a67b-f2e67977a1f4")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "da0af715-780b-413f-a2f1-31edd8ae5550")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "616b77f7-c77d-4b34-83ec-e3298153ead6")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "80149a87-15a5-433c-be4a-1324e6ef0b37")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "c8330789-7289-462f-9363-5562013e42f4")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "a5920914-69c9-47b4-8cf1-46df70847035")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "64afdc51-d105-42c4-b700-76dde93c120f")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "d8418cbb-f3ed-4aad-b7b5-395b4a170d61")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 3 "3V8_MODEM")
+			(uuid "7dcf1036-1dbf-476a-87ce-63bf69ad3059")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 9 "FB_3V8")
+			(uuid "38eeef89-7c9a-4982-af87-ba1ebf76acec")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste"
+		(layer "F.Cu")
+		(uuid "d0f7664e-4c12-4119-9624-df24a6d6a471")
+		(at 47.86 56)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "TP10"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "9f02f19c-11bb-4f8f-b323-5fe893b51530")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "TP_SDA DFT_PAD_1P70_NOPASTE_REV_A"
+			(at 0 1.65 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "d65a6174-c864-43c6-9d10-45fca738403a")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1c4752da-40db-4ae4-b0ef-ce987fa45b28")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "9a7125cb-3654-489d-bbc4-d3f842b8d005")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom)
+		(fp_circle
+			(center 0 0)
+			(end 1.15 0)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "84735a62-e2ae-47c5-93c3-42343091faf8")
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 1.7 1.7)
+			(layers "F.Cu" "F.Mask")
+			(net 15 "I2C2_SDA")
+			(solder_mask_margin 0.2)
+			(uuid "2f15a26a-6e21-492e-b1f8-1ffab16cf345")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "d125f36b-4f2a-4d69-b857-6f2e90fd077b")
+		(at 52.5 49)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R8"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "6cd8e726-e254-4060-b765-ae4ab17b3d7b")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "0 ohm ERJ-2GE0R00X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "261c5874-29c9-48fb-87e4-6eb93f6441e6")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "47711c61-766d-4339-bfca-4158a0080af0")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "253cf405-88f2-4bb6-8676-6007c4665fbe")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "3d84e713-57d9-44cb-b546-0152ace5502b")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "9bf2d31d-6529-425e-88af-d1b4e39b83a1")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "606eda84-1e40-4c4d-949d-16cb00f98138")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "47acdd1d-a390-4232-8ccc-f4cb4b3d45af")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "a867525b-4dc3-490e-a748-8da588b53636")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 17 "MODE_3V3")
+			(uuid "5d6a1c85-6739-4581-b676-78212227df12")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 13 "GND_PWR")
+			(uuid "088e515f-16a0-44a2-88ea-b1361b8d3b26")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_0603_1608Metric"
+		(layer "F.Cu")
+		(uuid "d53beafb-13ca-41f1-9617-594f8afe1fcc")
+		(at 16 27)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=INPUT_PROTECTION|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C9"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "27574d5b-a4b7-4d06-8ef1-e21741d0b394")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "100 nF 50 V X7R CGA3E2X7R1H104K080AA"
+			(at 0 1.43 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "5c28b7a1-0a97-4239-88b4-4a420095e9af")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f2e87f71-8648-4b1d-86ce-bdd44e0c4883")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "24148a04-ad80-49ac-b164-893afc8bbe10")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.14058 -0.51)
+			(end 0.14058 -0.51)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "3b6b68c8-6c13-44a6-95c3-be8e91589c36")
+		)
+		(fp_line
+			(start -0.14058 0.51)
+			(end 0.14058 0.51)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "668aa220-ae8f-4361-96da-1c2c125094a4")
+		)
+		(fp_rect
+			(start -1.48 -0.73)
+			(end 1.48 0.73)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "bf25b2ba-3d05-445b-b57f-a3525055990a")
+		)
+		(fp_rect
+			(start -0.8 -0.4)
+			(end 0.8 0.4)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "8f207371-293f-4e35-96e4-84e8efc3b49b")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "e9e7502b-ca37-4117-9aef-96124fc8c017")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.775 0)
+			(size 0.9 0.95)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 28 "VBAT_FUSED")
+			(uuid "a0d419ea-616d-416d-b1f0-4a8ddebf3668")
+		)
+		(pad "2" smd roundrect
+			(at 0.775 0)
+			(size 0.9 0.95)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 13 "GND_PWR")
+			(uuid "92aef4de-55f3-4cb8-80c5-d917aed74236")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_0603_1608Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Capacitor_SMD:C_1210_3225Metric"
+		(layer "F.Cu")
+		(uuid "d7226da8-48a9-4b65-8d85-b800b037a732")
+		(at 69 17)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C15"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "9aa5ed8d-d2c8-4e54-9100-33c181a9e191")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "22 uF 25 V X7R CGA6P3X7R1E226M250AB"
+			(at 0 2.3 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "b8e6bbc2-ac10-4e3e-bf6d-2aaf6a5cc90c")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "e7acbc74-b45a-488f-bb21-231a749b1de3")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "d662c905-8fc2-492d-95e9-f318fa7563ca")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "aa56255d-e9e2-49e6-b267-f8fbdc6a2b2a")
+		)
+		(fp_line
+			(start -0.711252 1.36)
+			(end 0.711252 1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "f5e4c01b-d325-4ff5-b5b1-4f3ee429e926")
+		)
+		(fp_rect
+			(start -2.3 -1.6)
+			(end 2.3 1.6)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "c09a6e20-ce80-48a0-bce0-3a85643f84d8")
+		)
+		(fp_rect
+			(start -1.6 -1.25)
+			(end 1.6 1.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "6e0abed5-bd0b-4e1e-8e5e-c5a6dedde8bc")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "e26a27e7-81cd-4b4a-b0a2-043a59c4d3e8")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 3 "3V8_MODEM")
+			(uuid "b380c6e3-d759-4327-a8d7-2701f343e977")
+		)
+		(pad "2" smd roundrect
+			(at 1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 13 "GND_PWR")
+			(uuid "f0c13791-7bb1-4215-b8a8-3d25dbf31d43")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_1210_3225Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste"
+		(layer "F.Cu")
+		(uuid "d8bd4a1e-40be-4e3a-9a2b-dcebbfcf25d1")
+		(at 30.08 56)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "TP3"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "0aa3140c-1c56-4b76-9bd8-7db5d9150e62")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "TP_SHUNT_LOAD DFT_PAD_1P70_NOPASTE_REV_A"
+			(at 0 1.65 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "a91d2ceb-0c84-497c-88e9-73fc98eca9b2")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "ec6c1623-33cb-48b1-9791-0a6541d16885")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0c225409-234c-47aa-a1c6-46b1098fa8e8")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom)
+		(fp_circle
+			(center 0 0)
+			(end 1.15 0)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "81a8de0b-99e4-4d2e-b9c5-2cb9e354f16b")
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 1.7 1.7)
+			(layers "F.Cu" "F.Mask")
+			(net 24 "SHUNT_LOAD_SENSE")
+			(solder_mask_margin 0.2)
+			(uuid "bd743c30-26da-44c9-9f2f-cc3e682f138f")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "DioneyaMain:Molex_43045-1202_MicroFit-12_RA"
+		(layer "F.Cu")
+		(uuid "db670c91-fe1f-476a-9652-f0a72fb11b44")
+		(at 90 56 -90)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=CONTROL_INTERFACE|placement=PROVISIONAL_SERVICE_CLEARANCE_PENDING|authority=PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "J2"
+			(at -1.4 0 270)
+			(layer "F.SilkS")
+			(uuid "1d0f5ace-3a22-4ff8-9df3-0f5cb0843e59")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "43045-1202"
+			(at 7.5 5.7 270)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "575f8953-d4a2-46c6-932d-2e257c4cead3")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 270)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4a625048-7413-4d1b-b580-e964c7490038")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 270)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c1e0febd-2abc-480d-bf80-75d3d98b7aa7")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr through_hole)
+		(fp_rect
+			(start -4.08 -9.42)
+			(end 19.08 4.25)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "7b4afda6-f770-4df0-9e9d-6b0889fbf815")
+		)
+		(fp_rect
+			(start -3.575 -8.92)
+			(end 18.575 0.99)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "1ea26cdb-87a6-43ba-9ab2-624852d8034a")
+		)
+		(pad "" np_thru_hole circle
+			(at 2.15 -4.32 270)
+			(size 3 3)
+			(drill 3)
+			(layers "*.Cu" "*.Mask")
+			(uuid "ade55754-5792-4f0b-a8c2-b24d107aa115")
+		)
+		(pad "" np_thru_hole circle
+			(at 12.85 -4.32 270)
+			(size 3 3)
+			(drill 3)
+			(layers "*.Cu" "*.Mask")
+			(uuid "636a435e-be4f-4a39-b922-dc2b8ae7d46c")
+		)
+		(pad "1" thru_hole roundrect
+			(at 0 0 270)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(roundrect_rratio 0.2)
+			(net 3 "3V8_MODEM")
+			(uuid "5d811d54-4d98-4316-b7d8-e7d23099ffb8")
+		)
+		(pad "2" thru_hole circle
+			(at 3 0 270)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(net 12 "GND_MODEM")
+			(uuid "cc9c01ad-5517-41f4-af74-5beb1e67d114")
+		)
+		(pad "3" thru_hole circle
+			(at 6 0 270)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(net 2 "3V3_DIGITAL")
+			(uuid "861841f1-1b0e-4ce8-84bf-9d7ead92abc2")
+		)
+		(pad "4" thru_hole circle
+			(at 9 0 270)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(net 10 "GND_DIGITAL")
+			(uuid "b185f5ae-6108-4029-a67c-62f77bdb5ce4")
+		)
+		(pad "5" thru_hole circle
+			(at 12 0 270)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(net 1 "1V8_MIC")
+			(uuid "9312f9ab-ab1f-4780-b9a4-47eac6809c5b")
+		)
+		(pad "6" thru_hole circle
+			(at 15 0 270)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(net 11 "GND_MIC")
+			(uuid "88daa285-21c6-41e8-ac39-bd60695130d3")
+		)
+		(pad "7" thru_hole circle
+			(at 0 3 270)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(net 20 "PWR_GOOD")
+			(uuid "b455033d-753e-499f-81ff-1025e66eff00")
+		)
+		(pad "8" thru_hole circle
+			(at 3 3 270)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(net 8 "FAULT")
+			(uuid "6de1a3fb-6634-4238-8949-af2ae7813b6c")
+		)
+		(pad "9" thru_hole circle
+			(at 6 3 270)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(net 7 "EN_MODEM")
+			(uuid "a30a0324-792b-4321-99f9-8bd3b53f2004")
+		)
+		(pad "10" thru_hole circle
+			(at 9 3 270)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(net 6 "EN_AUX")
+			(uuid "63b8fbb2-51cf-4756-a4cd-99c65c9f6c8c")
+		)
+		(pad "11" thru_hole circle
+			(at 12 3 270)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(net 14 "I2C2_SCL")
+			(uuid "400496b6-0ec5-4aee-88e6-71b3aae32d86")
+		)
+		(pad "12" thru_hole circle
+			(at 15 3 270)
+			(size 1.5 1.5)
+			(drill 1.02)
+			(layers "*.Cu" "*.Mask")
+			(remove_unused_layers no)
+			(net 15 "I2C2_SDA")
+			(uuid "8d510ba5-5749-4022-a221-4d61f6eb1a7d")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "DioneyaPWR:LMR60440_RAK0009A"
+		(layer "F.Cu")
+		(uuid "dbe4a6d0-1689-4791-8559-b9258a62c949")
+		(at 55 42)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PIN_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "U4"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "bc9314e5-1b6f-43d8-adae-9a25d5b44a01")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "LMR604403SRAKR"
+			(at 0 2.05 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2cace24d-998d-4886-9c86-6da1812a2296")
+			(effects
+				(font
+					(size 0.7 0.7)
+					(thickness 0.11)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4c87aa3e-6d32-4f58-a86c-0ffa2d73bcad")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "29382624-8070-45ba-8eb2-c476baa2dd2a")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -1 -1.38)
+			(end -0.9 -1.48)
+			(stroke
+				(width 0.12)
+				(type default)
+			)
+			(layer "F.SilkS")
+			(uuid "603ef7ce-165b-47ba-bb48-4ad8b9675146")
+		)
+		(fp_line
+			(start -0.9 -1.48)
+			(end -0.72 -1.48)
+			(stroke
+				(width 0.12)
+				(type default)
+			)
+			(layer "F.SilkS")
+			(uuid "afa89bfa-3d7c-4781-8869-0189476140c2")
+		)
+		(fp_rect
+			(start -1.5 -1.7)
+			(end 1.5 1.7)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "e05b6b9a-9d45-4974-8b4d-794582059a20")
+		)
+		(fp_poly
+			(pts
+				(xy -0.9 -1.25) (xy 1 -1.25) (xy 1 1.25) (xy -1 1.25) (xy -1 -1.15)
+			)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "480079c6-9b59-4e70-a64b-3ff7712e3c96")
+		)
+		(pad "" smd roundrect
+			(at -0.92 -0.9275)
+			(size 0.56 0.345)
+			(layers "F.Paste")
+			(roundrect_rratio 0.289855)
+			(uuid "6ab11dd6-e780-4677-b044-cc16ba42c314")
+		)
+		(pad "" smd roundrect
+			(at -0.92 0.9275)
+			(size 0.56 0.345)
+			(layers "F.Paste")
+			(roundrect_rratio 0.289855)
+			(uuid "f27bb584-07bc-4da6-92f4-85694e511a17")
+		)
+		(pad "" smd roundrect
+			(at -0.745 -1.1025)
+			(size 0.21 0.695)
+			(layers "F.Paste")
+			(roundrect_rratio 0.47619)
+			(uuid "03fd6cd6-0377-452d-b4c6-bd7ccf469c08")
+		)
+		(pad "" smd roundrect
+			(at -0.745 1.1025)
+			(size 0.21 0.695)
+			(layers "F.Paste")
+			(roundrect_rratio 0.47619)
+			(uuid "7e0d6186-4b30-407a-b4c7-b062c8f5333c")
+		)
+		(pad "" smd roundrect
+			(at -0.65 0)
+			(size 1.1 0.41)
+			(layers "F.Paste")
+			(roundrect_rratio 0.243902)
+			(uuid "00370346-099d-4197-84d2-6e5b4c536d9b")
+		)
+		(pad "" smd custom
+			(at 0 0)
+			(size 0.01 0.01)
+			(layers "F.Mask")
+			(options
+				(clearance outline)
+				(anchor rect)
+			)
+			(primitives
+				(gr_poly
+					(pts
+						(xy -1.15 -0.225) (xy -0.059 -0.225) (xy -0.027 -0.214) (xy 0.037 -0.161) (xy 0.069 -0.15) (xy 1.15 -0.15)
+						(xy 1.2 -0.1) (xy 1.2 0.1) (xy 1.15 0.15) (xy 0.069 0.15) (xy 0.037 0.161) (xy -0.027 0.214) (xy -0.059 0.225)
+						(xy -1.15 0.225) (xy -1.2 0.175) (xy -1.2 -0.175)
+					)
+					(width 0)
+					(fill yes)
+				)
+			)
+			(uuid "abf33e1b-237d-40f7-a28b-23af6c08c86b")
+		)
+		(pad "" smd roundrect
+			(at 0.65 0)
+			(size 1.1 0.3)
+			(layers "F.Paste")
+			(roundrect_rratio 0.333333)
+			(uuid "7cdf4546-01a1-47c9-b79d-2bf3116a2928")
+		)
+		(pad "1" smd roundrect
+			(at -0.9 -0.9275)
+			(size 0.6 0.345)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.289855)
+			(net 31 "VBAT_SYS")
+			(solder_mask_margin 0.05)
+			(uuid "2d21a7ad-52a8-4b5e-b7c9-835c9d4f68e0")
+		)
+		(pad "1" smd roundrect
+			(at -0.725 -1.1025)
+			(size 0.25 0.695)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.4)
+			(net 31 "VBAT_SYS")
+			(solder_mask_margin 0.05)
+			(uuid "66050095-dd2a-420f-b9a6-9ec12152b2a1")
+		)
+		(pad "2" smd roundrect
+			(at 0 0)
+			(size 2.5 0.55)
+			(layers "F.Cu")
+			(roundrect_rratio 0.363636)
+			(net 13 "GND_PWR")
+			(uuid "d9e5e7e1-ec08-4139-9183-60358e117561")
+		)
+		(pad "3" smd roundrect
+			(at -0.9 0.9275)
+			(size 0.6 0.345)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.289855)
+			(net 26 "SW_3V3")
+			(solder_mask_margin 0.05)
+			(uuid "f891be6a-8f19-4b28-9fe1-1d720b9e40a6")
+		)
+		(pad "3" smd roundrect
+			(at -0.725 1.1025)
+			(size 0.25 0.695)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.4)
+			(net 26 "SW_3V3")
+			(solder_mask_margin 0.05)
+			(uuid "aa10afa4-8be4-4530-bd8d-942e988aa934")
+		)
+		(pad "4" smd roundrect
+			(at -0.075 1.125)
+			(size 0.25 0.65)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.4)
+			(net 4 "BOOT_3V3")
+			(solder_mask_margin 0.05)
+			(uuid "24b4f83e-3694-4f7b-b3b8-7d6be37ac5c9")
+		)
+		(pad "5" smd roundrect
+			(at 0.7 1.175)
+			(size 0.3 0.55)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 20 "PWR_GOOD")
+			(solder_mask_margin 0.05)
+			(uuid "ad310be6-9584-4fc5-8ecb-c082e80d9fc3")
+		)
+		(pad "5" smd roundrect
+			(at 0.9 1)
+			(size 0.7 0.2)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.5)
+			(net 20 "PWR_GOOD")
+			(solder_mask_margin 0.05)
+			(uuid "1f260d9e-1e01-4981-9c20-5ea47664a8b8")
+		)
+		(pad "6" smd roundrect
+			(at 0.875 0.525)
+			(size 0.65 0.25)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.4)
+			(net 2 "3V3_DIGITAL")
+			(solder_mask_margin 0.05)
+			(uuid "97ea272b-96c8-470d-a2b7-56d41ad9971b")
+		)
+		(pad "7" smd roundrect
+			(at 0.875 -0.525)
+			(size 0.65 0.25)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.4)
+			(net 17 "MODE_3V3")
+			(solder_mask_margin 0.05)
+			(uuid "f39ce87d-433c-468c-b5a0-362bbd0d12d4")
+		)
+		(pad "8" smd roundrect
+			(at 0.7 -1.175)
+			(size 0.3 0.55)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.333333)
+			(net 22 "RT_3V3")
+			(solder_mask_margin 0.05)
+			(uuid "c4361d3b-31ee-4a76-939a-a72bd14f7164")
+		)
+		(pad "8" smd roundrect
+			(at 0.9 -1)
+			(size 0.7 0.2)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.5)
+			(net 22 "RT_3V3")
+			(solder_mask_margin 0.05)
+			(uuid "2a08eb38-194a-45bb-b511-fe774e8184f9")
+		)
+		(pad "9" smd roundrect
+			(at -0.075 -1.125)
+			(size 0.25 0.65)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.4)
+			(net 31 "VBAT_SYS")
+			(solder_mask_margin 0.05)
+			(uuid "d8fa8eca-406d-4c5d-b5b9-6e0e355db895")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "dd1b4d5b-7b1f-46f1-b1a6-eccc98d790e3")
+		(at 55.5 21)
+		(descr "DIONEA_PCB_PWR_REV_A|population=DNP|zone=BUCK_3V8|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R5"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "9b25d65c-7818-48ac-b314-e3ff7c07c5da")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "0 ohm ERJ-2GE0R00X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "602666a5-97c5-4a13-8dc0-ee544512a022")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "297f4318-1c21-4d0c-88f9-743f829a0b5d")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "3f023102-4a89-4932-bc7f-2e2711fee687")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom dnp)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "3f7c6e7a-cf9c-4806-995f-577f1d04b7bf")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "8ba8d3c6-0627-4c1f-9001-91cace362d88")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "14d689c3-a17f-4306-8ff8-8853282a6b21")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "7638ebde-1cf3-4c2f-92d0-9d51e46bfbbb")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "76daeec8-69b8-4196-9c08-b31cafedef78")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 18 "MODE_3V8")
+			(uuid "ef077b73-6b1c-4ec0-ba9a-0a4ef98bdbe8")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 23 "RT_3V8")
+			(uuid "19534324-6866-44c5-a530-e8e0b715fc09")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "NetTie:NetTie-2_SMD_Pad0.5mm"
+		(layer "F.Cu")
+		(uuid "dd68637e-9b46-479b-b11f-38c7f1ebd288")
+		(at 79 44)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=GROUND_JOIN|placement=PROVISIONAL_RETURN_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "NT3"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "d503139a-ffe0-4da3-9524-c0690a605ed9")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "2-pad copper net tie NET_TIE_COPPER_REV_A"
+			(at 0 1.2 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "b3397161-b7bc-4615-945b-7f17ab60b09d")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1fc4e0c8-7b31-45fb-8387-2fba2f362425")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "76084000-233a-4f2f-8d5a-7b9e0c6eaa79")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr exclude_from_pos_files exclude_from_bom allow_missing_courtyard)
+		(net_tie_pad_groups "1, 2")
+		(fp_poly
+			(pts
+				(xy -0.5 -0.25) (xy 0.5 -0.25) (xy 0.5 0.25) (xy -0.5 0.25)
+			)
+			(stroke
+				(width 0)
+				(type solid)
+			)
+			(fill yes)
+			(layer "F.Cu")
+			(uuid "a941fe4b-09b8-4d07-9a93-7c189f8d606b")
+		)
+		(pad "1" smd circle
+			(at -0.5 0)
+			(size 0.5 0.5)
+			(layers "F.Cu")
+			(net 11 "GND_MIC")
+			(uuid "7d944e34-6c8b-4e86-8fe9-73ece4a82da2")
+		)
+		(pad "2" smd circle
+			(at 0.5 0)
+			(size 0.5 0.5)
+			(layers "F.Cu")
+			(net 13 "GND_PWR")
+			(uuid "b3d02399-7a8b-4ebc-8e0c-cbb408c9a0cf")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Capacitor_SMD:C_0603_1608Metric"
+		(layer "F.Cu")
+		(uuid "e245b31a-e4be-4278-afec-0ccb4d9033e5")
+		(at 76 54)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=AUX_1V8|placement=PROVISIONAL_NOISE_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C8"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "eadf0958-10ad-4825-b731-2cf4f450da47")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "2.2 uF 10 V X7R CGA3E1X7R1A225K080AC"
+			(at 0 1.43 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "56eda1ae-c009-4730-bb60-a0c94c99227b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "40051dc1-418f-45c7-8f6c-2d0f56cfc83b")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0da8b31a-66f1-4d5b-8d02-0eee30a484a9")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.14058 -0.51)
+			(end 0.14058 -0.51)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "defdee51-d8b3-417a-909e-eb6645e35f8f")
+		)
+		(fp_line
+			(start -0.14058 0.51)
+			(end 0.14058 0.51)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "d50ff5a8-7754-421d-8b8f-64757719272f")
+		)
+		(fp_rect
+			(start -1.48 -0.73)
+			(end 1.48 0.73)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "ea44d93b-91b4-486d-8e05-d4fb6033dc7d")
+		)
+		(fp_rect
+			(start -0.8 -0.4)
+			(end 0.8 0.4)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "04bbadbe-c265-42c6-b263-dd98550776d2")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "633c657b-e177-4a36-a56a-63ee6790d68c")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.775 0)
+			(size 0.9 0.95)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 1 "1V8_MIC")
+			(uuid "bb5e49b6-c563-444b-b855-bda3482878d0")
+		)
+		(pad "2" smd roundrect
+			(at 0.775 0)
+			(size 0.9 0.95)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 13 "GND_PWR")
+			(uuid "fea8c53a-a047-4a75-af9d-f3fde85dfe52")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_0603_1608Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "Resistor_SMD:R_0402_1005Metric"
+		(layer "F.Cu")
+		(uuid "e60ae725-1c85-49e5-ab45-ea00b07222f0")
+		(at 68.5 49)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=CONTROL_INTERFACE|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "R12"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "42e5b88a-ead7-4dea-9dd5-0098243a399a")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "10 kOhm 1% ERJ-2RKF1002X"
+			(at 0 1.17 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2970938a-eaab-4fb4-a230-80b00b9f347e")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2a235b3a-3ab4-4de8-91c0-5e5c6fe9331c")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "63d7ce98-6157-4f70-aa58-d27342c2a711")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.153641 -0.38)
+			(end 0.153641 -0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "4c1144cf-dd06-47a2-b022-14bc4ba2a809")
+		)
+		(fp_line
+			(start -0.153641 0.38)
+			(end 0.153641 0.38)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "241759dd-c946-4ea2-b8a6-e1488adf3129")
+		)
+		(fp_rect
+			(start -0.93 -0.47)
+			(end 0.93 0.47)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "02525e3d-41f6-4885-a773-5d0abcc298d9")
+		)
+		(fp_rect
+			(start -0.525 -0.27)
+			(end 0.525 0.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "2638bebf-f2ac-4553-b865-e2ba98634318")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "67bfd316-bb41-4037-bf70-4bca295c00c3")
+			(effects
+				(font
+					(size 0.26 0.26)
+					(thickness 0.04)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 2 "3V3_DIGITAL")
+			(uuid "252c1ddb-83ac-4f2b-85df-7c64536cdd59")
+		)
+		(pad "2" smd roundrect
+			(at 0.51 0)
+			(size 0.54 0.64)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.25)
+			(net 8 "FAULT")
+			(uuid "f6c578fe-ed7d-4cd5-8e9e-d2c71ef1f403")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_0402_1005Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "DioneyaPWR:Coilcraft_XAL7030_472"
+		(layer "F.Cu")
+		(uuid "e721b151-6673-4d74-872b-8c9bd0080d80")
+		(at 62 14)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "L1"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "1c6052e0-453c-4dbf-b0db-ef4c448da4cd")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "XAL7030-472MEC"
+			(at 0 4.25 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1b4b866c-eafa-4520-89d9-4cfcdac8c0bf")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "1da75ee0-c5fe-4280-b83b-4885f3c144fc")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "a2918109-e964-4c61-869d-b3a7c40ff1f8")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_poly
+			(pts
+				(xy 3.3 -3.9) (xy 3.9 -3.9) (xy 3.9 -3.3)
+			)
+			(stroke
+				(width 0.15)
+				(type default)
+			)
+			(fill no)
+			(layer "F.SilkS")
+			(uuid "2c5b2577-9b7b-46bf-9ee2-5895600fd641")
+		)
+		(fp_rect
+			(start -4 -4)
+			(end 4 4)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "eedcdeb4-fd27-467f-8bc8-4590617ed86e")
+		)
+		(fp_rect
+			(start -3.75 -3.75)
+			(end 3.75 3.75)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "87ffcd6c-9150-49e4-a5dc-17ce09c36203")
+		)
+		(pad "1" smd rect
+			(at 2.26 0)
+			(size 1.58 6.5)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(net 27 "SW_3V8")
+			(uuid "c58eb890-75cb-4999-8f0b-6ade6bf1dc41")
+		)
+		(pad "2" smd rect
+			(at -2.26 0)
+			(size 1.58 6.5)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(net 3 "3V8_MODEM")
+			(uuid "638b1e7c-7a56-41ee-9123-46447b370223")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Capacitor_SMD:C_1210_3225Metric"
+		(layer "F.Cu")
+		(uuid "f158a3db-d157-4eb1-ad0a-88f743262425")
+		(at 73 10)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "C14"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "c1628b52-5265-4249-84ce-74d08ec6a706")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "22 uF 25 V X7R CGA6P3X7R1E226M250AB"
+			(at 0 2.3 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "e658f033-22c3-4c61-b89c-02670fd2e2dc")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "8fca9d21-5c96-4eba-853a-678d156f8718")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "3ebfd858-40c4-4d12-8ad5-44644e9f9bc0")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_line
+			(start -0.711252 -1.36)
+			(end 0.711252 -1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "63b07cf7-23f9-47d5-8b49-1f997cfcdc05")
+		)
+		(fp_line
+			(start -0.711252 1.36)
+			(end 0.711252 1.36)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "8568976e-3ab9-4d79-8a33-eb38ce7799ba")
+		)
+		(fp_rect
+			(start -2.3 -1.6)
+			(end 2.3 1.6)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "9389aadc-f2fb-4ef9-b6b8-00ac3d85c5af")
+		)
+		(fp_rect
+			(start -1.6 -1.25)
+			(end 1.6 1.25)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "d0ec552f-6b7c-4277-ab9b-096efc777ba4")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "1f54e839-1fca-415b-bd65-02019b627c8a")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at -1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 3 "3V8_MODEM")
+			(uuid "8c466954-01f2-476c-9098-3124d7bf4777")
+		)
+		(pad "2" smd roundrect
+			(at 1.475 0)
+			(size 1.15 2.7)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.217391)
+			(net 13 "GND_PWR")
+			(uuid "636a7db9-1f00-4c3d-8643-b263f10df371")
+		)
+		(embedded_fonts no)
+		(model "${KICAD9_3DMODEL_DIR}/Capacitor_SMD.3dshapes/C_1210_3225Metric.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+	)
+	(footprint "DioneyaMain:TI_DBV0005A_SOT23-5"
+		(layer "F.Cu")
+		(uuid "fa11ca58-2f1a-421c-85da-0024c8b3351a")
+		(at 76 46)
+		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=AUX_1V8|placement=PROVISIONAL_NOISE_REVIEW_PENDING|authority=PCB_PWR_PIN_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "U5"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "5bb33750-9193-43e7-939d-6023bbc8df1a")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "TPS7A2018PDBVR"
+			(at 0 2.2 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "e0d00a4b-49c6-4802-b30d-fb42fb892cef")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "6d4fa140-e23a-4a4c-848c-b6b2b483877e")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "77c956b8-013f-4ada-9df4-92ec053bbc08")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd)
+		(fp_poly
+			(pts
+				(xy -1.48 -1.08) (xy -1.68 -1.28) (xy -1.28 -1.28)
+			)
+			(stroke
+				(width 0.12)
+				(type default)
+			)
+			(fill yes)
+			(layer "F.SilkS")
+			(uuid "771a0eba-4602-43b4-ac93-d103311df001")
+		)
+		(fp_rect
+			(start -2.1 -1.78)
+			(end 2.1 1.78)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "00bad649-307f-4b60-9c99-2f09b6060e8c")
+		)
+		(fp_poly
+			(pts
+				(xy -0.8 -1.05) (xy -0.4 -1.45) (xy 0.8 -1.45) (xy 0.8 1.45) (xy -0.8 1.45)
+			)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "9ea41c11-095d-46b1-9661-7f14c5dbc413")
+		)
+		(pad "1" smd roundrect
+			(at -1.3 -0.95)
+			(size 1.1 0.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.166667)
+			(net 2 "3V3_DIGITAL")
+			(solder_mask_margin 0.07)
+			(uuid "ccec6917-e7b4-41b5-8a77-a7f1d9050e07")
+		)
+		(pad "2" smd roundrect
+			(at -1.3 0)
+			(size 1.1 0.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.166667)
+			(net 13 "GND_PWR")
+			(solder_mask_margin 0.07)
+			(uuid "5b6152c9-7768-4047-9a59-a094e5098e44")
+		)
+		(pad "3" smd roundrect
+			(at -1.3 0.95)
+			(size 1.1 0.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.166667)
+			(net 6 "EN_AUX")
+			(solder_mask_margin 0.07)
+			(uuid "85f619a9-eb7d-45c6-b2d7-4832dc45c6ae")
+		)
+		(pad "4" smd roundrect
+			(at 1.3 0.95)
+			(size 1.1 0.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.166667)
+			(solder_mask_margin 0.07)
+			(uuid "513b39d9-3ecd-448c-b7f5-9f5c15544f04")
+		)
+		(pad "5" smd roundrect
+			(at 1.3 -0.95)
+			(size 1.1 0.6)
+			(layers "F.Cu" "F.Mask" "F.Paste")
+			(roundrect_rratio 0.166667)
+			(net 1 "1V8_MIC")
+			(solder_mask_margin 0.07)
+			(uuid "4a30bd35-d621-4ad0-834e-7c280ea38869")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste"
+		(layer "F.Cu")
+		(uuid "fa2f61a0-fcd1-4180-a528-1f21076b53fa")
+		(at 35.16 56)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "TP5"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "a07ca322-dc00-45da-b0e2-e779a8d2f458")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "TP_PG_3V8 DFT_PAD_1P70_NOPASTE_REV_A"
+			(at 0 1.65 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "850b0d01-abcf-4405-b0fe-ab46b8cffb37")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "013fad39-62fd-4c6a-a3d3-dc231ac3394a")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "320b34b6-7a9a-4f3d-8ede-3f58f2f5b386")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom)
+		(fp_circle
+			(center 0 0)
+			(end 1.15 0)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "399b3d33-5aaa-46d3-a241-4f9bb8b90d1d")
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 1.7 1.7)
+			(layers "F.Cu" "F.Mask")
+			(net 19 "PG_3V8")
+			(solder_mask_margin 0.2)
+			(uuid "8e83e556-a196-4624-876f-1384af99ece2")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "DioneyaPWR:TestPoint_DFT_1.7mm_NoPaste"
+		(layer "F.Cu")
+		(uuid "feab9c5b-b898-42c0-bb08-5993bc266550")
+		(at 32.619999 56)
+		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+		(property "Reference" "TP4"
+			(at 0 -1.4 0)
+			(layer "F.SilkS")
+			(uuid "d7c31fc0-6243-4e4e-a2fb-34b1d4f20388")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Value" "TP_3V8 DFT_PAD_1P70_NOPASTE_REV_A"
+			(at 0 1.65 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "30ae480b-c1bd-4ae6-9b55-1cd1adaa18d5")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2d06a3f9-36e9-4be7-9d4d-5bd52da3a8f5")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 0 0 0)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "07cb4196-6c95-4a5e-9027-c02f54df0330")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(attr smd exclude_from_pos_files exclude_from_bom)
+		(fp_circle
+			(center 0 0)
+			(end 1.15 0)
+			(stroke
+				(width 0.05)
+				(type default)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "708039ac-12b6-4683-ad32-ee9da625e787")
+		)
+		(pad "1" smd circle
+			(at 0 0)
+			(size 1.7 1.7)
+			(layers "F.Cu" "F.Mask")
+			(net 3 "3V8_MODEM")
+			(solder_mask_margin 0.2)
+			(uuid "e283238f-09a1-41ad-a18e-862bd60f03b9")
+		)
+		(embedded_fonts no)
+	)
+	(gr_line
+		(start 0 0)
+		(end 90 0)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "e963c4bd-7753-46eb-ac41-4803624d384d")
+	)
+	(gr_line
+		(start 0 60)
+		(end 0 0)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "93b85011-3096-458c-8241-77b667aae22e")
+	)
+	(gr_line
+		(start 90 0)
+		(end 90 60)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "67fb77fe-5cd1-4418-a31f-826ea03012e8")
+	)
+	(gr_line
+		(start 90 60)
+		(end 0 60)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "Edge.Cuts")
+		(uuid "4cf80a7a-085b-4be1-beb4-43448a7ef388")
+	)
+	(embedded_fonts no)
+)

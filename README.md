@@ -29,11 +29,13 @@
 Входной набор PCB-MAIN синхронизирован с проверенным authority-срезом:
 `MAIN-AUTH-001…011` закрыты, native-схема прошла Review A и присутствует
 неразведённый placement-кандидат платы. Полный native source set PCB-MIC и
-native-схема PCB-PWR также отслеживаются и проверяются в CI; из девяти
-обязательных `.kicad_sch/.kicad_pcb/.kicad_pro` файлов отсутствует только
-`PCB-PWR.kicad_pcb`. Это не разрешает производство: PCB-MAIN routing/Review B,
-PCB-MIC Review A/B и PCB-PWR layout/Review B остаются открыты, производственный
-BOM и Gerber заблокированы. Firmware сохраняет статус `TARGET_PORT_REQUIRED`.
+PCB-PWR также отслеживается и проверяется в CI: все девять обязательных
+`.kicad_sch/.kicad_pcb/.kicad_pro` файлов присутствуют. Плата PCB-PWR пока
+является только неразведённым электрическим placement-canvas с условным контуром
+`90 x 60 mm`, без монтажных отверстий, трасс и copper zones до закрытия
+`DIM-003`. Это не разрешает производство: PCB-MAIN и PCB-PWR routing/Review B,
+PCB-MIC Review A/B, производственный BOM и Gerber заблокированы. Firmware
+сохраняет статус `TARGET_PORT_REQUIRED`.
 На PCB-PWR уже контролируются J1 `Molex 43045-0213`, U1 `LM74700-Q1`,
 U2 `INA226`, Q1 `CSD18540Q5B`, RSH1 `WSK2512R0100FEA`, U3/U4
 `LMR60440`, L1/L2 `XAL7030-472MEC`, U5 `TPS7A20` и J2
@@ -41,7 +43,8 @@ U2 `INA226`, Q1 `CSD18540Q5B`, RSH1 `WSK2512R0100FEA`, U3/U4
 единый per-reference authority с точным candidate MPN/идентификатором, корпусом,
 состоянием установки и pin/net-привязкой; генератор BOM и независимый QG-2 читают
 этот источник без скрытых MPN-констант. Производственный выпуск кандидатов,
-PCB-PWR layout, Review B и аппаратные доказательства остаются открыты.
+финальная механика и трассировка PCB-PWR, Review B и аппаратные доказательства
+остаются открыты.
 
 ## Контроль выпуска
 

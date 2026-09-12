@@ -63,6 +63,8 @@ def endpoint(instance, symbol, pin_number: str) -> tuple[float, float]:
 
 
 def ref_of(footprint) -> str:
+    if footprint.properties.get("Reference"):
+        return str(footprint.properties["Reference"])
     return next((str(item.text) for item in footprint.graphicItems
                  if getattr(item, "type", None) == "reference"), "")
 
@@ -142,6 +144,10 @@ def main() -> int:
         require(footprint.description == description, f"{ref}: placement metadata drift")
         require(footprint.tags == "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN",
                 f"{ref}: provisional interlock tags drift")
+        excluded = population in {"DNP", "PCB_FEATURE"}
+        require(footprint.attributes.excludeFromPosFiles is excluded and
+                footprint.attributes.excludeFromBom is excluded,
+                f"{ref}: BOM/POS exclusion state drift")
 
         pads: dict[str, list[object]] = defaultdict(list)
         for pad in footprint.pads:

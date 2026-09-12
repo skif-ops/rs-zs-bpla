@@ -39,8 +39,12 @@
 
 - версия ветки: `EVT-PRE-20 Rev.A v0.2` от 10.09.2026;
 - `MAIN-AUTH-001…011` закрыты и проходят основной и независимые authority-аудиты;
-- native `PCB-MAIN.kicad_sch/.kicad_pcb` отсутствуют;
-- Review A и Review B не выполнены;
+- все девять native `.kicad_sch/.kicad_pcb/.kicad_pro` файлов PCB-MAIN,
+  PCB-MIC и PCB-PWR присутствуют и контролируются CI;
+- native-схемы PCB-MAIN и PCB-PWR прошли Review A; PCB-MAIN и PCB-PWR имеют
+  только неразведённые placement-кандидаты, причём геометрия PCB-PWR остаётся
+  условной до закрытия `DIM-003`;
+- PCB-MIC Review A и все Review B остаются открыты;
 - производственный BOM, Gerber и статус `FOR_MANUFACTURE` заблокированы;
 - firmware имеет статус `TARGET_PORT_REQUIRED`;
 - аппаратный EVT имеет статус `NOT RUN`.
