@@ -15,6 +15,7 @@ server/data/*.sqlite3
 server/output/
 server/uploads/
 .env
+server/deploy/tls/
 
 # Large/raw datasets kept outside normal Git history
 server/dataset/raw/

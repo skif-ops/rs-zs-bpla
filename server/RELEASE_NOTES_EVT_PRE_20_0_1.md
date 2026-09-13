@@ -30,5 +30,13 @@
   distribution artifact; Docker и CI используют `pip --require-hashes`.
 - Добавлен воспроизводимый CycloneDX 1.6 server SBOM, byte-exact привязанный к
   runtime lock, а также независимые QG-1/QG-2 проверки состава и хешей.
+- Реализована серверная половина MQTT command downstream/ACK: canonical CBOR,
+  Ed25519, 15-минутный TTL, QoS 1 retry до application ACK, station ownership и
+  идемпотентная обработка повторов.
+- Production bridge не публикует unsigned-команды и требует owner-only signing
+  key; Docker build context исключает TLS private keys. Broker ACL разделён для
+  20 station credentials и разрешает каждой станции только собственные topics.
+- Firmware subscribe/parser/Ed25519 verifier/ACK и аппаратный end-to-end остаются
+  открытыми до сборки станций и не объявлены PASS.
 
 Изменение не закрывает security/deployment blockers из `EVT_PRE_20_RELEASE_AUDIT.md` и не является разрешением на internet-facing deployment.

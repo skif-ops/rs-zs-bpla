@@ -14,10 +14,70 @@ Detection schema: `4`
 |---|---|---:|---:|---|---|
 | `zs/v1/{tenant}/{station_id}/up` | station -> server | 1 | false | detection compact CBOR | EXISTS |
 | `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
-| `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | MISSING_BLOCKER |
-| `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | MISSING_BLOCKER |
+| `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | HOST_SERVER_IMPLEMENTED; FIRMWARE_TARGET_PENDING |
+| `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | HOST_SERVER_IMPLEMENTED; FIRMWARE_TARGET_PENDING |
 
 Client ID: `dioneya-{station_id}-{boot_id}`. Clean start запрещён после provisioning; session expiry и keepalive замораживаются после 24-часового теста сети. Повторная доставка QoS 1 ожидаема, дедупликация выполняется по `event_id`, а для команд по `command_id`.
+
+`tenant` is a 1..32 character identifier limited to ASCII letters, digits,
+underscore and hyphen, starting with a letter or digit. MQTT wildcard or path
+characters are rejected before connection. `station_id` is canonical decimal
+uint32 in topics; zero, signs, leading zeroes and overflow are rejected.
+
+### 2.1 Signed command envelope schema 1
+
+`down` uses deterministic canonical CBOR. Ed25519 signs the canonical encoding
+of keys 0..8; key 9 carries the resulting 64-byte signature. The complete
+envelope is limited to 2048 bytes. The server does not publish commands unless
+an explicit signing key is loaded.
+
+| Key | Field | Encoding |
+|---:|---|---|
+| 0 | schema version | uint, currently 1 |
+| 1 | message type | uint, command = 4 |
+| 2 | station_id | uint32 |
+| 3 | command_id | UUID as 16 bytes |
+| 4 | created_time_us | uint64 |
+| 5 | expires_time_us | uint64; maximum and default server TTL is 15 minutes |
+| 6 | command code | uint; `CMD_REQUEST_AUDIO` = 1 |
+| 7 | command payload | CBOR map |
+| 8 | signing key ID | first 8 bytes of SHA-256 over the raw Ed25519 public key |
+| 9 | signature | 64-byte Ed25519 signature over canonical keys 0..8 |
+
+The station must reject an unknown key ID, invalid signature, non-canonical
+encoding, wrong `station_id`, duplicate `command_id`, expired validity interval,
+unsupported command code or malformed payload before any side effect. Public-key
+provisioning and verification on the STM32 target remain open until the target
+receiver is bound and tested.
+
+Execution is allowed only inside `[created_time_us, expires_time_us)`. A station
+without sufficiently trusted time must reject the remote command rather than
+bypass this validity interval.
+
+### 2.2 Command ACK schema 1
+
+`ack` is canonical CBOR limited to 128 bytes. Its authenticity and station
+identity come from MQTT mutual TLS plus the per-station broker ACL. The bridge
+requires equality between the topic station ID, payload station ID and command
+owner in SQLite. Repeated ACK of the same command is idempotent.
+
+| Key | Field | Encoding |
+|---:|---|---|
+| 0 | schema version | uint, currently 1 |
+| 1 | message type | uint, ACK = 5 |
+| 2 | station_id | uint32 |
+| 3 | command_id | UUID as 16 bytes |
+| 4 | result_code | 0 OK, 1 REJECTED, 2 FAILED, 3 EXPIRED |
+| 5 | completed_time_us | uint64 |
+| 6 | detail_code | uint16, 0 when absent |
+
+Broker receipt is not an application ACK. The server persists a command and
+retries it after the configured interval until a valid application ACK arrives
+or the TTL expires. `retain` is always false. For inbound QoS 1 messages the
+bridge uses manual MQTT acknowledgement: valid input is acknowledged only after
+processing and durable storage, malformed input is acknowledged and discarded
+to avoid a poison-message loop, while a transient processing/storage failure is
+left unacknowledged for broker redelivery.
 
 ## 3. Detection compact CBOR
 
@@ -122,6 +182,12 @@ CA, клиентского сертификата и ключа. Явный `--i
 для изолированного стенда и отклоняет heartbeat с cellular identity. До полевого
 развёртывания остаются обязательными provisioning уникальных credentials и
 проверка broker ACL для каждого `station_id`.
+
+Для `down` требуется отдельный Ed25519 private key в unencrypted PKCS#8 PEM.
+Его отсутствие безопасно отключает публикацию команд, не понижая transport до
+unsigned режима. Файл не хранится в Git; raw 32-byte public key provisioned на
+станции отдельным контролируемым процессом. Ротация использует новый key ID и
+период явного доверия к старому и новому public key.
 
 ## 5. HTTPS fallback
 

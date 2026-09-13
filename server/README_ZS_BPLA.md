@@ -18,6 +18,8 @@
 - WebSocket realtime event stream;
 - station command queue and audio request/upload;
 - optional MQTT/TLS bridge process;
+- signed MQTT command downstream with canonical CBOR, Ed25519, TTL/retry and
+  station-bound application ACK; omitted signing key disables downstream;
 - fail-closed station HTTP transport, enabled only on an isolated bench with
   exact opt-in `ZS_STATION_HTTP_INSECURE_BENCH=1`;
 - hierarchical family/type updates use only the latest 4-8 unique feature
@@ -70,8 +72,17 @@ competition to UAV propulsion families; it does not permit a hard type lock.
 Run separately after configuring TLS credentials:
 
 ```bash
-python -m station.mqtt_bridge --host mqtt.example --port 8883 --tenant pilot
+python -m station.mqtt_bridge --host mqtt.example --port 8883 --tenant pilot \
+  --ca /run/tls/ca.crt --cert /run/tls/bridge.crt \
+  --key /run/tls/bridge.key \
+  --command-signing-key /run/tls/command-signing.key
 ```
+
+The command signing key is an owner-only (`0600`) Ed25519 PKCS#8 PEM. Without
+it the bridge remains telemetry-only and will not downgrade to unsigned
+commands. Command delivery uses QoS 1, retain false and durable retries until a
+station-bound application ACK or the 15-minute TTL. The checked-in ACL contains
+separate topic rights for station credentials 01 through 20.
 
 Full IMSI/ICCID is stored in the restricted station record. Do not expose the
 SQLite database or raw status payloads through logs, backups, diagnostics or the

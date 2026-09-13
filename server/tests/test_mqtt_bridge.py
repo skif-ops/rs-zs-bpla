@@ -2,7 +2,7 @@ from argparse import Namespace
 
 import pytest
 
-from station.mqtt_bridge import decode_status_obj, station_id_from_topic, validate_transport
+from station.mqtt_bridge import decode_status_obj, station_id_from_topic, validate_tenant, validate_transport
 
 
 def args(**overrides):
@@ -11,9 +11,10 @@ def args(**overrides):
     return Namespace(**values)
 
 
-def test_topic_binding_accepts_up_and_status():
+def test_topic_binding_accepts_uplink_and_ack_topics():
     assert station_id_from_topic("zs/v1/pilot/17/up", "pilot") == (17, "up")
     assert station_id_from_topic("zs/v1/pilot/17/status", "pilot") == (17, "status")
+    assert station_id_from_topic("zs/v1/pilot/17/ack", "pilot") == (17, "ack")
 
 
 @pytest.mark.parametrize(
@@ -23,11 +24,25 @@ def test_topic_binding_accepts_up_and_status():
         "zs/v1/pilot/17/down",
         "zs/v2/pilot/17/up",
         "zs/v1/pilot/not-a-number/up",
+        "zs/v1/pilot/0/up",
+        "zs/v1/pilot/-1/up",
+        "zs/v1/pilot/01/up",
+        "zs/v1/pilot/4294967296/up",
     ],
 )
 def test_topic_binding_rejects_wrong_scope(topic):
     with pytest.raises(ValueError):
         station_id_from_topic(topic, "pilot")
+
+
+@pytest.mark.parametrize("tenant", ["", "+", "#", "bad/name", "a" * 33])
+def test_tenant_rejects_empty_wildcard_path_and_oversize_values(tenant):
+    with pytest.raises(ValueError, match="tenant"):
+        validate_tenant(tenant)
+
+
+def test_tenant_accepts_bounded_safe_identifier():
+    assert validate_tenant("pilot_01-west") == "pilot_01-west"
 
 
 def test_transport_fails_closed_without_tls_material():

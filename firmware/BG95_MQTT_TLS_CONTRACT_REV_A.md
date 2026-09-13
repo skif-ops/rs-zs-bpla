@@ -80,7 +80,9 @@ and clear online/network-valid flags.
   selected BG95 firmware revision and every pilot operator, after stations are assembled;
 - certificate upload/provisioning and BG95 firmware-version compatibility;
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
-- QoS 1 publish/subscribe, downstream signature validation and store-and-forward;
+- target subscribe/parser, Ed25519 downstream signature validation, ACK publisher
+  and store-and-forward; the server-side canonical envelope, QoS 1 retry and
+  station-bound ACK path are implemented with host tests;
 - power-loss, network-loss, CGNAT, dual-SIM switching and 24-hour test logs after
   stations are assembled;
 - packet capture and broker/modem logs without secrets.

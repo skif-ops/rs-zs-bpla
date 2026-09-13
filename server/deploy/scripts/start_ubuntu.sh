@@ -6,6 +6,8 @@ cd "$deploy_dir"
 mkdir -p ../data ../output
 test -f .env
 test -f tls/ca.crt
+test -f tls/command-signing.key
+test "$(stat -c '%a' tls/command-signing.key)" = "600"
 docker compose --env-file .env -f compose.ubuntu.yml build --pull
 docker compose --env-file .env -f compose.ubuntu.yml up -d
 docker compose --env-file .env -f compose.ubuntu.yml ps

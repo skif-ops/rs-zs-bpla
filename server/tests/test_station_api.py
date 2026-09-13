@@ -70,3 +70,19 @@ def test_http_heartbeat_rejects_full_cellular_identity(insecure_station_http_ben
     response=client.post('/api/v1/stations/9020/heartbeat',json=payload)
     assert response.status_code==400
     assert 'mutual-TLS MQTT status' in response.json()['detail']
+
+
+def test_bench_http_ack_is_bound_to_command_station(insecure_station_http_bench):
+    command=store.create_command(9030,'CMD_REQUEST_AUDIO',{'event_id':9030001})
+    wrong=client.post(f'/api/v1/stations/9031/commands/{command.command_id}/ack')
+    assert wrong.status_code==409
+    accepted=client.post(f'/api/v1/stations/9030/commands/{command.command_id}/ack')
+    assert accepted.status_code==200 and accepted.json()['status']=='acked'
+    duplicate=client.post(f'/api/v1/stations/9030/commands/{command.command_id}/ack')
+    assert duplicate.status_code==200 and duplicate.json()['status']=='duplicate'
+
+
+def test_audio_request_rejects_station_id_outside_topic_uint32():
+    response=client.post('/api/v1/stations/0/audio-request',json={'event_id':1})
+    assert response.status_code==400
+    assert 'uint32' in response.json()['detail']

@@ -25,7 +25,10 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
 ## Блокеры предсерийного deployment
 
 1. FastAPI station endpoints не имеют законченной взаимной аутентификации/authorization для internet-facing deployment.
-2. MQTT downstream/ACK не реализован; server commands сейчас выдаются HTTP polling.
+2. ЧАСТИЧНО: server-side MQTT downstream/ACK реализован с Ed25519, canonical
+   CBOR, TTL/retry до application ACK и тройной привязкой station_id. Открыты
+   firmware subscribe/parser/signature verification/ACK на целевом STM32 и
+   hardware end-to-end evidence.
 3. ЗАКРЫТО: исходные диапазоны разрешены в хешированные Python 3.12 lockfiles;
    production image и CI используют `requirements.lock.txt` с
    `--require-hashes`, а `sbom/server.cdx.json` воспроизводимо генерируется из
@@ -42,6 +45,12 @@ audio upload теперь fail-closed и доступны только при т
 MQTT mTLS. Пункт 1 остаётся открытым до завершения auth/authz операторского
 REST/WebSocket UI и deployment-проверок; это изменение не разрешает публикацию
 FastAPI напрямую в интернет.
+
+Частично закрыт пункт 2: production bridge публикует только подписанные команды,
+не считает broker QoS ACK прикладным подтверждением и безопасно отключает
+downstream без ключа. ACL разрешает каждой station credential только собственные
+`down`/`ack`. Полное закрытие возможно после реализации и target-теста приёмника
+команд в firmware, provisioning public key и проверки на собранных станциях.
 
 До закрытия пунктов сервер разрешён только для разработки или изолированного стенда. Публикация напрямую в интернет запрещена.
 

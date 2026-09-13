@@ -98,16 +98,23 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "server/requirements-ci.lock.txt",
         "server/requirements-protocol.lock.txt",
         "server/sbom/server.cdx.json",
+        "server/.dockerignore",
         "server/station/http_transport.py",
+        "server/station/command_codec.py",
         "server/deploy/compose.windows.yml",
+        "server/deploy/compose.windows.tls.yml",
         "server/deploy/compose.ubuntu.yml",
+        "server/deploy/mosquitto/station_acl.conf",
         "server/deploy/scripts/start_windows.ps1",
         "server/deploy/scripts/start_ubuntu.sh",
+        "tools/generate_command_signing_key.py",
         "tools/generate_server_sbom.py",
         "tools/validate_server_supply_chain.py",
         "tools/audit_server_sbom_technical.py",
         "tools/validate_station_http_transport.py",
         "tools/audit_station_http_transport_technical.py",
+        "tools/validate_mqtt_command_transport.py",
+        "tools/audit_mqtt_command_transport_technical.py",
     ],
     "mechanics_source": [
         "mechanics/common/ACOUSTIC_GEOMETRY.csv",
@@ -314,7 +321,11 @@ def main() -> int:
     print(f"EVT-PRE-20 second-pass release audit: {'PASS' if result['release_ready'] else 'BLOCKED'}")
     for blocker in result["blockers"]:
         print(f"- {blocker}")
-    print(f"report: {output.relative_to(ROOT)}")
+    try:
+        display_output = output.relative_to(ROOT)
+    except ValueError:
+        display_output = output
+    print(f"report: {display_output}")
 
     return 1 if args.strict and not result["release_ready"] else 0
 

@@ -394,11 +394,13 @@ class AudioRequest(BaseModel):
 
 
 class StationCommand(BaseModel):
-    command_id: str
-    station_id: int
+    command_id: str = Field(strict=True)
+    station_id: int = Field(strict=True, ge=1, le=0xFFFFFFFF)
     command: str
     payload: dict = Field(default_factory=dict)
-    created_time_us: int
+    created_time_us: int = Field(strict=True, ge=0)
+    expires_time_us: int = Field(strict=True, ge=1)
+    publish_count: int = Field(default=0, strict=True, ge=0)
 
 
 class TargetEstimate(BaseModel):

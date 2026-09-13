@@ -26,6 +26,21 @@ isolated-bench configurations and must not be used for production.
 - Telegram/mobile notification credentials injected as secrets, not committed.
 - Python packages installed from `requirements.lock.txt` with `--require-hashes`;
   `sbom/server.cdx.json` checked against that exact lock in CI.
+- MQTT command publication requires `/run/tls/command-signing.key`, an
+  unencrypted PKCS#8 Ed25519 private key readable only by its owner. Generate an
+  initial keypair outside Git, from the repository root:
+
+  ```bash
+  python tools/generate_command_signing_key.py \
+    --private server/deploy/tls/command-signing.key \
+    --public server/deploy/tls/command-signing.pub
+  ```
+
+  Provision the exact 32-byte `.pub` file through the controlled station process.
+  Never copy the private file to a station or commit either generated file.
+  Ubuntu startup requires mode `0600`; on Windows restrict the source file with
+  NTFS ACLs to the deployment account and Docker service before using the TLS
+  compose file. Platform permission evidence remains part of the clean-deploy gate.
 
 The station wire messages remain compact CBOR. `station/cbor_codec.py` is the
 reference decoder for interface release 1.5, including detection schema 4 and

@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Any
 from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, StationCommand, SystemEvent
 
+COMMAND_TTL_US = 15 * 60 * 1_000_000
+
 SCHEMA = """
 PRAGMA journal_mode=WAL;
 CREATE TABLE IF NOT EXISTS stations(station_id INTEGER PRIMARY KEY, updated_us INTEGER NOT NULL, payload TEXT NOT NULL);
@@ -13,7 +15,7 @@ CREATE INDEX IF NOT EXISTS idx_det_time ON detections(event_time_us);
 CREATE TABLE IF NOT EXISTS system_events(system_event_id TEXT PRIMARY KEY, created_us INTEGER NOT NULL, event_type TEXT NOT NULL, payload TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS idx_evt_time ON system_events(created_us);
 CREATE TABLE IF NOT EXISTS security_events(event_id INTEGER PRIMARY KEY, station_id INTEGER NOT NULL, created_us INTEGER NOT NULL, payload TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS commands(command_id TEXT PRIMARY KEY, station_id INTEGER NOT NULL, created_us INTEGER NOT NULL, command TEXT NOT NULL, payload TEXT NOT NULL, delivered INTEGER NOT NULL DEFAULT 0, acked INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS commands(command_id TEXT PRIMARY KEY, station_id INTEGER NOT NULL, created_us INTEGER NOT NULL, expires_us INTEGER NOT NULL, command TEXT NOT NULL, payload TEXT NOT NULL, delivered INTEGER NOT NULL DEFAULT 0, acked INTEGER NOT NULL DEFAULT 0, last_publish_us INTEGER NOT NULL DEFAULT 0, publish_count INTEGER NOT NULL DEFAULT 0, ack_result INTEGER, ack_detail INTEGER, completed_us INTEGER);
 CREATE INDEX IF NOT EXISTS idx_cmd_station ON commands(station_id, delivered, acked);
 CREATE TABLE IF NOT EXISTS audio(event_id INTEGER NOT NULL, station_id INTEGER NOT NULL, segment TEXT NOT NULL, path TEXT NOT NULL, codec TEXT, sample_rate INTEGER, created_us INTEGER NOT NULL, PRIMARY KEY(event_id, station_id, segment));
 """
@@ -21,11 +23,27 @@ CREATE TABLE IF NOT EXISTS audio(event_id INTEGER NOT NULL, station_id INTEGER N
 class EventStore:
     def __init__(self, path: Path):
         self.path=path; path.parent.mkdir(parents=True,exist_ok=True); self.lock=threading.RLock()
-        with self._conn() as c: c.executescript(SCHEMA)
+        with self._conn() as c:
+            c.executescript(SCHEMA)
+            self._migrate_commands(c)
         try: os.chmod(path, 0o600)
         except OSError: pass
     def _conn(self):
         c=sqlite3.connect(self.path,timeout=10); c.row_factory=sqlite3.Row; return c
+    def _migrate_commands(self,c):
+        columns={row['name'] for row in c.execute("PRAGMA table_info(commands)")}
+        additions={
+            'expires_us':'INTEGER NOT NULL DEFAULT 0',
+            'last_publish_us':'INTEGER NOT NULL DEFAULT 0',
+            'publish_count':'INTEGER NOT NULL DEFAULT 0',
+            'ack_result':'INTEGER',
+            'ack_detail':'INTEGER',
+            'completed_us':'INTEGER',
+        }
+        for name,definition in additions.items():
+            if name not in columns: c.execute(f"ALTER TABLE commands ADD COLUMN {name} {definition}")
+        c.execute("UPDATE commands SET expires_us=created_us+? WHERE expires_us=0",(COMMAND_TTL_US,))
+        c.execute("CREATE INDEX IF NOT EXISTS idx_cmd_due ON commands(acked,expires_us,last_publish_us,created_us)")
     def get_station_heartbeat(self,station_id:int)->HeartbeatMessage|None:
         with self._conn() as c:
             row=c.execute("SELECT payload FROM stations WHERE station_id=?",(station_id,)).fetchone()
@@ -70,17 +88,39 @@ class EventStore:
                 cellular['imsi_redacted']=f'{imsi[:3]}...{imsi[-4:]}' if len(imsi)>=7 else '***'
                 cellular['iccid_redacted']=f'{iccid[:4]}...{iccid[-4:]}' if len(iccid)>=8 else '***'
         return payloads
-    def create_command(self,station_id:int,command:str,payload:dict)->StationCommand:
-        now=int(time.time()*1e6); cmd=StationCommand(command_id=str(uuid.uuid4()),station_id=station_id,command=command,payload=payload,created_time_us=now)
-        with self.lock,self._conn() as c: c.execute("INSERT INTO commands(command_id,station_id,created_us,command,payload) VALUES(?,?,?,?,?)",(cmd.command_id,station_id,now,command,json.dumps(payload,ensure_ascii=False)))
+    def _command_from_row(self,row)->StationCommand:
+        return StationCommand(command_id=row['command_id'],station_id=row['station_id'],command=row['command'],payload=json.loads(row['payload']),created_time_us=row['created_us'],expires_time_us=row['expires_us'],publish_count=row['publish_count'])
+    def create_command(self,station_id:int,command:str,payload:dict,ttl_us:int=COMMAND_TTL_US)->StationCommand:
+        if type(station_id) is not int or not 0<station_id<=0xFFFFFFFF: raise ValueError('station_id is outside uint32 range')
+        if type(ttl_us) is not int or not 0<ttl_us<=COMMAND_TTL_US: raise ValueError('command TTL must be 1..15 minutes')
+        now=int(time.time()*1e6); expires=now+ttl_us
+        cmd=StationCommand(command_id=str(uuid.uuid4()),station_id=station_id,command=command,payload=payload,created_time_us=now,expires_time_us=expires)
+        with self.lock,self._conn() as c: c.execute("INSERT INTO commands(command_id,station_id,created_us,expires_us,command,payload) VALUES(?,?,?,?,?,?)",(cmd.command_id,station_id,now,expires,command,json.dumps(payload,ensure_ascii=False)))
         return cmd
     def poll_commands(self,station_id:int,limit:int=10)->list[StationCommand]:
+        now=int(time.time()*1e6)
         with self.lock,self._conn() as c:
-            rows=c.execute("SELECT * FROM commands WHERE station_id=? AND delivered=0 ORDER BY created_us LIMIT ?",(station_id,limit)).fetchall()
-            c.executemany("UPDATE commands SET delivered=1 WHERE command_id=?",[(r['command_id'],) for r in rows])
-        return [StationCommand(command_id=r['command_id'],station_id=r['station_id'],command=r['command'],payload=json.loads(r['payload']),created_time_us=r['created_us']) for r in rows]
-    def ack_command(self,command_id:str):
-        with self.lock,self._conn() as c: c.execute("UPDATE commands SET acked=1 WHERE command_id=?",(command_id,))
+            rows=c.execute("SELECT * FROM commands WHERE station_id=? AND delivered=0 AND acked=0 AND expires_us>? ORDER BY created_us LIMIT ?",(station_id,now,limit)).fetchall()
+            c.executemany("UPDATE commands SET delivered=1,last_publish_us=?,publish_count=publish_count+1 WHERE command_id=?",[(now,r['command_id']) for r in rows])
+        return [self._command_from_row(r).model_copy(update={'publish_count':r['publish_count']+1}) for r in rows]
+    def due_commands(self,now_us:int,retry_after_us:int,limit:int=50)->list[StationCommand]:
+        cutoff=now_us-retry_after_us
+        with self._conn() as c:
+            rows=c.execute("SELECT * FROM commands WHERE acked=0 AND expires_us>? AND (last_publish_us=0 OR last_publish_us<=?) ORDER BY created_us LIMIT ?",(now_us,cutoff,limit)).fetchall()
+        return [self._command_from_row(r) for r in rows]
+    def mark_command_published(self,station_id:int,command_id:str,published_us:int)->bool:
+        with self.lock,self._conn() as c:
+            result=c.execute("UPDATE commands SET delivered=1,last_publish_us=?,publish_count=publish_count+1 WHERE command_id=? AND station_id=? AND acked=0",(published_us,command_id,station_id))
+        return result.rowcount==1
+    def ack_command(self,station_id:int,command_id:str,result_code:int=0,detail_code:int=0,completed_us:int|None=None)->str:
+        when=int(time.time()*1e6) if completed_us is None else completed_us
+        with self.lock,self._conn() as c:
+            row=c.execute("SELECT station_id,acked FROM commands WHERE command_id=?",(command_id,)).fetchone()
+            if row is None: return 'unknown'
+            if row['station_id']!=station_id: return 'station_mismatch'
+            if row['acked']: return 'duplicate'
+            c.execute("UPDATE commands SET acked=1,ack_result=?,ack_detail=?,completed_us=? WHERE command_id=? AND station_id=?",(result_code,detail_code,when,command_id,station_id))
+        return 'acked'
     def cleanup(self,retention_days:int=365):
         cutoff=int((time.time()-retention_days*86400)*1e6)
         with self.lock,self._conn() as c:
