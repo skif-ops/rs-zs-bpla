@@ -1,6 +1,6 @@
 # BG95-M3 MQTT/TLS transport contract Rev.A
 
-Status: `HOST CONTRACT + PORTABLE BG95 BINARY COMMAND/ACK, EVENT OUTBOX, FIXED-LENGTH EVENT UPLINK AND LENGTH-DELIMITED RECEIPT PASS / TARGET STORAGE, CRYPTO, UART ROUTING, MODEM AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
+Status: `HOST CONTRACT + PORTABLE BG95 BOUNDED RAW-UART SESSION, BINARY COMMAND/ACK, EVENT OUTBOX, FIXED-LENGTH EVENT UPLINK AND LENGTH-DELIMITED RECEIPT PASS / TARGET STORAGE, CRYPTO, USART-DMA, MODEM AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
 
 This contract extends the portable BG95 state machine from automatic SIM/network
 discovery to an outbound MQTT/TLS session. It does not claim that a particular
@@ -95,8 +95,13 @@ and clear online/network-valid flags.
   starts fixed-length `QMTPUB` of the durable ACK. It sends ACK bytes only after
   `>`, treats `+QMTPUB` success only as broker delivery and reconstructs the ACK
   from the journal on server retry without repeating execution. Partial UART,
-  timeout and mismatched result paths fail closed. While an ACK is in flight the
-  adapter returns `BUSY`; target UART routing must queue/serialize complete URCs.
+  timeout and mismatched result paths fail closed. The portable MQTT session is
+  the sole caller of command, receipt and event bindings: it reconstructs raw
+  fragmented line/prompt/length-delimited input in a 2304-byte bound, assigns a
+  single transmit owner, performs ordered subscriptions, retains one command
+  while transmit is occupied and exposes further arrivals as server-retry
+  required. Disconnect clears the RAM queue and forces resubscription; durable
+  completion still prevents re-execution.
   As with event receipts, `QMTRECV` does not expose retain, so initialization
   requires an external server-only/non-retained per-station ACL assertion.
 - Store-and-forward QG-1/QG-2: `tools/validate_event_outbox_contract.py` and
@@ -137,7 +142,7 @@ and clear online/network-valid flags.
   initialization requires an explicit external assertion that the provisioned
   station credential and per-station broker ACL admit only the server on this
   receipt route and reject retained receipt publication. This assertion is not
-  modem evidence: target UART framing, broker-policy verification and the
+  modem evidence: target USART/DMA framing, broker-policy verification and the
   selected BG95 firmware revision remain open until tested on assembled units.
 
 ## Open evidence
@@ -148,12 +153,13 @@ and clear online/network-valid flags.
 - certificate upload/provisioning and BG95 firmware-version compatibility;
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
 - reviewed Ed25519 backend and public-key provisioning, nonvolatile target-page
-  binding/endurance, target UART routing/scheduling for the host-tested command
+  binding/endurance, target USART/DMA/ISR integration and cache ownership for
+  the host-tested command
   down/ACK and event receipt bindings,
   and outbox
   slot-count/OCTOSPI/endurance binding; the fixed-length
-  event publish/prompt path, length-delimited receipt path and portable fixed-memory
-  parser, topic/QoS/retain boundary, ACK codec and server-side canonical envelope,
+  event publish/prompt path, length-delimited receipt path, portable fixed-memory
+  parser and single-owner MQTT session, topic/QoS/retain boundary, ACK codec and server-side canonical envelope,
   QoS 1 retry, command ACK path and event receipt path have host tests;
 - power-loss, network-loss, CGNAT, dual-SIM switching and 24-hour test logs after
   stations are assembled;

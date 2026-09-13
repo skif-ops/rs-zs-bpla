@@ -55,6 +55,9 @@ def main() -> int:
     bg95_binding_header = read("firmware/include/zs_bg95_command_transport.h")
     bg95_binding_codec = read("firmware/src/zs_bg95_command_transport.c")
     bg95_binding_test = read("firmware/tests/test_bg95_command_transport.c")
+    bg95_session_header = read("firmware/include/zs_bg95_mqtt_session.h")
+    bg95_session_codec = read("firmware/src/zs_bg95_mqtt_session.c")
+    bg95_session_test = read("firmware/tests/test_bg95_mqtt_session.c")
     cmake = read("firmware/CMakeLists.txt")
     vector_generator = read("tools/generate_mqtt_command_vector.py")
     vector_header = read("firmware/generated/zs_command_vector.h")
@@ -338,25 +341,67 @@ def main() -> int:
         "bg95_command_transport",
     ):
         require(token in cmake, f"BG95 command binding is absent from CMake: {token}")
+    for token in (
+        "ZS_BG95_MQTT_SESSION_RX_BYTES 2304u",
+        "ZS_BG95_MQTT_OWNER_COMMAND_SUBSCRIBE",
+        "ZS_BG95_MQTT_OWNER_RECEIPT_SUBSCRIBE",
+        "ZS_BG95_MQTT_OWNER_EVENT_UPLINK",
+        "ZS_BG95_MQTT_OWNER_COMMAND_ACK",
+        "ZS_BG95_MQTT_INPUT_COMMAND_RETRY_REQUIRED",
+        "zs_bg95_mqtt_session_feed_uart",
+        "sole caller of the three child BG95 MQTT bindings",
+        "Target USART/DMA/ISR ownership",
+    ):
+        require(token in bg95_session_header,
+                f"BG95 MQTT session interface missing: {token}")
+    for token in (
+        "qmt_frame_length",
+        "payload_size > ZS_BG95_MQTT_SESSION_RX_BYTES",
+        "session->pending_command",
+        "session->owner == ZS_BG95_MQTT_OWNER_NONE",
+        "zs_bg95_command_transport_on_prompt",
+        "zs_bg95_event_uplink_on_prompt",
+        "zs_bg95_mqtt_invalidate",
+    ):
+        require(token in bg95_session_codec,
+                f"BG95 MQTT session guard missing: {token}")
+    for token in (
+        "test_serialized_fragmented_end_to_end_lifecycle",
+        "test_binary_payload_and_protocol_guards",
+        "test_disconnect_discards_ram_queue_and_resubscribes",
+        "ZS_BG95_MQTT_INPUT_COMMAND_QUEUED",
+        "ZS_BG95_MQTT_INPUT_COMMAND_RETRY_REQUIRED",
+        "binary_payload",
+    ):
+        require(token in bg95_session_test,
+                f"BG95 MQTT session QG-2 case missing: {token}")
+    for token in (
+        "src/zs_bg95_mqtt_session.c",
+        "zs_bg95_mqtt_session_tests",
+        "bg95_mqtt_session",
+    ):
+        require(token in cmake, f"BG95 MQTT session is absent from CMake: {token}")
     require(
-        "command_binary_mqtt_transport: PORTABLE_EXACT_TOPIC_PAYLOAD_LENGTH_QG1_QG2_PASS_BG95_LENGTH_URC_FIXED_LENGTH_ACK_BOUND_TARGET_PENDING"
+        "command_binary_mqtt_transport: PORTABLE_EXACT_TOPIC_PAYLOAD_LENGTH_QG1_QG2_PASS_BG95_SESSION_ROUTED_TARGET_PENDING"
         in target_status,
         "target status omits the portable BG95 command binding",
     )
     require(
-        "command_bg95_binding: PORTABLE_LENGTH_ENABLED_BINARY_QMTRECV_FIXED_LENGTH_ACK_QG1_QG2_PASS_TARGET_UART_RETAIN_POLICY_AND_HARDWARE_PENDING"
+        "mqtt_uart_session: PORTABLE_BOUNDED_RAW_UART_FRAMER_SINGLE_TX_OWNER_QG1_QG2_PASS_TARGET_USART_DMA_ISR_CACHE_AND_MODEM_PENDING"
         in target_status and
-        "command_mqtt_binding: PORTABLE_BG95_LENGTH_URC_FIXED_LENGTH_ACK_QG1_QG2_PASS_TARGET_UART_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
+        "command_bg95_binding: PORTABLE_LENGTH_ENABLED_BINARY_QMTRECV_FIXED_LENGTH_ACK_SESSION_SERIALIZED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING"
         in target_status and
-        "command_mqtt_subscription_ack_binding: PORTABLE_BG95_LENGTH_URC_FIXED_LENGTH_ACK_QG1_QG2_PASS_TARGET_UART_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
+        "command_mqtt_binding: PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
+        in target_status and
+        "command_mqtt_subscription_ack_binding: PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
         in target_status,
         "target BG95 command blockers are not bounded",
     )
 
-    require("PORTABLE_BG95_LENGTH_URC_FIXED_LENGTH_ACK_QG_PASS; TARGET_CRYPTO_UART_RETAIN_POLICY_AND_HARDWARE_PENDING" in icd,
+    require("PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING" in icd,
             "ICD does not report the bounded implementation status")
     require("The BG95 command binding" in firmware_contract and
-            "target UART routing must queue/serialize complete URCs" in firmware_contract,
+            "target USART/DMA/ISR integration" in firmware_contract,
             "firmware target gap is not explicit")
     for token in ("tamper", "retry", "ownership", "duplicate"):
         require(token in tests, f"negative/robustness test missing: {token}")
@@ -378,7 +423,7 @@ def main() -> int:
             "portable binary MQTT boundary test is not bound to CTest")
 
     print("MQTT signed command transport QG-1: PASS")
-    print("scope: server + durable firmware channel + BG95 length-URC/fixed-length ACK host binding; target crypto/UART/retain policy/hardware remain pending")
+    print("scope: server + durable firmware + BG95 bounded raw-UART session/ACK host path; target crypto/USART-DMA/retain policy/hardware remain pending")
     return 0
 
 

@@ -141,51 +141,80 @@ def audit_firmware_vector() -> None:
 def audit_firmware_bg95_runtime() -> None:
     compiler = shutil.which("cc") or shutil.which("gcc")
     require(compiler is not None, "host C compiler is unavailable")
-    sources = (
-        "firmware/tests/test_bg95_command_transport.c",
-        "firmware/src/zs_bg95_command_transport.c",
-        "firmware/src/zs_bg95_mqtt_binary.c",
-        "firmware/src/zs_bg95.c",
-        "firmware/src/zs_mqtt_command_transport.c",
-        "firmware/src/zs_command_channel.c",
-        "firmware/src/zs_command_trust.c",
-        "firmware/src/zs_command_journal.c",
-        "firmware/src/zs_command.c",
-        "firmware/src/zs_cbor.c",
-        "firmware/src/zs_sha256.c",
+    tests = (
+        (
+            "zs_bg95_command_transport_tests",
+            (
+                "firmware/tests/test_bg95_command_transport.c",
+                "firmware/src/zs_bg95_command_transport.c",
+                "firmware/src/zs_bg95_mqtt_binary.c",
+                "firmware/src/zs_bg95.c",
+                "firmware/src/zs_mqtt_command_transport.c",
+                "firmware/src/zs_command_channel.c",
+                "firmware/src/zs_command_trust.c",
+                "firmware/src/zs_command_journal.c",
+                "firmware/src/zs_command.c",
+                "firmware/src/zs_cbor.c",
+                "firmware/src/zs_sha256.c",
+            ),
+        ),
+        (
+            "zs_bg95_mqtt_session_tests",
+            (
+                "firmware/tests/test_bg95_mqtt_session.c",
+                "firmware/src/zs_bg95_mqtt_session.c",
+                "firmware/src/zs_bg95_command_transport.c",
+                "firmware/src/zs_bg95_event_receipt.c",
+                "firmware/src/zs_bg95_event_uplink.c",
+                "firmware/src/zs_bg95_mqtt_binary.c",
+                "firmware/src/zs_bg95.c",
+                "firmware/src/zs_mqtt_command_transport.c",
+                "firmware/src/zs_command_channel.c",
+                "firmware/src/zs_command_trust.c",
+                "firmware/src/zs_command_journal.c",
+                "firmware/src/zs_command.c",
+                "firmware/src/zs_mqtt_event_transport.c",
+                "firmware/src/zs_event_receipt.c",
+                "firmware/src/zs_event_outbox.c",
+                "firmware/src/zs_protocol.c",
+                "firmware/src/zs_cbor.c",
+                "firmware/src/zs_sha256.c",
+            ),
+        ),
     )
     with tempfile.TemporaryDirectory(prefix="zs-command-fw-qg2-") as directory:
-        binary = Path(directory) / "zs_bg95_command_transport_tests"
-        result = subprocess.run(
-            [
-                compiler,
-                "-std=gnu11",
-                "-Wall",
-                "-Wextra",
-                "-Wpedantic",
-                "-Werror",
-                "-O2",
-                "-UNDEBUG",
-                f"-I{ROOT / 'firmware/include'}",
-                f"-I{ROOT / 'firmware/generated'}",
-                *(str(ROOT / source) for source in sources),
-                "-lm",
-                "-o",
-                str(binary),
-            ],
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        require(result.returncode == 0,
-                f"BG95 command test compile failed: {result.stderr}")
-        result = subprocess.run(
-            [str(binary)], check=False, capture_output=True, text=True
-        )
-        require(result.returncode == 0,
-                f"BG95 command test failed: {result.stderr}")
-        require("zs_bg95_command_transport_tests: OK" in result.stdout,
-                "BG95 command test did not report success")
+        for test_name, sources in tests:
+            binary = Path(directory) / test_name
+            result = subprocess.run(
+                [
+                    compiler,
+                    "-std=gnu11",
+                    "-Wall",
+                    "-Wextra",
+                    "-Wpedantic",
+                    "-Werror",
+                    "-O2",
+                    "-UNDEBUG",
+                    f"-I{ROOT / 'firmware/include'}",
+                    f"-I{ROOT / 'firmware/generated'}",
+                    *(str(ROOT / source) for source in sources),
+                    "-lm",
+                    "-o",
+                    str(binary),
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            require(result.returncode == 0,
+                    f"{test_name} compile failed: {result.stderr}")
+            result = subprocess.run(
+                [str(binary)], check=False, capture_output=True, text=True
+            )
+            require(result.returncode == 0,
+                    f"{test_name} failed: {result.stderr}")
+            require(f"{test_name}: OK" in result.stdout,
+                    f"{test_name} did not report success")
 
 
 def main() -> int:
@@ -345,7 +374,7 @@ def main() -> int:
                 "transient error log is absent or exposes exception details")
 
     print("MQTT signed command transport QG-2: PASS")
-    print("scope: host runtime + signed vector + BG95 length-URC/fixed-length ACK; target crypto/UART/retain policy/hardware remain pending")
+    print("scope: host runtime + signed vector + BG95 bounded raw-UART session/fixed ACK; target crypto/USART-DMA/retain policy/hardware remain pending")
     return 0
 
 

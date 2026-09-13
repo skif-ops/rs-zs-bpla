@@ -75,8 +75,12 @@ and hardware integration. Portable BG95 AT binding now confirms pre-connect
 length mode, subscribes to exact `down` at QoS 1, parses binary `QMTRECV` by
 declared length and publishes the durable ACK with fixed-length `QMTPUB`. A
 server retry after UART failure returns the journaled ACK without re-execution.
-Target UART serialization, retain-policy verification, reviewed crypto/Flash
-binding and assembled-station evidence remain open.
+A portable 2304-byte raw-UART session now serializes both subscriptions, event
+publish and command ACK with one TX owner, preserves length-delimited binary
+URCs across arbitrary input chunks, queues one command behind an active publish
+and records further frames as server-retry required. Target USART1 DMA/ISR/cache
+integration, retain-policy verification, reviewed crypto/Flash binding and
+assembled-station evidence remain open.
 
 The portable event outbox now atomically commits complete schema-4 detection
 CBOR with metadata CRC32 and payload SHA-256, orders pending events by priority
@@ -106,6 +110,8 @@ receive с обязательным payload length; receipt binding после c
 успех этого шага, выполняет exact QoS-1 subscription и передаёт
 length-delimited binary `+QMTRECV` в application-receipt validator. В URC нет
 retain-флага, поэтому init требует явный server-only/non-retained broker ACL
-contract; это не является target-доказательством. Target UART routing, реальная
+contract; это не является target-доказательством. Portable session уже
+маршрутизирует fragmented line/prompt/binary input и сериализует MQTT TX, но
+target USART1 DMA/ISR/cache wiring, реальная
 форма URC выбранной версии modem firmware, broker-policy verification и
 assembled-station recovery остаются release blockers.

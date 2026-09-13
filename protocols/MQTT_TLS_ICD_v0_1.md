@@ -12,11 +12,11 @@ Detection schema: `4`
 
 | Topic | Направление | QoS | Retain | Payload | Статус реализации |
 |---|---|---:|---:|---|---|
-| `zs/v1/{tenant}/{station_id}/up` | station -> server | 1 | false | detection compact CBOR | PORTABLE_BG95_FIXED_LENGTH_BINARY_QMTPUB_QG_PASS; TARGET_UART_AND_HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/up` | station -> server | 1 | false | detection compact CBOR | PORTABLE_BG95_SESSION_FIXED_LENGTH_QMTPUB_QG_PASS; TARGET_USART_DMA_AND_HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
-| `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | PORTABLE_BG95_LENGTH_URC_FIXED_LENGTH_ACK_QG_PASS; TARGET_CRYPTO_UART_RETAIN_POLICY_AND_HARDWARE_PENDING |
-| `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | PORTABLE_BG95_LENGTH_URC_FIXED_LENGTH_ACK_QG_PASS; TARGET_CRYPTO_UART_RETAIN_POLICY_AND_HARDWARE_PENDING |
-| `zs/v1/{tenant}/{station_id}/receipt` | server -> station | 1 | false | event application receipt | PORTABLE_BG95_LENGTH_DELIMITED_QMTRECV_QG_PASS; TARGET_UART_RETAIN_POLICY_AND_HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/receipt` | server -> station | 1 | false | event application receipt | PORTABLE_BG95_SESSION_LENGTH_DELIMITED_QMTRECV_QG_PASS; TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
 
 Client ID: `dioneya-{station_id}-{boot_id}`. Clean start запрещён после provisioning; session expiry и keepalive замораживаются после 24-часового теста сети. Повторная доставка QoS 1 ожидаема, дедупликация выполняется по `event_id`, а для команд по `command_id`.
 
@@ -64,7 +64,7 @@ The portable trust adapter supports a bounded rotation set of four public keys,
 derives each key ID from the raw key, rejects duplicates, zero keys, disabled-only
 sets and unknown IDs, and delegates the actual signature operation to a required
 backend. Production key provisioning, a reviewed target Ed25519 backend and
-target UART integration remain open. The portable BG95
+target USART/DMA/ISR integration remain open. The portable BG95
 subscription/receive/ACK path has host evidence only and is not a production
 crypto or assembled-station PASS.
 
@@ -131,12 +131,20 @@ the same ACK without repeating execution.
 
 The `+QMTRECV` URC exposes no retain flag, so command initialization requires
 the same externally verified station credential, exact ACL, server-only
-publisher and non-retained-route assertion described below. While one ACK is
-awaiting prompt/result, the adapter reports `BUSY`; the target UART dispatcher
-must serialize or queue complete URCs. The server continues to republish a
-command until its application ACK, so a transport failure does not authorize
-loss or a repeated side effect. Target UART scheduling, selected-modem firmware,
-broker policy and hardware recovery remain blockers.
+publisher and non-retained-route assertion described below.
+
+The portable BG95 MQTT session is the sole caller of command, receipt and event
+bindings. Its 2304-byte bounded framer consumes arbitrary raw UART chunks,
+distinguishes line responses and data prompts, and reconstructs `QMTRECV` by the
+declared payload length. One transaction owns MQTT transmit at a time: command
+subscription, receipt subscription, event publish or command ACK. If a command
+arrives while another transaction owns transmit, one complete frame is retained
+in a bounded RAM slot; further frames are dropped with an explicit server-retry
+counter. The server continues to republish until application ACK, and the
+durable command journal prevents repeated side effects. Disconnect discards the
+RAM slot and forces ordered resubscription. Target USART DMA/ISR wiring, buffer
+cache ownership, selected-modem firmware, broker policy and hardware recovery
+remain blockers; the portable session is not target evidence.
 
 ### 2.3 Event application receipt schema 1
 
@@ -193,7 +201,7 @@ therefore assert `retain=false` only when target integration has independently
 verified the station credential, exact per-station ACL, server-only publisher
 and broker rule forbidding retained receipt publication. The API requires that
 external assertion at initialization. This is a documented residual boundary,
-not an inferred modem property; selected-firmware URC behavior, UART routing
+not an inferred modem property; selected-firmware URC behavior, USART DMA wiring
 and broker policy still require assembled-station evidence.
 
 The server stores the exact payload hash and processing state before publishing
@@ -206,8 +214,9 @@ Server process state and MQTT callbacks must remain serialized per deployment;
 multi-worker receipt processing requires an equivalent transactional claim.
 
 The deterministic server-generated receipt vector is checked by both Python and
-C tests. Fixed-length BG95 event publication and length-delimited receipt
-subscription/URC parsing have portable host evidence. Target UART routing,
+C tests. Fixed-length BG95 event publication, length-delimited receipt parsing
+and their single-owner raw-UART session have portable host evidence. Target USART
+DMA/ISR integration,
 selected-modem-firmware framing, retain-policy verification and target outbox
 storage are still release blockers; portable host evidence is not
 assembled-station evidence.
@@ -357,8 +366,9 @@ MQTT PUBACK не является application ACK. Станция помечае
 только после проверенного server application receipt из раздела 2.3; torn ACK
 marker остаётся pending, поэтому recovery имеет семантику at-least-once и может
 повторить тот же `event_id`. Серверная схема и portable firmware parser проходят
-host QG-1/QG-2. Portable BG95 receive binding также проходит host QG;
-production outbox slot count, target UART/OCTOSPI binding, retain policy,
+host QG-1/QG-2. Portable BG95 receive binding и bounded single-owner raw-UART
+session также проходят host QG; production outbox slot count, target
+USART-DMA/OCTOSPI binding, retain policy,
 wear/endurance и аппаратная recovery-проверка пока открыты; portable QG не
 закрывает `REQ-CELL-003`.
 

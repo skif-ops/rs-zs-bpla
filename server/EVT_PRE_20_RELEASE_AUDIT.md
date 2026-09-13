@@ -38,7 +38,7 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    `QMTPUB` durable ACK; UART failure сохраняет completed journal result, а
    server retry не повторяет side effect. Из-за отсутствия retain-флага в URC
    init требует внешний server-only/non-retained ACL contract. Открыты target
-   UART scheduling, reviewed Ed25519 backend, public-key provisioning, Flash
+   USART/DMA/ISR/cache integration, reviewed Ed25519 backend, public-key provisioning, Flash
    page/endurance binding, broker-policy и hardware end-to-end evidence.
 3. ЗАКРЫТО: исходные диапазоны разрешены в хешированные Python 3.12 lockfiles;
    production image и CI используют `requirements.lock.txt` с
@@ -60,7 +60,7 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    connect требует успех этого шага, выполняет exact QoS-1 subscription и
    binary-safe parser. Поскольку `+QMTRECV` не показывает retain-флаг, init
    требует внешний station ACL/server-only/non-retained contract. Открыты
-   production slot count, target UART routing/scheduling и проверка этого
+   production slot count, target USART/DMA/ISR/cache wiring и проверка этого
    broker contract. Fixed-length BG95 event
    `QMTPUB`/prompt/binary/result path проходит host QG и не трактует PUBACK как
    application receipt. Target memory-map/OCTOSPI/endurance и аппаратный recovery
@@ -78,15 +78,17 @@ FastAPI напрямую в интернет.
 Частично закрыт пункт 2: production bridge публикует только подписанные команды,
 не считает broker QoS ACK прикладным подтверждением и безопасно отключает
 downstream без ключа. ACL разрешает каждой station credential только собственные
-`down`/`ack`. Portable BG95 receive/ACK binding проходит host QG. Полное закрытие
-возможно после target UART integration, production crypto/Flash binding,
+`down`/`ack`. Portable BG95 receive/ACK binding и bounded raw-UART session с
+единым TX owner проходят host QG; один command frame может ожидать занятого
+publish, следующие полагаются на application-ACK retry. Полное закрытие
+возможно после target USART/DMA/ISR integration, production crypto/Flash binding,
 provisioning public key, broker-policy и проверки на собранных станциях.
 
 Частично закрыт пункт 7: host outbox обеспечивает at-least-once и не вытесняет
 pending events, а server/portable-firmware application receipt подтверждает
 только exact payload после durable processing. MQTT PUBACK не считается таким
-подтверждением. Portable BG95 receipt binding закрыт только на host; до target
-UART/modem/broker-policy проверки события после восстановления сети не разрешено
+подтверждением. Portable BG95 receipt binding и session routing закрыты только
+на host; до target USART/DMA/modem/broker-policy проверки события после восстановления сети не разрешено
 удалять в изделии. Непересечение portable NOR-разделов проверено на host, но
 production slot count и физическая target-разметка ещё не утверждены.
 

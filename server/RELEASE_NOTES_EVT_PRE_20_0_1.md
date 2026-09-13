@@ -55,8 +55,12 @@
 - Portable BG95 command binding подписывается на exact `down` с QoS 1,
   разбирает length-delimited binary `QMTRECV` и публикует journal-backed ACK
   через fixed-length `QMTPUB`. При UART failure server retry восстанавливает ACK
-  без повторного выполнения; target UART serialization и внешний
-  server-only/non-retained ACL contract остаются обязательными.
+  без повторного выполнения; внешний server-only/non-retained ACL contract
+  остаётся обязательным.
+- Portable bounded raw-UART session собирает fragmented line/prompt/QMTRECV,
+  последовательно выполняет обе subscription и даёт единственного TX owner для
+  event publish или command ACK. Один command ожидает занятого TX в RAM, а
+  дальнейшие доставки требуют штатного server application-ACK retry.
 - Portable event outbox атомарно сохраняет полный schema-4 CBOR с metadata CRC32
   и SHA-256, выбирает priority/FIFO, не вытесняет pending events и при torn ACK
   обеспечивает безопасную at-least-once повторную доставку.
@@ -82,7 +86,7 @@
   хвосте и QG-проверяет их непересечение; shared bind API создаёт оба adapter-а
   из одного layout и обрезает archive storage на границе outbox. Production slot
   count, target memory-map/OCTOSPI/endurance остаются blockers.
-- Открыты target UART routing/scheduling, modem/broker-policy evidence и reviewed Ed25519 backend,
+- Открыты target USART/DMA/ISR/cache integration, modem/broker-policy evidence и reviewed Ed25519 backend,
   provisioning public key, Flash/outbox slot-count/OCTOSPI/endurance binding, command ACK
   target integration и аппаратный end-to-end;
   они не объявлены PASS до сборки станций.

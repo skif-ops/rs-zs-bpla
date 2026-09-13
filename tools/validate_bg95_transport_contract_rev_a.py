@@ -26,6 +26,9 @@ def main() -> int:
     receipt_test = read("firmware/tests/test_bg95_event_receipt.c")
     binary_header = read("firmware/include/zs_bg95_mqtt_binary.h")
     binary_source = read("firmware/src/zs_bg95_mqtt_binary.c")
+    session_header = read("firmware/include/zs_bg95_mqtt_session.h")
+    session_source = read("firmware/src/zs_bg95_mqtt_session.c")
+    session_test = read("firmware/tests/test_bg95_mqtt_session.c")
     cmake = read("firmware/CMakeLists.txt")
     ci = read(".github/workflows/ci.yml")
     policy = read("config/cellular/dual_sim_apn_profiles.yaml")
@@ -113,6 +116,27 @@ def main() -> int:
             "bg95_event_receipt" in cmake and
             "src/zs_bg95_mqtt_binary.c" in cmake,
             "BG95 event receipt test is not bound to CMake/CTest")
+    for token in ("ZS_BG95_MQTT_SESSION_RX_BYTES 2304u",
+                  "ZS_BG95_MQTT_OWNER_EVENT_UPLINK",
+                  "ZS_BG95_MQTT_OWNER_COMMAND_ACK",
+                  "zs_bg95_mqtt_session_tick",
+                  "zs_bg95_mqtt_session_feed_uart",
+                  "Target USART/DMA/ISR ownership"):
+        require(token in session_header,
+                f"BG95 MQTT session interface missing {token}")
+    for token in ("qmt_frame_length", "parse_decimal", "route_prompt",
+                  "session->pending_command", "zs_bg95_mqtt_invalidate"):
+        require(token in session_source,
+                f"BG95 MQTT session guard missing {token}")
+    for token in ("test_serialized_fragmented_end_to_end_lifecycle",
+                  "test_binary_payload_and_protocol_guards",
+                  "test_disconnect_discards_ram_queue_and_resubscribes"):
+        require(token in session_test,
+                f"BG95 MQTT session evidence missing {token}")
+    require("zs_bg95_mqtt_session_tests" in cmake and
+            "bg95_mqtt_session" in cmake and
+            "src/zs_bg95_mqtt_session.c" in cmake,
+            "BG95 MQTT session is not bound to CMake/CTest")
     require("validate_bg95_transport_contract_rev_a.py" in ci,
             "BG95 QG-1 is not bound to CI")
 

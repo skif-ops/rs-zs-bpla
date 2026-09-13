@@ -48,7 +48,7 @@ connect проверяет этот флаг, подписывается на ex
 разбирает полный URC по byte count, сохраняя NUL/quote/CRLF/`0x1a`. Сам URC не
 содержит retain-флаг, поэтому путь разрешается только явным внешним контрактом
 station credential + server-only ACL + запрет retained receipt. Host QG не
-заменяет target UART routing, проверку broker policy/версии BG95 и аппаратный
+заменяет target USART/DMA/ISR wiring, проверку broker policy/версии BG95 и аппаратный
 recovery test.
 
 Portable BG95 command binding использует тот же общий length-delimited parser:
@@ -56,10 +56,13 @@ Portable BG95 command binding использует тот же общий length
 signature/journal/executor channel. Fixed-length `ack` `QMTPUB` начинается лишь
 после durable `COMPLETED`; при reconnect повторная server command восстанавливает
 ACK из journal без повторного side effect. Partial UART, timeout и mismatched
-URC инвалидируют modem transport. Во время ACK in-flight новый frame получает
-`BUSY`, поэтому target UART router обязан сериализовать или буферизовать полные
-URC. Retain в `QMTRECV` не виден и покрывается только явно подтверждённым
-server-only/non-retained ACL contract. Target crypto, Flash pages, UART routing,
+URC инвалидируют modem transport. Общая portable MQTT session принимает
+произвольно фрагментированный raw UART, собирает line/prompt/length-delimited
+URC в лимите 2304 bytes, сериализует command/receipt subscriptions, event
+publish и command ACK единым TX owner. Один command frame буферизуется во время
+занятого TX, следующие учитываются как требующие server retry; disconnect
+очищает RAM queue и запускает ordered resubscribe. Retain в `QMTRECV` не виден и покрывается только явно подтверждённым
+server-only/non-retained ACL contract. Target crypto, Flash pages, USART/DMA/ISR,
 broker policy и hardware evidence остаются открыты.
 
 Portable NOR adapter выделяет каждому outbox slot отдельный erase block и

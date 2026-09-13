@@ -56,6 +56,9 @@ def main() -> int:
     bg95_receipt_header = read("firmware/include/zs_bg95_event_receipt.h")
     bg95_receipt_source = read("firmware/src/zs_bg95_event_receipt.c")
     bg95_receipt_test = read("firmware/tests/test_bg95_event_receipt.c")
+    bg95_session_header = read("firmware/include/zs_bg95_mqtt_session.h")
+    bg95_session_source = read("firmware/src/zs_bg95_mqtt_session.c")
+    bg95_session_test = read("firmware/tests/test_bg95_mqtt_session.c")
     generator = read("tools/generate_event_receipt_vector.py")
     vector = read("firmware/generated/zs_event_receipt_vector.h")
     cmake = read("firmware/CMakeLists.txt")
@@ -267,6 +270,37 @@ def main() -> int:
     require("src/zs_bg95_event_receipt.c" in cmake and
             "zs_bg95_event_receipt_tests" in cmake,
             "BG95 event receipt is not bound to CMake/CTest")
+    for token in (
+        "ZS_BG95_MQTT_SESSION_RX_BYTES 2304u",
+        "ZS_BG95_MQTT_OWNER_RECEIPT_SUBSCRIBE",
+        "ZS_BG95_MQTT_OWNER_EVENT_UPLINK",
+        "ZS_BG95_MQTT_INPUT_RECEIPT",
+        "zs_bg95_mqtt_session_feed_uart",
+        "Target USART/DMA/ISR ownership",
+    ):
+        require(token in bg95_session_header,
+                f"BG95 MQTT session interface missing: {token}")
+    for token in (
+        "qmt_frame_length",
+        "zs_bg95_event_receipt_on_frame",
+        "zs_bg95_event_uplink_on_prompt",
+        "session->pending_command",
+        "ZS_BG95_MQTT_OWNER_NONE",
+    ):
+        require(token in bg95_session_source,
+                f"BG95 MQTT session routing guard missing: {token}")
+    for token in (
+        "test_serialized_fragmented_end_to_end_lifecycle",
+        "test_binary_payload_and_protocol_guards",
+        "test_disconnect_discards_ram_queue_and_resubscribes",
+        "ZS_BG95_EVENT_RECEIPT_APPLIED",
+        "ZS_EVENT_OUTBOX_EMPTY",
+    ):
+        require(token in bg95_session_test,
+                f"BG95 MQTT session event case missing: {token}")
+    require("src/zs_bg95_mqtt_session.c" in cmake and
+            "zs_bg95_mqtt_session_tests" in cmake,
+            "BG95 MQTT session is not bound to CMake/CTest")
 
     require("encode_event_receipt" in generator and "--check" in generator,
             "server/firmware receipt vector generator is incomplete")
@@ -306,31 +340,33 @@ def main() -> int:
     require("PARTIAL_PASS_HOST_OUTBOX_RECEIPT" in requirements,
             "REQ-CELL-003 does not report bounded receipt evidence")
     require(
-        "event_application_receipt: PORTABLE_SERVER_FIRMWARE_BG95_LENGTH_URC_QG1_QG2_PASS_TARGET_UART_RETAIN_POLICY_AND_HARDWARE_PENDING"
+        "event_application_receipt: PORTABLE_SERVER_FIRMWARE_BG95_SESSION_ROUTED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING"
         in target,
         "target status overclaims or omits portable receipt evidence",
     )
     require(
-        "event_receipt_mqtt_binding: PORTABLE_LENGTH_ENABLED_BINARY_QMTRECV_QG1_QG2_PASS_TARGET_UART_ROUTING_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
+        "mqtt_uart_session_binding: PORTABLE_BOUNDED_RAW_UART_FRAMER_SINGLE_TX_OWNER_QG1_QG2_PASS_TARGET_USART_DMA_ISR_CACHE_AND_MODEM_BLOCKER"
+        in target and
+        "event_receipt_mqtt_binding: PORTABLE_LENGTH_ENABLED_BINARY_QMTRECV_SESSION_ROUTED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
         in target,
             "target receipt MQTT binding blocker is not explicit")
     require(
-        "event_bg95_receipt_binding: PORTABLE_LENGTH_ENABLED_BINARY_QMTRECV_QG1_QG2_PASS_TARGET_UART_ROUTING_RETAIN_POLICY_AND_HARDWARE_PENDING"
+        "event_bg95_receipt_binding: PORTABLE_LENGTH_ENABLED_BINARY_QMTRECV_SESSION_ROUTED_QG1_QG2_PASS_TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING"
         in target,
         "target status overclaims or omits BG95 event receipt evidence",
     )
     require(
-        "event_mqtt_uplink_transport: PORTABLE_EXACT_TOPIC_RETRY_RECEIPT_QG1_QG2_PASS_BG95_UPLINK_AND_RECEIPT_HOST_BINDINGS_TARGET_PENDING"
+        "event_mqtt_uplink_transport: PORTABLE_EXACT_TOPIC_RETRY_RECEIPT_QG1_QG2_PASS_BG95_SESSION_SERIALIZED_HOST_BINDING_TARGET_PENDING"
         in target,
         "target status overclaims or omits portable event MQTT evidence",
     )
     require(
-        "event_bg95_uplink_binding: PORTABLE_FIXED_LENGTH_BINARY_QMTPUB_QG1_QG2_PASS_TARGET_UART_ROUTING_PENDING"
+        "event_bg95_uplink_binding: PORTABLE_FIXED_LENGTH_BINARY_QMTPUB_SESSION_SERIALIZED_QG1_QG2_PASS_TARGET_USART_DMA_AND_HARDWARE_PENDING"
         in target,
         "target status overclaims or omits BG95 event uplink evidence",
     )
     require(
-        "event_mqtt_uplink_binding: PORTABLE_FIXED_LENGTH_BINARY_QMTPUB_QG1_QG2_PASS_TARGET_UART_ROUTING_AND_HARDWARE_BLOCKER"
+        "event_mqtt_uplink_binding: PORTABLE_FIXED_LENGTH_BINARY_QMTPUB_SESSION_SERIALIZED_QG1_QG2_PASS_TARGET_USART_DMA_AND_HARDWARE_BLOCKER"
         in target,
         "target event MQTT uplink binding blocker is not bounded",
     )
@@ -342,7 +378,7 @@ def main() -> int:
             "event receipt vector freshness is not bound to CI")
 
     print("Event application receipt QG-1: PASS")
-    print("scope: canonical server/firmware receipt + fixed-length BG95 uplink + length-enabled BG95 receipt URC; target UART/retain policy/storage remain pending")
+    print("scope: canonical receipt + fixed-length uplink + bounded raw-UART BG95 session routing; target USART-DMA/retain policy/storage remain pending")
     return 0
 
 

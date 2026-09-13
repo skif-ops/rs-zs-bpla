@@ -21,6 +21,7 @@ add_library(zs_core
   src/zs_bg95.c
   src/zs_bg95_command_transport.c
   src/zs_bg95_mqtt_binary.c
+  src/zs_bg95_mqtt_session.c
   src/zs_bg95_event_receipt.c
   src/zs_bg95_event_uplink.c
   src/zs_command.c
@@ -64,6 +65,8 @@ add_executable(zs_bg95_event_receipt_tests tests/test_bg95_event_receipt.c)
 target_link_libraries(zs_bg95_event_receipt_tests zs_core m)
 add_executable(zs_bg95_command_transport_tests tests/test_bg95_command_transport.c)
 target_link_libraries(zs_bg95_command_transport_tests zs_core m)
+add_executable(zs_bg95_mqtt_session_tests tests/test_bg95_mqtt_session.c)
+target_link_libraries(zs_bg95_mqtt_session_tests zs_core m)
 add_executable(zs_command_transport_tests tests/test_command_transport.c)
 target_link_libraries(zs_command_transport_tests zs_core m)
 add_executable(zs_command_channel_tests tests/test_command_channel.c)
@@ -117,6 +120,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_bg95_event_uplink_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_bg95_event_receipt_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_bg95_command_transport_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_bg95_mqtt_session_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_command_transport_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_command_channel_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_command_journal_tests PRIVATE -UNDEBUG)
@@ -148,6 +152,7 @@ add_test(NAME bg95_transport COMMAND zs_bg95_transport_tests)
 add_test(NAME bg95_event_uplink COMMAND zs_bg95_event_uplink_tests)
 add_test(NAME bg95_event_receipt COMMAND zs_bg95_event_receipt_tests)
 add_test(NAME bg95_command_transport COMMAND zs_bg95_command_transport_tests)
+add_test(NAME bg95_mqtt_session COMMAND zs_bg95_mqtt_session_tests)
 add_test(NAME command_transport COMMAND zs_command_transport_tests)
 add_test(NAME command_channel COMMAND zs_command_channel_tests)
 add_test(NAME command_journal COMMAND zs_command_journal_tests)
