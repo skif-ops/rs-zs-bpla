@@ -46,8 +46,12 @@ def main() -> int:
     channel_header = read("firmware/include/zs_command_channel.h")
     channel_codec = read("firmware/src/zs_command_channel.c")
     channel_test = read("firmware/tests/test_command_channel.c")
+    transport_header = read("firmware/include/zs_mqtt_command_transport.h")
+    transport_codec = read("firmware/src/zs_mqtt_command_transport.c")
+    transport_test = read("firmware/tests/test_mqtt_command_transport.c")
     vector_generator = read("tools/generate_mqtt_command_vector.py")
     vector_header = read("firmware/generated/zs_command_vector.h")
+    target_status = read("firmware/targets/evt_pre_20/target_status.yaml")
     tests = read("server/tests/test_mqtt_commands.py") + read(
         "server/tests/test_command_codec.py"
     )
@@ -235,9 +239,41 @@ def main() -> int:
     ):
         require(token in channel_test, f"portable command channel QG-2 case missing: {token}")
 
-    require("FIRMWARE_CODEC_IMPLEMENTED; TARGET_CRYPTO_AND_MODEM_BINDING_PENDING" in icd,
+    for token in (
+        "ZS_MQTT_COMMAND_TENANT_MAX_BYTES 32u",
+        "ZS_MQTT_COMMAND_TOPIC_MAX_BYTES 64u",
+        "zs_mqtt_command_message_t",
+        "zs_mqtt_command_transport_init",
+        "zs_mqtt_command_transport_handle",
+    ):
+        require(token in transport_header, f"binary MQTT boundary API missing: {token}")
+    for token in (
+        "tenant_is_valid",
+        "memcmp(message->topic",
+        "message->qos != ZS_MQTT_COMMAND_QOS",
+        "message->retained",
+        "zs_command_channel_handle",
+        "publication->payload_size = ack_size",
+    ):
+        require(token in transport_codec, f"binary MQTT boundary guard missing: {token}")
+    for token in (
+        "test_binary_down_to_ack",
+        "test_topic_and_delivery_rejection",
+        "test_result_mapping_without_ack",
+        "test_tenant_and_argument_guards",
+        "memchr(zs_command_vector_payload, 0",
+        "ZS_MQTT_COMMAND_REJECTED_DELIVERY",
+    ):
+        require(token in transport_test, f"binary MQTT boundary QG-2 case missing: {token}")
+    require(
+        "command_binary_mqtt_transport: PORTABLE_EXACT_TOPIC_PAYLOAD_LENGTH_QG1_QG2_PASS_BG95_AT_BINDING_PENDING"
+        in target_status,
+        "target status does not separate the portable MQTT boundary from BG95 binding",
+    )
+
+    require("FIRMWARE_PORTABLE_BINARY_PATH_IMPLEMENTED; TARGET_CRYPTO_AND_BG95_AT_BINDING_PENDING" in icd,
             "ICD does not report the bounded implementation status")
-    require("target MQTT subscription binding, reviewed Ed25519 backend" in firmware_contract,
+    require("exact BG95 binary receive/publish framing" in firmware_contract,
             "firmware target gap is not explicit")
     for token in ("tamper", "retry", "ownership", "duplicate"):
         require(token in tests, f"negative/robustness test missing: {token}")
@@ -255,9 +291,11 @@ def main() -> int:
             "firmware command trust-store test is not bound to CTest")
     require("zs_command_channel_tests" in read("firmware/CMakeLists.txt"),
             "portable command channel test is not bound to CTest")
+    require("zs_mqtt_command_binding_tests" in read("firmware/CMakeLists.txt"),
+            "portable binary MQTT boundary test is not bound to CTest")
 
     print("MQTT signed command transport QG-1: PASS")
-    print("scope: server transport + portable firmware codec; target crypto/modem and hardware remain pending")
+    print("scope: server transport + portable binary firmware path; target crypto/BG95 AT binding and hardware remain pending")
     return 0
 
 

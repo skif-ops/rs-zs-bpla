@@ -14,8 +14,8 @@ Detection schema: `4`
 |---|---|---:|---:|---|---|
 | `zs/v1/{tenant}/{station_id}/up` | station -> server | 1 | false | detection compact CBOR | EXISTS |
 | `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
-| `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | FIRMWARE_CODEC_IMPLEMENTED; TARGET_CRYPTO_AND_MODEM_BINDING_PENDING |
-| `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | FIRMWARE_CODEC_IMPLEMENTED; TARGET_CRYPTO_AND_MODEM_BINDING_PENDING |
+| `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | FIRMWARE_PORTABLE_BINARY_PATH_IMPLEMENTED; TARGET_CRYPTO_AND_BG95_AT_BINDING_PENDING |
+| `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | FIRMWARE_PORTABLE_BINARY_PATH_IMPLEMENTED; TARGET_CRYPTO_AND_BG95_AT_BINDING_PENDING |
 
 Client ID: `dioneya-{station_id}-{boot_id}`. Clean start запрещён после provisioning; session expiry и keepalive замораживаются после 24-часового теста сети. Повторная доставка QoS 1 ожидаема, дедупликация выполняется по `event_id`, а для команд по `command_id`.
 
@@ -108,6 +108,15 @@ The portable application channel enforces this order and emits no ACK for an
 invalid envelope, transient executor failure or storage failure. It re-verifies
 every broker redelivery, resumes an accepted idempotent operation, and returns a
 stored ACK for a completed duplicate. Calls must be serialized by the target task.
+
+The portable MQTT boundary consumes a complete binary publication as independent
+`topic+length` and `payload+length` pairs. It accepts only the exact canonical
+station `down` topic at QoS 1 with `retain=false`, so wrong-tenant, wrong-station,
+leading-zero and trailing-NUL topic variants never reach command verification.
+On durable completion it returns the exact station `ack` topic and binary CBOR
+length at QoS 1 with `retain=false`. The BG95 UART layer must preserve arbitrary
+payload bytes, including NUL, and must not use C-string parsing. Its exact AT/URC
+framing and publish prompt integration remain target blockers.
 
 ## 3. Detection compact CBOR
 

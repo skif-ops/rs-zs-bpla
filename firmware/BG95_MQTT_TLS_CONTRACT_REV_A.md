@@ -1,6 +1,6 @@
 # BG95-M3 MQTT/TLS transport contract Rev.A
 
-Status: `HOST CONTRACT + PORTABLE COMMAND CODEC PASS / TARGET CRYPTO, MODEM AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
+Status: `HOST CONTRACT + PORTABLE BINARY COMMAND PATH PASS / TARGET CRYPTO, BG95 AT BINDING AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
 
 This contract extends the portable BG95 state machine from automatic SIM/network
 discovery to an outbound MQTT/TLS session. It does not claim that a particular
@@ -83,6 +83,11 @@ and clear online/network-valid flags.
   Ed25519 backend; no production public key is embedded in portable source. The
   application channel joins verification, journal, idempotent executor and ACK in
   that fail-closed order and is tested for retry, rejection and completed replay.
+  The binary MQTT boundary then binds an exact canonical tenant/station `down`
+  topic to that channel and returns the exact `ack` topic plus payload length only
+  after durable completion. It rejects wrong or non-canonical topics, retained
+  delivery and non-QoS-1 delivery before command parsing, and its host test carries
+  embedded NUL bytes without treating CBOR as a string.
 
 ## Open evidence
 
@@ -91,10 +96,11 @@ and clear online/network-valid flags.
   selected BG95 firmware revision and every pilot operator, after stations are assembled;
 - certificate upload/provisioning and BG95 firmware-version compatibility;
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
-- target MQTT subscription binding, reviewed Ed25519 backend and public-key
-  provisioning, nonvolatile target-page binding/endurance, ACK publisher and
-  store-and-forward; the portable fixed-memory parser/ACK codec and server-side
-  canonical envelope, QoS 1 retry and station-bound ACK path have host tests;
+- reviewed Ed25519 backend and public-key provisioning, nonvolatile target-page
+  binding/endurance, exact BG95 binary receive/publish framing, subscription and
+  publish-prompt handling, and store-and-forward; the portable fixed-memory
+  parser, topic/QoS/retain boundary, ACK codec and server-side canonical envelope,
+  QoS 1 retry and station-bound ACK path have host tests;
 - power-loss, network-loss, CGNAT, dual-SIM switching and 24-hour test logs after
   stations are assembled;
 - packet capture and broker/modem logs without secrets.

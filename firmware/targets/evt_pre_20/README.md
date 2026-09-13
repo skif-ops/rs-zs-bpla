@@ -62,6 +62,9 @@ codec, a bounded public-key rotation adapter, and a power-loss-safe
 accepted/completed journal that cannot encode an ACK before completion is
 durable. A portable application channel enforces verify → accept → idempotent
 execute → complete → ACK and safely replays accepted/completed duplicates. Host
-QG includes a real server-generated Ed25519 vector, but the target still needs
-reviewed Ed25519 library binding, provisioned public keys, dedicated Flash
-pages/endurance evidence and BG95 MQTT receive/publish integration.
+QG includes a real server-generated Ed25519 vector. A portable binary MQTT
+adapter now enforces the exact tenant/station `down` topic, QoS 1 and non-retained
+delivery before command parsing, then exposes the exact `ack` topic and CBOR
+payload length after durable completion. The target still needs reviewed Ed25519
+library binding, provisioned public keys, dedicated Flash pages/endurance evidence
+and BG95 binary MQTT receive/publish AT framing integration.
