@@ -80,7 +80,9 @@ and clear online/network-valid flags.
   separately fault-injects the atomic accepted/completed journal and prevents ACK
   generation before a completed result is durable. The bounded trust adapter
   validates key IDs and enabled rotation entries before delegating to a mandatory
-  Ed25519 backend; no production public key is embedded in portable source.
+  Ed25519 backend; no production public key is embedded in portable source. The
+  application channel joins verification, journal, idempotent executor and ACK in
+  that fail-closed order and is tested for retry, rejection and completed replay.
 
 ## Open evidence
 

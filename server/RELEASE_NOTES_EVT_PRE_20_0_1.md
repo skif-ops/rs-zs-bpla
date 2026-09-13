@@ -46,6 +46,9 @@
 - Bounded trust adapter проверяет SHA-256-derived key ID, дубликаты, disabled
   rotation entries и неизвестные ключи до вызова обязательного crypto backend;
   production public keys в portable source отсутствуют.
+- Portable application channel связывает decode/trust/dedup, atomic journal и
+  idempotent executor; ACK появляется только после read-back `COMPLETED`, а
+  transient execution/storage failure оставляет команду для безопасного retry.
 - Открыты target MQTT subscription/URC binding, reviewed Ed25519 backend,
   provisioning public key, Flash page/endurance binding, ACK publisher и аппаратный end-to-end;
   они не объявлены PASS до сборки станций.

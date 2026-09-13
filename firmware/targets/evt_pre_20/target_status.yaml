@@ -82,6 +82,7 @@ cellular:
   signed_command_codec: PORTABLE_CANONICAL_CBOR_QG1_QG2_PASS
   command_result_journal: PORTABLE_ATOMIC_QG1_QG2_PASS_FLASH_BINDING_PENDING
   command_public_key_trust: PORTABLE_BOUNDED_ROTATION_QG1_QG2_PASS_PROVISIONING_PENDING
+  command_application_channel: PORTABLE_FAIL_CLOSED_QG1_QG2_PASS_MODEM_BINDING_PENDING
   command_ed25519_backend: MISSING_BLOCKER
   command_mqtt_binding: MISSING_BLOCKER
 storage:

@@ -60,6 +60,8 @@ durable audit backend and target service-window timer remain open target work.
 The portable downstream-command boundary now has a canonical fixed-memory CBOR
 codec, a bounded public-key rotation adapter, and a power-loss-safe
 accepted/completed journal that cannot encode an ACK before completion is
-durable. Host QG includes a real server-generated Ed25519 vector, but the target
-still needs reviewed Ed25519 library binding, provisioned public keys, dedicated
-Flash pages/endurance evidence and BG95 MQTT receive/publish integration.
+durable. A portable application channel enforces verify → accept → idempotent
+execute → complete → ACK and safely replays accepted/completed duplicates. Host
+QG includes a real server-generated Ed25519 vector, but the target still needs
+reviewed Ed25519 library binding, provisioned public keys, dedicated Flash
+pages/endurance evidence and BG95 MQTT receive/publish integration.

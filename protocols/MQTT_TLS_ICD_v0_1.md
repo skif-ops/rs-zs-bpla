@@ -104,6 +104,11 @@ the side effect. Reuse of a UUID with different signed command semantics is a
 fail-closed conflict. Target Flash page allocation and endurance validation remain
 open.
 
+The portable application channel enforces this order and emits no ACK for an
+invalid envelope, transient executor failure or storage failure. It re-verifies
+every broker redelivery, resumes an accepted idempotent operation, and returns a
+stored ACK for a completed duplicate. Calls must be serialized by the target task.
+
 ## 3. Detection compact CBOR
 
 | Key | Назначение |

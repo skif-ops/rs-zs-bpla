@@ -31,9 +31,9 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    durable-dedup callbacks и формирует ACK; граница server/firmware закреплена
    детерминированным Ed25519 vector. Portable atomic journal фиксирует
    accepted/completed до ACK, а bounded trust adapter fail-closed выбирает
-   provisioned public key. Открыты target MQTT binding, reviewed Ed25519 backend,
-   public-key provisioning, Flash page/endurance binding и hardware end-to-end
-   evidence.
+   provisioned public key. Portable application channel объединяет эти стадии и
+   идемпотентный executor. Открыты target MQTT binding, reviewed Ed25519 backend,
+   public-key provisioning, Flash page/endurance binding и hardware end-to-end evidence.
 3. ЗАКРЫТО: исходные диапазоны разрешены в хешированные Python 3.12 lockfiles;
    production image и CI используют `requirements.lock.txt` с
    `--require-hashes`, а `sbom/server.cdx.json` воспроизводимо генерируется из

@@ -43,6 +43,9 @@ def main() -> int:
     trust_header = read("firmware/include/zs_command_trust.h")
     trust_codec = read("firmware/src/zs_command_trust.c")
     trust_test = read("firmware/tests/test_command_trust.c")
+    channel_header = read("firmware/include/zs_command_channel.h")
+    channel_codec = read("firmware/src/zs_command_channel.c")
+    channel_test = read("firmware/tests/test_command_channel.c")
     vector_generator = read("tools/generate_mqtt_command_vector.py")
     vector_header = read("firmware/generated/zs_command_vector.h")
     tests = read("server/tests/test_mqtt_commands.py") + read(
@@ -210,6 +213,27 @@ def main() -> int:
         "zs_command_vector_public_key",
     ):
         require(token in trust_test, f"command trust-store QG-2 case missing: {token}")
+    for token in (
+        "zs_command_execute_fn",
+        "ZS_COMMAND_CHANNEL_ACK_READY",
+        "ZS_COMMAND_CHANNEL_EXECUTION_RETRY",
+        "zs_command_channel_handle",
+    ):
+        require(token in channel_header, f"portable command channel API missing: {token}")
+    for token in (
+        "zs_command_decode_verify",
+        "zs_command_journal_accept",
+        "zs_command_journal_complete",
+        "encode_durable_ack",
+    ):
+        require(token in channel_codec, f"portable command channel stage missing: {token}")
+    for token in (
+        "test_complete_then_duplicate_ack",
+        "test_retry_and_reject_paths",
+        "ZS_COMMAND_STATUS_DUPLICATE",
+        "zs_command_vector_ack",
+    ):
+        require(token in channel_test, f"portable command channel QG-2 case missing: {token}")
 
     require("FIRMWARE_CODEC_IMPLEMENTED; TARGET_CRYPTO_AND_MODEM_BINDING_PENDING" in icd,
             "ICD does not report the bounded implementation status")
@@ -229,6 +253,8 @@ def main() -> int:
             "firmware durable command journal test is not bound to CTest")
     require("zs_command_trust_tests" in read("firmware/CMakeLists.txt"),
             "firmware command trust-store test is not bound to CTest")
+    require("zs_command_channel_tests" in read("firmware/CMakeLists.txt"),
+            "portable command channel test is not bound to CTest")
 
     print("MQTT signed command transport QG-1: PASS")
     print("scope: server transport + portable firmware codec; target crypto/modem and hardware remain pending")
