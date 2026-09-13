@@ -33,6 +33,7 @@ def main() -> int:
         "zs_event_outbox_event_t",
         "payload_sha256[ZS_SHA256_DIGEST_BYTES]",
         "zs_event_outbox_enqueue_detection",
+        "zs_event_outbox_lookup",
         "zs_event_outbox_note_attempt",
         "zs_event_outbox_mark_application_acked",
     ):

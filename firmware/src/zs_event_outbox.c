@@ -368,6 +368,35 @@ zs_event_outbox_result_t zs_event_outbox_peek(
   return found ? ZS_EVENT_OUTBOX_OK : ZS_EVENT_OUTBOX_EMPTY;
 }
 
+zs_event_outbox_result_t zs_event_outbox_lookup(
+    const zs_event_outbox_io_t *io,
+    uint32_t station_id,
+    uint64_t event_id,
+    zs_event_outbox_item_t *item,
+    bool *delivered) {
+  decoded_slot_t decoded;
+  bool found = false;
+  slot_state_t state;
+  if (!io_valid(io) || station_id == 0u || event_id == 0u || !item ||
+      !delivered)
+    return ZS_EVENT_OUTBOX_INVALID_ARGUMENT;
+  memset(item, 0, sizeof(*item));
+  *delivered = false;
+  for (uint16_t slot = 0u; slot < io->slot_count; ++slot) {
+    state = read_slot(io, slot, &decoded);
+    if (state == SLOT_IO_ERROR || state == SLOT_CORRUPT)
+      return slot_error(state);
+    if (state != SLOT_VALID || decoded.item.station_id != station_id ||
+        decoded.item.event_id != event_id)
+      continue;
+    if (found) return ZS_EVENT_OUTBOX_CORRUPT;
+    *item = decoded.item;
+    *delivered = decoded.delivered;
+    found = true;
+  }
+  return found ? ZS_EVENT_OUTBOX_OK : ZS_EVENT_OUTBOX_EMPTY;
+}
+
 static zs_event_outbox_result_t load_matching(
     const zs_event_outbox_io_t *io,
     const zs_event_outbox_item_t *item,

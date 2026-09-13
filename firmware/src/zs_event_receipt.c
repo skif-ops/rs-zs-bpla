@@ -165,7 +165,6 @@ bool zs_event_receipt_transport_init(
 zs_event_receipt_result_t zs_event_receipt_transport_handle(
     const zs_event_receipt_transport_t *transport,
     const zs_event_outbox_io_t *outbox,
-    const zs_event_outbox_item_t *item,
     const uint8_t *topic,
     size_t topic_size,
     const uint8_t *payload,
@@ -174,11 +173,13 @@ zs_event_receipt_result_t zs_event_receipt_transport_handle(
     bool retained,
     zs_event_receipt_status_t *decode_status) {
   zs_event_receipt_t receipt;
+  zs_event_outbox_item_t item;
   zs_event_outbox_result_t result;
+  bool delivered;
   if (decode_status) *decode_status = ZS_EVENT_RECEIPT_STATUS_INVALID_ARGUMENT;
   if (!transport || transport->station_id == 0u ||
       transport->topic_size == 0u ||
-      transport->topic_size > sizeof(transport->topic) || !outbox || !item ||
+      transport->topic_size > sizeof(transport->topic) || !outbox ||
       !topic || topic_size == 0u || !payload || payload_size == 0u ||
       !decode_status)
     return ZS_EVENT_RECEIPT_INVALID_ARGUMENT;
@@ -191,18 +192,26 @@ zs_event_receipt_result_t zs_event_receipt_transport_handle(
       payload, payload_size, transport->station_id, &receipt);
   if (*decode_status != ZS_EVENT_RECEIPT_STATUS_OK)
     return ZS_EVENT_RECEIPT_REJECTED_RECEIPT;
-  if (item->station_id != transport->station_id ||
-      receipt.boot_id != item->boot_id || receipt.seq_no != item->seq_no ||
-      receipt.event_id != item->event_id) {
+  result = zs_event_outbox_lookup(outbox, receipt.station_id,
+                                  receipt.event_id, &item, &delivered);
+  if (result == ZS_EVENT_OUTBOX_EMPTY) {
     *decode_status = ZS_EVENT_RECEIPT_STATUS_ITEM_MISMATCH;
     return ZS_EVENT_RECEIPT_REJECTED_RECEIPT;
   }
-  if (memcmp(receipt.payload_sha256, item->payload_sha256,
+  if (result == ZS_EVENT_OUTBOX_INVALID_ARGUMENT)
+    return ZS_EVENT_RECEIPT_INVALID_ARGUMENT;
+  if (result != ZS_EVENT_OUTBOX_OK) return ZS_EVENT_RECEIPT_STORAGE_ERROR;
+  if (receipt.boot_id != item.boot_id || receipt.seq_no != item.seq_no) {
+    *decode_status = ZS_EVENT_RECEIPT_STATUS_ITEM_MISMATCH;
+    return ZS_EVENT_RECEIPT_REJECTED_RECEIPT;
+  }
+  if (memcmp(receipt.payload_sha256, item.payload_sha256,
              ZS_SHA256_DIGEST_BYTES) != 0) {
     *decode_status = ZS_EVENT_RECEIPT_STATUS_SHA256_MISMATCH;
     return ZS_EVENT_RECEIPT_REJECTED_RECEIPT;
   }
-  result = zs_event_outbox_mark_application_acked(outbox, item);
+  if (delivered) return ZS_EVENT_RECEIPT_ALREADY_APPLIED;
+  result = zs_event_outbox_mark_application_acked(outbox, &item);
   if (result == ZS_EVENT_OUTBOX_OK) return ZS_EVENT_RECEIPT_APPLIED;
   if (result == ZS_EVENT_OUTBOX_ALREADY_ACKED)
     return ZS_EVENT_RECEIPT_ALREADY_APPLIED;

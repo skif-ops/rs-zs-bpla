@@ -38,8 +38,10 @@ APN/IP/шлюза/DNS активного PDP и последовательнос
 Portable store-and-forward теперь дополнен серверным application receipt:
 сервер после durable processing публикует canonical CBOR с SHA-256 точного
 detection payload, а fixed-memory firmware parser проверяет topic, QoS/retain и
-полную identity события до маркировки outbox slot доставленным. Host QG не
-заменяет exact BG95 binary MQTT binding и аппаратный recovery test.
+полную identity события до маркировки outbox slot доставленным. Portable uplink
+adapter сохраняет retry marker до выдачи exact `up` topic/payload и не считает
+PUBACK разрешением на удаление. Host QG не заменяет exact BG95 binary MQTT
+binding и аппаратный recovery test.
 
 Первый target-инкремент уже фиксирует точный исходный контракт
 `STM32U585VIT6Q/LQFP100`: 67 назначений из Rev.A pin map и AAD addendum,

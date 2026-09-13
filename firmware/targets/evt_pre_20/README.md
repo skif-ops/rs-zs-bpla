@@ -81,6 +81,9 @@ delivery; a torn marker intentionally causes safe at-least-once redelivery. Host
 fault-injection is QG-1/QG-2 evidence only. The server now persists the exact
 detection-payload SHA-256 and processing state before publishing a canonical
 station-bound receipt; a fixed-memory firmware parser verifies the receipt and
-marks only the matching pending item delivered. Target NOR/Flash allocation,
-wear/endurance, exact BG95 receipt subscription/URC binding and assembled-station
-recovery remain release blockers.
+marks only the matching pending item delivered. A portable MQTT uplink adapter
+persists each attempt before exposing the exact outbox payload, publishes only
+to the canonical station `up` topic, ignores PUBACK for reclamation and can apply
+a queued receipt after restart by durable event lookup. Target NOR/Flash
+allocation, wear/endurance, exact BG95 publish/receipt subscription/URC binding
+and assembled-station recovery remain release blockers.

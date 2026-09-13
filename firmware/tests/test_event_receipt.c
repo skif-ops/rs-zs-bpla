@@ -109,17 +109,16 @@ static void test_server_vector_applies_after_exact_match(void) {
   memory_outbox_t memory;
   zs_event_outbox_io_t io;
   zs_event_outbox_item_t item = enqueue_vector(&memory, &io);
-  zs_event_outbox_item_t applied_item = item;
   zs_event_receipt_transport_t transport = make_transport();
   zs_event_receipt_status_t status;
 
   assert(zs_event_receipt_transport_handle(
-      &transport, &io, &item, transport.topic, transport.topic_size,
+      &transport, &io, transport.topic, transport.topic_size,
       zs_event_receipt_vector_payload, sizeof(zs_event_receipt_vector_payload),
       ZS_EVENT_RECEIPT_QOS, false, &status) == ZS_EVENT_RECEIPT_APPLIED);
   assert(status == ZS_EVENT_RECEIPT_STATUS_OK);
   assert(zs_event_receipt_transport_handle(
-      &transport, &io, &applied_item, transport.topic, transport.topic_size,
+      &transport, &io, transport.topic, transport.topic_size,
       zs_event_receipt_vector_payload, sizeof(zs_event_receipt_vector_payload),
       ZS_EVENT_RECEIPT_QOS, false, &status) ==
          ZS_EVENT_RECEIPT_ALREADY_APPLIED);
@@ -137,15 +136,15 @@ static void test_topic_delivery_and_receipt_rejections(void) {
   uint8_t changed[ZS_EVENT_RECEIPT_MAX_BYTES + 1u];
 
   assert(zs_event_receipt_transport_handle(
-      &transport, &io, &item, wrong_topic, sizeof(wrong_topic) - 1u,
+      &transport, &io, wrong_topic, sizeof(wrong_topic) - 1u,
       zs_event_receipt_vector_payload, sizeof(zs_event_receipt_vector_payload),
       1u, false, &status) == ZS_EVENT_RECEIPT_REJECTED_TOPIC);
   assert(zs_event_receipt_transport_handle(
-      &transport, &io, &item, transport.topic, transport.topic_size,
+      &transport, &io, transport.topic, transport.topic_size,
       zs_event_receipt_vector_payload, sizeof(zs_event_receipt_vector_payload),
       0u, false, &status) == ZS_EVENT_RECEIPT_REJECTED_DELIVERY);
   assert(zs_event_receipt_transport_handle(
-      &transport, &io, &item, transport.topic, transport.topic_size,
+      &transport, &io, transport.topic, transport.topic_size,
       zs_event_receipt_vector_payload, sizeof(zs_event_receipt_vector_payload),
       1u, true, &status) == ZS_EVENT_RECEIPT_REJECTED_DELIVERY);
 
@@ -153,7 +152,7 @@ static void test_topic_delivery_and_receipt_rejections(void) {
          sizeof(zs_event_receipt_vector_payload));
   changed[sizeof(zs_event_receipt_vector_payload) - 1u] ^= 1u;
   assert(zs_event_receipt_transport_handle(
-      &transport, &io, &item, transport.topic, transport.topic_size,
+      &transport, &io, transport.topic, transport.topic_size,
       changed, sizeof(zs_event_receipt_vector_payload), 1u, false,
       &status) == ZS_EVENT_RECEIPT_REJECTED_RECEIPT);
   assert(status == ZS_EVENT_RECEIPT_STATUS_SHA256_MISMATCH);
@@ -162,7 +161,7 @@ static void test_topic_delivery_and_receipt_rejections(void) {
          sizeof(zs_event_receipt_vector_payload));
   changed[6] = 18u;
   assert(zs_event_receipt_transport_handle(
-      &transport, &io, &item, transport.topic, transport.topic_size,
+      &transport, &io, transport.topic, transport.topic_size,
       changed, sizeof(zs_event_receipt_vector_payload), 1u, false,
       &status) == ZS_EVENT_RECEIPT_REJECTED_RECEIPT);
   assert(status == ZS_EVENT_RECEIPT_STATUS_STATION_MISMATCH);
@@ -171,7 +170,7 @@ static void test_topic_delivery_and_receipt_rejections(void) {
          sizeof(zs_event_receipt_vector_payload));
   changed[10] = 6u;
   assert(zs_event_receipt_transport_handle(
-      &transport, &io, &item, transport.topic, transport.topic_size,
+      &transport, &io, transport.topic, transport.topic_size,
       changed, sizeof(zs_event_receipt_vector_payload), 1u, false,
       &status) == ZS_EVENT_RECEIPT_REJECTED_RECEIPT);
   assert(status == ZS_EVENT_RECEIPT_STATUS_ITEM_MISMATCH);
@@ -190,7 +189,7 @@ static void test_topic_delivery_and_receipt_rejections(void) {
          sizeof(zs_event_receipt_vector_payload));
   changed[sizeof(zs_event_receipt_vector_payload)] = 0u;
   assert(zs_event_receipt_transport_handle(
-      &transport, &io, &item, transport.topic, transport.topic_size,
+      &transport, &io, transport.topic, transport.topic_size,
       changed, sizeof(zs_event_receipt_vector_payload) + 1u, 1u, false,
       &status) == ZS_EVENT_RECEIPT_REJECTED_RECEIPT);
   assert(zs_event_outbox_peek(&io, &item) == ZS_EVENT_OUTBOX_OK);
@@ -206,14 +205,14 @@ static void test_torn_ack_marker_remains_pending(void) {
   memory.fail_write_call = 1u;
   memory.partial_write_bytes = 2u;
   assert(zs_event_receipt_transport_handle(
-      &transport, &io, &item, transport.topic, transport.topic_size,
+      &transport, &io, transport.topic, transport.topic_size,
       zs_event_receipt_vector_payload, sizeof(zs_event_receipt_vector_payload),
       1u, false, &status) == ZS_EVENT_RECEIPT_STORAGE_ERROR);
   assert(zs_event_outbox_peek(&io, &item) == ZS_EVENT_OUTBOX_OK);
   memory.write_calls = 0u;
   memory.fail_write_call = 0u;
   assert(zs_event_receipt_transport_handle(
-      &transport, &io, &item, transport.topic, transport.topic_size,
+      &transport, &io, transport.topic, transport.topic_size,
       zs_event_receipt_vector_payload, sizeof(zs_event_receipt_vector_payload),
       1u, false, &status) == ZS_EVENT_RECEIPT_APPLIED);
 }

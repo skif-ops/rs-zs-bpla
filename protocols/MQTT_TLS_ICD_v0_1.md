@@ -143,6 +143,13 @@ encoding, `station_id`, `boot_id`, `seq_no`, `event_id` and `payload_sha256`
 against the still-pending item. An exact duplicate receipt is idempotent. A torn
 delivered-marker write leaves the event pending for at-least-once retry.
 
+The portable station MQTT adapter emits only the current priority/FIFO outbox
+item on the exact canonical `up` topic. It persists the retry attempt before
+exposing the binary payload to the modem layer; storage failure or retry
+exhaustion therefore emits no publication. A broker PUBACK does not change the
+outbox. A queued QoS-1 receipt can locate and close its exact durable slot after
+a station restart, without volatile in-flight state.
+
 The server stores the exact payload hash and processing state before publishing
 the receipt. A byte-identical broker redelivery after processing skips fusion
 side effects and republishes the same receipt. Reuse of an `event_id` with

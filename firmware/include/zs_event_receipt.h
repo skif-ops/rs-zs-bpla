@@ -66,7 +66,6 @@ bool zs_event_receipt_transport_init(
 zs_event_receipt_result_t zs_event_receipt_transport_handle(
     const zs_event_receipt_transport_t *transport,
     const zs_event_outbox_io_t *outbox,
-    const zs_event_outbox_item_t *item,
     const uint8_t *topic,
     size_t topic_size,
     const uint8_t *payload,

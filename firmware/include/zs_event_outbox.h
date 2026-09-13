@@ -90,6 +90,18 @@ zs_event_outbox_result_t zs_event_outbox_peek(
     const zs_event_outbox_io_t *io,
     zs_event_outbox_item_t *item);
 
+/*
+ * Find a committed event by station/event identity, including an already
+ * delivered slot. This allows a queued QoS-1 application receipt to be applied
+ * safely after a station restart without relying on volatile in-flight state.
+ */
+zs_event_outbox_result_t zs_event_outbox_lookup(
+    const zs_event_outbox_io_t *io,
+    uint32_t station_id,
+    uint64_t event_id,
+    zs_event_outbox_item_t *item,
+    bool *delivered);
+
 /* Persistently count an attempted transmission before submitting the payload. */
 zs_event_outbox_result_t zs_event_outbox_note_attempt(
     const zs_event_outbox_io_t *io,

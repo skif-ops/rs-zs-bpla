@@ -95,8 +95,10 @@ and clear online/network-valid flags.
   `tools/validate_event_receipt_contract.py`, its independent runtime audit and
   `firmware/tests/test_event_receipt.c` additionally verify the canonical
   server-to-firmware application receipt, exact payload-SHA binding, duplicate
-  replay and receipt-before-broker-ACK ordering. Target storage and exact BG95
-  receive/publish framing remain open.
+  replay and receipt-before-broker-ACK ordering. The portable uplink adapter
+  persists each retry before returning the exact `up` topic/payload view and
+  applies a queued receipt by durable lookup after restart. Target storage and
+  exact BG95 receive/publish framing remain open.
 
 ## Open evidence
 

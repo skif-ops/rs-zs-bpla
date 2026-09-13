@@ -43,6 +43,9 @@ def main() -> int:
     firmware_header = read("firmware/include/zs_event_receipt.h")
     firmware_source = read("firmware/src/zs_event_receipt.c")
     firmware_test = read("firmware/tests/test_event_receipt.c")
+    mqtt_header = read("firmware/include/zs_mqtt_event_transport.h")
+    mqtt_source = read("firmware/src/zs_mqtt_event_transport.c")
+    mqtt_test = read("firmware/tests/test_mqtt_event_transport.c")
     generator = read("tools/generate_event_receipt_vector.py")
     vector = read("firmware/generated/zs_event_receipt_vector.h")
     cmake = read("firmware/CMakeLists.txt")
@@ -112,10 +115,11 @@ def main() -> int:
         require(token in firmware_header, f"firmware receipt API missing: {token}")
     for token in (
         "byte != 0xa7u",
-        "receipt.event_id != item->event_id",
-        "memcmp(receipt.payload_sha256, item->payload_sha256",
+        "receipt.boot_id != item.boot_id",
+        "memcmp(receipt.payload_sha256, item.payload_sha256",
         "qos != ZS_EVENT_RECEIPT_QOS || retained",
         "zs_event_outbox_mark_application_acked",
+        "zs_event_outbox_lookup",
     ):
         require(token in firmware_source, f"firmware receipt guard missing: {token}")
     for token in (
@@ -127,6 +131,39 @@ def main() -> int:
         require(token in firmware_test, f"firmware receipt QG-2 case missing: {token}")
     require("src/zs_event_receipt.c" in cmake and "zs_event_receipt_tests" in cmake,
             "firmware receipt implementation is not bound to CMake/CTest")
+
+    for token in (
+        "ZS_MQTT_EVENT_TENANT_MAX_BYTES 32u",
+        "ZS_MQTT_EVENT_TOPIC_MAX_BYTES 64u",
+        "zs_mqtt_event_transport_init",
+        "zs_mqtt_event_transport_prepare",
+        "zs_mqtt_event_transport_handle_receipt",
+    ):
+        require(token in mqtt_header, f"firmware event MQTT API missing: {token}")
+    for token in (
+        "zs_event_outbox_peek",
+        "zs_event_outbox_note_attempt",
+        "publication->topic = transport->up_topic",
+        "publication->qos = ZS_MQTT_EVENT_QOS",
+        "zs_event_receipt_transport_handle",
+    ):
+        require(token in mqtt_source, f"firmware event MQTT stage missing: {token}")
+    require(
+        mqtt_source.index("zs_event_outbox_note_attempt")
+        < mqtt_source.index("publication->payload ="),
+        "event payload can be exposed before durable attempt accounting",
+    )
+    for token in (
+        "test_retry_then_exact_receipt_lifecycle",
+        "test_queued_receipt_applies_after_transport_restart",
+        "test_receipt_rejection_and_attempt_storage_failure",
+        "test_retry_limit_station_and_argument_guards",
+        "MQTT PUBACK is deliberately a no-op",
+    ):
+        require(token in mqtt_test, f"firmware event MQTT QG-2 case missing: {token}")
+    require("src/zs_mqtt_event_transport.c" in cmake and
+            "zs_mqtt_event_transport_tests" in cmake,
+            "firmware event MQTT transport is not bound to CMake/CTest")
 
     require("encode_event_receipt" in generator and "--check" in generator,
             "server/firmware receipt vector generator is incomplete")
@@ -172,6 +209,13 @@ def main() -> int:
     )
     require("event_receipt_mqtt_binding: MISSING_BLOCKER" in target,
             "target receipt MQTT binding blocker is not explicit")
+    require(
+        "event_mqtt_uplink_transport: PORTABLE_EXACT_TOPIC_RETRY_RECEIPT_QG1_QG2_PASS_BG95_AT_BINDING_PENDING"
+        in target,
+        "target status overclaims or omits portable event MQTT evidence",
+    )
+    require("event_mqtt_uplink_binding: MISSING_BLOCKER" in target,
+            "target event MQTT uplink binding blocker is not explicit")
     require("validate_event_receipt_contract.py" in ci,
             "event receipt QG-1 is not bound to CI")
     require("audit_event_receipt_technical.py" in ci,

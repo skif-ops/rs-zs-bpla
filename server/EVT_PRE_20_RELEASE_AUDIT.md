@@ -46,8 +46,10 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
 7. ЧАСТИЧНО: portable event outbox атомарно сохраняет schema-4 CBOR, metadata,
    SHA-256, приоритет и retry bitmap и проходит fault-injection. Серверная схема
    application receipt и portable firmware parser проверяют точный payload hash,
-   station/event identity, QoS/retain и идемпотентный повтор. Открыты exact BG95
-   binding, target storage/endurance и аппаратный recovery.
+   station/event identity, QoS/retain и идемпотентный повтор. Portable uplink
+   adapter сохраняет retry до выдачи exact binary publication и не освобождает
+   slot по PUBACK. Открыты exact BG95 binding, target storage/endurance и
+   аппаратный recovery.
 
 Закрыто в исходном baseline EVT-PRE-20: MQTT bridge теперь fail-closed и требует CA, client certificate и key. Plaintext разрешён только явным флагом `--insecure-bench`, который используется в отдельном development compose и проверяется отрицательными тестами.
 

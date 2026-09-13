@@ -59,6 +59,9 @@
   station/boot/sequence/event binding и SHA-256 точных detection bytes. Сервер
   сохраняет processing state до receipt, exact retry не повторяет fusion, а
   firmware освобождает outbox slot только после строгой проверки receipt.
+- Portable event MQTT adapter выдаёт только exact binary `up` publication после
+  durable retry accounting, оставляет PUBACK без влияния на outbox и применяет
+  queued receipt после рестарта через поиск durable event identity.
 - Открыты target MQTT subscription/URC binding, reviewed Ed25519 backend,
   provisioning public key, Flash/outbox storage/endurance binding, command ACK
   publisher, BG95 event-receipt binding и аппаратный end-to-end;
