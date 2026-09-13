@@ -34,6 +34,7 @@ add_library(zs_core
   src/zs_nor.c
   src/zs_nor_archive.c
   src/zs_nor_event_outbox.c
+  src/zs_nor_storage_layout.c
   src/zs_adpcm.c
   src/zs_prehistory.c
   src/zs_spatial.c
@@ -77,6 +78,8 @@ add_executable(zs_nor_tests tests/test_nor.c)
 target_link_libraries(zs_nor_tests zs_core m)
 add_executable(zs_nor_event_outbox_tests tests/test_nor_event_outbox.c)
 target_link_libraries(zs_nor_event_outbox_tests zs_core m)
+add_executable(zs_nor_storage_layout_tests tests/test_nor_storage_layout.c)
+target_link_libraries(zs_nor_storage_layout_tests zs_core m)
 add_executable(zs_prehistory_tests tests/test_prehistory.c)
 target_link_libraries(zs_prehistory_tests zs_core m)
 add_executable(zs_spatial_tests tests/test_spatial.c)
@@ -113,6 +116,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_archive_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_nor_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_nor_event_outbox_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_nor_storage_layout_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_prehistory_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_spatial_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_protocol_size_tests PRIVATE -UNDEBUG)
@@ -140,6 +144,7 @@ add_test(NAME heartbeat_telemetry COMMAND zs_heartbeat_telemetry_tests)
 add_test(NAME archive COMMAND zs_archive_tests)
 add_test(NAME nor COMMAND zs_nor_tests)
 add_test(NAME nor_event_outbox COMMAND zs_nor_event_outbox_tests)
+add_test(NAME nor_storage_layout COMMAND zs_nor_storage_layout_tests)
 add_test(NAME prehistory COMMAND zs_prehistory_tests)
 add_test(NAME spatial COMMAND zs_spatial_tests)
 add_test(NAME protocol_size COMMAND zs_protocol_size_tests)

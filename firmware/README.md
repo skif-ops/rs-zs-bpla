@@ -45,8 +45,12 @@ binding и аппаратный recovery test.
 
 Portable NOR adapter выделяет каждому outbox slot отдельный erase block и
 проверяет alignment/range partition, поэтому reclaim не стирает соседнее pending
-event. Конкретные base/count без пересечения с audio archive, OCTOSPI HAL и
-endurance ещё должны быть утверждены в target memory map и измерены на плате.
+event. Portable layout planner вычисляет непересекающиеся разделы: audio archive
+занимает выровненный префикс NOR, а outbox — хвост из одного erase block на
+каждый переданный target-ом slot. Для контрольной геометрии 64 MiB / 4 KiB / 256
+слотов host QG проверяет границу 63 MiB + 1 MiB. Серийное число слотов, OCTOSPI
+HAL и endurance ещё должны быть утверждены в target memory map и измерены на
+плате.
 
 Первый target-инкремент уже фиксирует точный исходный контракт
 `STM32U585VIT6Q/LQFP100`: 67 назначений из Rev.A pin map и AAD addendum,

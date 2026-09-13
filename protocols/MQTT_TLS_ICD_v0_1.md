@@ -293,16 +293,20 @@ commit marker. Незавершённая запись после потери �
 Portable W25Q-class adapter maps every 616-byte logical outbox slot to its own
 complete 4-KiB erase block. Partition base alignment, capacity and slot bounds
 are checked before use, so reclaiming one event cannot erase an adjacent pending
-event. The exact NOR base/count must be allocated outside the archive region in
-the reviewed target memory map; OCTOSPI HAL binding and measured endurance remain
-open.
+event. The portable layout planner assigns the erase-aligned NOR prefix to the
+audio archive and derives the outbox base from a caller-supplied slot count at
+the end of the same device. It rejects insufficient or unaligned geometries and
+proves that the two ranges do not overlap. The 64-MiB / 4-KiB / 256-slot host
+reference produces a 63-MiB archive prefix and a 1-MiB outbox tail. This example
+does not freeze the production slot count; that count, the reviewed target memory
+map, OCTOSPI HAL binding and measured endurance remain open.
 
 MQTT PUBACK не является application ACK. Станция помечает событие доставленным
 только после проверенного server application receipt из раздела 2.3; torn ACK
 marker остаётся pending, поэтому recovery имеет семантику at-least-once и может
 повторить тот же `event_id`. Серверная схема и portable firmware parser проходят
-host QG-1/QG-2. Exact BG95 receive binding, target storage binding,
-wear/endurance и аппаратная recovery-проверка пока открыты; portable QG не
+host QG-1/QG-2. Exact BG95 receive binding, production outbox slot count,
+target OCTOSPI binding, wear/endurance и аппаратная recovery-проверка пока открыты; portable QG не
 закрывает `REQ-CELL-003`.
 
 ## 7. Gate

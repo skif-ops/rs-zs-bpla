@@ -49,8 +49,9 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    station/event identity, QoS/retain и идемпотентный повтор. Portable uplink
    adapter сохраняет retry до выдачи exact binary publication и не освобождает
    slot по PUBACK. Portable NOR adapter изолирует slot отдельным erase block.
-   Открыты exact BG95 binding, target NOR partition/OCTOSPI/endurance и аппаратный
-   recovery.
+   Portable planner проверяет непересекающиеся archive-prefix/outbox-tail разделы
+   для заданного числа слотов. Открыты production slot count, exact BG95 binding,
+   target memory-map/OCTOSPI/endurance и аппаратный recovery.
 
 Закрыто в исходном baseline EVT-PRE-20: MQTT bridge теперь fail-closed и требует CA, client certificate и key. Plaintext разрешён только явным флагом `--insecure-bench`, который используется в отдельном development compose и проверяется отрицательными тестами.
 
@@ -72,7 +73,8 @@ production crypto/Flash binding/ACK publisher, provisioning public key и про
 pending events, а server/portable-firmware application receipt подтверждает
 только exact payload после durable processing. MQTT PUBACK не считается таким
 подтверждением. До exact BG95/target binding события после восстановления сети
-не разрешено удалять в изделии.
+не разрешено удалять в изделии. Непересечение portable NOR-разделов проверено на
+host, но production slot count и физическая target-разметка ещё не утверждены.
 
 До закрытия пунктов сервер разрешён только для разработки или изолированного стенда. Публикация напрямую в интернет запрещена.
 

@@ -23,6 +23,9 @@ def main() -> int:
     nor_header = read("firmware/include/zs_nor_event_outbox.h")
     nor_source = read("firmware/src/zs_nor_event_outbox.c")
     nor_test = read("firmware/tests/test_nor_event_outbox.c")
+    layout_header = read("firmware/include/zs_nor_storage_layout.h")
+    layout_source = read("firmware/src/zs_nor_storage_layout.c")
+    layout_test = read("firmware/tests/test_nor_storage_layout.c")
     cmake = read("firmware/CMakeLists.txt")
     ci = read(".github/workflows/ci.yml")
     icd = read("protocols/MQTT_TLS_ICD_v0_1.md")
@@ -104,6 +107,35 @@ def main() -> int:
     require("src/zs_nor_event_outbox.c" in cmake and
             "zs_nor_event_outbox_tests" in cmake,
             "NOR outbox adapter is not bound to CMake/CTest")
+    for token in (
+        "zs_nor_storage_layout_t",
+        "outbox_slot_count",
+        "outbox_base_address",
+        "outbox_partition_bytes",
+        "zs_archive_layout_t archive",
+        "zs_nor_storage_layout_make",
+    ):
+        require(token in layout_header, f"NOR layout API missing: {token}")
+    for token in (
+        "erase_block_bytes < ZS_EVENT_OUTBOX_SLOT_BYTES",
+        "capacity_bytes % erase_block_bytes != 0u",
+        "(uint64_t)outbox_slot_count * (uint64_t)erase_block_bytes",
+        "zs_archive_make_default_layout",
+        "out->outbox_base_address = archive_bytes",
+        "(uint64_t)archive_bytes + outbox_bytes != capacity_bytes",
+    ):
+        require(token in layout_source, f"NOR layout invariant missing: {token}")
+    for token in (
+        "test_default_64m_tail_partition",
+        "test_slot_count_remains_a_target_input",
+        "test_capacity_and_geometry_guards",
+        "layout.outbox_base_address == 63u * 1024u * 1024u",
+        "archive_end(&layout.archive) == layout.outbox_base_address",
+    ):
+        require(token in layout_test, f"NOR layout QG-2 case missing: {token}")
+    require("src/zs_nor_storage_layout.c" in cmake and
+            "zs_nor_storage_layout_tests" in cmake,
+            "NOR layout planner is not bound to CMake/CTest")
     require("validate_event_outbox_contract.py" in ci,
             "event outbox QG-1 is not bound to CI")
     for token in (
@@ -127,15 +159,25 @@ def main() -> int:
         "target status overclaims or omits NOR outbox evidence",
     )
     require(
-        "event_outbox_storage_binding: PORTABLE_NOR_ADAPTER_PASS_EXACT_PARTITION_AND_OCTOSPI_BINDING_BLOCKER"
+        "event_nor_partition_planner: PORTABLE_ARCHIVE_OUTBOX_NONOVERLAP_QG1_QG2_PASS_SLOT_COUNT_AND_OCTOSPI_BINDING_PENDING"
+        in target,
+        "target status overclaims or omits portable NOR layout evidence",
+    )
+    require(
+        "event_outbox_storage_binding: PORTABLE_LAYOUT_AND_NOR_ADAPTER_PASS_EXACT_SLOT_COUNT_OCTOSPI_ENDURANCE_BLOCKER"
         in target,
         "target outbox storage binding status is not bounded",
     )
-    require("event_outbox_nor_partition: MISSING_BLOCKER" in target,
-            "target outbox NOR partition blocker is not explicit")
+    require(
+        "event_outbox_nor_partition: PORTABLE_NONOVERLAP_LAYOUT_QG1_QG2_PASS_EXACT_SLOT_COUNT_AND_TARGET_BINDING_BLOCKER"
+        in target,
+        "target outbox NOR partition blocker is not explicit",
+    )
+    require("event_outbox_slot_count: MISSING_BLOCKER" in target,
+            "target outbox slot-count blocker is not explicit")
 
     print("Event store-and-forward outbox QG-1: PASS")
-    print("scope: portable atomic queue + erase-isolated NOR adapter; exact partition/OCTOSPI and hardware remain pending")
+    print("scope: portable atomic queue + erase-isolated NOR adapter + non-overlap planner; exact slot count/OCTOSPI and hardware remain pending")
     return 0
 
 

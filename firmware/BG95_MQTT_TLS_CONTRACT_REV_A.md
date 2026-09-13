@@ -99,8 +99,11 @@ and clear online/network-valid flags.
   persists each retry before returning the exact `up` topic/payload view and
   applies a queued receipt by durable lookup after restart. A W25Q-class adapter
   dedicates a complete erase block to each logical outbox slot and verifies
-  partition bounds. Exact NOR partition allocation, OCTOSPI HAL/endurance and
-  exact BG95 receive/publish framing remain open.
+  partition bounds. A portable planner assigns the aligned NOR prefix to the
+  audio archive and an erase-isolated tail to a caller-supplied outbox slot
+  count; QG-1/QG-2 verify exact non-overlap, including the 64 MiB / 4 KiB / 256
+  slot reference geometry. Production slot count, target memory-map/OCTOSPI
+  binding, endurance and exact BG95 receive/publish framing remain open.
 
 ## Open evidence
 
@@ -111,7 +114,7 @@ and clear online/network-valid flags.
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
 - reviewed Ed25519 backend and public-key provisioning, nonvolatile target-page
   binding/endurance, exact BG95 binary receive/publish framing, subscription and
-  publish-prompt handling and target outbox storage/endurance binding; the
+  publish-prompt handling and target outbox slot-count/OCTOSPI/endurance binding; the
   portable fixed-memory
   parser, topic/QoS/retain boundary, ACK codec and server-side canonical envelope,
   QoS 1 retry, command ACK path and event receipt path have host tests;

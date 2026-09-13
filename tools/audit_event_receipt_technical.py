@@ -152,6 +152,18 @@ def audit_firmware_runtime() -> None:
                 "firmware/src/zs_sha256.c",
             ),
         ),
+        (
+            "zs_nor_storage_layout_tests",
+            (
+                "firmware/tests/test_nor_storage_layout.c",
+                "firmware/src/zs_nor_storage_layout.c",
+                "firmware/src/zs_archive.c",
+                "firmware/src/zs_event_outbox.c",
+                "firmware/src/zs_protocol.c",
+                "firmware/src/zs_cbor.c",
+                "firmware/src/zs_sha256.c",
+            ),
+        ),
     )
     with tempfile.TemporaryDirectory(prefix="zs-event-fw-qg2-") as directory:
         for test_name, sources in tests:
@@ -293,7 +305,7 @@ def main() -> int:
                 "full uint64 event ID was truncated")
 
     print("Event application receipt QG-2 independent runtime audit: PASS")
-    print("- server runtime plus firmware publish/retry/receipt and erase-isolated NOR lifecycle verified")
+    print("- server runtime plus firmware publish/retry/receipt, erase-isolated NOR lifecycle and non-overlap layout verified")
     return 0
 
 
