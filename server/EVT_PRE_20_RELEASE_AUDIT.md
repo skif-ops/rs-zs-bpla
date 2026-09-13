@@ -52,8 +52,10 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    Portable planner проверяет непересекающиеся archive-prefix/outbox-tail разделы
    для заданного числа слотов, а единый bind API ограничивает archive storage на
    этой границе и создаёт outbox adapter для хвоста. Открыты production slot
-   count, exact BG95 binding, target memory-map/OCTOSPI/endurance и аппаратный
-   recovery.
+   count, BG95 receipt/downlink и target UART routing. Fixed-length BG95 event
+   `QMTPUB`/prompt/binary/result path проходит host QG и не трактует PUBACK как
+   application receipt. Target memory-map/OCTOSPI/endurance и аппаратный recovery
+   остаются открыты.
 
 Закрыто в исходном baseline EVT-PRE-20: MQTT bridge теперь fail-closed и требует CA, client certificate и key. Plaintext разрешён только явным флагом `--insecure-bench`, который используется в отдельном development compose и проверяется отрицательными тестами.
 
@@ -74,8 +76,8 @@ production crypto/Flash binding/ACK publisher, provisioning public key и про
 Частично закрыт пункт 7: host outbox обеспечивает at-least-once и не вытесняет
 pending events, а server/portable-firmware application receipt подтверждает
 только exact payload после durable processing. MQTT PUBACK не считается таким
-подтверждением. До exact BG95/target binding события после восстановления сети
-не разрешено удалять в изделии. Непересечение portable NOR-разделов проверено на
+подтверждением. До exact BG95 receipt/target binding события после восстановления
+сети не разрешено удалять в изделии. Непересечение portable NOR-разделов проверено на
 host, но production slot count и физическая target-разметка ещё не утверждены.
 
 До закрытия пунктов сервер разрешён только для разработки или изолированного стенда. Публикация напрямую в интернет запрещена.

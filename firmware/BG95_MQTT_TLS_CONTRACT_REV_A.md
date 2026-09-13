@@ -1,6 +1,6 @@
 # BG95-M3 MQTT/TLS transport contract Rev.A
 
-Status: `HOST CONTRACT + PORTABLE BINARY COMMAND PATH AND EVENT OUTBOX PASS / TARGET STORAGE, CRYPTO, BG95 AT BINDING AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
+Status: `HOST CONTRACT + PORTABLE BINARY COMMAND PATH, EVENT OUTBOX AND BG95 FIXED-LENGTH EVENT UPLINK PASS / TARGET STORAGE, CRYPTO, BG95 RECEIPT/DOWNLINK, UART ROUTING, MODEM AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
 
 This contract extends the portable BG95 state machine from automatic SIM/network
 discovery to an outbound MQTT/TLS session. It does not claim that a particular
@@ -104,8 +104,16 @@ and clear online/network-valid flags.
   count; QG-1/QG-2 verify exact non-overlap, including the 64 MiB / 4 KiB / 256
   slot reference geometry. The shared binding creates both adapters from this
   layout and caps archive-visible storage at the derived outbox base. Production
-  slot count, target memory-map/OCTOSPI binding, endurance and exact BG95
-  receive/publish framing remain open.
+  slot count, target memory-map/OCTOSPI binding and endurance remain open.
+  The BG95 event-uplink binding follows the fixed-length data mode from Quectel
+  `BG95&BG77&BG600L Series MQTT Application Note` v1.2 section 3.2.8: it writes
+  `AT+QMTPUB` with exact topic/QoS/retain/message length, waits for `>`, then
+  writes the exact binary CBOR bytes without a Ctrl+Z terminator. Partial UART
+  writes, unexpected/mismatched `+QMTPUB`, timeout and offline transition fail
+  closed while the outbox item remains pending. `+QMTPUB` success is recorded
+  only as broker ACK and never as the server application receipt. Target UART
+  routing and modem-firmware/hardware evidence remain open; receipt/downlink
+  framing is not closed by this uplink path.
 
 ## Open evidence
 
@@ -115,9 +123,10 @@ and clear online/network-valid flags.
 - certificate upload/provisioning and BG95 firmware-version compatibility;
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
 - reviewed Ed25519 backend and public-key provisioning, nonvolatile target-page
-  binding/endurance, exact BG95 binary receive/publish framing, subscription and
-  publish-prompt handling and target outbox slot-count/OCTOSPI/endurance binding; the
-  portable fixed-memory
+  binding/endurance, exact BG95 binary receive/publish framing for command
+  down/ACK plus event receipt, subscription and target UART routing, and outbox
+  slot-count/OCTOSPI/endurance binding; the fixed-length
+  event publish/prompt path and portable fixed-memory
   parser, topic/QoS/retain boundary, ACK codec and server-side canonical envelope,
   QoS 1 retry, command ACK path and event receipt path have host tests;
 - power-loss, network-loss, CGNAT, dual-SIM switching and 24-hour test logs after

@@ -18,6 +18,9 @@ def main() -> int:
     header = read("firmware/include/zs_bg95.h")
     source = read("firmware/src/zs_bg95.c")
     test = read("firmware/tests/test_bg95_transport.c")
+    uplink_header = read("firmware/include/zs_bg95_event_uplink.h")
+    uplink_source = read("firmware/src/zs_bg95_event_uplink.c")
+    uplink_test = read("firmware/tests/test_bg95_event_uplink.c")
     cmake = read("firmware/CMakeLists.txt")
     ci = read(".github/workflows/ci.yml")
     policy = read("config/cellular/dual_sim_apn_profiles.yaml")
@@ -58,6 +61,19 @@ def main() -> int:
         require(evidence in test, f"BG95 QG-2 scenario missing {evidence}")
     require("zs_bg95_transport_tests" in cmake and "bg95_transport" in cmake,
             "BG95 host test is not bound to CMake/CTest")
+    for token in ("zs_bg95_event_uplink_start", "zs_bg95_event_uplink_on_prompt",
+                  "zs_bg95_event_uplink_on_line", "ZS_BG95_EVENT_UPLINK_OUTCOME_BROKER_ACK"):
+        require(token in uplink_header, f"BG95 event uplink interface missing {token}")
+    for token in ("AT+QMTPUB=", "uart_write_all", "publication.payload_size",
+                  "zs_mqtt_event_transport_prepare"):
+        require(token in uplink_source, f"BG95 event uplink source missing {token}")
+    for token in ("test_fixed_length_binary_publish_and_broker_ack",
+                  "test_fixed_length_preserves_at_control_bytes",
+                  "test_uart_failures_preserve_pending_event",
+                  "Broker ACK is not the server application receipt"):
+        require(token in uplink_test, f"BG95 event uplink evidence missing {token}")
+    require("zs_bg95_event_uplink_tests" in cmake and "bg95_event_uplink" in cmake,
+            "BG95 event uplink test is not bound to CMake/CTest")
     require("validate_bg95_transport_contract_rev_a.py" in ci,
             "BG95 QG-1 is not bound to CI")
 

@@ -62,13 +62,16 @@
 - Portable event MQTT adapter выдаёт только exact binary `up` publication после
   durable retry accounting, оставляет PUBACK без влияния на outbox и применяет
   queued receipt после рестарта через поиск durable event identity.
+- Portable BG95 uplink формирует fixed-length QoS-1/non-retained `QMTPUB`, после
+  prompt передаёт exact binary CBOR и fail-closed обрабатывает partial UART,
+  timeout/offline и mismatched result; `+QMTPUB` success не освобождает outbox.
 - Portable W25Q-class outbox adapter использует один полный erase block на slot,
   проверяет alignment/capacity и сохраняет соседний pending slot при reclaim;
   portable planner размещает audio archive в выровненном префиксе NOR, outbox в
   хвосте и QG-проверяет их непересечение; shared bind API создаёт оба adapter-а
   из одного layout и обрезает archive storage на границе outbox. Production slot
   count, target memory-map/OCTOSPI/endurance остаются blockers.
-- Открыты target MQTT subscription/URC binding, reviewed Ed25519 backend,
+- Открыты target UART routing и MQTT receipt/downlink subscription/URC binding, reviewed Ed25519 backend,
   provisioning public key, Flash/outbox slot-count/OCTOSPI/endurance binding, command ACK
   publisher, BG95 event-receipt binding и аппаратный end-to-end;
   они не объявлены PASS до сборки станций.

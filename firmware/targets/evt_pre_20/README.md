@@ -92,5 +92,9 @@ tail, proving non-overlap for any accepted caller-supplied slot count; the host
 reference case verifies 63 MiB archive + 1 MiB/256-slot outbox on 64 MiB NOR.
 A single fail-closed bind API creates both adapters from that layout and caps
 the archive-visible storage at the outbox boundary. Production slot count,
-target memory-map/OCTOSPI binding, wear/endurance, exact BG95 publish/receipt
-subscription/URC binding and assembled-station recovery remain release blockers.
+target memory-map/OCTOSPI binding and wear/endurance remain release blockers.
+The portable BG95 uplink now emits fixed-length `QMTPUB`, waits for the data
+prompt and writes exact binary CBOR bytes; partial UART writes, wrong result URCs,
+offline transitions and timeout retain the pending event. Broker success still
+does not reclaim it. Target UART routing, BG95 receipt subscription/URC parsing,
+modem-firmware validation and assembled-station recovery remain release blockers.

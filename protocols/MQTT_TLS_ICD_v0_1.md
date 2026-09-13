@@ -12,7 +12,7 @@ Detection schema: `4`
 
 | Topic | Направление | QoS | Retain | Payload | Статус реализации |
 |---|---|---:|---:|---|---|
-| `zs/v1/{tenant}/{station_id}/up` | station -> server | 1 | false | detection compact CBOR | EXISTS |
+| `zs/v1/{tenant}/{station_id}/up` | station -> server | 1 | false | detection compact CBOR | PORTABLE_BG95_FIXED_LENGTH_BINARY_QMTPUB_QG_PASS; TARGET_UART_AND_HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | FIRMWARE_PORTABLE_BINARY_PATH_IMPLEMENTED; TARGET_CRYPTO_AND_BG95_AT_BINDING_PENDING |
 | `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | FIRMWARE_PORTABLE_BINARY_PATH_IMPLEMENTED; TARGET_CRYPTO_AND_BG95_AT_BINDING_PENDING |
@@ -150,6 +150,14 @@ exhaustion therefore emits no publication. A broker PUBACK does not change the
 outbox. A queued QoS-1 receipt can locate and close its exact durable slot after
 a station restart, without volatile in-flight state.
 
+The BG95 uplink uses fixed-length data mode
+`AT+QMTPUB=<client>,<msgID>,1,0,"<topic>",<msglen>`. Only after the `>` prompt
+does firmware write exactly `<msglen>` binary bytes; no Ctrl+Z delimiter is used,
+so embedded NUL, quote or `0x1a` values remain payload. Partial UART writes,
+timeouts, offline transitions and malformed or mismatched `+QMTPUB` results
+fail closed and preserve the durable event. A successful `+QMTPUB` remains a
+broker ACK, not the application receipt defined above.
+
 The server stores the exact payload hash and processing state before publishing
 the receipt. A byte-identical broker redelivery after processing skips fusion
 side effects and republishes the same receipt. Reuse of an `event_id` with
@@ -160,8 +168,9 @@ Server process state and MQTT callbacks must remain serialized per deployment;
 multi-worker receipt processing requires an equivalent transactional claim.
 
 The deterministic server-generated receipt vector is checked by both Python and
-C tests. Exact BG95 binary subscription/URC framing and target outbox storage are
-still release blockers; portable host evidence is not assembled-station evidence.
+C tests. Fixed-length BG95 event publication has portable host evidence. Exact
+receipt subscription/URC framing, target UART routing and target outbox storage
+are still release blockers; portable host evidence is not assembled-station evidence.
 
 ## 3. Detection compact CBOR
 

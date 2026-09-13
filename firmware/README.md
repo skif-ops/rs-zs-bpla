@@ -40,8 +40,10 @@ Portable store-and-forward теперь дополнен серверным appl
 detection payload, а fixed-memory firmware parser проверяет topic, QoS/retain и
 полную identity события до маркировки outbox slot доставленным. Portable uplink
 adapter сохраняет retry marker до выдачи exact `up` topic/payload и не считает
-PUBACK разрешением на удаление. Host QG не заменяет exact BG95 binary MQTT
-binding и аппаратный recovery test.
+PUBACK разрешением на удаление. BG95 uplink binding использует fixed-length
+`QMTPUB`: после `>` пишет ровно заявленное число binary CBOR bytes и оставляет
+event pending даже после `+QMTPUB` success. Host QG не заменяет target UART
+routing, BG95 receipt/downlink binding и аппаратный recovery test.
 
 Portable NOR adapter выделяет каждому outbox slot отдельный erase block и
 проверяет alignment/range partition, поэтому reclaim не стирает соседнее pending
