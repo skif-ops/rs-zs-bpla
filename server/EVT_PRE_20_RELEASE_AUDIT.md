@@ -51,8 +51,13 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    slot по PUBACK. Portable NOR adapter изолирует slot отдельным erase block.
    Portable planner проверяет непересекающиеся archive-prefix/outbox-tail разделы
    для заданного числа слотов, а единый bind API ограничивает archive storage на
-   этой границе и создаёт outbox adapter для хвоста. Открыты production slot
-   count, BG95 receipt/downlink и target UART routing. Fixed-length BG95 event
+   этой границе и создаёт outbox adapter для хвоста. Portable BG95 transport
+   настраивает length-enabled direct URC до `QMTOPEN`, а receipt path после
+   connect требует успех этого шага, выполняет exact QoS-1 subscription и
+   binary-safe parser. Поскольку `+QMTRECV` не показывает retain-флаг, init
+   требует внешний station ACL/server-only/non-retained contract. Открыты
+   production slot count, command downlink, target UART routing и проверка этого
+   broker contract. Fixed-length BG95 event
    `QMTPUB`/prompt/binary/result path проходит host QG и не трактует PUBACK как
    application receipt. Target memory-map/OCTOSPI/endurance и аппаратный recovery
    остаются открыты.
@@ -76,9 +81,10 @@ production crypto/Flash binding/ACK publisher, provisioning public key и про
 Частично закрыт пункт 7: host outbox обеспечивает at-least-once и не вытесняет
 pending events, а server/portable-firmware application receipt подтверждает
 только exact payload после durable processing. MQTT PUBACK не считается таким
-подтверждением. До exact BG95 receipt/target binding события после восстановления
-сети не разрешено удалять в изделии. Непересечение portable NOR-разделов проверено на
-host, но production slot count и физическая target-разметка ещё не утверждены.
+подтверждением. Portable BG95 receipt binding закрыт только на host; до target
+UART/modem/broker-policy проверки события после восстановления сети не разрешено
+удалять в изделии. Непересечение portable NOR-разделов проверено на host, но
+production slot count и физическая target-разметка ещё не утверждены.
 
 До закрытия пунктов сервер разрешён только для разработки или изолированного стенда. Публикация напрямую в интернет запрещена.
 

@@ -42,8 +42,14 @@ detection payload, а fixed-memory firmware parser проверяет topic, QoS
 adapter сохраняет retry marker до выдачи exact `up` topic/payload и не считает
 PUBACK разрешением на удаление. BG95 uplink binding использует fixed-length
 `QMTPUB`: после `>` пишет ровно заявленное число binary CBOR bytes и оставляет
-event pending даже после `+QMTPUB` success. Host QG не заменяет target UART
-routing, BG95 receipt/downlink binding и аппаратный recovery test.
+event pending даже после `+QMTPUB` success. Базовая BG95 state machine до
+`QMTOPEN` включает direct `QMTRECV` с обязательной длиной; receipt binding после
+connect проверяет этот флаг, подписывается на exact receipt topic с QoS 1 и
+разбирает полный URC по byte count, сохраняя NUL/quote/CRLF/`0x1a`. Сам URC не
+содержит retain-флаг, поэтому путь разрешается только явным внешним контрактом
+station credential + server-only ACL + запрет retained receipt. Host QG не
+заменяет target UART routing, проверку broker policy/версии BG95 и аппаратный
+recovery test.
 
 Portable NOR adapter выделяет каждому outbox slot отдельный erase block и
 проверяет alignment/range partition, поэтому reclaim не стирает соседнее pending

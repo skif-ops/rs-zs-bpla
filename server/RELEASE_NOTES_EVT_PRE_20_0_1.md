@@ -65,15 +65,21 @@
 - Portable BG95 uplink формирует fixed-length QoS-1/non-retained `QMTPUB`, после
   prompt передаёт exact binary CBOR и fail-closed обрабатывает partial UART,
   timeout/offline и mismatched result; `+QMTPUB` success не освобождает outbox.
+- Portable BG95 transport до `QMTOPEN` включает payload length в direct
+  `QMTRECV`; receipt path после connect требует успех этого шага, подписывается
+  на exact station receipt topic с QoS 1 и разбирает binary frame
+  по byte count. Отсутствующий в URC retain-флаг компенсируется только явным
+  внешним station ACL/server-only/non-retained contract; его target-проверка
+  остаётся blocker.
 - Portable W25Q-class outbox adapter использует один полный erase block на slot,
   проверяет alignment/capacity и сохраняет соседний pending slot при reclaim;
   portable planner размещает audio archive в выровненном префиксе NOR, outbox в
   хвосте и QG-проверяет их непересечение; shared bind API создаёт оба adapter-а
   из одного layout и обрезает archive storage на границе outbox. Production slot
   count, target memory-map/OCTOSPI/endurance остаются blockers.
-- Открыты target UART routing и MQTT receipt/downlink subscription/URC binding, reviewed Ed25519 backend,
+- Открыты target UART routing, modem/broker-policy evidence и command downlink AT binding, reviewed Ed25519 backend,
   provisioning public key, Flash/outbox slot-count/OCTOSPI/endurance binding, command ACK
-  publisher, BG95 event-receipt binding и аппаратный end-to-end;
+  publisher и аппаратный end-to-end;
   они не объявлены PASS до сборки станций.
 
 Изменение не закрывает security/deployment blockers из `EVT_PRE_20_RELEASE_AUDIT.md` и не является разрешением на internet-facing deployment.

@@ -77,6 +77,7 @@ static bool copy_quoted_field(const char *line, unsigned field,
 static bool send_cmd(zs_bg95_t *m, const char *command) {
   uint8_t frame[256];
   size_t n;
+  int result;
   if (!m || !command || !m->io.uart_write) return false;
   n = strlen(command);
   if (n == 0u || n >= sizeof(m->last_command) || n + 2u > sizeof(frame)) return false;
@@ -84,7 +85,8 @@ static bool send_cmd(zs_bg95_t *m, const char *command) {
   memcpy(frame, command, n);
   frame[n++] = '\r';
   frame[n++] = '\n';
-  if (m->io.uart_write(m->io.ctx, m->uart_channel, frame, n) < 0) return false;
+  result = m->io.uart_write(m->io.ctx, m->uart_channel, frame, n);
+  if (result != 0 && result != (int)n) return false;
   m->command_pending = true;
   return true;
 }
@@ -103,6 +105,7 @@ static void fail_transport(zs_bg95_t *m) {
   m->command_pending = false;
   m->mqtt_open = false;
   m->mqtt_connected = false;
+  m->mqtt_receive_length_enabled = false;
   m->network_settings.valid = false;
   m->state = ZS_BG95_ERROR;
 }
@@ -124,6 +127,10 @@ static bool send_tls_step(zs_bg95_t *m, uint32_t now_ms) {
     case 3u:
       n = snprintf(command, sizeof(command), "AT+QMTCFG=\"ssl\",%u,1,%u",
                    m->mqtt_client, m->ssl_context);
+      break;
+    case 4u:
+      n = snprintf(command, sizeof(command),
+                   "AT+QMTCFG=\"recv/mode\",%u,0,1", m->mqtt_client);
       break;
     default:
       return false;
@@ -376,9 +383,10 @@ static void on_ok(zs_bg95_t *m, uint32_t now_ms) {
       break;
     case ZS_BG95_TLS_CONFIGURING:
       ++m->tls_step;
-      if (m->tls_step < 4u) {
+      if (m->tls_step < 5u) {
         if (!send_tls_step(m, now_ms)) fail_transport(m);
       } else {
+        m->mqtt_receive_length_enabled = true;
         n = snprintf(command, sizeof(command), "AT+QMTOPEN=%u,\"%s\",%u",
                      m->mqtt_client, m->mqtt_host, m->mqtt_port);
         m->state = ZS_BG95_MQTT_OPENING;
@@ -523,6 +531,7 @@ bool zs_bg95_configure_mqtt_tls(zs_bg95_t *m, const char *host, uint16_t port,
                                 bool public_apn) {
   if (!m) return false;
   m->transport_configured = false;
+  m->mqtt_receive_length_enabled = false;
   if (!public_apn || (!m->auto_network && !valid_apn(m->apn)) ||
       (m->apn[0] && contains_private(m->apn)) ||
       (port != 443u && port != 8883u)) return false;

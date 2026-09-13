@@ -21,6 +21,9 @@ def main() -> int:
     uplink_header = read("firmware/include/zs_bg95_event_uplink.h")
     uplink_source = read("firmware/src/zs_bg95_event_uplink.c")
     uplink_test = read("firmware/tests/test_bg95_event_uplink.c")
+    receipt_header = read("firmware/include/zs_bg95_event_receipt.h")
+    receipt_source = read("firmware/src/zs_bg95_event_receipt.c")
+    receipt_test = read("firmware/tests/test_bg95_event_receipt.c")
     cmake = read("firmware/CMakeLists.txt")
     ci = read(".github/workflows/ci.yml")
     policy = read("config/cellular/dual_sim_apn_profiles.yaml")
@@ -38,26 +41,32 @@ def main() -> int:
                   "zs_bg95_network_settings_t", "zs_bg95_configure_auto_network",
                   "zs_bg95_configure_mqtt_tls", "zs_bg95_start_mqtt",
                   "zs_bg95_get_network_settings", "zs_bg95_export_cellular_telemetry",
-                  "zs_bg95_online"):
+                  "zs_bg95_online", "mqtt_receive_length_enabled"):
         require(token in header, f"BG95 interface missing {token}")
 
     for command in ('AT+QCCID', 'AT+CIMI', 'AT+COPS?', 'AT+CGNAPN',
                     'AT+QIACT=1', 'AT+CGCONTRDP=1', 'QSSLCFG=\\"sslversion\\"',
                     'QSSLCFG=\\"seclevel\\"', 'QSSLCFG=\\"cacert\\"',
-                    'QMTCFG=\\"ssl\\"', 'AT+QMTOPEN=', 'AT+QMTCONN='):
+                    'QMTCFG=\\"ssl\\"', 'QMTCFG=\\"recv/mode\\"',
+                    'AT+QMTOPEN=', 'AT+QMTCONN='):
         require(command in source, f"BG95 command sequence missing {command}")
     for guard in ("contains_private", "port != 443u && port != 8883u",
                   'strpbrk(src, "\\r\\n\\\"")', 'strstr(line, "+QMTSTAT:")',
                   "BG95_COMMAND_TIMEOUT_MS", "BG95_NO_PROFILE",
-                  "strcmp(apn, m->apn) != 0", "network_settings.valid = false"):
+                  "strcmp(apn, m->apn) != 0", "network_settings.valid = false",
+                  "result != 0 && result != (int)n"):
         require(guard in source, f"BG95 fail-closed guard missing {guard}")
+    require(source.index('QMTCFG=\\"recv/mode\\"') <
+            source.index('AT+QMTOPEN='),
+            "BG95 receive length mode is not configured before QMTOPEN")
 
     for evidence in ("test_mqtt_tls_happy_path", "test_automatic_network_settings",
                      "test_catalog_fallback_and_unknown_sim", "test_identity_query_fail_closed",
                      "zs_bg95_export_cellular_telemetry", "250011234567890",
                      "89701012345678901234",
                      "private.apn", "wrong.apn", "1883u", "pilot.example\\\"",
-                     "+QMTOPEN: 0,3", "124000u"):
+                     "+QMTOPEN: 0,3", "124000u", "short_uart_call",
+                     'AT+QMTCFG=\\"recv/mode\\",0,0,1'):
         require(evidence in test, f"BG95 QG-2 scenario missing {evidence}")
     require("zs_bg95_transport_tests" in cmake and "bg95_transport" in cmake,
             "BG95 host test is not bound to CMake/CTest")
@@ -74,6 +83,27 @@ def main() -> int:
         require(token in uplink_test, f"BG95 event uplink evidence missing {token}")
     require("zs_bg95_event_uplink_tests" in cmake and "bg95_event_uplink" in cmake,
             "BG95 event uplink test is not bound to CMake/CTest")
+    for token in ("zs_bg95_event_receipt_subscribe",
+                  "zs_bg95_event_receipt_on_line",
+                  "zs_bg95_event_receipt_on_frame",
+                  "authenticated_server_only_nonretained_route"):
+        require(token in receipt_header,
+                f"BG95 event receipt interface missing {token}")
+    for token in ("AT+QMTSUB=", "+QMTRECV: ", "reader_unsigned",
+                  "modem->mqtt_receive_length_enabled",
+                  "zs_mqtt_event_transport_handle_receipt",
+                  "Retain is not present in +QMTRECV"):
+        require(token in receipt_source,
+                f"BG95 event receipt source missing {token}")
+    for token in ("test_subscription_and_binary_receipt_lifecycle",
+                  "test_length_delimited_payload_preserves_control_bytes",
+                  "test_frame_topic_client_delivery_and_framing_guards",
+                  "test_setup_failures_and_policy_guard"):
+        require(token in receipt_test,
+                f"BG95 event receipt evidence missing {token}")
+    require("zs_bg95_event_receipt_tests" in cmake and
+            "bg95_event_receipt" in cmake,
+            "BG95 event receipt test is not bound to CMake/CTest")
     require("validate_bg95_transport_contract_rev_a.py" in ci,
             "BG95 QG-1 is not bound to CI")
 

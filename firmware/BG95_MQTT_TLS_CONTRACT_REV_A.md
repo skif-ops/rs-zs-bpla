@@ -1,6 +1,6 @@
 # BG95-M3 MQTT/TLS transport contract Rev.A
 
-Status: `HOST CONTRACT + PORTABLE BINARY COMMAND PATH, EVENT OUTBOX AND BG95 FIXED-LENGTH EVENT UPLINK PASS / TARGET STORAGE, CRYPTO, BG95 RECEIPT/DOWNLINK, UART ROUTING, MODEM AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
+Status: `HOST CONTRACT + PORTABLE BINARY COMMAND PATH, EVENT OUTBOX, BG95 FIXED-LENGTH EVENT UPLINK AND LENGTH-DELIMITED RECEIPT PASS / TARGET STORAGE, CRYPTO, COMMAND DOWNLINK, UART ROUTING, MODEM AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
 
 This contract extends the portable BG95 state machine from automatic SIM/network
 discovery to an outbound MQTT/TLS session. It does not claim that a particular
@@ -50,8 +50,10 @@ validation payloads containing IMSI/ICCID.
 4. require server authentication with `QSSLCFG seclevel=2`;
 5. bind a provisioned CA file to SSL context 1;
 6. bind MQTT client 0 to SSL context 1;
-7. open only port 443 or 8883, then wait for successful `+QMTOPEN`;
-8. connect with the controlled client ID, then wait for successful `+QMTCONN`.
+7. before opening MQTT, configure direct receive with mandatory payload length
+   using `AT+QMTCFG="recv/mode",0,0,1`;
+8. open only port 443 or 8883, then wait for successful `+QMTOPEN`;
+9. connect with the controlled client ID, then wait for successful `+QMTCONN`.
 
 The API requires the caller to assert a public-APN profile. It rejects an explicit
 private APN, unsupported plaintext port, oversized fields and CR/LF or quote
@@ -112,8 +114,22 @@ and clear online/network-valid flags.
   writes, unexpected/mismatched `+QMTPUB`, timeout and offline transition fail
   closed while the outbox item remains pending. `+QMTPUB` success is recorded
   only as broker ACK and never as the server application receipt. Target UART
-  routing and modem-firmware/hardware evidence remain open; receipt/downlink
-  framing is not closed by this uplink path.
+  routing and modem-firmware/hardware evidence remain open.
+  The base BG95 state machine sends
+  `AT+QMTCFG="recv/mode",<client>,0,1` before `QMTOPEN`; after connection the
+  receipt binding refuses to proceed unless that step completed, then subscribes with
+  `AT+QMTSUB=<client>,<msgID>,"<exact-receipt-topic>",1`. Its fixed-memory
+  parser consumes one complete length-delimited `+QMTRECV` frame, uses the
+  declared payload byte count rather than C-string termination and therefore
+  preserves embedded NUL, quote, CR/LF and `0x1a`. A zero receive message ID is
+  rejected as non-QoS-1; the setup requires an exact successful QoS-1 grant.
+  Malformed framing, setup timeout and partial UART writes fail closed.
+  Quectel's `+QMTRECV` URC does not expose the MQTT retain flag. Consequently,
+  initialization requires an explicit external assertion that the provisioned
+  station credential and per-station broker ACL admit only the server on this
+  receipt route and reject retained receipt publication. This assertion is not
+  modem evidence: target UART framing, broker-policy verification and the
+  selected BG95 firmware revision remain open until tested on assembled units.
 
 ## Open evidence
 
@@ -124,9 +140,10 @@ and clear online/network-valid flags.
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
 - reviewed Ed25519 backend and public-key provisioning, nonvolatile target-page
   binding/endurance, exact BG95 binary receive/publish framing for command
-  down/ACK plus event receipt, subscription and target UART routing, and outbox
+  down/ACK, target UART routing for the host-tested event receipt subscription,
+  and outbox
   slot-count/OCTOSPI/endurance binding; the fixed-length
-  event publish/prompt path and portable fixed-memory
+  event publish/prompt path, length-delimited receipt path and portable fixed-memory
   parser, topic/QoS/retain boundary, ACK codec and server-side canonical envelope,
   QoS 1 retry, command ACK path and event receipt path have host tests;
 - power-loss, network-loss, CGNAT, dual-SIM switching and 24-hour test logs after

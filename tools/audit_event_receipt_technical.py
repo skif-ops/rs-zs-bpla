@@ -181,6 +181,20 @@ def audit_firmware_runtime() -> None:
                 "firmware/src/zs_sha256.c",
             ),
         ),
+        (
+            "zs_bg95_event_receipt_tests",
+            (
+                "firmware/tests/test_bg95_event_receipt.c",
+                "firmware/src/zs_bg95_event_receipt.c",
+                "firmware/src/zs_bg95.c",
+                "firmware/src/zs_mqtt_event_transport.c",
+                "firmware/src/zs_event_receipt.c",
+                "firmware/src/zs_event_outbox.c",
+                "firmware/src/zs_protocol.c",
+                "firmware/src/zs_cbor.c",
+                "firmware/src/zs_sha256.c",
+            ),
+        ),
     )
     with tempfile.TemporaryDirectory(prefix="zs-event-fw-qg2-") as directory:
         for test_name, sources in tests:
@@ -322,7 +336,7 @@ def main() -> int:
                 "full uint64 event ID was truncated")
 
     print("Event application receipt QG-2 independent runtime audit: PASS")
-    print("- server runtime plus fixed-length BG95 uplink, firmware receipt, erase-isolated NOR lifecycle and shared non-overlap binding verified")
+    print("- server runtime plus fixed-length BG95 uplink, length-enabled binary receipt URC, firmware receipt, erase-isolated NOR lifecycle and shared non-overlap binding verified")
     return 0
 
 

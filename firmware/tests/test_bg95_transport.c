@@ -10,12 +10,17 @@
 typedef struct {
   char uart[8192];
   size_t used;
+  unsigned uart_calls;
+  unsigned short_uart_call;
   bool gpio[8];
 } mock_t;
 
 static int uart_write(void *ctx, unsigned channel, const uint8_t *data, size_t len) {
   mock_t *mock = ctx;
   (void)channel;
+  ++mock->uart_calls;
+  if (mock->uart_calls == mock->short_uart_call)
+    return len > 1u ? (int)(len - 1u) : -1;
   if (mock->used + len >= sizeof(mock->uart)) return -1;
   memcpy(mock->uart + mock->used, data, len);
   mock->used += len;
@@ -118,8 +123,12 @@ static void test_mqtt_tls_happy_path(void) {
   zs_bg95_on_line(&modem, "OK", 1006u);
   expect_last(&modem, "AT+QMTCFG=\"ssl\",0,1,1");
   zs_bg95_on_line(&modem, "OK", 1007u);
-  expect_last(&modem, "AT+QMTOPEN=0,\"pilot.example\",443");
+  expect_last(&modem, "AT+QMTCFG=\"recv/mode\",0,0,1");
+  assert(!modem.mqtt_receive_length_enabled);
   zs_bg95_on_line(&modem, "OK", 1008u);
+  expect_last(&modem, "AT+QMTOPEN=0,\"pilot.example\",443");
+  assert(modem.mqtt_receive_length_enabled);
+  zs_bg95_on_line(&modem, "OK", 1009u);
   assert(modem.state == ZS_BG95_MQTT_OPENING);
   zs_bg95_on_line(&modem, "+QMTOPEN: 0,0", 1010u);
   expect_last(&modem, "AT+QMTCONN=0,\"dioneya-001-boot1\"");
@@ -358,8 +367,23 @@ static void test_timeout_and_negative_results(void) {
   zs_bg95_on_line(&modem, "OK", 5005u);
   zs_bg95_on_line(&modem, "OK", 5006u);
   zs_bg95_on_line(&modem, "OK", 5007u);
-  zs_bg95_on_line(&modem, "+QMTOPEN: 0,3", 5008u);
+  zs_bg95_on_line(&modem, "OK", 5008u);
+  zs_bg95_on_line(&modem, "+QMTOPEN: 0,3", 5009u);
   assert(modem.state == ZS_BG95_ERROR);
+
+  memset(&mock, 0, sizeof(mock));
+  reach_registered(&modem, &mock, "internet");
+  assert(zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 443u,
+                                    "dioneya-001", "UFS:ca.pem", true));
+  assert(zs_bg95_start_mqtt(&modem, 5500u));
+  provide_pdp_settings(&modem, 5501u, "internet");
+  zs_bg95_on_line(&modem, "OK", 5504u);
+  zs_bg95_on_line(&modem, "OK", 5505u);
+  zs_bg95_on_line(&modem, "OK", 5506u);
+  mock.short_uart_call = mock.uart_calls + 1u;
+  zs_bg95_on_line(&modem, "OK", 5507u);
+  assert(modem.state == ZS_BG95_ERROR);
+  assert(!modem.mqtt_receive_length_enabled);
 
   memset(&mock, 0, sizeof(mock));
   reach_registered(&modem, &mock, "internet");

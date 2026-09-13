@@ -97,6 +97,7 @@ typedef struct {
   bool registered_cs;
   bool command_pending;
   bool transport_configured;
+  bool mqtt_receive_length_enabled;
   bool mqtt_open;
   bool mqtt_connected;
 } zs_bg95_t;

@@ -16,7 +16,7 @@ Detection schema: `4`
 | `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | FIRMWARE_PORTABLE_BINARY_PATH_IMPLEMENTED; TARGET_CRYPTO_AND_BG95_AT_BINDING_PENDING |
 | `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | FIRMWARE_PORTABLE_BINARY_PATH_IMPLEMENTED; TARGET_CRYPTO_AND_BG95_AT_BINDING_PENDING |
-| `zs/v1/{tenant}/{station_id}/receipt` | server -> station | 1 | false | event application receipt | SERVER_AND_FIRMWARE_PORTABLE_PATH_IMPLEMENTED; BG95_AT_BINDING_PENDING |
+| `zs/v1/{tenant}/{station_id}/receipt` | server -> station | 1 | false | event application receipt | PORTABLE_BG95_LENGTH_DELIMITED_QMTRECV_QG_PASS; TARGET_UART_RETAIN_POLICY_AND_HARDWARE_PENDING |
 
 Client ID: `dioneya-{station_id}-{boot_id}`. Clean start запрещён после provisioning; session expiry и keepalive замораживаются после 24-часового теста сети. Повторная доставка QoS 1 ожидаема, дедупликация выполняется по `event_id`, а для команд по `command_id`.
 
@@ -158,6 +158,25 @@ timeouts, offline transitions and malformed or mismatched `+QMTPUB` results
 fail closed and preserve the durable event. A successful `+QMTPUB` remains a
 broker ACK, not the application receipt defined above.
 
+Before `QMTOPEN`, the portable BG95 connection state machine configures direct
+delivery with an explicit payload byte count using
+`AT+QMTCFG="recv/mode",<client>,0,1`. After `QMTCONN`, the receipt path refuses
+to subscribe unless that pre-connect step completed, then requests the exact station receipt topic with
+`AT+QMTSUB=<client>,<msgID>,"<receipt-topic>",1`. Subscription completes only
+after the matching successful `+QMTSUB` result grants QoS 1. The receiver parses
+one complete `+QMTRECV: <client>,<msgID>,"<topic>",<payload_len>,"<payload>"`
+frame by bounds and `<payload_len>`, so embedded NUL, quote, CR/LF and `0x1a`
+are not delimiters. Because the granted maximum QoS is 1, message ID zero is
+treated as QoS 0 and rejected; a nonzero ID is passed as QoS 1.
+
+BG95 `+QMTRECV` does not report the MQTT retain flag. The portable binding may
+therefore assert `retain=false` only when target integration has independently
+verified the station credential, exact per-station ACL, server-only publisher
+and broker rule forbidding retained receipt publication. The API requires that
+external assertion at initialization. This is a documented residual boundary,
+not an inferred modem property; selected-firmware URC behavior, UART routing
+and broker policy still require assembled-station evidence.
+
 The server stores the exact payload hash and processing state before publishing
 the receipt. A byte-identical broker redelivery after processing skips fusion
 side effects and republishes the same receipt. Reuse of an `event_id` with
@@ -168,9 +187,11 @@ Server process state and MQTT callbacks must remain serialized per deployment;
 multi-worker receipt processing requires an equivalent transactional claim.
 
 The deterministic server-generated receipt vector is checked by both Python and
-C tests. Fixed-length BG95 event publication has portable host evidence. Exact
-receipt subscription/URC framing, target UART routing and target outbox storage
-are still release blockers; portable host evidence is not assembled-station evidence.
+C tests. Fixed-length BG95 event publication and length-delimited receipt
+subscription/URC parsing have portable host evidence. Target UART routing,
+selected-modem-firmware framing, retain-policy verification and target outbox
+storage are still release blockers; portable host evidence is not
+assembled-station evidence.
 
 ## 3. Detection compact CBOR
 

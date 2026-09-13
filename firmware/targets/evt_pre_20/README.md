@@ -96,5 +96,11 @@ target memory-map/OCTOSPI binding and wear/endurance remain release blockers.
 The portable BG95 uplink now emits fixed-length `QMTPUB`, waits for the data
 prompt and writes exact binary CBOR bytes; partial UART writes, wrong result URCs,
 offline transitions and timeout retain the pending event. Broker success still
-does not reclaim it. Target UART routing, BG95 receipt subscription/URC parsing,
-modem-firmware validation and assembled-station recovery remain release blockers.
+does not reclaim it. Portable BG95 transport до `QMTOPEN` настраивает direct
+receive с обязательным payload length; receipt binding после connect требует
+успех этого шага, выполняет exact QoS-1 subscription и передаёт
+length-delimited binary `+QMTRECV` в application-receipt validator. В URC нет
+retain-флага, поэтому init требует явный server-only/non-retained broker ACL
+contract; это не является target-доказательством. Target UART routing, реальная
+форма URC выбранной версии modem firmware, broker-policy verification и
+assembled-station recovery остаются release blockers.
