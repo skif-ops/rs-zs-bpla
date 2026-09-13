@@ -189,7 +189,7 @@ static void test_valid_audio_commands_and_ack(void) {
 
 static void test_fail_closed_guards(void) {
   static const uint8_t command_id[ZS_COMMAND_UUID_BYTES] = {1u};
-  uint8_t payload[512], noncanonical[513];
+  uint8_t payload[512], noncanonical[513], nil_uuid[512];
   verifier_t verifier = {.accept = true};
   dedup_t dedup = {.state = ZS_COMMAND_DEDUP_NOT_SEEN};
   zs_command_t command;
@@ -230,11 +230,21 @@ static void test_fail_closed_guards(void) {
                 &verifier, &dedup, sizeof(payload), &command) ==
          ZS_COMMAND_STATUS_INVALID_CBOR);
 
+  memcpy(nil_uuid, payload, size);
+  memset(&nil_uuid[9], 0, ZS_COMMAND_UUID_BYTES);
+  assert(decode(nil_uuid, size, 17u, UINT64_C(1500000), true,
+                &verifier, &dedup, sizeof(payload), &command) ==
+         ZS_COMMAND_STATUS_INVALID_CBOR);
+
   assert(zs_command_decode_verify(payload, size, 17u, UINT64_C(1500000), true,
       verify_signature, &verifier, NULL, NULL, noncanonical, sizeof(noncanonical),
       &command) == ZS_COMMAND_STATUS_DEDUP_REQUIRED);
   assert(zs_command_encode_ack(0u, command_id, ZS_COMMAND_ACK_OK, 1u, 0u,
                                noncanonical, sizeof(noncanonical)) == 0u);
+  assert(zs_command_encode_ack(17u, command_id, (zs_command_ack_result_t)-1,
+                               1u, 0u, noncanonical,
+                               sizeof(noncanonical)) == 0u);
+  assert(strcmp(zs_command_status_name((zs_command_status_t)-1), "?") == 0);
 }
 
 static void test_ttl_limit(void) {

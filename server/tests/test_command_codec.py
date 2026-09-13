@@ -74,6 +74,10 @@ def test_signed_command_rejects_noncanonical_and_unsupported_command():
         decode_signed_command(noncanonical, {key.key_id: key.public_key}, now_us=1_500_000)
     with pytest.raises(ValueError, match="unsupported command"):
         encode_signed_command(command(command="CMD_UNKNOWN"), key)
+    with pytest.raises(ValueError, match="nil UUID"):
+        encode_signed_command(
+            command(command_id="00000000-0000-0000-0000-000000000000"), key
+        )
 
 
 def test_command_ack_round_trip_and_strict_fields():

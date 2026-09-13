@@ -40,8 +40,11 @@
   encoder ACK: station/time/TTL binding, точное восстановление подписанных байтов,
   обязательные callback проверки Ed25519 и durable dedup. Межъязыковой
   server-generated Ed25519 vector проверяется Python и C тестами.
+- Portable atomic journal записывает `ACCEPTED` до идемпотентного действия и
+  `COMPLETED` до разрешения ACK; fault-injection проверяет потерю питания между
+  body/commit marker, повтор и заполнение ограниченного журнала.
 - Открыты target MQTT subscription/URC binding, production Ed25519 backend,
-  provisioning public key, durable result/ACK publisher и аппаратный end-to-end;
+  provisioning public key, Flash page/endurance binding, ACK publisher и аппаратный end-to-end;
   они не объявлены PASS до сборки станций.
 
 Изменение не закрывает security/deployment blockers из `EVT_PRE_20_RELEASE_AUDIT.md` и не является разрешением на internet-facing deployment.

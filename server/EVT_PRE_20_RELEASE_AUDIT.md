@@ -29,9 +29,10 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    CBOR, TTL/retry до application ACK и тройной привязкой station_id. Portable
    firmware codec разбирает и валидирует envelope через обязательные signature и
    durable-dedup callbacks и формирует ACK; граница server/firmware закреплена
-   детерминированным Ed25519 vector. Открыты target MQTT binding, production
-   Ed25519 backend, public-key provisioning, durable result integration и
-   hardware end-to-end evidence.
+   детерминированным Ed25519 vector. Portable atomic journal фиксирует
+   accepted/completed до ACK. Открыты target MQTT binding, production Ed25519
+   backend, public-key provisioning, Flash page/endurance binding и hardware
+   end-to-end evidence.
 3. ЗАКРЫТО: исходные диапазоны разрешены в хешированные Python 3.12 lockfiles;
    production image и CI используют `requirements.lock.txt` с
    `--require-hashes`, а `sbom/server.cdx.json` воспроизводимо генерируется из
@@ -53,7 +54,7 @@ FastAPI напрямую в интернет.
 не считает broker QoS ACK прикладным подтверждением и безопасно отключает
 downstream без ключа. ACL разрешает каждой station credential только собственные
 `down`/`ack`. Полное закрытие возможно после target-интеграции MQTT приёмника,
-production crypto/durable store/ACK publisher, provisioning public key и проверки
+production crypto/Flash binding/ACK publisher, provisioning public key и проверки
 на собранных станциях.
 
 До закрытия пунктов сервер разрешён только для разработки или изолированного стенда. Публикация напрямую в интернет запрещена.

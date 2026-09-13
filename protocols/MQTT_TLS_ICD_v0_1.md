@@ -92,10 +92,14 @@ processing and durable storage, malformed input is acknowledged and discarded
 to avoid a poison-message loop, while a transient processing/storage failure is
 left unacknowledged for broker redelivery.
 
-Firmware treats a successful decode as eligibility, not completion. The target
-integration must execute the request idempotently, persist the result against
-`command_id`, and only then publish the ACK. A duplicate must reuse the durable
-result without repeating the command side effect.
+Firmware treats a successful decode as eligibility, not completion. The portable
+journal atomically records `ACCEPTED` before an idempotent side effect and appends
+`COMPLETED` before allowing ACK encoding. An interrupted completion leaves the
+accepted record recoverable; restart must resume the idempotent operation keyed
+by `command_id`. A completed duplicate reuses the durable result without repeating
+the side effect. Reuse of a UUID with different signed command semantics is a
+fail-closed conflict. Target Flash page allocation and endurance validation remain
+open.
 
 ## 3. Detection compact CBOR
 

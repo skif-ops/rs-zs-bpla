@@ -76,7 +76,9 @@ and clear online/network-valid flags.
   runtime audit, the deterministic server-generated Ed25519 vector and
   `firmware/tests/test_command_transport.c` check canonical parsing, station/time
   binding, fail-closed signature callback handling, durable-dedup requirement and
-  ACK encoding under the host build.
+  ACK encoding under the host build. `firmware/tests/test_command_journal.c`
+  separately fault-injects the atomic accepted/completed journal and prevents ACK
+  generation before a completed result is durable.
 
 ## Open evidence
 
@@ -86,7 +88,7 @@ and clear online/network-valid flags.
 - certificate upload/provisioning and BG95 firmware-version compatibility;
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
 - target MQTT subscription binding, production Ed25519 backend and public-key
-  provisioning, durable command-result integration, ACK publisher and
+  provisioning, nonvolatile target-page binding/endurance, ACK publisher and
   store-and-forward; the portable fixed-memory parser/ACK codec and server-side
   canonical envelope, QoS 1 retry and station-bound ACK path have host tests;
 - power-loss, network-loss, CGNAT, dual-SIM switching and 24-hour test logs after

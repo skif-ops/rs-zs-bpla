@@ -11,6 +11,12 @@ typedef struct {
   size_t offset;
 } command_reader_t;
 
+static bool any_nonzero(const uint8_t *data, size_t size) {
+  uint8_t combined = 0u;
+  for (size_t i = 0u; i < size; ++i) combined |= data[i];
+  return combined != 0u;
+}
+
 static bool read_argument(command_reader_t *reader, uint8_t *major, uint64_t *value) {
   uint8_t initial, additional;
   size_t bytes;
@@ -147,6 +153,7 @@ static zs_command_status_t decode_envelope(
   if (command->station_id != expected_station_id) return ZS_COMMAND_STATUS_STATION_MISMATCH;
   if (!expect_uint(reader, 3u) ||
       !read_bytes(reader, command->command_id, ZS_COMMAND_UUID_BYTES) ||
+      !any_nonzero(command->command_id, ZS_COMMAND_UUID_BYTES) ||
       !expect_uint(reader, 4u) || !read_uint(reader, &command->created_time_us) ||
       !expect_uint(reader, 5u) || !read_uint(reader, &command->expires_time_us))
     return ZS_COMMAND_STATUS_INVALID_CBOR;
@@ -215,7 +222,8 @@ size_t zs_command_encode_ack(
     zs_command_ack_result_t result, uint64_t completed_time_us,
     uint16_t detail_code, uint8_t *output, size_t output_size) {
   zs_cbor_t cbor;
-  if (station_id == 0u || !command_id || result > ZS_COMMAND_ACK_EXPIRED ||
+  if (station_id == 0u || !command_id ||
+      (unsigned)result > (unsigned)ZS_COMMAND_ACK_EXPIRED ||
       !output || output_size == 0u) return 0u;
   zs_cbor_init(&cbor, output, output_size);
   zs_cbor_map(&cbor, 7u);
@@ -235,5 +243,7 @@ const char *zs_command_status_name(zs_command_status_t status) {
       "STATION_MISMATCH", "TIME_UNTRUSTED", "NOT_YET_VALID", "EXPIRED",
       "INVALID_TTL", "SIGNATURE_REJECTED", "DEDUP_REQUIRED",
       "DEDUP_STORAGE_ERROR", "DUPLICATE", "WORKSPACE_TOO_SMALL"};
-  return status <= ZS_COMMAND_STATUS_WORKSPACE_TOO_SMALL ? names[status] : "?";
+  return (unsigned)status <= (unsigned)ZS_COMMAND_STATUS_WORKSPACE_TOO_SMALL
+             ? names[status]
+             : "?";
 }

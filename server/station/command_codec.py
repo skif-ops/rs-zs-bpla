@@ -81,9 +81,12 @@ def _canonical(obj: object) -> bytes:
 
 def _uuid_bytes(value: str) -> bytes:
     try:
-        return uuid.UUID(value).bytes
+        parsed = uuid.UUID(value)
     except (ValueError, AttributeError):
         raise ValueError("command_id must be a UUID") from None
+    if parsed.int == 0:
+        raise ValueError("command_id must not be the nil UUID")
+    return parsed.bytes
 
 
 def _audio_payload_to_wire(payload: dict) -> dict[int, object]:
