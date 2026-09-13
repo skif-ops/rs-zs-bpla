@@ -3,12 +3,12 @@
 Status: `OPEN / NOT FOR MANUFACTURE`
 
 This register separates manufacturer-controlled geometry, drawing-verified
-KiCad-library geometry and package-outline-only dispositions. A completed
+KiCad-library geometry and project-controlled IPC candidates. A completed
 manufacturer-source review is not manufacturing approval when the source omits
 a PCB land pattern: every
-`PACKAGE_OUTLINE_VERIFIED_IPC_ASSEMBLY_CONTROL_REQUIRED` item remains blocked
-until independent IPC/assembly control is complete. The machine-readable
-19-pattern inventory is
+`PROJECT_IPC_PATTERN_CONTROLLED_ASSEMBLY_DFM_REQUIRED` item remains blocked
+until the assembly house accepts its land, mask and stencil rules. The
+machine-readable 19-pattern inventory is
 `hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv`.
 
 ## Current controlled result
@@ -20,7 +20,8 @@ until independent IPC/assembly control is complete. The machine-readable
 | Manufacturer-drawing controlled patterns | 50 | Fourteen initially controlled instances plus thirty-six reviewed instances controlled locally |
 | Drawing-verified KiCad library patterns | 5 | Four Molex 504050-0691 instances and one GCT USB4105 instance have exact audited geometry |
 | KiCad library patterns pending drawing review | 0 | Manufacturer-source review is complete for every registered pattern |
-| Package-outline verified; IPC/assembly control required | 3 | `U2/U25/U26` retain library geometry only as a review snapshot, not as production approval |
+| Package-outline-only library geometry | 0 | No routing depends on an uncontrolled workstation library snapshot |
+| Project-controlled IPC candidates; assembly DFM required | 3 | `U2/U25/U26` use deterministic local geometry; paste/mask and process acceptance remain open |
 | Provisional manufacturer-specific patterns | 0 | Closed for the current component set; any substitution reopens this gate |
 
 Earlier controlled updates reduced the provisional set from 52 to 4 instances by
@@ -238,15 +239,16 @@ separate, and this footprint pass does not infer a component substitution.
 The manufacturer-source review for `U2` is complete. Winbond W25Q512JV Rev B
 confirms the selected package `F`, its 1.27 mm pitch and full package
 tolerances, but does not publish a PCB land pattern for the 16-pin SOIC. The
-existing KiCad 2.05 x 0.60 mm lands therefore receive package-only status, not
-production approval; independent IPC/assembly-process control is still
-required.
+KiCad IPC-gullwing 2.05 x 0.60 mm geometry is now frozen as project-local
+`Winbond_W25Q512JV_PackageF_IPC_Candidate`; assembly-house paste, mask and
+process acceptance remain mandatory before production release.
 
 The manufacturer-source review for `U25` and `U26` is also complete against TI
 DRT0003A `MPDS340`. That document defines the package outline and lead
 tolerances but does not publish a PCB land pattern or stencil recommendation.
-The existing KiCad `Texas_DRT-3` geometry therefore receives package-only
-status and remains blocked for independent IPC/assembly-process control.
+The 0.30 x 0.30 mm KiCad flow-through geometry is now frozen as project-local
+`TI_DRT0003A_IPC_Candidate`; assembly-house DFM and routed USB signal-integrity
+review remain mandatory before production release.
 
 ## Remaining provisional references
 
@@ -258,9 +260,9 @@ Review B remains `OPEN`. No Gerber, drill, paste, pick-and-place, IPC-356 or
 STEP output from this candidate may be released until:
 
 1. the zero-provisional footprint state remains true for the release commit;
-2. the remaining 3 KiCad-derived instances receive independent IPC/assembly
-   land-pattern control because their manufacturers publish package outlines
-   but no PCB land pattern;
+2. the assembly house accepts the land, solder-mask and stencil rules for the
+   three project-controlled IPC candidates because their manufacturers publish
+   package outlines but no complete PCB process pattern;
 3. placement and routing audits pass in KiCad 9;
 4. DRC reports zero blocker/critical and zero unrouted items;
 5. RA-003 layout evidence is complete; physical droop and ripple measurement

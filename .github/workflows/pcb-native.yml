@@ -36,6 +36,7 @@ on:
       - "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md"
       - "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md"
       - "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv"
       - "hardware/DUAL_SIM_SINGLE_STANDBY.md"
       - "hardware/T5838_AAD_INTERFACE_REV_A.md"

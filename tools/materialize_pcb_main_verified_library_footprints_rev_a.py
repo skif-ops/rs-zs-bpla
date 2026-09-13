@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Record completed reviews on selected KiCad-library PCB-MAIN footprints.
 
-Only the two Dioneya properties inside the named footprint expressions are
-changed.  Copper, drills, paste, nets, placement and UUIDs remain byte-for-byte
-untouched; the independent layout audit checks the resulting geometry.  A
-package-outline-only review remains explicitly blocked for independent
-IPC/assembly land-pattern control.
+Only the two Dioneya properties inside the named drawing-verified library
+footprint expressions are changed. Copper, drills, paste, nets, placement and
+UUIDs remain byte-for-byte untouched; the independent layout audit checks the
+resulting geometry. Package-only U2/U25/U26 patterns are handled by the
+project-local footprint materializer instead.
 """
 from __future__ import annotations
 
@@ -21,7 +21,6 @@ ROOT = Path(__file__).resolve().parents[1]
 PCB = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 PENDING = "KICAD_LIBRARY_PATTERN_REVIEW_PENDING"
 VERIFIED = "KICAD_LIBRARY_PATTERN_DRAWING_VERIFIED"
-PACKAGE_ONLY = "PACKAGE_OUTLINE_VERIFIED_IPC_ASSEMBLY_CONTROL_REQUIRED"
 
 CONTROLLED = {
     "J11": (
@@ -46,22 +45,6 @@ CONTROLLED = {
     ),
 }
 
-PACKAGE_ONLY_CONTROLLED = {
-    "U2": (
-        "KiCad:Package_SO.pretty/SOIC-16W_7.5x10.3mm_P1.27mm",
-        "Winbond_W25Q512JV_RevB_PackageF_NoManufacturerLandPattern",
-    ),
-    "U25": (
-        "KiCad:Package_TO_SOT_SMD.pretty/Texas_DRT-3",
-        "TI_DRT0003A_MPDS340_PackageOnly_NoManufacturerLandPattern",
-    ),
-    "U26": (
-        "KiCad:Package_TO_SOT_SMD.pretty/Texas_DRT-3",
-        "TI_DRT0003A_MPDS340_PackageOnly_NoManufacturerLandPattern",
-    ),
-}
-
-
 def replace_property(block: str, key: str, allowed: set[str], value: str, ref: str) -> str:
     pattern = re.compile(r'(\(property "' + re.escape(key) + r'" ")([^"]+)("\))')
     match = pattern.search(block)
@@ -74,11 +57,7 @@ def replace_property(block: str, key: str, allowed: set[str], value: str, ref: s
 
 def materialize(source: Path, destination: Path) -> None:
     board_text = source.read_text(encoding="utf-8")
-    targets = {
-        **{ref: (*values, VERIFIED) for ref, values in CONTROLLED.items()},
-        **{ref: (*values, PACKAGE_ONLY)
-           for ref, values in PACKAGE_ONLY_CONTROLLED.items()},
-    }
+    targets = {ref: (*values, VERIFIED) for ref, values in CONTROLLED.items()}
     spans = [span for span in footprint_spans(board_text) if span[2] in targets]
     if {span[2] for span in spans} != set(targets):
         raise RuntimeError("could not locate every reviewed KiCad-library footprint")

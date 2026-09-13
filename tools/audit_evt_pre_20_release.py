@@ -21,10 +21,13 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "docs/RISK_REGISTER.csv",
         "docs/DECISION_LOG.csv",
         "docs/OPEN_INPUTS_FOR_FREEZE.csv",
+        "manufacturing/EVT_LOT_SELECTION_REV_A.csv",
+        "manufacturing/EVT_LOT_SELECTION_REV_A.md",
     ],
     "pcb_source": [
         "hardware/EVT_PRE_20_BOM_REV_A.csv",
         "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv",
+        "hardware/EVT_PRE_20_BOM_REV_A.xlsx",
         "hardware/EVT_PRE_20_BOM_POLICY_REV_A.md",
         "hardware/EVT_PRE_20_BOM_EVIDENCE_REV_A.md",
         "hardware/CHINA_PROCUREMENT_RFQ.csv",
@@ -41,6 +44,7 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md",
         "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
         "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md",
+        "hardware/PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md",
         "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
         "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv",
         "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
@@ -280,6 +284,8 @@ def audit() -> dict[str, object]:
         blockers.append("environment operating range is not locked to -40..+70 C")
     if "electronic_component_minimum_rating_c: [-40, 85]" not in baseline:
         blockers.append("electronic component temperature derating rule missing")
+    if "selected_evt_quantity: NOT_YET_SELECTED" in baseline:
+        blockers.append("EVT purchase quantity is not selected from 4 10 or 20")
 
     bom = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
     if bom.is_file():
@@ -317,11 +323,14 @@ def audit() -> dict[str, object]:
     manifest_inputs = [
         ROOT / "config/EVT_PRE_20_BASELINE.yaml",
         ROOT / "docs/DECISION_LOG.csv",
+        ROOT / "manufacturing/EVT_LOT_SELECTION_REV_A.csv",
+        ROOT / "manufacturing/EVT_LOT_SELECTION_REV_A.md",
         ROOT / "hardware/ENVIRONMENT_REV_A.md",
         ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md",
         ROOT / "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
         ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv",
         ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv",
+        ROOT / "hardware/EVT_PRE_20_BOM_REV_A.xlsx",
         ROOT / "hardware/EVT_PRE_20_BOM_POLICY_REV_A.md",
         ROOT / "hardware/EVT_PRE_20_BOM_EVIDENCE_REV_A.md",
         ROOT / "hardware/CHINA_PROCUREMENT_RFQ.csv",
@@ -334,6 +343,7 @@ def audit() -> dict[str, object]:
         ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md",
         ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
         ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md",
+        ROOT / "hardware/PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md",
         ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
         ROOT / "tools/generate_evt_pre_20_bom_rev_a.py",
         ROOT / "tools/validate_evt_pre_20_bom_qg1.py",

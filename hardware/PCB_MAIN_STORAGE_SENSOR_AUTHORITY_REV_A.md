@@ -17,9 +17,11 @@ This record closes only `MAIN-AUTH-002`. It freezes U2, U3, and U4 device-pad ma
 
 - Exact package is Winbond package code F: 16-pin SOIC, 300 mil.
 - Manufacturer-source review confirms the package outline but finds no Winbond
-  PCB land or stencil pattern. The retained KiCad SOIC-16W geometry therefore
-  has package-only status and remains blocked for independent IPC/assembly
-  control; it is not a production-approved land pattern.
+  PCB land or stencil pattern. The KiCad IPC-gullwing SOIC-16W geometry is
+  frozen into the project-local `Winbond_W25Q512JV_PackageF_IPC_Candidate` so
+  routing cannot drift with workstation libraries. Assembly-house land,
+  solder-mask and stencil acceptance remains mandatory; this is not a
+  production-approved land pattern.
 - Pin 1 is `NOR_IO3`, pin 8 is `NOR_IO1`, pin 9 is `NOR_IO2`, and pin 15 is `NOR_IO0`. The exact `IQ` ordering option ships with the factory default `QE=1`; firmware must verify or restore QE before Quad operation.
 - Pin 7 `/CS` is `NOR_NCS` with a required 10 kOhm pull-up to `3V3_DIGITAL`, so the device remains deselected while the MCU pins are high impedance during power transitions.
 - Dedicated pin 3 `/RESET` is tied directly to `3V3_DIGITAL`. Reset recovery is performed with the Winbond software-reset sequence when required.

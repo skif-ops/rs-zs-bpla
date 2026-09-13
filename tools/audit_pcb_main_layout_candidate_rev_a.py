@@ -112,6 +112,9 @@ def main() -> int:
     package_only = sorted(ref for ref, fp in footprints.items()
                           if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                           "PACKAGE_OUTLINE_VERIFIED_IPC_ASSEMBLY_CONTROL_REQUIRED")
+    ipc_candidates = sorted(ref for ref, fp in footprints.items()
+                            if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
+                            "PROJECT_IPC_PATTERN_CONTROLLED_ASSEMBLY_DFM_REQUIRED")
     library_verified = sorted(ref for ref, fp in footprints.items()
                               if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                               "KICAD_LIBRARY_PATTERN_DRAWING_VERIFIED")
@@ -121,8 +124,9 @@ def main() -> int:
     require(not provisional, f"manufacturer-specific provisional footprints remain: {provisional}")
     require(not library_pending,
             f"KiCad-library drawing reviews remain open: {library_pending}")
-    require(package_only == ["U2", "U25", "U26"],
-            f"unexpected package-only review set: {package_only}")
+    require(not package_only, f"package-only footprint reviews remain: {package_only}")
+    require(ipc_candidates == ["U2", "U25", "U26"],
+            f"unexpected project IPC-candidate set: {ipc_candidates}")
     require(library_verified == ["J11", "J_MIC1", "J_MIC2", "J_MIC3", "J_MIC4"],
             f"unexpected drawing-verified KiCad set: {library_verified}")
     require(manufacturer_controlled == ["C36", "C44", "D1", "D10", "D11", "D2", "D3", "D4", "D5", "D6", "D7",
@@ -150,6 +154,8 @@ def main() -> int:
             "PENDING": "KICAD_LIBRARY_PATTERN_REVIEW_PENDING",
             "PACKAGE_ONLY_IPC_CONTROL_REQUIRED":
                 "PACKAGE_OUTLINE_VERIFIED_IPC_ASSEMBLY_CONTROL_REQUIRED",
+            "PROJECT_IPC_CANDIDATE_DFM_REQUIRED":
+                "PROJECT_IPC_PATTERN_CONTROLLED_ASSEMBLY_DFM_REQUIRED",
             "DRAWING_VERIFIED": "KICAD_LIBRARY_PATTERN_DRAWING_VERIFIED",
             "REPLACED_PROJECT_CONTROLLED": "MANUFACTURER_DRAWING_PATTERN_CONTROLLED",
         }.get(row["Review_Status"])
@@ -166,6 +172,9 @@ def main() -> int:
     require(registered_by_status.get("PACKAGE_ONLY_IPC_CONTROL_REQUIRED", set()) ==
             set(package_only),
             "register package-only references differ from board")
+    require(registered_by_status.get("PROJECT_IPC_CANDIDATE_DFM_REQUIRED", set()) ==
+            set(ipc_candidates),
+            "register project IPC-candidate references differ from board")
     require(registered_by_status.get("DRAWING_VERIFIED", set()) == set(library_verified),
             "register verified references differ from board")
     require(registered_by_status.get("REPLACED_PROJECT_CONTROLLED", set()) ==
@@ -175,9 +184,11 @@ def main() -> int:
              "Q1", "Q2", "Q3", "Q4", "U6", "C36", "C44"},
             "register project-controlled replacement set differs from board")
 
-    # These KiCad lands are retained only as package-compatible review
-    # snapshots.  Winbond Rev B package F and TI MPDS340 define package
-    # three instances blocked for independent IPC/assembly control.
+    # These project-local lands freeze the package-compatible KiCad IPC
+    # candidates so library drift cannot alter routing. Winbond Rev B package F
+    # and TI MPDS340 remain the package authorities; independent assembly-house
+    # DFM is still mandatory because neither manufacturer publishes a complete
+    # production land/stencil pattern.
     u2_pads = {pad.number: pad for pad in footprints["U2"].pads if pad.number}
     require(set(u2_pads) == {str(number) for number in range(1, 17)},
             "U2: SOIC-16 pad set")
@@ -192,7 +203,7 @@ def main() -> int:
                 pad.shape == "roundrect" and
                 abs(float(pad.roundrectRatio or 0.0) - 0.25) < 0.002 and
                 pad.layers == ["F.Cu", "F.Paste", "F.Mask"],
-                f"U2.{number}: reviewed KiCad package snapshot drift")
+                f"U2.{number}: project-controlled IPC candidate drift")
     for ref in ("U25", "U26"):
         pads = {pad.number: pad for pad in footprints[ref].pads if pad.number}
         expected_drt = {
@@ -208,7 +219,7 @@ def main() -> int:
                     pad.shape == "roundrect" and
                     abs(float(pad.roundrectRatio or 0.0) - 0.25) < 0.002 and
                     pad.layers == ["F.Cu", "F.Paste", "F.Mask"],
-                    f"{ref}.{number}: reviewed KiCad package snapshot drift")
+                    f"{ref}.{number}: project-controlled IPC candidate drift")
 
     # KEMET/YAGEO T2076 Table 2 defines the D / 7343-31 Density Level B
     # nominal robust-reflow pattern: W=2.43, L=2.37, S=3.87 mm and a
@@ -905,6 +916,7 @@ def main() -> int:
     print(f"provisional_footprints={len(provisional)} "
           f"kicad_library_review_pending={len(library_pending)} "
           f"package_only_ipc_control_required={len(package_only)} "
+          f"project_ipc_candidates_dfm_required={len(ipc_candidates)} "
           f"kicad_library_drawing_verified={len(library_verified)} "
           f"manufacturer_controlled={len(manufacturer_controlled)} "
           "routing=ABSENT review_b=BLOCKED")

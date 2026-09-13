@@ -33,9 +33,10 @@ Source: `https://www.ti.com/lit/ds/symlink/tpd4e05u06.pdf`, SHA-256
 `c167cf1e72a5473a4d2c59b6a3c0251498701da05b7785919b9ceaae3b3e02c6`.
 The manufacturer-source review for `TPD2EUSB30DRTR` devices `U25/U26` is
 complete: TI `MPDS340` confirms the DRT0003A package outline but publishes no
-PCB land or stencil recommendation. The retained KiCad DRT-3 geometry therefore
-has package-only status and remains blocked for independent IPC/assembly control;
-it is not a production-approved land pattern.
+PCB land or stencil recommendation. The KiCad DRT-3 flow-through geometry is
+frozen into project-local `TI_DRT0003A_IPC_Candidate` so routing cannot drift
+with workstation libraries. Assembly-house DFM and routed USB SI acceptance
+remain mandatory; it is not a production-approved land pattern.
 The seven `TPD1E05U06DYAR` devices `D4/D6..D11` use project-local
 `TI_DYA0002A_SOD523` geometry from drawing 4224978/B in the same Rev.O data
 sheet: two 0.67 x 0.40 mm R0.05 lands at 1.48 mm center spacing, equal-size

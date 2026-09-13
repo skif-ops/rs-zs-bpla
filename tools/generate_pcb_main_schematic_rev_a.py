@@ -89,6 +89,10 @@ CONTROLLED_FOOTPRINTS = (
     "DioneyaMain.pretty" / "Molex_504050-0291_PicoLock-2.kicad_mod",
     ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
     "DioneyaMain.pretty" / "Molex_43045-1202_MicroFit-12_RA.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "Winbond_W25Q512JV_PackageF_IPC_Candidate.kicad_mod",
+    ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "libs" /
+    "DioneyaMain.pretty" / "TI_DRT0003A_IPC_Candidate.kicad_mod",
 )
 UUID_NAMESPACE = uuid.UUID("224f8048-0668-5a9f-98cb-43f39e0d8d3e")
 
@@ -112,10 +116,11 @@ MECHANICAL_AUTHORITY = ROOT / "hardware" / "PCB_MAIN_MECHANICAL_PLACEMENT_AUTHOR
 NET_OVERLAY = ROOT / "hardware" / "PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv"
 GROUND_AUTHORITY = ROOT / "hardware" / "PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv"
 FOOTPRINT_REVIEW = ROOT / "hardware" / "reviews" / "PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv"
+IPC_CANDIDATE_AUTHORITY = ROOT / "hardware" / "PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md"
 
 INPUTS = (*PIN_AUTHORITIES, SUPPORT_AUTHORITY, HARNESS_AUTHORITY, MAIN_FREEZE,
           CONNECTOR_FREEZE, CAPTURE_STATUS, MECHANICAL_AUTHORITY, NET_OVERLAY,
-          GROUND_AUTHORITY, FOOTPRINT_REVIEW)
+          GROUND_AUTHORITY, FOOTPRINT_REVIEW, IPC_CANDIDATE_AUTHORITY)
 
 EXPECTED_GENERIC_GROUND_ENDPOINTS = 157
 EXPECTED_MIC_GROUND_ENDPOINTS = 21
@@ -574,7 +579,7 @@ def write_project_libraries(schematic: Schematic, project_dir: Path) -> tuple[Pa
     fp_table = project_dir / "fp-lib-table"
     fp_table.write_text('''(fp_lib_table
   (version 7)
-  (lib (name "DioneyaMain")(type "KiCad")(uri "${KIPRJMOD}/libs/DioneyaMain.pretty")(options "")(descr "Controlled PCB-MAIN manufacturer land patterns"))
+  (lib (name "DioneyaMain")(type "KiCad")(uri "${KIPRJMOD}/libs/DioneyaMain.pretty")(options "")(descr "Controlled PCB-MAIN project-local land patterns and IPC candidates"))
   (lib (name "Capacitor_SMD")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Capacitor_SMD.pretty")(options "")(descr "KiCad capacitor SMD footprints"))
   (lib (name "Inductor_SMD")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Inductor_SMD.pretty")(options "")(descr "KiCad inductor SMD footprints"))
   (lib (name "Resistor_SMD")(type "KiCad")(uri "${KICAD9_FOOTPRINT_DIR}/Resistor_SMD.pretty")(options "")(descr "KiCad resistor SMD footprints"))

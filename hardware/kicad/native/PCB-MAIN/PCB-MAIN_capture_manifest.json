@@ -3,7 +3,7 @@
   "board": "PCB-MAIN",
   "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "4322ad2d7f7a35bb988aea8a2795ceca8337cde15d83c4dba753992c1840d224",
+  "generator_sha256": "f16348f1d4caf0569f78c414803c56b0e503de120988bcb167740125d616a411",
   "inputs": [
     {
       "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
@@ -59,7 +59,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "0ab1a45af3f087fd7378c6f3124d327b2f5e7ec8b88dd3b593538d3a1e2baf3c"
+      "sha256": "13693704300f51de9ee9ca9c8d36c3143bad8ba63126856d39dfb44a78ab9a10"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -75,7 +75,11 @@
     },
     {
       "path": "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv",
-      "sha256": "e762dd9947350d689d7bb45992ceb1f03723142c71aaebf103f7fd9361ed2c26"
+      "sha256": "8ddb512f9bf5dcc7df4c9be8a9099e93154d1276fb930403e8020cc030dc3b56"
+    },
+    {
+      "path": "hardware/PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md",
+      "sha256": "c93adc8d4f00235fa571e1aae39e6ddaffd33c6d8fd751e0105035bc7ddee360"
     }
   ],
   "component_count": 248,
@@ -86,7 +90,7 @@
   "project_sha256": "236a25b84abc40de5cb67464d9ee46cceaa247384d4710c84c93990a98961897",
   "symbol_library_sha256": "565d255cb6d45209be3b68fe5be51c5d897e66b5e4aba40c6c3197b30060eb56",
   "symbol_library_table_sha256": "06b7072dc084b7bfabb1ae955f30bf4972df14ac56d471186bef75949aeb8f63",
-  "footprint_library_table_sha256": "05c3409a193c26866ad34e8c3d4a34ccf8ab93719a0bf354e22db9954858c2fd",
+  "footprint_library_table_sha256": "1c47fb4609ed49f15a299ed2eb80d6538bdbc0082ec7471c483750a35cedefa3",
   "controlled_footprints": [
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/KEMET_T52X_D_7343-31_DensityB.kicad_mod",
@@ -195,6 +199,14 @@
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Molex_43045-1202_MicroFit-12_RA.kicad_mod",
       "sha256": "b495c6001746670a5d37afbb3de9fcf49392fc18e0a72528feccc44b8d276cdb"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Winbond_W25Q512JV_PackageF_IPC_Candidate.kicad_mod",
+      "sha256": "78a67dda268e971a3463c41a8fb8170c3c59a1d3af145c65ed6b7212d1d8af83"
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/TI_DRT0003A_IPC_Candidate.kicad_mod",
+      "sha256": "b82af2a8e0eb455b430115ea8d9f2c4aeae30cc71de92823573d4f2d092bc6b9"
     }
   ],
   "review_a": "SIGNED_PASS_PER_hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",

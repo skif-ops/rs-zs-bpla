@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Materialize PCB-MAIN manufacturer-controlled footprints.
+"""Materialize PCB-MAIN controlled project-local footprints.
 
 This pure-kiutils materializer is usable outside KiCad.  It preserves each
 component's locked placement, schematic nets, RefDes/value text and population
-state while replacing only its land-pattern geometry.
+state while replacing only its land-pattern geometry. Manufacturer-pattern
+controls and package-derived IPC candidates retain distinct release statuses.
 """
 from __future__ import annotations
 
@@ -187,6 +188,21 @@ CONTROLLED = {
     ),
 }
 
+IPC_CANDIDATE_CONTROLLED = {
+    "U2": (
+        "Winbond_W25Q512JV_PackageF_IPC_Candidate.kicad_mod",
+        "PROJECT_IPC_W25Q512JV_F_KICAD_GULLWING_ASSEMBLER_DFM_REQUIRED",
+    ),
+    "U25": (
+        "TI_DRT0003A_IPC_Candidate.kicad_mod",
+        "PROJECT_IPC_TI_DRT0003A_KICAD_DRT3_ASSEMBLER_DFM_REQUIRED",
+    ),
+    "U26": (
+        "TI_DRT0003A_IPC_Candidate.kicad_mod",
+        "PROJECT_IPC_TI_DRT0003A_KICAD_DRT3_ASSEMBLER_DFM_REQUIRED",
+    ),
+}
+
 
 def ref_of(footprint: Footprint) -> str:
     for item in footprint.graphicItems:
@@ -195,7 +211,7 @@ def ref_of(footprint: Footprint) -> str:
     return ""
 
 
-def replace(old: Footprint, ref: str, filename: str, source: str) -> Footprint:
+def replace(old: Footprint, ref: str, filename: str, source: str, status: str) -> Footprint:
     new = Footprint.from_file(str(LIB / filename), encoding="utf-8")
     old_by_number = {pad.number: pad for pad in old.pads if pad.number}
     new_numbers = {pad.number for pad in new.pads if pad.number}
@@ -213,7 +229,7 @@ def replace(old: Footprint, ref: str, filename: str, source: str) -> Footprint:
     new.path = old.path
     new.properties = {
         "DIONEA_FOOTPRINT_SOURCE": source,
-        "DIONEA_FOOTPRINT_STATUS": "MANUFACTURER_DRAWING_PATTERN_CONTROLLED",
+        "DIONEA_FOOTPRINT_STATUS": status,
         "DIONEA_PACKAGE": old.properties["DIONEA_PACKAGE"],
         "DIONEA_POPULATION": old.properties["DIONEA_POPULATION"],
     }
@@ -301,13 +317,23 @@ def footprint_spans(board_text: str) -> list[tuple[int, int, str]]:
 def materialize(source: Path, destination: Path) -> None:
     board_text = source.read_text(encoding="utf-8")
     board = Board.from_file(str(source), encoding="utf-8")
+    controlled = {
+        **{
+            ref: (*values, "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
+            for ref, values in CONTROLLED.items()
+        },
+        **{
+            ref: (*values, "PROJECT_IPC_PATTERN_CONTROLLED_ASSEMBLY_DFM_REQUIRED")
+            for ref, values in IPC_CANDIDATE_CONTROLLED.items()
+        },
+    }
     found: set[str] = set()
     rendered: dict[str, str] = {}
     for footprint in board.footprints:
         ref = ref_of(footprint)
-        if ref in CONTROLLED:
-            filename, drawing = CONTROLLED[ref]
-            footprint = replace(footprint, ref, filename, drawing)
+        if ref in controlled:
+            filename, drawing, status = controlled[ref]
+            footprint = replace(footprint, ref, filename, drawing, status)
             found.add(ref)
             rendered_footprint = footprint.to_sexpr(
                 indent=2, layerInFirstLine=True
@@ -318,10 +344,10 @@ def materialize(source: Path, destination: Path) -> None:
             rendered[ref] = rendered_footprint.replace(
                 '(layer "*.Cu")', '(layers "*.Cu")'
             )
-    if found != set(CONTROLLED):
+    if found != set(controlled):
         raise RuntimeError(f"controlled reference set mismatch: {sorted(found)}")
-    spans = [span for span in footprint_spans(board_text) if span[2] in CONTROLLED]
-    if {span[2] for span in spans} != set(CONTROLLED):
+    spans = [span for span in footprint_spans(board_text) if span[2] in controlled]
+    if {span[2] for span in spans} != set(controlled):
         raise RuntimeError("could not locate all controlled footprint expressions")
     for start, end, ref in reversed(spans):
         board_text = board_text[:start] + rendered[ref] + board_text[end:]
@@ -337,14 +363,14 @@ def main() -> int:
             candidate = Path(temp_dir) / PCB.name
             materialize(PCB, candidate)
             if candidate.read_bytes() != PCB.read_bytes():
-                raise SystemExit("PCB-MAIN manufacturer footprints are stale; run materializer")
-        print("PCB-MAIN manufacturer-footprint materialization: PASS")
+                raise SystemExit("PCB-MAIN controlled project-local footprints are stale; run materializer")
+        print("PCB-MAIN controlled project-local footprint materialization: PASS")
     else:
         with tempfile.TemporaryDirectory() as temp_dir:
             candidate = Path(temp_dir) / PCB.name
             materialize(PCB, candidate)
             PCB.write_bytes(candidate.read_bytes())
-        print("PCB-MAIN manufacturer-footprint materialization: UPDATED")
+        print("PCB-MAIN controlled project-local footprint materialization: UPDATED")
     return 0
 
 

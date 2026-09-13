@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Generate the PCB-MAIN Rev.A manufacturer-specific land patterns.
+"""Generate the PCB-MAIN Rev.A controlled project-local land patterns.
 
 The dimensions below are transcribed from the cited manufacturer drawings.  The
 files are deliberately generated from compact coordinate contracts so review and
-CI can detect any silent footprint drift.
+CI can detect any silent footprint drift.  Where a manufacturer publishes only a
+package outline, a named project IPC candidate is retained for routing and remains
+blocked for assembly-house DFM before fabrication release.
 """
 from __future__ import annotations
 
@@ -229,6 +231,52 @@ def ti_drl0006a() -> str:
     for number, (x, y) in expected.items():
         smd(lines, number, x, y, 0.67, 0.30, "roundrect",
             mask_margin=0.05, roundrect_ratio=1 / 3)
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
+def winbond_w25q512jv_package_f_ipc_candidate() -> str:
+    name = "Winbond_W25Q512JV_PackageF_IPC_Candidate"
+    lines = header(
+        name,
+        "Winbond W25Q512JV package F SOIC-16 300 mil; project-controlled KiCad IPC gullwing candidate; assembler DFM required",
+        "Winbond W25Q512JV package F SOIC-16W 1.27mm IPC candidate",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -6.10) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 6.10) (layer "F.Fab") hide'
+    rect(lines, -5.93, -5.40, 5.93, 5.40, "F.CrtYd", 0.05)
+    polygon(lines, [(-3.75, -4.15), (-2.75, -5.15), (3.75, -5.15),
+                    (3.75, 5.15), (-3.75, 5.15)], "F.Fab", 0.10)
+    polygon(lines, [(-4.7125, -5.005), (-5.0525, -5.475),
+                    (-4.3725, -5.475)], "F.SilkS", 0.12, "solid")
+    for number in range(1, 9):
+        smd(lines, str(number), -4.65, -4.445 + (number - 1) * 1.27,
+            2.05, 0.60, "roundrect", roundrect_ratio=0.25)
+    for number in range(9, 17):
+        smd(lines, str(number), 4.65, 4.445 - (number - 9) * 1.27,
+            2.05, 0.60, "roundrect", roundrect_ratio=0.25)
+    lines.append(")")
+    return "\n".join(lines) + "\n"
+
+
+def ti_drt0003a_ipc_candidate() -> str:
+    name = "TI_DRT0003A_IPC_Candidate"
+    lines = header(
+        name,
+        "TI DRT0003A 3-pin SOT-9X3; project-controlled KiCad package-derived candidate; assembler DFM and USB SI review required",
+        "Texas Instruments DRT0003A SOT-9X3 3 pin IPC candidate",
+    )
+    lines[5] = '  (fp_text reference "REF**" (at 0 -1.20) (layer "F.SilkS")'
+    lines[7] = f'  (fp_text value "{name}" (at 0 1.50) (layer "F.Fab") hide'
+    rect(lines, -0.80, -0.70, 0.80, 0.70, "F.CrtYd", 0.05)
+    polygon(lines, [(-0.50, -0.40), (0.50, -0.40), (0.50, 0.40),
+                    (-0.20, 0.40), (-0.50, 0.10)], "F.Fab", 0.10)
+    polygon(lines, [(-0.76, 0.43), (-0.76, 0.71),
+                    (-1.04, 0.43)], "F.SilkS", 0.12, "solid")
+    for number, (x, y) in {
+        "1": (-0.35, 0.425), "2": (0.35, 0.425), "3": (0.0, -0.425),
+    }.items():
+        smd(lines, number, x, y, 0.30, 0.30, "roundrect", roundrect_ratio=0.25)
     lines.append(")")
     return "\n".join(lines) + "\n"
 
@@ -705,6 +753,8 @@ GENERATORS = {
     "TI_PW0014A_TSSOP14.kicad_mod": ti_pw0014a,
     "TI_PW0024A_TSSOP24.kicad_mod": ti_pw0024a,
     "TI_DRL0006A_SOT6.kicad_mod": ti_drl0006a,
+    "Winbond_W25Q512JV_PackageF_IPC_Candidate.kicad_mod": winbond_w25q512jv_package_f_ipc_candidate,
+    "TI_DRT0003A_IPC_Candidate.kicad_mod": ti_drt0003a_ipc_candidate,
     "TI_DBV0005A_SOT23-5.kicad_mod": ti_dbv0005a,
     "TI_DYA0002A_SOD523.kicad_mod": ti_dya0002a,
     "Nexperia_PESD5V0S1UL_SOD882.kicad_mod": nexperia_pesd5v0s1ul_sod882,
@@ -737,7 +787,7 @@ def main() -> int:
             path.write_text(expected, encoding="utf-8")
     if mismatches:
         raise SystemExit("stale manufacturer footprint(s): " + ", ".join(mismatches))
-    print(f"PCB-MAIN manufacturer footprints: {'PASS' if args.check else 'GENERATED'} ({len(GENERATORS)})")
+    print(f"PCB-MAIN controlled project-local footprints: {'PASS' if args.check else 'GENERATED'} ({len(GENERATORS)})")
     return 0
 
 

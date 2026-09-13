@@ -39,17 +39,6 @@ KICAD_DRAWING_VERIFIED = {
     ): "GCT_USB4105_RevB4_2023-12-18_RecommendedPCBLayout",
 }
 
-KICAD_PACKAGE_ONLY_REVIEWED = {
-    (
-        "Package_SO.pretty",
-        "SOIC-16W_7.5x10.3mm_P1.27mm",
-    ): "Winbond_W25Q512JV_RevB_PackageF_NoManufacturerLandPattern",
-    (
-        "Package_TO_SOT_SMD.pretty",
-        "Texas_DRT-3",
-    ): "TI_DRT0003A_MPDS340_PackageOnly_NoManufacturerLandPattern",
-}
-
 STANDARD = {
     "LQFP100_14x14": ("PROJECT", "ST_STM32U585_LQFP100_1L", {}),
     "LGA-12_2x2mm": ("PROJECT", "ST_LIS2DW12_LGA-12L", {}),
@@ -58,7 +47,7 @@ STANDARD = {
     "SOT23": ("PROJECT", "Nexperia_MMBT3904_SOT23", {}),
     "SOT-563_SC-89": ("PROJECT", "Vishay_Si1016X_SC-89", {}),
     "SOD882": ("PROJECT", "Nexperia_PESD5V0S1UL_SOD882", {}),
-    "SOIC-16_300mil_F": ("Package_SO.pretty", "SOIC-16W_7.5x10.3mm_P1.27mm"),
+    "SOIC-16_300mil_F": ("PROJECT", "Winbond_W25Q512JV_PackageF_IPC_Candidate", {}),
     "U.FL_SMT": ("PROJECT", "Hirose_U.FL-R-SMT-1", {}),
     "USB-C_16P_horizontal_top_mount_1.20mm_stake": (
         "Connector_USB.pretty", "USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal",
@@ -66,7 +55,7 @@ STANDARD = {
     ),
     "SOT666_1.6x1.6mm": ("PROJECT", "ST_ESDALC6V1-5P6_SOT666", {}),
     "SOD-523_DYA": ("PROJECT", "TI_DYA0002A_SOD523", {}),
-    "SOT-9X3_DRT": ("Package_TO_SOT_SMD.pretty", "Texas_DRT-3", {}),
+    "SOT-9X3_DRT": ("PROJECT", "TI_DRT0003A_IPC_Candidate", {}),
     "SOT-5X3-6_DRL": ("PROJECT", "TI_DRL0006A_SOT6", {}),
     "7343-31": ("PROJECT", "KEMET_T52X_D_7343-31_DensityB", {}),
     "Pico-Lock_1.5_1x06_Right_Angle": (
@@ -240,7 +229,20 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
             logical = {p.GetNumber() for p in fp.Pads() if p.GetNumber()}
             if logical == set(pins):
                 if directory == "PROJECT":
-                    fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "MANUFACTURER_DRAWING_PATTERN_CONTROLLED")
+                    ipc_candidates = {
+                        "Winbond_W25Q512JV_PackageF_IPC_Candidate":
+                            "PROJECT_IPC_W25Q512JV_F_KICAD_GULLWING_ASSEMBLER_DFM_REQUIRED",
+                        "TI_DRT0003A_IPC_Candidate":
+                            "PROJECT_IPC_TI_DRT0003A_KICAD_DRT3_ASSEMBLER_DFM_REQUIRED",
+                    }
+                    fp.SetProperty(
+                        "DIONEA_FOOTPRINT_STATUS",
+                        (
+                            "PROJECT_IPC_PATTERN_CONTROLLED_ASSEMBLY_DFM_REQUIRED"
+                            if name in ipc_candidates
+                            else "MANUFACTURER_DRAWING_PATTERN_CONTROLLED"
+                        ),
+                    )
                     sources = {
                         "PESD5V0C1BSF_SOD962-2": "Nexperia_PESD5V0C1BSF_v3_Fig14",
                         "Nexperia_PESD5V0S1UL_SOD882": "Nexperia_PESD5V0S1UL_v5_2025-12-01_Fig11_ReflowFootprint",
@@ -269,20 +271,13 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                         "TI_DQA0010A_USON10": "TI_DQA0010A_4220328A_2015-12_RecommendedLandPattern",
                         "ST_LIS2DW12_LGA-12L": "ST_DS11811_Rev9_and_TN0018_Rev8_LGA-12L_Pattern",
                         "Raytac_MDBT50Q-P1MV2": "Raytac_MDBT50Q_Footprint_Design_Guide_230606",
+                        "Winbond_W25Q512JV_PackageF_IPC_Candidate": ipc_candidates["Winbond_W25Q512JV_PackageF_IPC_Candidate"],
+                        "TI_DRT0003A_IPC_Candidate": ipc_candidates["TI_DRT0003A_IPC_Candidate"],
                     }
                     fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", sources[name])
                 elif (directory, name) in KICAD_DRAWING_VERIFIED:
                     fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_DRAWING_VERIFIED")
                     fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", KICAD_DRAWING_VERIFIED[(directory, name)])
-                elif (directory, name) in KICAD_PACKAGE_ONLY_REVIEWED:
-                    fp.SetProperty(
-                        "DIONEA_FOOTPRINT_STATUS",
-                        "PACKAGE_OUTLINE_VERIFIED_IPC_ASSEMBLY_CONTROL_REQUIRED",
-                    )
-                    fp.SetProperty(
-                        "DIONEA_FOOTPRINT_SOURCE",
-                        KICAD_PACKAGE_ONLY_REVIEWED[(directory, name)],
-                    )
                 else:
                     fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
                     fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", f"KiCad:{directory}/{name}")
