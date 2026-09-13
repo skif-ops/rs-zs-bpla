@@ -161,6 +161,15 @@ def validate_deliverable_register() -> None:
         deliverables["MFG-008"]["QG-1 полнота"] == "PASS",
         "selected-lot housing plan is not QG-1 PASS",
     )
+    risks = {row["Risk_ID"]: row for row in read_csv("docs/RISK_REGISTER.csv")}
+    require(
+        "three project IPC candidates" in risks["R-025"]["Mitigation"],
+        "PCB-MAIN footprint risk still reports the superseded provisional set",
+    )
+    require(
+        "selected EVT lot" in risks["R-018"]["Mitigation"],
+        "RU868 configuration risk still assumes a fixed 20-unit build",
+    )
 
 
 def validate_pinmap() -> None:
