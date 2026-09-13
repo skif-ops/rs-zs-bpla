@@ -37,21 +37,25 @@ def validate_csv_shapes() -> None:
 
 def validate_lot() -> None:
     lot = read_csv("manufacturing/LOT_SERIAL_REGISTER.csv")
-    require([row["Serial"] for row in lot] == EXPECTED_SERIALS, "lot serial range mismatch")
-    require(len({row["Serial"] for row in lot}) == 20, "lot serials are not unique")
+    require([row["Serial"] for row in lot] == EXPECTED_SERIALS, "maximum-capacity serial range mismatch")
+    require(len({row["Serial"] for row in lot}) == 20, "reserved serials are not unique")
     require(
         all(row["Housing_Technology"] == "VACUUM_CASTING_PRIMARY" for row in lot),
-        "not all 20 units use the primary vacuum-casting allocation",
+        "reserved serial capacity does not retain the primary vacuum-casting process",
+    )
+    require(
+        all(row["Status"] == "RESERVED_CAPACITY_NOT_SELECTED" for row in lot),
+        "serial capacity was activated before an EVT lot scenario was selected",
     )
     require(all(row["APN_Mode"] == "PUBLIC_ONLY" for row in lot), "pilot APN is not PUBLIC_ONLY")
-    require(all(row["LoRa_Profile"] == "RU868_LOCKED" for row in lot), "pilot LoRa is not RU868")
+    require(all(row["LoRa_Profile"] == "RU868_LOCKED" for row in lot), "selected-lot LoRa is not RU868")
 
     housing = read_csv("manufacturing/HOUSING_LOT_PLAN.csv")
-    require([row["Serial"] for row in housing] == EXPECTED_SERIALS, "housing serial range mismatch")
-    require(sum(int(row["Primary_Qty"]) for row in housing) == 20, "primary housing total is not 20")
+    require([row["Serial"] for row in housing] == EXPECTED_SERIALS, "housing capacity serial range mismatch")
+    require(sum(int(row["Primary_Qty"]) for row in housing) == 20, "primary housing capacity is not 20")
     require(
         sum(int(row["Fallback_Qty_if_Activated"]) for row in housing) == 20,
-        "full-lot 3D fallback total is not 20",
+        "maximum 3D fallback capacity is not 20",
     )
     require(all(row["Primary_Process"] == "VACUUM_CASTING" for row in housing), "primary process mismatch")
     require(all(row["Fallback_Process"] == "3D_PRINT" for row in housing), "fallback process mismatch")
@@ -59,6 +63,21 @@ def validate_lot() -> None:
         all(row["Injection_Molding_Scope"] == "SOURCE_DATA_AND_DFM_ONLY" for row in housing),
         "injection molding exceeds source-data-only scope",
     )
+    require(
+        all(row["Status"] == "RESERVED_CAPACITY_NOT_RELEASED" for row in housing),
+        "housing capacity was released before an EVT lot scenario was selected",
+    )
+
+    scenarios = read_csv("manufacturing/EVT_LOT_SELECTION_REV_A.csv")
+    require([row["Station_Qty"] for row in scenarios] == ["4", "10", "20"], "EVT lot options are not 4 10 20")
+    for row in scenarios:
+        quantity = int(row["Station_Qty"])
+        require(row["Serial_Start"] == "DIO-EVT-001", f"{quantity}-station lot does not start at serial 001")
+        require(row["Serial_End"] == f"DIO-EVT-{quantity:03d}", f"{quantity}-station lot serial end mismatch")
+        require(row["BOM_Quantity_Column"] == f"Qty_{quantity}", f"{quantity}-station BOM quantity binding mismatch")
+        require(row["BOM_Procurement_Column"] == f"Procure_qty_{quantity}", f"{quantity}-station BOM procurement binding mismatch")
+        require(row["Procurement_Status"] == "RFQ_READY", f"{quantity}-station RFQ is not ready")
+        require(row["Selection_Status"] == "NOT_YET_SELECTED", "an EVT lot was selected without release control update")
 
 
 def validate_procurement() -> None:
@@ -102,17 +121,22 @@ def validate_procurement() -> None:
 
 def validate_decisions_and_tests() -> None:
     decisions = {row["Decision_ID"]: row for row in read_csv("docs/DECISION_LOG.csv")}
-    for decision_id in ("DEC-014", "DEC-015", "DEC-016", "DEC-017", "DEC-018"):
+    for decision_id in ("DEC-015", "DEC-016", "DEC-017", "DEC-018", "DEC-037"):
         require(decisions[decision_id]["Status"] == "LOCKED", f"{decision_id} is not locked")
+    require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
+    require(decisions["DEC-014"]["Status"] == "SUPERSEDED", "fixed 20-housing decision remains active")
 
     inputs = {row["Input_ID"]: row for row in read_csv("docs/OPEN_INPUTS_FOR_FREEZE.csv")}
     require(inputs["IN-004"]["Status"] == "LOCKED", "three housing source packages are not locked")
     require(inputs["IN-005"]["Status"] == "LOCKED", "housing lot allocation is not locked")
 
     tests = {row["Test_ID"]: row for row in read_csv("tests/EVT_MATRIX.csv")}
-    require(tests["EVT-MECH-VC"]["Population"] == "20_of_20", "vacuum housing EVT is not 20 of 20")
+    require(
+        tests["EVT-MECH-VC"]["Population"] == "SELECTED_EVT_LOT_ALL_UNITS",
+        "vacuum housing EVT does not cover every selected-lot unit",
+    )
     require(tests["EVT-MECH-IM"]["Population"] == "Source_package_only", "TPA test scope is not source-only")
     require("reject private APN" in tests["EVT-CELL-04"]["Method"], "private APN rejection test missing")
 
@@ -241,8 +265,14 @@ def validate_hardware_baseline() -> None:
 def validate_policy_text() -> None:
     baseline = (ROOT / "config/EVT_PRE_20_BASELINE.yaml").read_text(encoding="utf-8")
     require("pilot_apn_policy: public_only" in baseline, "baseline public-only APN policy missing")
-    require("pilot_primary_quantity: 20" in baseline, "baseline vacuum quantity missing")
-    require("pilot_fallback_quantity_if_activated: 20" in baseline, "baseline 3D fallback quantity missing")
+    require("maximum_station_quantity: 20" in baseline, "baseline maximum serial capacity missing")
+    require("supported_procurement_quantities: [4, 10, 20]" in baseline, "baseline 4 10 20 procurement options missing")
+    require("selected_evt_quantity: NOT_YET_SELECTED" in baseline, "baseline does not block purchase before lot selection")
+    require("pilot_primary_quantity: SELECTED_EVT_QUANTITY" in baseline, "baseline vacuum quantity does not follow selected lot")
+    require(
+        "pilot_fallback_quantity_if_activated: SELECTED_EVT_QUANTITY" in baseline,
+        "baseline 3D fallback quantity does not follow selected lot",
+    )
     require("authoritative_position_source: configured_installation_coordinates" in baseline, "configured installation coordinates are not authoritative")
     require("wifi_positioning_required: false" in baseline, "Wi-Fi positioning unexpectedly required")
     require("server_tdoa_station_position_source: configured_installation_coordinates" in baseline, "TDOA position source is not configured installation position")

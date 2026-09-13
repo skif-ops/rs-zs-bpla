@@ -8,6 +8,10 @@ Both contain explicit lot calculations for 4, 10 and 20 stations. They may be us
 sourcing work and design review, but they are not a factory release while QG-2 reports
 `BLOCKED`.
 
+`manufacturing/EVT_LOT_SELECTION_REV_A.csv` is the scenario-selection authority.
+Exactly one scenario must be selected before purchase release; quantities and spare
+columns from different scenarios must never be mixed.
+
 ## Required line data
 
 Every fitted electrical, harness and system line must contain:

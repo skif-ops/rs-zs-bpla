@@ -1,9 +1,9 @@
 Test_ID,Area,Population,Method,Pass_Criteria,Evidence,Status
-EVT-POS-001,Commissioning,20_of_20,Set installation coordinates manually over authenticated BLE then read back,Coordinates version source accuracy and lock match commissioning record,app log + station config dump + record,PLANNED
+EVT-POS-001,Commissioning,SELECTED_EVT_LOT_ALL_UNITS,Set installation coordinates manually over authenticated BLE then read back,Coordinates version source accuracy and lock match commissioning record,app log + station config dump + record,PLANNED
 EVT-POS-002,Commissioning,3_phones,Set coordinates from Android framework location without Google Play Services,Valid coordinates written and read back on Huawei/no-GMS and two reference phones,screen/log + record,PLANNED
 EVT-POS-003,Commissioning,5_units,Set coordinates from station GNSS snapshot then explicitly confirm,Configured coordinates freeze and no longer follow live GNSS,config dump + telemetry,PLANNED
-EVT-POS-004,Validation,20_of_20,Attempt invalid latitude longitude altitude accuracy and unlocked position,All invalid writes rejected atomically and old configuration retained,BLE trace + app log,PLANNED
-EVT-POS-005,Persistence,20_of_20,Power cycle after coordinate lock,Installation coordinates version/hash/lock retained exactly,before-after dump,PLANNED
+EVT-POS-004,Validation,SELECTED_EVT_LOT_ALL_UNITS,Attempt invalid latitude longitude altitude accuracy and unlocked position,All invalid writes rejected atomically and old configuration retained,BLE trace + app log,PLANNED
+EVT-POS-005,Persistence,SELECTED_EVT_LOT_ALL_UNITS,Power cycle after coordinate lock,Installation coordinates version/hash/lock retained exactly,before-after dump,PLANNED
 EVT-POS-006,GNSS_drift,5_units,Inject/simulate GNSS offset below 25 m,Position trust remains CONFIGURED_OK and effective position remains configured,telemetry + server record,PLANNED
 EVT-POS-007,GNSS_drift,5_units,Sustain GNSS offset above dynamic warning threshold for required persistence,CONFIGURED_WARN asserted; effective position remains configured,telemetry + server record,PLANNED
 EVT-POS-008,GNSS_drift,5_units,Sustain GNSS offset above dynamic suspect threshold for required persistence,CONFIGURED_SUSPECT asserted; effective position remains configured,telemetry + server record,PLANNED

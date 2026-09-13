@@ -12,7 +12,7 @@ SIM1_ICCID_Reference,YES,Controlled SIM registry,,Reference only; no PIN PUK or 
 SIM2_ICCID_Reference,YES,Controlled SIM registry,,Reference only; no PIN PUK or credentials
 Preferred_SIM_Slot,YES,Provisioning receipt,,Slot 1 or 2 and read-back ICCID match
 APN_Mode_and_Profile_Hash,YES,Provisioning receipt,,PUBLIC only and exact profile hash; private APN rejected
-LoRa_Profile,YES,Provisioning and label,RU868_LOCKED,All EVT-PRE-20 units exact match
+LoRa_Profile,YES,Provisioning and label,RU868_LOCKED,Every selected-lot unit exact match
 FW_Boot_App_BLE_Versions,YES,Release manifest,,Exact hashes resolve
 Calibration_Set_and_Hash,YES,Calibration record,,MIC and timing mapping matches serial
 Provisioning_Receipt,YES,Controlled records,,Challenge-response PASS

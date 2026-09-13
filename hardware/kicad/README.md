@@ -13,7 +13,7 @@ This directory is the authoritative electrical-CAD source package for the EVT-PR
 - Acoustic geometry: 3+1, equilateral base 120 mm, upper microphone +150 mm over center.
 - Cellular: Quectel `BG95-M3` candidate, two physical nano-SIM slots through external 2:1 SIM mux, Dual-SIM Single-Standby only.
 - GNSS/PPS: independent u-blox `MAX-M10S` class receiver.
-- LoRa: Ebyte `E22-900M22S` / SX1262 class, RU868 pilot profile on all 20 units.
+- LoRa: Ebyte `E22-900M22S` / SX1262 class, RU868 pilot profile on every station in the selected 4, 10 or 20-unit EVT lot.
 - BLE commissioning/diagnostics/OTA coprocessor: Raytac `MDBT50Q-P1MV2` based on Nordic `nRF52840`, integrated PCB antenna. `ESP32-C3-MINI-1-N4` is superseded and forbidden in active Rev.A BOM/capture.
 - BLE requirements: BLE 2M/1M/Coded Long Range, authenticated commissioning, signed OTA, local diagnostics; Wi-Fi is not required.
 - Local storage: W25Q512-class 64 MB NOR plus industrial microSD.

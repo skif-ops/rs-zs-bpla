@@ -21,7 +21,7 @@
 3. Incoming inspection and build of golden/instrumented units.
 4. Fixture MSA and pilot build review.
 5. Build remaining units with 100% traveller and EOL.
-6. Baseline functional EVT for all 20.
+6. Baseline functional EVT for every assembled station in the selected 4, 10 or 20-unit lot.
 7. Environmental, ingress, RF, energy and field tests by approved allocation.
 8. Repeat critical functional checks after every stress.
 9. Close deviations, publish raw evidence manifest and review configuration consistency.
@@ -35,4 +35,4 @@
 
 ## Открытые входы
 
-Exact site, public APN and RAT values for the selected SIMs, station deployment spacing, acoustic target set and negative set, environmental ranges, mast/wind conditions, transport route and acceptance thresholds must be frozen before QG-2. Tariff is not an EVT input. RU868 and the primary allocation of 20 vacuum-cast housings are locked; full-lot 3D printing is the controlled fallback and injection molding is source-data-only for the pilot.
+Exact site, public APN and RAT values for the selected SIMs, station deployment spacing, acoustic target set and negative set, environmental ranges, mast/wind conditions, transport route and acceptance thresholds must be frozen before QG-2. Tariff is not an EVT input. The procurement/EVT lot is selected from 4, 10 or 20 before purchase release. Every selected-lot unit uses RU868 and a vacuum-cast housing; equal-quantity 3D printing is the controlled fallback and injection molding is source-data-only for the pilot.

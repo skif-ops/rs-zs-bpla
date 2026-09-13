@@ -1,7 +1,7 @@
 project: Dioneya_ZS_BPLA
 configuration_id: EVT-PRE-20
-baseline_version: 0.2
-baseline_date: 2026-09-10
+baseline_version: 0.3
+baseline_date: 2026-09-13
 status: OPEN_NOT_RUN
 source_branch: evt
 source_commit: 2ec1d6dc81e3a16b7c127f1bbfe03f3945a72c45
@@ -16,16 +16,20 @@ authority_sync:
   integration_source_commit: f3411e51938aa1423fdbaeeef9585aeea385c239
   synchronized_blocks: [MAIN-AUTH-008, MAIN-AUTH-009, MAIN-AUTH-010, MAIN-AUTH-011]
   complete_set: MAIN-AUTH-001_THROUGH_011_CLOSED
-  native_pcb_main: PRESENT_SCHEMATIC_ERC_PASS_REVIEW_A_PENDING
-  review_a: NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING
-  review_b: BLOCKED_REVIEW_A_NOT_COMPLETE
+  native_pcb_main: PRESENT_SCHEMATIC_ERC_PASS_REVIEW_A_PASS_LAYOUT_CANDIDATE_UNROUTED
+  review_a: PASS_SIGNED_COMMIT_35C9ED91
+  review_b: OPEN_ROUTING_DRC_CAM_DFM_AND_EVIDENCE_PENDING
   production_bom: BLOCKED
 
 lot:
-  quantity: 20
+  maximum_station_quantity: 20
+  supported_procurement_quantities: [4, 10, 20]
+  selected_evt_quantity: NOT_YET_SELECTED
+  selection_required_before_purchase_release: true
   serial_prefix: DIO-EVT-
   serial_range: ["001", "020"]
-  allocation_status: LOCKED_CUSTOMER_RU868_ALL_20
+  serial_range_role: MAXIMUM_CAPACITY_RESERVATION
+  allocation_status: LOCKED_CUSTOMER_RU868_FOR_SELECTED_EVT_LOT
   lora_allocation:
     RU868: ["001", "020"]
     EU868: []
@@ -164,9 +168,11 @@ mechanics:
   primary_evt_print_platform: FlashForge_Adventurer_5M_Pro
   pilot_housing_allocation_status: LOCKED_CUSTOMER
   pilot_primary_process: vacuum_casting
-  pilot_primary_quantity: 20
+  pilot_primary_quantity: SELECTED_EVT_QUANTITY
+  supported_procurement_quantities: [4, 10, 20]
+  maximum_serial_capacity: 20
   pilot_fallback_process: 3d_print
-  pilot_fallback_quantity_if_activated: 20
+  pilot_fallback_quantity_if_activated: SELECTED_EVT_QUANTITY
   fallback_activation: customer_approved_if_vacuum_casting_unavailable
   injection_molding_scope: source_data_and_dfm_only_no_pilot_tooling
 
