@@ -85,5 +85,8 @@ marks only the matching pending item delivered. A portable MQTT uplink adapter
 persists each attempt before exposing the exact outbox payload, publishes only
 to the canonical station `up` topic, ignores PUBACK for reclamation and can apply
 a queued receipt after restart by durable event lookup. Target NOR/Flash
-allocation, wear/endurance, exact BG95 publish/receipt subscription/URC binding
-and assembled-station recovery remain release blockers.
+binding now has a portable adapter that dedicates one physical erase block to
+each outbox slot, preventing reclaim from erasing a neighbour. Exact non-overlap
+partition base/count, OCTOSPI HAL binding, wear/endurance, exact BG95
+publish/receipt subscription/URC binding and assembled-station recovery remain
+release blockers.

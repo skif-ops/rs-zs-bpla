@@ -97,7 +97,9 @@ and clear online/network-valid flags.
   server-to-firmware application receipt, exact payload-SHA binding, duplicate
   replay and receipt-before-broker-ACK ordering. The portable uplink adapter
   persists each retry before returning the exact `up` topic/payload view and
-  applies a queued receipt by durable lookup after restart. Target storage and
+  applies a queued receipt by durable lookup after restart. A W25Q-class adapter
+  dedicates a complete erase block to each logical outbox slot and verifies
+  partition bounds. Exact NOR partition allocation, OCTOSPI HAL/endurance and
   exact BG95 receive/publish framing remain open.
 
 ## Open evidence

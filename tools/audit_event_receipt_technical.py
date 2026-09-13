@@ -127,45 +127,65 @@ def audit_vector() -> None:
 def audit_firmware_runtime() -> None:
     compiler = shutil.which("cc") or shutil.which("gcc")
     require(compiler is not None, "host C compiler is unavailable")
-    sources = (
-        "firmware/tests/test_mqtt_event_transport.c",
-        "firmware/src/zs_mqtt_event_transport.c",
-        "firmware/src/zs_event_receipt.c",
-        "firmware/src/zs_event_outbox.c",
-        "firmware/src/zs_protocol.c",
-        "firmware/src/zs_cbor.c",
-        "firmware/src/zs_sha256.c",
+    tests = (
+        (
+            "zs_mqtt_event_transport_tests",
+            (
+                "firmware/tests/test_mqtt_event_transport.c",
+                "firmware/src/zs_mqtt_event_transport.c",
+                "firmware/src/zs_event_receipt.c",
+                "firmware/src/zs_event_outbox.c",
+                "firmware/src/zs_protocol.c",
+                "firmware/src/zs_cbor.c",
+                "firmware/src/zs_sha256.c",
+            ),
+        ),
+        (
+            "zs_nor_event_outbox_tests",
+            (
+                "firmware/tests/test_nor_event_outbox.c",
+                "firmware/src/zs_nor_event_outbox.c",
+                "firmware/src/zs_nor.c",
+                "firmware/src/zs_event_outbox.c",
+                "firmware/src/zs_protocol.c",
+                "firmware/src/zs_cbor.c",
+                "firmware/src/zs_sha256.c",
+            ),
+        ),
     )
     with tempfile.TemporaryDirectory(prefix="zs-event-fw-qg2-") as directory:
-        binary = Path(directory) / "zs_mqtt_event_transport_tests"
-        result = subprocess.run(
-            [
-                compiler,
-                "-std=gnu11",
-                "-Wall",
-                "-Wextra",
-                "-Wpedantic",
-                "-Werror",
-                "-O2",
-                "-UNDEBUG",
-                f"-I{ROOT / 'firmware/include'}",
-                f"-I{ROOT / 'firmware/generated'}",
-                *(str(ROOT / source) for source in sources),
-                "-lm",
-                "-o",
-                str(binary),
-            ],
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        require(result.returncode == 0, f"firmware event transport compile failed: {result.stderr}")
-        result = subprocess.run(
-            [str(binary)], check=False, capture_output=True, text=True
-        )
-        require(result.returncode == 0, f"firmware event transport test failed: {result.stderr}")
-        require("zs_mqtt_event_transport_tests: OK" in result.stdout,
-                "firmware event transport test did not report success")
+        for test_name, sources in tests:
+            binary = Path(directory) / test_name
+            result = subprocess.run(
+                [
+                    compiler,
+                    "-std=gnu11",
+                    "-Wall",
+                    "-Wextra",
+                    "-Wpedantic",
+                    "-Werror",
+                    "-O2",
+                    "-UNDEBUG",
+                    f"-I{ROOT / 'firmware/include'}",
+                    f"-I{ROOT / 'firmware/generated'}",
+                    *(str(ROOT / source) for source in sources),
+                    "-lm",
+                    "-o",
+                    str(binary),
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            require(result.returncode == 0,
+                    f"firmware test compile failed ({test_name}): {result.stderr}")
+            result = subprocess.run(
+                [str(binary)], check=False, capture_output=True, text=True
+            )
+            require(result.returncode == 0,
+                    f"firmware test failed ({test_name}): {result.stderr}")
+            require(f"{test_name}: OK" in result.stdout,
+                    f"firmware test did not report success: {test_name}")
 
 
 def main() -> int:
@@ -273,7 +293,7 @@ def main() -> int:
                 "full uint64 event ID was truncated")
 
     print("Event application receipt QG-2 independent runtime audit: PASS")
-    print("- server runtime plus firmware publish/retry/receipt lifecycle verified")
+    print("- server runtime plus firmware publish/retry/receipt and erase-isolated NOR lifecycle verified")
     return 0
 
 

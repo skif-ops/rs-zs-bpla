@@ -290,6 +290,13 @@ commit marker. Незавершённая запись после потери �
 с другой metadata или SHA-256 отклоняется как conflict. Счётчик попыток использует
 128-битную one-way bitmap без erase текущего события.
 
+Portable W25Q-class adapter maps every 616-byte logical outbox slot to its own
+complete 4-KiB erase block. Partition base alignment, capacity and slot bounds
+are checked before use, so reclaiming one event cannot erase an adjacent pending
+event. The exact NOR base/count must be allocated outside the archive region in
+the reviewed target memory map; OCTOSPI HAL binding and measured endurance remain
+open.
+
 MQTT PUBACK не является application ACK. Станция помечает событие доставленным
 только после проверенного server application receipt из раздела 2.3; torn ACK
 marker остаётся pending, поэтому recovery имеет семантику at-least-once и может

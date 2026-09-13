@@ -20,6 +20,9 @@ def main() -> int:
     header = read("firmware/include/zs_event_outbox.h")
     source = read("firmware/src/zs_event_outbox.c")
     test = read("firmware/tests/test_event_outbox.c")
+    nor_header = read("firmware/include/zs_nor_event_outbox.h")
+    nor_source = read("firmware/src/zs_nor_event_outbox.c")
+    nor_test = read("firmware/tests/test_nor_event_outbox.c")
     cmake = read("firmware/CMakeLists.txt")
     ci = read(".github/workflows/ci.yml")
     icd = read("protocols/MQTT_TLS_ICD_v0_1.md")
@@ -76,6 +79,31 @@ def main() -> int:
             "event outbox test is not bound to CMake/CTest")
     require("src/zs_event_outbox.c" in cmake,
             "event outbox source is not bound to the firmware core")
+    for token in (
+        "zs_nor_event_outbox_adapter_t",
+        "zs_nor_event_outbox_io_init",
+        "one complete physical erase block",
+    ):
+        require(token in nor_header, f"NOR outbox adapter API missing: {token}")
+    for token in (
+        "slot * adapter->nor->geometry.erase_bytes",
+        "erase_bytes < ZS_EVENT_OUTBOX_SLOT_BYTES",
+        "base_address % nor->geometry.erase_bytes != 0u",
+        "partition_end > nor->geometry.capacity_bytes",
+        "zs_nor_erase",
+        "zs_nor_program",
+    ):
+        require(token in nor_source, f"NOR outbox adapter guard missing: {token}")
+    for token in (
+        "test_sector_isolation_reclaim_and_roundtrip",
+        "test_partition_and_callback_guards",
+        "ZS_EVENT_OUTBOX_FULL",
+        "memcmp(preserved",
+    ):
+        require(token in nor_test, f"NOR outbox QG-2 case missing: {token}")
+    require("src/zs_nor_event_outbox.c" in cmake and
+            "zs_nor_event_outbox_tests" in cmake,
+            "NOR outbox adapter is not bound to CMake/CTest")
     require("validate_event_outbox_contract.py" in ci,
             "event outbox QG-1 is not bound to CI")
     for token in (
@@ -93,11 +121,21 @@ def main() -> int:
         in target,
         "target status overclaims or omits portable outbox evidence",
     )
-    require("event_outbox_storage_binding: MISSING_BLOCKER" in target,
-            "target outbox storage binding blocker is not explicit")
+    require(
+        "event_outbox_nor_adapter: PORTABLE_ERASE_ISOLATED_QG1_QG2_PASS_PARTITION_AND_OCTOSPI_BINDING_PENDING"
+        in target,
+        "target status overclaims or omits NOR outbox evidence",
+    )
+    require(
+        "event_outbox_storage_binding: PORTABLE_NOR_ADAPTER_PASS_EXACT_PARTITION_AND_OCTOSPI_BINDING_BLOCKER"
+        in target,
+        "target outbox storage binding status is not bounded",
+    )
+    require("event_outbox_nor_partition: MISSING_BLOCKER" in target,
+            "target outbox NOR partition blocker is not explicit")
 
     print("Event store-and-forward outbox QG-1: PASS")
-    print("scope: portable atomic queue; target storage and hardware remain pending")
+    print("scope: portable atomic queue + erase-isolated NOR adapter; exact partition/OCTOSPI and hardware remain pending")
     return 0
 
 

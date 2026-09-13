@@ -43,6 +43,11 @@ adapter сохраняет retry marker до выдачи exact `up` topic/paylo
 PUBACK разрешением на удаление. Host QG не заменяет exact BG95 binary MQTT
 binding и аппаратный recovery test.
 
+Portable NOR adapter выделяет каждому outbox slot отдельный erase block и
+проверяет alignment/range partition, поэтому reclaim не стирает соседнее pending
+event. Конкретные base/count без пересечения с audio archive, OCTOSPI HAL и
+endurance ещё должны быть утверждены в target memory map и измерены на плате.
+
 Первый target-инкремент уже фиксирует точный исходный контракт
 `STM32U585VIT6Q/LQFP100`: 67 назначений из Rev.A pin map и AAD addendum,
 запрет внешнего HSE, 32.768 kHz reference и пять ещё не измеренных runtime

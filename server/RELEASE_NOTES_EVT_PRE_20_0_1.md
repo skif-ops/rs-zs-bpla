@@ -62,6 +62,9 @@
 - Portable event MQTT adapter выдаёт только exact binary `up` publication после
   durable retry accounting, оставляет PUBACK без влияния на outbox и применяет
   queued receipt после рестарта через поиск durable event identity.
+- Portable W25Q-class outbox adapter использует один полный erase block на slot,
+  проверяет alignment/capacity и сохраняет соседний pending slot при reclaim;
+  exact partition/OCTOSPI/endurance остаются target blockers.
 - Открыты target MQTT subscription/URC binding, reviewed Ed25519 backend,
   provisioning public key, Flash/outbox storage/endurance binding, command ACK
   publisher, BG95 event-receipt binding и аппаратный end-to-end;
