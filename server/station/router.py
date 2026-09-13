@@ -2,12 +2,13 @@
 from __future__ import annotations
 import json, time
 from pathlib import Path
-from fastapi import APIRouter, Body, File, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Body, Depends, File, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
 from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage
 from station.store import EventStore
 from station.service import StationFusionService
 from station.cbor_codec import decode_detection_cbor
+from station.http_transport import require_insecure_station_http_bench
 from station.online_type_service import OnlineTypeSessionService
 
 BASE=Path(__file__).resolve().parents[1]
@@ -15,22 +16,23 @@ store=EventStore(BASE/'data'/'zs_bpla.sqlite3')
 service=StationFusionService(store)
 type_service=OnlineTypeSessionService()
 router=APIRouter(prefix='/api/v1',tags=['ZS-BPLA stations'])
+station_http_router=APIRouter(dependencies=[Depends(require_insecure_station_http_bench)])
 
 @router.get('/health')
 async def health(): return {'status':'ok','protocol':'1.5','service':'zs-bpla'}
 
-@router.post('/stations/{station_id}/heartbeat')
+@station_http_router.post('/stations/{station_id}/heartbeat')
 async def heartbeat(station_id:int,msg:HeartbeatMessage):
     if station_id!=msg.station_id: raise HTTPException(400,'station_id mismatch')
     if msg.cellular is not None: raise HTTPException(400,'cellular identity is accepted only through mutual-TLS MQTT status')
     store.upsert_station(msg); service.bus.publish_nowait({'type':'station','data':msg.model_dump()}); return {'status':'ok'}
 
-@router.post('/stations/{station_id}/detection')
+@station_http_router.post('/stations/{station_id}/detection')
 async def detection(station_id:int,msg:DetectionMessage):
     if station_id!=msg.station_id: raise HTTPException(400,'station_id mismatch')
     return service.ingest(msg).model_dump()
 
-@router.post('/stations/{station_id}/detection.cbor')
+@station_http_router.post('/stations/{station_id}/detection.cbor')
 async def detection_cbor(station_id:int,request:Request):
     raw=await request.body()
     try: msg=decode_detection_cbor(raw)
@@ -39,7 +41,7 @@ async def detection_cbor(station_id:int,request:Request):
     event=service.ingest(msg)
     return JSONResponse(event.model_dump())
 
-@router.post('/stations/{station_id}/events/{event_id}/features')
+@station_http_router.post('/stations/{station_id}/events/{event_id}/features')
 async def feature_update(station_id:int,event_id:int,msg:FeatureUpdateMessage):
     if station_id!=msg.station_id: raise HTTPException(400,'station_id mismatch')
     if event_id!=msg.event_id: raise HTTPException(400,'event_id mismatch')
@@ -47,7 +49,7 @@ async def feature_update(station_id:int,event_id:int,msg:FeatureUpdateMessage):
     service.bus.publish_nowait({'type':'type_update','data':status.model_dump()})
     return status.model_dump()
 
-@router.post('/stations/{station_id}/security')
+@station_http_router.post('/stations/{station_id}/security')
 async def security(station_id:int,msg:SecurityEventMessage):
     if station_id!=msg.station_id: raise HTTPException(400,'station_id mismatch')
     store.save_security(msg)
@@ -70,13 +72,13 @@ async def event(event_id:str):
 async def request_audio(station_id:int,req:AudioRequest):
     return store.create_command(station_id,'CMD_REQUEST_AUDIO',req.model_dump()).model_dump()
 
-@router.get('/stations/{station_id}/commands/poll')
+@station_http_router.get('/stations/{station_id}/commands/poll')
 async def poll_commands(station_id:int): return [x.model_dump() for x in store.poll_commands(station_id)]
 
-@router.post('/stations/{station_id}/commands/{command_id}/ack')
+@station_http_router.post('/stations/{station_id}/commands/{command_id}/ack')
 async def command_ack(station_id:int,command_id:str): store.ack_command(command_id); return {'status':'ok'}
 
-@router.post('/stations/{station_id}/events/{event_id}/audio')
+@station_http_router.post('/stations/{station_id}/events/{event_id}/audio')
 async def upload_audio(station_id:int,event_id:int,segment:str='pre',sample_rate:int=32000,codec:str='pcm16',audio:UploadFile=File(...)):
     if segment not in ('pre','post'): raise HTTPException(400,'segment must be pre or post')
     root=BASE/'data'/'audio'/str(station_id)/str(event_id); root.mkdir(parents=True,exist_ok=True)
@@ -93,3 +95,6 @@ async def stream(ws:WebSocket):
         while True: await ws.send_json(await q.get())
     except WebSocketDisconnect: pass
     finally: service.bus.unsubscribe(q)
+
+
+router.include_router(station_http_router)

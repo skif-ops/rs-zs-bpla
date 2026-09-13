@@ -22,5 +22,9 @@
 - Full CI восстанавливает `dataset/features.csv` из версионированного `features.csv.gz` штатным скриптом до pytest.
 - MQTT bridge переведён в fail-closed TLS mode: без CA, client certificate и key запуск отклоняется.
 - Plaintext MQTT оставлен только для изолированного стенда с явным `--insecure-bench`; добавлены отрицательные тесты конфигурации.
+- Станционный HTTP transport переведён в fail-closed mode: ingestion,
+  command polling/ACK и audio upload включаются только точным стендовым
+  `ZS_STATION_HTTP_INSECURE_BENCH=1`; полные IMSI/ICCID по HTTP по-прежнему
+  запрещены.
 
 Изменение не закрывает security/deployment blockers из `EVT_PRE_20_RELEASE_AUDIT.md` и не является разрешением на internet-facing deployment.

@@ -8,7 +8,10 @@ docker compose -f docker-compose.dev.yml up --build
 curl http://127.0.0.1:8000/api/v1/health
 ```
 
-The development broker listens only on localhost and allows anonymous clients for bench testing. It is not a production configuration.
+The development broker and server listen only on localhost and allow explicit
+insecure station transports for bench testing. `docker-compose.dev.yml` and the
+plaintext `compose.windows.yml` set `ZS_STATION_HTTP_INSECURE_BENCH=1`; both are
+isolated-bench configurations and must not be used for production.
 
 ## Production requirements
 
@@ -18,6 +21,8 @@ The development broker listens only on localhost and allows anonymous clients fo
 - Server-side `station_id` authorization, rate limiting and replay protection.
 - Persistent database volume and backup policy.
 - Reverse proxy for the REST/WebSocket UI with HTTPS.
+- Station HTTP ingress disabled by default; production telemetry enters through
+  the mutual-TLS MQTT bridge. Do not set `ZS_STATION_HTTP_INSECURE_BENCH`.
 - Telegram/mobile notification credentials injected as secrets, not committed.
 
 The station wire messages remain compact CBOR. `station/cbor_codec.py` is the

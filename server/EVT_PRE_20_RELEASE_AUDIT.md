@@ -33,6 +33,13 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
 
 Закрыто в исходном baseline EVT-PRE-20: MQTT bridge теперь fail-closed и требует CA, client certificate и key. Plaintext разрешён только явным флагом `--insecure-bench`, который используется в отдельном development compose и проверяется отрицательными тестами.
 
+Частично закрыто после baseline: station HTTP ingress, command polling/ACK и
+audio upload теперь fail-closed и доступны только при точном стендовом opt-in
+`ZS_STATION_HTTP_INSECURE_BENCH=1`. Production telemetry должна поступать через
+MQTT mTLS. Пункт 1 остаётся открытым до завершения auth/authz операторского
+REST/WebSocket UI и deployment-проверок; это изменение не разрешает публикацию
+FastAPI напрямую в интернет.
+
 До закрытия пунктов сервер разрешён только для разработки или изолированного стенда. Публикация напрямую в интернет запрещена.
 
 ## Выпускной gate

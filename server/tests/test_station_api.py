@@ -1,4 +1,5 @@
 from pathlib import Path
+import pytest
 from fastapi.testclient import TestClient
 from app import app
 from station.router import store
@@ -15,17 +16,32 @@ def det(station_id,event_id,t_us,lat,lon,az):
       'power':{'battery_pct':80,'battery_mv':13000,'solar_mv':17000,'temperature_c10':200},'route':{'transport':'TEST','hop_count':0}
     }
 
-def test_warning_then_alert(tmp_path):
+def test_station_http_ingress_is_disabled_by_default(monkeypatch):
+    monkeypatch.delenv('ZS_STATION_HTTP_INSECURE_BENCH',raising=False)
+    payload=det(9099,9099001,2_000_000_000_000_000,55.0,37.0,45.0)
+    response=client.post('/api/v1/stations/9099/detection',json=payload)
+    assert response.status_code==403
+    assert 'use mutual-TLS MQTT in production' in response.json()['detail']
+
+
+@pytest.mark.parametrize('value',['true','yes','on','0',''])
+def test_station_http_ingress_rejects_ambiguous_opt_in(monkeypatch,value):
+    monkeypatch.setenv('ZS_STATION_HTTP_INSECURE_BENCH',value)
+    response=client.get('/api/v1/stations/9099/commands/poll')
+    assert response.status_code==403
+
+
+def test_warning_then_alert(tmp_path,insecure_station_http_bench):
     # Unique IDs avoid collisions with persistent local DB from other tests.
     t=2_000_000_000_000_000
     a=client.post('/api/v1/stations/9001/detection',json=det(9001,9001001,t,55.0,37.0,45.0)); assert a.status_code==200; assert a.json()['event_type']=='AIR_WARNING'
     b=client.post('/api/v1/stations/9002/detection',json=det(9002,9002001,t+20000,55.0,37.02,315.0)); assert b.status_code==200; assert b.json()['event_type']=='AIR_ALERT'; assert b.json()['stations_used']>=2
 
-def test_feature_count_validation():
+def test_feature_count_validation(insecure_station_http_bench):
     d=det(9003,9003001,2_100_000_000_000_000,55.1,37.1,0); d['features']=[1.0]
     r=client.post('/api/v1/stations/9003/detection',json=d); assert r.status_code==422
 
-def test_feature_update_warms_up_without_hard_type_lock():
+def test_feature_update_warms_up_without_hard_type_lock(insecure_station_http_bench):
     payload={
         'schema_ver':1,'station_id':9010,'seq_no':1,'boot_id':1,'event_id':9010001,
         'event_time_us':2_200_000_000_000_000,'features':[0.0]*43,'detector_profile':'piston'
@@ -40,7 +56,7 @@ def test_feature_update_warms_up_without_hard_type_lock():
     assert body['max_windows']==8
     assert body['hierarchical_label']=='UNKNOWN'
 
-def test_http_heartbeat_rejects_full_cellular_identity():
+def test_http_heartbeat_rejects_full_cellular_identity(insecure_station_http_bench):
     payload={
         'station_id':9020,'time_us':1,
         'station':{'lat_e7':0,'lon_e7':0,'alt_dm':0},

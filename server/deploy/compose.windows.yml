@@ -14,6 +14,7 @@ services:
       ZS_MQTT_HOST: mqtt
       ZS_MQTT_PORT: "1883"
       ZS_TENANT: ${ZS_TENANT:-evt}
+      ZS_STATION_HTTP_INSECURE_BENCH: "1"
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
@@ -25,7 +26,7 @@ services:
     build:
       context: ..
     restart: unless-stopped
-    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "1883"]
+    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "1883", "--insecure-bench"]
     environment:
       ZS_TENANT: ${ZS_TENANT:-evt}
     volumes:

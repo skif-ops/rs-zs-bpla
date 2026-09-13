@@ -184,6 +184,10 @@ jobs:
       - name: Materialize versioned test assets
         working-directory: server
         run: python tools/materialize_assets.py
+      - name: QG-1 station HTTP fail-closed contract
+        run: python tools/validate_station_http_transport.py
+      - name: QG-2 independent station HTTP runtime audit
+        run: python tools/audit_station_http_transport_technical.py
       - name: Full pytest
         working-directory: server
         run: python -m pytest -q tests

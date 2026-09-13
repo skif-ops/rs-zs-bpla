@@ -18,6 +18,8 @@
 - WebSocket realtime event stream;
 - station command queue and audio request/upload;
 - optional MQTT/TLS bridge process;
+- fail-closed station HTTP transport, enabled only on an isolated bench with
+  exact opt-in `ZS_STATION_HTTP_INSECURE_BENCH=1`;
 - hierarchical family/type updates use only the latest 4-8 unique feature
   windows; fewer than four windows remain `warming_up`;
 - portable station firmware uses the same 4-8-window and 5/8 consensus rule
@@ -70,7 +72,8 @@ python -m station.mqtt_bridge --host mqtt.example --port 8883 --tenant pilot
 
 Full IMSI/ICCID is stored in the restricted station record. Do not expose the
 SQLite database or raw status payloads through logs, backups, diagnostics or the
-general API. The JSON/HTTP heartbeat route deliberately rejects cellular identity.
+general API. The JSON/HTTP heartbeat route deliberately rejects cellular identity
+even when the isolated bench transport is enabled.
 
 ## Data provenance note
 
