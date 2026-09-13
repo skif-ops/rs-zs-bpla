@@ -61,6 +61,10 @@
   последовательно выполняет обе subscription и даёт единственного TX owner для
   event publish или command ACK. Один command ожидает занятого TX в RAM, а
   дальнейшие доставки требуют штатного server application-ACK retry.
+- Portable command-journal NOR adapter выделяет отдельный erase block каждому
+  accepted/completed record и проходит restart, torn commit, range и neighbour
+  isolation host tests. Production storage/partition/slot count/endurance не
+  объявлены готовыми.
 - Portable event outbox атомарно сохраняет полный schema-4 CBOR с metadata CRC32
   и SHA-256, выбирает priority/FIFO, не вытесняет pending events и при torn ACK
   обеспечивает безопасную at-least-once повторную доставку.
@@ -87,7 +91,7 @@
   из одного layout и обрезает archive storage на границе outbox. Production slot
   count, target memory-map/OCTOSPI/endurance остаются blockers.
 - Открыты target USART/DMA/ISR/cache integration, modem/broker-policy evidence и reviewed Ed25519 backend,
-  provisioning public key, Flash/outbox slot-count/OCTOSPI/endurance binding, command ACK
+  provisioning public key, command-journal storage partition и Flash/outbox slot-count/OCTOSPI/endurance binding, command ACK
   target integration и аппаратный end-to-end;
   они не объявлены PASS до сборки станций.
 

@@ -181,6 +181,18 @@ def audit_firmware_bg95_runtime() -> None:
                 "firmware/src/zs_sha256.c",
             ),
         ),
+        (
+            "zs_nor_command_journal_tests",
+            (
+                "firmware/tests/test_nor_command_journal.c",
+                "firmware/src/zs_nor_command_journal.c",
+                "firmware/src/zs_nor.c",
+                "firmware/src/zs_command_journal.c",
+                "firmware/src/zs_command.c",
+                "firmware/src/zs_cbor.c",
+                "firmware/src/zs_sha256.c",
+            ),
+        ),
     )
     with tempfile.TemporaryDirectory(prefix="zs-command-fw-qg2-") as directory:
         for test_name, sources in tests:
@@ -374,7 +386,7 @@ def main() -> int:
                 "transient error log is absent or exposes exception details")
 
     print("MQTT signed command transport QG-2: PASS")
-    print("scope: host runtime + signed vector + BG95 bounded raw-UART session/fixed ACK; target crypto/USART-DMA/retain policy/hardware remain pending")
+    print("scope: host runtime + signed vector + erase-isolated NOR journal + BG95 bounded raw-UART session/fixed ACK; target crypto/storage partition/USART-DMA/retain policy/hardware remain pending")
     return 0
 
 

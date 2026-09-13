@@ -103,8 +103,12 @@ journal atomically records `ACCEPTED` before an idempotent side effect and appen
 accepted record recoverable; restart must resume the idempotent operation keyed
 by `command_id`. A completed duplicate reuses the durable result without repeating
 the side effect. Reuse of a UUID with different signed command semantics is a
-fail-closed conflict. Target Flash page allocation and endurance validation remain
-open.
+fail-closed conflict. The portable NOR adapter maps every 88-byte journal slot to its own full
+physical erase block, bounds all reads/programs to the logical record, and
+reuses a torn uncommitted slot without erasing a neighbouring record. Restart
+roundtrip, commit-write failure and partition guards pass host QG. Production
+storage selection, non-overlapping partition, exact slot count and measured
+endurance remain target blockers.
 
 The portable application channel enforces this order and emits no ACK for an
 invalid envelope, transient executor failure or storage failure. It re-verifies

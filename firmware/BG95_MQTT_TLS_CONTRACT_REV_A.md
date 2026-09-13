@@ -80,7 +80,11 @@ and clear online/network-valid flags.
   binding, fail-closed signature callback handling, durable-dedup requirement and
   ACK encoding under the host build. `firmware/tests/test_command_journal.c`
   separately fault-injects the atomic accepted/completed journal and prevents ACK
-  generation before a completed result is durable. The bounded trust adapter
+  generation before a completed result is durable. Its portable NOR adapter
+  gives every logical record a whole erase block, verifies range/alignment,
+  preserves neighbouring records across reclaim, and recovers after a torn
+  commit; production storage choice, partition and endurance remain target work.
+  The bounded trust adapter
   validates key IDs and enabled rotation entries before delegating to a mandatory
   Ed25519 backend; no production public key is embedded in portable source. The
   application channel joins verification, journal, idempotent executor and ACK in
@@ -152,8 +156,8 @@ and clear online/network-valid flags.
   selected BG95 firmware revision and every pilot operator, after stations are assembled;
 - certificate upload/provisioning and BG95 firmware-version compatibility;
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
-- reviewed Ed25519 backend and public-key provisioning, nonvolatile target-page
-  binding/endurance, target USART/DMA/ISR integration and cache ownership for
+- reviewed Ed25519 backend and public-key provisioning, nonvolatile storage
+  selection/non-overlap/endurance, target USART/DMA/ISR integration and cache ownership for
   the host-tested command
   down/ACK and event receipt bindings,
   and outbox

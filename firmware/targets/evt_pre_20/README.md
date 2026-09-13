@@ -64,13 +64,16 @@ durable audit backend and target service-window timer remain open target work.
 The portable downstream-command boundary now has a canonical fixed-memory CBOR
 codec, a bounded public-key rotation adapter, and a power-loss-safe
 accepted/completed journal that cannot encode an ACK before completion is
-durable. A portable application channel enforces verify → accept → idempotent
+durable. The journal now has a portable erase-isolated NOR adapter with one
+physical erase block per record and host-tested torn-commit restart recovery;
+target storage selection, non-overlapping partition and endurance remain open.
+A portable application channel enforces verify → accept → idempotent
 execute → complete → ACK and safely replays accepted/completed duplicates. Host
 QG includes a real server-generated Ed25519 vector. A portable binary MQTT
 adapter now enforces the exact tenant/station `down` topic, QoS 1 and non-retained
 delivery before command parsing, then exposes the exact `ack` topic and CBOR
 payload length after durable completion. The target still needs reviewed Ed25519
-library binding, provisioned public keys, dedicated Flash pages/endurance evidence
+library binding, provisioned public keys, production journal storage/partition/endurance evidence
 and hardware integration. Portable BG95 AT binding now confirms pre-connect
 length mode, subscribes to exact `down` at QoS 1, parses binary `QMTRECV` by
 declared length and publishes the durable ACK with fixed-length `QMTPUB`. A

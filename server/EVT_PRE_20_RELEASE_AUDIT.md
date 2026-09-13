@@ -38,8 +38,11 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    `QMTPUB` durable ACK; UART failure сохраняет completed journal result, а
    server retry не повторяет side effect. Из-за отсутствия retain-флага в URC
    init требует внешний server-only/non-retained ACL contract. Открыты target
-   USART/DMA/ISR/cache integration, reviewed Ed25519 backend, public-key provisioning, Flash
-   page/endurance binding, broker-policy и hardware end-to-end evidence.
+   USART/DMA/ISR/cache integration, reviewed Ed25519 backend, public-key provisioning,
+   production storage partition/endurance, broker-policy и hardware end-to-end evidence.
+   Portable command-journal NOR adapter уже изолирует каждый record отдельным
+   erase block и проходит torn-commit/restart QG; выбор production storage,
+   непересекающийся partition, slot count и endurance остаются открыты.
 3. ЗАКРЫТО: исходные диапазоны разрешены в хешированные Python 3.12 lockfiles;
    production image и CI используют `requirements.lock.txt` с
    `--require-hashes`, а `sbom/server.cdx.json` воспроизводимо генерируется из
@@ -81,7 +84,7 @@ downstream без ключа. ACL разрешает каждой station creden
 `down`/`ack`. Portable BG95 receive/ACK binding и bounded raw-UART session с
 единым TX owner проходят host QG; один command frame может ожидать занятого
 publish, следующие полагаются на application-ACK retry. Полное закрытие
-возможно после target USART/DMA/ISR integration, production crypto/Flash binding,
+возможно после target USART/DMA/ISR integration, production crypto/storage binding,
 provisioning public key, broker-policy и проверки на собранных станциях.
 
 Частично закрыт пункт 7: host outbox обеспечивает at-least-once и не вытесняет

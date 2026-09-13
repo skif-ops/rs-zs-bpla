@@ -40,6 +40,9 @@ def main() -> int:
     journal_header = read("firmware/include/zs_command_journal.h")
     journal_codec = read("firmware/src/zs_command_journal.c")
     journal_test = read("firmware/tests/test_command_journal.c")
+    nor_journal_header = read("firmware/include/zs_nor_command_journal.h")
+    nor_journal_codec = read("firmware/src/zs_nor_command_journal.c")
+    nor_journal_test = read("firmware/tests/test_nor_command_journal.c")
     trust_header = read("firmware/include/zs_command_trust.h")
     trust_codec = read("firmware/src/zs_command_trust.c")
     trust_test = read("firmware/tests/test_command_trust.c")
@@ -208,6 +211,39 @@ def main() -> int:
         "zs_command_vector_ack",
     ):
         require(token in journal_test, f"durable journal QG-2 case missing: {token}")
+    for token in (
+        "zs_nor_command_journal_adapter_t",
+        "zs_nor_command_journal_io_init",
+        "one whole erase block",
+        "Partition selection and",
+    ):
+        require(token in nor_journal_header,
+                f"command journal NOR adapter API missing: {token}")
+    for token in (
+        "adapter->slot_count < 2u",
+        "geometry.erase_bytes < ZS_COMMAND_JOURNAL_SLOT_BYTES",
+        "slot_range",
+        "zs_nor_erase",
+        "zs_nor_program",
+    ):
+        require(token in nor_journal_codec,
+                f"command journal NOR guard missing: {token}")
+    for token in (
+        "test_erase_isolation_roundtrip_and_restart",
+        "test_torn_commit_is_reusable_without_neighbour_erase",
+        "test_partition_and_callback_guards",
+        "ZS_COMMAND_JOURNAL_STATE_COMPLETED",
+        "fail_program_call = 2u",
+    ):
+        require(token in nor_journal_test,
+                f"command journal NOR QG-2 case missing: {token}")
+    for token in (
+        "src/zs_nor_command_journal.c",
+        "zs_nor_command_journal_tests",
+        "nor_command_journal",
+    ):
+        require(token in cmake,
+                f"command journal NOR adapter is absent from CMake: {token}")
     for token in (
         "ZS_COMMAND_TRUST_MAX_KEYS 4u",
         "zs_ed25519_verify_backend_fn",
@@ -397,6 +433,15 @@ def main() -> int:
         in target_status,
         "target BG95 command blockers are not bounded",
     )
+    require(
+        "command_result_journal: PORTABLE_ATOMIC_QG1_QG2_PASS_NOR_ERASE_ISOLATED_ADAPTER_BOUND_TARGET_PARTITION_ENDURANCE_PENDING"
+        in target_status and
+        "command_journal_nor_adapter: PORTABLE_ERASE_ISOLATED_QG1_QG2_PASS_TARGET_STORAGE_SELECTION_PARTITION_ENDURANCE_PENDING"
+        in target_status and
+        "command_journal_flash_binding: PORTABLE_NOR_ERASE_ISOLATED_QG1_QG2_PASS_TARGET_STORAGE_SELECTION_PARTITION_ENDURANCE_BLOCKER"
+        in target_status,
+        "target command journal storage blocker is not bounded",
+    )
 
     require("PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING" in icd,
             "ICD does not report the bounded implementation status")
@@ -423,7 +468,7 @@ def main() -> int:
             "portable binary MQTT boundary test is not bound to CTest")
 
     print("MQTT signed command transport QG-1: PASS")
-    print("scope: server + durable firmware + BG95 bounded raw-UART session/ACK host path; target crypto/USART-DMA/retain policy/hardware remain pending")
+    print("scope: server + durable firmware/NOR adapter + BG95 bounded raw-UART session/ACK host path; target crypto/storage partition/USART-DMA/retain policy/hardware remain pending")
     return 0
 
 
