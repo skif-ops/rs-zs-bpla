@@ -116,6 +116,18 @@ def main() -> None:
         require(values.get(property_key(pin_name, "Locked")) == "true", f"IOC pin not locked: {row['Net']}")
         require(values.get(property_key(pin_name, "Signal")) == expected_signal(row), f"IOC signal mismatch for {row['Net']}")
 
+    safe_low_outputs = {
+        "CELL_PWRKEY_CMD": "PD11",
+        "CELL_RESET_N_CMD": "PD12",
+        "CELL_DTR": "PD14",
+        "EN_MODEM": "PD4",
+        "SIM_MUX_SEL": "PE0",
+        "SIM_MUX_EN": "PE2",
+    }
+    for net, pin_name in safe_low_outputs.items():
+        require(values.get(property_key(pin_name, "PinState")) == "GPIO_PIN_RESET",
+                f"IOC safe LOW startup state missing for {net}")
+
     contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
     db_lock = json.loads(DB_LOCK.read_text(encoding="utf-8"))
     require(contract["status"] == "PINOUT_IOC_GENERATED_CUBEMX_OPEN_REGENERATE_PENDING", "CubeMX contract status mismatch")
@@ -138,7 +150,7 @@ def main() -> None:
     require(manifest["release_gate"]["status"] == "BLOCKED", "generated IOC removed release block")
 
     print("EVT-PRE-20 CubeMX IOC QG-1 completeness/provenance: PASS")
-    print("- 67/67 source assignments represented; CubeMX 6.12.0 DB.6.0.120 provenance hash-bound")
+    print("- 67/67 assignments, cellular cold-state LOW controls and CubeMX 6.12.0 DB.6.0.120 provenance verified")
 
 
 if __name__ == "__main__":

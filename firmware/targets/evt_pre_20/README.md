@@ -40,6 +40,12 @@ and RXEN is on PD8. Both RF-switch enables initialize LOW. QG-1 verifies full so
 QG-2 independently rejects duplicate EXTI sources, HSE activation and critical
 peripheral drift.
 
+The same generated pinout now explicitly initializes the complete cellular
+cold-state control set LOW: `CELL_PWRKEY_CMD`, `CELL_RESET_N_CMD`, `CELL_DTR`,
+`EN_MODEM`, `SIM_MUX_SEL` (SIM1 default while isolated) and `SIM_MUX_EN`
+(U13 High-Z). Both IOC gates verify these values independently; physical reset,
+brownout and rail behavior remain target measurements.
+
 The GCC startup and CMSIS system template are byte-for-byte imports from the
 CMSIS commit pinned by STM32CubeU5 v1.9.0. The linker covers the full 2 MiB flash,
 the contiguous 768 KiB SRAM1-3 and the separate 16 KiB SRAM4 retained section,
