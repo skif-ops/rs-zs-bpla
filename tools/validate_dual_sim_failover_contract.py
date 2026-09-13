@@ -22,6 +22,16 @@ def main() -> int:
     bridge_header = read("firmware/include/zs_dual_sim_bg95.h")
     bridge_source = read("firmware/src/zs_dual_sim_bg95.c")
     bridge_test = read("firmware/tests/test_dual_sim_bg95.c")
+    gpio_header = read(
+        "firmware/targets/evt_pre_20/include/evt_pre_20_dual_sim_gpio.h"
+    )
+    gpio_source = read(
+        "firmware/targets/evt_pre_20/src/evt_pre_20_dual_sim_gpio.c"
+    )
+    gpio_test = read("firmware/tests/test_evt_pre_20_dual_sim_gpio.c")
+    board_header = read(
+        "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h"
+    )
     cmake = read("firmware/CMakeLists.txt")
     policy = read("config/cellular/dual_sim_apn_profiles.yaml")
     baseline = read("config/EVT_PRE_20_BASELINE.yaml")
@@ -101,6 +111,47 @@ def main() -> int:
     require("printf" not in bridge_source and "puts" not in bridge_source,
             "dual-SIM/BG95 bridge must not log SIM identity")
 
+    for pin_id in (
+        "EVT_PRE_20_PIN_CELL_PWRKEY_CMD",
+        "EVT_PRE_20_PIN_CELL_STATUS",
+        "EVT_PRE_20_PIN_SIM_MUX_SEL",
+        "EVT_PRE_20_PIN_SIM_MUX_EN",
+        "EVT_PRE_20_PIN_SIM1_DET",
+        "EVT_PRE_20_PIN_SIM2_DET",
+        "EVT_PRE_20_PIN_PWR_GOOD",
+        "EVT_PRE_20_PIN_EN_MODEM",
+    ):
+        require(pin_id in board_header, f"generated target pin id missing {pin_id}")
+    for gpio_token in (
+        "EVT_PRE_20_PWRKEY_ON_PULSE_MS 700u",
+        "EVT_PRE_20_PWRKEY_FALLBACK_PULSE_MS 1000u",
+        "evt_pre_20_u13_enable_n_read_fn",
+        "EVT_PRE_20_DUAL_SIM_IO_COMPLETE_LOGICAL",
+        "EVT_PRE_20_DUAL_SIM_IO_COMPLETE_PHYSICAL",
+        "evt_pre_20_dual_sim_gpio_sample_presence",
+        "evt_pre_20_dual_sim_gpio_drive_recovery_fallback",
+        "evt_pre_20_dual_sim_gpio_verify_modem_off",
+        "evt_pre_20_dual_sim_gpio_disable_modem_rail",
+        "evt_pre_20_dual_sim_gpio_check_power_good",
+        "evt_pre_20_dual_sim_gpio_write_pwrkey",
+    ):
+        require(gpio_token in gpio_header,
+                f"EVT-PRE-20 dual-SIM GPIO interface missing {gpio_token}")
+    for gpio_guard in (
+        "graceful_shutdown_unavailable",
+        "EVT_PRE_20_PWRKEY_FALLBACK_PULSE_MS",
+        "EVT_PRE_20_PIN_CELL_STATUS, false",
+        "EVT_PRE_20_PIN_SIM_MUX_EN, false",
+        "EVT_PRE_20_PIN_EN_MODEM, false",
+        "ZS_DUAL_SIM_POWER_GOOD_STABLE_MS",
+        "verify_u13_enable_n(binding, true)",
+        "verify_u13_enable_n(binding, false)",
+    ):
+        require(gpio_guard in gpio_source,
+                f"EVT-PRE-20 GPIO fail-closed guard missing {gpio_guard}")
+    require("printf" not in gpio_source and "puts" not in gpio_source,
+            "target GPIO binding must not log SIM identity")
+
     for evidence in (
         "test_boot_and_bounded_automatic_failover",
         "test_auth_presence_and_configuration_guards",
@@ -119,8 +170,10 @@ def main() -> int:
         require(evidence in test, f"dual-SIM runtime scenario missing {evidence}")
     require("src/zs_dual_sim.c" in cmake and
             "src/zs_dual_sim_bg95.c" in cmake and
+            "targets/evt_pre_20/src/evt_pre_20_dual_sim_gpio.c" in cmake and
             "zs_dual_sim_tests" in cmake and
             "zs_dual_sim_bg95_tests" in cmake and
+            "evt_pre_20_dual_sim_gpio_tests" in cmake and
             "add_test(NAME dual_sim" in cmake and
             "add_test(NAME dual_sim_bg95" in cmake and
             "-UNDEBUG" in cmake,
@@ -134,6 +187,17 @@ def main() -> int:
     ):
         require(evidence in bridge_test,
                 f"dual-SIM/BG95 integration scenario missing {evidence}")
+    for evidence in (
+        "test_exact_rev_a_mapping_and_presence",
+        "test_safe_recovery_and_power_on_order",
+        "test_fail_closed_readback_and_logical_only_boundary",
+        "EVT_PRE_20_PIN_CELL_PWRKEY_CMD",
+        "EVT_PRE_20_PIN_SIM_MUX_EN",
+        "EVT_PRE_20_DUAL_SIM_IO_COMPLETE_PHYSICAL",
+        "EVT_PRE_20_DUAL_SIM_IO_COMPLETE_LOGICAL",
+    ):
+        require(evidence in gpio_test,
+                f"EVT-PRE-20 GPIO runtime scenario missing {evidence}")
 
     for policy_token in (
         "mode: dual_sim_single_standby",
@@ -152,21 +216,21 @@ def main() -> int:
         "DEFERRED_UNTIL_STATIONS_ASSEMBLED",
     ):
         require(policy_token in policy, f"dual-SIM policy drift: {policy_token}")
-    require("firmware_status: PORTABLE_SAFE_SEQUENCE_EXPLICIT_FAULT_RECOVERY_BG95_BRIDGE_QG1_QG2_PASS_TARGET_PENDING" in policy,
+    require("firmware_status: PORTABLE_SAFE_SEQUENCE_BG95_AND_EXACT_REV_A_GPIO_INTERLOCK_QG1_QG2_PASS_TARGET_HAL_PHYSICAL_PENDING" in policy,
             "portable failover status missing from controlled policy")
-    require("dual_sim_failover_firmware: PORTABLE_SAFE_SEQUENCE_EXPLICIT_FAULT_RECOVERY_BG95_POWER_IDENTITY_LINK_BRIDGE_QG1_QG2_PASS_TARGET_GPIO_POWER_PROFILE_BINDING_PENDING" in baseline,
+    require("dual_sim_failover_firmware: PORTABLE_SAFE_SEQUENCE_BG95_AND_EXACT_REV_A_GPIO_INTERLOCK_QG1_QG2_PASS_TARGET_HAL_PHYSICAL_PROFILE_BINDING_PENDING" in baseline,
             "portable failover status missing from EVT baseline")
     require("firmware debounce не менее 20 ms" in hardware and
             "Переключение без полного штатного выключения модема является ошибкой" in hardware,
             "hardware safe-switch authority drift")
-    require("PORTABLE POLICY AND SAFE-SEQUENCE QG-1/QG-2 PASS" in contract and
-            "TARGET GPIO" in contract and "100" in contract and
+    require("EXACT REV.A GPIO INTERLOCK QG-1/QG-2" in contract and
+            "STM32 HAL" in contract and "100" in contract and
             "24-hour" in contract,
             "dual-SIM contract overclaims or omits target evidence")
     require("dual_sim_failover_controller: PORTABLE_SAFE_SEQUENCE_EXPLICIT_MODEM_OFF_MUX_HIGH_Z_RAIL_OFF_RECOVERY_HOLD_RETRY_ICCID_QG1_QG2_PASS_TARGET_PENDING" in target and
-            "dual_sim_gpio_power_binding:" in target,
+            "dual_sim_gpio_power_binding: PORTABLE_EXACT_REV_A_GPIO_POLARITY_INTERLOCK_AND_OPTIONAL_FIXTURE_READBACK_INTERFACE_QG1_QG2_PASS" in target,
             "target boundary for dual-SIM failover is not explicit")
-    require("DEC-031" in decisions and
+    require("DEC-031" in decisions and "DEC-035" in decisions and
             "IMPLEMENTED_HOST_TARGET_BINDING_PENDING" in decisions,
             "dual-SIM portable implementation decision is not recorded")
     require("validate_dual_sim_failover_contract.py" in ci and

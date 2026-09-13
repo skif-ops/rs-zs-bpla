@@ -101,6 +101,14 @@ def main() -> None:
     require(len(source) == 67, f"source pin assignment count is {len(source)}, expected 67")
     require(len(generated) == len(source), "generated header does not contain every source assignment")
     require(generated == [expected_row(row) for row in source], "generated pin order or content differs from sources")
+    for index, row in enumerate(source):
+        identifier = re.sub(r"[^A-Z0-9_]", "_", row["Net"].upper())
+        if not identifier or identifier[0].isdigit():
+            identifier = "NET_" + identifier
+        require(
+            f"EVT_PRE_20_PIN_{identifier} = {index}u" in board_text,
+            f"generated named pin identifier missing or reordered: {row['Net']}",
+        )
 
     manifest = json.loads((ROOT / MANIFEST).read_text(encoding="utf-8"))
     require(manifest["configuration"] == "EVT-PRE-20", "manifest configuration mismatch")

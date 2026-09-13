@@ -51,7 +51,7 @@ apn_modes:
     allowed_in_pilot: false
     status: FUTURE_NOT_PROVISIONED
 profile_selection:
-  firmware_status: PORTABLE_SAFE_SEQUENCE_EXPLICIT_FAULT_RECOVERY_BG95_BRIDGE_QG1_QG2_PASS_TARGET_PENDING
+  firmware_status: PORTABLE_SAFE_SEQUENCE_BG95_AND_EXACT_REV_A_GPIO_INTERLOCK_QG1_QG2_PASS_TARGET_HAL_PHYSICAL_PENDING
   expected_iccid_per_slot: PROVISIONED_FULL_VALUE_REQUIRED
   order_per_slot: APPROVED_PUBLIC_PLMN_PROFILES_ONLY_TO_BE_PROVISIONED
   automatic_failover_enabled: true
@@ -91,6 +91,21 @@ failure_recovery_sequence:
     - verify_sim_mux_high_impedance
     - disable_modem_power_rail
   retry_failed_recovery_action_without_advancing: true
+target_gpio_binding:
+  firmware_status: PORTABLE_EXACT_REV_A_PIN_POLARITY_AND_INTERLOCK_HOST_TESTED
+  generated_named_pins: [CELL_PWRKEY_CMD, CELL_STATUS, SIM_MUX_SEL, SIM_MUX_EN, SIM1_DET, SIM2_DET, PWR_GOOD, EN_MODEM]
+  sim_mux_select: {low: SIM1, high: SIM2}
+  sim_mux_enable: {low: U13_HIGH_Z_BY_PULLUP_AND_OPEN_COLLECTOR, high: U13_ENABLED}
+  card_detect_present_level: high
+  modem_enable_level: high
+  cell_status_on_level: high
+  pwrkey_command_asserted_level: high
+  pwr_good_semantics: SYSTEM_3V3_POWER_GOOD_NOT_3V8_MODEM_SENSE
+  pwr_good_continuous_interlock_ms: 30
+  u13_enable_n_runtime_mcu_readback: NOT_ROUTED_ON_REV_A
+  u13_enable_n_fixture_readback: REQUIRED_FOR_PHYSICAL_EVT_EVIDENCE
+  stm32_hal_ll_binding: MISSING_BLOCKER
+  modem_3v8_measurement: DEFERRED_UNTIL_ASSEMBLED_STATIONS
 security:
   pin_puk_and_apn_passwords_in_repository: false
   imsi_iccid_station_storage: volatile_runtime_only

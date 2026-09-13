@@ -25,6 +25,12 @@ def main() -> int:
     header = (ROOT / "firmware/include/zs_dual_sim.h").read_text(encoding="utf-8")
     source = (ROOT / "firmware/src/zs_dual_sim.c").read_text(encoding="utf-8")
     test = (ROOT / "firmware/tests/test_dual_sim.c").read_text(encoding="utf-8")
+    gpio_source = (
+        ROOT / "firmware/targets/evt_pre_20/src/evt_pre_20_dual_sim_gpio.c"
+    ).read_text(encoding="utf-8")
+    board = (
+        ROOT / "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h"
+    ).read_text(encoding="utf-8")
     target = (ROOT / "firmware/targets/evt_pre_20/target_status.yaml").read_text(
         encoding="utf-8"
     )
@@ -73,6 +79,22 @@ def main() -> int:
             "BLOCKER" in next(line for line in target.splitlines()
                               if "dual_sim_gpio_power_binding:" in line),
             "target GPIO/power binding is not retained as blocker")
+    for pin_id in (
+        "CELL_PWRKEY_CMD", "CELL_STATUS", "SIM_MUX_SEL", "SIM_MUX_EN",
+        "SIM1_DET", "SIM2_DET", "PWR_GOOD", "EN_MODEM",
+    ):
+        require(f"EVT_PRE_20_PIN_{pin_id}" in board,
+                f"generated named target pin missing: {pin_id}")
+    require(gpio_source.index("EVT_PRE_20_PIN_CELL_STATUS, false") <
+            gpio_source.index("EVT_PRE_20_PIN_SIM_MUX_EN, false") <
+            gpio_source.index("EVT_PRE_20_PIN_EN_MODEM, false"),
+            "target adapter could remove rail before modem-off/mux-off checks")
+    require("graceful_shutdown_unavailable" in gpio_source and
+            "EVT_PRE_20_PWRKEY_FALLBACK_PULSE_MS" in gpio_source,
+            "target fallback is not gated after graceful shutdown")
+    require("EVT_PRE_20_DUAL_SIM_IO_COMPLETE_LOGICAL" in gpio_source and
+            "EVT_PRE_20_DUAL_SIM_IO_COMPLETE_PHYSICAL" in gpio_source,
+            "logical versus physical U13 evidence boundary is missing")
 
     compiler = shutil.which("cc") or shutil.which("gcc")
     require(compiler is not None, "host C compiler is unavailable")
@@ -92,6 +114,15 @@ def main() -> int:
             ),
             "dual-SIM BG95 bridge tests passed",
         ),
+        (
+            "evt_pre_20_dual_sim_gpio_qg2",
+            (
+                "firmware/src/zs_dual_sim.c",
+                "firmware/targets/evt_pre_20/src/evt_pre_20_dual_sim_gpio.c",
+                "firmware/tests/test_evt_pre_20_dual_sim_gpio.c",
+            ),
+            "EVT-PRE-20 dual-SIM GPIO binding tests passed",
+        ),
     )
     with tempfile.TemporaryDirectory(prefix="zs-dual-sim-qg2-") as directory:
         for test_name, sources, success_text in test_sets:
@@ -101,6 +132,7 @@ def main() -> int:
                     compiler,
                     "-std=c11", "-Wall", "-Wextra", "-Wpedantic", "-Werror",
                     "-O2", "-UNDEBUG", f"-I{ROOT / 'firmware/include'}",
+                    f"-I{ROOT / 'firmware/targets/evt_pre_20/include'}",
                     *(str(ROOT / source_name) for source_name in sources),
                     "-o", str(binary),
                 ],

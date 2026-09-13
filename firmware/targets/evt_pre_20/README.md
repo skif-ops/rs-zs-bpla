@@ -46,6 +46,15 @@ cold-state control set LOW: `CELL_PWRKEY_CMD`, `CELL_RESET_N_CMD`, `CELL_DTR`,
 (U13 High-Z). Both IOC gates verify these values independently; physical reset,
 brownout and rail behavior remain target measurements.
 
+`evt_pre_20_dual_sim_gpio` uses generated named pin identifiers instead of
+string lookup and host-checks the exact Rev.A levels and interlocks. It will not
+start the 1000 ms fallback PWRKEY while graceful shutdown is still available,
+will not remove EN_MODEM before CELL_STATUS LOW plus mux-disable verification,
+and requires continuous PWR_GOOD for 30 ms before mux/PWRKEY. The adapter keeps
+logical SIM_MUX_EN read-back separate from optional fixture sampling of the
+otherwise MCU-inaccessible U13_EN_N. STM32 HAL/LL wiring, physical U13 and
+3V8_MODEM measurements, SIM cycling and operator EVT remain blocked.
+
 The GCC startup and CMSIS system template are byte-for-byte imports from the
 CMSIS commit pinned by STM32CubeU5 v1.9.0. The linker covers the full 2 MiB flash,
 the contiguous 768 KiB SRAM1-3 and the separate 16 KiB SRAM4 retained section,

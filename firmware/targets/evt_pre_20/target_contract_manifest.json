@@ -22,7 +22,7 @@
     },
     {
       "path": "firmware/targets/evt_pre_20/target_status.yaml",
-      "sha256": "d65837b3a2d19e51410a644996f33ea13580b7efe96c43d12357cd010a7232d8"
+      "sha256": "1ba9e519c5b4044218b63f02e719b27c863256a34e4dcdaedde4e48e3b6dbcf9"
     },
     {
       "path": "firmware/targets/evt_pre_20/cubemx_generation_contract.json",
@@ -36,7 +36,7 @@
   "generated_outputs": [
     {
       "path": "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h",
-      "sha256": "4996c33902d339c2f881a834bfbd80ba4c15d9704778167b521212accef02206"
+      "sha256": "89d28545e2c0069df4525605c0a8ae7225e36f7ef25206a7de12108061825735"
     },
     {
       "path": "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h",

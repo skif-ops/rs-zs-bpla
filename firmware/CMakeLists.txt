@@ -54,6 +54,13 @@ add_library(zs_core
 target_include_directories(zs_core PUBLIC include generated)
 target_link_libraries(zs_core m)
 
+add_library(evt_pre_20_dual_sim_gpio
+  targets/evt_pre_20/src/evt_pre_20_dual_sim_gpio.c
+)
+target_link_libraries(evt_pre_20_dual_sim_gpio
+  PUBLIC zs_core evt_pre_20_target_contract
+)
+
 add_executable(zs_core_tests tests/test_core.c)
 target_link_libraries(zs_core_tests zs_core m)
 add_executable(zs_driver_tests tests/test_drivers.c)
@@ -118,6 +125,10 @@ add_executable(zs_ina226_tests tests/test_ina226.c)
 target_link_libraries(zs_ina226_tests zs_core m)
 add_executable(evt_pre_20_target_contract_tests tests/test_evt_pre_20_target_contract.c)
 target_link_libraries(evt_pre_20_target_contract_tests PRIVATE evt_pre_20_target_contract)
+add_executable(evt_pre_20_dual_sim_gpio_tests tests/test_evt_pre_20_dual_sim_gpio.c)
+target_link_libraries(evt_pre_20_dual_sim_gpio_tests
+  PRIVATE evt_pre_20_dual_sim_gpio
+)
 
 # Release configuration defines NDEBUG globally. Tests must keep assert() active,
 # otherwise validation expressions disappear and can hide both test failures and warnings.
@@ -154,6 +165,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_installation_commissioning_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_ina226_tests PRIVATE -UNDEBUG)
   target_compile_options(evt_pre_20_target_contract_tests PRIVATE -UNDEBUG)
+  target_compile_options(evt_pre_20_dual_sim_gpio_tests PRIVATE -UNDEBUG)
 endif()
 
 enable_testing()
@@ -189,6 +201,7 @@ add_test(NAME installation_store COMMAND zs_installation_store_tests)
 add_test(NAME installation_commissioning COMMAND zs_installation_commissioning_tests)
 add_test(NAME ina226 COMMAND zs_ina226_tests)
 add_test(NAME evt_pre_20_target_contract COMMAND evt_pre_20_target_contract_tests)
+add_test(NAME evt_pre_20_dual_sim_gpio COMMAND evt_pre_20_dual_sim_gpio_tests)
 
 add_executable(zs_emit_detection tools/emit_detection.c)
 target_link_libraries(zs_emit_detection PRIVATE zs_core m)

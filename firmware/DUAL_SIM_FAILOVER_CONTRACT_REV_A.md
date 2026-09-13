@@ -1,14 +1,16 @@
 # Dual-SIM single-standby failover contract Rev.A
 
-Status: `PORTABLE POLICY AND SAFE-SEQUENCE QG-1/QG-2 PASS / TARGET GPIO,
-MODEM POWER, PROVISIONED ICCID AND ASSEMBLED-STATION EVIDENCE OPEN / NOT FOR
-RELEASE`
+Status: `PORTABLE POLICY, BG95 BRIDGE AND EXACT REV.A GPIO INTERLOCK QG-1/QG-2
+PASS / STM32 HAL, PHYSICAL U13/3V8, PROVISIONED ICCID AND ASSEMBLED-STATION
+EVIDENCE OPEN / NOT FOR RELEASE`
 
 `zs_dual_sim` is a portable action sequencer between authenticated policy,
 the existing BG95 automatic public-APN state machine, persistent queues and a
-future STM32 target binding. `zs_dual_sim_bg95` joins only the modem-dependent
+the STM32 target boundary. `zs_dual_sim_bg95` joins only the modem-dependent
 actions to BG95 power, full-ICCID and validated-online state. Neither module
 drives board GPIO directly or claims that either physical SIM path works.
+`evt_pre_20_dual_sim_gpio` now binds the portable policy to generated named
+Rev.A pins and exact active levels without depending on STM32 HAL.
 
 ## Fixed policy
 
@@ -67,6 +69,22 @@ IMSI/ICCID. On power-up it uses the existing 700 ms PWRKEY state, requires
 validation only when automatic APN read-back and MQTT/TLS are online. A busy
 UART leaves the action pending instead of skipping shutdown.
 
+The target GPIO adapter maps PWRKEY to PD11, CELL_STATUS to PD13, mux select and
+enable to PE0/PE2, both DET inputs to PE3/PE5, PWR_GOOD to PD0 and EN_MODEM to
+PD4. It refuses fallback PWRKEY until graceful shutdown is reported unavailable,
+requires the full 1000 ms fallback pulse, refuses rail removal before
+CELL_STATUS LOW and mux-disable read-back, selects a slot only with the rail and
+mux off, and requires a continuous 30 ms PWR_GOOD interval before enabling the
+mux or asserting PWRKEY. PWR_GOOD is explicitly the Rev.A 3.3 V system PG; it is
+not represented as a 3V8_MODEM voltage proof.
+
+U13_EN_N is not routed to an MCU input on Rev.A. The adapter therefore returns
+separate logical-only and physical-fixture verification results. Runtime can
+verify the SIM_MUX_EN command/read-back and rely on the controlled pull-up plus
+Q3 open-collector design, while production qualification must provide actual
+U13_EN_N High/Low evidence through the fixture. Logical host success does not
+close that physical gate.
+
 ## Double control
 
 - QG-1: `tools/validate_dual_sim_failover_contract.py` checks interface,
@@ -81,12 +99,16 @@ UART leaves the action pending instead of skipping shutdown.
 - Bridge runtime: `firmware/tests/test_dual_sim_bg95.c` proves that QPOWD,
   physical-status assertions, PWRKEY, full ICCID and online network settings
   advance only their matching controller actions.
+- Target-contract runtime: `firmware/tests/test_evt_pre_20_dual_sim_gpio.c`
+  checks exact generated pin identifiers, active levels, fallback timing,
+  shutdown interlocks, continuous PWR_GOOD timing and the explicit distinction
+  between logical command read-back and physical U13 fixture evidence.
 
 ## Open target and EVT evidence
 
-- STM32 GPIO/rail/PWRKEY binding for `SIM_MUX_SEL`, `SIM_MUX_EN`, `SIM1_DET`,
-  `SIM2_DET`, `EN_MODEM`, `PWR_GOOD`, `CELL_STATUS` and U13 enable read-back;
-- STM32 sampling of `CELL_STATUS` and the remaining GPIO/rail actions;
+- STM32 HAL/LL implementation behind the exact generated GPIO contract;
+- physical U13 enable read-back through the test fixture and measured
+  `3V8_MODEM` stability after EN_MODEM;
 - durable audit backend and verified coupling of profile index to the existing
   approved public-APN catalog;
 - exact provisioned ICCIDs and actual BG95 response behavior;

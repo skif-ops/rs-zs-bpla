@@ -63,6 +63,15 @@ volatile IMSI/ICCID очищаются; повторный power-on разреш
 с APN/IP/gateway/DNS read-back. Busy UART не позволяет перескочить shutdown.
 Источник физического CELL_STATUS и прочие GPIO по-прежнему относятся к target.
 
+Для EVT-PRE-20 добавлен host-compiled target GPIO contract: generated pin IDs
+однозначно связывают PWRKEY/STATUS/mux/DET/PWR_GOOD/EN_MODEM с PD11, PD13, PE0,
+PE2, PE3, PE5, PD0 и PD4. Адаптер проверяет полярности и запрещает rail-off до
+`CELL_STATUS=LOW` и отключённого mux, а mux/PWRKEY — до непрерывных 30 ms
+`PWR_GOOD`. При этом PD0 означает системный 3.3-V PG, не измерение 3V8_MODEM.
+`U13_EN_N` не заведён на MCU, поэтому host различает logical command read-back
+и physical fixture read-back; STM32 HAL, оснастка и измерение 3V8 остаются
+target/EVT blockers.
+
 Portable store-and-forward теперь дополнен серверным application receipt:
 сервер после durable processing публикует canonical CBOR с SHA-256 точного
 detection payload, а fixed-memory firmware parser проверяет topic, QoS/retain и

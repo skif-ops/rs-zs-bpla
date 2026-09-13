@@ -122,7 +122,7 @@ communications:
     sim_architecture: dual_sim_single_standby
     physical_nano_sim_slots: 2
     simultaneously_active_sim_count: 1
-    dual_sim_failover_firmware: PORTABLE_SAFE_SEQUENCE_EXPLICIT_FAULT_RECOVERY_BG95_POWER_IDENTITY_LINK_BRIDGE_QG1_QG2_PASS_TARGET_GPIO_POWER_PROFILE_BINDING_PENDING
+    dual_sim_failover_firmware: PORTABLE_SAFE_SEQUENCE_BG95_AND_EXACT_REV_A_GPIO_INTERLOCK_QG1_QG2_PASS_TARGET_HAL_PHYSICAL_PROFILE_BINDING_PENDING
     pilot_operator_candidates: [MTS, MegaFon, Beeline, T2_Tele2, GLONASS_supplied_SIM]
     static_public_ip_required: false
     inbound_station_connection_required: false
