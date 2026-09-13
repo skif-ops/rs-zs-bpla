@@ -62,16 +62,42 @@ def validate_lot() -> None:
 
 
 def validate_procurement() -> None:
-    bom = {row["Item_ID"]: row for row in read_csv("hardware/EVT_PRE_20_BOM_DRAFT.csv")}
-    require(bom["HSG-VC"]["Qty_20"] == "20", "BOM vacuum housing quantity is not 20")
-    require(bom["HSG-VC"]["Procure_qty"] == "20", "BOM vacuum procurement quantity is not 20")
-    require(bom["HSG-3D"]["Procure_qty"] == "0", "3D fallback was ordered before activation")
-    require(bom["HSG-IM"]["Procure_qty"] == "0", "injection-molding pilot hardware was ordered")
+    bom = {row["Item_ID"]: row for row in read_csv("hardware/EVT_PRE_20_BOM_REV_A.csv")}
+    for lot_size in (4, 10, 20):
+        require(
+            bom["HSG-VC"][f"Qty_{lot_size}"] == str(lot_size),
+            f"BOM vacuum housing quantity is not {lot_size} for lot {lot_size}",
+        )
+        require(
+            bom["HSG-VC"][f"Procure_qty_{lot_size}"] == str(lot_size),
+            f"BOM vacuum housing procurement quantity is not {lot_size}",
+        )
+        require(
+            bom["HSG-3D"][f"Procure_qty_{lot_size}"] == "0",
+            f"3D fallback was ordered before activation for lot {lot_size}",
+        )
+        require(
+            bom["HSG-IM"][f"Procure_qty_{lot_size}"] == "0",
+            f"injection-molding pilot hardware was ordered for lot {lot_size}",
+        )
 
     rfq = {row["RFQ_ID"]: row for row in read_csv("hardware/CHINA_PROCUREMENT_RFQ.csv")}
-    require(rfq["RFQ-017"]["Required_qty"] == "20", "vacuum-casting RFQ quantity is not 20")
-    require(rfq["RFQ-018"]["Required_qty"] == "0", "3D fallback procurement is active")
-    require(rfq["RFQ-019"]["Required_qty"] == "0", "TPA procurement is active")
+    for lot_size in (4, 10, 20):
+        require(
+            rfq["RFQ-017"][f"Required_qty_{lot_size}"] == str(lot_size),
+            f"vacuum-casting RFQ quantity is not {lot_size}",
+        )
+        require(
+            rfq["RFQ-018"][f"Required_qty_{lot_size}"] == "0",
+            f"3D fallback procurement is active for lot {lot_size}",
+        )
+        require(
+            rfq["RFQ-019"][f"Required_qty_{lot_size}"] == "0",
+            f"injection-molding procurement is active for lot {lot_size}",
+        )
+    require(rfq["RFQ-006"]["Manufacturer"] == "Raytac", "RFQ BLE manufacturer is stale")
+    require(rfq["RFQ-006"]["MPN_or_spec"] == "MDBT50Q-P1MV2", "RFQ BLE MPN is stale")
+    require(rfq["RFQ-016"]["MPN_or_spec"] == "2336582-1", "RFQ SIM connector MPN is stale")
 
 
 def validate_decisions_and_tests() -> None:

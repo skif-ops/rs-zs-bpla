@@ -8,13 +8,30 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
+PROCUREMENT_BOM = ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
 OUT = ROOT / "artifacts/evt_pre_20_bom_qg1.json"
+LOT_SIZES = (4, 10, 20)
 
 REQUIRED_FIELDS = {
     "Item_ID", "Assembly", "RefDes", "Category", "Description", "Manufacturer",
-    "MPN", "Package", "Qty_per_station", "Qty_20", "Spares", "Procure_qty",
+    "MPN", "Package", "Qty_per_station", "Spare_policy",
     "Variant", "Status", "Value", "Line_class", "Population", "Temperature_C",
     "BOM_disposition",
+} | {
+    field
+    for lot_size in LOT_SIZES
+    for field in (f"Qty_{lot_size}", f"Spares_{lot_size}", f"Procure_qty_{lot_size}")
+}
+
+PROCUREMENT_REQUIRED_FIELDS = {
+    "Procurement_ID", "Assemblies", "Item_IDs", "RefDes", "Category",
+    "Manufacturer", "MPN", "Package", "Value", "Variant", "Population",
+    "Spare_policy", "BOM_disposition", "Status", "China_source_policy",
+    "Incoming_control",
+} | {
+    field
+    for lot_size in LOT_SIZES
+    for field in (f"Qty_{lot_size}", f"Spares_{lot_size}", f"Procure_qty_{lot_size}")
 }
 
 
@@ -46,22 +63,44 @@ def main() -> None:
         ):
             require(row[field], f"{item}: required field {field} is empty")
         numbers = {}
-        for field in ("Qty_per_station", "Qty_20", "Spares", "Procure_qty"):
+        for field in ("Qty_per_station", *sorted(REQUIRED_FIELDS & {
+            field
+            for lot_size in LOT_SIZES
+            for field in (f"Qty_{lot_size}", f"Spares_{lot_size}", f"Procure_qty_{lot_size}")
+        })):
             require(row[field].isdigit(), f"{item}: {field} is not a non-negative integer")
             numbers[field] = int(row[field])
+        policy = row["Spare_policy"]
         require(
-            numbers["Qty_20"] == 20 * numbers["Qty_per_station"],
-            f"{item}: Qty_20 does not equal 20 x Qty_per_station",
+            policy in {"NONE", "SCALE_CEIL_FROM_20_BASELINE", "FIXED_LOT_MIN"},
+            f"{item}: unsupported Spare_policy {policy}",
         )
-        require(
-            numbers["Procure_qty"] == numbers["Qty_20"] + numbers["Spares"],
-            f"{item}: Procure_qty does not equal Qty_20 + Spares",
-        )
-        if row["Population"] in {"DNP", "PCB_FEATURE"}:
+        for lot_size in LOT_SIZES:
             require(
-                numbers["Spares"] == 0,
-                f"{item}: {row['Population']} line must not carry procurement spares",
+                numbers[f"Qty_{lot_size}"] == lot_size * numbers["Qty_per_station"],
+                f"{item}: Qty_{lot_size} does not equal {lot_size} x Qty_per_station",
             )
+            require(
+                numbers[f"Procure_qty_{lot_size}"]
+                == numbers[f"Qty_{lot_size}"] + numbers[f"Spares_{lot_size}"],
+                f"{item}: Procure_qty_{lot_size} does not equal Qty_{lot_size} + Spares_{lot_size}",
+            )
+            if policy == "NONE":
+                expected_spares = 0
+            elif policy == "FIXED_LOT_MIN":
+                expected_spares = numbers["Spares_20"]
+            else:
+                expected_spares = (numbers["Spares_20"] * lot_size + 19) // 20
+            require(
+                numbers[f"Spares_{lot_size}"] == expected_spares,
+                f"{item}: Spares_{lot_size} violates {policy}",
+            )
+        if row["Population"] in {"DNP", "PCB_FEATURE"}:
+            for lot_size in LOT_SIZES:
+                require(
+                    numbers[f"Spares_{lot_size}"] == 0,
+                    f"{item}: {row['Population']} line must not carry procurement spares",
+                )
 
     expected_pwr_refs = {
         "PWR-REV-CTL": "U1", "PWR-REV-FET": "Q1", "U-MON-01": "U2",
@@ -120,7 +159,47 @@ def main() -> None:
     require(by_id["U13"]["MPN"] == "TS3A27518EPWR", "dual-SIM mux MPN mismatch")
     require(by_id["U14-U15"]["MPN"] == "ESDALC6V1-5P6", "dual-SIM ESD MPN mismatch")
     require(by_id["J-SIM1"]["MPN"] == by_id["J-SIM2"]["MPN"] == "2336582-1", "dual-SIM connector MPN mismatch")
-    require(by_id["PWR-L"]["Spares"] == "10", "PCB-PWR inductor spare policy mismatch")
+    for lot_size in LOT_SIZES:
+        require(by_id["PWR-L"][f"Spares_{lot_size}"] == "10", "PCB-PWR inductor spare policy mismatch")
+        require(by_id["C-MIC"][f"Spares_{lot_size}"] == "40", "PCB-MIC capacitor lot-minimum spare policy mismatch")
+        require(by_id["R-MIC"][f"Spares_{lot_size}"] == "40", "PCB-MIC resistor lot-minimum spare policy mismatch")
+        require(by_id["T-MIC"][f"Spares_{lot_size}"] == "48", "MIC terminal lot-minimum spare policy mismatch")
+
+    with PROCUREMENT_BOM.open(encoding="utf-8-sig", newline="") as source:
+        reader = csv.DictReader(source)
+        require(reader.fieldnames is not None, "procurement BOM header missing")
+        require(
+            PROCUREMENT_REQUIRED_FIELDS.issubset(reader.fieldnames),
+            "procurement BOM fields missing: "
+            f"{sorted(PROCUREMENT_REQUIRED_FIELDS - set(reader.fieldnames))}",
+        )
+        procurement_rows = list(reader)
+    require(procurement_rows, "procurement BOM is empty")
+    procurement_ids = [row["Procurement_ID"] for row in procurement_rows]
+    require(all(procurement_ids), "empty Procurement_ID in procurement BOM")
+    require(len(set(procurement_ids)) == len(procurement_ids), "duplicate Procurement_ID in procurement BOM")
+    represented_item_ids = {
+        item_id.strip()
+        for row in procurement_rows
+        for item_id in row["Item_IDs"].split("|")
+        if item_id.strip()
+    }
+    require(represented_item_ids == set(by_id), "procurement BOM Item_ID coverage mismatch")
+    for lot_size in LOT_SIZES:
+        detailed_total = sum(int(row[f"Procure_qty_{lot_size}"]) for row in rows)
+        procurement_total = sum(int(row[f"Procure_qty_{lot_size}"]) for row in procurement_rows)
+        require(
+            procurement_total == detailed_total,
+            f"procurement BOM lot {lot_size} total does not reconcile to engineering BOM",
+        )
+        for row in procurement_rows:
+            for field in (f"Qty_{lot_size}", f"Spares_{lot_size}", f"Procure_qty_{lot_size}"):
+                require(row[field].isdigit(), f"{row['Procurement_ID']}: invalid {field}")
+            require(
+                int(row[f"Procure_qty_{lot_size}"])
+                == int(row[f"Qty_{lot_size}"]) + int(row[f"Spares_{lot_size}"]),
+                f"{row['Procurement_ID']}: procurement quantity formula mismatch for lot {lot_size}",
+            )
 
     serialized = "\n".join(",".join(row.values()) for row in rows)
     for forbidden in ("ESP32-C3", "JST_BM05B", "GHR-05V-S", "5040500591", "5040510501"):
@@ -130,7 +209,9 @@ def main() -> None:
         "gate": "QG-1",
         "status": "PASS",
         "rows": len(rows),
-        "quantity_formula_rows": len(rows),
+        "procurement_rows": len(procurement_rows),
+        "lot_sizes": list(LOT_SIZES),
+        "quantity_formula_rows": {str(lot_size): len(rows) for lot_size in LOT_SIZES},
         "pcb_pwr_refdes_checked": len(expected_pwr_refs),
         "controlled_quantity_lines": expected_quantities,
     }

@@ -15,6 +15,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
+PROCUREMENT_BOM = ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+LOT_SIZES = (4, 10, 20)
 
 
 def read(path: Path) -> list[dict[str, str]]:
@@ -37,6 +39,80 @@ def main() -> int:
         checks.append({"name": name, "pass": ok, "detail": detail})
         if not ok:
             blockers.append(detail)
+
+    lot_errors: list[str] = []
+    required_lot_fields = {
+        "Spare_policy",
+        *(
+            field
+            for lot_size in LOT_SIZES
+            for field in (
+                f"Qty_{lot_size}",
+                f"Spares_{lot_size}",
+                f"Procure_qty_{lot_size}",
+            )
+        ),
+    }
+    for row in rows:
+        missing = sorted(field for field in required_lot_fields if field not in row)
+        if missing:
+            lot_errors.append(f"{row.get('Item_ID', '?')}:missing={','.join(missing)}")
+            continue
+        try:
+            qty_per_station = int(row["Qty_per_station"])
+            spares_20 = int(row["Spares_20"])
+            for lot_size in LOT_SIZES:
+                quantity = int(row[f"Qty_{lot_size}"])
+                spares = int(row[f"Spares_{lot_size}"])
+                procure = int(row[f"Procure_qty_{lot_size}"])
+                if quantity != qty_per_station * lot_size or procure != quantity + spares:
+                    lot_errors.append(f"{row['Item_ID']}:lot={lot_size}:arithmetic")
+                policy = row["Spare_policy"]
+                expected_spares = {
+                    "NONE": 0,
+                    "FIXED_LOT_MIN": spares_20,
+                    "SCALE_CEIL_FROM_20_BASELINE": (spares_20 * lot_size + 19) // 20,
+                }.get(policy)
+                if expected_spares is None or spares != expected_spares:
+                    lot_errors.append(f"{row['Item_ID']}:lot={lot_size}:spare_policy")
+        except ValueError:
+            lot_errors.append(f"{row.get('Item_ID', '?')}:non_integer_quantity")
+
+    procurement_rows = read(PROCUREMENT_BOM) if PROCUREMENT_BOM.is_file() else []
+    if not procurement_rows:
+        lot_errors.append("procurement_rollup:missing_or_empty")
+    else:
+        procurement_ids = [row.get("Procurement_ID", "") for row in procurement_rows]
+        if not all(procurement_ids) or len(set(procurement_ids)) != len(procurement_ids):
+            lot_errors.append("procurement_rollup:duplicate_or_empty_id")
+        represented = {
+            item_id.strip()
+            for row in procurement_rows
+            for item_id in row.get("Item_IDs", "").split("|")
+            if item_id.strip()
+        }
+        if represented != set(by_id):
+            lot_errors.append("procurement_rollup:item_coverage")
+        for lot_size in LOT_SIZES:
+            try:
+                detailed_total = sum(int(row[f"Procure_qty_{lot_size}"]) for row in rows)
+                rollup_total = sum(int(row[f"Procure_qty_{lot_size}"]) for row in procurement_rows)
+                rollup_formula_ok = all(
+                    int(row[f"Procure_qty_{lot_size}"])
+                    == int(row[f"Qty_{lot_size}"]) + int(row[f"Spares_{lot_size}"])
+                    for row in procurement_rows
+                )
+                if detailed_total != rollup_total or not rollup_formula_ok:
+                    lot_errors.append(f"procurement_rollup:lot={lot_size}:reconciliation")
+            except (KeyError, ValueError):
+                lot_errors.append(f"procurement_rollup:lot={lot_size}:invalid_quantity")
+    check(
+        "procurement_lots_4_10_20",
+        not lot_errors,
+        "BOM 4/10/20 lot or procurement-rollup mismatch: " + ", ".join(lot_errors)
+        if lot_errors
+        else "engineering and procurement BOM quantities independently reconcile for 4, 10 and 20 stations",
+    )
 
     main_freeze = read(ROOT / "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv")
     main_item_for_ref = {
@@ -150,8 +226,14 @@ def main() -> int:
 
     mic_native = ROOT / "hardware/kicad/native/PCB-MIC/PCB-MIC.sch"
     mic_native_text = mic_native.read_text(encoding="utf-8") if mic_native.is_file() else ""
-    check("mic_native_exact_orderable_mpn", "MMICT5838-00-012" in mic_native_text,
-          "native PCB-MIC does not bind MK1 to exact orderable MMICT5838-00-012")
+    mic_native_mpn_ok = "MMICT5838-00-012" in mic_native_text
+    check(
+        "mic_native_exact_orderable_mpn",
+        mic_native_mpn_ok,
+        "native PCB-MIC binds MK1 to exact orderable MMICT5838-00-012"
+        if mic_native_mpn_ok
+        else "native PCB-MIC does not bind MK1 to exact orderable MMICT5838-00-012",
+    )
 
     exact_fields_missing = []
     for row in rows:
