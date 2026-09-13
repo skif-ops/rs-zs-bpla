@@ -50,8 +50,10 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    adapter сохраняет retry до выдачи exact binary publication и не освобождает
    slot по PUBACK. Portable NOR adapter изолирует slot отдельным erase block.
    Portable planner проверяет непересекающиеся archive-prefix/outbox-tail разделы
-   для заданного числа слотов. Открыты production slot count, exact BG95 binding,
-   target memory-map/OCTOSPI/endurance и аппаратный recovery.
+   для заданного числа слотов, а единый bind API ограничивает archive storage на
+   этой границе и создаёт outbox adapter для хвоста. Открыты production slot
+   count, exact BG95 binding, target memory-map/OCTOSPI/endurance и аппаратный
+   recovery.
 
 Закрыто в исходном baseline EVT-PRE-20: MQTT bridge теперь fail-closed и требует CA, client certificate и key. Plaintext разрешён только явным флагом `--insecure-bench`, который используется в отдельном development compose и проверяется отрицательными тестами.
 

@@ -298,8 +298,11 @@ audio archive and derives the outbox base from a caller-supplied slot count at
 the end of the same device. It rejects insufficient or unaligned geometries and
 proves that the two ranges do not overlap. The 64-MiB / 4-KiB / 256-slot host
 reference produces a 63-MiB archive prefix and a 1-MiB outbox tail. This example
-does not freeze the production slot count; that count, the reviewed target memory
-map, OCTOSPI HAL binding and measured endurance remain open.
+does not freeze the production slot count. Both adapters are created by one
+fail-closed binding; its archive storage view ends exactly at the derived outbox
+base while the outbox adapter is bounded to the tail. The production slot count,
+reviewed target memory map, OCTOSPI HAL binding and measured endurance remain
+open.
 
 MQTT PUBACK не является application ACK. Станция помечает событие доставленным
 только после проверенного server application receipt из раздела 2.3; torn ACK

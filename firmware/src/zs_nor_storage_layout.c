@@ -45,3 +45,38 @@ bool zs_nor_storage_layout_make(uint32_t capacity_bytes,
   out->outbox_partition_bytes = (uint32_t)outbox_bytes;
   return true;
 }
+
+bool zs_nor_storage_bind(zs_nor_storage_bindings_t *bindings,
+                         zs_nor_t *nor,
+                         uint16_t outbox_slot_count,
+                         zs_archive_storage_t *out_archive_storage,
+                         zs_event_outbox_io_t *out_outbox_io) {
+  if (bindings) memset(bindings, 0, sizeof(*bindings));
+  if (out_archive_storage)
+    memset(out_archive_storage, 0, sizeof(*out_archive_storage));
+  if (out_outbox_io) memset(out_outbox_io, 0, sizeof(*out_outbox_io));
+  if (!bindings || !nor || !out_archive_storage || !out_outbox_io)
+    return false;
+
+  if (!zs_nor_storage_layout_make(
+          nor->geometry.capacity_bytes,
+          nor->geometry.erase_bytes,
+          outbox_slot_count,
+          &bindings->layout) ||
+      !zs_nor_archive_storage_init(
+          &bindings->archive_adapter, nor, out_archive_storage) ||
+      !zs_nor_event_outbox_io_init(
+          &bindings->outbox_adapter,
+          nor,
+          bindings->layout.outbox_base_address,
+          bindings->layout.outbox_slot_count,
+          out_outbox_io)) {
+    memset(bindings, 0, sizeof(*bindings));
+    memset(out_archive_storage, 0, sizeof(*out_archive_storage));
+    memset(out_outbox_io, 0, sizeof(*out_outbox_io));
+    return false;
+  }
+
+  out_archive_storage->size_bytes = bindings->layout.outbox_base_address;
+  return true;
+}

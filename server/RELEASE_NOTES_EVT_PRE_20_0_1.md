@@ -65,8 +65,9 @@
 - Portable W25Q-class outbox adapter использует один полный erase block на slot,
   проверяет alignment/capacity и сохраняет соседний pending slot при reclaim;
   portable planner размещает audio archive в выровненном префиксе NOR, outbox в
-  хвосте и QG-проверяет их непересечение. Production slot count, target
-  memory-map/OCTOSPI/endurance остаются blockers.
+  хвосте и QG-проверяет их непересечение; shared bind API создаёт оба adapter-а
+  из одного layout и обрезает archive storage на границе outbox. Production slot
+  count, target memory-map/OCTOSPI/endurance остаются blockers.
 - Открыты target MQTT subscription/URC binding, reviewed Ed25519 backend,
   provisioning public key, Flash/outbox slot-count/OCTOSPI/endurance binding, command ACK
   publisher, BG95 event-receipt binding и аппаратный end-to-end;

@@ -157,6 +157,9 @@ def audit_firmware_runtime() -> None:
             (
                 "firmware/tests/test_nor_storage_layout.c",
                 "firmware/src/zs_nor_storage_layout.c",
+                "firmware/src/zs_nor_archive.c",
+                "firmware/src/zs_nor_event_outbox.c",
+                "firmware/src/zs_nor.c",
                 "firmware/src/zs_archive.c",
                 "firmware/src/zs_event_outbox.c",
                 "firmware/src/zs_protocol.c",
@@ -305,7 +308,7 @@ def main() -> int:
                 "full uint64 event ID was truncated")
 
     print("Event application receipt QG-2 independent runtime audit: PASS")
-    print("- server runtime plus firmware publish/retry/receipt, erase-isolated NOR lifecycle and non-overlap layout verified")
+    print("- server runtime plus firmware publish/retry/receipt, erase-isolated NOR lifecycle and shared non-overlap binding verified")
     return 0
 
 

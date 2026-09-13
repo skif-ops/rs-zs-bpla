@@ -90,6 +90,7 @@ each outbox slot, preventing reclaim from erasing a neighbour. A portable layout
 planner gives the audio archive the aligned NOR prefix and the event outbox the
 tail, proving non-overlap for any accepted caller-supplied slot count; the host
 reference case verifies 63 MiB archive + 1 MiB/256-slot outbox on 64 MiB NOR.
-Production slot count, target memory-map/OCTOSPI binding, wear/endurance, exact
-BG95 publish/receipt subscription/URC binding and assembled-station recovery
-remain release blockers.
+A single fail-closed bind API creates both adapters from that layout and caps
+the archive-visible storage at the outbox boundary. Production slot count,
+target memory-map/OCTOSPI binding, wear/endurance, exact BG95 publish/receipt
+subscription/URC binding and assembled-station recovery remain release blockers.

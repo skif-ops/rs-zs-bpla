@@ -114,6 +114,8 @@ def main() -> int:
         "outbox_partition_bytes",
         "zs_archive_layout_t archive",
         "zs_nor_storage_layout_make",
+        "zs_nor_storage_bindings_t",
+        "zs_nor_storage_bind",
     ):
         require(token in layout_header, f"NOR layout API missing: {token}")
     for token in (
@@ -123,12 +125,17 @@ def main() -> int:
         "zs_archive_make_default_layout",
         "out->outbox_base_address = archive_bytes",
         "(uint64_t)archive_bytes + outbox_bytes != capacity_bytes",
+        "zs_nor_archive_storage_init",
+        "zs_nor_event_outbox_io_init",
+        "out_archive_storage->size_bytes = bindings->layout.outbox_base_address",
     ):
         require(token in layout_source, f"NOR layout invariant missing: {token}")
     for token in (
         "test_default_64m_tail_partition",
         "test_slot_count_remains_a_target_input",
         "test_capacity_and_geometry_guards",
+        "test_shared_binding_caps_archive_at_outbox",
+        "test_shared_binding_failure_is_atomic",
         "layout.outbox_base_address == 63u * 1024u * 1024u",
         "archive_end(&layout.archive) == layout.outbox_base_address",
     ):
@@ -164,7 +171,12 @@ def main() -> int:
         "target status overclaims or omits portable NOR layout evidence",
     )
     require(
-        "event_outbox_storage_binding: PORTABLE_LAYOUT_AND_NOR_ADAPTER_PASS_EXACT_SLOT_COUNT_OCTOSPI_ENDURANCE_BLOCKER"
+        "event_nor_shared_binding: PORTABLE_FAIL_CLOSED_ARCHIVE_CAP_AND_OUTBOX_TAIL_QG1_QG2_PASS_TARGET_BINDING_PENDING"
+        in target,
+        "target status overclaims or omits shared NOR binding evidence",
+    )
+    require(
+        "event_outbox_storage_binding: PORTABLE_SHARED_BINDING_PASS_EXACT_SLOT_COUNT_OCTOSPI_ENDURANCE_BLOCKER"
         in target,
         "target outbox storage binding status is not bounded",
     )
@@ -177,7 +189,7 @@ def main() -> int:
             "target outbox slot-count blocker is not explicit")
 
     print("Event store-and-forward outbox QG-1: PASS")
-    print("scope: portable atomic queue + erase-isolated NOR adapter + non-overlap planner; exact slot count/OCTOSPI and hardware remain pending")
+    print("scope: portable atomic queue + erase-isolated NOR adapter + shared non-overlap binding; exact slot count/OCTOSPI and hardware remain pending")
     return 0
 
 

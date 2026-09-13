@@ -102,8 +102,10 @@ and clear online/network-valid flags.
   partition bounds. A portable planner assigns the aligned NOR prefix to the
   audio archive and an erase-isolated tail to a caller-supplied outbox slot
   count; QG-1/QG-2 verify exact non-overlap, including the 64 MiB / 4 KiB / 256
-  slot reference geometry. Production slot count, target memory-map/OCTOSPI
-  binding, endurance and exact BG95 receive/publish framing remain open.
+  slot reference geometry. The shared binding creates both adapters from this
+  layout and caps archive-visible storage at the derived outbox base. Production
+  slot count, target memory-map/OCTOSPI binding, endurance and exact BG95
+  receive/publish framing remain open.
 
 ## Open evidence
 
