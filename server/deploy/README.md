@@ -24,6 +24,8 @@ isolated-bench configurations and must not be used for production.
 - Station HTTP ingress disabled by default; production telemetry enters through
   the mutual-TLS MQTT bridge. Do not set `ZS_STATION_HTTP_INSECURE_BENCH`.
 - Telegram/mobile notification credentials injected as secrets, not committed.
+- Python packages installed from `requirements.lock.txt` with `--require-hashes`;
+  `sbom/server.cdx.json` checked against that exact lock in CI.
 
 The station wire messages remain compact CBOR. `station/cbor_codec.py` is the
 reference decoder for interface release 1.5, including detection schema 4 and

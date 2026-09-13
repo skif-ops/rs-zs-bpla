@@ -26,5 +26,9 @@
   command polling/ACK и audio upload включаются только точным стендовым
   `ZS_STATION_HTTP_INSECURE_BENCH=1`; полные IMSI/ICCID по HTTP по-прежнему
   запрещены.
+- Добавлены universal Python 3.12 lockfiles с SHA-256 каждого допустимого
+  distribution artifact; Docker и CI используют `pip --require-hashes`.
+- Добавлен воспроизводимый CycloneDX 1.6 server SBOM, byte-exact привязанный к
+  runtime lock, а также независимые QG-1/QG-2 проверки состава и хешей.
 
 Изменение не закрывает security/deployment blockers из `EVT_PRE_20_RELEASE_AUDIT.md` и не является разрешением на internet-facing deployment.

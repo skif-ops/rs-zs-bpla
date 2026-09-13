@@ -132,6 +132,8 @@ jobs:
             firmware/targets/evt_pre_20/target_contract_manifest.json
             firmware/targets/evt_pre_20/stm32_scaffold_manifest.json
             firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc
+            server/requirements.lock.txt
+            server/sbom/server.cdx.json
           if-no-files-found: error
 
   firmware:
@@ -155,11 +157,11 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: server/requirements-ci.txt
+          cache-dependency-path: server/requirements-ci.lock.txt
       - name: Install core dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r server/requirements-ci.txt
+          pip install --require-hashes -r server/requirements-ci.lock.txt
       - name: Core pytest
         working-directory: server
         run: python -m pytest -q tests_core
@@ -173,17 +175,23 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: server/requirements.txt
+          cache-dependency-path: server/requirements.lock.txt
       - name: Install full dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r server/requirements.txt
+          pip install --require-hashes -r server/requirements.lock.txt
       - name: Compile Python sources
         working-directory: server
         run: python -m compileall -q .
       - name: Materialize versioned test assets
         working-directory: server
         run: python tools/materialize_assets.py
+      - name: QG-1 hashed dependency lock and SBOM traceability
+        run: python tools/validate_server_supply_chain.py
+      - name: QG-2 independent CycloneDX SBOM audit
+        run: python tools/audit_server_sbom_technical.py
+      - name: Verify reproducible CycloneDX SBOM
+        run: python tools/generate_server_sbom.py --check
       - name: QG-1 station HTTP fail-closed contract
         run: python tools/validate_station_http_transport.py
       - name: QG-2 independent station HTTP runtime audit
@@ -226,7 +234,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install protocol dependency
-        run: pip install 'pydantic>=2.7,<3'
+        run: pip install --require-hashes -r server/requirements-protocol.lock.txt
       - name: Build firmware packet emitter
         run: |
           cmake -S firmware -B firmware/build -DCMAKE_BUILD_TYPE=Release

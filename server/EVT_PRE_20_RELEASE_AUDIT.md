@@ -26,7 +26,10 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
 
 1. FastAPI station endpoints не имеют законченной взаимной аутентификации/authorization для internet-facing deployment.
 2. MQTT downstream/ACK не реализован; server commands сейчас выдаются HTTP polling.
-3. Requirements используют диапазоны версий, lockfile/SBOM отсутствуют.
+3. ЗАКРЫТО: исходные диапазоны разрешены в хешированные Python 3.12 lockfiles;
+   production image и CI используют `requirements.lock.txt` с
+   `--require-hashes`, а `sbom/server.cdx.json` воспроизводимо генерируется из
+   byte-exact lock и проходит отдельные QG-1/QG-2.
 4. Нет подтверждённого clean deployment и backup/restore на Windows 11 и Ubuntu 24.04.
 5. Нет load/reconnect/dedup теста для 20 реальных станций.
 6. Нет OTA repository, canary rollout, pause и rollback audit.
@@ -48,7 +51,6 @@ FastAPI напрямую в интернет.
 - core pytest;
 - полный `pytest tests`;
 - firmware CBOR -> server test;
-- dependency lock и SBOM;
 - secret scan;
 - clean deploy Windows 11 и Ubuntu 24.04;
 - broker mTLS/ACL и API auth tests;

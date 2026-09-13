@@ -33,6 +33,7 @@ drone_acoustic_intelligence/
   app.py
   config.py
   requirements.txt
+  requirements.lock.txt
   README.md
   audio/
     analyzer.py
@@ -81,7 +82,7 @@ cd drone_acoustic_intelligence
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install --require-hashes -r requirements.lock.txt
 ```
 
 ## Run

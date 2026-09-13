@@ -34,7 +34,7 @@
 ```bash
 python -m venv .venv
 . .venv/bin/activate          # Windows: .venv\\Scripts\\activate
-pip install -r requirements.txt
+pip install --require-hashes -r requirements.lock.txt
 uvicorn app:app --host 0.0.0.0 --port 8000
 ```
 
@@ -46,7 +46,10 @@ OpenAPI: `http://localhost:8000/docs`
 pytest -q
 ```
 
-Current working branch: 94 tests PASS.
+Current working branch: 100 full tests PASS.
+
+Dependency constraints, hashed locks and the reproducible CycloneDX SBOM are
+described in `DEPENDENCY_LOCK.md`.
 
 ## v0.8.1 field-recording corrections
 

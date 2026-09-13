@@ -15,11 +15,11 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: server/requirements-ci.txt
+          cache-dependency-path: server/requirements-ci.lock.txt
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r server/requirements-ci.txt
+          pip install --require-hashes -r server/requirements-ci.lock.txt
       - name: Run server core tests
         working-directory: server
         run: python -m pytest -q tests_core
@@ -32,7 +32,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install decoder dependency
-        run: pip install "pydantic>=2.7,<3"
+        run: pip install --require-hashes -r server/requirements-protocol.lock.txt
       - name: Build firmware packet emitter
         run: |
           cmake -S firmware -B firmware/build -DCMAKE_BUILD_TYPE=Release
