@@ -29,6 +29,10 @@
   a mandatory target-provided Ed25519 verification backend;
 - portable command application channel that emits an ACK only after verified,
   idempotent execution and durable completed-result read-back;
+- portable binary MQTT command boundary with exact topic/payload lengths,
+  canonical station ownership, QoS 1 and non-retained delivery guards;
+- portable atomic event outbox with schema-4 encoding, metadata CRC32, payload
+  SHA-256, priority/FIFO ordering and at-least-once torn-write recovery;
 - fail-closed station HTTP transport, enabled only on an isolated bench with
   exact opt-in `ZS_STATION_HTTP_INSECURE_BENCH=1`;
 - hierarchical family/type updates use only the latest 4-8 unique feature
@@ -92,6 +96,11 @@ it the bridge remains telemetry-only and will not downgrade to unsigned
 commands. Command delivery uses QoS 1, retain false and durable retries until a
 station-bound application ACK or the 15-minute TTL. The checked-in ACL contains
 separate topic rights for station credentials 01 through 20.
+
+The firmware event outbox is host-tested, but production store-and-forward is
+not complete until the server event application-ACK schema and BG95/target
+storage bindings are implemented and verified on assembled stations. MQTT
+PUBACK alone must not authorize event reclamation.
 
 Full IMSI/ICCID is stored in the restricted station record. Do not expose the
 SQLite database or raw status payloads through logs, backups, diagnostics or the

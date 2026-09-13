@@ -24,6 +24,7 @@ add_library(zs_core
   src/zs_command_journal.c
   src/zs_command_trust.c
   src/zs_mqtt_command_transport.c
+  src/zs_event_outbox.c
   src/zs_gnss.c
   src/zs_sx1262.c
   src/zs_audio.c
@@ -59,6 +60,8 @@ add_executable(zs_command_trust_tests tests/test_command_trust.c)
 target_link_libraries(zs_command_trust_tests zs_core m)
 add_executable(zs_mqtt_command_binding_tests tests/test_mqtt_command_transport.c)
 target_link_libraries(zs_mqtt_command_binding_tests zs_core m)
+add_executable(zs_event_outbox_tests tests/test_event_outbox.c)
+target_link_libraries(zs_event_outbox_tests zs_core m)
 add_executable(zs_heartbeat_telemetry_tests tests/test_heartbeat_telemetry.c)
 target_link_libraries(zs_heartbeat_telemetry_tests zs_core m)
 add_executable(zs_archive_tests tests/test_archive.c)
@@ -94,6 +97,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_command_journal_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_command_trust_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_mqtt_command_binding_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_event_outbox_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_heartbeat_telemetry_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_archive_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_nor_tests PRIVATE -UNDEBUG)
@@ -117,6 +121,7 @@ add_test(NAME command_channel COMMAND zs_command_channel_tests)
 add_test(NAME command_journal COMMAND zs_command_journal_tests)
 add_test(NAME command_trust COMMAND zs_command_trust_tests)
 add_test(NAME mqtt_command_binding COMMAND zs_mqtt_command_binding_tests)
+add_test(NAME event_outbox COMMAND zs_event_outbox_tests)
 add_test(NAME heartbeat_telemetry COMMAND zs_heartbeat_telemetry_tests)
 add_test(NAME archive COMMAND zs_archive_tests)
 add_test(NAME nor COMMAND zs_nor_tests)

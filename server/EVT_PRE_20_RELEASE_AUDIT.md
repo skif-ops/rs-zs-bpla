@@ -32,8 +32,10 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    детерминированным Ed25519 vector. Portable atomic journal фиксирует
    accepted/completed до ACK, а bounded trust adapter fail-closed выбирает
    provisioned public key. Portable application channel объединяет эти стадии и
-   идемпотентный executor. Открыты target MQTT binding, reviewed Ed25519 backend,
-   public-key provisioning, Flash page/endurance binding и hardware end-to-end evidence.
+   идемпотентный executor; portable binary MQTT boundary уже проверяет точный
+   topic, QoS/retain и длину payload. Открыты target MQTT binding, reviewed
+   Ed25519 backend, public-key provisioning, Flash page/endurance binding и
+   hardware end-to-end evidence.
 3. ЗАКРЫТО: исходные диапазоны разрешены в хешированные Python 3.12 lockfiles;
    production image и CI используют `requirements.lock.txt` с
    `--require-hashes`, а `sbom/server.cdx.json` воспроизводимо генерируется из
@@ -41,6 +43,9 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
 4. Нет подтверждённого clean deployment и backup/restore на Windows 11 и Ubuntu 24.04.
 5. Нет load/reconnect/dedup теста для 20 реальных станций.
 6. Нет OTA repository, canary rollout, pause и rollback audit.
+7. ЧАСТИЧНО: portable event outbox атомарно сохраняет schema-4 CBOR, metadata,
+   SHA-256, приоритет и retry bitmap и проходит fault-injection. Открыты server
+   event application-ACK, target storage/endurance binding и аппаратный recovery.
 
 Закрыто в исходном baseline EVT-PRE-20: MQTT bridge теперь fail-closed и требует CA, client certificate и key. Plaintext разрешён только явным флагом `--insecure-bench`, который используется в отдельном development compose и проверяется отрицательными тестами.
 
@@ -57,6 +62,10 @@ downstream без ключа. ACL разрешает каждой station creden
 `down`/`ack`. Полное закрытие возможно после target-интеграции MQTT приёмника,
 production crypto/Flash binding/ACK publisher, provisioning public key и проверки
 на собранных станциях.
+
+Частично закрыт пункт 7: host outbox обеспечивает at-least-once и не вытесняет
+pending events, но MQTT PUBACK не считается удалённым подтверждением. До появления
+отдельного server application-ACK события после восстановления сети не удаляются.
 
 До закрытия пунктов сервер разрешён только для разработки или изолированного стенда. Публикация напрямую в интернет запрещена.
 

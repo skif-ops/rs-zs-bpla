@@ -18,6 +18,7 @@ python tools/audit_evt_pre_20_stm32_scaffold_technical.py
 python tools/validate_installation_store_contract.py
 python tools/validate_installation_commissioning_contract.py
 python tools/audit_installation_commissioning_technical.py
+python tools/validate_event_outbox_contract.py
 ```
 
 QG-1 checks completeness, ordering and SHA-256 traceability. QG-2 separately
@@ -68,3 +69,12 @@ delivery before command parsing, then exposes the exact `ack` topic and CBOR
 payload length after durable completion. The target still needs reviewed Ed25519
 library binding, provisioned public keys, dedicated Flash pages/endurance evidence
 and BG95 binary MQTT receive/publish AT framing integration.
+
+The portable event outbox now atomically commits complete schema-4 detection
+CBOR with metadata CRC32 and payload SHA-256, orders pending events by priority
+then FIFO, persists up to 128 transmission attempts in a one-way bitmap, and
+never reclaims a pending event. Only a verified server application ACK may mark
+delivery; a torn marker intentionally causes safe at-least-once redelivery. Host
+fault-injection is QG-1/QG-2 evidence only. Target NOR/Flash allocation, wear and
+endurance, the server event-ACK protocol and assembled-station recovery remain
+release blockers.

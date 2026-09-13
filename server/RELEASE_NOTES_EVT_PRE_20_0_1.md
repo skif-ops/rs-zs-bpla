@@ -49,8 +49,15 @@
 - Portable application channel связывает decode/trust/dedup, atomic journal и
   idempotent executor; ACK появляется только после read-back `COMPLETED`, а
   transient execution/storage failure оставляет команду для безопасного retry.
+- Portable binary MQTT boundary принимает topic и CBOR только с точными длинами,
+  проверяет canonical tenant/station topic, QoS 1 и `retain=false`, затем выдаёт
+  ACK topic/payload только после durable completion.
+- Portable event outbox атомарно сохраняет полный schema-4 CBOR с metadata CRC32
+  и SHA-256, выбирает priority/FIFO, не вытесняет pending events и при torn ACK
+  обеспечивает безопасную at-least-once повторную доставку.
 - Открыты target MQTT subscription/URC binding, reviewed Ed25519 backend,
-  provisioning public key, Flash page/endurance binding, ACK publisher и аппаратный end-to-end;
+  provisioning public key, Flash/outbox storage/endurance binding, command ACK
+  publisher, server event application-ACK и аппаратный end-to-end;
   они не объявлены PASS до сборки станций.
 
 Изменение не закрывает security/deployment blockers из `EVT_PRE_20_RELEASE_AUDIT.md` и не является разрешением на internet-facing deployment.

@@ -1,6 +1,6 @@
 # BG95-M3 MQTT/TLS transport contract Rev.A
 
-Status: `HOST CONTRACT + PORTABLE BINARY COMMAND PATH PASS / TARGET CRYPTO, BG95 AT BINDING AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
+Status: `HOST CONTRACT + PORTABLE BINARY COMMAND PATH AND EVENT OUTBOX PASS / TARGET STORAGE, CRYPTO, BG95 AT BINDING AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
 
 This contract extends the portable BG95 state machine from automatic SIM/network
 discovery to an outbound MQTT/TLS session. It does not claim that a particular
@@ -88,6 +88,12 @@ and clear online/network-valid flags.
   after durable completion. It rejects wrong or non-canonical topics, retained
   delivery and non-QoS-1 delivery before command parsing, and its host test carries
   embedded NUL bytes without treating CBOR as a string.
+- Store-and-forward QG-1/QG-2: `tools/validate_event_outbox_contract.py` and
+  `firmware/tests/test_event_outbox.c` verify atomic event commit, metadata CRC,
+  payload SHA-256, priority/FIFO selection, idempotent duplicate handling,
+  bounded persistent retry count, full-queue behavior and torn-write recovery.
+  An application ACK is required before reclamation; target storage and server
+  event-ACK binding remain open.
 
 ## Open evidence
 
@@ -98,7 +104,8 @@ and clear online/network-valid flags.
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
 - reviewed Ed25519 backend and public-key provisioning, nonvolatile target-page
   binding/endurance, exact BG95 binary receive/publish framing, subscription and
-  publish-prompt handling, and store-and-forward; the portable fixed-memory
+  publish-prompt handling, event application-ACK protocol and target outbox
+  storage/endurance binding; the portable fixed-memory
   parser, topic/QoS/retain boundary, ACK codec and server-side canonical envelope,
   QoS 1 retry and station-bound ACK path have host tests;
 - power-loss, network-loss, CGNAT, dual-SIM switching and 24-hour test logs after

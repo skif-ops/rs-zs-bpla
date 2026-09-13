@@ -68,6 +68,8 @@ jobs:
         run: python tools/validate_bg95_transport_contract_rev_a.py
       - name: QG-1 protected cellular heartbeat traceability
         run: python tools/validate_cellular_heartbeat_contract_rev_a.py
+      - name: QG-1 portable event store-and-forward outbox
+        run: python tools/validate_event_outbox_contract.py
       - name: QG-1 hierarchical 4-8 window contract
         run: python tools/validate_hierarchy_consensus_contract.py
       - name: QG-1 installation position persistence contract

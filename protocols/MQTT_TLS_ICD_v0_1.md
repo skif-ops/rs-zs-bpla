@@ -234,7 +234,22 @@ unsigned режима. Файл не хранится в Git; raw 32-byte public
 
 ## 6. Store-and-forward
 
-Запись содержит `station_id`, `boot_id`, `seq_no`, `event_id`, timestamp, payload, priority, retry_count и SHA-256. Станция подтверждает удаление только после application ACK. Повторная передача того же `event_id` не создаёт второе событие.
+Portable outbox сохраняет полный binary CBOR detection вместе с `station_id`,
+`boot_id`, `seq_no`, `event_id`, timestamp, priority, persistent `retry_count` и
+SHA-256 payload. Metadata защищена CRC32; body и SHA-256 записываются до отдельного
+commit marker. Незавершённая запись после потери питания не становится событием.
+
+Выборка выполняется по убыванию priority и FIFO внутри одного priority. Pending
+событие никогда не вытесняется; при заполнении возвращается `FULL`. Повторная
+постановка идентичного `station_id/event_id` идемпотентна, а тот же идентификатор
+с другой metadata или SHA-256 отклоняется как conflict. Счётчик попыток использует
+128-битную one-way bitmap без erase текущего события.
+
+MQTT PUBACK не является application ACK. Станция помечает событие доставленным
+только после проверенного server application ACK; torn ACK marker остаётся pending,
+поэтому recovery имеет семантику at-least-once и может повторить тот же `event_id`.
+Серверная схема event application ACK, target storage binding, wear/endurance и
+аппаратная recovery-проверка пока открыты; portable QG не закрывает `REQ-CELL-003`.
 
 ## 7. Gate
 
