@@ -58,6 +58,13 @@ evidence: выдаёт `AT+QPOWD`, но завершает shutdown только
 только при online MQTT/TLS и валидном APN/IP/gateway/DNS read-back. Источник
 PD13/CELL_STATUS и GPIO mux/rail реализуются в target port.
 
+Любая ошибка normal sequence или brownout запускает отдельный recovery path:
+сначала пробует graceful shutdown; при его отказе и HIGH на CELL_STATUS
+используется 1000 ms fallback PWRKEY, затем обязательно
+подтверждается LOW, отключается mux, подтверждается High-Z и лишь после этого
+снимается modem rail. Перескочить recovery action или выбрать новый слот до
+завершения этой последовательности portable controller не позволяет.
+
 ## Проверка после сборки станций
 
 Операторские проверки и 24-часовой EVT PASS выполняются после сборки станций.

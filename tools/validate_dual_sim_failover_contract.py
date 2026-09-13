@@ -36,7 +36,11 @@ def main() -> int:
         "ZS_DUAL_SIM_MIN_HOLD_MS 900000u",
         "ZS_DUAL_SIM_MAX_ATTEMPTS_PER_PROFILE 3u",
         "ZS_DUAL_SIM_POWER_GOOD_STABLE_MS 30u",
-        "ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF",
+        "ZS_DUAL_SIM_STATE_RECOVERY_VERIFYING_MODEM_OFF",
+        "ZS_DUAL_SIM_STATE_RECOVERY_DISABLING_MUX",
+        "ZS_DUAL_SIM_STATE_RECOVERY_VERIFYING_MUX_HIGH_Z",
+        "ZS_DUAL_SIM_STATE_RECOVERY_DISABLING_MODEM_RAIL",
+        "ZS_DUAL_SIM_ACTION_REQUEST_MODEM_OFF_GRACEFUL_OR_FALLBACK_1000_MS",
         "ZS_DUAL_SIM_ACTION_RECORD_SWITCH_INTENT",
         "ZS_DUAL_SIM_ACTION_PERSIST_QUEUE_AND_SESSION",
         "ZS_DUAL_SIM_ACTION_VERIFY_MODEM_OFF",
@@ -65,6 +69,7 @@ def main() -> int:
         "action != zs_dual_sim_next_action(controller)",
         "strcmp(full_iccid",
         "need_safe_off(controller)",
+        "state_before == ZS_DUAL_SIM_STATE_RECOVERY_DISABLING_MODEM_RAIL",
         "now_ms - controller->last_activation_ms",
         "now_ms - controller->modem_rail_enabled_ms",
     ):
@@ -107,7 +112,7 @@ def main() -> int:
         "ZS_DUAL_SIM_REQUEST_REJECTED_PRESENCE",
         "ZS_DUAL_SIM_REQUEST_REJECTED_TRIGGER",
         "ZS_DUAL_SIM_ACTION_SELECT_PENDING_SLOT",
-        "ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF",
+        "ZS_DUAL_SIM_ACTION_REQUEST_MODEM_OFF_GRACEFUL_OR_FALLBACK_1000_MS",
         "SLOT1_ICCID",
         "SLOT2_ICCID",
     ):
@@ -138,15 +143,18 @@ def main() -> int:
         "minimum_hold_time_s: 900",
         "maximum_attempts_per_profile: 3",
         "preserve_store_and_forward_queue: true",
+        "fallback_pwrkey_pulse_ms_if_cell_status_high: 1000",
+        "allowed_hardware_window_ms: [650, 1500]",
+        "retry_failed_recovery_action_without_advancing: true",
         "authenticated_BLE_or_mTLS_server_command",
         "expected_iccid_per_slot: PROVISIONED_FULL_VALUE_REQUIRED",
         "FULL_IMSI_AND_ICCID_REQUIRED_IN_MTLS_HEARTBEAT",
         "DEFERRED_UNTIL_STATIONS_ASSEMBLED",
     ):
         require(policy_token in policy, f"dual-SIM policy drift: {policy_token}")
-    require("firmware_status: PORTABLE_SAFE_SEQUENCE_BG95_BRIDGE_QG1_QG2_PASS_TARGET_PENDING" in policy,
+    require("firmware_status: PORTABLE_SAFE_SEQUENCE_EXPLICIT_FAULT_RECOVERY_BG95_BRIDGE_QG1_QG2_PASS_TARGET_PENDING" in policy,
             "portable failover status missing from controlled policy")
-    require("dual_sim_failover_firmware: PORTABLE_SAFE_SEQUENCE_BG95_POWER_IDENTITY_LINK_BRIDGE_QG1_QG2_PASS_TARGET_GPIO_POWER_PROFILE_BINDING_PENDING" in baseline,
+    require("dual_sim_failover_firmware: PORTABLE_SAFE_SEQUENCE_EXPLICIT_FAULT_RECOVERY_BG95_POWER_IDENTITY_LINK_BRIDGE_QG1_QG2_PASS_TARGET_GPIO_POWER_PROFILE_BINDING_PENDING" in baseline,
             "portable failover status missing from EVT baseline")
     require("firmware debounce не менее 20 ms" in hardware and
             "Переключение без полного штатного выключения модема является ошибкой" in hardware,
@@ -155,7 +163,7 @@ def main() -> int:
             "TARGET GPIO" in contract and "100" in contract and
             "24-hour" in contract,
             "dual-SIM contract overclaims or omits target evidence")
-    require("dual_sim_failover_controller: PORTABLE_SAFE_SEQUENCE_HOLD_RETRY_ICCID_QG1_QG2_PASS_TARGET_PENDING" in target and
+    require("dual_sim_failover_controller: PORTABLE_SAFE_SEQUENCE_EXPLICIT_MODEM_OFF_MUX_HIGH_Z_RAIL_OFF_RECOVERY_HOLD_RETRY_ICCID_QG1_QG2_PASS_TARGET_PENDING" in target and
             "dual_sim_gpio_power_binding:" in target,
             "target boundary for dual-SIM failover is not explicit")
     require("DEC-031" in decisions and

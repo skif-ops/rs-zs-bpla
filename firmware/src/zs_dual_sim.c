@@ -174,7 +174,15 @@ zs_dual_sim_action_t zs_dual_sim_next_action(const zs_dual_sim_t *controller) {
   if (!controller) return ZS_DUAL_SIM_ACTION_NONE;
   switch (controller->state) {
     case ZS_DUAL_SIM_STATE_NEEDS_SAFE_OFF:
-      return ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF;
+      return ZS_DUAL_SIM_ACTION_REQUEST_MODEM_OFF_GRACEFUL_OR_FALLBACK_1000_MS;
+    case ZS_DUAL_SIM_STATE_RECOVERY_VERIFYING_MODEM_OFF:
+      return ZS_DUAL_SIM_ACTION_VERIFY_MODEM_OFF;
+    case ZS_DUAL_SIM_STATE_RECOVERY_DISABLING_MUX:
+      return ZS_DUAL_SIM_ACTION_DISABLE_MUX;
+    case ZS_DUAL_SIM_STATE_RECOVERY_VERIFYING_MUX_HIGH_Z:
+      return ZS_DUAL_SIM_ACTION_VERIFY_MUX_HIGH_Z;
+    case ZS_DUAL_SIM_STATE_RECOVERY_DISABLING_MODEM_RAIL:
+      return ZS_DUAL_SIM_ACTION_DISABLE_MODEM_RAIL;
     case ZS_DUAL_SIM_STATE_RECORDING_SWITCH_INTENT:
       return ZS_DUAL_SIM_ACTION_RECORD_SWITCH_INTENT;
     case ZS_DUAL_SIM_STATE_STOPPING_TRAFFIC:
@@ -225,19 +233,25 @@ zs_dual_sim_action_t zs_dual_sim_next_action(const zs_dual_sim_t *controller) {
 bool zs_dual_sim_complete_action(zs_dual_sim_t *controller,
                                  zs_dual_sim_action_t action,
                                  bool success, uint32_t now_ms) {
+  zs_dual_sim_state_t state_before;
   if (!controller || action == ZS_DUAL_SIM_ACTION_NONE ||
       action != zs_dual_sim_next_action(controller))
     return false;
-  if (action == ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF) {
-    if (!success) return false;
-    controller->state = ZS_DUAL_SIM_STATE_SAFE_OFF;
-    return true;
-  }
+  state_before = controller->state;
   if (!success) {
+    if (state_before == ZS_DUAL_SIM_STATE_NEEDS_SAFE_OFF ||
+        state_before == ZS_DUAL_SIM_STATE_RECOVERY_VERIFYING_MODEM_OFF ||
+        state_before == ZS_DUAL_SIM_STATE_RECOVERY_DISABLING_MUX ||
+        state_before == ZS_DUAL_SIM_STATE_RECOVERY_VERIFYING_MUX_HIGH_Z ||
+        state_before == ZS_DUAL_SIM_STATE_RECOVERY_DISABLING_MODEM_RAIL)
+      return false;
     need_safe_off(controller);
     return true;
   }
   switch (action) {
+    case ZS_DUAL_SIM_ACTION_REQUEST_MODEM_OFF_GRACEFUL_OR_FALLBACK_1000_MS:
+      controller->state = ZS_DUAL_SIM_STATE_RECOVERY_VERIFYING_MODEM_OFF;
+      break;
     case ZS_DUAL_SIM_ACTION_RECORD_SWITCH_INTENT:
       controller->state = controller->switch_from_active
                               ? ZS_DUAL_SIM_STATE_STOPPING_TRAFFIC
@@ -256,16 +270,28 @@ bool zs_dual_sim_complete_action(zs_dual_sim_t *controller,
       controller->state = ZS_DUAL_SIM_STATE_VERIFYING_MODEM_OFF;
       break;
     case ZS_DUAL_SIM_ACTION_VERIFY_MODEM_OFF:
-      controller->state = ZS_DUAL_SIM_STATE_DISABLING_MUX;
+      controller->state = state_before ==
+                                  ZS_DUAL_SIM_STATE_RECOVERY_VERIFYING_MODEM_OFF
+                              ? ZS_DUAL_SIM_STATE_RECOVERY_DISABLING_MUX
+                              : ZS_DUAL_SIM_STATE_DISABLING_MUX;
       break;
     case ZS_DUAL_SIM_ACTION_DISABLE_MUX:
-      controller->state = ZS_DUAL_SIM_STATE_VERIFYING_MUX_HIGH_Z;
+      controller->state = state_before ==
+                                  ZS_DUAL_SIM_STATE_RECOVERY_DISABLING_MUX
+                              ? ZS_DUAL_SIM_STATE_RECOVERY_VERIFYING_MUX_HIGH_Z
+                              : ZS_DUAL_SIM_STATE_VERIFYING_MUX_HIGH_Z;
       break;
     case ZS_DUAL_SIM_ACTION_VERIFY_MUX_HIGH_Z:
-      controller->state = ZS_DUAL_SIM_STATE_DISABLING_MODEM_RAIL;
+      controller->state =
+          state_before == ZS_DUAL_SIM_STATE_RECOVERY_VERIFYING_MUX_HIGH_Z
+              ? ZS_DUAL_SIM_STATE_RECOVERY_DISABLING_MODEM_RAIL
+              : ZS_DUAL_SIM_STATE_DISABLING_MODEM_RAIL;
       break;
     case ZS_DUAL_SIM_ACTION_DISABLE_MODEM_RAIL:
-      controller->state = ZS_DUAL_SIM_STATE_SELECTING_SLOT;
+      controller->state =
+          state_before == ZS_DUAL_SIM_STATE_RECOVERY_DISABLING_MODEM_RAIL
+              ? ZS_DUAL_SIM_STATE_SAFE_OFF
+              : ZS_DUAL_SIM_STATE_SELECTING_SLOT;
       break;
     case ZS_DUAL_SIM_ACTION_SELECT_PENDING_SLOT:
       controller->state = ZS_DUAL_SIM_STATE_ENABLING_MODEM_RAIL;
@@ -311,7 +337,6 @@ bool zs_dual_sim_complete_action(zs_dual_sim_t *controller,
       controller->switch_from_active = false;
       controller->state = ZS_DUAL_SIM_STATE_ACTIVE;
       break;
-    case ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF:
     case ZS_DUAL_SIM_ACTION_READ_AND_VERIFY_ICCID:
     case ZS_DUAL_SIM_ACTION_NONE:
     default:
@@ -350,7 +375,9 @@ zs_dual_sim_slot_t zs_dual_sim_active_slot(const zs_dual_sim_t *controller) {
 
 const char *zs_dual_sim_state_name(zs_dual_sim_state_t state) {
   static const char *const names[] = {
-      "needs_safe_off",       "safe_off",          "active",
+      "needs_safe_off",       "recovery_verifying_modem_off",
+      "recovery_disabling_mux", "recovery_verifying_mux_high_z",
+      "recovery_disabling_modem_rail", "safe_off", "active",
       "recording_switch_intent", "stopping_traffic", "persisting_queue",
       "closing_transport",
       "powering_modem_off",   "verifying_modem_off", "disabling_mux",

@@ -25,6 +25,22 @@ static void complete(zs_dual_sim_t *controller, zs_dual_sim_action_t action,
   assert(zs_dual_sim_complete_action(controller, action, true, now_ms));
 }
 
+static uint32_t drive_safe_recovery(zs_dual_sim_t *controller,
+                                    uint32_t now_ms) {
+  static const zs_dual_sim_action_t actions[] = {
+      ZS_DUAL_SIM_ACTION_REQUEST_MODEM_OFF_GRACEFUL_OR_FALLBACK_1000_MS,
+      ZS_DUAL_SIM_ACTION_VERIFY_MODEM_OFF,
+      ZS_DUAL_SIM_ACTION_DISABLE_MUX,
+      ZS_DUAL_SIM_ACTION_VERIFY_MUX_HIGH_Z,
+      ZS_DUAL_SIM_ACTION_DISABLE_MODEM_RAIL,
+  };
+  size_t i;
+  for (i = 0u; i < sizeof(actions) / sizeof(actions[0]); ++i)
+    complete(controller, actions[i], now_ms++);
+  assert(zs_dual_sim_state(controller) == ZS_DUAL_SIM_STATE_SAFE_OFF);
+  return now_ms;
+}
+
 static uint32_t drive_power_on(zs_dual_sim_t *controller, uint32_t now_ms,
                                const char *iccid) {
   complete(controller, ZS_DUAL_SIM_ACTION_SELECT_PENDING_SLOT, now_ms++);
@@ -49,16 +65,19 @@ static uint32_t drive_power_on(zs_dual_sim_t *controller, uint32_t now_ms,
 }
 
 static void start_slot_1(zs_dual_sim_t *controller, uint32_t *now_ms) {
+  uint32_t start_ms;
   assert(zs_dual_sim_init(controller, SLOT1_ICCID, SLOT2_ICCID));
   assert(zs_dual_sim_next_action(controller) ==
-         ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF);
+         ZS_DUAL_SIM_ACTION_REQUEST_MODEM_OFF_GRACEFUL_OR_FALLBACK_1000_MS);
+  assert(zs_dual_sim_request_start(controller, ZS_DUAL_SIM_SLOT_1, 0u) ==
+         ZS_DUAL_SIM_REQUEST_REJECTED_STATE);
   set_present(controller, ZS_DUAL_SIM_SLOT_1, 0u);
   set_present(controller, ZS_DUAL_SIM_SLOT_2, 0u);
-  complete(controller, ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF, 21u);
+  start_ms = drive_safe_recovery(controller, 21u);
   assert(zs_dual_sim_request_start(controller, ZS_DUAL_SIM_SLOT_1, 0u) ==
          ZS_DUAL_SIM_REQUEST_ACCEPTED);
-  complete(controller, ZS_DUAL_SIM_ACTION_RECORD_SWITCH_INTENT, 22u);
-  *now_ms = drive_power_on(controller, 23u, SLOT1_ICCID);
+  complete(controller, ZS_DUAL_SIM_ACTION_RECORD_SWITCH_INTENT, start_ms++);
+  *now_ms = drive_power_on(controller, start_ms, SLOT1_ICCID);
   assert(zs_dual_sim_state(controller) == ZS_DUAL_SIM_STATE_ACTIVE);
   assert(zs_dual_sim_active_slot(controller) == ZS_DUAL_SIM_SLOT_1);
 }
@@ -182,22 +201,23 @@ static void test_iccid_mismatch_and_action_failure_fail_closed(void) {
   assert(!zs_dual_sim_on_iccid(&controller, SLOT1_ICCID));
   assert(zs_dual_sim_active_slot(&controller) == ZS_DUAL_SIM_SLOT_NONE);
   assert(zs_dual_sim_next_action(&controller) ==
-         ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF);
-  complete(&controller, ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF, switch_ms + 56u);
+         ZS_DUAL_SIM_ACTION_REQUEST_MODEM_OFF_GRACEFUL_OR_FALLBACK_1000_MS);
+  now_ms = drive_safe_recovery(&controller, switch_ms + 56u);
   assert(zs_dual_sim_state(&controller) == ZS_DUAL_SIM_STATE_SAFE_OFF);
 
   assert(zs_dual_sim_request_start(&controller, ZS_DUAL_SIM_SLOT_1, 0u) ==
          ZS_DUAL_SIM_REQUEST_ACCEPTED);
   complete(&controller, ZS_DUAL_SIM_ACTION_RECORD_SWITCH_INTENT,
-           switch_ms + 57u);
+           now_ms++);
   assert(zs_dual_sim_complete_action(
       &controller, ZS_DUAL_SIM_ACTION_SELECT_PENDING_SLOT, false,
-      switch_ms + 58u));
+      now_ms++));
   assert(zs_dual_sim_next_action(&controller) ==
-         ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF);
+         ZS_DUAL_SIM_ACTION_REQUEST_MODEM_OFF_GRACEFUL_OR_FALLBACK_1000_MS);
   assert(!zs_dual_sim_complete_action(
-      &controller, ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF, false,
-      switch_ms + 59u));
+      &controller,
+      ZS_DUAL_SIM_ACTION_REQUEST_MODEM_OFF_GRACEFUL_OR_FALLBACK_1000_MS, false,
+      now_ms));
   assert(zs_dual_sim_state(&controller) ==
          ZS_DUAL_SIM_STATE_NEEDS_SAFE_OFF);
 }
@@ -209,7 +229,7 @@ static void test_brownout_and_debounced_active_slot_removal(void) {
   zs_dual_sim_report_brownout(&controller);
   assert(zs_dual_sim_active_slot(&controller) == ZS_DUAL_SIM_SLOT_NONE);
   assert(zs_dual_sim_next_action(&controller) ==
-         ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF);
+         ZS_DUAL_SIM_ACTION_REQUEST_MODEM_OFF_GRACEFUL_OR_FALLBACK_1000_MS);
 
   start_slot_1(&controller, &now_ms);
   assert(zs_dual_sim_update_presence(&controller, ZS_DUAL_SIM_SLOT_1, false,

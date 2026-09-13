@@ -51,7 +51,7 @@ apn_modes:
     allowed_in_pilot: false
     status: FUTURE_NOT_PROVISIONED
 profile_selection:
-  firmware_status: PORTABLE_SAFE_SEQUENCE_BG95_BRIDGE_QG1_QG2_PASS_TARGET_PENDING
+  firmware_status: PORTABLE_SAFE_SEQUENCE_EXPLICIT_FAULT_RECOVERY_BG95_BRIDGE_QG1_QG2_PASS_TARGET_PENDING
   expected_iccid_per_slot: PROVISIONED_FULL_VALUE_REQUIRED
   order_per_slot: APPROVED_PUBLIC_PLMN_PROFILES_ONLY_TO_BE_PROVISIONED
   automatic_failover_enabled: true
@@ -81,6 +81,16 @@ safe_slot_switch_sequence:
   - attach_and_validate_dns_tls_endpoint
   - record_audit_commit
   - resume_queue_with_existing_event_ids
+failure_recovery_sequence:
+  fallback_pwrkey_pulse_ms_if_cell_status_high: 1000
+  allowed_hardware_window_ms: [650, 1500]
+  actions:
+    - request_graceful_modem_off_or_fallback_if_needed
+    - verify_cell_status_low
+    - disable_sim_mux_to_high_impedance
+    - verify_sim_mux_high_impedance
+    - disable_modem_power_rail
+  retry_failed_recovery_action_without_advancing: true
 security:
   pin_puk_and_apn_passwords_in_repository: false
   imsi_iccid_station_storage: volatile_runtime_only

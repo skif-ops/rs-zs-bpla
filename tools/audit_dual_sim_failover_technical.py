@@ -52,6 +52,17 @@ def main() -> int:
     )
     offsets = [switch_prefix.index(action) for action in ordered_actions]
     require(offsets == sorted(offsets), "safe shutdown action order drift")
+    recovery = test[test.index("static uint32_t drive_safe_recovery"):]
+    recovery_actions = (
+        "ZS_DUAL_SIM_ACTION_REQUEST_MODEM_OFF_GRACEFUL_OR_FALLBACK_1000_MS",
+        "ZS_DUAL_SIM_ACTION_VERIFY_MODEM_OFF",
+        "ZS_DUAL_SIM_ACTION_DISABLE_MUX",
+        "ZS_DUAL_SIM_ACTION_VERIFY_MUX_HIGH_Z",
+        "ZS_DUAL_SIM_ACTION_DISABLE_MODEM_RAIL",
+    )
+    recovery_offsets = [recovery.index(action) for action in recovery_actions]
+    require(recovery_offsets == sorted(recovery_offsets),
+            "failure recovery could remove rail before modem-off and mux High-Z")
     require(source.index("ZS_DUAL_SIM_ACTION_VERIFY_MUX_HIGH_Z") <
             source.index("ZS_DUAL_SIM_ACTION_DISABLE_MODEM_RAIL") <
             source.index("ZS_DUAL_SIM_ACTION_SELECT_PENDING_SLOT"),
@@ -106,7 +117,7 @@ def main() -> int:
                     f"{test_name} runtime did not report PASS")
 
     print("Dual-SIM safe failover QG-2 independent technical audit: PASS")
-    print("fixed bounds, safe action order, BG95 power/identity/link bridge and strict C runtimes verified")
+    print("fixed bounds, non-skippable fault recovery, safe action order, BG95 bridge and strict C runtimes verified")
     return 0
 
 

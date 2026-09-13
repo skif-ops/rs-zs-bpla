@@ -47,6 +47,14 @@ brownout или debounced removal переводит controller в safe-off requ
 host QG-1/QG-2, а не доказательство GPIO, реальных SIM, 100 циклов, операторов
 или 24-часовой работы станции.
 
+Safe-off request теперь сам является явной неразрывной последовательностью:
+target сначала запрашивает graceful shutdown, а при его недоступности и
+`CELL_STATUS=HIGH` выдаёт fallback PWRKEY 1000 ms
+(внутри разрешённого аппаратного окна 650–1500 ms), подтвердить status LOW,
+отключить mux, подтвердить High-Z и только затем снять modem rail. Ошибка любого
+recovery action не переводит controller дальше и не допускает преждевременный
+выбор слота.
+
 Узкий portable bridge теперь связывает modem-dependent actions с BG95:
 `AT+QPOWD` не считается завершённым без внешнего `CELL_STATUS=LOW`, после чего
 volatile IMSI/ICCID очищаются; повторный power-on разрешён только из `OFF`.

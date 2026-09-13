@@ -52,15 +52,21 @@ static void make_slot_present(zs_dual_sim_t *controller,
 }
 
 static void controller_to_pwrkey(zs_dual_sim_t *controller) {
-  complete(controller, ZS_DUAL_SIM_ACTION_APPLY_SAFE_OFF, 21u);
+  complete(
+      controller,
+      ZS_DUAL_SIM_ACTION_REQUEST_MODEM_OFF_GRACEFUL_OR_FALLBACK_1000_MS, 21u);
+  complete(controller, ZS_DUAL_SIM_ACTION_VERIFY_MODEM_OFF, 22u);
+  complete(controller, ZS_DUAL_SIM_ACTION_DISABLE_MUX, 23u);
+  complete(controller, ZS_DUAL_SIM_ACTION_VERIFY_MUX_HIGH_Z, 24u);
+  complete(controller, ZS_DUAL_SIM_ACTION_DISABLE_MODEM_RAIL, 25u);
   assert(zs_dual_sim_request_start(controller, ZS_DUAL_SIM_SLOT_1, 0u) ==
          ZS_DUAL_SIM_REQUEST_ACCEPTED);
-  complete(controller, ZS_DUAL_SIM_ACTION_RECORD_SWITCH_INTENT, 22u);
-  complete(controller, ZS_DUAL_SIM_ACTION_SELECT_PENDING_SLOT, 23u);
-  complete(controller, ZS_DUAL_SIM_ACTION_ENABLE_MODEM_RAIL, 24u);
-  complete(controller, ZS_DUAL_SIM_ACTION_VERIFY_POWER_GOOD_30_MS, 54u);
-  complete(controller, ZS_DUAL_SIM_ACTION_ENABLE_MUX, 55u);
-  complete(controller, ZS_DUAL_SIM_ACTION_VERIFY_MUX_ENABLED, 56u);
+  complete(controller, ZS_DUAL_SIM_ACTION_RECORD_SWITCH_INTENT, 26u);
+  complete(controller, ZS_DUAL_SIM_ACTION_SELECT_PENDING_SLOT, 27u);
+  complete(controller, ZS_DUAL_SIM_ACTION_ENABLE_MODEM_RAIL, 28u);
+  complete(controller, ZS_DUAL_SIM_ACTION_VERIFY_POWER_GOOD_30_MS, 58u);
+  complete(controller, ZS_DUAL_SIM_ACTION_ENABLE_MUX, 59u);
+  complete(controller, ZS_DUAL_SIM_ACTION_VERIFY_MUX_ENABLED, 60u);
 }
 
 static void establish_online_modem(zs_bg95_t *modem) {
@@ -94,22 +100,22 @@ static void test_power_identity_link_and_shutdown_bridge(void) {
 
   zs_bg95_init(&modem, &io, 1u, 2u, NULL);
   assert(zs_bg95_configure_auto_network(&modem, profiles, 1u));
-  assert(zs_dual_sim_bg95_begin_power_on(&controller, &modem, 57u));
+  assert(zs_dual_sim_bg95_begin_power_on(&controller, &modem, 61u));
   assert(mock.pwrkey);
   assert(!zs_dual_sim_bg95_confirm_modem_on(
-      &controller, &modem, false, 757u));
-  zs_bg95_tick(&modem, 757u);
+      &controller, &modem, false, 761u));
+  zs_bg95_tick(&modem, 761u);
   assert(!mock.pwrkey);
   assert(modem.state == ZS_BG95_AT_SYNC);
   assert(zs_dual_sim_bg95_confirm_modem_on(
-      &controller, &modem, true, 758u));
+      &controller, &modem, true, 762u));
   assert(!zs_dual_sim_bg95_verify_iccid(&controller, &modem));
 
   establish_online_modem(&modem);
   assert(zs_dual_sim_bg95_verify_iccid(&controller, &modem));
-  assert(zs_dual_sim_bg95_confirm_link(&controller, &modem, 759u));
-  complete(&controller, ZS_DUAL_SIM_ACTION_RECORD_SWITCH_COMMIT, 760u);
-  complete(&controller, ZS_DUAL_SIM_ACTION_RESUME_PRESERVED_QUEUE, 761u);
+  assert(zs_dual_sim_bg95_confirm_link(&controller, &modem, 763u));
+  complete(&controller, ZS_DUAL_SIM_ACTION_RECORD_SWITCH_COMMIT, 764u);
+  complete(&controller, ZS_DUAL_SIM_ACTION_RESUME_PRESERVED_QUEUE, 765u);
   assert(zs_dual_sim_active_slot(&controller) == ZS_DUAL_SIM_SLOT_1);
 
   switch_ms = controller.last_activation_ms + ZS_DUAL_SIM_MIN_HOLD_MS;

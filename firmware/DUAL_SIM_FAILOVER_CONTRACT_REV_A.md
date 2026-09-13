@@ -33,8 +33,12 @@ an operator or APN.
 
 ## Action order
 
-On boot or after a fault, the target must first apply safe-off: modem rail off
-and SIM mux High-Z. Initial activation then executes audit intent, slot select,
+On boot or after a fault, the controller does not permit an immediate rail cut.
+It first requests graceful shutdown when available, otherwise a 1000 ms
+fallback PWRKEY pulse when `CELL_STATUS` is HIGH,
+then requires `CELL_STATUS=LOW`, disables the SIM mux, verifies High-Z and only
+then disables the modem rail. A failed recovery action remains current and
+cannot advance. Initial activation then executes audit intent, slot select,
 modem rail enable, stable `PWR_GOOD` for at least 30 ms, mux enable and
 verification, 700 ms PWRKEY, modem-on verification, full ICCID verification,
 attach/DNS/TLS validation, audit commit and preserved-queue resume.
@@ -50,10 +54,11 @@ Switching an active slot has the mandatory prefix:
 7. disable the modem rail;
 8. only then select the pending slot and perform the initial-activation suffix.
 
-The state machine rejects out-of-order action completion. A failed action,
+The state machine rejects out-of-order action completion. A failed normal action,
 malformed or mismatched ICCID, debounced removal of the active/pending card, or
-brownout discards active-slot knowledge and requests safe-off. It exposes no
-action that clears or renumbers queued events.
+brownout discards active-slot knowledge and starts the explicit modem-off →
+mux-High-Z → rail-off recovery. It exposes no action that clears or renumbers
+queued events.
 
 The portable BG95 bridge starts `AT+QPOWD`, but does not accept shutdown until
 the caller supplies `CELL_STATUS=LOW`; the BG95 state then clears volatile
@@ -71,7 +76,8 @@ UART leaves the action pending instead of skipping shutdown.
   under strict warnings.
 - Runtime: `firmware/tests/test_dual_sim.c` covers initial activation, bounded
   automatic failover, hold time, authentication, DET debounce, out-of-order
-  rejection, power-good timing, exact ICCID, action failure and brownout.
+  rejection, power-good timing, exact ICCID, action failure, non-skippable safe
+  recovery and brownout.
 - Bridge runtime: `firmware/tests/test_dual_sim_bg95.c` proves that QPOWD,
   physical-status assertions, PWRKEY, full ICCID and online network settings
   advance only their matching controller actions.
