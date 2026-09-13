@@ -43,7 +43,10 @@
 - Portable atomic journal записывает `ACCEPTED` до идемпотентного действия и
   `COMPLETED` до разрешения ACK; fault-injection проверяет потерю питания между
   body/commit marker, повтор и заполнение ограниченного журнала.
-- Открыты target MQTT subscription/URC binding, production Ed25519 backend,
+- Bounded trust adapter проверяет SHA-256-derived key ID, дубликаты, disabled
+  rotation entries и неизвестные ключи до вызова обязательного crypto backend;
+  production public keys в portable source отсутствуют.
+- Открыты target MQTT subscription/URC binding, reviewed Ed25519 backend,
   provisioning public key, Flash page/endurance binding, ACK publisher и аппаратный end-to-end;
   они не объявлены PASS до сборки станций.
 

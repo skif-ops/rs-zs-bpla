@@ -40,6 +40,9 @@ def main() -> int:
     journal_header = read("firmware/include/zs_command_journal.h")
     journal_codec = read("firmware/src/zs_command_journal.c")
     journal_test = read("firmware/tests/test_command_journal.c")
+    trust_header = read("firmware/include/zs_command_trust.h")
+    trust_codec = read("firmware/src/zs_command_trust.c")
+    trust_test = read("firmware/tests/test_command_trust.c")
     vector_generator = read("tools/generate_mqtt_command_vector.py")
     vector_header = read("firmware/generated/zs_command_vector.h")
     tests = read("server/tests/test_mqtt_commands.py") + read(
@@ -186,10 +189,31 @@ def main() -> int:
         "zs_command_vector_ack",
     ):
         require(token in journal_test, f"durable journal QG-2 case missing: {token}")
+    for token in (
+        "ZS_COMMAND_TRUST_MAX_KEYS 4u",
+        "zs_ed25519_verify_backend_fn",
+        "zs_command_trust_init",
+        "zs_command_trust_verify",
+    ):
+        require(token in trust_header, f"command trust-store API missing: {token}")
+    for token in (
+        "zs_sha256_digest",
+        "enabled_count == 0u",
+        "bytes_equal(key_id",
+        "trust->backend",
+    ):
+        require(token in trust_codec, f"command trust-store guard missing: {token}")
+    for token in (
+        "test_enabled_key_and_backend_binding",
+        "test_fail_closed_configuration",
+        "test_decoder_integration",
+        "zs_command_vector_public_key",
+    ):
+        require(token in trust_test, f"command trust-store QG-2 case missing: {token}")
 
     require("FIRMWARE_CODEC_IMPLEMENTED; TARGET_CRYPTO_AND_MODEM_BINDING_PENDING" in icd,
             "ICD does not report the bounded implementation status")
-    require("target MQTT subscription binding, production Ed25519 backend" in firmware_contract,
+    require("target MQTT subscription binding, reviewed Ed25519 backend" in firmware_contract,
             "firmware target gap is not explicit")
     for token in ("tamper", "retry", "ownership", "duplicate"):
         require(token in tests, f"negative/robustness test missing: {token}")
@@ -203,6 +227,8 @@ def main() -> int:
             "firmware command codec test is not bound to CTest")
     require("zs_command_journal_tests" in read("firmware/CMakeLists.txt"),
             "firmware durable command journal test is not bound to CTest")
+    require("zs_command_trust_tests" in read("firmware/CMakeLists.txt"),
+            "firmware command trust-store test is not bound to CTest")
 
     print("MQTT signed command transport QG-1: PASS")
     print("scope: server transport + portable firmware codec; target crypto/modem and hardware remain pending")

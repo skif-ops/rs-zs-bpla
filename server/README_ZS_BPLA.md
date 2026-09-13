@@ -25,6 +25,8 @@
   encoding and a deterministic server-to-firmware Ed25519 test vector;
 - portable power-loss-safe command journal that persists accepted/completed
   states and permits ACK encoding only from a durable completed record;
+- bounded firmware public-key rotation adapter with SHA-256-derived key IDs and
+  a mandatory target-provided Ed25519 verification backend;
 - fail-closed station HTTP transport, enabled only on an isolated bench with
   exact opt-in `ZS_STATION_HTTP_INSECURE_BENCH=1`;
 - hierarchical family/type updates use only the latest 4-8 unique feature

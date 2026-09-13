@@ -79,6 +79,11 @@ cellular:
   station_identity_storage: VOLATILE_RUNTIME_ONLY
   server_general_api_identity_view: REDACTED_ONLY
   physical_sim_operator_and_24h_evidence: DEFERRED_UNTIL_STATIONS_ASSEMBLED
+  signed_command_codec: PORTABLE_CANONICAL_CBOR_QG1_QG2_PASS
+  command_result_journal: PORTABLE_ATOMIC_QG1_QG2_PASS_FLASH_BINDING_PENDING
+  command_public_key_trust: PORTABLE_BOUNDED_ROTATION_QG1_QG2_PASS_PROVISIONING_PENDING
+  command_ed25519_backend: MISSING_BLOCKER
+  command_mqtt_binding: MISSING_BLOCKER
 storage:
   card: Kingston_SDCIT2_32GB
   socket: GCT_MEM2052_00_195_00_A
@@ -203,6 +208,9 @@ required_target_files:
   linker_script: ENGINEERING_FULL_FLASH_QG1_QG2_PASS_PRODUCTION_PARTITION_BLOCKER
   hal_ll_bindings: MISSING_BLOCKER
   installation_position_flash_binding: MISSING_BLOCKER
+  command_journal_flash_binding: MISSING_BLOCKER
+  command_ed25519_backend: MISSING_BLOCKER
+  command_mqtt_subscription_ack_binding: MISSING_BLOCKER
   board_pins: GENERATED_EXACT_REV_A_CONTRACT_QG1_QG2_PASS_CUBEMX_OPEN_PENDING
   secure_boot: MISSING_BLOCKER
   ota_ab: MISSING_BLOCKER

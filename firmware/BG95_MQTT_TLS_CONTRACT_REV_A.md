@@ -78,7 +78,9 @@ and clear online/network-valid flags.
   binding, fail-closed signature callback handling, durable-dedup requirement and
   ACK encoding under the host build. `firmware/tests/test_command_journal.c`
   separately fault-injects the atomic accepted/completed journal and prevents ACK
-  generation before a completed result is durable.
+  generation before a completed result is durable. The bounded trust adapter
+  validates key IDs and enabled rotation entries before delegating to a mandatory
+  Ed25519 backend; no production public key is embedded in portable source.
 
 ## Open evidence
 
@@ -87,7 +89,7 @@ and clear online/network-valid flags.
   selected BG95 firmware revision and every pilot operator, after stations are assembled;
 - certificate upload/provisioning and BG95 firmware-version compatibility;
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
-- target MQTT subscription binding, production Ed25519 backend and public-key
+- target MQTT subscription binding, reviewed Ed25519 backend and public-key
   provisioning, nonvolatile target-page binding/endurance, ACK publisher and
   store-and-forward; the portable fixed-memory parser/ACK codec and server-side
   canonical envelope, QoS 1 retry and station-bound ACK path have host tests;

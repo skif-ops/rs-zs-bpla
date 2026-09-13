@@ -56,3 +56,10 @@ requires an authenticated local BLE peer and a physical 10-minute service
 window, computes the canonical record SHA-256 on the station, and brackets each
 write with audit intent/commit callbacks. The nRF52840 GATT implementation,
 durable audit backend and target service-window timer remain open target work.
+
+The portable downstream-command boundary now has a canonical fixed-memory CBOR
+codec, a bounded public-key rotation adapter, and a power-loss-safe
+accepted/completed journal that cannot encode an ACK before completion is
+durable. Host QG includes a real server-generated Ed25519 vector, but the target
+still needs reviewed Ed25519 library binding, provisioned public keys, dedicated
+Flash pages/endurance evidence and BG95 MQTT receive/publish integration.

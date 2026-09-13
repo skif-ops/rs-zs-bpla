@@ -59,9 +59,12 @@ signature callback result, non-canonical encoding, wrong `station_id`, duplicate
 payload before any side effect. It reconstructs the exact canonical keys 0..8
 in caller-owned fixed memory and wipes that workspace after verification. A
 deterministic server-generated Ed25519 vector locks the byte boundary in CI.
-Production public-key provisioning, the target Ed25519 backend and the BG95 MQTT
-subscription/receive binding remain open until the target receiver is integrated
-and tested.
+The portable trust adapter supports a bounded rotation set of four public keys,
+derives each key ID from the raw key, rejects duplicates, zero keys, disabled-only
+sets and unknown IDs, and delegates the actual signature operation to a required
+backend. Production key provisioning, a reviewed target Ed25519 backend and the
+BG95 MQTT subscription/receive binding remain open until the target receiver is
+integrated and tested.
 
 Execution is allowed only inside `[created_time_us, expires_time_us)`. A station
 without sufficiently trusted time must reject the remote command rather than

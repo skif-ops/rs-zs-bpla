@@ -21,6 +21,7 @@ add_library(zs_core
   src/zs_bg95.c
   src/zs_command.c
   src/zs_command_journal.c
+  src/zs_command_trust.c
   src/zs_gnss.c
   src/zs_sx1262.c
   src/zs_audio.c
@@ -50,6 +51,8 @@ add_executable(zs_command_transport_tests tests/test_command_transport.c)
 target_link_libraries(zs_command_transport_tests zs_core m)
 add_executable(zs_command_journal_tests tests/test_command_journal.c)
 target_link_libraries(zs_command_journal_tests zs_core m)
+add_executable(zs_command_trust_tests tests/test_command_trust.c)
+target_link_libraries(zs_command_trust_tests zs_core m)
 add_executable(zs_heartbeat_telemetry_tests tests/test_heartbeat_telemetry.c)
 target_link_libraries(zs_heartbeat_telemetry_tests zs_core m)
 add_executable(zs_archive_tests tests/test_archive.c)
@@ -82,6 +85,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_bg95_transport_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_command_transport_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_command_journal_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_command_trust_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_heartbeat_telemetry_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_archive_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_nor_tests PRIVATE -UNDEBUG)
@@ -102,6 +106,7 @@ add_test(NAME classifier_consensus COMMAND zs_classifier_consensus_tests)
 add_test(NAME bg95_transport COMMAND zs_bg95_transport_tests)
 add_test(NAME command_transport COMMAND zs_command_transport_tests)
 add_test(NAME command_journal COMMAND zs_command_journal_tests)
+add_test(NAME command_trust COMMAND zs_command_trust_tests)
 add_test(NAME heartbeat_telemetry COMMAND zs_heartbeat_telemetry_tests)
 add_test(NAME archive COMMAND zs_archive_tests)
 add_test(NAME nor COMMAND zs_nor_tests)
