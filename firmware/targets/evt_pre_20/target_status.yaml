@@ -79,7 +79,8 @@ cellular:
   station_identity_storage: VOLATILE_RUNTIME_ONLY
   server_general_api_identity_view: REDACTED_ONLY
   physical_sim_operator_and_24h_evidence: DEFERRED_UNTIL_STATIONS_ASSEMBLED
-  event_store_forward_outbox: PORTABLE_ATOMIC_SHA256_PRIORITY_QG1_QG2_PASS_TARGET_STORAGE_AND_APPLICATION_ACK_BINDING_PENDING
+  event_store_forward_outbox: PORTABLE_ATOMIC_SHA256_PRIORITY_QG1_QG2_PASS_TARGET_STORAGE_BINDING_PENDING
+  event_application_receipt: PORTABLE_SERVER_FIRMWARE_QG1_QG2_PASS_BG95_BINDING_PENDING
   signed_command_codec: PORTABLE_CANONICAL_CBOR_QG1_QG2_PASS
   command_result_journal: PORTABLE_ATOMIC_QG1_QG2_PASS_FLASH_BINDING_PENDING
   command_public_key_trust: PORTABLE_BOUNDED_ROTATION_QG1_QG2_PASS_PROVISIONING_PENDING
@@ -213,6 +214,7 @@ required_target_files:
   installation_position_flash_binding: MISSING_BLOCKER
   command_journal_flash_binding: MISSING_BLOCKER
   event_outbox_storage_binding: MISSING_BLOCKER
+  event_receipt_mqtt_binding: MISSING_BLOCKER
   command_ed25519_backend: MISSING_BLOCKER
   command_mqtt_subscription_ack_binding: MISSING_BLOCKER
   board_pins: GENERATED_EXACT_REV_A_CONTRACT_QG1_QG2_PASS_CUBEMX_OPEN_PENDING

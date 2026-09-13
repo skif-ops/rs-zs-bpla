@@ -92,8 +92,11 @@ and clear online/network-valid flags.
   `firmware/tests/test_event_outbox.c` verify atomic event commit, metadata CRC,
   payload SHA-256, priority/FIFO selection, idempotent duplicate handling,
   bounded persistent retry count, full-queue behavior and torn-write recovery.
-  An application ACK is required before reclamation; target storage and server
-  event-ACK binding remain open.
+  `tools/validate_event_receipt_contract.py`, its independent runtime audit and
+  `firmware/tests/test_event_receipt.c` additionally verify the canonical
+  server-to-firmware application receipt, exact payload-SHA binding, duplicate
+  replay and receipt-before-broker-ACK ordering. Target storage and exact BG95
+  receive/publish framing remain open.
 
 ## Open evidence
 
@@ -104,10 +107,10 @@ and clear online/network-valid flags.
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
 - reviewed Ed25519 backend and public-key provisioning, nonvolatile target-page
   binding/endurance, exact BG95 binary receive/publish framing, subscription and
-  publish-prompt handling, event application-ACK protocol and target outbox
-  storage/endurance binding; the portable fixed-memory
+  publish-prompt handling and target outbox storage/endurance binding; the
+  portable fixed-memory
   parser, topic/QoS/retain boundary, ACK codec and server-side canonical envelope,
-  QoS 1 retry and station-bound ACK path have host tests;
+  QoS 1 retry, command ACK path and event receipt path have host tests;
 - power-loss, network-loss, CGNAT, dual-SIM switching and 24-hour test logs after
   stations are assembled;
 - packet capture and broker/modem logs without secrets.

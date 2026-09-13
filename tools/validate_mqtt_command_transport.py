@@ -129,6 +129,7 @@ def main() -> int:
         "topic read zs/v1/evt/+/status",
         "topic write zs/v1/evt/+/down",
         "topic read zs/v1/evt/+/ack",
+        "topic write zs/v1/evt/+/receipt",
     }, "bridge ACL has missing or excessive rights")
     for station_id in range(1, 21):
         user = f"station{station_id:02d}"
@@ -137,6 +138,7 @@ def main() -> int:
             f"topic write zs/v1/evt/{station_id}/status",
             f"topic read zs/v1/evt/{station_id}/down",
             f"topic write zs/v1/evt/{station_id}/ack",
+            f"topic read zs/v1/evt/{station_id}/receipt",
         }, f"station {station_id} ACL has missing or excessive rights")
     require(set(sections) == {"bridge"} | {f"station{i:02d}" for i in range(1, 21)},
             "unexpected MQTT ACL identity")

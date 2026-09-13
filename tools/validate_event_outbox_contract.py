@@ -85,10 +85,10 @@ def main() -> int:
     ):
         require(token in icd, f"store-and-forward ICD detail missing: {token}")
     require("REQ-CELL-003" in requirements and
-            "PARTIAL_PASS_HOST_OUTBOX" in requirements,
+            "PARTIAL_PASS_HOST_OUTBOX_RECEIPT" in requirements,
             "REQ-CELL-003 does not report bounded host evidence")
     require(
-        "event_store_forward_outbox: PORTABLE_ATOMIC_SHA256_PRIORITY_QG1_QG2_PASS_TARGET_STORAGE_AND_APPLICATION_ACK_BINDING_PENDING"
+        "event_store_forward_outbox: PORTABLE_ATOMIC_SHA256_PRIORITY_QG1_QG2_PASS_TARGET_STORAGE_BINDING_PENDING"
         in target,
         "target status overclaims or omits portable outbox evidence",
     )
@@ -96,7 +96,7 @@ def main() -> int:
             "target outbox storage binding blocker is not explicit")
 
     print("Event store-and-forward outbox QG-1: PASS")
-    print("scope: portable atomic queue; target storage, server application ACK and hardware remain pending")
+    print("scope: portable atomic queue; target storage and hardware remain pending")
     return 0
 
 

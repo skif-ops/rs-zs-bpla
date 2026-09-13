@@ -16,6 +16,7 @@ Detection schema: `4`
 | `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | FIRMWARE_PORTABLE_BINARY_PATH_IMPLEMENTED; TARGET_CRYPTO_AND_BG95_AT_BINDING_PENDING |
 | `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | FIRMWARE_PORTABLE_BINARY_PATH_IMPLEMENTED; TARGET_CRYPTO_AND_BG95_AT_BINDING_PENDING |
+| `zs/v1/{tenant}/{station_id}/receipt` | server -> station | 1 | false | event application receipt | SERVER_AND_FIRMWARE_PORTABLE_PATH_IMPLEMENTED; BG95_AT_BINDING_PENDING |
 
 Client ID: `dioneya-{station_id}-{boot_id}`. Clean start запрещён после provisioning; session expiry и keepalive замораживаются после 24-часового теста сети. Повторная доставка QoS 1 ожидаема, дедупликация выполняется по `event_id`, а для команд по `command_id`.
 
@@ -117,6 +118,43 @@ On durable completion it returns the exact station `ack` topic and binary CBOR
 length at QoS 1 with `retain=false`. The BG95 UART layer must preserve arbitrary
 payload bytes, including NUL, and must not use C-string parsing. Its exact AT/URC
 framing and publish prompt integration remain target blockers.
+
+### 2.3 Event application receipt schema 1
+
+`receipt` is canonical CBOR limited to 128 bytes. It is published only for a
+schema-4 detection whose exact binary payload has completed server processing and
+whose ingestion state is durable. Its authenticity and station scope come from
+MQTT mutual TLS plus the per-station broker ACL; the receipt is not separately
+signed. The station accepts only its exact canonical topic at QoS 1 with
+`retain=false`.
+
+| Key | Field | Encoding |
+|---:|---|---|
+| 0 | schema version | uint, currently 1 |
+| 1 | message type | uint, receipt = 6 |
+| 2 | station_id | uint32, nonzero |
+| 3 | boot_id | uint32 |
+| 4 | seq_no | uint32 |
+| 5 | event_id | uint64, nonzero |
+| 6 | payload_sha256 | byte string, exactly 32 bytes |
+
+Before reclaiming an outbox slot, firmware verifies topic, QoS/retain, canonical
+encoding, `station_id`, `boot_id`, `seq_no`, `event_id` and `payload_sha256`
+against the still-pending item. An exact duplicate receipt is idempotent. A torn
+delivered-marker write leaves the event pending for at-least-once retry.
+
+The server stores the exact payload hash and processing state before publishing
+the receipt. A byte-identical broker redelivery after processing skips fusion
+side effects and republishes the same receipt. Reuse of an `event_id` with
+different metadata or payload hash is acknowledged and discarded without a
+receipt, preventing a poison-message loop. If receipt publication cannot be
+queued, the inbound MQTT message is not broker-ACKed and is eligible for retry.
+Server process state and MQTT callbacks must remain serialized per deployment;
+multi-worker receipt processing requires an equivalent transactional claim.
+
+The deterministic server-generated receipt vector is checked by both Python and
+C tests. Exact BG95 binary subscription/URC framing and target outbox storage are
+still release blockers; portable host evidence is not assembled-station evidence.
 
 ## 3. Detection compact CBOR
 
@@ -246,10 +284,12 @@ commit marker. Незавершённая запись после потери �
 128-битную one-way bitmap без erase текущего события.
 
 MQTT PUBACK не является application ACK. Станция помечает событие доставленным
-только после проверенного server application ACK; torn ACK marker остаётся pending,
-поэтому recovery имеет семантику at-least-once и может повторить тот же `event_id`.
-Серверная схема event application ACK, target storage binding, wear/endurance и
-аппаратная recovery-проверка пока открыты; portable QG не закрывает `REQ-CELL-003`.
+только после проверенного server application receipt из раздела 2.3; torn ACK
+marker остаётся pending, поэтому recovery имеет семантику at-least-once и может
+повторить тот же `event_id`. Серверная схема и portable firmware parser проходят
+host QG-1/QG-2. Exact BG95 receive binding, target storage binding,
+wear/endurance и аппаратная recovery-проверка пока открыты; portable QG не
+закрывает `REQ-CELL-003`.
 
 ## 7. Gate
 

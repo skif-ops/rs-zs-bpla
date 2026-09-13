@@ -35,6 +35,12 @@ APN/IP/шлюза/DNS активного PDP и последовательнос
 аппаратные доказательства зафиксированы в `BG95_MQTT_TLS_CONTRACT_REV_A.md`;
 это не снимает общий `TARGET_PORT_REQUIRED` и не является сетевым EVT PASS.
 
+Portable store-and-forward теперь дополнен серверным application receipt:
+сервер после durable processing публикует canonical CBOR с SHA-256 точного
+detection payload, а fixed-memory firmware parser проверяет topic, QoS/retain и
+полную identity события до маркировки outbox slot доставленным. Host QG не
+заменяет exact BG95 binary MQTT binding и аппаратный recovery test.
+
 Первый target-инкремент уже фиксирует точный исходный контракт
 `STM32U585VIT6Q/LQFP100`: 67 назначений из Rev.A pin map и AAD addendum,
 запрет внешнего HSE, 32.768 kHz reference и пять ещё не измеренных runtime

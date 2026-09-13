@@ -44,8 +44,10 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
 5. Нет load/reconnect/dedup теста для 20 реальных станций.
 6. Нет OTA repository, canary rollout, pause и rollback audit.
 7. ЧАСТИЧНО: portable event outbox атомарно сохраняет schema-4 CBOR, metadata,
-   SHA-256, приоритет и retry bitmap и проходит fault-injection. Открыты server
-   event application-ACK, target storage/endurance binding и аппаратный recovery.
+   SHA-256, приоритет и retry bitmap и проходит fault-injection. Серверная схема
+   application receipt и portable firmware parser проверяют точный payload hash,
+   station/event identity, QoS/retain и идемпотентный повтор. Открыты exact BG95
+   binding, target storage/endurance и аппаратный recovery.
 
 Закрыто в исходном baseline EVT-PRE-20: MQTT bridge теперь fail-closed и требует CA, client certificate и key. Plaintext разрешён только явным флагом `--insecure-bench`, который используется в отдельном development compose и проверяется отрицательными тестами.
 
@@ -64,8 +66,10 @@ production crypto/Flash binding/ACK publisher, provisioning public key и про
 на собранных станциях.
 
 Частично закрыт пункт 7: host outbox обеспечивает at-least-once и не вытесняет
-pending events, но MQTT PUBACK не считается удалённым подтверждением. До появления
-отдельного server application-ACK события после восстановления сети не удаляются.
+pending events, а server/portable-firmware application receipt подтверждает
+только exact payload после durable processing. MQTT PUBACK не считается таким
+подтверждением. До exact BG95/target binding события после восстановления сети
+не разрешено удалять в изделии.
 
 До закрытия пунктов сервер разрешён только для разработки или изолированного стенда. Публикация напрямую в интернет запрещена.
 

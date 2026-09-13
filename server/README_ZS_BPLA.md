@@ -97,10 +97,13 @@ commands. Command delivery uses QoS 1, retain false and durable retries until a
 station-bound application ACK or the 15-minute TTL. The checked-in ACL contains
 separate topic rights for station credentials 01 through 20.
 
-The firmware event outbox is host-tested, but production store-and-forward is
-not complete until the server event application-ACK schema and BG95/target
-storage bindings are implemented and verified on assembled stations. MQTT
-PUBACK alone must not authorize event reclamation.
+The server and portable firmware event-receipt path is host-tested: after durable
+detection processing the bridge publishes canonical CBOR on the station-specific
+`receipt` topic, bound to the exact uplink payload SHA-256. Byte-identical retries
+do not repeat fusion side effects. Production store-and-forward is not complete
+until BG95 binary receipt handling and target storage/endurance are implemented
+and verified on assembled stations. MQTT PUBACK alone must not authorize event
+reclamation.
 
 Full IMSI/ICCID is stored in the restricted station record. Do not expose the
 SQLite database or raw status payloads through logs, backups, diagnostics or the

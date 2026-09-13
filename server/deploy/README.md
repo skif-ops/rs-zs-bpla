@@ -19,6 +19,8 @@ isolated-bench configurations and must not be used for production.
 - MQTT over TLS 1.2+ on port 8883.
 - Per-station credentials or client certificates.
 - Server-side `station_id` authorization, rate limiting and replay protection.
+- Broker ACL permits the bridge to publish event application receipts and each
+  station credential to read only its own `receipt` topic.
 - Persistent database volume and backup policy.
 - Reverse proxy for the REST/WebSocket UI with HTTPS.
 - Station HTTP ingress disabled by default; production telemetry enters through

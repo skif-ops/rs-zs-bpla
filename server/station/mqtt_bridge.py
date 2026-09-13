@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import os
 from pathlib import Path
 import re
@@ -13,6 +14,7 @@ import paho.mqtt.client as mqtt
 
 from station.cbor_codec import decode_cbor, decode_detection_obj, decode_heartbeat_obj
 from station.command_codec import CommandSigner, decode_command_ack, encode_signed_command
+from station.event_receipt_codec import EventReceipt, encode_event_receipt
 from station.router import service, store
 from station.schemas import HeartbeatMessage
 
@@ -153,8 +155,34 @@ def process_message(
     detection = decode_detection_obj(obj)
     if detection.station_id != topic_station_id:
         raise ValueError("station_id mismatch between topic and detection")
-    fusion_service.ingest(detection)
-    return "stored"
+    wire_sha256 = hashlib.sha256(payload).digest()
+    ingress = event_store.begin_mqtt_detection(detection, wire_sha256)
+    if ingress == "conflict":
+        raise ValueError("conflicting reuse of detection event_id")
+    if ingress != "duplicate":
+        fusion_service.ingest(detection)
+        if not event_store.complete_mqtt_detection(detection, wire_sha256):
+            raise RuntimeError("detection ingress completion failed")
+    return "duplicate" if ingress == "duplicate" else "stored"
+
+
+def build_event_receipt(topic: str, payload: bytes, tenant: str) -> tuple[str, bytes]:
+    topic_station_id, kind = station_id_from_topic(topic, tenant)
+    if kind != "up":
+        raise ValueError("event receipt is valid only for detection uplink")
+    detection = decode_detection_obj(decode_cbor(payload))
+    if detection.station_id != topic_station_id:
+        raise ValueError("station_id mismatch between topic and detection")
+    receipt = encode_event_receipt(
+        EventReceipt(
+            station_id=detection.station_id,
+            boot_id=detection.boot_id,
+            seq_no=detection.seq_no,
+            event_id=detection.event_id,
+            payload_sha256=hashlib.sha256(payload).digest(),
+        )
+    )
+    return f"zs/v1/{tenant}/{topic_station_id}/receipt", receipt
 
 
 def publish_due_commands(
@@ -210,6 +238,8 @@ def handle_message(
     """Process then MQTT-ACK; discard invalid input but retry transient failures."""
 
     try:
+        if type(message.qos) is not int or message.qos != 1 or getattr(message, "retain", False):
+            raise ValueError("station MQTT delivery must be QoS 1 and non-retained")
         process_message(
             message.topic,
             message.payload,
@@ -218,6 +248,19 @@ def handle_message(
             event_store=event_store,
             fusion_service=fusion_service,
         )
+        _, kind = station_id_from_topic(message.topic, tenant)
+        if kind == "up":
+            receipt_topic, receipt_payload = build_event_receipt(
+                message.topic, message.payload, tenant
+            )
+            info = client.publish(
+                receipt_topic,
+                receipt_payload,
+                qos=1,
+                retain=False,
+            )
+            if info.rc != mqtt.MQTT_ERR_SUCCESS:
+                raise RuntimeError("event application receipt publish failed")
     except ValueError as exc:
         print(f"MQTT decode error: {exc}", file=sys.stderr)
         if message.qos:

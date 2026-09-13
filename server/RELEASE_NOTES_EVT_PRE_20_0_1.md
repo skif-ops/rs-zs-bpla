@@ -55,9 +55,13 @@
 - Portable event outbox атомарно сохраняет полный schema-4 CBOR с metadata CRC32
   и SHA-256, выбирает priority/FIFO, не вытесняет pending events и при torn ACK
   обеспечивает безопасную at-least-once повторную доставку.
+- Server/portable-firmware application receipt использует canonical CBOR,
+  station/boot/sequence/event binding и SHA-256 точных detection bytes. Сервер
+  сохраняет processing state до receipt, exact retry не повторяет fusion, а
+  firmware освобождает outbox slot только после строгой проверки receipt.
 - Открыты target MQTT subscription/URC binding, reviewed Ed25519 backend,
   provisioning public key, Flash/outbox storage/endurance binding, command ACK
-  publisher, server event application-ACK и аппаратный end-to-end;
+  publisher, BG95 event-receipt binding и аппаратный end-to-end;
   они не объявлены PASS до сборки станций.
 
 Изменение не закрывает security/deployment blockers из `EVT_PRE_20_RELEASE_AUDIT.md` и не является разрешением на internet-facing deployment.

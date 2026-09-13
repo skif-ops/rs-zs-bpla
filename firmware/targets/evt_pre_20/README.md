@@ -19,6 +19,9 @@ python tools/validate_installation_store_contract.py
 python tools/validate_installation_commissioning_contract.py
 python tools/audit_installation_commissioning_technical.py
 python tools/validate_event_outbox_contract.py
+python tools/validate_event_receipt_contract.py
+python tools/audit_event_receipt_technical.py
+python tools/generate_event_receipt_vector.py --check
 ```
 
 QG-1 checks completeness, ordering and SHA-256 traceability. QG-2 separately
@@ -75,6 +78,9 @@ CBOR with metadata CRC32 and payload SHA-256, orders pending events by priority
 then FIFO, persists up to 128 transmission attempts in a one-way bitmap, and
 never reclaims a pending event. Only a verified server application ACK may mark
 delivery; a torn marker intentionally causes safe at-least-once redelivery. Host
-fault-injection is QG-1/QG-2 evidence only. Target NOR/Flash allocation, wear and
-endurance, the server event-ACK protocol and assembled-station recovery remain
-release blockers.
+fault-injection is QG-1/QG-2 evidence only. The server now persists the exact
+detection-payload SHA-256 and processing state before publishing a canonical
+station-bound receipt; a fixed-memory firmware parser verifies the receipt and
+marks only the matching pending item delivered. Target NOR/Flash allocation,
+wear/endurance, exact BG95 receipt subscription/URC binding and assembled-station
+recovery remain release blockers.
