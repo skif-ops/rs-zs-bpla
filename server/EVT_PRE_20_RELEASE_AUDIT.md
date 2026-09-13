@@ -26,8 +26,11 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
 
 1. FastAPI station endpoints не имеют законченной взаимной аутентификации/authorization для internet-facing deployment.
 2. ЧАСТИЧНО: server-side MQTT downstream/ACK реализован с Ed25519, canonical
-   CBOR, TTL/retry до application ACK и тройной привязкой station_id. Открыты
-   firmware subscribe/parser/signature verification/ACK на целевом STM32 и
+   CBOR, TTL/retry до application ACK и тройной привязкой station_id. Portable
+   firmware codec разбирает и валидирует envelope через обязательные signature и
+   durable-dedup callbacks и формирует ACK; граница server/firmware закреплена
+   детерминированным Ed25519 vector. Открыты target MQTT binding, production
+   Ed25519 backend, public-key provisioning, durable result integration и
    hardware end-to-end evidence.
 3. ЗАКРЫТО: исходные диапазоны разрешены в хешированные Python 3.12 lockfiles;
    production image и CI используют `requirements.lock.txt` с
@@ -49,8 +52,9 @@ FastAPI напрямую в интернет.
 Частично закрыт пункт 2: production bridge публикует только подписанные команды,
 не считает broker QoS ACK прикладным подтверждением и безопасно отключает
 downstream без ключа. ACL разрешает каждой station credential только собственные
-`down`/`ack`. Полное закрытие возможно после реализации и target-теста приёмника
-команд в firmware, provisioning public key и проверки на собранных станциях.
+`down`/`ack`. Полное закрытие возможно после target-интеграции MQTT приёмника,
+production crypto/durable store/ACK publisher, provisioning public key и проверки
+на собранных станциях.
 
 До закрытия пунктов сервер разрешён только для разработки или изолированного стенда. Публикация напрямую в интернет запрещена.
 

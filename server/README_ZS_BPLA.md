@@ -20,6 +20,9 @@
 - optional MQTT/TLS bridge process;
 - signed MQTT command downstream with canonical CBOR, Ed25519, TTL/retry and
   station-bound application ACK; omitted signing key disables downstream;
+- portable firmware command codec with canonical fixed-memory parsing, strict
+  station/time/TTL checks, required signature and durable-dedup callbacks, ACK
+  encoding and a deterministic server-to-firmware Ed25519 test vector;
 - fail-closed station HTTP transport, enabled only on an isolated bench with
   exact opt-in `ZS_STATION_HTTP_INSECURE_BENCH=1`;
 - hierarchical family/type updates use only the latest 4-8 unique feature
@@ -48,7 +51,7 @@ OpenAPI: `http://localhost:8000/docs`
 pytest -q
 ```
 
-Current working branch: 100 full tests PASS.
+Current working branch: 131 full tests PASS.
 
 Dependency constraints, hashed locks and the reproducible CycloneDX SBOM are
 described in `DEPENDENCY_LOCK.md`.

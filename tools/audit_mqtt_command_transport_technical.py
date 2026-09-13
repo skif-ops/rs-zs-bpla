@@ -4,14 +4,19 @@
 from __future__ import annotations
 
 from contextlib import redirect_stderr
+import hashlib
 import io
+import re
 import sys
 import tempfile
 from pathlib import Path
 from types import SimpleNamespace
 
 import cbor2
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+    Ed25519PrivateKey,
+    Ed25519PublicKey,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +25,7 @@ sys.path.insert(0, str(ROOT / "server"))
 from station.command_codec import (  # noqa: E402
     CommandAck,
     CommandSigner,
+    decode_command_ack,
     decode_signed_command,
     encode_command_ack,
 )
@@ -59,7 +65,79 @@ def expect_value_error(action, text: str) -> None:
         raise AssertionError(f"expected rejection containing: {text}")
 
 
+def c_array(header: str, name: str) -> bytes:
+    match = re.search(
+        rf"static const uint8_t {re.escape(name)}\[(\d+)\] = \{{(.*?)\n\}};",
+        header,
+        re.DOTALL,
+    )
+    require(match is not None, f"generated vector array is missing: {name}")
+    value = bytes(
+        int(token, 16)
+        for token in re.findall(r"0x([0-9a-fA-F]{2})u", match.group(2))
+    )
+    require(
+        len(value) == int(match.group(1)),
+        f"generated vector size mismatch: {name}",
+    )
+    return value
+
+
+def audit_firmware_vector() -> None:
+    header = (ROOT / "firmware/generated/zs_command_vector.h").read_text(
+        encoding="utf-8"
+    )
+    payload = c_array(header, "zs_command_vector_payload")
+    signed_cbor = c_array(header, "zs_command_vector_signed_cbor")
+    public_raw = c_array(header, "zs_command_vector_public_key")
+    key_id = c_array(header, "zs_command_vector_key_id")
+    signature = c_array(header, "zs_command_vector_signature")
+    ack_payload = c_array(header, "zs_command_vector_ack")
+    envelope = cbor2.loads(payload)
+    require(cbor2.dumps(envelope, canonical=True) == payload,
+            "firmware vector envelope is not canonical CBOR")
+    require(
+        cbor2.dumps({key: envelope[key] for key in range(9)}, canonical=True)
+        == signed_cbor,
+        "firmware vector signed bytes do not match its envelope",
+    )
+    require(envelope[8] == key_id and envelope[9] == signature,
+            "firmware vector key/signature fields do not match")
+    require(hashlib.sha256(public_raw).digest()[:8] == key_id,
+            "firmware vector key ID is not bound to its public key")
+    Ed25519PublicKey.from_public_bytes(public_raw).verify(signature, signed_cbor)
+    decoded = decode_signed_command(
+        payload,
+        {key_id: Ed25519PublicKey.from_public_bytes(public_raw)},
+        now_us=1_500_000,
+    )
+    require(
+        decoded.station_id == 17
+        and decoded.payload
+        == {
+            "event_id": 42,
+            "segment": "both",
+            "start_offset_ms": None,
+            "duration_ms": None,
+        },
+        "firmware vector semantic payload mismatch",
+    )
+    ack = decode_command_ack(ack_payload)
+    require(
+        ack
+        == CommandAck(
+            station_id=17,
+            command_id="12345678-1234-5678-1234-567812345678",
+            result_code=0,
+            completed_time_us=1_750_000,
+            detail_code=0,
+        ),
+        "firmware ACK vector semantic payload mismatch",
+    )
+
+
 def main() -> int:
+    audit_firmware_vector()
     with tempfile.TemporaryDirectory(prefix="zs-command-qg2-") as directory:
         store = EventStore(Path(directory) / "events.sqlite3")
         signer = CommandSigner(Ed25519PrivateKey.generate())
@@ -94,7 +172,7 @@ def main() -> int:
         require(decoded.command_id == command.command_id, "signed UUID mismatch")
 
         tampered = cbor2.loads(payload)
-        tampered[7]["event_id"] = 992
+        tampered[7][0] = 992
         expect_value_error(
             lambda: decode_signed_command(
                 cbor2.dumps(tampered, canonical=True),
@@ -214,7 +292,7 @@ def main() -> int:
                 "transient error log is absent or exposes exception details")
 
     print("MQTT signed command transport QG-2: PASS")
-    print("scope: host runtime simulation; broker, firmware target and hardware evidence remain pending")
+    print("scope: host runtime + signed cross-language vector; target crypto/modem and hardware remain pending")
     return 0
 
 

@@ -1,6 +1,6 @@
 # BG95-M3 MQTT/TLS transport contract Rev.A
 
-Status: `HOST CONTRACT PASS / MODEM AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
+Status: `HOST CONTRACT + PORTABLE COMMAND CODEC PASS / TARGET CRYPTO, MODEM AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
 
 This contract extends the portable BG95 state machine from automatic SIM/network
 discovery to an outbound MQTT/TLS session. It does not claim that a particular
@@ -72,6 +72,11 @@ and clear online/network-valid flags.
   firmware heartbeat and verifies both full identifiers survive the CBOR boundary;
   server tests verify validation, restricted persistence, API masking and mTLS
   enforcement.
+- Command QG-1/QG-2: `tools/validate_mqtt_command_transport.py`, the independent
+  runtime audit, the deterministic server-generated Ed25519 vector and
+  `firmware/tests/test_command_transport.c` check canonical parsing, station/time
+  binding, fail-closed signature callback handling, durable-dedup requirement and
+  ACK encoding under the host build.
 
 ## Open evidence
 
@@ -80,9 +85,10 @@ and clear online/network-valid flags.
   selected BG95 firmware revision and every pilot operator, after stations are assembled;
 - certificate upload/provisioning and BG95 firmware-version compatibility;
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
-- target subscribe/parser, Ed25519 downstream signature validation, ACK publisher
-  and store-and-forward; the server-side canonical envelope, QoS 1 retry and
-  station-bound ACK path are implemented with host tests;
+- target MQTT subscription binding, production Ed25519 backend and public-key
+  provisioning, durable command-result integration, ACK publisher and
+  store-and-forward; the portable fixed-memory parser/ACK codec and server-side
+  canonical envelope, QoS 1 retry and station-bound ACK path have host tests;
 - power-loss, network-loss, CGNAT, dual-SIM switching and 24-hour test logs after
   stations are assembled;
 - packet capture and broker/modem logs without secrets.

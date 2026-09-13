@@ -14,8 +14,8 @@ Detection schema: `4`
 |---|---|---:|---:|---|---|
 | `zs/v1/{tenant}/{station_id}/up` | station -> server | 1 | false | detection compact CBOR | EXISTS |
 | `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
-| `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | HOST_SERVER_IMPLEMENTED; FIRMWARE_TARGET_PENDING |
-| `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | HOST_SERVER_IMPLEMENTED; FIRMWARE_TARGET_PENDING |
+| `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | FIRMWARE_CODEC_IMPLEMENTED; TARGET_CRYPTO_AND_MODEM_BINDING_PENDING |
+| `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | FIRMWARE_CODEC_IMPLEMENTED; TARGET_CRYPTO_AND_MODEM_BINDING_PENDING |
 
 Client ID: `dioneya-{station_id}-{boot_id}`. Clean start запрещён после provisioning; session expiry и keepalive замораживаются после 24-часового теста сети. Повторная доставка QoS 1 ожидаема, дедупликация выполняется по `event_id`, а для команд по `command_id`.
 
@@ -44,11 +44,24 @@ an explicit signing key is loaded.
 | 8 | signing key ID | first 8 bytes of SHA-256 over the raw Ed25519 public key |
 | 9 | signature | 64-byte Ed25519 signature over canonical keys 0..8 |
 
-The station must reject an unknown key ID, invalid signature, non-canonical
-encoding, wrong `station_id`, duplicate `command_id`, expired validity interval,
-unsupported command code or malformed payload before any side effect. Public-key
-provisioning and verification on the STM32 target remain open until the target
-receiver is bound and tested.
+`CMD_REQUEST_AUDIO` key 7 is a four-entry numeric map:
+
+| Sub-key | Field | Encoding |
+|---:|---|---|
+| 0 | event_id | uint64, nonzero |
+| 1 | segment | 0 pre, 1 post, 2 both, 3 range |
+| 2 | start_offset_ms | signed int32 for range, otherwise null |
+| 3 | duration_ms | positive uint32 for range, otherwise null |
+
+The portable station codec rejects an unknown/rejected key ID, invalid
+signature callback result, non-canonical encoding, wrong `station_id`, duplicate
+`command_id`, expired validity interval, unsupported command code or malformed
+payload before any side effect. It reconstructs the exact canonical keys 0..8
+in caller-owned fixed memory and wipes that workspace after verification. A
+deterministic server-generated Ed25519 vector locks the byte boundary in CI.
+Production public-key provisioning, the target Ed25519 backend and the BG95 MQTT
+subscription/receive binding remain open until the target receiver is integrated
+and tested.
 
 Execution is allowed only inside `[created_time_us, expires_time_us)`. A station
 without sufficiently trusted time must reject the remote command rather than
@@ -78,6 +91,11 @@ bridge uses manual MQTT acknowledgement: valid input is acknowledged only after
 processing and durable storage, malformed input is acknowledged and discarded
 to avoid a poison-message loop, while a transient processing/storage failure is
 left unacknowledged for broker redelivery.
+
+Firmware treats a successful decode as eligibility, not completion. The target
+integration must execute the request idempotently, persist the result against
+`command_id`, and only then publish the ACK. A duplicate must reuse the durable
+result without repeating the command side effect.
 
 ## 3. Detection compact CBOR
 

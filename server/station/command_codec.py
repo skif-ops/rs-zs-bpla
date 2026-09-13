@@ -27,6 +27,8 @@ MAX_COMMAND_TTL_US = 15 * 60 * 1_000_000
 COMMAND_CODES = {"CMD_REQUEST_AUDIO": 1}
 COMMAND_NAMES = {value: key for key, value in COMMAND_CODES.items()}
 ACK_RESULTS = {0: "OK", 1: "REJECTED", 2: "FAILED", 3: "EXPIRED"}
+AUDIO_SEGMENT_CODES = {"pre": 0, "post": 1, "both": 2, "range": 3}
+AUDIO_SEGMENT_NAMES = {value: key for key, value in AUDIO_SEGMENT_CODES.items()}
 
 
 @dataclass(frozen=True)
@@ -84,6 +86,61 @@ def _uuid_bytes(value: str) -> bytes:
         raise ValueError("command_id must be a UUID") from None
 
 
+def _audio_payload_to_wire(payload: dict) -> dict[int, object]:
+    allowed = {"event_id", "segment", "start_offset_ms", "duration_ms"}
+    if set(payload) - allowed:
+        raise ValueError("unsupported audio request payload field")
+    event_id = payload.get("event_id")
+    segment = payload.get("segment", "both")
+    start = payload.get("start_offset_ms")
+    duration = payload.get("duration_ms")
+    if type(event_id) is not int or not 0 < event_id <= 0xFFFFFFFFFFFFFFFF:
+        raise ValueError("audio request event_id is outside uint64 range")
+    if segment not in AUDIO_SEGMENT_CODES:
+        raise ValueError("unsupported audio request segment")
+    if start is not None and (
+        type(start) is not int or not -0x80000000 <= start <= 0x7FFFFFFF
+    ):
+        raise ValueError("audio request start_offset_ms is outside int32 range")
+    if duration is not None and (
+        type(duration) is not int or not 0 < duration <= 0xFFFFFFFF
+    ):
+        raise ValueError("audio request duration_ms is outside uint32 range")
+    if segment == "range":
+        if start is None or duration is None:
+            raise ValueError("range audio request requires offset and duration")
+    elif start is not None or duration is not None:
+        raise ValueError("offset and duration are allowed only for range audio request")
+    return {0: event_id, 1: AUDIO_SEGMENT_CODES[segment], 2: start, 3: duration}
+
+
+def _audio_payload_from_wire(payload: object) -> dict[str, object]:
+    if not isinstance(payload, dict) or set(payload) != set(range(4)):
+        raise ValueError("invalid audio request payload keys")
+    if type(payload[1]) is not int or payload[1] not in AUDIO_SEGMENT_NAMES:
+        raise ValueError("unsupported audio request segment code")
+    normalized = {
+        "event_id": payload[0],
+        "segment": AUDIO_SEGMENT_NAMES[payload[1]],
+        "start_offset_ms": payload[2],
+        "duration_ms": payload[3],
+    }
+    _audio_payload_to_wire(normalized)
+    return normalized
+
+
+def _command_payload_to_wire(command_name: str, payload: dict) -> dict[int, object]:
+    if command_name == "CMD_REQUEST_AUDIO":
+        return _audio_payload_to_wire(payload)
+    raise ValueError(f"unsupported command: {command_name}")
+
+
+def _command_payload_from_wire(command_name: str, payload: object) -> dict[str, object]:
+    if command_name == "CMD_REQUEST_AUDIO":
+        return _audio_payload_from_wire(payload)
+    raise ValueError(f"unsupported command: {command_name}")
+
+
 def _command_unsigned(command: StationCommand, key_id: bytes) -> dict[int, object]:
     if command.command not in COMMAND_CODES:
         raise ValueError(f"unsupported command: {command.command}")
@@ -106,7 +163,7 @@ def _command_unsigned(command: StationCommand, key_id: bytes) -> dict[int, objec
         4: command.created_time_us,
         5: command.expires_time_us,
         6: COMMAND_CODES[command.command],
-        7: command.payload,
+        7: _command_payload_to_wire(command.command, command.payload),
         8: key_id,
     }
 
@@ -157,14 +214,14 @@ def decode_signed_command(
         raise ValueError("invalid signed command integer fields")
     if type(obj[6]) is not int or obj[6] not in COMMAND_NAMES:
         raise ValueError("unsupported command code")
-    if not isinstance(obj[7], dict):
-        raise ValueError("command payload must be a map")
+    command_name = COMMAND_NAMES[obj[6]]
+    command_payload = _command_payload_from_wire(command_name, obj[7])
     try:
         command = StationCommand(
             command_id=str(uuid.UUID(bytes=obj[3])),
             station_id=obj[2],
-            command=COMMAND_NAMES[obj[6]],
-            payload=obj[7],
+            command=command_name,
+            payload=command_payload,
             created_time_us=obj[4],
             expires_time_us=obj[5],
         )

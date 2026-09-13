@@ -51,7 +51,7 @@ def test_signed_command_rejects_tamper_unknown_key_and_expiry():
     key = signer()
     encoded = encode_signed_command(command(), key)
     obj = cbor2.loads(encoded)
-    obj[7]["event_id"] = 43
+    obj[7][0] = 43
     tampered = cbor2.dumps(obj, canonical=True)
     with pytest.raises(ValueError, match="signature"):
         decode_signed_command(tampered, {key.key_id: key.public_key}, now_us=1_500_000)
@@ -110,6 +110,32 @@ def test_command_and_ack_reject_boolean_integer_confusion_and_long_ttl():
                 result_code=True,
                 completed_time_us=1,
             )
+        )
+
+
+def test_audio_payload_is_compact_numeric_and_range_is_unambiguous():
+    key = signer()
+    encoded = encode_signed_command(command(), key)
+    wire = cbor2.loads(encoded)
+    assert wire[7] == {0: 42, 1: 2, 2: None, 3: None}
+    ranged = command(
+        payload={
+            "event_id": 42,
+            "segment": "range",
+            "start_offset_ms": -5000,
+            "duration_ms": 10000,
+        }
+    )
+    decoded = decode_signed_command(
+        encode_signed_command(ranged, key),
+        {key.key_id: key.public_key},
+        now_us=1_500_000,
+    )
+    assert decoded.payload == ranged.payload
+    with pytest.raises(ValueError, match="requires offset"):
+        encode_signed_command(
+            command(payload={"event_id": 42, "segment": "range"}),
+            key,
         )
 
 

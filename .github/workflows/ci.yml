@@ -198,6 +198,8 @@ jobs:
         run: python tools/audit_station_http_transport_technical.py
       - name: QG-1 signed MQTT command transport contract
         run: python tools/validate_mqtt_command_transport.py
+      - name: Verify server-to-firmware signed command vector
+        run: python tools/generate_mqtt_command_vector.py --check
       - name: QG-2 independent MQTT command runtime audit
         run: python tools/audit_mqtt_command_transport_technical.py
       - name: Full pytest

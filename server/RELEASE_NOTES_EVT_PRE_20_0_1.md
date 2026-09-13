@@ -36,7 +36,12 @@
 - Production bridge не публикует unsigned-команды и требует owner-only signing
   key; Docker build context исключает TLS private keys. Broker ACL разделён для
   20 station credentials и разрешает каждой станции только собственные topics.
-- Firmware subscribe/parser/Ed25519 verifier/ACK и аппаратный end-to-end остаются
-  открытыми до сборки станций и не объявлены PASS.
+- В portable firmware реализованы fixed-memory canonical CBOR parser команд и
+  encoder ACK: station/time/TTL binding, точное восстановление подписанных байтов,
+  обязательные callback проверки Ed25519 и durable dedup. Межъязыковой
+  server-generated Ed25519 vector проверяется Python и C тестами.
+- Открыты target MQTT subscription/URC binding, production Ed25519 backend,
+  provisioning public key, durable result/ACK publisher и аппаратный end-to-end;
+  они не объявлены PASS до сборки станций.
 
 Изменение не закрывает security/deployment blockers из `EVT_PRE_20_RELEASE_AUDIT.md` и не является разрешением на internet-facing deployment.

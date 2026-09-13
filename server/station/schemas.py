@@ -4,7 +4,7 @@ from __future__ import annotations
 from enum import IntEnum
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 FEATURE_COUNT = 43
 
@@ -387,10 +387,21 @@ class SecurityEventMessage(BaseModel):
 
 
 class AudioRequest(BaseModel):
-    event_id: int
+    event_id: int = Field(strict=True, ge=1, le=0xFFFFFFFFFFFFFFFF)
     segment: Literal["pre", "post", "both", "range"] = "both"
-    start_offset_ms: int | None = None
-    duration_ms: int | None = None
+    start_offset_ms: int | None = Field(
+        default=None, strict=True, ge=-0x80000000, le=0x7FFFFFFF
+    )
+    duration_ms: int | None = Field(default=None, strict=True, ge=1, le=0xFFFFFFFF)
+
+    @model_validator(mode="after")
+    def validate_range_fields(self):
+        if self.segment == "range":
+            if self.start_offset_ms is None or self.duration_ms is None:
+                raise ValueError("range requires start_offset_ms and duration_ms")
+        elif self.start_offset_ms is not None or self.duration_ms is not None:
+            raise ValueError("offset and duration are allowed only for range")
+        return self
 
 
 class StationCommand(BaseModel):
