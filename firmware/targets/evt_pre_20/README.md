@@ -22,6 +22,8 @@ python tools/validate_event_outbox_contract.py
 python tools/validate_event_receipt_contract.py
 python tools/audit_event_receipt_technical.py
 python tools/generate_event_receipt_vector.py --check
+python tools/validate_dual_sim_failover_contract.py
+python tools/audit_dual_sim_failover_technical.py
 ```
 
 QG-1 checks completeness, ordering and SHA-256 traceability. QG-2 separately
@@ -111,6 +113,13 @@ single fail-closed bind API creates all three adapters from that layout and caps
 the archive-visible storage at the journal boundary. Production slot counts,
 target memory-map/OCTOSPI binding and wear/endurance remain release blockers.
 Real sample identity/QE and power-loss behavior remain hardware gates.
+The portable dual-SIM controller now enforces the audited, queue-preserving
+single-standby sequence: 20 ms DET debounce, three attempts per profile,
+900-second hold, authenticated manual changes, graceful modem-off and mux
+/High-Z confirmation before slot select, 30 ms stable power-good, exact full
+provisioned ICCID and attach/DNS/TLS before resume. The target still needs the
+STM32 GPIO/modem-power/audit/profile binding and assembled-station fault and
+100-cycle evidence; operator and 24-hour EVT remain deferred until assembly.
 The portable BG95 uplink now emits fixed-length `QMTPUB`, waits for the data
 prompt and writes exact binary CBOR bytes; partial UART writes, wrong result URCs,
 offline transitions and timeout retain the pending event. Broker success still

@@ -70,6 +70,12 @@ and clear online/network-valid flags.
   network APN and catalog-fallback paths, unknown-SIM/APN-mismatch rejection,
   full-identity export, public/private policy, TLS-only ports, timeout and modem
   negative-result paths under the host build.
+- Dual-SIM QG-1/QG-2: `tools/validate_dual_sim_failover_contract.py` and
+  `tools/audit_dual_sim_failover_technical.py` verify the separate portable
+  action controller, including DET debounce, bounded attempts and hold,
+  authenticated/audited changes, modem-off/mux-High-Z order, exact provisioned
+  ICCID and attach/DNS/TLS before preserved-queue resume. Target GPIO, modem
+  power, audit/profile binding and assembled-station evidence remain open.
 - End-to-end QG-2: `server/tools/test_firmware_packet.py` decodes the actual
   firmware heartbeat and verifies both full identifiers survive the CBOR boundary;
   server tests verify validation, restricted persistence, API masking and mTLS

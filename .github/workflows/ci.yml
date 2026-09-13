@@ -66,6 +66,10 @@ jobs:
         run: python tools/validate_ru868_firmware_profile.py
       - name: Cross-check BG95 public-APN MQTT TLS host contract
         run: python tools/validate_bg95_transport_contract_rev_a.py
+      - name: QG-1 portable dual-SIM safe failover contract
+        run: python tools/validate_dual_sim_failover_contract.py
+      - name: QG-2 independent dual-SIM state-machine audit
+        run: python tools/audit_dual_sim_failover_technical.py
       - name: QG-1 protected cellular heartbeat traceability
         run: python tools/validate_cellular_heartbeat_contract_rev_a.py
       - name: QG-1 portable event store-and-forward outbox

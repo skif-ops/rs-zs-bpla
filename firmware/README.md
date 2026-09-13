@@ -35,6 +35,18 @@ APN/IP/шлюза/DNS активного PDP и последовательнос
 аппаратные доказательства зафиксированы в `BG95_MQTT_TLS_CONTRACT_REV_A.md`;
 это не снимает общий `TARGET_PORT_REQUIRED` и не является сетевым EVT PASS.
 
+Portable dual-SIM controller теперь отделяет проверяемую host-политику от
+будущего target GPIO binding. Он принимает слот только после 20 ms DET debounce,
+ограничивает профиль тремя попытками и 900-second hold, требует authenticated
+manual assertion и audit intent/commit. При активном переключении новый слот не
+может быть выбран до остановки трафика, сохранения очереди, штатного выключения
+BG95, подтверждения mux High-Z и отключения modem rail. После включения
+обязательны стабильный `PWR_GOOD` не менее 30 ms, 700 ms PWRKEY, полное совпадение
+provisioned ICCID и attach/DNS/TLS до resume прежних event IDs. Любая ошибка,
+brownout или debounced removal переводит controller в safe-off request. Это
+host QG-1/QG-2, а не доказательство GPIO, реальных SIM, 100 циклов, операторов
+или 24-часовой работы станции.
+
 Portable store-and-forward теперь дополнен серверным application receipt:
 сервер после durable processing публикует canonical CBOR с SHA-256 точного
 detection payload, а fixed-memory firmware parser проверяет topic, QoS/retain и
