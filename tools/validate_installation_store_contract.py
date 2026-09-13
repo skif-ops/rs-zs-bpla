@@ -36,10 +36,12 @@ def main() -> int:
     ):
         require(token in header, f"installation store interface missing {token}")
     for token in (
+        "RECORD_FORMAT UINT16_C(2)",
         "RECORD_CRC_OFFSET",
         "RECORD_COMMIT_OFFSET",
         "crc32",
         "generation_newer",
+        "zs_installation_record_hash_valid",
         "ZS_INSTALLATION_STORE_VERSION_REJECTED",
         "ZS_INSTALLATION_STORE_VERIFY_FAILED",
     ):
@@ -50,6 +52,7 @@ def main() -> int:
         "ZS_INSTALLATION_STORE_LOCKED",
         "ZS_INSTALLATION_STORE_VERSION_REJECTED",
         "Corrupt hash payload without updating CRC",
+        "commissioning_hash[0] ^= 0x80u",
     ):
         require(token in test, f"installation store QG-2 case missing {token}")
     require("zs_installation_store_tests" in cmake and "installation_store" in cmake,

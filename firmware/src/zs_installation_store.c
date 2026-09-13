@@ -1,13 +1,16 @@
 #include "zs_installation_store.h"
 
+#include "zs_sha256.h"
+
 #include <string.h>
 
 #define RECORD_MAGIC UINT32_C(0x3150535a) /* ZSP1 */
 #define RECORD_COMMIT UINT32_C(0x54494d43) /* CMIT */
-#define RECORD_FORMAT UINT16_C(1)
+#define RECORD_FORMAT UINT16_C(2)
 #define RECORD_PAYLOAD_BYTES UINT16_C(74)
 #define RECORD_CRC_OFFSET 82u
 #define RECORD_COMMIT_OFFSET 86u
+#define RECORD_HASH_INPUT_BYTES 58u
 
 static uint16_t get_u16(const uint8_t *p) {
   return (uint16_t)((uint16_t)p[0] | ((uint16_t)p[1] << 8));
@@ -37,6 +40,22 @@ static void put_u64(uint8_t *p, uint64_t value) {
   for (unsigned i = 0u; i < 8u; i++) p[i] = (uint8_t)(value >> (8u * i));
 }
 
+static void put_be16(uint8_t *p, uint16_t value) {
+  p[0] = (uint8_t)(value >> 8);
+  p[1] = (uint8_t)value;
+}
+
+static void put_be32(uint8_t *p, uint32_t value) {
+  p[0] = (uint8_t)(value >> 24);
+  p[1] = (uint8_t)(value >> 16);
+  p[2] = (uint8_t)(value >> 8);
+  p[3] = (uint8_t)value;
+}
+
+static void put_be64(uint8_t *p, uint64_t value) {
+  for (unsigned i = 0u; i < 8u; i++) p[7u - i] = (uint8_t)(value >> (8u * i));
+}
+
 static uint32_t crc32(const uint8_t *data, size_t size) {
   uint32_t crc = UINT32_MAX;
   for (size_t i = 0u; i < size; i++) {
@@ -48,10 +67,44 @@ static uint32_t crc32(const uint8_t *data, size_t size) {
   return ~crc;
 }
 
-static bool hash_present(const uint8_t hash[ZS_INSTALLATION_HASH_BYTES]) {
-  uint8_t combined = 0u;
-  for (size_t i = 0u; i < ZS_INSTALLATION_HASH_BYTES; i++) combined |= hash[i];
-  return combined != 0u;
+bool zs_installation_record_compute_hash(
+    const zs_installation_record_t *record,
+    uint8_t hash[ZS_INSTALLATION_HASH_BYTES]) {
+  static const uint8_t domain[] = {
+      'Z', 'S', '-', 'I', 'N', 'S', 'T', 'A', 'L', 'L', 'A', 'T', 'I', 'O', 'N', '-', 'V', '1'};
+  uint8_t bytes[RECORD_HASH_INPUT_BYTES] = {0};
+  _Static_assert(sizeof(domain) == 18u, "installation hash domain length drift");
+  if (record == NULL || hash == NULL) return false;
+  memcpy(bytes, domain, sizeof(domain));
+  bytes[18] = 1u;
+  bytes[19] = record->trust.configured ? 1u : 0u;
+  bytes[20] = record->trust.locked ? 1u : 0u;
+  bytes[21] = record->source;
+  bytes[22] = record->trust.installation.altitude_source;
+  bytes[23] = record->trust.installation.position_source;
+  put_be32(&bytes[24], record->version);
+  put_be32(&bytes[28], (uint32_t)record->trust.installation.lat_e7);
+  put_be32(&bytes[32], (uint32_t)record->trust.installation.lon_e7);
+  put_be32(&bytes[36], (uint32_t)record->trust.installation.alt_dm);
+  put_be16(&bytes[40], record->trust.installation.pos_accuracy_m);
+  put_be16(&bytes[42], record->trust.warning_distance_m);
+  put_be16(&bytes[44], record->trust.suspect_distance_m);
+  put_be16(&bytes[46], record->trust.gross_jump_distance_m);
+  bytes[48] = record->trust.warning_consecutive_fixes;
+  bytes[49] = record->trust.suspect_consecutive_fixes;
+  put_be64(&bytes[50], record->commissioned_time_us);
+  zs_sha256_digest(bytes, sizeof(bytes), hash);
+  return true;
+}
+
+bool zs_installation_record_hash_valid(const zs_installation_record_t *record) {
+  uint8_t expected[ZS_INSTALLATION_HASH_BYTES];
+  uint8_t difference = 0u;
+  if (record == NULL || !zs_installation_record_compute_hash(record, expected)) return false;
+  for (size_t i = 0u; i < sizeof(expected); i++) {
+    difference |= (uint8_t)(record->commissioning_hash[i] ^ expected[i]);
+  }
+  return difference == 0u;
 }
 
 static bool record_valid(const zs_installation_record_t *record) {
@@ -71,7 +124,7 @@ static bool record_valid(const zs_installation_record_t *record) {
          trust->gross_jump_distance_m > trust->suspect_distance_m && trust->gross_jump_distance_m <= 5000u &&
          trust->warning_consecutive_fixes >= 1u && trust->warning_consecutive_fixes <= 60u &&
          trust->suspect_consecutive_fixes >= trust->warning_consecutive_fixes &&
-         trust->suspect_consecutive_fixes <= 120u && hash_present(record->commissioning_hash);
+         trust->suspect_consecutive_fixes <= 120u && zs_installation_record_hash_valid(record);
 }
 
 static void encode_record(

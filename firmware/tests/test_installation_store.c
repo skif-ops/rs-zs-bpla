@@ -60,9 +60,7 @@ static zs_installation_record_t valid_record(uint32_t version) {
   record.version = version;
   record.commissioned_time_us = UINT64_C(2000000000000000) + version;
   record.source = 0u;
-  for (size_t i = 0u; i < ZS_INSTALLATION_HASH_BYTES; i++) {
-    record.commissioning_hash[i] = (uint8_t)(i + version);
-  }
+  assert(zs_installation_record_compute_hash(&record, record.commissioning_hash));
   return record;
 }
 
@@ -110,6 +108,9 @@ int main(void) {
   assert(zs_installation_store_commit(&io, &invalid, true, true, true) == ZS_INSTALLATION_STORE_INVALID_RECORD);
   invalid = valid_record(3u);
   memset(invalid.commissioning_hash, 0, sizeof(invalid.commissioning_hash));
+  assert(zs_installation_store_commit(&io, &invalid, true, true, true) == ZS_INSTALLATION_STORE_INVALID_RECORD);
+  invalid = valid_record(3u);
+  invalid.commissioning_hash[0] ^= 0x80u;
   assert(zs_installation_store_commit(&io, &invalid, true, true, true) == ZS_INSTALLATION_STORE_INVALID_RECORD);
   invalid = valid_record(3u);
   invalid.source = 4u;

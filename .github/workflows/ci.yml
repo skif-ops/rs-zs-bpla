@@ -72,6 +72,10 @@ jobs:
         run: python tools/validate_hierarchy_consensus_contract.py
       - name: QG-1 installation position persistence contract
         run: python tools/validate_installation_store_contract.py
+      - name: QG-1 local installation commissioning contract
+        run: python tools/validate_installation_commissioning_contract.py
+      - name: QG-2 independent installation commissioning audit
+        run: python tools/audit_installation_commissioning_technical.py
       - name: Verify generated STM32 target contract is current
         run: python tools/generate_evt_pre_20_target_contract.py --check
       - name: QG-1 target contract completeness and traceability

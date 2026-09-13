@@ -59,3 +59,12 @@ Portable слой хранения installation position реализует ат
 physical-service/authenticated-role gates. Host QG не закрывает привязку этих
 слотов к страницам STM32 Flash, ресурс перезаписи и power-loss fault injection
 на фактической плате.
+
+Portable слой commissioning принимает изменение installation position только
+из локального BLE-origin после BLE Secure Connections, проверки peer identity
+и физического сервисного окна не более 10 минут. Обычная installer-роль может
+использовать только locked policy defaults; нестандартная trust policy требует
+engineer-роли. Станция сама вычисляет канонический SHA-256, требует audit intent
+до записи и audit committed после read-back. Это ещё не nRF52840/GATT binding:
+UUID, pairing transport, сервисный таймер и durable audit backend проверяются на
+целевой связке STM32+nRF и остаются release blocker.

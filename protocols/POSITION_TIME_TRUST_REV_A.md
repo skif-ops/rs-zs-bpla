@@ -1,6 +1,6 @@
 # EVT-PRE-20 Rev.A — доверенные координаты установки и GNSS integrity
 
-Статус: `LOCKED ARCHITECTURE / PORTABLE STORE IMPLEMENTED / FLASH+BLE BINDING OPEN`
+Статус: `LOCKED ARCHITECTURE / PORTABLE STORE+BLE GUARD IMPLEMENTED / FLASH+NRF GATT BINDING OPEN`
 
 Основание: `DEC-018`.
 
@@ -106,6 +106,10 @@ commit-marker записывается последней операцией. П
 read-back, CRC и сравнение полей. При сбое питания до commit-marker предыдущий
 слот остаётся авторитетным.
 
+Storage format `2` требует не просто ненулевой commissioning hash, а точное
+совпадение со станционным каноническим SHA-256. Предыдущий host-only format `1`
+не мигрируется и отклоняется; серийных/EVT-станций с ним ещё не создавалось.
+
 Первая запись и recommission разрешены только при одновременно активном
 физическом service mode и подтверждённой локальной роли. Для locked-записи
 recommission должен быть указан явно, а `version` обязан монотонно увеличиваться.
@@ -116,6 +120,25 @@ CRC не заменяет BLE Secure Connections, авторизацию рол�
 hash. Текущий модуль задаёт переносимый формат и power-loss-safe алгоритм;
 STM32 Flash binding, адреса страниц, endurance и fault-injection на целевой плате
 остаются открытыми до target port и аппаратного EVT.
+
+### 6.2 Portable BLE commissioning guard
+
+Перед storage-модулем добавлена transport-independent граница, предназначенная
+для будущей привязки nRF52840 GATT к STM32. Она отклоняет MQTT/HTTPS origin,
+требует BLE Secure Connections, проверенного peer, авторизованной роли,
+физического service mode и возраста окна не более 600000 ms. Настройки trust,
+отличные от defaults 25/75/250 m и 3/10 fixes, доступны только engineer-роли.
+
+Приложение не назначает доверенный hash. Станция вычисляет SHA-256 по 58-байтной
+канонической big-endian записи с domain `ZS-INSTALLATION-V1`; storage generation
+и само поле hash в digest не входят. Audit intent обязан сохраниться до erase,
+после atomic commit выполняются load/read-back, повторная проверка hash и audit
+committed. Если audit finalize не подтверждён после уже выполненной записи,
+возвращается отдельное состояние, и FIELD_READY остаётся запрещённым.
+
+Portable guard не подтверждает UUID/MTU, nRF52840 firmware, UART binding,
+реальный service-mode timer или durable audit storage. Эти части и аппаратное
+fault injection остаются открытыми.
 
 ## 7. BLE configuration objects
 

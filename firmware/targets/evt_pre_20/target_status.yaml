@@ -136,7 +136,7 @@ positioning:
   firmware_module: zs_position_trust
   wifi_positioning: NOT_REQUIRED
   installation_position_storage: PORTABLE_ATOMIC_DUAL_SLOT_QG1_QG2_PASS_FLASH_BINDING_PENDING
-  installation_position_ble_commissioning: MISSING_BLOCKER
+  installation_position_ble_commissioning: PORTABLE_LOCAL_BLE_GUARD_QG1_QG2_PASS_NRF_GATT_PENDING
   configured_position_required_for_field_ready: true
   default_warning_distance_m: 25
   default_suspect_distance_m: 75

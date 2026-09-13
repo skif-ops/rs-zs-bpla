@@ -16,6 +16,8 @@ python tools/import_evt_pre_20_stm32_vendor.py --check
 python tools/validate_evt_pre_20_stm32_scaffold.py
 python tools/audit_evt_pre_20_stm32_scaffold_technical.py
 python tools/validate_installation_store_contract.py
+python tools/validate_installation_commissioning_contract.py
+python tools/audit_installation_commissioning_technical.py
 ```
 
 QG-1 checks completeness, ordering and SHA-256 traceability. QG-2 separately
@@ -48,3 +50,9 @@ The portable installation-position store now provides a two-slot atomic record,
 CRC, last-write commit marker, monotonic recommission version and read-back. Its
 QG-1/QG-2 host result does not define STM32 Flash page addresses or close target
 power-loss/endurance testing; that binding remains a target-port blocker.
+
+The portable commissioning boundary now rejects MQTT/HTTPS coordinate writes,
+requires an authenticated local BLE peer and a physical 10-minute service
+window, computes the canonical record SHA-256 on the station, and brackets each
+write with audit intent/commit callbacks. The nRF52840 GATT implementation,
+durable audit backend and target service-window timer remain open target work.

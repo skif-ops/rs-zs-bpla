@@ -44,6 +44,12 @@ zs_installation_store_result_t zs_installation_store_load(
     zs_installation_record_t *record,
     uint8_t *active_slot);
 
+bool zs_installation_record_compute_hash(
+    const zs_installation_record_t *record,
+    uint8_t hash[ZS_INSTALLATION_HASH_BYTES]);
+
+bool zs_installation_record_hash_valid(const zs_installation_record_t *record);
+
 zs_installation_store_result_t zs_installation_store_commit(
     const zs_installation_store_io_t *io,
     const zs_installation_record_t *record,
