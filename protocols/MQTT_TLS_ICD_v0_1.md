@@ -14,8 +14,8 @@ Detection schema: `4`
 |---|---|---:|---:|---|---|
 | `zs/v1/{tenant}/{station_id}/up` | station -> server | 1 | false | detection compact CBOR | PORTABLE_BG95_FIXED_LENGTH_BINARY_QMTPUB_QG_PASS; TARGET_UART_AND_HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
-| `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | FIRMWARE_PORTABLE_BINARY_PATH_IMPLEMENTED; TARGET_CRYPTO_AND_BG95_AT_BINDING_PENDING |
-| `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | FIRMWARE_PORTABLE_BINARY_PATH_IMPLEMENTED; TARGET_CRYPTO_AND_BG95_AT_BINDING_PENDING |
+| `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | PORTABLE_BG95_LENGTH_URC_FIXED_LENGTH_ACK_QG_PASS; TARGET_CRYPTO_UART_RETAIN_POLICY_AND_HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | PORTABLE_BG95_LENGTH_URC_FIXED_LENGTH_ACK_QG_PASS; TARGET_CRYPTO_UART_RETAIN_POLICY_AND_HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/receipt` | server -> station | 1 | false | event application receipt | PORTABLE_BG95_LENGTH_DELIMITED_QMTRECV_QG_PASS; TARGET_UART_RETAIN_POLICY_AND_HARDWARE_PENDING |
 
 Client ID: `dioneya-{station_id}-{boot_id}`. Clean start запрещён после provisioning; session expiry и keepalive замораживаются после 24-часового теста сети. Повторная доставка QoS 1 ожидаема, дедупликация выполняется по `event_id`, а для команд по `command_id`.
@@ -63,9 +63,10 @@ deterministic server-generated Ed25519 vector locks the byte boundary in CI.
 The portable trust adapter supports a bounded rotation set of four public keys,
 derives each key ID from the raw key, rejects duplicates, zero keys, disabled-only
 sets and unknown IDs, and delegates the actual signature operation to a required
-backend. Production key provisioning, a reviewed target Ed25519 backend and the
-BG95 MQTT subscription/receive binding remain open until the target receiver is
-integrated and tested.
+backend. Production key provisioning, a reviewed target Ed25519 backend and
+target UART integration remain open. The portable BG95
+subscription/receive/ACK path has host evidence only and is not a production
+crypto or assembled-station PASS.
 
 Execution is allowed only inside `[created_time_us, expires_time_us)`. A station
 without sufficiently trusted time must reject the remote command rather than
@@ -115,9 +116,27 @@ The portable MQTT boundary consumes a complete binary publication as independent
 station `down` topic at QoS 1 with `retain=false`, so wrong-tenant, wrong-station,
 leading-zero and trailing-NUL topic variants never reach command verification.
 On durable completion it returns the exact station `ack` topic and binary CBOR
-length at QoS 1 with `retain=false`. The BG95 UART layer must preserve arbitrary
-payload bytes, including NUL, and must not use C-string parsing. Its exact AT/URC
-framing and publish prompt integration remain target blockers.
+length at QoS 1 with `retain=false`.
+
+The portable BG95 command binding requires the pre-`QMTOPEN` length-enabled
+receive mode, then subscribes to the exact `down` topic with QoS 1. It parses a
+complete `+QMTRECV` by explicit topic/payload bounds, so NUL, quote, CR/LF and
+`0x1a` inside the signed CBOR do not terminate the command. Only after signature
+verification, journal `ACCEPTED`, idempotent execution, journal `COMPLETED` and
+durable ACK reconstruction does it issue
+`AT+QMTPUB=<client>,<msgID>,1,0,"<ack-topic>",<ack-len>`, wait for `>` and write
+exactly `<ack-len>` bytes without Ctrl+Z. Partial UART, timeout and mismatched
+result paths invalidate the modem transport. A completed duplicate recreates
+the same ACK without repeating execution.
+
+The `+QMTRECV` URC exposes no retain flag, so command initialization requires
+the same externally verified station credential, exact ACL, server-only
+publisher and non-retained-route assertion described below. While one ACK is
+awaiting prompt/result, the adapter reports `BUSY`; the target UART dispatcher
+must serialize or queue complete URCs. The server continues to republish a
+command until its application ACK, so a transport failure does not authorize
+loss or a repeated side effect. Target UART scheduling, selected-modem firmware,
+broker policy and hardware recovery remain blockers.
 
 ### 2.3 Event application receipt schema 1
 
@@ -338,8 +357,9 @@ MQTT PUBACK не является application ACK. Станция помечае
 только после проверенного server application receipt из раздела 2.3; torn ACK
 marker остаётся pending, поэтому recovery имеет семантику at-least-once и может
 повторить тот же `event_id`. Серверная схема и portable firmware parser проходят
-host QG-1/QG-2. Exact BG95 receive binding, production outbox slot count,
-target OCTOSPI binding, wear/endurance и аппаратная recovery-проверка пока открыты; portable QG не
+host QG-1/QG-2. Portable BG95 receive binding также проходит host QG;
+production outbox slot count, target UART/OCTOSPI binding, retain policy,
+wear/endurance и аппаратная recovery-проверка пока открыты; portable QG не
 закрывает `REQ-CELL-003`.
 
 ## 7. Gate

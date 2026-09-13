@@ -33,9 +33,13 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    accepted/completed до ACK, а bounded trust adapter fail-closed выбирает
    provisioned public key. Portable application channel объединяет эти стадии и
    идемпотентный executor; portable binary MQTT boundary уже проверяет точный
-   topic, QoS/retain и длину payload. Открыты target MQTT binding, reviewed
-   Ed25519 backend, public-key provisioning, Flash page/endurance binding и
-   hardware end-to-end evidence.
+   topic, QoS/retain и длину payload. Portable BG95 binding использует
+   length-delimited `QMTRECV`, exact QoS-1 `down` subscription и fixed-length
+   `QMTPUB` durable ACK; UART failure сохраняет completed journal result, а
+   server retry не повторяет side effect. Из-за отсутствия retain-флага в URC
+   init требует внешний server-only/non-retained ACL contract. Открыты target
+   UART scheduling, reviewed Ed25519 backend, public-key provisioning, Flash
+   page/endurance binding, broker-policy и hardware end-to-end evidence.
 3. ЗАКРЫТО: исходные диапазоны разрешены в хешированные Python 3.12 lockfiles;
    production image и CI используют `requirements.lock.txt` с
    `--require-hashes`, а `sbom/server.cdx.json` воспроизводимо генерируется из
@@ -56,7 +60,7 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    connect требует успех этого шага, выполняет exact QoS-1 subscription и
    binary-safe parser. Поскольку `+QMTRECV` не показывает retain-флаг, init
    требует внешний station ACL/server-only/non-retained contract. Открыты
-   production slot count, command downlink, target UART routing и проверка этого
+   production slot count, target UART routing/scheduling и проверка этого
    broker contract. Fixed-length BG95 event
    `QMTPUB`/prompt/binary/result path проходит host QG и не трактует PUBACK как
    application receipt. Target memory-map/OCTOSPI/endurance и аппаратный recovery
@@ -74,9 +78,9 @@ FastAPI напрямую в интернет.
 Частично закрыт пункт 2: production bridge публикует только подписанные команды,
 не считает broker QoS ACK прикладным подтверждением и безопасно отключает
 downstream без ключа. ACL разрешает каждой station credential только собственные
-`down`/`ack`. Полное закрытие возможно после target-интеграции MQTT приёмника,
-production crypto/Flash binding/ACK publisher, provisioning public key и проверки
-на собранных станциях.
+`down`/`ack`. Portable BG95 receive/ACK binding проходит host QG. Полное закрытие
+возможно после target UART integration, production crypto/Flash binding,
+provisioning public key, broker-policy и проверки на собранных станциях.
 
 Частично закрыт пункт 7: host outbox обеспечивает at-least-once и не вытесняет
 pending events, а server/portable-firmware application receipt подтверждает

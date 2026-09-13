@@ -52,6 +52,11 @@
 - Portable binary MQTT boundary принимает topic и CBOR только с точными длинами,
   проверяет canonical tenant/station topic, QoS 1 и `retain=false`, затем выдаёт
   ACK topic/payload только после durable completion.
+- Portable BG95 command binding подписывается на exact `down` с QoS 1,
+  разбирает length-delimited binary `QMTRECV` и публикует journal-backed ACK
+  через fixed-length `QMTPUB`. При UART failure server retry восстанавливает ACK
+  без повторного выполнения; target UART serialization и внешний
+  server-only/non-retained ACL contract остаются обязательными.
 - Portable event outbox атомарно сохраняет полный schema-4 CBOR с metadata CRC32
   и SHA-256, выбирает priority/FIFO, не вытесняет pending events и при torn ACK
   обеспечивает безопасную at-least-once повторную доставку.
@@ -77,9 +82,9 @@
   хвосте и QG-проверяет их непересечение; shared bind API создаёт оба adapter-а
   из одного layout и обрезает archive storage на границе outbox. Production slot
   count, target memory-map/OCTOSPI/endurance остаются blockers.
-- Открыты target UART routing, modem/broker-policy evidence и command downlink AT binding, reviewed Ed25519 backend,
+- Открыты target UART routing/scheduling, modem/broker-policy evidence и reviewed Ed25519 backend,
   provisioning public key, Flash/outbox slot-count/OCTOSPI/endurance binding, command ACK
-  publisher и аппаратный end-to-end;
+  target integration и аппаратный end-to-end;
   они не объявлены PASS до сборки станций.
 
 Изменение не закрывает security/deployment blockers из `EVT_PRE_20_RELEASE_AUDIT.md` и не является разрешением на internet-facing deployment.

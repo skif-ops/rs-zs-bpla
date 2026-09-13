@@ -24,6 +24,8 @@ def main() -> int:
     receipt_header = read("firmware/include/zs_bg95_event_receipt.h")
     receipt_source = read("firmware/src/zs_bg95_event_receipt.c")
     receipt_test = read("firmware/tests/test_bg95_event_receipt.c")
+    binary_header = read("firmware/include/zs_bg95_mqtt_binary.h")
+    binary_source = read("firmware/src/zs_bg95_mqtt_binary.c")
     cmake = read("firmware/CMakeLists.txt")
     ci = read(".github/workflows/ci.yml")
     policy = read("config/cellular/dual_sim_apn_profiles.yaml")
@@ -89,12 +91,18 @@ def main() -> int:
                   "authenticated_server_only_nonretained_route"):
         require(token in receipt_header,
                 f"BG95 event receipt interface missing {token}")
-    for token in ("AT+QMTSUB=", "+QMTRECV: ", "reader_unsigned",
+    for token in ("AT+QMTSUB=", "zs_bg95_mqtt_parse_receive_frame",
                   "modem->mqtt_receive_length_enabled",
                   "zs_mqtt_event_transport_handle_receipt",
                   "Retain is not present in +QMTRECV"):
         require(token in receipt_source,
                 f"BG95 event receipt source missing {token}")
+    for token in ("+QMTRECV: ", "reader_unsigned",
+                  "zs_bg95_mqtt_parse_receive_frame",
+                  "zs_bg95_mqtt_parse_subscribe_result",
+                  "zs_bg95_mqtt_parse_publish_result"):
+        require(token in binary_header + binary_source,
+                f"shared BG95 binary transport missing {token}")
     for token in ("test_subscription_and_binary_receipt_lifecycle",
                   "test_length_delimited_payload_preserves_control_bytes",
                   "test_frame_topic_client_delivery_and_framing_guards",
@@ -102,7 +110,8 @@ def main() -> int:
         require(token in receipt_test,
                 f"BG95 event receipt evidence missing {token}")
     require("zs_bg95_event_receipt_tests" in cmake and
-            "bg95_event_receipt" in cmake,
+            "bg95_event_receipt" in cmake and
+            "src/zs_bg95_mqtt_binary.c" in cmake,
             "BG95 event receipt test is not bound to CMake/CTest")
     require("validate_bg95_transport_contract_rev_a.py" in ci,
             "BG95 QG-1 is not bound to CI")

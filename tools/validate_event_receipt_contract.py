@@ -45,6 +45,8 @@ def main() -> int:
     firmware_test = read("firmware/tests/test_event_receipt.c")
     bg95_header = read("firmware/include/zs_bg95.h")
     bg95_source = read("firmware/src/zs_bg95.c")
+    bg95_binary_header = read("firmware/include/zs_bg95_mqtt_binary.h")
+    bg95_binary_source = read("firmware/src/zs_bg95_mqtt_binary.c")
     mqtt_header = read("firmware/include/zs_mqtt_event_transport.h")
     mqtt_source = read("firmware/src/zs_mqtt_event_transport.c")
     mqtt_test = read("firmware/tests/test_mqtt_event_transport.c")
@@ -186,12 +188,12 @@ def main() -> int:
     for token in (
         '"AT+QMTPUB=%u,%u,1,0,\\\""',
         "uplink->publication.payload_size",
-        "uart_write_all(uplink->modem, uplink->publication.payload",
+        "zs_bg95_mqtt_uart_write_all",
         "topic_is_at_safe",
-        "invalidate_modem_transport",
         "zs_mqtt_event_transport_prepare",
         "ZS_BG95_EVENT_UPLINK_OUTCOME_BROKER_ACK",
         "ZS_BG95_EVENT_UPLINK_OUTCOME_PROTOCOL_ERROR",
+        "zs_bg95_mqtt_invalidate",
     ):
         require(token in bg95_uplink_source,
                 f"BG95 event uplink invariant missing: {token}")
@@ -224,12 +226,11 @@ def main() -> int:
     for token in (
         '"AT+QMTSUB=%u,%u,\\\""',
         "modem->mqtt_receive_length_enabled",
-        "reader_unsigned",
-        "received->payload_size",
+        "zs_bg95_mqtt_parse_receive_frame",
         "received.message_id == 0u ? 0u : ZS_MQTT_EVENT_QOS",
         "Retain is not present in +QMTRECV",
         "zs_mqtt_event_transport_handle_receipt",
-        "invalidate_modem_transport",
+        "zs_bg95_mqtt_invalidate",
     ):
         require(token in bg95_receipt_source,
                 f"BG95 event receipt invariant missing: {token}")
@@ -240,6 +241,16 @@ def main() -> int:
     require(bg95_source.index('QMTCFG=\\"recv/mode\\"') <
             bg95_source.index('AT+QMTOPEN='),
             "BG95 receive mode can be configured after MQTT open")
+    for token in (
+        "zs_bg95_mqtt_parse_receive_frame",
+        "reader_unsigned",
+        "received->payload_size",
+        "result == 0 || result == (int)size",
+    ):
+        require(token in bg95_binary_header + bg95_binary_source,
+                f"shared BG95 binary framing invariant missing: {token}")
+    require("src/zs_bg95_mqtt_binary.c" in cmake,
+            "shared BG95 binary framing is not bound to CMake")
     for token in (
         "test_subscription_and_binary_receipt_lifecycle",
         "test_length_delimited_payload_preserves_control_bytes",

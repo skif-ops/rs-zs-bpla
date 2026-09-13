@@ -49,6 +49,13 @@ def main() -> int:
     transport_header = read("firmware/include/zs_mqtt_command_transport.h")
     transport_codec = read("firmware/src/zs_mqtt_command_transport.c")
     transport_test = read("firmware/tests/test_mqtt_command_transport.c")
+    bg95_header = read("firmware/include/zs_bg95.h")
+    bg95_binary_header = read("firmware/include/zs_bg95_mqtt_binary.h")
+    bg95_binary_codec = read("firmware/src/zs_bg95_mqtt_binary.c")
+    bg95_binding_header = read("firmware/include/zs_bg95_command_transport.h")
+    bg95_binding_codec = read("firmware/src/zs_bg95_command_transport.c")
+    bg95_binding_test = read("firmware/tests/test_bg95_command_transport.c")
+    cmake = read("firmware/CMakeLists.txt")
     vector_generator = read("tools/generate_mqtt_command_vector.py")
     vector_header = read("firmware/generated/zs_command_vector.h")
     target_status = read("firmware/targets/evt_pre_20/target_status.yaml")
@@ -267,15 +274,89 @@ def main() -> int:
         "ZS_MQTT_COMMAND_REJECTED_DELIVERY",
     ):
         require(token in transport_test, f"binary MQTT boundary QG-2 case missing: {token}")
+
+    for token in (
+        "zs_bg95_mqtt_uart_write_all",
+        "zs_bg95_mqtt_parse_receive_frame",
+        "zs_bg95_mqtt_parse_subscribe_result",
+        "zs_bg95_mqtt_parse_publish_result",
+    ):
+        require(token in bg95_binary_header,
+                f"shared BG95 binary interface missing: {token}")
+    for token in (
+        "+QMTRECV: ",
+        "reader_unsigned",
+        "received->payload_size",
+        "result == 0 || result == (int)size",
+        "mqtt_receive_length_enabled = false",
+    ):
+        require(token in bg95_binary_codec,
+                f"shared BG95 binary guard missing: {token}")
+    require("mqtt_receive_length_enabled" in bg95_header,
+            "BG95 connection does not expose verified receive length mode")
+    for token in (
+        "ZS_BG95_COMMAND_TRANSPORT_WAIT_SUBSCRIBE_RESULT",
+        "ZS_BG95_COMMAND_TRANSPORT_WAIT_ACK_PROMPT",
+        "ZS_BG95_COMMAND_TRANSPORT_WAIT_ACK_RESULT",
+        "zs_bg95_command_transport_subscribe",
+        "zs_bg95_command_transport_on_frame",
+        "zs_bg95_command_transport_on_prompt",
+        "authenticated_server_only_nonretained_down_route",
+        "does not expose MQTT retain",
+    ):
+        require(token in bg95_binding_header,
+                f"BG95 command binding API missing: {token}")
+    for token in (
+        '"AT+QMTSUB=%u,%u,\\\""',
+        '"AT+QMTPUB=%u,%u,1,0,\\\""',
+        "binding->modem->mqtt_receive_length_enabled",
+        "zs_bg95_mqtt_parse_receive_frame",
+        "zs_mqtt_command_transport_handle",
+        "binding->ack_publication.payload_size",
+        "Retain is not present in +QMTRECV",
+        "ZS_BG95_COMMAND_TRANSPORT_OUTCOME_ACK_BROKER_ACK",
+    ):
+        require(token in bg95_binding_codec,
+                f"BG95 command binding invariant missing: {token}")
+    require(bg95_binding_codec.index("zs_mqtt_command_transport_handle") <
+            bg95_binding_codec.index("send_ack_command(binding)"),
+            "BG95 ACK can be sent before durable command handling")
+    for token in (
+        "test_binary_down_to_fixed_length_durable_ack",
+        "test_receive_routing_and_framing_guards",
+        "test_policy_setup_and_ack_uart_failures",
+        "Server retry after reconnect obtains durable ACK without re-execution",
+        "ZS_COMMAND_STATUS_DUPLICATE",
+        "memchr(zs_command_vector_payload, 0",
+    ):
+        require(token in bg95_binding_test,
+                f"BG95 command binding QG-2 case missing: {token}")
+    for token in (
+        "src/zs_bg95_mqtt_binary.c",
+        "src/zs_bg95_command_transport.c",
+        "zs_bg95_command_transport_tests",
+        "bg95_command_transport",
+    ):
+        require(token in cmake, f"BG95 command binding is absent from CMake: {token}")
     require(
-        "command_binary_mqtt_transport: PORTABLE_EXACT_TOPIC_PAYLOAD_LENGTH_QG1_QG2_PASS_BG95_AT_BINDING_PENDING"
+        "command_binary_mqtt_transport: PORTABLE_EXACT_TOPIC_PAYLOAD_LENGTH_QG1_QG2_PASS_BG95_LENGTH_URC_FIXED_LENGTH_ACK_BOUND_TARGET_PENDING"
         in target_status,
-        "target status does not separate the portable MQTT boundary from BG95 binding",
+        "target status omits the portable BG95 command binding",
+    )
+    require(
+        "command_bg95_binding: PORTABLE_LENGTH_ENABLED_BINARY_QMTRECV_FIXED_LENGTH_ACK_QG1_QG2_PASS_TARGET_UART_RETAIN_POLICY_AND_HARDWARE_PENDING"
+        in target_status and
+        "command_mqtt_binding: PORTABLE_BG95_LENGTH_URC_FIXED_LENGTH_ACK_QG1_QG2_PASS_TARGET_UART_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
+        in target_status and
+        "command_mqtt_subscription_ack_binding: PORTABLE_BG95_LENGTH_URC_FIXED_LENGTH_ACK_QG1_QG2_PASS_TARGET_UART_RETAIN_POLICY_AND_HARDWARE_BLOCKER"
+        in target_status,
+        "target BG95 command blockers are not bounded",
     )
 
-    require("FIRMWARE_PORTABLE_BINARY_PATH_IMPLEMENTED; TARGET_CRYPTO_AND_BG95_AT_BINDING_PENDING" in icd,
+    require("PORTABLE_BG95_LENGTH_URC_FIXED_LENGTH_ACK_QG_PASS; TARGET_CRYPTO_UART_RETAIN_POLICY_AND_HARDWARE_PENDING" in icd,
             "ICD does not report the bounded implementation status")
-    require("exact BG95 binary receive/publish framing" in firmware_contract,
+    require("The BG95 command binding" in firmware_contract and
+            "target UART routing must queue/serialize complete URCs" in firmware_contract,
             "firmware target gap is not explicit")
     for token in ("tamper", "retry", "ownership", "duplicate"):
         require(token in tests, f"negative/robustness test missing: {token}")
@@ -285,19 +366,19 @@ def main() -> int:
             "QG-2 is not bound to CI")
     require("generate_mqtt_command_vector.py --check" in ci,
             "server/firmware vector freshness is not bound to CI")
-    require("zs_command_transport_tests" in read("firmware/CMakeLists.txt"),
+    require("zs_command_transport_tests" in cmake,
             "firmware command codec test is not bound to CTest")
-    require("zs_command_journal_tests" in read("firmware/CMakeLists.txt"),
+    require("zs_command_journal_tests" in cmake,
             "firmware durable command journal test is not bound to CTest")
-    require("zs_command_trust_tests" in read("firmware/CMakeLists.txt"),
+    require("zs_command_trust_tests" in cmake,
             "firmware command trust-store test is not bound to CTest")
-    require("zs_command_channel_tests" in read("firmware/CMakeLists.txt"),
+    require("zs_command_channel_tests" in cmake,
             "portable command channel test is not bound to CTest")
-    require("zs_mqtt_command_binding_tests" in read("firmware/CMakeLists.txt"),
+    require("zs_mqtt_command_binding_tests" in cmake,
             "portable binary MQTT boundary test is not bound to CTest")
 
     print("MQTT signed command transport QG-1: PASS")
-    print("scope: server transport + portable binary firmware path; target crypto/BG95 AT binding and hardware remain pending")
+    print("scope: server + durable firmware channel + BG95 length-URC/fixed-length ACK host binding; target crypto/UART/retain policy/hardware remain pending")
     return 0
 
 

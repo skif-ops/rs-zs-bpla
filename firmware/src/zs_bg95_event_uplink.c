@@ -1,54 +1,18 @@
 #include "zs_bg95_event_uplink.h"
+#include "zs_bg95_mqtt_binary.h"
 
-#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 
 #define BG95_QMTPUB_COMMAND_MAX_BYTES 160u
 #define BG95_QMTPUB_MAX_PAYLOAD_BYTES 4096u
 
-static bool uart_write_all(zs_bg95_t *modem,
-                           const uint8_t *data,
-                           size_t size) {
-  int result;
-  if (!modem || !modem->io.uart_write || (!data && size != 0u) ||
-      size > (size_t)INT_MAX)
-    return false;
-  result = modem->io.uart_write(
-      modem->io.ctx, modem->uart_channel, data, size);
-  return result == 0 || result == (int)size;
-}
-
-static bool topic_is_at_safe(const uint8_t *topic, size_t size) {
-  if (!topic || size == 0u || size > ZS_MQTT_EVENT_TOPIC_MAX_BYTES)
-    return false;
-  for (size_t i = 0u; i < size; ++i) {
-    const uint8_t value = topic[i];
-    const bool alpha = (value >= (uint8_t)'A' && value <= (uint8_t)'Z') ||
-                       (value >= (uint8_t)'a' && value <= (uint8_t)'z');
-    const bool digit = value >= (uint8_t)'0' && value <= (uint8_t)'9';
-    if (!alpha && !digit && value != (uint8_t)'/' &&
-        value != (uint8_t)'_' && value != (uint8_t)'-')
-      return false;
-  }
-  return true;
-}
-
-static void invalidate_modem_transport(zs_bg95_event_uplink_t *uplink) {
-  if (!uplink || !uplink->modem) return;
-  uplink->modem->command_pending = false;
-  uplink->modem->mqtt_open = false;
-  uplink->modem->mqtt_connected = false;
-  uplink->modem->network_settings.valid = false;
-  uplink->modem->state = ZS_BG95_ERROR;
-}
-
 static void finish(zs_bg95_event_uplink_t *uplink,
                    zs_bg95_event_uplink_outcome_t outcome) {
   if (outcome == ZS_BG95_EVENT_UPLINK_OUTCOME_TIMEOUT ||
       outcome == ZS_BG95_EVENT_UPLINK_OUTCOME_IO_ERROR ||
       outcome == ZS_BG95_EVENT_UPLINK_OUTCOME_PROTOCOL_ERROR)
-    invalidate_modem_transport(uplink);
+    zs_bg95_mqtt_invalidate(uplink->modem);
   uplink->state = ZS_BG95_EVENT_UPLINK_IDLE;
   uplink->last_outcome = outcome;
   uplink->message_id = 0u;
@@ -89,7 +53,7 @@ static bool send_publish_command(zs_bg95_event_uplink_t *uplink) {
   return text_size >= 0 && (size_t)text_size < sizeof(text) &&
          append_bytes(command, &used, (const uint8_t *)text,
                       (size_t)text_size) &&
-         uart_write_all(uplink->modem, command, used);
+         zs_bg95_mqtt_uart_write_all(uplink->modem, command, used);
 }
 
 bool zs_bg95_event_uplink_init(zs_bg95_event_uplink_t *uplink,
@@ -130,8 +94,9 @@ zs_bg95_event_uplink_start_result_t zs_bg95_event_uplink_start(
   if (prepared == ZS_MQTT_EVENT_STATION_MISMATCH)
     return ZS_BG95_EVENT_UPLINK_STATION_MISMATCH;
   if (prepared != ZS_MQTT_EVENT_PUBLICATION_READY ||
-      !topic_is_at_safe(uplink->publication.topic,
-                        uplink->publication.topic_size) ||
+      !zs_bg95_mqtt_topic_is_at_safe(
+          uplink->publication.topic, uplink->publication.topic_size,
+          ZS_MQTT_EVENT_TOPIC_MAX_BYTES) ||
       !uplink->publication.payload || uplink->publication.payload_size == 0u ||
       uplink->publication.payload_size > BG95_QMTPUB_MAX_PAYLOAD_BYTES ||
       uplink->publication.qos != 1u || uplink->publication.retained) {
@@ -165,36 +130,15 @@ bool zs_bg95_event_uplink_on_prompt(zs_bg95_event_uplink_t *uplink,
     finish(uplink, ZS_BG95_EVENT_UPLINK_OUTCOME_TIMEOUT);
     return false;
   }
-  if (!uart_write_all(uplink->modem, uplink->publication.payload,
-                      uplink->publication.payload_size)) {
+  if (!zs_bg95_mqtt_uart_write_all(
+          uplink->modem, uplink->publication.payload,
+          uplink->publication.payload_size)) {
     finish(uplink, ZS_BG95_EVENT_UPLINK_OUTCOME_IO_ERROR);
     return false;
   }
   uplink->state = ZS_BG95_EVENT_UPLINK_WAIT_RESULT;
   uplink->deadline_ms = now_ms + ZS_BG95_EVENT_UPLINK_TIMEOUT_MS;
   return true;
-}
-
-static bool parse_publish_result(const char *line,
-                                 unsigned *client,
-                                 unsigned *message_id,
-                                 unsigned *result) {
-  int consumed = 0;
-  unsigned retry_count = 0u;
-  if (!line || !client || !message_id || !result ||
-      sscanf(line, "+QMTPUB: %u,%u,%u,%u%n", client, message_id, result,
-             &retry_count, &consumed) != 4) {
-    consumed = 0;
-    if (!line || !client || !message_id || !result ||
-        sscanf(line, "+QMTPUB: %u,%u,%u%n", client, message_id, result,
-               &consumed) != 3)
-      return false;
-  } else if (*result != 1u) {
-    return false;
-  }
-  while (line[consumed] == ' ' || line[consumed] == '\t') ++consumed;
-  return line[consumed] == '\0' && *client <= 5u &&
-         *message_id <= UINT16_MAX && *result <= 2u;
 }
 
 bool zs_bg95_event_uplink_on_line(zs_bg95_event_uplink_t *uplink,
@@ -215,7 +159,8 @@ bool zs_bg95_event_uplink_on_line(zs_bg95_event_uplink_t *uplink,
     finish(uplink, ZS_BG95_EVENT_UPLINK_OUTCOME_MODEM_REJECTED);
     return true;
   }
-  if (!parse_publish_result(line, &client, &message_id, &result)) {
+  if (!zs_bg95_mqtt_parse_publish_result(
+          line, &client, &message_id, &result)) {
     if (strncmp(line, "+QMTPUB:", 8u) == 0) {
       finish(uplink, ZS_BG95_EVENT_UPLINK_OUTCOME_PROTOCOL_ERROR);
       return true;

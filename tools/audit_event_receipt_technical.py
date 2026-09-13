@@ -172,6 +172,7 @@ def audit_firmware_runtime() -> None:
             (
                 "firmware/tests/test_bg95_event_uplink.c",
                 "firmware/src/zs_bg95_event_uplink.c",
+                "firmware/src/zs_bg95_mqtt_binary.c",
                 "firmware/src/zs_bg95.c",
                 "firmware/src/zs_mqtt_event_transport.c",
                 "firmware/src/zs_event_receipt.c",
@@ -186,6 +187,7 @@ def audit_firmware_runtime() -> None:
             (
                 "firmware/tests/test_bg95_event_receipt.c",
                 "firmware/src/zs_bg95_event_receipt.c",
+                "firmware/src/zs_bg95_mqtt_binary.c",
                 "firmware/src/zs_bg95.c",
                 "firmware/src/zs_mqtt_event_transport.c",
                 "firmware/src/zs_event_receipt.c",

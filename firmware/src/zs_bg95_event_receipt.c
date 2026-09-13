@@ -1,68 +1,17 @@
 #include "zs_bg95_event_receipt.h"
+#include "zs_bg95_mqtt_binary.h"
 
-#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 
 #define BG95_RECEIPT_COMMAND_MAX_BYTES 160u
-
-typedef struct {
-  const uint8_t *data;
-  size_t size;
-  size_t offset;
-} byte_reader_t;
-
-typedef struct {
-  unsigned client;
-  unsigned message_id;
-  const uint8_t *topic;
-  size_t topic_size;
-  const uint8_t *payload;
-  size_t payload_size;
-} received_frame_t;
-
-static bool uart_write_all(zs_bg95_t *modem,
-                           const uint8_t *data,
-                           size_t size) {
-  int result;
-  if (!modem || !modem->io.uart_write || (!data && size != 0u) ||
-      size > (size_t)INT_MAX)
-    return false;
-  result = modem->io.uart_write(
-      modem->io.ctx, modem->uart_channel, data, size);
-  return result == 0 || result == (int)size;
-}
-
-static bool topic_is_at_safe(const uint8_t *topic, size_t size) {
-  if (!topic || size == 0u || size > ZS_MQTT_EVENT_TOPIC_MAX_BYTES)
-    return false;
-  for (size_t i = 0u; i < size; ++i) {
-    const uint8_t value = topic[i];
-    const bool alpha = (value >= (uint8_t)'A' && value <= (uint8_t)'Z') ||
-                       (value >= (uint8_t)'a' && value <= (uint8_t)'z');
-    const bool digit = value >= (uint8_t)'0' && value <= (uint8_t)'9';
-    if (!alpha && !digit && value != (uint8_t)'/' &&
-        value != (uint8_t)'_' && value != (uint8_t)'-')
-      return false;
-  }
-  return true;
-}
-
-static void invalidate_modem_transport(zs_bg95_event_receipt_t *receiver) {
-  if (!receiver || !receiver->modem) return;
-  receiver->modem->command_pending = false;
-  receiver->modem->mqtt_open = false;
-  receiver->modem->mqtt_connected = false;
-  receiver->modem->network_settings.valid = false;
-  receiver->modem->state = ZS_BG95_ERROR;
-}
 
 static void finish_setup(zs_bg95_event_receipt_t *receiver,
                          zs_bg95_event_receipt_outcome_t outcome) {
   if (outcome == ZS_BG95_EVENT_RECEIPT_OUTCOME_TIMEOUT ||
       outcome == ZS_BG95_EVENT_RECEIPT_OUTCOME_IO_ERROR ||
       outcome == ZS_BG95_EVENT_RECEIPT_OUTCOME_PROTOCOL_ERROR)
-    invalidate_modem_transport(receiver);
+    zs_bg95_mqtt_invalidate(receiver->modem);
   receiver->state = ZS_BG95_EVENT_RECEIPT_IDLE;
   receiver->last_outcome = outcome;
   receiver->subscribe_message_id = 0u;
@@ -94,7 +43,7 @@ static bool send_subscription(zs_bg95_event_receipt_t *receiver) {
          append_bytes(command, &used, receiver->transport->receipt.topic,
                       receiver->transport->receipt.topic_size) &&
          append_bytes(command, &used, suffix, sizeof(suffix)) &&
-         uart_write_all(receiver->modem, command, used);
+         zs_bg95_mqtt_uart_write_all(receiver->modem, command, used);
 }
 
 bool zs_bg95_event_receipt_init(
@@ -107,8 +56,9 @@ bool zs_bg95_event_receipt_init(
   if (!modem || !transport || !transport->outbox ||
       !authenticated_server_only_nonretained_route ||
       modem->mqtt_client > 5u || !modem->io.uart_write ||
-      !topic_is_at_safe(transport->receipt.topic,
-                        transport->receipt.topic_size))
+      !zs_bg95_mqtt_topic_is_at_safe(
+          transport->receipt.topic, transport->receipt.topic_size,
+          ZS_MQTT_EVENT_TOPIC_MAX_BYTES))
     return false;
   receiver->modem = modem;
   receiver->transport = transport;
@@ -147,21 +97,6 @@ zs_bg95_event_receipt_subscribe_result_t zs_bg95_event_receipt_subscribe(
   return ZS_BG95_EVENT_RECEIPT_SUBSCRIBE_STARTED;
 }
 
-static bool parse_subscribe_result(const char *line,
-                                   unsigned *client,
-                                   unsigned *message_id,
-                                   unsigned *result,
-                                   unsigned *granted_qos) {
-  int consumed = 0;
-  if (!line || !client || !message_id || !result || !granted_qos ||
-      sscanf(line, "+QMTSUB: %u,%u,%u,%u%n", client, message_id,
-             result, granted_qos, &consumed) != 4)
-    return false;
-  while (line[consumed] == ' ' || line[consumed] == '\t') ++consumed;
-  return line[consumed] == '\0' && *client <= 5u &&
-         *message_id <= UINT16_MAX && *result <= 2u && *granted_qos <= 2u;
-}
-
 bool zs_bg95_event_receipt_on_line(zs_bg95_event_receipt_t *receiver,
                                    const char *line,
                                    uint32_t now_ms) {
@@ -185,8 +120,8 @@ bool zs_bg95_event_receipt_on_line(zs_bg95_event_receipt_t *receiver,
   if (strcmp(line, "OK") == 0) {
     return true;
   }
-  if (!parse_subscribe_result(line, &client, &message_id, &result,
-                              &granted_qos)) {
+  if (!zs_bg95_mqtt_parse_subscribe_result(
+          line, &client, &message_id, &result, &granted_qos)) {
     if (strncmp(line, "+QMTSUB:", 8u) == 0) {
       finish_setup(receiver, ZS_BG95_EVENT_RECEIPT_OUTCOME_PROTOCOL_ERROR);
       return true;
@@ -207,81 +142,6 @@ bool zs_bg95_event_receipt_on_line(zs_bg95_event_receipt_t *receiver,
   receiver->last_outcome = ZS_BG95_EVENT_RECEIPT_OUTCOME_READY;
   receiver->deadline_ms = 0u;
   return true;
-}
-
-static bool reader_take(byte_reader_t *reader, uint8_t expected) {
-  if (!reader || reader->offset >= reader->size ||
-      reader->data[reader->offset] != expected)
-    return false;
-  ++reader->offset;
-  return true;
-}
-
-static bool reader_take_literal(byte_reader_t *reader,
-                                const uint8_t *literal,
-                                size_t size) {
-  if (!reader || !literal || size > reader->size - reader->offset ||
-      memcmp(&reader->data[reader->offset], literal, size) != 0)
-    return false;
-  reader->offset += size;
-  return true;
-}
-
-static bool reader_unsigned(byte_reader_t *reader, unsigned *value) {
-  unsigned parsed = 0u;
-  size_t digits = 0u;
-  if (!reader || !value) return false;
-  while (reader->offset < reader->size) {
-    const uint8_t byte = reader->data[reader->offset];
-    unsigned digit;
-    if (byte < (uint8_t)'0' || byte > (uint8_t)'9') break;
-    digit = (unsigned)(byte - (uint8_t)'0');
-    if (parsed > (UINT_MAX - digit) / 10u) return false;
-    parsed = parsed * 10u + digit;
-    ++reader->offset;
-    ++digits;
-  }
-  if (digits == 0u) return false;
-  *value = parsed;
-  return true;
-}
-
-static bool parse_received_frame(const uint8_t *frame, size_t frame_size,
-                                 received_frame_t *received) {
-  static const uint8_t prefix[] = "+QMTRECV: ";
-  byte_reader_t reader = {frame, frame_size, 0u};
-  unsigned payload_size;
-  size_t topic_start;
-  if (!frame || !received ||
-      !reader_take_literal(&reader, prefix, sizeof(prefix) - 1u) ||
-      !reader_unsigned(&reader, &received->client) ||
-      !reader_take(&reader, (uint8_t)',') ||
-      !reader_unsigned(&reader, &received->message_id) ||
-      !reader_take(&reader, (uint8_t)',') ||
-      !reader_take(&reader, (uint8_t)'"'))
-    return false;
-  topic_start = reader.offset;
-  while (reader.offset < reader.size &&
-         reader.data[reader.offset] != (uint8_t)'"')
-    ++reader.offset;
-  if (reader.offset == reader.size) return false;
-  received->topic = &reader.data[topic_start];
-  received->topic_size = reader.offset - topic_start;
-  if (!reader_take(&reader, (uint8_t)'"') ||
-      !reader_take(&reader, (uint8_t)',') ||
-      !reader_unsigned(&reader, &payload_size) ||
-      !reader_take(&reader, (uint8_t)',') ||
-      !reader_take(&reader, (uint8_t)'"') ||
-      (size_t)payload_size > reader.size - reader.offset)
-    return false;
-  received->payload = &reader.data[reader.offset];
-  received->payload_size = (size_t)payload_size;
-  reader.offset += received->payload_size;
-  if (!reader_take(&reader, (uint8_t)'"')) return false;
-  if (reader.offset == reader.size) return true;
-  return reader.size - reader.offset == 2u &&
-         reader.data[reader.offset] == (uint8_t)'\r' &&
-         reader.data[reader.offset + 1u] == (uint8_t)'\n';
 }
 
 static zs_bg95_event_receipt_receive_result_t map_receipt_result(
@@ -310,8 +170,8 @@ zs_bg95_event_receipt_receive_result_t zs_bg95_event_receipt_on_frame(
     const uint8_t *frame,
     size_t frame_size,
     zs_event_receipt_status_t *decode_status) {
-  static const uint8_t prefix[] = "+QMTRECV:";
-  received_frame_t received;
+  zs_bg95_mqtt_receive_frame_t received;
+  zs_bg95_mqtt_receive_parse_result_t parsed;
   zs_mqtt_event_message_t message;
   zs_event_receipt_result_t result;
   if (decode_status) *decode_status = ZS_EVENT_RECEIPT_STATUS_INVALID_ARGUMENT;
@@ -325,11 +185,10 @@ zs_bg95_event_receipt_receive_result_t zs_bg95_event_receipt_on_frame(
     finish_setup(receiver, ZS_BG95_EVENT_RECEIPT_OUTCOME_OFFLINE);
     return ZS_BG95_EVENT_RECEIPT_RECEIVE_OFFLINE;
   }
-  if (frame_size < sizeof(prefix) - 1u ||
-      memcmp(frame, prefix, sizeof(prefix) - 1u) != 0)
+  parsed = zs_bg95_mqtt_parse_receive_frame(frame, frame_size, &received);
+  if (parsed == ZS_BG95_MQTT_RECEIVE_NOT_FRAME)
     return ZS_BG95_EVENT_RECEIPT_NOT_RECEIPT_FRAME;
-  memset(&received, 0, sizeof(received));
-  if (!parse_received_frame(frame, frame_size, &received)) {
+  if (parsed != ZS_BG95_MQTT_RECEIVE_FRAME_OK) {
     finish_setup(receiver, ZS_BG95_EVENT_RECEIPT_OUTCOME_PROTOCOL_ERROR);
     return ZS_BG95_EVENT_RECEIPT_FRAMING_ERROR;
   }

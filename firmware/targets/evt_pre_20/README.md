@@ -71,7 +71,12 @@ adapter now enforces the exact tenant/station `down` topic, QoS 1 and non-retain
 delivery before command parsing, then exposes the exact `ack` topic and CBOR
 payload length after durable completion. The target still needs reviewed Ed25519
 library binding, provisioned public keys, dedicated Flash pages/endurance evidence
-and BG95 binary MQTT receive/publish AT framing integration.
+and hardware integration. Portable BG95 AT binding now confirms pre-connect
+length mode, subscribes to exact `down` at QoS 1, parses binary `QMTRECV` by
+declared length and publishes the durable ACK with fixed-length `QMTPUB`. A
+server retry after UART failure returns the journaled ACK without re-execution.
+Target UART serialization, retain-policy verification, reviewed crypto/Flash
+binding and assembled-station evidence remain open.
 
 The portable event outbox now atomically commits complete schema-4 detection
 CBOR with metadata CRC32 and payload SHA-256, orders pending events by priority

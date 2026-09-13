@@ -51,6 +51,17 @@ station credential + server-only ACL + запрет retained receipt. Host QG н
 заменяет target UART routing, проверку broker policy/версии BG95 и аппаратный
 recovery test.
 
+Portable BG95 command binding использует тот же общий length-delimited parser:
+после exact QoS-1 `down` subscription он передаёт только полный binary payload в
+signature/journal/executor channel. Fixed-length `ack` `QMTPUB` начинается лишь
+после durable `COMPLETED`; при reconnect повторная server command восстанавливает
+ACK из journal без повторного side effect. Partial UART, timeout и mismatched
+URC инвалидируют modem transport. Во время ACK in-flight новый frame получает
+`BUSY`, поэтому target UART router обязан сериализовать или буферизовать полные
+URC. Retain в `QMTRECV` не виден и покрывается только явно подтверждённым
+server-only/non-retained ACL contract. Target crypto, Flash pages, UART routing,
+broker policy и hardware evidence остаются открыты.
+
 Portable NOR adapter выделяет каждому outbox slot отдельный erase block и
 проверяет alignment/range partition, поэтому reclaim не стирает соседнее pending
 event. Portable layout planner вычисляет непересекающиеся разделы: audio archive

@@ -1,6 +1,6 @@
 # BG95-M3 MQTT/TLS transport contract Rev.A
 
-Status: `HOST CONTRACT + PORTABLE BINARY COMMAND PATH, EVENT OUTBOX, BG95 FIXED-LENGTH EVENT UPLINK AND LENGTH-DELIMITED RECEIPT PASS / TARGET STORAGE, CRYPTO, COMMAND DOWNLINK, UART ROUTING, MODEM AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
+Status: `HOST CONTRACT + PORTABLE BG95 BINARY COMMAND/ACK, EVENT OUTBOX, FIXED-LENGTH EVENT UPLINK AND LENGTH-DELIMITED RECEIPT PASS / TARGET STORAGE, CRYPTO, UART ROUTING, MODEM AND END-TO-END EVIDENCE OPEN / NOT FOR RELEASE`
 
 This contract extends the portable BG95 state machine from automatic SIM/network
 discovery to an outbound MQTT/TLS session. It does not claim that a particular
@@ -89,7 +89,16 @@ and clear online/network-valid flags.
   topic to that channel and returns the exact `ack` topic plus payload length only
   after durable completion. It rejects wrong or non-canonical topics, retained
   delivery and non-QoS-1 delivery before command parsing, and its host test carries
-  embedded NUL bytes without treating CBOR as a string.
+  embedded NUL bytes without treating CBOR as a string. The BG95 command binding
+  subscribes to that exact `down` topic after the pre-connect length mode is
+  confirmed, parses complete binary `+QMTRECV` frames by declared byte count and
+  starts fixed-length `QMTPUB` of the durable ACK. It sends ACK bytes only after
+  `>`, treats `+QMTPUB` success only as broker delivery and reconstructs the ACK
+  from the journal on server retry without repeating execution. Partial UART,
+  timeout and mismatched result paths fail closed. While an ACK is in flight the
+  adapter returns `BUSY`; target UART routing must queue/serialize complete URCs.
+  As with event receipts, `QMTRECV` does not expose retain, so initialization
+  requires an external server-only/non-retained per-station ACL assertion.
 - Store-and-forward QG-1/QG-2: `tools/validate_event_outbox_contract.py` and
   `firmware/tests/test_event_outbox.c` verify atomic event commit, metadata CRC,
   payload SHA-256, priority/FIFO selection, idempotent duplicate handling,
@@ -139,8 +148,8 @@ and clear online/network-valid flags.
 - certificate upload/provisioning and BG95 firmware-version compatibility;
 - DNS, TLS hostname and certificate-failure tests against the pilot endpoint;
 - reviewed Ed25519 backend and public-key provisioning, nonvolatile target-page
-  binding/endurance, exact BG95 binary receive/publish framing for command
-  down/ACK, target UART routing for the host-tested event receipt subscription,
+  binding/endurance, target UART routing/scheduling for the host-tested command
+  down/ACK and event receipt bindings,
   and outbox
   slot-count/OCTOSPI/endurance binding; the fixed-length
   event publish/prompt path, length-delimited receipt path and portable fixed-memory

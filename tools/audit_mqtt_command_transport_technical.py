@@ -7,6 +7,8 @@ from contextlib import redirect_stderr
 import hashlib
 import io
 import re
+import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -136,8 +138,59 @@ def audit_firmware_vector() -> None:
     )
 
 
+def audit_firmware_bg95_runtime() -> None:
+    compiler = shutil.which("cc") or shutil.which("gcc")
+    require(compiler is not None, "host C compiler is unavailable")
+    sources = (
+        "firmware/tests/test_bg95_command_transport.c",
+        "firmware/src/zs_bg95_command_transport.c",
+        "firmware/src/zs_bg95_mqtt_binary.c",
+        "firmware/src/zs_bg95.c",
+        "firmware/src/zs_mqtt_command_transport.c",
+        "firmware/src/zs_command_channel.c",
+        "firmware/src/zs_command_trust.c",
+        "firmware/src/zs_command_journal.c",
+        "firmware/src/zs_command.c",
+        "firmware/src/zs_cbor.c",
+        "firmware/src/zs_sha256.c",
+    )
+    with tempfile.TemporaryDirectory(prefix="zs-command-fw-qg2-") as directory:
+        binary = Path(directory) / "zs_bg95_command_transport_tests"
+        result = subprocess.run(
+            [
+                compiler,
+                "-std=gnu11",
+                "-Wall",
+                "-Wextra",
+                "-Wpedantic",
+                "-Werror",
+                "-O2",
+                "-UNDEBUG",
+                f"-I{ROOT / 'firmware/include'}",
+                f"-I{ROOT / 'firmware/generated'}",
+                *(str(ROOT / source) for source in sources),
+                "-lm",
+                "-o",
+                str(binary),
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        require(result.returncode == 0,
+                f"BG95 command test compile failed: {result.stderr}")
+        result = subprocess.run(
+            [str(binary)], check=False, capture_output=True, text=True
+        )
+        require(result.returncode == 0,
+                f"BG95 command test failed: {result.stderr}")
+        require("zs_bg95_command_transport_tests: OK" in result.stdout,
+                "BG95 command test did not report success")
+
+
 def main() -> int:
     audit_firmware_vector()
+    audit_firmware_bg95_runtime()
     with tempfile.TemporaryDirectory(prefix="zs-command-qg2-") as directory:
         store = EventStore(Path(directory) / "events.sqlite3")
         signer = CommandSigner(Ed25519PrivateKey.generate())
@@ -292,7 +345,7 @@ def main() -> int:
                 "transient error log is absent or exposes exception details")
 
     print("MQTT signed command transport QG-2: PASS")
-    print("scope: host runtime + signed cross-language vector; target crypto/modem and hardware remain pending")
+    print("scope: host runtime + signed vector + BG95 length-URC/fixed-length ACK; target crypto/UART/retain policy/hardware remain pending")
     return 0
 
 
