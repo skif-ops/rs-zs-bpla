@@ -3,6 +3,9 @@
 #include <ctype.h>
 #include <string.h>
 
+_Static_assert(ZS_BG95_MAX_APN_PROFILES == ZS_DUAL_SIM_MAX_PROFILES,
+               "BG95 and dual-SIM profile bounds must match");
+
 static bool action_is(const zs_dual_sim_t *controller,
                       zs_dual_sim_action_t expected) {
   return controller && zs_dual_sim_next_action(controller) == expected;
@@ -92,9 +95,14 @@ bool zs_dual_sim_bg95_confirm_link(zs_dual_sim_t *controller,
                                    const zs_bg95_t *modem,
                                    uint32_t now_ms) {
   const zs_bg95_network_settings_t *settings;
+  uint8_t pending_profile;
+  uint8_t selected_profile;
   if (!modem || !action_is(controller,
                            ZS_DUAL_SIM_ACTION_ATTACH_VALIDATE_DNS_TLS) ||
-      !zs_bg95_online(modem))
+      !zs_bg95_online(modem) ||
+      !zs_dual_sim_pending_profile(controller, &pending_profile) ||
+      !zs_bg95_selected_apn_profile(modem, &selected_profile) ||
+      selected_profile != pending_profile)
     return false;
   settings = zs_bg95_get_network_settings(modem);
   if (!settings || !settings->valid || settings->apn[0] == '\0' ||

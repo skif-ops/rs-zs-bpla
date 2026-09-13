@@ -67,6 +67,7 @@ def main() -> int:
         "zs_dual_sim_complete_action",
         "zs_dual_sim_on_iccid",
         "zs_dual_sim_report_brownout",
+        "zs_dual_sim_pending_profile",
     ):
         require(token in header, f"dual-SIM interface missing {token}")
 
@@ -105,6 +106,9 @@ def main() -> int:
         "full_iccid_available",
         "zs_bg95_online",
         "settings->primary_dns[0]",
+        "zs_bg95_selected_apn_profile",
+        "selected_profile != pending_profile",
+        "ZS_BG95_MAX_APN_PROFILES == ZS_DUAL_SIM_MAX_PROFILES",
     ):
         require(bridge_guard in bridge_source,
                 f"dual-SIM/BG95 bridge guard missing {bridge_guard}")
@@ -184,6 +188,7 @@ def main() -> int:
         "zs_dual_sim_bg95_verify_iccid",
         "zs_dual_sim_bg95_confirm_link",
         "zs_dual_sim_bg95_confirm_shutdown",
+        "modem.selected_apn_profile = 0u",
     ):
         require(evidence in bridge_test,
                 f"dual-SIM/BG95 integration scenario missing {evidence}")
@@ -212,13 +217,14 @@ def main() -> int:
         "retry_failed_recovery_action_without_advancing: true",
         "authenticated_BLE_or_mTLS_server_command",
         "expected_iccid_per_slot: PROVISIONED_FULL_VALUE_REQUIRED",
+        "requested_profile_binding: BG95_SELECTED_INDEX_MUST_EQUAL_DUAL_SIM_PENDING_PROFILE",
         "FULL_IMSI_AND_ICCID_REQUIRED_IN_MTLS_HEARTBEAT",
         "DEFERRED_UNTIL_STATIONS_ASSEMBLED",
     ):
         require(policy_token in policy, f"dual-SIM policy drift: {policy_token}")
-    require("firmware_status: PORTABLE_SAFE_SEQUENCE_BG95_AND_EXACT_REV_A_GPIO_INTERLOCK_QG1_QG2_PASS_TARGET_HAL_PHYSICAL_PENDING" in policy,
+    require("firmware_status: PORTABLE_SAFE_SEQUENCE_BG95_PROFILE_MATCH_AND_EXACT_REV_A_GPIO_INTERLOCK_QG1_QG2_PASS_TARGET_HAL_PHYSICAL_PENDING" in policy,
             "portable failover status missing from controlled policy")
-    require("dual_sim_failover_firmware: PORTABLE_SAFE_SEQUENCE_BG95_AND_EXACT_REV_A_GPIO_INTERLOCK_QG1_QG2_PASS_TARGET_HAL_PHYSICAL_PROFILE_BINDING_PENDING" in baseline,
+    require("dual_sim_failover_firmware: PORTABLE_SAFE_SEQUENCE_BG95_PROFILE_MATCH_AND_EXACT_REV_A_GPIO_INTERLOCK_QG1_QG2_PASS_TARGET_HAL_PHYSICAL_AUDIT_BINDING_PENDING" in baseline,
             "portable failover status missing from EVT baseline")
     require("firmware debounce не менее 20 ms" in hardware and
             "Переключение без полного штатного выключения модема является ошибкой" in hardware,
@@ -228,9 +234,11 @@ def main() -> int:
             "24-hour" in contract,
             "dual-SIM contract overclaims or omits target evidence")
     require("dual_sim_failover_controller: PORTABLE_SAFE_SEQUENCE_EXPLICIT_MODEM_OFF_MUX_HIGH_Z_RAIL_OFF_RECOVERY_HOLD_RETRY_ICCID_QG1_QG2_PASS_TARGET_PENDING" in target and
+            "dual_sim_bg95_bridge: PORTABLE_QPOWD_CELL_STATUS_FULL_ICCID_EXACT_PENDING_PROFILE_ONLINE_TLS_GATE_QG1_QG2_PASS_TARGET_PENDING" in target and
             "dual_sim_gpio_power_binding: PORTABLE_EXACT_REV_A_GPIO_POLARITY_INTERLOCK_AND_OPTIONAL_FIXTURE_READBACK_INTERFACE_QG1_QG2_PASS" in target,
             "target boundary for dual-SIM failover is not explicit")
     require("DEC-031" in decisions and "DEC-035" in decisions and
+            "DEC-036" in decisions and
             "IMPLEMENTED_HOST_TARGET_BINDING_PENDING" in decisions,
             "dual-SIM portable implementation decision is not recorded")
     require("validate_dual_sim_failover_contract.py" in ci and

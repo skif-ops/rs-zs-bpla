@@ -143,6 +143,8 @@ bool zs_dual_sim_on_iccid(zs_dual_sim_t *controller, const char *full_iccid);
 void zs_dual_sim_report_brownout(zs_dual_sim_t *controller);
 zs_dual_sim_state_t zs_dual_sim_state(const zs_dual_sim_t *controller);
 zs_dual_sim_slot_t zs_dual_sim_active_slot(const zs_dual_sim_t *controller);
+bool zs_dual_sim_pending_profile(const zs_dual_sim_t *controller,
+                                 uint8_t *profile_index);
 const char *zs_dual_sim_state_name(zs_dual_sim_state_t state);
 
 #endif

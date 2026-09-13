@@ -51,9 +51,10 @@ apn_modes:
     allowed_in_pilot: false
     status: FUTURE_NOT_PROVISIONED
 profile_selection:
-  firmware_status: PORTABLE_SAFE_SEQUENCE_BG95_AND_EXACT_REV_A_GPIO_INTERLOCK_QG1_QG2_PASS_TARGET_HAL_PHYSICAL_PENDING
+  firmware_status: PORTABLE_SAFE_SEQUENCE_BG95_PROFILE_MATCH_AND_EXACT_REV_A_GPIO_INTERLOCK_QG1_QG2_PASS_TARGET_HAL_PHYSICAL_PENDING
   expected_iccid_per_slot: PROVISIONED_FULL_VALUE_REQUIRED
   order_per_slot: APPROVED_PUBLIC_PLMN_PROFILES_ONLY_TO_BE_PROVISIONED
+  requested_profile_binding: BG95_SELECTED_INDEX_MUST_EQUAL_DUAL_SIM_PENDING_PROFILE
   automatic_failover_enabled: true
   failure_triggers: [attach_timeout, pdp_failure, dns_failure, tls_failure, sustained_link_loss]
   manual_override: authenticated_BLE_or_mTLS_server_command

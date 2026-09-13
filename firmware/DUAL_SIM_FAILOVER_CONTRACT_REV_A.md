@@ -30,8 +30,10 @@ Rev.A pins and exact active levels without depending on STM32 HAL.
 
 The numeric profile index identifies an entry in the separately provisioned
 approved public-APN list. The target binding must pass the same index to the
-BG95 automatic network selection path; the portable controller never invents
-an operator or APN.
+BG95 automatic network selection path. The BG95 bridge now fails closed unless
+the longest approved IMSI-prefix match selected exactly that pending index,
+even if the modem is otherwise online with valid APN/IP/gateway/DNS values.
+The portable controller never invents an operator or APN.
 
 ## Action order
 
@@ -67,7 +69,9 @@ the caller supplies `CELL_STATUS=LOW`; the BG95 state then clears volatile
 IMSI/ICCID. On power-up it uses the existing 700 ms PWRKEY state, requires
 `CELL_STATUS=HIGH`, reads the full ICCID from BG95 runtime and completes link
 validation only when automatic APN read-back and MQTT/TLS are online. A busy
-UART leaves the action pending instead of skipping shutdown.
+UART leaves the action pending instead of skipping shutdown. Link confirmation
+also requires the BG95 selected approved-catalog index to equal the controller's
+pending profile; an online connection through another entry cannot be committed.
 
 The target GPIO adapter maps PWRKEY to PD11, CELL_STATUS to PD13, mux select and
 enable to PE0/PE2, both DET inputs to PE3/PE5, PWR_GOOD to PD0 and EN_MODEM to
@@ -109,8 +113,7 @@ close that physical gate.
 - STM32 HAL/LL implementation behind the exact generated GPIO contract;
 - physical U13 enable read-back through the test fixture and measured
   `3V8_MODEM` stability after EN_MODEM;
-- durable audit backend and verified coupling of profile index to the existing
-  approved public-APN catalog;
+- durable audit backend and provisioned approved public-APN catalog contents;
 - exact provisioned ICCIDs and actual BG95 response behavior;
 - power interruption in every switch phase, signal-integrity/ESD checks and 100
   SIM1/SIM2 cycles on assembled stations;

@@ -657,6 +657,15 @@ const zs_bg95_network_settings_t *zs_bg95_get_network_settings(const zs_bg95_t *
   return m ? &m->network_settings : NULL;
 }
 
+bool zs_bg95_selected_apn_profile(const zs_bg95_t *m,
+                                  uint8_t *profile_index) {
+  if (!m || !profile_index || !m->auto_network ||
+      m->selected_apn_profile >= m->apn_profile_count)
+    return false;
+  *profile_index = m->selected_apn_profile;
+  return true;
+}
+
 bool zs_bg95_export_cellular_telemetry(const zs_bg95_t *m,
                                        zs_cellular_telemetry_t *telemetry) {
   if (!m || !telemetry || !m->network_settings.valid ||

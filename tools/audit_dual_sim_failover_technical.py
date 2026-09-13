@@ -25,6 +25,12 @@ def main() -> int:
     header = (ROOT / "firmware/include/zs_dual_sim.h").read_text(encoding="utf-8")
     source = (ROOT / "firmware/src/zs_dual_sim.c").read_text(encoding="utf-8")
     test = (ROOT / "firmware/tests/test_dual_sim.c").read_text(encoding="utf-8")
+    bridge_source = (ROOT / "firmware/src/zs_dual_sim_bg95.c").read_text(
+        encoding="utf-8"
+    )
+    bridge_test = (ROOT / "firmware/tests/test_dual_sim_bg95.c").read_text(
+        encoding="utf-8"
+    )
     gpio_source = (
         ROOT / "firmware/targets/evt_pre_20/src/evt_pre_20_dual_sim_gpio.c"
     ).read_text(encoding="utf-8")
@@ -95,6 +101,20 @@ def main() -> int:
     require("EVT_PRE_20_DUAL_SIM_IO_COMPLETE_LOGICAL" in gpio_source and
             "EVT_PRE_20_DUAL_SIM_IO_COMPLETE_PHYSICAL" in gpio_source,
             "logical versus physical U13 evidence boundary is missing")
+    require("zs_dual_sim_pending_profile" in bridge_source and
+            "zs_bg95_selected_apn_profile" in bridge_source and
+            "selected_profile != pending_profile" in bridge_source,
+            "BG95 selected profile is not bound to pending dual-SIM profile")
+    mismatch_check = bridge_test.index(
+        "!zs_dual_sim_bg95_confirm_link(&controller, &modem, 763u)"
+    )
+    corrected_profile = bridge_test.index("modem.selected_apn_profile = 0u")
+    accepted_link = bridge_test.index(
+        "zs_dual_sim_bg95_confirm_link(&controller, &modem, 763u)",
+        corrected_profile,
+    )
+    require(mismatch_check < corrected_profile < accepted_link,
+            "profile mismatch fail-closed runtime scenario is missing")
 
     compiler = shutil.which("cc") or shutil.which("gcc")
     require(compiler is not None, "host C compiler is unavailable")

@@ -144,11 +144,14 @@ static void test_boot_and_bounded_automatic_failover(void) {
 static void test_auth_presence_and_configuration_guards(void) {
   zs_dual_sim_t controller;
   uint32_t now_ms;
+  uint8_t pending_profile = 0xffu;
 
   assert(!zs_dual_sim_init(NULL, SLOT1_ICCID, SLOT2_ICCID));
   assert(!zs_dual_sim_init(&controller, "1234", SLOT2_ICCID));
   assert(!zs_dual_sim_init(&controller, SLOT1_ICCID, SLOT1_ICCID));
   start_slot_1(&controller, &now_ms);
+  assert(!zs_dual_sim_pending_profile(&controller, &pending_profile));
+  assert(!zs_dual_sim_pending_profile(&controller, NULL));
 
   assert(zs_dual_sim_request_manual_switch(
              &controller, ZS_DUAL_SIM_SLOT_2, 0u, false,
@@ -184,11 +187,14 @@ static void test_iccid_mismatch_and_action_failure_fail_closed(void) {
   zs_dual_sim_t controller;
   uint32_t now_ms;
   uint32_t switch_ms;
+  uint8_t pending_profile = 0xffu;
   start_slot_1(&controller, &now_ms);
   switch_ms = controller.last_activation_ms + ZS_DUAL_SIM_MIN_HOLD_MS;
   assert(zs_dual_sim_request_manual_switch(
              &controller, ZS_DUAL_SIM_SLOT_2, 2u, true, switch_ms) ==
          ZS_DUAL_SIM_REQUEST_ACCEPTED);
+  assert(zs_dual_sim_pending_profile(&controller, &pending_profile));
+  assert(pending_profile == 2u);
   drive_safe_switch_prefix(&controller, switch_ms + 1u);
   complete(&controller, ZS_DUAL_SIM_ACTION_SELECT_PENDING_SLOT, switch_ms + 20u);
   complete(&controller, ZS_DUAL_SIM_ACTION_ENABLE_MODEM_RAIL, switch_ms + 21u);

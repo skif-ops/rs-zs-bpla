@@ -72,6 +72,12 @@ PE2, PE3, PE5, PD0 и PD4. Адаптер проверяет полярност�
 и physical fixture read-back; STM32 HAL, оснастка и измерение 3V8 остаются
 target/EVT blockers.
 
+BG95 link gate также теперь сверяет реально выбранный longest-prefix public-APN
+catalog index с `pending_profile` dual-SIM controller. Поэтому даже online
+MQTT/TLS с полным ICCID и валидным APN/IP/gateway/DNS не завершает switch через
+другой индекс профиля. Содержимое production-каталога и durable audit backend
+остаются provisioning/target blockers.
+
 Portable store-and-forward теперь дополнен серверным application receipt:
 сервер после durable processing публикует canonical CBOR с SHA-256 точного
 detection payload, а fixed-memory firmware parser проверяет topic, QoS/retain и

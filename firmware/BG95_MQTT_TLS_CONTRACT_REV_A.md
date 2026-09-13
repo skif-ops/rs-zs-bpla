@@ -37,8 +37,10 @@ target to assert physical `CELL_STATUS=LOW`. Only then does the state return to
 
 `zs_dual_sim_bg95` binds this handshake plus the existing 700 ms power-on,
 full-ICCID result and validated online network settings to the matching
-dual-SIM actions. STM32 status sampling, mux/rail GPIO and hardware timing remain
-target work.
+dual-SIM actions. Before link commit it also requires the BG95 catalog index
+selected by the full-IMSI longest-prefix match to equal the controller's pending
+profile. STM32 status sampling, mux/rail GPIO and hardware timing remain target
+work.
 
 ## Protected identity telemetry
 
@@ -89,8 +91,9 @@ and clear online/network-valid flags.
   `tools/audit_dual_sim_failover_technical.py` verify the separate portable
   action controller, including DET debounce, bounded attempts and hold,
   authenticated/audited changes, modem-off/mux-High-Z order, exact provisioned
-  ICCID and attach/DNS/TLS before preserved-queue resume. Target GPIO, modem
-  power, audit/profile binding and assembled-station evidence remain open.
+  ICCID, exact pending-profile match and attach/DNS/TLS before preserved-queue
+  resume. Target HAL, modem power, durable audit, provisioned catalog contents
+  and assembled-station evidence remain open.
 - End-to-end QG-2: `server/tools/test_firmware_packet.py` decodes the actual
   firmware heartbeat and verifies both full identifiers survive the CBOR boundary;
   server tests verify validation, restricted persistence, API masking and mTLS

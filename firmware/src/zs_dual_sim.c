@@ -373,6 +373,16 @@ zs_dual_sim_slot_t zs_dual_sim_active_slot(const zs_dual_sim_t *controller) {
              : ZS_DUAL_SIM_SLOT_NONE;
 }
 
+bool zs_dual_sim_pending_profile(const zs_dual_sim_t *controller,
+                                 uint8_t *profile_index) {
+  if (!controller || !profile_index ||
+      !valid_slot(controller->pending_slot) ||
+      controller->pending_profile >= ZS_DUAL_SIM_MAX_PROFILES)
+    return false;
+  *profile_index = controller->pending_profile;
+  return true;
+}
+
 const char *zs_dual_sim_state_name(zs_dual_sim_state_t state) {
   static const char *const names[] = {
       "needs_safe_off",       "recovery_verifying_modem_off",

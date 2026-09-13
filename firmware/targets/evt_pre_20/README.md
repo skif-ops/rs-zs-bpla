@@ -55,6 +55,11 @@ logical SIM_MUX_EN read-back separate from optional fixture sampling of the
 otherwise MCU-inaccessible U13_EN_N. STM32 HAL/LL wiring, physical U13 and
 3V8_MODEM measurements, SIM cycling and operator EVT remain blocked.
 
+The BG95 bridge additionally compares the automatic-network catalog index
+selected from the full IMSI against the dual-SIM controller's pending profile.
+An otherwise valid online link through a different approved entry fails closed;
+production catalog values and durable audit persistence are still open.
+
 The GCC startup and CMSIS system template are byte-for-byte imports from the
 CMSIS commit pinned by STM32CubeU5 v1.9.0. The linker covers the full 2 MiB flash,
 the contiguous 768 KiB SRAM1-3 and the separate 16 KiB SRAM4 retained section,

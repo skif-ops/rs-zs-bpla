@@ -69,7 +69,8 @@ static void controller_to_pwrkey(zs_dual_sim_t *controller) {
   complete(controller, ZS_DUAL_SIM_ACTION_VERIFY_MUX_ENABLED, 60u);
 }
 
-static void establish_online_modem(zs_bg95_t *modem) {
+static void establish_online_modem(zs_bg95_t *modem,
+                                   uint8_t selected_apn_profile) {
   strcpy(modem->network_settings.iccid, SLOT1_ICCID);
   strcpy(modem->network_settings.imsi, "250011234567890");
   strcpy(modem->network_settings.apn, "network.apn");
@@ -77,6 +78,7 @@ static void establish_online_modem(zs_bg95_t *modem) {
   strcpy(modem->network_settings.gateway, "10.10.0.1");
   strcpy(modem->network_settings.primary_dns, "1.1.1.1");
   modem->network_settings.valid = true;
+  modem->selected_apn_profile = selected_apn_profile;
   modem->command_pending = false;
   modem->mqtt_connected = true;
   modem->mqtt_open = true;
@@ -86,6 +88,7 @@ static void establish_online_modem(zs_bg95_t *modem) {
 static void test_power_identity_link_and_shutdown_bridge(void) {
   static const zs_bg95_apn_profile_t profiles[] = {
       {"25001", "", true, true},
+      {"25002", "backup.apn", true, false},
   };
   zs_dual_sim_t controller;
   zs_bg95_t modem;
@@ -99,7 +102,7 @@ static void test_power_identity_link_and_shutdown_bridge(void) {
   controller_to_pwrkey(&controller);
 
   zs_bg95_init(&modem, &io, 1u, 2u, NULL);
-  assert(zs_bg95_configure_auto_network(&modem, profiles, 1u));
+  assert(zs_bg95_configure_auto_network(&modem, profiles, 2u));
   assert(zs_dual_sim_bg95_begin_power_on(&controller, &modem, 61u));
   assert(mock.pwrkey);
   assert(!zs_dual_sim_bg95_confirm_modem_on(
@@ -111,8 +114,10 @@ static void test_power_identity_link_and_shutdown_bridge(void) {
       &controller, &modem, true, 762u));
   assert(!zs_dual_sim_bg95_verify_iccid(&controller, &modem));
 
-  establish_online_modem(&modem);
+  establish_online_modem(&modem, 1u);
   assert(zs_dual_sim_bg95_verify_iccid(&controller, &modem));
+  assert(!zs_dual_sim_bg95_confirm_link(&controller, &modem, 763u));
+  modem.selected_apn_profile = 0u;
   assert(zs_dual_sim_bg95_confirm_link(&controller, &modem, 763u));
   complete(&controller, ZS_DUAL_SIM_ACTION_RECORD_SWITCH_COMMIT, 764u);
   complete(&controller, ZS_DUAL_SIM_ACTION_RESUME_PRESERVED_QUEUE, 765u);

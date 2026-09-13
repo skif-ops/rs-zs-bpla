@@ -129,6 +129,8 @@ bool zs_bg95_start_mqtt(zs_bg95_t *m, uint32_t now_ms);
 bool zs_bg95_ready(const zs_bg95_t *m);
 bool zs_bg95_online(const zs_bg95_t *m);
 const zs_bg95_network_settings_t *zs_bg95_get_network_settings(const zs_bg95_t *m);
+bool zs_bg95_selected_apn_profile(const zs_bg95_t *m,
+                                  uint8_t *profile_index);
 bool zs_bg95_export_cellular_telemetry(const zs_bg95_t *m,
                                        zs_cellular_telemetry_t *telemetry);
 const char *zs_bg95_state_name(zs_bg95_state_t state);
