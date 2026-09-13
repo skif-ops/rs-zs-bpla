@@ -141,6 +141,28 @@ def validate_decisions_and_tests() -> None:
     require("reject private APN" in tests["EVT-CELL-04"]["Method"], "private APN rejection test missing")
 
 
+def validate_deliverable_register() -> None:
+    rows = read_csv("docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv")
+    ids = [row["ID"] for row in rows]
+    require(len(ids) == len(set(ids)), "deliverable register contains duplicate IDs")
+    deliverables = {row["ID"]: row for row in rows}
+    require(deliverables["CM-002"]["QG-1 полнота"] == "PASS", "selectable-lot baseline is not QG-1 PASS")
+    require(
+        "zero provisional footprints and three controlled IPC candidates"
+        in deliverables["HW-M-002"]["Критерий выпуска"],
+        "PCB-MAIN deliverable still reports a stale footprint disposition",
+    )
+    require(
+        "4 10 и 20" in deliverables["PROC-001"]["Поставочный объект"]
+        and deliverables["PROC-001"]["QG-1 полнота"] == "PASS",
+        "production BOM deliverable is not bound to validated 4 10 20 quantities",
+    )
+    require(
+        deliverables["MFG-008"]["QG-1 полнота"] == "PASS",
+        "selected-lot housing plan is not QG-1 PASS",
+    )
+
+
 def validate_pinmap() -> None:
     pinmap = read_csv("hardware/EVT_PRE_20_PIN_MAP_REV_A.csv")
     require(len(pinmap) >= 50, "Rev.A pin map is unexpectedly incomplete")
@@ -314,6 +336,7 @@ def main() -> None:
     validate_lot()
     validate_procurement()
     validate_decisions_and_tests()
+    validate_deliverable_register()
     validate_pinmap()
     validate_hardware_baseline()
     validate_policy_text()

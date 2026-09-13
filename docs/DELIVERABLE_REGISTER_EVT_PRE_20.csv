@@ -1,18 +1,18 @@
 ID,Раздел,Поставочный объект,Формат,Критичность,Статус,QG-1 полнота,QG-2 техника,Критерий выпуска
 CM-001,Управление,Ведомость документов,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Все позиции реестра имеют владельца версию статус и путь
-CM-002,Управление,Конфигурационная база EVT-PRE-20,YAML+DOCX,P0,DRAFT,OPEN,OPEN,Решения партии однозначны и трассируются
+CM-002,Управление,Конфигурационная база EVT-PRE-20,YAML+DOCX,P0,DRAFT,PASS,OPEN,Варианты закупки 4 10 и 20 однозначны; до purchase release выбирается ровно один сценарий
 CM-003,Управление,Матрица требований и трассировки,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Каждое требование связано с проверкой и evidence
 CM-004,Управление,Журнал решений и изменений,XLSX+CSV,P1,DRAFT,OPEN,OPEN,Все изменения имеют основание и влияние
 CM-005,Управление,Реестр рисков и отклонений,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Блокирующие риски имеют владельца и действие
 CM-006,Управление,Манифест SHA-256,TXT+CSV,P0,PLANNED,OPEN,OPEN,Покрыты все поставочные файлы
-SYS-001,Требования,ТЗ предсерийного EVT,DOCX+PDF,P0,PLANNED,OPEN,OPEN,Согласовано для 20 изделий RU868 и будущей совместимости EU868
+SYS-001,Требования,ТЗ предсерийного EVT,DOCX+PDF,P0,PLANNED,OPEN,OPEN,Согласовано для выбранного лота 4 10 или 20 изделий RU868 и будущей совместимости EU868
 SYS-002,Архитектура,Архитектура изделия и системы,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Нет конфликтов hardware firmware server Android
 SYS-003,Архитектура,ICD станция-сервер,DOCX+CBOR schema,P0,DRAFT,PASS,OPEN,Decoder explicitly accepts controlled schemas 1 3 4 and rejects unknown versions; target and field compatibility remain QG2
 SYS-004,Архитектура,Энергобаланс 40-60 Ач и 60-80 Вт,XLSX+DOCX,P0,PLANNED,OPEN,OPEN,Расчёт и измерение S0-S4 согласованы
 SYS-005,Архитектура,Threat model и управление ключами,DOCX,P0,PLANNED,OPEN,OPEN,Ключи не включены в пакет; процессы provisioning описаны
 HW-M-000,PCB main,Комплект входных authority MAIN-AUTH-001..011,CSV+MD+JSON,P0,CONTROLLED,PASS,PASS,Основной аудит и 11 независимых проверок подтверждают полный capture input без разрешения производства
 HW-M-001,PCB main,Схема электрическая принципиальная,KICAD_SCH+PDF,P0,CONTROLLED,PASS,PASS,Native schematic and signed Review A PASS; commit-matched KiCad 9 ERC zero violations
-HW-M-002,PCB main,Разводка основной платы,KICAD_PCB+STEP,P0,DRAFT,PASS,OPEN,Six-layer placement candidate present and structurally audited; 52 provisional instances routing DRC STEP and Review B remain open
+HW-M-002,PCB main,Разводка основной платы,KICAD_PCB+STEP,P0,DRAFT,PASS,OPEN,Six-layer placement candidate structurally audited; zero provisional footprints and three controlled IPC candidates require assembler DFM; routing DRC STEP and Review B remain open
 HW-M-003,PCB main,Gerber и сверловка,GERBER+DRILL,P0,PLANNED,OPEN,OPEN,Сверены с source и просмотрены CAM
 HW-M-004,PCB main,IPC netlist и тестовые точки,IPC356+CSV,P0,PLANNED,OPEN,OPEN,Netlist совпадает; coverage тестов подтверждён
 HW-M-005,PCB main,Сборочные чертежи TOP/BOTTOM,PDF+SVG,P0,PLANNED,OPEN,OPEN,Полярность pin-1 и DNP видимы
@@ -30,16 +30,16 @@ HW-P-003,Power,Спецификация MPPT и батареи,DOCX+XLSX,P0,DRAF
 HW-C-001,Кабели,Схема соединения всех элементов,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Каждый pin связан с net fuse wire gauge connector
 HW-C-002,Кабели,Чертежи жгутов и распайка,DOCX+CSV,P0,PLANNED,OPEN,OPEN,Длина сечение цвет контакт обжим указаны
 HW-C-003,Кабели,Таблица разъёмов и mating parts,XLSX+CSV,P1,DRAFT,OPEN,OPEN,Разъёмы съёмные; пары и инструменты указаны
-PROC-001,Закупка,Сводный BOM на 20 изделий и запас,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Расчёт qty закупки и стоимости формульный
+PROC-001,Закупка,Сводный BOM для 4 10 и 20 изделий и запас,XLSX+CSV,P0,DRAFT,PASS,OPEN,Engineering и procurement quantities для всех трёх сценариев воспроизводимы; purchase release блокируется до выбора одного лота и QG-2
 PROC-002,Закупка,China sourcing snapshot,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Поставщик ссылка дата MOQ lead time stock
 PROC-003,Закупка,Approved vendor list и аналоги,XLSX+CSV,P0,PLANNED,OPEN,OPEN,Аналоги не снижают функциональность
 PROC-004,Закупка,План входного контроля,DOCX+forms,P0,DRAFT,OPEN,OPEN,Counterfeit ESD MSL functional sampling
 MECH-3D-001,Корпус 3D,Параметрическая сборка корпуса,FCSTD_or_BLEND+STEP,P0,PLANNED,OPEN,OPEN,Сборка без пересечений и с сервисным доступом
 MECH-3D-002,Корпус 3D,Детали для печати,STL+3MF,P0,PLANNED,OPEN,OPEN,Manifold размеры ориентация проверены
-MECH-3D-003,Корпус 3D,Профиль FlashForge 5M Pro,3MF+DOCX,P0,PLANNED,OPEN,OPEN,Пробная печать и fit check PASS; готовность выпуска 20 изделий при активации резерва
+MECH-3D-003,Корпус 3D,Профиль FlashForge 5M Pro,3MF+DOCX,P0,PLANNED,OPEN,OPEN,Пробная печать и fit check PASS; готовность выпуска выбранного количества 4 10 или 20 при активации резерва
 MECH-3D-004,Корпус 3D,Сборочный чертёж и крепёж,DOCX+PDF,P0,PLANNED,OPEN,OPEN,Крепёж уплотнения гермовводы и моменты указаны
 MECH-VC-001,Вакуумное литьё,Master и разъём формы,STEP+DRAWING,P0,PLANNED,OPEN,OPEN,Усадка литники вентиляция и допуски проверены
-MECH-VC-002,Вакуумное литьё,Материал и технологические требования,DOCX,P0,PLANNED,OPEN,OPEN,Материал UV температура герметичность и выпуск 20 корпусов согласованы
+MECH-VC-002,Вакуумное литьё,Материал и технологические требования,DOCX,P0,PLANNED,OPEN,OPEN,Материал UV температура герметичность и выпуск выбранного количества 4 10 или 20 корпусов согласованы
 MECH-IM-001,ТПА,Литьевая конструкция корпуса,STEP+DRAWING,P0,PLANNED,OPEN,OPEN,Draft ribs bosses wall thickness DFM PASS
 MECH-IM-002,ТПА,Требования к пресс-форме и материалу,DOCX,P1,PLANNED,OPEN,OPEN,Parting ejector inserts texture shrinkage указаны; изготовление оснастки не входит в пилот
 FW-001,Firmware,Исходники target STM32U585,C+IOC+CMAKE,P0,DRAFT,PARTIAL_PASS_GENERATED_IOC_STARTUP_LINKER,PARTIAL_PASS_GENERATED_IOC_EXTI_AUDIT,Reproducible target build PASS
@@ -61,22 +61,21 @@ PR-003,Протоколы,LoRa P2P mesh store-and-forward,DOCX+CBOR schema,P0,DR
 PR-004,Протоколы,BLE GATT configuration OTA,DOCX+schema,P0,DRAFT,OPEN,OPEN,Android-station compatibility PASS
 PR-005,Протоколы,GNSS PPS time quality,DOCX,P0,DRAFT,PASS,OPEN,RMC date to UTC epoch and PPS-loss holdover degradation host-tested; STM32 timer binding and measured holdover remain QG2
 PR-006,Протоколы,Dual SIM и public APN failover,DOCX+YAML,P0,DRAFT,PASS,PARTIAL_PASS_HOST_SAFE_SEQUENCE,Portable audited safe-sequence hold retry ICCID and queue-resume policy QG-1/QG-2 PASS; target binding обычные SIM публичные APN операторская матрица 100 switches и recovery remain open
-MFG-001,Производство,Маршрут сборки 20 изделий,DOCX+XLSX,P0,DRAFT,OPEN,OPEN,Все операции критерии и evidence указаны
+MFG-001,Производство,Маршрут сборки выбранного EVT-лота,DOCX+XLSX,P0,DRAFT,OPEN,OPEN,Все операции критерии и evidence применяются к каждому изделию выбранного лота 4 10 или 20
 MFG-002,Производство,Stencil paste reflow profile,DOCX+CSV,P0,PLANNED,OPEN,OPEN,Профиль записан термопарами
 MFG-003,Производство,Программирование и provisioning,DOCX+SCRIPTS,P0,DRAFT,OPEN,OPEN,Уникальные ID и ключи без утечки
 MFG-004,Производство,EOL fixture и тестовая программа,CAD+SCRIPTS+DOCX,P0,DRAFT,OPEN,OPEN,Golden unit и self-test coverage PASS
 MFG-005,Производство,Калибровка микрофонов и задержек,DOCX+CSV,P0,PLANNED,OPEN,OPEN,Разброс и задержка не более 1 отсчёта
 MFG-006,Производство,Маркировка и паспорт изделия,DOCX+LABEL,P0,DRAFT,OPEN,OPEN,Serial HW FW RU868 и обе ICCID refs однозначны
 MFG-007,Производство,Упаковка транспорт хранение,DOCX,P1,PLANNED,OPEN,OPEN,ESD moisture battery transport требования учтены
-MFG-008,Производство,План технологии корпусов по 20 серийным номерам,CSV,P0,DRAFT,OPEN,OPEN,20 вакуумных основных позиций и 20 условных 3D резервов согласованы; ТПА только исходные данные
-MFG-008,Производство,План корпусов партии 20 изделий,CSV+DOCX,P0,DRAFT,OPEN,OPEN,20 вакуумных корпусов назначены по serial; 3D резерв всей партии; ТПА без пилотной оснастки
-EVT-001,Испытания,ПМИ предсерийной партии,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Матрица 20 изделий и выборки утверждены
-EVT-002,Испытания,Формы протоколов на 20 изделий,DOCX+XLSX+CSV,P0,DRAFT,OPEN,OPEN,Serial и evidence links обязательны
+MFG-008,Производство,План корпусов выбранного EVT-лота,CSV+DOCX,P0,DRAFT,PASS,OPEN,Сценарии 4 10 и 20 привязаны к ведущему serial range; вакуумное литьё основное; равный 3D резерв условный; ТПА без пилотной оснастки
+EVT-001,Испытания,ПМИ предсерийной партии,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Матрица и выборки утверждены для каждого изделия выбранного лота 4 10 или 20
+EVT-002,Испытания,Формы протоколов выбранного EVT-лота,DOCX+XLSX+CSV,P0,DRAFT,OPEN,OPEN,Serial и evidence links обязательны для каждого изделия выбранного лота
 EVT-003,Испытания,Аудио DSP классификация,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Pd FAR и negative set определены
 EVT-004,Испытания,GNSS PPS TDOA,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Raw PPS and synchronized audio stored
-EVT-005,Испытания,GSM LTE LoRa BLE,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,RU868 на 20 изделиях dual SIM public APN и BLE проверены; private APN отклонён
+EVT-005,Испытания,GSM LTE LoRa BLE,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,RU868 на каждом изделии выбранного лота; dual SIM public APN и BLE проверены; private APN отклонён
 EVT-006,Испытания,Энергетика S0-S4 solar battery,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Токи температура MPPT автономность evidence
-EVT-007,Испытания,Механика IP климат UV,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,20 вакуумных корпусов; 3D как утверждённый резерв; ТПА только аудит исходных данных
+EVT-007,Испытания,Механика IP климат UV,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Вакуумные корпуса на выбранный лот 4 10 или 20; 3D как утверждённый равный резерв; ТПА только аудит исходных данных
 EVT-008,Испытания,Сводный отчёт и deviation closure,DOCX+XLSX,P0,PLANNED,OPEN,OPEN,Нет незакрытых blocker deviations
 AND-001,Android,Требования и UX flow,DOCX+FIGMA_or_SVG,P0,DRAFT,OPEN,OPEN,Сценарии монтажника и сервис-инженера приняты
 AND-002,Android,Исходный проект Kotlin/Android,KOTLIN+GRADLE,P0,DRAFT,OPEN,OPEN,Reproducible build and tests PASS
