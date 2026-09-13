@@ -25,6 +25,21 @@ on hardware.
 `COPS?` is an optional diagnostic query. `QCCID`, `CIMI`, profile authorization,
 PDP activation and active-context verification are mandatory and fail closed.
 
+## Graceful power-off boundary
+
+`zs_bg95_request_graceful_power_off` emits `AT+QPOWD` only when no command is
+pending, invalidates MQTT/network-valid state immediately and enters
+`POWERING_OFF`. `OK`, `NORMAL POWER DOWN` or `POWERED DOWN` never by themselves
+declare the rail safe: `zs_bg95_confirm_power_off` additionally requires the
+target to assert physical `CELL_STATUS=LOW`. Only then does the state return to
+`OFF` and erase volatile IMSI/ICCID. A 120-second timeout fails closed, and
+`zs_bg95_power_on` refuses any state other than `OFF`.
+
+`zs_dual_sim_bg95` binds this handshake plus the existing 700 ms power-on,
+full-ICCID result and validated online network settings to the matching
+dual-SIM actions. STM32 status sampling, mux/rail GPIO and hardware timing remain
+target work.
+
 ## Protected identity telemetry
 
 After active-context verification the BG95 state can be exported into compact

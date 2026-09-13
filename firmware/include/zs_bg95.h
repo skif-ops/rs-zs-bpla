@@ -28,8 +28,16 @@ typedef enum {
   ZS_BG95_MQTT_OPENING,
   ZS_BG95_MQTT_CONNECTING,
   ZS_BG95_ONLINE,
+  ZS_BG95_POWERING_OFF,
   ZS_BG95_ERROR
 } zs_bg95_state_t;
+
+typedef enum {
+  ZS_BG95_SHUTDOWN_STARTED = 0,
+  ZS_BG95_SHUTDOWN_ALREADY_OFF,
+  ZS_BG95_SHUTDOWN_REJECTED_BUSY,
+  ZS_BG95_SHUTDOWN_IO_ERROR
+} zs_bg95_shutdown_result_t;
 
 typedef enum {
   ZS_BG95_NET_NONE = 0,
@@ -108,6 +116,10 @@ bool zs_bg95_configure_auto_network(zs_bg95_t *m,
                                     const zs_bg95_apn_profile_t *profiles,
                                     size_t profile_count);
 void zs_bg95_power_on(zs_bg95_t *m, uint32_t now_ms);
+zs_bg95_shutdown_result_t zs_bg95_request_graceful_power_off(
+    zs_bg95_t *m, uint32_t now_ms);
+bool zs_bg95_confirm_power_off(zs_bg95_t *m, bool cell_status_low);
+bool zs_bg95_power_off_pending(const zs_bg95_t *m);
 void zs_bg95_tick(zs_bg95_t *m, uint32_t now_ms);
 void zs_bg95_on_line(zs_bg95_t *m, const char *line, uint32_t now_ms);
 bool zs_bg95_configure_mqtt_tls(zs_bg95_t *m, const char *host, uint16_t port,

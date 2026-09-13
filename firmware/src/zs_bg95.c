@@ -285,7 +285,7 @@ bool zs_bg95_configure_auto_network(zs_bg95_t *m,
 
 void zs_bg95_power_on(zs_bg95_t *m, uint32_t now_ms) {
   zs_bg95_apn_source_t apn_source;
-  if (!m) return;
+  if (!m || m->state != ZS_BG95_OFF) return;
   apn_source = m->auto_network ? ZS_BG95_APN_NONE : m->network_settings.apn_source;
   if (m->io.gpio_write) m->io.gpio_write(m->io.ctx, m->pwrkey_gpio, true);
   m->state = ZS_BG95_POWERING;
@@ -306,6 +306,53 @@ void zs_bg95_power_on(zs_bg95_t *m, uint32_t now_ms) {
     m->apn_public_approved = false;
     m->apn[0] = '\0';
   }
+}
+
+zs_bg95_shutdown_result_t zs_bg95_request_graceful_power_off(
+    zs_bg95_t *m, uint32_t now_ms) {
+  if (!m) return ZS_BG95_SHUTDOWN_IO_ERROR;
+  if (m->state == ZS_BG95_OFF) return ZS_BG95_SHUTDOWN_ALREADY_OFF;
+  if (m->state == ZS_BG95_POWERING || m->state == ZS_BG95_POWERING_OFF ||
+      m->command_pending)
+    return ZS_BG95_SHUTDOWN_REJECTED_BUSY;
+  m->mqtt_open = false;
+  m->mqtt_connected = false;
+  m->mqtt_receive_length_enabled = false;
+  m->network_settings.valid = false;
+  m->state = ZS_BG95_POWERING_OFF;
+  if (!send_timed_cmd(m, "AT+QPOWD", now_ms)) {
+    fail_transport(m);
+    return ZS_BG95_SHUTDOWN_IO_ERROR;
+  }
+  return ZS_BG95_SHUTDOWN_STARTED;
+}
+
+bool zs_bg95_confirm_power_off(zs_bg95_t *m, bool cell_status_low) {
+  zs_bg95_apn_source_t apn_source;
+  if (!m || m->state != ZS_BG95_POWERING_OFF || !cell_status_low) return false;
+  apn_source = m->auto_network ? ZS_BG95_APN_NONE : m->network_settings.apn_source;
+  m->state = ZS_BG95_OFF;
+  m->network = ZS_BG95_NET_NONE;
+  m->command_pending = false;
+  m->mqtt_open = false;
+  m->mqtt_connected = false;
+  m->mqtt_receive_length_enabled = false;
+  m->sim_ready = false;
+  m->registered_eps = false;
+  m->registered_cs = false;
+  memset(&m->network_settings, 0, sizeof(m->network_settings));
+  m->network_settings.apn_source = apn_source;
+  m->network_apn[0] = '\0';
+  if (m->auto_network) {
+    m->selected_apn_profile = BG95_NO_PROFILE;
+    m->apn_public_approved = false;
+    m->apn[0] = '\0';
+  }
+  return true;
+}
+
+bool zs_bg95_power_off_pending(const zs_bg95_t *m) {
+  return m && m->state == ZS_BG95_POWERING_OFF;
 }
 
 static int registration_status(const char *line) {
@@ -421,6 +468,11 @@ void zs_bg95_on_line(zs_bg95_t *m, const char *line, uint32_t now_ms) {
   unsigned client = 0u, result = 0u, ack = 0u;
   int n;
   if (!m || !line) return;
+  if (m->state == ZS_BG95_POWERING_OFF &&
+      (strstr(line, "NORMAL POWER DOWN") || strstr(line, "POWERED DOWN"))) {
+    m->command_pending = false;
+    return;
+  }
   if (strstr(line, "+CPIN: READY")) {
     m->sim_ready = true;
     return;
@@ -504,7 +556,7 @@ void zs_bg95_on_line(zs_bg95_t *m, const char *line, uint32_t now_ms) {
     return;
   }
   if (strstr(line, "+QMTSTAT:")) {
-    fail_transport(m);
+    if (m->state != ZS_BG95_POWERING_OFF) fail_transport(m);
     return;
   }
   if (strcmp(line, "OK") == 0) {
@@ -589,6 +641,8 @@ void zs_bg95_tick(zs_bg95_t *m, uint32_t now_ms) {
   }
   if (m->state >= ZS_BG95_PDP_ACTIVATING && m->state <= ZS_BG95_MQTT_CONNECTING &&
       now_ms >= m->deadline_ms) fail_transport(m);
+  if (m->state == ZS_BG95_POWERING_OFF && now_ms >= m->deadline_ms)
+    fail_transport(m);
 }
 
 bool zs_bg95_ready(const zs_bg95_t *m) {
@@ -638,7 +692,8 @@ const char *zs_bg95_state_name(zs_bg95_state_t state) {
     "OFF", "POWERING", "AT_SYNC", "SIM_CHECK", "SIM_ICCID_QUERY",
     "SIM_IMSI_QUERY", "OPERATOR_QUERY", "APN_DISCOVERING", "CONFIGURE",
     "REGISTERING", "READY", "PDP_ACTIVATING", "PDP_SETTINGS_QUERY",
-    "TLS_CONFIGURING", "MQTT_OPENING", "MQTT_CONNECTING", "ONLINE", "ERROR"
+    "TLS_CONFIGURING", "MQTT_OPENING", "MQTT_CONNECTING", "ONLINE",
+    "POWERING_OFF", "ERROR"
   };
   return state <= ZS_BG95_ERROR ? names[state] : "?";
 }

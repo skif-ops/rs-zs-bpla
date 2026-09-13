@@ -19,6 +19,9 @@ def main() -> int:
     header = read("firmware/include/zs_dual_sim.h")
     source = read("firmware/src/zs_dual_sim.c")
     test = read("firmware/tests/test_dual_sim.c")
+    bridge_header = read("firmware/include/zs_dual_sim_bg95.h")
+    bridge_source = read("firmware/src/zs_dual_sim_bg95.c")
+    bridge_test = read("firmware/tests/test_dual_sim_bg95.c")
     cmake = read("firmware/CMakeLists.txt")
     policy = read("config/cellular/dual_sim_apn_profiles.yaml")
     baseline = read("config/EVT_PRE_20_BASELINE.yaml")
@@ -69,6 +72,30 @@ def main() -> int:
     require("printf" not in source and "puts" not in source,
             "portable controller must not log provisioned or observed identity")
 
+    for bridge_token in (
+        "zs_dual_sim_bg95_begin_graceful_shutdown",
+        "zs_dual_sim_bg95_confirm_shutdown",
+        "zs_dual_sim_bg95_begin_power_on",
+        "zs_dual_sim_bg95_confirm_modem_on",
+        "zs_dual_sim_bg95_verify_iccid",
+        "zs_dual_sim_bg95_confirm_link",
+    ):
+        require(bridge_token in bridge_header and bridge_token in bridge_source,
+                f"dual-SIM/BG95 bridge missing {bridge_token}")
+    for bridge_guard in (
+        "ZS_DUAL_SIM_ACTION_GRACEFUL_MODEM_OFF",
+        "ZS_BG95_SHUTDOWN_STARTED",
+        "cell_status_low",
+        "ZS_DUAL_SIM_ACTION_PULSE_PWRKEY_700_MS",
+        "full_iccid_available",
+        "zs_bg95_online",
+        "settings->primary_dns[0]",
+    ):
+        require(bridge_guard in bridge_source,
+                f"dual-SIM/BG95 bridge guard missing {bridge_guard}")
+    require("printf" not in bridge_source and "puts" not in bridge_source,
+            "dual-SIM/BG95 bridge must not log SIM identity")
+
     for evidence in (
         "test_boot_and_bounded_automatic_failover",
         "test_auth_presence_and_configuration_guards",
@@ -86,10 +113,22 @@ def main() -> int:
     ):
         require(evidence in test, f"dual-SIM runtime scenario missing {evidence}")
     require("src/zs_dual_sim.c" in cmake and
+            "src/zs_dual_sim_bg95.c" in cmake and
             "zs_dual_sim_tests" in cmake and
+            "zs_dual_sim_bg95_tests" in cmake and
             "add_test(NAME dual_sim" in cmake and
+            "add_test(NAME dual_sim_bg95" in cmake and
             "-UNDEBUG" in cmake,
             "dual-SIM test is not bound to strict CMake/CTest")
+    for evidence in (
+        "test_power_identity_link_and_shutdown_bridge",
+        "AT+QPOWD\\r\\n",
+        "zs_dual_sim_bg95_verify_iccid",
+        "zs_dual_sim_bg95_confirm_link",
+        "zs_dual_sim_bg95_confirm_shutdown",
+    ):
+        require(evidence in bridge_test,
+                f"dual-SIM/BG95 integration scenario missing {evidence}")
 
     for policy_token in (
         "mode: dual_sim_single_standby",
@@ -105,9 +144,9 @@ def main() -> int:
         "DEFERRED_UNTIL_STATIONS_ASSEMBLED",
     ):
         require(policy_token in policy, f"dual-SIM policy drift: {policy_token}")
-    require("firmware_status: PORTABLE_SAFE_SEQUENCE_QG1_QG2_PASS_TARGET_PENDING" in policy,
+    require("firmware_status: PORTABLE_SAFE_SEQUENCE_BG95_BRIDGE_QG1_QG2_PASS_TARGET_PENDING" in policy,
             "portable failover status missing from controlled policy")
-    require("dual_sim_failover_firmware: PORTABLE_SAFE_SEQUENCE_QG1_QG2_PASS_TARGET_GPIO_POWER_PROFILE_BINDING_PENDING" in baseline,
+    require("dual_sim_failover_firmware: PORTABLE_SAFE_SEQUENCE_BG95_POWER_IDENTITY_LINK_BRIDGE_QG1_QG2_PASS_TARGET_GPIO_POWER_PROFILE_BINDING_PENDING" in baseline,
             "portable failover status missing from EVT baseline")
     require("firmware debounce не менее 20 ms" in hardware and
             "Переключение без полного штатного выключения модема является ошибкой" in hardware,

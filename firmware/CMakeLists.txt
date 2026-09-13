@@ -20,6 +20,7 @@ add_library(zs_core
   src/zs_dsp.c
   src/zs_bg95.c
   src/zs_dual_sim.c
+  src/zs_dual_sim_bg95.c
   src/zs_bg95_command_transport.c
   src/zs_bg95_mqtt_binary.c
   src/zs_bg95_mqtt_session.c
@@ -63,6 +64,8 @@ add_executable(zs_bg95_transport_tests tests/test_bg95_transport.c)
 target_link_libraries(zs_bg95_transport_tests zs_core m)
 add_executable(zs_dual_sim_tests tests/test_dual_sim.c)
 target_link_libraries(zs_dual_sim_tests zs_core m)
+add_executable(zs_dual_sim_bg95_tests tests/test_dual_sim_bg95.c)
+target_link_libraries(zs_dual_sim_bg95_tests zs_core m)
 add_executable(zs_bg95_event_uplink_tests tests/test_bg95_event_uplink.c)
 target_link_libraries(zs_bg95_event_uplink_tests zs_core m)
 add_executable(zs_bg95_event_receipt_tests tests/test_bg95_event_receipt.c)
@@ -124,6 +127,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_classifier_consensus_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_bg95_transport_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_dual_sim_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_dual_sim_bg95_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_bg95_event_uplink_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_bg95_event_receipt_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_bg95_command_transport_tests PRIVATE -UNDEBUG)
@@ -158,6 +162,7 @@ add_test(NAME drivers COMMAND zs_driver_tests)
 add_test(NAME classifier_consensus COMMAND zs_classifier_consensus_tests)
 add_test(NAME bg95_transport COMMAND zs_bg95_transport_tests)
 add_test(NAME dual_sim COMMAND zs_dual_sim_tests)
+add_test(NAME dual_sim_bg95 COMMAND zs_dual_sim_bg95_tests)
 add_test(NAME bg95_event_uplink COMMAND zs_bg95_event_uplink_tests)
 add_test(NAME bg95_event_receipt COMMAND zs_bg95_event_receipt_tests)
 add_test(NAME bg95_command_transport COMMAND zs_bg95_command_transport_tests)

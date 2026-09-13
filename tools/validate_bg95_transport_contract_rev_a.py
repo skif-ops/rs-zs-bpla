@@ -42,14 +42,18 @@ def main() -> int:
                   "ZS_BG95_PDP_ACTIVATING", "ZS_BG95_PDP_SETTINGS_QUERY",
                   "ZS_BG95_TLS_CONFIGURING",
                   "ZS_BG95_MQTT_OPENING", "ZS_BG95_MQTT_CONNECTING",
-                  "ZS_BG95_ONLINE", "zs_bg95_apn_profile_t",
+                  "ZS_BG95_ONLINE", "ZS_BG95_POWERING_OFF",
+                  "zs_bg95_shutdown_result_t",
+                  "zs_bg95_request_graceful_power_off",
+                  "zs_bg95_confirm_power_off", "zs_bg95_power_off_pending",
+                  "zs_bg95_apn_profile_t",
                   "zs_bg95_network_settings_t", "zs_bg95_configure_auto_network",
                   "zs_bg95_configure_mqtt_tls", "zs_bg95_start_mqtt",
                   "zs_bg95_get_network_settings", "zs_bg95_export_cellular_telemetry",
                   "zs_bg95_online", "mqtt_receive_length_enabled"):
         require(token in header, f"BG95 interface missing {token}")
 
-    for command in ('AT+QCCID', 'AT+CIMI', 'AT+COPS?', 'AT+CGNAPN',
+    for command in ('AT+QCCID', 'AT+CIMI', 'AT+COPS?', 'AT+CGNAPN', 'AT+QPOWD',
                     'AT+QIACT=1', 'AT+CGCONTRDP=1', 'QSSLCFG=\\"sslversion\\"',
                     'QSSLCFG=\\"seclevel\\"', 'QSSLCFG=\\"cacert\\"',
                     'QMTCFG=\\"ssl\\"', 'QMTCFG=\\"recv/mode\\"',
@@ -59,7 +63,8 @@ def main() -> int:
                   'strpbrk(src, "\\r\\n\\\"")', 'strstr(line, "+QMTSTAT:")',
                   "BG95_COMMAND_TIMEOUT_MS", "BG95_NO_PROFILE",
                   "strcmp(apn, m->apn) != 0", "network_settings.valid = false",
-                  "result != 0 && result != (int)n"):
+                  "result != 0 && result != (int)n",
+                  "m->state != ZS_BG95_OFF", "cell_status_low"):
         require(guard in source, f"BG95 fail-closed guard missing {guard}")
     require(source.index('QMTCFG=\\"recv/mode\\"') <
             source.index('AT+QMTOPEN='),
@@ -67,6 +72,9 @@ def main() -> int:
 
     for evidence in ("test_mqtt_tls_happy_path", "test_automatic_network_settings",
                      "test_catalog_fallback_and_unknown_sim", "test_identity_query_fail_closed",
+                     "test_graceful_power_off_requires_status_confirmation",
+                     "test_graceful_power_off_busy_io_and_timeout",
+                     "+QMTSTAT: 0,1",
                      "zs_bg95_export_cellular_telemetry", "250011234567890",
                      "89701012345678901234",
                      "private.apn", "wrong.apn", "1883u", "pilot.example\\\"",

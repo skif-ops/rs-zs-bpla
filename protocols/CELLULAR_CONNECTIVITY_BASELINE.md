@@ -51,6 +51,13 @@ index, который использует автоматическое полу
 SIM, операторский результат, power-fault и 100-cycle evidence остаются в
 послесборочном EVT.
 
+Portable BG95 bridge связывает modem-dependent этапы без подмены hardware
+evidence: выдаёт `AT+QPOWD`, но завершает shutdown только по внешнему
+`CELL_STATUS=LOW`; очищает volatile IMSI/ICCID; допускает новый 700 ms PWRKEY
+только из `OFF`; передаёт controller полный ICCID и разрешает link-success
+только при online MQTT/TLS и валидном APN/IP/gateway/DNS read-back. Источник
+PD13/CELL_STATUS и GPIO mux/rail реализуются в target port.
+
 ## Проверка после сборки станций
 
 Операторские проверки и 24-часовой EVT PASS выполняются после сборки станций.

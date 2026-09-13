@@ -47,6 +47,14 @@ brownout или debounced removal переводит controller в safe-off requ
 host QG-1/QG-2, а не доказательство GPIO, реальных SIM, 100 циклов, операторов
 или 24-часовой работы станции.
 
+Узкий portable bridge теперь связывает modem-dependent actions с BG95:
+`AT+QPOWD` не считается завершённым без внешнего `CELL_STATUS=LOW`, после чего
+volatile IMSI/ICCID очищаются; повторный power-on разрешён только из `OFF`.
+Обратный путь требует штатного 700 ms PWRKEY, `CELL_STATUS=HIGH`, полного ICCID
+из runtime автоматического network discovery и действительного online MQTT/TLS
+с APN/IP/gateway/DNS read-back. Busy UART не позволяет перескочить shutdown.
+Источник физического CELL_STATUS и прочие GPIO по-прежнему относятся к target.
+
 Portable store-and-forward теперь дополнен серверным application receipt:
 сервер после durable processing публикует canonical CBOR с SHA-256 точного
 detection payload, а fixed-memory firmware parser проверяет topic, QoS/retain и

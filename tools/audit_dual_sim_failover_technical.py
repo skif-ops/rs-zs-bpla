@@ -65,31 +65,48 @@ def main() -> int:
 
     compiler = shutil.which("cc") or shutil.which("gcc")
     require(compiler is not None, "host C compiler is unavailable")
+    test_sets = (
+        (
+            "dual_sim_qg2",
+            ("firmware/src/zs_dual_sim.c", "firmware/tests/test_dual_sim.c"),
+            "dual-SIM safe failover tests passed",
+        ),
+        (
+            "dual_sim_bg95_qg2",
+            (
+                "firmware/src/zs_dual_sim.c",
+                "firmware/src/zs_bg95.c",
+                "firmware/src/zs_dual_sim_bg95.c",
+                "firmware/tests/test_dual_sim_bg95.c",
+            ),
+            "dual-SIM BG95 bridge tests passed",
+        ),
+    )
     with tempfile.TemporaryDirectory(prefix="zs-dual-sim-qg2-") as directory:
-        binary = Path(directory) / "dual_sim_qg2"
-        compile_result = subprocess.run(
-            [
-                compiler,
-                "-std=c11", "-Wall", "-Wextra", "-Wpedantic", "-Werror",
-                "-O2", "-UNDEBUG", f"-I{ROOT / 'firmware/include'}",
-                str(ROOT / "firmware/src/zs_dual_sim.c"),
-                str(ROOT / "firmware/tests/test_dual_sim.c"),
-                "-o", str(binary),
-            ],
-            check=False, capture_output=True, text=True, cwd=ROOT,
-        )
-        require(compile_result.returncode == 0,
-                f"strict dual-SIM compile failed: {compile_result.stderr}")
-        run_result = subprocess.run(
-            [str(binary)], check=False, capture_output=True, text=True, cwd=ROOT
-        )
-        require(run_result.returncode == 0,
-                f"dual-SIM runtime failed: {run_result.stderr}")
-        require("dual-SIM safe failover tests passed" in run_result.stdout,
-                "dual-SIM runtime did not report PASS")
+        for test_name, sources, success_text in test_sets:
+            binary = Path(directory) / test_name
+            compile_result = subprocess.run(
+                [
+                    compiler,
+                    "-std=c11", "-Wall", "-Wextra", "-Wpedantic", "-Werror",
+                    "-O2", "-UNDEBUG", f"-I{ROOT / 'firmware/include'}",
+                    *(str(ROOT / source_name) for source_name in sources),
+                    "-o", str(binary),
+                ],
+                check=False, capture_output=True, text=True, cwd=ROOT,
+            )
+            require(compile_result.returncode == 0,
+                    f"strict {test_name} compile failed: {compile_result.stderr}")
+            run_result = subprocess.run(
+                [str(binary)], check=False, capture_output=True, text=True, cwd=ROOT
+            )
+            require(run_result.returncode == 0,
+                    f"{test_name} runtime failed: {run_result.stderr}")
+            require(success_text in run_result.stdout,
+                    f"{test_name} runtime did not report PASS")
 
     print("Dual-SIM safe failover QG-2 independent technical audit: PASS")
-    print("fixed bounds, safe action order and strict C runtime verified")
+    print("fixed bounds, safe action order, BG95 power/identity/link bridge and strict C runtimes verified")
     return 0
 
 

@@ -120,6 +120,11 @@ single-standby sequence: 20 ms DET debounce, three attempts per profile,
 provisioned ICCID and attach/DNS/TLS before resume. The target still needs the
 STM32 GPIO/modem-power/audit/profile binding and assembled-station fault and
 100-cycle evidence; operator and 24-hour EVT remain deferred until assembly.
+The portable BG95 bridge closes the host-only modem handshake inside that
+sequence: it sends `AT+QPOWD`, requires caller-confirmed `CELL_STATUS=LOW`,
+clears volatile SIM identity, admits PWRKEY only from `OFF`, and gates ICCID/link
+actions on full identity plus valid online APN/IP/gateway/DNS state. Actual
+PD13 sampling and the remaining STM32 GPIO/rail implementation stay blocked.
 The portable BG95 uplink now emits fixed-length `QMTPUB`, waits for the data
 prompt and writes exact binary CBOR bytes; partial UART writes, wrong result URCs,
 offline transitions and timeout retain the pending event. Broker success still

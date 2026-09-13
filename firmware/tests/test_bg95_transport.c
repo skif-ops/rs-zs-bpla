@@ -299,6 +299,63 @@ static void test_identity_query_fail_closed(void) {
   assert(modem.state == ZS_BG95_ERROR);
 }
 
+static void test_graceful_power_off_requires_status_confirmation(void) {
+  mock_t mock = {0};
+  zs_bg95_t modem;
+  reach_registered(&modem, &mock, "internet");
+  assert(modem.network_settings.iccid[0] != '\0');
+  assert(zs_bg95_request_graceful_power_off(&modem, 800u) ==
+         ZS_BG95_SHUTDOWN_STARTED);
+  expect_last(&modem, "AT+QPOWD");
+  assert(zs_bg95_power_off_pending(&modem));
+  assert(!zs_bg95_confirm_power_off(&modem, false));
+
+  zs_bg95_power_on(&modem, 801u);
+  assert(modem.state == ZS_BG95_POWERING_OFF);
+  zs_bg95_on_line(&modem, "+QMTSTAT: 0,1", 802u);
+  assert(modem.state == ZS_BG95_POWERING_OFF);
+  zs_bg95_on_line(&modem, "NORMAL POWER DOWN", 803u);
+  assert(!modem.command_pending);
+  assert(zs_bg95_power_off_pending(&modem));
+  assert(zs_bg95_confirm_power_off(&modem, true));
+  assert(modem.state == ZS_BG95_OFF);
+  assert(modem.network_settings.iccid[0] == '\0');
+  assert(modem.network_settings.imsi[0] == '\0');
+  assert(!modem.sim_ready);
+  assert(zs_bg95_request_graceful_power_off(&modem, 804u) ==
+         ZS_BG95_SHUTDOWN_ALREADY_OFF);
+}
+
+static void test_graceful_power_off_busy_io_and_timeout(void) {
+  mock_t mock = {0};
+  zs_bg95_t modem;
+  zs_hal_port_t io = port(&mock);
+
+  zs_bg95_init(&modem, &io, 1u, 2u, "internet");
+  zs_bg95_power_on(&modem, 0u);
+  assert(zs_bg95_request_graceful_power_off(&modem, 1u) ==
+         ZS_BG95_SHUTDOWN_REJECTED_BUSY);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_tick(&modem, 700u);
+  assert(modem.command_pending);
+  assert(zs_bg95_request_graceful_power_off(&modem, 701u) ==
+         ZS_BG95_SHUTDOWN_REJECTED_BUSY);
+
+  reach_registered(&modem, &mock, "internet");
+  mock.short_uart_call = mock.uart_calls + 1u;
+  assert(zs_bg95_request_graceful_power_off(&modem, 900u) ==
+         ZS_BG95_SHUTDOWN_IO_ERROR);
+  assert(modem.state == ZS_BG95_ERROR);
+
+  memset(&mock, 0, sizeof(mock));
+  reach_registered(&modem, &mock, "internet");
+  assert(zs_bg95_request_graceful_power_off(&modem, 1000u) ==
+         ZS_BG95_SHUTDOWN_STARTED);
+  zs_bg95_tick(&modem, 121000u);
+  assert(modem.state == ZS_BG95_ERROR);
+  assert(!zs_bg95_confirm_power_off(&modem, true));
+}
+
 static void test_fail_closed_policy_and_urc(void) {
   static const zs_bg95_apn_profile_t private_profile[] = {
     {"25001", "private.apn", true, false}
@@ -410,6 +467,8 @@ int main(void) {
   test_automatic_network_settings();
   test_catalog_fallback_and_unknown_sim();
   test_identity_query_fail_closed();
+  test_graceful_power_off_requires_status_confirmation();
+  test_graceful_power_off_busy_io_and_timeout();
   test_fail_closed_policy_and_urc();
   test_timeout_and_negative_results();
   puts("zs_bg95_transport_tests: OK");

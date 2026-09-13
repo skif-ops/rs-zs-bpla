@@ -40,6 +40,7 @@ automatic_network_discovery:
   server_general_api_identity_policy: REDACTED_ONLY
   physical_sim_and_operator_evidence: DEFERRED_UNTIL_STATIONS_ASSEMBLED
   mqtt_24h_evidence: DEFERRED_UNTIL_STATIONS_ASSEMBLED
+  graceful_shutdown: PORTABLE_AT_QPOWD_CELL_STATUS_CONFIRMATION_HOST_TESTED_TARGET_GPIO_PENDING
 apn_modes:
   public:
     allowed: true
@@ -50,7 +51,7 @@ apn_modes:
     allowed_in_pilot: false
     status: FUTURE_NOT_PROVISIONED
 profile_selection:
-  firmware_status: PORTABLE_SAFE_SEQUENCE_QG1_QG2_PASS_TARGET_PENDING
+  firmware_status: PORTABLE_SAFE_SEQUENCE_BG95_BRIDGE_QG1_QG2_PASS_TARGET_PENDING
   expected_iccid_per_slot: PROVISIONED_FULL_VALUE_REQUIRED
   order_per_slot: APPROVED_PUBLIC_PLMN_PROFILES_ONLY_TO_BE_PROVISIONED
   automatic_failover_enabled: true

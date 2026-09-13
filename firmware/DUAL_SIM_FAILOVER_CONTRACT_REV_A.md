@@ -6,8 +6,9 @@ RELEASE`
 
 `zs_dual_sim` is a portable action sequencer between authenticated policy,
 the existing BG95 automatic public-APN state machine, persistent queues and a
-future STM32 target binding. It does not drive board GPIO directly and does not
-claim that either physical SIM path works.
+future STM32 target binding. `zs_dual_sim_bg95` joins only the modem-dependent
+actions to BG95 power, full-ICCID and validated-online state. Neither module
+drives board GPIO directly or claims that either physical SIM path works.
 
 ## Fixed policy
 
@@ -54,6 +55,13 @@ malformed or mismatched ICCID, debounced removal of the active/pending card, or
 brownout discards active-slot knowledge and requests safe-off. It exposes no
 action that clears or renumbers queued events.
 
+The portable BG95 bridge starts `AT+QPOWD`, but does not accept shutdown until
+the caller supplies `CELL_STATUS=LOW`; the BG95 state then clears volatile
+IMSI/ICCID. On power-up it uses the existing 700 ms PWRKEY state, requires
+`CELL_STATUS=HIGH`, reads the full ICCID from BG95 runtime and completes link
+validation only when automatic APN read-back and MQTT/TLS are online. A busy
+UART leaves the action pending instead of skipping shutdown.
+
 ## Double control
 
 - QG-1: `tools/validate_dual_sim_failover_contract.py` checks interface,
@@ -64,11 +72,15 @@ action that clears or renumbers queued events.
 - Runtime: `firmware/tests/test_dual_sim.c` covers initial activation, bounded
   automatic failover, hold time, authentication, DET debounce, out-of-order
   rejection, power-good timing, exact ICCID, action failure and brownout.
+- Bridge runtime: `firmware/tests/test_dual_sim_bg95.c` proves that QPOWD,
+  physical-status assertions, PWRKEY, full ICCID and online network settings
+  advance only their matching controller actions.
 
 ## Open target and EVT evidence
 
 - STM32 GPIO/rail/PWRKEY binding for `SIM_MUX_SEL`, `SIM_MUX_EN`, `SIM1_DET`,
   `SIM2_DET`, `EN_MODEM`, `PWR_GOOD`, `CELL_STATUS` and U13 enable read-back;
+- STM32 sampling of `CELL_STATUS` and the remaining GPIO/rail actions;
 - durable audit backend and verified coupling of profile index to the existing
   approved public-APN catalog;
 - exact provisioned ICCIDs and actual BG95 response behavior;
