@@ -63,8 +63,8 @@
   дальнейшие доставки требуют штатного server application-ACK retry.
 - Portable command-journal NOR adapter выделяет отдельный erase block каждому
   accepted/completed record и проходит restart, torn commit, range и neighbour
-  isolation host tests. Production storage/partition/slot count/endurance не
-  объявлены готовыми.
+  isolation host tests. Shared layout/bind также доказывает непересечение с
+  archive и outbox. Production slot count/OCTOSPI/endurance не объявлены готовыми.
 - Portable event outbox атомарно сохраняет полный schema-4 CBOR с metadata CRC32
   и SHA-256, выбирает priority/FIFO, не вытесняет pending events и при torn ACK
   обеспечивает безопасную at-least-once повторную доставку.
@@ -86,12 +86,13 @@
   остаётся blocker.
 - Portable W25Q-class outbox adapter использует один полный erase block на slot,
   проверяет alignment/capacity и сохраняет соседний pending slot при reclaim;
-  portable planner размещает audio archive в выровненном префиксе NOR, outbox в
-  хвосте и QG-проверяет их непересечение; shared bind API создаёт оба adapter-а
-  из одного layout и обрезает archive storage на границе outbox. Production slot
-  count, target memory-map/OCTOSPI/endurance остаются blockers.
+  portable planner размещает audio archive в выровненном префиксе NOR, command
+  journal следующим разделом, outbox в хвосте и QG-проверяет непересечение всех
+  трёх; shared bind API создаёт три adapter-а из одного layout и обрезает archive
+  storage на границе journal. Production command/outbox slot counts, target
+  memory-map/OCTOSPI/endurance остаются blockers.
 - Открыты target USART/DMA/ISR/cache integration, modem/broker-policy evidence и reviewed Ed25519 backend,
-  provisioning public key, command-journal storage partition и Flash/outbox slot-count/OCTOSPI/endurance binding, command ACK
+  provisioning public key, command-journal/outbox slot-count и OCTOSPI/endurance binding, command ACK
   target integration и аппаратный end-to-end;
   они не объявлены PASS до сборки станций.
 

@@ -43,6 +43,9 @@ def main() -> int:
     nor_journal_header = read("firmware/include/zs_nor_command_journal.h")
     nor_journal_codec = read("firmware/src/zs_nor_command_journal.c")
     nor_journal_test = read("firmware/tests/test_nor_command_journal.c")
+    nor_layout_header = read("firmware/include/zs_nor_storage_layout.h")
+    nor_layout_codec = read("firmware/src/zs_nor_storage_layout.c")
+    nor_layout_test = read("firmware/tests/test_nor_storage_layout.c")
     trust_header = read("firmware/include/zs_command_trust.h")
     trust_codec = read("firmware/src/zs_command_trust.c")
     trust_test = read("firmware/tests/test_command_trust.c")
@@ -245,6 +248,38 @@ def main() -> int:
         require(token in cmake,
                 f"command journal NOR adapter is absent from CMake: {token}")
     for token in (
+        "command_slot_count",
+        "command_base_address",
+        "command_partition_bytes",
+        "outbox_base_address",
+        "zs_nor_command_journal_adapter_t command_adapter",
+        "zs_nor_storage_bind",
+    ):
+        require(token in nor_layout_header,
+                f"shared command-journal NOR layout API missing: {token}")
+    for token in (
+        "command_slot_count < 2u",
+        "reserved_bytes = command_bytes + outbox_bytes",
+        "out->command_base_address = archive_bytes",
+        "out->outbox_base_address = archive_bytes + (uint32_t)command_bytes",
+        "zs_nor_command_journal_io_init",
+        "out_archive_storage->size_bytes = bindings->layout.command_base_address",
+    ):
+        require(token in nor_layout_codec,
+                f"shared command-journal NOR layout guard missing: {token}")
+    for token in (
+        "test_slot_counts_remain_target_inputs",
+        "test_shared_binding_caps_archive_and_separates_tail",
+        "test_shared_binding_failure_is_atomic",
+        "command_io.ctx == &bindings.command_adapter",
+        "bindings.layout.outbox_base_address",
+    ):
+        require(token in nor_layout_test,
+                f"shared command-journal NOR layout QG-2 case missing: {token}")
+    require("src/zs_nor_storage_layout.c" in cmake and
+            "zs_nor_storage_layout_tests" in cmake,
+            "shared command-journal NOR layout is not bound to CMake/CTest")
+    for token in (
         "ZS_COMMAND_TRUST_MAX_KEYS 4u",
         "zs_ed25519_verify_backend_fn",
         "zs_command_trust_init",
@@ -434,14 +469,16 @@ def main() -> int:
         "target BG95 command blockers are not bounded",
     )
     require(
-        "command_result_journal: PORTABLE_ATOMIC_QG1_QG2_PASS_NOR_ERASE_ISOLATED_ADAPTER_BOUND_TARGET_PARTITION_ENDURANCE_PENDING"
+        "command_result_journal: PORTABLE_ATOMIC_QG1_QG2_PASS_NOR_ERASE_ISOLATED_SHARED_NONOVERLAP_BOUND_TARGET_SLOT_COUNT_ENDURANCE_PENDING"
         in target_status and
-        "command_journal_nor_adapter: PORTABLE_ERASE_ISOLATED_QG1_QG2_PASS_TARGET_STORAGE_SELECTION_PARTITION_ENDURANCE_PENDING"
+        "command_journal_nor_adapter: PORTABLE_ERASE_ISOLATED_SHARED_ARCHIVE_COMMAND_OUTBOX_NONOVERLAP_QG1_QG2_PASS_TARGET_SLOT_COUNT_ENDURANCE_PENDING"
         in target_status and
-        "command_journal_flash_binding: PORTABLE_NOR_ERASE_ISOLATED_QG1_QG2_PASS_TARGET_STORAGE_SELECTION_PARTITION_ENDURANCE_BLOCKER"
+        "command_journal_flash_binding: PORTABLE_NOR_ERASE_ISOLATED_SHARED_NONOVERLAP_QG1_QG2_PASS_TARGET_SLOT_COUNT_OCTOSPI_ENDURANCE_BLOCKER"
         in target_status,
         "target command journal storage blocker is not bounded",
     )
+    require("command_journal_slot_count: MISSING_BLOCKER" in target_status,
+            "target command journal slot-count blocker is not explicit")
 
     require("PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING" in icd,
             "ICD does not report the bounded implementation status")
@@ -468,7 +505,7 @@ def main() -> int:
             "portable binary MQTT boundary test is not bound to CTest")
 
     print("MQTT signed command transport QG-1: PASS")
-    print("scope: server + durable firmware/NOR adapter + BG95 bounded raw-UART session/ACK host path; target crypto/storage partition/USART-DMA/retain policy/hardware remain pending")
+    print("scope: server + durable firmware/NOR adapter + shared archive/command/outbox non-overlap + BG95 bounded raw-UART session/ACK host path; target crypto/slot count/OCTOSPI/USART-DMA/retain policy/hardware remain pending")
     return 0
 
 

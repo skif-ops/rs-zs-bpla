@@ -66,14 +66,15 @@ codec, a bounded public-key rotation adapter, and a power-loss-safe
 accepted/completed journal that cannot encode an ACK before completion is
 durable. The journal now has a portable erase-isolated NOR adapter with one
 physical erase block per record and host-tested torn-commit restart recovery;
-target storage selection, non-overlapping partition and endurance remain open.
+the shared layout/binding also proves it is disjoint from archive and outbox.
+Target slot count, OCTOSPI binding and endurance remain open.
 A portable application channel enforces verify → accept → idempotent
 execute → complete → ACK and safely replays accepted/completed duplicates. Host
 QG includes a real server-generated Ed25519 vector. A portable binary MQTT
 adapter now enforces the exact tenant/station `down` topic, QoS 1 and non-retained
 delivery before command parsing, then exposes the exact `ack` topic and CBOR
 payload length after durable completion. The target still needs reviewed Ed25519
-library binding, provisioned public keys, production journal storage/partition/endurance evidence
+library binding, provisioned public keys, production journal slot-count/OCTOSPI/endurance evidence
 and hardware integration. Portable BG95 AT binding now confirms pre-connect
 length mode, subscribes to exact `down` at QoS 1, parses binary `QMTRECV` by
 declared length and publishes the durable ACK with fixed-length `QMTPUB`. A
@@ -99,11 +100,12 @@ to the canonical station `up` topic, ignores PUBACK for reclamation and can appl
 a queued receipt after restart by durable event lookup. Target NOR/Flash
 binding now has a portable adapter that dedicates one physical erase block to
 each outbox slot, preventing reclaim from erasing a neighbour. A portable layout
-planner gives the audio archive the aligned NOR prefix and the event outbox the
-tail, proving non-overlap for any accepted caller-supplied slot count; the host
-reference case verifies 63 MiB archive + 1 MiB/256-slot outbox on 64 MiB NOR.
-A single fail-closed bind API creates both adapters from that layout and caps
-the archive-visible storage at the outbox boundary. Production slot count,
+planner gives the audio archive the aligned NOR prefix, command journal the next
+erase-isolated partition, and event outbox the tail, proving non-overlap for both
+accepted caller-supplied slot counts. The host reference case verifies 62.9375
+MiB archive + 64 KiB/16-slot journal + 1 MiB/256-slot outbox on 64 MiB NOR. A
+single fail-closed bind API creates all three adapters from that layout and caps
+the archive-visible storage at the journal boundary. Production slot counts,
 target memory-map/OCTOSPI binding and wear/endurance remain release blockers.
 The portable BG95 uplink now emits fixed-length `QMTPUB`, waits for the data
 prompt and writes exact binary CBOR bytes; partial UART writes, wrong result URCs,

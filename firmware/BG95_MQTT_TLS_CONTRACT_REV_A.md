@@ -83,7 +83,9 @@ and clear online/network-valid flags.
   generation before a completed result is durable. Its portable NOR adapter
   gives every logical record a whole erase block, verifies range/alignment,
   preserves neighbouring records across reclaim, and recovers after a torn
-  commit; production storage choice, partition and endurance remain target work.
+  commit. The shared layout/binding below also keeps it disjoint from archive
+  and event outbox; production slot count, OCTOSPI binding and endurance remain
+  target work.
   The bounded trust adapter
   validates key IDs and enabled rotation entries before delegating to a mandatory
   Ed25519 backend; no production public key is embedded in portable source. The
@@ -120,11 +122,13 @@ and clear online/network-valid flags.
   applies a queued receipt by durable lookup after restart. A W25Q-class adapter
   dedicates a complete erase block to each logical outbox slot and verifies
   partition bounds. A portable planner assigns the aligned NOR prefix to the
-  audio archive and an erase-isolated tail to a caller-supplied outbox slot
-  count; QG-1/QG-2 verify exact non-overlap, including the 64 MiB / 4 KiB / 256
-  slot reference geometry. The shared binding creates both adapters from this
-  layout and caps archive-visible storage at the derived outbox base. Production
-  slot count, target memory-map/OCTOSPI binding and endurance remain open.
+  audio archive, the next erase-isolated partition to a caller-supplied command
+  journal slot count, and the tail to a caller-supplied outbox slot count;
+  QG-1/QG-2 verify exact three-consumer non-overlap, including the 64 MiB / 4 KiB
+  / 16 command / 256 outbox slot reference geometry. The shared binding creates
+  all three adapters from this layout and caps archive-visible storage at the
+  derived command-journal base. Production slot counts, target memory-map/OCTOSPI
+  binding and endurance remain open.
   The BG95 event-uplink binding follows the fixed-length data mode from Quectel
   `BG95&BG77&BG600L Series MQTT Application Note` v1.2 section 3.2.8: it writes
   `AT+QMTPUB` with exact topic/QoS/retain/message length, waits for `>`, then

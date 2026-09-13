@@ -109,35 +109,48 @@ def main() -> int:
             "NOR outbox adapter is not bound to CMake/CTest")
     for token in (
         "zs_nor_storage_layout_t",
+        "command_slot_count",
+        "command_base_address",
+        "command_partition_bytes",
         "outbox_slot_count",
         "outbox_base_address",
         "outbox_partition_bytes",
         "zs_archive_layout_t archive",
         "zs_nor_storage_layout_make",
         "zs_nor_storage_bindings_t",
+        "zs_nor_command_journal_adapter_t command_adapter",
         "zs_nor_storage_bind",
     ):
         require(token in layout_header, f"NOR layout API missing: {token}")
     for token in (
+        "command_slot_count < 2u",
+        "erase_block_bytes < ZS_COMMAND_JOURNAL_SLOT_BYTES",
         "erase_block_bytes < ZS_EVENT_OUTBOX_SLOT_BYTES",
         "capacity_bytes % erase_block_bytes != 0u",
+        "(uint64_t)command_slot_count * (uint64_t)erase_block_bytes",
         "(uint64_t)outbox_slot_count * (uint64_t)erase_block_bytes",
+        "reserved_bytes = command_bytes + outbox_bytes",
         "zs_archive_make_default_layout",
-        "out->outbox_base_address = archive_bytes",
-        "(uint64_t)archive_bytes + outbox_bytes != capacity_bytes",
+        "out->command_base_address = archive_bytes",
+        "out->outbox_base_address = archive_bytes + (uint32_t)command_bytes",
+        "(uint64_t)archive_bytes + command_bytes + outbox_bytes !=",
         "zs_nor_archive_storage_init",
+        "zs_nor_command_journal_io_init",
         "zs_nor_event_outbox_io_init",
-        "out_archive_storage->size_bytes = bindings->layout.outbox_base_address",
+        "out_archive_storage->size_bytes = bindings->layout.command_base_address",
     ):
         require(token in layout_source, f"NOR layout invariant missing: {token}")
     for token in (
-        "test_default_64m_tail_partition",
-        "test_slot_count_remains_a_target_input",
+        "test_default_64m_three_consumer_layout",
+        "test_slot_counts_remain_target_inputs",
         "test_capacity_and_geometry_guards",
-        "test_shared_binding_caps_archive_at_outbox",
+        "test_shared_binding_caps_archive_and_separates_tail",
         "test_shared_binding_failure_is_atomic",
+        "layout.command_partition_bytes == 64u * 1024u",
         "layout.outbox_base_address == 63u * 1024u * 1024u",
-        "archive_end(&layout.archive) == layout.outbox_base_address",
+        "archive_end(&layout.archive) == layout.command_base_address",
+        "layout.command_partition_bytes ==",
+        "layout.outbox_base_address",
     ):
         require(token in layout_test, f"NOR layout QG-2 case missing: {token}")
     require("src/zs_nor_storage_layout.c" in cmake and
@@ -166,30 +179,32 @@ def main() -> int:
         "target status overclaims or omits NOR outbox evidence",
     )
     require(
-        "event_nor_partition_planner: PORTABLE_ARCHIVE_OUTBOX_NONOVERLAP_QG1_QG2_PASS_SLOT_COUNT_AND_OCTOSPI_BINDING_PENDING"
+        "event_nor_partition_planner: PORTABLE_ARCHIVE_COMMAND_OUTBOX_NONOVERLAP_QG1_QG2_PASS_SLOT_COUNTS_AND_OCTOSPI_BINDING_PENDING"
         in target,
         "target status overclaims or omits portable NOR layout evidence",
     )
     require(
-        "event_nor_shared_binding: PORTABLE_FAIL_CLOSED_ARCHIVE_CAP_AND_OUTBOX_TAIL_QG1_QG2_PASS_TARGET_BINDING_PENDING"
+        "event_nor_shared_binding: PORTABLE_FAIL_CLOSED_ARCHIVE_COMMAND_OUTBOX_QG1_QG2_PASS_TARGET_BINDING_PENDING"
         in target,
         "target status overclaims or omits shared NOR binding evidence",
     )
     require(
-        "event_outbox_storage_binding: PORTABLE_SHARED_BINDING_PASS_EXACT_SLOT_COUNT_OCTOSPI_ENDURANCE_BLOCKER"
+        "event_outbox_storage_binding: PORTABLE_SHARED_THREE_CONSUMER_BINDING_PASS_EXACT_SLOT_COUNTS_OCTOSPI_ENDURANCE_BLOCKER"
         in target,
         "target outbox storage binding status is not bounded",
     )
     require(
-        "event_outbox_nor_partition: PORTABLE_NONOVERLAP_LAYOUT_QG1_QG2_PASS_EXACT_SLOT_COUNT_AND_TARGET_BINDING_BLOCKER"
+        "event_outbox_nor_partition: PORTABLE_ARCHIVE_COMMAND_OUTBOX_NONOVERLAP_QG1_QG2_PASS_EXACT_SLOT_COUNTS_AND_TARGET_BINDING_BLOCKER"
         in target,
         "target outbox NOR partition blocker is not explicit",
     )
     require("event_outbox_slot_count: MISSING_BLOCKER" in target,
             "target outbox slot-count blocker is not explicit")
+    require("command_journal_slot_count: MISSING_BLOCKER" in target,
+            "target command-journal slot-count blocker is not explicit")
 
     print("Event store-and-forward outbox QG-1: PASS")
-    print("scope: portable atomic queue + erase-isolated NOR adapter + shared non-overlap binding; exact slot count/OCTOSPI and hardware remain pending")
+    print("scope: portable atomic queue + erase-isolated NOR adapter + shared archive/command/outbox non-overlap binding; exact slot counts/OCTOSPI and hardware remain pending")
     return 0
 
 

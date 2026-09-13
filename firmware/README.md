@@ -62,26 +62,28 @@ URC в лимите 2304 bytes, сериализует command/receipt subscript
 publish и command ACK единым TX owner. Один command frame буферизуется во время
 занятого TX, следующие учитываются как требующие server retry; disconnect
 очищает RAM queue и запускает ordered resubscribe. Retain в `QMTRECV` не виден и покрывается только явно подтверждённым
-server-only/non-retained ACL contract. Target crypto, storage partition/endurance, USART/DMA/ISR,
+server-only/non-retained ACL contract. Target crypto, exact slot counts/OCTOSPI/endurance, USART/DMA/ISR,
 broker policy и hardware evidence остаются открыты.
 
 Command journal теперь имеет отдельный portable NOR adapter: каждый 88-byte
 accepted/completed record занимает собственный physical erase block, callbacks
 не могут выйти за логический slot, а torn commit повторно используется без
 стирания соседнего record. Host QG проверяет restart roundtrip, commit-write
-failure, alignment/range и erase isolation. Production storage selection,
-непересекающийся partition, slot count и endurance всё ещё не определены.
+failure, alignment/range и erase isolation. Общий layout/bind ниже также
+доказывает непересечение journal с archive и outbox. Production slot count,
+OCTOSPI binding и endurance всё ещё не определены.
 
 Portable NOR adapter выделяет каждому outbox slot отдельный erase block и
 проверяет alignment/range partition, поэтому reclaim не стирает соседнее pending
 event. Portable layout planner вычисляет непересекающиеся разделы: audio archive
-занимает выровненный префикс NOR, а outbox — хвост из одного erase block на
-каждый переданный target-ом slot. Для контрольной геометрии 64 MiB / 4 KiB / 256
-слотов host QG проверяет границу 63 MiB + 1 MiB. Единый bind API создаёт оба
-adapter-а из этого layout и ограничивает видимую archive storage точно началом
-outbox, поэтому независимая ошибочная инициализация диапазонов fail-closed.
-Серийное число слотов, OCTOSPI HAL и endurance ещё должны быть утверждены в
-target memory map и измерены на плате.
+занимает выровненный префикс NOR, за ним расположен erase-isolated command
+journal, а outbox занимает хвост. Для контрольной геометрии 64 MiB / 4 KiB / 16
+command slots / 256 event slots host QG проверяет 62.9375 MiB archive + 64 KiB
+journal + 1 MiB outbox. Единый bind API создаёт все три adapter-а из одного
+layout и ограничивает видимую archive storage точно началом journal, поэтому
+независимая ошибочная инициализация диапазонов fail-closed. Точные числа слотов,
+OCTOSPI HAL и endurance ещё должны быть утверждены в target memory map и
+измерены на плате.
 
 Первый target-инкремент уже фиксирует точный исходный контракт
 `STM32U585VIT6Q/LQFP100`: 67 назначений из Rev.A pin map и AAD addendum,

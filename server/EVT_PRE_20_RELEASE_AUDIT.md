@@ -39,10 +39,11 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    server retry не повторяет side effect. Из-за отсутствия retain-флага в URC
    init требует внешний server-only/non-retained ACL contract. Открыты target
    USART/DMA/ISR/cache integration, reviewed Ed25519 backend, public-key provisioning,
-   production storage partition/endurance, broker-policy и hardware end-to-end evidence.
+   production slot count/OCTOSPI/endurance, broker-policy и hardware end-to-end evidence.
    Portable command-journal NOR adapter уже изолирует каждый record отдельным
-   erase block и проходит torn-commit/restart QG; выбор production storage,
-   непересекающийся partition, slot count и endurance остаются открыты.
+   erase block и проходит torn-commit/restart QG; общий layout/bind доказывает
+   непересечение с archive и outbox. Production slot count, OCTOSPI binding и
+   endurance остаются открыты.
 3. ЗАКРЫТО: исходные диапазоны разрешены в хешированные Python 3.12 lockfiles;
    production image и CI используют `requirements.lock.txt` с
    `--require-hashes`, а `sbom/server.cdx.json` воспроизводимо генерируется из
@@ -56,14 +57,15 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    station/event identity, QoS/retain и идемпотентный повтор. Portable uplink
    adapter сохраняет retry до выдачи exact binary publication и не освобождает
    slot по PUBACK. Portable NOR adapter изолирует slot отдельным erase block.
-   Portable planner проверяет непересекающиеся archive-prefix/outbox-tail разделы
-   для заданного числа слотов, а единый bind API ограничивает archive storage на
-   этой границе и создаёт outbox adapter для хвоста. Portable BG95 transport
+   Portable planner проверяет непересекающиеся archive-prefix/command-journal/
+   outbox-tail разделы для двух заданных чисел слотов, а единый bind API
+   ограничивает archive storage на первой границе и создаёт оба tail adapter-а.
+   Portable BG95 transport
    настраивает length-enabled direct URC до `QMTOPEN`, а receipt path после
    connect требует успех этого шага, выполняет exact QoS-1 subscription и
    binary-safe parser. Поскольку `+QMTRECV` не показывает retain-флаг, init
    требует внешний station ACL/server-only/non-retained contract. Открыты
-   production slot count, target USART/DMA/ISR/cache wiring и проверка этого
+   production command/outbox slot counts, target USART/DMA/ISR/cache wiring и проверка этого
    broker contract. Fixed-length BG95 event
    `QMTPUB`/prompt/binary/result path проходит host QG и не трактует PUBACK как
    application receipt. Target memory-map/OCTOSPI/endurance и аппаратный recovery
@@ -92,8 +94,9 @@ pending events, а server/portable-firmware application receipt подтверж
 только exact payload после durable processing. MQTT PUBACK не считается таким
 подтверждением. Portable BG95 receipt binding и session routing закрыты только
 на host; до target USART/DMA/modem/broker-policy проверки события после восстановления сети не разрешено
-удалять в изделии. Непересечение portable NOR-разделов проверено на host, но
-production slot count и физическая target-разметка ещё не утверждены.
+удалять в изделии. Непересечение трёх portable NOR-разделов проверено на host,
+но production command/outbox slot counts и физическая target-разметка ещё не
+утверждены.
 
 До закрытия пунктов сервер разрешён только для разработки или изолированного стенда. Публикация напрямую в интернет запрещена.
 

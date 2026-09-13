@@ -106,9 +106,10 @@ the side effect. Reuse of a UUID with different signed command semantics is a
 fail-closed conflict. The portable NOR adapter maps every 88-byte journal slot to its own full
 physical erase block, bounds all reads/programs to the logical record, and
 reuses a torn uncommitted slot without erasing a neighbouring record. Restart
-roundtrip, commit-write failure and partition guards pass host QG. Production
-storage selection, non-overlapping partition, exact slot count and measured
-endurance remain target blockers.
+roundtrip, commit-write failure and partition guards pass host QG. The shared
+layout/binding in section 6 keeps the command journal disjoint from
+both audio archive and event outbox. Production exact slot count, OCTOSPI
+binding and measured endurance remain target blockers.
 
 The portable application channel enforces this order and emits no ACK for an
 invalid envelope, transient executor failure or storage failure. It re-verifies
@@ -356,22 +357,23 @@ Portable W25Q-class adapter maps every 616-byte logical outbox slot to its own
 complete 4-KiB erase block. Partition base alignment, capacity and slot bounds
 are checked before use, so reclaiming one event cannot erase an adjacent pending
 event. The portable layout planner assigns the erase-aligned NOR prefix to the
-audio archive and derives the outbox base from a caller-supplied slot count at
-the end of the same device. It rejects insufficient or unaligned geometries and
-proves that the two ranges do not overlap. The 64-MiB / 4-KiB / 256-slot host
-reference produces a 63-MiB archive prefix and a 1-MiB outbox tail. This example
-does not freeze the production slot count. Both adapters are created by one
-fail-closed binding; its archive storage view ends exactly at the derived outbox
-base while the outbox adapter is bounded to the tail. The production slot count,
-reviewed target memory map, OCTOSPI HAL binding and measured endurance remain
-open.
+audio archive, derives a command-journal partition from a caller-supplied slot
+count, and places the caller-sized outbox at the tail. It rejects insufficient
+or unaligned geometries and proves that all three ranges do not overlap. The
+64-MiB / 4-KiB / 16-command / 256-event host reference produces a 62.9375-MiB
+archive prefix, a 64-KiB command journal and a 1-MiB outbox tail. This example
+does not freeze the production slot counts. All three adapters are created by
+one fail-closed binding; its archive storage view ends exactly at the derived
+command base, and both tail adapters are bounded to their own partitions. The
+production slot counts, reviewed target memory map, OCTOSPI HAL binding and
+measured endurance remain open.
 
 MQTT PUBACK не является application ACK. Станция помечает событие доставленным
 только после проверенного server application receipt из раздела 2.3; torn ACK
 marker остаётся pending, поэтому recovery имеет семантику at-least-once и может
 повторить тот же `event_id`. Серверная схема и portable firmware parser проходят
 host QG-1/QG-2. Portable BG95 receive binding и bounded single-owner raw-UART
-session также проходят host QG; production outbox slot count, target
+session также проходят host QG; production command/outbox slot counts, target
 USART-DMA/OCTOSPI binding, retain policy,
 wear/endurance и аппаратная recovery-проверка пока открыты; portable QG не
 закрывает `REQ-CELL-003`.
