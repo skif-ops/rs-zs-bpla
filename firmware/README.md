@@ -75,7 +75,10 @@ OCTOSPI binding и endurance всё ещё не определены.
 
 Portable NOR adapter выделяет каждому outbox slot отдельный erase block и
 проверяет alignment/range partition, поэтому reclaim не стирает соседнее pending
-event. Portable layout planner вычисляет непересекающиеся разделы: audio archive
+event. Перед выдачей любого storage interface общий bind fail-closed проверяет
+точный W25Q512JV JEDEC ID `EF 40 20`, SFDP/BFPT ёмкость 64 MiB, 4-byte geometry
+и Status Register-2 QE; сброшенный QE восстанавливается с read-back. Portable
+layout planner вычисляет непересекающиеся разделы: audio archive
 занимает выровненный префикс NOR, за ним расположен erase-isolated command
 journal, а outbox занимает хвост. Для контрольной геометрии 64 MiB / 4 KiB / 16
 command slots / 256 event slots host QG проверяет 62.9375 MiB archive + 64 KiB
@@ -83,7 +86,7 @@ journal + 1 MiB outbox. Единый bind API создаёт все три adapt
 layout и ограничивает видимую archive storage точно началом journal, поэтому
 независимая ошибочная инициализация диапазонов fail-closed. Точные числа слотов,
 OCTOSPI HAL и endurance ещё должны быть утверждены в target memory map и
-измерены на плате.
+измерены на плате; host probe не заменяет проверку реального sample.
 
 Первый target-инкремент уже фиксирует точный исходный контракт
 `STM32U585VIT6Q/LQFP100`: 67 назначений из Rev.A pin map и AAD addendum,

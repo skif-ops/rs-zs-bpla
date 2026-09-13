@@ -121,14 +121,17 @@ and clear online/network-valid flags.
   persists each retry before returning the exact `up` topic/payload view and
   applies a queued receipt by durable lookup after restart. A W25Q-class adapter
   dedicates a complete erase block to each logical outbox slot and verifies
-  partition bounds. A portable planner assigns the aligned NOR prefix to the
+  partition bounds. Before exposing any storage interface, the shared binding
+  requires the frozen W25Q512JV JEDEC ID `EF 40 20`, a valid SFDP/BFPT 64 MiB
+  density, exact 4-byte geometry and verified Status Register-2 QE; it restores
+  a cleared QE via `35h`/`31h` and read-back. A portable planner assigns the aligned NOR prefix to the
   audio archive, the next erase-isolated partition to a caller-supplied command
   journal slot count, and the tail to a caller-supplied outbox slot count;
   QG-1/QG-2 verify exact three-consumer non-overlap, including the 64 MiB / 4 KiB
   / 16 command / 256 outbox slot reference geometry. The shared binding creates
   all three adapters from this layout and caps archive-visible storage at the
   derived command-journal base. Production slot counts, target memory-map/OCTOSPI
-  binding and endurance remain open.
+  binding, sample identity/QE behavior and endurance remain open.
   The BG95 event-uplink binding follows the fixed-length data mode from Quectel
   `BG95&BG77&BG600L Series MQTT Application Note` v1.2 section 3.2.8: it writes
   `AT+QMTPUB` with exact topic/QoS/retain/message length, waits for `>`, then

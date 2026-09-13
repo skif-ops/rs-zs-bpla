@@ -22,7 +22,7 @@
     },
     {
       "path": "firmware/targets/evt_pre_20/target_status.yaml",
-      "sha256": "0af159ed0174f3896efc5121e7ae0ddc355651426b0cc8b9e23bc7335ec49236"
+      "sha256": "9e787b29ce030cfcbd49233c5df058fa004ac846b9d4fdab75ebbe6f77c1a549"
     },
     {
       "path": "firmware/targets/evt_pre_20/cubemx_generation_contract.json",

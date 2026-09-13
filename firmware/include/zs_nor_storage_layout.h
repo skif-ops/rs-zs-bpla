@@ -23,6 +23,7 @@ typedef struct {
 
 typedef struct {
   zs_nor_storage_layout_t layout;
+  zs_nor_probe_info_t nor_probe;
   zs_nor_archive_adapter_t archive_adapter;
   zs_nor_command_journal_adapter_t command_adapter;
   zs_nor_event_outbox_adapter_t outbox_adapter;
@@ -40,8 +41,9 @@ bool zs_nor_storage_layout_make(uint32_t capacity_bytes,
                                 zs_nor_storage_layout_t *out);
 
 /*
- * Bind all three consumers from one layout. Archive storage is capped at the
- * command boundary even though all adapters share the same NOR device.
+ * Validate exact W25Q512JV JEDEC/SFDP/QE state, then bind all three consumers
+ * from one layout. Archive storage is capped at the command boundary even
+ * though all adapters share the same NOR device.
  * bindings must remain at a stable address while any returned interface is
  * in use because their ctx pointers refer to its embedded adapters.
  */

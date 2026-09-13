@@ -86,11 +86,14 @@
   остаётся blocker.
 - Portable W25Q-class outbox adapter использует один полный erase block на slot,
   проверяет alignment/capacity и сохраняет соседний pending slot при reclaim;
+  общий bind сначала проверяет exact W25Q512JV JEDEC `EF 40 20`, SFDP/BFPT
+  64 MiB density, 4-byte geometry и QE с restore/read-back, иначе не выдаёт ни
+  один storage interface;
   portable planner размещает audio archive в выровненном префиксе NOR, command
   journal следующим разделом, outbox в хвосте и QG-проверяет непересечение всех
   трёх; shared bind API создаёт три adapter-а из одного layout и обрезает archive
   storage на границе journal. Production command/outbox slot counts, target
-  memory-map/OCTOSPI/endurance остаются blockers.
+  memory-map/OCTOSPI/sample/endurance остаются blockers.
 - Открыты target USART/DMA/ISR/cache integration, modem/broker-policy evidence и reviewed Ed25519 backend,
   provisioning public key, command-journal/outbox slot-count и OCTOSPI/endurance binding, command ACK
   target integration и аппаратный end-to-end;

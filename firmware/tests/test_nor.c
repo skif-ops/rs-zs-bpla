@@ -12,12 +12,19 @@
 typedef struct {
   uint8_t *mem;
   size_t size;
+  uint8_t jedec_id[3];
+  uint8_t sfdp[256];
   uint8_t status;
+  uint8_t status_2;
+  uint8_t fail_opcode;
   uint32_t ms;
   uint32_t program_commands;
   uint32_t erase_commands;
+  uint32_t status_2_write_commands;
   uint32_t last_memory_address;
   uint8_t last_memory_address_bytes;
+  uint8_t last_sfdp_address_bytes;
+  uint8_t last_sfdp_dummy;
 } mock_nor_t;
 
 static uint32_t mock_millis(void *ctx) { return ((mock_nor_t *)ctx)->ms; }
@@ -37,9 +44,10 @@ static int mock_command(void *ctx,
                         uint8_t *rx,
                         size_t rx_len) {
   mock_nor_t *m = (mock_nor_t *)ctx;
+  if (opcode == m->fail_opcode) return -1;
   if (opcode == 0x9fu) {
     if (!rx || rx_len != 3u) return -1;
-    rx[0] = 0xc2u; rx[1] = 0x20u; rx[2] = 0x1au;
+    memcpy(rx, m->jedec_id, 3u);
     return 0;
   }
   if (opcode == 0x05u) {
@@ -49,6 +57,29 @@ static int mock_command(void *ctx,
   }
   if (opcode == 0x06u) {
     m->status |= 0x02u;
+    return 0;
+  }
+  if (opcode == 0x35u) {
+    if (!rx || rx_len != 1u) return -1;
+    rx[0] = m->status_2;
+    return 0;
+  }
+  if (opcode == 0x31u) {
+    if (!tx || tx_len != 1u || rx || rx_len != 0u ||
+        (m->status & 0x02u) == 0u)
+      return -1;
+    m->status_2 = tx[0];
+    m->status &= (uint8_t)~0x02u;
+    m->status_2_write_commands++;
+    return 0;
+  }
+  if (opcode == 0x5au) {
+    if (address_bytes != 3u || !tx || tx_len != 1u || !rx ||
+        (uint64_t)address + rx_len > sizeof(m->sfdp))
+      return -1;
+    m->last_sfdp_address_bytes = address_bytes;
+    m->last_sfdp_dummy = tx[0];
+    memcpy(rx, &m->sfdp[address], rx_len);
     return 0;
   }
   if (opcode == 0x13u) {
@@ -94,10 +125,34 @@ static zs_nor_t make_nor(mock_nor_t *mock) {
   return nor;
 }
 
+static void init_w25q512_identity(mock_nor_t *mock) {
+  memset(mock->sfdp, 0xff, sizeof(mock->sfdp));
+  mock->jedec_id[0] = ZS_NOR_W25Q512JV_JEDEC_MANUFACTURER;
+  mock->jedec_id[1] = ZS_NOR_W25Q512JV_JEDEC_MEMORY_TYPE;
+  mock->jedec_id[2] = ZS_NOR_W25Q512JV_JEDEC_CAPACITY;
+  memcpy(mock->sfdp, "SFDP", 4u);
+  mock->sfdp[4] = 6u;
+  mock->sfdp[5] = 1u;
+  mock->sfdp[6] = 0u;
+  mock->sfdp[7] = 0xffu;
+  mock->sfdp[8] = 0x00u;
+  mock->sfdp[9] = 6u;
+  mock->sfdp[10] = 1u;
+  mock->sfdp[11] = 16u;
+  mock->sfdp[12] = 0x20u;
+  mock->sfdp[13] = 0x00u;
+  mock->sfdp[14] = 0x00u;
+  mock->sfdp[15] = 0xffu;
+  mock->sfdp[0x24u] = 0xffu;
+  mock->sfdp[0x25u] = 0xffu;
+  mock->sfdp[0x26u] = 0xffu;
+  mock->sfdp[0x27u] = 0x1fu;
+}
+
 static void test_id_and_addressing(mock_nor_t *mock, zs_nor_t *nor) {
   uint8_t id[3] = {0};
   assert(zs_nor_read_jedec_id(nor, id));
-  assert(id[0] == 0xc2u && id[1] == 0x20u && id[2] == 0x1au);
+  assert(id[0] == 0xefu && id[1] == 0x40u && id[2] == 0x20u);
 
   const uint32_t address = 0x01000010u; /* Above 16 MiB, requires 4-byte address. */
   uint8_t src[32];
@@ -151,12 +206,77 @@ static void test_bounds(zs_nor_t *nor) {
   assert(!zs_nor_program(nor, 0xffffffffu, &one, 1u));
 }
 
+static void test_w25q512_probe_and_quad_restore(mock_nor_t *mock,
+                                                zs_nor_t *nor) {
+  zs_nor_probe_info_t info;
+
+  mock->status_2 = 0x40u;
+  assert(zs_nor_probe_w25q512jv(nor, &info) == ZS_NOR_PROBE_OK);
+  assert(info.jedec_id[0] == 0xefu && info.jedec_id[1] == 0x40u &&
+         info.jedec_id[2] == 0x20u);
+  assert(info.sfdp_major == 1u && info.sfdp_minor == 6u);
+  assert(info.capacity_bytes == 64u * 1024u * 1024u);
+  assert(info.quad_enabled && info.quad_enable_restored);
+  assert(mock->status_2 == 0x42u);
+  assert(mock->status_2_write_commands == 1u);
+  assert(mock->last_sfdp_address_bytes == 3u);
+  assert(mock->last_sfdp_dummy == 0u);
+
+  assert(zs_nor_probe_w25q512jv(nor, &info) == ZS_NOR_PROBE_OK);
+  assert(info.quad_enabled && !info.quad_enable_restored);
+  assert(mock->status_2_write_commands == 1u);
+}
+
+static void test_w25q512_probe_fail_closed(mock_nor_t *mock,
+                                           zs_nor_t *nor) {
+  zs_nor_probe_info_t info;
+  zs_nor_probe_info_t zero;
+  zs_nor_t wrong_geometry = *nor;
+
+  memset(&zero, 0, sizeof(zero));
+  memset(&info, 0xa5, sizeof(info));
+  assert(zs_nor_probe_w25q512jv(NULL, &info) ==
+         ZS_NOR_PROBE_INVALID_ARGUMENT);
+  assert(memcmp(&info, &zero, sizeof(info)) == 0);
+  assert(zs_nor_probe_w25q512jv(nor, NULL) ==
+         ZS_NOR_PROBE_INVALID_ARGUMENT);
+
+  wrong_geometry.geometry.capacity_bytes /= 2u;
+  assert(zs_nor_probe_w25q512jv(&wrong_geometry, &info) ==
+         ZS_NOR_PROBE_GEOMETRY_MISMATCH);
+
+  mock->jedec_id[2] = 0x19u;
+  assert(zs_nor_probe_w25q512jv(nor, &info) ==
+         ZS_NOR_PROBE_JEDEC_MISMATCH);
+  mock->jedec_id[2] = ZS_NOR_W25Q512JV_JEDEC_CAPACITY;
+
+  mock->sfdp[0] = 0u;
+  assert(zs_nor_probe_w25q512jv(nor, &info) ==
+         ZS_NOR_PROBE_SFDP_MISMATCH);
+  mock->sfdp[0] = (uint8_t)'S';
+
+  mock->sfdp[0x27u] = 0x0fu;
+  assert(zs_nor_probe_w25q512jv(nor, &info) ==
+         ZS_NOR_PROBE_CAPACITY_MISMATCH);
+  mock->sfdp[0x27u] = 0x1fu;
+
+  mock->status = 0u;
+  mock->status_2 = 0u;
+  mock->fail_opcode = 0x31u;
+  assert(zs_nor_probe_w25q512jv(nor, &info) ==
+         ZS_NOR_PROBE_QUAD_ENABLE_FAILED);
+  assert(memcmp(&info, &zero, sizeof(info)) == 0);
+  mock->fail_opcode = 0u;
+  mock->status = 0u;
+}
+
 int main(void) {
   mock_nor_t mock = {0};
   mock.size = MOCK_BYTES;
   mock.mem = (uint8_t *)malloc(mock.size);
   assert(mock.mem != NULL);
   memset(mock.mem, 0xff, mock.size);
+  init_w25q512_identity(&mock);
 
   zs_nor_t nor = make_nor(&mock);
   test_id_and_addressing(&mock, &nor);
@@ -164,6 +284,8 @@ int main(void) {
   test_erase_rules(&mock, &nor);
   test_archive_adapter(&nor);
   test_bounds(&nor);
+  test_w25q512_probe_and_quad_restore(&mock, &nor);
+  test_w25q512_probe_fail_closed(&mock, &nor);
 
   free(mock.mem);
   puts("zs_nor_tests: OK");

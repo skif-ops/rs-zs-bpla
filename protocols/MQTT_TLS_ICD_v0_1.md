@@ -356,7 +356,12 @@ commit marker. Незавершённая запись после потери �
 Portable W25Q-class adapter maps every 616-byte logical outbox slot to its own
 complete 4-KiB erase block. Partition base alignment, capacity and slot bounds
 are checked before use, so reclaiming one event cannot erase an adjacent pending
-event. The portable layout planner assigns the erase-aligned NOR prefix to the
+event. Before returning any archive, command-journal or outbox interface, the
+shared binding requires exact W25Q512JV JEDEC ID `EF 40 20`, a valid SFDP header
+and BFPT density of 64 MiB, the expected 4-byte read/program/erase geometry and
+Status Register-2 QE. A cleared QE is restored with `35h`/`31h`, wait-ready and
+read-back; any mismatch leaves all returned interfaces zeroed. The portable
+layout planner assigns the erase-aligned NOR prefix to the
 audio archive, derives a command-journal partition from a caller-supplied slot
 count, and places the caller-sized outbox at the tail. It rejects insufficient
 or unaligned geometries and proves that all three ranges do not overlap. The
@@ -366,7 +371,8 @@ does not freeze the production slot counts. All three adapters are created by
 one fail-closed binding; its archive storage view ends exactly at the derived
 command base, and both tail adapters are bounded to their own partitions. The
 production slot counts, reviewed target memory map, OCTOSPI HAL binding and
-measured endurance remain open.
+measured endurance remain open. Host emulation does not replace probe and
+power-loss evidence on the assembled W25Q512JV sample.
 
 MQTT PUBACK не является application ACK. Станция помечает событие доставленным
 только после проверенного server application receipt из раздела 2.3; torn ACK

@@ -46,6 +46,9 @@ def main() -> int:
     nor_layout_header = read("firmware/include/zs_nor_storage_layout.h")
     nor_layout_codec = read("firmware/src/zs_nor_storage_layout.c")
     nor_layout_test = read("firmware/tests/test_nor_storage_layout.c")
+    core_nor_header = read("firmware/include/zs_nor.h")
+    core_nor_codec = read("firmware/src/zs_nor.c")
+    core_nor_test = read("firmware/tests/test_nor.c")
     trust_header = read("firmware/include/zs_command_trust.h")
     trust_codec = read("firmware/src/zs_command_trust.c")
     trust_test = read("firmware/tests/test_command_trust.c")
@@ -253,6 +256,7 @@ def main() -> int:
         "command_partition_bytes",
         "outbox_base_address",
         "zs_nor_command_journal_adapter_t command_adapter",
+        "zs_nor_probe_info_t nor_probe",
         "zs_nor_storage_bind",
     ):
         require(token in nor_layout_header,
@@ -260,6 +264,7 @@ def main() -> int:
     for token in (
         "command_slot_count < 2u",
         "reserved_bytes = command_bytes + outbox_bytes",
+        "zs_nor_probe_w25q512jv(nor, &bindings->nor_probe)",
         "out->command_base_address = archive_bytes",
         "out->outbox_base_address = archive_bytes + (uint32_t)command_bytes",
         "zs_nor_command_journal_io_init",
@@ -272,6 +277,7 @@ def main() -> int:
         "test_shared_binding_caps_archive_and_separates_tail",
         "test_shared_binding_failure_is_atomic",
         "command_io.ctx == &bindings.command_adapter",
+        "bindings.nor_probe.quad_enabled",
         "bindings.layout.outbox_base_address",
     ):
         require(token in nor_layout_test,
@@ -279,6 +285,11 @@ def main() -> int:
     require("src/zs_nor_storage_layout.c" in cmake and
             "zs_nor_storage_layout_tests" in cmake,
             "shared command-journal NOR layout is not bound to CMake/CTest")
+    require("zs_nor_probe_w25q512jv" in core_nor_header and
+            "ZS_NOR_OP_READ_SFDP 0x5au" in core_nor_codec and
+            "test_w25q512_probe_fail_closed" in core_nor_test and
+            "zs_nor_tests" in cmake,
+            "command-journal exposure is not gated by exact NOR boot probe")
     for token in (
         "ZS_COMMAND_TRUST_MAX_KEYS 4u",
         "zs_ed25519_verify_backend_fn",
@@ -479,6 +490,13 @@ def main() -> int:
     )
     require("command_journal_slot_count: MISSING_BLOCKER" in target_status,
             "target command journal slot-count blocker is not explicit")
+    require(
+        "nor_boot_probe: PORTABLE_W25Q512JV_EXACT_JEDEC_SFDP_CAPACITY_QE_RESTORE_QG1_QG2_PASS_TARGET_OCTOSPI_AND_SAMPLE_PENDING"
+        in target_status and
+        "nor_octospi_binding: PORTABLE_W25Q512JV_PROBE_QG1_QG2_PASS_TARGET_OCTOSPI_AND_SAMPLE_BLOCKER"
+        in target_status,
+        "target exact NOR boot-probe blocker is not bounded",
+    )
 
     require("PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING" in icd,
             "ICD does not report the bounded implementation status")
@@ -505,7 +523,7 @@ def main() -> int:
             "portable binary MQTT boundary test is not bound to CTest")
 
     print("MQTT signed command transport QG-1: PASS")
-    print("scope: server + durable firmware/NOR adapter + shared archive/command/outbox non-overlap + BG95 bounded raw-UART session/ACK host path; target crypto/slot count/OCTOSPI/USART-DMA/retain policy/hardware remain pending")
+    print("scope: server + durable firmware/NOR adapter + exact W25Q512JV boot probe + shared archive/command/outbox non-overlap + BG95 bounded raw-UART session/ACK host path; target crypto/slot count/OCTOSPI/sample/USART-DMA/retain policy/hardware remain pending")
     return 0
 
 

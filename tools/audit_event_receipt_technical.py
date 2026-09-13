@@ -129,6 +129,15 @@ def audit_firmware_runtime() -> None:
     require(compiler is not None, "host C compiler is unavailable")
     tests = (
         (
+            "zs_nor_tests",
+            (
+                "firmware/tests/test_nor.c",
+                "firmware/src/zs_nor.c",
+                "firmware/src/zs_nor_archive.c",
+                "firmware/src/zs_archive.c",
+            ),
+        ),
+        (
             "zs_mqtt_event_transport_tests",
             (
                 "firmware/tests/test_mqtt_event_transport.c",
@@ -364,7 +373,7 @@ def main() -> int:
                 "full uint64 event ID was truncated")
 
     print("Event application receipt QG-2 independent runtime audit: PASS")
-    print("- server runtime plus bounded raw-UART BG95 session, fixed-length uplink, binary receipt, erase-isolated NOR lifecycle and shared non-overlap binding verified")
+    print("- server runtime plus bounded raw-UART BG95 session, fixed-length uplink, binary receipt, exact W25Q512JV boot probe, erase-isolated NOR lifecycle and shared non-overlap binding verified")
     return 0
 
 

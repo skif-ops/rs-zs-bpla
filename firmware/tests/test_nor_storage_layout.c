@@ -7,17 +7,52 @@
 #define CAPACITY_64_MIB (64u * 1024u * 1024u)
 #define ERASE_4_KIB 4096u
 
-static int unused_command(void *ctx, uint8_t opcode, uint32_t address,
-                          uint8_t address_bytes, const uint8_t *tx,
-                          size_t tx_size, uint8_t *rx, size_t rx_size) {
-  (void)ctx;
-  (void)opcode;
-  (void)address;
-  (void)address_bytes;
-  (void)tx;
-  (void)tx_size;
-  (void)rx;
-  (void)rx_size;
+typedef struct {
+  uint8_t status_1;
+  uint8_t status_2;
+  bool wrong_jedec;
+} mock_probe_t;
+
+static int probe_command(void *ctx, uint8_t opcode, uint32_t address,
+                         uint8_t address_bytes, const uint8_t *tx,
+                         size_t tx_size, uint8_t *rx, size_t rx_size) {
+  mock_probe_t *mock = ctx;
+  static const uint8_t header[16] = {
+      'S', 'F', 'D', 'P', 6u, 1u, 0u, 0xffu,
+      0u, 6u, 1u, 16u, 0x20u, 0u, 0u, 0xffu};
+  static const uint8_t density[4] = {0xffu, 0xffu, 0xffu, 0x1fu};
+
+  if (!mock) return -1;
+  if (opcode == 0x05u && rx && rx_size == 1u) {
+    rx[0] = mock->status_1;
+    return 0;
+  }
+  if (opcode == 0x06u && !tx && tx_size == 0u && !rx && rx_size == 0u) {
+    mock->status_1 |= 0x02u;
+    return 0;
+  }
+  if (opcode == 0x9fu && rx && rx_size == 3u) {
+    rx[0] = 0xefu;
+    rx[1] = 0x40u;
+    rx[2] = mock->wrong_jedec ? 0x19u : 0x20u;
+    return 0;
+  }
+  if (opcode == 0x5au && address_bytes == 3u && tx && tx_size == 1u &&
+      rx && ((address == 0u && rx_size == sizeof(header)) ||
+             (address == 0x24u && rx_size == sizeof(density)))) {
+    memcpy(rx, address == 0u ? header : density, rx_size);
+    return 0;
+  }
+  if (opcode == 0x35u && rx && rx_size == 1u) {
+    rx[0] = mock->status_2;
+    return 0;
+  }
+  if (opcode == 0x31u && tx && tx_size == 1u && !rx && rx_size == 0u &&
+      (mock->status_1 & 0x02u) != 0u) {
+    mock->status_2 = tx[0];
+    mock->status_1 &= (uint8_t)~0x02u;
+    return 0;
+  }
   return -1;
 }
 
@@ -31,9 +66,9 @@ static void unused_delay(void *ctx, uint32_t millis) {
   (void)millis;
 }
 
-static zs_nor_t make_nor(void) {
+static zs_nor_t make_nor(mock_probe_t *mock) {
   const zs_nor_port_t port = {
-      NULL, unused_command, unused_millis, unused_delay};
+      mock, probe_command, unused_millis, unused_delay};
   const zs_nor_geometry_t geometry = zs_nor_geometry_64m_4byte();
   zs_nor_t nor;
   assert(zs_nor_init(&nor, &port, &geometry));
@@ -121,7 +156,8 @@ static void test_capacity_and_geometry_guards(void) {
 }
 
 static void test_shared_binding_caps_archive_and_separates_tail(void) {
-  zs_nor_t nor = make_nor();
+  mock_probe_t mock = {0u};
+  zs_nor_t nor = make_nor(&mock);
   zs_nor_storage_bindings_t bindings;
   zs_archive_storage_t archive_storage;
   zs_command_journal_io_t command_io;
@@ -133,6 +169,9 @@ static void test_shared_binding_caps_archive_and_separates_tail(void) {
       &bindings, &nor, 16u, 256u, &archive_storage,
       &command_io, &outbox_io));
   assert(archive_storage.ctx == &bindings.archive_adapter);
+  assert(bindings.nor_probe.capacity_bytes == CAPACITY_64_MIB);
+  assert(bindings.nor_probe.quad_enabled);
+  assert(bindings.nor_probe.quad_enable_restored);
   assert(archive_storage.size_bytes == bindings.layout.command_base_address);
   assert(archive_storage.erase_block_bytes == ERASE_4_KIB);
   assert(command_io.ctx == &bindings.command_adapter);
@@ -158,7 +197,8 @@ static void test_shared_binding_caps_archive_and_separates_tail(void) {
 }
 
 static void test_shared_binding_failure_is_atomic(void) {
-  zs_nor_t nor = make_nor();
+  mock_probe_t mock = {0u};
+  zs_nor_t nor = make_nor(&mock);
   zs_nor_storage_bindings_t bindings;
   zs_nor_storage_bindings_t zero_bindings;
   zs_archive_storage_t archive_storage;
@@ -176,8 +216,23 @@ static void test_shared_binding_failure_is_atomic(void) {
   memset(&archive_storage, 0xa5, sizeof(archive_storage));
   memset(&command_io, 0xa5, sizeof(command_io));
   memset(&outbox_io, 0xa5, sizeof(outbox_io));
-  nor.port.millis = NULL;
+  mock.wrong_jedec = true;
 
+  assert(!zs_nor_storage_bind(
+      &bindings, &nor, 16u, 256u, &archive_storage,
+      &command_io, &outbox_io));
+  assert(memcmp(&bindings, &zero_bindings, sizeof(bindings)) == 0);
+  assert(memcmp(&archive_storage, &zero_archive_storage,
+                sizeof(archive_storage)) == 0);
+  assert(memcmp(&command_io, &zero_command_io,
+                sizeof(command_io)) == 0);
+  assert(memcmp(&outbox_io, &zero_outbox_io, sizeof(outbox_io)) == 0);
+  mock.wrong_jedec = false;
+  nor.port.millis = NULL;
+  memset(&bindings, 0xa5, sizeof(bindings));
+  memset(&archive_storage, 0xa5, sizeof(archive_storage));
+  memset(&command_io, 0xa5, sizeof(command_io));
+  memset(&outbox_io, 0xa5, sizeof(outbox_io));
   assert(!zs_nor_storage_bind(
       &bindings, &nor, 16u, 256u, &archive_storage,
       &command_io, &outbox_io));

@@ -143,6 +143,15 @@ def audit_firmware_bg95_runtime() -> None:
     require(compiler is not None, "host C compiler is unavailable")
     tests = (
         (
+            "zs_nor_tests",
+            (
+                "firmware/tests/test_nor.c",
+                "firmware/src/zs_nor.c",
+                "firmware/src/zs_nor_archive.c",
+                "firmware/src/zs_archive.c",
+            ),
+        ),
+        (
             "zs_bg95_command_transport_tests",
             (
                 "firmware/tests/test_bg95_command_transport.c",
@@ -404,7 +413,7 @@ def main() -> int:
                 "transient error log is absent or exposes exception details")
 
     print("MQTT signed command transport QG-2: PASS")
-    print("scope: host runtime + signed vector + erase-isolated NOR journal + shared archive/command/outbox non-overlap + BG95 bounded raw-UART session/fixed ACK; target crypto/slot count/OCTOSPI/USART-DMA/retain policy/hardware remain pending")
+    print("scope: host runtime + signed vector + exact W25Q512JV boot probe + erase-isolated NOR journal + shared archive/command/outbox non-overlap + BG95 bounded raw-UART session/fixed ACK; target crypto/slot count/OCTOSPI/sample/USART-DMA/retain policy/hardware remain pending")
     return 0
 
 

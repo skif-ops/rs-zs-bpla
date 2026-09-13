@@ -25,7 +25,11 @@ This record closes only `MAIN-AUTH-002`. It freezes U2, U3, and U4 device-pad ma
 - Dedicated pin 3 `/RESET` is tied directly to `3V3_DIGITAL`. Reset recovery is performed with the Winbond software-reset sequence when required.
 - Pins 4, 5, 6, 11, 12, 13, and 14 are manufacturer `N/C / DNU` and must have no electrical connection.
 - VCC pin 2 uses local 100 nF plus 1 uF decoupling to GND pin 10.
-- Firmware must validate JEDEC/SFDP identity and use 4-byte addressing mode or the dedicated 4-byte instructions before accessing addresses above the 128-Mbit boundary.
+- Portable firmware now fail-closed validates JEDEC/SFDP identity (`EF 40 20`
+  and BFPT 64 MiB density), exact 4-byte geometry and Status Register-2 QE before shared
+  storage binding, restoring QE with read-back when needed. Target OCTOSPI
+  integration and the same checks on an assembled W25Q512JVFIQ sample remain
+  mandatory before release.
 
 ## U3 LIS2DW12TR contract
 

@@ -57,6 +57,8 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    station/event identity, QoS/retain и идемпотентный повтор. Portable uplink
    adapter сохраняет retry до выдачи exact binary publication и не освобождает
    slot по PUBACK. Portable NOR adapter изолирует slot отдельным erase block.
+   Общий bind до выдачи storage interfaces проверяет exact W25Q512JV JEDEC,
+   SFDP/BFPT ёмкость и QE с read-back; sample/OCTOSPI evidence остаётся открытым.
    Portable planner проверяет непересекающиеся archive-prefix/command-journal/
    outbox-tail разделы для двух заданных чисел слотов, а единый bind API
    ограничивает archive storage на первой границе и создаёт оба tail adapter-а.
@@ -68,7 +70,7 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    production command/outbox slot counts, target USART/DMA/ISR/cache wiring и проверка этого
    broker contract. Fixed-length BG95 event
    `QMTPUB`/prompt/binary/result path проходит host QG и не трактует PUBACK как
-   application receipt. Target memory-map/OCTOSPI/endurance и аппаратный recovery
+   application receipt. Target memory-map/OCTOSPI/sample/endurance и аппаратный recovery
    остаются открыты.
 
 Закрыто в исходном baseline EVT-PRE-20: MQTT bridge теперь fail-closed и требует CA, client certificate и key. Plaintext разрешён только явным флагом `--insecure-bench`, который используется в отдельном development compose и проверяется отрицательными тестами.

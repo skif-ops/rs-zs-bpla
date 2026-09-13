@@ -99,7 +99,10 @@ persists each attempt before exposing the exact outbox payload, publishes only
 to the canonical station `up` topic, ignores PUBACK for reclamation and can apply
 a queued receipt after restart by durable event lookup. Target NOR/Flash
 binding now has a portable adapter that dedicates one physical erase block to
-each outbox slot, preventing reclaim from erasing a neighbour. A portable layout
+each outbox slot, preventing reclaim from erasing a neighbour. The shared bind
+now first validates exact W25Q512JV JEDEC `EF 40 20`, SFDP/BFPT 64 MiB density,
+4-byte geometry and Status Register-2 QE, restoring QE with read-back if needed;
+all returned interfaces remain zero on failure. A portable layout
 planner gives the audio archive the aligned NOR prefix, command journal the next
 erase-isolated partition, and event outbox the tail, proving non-overlap for both
 accepted caller-supplied slot counts. The host reference case verifies 62.9375
@@ -107,6 +110,7 @@ MiB archive + 64 KiB/16-slot journal + 1 MiB/256-slot outbox on 64 MiB NOR. A
 single fail-closed bind API creates all three adapters from that layout and caps
 the archive-visible storage at the journal boundary. Production slot counts,
 target memory-map/OCTOSPI binding and wear/endurance remain release blockers.
+Real sample identity/QE and power-loss behavior remain hardware gates.
 The portable BG95 uplink now emits fixed-length `QMTPUB`, waits for the data
 prompt and writes exact binary CBOR bytes; partial UART writes, wrong result URCs,
 offline transitions and timeout retain the pending event. Broker success still

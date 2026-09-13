@@ -23,6 +23,9 @@ def main() -> int:
     nor_header = read("firmware/include/zs_nor_event_outbox.h")
     nor_source = read("firmware/src/zs_nor_event_outbox.c")
     nor_test = read("firmware/tests/test_nor_event_outbox.c")
+    core_nor_header = read("firmware/include/zs_nor.h")
+    core_nor_source = read("firmware/src/zs_nor.c")
+    core_nor_test = read("firmware/tests/test_nor.c")
     layout_header = read("firmware/include/zs_nor_storage_layout.h")
     layout_source = read("firmware/src/zs_nor_storage_layout.c")
     layout_test = read("firmware/tests/test_nor_storage_layout.c")
@@ -108,6 +111,40 @@ def main() -> int:
             "zs_nor_event_outbox_tests" in cmake,
             "NOR outbox adapter is not bound to CMake/CTest")
     for token in (
+        "ZS_NOR_W25Q512JV_JEDEC_MANUFACTURER 0xefu",
+        "ZS_NOR_W25Q512JV_JEDEC_MEMORY_TYPE 0x40u",
+        "ZS_NOR_W25Q512JV_JEDEC_CAPACITY 0x20u",
+        "zs_nor_probe_result_t",
+        "zs_nor_probe_w25q512jv",
+        "quad_enable_restored",
+    ):
+        require(token in core_nor_header,
+                f"exact NOR boot-probe API missing: {token}")
+    for token in (
+        "ZS_NOR_OP_READ_SFDP 0x5au",
+        "ZS_NOR_OP_READ_STATUS_2 0x35u",
+        "ZS_NOR_OP_WRITE_STATUS_2 0x31u",
+        "memcmp(sfdp, \"SFDP\", 4u)",
+        "sfdp_density_bytes",
+        "capacity_bytes != nor->geometry.capacity_bytes",
+        "restore_quad_enable",
+        "ZS_NOR_PROBE_QUAD_ENABLE_FAILED",
+    ):
+        require(token in core_nor_source,
+                f"exact NOR boot-probe guard missing: {token}")
+    for token in (
+        "test_w25q512_probe_and_quad_restore",
+        "test_w25q512_probe_fail_closed",
+        "ZS_NOR_PROBE_JEDEC_MISMATCH",
+        "ZS_NOR_PROBE_SFDP_MISMATCH",
+        "ZS_NOR_PROBE_CAPACITY_MISMATCH",
+        "ZS_NOR_PROBE_QUAD_ENABLE_FAILED",
+    ):
+        require(token in core_nor_test,
+                f"exact NOR boot-probe QG-2 case missing: {token}")
+    require("zs_nor_tests" in cmake,
+            "exact NOR boot-probe test is not bound to CMake/CTest")
+    for token in (
         "zs_nor_storage_layout_t",
         "command_slot_count",
         "command_base_address",
@@ -118,6 +155,7 @@ def main() -> int:
         "zs_archive_layout_t archive",
         "zs_nor_storage_layout_make",
         "zs_nor_storage_bindings_t",
+        "zs_nor_probe_info_t nor_probe",
         "zs_nor_command_journal_adapter_t command_adapter",
         "zs_nor_storage_bind",
     ):
@@ -130,6 +168,7 @@ def main() -> int:
         "(uint64_t)command_slot_count * (uint64_t)erase_block_bytes",
         "(uint64_t)outbox_slot_count * (uint64_t)erase_block_bytes",
         "reserved_bytes = command_bytes + outbox_bytes",
+        "zs_nor_probe_w25q512jv(nor, &bindings->nor_probe)",
         "zs_archive_make_default_layout",
         "out->command_base_address = archive_bytes",
         "out->outbox_base_address = archive_bytes + (uint32_t)command_bytes",
@@ -146,6 +185,7 @@ def main() -> int:
         "test_capacity_and_geometry_guards",
         "test_shared_binding_caps_archive_and_separates_tail",
         "test_shared_binding_failure_is_atomic",
+        "bindings.nor_probe.quad_enabled",
         "layout.command_partition_bytes == 64u * 1024u",
         "layout.outbox_base_address == 63u * 1024u * 1024u",
         "archive_end(&layout.archive) == layout.command_base_address",
@@ -202,9 +242,19 @@ def main() -> int:
             "target outbox slot-count blocker is not explicit")
     require("command_journal_slot_count: MISSING_BLOCKER" in target,
             "target command-journal slot-count blocker is not explicit")
+    require(
+        "nor_boot_probe: PORTABLE_W25Q512JV_EXACT_JEDEC_SFDP_CAPACITY_QE_RESTORE_QG1_QG2_PASS_TARGET_OCTOSPI_AND_SAMPLE_PENDING"
+        in target,
+        "target status overclaims or omits exact NOR boot probe",
+    )
+    require(
+        "nor_octospi_binding: PORTABLE_W25Q512JV_PROBE_QG1_QG2_PASS_TARGET_OCTOSPI_AND_SAMPLE_BLOCKER"
+        in target,
+        "target NOR OCTOSPI/sample blocker is not explicit",
+    )
 
     print("Event store-and-forward outbox QG-1: PASS")
-    print("scope: portable atomic queue + erase-isolated NOR adapter + shared archive/command/outbox non-overlap binding; exact slot counts/OCTOSPI and hardware remain pending")
+    print("scope: exact W25Q512JV JEDEC/SFDP/QE boot gate + portable atomic queue + erase-isolated NOR adapter + shared archive/command/outbox non-overlap binding; exact slot counts/OCTOSPI and hardware remain pending")
     return 0
 
 

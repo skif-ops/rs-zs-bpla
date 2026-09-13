@@ -80,6 +80,7 @@ bool zs_nor_storage_bind(zs_nor_storage_bindings_t *bindings,
           command_slot_count,
           outbox_slot_count,
           &bindings->layout) ||
+      zs_nor_probe_w25q512jv(nor, &bindings->nor_probe) != ZS_NOR_PROBE_OK ||
       !zs_nor_archive_storage_init(
           &bindings->archive_adapter, nor, out_archive_storage) ||
       !zs_nor_command_journal_io_init(
