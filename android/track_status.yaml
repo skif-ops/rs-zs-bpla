@@ -1,6 +1,6 @@
 track_id: dioneya_android_commissioning
 status: SOURCE_BASELINE
-source_status: SKELETON_WITH_VALIDATORS_AND_TESTS
+source_status: SKELETON_WITH_VALIDATORS_TESTS_AND_POSITION_READBACK_HASH
 apk_status: RELEASE_NOT_BUILT
 debug_ci_build:
   status: PASS
@@ -13,6 +13,10 @@ internet_required_for_commissioning: false
 primary_transport: BLE
 service_recovery_transport: USB_C
 roles: [installer, service_engineer]
+implemented_host_contracts:
+  - POSITION_HASH_READBACK_QG1_QG2_PASS
+  - POSITION_POLICY_ROLE_AND_VERSION_VALIDATION_PASS
+ble_transport_status: BLE_TRANSPORT_NOT_IMPLEMENTED
 candidate_os_support:
   minimum_android: Android_9
   release_target_sdk: API_36

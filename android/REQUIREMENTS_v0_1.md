@@ -66,3 +66,12 @@
 Требования получают `LOCKED` после утверждения UX двух ролей, GATT prototype, security review, проверки минимум на трёх смартфонах включая устройство Huawei без GMS и совместного теста с target firmware.
 
 Для EVT-PRE-20 обязательны отдельные acceptance tests: manual/phone/station-GNSS coordinate commissioning, invalid-coordinate rejection, read-back/hash/lock, power-cycle retention, GNSS drift indication, spoof/jam display, revalidation after coordinate change и подтверждение того, что effective station position не изменяется вслед за GNSS drift.
+
+## Host evidence
+
+Для AND-F-006/022/024/025 реализован Kotlin domain contract: те же 58 bytes и
+SHA-256 known-answer, что в portable firmware, uint32 version bound, monotonic
+recommission, installer/default-policy и service-engineer/custom-policy,
+сравнение всех read-back полей, storage generation, hash и audit committed.
+QG-1/QG-2 и JVM unit tests не закрывают BLE UUID/pairing/GATT, физическое
+10-минутное окно или совместный тест со станцией.

@@ -24,7 +24,7 @@ REQ-POS-001,Locked installation coordinates survive power loss and reject unauth
 REQ-MECH-001,Separate full-lot fallback housing package exists for 3D printing,Customer,mechanics/3d_print release set,EVT-MECH-3D,Engineering_sample_and_20_if_fallback,OPEN,
 REQ-MECH-002,Primary pilot allocation is 20 vacuum-cast housings and TPA remains source-data-only,Customer,Independent vacuum and injection source releases with no pilot TPA tooling,EVT-MECH-VC and source audit EVT-MECH-IM,20_vacuum_plus_source_audit,OPEN,
 REQ-MECH-003,Enclosure minimum IP65 target IP67,Project baseline,Seals membranes vents and process control,Leak plus ingress campaign,20_primary_or_approved_fallback,OPEN,
-REQ-APP-001,Android application configures station offline,Customer,Separate no-GMS BLE app,Android acceptance plus EVT-BLE-01,Supported_devices,OPEN,
+REQ-APP-001,Android application configures station offline,Customer,No-GMS Android baseline with position validation canonical hash and read-back gate plus pending BLE transport,Android QG-1/QG-2 JVM tests and EVT-BLE-01,Supported_devices,PARTIAL_PASS_HOST,Position commissioning domain contract implemented; BLE UUID pairing GATT device matrix and hardware evidence open
 REQ-APP-002,Android application updates station firmware securely,Customer,Signed OTA client with resume,Android acceptance plus EVT-OTA-01,Supported_devices,OPEN,
 REQ-MFG-001,All 20 units receive 100 percent EOL,Quality policy,EOL fixture and register,EOL_TEST_SPEC,20_of_20,OPEN,
 REQ-MFG-002,China procurement is traceable and substitutions controlled,Customer procurement intent,RFQ AVL incoming control ECN,Receiving audit,All_lots,OPEN,

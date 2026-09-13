@@ -136,6 +136,31 @@ STM32 Flash binding, адреса страниц, endurance и fault-injection �
 committed. Если audit finalize не подтверждён после уже выполненной записи,
 возвращается отдельное состояние, и FIELD_READY остаётся запрещённым.
 
+| Offset | Bytes | Поле |
+|---:|---:|---|
+| 0 | 18 | ASCII `ZS-INSTALLATION-V1` |
+| 18 | 1 | canonical hash format `1` |
+| 19 | 1 | configured = `1` |
+| 20 | 1 | locked = `1` |
+| 21 | 1 | source: manual `0`, phone `1`, station GNSS `2`, surveyed `3` |
+| 22 | 1 | altitude source = configured MSL `1` |
+| 23 | 1 | position source = configured install `1` |
+| 24 | 4 | configuration version, unsigned big-endian |
+| 28 | 4 | lat_e7, signed two's-complement big-endian |
+| 32 | 4 | lon_e7, signed two's-complement big-endian |
+| 36 | 4 | alt_dm, signed two's-complement big-endian |
+| 40 | 2 | accuracy_m, unsigned big-endian |
+| 42 | 2 | warning distance, unsigned big-endian |
+| 44 | 2 | suspect distance, unsigned big-endian |
+| 46 | 2 | gross-jump distance, unsigned big-endian |
+| 48 | 1 | warning consecutive fixes |
+| 49 | 1 | suspect consecutive fixes |
+| 50 | 8 | commissioned_time_us, unsigned big-endian |
+
+Operation initial/recommission, storage generation, audit phase and digest bytes
+не входят в эти 58 bytes. Они проверяются отдельно соответствующим state/store
+контрактом.
+
 Portable guard не подтверждает UUID/MTU, nRF52840 firmware, UART binding,
 реальный service-mode timer или durable audit storage. Эти части и аппаратное
 fault injection остаются открытыми.
