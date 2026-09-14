@@ -343,7 +343,7 @@ def main() -> int:
         "manufacturing_release": False,
         "remaining_review_a_evidence": [
             "commit-matched KiCad 9 ERC with zero unexplained violations",
-            "manufacturer geometry audit artifacts",
+            "commit-matched archived manufacturer geometry audit artifacts",
             "reviewer/date/commit signature",
         ],
     }
@@ -353,7 +353,7 @@ def main() -> int:
     print("PCB-MIC native schematic independent structural Review-A audit PASS")
     print("components=4 pins=19 labels=17 explicit_nc=2; four frozen harness leaves normalized")
     print("exact MK1/J1/C1/R1 production BOM bindings and project-local footprints PASS")
-    print("Review A remains OPEN pending KiCad 9 ERC, geometry evidence and signed traceability")
+    print("Review A remains OPEN pending KiCad 9 ERC, archived commit-matched geometry evidence and signed traceability")
     return 0
 
 

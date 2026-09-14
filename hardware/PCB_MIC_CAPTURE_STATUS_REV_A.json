@@ -18,6 +18,22 @@
     "project": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro",
     "fabrication_metadata": "hardware/kicad/native/PCB-MIC/fabrication_metadata.json",
     "independent_schematic_audit": "artifacts/pcb_mic_native_schematic_rev_a.json",
+    "independent_geometry_audit": "tools/audit_pcb_mic_review_a_geometry_rev_a.py",
+    "ci_geometry_evidence": [
+      "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
+      "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
+      "artifacts/kicad-native/PCB-MIC/committed_native_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/committed_molex_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/committed_mechanical_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/materialized_native_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/materialized_molex_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/materialized_mechanical_geometry_pcbnew.txt"
+    ],
+    "ci_erc_evidence": [
+      "artifacts/kicad-native/PCB-MIC/erc.json",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_schematic.pdf",
+      "artifacts/kicad-native/sha256_manifest.json"
+    ],
     "routing_status": "PRESENT_NOT_DRC_OR_CAM_RELEASED"
   },
   "component_contract": {
@@ -37,9 +53,10 @@
   },
   "review_a": {
     "complete": false,
-    "status": "OPEN_NATIVE_ERC_GEOMETRY_AND_SIGNED_TRACEABILITY",
+    "status": "OPEN_COMMIT_MATCHED_CI_ARCHIVE_AND_SIGNED_TRACEABILITY",
     "checklist": "hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
     "structural_audit_status": "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_REMAINS_OPEN",
+    "geometry_audit_status": "PASS_LOCAL_CONTROL_IMPLEMENTED_REMOTE_COMMIT_ARCHIVE_PENDING",
     "reviewer": null,
     "date": null,
     "commit_sha": null

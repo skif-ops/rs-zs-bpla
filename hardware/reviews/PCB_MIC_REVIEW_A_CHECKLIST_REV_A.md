@@ -12,9 +12,11 @@ frozen mechanical interface. It does not approve layout manufacturing evidence.
 - [x] Fabrication metadata resolves to the active Rev.A mechanical addendum.
 - [x] Independent structural audit binds all 19 pins, 17 endpoint labels and two explicit NC markers to the frozen four-leaf harness.
 - [x] Exact MK1/J1/C1/R1 MPN, value, population and per-station quantity are reconciled to the production BOM.
+- [x] Independent archiveable audit covers native-board and project-library T5838/Molex copper, mask, paste and drill geometry with source hashes and commit binding.
 - [ ] Commit-matched KiCad 9 ERC report has zero unexplained violations.
-- [ ] T5838 and Molex copper, mask, paste and drill geometry audits are archived against the reviewed commit.
+- [ ] A successful remote gate archives the commit-matched JSON geometry report and native `pcbnew` second-control logs.
 - [ ] Reviewer, date, commit SHA and evidence links are recorded in the status file.
 
-Decision: `OPEN`. Review B and physical acoustic evidence remain mandatory after
-Review A is signed.
+Decision: `OPEN`. The geometry control is locally reproducible, but Review A cannot
+be signed until its remote commit-matched evidence and KiCad 9 ERC are archived.
+Review B and physical acoustic evidence remain mandatory after Review A is signed.

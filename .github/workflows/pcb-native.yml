@@ -101,6 +101,7 @@ on:
       - "tools/materialize_pcb_mic_libraries.py"
       - "tools/export_pcb_mic_footprints.py"
       - "tools/audit_pcb_mic_native_geometry.py"
+      - "tools/audit_pcb_mic_review_a_geometry_rev_a.py"
       - "tools/audit_pcb_mic_mechanical_rev_a.py"
       - "tools/audit_pcb_mic_molex_rev_a.py"
       - ".github/workflows/pcb-native.yml"
@@ -243,6 +244,7 @@ jobs:
             --output artifacts/kicad-reference/PCB-MIC/reference_geometry_report.json
       - name: Verify committed PCB-MIC and PCB-PWR native sources
         run: |
+          mkdir -p artifacts/kicad-native/PCB-MIC
           test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
           test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
           test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
@@ -250,11 +252,20 @@ jobs:
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
           /usr/bin/python3 tools/audit_pcb_mic_native_geometry.py \
-            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            | tee artifacts/kicad-native/PCB-MIC/committed_native_geometry_pcbnew.txt
           /usr/bin/python3 tools/audit_pcb_mic_molex_rev_a.py \
-            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            | tee artifacts/kicad-native/PCB-MIC/committed_molex_geometry_pcbnew.txt
           /usr/bin/python3 tools/audit_pcb_mic_mechanical_rev_a.py \
-            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            | tee artifacts/kicad-native/PCB-MIC/committed_mechanical_geometry_pcbnew.txt
+          python tools/audit_pcb_mic_review_a_geometry_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            --output artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json \
+            --commit-sha "$GITHUB_SHA" \
+            --phase COMMITTED_SOURCE \
+            --require-clean-source
           python tools/audit_pcb_mic_native_schematic_rev_a.py \
             --schematic hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch \
             --output artifacts/kicad-native/PCB-MIC/committed_native_schematic_audit.json
@@ -421,15 +432,25 @@ jobs:
       - name: Independent PCB-MIC native geometry audit
         run: |
           /usr/bin/python3 tools/audit_pcb_mic_native_geometry.py \
-            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            | tee artifacts/kicad-native/PCB-MIC/materialized_native_geometry_pcbnew.txt
       - name: Independent PCB-MIC Molex manufacturer-pattern audit
         run: |
           /usr/bin/python3 tools/audit_pcb_mic_molex_rev_a.py \
-            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            | tee artifacts/kicad-native/PCB-MIC/materialized_molex_geometry_pcbnew.txt
       - name: Independent PCB-MIC mechanical audit
         run: |
           /usr/bin/python3 tools/audit_pcb_mic_mechanical_rev_a.py \
-            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            | tee artifacts/kicad-native/PCB-MIC/materialized_mechanical_geometry_pcbnew.txt
+      - name: Archive commit-bound PCB-MIC Review-A geometry evidence
+        run: |
+          python tools/audit_pcb_mic_review_a_geometry_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            --output artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json \
+            --commit-sha "$GITHUB_SHA" \
+            --phase MATERIALIZED_SOURCE
       - name: ERC DRC and fabrication export for every available board
         run: python tools/kicad_native_gate.py --run-cli
       - name: Upload native gate reference and generated source evidence
