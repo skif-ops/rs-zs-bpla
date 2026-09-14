@@ -1,23 +1,24 @@
 # PCB-MIC Rev.A Review B checklist
 
-Status: `OPEN AFTER REPEAT REVIEW A / NOT SIGNED / NOT FOR MANUFACTURE`
+Status: `COPPER RETURN ACCEPTED / REVIEW B OPEN / NOT SIGNED / NOT FOR MANUFACTURE`
 
 Review B is an independent PCB/CAM/assembly pass performed after signed Review A.
-Repeat Review A is now signed for the copper ECO source, so Review B may proceed.
-No machine preflight or Review-A signature completes the remaining human, DFM,
-panelization, acoustic-stack or physical-EVT gates below.
+Repeat Review A is signed for the copper ECO source and the independent copper-return
+subgate is accepted. No machine preflight or subgate signature completes the remaining
+DFM, panelization, acoustic-stack, physical-EVT or final Review-B gates below.
 
 - [x] Native PCB contains a routed candidate rather than an empty placement canvas.
 - [x] Mechanical outline, mounting pattern and acoustic opening are represented in native CAD.
 - [x] ECO candidate KiCad 9 DRC passes with zero violations and zero unrouted items.
-- [ ] Copper return path and T5838 decoupling placement are independently accepted after repeat Review A.
+- [x] Copper return path and T5838 decoupling placement are independently accepted after repeat Review A.
   - [x] Baseline machine evidence measured the 22.248973 mm return and absent GND Gerber region.
   - [x] Reviewer `Скиф` selected `ECO_REQUIRED` on `14.09.2026` against evidence commit `cb69c0bbc1457b498ee4f44ee7da1d566033c23f`.
   - [x] The ECO candidate removes the non-materialized zone and adds a direct explicit 0.50 mm B.Cu C1 return.
   - [x] Local independent parsing measures the candidate return at 7.108150 mm and loop at 8.766161 mm.
   - [x] Commit-bound candidate CAM and copper drawings are archived and independently checked for evidence integrity.
   - [x] Repeat Review A is signed by `Скиф` for commit `e17a86bc78ba979f74c5549b378e94f7f3447fe4` and PCB SHA-256 `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031`.
-  - [x] Signed-state PCB Native Gate #162 reconfirms source continuity, CAM topology and zero ERC/DRC/unrouted findings.
+  - [x] Decision-input PCB Native Gate #163 reconfirms source continuity, CAM topology and zero ERC/DRC/unrouted findings for commit `7aeec13aa0c7ba1b3cd9095b800c6d08755912a3`.
+  - [x] Reviewer `Скиф` selected `ACCEPT_COPPER_RETURN` on `14.09.2026` for that commit and PCB SHA-256 `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031`.
 - [ ] The bottom acoustic port has no paste, mask, adhesive or coating obstruction.
   - [x] Baseline CAM proved zero paste flashes at acoustic and mounting holes and exact F/B mask openings.
   - [x] ECO candidate CAM reconfirms the baseline machine checks.
@@ -46,17 +47,17 @@ validate or sign the ECO candidate.
 ## ECO candidate state
 
 - Review A: `PASS`, repeat signature recorded for commit `e17a86bc78ba979f74c5549b378e94f7f3447fe4`.
-- Review B: `OPEN_COPPER_RETURN_AND_REMAINING_REVIEW_B_GATES`.
+- Review B: `OPEN_REMAINING_REVIEW_B_GATES_AFTER_COPPER_RETURN_ACCEPTANCE`.
 - Candidate design commit: `159068f2743904fc366a4a65ede5fee829797ed2`.
 - Native PCB SHA-256: `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031`.
-- Candidate evidence: `PASS_SIGNED_STATE_COMMIT_BOUND_CI_READY_FOR_REVIEW_B_COPPER_DECISION`.
-- Signed-state evidence commit: `cf8434892ead11e543935065ce1b620ddb6a722b`.
-- CI: [run #432](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34855152452), `success`.
-- PCB Native Gate: [run #162](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34855152369), `success`.
-- Artifact: [evt-pre-20-kicad-native-gate](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34855152369/artifacts/10352424509), ID `10352424509`, SHA-256 `4a1fdfab66c565c1b4d809fb8e345af9a636311a9a31f5a877ef8b10423e0e1d`.
+- Candidate evidence: `PASS_COPPER_RETURN_SUBGATE_ACCEPTED_REVIEW_B_REMAINS_OPEN`.
+- Decision-input evidence commit: `7aeec13aa0c7ba1b3cd9095b800c6d08755912a3`.
+- CI: [run #433](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892866), `success`.
+- PCB Native Gate: [run #163](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892890), `success`.
+- Artifact: [evt-pre-20-kicad-native-gate](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892890/artifacts/10360925100), ID `10360925100`, SHA-256 `1986effdd10fdef86d97ffecb139dd7beea13ff699adeff8f481440e74630321`.
 - Hash control: 62 manifest entries, 12 controlled source hashes and 27 PCB-MIC output hashes verified.
-- Engineering recommendation: `ACCEPT_COPPER_RETURN_SUBGATE`; independent reviewer decision remains required.
-- Review-B decision: `OPEN`.
+- Copper-return subgate: reviewer `Скиф`, date `14.09.2026`, decision `ACCEPT_COPPER_RETURN`, scope `PCB_MIC_REVIEW_B_COPPER_RETURN_SUBGATE_ONLY`.
+- Overall Review-B decision: `OPEN`.
 - Manufacturing release: `false`.
 
 Physical calibration and acoustic EVT begin only after assembled boards exist and

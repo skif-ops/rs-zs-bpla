@@ -1,11 +1,12 @@
 # PCB-MIC Rev.A Review B copper-return and decoupling packet
 
-Status: `ECO_REQUIRED RECORDED / ECO IMPLEMENTED / REPEAT REVIEW A PASS / REVIEW B OPEN / NOT FOR MANUFACTURE`
+Status: `ECO REQUIRED HISTORY PRESERVED / COPPER RETURN ACCEPTED / REVIEW B OPEN / NOT FOR MANUFACTURE`
 
 This packet records the independent copper-return decision, preserves the baseline
 evidence that caused the hold, and defines the bounded PCB-MIC copper ECO. Repeat
-Review A is now signed against the controlled ECO source and evidence. This does not
-complete Review B or grant manufacturing release.
+Review A is signed against the controlled ECO source and evidence, and the independent
+copper-return subgate is accepted. This does not complete Review B or grant
+manufacturing release.
 
 ## Controlled decision binding
 
@@ -117,26 +118,31 @@ source model.
 | Artifact SHA-256 | `c54b6669b40fa4de3cd3b0515e4bdb742d90f4ab6f40a789eb1f7bb82dfd19ba` |
 
 The repeat signature accepts the bounded PCB source for Review A. The independent
-Review-B copper-return acceptance and every external manufacturing gate remain open.
+Review-B copper-return acceptance is recorded below; all other Review-B and external
+manufacturing gates remain open.
 
-## Signed-state Review-B decision evidence
+## Copper-return decision-input evidence
 
 | Item | Controlled value |
 |---|---|
-| Signed-state evidence commit | `cf8434892ead11e543935065ce1b620ddb6a722b` |
-| PCB Native Gate | [run #162](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34855152369), `success` |
-| CI | [run #432](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34855152452), `success` |
-| Artifact | [ID 10352424509](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34855152369/artifacts/10352424509) |
-| Artifact SHA-256 | `4a1fdfab66c565c1b4d809fb8e345af9a636311a9a31f5a877ef8b10423e0e1d` |
+| Decision-input evidence commit | `7aeec13aa0c7ba1b3cd9095b800c6d08755912a3` |
+| PCB Native Gate | [run #163](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892890), `success` |
+| CI | [run #433](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892866), `success` |
+| Artifact | [ID 10360925100](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892890/artifacts/10360925100) |
+| Artifact SHA-256 | `1986effdd10fdef86d97ffecb139dd7beea13ff699adeff8f481440e74630321` |
 | Manifest / source / output verification | `62 / 12 / 27`, no mismatch |
 | Review-B preflight | `PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN` |
 | Copper disposition | `READY_FOR_INDEPENDENT_HUMAN_COPPER_RETURN_REVIEW` |
+| Review-B preflight SHA-256 | `48eb46975dfb5d474332aed3348eb48a001e6d828eb451316673cd1c9e584173` |
+| Copper audit SHA-256 | `1641b5eb173698febd57b074d6e2f9dfc85418dadbdae6ca5e59e67e500befd7` |
+| Manifest SHA-256 | `696fc45c6982c45780912e2e310882e21d863ff3624d6b2304b74b03a4b7e635` |
+| F.Cu / B.Cu SVG SHA-256 | `5e4116ccb976c16d610fbf0d4dc0488836e7b5f91157bdb6560fd55c259f4994` / `3967d710d9523a33bd513ce7bef4799289ddbecda6d2663deedfce7a3cef1f07` |
 
-Engineering recommendation: `ACCEPT_COPPER_RETURN_SUBGATE`. The direct return is
-explicit in both source and CAM, the return is reduced by `15.140823 mm`, the local
-B.Cu segment is `0.50 mm` wide, other-net copper-edge clearance is `0.802865 mm`
-against the `0.2 mm` project rule, and KiCad 9.0.9 reports zero ERC, DRC, unrouted or
-schematic-parity findings. This recommendation is not the independent human decision.
+The direct return is explicit in both source and CAM, the return is reduced by
+`15.140823 mm`, the local B.Cu segment is `0.50 mm` wide, other-net copper-edge
+clearance is `0.802865 mm` against the `0.2 mm` project rule, and KiCad 9.0.9 reports
+zero ERC, DRC, unrouted or schematic-parity findings. Reviewer `Скиф` accepted this
+bounded copper-return subgate on `14.09.2026` with decision `ACCEPT_COPPER_RETURN`.
 
 ## Required next gates
 
@@ -145,10 +151,10 @@ schematic-parity findings. This recommendation is not the independent human deci
 - [x] Commit-bound Gerber confirms explicit-routing-only B.Cu copper with zero GND regions.
 - [x] Updated copper SVGs, topology JSON, CAM reports and SHA-256 manifest are archived.
 - [x] Repeat Review A is signed against the ECO candidate commit and its archived evidence.
-- [ ] Repeat the independent copper-return decision within Review B after Review A closes.
+- [x] Repeat the independent copper-return decision within Review B after Review A closes.
 - [ ] Complete the remaining panelization, DFM, acoustic-stack and physical-EVT gates.
 
-## Decision signature
+## Initial ECO decision signature
 
 - Reviewer: `Скиф`
 - Date: `14.09.2026`
@@ -156,5 +162,18 @@ schematic-parity findings. This recommendation is not the independent human deci
 - Workflow and artifact: PCB Native Gate `34840246015`, artifact `10345408977`
 - Disposition: `ECO_REQUIRED`
 - New Review A complete: `true`, signed separately against commit `e17a86bc78ba979f74c5549b378e94f7f3447fe4`
+- Review B complete: `false`
+- Manufacturing release: `false`
+
+## Copper-return subgate acceptance signature
+
+- Reviewer: `Скиф`
+- Date: `14.09.2026`
+- Reviewed evidence commit: `7aeec13aa0c7ba1b3cd9095b800c6d08755912a3`
+- Approved native PCB SHA-256: `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031`
+- Workflow and artifact: PCB Native Gate `34873892890`, artifact `10360925100`
+- Disposition: `ACCEPT_COPPER_RETURN`
+- Approval scope: `PCB_MIC_REVIEW_B_COPPER_RETURN_SUBGATE_ONLY`
+- Copper-return subgate complete: `true`
 - Review B complete: `false`
 - Manufacturing release: `false`

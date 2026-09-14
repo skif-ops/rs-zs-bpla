@@ -106,8 +106,9 @@ EXPECTED_TRACE_SIGNATURE = {
     ("PDM_DATA_MIC", "F.Cu"): 2,
 }
 
+COPPER_RETURN_GATE = "independent human copper-return and decoupling review"
 REMAINING_EXTERNAL_GATES = [
-    "independent human copper-return and decoupling review",
+    COPPER_RETURN_GATE,
     "panelization, tooling rails and MEMS-safe depanel method",
     "fabricator and assembler DFM acceptance",
     "adhesive and conformal-coating keepout acceptance",
@@ -238,7 +239,52 @@ def audit_release_state() -> tuple[dict[str, Any], dict[str, Any]]:
                 "signed Review A is not complete/pass")
         require(review_a.get("reviewer") and review_a.get("date") and review_a.get("commit_sha"),
                 "signed Review-A traceability is incomplete")
-        release_status = "PASS_REVIEW_A_SIGNED_REVIEW_B_OPEN"
+        gate = review_b.get("copper_return_gate", {})
+        gate_accepted = gate.get("complete") is True
+        if gate_accepted:
+            current_decision = gate.get("current_review_b_decision", {})
+            require(
+                review_b.get("status") ==
+                "OPEN_REMAINING_REVIEW_B_GATES_AFTER_COPPER_RETURN_ACCEPTANCE",
+                "Review B status does not preserve the accepted copper-return subgate",
+            )
+            require(
+                gate.get("status") ==
+                "PASS_ACCEPT_COPPER_RETURN_REVIEW_B_REMAINS_OPEN"
+                and gate.get("decision") == "ACCEPT_COPPER_RETURN"
+                and current_decision.get("status") ==
+                "ACCEPTED_INDEPENDENT_HUMAN_REVIEW"
+                and current_decision.get("approval_scope") ==
+                "PCB_MIC_REVIEW_B_COPPER_RETURN_SUBGATE_ONLY"
+                and current_decision.get("decision") == "ACCEPT_COPPER_RETURN",
+                "copper-return acceptance record is incomplete",
+            )
+            require(
+                gate.get("reviewer") == current_decision.get("reviewer")
+                and gate.get("date") == current_decision.get("date")
+                and gate.get("commit_sha") == current_decision.get("reviewed_commit_sha")
+                and gate.get("decision_evidence_commit_sha") ==
+                current_decision.get("reviewed_commit_sha"),
+                "copper-return acceptance signature fields mismatch",
+            )
+            require(current_decision.get("native_board_sha256") == sha256(BOARD),
+                    "copper-return acceptance board hash mismatch")
+            initial_decision = gate.get("initial_eco_decision", {})
+            require(
+                initial_decision.get("decision") == "ECO_REQUIRED"
+                and initial_decision.get("reviewer")
+                and initial_decision.get("date")
+                and initial_decision.get("decision_evidence_commit_sha"),
+                "initial ECO_REQUIRED decision history is incomplete",
+            )
+            release_status = (
+                "PASS_REVIEW_A_SIGNED_COPPER_RETURN_ACCEPTED_REVIEW_B_OPEN"
+            )
+        else:
+            require(review_b.get("status") ==
+                    "OPEN_COPPER_RETURN_AND_REMAINING_REVIEW_B_GATES",
+                    "open copper-return Review B status mismatch")
+            release_status = "PASS_REVIEW_A_SIGNED_REVIEW_B_OPEN"
         review_record = {
             "reviewer": review_a["reviewer"],
             "date": review_a["date"],
@@ -269,6 +315,9 @@ def audit_release_state() -> tuple[dict[str, Any], dict[str, Any]]:
         "status": release_status,
         "review_a": review_record,
         "review_b_status": review_b.get("status"),
+        "copper_return_gate_complete": (
+            review_b.get("copper_return_gate", {}).get("complete") is True
+        ),
         "manufacturing_release": False,
     }
 
@@ -941,9 +990,12 @@ def audit_copper_return_report(artifact_root: Path, commit_sha: str) -> dict[str
         "copper-return topology measurement did not pass",
     )
     status = json.loads(STATUS.read_text(encoding="utf-8"))
+    gate = status.get("review_b", {}).get("copper_return_gate", {})
     expected_disposition = (
         "ECO_CANDIDATE_EXPLICIT_LOCAL_RETURN_READY_FOR_REPEAT_REVIEW_A"
         if status.get("release_state") == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO" else
+        "PASS_HUMAN_ACCEPTED_COPPER_RETURN_SUBGATE_REVIEW_B_REMAINS_OPEN"
+        if gate.get("complete") is True else
         "READY_FOR_INDEPENDENT_HUMAN_COPPER_RETURN_REVIEW"
     )
     require(
@@ -954,6 +1006,13 @@ def audit_copper_return_report(artifact_root: Path, commit_sha: str) -> dict[str
             "copper-return precheck must not complete Review B")
     require(report.get("manufacturing_release") is False,
             "copper-return precheck must not grant manufacturing release")
+    findings = {item.get("id"): item for item in report.get("findings", [])}
+    if gate.get("complete") is True:
+        require(
+            findings.get("PCB-MIC-RB-CU-002", {}).get("severity") ==
+            "ACCEPTED_BY_INDEPENDENT_REVIEWER",
+            "accepted copper-return report still requests a human decision",
+        )
     binding = report.get("commit_binding", {})
     require(binding.get("evidence_commit_sha") == commit_sha,
             "copper-return audit commit binding mismatch")
@@ -993,6 +1052,8 @@ def audit_copper_return_report(artifact_root: Path, commit_sha: str) -> dict[str
         "ground_return_reduction_mm": topology.get("ground_return_reduction_mm"),
         "bcu_gnd_region_count": cam.get("gnd_region_count"),
         "copper_model": source_zone.get("copper_model"),
+        "copper_return_gate_complete": gate.get("complete") is True,
+        "copper_return_decision": gate.get("decision"),
         "review_b_complete": False,
         "manufacturing_release": False,
     }
@@ -1059,6 +1120,8 @@ def audit(artifact_root: Path, commit_sha: str) -> dict[str, Any]:
     remaining_external_gates = list(REMAINING_EXTERNAL_GATES)
     if status["release_state"] == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO":
         remaining_external_gates.insert(0, REPEAT_REVIEW_A_GATE)
+    elif status["review_b"]["copper_return_gate"].get("complete") is True:
+        remaining_external_gates.remove(COPPER_RETURN_GATE)
     return {
         "schema": "dioneya-pcb-mic-review-b-internal-preflight-v1",
         "configuration": "EVT-PRE-20 Rev.A",

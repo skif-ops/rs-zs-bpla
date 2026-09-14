@@ -717,6 +717,67 @@ def audit_commit_binding(commit_sha: str | None, require_clean_source: bool) -> 
         review_a_state = "SIGNED_PASS"
         previous_review_a = None
 
+    gate = review_b.get("copper_return_gate", {})
+    current_decision = gate.get("current_review_b_decision", {})
+    gate_accepted = gate.get("complete") is True
+    acceptance: dict[str, Any] | None = None
+    if gate_accepted:
+        require(review_a_state == "SIGNED_PASS",
+                "copper-return acceptance requires a signed Review A")
+        require(
+            gate.get("status") ==
+            "PASS_ACCEPT_COPPER_RETURN_REVIEW_B_REMAINS_OPEN",
+            "accepted copper-return gate status mismatch",
+        )
+        require(
+            current_decision.get("status") == "ACCEPTED_INDEPENDENT_HUMAN_REVIEW"
+            and current_decision.get("approval_scope") ==
+            "PCB_MIC_REVIEW_B_COPPER_RETURN_SUBGATE_ONLY"
+            and current_decision.get("decision") == "ACCEPT_COPPER_RETURN",
+            "accepted copper-return decision record is incomplete",
+        )
+        reviewer = current_decision.get("reviewer")
+        date = current_decision.get("date")
+        reviewed_commit = str(current_decision.get("reviewed_commit_sha", ""))
+        board_sha256 = sha256(BOARD)
+        require(reviewer and date, "accepted copper-return reviewer/date are missing")
+        require(re.fullmatch(r"[0-9a-f]{40}", reviewed_commit) is not None,
+                "accepted copper-return reviewed commit SHA is invalid")
+        require(git_bytes(reviewed_commit, BOARD) == BOARD.read_bytes(),
+                "accepted copper-return reviewed commit has different PCB bytes")
+        require(current_decision.get("native_board_sha256") == board_sha256,
+                "accepted copper-return board hash mismatch")
+        require(
+            gate.get("reviewer") == reviewer
+            and gate.get("date") == date
+            and gate.get("commit_sha") == reviewed_commit
+            and gate.get("decision") == "ACCEPT_COPPER_RETURN"
+            and gate.get("decision_evidence_commit_sha") == reviewed_commit,
+            "accepted copper-return flat signature fields mismatch",
+        )
+        initial_decision = gate.get("initial_eco_decision", {})
+        require(
+            initial_decision.get("decision") == "ECO_REQUIRED"
+            and initial_decision.get("reviewer")
+            and initial_decision.get("date")
+            and initial_decision.get("decision_evidence_commit_sha"),
+            "initial ECO_REQUIRED decision history is incomplete",
+        )
+        require(gate.get("review_b_complete") is False
+                and gate.get("manufacturing_release") is False,
+                "copper-return acceptance must not close Review B or release manufacture")
+        acceptance = {
+            "status": current_decision["status"],
+            "approval_scope": current_decision["approval_scope"],
+            "reviewer": reviewer,
+            "date": date,
+            "reviewed_commit_sha": reviewed_commit,
+            "native_board_sha256": board_sha256,
+            "decision": current_decision["decision"],
+            "review_b_complete": False,
+            "manufacturing_release": False,
+        }
+
     head = git_head()
     if commit_sha is not None:
         require(re.fullmatch(r"[0-9a-f]{40}", commit_sha) is not None,
@@ -742,6 +803,8 @@ def audit_commit_binding(commit_sha: str | None, require_clean_source: bool) -> 
         "review_a_state": review_a_state,
         "signed_source_continuity": review_a_state == "SIGNED_PASS",
         "superseded_review_a_signature": previous_review_a,
+        "copper_return_gate_complete": gate_accepted,
+        "copper_return_acceptance": acceptance,
         "review_b_complete": False,
         "manufacturing_release": False,
     }
@@ -798,6 +861,8 @@ def run_audit(artifact_root: Path | None, commit_sha: str | None,
                 "explicit-routing-only CAM unexpectedly contains a GND region")
 
     review_a_signed = binding["review_a_state"] == "SIGNED_PASS"
+    copper_return_accepted = binding["copper_return_gate_complete"]
+    acceptance = binding["copper_return_acceptance"]
     findings: list[dict[str, Any]] = [{
         "id": "PCB-MIC-RB-CU-001",
         "severity": (
@@ -811,25 +876,41 @@ def run_audit(artifact_root: Path | None, commit_sha: str | None,
         ),
         "verification": (
             "Source and CAM use explicit routing only; signed Review A is continuous with "
+            "the current native PCB bytes; the copper-return subgate is independently "
+            "accepted while Review B remains open."
+            if copper_return_accepted else
+            "Source and CAM use explicit routing only; signed Review A is continuous with "
             "the current native PCB bytes; independent Review-B copper acceptance remains "
             "required."
             if review_a_signed else
             "Source and CAM use explicit routing only; repeat Review A is required because "
             "the native PCB bytes changed."
         ),
-    }, {
+    }]
+    limit_finding: dict[str, Any] = {
         "id": "PCB-MIC-RB-CU-002",
-        "severity": "HUMAN_ACCEPTANCE_REQUIRED",
+        "severity": (
+            "ACCEPTED_BY_INDEPENDENT_REVIEWER"
+            if copper_return_accepted else "HUMAN_ACCEPTANCE_REQUIRED"
+        ),
         "finding": (
             "No project-controlled normative maximum is frozen for the C1-to-MK1 "
             "decoupling loop; measured supply and return lengths cannot self-authorize a PASS."
         ),
-        "required_decision": "Reviewer accepts the loop or raises a routed-board ECO.",
-    }]
+    }
+    if copper_return_accepted:
+        limit_finding["recorded_decision"] = acceptance
+    else:
+        limit_finding["required_decision"] = (
+            "Reviewer accepts the loop or raises a routed-board ECO."
+        )
+    findings.append(limit_finding)
 
     decision = (
         "ECO_CANDIDATE_EXPLICIT_LOCAL_RETURN_READY_FOR_REPEAT_REVIEW_A"
         if binding["review_a_state"] == "ECO_CANDIDATE_REPEAT_REVIEW_A_REQUIRED" else
+        "PASS_HUMAN_ACCEPTED_COPPER_RETURN_SUBGATE_REVIEW_B_REMAINS_OPEN"
+        if copper_return_accepted else
         "READY_FOR_INDEPENDENT_HUMAN_COPPER_RETURN_REVIEW"
     )
     return {
@@ -867,7 +948,10 @@ def run_audit(artifact_root: Path | None, commit_sha: str | None,
             ),
             "decoupling_loop_reduction_mm": round(baseline_loop - loop_length, 6),
             "normative_maximum_loop_length_mm": None,
-            "normative_limit_status": "NOT_FROZEN_HUMAN_REVIEW_REQUIRED",
+            "normative_limit_status": (
+                "NOT_FROZEN_ACCEPTED_BY_INDEPENDENT_REVIEWER"
+                if copper_return_accepted else "NOT_FROZEN_HUMAN_REVIEW_REQUIRED"
+            ),
         },
         "ground_zone": {
             "source": zone,
