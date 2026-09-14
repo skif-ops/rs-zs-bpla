@@ -179,6 +179,15 @@ def audit() -> dict[str, object]:
     )
 
     mic_metadata = read_json("hardware/kicad/native/PCB-MIC/fabrication_metadata.json")
+    expected_mic_authority = "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md"
+    mic_authority = str(mic_metadata.get("authority", ""))
+    mic_authority_ok = mic_authority == expected_mic_authority and (ROOT / mic_authority).is_file()
+    check(
+        "pcb_mic_mechanical_authority_traceability",
+        mic_authority_ok,
+        mic_authority or "MISSING",
+        "PCB-MIC fabrication metadata does not resolve to the controlled mechanical authority",
+    )
     mic_released = mic_metadata.get("status") == "FOR_MANUFACTURE"
     check(
         "pcb_mic_fabrication_release",

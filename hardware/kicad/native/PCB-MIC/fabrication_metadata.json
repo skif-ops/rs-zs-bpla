@@ -7,7 +7,7 @@
   "board_thickness_mm": 1.0,
   "copper_layers": 2,
   "status": "NOT_FOR_MANUFACTURE",
-  "authority": "hardware/PCB_MIC_MECHANICAL_FREEZE_REV_A.md",
+  "authority": "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
   "release_notes": [
     "Review A and Review B remain mandatory",
     "Fabricator DFM remains mandatory",
