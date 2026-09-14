@@ -4,9 +4,10 @@
 This audit consumes only committed native sources, frozen production authority and
 the files emitted by KiCad 9. It is deliberately independent from the PCB generator
 and from ``kicad_native_gate.py`` export logic. It can validate either a signed
-Review-A source set or a post-ECO candidate. A candidate PASS does not close Review A
-or Review B; panelization, fabricator/assembler DFM, acoustic stack validation and
-manufacturing release remain open.
+Review-A source set or a post-ECO candidate. A candidate PASS does not close Review A.
+In either state, the independent Review-B decision, panelization,
+fabricator/assembler DFM, acoustic stack validation and manufacturing release remain
+open.
 """
 from __future__ import annotations
 
@@ -106,7 +107,6 @@ EXPECTED_TRACE_SIGNATURE = {
 }
 
 REMAINING_EXTERNAL_GATES = [
-    "repeat PCB-MIC Review A against the copper ECO candidate commit",
     "independent human copper-return and decoupling review",
     "panelization, tooling rails and MEMS-safe depanel method",
     "fabricator and assembler DFM acceptance",
@@ -115,6 +115,7 @@ REMAINING_EXTERNAL_GATES = [
     "assembled acoustic inspection and physical EVT calibration",
     "independent Review-B signature and manufacturing release",
 ]
+REPEAT_REVIEW_A_GATE = "repeat PCB-MIC Review A against the copper ECO candidate commit"
 
 
 def require(condition: bool, message: str) -> None:
@@ -1055,6 +1056,9 @@ def audit(artifact_root: Path, commit_sha: str) -> dict[str, Any]:
         if status["release_state"] == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO" else
         "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN"
     )
+    remaining_external_gates = list(REMAINING_EXTERNAL_GATES)
+    if status["release_state"] == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO":
+        remaining_external_gates.insert(0, REPEAT_REVIEW_A_GATE)
     return {
         "schema": "dioneya-pcb-mic-review-b-internal-preflight-v1",
         "configuration": "EVT-PRE-20 Rev.A",
@@ -1067,7 +1071,7 @@ def audit(artifact_root: Path, commit_sha: str) -> dict[str, Any]:
         "checks": checks,
         "source_hashes": {display_path(path): sha256(path) for path in source_paths},
         "output_hashes": output_hashes(artifact_root),
-        "remaining_external_gates": REMAINING_EXTERNAL_GATES,
+        "remaining_external_gates": remaining_external_gates,
     }
 
 
@@ -1091,7 +1095,7 @@ def main() -> int:
             "review_b_complete": False,
             "manufacturing_release": False,
             "error": f"{type(exc).__name__}: {exc}",
-            "remaining_external_gates": REMAINING_EXTERNAL_GATES,
+            "remaining_external_gates": [REPEAT_REVIEW_A_GATE, *REMAINING_EXTERNAL_GATES],
         }
         args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
         print(f"PCB-MIC Review-B internal CAM preflight FAIL: {exc}")
@@ -1099,7 +1103,10 @@ def main() -> int:
 
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(f"PCB-MIC CAM preflight PASS: {report['status']}")
-    print("Review A/Review B remain OPEN as recorded; manufacturing release remains FALSE")
+    if report["signed_review_a_commit_sha"]:
+        print("Review A is signed; Review B remains OPEN; manufacturing release remains FALSE")
+    else:
+        print("Review A/Review B remain OPEN as recorded; manufacturing release remains FALSE")
     print(f"evidence commit: {args.commit_sha}")
     print(f"hashed source files: {len(report['source_hashes'])}")
     print(f"hashed output files: {len(report['output_hashes'])}")

@@ -797,14 +797,23 @@ def run_audit(artifact_root: Path | None, commit_sha: str | None,
         require(gerber.get("gnd_region_count") == 0,
                 "explicit-routing-only CAM unexpectedly contains a GND region")
 
+    review_a_signed = binding["review_a_state"] == "SIGNED_PASS"
     findings: list[dict[str, Any]] = [{
         "id": "PCB-MIC-RB-CU-001",
-        "severity": "RESOLVED_IN_ECO_CANDIDATE_PENDING_REPEAT_REVIEW_A",
+        "severity": (
+            "RESOLVED_ECO_VERIFIED_REVIEW_A_SIGNED"
+            if review_a_signed else
+            "RESOLVED_IN_ECO_CANDIDATE_PENDING_REPEAT_REVIEW_A"
+        ),
         "finding": (
             "The non-materialized B.Cu GND zone was removed and the remote C1 branch was "
             "replaced by one direct, explicit 0.50 mm B.Cu return segment."
         ),
         "verification": (
+            "Source and CAM use explicit routing only; signed Review A is continuous with "
+            "the current native PCB bytes; independent Review-B copper acceptance remains "
+            "required."
+            if review_a_signed else
             "Source and CAM use explicit routing only; repeat Review A is required because "
             "the native PCB bytes changed."
         ),

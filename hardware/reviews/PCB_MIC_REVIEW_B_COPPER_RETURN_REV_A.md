@@ -119,6 +119,25 @@ source model.
 The repeat signature accepts the bounded PCB source for Review A. The independent
 Review-B copper-return acceptance and every external manufacturing gate remain open.
 
+## Signed-state Review-B decision evidence
+
+| Item | Controlled value |
+|---|---|
+| Signed-state evidence commit | `cf8434892ead11e543935065ce1b620ddb6a722b` |
+| PCB Native Gate | [run #162](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34855152369), `success` |
+| CI | [run #432](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34855152452), `success` |
+| Artifact | [ID 10352424509](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34855152369/artifacts/10352424509) |
+| Artifact SHA-256 | `4a1fdfab66c565c1b4d809fb8e345af9a636311a9a31f5a877ef8b10423e0e1d` |
+| Manifest / source / output verification | `62 / 12 / 27`, no mismatch |
+| Review-B preflight | `PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN` |
+| Copper disposition | `READY_FOR_INDEPENDENT_HUMAN_COPPER_RETURN_REVIEW` |
+
+Engineering recommendation: `ACCEPT_COPPER_RETURN_SUBGATE`. The direct return is
+explicit in both source and CAM, the return is reduced by `15.140823 mm`, the local
+B.Cu segment is `0.50 mm` wide, other-net copper-edge clearance is `0.802865 mm`
+against the `0.2 mm` project rule, and KiCad 9.0.9 reports zero ERC, DRC, unrouted or
+schematic-parity findings. This recommendation is not the independent human decision.
+
 ## Required next gates
 
 - [x] Commit and push the ECO candidate as one controlled source set.
