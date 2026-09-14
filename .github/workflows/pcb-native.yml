@@ -456,6 +456,24 @@ jobs:
             --output artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json \
             --commit-sha "$GITHUB_SHA" \
             --phase MATERIALIZED_SOURCE
+      - name: Restore commit-bound PCB-MIC sources after regeneration check
+        shell: bash
+        run: |
+          set -euo pipefail
+          regenerated=artifacts/kicad-native/PCB-MIC/regenerated-source
+          mkdir -p "$regenerated"
+          cp hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb "$regenerated/PCB-MIC.kicad_pcb"
+          cp hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch "$regenerated/PCB-MIC.kicad_sch"
+          git diff --binary -- \
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch \
+            > "$regenerated/regenerated_vs_commit.diff"
+          git restore --source="$GITHUB_SHA" -- \
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
+          git diff --exit-code -- \
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
       - name: ERC DRC and fabrication export for every available board
         run: python tools/kicad_native_gate.py --run-cli
       - name: Upload native gate reference and generated source evidence
