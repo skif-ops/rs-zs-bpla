@@ -34,7 +34,18 @@
       "artifacts/kicad-native/PCB-MIC/PCB-MIC_schematic.pdf",
       "artifacts/kicad-native/sha256_manifest.json"
     ],
-    "routing_status": "PRESENT_CLI_DRC_AND_CAM_EVIDENCE_REVIEW_B_OPEN"
+    "ci_review_b_preflight_evidence": [
+      "artifacts/kicad-native/PCB-MIC/review_b_preflight_audit.json",
+      "artifacts/kicad-native/PCB-MIC/cam_source_transform.json",
+      "artifacts/kicad-native/PCB-MIC/gerber/PCB-MIC-job.gbrjob",
+      "artifacts/kicad-native/PCB-MIC/drill/PCB-MIC.drl",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC.d356",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_pos.csv",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_manufacturing_bom.csv",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_assembly_fabrication.pdf",
+      "artifacts/kicad-native/sha256_manifest.json"
+    ],
+    "routing_status": "PRESENT_CLI_DRC_AND_INTERNAL_CAM_PREFLIGHT_PASS_REVIEW_B_OPEN"
   },
   "component_contract": {
     "microphone": "TDK InvenSense MMICT5838-00-012",
@@ -73,11 +84,38 @@
   },
   "review_b": {
     "complete": false,
-    "status": "OPEN_DRC_CAM_PANELIZATION_DFM_ACOUSTIC_STACK_AND_EVIDENCE",
+    "status": "OPEN_HUMAN_COPPER_REVIEW_PANELIZATION_DFM_ADHESIVE_COATING_ACOUSTIC_STACK_AND_SIGNATURE",
     "checklist": "hardware/reviews/PCB_MIC_REVIEW_B_CHECKLIST_REV_A.md",
     "reviewer": null,
     "date": null,
-    "commit_sha": null
+    "commit_sha": null,
+    "internal_preflight": {
+      "complete": true,
+      "status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
+      "evidence_commit_sha": "8264c6b8bc2ced3e0852a6e7f3d00318bffbc904",
+      "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34834219819",
+      "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34834219791",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34834219819/artifacts/10342982895",
+      "artifact_id": 10342982895,
+      "artifact_digest": "sha256:11701d079ab95c2046fb14553fea822d84e70900af2f4a6e8f9ffbe5aa8b4188",
+      "audit": "artifacts/kicad-native/PCB-MIC/review_b_preflight_audit.json",
+      "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json",
+      "sha256_manifest_entries": 59,
+      "pcb_mic_output_hashes_verified": 24,
+      "kicad_cli": {
+        "version": "9.0.9",
+        "erc_violations": 0,
+        "drc_violations": 0,
+        "unrouted_items": 0
+      },
+      "cam_source": {
+        "signed_source_sha256": "aecd1a374b5f66d32a5ae056eb4ad452d68e2a2391e65f6068acc8cad37f2295",
+        "derived_source_sha256": "3768ba97b0c21aca933795a52876aaa351f7dd19f5b39da2c7324c45e7d0e4c0",
+        "design_geometry_modified": false
+      },
+      "review_b_complete": false,
+      "manufacturing_release": false
+    }
   },
   "physical_evt": {
     "status": "NOT_RUN",
