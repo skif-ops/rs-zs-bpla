@@ -121,18 +121,6 @@ def add_via(board, net, xy, *, diameter=0.65, drill=0.30):
     return via
 
 
-def add_ground_zone(board, gnd_net, width: float, height: float):
-    z = pcbnew.ZONE(board)
-    z.SetLayer(pcbnew.B_Cu); z.SetNetCode(gnd_net.GetNetCode())
-    z.SetZoneName("PCB_MIC_BCU_GND_REFERENCE")
-    poly = pcbnew.SHAPE_LINE_CHAIN()
-    inset = 0.65
-    for xy in ((inset,inset),(width-inset,inset),(width-inset,height-inset),(inset,height-inset)):
-        poly.Append(v(*xy))
-    poly.SetClosed(True); z.AddPolygon(poly); board.Add(z)
-    return z
-
-
 def build_t5838(board, center=(12.0, 16.0)):
     """Create T5838 footprint already rotated 270 degrees for Rev.A placement."""
     cx, cy = center
@@ -278,10 +266,11 @@ def main() -> int:
     add_track(board,nets["GND"],[(12.70,gy),gnd_m],width=0.30)
     add_track(board,nets["GND"],[mp["2"],(11.70,16.05)],width=0.16)
 
-    # Explicit B.Cu star/backbone is the first-control connectivity path. It must also
-    # respect the T5838 acoustic keepout: the backbone detours below the microphone
-    # instead of crossing the 0.8 mm NPTH at (12.0, 16.65). The B.Cu zone remains for
-    # the final low-impedance reference plane and is independently checked by KiCad.
+    # Explicit B.Cu star/backbone is the controlled fabrication path. It respects the
+    # T5838 acoustic keepout by detouring below the microphone instead of crossing the
+    # 0.8 mm NPTH at (12.0, 16.65). The C1 return now runs directly from its via to the
+    # microphone-return via; this replaces the previous 6.25 mm branch into the remote
+    # spine and removes any dependency on an unmaterialized zone.
     gnd_spine_x=9.0
     gnd_detour_y=18.10
     add_track(board,nets["GND"],[
@@ -291,13 +280,8 @@ def main() -> int:
         (gnd_m[0],gnd_detour_y),
         gnd_m,
     ],width=0.50,layer=pcbnew.B_Cu)
-    add_track(board,nets["GND"],[(gnd_spine_x,cp2[1]),gnd_c],width=0.50,layer=pcbnew.B_Cu)
-    print("explicit B.Cu GND backbone added with acoustic-hole detour", flush=True)
-
-    add_ground_zone(board,nets["GND"],bw,bh)
-    print("before zone fill", flush=True)
-    pcbnew.ZONE_FILLER(board).Fill(board.Zones())
-    print("zone fill complete", flush=True)
+    add_track(board,nets["GND"],[gnd_c,gnd_m],width=0.50,layer=pcbnew.B_Cu)
+    print("explicit B.Cu GND backbone and short local C1 return added", flush=True)
 
     txt=pcbnew.PCB_TEXT(board); txt.SetText("PCB-MIC Rev.A ELECTRICAL CANDIDATE - DIM-004 OPEN")
     txt.SetPosition(v(12.0,21.2)); txt.SetLayer(pcbnew.F_Fab); txt.SetTextHeight(mm(0.7)); txt.SetTextWidth(mm(0.7)); txt.SetTextThickness(mm(0.11)); board.Add(txt)

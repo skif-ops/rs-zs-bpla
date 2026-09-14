@@ -3,9 +3,10 @@
 
 This audit consumes only committed native sources, frozen production authority and
 the files emitted by KiCad 9. It is deliberately independent from the PCB generator
-and from ``kicad_native_gate.py`` export logic. A PASS closes only the internal
-machine-verifiable preflight. Review B, panelization, fabricator/assembler DFM,
-acoustic stack validation and manufacturing release remain open.
+and from ``kicad_native_gate.py`` export logic. It can validate either a signed
+Review-A source set or a post-ECO candidate. A candidate PASS does not close Review A
+or Review B; panelization, fabricator/assembler DFM, acoustic stack validation and
+manufacturing release remain open.
 """
 from __future__ import annotations
 
@@ -34,6 +35,8 @@ PRODUCTION_BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
 NATIVE_GATE = ROOT / "tools/kicad_native_gate.py"
 COPPER_RETURN_AUDIT = ROOT / "tools/audit_pcb_mic_copper_return_rev_a.py"
 COPPER_RETURN_PACKET = ROOT / "hardware/reviews/PCB_MIC_REVIEW_B_COPPER_RETURN_REV_A.md"
+GENERATOR = ROOT / "tools/generate_pcb_mic_clean_rev_a.py"
+NATIVE_WORKFLOW = ROOT / ".github/workflows/pcb-native.yml"
 
 EXPECTED_COMPONENTS = {
     "C1": {
@@ -103,6 +106,7 @@ EXPECTED_TRACE_SIGNATURE = {
 }
 
 REMAINING_EXTERNAL_GATES = [
+    "repeat PCB-MIC Review A against the copper ECO candidate commit",
     "independent human copper-return and decoupling review",
     "panelization, tooling rails and MEMS-safe depanel method",
     "fabricator and assembler DFM acceptance",
@@ -154,11 +158,9 @@ def git_bytes(commit: str, path: Path) -> bytes:
     )
 
 
-def audit_commit_binding(commit_sha: str, signed_commit: str) -> dict[str, Any]:
+def audit_commit_binding(commit_sha: str, status: dict[str, Any]) -> dict[str, Any]:
     require(re.fullmatch(r"[0-9a-f]{40}", commit_sha) is not None,
             f"invalid evidence commit SHA: {commit_sha!r}")
-    require(re.fullmatch(r"[0-9a-f]{40}", signed_commit) is not None,
-            f"invalid signed Review-A commit SHA: {signed_commit!r}")
     head = subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
     ).strip()
@@ -167,7 +169,7 @@ def audit_commit_binding(commit_sha: str, signed_commit: str) -> dict[str, Any]:
     controlled = [
         BOARD, SCHEMATIC, PROJECT, FABRICATION_METADATA, STATUS,
         PRODUCTION_BOM, NATIVE_GATE, COPPER_RETURN_AUDIT,
-        COPPER_RETURN_PACKET, Path(__file__).resolve(),
+        COPPER_RETURN_PACKET, GENERATOR, NATIVE_WORKFLOW, Path(__file__).resolve(),
     ]
     dirty = subprocess.check_output(
         ["git", "status", "--porcelain", "--", *[str(p.relative_to(ROOT)) for p in controlled]],
@@ -176,21 +178,46 @@ def audit_commit_binding(commit_sha: str, signed_commit: str) -> dict[str, Any]:
     ).strip()
     require(not dirty, f"commit-bound source set is dirty: {dirty}")
 
-    signed_source_hashes: dict[str, str] = {}
+    current_source_hashes: dict[str, str] = {}
     for path in (BOARD, SCHEMATIC, PROJECT, FABRICATION_METADATA):
-        signed = git_bytes(signed_commit, path)
         current = path.read_bytes()
-        require(
-            current == signed,
-            f"{path.relative_to(ROOT)} drifted from signed Review-A commit {signed_commit}",
-        )
-        signed_source_hashes[str(path.relative_to(ROOT))] = hashlib.sha256(signed).hexdigest()
+        committed = git_bytes(commit_sha, path)
+        require(current == committed,
+                f"{path.relative_to(ROOT)} differs from evidence commit {commit_sha}")
+        current_source_hashes[str(path.relative_to(ROOT))] = hashlib.sha256(current).hexdigest()
+
+    review_a = status["review_a"]
+    if status["release_state"] == "REVIEW_A_PASS":
+        signed_commit = str(review_a.get("commit_sha", ""))
+        require(re.fullmatch(r"[0-9a-f]{40}", signed_commit) is not None,
+                f"invalid signed Review-A commit SHA: {signed_commit!r}")
+        for path in (BOARD, SCHEMATIC, PROJECT, FABRICATION_METADATA):
+            require(path.read_bytes() == git_bytes(signed_commit, path),
+                    f"{path.relative_to(ROOT)} drifted from signed Review-A commit {signed_commit}")
+        review_a_state = "SIGNED_PASS"
+        prior_signature = None
+    else:
+        require(status["release_state"] == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO",
+                "unexpected PCB-MIC release state")
+        signed_commit = None
+        prior_signature = review_a.get("superseded_signature", {})
+        prior_commit = str(prior_signature.get("commit_sha", ""))
+        require(re.fullmatch(r"[0-9a-f]{40}", prior_commit) is not None,
+                "invalid superseded Review-A commit SHA")
+        require(BOARD.read_bytes() != git_bytes(prior_commit, BOARD),
+                "post-ECO board still matches the superseded Review-A board")
+        for path in (SCHEMATIC, PROJECT, FABRICATION_METADATA):
+            require(path.read_bytes() == git_bytes(prior_commit, path),
+                    f"post-ECO change escaped board-only scope: {path.relative_to(ROOT)}")
+        review_a_state = "ECO_CANDIDATE_REPEAT_REVIEW_A_REQUIRED"
 
     return {
         "status": "PASS",
         "evidence_commit_sha": commit_sha,
         "signed_review_a_commit_sha": signed_commit,
-        "signed_source_continuity": signed_source_hashes,
+        "review_a_state": review_a_state,
+        "current_source_continuity": current_source_hashes,
+        "superseded_review_a_signature": prior_signature,
         "controlled_source_dirty_lines": 0,
     }
 
@@ -198,25 +225,48 @@ def audit_commit_binding(commit_sha: str, signed_commit: str) -> dict[str, Any]:
 def audit_release_state() -> tuple[dict[str, Any], dict[str, Any]]:
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     require(status.get("assembly") == "PCB-MIC", "capture status assembly mismatch")
-    require(status.get("release_state") == "REVIEW_A_PASS", "PCB-MIC is not at Review-A pass")
     require(status.get("manufacturing_release") is False,
             "manufacturing release must remain false during Review-B preflight")
     review_a = status.get("review_a", {})
     review_b = status.get("review_b", {})
-    require(review_a.get("complete") is True and review_a.get("status") == "PASS",
-            "signed Review A is not complete/pass")
-    require(review_a.get("reviewer") and review_a.get("date") and review_a.get("commit_sha"),
-            "signed Review-A traceability is incomplete")
     require(review_b.get("complete") is False, "Review B must remain open")
     require(review_b.get("reviewer") is None and review_b.get("date") is None,
             "unsigned Review B unexpectedly has reviewer/date")
-    return status, {
-        "status": "PASS_REVIEW_A_SIGNED_REVIEW_B_OPEN",
-        "review_a": {
+    if status.get("release_state") == "REVIEW_A_PASS":
+        require(review_a.get("complete") is True and review_a.get("status") == "PASS",
+                "signed Review A is not complete/pass")
+        require(review_a.get("reviewer") and review_a.get("date") and review_a.get("commit_sha"),
+                "signed Review-A traceability is incomplete")
+        release_status = "PASS_REVIEW_A_SIGNED_REVIEW_B_OPEN"
+        review_record = {
             "reviewer": review_a["reviewer"],
             "date": review_a["date"],
             "commit_sha": review_a["commit_sha"],
-        },
+        }
+    else:
+        require(status.get("release_state") == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO",
+                "PCB-MIC is neither signed nor an explicit post-ECO candidate")
+        require(review_a.get("complete") is False
+                and review_a.get("status") == "REVIEW_REQUIRED_AFTER_COPPER_ECO",
+                "post-ECO Review A must be open")
+        require(all(review_a.get(field) is None for field in ("reviewer", "date", "commit_sha")),
+                "post-ECO Review A unexpectedly retains an active signature")
+        require(review_b.get("status") == "BLOCKED_PENDING_REPEAT_REVIEW_A_AFTER_COPPER_ECO",
+                "Review B is not blocked on repeat Review A")
+        gate = review_b.get("copper_return_gate", {})
+        require(gate.get("decision") == "ECO_REQUIRED"
+                and gate.get("reviewer") and gate.get("date"),
+                "ECO_REQUIRED decision traceability is incomplete")
+        release_status = "PASS_ECO_CANDIDATE_REVIEW_A_REQUIRED_REVIEW_B_BLOCKED"
+        review_record = {
+            "reviewer": None,
+            "date": None,
+            "commit_sha": None,
+            "superseded_signature": review_a.get("superseded_signature"),
+        }
+    return status, {
+        "status": release_status,
+        "review_a": review_record,
         "review_b_status": review_b.get("status"),
         "manufacturing_release": False,
     }
@@ -683,14 +733,8 @@ def audit_native_topology() -> dict[str, Any]:
     require(mic_pads.get("7") == "1V8_MIC" and mic_pads.get("2") == "GND" and mic_pads.get("3") == "GND",
             f"MK1 power/return pad assignment mismatch: {mic_pads}")
 
-    zones = [
-        zone for zone in board.zones
-        if zone.netName == "GND" and zone.layers == ["B.Cu"]
-    ]
-    require(len(zones) == 1, f"expected one B.Cu GND reference zone, got {len(zones)}")
-    require(zones[0].name == "PCB_MIC_BCU_GND_REFERENCE", "B.Cu GND zone name mismatch")
-    require(len(zones[0].polygons) == 1 and len(zones[0].polygons[0].coordinates) == 4,
-            "B.Cu GND reference zone polygon mismatch")
+    require(not board.zones,
+            f"explicit-routing-only ECO must contain zero zones, got {len(board.zones)}")
 
     gnd_bcu = [
         item for item in board.traceItems
@@ -720,7 +764,8 @@ def audit_native_topology() -> dict[str, Any]:
         "trace_signature": {
             f"{net}:{layer}": count for (net, layer), count in sorted(signature.items())
         },
-        "bcu_gnd_zone": zones[0].name,
+        "bcu_gnd_zone": None,
+        "copper_model": "EXPLICIT_ROUTING_ONLY",
         "minimum_bcu_gnd_edge_to_acoustic_hole_clearance_mm": round(min(clearances), 6),
         "c1_to_mk1_center_distance_mm": round(decoupling_distance, 6),
         "human_review_still_required": True,
@@ -887,17 +932,22 @@ def audit_copper_return_report(artifact_root: Path, commit_sha: str) -> dict[str
     path = artifact_root / "copper_return_review_audit.json"
     report = json.loads(path.read_text(encoding="utf-8"))
     require(
-        report.get("schema") == "dioneya-pcb-mic-copper-return-review-b-precheck-v1",
+        report.get("schema") == "dioneya-pcb-mic-copper-return-review-b-precheck-v2",
         "unexpected copper-return audit schema",
     )
     require(
-        report.get("machine_status") == "PASS_REPRODUCIBLE_TOPOLOGY_MEASUREMENT",
+        report.get("machine_status") == "PASS_REPRODUCIBLE_ECO_TOPOLOGY_MEASUREMENT",
         "copper-return topology measurement did not pass",
     )
+    status = json.loads(STATUS.read_text(encoding="utf-8"))
+    expected_disposition = (
+        "ECO_CANDIDATE_EXPLICIT_LOCAL_RETURN_READY_FOR_REPEAT_REVIEW_A"
+        if status.get("release_state") == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO" else
+        "READY_FOR_INDEPENDENT_HUMAN_COPPER_RETURN_REVIEW"
+    )
     require(
-        report.get("review_b_disposition") ==
-        "HOLD_UNFILLED_GND_ZONE_AND_DECOUPLING_RETURN_REQUIRE_HUMAN_ECO_DECISION",
-        "copper-return HOLD disposition changed without Review-B control update",
+        report.get("review_b_disposition") == expected_disposition,
+        "copper-return disposition does not match the Review-A state",
     )
     require(report.get("review_b_complete") is False,
             "copper-return precheck must not complete Review B")
@@ -915,16 +965,33 @@ def audit_copper_return_report(artifact_root: Path, commit_sha: str) -> dict[str
         and paths.get("C1.2_to_MK1.2_ground_return", {}).get("connected") is True,
         "copper-return audit lacks connected local supply/return paths",
     )
+    require(paths["C1.2_to_MK1.2_ground_return"].get("trace_length_mm") == 7.10815,
+            "post-ECO C1-to-MK1 return length mismatch")
+    explicit = report.get("explicit_local_return", {})
+    require(explicit.get("status") == "PASS_DIRECT_BCU_C1_RETURN"
+            and explicit.get("legacy_remote_branch_present") is False,
+            "direct explicit C1 return control is missing")
+    source_zone = report.get("ground_zone", {}).get("source", {})
+    require(source_zone.get("source_zone_present") is False
+            and source_zone.get("copper_model") == "EXPLICIT_ROUTING_ONLY",
+            "source copper model is not explicit-routing-only")
     cam = report.get("ground_zone", {}).get("cam", {})
-    require(cam.get("checked") is True and cam.get("materialized_gnd_region") is False,
-            "copper-return CAM zone finding is absent or changed")
+    require(cam.get("checked") is True
+            and cam.get("materialized_gnd_region") is False
+            and cam.get("gnd_region_count") == 0,
+            "explicit-routing-only CAM unexpectedly contains a GND region")
     return {
         "status": report["machine_status"],
         "review_b_disposition": report["review_b_disposition"],
         "decoupling_loop_trace_length_mm": topology.get(
             "measured_decoupling_loop_trace_length_mm"
         ),
+        "ground_return_trace_length_mm": paths[
+            "C1.2_to_MK1.2_ground_return"
+        ]["trace_length_mm"],
+        "ground_return_reduction_mm": topology.get("ground_return_reduction_mm"),
         "bcu_gnd_region_count": cam.get("gnd_region_count"),
+        "copper_model": source_zone.get("copper_model"),
         "review_b_complete": False,
         "manufacturing_release": False,
     }
@@ -962,10 +1029,10 @@ def output_hashes(artifact_root: Path) -> dict[str, dict[str, Any]]:
 
 def audit(artifact_root: Path, commit_sha: str) -> dict[str, Any]:
     status, release_check = audit_release_state()
-    signed_commit = str(status["review_a"]["commit_sha"])
+    signed_commit = status["review_a"].get("commit_sha")
     checks = {
         "release_state": release_check,
-        "commit_binding": audit_commit_binding(commit_sha, signed_commit),
+        "commit_binding": audit_commit_binding(commit_sha, status),
         "cli_reports": audit_cli_reports(artifact_root),
         "cam_source_transform": audit_cam_transform(artifact_root, commit_sha),
         "native_topology": audit_native_topology(),
@@ -981,13 +1048,18 @@ def audit(artifact_root: Path, commit_sha: str) -> dict[str, Any]:
     source_paths = [
         BOARD, SCHEMATIC, PROJECT, FABRICATION_METADATA, STATUS,
         PRODUCTION_BOM, NATIVE_GATE, COPPER_RETURN_AUDIT,
-        COPPER_RETURN_PACKET, Path(__file__).resolve(),
+        COPPER_RETURN_PACKET, GENERATOR, NATIVE_WORKFLOW, Path(__file__).resolve(),
     ]
+    report_status = (
+        "PASS_ECO_CANDIDATE_CAM_PREFLIGHT_REPEAT_REVIEW_A_REQUIRED"
+        if status["release_state"] == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO" else
+        "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN"
+    )
     return {
         "schema": "dioneya-pcb-mic-review-b-internal-preflight-v1",
         "configuration": "EVT-PRE-20 Rev.A",
         "assembly": "PCB-MIC",
-        "status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
+        "status": report_status,
         "evidence_commit_sha": commit_sha,
         "signed_review_a_commit_sha": signed_commit,
         "review_b_complete": False,
@@ -1026,8 +1098,8 @@ def main() -> int:
         return 1
 
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    print("PCB-MIC Review-B internal CAM preflight PASS")
-    print("Review B remains OPEN; manufacturing release remains FALSE")
+    print(f"PCB-MIC CAM preflight PASS: {report['status']}")
+    print("Review A/Review B remain OPEN as recorded; manufacturing release remains FALSE")
     print(f"evidence commit: {args.commit_sha}")
     print(f"hashed source files: {len(report['source_hashes'])}")
     print(f"hashed output files: {len(report['output_hashes'])}")

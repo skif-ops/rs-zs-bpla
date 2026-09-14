@@ -134,9 +134,9 @@ def paths(name: str) -> dict[str, Path]:
 def prepare_cam_source(name: str, pcb: Path, out: Path) -> Path:
     """Archive a controlled CAM-only copy with drill guide flashes disabled.
 
-    PCB-MIC Review A is signed against the committed native PCB. KiCad's saved
+    PCB-MIC review evidence is bound against the committed native PCB. KiCad's saved
     ``drillshape 1`` plot preference adds 0.35 mm guide flashes to every plotted
-    technical layer, including paste and mask. The manufacturing source itself must
+    technical layer, including paste and mask. The controlled native source itself must
     remain byte-for-byte unchanged, so only an archived CAM-input copy is changed and
     the exact one-field transform is recorded beside it.
     """
@@ -195,7 +195,7 @@ def prepare_cam_source(name: str, pcb: Path, out: Path) -> Path:
     )
     print(
         "PCB-MIC: controlled CAM source PASS: drillshape 1 -> 0; "
-        "signed native source unchanged"
+        "committed native source unchanged"
     )
     return derived
 
@@ -766,9 +766,8 @@ def main() -> int:
                 check=False,
             )
             if copper_audit_rc == 0:
-                mic["copper_return_review_state"] = (
-                    "HOLD_MACHINE_MEASURED_INDEPENDENT_HUMAN_ECO_DECISION_REQUIRED"
-                )
+                copper_report = json.loads(copper_audit_output.read_text(encoding="utf-8"))
+                mic["copper_return_review_state"] = copper_report["review_b_disposition"]
             else:
                 mic["copper_return_review_state"] = f"FAIL_rc{copper_audit_rc}"
                 cli_failures.append(
@@ -788,9 +787,8 @@ def main() -> int:
                     check=False,
                 )
                 if audit_rc == 0:
-                    mic["review_b_preflight_state"] = (
-                        "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN"
-                    )
+                    audit_report = json.loads(audit_output.read_text(encoding="utf-8"))
+                    mic["review_b_preflight_state"] = audit_report["status"]
                 else:
                     mic["review_b_preflight_state"] = f"FAIL_rc{audit_rc}"
                     cli_failures.append(f"PCB-MIC: REVIEW_B_PREFLIGHT_FAIL_rc{audit_rc}")

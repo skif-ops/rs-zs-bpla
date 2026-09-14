@@ -2,7 +2,7 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-MIC",
-  "release_state": "REVIEW_A_PASS",
+  "release_state": "REVIEW_A_REQUIRED_AFTER_COPPER_ECO",
   "manufacturing_release": false,
   "authoritative_inputs": [
     "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
@@ -48,7 +48,7 @@
       "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
       "artifacts/kicad-native/sha256_manifest.json"
     ],
-    "routing_status": "PRESENT_INTERNAL_CAM_PASS_COPPER_RETURN_HOLD_REVIEW_B_OPEN"
+    "routing_status": "COPPER_ECO_CANDIDATE_EXPLICIT_RETURN_REVIEW_A_REQUIRED"
   },
   "component_contract": {
     "microphone": "TDK InvenSense MMICT5838-00-012",
@@ -66,16 +66,24 @@
     "status": "DIM_004_CLOSED"
   },
   "review_a": {
-    "complete": true,
-    "status": "PASS",
+    "complete": false,
+    "status": "REVIEW_REQUIRED_AFTER_COPPER_ECO",
     "checklist": "hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
-    "structural_audit_status": "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
-    "geometry_audit_status": "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
-    "reviewer": "Скиф",
-    "date": "2026-09-14",
-    "commit_sha": "3e215e26e0d4cb160b309de3d3fd5a3145a756bf",
-    "evidence": {
-      "signed_checklist": "hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
+    "structural_audit_status": "PASS_STRUCTURAL_EVIDENCE_ECO_CANDIDATE_REPEAT_REVIEW_A_REQUIRED",
+    "geometry_audit_status": "PASS_ECO_CANDIDATE_GEOMETRY_REPEAT_REVIEW_A_REQUIRED",
+    "reviewer": null,
+    "date": null,
+    "commit_sha": null,
+    "superseded_signature": {
+      "status": "SUPERSEDED_BY_COPPER_ECO_BOARD_BYTE_CHANGE",
+      "reviewer": "Скиф",
+      "date": "2026-09-14",
+      "commit_sha": "3e215e26e0d4cb160b309de3d3fd5a3145a756bf",
+      "board_sha256": "aecd1a374b5f66d32a5ae056eb4ad452d68e2a2391e65f6068acc8cad37f2295"
+    },
+    "superseded_evidence": {
+      "signed_checklist_snapshot_commit": "ac124df132a911a2326c678d2ccebf37804c2444",
+      "signed_checklist": "ac124df132a911a2326c678d2ccebf37804c2444:hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
       "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34823813170",
       "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34823813170/artifacts/10339034239",
       "schematic_pdf": "artifacts/kicad-native/PCB-MIC/PCB-MIC_schematic.pdf",
@@ -83,26 +91,35 @@
       "committed_geometry_audit": "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
       "materialized_geometry_audit": "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
       "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json"
+    },
+    "required_evidence": {
+      "status": "PENDING_COMMIT_BOUND_CI",
+      "committed_geometry_audit": "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
+      "materialized_geometry_audit": "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
+      "erc_report": "artifacts/kicad-native/PCB-MIC/erc.json",
+      "drc_report": "artifacts/kicad-native/PCB-MIC/drc.json",
+      "copper_return_audit": "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
+      "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json"
     }
   },
   "review_b": {
     "complete": false,
-    "status": "HOLD_COPPER_RETURN_ECO_DECISION_AND_REMAINING_REVIEW_B_GATES",
+    "status": "BLOCKED_PENDING_REPEAT_REVIEW_A_AFTER_COPPER_ECO",
     "checklist": "hardware/reviews/PCB_MIC_REVIEW_B_CHECKLIST_REV_A.md",
     "reviewer": null,
     "date": null,
     "commit_sha": null,
     "copper_return_gate": {
       "complete": false,
-      "status": "HOLD_UNFILLED_GND_ZONE_AND_DECOUPLING_RETURN_REQUIRE_HUMAN_ECO_DECISION",
+      "status": "ECO_CANDIDATE_EXPLICIT_LOCAL_RETURN_PENDING_COMMIT_BOUND_CI_AND_REPEAT_REVIEW_A",
       "packet": "hardware/reviews/PCB_MIC_REVIEW_B_COPPER_RETURN_REV_A.md",
       "audit": "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
       "drawings": [
         "artifacts/kicad-native/PCB-MIC/PCB-MIC_F_Cu_review.svg",
         "artifacts/kicad-native/PCB-MIC/PCB-MIC_B_Cu_review.svg"
       ],
-      "commit_bound_ci_status": "PASS_MACHINE_EVIDENCE_READY_HUMAN_DECISION_REQUIRED",
-      "commit_bound_evidence": {
+      "commit_bound_ci_status": "PENDING_ECO_CANDIDATE_CI",
+      "baseline_commit_bound_evidence": {
         "evidence_commit_sha": "cb69c0bbc1457b498ee4f44ee7da1d566033c23f",
         "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015",
         "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840245983",
@@ -128,23 +145,36 @@
         "artifact_id": 10343758832,
         "artifact_digest": "sha256:2867ce92728a8f7c490f4856155a1ceb987b92e47165c1c8627ace57030cffd8"
       },
-      "machine_measurement": {
+      "baseline_machine_measurement": {
         "c1_to_mk1_vdd_trace_length_mm": 1.658011,
         "c1_to_mk1_ground_return_trace_length_mm": 22.248973,
         "decoupling_loop_trace_length_mm": 23.906984,
         "source_zone_cached_filled_polygons": 0,
         "baseline_cam_gnd_regions": 0
       },
-      "reviewer": null,
-      "date": null,
+      "eco_candidate_design": {
+        "route": "DIRECT_BCU_C1_RETURN_VIA_TO_MIC_RETURN_VIA",
+        "local_bcu_segment_length_mm": 3.409178,
+        "c1_to_mk1_ground_return_trace_length_mm": 7.10815,
+        "decoupling_loop_trace_length_mm": 8.766161,
+        "ground_return_vias": 2,
+        "source_bcu_ground_zones": 0,
+        "manufacturing_copper_model": "EXPLICIT_ROUTING_ONLY",
+        "evidence_status": "PENDING_COMMIT_BOUND_CI"
+      },
+      "reviewer": "Скиф",
+      "date": "2026-09-14",
       "commit_sha": null,
-      "decision": null,
+      "decision": "ECO_REQUIRED",
+      "decision_evidence_commit_sha": "cb69c0bbc1457b498ee4f44ee7da1d566033c23f",
       "review_b_complete": false,
       "manufacturing_release": false
     },
     "internal_preflight": {
-      "complete": true,
-      "status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
+      "complete": false,
+      "status": "PENDING_ECO_CANDIDATE_COMMIT_BOUND_CI_REPEAT_REVIEW_A_REQUIRED",
+      "evidence_role": "SUPERSEDED_BASELINE_ONLY",
+      "baseline_status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
       "evidence_commit_sha": "cb69c0bbc1457b498ee4f44ee7da1d566033c23f",
       "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015",
       "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840245983",

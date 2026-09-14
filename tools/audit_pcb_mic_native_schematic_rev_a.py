@@ -3,9 +3,9 @@
 
 This control deliberately does not import the schematic generator. It checks the
 committed KiCad source against the frozen harness, production BOM and project-local
-footprint authority, then validates the separately signed Review-A traceability.
-A PASS does not authorize manufacturing; Review B and physical evidence remain
-mandatory.
+footprint authority, then validates either signed Review-A traceability or the
+explicitly reopened post-ECO state. A PASS never creates a human signature or
+authorizes manufacturing; Review B and physical evidence remain mandatory.
 """
 from __future__ import annotations
 
@@ -320,35 +320,87 @@ def main() -> int:
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     require(status["assembly"] == "PCB-MIC", "PCB-MIC status identity mismatch")
     review_a = status["review_a"]
-    require(status["release_state"] == "REVIEW_A_PASS",
-            "PCB-MIC release state does not record Review A PASS")
-    require(review_a["complete"] is True and review_a["status"] == "PASS",
-            "PCB-MIC Review A is not a signed PASS")
-    require(all(review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
-            "PCB-MIC signed Review A lacks reviewer/date/commit SHA")
-    require(re.fullmatch(r"[0-9a-f]{40}", review_a["commit_sha"]) is not None,
-            "PCB-MIC Review A commit SHA is invalid")
-    require(review_a["structural_audit_status"] ==
-            "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
-            "PCB-MIC structural audit status does not match signed Review A")
-    require(review_a["geometry_audit_status"] ==
-            "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
-            "PCB-MIC geometry audit status does not match signed Review A")
-    evidence = review_a.get("evidence", {})
-    required_evidence = {
-        "signed_checklist", "workflow_run", "artifact", "schematic_pdf",
-        "erc_report", "committed_geometry_audit",
-        "materialized_geometry_audit", "sha256_manifest",
-    }
-    require(isinstance(evidence, dict) and all(evidence.get(key) for key in required_evidence),
-            "PCB-MIC signed Review A evidence links are incomplete")
     require(status["review_b"]["complete"] is False,
             "PCB-MIC Review B was silently promoted with Review A")
     require(status["manufacturing_release"] is False,
             "PCB-MIC manufacturing release is asserted before Review A/B")
 
+    if status["release_state"] == "REVIEW_A_PASS":
+        require(review_a["complete"] is True and review_a["status"] == "PASS",
+                "PCB-MIC Review A is not a signed PASS")
+        require(all(review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
+                "PCB-MIC signed Review A lacks reviewer/date/commit SHA")
+        require(re.fullmatch(r"[0-9a-f]{40}", review_a["commit_sha"]) is not None,
+                "PCB-MIC Review A commit SHA is invalid")
+        require(review_a["structural_audit_status"] ==
+                "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
+                "PCB-MIC structural audit status does not match signed Review A")
+        require(review_a["geometry_audit_status"] ==
+                "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
+                "PCB-MIC geometry audit status does not match signed Review A")
+        evidence = review_a.get("evidence", {})
+        signed_required_evidence = {
+            "signed_checklist", "workflow_run", "artifact", "schematic_pdf",
+            "erc_report", "committed_geometry_audit",
+            "materialized_geometry_audit", "sha256_manifest",
+        }
+        require(isinstance(evidence, dict)
+                and all(evidence.get(key) for key in signed_required_evidence),
+                "PCB-MIC signed Review A evidence links are incomplete")
+        report_status = "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS"
+        review_a_complete = True
+        review_a_reviewer = review_a["reviewer"]
+        review_a_date = review_a["date"]
+        review_a_commit_sha = review_a["commit_sha"]
+        superseded_signature = None
+        remaining_review_a_evidence: list[str] = []
+        summary = (
+            f"Review A signed PASS by {review_a['reviewer']} on {review_a['date']} "
+            f"for {review_a['commit_sha']}; Review B and manufacturing release remain open"
+        )
+    else:
+        require(status["release_state"] == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO",
+                f"unexpected PCB-MIC release state: {status['release_state']}")
+        require(review_a["complete"] is False
+                and review_a["status"] == "REVIEW_REQUIRED_AFTER_COPPER_ECO",
+                "post-ECO Review A must be open")
+        require(all(review_a.get(field) is None for field in ("reviewer", "date", "commit_sha")),
+                "post-ECO Review A unexpectedly retains an active signature")
+        require(review_a["structural_audit_status"] ==
+                "PASS_STRUCTURAL_EVIDENCE_ECO_CANDIDATE_REPEAT_REVIEW_A_REQUIRED",
+                "PCB-MIC structural audit status does not match ECO candidate state")
+        require(review_a["geometry_audit_status"] ==
+                "PASS_ECO_CANDIDATE_GEOMETRY_REPEAT_REVIEW_A_REQUIRED",
+                "PCB-MIC geometry audit status does not match ECO candidate state")
+        require(status["review_b"]["status"] ==
+                "BLOCKED_PENDING_REPEAT_REVIEW_A_AFTER_COPPER_ECO",
+                "Review B is not blocked on repeat Review A")
+        prior = review_a.get("superseded_signature", {})
+        require(prior.get("status") == "SUPERSEDED_BY_COPPER_ECO_BOARD_BYTE_CHANGE",
+                "prior Review-A signature is not marked superseded")
+        require(re.fullmatch(r"[0-9a-f]{40}", str(prior.get("commit_sha", ""))) is not None,
+                "superseded Review-A commit SHA is invalid")
+        evidence = review_a.get("required_evidence", {})
+        require(evidence.get("status") in {
+            "PENDING_COMMIT_BOUND_CI", "PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A"
+        }, "post-ECO Review-A evidence state is invalid")
+        report_status = "PASS_STRUCTURAL_EVIDENCE_ECO_CANDIDATE_REPEAT_REVIEW_A_REQUIRED"
+        review_a_complete = False
+        review_a_reviewer = None
+        review_a_date = None
+        review_a_commit_sha = None
+        superseded_signature = prior
+        remaining_review_a_evidence = [
+            "successful commit-bound KiCad 9 ERC/DRC and candidate geometry archive",
+            "independent human Review-A signature against the ECO candidate commit",
+        ]
+        summary = (
+            "Schematic structure PASS and unchanged in scope; copper ECO candidate "
+            "still requires a new Review-A signature"
+        )
+
     report = {
-        "status": "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
+        "status": report_status,
         "configuration": "EVT-PRE-20 Rev.A",
         "board": "PCB-MIC",
         "schematic": display_path(schematic_path),
@@ -363,13 +415,14 @@ def main() -> int:
         },
         "normalized_station_harnesses": normalized_harness,
         "production_bom_items": bom_evidence,
-        "review_a_complete": True,
-        "review_a_reviewer": review_a["reviewer"],
-        "review_a_date": review_a["date"],
-        "review_a_commit_sha": review_a["commit_sha"],
+        "review_a_complete": review_a_complete,
+        "review_a_reviewer": review_a_reviewer,
+        "review_a_date": review_a_date,
+        "review_a_commit_sha": review_a_commit_sha,
         "review_a_evidence": evidence,
+        "superseded_review_a_signature": superseded_signature,
         "manufacturing_release": False,
-        "remaining_review_a_evidence": [],
+        "remaining_review_a_evidence": remaining_review_a_evidence,
         "remaining_release_evidence": [
             "independent Review B and CAM/DFM closure",
             "panelization and acoustic membrane/cavity stack",
@@ -382,10 +435,7 @@ def main() -> int:
     print("PCB-MIC native schematic independent structural Review-A audit PASS")
     print("components=4 pins=19 labels=17 explicit_nc=2; four frozen harness leaves normalized")
     print("exact MK1/J1/C1/R1 production BOM bindings and project-local footprints PASS")
-    print(
-        f"Review A signed PASS by {review_a['reviewer']} on {review_a['date']} "
-        f"for {review_a['commit_sha']}; Review B and manufacturing release remain open"
-    )
+    print(summary)
     return 0
 
 

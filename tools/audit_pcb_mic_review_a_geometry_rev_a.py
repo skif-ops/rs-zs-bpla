@@ -6,9 +6,10 @@ expected.  This second control uses kiutils and direct source inspection so it c
 emit a stable JSON record containing the reviewed source hashes, commit binding,
 and the exact T5838/Molex copper, mask, paste and drill geometry.
 
-A PASS from this script revalidates geometry and the separately signed Review-A
-traceability. It does not replace Review B, independent CAM/DFM, or physical
-acoustic verification.
+A PASS from this script validates geometry and either revalidates a signed Review-A
+source set or proves that a post-ECO candidate is ready to collect new commit-bound
+evidence. It never creates a human signature and does not replace Review B,
+independent CAM/DFM, or physical acoustic verification.
 """
 from __future__ import annotations
 
@@ -35,6 +36,7 @@ FABRICATION_METADATA = ROOT / "hardware/kicad/native/PCB-MIC/fabrication_metadat
 AUDIT_TOOL = Path(__file__).resolve()
 NATIVE_WORKFLOW = ROOT / ".github/workflows/pcb-native.yml"
 STATUS = ROOT / "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json"
+GENERATOR = ROOT / "tools/generate_pcb_mic_clean_rev_a.py"
 
 T5838_SIGNAL_PADS = {
     "1": ((-0.630, -1.420), (0.522, 0.725), -0.050, "PDM_DATA_MIC"),
@@ -446,21 +448,22 @@ def audit_mechanical(board: Board) -> dict[str, Any]:
     }
 
 
+def source_path_matches_commit(commit_sha: str, path: Path) -> bool:
+    actual = subprocess.check_output(
+        ["git", "hash-object", str(path)], cwd=ROOT, text=True
+    ).strip()
+    committed = subprocess.run(
+        ["git", "rev-parse", f"{commit_sha}:{rel(path)}"],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    return committed.returncode == 0 and committed.stdout.strip() == actual
+
+
 def source_matches_commit(commit_sha: str, paths: list[Path]) -> bool:
-    for path in paths:
-        actual = subprocess.check_output(
-            ["git", "hash-object", str(path)], cwd=ROOT, text=True
-        ).strip()
-        committed = subprocess.run(
-            ["git", "rev-parse", f"{commit_sha}:{rel(path)}"],
-            cwd=ROOT,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        if committed.returncode != 0 or committed.stdout.strip() != actual:
-            return False
-    return True
+    return all(source_path_matches_commit(commit_sha, path) for path in paths)
 
 
 def commit_available(commit_sha: str) -> bool:
@@ -498,7 +501,7 @@ def main() -> int:
         MOLEX_LIBRARY,
         FABRICATION_METADATA,
     ]
-    control_definition_paths = [AUDIT_TOOL, NATIVE_WORKFLOW, STATUS]
+    control_definition_paths = [AUDIT_TOOL, NATIVE_WORKFLOW, STATUS, GENERATOR]
     commit_sha = resolve_commit(args.commit_sha)
     source_commit_match = source_matches_commit(commit_sha, controlled_paths)
     control_commit_match = source_matches_commit(commit_sha, control_definition_paths)
@@ -521,36 +524,104 @@ def main() -> int:
     mechanical = audit_mechanical(board)
     status_record = json.loads(STATUS.read_text(encoding="utf-8"))
     review_a = status_record["review_a"]
-    require(status_record["release_state"] == "REVIEW_A_PASS",
-            "PCB-MIC release state does not record Review A PASS")
-    require(review_a["complete"] is True and review_a["status"] == "PASS",
-            "PCB-MIC Review A is not a signed PASS")
-    require(all(review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
-            "PCB-MIC signed Review A lacks reviewer/date/commit SHA")
-    require(re.fullmatch(r"[0-9a-f]{40}", review_a["commit_sha"]) is not None,
-            "PCB-MIC Review A commit SHA is invalid")
-    require(commit_available(review_a["commit_sha"]),
-            "signed PCB-MIC Review A commit is unavailable; checkout full history")
-    reviewed_source_commit_match = source_matches_commit(
-        review_a["commit_sha"], controlled_paths
-    )
-    if args.require_clean_source:
-        require(reviewed_source_commit_match,
-                "current PCB-MIC reviewed sources diverge from the signed Review A commit")
-    require(review_a["geometry_audit_status"] ==
-            "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
-            "PCB-MIC geometry audit status does not match signed Review A")
-    evidence = review_a.get("evidence", {})
-    require(isinstance(evidence, dict) and evidence.get("workflow_run") and
-            evidence.get("artifact") and evidence.get("erc_report") and
-            evidence.get("sha256_manifest"),
-            "PCB-MIC signed Review A evidence links are incomplete")
     require(status_record["review_b"]["complete"] is False and
             status_record["manufacturing_release"] is False,
-            "PCB-MIC Review A signature silently promoted manufacturing release")
+            "PCB-MIC review state silently promoted manufacturing release")
+
+    release_state = status_record["release_state"]
+    if release_state == "REVIEW_A_PASS":
+        require(review_a["complete"] is True and review_a["status"] == "PASS",
+                "PCB-MIC Review A is not a signed PASS")
+        require(all(review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
+                "PCB-MIC signed Review A lacks reviewer/date/commit SHA")
+        require(re.fullmatch(r"[0-9a-f]{40}", review_a["commit_sha"]) is not None,
+                "PCB-MIC Review A commit SHA is invalid")
+        require(commit_available(review_a["commit_sha"]),
+                "signed PCB-MIC Review A commit is unavailable; checkout full history")
+        reviewed_source_commit_match = source_matches_commit(
+            review_a["commit_sha"], controlled_paths
+        )
+        if args.require_clean_source:
+            require(reviewed_source_commit_match,
+                    "current PCB-MIC reviewed sources diverge from the signed Review A commit")
+        require(review_a["geometry_audit_status"] ==
+                "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
+                "PCB-MIC geometry audit status does not match signed Review A")
+        evidence = review_a.get("evidence", {})
+        require(isinstance(evidence, dict) and evidence.get("workflow_run") and
+                evidence.get("artifact") and evidence.get("erc_report") and
+                evidence.get("sha256_manifest"),
+                "PCB-MIC signed Review A evidence links are incomplete")
+        report_status = "PASS_GEOMETRY_EVIDENCE_REVIEW_A_SIGNED_PASS"
+        review_a_signature: dict[str, Any] | None = {
+            "reviewer": review_a["reviewer"],
+            "date": review_a["date"],
+            "reviewed_commit_sha": review_a["commit_sha"],
+            "evidence": evidence,
+        }
+        superseded_signature = None
+        remaining_review_a_evidence: list[str] = []
+        review_summary = (
+            f"Review A signed PASS by {review_a['reviewer']} on {review_a['date']} "
+            f"for {review_a['commit_sha']}; Review B and manufacturing release remain open"
+        )
+    else:
+        require(release_state == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO",
+                f"unexpected PCB-MIC release state: {release_state}")
+        require(review_a["complete"] is False
+                and review_a["status"] == "REVIEW_REQUIRED_AFTER_COPPER_ECO",
+                "post-ECO Review A must be open")
+        require(all(review_a.get(field) is None for field in ("reviewer", "date", "commit_sha")),
+                "post-ECO Review A unexpectedly retains an active signature")
+        require(review_a["geometry_audit_status"] ==
+                "PASS_ECO_CANDIDATE_GEOMETRY_REPEAT_REVIEW_A_REQUIRED",
+                "PCB-MIC geometry audit status does not match ECO candidate state")
+        require(status_record["review_b"]["status"] ==
+                "BLOCKED_PENDING_REPEAT_REVIEW_A_AFTER_COPPER_ECO",
+                "Review B is not blocked on repeat Review A")
+        prior = review_a.get("superseded_signature", {})
+        prior_commit = str(prior.get("commit_sha", ""))
+        require(prior.get("status") == "SUPERSEDED_BY_COPPER_ECO_BOARD_BYTE_CHANGE",
+                "prior Review-A signature is not marked superseded")
+        require(re.fullmatch(r"[0-9a-f]{40}", prior_commit) is not None,
+                "superseded Review-A commit SHA is invalid")
+        require(commit_available(prior_commit),
+                "superseded Review-A commit is unavailable; checkout full history")
+        reviewed_source_commit_match = source_matches_commit(prior_commit, controlled_paths)
+        board_matches_prior = source_path_matches_commit(prior_commit, board_path)
+        unchanged_non_board = all(
+            source_path_matches_commit(prior_commit, path)
+            for path in controlled_paths if path != board_path
+        )
+        if args.require_clean_source:
+            require(not board_matches_prior,
+                    "ECO candidate board bytes still match the superseded Review-A board")
+            require(unchanged_non_board,
+                    "post-ECO change escaped the controlled native-board scope")
+        required_evidence = review_a.get("required_evidence", {})
+        require(required_evidence.get("status") in {
+            "PENDING_COMMIT_BOUND_CI", "PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A"
+        }, "post-ECO Review-A evidence state is invalid")
+        report_status = "PASS_GEOMETRY_ECO_CANDIDATE_REPEAT_REVIEW_A_REQUIRED"
+        review_a_signature = None
+        superseded_signature = {
+            "reviewer": prior.get("reviewer"),
+            "date": prior.get("date"),
+            "reviewed_commit_sha": prior_commit,
+            "board_sha256": prior.get("board_sha256"),
+            "status": prior.get("status"),
+        }
+        remaining_review_a_evidence = [
+            "successful commit-bound KiCad 9 ERC/DRC and candidate geometry archive",
+            "independent human Review-A signature against the ECO candidate commit",
+        ]
+        review_summary = (
+            f"ECO candidate geometry PASS for {commit_sha}; prior Review A at "
+            f"{prior_commit} is superseded and repeat Review A remains required"
+        )
 
     report = {
-        "status": "PASS_GEOMETRY_EVIDENCE_REVIEW_A_SIGNED_PASS",
+        "status": report_status,
         "configuration": "EVT-PRE-20 Rev.A",
         "assembly": "PCB-MIC",
         "phase": args.phase,
@@ -559,17 +630,15 @@ def main() -> int:
             "controlled_sources_match_commit": source_commit_match,
             "audit_control_matches_commit": control_commit_match,
             "controlled_sources_match_signed_review_commit": reviewed_source_commit_match,
-            "signed_review_source_match_required": bool(args.require_clean_source),
+            "signed_review_source_match_required": bool(
+                args.require_clean_source and release_state == "REVIEW_A_PASS"
+            ),
             "require_clean_source": bool(args.require_clean_source),
         },
         "source_files": [file_record(path) for path in controlled_paths],
         "audit_control_files": [file_record(path) for path in control_definition_paths],
-        "review_a_signature": {
-            "reviewer": review_a["reviewer"],
-            "date": review_a["date"],
-            "reviewed_commit_sha": review_a["commit_sha"],
-            "evidence": evidence,
-        },
+        "review_a_signature": review_a_signature,
+        "superseded_review_a_signature": superseded_signature,
         "checks": {
             "native_board_t5838": board_t5838,
             "project_library_t5838": library_t5838,
@@ -578,7 +647,7 @@ def main() -> int:
             "t5838_stencil_ring": paste_ring,
             "mechanical_and_fabrication_metadata": mechanical,
         },
-        "remaining_review_a_evidence": [],
+        "remaining_review_a_evidence": remaining_review_a_evidence,
         "remaining_release_evidence": [
             "independent Review B and CAM/DFM closure",
             "panelization and acoustic membrane/cavity stack",
@@ -594,10 +663,7 @@ def main() -> int:
         f"audit_control_matches_commit={control_commit_match} phase={args.phase}"
     )
     print(f"evidence={args.output}")
-    print(
-        f"Review A signed PASS by {review_a['reviewer']} on {review_a['date']} "
-        f"for {review_a['commit_sha']}; Review B and manufacturing release remain open"
-    )
+    print(review_summary)
     return 0
 
 

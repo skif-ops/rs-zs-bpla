@@ -93,7 +93,6 @@ on:
       - "tools/audit_pcb_pwr_native_completeness_rev_a.py"
       - "tools/audit_pcb_pwr_footprints_rev_a.py"
       - "tools/generate_pcb_mic_clean_rev_a.py"
-      - "tools/run_pcb_mic_no_zonefill.py"
       - "tools/finalize_pcb_mic_mechanical_rev_a.py"
       - "tools/finalize_pcb_mic_molex_rev_a.py"
       - "tools/generate_pcb_mic_schematic.py"
@@ -403,7 +402,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p hardware/kicad/native/PCB-MIC
-          /usr/bin/python3 tools/run_pcb_mic_no_zonefill.py \
+          /usr/bin/python3 tools/generate_pcb_mic_clean_rev_a.py \
             --t5838-root artifacts/kicad-reference/PCB-MIC/t5838_ref.pretty \
             --molex-root artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.pretty \
             --reference-report artifacts/kicad-reference/PCB-MIC/reference_geometry_report.json \

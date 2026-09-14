@@ -279,35 +279,71 @@ def validate_hardware_baseline() -> None:
     require(mic_status["assembly"] == "PCB-MIC", "PCB-MIC release-status identity mismatch")
     require(mic_status["manufacturing_release"] is False, "PCB-MIC was released without Review A/B evidence")
     mic_review_a = mic_status["review_a"]
-    require(mic_status["release_state"] == "REVIEW_A_PASS", "PCB-MIC release state does not record Review A PASS")
-    require(mic_review_a["complete"] is True and mic_review_a["status"] == "PASS",
-            "PCB-MIC Review A is not a signed PASS")
-    require(all(mic_review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
-            "PCB-MIC signed Review A lacks reviewer/date/commit SHA")
-    require(re.fullmatch(r"[0-9a-f]{40}", mic_review_a["commit_sha"]) is not None,
-            "PCB-MIC signed Review A commit SHA is invalid")
     require(mic_status["review_b"]["complete"] is False, "PCB-MIC Review B was marked complete without manufacturing evidence")
-    require(
-        mic_review_a["structural_audit_status"] ==
-        "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
-        "PCB-MIC independent structural audit status does not match signed Review A",
-    )
-    require(
-        mic_review_a["geometry_audit_status"] ==
-        "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
-        "PCB-MIC independent geometry audit status does not match signed Review A",
-    )
-    mic_review_a_evidence = mic_review_a.get("evidence", {})
-    required_mic_review_a_evidence = {
-        "signed_checklist", "workflow_run", "artifact", "schematic_pdf",
-        "erc_report", "committed_geometry_audit",
-        "materialized_geometry_audit", "sha256_manifest",
-    }
-    require(
-        isinstance(mic_review_a_evidence, dict) and
-        all(mic_review_a_evidence.get(key) for key in required_mic_review_a_evidence),
-        "PCB-MIC signed Review A evidence links are incomplete",
-    )
+    if mic_status["release_state"] == "REVIEW_A_PASS":
+        require(mic_review_a["complete"] is True and mic_review_a["status"] == "PASS",
+                "PCB-MIC Review A is not a signed PASS")
+        require(all(mic_review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
+                "PCB-MIC signed Review A lacks reviewer/date/commit SHA")
+        require(re.fullmatch(r"[0-9a-f]{40}", mic_review_a["commit_sha"]) is not None,
+                "PCB-MIC signed Review A commit SHA is invalid")
+        require(
+            mic_review_a["structural_audit_status"] ==
+            "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
+            "PCB-MIC independent structural audit status does not match signed Review A",
+        )
+        require(
+            mic_review_a["geometry_audit_status"] ==
+            "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
+            "PCB-MIC independent geometry audit status does not match signed Review A",
+        )
+        mic_review_a_evidence = mic_review_a.get("evidence", {})
+        required_mic_review_a_evidence = {
+            "signed_checklist", "workflow_run", "artifact", "schematic_pdf",
+            "erc_report", "committed_geometry_audit",
+            "materialized_geometry_audit", "sha256_manifest",
+        }
+        require(
+            isinstance(mic_review_a_evidence, dict) and
+            all(mic_review_a_evidence.get(key) for key in required_mic_review_a_evidence),
+            "PCB-MIC signed Review A evidence links are incomplete",
+        )
+    else:
+        require(mic_status["release_state"] == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO",
+                "PCB-MIC release state is neither signed nor an explicit post-ECO candidate")
+        require(mic_review_a["complete"] is False
+                and mic_review_a["status"] == "REVIEW_REQUIRED_AFTER_COPPER_ECO",
+                "PCB-MIC post-ECO Review A is not explicitly open")
+        require(all(mic_review_a.get(field) is None for field in ("reviewer", "date", "commit_sha")),
+                "PCB-MIC post-ECO Review A retains an active signature")
+        require(
+            mic_review_a["structural_audit_status"] ==
+            "PASS_STRUCTURAL_EVIDENCE_ECO_CANDIDATE_REPEAT_REVIEW_A_REQUIRED",
+            "PCB-MIC post-ECO structural audit state mismatch",
+        )
+        require(
+            mic_review_a["geometry_audit_status"] ==
+            "PASS_ECO_CANDIDATE_GEOMETRY_REPEAT_REVIEW_A_REQUIRED",
+            "PCB-MIC post-ECO geometry audit state mismatch",
+        )
+        prior = mic_review_a.get("superseded_signature", {})
+        require(prior.get("status") == "SUPERSEDED_BY_COPPER_ECO_BOARD_BYTE_CHANGE",
+                "PCB-MIC prior Review-A signature is not explicitly superseded")
+        require(re.fullmatch(r"[0-9a-f]{40}", str(prior.get("commit_sha", ""))) is not None,
+                "PCB-MIC superseded Review-A commit SHA is invalid")
+        require(re.fullmatch(r"[0-9a-f]{64}", str(prior.get("board_sha256", ""))) is not None,
+                "PCB-MIC superseded Review-A board hash is invalid")
+        required_evidence = mic_review_a.get("required_evidence", {})
+        require(required_evidence.get("status") in {
+            "PENDING_COMMIT_BOUND_CI", "PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A"
+        }, "PCB-MIC post-ECO evidence state is invalid")
+        mic_review_b = mic_status["review_b"]
+        require(mic_review_b["status"] == "BLOCKED_PENDING_REPEAT_REVIEW_A_AFTER_COPPER_ECO",
+                "PCB-MIC Review B is not blocked on repeat Review A")
+        copper_gate = mic_review_b.get("copper_return_gate", {})
+        require(copper_gate.get("decision") == "ECO_REQUIRED"
+                and copper_gate.get("reviewer") and copper_gate.get("date"),
+                "PCB-MIC ECO_REQUIRED decision traceability is incomplete")
     require(
         mic_status["native_source"]["independent_schematic_audit"] ==
         "artifacts/pcb_mic_native_schematic_rev_a.json",

@@ -1,111 +1,101 @@
 # PCB-MIC Rev.A Review B copper-return and decoupling packet
 
-Status: `HOLD / INDEPENDENT HUMAN DECISION REQUIRED / REVIEW B OPEN / NOT FOR MANUFACTURE`
+Status: `ECO_REQUIRED RECORDED / ECO CANDIDATE IMPLEMENTED / COMMIT-BOUND CI PENDING / REPEAT REVIEW A REQUIRED / REVIEW B BLOCKED / NOT FOR MANUFACTURE`
 
-This packet isolates the PCB-MIC copper-return and T5838 decoupling decision from
-the already signed Review A. It does not change the native PCB, schematic or project
-and it does not grant a Review-B signature or manufacturing release.
+This packet records the independent copper-return decision, preserves the baseline
+evidence that caused the hold, and defines the bounded PCB-MIC copper ECO. It does not
+create a new Review-A signature, complete Review B, or grant manufacturing release.
 
-## Controlled source binding
+## Controlled decision binding
 
 | Item | Controlled value |
 |---|---|
-| Signed Review-A commit | `3e215e26e0d4cb160b309de3d3fd5a3145a756bf` |
-| Signed native PCB SHA-256 | `aecd1a374b5f66d32a5ae056eb4ad452d68e2a2391e65f6068acc8cad37f2295` |
-| Microphone | TDK InvenSense `MMICT5838-00-012` |
-| Decoupling capacitor | TDK `CGA2B3X7R1E104K050BB`, 100 nF, 25 V, X7R, 0402 |
-| Frozen datasheet authority | TDK `DS-000383`, Revision 1.2, 2025-09-04 |
-| Frozen datasheet SHA-256 | `5befb710bfe7a415cdc1aba41ebc18b484d7f9fc320ce15a7481507531cf58a4` |
-| Machine measurement | `tools/audit_pcb_mic_copper_return_rev_a.py` |
-| Generated F.Cu drawing | `artifacts/kicad-native/PCB-MIC/PCB-MIC_F_Cu_review.svg` |
-| Generated B.Cu drawing | `artifacts/kicad-native/PCB-MIC/PCB-MIC_B_Cu_review.svg` |
-| Generated JSON evidence | `artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json` |
+| Superseded signed Review-A commit | `3e215e26e0d4cb160b309de3d3fd5a3145a756bf` |
+| Superseded native PCB SHA-256 | `aecd1a374b5f66d32a5ae056eb4ad452d68e2a2391e65f6068acc8cad37f2295` |
+| Copper decision evidence commit | `cb69c0bbc1457b498ee4f44ee7da1d566033c23f` |
+| PCB Native Gate | [run #158](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015) |
+| CI | [run #428](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840245983) |
+| Artifact | ID `10345408977`, SHA-256 `f535c183a3feda6b4e2d38a636987b30aacaa0767103bec39379fbf042d95664` |
+| Independent measurement | `tools/audit_pcb_mic_copper_return_rev_a.py` |
+| Reviewer | `Скиф` |
+| Date | `14.09.2026` |
+| Decision | `ECO_REQUIRED` |
 
-Each CI execution binds the generated evidence to its checked-out commit while also
-proving that the native PCB bytes still equal the signed Review-A PCB.
+The decision evidence verified all 62 manifest entries, 10 controlled source hashes
+and 27 PCB-MIC output hashes. The vector F.Cu and B.Cu drawings were board-sized,
+distinct and bound to the source hash above.
 
-The baseline CAM inspected for this finding is PCB Native Gate
-[run #155](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34835113074),
-evidence commit `7d7776e67001c0cff00643f524ceff9d0f0536af`, artifact ID
-`10343758832`, artifact SHA-256
-`2867ce92728a8f7c490f4856155a1ceb987b92e47165c1c8627ace57030cffd8`.
+## Baseline blocking finding PCB-MIC-RB-CU-001
 
-The commit-bound decision packet passed PCB Native Gate
-[run #158](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015) and CI
-[run #428](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840245983) for evidence
-commit `cb69c0bbc1457b498ee4f44ee7da1d566033c23f`. Artifact ID `10345408977`
-has SHA-256 `f535c183a3feda6b4e2d38a636987b30aacaa0767103bec39379fbf042d95664`.
-All 62 manifest entries, 10 controlled source hashes and 27 PCB-MIC output hashes were
-independently verified. The regenerated preflight JSON was byte-identical to the
-uploaded report.
+The signed baseline source contained a B.Cu GND zone named
+`PCB_MIC_BCU_GND_REFERENCE` with zero cached filled polygons. Its KiCad 9.0.9 B.Cu
+Gerber contained zero GND regions and only the five explicit GND conductor draws.
+The emitted fabrication copper therefore used the long explicit backbone, not the
+named zone.
 
-The two vector copper views passed structural and render-usability control. Each contains
-the complete 24x22 mm Edge.Cuts rectangle on a 34.0106x22.1488 mm canvas, with outline
-coverage `0.706 x 0.993`, and no drawing sheet. Their SHA-256 values are:
+| Baseline routed path | Trace length | Vias | Minimum width |
+|---|---:|---:|---:|
+| C1.1 to MK1.7 local VDD leg | 1.658011 mm | 0 | 0.300 mm |
+| C1.2 to MK1.2 explicit GND return | 22.248973 mm | 2 | 0.160 mm |
+| Complete decoupling loop | 23.906984 mm | 2 return vias | 0.160 mm |
 
-- F.Cu: `2c06fac7e7a52b394cc7376aabaff1b36b75646d39477cf93bfd66998ec8d951`.
-- B.Cu: `c50281869520748c37b2f3251f30d03ff95cdcb3fef69a66b4a373e8284c86b0`.
+Disposition recorded by the reviewer: `ECO_REQUIRED`.
 
-## Reproducible measurements
+- [x] Inspect the commit-bound F.Cu/B.Cu drawings and machine topology report.
+- [x] Confirm that the absent B.Cu region is not intended fabrication copper.
+- [x] Reject implicit acceptance based only on zero DRC or connectivity.
+- [x] Select `ECO_REQUIRED` and reopen Review A for changed PCB bytes.
 
-The independent audit parses the native KiCad S-expression with Python's standard
-library. It does not use `pcbnew`, `kiutils`, either PCB generator or the existing CAM
-preflight parser.
+## Bounded ECO candidate
 
-| Routed path | Trace length | Vias | Minimum width | Layer length |
-|---|---:|---:|---:|---|
-| J1.1 to C1.1, 1V8 feed | 15.369931 mm | 2 | 0.300 mm | F.Cu 3.984774 mm; B.Cu 11.385157 mm |
-| C1.1 to MK1.7, local VDD leg | 1.658011 mm | 0 | 0.300 mm | F.Cu 1.658011 mm |
-| C1.2 to MK1.2, explicit GND return | 22.248973 mm | 2 | 0.160 mm | F.Cu 3.698972 mm; B.Cu 18.550001 mm |
-| J1.2 to MK1.2, connector return | 28.303419 mm | 2 | 0.160 mm | F.Cu 3.953418 mm; B.Cu 24.350001 mm |
+The ECO preserves placement, schematic, mechanical outline, holes, component set,
+net assignments, via count and signal routing. It changes only the controlled GND
+copper model:
 
-The measured C1-to-MK1 decoupling-loop trace length is `23.906984 mm`, consisting
-of the 1.658011 mm VDD leg and the 22.248973 mm explicit GND return. No project-
-controlled normative maximum for this loop is frozen, so the measurement cannot
-self-authorize acceptance.
+1. Remove the non-materialized B.Cu zone from the native board and production generator.
+2. Remove the remote B.Cu C1 branch from `(15.25, 13.25)` to `(9.00, 13.25)`.
+3. Add one explicit 0.50 mm B.Cu local return from the C1 GND via at
+   `(15.25, 13.25)` directly to the microphone-return via at `(15.00, 16.65)`.
+4. Generate the board directly with `tools/generate_pcb_mic_clean_rev_a.py`; the
+   obsolete zone-fill bypass wrapper is removed.
 
-## Blocking finding PCB-MIC-RB-CU-001
+The local standard-library audit produces these candidate measurements before the
+commit-bound KiCad run:
 
-The signed source contains a B.Cu GND zone named
-`PCB_MIC_BCU_GND_REFERENCE`, but it contains zero cached filled polygons. The
-commit-bound KiCad 9.0.9 B.Cu Gerber from the baseline run contains zero
-Gerber regions and only five explicit GND conductor draws. Therefore the named zone
-is not part of the emitted fabrication copper; the 22.248973 mm routed path above is
-the actual explicit C1-to-MK1 return represented in that CAM output.
+| ECO candidate routed path | Trace length | Vias | Layer length |
+|---|---:|---:|---|
+| J1.1 to C1.1 supply feed | 15.369931 mm | 2 | F.Cu 3.984774 mm; B.Cu 11.385157 mm |
+| C1.1 to MK1.7 local VDD leg | 1.658011 mm | 0 | F.Cu 1.658011 mm |
+| C1.2 to MK1.2 explicit GND return | 7.108150 mm | 2 | F.Cu 3.698972 mm; B.Cu 3.409178 mm |
+| Complete decoupling loop | 8.766161 mm | 2 return vias | Reduction 15.140823 mm |
+| J1.2 to MK1.2 connector return | 28.303419 mm | 2 | F.Cu 3.953418 mm; B.Cu 24.350001 mm |
 
-Disposition: `HOLD`. An independent reviewer must choose one of these outcomes:
+Geometry checks calculate at least `0.802865 mm` copper-edge clearance from the new
+segment to other-net B.Cu copper, against the project `0.2 mm` clearance, and
+`2.35 mm` from the new segment edge to the acoustic-hole edge. KiCad 9 DRC and CAM
+remain mandatory independent controls.
 
-1. `ECO_REQUIRED`: return the board to layout work, create a short controlled local
-   return/plane solution, rerun Review A for the changed PCB bytes, and then repeat
-   Review B.
-2. `ACCEPT_WITH_EVIDENCE`: record a reasoned acceptance against the generated copper
-   SVGs and JSON plus fabricator confirmation that the reviewed copper is exactly what
-   will be manufactured.
+The project still has no frozen normative maximum for the decoupling loop. These
+measurements prove the bounded topology change and regression, but cannot self-sign
+Review A or Review B.
 
-The second outcome must not be inferred from DRC, connectivity or this document.
+## Required next gates
 
-## Independent human review checklist
+- [ ] Commit and push the ECO candidate as one controlled source set.
+- [ ] KiCad 9 ERC and DRC pass with zero violations and zero unrouted items.
+- [ ] Commit-bound Gerber confirms explicit-routing-only B.Cu copper with zero GND regions.
+- [ ] Updated copper SVGs, topology JSON, CAM reports and SHA-256 manifest are archived.
+- [ ] Repeat Review A is signed against the ECO candidate commit and its archived evidence.
+- [ ] Repeat the independent copper-return decision within Review B after Review A closes.
+- [ ] Complete the remaining panelization, DFM, acoustic-stack and physical-EVT gates.
 
-- [ ] Open `PCB-MIC_F_Cu_review.svg` and `PCB-MIC_B_Cu_review.svg`; verify both
-  board-sized layer drawings against the signed native board hash above.
-- [ ] Confirm that the C1.1-to-MK1.7 VDD leg reaches the microphone without a via or
-  intervening branch.
-- [ ] Review the complete C1.2-to-MK1 ground-return path, including both vias, the
-  B.Cu detour and the 0.16 mm MK1.2 local connection.
-- [ ] Confirm whether the absence of a materialized B.Cu GND region is intended.
-- [ ] Decide `ECO_REQUIRED` or `ACCEPT_WITH_EVIDENCE`; do not leave the decision
-  implicit.
-- [ ] Check that any proposed copper change preserves the 0.8 mm acoustic NPTH and
-  all copper, mask, paste, adhesive and coating keepouts.
-- [ ] Record the reviewer, date, reviewed commit, artifact ID/digest and exact
-  disposition in the parent Review-B checklist.
+## Decision signature
 
-## Signature fields
-
-- Reviewer: `OPEN`
-- Date: `OPEN`
-- Reviewed evidence commit: `OPEN`
-- Workflow run and artifact: `OPEN`
-- Disposition: `HOLD`
+- Reviewer: `Скиф`
+- Date: `14.09.2026`
+- Reviewed evidence commit: `cb69c0bbc1457b498ee4f44ee7da1d566033c23f`
+- Workflow and artifact: PCB Native Gate `34840246015`, artifact `10345408977`
+- Disposition: `ECO_REQUIRED`
+- New Review A complete: `false`
 - Review B complete: `false`
 - Manufacturing release: `false`

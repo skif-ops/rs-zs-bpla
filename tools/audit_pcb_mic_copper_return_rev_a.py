@@ -3,9 +3,9 @@
 
 The parser in this tool is intentionally standard-library-only and does not use
 pcbnew, kiutils, the board generator, or the CAM preflight parser.  It builds a
-layer-aware graph directly from the committed KiCad S-expression, binds the
-signed Review-A board bytes, and optionally checks the emitted B.Cu Gerber for a
-materialized GND region.
+layer-aware graph directly from the committed KiCad S-expression, binds either a
+signed Review-A board or an explicit post-ECO candidate, and optionally checks the
+emitted B.Cu Gerber against the declared explicit-routing-only copper model.
 
 A successful execution means that the topology was measured reproducibly.  It
 does not sign Review B and it never grants manufacturing release.
@@ -32,6 +32,8 @@ STATUS = ROOT / "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json"
 REVIEW_PACKET = ROOT / "hardware/reviews/PCB_MIC_REVIEW_B_COPPER_RETURN_REV_A.md"
 DEFAULT_OUTPUT = ROOT / "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json"
 TDK_AUTHORITY = ROOT / "hardware/PCB_MAIN_AUDIO_LOGIC_AUTHORITY_REV_A.md"
+GENERATOR = ROOT / "tools/generate_pcb_mic_clean_rev_a.py"
+NATIVE_WORKFLOW = ROOT / ".github/workflows/pcb-native.yml"
 
 TDK_DATASHEET = {
     "document": "TDK T5838 DS-000383 Revision 1.2",
@@ -360,6 +362,21 @@ def closest_point(point: Point, start: Point, end: Point) -> Point:
     return rounded((start[0] + parameter * delta[0], start[1] + parameter * delta[1]))
 
 
+def point_to_segment_distance(point: Point, start: Point, end: Point) -> float:
+    return math.dist(point, closest_point(point, start, end))
+
+
+def segment_to_segment_distance(first: Segment, second: Segment) -> float:
+    if segment_intersections(first, second):
+        return 0.0
+    return min(
+        point_to_segment_distance(first.start, second.start, second.end),
+        point_to_segment_distance(first.end, second.start, second.end),
+        point_to_segment_distance(second.start, first.start, first.end),
+        point_to_segment_distance(second.end, first.start, first.end),
+    )
+
+
 def point_node(net: str, layer: str, point: Point) -> GraphNode:
     return "point", net, layer, round(point[0], 6), round(point[1], 6)
 
@@ -524,23 +541,78 @@ def descendant_count(node: list[Any], name: str) -> int:
 
 
 def audit_zone(zones: list[list[Any]]) -> dict[str, Any]:
-    matches = []
-    for zone in zones:
-        net_name = child(zone, "net_name")
-        layer = child(zone, "layer")
-        if net_name is not None and layer is not None and net_name[1] == "GND" and layer[1] == "B.Cu":
-            matches.append(zone)
-    require(len(matches) == 1, f"expected one B.Cu GND zone, got {len(matches)}")
-    zone = matches[0]
-    name = child(zone, "name")
-    require(name is not None and name[1] == "PCB_MIC_BCU_GND_REFERENCE",
-            "B.Cu GND zone name mismatch")
-    filled_polygons = descendant_count(zone, "filled_polygon")
+    require(not zones, f"explicit-routing-only ECO must contain zero zones, got {len(zones)}")
     return {
-        "name": str(name[1]),
-        "source_zone_present": True,
-        "cached_filled_polygon_count": filled_polygons,
-        "source_zone_materialized": filled_polygons > 0,
+        "name": None,
+        "source_zone_present": False,
+        "cached_filled_polygon_count": 0,
+        "source_zone_materialized": False,
+        "copper_model": "EXPLICIT_ROUTING_ONLY",
+    }
+
+
+def audit_explicit_local_return(segments: list[Segment], vias: list[Via]) -> dict[str, Any]:
+    expected_endpoints = ((15.25, 13.25), (15.0, 16.65))
+    def endpoints_match(segment: Segment, expected: tuple[Point, Point]) -> bool:
+        return (
+            math.dist(segment.start, expected[0]) <= 2e-6
+            and math.dist(segment.end, expected[1]) <= 2e-6
+        ) or (
+            math.dist(segment.start, expected[1]) <= 2e-6
+            and math.dist(segment.end, expected[0]) <= 2e-6
+        )
+
+    direct = [
+        segment for segment in segments
+        if segment.net == "GND"
+        and segment.layer == "B.Cu"
+        and endpoints_match(segment, expected_endpoints)
+    ]
+    require(len(direct) == 1, f"expected one direct C1-to-microphone B.Cu return, got {direct}")
+    segment = direct[0]
+    require(abs(segment.width - 0.50) <= 1e-6,
+            f"direct C1 return width {segment.width:.6f} mm != 0.500000 mm")
+    legacy_endpoints = ((9.0, 13.25), (15.25, 13.25))
+    require(not any(
+        item.net == "GND" and item.layer == "B.Cu"
+        and endpoints_match(item, legacy_endpoints)
+        for item in segments
+    ), "legacy remote C1-to-spine branch remains present")
+    length = math.dist(segment.start, segment.end)
+    require(abs(length - 3.4091787867461556) <= 1e-6,
+            f"direct C1 return length drift: {length:.6f} mm")
+    clearances = [
+        segment_to_segment_distance(segment, item)
+        - (segment.width + item.width) / 2.0
+        for item in segments
+        if item.layer == "B.Cu" and item.net != "GND"
+    ]
+    clearances.extend(
+        point_to_segment_distance(item.point, segment.start, segment.end)
+        - (segment.width + item.size) / 2.0
+        for item in vias
+        if "B.Cu" in item.layers and item.net != "GND"
+    )
+    require(clearances, "no other-net B.Cu copper found for local-return clearance audit")
+    minimum_clearance = min(clearances)
+    require(minimum_clearance >= 0.20,
+            f"direct C1 return B.Cu clearance {minimum_clearance:.6f} mm < 0.200000 mm")
+    acoustic_clearance = (
+        point_to_segment_distance((12.0, 16.65), segment.start, segment.end)
+        - segment.width / 2.0 - 0.4
+    )
+    require(acoustic_clearance >= 0.80,
+            f"direct C1 return acoustic clearance {acoustic_clearance:.6f} mm < 0.800000 mm")
+    return {
+        "status": "PASS_DIRECT_BCU_C1_RETURN",
+        "start_mm": list(segment.start),
+        "end_mm": list(segment.end),
+        "width_mm": segment.width,
+        "length_mm": round(length, 6),
+        "minimum_other_net_bcu_copper_edge_clearance_mm": round(minimum_clearance, 6),
+        "project_minimum_copper_clearance_mm": 0.20,
+        "acoustic_hole_edge_clearance_mm": round(acoustic_clearance, 6),
+        "legacy_remote_branch_present": False,
     }
 
 
@@ -595,22 +667,55 @@ def audit_commit_binding(commit_sha: str | None, require_clean_source: bool) -> 
             "manufacturing release must remain false")
     review_a = status.get("review_a", {})
     review_b = status.get("review_b", {})
-    require(review_a.get("complete") is True and review_a.get("status") == "PASS",
-            "signed Review A is not complete/pass")
     require(review_b.get("complete") is False and review_b.get("reviewer") is None,
             "Review B must remain open and unsigned")
-    require(
-        review_b.get("status") ==
-        "HOLD_COPPER_RETURN_ECO_DECISION_AND_REMAINING_REVIEW_B_GATES",
-        "PCB-MIC Review-B status does not preserve the copper-return HOLD",
-    )
     require(REVIEW_PACKET.is_file(), "copper-return human-review packet is missing")
-    signed_commit = str(review_a.get("commit_sha", ""))
-    require(re.fullmatch(r"[0-9a-f]{40}", signed_commit) is not None,
-            "signed Review-A commit SHA is invalid")
-    signed_board = git_bytes(signed_commit, BOARD)
-    require(signed_board == BOARD.read_bytes(),
-            f"native board drifted from signed Review-A commit {signed_commit}")
+
+    release_state = status.get("release_state")
+    if release_state == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO":
+        require(review_a.get("complete") is False
+                and review_a.get("status") == "REVIEW_REQUIRED_AFTER_COPPER_ECO",
+                "post-ECO Review A must be open")
+        require(all(review_a.get(field) is None for field in ("reviewer", "date", "commit_sha")),
+                "post-ECO Review A unexpectedly retains an active signature")
+        require(review_b.get("status") == "BLOCKED_PENDING_REPEAT_REVIEW_A_AFTER_COPPER_ECO",
+                "Review B is not blocked on repeat Review A")
+        gate = review_b.get("copper_return_gate", {})
+        require(gate.get("decision") == "ECO_REQUIRED"
+                and gate.get("reviewer") and gate.get("date"),
+                "ECO_REQUIRED decision traceability is incomplete")
+        prior = review_a.get("superseded_signature", {})
+        prior_commit = str(prior.get("commit_sha", ""))
+        require(prior.get("status") == "SUPERSEDED_BY_COPPER_ECO_BOARD_BYTE_CHANGE",
+                "prior Review-A signature is not marked superseded")
+        require(re.fullmatch(r"[0-9a-f]{40}", prior_commit) is not None,
+                "superseded Review-A commit SHA is invalid")
+        prior_board = git_bytes(prior_commit, BOARD)
+        require(hashlib.sha256(prior_board).hexdigest() == prior.get("board_sha256"),
+                "superseded Review-A board hash mismatch")
+        require(prior_board != BOARD.read_bytes(),
+                "post-ECO board does not differ from the superseded Review-A board")
+        review_a_state = "ECO_CANDIDATE_REPEAT_REVIEW_A_REQUIRED"
+        signed_commit: str | None = None
+        previous_review_a = {
+            "reviewer": prior.get("reviewer"),
+            "date": prior.get("date"),
+            "commit_sha": prior_commit,
+            "board_sha256": prior.get("board_sha256"),
+            "status": prior.get("status"),
+        }
+    else:
+        require(release_state == "REVIEW_A_PASS", "unexpected PCB-MIC release state")
+        require(review_a.get("complete") is True and review_a.get("status") == "PASS",
+                "signed Review A is not complete/pass")
+        signed_commit = str(review_a.get("commit_sha", ""))
+        require(re.fullmatch(r"[0-9a-f]{40}", signed_commit) is not None,
+                "signed Review-A commit SHA is invalid")
+        signed_board = git_bytes(signed_commit, BOARD)
+        require(signed_board == BOARD.read_bytes(),
+                f"native board drifted from signed Review-A commit {signed_commit}")
+        review_a_state = "SIGNED_PASS"
+        previous_review_a = None
 
     head = git_head()
     if commit_sha is not None:
@@ -619,7 +724,8 @@ def audit_commit_binding(commit_sha: str | None, require_clean_source: bool) -> 
         require(commit_sha == head, f"evidence commit {commit_sha} != HEAD {head}")
     if require_clean_source:
         controlled = [
-            BOARD, STATUS, REVIEW_PACKET, TDK_AUTHORITY, Path(__file__).resolve()
+            BOARD, STATUS, REVIEW_PACKET, TDK_AUTHORITY, GENERATOR,
+            NATIVE_WORKFLOW, Path(__file__).resolve()
         ]
         dirty = subprocess.check_output(
             ["git", "status", "--porcelain", "--", *[
@@ -632,8 +738,10 @@ def audit_commit_binding(commit_sha: str | None, require_clean_source: bool) -> 
     return {
         "evidence_commit_sha": commit_sha or head,
         "signed_review_a_commit_sha": signed_commit,
-        "board_sha256": hashlib.sha256(signed_board).hexdigest(),
-        "signed_source_continuity": True,
+        "board_sha256": sha256(BOARD),
+        "review_a_state": review_a_state,
+        "signed_source_continuity": review_a_state == "SIGNED_PASS",
+        "superseded_review_a_signature": previous_review_a,
         "review_b_complete": False,
         "manufacturing_release": False,
     }
@@ -665,6 +773,7 @@ def run_audit(artifact_root: Path | None, commit_sha: str | None,
     return_local = shortest_path(graph, terminal_node("C1", "2"), terminal_node("MK1", "2"))
     connector_return = shortest_path(graph, terminal_node("J1", "2"), terminal_node("MK1", "2"))
     zone = audit_zone(zones)
+    explicit_local_return = audit_explicit_local_return(segments, vias)
     gerber = audit_bcu_gerber(artifact_root)
 
     require(supply_local["via_transitions"] == 0,
@@ -673,25 +782,33 @@ def run_audit(artifact_root: Path | None, commit_sha: str | None,
             and supply_local["minimum_trace_width_mm"] >= 0.3,
             "C1-to-MK1 VDD local trace is below 0.3 mm")
     require(return_local["connected"], "C1-to-MK1 explicit GND return is not connected")
+    require(return_local["via_transitions"] == 2,
+            "C1-to-MK1 explicit GND return must use the two controlled vias")
+    status = json.loads(STATUS.read_text(encoding="utf-8"))
+    baseline = status["review_b"]["copper_return_gate"]["baseline_machine_measurement"]
+    baseline_return = float(baseline["c1_to_mk1_ground_return_trace_length_mm"])
+    baseline_loop = float(baseline["decoupling_loop_trace_length_mm"])
+    loop_length = supply_local["trace_length_mm"] + return_local["trace_length_mm"]
+    require(return_local["trace_length_mm"] < baseline_return,
+            "ECO candidate did not shorten the C1-to-MK1 return")
+    require(loop_length < baseline_loop,
+            "ECO candidate did not shorten the decoupling loop")
+    if gerber.get("checked") is True:
+        require(gerber.get("gnd_region_count") == 0,
+                "explicit-routing-only CAM unexpectedly contains a GND region")
 
-    cam_zone_missing = gerber.get("checked") is True and not gerber.get("materialized_gnd_region")
-    source_zone_unfilled = not zone["source_zone_materialized"]
-    findings: list[dict[str, Any]] = []
-    if source_zone_unfilled and cam_zone_missing:
-        findings.append({
-            "id": "PCB-MIC-RB-CU-001",
-            "severity": "REVIEW_B_BLOCKING",
-            "finding": (
-                "The named B.Cu GND zone has no cached fill in the signed source and no "
-                "GND region is present in the emitted B.Cu Gerber; fabrication copper uses "
-                "the explicit routed backbone only."
-            ),
-            "required_decision": (
-                "Independent reviewer must require an ECO or explicitly accept the measured "
-                "explicit-return topology with fabricator evidence."
-            ),
-        })
-    findings.append({
+    findings: list[dict[str, Any]] = [{
+        "id": "PCB-MIC-RB-CU-001",
+        "severity": "RESOLVED_IN_ECO_CANDIDATE_PENDING_REPEAT_REVIEW_A",
+        "finding": (
+            "The non-materialized B.Cu GND zone was removed and the remote C1 branch was "
+            "replaced by one direct, explicit 0.50 mm B.Cu return segment."
+        ),
+        "verification": (
+            "Source and CAM use explicit routing only; repeat Review A is required because "
+            "the native PCB bytes changed."
+        ),
+    }, {
         "id": "PCB-MIC-RB-CU-002",
         "severity": "HUMAN_ACCEPTANCE_REQUIRED",
         "finding": (
@@ -699,19 +816,18 @@ def run_audit(artifact_root: Path | None, commit_sha: str | None,
             "decoupling loop; measured supply and return lengths cannot self-authorize a PASS."
         ),
         "required_decision": "Reviewer accepts the loop or raises a routed-board ECO.",
-    })
+    }]
 
     decision = (
-        "HOLD_UNFILLED_GND_ZONE_AND_DECOUPLING_RETURN_REQUIRE_HUMAN_ECO_DECISION"
-        if cam_zone_missing else
+        "ECO_CANDIDATE_EXPLICIT_LOCAL_RETURN_READY_FOR_REPEAT_REVIEW_A"
+        if binding["review_a_state"] == "ECO_CANDIDATE_REPEAT_REVIEW_A_REQUIRED" else
         "READY_FOR_INDEPENDENT_HUMAN_COPPER_RETURN_REVIEW"
     )
-    loop_length = supply_local["trace_length_mm"] + return_local["trace_length_mm"]
     return {
-        "schema": "dioneya-pcb-mic-copper-return-review-b-precheck-v1",
+        "schema": "dioneya-pcb-mic-copper-return-review-b-precheck-v2",
         "configuration": "EVT-PRE-20 Rev.A",
         "assembly": "PCB-MIC",
-        "machine_status": "PASS_REPRODUCIBLE_TOPOLOGY_MEASUREMENT",
+        "machine_status": "PASS_REPRODUCIBLE_ECO_TOPOLOGY_MEASUREMENT",
         "review_b_disposition": decision,
         "review_b_complete": False,
         "manufacturing_release": False,
@@ -735,6 +851,12 @@ def run_audit(artifact_root: Path | None, commit_sha: str | None,
                 "J1.2_to_MK1.2_connector_return": connector_return,
             },
             "measured_decoupling_loop_trace_length_mm": round(loop_length, 6),
+            "baseline_c1_to_mk1_ground_return_trace_length_mm": baseline_return,
+            "baseline_decoupling_loop_trace_length_mm": baseline_loop,
+            "ground_return_reduction_mm": round(
+                baseline_return - return_local["trace_length_mm"], 6
+            ),
+            "decoupling_loop_reduction_mm": round(baseline_loop - loop_length, 6),
             "normative_maximum_loop_length_mm": None,
             "normative_limit_status": "NOT_FROZEN_HUMAN_REVIEW_REQUIRED",
         },
@@ -742,6 +864,7 @@ def run_audit(artifact_root: Path | None, commit_sha: str | None,
             "source": zone,
             "cam": gerber,
         },
+        "explicit_local_return": explicit_local_return,
         "findings": findings,
         "human_review_packet": str(REVIEW_PACKET.relative_to(ROOT)),
         "human_review_drawings": [
@@ -765,7 +888,7 @@ def main() -> int:
         report = run_audit(artifact_root, args.commit_sha, args.require_clean_source)
     except Exception as exc:
         report = {
-            "schema": "dioneya-pcb-mic-copper-return-review-b-precheck-v1",
+            "schema": "dioneya-pcb-mic-copper-return-review-b-precheck-v2",
             "configuration": "EVT-PRE-20 Rev.A",
             "assembly": "PCB-MIC",
             "machine_status": "FAIL_TOPOLOGY_MEASUREMENT",
