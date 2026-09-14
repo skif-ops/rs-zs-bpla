@@ -404,6 +404,32 @@ def validate_position_export(name: str, pos_path: Path) -> None:
     print(f"{name}: PnP export verification PASS: refs={refs}")
 
 
+def normalize_assembly_fabrication_pdf(
+    name: str, export_path: Path, final_path: Path,
+) -> None:
+    """Normalize KiCad 9.0.x multipage PDF output across CLI packaging variants."""
+    if export_path.is_file():
+        generated = export_path
+    elif export_path.is_dir():
+        candidates = sorted(export_path.glob("*.pdf"))
+        if len(candidates) != 1:
+            raise RuntimeError(
+                f"{name}: expected one multipage PDF in {export_path}, got {candidates}"
+            )
+        generated = candidates[0]
+    else:
+        raise RuntimeError(f"{name}: assembly/fabrication PDF export is missing: {export_path}")
+
+    with generated.open("rb") as stream:
+        header = stream.read(5)
+    if generated.stat().st_size <= 1000 or header != b"%PDF-":
+        raise RuntimeError(f"{name}: assembly/fabrication PDF is invalid: {generated}")
+    generated.replace(final_path)
+    if export_path.is_dir():
+        export_path.rmdir()
+    print(f"{name}: assembly/fabrication multipage PDF PASS: {final_path.name}")
+
+
 def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
     out = ART / name
     out.mkdir(parents=True, exist_ok=True)
@@ -439,10 +465,14 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
         [cli, "pcb", "export", "step", "--board-only", "--force",
          "-o", str(out / f"{name}_board.step"), str(pcb)],
     ]
+    assembly_pdf_export: Path | None = None
+    assembly_pdf_final: Path | None = None
     if name == "PCB-MIC":
+        assembly_pdf_export = out / "assembly-fabrication-pdf-export"
+        assembly_pdf_final = out / f"{name}_assembly_fabrication.pdf"
         export_commands.append([
             cli, "pcb", "export", "pdf",
-            "-o", str(out / f"{name}_assembly_fabrication.pdf"),
+            "-o", str(assembly_pdf_export),
             "--layers", "F.Fab,B.Fab,F.Silkscreen,B.Silkscreen",
             "--common-layers", "Edge.Cuts",
             "--mode-multipage",
@@ -457,6 +487,10 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
         return False, f"CLI_DRC_PASS_EXPORT_FAIL_{export_rcs}"
 
     try:
+        if assembly_pdf_export is not None and assembly_pdf_final is not None:
+            normalize_assembly_fabrication_pdf(
+                name, assembly_pdf_export, assembly_pdf_final
+            )
         apply_fabrication_metadata(name, pcb, out, gerber)
         validate_position_export(name, pos_path)
     except Exception as exc:
