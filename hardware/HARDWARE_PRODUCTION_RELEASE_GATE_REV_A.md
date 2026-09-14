@@ -20,6 +20,10 @@ closed mechanical dimensions.
 collected for all three quantities before that selection; mixing their quantity
 columns is prohibited.
 
+The selected lot is `EVT-20` for 20 stations. This closes only the lot-selection
+condition. It does not release purchasing while hardware design or supplier
+evidence remains blocked.
+
 The production interlock is implemented by:
 
 ```bash
@@ -40,7 +44,7 @@ candidates or successful software tests.
   process-dependent stencil/mask rules;
 - PCB-PWR DIM-003 and the remaining enclosure, antenna, harness, installation and
   environmental mechanical inputs;
-- supplier/fabricator/assembler quotation evidence and one selected 4/10/20
+- supplier/fabricator/assembler quotation evidence for the selected 20-station
   purchase scenario.
 
 Physical EVT and operator/SIM evidence remain later acceptance evidence after

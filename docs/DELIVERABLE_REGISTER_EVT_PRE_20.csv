@@ -1,6 +1,6 @@
 ID,Раздел,Поставочный объект,Формат,Критичность,Статус,QG-1 полнота,QG-2 техника,Критерий выпуска
 CM-001,Управление,Ведомость документов,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Все позиции реестра имеют владельца версию статус и путь
-CM-002,Управление,Конфигурационная база EVT-PRE-20,YAML+DOCX,P0,DRAFT,PASS,OPEN,Варианты закупки 4 10 и 20 однозначны; до purchase release выбирается ровно один сценарий
+CM-002,Управление,Конфигурационная база EVT-PRE-20,YAML+DOCX,P0,DRAFT,PASS,OPEN,Выбран EVT-20; варианты 4 и 10 сохранены только для сравнения; purchase release остаётся под QG-2
 CM-003,Управление,Матрица требований и трассировки,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Каждое требование связано с проверкой и evidence
 CM-004,Управление,Журнал решений и изменений,XLSX+CSV,P1,DRAFT,OPEN,OPEN,Все изменения имеют основание и влияние
 CM-005,Управление,Реестр рисков и отклонений,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Блокирующие риски имеют владельца и действие
@@ -30,7 +30,7 @@ HW-P-003,Power,Спецификация MPPT и батареи,DOCX+XLSX,P0,DRAF
 HW-C-001,Кабели,Схема соединения всех элементов,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Каждый pin связан с net fuse wire gauge connector
 HW-C-002,Кабели,Чертежи жгутов и распайка,DOCX+CSV,P0,PLANNED,OPEN,OPEN,Длина сечение цвет контакт обжим указаны
 HW-C-003,Кабели,Таблица разъёмов и mating parts,XLSX+CSV,P1,DRAFT,OPEN,OPEN,Разъёмы съёмные; пары и инструменты указаны
-PROC-001,Закупка,Сводный BOM для 4 10 и 20 изделий и запас,XLSX+CSV,P0,DRAFT,PASS,OPEN,Engineering и procurement quantities для всех трёх сценариев воспроизводимы; purchase release блокируется до выбора одного лота и QG-2
+PROC-001,Закупка,Сводный BOM для 4 10 и 20 изделий и запас,XLSX+CSV,P0,DRAFT,PASS,OPEN,Engineering и procurement quantities воспроизводимы; EVT-20 выбран; purchase release блокируется QG-2 и supplier evidence
 PROC-002,Закупка,China sourcing snapshot,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Поставщик ссылка дата MOQ lead time stock
 PROC-003,Закупка,Approved vendor list и аналоги,XLSX+CSV,P0,PLANNED,OPEN,OPEN,Аналоги не снижают функциональность
 PROC-004,Закупка,План входного контроля,DOCX+forms,P0,DRAFT,OPEN,OPEN,Counterfeit ESD MSL functional sampling
@@ -68,7 +68,7 @@ MFG-004,Производство,EOL fixture и тестовая програм�
 MFG-005,Производство,Калибровка микрофонов и задержек,DOCX+CSV,P0,PLANNED,OPEN,OPEN,Разброс и задержка не более 1 отсчёта
 MFG-006,Производство,Маркировка и паспорт изделия,DOCX+LABEL,P0,DRAFT,OPEN,OPEN,Serial HW FW RU868 и обе ICCID refs однозначны
 MFG-007,Производство,Упаковка транспорт хранение,DOCX,P1,PLANNED,OPEN,OPEN,ESD moisture battery transport требования учтены
-MFG-008,Производство,План корпусов выбранного EVT-лота,CSV+DOCX,P0,DRAFT,PASS,OPEN,Сценарии 4 10 и 20 привязаны к ведущему serial range; вакуумное литьё основное; равный 3D резерв условный; ТПА без пилотной оснастки
+MFG-008,Производство,План корпусов выбранного EVT-лота,CSV+DOCX,P0,DRAFT,PASS,OPEN,EVT-20 привязан к DIO-EVT-001..020; вакуумное литьё основное; 20 комплектов 3D резерва условны; ТПА без пилотной оснастки
 EVT-001,Испытания,ПМИ предсерийной партии,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Матрица и выборки утверждены для каждого изделия выбранного лота 4 10 или 20
 EVT-002,Испытания,Формы протоколов выбранного EVT-лота,DOCX+XLSX+CSV,P0,DRAFT,OPEN,OPEN,Serial и evidence links обязательны для каждого изделия выбранного лота
 EVT-003,Испытания,Аудио DSP классификация,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Pd FAR и negative set определены

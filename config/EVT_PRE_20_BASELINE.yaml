@@ -24,12 +24,14 @@ authority_sync:
 lot:
   maximum_station_quantity: 20
   supported_procurement_quantities: [4, 10, 20]
-  selected_evt_quantity: NOT_YET_SELECTED
+  selected_evt_quantity: 20
   selection_required_before_purchase_release: true
+  selection_status: LOCKED_CURRENT_CUSTOMER_EVT_20
+  selected_serial_range: ["001", "020"]
   serial_prefix: DIO-EVT-
   serial_range: ["001", "020"]
   serial_range_role: MAXIMUM_CAPACITY_RESERVATION
-  allocation_status: LOCKED_CUSTOMER_RU868_FOR_SELECTED_EVT_LOT
+  allocation_status: LOCKED_CUSTOMER_RU868_FOR_20_UNIT_EVT_LOT
   lora_allocation:
     RU868: ["001", "020"]
     EU868: []
@@ -168,11 +170,11 @@ mechanics:
   primary_evt_print_platform: FlashForge_Adventurer_5M_Pro
   pilot_housing_allocation_status: LOCKED_CUSTOMER
   pilot_primary_process: vacuum_casting
-  pilot_primary_quantity: SELECTED_EVT_QUANTITY
+  pilot_primary_quantity: 20
   supported_procurement_quantities: [4, 10, 20]
   maximum_serial_capacity: 20
   pilot_fallback_process: 3d_print
-  pilot_fallback_quantity_if_activated: SELECTED_EVT_QUANTITY
+  pilot_fallback_quantity_if_activated: 20
   fallback_activation: customer_approved_if_vacuum_casting_unavailable
   injection_molding_scope: source_data_and_dfm_only_no_pilot_tooling
 

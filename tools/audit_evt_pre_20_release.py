@@ -289,8 +289,8 @@ def audit() -> dict[str, object]:
         blockers.append("environment operating range is not locked to -40..+70 C")
     if "electronic_component_minimum_rating_c: [-40, 85]" not in baseline:
         blockers.append("electronic component temperature derating rule missing")
-    if "selected_evt_quantity: NOT_YET_SELECTED" in baseline:
-        blockers.append("EVT purchase quantity is not selected from 4 10 or 20")
+    if "selected_evt_quantity: 20" not in baseline:
+        blockers.append("locked current-customer EVT purchase quantity is not 20")
 
     bom = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
     if bom.is_file():

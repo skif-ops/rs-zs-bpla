@@ -9,8 +9,10 @@ sourcing work and design review, but they are not a factory release while QG-2 r
 `BLOCKED`.
 
 `manufacturing/EVT_LOT_SELECTION_REV_A.csv` is the scenario-selection authority.
-Exactly one scenario must be selected before purchase release; quantities and spare
-columns from different scenarios must never be mixed.
+`EVT-20` is selected for the current customer. The 4- and 10-station columns remain
+controlled comparison scenarios only; quantities and spare columns from different
+scenarios must never be mixed. Selection alone does not authorize purchasing while
+QG-2 or supplier release evidence remains open.
 
 ## Required line data
 

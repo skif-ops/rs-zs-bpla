@@ -1,4 +1,4 @@
 Scenario_ID,Station_Qty,Serial_Start,Serial_End,BOM_Quantity_Column,BOM_Procurement_Column,Procurement_Status,Selection_Status,Release_Rule
-EVT-4,4,DIO-EVT-001,DIO-EVT-004,Qty_4,Procure_qty_4,RFQ_READY,NOT_YET_SELECTED,Select exactly one scenario before purchase release
-EVT-10,10,DIO-EVT-001,DIO-EVT-010,Qty_10,Procure_qty_10,RFQ_READY,NOT_YET_SELECTED,Select exactly one scenario before purchase release
-EVT-20,20,DIO-EVT-001,DIO-EVT-020,Qty_20,Procure_qty_20,RFQ_READY,NOT_YET_SELECTED,Select exactly one scenario before purchase release
+EVT-4,4,DIO-EVT-001,DIO-EVT-004,Qty_4,Procure_qty_4,RFQ_READY,NOT_SELECTED,Reference quotation only; do not issue purchase order
+EVT-10,10,DIO-EVT-001,DIO-EVT-010,Qty_10,Procure_qty_10,RFQ_READY,NOT_SELECTED,Reference quotation only; do not issue purchase order
+EVT-20,20,DIO-EVT-001,DIO-EVT-020,Qty_20,Procure_qty_20,RFQ_READY,SELECTED,Customer-selected EVT lot; purchase remains blocked by QG-2 and supplier release
