@@ -272,6 +272,20 @@ def validate_hardware_baseline() -> None:
     require(mic_status["manufacturing_release"] is False, "PCB-MIC was released without Review A/B evidence")
     require(mic_status["review_a"]["complete"] is False, "PCB-MIC Review A was marked complete without signing evidence")
     require(mic_status["review_b"]["complete"] is False, "PCB-MIC Review B was marked complete without manufacturing evidence")
+    require(
+        mic_status["review_a"]["structural_audit_status"] ==
+        "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_REMAINS_OPEN",
+        "PCB-MIC independent structural audit status is missing or overstated",
+    )
+    require(
+        mic_status["native_source"]["independent_schematic_audit"] ==
+        "artifacts/pcb_mic_native_schematic_rev_a.json",
+        "PCB-MIC independent schematic audit artifact path mismatch",
+    )
+    require(
+        (ROOT / "tools/audit_pcb_mic_native_schematic_rev_a.py").is_file(),
+        "PCB-MIC independent native schematic audit source is missing",
+    )
     mic_metadata = json.loads(
         (ROOT / "hardware/kicad/native/PCB-MIC/fabrication_metadata.json").read_text(encoding="utf-8")
     )

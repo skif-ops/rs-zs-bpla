@@ -96,6 +96,7 @@ on:
       - "tools/finalize_pcb_mic_mechanical_rev_a.py"
       - "tools/finalize_pcb_mic_molex_rev_a.py"
       - "tools/generate_pcb_mic_schematic.py"
+      - "tools/audit_pcb_mic_native_schematic_rev_a.py"
       - "tools/inspect_pcb_mic_reference_cad.py"
       - "tools/materialize_pcb_mic_libraries.py"
       - "tools/export_pcb_mic_footprints.py"
@@ -254,6 +255,9 @@ jobs:
             --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
           /usr/bin/python3 tools/audit_pcb_mic_mechanical_rev_a.py \
             --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          python tools/audit_pcb_mic_native_schematic_rev_a.py \
+            --schematic hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch \
+            --output artifacts/kicad-native/PCB-MIC/committed_native_schematic_audit.json
           python tools/audit_pcb_pwr_native_schematic_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/audit_pcb_pwr_native_completeness_rev_a.py \
@@ -409,6 +413,11 @@ jobs:
           test -s hardware/kicad/native/PCB-MIC/fabrication_metadata.json
           test -s hardware/kicad/native/PCB-MIC/sym-lib-table
           test -s hardware/kicad/native/PCB-MIC/fp-lib-table
+      - name: Independent PCB-MIC native schematic structural audit
+        run: |
+          python tools/audit_pcb_mic_native_schematic_rev_a.py \
+            --schematic hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch \
+            --output artifacts/kicad-native/PCB-MIC/native_schematic_audit.json
       - name: Independent PCB-MIC native geometry audit
         run: |
           /usr/bin/python3 tools/audit_pcb_mic_native_geometry.py \

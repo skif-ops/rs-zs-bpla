@@ -17,6 +17,7 @@
     "board": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
     "project": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro",
     "fabrication_metadata": "hardware/kicad/native/PCB-MIC/fabrication_metadata.json",
+    "independent_schematic_audit": "artifacts/pcb_mic_native_schematic_rev_a.json",
     "routing_status": "PRESENT_NOT_DRC_OR_CAM_RELEASED"
   },
   "component_contract": {
@@ -36,8 +37,9 @@
   },
   "review_a": {
     "complete": false,
-    "status": "OPEN_NATIVE_ERC_PIN_NET_BOM_AND_GEOMETRY_EVIDENCE",
+    "status": "OPEN_NATIVE_ERC_GEOMETRY_AND_SIGNED_TRACEABILITY",
     "checklist": "hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
+    "structural_audit_status": "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_REMAINS_OPEN",
     "reviewer": null,
     "date": null,
     "commit_sha": null
