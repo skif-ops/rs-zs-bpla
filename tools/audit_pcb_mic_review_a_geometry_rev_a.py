@@ -463,6 +463,17 @@ def source_matches_commit(commit_sha: str, paths: list[Path]) -> bool:
     return True
 
 
+def commit_available(commit_sha: str) -> bool:
+    result = subprocess.run(
+        ["git", "cat-file", "-e", f"{commit_sha}^{{commit}}"],
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    return result.returncode == 0
+
+
 def resolve_commit(explicit: str | None) -> str:
     if explicit:
         require(re.fullmatch(r"[0-9a-fA-F]{40}", explicit) is not None, "--commit-sha must be a full 40-hex SHA")
@@ -518,6 +529,8 @@ def main() -> int:
             "PCB-MIC signed Review A lacks reviewer/date/commit SHA")
     require(re.fullmatch(r"[0-9a-f]{40}", review_a["commit_sha"]) is not None,
             "PCB-MIC Review A commit SHA is invalid")
+    require(commit_available(review_a["commit_sha"]),
+            "signed PCB-MIC Review A commit is unavailable; checkout full history")
     reviewed_source_commit_match = source_matches_commit(
         review_a["commit_sha"], controlled_paths
     )
