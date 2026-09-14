@@ -224,15 +224,22 @@ def main() -> int:
     check("mic_native_component_identity", not mic_mismatch,
           "PCB-MIC component identity mismatch: " + ", ".join(mic_mismatch) if mic_mismatch else "four native PCB-MIC fitted identities match")
 
-    mic_native = ROOT / "hardware/kicad/native/PCB-MIC/PCB-MIC.sch"
+    mic_native = ROOT / "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch"
+    mic_legacy = ROOT / "hardware/kicad/native/PCB-MIC/PCB-MIC.sch"
     mic_native_text = mic_native.read_text(encoding="utf-8") if mic_native.is_file() else ""
-    mic_native_mpn_ok = "MMICT5838-00-012" in mic_native_text
+    mic_native_mpn_ok = (
+        mic_native.is_file()
+        and "MMICT5838-00-012" in mic_native_text
+        and "Dioneya:T5838_RevA" in mic_native_text
+        and "Dioneya:Molex_5040500691" in mic_native_text
+        and not mic_legacy.exists()
+    )
     check(
         "mic_native_exact_orderable_mpn",
         mic_native_mpn_ok,
-        "native PCB-MIC binds MK1 to exact orderable MMICT5838-00-012"
+        "single native KiCad-9 PCB-MIC source binds exact MK1/J1 identities and controlled footprints"
         if mic_native_mpn_ok
-        else "native PCB-MIC does not bind MK1 to exact orderable MMICT5838-00-012",
+        else "PCB-MIC KiCad-9 source/footprint identity is incomplete or a competing legacy .sch remains",
     )
 
     exact_fields_missing = []
