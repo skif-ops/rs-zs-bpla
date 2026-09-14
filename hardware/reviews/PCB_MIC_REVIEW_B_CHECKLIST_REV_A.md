@@ -1,6 +1,6 @@
 # PCB-MIC Rev.A Review B checklist
 
-Status: `INTERNAL CAM PREFLIGHT PASS / REVIEW B OPEN / NOT SIGNED / NOT FOR MANUFACTURE`
+Status: `INTERNAL CAM PREFLIGHT PASS / COPPER RETURN HOLD / REVIEW B OPEN / NOT SIGNED / NOT FOR MANUFACTURE`
 
 Review B is an independent PCB/CAM/assembly pass performed after signed Review A.
 
@@ -8,6 +8,11 @@ Review B is an independent PCB/CAM/assembly pass performed after signed Review A
 - [x] Mechanical outline, mounting pattern and acoustic opening are represented in native CAD.
 - [x] KiCad 9 DRC passes with zero violations and zero unrouted items.
 - [ ] Copper return path and T5838 decoupling placement are independently reviewed.
+  - [x] A standard-library-only graph audit measures the routed supply and return paths.
+  - [x] The audit identifies that the named B.Cu GND zone is not materialized in the
+    commit-bound Gerber and that the explicit C1-to-MK1 return is 22.248973 mm.
+  - [ ] An independent reviewer records `ECO_REQUIRED` or `ACCEPT_WITH_EVIDENCE` in
+    `PCB_MIC_REVIEW_B_COPPER_RETURN_REV_A.md`.
 - [ ] The bottom acoustic port has no paste, mask, adhesive or coating obstruction.
   - [x] Internal CAM proves zero paste flashes at the acoustic and mounting holes and exact F/B mask openings.
   - [ ] Adhesive and conformal-coating keepouts are accepted by the assembler.
@@ -35,6 +40,21 @@ This evidence closes only the internal machine-verifiable preflight. Human coppe
 review, panelization, fabricator/assembler DFM, adhesive/coating acceptance, acoustic
 stack validation, physical EVT, independent Review-B signature and manufacturing
 release remain open.
+
+## Copper-return precheck
+
+- Packet: `hardware/reviews/PCB_MIC_REVIEW_B_COPPER_RETURN_REV_A.md`.
+- Independent audit: `tools/audit_pcb_mic_copper_return_rev_a.py`.
+- Machine result: `PASS_REPRODUCIBLE_TOPOLOGY_MEASUREMENT`.
+- Disposition: `HOLD_UNFILLED_GND_ZONE_AND_DECOUPLING_RETURN_REQUIRE_HUMAN_ECO_DECISION`.
+- C1.1 to MK1.7 VDD leg: `1.658011 mm`, zero vias, 0.300 mm width.
+- C1.2 to MK1.2 explicit return: `22.248973 mm`, two vias, 0.160 mm minimum width.
+- Measured decoupling loop: `23.906984 mm`.
+- B.Cu zone state in PCB Native Gate [run #155](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34835113074),
+  artifact `10343758832`: zero cached source fills and zero materialized GND Gerber
+  regions; five explicit GND conductor draws remain.
+- Next commit-bound artifact must contain `PCB-MIC_copper_review.pdf` and
+  `copper_return_review_audit.json` before the human decision is recorded.
 
 Decision: `HOLD`. Physical calibration and acoustic EVT begin only after assembled
 boards exist; they cannot be replaced by this checklist.

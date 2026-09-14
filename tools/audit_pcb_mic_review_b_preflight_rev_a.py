@@ -31,6 +31,8 @@ FABRICATION_METADATA = ROOT / "hardware/kicad/native/PCB-MIC/fabrication_metadat
 STATUS = ROOT / "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json"
 PRODUCTION_BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
 NATIVE_GATE = ROOT / "tools/kicad_native_gate.py"
+COPPER_RETURN_AUDIT = ROOT / "tools/audit_pcb_mic_copper_return_rev_a.py"
+COPPER_RETURN_PACKET = ROOT / "hardware/reviews/PCB_MIC_REVIEW_B_COPPER_RETURN_REV_A.md"
 
 EXPECTED_COMPONENTS = {
     "C1": {
@@ -163,7 +165,8 @@ def audit_commit_binding(commit_sha: str, signed_commit: str) -> dict[str, Any]:
 
     controlled = [
         BOARD, SCHEMATIC, PROJECT, FABRICATION_METADATA, STATUS,
-        PRODUCTION_BOM, NATIVE_GATE, Path(__file__).resolve(),
+        PRODUCTION_BOM, NATIVE_GATE, COPPER_RETURN_AUDIT,
+        COPPER_RETURN_PACKET, Path(__file__).resolve(),
     ]
     dirty = subprocess.check_output(
         ["git", "status", "--porcelain", "--", *[str(p.relative_to(ROOT)) for p in controlled]],
@@ -725,29 +728,91 @@ def audit_native_topology() -> dict[str, Any]:
 
 def audit_documents(artifact_root: Path) -> dict[str, Any]:
     pdfs = {
-        "schematic": artifact_root / "PCB-MIC_schematic.pdf",
-        "assembly_fabrication": artifact_root / "PCB-MIC_assembly_fabrication.pdf",
-        "drill_map": artifact_root / "drill/PCB-MIC-drl_map.pdf",
+        "schematic": (artifact_root / "PCB-MIC_schematic.pdf", None),
+        "assembly_fabrication": (
+            artifact_root / "PCB-MIC_assembly_fabrication.pdf", 4
+        ),
+        "copper_review": (artifact_root / "PCB-MIC_copper_review.pdf", 2),
+        "drill_map": (artifact_root / "drill/PCB-MIC-drl_map.pdf", None),
     }
     sizes: dict[str, int] = {}
-    for label, path in pdfs.items():
+    pages: dict[str, int] = {}
+    for label, (path, expected_pages) in pdfs.items():
         data = path.read_bytes()
         require(data.startswith(b"%PDF-"), f"{label} PDF header missing")
         require(len(data) > 1000, f"{label} PDF unexpectedly small: {len(data)} bytes")
         sizes[label] = len(data)
+        page_count = len(re.findall(rb"/Type\s*/Page\b", data))
+        if expected_pages is not None:
+            require(page_count == expected_pages,
+                    f"{label} PDF page count {page_count} != {expected_pages}")
+        pages[label] = page_count
 
     step = artifact_root / "PCB-MIC_board.step"
     step_data = step.read_bytes()
     require(step_data.startswith(b"ISO-10303-21;"), "board STEP header missing")
     require(b"END-ISO-10303-21;" in step_data, "board STEP terminator missing")
     require(len(step_data) > 1000, f"board STEP unexpectedly small: {len(step_data)} bytes")
-    return {"status": "PASS", "pdf_bytes": sizes, "board_step_bytes": len(step_data)}
+    return {
+        "status": "PASS",
+        "pdf_bytes": sizes,
+        "pdf_pages": pages,
+        "board_step_bytes": len(step_data),
+    }
+
+
+def audit_copper_return_report(artifact_root: Path, commit_sha: str) -> dict[str, Any]:
+    path = artifact_root / "copper_return_review_audit.json"
+    report = json.loads(path.read_text(encoding="utf-8"))
+    require(
+        report.get("schema") == "dioneya-pcb-mic-copper-return-review-b-precheck-v1",
+        "unexpected copper-return audit schema",
+    )
+    require(
+        report.get("machine_status") == "PASS_REPRODUCIBLE_TOPOLOGY_MEASUREMENT",
+        "copper-return topology measurement did not pass",
+    )
+    require(
+        report.get("review_b_disposition") ==
+        "HOLD_UNFILLED_GND_ZONE_AND_DECOUPLING_RETURN_REQUIRE_HUMAN_ECO_DECISION",
+        "copper-return HOLD disposition changed without Review-B control update",
+    )
+    require(report.get("review_b_complete") is False,
+            "copper-return precheck must not complete Review B")
+    require(report.get("manufacturing_release") is False,
+            "copper-return precheck must not grant manufacturing release")
+    binding = report.get("commit_binding", {})
+    require(binding.get("evidence_commit_sha") == commit_sha,
+            "copper-return audit commit binding mismatch")
+    require(binding.get("board_sha256") == sha256(BOARD),
+            "copper-return audit board hash mismatch")
+    topology = report.get("topology", {})
+    paths = topology.get("paths", {})
+    require(
+        paths.get("C1.1_to_MK1.7_vdd_local", {}).get("connected") is True
+        and paths.get("C1.2_to_MK1.2_ground_return", {}).get("connected") is True,
+        "copper-return audit lacks connected local supply/return paths",
+    )
+    cam = report.get("ground_zone", {}).get("cam", {})
+    require(cam.get("checked") is True and cam.get("materialized_gnd_region") is False,
+            "copper-return CAM zone finding is absent or changed")
+    return {
+        "status": report["machine_status"],
+        "review_b_disposition": report["review_b_disposition"],
+        "decoupling_loop_trace_length_mm": topology.get(
+            "measured_decoupling_loop_trace_length_mm"
+        ),
+        "bcu_gnd_region_count": cam.get("gnd_region_count"),
+        "review_b_complete": False,
+        "manufacturing_release": False,
+    }
 
 
 def output_hashes(artifact_root: Path) -> dict[str, dict[str, Any]]:
     relative_paths = [
         "PCB-MIC.d356",
         "PCB-MIC_assembly_fabrication.pdf",
+        "PCB-MIC_copper_review.pdf",
         "PCB-MIC_board.step",
         "PCB-MIC_fabrication_metadata.json",
         "PCB-MIC_kicad_bom.csv",
@@ -756,6 +821,7 @@ def output_hashes(artifact_root: Path) -> dict[str, dict[str, Any]]:
         "PCB-MIC_schematic.pdf",
         "cam-source/PCB-MIC.kicad_pcb",
         "cam_source_transform.json",
+        "copper_return_review_audit.json",
         "drc.json",
         "drill/PCB-MIC-drl_map.pdf",
         "drill/PCB-MIC.drl",
@@ -786,10 +852,12 @@ def audit(artifact_root: Path, commit_sha: str) -> dict[str, Any]:
         "bom": audit_boms(artifact_root),
         "ipc_d_356": audit_ipc356(artifact_root),
         "documents": audit_documents(artifact_root),
+        "copper_return_review": audit_copper_return_report(artifact_root, commit_sha),
     }
     source_paths = [
         BOARD, SCHEMATIC, PROJECT, FABRICATION_METADATA, STATUS,
-        PRODUCTION_BOM, NATIVE_GATE, Path(__file__).resolve(),
+        PRODUCTION_BOM, NATIVE_GATE, COPPER_RETURN_AUDIT,
+        COPPER_RETURN_PACKET, Path(__file__).resolve(),
     ]
     return {
         "schema": "dioneya-pcb-mic-review-b-internal-preflight-v1",

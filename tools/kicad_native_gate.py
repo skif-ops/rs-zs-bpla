@@ -36,6 +36,7 @@ PCB_MIC_STATUS = ROOT / "hardware" / "PCB_MIC_CAPTURE_STATUS_REV_A.json"
 PCB_PWR_STATUS = ROOT / "hardware" / "PCB_PWR_CAPTURE_STATUS_REV_A.json"
 PRODUCTION_BOM = ROOT / "hardware" / "EVT_PRE_20_BOM_REV_A.csv"
 PCB_MIC_REVIEW_B_AUDIT = ROOT / "tools" / "audit_pcb_mic_review_b_preflight_rev_a.py"
+PCB_MIC_COPPER_RETURN_AUDIT = ROOT / "tools" / "audit_pcb_mic_copper_return_rev_a.py"
 
 PCB_MIC_BOM_ITEMS = {
     "C1": "C-MIC",
@@ -404,8 +405,8 @@ def validate_position_export(name: str, pos_path: Path) -> None:
     print(f"{name}: PnP export verification PASS: refs={refs}")
 
 
-def normalize_assembly_fabrication_pdf(
-    name: str, export_path: Path, final_path: Path,
+def normalize_multipage_pdf(
+    name: str, document: str, export_path: Path, final_path: Path,
 ) -> None:
     """Normalize KiCad 9.0.x multipage PDF output across CLI packaging variants."""
     if export_path.is_file():
@@ -414,20 +415,21 @@ def normalize_assembly_fabrication_pdf(
         candidates = sorted(export_path.glob("*.pdf"))
         if len(candidates) != 1:
             raise RuntimeError(
-                f"{name}: expected one multipage PDF in {export_path}, got {candidates}"
+                f"{name}: expected one {document} multipage PDF in {export_path}, "
+                f"got {candidates}"
             )
         generated = candidates[0]
     else:
-        raise RuntimeError(f"{name}: assembly/fabrication PDF export is missing: {export_path}")
+        raise RuntimeError(f"{name}: {document} PDF export is missing: {export_path}")
 
     with generated.open("rb") as stream:
         header = stream.read(5)
     if generated.stat().st_size <= 1000 or header != b"%PDF-":
-        raise RuntimeError(f"{name}: assembly/fabrication PDF is invalid: {generated}")
+        raise RuntimeError(f"{name}: {document} PDF is invalid: {generated}")
     generated.replace(final_path)
     if export_path.is_dir():
         export_path.rmdir()
-    print(f"{name}: assembly/fabrication multipage PDF PASS: {final_path.name}")
+    print(f"{name}: {document} multipage PDF PASS: {final_path.name}")
 
 
 def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
@@ -467,9 +469,13 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
     ]
     assembly_pdf_export: Path | None = None
     assembly_pdf_final: Path | None = None
+    copper_pdf_export: Path | None = None
+    copper_pdf_final: Path | None = None
     if name == "PCB-MIC":
         assembly_pdf_export = out / "assembly-fabrication-pdf-export"
         assembly_pdf_final = out / f"{name}_assembly_fabrication.pdf"
+        copper_pdf_export = out / "copper-review-pdf-export"
+        copper_pdf_final = out / f"{name}_copper_review.pdf"
         export_commands.append([
             cli, "pcb", "export", "pdf",
             "-o", str(assembly_pdf_export),
@@ -482,14 +488,29 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
             "--drill-shape-opt", "2",
             str(pcb),
         ])
+        export_commands.append([
+            cli, "pcb", "export", "pdf",
+            "-o", str(copper_pdf_export),
+            "--layers", "F.Cu,B.Cu",
+            "--common-layers", "Edge.Cuts",
+            "--mode-multipage",
+            "--black-and-white",
+            "--include-border-title",
+            "--drill-shape-opt", "2",
+            str(pcb),
+        ])
     export_rcs = [run(cmd, check=False) for cmd in export_commands]
     if any(export_rcs):
         return False, f"CLI_DRC_PASS_EXPORT_FAIL_{export_rcs}"
 
     try:
         if assembly_pdf_export is not None and assembly_pdf_final is not None:
-            normalize_assembly_fabrication_pdf(
-                name, assembly_pdf_export, assembly_pdf_final
+            normalize_multipage_pdf(
+                name, "assembly/fabrication", assembly_pdf_export, assembly_pdf_final
+            )
+        if copper_pdf_export is not None and copper_pdf_final is not None:
+            normalize_multipage_pdf(
+                name, "copper-review", copper_pdf_export, copper_pdf_final
             )
         apply_fabrication_metadata(name, pcb, out, gerber)
         validate_position_export(name, pos_path)
@@ -610,25 +631,51 @@ def main() -> int:
         mic_pcb_ok = str(mic["pcb_state"]).startswith("CLI_DRC_FAB_EXPORT_METADATA_PASS")
         mic_sch_ok = str(mic["sch_state"]).startswith("CLI_ERC_PDF_BOM_PASS")
         if mic_pcb_ok and mic_sch_ok:
-            audit_output = ART / "PCB-MIC" / "review_b_preflight_audit.json"
-            audit_rc = run(
+            copper_audit_output = ART / "PCB-MIC" / "copper_return_review_audit.json"
+            copper_audit_rc = run(
                 [
                     sys.executable,
-                    str(PCB_MIC_REVIEW_B_AUDIT.relative_to(ROOT)),
+                    str(PCB_MIC_COPPER_RETURN_AUDIT.relative_to(ROOT)),
                     "--artifact-root", str(ART / "PCB-MIC"),
-                    "--output", str(audit_output),
+                    "--output", str(copper_audit_output),
                     "--commit-sha", git_head(),
+                    "--require-clean-source",
                 ],
                 check=False,
             )
-            if audit_rc == 0:
-                mic["review_b_preflight_state"] = (
-                    "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN"
+            if copper_audit_rc == 0:
+                mic["copper_return_review_state"] = (
+                    "HOLD_MACHINE_MEASURED_INDEPENDENT_HUMAN_ECO_DECISION_REQUIRED"
                 )
             else:
-                mic["review_b_preflight_state"] = f"FAIL_rc{audit_rc}"
-                cli_failures.append(f"PCB-MIC: REVIEW_B_PREFLIGHT_FAIL_rc{audit_rc}")
+                mic["copper_return_review_state"] = f"FAIL_rc{copper_audit_rc}"
+                cli_failures.append(
+                    f"PCB-MIC: COPPER_RETURN_AUDIT_FAIL_rc{copper_audit_rc}"
+                )
+
+            if copper_audit_rc == 0:
+                audit_output = ART / "PCB-MIC" / "review_b_preflight_audit.json"
+                audit_rc = run(
+                    [
+                        sys.executable,
+                        str(PCB_MIC_REVIEW_B_AUDIT.relative_to(ROOT)),
+                        "--artifact-root", str(ART / "PCB-MIC"),
+                        "--output", str(audit_output),
+                        "--commit-sha", git_head(),
+                    ],
+                    check=False,
+                )
+                if audit_rc == 0:
+                    mic["review_b_preflight_state"] = (
+                        "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN"
+                    )
+                else:
+                    mic["review_b_preflight_state"] = f"FAIL_rc{audit_rc}"
+                    cli_failures.append(f"PCB-MIC: REVIEW_B_PREFLIGHT_FAIL_rc{audit_rc}")
+            else:
+                mic["review_b_preflight_state"] = "NOT_RUN_COPPER_RETURN_AUDIT_FAILURE"
         else:
+            mic["copper_return_review_state"] = "NOT_RUN_PREREQUISITE_CLI_FAILURE"
             mic["review_b_preflight_state"] = "NOT_RUN_PREREQUISITE_CLI_FAILURE"
 
     if not all_missing and not cli_failures:

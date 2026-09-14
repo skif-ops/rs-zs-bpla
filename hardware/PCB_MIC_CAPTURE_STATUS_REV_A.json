@@ -43,9 +43,11 @@
       "artifacts/kicad-native/PCB-MIC/PCB-MIC_pos.csv",
       "artifacts/kicad-native/PCB-MIC/PCB-MIC_manufacturing_bom.csv",
       "artifacts/kicad-native/PCB-MIC/PCB-MIC_assembly_fabrication.pdf",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_copper_review.pdf",
+      "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
       "artifacts/kicad-native/sha256_manifest.json"
     ],
-    "routing_status": "PRESENT_CLI_DRC_AND_INTERNAL_CAM_PREFLIGHT_PASS_REVIEW_B_OPEN"
+    "routing_status": "PRESENT_INTERNAL_CAM_PASS_COPPER_RETURN_HOLD_REVIEW_B_OPEN"
   },
   "component_contract": {
     "microphone": "TDK InvenSense MMICT5838-00-012",
@@ -84,11 +86,38 @@
   },
   "review_b": {
     "complete": false,
-    "status": "OPEN_HUMAN_COPPER_REVIEW_PANELIZATION_DFM_ADHESIVE_COATING_ACOUSTIC_STACK_AND_SIGNATURE",
+    "status": "HOLD_COPPER_RETURN_ECO_DECISION_AND_REMAINING_REVIEW_B_GATES",
     "checklist": "hardware/reviews/PCB_MIC_REVIEW_B_CHECKLIST_REV_A.md",
     "reviewer": null,
     "date": null,
     "commit_sha": null,
+    "copper_return_gate": {
+      "complete": false,
+      "status": "HOLD_UNFILLED_GND_ZONE_AND_DECOUPLING_RETURN_REQUIRE_HUMAN_ECO_DECISION",
+      "packet": "hardware/reviews/PCB_MIC_REVIEW_B_COPPER_RETURN_REV_A.md",
+      "audit": "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
+      "drawing": "artifacts/kicad-native/PCB-MIC/PCB-MIC_copper_review.pdf",
+      "commit_bound_ci_status": "PENDING",
+      "baseline_cam_evidence": {
+        "evidence_commit_sha": "7d7776e67001c0cff00643f524ceff9d0f0536af",
+        "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34835113074",
+        "artifact_id": 10343758832,
+        "artifact_digest": "sha256:2867ce92728a8f7c490f4856155a1ceb987b92e47165c1c8627ace57030cffd8"
+      },
+      "machine_measurement": {
+        "c1_to_mk1_vdd_trace_length_mm": 1.658011,
+        "c1_to_mk1_ground_return_trace_length_mm": 22.248973,
+        "decoupling_loop_trace_length_mm": 23.906984,
+        "source_zone_cached_filled_polygons": 0,
+        "baseline_cam_gnd_regions": 0
+      },
+      "reviewer": null,
+      "date": null,
+      "commit_sha": null,
+      "decision": null,
+      "review_b_complete": false,
+      "manufacturing_release": false
+    },
     "internal_preflight": {
       "complete": true,
       "status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
