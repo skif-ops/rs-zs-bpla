@@ -1,20 +1,20 @@
-RFQ_ID,Category,Manufacturer,MPN_or_spec,Required_qty_4,Required_qty_10,Required_qty_20,Preferred_channel,Quote_date,Supplier,URL,MOQ,Lead_time_days,Stock_claim,Traceability_required,Sample_required,Status,Blocking_check
-RFQ-001,MCU,STMicroelectronics,STM32U585VIT6Q,5,13,25,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Package marking ID readout and exact LQFP100 package control
-RFQ-002,Microphone,TDK InvenSense,MMICT5838-00-012 same lot,20,48,96,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Acoustic sensitivity noise phase matching and bottom-port assembly control
-RFQ-003,Cellular,Quectel,BG95-M3 regional firmware identity,5,13,25,Quectel authorized channel,,,,,,,Yes,Yes,RFQ_REQUIRED,Ordered regional identity operator bands IMEI attach burst and TLS
-RFQ-004,GNSS,u-blox,MAX-M10S-00B,5,13,25,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Fix sensitivity PPS and antenna interface
-RFQ-005,LoRa,Ebyte,E22-900M22S,6,13,26,Ebyte official or authorized,,,,,,,Yes,Yes,RFQ_REQUIRED,Quote and COC must state 20x14 22-pad castellated-ANT option with no module IPEX fitted; conducted RF RU868 windows 864-865 and 868.7-869.2 MHz plus sleep current
-RFQ-006,BLE,Raytac,MDBT50Q-P1MV2,5,13,25,Raytac authorized or traceable distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Exact module suffix integrated-antenna keepout BLE pairing OTA current and RF range
-RFQ-007,QSPI NOR,Winbond,W25Q512JVFIQ,5,13,25,Authorized or traceable tier-1,,,,,,,Yes,Yes,RFQ_REQUIRED,JEDEC ID full read write erase soak
-RFQ-008,Battery,TBD,12.8 V 40-60 Ah LiFePO4 with BMS,5,11,21,Cell or pack manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,UN38.3 MSDS capacity DCIR thresholds low-temp inhibit
-RFQ-009,Solar,TBD,60-80 W outdoor panel,5,11,21,Panel manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,Voc Isc Pmax insulation weathering evidence
-RFQ-010,MPPT,TBD,10 A LiFePO4 sealed MPPT,5,11,21,Controller manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,Charge profile cold Voc low-temp reverse current quiescent
-RFQ-011,PCBA main,TBD,6-layer assembled main PCB 110x75x1.6 mm,5,11,22,Qualified CM with AOI,,,,,,,Yes,Yes,RFQ_REQUIRED,"final stackup and 50 Ohm coupon; DFM stencil traceability test coverage; MAIN-AUTH-011 outline/keepout compliance"
-RFQ-012,PCBA mic,TBD,2-layer assembled microphone PCB,18,44,88,Qualified CM with AOI,,,,,,,Yes,Yes,RFQ_REQUIRED,Acoustic port contamination and lot control
-RFQ-013,PCBA power,TBD,assembled power PCB stackup pending DIM-003,5,11,22,Qualified CM with thermal process,,,,,,,Yes,Yes,RFQ_REQUIRED,Current thermal copper Kelvin routing and functional test
-RFQ-014,Harness,TBD,Labeled station harness set,5,11,22,Qualified harness factory,,,,,,,Yes,Yes,RFQ_REQUIRED,Crimp tooling pull force exact lengths and 100 percent continuity
-RFQ-015,SIM switch,Texas Instruments,TS3A27518EPWR,5,13,25,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Supply leakage Ron capacitance ESD and BG95 signal integrity
-RFQ-016,SIM connector,TE Connectivity,2336582-1,10,26,50,Authorized or traceable TE distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Exact drawing revision mating cycles coplanarity card detect and service access
-RFQ-017,Vacuum-cast housing,TBD,Outdoor polyurethane housing set with inserts seals and service cover,4,10,20,Qualified vacuum casting manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,FAI shrink cure material UV finish leak fit acoustic and RF checks for selected EVT lot
-RFQ-018,3D-printed fallback housing,TBD,Outdoor printed housing set with inserts seals and service cover,0,0,0,Qualified print supplier or controlled FlashForge 5M Pro process,,,,,,,Yes,Yes,CONDITIONAL_CAPACITY_QUOTE,Quote capacity for 4 10 and 20; procure only after fallback activation
-RFQ-019,Injection-molding DFM,TBD,Independent CAD DFM and tool quotation package,0,0,0,Qualified mold manufacturer,,,,,,,Yes,No,SOURCE_DATA_AND_DFM_ONLY,Review tool concept material draft wall ribs bosses parting ejector shrink and expected tooling lead time; no tooling authorization
+RFQ_ID,BOM_Item_IDs,Category,Manufacturer,MPN_or_spec,Required_qty_4,Required_qty_10,Required_qty_20,Preferred_channel,Quote_date,Supplier,URL,MOQ,Lead_time_days,Stock_claim,Traceability_required,Sample_required,Status,Blocking_check
+RFQ-001,U1,MCU,STMicroelectronics,STM32U585VIT6Q,5,13,25,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Package marking ID readout and exact LQFP100 package control
+RFQ-002,MK1,Microphone,TDK InvenSense,MMICT5838-00-012 same lot,20,48,96,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Acoustic sensitivity noise phase matching and bottom-port assembly control
+RFQ-003,U8,Cellular,Quectel,BG95-M3 marking and firmware identity,5,13,25,Quectel authorized channel,,,,,,,Yes,Yes,RFQ_REQUIRED,Verify ordered BG95-M3 marking and firmware identity at incoming; operator SIM attach burst and TLS remain assembled-station EVT
+RFQ-004,U9,GNSS,u-blox,MAX-M10S-00B,5,13,25,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Fix sensitivity PPS and antenna interface
+RFQ-005,U10,LoRa,Ebyte,E22-900M22S,6,13,26,Ebyte official or authorized,,,,,,,Yes,Yes,RFQ_REQUIRED,Quote and COC must state 20x14 22-pad castellated-ANT option with no module IPEX fitted; conducted RF RU868 windows 864-865 and 868.7-869.2 MHz plus sleep current
+RFQ-006,U11,BLE,Raytac,MDBT50Q-P1MV2,5,13,25,Raytac authorized or traceable distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Exact module suffix integrated-antenna keepout BLE pairing OTA current and RF range
+RFQ-007,U2,QSPI NOR,Winbond,W25Q512JVFIQ,5,13,25,Authorized or traceable tier-1,,,,,,,Yes,Yes,RFQ_REQUIRED,JEDEC ID full read write erase soak
+RFQ-008,BAT1,Battery,TBD,12.8 V 40-60 Ah LiFePO4 with BMS,5,11,21,Cell or pack manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,UN38.3 MSDS capacity DCIR thresholds low-temp inhibit
+RFQ-009,PV1,Solar,TBD,60-80 W outdoor panel,5,11,21,Panel manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,Voc Isc Pmax insulation weathering evidence
+RFQ-010,MPPT1,MPPT,TBD,10 A LiFePO4 sealed MPPT,5,11,21,Controller manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,Charge profile cold Voc low-temp reverse current quiescent
+RFQ-011,ASM-MAIN,PCBA main,TBD,6-layer assembled main PCB 110x75x1.6 mm,5,11,22,Qualified CM with AOI,,,,,,,Yes,Yes,RFQ_REQUIRED,"final stackup and 50 Ohm coupon; DFM stencil traceability test coverage; MAIN-AUTH-011 outline/keepout compliance"
+RFQ-012,ASM-MIC,PCBA mic,TBD,2-layer assembled microphone PCB,18,44,88,Qualified CM with AOI,,,,,,,Yes,Yes,RFQ_REQUIRED,Acoustic port contamination and lot control
+RFQ-013,ASM-PWR,PCBA power,TBD,assembled power PCB stackup pending DIM-003,5,11,22,Qualified CM with thermal process,,,,,,,Yes,Yes,RFQ_REQUIRED,Current thermal copper Kelvin routing and functional test
+RFQ-014,HARNESS,Harness,TBD,Labeled station harness set,5,11,22,Qualified harness factory,,,,,,,Yes,Yes,RFQ_REQUIRED,Crimp tooling pull force exact lengths and 100 percent continuity
+RFQ-015,U13,SIM switch,Texas Instruments,TS3A27518EPWR,5,13,25,Authorized distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Supply leakage Ron capacitance ESD and BG95 signal integrity
+RFQ-016,J-SIM1|J-SIM2,SIM connector,TE Connectivity,2336582-1,10,26,50,Authorized or traceable TE distributor,,,,,,,Yes,Yes,RFQ_REQUIRED,Exact drawing revision mating cycles coplanarity card detect and service access
+RFQ-017,HSG-VC,Vacuum-cast housing,TBD,Outdoor polyurethane housing set with inserts seals and service cover,4,10,20,Qualified vacuum casting manufacturer,,,,,,,Yes,Yes,RFQ_REQUIRED,FAI shrink cure material UV finish leak fit acoustic and RF checks for selected EVT lot
+RFQ-018,HSG-3D,3D-printed fallback housing,TBD,Outdoor printed housing set with inserts seals and service cover,0,0,0,Qualified print supplier or controlled FlashForge 5M Pro process,,,,,,,Yes,Yes,CONDITIONAL_CAPACITY_QUOTE,Quote capacity for 4 10 and 20; procure only after fallback activation
+RFQ-019,HSG-IM,Injection-molding DFM,TBD,Independent CAD DFM and tool quotation package,0,0,0,Qualified mold manufacturer,,,,,,,Yes,No,SOURCE_DATA_AND_DFM_ONLY,Review tool concept material draft wall ribs bosses parting ejector shrink and expected tooling lead time; no tooling authorization

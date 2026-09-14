@@ -64,7 +64,9 @@ item ID and must not leak into procurement quantities.
 
 QG-1 (`tools/validate_evt_pre_20_bom_qg1.py`) checks schema, 4/10/20 arithmetic,
 spare-policy application, engineering-to-procurement reconciliation, native PCB-PWR
-major RefDes mapping, connector MPNs and quantity invariants.
+major RefDes mapping, connector MPNs and quantity invariants. Every controlled RFQ
+also names its source BOM item or items; QG-1 independently sums their
+`Procure_qty_4/10/20` values and requires an exact match to the RFQ quantities.
 
 QG-2 (`tools/audit_evt_pre_20_bom_qg2.py`) independently compares freeze tables,
 checks exact fitted-line fields, independently reconstructs the 17 PCB-PWR passive

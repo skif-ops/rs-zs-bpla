@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
 PROCUREMENT_BOM = ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+RFQ = ROOT / "hardware/CHINA_PROCUREMENT_RFQ.csv"
 OUT = ROOT / "artifacts/evt_pre_20_bom_qg1.json"
 LOT_SIZES = (4, 10, 20)
 
@@ -33,6 +34,13 @@ PROCUREMENT_REQUIRED_FIELDS = {
     for lot_size in LOT_SIZES
     for field in (f"Qty_{lot_size}", f"Spares_{lot_size}", f"Procure_qty_{lot_size}")
 }
+
+RFQ_REQUIRED_FIELDS = {
+    "RFQ_ID", "BOM_Item_IDs", "Category", "Manufacturer", "MPN_or_spec",
+    "Preferred_channel", "Quote_date", "Supplier", "URL", "MOQ",
+    "Lead_time_days", "Stock_claim", "Traceability_required", "Sample_required",
+    "Status", "Blocking_check",
+} | {f"Required_qty_{lot_size}" for lot_size in LOT_SIZES}
 
 
 def require(ok: bool, message: str) -> None:
@@ -201,6 +209,34 @@ def main() -> None:
                 f"{row['Procurement_ID']}: procurement quantity formula mismatch for lot {lot_size}",
             )
 
+    with RFQ.open(encoding="utf-8-sig", newline="") as source:
+        reader = csv.DictReader(source)
+        require(reader.fieldnames is not None, "RFQ header missing")
+        require(
+            RFQ_REQUIRED_FIELDS.issubset(reader.fieldnames),
+            f"RFQ fields missing: {sorted(RFQ_REQUIRED_FIELDS - set(reader.fieldnames))}",
+        )
+        rfq_rows = list(reader)
+    require(len(rfq_rows) == 19, f"expected 19 controlled RFQ rows, got {len(rfq_rows)}")
+    rfq_ids = [row["RFQ_ID"] for row in rfq_rows]
+    require(all(rfq_ids) and len(set(rfq_ids)) == len(rfq_ids), "duplicate or empty RFQ_ID")
+    mapped_items: list[str] = []
+    for row in rfq_rows:
+        items = [item.strip() for item in row["BOM_Item_IDs"].split("|") if item.strip()]
+        require(items, f"{row['RFQ_ID']}: BOM item mapping is empty")
+        missing_items = sorted(set(items) - set(by_id))
+        require(not missing_items, f"{row['RFQ_ID']}: unknown BOM items {missing_items}")
+        mapped_items.extend(items)
+        for lot_size in LOT_SIZES:
+            field = f"Required_qty_{lot_size}"
+            require(row[field].isdigit(), f"{row['RFQ_ID']}: invalid {field}")
+            expected = sum(int(by_id[item][f"Procure_qty_{lot_size}"]) for item in items)
+            require(
+                int(row[field]) == expected,
+                f"{row['RFQ_ID']}: {field}={row[field]} does not match BOM total {expected}",
+            )
+    require(len(mapped_items) == len(set(mapped_items)), "one BOM item is mapped to multiple RFQs")
+
     serialized = "\n".join(",".join(row.values()) for row in rows)
     for forbidden in ("ESP32-C3", "JST_BM05B", "GHR-05V-S", "5040500591", "5040510501"):
         require(forbidden not in serialized, f"superseded token in BOM: {forbidden}")
@@ -210,6 +246,8 @@ def main() -> None:
         "status": "PASS",
         "rows": len(rows),
         "procurement_rows": len(procurement_rows),
+        "rfq_rows": len(rfq_rows),
+        "rfq_mapped_bom_items": len(mapped_items),
         "lot_sizes": list(LOT_SIZES),
         "quantity_formula_rows": {str(lot_size): len(rows) for lot_size in LOT_SIZES},
         "pcb_pwr_refdes_checked": len(expected_pwr_refs),
