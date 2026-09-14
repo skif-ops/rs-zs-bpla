@@ -201,9 +201,14 @@ def main() -> int:
     finally:
         reader.close()
 
+    try:
+        workbook_display = str(workbook_path.relative_to(ROOT))
+    except ValueError:
+        workbook_display = str(workbook_path)
+
     result = {
         "status": "PASS",
-        "workbook": str(workbook_path.relative_to(ROOT)),
+        "workbook": workbook_display,
         "workbook_sha256": sha256(workbook_path),
         "worksheets": {
             name: {
