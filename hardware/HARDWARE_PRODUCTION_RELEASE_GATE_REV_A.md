@@ -34,8 +34,8 @@ candidates or successful software tests.
 
 - exact and released BAT1, PV1, MPPT1, ANT-CELL, ANT-GNSS, ANT-LORA, HARNESS and
   HSG-VC system identities;
-- PCB-MAIN, PCB-MIC and PCB-PWR routing, DRC, CAM, production outputs, DFM and
-  independent Review B;
+- PCB-MAIN and PCB-PWR routing; all three boards' DRC, CAM, production outputs,
+  DFM and independent Review B;
 - assembler acceptance of the PCB-MAIN U2/U25/U26 project IPC candidates and
   process-dependent stencil/mask rules;
 - PCB-PWR DIM-003 and the remaining enclosure, antenna, harness, installation and

@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -41,9 +42,9 @@ def read_json(relative_path: str) -> dict[str, object]:
 def board_copper_counts(path: Path) -> dict[str, int]:
     text = path.read_text(encoding="utf-8", errors="replace") if path.is_file() else ""
     return {
-        "segments": text.count("(segment "),
-        "vias": text.count("(via "),
-        "zones": text.count("(zone "),
+        "segments": len(re.findall(r"\(segment\b", text)),
+        "vias": len(re.findall(r"\(via\b", text)),
+        "zones": len(re.findall(r"\(zone\b", text)),
     }
 
 
@@ -128,12 +129,12 @@ def audit() -> dict[str, object]:
     for board, files in BOARD_FILES.items():
         missing = [name for name, path in files.items() if not path.is_file()]
         copper = board_copper_counts(files["board"])
-        routed = copper["segments"] > 0
+        routing_present = copper["segments"] > 0
         board_results[board] = {
             "files": {name: str(path.relative_to(ROOT)) for name, path in files.items()},
             "missing": missing,
             "copper": copper,
-            "routed": routed,
+            "routing_present": routing_present,
         }
         check(
             f"{board.lower()}_native_source",
@@ -142,8 +143,8 @@ def audit() -> dict[str, object]:
             f"{board} native source set is incomplete: {', '.join(missing)}",
         )
         check(
-            f"{board.lower()}_routing",
-            routed,
+            f"{board.lower()}_routing_presence",
+            routing_present,
             f"segments={copper['segments']} vias={copper['vias']} zones={copper['zones']}",
             f"{board} routing is absent",
         )
@@ -178,6 +179,21 @@ def audit() -> dict[str, object]:
         "PCB-PWR DIM-003/routing/DRC/CAM/DFM Review B release is not complete",
     )
 
+    mic_status = read_json("hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json")
+    mic_review_a = mic_status.get("review_a", {})
+    mic_review_b = mic_status.get("review_b", {})
+    mic_status_ok = (
+        mic_status.get("schema_version") == 1
+        and mic_status.get("configuration") == "EVT-PRE-20 Rev.A"
+        and mic_status.get("assembly") == "PCB-MIC"
+    )
+    check(
+        "pcb_mic_release_status_control",
+        mic_status_ok,
+        str(mic_status.get("release_state", "MISSING")),
+        "PCB-MIC controlled release-status record is missing or invalid",
+    )
+
     mic_metadata = read_json("hardware/kicad/native/PCB-MIC/fabrication_metadata.json")
     expected_mic_authority = "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md"
     mic_authority = str(mic_metadata.get("authority", ""))
@@ -188,11 +204,25 @@ def audit() -> dict[str, object]:
         mic_authority or "MISSING",
         "PCB-MIC fabrication metadata does not resolve to the controlled mechanical authority",
     )
-    mic_released = mic_metadata.get("status") == "FOR_MANUFACTURE"
+    mic_released = (
+        mic_status_ok
+        and mic_status.get("manufacturing_release") is True
+        and isinstance(mic_review_a, dict)
+        and mic_review_a.get("complete") is True
+        and mic_review_a.get("status") == "PASS"
+        and isinstance(mic_review_b, dict)
+        and mic_review_b.get("complete") is True
+        and mic_review_b.get("status") == "PASS"
+        and mic_metadata.get("status") == "FOR_MANUFACTURE"
+    )
     check(
         "pcb_mic_fabrication_release",
         mic_released,
-        str(mic_metadata.get("status", "MISSING")),
+        (
+            f"status={mic_status.get('release_state', 'MISSING')}; "
+            f"Review A={mic_review_a.get('status', 'MISSING') if isinstance(mic_review_a, dict) else 'MISSING'}; "
+            f"Review B={mic_review_b.get('status', 'MISSING') if isinstance(mic_review_b, dict) else 'MISSING'}"
+        ),
         "PCB-MIC Review A/Review B/DFM fabrication release is not complete",
     )
 

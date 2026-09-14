@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-MIC",
+  "release_state": "NATIVE_ROUTED_CANDIDATE_REVIEW_A_OPEN",
+  "manufacturing_release": false,
+  "authoritative_inputs": [
+    "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
+    "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
+    "hardware/T5838_AAD_INTERFACE_REV_A.md",
+    "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+    "hardware/CONNECTOR_FREEZE_REV_A.csv",
+    "hardware/EVT_PRE_20_BOM_REV_A.csv"
+  ],
+  "native_source": {
+    "schematic": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch",
+    "board": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
+    "project": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro",
+    "fabrication_metadata": "hardware/kicad/native/PCB-MIC/fabrication_metadata.json",
+    "routing_status": "PRESENT_NOT_DRC_OR_CAM_RELEASED"
+  },
+  "component_contract": {
+    "microphone": "TDK InvenSense MMICT5838-00-012",
+    "connector": "Molex 5040500691",
+    "decoupling": "TDK CGA2B3X7R1E104K050BB",
+    "data_tuning_resistor": "Panasonic ERJ-2GE0R00X",
+    "boards_per_station": 4
+  },
+  "mechanical_contract": {
+    "outline_mm": [24.0, 22.0],
+    "thickness_mm": 1.0,
+    "mounting_holes": "H1/H2 NPTH 2.2 mm at X4/X20 Y16.65",
+    "acoustic_port": "NPTH 0.8 mm at X12 Y16.65",
+    "authority": "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
+    "status": "DIM_004_CLOSED"
+  },
+  "review_a": {
+    "complete": false,
+    "status": "OPEN_NATIVE_ERC_PIN_NET_BOM_AND_GEOMETRY_EVIDENCE",
+    "checklist": "hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
+    "reviewer": null,
+    "date": null,
+    "commit_sha": null
+  },
+  "review_b": {
+    "complete": false,
+    "status": "OPEN_DRC_CAM_PANELIZATION_DFM_ACOUSTIC_STACK_AND_EVIDENCE",
+    "checklist": "hardware/reviews/PCB_MIC_REVIEW_B_CHECKLIST_REV_A.md",
+    "reviewer": null,
+    "date": null,
+    "commit_sha": null
+  },
+  "physical_evt": {
+    "status": "NOT_RUN",
+    "required_evidence": [
+      "assembled acoustic-port inspection",
+      "membrane and cavity tolerance stack",
+      "per-board sensitivity noise phase and delay calibration",
+      "panelization and depanel damage inspection"
+    ]
+  }
+}

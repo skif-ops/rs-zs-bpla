@@ -141,6 +141,7 @@ jobs:
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md
             hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json
+            hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json
             firmware/targets/evt_pre_20/target_contract_manifest.json
             firmware/targets/evt_pre_20/stm32_scaffold_manifest.json
             firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc

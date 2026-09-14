@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import csv
+import json
 from pathlib import Path
 
 
@@ -265,6 +266,21 @@ def validate_hardware_baseline() -> None:
     require("12-pin" in pwr_addendum and "INA226" in pwr_addendum, "Rev.A 12-pin/INA226 capture addendum missing")
     require("Review A" in gate and "Review B" in gate, "double-review PCB gate is incomplete")
     require("FOR_MANUFACTURE" in gate, "PCB release state is not defined")
+
+    mic_status = json.loads((ROOT / "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8"))
+    require(mic_status["assembly"] == "PCB-MIC", "PCB-MIC release-status identity mismatch")
+    require(mic_status["manufacturing_release"] is False, "PCB-MIC was released without Review A/B evidence")
+    require(mic_status["review_a"]["complete"] is False, "PCB-MIC Review A was marked complete without signing evidence")
+    require(mic_status["review_b"]["complete"] is False, "PCB-MIC Review B was marked complete without manufacturing evidence")
+    mic_metadata = json.loads(
+        (ROOT / "hardware/kicad/native/PCB-MIC/fabrication_metadata.json").read_text(encoding="utf-8")
+    )
+    mic_authority = ROOT / mic_metadata["authority"]
+    require(mic_authority.is_file(), "PCB-MIC fabrication metadata authority is unresolved")
+    require(
+        mic_metadata["authority"] == mic_status["mechanical_contract"]["authority"],
+        "PCB-MIC mechanical authority differs between release status and fabrication metadata",
+    )
 
     bom = {row["Item_ID"]: row for row in read_csv("hardware/EVT_PRE_20_BOM_DRAFT.csv")}
     require(bom["U1"]["MPN"] == "STM32U585VIT6Q", "BOM MCU does not match baseline")
