@@ -69,6 +69,12 @@ also names its source BOM item or items; QG-1 independently sums their
 `Procure_qty_4/10/20` values and requires an exact match to the RFQ quantities.
 Dedicated RFQs are mandatory for the eight purchase-release system/mechanical items
 `BAT1`, `PV1`, `MPPT1`, `ANT-CELL`, `ANT-GNSS`, `ANT-LORA`, `HARNESS` and `HSG-VC`.
+The three PCBA service lines `ASM-MAIN`, `ASM-MIC` and `ASM-PWR` and the three bare-PCB
+fabrication lines `PCB-MAIN`, `PCB-MIC` and `PCB-PWR` also require six separate RFQs.
+The PCBA and bare-PCB quantities must not be merged because their spare policies and
+procurement quantities differ. A PCB-PWR fabrication RFQ may collect a clearly marked
+provisional budgetary response, but it is not build authorization while `DIM-003`, the
+final stackup/copper weight, routing, CAM and Review B remain open.
 
 QG-2 (`tools/audit_evt_pre_20_bom_qg2.py`) independently compares freeze tables,
 checks exact fitted-line fields, independently reconstructs the 17 PCB-PWR passive

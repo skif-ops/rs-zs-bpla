@@ -217,7 +217,7 @@ def main() -> None:
             f"RFQ fields missing: {sorted(RFQ_REQUIRED_FIELDS - set(reader.fieldnames))}",
         )
         rfq_rows = list(reader)
-    require(len(rfq_rows) == 22, f"expected 22 controlled RFQ rows, got {len(rfq_rows)}")
+    require(len(rfq_rows) == 25, f"expected 25 controlled RFQ rows, got {len(rfq_rows)}")
     rfq_ids = [row["RFQ_ID"] for row in rfq_rows]
     require(all(rfq_ids) and len(set(rfq_ids)) == len(rfq_ids), "duplicate or empty RFQ_ID")
     mapped_items: list[str] = []
@@ -251,6 +251,18 @@ def main() -> None:
         all(rfq_items_by_id.get(rfq_id) == item for rfq_id, item in required_system_rfqs.items()),
         "system/mechanical purchase-release RFQ coverage mismatch",
     )
+    required_pcb_rfqs = {
+        "RFQ-011": "ASM-MAIN",
+        "RFQ-012": "ASM-MIC",
+        "RFQ-013": "ASM-PWR",
+        "RFQ-023": "PCB-MAIN",
+        "RFQ-024": "PCB-MIC",
+        "RFQ-025": "PCB-PWR",
+    }
+    require(
+        all(rfq_items_by_id.get(rfq_id) == item for rfq_id, item in required_pcb_rfqs.items()),
+        "PCBA service and bare-PCB fabrication RFQ coverage mismatch",
+    )
 
     serialized = "\n".join(",".join(row.values()) for row in rows)
     for forbidden in ("ESP32-C3", "JST_BM05B", "GHR-05V-S", "5040500591", "5040510501"):
@@ -264,6 +276,7 @@ def main() -> None:
         "rfq_rows": len(rfq_rows),
         "rfq_mapped_bom_items": len(mapped_items),
         "system_rfq_items": list(required_system_rfqs.values()),
+        "pcb_rfq_items": list(required_pcb_rfqs.values()),
         "lot_sizes": list(LOT_SIZES),
         "quantity_formula_rows": {str(lot_size): len(rows) for lot_size in LOT_SIZES},
         "pcb_pwr_refdes_checked": len(expected_pwr_refs),
