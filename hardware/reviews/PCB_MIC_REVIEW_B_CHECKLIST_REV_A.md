@@ -1,11 +1,11 @@
 # PCB-MIC Rev.A Review B checklist
 
-Status: `BLOCKED ON REPEAT REVIEW A AFTER COPPER ECO / NOT SIGNED / NOT FOR MANUFACTURE`
+Status: `OPEN AFTER REPEAT REVIEW A / NOT SIGNED / NOT FOR MANUFACTURE`
 
-Review B is an independent PCB/CAM/assembly pass performed only after signed
-Review A. The earlier Review-A signature is superseded for the changed board bytes,
-so no Review-B item below can grant release until the ECO candidate receives a new
-Review-A signature.
+Review B is an independent PCB/CAM/assembly pass performed after signed Review A.
+Repeat Review A is now signed for the copper ECO source, so Review B may proceed.
+No machine preflight or Review-A signature completes the remaining human, DFM,
+panelization, acoustic-stack or physical-EVT gates below.
 
 - [x] Native PCB contains a routed candidate rather than an empty placement canvas.
 - [x] Mechanical outline, mounting pattern and acoustic opening are represented in native CAD.
@@ -16,6 +16,7 @@ Review-A signature.
   - [x] The ECO candidate removes the non-materialized zone and adds a direct explicit 0.50 mm B.Cu C1 return.
   - [x] Local independent parsing measures the candidate return at 7.108150 mm and loop at 8.766161 mm.
   - [x] Commit-bound candidate CAM and copper drawings are archived and independently checked for evidence integrity.
+  - [x] Repeat Review A is signed by `Скиф` for commit `e17a86bc78ba979f74c5549b378e94f7f3447fe4` and PCB SHA-256 `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031`.
 - [ ] The bottom acoustic port has no paste, mask, adhesive or coating obstruction.
   - [x] Baseline CAM proved zero paste flashes at acoustic and mounting holes and exact F/B mask openings.
   - [x] ECO candidate CAM reconfirms the baseline machine checks.
@@ -43,8 +44,8 @@ validate or sign the ECO candidate.
 
 ## ECO candidate state
 
-- Review A: `REVIEW_REQUIRED_AFTER_COPPER_ECO`.
-- Review B: `BLOCKED_PENDING_REPEAT_REVIEW_A_AFTER_COPPER_ECO`.
+- Review A: `PASS`, repeat signature recorded for commit `e17a86bc78ba979f74c5549b378e94f7f3447fe4`.
+- Review B: `OPEN_COPPER_RETURN_AND_REMAINING_REVIEW_B_GATES`.
 - Candidate design commit: `159068f2743904fc366a4a65ede5fee829797ed2`.
 - Native PCB SHA-256: `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031`.
 - Candidate evidence: `PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A`.
@@ -52,7 +53,7 @@ validate or sign the ECO candidate.
 - PCB Native Gate: [run #160](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515), `success`.
 - Artifact: [evt-pre-20-kicad-native-gate](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515/artifacts/10350416547), ID `10350416547`, SHA-256 `cc32b9f7327d9c1c8870c68f70419f96aa83b412973b2d7cde9ded711fb9f31d`.
 - Hash control: 62 manifest entries, 12 controlled source hashes and 27 PCB-MIC output hashes verified.
-- Review-B decision: `OPEN` after repeat Review A.
+- Review-B decision: `OPEN`.
 - Manufacturing release: `false`.
 
 Physical calibration and acoustic EVT begin only after assembled boards exist and

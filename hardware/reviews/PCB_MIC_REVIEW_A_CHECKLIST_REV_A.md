@@ -1,13 +1,12 @@
 # PCB-MIC Rev.A Review A checklist
 
-Status: `REOPENED AFTER COPPER ECO / SIGNATURE REQUIRED / NOT FOR MANUFACTURE`
+Status: `PASS / REPEAT REVIEW A SIGNED / NOT FOR MANUFACTURE`
 
 Review A was reopened because the native PCB bytes changed after the copper-return
-review selected `ECO_REQUIRED`. The schematic, exact component identities, pin/net
-binding and frozen mechanical interface remain controlled, but the new PCB commit
-must receive fresh commit-bound evidence and a new human signature. The evidence is
-now complete for design commit `159068f2743904fc366a4a65ede5fee829797ed2`;
-the signature remains open.
+review selected `ECO_REQUIRED`. The bounded ECO, unchanged schematic and mechanical
+contract, exact component identities, pin/net binding, commit-bound evidence and
+archived CAM outputs were reviewed again. Reviewer `Скиф` approved the controlled
+evidence commit and exact PCB hash recorded below.
 
 ## ECO candidate controls
 
@@ -21,29 +20,32 @@ the signature remains open.
 - [x] The independent standard-library parser measures C1.2-to-MK1.2 return `7.108150 mm` and full decoupling loop `8.766161 mm`.
 - [x] Commit-bound KiCad 9 ERC and DRC reports pass with zero violations and zero unrouted items for the ECO candidate commit.
 - [x] Committed and regenerated geometry reports, CAM files, copper SVGs and SHA-256 manifest are archived for the ECO candidate commit.
-- [ ] Reviewer, date, reviewed commit SHA and evidence links are recorded in `PCB_MIC_CAPTURE_STATUS_REV_A.json`.
+- [x] Reviewer, date, reviewed commit SHA and evidence links are recorded in `PCB_MIC_CAPTURE_STATUS_REV_A.json`.
 
 ## ECO candidate evidence
 
 - Design commit: `159068f2743904fc366a4a65ede5fee829797ed2`.
+- Reviewed controlled evidence commit: `e17a86bc78ba979f74c5549b378e94f7f3447fe4`.
 - Native PCB SHA-256: `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031`.
-- CI: [run #430](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294478), `success`.
-- PCB Native Gate: [run #160](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515), `success`.
-- Artifact: [evt-pre-20-kicad-native-gate](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515/artifacts/10350416547), ID `10350416547`.
-- Artifact ZIP SHA-256 and GitHub digest: `cc32b9f7327d9c1c8870c68f70419f96aa83b412973b2d7cde9ded711fb9f31d`.
+- CI: [run #431](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34851982915), `success`.
+- PCB Native Gate: [run #161](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34851983013), `success`.
+- Artifact: [evt-pre-20-kicad-native-gate](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34851983013/artifacts/10350269024), ID `10350269024`.
+- Artifact ZIP SHA-256 and GitHub digest: `c54b6669b40fa4de3cd3b0515e4bdb742d90f4ab6f40a789eb1f7bb82dfd19ba`.
 - Hash control: all 62 manifest entries, 12 controlled source hashes and 27 PCB-MIC output hashes independently verified.
 - KiCad 9.0.9: ERC `0`, DRC `0`, unrouted `0`, schematic parity `0`.
-- Internal CAM preflight: `PASS_ECO_CANDIDATE_CAM_PREFLIGHT_REPEAT_REVIEW_A_REQUIRED`.
+- Archived internal CAM preflight: `PASS_ECO_CANDIDATE_CAM_PREFLIGHT_REPEAT_REVIEW_A_REQUIRED`.
 - Copper audit: `ECO_CANDIDATE_EXPLICIT_LOCAL_RETURN_READY_FOR_REPEAT_REVIEW_A`.
-- Copper drawings: F.Cu SHA-256 `49d0cc972078861b5e790788bc9c36c6c84cf1ab98eec70e93949be74253a20c`; B.Cu SHA-256 `71f6100685f32c91a9eff8ff784ce6a5e1735044282ce4d80691b32101bfe3ed`.
+- Copper drawings: F.Cu SHA-256 `fb5299746e8c6cc75bd71dd5915b05eae81e577aea1ac0b16d6262546143fe95`; B.Cu SHA-256 `66dc3609592146848e5f61cbd3a8a03ac56df8c3bb844164091cd6b9e195b901`.
 
-Decision: `OPEN - REPEAT REVIEW A REQUIRED`.
+Decision: `PASS` for repeat PCB-MIC Review A at controlled evidence commit
+`e17a86bc78ba979f74c5549b378e94f7f3447fe4` and native PCB SHA-256
+`a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031`.
 
-Reviewer signature: `OPEN`
+Reviewer signature: `Скиф`
 
-Date: `OPEN`
+Date: `14.09.2026`
 
-Reviewed ECO candidate commit: `OPEN`
+Reviewed ECO candidate commit: `e17a86bc78ba979f74c5549b378e94f7f3447fe4`
 
 ## Superseded signature history
 

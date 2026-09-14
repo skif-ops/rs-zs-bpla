@@ -1,10 +1,11 @@
 # PCB-MIC Rev.A Review B copper-return and decoupling packet
 
-Status: `ECO_REQUIRED RECORDED / ECO CANDIDATE COMMIT-BOUND CI PASS / REPEAT REVIEW A REQUIRED / REVIEW B BLOCKED / NOT FOR MANUFACTURE`
+Status: `ECO_REQUIRED RECORDED / ECO IMPLEMENTED / REPEAT REVIEW A PASS / REVIEW B OPEN / NOT FOR MANUFACTURE`
 
 This packet records the independent copper-return decision, preserves the baseline
-evidence that caused the hold, and defines the bounded PCB-MIC copper ECO. It does not
-create a new Review-A signature, complete Review B, or grant manufacturing release.
+evidence that caused the hold, and defines the bounded PCB-MIC copper ECO. Repeat
+Review A is now signed against the controlled ECO source and evidence. This does not
+complete Review B or grant manufacturing release.
 
 ## Controlled decision binding
 
@@ -101,13 +102,30 @@ from the extracted artifact produced byte-identical JSON. The B.Cu Gerber contai
 zero GND regions and five explicit GND draws, matching the explicit-routing-only
 source model.
 
+## Repeat Review A signature
+
+| Item | Controlled value |
+|---|---|
+| Reviewer | `Скиф` |
+| Date | `14.09.2026` |
+| Decision | `PASS` |
+| Reviewed controlled evidence commit | `e17a86bc78ba979f74c5549b378e94f7f3447fe4` |
+| Approved native PCB SHA-256 | `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031` |
+| PCB Native Gate | [run #161](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34851983013), `success` |
+| CI | [run #431](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34851982915), `success` |
+| Artifact | [ID 10350269024](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34851983013/artifacts/10350269024) |
+| Artifact SHA-256 | `c54b6669b40fa4de3cd3b0515e4bdb742d90f4ab6f40a789eb1f7bb82dfd19ba` |
+
+The repeat signature accepts the bounded PCB source for Review A. The independent
+Review-B copper-return acceptance and every external manufacturing gate remain open.
+
 ## Required next gates
 
 - [x] Commit and push the ECO candidate as one controlled source set.
 - [x] KiCad 9 ERC and DRC pass with zero violations and zero unrouted items.
 - [x] Commit-bound Gerber confirms explicit-routing-only B.Cu copper with zero GND regions.
 - [x] Updated copper SVGs, topology JSON, CAM reports and SHA-256 manifest are archived.
-- [ ] Repeat Review A is signed against the ECO candidate commit and its archived evidence.
+- [x] Repeat Review A is signed against the ECO candidate commit and its archived evidence.
 - [ ] Repeat the independent copper-return decision within Review B after Review A closes.
 - [ ] Complete the remaining panelization, DFM, acoustic-stack and physical-EVT gates.
 
@@ -118,6 +136,6 @@ source model.
 - Reviewed evidence commit: `cb69c0bbc1457b498ee4f44ee7da1d566033c23f`
 - Workflow and artifact: PCB Native Gate `34840246015`, artifact `10345408977`
 - Disposition: `ECO_REQUIRED`
-- New Review A complete: `false`
+- New Review A complete: `true`, signed separately against commit `e17a86bc78ba979f74c5549b378e94f7f3447fe4`
 - Review B complete: `false`
 - Manufacturing release: `false`
