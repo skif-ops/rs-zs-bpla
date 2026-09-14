@@ -129,8 +129,29 @@ def validate_procurement() -> None:
 
 def validate_decisions_and_tests() -> None:
     decisions = {row["Decision_ID"]: row for row in read_csv("docs/DECISION_LOG.csv")}
-    for decision_id in ("DEC-015", "DEC-016", "DEC-017", "DEC-018", "DEC-037", "DEC-038"):
+    for decision_id in (
+        "DEC-015", "DEC-016", "DEC-017", "DEC-018", "DEC-037", "DEC-038",
+        "DEC-039", "DEC-040", "DEC-041", "DEC-042",
+    ):
         require(decisions[decision_id]["Status"] == "LOCKED", f"{decision_id} is not locked")
+    require(
+        "3e215e26e0d4cb160b309de3d3fd5a3145a756bf" in decisions["DEC-039"]["Decision"],
+        "initial PCB-MIC Review-A decision binding is missing",
+    )
+    require(
+        "cb69c0bbc1457b498ee4f44ee7da1d566033c23f" in decisions["DEC-040"]["Decision"]
+        and "ECO_REQUIRED" in decisions["DEC-040"]["Impact"],
+        "PCB-MIC baseline copper ECO decision binding is missing",
+    )
+    require(
+        "e17a86bc78ba979f74c5549b378e94f7f3447fe4" in decisions["DEC-041"]["Decision"],
+        "repeat PCB-MIC Review-A decision binding is missing",
+    )
+    require(
+        "7aeec13aa0c7ba1b3cd9095b800c6d08755912a3" in decisions["DEC-042"]["Decision"]
+        and "copper-return subgate" in decisions["DEC-042"]["Decision"],
+        "PCB-MIC copper-return acceptance binding is missing",
+    )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
@@ -160,6 +181,14 @@ def validate_deliverable_register() -> None:
         "zero provisional footprints and three controlled IPC candidates"
         in deliverables["HW-M-002"]["Критерий выпуска"],
         "PCB-MAIN deliverable still reports a stale footprint disposition",
+    )
+    require(
+        deliverables["HW-A-002"]["Статус"] == "DRAFT"
+        and deliverables["HW-A-002"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-A-002"]["QG-2 техника"] == "OPEN"
+        and "manufacturing release remain open"
+        in deliverables["HW-A-002"]["Критерий выпуска"],
+        "PCB-MIC candidate CAM deliverable state is stale or over-released",
     )
     require(
         "4 10 и 20" in deliverables["PROC-001"]["Поставочный объект"]

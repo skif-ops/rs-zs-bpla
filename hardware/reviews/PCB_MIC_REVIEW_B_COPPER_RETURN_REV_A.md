@@ -144,6 +144,27 @@ clearance is `0.802865 mm` against the `0.2 mm` project rule, and KiCad 9.0.9 re
 zero ERC, DRC, unrouted or schematic-parity findings. Reviewer `Скиф` accepted this
 bounded copper-return subgate on `14.09.2026` with decision `ACCEPT_COPPER_RETURN`.
 
+## Post-acceptance commit-bound evidence
+
+| Item | Controlled value |
+|---|---|
+| Acceptance-state commit | `8aa4a3d21b55956625db643e22436f248f75b258` |
+| PCB Native Gate | [run #164](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34878120514), `success` |
+| CI | [run #434](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34878120579), `success` |
+| Artifact | [ID 10361911939](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34878120514/artifacts/10361911939) |
+| Artifact SHA-256 | `960f84ff068ddf881f01008a6844bfbbf7ed8b7f3e1720b73e6dadae11ee863e` |
+| Manifest / source / output verification | `62 / 12 / 27`, no mismatch |
+| Manifest SHA-256 | `9f8e9c59d60970419370eeb29c2a9d4bb9549a43d2e8a1ea2db28ce482950e59` |
+| Review-B preflight SHA-256 | `808779c6957ed8599d5226a94c48a54991806264392509fa1938b48f27056de6` |
+| Copper audit SHA-256 | `9fee77cc7ac5f697f32234072cdc74a2e7c9cda5ccd954bd53ed64ea386e6ab0` |
+| F.Cu / B.Cu SVG SHA-256 | `a77ce3b8b3cf09f771284acd68c3accc9b9744e5720af8447927fa128c4e0cc1` / `0020c178abf814ec712cd40bb7dfd7e1e30db928ae6ad373153649b8905830ac` |
+| Copper disposition | `PASS_HUMAN_ACCEPTED_COPPER_RETURN_SUBGATE_REVIEW_B_REMAINS_OPEN` |
+
+The extracted archive was independently hashed, and regenerating both JSON audits
+from it produced byte-identical results. This evidence confirms the recorded copper
+acceptance state only. Panelization, DFM, acoustic-stack, physical-EVT, final Review B
+and manufacturing release remain open.
+
 ## Required next gates
 
 - [x] Commit and push the ECO candidate as one controlled source set.

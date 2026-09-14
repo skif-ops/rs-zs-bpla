@@ -208,6 +208,35 @@
         "review_b_complete": false,
         "manufacturing_release": false
       },
+      "acceptance_state_evidence": {
+        "evidence_commit_sha": "8aa4a3d21b55956625db643e22436f248f75b258",
+        "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+        "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34878120514",
+        "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34878120579",
+        "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34878120514/artifacts/10361911939",
+        "artifact_id": 10361911939,
+        "artifact_digest": "sha256:960f84ff068ddf881f01008a6844bfbbf7ed8b7f3e1720b73e6dadae11ee863e",
+        "sha256_manifest_entries_verified": 62,
+        "source_hashes_verified": 12,
+        "pcb_mic_output_hashes_verified": 27,
+        "sha256_manifest_sha256": "9f8e9c59d60970419370eeb29c2a9d4bb9549a43d2e8a1ea2db28ce482950e59",
+        "review_b_preflight_audit_sha256": "808779c6957ed8599d5226a94c48a54991806264392509fa1938b48f27056de6",
+        "copper_return_audit_sha256": "9fee77cc7ac5f697f32234072cdc74a2e7c9cda5ccd954bd53ed64ea386e6ab0",
+        "copper_review_svg_sha256": {
+          "F.Cu": "a77ce3b8b3cf09f771284acd68c3accc9b9744e5720af8447927fa128c4e0cc1",
+          "B.Cu": "0020c178abf814ec712cd40bb7dfd7e1e30db928ae6ad373153649b8905830ac"
+        },
+        "review_b_preflight_status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
+        "copper_return_disposition": "PASS_HUMAN_ACCEPTED_COPPER_RETURN_SUBGATE_REVIEW_B_REMAINS_OPEN",
+        "drawing_control": "PASS_BOARD_SIZED_ZOOMABLE_LAYER_DRAWINGS",
+        "kicad_version": "9.0.9",
+        "erc_violations": 0,
+        "drc_violations": 0,
+        "unrouted_items": 0,
+        "copper_return_gate_complete": true,
+        "review_b_complete": false,
+        "manufacturing_release": false
+      },
       "baseline_commit_bound_evidence": {
         "evidence_commit_sha": "cb69c0bbc1457b498ee4f44ee7da1d566033c23f",
         "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015",

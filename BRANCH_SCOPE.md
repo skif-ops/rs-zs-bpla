@@ -37,14 +37,16 @@
 
 ## Текущий контрольный срез
 
-- версия ветки: `EVT-PRE-20 Rev.A v0.2` от 10.09.2026;
+- версия ветки: `EVT-PRE-20 Rev.A v0.3` от 14.09.2026;
 - `MAIN-AUTH-001…011` закрыты и проходят основной и независимые authority-аудиты;
 - все девять native `.kicad_sch/.kicad_pcb/.kicad_pro` файлов PCB-MAIN,
   PCB-MIC и PCB-PWR присутствуют и контролируются CI;
 - native-схемы PCB-MAIN и PCB-PWR прошли Review A; PCB-MAIN и PCB-PWR имеют
   только неразведённые placement-кандидаты, причём геометрия PCB-PWR остаётся
   условной до закрытия `DIM-003`;
-- PCB-MIC Review A подписан `PASS` по commit `3e215e26`; все Review B остаются открыты;
+- повторный PCB-MIC Review A после copper ECO подписан `PASS` по commit `e17a86bc`;
+  copper-return subgate Review B принят по commit `7aeec13a`, но panelization,
+  DFM, acoustic-stack, physical-EVT, общий Review B и manufacturing release открыты;
 - производственный BOM, Gerber и статус `FOR_MANUFACTURE` заблокированы;
 - firmware имеет статус `TARGET_PORT_REQUIRED`;
 - аппаратный EVT имеет статус `NOT RUN`.

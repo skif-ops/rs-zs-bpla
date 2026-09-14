@@ -5,9 +5,9 @@ This audit consumes only committed native sources, frozen production authority a
 the files emitted by KiCad 9. It is deliberately independent from the PCB generator
 and from ``kicad_native_gate.py`` export logic. It can validate either a signed
 Review-A source set or a post-ECO candidate. A candidate PASS does not close Review A.
-In either state, the independent Review-B decision, panelization,
-fabricator/assembler DFM, acoustic stack validation and manufacturing release remain
-open.
+An accepted copper-return subgate clears only its matching human-review flag. The
+remaining Review-B signature, panelization, fabricator/assembler DFM, acoustic stack
+validation, physical EVT and manufacturing release remain open.
 """
 from __future__ import annotations
 
@@ -276,6 +276,28 @@ def audit_release_state() -> tuple[dict[str, Any], dict[str, Any]]:
                 and initial_decision.get("date")
                 and initial_decision.get("decision_evidence_commit_sha"),
                 "initial ECO_REQUIRED decision history is incomplete",
+            )
+            acceptance_evidence = gate.get("acceptance_state_evidence", {})
+            require(
+                re.fullmatch(
+                    r"[0-9a-f]{40}",
+                    str(acceptance_evidence.get("evidence_commit_sha", "")),
+                ) is not None
+                and acceptance_evidence.get("native_board_sha256") == sha256(BOARD)
+                and acceptance_evidence.get("sha256_manifest_entries_verified") == 62
+                and acceptance_evidence.get("source_hashes_verified") == 12
+                and acceptance_evidence.get("pcb_mic_output_hashes_verified") == 27,
+                "post-acceptance commit-bound evidence is incomplete",
+            )
+            require(
+                acceptance_evidence.get("review_b_preflight_status") ==
+                "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN"
+                and acceptance_evidence.get("copper_return_disposition") ==
+                "PASS_HUMAN_ACCEPTED_COPPER_RETURN_SUBGATE_REVIEW_B_REMAINS_OPEN"
+                and acceptance_evidence.get("copper_return_gate_complete") is True
+                and acceptance_evidence.get("review_b_complete") is False
+                and acceptance_evidence.get("manufacturing_release") is False,
+                "post-acceptance evidence does not preserve the bounded release state",
             )
             release_status = (
                 "PASS_REVIEW_A_SIGNED_COPPER_RETURN_ACCEPTED_REVIEW_B_OPEN"
@@ -742,7 +764,7 @@ def pad_net_name(pad: Any) -> str | None:
     return str(net.name) if net is not None else None
 
 
-def audit_native_topology() -> dict[str, Any]:
+def audit_native_topology(status: dict[str, Any]) -> dict[str, Any]:
     board = Board().from_file(BOARD)
     require(board is not None, "kiutils could not parse PCB-MIC")
     net_names = {int(net.number): str(net.name) for net in board.nets}
@@ -807,6 +829,12 @@ def audit_native_topology() -> dict[str, Any]:
     )
     require(decoupling_distance < 3.6,
             f"C1-to-MK1 center distance too large: {decoupling_distance:.3f} mm")
+    copper_gate = status.get("review_b", {}).get("copper_return_gate", {})
+    copper_return_accepted = (
+        status.get("release_state") == "REVIEW_A_PASS"
+        and copper_gate.get("complete") is True
+        and copper_gate.get("decision") == "ACCEPT_COPPER_RETURN"
+    )
     return {
         "status": "PASS_MACHINE_TOPOLOGY_PREFLIGHT",
         "segments": sum(signature.values()) - signature.get(("1V8_MIC", "via"), 0) - signature.get(("GND", "via"), 0),
@@ -818,7 +846,9 @@ def audit_native_topology() -> dict[str, Any]:
         "copper_model": "EXPLICIT_ROUTING_ONLY",
         "minimum_bcu_gnd_edge_to_acoustic_hole_clearance_mm": round(min(clearances), 6),
         "c1_to_mk1_center_distance_mm": round(decoupling_distance, 6),
-        "human_review_still_required": True,
+        "human_review_still_required": not copper_return_accepted,
+        "copper_return_gate_complete": copper_return_accepted,
+        "copper_return_decision": copper_gate.get("decision"),
     }
 
 
@@ -1097,7 +1127,7 @@ def audit(artifact_root: Path, commit_sha: str) -> dict[str, Any]:
         "commit_binding": audit_commit_binding(commit_sha, status),
         "cli_reports": audit_cli_reports(artifact_root),
         "cam_source_transform": audit_cam_transform(artifact_root, commit_sha),
-        "native_topology": audit_native_topology(),
+        "native_topology": audit_native_topology(status),
         "gerber_job_and_layers": audit_gerbers(artifact_root),
         "excellon": audit_drill(artifact_root),
         "pick_and_place": audit_pnp(artifact_root),

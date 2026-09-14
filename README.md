@@ -1,7 +1,7 @@
 # Дионея / РС ЗС-БПЛА — EVT-PRE-20
 
 Эта ветка содержит инженерную базу предсерийного EVT с выбранной партией 20 станций. Расчёты для 4 и 10 станций сохранены для сравнения и контролируемого перепланирования.
-Текущий контрольный срез: `EVT-PRE-20 Rev.A v0.3`, дата 13.09.2026.
+Текущий контрольный срез: `EVT-PRE-20 Rev.A v0.3`, дата 14.09.2026.
 
 ## Зафиксированный baseline
 
@@ -33,10 +33,11 @@ PCB-PWR также отслеживается и проверяется в CI: �
 `.kicad_sch/.kicad_pcb/.kicad_pro` файлов присутствуют. Плата PCB-PWR пока
 является только неразведённым электрическим placement-canvas с условным контуром
 `90 x 60 mm`, без монтажных отверстий, трасс и copper zones до закрытия
-`DIM-003`. PCB-MIC Review A подписан `PASS` по commit `3e215e26` с
-commit-matched KiCad 9 ERC и геометрическими evidence. Это не разрешает
-производство: PCB-MAIN и PCB-PWR routing/Review B, PCB-MIC Review B,
-производственный BOM и Gerber заблокированы. Firmware
+`DIM-003`. После ограниченного copper ECO повторный PCB-MIC Review A подписан
+`PASS` по commit `e17a86bc`, а copper-return subgate Review B принят по commit
+`7aeec13a` и PCB SHA-256 `a292a6ec…e4031`. Это не разрешает производство:
+PCB-MAIN и PCB-PWR routing/Review B, оставшиеся PCB-MIC Review B gates и
+производственный выпуск BOM/Gerber заблокированы. Firmware
 сохраняет статус `TARGET_PORT_REQUIRED`.
 На PCB-PWR уже контролируются J1 `Molex 43045-0213`, U1 `LM74700-Q1`,
 U2 `INA226`, Q1 `CSD18540Q5B`, RSH1 `WSK2512R0100FEA`, U3/U4

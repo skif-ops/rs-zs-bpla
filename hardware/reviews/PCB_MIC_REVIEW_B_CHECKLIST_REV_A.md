@@ -19,6 +19,7 @@ DFM, panelization, acoustic-stack, physical-EVT or final Review-B gates below.
   - [x] Repeat Review A is signed by `Скиф` for commit `e17a86bc78ba979f74c5549b378e94f7f3447fe4` and PCB SHA-256 `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031`.
   - [x] Decision-input PCB Native Gate #163 reconfirms source continuity, CAM topology and zero ERC/DRC/unrouted findings for commit `7aeec13aa0c7ba1b3cd9095b800c6d08755912a3`.
   - [x] Reviewer `Скиф` selected `ACCEPT_COPPER_RETURN` on `14.09.2026` for that commit and PCB SHA-256 `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031`.
+  - [x] Post-acceptance PCB Native Gate #164 verifies the signed state at commit `8aa4a3d21b55956625db643e22436f248f75b258`; the copper audit records the accepted disposition while Review B and manufacturing release remain false.
 - [ ] The bottom acoustic port has no paste, mask, adhesive or coating obstruction.
   - [x] Baseline CAM proved zero paste flashes at acoustic and mounting holes and exact F/B mask openings.
   - [x] ECO candidate CAM reconfirms the baseline machine checks.
@@ -57,6 +58,8 @@ validate or sign the ECO candidate.
 - Artifact: [evt-pre-20-kicad-native-gate](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892890/artifacts/10360925100), ID `10360925100`, SHA-256 `1986effdd10fdef86d97ffecb139dd7beea13ff699adeff8f481440e74630321`.
 - Hash control: 62 manifest entries, 12 controlled source hashes and 27 PCB-MIC output hashes verified.
 - Copper-return subgate: reviewer `Скиф`, date `14.09.2026`, decision `ACCEPT_COPPER_RETURN`, scope `PCB_MIC_REVIEW_B_COPPER_RETURN_SUBGATE_ONLY`.
+- Post-acceptance evidence: PCB Native Gate [#164](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34878120514), CI [#434](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34878120579), artifact [10361911939](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34878120514/artifacts/10361911939), digest `960f84ff068ddf881f01008a6844bfbbf7ed8b7f3e1720b73e6dadae11ee863e`.
+- Post-acceptance archive verification: 62 manifest entries, 12 controlled source hashes, 27 PCB-MIC output hashes, regenerated preflight and copper audit byte-identical.
 - Overall Review-B decision: `OPEN`.
 - Manufacturing release: `false`.
 
