@@ -71,6 +71,7 @@ The actual factory gate is:
 python tools/generate_evt_pre_20_bom_rev_a.py --check
 python tools/validate_evt_pre_20_bom_qg1.py
 python tools/audit_evt_pre_20_bom_qg2.py --strict
+python tools/audit_evt_pre_20_hardware_release.py --strict
 ```
 
 No spreadsheet cleanup, RFQ response or supplier substitution may bypass the strict

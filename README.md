@@ -54,6 +54,8 @@ U2 `INA226`, Q1 `CSD18540Q5B`, RSH1 `WSK2512R0100FEA`, U3/U4
 2. `QG-2 Technical` — ERC/DRC, сборка, тест, визуальная проверка или измерение по типу объекта.
 
 Gerber, прошивки, бинарники, корпуса и серверный релиз не считаются выпущенными, пока оба контроля не отмечены `PASS` в реестре.
+Отдельный hardware-only gate оценивает BOM, три PCB, механику, жгуты, DFM и
+выбор закупочного лота без блокировки со стороны Android/server/обычного firmware.
 
 ## Навигация
 
@@ -64,9 +66,10 @@ Gerber, прошивки, бинарники, корпуса и серверны
 - [`protocols/CELLULAR_CONNECTIVITY_BASELINE.md`](protocols/CELLULAR_CONNECTIVITY_BASELINE.md) — SIM/APN и исходящая связь.
 - [`hardware/DUAL_SIM_SINGLE_STANDBY.md`](hardware/DUAL_SIM_SINGLE_STANDBY.md) - двух-SIMная аппаратная архитектура и безопасное переключение.
 - [`hardware/EVT_PRE_20_BOM_POLICY_REV_A.md`](hardware/EVT_PRE_20_BOM_POLICY_REV_A.md) - правила производственного BOM, формулы количества и двойной контроль QG-1/QG-2.
+- [`hardware/HARDWARE_PRODUCTION_RELEASE_GATE_REV_A.md`](hardware/HARDWARE_PRODUCTION_RELEASE_GATE_REV_A.md) - независимый hardware design/purchase release gate без нерелевантных software-блокеров.
 - [`config/cellular/dual_sim_apn_profiles.yaml`](config/cellular/dual_sim_apn_profiles.yaml) - машинно-читаемая политика SIM/APN failover.
 - [`manufacturing/README.md`](manufacturing/README.md) — маршрут партии, traceability, provisioning и EOL.
-- [`manufacturing/HOUSING_LOT_PLAN.csv`](manufacturing/HOUSING_LOT_PLAN.csv) - основной и резервный корпус для каждого из 20 серийных номеров.
+- [`manufacturing/HOUSING_LOT_PLAN.csv`](manufacturing/HOUSING_LOT_PLAN.csv) - резерв ёмкости на 20 серийных номеров; активируется только ведущий диапазон выбранного лота 4, 10 или 20.
 - [`tests/EVT_MASTER_PLAN.md`](tests/EVT_MASTER_PLAN.md) — последовательность и правила принятия EVT.
 - [`docs/REQUIREMENTS_TRACEABILITY.csv`](docs/REQUIREMENTS_TRACEABILITY.csv) — требования, проверки и evidence.
 - [`android/README.md`](android/README.md) — отдельный Android-трек.
@@ -78,6 +81,6 @@ Gerber, прошивки, бинарники, корпуса и серверны
 проверенные изменения могут отдельно продвигаться в `develop` и `main`. Макетная плата
 70×90 мм и WeAct STM32U585CIU6 не являются производственной документацией предсерийной партии.
 
-Срез v0.2 выборочно синхронизирует только собственные Rev.A authority, схемные входы,
+Срез v0.3 выборочно синхронизирует только собственные Rev.A authority, схемные входы,
 проверки и общие программные исправления из проверенного интеграционного дерева
 `f3411e51938aa1423fdbaeeef9585aeea385c239`. Merge поставочных веток не выполнялся.
