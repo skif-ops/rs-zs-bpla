@@ -744,6 +744,10 @@ def run_audit(artifact_root: Path | None, commit_sha: str | None,
         },
         "findings": findings,
         "human_review_packet": str(REVIEW_PACKET.relative_to(ROOT)),
+        "human_review_drawings": [
+            "artifacts/kicad-native/PCB-MIC/PCB-MIC_F_Cu_review.svg",
+            "artifacts/kicad-native/PCB-MIC/PCB-MIC_B_Cu_review.svg",
+        ],
     }
 
 

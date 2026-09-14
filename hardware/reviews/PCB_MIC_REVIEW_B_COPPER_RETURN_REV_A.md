@@ -17,7 +17,8 @@ and it does not grant a Review-B signature or manufacturing release.
 | Frozen datasheet authority | TDK `DS-000383`, Revision 1.2, 2025-09-04 |
 | Frozen datasheet SHA-256 | `5befb710bfe7a415cdc1aba41ebc18b484d7f9fc320ce15a7481507531cf58a4` |
 | Machine measurement | `tools/audit_pcb_mic_copper_return_rev_a.py` |
-| Generated layer drawing | `artifacts/kicad-native/PCB-MIC/PCB-MIC_copper_review.pdf` |
+| Generated F.Cu drawing | `artifacts/kicad-native/PCB-MIC/PCB-MIC_F_Cu_review.svg` |
+| Generated B.Cu drawing | `artifacts/kicad-native/PCB-MIC/PCB-MIC_B_Cu_review.svg` |
 | Generated JSON evidence | `artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json` |
 
 Each CI execution binds the generated evidence to its checked-out commit while also
@@ -62,15 +63,15 @@ Disposition: `HOLD`. An independent reviewer must choose one of these outcomes:
    return/plane solution, rerun Review A for the changed PCB bytes, and then repeat
    Review B.
 2. `ACCEPT_WITH_EVIDENCE`: record a reasoned acceptance against the generated copper
-   PDF and JSON plus fabricator confirmation that the reviewed copper is exactly what
+   SVGs and JSON plus fabricator confirmation that the reviewed copper is exactly what
    will be manufactured.
 
 The second outcome must not be inferred from DRC, connectivity or this document.
 
 ## Independent human review checklist
 
-- [ ] Open both pages of `PCB-MIC_copper_review.pdf` and verify F.Cu and B.Cu against
-  the signed native board hash above.
+- [ ] Open `PCB-MIC_F_Cu_review.svg` and `PCB-MIC_B_Cu_review.svg`; verify both
+  board-sized layer drawings against the signed native board hash above.
 - [ ] Confirm that the C1.1-to-MK1.7 VDD leg reaches the microphone without a via or
   intervening branch.
 - [ ] Review the complete C1.2-to-MK1 ground-return path, including both vias, the

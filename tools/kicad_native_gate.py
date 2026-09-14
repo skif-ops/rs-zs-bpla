@@ -25,6 +25,7 @@ import re
 import shutil
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -432,6 +433,33 @@ def normalize_multipage_pdf(
     print(f"{name}: {document} multipage PDF PASS: {final_path.name}")
 
 
+def validate_copper_review_svgs(name: str, paths_by_layer: dict[str, Path]) -> None:
+    """Require board-sized, zoomable copper drawings rather than A4 thumbnails."""
+    if set(paths_by_layer) != {"F.Cu", "B.Cu"}:
+        raise RuntimeError(f"{name}: copper-review SVG layer set mismatch")
+    expected_ratio = 24.0 / 22.0
+    for layer, path in paths_by_layer.items():
+        if not path.is_file() or path.stat().st_size <= 1000:
+            raise RuntimeError(f"{name}: {layer} copper-review SVG is missing/empty: {path}")
+        root = ET.parse(path).getroot()
+        if not root.tag.endswith("svg"):
+            raise RuntimeError(f"{name}: {layer} copper-review file is not SVG")
+        view_box = root.attrib.get("viewBox", "").replace(",", " ").split()
+        if len(view_box) != 4:
+            raise RuntimeError(f"{name}: {layer} copper-review SVG viewBox missing")
+        width = float(view_box[2])
+        height = float(view_box[3])
+        if width <= 0 or height <= 0 or abs(width / height - expected_ratio) > 0.02:
+            raise RuntimeError(
+                f"{name}: {layer} copper-review SVG is not board-proportioned: "
+                f"viewBox={view_box}"
+            )
+        print(
+            f"{name}: {layer} board-sized copper-review SVG PASS: "
+            f"viewBox={view_box}"
+        )
+
+
 def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
     out = ART / name
     out.mkdir(parents=True, exist_ok=True)
@@ -469,13 +497,10 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
     ]
     assembly_pdf_export: Path | None = None
     assembly_pdf_final: Path | None = None
-    copper_pdf_export: Path | None = None
-    copper_pdf_final: Path | None = None
+    copper_review_svgs: dict[str, Path] = {}
     if name == "PCB-MIC":
         assembly_pdf_export = out / "assembly-fabrication-pdf-export"
         assembly_pdf_final = out / f"{name}_assembly_fabrication.pdf"
-        copper_pdf_export = out / "copper-review-pdf-export"
-        copper_pdf_final = out / f"{name}_copper_review.pdf"
         export_commands.append([
             cli, "pcb", "export", "pdf",
             "-o", str(assembly_pdf_export),
@@ -488,17 +513,20 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
             "--drill-shape-opt", "2",
             str(pcb),
         ])
-        export_commands.append([
-            cli, "pcb", "export", "pdf",
-            "-o", str(copper_pdf_export),
-            "--layers", "F.Cu,B.Cu",
-            "--common-layers", "Edge.Cuts",
-            "--mode-multipage",
-            "--black-and-white",
-            "--include-border-title",
-            "--drill-shape-opt", "2",
-            str(pcb),
-        ])
+        for layer in ("F.Cu", "B.Cu"):
+            output = out / f"{name}_{layer.replace('.', '_')}_review.svg"
+            copper_review_svgs[layer] = output
+            export_commands.append([
+                cli, "pcb", "export", "svg",
+                "-o", str(output),
+                "--layers", f"{layer},Edge.Cuts",
+                "--mode-single",
+                "--black-and-white",
+                "--fit-page-to-board",
+                "--exclude-drawing-sheet",
+                "--drill-shape-opt", "2",
+                str(pcb),
+            ])
     export_rcs = [run(cmd, check=False) for cmd in export_commands]
     if any(export_rcs):
         return False, f"CLI_DRC_PASS_EXPORT_FAIL_{export_rcs}"
@@ -508,10 +536,8 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
             normalize_multipage_pdf(
                 name, "assembly/fabrication", assembly_pdf_export, assembly_pdf_final
             )
-        if copper_pdf_export is not None and copper_pdf_final is not None:
-            normalize_multipage_pdf(
-                name, "copper-review", copper_pdf_export, copper_pdf_final
-            )
+        if copper_review_svgs:
+            validate_copper_review_svgs(name, copper_review_svgs)
         apply_fabrication_metadata(name, pcb, out, gerber)
         validate_position_export(name, pos_path)
     except Exception as exc:

@@ -53,8 +53,9 @@ release remain open.
 - B.Cu zone state in PCB Native Gate [run #155](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34835113074),
   artifact `10343758832`: zero cached source fills and zero materialized GND Gerber
   regions; five explicit GND conductor draws remain.
-- Next commit-bound artifact must contain `PCB-MIC_copper_review.pdf` and
-  `copper_return_review_audit.json` before the human decision is recorded.
+- Next commit-bound artifact must contain board-sized `PCB-MIC_F_Cu_review.svg`,
+  `PCB-MIC_B_Cu_review.svg` and `copper_return_review_audit.json` before the human
+  decision is recorded.
 
 Decision: `HOLD`. Physical calibration and acoustic EVT begin only after assembled
 boards exist; they cannot be replaced by this checklist.

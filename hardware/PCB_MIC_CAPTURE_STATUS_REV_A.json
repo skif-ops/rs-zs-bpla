@@ -43,7 +43,8 @@
       "artifacts/kicad-native/PCB-MIC/PCB-MIC_pos.csv",
       "artifacts/kicad-native/PCB-MIC/PCB-MIC_manufacturing_bom.csv",
       "artifacts/kicad-native/PCB-MIC/PCB-MIC_assembly_fabrication.pdf",
-      "artifacts/kicad-native/PCB-MIC/PCB-MIC_copper_review.pdf",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_F_Cu_review.svg",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_B_Cu_review.svg",
       "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
       "artifacts/kicad-native/sha256_manifest.json"
     ],
@@ -96,7 +97,10 @@
       "status": "HOLD_UNFILLED_GND_ZONE_AND_DECOUPLING_RETURN_REQUIRE_HUMAN_ECO_DECISION",
       "packet": "hardware/reviews/PCB_MIC_REVIEW_B_COPPER_RETURN_REV_A.md",
       "audit": "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
-      "drawing": "artifacts/kicad-native/PCB-MIC/PCB-MIC_copper_review.pdf",
+      "drawings": [
+        "artifacts/kicad-native/PCB-MIC/PCB-MIC_F_Cu_review.svg",
+        "artifacts/kicad-native/PCB-MIC/PCB-MIC_B_Cu_review.svg"
+      ],
       "commit_bound_ci_status": "PENDING",
       "baseline_cam_evidence": {
         "evidence_commit_sha": "7d7776e67001c0cff00643f524ceff9d0f0536af",

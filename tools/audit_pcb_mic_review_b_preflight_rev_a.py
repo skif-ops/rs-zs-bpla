@@ -16,6 +16,7 @@ import json
 import math
 import re
 import subprocess
+import xml.etree.ElementTree as ET
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -732,7 +733,6 @@ def audit_documents(artifact_root: Path) -> dict[str, Any]:
         "assembly_fabrication": (
             artifact_root / "PCB-MIC_assembly_fabrication.pdf", 4
         ),
-        "copper_review": (artifact_root / "PCB-MIC_copper_review.pdf", 2),
         "drill_map": (artifact_root / "drill/PCB-MIC-drl_map.pdf", None),
     }
     sizes: dict[str, int] = {}
@@ -758,6 +758,47 @@ def audit_documents(artifact_root: Path) -> dict[str, Any]:
         "pdf_bytes": sizes,
         "pdf_pages": pages,
         "board_step_bytes": len(step_data),
+    }
+
+
+def audit_copper_review_svgs(artifact_root: Path) -> dict[str, Any]:
+    files = {
+        "F.Cu": artifact_root / "PCB-MIC_F_Cu_review.svg",
+        "B.Cu": artifact_root / "PCB-MIC_B_Cu_review.svg",
+    }
+    expected_ratio = 24.0 / 22.0
+    results: dict[str, Any] = {}
+    contents: dict[str, bytes] = {}
+    for layer, path in files.items():
+        data = path.read_bytes()
+        require(len(data) > 1000, f"{layer} copper-review SVG unexpectedly small")
+        require(b"<svg" in data[:1000], f"{layer} copper-review SVG root missing")
+        root = ET.fromstring(data)
+        require(root.tag.endswith("svg"), f"{layer} copper-review document is not SVG")
+        view_box = root.attrib.get("viewBox", "").replace(",", " ").split()
+        require(len(view_box) == 4, f"{layer} copper-review SVG viewBox missing")
+        dimensions = [float(value) for value in view_box]
+        width, height = dimensions[2], dimensions[3]
+        require(width > 0 and height > 0, f"{layer} copper-review SVG has invalid size")
+        require(abs(width / height - expected_ratio) <= 0.02,
+                f"{layer} copper-review SVG is not fit to 24x22 board: {view_box}")
+        contents[layer] = data
+        results[layer] = {
+            "path": str(path.relative_to(artifact_root)),
+            "sha256": sha256(path),
+            "bytes": len(data),
+            "view_box": dimensions,
+            "board_proportioned": True,
+            "drawing_sheet_excluded": b"Dioneya / ZS-BPLA" not in data,
+        }
+        require(results[layer]["drawing_sheet_excluded"],
+                f"{layer} copper-review SVG still contains the A4 drawing sheet")
+    require(contents["F.Cu"] != contents["B.Cu"],
+            "F.Cu and B.Cu review SVGs are unexpectedly identical")
+    return {
+        "status": "PASS_BOARD_SIZED_ZOOMABLE_LAYER_DRAWINGS",
+        "layers": results,
+        "layer_files_distinct": True,
     }
 
 
@@ -812,7 +853,8 @@ def output_hashes(artifact_root: Path) -> dict[str, dict[str, Any]]:
     relative_paths = [
         "PCB-MIC.d356",
         "PCB-MIC_assembly_fabrication.pdf",
-        "PCB-MIC_copper_review.pdf",
+        "PCB-MIC_B_Cu_review.svg",
+        "PCB-MIC_F_Cu_review.svg",
         "PCB-MIC_board.step",
         "PCB-MIC_fabrication_metadata.json",
         "PCB-MIC_kicad_bom.csv",
@@ -852,6 +894,7 @@ def audit(artifact_root: Path, commit_sha: str) -> dict[str, Any]:
         "bom": audit_boms(artifact_root),
         "ipc_d_356": audit_ipc356(artifact_root),
         "documents": audit_documents(artifact_root),
+        "copper_review_drawings": audit_copper_review_svgs(artifact_root),
         "copper_return_review": audit_copper_return_report(artifact_root, commit_sha),
     }
     source_paths = [
