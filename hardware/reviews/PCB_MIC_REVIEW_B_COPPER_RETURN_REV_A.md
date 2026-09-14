@@ -30,6 +30,22 @@ evidence commit `7d7776e67001c0cff00643f524ceff9d0f0536af`, artifact ID
 `10343758832`, artifact SHA-256
 `2867ce92728a8f7c490f4856155a1ceb987b92e47165c1c8627ace57030cffd8`.
 
+The commit-bound decision packet passed PCB Native Gate
+[run #158](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015) and CI
+[run #428](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840245983) for evidence
+commit `cb69c0bbc1457b498ee4f44ee7da1d566033c23f`. Artifact ID `10345408977`
+has SHA-256 `f535c183a3feda6b4e2d38a636987b30aacaa0767103bec39379fbf042d95664`.
+All 62 manifest entries, 10 controlled source hashes and 27 PCB-MIC output hashes were
+independently verified. The regenerated preflight JSON was byte-identical to the
+uploaded report.
+
+The two vector copper views passed structural and render-usability control. Each contains
+the complete 24x22 mm Edge.Cuts rectangle on a 34.0106x22.1488 mm canvas, with outline
+coverage `0.706 x 0.993`, and no drawing sheet. Their SHA-256 values are:
+
+- F.Cu: `2c06fac7e7a52b394cc7376aabaff1b36b75646d39477cf93bfd66998ec8d951`.
+- B.Cu: `c50281869520748c37b2f3251f30d03ff95cdcb3fef69a66b4a373e8284c86b0`.
+
 ## Reproducible measurements
 
 The independent audit parses the native KiCad S-expression with Python's standard

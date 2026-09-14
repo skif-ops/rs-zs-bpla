@@ -25,14 +25,16 @@ Review B is an independent PCB/CAM/assembly pass performed after signed Review A
 
 ## Internal preflight evidence
 
-- Evidence commit: `8264c6b8bc2ced3e0852a6e7f3d00318bffbc904`.
-- CI: [run #424](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34834219791), `success`.
-- PCB Native Gate: [run #154](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34834219819), `success`.
-- Artifact: [evt-pre-20-kicad-native-gate](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34834219819/artifacts/10342982895), ID `10342982895`.
-- Artifact digest: `sha256:11701d079ab95c2046fb14553fea822d84e70900af2f4a6e8f9ffbe5aa8b4188`.
+- Evidence commit: `cb69c0bbc1457b498ee4f44ee7da1d566033c23f`.
+- CI: [run #428](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840245983), `success`.
+- PCB Native Gate: [run #158](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015), `success`.
+- Artifact: [evt-pre-20-kicad-native-gate](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015/artifacts/10345408977), ID `10345408977`.
+- Artifact digest: `sha256:f535c183a3feda6b4e2d38a636987b30aacaa0767103bec39379fbf042d95664`.
 - Audit result: `PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN`.
 - KiCad 9.0.9: ERC `0`, DRC `0`, unrouted `0`.
-- Hash control: all `59` artifact-manifest entries and all `24` PCB-MIC output hashes independently verified.
+- Hash control: all `62` artifact-manifest entries, all `10` controlled source hashes and
+  all `27` PCB-MIC output hashes independently verified. The regenerated preflight JSON
+  was byte-identical to the uploaded report.
 - Signed source continuity: Review-A board SHA-256 `aecd1a374b5f66d32a5ae056eb4ad452d68e2a2391e65f6068acc8cad37f2295`.
 - Controlled CAM derivative SHA-256: `3768ba97b0c21aca933795a52876aaa351f7dd19f5b39da2c7324c45e7d0e4c0`; design geometry unchanged.
 
@@ -53,9 +55,14 @@ release remain open.
 - B.Cu zone state in PCB Native Gate [run #155](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34835113074),
   artifact `10343758832`: zero cached source fills and zero materialized GND Gerber
   regions; five explicit GND conductor draws remain.
-- Next commit-bound artifact must contain board-sized `PCB-MIC_F_Cu_review.svg`,
-  `PCB-MIC_B_Cu_review.svg` and `copper_return_review_audit.json` before the human
-  decision is recorded.
+- Commit-bound decision evidence: PCB Native Gate
+  [run #158](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015), artifact
+  `10345408977`, digest
+  `sha256:f535c183a3feda6b4e2d38a636987b30aacaa0767103bec39379fbf042d95664`.
+- Both SVGs contain the four-edge 24x22 mm outline, exclude the drawing sheet and place
+  the outline across `0.706 x 0.993` of the vector canvas. F.Cu and B.Cu are distinct.
+- The machine-evidence requirement is satisfied. The independent human decision remains
+  open and no manufacturing release is granted.
 
 Decision: `HOLD`. Physical calibration and acoustic EVT begin only after assembled
 boards exist; they cannot be replaced by this checklist.
