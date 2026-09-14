@@ -223,7 +223,7 @@ def audit() -> dict[str, object]:
             f"Review A={mic_review_a.get('status', 'MISSING') if isinstance(mic_review_a, dict) else 'MISSING'}; "
             f"Review B={mic_review_b.get('status', 'MISSING') if isinstance(mic_review_b, dict) else 'MISSING'}"
         ),
-        "PCB-MIC Review A/Review B/DFM fabrication release is not complete",
+        "PCB-MIC Review B/CAM/DFM and manufacturing release are not complete",
     )
 
     dimensions = read_csv("mechanics/common/OPEN_DIMENSIONS.csv")

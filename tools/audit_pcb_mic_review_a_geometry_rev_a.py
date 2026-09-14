@@ -6,8 +6,9 @@ expected.  This second control uses kiutils and direct source inspection so it c
 emit a stable JSON record containing the reviewed source hashes, commit binding,
 and the exact T5838/Molex copper, mask, paste and drill geometry.
 
-A PASS from this script is geometry evidence only.  It does not replace KiCad 9
-ERC/DRC, Review-A signature, Review B, DFM, or physical acoustic verification.
+A PASS from this script revalidates geometry and the separately signed Review-A
+traceability. It does not replace Review B, independent CAM/DFM, or physical
+acoustic verification.
 """
 from __future__ import annotations
 
@@ -26,12 +27,14 @@ from kiutils.footprint import Footprint
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BOARD = ROOT / "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb"
+DEFAULT_SCHEMATIC = ROOT / "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch"
 DEFAULT_OUTPUT = ROOT / "artifacts/kicad-native/PCB-MIC/review_a_geometry_audit.json"
 T5838_LIBRARY = ROOT / "hardware/kicad/native/PCB-MIC/libs/Dioneya.pretty/T5838_RevA.kicad_mod"
 MOLEX_LIBRARY = ROOT / "hardware/kicad/native/PCB-MIC/libs/Dioneya.pretty/Molex_5040500691.kicad_mod"
 FABRICATION_METADATA = ROOT / "hardware/kicad/native/PCB-MIC/fabrication_metadata.json"
 AUDIT_TOOL = Path(__file__).resolve()
 NATIVE_WORKFLOW = ROOT / ".github/workflows/pcb-native.yml"
+STATUS = ROOT / "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json"
 
 T5838_SIGNAL_PADS = {
     "1": ((-0.630, -1.420), (0.522, 0.725), -0.050, "PDM_DATA_MIC"),
@@ -477,8 +480,14 @@ def main() -> int:
     args = parser.parse_args()
 
     board_path = args.board.resolve()
-    controlled_paths = [board_path, T5838_LIBRARY, MOLEX_LIBRARY, FABRICATION_METADATA]
-    control_definition_paths = [AUDIT_TOOL, NATIVE_WORKFLOW]
+    controlled_paths = [
+        board_path,
+        DEFAULT_SCHEMATIC,
+        T5838_LIBRARY,
+        MOLEX_LIBRARY,
+        FABRICATION_METADATA,
+    ]
+    control_definition_paths = [AUDIT_TOOL, NATIVE_WORKFLOW, STATUS]
     commit_sha = resolve_commit(args.commit_sha)
     source_commit_match = source_matches_commit(commit_sha, controlled_paths)
     control_commit_match = source_matches_commit(commit_sha, control_definition_paths)
@@ -499,9 +508,35 @@ def main() -> int:
     library_molex = audit_molex(molex_library, require_nets=False)
     paste_ring = audit_t5838_paste_ring(board_path)
     mechanical = audit_mechanical(board)
+    status_record = json.loads(STATUS.read_text(encoding="utf-8"))
+    review_a = status_record["review_a"]
+    require(status_record["release_state"] == "REVIEW_A_PASS",
+            "PCB-MIC release state does not record Review A PASS")
+    require(review_a["complete"] is True and review_a["status"] == "PASS",
+            "PCB-MIC Review A is not a signed PASS")
+    require(all(review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
+            "PCB-MIC signed Review A lacks reviewer/date/commit SHA")
+    require(re.fullmatch(r"[0-9a-f]{40}", review_a["commit_sha"]) is not None,
+            "PCB-MIC Review A commit SHA is invalid")
+    reviewed_source_commit_match = source_matches_commit(
+        review_a["commit_sha"], controlled_paths
+    )
+    require(reviewed_source_commit_match,
+            "current PCB-MIC reviewed sources diverge from the signed Review A commit")
+    require(review_a["geometry_audit_status"] ==
+            "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
+            "PCB-MIC geometry audit status does not match signed Review A")
+    evidence = review_a.get("evidence", {})
+    require(isinstance(evidence, dict) and evidence.get("workflow_run") and
+            evidence.get("artifact") and evidence.get("erc_report") and
+            evidence.get("sha256_manifest"),
+            "PCB-MIC signed Review A evidence links are incomplete")
+    require(status_record["review_b"]["complete"] is False and
+            status_record["manufacturing_release"] is False,
+            "PCB-MIC Review A signature silently promoted manufacturing release")
 
     report = {
-        "status": "PASS_GEOMETRY_EVIDENCE_REVIEW_A_SIGNATURE_STILL_REQUIRED",
+        "status": "PASS_GEOMETRY_EVIDENCE_REVIEW_A_SIGNED_PASS",
         "configuration": "EVT-PRE-20 Rev.A",
         "assembly": "PCB-MIC",
         "phase": args.phase,
@@ -509,10 +544,17 @@ def main() -> int:
             "commit_sha": commit_sha,
             "controlled_sources_match_commit": source_commit_match,
             "audit_control_matches_commit": control_commit_match,
+            "controlled_sources_match_signed_review_commit": reviewed_source_commit_match,
             "require_clean_source": bool(args.require_clean_source),
         },
         "source_files": [file_record(path) for path in controlled_paths],
         "audit_control_files": [file_record(path) for path in control_definition_paths],
+        "review_a_signature": {
+            "reviewer": review_a["reviewer"],
+            "date": review_a["date"],
+            "reviewed_commit_sha": review_a["commit_sha"],
+            "evidence": evidence,
+        },
         "checks": {
             "native_board_t5838": board_t5838,
             "project_library_t5838": library_t5838,
@@ -521,9 +563,11 @@ def main() -> int:
             "t5838_stencil_ring": paste_ring,
             "mechanical_and_fabrication_metadata": mechanical,
         },
-        "remaining_review_a_evidence": [
-            "commit-matched KiCad 9 ERC report with zero unexplained violations",
-            "reviewer/date/commit signature and evidence links in PCB_MIC_CAPTURE_STATUS_REV_A.json",
+        "remaining_review_a_evidence": [],
+        "remaining_release_evidence": [
+            "independent Review B and CAM/DFM closure",
+            "panelization and acoustic membrane/cavity stack",
+            "physical calibration and acoustic EVT",
         ],
         "release_effect": "NONE_NOT_FOR_MANUFACTURE",
     }
@@ -535,7 +579,10 @@ def main() -> int:
         f"audit_control_matches_commit={control_commit_match} phase={args.phase}"
     )
     print(f"evidence={args.output}")
-    print("Review A remains OPEN pending commit-matched KiCad 9 ERC and signed traceability")
+    print(
+        f"Review A signed PASS by {review_a['reviewer']} on {review_a['date']} "
+        f"for {review_a['commit_sha']}; Review B and manufacturing release remain open"
+    )
     return 0
 
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import csv
 import json
+import re
 from pathlib import Path
 
 
@@ -277,12 +278,35 @@ def validate_hardware_baseline() -> None:
     mic_status = json.loads((ROOT / "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8"))
     require(mic_status["assembly"] == "PCB-MIC", "PCB-MIC release-status identity mismatch")
     require(mic_status["manufacturing_release"] is False, "PCB-MIC was released without Review A/B evidence")
-    require(mic_status["review_a"]["complete"] is False, "PCB-MIC Review A was marked complete without signing evidence")
+    mic_review_a = mic_status["review_a"]
+    require(mic_status["release_state"] == "REVIEW_A_PASS", "PCB-MIC release state does not record Review A PASS")
+    require(mic_review_a["complete"] is True and mic_review_a["status"] == "PASS",
+            "PCB-MIC Review A is not a signed PASS")
+    require(all(mic_review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
+            "PCB-MIC signed Review A lacks reviewer/date/commit SHA")
+    require(re.fullmatch(r"[0-9a-f]{40}", mic_review_a["commit_sha"]) is not None,
+            "PCB-MIC signed Review A commit SHA is invalid")
     require(mic_status["review_b"]["complete"] is False, "PCB-MIC Review B was marked complete without manufacturing evidence")
     require(
-        mic_status["review_a"]["structural_audit_status"] ==
-        "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_REMAINS_OPEN",
-        "PCB-MIC independent structural audit status is missing or overstated",
+        mic_review_a["structural_audit_status"] ==
+        "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
+        "PCB-MIC independent structural audit status does not match signed Review A",
+    )
+    require(
+        mic_review_a["geometry_audit_status"] ==
+        "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
+        "PCB-MIC independent geometry audit status does not match signed Review A",
+    )
+    mic_review_a_evidence = mic_review_a.get("evidence", {})
+    required_mic_review_a_evidence = {
+        "signed_checklist", "workflow_run", "artifact", "schematic_pdf",
+        "erc_report", "committed_geometry_audit",
+        "materialized_geometry_audit", "sha256_manifest",
+    }
+    require(
+        isinstance(mic_review_a_evidence, dict) and
+        all(mic_review_a_evidence.get(key) for key in required_mic_review_a_evidence),
+        "PCB-MIC signed Review A evidence links are incomplete",
     )
     require(
         mic_status["native_source"]["independent_schematic_audit"] ==

@@ -30,7 +30,23 @@ NATIVE = ROOT / "hardware" / "kicad" / "native"
 ART = ROOT / "artifacts" / "kicad-native"
 BOARDS = ("PCB-MAIN", "PCB-MIC", "PCB-PWR")
 PCB_MAIN_STATUS = ROOT / "hardware" / "PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+PCB_MIC_STATUS = ROOT / "hardware" / "PCB_MIC_CAPTURE_STATUS_REV_A.json"
 PCB_PWR_STATUS = ROOT / "hardware" / "PCB_PWR_CAPTURE_STATUS_REV_A.json"
+
+BOARD_STATUS = {
+    "PCB-MAIN": PCB_MAIN_STATUS,
+    "PCB-MIC": PCB_MIC_STATUS,
+    "PCB-PWR": PCB_PWR_STATUS,
+}
+
+
+def review_a_complete(name: str) -> bool:
+    status_path = BOARD_STATUS[name]
+    if not status_path.is_file():
+        return False
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+    review_a = status.get("review_a", {})
+    return isinstance(review_a, dict) and review_a.get("complete") is True
 
 
 def placement_candidate_audit(name: str) -> str | None:
@@ -102,7 +118,8 @@ def validate_schematic(cli: str, name: str, sch: Path) -> tuple[bool, str]:
         check=False,
     )
     if rc == 0 and pdf_rc == 0:
-        return True, "CLI_ERC_PDF_PASS_REVIEW_A_PENDING"
+        review_state = "REVIEW_A_SIGNED" if review_a_complete(name) else "REVIEW_A_PENDING"
+        return True, f"CLI_ERC_PDF_PASS_{review_state}_REVIEW_B_PENDING"
     return False, f"CLI_ERC_FAIL_rc{rc}_PDF_rc{pdf_rc}"
 
 
@@ -340,7 +357,12 @@ def main() -> int:
                     cli_failures.append(f"{name}: {state}")
 
     if not all_missing and not cli_failures:
-        report["release"] = "ALL_NATIVE_SOURCES_AND_CLI_PASS_REVIEW_A_B_STILL_REQUIRED"
+        if all(review_a_complete(name) for name in BOARDS):
+            report["release"] = (
+                "ALL_NATIVE_SOURCES_AND_CLI_PASS_REVIEW_B_AND_MANUFACTURING_RELEASE_STILL_REQUIRED"
+            )
+        else:
+            report["release"] = "ALL_NATIVE_SOURCES_AND_CLI_PASS_REVIEW_A_B_STILL_REQUIRED"
     else:
         if all_missing:
             report["missing"] = all_missing

@@ -44,7 +44,7 @@
 - native-схемы PCB-MAIN и PCB-PWR прошли Review A; PCB-MAIN и PCB-PWR имеют
   только неразведённые placement-кандидаты, причём геометрия PCB-PWR остаётся
   условной до закрытия `DIM-003`;
-- PCB-MIC Review A и все Review B остаются открыты;
+- PCB-MIC Review A подписан `PASS` по commit `3e215e26`; все Review B остаются открыты;
 - производственный BOM, Gerber и статус `FOR_MANUFACTURE` заблокированы;
 - firmware имеет статус `TARGET_PORT_REQUIRED`;
 - аппаратный EVT имеет статус `NOT RUN`.

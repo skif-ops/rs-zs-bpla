@@ -3,8 +3,9 @@
 
 This control deliberately does not import the schematic generator. It checks the
 committed KiCad source against the frozen harness, production BOM and project-local
-footprint authority. A PASS is evidence for Review A; it is not a Review-A signature
-and does not authorize manufacturing.
+footprint authority, then validates the separately signed Review-A traceability.
+A PASS does not authorize manufacturing; Review B and physical evidence remain
+mandatory.
 """
 from __future__ import annotations
 
@@ -318,13 +319,36 @@ def main() -> int:
     bom_evidence = audit_bom()
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     require(status["assembly"] == "PCB-MIC", "PCB-MIC status identity mismatch")
-    require(status["review_a"]["complete"] is False,
-            "structural audit must not silently promote Review A to complete")
+    review_a = status["review_a"]
+    require(status["release_state"] == "REVIEW_A_PASS",
+            "PCB-MIC release state does not record Review A PASS")
+    require(review_a["complete"] is True and review_a["status"] == "PASS",
+            "PCB-MIC Review A is not a signed PASS")
+    require(all(review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
+            "PCB-MIC signed Review A lacks reviewer/date/commit SHA")
+    require(re.fullmatch(r"[0-9a-f]{40}", review_a["commit_sha"]) is not None,
+            "PCB-MIC Review A commit SHA is invalid")
+    require(review_a["structural_audit_status"] ==
+            "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
+            "PCB-MIC structural audit status does not match signed Review A")
+    require(review_a["geometry_audit_status"] ==
+            "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
+            "PCB-MIC geometry audit status does not match signed Review A")
+    evidence = review_a.get("evidence", {})
+    required_evidence = {
+        "signed_checklist", "workflow_run", "artifact", "schematic_pdf",
+        "erc_report", "committed_geometry_audit",
+        "materialized_geometry_audit", "sha256_manifest",
+    }
+    require(isinstance(evidence, dict) and all(evidence.get(key) for key in required_evidence),
+            "PCB-MIC signed Review A evidence links are incomplete")
+    require(status["review_b"]["complete"] is False,
+            "PCB-MIC Review B was silently promoted with Review A")
     require(status["manufacturing_release"] is False,
             "PCB-MIC manufacturing release is asserted before Review A/B")
 
     report = {
-        "status": "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_REMAINS_OPEN",
+        "status": "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
         "configuration": "EVT-PRE-20 Rev.A",
         "board": "PCB-MIC",
         "schematic": display_path(schematic_path),
@@ -339,12 +363,17 @@ def main() -> int:
         },
         "normalized_station_harnesses": normalized_harness,
         "production_bom_items": bom_evidence,
-        "review_a_complete": False,
+        "review_a_complete": True,
+        "review_a_reviewer": review_a["reviewer"],
+        "review_a_date": review_a["date"],
+        "review_a_commit_sha": review_a["commit_sha"],
+        "review_a_evidence": evidence,
         "manufacturing_release": False,
-        "remaining_review_a_evidence": [
-            "commit-matched KiCad 9 ERC with zero unexplained violations",
-            "commit-matched archived manufacturer geometry audit artifacts",
-            "reviewer/date/commit signature",
+        "remaining_review_a_evidence": [],
+        "remaining_release_evidence": [
+            "independent Review B and CAM/DFM closure",
+            "panelization and acoustic membrane/cavity stack",
+            "physical calibration and acoustic EVT",
         ],
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -353,7 +382,10 @@ def main() -> int:
     print("PCB-MIC native schematic independent structural Review-A audit PASS")
     print("components=4 pins=19 labels=17 explicit_nc=2; four frozen harness leaves normalized")
     print("exact MK1/J1/C1/R1 production BOM bindings and project-local footprints PASS")
-    print("Review A remains OPEN pending KiCad 9 ERC, archived commit-matched geometry evidence and signed traceability")
+    print(
+        f"Review A signed PASS by {review_a['reviewer']} on {review_a['date']} "
+        f"for {review_a['commit_sha']}; Review B and manufacturing release remain open"
+    )
     return 0
 
 

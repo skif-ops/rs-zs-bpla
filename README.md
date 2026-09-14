@@ -33,8 +33,10 @@ PCB-PWR также отслеживается и проверяется в CI: �
 `.kicad_sch/.kicad_pcb/.kicad_pro` файлов присутствуют. Плата PCB-PWR пока
 является только неразведённым электрическим placement-canvas с условным контуром
 `90 x 60 mm`, без монтажных отверстий, трасс и copper zones до закрытия
-`DIM-003`. Это не разрешает производство: PCB-MAIN и PCB-PWR routing/Review B,
-PCB-MIC Review A/B, производственный BOM и Gerber заблокированы. Firmware
+`DIM-003`. PCB-MIC Review A подписан `PASS` по commit `3e215e26` с
+commit-matched KiCad 9 ERC и геометрическими evidence. Это не разрешает
+производство: PCB-MAIN и PCB-PWR routing/Review B, PCB-MIC Review B,
+производственный BOM и Gerber заблокированы. Firmware
 сохраняет статус `TARGET_PORT_REQUIRED`.
 На PCB-PWR уже контролируются J1 `Molex 43045-0213`, U1 `LM74700-Q1`,
 U2 `INA226`, Q1 `CSD18540Q5B`, RSH1 `WSK2512R0100FEA`, U3/U4

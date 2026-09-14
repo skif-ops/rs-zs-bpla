@@ -2,7 +2,7 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-MIC",
-  "release_state": "NATIVE_ROUTED_CANDIDATE_REVIEW_A_OPEN",
+  "release_state": "REVIEW_A_PASS",
   "manufacturing_release": false,
   "authoritative_inputs": [
     "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
@@ -34,7 +34,7 @@
       "artifacts/kicad-native/PCB-MIC/PCB-MIC_schematic.pdf",
       "artifacts/kicad-native/sha256_manifest.json"
     ],
-    "routing_status": "PRESENT_NOT_DRC_OR_CAM_RELEASED"
+    "routing_status": "PRESENT_CLI_DRC_AND_CAM_EVIDENCE_REVIEW_B_OPEN"
   },
   "component_contract": {
     "microphone": "TDK InvenSense MMICT5838-00-012",
@@ -52,14 +52,24 @@
     "status": "DIM_004_CLOSED"
   },
   "review_a": {
-    "complete": false,
-    "status": "OPEN_COMMIT_MATCHED_CI_ARCHIVE_AND_SIGNED_TRACEABILITY",
+    "complete": true,
+    "status": "PASS",
     "checklist": "hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
-    "structural_audit_status": "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_REMAINS_OPEN",
-    "geometry_audit_status": "PASS_LOCAL_CONTROL_IMPLEMENTED_REMOTE_COMMIT_ARCHIVE_PENDING",
-    "reviewer": null,
-    "date": null,
-    "commit_sha": null
+    "structural_audit_status": "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
+    "geometry_audit_status": "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
+    "reviewer": "Скиф",
+    "date": "2026-09-14",
+    "commit_sha": "3e215e26e0d4cb160b309de3d3fd5a3145a756bf",
+    "evidence": {
+      "signed_checklist": "hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
+      "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34823813170",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34823813170/artifacts/10339034239",
+      "schematic_pdf": "artifacts/kicad-native/PCB-MIC/PCB-MIC_schematic.pdf",
+      "erc_report": "artifacts/kicad-native/PCB-MIC/erc.json",
+      "committed_geometry_audit": "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
+      "materialized_geometry_audit": "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
+      "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json"
+    }
   },
   "review_b": {
     "complete": false,
