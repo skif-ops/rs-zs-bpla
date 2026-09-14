@@ -9,18 +9,18 @@ Review-A signature.
 
 - [x] Native PCB contains a routed candidate rather than an empty placement canvas.
 - [x] Mechanical outline, mounting pattern and acoustic opening are represented in native CAD.
-- [ ] ECO candidate KiCad 9 DRC passes with zero violations and zero unrouted items.
+- [x] ECO candidate KiCad 9 DRC passes with zero violations and zero unrouted items.
 - [ ] Copper return path and T5838 decoupling placement are independently accepted after repeat Review A.
   - [x] Baseline machine evidence measured the 22.248973 mm return and absent GND Gerber region.
   - [x] Reviewer `Скиф` selected `ECO_REQUIRED` on `14.09.2026` against evidence commit `cb69c0bbc1457b498ee4f44ee7da1d566033c23f`.
   - [x] The ECO candidate removes the non-materialized zone and adds a direct explicit 0.50 mm B.Cu C1 return.
   - [x] Local independent parsing measures the candidate return at 7.108150 mm and loop at 8.766161 mm.
-  - [ ] Commit-bound candidate CAM and copper drawings are archived and independently reviewed.
+  - [x] Commit-bound candidate CAM and copper drawings are archived and independently checked for evidence integrity.
 - [ ] The bottom acoustic port has no paste, mask, adhesive or coating obstruction.
   - [x] Baseline CAM proved zero paste flashes at acoustic and mounting holes and exact F/B mask openings.
-  - [ ] ECO candidate CAM reconfirms the baseline machine checks.
+  - [x] ECO candidate CAM reconfirms the baseline machine checks.
   - [ ] Adhesive and conformal-coating keepouts are accepted by the assembler.
-- [ ] Gerber/Excellon, IPC-356, PnP, BOM and assembly/fabrication drawings are regenerated from the ECO candidate commit.
+- [x] Gerber/Excellon, IPC-356, PnP, BOM and assembly/fabrication drawings are regenerated from the ECO candidate commit.
 - [ ] Panelization, tooling rails and depanel method protect the MEMS microphone.
 - [ ] PCB fabricator and assembler accept the T5838 fine-feature rule and close all DFM comments.
 - [ ] Membrane/cavity tolerance stack and service assembly are frozen.
@@ -45,7 +45,13 @@ validate or sign the ECO candidate.
 
 - Review A: `REVIEW_REQUIRED_AFTER_COPPER_ECO`.
 - Review B: `BLOCKED_PENDING_REPEAT_REVIEW_A_AFTER_COPPER_ECO`.
-- Candidate evidence: `PENDING_COMMIT_BOUND_CI`.
+- Candidate design commit: `159068f2743904fc366a4a65ede5fee829797ed2`.
+- Native PCB SHA-256: `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031`.
+- Candidate evidence: `PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A`.
+- CI: [run #430](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294478), `success`.
+- PCB Native Gate: [run #160](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515), `success`.
+- Artifact: [evt-pre-20-kicad-native-gate](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515/artifacts/10350416547), ID `10350416547`, SHA-256 `cc32b9f7327d9c1c8870c68f70419f96aa83b412973b2d7cde9ded711fb9f31d`.
+- Hash control: 62 manifest entries, 12 controlled source hashes and 27 PCB-MIC output hashes verified.
 - Review-B decision: `OPEN` after repeat Review A.
 - Manufacturing release: `false`.
 

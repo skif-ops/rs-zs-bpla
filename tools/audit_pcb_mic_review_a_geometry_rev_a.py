@@ -612,9 +612,13 @@ def main() -> int:
             "status": prior.get("status"),
         }
         remaining_review_a_evidence = [
-            "successful commit-bound KiCad 9 ERC/DRC and candidate geometry archive",
             "independent human Review-A signature against the ECO candidate commit",
         ]
+        if required_evidence.get("status") != "PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A":
+            remaining_review_a_evidence.insert(
+                0,
+                "successful commit-bound KiCad 9 ERC/DRC and candidate geometry archive",
+            )
         review_summary = (
             f"ECO candidate geometry PASS for {commit_sha}; prior Review A at "
             f"{prior_commit} is superseded and repeat Review A remains required"

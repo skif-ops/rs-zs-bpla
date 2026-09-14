@@ -391,9 +391,13 @@ def main() -> int:
         review_a_commit_sha = None
         superseded_signature = prior
         remaining_review_a_evidence = [
-            "successful commit-bound KiCad 9 ERC/DRC and candidate geometry archive",
             "independent human Review-A signature against the ECO candidate commit",
         ]
+        if evidence.get("status") != "PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A":
+            remaining_review_a_evidence.insert(
+                0,
+                "successful commit-bound KiCad 9 ERC/DRC and candidate geometry archive",
+            )
         summary = (
             "Schematic structure PASS and unchanged in scope; copper ECO candidate "
             "still requires a new Review-A signature"

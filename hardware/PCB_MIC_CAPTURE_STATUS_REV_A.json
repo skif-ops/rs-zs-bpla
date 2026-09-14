@@ -93,13 +93,38 @@
       "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json"
     },
     "required_evidence": {
-      "status": "PENDING_COMMIT_BOUND_CI",
+      "status": "PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A",
+      "design_commit_sha": "159068f2743904fc366a4a65ede5fee829797ed2",
+      "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+      "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515",
+      "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294478",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515/artifacts/10350416547",
+      "artifact_id": 10350416547,
+      "artifact_digest": "sha256:cc32b9f7327d9c1c8870c68f70419f96aa83b412973b2d7cde9ded711fb9f31d",
+      "kicad_cli": {
+        "version": "9.0.9",
+        "erc_violations": 0,
+        "drc_violations": 0,
+        "unrouted_items": 0,
+        "schematic_parity_items": 0
+      },
+      "archive_verification": {
+        "sha256_manifest_entries_verified": 62,
+        "controlled_source_hashes_verified": 12,
+        "pcb_mic_output_hashes_verified": 27,
+        "artifact_zip_sha256_verified": true,
+        "regenerated_preflight_byte_identical": true
+      },
       "committed_geometry_audit": "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
       "materialized_geometry_audit": "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
       "erc_report": "artifacts/kicad-native/PCB-MIC/erc.json",
       "drc_report": "artifacts/kicad-native/PCB-MIC/drc.json",
       "copper_return_audit": "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
-      "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json"
+      "copper_return_audit_sha256": "05fd68dcfe1f7f65df306e30772ffb253ee4f0cb5b56df00e03020d9e4d1c6b9",
+      "review_b_preflight_audit": "artifacts/kicad-native/PCB-MIC/review_b_preflight_audit.json",
+      "review_b_preflight_audit_sha256": "5b5b392aa2c16c731d51a04531d82205e2bb83e12d73b43e8dacf58c647502b6",
+      "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json",
+      "sha256_manifest_sha256": "b60faa4ad917af0ceaa137fe7f5ca9447e01226420c1ca0f8fdba4d2c3e98aa8"
     }
   },
   "review_b": {
@@ -111,14 +136,40 @@
     "commit_sha": null,
     "copper_return_gate": {
       "complete": false,
-      "status": "ECO_CANDIDATE_EXPLICIT_LOCAL_RETURN_PENDING_COMMIT_BOUND_CI_AND_REPEAT_REVIEW_A",
+      "status": "ECO_CANDIDATE_EXPLICIT_LOCAL_RETURN_COMMIT_BOUND_CI_PASS_REPEAT_REVIEW_A_REQUIRED",
       "packet": "hardware/reviews/PCB_MIC_REVIEW_B_COPPER_RETURN_REV_A.md",
       "audit": "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
       "drawings": [
         "artifacts/kicad-native/PCB-MIC/PCB-MIC_F_Cu_review.svg",
         "artifacts/kicad-native/PCB-MIC/PCB-MIC_B_Cu_review.svg"
       ],
-      "commit_bound_ci_status": "PENDING_ECO_CANDIDATE_CI",
+      "commit_bound_ci_status": "PASS_ECO_CANDIDATE_COMMIT_BOUND_CI",
+      "commit_bound_evidence": {
+        "design_commit_sha": "159068f2743904fc366a4a65ede5fee829797ed2",
+        "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+        "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515",
+        "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294478",
+        "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515/artifacts/10350416547",
+        "artifact_id": 10350416547,
+        "artifact_digest": "sha256:cc32b9f7327d9c1c8870c68f70419f96aa83b412973b2d7cde9ded711fb9f31d",
+        "sha256_manifest_entries_verified": 62,
+        "source_hashes_verified": 12,
+        "pcb_mic_output_hashes_verified": 27,
+        "review_b_preflight_audit_sha256": "5b5b392aa2c16c731d51a04531d82205e2bb83e12d73b43e8dacf58c647502b6",
+        "copper_return_audit_sha256": "05fd68dcfe1f7f65df306e30772ffb253ee4f0cb5b56df00e03020d9e4d1c6b9",
+        "copper_review_svg_sha256": {
+          "F.Cu": "49d0cc972078861b5e790788bc9c36c6c84cf1ab98eec70e93949be74253a20c",
+          "B.Cu": "71f6100685f32c91a9eff8ff784ce6a5e1735044282ce4d80691b32101bfe3ed"
+        },
+        "drawing_control": "PASS_BOARD_SIZED_ZOOMABLE_LAYER_DRAWINGS",
+        "kicad_version": "9.0.9",
+        "erc_violations": 0,
+        "drc_violations": 0,
+        "unrouted_items": 0,
+        "review_a_complete": false,
+        "review_b_complete": false,
+        "manufacturing_release": false
+      },
       "baseline_commit_bound_evidence": {
         "evidence_commit_sha": "cb69c0bbc1457b498ee4f44ee7da1d566033c23f",
         "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015",
@@ -160,7 +211,7 @@
         "ground_return_vias": 2,
         "source_bcu_ground_zones": 0,
         "manufacturing_copper_model": "EXPLICIT_ROUTING_ONLY",
-        "evidence_status": "PENDING_COMMIT_BOUND_CI"
+        "evidence_status": "PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A"
       },
       "reviewer": "Скиф",
       "date": "2026-09-14",
@@ -171,22 +222,21 @@
       "manufacturing_release": false
     },
     "internal_preflight": {
-      "complete": false,
-      "status": "PENDING_ECO_CANDIDATE_COMMIT_BOUND_CI_REPEAT_REVIEW_A_REQUIRED",
-      "evidence_role": "SUPERSEDED_BASELINE_ONLY",
-      "baseline_status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
-      "evidence_commit_sha": "cb69c0bbc1457b498ee4f44ee7da1d566033c23f",
-      "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015",
-      "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840245983",
-      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015/artifacts/10345408977",
-      "artifact_id": 10345408977,
-      "artifact_digest": "sha256:f535c183a3feda6b4e2d38a636987b30aacaa0767103bec39379fbf042d95664",
+      "complete": true,
+      "status": "PASS_ECO_CANDIDATE_CAM_PREFLIGHT_REPEAT_REVIEW_A_REQUIRED",
+      "evidence_role": "CURRENT_ECO_CANDIDATE",
+      "evidence_commit_sha": "159068f2743904fc366a4a65ede5fee829797ed2",
+      "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515",
+      "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294478",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515/artifacts/10350416547",
+      "artifact_id": 10350416547,
+      "artifact_digest": "sha256:cc32b9f7327d9c1c8870c68f70419f96aa83b412973b2d7cde9ded711fb9f31d",
       "audit": "artifacts/kicad-native/PCB-MIC/review_b_preflight_audit.json",
-      "audit_sha256": "b509f8f87a556eecf5e2b5fe7ad81cc1f461780d89233933da75976e8af94bd4",
+      "audit_sha256": "5b5b392aa2c16c731d51a04531d82205e2bb83e12d73b43e8dacf58c647502b6",
       "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json",
-      "sha256_manifest_sha256": "01a7d3f4cb0eae621e4f61416e9d2018e8168ba701b38cc1ab79f1e29fdb934b",
+      "sha256_manifest_sha256": "b60faa4ad917af0ceaa137fe7f5ca9447e01226420c1ca0f8fdba4d2c3e98aa8",
       "sha256_manifest_entries": 62,
-      "source_hashes_verified": 10,
+      "source_hashes_verified": 12,
       "pcb_mic_output_hashes_verified": 27,
       "kicad_cli": {
         "version": "9.0.9",
@@ -195,9 +245,16 @@
         "unrouted_items": 0
       },
       "cam_source": {
-        "signed_source_sha256": "aecd1a374b5f66d32a5ae056eb4ad452d68e2a2391e65f6068acc8cad37f2295",
-        "derived_source_sha256": "3768ba97b0c21aca933795a52876aaa351f7dd19f5b39da2c7324c45e7d0e4c0",
+        "source_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+        "derived_source_sha256": "0f2fb434731b969f241701aecf02fab4c18771580b8c6fe2a79f85dbcecad443",
         "design_geometry_modified": false
+      },
+      "superseded_baseline_evidence": {
+        "status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
+        "evidence_commit_sha": "cb69c0bbc1457b498ee4f44ee7da1d566033c23f",
+        "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015",
+        "artifact_id": 10345408977,
+        "artifact_digest": "sha256:f535c183a3feda6b4e2d38a636987b30aacaa0767103bec39379fbf042d95664"
       },
       "review_b_complete": false,
       "manufacturing_release": false

@@ -1,6 +1,6 @@
 # PCB-MIC Rev.A Review B copper-return and decoupling packet
 
-Status: `ECO_REQUIRED RECORDED / ECO CANDIDATE IMPLEMENTED / COMMIT-BOUND CI PENDING / REPEAT REVIEW A REQUIRED / REVIEW B BLOCKED / NOT FOR MANUFACTURE`
+Status: `ECO_REQUIRED RECORDED / ECO CANDIDATE COMMIT-BOUND CI PASS / REPEAT REVIEW A REQUIRED / REVIEW B BLOCKED / NOT FOR MANUFACTURE`
 
 This packet records the independent copper-return decision, preserves the baseline
 evidence that caused the hold, and defines the bounded PCB-MIC copper ECO. It does not
@@ -79,12 +79,34 @@ The project still has no frozen normative maximum for the decoupling loop. These
 measurements prove the bounded topology change and regression, but cannot self-sign
 Review A or Review B.
 
+## ECO candidate commit-bound evidence
+
+| Item | Controlled value |
+|---|---|
+| Design commit | `159068f2743904fc366a4a65ede5fee829797ed2` |
+| Native PCB SHA-256 | `a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031` |
+| PCB Native Gate | [run #160](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515), `success` |
+| CI | [run #430](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294478), `success` |
+| Artifact | [ID 10350416547](https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515/artifacts/10350416547) |
+| Artifact SHA-256 | `cc32b9f7327d9c1c8870c68f70419f96aa83b412973b2d7cde9ded711fb9f31d` |
+| KiCad 9.0.9 | ERC `0`; DRC `0`; unrouted `0`; schematic parity `0` |
+| Archive verification | 62 manifest entries; 12 controlled source hashes; 27 PCB-MIC output hashes |
+| Review-B preflight SHA-256 | `5b5b392aa2c16c731d51a04531d82205e2bb83e12d73b43e8dacf58c647502b6` |
+| Copper audit SHA-256 | `05fd68dcfe1f7f65df306e30772ffb253ee4f0cb5b56df00e03020d9e4d1c6b9` |
+| F.Cu / B.Cu SVG SHA-256 | `49d0cc972078861b5e790788bc9c36c6c84cf1ab98eec70e93949be74253a20c` / `71f6100685f32c91a9eff8ff784ce6a5e1735044282ce4d80691b32101bfe3ed` |
+
+Independent archive verification matched the GitHub artifact digest, all manifest
+entries and both nested source/output hash sets. Regenerating the Review-B preflight
+from the extracted artifact produced byte-identical JSON. The B.Cu Gerber contains
+zero GND regions and five explicit GND draws, matching the explicit-routing-only
+source model.
+
 ## Required next gates
 
-- [ ] Commit and push the ECO candidate as one controlled source set.
-- [ ] KiCad 9 ERC and DRC pass with zero violations and zero unrouted items.
-- [ ] Commit-bound Gerber confirms explicit-routing-only B.Cu copper with zero GND regions.
-- [ ] Updated copper SVGs, topology JSON, CAM reports and SHA-256 manifest are archived.
+- [x] Commit and push the ECO candidate as one controlled source set.
+- [x] KiCad 9 ERC and DRC pass with zero violations and zero unrouted items.
+- [x] Commit-bound Gerber confirms explicit-routing-only B.Cu copper with zero GND regions.
+- [x] Updated copper SVGs, topology JSON, CAM reports and SHA-256 manifest are archived.
 - [ ] Repeat Review A is signed against the ECO candidate commit and its archived evidence.
 - [ ] Repeat the independent copper-return decision within Review B after Review A closes.
 - [ ] Complete the remaining panelization, DFM, acoustic-stack and physical-EVT gates.
