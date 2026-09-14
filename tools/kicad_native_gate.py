@@ -433,31 +433,127 @@ def normalize_multipage_pdf(
     print(f"{name}: {document} multipage PDF PASS: {final_path.name}")
 
 
+def svg_mm_dimension(value: str, label: str) -> float:
+    """Parse the explicit millimetre page size emitted by KiCad's SVG exporter."""
+    match = re.fullmatch(
+        r"\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)mm\s*", value
+    )
+    if match is None:
+        raise RuntimeError(f"{label} must be an explicit millimetre dimension: {value!r}")
+    return float(match.group(1))
+
+
+def find_svg_board_outline(
+    root: ET.Element, expected_width: float = 24.0, expected_height: float = 22.0,
+) -> tuple[float, float, float, float]:
+    """Find the four simple SVG line paths forming the signed rectangular outline."""
+    number_pattern = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
+    segments: list[tuple[float, float, float, float]] = []
+    for element in root.iter():
+        if not element.tag.endswith("path"):
+            continue
+        path_data = element.attrib.get("d", "")
+        if re.findall(r"[A-Za-z]", path_data) != ["M", "L"]:
+            continue
+        values = [float(value) for value in re.findall(number_pattern, path_data)]
+        if len(values) == 4:
+            segments.append(tuple(values))
+
+    tolerance = 0.01
+    horizontal = [
+        (min(x1, x2), max(x1, x2), (y1 + y2) / 2.0)
+        for x1, y1, x2, y2 in segments
+        if abs(y1 - y2) <= tolerance
+        and abs(abs(x2 - x1) - expected_width) <= tolerance
+    ]
+    vertical = [
+        ((x1 + x2) / 2.0, min(y1, y2), max(y1, y2))
+        for x1, y1, x2, y2 in segments
+        if abs(x1 - x2) <= tolerance
+        and abs(abs(y2 - y1) - expected_height) <= tolerance
+    ]
+    for left, right, y1 in horizontal:
+        for other_left, other_right, y2 in horizontal:
+            if (
+                abs(left - other_left) > tolerance
+                or abs(right - other_right) > tolerance
+                or abs(abs(y2 - y1) - expected_height) > tolerance
+            ):
+                continue
+            top, bottom = sorted((y1, y2))
+            has_left = any(
+                abs(x - left) <= tolerance
+                and abs(start - top) <= tolerance
+                and abs(end - bottom) <= tolerance
+                for x, start, end in vertical
+            )
+            has_right = any(
+                abs(x - right) <= tolerance
+                and abs(start - top) <= tolerance
+                and abs(end - bottom) <= tolerance
+                for x, start, end in vertical
+            )
+            if has_left and has_right:
+                return left, top, right, bottom
+    raise RuntimeError(
+        f"24x22 mm four-edge board outline missing from copper-review SVG; "
+        f"simple_segments={len(segments)}"
+    )
+
+
 def validate_copper_review_svgs(name: str, paths_by_layer: dict[str, Path]) -> None:
-    """Require board-sized, zoomable copper drawings rather than A4 thumbnails."""
+    """Require board-fitted, zoomable copper drawings rather than A4 thumbnails."""
     if set(paths_by_layer) != {"F.Cu", "B.Cu"}:
         raise RuntimeError(f"{name}: copper-review SVG layer set mismatch")
-    expected_ratio = 24.0 / 22.0
+    contents: dict[str, bytes] = {}
     for layer, path in paths_by_layer.items():
         if not path.is_file() or path.stat().st_size <= 1000:
             raise RuntimeError(f"{name}: {layer} copper-review SVG is missing/empty: {path}")
+        contents[layer] = path.read_bytes()
         root = ET.parse(path).getroot()
         if not root.tag.endswith("svg"):
             raise RuntimeError(f"{name}: {layer} copper-review file is not SVG")
         view_box = root.attrib.get("viewBox", "").replace(",", " ").split()
         if len(view_box) != 4:
             raise RuntimeError(f"{name}: {layer} copper-review SVG viewBox missing")
-        width = float(view_box[2])
-        height = float(view_box[3])
-        if width <= 0 or height <= 0 or abs(width / height - expected_ratio) > 0.02:
+        view_x, view_y, width, height = [float(value) for value in view_box]
+        if width <= 0 or height <= 0:
             raise RuntimeError(
-                f"{name}: {layer} copper-review SVG is not board-proportioned: "
-                f"viewBox={view_box}"
+                f"{name}: {layer} copper-review SVG has invalid viewBox: {view_box}"
             )
+        page_width = svg_mm_dimension(root.attrib.get("width", ""), f"{name}: {layer} width")
+        page_height = svg_mm_dimension(root.attrib.get("height", ""), f"{name}: {layer} height")
+        if abs(page_width - width) > 0.01 or abs(page_height - height) > 0.01:
+            raise RuntimeError(
+                f"{name}: {layer} physical page size does not match viewBox: "
+                f"page={page_width}x{page_height}mm viewBox={view_box}"
+            )
+        left, top, right, bottom = find_svg_board_outline(root)
+        if (
+            left < view_x - 0.01
+            or top < view_y - 0.01
+            or right > view_x + width + 0.01
+            or bottom > view_y + height + 0.01
+        ):
+            raise RuntimeError(f"{name}: {layer} board outline falls outside SVG viewBox")
+        coverage = (24.0 / width, 22.0 / height)
+        # KiCad 9.0.9 keeps about 5 mm of horizontal margin even with
+        # --fit-page-to-board (actual X coverage is ~0.706).  The lower bound
+        # admits that deterministic margin while rejecting an A4 thumbnail (~0.114).
+        if min(coverage) < 0.65:
+            raise RuntimeError(
+                f"{name}: {layer} board is a thumbnail on the SVG page: "
+                f"viewBox={view_box}, outline_coverage={coverage}"
+            )
+        if b"Dioneya / ZS-BPLA" in contents[layer]:
+            raise RuntimeError(f"{name}: {layer} copper-review SVG contains the drawing sheet")
         print(
-            f"{name}: {layer} board-sized copper-review SVG PASS: "
-            f"viewBox={view_box}"
+            f"{name}: {layer} board-fitted copper-review SVG PASS: "
+            f"canvas={width:.4f}x{height:.4f}mm, "
+            f"outline_coverage={coverage[0]:.3f}x{coverage[1]:.3f}"
         )
+    if contents["F.Cu"] == contents["B.Cu"]:
+        raise RuntimeError(f"{name}: F.Cu and B.Cu review SVGs are identical")
 
 
 def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:

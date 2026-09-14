@@ -761,12 +761,75 @@ def audit_documents(artifact_root: Path) -> dict[str, Any]:
     }
 
 
+def svg_mm_dimension(value: str, label: str) -> float:
+    match = re.fullmatch(
+        r"\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)mm\s*", value
+    )
+    require(match is not None, f"{label} must use explicit millimetres: {value!r}")
+    return float(match.group(1))
+
+
+def find_svg_board_outline(root: ET.Element) -> tuple[float, float, float, float]:
+    """Independently locate the four 24x22 mm Edge.Cuts paths in a layer SVG."""
+    number_pattern = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
+    segments: list[tuple[float, float, float, float]] = []
+    for element in root.iter():
+        if not element.tag.endswith("path"):
+            continue
+        path_data = element.attrib.get("d", "")
+        if re.findall(r"[A-Za-z]", path_data) != ["M", "L"]:
+            continue
+        values = [float(value) for value in re.findall(number_pattern, path_data)]
+        if len(values) == 4:
+            segments.append(tuple(values))
+
+    tolerance = 0.01
+    horizontal = [
+        (min(x1, x2), max(x1, x2), (y1 + y2) / 2.0)
+        for x1, y1, x2, y2 in segments
+        if abs(y1 - y2) <= tolerance and abs(abs(x2 - x1) - 24.0) <= tolerance
+    ]
+    vertical = [
+        ((x1 + x2) / 2.0, min(y1, y2), max(y1, y2))
+        for x1, y1, x2, y2 in segments
+        if abs(x1 - x2) <= tolerance and abs(abs(y2 - y1) - 22.0) <= tolerance
+    ]
+    for left, right, y1 in horizontal:
+        for other_left, other_right, y2 in horizontal:
+            if (
+                abs(left - other_left) > tolerance
+                or abs(right - other_right) > tolerance
+                or abs(abs(y2 - y1) - 22.0) > tolerance
+            ):
+                continue
+            top, bottom = sorted((y1, y2))
+            sides = {
+                "left": any(
+                    abs(x - left) <= tolerance
+                    and abs(start - top) <= tolerance
+                    and abs(end - bottom) <= tolerance
+                    for x, start, end in vertical
+                ),
+                "right": any(
+                    abs(x - right) <= tolerance
+                    and abs(start - top) <= tolerance
+                    and abs(end - bottom) <= tolerance
+                    for x, start, end in vertical
+                ),
+            }
+            if all(sides.values()):
+                return left, top, right, bottom
+    raise RuntimeError(
+        f"24x22 mm four-edge board outline missing from copper-review SVG; "
+        f"simple_segments={len(segments)}"
+    )
+
+
 def audit_copper_review_svgs(artifact_root: Path) -> dict[str, Any]:
     files = {
         "F.Cu": artifact_root / "PCB-MIC_F_Cu_review.svg",
         "B.Cu": artifact_root / "PCB-MIC_B_Cu_review.svg",
     }
-    expected_ratio = 24.0 / 22.0
     results: dict[str, Any] = {}
     contents: dict[str, bytes] = {}
     for layer, path in files.items():
@@ -778,17 +841,35 @@ def audit_copper_review_svgs(artifact_root: Path) -> dict[str, Any]:
         view_box = root.attrib.get("viewBox", "").replace(",", " ").split()
         require(len(view_box) == 4, f"{layer} copper-review SVG viewBox missing")
         dimensions = [float(value) for value in view_box]
-        width, height = dimensions[2], dimensions[3]
+        view_x, view_y, width, height = dimensions
         require(width > 0 and height > 0, f"{layer} copper-review SVG has invalid size")
-        require(abs(width / height - expected_ratio) <= 0.02,
-                f"{layer} copper-review SVG is not fit to 24x22 board: {view_box}")
+        page_width = svg_mm_dimension(root.attrib.get("width", ""), f"{layer} SVG width")
+        page_height = svg_mm_dimension(root.attrib.get("height", ""), f"{layer} SVG height")
+        require(abs(page_width - width) <= 0.01 and abs(page_height - height) <= 0.01,
+                f"{layer} SVG physical size/viewBox mismatch")
+        left, top, right, bottom = find_svg_board_outline(root)
+        require(
+            left >= view_x - 0.01
+            and top >= view_y - 0.01
+            and right <= view_x + width + 0.01
+            and bottom <= view_y + height + 0.01,
+            f"{layer} 24x22 board outline falls outside the SVG viewBox",
+        )
+        coverage = [24.0 / width, 22.0 / height]
+        # Independent usability bound: KiCad's fitted export is ~0.706 in X;
+        # the same 24 mm outline on an A4-width canvas would be only ~0.114.
+        require(min(coverage) >= 0.65,
+                f"{layer} board is a thumbnail on SVG canvas: coverage={coverage}")
         contents[layer] = data
         results[layer] = {
             "path": str(path.relative_to(artifact_root)),
             "sha256": sha256(path),
             "bytes": len(data),
             "view_box": dimensions,
-            "board_proportioned": True,
+            "physical_page_mm": [page_width, page_height],
+            "board_outline": [left, top, right, bottom],
+            "outline_canvas_fraction": coverage,
+            "board_fitted": True,
             "drawing_sheet_excluded": b"Dioneya / ZS-BPLA" not in data,
         }
         require(results[layer]["drawing_sheet_excluded"],
