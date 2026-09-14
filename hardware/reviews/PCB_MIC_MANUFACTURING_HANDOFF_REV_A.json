@@ -1,0 +1,122 @@
+{
+  "schema": "dioneya-pcb-mic-manufacturing-handoff-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-MIC",
+  "revision": "A",
+  "status": "PACKET_READY_EXTERNAL_ACCEPTANCE_REQUIRED_NOT_FOR_MANUFACTURE",
+  "authority_inputs": [
+    "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
+    "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_dru",
+    "hardware/CHINA_PROCUREMENT_RFQ.csv",
+    "hardware/PCB_DOUBLE_REVIEW_GATE.md",
+    "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json"
+  ],
+  "source_binding": {
+    "native_board": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
+    "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+    "repeat_review_a_commit_sha": "e17a86bc78ba979f74c5549b378e94f7f3447fe4",
+    "copper_return_decision_commit_sha": "7aeec13aa0c7ba1b3cd9095b800c6d08755912a3",
+    "copper_return_acceptance_state_commit_sha": "8aa4a3d21b55956625db643e22436f248f75b258"
+  },
+  "board_contract": {
+    "coordinate_origin": "LOWER_LEFT_OF_BOARD_OUTLINE",
+    "outline_mm": [24.0, 22.0],
+    "thickness_mm": 1.0,
+    "copper_layers": 2,
+    "material": "FR-4",
+    "surface_finish": "ENIG",
+    "acoustic_port": {
+      "type": "NPTH",
+      "diameter_mm": 0.8,
+      "x_mm": 12.0,
+      "y_mm": 16.65
+    },
+    "mounting_holes": [
+      {"reference": "H1", "type": "NPTH", "diameter_mm": 2.2, "x_mm": 4.0, "y_mm": 16.65},
+      {"reference": "H2", "type": "NPTH", "diameter_mm": 2.2, "x_mm": 20.0, "y_mm": 16.65}
+    ],
+    "fitted_top_references": ["C1", "J1", "MK1", "R1"],
+    "fitted_bottom_references": []
+  },
+  "process_contract": {
+    "t5838_local_clearance_rule": {
+      "minimum_copper_clearance_mm": 0.125,
+      "minimum_npth_to_copper_clearance_mm": 0.1,
+      "fabricator_acceptance_required": true
+    },
+    "acoustic_path": {
+      "prohibited_obstructions": [
+        "copper",
+        "solder mask",
+        "solder paste",
+        "adhesive",
+        "conformal coating",
+        "membrane glue",
+        "enclosure feature",
+        "mounting screw",
+        "washer",
+        "metallic insert"
+      ],
+      "assembler_process_acceptance_required": true
+    },
+    "panelization": {
+      "vendor_panel_drawing_required": true,
+      "tooling_rails_required": true,
+      "mems_safe_depanel_method_required": true,
+      "numerical_panel_geometry_frozen": false,
+      "prohibited_intersections": [
+        "T5838 body and courtyard",
+        "acoustic NPTH and acoustic path",
+        "H1 and H2 mounting holes"
+      ]
+    },
+    "electrical_test": "100_PERCENT_NET_TEST_AGAINST_CONTROLLED_IPC_356",
+    "lot_traceability_required": true
+  },
+  "controlled_candidate_outputs": [
+    "gerber/PCB-MIC-job.gbrjob",
+    "drill/PCB-MIC.drl",
+    "PCB-MIC.d356",
+    "PCB-MIC_pos.csv",
+    "PCB-MIC_manufacturing_bom.csv",
+    "PCB-MIC_assembly_fabrication.pdf",
+    "PCB-MIC_F_Cu_review.svg",
+    "PCB-MIC_B_Cu_review.svg"
+  ],
+  "pcb_native_gate_bundle": {
+    "audit": "PCB-MIC/manufacturing_handoff_audit.json",
+    "packet": "PCB-MIC/manufacturing-handoff/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.md",
+    "machine_contract": "PCB-MIC/manufacturing-handoff/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json",
+    "response_register": "PCB-MIC/manufacturing-handoff/PCB_MIC_DFM_RESPONSE_REV_A.csv"
+  },
+  "external_acceptance": {
+    "response_register": "hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv",
+    "required_gate_ids": [
+      "FAB-STACKUP",
+      "FAB-GEOMETRY",
+      "FAB-FINE-FEATURE",
+      "FAB-NET-TEST",
+      "PANEL-DRAWING",
+      "PANEL-DEPANEL",
+      "ASM-PLACEMENT",
+      "ASM-ACOUSTIC-KEEPOUT",
+      "DFM-CLOSURE"
+    ],
+    "fabricator_acceptance": "PENDING_EXTERNAL_ACCEPTANCE",
+    "assembler_acceptance": "PENDING_EXTERNAL_ACCEPTANCE",
+    "panelization_depanel_acceptance": "PENDING_EXTERNAL_ACCEPTANCE",
+    "adhesive_conformal_coating_keepout_acceptance": "PENDING_EXTERNAL_ACCEPTANCE",
+    "blocker_critical_dfm_closure": "PENDING_EXTERNAL_ACCEPTANCE",
+    "complete": false
+  },
+  "remaining_non_vendor_gates": [
+    "membrane and cavity tolerance-stack freeze",
+    "assembled acoustic inspection and physical EVT calibration",
+    "independent Review-B signature and manufacturing release"
+  ],
+  "release_interlock": {
+    "review_b_complete": false,
+    "manufacturing_release": false,
+    "fabrication_authorized": false
+  }
+}

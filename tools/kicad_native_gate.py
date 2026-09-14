@@ -38,6 +38,12 @@ PCB_PWR_STATUS = ROOT / "hardware" / "PCB_PWR_CAPTURE_STATUS_REV_A.json"
 PRODUCTION_BOM = ROOT / "hardware" / "EVT_PRE_20_BOM_REV_A.csv"
 PCB_MIC_REVIEW_B_AUDIT = ROOT / "tools" / "audit_pcb_mic_review_b_preflight_rev_a.py"
 PCB_MIC_COPPER_RETURN_AUDIT = ROOT / "tools" / "audit_pcb_mic_copper_return_rev_a.py"
+PCB_MIC_HANDOFF_AUDIT = ROOT / "tools" / "audit_pcb_mic_manufacturing_handoff_rev_a.py"
+PCB_MIC_HANDOFF_SOURCES = [
+    ROOT / "hardware" / "reviews" / "PCB_MIC_MANUFACTURING_HANDOFF_REV_A.md",
+    ROOT / "hardware" / "reviews" / "PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json",
+    ROOT / "hardware" / "reviews" / "PCB_MIC_DFM_RESPONSE_REV_A.csv",
+]
 
 PCB_MIC_BOM_ITEMS = {
     "C1": "C-MIC",
@@ -789,14 +795,46 @@ def main() -> int:
                 if audit_rc == 0:
                     audit_report = json.loads(audit_output.read_text(encoding="utf-8"))
                     mic["review_b_preflight_state"] = audit_report["status"]
+                    handoff_output = ART / "PCB-MIC" / "manufacturing_handoff_audit.json"
+                    handoff_rc = run(
+                        [
+                            sys.executable,
+                            str(PCB_MIC_HANDOFF_AUDIT.relative_to(ROOT)),
+                            "--output", str(handoff_output),
+                            "--commit-sha", git_head(),
+                            "--require-clean-source",
+                        ],
+                        check=False,
+                    )
+                    if handoff_rc == 0:
+                        handoff_report = json.loads(
+                            handoff_output.read_text(encoding="utf-8")
+                        )
+                        mic["manufacturing_handoff_state"] = handoff_report["status"]
+                        handoff_root = ART / "PCB-MIC" / "manufacturing-handoff"
+                        handoff_root.mkdir(parents=True, exist_ok=True)
+                        for source in PCB_MIC_HANDOFF_SOURCES:
+                            shutil.copy2(source, handoff_root / source.name)
+                    else:
+                        mic["manufacturing_handoff_state"] = f"FAIL_rc{handoff_rc}"
+                        cli_failures.append(
+                            f"PCB-MIC: MANUFACTURING_HANDOFF_AUDIT_FAIL_rc{handoff_rc}"
+                        )
                 else:
                     mic["review_b_preflight_state"] = f"FAIL_rc{audit_rc}"
+                    mic["manufacturing_handoff_state"] = (
+                        "NOT_RUN_REVIEW_B_PREFLIGHT_FAILURE"
+                    )
                     cli_failures.append(f"PCB-MIC: REVIEW_B_PREFLIGHT_FAIL_rc{audit_rc}")
             else:
                 mic["review_b_preflight_state"] = "NOT_RUN_COPPER_RETURN_AUDIT_FAILURE"
+                mic["manufacturing_handoff_state"] = (
+                    "NOT_RUN_COPPER_RETURN_AUDIT_FAILURE"
+                )
         else:
             mic["copper_return_review_state"] = "NOT_RUN_PREREQUISITE_CLI_FAILURE"
             mic["review_b_preflight_state"] = "NOT_RUN_PREREQUISITE_CLI_FAILURE"
+            mic["manufacturing_handoff_state"] = "NOT_RUN_PREREQUISITE_CLI_FAILURE"
 
     if not all_missing and not cli_failures:
         if all(review_a_complete(name) for name in BOARDS):

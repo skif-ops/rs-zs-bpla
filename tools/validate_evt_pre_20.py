@@ -152,6 +152,10 @@ def validate_decisions_and_tests() -> None:
         and "copper-return subgate" in decisions["DEC-042"]["Decision"],
         "PCB-MIC copper-return acceptance binding is missing",
     )
+    require(
+        decisions["DEC-043"]["Status"] == "IMPLEMENTED_EXTERNAL_ACCEPTANCE_PENDING",
+        "PCB-MIC manufacturing-handoff separation decision is missing",
+    )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
@@ -373,6 +377,32 @@ def validate_hardware_baseline() -> None:
         require(copper_gate.get("decision") == "ECO_REQUIRED"
                 and copper_gate.get("reviewer") and copper_gate.get("date"),
                 "PCB-MIC ECO_REQUIRED decision traceability is incomplete")
+    mic_handoff = mic_status["review_b"].get("manufacturing_handoff", {})
+    require(
+        mic_handoff.get("status") == "PACKET_READY_EXTERNAL_ACCEPTANCE_REQUIRED"
+        and mic_handoff.get("internal_packet_complete") is True
+        and mic_handoff.get("complete") is False,
+        "PCB-MIC manufacturing handoff is not internally ready and externally blocked",
+    )
+    require(
+        all(mic_handoff.get(key) is False for key in (
+            "fabricator_dfm_acceptance",
+            "assembler_dfm_acceptance",
+            "panelization_acceptance",
+            "depanel_acceptance",
+            "assembler_process_keepout_acceptance",
+            "review_b_complete",
+            "manufacturing_release",
+        )),
+        "PCB-MIC manufacturing handoff advanced an external or release gate",
+    )
+    for relative in (
+        mic_handoff.get("packet"),
+        mic_handoff.get("machine_contract"),
+        mic_handoff.get("response_register"),
+    ):
+        require(isinstance(relative, str) and (ROOT / relative).is_file(),
+                f"PCB-MIC manufacturing handoff file is missing: {relative}")
     require(
         mic_status["native_source"]["independent_schematic_audit"] ==
         "artifacts/pcb_mic_native_schematic_rev_a.json",

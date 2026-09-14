@@ -35,7 +35,8 @@ PCB-PWR также отслеживается и проверяется в CI: �
 `90 x 60 mm`, без монтажных отверстий, трасс и copper zones до закрытия
 `DIM-003`. После ограниченного copper ECO повторный PCB-MIC Review A подписан
 `PASS` по commit `e17a86bc`, а copper-return subgate Review B принят по commit
-`7aeec13a` и PCB SHA-256 `a292a6ec…e4031`. Это не разрешает производство:
+`7aeec13a` и PCB SHA-256 `a292a6ec…e4031`. Контролируемый manufacturing-handoff
+packet готов, но все ответы фабрики и сборщика остаются `PENDING`. Это не разрешает производство:
 PCB-MAIN и PCB-PWR routing/Review B, оставшиеся PCB-MIC Review B gates и
 производственный выпуск BOM/Gerber заблокированы. Firmware
 сохраняет статус `TARGET_PORT_REQUIRED`.

@@ -104,6 +104,7 @@ on:
       - "tools/audit_pcb_mic_review_a_geometry_rev_a.py"
       - "tools/audit_pcb_mic_review_b_preflight_rev_a.py"
       - "tools/audit_pcb_mic_copper_return_rev_a.py"
+      - "tools/audit_pcb_mic_manufacturing_handoff_rev_a.py"
       - "tools/audit_pcb_mic_mechanical_rev_a.py"
       - "tools/audit_pcb_mic_molex_rev_a.py"
       - ".github/workflows/pcb-native.yml"

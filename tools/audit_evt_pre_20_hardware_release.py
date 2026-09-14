@@ -204,6 +204,24 @@ def audit() -> dict[str, object]:
         mic_authority or "MISSING",
         "PCB-MIC fabrication metadata does not resolve to the controlled mechanical authority",
     )
+    mic_handoff = mic_review_b.get("manufacturing_handoff", {})
+    mic_handoff_ready = (
+        isinstance(mic_handoff, dict)
+        and mic_handoff.get("status") == "PACKET_READY_EXTERNAL_ACCEPTANCE_REQUIRED"
+        and mic_handoff.get("internal_packet_complete") is True
+        and mic_handoff.get("complete") is False
+        and mic_handoff.get("fabricator_dfm_acceptance") is False
+        and mic_handoff.get("assembler_dfm_acceptance") is False
+        and mic_handoff.get("panelization_acceptance") is False
+        and mic_handoff.get("depanel_acceptance") is False
+        and mic_handoff.get("assembler_process_keepout_acceptance") is False
+    )
+    check(
+        "pcb_mic_manufacturing_handoff_packet",
+        mic_handoff_ready,
+        str(mic_handoff.get("status", "MISSING")) if isinstance(mic_handoff, dict) else "MISSING",
+        "PCB-MIC controlled manufacturing handoff packet is not ready",
+    )
     mic_released = (
         mic_status_ok
         and mic_status.get("manufacturing_release") is True

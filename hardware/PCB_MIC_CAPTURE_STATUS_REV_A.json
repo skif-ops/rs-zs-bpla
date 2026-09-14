@@ -48,6 +48,13 @@
       "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
       "artifacts/kicad-native/sha256_manifest.json"
     ],
+    "manufacturing_handoff_evidence": [
+      "artifacts/pcb_mic_manufacturing_handoff_rev_a.json",
+      "artifacts/kicad-native/PCB-MIC/manufacturing_handoff_audit.json",
+      "artifacts/kicad-native/PCB-MIC/manufacturing-handoff/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.md",
+      "artifacts/kicad-native/PCB-MIC/manufacturing-handoff/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json",
+      "artifacts/kicad-native/PCB-MIC/manufacturing-handoff/PCB_MIC_DFM_RESPONSE_REV_A.csv"
+    ],
     "routing_status": "EXPLICIT_LOCAL_RETURN_REVIEW_A_SIGNED_REVIEW_B_OPEN"
   },
   "component_contract": {
@@ -356,6 +363,22 @@
         "artifact_id": 10345408977,
         "artifact_digest": "sha256:f535c183a3feda6b4e2d38a636987b30aacaa0767103bec39379fbf042d95664"
       },
+      "review_b_complete": false,
+      "manufacturing_release": false
+    },
+    "manufacturing_handoff": {
+      "complete": false,
+      "status": "PACKET_READY_EXTERNAL_ACCEPTANCE_REQUIRED",
+      "internal_packet_complete": true,
+      "packet": "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.md",
+      "machine_contract": "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json",
+      "response_register": "hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv",
+      "audit": "artifacts/pcb_mic_manufacturing_handoff_rev_a.json",
+      "fabricator_dfm_acceptance": false,
+      "assembler_dfm_acceptance": false,
+      "panelization_acceptance": false,
+      "depanel_acceptance": false,
+      "assembler_process_keepout_acceptance": false,
       "review_b_complete": false,
       "manufacturing_release": false
     }

@@ -47,6 +47,8 @@
 - повторный PCB-MIC Review A после copper ECO подписан `PASS` по commit `e17a86bc`;
   copper-return subgate Review B принят по commit `7aeec13a`, но panelization,
   DFM, acoustic-stack, physical-EVT, общий Review B и manufacturing release открыты;
+- PCB-MIC manufacturing-handoff packet подготовлен; все fabricator/assembler
+  response rows остаются `PENDING_EXTERNAL_ACCEPTANCE`;
 - производственный BOM, Gerber и статус `FOR_MANUFACTURE` заблокированы;
 - firmware имеет статус `TARGET_PORT_REQUIRED`;
 - аппаратный EVT имеет статус `NOT RUN`.

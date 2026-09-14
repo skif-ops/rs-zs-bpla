@@ -9,6 +9,7 @@
 - native-схемы PCB-MAIN и PCB-PWR, а также их KiCad 9 ERC: `PASS / REVIEW A`;
 - PCB-MAIN и PCB-PWR routing, Review B и manufacturing release: `OPEN / BLOCKED`;
 - повторный PCB-MIC Review A: `PASS`; copper-return subgate Review B: `ACCEPTED`;
+- PCB-MIC manufacturing handoff: `PACKET READY / EXTERNAL DFM ACCEPTANCE PENDING`;
 - оставшиеся PCB-MIC panelization/DFM/acoustic/physical-EVT gates: `OPEN`;
 - аппаратный EVT: `NOT RUN`;
 - общий статус: `OPEN / NOT FOR MANUFACTURE`.

@@ -37,6 +37,12 @@ jobs:
           python tools/audit_pcb_mic_native_schematic_rev_a.py \
             --schematic hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch \
             --output artifacts/pcb_mic_native_schematic_rev_a.json
+      - name: Audit PCB-MIC controlled manufacturing handoff
+        run: |
+          python tools/audit_pcb_mic_manufacturing_handoff_rev_a.py \
+            --output artifacts/pcb_mic_manufacturing_handoff_rev_a.json \
+            --commit-sha "$GITHUB_SHA" \
+            --require-clean-source
       - name: Independent PCB-MAIN capture-authority audit
         run: python tools/audit_pcb_main_capture_authority_rev_a.py
       - name: Second independent PCB-MAIN U1 electrical control
@@ -131,6 +137,7 @@ jobs:
             artifacts/evt_pre_20_bom_workbook_audit.json
             artifacts/evt_pre_20_bom_qg2.json
             artifacts/pcb_mic_native_schematic_rev_a.json
+            artifacts/pcb_mic_manufacturing_handoff_rev_a.json
             artifacts/pcb_main_capture_authority_rev_a.json
             artifacts/pcb_main_mcu_pin_authority_rev_a.json
             artifacts/pcb_main_storage_sensor_authority_rev_a.json
