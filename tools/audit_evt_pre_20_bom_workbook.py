@@ -193,6 +193,10 @@ def main() -> int:
             ["10", "10", "10", "40", "40", "10"],
             ["20", "20", "20", "80", "80", "20"],
         ], "Summary: 4/10/20 station quantities mismatch")
+        require(summary[8] == [
+            "Selected scenario", "EVT-20", "20 stations", "DIO-EVT-001..020",
+            "Purchase gate", "BLOCKED",
+        ], "Summary: selected EVT-20 scenario or blocked purchase gate mismatch")
         require(summary[14][1] == "PASS", "Summary: QG-1 status is not PASS")
         require(summary[15][1] == "BLOCKED", "Summary: QG-2 must remain BLOCKED")
         require("U8" not in summary[22][1], "Summary: U8 incorrectly remains an open selection")
