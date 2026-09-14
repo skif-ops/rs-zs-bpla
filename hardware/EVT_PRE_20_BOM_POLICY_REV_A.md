@@ -24,6 +24,13 @@ Every fitted electrical, harness and system line must contain:
 - operating temperature capability compatible with the Rev.A environment rule;
 - selection status, source evidence and incoming-control method.
 
+An exact hardware MPN may be `CONTROLLED_PENDING_VERIFICATION` when the remaining
+evidence can only be collected on assembled stations. For `U8`, `BG95-M3` is the
+controlled hardware identity; marking and firmware identity are incoming checks,
+while operator/SIM attach and representative burst results remain post-assembly EVT.
+Those later tests may not be marked PASS in the BOM and do not revert the exact MPN
+to an unresolved engineering selection.
+
 PCBA service and bare-PCB lines use the released fabrication/assembly specification and
 approved supplier instead of an electronic-component MPN. Conditional housing options
 must have zero quantity unless that variant is formally selected.

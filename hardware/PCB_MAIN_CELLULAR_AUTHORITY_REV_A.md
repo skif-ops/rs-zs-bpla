@@ -115,13 +115,14 @@ Exact 4.7 kOhm, 47 kOhm, and 10 nF passive MPNs are frozen by `MAIN-AUTH-010`; t
 
 The rail must not be cut while `CELL_STATUS=HIGH`. Fast shutdown on U8 pad 25 is not enabled in Rev.A.
 
-## Review A and EVT evidence still required
+## Incoming and assembled-station EVT evidence still required
 
 - Verify all 102 U8 pads against the final native symbol and land pattern.
-- Record the exact ordered BG95-M3 firmware and regional procurement identity.
+- Record the exact ordered BG95-M3 marking and firmware identity at incoming inspection.
 - Probe PWRKEY, RESET_N, STATUS, VDD_EXT, both UART directions, DTR, and RI across cold start, warm restart, shutdown, and brownout.
 - Verify the 700 ms power-on pulse, the 650-1500 ms shutdown fallback window, and the 2-3.8 s emergency reset window.
 - Verify U16 partial-power isolation with `3V3_DIGITAL` present and `3V8_MODEM` absent.
 - Verify all four U8 VBAT pads remain at or above 3.3 V during representative LTE and EGPRS bursts.
 - Measure `GND_MODEM` to `GND_DIGITAL` offset and noise at U16; the peak must remain below 75 mV.
-- Complete dual-SIM SI and connector procurement evidence, modem recovery, cellular RF, exact passive, layout, native ERC, BOM-from-schematic, and independent PCB reviews before any manufacturing release.
+- Complete exact passive, layout, native ERC, BOM-from-schematic and independent PCB reviews before PCBA manufacturing release.
+- Complete dual-SIM cycling, modem recovery, cellular RF, operator attach and representative burst evidence on assembled stations before EVT acceptance. Until then those results remain `NOT_RUN`, never inferred from the hardware selection.

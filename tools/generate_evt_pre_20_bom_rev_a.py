@@ -541,7 +541,7 @@ def main(*, check_only: bool = False) -> None:
             row["BOM_disposition"] = "CONDITIONAL_NOT_RELEASED"
         elif not exact_identity or status.startswith(("OPEN", "RFQ_REQUIRED", "SOURCE_PACKAGE_REQUIRED")):
             row["BOM_disposition"] = "BLOCKED_SELECTION"
-        elif status.startswith("CANDIDATE") or "REGION_OPERATOR" in status:
+        elif status.startswith("CANDIDATE"):
             row["BOM_disposition"] = "BLOCKED_ENGINEERING_SELECTION"
         elif row["Temperature_C"] in ("", "OPEN", "TBD") or "TEMP_VERIFY" in status:
             row["BOM_disposition"] = "BLOCKED_RATING_VERIFICATION"

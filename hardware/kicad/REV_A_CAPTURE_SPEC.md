@@ -134,7 +134,7 @@ Required AAD tests before release:
 
 ### 1.5 Cellular and dual SIM
 
-- `U8`: Quectel `BG95-M3` in the 102-pad 23.6 x 19.9 mm LGA; exact ordered firmware/region identity and operator validation remain release blockers.
+- `U8`: exact Quectel `BG95-M3` hardware in the 102-pad 23.6 x 19.9 mm LGA is selected. Ordered marking and firmware identity are recorded by incoming inspection. Operator/SIM validation and representative LTE/EGPRS burst tests remain `NOT_RUN` post-assembly EVT evidence; they are not an unresolved BOM identity.
 - The complete U8 pad disposition is frozen in `hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv`; it closes only `MAIN-AUTH-004` together with U16 and Q1/Q2.
 - U8 pins 32/33 `VBAT_BB` use `3V8_MODEM_BB`; pins 52/53 `VBAT_RF` use `3V8_MODEM_RF`; both branches originate from the single `3V8_MODEM` star point.
 - The BB branch requires 100 uF low-ESR plus 220 nF, 47 nF, 150 pF, 100 pF, 68 pF, 33 pF, and 10 pF with a ferrite bead adjacent to U8. BB copper is at least 0.6 mm equivalent width.
