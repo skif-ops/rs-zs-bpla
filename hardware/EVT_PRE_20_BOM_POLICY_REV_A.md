@@ -74,11 +74,17 @@ groups from the 47-row authority, repeats the 4/10/20 lot and roll-up reconcilia
 verifies schematic RefDes coverage and refuses a production release while native
 schematic or system SKU evidence is incomplete.
 
+`tools/audit_evt_pre_20_bom_workbook.py` reads the XLSX package independently with
+the Python standard library. It compares every displayed value in the Engineering
+BOM, Procurement and RFQ worksheets with their CSV authorities and verifies the
+native Excel-table ranges, summary lot quantities and gate statuses.
+
 The actual factory gate is:
 
 ```bash
 python tools/generate_evt_pre_20_bom_rev_a.py --check
 python tools/validate_evt_pre_20_bom_qg1.py
+python tools/audit_evt_pre_20_bom_workbook.py
 python tools/audit_evt_pre_20_bom_qg2.py --strict
 python tools/audit_evt_pre_20_hardware_release.py --strict
 ```

@@ -59,6 +59,7 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "tools/generate_evt_pre_20_bom_rev_a.py",
         "tools/validate_evt_pre_20_bom_qg1.py",
         "tools/audit_evt_pre_20_bom_qg2.py",
+        "tools/audit_evt_pre_20_bom_workbook.py",
         "tools/audit_evt_pre_20_hardware_release.py",
         "tools/audit_pcb_mic_native_schematic_rev_a.py",
         "tools/audit_pcb_main_capture_authority_rev_a.py",
