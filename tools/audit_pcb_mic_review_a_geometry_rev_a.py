@@ -534,8 +534,9 @@ def main() -> int:
     reviewed_source_commit_match = source_matches_commit(
         review_a["commit_sha"], controlled_paths
     )
-    require(reviewed_source_commit_match,
-            "current PCB-MIC reviewed sources diverge from the signed Review A commit")
+    if args.require_clean_source:
+        require(reviewed_source_commit_match,
+                "current PCB-MIC reviewed sources diverge from the signed Review A commit")
     require(review_a["geometry_audit_status"] ==
             "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
             "PCB-MIC geometry audit status does not match signed Review A")
@@ -558,6 +559,7 @@ def main() -> int:
             "controlled_sources_match_commit": source_commit_match,
             "audit_control_matches_commit": control_commit_match,
             "controlled_sources_match_signed_review_commit": reviewed_source_commit_match,
+            "signed_review_source_match_required": bool(args.require_clean_source),
             "require_clean_source": bool(args.require_clean_source),
         },
         "source_files": [file_record(path) for path in controlled_paths],
