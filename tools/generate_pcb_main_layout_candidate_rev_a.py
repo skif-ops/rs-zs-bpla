@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 """Generate the controlled PCB-MAIN Rev.A placement-stage native layout.
 
@@ -109,6 +110,14 @@ def mm(x: float, y: float) -> pcbnew.VECTOR2I:
     return pcbnew.VECTOR2I_MM(float(x), float(y))
 
 
+def set_footprint_property(fp: pcbnew.FOOTPRINT, key: str, value: str) -> None:
+    """Set a custom footprint field across the KiCad 7-to-9 SWIG API change."""
+    if hasattr(fp, "SetField"):
+        fp.SetField(key, value)
+    else:
+        fp.SetProperty(key, value)
+
+
 def props(symbol: dict) -> tuple[str, str]:
     return str(symbol["mpn"]), str(symbol["package"])
 
@@ -176,8 +185,8 @@ def passive_footprint(board: pcbnew.BOARD, package: str) -> pcbnew.FOOTPRINT:
     courtyard.SetLayer(pcbnew.F_CrtYd)
     courtyard.SetWidth(pcbnew.FromMM(0.05))
     fp.Add(courtyard)
-    fp.SetProperty("DIONEA_COURTYARD_STATUS", PASSIVE_COURTYARD_STATUS)
-    fp.SetProperty("DIONEA_COURTYARD_SOURCE", PASSIVE_COURTYARD_SOURCE)
+    set_footprint_property(fp, "DIONEA_COURTYARD_STATUS", PASSIVE_COURTYARD_STATUS)
+    set_footprint_property(fp, "DIONEA_COURTYARD_SOURCE", PASSIVE_COURTYARD_SOURCE)
     return fp
 
 
@@ -189,7 +198,9 @@ def generic_footprint(board: pcbnew.BOARD, pin_numbers: list[str], package: str)
     """
     width, height = BODY.get(package, (max(2.0, min(12.0, len(pin_numbers) * 0.35)), 3.0))
     fp = pcbnew.FOOTPRINT(board)
-    fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "PROVISIONAL_REQUIRES_MANUFACTURER_DRAWING")
+    set_footprint_property(
+        fp, "DIONEA_FOOTPRINT_STATUS", "PROVISIONAL_REQUIRES_MANUFACTURER_DRAWING"
+    )
     count = len(pin_numbers)
     sides = max(1, (count + 3) // 4)
     coords: list[tuple[float, float]] = []
@@ -229,8 +240,10 @@ def fixture_footprint(board: pcbnew.BOARD, ref: str, pins: list[str]) -> tuple[p
     x0, y0 = float(rows[0]["X_mm"]), float(rows[0]["Y_mm"])
     fp = pcbnew.FOOTPRINT(board)
     fp.SetLayer(pcbnew.B_Cu)
-    fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "CONTROLLED_MAIN_AUTH_011_POGO_PATTERN")
-    fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", str(MECH.relative_to(ROOT)))
+    set_footprint_property(
+        fp, "DIONEA_FOOTPRINT_STATUS", "CONTROLLED_MAIN_AUTH_011_POGO_PATTERN"
+    )
+    set_footprint_property(fp, "DIONEA_FOOTPRINT_SOURCE", str(MECH.relative_to(ROOT)))
     for row in rows:
         pad = pcbnew.PAD(fp)
         pad.SetNumber(row["Contact"])
@@ -272,7 +285,8 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                         "TI_DRT0003A_IPC_Candidate":
                             "PROJECT_IPC_TI_DRT0003A_KICAD_DRT3_ASSEMBLER_DFM_REQUIRED",
                     }
-                    fp.SetProperty(
+                    set_footprint_property(
+                        fp,
                         "DIONEA_FOOTPRINT_STATUS",
                         (
                             "PROJECT_IPC_PATTERN_CONTROLLED_ASSEMBLY_DFM_REQUIRED"
@@ -311,13 +325,21 @@ def load_footprint(board: pcbnew.BOARD, package: str, pins: list[str]) -> pcbnew
                         "Winbond_W25Q512JV_PackageF_IPC_Candidate": ipc_candidates["Winbond_W25Q512JV_PackageF_IPC_Candidate"],
                         "TI_DRT0003A_IPC_Candidate": ipc_candidates["TI_DRT0003A_IPC_Candidate"],
                     }
-                    fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", sources[name])
+                    set_footprint_property(fp, "DIONEA_FOOTPRINT_SOURCE", sources[name])
                 elif (directory, name) in KICAD_DRAWING_VERIFIED:
-                    fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_DRAWING_VERIFIED")
-                    fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", KICAD_DRAWING_VERIFIED[(directory, name)])
+                    set_footprint_property(
+                        fp, "DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_DRAWING_VERIFIED"
+                    )
+                    set_footprint_property(
+                        fp, "DIONEA_FOOTPRINT_SOURCE", KICAD_DRAWING_VERIFIED[(directory, name)]
+                    )
                 else:
-                    fp.SetProperty("DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_REVIEW_PENDING")
-                    fp.SetProperty("DIONEA_FOOTPRINT_SOURCE", f"KiCad:{directory}/{name}")
+                    set_footprint_property(
+                        fp, "DIONEA_FOOTPRINT_STATUS", "KICAD_LIBRARY_PATTERN_REVIEW_PENDING"
+                    )
+                    set_footprint_property(
+                        fp, "DIONEA_FOOTPRINT_SOURCE", f"KiCad:{directory}/{name}"
+                    )
                 return fp
     return generic_footprint(board, pins, package)
 
@@ -407,8 +429,9 @@ def main() -> int:
             fp, fixture_position = fixture_footprint(board, ref, pin_numbers)
         else:
             fp = load_footprint(board, package, pin_numbers)
-        fp.SetReference(ref); fp.SetValue(mpn); fp.SetProperty("DIONEA_PACKAGE", package)
-        fp.SetProperty("DIONEA_POPULATION", component["population"])
+        fp.SetReference(ref); fp.SetValue(mpn)
+        set_footprint_property(fp, "DIONEA_PACKAGE", package)
+        set_footprint_property(fp, "DIONEA_POPULATION", component["population"])
         if component["population"] == "DNP":
             fp.SetExcludedFromPosFiles(True)
         by_number = {pad.GetNumber(): pad for pad in fp.Pads() if pad.GetNumber()}
@@ -423,8 +446,12 @@ def main() -> int:
             x, y, angle = fixed[ref]
         else:
             x, y, angle = placement[ref]
-            fp.SetProperty("DIONEA_PLACEMENT_SOURCE", "PCB_MAIN_PLACEMENT_REPACK_REV_A")
-            fp.SetProperty("DIONEA_PLACEMENT_CLASS", "UNLOCKED_LAYOUT_CANDIDATE")
+            set_footprint_property(
+                fp, "DIONEA_PLACEMENT_SOURCE", "PCB_MAIN_PLACEMENT_REPACK_REV_A"
+            )
+            set_footprint_property(
+                fp, "DIONEA_PLACEMENT_CLASS", "UNLOCKED_LAYOUT_CANDIDATE"
+            )
         fp.SetPosition(mm(x, y)); fp.SetOrientationDegrees(angle); normalize_text(fp); board.Add(fp)
 
     board.BuildListOfNets()
