@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """Generate the controlled PCB-MAIN Rev.A placement-stage native layout.
 
