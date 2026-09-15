@@ -12,9 +12,12 @@ signed and contains no manufacturing release assertion.
 - Native PCB: placement-stage candidate present.
 - Placement clearance: `BLOCKED`; the independent controlled audit records 17
   confirmed courtyard collisions, 67 pad-envelope screening collisions, two
-  confirmed mounting-exclusion conflicts and one screening mounting conflict.
+  confirmed mounting-exclusion conflicts, one screening mounting conflict and
+  two confirmed U.FL tool-cylinder conflicts.
 - MAIN-AUTH-011 limited ECO: required for locked `J8/U8`, `J_MIC1/J_PWR`,
-  `H1/J_PWR` and `H2/J13` conflicts; no revised coordinate is approved yet.
+  `H1/J_PWR`, `H2/J13` and J8/J10 tool-cylinder conflicts against U8/U10.
+  Proposal `PCB-MAIN-MECH-ECO-001` clears this locked conflict set in the
+  independent geometry overlay, but is explicitly not approved or applied.
 - Board: 110 x 75 x 1.6 mm, six copper layers, rounded R3 outline, four M3 NPTH holes.
 - Population represented: 247 on-board components plus four mounting holes; 186 native nets.
 - Routing/copper zones: absent.
@@ -33,12 +36,16 @@ signed and contains no manufacturing release assertion.
 - [x] Locked connector/module anchors and rotations match MAIN-AUTH-011.
 - [x] Six-layer count, thickness, outline and mounting pattern are represented.
 - [x] All registered manufacturer-source footprint reviews are complete; provisional and library-review-pending counts are zero.
-- [x] Placement/courtyard and mounting-exclusion blockers are independently
-  inventoried and hash-bound by `tools/audit_pcb_main_placement_clearance_rev_a.py`.
+- [x] Placement/courtyard, mounting-exclusion and U.FL tool/service blockers are
+  independently inventoried and hash-bound by
+  `tools/audit_pcb_main_placement_clearance_rev_a.py`.
+- [x] A bounded mechanical ECO candidate is machine-readable, baseline-hash-bound
+  and independently confirms no locked conflict after the proposed overlay.
 - [ ] U9 paste stencil is adapted and approved for the selected assembly process.
 - [ ] The selected assembler approves copper, mask and stencil rules for the `U2/U25/U26` project IPC candidates.
-- [ ] A limited mechanical ECO supersedes the four internally conflicting
-  MAIN-AUTH-011 placements/exclusions and receives independent mechanical review.
+- [ ] A limited mechanical ECO supersedes the six internally conflicting
+  MAIN-AUTH-011 component placements, mounting exclusions and U.FL service
+  cylinders, then receives independent mechanical review.
 - [ ] All 169 pad-envelope screening footprints receive controlled courtyard/body
   disposition or are placed with equivalent independently reviewed evidence.
 - [ ] Placement is collision-free and every courtyard/height/service zone passes.

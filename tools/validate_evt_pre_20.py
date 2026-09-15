@@ -190,7 +190,7 @@ def validate_deliverable_register() -> None:
         deliverables["HW-M-000"]["Статус"] == "CONTROLLED_ECO_REQUIRED"
         and deliverables["HW-M-000"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-M-000"]["QG-2 техника"] == "OPEN"
-        and "four locked placement or mounting-exclusion conflicts"
+        and "six locked component mounting-exclusion or U.FL tool/service conflicts"
         in deliverables["HW-M-000"]["Критерий выпуска"],
         "PCB-MAIN mechanical authority is not held for the controlled limited ECO",
     )

@@ -10,7 +10,7 @@ SYS-002,Архитектура,Архитектура изделия и сист
 SYS-003,Архитектура,ICD станция-сервер,DOCX+CBOR schema,P0,DRAFT,PASS,OPEN,Decoder explicitly accepts controlled schemas 1 3 4 and rejects unknown versions; target and field compatibility remain QG2
 SYS-004,Архитектура,Энергобаланс 40-60 Ач и 60-80 Вт,XLSX+DOCX,P0,PLANNED,OPEN,OPEN,Расчёт и измерение S0-S4 согласованы
 SYS-005,Архитектура,Threat model и управление ключами,DOCX,P0,PLANNED,OPEN,OPEN,Ключи не включены в пакет; процессы provisioning описаны
-HW-M-000,PCB main,Комплект входных authority MAIN-AUTH-001..011,CSV+MD+JSON,P0,CONTROLLED_ECO_REQUIRED,PASS,OPEN,Electrical capture input is complete but MAIN-AUTH-011 has four locked placement or mounting-exclusion conflicts requiring a limited mechanical ECO
+HW-M-000,PCB main,Комплект входных authority MAIN-AUTH-001..011,CSV+MD+JSON,P0,CONTROLLED_ECO_REQUIRED,PASS,OPEN,Electrical capture input is complete but MAIN-AUTH-011 has six locked component mounting-exclusion or U.FL tool/service conflicts requiring a limited mechanical ECO
 HW-M-001,PCB main,Схема электрическая принципиальная,KICAD_SCH+PDF,P0,CONTROLLED,PASS,PASS,Native schematic and signed Review A PASS; commit-matched KiCad 9 ERC zero violations
 HW-M-002,PCB main,Разводка основной платы,KICAD_PCB+STEP,P0,DRAFT,PASS,OPEN,Six-layer placement candidate has zero provisional footprints and three controlled IPC candidates but clearance audit is blocked; limited mechanical ECO full repack routing DRC STEP and Review B remain open
 HW-M-003,PCB main,Gerber и сверловка,GERBER+DRILL,P0,PLANNED,OPEN,OPEN,Сверены с source и просмотрены CAM

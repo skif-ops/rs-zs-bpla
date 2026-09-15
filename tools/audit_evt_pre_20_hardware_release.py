@@ -162,8 +162,11 @@ def audit() -> dict[str, object]:
         and main_clearance.get("screening_component_collisions") == 0
         and main_clearance.get("confirmed_mounting_clearance_conflicts") == 0
         and main_clearance.get("screening_mounting_clearance_conflicts") == 0
+        and main_clearance.get("confirmed_tool_clearance_conflicts") == 0
+        and main_clearance.get("screening_tool_clearance_conflicts") == 0
         and main_clearance.get("locked_authority_component_conflicts") == []
         and main_clearance.get("locked_authority_mounting_conflicts") == []
+        and main_clearance.get("locked_authority_tool_conflicts") == []
     )
     check(
         "pcb_main_placement_clearance",
@@ -173,9 +176,11 @@ def audit() -> dict[str, object]:
             f"confirmed={main_clearance.get('confirmed_component_collisions', 'MISSING')} "
             f"screening={main_clearance.get('screening_component_collisions', 'MISSING')} "
             f"mounting_confirmed={main_clearance.get('confirmed_mounting_clearance_conflicts', 'MISSING')} "
-            f"mounting_screening={main_clearance.get('screening_mounting_clearance_conflicts', 'MISSING')}"
+            f"mounting_screening={main_clearance.get('screening_mounting_clearance_conflicts', 'MISSING')} "
+            f"tool_confirmed={main_clearance.get('confirmed_tool_clearance_conflicts', 'MISSING')} "
+            f"tool_screening={main_clearance.get('screening_tool_clearance_conflicts', 'MISSING')}"
         ) if isinstance(main_clearance, dict) else "MISSING",
-        "PCB-MAIN placement has unresolved courtyard/pad-envelope or mounting-exclusion conflicts",
+        "PCB-MAIN placement has unresolved courtyard/pad-envelope, mounting-exclusion or U.FL tool/service conflicts",
     )
     main_released = (
         main_status.get("manufacturing_release") is True

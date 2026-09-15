@@ -76,6 +76,7 @@ on:
       - "tools/materialize_pcb_main_verified_library_footprints_rev_a.py"
       - "tools/audit_pcb_main_layout_candidate_rev_a.py"
       - "tools/audit_pcb_main_placement_clearance_rev_a.py"
+      - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
       - "tools/audit_pcb_main_native_schematic_rev_a.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
@@ -299,6 +300,8 @@ jobs:
           python tools/audit_pcb_main_layout_candidate_rev_a.py
           python tools/audit_pcb_main_placement_clearance_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/placement_clearance_audit.json
+          python tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/mechanical_eco_candidate_audit.json
           python tools/generate_pcb_main_schematic_rev_a.py --check
           python tools/audit_pcb_main_native_schematic_rev_a.py \
             --schematic hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch \

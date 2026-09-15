@@ -223,6 +223,10 @@
       "layout_independent_audit": "tools/audit_pcb_main_layout_candidate_rev_a.py",
       "placement_clearance_audit": "tools/audit_pcb_main_placement_clearance_rev_a.py",
       "placement_clearance_record": "hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md",
+      "mechanical_eco_candidate": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.json",
+      "mechanical_eco_candidate_record": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.md",
+      "mechanical_eco_candidate_audit": "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py",
+      "mechanical_eco_candidate_status": "PROPOSED_NOT_APPROVED",
       "placement_clearance_control": {
         "state": "BLOCKED_PLACEMENT_CLEARANCE",
         "board_sha256": "aa35fe622b6a0761b9b25ae488e1a2c6e7160c285ab771b580f63513b83e4a22",
@@ -234,6 +238,8 @@
         "screening_component_collisions": 67,
         "confirmed_mounting_clearance_conflicts": 2,
         "screening_mounting_clearance_conflicts": 1,
+        "confirmed_tool_clearance_conflicts": 2,
+        "screening_tool_clearance_conflicts": 0,
         "locked_authority_component_conflicts": [
           [
             "J8",
@@ -252,6 +258,16 @@
           [
             "H2",
             "J13"
+          ]
+        ],
+        "locked_authority_tool_conflicts": [
+          [
+            "J10",
+            "U10"
+          ],
+          [
+            "J8",
+            "U8"
           ]
         ]
       },

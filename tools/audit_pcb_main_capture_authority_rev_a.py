@@ -1681,6 +1681,8 @@ def main() -> None:
             required_layout_evidence = {
                 "native_layout_candidate", "layout_generator", "layout_independent_audit",
                 "placement_clearance_audit", "placement_clearance_record",
+                "mechanical_eco_candidate", "mechanical_eco_candidate_record",
+                "mechanical_eco_candidate_audit",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
             require(required_layout_evidence <= set(review_b["evidence"]),
@@ -1693,6 +1695,17 @@ def main() -> None:
                         "calculation": "CLOSED", "layout": "OPEN",
                         "measurement": "OPEN", "overall": "OPEN",
                     }, "RA-003 split disposition drift")
+            require(review_b["evidence"].get("mechanical_eco_candidate_status") ==
+                    "PROPOSED_NOT_APPROVED",
+                    "PCB-MAIN mechanical ECO candidate status drift")
+            mechanical_candidate = json.loads(
+                (ROOT / review_b["evidence"]["mechanical_eco_candidate"])
+                .read_text(encoding="utf-8")
+            )
+            require(mechanical_candidate.get("status") == "PROPOSED_NOT_APPROVED" and
+                    mechanical_candidate.get("manufacturing_release") is False and
+                    not any(mechanical_candidate.get("approval", {}).values()),
+                    "PCB-MAIN mechanical ECO candidate is not safely interlocked")
             placement_control = review_b["evidence"].get("placement_clearance_control")
             require(isinstance(placement_control, dict),
                     "placement-clearance controlled baseline is missing")
@@ -1703,13 +1716,17 @@ def main() -> None:
                         "screening_component_collisions",
                         "confirmed_mounting_clearance_conflicts",
                         "screening_mounting_clearance_conflicts",
+                        "confirmed_tool_clearance_conflicts",
+                        "screening_tool_clearance_conflicts",
                         "locked_authority_component_conflicts",
                         "locked_authority_mounting_conflicts",
+                        "locked_authority_tool_conflicts",
                     }, "placement-clearance controlled baseline schema drift")
             require(placement_control["state"] == "BLOCKED_PLACEMENT_CLEARANCE",
                     "current PCB-MAIN placement must remain blocked")
             require(placement_control["confirmed_component_collisions"] > 0 and
-                    placement_control["confirmed_mounting_clearance_conflicts"] > 0,
+                    placement_control["confirmed_mounting_clearance_conflicts"] > 0 and
+                    placement_control["confirmed_tool_clearance_conflicts"] > 0,
                     "placement blocker counts cannot be empty while status is blocked")
             require(placement_control["locked_authority_component_conflicts"] == [
                         ["J8", "U8"], ["J_MIC1", "J_PWR"],
@@ -1717,6 +1734,9 @@ def main() -> None:
             require(placement_control["locked_authority_mounting_conflicts"] == [
                         ["H1", "J_PWR"], ["H2", "J13"],
                     ], "controlled locked mounting-conflict set drift")
+            require(placement_control["locked_authority_tool_conflicts"] == [
+                        ["J10", "U10"], ["J8", "U8"],
+                    ], "controlled locked U.FL tool-conflict set drift")
     elif native_present:
         require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
                 "human Review A identity/date/SHA claimed before sign-off")

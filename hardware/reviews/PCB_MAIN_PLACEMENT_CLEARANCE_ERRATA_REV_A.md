@@ -26,6 +26,9 @@ footprint rotation and translation are applied.
 - Positive overlap must exceed 0.02 mm on both axes to be reported.
 - The MAIN-AUTH-011 10.0 mm component-exclusion diameter around H1-H4 is checked
   against the same envelopes.
+- Each `TOOL_D8_Z15` U.FL rule is checked as a 4.0 mm-radius, 15.0 mm-high
+  top-side service cylinder against every other fitted assembly envelope. The cylinder may open
+  beyond a service edge, but it may not intersect a component courtyard/body.
 - Bottom production pogo footprints are fixture contacts, not assembled bodies,
   and are excluded from component-collision counts.
 
@@ -45,6 +48,8 @@ inspection remain mandatory and are not replaced by this audit.
 | Screening component collisions | 67 | Rework or exact courtyard required |
 | Confirmed mounting-exclusion conflicts | 2 | Placement blocker |
 | Screening mounting-exclusion conflicts | 1 | Rework or exact courtyard required |
+| Confirmed U.FL tool-clearance conflicts | 2 | Locked service-volume blocker |
+| Screening U.FL tool-clearance conflicts | 0 | None |
 
 Confirmed courtyard/courtyard collisions:
 
@@ -79,10 +84,18 @@ The pad-envelope screening also finds H1/C1 with a 0.112 mm apparent deficit.
 That finding is controlled as placement rework or courtyard completion, not as a
 new authority conflict.
 
+Confirmed U.FL D8 tool-cylinder conflicts:
+
+| Tool / component | Required radius, mm | Nearest courtyard distance, mm | Deficit, mm | Authority disposition |
+|---|---:|---:|---:|---|
+| J8 / U8 | 4.000 | 0.200 | 3.800 | `MAIN-AUTH-011` conflict, limited ECO required |
+| J10 / U10 | 4.000 | 2.750 | 1.250 | `MAIN-AUTH-011` conflict, limited ECO required |
+
 ## ECO and release boundary
 
-`MAIN-AUTH-011` currently locks both members of `J8/U8` and `J_MIC1/J_PWR`, and
-locks J_PWR/J13 against the H1/H2 mounting exclusions. These four conflicts
+`MAIN-AUTH-011` currently locks both members of `J8/U8` and `J_MIC1/J_PWR`,
+locks J_PWR/J13 against the H1/H2 mounting exclusions, and also locks the D8
+tool cylinders of J8/J10 into the U8/U10 courtyards. These controlled conflicts
 cannot be removed by moving only non-authority components. No coordinate in the
 signed mechanical authority is changed by this errata.
 
@@ -93,6 +106,16 @@ without entering the cellular allocation, and relocating J8 or U8 must preserve
 the BG95 adjacent-component clearance and the short/no-stub cellular RF path.
 H1-H4 and the 10.0 mm component exclusions remain mandatory unless a separately
 approved mechanical change supersedes them.
+
+`PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.md` and its machine-readable JSON now
+record proposal `PCB-MAIN-MECH-ECO-001`. The independent overlay audit clears
+the two locked component pairs, two locked mounting pairs and two locked U.FL
+tool-cylinder pairs geometrically. It also preserves at least 1.0 mm courtyard
+clearance to the north PCB edge for moved J8/J10. The candidate is explicitly
+`PROPOSED_NOT_APPROVED`: it has not changed this authority or the board. The
+exact 10.0 mm MIC1 corridor and north-side coax/tool openings can be frozen only
+as minimum capture allocations; named harness and enclosure evidence remain
+manufacturing-release blockers.
 
 After that decision, all unlocked footprints must be repacked, the 169 screened
 footprints must receive controlled courtyard/body disposition, and the following

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Inventory PCB-MAIN Rev.A placement and mounting-hole clearances.
+"""Inventory PCB-MAIN Rev.A placement, mounting and U.FL service clearances.
 
 The committed board is still an unrouted engineering placement candidate.  This
 audit therefore has two modes:
@@ -41,6 +41,9 @@ GEOMETRY_TOLERANCE_MM = 0.02
 COURTYARD_SOURCE = "COURTYARD"
 PAD_SOURCE = "PAD_ENVELOPE_PLUS_0_25_MM"
 FIXTURE_PACKAGE_PREFIX = "POGO_FIXTURE_"
+TOOL_GEOMETRY_PATTERN = re.compile(
+    r"(?:^|_)TOOL_D([0-9]+(?:\.[0-9]+)?)_Z([0-9]+(?:\.[0-9]+)?)(?:_|$)"
+)
 
 
 @dataclass(frozen=True)
@@ -197,6 +200,33 @@ def load_authority(path: Path) -> tuple[set[str], list[dict[str, Any]]]:
     return locked_refs, mounting_holes
 
 
+def load_tool_clearances(path: Path) -> list[dict[str, Any]]:
+    clearances: list[dict[str, Any]] = []
+    with path.open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    for row in rows:
+        match = TOOL_GEOMETRY_PATTERN.search(row["Clearance_Rule"])
+        if match is None:
+            continue
+        require(row["Feature_Type"] == "CONNECTOR_PLACEMENT" and
+                row["Side"] == "TOP" and row["Access_Direction"] == "UP_Z",
+                f"{row['Record_ID']}: tool clearance owner must be a top connector with UP_Z access")
+        clearances.append({
+            "ref": row["RefDes"],
+            "x_mm": float(row["X_mm"]),
+            "y_mm": float(row["Y_mm"]),
+            "diameter_mm": float(match.group(1)),
+            "height_mm": float(match.group(2)),
+            "access_direction": row["Access_Direction"],
+            "clearance_rule": row["Clearance_Rule"],
+        })
+    require([item["ref"] for item in clearances] == ["J8", "J9", "J10"],
+            "expected J8/J9/J10 U.FL tool-clearance set")
+    require({(item["diameter_mm"], item["height_mm"]) for item in clearances} ==
+            {(8.0, 15.0)}, "expected D8 x Z15 U.FL tool-clearance geometry")
+    return clearances
+
+
 def component_collision(first: Envelope, second: Envelope) -> dict[str, Any] | None:
     if first.side != second.side:
         return None
@@ -246,6 +276,37 @@ def mounting_conflict(hole: dict[str, Any], envelope: Envelope) -> dict[str, Any
     }
 
 
+def tool_clearance_conflict(clearance: dict[str, Any], envelope: Envelope) -> dict[str, Any] | None:
+    if envelope.side != "TOP" or envelope.ref == clearance["ref"]:
+        return None
+    nearest_x = max(envelope.xmin, min(clearance["x_mm"], envelope.xmax))
+    nearest_y = max(envelope.ymin, min(clearance["y_mm"], envelope.ymax))
+    distance = math.hypot(nearest_x - clearance["x_mm"],
+                          nearest_y - clearance["y_mm"])
+    radius = clearance["diameter_mm"] / 2.0
+    if distance >= radius - GEOMETRY_TOLERANCE_MM:
+        return None
+    confirmed = envelope.source == COURTYARD_SOURCE
+    return {
+        "pair": [clearance["ref"], envelope.ref],
+        "side": envelope.side,
+        "classification": (
+            "CONFIRMED_TOOL_CLEARANCE_TO_COURTYARD_CONFLICT" if confirmed
+            else "SCREENING_TOOL_CLEARANCE_TO_PAD_ENVELOPE_CONFLICT"
+        ),
+        "envelope_source": envelope.source,
+        "tool_center_mm": [rounded(clearance["x_mm"]), rounded(clearance["y_mm"])],
+        "required_radius_mm": rounded(radius),
+        "required_height_mm": rounded(clearance["height_mm"]),
+        "actual_nearest_distance_mm": rounded(distance),
+        "clearance_deficit_mm": rounded(radius - distance),
+        "access_direction": clearance["access_direction"],
+        "clearance_rule": clearance["clearance_rule"],
+        "authority_locked_component": envelope.authority_locked,
+        "component_bounds_mm": envelope.bounds(),
+    }
+
+
 def expected_control(report: dict[str, Any]) -> dict[str, Any]:
     summary = report["summary"]
     return {
@@ -259,8 +320,11 @@ def expected_control(report: dict[str, Any]) -> dict[str, Any]:
         "screening_component_collisions": summary["screening_component_collisions"],
         "confirmed_mounting_clearance_conflicts": summary["confirmed_mounting_clearance_conflicts"],
         "screening_mounting_clearance_conflicts": summary["screening_mounting_clearance_conflicts"],
+        "confirmed_tool_clearance_conflicts": summary["confirmed_tool_clearance_conflicts"],
+        "screening_tool_clearance_conflicts": summary["screening_tool_clearance_conflicts"],
         "locked_authority_component_conflicts": summary["locked_authority_component_conflicts"],
         "locked_authority_mounting_conflicts": summary["locked_authority_mounting_conflicts"],
+        "locked_authority_tool_conflicts": summary["locked_authority_tool_conflicts"],
     }
 
 
@@ -284,6 +348,7 @@ def verify_controlled_status(status_path: Path, report: dict[str, Any]) -> None:
 
 def audit(board_path: Path, authority_path: Path) -> dict[str, Any]:
     locked_refs, mounting_holes = load_authority(authority_path)
+    tool_clearances = load_tool_clearances(authority_path)
     board = Board.from_file(str(board_path), encoding="utf-8")
     footprints = {ref_of(footprint): footprint for footprint in board.footprints}
     require(len(footprints) == len(board.footprints), "duplicate footprint reference")
@@ -312,6 +377,14 @@ def audit(board_path: Path, authority_path: Path) -> dict[str, Any]:
                 mounting.append(finding)
     mounting.sort(key=lambda finding: tuple(finding["pair"]))
 
+    tool_findings = []
+    for clearance in tool_clearances:
+        for envelope in assembly:
+            finding = tool_clearance_conflict(clearance, envelope)
+            if finding is not None:
+                tool_findings.append(finding)
+    tool_findings.sort(key=lambda finding: tuple(finding["pair"]))
+
     confirmed_collisions = [finding for finding in collisions
                             if finding["classification"] == "CONFIRMED_COURTYARD_COLLISION"]
     screening_collisions = [finding for finding in collisions
@@ -320,6 +393,10 @@ def audit(board_path: Path, authority_path: Path) -> dict[str, Any]:
                           if finding["classification"].startswith("CONFIRMED_")]
     screening_mounting = [finding for finding in mounting
                           if finding["classification"].startswith("SCREENING_")]
+    confirmed_tool = [finding for finding in tool_findings
+                      if finding["classification"].startswith("CONFIRMED_")]
+    screening_tool = [finding for finding in tool_findings
+                      if finding["classification"].startswith("SCREENING_")]
     locked_component_pairs = sorted(
         finding["pair"] for finding in confirmed_collisions
         if finding["authority_locked_pair"]
@@ -328,7 +405,11 @@ def audit(board_path: Path, authority_path: Path) -> dict[str, Any]:
         finding["pair"] for finding in confirmed_mounting
         if finding["authority_locked_component"]
     )
-    blocked = bool(collisions or mounting)
+    locked_tool_pairs = sorted(
+        finding["pair"] for finding in confirmed_tool
+        if finding["authority_locked_component"]
+    )
+    blocked = bool(collisions or mounting or tool_findings)
     summary = {
         "state": "BLOCKED_PLACEMENT_CLEARANCE" if blocked else "PASS",
         "assembly_footprints": len(assembly),
@@ -338,8 +419,11 @@ def audit(board_path: Path, authority_path: Path) -> dict[str, Any]:
         "screening_component_collisions": len(screening_collisions),
         "confirmed_mounting_clearance_conflicts": len(confirmed_mounting),
         "screening_mounting_clearance_conflicts": len(screening_mounting),
+        "confirmed_tool_clearance_conflicts": len(confirmed_tool),
+        "screening_tool_clearance_conflicts": len(screening_tool),
         "locked_authority_component_conflicts": locked_component_pairs,
         "locked_authority_mounting_conflicts": locked_mounting_pairs,
+        "locked_authority_tool_conflicts": locked_tool_pairs,
     }
     return {
         "schema_version": "dioneya.pcb-main-placement-clearance.v1",
@@ -352,6 +436,8 @@ def audit(board_path: Path, authority_path: Path) -> dict[str, Any]:
             "same_side_only": True,
             "courtyard_geometry": "AXIS_ALIGNED_ENVELOPE_AFTER_FOOTPRINT_TRANSFORM",
             "missing_courtyard_screening": f"PAD_BOUNDS_PLUS_{PAD_SCREENING_MARGIN_MM:.2f}_MM",
+            "ufl_tool_geometry": "TOP_SIDE_CIRCLE_FROM_TOOL_D_RULE",
+            "service_edge_overhang": "ALLOWED_BUT_REQUIRES_ENCLOSURE_SWEEP",
             "positive_overlap_tolerance_mm": GEOMETRY_TOLERANCE_MM,
             "fixture_pogo_footprints_excluded": True,
         },
@@ -360,6 +446,8 @@ def audit(board_path: Path, authority_path: Path) -> dict[str, Any]:
         "screening_component_collisions": screening_collisions,
         "confirmed_mounting_clearance_conflicts": confirmed_mounting,
         "screening_mounting_clearance_conflicts": screening_mounting,
+        "confirmed_tool_clearance_conflicts": confirmed_tool,
+        "screening_tool_clearance_conflicts": screening_tool,
         "release_disposition": (
             "HOLD_MAIN_AUTH_011_LIMITED_MECHANICAL_ECO_AND_PLACEMENT_REWORK_REQUIRED"
             if blocked else "PLACEMENT_CLEARANCE_SUBGATE_READY_FOR_INDEPENDENT_REVIEW"
@@ -404,13 +492,17 @@ def main() -> int:
         f"confirmed_collisions={summary['confirmed_component_collisions']} "
         f"screening_collisions={summary['screening_component_collisions']} "
         f"confirmed_mounting={summary['confirmed_mounting_clearance_conflicts']} "
-        f"screening_mounting={summary['screening_mounting_clearance_conflicts']}"
+        f"screening_mounting={summary['screening_mounting_clearance_conflicts']} "
+        f"confirmed_tool={summary['confirmed_tool_clearance_conflicts']} "
+        f"screening_tool={summary['screening_tool_clearance_conflicts']}"
     )
     print(
         "locked_authority_component_conflicts="
         f"{summary['locked_authority_component_conflicts']} "
         "locked_authority_mounting_conflicts="
-        f"{summary['locked_authority_mounting_conflicts']}"
+        f"{summary['locked_authority_mounting_conflicts']} "
+        "locked_authority_tool_conflicts="
+        f"{summary['locked_authority_tool_conflicts']}"
     )
     if args.strict and summary["state"] != "PASS":
         print("strict placement-clearance gate: FAIL", file=sys.stderr)
