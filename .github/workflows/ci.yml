@@ -69,16 +69,19 @@ jobs:
         run: python tools/verify_pcb_main_passive_support_authority_rev_a.py
       - name: Second independent PCB-MAIN mechanical placement control
         run: python tools/verify_pcb_main_mechanical_placement_authority_rev_a.py
-      - name: Audit PCB-MAIN native placement candidate and fabrication interlock
+      - name: Audit PCB-MAIN placement and pre-route constraint interlocks
         run: |
           python tools/generate_pcb_main_manufacturer_footprints_rev_a.py --check
           python tools/materialize_pcb_main_manufacturer_footprints_rev_a.py --check
           python tools/materialize_pcb_main_verified_library_footprints_rev_a.py --check
           python tools/generate_pcb_main_placement_repack_rev_a.py --check
+          python tools/generate_pcb_main_routing_authority_rev_a.py --check
           python tools/audit_pcb_main_layout_candidate_rev_a.py
           python tools/audit_pcb_main_placement_clearance_rev_a.py \
             --output artifacts/pcb_main_placement_clearance_rev_a.json \
             --strict
+          python tools/audit_pcb_main_routing_authority_rev_a.py \
+            --output artifacts/pcb_main_routing_authority_rev_a.json
           python tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py \
             --output artifacts/pcb_main_mechanical_eco_candidate_rev_a.json
       - name: First-pass configuration and hardware baseline validation
@@ -148,6 +151,7 @@ jobs:
             artifacts/pcb_mic_manufacturing_handoff_rev_a.json
             artifacts/pcb_main_capture_authority_rev_a.json
             artifacts/pcb_main_placement_clearance_rev_a.json
+            artifacts/pcb_main_routing_authority_rev_a.json
             artifacts/pcb_main_mechanical_eco_candidate_rev_a.json
             artifacts/pcb_main_mcu_pin_authority_rev_a.json
             artifacts/pcb_main_storage_sensor_authority_rev_a.json
@@ -166,6 +170,8 @@ jobs:
             hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md
+            hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv
+            hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.md
             hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json
             hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md
             hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.json

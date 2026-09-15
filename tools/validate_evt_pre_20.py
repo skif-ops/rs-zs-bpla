@@ -174,6 +174,12 @@ def validate_decisions_and_tests() -> None:
         and "227 controlled courtyards" in decisions["DEC-046"]["Impact"],
         "PCB-MAIN deterministic placement-repack decision is missing",
     )
+    require(
+        decisions["DEC-047"]["Status"] == "IMPLEMENTED_PRE_ROUTE_CONSTRAINT_PASS"
+        and "all 186 PCB-MAIN native nets" in decisions["DEC-047"]["Decision"]
+        and "numeric RF/USB geometry" in decisions["DEC-047"]["Impact"],
+        "PCB-MAIN pre-route constraint decision is missing or over-released",
+    )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
@@ -212,6 +218,10 @@ def validate_deliverable_register() -> None:
         in deliverables["HW-M-002"]["Критерий выпуска"]
         and "strict 2D placement-clearance PASS"
         in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "explicit pre-route constraints for all 186 native nets"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "factory stackup numeric RF/USB geometry"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
         and "Review B remain open" in deliverables["HW-M-002"]["Критерий выпуска"],
         "PCB-MAIN deliverable still reports a stale footprint disposition",
     )
@@ -234,7 +244,9 @@ def validate_deliverable_register() -> None:
     )
     risks = {row["Risk_ID"]: row for row in read_csv("docs/RISK_REGISTER.csv")}
     require(
-        "three project IPC candidates" in risks["R-025"]["Mitigation"],
+        "three project IPC candidates" in risks["R-025"]["Mitigation"]
+        and "audited 186-net pre-route authority" in risks["R-025"]["Mitigation"]
+        and "guessed RF/USB geometry" in risks["R-025"]["Trigger"],
         "PCB-MAIN footprint risk still reports the superseded provisional set",
     )
     require(

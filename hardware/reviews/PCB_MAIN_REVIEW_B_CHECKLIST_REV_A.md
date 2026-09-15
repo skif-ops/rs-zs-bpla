@@ -25,6 +25,10 @@ signed and contains no manufacturing release assertion.
 - Board: 110 x 75 x 1.6 mm, six copper layers, rounded R3 outline, four M3 NPTH holes.
 - Population represented: 247 on-board components plus four mounting holes; 186 native nets.
 - Routing/copper zones: absent.
+- Pre-route constraint coverage: `PASS` for all 186 native nets. The controlled
+  manifest assigns one explicit class, return domain, topology, priority and
+  source authority to every net; numeric RF/USB geometry remains blocked on the
+  selected fabricator stackup.
 - Provisional manufacturer-specific footprints: 0 instances (reduced from 52).
 - Manufacturer-drawing controlled project-local footprints: 50 instances.
 - Drawing-verified KiCad library patterns: 5 instances (`J11`, `J_MIC1..J_MIC4`).
@@ -58,6 +62,9 @@ signed and contains no manufacturing release assertion.
   BLE-body and audio allocations plus the BLE all-layer antenna keepout.
 - [ ] Component heights, connector mates, cards, coax and harness service volumes
   pass native STEP/enclosure review.
+- [x] All 186 native nets have an explicit pre-route class, reference domain and
+  topology; the generator and independent audit fail on missing, extra,
+  overlapping or reclassified nets.
 - [ ] RF, power, PDM, USB and SIM routing is complete.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.
 - [ ] KiCad 9 DRC passes with zero blocker/critical violations and zero unrouted items.
@@ -71,8 +78,10 @@ signed and contains no manufacturing release assertion.
 
 ## 3. Decision
 
-`HOLD`. The candidate is 2D placement-complete, but it is unrouted and has not
-passed 3D/service, DRC, CAM, DFM or Review B. The exact current clearance result
-and release boundary are recorded in
-`hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md`. Production outputs
+`HOLD`. The candidate is 2D placement-complete and its 186-net pre-route
+constraint coverage is controlled, but it is unrouted and has not passed
+3D/service, DRC, CAM, DFM or Review B. The exact current clearance result and
+release boundary are recorded in
+`hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md`; the routing input
+is recorded in `hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.md`. Production outputs
 are prohibited until every unchecked item passes.

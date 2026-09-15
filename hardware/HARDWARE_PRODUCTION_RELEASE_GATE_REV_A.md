@@ -41,6 +41,13 @@ U.FL tool-zone conflicts. This is engineering progress only; the unrouted board
 has no copper zones and still requires routed-board DRC, 3D/service evidence,
 CAM, DFM and independent Review B.
 
+PCB-MAIN also has explicit pre-route constraint coverage for all 186 native
+nets. The independent audit enforces disjoint route classes, ground-domain
+references, four USB differential-pair segments, seven 50-ohm RF nets and the
+controlled modem-feed minimum widths. Numeric RF/USB geometry remains blocked
+until the fabricator stackup is accepted, and the constraint PASS does not close
+routing, copper, DRC, CAM, DFM or Review B.
+
 ## Current blocker classes
 
 - exact and released BAT1, PV1, MPPT1, ANT-CELL, ANT-GNSS, ANT-LORA, HARNESS and

@@ -59,6 +59,11 @@ release interlock for this state.
   227/227 fitted assembly footprints have courtyards and all component,
   mounting-exclusion and U.FL tool-zone conflict sets are empty. Routing,
   KiCad DRC, 3D/service review and Review B remain required.
+- Use `hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv` as the controlled pre-route
+  input. It explicitly classifies all 186 native nets and preserves separate
+  `GND_MODEM`, `GND_DIGITAL` and `GND_MIC` references. Its PASS is constraint
+  coverage only: final stackup-dependent RF/USB geometry, routed copper, pours,
+  DRC and manufacturing evidence remain open.
 - Freeze CubeMX pin/peripheral assignment for STM32U585VIT6Q; no unresolved AF conflicts.
 - Replace provisional MAIN/PWR placement candidates with mechanically frozen,
   reviewed and routed boards; keep all native `.kicad_sch/.kicad_pcb/.kicad_pro`
