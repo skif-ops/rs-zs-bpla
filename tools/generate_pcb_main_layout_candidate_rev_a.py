@@ -160,7 +160,7 @@ def passive_footprint(board: pcbnew.BOARD, package: str) -> pcbnew.FOOTPRINT:
         pad.SetShape(pcbnew.PAD_SHAPE_ROUNDRECT)
         pad.SetRoundRectRadiusRatio(0.2)
         pad.SetSize(mm(max(0.55, length / 2), width))
-        pad.SetPosition(mm(x, 0)); pad.SetPos0(mm(x, 0))
+        pad.SetFPRelativePosition(mm(x, 0))
         layers = pcbnew.LSET()
         for layer in (pcbnew.F_Cu, pcbnew.F_Paste, pcbnew.F_Mask):
             layers.AddLayer(layer)
@@ -207,7 +207,7 @@ def generic_footprint(board: pcbnew.BOARD, pin_numbers: list[str], package: str)
         if str(number) != "1":
             pad.SetRoundRectRadiusRatio(0.2)
         pad.SetSize(mm(0.55, 0.9))
-        pad.SetPosition(mm(x, y)); pad.SetPos0(mm(x, y))
+        pad.SetFPRelativePosition(mm(x, y))
         layers = pcbnew.LSET()
         for layer in (pcbnew.F_Cu, pcbnew.F_Paste, pcbnew.F_Mask):
             layers.AddLayer(layer)
@@ -238,7 +238,7 @@ def fixture_footprint(board: pcbnew.BOARD, ref: str, pins: list[str]) -> tuple[p
         pad.SetShape(pcbnew.PAD_SHAPE_CIRCLE)
         pad.SetSize(mm(1.70, 1.70))
         relative = mm(float(row["X_mm"]) - x0, float(row["Y_mm"]) - y0)
-        pad.SetPosition(relative); pad.SetPos0(relative)
+        pad.SetFPRelativePosition(relative)
         pad.SetLocalSolderMaskMargin(pcbnew.FromMM(0.20))
         layers = pcbnew.LSET()
         for layer in (pcbnew.B_Cu, pcbnew.B_Mask):
