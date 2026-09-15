@@ -1,0 +1,118 @@
+{
+  "schema": "dioneya-pcb-main-stackup-impedance-request-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-MAIN",
+  "revision": "A",
+  "status": "PACKET_READY_TWO_FABRICATOR_RESPONSES_REQUIRED_NOT_FOR_ROUTING_OR_MANUFACTURE",
+  "authority_inputs": [
+    "hardware/kicad/PCB_RULES.md",
+    "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
+    "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
+    "hardware/CHINA_PROCUREMENT_RFQ.csv",
+    "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv",
+    "hardware/PCB_DOUBLE_REVIEW_GATE.md",
+    "hardware/PCB_RELEASE_CHECKLIST.csv"
+  ],
+  "source_binding": {
+    "native_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "native_board_sha256": "c61d7d279d18bf72b410011ffcc9587e9ee7b61e8afa93d29a6746ec544d4137",
+    "mechanical_authority": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+    "mechanical_authority_sha256": "6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44",
+    "placement_manifest": "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
+    "placement_manifest_sha256": "0fe702d03af4457a3d44aae93ea6ddc539040f38546d4b09f200612627890e35",
+    "routing_authority": "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv",
+    "routing_authority_sha256": "f77948c4837448fbc6c3d0cfd6820354a0a8cab12925457bf90768704cb9e1dc"
+  },
+  "board_request_basis": {
+    "outline_mm": [110.0, 75.0],
+    "finished_thickness_mm": 1.6,
+    "copper_layers": 6,
+    "base_material_family": "FR-4",
+    "layer_function_intent": [
+      "SIGNAL_RF",
+      "REFERENCE",
+      "POWER_DOMAINS",
+      "SIGNAL",
+      "REFERENCE",
+      "SIGNAL"
+    ],
+    "layer_function_status": "REQUEST_BASIS_ONLY_VENDOR_ALTERNATIVE_REQUIRES_CONTROLLED_REVIEW",
+    "final_stackup_frozen": false,
+    "material_system_frozen": false,
+    "copper_weights_frozen": false,
+    "surface_finish_frozen": false,
+    "numeric_fabrication_rules_frozen": false,
+    "native_trace_items": 0,
+    "native_copper_zones": 0
+  },
+  "impedance_requests": {
+    "rf_single_ended": {
+      "target_ohm": 50.0,
+      "nets": [
+        "CELL_RF",
+        "CELL_RF_ANT",
+        "GNSS_RF_ANT_BIASED",
+        "GNSS_RF_DC_BLOCK",
+        "GNSS_RF_FILTERED",
+        "LORA_RF_ANT",
+        "LORA_RF_MODULE"
+      ],
+      "preferred_route_reference": "OUTER_SIGNAL_LAYER_TO_ADJACENT_UNINTERRUPTED_LOCAL_REFERENCE",
+      "target_tolerance_percent": null,
+      "solver_frequency_hz": null,
+      "trace_width_mm": null,
+      "copper_to_reference_mm": null,
+      "solder_mask_model": null
+    },
+    "usb_differential": {
+      "target_ohm": 90.0,
+      "pair_groups": {
+        "USB_MAIN_MCU_SEGMENT": ["USB_DM_U1", "USB_DP_U1"],
+        "USB_MAIN_CONNECTOR_SEGMENT": ["USB_DM_CONN", "USB_DP_CONN"],
+        "USB_CELL_MODEM_SEGMENT": ["CELL_USB_DM_U8", "CELL_USB_DP_U8"],
+        "USB_CELL_FIXTURE_SEGMENT": ["CELL_USB_DM_TP", "CELL_USB_DP_TP"]
+      },
+      "preferred_route_reference": "ONE_SIGNAL_LAYER_TO_ADJACENT_UNINTERRUPTED_LOCAL_REFERENCE",
+      "target_tolerance_percent": null,
+      "solver_frequency_hz": null,
+      "trace_width_mm": null,
+      "pair_gap_mm": null,
+      "copper_to_reference_mm": null,
+      "solder_mask_model": null
+    },
+    "numeric_geometry_authority": "SELECTED_FABRICATOR_RESPONSE_PLUS_PROJECT_RF_SI_REVIEW_REQUIRED"
+  },
+  "required_fabricator_slots": ["FAB-A", "FAB-B"],
+  "required_question_ids": [
+    "STACKUP-CROSS-SECTION",
+    "MATERIAL-DK-DF",
+    "COPPER-PLATING",
+    "RF50-GEOMETRY",
+    "USB90-GEOMETRY",
+    "IMPEDANCE-TOLERANCE",
+    "IMPEDANCE-COUPON",
+    "MIN-GEOMETRY-REGISTRATION",
+    "VIA-DRILL",
+    "MASK-FINISH",
+    "PANEL-NETTEST-DFM"
+  ],
+  "external_response": {
+    "response_register": "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv",
+    "required_rows": 22,
+    "pending_rows": 22,
+    "accepted_fabricator_slots": 0,
+    "selected_fabricator_slot": null,
+    "complete": false
+  },
+  "release_interlock": {
+    "stackup_accepted": false,
+    "rf_50ohm_numeric_geometry_authorized": false,
+    "usb_90ohm_numeric_geometry_authorized": false,
+    "routing_authorized": false,
+    "review_b_complete": false,
+    "manufacturing_release": false,
+    "fabrication_authorized": false
+  }
+}

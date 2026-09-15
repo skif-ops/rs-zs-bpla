@@ -21,6 +21,7 @@ HW-M-007,PCB main,Производственный BOM и AVL,XLSX+CSV,P0,DRAFT,
 HW-M-008,PCB main,Stackup и fabrication notes,PDF+TXT,P0,PLANNED,OPEN,OPEN,Согласовано с фабрикой и impedance notes
 HW-M-009,PCB main,ERC DRC DFM отчёт,HTML+PDF,P0,PLANNED,OPEN,OPEN,Нет открытых blocker/critical
 HW-M-010,PCB main,Dual SIM Single Standby схема и отчёт,DOCX+PDF+CSV,P0,DRAFT,OPEN,OPEN,Два ICCID 100 переключений ESD SI и power-fault tests PASS
+HW-M-011,PCB main,Pre-route stackup and impedance request,JSON+MD+CSV,P0,CONTROLLED_REQUEST,PASS,OPEN,Internal two-fabricator packet and 22-row response template are complete; both attributable responses construction selection numeric 50-ohm and 90-ohm geometry and RF/SI review remain required; routing and manufacture are blocked
 HW-A-001,PCB microphones,Схема и PCB микрофонного leaf,KICAD+PDF+STEP,P0,CONTROLLED,PASS,PASS,Four identical boards; signed Review A PASS; commit-matched KiCad 9 ERC and geometry evidence; Review B remains mandatory
 HW-A-002,PCB microphones,Gerber drill PnP BOM,ZIP+CSV,P0,DRAFT,PASS,OPEN,Commit-bound candidate CAM package and controlled vendor-handoff response set are reproducible; external panelization assembler DFM final Review B and manufacturing release remain open
 HW-A-003,PCB microphones,Оснастка позиционирования 3+1,STEP+STL+DRAWING,P0,PLANNED,OPEN,OPEN,120 мм и +150 мм подтверждены CMM/шаблоном

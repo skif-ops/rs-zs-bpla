@@ -48,6 +48,11 @@ controlled modem-feed minimum widths. Numeric RF/USB geometry remains blocked
 until the fabricator stackup is accepted, and the constraint PASS does not close
 routing, copper, DRC, CAM, DFM or Review B.
 
+The PCB-MAIN stackup/impedance request packet is internally ready, but it has
+0/2 fabricator responses accepted and no selected construction. Its 22-row
+register is a quotation/capability input only; it is not Gerber, a purchase
+order, routing authority or fabrication release.
+
 ## Current blocker classes
 
 - exact and released BAT1, PV1, MPPT1, ANT-CELL, ANT-GNSS, ANT-LORA, HARNESS and

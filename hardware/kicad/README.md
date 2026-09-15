@@ -64,6 +64,10 @@ release interlock for this state.
   `GND_MODEM`, `GND_DIGITAL` and `GND_MIC` references. Its PASS is constraint
   coverage only: final stackup-dependent RF/USB geometry, routed copper, pours,
   DRC and manufacturing evidence remain open.
+- Use `hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json` and its
+  blank response register only to obtain comparable construction data from
+  `FAB-A` and `FAB-B`. The current `0/2` accepted response state does not select
+  a stackup, authorize numeric 50-ohm/90-ohm rules or permit routing.
 - Freeze CubeMX pin/peripheral assignment for STM32U585VIT6Q; no unresolved AF conflicts.
 - Replace provisional MAIN/PWR placement candidates with mechanically frozen,
   reviewed and routed boards; keep all native `.kicad_sch/.kicad_pcb/.kicad_pro`

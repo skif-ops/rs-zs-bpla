@@ -24,6 +24,14 @@ width. The selected fabricator must provide the final six-layer stackup,
 dielectric data, copper thickness and impedance construction before numeric RF
 or USB geometry is entered into KiCad.
 
+The controlled two-fabricator request is
+`hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json`; its
+human-readable packet and blank 22-row response register are
+`hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.md` and
+`hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv`. Both
+fabricator slots remain pending, so this handoff has zero accepted constructions
+and does not authorize routing.
+
 ## Controlled class inventory
 
 | Route class | Nets | Binding rule |
@@ -78,6 +86,11 @@ The four USB pair groups are independent:
 Each group has target `90_OHM_DIFFERENTIAL_FACTORY_STACKUP_PENDING`. Numeric
 width, gap and allowable skew remain open until the fabricator stackup and SI
 review are available. Main USB and BG95 recovery USB never share copper nets.
+
+The request packet asks `FAB-A` and `FAB-B` the same 11 construction,
+impedance, capability and DFM questions. Selection requires two attributable
+responses plus project RF/SI review; the response template currently records
+`0/2` accepted fabricators.
 
 ## Route-order input
 

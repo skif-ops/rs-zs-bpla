@@ -29,6 +29,9 @@ signed and contains no manufacturing release assertion.
   manifest assigns one explicit class, return domain, topology, priority and
   source authority to every net; numeric RF/USB geometry remains blocked on the
   selected fabricator stackup.
+- Stackup/impedance request: controlled packet and blank 22-row response
+  register are ready, with 0/2 accepted fabricator responses. No construction,
+  numeric RF/USB geometry or route rule has been accepted.
 - Provisional manufacturer-specific footprints: 0 instances (reduced from 52).
 - Manufacturer-drawing controlled project-local footprints: 50 instances.
 - Drawing-verified KiCad library patterns: 5 instances (`J11`, `J_MIC1..J_MIC4`).
@@ -65,6 +68,11 @@ signed and contains no manufacturing release assertion.
 - [x] All 186 native nets have an explicit pre-route class, reference domain and
   topology; the generator and independent audit fail on missing, extra,
   overlapping or reclassified nets.
+- [x] A machine-audited stackup/impedance request and identical 11-question
+  templates for `FAB-A` and `FAB-B` are ready without guessed numeric geometry.
+- [ ] Two attributable fabricator responses are complete, compared and accepted;
+  one construction and its 50-ohm/90-ohm numeric geometry are selected through
+  project RF/SI review.
 - [ ] RF, power, PDM, USB and SIM routing is complete.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.
 - [ ] KiCad 9 DRC passes with zero blocker/critical violations and zero unrouted items.

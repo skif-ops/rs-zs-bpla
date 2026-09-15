@@ -180,6 +180,13 @@ def validate_decisions_and_tests() -> None:
         and "numeric RF/USB geometry" in decisions["DEC-047"]["Impact"],
         "PCB-MAIN pre-route constraint decision is missing or over-released",
     )
+    require(
+        decisions["DEC-048"]["Status"] == "IMPLEMENTED_TWO_FABRICATOR_RESPONSES_PENDING"
+        and "fabricator acceptance and routing authority" in decisions["DEC-048"]["Decision"]
+        and "two independent fabricators" in decisions["DEC-048"]["Impact"]
+        and "manufacturing release open" in decisions["DEC-048"]["Impact"],
+        "PCB-MAIN stackup-request/fabricator-acceptance separation decision is missing",
+    )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
@@ -226,6 +233,16 @@ def validate_deliverable_register() -> None:
         "PCB-MAIN deliverable still reports a stale footprint disposition",
     )
     require(
+        deliverables["HW-M-011"]["Статус"] == "CONTROLLED_REQUEST"
+        and deliverables["HW-M-011"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-M-011"]["QG-2 техника"] == "OPEN"
+        and "two-fabricator packet and 22-row response template"
+        in deliverables["HW-M-011"]["Критерий выпуска"]
+        and "routing and manufacture are blocked"
+        in deliverables["HW-M-011"]["Критерий выпуска"],
+        "PCB-MAIN stackup/impedance request deliverable is missing or over-released",
+    )
+    require(
         deliverables["HW-A-002"]["Статус"] == "DRAFT"
         and deliverables["HW-A-002"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-A-002"]["QG-2 техника"] == "OPEN"
@@ -246,7 +263,9 @@ def validate_deliverable_register() -> None:
     require(
         "three project IPC candidates" in risks["R-025"]["Mitigation"]
         and "audited 186-net pre-route authority" in risks["R-025"]["Mitigation"]
-        and "guessed RF/USB geometry" in risks["R-025"]["Trigger"],
+        and "two attributable fabricator stackup responses" in risks["R-025"]["Mitigation"]
+        and "missing one or both signed stackup responses" in risks["R-025"]["Trigger"]
+        and "guessed or unaccepted RF/USB geometry" in risks["R-025"]["Trigger"],
         "PCB-MAIN footprint risk still reports the superseded provisional set",
     )
     require(
@@ -348,6 +367,50 @@ def validate_hardware_baseline() -> None:
     require("12-pin" in pwr_addendum and "INA226" in pwr_addendum, "Rev.A 12-pin/INA226 capture addendum missing")
     require("Review A" in gate and "Review B" in gate, "double-review PCB gate is incomplete")
     require("FOR_MANUFACTURE" in gate, "PCB release state is not defined")
+
+    main_status = json.loads(
+        (ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8")
+    )
+    require(main_status["assembly"] == "PCB-MAIN", "PCB-MAIN release-status identity mismatch")
+    require(main_status["review_b"]["complete"] is False
+            and main_status["manufacturing_release"] is False,
+            "PCB-MAIN was advanced by a pre-route stackup request")
+    main_handoff = main_status["review_b"].get("evidence", {}).get(
+        "stackup_impedance_handoff", {}
+    )
+    require(
+        main_handoff.get("status") == "PACKET_READY_TWO_FABRICATOR_RESPONSES_REQUIRED"
+        and main_handoff.get("internal_packet_complete") is True
+        and main_handoff.get("complete") is False
+        and main_handoff.get("required_fabricator_slots") == ["FAB-A", "FAB-B"]
+        and main_handoff.get("accepted_fabricator_response_count") == 0
+        and main_handoff.get("selected_fabricator_slot") is None,
+        "PCB-MAIN stackup/impedance handoff is not internally ready and externally blocked",
+    )
+    require(
+        all(main_handoff.get(key) is False for key in (
+            "stackup_accepted",
+            "rf_50ohm_numeric_geometry_accepted",
+            "usb_90ohm_numeric_geometry_accepted",
+            "routing_authorized",
+            "review_b_complete",
+            "manufacturing_release",
+        )),
+        "PCB-MAIN stackup request advanced an external, routing or release gate",
+    )
+    for relative in (
+        main_handoff.get("packet"),
+        main_handoff.get("machine_contract"),
+        main_handoff.get("response_register"),
+    ):
+        require(isinstance(relative, str) and (ROOT / relative).is_file(),
+                f"PCB-MAIN stackup/impedance handoff file is missing: {relative}")
+    main_responses = read_csv(main_handoff["response_register"])
+    require(len(main_responses) == 22
+            and {row["Fabricator_Slot"] for row in main_responses} == {"FAB-A", "FAB-B"}
+            and all(row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
+                    and row["Blocking"] == "YES" for row in main_responses),
+            "PCB-MAIN stackup response register is not the blank 2 x 11 blocking template")
 
     mic_status = json.loads((ROOT / "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8"))
     require(mic_status["assembly"] == "PCB-MIC", "PCB-MIC release-status identity mismatch")

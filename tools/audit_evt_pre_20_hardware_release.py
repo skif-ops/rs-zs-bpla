@@ -182,6 +182,56 @@ def audit() -> dict[str, object]:
         ) if isinstance(main_clearance, dict) else "MISSING",
         "PCB-MAIN placement has unresolved courtyard/pad-envelope, mounting-exclusion or U.FL tool/service conflicts",
     )
+    main_evidence = main_review_b.get("evidence", {}) if isinstance(main_review_b, dict) else {}
+    main_stackup = (
+        main_evidence.get("stackup_impedance_handoff", {})
+        if isinstance(main_evidence, dict) else {}
+    )
+    main_stackup_files = [
+        main_stackup.get("packet"),
+        main_stackup.get("machine_contract"),
+        main_stackup.get("response_register"),
+    ] if isinstance(main_stackup, dict) else []
+    main_stackup_packet_ready = (
+        isinstance(main_stackup, dict)
+        and main_stackup.get("internal_packet_complete") is True
+        and main_stackup.get("required_fabricator_slots") == ["FAB-A", "FAB-B"]
+        and all(isinstance(path, str) and (ROOT / path).is_file()
+                for path in main_stackup_files)
+    )
+    check(
+        "pcb_main_stackup_impedance_request_packet",
+        main_stackup_packet_ready,
+        str(main_stackup.get("status", "MISSING")) if isinstance(main_stackup, dict) else "MISSING",
+        "PCB-MAIN controlled two-fabricator stackup/impedance request packet is not ready",
+    )
+    accepted_fabricator_count = (
+        main_stackup.get("accepted_fabricator_response_count", 0)
+        if isinstance(main_stackup, dict) else 0
+    )
+    selected_fabricator = (
+        main_stackup.get("selected_fabricator_slot")
+        if isinstance(main_stackup, dict) else None
+    )
+    main_stackup_accepted = (
+        isinstance(main_stackup, dict)
+        and main_stackup.get("complete") is True
+        and accepted_fabricator_count == 2
+        and selected_fabricator in {"FAB-A", "FAB-B"}
+        and main_stackup.get("stackup_accepted") is True
+        and main_stackup.get("rf_50ohm_numeric_geometry_accepted") is True
+        and main_stackup.get("usb_90ohm_numeric_geometry_accepted") is True
+    )
+    check(
+        "pcb_main_stackup_impedance_acceptance",
+        main_stackup_accepted,
+        f"accepted={accepted_fabricator_count}/2 selected={selected_fabricator or 'NONE'}",
+        (
+            "PCB-MAIN stackup/impedance acceptance remains open: "
+            f"{accepted_fabricator_count}/2 fabricator responses accepted and "
+            f"selected construction={selected_fabricator or 'NONE'}"
+        ),
+    )
     main_released = (
         main_status.get("manufacturing_release") is True
         and isinstance(main_review_b, dict)
