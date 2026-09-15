@@ -48,6 +48,15 @@ controlled modem-feed minimum widths. Numeric RF/USB geometry remains blocked
 until the fabricator stackup is accepted, and the constraint PASS does not close
 routing, copper, DRC, CAM, DFM or Review B.
 
+PCB-PWR has explicit pre-route constraint coverage for all 31 native nets. The
+independent audit binds the 5 A system basis, both 4 A buck channels, the 3.3 A
+BG95 BB+RF peak basis, three separate harness returns/net ties, two switch nodes,
+two bootstrap loops, two Kelvin lines, feedback and 100 kHz I2C. Numeric widths,
+via arrays and plane geometry remain blocked on `DIM-003`, final current/fault
+envelopes, selected stackup/copper weights and thermal/current-density review.
+The board remains unrouted with zero copper zones; DRC, CAM, DFM and Review B are
+open.
+
 The PCB-MAIN stackup/impedance request packet is internally ready, but it has
 0/2 fabricator responses accepted and no selected construction. Its 22-row
 register is a quotation/capability input only; it is not Gerber, a purchase
@@ -63,7 +72,8 @@ rule, PnP polarity, first-article assembly, Review B or manufacturing release.
 
 - exact and released BAT1, PV1, MPPT1, ANT-CELL, ANT-GNSS, ANT-LORA, HARNESS and
   HSG-VC system identities;
-- PCB-MAIN and PCB-PWR routing, DRC and CAM; PCB-MIC independent Review B,
+- PCB-MAIN and PCB-PWR routing, DRC and CAM; PCB-PWR `DIM-003`, final stackup,
+  numeric current-density/thermal geometry and physical power evidence; PCB-MIC independent Review B,
   CAM comparison, panelization and acoustic-stack review; all three boards'
   DFM and manufacturing release;
 - selected-assembler acceptance of the PCB-MAIN U2/U25/U26 project IPC

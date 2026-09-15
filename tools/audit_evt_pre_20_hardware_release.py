@@ -166,6 +166,25 @@ def audit() -> dict[str, object]:
         "PCB layer counts are inconsistent across native boards, BOM/RFQ or controlled authorities",
     )
 
+    pwr_routing_authority = run_json_audit("audit_pcb_pwr_routing_authority_rev_a.py")
+    pwr_routing_controlled = (
+        pwr_routing_authority.get("status") ==
+        "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN"
+        and pwr_routing_authority.get("authority", {}).get("row_count") == 31
+        and pwr_routing_authority.get("board", {}).get("net_count") == 31
+        and pwr_routing_authority.get("board", {}).get("trace_items") == 0
+        and pwr_routing_authority.get("board", {}).get("copper_zones") == 0
+        and pwr_routing_authority.get("dim_003") == "OPEN_REQUIRED_BEFORE_ROUTING"
+        and pwr_routing_authority.get("routing_complete") is False
+        and pwr_routing_authority.get("manufacturing_release") is False
+    )
+    check(
+        "pcb_pwr_pre_route_constraint_coverage",
+        pwr_routing_controlled,
+        str(pwr_routing_authority.get("status", "MISSING")),
+        "PCB-PWR pre-route constraint authority is incomplete or its no-routing interlock drifted",
+    )
+
     harness = run_json_audit("audit_harness_manufacturing_rev_a.py")
     harness_packet_ok = (
         harness.get("status") == "PASS_CONTROLLED_PRELIMINARY_LENGTHS_OPEN"

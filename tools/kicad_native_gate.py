@@ -35,6 +35,7 @@ BOARDS = ("PCB-MAIN", "PCB-MIC", "PCB-PWR")
 PCB_MAIN_STATUS = ROOT / "hardware" / "PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 PCB_MAIN_CLEARANCE_AUDIT = ROOT / "tools" / "audit_pcb_main_placement_clearance_rev_a.py"
 PCB_MAIN_ROUTING_AUDIT = ROOT / "tools" / "audit_pcb_main_routing_authority_rev_a.py"
+PCB_PWR_ROUTING_AUDIT = ROOT / "tools" / "audit_pcb_pwr_routing_authority_rev_a.py"
 PCB_MIC_STATUS = ROOT / "hardware" / "PCB_MIC_CAPTURE_STATUS_REV_A.json"
 PCB_PWR_STATUS = ROOT / "hardware" / "PCB_PWR_CAPTURE_STATUS_REV_A.json"
 PRODUCTION_BOM = ROOT / "hardware" / "EVT_PRE_20_BOM_REV_A.csv"
@@ -86,7 +87,7 @@ def placement_candidate_audit(name: str) -> str | None:
         ),
         "PCB-PWR": (
             PCB_PWR_STATUS,
-            "OPEN_PROVISIONAL_PLACEMENT_CANVAS_DIM_003_ROUTING_AND_EVIDENCE_PENDING",
+            "OPEN_PRE_ROUTE_CONSTRAINT_COVERAGE_PASS_DIM_003_ROUTING_AND_EVIDENCE_PENDING",
             "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
         ),
     }
@@ -771,6 +772,22 @@ def main() -> int:
                             routing_report["state"]
                         report["boards"][name]["pcb_state"] = (
                             "PLACEMENT_CANDIDATE_STRUCTURE_AND_2D_CLEARANCE_PASS_"
+                            "ROUTING_DRC_AND_FAB_EXPORT_PROHIBITED"
+                        )
+                    elif name == "PCB-PWR":
+                        routing_output = ART / name / "routing_authority_audit.json"
+                        run([
+                            sys.executable,
+                            str(PCB_PWR_ROUTING_AUDIT.relative_to(ROOT)),
+                            "--output", str(routing_output),
+                        ])
+                        routing_report = json.loads(
+                            routing_output.read_text(encoding="utf-8")
+                        )
+                        report["boards"][name]["routing_constraint_state"] = \
+                            routing_report["status"]
+                        report["boards"][name]["pcb_state"] = (
+                            "PLACEMENT_CANDIDATE_AND_PRE_ROUTE_CONSTRAINT_PASS_"
                             "ROUTING_DRC_AND_FAB_EXPORT_PROHIBITED"
                         )
                     else:

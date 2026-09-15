@@ -32,6 +32,13 @@ audit checks the complete reference/net/footprint set, every candidate coordinat
 the frozen layer count, provisional outline/thickness assumptions and the open
 `DIM-003` record.
 
+All 31 native nets now have controlled pre-route coverage in
+`hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv`. That manifest adds current,
+return-domain, topology, layer/via and separation inputs without relaxing this
+placement interlock: actual routing remains prohibited until `DIM-003`, the
+fabricator stackup/copper weights and numeric current-density/thermal geometry
+are accepted.
+
 Review B still requires frozen mechanics, final stack-up and copper weight; high-current and
 Kelvin routing; hot-loop and switch-node control; thermal/current-density calculation;
 TVS/fuse coordination; DRC; DFM; load-step, cold-start, fault, EMI and fixture evidence.

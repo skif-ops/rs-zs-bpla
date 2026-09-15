@@ -2,7 +2,7 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-PWR",
-  "release_state": "REVIEW_A_PIN_NET_PASS_PLACEMENT_CANDIDATE",
+  "release_state": "REVIEW_A_PIN_NET_PASS_PLACEMENT_AND_PRE_ROUTE_CONSTRAINT_CANDIDATE",
   "manufacturing_release": false,
   "native_schematic": {
     "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
@@ -32,9 +32,55 @@
     "complete": true,
     "status": "PASS_PIN_NET_ONLY"
   },
+  "pre_route_constraints": {
+    "authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
+    "record": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md",
+    "generator": "tools/generate_pcb_pwr_routing_authority_rev_a.py",
+    "independent_audit": "tools/audit_pcb_pwr_routing_authority_rev_a.py",
+    "control": {
+      "state": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN",
+      "board_sha256": "c32ac0e73d5fda95ec57d7700c2ca932ae32162d9c31e109da735f68481f05e9",
+      "authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
+      "net_count": 31,
+      "class_counts": {
+        "ANALOG_TIMING": 3,
+        "BOOTSTRAP_LOOP": 2,
+        "FEEDBACK_SENSE": 1,
+        "GATE_DRIVE": 1,
+        "I2C_OPEN_DRAIN": 2,
+        "KELVIN_SENSE": 2,
+        "LOW_SPEED_CONTROL": 2,
+        "MODE_CONTROL": 2,
+        "OPEN_DRAIN_STATUS": 3,
+        "POWER_INPUT_HIGH_CURRENT": 4,
+        "POWER_OUTPUT_HIGH_CURRENT": 1,
+        "POWER_RAIL": 2,
+        "POWER_RETURN_PLANE": 1,
+        "SEPARATE_HARNESS_RETURN": 3,
+        "SWITCH_NODE": 2
+      },
+      "reference_domain_counts": {
+        "CROSS_GND_DIGITAL_GND_PWR_VIA_NT2": 6,
+        "GND_PWR": 18,
+        "GND_PWR_TO_GND_DIGITAL_AT_NT2": 1,
+        "GND_PWR_TO_GND_MIC_AT_NT3": 1,
+        "GND_PWR_TO_GND_MODEM_AT_NT1": 1,
+        "SELF_GND_PWR": 1,
+        "SELF_TO_GND_PWR_ONLY_AT_NT1": 1,
+        "SELF_TO_GND_PWR_ONLY_AT_NT2": 1,
+        "SELF_TO_GND_PWR_ONLY_AT_NT3": 1
+      },
+      "trace_items": 0,
+      "copper_zones": 0,
+      "dim_003": "OPEN_REQUIRED_BEFORE_ROUTING",
+      "numeric_power_geometry": "OPEN_FINAL_STACKUP_COPPER_THERMAL_CURRENT_DENSITY",
+      "routing_complete": false,
+      "manufacturing_release": false
+    }
+  },
   "review_b": {
     "complete": false,
-    "status": "OPEN_PROVISIONAL_PLACEMENT_CANVAS_DIM_003_ROUTING_AND_EVIDENCE_PENDING",
+    "status": "OPEN_PRE_ROUTE_CONSTRAINT_COVERAGE_PASS_DIM_003_ROUTING_AND_EVIDENCE_PENDING",
     "blockers": [
       "DIM-003 assembled envelope terminal zones mounting pattern and frozen PCB STEP",
       "final stack-up dielectric construction and copper-weight authority",

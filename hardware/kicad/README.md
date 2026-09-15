@@ -37,6 +37,12 @@ mounting holes, routing and copper zones are deliberately absent while `DIM-003`
 remains open. `hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json` is the machine-readable
 release interlock for this state.
 
+`hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv` classifies all 31 native nets as a
+pre-route input, including high-current paths, three controlled net-tie returns,
+switch/bootstrap loops, Kelvin sense, feedback and I2C. Its PASS does not permit
+routing: numeric width, via-array and plane geometry remain open until `DIM-003`,
+final current/fault envelopes, stackup/copper weights and thermal review close.
+
 ## Logical sheet plan
 
 1. `01_POWER` - protected input and regulated rails; no integrated solar MPPT.
@@ -72,6 +78,9 @@ release interlock for this state.
   its blank 14-row register only for the bounded `U2/U25/U26/U9` process review.
   The current `0/14` accepted state does not select an assembler or process,
   create U9 paste apertures, close USB SI/whole-board DFM or permit manufacture.
+- Use `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv` as the 31-net PCB-PWR
+  pre-route input. Freeze `DIM-003`, current/fault envelopes, stackup/copper
+  weights and numeric thermal/current-density geometry before routing any copper.
 - Freeze CubeMX pin/peripheral assignment for STM32U585VIT6Q; no unresolved AF conflicts.
 - Replace provisional MAIN/PWR placement candidates with mechanically frozen,
   reviewed and routed boards; keep all native `.kicad_sch/.kicad_pcb/.kicad_pro`
