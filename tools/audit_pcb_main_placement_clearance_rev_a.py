@@ -87,10 +87,19 @@ def require(value: bool, message: str) -> None:
 
 
 def ref_of(footprint: Any) -> str:
-    refs = [str(item.text) for item in footprint.graphicItems
-            if getattr(item, "type", None) == "reference"]
-    require(len(refs) == 1 and refs[0], "footprint has duplicate or blank reference")
-    return refs[0]
+    graphic_refs = [str(item.text) for item in footprint.graphicItems
+                    if getattr(item, "type", None) == "reference"]
+    require(len(graphic_refs) <= 1,
+            f"footprint has duplicate reference graphics: {graphic_refs}")
+    property_ref = str(footprint.properties.get("Reference", ""))
+    if property_ref:
+        require(not graphic_refs or graphic_refs[0] == property_ref,
+                "footprint reference field and graphic disagree: "
+                f"field={property_ref!r} graphic={graphic_refs}")
+        return property_ref
+    require(len(graphic_refs) == 1 and graphic_refs[0],
+            "footprint has no non-blank Reference field or reference graphic")
+    return graphic_refs[0]
 
 
 def rotate(point: tuple[float, float], angle_deg: float) -> tuple[float, float]:
