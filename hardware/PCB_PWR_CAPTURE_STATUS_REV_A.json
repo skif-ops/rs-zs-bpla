@@ -18,7 +18,8 @@
     "outline_mm": [90.0, 60.0],
     "outline_status": "PROVISIONAL_NOT_MECHANICALLY_FROZEN",
     "copper_layers": 4,
-    "layer_count_status": "PROVISIONAL_STACKUP_OPEN",
+    "layer_count_authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
+    "layer_count_status": "FROZEN_REV_A_FINAL_STACKUP_OPEN",
     "board_thickness_mm": 1.6,
     "thickness_status": "PROVISIONAL_DIM_003_OPEN",
     "mounting_holes": 0,
@@ -36,7 +37,7 @@
     "status": "OPEN_PROVISIONAL_PLACEMENT_CANVAS_DIM_003_ROUTING_AND_EVIDENCE_PENDING",
     "blockers": [
       "DIM-003 assembled envelope terminal zones mounting pattern and frozen PCB STEP",
-      "stack-up and copper-weight authority",
+      "final stack-up dielectric construction and copper-weight authority",
       "high-current Kelvin hot-loop and switch-node routing",
       "thermal current-density transient load-step cold-start and EMI evidence",
       "DFT side datum accessibility and probe-wear validation",

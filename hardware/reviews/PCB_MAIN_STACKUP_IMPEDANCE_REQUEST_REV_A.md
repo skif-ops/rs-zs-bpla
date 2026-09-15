@@ -30,6 +30,10 @@ The request basis is the controlled 110 x 75 x 1.6 mm six-layer engineering
 candidate. The current native board has zero tracks, zero vias and zero copper
 zones. No vendor may treat this packet or the native board as fabrication data.
 
+The six-layer count is controlled by
+`hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv`; the final construction remains
+open exactly as stated in this request.
+
 ## Requested construction
 
 The functional layer intent is signal/RF, adjacent reference, power domains,

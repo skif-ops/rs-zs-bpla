@@ -21,6 +21,7 @@ BLE_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv"
 OPEN_DIMENSIONS_PATH = ROOT / "mechanics/common/OPEN_DIMENSIONS.csv"
 CAPTURE_SPEC_PATH = ROOT / "hardware/kicad/REV_A_CAPTURE_SPEC.md"
 PCB_RULES_PATH = ROOT / "hardware/kicad/PCB_RULES.md"
+LAYER_AUTHORITY_PATH = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
 
 FIELDS = [
     "Record_ID", "Feature_Type", "RefDes", "Contact", "Side",
@@ -323,12 +324,17 @@ def main() -> None:
 
     capture_spec = CAPTURE_SPEC_PATH.read_text(encoding="utf-8")
     pcb_rules = PCB_RULES_PATH.read_text(encoding="utf-8")
+    layer_authority = {row["Board"]: row for row in read_rows(LAYER_AUTHORITY_PATH)}
     for marker in (
         "PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv", "MAIN-AUTH-011",
         "110 x 75", "31 production pogo pads", "capture-authority input set is complete",
     ):
         require(marker in capture_spec, f"capture spec missing mechanical marker: {marker}")
-    require("Main board target: 6 layers" in pcb_rules, "six-layer PCB-MAIN target missing")
+    require("PCB-MAIN 6, PCB-PWR 4 and PCB-MIC 2 layers" in pcb_rules,
+            "controlled Rev.A layer-count statement missing")
+    require(layer_authority["PCB-MAIN"]["Copper_Layers"] == "6" and
+            layer_authority["PCB-MAIN"]["Layer_Count_Status"] == "FROZEN_REV_A",
+            "six-layer PCB-MAIN authority missing")
     require("no guessed trace width" in pcb_rules, "stackup-dependent impedance boundary missing")
 
     result = {

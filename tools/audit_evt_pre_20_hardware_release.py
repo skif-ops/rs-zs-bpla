@@ -75,6 +75,30 @@ def run_bom_qg2() -> dict[str, object]:
         return json.loads(output.read_text(encoding="utf-8"))
 
 
+def run_json_audit(script_name: str) -> dict[str, object]:
+    """Run an internal hardware audit without leaving generated files in the tree."""
+    with tempfile.TemporaryDirectory(prefix="evt-pre-20-hw-subgate-") as temp_dir:
+        output = Path(temp_dir) / "audit.json"
+        process = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / f"tools/{script_name}"),
+                "--output",
+                str(output),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if process.returncode != 0 or not output.is_file():
+            return {
+                "status": "ERROR",
+                "error": process.stderr.strip() or process.stdout.strip() or f"exit {process.returncode}",
+            }
+        return json.loads(output.read_text(encoding="utf-8"))
+
+
 def audit() -> dict[str, object]:
     checks: list[dict[str, object]] = []
     design_blockers: list[str] = []
@@ -123,6 +147,48 @@ def audit() -> dict[str, object]:
         qg2_ok,
         "production BOM QG-2 PASS" if qg2_ok else f"production BOM QG-2 BLOCKED ({len(qg2_blockers)} findings)",
         "production BOM QG-2 remains BLOCKED: " + " | ".join(qg2_blockers),
+    )
+
+    layer_authority = run_json_audit("audit_pcb_layer_count_authority_rev_a.py")
+    layer_authority_ok = (
+        layer_authority.get("status") == "PASS_CONTROLLED_LAYER_COUNTS_FINAL_STACKUPS_OPEN"
+        and layer_authority.get("manufacturing_release") is False
+        and layer_authority.get("controlled_counts") == {
+            "PCB-MAIN": 6,
+            "PCB-PWR": 4,
+            "PCB-MIC": 2,
+        }
+    )
+    check(
+        "pcb_layer_count_authority",
+        layer_authority_ok,
+        str(layer_authority.get("status", "MISSING")),
+        "PCB layer counts are inconsistent across native boards, BOM/RFQ or controlled authorities",
+    )
+
+    harness = run_json_audit("audit_harness_manufacturing_rev_a.py")
+    harness_packet_ok = (
+        harness.get("status") == "PASS_CONTROLLED_PRELIMINARY_LENGTHS_OPEN"
+        and harness.get("packet_complete") is True
+        and harness.get("controlled_conductors") == 38
+    )
+    check(
+        "harness_controlled_preliminary_packet",
+        harness_packet_ok,
+        str(harness.get("status", "MISSING")),
+        "internal harness drawing and point-to-point manufacturing schedule are incomplete",
+    )
+    harness_released = harness.get("manufacturing_release") is True
+    harness_blockers = [str(item) for item in harness.get("open_blockers", [])]
+    check(
+        "harness_manufacturing_release",
+        harness_released,
+        (
+            "physical harness release PASS"
+            if harness_released
+            else f"controlled preliminary; {len(harness_blockers)} release blockers"
+        ),
+        "harness manufacturing release remains open: " + " | ".join(harness_blockers),
     )
 
     board_results: dict[str, object] = {}
@@ -474,6 +540,8 @@ def audit() -> dict[str, object]:
         },
         "boards": board_results,
         "bom_qg2": bom_qg2,
+        "pcb_layer_count_authority": layer_authority,
+        "harness": harness,
         "checks": checks,
     }
 

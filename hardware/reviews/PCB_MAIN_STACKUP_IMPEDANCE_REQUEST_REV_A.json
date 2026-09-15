@@ -6,6 +6,7 @@
   "status": "PACKET_READY_TWO_FABRICATOR_RESPONSES_REQUIRED_NOT_FOR_ROUTING_OR_MANUFACTURE",
   "authority_inputs": [
     "hardware/kicad/PCB_RULES.md",
+    "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
     "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv",

@@ -11,7 +11,15 @@ on:
       - "hardware/reviews/**"
       - "hardware/*FREEZE_REV_A.csv"
       - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
+      - "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv"
+      - "hardware/HARNESS_MANUFACTURING_DRAWING_REV_A.md"
+      - "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.md"
+      - "hardware/EVT_PRE_20_BOM_DRAFT.csv"
       - "hardware/EVT_PRE_20_BOM_REV_A.csv"
+      - "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+      - "hardware/EVT_PRE_20_BOM_REV_A.xlsx"
+      - "hardware/CHINA_PROCUREMENT_RFQ.csv"
       - "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv"
       - "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md"
@@ -88,6 +96,8 @@ on:
       - "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py"
       - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
       - "tools/audit_pcb_main_native_schematic_rev_a.py"
+      - "tools/audit_pcb_layer_count_authority_rev_a.py"
+      - "tools/audit_harness_manufacturing_rev_a.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
@@ -127,7 +137,15 @@ on:
       - "hardware/reviews/**"
       - "hardware/*FREEZE_REV_A.csv"
       - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
+      - "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv"
+      - "hardware/HARNESS_MANUFACTURING_DRAWING_REV_A.md"
+      - "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.md"
+      - "hardware/EVT_PRE_20_BOM_DRAFT.csv"
       - "hardware/EVT_PRE_20_BOM_REV_A.csv"
+      - "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+      - "hardware/EVT_PRE_20_BOM_REV_A.xlsx"
+      - "hardware/CHINA_PROCUREMENT_RFQ.csv"
       - "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv"
       - "hardware/PCB_MAIN_*AUTHORITY_REV_A.*"
       - "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
@@ -140,6 +158,7 @@ on:
       - "hardware/POWER_*.md"
       - "mechanics/common/OPEN_DIMENSIONS.csv"
       - "tools/*pcb*_rev_a.py"
+      - "tools/audit_harness_manufacturing_rev_a.py"
       - "tools/kicad_native_gate.py"
       - ".github/workflows/pcb-native.yml"
 
@@ -156,6 +175,10 @@ jobs:
           python-version: "3.12"
       - name: Engineering preflight
         run: python tools/kicad_native_gate.py
+      - name: Independent PCB layer-count authority audit
+        run: python tools/audit_pcb_layer_count_authority_rev_a.py --output artifacts/kicad-native/pcb_layer_count_authority_rev_a.json
+      - name: Independent harness manufacturing drawing audit
+        run: python tools/audit_harness_manufacturing_rev_a.py --output artifacts/kicad-native/harness_manufacturing_rev_a.json
       - name: Independent PCB-MAIN capture-authority audit
         run: |
           python tools/audit_pcb_main_capture_authority_rev_a.py \

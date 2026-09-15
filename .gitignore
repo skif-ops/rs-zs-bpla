@@ -27,6 +27,15 @@ rkd/**/*.docx
 rkd/**/*.xlsx
 rkd/figures/*.png
 
+# Local/CI audit outputs (authorities and source files remain tracked)
+artifacts/kicad-native/
+artifacts/evt_pre_20_bom_qg1.json
+artifacts/evt_pre_20_bom_qg2.json
+artifacts/evt_pre_20_bom_workbook_audit.json
+artifacts/evt_pre_20_hardware_release_audit.json
+artifacts/pcb_layer_count_authority_rev_a.json
+artifacts/harness_manufacturing_rev_a.json
+
 # OS/editor
 .DS_Store
 Thumbs.db

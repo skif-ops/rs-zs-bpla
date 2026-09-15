@@ -3,10 +3,11 @@
 Status: `ELECTRICAL PLACEMENT CANVAS / DIM-003 OPEN / ROUTING ABSENT / NOT FOR MANUFACTURE`
 
 This authority creates a reviewable native-board canvas without claiming enclosure or
-fabrication approval. The `90 x 60 mm`, four-copper-layer and `1.6 mm` values are
-deliberately provisional working values. They are not a mechanical freeze and must be
-replaced or explicitly accepted after `DIM-003` supplies the assembled envelope,
-terminal zones, mounting pattern and frozen PCB STEP.
+fabrication approval. The four-copper-layer count is frozen for Rev.A by
+`hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv`. The `90 x 60 mm` outline and
+`1.6 mm` thickness remain deliberately provisional working values. They are not a
+mechanical freeze and must be replaced or explicitly accepted after `DIM-003`
+supplies the assembled envelope, terminal zones, mounting pattern and frozen PCB STEP.
 
 ## Controlled candidate content
 
@@ -28,8 +29,9 @@ terminal zones, mounting pattern and frozen PCB STEP.
 The candidate must contain zero tracks, zero vias and zero copper zones. DRC, Gerber,
 drill, position, IPC-356 and STEP export are prohibited for this state. The independent
 audit checks the complete reference/net/footprint set, every candidate coordinate,
-the provisional outline/layer assumptions and the open `DIM-003` record.
+the frozen layer count, provisional outline/thickness assumptions and the open
+`DIM-003` record.
 
-Review B still requires frozen mechanics, stack-up and copper weight; high-current and
+Review B still requires frozen mechanics, final stack-up and copper weight; high-current and
 Kelvin routing; hot-loop and switch-node control; thermal/current-density calculation;
 TVS/fuse coordination; DRC; DFM; load-step, cold-start, fault, EMI and fixture evidence.

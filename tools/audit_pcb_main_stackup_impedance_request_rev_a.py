@@ -22,6 +22,7 @@ from kiutils.board import Board
 ROOT = Path(__file__).resolve().parents[1]
 BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 RULES = ROOT / "hardware/kicad/PCB_RULES.md"
+LAYER_AUTHORITY = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
 MECHANICAL = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
 ROUTING = ROOT / "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv"
@@ -73,6 +74,7 @@ USB_PAIR_GROUPS = {
 
 AUTHORITY_INPUTS = [
     "hardware/kicad/PCB_RULES.md",
+    "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
     "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv",
@@ -114,6 +116,7 @@ QUESTION_TOKENS = {
 CONTROLLED_SOURCES = [
     BOARD,
     RULES,
+    LAYER_AUTHORITY,
     MECHANICAL,
     PLACEMENT,
     ROUTING,
