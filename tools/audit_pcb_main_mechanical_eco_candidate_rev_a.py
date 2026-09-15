@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Audit the unapproved PCB-MAIN limited mechanical ECO candidate.
+"""Audit the approved PCB-MAIN limited mechanical ECO and its application.
 
-The candidate is an overlay calculation only.  It deliberately does not edit
-MAIN-AUTH-011 or the native board and cannot be used as manufacturing release.
+The immutable candidate remains the exact proposal reviewed by the customer.
+Its sidecar approval authorizes only the bounded MAIN-AUTH-011 delta.  This
+audit reconstructs the reviewed baseline from Git, repeats the independent
+overlay calculation, and accepts either the signed pre-application state or an
+exact application of that delta.  It never releases manufacturing.
 """
 from __future__ import annotations
 
@@ -11,7 +14,10 @@ import csv
 import hashlib
 import json
 import math
+import re
+import subprocess
 import sys
+import tempfile
 from collections import Counter
 from dataclasses import replace
 from itertools import combinations
@@ -35,7 +41,10 @@ from audit_pcb_main_placement_clearance_rev_a import (  # noqa: E402
 )
 
 DEFAULT_CANDIDATE = ROOT / "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.json"
+DEFAULT_APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.json"
 NUMERIC_TOLERANCE = 1e-6
+REVIEWED_COMMIT = "61cbe796de2f87560342a44b063ff6283a8ce1e8"
+REVIEWED_CANDIDATE_SHA256 = "5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1"
 EXPECTED_CHANGES = {
     "MECH-007": {"Y_mm": (13.0, 15.0)},
     "MECH-008": {"Y_mm": (30.0, 42.5)},
@@ -46,6 +55,18 @@ EXPECTED_CHANGES = {
     "MECH-024": {"Y_mm": (42.0, 34.0), "Extent_Y_mm": (30.0, 40.0)},
     "MECH-026": {"Extent_Y_mm": (26.0, 28.0)},
     "MECH-032": {"Y_mm": (25.0, 37.5), "Extent_X_mm": (12.0, 10.0)},
+}
+NUMERIC_FIELDS = {
+    "X_mm", "Y_mm", "Rotation_deg", "Extent_X_mm", "Extent_Y_mm",
+    "Z_Min_mm", "Z_Max_mm",
+}
+BOARD_POSITION_LINES = {
+    "J_PWR": ("    (at 0 13 90)", "    (at 0 15 90)"),
+    "J_MIC1": ("    (at 0 30 90)", "    (at 0 42.5 90)"),
+    "J8": ("    (at 16 68)", "    (at 16 71.5)"),
+    "J10": ("    (at 74 68)", "    (at 74 71.5)"),
+    "J13": ("    (at 110 13 -90)", "    (at 110 15 -90)"),
+    "U8": ("    (at 24 53)", "    (at 24 52)"),
 }
 
 
@@ -60,6 +81,133 @@ def sha256(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def sha256_bytes(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
+
+
+def git_blob(commit: str, relative_path: str) -> bytes:
+    completed = subprocess.run(
+        ["git", "show", f"{commit}:{relative_path}"],
+        cwd=ROOT,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    require(
+        completed.returncode == 0,
+        f"cannot read reviewed Git object {commit}:{relative_path}: "
+        f"{completed.stderr.decode('utf-8', errors='replace').strip()}",
+    )
+    return completed.stdout
+
+
+def validate_approval(approval_path: Path, candidate_path: Path) -> dict[str, Any]:
+    approval = json.loads(approval_path.read_text(encoding="utf-8"))
+    require(set(approval) == {
+                "schema_version", "configuration", "proposal_id", "reviewer",
+                "date", "reviewed_commit_sha", "reviewed_candidate",
+                "reviewed_candidate_sha256", "decision", "scope",
+                "approved_change_records", "implementation_authorized",
+                "retained_blockers", "manufacturing_release",
+            }, "mechanical ECO approval schema drift")
+    require(approval["schema_version"] ==
+            "dioneya.pcb-main-mechanical-eco-approval.v1",
+            "mechanical ECO approval schema version drift")
+    require(approval["configuration"] == "EVT-PRE-20 Rev.A" and
+            approval["proposal_id"] == "PCB-MAIN-MECH-ECO-001",
+            "mechanical ECO approval identity drift")
+    require(approval["reviewer"] == "Скиф" and approval["date"] == "2026-09-15",
+            "mechanical ECO reviewer or date drift")
+    require(approval["reviewed_commit_sha"] == REVIEWED_COMMIT,
+            "mechanical ECO reviewed commit drift")
+    require(approval["reviewed_candidate"] ==
+            str(candidate_path.resolve().relative_to(ROOT)),
+            "mechanical ECO reviewed-candidate path drift")
+    require(approval["reviewed_candidate_sha256"] == REVIEWED_CANDIDATE_SHA256,
+            "mechanical ECO reviewed-candidate SHA-256 drift")
+    require(approval["decision"] == "ACCEPT_LIMITED_MECHANICAL_ECO" and
+            approval["scope"] == "LIMITED_MAIN_AUTH_011_MECHANICAL_ECO_ONLY" and
+            approval["implementation_authorized"] is True,
+            "mechanical ECO approval decision or scope drift")
+    require(approval["approved_change_records"] == list(EXPECTED_CHANGES),
+            "mechanical ECO approved record sequence drift")
+    require(isinstance(approval["retained_blockers"], list) and
+            len(approval["retained_blockers"]) == 7 and
+            all(isinstance(item, str) and item for item in approval["retained_blockers"]),
+            "mechanical ECO retained-blocker record drift")
+    require(approval["manufacturing_release"] is False,
+            "mechanical ECO approval cannot release manufacturing")
+    return approval
+
+
+def footprint_block(source: str, ref: str) -> tuple[int, int, str]:
+    for match in re.finditer(r"(?m)^  \(footprint ", source):
+        start = match.start() + 2
+        depth = 0
+        in_string = False
+        escaped = False
+        for index in range(start, len(source)):
+            char = source[index]
+            if in_string:
+                if escaped:
+                    escaped = False
+                elif char == "\\":
+                    escaped = True
+                elif char == '"':
+                    in_string = False
+                continue
+            if char == '"':
+                in_string = True
+            elif char == "(":
+                depth += 1
+            elif char == ")":
+                depth -= 1
+                if depth == 0:
+                    end = index + 1
+                    block = source[start:end]
+                    if re.search(
+                        rf'(?m)^    \(fp_text reference "{re.escape(ref)}"(?: |\))',
+                        block,
+                    ):
+                        return start, end, block
+                    break
+    raise AssertionError(f"baseline board footprint not found: {ref}")
+
+
+def expected_applied_board(baseline: bytes) -> bytes:
+    source = baseline.decode("utf-8")
+    for ref, (old_line, new_line) in BOARD_POSITION_LINES.items():
+        start, end, block = footprint_block(source, ref)
+        require(block.count(old_line) == 1,
+                f"{ref}: reviewed baseline position line drift")
+        require(new_line not in block, f"{ref}: reviewed baseline is already moved")
+        block = block.replace(old_line, new_line, 1)
+        source = source[:start] + block + source[end:]
+    return source.encode("utf-8")
+
+
+def authority_matches_applied(
+    live_path: Path,
+    expected_by_id: dict[str, dict[str, Any]],
+) -> bool:
+    live_rows, live_by_id = load_rows(live_path)
+    require(len(live_rows) == len(expected_by_id) and
+            set(live_by_id) == set(expected_by_id),
+            "applied MAIN-AUTH-011 record set drift")
+    for record_id, expected in expected_by_id.items():
+        actual = live_by_id[record_id]
+        require(set(actual) == set(expected),
+                f"{record_id}: applied MAIN-AUTH-011 field set drift")
+        for field, expected_value in expected.items():
+            if field in NUMERIC_FIELDS:
+                require(close(float(actual[field]), float(expected_value)),
+                        f"{record_id}.{field}: applied value drift")
+            else:
+                require(actual[field] == expected_value,
+                        f"{record_id}.{field}: applied value drift")
+    return True
 
 
 def close(first: float, second: float) -> bool:
@@ -191,8 +339,19 @@ def circle_to_hole_exclusion_gap(clearance: dict[str, Any], hole: dict[str, Any]
             hole["component_exclusion_diameter_mm"] / 2.0)
 
 
-def audit(candidate_path: Path) -> dict[str, Any]:
-    candidate = json.loads(candidate_path.read_text(encoding="utf-8"))
+def audit(candidate_path: Path, approval_path: Path) -> dict[str, Any]:
+    approval = validate_approval(approval_path, candidate_path)
+    live_candidate = candidate_path.read_bytes()
+    require(sha256_bytes(live_candidate) == REVIEWED_CANDIDATE_SHA256,
+            "live mechanical ECO candidate SHA-256 does not match approval")
+    reviewed_candidate = git_blob(
+        approval["reviewed_commit_sha"], approval["reviewed_candidate"]
+    )
+    require(sha256_bytes(reviewed_candidate) == approval["reviewed_candidate_sha256"],
+            "reviewed Git candidate SHA-256 does not match approval")
+    require(live_candidate == reviewed_candidate,
+            "live mechanical ECO candidate differs from reviewed Git candidate")
+    candidate = json.loads(reviewed_candidate.decode("utf-8"))
     require(candidate.get("schema_version") == "dioneya.pcb-main-mechanical-eco-candidate.v1",
             "candidate schema version drift")
     require(candidate.get("configuration") == "EVT-PRE-20 Rev.A",
@@ -213,14 +372,18 @@ def audit(candidate_path: Path) -> dict[str, Any]:
     require(baseline.get("inspected_commit") ==
             "989ce217d44795ba2986453d1f37152af5a8e1fc",
             "candidate inspected commit drift")
-    board_path = ROOT / baseline["board"]
-    authority_path = ROOT / baseline["authority"]
-    require(board_path.is_file(), "candidate baseline board is missing")
-    require(authority_path.is_file(), "candidate baseline authority is missing")
-    require(sha256(board_path) == baseline["board_sha256"],
+    baseline_board = git_blob(baseline["inspected_commit"], baseline["board"])
+    baseline_authority = git_blob(baseline["inspected_commit"], baseline["authority"])
+    require(sha256_bytes(baseline_board) == baseline["board_sha256"],
             "candidate baseline board SHA-256 drift")
-    require(sha256(authority_path) == baseline["authority_sha256"],
+    require(sha256_bytes(baseline_authority) == baseline["authority_sha256"],
             "candidate baseline authority SHA-256 drift")
+
+    history = tempfile.TemporaryDirectory(prefix="pcb-main-mechanical-eco-")
+    board_path = Path(history.name) / "PCB-MAIN-baseline.kicad_pcb"
+    authority_path = Path(history.name) / "PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_BASELINE.csv"
+    board_path.write_bytes(baseline_board)
+    authority_path.write_bytes(baseline_authority)
 
     rows, baseline_by_id = load_rows(authority_path)
     require(len(rows) == 70, "MAIN-AUTH-011 record count drift")
@@ -417,14 +580,39 @@ def audit(candidate_path: Path) -> dict[str, Any]:
     require(isinstance(open_validation, list) and len(open_validation) == 4 and
             all(isinstance(item, str) and item for item in open_validation),
             "candidate open-validation list drift")
+    live_board_path = ROOT / baseline["board"]
+    live_authority_path = ROOT / baseline["authority"]
+    require(live_board_path.is_file(), "live PCB-MAIN board is missing")
+    require(live_authority_path.is_file(), "live MAIN-AUTH-011 authority is missing")
+    live_board_sha = sha256(live_board_path)
+    live_authority_sha = sha256(live_authority_path)
+    baseline_is_live = (
+        live_board_sha == baseline["board_sha256"] and
+        live_authority_sha == baseline["authority_sha256"]
+    )
+    if baseline_is_live:
+        application_status = "APPROVED_PENDING_APPLICATION"
+    else:
+        require(live_board_sha != baseline["board_sha256"] and
+                live_authority_sha != baseline["authority_sha256"],
+                "mechanical ECO is only partially applied")
+        authority_matches_applied(live_authority_path, candidate_by_id)
+        require(live_board_path.read_bytes() == expected_applied_board(baseline_board),
+                "native PCB-MAIN differs from the exact approved six-anchor move")
+        application_status = (
+            "PASS_APPROVED_ECO_APPLIED_GEOMETRY_ONLY_PLACEMENT_REPACK_REQUIRED"
+        )
+
     return {
         "schema_version": "dioneya.pcb-main-mechanical-eco-audit.v1",
         "proposal_id": candidate["proposal_id"],
-        "status": "PASS_PROPOSAL_GEOMETRY_ONLY_NOT_APPROVED",
+        "status": application_status,
         "candidate_file": str(candidate_path.resolve().relative_to(ROOT)),
         "candidate_sha256": sha256(candidate_path),
-        "baseline_board_sha256": sha256(board_path),
-        "baseline_authority_sha256": sha256(authority_path),
+        "baseline_board_sha256": sha256_bytes(baseline_board),
+        "baseline_authority_sha256": sha256_bytes(baseline_authority),
+        "live_board_sha256": live_board_sha,
+        "live_authority_sha256": live_authority_sha,
         "changed_records": sorted(EXPECTED_CHANGES),
         "baseline_locked_component_conflicts": baseline_components,
         "baseline_locked_mounting_conflicts": baseline_mounting,
@@ -435,7 +623,14 @@ def audit(candidate_path: Path) -> dict[str, Any]:
         "candidate_unresolved_placement": unresolved,
         "margins_mm": metrics,
         "service_geometry_mm": service_geometry,
-        "approval": candidate["approval"],
+        "approval": {
+            "reviewer": approval["reviewer"],
+            "date": approval["date"],
+            "reviewed_commit_sha": approval["reviewed_commit_sha"],
+            "reviewed_candidate_sha256": approval["reviewed_candidate_sha256"],
+            "decision": approval["decision"],
+            "scope": approval["scope"],
+        },
         "manufacturing_release": False,
     }
 
@@ -443,11 +638,14 @@ def audit(candidate_path: Path) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--candidate", type=Path, default=DEFAULT_CANDIDATE)
+    parser.add_argument("--approval", type=Path, default=DEFAULT_APPROVAL)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     candidate_path = args.candidate.resolve()
+    approval_path = args.approval.resolve()
     require(candidate_path.is_file(), f"candidate not found: {candidate_path}")
-    report = audit(candidate_path)
+    require(approval_path.is_file(), f"approval not found: {approval_path}")
+    report = audit(candidate_path, approval_path)
     if args.output:
         output = args.output.resolve()
         output.parent.mkdir(parents=True, exist_ok=True)
@@ -463,7 +661,10 @@ def main() -> int:
     )
     print(f"residual_unlocked_placement={report['candidate_unresolved_placement']}")
     print(f"margins_mm={report['margins_mm']}")
-    print("authority_mutated=false approval=false manufacturing_release=false")
+    print(
+        "approval=ACCEPT_LIMITED_MECHANICAL_ECO "
+        f"application={report['status']} manufacturing_release=false"
+    )
     return 0
 
 

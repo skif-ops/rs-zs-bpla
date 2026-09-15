@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -166,6 +168,8 @@ jobs:
             hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md
             hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.json
             hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.md
             hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json
             firmware/targets/evt_pre_20/target_contract_manifest.json
             firmware/targets/evt_pre_20/stm32_scaffold_manifest.json

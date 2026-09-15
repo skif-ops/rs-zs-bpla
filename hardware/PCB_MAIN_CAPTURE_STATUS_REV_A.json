@@ -226,7 +226,9 @@
       "mechanical_eco_candidate": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.json",
       "mechanical_eco_candidate_record": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.md",
       "mechanical_eco_candidate_audit": "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py",
-      "mechanical_eco_candidate_status": "PROPOSED_NOT_APPROVED",
+      "mechanical_eco_approval": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.json",
+      "mechanical_eco_approval_record": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.md",
+      "mechanical_eco_candidate_status": "APPROVED_PENDING_APPLICATION",
       "placement_clearance_control": {
         "state": "BLOCKED_PLACEMENT_CLEARANCE",
         "board_sha256": "aa35fe622b6a0761b9b25ae488e1a2c6e7160c285ab771b580f63513b83e4a22",
