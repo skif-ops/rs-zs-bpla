@@ -129,6 +129,80 @@ def relative(path: Path) -> str:
         return str(path.resolve())
 
 
+def number(value: object) -> float:
+    return round(float(value or 0.0), 6)
+
+
+def ref_of(footprint: object) -> str:
+    properties = getattr(footprint, "properties", {})
+    if properties.get("Reference"):
+        return str(properties["Reference"])
+    return next((str(item.text) for item in getattr(footprint, "graphicItems", [])
+                 if getattr(item, "type", None) == "reference"), "")
+
+
+def semantic_board_sha256(board: Board) -> str:
+    """Hash UUID/order-independent placement, pad/net and outline semantics."""
+    footprints: list[dict[str, Any]] = []
+    for footprint in board.footprints:
+        pads = []
+        for pad in footprint.pads:
+            pads.append({
+                "number": str(pad.number),
+                "type": str(pad.type),
+                "shape": str(pad.shape),
+                "position": [number(pad.position.X), number(pad.position.Y),
+                             number(pad.position.angle)],
+                "size": [number(pad.size.X), number(pad.size.Y)],
+                "layers": [str(layer) for layer in pad.layers],
+                "net": str(pad.net.name) if pad.net is not None else "NC",
+            })
+        pads.sort(key=lambda item: json.dumps(item, sort_keys=True, separators=(",", ":")))
+        attributes = footprint.attributes
+        footprints.append({
+            "reference": ref_of(footprint),
+            "lib_id": str(footprint.libId),
+            "position": [number(footprint.position.X), number(footprint.position.Y),
+                         number(footprint.position.angle)],
+            "layer": str(footprint.layer),
+            "description": str(footprint.description),
+            "tags": str(footprint.tags),
+            "population": {
+                "exclude_from_pos": bool(attributes.excludeFromPosFiles),
+                "exclude_from_bom": bool(attributes.excludeFromBom),
+            },
+            "pads": pads,
+        })
+    footprints.sort(key=lambda item: item["reference"])
+
+    edges = []
+    for item in board.graphicItems:
+        if getattr(item, "layer", None) != "Edge.Cuts":
+            continue
+        edges.append({
+            "type": type(item).__name__,
+            "start": [number(item.start.X), number(item.start.Y)],
+            "end": [number(item.end.X), number(item.end.Y)],
+            "width": number(item.width),
+        })
+    edges.sort(key=lambda item: json.dumps(item, sort_keys=True, separators=(",", ":")))
+
+    basis = {
+        "copper_layers": [layer.name for layer in board.layers if layer.name.endswith(".Cu")],
+        "thickness_mm": number(board.general.thickness),
+        "nets": sorted(str(net.name) for net in board.nets
+                       if int(net.number) != 0 and str(net.name)),
+        "footprints": footprints,
+        "edges": edges,
+        "trace_items": len(board.traceItems),
+        "copper_zones": len(board.zones),
+    }
+    encoded = json.dumps(
+        basis, ensure_ascii=True, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def expected_class_by_net() -> dict[str, str]:
     result: dict[str, str] = {}
     for route_class, nets in EXPECTED_CLASS_NETS.items():
@@ -278,12 +352,12 @@ def validate_row(row: dict[str, str], route_class: str) -> None:
         require(ROOT.joinpath(*pure.parts).is_file(), f"{net}: source is missing: {source}")
 
 
-def expected_status_control(board_digest: str, authority_digest: str,
+def expected_status_control(board_semantic_digest: str, authority_digest: str,
                             class_counts: dict[str, int],
                             domain_counts: dict[str, int]) -> dict[str, Any]:
     return {
         "state": STATE,
-        "board_sha256": board_digest,
+        "board_semantic_sha256": board_semantic_digest,
         "authority_sha256": authority_digest,
         "net_count": 31,
         "class_counts": class_counts,
@@ -391,8 +465,11 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
         require(marker in review_text, f"PCB-PWR Review B boundary marker missing: {marker}")
 
     board_digest = sha256(board_path)
+    board_semantic_digest = semantic_board_sha256(board)
     authority_digest = sha256(authority_path)
-    control = expected_status_control(board_digest, authority_digest, class_counts, domain_counts)
+    control = expected_status_control(
+        board_semantic_digest, authority_digest, class_counts, domain_counts
+    )
     if status_path is not None:
         status = json.loads(status_path.resolve().read_text(encoding="utf-8"))
         traceability = status.get("pre_route_constraints", {})
@@ -415,6 +492,7 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
         "board": {
             "path": relative(board_path),
             "sha256": board_digest,
+            "semantic_sha256": board_semantic_digest,
             "net_count": len(board_nets),
             "copper_layers": len(copper_layers),
             "trace_items": trace_items,

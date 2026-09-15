@@ -24,6 +24,12 @@ thermal geometry. Those values require the actual current envelope, DC-drop and
 fault-energy calculations, +70 °C thermal evidence and an accepted four-layer
 fabricator stackup.
 
+The machine status binds a UUID/order-independent semantic board digest covering
+the layer stack, outline, complete footprint placement, pad/net assignment and
+absence of copper. The audit still reports the raw file SHA-256 for evidence, but
+does not mistake KiCad-generated UUID/order changes for an electrical or layout
+change.
+
 ## Controlled class inventory
 
 | Route class | Nets | Binding rule |

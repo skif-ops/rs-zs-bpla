@@ -39,7 +39,7 @@
     "independent_audit": "tools/audit_pcb_pwr_routing_authority_rev_a.py",
     "control": {
       "state": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN",
-      "board_sha256": "c32ac0e73d5fda95ec57d7700c2ca932ae32162d9c31e109da735f68481f05e9",
+      "board_semantic_sha256": "21ee8a7b85ff20f1a0cfe5b4e9eda6e596ebd319ba572ba52e195307c3d0543c",
       "authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
       "net_count": 31,
       "class_counts": {
