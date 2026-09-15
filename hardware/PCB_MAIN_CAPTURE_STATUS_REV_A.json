@@ -228,50 +228,25 @@
       "mechanical_eco_candidate_audit": "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py",
       "mechanical_eco_approval": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.json",
       "mechanical_eco_approval_record": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.md",
-      "mechanical_eco_candidate_status": "APPROVED_PENDING_APPLICATION",
+      "mechanical_eco_review_commit_mapping": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_REVIEW_COMMIT_MAPPING_REV_A.json",
+      "mechanical_eco_application": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPLICATION_REV_A.json",
+      "mechanical_eco_candidate_status": "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
       "placement_clearance_control": {
         "state": "BLOCKED_PLACEMENT_CLEARANCE",
-        "board_sha256": "aa35fe622b6a0761b9b25ae488e1a2c6e7160c285ab771b580f63513b83e4a22",
-        "authority_sha256": "2ea8da3b8469f616c469eb342127afd2e75b3b0ad04f3ab75154560211f353c9",
+        "board_sha256": "8de8ac2eedc00775853a26641931ded8873cf5c1d9f61e7358d0546fea9dc379",
+        "authority_sha256": "6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44",
         "assembly_footprints": 227,
         "courtyard_footprints": 58,
         "pad_screening_footprints": 169,
-        "confirmed_component_collisions": 17,
+        "confirmed_component_collisions": 15,
         "screening_component_collisions": 67,
-        "confirmed_mounting_clearance_conflicts": 2,
+        "confirmed_mounting_clearance_conflicts": 0,
         "screening_mounting_clearance_conflicts": 1,
-        "confirmed_tool_clearance_conflicts": 2,
+        "confirmed_tool_clearance_conflicts": 0,
         "screening_tool_clearance_conflicts": 0,
-        "locked_authority_component_conflicts": [
-          [
-            "J8",
-            "U8"
-          ],
-          [
-            "J_MIC1",
-            "J_PWR"
-          ]
-        ],
-        "locked_authority_mounting_conflicts": [
-          [
-            "H1",
-            "J_PWR"
-          ],
-          [
-            "H2",
-            "J13"
-          ]
-        ],
-        "locked_authority_tool_conflicts": [
-          [
-            "J10",
-            "U10"
-          ],
-          [
-            "J8",
-            "U8"
-          ]
-        ]
+        "locked_authority_component_conflicts": [],
+        "locked_authority_mounting_conflicts": [],
+        "locked_authority_tool_conflicts": []
       },
       "review_b_checklist": "hardware/reviews/PCB_MAIN_REVIEW_B_CHECKLIST_REV_A.md",
       "ra_003_calculation": "hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md",

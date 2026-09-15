@@ -1431,7 +1431,7 @@ def main() -> None:
     mechanical_review = MECHANICAL_PLACEMENT_REVIEW_PATH.read_text(encoding="utf-8")
     mechanical_sha256 = hashlib.sha256(MECHANICAL_PLACEMENT_AUTHORITY_PATH.read_bytes()).hexdigest()
     for marker in {
-        "MECHANICAL_PLACEMENT_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        "MECHANICAL_PLACEMENT_AUTHORITY_PASS / LIMITED ECO APPLIED / PCB REVIEW B OPEN / NOT FOR MANUFACTURE",
         mechanical_sha256, "70 records", "110 x 75 x 1.60 mm", "31 individual pogo pads",
         "CONTROLLED_PENDING_NATIVE_STEP", "All physical tests remain `NOT RUN`",
     }:
@@ -1683,7 +1683,7 @@ def main() -> None:
                 "placement_clearance_audit", "placement_clearance_record",
                 "mechanical_eco_candidate", "mechanical_eco_candidate_record",
                 "mechanical_eco_candidate_audit", "mechanical_eco_approval",
-                "mechanical_eco_approval_record",
+                "mechanical_eco_approval_record", "mechanical_eco_review_commit_mapping",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
             require(required_layout_evidence <= set(review_b["evidence"]),
@@ -1733,6 +1733,39 @@ def main() -> None:
             require(hashlib.sha256(candidate_path.read_bytes()).hexdigest() ==
                     mechanical_approval["reviewed_candidate_sha256"],
                     "approved PCB-MAIN mechanical ECO candidate SHA-256 drift")
+            review_commit_mapping = json.loads(
+                (ROOT / review_b["evidence"]["mechanical_eco_review_commit_mapping"])
+                .read_text(encoding="utf-8")
+            )
+            require(review_commit_mapping.get("reviewed_local_commit_sha") ==
+                    mechanical_approval["reviewed_commit_sha"] and
+                    review_commit_mapping.get("github_equivalent_commit_sha") ==
+                    "e265d1f1a0a74f94b9c887e12794a9b59fc2bfa0" and
+                    review_commit_mapping.get("reviewed_tree_sha") ==
+                    "f1fd423bbcfedefa830677ce2d8b3c54b2294caa" and
+                    review_commit_mapping.get("candidate_blob_sha") ==
+                    "b3dede3b466676bbab4e3bd737160cacfc57ad28" and
+                    review_commit_mapping.get("candidate_sha256") ==
+                    mechanical_approval["reviewed_candidate_sha256"] and
+                    review_commit_mapping.get("equivalence") ==
+                    "EXACT_TREE_AND_CANDIDATE_BLOB" and
+                    review_commit_mapping.get("manufacturing_release") is False,
+                    "PCB-MAIN mechanical ECO review-commit mapping drift")
+            mechanical_application = None
+            if mechanical_eco_status == "APPROVED_APPLIED_FULL_REPACK_REQUIRED":
+                require("mechanical_eco_application" in review_b["evidence"],
+                        "PCB-MAIN mechanical ECO application record is missing")
+                application_path = ROOT / review_b["evidence"]["mechanical_eco_application"]
+                require(application_path.is_file() and application_path.stat().st_size > 0,
+                        "PCB-MAIN mechanical ECO application record is empty")
+                mechanical_application = json.loads(
+                    application_path.read_text(encoding="utf-8")
+                )
+                require(mechanical_application.get("status") ==
+                        "APPLIED_FULL_REPACK_REQUIRED" and
+                        mechanical_application.get("review_b_complete") is False and
+                        mechanical_application.get("manufacturing_release") is False,
+                        "PCB-MAIN mechanical ECO application interlock drift")
             placement_control = review_b["evidence"].get("placement_clearance_control")
             require(isinstance(placement_control, dict),
                     "placement-clearance controlled baseline is missing")
@@ -1777,6 +1810,26 @@ def main() -> None:
                         not placement_control["locked_authority_mounting_conflicts"] and
                         not placement_control["locked_authority_tool_conflicts"],
                         "approved ECO did not clear the locked conflict set")
+                require(mechanical_application is not None and
+                        mechanical_application.get("post_application_clearance") == {
+                            key: placement_control[key]
+                            for key in (
+                                "confirmed_component_collisions",
+                                "screening_component_collisions",
+                                "confirmed_mounting_clearance_conflicts",
+                                "screening_mounting_clearance_conflicts",
+                                "confirmed_tool_clearance_conflicts",
+                                "screening_tool_clearance_conflicts",
+                                "locked_authority_component_conflicts",
+                                "locked_authority_mounting_conflicts",
+                                "locked_authority_tool_conflicts",
+                            )
+                        }, "PCB-MAIN mechanical ECO application inventory drift")
+                require(mechanical_application.get("applied", {}).get("board_sha256") ==
+                        placement_control["board_sha256"] and
+                        mechanical_application.get("applied", {}).get("authority_sha256") ==
+                        placement_control["authority_sha256"],
+                        "PCB-MAIN mechanical ECO application hash drift")
     elif native_present:
         require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
                 "human Review A identity/date/SHA claimed before sign-off")
@@ -1829,8 +1882,13 @@ def main() -> None:
             "placement_clearance_control", {}
         ).get("state", "BLOCKED"),
         "mechanical_authority_disposition": (
-            "CLOSED_CAPTURE_INPUT_LIMITED_MAIN_AUTH_011_ECO_REQUIRED_FOR_LAYOUT"
-            if review_a["complete"] is True else "CAPTURE_INPUT_CONTROLLED"
+            "CLOSED_CAPTURE_INPUT_LIMITED_MAIN_AUTH_011_ECO_APPLIED_REPACK_REQUIRED"
+            if review_b["evidence"].get("mechanical_eco_candidate_status") ==
+            "APPROVED_APPLIED_FULL_REPACK_REQUIRED"
+            else "CLOSED_CAPTURE_INPUT_LIMITED_MAIN_AUTH_011_ECO_APPROVED_PENDING_APPLICATION"
+            if review_b["evidence"].get("mechanical_eco_candidate_status") ==
+            "APPROVED_PENDING_APPLICATION"
+            else "CAPTURE_INPUT_CONTROLLED"
         ),
         "production_bom": "BLOCKED",
     }
@@ -1857,8 +1915,8 @@ def main() -> None:
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(
         "- all 11 authorities remain closed as capture inputs; native schematic Review A "
-        "is signed PASS; limited MAIN-AUTH-011 mechanical ECO, Review B and production "
-        "evidence remain blockers"
+        "is signed PASS; the limited MAIN-AUTH-011 mechanical ECO is applied; full "
+        "placement repack, Review B and production evidence remain blockers"
     )
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 

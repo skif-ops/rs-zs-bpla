@@ -42,6 +42,10 @@ from audit_pcb_main_placement_clearance_rev_a import (  # noqa: E402
 
 DEFAULT_CANDIDATE = ROOT / "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.json"
 DEFAULT_APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.json"
+DEFAULT_REVIEW_COMMIT_MAPPING = (
+    ROOT / "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_REVIEW_COMMIT_MAPPING_REV_A.json"
+)
+DEFAULT_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPLICATION_REV_A.json"
 NUMERIC_TOLERANCE = 1e-6
 REVIEWED_COMMIT = "61cbe796de2f87560342a44b063ff6283a8ce1e8"
 REVIEWED_CANDIDATE_SHA256 = "5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1"
@@ -101,6 +105,92 @@ def git_blob(commit: str, relative_path: str) -> bytes:
         f"{completed.stderr.decode('utf-8', errors='replace').strip()}",
     )
     return completed.stdout
+
+
+def git_object_exists(commit: str) -> bool:
+    return subprocess.run(
+        ["git", "cat-file", "-e", f"{commit}^{{commit}}"],
+        cwd=ROOT,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    ).returncode == 0
+
+
+def git_tree_sha(commit: str) -> str:
+    completed = subprocess.run(
+        ["git", "rev-parse", f"{commit}^{{tree}}"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    require(completed.returncode == 0,
+            f"cannot resolve reviewed tree for {commit}")
+    return completed.stdout.strip()
+
+
+def git_blob_sha(payload: bytes) -> str:
+    header = f"blob {len(payload)}\0".encode("ascii")
+    return hashlib.sha1(header + payload).hexdigest()
+
+
+def validate_review_commit_mapping(
+    mapping_path: Path,
+    approval: dict[str, Any],
+) -> tuple[dict[str, Any], bytes]:
+    mapping = json.loads(mapping_path.read_text(encoding="utf-8"))
+    require(set(mapping) == {
+                "schema_version", "configuration", "proposal_id",
+                "reviewed_local_commit_sha", "github_equivalent_commit_sha",
+                "reviewed_tree_sha", "candidate_path", "candidate_blob_sha",
+                "candidate_sha256", "equivalence", "transport", "reason",
+                "manufacturing_release",
+            }, "mechanical ECO review-commit mapping schema drift")
+    require(mapping["schema_version"] ==
+            "dioneya.pcb-main-mechanical-eco-review-commit-mapping.v1" and
+            mapping["configuration"] == "EVT-PRE-20 Rev.A" and
+            mapping["proposal_id"] == "PCB-MAIN-MECH-ECO-001",
+            "mechanical ECO review-commit mapping identity drift")
+    require(mapping["reviewed_local_commit_sha"] == approval["reviewed_commit_sha"] and
+            mapping["reviewed_local_commit_sha"] == REVIEWED_COMMIT and
+            mapping["github_equivalent_commit_sha"] ==
+            "e265d1f1a0a74f94b9c887e12794a9b59fc2bfa0",
+            "mechanical ECO review-commit mapping SHA drift")
+    require(mapping["reviewed_tree_sha"] ==
+            "f1fd423bbcfedefa830677ce2d8b3c54b2294caa" and
+            mapping["candidate_path"] == approval["reviewed_candidate"] and
+            mapping["candidate_blob_sha"] ==
+            "b3dede3b466676bbab4e3bd737160cacfc57ad28" and
+            mapping["candidate_sha256"] == approval["reviewed_candidate_sha256"],
+            "mechanical ECO review tree or candidate mapping drift")
+    require(mapping["equivalence"] == "EXACT_TREE_AND_CANDIDATE_BLOB" and
+            mapping["transport"] == "GITHUB_APP_GIT_DATABASE_API" and
+            mapping["reason"] == "LOCAL_HTTPS_CREDENTIAL_UNAVAILABLE" and
+            mapping["manufacturing_release"] is False,
+            "mechanical ECO transport or release interlock drift")
+
+    present = [
+        commit for commit in (
+            mapping["reviewed_local_commit_sha"],
+            mapping["github_equivalent_commit_sha"],
+        )
+        if git_object_exists(commit)
+    ]
+    require(present, "neither reviewed local nor exact-tree GitHub commit is available")
+    reviewed_candidate = b""
+    for commit in present:
+        require(git_tree_sha(commit) == mapping["reviewed_tree_sha"],
+                f"reviewed commit tree drift: {commit}")
+        payload = git_blob(commit, mapping["candidate_path"])
+        require(git_blob_sha(payload) == mapping["candidate_blob_sha"] and
+                sha256_bytes(payload) == mapping["candidate_sha256"],
+                f"reviewed candidate blob drift: {commit}")
+        if reviewed_candidate:
+            require(payload == reviewed_candidate,
+                    "local and GitHub reviewed candidate blobs differ")
+        reviewed_candidate = payload
+    return mapping, reviewed_candidate
 
 
 def validate_approval(approval_path: Path, candidate_path: Path) -> dict[str, Any]:
@@ -208,6 +298,62 @@ def authority_matches_applied(
                 require(actual[field] == expected_value,
                         f"{record_id}.{field}: applied value drift")
     return True
+
+
+def validate_application(
+    application_path: Path,
+    candidate: dict[str, Any],
+    approval: dict[str, Any],
+    live_board_sha: str,
+    live_authority_sha: str,
+) -> dict[str, Any]:
+    application = json.loads(application_path.read_text(encoding="utf-8"))
+    require(set(application) == {
+                "schema_version", "configuration", "proposal_id", "approval",
+                "application_date", "reviewed_commit_sha",
+                "reviewed_candidate_sha256", "decision", "baseline", "applied",
+                "post_application_clearance", "status", "review_b_complete",
+                "manufacturing_release",
+            }, "mechanical ECO application schema drift")
+    require(application["schema_version"] ==
+            "dioneya.pcb-main-mechanical-eco-application.v1" and
+            application["configuration"] == candidate["configuration"] and
+            application["proposal_id"] == candidate["proposal_id"],
+            "mechanical ECO application identity drift")
+    require(application["approval"] ==
+            "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.json" and
+            application["application_date"] == "2026-09-15",
+            "mechanical ECO application provenance drift")
+    require(application["reviewed_commit_sha"] == approval["reviewed_commit_sha"] and
+            application["reviewed_candidate_sha256"] ==
+            approval["reviewed_candidate_sha256"] and
+            application["decision"] == approval["decision"],
+            "mechanical ECO application approval binding drift")
+    require(application["baseline"] == {
+                "commit_sha": candidate["baseline"]["inspected_commit"],
+                "board_sha256": candidate["baseline"]["board_sha256"],
+                "authority_sha256": candidate["baseline"]["authority_sha256"],
+            }, "mechanical ECO application baseline drift")
+    applied = application["applied"]
+    require(applied == {
+                "board": candidate["baseline"]["board"],
+                "board_sha256": live_board_sha,
+                "authority": candidate["baseline"]["authority"],
+                "authority_sha256": live_authority_sha,
+                "changed_records": list(EXPECTED_CHANGES),
+                "moved_board_anchors": list(BOARD_POSITION_LINES),
+            }, "mechanical ECO applied-file record drift")
+    require(application["post_application_clearance"] ==
+            candidate["expected_audit"]["candidate_unresolved_placement"] | {
+                "locked_authority_component_conflicts": [],
+                "locked_authority_mounting_conflicts": [],
+                "locked_authority_tool_conflicts": [],
+            }, "mechanical ECO post-application clearance record drift")
+    require(application["status"] == "APPLIED_FULL_REPACK_REQUIRED" and
+            application["review_b_complete"] is False and
+            application["manufacturing_release"] is False,
+            "mechanical ECO application release interlock drift")
+    return application
 
 
 def close(first: float, second: float) -> bool:
@@ -339,14 +485,17 @@ def circle_to_hole_exclusion_gap(clearance: dict[str, Any], hole: dict[str, Any]
             hole["component_exclusion_diameter_mm"] / 2.0)
 
 
-def audit(candidate_path: Path, approval_path: Path) -> dict[str, Any]:
+def audit(
+    candidate_path: Path,
+    approval_path: Path,
+    mapping_path: Path,
+    application_path: Path,
+) -> dict[str, Any]:
     approval = validate_approval(approval_path, candidate_path)
+    mapping, reviewed_candidate = validate_review_commit_mapping(mapping_path, approval)
     live_candidate = candidate_path.read_bytes()
     require(sha256_bytes(live_candidate) == REVIEWED_CANDIDATE_SHA256,
             "live mechanical ECO candidate SHA-256 does not match approval")
-    reviewed_candidate = git_blob(
-        approval["reviewed_commit_sha"], approval["reviewed_candidate"]
-    )
     require(sha256_bytes(reviewed_candidate) == approval["reviewed_candidate_sha256"],
             "reviewed Git candidate SHA-256 does not match approval")
     require(live_candidate == reviewed_candidate,
@@ -599,6 +748,10 @@ def audit(candidate_path: Path, approval_path: Path) -> dict[str, Any]:
         authority_matches_applied(live_authority_path, candidate_by_id)
         require(live_board_path.read_bytes() == expected_applied_board(baseline_board),
                 "native PCB-MAIN differs from the exact approved six-anchor move")
+        require(application_path.is_file(), "mechanical ECO application record is missing")
+        validate_application(
+            application_path, candidate, approval, live_board_sha, live_authority_sha
+        )
         application_status = (
             "PASS_APPROVED_ECO_APPLIED_GEOMETRY_ONLY_PLACEMENT_REPACK_REQUIRED"
         )
@@ -631,6 +784,13 @@ def audit(candidate_path: Path, approval_path: Path) -> dict[str, Any]:
             "decision": approval["decision"],
             "scope": approval["scope"],
         },
+        "review_commit_mapping": {
+            "reviewed_local_commit_sha": mapping["reviewed_local_commit_sha"],
+            "github_equivalent_commit_sha": mapping["github_equivalent_commit_sha"],
+            "reviewed_tree_sha": mapping["reviewed_tree_sha"],
+            "candidate_blob_sha": mapping["candidate_blob_sha"],
+            "equivalence": mapping["equivalence"],
+        },
         "manufacturing_release": False,
     }
 
@@ -639,13 +799,20 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--candidate", type=Path, default=DEFAULT_CANDIDATE)
     parser.add_argument("--approval", type=Path, default=DEFAULT_APPROVAL)
+    parser.add_argument(
+        "--review-commit-mapping", type=Path, default=DEFAULT_REVIEW_COMMIT_MAPPING
+    )
+    parser.add_argument("--application", type=Path, default=DEFAULT_APPLICATION)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     candidate_path = args.candidate.resolve()
     approval_path = args.approval.resolve()
+    mapping_path = args.review_commit_mapping.resolve()
+    application_path = args.application.resolve()
     require(candidate_path.is_file(), f"candidate not found: {candidate_path}")
     require(approval_path.is_file(), f"approval not found: {approval_path}")
-    report = audit(candidate_path, approval_path)
+    require(mapping_path.is_file(), f"review commit mapping not found: {mapping_path}")
+    report = audit(candidate_path, approval_path, mapping_path, application_path)
     if args.output:
         output = args.output.resolve()
         output.parent.mkdir(parents=True, exist_ok=True)

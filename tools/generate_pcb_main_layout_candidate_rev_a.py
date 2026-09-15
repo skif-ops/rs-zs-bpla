@@ -120,6 +120,22 @@ def anchors() -> dict[str, tuple[float, float, float]]:
     return result
 
 
+def placement_regions() -> dict[str, tuple[float, float, float, float]]:
+    result: dict[str, tuple[float, float, float, float]] = {}
+    with MECH.open(encoding="utf-8", newline="") as stream:
+        for row in csv.DictReader(stream):
+            if row["Feature_Type"] in {"RF_ZONE", "KEEP_OUT", "QUIET_ZONE", "DFT_ZONE"}:
+                x = float(row["X_mm"])
+                y = float(row["Y_mm"])
+                result[row["RefDes"]] = (
+                    x,
+                    y,
+                    x + float(row["Extent_X_mm"]),
+                    y + float(row["Extent_Y_mm"]),
+                )
+    return result
+
+
 def passive_footprint(board: pcbnew.BOARD, package: str) -> pcbnew.FOOTPRINT:
     dims = {
         "0402": (1.0, 0.5, 0.55), "0603": (1.6, 0.8, 0.9),
@@ -348,7 +364,8 @@ def main() -> int:
         item = pcbnew.NETINFO_ITEM(board, name); board.Add(item); net_items[name] = item
 
     fixed = anchors()
-    occupied = [(10, 42, 36, 72), (44, 51, 63, 72), (64, 46, 85.5, 72),
+    regions = placement_regions()
+    occupied = [regions["ZONE_CELL"], regions["ZONE_GNSS"], regions["ZONE_LORA"],
                 (94.5, 30, 110, 59), (35, 31, 70, 51), (0, 0, 8, 75),
                 (100, 0, 110, 75), (10, 0, 95, 6)]
     slots = placement_slots(occupied)

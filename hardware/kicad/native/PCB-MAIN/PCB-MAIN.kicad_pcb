@@ -4650,7 +4650,7 @@
 
   (footprint "Hirose_U.FL-R-SMT-1" (version 20221018) (generator pcbnew) (layer "F.Cu")
     (tedit 6aa3f9fb) (tstamp a62a2c86-326e-4b31-b620-d1363023d039)
-    (at 16 68)
+    (at 16 71.5)
     (descr "Hirose U.FL-R-SMT-1 vertical receptacle; U.FL catalog 2026-08-01 recommended PCB and metal-mask patterns")
     (tags "Hirose U.FL-R-SMT-1 coaxial vertical")
     (property "DIONEA_FOOTPRINT_SOURCE" "Hirose_U.FL_CAT_2026-08-01_PCB_and_MetalMask")
@@ -4790,7 +4790,7 @@
 
   (footprint "Molex_Pico-Lock_504050-0691_1x06-1MP_P1.50mm_Horizontal" (layer "F.Cu")
     (tstamp aa7fa009-e246-4892-825d-f5ba8e1f1c29)
-    (at 0 30 90)
+    (at 0 42.5 90)
     (descr "Molex Pico-Lock series connector, 504050-0691 (http://www.molex.com/pdm_docs/sd/5040500891_sd.pdf), generated with kicad-footprint-generator")
     (tags "connector Molex Pico-Lock horizontal")
     (property "DIONEA_FOOTPRINT_SOURCE" "Molex_5040500000-SD_PSD000_RevB_RecommendedPattern")
@@ -5268,7 +5268,7 @@
 
   (footprint "Hirose_U.FL-R-SMT-1" (version 20221018) (generator pcbnew) (layer "F.Cu")
     (tedit 6aa3f9fb) (tstamp b621fdf2-f847-4467-8b37-ef57035dd2c2)
-    (at 74 68)
+    (at 74 71.5)
     (descr "Hirose U.FL-R-SMT-1 vertical receptacle; U.FL catalog 2026-08-01 recommended PCB and metal-mask patterns")
     (tags "Hirose U.FL-R-SMT-1 coaxial vertical")
     (property "DIONEA_FOOTPRINT_SOURCE" "Hirose_U.FL_CAT_2026-08-01_PCB_and_MetalMask")
@@ -5413,7 +5413,7 @@
 
   (footprint "Molex_504050-0291_PicoLock-2" (version 20221018) (generator pcbnew) (layer "F.Cu")
     (tedit 6aa3f43b) (tstamp bd6748ff-d860-4109-a826-a090eaa0c48f)
-    (at 110 13 -90)
+    (at 110 15 -90)
     (descr "Molex 504050-0291 Pico-Lock 1.50 mm two-circuit right-angle SMT; customer drawing 5040500000-SD PSD 001 Rev B")
     (tags "Molex 504050-0291 Pico-Lock 1.5mm")
     (property "DIONEA_FOOTPRINT_SOURCE" "Molex_5040500000-SD_PSD001_RevB_RecommendedPattern")
@@ -5524,7 +5524,7 @@
 
   (footprint "Molex_43045-1202_MicroFit-12_RA" (version 20221018) (generator pcbnew) (layer "F.Cu")
     (tedit 6aa3f43b) (tstamp c43e2203-e170-4311-aaf4-6a35eaf67975)
-    (at 0 13 90)
+    (at 0 15 90)
     (descr "Molex 43045-1202 Micro-Fit 3.0 2x6 right-angle through-hole; customer drawing SD-43045-001 PSD 001 Rev H1")
     (tags "Molex 43045-1202 Micro-Fit 3.0 12 circuit right angle")
     (property "DIONEA_FOOTPRINT_SOURCE" "Molex_SD-43045-001_PSD001_RevH1_PCBLayout")
@@ -5728,7 +5728,7 @@
 
   (footprint "Quectel_BG95-M3_LGA-102" (version 20221018) (generator pcbnew) (layer "F.Cu")
     (tedit 6aa3f43b) (tstamp c8b8fb12-cbb9-477a-af5b-db0afa3e2fe0)
-    (at 24 53)
+    (at 24 52)
     (descr "Quectel BG95-M3 LGA-102; recommended footprint in BG95 Series Hardware Design V1.8 Figure 46")
     (tags "Quectel BG95-M3 LGA-102 23.6x19.9")
     (property "DIONEA_FOOTPRINT_SOURCE" "Quectel_BG95_HW_Design_V1.8_Figure46")

@@ -131,7 +131,7 @@ def validate_decisions_and_tests() -> None:
     decisions = {row["Decision_ID"]: row for row in read_csv("docs/DECISION_LOG.csv")}
     for decision_id in (
         "DEC-015", "DEC-016", "DEC-017", "DEC-018", "DEC-037", "DEC-038",
-        "DEC-039", "DEC-040", "DEC-041", "DEC-042",
+        "DEC-039", "DEC-040", "DEC-041", "DEC-042", "DEC-045",
     ):
         require(decisions[decision_id]["Status"] == "LOCKED", f"{decision_id} is not locked")
     require(
@@ -161,6 +161,13 @@ def validate_decisions_and_tests() -> None:
         and "MAIN-AUTH-011" in decisions["DEC-044"]["Decision"],
         "PCB-MAIN placement-clearance ECO decision is missing",
     )
+    require(
+        "61cbe796de2f87560342a44b063ff6283a8ce1e8" in decisions["DEC-045"]["Decision"]
+        and "5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1"
+        in decisions["DEC-045"]["Decision"]
+        and "ACCEPT_LIMITED_MECHANICAL_ECO" in decisions["DEC-045"]["Source"],
+        "PCB-MAIN limited mechanical ECO acceptance binding is missing",
+    )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
@@ -187,12 +194,12 @@ def validate_deliverable_register() -> None:
     deliverables = {row["ID"]: row for row in rows}
     require(deliverables["CM-002"]["QG-1 полнота"] == "PASS", "selectable-lot baseline is not QG-1 PASS")
     require(
-        deliverables["HW-M-000"]["Статус"] == "CONTROLLED_ECO_REQUIRED"
+        deliverables["HW-M-000"]["Статус"] == "CONTROLLED_ECO_APPLIED"
         and deliverables["HW-M-000"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-M-000"]["QG-2 техника"] == "OPEN"
-        and "six locked component mounting-exclusion or U.FL tool/service conflicts"
+        and "clears all six locked component mounting-exclusion and U.FL tool/service conflicts"
         in deliverables["HW-M-000"]["Критерий выпуска"],
-        "PCB-MAIN mechanical authority is not held for the controlled limited ECO",
+        "PCB-MAIN mechanical authority does not record the applied limited ECO",
     )
     require(
         "zero provisional footprints and three controlled IPC candidates"

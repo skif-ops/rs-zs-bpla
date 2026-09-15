@@ -10,14 +10,16 @@ signed and contains no manufacturing release assertion.
 - Review A: `PASS`, signed by Скиф.
 - Native schematic: present; commit-matched KiCad 9 ERC evidence is PASS.
 - Native PCB: placement-stage candidate present.
-- Placement clearance: `BLOCKED`; the independent controlled audit records 17
-  confirmed courtyard collisions, 67 pad-envelope screening collisions, two
-  confirmed mounting-exclusion conflicts, one screening mounting conflict and
-  two confirmed U.FL tool-cylinder conflicts.
-- MAIN-AUTH-011 limited ECO: required for locked `J8/U8`, `J_MIC1/J_PWR`,
-  `H1/J_PWR`, `H2/J13` and J8/J10 tool-cylinder conflicts against U8/U10.
-  Proposal `PCB-MAIN-MECH-ECO-001` clears this locked conflict set in the
-  independent geometry overlay, but is explicitly not approved or applied.
+- Placement clearance: `BLOCKED`; after the limited ECO, the independent
+  controlled audit records 15 confirmed courtyard collisions, 67 pad-envelope
+  screening collisions, no confirmed mounting-exclusion conflict, one
+  screening mounting conflict and no U.FL tool-cylinder conflict.
+- MAIN-AUTH-011 limited ECO: proposal `PCB-MAIN-MECH-ECO-001` was accepted by
+  reviewer `Скиф` on `15.09.2026` against commit
+  `61cbe796de2f87560342a44b063ff6283a8ce1e8` and candidate SHA-256
+  `5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1`,
+  then applied exactly. The previously locked component, mounting and U.FL
+  tool-cylinder conflict sets are empty.
 - Board: 110 x 75 x 1.6 mm, six copper layers, rounded R3 outline, four M3 NPTH holes.
 - Population represented: 247 on-board components plus four mounting holes; 186 native nets.
 - Routing/copper zones: absent.
@@ -43,9 +45,9 @@ signed and contains no manufacturing release assertion.
   and independently confirms no locked conflict after the proposed overlay.
 - [ ] U9 paste stencil is adapted and approved for the selected assembly process.
 - [ ] The selected assembler approves copper, mask and stencil rules for the `U2/U25/U26` project IPC candidates.
-- [ ] A limited mechanical ECO supersedes the six internally conflicting
-  MAIN-AUTH-011 component placements, mounting exclusions and U.FL service
-  cylinders, then receives independent mechanical review.
+- [x] The accepted limited mechanical ECO supersedes the six internally
+  conflicting MAIN-AUTH-011 component placements, mounting exclusions and
+  U.FL service cylinders and passes its independent geometry/application audit.
 - [ ] All 169 pad-envelope screening footprints receive controlled courtyard/body
   disposition or are placed with equivalent independently reviewed evidence.
 - [ ] Placement is collision-free and every courtyard/height/service zone passes.

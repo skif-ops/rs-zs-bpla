@@ -1,0 +1,15 @@
+{
+  "schema_version": "dioneya.pcb-main-mechanical-eco-review-commit-mapping.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-MECH-ECO-001",
+  "reviewed_local_commit_sha": "61cbe796de2f87560342a44b063ff6283a8ce1e8",
+  "github_equivalent_commit_sha": "e265d1f1a0a74f94b9c887e12794a9b59fc2bfa0",
+  "reviewed_tree_sha": "f1fd423bbcfedefa830677ce2d8b3c54b2294caa",
+  "candidate_path": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.json",
+  "candidate_blob_sha": "b3dede3b466676bbab4e3bd737160cacfc57ad28",
+  "candidate_sha256": "5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1",
+  "equivalence": "EXACT_TREE_AND_CANDIDATE_BLOB",
+  "transport": "GITHUB_APP_GIT_DATABASE_API",
+  "reason": "LOCAL_HTTPS_CREDENTIAL_UNAVAILABLE",
+  "manufacturing_release": false
+}

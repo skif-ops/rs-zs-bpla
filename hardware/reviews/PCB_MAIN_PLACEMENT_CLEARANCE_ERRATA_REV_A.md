@@ -1,6 +1,6 @@
 # PCB-MAIN Rev.A placement-clearance errata
 
-Status: `OPEN / LIMITED MECHANICAL ECO AND PLACEMENT REWORK REQUIRED / NOT FOR MANUFACTURE`
+Status: `OPEN / LIMITED MECHANICAL ECO APPLIED / FULL PLACEMENT REWORK REQUIRED / NOT FOR MANUFACTURE`
 
 Discovery date: 2026-09-15  
 Inspected commit: `989ce217d44795ba2986453d1f37152af5a8e1fc`  
@@ -8,10 +8,10 @@ PCB SHA-256: `aa35fe622b6a0761b9b25ae488e1a2c6e7160c285ab771b580f63513b83e4a22`
 MAIN-AUTH-011 CSV SHA-256: `2ea8da3b8469f616c469eb342127afd2e75b3b0ad04f3ab75154560211f353c9`
 
 This record controls a defect discovered after the signed PCB-MAIN electrical
-Review A. It does not alter the signed schematic conclusion and does not approve
-new mechanical coordinates. It blocks placement completion and Review B until a
-limited mechanical ECO is reviewed, the remaining candidate placement is
-reworked, and the strict clearance audit passes.
+Review A. It does not alter the signed schematic conclusion. The limited
+mechanical ECO was accepted and applied on 2026-09-15; placement completion and
+Review B remain blocked until the remaining candidate placement is reworked and
+the strict clearance audit passes.
 
 ## Independent method
 
@@ -37,7 +37,7 @@ boundaries, so each reported courtyard/courtyard overlap below is an exact
 axis-aligned overlap after transformation. KiCad DRC and a final 3D/service-volume
 inspection remain mandatory and are not replaced by this audit.
 
-## Controlled result
+## Controlled pre-ECO result
 
 | Item | Count | Disposition |
 |---|---:|---|
@@ -93,31 +93,36 @@ Confirmed U.FL D8 tool-cylinder conflicts:
 
 ## ECO and release boundary
 
-`MAIN-AUTH-011` currently locks both members of `J8/U8` and `J_MIC1/J_PWR`,
-locks J_PWR/J13 against the H1/H2 mounting exclusions, and also locks the D8
-tool cylinders of J8/J10 into the U8/U10 courtyards. These controlled conflicts
-cannot be removed by moving only non-authority components. No coordinate in the
-signed mechanical authority is changed by this errata.
+Reviewer `Скиф` accepted proposal `PCB-MAIN-MECH-ECO-001` on 2026-09-15 with
+decision `ACCEPT_LIMITED_MECHANICAL_ECO`, bound to commit
+`61cbe796de2f87560342a44b063ff6283a8ce1e8` and candidate SHA-256
+`5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1`.
+The candidate remains immutable and its separate approval record is
+`PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.json`.
 
-A limited ECO must select and independently review revised edge/module anchors
-and any affected RF zone, cable corridor or enclosure/service allocation. In
-particular, relocating J_MIC1 must preserve its latch pull and bend corridor
-without entering the cellular allocation, and relocating J8 or U8 must preserve
-the BG95 adjacent-component clearance and the short/no-stub cellular RF path.
-H1-H4 and the 10.0 mm component exclusions remain mandatory unless a separately
-approved mechanical change supersedes them.
+The nine accepted MAIN-AUTH-011 record changes and six corresponding native-PCB
+anchor translations are applied. Current controlled hashes are:
 
-`PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.md` and its machine-readable JSON now
-record proposal `PCB-MAIN-MECH-ECO-001`. The independent overlay audit clears
-the two locked component pairs, two locked mounting pairs and two locked U.FL
-tool-cylinder pairs geometrically. It also preserves at least 1.0 mm courtyard
-clearance to the north PCB edge for moved J8/J10. The candidate is explicitly
-`PROPOSED_NOT_APPROVED`: it has not changed this authority or the board. The
-exact 10.0 mm MIC1 corridor and north-side coax/tool openings can be frozen only
-as minimum capture allocations; named harness and enclosure evidence remain
-manufacturing-release blockers.
+- PCB SHA-256: `8de8ac2eedc00775853a26641931ded8873cf5c1d9f61e7358d0546fea9dc379`
+- MAIN-AUTH-011 CSV SHA-256: `6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44`
 
-After that decision, all unlocked footprints must be repacked, the 169 screened
+The machine-readable application record is
+`PCB_MAIN_MECHANICAL_ECO_APPLICATION_REV_A.json`.
+
+GitHub App transport reproduced the reviewed local commit tree exactly as
+remote commit `e265d1f1a0a74f94b9c887e12794a9b59fc2bfa0`. Both commits have tree
+SHA `f1fd423bbcfedefa830677ce2d8b3c54b2294caa` and candidate blob SHA
+`b3dede3b466676bbab4e3bd737160cacfc57ad28`. The machine-audited mapping is
+`PCB_MAIN_MECHANICAL_ECO_REVIEW_COMMIT_MAPPING_REV_A.json`.
+
+The post-ECO audit reports no locked component, mounting or U.FL tool-cylinder
+conflicts. It leaves 15 confirmed component collisions, 67 pad-envelope
+screening collisions and one pad-envelope mounting-screening finding, all in
+the unlocked placement/repack scope. The 10.0 mm MIC1 corridor and north-side
+coax/tool openings remain minimum capture allocations; named harness and
+enclosure evidence remain manufacturing-release blockers.
+
+All unlocked footprints must now be repacked, the 169 screened
 footprints must receive controlled courtyard/body disposition, and the following
 must pass on one commit:
 

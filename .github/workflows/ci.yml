@@ -170,6 +170,8 @@ jobs:
             hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.md
             hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.json
             hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_MECHANICAL_ECO_REVIEW_COMMIT_MAPPING_REV_A.json
+            hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPLICATION_REV_A.json
             hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json
             firmware/targets/evt_pre_20/target_contract_manifest.json
             firmware/targets/evt_pre_20/stm32_scaffold_manifest.json

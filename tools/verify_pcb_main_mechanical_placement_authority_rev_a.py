@@ -45,38 +45,39 @@ EXPECTED_COUNTS = Counter({
 })
 
 EXPECTED_CONNECTORS = {
-    "J_PWR": (0.0, 13.0, 90.0, "OUTBOARD_WEST"),
-    "J_MIC1": (0.0, 30.0, 90.0, "OUTBOARD_WEST"),
+    "J_PWR": (0.0, 15.0, 90.0, "OUTBOARD_WEST"),
+    "J_MIC1": (0.0, 42.5, 90.0, "OUTBOARD_WEST"),
     "J_MIC2": (40.0, 75.0, 0.0, "OUTBOARD_NORTH"),
     "J_MIC3": (92.0, 75.0, 0.0, "OUTBOARD_NORTH"),
     "J_MIC4": (110.0, 54.0, 270.0, "OUTBOARD_EAST"),
     "J6": (18.0, 2.5, 180.0, "OUTBOARD_SOUTH"),
     "J7": (64.0, 2.5, 180.0, "OUTBOARD_SOUTH"),
-    "J8": (16.0, 68.0, 0.0, "UP_Z"),
+    "J8": (16.0, 71.5, 0.0, "UP_Z"),
     "J9": (53.5, 68.0, 0.0, "UP_Z"),
-    "J10": (74.0, 68.0, 0.0, "UP_Z"),
+    "J10": (74.0, 71.5, 0.0, "UP_Z"),
     "J11": (42.0, 0.0, 180.0, "OUTBOARD_SOUTH"),
     "J12": (87.0, 2.5, 180.0, "OUTBOARD_SOUTH"),
-    "J13": (110.0, 13.0, 270.0, "OUTBOARD_EAST"),
+    "J13": (110.0, 15.0, 270.0, "OUTBOARD_EAST"),
 }
 
 EXPECTED_MODULES = {
-    "U8": (24.0, 53.0, 0.0, 23.6, 19.9),
+    "U8": (24.0, 52.0, 0.0, 23.6, 19.9),
     "U9": (53.5, 58.0, 0.0, 9.7, 10.1),
     "U10": (74.0, 55.0, 0.0, 20.0, 14.0),
     "U11": (102.25, 35.25, 270.0, 15.5, 10.5),
 }
 
 EXPECTED_REGIONS = {
-    "ZONE_CELL": (10.0, 42.0, 26.0, 30.0),
+    "ZONE_CELL": (10.0, 34.0, 26.0, 40.0),
     "ZONE_GNSS": (44.0, 51.0, 19.0, 21.0),
-    "ZONE_LORA": (64.0, 46.0, 21.5, 26.0),
+    "ZONE_LORA": (64.0, 46.0, 21.5, 28.0),
     "ZONE_BLE_BODY": (94.5, 30.0, 15.5, 10.5),
     "KO_BLE_ANT_BOARD": (106.2, 30.0, 3.8, 10.5),
     "KO_BLE_ANT_VOLUME": (106.2, 27.0, 18.8, 16.5),
     "KO_GNSS_UPPER_VIEW": (44.0, 51.0, 19.0, 24.0),
     "ZONE_AUDIO_DIGITAL": (37.0, 39.0, 29.0, 11.0),
     "ZONE_DFT_BOTTOM": (27.0, 15.0, 67.0, 25.0),
+    "KO_MIC1_HARNESS": (0.0, 37.5, 10.0, 10.0),
 }
 
 EXPECTED_TEST_GROUPS = {
@@ -274,7 +275,7 @@ def main() -> None:
     review = REVIEW_PATH.read_text(encoding="utf-8")
     require(f"Authority CSV SHA-256: `{digest}`" in review, "mechanical authority SHA marker mismatch")
     for marker in (
-        "MECHANICAL_PLACEMENT_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        "MECHANICAL_PLACEMENT_AUTHORITY_PASS / LIMITED ECO APPLIED / PCB REVIEW B OPEN / NOT FOR MANUFACTURE",
         "110 x 75 x 1.60 mm", "70 records", "31 individual pogo pads", "2.54 mm",
         "CONTROLLED_PENDING_NATIVE_STEP", "All physical tests remain `NOT RUN`",
     ):
