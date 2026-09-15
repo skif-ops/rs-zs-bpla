@@ -4,8 +4,9 @@
 The immutable candidate remains the exact proposal reviewed by the customer.
 Its sidecar approval authorizes only the bounded MAIN-AUTH-011 delta.  This
 audit reconstructs the reviewed baseline from Git, repeats the independent
-overlay calculation, and accepts either the signed pre-application state or an
-exact application of that delta.  It never releases manufacturing.
+overlay calculation, and accepts either the signed pre-application state, the
+exact immediate application, or a later placement candidate that preserves the
+accepted locked geometry exactly. It never releases manufacturing.
 """
 from __future__ import annotations
 
@@ -304,8 +305,8 @@ def validate_application(
     application_path: Path,
     candidate: dict[str, Any],
     approval: dict[str, Any],
-    live_board_sha: str,
-    live_authority_sha: str,
+    applied_board_sha: str,
+    applied_authority_sha: str,
 ) -> dict[str, Any]:
     application = json.loads(application_path.read_text(encoding="utf-8"))
     require(set(application) == {
@@ -337,9 +338,9 @@ def validate_application(
     applied = application["applied"]
     require(applied == {
                 "board": candidate["baseline"]["board"],
-                "board_sha256": live_board_sha,
+                "board_sha256": applied_board_sha,
                 "authority": candidate["baseline"]["authority"],
-                "authority_sha256": live_authority_sha,
+                "authority_sha256": applied_authority_sha,
                 "changed_records": list(EXPECTED_CHANGES),
                 "moved_board_anchors": list(BOARD_POSITION_LINES),
             }, "mechanical ECO applied-file record drift")
@@ -746,15 +747,28 @@ def audit(
                 live_authority_sha != baseline["authority_sha256"],
                 "mechanical ECO is only partially applied")
         authority_matches_applied(live_authority_path, candidate_by_id)
-        require(live_board_path.read_bytes() == expected_applied_board(baseline_board),
-                "native PCB-MAIN differs from the exact approved six-anchor move")
+        immediate_applied_board = expected_applied_board(baseline_board)
         require(application_path.is_file(), "mechanical ECO application record is missing")
         validate_application(
-            application_path, candidate, approval, live_board_sha, live_authority_sha
+            application_path, candidate, approval,
+            sha256_bytes(immediate_applied_board), live_authority_sha,
         )
-        application_status = (
-            "PASS_APPROVED_ECO_APPLIED_GEOMETRY_ONLY_PLACEMENT_REPACK_REQUIRED"
-        )
+        immediate_text = immediate_applied_board.decode("utf-8")
+        live_text = live_board_path.read_text(encoding="utf-8")
+        for ref in sorted(locked_refs | {"H1", "H2", "H3", "H4"}):
+            expected_block = footprint_block(immediate_text, ref)[2]
+            actual_block = footprint_block(live_text, ref)[2]
+            require(actual_block == expected_block,
+                    f"{ref}: accepted locked ECO geometry changed during later layout work")
+        if live_board_path.read_bytes() == immediate_applied_board:
+            application_status = (
+                "PASS_APPROVED_ECO_APPLIED_GEOMETRY_ONLY_PLACEMENT_REPACK_REQUIRED"
+            )
+        else:
+            application_status = (
+                "PASS_APPROVED_ECO_APPLIED_LOCKED_GEOMETRY_PRESERVED_"
+                "PLACEMENT_REPACK_PRESENT"
+            )
 
     return {
         "schema_version": "dioneya.pcb-main-mechanical-eco-audit.v1",

@@ -9,11 +9,13 @@ signed and contains no manufacturing release assertion.
 
 - Review A: `PASS`, signed by Скиф.
 - Native schematic: present; commit-matched KiCad 9 ERC evidence is PASS.
-- Native PCB: placement-stage candidate present.
-- Placement clearance: `BLOCKED`; after the limited ECO, the independent
-  controlled audit records 15 confirmed courtyard collisions, 67 pad-envelope
-  screening collisions, no confirmed mounting-exclusion conflict, one
-  screening mounting conflict and no U.FL tool-cylinder conflict.
+- Native PCB: unrouted, 2D placement-complete engineering candidate present.
+- Placement clearance: `PASS` for the bounded 2D subgate. The deterministic
+  225-reference repack and controlled passive courtyards give 227/227 fitted
+  assembly footprints explicit courtyards; the strict audit records zero
+  component, mounting-exclusion and U.FL tool-cylinder conflicts. The independent
+  layout audit also reports no non-owner movable footprint in a locked RF/audio
+  allocation or the BLE all-layer antenna keepout.
 - MAIN-AUTH-011 limited ECO: proposal `PCB-MAIN-MECH-ECO-001` was accepted by
   reviewer `Скиф` on `15.09.2026` against commit
   `61cbe796de2f87560342a44b063ff6283a8ce1e8` and candidate SHA-256
@@ -48,9 +50,14 @@ signed and contains no manufacturing release assertion.
 - [x] The accepted limited mechanical ECO supersedes the six internally
   conflicting MAIN-AUTH-011 component placements, mounting exclusions and
   U.FL service cylinders and passes its independent geometry/application audit.
-- [ ] All 169 pad-envelope screening footprints receive controlled courtyard/body
+- [x] All 169 pad-envelope screening footprints receive controlled courtyard/body
   disposition or are placed with equivalent independently reviewed evidence.
-- [ ] Placement is collision-free and every courtyard/height/service zone passes.
+- [x] The 2D placement is collision-free and all controlled courtyard,
+  mounting-exclusion and U.FL tool-zone checks pass the strict independent audit.
+- [x] Movable footprints respect the MAIN-AUTH-011 exclusive CELL, GNSS, LoRa,
+  BLE-body and audio allocations plus the BLE all-layer antenna keepout.
+- [ ] Component heights, connector mates, cards, coax and harness service volumes
+  pass native STEP/enclosure review.
 - [ ] RF, power, PDM, USB and SIM routing is complete.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.
 - [ ] KiCad 9 DRC passes with zero blocker/critical violations and zero unrouted items.
@@ -64,8 +71,8 @@ signed and contains no manufacturing release assertion.
 
 ## 3. Decision
 
-`HOLD`. The candidate is a controlled starting point for placement and footprint
-qualification, but it is not placement-complete. The exact current blocker inventory
+`HOLD`. The candidate is 2D placement-complete, but it is unrouted and has not
+passed 3D/service, DRC, CAM, DFM or Review B. The exact current clearance result
 and release boundary are recorded in
 `hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md`. Production outputs
 are prohibited until every unchecked item passes.

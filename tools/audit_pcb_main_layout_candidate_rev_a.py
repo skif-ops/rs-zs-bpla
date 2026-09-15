@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import math
 import sys
 from pathlib import Path
 
@@ -15,6 +16,24 @@ from audit_pcb_main_native_schematic_rev_a import expected_components  # noqa: E
 PCB = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 MECH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 FOOTPRINT_REVIEW = ROOT / "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv"
+PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+PLACEMENT_GRID_MM = 0.25
+ZONE_CLEARANCE_MM = 0.14
+EXCLUSIVE_ZONE_GROUPS = {
+    "ZONE_CELL": "CELL",
+    "ZONE_GNSS": "GNSS",
+    "ZONE_LORA": "LORA",
+    "ZONE_BLE_BODY": "BLE",
+    "ZONE_AUDIO_DIGITAL": "AUDIO",
+}
+
+PASSIVE_COURTYARDS = {
+    "0402": (-0.800, -0.500, 0.800, 0.500),
+    "0603": (-1.100, -0.650, 1.100, 0.650),
+    "0805": (-1.275, -0.875, 1.275, 0.875),
+    "1206": (-1.825, -1.050, 1.825, 1.050),
+    "1210": (-1.825, -1.500, 1.825, 1.500),
+}
 
 
 def require(value: bool, message: str) -> None:
@@ -27,6 +46,51 @@ def ref_of(fp) -> str:
         if getattr(item, "type", None) == "reference":
             return str(item.text)
     return ""
+
+
+def courtyard_bounds(fp) -> tuple[float, float, float, float]:
+    items = [item for item in fp.graphicItems
+             if getattr(item, "layer", None) == "F.CrtYd"]
+    require(len(items) == 1 and type(items[0]).__name__ == "FpRect",
+            f"{ref_of(fp)}: expected exactly one rectangular F.CrtYd")
+    item = items[0]
+    return (float(item.start.X), float(item.start.Y),
+            float(item.end.X), float(item.end.Y))
+
+
+def absolute_courtyard_bounds(fp) -> tuple[float, float, float, float]:
+    items = [item for item in fp.graphicItems
+             if getattr(item, "layer", None) == "F.CrtYd"]
+    require(items, f"{ref_of(fp)}: F.CrtYd is missing")
+    angle = math.radians(float(fp.position.angle or 0.0))
+    cosine, sine = math.cos(angle), math.sin(angle)
+    points: list[tuple[float, float]] = []
+    for item in items:
+        for field in ("start", "end"):
+            point = getattr(item, field, None)
+            require(point is not None,
+                    f"{ref_of(fp)}: unsupported F.CrtYd primitive")
+            local_x, local_y = float(point.X), float(point.Y)
+            points.append((
+                local_x * cosine - local_y * sine + float(fp.position.X),
+                local_x * sine + local_y * cosine + float(fp.position.Y),
+            ))
+    return (
+        min(point[0] for point in points), min(point[1] for point in points),
+        max(point[0] for point in points), max(point[1] for point in points),
+    )
+
+
+def rectangles_overlap(
+    first: tuple[float, float, float, float],
+    second: tuple[float, float, float, float],
+) -> bool:
+    return not (
+        first[2] + ZONE_CLEARANCE_MM <= second[0]
+        or second[2] + ZONE_CLEARANCE_MM <= first[0]
+        or first[3] + ZONE_CLEARANCE_MM <= second[1]
+        or second[3] + ZONE_CLEARANCE_MM <= first[1]
+    )
 
 
 def main() -> int:
@@ -65,16 +129,116 @@ def main() -> int:
             require(len(positions) > 1, f"{ref}: all logical pads collapse onto one point")
 
     locked: dict[str, tuple[float, float, float]] = {}
+    exclusive_zones: dict[str, tuple[float, float, float, float]] = {}
+    antenna_keepout: tuple[float, float, float, float] | None = None
     with MECH.open(encoding="utf-8", newline="") as stream:
         for row in csv.DictReader(stream):
             if row["Feature_Type"] in {"CONNECTOR_PLACEMENT", "MODULE_PLACEMENT"}:
                 locked[row["RefDes"]] = (float(row["X_mm"]), float(row["Y_mm"]), float(row["Rotation_deg"]))
+            if row["RefDes"] in EXCLUSIVE_ZONE_GROUPS:
+                x, y = float(row["X_mm"]), float(row["Y_mm"])
+                exclusive_zones[EXCLUSIVE_ZONE_GROUPS[row["RefDes"]]] = (
+                    x, y, x + float(row["Extent_X_mm"]),
+                    y + float(row["Extent_Y_mm"]),
+                )
+            if row["RefDes"] == "KO_BLE_ANT_BOARD":
+                x, y = float(row["X_mm"]), float(row["Y_mm"])
+                antenna_keepout = (
+                    x, y, x + float(row["Extent_X_mm"]),
+                    y + float(row["Extent_Y_mm"]),
+                )
+    require(set(exclusive_zones) == set(EXCLUSIVE_ZONE_GROUPS.values()),
+            "exclusive MAIN-AUTH-011 placement-zone set drift")
+    require(antenna_keepout is not None, "BLE all-layer antenna keepout is missing")
     for ref, (x, y, angle) in locked.items():
         fp = footprints[ref]
         require(abs(fp.position.X - x) < 0.002 and abs(fp.position.Y - y) < 0.002,
                 f"{ref}: locked anchor drift")
         actual_angle = float(fp.position.angle or 0.0) % 360.0
         require(abs(actual_angle - angle) < 0.01, f"{ref}: locked orientation drift")
+
+    placement_rows = list(csv.DictReader(PLACEMENT.open(encoding="utf-8", newline="")))
+    placement = {row["RefDes"]: row for row in placement_rows}
+    require(len(placement_rows) == len(placement), "duplicate PCB-MAIN placement manifest row")
+    expected_movable = {
+        ref for ref in expected_on_board
+        if ref not in locked
+        and not str(expected[ref]["package"]).startswith("POGO_FIXTURE_")
+    }
+    require(set(placement) == expected_movable,
+            f"placement manifest mismatch: missing={sorted(expected_movable-set(placement))} "
+            f"extra={sorted(set(placement)-expected_movable)}")
+    require(len(placement) == 225, "PCB-MAIN placement manifest must contain 225 movable refs")
+    allowed_groups = {
+        "PWR", "MCU", "STORAGE", "AUDIO", "CELL", "SIMCTRL", "SIM1", "SIM2",
+        "GNSS", "LORA", "BLE", "MIC1", "MIC2", "MIC3", "MIC4", "USB", "SD",
+        "TAMPER", "EOL",
+    }
+    for ref, row in placement.items():
+        fp = footprints[ref]
+        require(row["Placement_Class"] == "UNLOCKED_LAYOUT_CANDIDATE" and
+                row["Status"] == "ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE" and
+                row["Authority"] == "PCB-MAIN-PLACEMENT-REPACK-REV-A",
+                f"{ref}: invalid placement release boundary")
+        require(row["Functional_Group"] in allowed_groups,
+                f"{ref}: unknown functional placement group")
+        require(row["Placement_Method"] in {
+                    "ACTIVE_SKELETON", "FUNCTIONAL_REGION_GREEDY",
+                } and bool(row["Target"]),
+                f"{ref}: placement method or target is not controlled")
+        for coordinate in ("X_mm", "Y_mm"):
+            grid_units = float(row[coordinate]) / PLACEMENT_GRID_MM
+            require(abs(grid_units - round(grid_units)) < 1e-6,
+                    f"{ref}: {coordinate} is off the 0.25 mm placement grid")
+        require(abs(fp.position.X - float(row["X_mm"])) < 0.002 and
+                abs(fp.position.Y - float(row["Y_mm"])) < 0.002 and
+                abs(float(fp.position.angle or 0.0) - float(row["Rotation_deg"])) < 0.01,
+                f"{ref}: native position differs from placement manifest")
+        require(fp.properties.get("DIONEA_PLACEMENT_SOURCE") ==
+                "PCB_MAIN_PLACEMENT_REPACK_REV_A" and
+                fp.properties.get("DIONEA_PLACEMENT_CLASS") ==
+                "UNLOCKED_LAYOUT_CANDIDATE",
+                f"{ref}: native placement traceability is missing")
+        envelope = absolute_courtyard_bounds(fp)
+        for owner_group, zone in exclusive_zones.items():
+            require(row["Functional_Group"] == owner_group or
+                    not rectangles_overlap(envelope, zone),
+                    f"{ref}: {row['Functional_Group']} placement enters exclusive "
+                    f"{owner_group} zone")
+        require(not rectangles_overlap(envelope, antenna_keepout),
+                f"{ref}: placement enters the BLE all-layer antenna keepout")
+
+    passive_refs = {
+        ref for ref in expected_on_board
+        if expected[ref]["package"] in PASSIVE_COURTYARDS
+    }
+    require(len(passive_refs) == 184, "expected 184 generic passive footprints")
+    for ref in passive_refs:
+        fp = footprints[ref]
+        expected_bounds = PASSIVE_COURTYARDS[str(expected[ref]["package"])]
+        actual_bounds = courtyard_bounds(fp)
+        require(all(abs(actual - wanted) < 0.002
+                    for actual, wanted in zip(actual_bounds, expected_bounds)),
+                f"{ref}: passive courtyard differs from controlled package rule")
+        require(fp.properties.get("DIONEA_COURTYARD_STATUS") ==
+                "CONTROLLED_PAD_ENVELOPE_PLUS_0.25_MM" and
+                fp.properties.get("DIONEA_COURTYARD_SOURCE") ==
+                "PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A",
+                f"{ref}: passive courtyard traceability is missing")
+
+    fitted_assembly = {
+        ref for ref in expected_on_board
+        if expected[ref]["population"] == "FITTED"
+        and not str(expected[ref]["package"]).startswith("POGO_FIXTURE_")
+    }
+    require(len(fitted_assembly) == 227, "expected 227 fitted assembly footprints")
+    missing_courtyard = sorted(
+        ref for ref in fitted_assembly
+        if not any(getattr(item, "layer", None) == "F.CrtYd"
+                   for item in footprints[ref].graphicItems)
+    )
+    require(not missing_courtyard,
+            f"fitted footprints without controlled courtyard: {missing_courtyard}")
 
     pogo_rows: dict[str, list[dict[str, str]]] = {}
     with MECH.open(encoding="utf-8", newline="") as stream:

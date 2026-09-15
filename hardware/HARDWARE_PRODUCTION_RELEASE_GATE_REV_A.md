@@ -34,6 +34,13 @@ Default mode records the same blockers without failing engineering CI. A PASS
 must not be inferred from source completeness, BOM QG-1, unrouted placement
 candidates or successful software tests.
 
+PCB-MAIN has passed its bounded 2D placement-clearance subgate: the controlled
+225-reference repack gives all 227 fitted assembly footprints an explicit
+courtyard and the strict audit reports zero component, mounting-exclusion and
+U.FL tool-zone conflicts. This is engineering progress only; the unrouted board
+has no copper zones and still requires routed-board DRC, 3D/service evidence,
+CAM, DFM and independent Review B.
+
 ## Current blocker classes
 
 - exact and released BAT1, PV1, MPPT1, ANT-CELL, ANT-GNSS, ANT-LORA, HARNESS and

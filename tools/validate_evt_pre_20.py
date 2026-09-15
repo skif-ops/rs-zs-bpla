@@ -157,7 +157,7 @@ def validate_decisions_and_tests() -> None:
         "PCB-MIC manufacturing-handoff separation decision is missing",
     )
     require(
-        decisions["DEC-044"]["Status"] == "IMPLEMENTED_ECO_APPROVAL_PENDING"
+        decisions["DEC-044"]["Status"] == "IMPLEMENTED_2D_CLEARANCE_PASS"
         and "MAIN-AUTH-011" in decisions["DEC-044"]["Decision"],
         "PCB-MAIN placement-clearance ECO decision is missing",
     )
@@ -167,6 +167,12 @@ def validate_decisions_and_tests() -> None:
         in decisions["DEC-045"]["Decision"]
         and "ACCEPT_LIMITED_MECHANICAL_ECO" in decisions["DEC-045"]["Source"],
         "PCB-MAIN limited mechanical ECO acceptance binding is missing",
+    )
+    require(
+        decisions["DEC-046"]["Status"] == "IMPLEMENTED_2D_CLEARANCE_PASS"
+        and "225-reference manifest" in decisions["DEC-046"]["Decision"]
+        and "227 controlled courtyards" in decisions["DEC-046"]["Impact"],
+        "PCB-MAIN deterministic placement-repack decision is missing",
     )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
@@ -197,14 +203,16 @@ def validate_deliverable_register() -> None:
         deliverables["HW-M-000"]["Статус"] == "CONTROLLED_ECO_APPLIED"
         and deliverables["HW-M-000"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-M-000"]["QG-2 техника"] == "OPEN"
-        and "clears all six locked component mounting-exclusion and U.FL tool/service conflicts"
+        and "controlled full repack pass strict 2D clearance"
         in deliverables["HW-M-000"]["Критерий выпуска"],
-        "PCB-MAIN mechanical authority does not record the applied limited ECO",
+        "PCB-MAIN mechanical authority does not record the controlled repack clearance state",
     )
     require(
-        "zero provisional footprints and three controlled IPC candidates"
+        "zero provisional footprints three controlled IPC candidates"
         in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "clearance audit is blocked" in deliverables["HW-M-002"]["Критерий выпуска"],
+        and "strict 2D placement-clearance PASS"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "Review B remain open" in deliverables["HW-M-002"]["Критерий выпуска"],
         "PCB-MAIN deliverable still reports a stale footprint disposition",
     )
     require(

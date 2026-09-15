@@ -11,6 +11,7 @@ file with KiCad 9.
 """
 from __future__ import annotations
 
+import argparse
 import csv
 import os
 import sys
@@ -25,8 +26,11 @@ from audit_pcb_main_native_schematic_rev_a import expected_components  # noqa: E
 
 OUT = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 MECH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
+PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
 KICAD_FP = Path(os.environ.get("DIONEYA_KICAD_FOOTPRINT_DIR", "/usr/share/kicad/footprints"))
 PROJECT_FP = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
+PASSIVE_COURTYARD_STATUS = "CONTROLLED_PAD_ENVELOPE_PLUS_0.25_MM"
+PASSIVE_COURTYARD_SOURCE = "PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A"
 
 KICAD_DRAWING_VERIFIED = {
     (
@@ -120,19 +124,24 @@ def anchors() -> dict[str, tuple[float, float, float]]:
     return result
 
 
-def placement_regions() -> dict[str, tuple[float, float, float, float]]:
-    result: dict[str, tuple[float, float, float, float]] = {}
-    with MECH.open(encoding="utf-8", newline="") as stream:
-        for row in csv.DictReader(stream):
-            if row["Feature_Type"] in {"RF_ZONE", "KEEP_OUT", "QUIET_ZONE", "DFT_ZONE"}:
-                x = float(row["X_mm"])
-                y = float(row["Y_mm"])
-                result[row["RefDes"]] = (
-                    x,
-                    y,
-                    x + float(row["Extent_X_mm"]),
-                    y + float(row["Extent_Y_mm"]),
-                )
+def placement_manifest() -> dict[str, tuple[float, float, float]]:
+    result: dict[str, tuple[float, float, float]] = {}
+    with PLACEMENT.open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    if not rows:
+        raise RuntimeError("PCB-MAIN placement repack manifest is empty")
+    for row in rows:
+        ref = row["RefDes"]
+        if ref in result:
+            raise RuntimeError(f"{ref}: duplicate placement manifest row")
+        if (row["Placement_Class"] != "UNLOCKED_LAYOUT_CANDIDATE"
+                or row["Status"] != "ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE"):
+            raise RuntimeError(f"{ref}: invalid placement release boundary")
+        result[ref] = (
+            float(row["X_mm"]),
+            float(row["Y_mm"]),
+            float(row["Rotation_deg"]),
+        )
     return result
 
 
@@ -157,6 +166,18 @@ def passive_footprint(board: pcbnew.BOARD, package: str) -> pcbnew.FOOTPRINT:
             layers.AddLayer(layer)
         pad.SetLayerSet(layers)
         fp.Add(pad)
+    pad_width = max(0.55, length / 2)
+    half_x = pitch / 2 + pad_width / 2 + 0.25
+    half_y = width / 2 + 0.25
+    courtyard = pcbnew.PCB_SHAPE(fp)
+    courtyard.SetShape(pcbnew.SHAPE_T_RECT)
+    courtyard.SetStart(mm(-half_x, -half_y))
+    courtyard.SetEnd(mm(half_x, half_y))
+    courtyard.SetLayer(pcbnew.F_CrtYd)
+    courtyard.SetWidth(pcbnew.FromMM(0.05))
+    fp.Add(courtyard)
+    fp.SetProperty("DIONEA_COURTYARD_STATUS", PASSIVE_COURTYARD_STATUS)
+    fp.SetProperty("DIONEA_COURTYARD_SOURCE", PASSIVE_COURTYARD_SOURCE)
     return fp
 
 
@@ -329,17 +350,6 @@ def add_mounting_hole(board: pcbnew.BOARD, ref: str, x: float, y: float) -> None
     fp.SetPosition(mm(x, y)); normalize_text(fp); board.Add(fp)
 
 
-def placement_slots(occupied: list[tuple[float, float, float, float]]) -> list[tuple[float, float]]:
-    slots = []
-    for y in [8 + 2.8 * i for i in range(16)]:
-        for x in [10 + 2.8 * i for i in range(33)]:
-            if any(x0 - 1.5 <= x <= x1 + 1.5 and y0 - 1.5 <= y <= y1 + 1.5
-                   for x0, y0, x1, y1 in occupied):
-                continue
-            slots.append((x, y))
-    return slots
-
-
 def normalize_text(fp: pcbnew.FOOTPRINT) -> None:
     """Keep the placement plot readable; values stay available in properties/BOM."""
     fp.Value().SetVisible(False)
@@ -350,6 +360,14 @@ def normalize_text(fp: pcbnew.FOOTPRINT) -> None:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--output", type=Path, default=OUT,
+        help="write the generated native board to this path",
+    )
+    args = parser.parse_args()
+    output = args.output.resolve()
+
     components = expected_components()
     board = pcbnew.BOARD(); board.SetCopperLayerCount(6)
     board.GetDesignSettings().SetBoardThickness(pcbnew.FromMM(1.6))
@@ -364,20 +382,19 @@ def main() -> int:
         item = pcbnew.NETINFO_ITEM(board, name); board.Add(item); net_items[name] = item
 
     fixed = anchors()
-    regions = placement_regions()
-    occupied = [regions["ZONE_CELL"], regions["ZONE_GNSS"], regions["ZONE_LORA"],
-                (94.5, 30, 110, 59), (35, 31, 70, 51), (0, 0, 8, 75),
-                (100, 0, 110, 75), (10, 0, 95, 6)]
-    slots = placement_slots(occupied)
-    slot_index = 0
-    preferred = {"U1": (52, 34, 0), "U2": (77, 34, 0), "U3": (70, 41, 0),
-                 "U4": (75, 41, 0), "U5": (41, 41, 0), "U6": (46, 41, 0),
-                 "U7": (61, 42, 0), "U13": (38, 18, 0), "U14": (25, 12, 0),
-                 "U15": (70, 12, 0), "U16": (35, 48, 0), "U17": (52, 47, 0),
-                 "U18": (59, 47, 0), "U19": (18, 15, 0), "U20": (25, 15, 0),
-                 "U21": (68, 15, 0), "U22": (75, 15, 0), "U23": (84, 8, 0),
-                 "U24": (90, 8, 0), "U25": (40, 8, 0), "U26": (40, 54, 0),
-                 "U27": (105, 13, 0)}
+    placement = placement_manifest()
+    expected_movable = {
+        ref for ref, component in components.items()
+        if component["on_board"]
+        and ref not in fixed
+        and not str(component["package"]).startswith("POGO_FIXTURE_")
+    }
+    if set(placement) != expected_movable:
+        raise RuntimeError(
+            "placement manifest reference mismatch: "
+            f"missing={sorted(expected_movable - set(placement))} "
+            f"extra={sorted(set(placement) - expected_movable)}"
+        )
 
     for ref in sorted(components):
         component = components[ref]
@@ -404,18 +421,17 @@ def main() -> int:
             x, y = fixture_position; angle = 0
         elif ref in fixed:
             x, y, angle = fixed[ref]
-        elif ref in preferred:
-            x, y, angle = preferred[ref]
         else:
-            if slot_index >= len(slots):
-                raise RuntimeError("placement grid exhausted")
-            x, y = slots[slot_index]; angle = 0; slot_index += 1
+            x, y, angle = placement[ref]
+            fp.SetProperty("DIONEA_PLACEMENT_SOURCE", "PCB_MAIN_PLACEMENT_REPACK_REV_A")
+            fp.SetProperty("DIONEA_PLACEMENT_CLASS", "UNLOCKED_LAYOUT_CANDIDATE")
         fp.SetPosition(mm(x, y)); fp.SetOrientationDegrees(angle); normalize_text(fp); board.Add(fp)
 
     board.BuildListOfNets()
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    pcbnew.SaveBoard(str(OUT), board)
-    print(f"PCB-MAIN placement candidate: {OUT.relative_to(ROOT)}")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    pcbnew.SaveBoard(str(output), board)
+    display = output.relative_to(ROOT) if output.is_relative_to(ROOT) else output
+    print(f"PCB-MAIN placement candidate: {display}")
     print(f"components={len(list(board.GetFootprints())) - 4} holes=4 nets={len(nets)} copper_layers=6")
     print("status=LAYOUT_ENGINEERING_CANDIDATE / NOT FOR MANUFACTURE")
     return 0

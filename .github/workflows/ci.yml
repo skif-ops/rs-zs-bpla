@@ -74,9 +74,11 @@ jobs:
           python tools/generate_pcb_main_manufacturer_footprints_rev_a.py --check
           python tools/materialize_pcb_main_manufacturer_footprints_rev_a.py --check
           python tools/materialize_pcb_main_verified_library_footprints_rev_a.py --check
+          python tools/generate_pcb_main_placement_repack_rev_a.py --check
           python tools/audit_pcb_main_layout_candidate_rev_a.py
           python tools/audit_pcb_main_placement_clearance_rev_a.py \
-            --output artifacts/pcb_main_placement_clearance_rev_a.json
+            --output artifacts/pcb_main_placement_clearance_rev_a.json \
+            --strict
           python tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py \
             --output artifacts/pcb_main_mechanical_eco_candidate_rev_a.json
       - name: First-pass configuration and hardware baseline validation

@@ -80,7 +80,7 @@ def placement_candidate_audit(name: str) -> str | None:
     controls = {
         "PCB-MAIN": (
             PCB_MAIN_STATUS,
-            "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
+            "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
             "tools/audit_pcb_main_layout_candidate_rev_a.py",
         ),
         "PCB-PWR": (
@@ -750,7 +750,7 @@ def main() -> int:
                         run([
                             sys.executable,
                             str(PCB_MAIN_CLEARANCE_AUDIT.relative_to(ROOT)),
-                            "--output", str(clearance_output),
+                            "--output", str(clearance_output), "--strict",
                         ])
                         clearance_report = json.loads(
                             clearance_output.read_text(encoding="utf-8")
@@ -758,8 +758,8 @@ def main() -> int:
                         report["boards"][name]["placement_clearance_state"] = \
                             clearance_report["summary"]["state"]
                         report["boards"][name]["pcb_state"] = (
-                            "PLACEMENT_CANDIDATE_STRUCTURE_PASS_CLEARANCE_BLOCKED_"
-                            "DRC_AND_FAB_EXPORT_PROHIBITED"
+                            "PLACEMENT_CANDIDATE_STRUCTURE_AND_2D_CLEARANCE_PASS_"
+                            "ROUTING_DRC_AND_FAB_EXPORT_PROHIBITED"
                         )
                     else:
                         report["boards"][name]["pcb_state"] = \

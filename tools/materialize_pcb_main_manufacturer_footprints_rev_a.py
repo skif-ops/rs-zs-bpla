@@ -2,9 +2,10 @@
 """Materialize PCB-MAIN controlled project-local footprints.
 
 This pure-kiutils materializer is usable outside KiCad.  It preserves each
-component's locked placement, schematic nets, RefDes/value text and population
-state while replacing only its land-pattern geometry. Manufacturer-pattern
-controls and package-derived IPC candidates retain distinct release statuses.
+component's placement and traceability properties, schematic nets, RefDes/value
+text and population state while replacing only its land-pattern geometry.
+Manufacturer-pattern controls and package-derived IPC candidates retain distinct
+release statuses.
 """
 from __future__ import annotations
 
@@ -227,12 +228,13 @@ def replace(old: Footprint, ref: str, filename: str, source: str, status: str) -
     new.locked = old.locked
     new.placed = old.placed
     new.path = old.path
-    new.properties = {
+    new.properties = copy.deepcopy(old.properties)
+    new.properties.update({
         "DIONEA_FOOTPRINT_SOURCE": source,
         "DIONEA_FOOTPRINT_STATUS": status,
         "DIONEA_PACKAGE": old.properties["DIONEA_PACKAGE"],
         "DIONEA_POPULATION": old.properties["DIONEA_POPULATION"],
-    }
+    })
     new.attributes.excludeFromPosFiles = old.attributes.excludeFromPosFiles
     new.attributes.excludeFromBom = old.attributes.excludeFromBom
 

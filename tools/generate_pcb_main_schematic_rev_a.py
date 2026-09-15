@@ -659,7 +659,7 @@ def build(output: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
             for path in CONTROLLED_FOOTPRINTS
         ],
         "review_a": "SIGNED_PASS_PER_hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-        "review_b": "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
+        "review_b": "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
     }
     manifest.write_text(json.dumps(manifest_payload, indent=2) + "\n", encoding="utf-8")
     return output, project, symbol_library, sym_table, fp_table, manifest

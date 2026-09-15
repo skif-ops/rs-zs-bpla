@@ -1,17 +1,17 @@
 # PCB-MAIN Rev.A placement-clearance errata
 
-Status: `OPEN / LIMITED MECHANICAL ECO APPLIED / FULL PLACEMENT REWORK REQUIRED / NOT FOR MANUFACTURE`
+Status: `2D PLACEMENT CLEARANCE PASS / ROUTING AND 3D REVIEW PENDING / NOT FOR MANUFACTURE`
 
 Discovery date: 2026-09-15  
 Inspected commit: `989ce217d44795ba2986453d1f37152af5a8e1fc`  
 PCB SHA-256: `aa35fe622b6a0761b9b25ae488e1a2c6e7160c285ab771b580f63513b83e4a22`  
 MAIN-AUTH-011 CSV SHA-256: `2ea8da3b8469f616c469eb342127afd2e75b3b0ad04f3ab75154560211f353c9`
 
-This record controls a defect discovered after the signed PCB-MAIN electrical
-Review A. It does not alter the signed schematic conclusion. The limited
-mechanical ECO was accepted and applied on 2026-09-15; placement completion and
-Review B remain blocked until the remaining candidate placement is reworked and
-the strict clearance audit passes.
+This record preserves a defect discovered after the signed PCB-MAIN electrical
+Review A and records its bounded 2D closure. It does not alter the signed
+schematic conclusion. The limited mechanical ECO and full deterministic repack
+were applied on 2026-09-15. The strict 2D clearance subgate now passes; routing,
+3D/service review and Review B remain open.
 
 ## Independent method
 
@@ -91,7 +91,7 @@ Confirmed U.FL D8 tool-cylinder conflicts:
 | J8 / U8 | 4.000 | 0.200 | 3.800 | `MAIN-AUTH-011` conflict, limited ECO required |
 | J10 / U10 | 4.000 | 2.750 | 1.250 | `MAIN-AUTH-011` conflict, limited ECO required |
 
-## ECO and release boundary
+## ECO application and post-ECO inventory
 
 Reviewer `Скиф` accepted proposal `PCB-MAIN-MECH-ECO-001` on 2026-09-15 with
 decision `ACCEPT_LIMITED_MECHANICAL_ECO`, bound to commit
@@ -101,7 +101,7 @@ The candidate remains immutable and its separate approval record is
 `PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.json`.
 
 The nine accepted MAIN-AUTH-011 record changes and six corresponding native-PCB
-anchor translations are applied. Current controlled hashes are:
+anchor translations were applied first. Their immutable application hashes are:
 
 - PCB SHA-256: `8de8ac2eedc00775853a26641931ded8873cf5c1d9f61e7358d0546fea9dc379`
 - MAIN-AUTH-011 CSV SHA-256: `6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44`
@@ -115,22 +115,56 @@ SHA `f1fd423bbcfedefa830677ce2d8b3c54b2294caa` and candidate blob SHA
 `b3dede3b466676bbab4e3bd737160cacfc57ad28`. The machine-audited mapping is
 `PCB_MAIN_MECHANICAL_ECO_REVIEW_COMMIT_MAPPING_REV_A.json`.
 
-The post-ECO audit reports no locked component, mounting or U.FL tool-cylinder
-conflicts. It leaves 15 confirmed component collisions, 67 pad-envelope
-screening collisions and one pad-envelope mounting-screening finding, all in
-the unlocked placement/repack scope. The 10.0 mm MIC1 corridor and north-side
-coax/tool openings remain minimum capture allocations; named harness and
-enclosure evidence remain manufacturing-release blockers.
+The immediate post-ECO audit reported no locked component, mounting or U.FL
+tool-cylinder conflicts, but still recorded 15 confirmed component collisions,
+67 pad-envelope screening collisions and one pad-envelope mounting-screening
+finding in the unlocked placement scope. That inventory is retained in
+`PCB_MAIN_MECHANICAL_ECO_APPLICATION_REV_A.json` as historical application
+evidence.
 
-All unlocked footprints must now be repacked, the 169 screened
-footprints must receive controlled courtyard/body disposition, and the following
-must pass on one commit:
+## Controlled post-repack result
+
+`hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv` fixes all 225 movable top-side
+references on a 0.25 mm grid by functional group while leaving the 17
+MAIN-AUTH-011 connector/module anchors unchanged. Non-owner movable footprints
+are excluded from the locked CELL, GNSS, LoRa, BLE-body and audio allocations,
+and every movable footprint stays outside the BLE all-layer antenna keepout.
+The five generic passive packages receive the controlled rule in
+`hardware/PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A.md`: 184 explicit courtyards,
+including 169 fitted and 15 DNP footprints.
+
+| Item | Count | Disposition |
+|---|---:|---|
+| Fitted assembly footprints | 227 | Audited |
+| Footprints with controlled courtyard | 227 | Strict 2D check |
+| Footprints using pad-envelope screening | 0 | Closed |
+| Confirmed component collisions | 0 | PASS |
+| Screening component collisions | 0 | PASS |
+| Confirmed/screening mounting conflicts | 0 / 0 | PASS |
+| Confirmed/screening U.FL tool conflicts | 0 / 0 | PASS |
+
+Controlled hashes:
+
+- native PCB SHA-256: `c61d7d279d18bf72b410011ffcc9587e9ee7b61e8afa93d29a6746ec544d4137`
+- placement manifest SHA-256: `0fe702d03af4457a3d44aae93ea6ddc539040f38546d4b09f200612627890e35`
+- MAIN-AUTH-011 CSV SHA-256: `6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44`
+
+The two independent controls now pass on the same source state:
 
 1. `python tools/audit_pcb_main_layout_candidate_rev_a.py`
 2. `python tools/audit_pcb_main_placement_clearance_rev_a.py --strict`
-3. KiCad 9 DRC with zero blocker/critical violations and zero unrouted items
-4. Native STEP plus enclosure, connector-mate, card, coax-tool and harness-sweep review
-5. Independent PCB-MAIN Review B and factory/assembler DFM
 
-Until then the disposition is `HOLD`; Gerber, placement release, production BOM
-release and any `FOR_MANUFACTURE` claim remain prohibited.
+## Remaining release boundary
+
+The 2D placement-clearance subgate is closed. The board still has no routing or
+copper zones, and the 2D envelope method cannot approve component height,
+connector mates, cards, coax access or harness sweeps. The following remain
+mandatory:
+
+1. electrically and RF-constrained routing, return planes, stitching and stackup;
+2. KiCad 9 DRC with zero blocker/critical violations and zero unrouted items;
+3. native STEP plus enclosure, connector-mate, card, coax-tool and harness review;
+4. CAM comparison, factory/assembler DFM and independent PCB-MAIN Review B.
+
+The overall disposition remains `HOLD`; Gerber, placement release, production
+BOM release and any `FOR_MANUFACTURE` claim remain prohibited.

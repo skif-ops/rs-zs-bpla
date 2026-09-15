@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Inventory PCB-MAIN Rev.A placement, mounting and U.FL service clearances.
 
-The committed board is still an unrouted engineering placement candidate.  This
-audit therefore has two modes:
+The committed board is still an unrouted engineering placement candidate. This
+audit has two modes:
 
-* the default controlled-baseline mode records the known blockers and verifies
-  that their summary matches PCB_MAIN_CAPTURE_STATUS_REV_A.json;
-* ``--strict`` additionally fails while any collision remains and is intended
-  for the eventual Review-B placement gate.
+* the default controlled-baseline mode inventories the placement and verifies
+  that its summary matches PCB_MAIN_CAPTURE_STATUS_REV_A.json;
+* ``--strict`` additionally fails while any collision remains and is the
+  machine-enforced 2D placement-clearance subgate.
 
 Manufacturer/drawing courtyards are treated as confirmed assembly envelopes.
 Footprints without a courtyard use their pad bounds plus a conservative 0.25 mm
@@ -449,8 +449,8 @@ def audit(board_path: Path, authority_path: Path) -> dict[str, Any]:
         "confirmed_tool_clearance_conflicts": confirmed_tool,
         "screening_tool_clearance_conflicts": screening_tool,
         "release_disposition": (
-            "HOLD_MAIN_AUTH_011_LIMITED_MECHANICAL_ECO_AND_PLACEMENT_REWORK_REQUIRED"
-            if blocked else "PLACEMENT_CLEARANCE_SUBGATE_READY_FOR_INDEPENDENT_REVIEW"
+            "HOLD_PLACEMENT_CLEARANCE_REWORK_REQUIRED"
+            if blocked else "PASS_2D_PLACEMENT_CLEARANCE_ROUTING_AND_3D_REVIEW_PENDING"
         ),
         "manufacturing_release": False,
     }

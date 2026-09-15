@@ -1650,6 +1650,7 @@ def main() -> None:
         require(review_b["complete"] is False and review_b["status"] in {
                     "OPEN_LAYOUT_AND_EVIDENCE_PENDING",
                     "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
+                    "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
                 },
                 "Review B must be open but incomplete after Review A PASS")
     else:
@@ -1677,7 +1678,10 @@ def main() -> None:
                     f"Review A {evidence_name} is not a commit-traceable GitHub Actions reference")
         require(review_b["evidence"].get("carried_findings") == ["RA-003"],
                 "Review B must carry forward Review A finding RA-003")
-        if review_b["status"] == "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING":
+        if review_b["status"] in {
+                "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
+                "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
+        }:
             required_layout_evidence = {
                 "native_layout_candidate", "layout_generator", "layout_independent_audit",
                 "placement_clearance_audit", "placement_clearance_record",
@@ -1686,9 +1690,21 @@ def main() -> None:
                 "mechanical_eco_approval_record", "mechanical_eco_review_commit_mapping",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
+            if review_b["status"] == \
+                    "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING":
+                required_layout_evidence |= {
+                    "placement_repack_manifest", "placement_repack_generator",
+                    "passive_courtyard_rule", "placement_repack_status",
+                }
+                require(review_b["evidence"].get("placement_repack_status") ==
+                        "PASS_STRICT_2D_CLEARANCE_AND_EXCLUSIVE_ZONES_"
+                        "ROUTING_AND_3D_REVIEW_PENDING",
+                        "PCB-MAIN placement-repack release boundary drift")
             require(required_layout_evidence <= set(review_b["evidence"]),
                     "placement-candidate Review B evidence schema incomplete")
-            for evidence_name in required_layout_evidence - {"ra_003_status"}:
+            for evidence_name in required_layout_evidence - {
+                    "ra_003_status", "placement_repack_status",
+            }:
                 evidence_path = ROOT / review_b["evidence"][evidence_name]
                 require(evidence_path.is_file() and evidence_path.stat().st_size > 0,
                         f"Review B placement evidence missing: {evidence_name}")
@@ -1702,6 +1718,7 @@ def main() -> None:
             require(mechanical_eco_status in {
                         "APPROVED_PENDING_APPLICATION",
                         "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
+                        "APPROVED_APPLIED_PLACEMENT_REPACK_PASS",
                     },
                     "PCB-MAIN mechanical ECO candidate status drift")
             mechanical_candidate = json.loads(
@@ -1752,7 +1769,10 @@ def main() -> None:
                     review_commit_mapping.get("manufacturing_release") is False,
                     "PCB-MAIN mechanical ECO review-commit mapping drift")
             mechanical_application = None
-            if mechanical_eco_status == "APPROVED_APPLIED_FULL_REPACK_REQUIRED":
+            if mechanical_eco_status in {
+                    "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
+                    "APPROVED_APPLIED_PLACEMENT_REPACK_PASS",
+            }:
                 require("mechanical_eco_application" in review_b["evidence"],
                         "PCB-MAIN mechanical ECO application record is missing")
                 application_path = ROOT / review_b["evidence"]["mechanical_eco_application"]
@@ -1782,9 +1802,9 @@ def main() -> None:
                         "locked_authority_mounting_conflicts",
                         "locked_authority_tool_conflicts",
                     }, "placement-clearance controlled baseline schema drift")
-            require(placement_control["state"] == "BLOCKED_PLACEMENT_CLEARANCE",
-                    "current PCB-MAIN placement must remain blocked")
             if mechanical_eco_status == "APPROVED_PENDING_APPLICATION":
+                require(placement_control["state"] == "BLOCKED_PLACEMENT_CLEARANCE",
+                        "pre-application PCB-MAIN placement must remain blocked")
                 require(placement_control["confirmed_component_collisions"] > 0 and
                         placement_control["confirmed_mounting_clearance_conflicts"] > 0 and
                         placement_control["confirmed_tool_clearance_conflicts"] > 0,
@@ -1798,7 +1818,9 @@ def main() -> None:
                 require(placement_control["locked_authority_tool_conflicts"] == [
                             ["J10", "U10"], ["J8", "U8"],
                         ], "controlled locked U.FL tool-conflict set drift")
-            else:
+            elif mechanical_eco_status == "APPROVED_APPLIED_FULL_REPACK_REQUIRED":
+                require(placement_control["state"] == "BLOCKED_PLACEMENT_CLEARANCE",
+                        "post-ECO PCB-MAIN placement must remain blocked until repack")
                 require(placement_control["confirmed_component_collisions"] == 15 and
                         placement_control["screening_component_collisions"] == 67 and
                         placement_control["confirmed_mounting_clearance_conflicts"] == 0 and
@@ -1830,6 +1852,40 @@ def main() -> None:
                         mechanical_application.get("applied", {}).get("authority_sha256") ==
                         placement_control["authority_sha256"],
                         "PCB-MAIN mechanical ECO application hash drift")
+            else:
+                require(placement_control["state"] == "PASS" and
+                        placement_control["assembly_footprints"] == 227 and
+                        placement_control["courtyard_footprints"] == 227 and
+                        placement_control["pad_screening_footprints"] == 0,
+                        "PCB-MAIN placement-repack controlled inventory drift")
+                zero_count_keys = (
+                    "confirmed_component_collisions",
+                    "screening_component_collisions",
+                    "confirmed_mounting_clearance_conflicts",
+                    "screening_mounting_clearance_conflicts",
+                    "confirmed_tool_clearance_conflicts",
+                    "screening_tool_clearance_conflicts",
+                )
+                require(all(placement_control[key] == 0 for key in zero_count_keys) and
+                        not placement_control["locked_authority_component_conflicts"] and
+                        not placement_control["locked_authority_mounting_conflicts"] and
+                        not placement_control["locked_authority_tool_conflicts"],
+                        "PCB-MAIN strict 2D placement-clearance PASS drift")
+                require(mechanical_application is not None and
+                        mechanical_application.get("post_application_clearance") == {
+                            "confirmed_component_collisions": 15,
+                            "screening_component_collisions": 67,
+                            "confirmed_mounting_clearance_conflicts": 0,
+                            "screening_mounting_clearance_conflicts": 1,
+                            "confirmed_tool_clearance_conflicts": 0,
+                            "screening_tool_clearance_conflicts": 0,
+                            "locked_authority_component_conflicts": [],
+                            "locked_authority_mounting_conflicts": [],
+                            "locked_authority_tool_conflicts": [],
+                        }, "PCB-MAIN mechanical ECO historical inventory drift")
+                require(mechanical_application.get("applied", {}).get("authority_sha256") ==
+                        placement_control["authority_sha256"],
+                        "PCB-MAIN repack authority differs from the accepted ECO authority")
     elif native_present:
         require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
                 "human Review A identity/date/SHA claimed before sign-off")
@@ -1882,7 +1938,10 @@ def main() -> None:
             "placement_clearance_control", {}
         ).get("state", "BLOCKED"),
         "mechanical_authority_disposition": (
-            "CLOSED_CAPTURE_INPUT_LIMITED_MAIN_AUTH_011_ECO_APPLIED_REPACK_REQUIRED"
+            "CLOSED_CAPTURE_INPUT_LIMITED_MAIN_AUTH_011_ECO_APPLIED_PLACEMENT_REPACK_PASS"
+            if review_b["evidence"].get("mechanical_eco_candidate_status") ==
+            "APPROVED_APPLIED_PLACEMENT_REPACK_PASS"
+            else "CLOSED_CAPTURE_INPUT_LIMITED_MAIN_AUTH_011_ECO_APPLIED_REPACK_REQUIRED"
             if review_b["evidence"].get("mechanical_eco_candidate_status") ==
             "APPROVED_APPLIED_FULL_REPACK_REQUIRED"
             else "CLOSED_CAPTURE_INPUT_LIMITED_MAIN_AUTH_011_ECO_APPROVED_PENDING_APPLICATION"
@@ -1910,13 +1969,13 @@ def main() -> None:
     print(f"- all {len(passive_support_rows)} passive/support RefDes, MPNs, populations and physical pin sets verified")
     print(
         f"- all {len(mechanical_rows)} outline, placement, zone, keepout and production "
-        "fixture records structurally verified; cross-record placement clearance is BLOCKED"
+        "fixture records structurally verified; strict 2D placement clearance is PASS"
     )
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(
         "- all 11 authorities remain closed as capture inputs; native schematic Review A "
-        "is signed PASS; the limited MAIN-AUTH-011 mechanical ECO is applied; full "
-        "placement repack, Review B and production evidence remain blockers"
+        "is signed PASS; the limited MAIN-AUTH-011 mechanical ECO and controlled placement "
+        "repack are applied; routing, 3D review, Review B and production evidence remain blockers"
     )
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 

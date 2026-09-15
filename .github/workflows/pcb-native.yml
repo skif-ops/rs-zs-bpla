@@ -44,6 +44,8 @@ on:
       - "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
       - "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv"
       - "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+      - "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+      - "hardware/PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A.md"
       - "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json"
       - "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
       - "hardware/PCB_PWR_PIN_AUTHORITY_REV_A.csv"
@@ -76,6 +78,7 @@ on:
       - "tools/materialize_pcb_main_verified_library_footprints_rev_a.py"
       - "tools/audit_pcb_main_layout_candidate_rev_a.py"
       - "tools/audit_pcb_main_placement_clearance_rev_a.py"
+      - "tools/generate_pcb_main_placement_repack_rev_a.py"
       - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
       - "tools/audit_pcb_main_native_schematic_rev_a.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
@@ -120,6 +123,8 @@ on:
       - "hardware/EVT_PRE_20_BOM_REV_A.csv"
       - "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv"
       - "hardware/PCB_MAIN_*AUTHORITY_REV_A.*"
+      - "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+      - "hardware/PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A.md"
       - "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
       - "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json"
       - "hardware/PCB_PWR_*.csv"
@@ -297,9 +302,11 @@ jobs:
           python tools/generate_pcb_main_manufacturer_footprints_rev_a.py --check
           python tools/materialize_pcb_main_manufacturer_footprints_rev_a.py --check
           python tools/materialize_pcb_main_verified_library_footprints_rev_a.py --check
+          python tools/generate_pcb_main_placement_repack_rev_a.py --check
           python tools/audit_pcb_main_layout_candidate_rev_a.py
           python tools/audit_pcb_main_placement_clearance_rev_a.py \
-            --output artifacts/kicad-native/PCB-MAIN/placement_clearance_audit.json
+            --output artifacts/kicad-native/PCB-MAIN/placement_clearance_audit.json \
+            --strict
           python tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/mechanical_eco_candidate_audit.json
           python tools/generate_pcb_main_schematic_rev_a.py --check
@@ -309,6 +316,14 @@ jobs:
             --bom-output artifacts/kicad-native/PCB-MAIN/native_schematic_bom.csv
       - name: Parse PCB-MAIN placement candidate and controlled footprints with KiCad 9
         run: |
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/generate_pcb_main_layout_candidate_rev_a.py \
+            --output /tmp/PCB-MAIN-generated.kicad_pcb
+          python tools/audit_pcb_main_placement_clearance_rev_a.py \
+            --board /tmp/PCB-MAIN-generated.kicad_pcb \
+            --no-status-check \
+            --strict
           /usr/bin/python3 - <<'PY'
           from pathlib import Path
           import pcbnew

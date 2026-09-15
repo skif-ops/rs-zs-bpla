@@ -3,7 +3,7 @@
   "board": "PCB-MAIN",
   "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "f16348f1d4caf0569f78c414803c56b0e503de120988bcb167740125d616a411",
+  "generator_sha256": "3de70cd568eeffa92a962041ec7b39a81b3b6011005cdd4eaf11bac25043ef33",
   "inputs": [
     {
       "path": "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv",
@@ -59,7 +59,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "703094a2b7390064336445186f87bb76434972063a269d8742f0d75aa21ba6b1"
+      "sha256": "c962ae7f02b8abf0617de98f9e9b0ce4a8c081d4835174d907f0b3f5ec4c4d04"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -210,5 +210,5 @@
     }
   ],
   "review_a": "SIGNED_PASS_PER_hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-  "review_b": "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING"
+  "review_b": "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING"
 }
