@@ -58,7 +58,10 @@ PCB-PWR также отслеживается и проверяется в CI: �
 `DIM-003`. Все 31 native-сети PCB-PWR уже имеют отдельный проверяемый pre-route
 authority для силовых цепей, возвратов/net-tie, hot-loop, switch-node, Kelvin,
 feedback и I2C. Этот PASS закрывает только полноту ограничений: численная
-геометрия меди, трассировка, DRC и производство остаются запрещены. После
+геометрия меди, трассировка, DRC и производство остаются запрещены. Отдельный
+строгий подгейт PCB-PWR теперь подтверждает `42/42` fitted-courtyard,
+минимальный зазор `0.22 mm` при требовании `0.20 mm` и ноль конфликтов; `DIM-003`,
+J1/J2/DFT service volumes, mounting, STEP и Review B остаются открыты. После
 ограниченного copper ECO повторный PCB-MIC Review A подписан
 `PASS` по commit `e17a86bc`, а copper-return subgate Review B принят по commit
 `7aeec13a` и PCB SHA-256 `a292a6ec…e4031`. Контролируемый manufacturing-handoff

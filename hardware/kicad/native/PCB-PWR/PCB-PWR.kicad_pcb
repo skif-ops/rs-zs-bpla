@@ -869,7 +869,7 @@
 	(footprint "Capacitor_SMD:C_1210_3225Metric"
 		(layer "F.Cu")
 		(uuid "28057b3a-ccf4-41b7-8f4e-592a6fb41d93")
-		(at 73 17)
+		(at 74 17)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
 		(property "Reference" "C16"
@@ -1685,7 +1685,7 @@
 	(footprint "Capacitor_SMD:C_1210_3225Metric"
 		(layer "F.Cu")
 		(uuid "443c29b3-896b-4a31-8f41-39a6c6f6cb08")
-		(at 73 38)
+		(at 74 38)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
 		(property "Reference" "C17"
@@ -5309,7 +5309,7 @@
 	(footprint "Capacitor_SMD:C_0402_1005Metric"
 		(layer "F.Cu")
 		(uuid "be28dc7f-6c4c-4d4a-8ec4-b742aa7a3e6b")
-		(at 48 22)
+		(at 48.5 22)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=CURRENT_SENSE|placement=PROVISIONAL_PLACEMENT_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
 		(property "Reference" "C2"
@@ -5847,7 +5847,7 @@
 	(footprint "Capacitor_SMD:C_1210_3225Metric"
 		(layer "F.Cu")
 		(uuid "c9c990dd-a045-4d29-8f37-5e158c18dafb")
-		(at 73 45)
+		(at 74 42.25)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
 		(property "Reference" "C19"
@@ -6541,7 +6541,7 @@
 	(footprint "Capacitor_SMD:C_0603_1608Metric"
 		(layer "F.Cu")
 		(uuid "d53beafb-13ca-41f1-9617-594f8afe1fcc")
-		(at 16 27)
+		(at 16 26.75)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=INPUT_PROTECTION|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
 		(property "Reference" "C9"
@@ -7964,7 +7964,7 @@
 	(footprint "Capacitor_SMD:C_1210_3225Metric"
 		(layer "F.Cu")
 		(uuid "f158a3db-d157-4eb1-ad0a-88f743262425")
-		(at 73 10)
+		(at 74 10)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
 		(property "Reference" "C14"

@@ -456,7 +456,7 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
 
     review_text = REVIEW_B.read_text(encoding="utf-8")
     for marker in (
-        "Status: `OPEN / PROVISIONAL PRE-ROUTE CANDIDATE / NOT FOR MANUFACTURE`",
+        "Status: `OPEN / FITTED 2D CLEARANCE AND PRE-ROUTE CONSTRAINT PASS / NOT FOR MANUFACTURE`",
         "- [x] All 31 native/capture nets",
         "- [ ] `DIM-003` freezes",
         "- [ ] KiCad 9 DRC passes",

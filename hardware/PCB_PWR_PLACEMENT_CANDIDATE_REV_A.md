@@ -1,6 +1,6 @@
 # Дионея EVT-PRE-20 Rev.A - PCB-PWR provisional placement candidate
 
-Status: `ELECTRICAL PLACEMENT CANVAS / DIM-003 OPEN / ROUTING ABSENT / NOT FOR MANUFACTURE`
+Status: `FITTED 2D CLEARANCE PASS / DIM-003 OPEN / ROUTING ABSENT / NOT FOR MANUFACTURE`
 
 This authority creates a reviewable native-board canvas without claiming enclosure or
 fabrication approval. The four-copper-layer count is frozen for Rev.A by
@@ -23,6 +23,9 @@ supplies the assembled envelope, terminal zones, mounting pattern and frozen PCB
   `1.70 mm` target. Final side, fixture datum and probe access remain open;
 - there are no mounting holes because their number and coordinates belong to
   `DIM-003` rather than electrical design authority.
+- all 42 simultaneously fitted assembly bodies have controlled courtyards and
+  pass the independent `0.20 mm` 2D clearance subgate; the minimum observed
+  fitted-courtyard clearance is `0.22 mm`.
 
 ## Hard interlocks
 
@@ -31,6 +34,12 @@ drill, position, IPC-356 and STEP export are prohibited for this state. The inde
 audit checks the complete reference/net/footprint set, every candidate coordinate,
 the frozen layer count, provisional outline/thickness assumptions and the open
 `DIM-003` record.
+
+The bounded fitted-body clearance repack and its independent strict audit are
+recorded in `hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md`. Five DNP
+footprints and thirteen PCB features are not assembly bodies; their copper,
+fixture and service-access checks remain mandatory. J2's provisional east-edge
+overhang is not a mating, cable-bend, enclosure or 3D clearance approval.
 
 All 31 native nets now have controlled pre-route coverage in
 `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv`. That manifest adds current,

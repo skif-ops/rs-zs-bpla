@@ -191,7 +191,7 @@ def main() -> int:
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     layout = status["native_layout"]
     require(status["manufacturing_release"] is False and
-            layout["status"] == "PROVISIONAL_PLACEMENT_CANVAS_DIM_003_OPEN" and
+            layout["status"] == "PROVISIONAL_FITTED_2D_CLEARANCE_PASS_DIM_003_OPEN" and
             layout["layer_count_authority"] == "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv" and
             layout["layer_count_status"] == "FROZEN_REV_A_FINAL_STACKUP_OPEN" and
             layout["routing_present"] is False and layout["copper_zones_present"] is False and

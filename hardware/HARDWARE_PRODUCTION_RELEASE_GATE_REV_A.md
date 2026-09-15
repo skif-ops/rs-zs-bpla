@@ -57,6 +57,12 @@ envelopes, selected stackup/copper weights and thermal/current-density review.
 The board remains unrouted with zero copper zones; DRC, CAM, DFM and Review B are
 open.
 
+PCB-PWR has also passed its bounded fitted-body 2D placement-clearance subgate.
+All 42 simultaneously fitted footprints have controlled courtyards, the required
+minimum is 0.20 mm, the observed minimum is 0.22 mm and conflicts are zero. This
+does not close `DIM-003`, mounting or connector/tool service volumes, DNP and DFT
+fixture access, assembled STEP, routing, DRC, CAM, DFM or Review B.
+
 The PCB-MAIN stackup/impedance request packet is internally ready, but it has
 0/2 fabricator responses accepted and no selected construction. Its 22-row
 register is a quotation/capability input only; it is not Gerber, a purchase

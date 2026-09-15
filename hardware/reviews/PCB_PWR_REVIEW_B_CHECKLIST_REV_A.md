@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A Review B checklist
 
-Status: `OPEN / PROVISIONAL PRE-ROUTE CANDIDATE / NOT FOR MANUFACTURE`
+Status: `OPEN / FITTED 2D CLEARANCE AND PRE-ROUTE CONSTRAINT PASS / NOT FOR MANUFACTURE`
 
 Review B is independent from the completed pin/net Review A. This checklist is
 not signed and contains no routing, CAM or manufacturing-release assertion.
@@ -11,6 +11,8 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
 - Native KiCad 9 schematic and zero-violation ERC evidence: present.
 - Native PCB: provisional 90 x 60 x 1.6 mm, four copper layers, 60 footprints,
   zero mounting holes, zero traces/vias/zones.
+- Fitted-body 2D clearance: `PASS`; 42/42 fitted footprints have courtyards,
+  minimum required/observed separation is 0.20/0.22 mm and conflicts are zero.
 - Mechanical authority: `DIM-003 OPEN`; the outline, mounting pattern, terminal
   zones, tool access and assembled STEP are not frozen.
 - Pre-route constraint coverage: `PASS` for all 31 native nets. Numeric widths,
@@ -21,6 +23,8 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
 
 - [x] Native PCB parses independently and its component/net set matches the
   reviewed schematic and placement authority.
+- [x] All 42 fitted assembly courtyards pass the bounded 0.20 mm 2D clearance
+  subgate; DNP/PCB-feature service and fixture checks remain open.
 - [x] Four-layer count is frozen for Rev.A and agrees with the native board.
 - [x] All 31 native/capture nets have one explicit route class, return domain,
   topology, current basis and source authority.
@@ -60,6 +64,7 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
 
 ## 3. Decision
 
-`HOLD`. Constraint coverage is complete, but mechanics, stackup, numeric copper
-geometry, routing, physical evidence, DRC, CAM, DFM and independent Review B are
-open. Production outputs remain prohibited.
+`HOLD`. Fitted-body 2D clearance and constraint coverage are complete, but
+mechanics/service volumes, DNP/PCB-feature access, stackup, numeric copper
+geometry, routing, physical evidence, DRC, CAM, DFM and independent Review B
+are open. Production outputs remain prohibited.

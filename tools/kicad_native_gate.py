@@ -35,6 +35,7 @@ BOARDS = ("PCB-MAIN", "PCB-MIC", "PCB-PWR")
 PCB_MAIN_STATUS = ROOT / "hardware" / "PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 PCB_MAIN_CLEARANCE_AUDIT = ROOT / "tools" / "audit_pcb_main_placement_clearance_rev_a.py"
 PCB_MAIN_ROUTING_AUDIT = ROOT / "tools" / "audit_pcb_main_routing_authority_rev_a.py"
+PCB_PWR_CLEARANCE_AUDIT = ROOT / "tools" / "audit_pcb_pwr_placement_clearance_rev_a.py"
 PCB_PWR_ROUTING_AUDIT = ROOT / "tools" / "audit_pcb_pwr_routing_authority_rev_a.py"
 PCB_MIC_STATUS = ROOT / "hardware" / "PCB_MIC_CAPTURE_STATUS_REV_A.json"
 PCB_PWR_STATUS = ROOT / "hardware" / "PCB_PWR_CAPTURE_STATUS_REV_A.json"
@@ -87,7 +88,7 @@ def placement_candidate_audit(name: str) -> str | None:
         ),
         "PCB-PWR": (
             PCB_PWR_STATUS,
-            "OPEN_PRE_ROUTE_CONSTRAINT_COVERAGE_PASS_DIM_003_ROUTING_AND_EVIDENCE_PENDING",
+            "OPEN_FITTED_2D_CLEARANCE_AND_PRE_ROUTE_CONSTRAINT_PASS_DIM_003_ROUTING_AND_EVIDENCE_PENDING",
             "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
         ),
     }
@@ -775,6 +776,17 @@ def main() -> int:
                             "ROUTING_DRC_AND_FAB_EXPORT_PROHIBITED"
                         )
                     elif name == "PCB-PWR":
+                        clearance_output = ART / name / "placement_clearance_audit.json"
+                        run([
+                            sys.executable,
+                            str(PCB_PWR_CLEARANCE_AUDIT.relative_to(ROOT)),
+                            "--output", str(clearance_output), "--strict",
+                        ])
+                        clearance_report = json.loads(
+                            clearance_output.read_text(encoding="utf-8")
+                        )
+                        report["boards"][name]["placement_clearance_state"] = \
+                            clearance_report["summary"]["state"]
                         routing_output = ART / name / "routing_authority_audit.json"
                         run([
                             sys.executable,
@@ -787,7 +799,7 @@ def main() -> int:
                         report["boards"][name]["routing_constraint_state"] = \
                             routing_report["status"]
                         report["boards"][name]["pcb_state"] = (
-                            "PLACEMENT_CANDIDATE_AND_PRE_ROUTE_CONSTRAINT_PASS_"
+                            "FITTED_2D_CLEARANCE_AND_PRE_ROUTE_CONSTRAINT_PASS_"
                             "ROUTING_DRC_AND_FAB_EXPORT_PROHIBITED"
                         )
                     else:

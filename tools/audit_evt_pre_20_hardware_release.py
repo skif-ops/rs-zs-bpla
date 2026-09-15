@@ -166,6 +166,28 @@ def audit() -> dict[str, object]:
         "PCB layer counts are inconsistent across native boards, BOM/RFQ or controlled authorities",
     )
 
+    pwr_clearance = run_json_audit("audit_pcb_pwr_placement_clearance_rev_a.py")
+    pwr_clearance_summary = pwr_clearance.get("summary", {})
+    pwr_clearance_controlled = (
+        isinstance(pwr_clearance_summary, dict)
+        and pwr_clearance_summary.get("state") ==
+        "PASS_FITTED_2D_PLACEMENT_CLEARANCE_DIM_003_OPEN"
+        and pwr_clearance_summary.get("fitted_footprints") == 42
+        and pwr_clearance_summary.get("courtyard_footprints") == 42
+        and pwr_clearance_summary.get("required_clearance_mm") == 0.2
+        and pwr_clearance_summary.get("minimum_observed_clearance_mm", 0) >= 0.2
+        and pwr_clearance_summary.get("clearance_conflicts") == 0
+        and pwr_clearance.get("board", {}).get("trace_items") == 0
+        and pwr_clearance.get("board", {}).get("copper_zones") == 0
+        and pwr_clearance.get("manufacturing_release") is False
+    )
+    check(
+        "pcb_pwr_fitted_2d_placement_clearance",
+        pwr_clearance_controlled,
+        str(pwr_clearance_summary.get("state", "MISSING")),
+        "PCB-PWR fitted-component 2D placement clearance has regressed",
+    )
+
     pwr_routing_authority = run_json_audit("audit_pcb_pwr_routing_authority_rev_a.py")
     pwr_routing_controlled = (
         pwr_routing_authority.get("status") ==

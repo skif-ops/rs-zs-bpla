@@ -2,7 +2,7 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-PWR",
-  "release_state": "REVIEW_A_PIN_NET_PASS_PLACEMENT_AND_PRE_ROUTE_CONSTRAINT_CANDIDATE",
+  "release_state": "REVIEW_A_PIN_NET_PASS_FITTED_2D_CLEARANCE_AND_PRE_ROUTE_CONSTRAINT_CANDIDATE",
   "manufacturing_release": false,
   "native_schematic": {
     "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
@@ -14,7 +14,7 @@
     "generator": "tools/generate_pcb_pwr_layout_candidate_rev_a.py",
     "independent_audit": "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
     "placement_authority": "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
-    "status": "PROVISIONAL_PLACEMENT_CANVAS_DIM_003_OPEN",
+    "status": "PROVISIONAL_FITTED_2D_CLEARANCE_PASS_DIM_003_OPEN",
     "outline_mm": [90.0, 60.0],
     "outline_status": "PROVISIONAL_NOT_MECHANICALLY_FROZEN",
     "copper_layers": 4,
@@ -26,7 +26,28 @@
     "mounting_status": "ABSENT_PENDING_DIM_003",
     "routing_present": false,
     "copper_zones_present": false,
-    "cam_export_authorized": false
+    "cam_export_authorized": false,
+    "placement_clearance": {
+      "audit": "tools/audit_pcb_pwr_placement_clearance_rev_a.py",
+      "record": "hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md",
+      "control": {
+        "state": "PASS_FITTED_2D_PLACEMENT_CLEARANCE_DIM_003_OPEN",
+        "board_semantic_sha256": "5f854a5276e8dfd6dc82516f61db1a158888b5343b82058e6024e5970b51e6c1",
+        "placement_authority_sha256": "98a9bd0c221d880c53e95f8bb93d92ae93b3237f94293a9b7e145f31a2eeb64f",
+        "fitted_footprints": 42,
+        "courtyard_footprints": 42,
+        "excluded_dnp_footprints": 5,
+        "excluded_pcb_feature_footprints": 13,
+        "required_clearance_mm": 0.2,
+        "minimum_observed_clearance_mm": 0.22,
+        "clearance_conflicts": 0,
+        "provisional_edge_overhangs": ["J2"],
+        "mounting_pattern": "OPEN_DIM_003",
+        "connector_and_probe_service_clearance": "OPEN_DIM_003_AND_FIXTURE_REVIEW",
+        "routing_complete": false,
+        "manufacturing_release": false
+      }
+    }
   },
   "review_a": {
     "complete": true,
@@ -39,7 +60,7 @@
     "independent_audit": "tools/audit_pcb_pwr_routing_authority_rev_a.py",
     "control": {
       "state": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN",
-      "board_semantic_sha256": "21ee8a7b85ff20f1a0cfe5b4e9eda6e596ebd319ba572ba52e195307c3d0543c",
+      "board_semantic_sha256": "5f854a5276e8dfd6dc82516f61db1a158888b5343b82058e6024e5970b51e6c1",
       "authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
       "net_count": 31,
       "class_counts": {
@@ -80,7 +101,7 @@
   },
   "review_b": {
     "complete": false,
-    "status": "OPEN_PRE_ROUTE_CONSTRAINT_COVERAGE_PASS_DIM_003_ROUTING_AND_EVIDENCE_PENDING",
+    "status": "OPEN_FITTED_2D_CLEARANCE_AND_PRE_ROUTE_CONSTRAINT_PASS_DIM_003_ROUTING_AND_EVIDENCE_PENDING",
     "blockers": [
       "DIM-003 assembled envelope terminal zones mounting pattern and frozen PCB STEP",
       "final stack-up dielectric construction and copper-weight authority",
