@@ -187,6 +187,14 @@ def validate_decisions_and_tests() -> None:
         and "manufacturing release open" in decisions["DEC-048"]["Impact"],
         "PCB-MAIN stackup-request/fabricator-acceptance separation decision is missing",
     )
+    require(
+        decisions["DEC-049"]["Status"] == "IMPLEMENTED_SELECTED_ASSEMBLER_RESPONSE_PENDING"
+        and "internal assembler-request readiness" in decisions["DEC-049"]["Decision"]
+        and "bounded 14-question request" in decisions["DEC-049"]["Impact"]
+        and "paste export USB SI whole-board DFM Review B and manufacturing release open"
+        in decisions["DEC-049"]["Impact"],
+        "PCB-MAIN assembler-request/process-acceptance separation decision is missing",
+    )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
@@ -243,6 +251,16 @@ def validate_deliverable_register() -> None:
         "PCB-MAIN stackup/impedance request deliverable is missing or over-released",
     )
     require(
+        deliverables["HW-M-012"]["Статус"] == "CONTROLLED_REQUEST"
+        and deliverables["HW-M-012"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-M-012"]["QG-2 техника"] == "OPEN"
+        and "14-row response template" in deliverables["HW-M-012"]["Критерий выпуска"]
+        and "0 accepted responses" in deliverables["HW-M-012"]["Критерий выпуска"]
+        and "paste export Review B and manufacture are blocked"
+        in deliverables["HW-M-012"]["Критерий выпуска"],
+        "PCB-MAIN assembler DFM/stencil request deliverable is missing or over-released",
+    )
+    require(
         deliverables["HW-A-002"]["Статус"] == "DRAFT"
         and deliverables["HW-A-002"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-A-002"]["QG-2 техника"] == "OPEN"
@@ -264,8 +282,12 @@ def validate_deliverable_register() -> None:
         "three project IPC candidates" in risks["R-025"]["Mitigation"]
         and "audited 186-net pre-route authority" in risks["R-025"]["Mitigation"]
         and "two attributable fabricator stackup responses" in risks["R-025"]["Mitigation"]
+        and "all 14 selected-assembler DFM/stencil responses" in risks["R-025"]["Mitigation"]
+        and "controlled U9 zero-paste-to-process gate" in risks["R-025"]["Mitigation"]
         and "missing one or both signed stackup responses" in risks["R-025"]["Trigger"]
-        and "guessed or unaccepted RF/USB geometry" in risks["R-025"]["Trigger"],
+        and "guessed or unaccepted RF/USB geometry" in risks["R-025"]["Trigger"]
+        and "fewer than 14 accepted selected-assembler responses" in risks["R-025"]["Trigger"]
+        and "premature U9 paste" in risks["R-025"]["Trigger"],
         "PCB-MAIN footprint risk still reports the superseded provisional set",
     )
     require(
@@ -411,6 +433,63 @@ def validate_hardware_baseline() -> None:
             and all(row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
                     and row["Blocking"] == "YES" for row in main_responses),
             "PCB-MAIN stackup response register is not the blank 2 x 11 blocking template")
+
+    main_assembler_handoff = main_status["review_b"].get("evidence", {}).get(
+        "assembler_dfm_stencil_handoff", {}
+    )
+    require(
+        main_assembler_handoff.get("status") ==
+        "PACKET_READY_SELECTED_ASSEMBLER_RESPONSE_REQUIRED"
+        and main_assembler_handoff.get("internal_packet_complete") is True
+        and main_assembler_handoff.get("complete") is False
+        and main_assembler_handoff.get("required_scope_references") ==
+        ["U2", "U25", "U26", "U9"]
+        and main_assembler_handoff.get("required_response_rows") == 14
+        and main_assembler_handoff.get("accepted_response_rows") == 0
+        and main_assembler_handoff.get("selected_assembler_legal_entity") is None
+        and main_assembler_handoff.get("selected_manufacturing_site") is None,
+        "PCB-MAIN assembler DFM/stencil handoff is not internally ready and externally blocked",
+    )
+    require(
+        all(main_assembler_handoff.get(key) is False for key in (
+            "u2_land_mask_stencil_accepted",
+            "u25_u26_land_mask_stencil_accepted",
+            "u9_stencil_reflow_inspection_accepted",
+            "pnp_polarity_accepted",
+            "first_article_plan_accepted",
+            "blocker_critical_dfm_closed",
+            "paste_export_authorized",
+            "review_b_complete",
+            "manufacturing_release",
+        )),
+        "PCB-MAIN assembler request advanced a process, paste or release gate",
+    )
+    for relative in (
+        main_assembler_handoff.get("packet"),
+        main_assembler_handoff.get("machine_contract"),
+        main_assembler_handoff.get("response_register"),
+    ):
+        require(isinstance(relative, str) and (ROOT / relative).is_file(),
+                f"PCB-MAIN assembler DFM/stencil handoff file is missing: {relative}")
+    main_assembler_responses = read_csv(
+        main_assembler_handoff["response_register"]
+    )
+    require(
+        len(main_assembler_responses) == 14
+        and len({row["Gate_ID"] for row in main_assembler_responses}) == 14
+        and all(
+            row["Gate_ID"].startswith("ASM-MAIN-")
+            and row["Assembler_Slot"] == "ASM-MAIN-CANDIDATE"
+            and row["Required_Party"] == "SELECTED_ASSEMBLER"
+            and row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
+            and row["Blocking"] == "YES"
+            and not any(row[field] for field in (
+                "Response_Value", "Response_Reference", "Responder", "Response_Date"
+            ))
+            for row in main_assembler_responses
+        ),
+        "PCB-MAIN assembler response register is not the blank 14-row blocking template",
+    )
 
     mic_status = json.loads((ROOT / "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8"))
     require(mic_status["assembly"] == "PCB-MIC", "PCB-MIC release-status identity mismatch")

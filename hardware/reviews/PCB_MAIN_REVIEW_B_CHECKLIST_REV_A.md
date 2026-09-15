@@ -32,6 +32,10 @@ signed and contains no manufacturing release assertion.
 - Stackup/impedance request: controlled packet and blank 22-row response
   register are ready, with 0/2 accepted fabricator responses. No construction,
   numeric RF/USB geometry or route rule has been accepted.
+- Assembler DFM/stencil request: the bounded `U2/U25/U26/U9` packet and blank
+  14-row response register are ready, with 0/14 accepted assembler responses.
+  No assembler legal entity, manufacturing site, paste/stencil/reflow process,
+  footprint acceptance or U9 paste aperture has been selected or approved.
 - Provisional manufacturer-specific footprints: 0 instances (reduced from 52).
 - Manufacturer-drawing controlled project-local footprints: 50 instances.
 - Drawing-verified KiCad library patterns: 5 instances (`J11`, `J_MIC1..J_MIC4`).
@@ -70,9 +74,16 @@ signed and contains no manufacturing release assertion.
   overlapping or reclassified nets.
 - [x] A machine-audited stackup/impedance request and identical 11-question
   templates for `FAB-A` and `FAB-B` are ready without guessed numeric geometry.
+- [x] A machine-audited bounded assembler DFM/stencil request and blank
+  14-question response template for `U2/U25/U26/U9` are ready without guessed
+  paste, stencil, reflow, inspection or first-article process parameters.
 - [ ] Two attributable fabricator responses are complete, compared and accepted;
   one construction and its 50-ohm/90-ohm numeric geometry are selected through
   project RF/SI review.
+- [ ] All 14 attributable assembler responses are accepted for a named legal
+  entity and manufacturing site; the process baseline, U2/U25/U26 land/mask/
+  stencil decisions, U9 stencil adaptation, PnP polarity, first-article plan and
+  blocker/critical DFM closure are approved through controlled review.
 - [ ] RF, power, PDM, USB and SIM routing is complete.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.
 - [ ] KiCad 9 DRC passes with zero blocker/critical violations and zero unrouted items.

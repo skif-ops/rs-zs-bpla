@@ -53,6 +53,12 @@ The PCB-MAIN stackup/impedance request packet is internally ready, but it has
 register is a quotation/capability input only; it is not Gerber, a purchase
 order, routing authority or fabrication release.
 
+The bounded PCB-MAIN assembler request for `U2`, `U25`, `U26` and `U9` is also
+internally ready, but it has 0/14 assembler DFM/stencil responses accepted and
+no selected assembler legal entity, manufacturing site or controlled process.
+The blank response register does not approve U9 paste, any land/mask/stencil
+rule, PnP polarity, first-article assembly, Review B or manufacturing release.
+
 ## Current blocker classes
 
 - exact and released BAT1, PV1, MPPT1, ANT-CELL, ANT-GNSS, ANT-LORA, HARNESS and
@@ -60,8 +66,9 @@ order, routing authority or fabrication release.
 - PCB-MAIN and PCB-PWR routing, DRC and CAM; PCB-MIC independent Review B,
   CAM comparison, panelization and acoustic-stack review; all three boards'
   DFM and manufacturing release;
-- assembler acceptance of the PCB-MAIN U2/U25/U26 project IPC candidates and
-  process-dependent stencil/mask rules;
+- selected-assembler acceptance of the PCB-MAIN U2/U25/U26 project IPC
+  candidates, U9 process-dependent stencil adaptation, PnP polarity,
+  first-article controls and closure of blocker/critical DFM findings;
 - PCB-PWR DIM-003 and the remaining enclosure, antenna, harness, installation and
   environmental mechanical inputs;
 - supplier/fabricator/assembler quotation evidence for the selected 20-station

@@ -86,6 +86,10 @@ jobs:
             --output artifacts/pcb_main_stackup_impedance_request_rev_a.json \
             --commit-sha "$GITHUB_SHA" \
             --require-clean-source
+          python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
+            --output artifacts/pcb_main_assembler_dfm_stencil_request_rev_a.json \
+            --commit-sha "$GITHUB_SHA" \
+            --require-clean-source
           python tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py \
             --output artifacts/pcb_main_mechanical_eco_candidate_rev_a.json
       - name: First-pass configuration and hardware baseline validation
@@ -157,6 +161,7 @@ jobs:
             artifacts/pcb_main_placement_clearance_rev_a.json
             artifacts/pcb_main_routing_authority_rev_a.json
             artifacts/pcb_main_stackup_impedance_request_rev_a.json
+            artifacts/pcb_main_assembler_dfm_stencil_request_rev_a.json
             artifacts/pcb_main_mechanical_eco_candidate_rev_a.json
             artifacts/pcb_main_mcu_pin_authority_rev_a.json
             artifacts/pcb_main_storage_sensor_authority_rev_a.json
@@ -180,6 +185,9 @@ jobs:
             hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json
             hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.md
             hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json
+            hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.md
+            hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_RESPONSE_REV_A.csv
             hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json
             hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md
             hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.json

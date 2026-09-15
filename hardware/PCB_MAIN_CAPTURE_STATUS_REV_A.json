@@ -319,6 +319,34 @@
         "review_b_complete": false,
         "manufacturing_release": false
       },
+      "assembler_dfm_stencil_handoff": {
+        "complete": false,
+        "status": "PACKET_READY_SELECTED_ASSEMBLER_RESPONSE_REQUIRED",
+        "internal_packet_complete": true,
+        "packet": "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.md",
+        "machine_contract": "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json",
+        "response_register": "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_RESPONSE_REV_A.csv",
+        "audit": "artifacts/pcb_main_assembler_dfm_stencil_request_rev_a.json",
+        "required_scope_references": [
+          "U2",
+          "U25",
+          "U26",
+          "U9"
+        ],
+        "required_response_rows": 14,
+        "accepted_response_rows": 0,
+        "selected_assembler_legal_entity": null,
+        "selected_manufacturing_site": null,
+        "u2_land_mask_stencil_accepted": false,
+        "u25_u26_land_mask_stencil_accepted": false,
+        "u9_stencil_reflow_inspection_accepted": false,
+        "pnp_polarity_accepted": false,
+        "first_article_plan_accepted": false,
+        "blocker_critical_dfm_closed": false,
+        "paste_export_authorized": false,
+        "review_b_complete": false,
+        "manufacturing_release": false
+      },
       "review_b_checklist": "hardware/reviews/PCB_MAIN_REVIEW_B_CHECKLIST_REV_A.md",
       "ra_003_calculation": "hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md",
       "ra_003_status": {

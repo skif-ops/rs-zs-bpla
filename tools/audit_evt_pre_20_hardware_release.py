@@ -232,6 +232,88 @@ def audit() -> dict[str, object]:
             f"selected construction={selected_fabricator or 'NONE'}"
         ),
     )
+    main_assembler = (
+        main_evidence.get("assembler_dfm_stencil_handoff", {})
+        if isinstance(main_evidence, dict) else {}
+    )
+    main_assembler_files = [
+        main_assembler.get("packet"),
+        main_assembler.get("machine_contract"),
+        main_assembler.get("response_register"),
+    ] if isinstance(main_assembler, dict) else []
+    main_assembler_response_path = (
+        ROOT / main_assembler_files[2]
+        if len(main_assembler_files) == 3
+        and isinstance(main_assembler_files[2], str)
+        else None
+    )
+    main_assembler_rows = (
+        read_csv(main_assembler_files[2])
+        if main_assembler_response_path is not None
+        and main_assembler_response_path.is_file()
+        else []
+    )
+    main_assembler_packet_ready = (
+        isinstance(main_assembler, dict)
+        and main_assembler.get("internal_packet_complete") is True
+        and main_assembler.get("required_scope_references") ==
+        ["U2", "U25", "U26", "U9"]
+        and main_assembler.get("required_response_rows") == 14
+        and all(isinstance(path, str) and (ROOT / path).is_file()
+                for path in main_assembler_files)
+        and len(main_assembler_rows) == 14
+        and all(row.get("Gate_ID", "").startswith("ASM-MAIN-")
+                and row.get("Blocking") == "YES"
+                for row in main_assembler_rows)
+    )
+    check(
+        "pcb_main_assembler_dfm_stencil_request_packet",
+        main_assembler_packet_ready,
+        str(main_assembler.get("status", "MISSING"))
+        if isinstance(main_assembler, dict) else "MISSING",
+        "PCB-MAIN bounded assembler DFM/stencil request packet is not ready",
+    )
+    accepted_response_rows = (
+        main_assembler.get("accepted_response_rows", 0)
+        if isinstance(main_assembler, dict) else 0
+    )
+    selected_assembler = (
+        main_assembler.get("selected_assembler_legal_entity")
+        if isinstance(main_assembler, dict) else None
+    )
+    selected_site = (
+        main_assembler.get("selected_manufacturing_site")
+        if isinstance(main_assembler, dict) else None
+    )
+    main_assembler_accepted = (
+        isinstance(main_assembler, dict)
+        and main_assembler.get("complete") is True
+        and accepted_response_rows == 14
+        and isinstance(selected_assembler, str) and bool(selected_assembler.strip())
+        and isinstance(selected_site, str) and bool(selected_site.strip())
+        and all(main_assembler.get(key) is True for key in (
+            "u2_land_mask_stencil_accepted",
+            "u25_u26_land_mask_stencil_accepted",
+            "u9_stencil_reflow_inspection_accepted",
+            "pnp_polarity_accepted",
+            "first_article_plan_accepted",
+            "blocker_critical_dfm_closed",
+        ))
+    )
+    check(
+        "pcb_main_assembler_dfm_stencil_acceptance",
+        main_assembler_accepted,
+        (
+            f"accepted={accepted_response_rows}/14 "
+            f"assembler={selected_assembler or 'NONE'} "
+            f"site={selected_site or 'NONE'}"
+        ),
+        (
+            "PCB-MAIN assembler DFM/stencil acceptance remains open: "
+            f"{accepted_response_rows}/14 responses accepted and selected "
+            f"assembler={selected_assembler or 'NONE'} site={selected_site or 'NONE'}"
+        ),
+    )
     main_released = (
         main_status.get("manufacturing_release") is True
         and isinstance(main_review_b, dict)

@@ -68,6 +68,10 @@ release interlock for this state.
   blank response register only to obtain comparable construction data from
   `FAB-A` and `FAB-B`. The current `0/2` accepted response state does not select
   a stackup, authorize numeric 50-ohm/90-ohm rules or permit routing.
+- Use `hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json` and
+  its blank 14-row register only for the bounded `U2/U25/U26/U9` process review.
+  The current `0/14` accepted state does not select an assembler or process,
+  create U9 paste apertures, close USB SI/whole-board DFM or permit manufacture.
 - Freeze CubeMX pin/peripheral assignment for STM32U585VIT6Q; no unresolved AF conflicts.
 - Replace provisional MAIN/PWR placement candidates with mechanically frozen,
   reviewed and routed boards; keep all native `.kicad_sch/.kicad_pcb/.kicad_pro`
