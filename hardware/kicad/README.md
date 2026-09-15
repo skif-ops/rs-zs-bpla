@@ -52,6 +52,10 @@ release interlock for this state.
 ## Required CAD gates before Gerber release
 
 - Pre-schematic PCB-MAIN authorities `MAIN-AUTH-001…011` are closed; the 110 x 75 mm outline, connector/module anchors, RF/keepout regions and 31 production pogo-pad coordinates are frozen by `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv`.
+- Treat that frozen PCB-MAIN placement as a capture baseline, not a released
+  placement: the independent clearance inventory records four conflicts inside
+  MAIN-AUTH-011 plus additional candidate collisions. A limited mechanical ECO,
+  full repack and strict clearance PASS are required before routing/Review B.
 - Freeze CubeMX pin/peripheral assignment for STM32U585VIT6Q; no unresolved AF conflicts.
 - Replace provisional MAIN/PWR placement candidates with mechanically frozen,
   reviewed and routed boards; keep all native `.kicad_sch/.kicad_pcb/.kicad_pro`

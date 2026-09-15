@@ -33,6 +33,7 @@ NATIVE = ROOT / "hardware" / "kicad" / "native"
 ART = ROOT / "artifacts" / "kicad-native"
 BOARDS = ("PCB-MAIN", "PCB-MIC", "PCB-PWR")
 PCB_MAIN_STATUS = ROOT / "hardware" / "PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+PCB_MAIN_CLEARANCE_AUDIT = ROOT / "tools" / "audit_pcb_main_placement_clearance_rev_a.py"
 PCB_MIC_STATUS = ROOT / "hardware" / "PCB_MIC_CAPTURE_STATUS_REV_A.json"
 PCB_PWR_STATUS = ROOT / "hardware" / "PCB_PWR_CAPTURE_STATUS_REV_A.json"
 PRODUCTION_BOM = ROOT / "hardware" / "EVT_PRE_20_BOM_REV_A.csv"
@@ -716,6 +717,7 @@ def main() -> int:
     all_missing: list[str] = []
     complete_sets: list[str] = []
     cli_failures: list[str] = []
+    placement_candidates: list[str] = []
 
     for name in BOARDS:
         p = paths(name)
@@ -742,8 +744,26 @@ def main() -> int:
                 placement_audit = placement_candidate_audit(name)
                 if placement_audit:
                     run(["python", placement_audit])
-                    report["boards"][name]["pcb_state"] = \
-                        "PLACEMENT_CANDIDATE_AUDIT_PASS_DRC_AND_FAB_EXPORT_PROHIBITED"
+                    placement_candidates.append(name)
+                    if name == "PCB-MAIN":
+                        clearance_output = ART / name / "placement_clearance_audit.json"
+                        run([
+                            sys.executable,
+                            str(PCB_MAIN_CLEARANCE_AUDIT.relative_to(ROOT)),
+                            "--output", str(clearance_output),
+                        ])
+                        clearance_report = json.loads(
+                            clearance_output.read_text(encoding="utf-8")
+                        )
+                        report["boards"][name]["placement_clearance_state"] = \
+                            clearance_report["summary"]["state"]
+                        report["boards"][name]["pcb_state"] = (
+                            "PLACEMENT_CANDIDATE_STRUCTURE_PASS_CLEARANCE_BLOCKED_"
+                            "DRC_AND_FAB_EXPORT_PROHIBITED"
+                        )
+                    else:
+                        report["boards"][name]["pcb_state"] = \
+                            "PLACEMENT_CANDIDATE_AUDIT_PASS_DRC_AND_FAB_EXPORT_PROHIBITED"
                 else:
                     ok, state = validate_pcb(cli, name, p["pcb"])
                     report["boards"][name]["pcb_state"] = state
@@ -837,7 +857,12 @@ def main() -> int:
             mic["manufacturing_handoff_state"] = "NOT_RUN_PREREQUISITE_CLI_FAILURE"
 
     if not all_missing and not cli_failures:
-        if all(review_a_complete(name) for name in BOARDS):
+        if placement_candidates:
+            report["release"] = (
+                "ALL_NATIVE_SOURCES_PRESENT_PLACEMENT_CANDIDATES_BLOCK_"
+                "ROUTING_DRC_REVIEW_B_AND_MANUFACTURING_RELEASE"
+            )
+        elif all(review_a_complete(name) for name in BOARDS):
             report["release"] = (
                 "ALL_NATIVE_SOURCES_AND_CLI_PASS_REVIEW_B_AND_MANUFACTURING_RELEASE_STILL_REQUIRED"
             )

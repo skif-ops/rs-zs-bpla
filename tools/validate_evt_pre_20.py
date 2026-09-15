@@ -156,6 +156,11 @@ def validate_decisions_and_tests() -> None:
         decisions["DEC-043"]["Status"] == "IMPLEMENTED_EXTERNAL_ACCEPTANCE_PENDING",
         "PCB-MIC manufacturing-handoff separation decision is missing",
     )
+    require(
+        decisions["DEC-044"]["Status"] == "IMPLEMENTED_ECO_APPROVAL_PENDING"
+        and "MAIN-AUTH-011" in decisions["DEC-044"]["Decision"],
+        "PCB-MAIN placement-clearance ECO decision is missing",
+    )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
@@ -182,8 +187,17 @@ def validate_deliverable_register() -> None:
     deliverables = {row["ID"]: row for row in rows}
     require(deliverables["CM-002"]["QG-1 полнота"] == "PASS", "selectable-lot baseline is not QG-1 PASS")
     require(
+        deliverables["HW-M-000"]["Статус"] == "CONTROLLED_ECO_REQUIRED"
+        and deliverables["HW-M-000"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-M-000"]["QG-2 техника"] == "OPEN"
+        and "four locked placement or mounting-exclusion conflicts"
+        in deliverables["HW-M-000"]["Критерий выпуска"],
+        "PCB-MAIN mechanical authority is not held for the controlled limited ECO",
+    )
+    require(
         "zero provisional footprints and three controlled IPC candidates"
-        in deliverables["HW-M-002"]["Критерий выпуска"],
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "clearance audit is blocked" in deliverables["HW-M-002"]["Критерий выпуска"],
         "PCB-MAIN deliverable still reports a stale footprint disposition",
     )
     require(

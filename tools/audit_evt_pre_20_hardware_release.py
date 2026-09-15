@@ -151,6 +151,32 @@ def audit() -> dict[str, object]:
 
     main_status = read_json("hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json")
     main_review_b = main_status.get("review_b", {})
+    main_clearance = (
+        main_review_b.get("evidence", {}).get("placement_clearance_control", {})
+        if isinstance(main_review_b, dict) else {}
+    )
+    main_clearance_pass = (
+        isinstance(main_clearance, dict)
+        and main_clearance.get("state") == "PASS"
+        and main_clearance.get("confirmed_component_collisions") == 0
+        and main_clearance.get("screening_component_collisions") == 0
+        and main_clearance.get("confirmed_mounting_clearance_conflicts") == 0
+        and main_clearance.get("screening_mounting_clearance_conflicts") == 0
+        and main_clearance.get("locked_authority_component_conflicts") == []
+        and main_clearance.get("locked_authority_mounting_conflicts") == []
+    )
+    check(
+        "pcb_main_placement_clearance",
+        main_clearance_pass,
+        (
+            f"state={main_clearance.get('state', 'MISSING')} "
+            f"confirmed={main_clearance.get('confirmed_component_collisions', 'MISSING')} "
+            f"screening={main_clearance.get('screening_component_collisions', 'MISSING')} "
+            f"mounting_confirmed={main_clearance.get('confirmed_mounting_clearance_conflicts', 'MISSING')} "
+            f"mounting_screening={main_clearance.get('screening_mounting_clearance_conflicts', 'MISSING')}"
+        ) if isinstance(main_clearance, dict) else "MISSING",
+        "PCB-MAIN placement has unresolved courtyard/pad-envelope or mounting-exclusion conflicts",
+    )
     main_released = (
         main_status.get("manufacturing_release") is True
         and isinstance(main_review_b, dict)

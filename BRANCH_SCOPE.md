@@ -44,6 +44,10 @@
 - native-схемы PCB-MAIN и PCB-PWR прошли Review A; PCB-MAIN и PCB-PWR имеют
   только неразведённые placement-кандидаты, причём геометрия PCB-PWR остаётся
   условной до закрытия `DIM-003`;
+- PCB-MAIN placement-кандидат имеет контролируемый clearance-блокер: 17
+  подтверждённых courtyard-коллизий, 67 screening-коллизий и четыре конфликта
+  внутри механически зафиксированных пар/монтажных исключений; требуется
+  ограниченный ECO `MAIN-AUTH-011`, подписанный электрический Review A не заменён;
 - повторный PCB-MIC Review A после copper ECO подписан `PASS` по commit `e17a86bc`;
   copper-return subgate Review B принят по commit `7aeec13a`, но panelization,
   DFM, acoustic-stack, physical-EVT, общий Review B и manufacturing release открыты;

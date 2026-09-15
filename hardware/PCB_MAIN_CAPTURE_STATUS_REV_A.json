@@ -221,6 +221,40 @@
       "native_layout_candidate": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
       "layout_generator": "tools/generate_pcb_main_layout_candidate_rev_a.py",
       "layout_independent_audit": "tools/audit_pcb_main_layout_candidate_rev_a.py",
+      "placement_clearance_audit": "tools/audit_pcb_main_placement_clearance_rev_a.py",
+      "placement_clearance_record": "hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md",
+      "placement_clearance_control": {
+        "state": "BLOCKED_PLACEMENT_CLEARANCE",
+        "board_sha256": "aa35fe622b6a0761b9b25ae488e1a2c6e7160c285ab771b580f63513b83e4a22",
+        "authority_sha256": "2ea8da3b8469f616c469eb342127afd2e75b3b0ad04f3ab75154560211f353c9",
+        "assembly_footprints": 227,
+        "courtyard_footprints": 58,
+        "pad_screening_footprints": 169,
+        "confirmed_component_collisions": 17,
+        "screening_component_collisions": 67,
+        "confirmed_mounting_clearance_conflicts": 2,
+        "screening_mounting_clearance_conflicts": 1,
+        "locked_authority_component_conflicts": [
+          [
+            "J8",
+            "U8"
+          ],
+          [
+            "J_MIC1",
+            "J_PWR"
+          ]
+        ],
+        "locked_authority_mounting_conflicts": [
+          [
+            "H1",
+            "J_PWR"
+          ],
+          [
+            "H2",
+            "J13"
+          ]
+        ]
+      },
       "review_b_checklist": "hardware/reviews/PCB_MAIN_REVIEW_B_CHECKLIST_REV_A.md",
       "ra_003_calculation": "hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md",
       "ra_003_status": {

@@ -10,6 +10,11 @@ signed and contains no manufacturing release assertion.
 - Review A: `PASS`, signed by Скиф.
 - Native schematic: present; commit-matched KiCad 9 ERC evidence is PASS.
 - Native PCB: placement-stage candidate present.
+- Placement clearance: `BLOCKED`; the independent controlled audit records 17
+  confirmed courtyard collisions, 67 pad-envelope screening collisions, two
+  confirmed mounting-exclusion conflicts and one screening mounting conflict.
+- MAIN-AUTH-011 limited ECO: required for locked `J8/U8`, `J_MIC1/J_PWR`,
+  `H1/J_PWR` and `H2/J13` conflicts; no revised coordinate is approved yet.
 - Board: 110 x 75 x 1.6 mm, six copper layers, rounded R3 outline, four M3 NPTH holes.
 - Population represented: 247 on-board components plus four mounting holes; 186 native nets.
 - Routing/copper zones: absent.
@@ -28,8 +33,14 @@ signed and contains no manufacturing release assertion.
 - [x] Locked connector/module anchors and rotations match MAIN-AUTH-011.
 - [x] Six-layer count, thickness, outline and mounting pattern are represented.
 - [x] All registered manufacturer-source footprint reviews are complete; provisional and library-review-pending counts are zero.
+- [x] Placement/courtyard and mounting-exclusion blockers are independently
+  inventoried and hash-bound by `tools/audit_pcb_main_placement_clearance_rev_a.py`.
 - [ ] U9 paste stencil is adapted and approved for the selected assembly process.
 - [ ] The selected assembler approves copper, mask and stencil rules for the `U2/U25/U26` project IPC candidates.
+- [ ] A limited mechanical ECO supersedes the four internally conflicting
+  MAIN-AUTH-011 placements/exclusions and receives independent mechanical review.
+- [ ] All 169 pad-envelope screening footprints receive controlled courtyard/body
+  disposition or are placed with equivalent independently reviewed evidence.
 - [ ] Placement is collision-free and every courtyard/height/service zone passes.
 - [ ] RF, power, PDM, USB and SIM routing is complete.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.
@@ -45,4 +56,7 @@ signed and contains no manufacturing release assertion.
 ## 3. Decision
 
 `HOLD`. The candidate is a controlled starting point for placement and footprint
-qualification. Production outputs are prohibited until every unchecked item passes.
+qualification, but it is not placement-complete. The exact current blocker inventory
+and release boundary are recorded in
+`hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md`. Production outputs
+are prohibited until every unchecked item passes.

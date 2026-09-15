@@ -1680,6 +1680,7 @@ def main() -> None:
         if review_b["status"] == "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING":
             required_layout_evidence = {
                 "native_layout_candidate", "layout_generator", "layout_independent_audit",
+                "placement_clearance_audit", "placement_clearance_record",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
             require(required_layout_evidence <= set(review_b["evidence"]),
@@ -1692,6 +1693,30 @@ def main() -> None:
                         "calculation": "CLOSED", "layout": "OPEN",
                         "measurement": "OPEN", "overall": "OPEN",
                     }, "RA-003 split disposition drift")
+            placement_control = review_b["evidence"].get("placement_clearance_control")
+            require(isinstance(placement_control, dict),
+                    "placement-clearance controlled baseline is missing")
+            require(set(placement_control) == {
+                        "state", "board_sha256", "authority_sha256",
+                        "assembly_footprints", "courtyard_footprints",
+                        "pad_screening_footprints", "confirmed_component_collisions",
+                        "screening_component_collisions",
+                        "confirmed_mounting_clearance_conflicts",
+                        "screening_mounting_clearance_conflicts",
+                        "locked_authority_component_conflicts",
+                        "locked_authority_mounting_conflicts",
+                    }, "placement-clearance controlled baseline schema drift")
+            require(placement_control["state"] == "BLOCKED_PLACEMENT_CLEARANCE",
+                    "current PCB-MAIN placement must remain blocked")
+            require(placement_control["confirmed_component_collisions"] > 0 and
+                    placement_control["confirmed_mounting_clearance_conflicts"] > 0,
+                    "placement blocker counts cannot be empty while status is blocked")
+            require(placement_control["locked_authority_component_conflicts"] == [
+                        ["J8", "U8"], ["J_MIC1", "J_PWR"],
+                    ], "controlled locked component-conflict set drift")
+            require(placement_control["locked_authority_mounting_conflicts"] == [
+                        ["H1", "J_PWR"], ["H2", "J13"],
+                    ], "controlled locked mounting-conflict set drift")
     elif native_present:
         require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
                 "human Review A identity/date/SHA claimed before sign-off")
@@ -1733,9 +1758,20 @@ def main() -> None:
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
-        "native_schematic": "PRESENT_REVIEW_PENDING" if native_present else "ABSENT",
-        "review_a": "PENDING" if native_present else "BLOCKED",
-        "review_b": "BLOCKED",
+        "native_schematic": (
+            "PRESENT_REVIEW_A_PASS" if review_a["complete"] is True
+            else "PRESENT_REVIEW_PENDING" if native_present else "ABSENT"
+        ),
+        "review_a": "PASS" if review_a["complete"] is True else (
+            "PENDING" if native_present else "BLOCKED"
+        ),
+        "review_b": review_b["evidence"].get(
+            "placement_clearance_control", {}
+        ).get("state", "BLOCKED"),
+        "mechanical_authority_disposition": (
+            "CLOSED_CAPTURE_INPUT_LIMITED_MAIN_AUTH_011_ECO_REQUIRED_FOR_LAYOUT"
+            if review_a["complete"] is True else "CAPTURE_INPUT_CONTROLLED"
+        ),
         "production_bom": "BLOCKED",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -1754,11 +1790,15 @@ def main() -> None:
     print(f"- all {len(ble_rows)} U11/TP_BLE_SWD contacts, fail-closed boot/reset, independent SWD and antenna keepout inputs verified")
     print(f"- all {len(connector_fixture_rows)} connector/card/RF/tamper/fixture contacts and domain-isolation rules verified")
     print(f"- all {len(passive_support_rows)} passive/support RefDes, MPNs, populations and physical pin sets verified")
-    print(f"- all {len(mechanical_rows)} outline, placement, zone, keepout and production fixture records verified")
+    print(
+        f"- all {len(mechanical_rows)} outline, placement, zone, keepout and production "
+        "fixture records structurally verified; cross-record placement clearance is BLOCKED"
+    )
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
     print(
-        "- all 11 capture authorities closed; native schematic source is present; "
-        "Review A is signed PASS; Review B and production evidence remain blockers"
+        "- all 11 authorities remain closed as capture inputs; native schematic Review A "
+        "is signed PASS; limited MAIN-AUTH-011 mechanical ECO, Review B and production "
+        "evidence remain blockers"
     )
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
