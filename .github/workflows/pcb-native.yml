@@ -76,6 +76,7 @@ on:
       - "tools/generate_pcb_main_manufacturer_footprints_rev_a.py"
       - "tools/materialize_pcb_main_manufacturer_footprints_rev_a.py"
       - "tools/materialize_pcb_main_verified_library_footprints_rev_a.py"
+      - "tools/generate_pcb_main_layout_candidate_rev_a.py"
       - "tools/audit_pcb_main_layout_candidate_rev_a.py"
       - "tools/audit_pcb_main_placement_clearance_rev_a.py"
       - "tools/generate_pcb_main_placement_repack_rev_a.py"
