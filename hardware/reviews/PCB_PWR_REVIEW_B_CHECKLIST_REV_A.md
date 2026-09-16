@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A Review B checklist
 
-Status: `OPEN / FITTED 2D CLEARANCE AND PRE-ROUTE CONSTRAINT PASS / NOT FOR MANUFACTURE`
+Status: `OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
 
 Review B is independent from the completed pin/net Review A. This checklist is
 not signed and contains no routing, CAM or manufacturing-release assertion.
@@ -19,6 +19,10 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
   accepted, so no provisional dimension or service volume is authorized.
 - Pre-route constraint coverage: `PASS` for all 31 native nets. Numeric widths,
   copper weights, via arrays and thermal geometry remain open.
+- Stackup/copper request: internally complete for `FAB-A` and `FAB-B`; the
+  24-row response register is `0/24` accepted, `0/2` fabricator sets are
+  accepted and no construction is selected. The controlled template is
+  `PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv`.
 - Manufacturing release: `HOLD`.
 
 ## 2. Review-B gate
@@ -37,8 +41,12 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
 - [ ] `DIM-003` has all 18 attributable response rows accepted and freezes the
   board outline, mounting holes, terminal/tool zones, assembled envelope and
   PCB STEP in `PCB_PWR_DIM_003_RESPONSE_REV_A.csv`.
-- [ ] A selected fabricator accepts the four-layer dielectric construction,
-  finished thickness, copper weights and manufacturing minimums.
+- [ ] Both independent fabricators return all 24 attributable stackup/copper
+  rows, the project accepts both complete response sets, compares them and
+  selects one four-layer dielectric construction.
+- [ ] The selected fabricator construction freezes finished thickness, base and
+  finished copper, hole-wall plating, via construction, minimum rules, mask and
+  finish without silently changing the PCB source.
 - [ ] Input fault/transient envelope, fuse/TVS coordination and MOSFET SOA are
   closed against battery/BMS/MPPT evidence.
 - [ ] Numeric high-current widths, plane geometry and via arrays pass DC-drop,
@@ -68,7 +76,8 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
 ## 3. Decision
 
 `HOLD`. Fitted-body 2D clearance, constraint coverage and the internal DIM-003
-request are complete, but the response register remains `0/18`; accepted
-mechanics/service volumes, DNP/PCB-feature access, stackup, numeric copper
-geometry, routing, physical evidence, DRC, CAM, DFM and independent Review B
-are open. Production outputs remain prohibited.
+and two-fabricator stackup/copper requests are complete, but the response
+registers remain `0/18` and `0/24` with `0/2` accepted fabricator sets. Accepted
+mechanics/service volumes, DNP/PCB-feature access, selected construction,
+numeric copper geometry, routing, physical evidence, DRC, CAM, DFM and
+independent Review B are open. Production outputs remain prohibited.

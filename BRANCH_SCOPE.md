@@ -45,11 +45,12 @@
   только неразведённые placement-кандидаты, причём геометрия PCB-PWR остаётся
   условной до закрытия `DIM-003`; внутренний 18-строчный запрос готов, но
   принятие остаётся `0/18`;
-- PCB-MAIN placement-кандидат имеет контролируемый clearance-блокер: 17
-  подтверждённых courtyard-коллизий, 67 screening-коллизий и шесть конфликтов
-  внутри механически зафиксированных пар, монтажных исключений и U.FL
-  tool/service цилиндров; требуется
-  ограниченный ECO `MAIN-AUTH-011`, подписанный электрический Review A не заменён;
+- внутренний PCB-PWR stackup/copper-запрос двум фабрикам готов, но все 24 строки
+  остаются пустыми (`0/24`), принято `0/2` комплектов, конструкция не выбрана;
+- PCB-MAIN placement-кандидат после принятого ограниченного ECO и полного
+  репака проходит строгий 2D clearance: 227/227 fitted footprint имеют
+  courtyard, component/mounting/U.FL-tool конфликты равны нулю; routing, DRC,
+  STEP, CAM/DFM и Review B остаются открыты;
 - повторный PCB-MIC Review A после copper ECO подписан `PASS` по commit `e17a86bc`;
   copper-return subgate Review B принят по commit `7aeec13a`, но panelization,
   DFM, acoustic-stack, physical-EVT, общий Review B и manufacturing release открыты;

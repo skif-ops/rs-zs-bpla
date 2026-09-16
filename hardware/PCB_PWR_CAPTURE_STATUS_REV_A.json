@@ -2,7 +2,7 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-PWR",
-  "release_state": "REVIEW_A_PIN_NET_PASS_FITTED_2D_CLEARANCE_PRE_ROUTE_CONSTRAINT_AND_DIM_003_REQUEST_READY_CANDIDATE",
+  "release_state": "REVIEW_A_PIN_NET_PASS_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_COPPER_REQUESTS_READY_CANDIDATE",
   "manufacturing_release": false,
   "native_schematic": {
     "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
@@ -69,6 +69,27 @@
       "manufacturing_release": false
     }
   },
+  "stackup_copper_handoff": {
+    "request_packet": "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md",
+    "machine_contract": "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json",
+    "response_register": "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv",
+    "independent_audit": "tools/audit_pcb_pwr_stackup_copper_request_rev_a.py",
+    "control": {
+      "state": "PASS_INTERNAL_STACKUP_COPPER_REQUEST_READY_EXTERNAL_RESPONSES_PENDING",
+      "required_fabricator_slots": 2,
+      "required_response_rows": 24,
+      "accepted_fabricator_slots": 0,
+      "accepted_response_rows": 0,
+      "selected_fabricator_slot": null,
+      "complete": false,
+      "stackup_accepted": false,
+      "copper_weights_and_plating_accepted": false,
+      "numeric_power_geometry_authorized": false,
+      "routing_authorized": false,
+      "review_b_complete": false,
+      "manufacturing_release": false
+    }
+  },
   "review_a": {
     "complete": true,
     "status": "PASS_PIN_NET_ONLY"
@@ -114,17 +135,17 @@
       "trace_items": 0,
       "copper_zones": 0,
       "dim_003": "CONTROLLED_REQUEST_READY_0_OF_18_ACCEPTED_REQUIRED_BEFORE_ROUTING",
-      "numeric_power_geometry": "OPEN_FINAL_STACKUP_COPPER_THERMAL_CURRENT_DENSITY",
+      "numeric_power_geometry": "CONTROLLED_STACKUP_COPPER_REQUEST_READY_0_OF_2_FABRICATORS_ACCEPTED_THERMAL_CURRENT_DENSITY_OPEN",
       "routing_complete": false,
       "manufacturing_release": false
     }
   },
   "review_b": {
     "complete": false,
-    "status": "OPEN_FITTED_2D_CLEARANCE_AND_PRE_ROUTE_CONSTRAINT_PASS_DIM_003_REQUEST_READY_ROUTING_AND_EVIDENCE_PENDING",
+    "status": "OPEN_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_AND_EVIDENCE_PENDING",
     "blockers": [
       "DIM-003 mechanical freeze response register has 0/18 accepted rows; assembled envelope terminal zones mounting pattern and frozen PCB STEP remain open",
-      "final stack-up dielectric construction and copper-weight authority",
+      "PCB-PWR stackup/copper response register has 0/24 accepted rows across 0/2 fabricator slots; no selected construction or accepted copper/plating authority",
       "high-current Kelvin hot-loop and switch-node routing",
       "thermal current-density transient load-step cold-start and EMI evidence",
       "DFT side datum accessibility and probe-wear validation",

@@ -70,6 +70,14 @@ DFT fixture/probe access, assembled height, enclosure/thermal keep-outs, harness
 length datums and a hash-bound frozen STEP. It is an input request only; no
 provisional dimension, routing or harness cut length is released.
 
+The PCB-PWR stackup/copper request is internally complete and machine-audited,
+but it has `0/24` accepted rows across `0/2` independent fabricator slots and no
+selected construction. It requests the actual four-layer cross-section,
+material, finished thickness, base/finished copper, hole-wall plating, via and
+heavy-copper process limits, mask/finish, panel controls, net test and DFM
+traceability. This establishes a controlled external input path only; it does
+not authorize numeric current geometry, routing or fabrication.
+
 The PCB-MAIN stackup/impedance request packet is internally ready, but it has
 0/2 fabricator responses accepted and no selected construction. Its 22-row
 register is a quotation/capability input only; it is not Gerber, a purchase
@@ -95,6 +103,9 @@ rule, PnP polarity, first-article assembly, Review B or manufacturing release.
 - acceptance of all 18 PCB-PWR `DIM-003` rows in
   `PCB_PWR_DIM_003_RESPONSE_REV_A.csv`, plus the remaining enclosure, antenna,
   harness, installation and environmental mechanical inputs;
+- acceptance of both PCB-PWR stackup/copper fabricator sets in the 24-row
+  `PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv`, selection of one construction,
+  and separate current-density/DC-drop/fault/+70 °C thermal approval;
 - supplier/fabricator/assembler quotation evidence for the selected 20-station
   purchase scenario.
 

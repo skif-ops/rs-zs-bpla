@@ -109,6 +109,10 @@ jobs:
             --output artifacts/pcb_pwr_dim_003_request_rev_a.json \
             --commit-sha "$GITHUB_SHA" \
             --require-clean-source
+          python tools/audit_pcb_pwr_stackup_copper_request_rev_a.py \
+            --output artifacts/pcb_pwr_stackup_copper_request_rev_a.json \
+            --commit-sha "$GITHUB_SHA" \
+            --require-clean-source
       - name: First-pass configuration and hardware baseline validation
         run: python tools/validate_evt_pre_20.py
       - name: Cross-check locked Rev.A clock policy
@@ -185,9 +189,13 @@ jobs:
             artifacts/pcb_pwr_placement_clearance_rev_a.json
             artifacts/pcb_pwr_routing_authority_rev_a.json
             artifacts/pcb_pwr_dim_003_request_rev_a.json
+            artifacts/pcb_pwr_stackup_copper_request_rev_a.json
             hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json
             hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md
             hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json
+            hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md
+            hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv
             artifacts/pcb_main_mcu_pin_authority_rev_a.json
             artifacts/pcb_main_storage_sensor_authority_rev_a.json
             artifacts/pcb_main_audio_logic_authority_rev_a.json

@@ -202,6 +202,15 @@ def validate_decisions_and_tests() -> None:
         and "0/18" in decisions["DEC-054"]["Impact"],
         "PCB-PWR DIM-003 request/mechanical-acceptance separation decision is missing",
     )
+    require(
+        decisions["DEC-055"]["Status"] == "IMPLEMENTED_TWO_FABRICATOR_RESPONSES_PENDING"
+        and "fabricator acceptance and numeric power geometry"
+        in decisions["DEC-055"]["Decision"]
+        and "24-row" in decisions["DEC-055"]["Impact"]
+        and "two independent fabricators" in decisions["DEC-055"]["Impact"]
+        and "0/24" in decisions["DEC-055"]["Impact"],
+        "PCB-PWR stackup/copper request and numeric-geometry separation decision is missing",
+    )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
@@ -268,6 +277,17 @@ def validate_deliverable_register() -> None:
         "PCB-MAIN assembler DFM/stencil request deliverable is missing or over-released",
     )
     require(
+        deliverables["HW-P-005"]["Статус"] == "CONTROLLED_REQUEST"
+        and deliverables["HW-P-005"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-P-005"]["QG-2 техника"] == "OPEN"
+        and "two-fabricator 24-row" in deliverables["HW-P-005"]["Критерий выпуска"]
+        and "0/24 rows and 0/2 fabricator sets"
+        in deliverables["HW-P-005"]["Критерий выпуска"]
+        and "numeric power geometry routing Review B and manufacture remain blocked"
+        in deliverables["HW-P-005"]["Критерий выпуска"],
+        "PCB-PWR stackup/copper request deliverable is missing or over-released",
+    )
+    require(
         deliverables["HW-A-002"]["Статус"] == "DRAFT"
         and deliverables["HW-A-002"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-A-002"]["QG-2 техника"] == "OPEN"
@@ -300,6 +320,12 @@ def validate_deliverable_register() -> None:
     require(
         "selected EVT lot" in risks["R-018"]["Mitigation"],
         "RU868 configuration risk still assumes a fixed 20-unit build",
+    )
+    require(
+        "stackup/copper register at 0/24 and 0/2" in risks["R-027"]["Mitigation"]
+        and "fewer than 24 accepted stackup/copper responses" in risks["R-027"]["Trigger"]
+        and "fewer than 2 accepted fabricator sets" in risks["R-027"]["Trigger"],
+        "PCB-PWR stackup/copper acceptance risk is not explicit",
     )
 
 
@@ -496,6 +522,62 @@ def validate_hardware_baseline() -> None:
             for row in main_assembler_responses
         ),
         "PCB-MAIN assembler response register is not the blank 14-row blocking template",
+    )
+
+    pwr_status = json.loads(
+        (ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8")
+    )
+    require(pwr_status["assembly"] == "PCB-PWR", "PCB-PWR release-status identity mismatch")
+    require(
+        pwr_status["review_b"]["complete"] is False
+        and pwr_status["manufacturing_release"] is False,
+        "PCB-PWR was advanced by a pre-route stackup/copper request",
+    )
+    pwr_stackup = pwr_status.get("stackup_copper_handoff", {})
+    pwr_stackup_control = pwr_stackup.get("control", {})
+    require(
+        pwr_stackup_control.get("state") ==
+        "PASS_INTERNAL_STACKUP_COPPER_REQUEST_READY_EXTERNAL_RESPONSES_PENDING"
+        and pwr_stackup_control.get("required_fabricator_slots") == 2
+        and pwr_stackup_control.get("required_response_rows") == 24
+        and pwr_stackup_control.get("accepted_fabricator_slots") == 0
+        and pwr_stackup_control.get("accepted_response_rows") == 0
+        and pwr_stackup_control.get("selected_fabricator_slot") is None
+        and pwr_stackup_control.get("complete") is False,
+        "PCB-PWR stackup/copper handoff is not internally ready and externally blocked",
+    )
+    require(
+        all(pwr_stackup_control.get(key) is False for key in (
+            "stackup_accepted",
+            "copper_weights_and_plating_accepted",
+            "numeric_power_geometry_authorized",
+            "routing_authorized",
+            "review_b_complete",
+            "manufacturing_release",
+        )),
+        "PCB-PWR stackup request advanced an external, geometry, routing or release gate",
+    )
+    for relative in (
+        pwr_stackup.get("request_packet"),
+        pwr_stackup.get("machine_contract"),
+        pwr_stackup.get("response_register"),
+    ):
+        require(isinstance(relative, str) and (ROOT / relative).is_file(),
+                f"PCB-PWR stackup/copper handoff file is missing: {relative}")
+    pwr_stackup_responses = read_csv(pwr_stackup["response_register"])
+    require(
+        len(pwr_stackup_responses) == 24
+        and {row["Fabricator_Slot"] for row in pwr_stackup_responses} == {"FAB-A", "FAB-B"}
+        and all(
+            row["Required_Party"] == "FABRICATOR"
+            and row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
+            and row["Blocking"] == "YES"
+            and not any(row[field] for field in (
+                "Response_Value", "Response_Reference", "Responder", "Response_Date"
+            ))
+            for row in pwr_stackup_responses
+        ),
+        "PCB-PWR stackup/copper response register is not the blank 2 x 12 blocking template",
     )
 
     mic_status = json.loads((ROOT / "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8"))

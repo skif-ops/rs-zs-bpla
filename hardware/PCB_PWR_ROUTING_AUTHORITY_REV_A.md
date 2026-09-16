@@ -20,6 +20,12 @@ mounting pattern and terminal zones remain open under `DIM-003`.
 The internal `DIM-003` request packet is ready, but its attributable response
 register remains `0/18`; this is still an open routing prerequisite.
 
+The internal two-fabricator stackup/copper packet is also ready at
+`hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`, but
+`PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv` remains `0/24` accepted across
+`0/2` fabricator slots. It provides no selected construction, copper weight,
+plating, via or manufacturing-minimum authority.
+
 The committed board still has zero traces, zero vias and zero copper zones. The
 manifest does not guess final trace widths, copper weights, via-array counts or
 thermal geometry. Those values require the actual current envelope, DC-drop and
@@ -83,7 +89,8 @@ size and route the high-current input and output paths.
 Constraint coverage may remain PASS only while all of these are explicit:
 
 - `DIM-003` frozen outline, mounting pattern, terminal/tool zones and PCB STEP;
-- selected four-layer dielectric construction and accepted copper weights;
+- two complete attributable fabricator response sets, selected four-layer
+  dielectric construction and accepted copper/plating authority;
 - current-density, DC-drop, via-array, fault-energy and +70 °C thermal analysis;
 - routed hot loops, switch nodes, Kelvin pair, feedback pickup, rail/return
   copper and all remaining nets;

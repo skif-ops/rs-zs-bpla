@@ -94,6 +94,10 @@ final current/fault envelopes, stackup/copper weights and thermal review close.
 - Use `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv` as the 31-net PCB-PWR
   pre-route input. Freeze `DIM-003`, current/fault envelopes, stackup/copper
   weights and numeric thermal/current-density geometry before routing any copper.
+- Use `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json` and its blank
+  24-row register only to collect comparable stackup/copper inputs from two
+  fabricators. The current `0/24` and `0/2` state selects no construction and
+  authorizes no numeric power geometry, routing or fabrication.
 - Preserve the strict PCB-PWR fitted-body clearance PASS and its six-reference
   coordinate delta; repeat the audit after any placement or footprint change.
 - Freeze CubeMX pin/peripheral assignment for STM32U585VIT6Q; no unresolved AF conflicts.

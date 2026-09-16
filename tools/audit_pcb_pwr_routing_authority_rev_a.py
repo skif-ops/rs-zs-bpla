@@ -29,7 +29,10 @@ REVIEW_B = ROOT / "hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md"
 
 STATE = "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN"
 ROW_STATUS = "PRE_ROUTE_CONSTRAINT_CONTROLLED_ROUTING_NOT_COMPLETE"
-NUMERIC_GEOMETRY = "OPEN_FINAL_STACKUP_COPPER_THERMAL_CURRENT_DENSITY"
+NUMERIC_GEOMETRY = (
+    "CONTROLLED_STACKUP_COPPER_REQUEST_READY_0_OF_2_FABRICATORS_ACCEPTED_"
+    "THERMAL_CURRENT_DENSITY_OPEN"
+)
 
 FIELDS = [
     "Net_Name",
@@ -457,9 +460,10 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
 
     review_text = REVIEW_B.read_text(encoding="utf-8")
     for marker in (
-        "Status: `OPEN / FITTED 2D CLEARANCE AND PRE-ROUTE CONSTRAINT PASS / NOT FOR MANUFACTURE`",
+        "Status: `OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`",
         "- [x] All 31 native/capture nets",
         "- [ ] `DIM-003` has all 18 attributable response rows accepted",
+        "0/24",
         "- [ ] KiCad 9 DRC passes",
         "`HOLD`",
     ):

@@ -242,6 +242,59 @@ def audit() -> dict[str, object]:
         ),
     )
 
+    pwr_stackup_copper = run_json_audit(
+        "audit_pcb_pwr_stackup_copper_request_rev_a.py"
+    )
+    pwr_stackup_packet_ready = (
+        pwr_stackup_copper.get("status") ==
+        "PASS_INTERNAL_STACKUP_COPPER_REQUEST_READY_EXTERNAL_RESPONSES_PENDING"
+        and pwr_stackup_copper.get("internal_packet_complete") is True
+        and pwr_stackup_copper.get("required_fabricator_slots") == ["FAB-A", "FAB-B"]
+        and pwr_stackup_copper.get("required_response_rows") == 24
+        and pwr_stackup_copper.get("accepted_fabricator_slots") == 0
+        and pwr_stackup_copper.get("accepted_response_rows") == 0
+        and pwr_stackup_copper.get("numeric_power_geometry_authorized") is False
+        and pwr_stackup_copper.get("routing_authorized") is False
+        and pwr_stackup_copper.get("manufacturing_release") is False
+    )
+    check(
+        "pcb_pwr_stackup_copper_request_packet",
+        pwr_stackup_packet_ready,
+        str(pwr_stackup_copper.get("status", "MISSING")),
+        "PCB-PWR controlled two-fabricator stackup/copper request packet is not ready",
+    )
+    accepted_fabricator_slots = int(
+        pwr_stackup_copper.get("accepted_fabricator_slots", 0) or 0
+    )
+    accepted_stackup_rows = int(
+        pwr_stackup_copper.get("accepted_response_rows", 0) or 0
+    )
+    selected_pwr_fabricator = pwr_stackup_copper.get("selected_fabricator_slot")
+    pwr_stackup_accepted = (
+        pwr_stackup_copper.get("complete") is True
+        and accepted_fabricator_slots == 2
+        and accepted_stackup_rows == 24
+        and selected_pwr_fabricator in {"FAB-A", "FAB-B"}
+        and pwr_stackup_copper.get("stackup_accepted") is True
+        and pwr_stackup_copper.get("copper_weights_and_plating_accepted") is True
+        and pwr_stackup_copper.get("numeric_power_geometry_authorized") is True
+    )
+    check(
+        "pcb_pwr_stackup_copper_acceptance",
+        pwr_stackup_accepted,
+        (
+            f"accepted_rows={accepted_stackup_rows}/24 "
+            f"fabricators={accepted_fabricator_slots}/2 "
+            f"selected={selected_pwr_fabricator or 'NONE'}"
+        ),
+        (
+            "PCB-PWR stackup/copper acceptance remains open: "
+            f"{accepted_stackup_rows}/24 responses and "
+            f"{accepted_fabricator_slots}/2 fabricator sets accepted; "
+            f"selected construction={selected_pwr_fabricator or 'NONE'}"
+        ),
+    )
+
     harness = run_json_audit("audit_harness_manufacturing_rev_a.py")
     harness_packet_ok = (
         harness.get("status") == "PASS_CONTROLLED_PRELIMINARY_LENGTHS_OPEN"
@@ -618,6 +671,7 @@ def audit() -> dict[str, object]:
         "bom_qg2": bom_qg2,
         "pcb_layer_count_authority": layer_authority,
         "pcb_pwr_dim_003": pwr_dim_003,
+        "pcb_pwr_stackup_copper": pwr_stackup_copper,
         "harness": harness,
         "checks": checks,
     }

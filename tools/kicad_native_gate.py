@@ -38,6 +38,7 @@ PCB_MAIN_ROUTING_AUDIT = ROOT / "tools" / "audit_pcb_main_routing_authority_rev_
 PCB_PWR_CLEARANCE_AUDIT = ROOT / "tools" / "audit_pcb_pwr_placement_clearance_rev_a.py"
 PCB_PWR_ROUTING_AUDIT = ROOT / "tools" / "audit_pcb_pwr_routing_authority_rev_a.py"
 PCB_PWR_DIM_003_AUDIT = ROOT / "tools" / "audit_pcb_pwr_dim_003_request_rev_a.py"
+PCB_PWR_STACKUP_COPPER_AUDIT = ROOT / "tools" / "audit_pcb_pwr_stackup_copper_request_rev_a.py"
 PCB_MIC_STATUS = ROOT / "hardware" / "PCB_MIC_CAPTURE_STATUS_REV_A.json"
 PCB_PWR_STATUS = ROOT / "hardware" / "PCB_PWR_CAPTURE_STATUS_REV_A.json"
 PRODUCTION_BOM = ROOT / "hardware" / "EVT_PRE_20_BOM_REV_A.csv"
@@ -89,7 +90,7 @@ def placement_candidate_audit(name: str) -> str | None:
         ),
         "PCB-PWR": (
             PCB_PWR_STATUS,
-            "OPEN_FITTED_2D_CLEARANCE_AND_PRE_ROUTE_CONSTRAINT_PASS_DIM_003_REQUEST_READY_ROUTING_AND_EVIDENCE_PENDING",
+            "OPEN_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_AND_EVIDENCE_PENDING",
             "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
         ),
     }
@@ -810,6 +811,17 @@ def main() -> int:
                         )
                         report["boards"][name]["mechanical_request_state"] = \
                             dim_003_report["status"]
+                        stackup_output = ART / name / "stackup_copper_request_audit.json"
+                        run([
+                            sys.executable,
+                            str(PCB_PWR_STACKUP_COPPER_AUDIT.relative_to(ROOT)),
+                            "--output", str(stackup_output),
+                        ])
+                        stackup_report = json.loads(
+                            stackup_output.read_text(encoding="utf-8")
+                        )
+                        report["boards"][name]["stackup_copper_request_state"] = \
+                            stackup_report["status"]
                         report["boards"][name]["pcb_state"] = (
                             "FITTED_2D_CLEARANCE_AND_PRE_ROUTE_CONSTRAINT_PASS_"
                             "ROUTING_DRC_AND_FAB_EXPORT_PROHIBITED"

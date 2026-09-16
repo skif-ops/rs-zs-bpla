@@ -51,6 +51,11 @@ placement interlock: actual routing remains prohibited until `DIM-003`, the
 fabricator stackup/copper weights and numeric current-density/thermal geometry
 are accepted.
 
+The two-fabricator stackup/copper request is controlled in
+`hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`. Its blank register
+remains `0/24` rows and `0/2` accepted fabricator sets; request readiness does
+not freeze copper weights, plating, via rules or numeric geometry.
+
 Review B still requires frozen mechanics, final stack-up and copper weight; high-current and
 Kelvin routing; hot-loop and switch-node control; thermal/current-density calculation;
 TVS/fuse coordination; DRC; DFM; load-step, cold-start, fault, EMI and fixture evidence.
