@@ -144,10 +144,16 @@ SYMBOL_GEOMETRY: dict[str, tuple[tuple[float, float, float, float], dict[str, tu
         "3": (-7.62, 0.0, 0), "4": (7.62, -2.54, 180),
         "5": (7.62, 5.08, 180),
     }),
-    "DioneyaPWR:Conn_01x04": ((-6.35, 6.35, 6.35, -6.35), {
-        "1": (-8.89, 2.54, 0), "2": (8.89, 2.54, 180),
-        "3": (-8.89, -2.54, 0), "4": (8.89, -2.54, 180),
+    "DioneyaPWR:Conn_01x04": ((-10.16, 6.35, 10.16, -6.35), {
+        "1": (-12.70, 2.54, 0), "2": (12.70, 2.54, 180),
+        "3": (-12.70, -2.54, 0), "4": (12.70, -2.54, 180),
     }),
+}
+
+HIDE_PIN_NAMES = {
+    # J2 pin names are identical to the visible authoritative net labels.  Hiding
+    # the duplicate names retains pin numbers and removes twelve text collisions.
+    "DioneyaPWR:Conn_01x12",
 }
 
 
@@ -265,6 +271,8 @@ def layout_properties(instance, symbol) -> None:
 
 
 def reshape_library_symbol(symbol) -> None:
+    if symbol.libId in HIDE_PIN_NAMES:
+        symbol.pinNamesHide = True
     geometry = SYMBOL_GEOMETRY.get(symbol.libId)
     if geometry is None:
         return
@@ -309,11 +317,18 @@ def wire(start: tuple[float, float], end: tuple[float, float], token: str) -> Co
     )
 
 
-def local_label(net: str, at: tuple[float, float], angle: int, token: str) -> LocalLabel:
+def local_label(
+    net: str,
+    at: tuple[float, float],
+    angle: int,
+    token: str,
+    *,
+    hidden: bool = False,
+) -> LocalLabel:
     return LocalLabel(
         text=net,
         position=Position(X=at[0], Y=at[1], angle=angle),
-        effects=Effects(),
+        effects=Effects(font=Font(height=0.9, width=0.9), hide=hidden),
         uuid=stable_uuid(f"label:{token}"),
     )
 
@@ -323,7 +338,7 @@ def hierarchy_label(net: str, at: tuple[float, float], angle: int, token: str) -
         text=net,
         shape="passive",
         position=Position(X=at[0], Y=at[1], angle=angle),
-        effects=Effects(),
+        effects=Effects(font=Font(height=0.9, width=0.9)),
         uuid=stable_uuid(f"hier-label:{token}"),
     )
 
@@ -522,7 +537,7 @@ def make_root(flat: Schematic, sheet_nets: dict[str, set[str]]) -> Schematic:
             label_angle = 180 if outward < 0 else 0
             root.graphicalItems.append(wire(pin_at, end, f"root:{spec.key}:{pin.name}"))
             root.labels.append(local_label(
-                str(pin.name), end, label_angle, f"root:{spec.key}:{pin.name}"
+                str(pin.name), end, label_angle, f"root:{spec.key}:{pin.name}", hidden=True
             ))
 
     root.texts.append(Text(

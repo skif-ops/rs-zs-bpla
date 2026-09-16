@@ -151,6 +151,8 @@ def main() -> int:
             root.sheetInstances[0].page == "1", "root sheet-instance/page contract drift")
     require(len(root.labels) == len(root.graphicalItems) and len(root.labels) > 0,
             "root overview pins must each have one explicit wire and label")
+    require(all(item.effects.hide for item in root.labels),
+            "root connectivity labels must be hidden to avoid duplicating visible sheet-pin names")
     require(not root.globalLabels and not root.hierarchicalLabels,
             "root overview must not bypass sheet pins with global/hierarchical labels")
     require(root.paper.paperSize == "A3" and not root.paper.portrait,
@@ -185,6 +187,11 @@ def main() -> int:
                 f"{name}: review note is clipped outside the printable area")
         require(not document.schematic.globalLabels,
                 f"{name}: global labels are forbidden in bounded hierarchy")
+        require(all(not label.effects.hide
+                    for labels in (document.schematic.labels,
+                                   document.schematic.hierarchicalLabels)
+                    for label in labels),
+                f"{name}: functional pin/net labels must remain visible")
 
         root_sheet = root_sheet_by_name[name]
         instance_paths = [path for project in root_sheet.instances for path in project.paths]
@@ -302,6 +309,11 @@ def main() -> int:
     require({int(pin.position.angle or 0) % 360
              for pin in selected_pins(rsh.symbol, rsh.instance.unit or 1).values()} == {0, 180},
             "RSH1: current/Kelvin terminals must be visibly split across both sides")
+    rsh_rectangles = symbol_geometry_signature(rsh.symbol)[1]
+    require(any(abs(left - right) >= 20.32 for left, _top, right, _bottom in rsh_rectangles),
+            "RSH1: body is too narrow for distinct CURRENT/SENSE pin labels")
+    require(model.symbols["J2"].symbol.pinNamesHide,
+            "J2: duplicate connector pin names must be hidden; net labels and pin numbers remain")
 
     # Embedded functional glyphs and the project symbol library must have the
     # same pins and body rectangles.  KiCad otherwise reports lib_symbol_mismatch
