@@ -267,6 +267,17 @@ def footprint_block(source: str, ref: str) -> tuple[int, int, str]:
     raise AssertionError(f"baseline board footprint not found: {ref}")
 
 
+def footprint_geometry_block(source: str, ref: str) -> str:
+    """Return a locked footprint block without electrical net annotations.
+
+    The accepted ECO owns placement and land-pattern geometry. Later authority-
+    preserving correction of duplicate physical pad net assignments is electrical,
+    not mechanical, and is independently checked by the layout/hierarchy audits.
+    """
+    block = footprint_block(source, ref)[2]
+    return re.sub(r'\s*\(net\s+\d+\s+"(?:[^"\\]|\\.)*"\)', "", block)
+
+
 def expected_applied_board(baseline: bytes) -> bytes:
     source = baseline.decode("utf-8")
     for ref, (old_line, new_line) in BOARD_POSITION_LINES.items():
@@ -756,8 +767,8 @@ def audit(
         immediate_text = immediate_applied_board.decode("utf-8")
         live_text = live_board_path.read_text(encoding="utf-8")
         for ref in sorted(locked_refs | {"H1", "H2", "H3", "H4"}):
-            expected_block = footprint_block(immediate_text, ref)[2]
-            actual_block = footprint_block(live_text, ref)[2]
+            expected_block = footprint_geometry_block(immediate_text, ref)
+            actual_block = footprint_geometry_block(live_text, ref)
             require(actual_block == expected_block,
                     f"{ref}: accepted locked ECO geometry changed during later layout work")
         if live_board_path.read_bytes() == immediate_applied_board:

@@ -19,7 +19,7 @@
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
-    "native_board_sha256": "c61d7d279d18bf72b410011ffcc9587e9ee7b61e8afa93d29a6746ec544d4137",
+    "native_board_sha256": "855fb727cdddddedeec4fcb630fbe30321900e2108648710be696070742c111d",
     "placement_manifest": "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
     "placement_manifest_sha256": "0fe702d03af4457a3d44aae93ea6ddc539040f38546d4b09f200612627890e35",
     "u2_footprint": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Winbond_W25Q512JV_PackageF_IPC_Candidate.kicad_mod",

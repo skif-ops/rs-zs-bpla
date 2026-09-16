@@ -433,12 +433,16 @@ def main() -> int:
         set_footprint_property(fp, "DIONEA_POPULATION", component["population"])
         if component["population"] == "DNP":
             fp.SetExcludedFromPosFiles(True)
-        by_number = {pad.GetNumber(): pad for pad in fp.Pads() if pad.GetNumber()}
+        by_number: dict[str, list[pcbnew.PAD]] = {}
+        for pad in fp.Pads():
+            if pad.GetNumber():
+                by_number.setdefault(pad.GetNumber(), []).append(pad)
         if set(by_number) != set(pin_numbers):
             raise RuntimeError(f"{ref}: footprint pin mismatch {sorted(by_number)} != {sorted(pin_numbers)}")
         for number, pin in component["pins"].items():
             if pin["native"] != "NC":
-                by_number[number].SetNet(net_items[pin["native"]])
+                for pad in by_number[number]:
+                    pad.SetNet(net_items[pin["native"]])
         if fixture_position is not None:
             x, y = fixture_position; angle = 0
         elif ref in fixed:

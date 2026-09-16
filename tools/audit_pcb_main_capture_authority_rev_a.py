@@ -1532,6 +1532,48 @@ def main() -> None:
                 "native project manifest hash mismatch")
         require(native_manifest_data["generator_sha256"] == hashlib.sha256(native_generator.read_bytes()).hexdigest(),
                 "native generator manifest hash mismatch")
+        hierarchy = status.get("human_readable_hierarchy", {})
+        hierarchy_control = hierarchy.get("control", {})
+        require(
+            hierarchy.get("generator") == "tools/materialize_pcb_main_hierarchy_rev_a.py"
+            and hierarchy.get("connectivity_reader") == "tools/pcb_main_schematic_hierarchy.py"
+            and hierarchy.get("independent_audit") == "tools/audit_pcb_main_hierarchy_rev_a.py"
+            and hierarchy.get("review_record") ==
+            "hardware/reviews/PCB_MAIN_HIERARCHY_REVIEW_REV_A.md"
+            and (ROOT / hierarchy["review_record"]).is_file(),
+            "PCB-MAIN hierarchy toolchain binding drift",
+        )
+        require(
+            hierarchy_control.get("state") ==
+            "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_REVIEW_REQUIRED"
+            and hierarchy_control.get("pages") == 10
+            and hierarchy_control.get("functional_child_sheets") == 9
+            and hierarchy_control.get("symbols") == 248
+            and hierarchy_control.get("physical_symbols") == 247
+            and hierarchy_control.get("logical_pad_numbers") == 1066
+            and hierarchy_control.get("physical_pad_occurrences") == 1077
+            and hierarchy_control.get("repeated_logical_pad_numbers") == 7
+            and hierarchy_control.get("duplicate_pad_occurrences") == 11
+            and hierarchy_control.get("connected_pin_wires") == 905
+            and hierarchy_control.get("explicit_nc") == 169
+            and hierarchy_control.get("pin_net_review_a_retained") is True
+            and all(hierarchy_control.get(field) is False for field in (
+                "native_kicad_9_erc_pass", "committed_erc_evidence",
+                "committed_pdf_evidence", "independent_human_review_complete",
+                "routing_authorized", "manufacturing_release",
+            )),
+            "PCB-MAIN hierarchy review/release boundary drift",
+        )
+        hierarchy_sources = native_manifest_data.get("hierarchy_sources", [])
+        require(native_manifest_data.get("hierarchy_pages") == 10 and
+                native_manifest_data.get("hierarchy_functional_child_sheets") == 9 and
+                len(hierarchy_sources) == 10,
+                "PCB-MAIN hierarchy manifest page count drift")
+        for source in hierarchy_sources:
+            path = native_path.parent / source["path"]
+            require(path.is_file() and
+                    source["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest(),
+                    f"PCB-MAIN hierarchy source hash mismatch: {source.get('path')}")
     else:
         require(native["status"] == "ABSENT" and not native_path.exists(),
                 "native schematic filesystem/status mismatch")

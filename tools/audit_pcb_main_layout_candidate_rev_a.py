@@ -118,14 +118,25 @@ def main() -> int:
         fp = footprints[ref]
         # Unnumbered pads are permitted only as mechanical/paste features and
         # do not participate in the schematic pin contract.
-        pads = {pad.number: pad for pad in fp.pads if pad.number}
+        pads: dict[str, list[object]] = {}
+        for pad in fp.pads:
+            if pad.number:
+                pads.setdefault(pad.number, []).append(pad)
         wanted = expected[ref]["pins"]
         require(set(pads) == set(wanted), f"{ref}: pad-number set mismatch")
         for number, pin in wanted.items():
-            actual = pads[number].net.name if pads[number].net is not None else "NC"
-            require(actual == pin["native"], f"{ref}.{number}: {actual} != {pin['native']}")
+            actual = {
+                pad.net.name if pad.net is not None else "NC"
+                for pad in pads[number]
+            }
+            require(actual == {pin["native"]},
+                    f"{ref}.{number}: {sorted(actual)} != {pin['native']}")
         if len(pads) > 1:
-            positions = {(round(pad.position.X, 4), round(pad.position.Y, 4)) for pad in pads.values()}
+            positions = {
+                (round(pad.position.X, 4), round(pad.position.Y, 4))
+                for physical_pads in pads.values()
+                for pad in physical_pads
+            }
             require(len(positions) > 1, f"{ref}: all logical pads collapse onto one point")
 
     locked: dict[str, tuple[float, float, float]] = {}

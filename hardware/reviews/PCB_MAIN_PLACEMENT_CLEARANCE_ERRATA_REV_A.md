@@ -145,7 +145,7 @@ including 169 fitted and 15 DNP footprints.
 
 Controlled hashes:
 
-- native PCB SHA-256: `c61d7d279d18bf72b410011ffcc9587e9ee7b61e8afa93d29a6746ec544d4137`
+- native PCB SHA-256: `855fb727cdddddedeec4fcb630fbe30321900e2108648710be696070742c111d`
 - placement manifest SHA-256: `0fe702d03af4457a3d44aae93ea6ddc539040f38546d4b09f200612627890e35`
 - MAIN-AUTH-011 CSV SHA-256: `6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44`
 

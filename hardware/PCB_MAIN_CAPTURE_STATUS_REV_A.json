@@ -208,6 +208,60 @@
       "net_name_diff": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34515812116#artifact-evt-pre-20-kicad-native-gate:artifacts/kicad-native/PCB-MAIN/native_schematic_audit.json"
     }
   },
+  "human_readable_hierarchy": {
+    "generator": "tools/materialize_pcb_main_hierarchy_rev_a.py",
+    "connectivity_reader": "tools/pcb_main_schematic_hierarchy.py",
+    "independent_audit": "tools/audit_pcb_main_hierarchy_rev_a.py",
+    "review_record": "hardware/reviews/PCB_MAIN_HIERARCHY_REVIEW_REV_A.md",
+    "control": {
+      "state": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_REVIEW_REQUIRED",
+      "pages": 10,
+      "functional_child_sheets": 9,
+      "symbols": 248,
+      "physical_symbols": 247,
+      "logical_pad_numbers": 1066,
+      "physical_pad_occurrences": 1077,
+      "repeated_logical_pad_numbers": 7,
+      "duplicate_pad_occurrences": 11,
+      "wire_segments": 1073,
+      "connected_pin_wires": 905,
+      "explicit_nc": 169,
+      "cross_sheet_nets": 75,
+      "hierarchical_labels": 168,
+      "pin_net_semantic_sha256": "d320bdd98712a65f9736bd520a8f9197d4f53fedb4be3b798086810e7a8f4bf6",
+      "pin_net_review_a_retained": true,
+      "native_kicad_9_erc_pass": false,
+      "committed_erc_evidence": false,
+      "committed_pdf_evidence": false,
+      "independent_human_review_complete": false,
+      "routing_authorized": false,
+      "manufacturing_release": false
+    },
+    "evidence": {
+      "status": "PENDING_COMMIT_BOUND_KICAD_9_ERC_PDF_AND_HUMAN_REVIEW",
+      "source_commit_sha": null,
+      "source_tree_sha": null,
+      "pcb_native_gate_run": null,
+      "ci_run": null,
+      "artifact": null,
+      "artifact_id": null,
+      "artifact_digest": null,
+      "erc": null,
+      "schematic_pdf": null,
+      "schematic_source_sha256": null,
+      "independent_human_review": {
+        "status": "PENDING",
+        "reviewer": null,
+        "date": null,
+        "decision": null,
+        "scope": "PCB_MAIN_HUMAN_READABLE_HIERARCHY_ONLY",
+        "reviewed_source_commit_sha": null,
+        "reviewed_pdf_sha256": null
+      },
+      "routing_authorized": false,
+      "manufacturing_release": false
+    }
+  },
   "review_b": {
     "complete": false,
     "status": "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
@@ -237,7 +291,7 @@
       "mechanical_eco_candidate_status": "APPROVED_APPLIED_PLACEMENT_REPACK_PASS",
       "placement_clearance_control": {
         "state": "PASS",
-        "board_sha256": "c61d7d279d18bf72b410011ffcc9587e9ee7b61e8afa93d29a6746ec544d4137",
+        "board_sha256": "855fb727cdddddedeec4fcb630fbe30321900e2108648710be696070742c111d",
         "authority_sha256": "6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44",
         "assembly_footprints": 227,
         "courtyard_footprints": 227,
@@ -259,7 +313,7 @@
       "routing_constraint_status": "PASS_ALL_186_NETS_CLASSIFIED_FACTORY_STACKUP_AND_ROUTING_PENDING",
       "routing_constraint_control": {
         "state": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE",
-        "board_sha256": "c61d7d279d18bf72b410011ffcc9587e9ee7b61e8afa93d29a6746ec544d4137",
+        "board_sha256": "855fb727cdddddedeec4fcb630fbe30321900e2108648710be696070742c111d",
         "authority_sha256": "f77948c4837448fbc6c3d0cfd6820354a0a8cab12925457bf90768704cb9e1dc",
         "net_count": 186,
         "class_counts": {

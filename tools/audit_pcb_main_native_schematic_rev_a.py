@@ -9,14 +9,17 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from kiutils.schematic import Schematic
 from kiutils.symbol import SymbolLib
+
+from pcb_main_schematic_hierarchy import HierarchicalSchematic
 
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SCHEMATIC = ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "PCB-MAIN.kicad_sch"
 MANIFEST = DEFAULT_SCHEMATIC.parent / "PCB-MAIN_capture_manifest.json"
 GENERATOR = ROOT / "tools" / "generate_pcb_main_schematic_rev_a.py"
+HIERARCHY_MATERIALIZER = ROOT / "tools" / "materialize_pcb_main_hierarchy_rev_a.py"
+HIERARCHY_READER = ROOT / "tools" / "pcb_main_schematic_hierarchy.py"
 SYMBOL_LIBRARY = DEFAULT_SCHEMATIC.parent / "libs" / "DioneyaMain.kicad_sym"
 SYMBOL_LIBRARY_TABLE = DEFAULT_SCHEMATIC.parent / "sym-lib-table"
 FOOTPRINT_LIBRARY_TABLE = DEFAULT_SCHEMATIC.parent / "fp-lib-table"
@@ -301,7 +304,8 @@ def main() -> int:
     schematic_path = args.schematic.resolve()
 
     expected = expected_components()
-    schematic = Schematic.from_file(str(schematic_path), encoding="utf-8")
+    model = HierarchicalSchematic(schematic_path)
+    schematic = model.root.schematic
     for required in (SYMBOL_LIBRARY, SYMBOL_LIBRARY_TABLE, FOOTPRINT_LIBRARY_TABLE):
         require(required.is_file() and required.stat().st_size > 0,
                 f"missing project-local KiCad library input: {required.relative_to(ROOT)}")
@@ -309,22 +313,20 @@ def main() -> int:
     local_entries = [str(symbol.entryName) for symbol in local_symbols.symbols]
     require(len(local_entries) == len(set(local_entries)),
             "duplicate entry in project-local DioneyaMain symbol library")
-    instances = {ref_of(instance): instance for instance in schematic.schematicSymbols}
-    require("" not in instances, "native schematic contains an empty component reference")
-    require(len(instances) == len(schematic.schematicSymbols), "duplicate native component reference")
+    instances = {ref: record.instance for ref, record in model.symbols.items()}
+    symbols = {ref: record.symbol for ref, record in model.symbols.items()}
     require(set(instances) == set(expected),
             f"native component set mismatch: missing={sorted(set(expected)-set(instances))} "
             f"extra={sorted(set(instances)-set(expected))}")
-    lib_by_id = {symbol.libId: symbol for symbol in schematic.libSymbols}
-    require(len(lib_by_id) == len(schematic.libSymbols), "duplicate embedded library symbol ID")
-    require(sorted(local_entries) == sorted(str(symbol.entryName) for symbol in schematic.libSymbols),
+    embedded_entries = [
+        str(symbol.entryName)
+        for document in model.documents[1:]
+        for symbol in document.schematic.libSymbols
+    ]
+    require(len(embedded_entries) == len(set(embedded_entries)),
+            "duplicate embedded hierarchy library symbol ID")
+    require(sorted(local_entries) == sorted(embedded_entries),
             "project-local symbol library does not match embedded controlled symbols")
-
-    labels: dict[tuple[float, float], set[str]] = {}
-    for label in schematic.labels:
-        position = (round(label.position.X, 4), round(label.position.Y, 4))
-        labels.setdefault(position, set()).add(str(label.text))
-    no_connects = {(round(item.position.X, 4), round(item.position.Y, 4)) for item in schematic.noConnects}
 
     endpoint_counts: Counter[str] = Counter()
     fitted_count = 0
@@ -339,8 +341,7 @@ def main() -> int:
         for prop in instance.properties:
             require(prop.position.angle is not None,
                     f"{ref}.{prop.key}: property position is missing the KiCad rotation field")
-        require(instance.libId in lib_by_id, f"{ref}: missing embedded library symbol")
-        symbol = lib_by_id[instance.libId]
+        symbol = symbols[ref]
         native_pins = selected_pins(symbol, instance.unit or 1)
         expected_pins = component["pins"]
         require(set(native_pins) == set(expected_pins),
@@ -376,12 +377,16 @@ def main() -> int:
             native_net = expected_pin["native"]
             if native_net == "NC":
                 nc_count += 1
-                require(position in no_connects, f"{ref}.{pin_number}: NC marker missing")
-                require(not labels.get(position), f"{ref}.{pin_number}: NC pin also has net label")
+                require(model.pin_is_no_connect(ref, pin_number),
+                        f"{ref}.{pin_number}: NC marker missing")
+                require(not model.pin_nets(ref, pin_number),
+                        f"{ref}.{pin_number}: NC pin also resolves to a net")
             else:
-                require(labels.get(position, set()) == {native_net},
-                        f"{ref}.{pin_number}: expected {native_net}, got {sorted(labels.get(position, set()))}")
-                require(position not in no_connects, f"{ref}.{pin_number}: connected pin also marked NC")
+                resolved = model.pin_nets(ref, pin_number)
+                require(resolved == {native_net},
+                        f"{ref}.{pin_number}: expected {native_net}, got {sorted(resolved)}")
+                require(not model.pin_is_no_connect(ref, pin_number),
+                        f"{ref}.{pin_number}: connected pin also marked NC")
                 endpoint_counts[native_net] += 1
                 if native_net in {"GND_MODEM", "GND_DIGITAL", "GND_MIC"}:
                     ground_domains.add(native_net)
@@ -389,9 +394,24 @@ def main() -> int:
             require(len(ground_domains) <= 1,
                     f"{ref}: bridges return domains on PCB-MAIN: {sorted(ground_domains)}")
 
-    require(len(schematic.labels) == pin_count - nc_count,
-            "native schematic contains missing or extra endpoint labels")
-    require(len(schematic.noConnects) == nc_count,
+    child_label_count = sum(
+        len(document.schematic.labels)
+        + len(document.schematic.hierarchicalLabels)
+        + len(document.schematic.globalLabels)
+        for document in model.documents[1:]
+    )
+    child_wire_count = sum(
+        sum(1 for item in document.schematic.graphicalItems
+            if getattr(item, "type", None) == "wire")
+        for document in model.documents[1:]
+    )
+    child_nc_count = sum(len(document.schematic.noConnects)
+                         for document in model.documents[1:])
+    require(child_label_count == pin_count - nc_count,
+            "hierarchical schematic contains missing or extra endpoint labels")
+    require(child_wire_count == pin_count - nc_count,
+            "hierarchical schematic must contain one explicit wire per connected pin")
+    require(child_nc_count == nc_count,
             "native schematic contains missing or extra NC markers")
     require("GND" not in endpoint_counts, "unresolved generic GND remains in native schematic")
     singletons = sorted(net for net, count in endpoint_counts.items() if count < 2)
@@ -415,7 +435,26 @@ def main() -> int:
     require(manifest_inputs == expected_inputs, "capture manifest input set or hashes are stale")
     require(manifest["generator"] == str(GENERATOR.relative_to(ROOT)), "manifest generator path mismatch")
     require(manifest["generator_sha256"] == sha256(GENERATOR), "manifest generator hash mismatch")
+    require(manifest["hierarchy_materializer"] == str(HIERARCHY_MATERIALIZER.relative_to(ROOT)),
+            "manifest hierarchy materializer path mismatch")
+    require(manifest["hierarchy_materializer_sha256"] == sha256(HIERARCHY_MATERIALIZER),
+            "manifest hierarchy materializer hash mismatch")
+    require(manifest["hierarchy_connectivity_reader"] == str(HIERARCHY_READER.relative_to(ROOT)),
+            "manifest hierarchy connectivity-reader path mismatch")
+    require(manifest["hierarchy_connectivity_reader_sha256"] == sha256(HIERARCHY_READER),
+            "manifest hierarchy connectivity-reader hash mismatch")
     require(manifest["schematic_sha256"] == sha256(schematic_path), "manifest schematic hash mismatch")
+    hierarchy_sources = {
+        item["path"]: item["sha256"] for item in manifest["hierarchy_sources"]
+    }
+    actual_hierarchy_sources = {
+        document.path.name: sha256(document.path) for document in model.documents
+    }
+    require(hierarchy_sources == actual_hierarchy_sources,
+            "capture manifest hierarchy source set or hashes are stale")
+    require(manifest["hierarchy_pages"] == 10 and
+            manifest["hierarchy_functional_child_sheets"] == 9,
+            "capture manifest hierarchy page count drift")
     project = schematic_path.with_suffix(".kicad_pro")
     require(manifest["project_sha256"] == sha256(project), "manifest project hash mismatch")
     require(manifest["symbol_library_sha256"] == sha256(SYMBOL_LIBRARY),
@@ -466,8 +505,14 @@ def main() -> int:
             "capture status does not record signed Review A PASS")
     require(bool(review_a["reviewer"]) and bool(review_a["date"]) and bool(review_a["commit_sha"]),
             "signed Review A traceability is incomplete")
+    hierarchy = capture_status.get("human_readable_hierarchy", {})
+    control = hierarchy.get("control", {}) if isinstance(hierarchy, dict) else {}
+    require(control.get("pin_net_review_a_retained") is True and
+            control.get("routing_authorized") is False and
+            control.get("manufacturing_release") is False,
+            "PCB-MAIN hierarchy boundary is missing or overstates release")
     report = {
-        "status": "PASS_NATIVE_SOURCE_AND_NET_AUDIT_REVIEW_A_SIGNED_PASS",
+        "status": "PASS_NATIVE_HIERARCHICAL_SOURCE_AND_NET_AUDIT_REVIEW_A_PIN_NET_PASS_RETAINED",
         "configuration": "EVT-PRE-20 Rev.A",
         "board": "PCB-MAIN",
         "schematic": str(schematic_path.relative_to(ROOT)),
@@ -478,6 +523,9 @@ def main() -> int:
         "pins": pin_count,
         "explicit_nc": nc_count,
         "native_nets": len(endpoint_counts),
+        "hierarchy_pages": len(model.documents),
+        "functional_child_sheets": len(model.documents) - 1,
+        "explicit_pin_wires": child_wire_count,
         "ground_endpoint_counts": {
             name: endpoint_counts[name] for name in ("GND_MODEM", "GND_DIGITAL", "GND_MIC")
         },

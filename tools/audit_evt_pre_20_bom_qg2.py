@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -320,7 +321,43 @@ def main() -> int:
     native_record = main_status.get("native_schematic", {}) if isinstance(main_status, dict) else {}
     native_relative = native_record.get("path", "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch") if isinstance(native_record, dict) else "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch"
     main_native = ROOT / str(native_relative)
-    native_text = main_native.read_text(encoding="utf-8", errors="replace") if main_native.is_file() else ""
+    native_manifest: dict[str, object] = {}
+    native_source_set_ok = False
+    native_source_error = ""
+    native_sources: list[Path] = []
+    try:
+        manifest_relative = native_record.get("manifest", "")
+        manifest_path = ROOT / str(manifest_relative)
+        native_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        hierarchy_sources = native_manifest.get("hierarchy_sources", [])
+        if not isinstance(hierarchy_sources, list):
+            raise ValueError("hierarchy_sources is not a list")
+        if (native_manifest.get("hierarchy_pages") != 10 or
+                native_manifest.get("hierarchy_functional_child_sheets") != 9 or
+                len(hierarchy_sources) != 10):
+            raise ValueError("hierarchy page/source count drift")
+        for source in hierarchy_sources:
+            if not isinstance(source, dict):
+                raise ValueError("hierarchy source record is not an object")
+            relative = str(source.get("path", ""))
+            if not relative or Path(relative).name != relative:
+                raise ValueError(f"invalid hierarchy source path: {relative!r}")
+            path = main_native.parent / relative
+            if not path.is_file():
+                raise ValueError(f"missing hierarchy source: {relative}")
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            if digest != source.get("sha256"):
+                raise ValueError(f"hierarchy source hash drift: {relative}")
+            native_sources.append(path)
+        if native_sources[0] != main_native:
+            raise ValueError("hierarchy manifest root source is not PCB-MAIN.kicad_sch")
+        native_source_set_ok = True
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        native_source_error = str(exc)
+    native_text = "\n".join(
+        path.read_text(encoding="utf-8", errors="replace")
+        for path in native_sources
+    )
     pin_rows = read(ROOT / "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv")
     device_pin_rows = read(ROOT / "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv")
     audio_logic_pin_rows = read(ROOT / "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv")
@@ -362,6 +399,7 @@ def main() -> int:
     native_tokens_missing = sorted(token for token in required_native_tokens if token not in native_text)
     native_ok = (
         main_native.is_file()
+        and native_source_set_ok
         and isinstance(native_record, dict)
         and native_record.get("status") in {"PRESENT_REVIEW_PENDING", "REVIEW_A_PASS", "REVIEW_B_PASS"}
         and native_record.get("schematic_derived_bom") is True
@@ -372,10 +410,12 @@ def main() -> int:
         native_ok,
         (
             "native PCB-MAIN schematic, physical overlay/ground-domain tokens or declared "
-            "schematic-derived BOM provenance are incomplete: " + ", ".join(native_tokens_missing)
+            "schematic-derived BOM provenance are incomplete: "
+            + (native_source_error + "; " if native_source_error else "")
+            + ", ".join(native_tokens_missing)
         ) if not native_ok else (
-            "native PCB-MAIN source contains all frozen MPNs, controlled physical-net overlay, "
-            "three ground domains and schematic-derived BOM provenance"
+            "all 10 native PCB-MAIN hierarchy sources contain the frozen MPNs, controlled "
+            "physical-net overlay, three ground domains and schematic-derived BOM provenance"
         ),
     )
 

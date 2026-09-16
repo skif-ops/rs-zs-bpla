@@ -8,7 +8,12 @@ signed and contains no manufacturing release assertion.
 ## 1. Current controlled baseline
 
 - Review A: `PASS`, signed by Скиф.
-- Native schematic: present; commit-matched KiCad 9 ERC evidence is PASS.
+- Signed Review-A electrical baseline: commit-matched KiCad 9 ERC evidence is PASS.
+- Human-readable schematic hierarchy: deterministic 10-page A2 candidate present
+  (root plus nine functional sheets). Exact 248-symbol, 1,074-pin Review-A
+  semantics are retained; 905 connected pins have explicit wire stubs and all
+  169 NC pins remain explicit. Fresh commit-bound KiCad 9 ERC/PDF evidence and
+  independent `ACCEPT_HIERARCHY_ONLY` review are pending.
 - Native PCB: unrouted, 2D placement-complete engineering candidate present.
 - Placement clearance: `PASS` for the bounded 2D subgate. The deterministic
   225-reference repack and controlled passive courtyards give 227/227 fitted
@@ -48,6 +53,16 @@ signed and contains no manufacturing release assertion.
 
 - [x] Native PCB file exists and parses independently.
 - [x] Component and net sets match the reviewed schematic authority.
+- [x] Human-readable hierarchy allocates every one of 248 symbols exactly once
+  across nine functional child sheets and preserves the signed Review-A pin/net
+  semantic SHA-256.
+- [x] Every physical pad sharing one logical pad number carries the same
+  authority net; this includes all `J11.SHIELD`, `J6.SHIELD` and `J7.SHIELD`
+  solder features.
+- [ ] Fresh commit-bound KiCad 9 ERC and 10-page PDF evidence passes for the
+  hierarchy candidate.
+- [ ] Independent reviewer records `ACCEPT_HIERARCHY_ONLY` against the exact
+  source commit and PDF SHA-256; this decision does not authorize routing.
 - [x] Locked connector/module anchors and rotations match MAIN-AUTH-011.
 - [x] Six-layer count, thickness, outline and mounting pattern are represented.
 - [x] All registered manufacturer-source footprint reviews are complete; provisional and library-review-pending counts are zero.
@@ -98,8 +113,10 @@ signed and contains no manufacturing release assertion.
 ## 3. Decision
 
 `HOLD`. The candidate is 2D placement-complete and its 186-net pre-route
-constraint coverage is controlled, but it is unrouted and has not passed
-3D/service, DRC, CAM, DFM or Review B. The exact current clearance result and
+constraint coverage is controlled, but the new hierarchy still requires
+commit-bound KiCad 9 ERC/PDF evidence and independent hierarchy-only review.
+The board is unrouted and has not passed 3D/service, DRC, CAM, DFM or Review B.
+The exact current clearance result and
 release boundary are recorded in
 `hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md`; the routing input
 is recorded in `hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.md`. Production outputs

@@ -166,6 +166,69 @@ def audit() -> dict[str, object]:
         "PCB layer counts are inconsistent across native boards, BOM/RFQ or controlled authorities",
     )
 
+    main_status = read_json("hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json")
+    main_hierarchy = run_json_audit("audit_pcb_main_hierarchy_rev_a.py")
+    main_hierarchy_internal_ok = (
+        main_hierarchy.get("status") ==
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_REVIEW_REQUIRED"
+        and main_hierarchy.get("pages") == 10
+        and main_hierarchy.get("root_sheets") == 9
+        and main_hierarchy.get("symbols") == 248
+        and main_hierarchy.get("physical_symbols") == 247
+        and main_hierarchy.get("logical_pad_numbers") == 1066
+        and main_hierarchy.get("physical_pad_occurrences") == 1077
+        and main_hierarchy.get("repeated_logical_pad_numbers") == 7
+        and main_hierarchy.get("duplicate_pad_occurrences") == 11
+        and main_hierarchy.get("wire_segments") == 1073
+        and main_hierarchy.get("connected_pin_wires") == 905
+        and main_hierarchy.get("explicit_nc") == 169
+        and main_hierarchy.get("cross_sheet_nets") == 75
+        and main_hierarchy.get("hierarchical_labels") == 168
+        and main_hierarchy.get("pin_net_semantic_sha256") ==
+        "d320bdd98712a65f9736bd520a8f9197d4f53fedb4be3b798086810e7a8f4bf6"
+        and main_hierarchy.get("routing_authorized") is False
+        and main_hierarchy.get("manufacturing_release") is False
+    )
+    check(
+        "pcb_main_human_readable_hierarchy_internal_equivalence",
+        main_hierarchy_internal_ok,
+        str(main_hierarchy.get("status", "MISSING")),
+        "PCB-MAIN ten-page hierarchy or exact 247-position/1077-physical-pad net equivalence has regressed",
+    )
+    main_hierarchy_record = main_status.get("human_readable_hierarchy", {})
+    main_hierarchy_control = (
+        main_hierarchy_record.get("control", {})
+        if isinstance(main_hierarchy_record, dict)
+        else {}
+    )
+    main_hierarchy_native_evidence_complete = (
+        main_hierarchy_internal_ok
+        and isinstance(main_hierarchy_control, dict)
+        and main_hierarchy_control.get("native_kicad_9_erc_pass") is True
+        and main_hierarchy_control.get("committed_erc_evidence") is True
+        and main_hierarchy_control.get("committed_pdf_evidence") is True
+    )
+    check(
+        "pcb_main_hierarchy_native_erc_pdf_evidence",
+        main_hierarchy_native_evidence_complete,
+        "commit-bound KiCad 9 ERC/PDF evidence PASS"
+        if main_hierarchy_native_evidence_complete else
+        "commit-bound KiCad 9 ERC/PDF evidence PENDING",
+        "PCB-MAIN hierarchy still requires commit-bound KiCad 9 ERC/PDF evidence",
+    )
+    main_hierarchy_human_review_complete = (
+        main_hierarchy_native_evidence_complete
+        and main_hierarchy_control.get("independent_human_review_complete") is True
+    )
+    check(
+        "pcb_main_hierarchy_independent_human_review",
+        main_hierarchy_human_review_complete,
+        "independent human hierarchy review PASS"
+        if main_hierarchy_human_review_complete else
+        "independent human hierarchy review PENDING",
+        "PCB-MAIN hierarchy independent human acceptance remains open",
+    )
+
     pwr_status = read_json("hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json")
     pwr_hierarchy = run_json_audit("audit_pcb_pwr_hierarchy_rev_a.py")
     pwr_hierarchy_internal_ok = (
@@ -724,6 +787,7 @@ def audit() -> dict[str, object]:
         "boards": board_results,
         "bom_qg2": bom_qg2,
         "pcb_layer_count_authority": layer_authority,
+        "pcb_main_hierarchy": main_hierarchy,
         "pcb_pwr_hierarchy": pwr_hierarchy,
         "pcb_pwr_dim_003": pwr_dim_003,
         "pcb_pwr_stackup_copper": pwr_stackup_copper,

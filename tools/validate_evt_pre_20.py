@@ -430,6 +430,61 @@ def validate_hardware_baseline() -> None:
     require(main_status["review_b"]["complete"] is False
             and main_status["manufacturing_release"] is False,
             "PCB-MAIN was advanced by a pre-route stackup request")
+    main_hierarchy = main_status.get("human_readable_hierarchy", {})
+    main_hierarchy_control = main_hierarchy.get("control", {})
+    require(
+        main_hierarchy.get("generator") ==
+        "tools/materialize_pcb_main_hierarchy_rev_a.py"
+        and main_hierarchy.get("connectivity_reader") ==
+        "tools/pcb_main_schematic_hierarchy.py"
+        and main_hierarchy.get("independent_audit") ==
+        "tools/audit_pcb_main_hierarchy_rev_a.py"
+        and main_hierarchy.get("review_record") ==
+        "hardware/reviews/PCB_MAIN_HIERARCHY_REVIEW_REV_A.md"
+        and main_hierarchy_control.get("state") ==
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_REVIEW_REQUIRED"
+        and main_hierarchy_control.get("pages") == 10
+        and main_hierarchy_control.get("functional_child_sheets") == 9
+        and main_hierarchy_control.get("symbols") == 248
+        and main_hierarchy_control.get("physical_symbols") == 247
+        and main_hierarchy_control.get("logical_pad_numbers") == 1066
+        and main_hierarchy_control.get("physical_pad_occurrences") == 1077
+        and main_hierarchy_control.get("repeated_logical_pad_numbers") == 7
+        and main_hierarchy_control.get("duplicate_pad_occurrences") == 11
+        and main_hierarchy_control.get("wire_segments") == 1073
+        and main_hierarchy_control.get("connected_pin_wires") == 905
+        and main_hierarchy_control.get("explicit_nc") == 169
+        and main_hierarchy_control.get("cross_sheet_nets") == 75
+        and main_hierarchy_control.get("hierarchical_labels") == 168
+        and main_hierarchy_control.get("pin_net_semantic_sha256") ==
+        "d320bdd98712a65f9736bd520a8f9197d4f53fedb4be3b798086810e7a8f4bf6"
+        and main_hierarchy_control.get("pin_net_review_a_retained") is True,
+        "PCB-MAIN human-readable hierarchy/electrical-equivalence control has drifted",
+    )
+    require(
+        all(main_hierarchy_control.get(key) is False for key in (
+            "native_kicad_9_erc_pass",
+            "committed_erc_evidence",
+            "committed_pdf_evidence",
+            "independent_human_review_complete",
+            "routing_authorized",
+            "manufacturing_release",
+        )),
+        "PCB-MAIN hierarchy prematurely advanced an evidence, review, routing or release gate",
+    )
+    main_hierarchy_sources = [
+        ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch",
+        *(ROOT / "hardware/kicad/native/PCB-MAIN" /
+          f"PCB-MAIN_{index:02d}_{suffix}.kicad_sch"
+          for index, suffix in enumerate((
+              "POWER", "MCU", "AUDIO", "GNSS", "CELLULAR", "LORA", "BLE",
+              "STORAGE_SENSORS", "CONNECTORS_TEST",
+          ), start=1)),
+    ]
+    require(all(path.is_file() for path in main_hierarchy_sources),
+            "PCB-MAIN hierarchy source set is incomplete")
+    require((ROOT / main_hierarchy["review_record"]).is_file(),
+            "PCB-MAIN hierarchy review record is missing")
     main_handoff = main_status["review_b"].get("evidence", {}).get(
         "stackup_impedance_handoff", {}
     )

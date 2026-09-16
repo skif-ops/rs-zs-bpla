@@ -85,6 +85,9 @@ on:
       - "tools/verify_pcb_main_passive_support_authority_rev_a.py"
       - "tools/verify_pcb_main_mechanical_placement_authority_rev_a.py"
       - "tools/generate_pcb_main_schematic_rev_a.py"
+      - "tools/materialize_pcb_main_hierarchy_rev_a.py"
+      - "tools/pcb_main_schematic_hierarchy.py"
+      - "tools/audit_pcb_main_hierarchy_rev_a.py"
       - "tools/generate_pcb_main_manufacturer_footprints_rev_a.py"
       - "tools/materialize_pcb_main_manufacturer_footprints_rev_a.py"
       - "tools/materialize_pcb_main_verified_library_footprints_rev_a.py"
@@ -168,6 +171,9 @@ on:
       - "hardware/POWER_*.md"
       - "mechanics/common/OPEN_DIMENSIONS.csv"
       - "tools/*pcb*_rev_a.py"
+      - "tools/materialize_pcb_main_hierarchy_rev_a.py"
+      - "tools/pcb_main_schematic_hierarchy.py"
+      - "tools/audit_pcb_main_hierarchy_rev_a.py"
       - "tools/materialize_pcb_pwr_hierarchy_rev_a.py"
       - "tools/pcb_pwr_schematic_hierarchy.py"
       - "tools/audit_pcb_pwr_hierarchy_rev_a.py"
@@ -353,6 +359,7 @@ jobs:
       - name: Verify committed native PCB-MAIN schematic
         run: |
           test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch
+          test "$(find hardware/kicad/native/PCB-MAIN -maxdepth 1 -name 'PCB-MAIN_*.kicad_sch' -type f | wc -l)" -eq 9
           test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro
           test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json
           test -s hardware/kicad/native/PCB-MAIN/sym-lib-table
@@ -384,6 +391,9 @@ jobs:
             --schematic hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch \
             --output artifacts/kicad-native/PCB-MAIN/native_schematic_audit.json \
             --bom-output artifacts/kicad-native/PCB-MAIN/native_schematic_bom.csv
+          python tools/audit_pcb_main_hierarchy_rev_a.py \
+            --schematic hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch \
+            --output artifacts/kicad-native/PCB-MAIN/hierarchy_audit.json
       - name: Parse PCB-MAIN placement candidate and controlled footprints with KiCad 9
         run: |
           DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
@@ -593,6 +603,7 @@ jobs:
             artifacts/kicad-native/
             artifacts/kicad-reference/
             hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch
+            hardware/kicad/native/PCB-MAIN/PCB-MAIN_*.kicad_sch
             hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb
             hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro
             hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json
@@ -650,6 +661,7 @@ jobs:
             hardware/reviews/PCB_MAIN_MECHANICAL_ECO_REVIEW_COMMIT_MAPPING_REV_A.json
             hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPLICATION_REV_A.json
             hardware/reviews/PCB_MAIN_REVIEW_B_CHECKLIST_REV_A.md
+            hardware/reviews/PCB_MAIN_HIERARCHY_REVIEW_REV_A.md
             hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv
             hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md
             hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv

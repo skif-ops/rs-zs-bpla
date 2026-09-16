@@ -31,6 +31,9 @@ from kiutils.items.syitems import SyRect
 from kiutils.schematic import Schematic
 from kiutils.symbol import Symbol, SymbolLib, SymbolPin
 
+from materialize_pcb_main_hierarchy_rev_a import SHEETS as HIERARCHY_SHEETS
+from materialize_pcb_main_hierarchy_rev_a import materialize as materialize_hierarchy
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "hardware" / "kicad" / "native" / "PCB-MAIN" / "PCB-MAIN.kicad_sch"
@@ -117,6 +120,8 @@ NET_OVERLAY = ROOT / "hardware" / "PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv"
 GROUND_AUTHORITY = ROOT / "hardware" / "PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv"
 FOOTPRINT_REVIEW = ROOT / "hardware" / "reviews" / "PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv"
 IPC_CANDIDATE_AUTHORITY = ROOT / "hardware" / "PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md"
+HIERARCHY_MATERIALIZER = ROOT / "tools" / "materialize_pcb_main_hierarchy_rev_a.py"
+HIERARCHY_READER = ROOT / "tools" / "pcb_main_schematic_hierarchy.py"
 
 INPUTS = (*PIN_AUTHORITIES, SUPPORT_AUTHORITY, HARNESS_AUTHORITY, MAIN_FREEZE,
           CONNECTOR_FREEZE, CAPTURE_STATUS, MECHANICAL_AUTHORITY, NET_OVERLAY,
@@ -601,7 +606,7 @@ def project_payload() -> dict[str, object]:
     }
 
 
-def build(output: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
+def build(output: Path) -> tuple[Path, ...]:
     specs = load_component_specs()
     schematic = Schematic.create_new()
     schematic.version = "20231120"
@@ -633,6 +638,7 @@ def build(output: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
     project = output.with_suffix(".kicad_pro")
     project.write_text(json.dumps(project_payload(), indent=2) + "\n", encoding="utf-8")
     symbol_library, sym_table, fp_table = write_project_libraries(schematic, output.parent)
+    hierarchy_sources = materialize_hierarchy(output)
     manifest = output.parent / "PCB-MAIN_capture_manifest.json"
     capture_status = json.loads(CAPTURE_STATUS.read_text(encoding="utf-8"))
     review_a = capture_status["review_a"]
@@ -644,12 +650,25 @@ def build(output: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
         "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
         "generator": str(Path(__file__).relative_to(ROOT)),
         "generator_sha256": sha256(Path(__file__)),
+        "hierarchy_materializer": str(HIERARCHY_MATERIALIZER.relative_to(ROOT)),
+        "hierarchy_materializer_sha256": sha256(HIERARCHY_MATERIALIZER),
+        "hierarchy_connectivity_reader": str(HIERARCHY_READER.relative_to(ROOT)),
+        "hierarchy_connectivity_reader_sha256": sha256(HIERARCHY_READER),
         "inputs": [{"path": str(path.relative_to(ROOT)), "sha256": sha256(path)} for path in INPUTS],
         "component_count": len(specs),
         "fitted_count": sum(spec.population == "FITTED" for spec in specs),
         "dnp_count": sum(spec.population == "DNP" for spec in specs),
         "pin_count": sum(len(spec.pins) for spec in specs),
         "schematic_sha256": sha256(output),
+        "hierarchy_sources": [
+            {
+                "path": path.name,
+                "sha256": sha256(path),
+            }
+            for path in hierarchy_sources
+        ],
+        "hierarchy_pages": len(hierarchy_sources),
+        "hierarchy_functional_child_sheets": len(HIERARCHY_SHEETS),
         "project_sha256": sha256(project),
         "symbol_library_sha256": sha256(symbol_library),
         "symbol_library_table_sha256": sha256(sym_table),
@@ -658,11 +677,12 @@ def build(output: Path) -> tuple[Path, Path, Path, Path, Path, Path]:
             {"path": str(path.relative_to(ROOT)), "sha256": sha256(path)}
             for path in CONTROLLED_FOOTPRINTS
         ],
-        "review_a": "SIGNED_PASS_PER_hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
+        "review_a": "SIGNED_PIN_NET_PASS_RETAINED_BY_EXACT_HIERARCHY_EQUIVALENCE",
+        "hierarchy_review": "PENDING_COMMIT_BOUND_KICAD_9_ERC_PDF_AND_HUMAN_ACCEPTANCE",
         "review_b": "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
     }
     manifest.write_text(json.dumps(manifest_payload, indent=2) + "\n", encoding="utf-8")
-    return output, project, symbol_library, sym_table, fp_table, manifest
+    return (*hierarchy_sources, project, symbol_library, sym_table, fp_table, manifest)
 
 
 def main() -> int:
@@ -675,6 +695,7 @@ def main() -> int:
     if args.check:
         expected = (
             output,
+            *(output.parent / spec.filename for spec in HIERARCHY_SHEETS),
             output.with_suffix(".kicad_pro"),
             output.parent / "libs" / "DioneyaMain.kicad_sym",
             output.parent / "sym-lib-table",
@@ -693,7 +714,10 @@ def main() -> int:
 
     generated = build(output)
     for path in generated:
-        print(path.relative_to(ROOT))
+        try:
+            print(path.relative_to(ROOT))
+        except ValueError:
+            print(path)
     return 0
 
 
