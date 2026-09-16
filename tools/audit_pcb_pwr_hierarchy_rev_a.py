@@ -9,6 +9,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from kiutils.board import Board
+from kiutils.symbol import SymbolLib
 
 from pcb_pwr_schematic_hierarchy import (
     HierarchicalSchematic,
@@ -22,6 +23,8 @@ from pcb_pwr_schematic_hierarchy import (
 ROOT = Path(__file__).resolve().parents[1]
 PCB = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
+SYMBOL_LIBRARY = ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.kicad_sym"
+GRID_MM = 2.54
 
 EXPECTED_SHEETS = {
     "Input protection and monitor": {
@@ -75,6 +78,35 @@ def root_pin_net(model: HierarchicalSchematic, sheet, pin) -> set[str]:
     return model.connectivity[model.root.path].nets_at(at)
 
 
+def on_grid(value: float, grid: float = GRID_MM) -> bool:
+    return abs(float(value) / grid - round(float(value) / grid)) < 1e-6
+
+
+def symbol_geometry_signature(symbol) -> tuple:
+    pins = tuple(sorted(
+        (
+            str(number), str(pin.name), str(pin.electricalType), str(pin.graphicalStyle),
+            round(float(pin.position.X), 4), round(float(pin.position.Y), 4),
+            int(pin.position.angle or 0) % 360, round(float(pin.length), 4),
+        )
+        for number, pin in selected_pins(symbol).items()
+    ))
+    rectangles = []
+
+    def visit(node) -> None:
+        for item in getattr(node, "graphicItems", []):
+            if item.__class__.__name__ == "SyRect":
+                rectangles.append((
+                    round(float(item.start.X), 4), round(float(item.start.Y), 4),
+                    round(float(item.end.X), 4), round(float(item.end.Y), 4),
+                ))
+        for child in getattr(node, "units", []):
+            visit(child)
+
+    visit(symbol)
+    return pins, tuple(sorted(rectangles))
+
+
 def segments_intersect(a, b, c, d) -> bool:
     """Conservative intersection check for the generated axis-aligned stubs."""
     def between(value, left, right) -> bool:
@@ -121,6 +153,10 @@ def main() -> int:
             "root overview pins must each have one explicit wire and label")
     require(not root.globalLabels and not root.hierarchicalLabels,
             "root overview must not bypass sheet pins with global/hierarchical labels")
+    require(root.paper.paperSize == "A3" and not root.paper.portrait,
+            "root overview must use the controlled A3 landscape review page")
+    require(root.texts and all(100.0 <= float(item.position.X) <= 320.0 for item in root.texts),
+            "root review note is not centered inside the printable area")
 
     document_by_name = {item.sheet_name: item for item in model.documents[1:]}
     require(set(document_by_name) == set(EXPECTED_SHEETS),
@@ -141,6 +177,12 @@ def main() -> int:
                 f"{name}: hierarchy/review title control missing")
         require(document.schematic.texts and document.schematic.graphicalItems,
                 f"{name}: readable note or explicit wires missing")
+        require(document.schematic.paper.paperSize == "A3" and
+                not document.schematic.paper.portrait,
+                f"{name}: child sheet must use the controlled A3 landscape review page")
+        require(all(100.0 <= float(item.position.X) <= 320.0
+                    for item in document.schematic.texts),
+                f"{name}: review note is clipped outside the printable area")
         require(not document.schematic.globalLabels,
                 f"{name}: global labels are forbidden in bounded hierarchy")
 
@@ -152,9 +194,25 @@ def main() -> int:
         child_hier_names = {str(label.text) for label in document.schematic.hierarchicalLabels}
         require(root_pin_names == child_hier_names,
                 f"{name}: root pins and child hierarchical labels differ")
+        sheet_left = round(float(root_sheet.position.X), 4)
+        sheet_right = round(sheet_left + float(root_sheet.width), 4)
+        pin_y = []
         for pin in root_sheet.pins:
+            x = round(float(pin.position.X), 4)
+            y = round(float(pin.position.Y), 4)
+            angle = int(pin.position.angle or 0) % 360
+            require(x in {sheet_left, sheet_right},
+                    f"{name}.{pin.name}: sheet pin is not on a vertical sheet edge")
+            expected_angle = 180 if x == sheet_left else 0
+            require(angle == expected_angle,
+                    f"{name}.{pin.name}: KiCad sheet-pin orientation {angle} would move "
+                    f"the electrical endpoint to the opposite edge (expected {expected_angle})")
+            require(on_grid(y), f"{name}.{pin.name}: sheet pin is off the 2.54 mm review grid")
+            pin_y.append(y)
             require(root_pin_net(model, root_sheet, pin) == {str(pin.name)},
                     f"{name}.{pin.name}: root sheet pin is not explicitly wired/labeled")
+        require(len(pin_y) == len(set(pin_y)),
+                f"{name}: opposite-side sheet pins share a Y coordinate and could hide a side swap")
 
         label_positions = {
             point(label.position.X, label.position.Y)
@@ -179,6 +237,15 @@ def main() -> int:
                         f"{ref}.{number}: label remains directly on pin; explicit wire stub required")
                 if nets:
                     connected_pin_count += 1
+            visible = {item.key: item for item in record.instance.properties
+                       if item.key in {"Reference", "Value"}}
+            require(set(visible) == {"Reference", "Value"} and
+                    all(not item.effects.hide for item in visible.values()),
+                    f"{ref}: review reference/value visibility drift")
+            require(all(12.7 <= float(item.position.X) <= 407.3 and
+                        12.7 <= float(item.position.Y) <= 284.3
+                        for item in visible.values()),
+                    f"{ref}: visible property is outside the A3 printable review area")
         wire_count = sum(1 for item in document.schematic.graphicalItems
                          if getattr(item, "type", None) == "wire")
         require(wire_count == connected_pin_count,
@@ -235,6 +302,24 @@ def main() -> int:
     require({int(pin.position.angle or 0) % 360
              for pin in selected_pins(rsh.symbol, rsh.instance.unit or 1).values()} == {0, 180},
             "RSH1: current/Kelvin terminals must be visibly split across both sides")
+
+    # Embedded functional glyphs and the project symbol library must have the
+    # same pins and body rectangles.  KiCad otherwise reports lib_symbol_mismatch
+    # even if the schematic-level electrical audit happens to pass.
+    external_library = SymbolLib.from_file(str(SYMBOL_LIBRARY), encoding="utf-8")
+    external_symbols = {str(item.entryName): item for item in external_library.symbols}
+    checked_library_entries = set()
+    for record in model.symbols.values():
+        if record.instance.libraryNickname != "DioneyaPWR":
+            continue
+        entry = str(record.instance.entryName)
+        require(entry in external_symbols, f"{entry}: project symbol library entry missing")
+        require(symbol_geometry_signature(record.symbol) ==
+                symbol_geometry_signature(external_symbols[entry]),
+                f"{entry}: embedded/project-library symbol geometry mismatch")
+        checked_library_entries.add(entry)
+    require(checked_library_entries,
+            "no DioneyaPWR embedded/project-library symbol geometry was checked")
 
     # Independent electrical equivalence: every physical schematic pin equals every PCB pad net.
     board = Board.from_file(str(PCB), encoding="utf-8")

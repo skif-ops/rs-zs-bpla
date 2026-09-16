@@ -15,6 +15,8 @@ from pathlib import Path
 from kiutils.schematic import Schematic
 from kiutils.symbol import SymbolLib
 
+from materialize_pcb_pwr_hierarchy_rev_a import reshape_library_symbol
+
 UNRESOLVED_FOOTPRINT_REFS: set[str] = set()
 
 CONTROLLED_FOOTPRINTS = {
@@ -107,6 +109,7 @@ def export_custom_symbols(schematic: Schematic, connector_lib: Path, output: Pat
     combined.symbols = []
     for symbol in custom:
         exported = copy.deepcopy(symbol)
+        reshape_library_symbol(exported)
         exported.libraryNickname = None
         verify_unit_names(exported)
         combined.symbols.append(exported)

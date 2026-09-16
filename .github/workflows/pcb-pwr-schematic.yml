@@ -176,12 +176,17 @@ jobs:
           print("PCB-PWR controlled footprints KiCad 9 native parse: PASS")
           PY
 
-      - name: KiCad ERC and PDF
+      - name: KiCad ERC
         run: |
           mkdir -p artifacts/kicad-native/PCB-PWR
           kicad-cli sch erc --format json --severity-all --exit-code-violations \
             -o artifacts/kicad-native/PCB-PWR/erc.json \
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+
+      - name: KiCad PDF
+        if: always()
+        run: |
+          mkdir -p artifacts/kicad-native/PCB-PWR
           kicad-cli sch export pdf \
             -o artifacts/kicad-native/PCB-PWR/PCB-PWR_schematic.pdf \
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch

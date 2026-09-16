@@ -19,7 +19,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
-from kiutils.items.common import Effects, Position, Property, TitleBlock
+from kiutils.items.common import Effects, Font, Position, Property, TitleBlock
 from kiutils.items.schitems import (
     Connection,
     HierarchicalLabel,
@@ -42,7 +42,11 @@ from pcb_pwr_schematic_hierarchy import endpoint, property_value, ref_of, select
 NAMESPACE = uuid.UUID("a8ab3f2c-21cf-41de-8639-8b1e11b6bf09")
 ROOT_UUID = str(uuid.uuid5(NAMESPACE, "PCB-PWR:root"))
 PROJECT = "PCB-PWR"
-STUB_MM = 2.54
+PAGE_SIZE = "A3"
+GRID_MM = 2.54
+STUB_MM = 7.62
+PAGE_ORIGIN = (30.48, 38.10)
+PAGE_SCALE = 1.5
 
 
 @dataclass(frozen=True)
@@ -67,8 +71,8 @@ SHEETS = (
             "RSH1", "U2", "C2", "TP1", "TP2", "TP3", "TP8", "TP9",
             "TP10", "#FLG01", "#FLG02",
         }),
-        (17.78, 35.56),
-        (66.04, 88.90),
+        (40.64, 50.80),
+        (91.44, 152.40),
     ),
     SheetSpec(
         "modem",
@@ -79,8 +83,8 @@ SHEETS = (
             "U3", "L1", "C3", "C4", "C11", "C14", "C15", "C16",
             "R1", "R2", "R3", "R4", "R5", "R6", "R15", "TP4", "TP5",
         }),
-        (101.60, 25.40),
-        (71.12, 66.04),
+        (157.48, 38.10),
+        (91.44, 71.12),
     ),
     SheetSpec(
         "digital",
@@ -92,8 +96,8 @@ SHEETS = (
             "R7", "R8", "R9", "R10", "R12", "R13", "R14", "TP6",
             "#FLG03",
         }),
-        (101.60, 111.76),
-        (71.12, 66.04),
+        (157.48, 132.08),
+        (91.44, 71.12),
     ),
     SheetSpec(
         "harness",
@@ -101,8 +105,8 @@ SHEETS = (
         "PCB-PWR_04_AUX_HARNESS.kicad_sch",
         "5",
         frozenset({"U5", "C7", "C8", "R11", "NT1", "NT2", "NT3", "J2", "TP7"}),
-        (193.04, 50.80),
-        (76.20, 101.60),
+        (274.32, 50.80),
+        (96.52, 152.40),
     ),
 )
 
@@ -234,6 +238,32 @@ def set_position(instance, x: float, y: float) -> None:
         )
 
 
+def review_position(position: tuple[float, float]) -> tuple[float, float]:
+    """Expand the former A4 placement onto an A3 review grid."""
+    x, y = position
+    return (
+        round(PAGE_ORIGIN[0] + (x - 25.40) * PAGE_SCALE, 4),
+        round(PAGE_ORIGIN[1] + (y - 35.56) * PAGE_SCALE, 4),
+    )
+
+
+def layout_properties(instance, symbol) -> None:
+    """Keep visible reference/value fields clear of pins and their net stubs."""
+    pins = selected_pins(symbol, instance.unit or 1).values()
+    vertical_extent = max((abs(float(pin.position.Y)) for pin in pins), default=2.54)
+    clearance = vertical_extent + STUB_MM + 2.54
+    x = float(instance.position.X)
+    y = float(instance.position.Y)
+    for item in instance.properties:
+        if item.key == "Reference":
+            item.position = Position(X=x, Y=round(y - clearance, 4), angle=0)
+        elif item.key == "Value":
+            item.position = Position(X=x, Y=round(y + clearance, 4), angle=0)
+        if item.key in {"Reference", "Value"}:
+            item.effects.font = Font(height=0.85, width=0.85)
+            item.effects.hide = False
+
+
 def reshape_library_symbol(symbol) -> None:
     geometry = SYMBOL_GEOMETRY.get(symbol.libId)
     if geometry is None:
@@ -325,6 +355,8 @@ def make_child(
     child.generator = "dioneya-pcb-pwr-hierarchy"
     child.uuid = stable_uuid(f"file:{spec.filename}")
     child.paper = copy.deepcopy(flat.paper)
+    child.paper.paperSize = PAGE_SIZE
+    child.paper.portrait = False
     child.titleBlock = title_block(
         f"Dioneya EVT-PRE-20 PCB-PWR Rev.A - {spec.name}",
         f"Functional sheet {spec.page} of 5",
@@ -346,7 +378,7 @@ def make_child(
 
     for ref in sorted(spec.refs):
         instance = copy.deepcopy(flat_instances[ref])
-        target = SCHEMATIC_POSITIONS[ref]
+        target = review_position(SCHEMATIC_POSITIONS[ref])
         set_position(instance, *target)
         instance.uuid = stable_uuid(f"symbol:{ref}")
         instance.pins = {
@@ -364,6 +396,7 @@ def make_child(
         child.schematicSymbols.append(instance)
 
         symbol = libraries[instance.libId]
+        layout_properties(instance, symbol)
         for number, pin in selected_pins(symbol, instance.unit or 1).items():
             pin_at = endpoint(instance, symbol, number)
             if (ref, number) in nc_pins:
@@ -384,11 +417,34 @@ def make_child(
     child.texts.append(Text(
         text=("Explicit wire stubs expose every reviewed pin/net connection. "
               "Hierarchical labels are the only cross-sheet connections."),
-        position=Position(X=20.32, Y=20.32, angle=0),
-        effects=Effects(),
+        position=Position(X=210.0, Y=20.32, angle=0),
+        effects=Effects(font=Font(height=1.2, width=1.2)),
         uuid=stable_uuid(f"note:{spec.key}"),
     ))
     return child
+
+
+def pin_grid_indices(
+    height: float,
+    count: int,
+    side: str,
+    avoid: set[int] | None = None,
+) -> list[int]:
+    units = int(round(height / GRID_MM))
+    shift = 0 if side == "left" else max(1, units // 20)
+    unavailable = set(avoid or ())
+    result = []
+    for index in range(count):
+        grid_index = int(round((index + 1) * units / (count + 1))) + shift
+        grid_index = min(grid_index, units - 2)
+        while grid_index in unavailable or grid_index in result:
+            grid_index += 1
+            require(grid_index <= units - 2,
+                    "hierarchical pin grid cannot avoid an opposite-side Y collision")
+        require(grid_index > 1, "hierarchical pin escaped the sheet review area")
+        result.append(grid_index)
+    require(len(result) == len(set(result)), "hierarchical pin grid collapsed")
+    return result
 
 
 def make_sheet(spec: SheetSpec, cross_nets: set[str], sheet_uuid: str) -> HierarchicalSheet:
@@ -419,17 +475,23 @@ def make_sheet(spec: SheetSpec, cross_nets: set[str], sheet_uuid: str) -> Hierar
     names = sorted(cross_nets)
     left = names[::2]
     right = names[1::2]
+    left_indices = pin_grid_indices(height, len(left), "left")
+    right_indices = pin_grid_indices(height, len(right), "right", set(left_indices))
     for side, items in (("left", left), ("right", right)):
-        spacing = height / (len(items) + 1)
-        for index, net in enumerate(items, start=1):
+        grid_indices = left_indices if side == "left" else right_indices
+        for grid_index, net in zip(grid_indices, items):
             pin_x = x if side == "left" else x + width
-            pin_y = round(y + index * spacing, 4)
-            angle = 0 if side == "left" else 180
+            pin_y = round(y + grid_index * GRID_MM, 4)
+            # KiCad sheet-pin orientation points into the sheet: 180 degrees on
+            # the left edge and 0 degrees on the right edge.  Reversing these
+            # angles makes KiCad relocate the electrical endpoint to the
+            # opposite edge even though the serialized coordinate is unchanged.
+            angle = 180 if side == "left" else 0
             sheet.pins.append(HierarchicalPin(
                 name=net,
                 connectionType="passive",
                 position=Position(X=pin_x, Y=pin_y, angle=angle),
-                effects=Effects(),
+                effects=Effects(font=Font(height=0.9, width=0.9)),
                 uuid=stable_uuid(f"sheet-pin:{spec.key}:{net}"),
             ))
     return sheet
@@ -441,6 +503,8 @@ def make_root(flat: Schematic, sheet_nets: dict[str, set[str]]) -> Schematic:
     root.generator = "dioneya-pcb-pwr-hierarchy"
     root.uuid = ROOT_UUID
     root.paper = copy.deepcopy(flat.paper)
+    root.paper.paperSize = PAGE_SIZE
+    root.paper.portrait = False
     root.titleBlock = title_block(
         "Dioneya EVT-PRE-20 PCB-PWR Rev.A - System overview",
         "Root sheet 1 of 5",
@@ -453,7 +517,7 @@ def make_root(flat: Schematic, sheet_nets: dict[str, set[str]]) -> Schematic:
         root.sheets.append(sheet)
         for pin in sheet.pins:
             pin_at = (round(pin.position.X, 4), round(pin.position.Y, 4))
-            outward = -STUB_MM if int(pin.position.angle or 0) == 0 else STUB_MM
+            outward = -STUB_MM if int(pin.position.angle or 0) == 180 else STUB_MM
             end = (round(pin_at[0] + outward, 4), pin_at[1])
             label_angle = 180 if outward < 0 else 0
             root.graphicalItems.append(wire(pin_at, end, f"root:{spec.key}:{pin.name}"))
@@ -464,8 +528,8 @@ def make_root(flat: Schematic, sheet_nets: dict[str, set[str]]) -> Schematic:
     root.texts.append(Text(
         text=("Functional hierarchy for independent electrical review. "
               "PCB routing, DIM-003, stackup/copper, DRC and Review B remain open."),
-        position=Position(X=17.78, Y=17.78, angle=0),
-        effects=Effects(),
+        position=Position(X=210.0, Y=20.32, angle=0),
+        effects=Effects(font=Font(height=1.2, width=1.2)),
         uuid=stable_uuid("note:root"),
     ))
     return root
