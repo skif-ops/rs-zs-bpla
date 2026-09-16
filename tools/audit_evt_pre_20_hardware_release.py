@@ -170,7 +170,7 @@ def audit() -> dict[str, object]:
     main_hierarchy = run_json_audit("audit_pcb_main_hierarchy_rev_a.py")
     main_hierarchy_internal_ok = (
         main_hierarchy.get("status") ==
-        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_REVIEW_REQUIRED"
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE"
         and main_hierarchy.get("pages") == 10
         and main_hierarchy.get("root_sheets") == 9
         and main_hierarchy.get("symbols") == 248

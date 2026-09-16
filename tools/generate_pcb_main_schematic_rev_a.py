@@ -678,8 +678,8 @@ def build(output: Path) -> tuple[Path, ...]:
             for path in CONTROLLED_FOOTPRINTS
         ],
         "review_a": "SIGNED_PIN_NET_PASS_RETAINED_BY_EXACT_HIERARCHY_EQUIVALENCE",
-        "hierarchy_review": "PENDING_COMMIT_BOUND_KICAD_9_ERC_PDF_AND_HUMAN_ACCEPTANCE",
-        "review_b": "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
+        "hierarchy_review": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
+        "review_b": "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
     }
     manifest.write_text(json.dumps(manifest_payload, indent=2) + "\n", encoding="utf-8")
     return (*hierarchy_sources, project, symbol_library, sym_table, fp_table, manifest)

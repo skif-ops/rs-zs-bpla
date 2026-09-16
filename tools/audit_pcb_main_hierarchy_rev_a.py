@@ -376,7 +376,8 @@ def main() -> int:
             "PCB-MAIN status does not bind the hierarchy toolchain")
     control = hierarchy.get("control", {})
     expected_control = {
-        "state": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_REVIEW_REQUIRED",
+        "state": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_"
+                 "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
         "pages": 10,
         "functional_child_sheets": 9,
         "symbols": 248,
@@ -392,43 +393,96 @@ def main() -> int:
         "hierarchical_labels": 168,
         "pin_net_semantic_sha256": semantic_sha256,
         "pin_net_review_a_retained": True,
-        "native_kicad_9_erc_pass": False,
-        "committed_erc_evidence": False,
-        "committed_pdf_evidence": False,
-        "independent_human_review_complete": False,
+        "native_kicad_9_erc_pass": True,
+        "committed_erc_evidence": True,
+        "committed_pdf_evidence": True,
+        "independent_human_review_complete": True,
         "routing_authorized": False,
         "manufacturing_release": False,
     }
     require(control == expected_control,
             f"PCB-MAIN hierarchy control drift: {control!r} != {expected_control!r}")
     evidence = hierarchy.get("evidence", {})
-    require(evidence == {
-        "status": "PENDING_COMMIT_BOUND_KICAD_9_ERC_PDF_AND_HUMAN_REVIEW",
-        "source_commit_sha": None,
-        "source_tree_sha": None,
-        "pcb_native_gate_run": None,
-        "ci_run": None,
-        "artifact": None,
-        "artifact_id": None,
-        "artifact_digest": None,
-        "erc": None,
-        "schematic_pdf": None,
-        "schematic_source_sha256": None,
-        "independent_human_review": {
-            "status": "PENDING",
-            "reviewer": None,
-            "date": None,
-            "decision": None,
-            "scope": "PCB_MAIN_HUMAN_READABLE_HIERARCHY_ONLY",
-            "reviewed_source_commit_sha": None,
-            "reviewed_pdf_sha256": None,
-        },
+    require(isinstance(evidence, dict) and evidence.get("status") ==
+            "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
+            "PCB-MAIN hierarchy evidence status drift")
+    for key, expected in {
+        "source_commit_sha": "9aceca9531f0b9c18679bee1a8050ae7cd94308a",
+        "source_tree_sha": "f77848562f0f2c0ff4965ff8474b582cf49b6885",
+        "pcb_native_gate_run":
+        "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35136239933",
+        "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35136240003",
+        "artifact":
+        "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35136239933/artifacts/10462359549",
+        "artifact_id": 10462359549,
+        "artifact_digest":
+        "sha256:8839e26a79f17da3deb342e9e4c5009f4b7eb365a0f04c4cb526f7e5051bc697",
         "routing_authorized": False,
         "manufacturing_release": False,
-    }, "PCB-MAIN hierarchy pending-evidence record drift")
+    }.items():
+        require(evidence.get(key) == expected,
+                f"PCB-MAIN hierarchy evidence {key} drift: "
+                f"{evidence.get(key)!r} != {expected!r}")
+    require(evidence.get("erc") == {
+        "path": "artifacts/kicad-native/PCB-MAIN/erc.json",
+        "sha256": "d4dc32aa136be917106a4211734ec9ff0e5db903a268a30b4cd4babb004df5c8",
+        "kicad_version": "9.0.9",
+        "sheets": 10,
+        "violations": 0,
+    }, "PCB-MAIN commit-bound ERC evidence drift")
+    require(evidence.get("schematic_pdf") == {
+        "path": "artifacts/kicad-native/PCB-MAIN/PCB-MAIN_schematic.pdf",
+        "sha256": "7e6ef20a989ec66c55b3e1a32de0a914b9e37a6e70cc5835d36f3260b65ff8d9",
+        "pages": 10,
+        "page_size": "A2",
+        "orientation": "landscape",
+        "visual_preflight":
+        "PASS_ORDERED_1_TO_10_NO_CLIPPING_NO_VISIBLE_DUPLICATE_ROOT_LABELS",
+    }, "PCB-MAIN commit-bound PDF evidence drift")
+    expected_source_sha256 = {
+        "PCB-MAIN.kicad_sch":
+        "810a3aa16d88e4179cf84a7bfbfd9c29d1a5d95066a75a6e2517f4d1d30a0918",
+        "PCB-MAIN_01_POWER.kicad_sch":
+        "4c163f8c88b42a4ffd35e4b6cb27acd32753c1fa2004acb194084997c8de51c0",
+        "PCB-MAIN_02_MCU.kicad_sch":
+        "e2f13a507e66a9658d65dc628897db0eb824d46216fcefe7f7f8e8b153d8e405",
+        "PCB-MAIN_03_AUDIO.kicad_sch":
+        "e359b46850186940efd914460eaefa8e6f292d0cddaae91ad92ae1f99d5c2516",
+        "PCB-MAIN_04_GNSS.kicad_sch":
+        "0741780507d2c4b5907d8ab0b00807eb2b1ecb2becf899e6246d3a4787b1e38c",
+        "PCB-MAIN_05_CELLULAR.kicad_sch":
+        "b944b2ae8eed85e9436577e62beac1e0fdd6a6831dcc292f2e2bf37058bdecd4",
+        "PCB-MAIN_06_LORA.kicad_sch":
+        "733c2996581794b49eb7061019c9136c53476750a251e0499e37a849a05db155",
+        "PCB-MAIN_07_BLE.kicad_sch":
+        "af66b777d65d86645893dd1966b6980045a2c444b9d06e6979bc676cfb72f7fd",
+        "PCB-MAIN_08_STORAGE_SENSORS.kicad_sch":
+        "24a76c439aa3f7ad22b3f2b761d8458b852b190ea62169647ab0d150a00260aa",
+        "PCB-MAIN_09_CONNECTORS_TEST.kicad_sch":
+        "fe24ad6ccc93310acd2bede9d9f5839bfa825a857bef9e9319ec1b6ef3ec658d",
+    }
+    require(evidence.get("schematic_source_sha256") == expected_source_sha256,
+            "PCB-MAIN hierarchy evidence source-hash register drift")
+    for filename, expected_sha256 in expected_source_sha256.items():
+        path = args.schematic.parent / filename
+        actual_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+        require(actual_sha256 == expected_sha256,
+                f"PCB-MAIN hierarchy evidence source drift: {filename} "
+                f"{actual_sha256} != {expected_sha256}")
+    require(evidence.get("independent_human_review") == {
+        "status": "ACCEPTED_INDEPENDENT_HUMAN_REVIEW",
+        "reviewer": "Скиф",
+        "date": "2026-09-16",
+        "decision": "ACCEPT_HIERARCHY_ONLY",
+        "scope": "PCB_MAIN_HUMAN_READABLE_HIERARCHY_ONLY",
+        "reviewed_source_commit_sha":
+        "9aceca9531f0b9c18679bee1a8050ae7cd94308a",
+        "reviewed_pdf_sha256":
+        "7e6ef20a989ec66c55b3e1a32de0a914b9e37a6e70cc5835d36f3260b65ff8d9",
+    }, "PCB-MAIN hierarchy human-review acceptance record drift")
 
     report = {
-        "status": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_REVIEW_REQUIRED",
+        "status": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE",
         "root_sheets": 9,
         "pages": 10,
         "pdf_page_order": [str(page) for page in range(1, 11)],
@@ -445,9 +499,9 @@ def main() -> int:
         "cross_sheet_nets": 75,
         "hierarchical_labels": 168,
         "pin_net_semantic_sha256": semantic_sha256,
-        "erc_native_kicad_9": "PENDING_COMMIT_BOUND_RUN",
-        "hierarchy_pdf_evidence": "PENDING_COMMIT_BOUND_VISUAL_PREFLIGHT",
-        "hierarchy_human_review": "PENDING_ACCEPT_HIERARCHY_ONLY",
+        "erc_native_kicad_9": "PASS_COMMIT_BOUND_ZERO_VIOLATIONS",
+        "hierarchy_pdf_evidence": "PASS_COMMIT_BOUND_TEN_PAGE_A2_VISUAL_PREFLIGHT",
+        "hierarchy_human_review": "ACCEPTED_SKIF_ACCEPT_HIERARCHY_ONLY",
         "routing_authorized": False,
         "manufacturing_release": False,
     }

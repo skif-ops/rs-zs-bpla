@@ -1,9 +1,10 @@
 # PCB-MAIN Rev.A Review B checklist
 
-Status: `OPEN / LAYOUT ENGINEERING CANDIDATE / NOT FOR MANUFACTURE`
+Status: `HIERARCHY ACCEPTED / REVIEW B OPEN / LAYOUT ENGINEERING CANDIDATE / NOT FOR MANUFACTURE`
 
 Review B is independent from the signed Review A. This record is intentionally not
-signed and contains no manufacturing release assertion.
+signed for Review B; only its bounded hierarchy subgate is signed, and it contains
+no routing or manufacturing-release assertion.
 
 ## 1. Current controlled baseline
 
@@ -12,8 +13,12 @@ signed and contains no manufacturing release assertion.
 - Human-readable schematic hierarchy: deterministic 10-page A2 candidate present
   (root plus nine functional sheets). Exact 248-symbol, 1,074-pin Review-A
   semantics are retained; 905 connected pins have explicit wire stubs and all
-  169 NC pins remain explicit. Fresh commit-bound KiCad 9 ERC/PDF evidence and
-  independent `ACCEPT_HIERARCHY_ONLY` review are pending.
+  169 NC pins remain explicit. Commit-bound KiCad 9.0.9 ERC reports zero
+  violations across all ten sheets; the ordered ten-page PDF and source hashes
+  are bound to commit `9aceca9531f0b9c18679bee1a8050ae7cd94308a`.
+  Reviewer `Скиф` accepted this bounded subgate on `2026-09-16` with decision
+  `ACCEPT_HIERARCHY_ONLY` against PDF SHA-256
+  `7e6ef20a989ec66c55b3e1a32de0a914b9e37a6e70cc5835d36f3260b65ff8d9`.
 - Native PCB: unrouted, 2D placement-complete engineering candidate present.
 - Placement clearance: `PASS` for the bounded 2D subgate. The deterministic
   225-reference repack and controlled passive courtyards give 227/227 fitted
@@ -59,10 +64,11 @@ signed and contains no manufacturing release assertion.
 - [x] Every physical pad sharing one logical pad number carries the same
   authority net; this includes all `J11.SHIELD`, `J6.SHIELD` and `J7.SHIELD`
   solder features.
-- [ ] Fresh commit-bound KiCad 9 ERC and 10-page PDF evidence passes for the
-  hierarchy candidate.
-- [ ] Independent reviewer records `ACCEPT_HIERARCHY_ONLY` against the exact
-  source commit and PDF SHA-256; this decision does not authorize routing.
+- [x] Commit-bound KiCad 9 ERC has zero violations, and the ordered 10-page A2
+  PDF, source tree and artifact are SHA-256 bound to the reviewed commit.
+- [x] Independent reviewer `Скиф` recorded `ACCEPT_HIERARCHY_ONLY` on
+  `2026-09-16` against the exact source commit and PDF SHA-256; routing remains
+  unauthorized.
 - [x] Locked connector/module anchors and rotations match MAIN-AUTH-011.
 - [x] Six-layer count, thickness, outline and mounting pattern are represented.
 - [x] All registered manufacturer-source footprint reviews are complete; provisional and library-review-pending counts are zero.
@@ -108,14 +114,17 @@ signed and contains no manufacturing release assertion.
 - [ ] Factory stackup and DFM response are accepted; blocker/critical comments are closed.
 - [ ] RA-003-LAYOUT is closed with routed-board evidence.
 - [ ] RA-003-MEAS is closed with physical droop/ripple evidence from assembled hardware.
-- [ ] Reviewer, date and reviewed commit SHA are recorded in a separate signing commit.
+- [ ] Final Review-B reviewer, date and reviewed routed-board commit SHA are
+  recorded in a separate signing commit.
 
 ## 3. Decision
 
-`HOLD`. The candidate is 2D placement-complete and its 186-net pre-route
-constraint coverage is controlled, but the new hierarchy still requires
-commit-bound KiCad 9 ERC/PDF evidence and independent hierarchy-only review.
-The board is unrouted and has not passed 3D/service, DRC, CAM, DFM or Review B.
+`HOLD`. Reviewer `Скиф` accepted the hierarchy-only subgate on `2026-09-16`
+for source commit `9aceca9531f0b9c18679bee1a8050ae7cd94308a` and PDF SHA-256
+`7e6ef20a989ec66c55b3e1a32de0a914b9e37a6e70cc5835d36f3260b65ff8d9`.
+The candidate is 2D placement-complete and its 186-net pre-route constraint
+coverage is controlled, but the board is unrouted and has not passed 3D/service,
+DRC, CAM, DFM or Review B.
 The exact current clearance result and
 release boundary are recorded in
 `hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md`; the routing input

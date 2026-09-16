@@ -1545,7 +1545,8 @@ def main() -> None:
         )
         require(
             hierarchy_control.get("state") ==
-            "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_REVIEW_REQUIRED"
+            "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_"
+            "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
             and hierarchy_control.get("pages") == 10
             and hierarchy_control.get("functional_child_sheets") == 9
             and hierarchy_control.get("symbols") == 248
@@ -1557,9 +1558,11 @@ def main() -> None:
             and hierarchy_control.get("connected_pin_wires") == 905
             and hierarchy_control.get("explicit_nc") == 169
             and hierarchy_control.get("pin_net_review_a_retained") is True
-            and all(hierarchy_control.get(field) is False for field in (
+            and all(hierarchy_control.get(field) is True for field in (
                 "native_kicad_9_erc_pass", "committed_erc_evidence",
                 "committed_pdf_evidence", "independent_human_review_complete",
+            ))
+            and all(hierarchy_control.get(field) is False for field in (
                 "routing_authorized", "manufacturing_release",
             )),
             "PCB-MAIN hierarchy review/release boundary drift",
@@ -1693,6 +1696,7 @@ def main() -> None:
                     "OPEN_LAYOUT_AND_EVIDENCE_PENDING",
                     "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
                     "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
                 },
                 "Review B must be open but incomplete after Review A PASS")
     else:
@@ -1723,6 +1727,7 @@ def main() -> None:
         if review_b["status"] in {
                 "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
                 "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
         }:
             required_layout_evidence = {
                 "native_layout_candidate", "layout_generator", "layout_independent_audit",
@@ -1732,8 +1737,10 @@ def main() -> None:
                 "mechanical_eco_approval_record", "mechanical_eco_review_commit_mapping",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
-            if review_b["status"] == \
-                    "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING":
+            if review_b["status"] in {
+                    "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
+            }:
                 required_layout_evidence |= {
                     "placement_repack_manifest", "placement_repack_generator",
                     "passive_courtyard_rule", "placement_repack_status",

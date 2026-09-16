@@ -562,7 +562,7 @@ def materialize(schematic_path: Path) -> tuple[Path, ...]:
     print(f"PCB-MAIN hierarchy materialized: root + {len(SHEETS)} functional sheets")
     print(f"symbols={child_symbol_count} child_wires={child_wire_count} "
           f"cross_nets={len(cross_nets)} hierarchical_labels={child_hier_count}")
-    print("exact pin/net authority retained; native KiCad ERC/PDF and human hierarchy review remain required")
+    print("exact pin/net authority retained; routing, Review B and manufacture remain prohibited")
     return (schematic_path, *children)
 
 

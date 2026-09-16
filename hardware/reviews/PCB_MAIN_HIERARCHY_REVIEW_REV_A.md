@@ -1,6 +1,6 @@
 # PCB-MAIN Rev.A human-readable hierarchy review
 
-Status: `CANDIDATE / COMMIT-BOUND KICAD 9 EVIDENCE AND HUMAN REVIEW PENDING`
+Status: `ACCEPTED HIERARCHY ONLY / NOT FOR ROUTING OR MANUFACTURE`
 
 ## 1. Scope
 
@@ -24,6 +24,23 @@ Permitted reviewer decision: `ACCEPT_HIERARCHY_ONLY` or `REJECT_HIERARCHY`.
 - Total controlled wire segments: 1,073.
 - Pin/net semantic SHA-256:
   `d320bdd98712a65f9736bd520a8f9197d4f53fedb4be3b798086810e7a8f4bf6`.
+- Reviewed source commit:
+  `9aceca9531f0b9c18679bee1a8050ae7cd94308a` (tree
+  `f77848562f0f2c0ff4965ff8474b582cf49b6885`).
+- PCB Native Gate
+  [#35136239933](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35136239933):
+  KiCad `9.0.9`, zero ERC violations on all 10 sheets. Evidence artifact
+  [10462359549](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35136239933/artifacts/10462359549),
+  ZIP SHA-256
+  `8839e26a79f17da3deb342e9e4c5009f4b7eb365a0f04c4cb526f7e5051bc697`.
+- ERC JSON SHA-256:
+  `d4dc32aa136be917106a4211734ec9ff0e5db903a268a30b4cd4babb004df5c8`.
+- Ten-page A2 landscape PDF SHA-256:
+  `7e6ef20a989ec66c55b3e1a32de0a914b9e37a6e70cc5835d36f3260b65ff8d9`;
+  pages `1/10` through `10/10` were visually checked in order with no clipping
+  or visible duplicate root labels.
+- CI [#35136240003](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35136240003):
+  `PASS` for the reviewed source commit.
 - Routing authorized: `false`.
 - Manufacturing release: `false`.
 
@@ -49,22 +66,26 @@ Permitted reviewer decision: `ACCEPT_HIERARCHY_ONLY` or `REJECT_HIERARCHY`.
 - [x] Exact schematic-to-PCB pad/net comparison for every physical pad, including
   all 11 duplicated shell solder occurrences.
 - [x] Release boundary keeps routing and manufacture prohibited.
-- [ ] Commit-bound KiCad 9 ERC: zero violations.
-- [ ] Commit-bound 10-page schematic PDF archived and visually inspected.
-- [ ] Source commit SHA and PDF SHA-256 recorded.
-- [ ] Independent human hierarchy decision recorded.
+- [x] Commit-bound KiCad 9 ERC: zero violations on all 10 sheets.
+- [x] Commit-bound 10-page A2 schematic PDF archived and visually inspected.
+- [x] Source commit SHA, tree SHA, artifact digest, ERC SHA-256 and PDF SHA-256 recorded.
+- [x] Independent human hierarchy decision recorded.
 
 ## 5. Human review
 
-Reviewer: `PENDING`
+Reviewer: `Скиф`
 
-Date: `PENDING`
+Date: `2026-09-16`
 
-Source commit SHA: `PENDING`
+Source commit SHA: `9aceca9531f0b9c18679bee1a8050ae7cd94308a`
 
-Reviewed PDF SHA-256: `PENDING`
+Reviewed PDF SHA-256: `7e6ef20a989ec66c55b3e1a32de0a914b9e37a6e70cc5835d36f3260b65ff8d9`
 
-Decision: `PENDING`
+Decision: `ACCEPT_HIERARCHY_ONLY`
+
+The decision accepts only the human-readable hierarchy and its exact electrical
+equivalence to the retained Review-A pin/net authority. It does not authorize
+routing, fabrication, assembly, Review B or manufacturing release.
 
 ## 6. Retained blockers
 

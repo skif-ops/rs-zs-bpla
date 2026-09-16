@@ -3,9 +3,9 @@
   "board": "PCB-MAIN",
   "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "bc5d7c91694a5d91532c0ba039cc1804118b3b407f876fc3ff74f05ae10dec46",
+  "generator_sha256": "bc5b9f9ecff7abe8777adad844daf8cb94ad75c069677b63239b45942a2f6a73",
   "hierarchy_materializer": "tools/materialize_pcb_main_hierarchy_rev_a.py",
-  "hierarchy_materializer_sha256": "924be216559f7ebd24b2183228a3d50d17394db069a83f4423cd2686b7e72838",
+  "hierarchy_materializer_sha256": "0c04a3d07878ac613679175504fb1bc9e66303ed4d2190436655792ba0c5122b",
   "hierarchy_connectivity_reader": "tools/pcb_main_schematic_hierarchy.py",
   "hierarchy_connectivity_reader_sha256": "3d02a528b55239292ef760e5df7b3b619111da099f27eca5dc1964723cb5421f",
   "inputs": [
@@ -63,7 +63,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "0dc2dd0e1528c0d0d25cc8207630d9a5f16193f8fda83835f73a15a24aec4f17"
+      "sha256": "2b8b486c9927c79f089ede951804c731718ad62747489e28a26005cbf444f01f"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -258,6 +258,6 @@
     }
   ],
   "review_a": "SIGNED_PIN_NET_PASS_RETAINED_BY_EXACT_HIERARCHY_EQUIVALENCE",
-  "hierarchy_review": "PENDING_COMMIT_BOUND_KICAD_9_ERC_PDF_AND_HUMAN_ACCEPTANCE",
-  "review_b": "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING"
+  "hierarchy_review": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
+  "review_b": "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING"
 }

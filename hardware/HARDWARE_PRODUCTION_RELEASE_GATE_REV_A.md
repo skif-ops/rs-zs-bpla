@@ -41,6 +41,13 @@ U.FL tool-zone conflicts. This is engineering progress only; the unrouted board
 has no copper zones and still requires routed-board DRC, 3D/service evidence,
 CAM, DFM and independent Review B.
 
+PCB-MAIN also has an accepted human-readable hierarchy-only subgate. Source
+commit `9aceca9531f0b9c18679bee1a8050ae7cd94308a` has commit-bound KiCad 9.0.9
+ERC with zero violations, an ordered ten-page A2 PDF and exact electrical
+equivalence to all 247 physical symbols and 1,077 physical pad occurrences.
+Reviewer `Скиф` recorded `ACCEPT_HIERARCHY_ONLY` on `2026-09-16`. This does not
+authorize routing, fabrication, assembly, Review B or manufacturing release.
+
 PCB-MAIN also has explicit pre-route constraint coverage for all 186 native
 nets. The independent audit enforces disjoint route classes, ground-domain
 references, four USB differential-pair segments, seven 50-ohm RF nets and the
@@ -63,8 +70,10 @@ current monitoring, 3V8 modem power, 3V3 digital power, and 1V8/harness interfac
 The independent hierarchy audit finds 63 symbols, 185 explicit wire segments,
 9 cross-sheet nets, 26 hierarchical labels, no cross-net wire collision and exact
 pad/net equivalence to all 60 PCB footprints. This retains the signed pin/net
-authority only; repeat native KiCad 9 ERC/PDF evidence and independent human
-hierarchy review remain blocking before routing.
+authority only. Repeat native KiCad 9 ERC/PDF evidence and independent human
+hierarchy review were accepted on `2026-09-16` for source commit
+`2a973f6856aa115aa59323d619be985578780682`. Routing and manufacturing release
+remain blocked by the separate open gates below.
 
 PCB-PWR has also passed its bounded fitted-body 2D placement-clearance subgate.
 All 42 simultaneously fitted footprints have controlled courtyards, the required
@@ -115,9 +124,6 @@ rule, PnP polarity, first-article assembly, Review B or manufacturing release.
 - acceptance of both PCB-PWR stackup/copper fabricator sets in the 24-row
   `PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv`, selection of one construction,
   and separate current-density/DC-drop/fault/+70 °C thermal approval;
-- repeat KiCad 9 zero-violation ERC and committed five-page schematic PDF/JSON
-  evidence for PCB-PWR, plus independent human acceptance of the functional
-  hierarchy;
 - supplier/fabricator/assembler quotation evidence for the selected 20-station
   purchase scenario.
 

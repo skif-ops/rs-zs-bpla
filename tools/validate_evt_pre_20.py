@@ -442,7 +442,8 @@ def validate_hardware_baseline() -> None:
         and main_hierarchy.get("review_record") ==
         "hardware/reviews/PCB_MAIN_HIERARCHY_REVIEW_REV_A.md"
         and main_hierarchy_control.get("state") ==
-        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_REVIEW_REQUIRED"
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_"
+        "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
         and main_hierarchy_control.get("pages") == 10
         and main_hierarchy_control.get("functional_child_sheets") == 9
         and main_hierarchy_control.get("symbols") == 248
@@ -462,15 +463,17 @@ def validate_hardware_baseline() -> None:
         "PCB-MAIN human-readable hierarchy/electrical-equivalence control has drifted",
     )
     require(
-        all(main_hierarchy_control.get(key) is False for key in (
+        all(main_hierarchy_control.get(key) is True for key in (
             "native_kicad_9_erc_pass",
             "committed_erc_evidence",
             "committed_pdf_evidence",
             "independent_human_review_complete",
+        ))
+        and all(main_hierarchy_control.get(key) is False for key in (
             "routing_authorized",
             "manufacturing_release",
         )),
-        "PCB-MAIN hierarchy prematurely advanced an evidence, review, routing or release gate",
+        "PCB-MAIN hierarchy evidence, review, routing or release state has drifted",
     )
     main_hierarchy_sources = [
         ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch",

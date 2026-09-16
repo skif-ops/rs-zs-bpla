@@ -85,7 +85,7 @@ def placement_candidate_audit(name: str) -> str | None:
     controls = {
         "PCB-MAIN": (
             PCB_MAIN_STATUS,
-            "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
+            "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
             "tools/audit_pcb_main_layout_candidate_rev_a.py",
         ),
         "PCB-PWR": (
