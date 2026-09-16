@@ -45,6 +45,7 @@ PROJECT = "PCB-PWR"
 PAGE_SIZE = "A3"
 GRID_MM = 2.54
 STUB_MM = 7.62
+ROOT_LABEL_FONT_MM = 0.01
 PAGE_ORIGIN = (30.48, 38.10)
 PAGE_SCALE = 1.5
 
@@ -324,11 +325,12 @@ def local_label(
     token: str,
     *,
     hidden: bool = False,
+    font_size: float = 0.9,
 ) -> LocalLabel:
     return LocalLabel(
         text=net,
         position=Position(X=at[0], Y=at[1], angle=angle),
-        effects=Effects(font=Font(height=0.9, width=0.9), hide=hidden),
+        effects=Effects(font=Font(height=font_size, width=font_size), hide=hidden),
         uuid=stable_uuid(f"label:{token}"),
     )
 
@@ -536,8 +538,13 @@ def make_root(flat: Schematic, sheet_nets: dict[str, set[str]]) -> Schematic:
             end = (round(pin_at[0] + outward, 4), pin_at[1])
             label_angle = 180 if outward < 0 else 0
             root.graphicalItems.append(wire(pin_at, end, f"root:{spec.key}:{pin.name}"))
+            # KiCad 9's PDF plotter emits local-label text even when its `hide`
+            # flag is set.  Keep the label as the machine-auditable electrical
+            # net authority, while making that duplicate text sub-print.  The
+            # visible 0.9 mm sheet-pin name remains the human-facing net name.
             root.labels.append(local_label(
-                str(pin.name), end, label_angle, f"root:{spec.key}:{pin.name}", hidden=True
+                str(pin.name), end, label_angle, f"root:{spec.key}:{pin.name}",
+                hidden=True, font_size=ROOT_LABEL_FONT_MM,
             ))
 
     root.texts.append(Text(

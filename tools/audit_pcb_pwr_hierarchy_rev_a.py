@@ -25,6 +25,7 @@ PCB = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 SYMBOL_LIBRARY = ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.kicad_sym"
 GRID_MM = 2.54
+ROOT_LABEL_FONT_MAX_MM = 0.02
 
 EXPECTED_SHEETS = {
     "Input protection and monitor": {
@@ -153,6 +154,10 @@ def main() -> int:
             "root overview pins must each have one explicit wire and label")
     require(all(item.effects.hide for item in root.labels),
             "root connectivity labels must be hidden to avoid duplicating visible sheet-pin names")
+    require(all(float(item.effects.font.height) <= ROOT_LABEL_FONT_MAX_MM and
+                float(item.effects.font.width) <= ROOT_LABEL_FONT_MAX_MM
+                for item in root.labels),
+            "root connectivity labels must remain sub-print because KiCad 9 plots hidden labels")
     require(not root.globalLabels and not root.hierarchicalLabels,
             "root overview must not bypass sheet pins with global/hierarchical labels")
     require(root.paper.paperSize == "A3" and not root.paper.portrait,
