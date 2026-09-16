@@ -1,9 +1,10 @@
 # PCB-PWR Rev.A Review B checklist
 
-Status: `OPEN / HUMAN-READABLE HIERARCHY INTERNAL EQUIVALENCE, FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
+Status: `HIERARCHY ACCEPTED / REVIEW B OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
 
 Review B is independent from the completed pin/net Review A. This checklist is
-not signed and contains no routing, CAM or manufacturing-release assertion.
+signed only for the bounded hierarchy subgate and contains no routing, CAM or
+manufacturing-release assertion.
 
 ## 1. Current controlled baseline
 
@@ -14,9 +15,14 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
   9 cross-sheet nets and 26 hierarchical labels. The independently calculated
   pin/net semantic SHA-256 is
   `fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a`.
-- Repeat native KiCad 9 ERC/PDF evidence for the five-page hierarchy and the
-  independent human hierarchy review are open. The earlier flat-sheet ERC does
-  not close these new representation checks.
+- Commit-bound native KiCad 9.0.9 evidence for source commit
+  `2a973f6856aa115aa59323d619be985578780682` is `PASS`: Schematic Gate
+  [#35122481138](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35122481138)
+  reports zero violations across all five sheets, and its A3 landscape PDF has
+  five unclipped pages with no visible duplicate root labels. The evidence ZIP,
+  ERC JSON and PDF are SHA-256 bound in `PCB_PWR_CAPTURE_STATUS_REV_A.json`.
+  Reviewer `Скиф` accepted this bounded hierarchy subgate on `2026-09-16` with
+  decision `ACCEPT_HIERARCHY_ONLY`.
 - Native PCB: provisional 90 x 60 x 1.6 mm, four copper layers, 60 footprints,
   zero mounting holes, zero traces/vias/zones.
 - Fitted-body 2D clearance: `PASS`; 42/42 fitted footprints have courtyards,
@@ -49,9 +55,12 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
   explicit without invented final geometry.
 - [x] I²C remains 100 kHz initially with authoritative pull-ups on PCB-MAIN and
   PCB-PWR pull-up footprints DNP.
-- [ ] KiCad 9 opens the complete root plus four child sheets, repeat ERC has zero
-  violations, the exported five-page PDF and JSON ERC report are committed and
-  hash-bound, and an independent human reviewer accepts the functional drawing.
+- [x] KiCad 9 opens the complete root plus four child sheets, repeat ERC has zero
+  violations, and the exported five-page PDF and JSON ERC report are commit-bound
+  and SHA-256 bound to source commit `2a973f6856aa115aa59323d619be985578780682`.
+- [x] Independent reviewer `Скиф` accepted the functional five-page drawing on
+  `2026-09-16` with decision `ACCEPT_HIERARCHY_ONLY`; routing and manufacture
+  remain unauthorized.
 - [ ] `DIM-003` has all 18 attributable response rows accepted and freezes the
   board outline, mounting holes, terminal/tool zones, assembled envelope and
   PCB STEP in `PCB_PWR_DIM_003_RESPONSE_REV_A.csv`.
@@ -89,11 +98,13 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
 
 ## 3. Decision
 
-`HOLD`. The internal human-readable hierarchy and exact electrical-equivalence
-subgate pass, as do fitted-body 2D clearance, constraint coverage and the internal
-DIM-003 and two-fabricator stackup/copper requests. Repeat native KiCad 9 ERC/PDF
-evidence and independent human hierarchy review remain open; the response
-registers also remain `0/18` and `0/24` with `0/2` accepted fabricator sets.
+`HOLD`. Reviewer `Скиф` accepted the human-readable hierarchy-only subgate on
+`2026-09-16` for source commit `2a973f6856aa115aa59323d619be985578780682`
+and PDF SHA-256 `7a1eee774d6a0dd03e6cb72935824f5a7d2af4bebe0e37ad739f61eb8d32a1f4`.
+Exact electrical equivalence and commit-bound KiCad 9 ERC/PDF evidence pass, as do
+fitted-body 2D clearance, constraint coverage and the internal DIM-003 and
+two-fabricator stackup/copper requests. The response registers remain `0/18` and
+`0/24` with `0/2` accepted fabricator sets.
 Accepted mechanics/service volumes, DNP/PCB-feature access, selected construction,
 numeric copper geometry, routing, physical evidence, DRC, CAM, DFM and independent
 Review B are open. Production outputs remain prohibited.

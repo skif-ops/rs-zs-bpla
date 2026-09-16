@@ -197,27 +197,28 @@ def audit() -> dict[str, object]:
         if isinstance(pwr_hierarchy_record, dict)
         else {}
     )
-    pwr_hierarchy_review_complete = (
+    pwr_hierarchy_native_evidence_complete = (
         pwr_hierarchy_internal_ok
         and isinstance(pwr_hierarchy_control, dict)
         and pwr_hierarchy_control.get("native_kicad_9_erc_pass") is True
         and pwr_hierarchy_control.get("committed_erc_evidence") is True
         and pwr_hierarchy_control.get("committed_pdf_evidence") is True
+    )
+    check(
+        "pcb_pwr_hierarchy_native_erc_pdf_evidence",
+        pwr_hierarchy_native_evidence_complete,
+        "commit-bound KiCad 9 ERC/PDF evidence PASS",
+        "PCB-PWR hierarchy still requires commit-bound KiCad 9 ERC/PDF evidence",
+    )
+    pwr_hierarchy_human_review_complete = (
+        pwr_hierarchy_native_evidence_complete
         and pwr_hierarchy_control.get("independent_human_review_complete") is True
     )
     check(
-        "pcb_pwr_hierarchy_native_erc_pdf_and_human_review",
-        pwr_hierarchy_review_complete,
-        (
-            "native_erc={native} committed_erc={erc} committed_pdf={pdf} "
-            "human_review={human}"
-        ).format(
-            native=pwr_hierarchy_control.get("native_kicad_9_erc_pass", False),
-            erc=pwr_hierarchy_control.get("committed_erc_evidence", False),
-            pdf=pwr_hierarchy_control.get("committed_pdf_evidence", False),
-            human=pwr_hierarchy_control.get("independent_human_review_complete", False),
-        ),
-        "PCB-PWR hierarchy still requires committed KiCad 9 ERC/PDF evidence and independent human review",
+        "pcb_pwr_hierarchy_independent_human_review",
+        pwr_hierarchy_human_review_complete,
+        "independent human hierarchy review PASS",
+        "PCB-PWR hierarchy independent human acceptance remains open",
     )
 
     pwr_clearance = run_json_audit("audit_pcb_pwr_placement_clearance_rev_a.py")

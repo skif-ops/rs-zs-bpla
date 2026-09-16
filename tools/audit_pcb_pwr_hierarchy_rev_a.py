@@ -375,9 +375,10 @@ def main() -> int:
         "cross_sheet_nets": len(cross_nets),
         "hierarchical_labels": total_hier_labels,
         "pin_net_semantic_sha256": semantic_sha256,
-        "erc_native_kicad_9": "REQUIRED_SEPARATE_GATE",
+        "erc_native_kicad_9": "PASS_COMMIT_BOUND_ZERO_VIOLATIONS",
+        "hierarchy_pdf_evidence": "PASS_COMMIT_BOUND_FIVE_PAGE_A3_VISUAL_PREFLIGHT",
         "pin_net_review_a": "RETAINED_BY_EXACT_ELECTRICAL_EQUIVALENCE",
-        "hierarchy_human_review": "REQUIRED_BEFORE_ROUTING",
+        "hierarchy_human_review": "ACCEPTED_SKIF_ACCEPT_HIERARCHY_ONLY",
         "manufacturing_release": False,
     }
     status = json.loads(STATUS.read_text(encoding="utf-8"))
@@ -397,18 +398,76 @@ def main() -> int:
         "hierarchical_labels": 26,
         "pin_net_semantic_sha256": semantic_sha256,
         "pin_net_review_a_retained": True,
-        "native_kicad_9_erc_pass": False,
-        "committed_erc_evidence": False,
-        "committed_pdf_evidence": False,
-        "independent_human_review_complete": False,
+        "native_kicad_9_erc_pass": True,
+        "committed_erc_evidence": True,
+        "committed_pdf_evidence": True,
+        "independent_human_review_complete": True,
         "routing_authorized": False,
         "manufacturing_release": False,
     }.items():
         require(control.get(key) == expected,
                 f"PCB-PWR hierarchy status {key} drift: {control.get(key)!r} != {expected!r}")
     require(control.get("state") ==
-            "PASS_INTERNAL_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_NATIVE_KICAD_9_AND_HUMAN_REVIEW_PENDING",
+            "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
             "PCB-PWR hierarchy control state drift")
+    evidence = hierarchy.get("evidence", {})
+    require(isinstance(evidence, dict) and evidence.get("status") ==
+            "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
+            "PCB-PWR hierarchy evidence status drift")
+    for key, expected in {
+        "source_commit_sha": "2a973f6856aa115aa59323d619be985578780682",
+        "source_tree_sha": "c8cd8272c0ebe50a4e5fc30fd484427740dbda11",
+        "schematic_gate_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35122481138",
+        "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35122481079",
+        "pcb_native_gate_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35122481037",
+        "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35122481138/artifacts/10457498007",
+        "artifact_id": 10457498007,
+        "artifact_digest": "sha256:01d19ff8622c2cd3dbe420987439f3452800499116c84f72708df918503b4a75",
+        "routing_authorized": False,
+        "manufacturing_release": False,
+    }.items():
+        require(evidence.get(key) == expected,
+                f"PCB-PWR hierarchy evidence {key} drift: {evidence.get(key)!r} != {expected!r}")
+    erc_evidence = evidence.get("erc", {})
+    require(erc_evidence == {
+        "path": "artifacts/kicad-native/PCB-PWR/erc.json",
+        "sha256": "0ec8289ecac2437eafc3c72b560dad1cdf92f1039c996658b245ab5ae0126b92",
+        "kicad_version": "9.0.9",
+        "sheets": 5,
+        "violations": 0,
+    }, "PCB-PWR commit-bound ERC evidence drift")
+    pdf_evidence = evidence.get("schematic_pdf", {})
+    require(pdf_evidence == {
+        "path": "artifacts/kicad-native/PCB-PWR/PCB-PWR_schematic.pdf",
+        "sha256": "7a1eee774d6a0dd03e6cb72935824f5a7d2af4bebe0e37ad739f61eb8d32a1f4",
+        "pages": 5,
+        "page_size": "A3",
+        "orientation": "landscape",
+        "visual_preflight": "PASS_NO_CLIPPING_NO_VISIBLE_DUPLICATE_ROOT_LABELS",
+    }, "PCB-PWR commit-bound PDF evidence drift")
+    expected_source_sha256 = {
+        "PCB-PWR.kicad_sch": "16365f1c8be5a98eb5f2635f2740198998baf560db15b2ee761d65c9ade903a5",
+        "PCB-PWR_01_INPUT_PROTECTION.kicad_sch": "33d557e3a6450e18f3e89a676284a24406a5a5cca9c4cf4d4c63b827711ebd9e",
+        "PCB-PWR_02_3V8_MODEM.kicad_sch": "c746b8a526c647d87c39c18163cb69f4fcf8952ec60859b95a2d7bb6718087e0",
+        "PCB-PWR_03_3V3_DIGITAL.kicad_sch": "53c1297232aa3932310d8f60135ff555516b45a4a5f31f29476d5b0bc26be724",
+        "PCB-PWR_04_AUX_HARNESS.kicad_sch": "b9a73ead5a7897857b8c57987cd79b65f66b4f13070a9023b15b0b00dece0c71",
+    }
+    require(evidence.get("schematic_source_sha256") == expected_source_sha256,
+            "PCB-PWR hierarchy evidence source-hash register drift")
+    for filename, expected_sha256 in expected_source_sha256.items():
+        path = args.schematic.parent / filename
+        actual_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+        require(actual_sha256 == expected_sha256,
+                f"PCB-PWR hierarchy evidence source drift: {filename} {actual_sha256} != {expected_sha256}")
+    require(evidence.get("independent_human_review") == {
+        "status": "ACCEPTED_INDEPENDENT_HUMAN_REVIEW",
+        "reviewer": "Скиф",
+        "date": "2026-09-16",
+        "decision": "ACCEPT_HIERARCHY_ONLY",
+        "scope": "PCB_PWR_HUMAN_READABLE_HIERARCHY_ONLY",
+        "reviewed_source_commit_sha": "2a973f6856aa115aa59323d619be985578780682",
+        "reviewed_pdf_sha256": "7a1eee774d6a0dd03e6cb72935824f5a7d2af4bebe0e37ad739f61eb8d32a1f4",
+    }, "PCB-PWR hierarchy human-review acceptance record drift")
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")

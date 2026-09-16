@@ -90,7 +90,7 @@ def placement_candidate_audit(name: str) -> str | None:
         ),
         "PCB-PWR": (
             PCB_PWR_STATUS,
-            "OPEN_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_AND_EVIDENCE_PENDING",
+            "OPEN_HIERARCHY_ACCEPTED_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_PENDING",
             "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
         ),
     }
