@@ -5,7 +5,7 @@
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
   "generator_sha256": "bc5d7c91694a5d91532c0ba039cc1804118b3b407f876fc3ff74f05ae10dec46",
   "hierarchy_materializer": "tools/materialize_pcb_main_hierarchy_rev_a.py",
-  "hierarchy_materializer_sha256": "5fcd394144d8f9f7002d6e171bde2df627fd66900444beacf10cb82b17f5405f",
+  "hierarchy_materializer_sha256": "924be216559f7ebd24b2183228a3d50d17394db069a83f4423cd2686b7e72838",
   "hierarchy_connectivity_reader": "tools/pcb_main_schematic_hierarchy.py",
   "hierarchy_connectivity_reader_sha256": "3d02a528b55239292ef760e5df7b3b619111da099f27eca5dc1964723cb5421f",
   "inputs": [
@@ -90,47 +90,47 @@
   "fitted_count": 233,
   "dnp_count": 15,
   "pin_count": 1074,
-  "schematic_sha256": "223e3901b9cb4d072be680170974083dbfdc8f4d03f43be3acc62bf096973fd0",
+  "schematic_sha256": "810a3aa16d88e4179cf84a7bfbfd9c29d1a5d95066a75a6e2517f4d1d30a0918",
   "hierarchy_sources": [
     {
       "path": "PCB-MAIN.kicad_sch",
-      "sha256": "223e3901b9cb4d072be680170974083dbfdc8f4d03f43be3acc62bf096973fd0"
+      "sha256": "810a3aa16d88e4179cf84a7bfbfd9c29d1a5d95066a75a6e2517f4d1d30a0918"
     },
     {
       "path": "PCB-MAIN_01_POWER.kicad_sch",
-      "sha256": "a63c1158f1e416bcd2cd9f40a310be84a5636d96895a4442a7783e49a5e30946"
+      "sha256": "4c163f8c88b42a4ffd35e4b6cb27acd32753c1fa2004acb194084997c8de51c0"
     },
     {
       "path": "PCB-MAIN_02_MCU.kicad_sch",
-      "sha256": "ebb94ed399d0249759edba28266729997881e397fc3acca1c7bad97ac119d45e"
+      "sha256": "e2f13a507e66a9658d65dc628897db0eb824d46216fcefe7f7f8e8b153d8e405"
     },
     {
       "path": "PCB-MAIN_03_AUDIO.kicad_sch",
-      "sha256": "90420b07253f234758a77ede1c6d1010dfa4e82d9acbb2e5d1e07d62506a2ecd"
+      "sha256": "e359b46850186940efd914460eaefa8e6f292d0cddaae91ad92ae1f99d5c2516"
     },
     {
       "path": "PCB-MAIN_04_GNSS.kicad_sch",
-      "sha256": "dd59ddaa40603f70daa6fbb0f4e32d2ed517e56f27d424965903830f2ff4bc47"
+      "sha256": "0741780507d2c4b5907d8ab0b00807eb2b1ecb2becf899e6246d3a4787b1e38c"
     },
     {
       "path": "PCB-MAIN_05_CELLULAR.kicad_sch",
-      "sha256": "075851ca22f3268a20b82cee82a71bb96f398b07df5cb5498d7c284fe2aeb7a0"
+      "sha256": "b944b2ae8eed85e9436577e62beac1e0fdd6a6831dcc292f2e2bf37058bdecd4"
     },
     {
       "path": "PCB-MAIN_06_LORA.kicad_sch",
-      "sha256": "f8db974bf1ed4389f2ef8c84ff2e1c5c41ebce3140fcbb915ea3edeb779f42a8"
+      "sha256": "733c2996581794b49eb7061019c9136c53476750a251e0499e37a849a05db155"
     },
     {
       "path": "PCB-MAIN_07_BLE.kicad_sch",
-      "sha256": "eb14f24142fbb07d0d370a4150e32648a30924c2c514cabd3b6a35721d2efb84"
+      "sha256": "af66b777d65d86645893dd1966b6980045a2c444b9d06e6979bc676cfb72f7fd"
     },
     {
       "path": "PCB-MAIN_08_STORAGE_SENSORS.kicad_sch",
-      "sha256": "e91e6bf4744464849acbc2fb9c19681c38e55a083f6b1b6135bd4d0325720bfd"
+      "sha256": "24a76c439aa3f7ad22b3f2b761d8458b852b190ea62169647ab0d150a00260aa"
     },
     {
       "path": "PCB-MAIN_09_CONNECTORS_TEST.kicad_sch",
-      "sha256": "5b8732f563e8fb0378468954e1119c0016af83279711c5720f0bc73fbcd9fdc4"
+      "sha256": "fe24ad6ccc93310acd2bede9d9f5839bfa825a857bef9e9319ec1b6ef3ec658d"
     }
   ],
   "hierarchy_pages": 10,

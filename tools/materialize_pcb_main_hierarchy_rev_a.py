@@ -137,6 +137,18 @@ SHEETS = (
     ),
 )
 
+REVIEW_TITLES = {
+    "power": "Power",
+    "mcu": "MCU",
+    "audio": "PDM audio",
+    "gnss": "GNSS",
+    "cellular": "Cellular + dual SIM",
+    "lora": "LoRa",
+    "ble": "BLE",
+    "storage": "Storage + sensors",
+    "connectors": "USB + debug",
+}
+
 
 def stable_uuid(token: str) -> str:
     return str(uuid.uuid5(NAMESPACE, token))
@@ -317,7 +329,7 @@ def make_child(flat: Schematic, spec: SheetSpec, pin_map: dict[str, dict[str, st
     child.paper.paperSize = PAGE_SIZE
     child.paper.portrait = False
     child.titleBlock = title_block(
-        f"Dioneya EVT-PRE-20 PCB-MAIN Rev.A - {spec.name}",
+        f"Dioneya PCB-MAIN Rev.A - {REVIEW_TITLES[spec.key]}",
         f"Functional sheet {spec.page} of {len(SHEETS) + 1}",
     )
 
@@ -399,8 +411,10 @@ def pin_grid_indices(height: float, count: int) -> list[int]:
 
 def make_sheet(spec: SheetSpec, cross_nets: set[str], index: int) -> HierarchicalSheet:
     width, height = 165.10, 106.68
-    column = index % 3
-    row = index // 3
+    # KiCad's hierarchy exporter traverses the root drawing by X and then Y.
+    # Fill columns top-to-bottom so that exported PDF pages follow 2..10.
+    column = index // 3
+    row = index % 3
     x = 20.32 + column * 185.42
     y = 35.56 + row * 121.92
     sheet_uuid = stable_uuid(f"sheet:{spec.key}")
@@ -460,7 +474,7 @@ def make_root(flat: Schematic, sheet_nets: dict[str, set[str]]) -> Schematic:
     root.paper.paperSize = PAGE_SIZE
     root.paper.portrait = False
     root.titleBlock = title_block(
-        "Dioneya EVT-PRE-20 PCB-MAIN Rev.A - System overview",
+        "Dioneya PCB-MAIN Rev.A - System overview",
         f"Root sheet 1 of {len(SHEETS) + 1}",
     )
     root.sheetInstances = [HierarchicalSheetInstance(instancePath="/", page="1")]

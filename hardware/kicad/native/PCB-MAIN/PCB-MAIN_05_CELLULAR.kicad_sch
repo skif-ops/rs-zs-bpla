@@ -5,7 +5,7 @@
   (paper "A2")
 
   (title_block
-    (title "Dioneya EVT-PRE-20 PCB-MAIN Rev.A - Cellular modem dual SIM and recovery")
+    (title "Dioneya PCB-MAIN Rev.A - Cellular + dual SIM")
     (date "2026-09-16")
     (rev "A")
     (company "Dioneya / ZS-BPLA")

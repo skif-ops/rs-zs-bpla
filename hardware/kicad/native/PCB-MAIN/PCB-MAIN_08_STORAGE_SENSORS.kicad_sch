@@ -5,7 +5,7 @@
   (paper "A2")
 
   (title_block
-    (title "Dioneya EVT-PRE-20 PCB-MAIN Rev.A - Storage sensors microSD and tamper")
+    (title "Dioneya PCB-MAIN Rev.A - Storage + sensors")
     (date "2026-09-16")
     (rev "A")
     (company "Dioneya / ZS-BPLA")

@@ -41,14 +41,17 @@ def ref_range(prefix: str, first: int, last: int) -> set[str]:
 EXPECTED_SHEETS = {
     "Power entry and rail interface": {
         "file": "PCB-MAIN_01_POWER.kicad_sch", "page": "2",
+        "title": "Dioneya PCB-MAIN Rev.A - Power",
         "refs": {"J_PWR", "C19", "C20", "R103"},
     },
     "MCU clocks reset and straps": {
         "file": "PCB-MAIN_02_MCU.kicad_sch", "page": "3",
+        "title": "Dioneya PCB-MAIN Rev.A - MCU",
         "refs": {"U1", "X1", "L1"} | ref_range("C", 1, 18) | ref_range("R", 1, 6),
     },
     "PDM audio AAD and microphone harnesses": {
         "file": "PCB-MAIN_03_AUDIO.kicad_sch", "page": "4",
+        "title": "Dioneya PCB-MAIN Rev.A - PDM audio",
         "refs": (
             {"U7", "U17", "U18"}
             | {f"J_MIC{index}" for index in range(1, 5)}
@@ -57,6 +60,7 @@ EXPECTED_SHEETS = {
     },
     "GNSS timing antenna and supervisor": {
         "file": "PCB-MAIN_04_GNSS.kicad_sch", "page": "5",
+        "title": "Dioneya PCB-MAIN Rev.A - GNSS",
         "refs": (
             {"U9", "J9", "L2", "FL1", "U5", "Q4", "D4"}
             | ref_range("C", 60, 65) | ref_range("R", 56, 62)
@@ -64,6 +68,7 @@ EXPECTED_SHEETS = {
     },
     "Cellular modem dual SIM and recovery": {
         "file": "PCB-MAIN_05_CELLULAR.kicad_sch", "page": "6",
+        "title": "Dioneya PCB-MAIN Rev.A - Cellular + dual SIM",
         "refs": (
             {
                 "U8", "U16", "Q1", "Q2", "U13", "U14", "U15", "Q3",
@@ -75,14 +80,17 @@ EXPECTED_SHEETS = {
     },
     "LoRa radio control and conducted RF": {
         "file": "PCB-MAIN_06_LORA.kicad_sch", "page": "7",
+        "title": "Dioneya PCB-MAIN Rev.A - LoRa",
         "refs": {"U10", "J10", "D5"} | ref_range("C", 66, 70) | ref_range("R", 63, 73),
     },
     "BLE module reset DFU and SWD": {
         "file": "PCB-MAIN_07_BLE.kicad_sch", "page": "8",
+        "title": "Dioneya PCB-MAIN Rev.A - BLE",
         "refs": {"U11", "TP_BLE_SWD", "U6"} | ref_range("C", 71, 73) | ref_range("R", 74, 78),
     },
     "Storage sensors microSD and tamper": {
         "file": "PCB-MAIN_08_STORAGE_SENSORS.kicad_sch", "page": "9",
+        "title": "Dioneya PCB-MAIN Rev.A - Storage + sensors",
         "refs": (
             {
                 "U2", "U3", "U4", "U12", "J12", "J13", "U23", "U24",
@@ -94,6 +102,7 @@ EXPECTED_SHEETS = {
     },
     "USB service debug and EOL fixture": {
         "file": "PCB-MAIN_09_CONNECTORS_TEST.kicad_sch", "page": "10",
+        "title": "Dioneya PCB-MAIN Rev.A - USB + debug",
         "refs": (
             {"J11", "TP_MCU_SWD", "TP_EOL", "C77", "U25", "D6", "D7", "D8"}
             | ref_range("R", 91, 98) | ref_range("R", 101, 102)
@@ -163,6 +172,16 @@ def main() -> int:
     require(set(documents) == set(EXPECTED_SHEETS),
             f"functional sheet-name drift: {sorted(documents)}")
     root_sheets = {str(item.sheetName.value): item for item in root.sheets}
+    spatial_page_order = []
+    for sheet in sorted(
+        root.sheets,
+        key=lambda item: (float(item.position.X), float(item.position.Y)),
+    ):
+        paths = [path for project in sheet.instances for path in project.paths]
+        require(len(paths) == 1, "root sheet must have one project page instance")
+        spatial_page_order.append(paths[0].page)
+    require(spatial_page_order == [str(page) for page in range(2, 11)],
+            f"KiCad spatial PDF page order drift: {spatial_page_order}")
     sheet_refs: dict[str, set[str]] = {}
     total_child_wires = 0
     total_child_labels = 0
@@ -178,6 +197,8 @@ def main() -> int:
                 "Human-readable hierarchy candidate" in
                 schematic.titleBlock.comments.get(1, ""),
                 f"{name}: hierarchy/review title control missing")
+        require(schematic.titleBlock.title == expected_sheet["title"],
+                f"{name}: short printable title drift")
         require(schematic.texts and schematic.graphicalItems,
                 f"{name}: readable note or explicit wires missing")
         require(not schematic.globalLabels, f"{name}: global labels are forbidden")
@@ -410,6 +431,7 @@ def main() -> int:
         "status": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_REVIEW_REQUIRED",
         "root_sheets": 9,
         "pages": 10,
+        "pdf_page_order": [str(page) for page in range(1, 11)],
         "symbols": 248,
         "physical_symbols": 247,
         "logical_pad_numbers": logical_pad_numbers,

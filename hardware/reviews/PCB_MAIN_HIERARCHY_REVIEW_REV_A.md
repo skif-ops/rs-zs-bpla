@@ -42,6 +42,8 @@ Permitted reviewer decision: `ACCEPT_HIERARCHY_ONLY` or `REJECT_HIERARCHY`.
 ## 4. Machine controls
 
 - [x] Deterministic regeneration of root and all nine child sheets.
+- [x] Root-sheet spatial traversal controls KiCad PDF order as pages 1 through 10,
+  with short title-block labels bounded inside the printable frame.
 - [x] Exact RefDes allocation: every symbol appears once and only once.
 - [x] Exact authority pin/net equivalence and explicit NC preservation.
 - [x] Exact schematic-to-PCB pad/net comparison for every physical pad, including
