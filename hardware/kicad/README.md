@@ -4,7 +4,7 @@ Status: `NATIVE SOURCE CONTROLLED / NOT FOR MANUFACTURE`
 Configuration: `EVT-PRE-20 Rev.A`
 Authoritative branch: `evt-pre-20`
 
-This directory is the authoritative electrical-CAD source package for the EVT-PRE-20 custom-PCB build. All nine native schematic, board and project files are present. It remains blocked from manufacturing until each provisional board is completed and the required ERC/DRC, CAM, DFM and independent reviews are complete.
+This directory is the authoritative electrical-CAD source package for the EVT-PRE-20 custom-PCB build. The three native projects and their required hierarchical child sheets are present. It remains blocked from manufacturing until each provisional board is completed and the required ERC/DRC, CAM, DFM and independent reviews are complete.
 
 ## Frozen baseline used for capture
 
@@ -30,6 +30,14 @@ PCB-PWR `C1-C19`, `R1-R15`, `NT1-NT3` and `TP1-TP10` are bound from
 `hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv`. This is a capture/placement input,
 not a manufacturing release; its electrical, package, fixture and environmental
 blockers remain explicit in the authority.
+
+PCB-PWR now uses a human-readable five-page native hierarchy: one system overview
+plus four functional child sheets for input protection/current monitoring, 3V8,
+3V3 and 1V8/harness interfaces. The controlled materializer gives every connected
+pin an explicit wire stub and the independent audit proves exact pad/net
+equivalence to the native PCB. Repeat KiCad 9 ERC/PDF evidence for this hierarchy
+and independent human acceptance remain open; the earlier one-page label-only ERC
+does not release the new representation.
 
 PCB-PWR currently contains a native, unrouted 60-footprint electrical placement
 canvas. Its `90 x 60 mm`, four-layer and `1.6 mm` assumptions are provisional;

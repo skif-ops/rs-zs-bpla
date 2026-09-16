@@ -7,7 +7,7 @@ import csv
 from collections import defaultdict
 from pathlib import Path
 
-from kiutils.schematic import Schematic
+from pcb_pwr_schematic_hierarchy import HierarchicalSchematic
 
 ROOT = Path(__file__).resolve().parents[1]
 AUTHORITY = ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
@@ -121,12 +121,8 @@ def main() -> int:
     require(all(not row["BOM_Item_ID"] and row["Population"] == "PCB_FEATURE"
                 for row in testpoints), "DFT points must remain non-procured PCB features")
 
-    schematic = Schematic.from_file(str(args.schematic), encoding="utf-8")
-    instances = {property_value(item, "Reference"): item for item in schematic.schematicSymbols}
-    libraries = {item.libId: item for item in schematic.libSymbols}
-    labels: dict[tuple[float, float], set[str]] = defaultdict(set)
-    for label in schematic.labels:
-        labels[(round(label.position.X, 4), round(label.position.Y, 4))].add(str(label.text))
+    model = HierarchicalSchematic(args.schematic)
+    instances = {ref: record.instance for ref, record in model.symbols.items()}
 
     for row in authority:
         ref = row["RefDes"]
@@ -140,9 +136,8 @@ def main() -> int:
                 f"{ref}: source binding drift")
         require(bool(instance.dnp) == (row["Population"] == "DNP"),
                 f"{ref}: population binding drift")
-        symbol = libraries[instance.libId]
         for pin_number, net in parse_pin_map(row["Pin_Map"]).items():
-            actual = labels.get(endpoint(instance, symbol, pin_number), set())
+            actual = model.pin_nets(ref, pin_number)
             require(actual == {net}, f"{ref}.{pin_number}: expected {net}, found {sorted(actual)}")
 
     generator = BOM_GENERATOR.read_text(encoding="utf-8")

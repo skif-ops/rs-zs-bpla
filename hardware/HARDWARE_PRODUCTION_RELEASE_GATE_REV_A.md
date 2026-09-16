@@ -57,6 +57,15 @@ envelopes, selected stackup/copper weights and thermal/current-density review.
 The board remains unrouted with zero copper zones; DRC, CAM, DFM and Review B are
 open.
 
+PCB-PWR is no longer a one-page label-only capture. Its native project now has a
+system overview and four bounded functional child sheets for input protection and
+current monitoring, 3V8 modem power, 3V3 digital power, and 1V8/harness interfaces.
+The independent hierarchy audit finds 63 symbols, 185 explicit wire segments,
+9 cross-sheet nets, 26 hierarchical labels, no cross-net wire collision and exact
+pad/net equivalence to all 60 PCB footprints. This retains the signed pin/net
+authority only; repeat native KiCad 9 ERC/PDF evidence and independent human
+hierarchy review remain blocking before routing.
+
 PCB-PWR has also passed its bounded fitted-body 2D placement-clearance subgate.
 All 42 simultaneously fitted footprints have controlled courtyards, the required
 minimum is 0.20 mm, the observed minimum is 0.22 mm and conflicts are zero. This
@@ -106,6 +115,9 @@ rule, PnP polarity, first-article assembly, Review B or manufacturing release.
 - acceptance of both PCB-PWR stackup/copper fabricator sets in the 24-row
   `PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv`, selection of one construction,
   and separate current-density/DC-drop/fault/+70 °C thermal approval;
+- repeat KiCad 9 zero-violation ERC and committed five-page schematic PDF/JSON
+  evidence for PCB-PWR, plus independent human acceptance of the functional
+  hierarchy;
 - supplier/fabricator/assembler quotation evidence for the selected 20-station
   purchase scenario.
 

@@ -460,7 +460,9 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
 
     review_text = REVIEW_B.read_text(encoding="utf-8")
     for marker in (
-        "Status: `OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`",
+        "Status: `OPEN / HUMAN-READABLE HIERARCHY INTERNAL EQUIVALENCE, FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`",
+        "Repeat native KiCad 9 ERC/PDF evidence for the five-page hierarchy",
+        "independent human hierarchy review are open",
         "- [x] All 31 native/capture nets",
         "- [ ] `DIM-003` has all 18 attributable response rows accepted",
         "0/24",

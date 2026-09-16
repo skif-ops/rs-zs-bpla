@@ -40,6 +40,9 @@ on:
       - "tools/finalize_pcb_pwr_passive_authority_rev_a.py"
       - "tools/finalize_pcb_pwr_erc_power_model_rev_a.py"
       - "tools/materialize_pcb_pwr_libraries_rev_a.py"
+      - "tools/materialize_pcb_pwr_hierarchy_rev_a.py"
+      - "tools/pcb_pwr_schematic_hierarchy.py"
+      - "tools/audit_pcb_pwr_hierarchy_rev_a.py"
       - "tools/audit_pcb_pwr_native_schematic_rev_a.py"
       - "tools/audit_pcb_pwr_native_completeness_rev_a.py"
       - "tools/audit_pcb_pwr_footprints_rev_a.py"
@@ -119,6 +122,10 @@ jobs:
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/materialize_pcb_pwr_libraries_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/materialize_pcb_pwr_hierarchy_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_hierarchy_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/hierarchy_audit.json
           python tools/audit_pcb_pwr_native_schematic_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/audit_pcb_pwr_native_completeness_rev_a.py \
@@ -137,7 +144,9 @@ jobs:
             --output artifacts/kicad-native/PCB-PWR/dim_003_request_audit.json
           python tools/audit_pcb_pwr_stackup_copper_request_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/stackup_copper_request_audit.json
+          git diff --exit-code -- hardware/kicad/native/PCB-PWR/PCB-PWR*.kicad_sch
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          test "$(find hardware/kicad/native/PCB-PWR -maxdepth 1 -name 'PCB-PWR_*.kicad_sch' -type f | wc -l)" -eq 4
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
           test -s hardware/kicad/native/PCB-PWR/sym-lib-table
@@ -198,6 +207,7 @@ jobs:
           path: |
             artifacts/kicad-native/PCB-PWR/
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+            hardware/kicad/native/PCB-PWR/PCB-PWR_*.kicad_sch
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
             hardware/kicad/native/PCB-PWR/sym-lib-table

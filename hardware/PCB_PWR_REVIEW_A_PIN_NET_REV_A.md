@@ -171,7 +171,21 @@ The native schematic must fail Review A regression if it:
 - changes the 12-pin MAIN/PWR order;
 - treats FAULT as a replacement for INA226 I2C telemetry.
 
-## 8. Open items outside this Review A scope
+## 8. Human-readable hierarchy conversion
+
+The native representation has been converted from the original one-page direct-label
+capture into one system overview and four functional child sheets. The controlled
+conversion contains 63 symbols, 185 explicit wire segments, 9 cross-sheet nets and
+26 hierarchical labels. An independent audit compares every schematic pin with every
+pad/net on all 60 physical PCB positions and records semantic SHA-256
+`fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a`.
+
+This exact equivalence retains the `PASS - PIN/NET AUTHORITY` decision above. It does
+not yet accept the new drawing as complete review evidence: repeat native KiCad 9 ERC,
+the exported five-page PDF and JSON ERC report, and an independent human functional
+review must be committed before routing starts.
+
+## 9. Open items outside this Review A scope
 
 - `U1`, `U2` and `U5` now use the exact TI DBV0006A, DGS0010A and DBV0005A
   land/mask/stencil examples; their placement, local routing and assembly validation

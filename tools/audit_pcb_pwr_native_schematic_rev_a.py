@@ -6,7 +6,7 @@ import argparse
 import csv
 from pathlib import Path
 
-from kiutils.schematic import Schematic
+from pcb_pwr_schematic_hierarchy import HierarchicalSchematic
 
 ROOT = Path(__file__).resolve().parents[1]
 PIN_AUTH = ROOT / "hardware" / "PCB_PWR_PIN_AUTHORITY_REV_A.csv"
@@ -105,15 +105,9 @@ def main() -> int:
     ap.add_argument("--schematic", type=Path, required=True)
     args = ap.parse_args()
 
-    sch = Schematic.from_file(str(args.schematic), encoding="utf-8")
-    instances = {ref_of(s): s for s in sch.schematicSymbols}
-    require(len(instances) == len(sch.schematicSymbols), "duplicate or empty schematic references")
-    lib_by_id = {s.libId: s for s in sch.libSymbols}
-    labels: dict[tuple[float, float], set[str]] = {}
-    for lab in sch.labels:
-        key = (round(lab.position.X, 4), round(lab.position.Y, 4))
-        labels.setdefault(key, set()).add(str(lab.text))
-    nc_positions = {(round(n.position.X, 4), round(n.position.Y, 4)) for n in sch.noConnects}
+    model = HierarchicalSchematic(args.schematic)
+    instances = {ref: record.instance for ref, record in model.symbols.items()}
+    require(len(instances) == 63, "hierarchical PCB-PWR must contain 63 unique symbols")
 
     # Pin names and pin-to-net mapping must match the reviewed authority exactly.
     for row in rows(PIN_AUTH):
@@ -121,20 +115,18 @@ def main() -> int:
         pin_no = row["Pin"]
         require(ref in instances, f"native PCB-PWR missing authority component {ref}")
         inst = instances[ref]
-        require(inst.libId in lib_by_id, f"{ref}: embedded library symbol missing for {inst.libId}")
-        sym = lib_by_id[inst.libId]
+        sym = model.symbols[ref].symbol
         pins = selected_pins(sym, inst.unit or 1)
         require(pin_no in pins, f"{ref}: native symbol missing pin {pin_no}")
         require(str(pins[pin_no].name) == row["Pin_Name"],
                 f"{ref}.{pin_no} name mismatch native={pins[pin_no].name!r} authority={row['Pin_Name']!r}")
-        pos = endpoint(inst, sym, pin_no)
         expected_net = row["RevA_Net"]
         if expected_net == "NC":
-            require(pos in nc_positions, f"{ref}.{pin_no} must be explicit no-connect")
-            require(not labels.get(pos), f"{ref}.{pin_no} NC unexpectedly has net label {labels.get(pos)}")
+            require(model.pin_is_no_connect(ref, pin_no), f"{ref}.{pin_no} must be explicit no-connect")
+            require(not model.pin_nets(ref, pin_no), f"{ref}.{pin_no} NC unexpectedly has a net")
         else:
-            require(expected_net in labels.get(pos, set()),
-                    f"{ref}.{pin_no} expected net {expected_net}, found labels {sorted(labels.get(pos, set()))}")
+            require(model.pin_nets(ref, pin_no) == {expected_net},
+                    f"{ref}.{pin_no} expected net {expected_net}, found {sorted(model.pin_nets(ref, pin_no))}")
 
     require(footprint_of(instances["Q1"]) == Q1_FOOTPRINT,
             f"Q1 must use manufacturer-controlled footprint {Q1_FOOTPRINT}")
@@ -159,11 +151,10 @@ def main() -> int:
     require([r["Pin"] for r in main_pwr] == [str(i) for i in range(1, 13)], "authority harness is no longer 12-pin")
     require("J2" in instances, "native MAIN/PWR connector J2 missing")
     j2 = instances["J2"]
-    j2sym = lib_by_id[j2.libId]
+    j2sym = model.symbols["J2"].symbol
     for row in main_pwr:
-        pos = endpoint(j2, j2sym, row["Pin"])
-        require(row["Net"] in labels.get(pos, set()),
-                f"J2 pin {row['Pin']} must be {row['Net']}, got {sorted(labels.get(pos, set()))}")
+        require(model.pin_nets("J2", row["Pin"]) == {row["Net"]},
+                f"J2 pin {row['Pin']} must be {row['Net']}, got {sorted(model.pin_nets('J2', row['Pin']))}")
     require(set(selected_pins(j2sym)) == {str(i) for i in range(1, 13)}, "J2 is not exactly 12 positions")
     require(footprint_of(j2) == J2_FOOTPRINT,
             f"J2 must use shared controlled footprint {J2_FOOTPRINT}")
@@ -172,17 +163,17 @@ def main() -> int:
 
     # Input connector and true 4-terminal shunt topology.
     require("J1" in instances and "RSH1" in instances, "J1/RSH1 missing")
-    j1 = instances["J1"]; j1sym = lib_by_id[j1.libId]
+    j1 = instances["J1"]; j1sym = model.symbols["J1"].symbol
     for pin, net in {"1":"VBAT_RAW", "2":"GND_PWR"}.items():
-        require(net in labels.get(endpoint(j1,j1sym,pin), set()), f"J1.{pin} input mapping mismatch")
+        require(model.pin_nets("J1", pin) == {net}, f"J1.{pin} input mapping mismatch")
     require(J1_FOOTPRINT_FILE.is_file(), f"J1 controlled footprint file missing: {J1_FOOTPRINT_FILE}")
     require(footprint_of(j1) == J1_FOOTPRINT, f"J1 must use {J1_FOOTPRINT}")
     require("43045-0213" in value_of(j1), "J1 exact gold-plated MPN is not bound")
-    rsh = instances["RSH1"]; rshsym = lib_by_id[rsh.libId]
+    rsh = instances["RSH1"]; rshsym = model.symbols["RSH1"].symbol
     rsh_expected = {"1":"VBAT_PROTECTED","2":"VBAT_SYS","3":"SHUNT_SOURCE_SENSE","4":"SHUNT_LOAD_SENSE"}
     require(set(selected_pins(rshsym)) == set(rsh_expected), "RSH1 must remain true 4-terminal symbol")
     for pin, net in rsh_expected.items():
-        require(net in labels.get(endpoint(rsh,rshsym,pin), set()), f"RSH1.{pin} Kelvin/current mapping mismatch")
+        require(model.pin_nets("RSH1", pin) == {net}, f"RSH1.{pin} Kelvin/current mapping mismatch")
     require(RSH1_FOOTPRINT_FILE.is_file(), f"RSH1 controlled footprint file missing: {RSH1_FOOTPRINT_FILE}")
     require(footprint_of(rsh) == RSH1_FOOTPRINT, f"RSH1 must use {RSH1_FOOTPRINT}")
     require("WSK2512R0100FEA" in value_of(rsh), "RSH1 exact MPN is not bound")
@@ -193,11 +184,9 @@ def main() -> int:
         require("XAL7030-472MEC" in value_of(instances[ref]), f"{ref} exact MPN is not bound")
 
     # Startup deadlock regression: U4 must self-bootstrap from VBAT_SYS; EN_AUX gates U5 only.
-    u4 = instances["U4"]; u4sym = lib_by_id[u4.libId]
-    require("VBAT_SYS" in labels.get(endpoint(u4,u4sym,"9"), set()), "U4 EN no longer tied to VBAT_SYS - startup deadlock risk")
-    require("EN_AUX" not in labels.get(endpoint(u4,u4sym,"9"), set()), "U4 EN illegally returned to EN_AUX")
-    u5 = instances["U5"]; u5sym = lib_by_id[u5.libId]
-    require("EN_AUX" in labels.get(endpoint(u5,u5sym,"3"), set()), "U5 EN must be controlled by EN_AUX")
+    require(model.pin_nets("U4", "9") == {"VBAT_SYS"},
+            "U4 EN no longer tied to VBAT_SYS - startup deadlock risk")
+    require(model.pin_nets("U5", "3") == {"EN_AUX"}, "U5 EN must be controlled by EN_AUX")
 
     # Output capacitance is eight physical, individually referenced 1210 MLCCs.
     cap_banks = {
@@ -208,13 +197,13 @@ def main() -> int:
         for ref in cap_refs:
             require(ref in instances, f"native PCB-PWR missing physical output capacitor {ref}")
             inst = instances[ref]
-            sym = lib_by_id[inst.libId]
+            sym = model.symbols[ref].symbol
             value = next((p.value for p in inst.properties if p.key == "Value"), "")
             footprint = next((p.value for p in inst.properties if p.key == "Footprint"), "")
             require("CGA6P3X7R1E226M250AB" in value, f"{ref}: output capacitor MPN is not bound")
             require(footprint == "Capacitor_SMD:C_1210_3225Metric", f"{ref}: 1210 footprint is not bound")
-            require(rail in labels.get(endpoint(inst, sym, "1"), set()), f"{ref}.1 is not on {rail}")
-            require("GND_PWR" in labels.get(endpoint(inst, sym, "2"), set()), f"{ref}.2 is not on GND_PWR")
+            require(model.pin_nets(ref, "1") == {rail}, f"{ref}.1 is not on {rail}")
+            require(model.pin_nets(ref, "2") == {"GND_PWR"}, f"{ref}.2 is not on GND_PWR")
 
     # Explicit ground-return net ties, never implicit plane aliases.
     ties = {
@@ -224,9 +213,8 @@ def main() -> int:
     }
     for ref, (a,b) in ties.items():
         require(ref in instances, f"missing explicit ground net tie {ref}")
-        inst = instances[ref]; sym = lib_by_id[inst.libId]
-        require(a in labels.get(endpoint(inst,sym,"1"), set()), f"{ref}.1 must be {a}")
-        require(b in labels.get(endpoint(inst,sym,"2"), set()), f"{ref}.2 must be {b}")
+        require(model.pin_nets(ref, "1") == {a}, f"{ref}.1 must be {a}")
+        require(model.pin_nets(ref, "2") == {b}, f"{ref}.2 must be {b}")
 
     # Population policy that affects behaviour.
     expected_dnp = {"R5","R9","R13","R14","R15"}
@@ -235,8 +223,8 @@ def main() -> int:
     require(not ({"R6","R10","R11","R12"} & actual_dnp), "required pull-down/pull-up unexpectedly marked DNP")
 
     # No stale legacy contract may be embedded in title/value/net labels.
-    serialized_tokens = "\n".join([str(l.text) for l in sch.labels] + [
-        next((p.value for p in s.properties if p.key == "Value"), "") for s in sch.schematicSymbols
+    serialized_tokens = "\n".join(model.all_label_texts() + [
+        next((p.value for p in s.properties if p.key == "Value"), "") for s in instances.values()
     ])
     require("10-contact" not in serialized_tokens and "10-pin MAIN/PWR" not in serialized_tokens,
             "legacy 10-pin token present in native schematic")

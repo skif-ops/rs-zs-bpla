@@ -533,6 +533,50 @@ def validate_hardware_baseline() -> None:
         and pwr_status["manufacturing_release"] is False,
         "PCB-PWR was advanced by a pre-route stackup/copper request",
     )
+    pwr_hierarchy = pwr_status.get("human_readable_hierarchy", {})
+    pwr_hierarchy_control = pwr_hierarchy.get("control", {})
+    require(
+        pwr_status.get("native_schematic", {}).get("page_count") == 5
+        and pwr_status.get("native_schematic", {}).get("functional_child_sheets") == 4
+        and pwr_hierarchy.get("generator") ==
+        "tools/materialize_pcb_pwr_hierarchy_rev_a.py"
+        and pwr_hierarchy.get("connectivity_reader") ==
+        "tools/pcb_pwr_schematic_hierarchy.py"
+        and pwr_hierarchy.get("independent_audit") ==
+        "tools/audit_pcb_pwr_hierarchy_rev_a.py"
+        and pwr_hierarchy_control.get("state") ==
+        "PASS_INTERNAL_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_NATIVE_KICAD_9_AND_HUMAN_REVIEW_PENDING"
+        and pwr_hierarchy_control.get("pages") == 5
+        and pwr_hierarchy_control.get("functional_child_sheets") == 4
+        and pwr_hierarchy_control.get("symbols") == 63
+        and pwr_hierarchy_control.get("physical_symbols") == 60
+        and pwr_hierarchy_control.get("wire_segments") == 185
+        and pwr_hierarchy_control.get("cross_sheet_nets") == 9
+        and pwr_hierarchy_control.get("hierarchical_labels") == 26
+        and pwr_hierarchy_control.get("pin_net_semantic_sha256") ==
+        "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a"
+        and pwr_hierarchy_control.get("pin_net_review_a_retained") is True,
+        "PCB-PWR human-readable hierarchy/electrical-equivalence control has drifted",
+    )
+    require(
+        all(pwr_hierarchy_control.get(key) is False for key in (
+            "native_kicad_9_erc_pass",
+            "committed_erc_evidence",
+            "committed_pdf_evidence",
+            "independent_human_review_complete",
+            "routing_authorized",
+            "manufacturing_release",
+        )),
+        "PCB-PWR hierarchy conversion prematurely advanced native review, routing or release",
+    )
+    for relative in (
+        pwr_status.get("native_schematic", {}).get("path"),
+        *pwr_status.get("native_schematic", {}).get("child_paths", []),
+    ):
+        require(
+            isinstance(relative, str) and (ROOT / relative).is_file(),
+            f"PCB-PWR hierarchy source is missing: {relative}",
+        )
     pwr_stackup = pwr_status.get("stackup_copper_handoff", {})
     pwr_stackup_control = pwr_stackup.get("control", {})
     require(

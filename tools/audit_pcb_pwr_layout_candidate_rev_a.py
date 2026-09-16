@@ -8,7 +8,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 from kiutils.board import Board
-from kiutils.schematic import Schematic
+from pcb_pwr_schematic_hierarchy import HierarchicalSchematic
 
 ROOT = Path(__file__).resolve().parents[1]
 PCB = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
@@ -87,20 +87,16 @@ def main() -> int:
     passive_population = {row["RefDes"]: row["Population"]
                           for row in read_csv(PASSIVE_AUTHORITY)}
 
-    schematic = Schematic.from_file(str(SCHEMATIC), encoding="utf-8")
-    libraries = {item.libId: item for item in schematic.libSymbols}
-    labels: dict[tuple[float, float], set[str]] = defaultdict(set)
-    for label in schematic.labels:
-        labels[(round(label.position.X, 4), round(label.position.Y, 4))].add(str(label.text))
+    model = HierarchicalSchematic(SCHEMATIC)
     expected = {}
-    for instance in schematic.schematicSymbols:
-        ref = prop(instance, "Reference")
+    for ref, record in model.symbols.items():
+        instance = record.instance
         if not ref or ref.startswith("#"):
             continue
-        symbol = libraries[instance.libId]
+        symbol = record.symbol
         pins = {}
         for number in selected_pins(symbol, instance.unit or 1):
-            found = labels.get(endpoint(instance, symbol, number), set())
+            found = model.pin_nets(ref, number)
             require(len(found) <= 1, f"{ref}.{number}: ambiguous schematic label set {sorted(found)}")
             pins[number] = next(iter(found)) if found else "NC"
         expected[ref] = {

@@ -1,14 +1,22 @@
 # PCB-PWR Rev.A Review B checklist
 
-Status: `OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
+Status: `OPEN / HUMAN-READABLE HIERARCHY INTERNAL EQUIVALENCE, FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
 
 Review B is independent from the completed pin/net Review A. This checklist is
 not signed and contains no routing, CAM or manufacturing-release assertion.
 
 ## 1. Current controlled baseline
 
-- Review A pin/net audit: `PASS`.
-- Native KiCad 9 schematic and zero-violation ERC evidence: present.
+- Review A pin/net authority: `PASS`; the exact 60-position pad/net comparison
+  retains this electrical decision across the hierarchy-only representation change.
+- Human-readable schematic hierarchy: internally `PASS`; one system overview and
+  four functional child sheets contain 63 symbols, 185 explicit wire segments,
+  9 cross-sheet nets and 26 hierarchical labels. The independently calculated
+  pin/net semantic SHA-256 is
+  `fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a`.
+- Repeat native KiCad 9 ERC/PDF evidence for the five-page hierarchy and the
+  independent human hierarchy review are open. The earlier flat-sheet ERC does
+  not close these new representation checks.
 - Native PCB: provisional 90 x 60 x 1.6 mm, four copper layers, 60 footprints,
   zero mounting holes, zero traces/vias/zones.
 - Fitted-body 2D clearance: `PASS`; 42/42 fitted footprints have courtyards,
@@ -29,6 +37,9 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
 
 - [x] Native PCB parses independently and its component/net set matches the
   reviewed schematic and placement authority.
+- [x] The five-page hierarchy has one explicit wire stub per connected pin, no
+  cross-net wire collisions and exact electrical equivalence to all 60 PCB
+  footprints/pads.
 - [x] All 42 fitted assembly courtyards pass the bounded 0.20 mm 2D clearance
   subgate; DNP/PCB-feature service and fixture checks remain open.
 - [x] Four-layer count is frozen for Rev.A and agrees with the native board.
@@ -38,6 +49,9 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
   explicit without invented final geometry.
 - [x] I²C remains 100 kHz initially with authoritative pull-ups on PCB-MAIN and
   PCB-PWR pull-up footprints DNP.
+- [ ] KiCad 9 opens the complete root plus four child sheets, repeat ERC has zero
+  violations, the exported five-page PDF and JSON ERC report are committed and
+  hash-bound, and an independent human reviewer accepts the functional drawing.
 - [ ] `DIM-003` has all 18 attributable response rows accepted and freezes the
   board outline, mounting holes, terminal/tool zones, assembled envelope and
   PCB STEP in `PCB_PWR_DIM_003_RESPONSE_REV_A.csv`.
@@ -75,9 +89,11 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
 
 ## 3. Decision
 
-`HOLD`. Fitted-body 2D clearance, constraint coverage and the internal DIM-003
-and two-fabricator stackup/copper requests are complete, but the response
-registers remain `0/18` and `0/24` with `0/2` accepted fabricator sets. Accepted
-mechanics/service volumes, DNP/PCB-feature access, selected construction,
-numeric copper geometry, routing, physical evidence, DRC, CAM, DFM and
-independent Review B are open. Production outputs remain prohibited.
+`HOLD`. The internal human-readable hierarchy and exact electrical-equivalence
+subgate pass, as do fitted-body 2D clearance, constraint coverage and the internal
+DIM-003 and two-fabricator stackup/copper requests. Repeat native KiCad 9 ERC/PDF
+evidence and independent human hierarchy review remain open; the response
+registers also remain `0/18` and `0/24` with `0/2` accepted fabricator sets.
+Accepted mechanics/service volumes, DNP/PCB-feature access, selected construction,
+numeric copper geometry, routing, physical evidence, DRC, CAM, DFM and independent
+Review B are open. Production outputs remain prohibited.

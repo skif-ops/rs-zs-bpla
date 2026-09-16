@@ -166,6 +166,60 @@ def audit() -> dict[str, object]:
         "PCB layer counts are inconsistent across native boards, BOM/RFQ or controlled authorities",
     )
 
+    pwr_status = read_json("hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json")
+    pwr_hierarchy = run_json_audit("audit_pcb_pwr_hierarchy_rev_a.py")
+    pwr_hierarchy_internal_ok = (
+        pwr_hierarchy.get("status") ==
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE"
+        and pwr_hierarchy.get("pages") == 5
+        and pwr_hierarchy.get("root_sheets") == 4
+        and pwr_hierarchy.get("symbols") == 63
+        and pwr_hierarchy.get("physical_symbols") == 60
+        and pwr_hierarchy.get("wire_segments") == 185
+        and pwr_hierarchy.get("cross_sheet_nets") == 9
+        and pwr_hierarchy.get("hierarchical_labels") == 26
+        and pwr_hierarchy.get("pin_net_semantic_sha256") ==
+        "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a"
+        and pwr_hierarchy.get("pin_net_review_a") ==
+        "RETAINED_BY_EXACT_ELECTRICAL_EQUIVALENCE"
+        and pwr_hierarchy.get("manufacturing_release") is False
+    )
+    check(
+        "pcb_pwr_human_readable_hierarchy_internal_equivalence",
+        pwr_hierarchy_internal_ok,
+        str(pwr_hierarchy.get("status", "MISSING")),
+        "PCB-PWR five-page hierarchy or exact 60-position pad/net equivalence has regressed",
+    )
+
+    pwr_hierarchy_record = pwr_status.get("human_readable_hierarchy", {})
+    pwr_hierarchy_control = (
+        pwr_hierarchy_record.get("control", {})
+        if isinstance(pwr_hierarchy_record, dict)
+        else {}
+    )
+    pwr_hierarchy_review_complete = (
+        pwr_hierarchy_internal_ok
+        and isinstance(pwr_hierarchy_control, dict)
+        and pwr_hierarchy_control.get("native_kicad_9_erc_pass") is True
+        and pwr_hierarchy_control.get("committed_erc_evidence") is True
+        and pwr_hierarchy_control.get("committed_pdf_evidence") is True
+        and pwr_hierarchy_control.get("independent_human_review_complete") is True
+    )
+    check(
+        "pcb_pwr_hierarchy_native_erc_pdf_and_human_review",
+        pwr_hierarchy_review_complete,
+        (
+            "native_erc={native} committed_erc={erc} committed_pdf={pdf} "
+            "human_review={human}"
+        ).format(
+            native=pwr_hierarchy_control.get("native_kicad_9_erc_pass", False),
+            erc=pwr_hierarchy_control.get("committed_erc_evidence", False),
+            pdf=pwr_hierarchy_control.get("committed_pdf_evidence", False),
+            human=pwr_hierarchy_control.get("independent_human_review_complete", False),
+        ),
+        "PCB-PWR hierarchy still requires committed KiCad 9 ERC/PDF evidence and independent human review",
+    )
+
     pwr_clearance = run_json_audit("audit_pcb_pwr_placement_clearance_rev_a.py")
     pwr_clearance_summary = pwr_clearance.get("summary", {})
     pwr_clearance_controlled = (
@@ -522,7 +576,6 @@ def audit() -> dict[str, object]:
         "PCB-MAIN Review B/DRC/CAM/DFM release is not complete",
     )
 
-    pwr_status = read_json("hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json")
     pwr_review_b = pwr_status.get("review_b", {})
     pwr_released = (
         pwr_status.get("manufacturing_release") is True
@@ -670,6 +723,7 @@ def audit() -> dict[str, object]:
         "boards": board_results,
         "bom_qg2": bom_qg2,
         "pcb_layer_count_authority": layer_authority,
+        "pcb_pwr_hierarchy": pwr_hierarchy,
         "pcb_pwr_dim_003": pwr_dim_003,
         "pcb_pwr_stackup_copper": pwr_stackup_copper,
         "harness": harness,
