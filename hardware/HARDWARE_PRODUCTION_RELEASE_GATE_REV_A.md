@@ -63,6 +63,13 @@ minimum is 0.20 mm, the observed minimum is 0.22 mm and conflicts are zero. This
 does not close `DIM-003`, mounting or connector/tool service volumes, DNP and DFT
 fixture access, assembled STEP, routing, DRC, CAM, DFM or Review B.
 
+The PCB-PWR `DIM-003` mechanical-freeze request is now internally complete and
+machine-audited, but its response register has `0/18` accepted rows. The packet
+requires final outline and mounting authority, J1/J2 mating and cable volumes,
+DFT fixture/probe access, assembled height, enclosure/thermal keep-outs, harness
+length datums and a hash-bound frozen STEP. It is an input request only; no
+provisional dimension, routing or harness cut length is released.
+
 The PCB-MAIN stackup/impedance request packet is internally ready, but it has
 0/2 fabricator responses accepted and no selected construction. Its 22-row
 register is a quotation/capability input only; it is not Gerber, a purchase
@@ -85,8 +92,9 @@ rule, PnP polarity, first-article assembly, Review B or manufacturing release.
 - selected-assembler acceptance of the PCB-MAIN U2/U25/U26 project IPC
   candidates, U9 process-dependent stencil adaptation, PnP polarity,
   first-article controls and closure of blocker/critical DFM findings;
-- PCB-PWR DIM-003 and the remaining enclosure, antenna, harness, installation and
-  environmental mechanical inputs;
+- acceptance of all 18 PCB-PWR `DIM-003` rows in
+  `PCB_PWR_DIM_003_RESPONSE_REV_A.csv`, plus the remaining enclosure, antenna,
+  harness, installation and environmental mechanical inputs;
 - supplier/fabricator/assembler quotation evidence for the selected 20-station
   purchase scenario.
 

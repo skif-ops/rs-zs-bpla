@@ -2,7 +2,7 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-PWR",
-  "release_state": "REVIEW_A_PIN_NET_PASS_FITTED_2D_CLEARANCE_AND_PRE_ROUTE_CONSTRAINT_CANDIDATE",
+  "release_state": "REVIEW_A_PIN_NET_PASS_FITTED_2D_CLEARANCE_PRE_ROUTE_CONSTRAINT_AND_DIM_003_REQUEST_READY_CANDIDATE",
   "manufacturing_release": false,
   "native_schematic": {
     "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
@@ -49,6 +49,26 @@
       }
     }
   },
+  "mechanical_freeze_input": {
+    "dim_id": "DIM-003",
+    "request_packet": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md",
+    "machine_contract": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
+    "response_register": "hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv",
+    "independent_audit": "tools/audit_pcb_pwr_dim_003_request_rev_a.py",
+    "control": {
+      "state": "PASS_INTERNAL_DIM_003_REQUEST_READY_EXTERNAL_RESPONSE_PENDING",
+      "required_response_rows": 18,
+      "accepted_response_rows": 0,
+      "complete": false,
+      "outline_and_mounting_frozen": false,
+      "connector_service_volumes_accepted": false,
+      "dft_fixture_access_accepted": false,
+      "frozen_step_accepted": false,
+      "harness_length_release_authorized": false,
+      "routing_authorized": false,
+      "manufacturing_release": false
+    }
+  },
   "review_a": {
     "complete": true,
     "status": "PASS_PIN_NET_ONLY"
@@ -93,7 +113,7 @@
       },
       "trace_items": 0,
       "copper_zones": 0,
-      "dim_003": "OPEN_REQUIRED_BEFORE_ROUTING",
+      "dim_003": "CONTROLLED_REQUEST_READY_0_OF_18_ACCEPTED_REQUIRED_BEFORE_ROUTING",
       "numeric_power_geometry": "OPEN_FINAL_STACKUP_COPPER_THERMAL_CURRENT_DENSITY",
       "routing_complete": false,
       "manufacturing_release": false
@@ -101,9 +121,9 @@
   },
   "review_b": {
     "complete": false,
-    "status": "OPEN_FITTED_2D_CLEARANCE_AND_PRE_ROUTE_CONSTRAINT_PASS_DIM_003_ROUTING_AND_EVIDENCE_PENDING",
+    "status": "OPEN_FITTED_2D_CLEARANCE_AND_PRE_ROUTE_CONSTRAINT_PASS_DIM_003_REQUEST_READY_ROUTING_AND_EVIDENCE_PENDING",
     "blockers": [
-      "DIM-003 assembled envelope terminal zones mounting pattern and frozen PCB STEP",
+      "DIM-003 mechanical freeze response register has 0/18 accepted rows; assembled envelope terminal zones mounting pattern and frozen PCB STEP remain open",
       "final stack-up dielectric construction and copper-weight authority",
       "high-current Kelvin hot-loop and switch-node routing",
       "thermal current-density transient load-step cold-start and EMI evidence",

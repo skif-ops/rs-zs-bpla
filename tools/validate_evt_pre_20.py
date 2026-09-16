@@ -195,6 +195,13 @@ def validate_decisions_and_tests() -> None:
         in decisions["DEC-049"]["Impact"],
         "PCB-MAIN assembler-request/process-acceptance separation decision is missing",
     )
+    require(
+        decisions["DEC-054"]["Status"] == "IMPLEMENTED_DIM_003_EXTERNAL_ACCEPTANCE_PENDING"
+        and "mechanical acceptance and routing authority" in decisions["DEC-054"]["Decision"]
+        and "18-row" in decisions["DEC-054"]["Impact"]
+        and "0/18" in decisions["DEC-054"]["Impact"],
+        "PCB-PWR DIM-003 request/mechanical-acceptance separation decision is missing",
+    )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")

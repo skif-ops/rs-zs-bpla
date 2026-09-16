@@ -110,6 +110,7 @@ on:
       - "tools/audit_pcb_pwr_placement_clearance_rev_a.py"
       - "tools/generate_pcb_pwr_routing_authority_rev_a.py"
       - "tools/audit_pcb_pwr_routing_authority_rev_a.py"
+      - "tools/audit_pcb_pwr_dim_003_request_rev_a.py"
       - "tools/generate_pcb_pwr_schematic_rev_a.py"
       - "tools/finalize_pcb_pwr_symbol_types_rev_a.py"
       - "tools/finalize_pcb_pwr_schematic_completeness_rev_a.py"
@@ -331,6 +332,10 @@ jobs:
           python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/committed_routing_authority_audit.json
+          python tools/audit_pcb_pwr_dim_003_request_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/committed_dim_003_request_audit.json \
+            --commit-sha "$GITHUB_SHA" \
+            --require-clean-source
           python tools/kicad_native_gate.py --run-cli
       - name: Verify committed native PCB-MAIN schematic
         run: |
@@ -447,6 +452,8 @@ jobs:
           python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/routing_authority_audit.json
+          python tools/audit_pcb_pwr_dim_003_request_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/dim_003_request_audit.json
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
           /usr/bin/python3 - <<'PY'
           import pcbnew
@@ -581,6 +588,9 @@ jobs:
             hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md
             hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv
             hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md
+            hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json
+            hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md
+            hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv
             hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
             hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md
             hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md

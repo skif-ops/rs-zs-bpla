@@ -56,3 +56,5 @@ board and a fresh KiCad 9 materialization must produce the same placement result
 `DIM-003`, mounting holes, J1/J2 service volumes, TP1-TP10 fixture access,
 assembled STEP, stackup, numeric power geometry, routing, DRC, CAM, DFM, physical
 evidence and independent Review B remain blocking.
+The controlled DIM-003 request packet is ready, but its response register is
+still `0/18`; no item in that list is accepted by this clearance result.

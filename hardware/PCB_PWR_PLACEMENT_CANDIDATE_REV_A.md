@@ -8,6 +8,9 @@ fabrication approval. The four-copper-layer count is frozen for Rev.A by
 `1.6 mm` thickness remain deliberately provisional working values. They are not a
 mechanical freeze and must be replaced or explicitly accepted after `DIM-003`
 supplies the assembled envelope, terminal zones, mounting pattern and frozen PCB STEP.
+The bounded request and blank `0/18` response register are controlled in
+`hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md`; packet readiness does not
+accept any provisional geometry.
 
 ## Controlled candidate content
 

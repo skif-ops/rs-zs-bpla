@@ -37,6 +37,12 @@ mounting holes, routing and copper zones are deliberately absent while `DIM-003`
 remains open. `hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json` is the machine-readable
 release interlock for this state.
 
+The bounded `DIM-003` request is now controlled by
+`hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json`; its 18-row response
+register remains `0/18` accepted. It requests outline, mounting, J1/J2, DFT,
+assembled-height, enclosure/thermal, harness-datum and frozen-STEP evidence but
+does not release any of those values.
+
 The bounded fitted-body clearance repack passes a strict independent subgate:
 all 42 simultaneously fitted footprints have controlled courtyards, the required
 minimum gap is `0.20 mm`, the observed minimum is `0.22 mm`, and conflicts are

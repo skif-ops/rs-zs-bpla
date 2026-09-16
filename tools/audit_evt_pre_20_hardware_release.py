@@ -196,7 +196,8 @@ def audit() -> dict[str, object]:
         and pwr_routing_authority.get("board", {}).get("net_count") == 31
         and pwr_routing_authority.get("board", {}).get("trace_items") == 0
         and pwr_routing_authority.get("board", {}).get("copper_zones") == 0
-        and pwr_routing_authority.get("dim_003") == "OPEN_REQUIRED_BEFORE_ROUTING"
+        and pwr_routing_authority.get("dim_003") ==
+        "CONTROLLED_REQUEST_READY_0_OF_18_ACCEPTED_REQUIRED_BEFORE_ROUTING"
         and pwr_routing_authority.get("routing_complete") is False
         and pwr_routing_authority.get("manufacturing_release") is False
     )
@@ -205,6 +206,40 @@ def audit() -> dict[str, object]:
         pwr_routing_controlled,
         str(pwr_routing_authority.get("status", "MISSING")),
         "PCB-PWR pre-route constraint authority is incomplete or its no-routing interlock drifted",
+    )
+
+    pwr_dim_003 = run_json_audit("audit_pcb_pwr_dim_003_request_rev_a.py")
+    pwr_dim_003_packet_ready = (
+        pwr_dim_003.get("status") ==
+        "PASS_INTERNAL_DIM_003_REQUEST_READY_EXTERNAL_RESPONSE_PENDING"
+        and pwr_dim_003.get("internal_packet_complete") is True
+        and pwr_dim_003.get("required_response_rows") == 18
+        and pwr_dim_003.get("accepted_response_rows") == 0
+        and pwr_dim_003.get("routing_authorized") is False
+        and pwr_dim_003.get("harness_length_release_authorized") is False
+        and pwr_dim_003.get("manufacturing_release") is False
+    )
+    check(
+        "pcb_pwr_dim_003_request_packet",
+        pwr_dim_003_packet_ready,
+        str(pwr_dim_003.get("status", "MISSING")),
+        "PCB-PWR controlled DIM-003 mechanical-freeze request packet is not ready",
+    )
+    accepted_response_rows = int(pwr_dim_003.get("accepted_response_rows", 0) or 0)
+    pwr_dim_003_accepted = (
+        pwr_dim_003.get("dim_003_accepted") is True
+        and accepted_response_rows == 18
+        and pwr_dim_003.get("routing_authorized") is True
+        and pwr_dim_003.get("harness_length_release_authorized") is True
+    )
+    check(
+        "pcb_pwr_dim_003_acceptance",
+        pwr_dim_003_accepted,
+        f"{accepted_response_rows}/18 responses accepted",
+        (
+            "PCB-PWR DIM-003 mechanical acceptance remains open: "
+            f"{accepted_response_rows}/18 attributable responses accepted"
+        ),
     )
 
     harness = run_json_audit("audit_harness_manufacturing_rev_a.py")
@@ -582,6 +617,7 @@ def audit() -> dict[str, object]:
         "boards": board_results,
         "bom_qg2": bom_qg2,
         "pcb_layer_count_authority": layer_authority,
+        "pcb_pwr_dim_003": pwr_dim_003,
         "harness": harness,
         "checks": checks,
     }

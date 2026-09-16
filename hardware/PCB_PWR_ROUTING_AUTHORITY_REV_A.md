@@ -17,6 +17,8 @@ return/reference-domain rule, topology, current basis, geometry rule, layer/via
 rule, aggressor-separation rule, priority and source authority. This closes only
 pre-route constraint coverage. It does not authorize routing while the outline,
 mounting pattern and terminal zones remain open under `DIM-003`.
+The internal `DIM-003` request packet is ready, but its attributable response
+register remains `0/18`; this is still an open routing prerequisite.
 
 The committed board still has zero traces, zero vias and zero copper zones. The
 manifest does not guess final trace widths, copper weights, via-array counts or
@@ -96,6 +98,7 @@ Run the controls with:
 ```bash
 python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
 python tools/audit_pcb_pwr_routing_authority_rev_a.py
+python tools/audit_pcb_pwr_dim_003_request_rev_a.py
 ```
 
 Neither command authorizes fabrication.

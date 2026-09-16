@@ -15,6 +15,8 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
   minimum required/observed separation is 0.20/0.22 mm and conflicts are zero.
 - Mechanical authority: `DIM-003 OPEN`; the outline, mounting pattern, terminal
   zones, tool access and assembled STEP are not frozen.
+- DIM-003 request packet: internally complete; the response register is `0/18`
+  accepted, so no provisional dimension or service volume is authorized.
 - Pre-route constraint coverage: `PASS` for all 31 native nets. Numeric widths,
   copper weights, via arrays and thermal geometry remain open.
 - Manufacturing release: `HOLD`.
@@ -32,8 +34,9 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
   explicit without invented final geometry.
 - [x] I²C remains 100 kHz initially with authoritative pull-ups on PCB-MAIN and
   PCB-PWR pull-up footprints DNP.
-- [ ] `DIM-003` freezes the board outline, mounting holes, terminal/tool zones,
-  assembled envelope and PCB STEP.
+- [ ] `DIM-003` has all 18 attributable response rows accepted and freezes the
+  board outline, mounting holes, terminal/tool zones, assembled envelope and
+  PCB STEP in `PCB_PWR_DIM_003_RESPONSE_REV_A.csv`.
 - [ ] A selected fabricator accepts the four-layer dielectric construction,
   finished thickness, copper weights and manufacturing minimums.
 - [ ] Input fault/transient envelope, fuse/TVS coordination and MOSFET SOA are
@@ -64,7 +67,8 @@ not signed and contains no routing, CAM or manufacturing-release assertion.
 
 ## 3. Decision
 
-`HOLD`. Fitted-body 2D clearance and constraint coverage are complete, but
+`HOLD`. Fitted-body 2D clearance, constraint coverage and the internal DIM-003
+request are complete, but the response register remains `0/18`; accepted
 mechanics/service volumes, DNP/PCB-feature access, stackup, numeric copper
 geometry, routing, physical evidence, DRC, CAM, DFM and independent Review B
 are open. Production outputs remain prohibited.

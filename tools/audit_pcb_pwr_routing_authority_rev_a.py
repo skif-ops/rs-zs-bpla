@@ -364,7 +364,7 @@ def expected_status_control(board_semantic_digest: str, authority_digest: str,
         "reference_domain_counts": domain_counts,
         "trace_items": 0,
         "copper_zones": 0,
-        "dim_003": "OPEN_REQUIRED_BEFORE_ROUTING",
+        "dim_003": "CONTROLLED_REQUEST_READY_0_OF_18_ACCEPTED_REQUIRED_BEFORE_ROUTING",
         "numeric_power_geometry": NUMERIC_GEOMETRY,
         "routing_complete": False,
         "manufacturing_release": False,
@@ -451,14 +451,15 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             pwr_layer["Final_Stackup_Status"] == "OPEN_DIM_003_THERMAL_DFM",
             "PCB-PWR layer/stackup release boundary drift")
     dimensions = {row["ID"]: row for row in read_csv(OPEN_DIMENSIONS)}
-    require(dimensions["DIM-003"]["Status"] == "OPEN",
-            "DIM-003 must remain open before PCB-PWR routing")
+    require(dimensions["DIM-003"]["Status"] == "CONTROLLED_REQUEST_READY_0_OF_18_ACCEPTED"
+            and dimensions["DIM-003"]["Owner"] == "EE_ME",
+            "DIM-003 must remain at the controlled 0/18 EE_ME request state before PCB-PWR routing")
 
     review_text = REVIEW_B.read_text(encoding="utf-8")
     for marker in (
         "Status: `OPEN / FITTED 2D CLEARANCE AND PRE-ROUTE CONSTRAINT PASS / NOT FOR MANUFACTURE`",
         "- [x] All 31 native/capture nets",
-        "- [ ] `DIM-003` freezes",
+        "- [ ] `DIM-003` has all 18 attributable response rows accepted",
         "- [ ] KiCad 9 DRC passes",
         "`HOLD`",
     ):
@@ -513,7 +514,7 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             "mic_ldo_rated_a": 0.3,
         },
         "i2c_initial_hz": 100000,
-        "dim_003": "OPEN_REQUIRED_BEFORE_ROUTING",
+        "dim_003": "CONTROLLED_REQUEST_READY_0_OF_18_ACCEPTED_REQUIRED_BEFORE_ROUTING",
         "numeric_power_geometry": NUMERIC_GEOMETRY,
         "routing_complete": False,
         "manufacturing_release": False,
@@ -535,7 +536,7 @@ def main() -> int:
         output.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
                           encoding="utf-8")
     print("PCB-PWR routing authority audit: PASS")
-    print("nets=31 classes=15 trace_items=0 copper_zones=0 DIM-003=open routing_complete=false")
+    print("nets=31 classes=15 trace_items=0 copper_zones=0 DIM-003=0/18 accepted routing_complete=false")
     return 0
 
 

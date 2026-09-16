@@ -186,8 +186,9 @@ def main() -> int:
         close(float(row["Y_mm"]), 56.0, f"TP{index} row")
 
     dim_rows = {row["ID"]: row for row in read_csv(OPEN_DIMENSIONS)}
-    require(dim_rows["DIM-003"]["Status"] == "OPEN" and dim_rows["DIM-003"]["Owner"] == "EE",
-            "DIM-003 must remain an open EE blocker")
+    require(dim_rows["DIM-003"]["Status"] == "CONTROLLED_REQUEST_READY_0_OF_18_ACCEPTED"
+            and dim_rows["DIM-003"]["Owner"] == "EE_ME",
+            "DIM-003 must remain at the controlled 0/18 EE_ME request state")
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     layout = status["native_layout"]
     require(status["manufacturing_release"] is False and
@@ -200,7 +201,7 @@ def main() -> int:
 
     print("PCB-PWR provisional placement-candidate independent audit PASS")
     print("60 footprints; exact schematic nets; 90x60 four-layer canvas; routing/zones/holes absent")
-    print("DIM-003 OPEN; DRC/CAM/Review B/manufacturing remain prohibited")
+    print("DIM-003 request ready with 0/18 accepted; DRC/CAM/Review B/manufacturing remain prohibited")
     return 0
 
 
