@@ -595,10 +595,10 @@ def validate_hardware_baseline() -> None:
     pwr_hierarchy_control = pwr_hierarchy.get("control", {})
     pwr_current_evidence = pwr_hierarchy.get("current_evidence", {})
     pwr_evidence_complete = pwr_current_evidence.get("status") == \
-        "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING"
+        "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
     expected_pwr_hierarchy_state = (
         "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_"
-        "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING"
+        "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
         if pwr_evidence_complete else
         "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_"
         "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PENDING_HUMAN_REVIEW_PENDING"
@@ -612,6 +612,9 @@ def validate_hardware_baseline() -> None:
         "tools/pcb_pwr_schematic_hierarchy.py"
         and pwr_hierarchy.get("independent_audit") ==
         "tools/audit_pcb_pwr_hierarchy_rev_a.py"
+        and pwr_hierarchy.get("review_record") ==
+        "hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md"
+        and (ROOT / pwr_hierarchy["review_record"]).is_file()
         and pwr_hierarchy_control.get("state") == expected_pwr_hierarchy_state
         and pwr_hierarchy_control.get("pages") == 5
         and pwr_hierarchy_control.get("functional_child_sheets") == 4
@@ -634,12 +637,12 @@ def validate_hardware_baseline() -> None:
             "committed_erc_evidence",
             "committed_pdf_evidence",
         ))
+        and pwr_hierarchy_control.get("independent_human_review_complete") is True
         and all(pwr_hierarchy_control.get(key) is False for key in (
-            "independent_human_review_complete",
             "routing_authorized",
             "manufacturing_release",
         )),
-        "PCB-PWR hierarchy evidence or pending human/routing/release state has drifted",
+        "PCB-PWR hierarchy evidence, accepted human review or routing/release state has drifted",
     )
     for relative in (
         pwr_status.get("native_schematic", {}).get("path"),

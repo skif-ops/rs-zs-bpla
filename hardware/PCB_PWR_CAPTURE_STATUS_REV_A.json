@@ -2,12 +2,12 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-PWR",
-  "release_state": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS_CINHF_ECO_APPLIED_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_COPPER_REQUESTS_READY_CANDIDATE",
+  "release_state": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS_CINHF_ECO_APPLIED_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_COPPER_REQUESTS_READY_CANDIDATE",
   "manufacturing_release": false,
   "native_schematic": {
     "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
     "status": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS",
-    "erc_status": "PASS_KICAD_9_POST_CINHF_ECO_COMMIT_BOUND_EVIDENCE_HUMAN_REVIEW_PENDING",
+    "erc_status": "PASS_KICAD_9_POST_CINHF_ECO_COMMIT_BOUND_EVIDENCE_HUMAN_ACCEPTED",
     "page_count": 5,
     "functional_child_sheets": 4,
     "child_paths": [
@@ -34,7 +34,7 @@
         "SNOSD17G": "e16b3a8c0023201fafa5825436f5f2dd6f885b92b84e65602b3f50d741c58b6f"
       },
       "electrical_schematic_changed": false,
-      "independent_human_hierarchy_acceptance_complete": false,
+      "independent_human_hierarchy_acceptance_complete": true,
       "routing_authorized": false,
       "manufacturing_release": false
     }
@@ -43,8 +43,9 @@
     "generator": "tools/materialize_pcb_pwr_hierarchy_rev_a.py",
     "connectivity_reader": "tools/pcb_pwr_schematic_hierarchy.py",
     "independent_audit": "tools/audit_pcb_pwr_hierarchy_rev_a.py",
+    "review_record": "hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md",
     "control": {
-      "state": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING",
+      "state": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
       "pages": 5,
       "functional_child_sheets": 4,
       "symbols": 65,
@@ -57,7 +58,7 @@
       "native_kicad_9_erc_pass": true,
       "committed_erc_evidence": true,
       "committed_pdf_evidence": true,
-      "independent_human_review_complete": false,
+      "independent_human_review_complete": true,
       "prior_evidence_superseded_by_f1_value_eco": true,
       "prior_evidence_superseded_by_legibility_remediation": true,
       "prior_evidence_superseded_by_cinhf_eco": true,
@@ -110,7 +111,7 @@
       "manufacturing_release": false
     },
     "current_evidence": {
-      "status": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING",
+      "status": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
       "change": {
         "reason": "TI_LMR60440_TABLE_8_3_LOCAL_CIN_HF_ECO",
         "presentation_only": false,
@@ -152,7 +153,15 @@
         "PCB-PWR_03_3V3_DIGITAL.kicad_sch": "d51ff6a624d7d99a6971406a41885b422ba2dd4e6f5baa63a211f12fa84e1605",
         "PCB-PWR_04_AUX_HARNESS.kicad_sch": "7bac18a1db49dfc4fada07ec15cf8ce72958343048eddf29a4a7f1c832436db9"
       },
-      "independent_human_review": null,
+      "independent_human_review": {
+        "status": "ACCEPTED_INDEPENDENT_HUMAN_REVIEW",
+        "reviewer": "Скиф",
+        "date": "2026-09-17",
+        "decision": "ACCEPT_HIERARCHY_ONLY",
+        "scope": "PCB_PWR_HUMAN_READABLE_HIERARCHY_ONLY",
+        "reviewed_source_commit_sha": "e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a",
+        "reviewed_pdf_sha256": "7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130"
+      },
       "routing_authorized": false,
       "manufacturing_release": false
     },
@@ -329,7 +338,7 @@
   },
   "review_a": {
     "complete": true,
-    "status": "PASS_PIN_NET_AUTHORITY_HIERARCHY_INTERNAL_EQUIVALENCE_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING"
+    "status": "PASS_PIN_NET_AUTHORITY_HIERARCHY_INTERNAL_EQUIVALENCE_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
   },
   "pre_route_constraints": {
     "authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
@@ -378,7 +387,7 @@
     }
   },
   "input_protection_candidate_eco": {
-    "state": "TARGET_8A_NATIVE_VALUE_ECO_RETAINED_ACTIVE_CINHF_ECO_REPEAT_ERC_PDF_EVIDENCE_PASS_HUMAN_HIERARCHY_REVIEW_PENDING",
+    "state": "TARGET_8A_NATIVE_VALUE_ECO_RETAINED_ACTIVE_CINHF_ECO_REPEAT_EVIDENCE_HUMAN_ACCEPTED_PHYSICAL_QUALIFICATION_PENDING",
     "qualification_record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md",
     "machine_contract": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json",
     "test_matrix": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
@@ -398,17 +407,17 @@
     "repeat_pdf_evidence_required": true,
     "repeat_pdf_evidence_complete": true,
     "repeat_independent_human_hierarchy_review_required": true,
-    "repeat_independent_human_hierarchy_review_complete": false,
-    "accepted_test_rows": 1,
+    "repeat_independent_human_hierarchy_review_complete": true,
+    "accepted_test_rows": 2,
     "required_test_rows": 20,
     "pcba_procurement_authorized": false,
     "manufacturing_release": false
   },
   "review_b": {
     "complete": false,
-    "status": "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_PENDING",
+    "status": "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_PENDING",
     "blockers": [
-      "C20/C21 local LMR60440 CIN_HF ECO is applied; commit-bound KiCad 9 ERC/PDF evidence passes, while a new independent human hierarchy review remains required before PCBA procurement",
+      "C11/C12 effective capacitance and routed C11/C20/U3 and C12/C21/U4 VIN-PGND hot-loop geometry remain open; C13 is central damping and not a local-CIN substitute",
       "DIM-003 mechanical freeze response register has 0/18 accepted rows; assembled envelope terminal zones mounting pattern and frozen PCB STEP remain open",
       "PCB-PWR stackup/copper response register has 0/24 accepted rows across 0/2 fabricator slots; no selected construction or accepted copper/plating authority",
       "high-current Kelvin hot-loop and switch-node routing",

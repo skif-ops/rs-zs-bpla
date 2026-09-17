@@ -74,11 +74,11 @@ def main() -> int:
             "power baseline lost NOT FOR MANUFACTURE interlock")
     baseline_input = baseline.get("input_protection_qualification", {})
     require(baseline_input.get("status") ==
-            "TARGET_EVT_CANDIDATES_SELECTED_NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_AND_PHYSICAL_QUALIFICATION_PENDING" and
+            "TARGET_EVT_CANDIDATES_SELECTED_NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_COMPLETE_PHYSICAL_QUALIFICATION_PENDING" and
             baseline_input.get("fuse", {}).get("native_value_eco_applied") is True and
             baseline_input.get("fuse", {}).get(
-                "repeat_erc_pdf_human_hierarchy_review_complete") is False,
-            "power baseline does not expose the post-ECO repeat-evidence gate")
+                "repeat_erc_pdf_human_hierarchy_review_complete") is True,
+            "power baseline does not expose the completed post-ECO repeat-evidence gate")
     require(capture_status["manufacturing_release"] is False,
             "PCB-PWR capture status released manufacture")
 
@@ -142,8 +142,9 @@ def main() -> int:
     require(frozen["MPN"] == fuse["target_evt_mpn"], "freeze/contract fuse MPN mismatch")
     require("CANDIDATE_SELECTED_FOR_EVT_QUALIFICATION" in frozen["Status"],
             "freeze does not identify selected qualification candidate")
-    require("NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_PENDING" in frozen["Status"],
-            "freeze lost post-ECO repeat-evidence interlock")
+    require("NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_PASS_PHYSICAL_QUALIFICATION_PENDING"
+            in frozen["Status"],
+            "freeze lost post-ECO repeat-evidence/physical-qualification interlock")
 
     bom_fuse = bom["PWR-FUSE-01"]
     require(bom_fuse["MPN"] == fuse["target_evt_mpn"], "engineering BOM fuse MPN mismatch")
@@ -180,7 +181,7 @@ def main() -> int:
         "repeat_pdf_evidence_required": True,
         "repeat_pdf_evidence_complete": True,
         "repeat_independent_human_hierarchy_review_required": True,
-        "repeat_independent_human_hierarchy_review_complete": False,
+        "repeat_independent_human_hierarchy_review_complete": True,
         "pcba_procurement_authorized": False,
         "manufacturing_release": False,
     }, "native value ECO control drift")
@@ -204,7 +205,7 @@ def main() -> int:
 
     status_eco = capture_status.get("input_protection_candidate_eco", {})
     require(status_eco.get("state") ==
-            "TARGET_8A_NATIVE_VALUE_ECO_RETAINED_ACTIVE_CINHF_ECO_REPEAT_ERC_PDF_EVIDENCE_PASS_HUMAN_HIERARCHY_REVIEW_PENDING",
+            "TARGET_8A_NATIVE_VALUE_ECO_RETAINED_ACTIVE_CINHF_ECO_REPEAT_EVIDENCE_HUMAN_ACCEPTED_PHYSICAL_QUALIFICATION_PENDING",
             "PCB-PWR capture status does not expose the post-ECO review gate")
     require(status_eco.get("target_fuse_mpn") == fuse["target_evt_mpn"],
             "PCB-PWR capture status target fuse mismatch")
@@ -221,10 +222,10 @@ def main() -> int:
     active_hierarchy_evidence = capture_status.get("human_readable_hierarchy", {}).get(
         "current_evidence", {})
     active_evidence_complete = active_hierarchy_evidence.get("status") == \
-        "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING"
+        "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
     require(status_eco.get("repeat_native_kicad_9_erc_complete") is active_evidence_complete and
             status_eco.get("repeat_pdf_evidence_complete") is active_evidence_complete and
-            status_eco.get("repeat_independent_human_hierarchy_review_complete") is False,
+            status_eco.get("repeat_independent_human_hierarchy_review_complete") is active_evidence_complete,
             "PCB-PWR capture status repeat-evidence boundary drift")
     require(status_eco.get("pcba_procurement_authorized") is False,
             "PCB-PWR capture status prematurely authorizes procurement")
@@ -260,8 +261,15 @@ def main() -> int:
             matrix_by_id["PWR-IPQ-003"]["Artifact_SHA256"] ==
             "bf80f07c9b20d93d610c3e8c124887becb4209f8d688f085fe68bac53e0ad0b9",
             "PWR-IPQ-003 native-value ECO evidence drift")
-    require(matrix_by_id["PWR-IPQ-004"]["Status"] == "PENDING_EVIDENCE",
-            "PWR-IPQ-004 must remain pending until independent human hierarchy review")
+    require(matrix_by_id["PWR-IPQ-004"]["Status"] == "PASS" and
+            matrix_by_id["PWR-IPQ-004"]["Result"] ==
+            "Source e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a and PDF 7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130 accepted hierarchy-only" and
+            matrix_by_id["PWR-IPQ-004"]["Operator"] ==
+            "GitHub Actions run 35217048575 + reviewer Скиф" and
+            matrix_by_id["PWR-IPQ-004"]["Date"] == "2026-09-17" and
+            matrix_by_id["PWR-IPQ-004"]["Artifact_SHA256"] ==
+            "f29dfa4e0be9c25f8023e7d5218a97a28db70b0a1059eaca0141f699f46e64d3",
+            "PWR-IPQ-004 repeat hierarchy evidence drift")
 
     accepted_rows = sum(row["Status"] == "PASS" for row in matrix)
     failed_rows = [row["Test_ID"] for row in matrix if row["Status"] == "FAIL"]
@@ -274,9 +282,9 @@ def main() -> int:
                 and repeat_gate_complete)
     require(contract["test_matrix"]["required_rows"] == 20,
             "contract qualification row count drift")
-    require(contract["test_matrix"]["accepted_rows"] == 1,
+    require(contract["test_matrix"]["accepted_rows"] == 2,
             "contract accepted-row count does not match post-ECO evidence")
-    require(status_eco.get("accepted_test_rows") == accepted_rows == 1,
+    require(status_eco.get("accepted_test_rows") == accepted_rows == 2,
             "capture-status qualification accepted-row count drift")
     require(contract["test_matrix"]["complete"] is False,
             "contract claims physical qualification complete")

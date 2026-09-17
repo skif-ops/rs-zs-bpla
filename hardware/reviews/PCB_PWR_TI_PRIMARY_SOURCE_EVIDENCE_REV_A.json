@@ -161,7 +161,7 @@
     "electrical_schematic_changed_by_this_record": false,
     "native_schematic_source_commit": "e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a",
     "review_pdf_sha256": "7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130",
-    "independent_human_hierarchy_acceptance_complete": false,
+    "independent_human_hierarchy_acceptance_complete": true,
     "routing_authorized": false,
     "procurement_authorized": false,
     "manufacturing_release": false,

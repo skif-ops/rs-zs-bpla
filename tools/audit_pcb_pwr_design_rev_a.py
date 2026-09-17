@@ -316,7 +316,9 @@ def main() -> int:
     require(release_boundary["electrical_schematic_changed_by_this_record"] is False, "TI evidence unexpectedly claims an electrical ECO")
     require(release_boundary["native_schematic_source_commit"] == "e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a", "TI evidence source-commit binding mismatch")
     require(release_boundary["review_pdf_sha256"] == "7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130", "TI evidence PDF binding mismatch")
-    for field in ("independent_human_hierarchy_acceptance_complete", "routing_authorized", "procurement_authorized", "manufacturing_release"):
+    require(release_boundary["independent_human_hierarchy_acceptance_complete"] is True,
+            "TI evidence does not retain the accepted hierarchy decision")
+    for field in ("routing_authorized", "procurement_authorized", "manufacturing_release"):
         require(release_boundary[field] is False, f"TI evidence release interlock weakened: {field}")
     required_open_controls = {
         "C11_C12_effective_capacitance_at_bias_and_temperature",
@@ -362,9 +364,10 @@ def main() -> int:
         },
         "PCB-PWR status TI source hashes mismatch",
     )
+    require(evidence_control["independent_human_hierarchy_acceptance_complete"] is True,
+            "PCB-PWR status lost accepted hierarchy decision")
     for field in (
         "electrical_schematic_changed",
-        "independent_human_hierarchy_acceptance_complete",
         "routing_authorized",
         "manufacturing_release",
     ):

@@ -74,14 +74,14 @@
     "repeat_pdf_evidence_required": true,
     "repeat_pdf_evidence_complete": true,
     "repeat_independent_human_hierarchy_review_required": true,
-    "repeat_independent_human_hierarchy_review_complete": false,
+    "repeat_independent_human_hierarchy_review_complete": true,
     "pcba_procurement_authorized": false,
     "manufacturing_release": false
   },
   "test_matrix": {
     "path": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
     "required_rows": 20,
-    "accepted_rows": 1,
+    "accepted_rows": 2,
     "complete": false
   },
   "source_evidence": [

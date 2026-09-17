@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A TI primary-source evidence
 
-Status: `PASS PRIMARY-SOURCE BINDING / SCHEMATIC UNCHANGED / HUMAN HIERARCHY SIGNATURE PENDING / NOT FOR MANUFACTURE`
+Status: `PASS PRIMARY-SOURCE BINDING / SCHEMATIC UNCHANGED / HUMAN HIERARCHY ACCEPTED / NOT FOR MANUFACTURE`
 
 This record answers the two data-sheet questions raised during the independent
 read-only review of PCB-PWR at branch commit `4c73232151bc132443c256e1a37f43ccae24c18f`.
@@ -93,5 +93,7 @@ This evidence record makes no electrical change. The reviewed native source
 remains commit `e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a`; the readable A3 PDF
 remains SHA-256
 `7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`.
-A reviewer decision for that exact source/PDF pair is still required. Routing,
-procurement and manufacturing remain prohibited.
+Reviewer `Скиф` accepted that exact source/PDF pair on `2026-09-17` with
+decision `ACCEPT_HIERARCHY_ONLY`; the signed record is
+`hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md`. Routing, procurement and
+manufacturing remain prohibited.

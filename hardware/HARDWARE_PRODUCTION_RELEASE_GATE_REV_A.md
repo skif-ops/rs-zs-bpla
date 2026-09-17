@@ -93,8 +93,9 @@ passes KiCad 9.0.9 ERC with zero violations on all five sheets. Its five-page A3
 PDF SHA-256 is
 `7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`;
 all pages pass visual preflight without text/symbol/connection overlap or
-clipping. A new independent hierarchy decision remains open. Routing and
-manufacturing release remain blocked by the separate gates below.
+clipping. Reviewer `Скиф` accepted this exact source/PDF pair on `2026-09-17`
+with decision `ACCEPT_HIERARCHY_ONLY`. Routing and manufacturing release remain
+blocked by the separate gates below.
 
 The independent review's LMR60440 part-mode and LM74700 VCAP document questions
 are now closed by the machine-audited
@@ -120,10 +121,9 @@ PCB and generators with footprint, placement, topology, nets and pad mapping
 retained. This does not extend the prior hierarchy acceptance. The earlier
 post-ECO PDF is superseded by the legibility remediation, and the later C20/C21
 electrical ECO supersedes the first remediated artifact. Fresh active-source
-KiCad 9 ERC/PDF evidence now passes; independent human hierarchy review remains
-mandatory. The
-input-protection matrix has `1/20` accepted rows
-(`PWR-IPQ-003`); PCBA procurement and manufacturing release remain prohibited.
+KiCad 9 ERC/PDF evidence and independent human hierarchy review now pass. The
+input-protection matrix has `2/20` accepted rows (`PWR-IPQ-003/004`); PCBA
+procurement and manufacturing release remain prohibited.
 
 PCB-PWR has also passed its bounded fitted-body 2D placement-clearance subgate.
 All 44 simultaneously fitted footprints have controlled courtyards, the required
@@ -172,10 +172,8 @@ blocked by `DIM-001`, `DIM-003` and `DIM-012`; the packet is not a build release
   numeric current-density/thermal geometry and physical power evidence; PCB-MIC independent Review B,
   CAM comparison, panelization and acoustic-stack review; all three boards'
   DFM and manufacturing release;
-- PCB-PWR independent human hierarchy acceptance of the commit-bound ERC/PDF
-  evidence after the applied F1 value-only ECO from rejected historical
-  `0451005.MRL` to active target `0451008.MRL`, plus the remaining 19
-  input-protection qualification rows including +70 C 5 A thermal,
+- the remaining 18 PCB-PWR input-protection qualification rows after accepted
+  native-value and repeat-hierarchy gates, including +70 C 5 A thermal,
   prospective-current, battery-side primary-fuse and SMBJ18A coordination;
 - selected-assembler acceptance of the PCB-MAIN U2/U25/U26 project IPC
   candidates, U9 process-dependent stencil adaptation, PnP polarity,

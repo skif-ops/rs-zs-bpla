@@ -97,10 +97,10 @@ def placement_candidate_audit(name: str) -> str | None:
             "current_evidence", {}
         )
         evidence_complete = current_evidence.get("status") == (
-            "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING"
+            "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
         )
         expected = (
-            "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING_"
+            "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_"
             "FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_"
             "ROUTING_PENDING"
             if evidence_complete else

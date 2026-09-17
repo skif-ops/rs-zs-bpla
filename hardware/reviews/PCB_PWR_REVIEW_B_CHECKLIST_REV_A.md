@@ -1,10 +1,10 @@
 # PCB-PWR Rev.A Review B checklist
 
-Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC AND PDF EVIDENCE PASS / HUMAN HIERARCHY REVIEW PENDING / REVIEW B OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
+Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / REVIEW B OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
 
-Review B is independent from the completed pin/net Review A. Only the historical
-bounded hierarchy subgate is signed; the active C20/C21 ECO is unsigned and this
-checklist contains no routing, CAM or manufacturing-release assertion.
+Review B is independent from the completed pin/net Review A. The active C20/C21
+hierarchy subgate is signed, but this checklist contains no routing, CAM or
+manufacturing-release assertion.
 
 ## 1. Current controlled baseline
 
@@ -49,8 +49,9 @@ checklist contains no routing, CAM or manufacturing-release assertion.
   passes KiCad 9.0.9 ERC with zero violations on all five sheets. PDF SHA-256
   `7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`
   covers five A3 landscape pages; independent visual preflight found no
-  text/symbol/connection overlap or clipping. Independent human review of this
-  exact active source and PDF remains pending.
+  text/symbol/connection overlap or clipping. Reviewer `Скиф` accepted this
+  exact active source/PDF pair on `2026-09-17` with decision
+  `ACCEPT_HIERARCHY_ONLY`.
 - Native PCB: provisional 90 x 60 x 1.6 mm, four copper layers, 62 footprints,
   zero mounting holes, zero traces/vias/zones.
 - TI primary-source binding: `PASS`. The machine-audited record
@@ -75,9 +76,8 @@ checklist contains no routing, CAM or manufacturing-release assertion.
 - Input protection: active native F1 is Littelfuse `0451008.MRL` and target D1
   remains `SMBJ18A`. The bounded value-only ECO is applied with footprint,
   placement, topology and nets retained. The later C20/C21 electrical ECO leaves
-  F1 unchanged. Its active-source ERC/PDF artifact passes, while the new human
-  hierarchy review remains open; 19 of 20 input-protection qualification rows
-  remain open.
+  F1 unchanged. Its active-source ERC/PDF/human hierarchy gate passes; 18 of 20
+  input-protection qualification rows remain open.
   PCBA procurement is prohibited.
 
 ## 2. Review-B gate
@@ -122,9 +122,10 @@ checklist contains no routing, CAM or manufacturing-release assertion.
 - [ ] Routed C11/C20/U3 and C12/C21/U4 VIN-PGND hot loops prove direct
   pad-first geometry; C11/C12 effective capacitance at bias and temperature is
   accepted. C13 remains central damping and is not a local-CIN substitute.
-- [ ] A new independent hierarchy review accepts exact source commit
+- [x] Independent reviewer `Скиф` accepted exact source commit
   `e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a` and PDF SHA-256
-  `7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`.
+  `7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`
+  on `2026-09-17` with decision `ACCEPT_HIERARCHY_ONLY`.
 - [ ] Conducted-emissions, RF coexistence and signed input-filter/no-filter
   decision rows `EVT-PWR-02/03/04` pass before routing.
 - [ ] All 20 rows in `PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv` pass,
@@ -162,8 +163,8 @@ checklist contains no routing, CAM or manufacturing-release assertion.
 `2026-09-16` for source commit `2a973f6856aa115aa59323d619be985578780682`
 and PDF SHA-256 `7a1eee774d6a0dd03e6cb72935824f5a7d2af4bebe0e37ad739f61eb8d32a1f4`.
 The active source includes the later C20/C21 electrical ECO and has a new exact
-pin/net semantic digest. Commit-bound KiCad 9 ERC/PDF evidence passes;
-independent human review remains pending. Fitted-body 2D
+pin/net semantic digest. Commit-bound KiCad 9 ERC/PDF evidence and independent
+human hierarchy acceptance pass. Fitted-body 2D
 clearance, constraint coverage and the
 internal DIM-003 and two-fabricator stackup/copper requests remain valid. The
 response registers remain `0/18` and `0/24` with `0/2` accepted fabricator sets.

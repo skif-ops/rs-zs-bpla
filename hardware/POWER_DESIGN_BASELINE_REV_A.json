@@ -25,7 +25,7 @@
     "vcap_requirement_source": "TI LM74700-Q1 Rev.G recommends 0.1 uF"
   },
   "input_protection_qualification": {
-    "status": "TARGET_EVT_CANDIDATES_SELECTED_NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_AND_PHYSICAL_QUALIFICATION_PENDING",
+    "status": "TARGET_EVT_CANDIDATES_SELECTED_NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_COMPLETE_PHYSICAL_QUALIFICATION_PENDING",
     "system_continuous_current_a": 5.0,
     "system_continuous_current_interpretation": "CONSERVATIVE_QUALIFICATION_AND_PROTECTION_ENVELOPE_NOT_PREDICTED_NORMAL_DRAW",
     "two_buck_max_output_power_w": 28.4,
@@ -46,7 +46,7 @@
       "fault_i2t_trace_harness_and_primary_fuse_coordination_required": true,
       "package_land_pattern_change": false,
       "native_value_eco_applied": true,
-      "repeat_erc_pdf_human_hierarchy_review_complete": false
+      "repeat_erc_pdf_human_hierarchy_review_complete": true
     },
     "input_connector": {
       "board_header_mpn": "43045-0213",

@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A input-protection qualification
 
-Status: `CONTROLLED PLAN / F1 NATIVE VALUE ECO APPLIED / C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC AND PDF EVIDENCE PASS / HUMAN REVIEW AND PHYSICAL EVIDENCE PENDING / NOT FOR MANUFACTURE`
+Status: `CONTROLLED PLAN / F1 NATIVE VALUE ECO APPLIED / C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / PHYSICAL EVIDENCE PENDING / NOT FOR MANUFACTURE`
 
 Configuration: `EVT-PRE-20 Rev.A`
 
@@ -10,8 +10,9 @@ or pad mapping. The previously accepted five-page source remains historical
 evidence only. The post-ECO PDF was superseded after independent review found
 text/symbol overlap. The later C20/C21 electrical ECO superseded the first
 remediated artifact. Fresh commit-bound ERC/PDF evidence for the active source
-now passes; a new independent human hierarchy decision is required before any
-PCB assembly procurement.
+passes, and reviewer `Скиф` accepted the exact active source/PDF hierarchy on
+`2026-09-17`. Physical qualification remains required before any PCB assembly
+procurement.
 
 ## 1. Controlled decision
 
@@ -31,7 +32,7 @@ The exact EVT qualification pair is:
 
 | Function | Candidate | Controlled rating | State |
 |---|---|---|---|
-| F1 PCB input fuse | Littelfuse `0451008.MRL` | 8 A; 7.7 mOhm nominal cold resistance; 20.23 A²s nominal melting I²t; 400 A at 32 VDC interrupting rating | Native value ECO retained through C20/C21 ECO; active-source ERC/PDF evidence passes; human review and physical qualification pending |
+| F1 PCB input fuse | Littelfuse `0451008.MRL` | 8 A; 7.7 mOhm nominal cold resistance; 20.23 A²s nominal melting I²t; 400 A at 32 VDC interrupting rating | Native value ECO retained through C20/C21 ECO; active-source ERC/PDF/human hierarchy evidence passes; physical qualification pending |
 | D1 transient clamp | Littelfuse `SMBJ18A` | 18 V standoff; 20.0–22.1 V breakdown; 29.2 V maximum clamp at 20.6 A; 600 W at 10/1000 us | Selected for qualification; measured transient envelope pending |
 
 At 5 A the fuse's nominal cold loss is:
@@ -64,8 +65,8 @@ commit `6ba3ba5d219b95cb7de12f37c4eb646f7f18cfa8`, KiCad 9.0.9 ERC passes
 with zero violations on five sheets and PDF SHA-256
 `16afef6ecb337109f2a61318c9459167c6d06f4b74534b656c97884c1fed57dd`
 covers five visually preflighted A3 landscape pages without text/symbol/
-connection overlap or clipping. A repeat independent hierarchy decision remains
-mandatory. The subsequent C20/C21 CIN_HF electrical ECO retains F1 and changes
+connection overlap or clipping. That evidence was superseded before review by
+the subsequent C20/C21 CIN_HF electrical ECO, which retains F1 and changes
 the active pin/net digest. For exact source commit
 `e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a`, Schematic Gate
 [#35217048575](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35217048575)
@@ -73,9 +74,10 @@ passes KiCad 9.0.9 ERC with zero violations on five sheets. Its five-page A3
 PDF SHA-256 is
 `7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`
 and passes visual preflight without text/symbol/connection overlap or clipping.
-The repeat independent hierarchy decision remains mandatory.
+Reviewer `Скиф` accepted that exact source/PDF pair on `2026-09-17` with
+decision `ACCEPT_HIERARCHY_ONLY`; `PWR-IPQ-004` is therefore `PASS`.
 
-Until then:
+The retained interlocks are:
 
 - no PCB-PWR PCBA procurement is authorized;
 - no BOM line may claim `CONTROLLED` release for F1;
@@ -117,7 +119,7 @@ Tests run in the order controlled by
 `PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv`:
 
 1. source control, sample identity and bounded native ECO;
-2. repeat ERC/PDF/human hierarchy gate after the legibility remediation (ERC/PDF evidence passes; human review pending);
+2. repeat ERC/PDF/human hierarchy gate after the legibility remediation and C20/C21 ECO (`PASS`);
 3. 25 C, +70 C and -40 C operating tests;
 4. inrush and modem-burst tests;
 5. overload, prospective-short and primary-fuse coordination using a

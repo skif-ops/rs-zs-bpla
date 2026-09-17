@@ -635,6 +635,7 @@ jobs:
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv
             hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
             hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md
+            hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md
             hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb

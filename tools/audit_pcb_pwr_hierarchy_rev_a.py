@@ -23,6 +23,7 @@ from pcb_pwr_schematic_hierarchy import (
 ROOT = Path(__file__).resolve().parents[1]
 PCB = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
+REVIEW_RECORD = ROOT / "hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md"
 SYMBOL_LIBRARY = ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.kicad_sym"
 GRID_MM = 2.54
 ROOT_LABEL_FONT_MAX_MM = 0.02
@@ -425,7 +426,7 @@ def main() -> int:
         "erc_native_kicad_9": "PENDING_COMMIT_BOUND_POST_CINHF_ECO",
         "hierarchy_pdf_evidence": "PENDING_COMMIT_BOUND_POST_CINHF_ECO",
         "pin_net_review_a": "RETAINED_BY_EXACT_ELECTRICAL_EQUIVALENCE",
-        "hierarchy_human_review": "PENDING_REPEAT_INDEPENDENT_REVIEW_POST_CINHF_ECO",
+        "hierarchy_human_review": "ACCEPTED_SKIF_ACCEPT_HIERARCHY_ONLY",
         "manufacturing_release": False,
     }
     status = json.loads(STATUS.read_text(encoding="utf-8"))
@@ -433,11 +434,14 @@ def main() -> int:
     control = hierarchy.get("control", {})
     require(hierarchy.get("generator") == "tools/materialize_pcb_pwr_hierarchy_rev_a.py" and
             hierarchy.get("connectivity_reader") == "tools/pcb_pwr_schematic_hierarchy.py" and
-            hierarchy.get("independent_audit") == "tools/audit_pcb_pwr_hierarchy_rev_a.py",
+            hierarchy.get("independent_audit") == "tools/audit_pcb_pwr_hierarchy_rev_a.py" and
+            hierarchy.get("review_record") ==
+            "hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md" and
+            REVIEW_RECORD.is_file(),
             "PCB-PWR status does not bind the hierarchy toolchain")
     current_evidence = hierarchy.get("current_evidence", {})
     evidence_complete = current_evidence.get("status") == \
-        "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING"
+        "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
     for key, expected in {
         "pages": 5,
         "functional_child_sheets": 4,
@@ -451,7 +455,7 @@ def main() -> int:
         "native_kicad_9_erc_pass": evidence_complete,
         "committed_erc_evidence": evidence_complete,
         "committed_pdf_evidence": evidence_complete,
-        "independent_human_review_complete": False,
+        "independent_human_review_complete": True,
         "prior_evidence_superseded_by_f1_value_eco": True,
         "prior_evidence_superseded_by_legibility_remediation": True,
         "prior_evidence_superseded_by_cinhf_eco": True,
@@ -462,7 +466,7 @@ def main() -> int:
                 f"PCB-PWR hierarchy status {key} drift: {control.get(key)!r} != {expected!r}")
     expected_state = (
         "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_"
-        "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING"
+        "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
         if evidence_complete else
         "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_"
         "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PENDING_HUMAN_REVIEW_PENDING"
@@ -480,8 +484,17 @@ def main() -> int:
     }
     require(current_evidence.get("change") == expected_change,
             "PCB-PWR active CIN_HF ECO evidence change boundary drift")
-    require(current_evidence.get("independent_human_review") is None and
-            current_evidence.get("routing_authorized") is False and
+    require(current_evidence.get("independent_human_review") == {
+                "status": "ACCEPTED_INDEPENDENT_HUMAN_REVIEW",
+                "reviewer": "Скиф",
+                "date": "2026-09-17",
+                "decision": "ACCEPT_HIERARCHY_ONLY",
+                "scope": "PCB_PWR_HUMAN_READABLE_HIERARCHY_ONLY",
+                "reviewed_source_commit_sha":
+                    "e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a",
+                "reviewed_pdf_sha256":
+                    "7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130",
+            } and current_evidence.get("routing_authorized") is False and
             current_evidence.get("manufacturing_release") is False,
             "PCB-PWR active CIN_HF ECO review/release interlock drift")
     evidence_fields = (
