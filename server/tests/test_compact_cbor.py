@@ -52,7 +52,7 @@ def test_legacy_packet_remains_decodable():
     assert msg.station.position_source=='gnss_live'
     assert msg.gnss.position_trust=='UNCONFIGURED'
 
-def test_compact_cbor_http_ingress():
+def test_compact_cbor_http_ingress(insecure_station_http_bench):
     client=TestClient(app); r=client.post('/api/v1/stations/7011/detection.cbor',content=compact_packet(7011,0x55667788),headers={'content-type':'application/cbor'})
     assert r.status_code==200,r.text; assert r.json()['event_type'] in ('AIR_WARNING','AIR_ALERT')
 

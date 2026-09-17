@@ -1,0 +1,476 @@
+#include "zs_bg95.h"
+#include "zs_protocol.h"
+
+#include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+  char uart[8192];
+  size_t used;
+  unsigned uart_calls;
+  unsigned short_uart_call;
+  bool gpio[8];
+} mock_t;
+
+static int uart_write(void *ctx, unsigned channel, const uint8_t *data, size_t len) {
+  mock_t *mock = ctx;
+  (void)channel;
+  ++mock->uart_calls;
+  if (mock->uart_calls == mock->short_uart_call)
+    return len > 1u ? (int)(len - 1u) : -1;
+  if (mock->used + len >= sizeof(mock->uart)) return -1;
+  memcpy(mock->uart + mock->used, data, len);
+  mock->used += len;
+  mock->uart[mock->used] = '\0';
+  return 0;
+}
+
+static void gpio_write(void *ctx, unsigned id, bool level) {
+  mock_t *mock = ctx;
+  if (id < 8u) mock->gpio[id] = level;
+}
+
+static zs_hal_port_t port(mock_t *mock) {
+  zs_hal_port_t io = {0};
+  io.ctx = mock;
+  io.uart_write = uart_write;
+  io.gpio_write = gpio_write;
+  return io;
+}
+
+static void expect_last(const zs_bg95_t *modem, const char *command) {
+  assert(strcmp(modem->last_command, command) == 0);
+  assert(modem->command_pending);
+}
+
+static bool contains_bytes(const uint8_t *data, size_t size, const char *text) {
+  size_t i, length = strlen(text);
+  if (length == 0u || length > size) return false;
+  for (i = 0u; i + length <= size; ++i) {
+    if (memcmp(data + i, text, length) == 0) return true;
+  }
+  return false;
+}
+
+static void reach_registered(zs_bg95_t *modem, mock_t *mock, const char *apn) {
+  zs_hal_port_t io = port(mock);
+  zs_bg95_init(modem, &io, 1u, 2u, apn);
+  zs_bg95_power_on(modem, 0u);
+  assert(mock->gpio[2]);
+  zs_bg95_tick(modem, 700u);
+  assert(!mock->gpio[2]);
+  zs_bg95_tick(modem, 700u);
+  expect_last(modem, "AT");
+  zs_bg95_on_line(modem, "OK", 701u);
+  expect_last(modem, "AT+CPIN?");
+  zs_bg95_on_line(modem, "+CPIN: READY", 702u);
+  expect_last(modem, "AT+CPIN?");
+  zs_bg95_on_line(modem, "OK", 703u);
+  expect_last(modem, "AT+QCCID");
+  zs_bg95_on_line(modem, "+QCCID: 89701012345678901234", 704u);
+  zs_bg95_on_line(modem, "OK", 705u);
+  expect_last(modem, "AT+CIMI");
+  zs_bg95_on_line(modem, "250011234567890", 706u);
+  zs_bg95_on_line(modem, "OK", 707u);
+  expect_last(modem, "AT+COPS?");
+  zs_bg95_on_line(modem, "+COPS: 0,0,\"Test Operator\",7", 708u);
+  zs_bg95_on_line(modem, "OK", 709u);
+  assert(strstr(modem->last_command, "AT+CGDCONT=1,\"IP\"") != NULL);
+  zs_bg95_on_line(modem, "OK", 710u);
+  expect_last(modem, "AT+CEREG?");
+  zs_bg95_on_line(modem, "+CEREG: 2,1,\"001A\",\"00BC1234\",8", 711u);
+  assert(modem->state == ZS_BG95_READY);
+}
+
+static void provide_pdp_settings(zs_bg95_t *modem, uint32_t now_ms, const char *apn) {
+  char line[320];
+  int n;
+  zs_bg95_on_line(modem, "OK", now_ms);
+  expect_last(modem, "AT+CGCONTRDP=1");
+  n = snprintf(line, sizeof(line),
+               "+CGCONTRDP: 1,5,\"%s\",\"10.10.0.2.255.255.255.0\","
+               "\"10.10.0.1\",\"1.1.1.1\",\"8.8.8.8\"", apn);
+  assert(n > 0 && (size_t)n < sizeof(line));
+  zs_bg95_on_line(modem, line, now_ms + 1u);
+  zs_bg95_on_line(modem, "OK", now_ms + 2u);
+  expect_last(modem, "AT+QSSLCFG=\"sslversion\",1,4");
+}
+
+static void test_mqtt_tls_happy_path(void) {
+  mock_t mock = {0};
+  zs_bg95_t modem;
+  const zs_bg95_network_settings_t *settings;
+  reach_registered(&modem, &mock, "internet");
+  assert(zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 443u,
+                                    "dioneya-001-boot1", "UFS:pilot-ca.pem", true));
+  assert(zs_bg95_start_mqtt(&modem, 1000u));
+  expect_last(&modem, "AT+QIACT=1");
+  provide_pdp_settings(&modem, 1001u, "internet");
+  settings = zs_bg95_get_network_settings(&modem);
+  assert(settings && settings->valid);
+  assert(strcmp(settings->apn, "internet") == 0);
+  assert(strcmp(settings->local_address, "10.10.0.2.255.255.255.0") == 0);
+  assert(strcmp(settings->gateway, "10.10.0.1") == 0);
+  assert(strcmp(settings->primary_dns, "1.1.1.1") == 0);
+  assert(strcmp(settings->secondary_dns, "8.8.8.8") == 0);
+  zs_bg95_on_line(&modem, "OK", 1004u);
+  expect_last(&modem, "AT+QSSLCFG=\"seclevel\",1,2");
+  zs_bg95_on_line(&modem, "OK", 1005u);
+  expect_last(&modem, "AT+QSSLCFG=\"cacert\",1,\"UFS:pilot-ca.pem\"");
+  zs_bg95_on_line(&modem, "OK", 1006u);
+  expect_last(&modem, "AT+QMTCFG=\"ssl\",0,1,1");
+  zs_bg95_on_line(&modem, "OK", 1007u);
+  expect_last(&modem, "AT+QMTCFG=\"recv/mode\",0,0,1");
+  assert(!modem.mqtt_receive_length_enabled);
+  zs_bg95_on_line(&modem, "OK", 1008u);
+  expect_last(&modem, "AT+QMTOPEN=0,\"pilot.example\",443");
+  assert(modem.mqtt_receive_length_enabled);
+  zs_bg95_on_line(&modem, "OK", 1009u);
+  assert(modem.state == ZS_BG95_MQTT_OPENING);
+  zs_bg95_on_line(&modem, "+QMTOPEN: 0,0", 1010u);
+  expect_last(&modem, "AT+QMTCONN=0,\"dioneya-001-boot1\"");
+  zs_bg95_on_line(&modem, "+QMTCONN: 0,0,0", 1011u);
+  assert(zs_bg95_online(&modem));
+  assert(modem.mqtt_open && modem.mqtt_connected);
+}
+
+static void boot_to_auto_apn(zs_bg95_t *modem, mock_t *mock,
+                             const zs_bg95_apn_profile_t *profiles,
+                             size_t profile_count, const char *imsi,
+                             const char *network_apn) {
+  zs_hal_port_t io = port(mock);
+  char line[96];
+  int n;
+  zs_bg95_init(modem, &io, 1u, 2u, NULL);
+  assert(zs_bg95_configure_auto_network(modem, profiles, profile_count));
+  assert(zs_bg95_configure_mqtt_tls(modem, "pilot.example", 443u,
+                                    "dioneya-auto", "UFS:pilot-ca.pem", true));
+  zs_bg95_power_on(modem, 0u);
+  zs_bg95_tick(modem, 700u);
+  zs_bg95_tick(modem, 700u);
+  zs_bg95_on_line(modem, "OK", 701u);
+  expect_last(modem, "AT+CPIN?");
+  zs_bg95_on_line(modem, "+CPIN: READY", 702u);
+  zs_bg95_on_line(modem, "OK", 703u);
+  expect_last(modem, "AT+QCCID");
+  zs_bg95_on_line(modem, "+QCCID: 89701012345678901234", 704u);
+  zs_bg95_on_line(modem, "OK", 705u);
+  expect_last(modem, "AT+CIMI");
+  zs_bg95_on_line(modem, imsi, 706u);
+  assert(modem->state != ZS_BG95_ERROR);
+  zs_bg95_on_line(modem, "OK", 707u);
+  expect_last(modem, "AT+COPS?");
+  zs_bg95_on_line(modem, "+COPS: 0,0,\"Test Operator\",7", 708u);
+  zs_bg95_on_line(modem, "OK", 709u);
+  expect_last(modem, "AT+CGNAPN");
+  n = snprintf(line, sizeof(line), "+CGNAPN: 1,\"%s\"", network_apn);
+  assert(n > 0 && (size_t)n < sizeof(line));
+  zs_bg95_on_line(modem, line, 710u);
+  zs_bg95_on_line(modem, "OK", 711u);
+}
+
+static void test_automatic_network_settings(void) {
+  static const zs_bg95_apn_profile_t profiles[] = {
+    {"25001", "", true, true},
+    {"25002", "catalog.apn", true, false}
+  };
+  mock_t mock = {0};
+  zs_bg95_t modem;
+  const zs_bg95_network_settings_t *settings;
+  zs_cellular_telemetry_t telemetry;
+  zs_heartbeat_t heartbeat = {0};
+  uint8_t encoded[1024];
+  size_t encoded_size;
+  const char *full_imsi = "250011234567890";
+  const char *full_iccid = "89701012345678901234";
+
+  boot_to_auto_apn(&modem, &mock, profiles, 2u, full_imsi, "network.apn");
+  expect_last(&modem, "AT+CGDCONT=1,\"IP\",\"network.apn\"");
+  assert(modem.network_settings.apn_source == ZS_BG95_APN_NETWORK);
+  assert(strcmp(modem.network_settings.home_plmn, "25001") == 0);
+  assert(strcmp(modem.network_settings.imsi, full_imsi) == 0);
+  assert(strcmp(modem.network_settings.iccid, full_iccid) == 0);
+  assert(strcmp(modem.network_settings.registered_operator, "Test Operator") == 0);
+  assert(modem.network_settings.access_technology == 7u);
+
+  zs_bg95_on_line(&modem, "OK", 712u);
+  expect_last(&modem, "AT+CEREG?");
+  zs_bg95_on_line(&modem, "+CEREG: 2,1", 713u);
+  assert(zs_bg95_start_mqtt(&modem, 714u));
+  provide_pdp_settings(&modem, 715u, "network.apn");
+  settings = zs_bg95_get_network_settings(&modem);
+  assert(settings && settings->valid);
+  assert(settings->apn_source == ZS_BG95_APN_NETWORK);
+  assert(zs_bg95_export_cellular_telemetry(&modem, &telemetry));
+  assert(strcmp(telemetry.imsi, full_imsi) == 0);
+  assert(strcmp(telemetry.iccid, full_iccid) == 0);
+  assert(telemetry.settings_valid);
+
+  heartbeat.schema_ver = 1u;
+  heartbeat.station_id = 424242u;
+  heartbeat.cellular = telemetry;
+  strcpy(heartbeat.firmware_ver, "evt-pre-20-test");
+  strcpy(heartbeat.model_ver, "model-test");
+  strcpy(heartbeat.hardware_rev, "EVT-PRE-20-Rev.A");
+  encoded_size = zs_protocol_encode_heartbeat(&heartbeat, encoded, sizeof(encoded));
+  assert(encoded_size > 0u);
+  assert(contains_bytes(encoded, encoded_size, full_imsi));
+  assert(contains_bytes(encoded, encoded_size, full_iccid));
+}
+
+static void test_catalog_fallback_and_unknown_sim(void) {
+  static const zs_bg95_apn_profile_t profiles[] = {
+    {"25002", "catalog.apn", true, false}
+  };
+  mock_t mock = {0};
+  zs_bg95_t modem;
+  zs_hal_port_t io = port(&mock);
+
+  zs_bg95_init(&modem, &io, 1u, 2u, NULL);
+  assert(zs_bg95_configure_auto_network(&modem, profiles, 1u));
+  zs_bg95_power_on(&modem, 0u);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_on_line(&modem, "OK", 701u);
+  zs_bg95_on_line(&modem, "+CPIN: READY", 702u);
+  zs_bg95_on_line(&modem, "OK", 703u);
+  expect_last(&modem, "AT+QCCID");
+  zs_bg95_on_line(&modem, "+QCCID: 89701012345678904321", 704u);
+  zs_bg95_on_line(&modem, "OK", 705u);
+  expect_last(&modem, "AT+CIMI");
+  zs_bg95_on_line(&modem, "250021234567890", 706u);
+  zs_bg95_on_line(&modem, "OK", 707u);
+  expect_last(&modem, "AT+COPS?");
+  zs_bg95_on_line(&modem, "ERROR", 708u);
+  expect_last(&modem, "AT+CGNAPN");
+  zs_bg95_on_line(&modem, "ERROR", 709u);
+  expect_last(&modem, "AT+CGDCONT=1,\"IP\",\"catalog.apn\"");
+  assert(modem.network_settings.apn_source == ZS_BG95_APN_CATALOG);
+
+  memset(&mock, 0, sizeof(mock));
+  io = port(&mock);
+  zs_bg95_init(&modem, &io, 1u, 2u, NULL);
+  assert(zs_bg95_configure_auto_network(&modem, profiles, 1u));
+  zs_bg95_power_on(&modem, 0u);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_on_line(&modem, "OK", 701u);
+  zs_bg95_on_line(&modem, "+CPIN: READY", 702u);
+  zs_bg95_on_line(&modem, "OK", 703u);
+  zs_bg95_on_line(&modem, "+QCCID: 89701012345678904321", 704u);
+  zs_bg95_on_line(&modem, "OK", 705u);
+  zs_bg95_on_line(&modem, "999991234567890", 706u);
+  assert(modem.state == ZS_BG95_ERROR);
+}
+
+static void test_identity_query_fail_closed(void) {
+  static const zs_bg95_apn_profile_t profiles[] = {
+    {"25001", "internet", true, true}
+  };
+  mock_t mock = {0};
+  zs_bg95_t modem;
+  zs_hal_port_t io = port(&mock);
+  zs_bg95_init(&modem, &io, 1u, 2u, NULL);
+  assert(zs_bg95_configure_auto_network(&modem, profiles, 1u));
+  zs_bg95_power_on(&modem, 0u);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_on_line(&modem, "OK", 701u);
+  zs_bg95_on_line(&modem, "+CPIN: READY", 702u);
+  zs_bg95_on_line(&modem, "OK", 703u);
+  expect_last(&modem, "AT+QCCID");
+  zs_bg95_on_line(&modem, "ERROR", 704u);
+  assert(modem.state == ZS_BG95_ERROR);
+
+  memset(&mock, 0, sizeof(mock));
+  io = port(&mock);
+  zs_bg95_init(&modem, &io, 1u, 2u, NULL);
+  assert(zs_bg95_configure_auto_network(&modem, profiles, 1u));
+  zs_bg95_power_on(&modem, 0u);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_on_line(&modem, "OK", 701u);
+  zs_bg95_on_line(&modem, "+CPIN: READY", 702u);
+  zs_bg95_on_line(&modem, "OK", 703u);
+  zs_bg95_on_line(&modem, "+QCCID: 1234", 704u);
+  assert(modem.state == ZS_BG95_ERROR);
+}
+
+static void test_graceful_power_off_requires_status_confirmation(void) {
+  mock_t mock = {0};
+  zs_bg95_t modem;
+  reach_registered(&modem, &mock, "internet");
+  assert(modem.network_settings.iccid[0] != '\0');
+  assert(zs_bg95_request_graceful_power_off(&modem, 800u) ==
+         ZS_BG95_SHUTDOWN_STARTED);
+  expect_last(&modem, "AT+QPOWD");
+  assert(zs_bg95_power_off_pending(&modem));
+  assert(!zs_bg95_confirm_power_off(&modem, false));
+
+  zs_bg95_power_on(&modem, 801u);
+  assert(modem.state == ZS_BG95_POWERING_OFF);
+  zs_bg95_on_line(&modem, "+QMTSTAT: 0,1", 802u);
+  assert(modem.state == ZS_BG95_POWERING_OFF);
+  zs_bg95_on_line(&modem, "NORMAL POWER DOWN", 803u);
+  assert(!modem.command_pending);
+  assert(zs_bg95_power_off_pending(&modem));
+  assert(zs_bg95_confirm_power_off(&modem, true));
+  assert(modem.state == ZS_BG95_OFF);
+  assert(modem.network_settings.iccid[0] == '\0');
+  assert(modem.network_settings.imsi[0] == '\0');
+  assert(!modem.sim_ready);
+  assert(zs_bg95_request_graceful_power_off(&modem, 804u) ==
+         ZS_BG95_SHUTDOWN_ALREADY_OFF);
+}
+
+static void test_graceful_power_off_busy_io_and_timeout(void) {
+  mock_t mock = {0};
+  zs_bg95_t modem;
+  zs_hal_port_t io = port(&mock);
+
+  zs_bg95_init(&modem, &io, 1u, 2u, "internet");
+  zs_bg95_power_on(&modem, 0u);
+  assert(zs_bg95_request_graceful_power_off(&modem, 1u) ==
+         ZS_BG95_SHUTDOWN_REJECTED_BUSY);
+  zs_bg95_tick(&modem, 700u);
+  zs_bg95_tick(&modem, 700u);
+  assert(modem.command_pending);
+  assert(zs_bg95_request_graceful_power_off(&modem, 701u) ==
+         ZS_BG95_SHUTDOWN_REJECTED_BUSY);
+
+  reach_registered(&modem, &mock, "internet");
+  mock.short_uart_call = mock.uart_calls + 1u;
+  assert(zs_bg95_request_graceful_power_off(&modem, 900u) ==
+         ZS_BG95_SHUTDOWN_IO_ERROR);
+  assert(modem.state == ZS_BG95_ERROR);
+
+  memset(&mock, 0, sizeof(mock));
+  reach_registered(&modem, &mock, "internet");
+  assert(zs_bg95_request_graceful_power_off(&modem, 1000u) ==
+         ZS_BG95_SHUTDOWN_STARTED);
+  zs_bg95_tick(&modem, 121000u);
+  assert(modem.state == ZS_BG95_ERROR);
+  assert(!zs_bg95_confirm_power_off(&modem, true));
+}
+
+static void test_fail_closed_policy_and_urc(void) {
+  static const zs_bg95_apn_profile_t private_profile[] = {
+    {"25001", "private.apn", true, false}
+  };
+  static const zs_bg95_apn_profile_t unapproved_profile[] = {
+    {"25001", "internet", false, false}
+  };
+  static const zs_bg95_apn_profile_t duplicate_profiles[] = {
+    {"25001", "internet", true, false},
+    {"25001", "alternate", true, false}
+  };
+  mock_t mock = {0};
+  zs_bg95_t modem;
+  zs_hal_port_t io = port(&mock);
+
+  zs_bg95_init(&modem, &io, 1u, 2u, "private.apn");
+  assert(modem.apn[0] == '\0');
+  assert(!zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 443u,
+                                     "dioneya-001", "UFS:ca.pem", true));
+  assert(!zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 1883u,
+                                     "dioneya-001", "UFS:ca.pem", true));
+  assert(!zs_bg95_configure_mqtt_tls(&modem, "pilot.example\"", 443u,
+                                     "dioneya-001", "UFS:ca.pem", true));
+  assert(!zs_bg95_start_mqtt(&modem, 2000u));
+
+  zs_bg95_init(&modem, &io, 1u, 2u, NULL);
+  assert(!zs_bg95_configure_auto_network(&modem, private_profile, 1u));
+  assert(!zs_bg95_configure_auto_network(&modem, unapproved_profile, 1u));
+  assert(!zs_bg95_configure_auto_network(&modem, duplicate_profiles, 2u));
+
+  memset(&mock, 0, sizeof(mock));
+  reach_registered(&modem, &mock, "internet");
+  assert(zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 8883u,
+                                    "dioneya-001", "UFS:ca.pem", true));
+  assert(zs_bg95_start_mqtt(&modem, 3000u));
+  zs_bg95_on_line(&modem, "ERROR", 3001u);
+  assert(modem.state == ZS_BG95_ERROR);
+  assert(!zs_bg95_online(&modem));
+
+  memset(&mock, 0, sizeof(mock));
+  reach_registered(&modem, &mock, "internet");
+  assert(zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 443u,
+                                    "dioneya-001", "UFS:ca.pem", true));
+  assert(!zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 1883u,
+                                     "dioneya-001", "UFS:ca.pem", true));
+  assert(!modem.transport_configured);
+}
+
+static void test_timeout_and_negative_results(void) {
+  mock_t mock = {0};
+  zs_bg95_t modem;
+  reach_registered(&modem, &mock, "internet");
+  assert(zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 443u,
+                                    "dioneya-001", "UFS:ca.pem", true));
+  assert(zs_bg95_start_mqtt(&modem, 4000u));
+  zs_bg95_tick(&modem, 124000u);
+  assert(modem.state == ZS_BG95_ERROR);
+
+  memset(&mock, 0, sizeof(mock));
+  reach_registered(&modem, &mock, "internet");
+  assert(zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 443u,
+                                    "dioneya-001", "UFS:ca.pem", true));
+  assert(zs_bg95_start_mqtt(&modem, 5000u));
+  provide_pdp_settings(&modem, 5001u, "internet");
+  zs_bg95_on_line(&modem, "OK", 5004u);
+  zs_bg95_on_line(&modem, "OK", 5005u);
+  zs_bg95_on_line(&modem, "OK", 5006u);
+  zs_bg95_on_line(&modem, "OK", 5007u);
+  zs_bg95_on_line(&modem, "OK", 5008u);
+  zs_bg95_on_line(&modem, "+QMTOPEN: 0,3", 5009u);
+  assert(modem.state == ZS_BG95_ERROR);
+
+  memset(&mock, 0, sizeof(mock));
+  reach_registered(&modem, &mock, "internet");
+  assert(zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 443u,
+                                    "dioneya-001", "UFS:ca.pem", true));
+  assert(zs_bg95_start_mqtt(&modem, 5500u));
+  provide_pdp_settings(&modem, 5501u, "internet");
+  zs_bg95_on_line(&modem, "OK", 5504u);
+  zs_bg95_on_line(&modem, "OK", 5505u);
+  zs_bg95_on_line(&modem, "OK", 5506u);
+  mock.short_uart_call = mock.uart_calls + 1u;
+  zs_bg95_on_line(&modem, "OK", 5507u);
+  assert(modem.state == ZS_BG95_ERROR);
+  assert(!modem.mqtt_receive_length_enabled);
+
+  memset(&mock, 0, sizeof(mock));
+  reach_registered(&modem, &mock, "internet");
+  assert(zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 443u,
+                                    "dioneya-001", "UFS:ca.pem", true));
+  assert(zs_bg95_start_mqtt(&modem, 6000u));
+  zs_bg95_on_line(&modem, "OK", 6001u);
+  zs_bg95_on_line(&modem,
+                  "+CGCONTRDP: 1,5,\"wrong.apn\",\"10.0.0.2\",\"10.0.0.1\",\"1.1.1.1\"",
+                  6002u);
+  assert(modem.state == ZS_BG95_ERROR);
+
+  memset(&mock, 0, sizeof(mock));
+  reach_registered(&modem, &mock, "internet");
+  assert(zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 443u,
+                                    "dioneya-001", "UFS:ca.pem", true));
+  assert(zs_bg95_start_mqtt(&modem, 7000u));
+  zs_bg95_on_line(&modem, "+CEREG: 0,2", 7001u);
+  assert(modem.state == ZS_BG95_ERROR);
+}
+
+int main(void) {
+  test_mqtt_tls_happy_path();
+  test_automatic_network_settings();
+  test_catalog_fallback_and_unknown_sim();
+  test_identity_query_fail_closed();
+  test_graceful_power_off_requires_status_confirmation();
+  test_graceful_power_off_busy_io_and_timeout();
+  test_fail_closed_policy_and_urc();
+  test_timeout_and_negative_results();
+  puts("zs_bg95_transport_tests: OK");
+  return 0;
+}

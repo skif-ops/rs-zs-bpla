@@ -8,11 +8,13 @@ This record closes only `MAIN-AUTH-001`. It establishes the complete package-pin
 
 - ST CubeMX device data: `mcu/STM32U585VITxQ.xml` at pinned upstream commit `f4ec11f00e762e37ffc4020f6d4f20d225bc061d`.
 - Pinned XML SHA-256: `4349055dfd06e6eb2dce1a440c44a995ad7c924e28435ede119a7d4bb10f556d`.
-- ST datasheet: DS13086 Rev 10, July 2024, `https://www.st.com/resource/en/datasheet/stm32u585ai.pdf`.
+- ST datasheet: DS13086 Rev 10, July 2024, `https://www.st.com/resource/en/datasheet/stm32u585ai.pdf`. Retrieved document SHA-256: `6483871075d4889d39356648a9c1f1fb34f48dce2ce3e8c5a8d73a73f7e935e3`.
 - ST hardware-development application note: AN5373 Rev 7, `https://www.st.com/resource/en/application_note/an5373-getting-started-with-stm32u5-mcu-hardware-development-stmicroelectronics.pdf`.
 - Project functional map: `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv` plus `hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv`.
 
 The 100 package positions are accounted for as 67 locked functional assignments, 12 explicit unused I/O positions, one NRST position, and 20 power, reference, SMPS, or ground positions.
+
+The project-local `ST_STM32U585_LQFP100_1L` footprint follows DS13086 Rev 10 Figure 96: 100 rectangular 1.20 x 0.30 mm lands at 0.50 mm pitch, 16.70 mm outer span, 14.30 mm inner span, and 12.30 mm span along each 25-land row. Solder-mask and stencil adaptation remain assembly-process/DFM controls because Figure 96 defines the copper footprint example only.
 
 The LoRa RF-switch controls are part of the locked functional set: PB15 / package pin 54 drives active-HIGH `LORA_TXEN`, and PD8 / package pin 55 drives active-HIGH `LORA_RXEN`. Both nets have external pull-downs and CubeMX LOW startup states. They must never be asserted at the same time. `LORA_DIO1` remains PC2 / EXTI2.
 

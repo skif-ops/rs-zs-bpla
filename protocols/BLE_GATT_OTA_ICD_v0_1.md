@@ -1,6 +1,6 @@
 # ICD BLE configuration and OTA v0.1
 
-Статус: `DRAFT / OPEN / NOT IMPLEMENTED`
+Статус: `DRAFT / PORTABLE POSITION COMMISSIONING CORE IMPLEMENTED / NRF GATT+OTA OPEN`
 
 ## 1. Роль BLE
 
@@ -34,6 +34,20 @@ BLE используется только рядом со станцией дл�
 | OTA | control | write/notify | start, resume, verify, install, rollback status |
 
 UUID, MTU, chunk size и flow control замораживаются после совместного Android/firmware prototype.
+
+Portable firmware boundary уже реализован до GATT transport binding. Он:
+- принимает запись координат только с origin `BLE_LOCAL`;
+- требует BLE Secure Connections, подтверждённую identity peer и роль installer/engineer;
+- требует физический service mode и проверяет 10-минутное окно;
+- разрешает installer только locked defaults position-trust policy, а изменение policy — engineer;
+- сам формирует станционный SHA-256 канонической записи, не доверяя hash из приложения;
+- выполняет обязательный audit intent до Flash mutation, atomic store commit, read-back/hash verify и audit committed;
+- возвращает отдельный `AUDIT_FINALIZE_FAILED`, если запись уже сохранена, но durable audit не подтверждён; такая станция не получает FIELD_READY.
+
+Это не является реализацией `nRF52840/GATT binding`: UUID, MTU, pairing/QR
+transport, межпроцессорный UART protocol, фактический service-mode timer и
+durable audit backend остаются открытыми до совместного firmware/Android
+prototype и target EVT.
 
 ### 3.1 installation_position
 

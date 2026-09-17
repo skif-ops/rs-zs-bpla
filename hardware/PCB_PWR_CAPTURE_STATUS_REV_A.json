@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-PWR",
+  "release_state": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_NATIVE_ERC_PDF_EVIDENCE_PASS_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_COPPER_REQUESTS_READY_CANDIDATE",
+  "manufacturing_release": false,
+  "native_schematic": {
+    "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
+    "status": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS",
+    "erc_status": "PASS_KICAD_9_ZERO_VIOLATIONS_COMMIT_BOUND_EVIDENCE",
+    "page_count": 5,
+    "functional_child_sheets": 4,
+    "child_paths": [
+      "hardware/kicad/native/PCB-PWR/PCB-PWR_01_INPUT_PROTECTION.kicad_sch",
+      "hardware/kicad/native/PCB-PWR/PCB-PWR_02_3V8_MODEM.kicad_sch",
+      "hardware/kicad/native/PCB-PWR/PCB-PWR_03_3V3_DIGITAL.kicad_sch",
+      "hardware/kicad/native/PCB-PWR/PCB-PWR_04_AUX_HARNESS.kicad_sch"
+    ]
+  },
+  "human_readable_hierarchy": {
+    "generator": "tools/materialize_pcb_pwr_hierarchy_rev_a.py",
+    "connectivity_reader": "tools/pcb_pwr_schematic_hierarchy.py",
+    "independent_audit": "tools/audit_pcb_pwr_hierarchy_rev_a.py",
+    "control": {
+      "state": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
+      "pages": 5,
+      "functional_child_sheets": 4,
+      "symbols": 63,
+      "physical_symbols": 60,
+      "wire_segments": 185,
+      "cross_sheet_nets": 9,
+      "hierarchical_labels": 26,
+      "pin_net_semantic_sha256": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
+      "pin_net_review_a_retained": true,
+      "native_kicad_9_erc_pass": true,
+      "committed_erc_evidence": true,
+      "committed_pdf_evidence": true,
+      "independent_human_review_complete": true,
+      "routing_authorized": false,
+      "manufacturing_release": false
+    },
+    "evidence": {
+      "status": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
+      "source_commit_sha": "2a973f6856aa115aa59323d619be985578780682",
+      "source_tree_sha": "c8cd8272c0ebe50a4e5fc30fd484427740dbda11",
+      "schematic_gate_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35122481138",
+      "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35122481079",
+      "pcb_native_gate_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35122481037",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35122481138/artifacts/10457498007",
+      "artifact_id": 10457498007,
+      "artifact_digest": "sha256:01d19ff8622c2cd3dbe420987439f3452800499116c84f72708df918503b4a75",
+      "erc": {
+        "path": "artifacts/kicad-native/PCB-PWR/erc.json",
+        "sha256": "0ec8289ecac2437eafc3c72b560dad1cdf92f1039c996658b245ab5ae0126b92",
+        "kicad_version": "9.0.9",
+        "sheets": 5,
+        "violations": 0
+      },
+      "schematic_pdf": {
+        "path": "artifacts/kicad-native/PCB-PWR/PCB-PWR_schematic.pdf",
+        "sha256": "7a1eee774d6a0dd03e6cb72935824f5a7d2af4bebe0e37ad739f61eb8d32a1f4",
+        "pages": 5,
+        "page_size": "A3",
+        "orientation": "landscape",
+        "visual_preflight": "PASS_NO_CLIPPING_NO_VISIBLE_DUPLICATE_ROOT_LABELS"
+      },
+      "schematic_source_sha256": {
+        "PCB-PWR.kicad_sch": "16365f1c8be5a98eb5f2635f2740198998baf560db15b2ee761d65c9ade903a5",
+        "PCB-PWR_01_INPUT_PROTECTION.kicad_sch": "33d557e3a6450e18f3e89a676284a24406a5a5cca9c4cf4d4c63b827711ebd9e",
+        "PCB-PWR_02_3V8_MODEM.kicad_sch": "c746b8a526c647d87c39c18163cb69f4fcf8952ec60859b95a2d7bb6718087e0",
+        "PCB-PWR_03_3V3_DIGITAL.kicad_sch": "53c1297232aa3932310d8f60135ff555516b45a4a5f31f29476d5b0bc26be724",
+        "PCB-PWR_04_AUX_HARNESS.kicad_sch": "b9a73ead5a7897857b8c57987cd79b65f66b4f13070a9023b15b0b00dece0c71"
+      },
+      "independent_human_review": {
+        "status": "ACCEPTED_INDEPENDENT_HUMAN_REVIEW",
+        "reviewer": "Скиф",
+        "date": "2026-09-16",
+        "decision": "ACCEPT_HIERARCHY_ONLY",
+        "scope": "PCB_PWR_HUMAN_READABLE_HIERARCHY_ONLY",
+        "reviewed_source_commit_sha": "2a973f6856aa115aa59323d619be985578780682",
+        "reviewed_pdf_sha256": "7a1eee774d6a0dd03e6cb72935824f5a7d2af4bebe0e37ad739f61eb8d32a1f4"
+      },
+      "routing_authorized": false,
+      "manufacturing_release": false
+    }
+  },
+  "native_layout": {
+    "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
+    "generator": "tools/generate_pcb_pwr_layout_candidate_rev_a.py",
+    "independent_audit": "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
+    "placement_authority": "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
+    "status": "PROVISIONAL_FITTED_2D_CLEARANCE_PASS_DIM_003_OPEN",
+    "outline_mm": [90.0, 60.0],
+    "outline_status": "PROVISIONAL_NOT_MECHANICALLY_FROZEN",
+    "copper_layers": 4,
+    "layer_count_authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
+    "layer_count_status": "FROZEN_REV_A_FINAL_STACKUP_OPEN",
+    "board_thickness_mm": 1.6,
+    "thickness_status": "PROVISIONAL_DIM_003_OPEN",
+    "mounting_holes": 0,
+    "mounting_status": "ABSENT_PENDING_DIM_003",
+    "routing_present": false,
+    "copper_zones_present": false,
+    "cam_export_authorized": false,
+    "placement_clearance": {
+      "audit": "tools/audit_pcb_pwr_placement_clearance_rev_a.py",
+      "record": "hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md",
+      "control": {
+        "state": "PASS_FITTED_2D_PLACEMENT_CLEARANCE_DIM_003_OPEN",
+        "board_semantic_sha256": "5f854a5276e8dfd6dc82516f61db1a158888b5343b82058e6024e5970b51e6c1",
+        "placement_authority_sha256": "98a9bd0c221d880c53e95f8bb93d92ae93b3237f94293a9b7e145f31a2eeb64f",
+        "fitted_footprints": 42,
+        "courtyard_footprints": 42,
+        "excluded_dnp_footprints": 5,
+        "excluded_pcb_feature_footprints": 13,
+        "required_clearance_mm": 0.2,
+        "minimum_observed_clearance_mm": 0.22,
+        "clearance_conflicts": 0,
+        "provisional_edge_overhangs": ["J2"],
+        "mounting_pattern": "OPEN_DIM_003",
+        "connector_and_probe_service_clearance": "OPEN_DIM_003_AND_FIXTURE_REVIEW",
+        "routing_complete": false,
+        "manufacturing_release": false
+      }
+    }
+  },
+  "mechanical_freeze_input": {
+    "dim_id": "DIM-003",
+    "request_packet": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md",
+    "machine_contract": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
+    "response_register": "hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv",
+    "independent_audit": "tools/audit_pcb_pwr_dim_003_request_rev_a.py",
+    "control": {
+      "state": "PASS_INTERNAL_DIM_003_REQUEST_READY_EXTERNAL_RESPONSE_PENDING",
+      "required_response_rows": 18,
+      "accepted_response_rows": 0,
+      "complete": false,
+      "outline_and_mounting_frozen": false,
+      "connector_service_volumes_accepted": false,
+      "dft_fixture_access_accepted": false,
+      "frozen_step_accepted": false,
+      "harness_length_release_authorized": false,
+      "routing_authorized": false,
+      "manufacturing_release": false
+    }
+  },
+  "stackup_copper_handoff": {
+    "request_packet": "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md",
+    "machine_contract": "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json",
+    "response_register": "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv",
+    "independent_audit": "tools/audit_pcb_pwr_stackup_copper_request_rev_a.py",
+    "control": {
+      "state": "PASS_INTERNAL_STACKUP_COPPER_REQUEST_READY_EXTERNAL_RESPONSES_PENDING",
+      "required_fabricator_slots": 2,
+      "required_response_rows": 24,
+      "accepted_fabricator_slots": 0,
+      "accepted_response_rows": 0,
+      "selected_fabricator_slot": null,
+      "complete": false,
+      "stackup_accepted": false,
+      "copper_weights_and_plating_accepted": false,
+      "numeric_power_geometry_authorized": false,
+      "routing_authorized": false,
+      "review_b_complete": false,
+      "manufacturing_release": false
+    }
+  },
+  "review_a": {
+    "complete": true,
+    "status": "PASS_PIN_NET_AUTHORITY_HIERARCHY_NATIVE_ERC_PDF_EVIDENCE_PASS_HUMAN_ACCEPTED"
+  },
+  "pre_route_constraints": {
+    "authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
+    "record": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md",
+    "generator": "tools/generate_pcb_pwr_routing_authority_rev_a.py",
+    "independent_audit": "tools/audit_pcb_pwr_routing_authority_rev_a.py",
+    "control": {
+      "state": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN",
+      "board_semantic_sha256": "5f854a5276e8dfd6dc82516f61db1a158888b5343b82058e6024e5970b51e6c1",
+      "authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
+      "net_count": 31,
+      "class_counts": {
+        "ANALOG_TIMING": 3,
+        "BOOTSTRAP_LOOP": 2,
+        "FEEDBACK_SENSE": 1,
+        "GATE_DRIVE": 1,
+        "I2C_OPEN_DRAIN": 2,
+        "KELVIN_SENSE": 2,
+        "LOW_SPEED_CONTROL": 2,
+        "MODE_CONTROL": 2,
+        "OPEN_DRAIN_STATUS": 3,
+        "POWER_INPUT_HIGH_CURRENT": 4,
+        "POWER_OUTPUT_HIGH_CURRENT": 1,
+        "POWER_RAIL": 2,
+        "POWER_RETURN_PLANE": 1,
+        "SEPARATE_HARNESS_RETURN": 3,
+        "SWITCH_NODE": 2
+      },
+      "reference_domain_counts": {
+        "CROSS_GND_DIGITAL_GND_PWR_VIA_NT2": 6,
+        "GND_PWR": 18,
+        "GND_PWR_TO_GND_DIGITAL_AT_NT2": 1,
+        "GND_PWR_TO_GND_MIC_AT_NT3": 1,
+        "GND_PWR_TO_GND_MODEM_AT_NT1": 1,
+        "SELF_GND_PWR": 1,
+        "SELF_TO_GND_PWR_ONLY_AT_NT1": 1,
+        "SELF_TO_GND_PWR_ONLY_AT_NT2": 1,
+        "SELF_TO_GND_PWR_ONLY_AT_NT3": 1
+      },
+      "trace_items": 0,
+      "copper_zones": 0,
+      "dim_003": "CONTROLLED_REQUEST_READY_0_OF_18_ACCEPTED_REQUIRED_BEFORE_ROUTING",
+      "numeric_power_geometry": "CONTROLLED_STACKUP_COPPER_REQUEST_READY_0_OF_2_FABRICATORS_ACCEPTED_THERMAL_CURRENT_DENSITY_OPEN",
+      "routing_complete": false,
+      "manufacturing_release": false
+    }
+  },
+  "input_protection_candidate_eco": {
+    "state": "TARGET_8A_SELECTED_SIGNED_NATIVE_5A_VALUE_ECO_PENDING",
+    "qualification_record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md",
+    "machine_contract": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json",
+    "test_matrix": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
+    "independent_audit": "tools/audit_pcb_pwr_input_protection_rev_a.py",
+    "signed_native_fuse_mpn": "0451005.MRL",
+    "signed_native_fuse_disposition": "REJECTED_FOR_5A_CONTINUOUS_SERVICE_DO_NOT_PROCURE",
+    "target_fuse_mpn": "0451008.MRL",
+    "target_tvs_mpn": "SMBJ18A",
+    "topology_change": false,
+    "footprint_change": false,
+    "native_value_eco_applied": false,
+    "repeat_native_kicad_9_erc_required": true,
+    "repeat_pdf_evidence_required": true,
+    "repeat_independent_human_hierarchy_review_required": true,
+    "accepted_test_rows": 0,
+    "required_test_rows": 20,
+    "pcba_procurement_authorized": false,
+    "manufacturing_release": false
+  },
+  "review_b": {
+    "complete": false,
+    "status": "OPEN_HIERARCHY_ACCEPTED_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_PENDING",
+    "blockers": [
+      "target F1 0451008.MRL is selected only in BOM/qualification control; signed native value 0451005.MRL is rejected and requires a bounded value-only ECO plus repeat ERC PDF and human hierarchy review before PCBA procurement",
+      "DIM-003 mechanical freeze response register has 0/18 accepted rows; assembled envelope terminal zones mounting pattern and frozen PCB STEP remain open",
+      "PCB-PWR stackup/copper response register has 0/24 accepted rows across 0/2 fabricator slots; no selected construction or accepted copper/plating authority",
+      "high-current Kelvin hot-loop and switch-node routing",
+      "thermal current-density transient load-step cold-start and EMI evidence",
+      "DFT side datum accessibility and probe-wear validation",
+      "DRC DFM and independent Review B"
+    ]
+  }
+}

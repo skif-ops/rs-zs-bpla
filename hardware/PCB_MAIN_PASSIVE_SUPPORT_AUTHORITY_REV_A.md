@@ -6,7 +6,7 @@ This record closes `MAIN-AUTH-010`. It freezes every PCB-MAIN passive, support d
 
 Machine authority: `hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv`.
 
-Authority CSV SHA-256: `ed314382e2491f7d981c9deb670ffe9b3a8a4dbf7d0fb98c9a5b7c4e93073fb0`.
+Authority CSV SHA-256: `0b2abb5e967526590b02f069992579a2606d05d485f8ce3917472a3dbfbcd2b6`.
 
 The registry contains 211 unique physical components: 80 capacitors, 103 resistors, two inductors, one ferrite bead, one SAW filter, two support ICs, one complementary MOSFET, seven four-channel ESD arrays, two USB ESD arrays, six single-line ESD diodes, two supply TVS devices, three RF ESD devices and the already-selected X1 TCXO. There are 196 fitted and 15 DNP positions. Every row has an exact manufacturer, orderable MPN, package, value/function, population state, temperature range, logical net, full physical-pin map, electrical path and disposition.
 
@@ -23,6 +23,47 @@ The registry contains 211 unique physical components: 80 capacitors, 103 resisto
 - Nexperia `PESD5V0S1UL` and `PESD5V0C1BSF` product data: `https://assets.nexperia.com/documents/data-sheet/PESD5V0S1UL.pdf` and `https://assets.nexperia.com/documents/data-sheet/PESD5V0C1BSF.pdf`.
 
 The named document identities in the CSV are traceability labels. The exact MPN and physical-pin values are the capture contract. Supplier inventory, lot traceability and counterfeit screening remain procurement controls and are not inferred from this authority.
+
+The seven fitted `TPD4E05U06DQAR` devices `U19..U24/U27` use the project-local
+`TI_DQA0010A_USON10` footprint from the DQA0010A board/stencil layout in the
+official `TPD4E05U06` data sheet. It fixes 0.565 x 0.20 mm signal lands,
+0.565 x 0.40 mm GND lands 3/8, 0.50 mm pitch, 0.835 mm row-center spacing,
+0.07 mm preferred NSMD expansion and 0.565 x 0.36 mm GND stencil apertures.
+Source: `https://www.ti.com/lit/ds/symlink/tpd4e05u06.pdf`, SHA-256
+`c167cf1e72a5473a4d2c59b6a3c0251498701da05b7785919b9ceaae3b3e02c6`.
+The manufacturer-source review for `TPD2EUSB30DRTR` devices `U25/U26` is
+complete: TI `MPDS340` confirms the DRT0003A package outline but publishes no
+PCB land or stencil recommendation. The KiCad DRT-3 flow-through geometry is
+frozen into project-local `TI_DRT0003A_IPC_Candidate` so routing cannot drift
+with workstation libraries. Assembly-house DFM and routed USB SI acceptance
+remain mandatory; it is not a production-approved land pattern.
+The seven `TPD1E05U06DYAR` devices `D4/D6..D11` use project-local
+`TI_DYA0002A_SOD523` geometry from drawing 4224978/B in the same Rev.O data
+sheet: two 0.67 x 0.40 mm R0.05 lands at 1.48 mm center spacing, equal-size
+stencil apertures and 0.05 mm preferred NSMD expansion.
+The two `PESD5V0S1UL` supply TVS devices `D1/D2` use project-local
+`Nexperia_PESD5V0S1UL_SOD882` geometry from data-sheet v5 Figure 11: 0.40 x
+0.70 mm R0.05 copper, 0.50 x 0.80 mm solder-resist openings and separate
+0.30 x 0.60 mm R0.05 paste apertures at 0.70 mm center spacing. Source
+SHA-256: `8ddea76afa74f87de5d3662e4d9149bf7397761fa99dc29b44bfbe42872d447e`.
+The two `T520D107M006ATE015` modem bulk capacitors `C36/C44` use the
+project-local `KEMET_T52X_D_7343-31_DensityB` pattern from KEMET/YAGEO
+`T2076_T52X-530` Table 2. The D-case nominal robust-reflow option defines
+2.37 x 2.43 mm lands, a 3.87 mm inner gap, 6.24 mm center spacing and a
+9.12 x 5.10 mm courtyard. Mask and stencil remain assembly-process controls.
+The 2026-08-20 source is SHA-256
+`ddaf1c0f41f55de0c9e1d2df5cdfbcc1b3f6b3e7658d2a493fe65d3f006db586`.
+That current source marks T520 as not recommended for new designs, so the
+frozen exact MPN still requires procurement/lifecycle review; no substitution
+is authorized by this land-pattern closure.
+The `Si1016X-T1-GE3` antenna-switch MOSFET `Q4` uses project-local
+`Vishay_Si1016X_SC-89` copper from Application Note 826: six rectangular
+0.300 x 0.478 mm minimum pads at 0.500 mm pitch and a 0.798 mm inner gap.
+Rotated into the established board orientation, the lands are 0.478 x
+0.300 mm at 1.276 mm row-center spacing. Mask and stencil remain
+assembly-process controls because the Vishay guideline does not define them.
+The official Rev E data sheet embedding the application note is SHA-256
+`5e561d2786874eb79c8c6e36e4eb4d9b0de774384005e72c4998ab3dcc2cf518`.
 
 ## Frozen cross-domain decisions
 
@@ -59,4 +100,4 @@ D4 is unidirectional `TPD1E05U06DYAR`, rather than the bidirectional RF part use
 
 Closing `MAIN-AUTH-010` means the native schematic can be captured without selecting any missing PCB-MAIN passive or support MPN. It does not prove placement-dependent performance. Review A must still verify every row and pin map against the rendered native schematic and schematic-derived BOM, plus DC-bias capacitance, U1 SMPS stability, the FB1 700-960 MHz impedance requirement, modem burst droop, SIM voltage, GNSS supervisor thresholds, USB signal integrity and RF tuning evidence.
 
-At the `MAIN-AUTH-010` checkpoint, `MAIN-AUTH-011` remained open for outline, connector orientation, RF zones, keepouts and exact production test-point placement; it is now separately closed by the mechanical placement authority. Native capture is absent, Reviews A/B are incomplete and all physical tests remain `NOT RUN`. Production Gerbers and the production BOM remain blocked.
+At the `MAIN-AUTH-010` checkpoint, `MAIN-AUTH-011` remained open for outline, connector orientation, RF zones, keepouts and exact production test-point placement; it is now separately closed by the mechanical placement authority. Native capture has advanced to `SCHEMATIC_REVIEW`; Reviews A/B are incomplete and all physical tests remain `NOT RUN`. Production Gerbers and the production BOM remain blocked.

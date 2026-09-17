@@ -1,0 +1,26 @@
+{
+  "configuration": "EVT-PRE-20 Rev.A",
+  "audit": "PCB-PWR Rev.A input-protection qualification control",
+  "status": "PASS_CONTROLLED_QUALIFICATION_PLAN_PHYSICAL_EVIDENCE_PENDING",
+  "fuse": {
+    "signed_native_mpn": "0451005.MRL",
+    "target_evt_mpn": "0451008.MRL",
+    "continuous_current_a": 5.0,
+    "minimum_nominal_rating_at_25c_a": 6.666666666666667,
+    "target_capacity_after_standard_derating_a": 6.0,
+    "nominal_loss_at_5a_w": 0.1925
+  },
+  "tvs": {
+    "target_evt_mpn": "SMBJ18A",
+    "maximum_clamp_v": 29.2,
+    "project_candidate_clamp_limit_v": 32.0,
+    "buck_absolute_max_input_v": 36.0
+  },
+  "native_value_eco_applied": false,
+  "accepted_rows": 0,
+  "required_rows": 20,
+  "failed_rows": [],
+  "physical_qualification_complete": false,
+  "pcba_procurement_authorized": false,
+  "manufacturing_release": false
+}

@@ -1,0 +1,8 @@
+deploy/tls/
+**/*.key
+data/
+output/
+uploads/
+**/__pycache__/
+**/.pytest_cache/
+*.pyc

@@ -53,6 +53,9 @@ class AcousticFamilyClassifier:
     model_path: Path = settings.base_dir / "models" / "acoustic_family_model_v08.json"
     min_score: float = 0.48
     min_margin: float = 0.08
+    min_evidence_windows: int = settings.hierarchy_min_evidence_windows
+    max_evidence_windows: int = settings.hierarchy_max_evidence_windows
+    min_consensus_ratio: float = settings.hierarchy_min_consensus_ratio
 
     def train(self, frame: pd.DataFrame | None = None) -> dict[str, Any]:
         source = frame.copy() if frame is not None else pd.read_csv(self.dataset_path)
@@ -159,51 +162,108 @@ class AcousticFamilyClassifier:
         model = model or self.load_model()
         if model is None or rows.empty:
             return None
-        matrix = rows.loc[:, list(FEATURE_COLUMNS)].apply(pd.to_numeric, errors="coerce").fillna(0.0).to_numpy(float)
-        vector = np.median(matrix, axis=0)
+        ordered = rows.sort_values("start_seconds") if "start_seconds" in rows.columns else rows
+        bounded = ordered.tail(self.max_evidence_windows)
+        evidence_windows = int(len(bounded))
+        if evidence_windows < self.min_evidence_windows:
+            return FamilyClassificationResult(
+                status="warming_up",
+                conditional_on_air_target=bool(air_target_confirmed),
+                evidence_windows=evidence_windows,
+                required_windows=self.min_evidence_windows,
+                max_windows=self.max_evidence_windows,
+                model_version=str(model.get("version", "unknown")),
+                explanation=(
+                    f"Для решения по семейству требуется не менее {self.min_evidence_windows} "
+                    f"окон; получено {evidence_windows}."
+                ),
+            )
+        matrix = bounded.loc[:, list(FEATURE_COLUMNS)].apply(pd.to_numeric, errors="coerce").fillna(0.0).to_numpy(float)
         mean = np.asarray(model["mean"], dtype=float)
         std = np.asarray(model["std"], dtype=float)
         std = np.where(std < 1e-9, 1.0, std)
-        z = (vector - mean) / std
-
-        raw: list[tuple[str, float, float, dict[str, Any]]] = []
         allowed_air = {
             AcousticFamily.PROP_PISTON.value,
             AcousticFamily.ROTOR_ELECTRIC.value,
             AcousticFamily.TURBINE_JET.value,
         }
-        for family, data in model.get("classes", {}).items():
-            if air_target_confirmed and family not in allowed_air:
-                continue
-            centroid = np.asarray(data["centroid"], dtype=float)
-            radius = max(float(data.get("radius", 1.0)), 1.0)
-            distance = float(np.linalg.norm(z - centroid))
-            score = float(np.exp(-0.5 * (distance / radius) ** 2))
-            raw.append((family, score, distance, data))
-        if not raw:
+        classes = {
+            str(family): data
+            for family, data in model.get("classes", {}).items()
+            if not air_target_confirmed or family in allowed_air
+        }
+        if not classes:
             return None
-        total = max(sum(item[1] for item in raw), 1e-12)
+
+        window_results: list[dict[str, Any]] = []
+        for vector in matrix:
+            z = (vector - mean) / std
+            raw_scores: dict[str, float] = {}
+            distances: dict[str, float] = {}
+            for family, data in classes.items():
+                centroid = np.asarray(data["centroid"], dtype=float)
+                radius = max(float(data.get("radius", 1.0)), 1.0)
+                distance = float(np.linalg.norm(z - centroid))
+                distances[family] = distance
+                raw_scores[family] = float(np.exp(-0.5 * (distance / radius) ** 2))
+            total = max(sum(raw_scores.values()), 1e-12)
+            normalized = {family: score / total for family, score in raw_scores.items()}
+            ranking = sorted(normalized.items(), key=lambda item: item[1], reverse=True)
+            best_family, relative = ranking[0]
+            runner = ranking[1][1] if len(ranking) > 1 else 0.0
+            margin = float(relative - runner)
+            absolute_fit = float(np.clip(raw_scores[best_family], 0.0, 1.0))
+            confidence = float(relative * (0.45 + 0.55 * absolute_fit))
+            vote = best_family if confidence >= self.min_score and margin >= self.min_margin else AcousticFamily.UNKNOWN.value
+            window_results.append({
+                "vote": vote,
+                "scores": normalized,
+                "distances": distances,
+                "confidence": confidence,
+                "absolute_fit": absolute_fit,
+            })
+
+        aggregate_scores = {
+            family: float(np.mean([item["scores"][family] for item in window_results]))
+            for family in classes
+        }
+        vote_counts = {
+            family: sum(item["vote"] == family for item in window_results)
+            for family in classes
+        }
+        winning_family = max(classes, key=lambda family: (vote_counts[family], aggregate_scores[family], family))
+        winning_votes = int(vote_counts[winning_family])
+        consensus_ratio = float(winning_votes / evidence_windows)
+        support = [item for item in window_results if item["vote"] == winning_family]
+        absolute_fit = float(np.mean([item["absolute_fit"] for item in support])) if support else 0.0
+        support_confidence = float(np.mean([item["confidence"] for item in support])) if support else 0.0
+        confidence = float(support_confidence * (0.75 + 0.25 * consensus_ratio))
+        ranking = sorted(aggregate_scores.items(), key=lambda item: item[1], reverse=True)
+        runner = ranking[1][1] if len(ranking) > 1 else 0.0
+        margin = float(aggregate_scores[winning_family] - runner)
+        accepted = (
+            consensus_ratio >= self.min_consensus_ratio
+            and confidence >= self.min_score
+            and margin >= self.min_margin
+        )
+        best_family = winning_family if accepted else AcousticFamily.UNKNOWN.value
+
         scores = [
             FamilyClassificationScore(
                 family=family,
-                score=float(score / total),
-                distance=distance,
+                score=aggregate_scores[family],
+                distance=float(np.median([item["distances"][family] for item in window_results])),
                 sources=int(data.get("sources", 0)),
             )
-            for family, score, distance, data in raw
+            for family, data in classes.items()
         ]
         scores.sort(key=lambda item: item.score, reverse=True)
-        best = scores[0]
-        runner = scores[1].score if len(scores) > 1 else 0.0
-        margin = float(best.score - runner)
-        raw_best = next(item[1] for item in raw if item[0] == best.family)
-        absolute_fit = float(np.clip(raw_best, 0.0, 1.0))
-        confidence = float(best.score * (0.45 + 0.55 * absolute_fit))
-        best_family = best.family if confidence >= self.min_score and margin >= self.min_margin else AcousticFamily.UNKNOWN.value
-        readiness = model.get("readiness", {}).get(best.family, {})
+        readiness = model.get("readiness", {}).get(winning_family, {})
         operational_ready = bool(readiness.get("operational_validation_ready", False))
         if best_family == AcousticFamily.UNKNOWN.value:
             status = "unknown"
+        elif best_family in set(model.get("unsupported_families", [])):
+            status = "unsupported"
         elif operational_ready:
             status = "validated_family"
         else:
@@ -216,13 +276,21 @@ class AcousticFamilyClassifier:
             status=status,
             conditional_on_air_target=bool(air_target_confirmed),
             operational_validation_ready=operational_ready,
+            evidence_windows=evidence_windows,
+            required_windows=self.min_evidence_windows,
+            max_windows=self.max_evidence_windows,
+            consensus_ratio=consensus_ratio,
             scores=scores,
             model_version=str(model.get("version", "unknown")),
             explanation=(
-                ("Семейство определено условно после независимого AIR_TARGET detector gate."
-                 if air_target_confirmed else "Семейство определено по source-balanced модели 43 признаков.")
+                (f"Семейство подтверждено в {winning_votes}/{evidence_windows} последних окон "
+                 + ("после независимого AIR_TARGET detector gate."
+                    if air_target_confirmed else "source-balanced моделью 43 признаков."))
                 if best_family != AcousticFamily.UNKNOWN.value
-                else "Отрыв между семействами недостаточен, результат оставлен UNKNOWN."
+                else (
+                    f"Серия {evidence_windows} окон не достигла порога согласия "
+                    f"{self.min_consensus_ratio:.3f}; результат оставлен UNKNOWN."
+                )
             ),
         )
 

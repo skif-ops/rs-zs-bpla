@@ -89,6 +89,8 @@ def main() -> int:
         "U-PWR2": baseline["buck_3v3"]["mpn"],
         "U-PWR3": baseline["mic_ldo"]["mpn"],
         "U-MON-01": baseline["current_monitor"]["mpn"],
+        "PWR-L": baseline["buck_3v8"]["inductor_mpn"],
+        "R-SHUNT-01": baseline["current_monitor"]["shunt_mpn"],
     }
     for cid, mpn in expected_mpns.items():
         require(cid in freeze, f"missing frozen component {cid}")
@@ -106,6 +108,8 @@ def main() -> int:
         "LMR604403SRAKR",
         "TPS7A2018PDBVR",
         "INA226AIDGSR",
+        "XAL7030-472MEC",
+        "WSK2512R0100FEA",
         "400 kHz",
         "4.7 uH",
         "86.6 kOhm",
@@ -163,7 +167,20 @@ def main() -> int:
     require(float(b38["cboot_voltage_min_v"]) >= 10.0, "3V8 CBOOT voltage rating below 10 V")
     require(float(b38["inductor_isat_min_a"]) >= 6.0, "3V8 inductor Isat target below 6 A")
     require(float(b38["inductor_irms_min_a"]) >= 4.5, "3V8 inductor Irms target below 4.5 A")
-    record("buck_3v8_passives", frequency_hz=b38["switching_frequency_hz"], rt_ohm=b38["rt_ohm"], inductor_h=b38["inductor_h"])
+    require(b38["inductor_mpn"] == "XAL7030-472MEC", "3V8 exact inductor MPN drift")
+    require(float(b38["inductor_isat_a"]) >= float(b38["inductor_isat_min_a"]), "3V8 selected inductor Isat below target")
+    require(float(b38["inductor_irms_20c_rise_a"]) >= float(b38["inductor_irms_min_a"]), "3V8 selected inductor Irms below target")
+    ripple_38 = calculated_vout * (float(inp["working_max_v"]) - calculated_vout) / (
+        float(inp["working_max_v"]) * float(b38["inductor_h"]) * float(b38["switching_frequency_hz"])
+    )
+    peak_38 = float(b38["current_a"]) + ripple_38 / 2.0
+    rms_38 = math.sqrt(float(b38["current_a"]) ** 2 + ripple_38 ** 2 / 12.0)
+    require(float(b38["inductor_isat_a"]) >= peak_38, "3V8 selected inductor saturates below calculated peak")
+    require(float(b38["inductor_irms_20c_rise_a"]) >= rms_38, "3V8 selected inductor Irms below calculated RMS")
+    dcr_loss_38 = float(b38["current_a"]) ** 2 * float(b38["inductor_dcr_max_mohm"]) / 1000.0
+    record("buck_3v8_passives", frequency_hz=b38["switching_frequency_hz"], rt_ohm=b38["rt_ohm"],
+           inductor_h=b38["inductor_h"], inductor_mpn=b38["inductor_mpn"], ripple_a=ripple_38,
+           peak_a=peak_38, rms_a=rms_38, max_dcr_loss_w=dcr_loss_38)
 
     # The two BG95 supply domains can reach the documented peaks. For capture sizing,
     # verify the arithmetic sum remains below the dedicated 4-A converter rating.
@@ -179,7 +196,18 @@ def main() -> int:
     close(float(b33["rt_ohm"]), 86600.0, 0.1, "3V3 RT")
     close(float(b33["inductor_h"]), 4.7e-6, 1e-12, "3V3 inductance")
     require(float(b33["cout_effective_min_f"]) >= 54e-6, "3V3 effective COUT below 54 uF")
-    record("buck_3v3_fixed_mode", output_v=b33["fixed_output_v"], mpn=b33["mpn"])
+    require(b33["inductor_mpn"] == b38["inductor_mpn"], "3V3/3V8 inductor MPN mismatch")
+    ripple_33 = float(b33["fixed_output_v"]) * (float(inp["working_max_v"]) - float(b33["fixed_output_v"])) / (
+        float(inp["working_max_v"]) * float(b33["inductor_h"]) * float(b33["switching_frequency_hz"])
+    )
+    peak_33 = float(b33["current_a"]) + ripple_33 / 2.0
+    rms_33 = math.sqrt(float(b33["current_a"]) ** 2 + ripple_33 ** 2 / 12.0)
+    require(float(b33["inductor_isat_a"]) >= peak_33, "3V3 selected inductor saturates below calculated peak")
+    require(float(b33["inductor_irms_20c_rise_a"]) >= rms_33, "3V3 selected inductor Irms below calculated RMS")
+    dcr_loss_33 = float(b33["current_a"]) ** 2 * float(b33["inductor_dcr_max_mohm"]) / 1000.0
+    record("buck_3v3_fixed_mode", output_v=b33["fixed_output_v"], mpn=b33["mpn"],
+           inductor_mpn=b33["inductor_mpn"], ripple_a=ripple_33, peak_a=peak_33,
+           rms_a=rms_33, max_dcr_loss_w=dcr_loss_33)
 
     close(float(ldo["input_v"]), 3.3, 1e-9, "mic LDO input")
     close(float(ldo["output_v"]), 1.8, 1e-9, "mic LDO output")
@@ -200,6 +228,9 @@ def main() -> int:
     require(vshunt < float(mon["shunt_input_abs_max_v"]), "INA226 5-A shunt voltage exceeds input range")
     require(pshunt <= 0.25, "10-mOhm shunt dissipation unexpectedly exceeds 0.25 W at 5 A")
     require(float(mon["shunt_power_rating_min_w"]) >= 4.0 * pshunt, "shunt rating has less than 4x nominal power margin")
+    require(mon["shunt_mpn"] == "WSK2512R0100FEA", "exact four-terminal shunt MPN drift")
+    require(float(mon["shunt_tolerance_pct"]) <= 1.0, "shunt tolerance exceeds 1 percent")
+    require(float(mon["shunt_tcr_max_ppm_per_c"]) <= 50.0, "shunt TCR exceeds 50 ppm/C target")
     require(float(mon["current_lsb_a"]) >= min_current_lsb, "chosen INA226 Current_LSB is too small for 5-A range")
     require(max_representable_current >= ishunt, "chosen INA226 Current_LSB cannot represent 5 A")
     close(cal, float(mon["calibration_register"]), 1e-9, "INA226 CAL")
@@ -220,9 +251,9 @@ def main() -> int:
         "mppt_transient_envelope",
         "tvs_final_value_and_pulse_coordination",
         "pcb_fuse_final_value_and_fault_energy_coordination",
-        "inductor_exact_mpn_and_thermal_margin",
+        "inductor_in_application_thermal_and_emi_validation",
         "mlcc_and_bulk_exact_mpn_with_dc_bias_and_cold_esr",
-        "shunt_exact_mpn_and_kelvin_layout",
+        "shunt_kelvin_layout_and_reference_calibration",
         "reverse_mosfet_soa_and_gate_transient_review",
         "plus70c_thermal_test",
         "minus40c_cold_start_test",
@@ -250,6 +281,14 @@ def main() -> int:
             "ina226_min_current_lsb_a": min_current_lsb,
             "ina226_calibration": cal,
             "ina226_power_lsb_w": power_lsb,
+            "buck_3v8_inductor_ripple_a": ripple_38,
+            "buck_3v8_inductor_peak_a": peak_38,
+            "buck_3v8_inductor_rms_a": rms_38,
+            "buck_3v8_inductor_max_dcr_loss_w": dcr_loss_38,
+            "buck_3v3_inductor_ripple_a": ripple_33,
+            "buck_3v3_inductor_peak_a": peak_33,
+            "buck_3v3_inductor_rms_a": rms_33,
+            "buck_3v3_inductor_max_dcr_loss_w": dcr_loss_33,
         },
         "release_open_items": sorted(open_items),
     }

@@ -1,8 +1,8 @@
 # EVT-PRE-20 Rev.A native KiCad capture specification
 
-Status: `CAPTURE_INPUT / BLOCKING / NOT FOR MANUFACTURE`
+Status: `SCHEMATIC_REVIEW / BLOCKING / NOT FOR MANUFACTURE`
 
-This document is the authoritative bridge from the locked EVT-PRE-20 system baseline to native KiCad capture. Native `.kicad_sch/.kicad_pcb` files, ERC/DRC and Review A/B remain mandatory before any Gerber may be released.
+This document is the authoritative bridge from the locked EVT-PRE-20 system baseline to native KiCad capture. Native PCB-MAIN `.kicad_sch` is present and KiCad 9 ERC passes with zero violations; Review A is signed PASS. A placement-stage `.kicad_pcb` candidate is present, but routing, production-footprint approval, KiCad 9 DRC and Review B remain mandatory before any Gerber may be released.
 
 Authoritative inputs:
 - `config/EVT_PRE_20_BASELINE.yaml`;
@@ -19,6 +19,8 @@ Authoritative inputs:
 - `hardware/PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv` and its independent review record;
+- `hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv`;
+- `hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv` and its independent review record;
 - `hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv`;
 - `hardware/MAIN_COMPONENT_FREEZE_REV_A.csv`;
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`;
@@ -30,9 +32,9 @@ Authoritative inputs:
 Capture-control status is recorded in
 `hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json` and independently checked by
 `tools/audit_pcb_main_capture_authority_rev_a.py`. A PASS from that audit means
-only that the current input set and open-authority register are controlled. It
-does not mean that native capture, Review A, Review B or the production BOM has
-passed.
+only that the current input set, native-source state and open-authority register
+are controlled. It does not mean that Review A, Review B or the production BOM
+has passed.
 
 ## 1. PCB-MAIN Rev.A
 
@@ -132,7 +134,7 @@ Required AAD tests before release:
 
 ### 1.5 Cellular and dual SIM
 
-- `U8`: Quectel `BG95-M3` in the 102-pad 23.6 x 19.9 mm LGA; exact ordered firmware/region identity and operator validation remain release blockers.
+- `U8`: exact Quectel `BG95-M3` hardware in the 102-pad 23.6 x 19.9 mm LGA is selected. Ordered marking and firmware identity are recorded by incoming inspection. Operator/SIM validation and representative LTE/EGPRS burst tests remain `NOT_RUN` post-assembly EVT evidence; they are not an unresolved BOM identity.
 - The complete U8 pad disposition is frozen in `hardware/PCB_MAIN_CELLULAR_PIN_AUTHORITY_REV_A.csv`; it closes only `MAIN-AUTH-004` together with U16 and Q1/Q2.
 - U8 pins 32/33 `VBAT_BB` use `3V8_MODEM_BB`; pins 52/53 `VBAT_RF` use `3V8_MODEM_RF`; both branches originate from the single `3V8_MODEM` star point.
 - The BB branch requires 100 uF low-ESR plus 220 nF, 47 nF, 150 pF, 100 pF, 68 pF, 33 pF, and 10 pF with a ferrite bead adjacent to U8. BB copper is at least 0.6 mm equivalent width.
@@ -224,11 +226,13 @@ Required AAD tests before release:
 - Every row freezes one PCB-MAIN RefDes with manufacturer, exact MPN, package, value/function, population, temperature range, full physical-pin set, endpoint-qualified net path and disposition.
 - `C1..C80`, `R1..R103`, `L1/L2`, `FB1`, `FL1`, `U5/U6/U19..U27`, `Q4`, `D1..D11`, and `X1` are the complete Rev.A set governed by this authority. X1 is restated to close its complete four-pad map without creating a duplicate BOM item.
 - Endpoint suffixes such as `_U1`, `_U9`, `_U10`, `_U11`, `_U16`, `_CARD`, `_CONN`, `_MUX` and `_TP` distinguish the two physical nets around a series component. The unsuffixed names in earlier device authorities remain logical interface names; the `MAIN-AUTH-010` endpoint map governs native capture around the series element.
+- `hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv` is the exact endpoint bridge from those logical interface names to physical native nets.
+- Generic pre-capture `GND` resolves through `hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv`: 21 microphone endpoints use `GND_MIC`, every remaining generic ground endpoint uses `GND_DIGITAL`, and existing `GND_MODEM` endpoints remain unchanged. PCB-MAIN contains no ground-domain net-tie; the only joins to `GND_PWR` remain NT1/NT2/NT3 on PCB-PWR.
 - The GNSS supervisor is the exact u-blox Figure 38 topology with `LT6000IDCB#TRMPBF`, `Si1016X-T1-GE3`, `LQW15AN27NJ00D` and `ABSES5AF-L100KM`. The J9 RF protector is unidirectional because that RF node carries positive DC antenna bias.
 - Rev.A hardware revision encoding is fixed as `HW_REV[1:0]=00`: R3/R5 fitted pull-downs and R4/R6 DNP alternate pull-ups.
 - STM32/nRF SWD and guarded I2C fixture contacts remain direct by design. There is no board-side protection or series element on those controlled internal test contacts.
 - The authority closes component selection only. DC-bias capacitance, SMPS stability, FB1 frequency response, modem burst droop, GNSS thresholds, USB/SIM signal integrity and RF tuning remain Review A/EVT evidence.
-- Placement-dependent performance remains Review A/Review B and physical evidence. Native capture, Reviews A/B and physical tests remain open. This capture input is `NOT FOR MANUFACTURE` and cannot release a production BOM or fabrication data.
+- Placement-dependent performance remains Review A/Review B and physical evidence. Native schematic capture is present, independently source/net-audited and passes KiCad 9 ERC with zero violations; human Review A, layout, Review B and physical tests remain open. This capture is `NOT FOR MANUFACTURE` and cannot release a production BOM or fabrication data.
 
 ### 1.11 Mechanical placement and DFT geometry
 
@@ -239,7 +243,7 @@ Required AAD tests before release:
 - U8/J8, U9/J9, U10/J10 and U11 occupy separate cellular, GNSS, RU868 and BLE zones. The U11 antenna end is flush to the east edge with a 3.8 x 10.5 mm all-layer board keepout and a larger enclosure exclusion.
 - The GNSS upper-view mechanical exclusion prohibits solar, metal and cable bundles above its reserved route. Final active antenna and coax geometry remain separate system inputs.
 - All 31 production pogo pads are fixed on the bottom side as 1.70 mm copper pads with 2.10 mm mask openings, no paste and 2.54 mm intra-group pitch. Three bottom fixture fiducials and a component-free fixture window are fixed with them.
-- Closing `MAIN-AUTH-011` means the capture-authority input set is complete. It does not create native CAD, pass either review, validate the 110 x 75 x 12 mm envelope against STEP, or release the BOM or fabrication data.
+- Closing `MAIN-AUTH-011` means the capture-authority input set is complete. It does not create the native PCB layout, pass either review, validate the 110 x 75 x 12 mm envelope against STEP, or release the BOM or fabrication data.
 
 ## 2. PCB-MIC Rev.A
 
@@ -269,7 +273,10 @@ Input: protected battery bus from LiFePO4/BMS/external MPPT. No MPPT charger is 
 Selected capture baseline:
 - reverse/reverse-current controller `LM74700QDBVRQ1` plus `CSD18540Q5B` 60 V N-MOSFET;
 - transient clamp `SMBJ18A` candidate pending measured transient envelope;
-- PCB fuse `0451005.MRL` candidate pending fuse coordination;
+- signed native PCB fuse value `0451005.MRL` is rejected for 5 A continuous
+  service; target EVT qualification candidate `0451008.MRL` uses the same
+  Nano2 451 footprint and remains blocked on a value-only native ECO, repeat
+  ERC/PDF/human hierarchy review and fuse/TVS/fault coordination;
 - `3V8_MODEM`: `LMR604403SRAKR`, 4 A adjustable synchronous buck;
 - `3V3_DIGITAL`: second `LMR604403SRAKR`, 4 A;
 - no separate 3V3_AON regulator in Rev.A unless measured S0 requires a configuration change;
@@ -314,6 +321,12 @@ Native directory contract:
 - `hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch/.kicad_pcb/.kicad_pro`;
 - `hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch/.kicad_pcb/.kicad_pro`;
 - `hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch/.kicad_pcb/.kicad_pro`.
+
+PCB-MAIN schematic-review source also carries a deterministic project-local
+`DioneyaMain.kicad_sym`, `sym-lib-table` and `fp-lib-table`. Exact package and MPN
+authority remains in the component properties. Custom footprint fields stay blank
+until the corresponding manufacturer land patterns pass Review A/Review B; synthetic
+placeholder land patterns are prohibited.
 
 Capture is complete only when:
 1. exact symbols and footprints are assigned and datasheet-reviewed;

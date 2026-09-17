@@ -1,0 +1,34 @@
+{
+  "schema_version": "dioneya.pcb-main-mechanical-eco-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-MECH-ECO-001",
+  "reviewer": "Скиф",
+  "date": "2026-09-15",
+  "reviewed_commit_sha": "61cbe796de2f87560342a44b063ff6283a8ce1e8",
+  "reviewed_candidate": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.json",
+  "reviewed_candidate_sha256": "5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1",
+  "decision": "ACCEPT_LIMITED_MECHANICAL_ECO",
+  "scope": "LIMITED_MAIN_AUTH_011_MECHANICAL_ECO_ONLY",
+  "approved_change_records": [
+    "MECH-007",
+    "MECH-008",
+    "MECH-014",
+    "MECH-016",
+    "MECH-019",
+    "MECH-020",
+    "MECH-024",
+    "MECH-026",
+    "MECH-032"
+  ],
+  "implementation_authorized": true,
+  "retained_blockers": [
+    "Full electrically constrained repack of all unlocked footprints",
+    "Controlled courtyard or body evidence for 169 screened fitted footprints",
+    "Strict placement-clearance PASS",
+    "KiCad DRC with zero blocking violations and zero unrouted items",
+    "Native STEP and enclosure service-sweep review",
+    "Independent PCB-MAIN Review B",
+    "Fabricator and assembler DFM acceptance"
+  ],
+  "manufacturing_release": false
+}

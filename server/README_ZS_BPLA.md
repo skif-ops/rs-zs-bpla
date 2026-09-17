@@ -7,6 +7,8 @@
 - live station protocol under `/api/v1`;
 - JSON and CBOR detection ingestion;
 - station heartbeat and security events;
+- compact cellular heartbeat with full IMSI/ICCID accepted only over mutual-TLS
+  MQTT status transport; general station listing returns masked identifiers;
 - persistent SQLite WAL event store;
 - AIR_WARNING for one station and AIR_ALERT only for two or more stations;
 - WGS84/ECEF/ENU geodesy;
@@ -16,6 +18,30 @@
 - WebSocket realtime event stream;
 - station command queue and audio request/upload;
 - optional MQTT/TLS bridge process;
+- signed MQTT command downstream with canonical CBOR, Ed25519, TTL/retry and
+  station-bound application ACK; omitted signing key disables downstream;
+- portable firmware command codec with canonical fixed-memory parsing, strict
+  station/time/TTL checks, required signature and durable-dedup callbacks, ACK
+  encoding and a deterministic server-to-firmware Ed25519 test vector;
+- portable power-loss-safe command journal that persists accepted/completed
+  states and permits ACK encoding only from a durable completed record;
+- bounded firmware public-key rotation adapter with SHA-256-derived key IDs and
+  a mandatory target-provided Ed25519 verification backend;
+- portable command application channel that emits an ACK only after verified,
+  idempotent execution and durable completed-result read-back;
+- portable binary MQTT command boundary with exact topic/payload lengths,
+  canonical station ownership, QoS 1 and non-retained delivery guards;
+- portable atomic event outbox with schema-4 encoding, metadata CRC32, payload
+  SHA-256, priority/FIFO ordering and at-least-once torn-write recovery;
+- fail-closed station HTTP transport, enabled only on an isolated bench with
+  exact opt-in `ZS_STATION_HTTP_INSECURE_BENCH=1`;
+- hierarchical family/type updates use only the latest 4-8 unique feature
+  windows; fewer than four windows remain `warming_up`;
+- portable station firmware uses the same 4-8-window and 5/8 consensus rule
+  before filling the compact hierarchy fields;
+- known UAV families retain an explicit unknown-type branch:
+  `UNKNOWN_PROP_PISTON_UAV`, `UNKNOWN_TURBINE_JET_UAV` or
+  `UNKNOWN_ROTOR_ELECTRIC_UAV`;
 - 365-day retention cleanup hook.
 
 ## Run
@@ -23,7 +49,7 @@
 ```bash
 python -m venv .venv
 . .venv/bin/activate          # Windows: .venv\\Scripts\\activate
-pip install -r requirements.txt
+pip install --require-hashes -r requirements.lock.txt
 uvicorn app:app --host 0.0.0.0 --port 8000
 ```
 
@@ -35,7 +61,10 @@ OpenAPI: `http://localhost:8000/docs`
 pytest -q
 ```
 
-Current working branch: 68 tests PASS.
+Current working branch: 131 full tests PASS.
+
+Dependency constraints, hashed locks and the reproducible CycloneDX SBOM are
+described in `DEPENDENCY_LOCK.md`.
 
 ## v0.8.1 field-recording corrections
 
@@ -45,15 +74,41 @@ Current working branch: 68 tests PASS.
 - unvalidated expert FP-1/GR2 hints remain research metadata and cannot become an operational type;
 - `httpx2` is pinned in runtime requirements so the complete API regression suite is reproducible.
 
-The four September 2026 field recordings are intentionally not added to the training set because their aircraft type and flight metadata have not yet been confirmed. Detection is usable; type remains `UNKNOWN` until labeled source material passes the dataset readiness gate.
+The four September 2026 field recordings are intentionally not added to the training set because their aircraft type and flight metadata have not yet been confirmed. Detection is usable; a family may remain visible after 4-8 agreeing windows, but the exact type stays `UNKNOWN` until labeled source material passes the dataset readiness gate.
+
+Live feature updates may set `air_target_confirmed=true` only when the event has
+already passed the independent AIR target gate. This flag restricts family
+competition to UAV propulsion families; it does not permit a hard type lock.
 
 ## MQTT bridge
 
 Run separately after configuring TLS credentials:
 
 ```bash
-python -m station.mqtt_bridge --host mqtt.example --port 8883 --tenant pilot
+python -m station.mqtt_bridge --host mqtt.example --port 8883 --tenant pilot \
+  --ca /run/tls/ca.crt --cert /run/tls/bridge.crt \
+  --key /run/tls/bridge.key \
+  --command-signing-key /run/tls/command-signing.key
 ```
+
+The command signing key is an owner-only (`0600`) Ed25519 PKCS#8 PEM. Without
+it the bridge remains telemetry-only and will not downgrade to unsigned
+commands. Command delivery uses QoS 1, retain false and durable retries until a
+station-bound application ACK or the 15-minute TTL. The checked-in ACL contains
+separate topic rights for station credentials 01 through 20.
+
+The server and portable firmware event-receipt path is host-tested: after durable
+detection processing the bridge publishes canonical CBOR on the station-specific
+`receipt` topic, bound to the exact uplink payload SHA-256. Byte-identical retries
+do not repeat fusion side effects. Production store-and-forward is not complete
+until BG95 binary receipt handling and target storage/endurance are implemented
+and verified on assembled stations. MQTT PUBACK alone must not authorize event
+reclamation.
+
+Full IMSI/ICCID is stored in the restricted station record. Do not expose the
+SQLite database or raw status payloads through logs, backups, diagnostics or the
+general API. The JSON/HTTP heartbeat route deliberately rejects cellular identity
+even when the isolated bench transport is enabled.
 
 ## Data provenance note
 

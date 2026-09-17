@@ -12,7 +12,7 @@ Authority CSV SHA-256: `3431c903eb9a1138e9976a0d95479c4269e2c0d25d72c98bbe5dc6e7
 
 - Quectel `BG95 Series Hardware Design`, version 1.6, 14 August 2023. The retrieved original Quectel document has SHA-256 `6ff03aa31577971d02dc15eac11adee4d52b80077ae3fa3503978c1b12496e81`. Public document copy: `https://raw.githubusercontent.com/jamesmarrs/farseer/fd4425f955fb3ebf50f330afe9228b8911a85a86/datasheets/quectel_bg95_series_hardware_design_v1-6.pdf`. Canonical product page: `https://www.quectel.com/product/lpwa-bg95-cat-m1-cat-nb2-egprs-series/`.
 - TI `SN74AXC8T245` datasheet SCES875C, Revision C, January 2024: `https://www.ti.com/lit/ds/symlink/sn74axc8t245.pdf`. Retrieved document SHA-256: `6cf4003c438c0546fb86f0932613896197dd19a75bdb307f385eb6e75535126e`.
-- Nexperia `MMBT3904` product data sheet, version 5, 8 April 2026: `https://assets.nexperia.com/documents/data-sheet/MMBT3904.pdf`.
+- Nexperia `MMBT3904` product data sheet, version 5, 8 April 2026: `https://assets.nexperia.com/documents/data-sheet/MMBT3904.pdf`. Retrieved document SHA-256: `ade27b408c77a94ea4448c8473a9e80096dd60da3e1914e004c52344e9cd8d00`.
 - Project sources: `hardware/EVT_PRE_20_PIN_MAP_REV_A.csv`, `hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv`, `hardware/POWER_DESIGN_BASELINE_REV_A.json`, `hardware/POWER_DESIGN_CALC_REV_A.md`, and `hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md`.
 
 ## U8 BG95-M3 pad contract
@@ -57,6 +57,11 @@ The external source is the single `3V8_MODEM` rail from PCB-PWR. It splits at a 
 
 ## U16 SN74AXC8T245PWR contract
 
+The project-local `TI_PW0024A_TSSOP24` footprint follows TI 4220208/A: 24
+1.50 x 0.45 mm R0.05 lands at 0.65 mm pitch with 5.80 mm between row
+centers, equal-size stencil apertures, and 0.05 mm NSMD expansion. It replaces
+the incorrect 0.50 mm-pitch KiCad pattern previously assigned to U16.
+
 U16 uses the BG95 `VDD_EXT` output for VCCA. It therefore powers down with the modem 1.8 V domain. VCCB uses `3V3_DIGITAL`, U16 GND uses `GND_MODEM`, and active-low OE is tied to `GND_MODEM`. TI VCC isolation and Ioff prevent a powered 3.3 V MCU domain from driving an unpowered modem domain.
 
 | U16 group | Direction | 1.8 V port A | 3.3 V port B |
@@ -81,6 +86,12 @@ At the minimum U16 VCCA value of 1.65 V, the guaranteed U16 output HIGH toward B
 
 Q1 and Q2 are Nexperia `MMBT3904,215` in SOT23. The exact pin order is 1 base, 2 emitter, 3 collector.
 
+The project-local `Nexperia_MMBT3904_SOT23` footprint follows Figure 8:
+rectangular 0.60 x 0.70 mm copper lands, 0.50 x 0.60 mm stencil apertures,
+0.75 x 0.85 mm solder-resist openings, 1.90 mm lead pitch and 2.00 mm row
+spacing. It is rotated into the established board orientation while retaining
+the exact base/emitter/collector pin order.
+
 - Each base is driven through 4.7 kOhm from its STM32 command and has 47 kOhm from base to emitter.
 - Both emitters connect to `GND_MODEM`.
 - Q1 collector connects to U8 pad 15 `PWRKEY`; the node has 10 nF to `GND_MODEM` and a Review A test point.
@@ -104,13 +115,14 @@ Exact 4.7 kOhm, 47 kOhm, and 10 nF passive MPNs are frozen by `MAIN-AUTH-010`; t
 
 The rail must not be cut while `CELL_STATUS=HIGH`. Fast shutdown on U8 pad 25 is not enabled in Rev.A.
 
-## Review A and EVT evidence still required
+## Incoming and assembled-station EVT evidence still required
 
 - Verify all 102 U8 pads against the final native symbol and land pattern.
-- Record the exact ordered BG95-M3 firmware and regional procurement identity.
+- Record the exact ordered BG95-M3 marking and firmware identity at incoming inspection.
 - Probe PWRKEY, RESET_N, STATUS, VDD_EXT, both UART directions, DTR, and RI across cold start, warm restart, shutdown, and brownout.
 - Verify the 700 ms power-on pulse, the 650-1500 ms shutdown fallback window, and the 2-3.8 s emergency reset window.
 - Verify U16 partial-power isolation with `3V3_DIGITAL` present and `3V8_MODEM` absent.
 - Verify all four U8 VBAT pads remain at or above 3.3 V during representative LTE and EGPRS bursts.
 - Measure `GND_MODEM` to `GND_DIGITAL` offset and noise at U16; the peak must remain below 75 mV.
-- Complete dual-SIM SI and connector procurement evidence, modem recovery, cellular RF, exact passive, layout, native ERC, BOM-from-schematic, and independent PCB reviews before any manufacturing release.
+- Complete exact passive, layout, native ERC, BOM-from-schematic and independent PCB reviews before PCBA manufacturing release.
+- Complete dual-SIM cycling, modem recovery, cellular RF, operator attach and representative burst evidence on assembled stations before EVT acceptance. Until then those results remain `NOT_RUN`, never inferred from the hardware selection.

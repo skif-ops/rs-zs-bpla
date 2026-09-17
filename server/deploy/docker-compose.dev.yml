@@ -14,8 +14,9 @@ services:
       ZS_MQTT_HOST: mqtt
       ZS_MQTT_PORT: "1883"
       ZS_TENANT: default
+      ZS_STATION_HTTP_INSECURE_BENCH: "1"
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
       - ../data:/app/data
       - ../output:/app/output

@@ -9,7 +9,10 @@ Configuration: `EVT-PRE-20 Rev.A`
 
 This Review A covers only component pin authority, named-net authority, inter-board pin contract, startup dependencies and controlled ground-return joins required before native KiCad schematic capture.
 
-It does not approve final passive MPNs, TVS/fuse coordination, thermal design, PCB layout, DFM, EMC/EMI, environmental qualification or manufacturing release. Those remain Review B / EVT / release items.
+It does not approve the controlled passive candidates for manufacture or close their
+derating, transient, thermal, assembly and load-step evidence. TVS/fuse coordination,
+PCB layout, DFM, EMC/EMI, environmental qualification and manufacturing release also
+remain Review B / EVT / release items.
 
 ## 2. Authoritative inputs reviewed
 
@@ -19,6 +22,7 @@ It does not approve final passive MPNs, TVS/fuse coordination, thermal design, P
 - `hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md`
 - `hardware/CONNECTOR_FREEZE_REV_A.csv`
 - `hardware/POWER_COMPONENT_FREEZE_REV_A.csv`
+- `hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv`
 - `hardware/POWER_DESIGN_BASELINE_REV_A.json`
 - `hardware/kicad/sheets/01_POWER.csv`
 - TI primary datasheets for LM74700-Q1, CSD18540Q5B, LMR60440, TPS7A20 and INA226.
@@ -167,11 +171,48 @@ The native schematic must fail Review A regression if it:
 - changes the 12-pin MAIN/PWR order;
 - treats FAULT as a replacement for INA226 I2C telemetry.
 
-## 8. Open items outside this Review A scope
+## 8. Human-readable hierarchy conversion
 
-- exact shunt MPN and Kelvin layout;
+The native representation has been converted from the original one-page direct-label
+capture into one system overview and four functional child sheets. The controlled
+conversion contains 63 symbols, 185 explicit wire segments, 9 cross-sheet nets and
+26 hierarchical labels. An independent audit compares every schematic pin with every
+pad/net on all 60 physical PCB positions and records semantic SHA-256
+`fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a`.
+
+This exact equivalence retains the `PASS - PIN/NET AUTHORITY` decision above. It does
+not yet accept the new drawing as complete review evidence: repeat native KiCad 9 ERC,
+the exported five-page PDF and JSON ERC report, and an independent human functional
+review must be committed before routing starts.
+
+## 9. Open items outside this Review A scope
+
+- `U1`, `U2` and `U5` now use the exact TI DBV0006A, DGS0010A and DBV0005A
+  land/mask/stencil examples; their placement, local routing and assembly validation
+  remain Review-B controls;
+- `Q1` copper and segmented stencil are now controlled by
+  `DioneyaPWR:CSD18540Q5B_DNK` from TI SLPS488B sections 7.2/7.3; solder-mask
+  expansion, drain thermal spreading/vias, placement, SOA and assembly validation
+  remain Review-B controls;
+- `U3/U4` copper, solder-mask opening and stencil are now controlled by
+  `DioneyaPWR:LMR60440_RAK0009A` from TI SNAS877 package drawing
+  4229353/J; optional thermal vias, power-loop placement, EMI/thermal evidence
+  and assembly validation remain Review-B controls;
+- `RSH1` is frozen as `WSK2512R0100FEA` with the manufacturer land pattern;
+  Kelvin routing, current-density, thermal and reference-calibration evidence remain open;
+- `J1` is frozen as vertical gold-contact `Molex 43045-0213` with both possible
+  polarization-peg holes; orientation, service clearance and pull/thermal tests remain open;
+- `J2` electrical footprint is shared with the manufacturer-controlled
+  PCB-MAIN `Molex 43045-1202` pattern; its PCB-PWR placement, orientation and
+  service clearance remain open with `DIM-003`;
 - final TVS and fuse values and coordination;
-- exact inductor/capacitor/bulk MPNs and derating;
+- `L1/L2` are frozen as `XAL7030-472MEC` with the manufacturer land pattern;
+  hot-loop placement, temperature rise, load-step and EMI evidence remain open;
+- all `C1-C19`, `R1-R15`, `NT1-NT3` and `TP1-TP10` now have exact candidate identity,
+  population, footprint and pin/net bindings in
+  `PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv`; capacitor DC-bias/cold-ESR/transient evidence,
+  C13 manufacturer land-pattern comparison, assembly review and DFT accessibility
+  remain open;
 - selected battery/BMS voltage limits;
 - MPPT/harness transient envelope;
 - I2C final harness capacitance and pull-up validation;

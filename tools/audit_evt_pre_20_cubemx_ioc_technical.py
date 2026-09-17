@@ -135,6 +135,17 @@ def main() -> None:
     require(label_to_pin["LORA_RXEN"] == "PD8", "LoRa RXEN output mapping drift")
     require(values["PB15.PinState"] == "GPIO_PIN_RESET", "LoRa TXEN does not initialize LOW")
     require(values["PD8.PinState"] == "GPIO_PIN_RESET", "LoRa RXEN does not initialize LOW")
+    safe_cellular_low = {
+        "CELL_PWRKEY_CMD": "PD11",
+        "CELL_RESET_N_CMD": "PD12",
+        "CELL_DTR": "PD14",
+        "EN_MODEM": "PD4",
+        "SIM_MUX_SEL": "PE0",
+        "SIM_MUX_EN": "PE2",
+    }
+    for net, pin in safe_cellular_low.items():
+        require(values.get(f"{pin}.PinState") == "GPIO_PIN_RESET",
+                f"cellular cold-state output does not initialize LOW: {net}")
 
     require(values["PC14-OSC32_IN\\ (PC14).Mode"] == "LSE-External-Clock-Source", "LSE bypass source mode missing")
     require(values["PC15-OSC32_OUT\\ (PC15).Signal"] == "RCC_OSC32_OUT", "LSE output pin is not reserved")
@@ -171,7 +182,7 @@ def main() -> None:
     )
 
     print("EVT-PRE-20 CubeMX IOC QG-2 independent technical audit: PASS")
-    print("- 67 pins, fail-closed LoRa TXEN/RXEN, 17 IPs, unique EXTI2/6/7/8 sources, no HSE and unreleased PWR/clock settings verified")
+    print("- 67 pins, fail-closed LoRa and cellular outputs, 17 IPs, unique EXTI2/6/7/8 sources, no HSE and unreleased PWR/clock settings verified")
 
 
 if __name__ == "__main__":

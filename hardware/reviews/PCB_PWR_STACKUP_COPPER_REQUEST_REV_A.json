@@ -1,0 +1,145 @@
+{
+  "schema": "dioneya-pcb-pwr-stackup-copper-request-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-PWR",
+  "revision": "A",
+  "status": "PACKET_READY_TWO_FABRICATOR_RESPONSES_REQUIRED_NOT_FOR_ROUTING_OR_MANUFACTURE",
+  "authority_inputs": [
+    "hardware/kicad/PCB_RULES.md",
+    "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
+    "hardware/POWER_DESIGN_BASELINE_REV_A.json",
+    "hardware/POWER_DESIGN_CALC_REV_A.md",
+    "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
+    "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
+    "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
+    "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json",
+    "hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md",
+    "hardware/CHINA_PROCUREMENT_RFQ.csv",
+    "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv",
+    "hardware/PCB_RELEASE_CHECKLIST.csv"
+  ],
+  "source_binding": {
+    "native_board": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
+    "native_board_semantic_sha256": "5f854a5276e8dfd6dc82516f61db1a158888b5343b82058e6024e5970b51e6c1",
+    "placement_authority": "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
+    "placement_authority_sha256": "98a9bd0c221d880c53e95f8bb93d92ae93b3237f94293a9b7e145f31a2eeb64f",
+    "routing_authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
+    "routing_authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
+    "layer_count_authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
+    "layer_count_authority_sha256": "3774347b5cca2b09ef1949f08af22ac2e319db7b0d99bb63034a28f1dc590b80",
+    "power_design_baseline": "hardware/POWER_DESIGN_BASELINE_REV_A.json",
+    "power_design_baseline_sha256": "d8077ea641aad41f8853c2744f07e2e19d5d22a046135e6f4310899922a75336",
+    "power_design_calculation": "hardware/POWER_DESIGN_CALC_REV_A.md",
+    "power_design_calculation_sha256": "b8f26621d5b921efb0e7d327182c334d97719fe1502fb7802a45f78f99bbb8a9",
+    "dim_003_request": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
+    "dim_003_request_sha256": "5ec0e2b95719aee6f631337767120bc3ec2a78c7f32ad2a0c558df7b400c68e2"
+  },
+  "board_request_basis": {
+    "provisional_outline_mm": [
+      90.0,
+      60.0
+    ],
+    "outline_status": "PROVISIONAL_DIM_003_OPEN_NOT_A_FABRICATION_DIMENSION",
+    "finished_thickness_target_mm": 1.6,
+    "finished_thickness_status": "PROVISIONAL_DIM_003_OPEN",
+    "copper_layers": 4,
+    "native_layer_order": [
+      "F.Cu",
+      "In1.Cu",
+      "In2.Cu",
+      "B.Cu"
+    ],
+    "layer_function_intent": [
+      "POWER_SIGNAL",
+      "REFERENCE",
+      "POWER_RETURN",
+      "POWER_SIGNAL"
+    ],
+    "layer_function_status": "REQUEST_BASIS_ONLY_VENDOR_ALTERNATIVE_REQUIRES_CONTROLLED_REVIEW",
+    "base_material_family": "FR-4",
+    "copper_weight_targets": {
+      "outer_oz": 2.0,
+      "inner_oz": 1.0,
+      "status": "REQUEST_TARGETS_ONLY_NOT_FROZEN"
+    },
+    "final_stackup_frozen": false,
+    "material_system_frozen": false,
+    "finished_thickness_frozen": false,
+    "copper_weights_frozen": false,
+    "surface_finish_frozen": false,
+    "numeric_fabrication_rules_frozen": false,
+    "native_trace_items": 0,
+    "native_copper_zones": 0
+  },
+  "power_geometry_boundary": {
+    "system_expected_max_input_current_a": 5.0,
+    "system_fault_and_transient_envelope_status": "OPEN",
+    "buck_channel_rating_a": 4.0,
+    "modem_3v8_peak_basis_a": 3.3,
+    "microphone_1v8_regulator_rating_a": 0.3,
+    "ambient_requirement_c": [
+      -40,
+      70
+    ],
+    "dc_drop_limit_v": null,
+    "allowed_conductor_temperature_rise_c": null,
+    "minimum_trace_width_mm": null,
+    "minimum_plane_neck_mm": null,
+    "via_pad_mm": null,
+    "via_finished_drill_mm": null,
+    "via_array_count": null,
+    "thermal_via_geometry": null,
+    "numeric_geometry_authority": "SELECTED_FABRICATION_INPUTS_PLUS_PROJECT_CURRENT_DENSITY_DC_DROP_FAULT_ENERGY_AND_PLUS70C_THERMAL_REVIEW_REQUIRED"
+  },
+  "required_fabricator_slots": [
+    "FAB-A",
+    "FAB-B"
+  ],
+  "required_question_ids": [
+    "STACKUP-CROSS-SECTION",
+    "MATERIAL-THERMAL-SYSTEM",
+    "FINISHED-THICKNESS",
+    "COPPER-WEIGHT-PLATING",
+    "HEAVY-COPPER-ETCH",
+    "VIA-DRILL-PLATING",
+    "THERMAL-VIA-FILL",
+    "MIN-GEOMETRY-REGISTRATION",
+    "MASK-FINISH",
+    "COPPER-BALANCE-PANEL-WARPAGE",
+    "NETTEST-TRACEABILITY-MICROSECTION",
+    "DFM-CLOSURE"
+  ],
+  "external_response": {
+    "response_register": "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv",
+    "required_rows": 24,
+    "pending_rows": 24,
+    "accepted_fabricator_slots": 0,
+    "selected_fabricator_slot": null,
+    "complete": false
+  },
+  "accepted_authority": {
+    "selected_stackup": null,
+    "selected_material_system": null,
+    "accepted_finished_thickness_mm": null,
+    "accepted_outer_finished_copper_um": null,
+    "accepted_inner_finished_copper_um": null,
+    "accepted_hole_wall_plating_um": null,
+    "accepted_minimum_geometry": null,
+    "accepted_via_construction": null,
+    "accepted_surface_finish": null
+  },
+  "release_interlock": {
+    "two_fabricator_responses_accepted": false,
+    "fabricator_selected": false,
+    "stackup_accepted": false,
+    "copper_weights_and_plating_accepted": false,
+    "manufacturing_minimums_accepted": false,
+    "dim_003_accepted": false,
+    "current_density_dc_drop_fault_thermal_calculation_accepted": false,
+    "numeric_power_geometry_authorized": false,
+    "routing_authorized": false,
+    "review_b_complete": false,
+    "manufacturing_release": false,
+    "fabrication_authorized": false
+  }
+}

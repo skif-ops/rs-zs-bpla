@@ -165,7 +165,8 @@ def main() -> int:
     label_pins(sch, D1, zener, {by_name["K"]:"VBAT_FUSED", by_name["A"]:"GND_PWR"})
 
     # Passives already named in PCB_PWR_CAPTURE_NETS_REV_A.csv but absent from the
-    # first native capture. Blank footprints are intentional until MPN/derating freeze.
+    # first native capture. Exact candidate identity and footprint are applied later
+    # from PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv.
     caps = [
         ("C9",  "CIN_REV VALUE_TBD TRANSIENT_REVIEW",       "VBAT_FUSED",     73.66, 58.42),
         ("C10", "C_PROT_MIN VALUE_TBD TRANSIENT_REVIEW",    "VBAT_PROTECTED", 116.84, 58.42),
@@ -179,8 +180,8 @@ def main() -> int:
         sch.schematicSymbols.append(inst)
         label_pins(sch, inst, capacitor, {"1":net, "2":"GND_PWR"})
 
-    # Explicit DFT access required by the PWR/I2C/Kelvin EVT plan. Footprint remains
-    # blank until DFT pad geometry/fixture review; the schematic requirement is locked now.
+    # Explicit DFT access required by the PWR/I2C/Kelvin EVT plan. The controlled
+    # no-paste footprint is applied later from the passive/DFT authority table.
     tp = load_symbol(args.connector_symbols, "Conn_01x01", "DioneyaPWR")
     rename_symbol_tree(tp, "Conn_01x01", "TESTPOINT")
     tp.entryName = "TESTPOINT"

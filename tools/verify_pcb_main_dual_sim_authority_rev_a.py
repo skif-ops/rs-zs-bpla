@@ -267,7 +267,7 @@ def main() -> None:
     print("- all 55 physical contacts and independent TI/ST/TE pin maps verified")
     print("- six switch routes, three-channel VDD path and boot-safe Q3 inversion verified")
     print("- both protected socket maps, card-detect filters and MCU endpoints verified")
-    print("- native capture and Reviews A/B keep the production BOM blocked")
+    print("- Reviews A/B keep the production BOM blocked")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

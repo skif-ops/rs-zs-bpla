@@ -1,0 +1,54 @@
+{
+  "schema_version": "dioneya.pcb-main-mechanical-eco-application.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-MECH-ECO-001",
+  "approval": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.json",
+  "application_date": "2026-09-15",
+  "reviewed_commit_sha": "61cbe796de2f87560342a44b063ff6283a8ce1e8",
+  "reviewed_candidate_sha256": "5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1",
+  "decision": "ACCEPT_LIMITED_MECHANICAL_ECO",
+  "baseline": {
+    "commit_sha": "989ce217d44795ba2986453d1f37152af5a8e1fc",
+    "board_sha256": "aa35fe622b6a0761b9b25ae488e1a2c6e7160c285ab771b580f63513b83e4a22",
+    "authority_sha256": "2ea8da3b8469f616c469eb342127afd2e75b3b0ad04f3ab75154560211f353c9"
+  },
+  "applied": {
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "8de8ac2eedc00775853a26641931ded8873cf5c1d9f61e7358d0546fea9dc379",
+    "authority": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+    "authority_sha256": "6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44",
+    "changed_records": [
+      "MECH-007",
+      "MECH-008",
+      "MECH-014",
+      "MECH-016",
+      "MECH-019",
+      "MECH-020",
+      "MECH-024",
+      "MECH-026",
+      "MECH-032"
+    ],
+    "moved_board_anchors": [
+      "J_PWR",
+      "J_MIC1",
+      "J8",
+      "J10",
+      "J13",
+      "U8"
+    ]
+  },
+  "post_application_clearance": {
+    "confirmed_component_collisions": 15,
+    "screening_component_collisions": 67,
+    "confirmed_mounting_clearance_conflicts": 0,
+    "screening_mounting_clearance_conflicts": 1,
+    "confirmed_tool_clearance_conflicts": 0,
+    "screening_tool_clearance_conflicts": 0,
+    "locked_authority_component_conflicts": [],
+    "locked_authority_mounting_conflicts": [],
+    "locked_authority_tool_conflicts": []
+  },
+  "status": "APPLIED_FULL_REPACK_REQUIRED",
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

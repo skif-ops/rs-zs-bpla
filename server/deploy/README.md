@@ -8,7 +8,10 @@ docker compose -f docker-compose.dev.yml up --build
 curl http://127.0.0.1:8000/api/v1/health
 ```
 
-The development broker listens only on localhost and allows anonymous clients for bench testing. It is not a production configuration.
+The development broker and server listen only on localhost and allow explicit
+insecure station transports for bench testing. `docker-compose.dev.yml` and the
+plaintext `compose.windows.yml` set `ZS_STATION_HTTP_INSECURE_BENCH=1`; both are
+isolated-bench configurations and must not be used for production.
 
 ## Production requirements
 
@@ -16,8 +19,31 @@ The development broker listens only on localhost and allows anonymous clients fo
 - MQTT over TLS 1.2+ on port 8883.
 - Per-station credentials or client certificates.
 - Server-side `station_id` authorization, rate limiting and replay protection.
+- Broker ACL permits the bridge to publish event application receipts and each
+  station credential to read only its own `receipt` topic.
 - Persistent database volume and backup policy.
 - Reverse proxy for the REST/WebSocket UI with HTTPS.
+- Station HTTP ingress disabled by default; production telemetry enters through
+  the mutual-TLS MQTT bridge. Do not set `ZS_STATION_HTTP_INSECURE_BENCH`.
 - Telegram/mobile notification credentials injected as secrets, not committed.
+- Python packages installed from `requirements.lock.txt` with `--require-hashes`;
+  `sbom/server.cdx.json` checked against that exact lock in CI.
+- MQTT command publication requires `/run/tls/command-signing.key`, an
+  unencrypted PKCS#8 Ed25519 private key readable only by its owner. Generate an
+  initial keypair outside Git, from the repository root:
 
-The station wire message remains compact CBOR. `station/cbor_codec.py` is the reference decoder for firmware protocol 1.4.
+  ```bash
+  python tools/generate_command_signing_key.py \
+    --private server/deploy/tls/command-signing.key \
+    --public server/deploy/tls/command-signing.pub
+  ```
+
+  Provision the exact 32-byte `.pub` file through the controlled station process.
+  Never copy the private file to a station or commit either generated file.
+  Ubuntu startup requires mode `0600`; on Windows restrict the source file with
+  NTFS ACLs to the deployment account and Docker service before using the TLS
+  compose file. Platform permission evidence remains part of the clean-deploy gate.
+
+The station wire messages remain compact CBOR. `station/cbor_codec.py` is the
+reference decoder for interface release 1.5, including detection schema 4 and
+protected cellular heartbeat schema 1.

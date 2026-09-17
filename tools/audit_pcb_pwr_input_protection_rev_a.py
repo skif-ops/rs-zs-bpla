@@ -1,0 +1,270 @@
+#!/usr/bin/env python3
+"""Audit the controlled PCB-PWR fuse/TVS qualification packet.
+
+Default mode validates that the exact EVT candidates, staged native-value ECO,
+test matrix and manufacturing interlocks are internally consistent. Strict mode
+is the physical qualification gate and remains non-zero until all matrix rows
+carry attributable PASS evidence.
+"""
+from __future__ import annotations
+
+import argparse
+import csv
+import json
+import math
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+CONTRACT = ROOT / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json"
+MATRIX = ROOT / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv"
+FREEZE = ROOT / "hardware/POWER_COMPONENT_FREEZE_REV_A.csv"
+BASELINE = ROOT / "hardware/POWER_DESIGN_BASELINE_REV_A.json"
+BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
+PROCUREMENT = ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
+NATIVE_SCH = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR_01_INPUT_PROTECTION.kicad_sch"
+NATIVE_PCB = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
+SCH_GENERATOR = ROOT / "tools/generate_pcb_pwr_schematic_rev_a.py"
+PCB_GENERATOR = ROOT / "tools/generate_pcb_pwr_layout_candidate_rev_a.py"
+
+
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        raise RuntimeError(message)
+
+
+def read_csv(path: Path) -> list[dict[str, str]]:
+    with path.open(encoding="utf-8-sig", newline="") as source:
+        return list(csv.DictReader(source))
+
+
+def close(actual: float, expected: float, tolerance: float, label: str) -> None:
+    if not math.isclose(actual, expected, rel_tol=0.0, abs_tol=tolerance):
+        raise RuntimeError(
+            f"{label}: actual={actual:.12g} expected={expected:.12g} "
+            f"tolerance={tolerance:.12g}"
+        )
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=ROOT / "artifacts/pcb_pwr_input_protection_qualification_rev_a.json",
+    )
+    parser.add_argument("--strict", action="store_true")
+    args = parser.parse_args()
+
+    contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
+    baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+    capture_status = json.loads(STATUS.read_text(encoding="utf-8"))
+    matrix = read_csv(MATRIX)
+    freeze = {row["Component_ID"]: row for row in read_csv(FREEZE)}
+    bom = {row["Item_ID"]: row for row in read_csv(BOM)}
+    procurement = read_csv(PROCUREMENT)
+
+    require(contract["schema_version"] == 1, "qualification schema version drift")
+    require(contract["configuration"] == "EVT-PRE-20 Rev.A", "configuration drift")
+    require(contract["assembly"] == "PCB-PWR", "assembly drift")
+    require(contract["manufacturing_release"] is False, "qualification packet released manufacture")
+    require(baseline["status"] == "CAPTURE_BASELINE_NOT_FOR_MANUFACTURE",
+            "power baseline lost NOT FOR MANUFACTURE interlock")
+    require(capture_status["manufacturing_release"] is False,
+            "PCB-PWR capture status released manufacture")
+
+    fuse = contract["fuse"]
+    continuous_a = float(contract["system_continuous_current_a"])
+    derating = float(fuse["standard_continuous_derating_fraction"])
+    target_rating_a = float(fuse["target_rating_a"])
+    required_rating_a = continuous_a / derating
+    capacity_a = target_rating_a * derating
+    loss_w = continuous_a * continuous_a * float(fuse["nominal_cold_resistance_ohm"])
+    close(required_rating_a, float(fuse["minimum_nominal_rating_at_25c_a"]), 1e-9,
+          "minimum nominal fuse rating")
+    close(capacity_a, float(fuse["capacity_after_standard_derating_a"]), 1e-9,
+          "standard-derated fuse capacity")
+    close(loss_w, float(fuse["nominal_loss_at_5a_w"]), 1e-12,
+          "5 A nominal cold fuse loss")
+    require(fuse["signed_native_mpn"] == "0451005.MRL", "signed native fuse identity drift")
+    require(fuse["target_evt_mpn"] == "0451008.MRL", "target fuse identity drift")
+    require(float(fuse["signed_native_rating_a"]) * derating < continuous_a,
+            "captured 5 A fuse is no longer proven inadequate")
+    require(target_rating_a > required_rating_a and capacity_a > continuous_a,
+            "target fuse lacks standard-derating headroom")
+    require(fuse["temperature_rerating_required"] is True,
+            "temperature rerating requirement was removed")
+    require(fuse["package_land_pattern_change"] is False,
+            "qualification packet unexpectedly changes F1 land pattern")
+
+    connector = contract["input_connector"]
+    require(connector["board_header_mpn"] == "43045-0213", "input header MPN drift")
+    require(connector["terminal_mpn"] == "43030-0038", "input terminal MPN drift")
+    require(float(connector["maximum_current_per_contact_a"]) == 8.5,
+            "Molex maximum current fact drift")
+    require(float(connector["maximum_current_per_contact_a"]) > target_rating_a,
+            "fuse nominal rating is not below connector maximum")
+    require(connector["qualification_at_plus70c_required"] is True,
+            "+70 C connector qualification was removed")
+
+    tvs = contract["tvs"]
+    require(tvs["target_evt_mpn"] == "SMBJ18A", "TVS identity drift")
+    require(float(tvs["reverse_standoff_v"]) > float(baseline["input"]["working_max_v"]),
+            "TVS standoff is not above provisional input maximum")
+    require(float(tvs["maximum_clamp_v"]) < float(tvs["project_candidate_clamp_limit_at_protected_node_v"]),
+            "project clamp limit does not exceed tabulated TVS clamp")
+    require(float(tvs["project_candidate_clamp_limit_at_protected_node_v"]) <
+            float(tvs["buck_absolute_max_input_v"]),
+            "project clamp limit does not preserve buck absolute-maximum margin")
+    require(tvs["sustained_overvoltage_protection"] is False,
+            "TVS was incorrectly declared a sustained-overvoltage protector")
+
+    telemetry = contract["telemetry_scope"]
+    full_scale = 32767.0 * float(telemetry["current_lsb_a"])
+    close(full_scale, float(telemetry["signed_full_scale_a"]), 1e-12,
+          "INA226 signed positive full scale")
+    require(float(telemetry["normal_operating_current_max_a"]) == continuous_a,
+            "INA226 normal range and project continuous current diverged")
+    require(telemetry["ina226_not_fault_energy_instrument"] is True,
+            "INA226 was incorrectly promoted to fault-energy instrument")
+
+    frozen = freeze["PWR-FUSE-01"]
+    require(frozen["Manufacturer"] == "Littelfuse", "frozen fuse manufacturer drift")
+    require(frozen["MPN"] == fuse["target_evt_mpn"], "freeze/contract fuse MPN mismatch")
+    require("CANDIDATE_SELECTED_FOR_EVT_QUALIFICATION" in frozen["Status"],
+            "freeze does not identify selected qualification candidate")
+    require("NATIVE_VALUE_ECO_PENDING" in frozen["Status"],
+            "freeze lost native-value ECO interlock")
+
+    bom_fuse = bom["PWR-FUSE-01"]
+    require(bom_fuse["MPN"] == fuse["target_evt_mpn"], "engineering BOM fuse MPN mismatch")
+    require(bom_fuse["BOM_disposition"] == "BLOCKED_ENGINEERING_SELECTION",
+            "engineering BOM prematurely released F1")
+    procurement_fuse = [
+        row for row in procurement
+        if "PWR-FUSE-01" in row.get("Item_IDs", "").split("|")
+    ]
+    require(len(procurement_fuse) == 1, "procurement rollup must have one F1 row")
+    require(procurement_fuse[0]["MPN"] == fuse["target_evt_mpn"],
+            "procurement rollup fuse MPN mismatch")
+    require(procurement_fuse[0]["BOM_disposition"] == "BLOCKED_ENGINEERING_SELECTION",
+            "procurement rollup prematurely released F1")
+
+    native_eco = contract["native_value_eco"]
+    require(native_eco == {
+        "applied": False,
+        "topology_change": False,
+        "value_only_change": True,
+        "signed_source_must_remain_unchanged_until_eco": True,
+        "repeat_native_kicad_9_erc_required": True,
+        "repeat_pdf_evidence_required": True,
+        "repeat_independent_human_hierarchy_review_required": True,
+        "pcba_procurement_authorized": False,
+        "manufacturing_release": False,
+    }, "native value ECO control drift")
+    for path in (NATIVE_SCH, NATIVE_PCB, SCH_GENERATOR, PCB_GENERATOR):
+        text = path.read_text(encoding="utf-8")
+        require("0451005.MRL CANDIDATE" in text,
+                f"signed native 5 A value unexpectedly changed before controlled ECO: {path}")
+        require("0451008.MRL" not in text,
+                f"target 8 A value partially applied before controlled ECO: {path}")
+
+    status_eco = capture_status.get("input_protection_candidate_eco", {})
+    require(status_eco.get("state") ==
+            "TARGET_8A_SELECTED_SIGNED_NATIVE_5A_VALUE_ECO_PENDING",
+            "PCB-PWR capture status does not expose the staged fuse ECO")
+    require(status_eco.get("target_fuse_mpn") == fuse["target_evt_mpn"],
+            "PCB-PWR capture status target fuse mismatch")
+    require(status_eco.get("signed_native_fuse_mpn") == fuse["signed_native_mpn"],
+            "PCB-PWR capture status signed fuse mismatch")
+    require(status_eco.get("native_value_eco_applied") is False,
+            "PCB-PWR capture status prematurely applies native fuse ECO")
+    require(status_eco.get("pcba_procurement_authorized") is False,
+            "PCB-PWR capture status prematurely authorizes procurement")
+    require(status_eco.get("manufacturing_release") is False,
+            "PCB-PWR capture status prematurely releases manufacture")
+
+    required_ids = [f"PWR-IPQ-{index:03d}" for index in range(1, 21)]
+    require(len(matrix) == 20, f"qualification matrix row count drift: {len(matrix)}")
+    require([row["Test_ID"] for row in matrix] == required_ids,
+            "qualification matrix IDs/order drift")
+    require(all(row["Blocking"] == "YES" for row in matrix),
+            "every qualification row must remain blocking")
+    allowed_status = {"PENDING_EVIDENCE", "PENDING_PHYSICAL_TEST", "PASS", "FAIL"}
+    require(all(row["Status"] in allowed_status for row in matrix),
+            "qualification matrix contains unsupported status")
+    for row in matrix:
+        if row["Status"].startswith("PENDING"):
+            require(not any(row[field] for field in
+                            ("Result", "Operator", "Date", "Artifact_SHA256")),
+                    f"{row['Test_ID']}: pending row carries unaudited result metadata")
+        if row["Status"] == "PASS":
+            require(all(row[field] for field in
+                        ("Result", "Operator", "Date", "Artifact_SHA256")),
+                    f"{row['Test_ID']}: PASS lacks attributable evidence")
+
+    accepted_rows = sum(row["Status"] == "PASS" for row in matrix)
+    failed_rows = [row["Test_ID"] for row in matrix if row["Status"] == "FAIL"]
+    complete = accepted_rows == 20 and not failed_rows and native_eco["applied"]
+    require(contract["test_matrix"]["required_rows"] == 20,
+            "contract qualification row count drift")
+    require(contract["test_matrix"]["accepted_rows"] == 0,
+            "contract claims accepted rows before evidence update")
+    require(contract["test_matrix"]["complete"] is False,
+            "contract claims physical qualification complete")
+
+    result = {
+        "configuration": contract["configuration"],
+        "audit": "PCB-PWR Rev.A input-protection qualification control",
+        "status": (
+            "PASS_QUALIFIED_FOR_RELEASE"
+            if complete
+            else "PASS_CONTROLLED_QUALIFICATION_PLAN_PHYSICAL_EVIDENCE_PENDING"
+        ),
+        "fuse": {
+            "signed_native_mpn": fuse["signed_native_mpn"],
+            "target_evt_mpn": fuse["target_evt_mpn"],
+            "continuous_current_a": continuous_a,
+            "minimum_nominal_rating_at_25c_a": required_rating_a,
+            "target_capacity_after_standard_derating_a": capacity_a,
+            "nominal_loss_at_5a_w": loss_w,
+        },
+        "tvs": {
+            "target_evt_mpn": tvs["target_evt_mpn"],
+            "maximum_clamp_v": tvs["maximum_clamp_v"],
+            "project_candidate_clamp_limit_v": tvs[
+                "project_candidate_clamp_limit_at_protected_node_v"
+            ],
+            "buck_absolute_max_input_v": tvs["buck_absolute_max_input_v"],
+        },
+        "native_value_eco_applied": native_eco["applied"],
+        "accepted_rows": accepted_rows,
+        "required_rows": 20,
+        "failed_rows": failed_rows,
+        "physical_qualification_complete": complete,
+        "pcba_procurement_authorized": False,
+        "manufacturing_release": False,
+    }
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+
+    print("PCB-PWR input-protection qualification packet audit PASS")
+    print(
+        f"F1 target={fuse['target_evt_mpn']} "
+        f"standard-derated capacity={capacity_a:.3f} A; "
+        f"D1 target={tvs['target_evt_mpn']}"
+    )
+    print(
+        f"Native value ECO applied={native_eco['applied']}; "
+        f"physical evidence={accepted_rows}/20 PASS"
+    )
+    print("PCBA procurement and manufacturing release remain BLOCKED")
+    print(args.output)
+
+    if args.strict and not complete:
+        return 2
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

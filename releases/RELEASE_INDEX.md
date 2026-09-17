@@ -1,8 +1,10 @@
 # Интеграционный реестр актуальных материалов
 
-Версия контрольного среза: `DIONEA-INTEGRATION-v0.12`.
-Дата: 10.09.2026.
+Версия контрольного среза: `DIONEA-INTEGRATION-v0.13`.
+Дата: 17.09.2026.
 Статус: `OPEN / NOT FOR MANUFACTURE`.
+
+Описание интеграционного среза: [`releases/integration/v0.13/README.md`](integration/v0.13/README.md).
 
 `main` и `develop` содержат согласованный интеграционный срез. Поставочные материалы
 `evt-mb` и `evt-pre-20` сохраняются в раздельных пространствах и не являются взаимозаменяемыми.
@@ -20,14 +22,15 @@
 ## Текущий инженерный baseline EVT-PRE-20
 
 - исходная ветка: `evt-pre-20`;
-- зафиксированный SHA: `b2fe734fe024d5e80573e85c23de3f0fc86c602a`;
+- зафиксированный SHA: `0ef02fd7805b19802bc5027bd9a2fe8b1ed514f2`;
 - аппаратная конфигурация: `EVT-PRE-20 Rev.A`, 20 станций, собственные PCB;
-- `PCB-MAIN MAIN-AUTH`: закрыты `001`–`011`, входной capture authority complete;
-- 211 точных PCB-MAIN passive/support позиций перенесены в контролируемый BOM; 196 fitted и 15 DNP;
-- PCB-MAIN mechanical authority: 110 x 75 x 1.6 мм, четыре NPTH, отдельные RF-зоны и 31 точный production pogo pad;
-- native-схема `PCB-MAIN`: `ABSENT`;
-- `Review A`: не начат; `Review B`: заблокирован;
-- производственный BOM и выпуск в изготовление: заблокированы;
+- `PCB-MAIN`: десятистраничная hierarchy и pad/net equivalence приняты только как `ACCEPT_HIERARCHY_ONLY`; routing и Review B открыты;
+- `PCB-PWR`: пятистраничная hierarchy принята; целевой F1 `0451008.MRL`, native value ECO не применён, evidence 0/20;
+- `PCB-MIC`: copper-return subgate принят, но общий Review B и manufacturing handoff открыты;
+- контролируемый BOM: 295 engineering-строк и 124 procurement-строки; QG-1 `PASS`, QG-2 `BLOCKED`;
+- системные кандидаты: RB40, SLP080S-12M, SCC075010060R, SBS050150200,
+  Taoglas G30.B.108111, AA.166.A.301111, TI.89.B.2111W и `CAB.0243`;
+- производственный BOM, routing, Gerber/CAM/DFM и выпуск в изготовление заблокированы;
 - аппаратный EVT: `NOT RUN`.
 
 Инженерные пакеты EVT-PRE-20 формируются CI как воспроизводимые артефакты. Они не

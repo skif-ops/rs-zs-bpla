@@ -19,6 +19,11 @@ Authority CSV SHA-256: `ff84acbcc8ecc104cbc6691d5a2eaed652adfab082c510518bd0ab48
 
 ## U7 SN74AXC8T245PWR contract
 
+The project-local `TI_PW0024A_TSSOP24` footprint follows TI 4220208/A: 24
+1.50 x 0.45 mm R0.05 lands at 0.65 mm pitch with 5.80 mm between row
+centers, equal-size stencil apertures, and 0.05 mm NSMD expansion. This
+replaces the incorrect 0.50 mm-pitch KiCad pattern previously assigned to U7.
+
 The exact PW package has 24 pins and two independent direction groups. This is not a single-direction eight-channel translator. With `VCCA=1V8_MIC`, `VCCB=3V3_DIGITAL`, `DIR1=HIGH`, and `DIR2=LOW`, channels 1 through 4 translate from A to B while channels 5 through 8 translate from B to A at the same time.
 
 | U7 group | Direction | 1.8 V port A | 3.3 V port B |
@@ -42,6 +47,10 @@ The harness-facing 1.8 V nets carry `_1V8` in native KiCad so they cannot be acc
 
 ## U17 SN74LVC32APWR contract
 
+The project-local `TI_PW0014A_TSSOP14` footprint follows TI 4220202/B: 14
+1.50 x 0.45 mm R0.05 lands at 0.65 mm pitch with 5.80 mm between row
+centers, equal-size stencil apertures, and 0.05 mm NSMD expansion.
+
 U17 operates from `1V8_MIC`. Its three used gates implement this exact active-high function:
 
 `MIC_WAKE_OR_1V8 = (MIC_WAKE1 OR MIC_WAKE2) OR (MIC_WAKE3 OR MIC_WAKE4)`
@@ -56,6 +65,13 @@ U17 operates from `1V8_MIC`. Its three used gates implement this exact active-hi
 - Place one 100 nF bypass capacitor at U17 pin 14 to GND pin 7. Exact capacitor RefDes and MPN are assigned by `MAIN-AUTH-010`.
 
 ## U18 SN74AXC1T45DRLR contract
+
+The project-local `TI_DRL0006A_SOT6` footprint follows TI 4223266/F: six
+0.67 x 0.30 mm R0.05 lands at 0.50 mm pitch with 1.48 mm between row
+centers, equal-size stencil apertures, and 0.05 mm preferred NSMD expansion.
+The exact official package drawing is
+`https://www.ti.com/lit/pdf/MPDS159I`, SHA-256
+`588597e633a3f02cd4546fd98f6872ef98a6578e1285db325eda3bbb16a516ee`.
 
 - U18 DRL package pin 1 `VCCA` uses `1V8_MIC`; pin 6 `VCCB` uses `3V3_DIGITAL`; pin 2 is GND.
 - Pin 5 `DIR` is tied directly to `1V8_MIC`, fixing A-to-B translation.

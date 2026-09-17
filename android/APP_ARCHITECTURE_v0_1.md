@@ -1,6 +1,6 @@
 # Android commissioning app - архитектура v0.1
 
-Статус: `DRAFT / SOURCE BASELINE STARTED / BLE NOT IMPLEMENTED`
+Статус: `DRAFT / POSITION READ-BACK DOMAIN PASS / BLE NOT IMPLEMENTED`
 
 ## Модули
 
@@ -17,7 +17,7 @@
 | `diagnostics` | health snapshot, guided checks, redacted export |
 | `storage` | encrypted local records without station private keys |
 
-Реализация: Kotlin, Android framework BLE and location APIs, без обязательных Google libraries. Toolchain зафиксирован в `TOOLCHAIN.md`. Первый baseline содержит state machine, identity/config/installation-position validation и OTA preflight; BLE transport и cryptographic signature verifier остаются fail-closed до freeze ICD.
+Реализация: Kotlin, Android framework BLE and location APIs, без обязательных Google libraries. Toolchain зафиксирован в `TOOLCHAIN.md`. Baseline содержит state machine, identity/config/installation-position validation, OTA preflight и независимый 58-byte big-endian SHA-256/read-back verifier, совпадающий с firmware known-answer vector. BLE transport, nRF52840 GATT binding и cryptographic OTA signature verifier остаются fail-closed до freeze ICD.
 
 ## Поток commissioning
 

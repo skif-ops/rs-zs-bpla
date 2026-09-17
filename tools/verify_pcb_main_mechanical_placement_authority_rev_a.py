@@ -21,6 +21,7 @@ BLE_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv"
 OPEN_DIMENSIONS_PATH = ROOT / "mechanics/common/OPEN_DIMENSIONS.csv"
 CAPTURE_SPEC_PATH = ROOT / "hardware/kicad/REV_A_CAPTURE_SPEC.md"
 PCB_RULES_PATH = ROOT / "hardware/kicad/PCB_RULES.md"
+LAYER_AUTHORITY_PATH = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
 
 FIELDS = [
     "Record_ID", "Feature_Type", "RefDes", "Contact", "Side",
@@ -45,38 +46,39 @@ EXPECTED_COUNTS = Counter({
 })
 
 EXPECTED_CONNECTORS = {
-    "J_PWR": (0.0, 13.0, 90.0, "OUTBOARD_WEST"),
-    "J_MIC1": (0.0, 30.0, 90.0, "OUTBOARD_WEST"),
+    "J_PWR": (0.0, 15.0, 90.0, "OUTBOARD_WEST"),
+    "J_MIC1": (0.0, 42.5, 90.0, "OUTBOARD_WEST"),
     "J_MIC2": (40.0, 75.0, 0.0, "OUTBOARD_NORTH"),
     "J_MIC3": (92.0, 75.0, 0.0, "OUTBOARD_NORTH"),
     "J_MIC4": (110.0, 54.0, 270.0, "OUTBOARD_EAST"),
     "J6": (18.0, 2.5, 180.0, "OUTBOARD_SOUTH"),
     "J7": (64.0, 2.5, 180.0, "OUTBOARD_SOUTH"),
-    "J8": (16.0, 68.0, 0.0, "UP_Z"),
+    "J8": (16.0, 71.5, 0.0, "UP_Z"),
     "J9": (53.5, 68.0, 0.0, "UP_Z"),
-    "J10": (74.0, 68.0, 0.0, "UP_Z"),
+    "J10": (74.0, 71.5, 0.0, "UP_Z"),
     "J11": (42.0, 0.0, 180.0, "OUTBOARD_SOUTH"),
     "J12": (87.0, 2.5, 180.0, "OUTBOARD_SOUTH"),
-    "J13": (110.0, 13.0, 270.0, "OUTBOARD_EAST"),
+    "J13": (110.0, 15.0, 270.0, "OUTBOARD_EAST"),
 }
 
 EXPECTED_MODULES = {
-    "U8": (24.0, 53.0, 0.0, 23.6, 19.9),
+    "U8": (24.0, 52.0, 0.0, 23.6, 19.9),
     "U9": (53.5, 58.0, 0.0, 9.7, 10.1),
     "U10": (74.0, 55.0, 0.0, 20.0, 14.0),
     "U11": (102.25, 35.25, 270.0, 15.5, 10.5),
 }
 
 EXPECTED_REGIONS = {
-    "ZONE_CELL": (10.0, 42.0, 26.0, 30.0),
+    "ZONE_CELL": (10.0, 34.0, 26.0, 40.0),
     "ZONE_GNSS": (44.0, 51.0, 19.0, 21.0),
-    "ZONE_LORA": (64.0, 46.0, 21.5, 26.0),
+    "ZONE_LORA": (64.0, 46.0, 21.5, 28.0),
     "ZONE_BLE_BODY": (94.5, 30.0, 15.5, 10.5),
     "KO_BLE_ANT_BOARD": (106.2, 30.0, 3.8, 10.5),
     "KO_BLE_ANT_VOLUME": (106.2, 27.0, 18.8, 16.5),
     "KO_GNSS_UPPER_VIEW": (44.0, 51.0, 19.0, 24.0),
     "ZONE_AUDIO_DIGITAL": (37.0, 39.0, 29.0, 11.0),
     "ZONE_DFT_BOTTOM": (27.0, 15.0, 67.0, 25.0),
+    "KO_MIC1_HARNESS": (0.0, 37.5, 10.0, 10.0),
 }
 
 EXPECTED_TEST_GROUPS = {
@@ -274,7 +276,7 @@ def main() -> None:
     review = REVIEW_PATH.read_text(encoding="utf-8")
     require(f"Authority CSV SHA-256: `{digest}`" in review, "mechanical authority SHA marker mismatch")
     for marker in (
-        "MECHANICAL_PLACEMENT_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        "MECHANICAL_PLACEMENT_AUTHORITY_PASS / LIMITED ECO APPLIED / PCB REVIEW B OPEN / NOT FOR MANUFACTURE",
         "110 x 75 x 1.60 mm", "70 records", "31 individual pogo pads", "2.54 mm",
         "CONTROLLED_PENDING_NATIVE_STEP", "All physical tests remain `NOT RUN`",
     ):
@@ -295,8 +297,11 @@ def main() -> None:
     }, "MAIN-AUTH-011 evidence set mismatch")
     require(readiness["complete"] is True and not readiness["open_authorities"], "capture authority is not complete")
     require(status["manufacturing_release"] is False, "mechanical authority prematurely released manufacturing")
-    require(status["native_schematic"]["status"] == "ABSENT", "native schematic state unexpectedly changed")
-    require(status["review_a"]["status"] == "BLOCKED_NATIVE_SCHEMATIC_ABSENT", "Review A blocker changed incorrectly")
+    require(status["native_schematic"]["status"] in {"PRESENT_REVIEW_PENDING", "REVIEW_A_PASS"},
+            "native schematic state mismatch")
+    require(status["review_a"]["status"] in
+            {"NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING", "PASS"},
+            "Review A state mismatch")
 
     connector_freeze = {row["Connector_ID"]: row for row in read_rows(CONNECTOR_FREEZE_PATH)}
     pcb_main_connector_ids = {
@@ -319,12 +324,17 @@ def main() -> None:
 
     capture_spec = CAPTURE_SPEC_PATH.read_text(encoding="utf-8")
     pcb_rules = PCB_RULES_PATH.read_text(encoding="utf-8")
+    layer_authority = {row["Board"]: row for row in read_rows(LAYER_AUTHORITY_PATH)}
     for marker in (
         "PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv", "MAIN-AUTH-011",
         "110 x 75", "31 production pogo pads", "capture-authority input set is complete",
     ):
         require(marker in capture_spec, f"capture spec missing mechanical marker: {marker}")
-    require("Main board target: 6 layers" in pcb_rules, "six-layer PCB-MAIN target missing")
+    require("PCB-MAIN 6, PCB-PWR 4 and PCB-MIC 2 layers" in pcb_rules,
+            "controlled Rev.A layer-count statement missing")
+    require(layer_authority["PCB-MAIN"]["Copper_Layers"] == "6" and
+            layer_authority["PCB-MAIN"]["Layer_Count_Status"] == "FROZEN_REV_A",
+            "six-layer PCB-MAIN authority missing")
     require("no guessed trace width" in pcb_rules, "stackup-dependent impedance boundary missing")
 
     result = {
@@ -341,7 +351,7 @@ def main() -> None:
         "fixture_fiducials_verified": len(fiducials),
         "authority_sha256": digest,
         "open_authorities": [],
-        "native_schematic": "ABSENT",
+        "native_schematic": "PRESENT_REVIEW_PENDING",
         "physical_tests": "NOT_RUN",
         "production_bom": "BLOCKED",
     }
@@ -351,7 +361,7 @@ def main() -> None:
     print(
         "PCB-MAIN MAIN-AUTH-011 mechanical placement verification: PASS "
         "(110 x 75 x 1.6 mm; four holes; 13 connectors; four RF zones; "
-        "31 pogo pads; native capture/reviews remain blocking)"
+        "31 pogo pads; Review A is signed PASS; Review B remains blocking)"
     )
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 

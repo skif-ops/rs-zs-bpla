@@ -50,7 +50,7 @@ The controlled board RF chain is:
 
 The route is 50 Ohm controlled impedance over uninterrupted RF ground. U10 pads 20 and 22, all other module grounds and the J10 shell use dense ground stitching. J10 is exact Hirose `U.FL-R-SMT-1(60)` and doubles as the conducted-test port; a tee test point or other RF stub is forbidden. Exact pi/ESD MPNs and RefDes are frozen by `MAIN-AUTH-010`. The cable and antenna remain separate unreleased system BOM lines.
 
-All 20 pilot units use only the signed RU868 profile. Power, duty cycle, occupied bandwidth and channel mask remain fail-closed; no transmission is authorized merely by this electrical authority.
+Every assembled station in the selected 4, 10 or 20-unit EVT lot uses only the signed RU868 profile. Power, duty cycle, occupied bandwidth and channel mask remain fail-closed; no transmission is authorized merely by this electrical authority.
 
 ## Layout and firmware constraints
 

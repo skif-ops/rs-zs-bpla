@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent pre-schematic authority audit for EVT-PRE-20 PCB-MAIN Rev.A.
+"""Independent capture-input authority audit for EVT-PRE-20 PCB-MAIN Rev.A.
 
 This gate proves that the complete pre-schematic capture inputs are internally
 consistent. It does not claim
@@ -47,6 +47,9 @@ MECHANICAL_PLACEMENT_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMEN
 DUAL_SIM_POLICY_PATH = ROOT / "hardware/DUAL_SIM_SINGLE_STANDBY.md"
 AUDIO_INTERFACE_PATH = ROOT / "hardware/T5838_AAD_INTERFACE_REV_A.md"
 POWER_ARCHITECTURE_PATH = ROOT / "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
+GROUND_DOMAIN_AUTHORITY_PATH = ROOT / "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv"
+GROUND_DOMAIN_REVIEW_PATH = ROOT / "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md"
+NATIVE_NET_OVERLAY_PATH = ROOT / "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv"
 
 EXPECTED_AUTHORITATIVE_INPUTS = {
     "config/EVT_PRE_20_BASELINE.yaml",
@@ -74,6 +77,10 @@ EXPECTED_AUTHORITATIVE_INPUTS = {
     "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md",
     "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
     "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv",
+    "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md",
+    "hardware/PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md",
+    "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv",
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv",
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -411,7 +418,8 @@ def main() -> None:
     require(status["schema_version"] == 1, "PCB-MAIN status schema mismatch")
     require(status["configuration"] == "EVT-PRE-20 Rev.A", "configuration mismatch")
     require(status["assembly"] == "PCB-MAIN", "assembly mismatch")
-    require(status["release_state"] == "CAPTURE_INPUT", "premature PCB-MAIN release state")
+    require(status["release_state"] in {"CAPTURE_INPUT", "SCHEMATIC_REVIEW", "REVIEW_A_PASS"},
+            "invalid PCB-MAIN capture/review state")
     require(status["manufacturing_release"] is False, "PCB-MAIN must remain blocked")
 
     source_control = status["source_control"]
@@ -547,6 +555,7 @@ def main() -> None:
         "PIN_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
         "f4ec11f00e762e37ffc4020f6d4f20d225bc061d",
         "4349055dfd06e6eb2dce1a440c44a995ad7c924e28435ede119a7d4bb10f556d",
+        "6483871075d4889d39356648a9c1f1fb34f48dce2ce3e8c5a8d73a73f7e935e3",
         "No HSE is fitted",
         "VREFBUF disabled",
         "67 locked functional assignments",
@@ -617,9 +626,10 @@ def main() -> None:
         "DEVICE_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
         "a898962af314ca90719eadba732e7f5fd42a1c48c4bfd283062c403d1c27bfd0",
         "5208623aa91c63a33be0e930518c20f5210c4eb76932350f35369687ae1d0dd5",
+        "4dc419fabe93f7f0b1ee5730967ed74573aa0dc91188cf88749ce10d5ab4a34e",
         "3f6937595517c4f738021037942e7d19d5b7c84cfe4e9b7e8635fcc06ff783fe",
         "factory default `QE=1`",
-        "4-byte addressing mode",
+        "exact 4-byte geometry",
         "0x18",
         "0x3F",
         "0x40",
@@ -1421,7 +1431,7 @@ def main() -> None:
     mechanical_review = MECHANICAL_PLACEMENT_REVIEW_PATH.read_text(encoding="utf-8")
     mechanical_sha256 = hashlib.sha256(MECHANICAL_PLACEMENT_AUTHORITY_PATH.read_bytes()).hexdigest()
     for marker in {
-        "MECHANICAL_PLACEMENT_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE",
+        "MECHANICAL_PLACEMENT_AUTHORITY_PASS / LIMITED ECO APPLIED / PCB REVIEW B OPEN / NOT FOR MANUFACTURE",
         mechanical_sha256, "70 records", "110 x 75 x 1.60 mm", "31 individual pogo pads",
         "CONTROLLED_PENDING_NATIVE_STEP", "All physical tests remain `NOT RUN`",
     }:
@@ -1504,8 +1514,74 @@ def main() -> None:
 
     native = status["native_schematic"]
     native_path = ROOT / native["path"]
-    require(native["status"] == "ABSENT" and not native_path.exists(), "native schematic filesystem/status mismatch")
-    require(native["schematic_derived_bom"] is False, "schematic-derived BOM claimed without native source")
+    native_project = ROOT / native.get("project", "")
+    native_manifest = ROOT / native.get("manifest", "")
+    native_generator = ROOT / native.get("generator", "")
+    native_present = status["release_state"] in {"SCHEMATIC_REVIEW", "REVIEW_A_PASS", "LAYOUT_REVIEW", "REVIEW_B_PASS", "FOR_MANUFACTURE"}
+    if native_present:
+        require(native["status"] in {"PRESENT_REVIEW_PENDING", "REVIEW_A_PASS", "REVIEW_B_PASS"},
+                "native schematic status mismatch")
+        require(all(path.is_file() for path in (native_path, native_project, native_manifest, native_generator)),
+                "controlled native schematic source set is incomplete")
+        require(native["schematic_derived_bom"] is True,
+                "native schematic BOM provenance is not declared")
+        native_manifest_data = json.loads(native_manifest.read_text(encoding="utf-8"))
+        require(native_manifest_data["schematic_sha256"] == hashlib.sha256(native_path.read_bytes()).hexdigest(),
+                "native schematic manifest hash mismatch")
+        require(native_manifest_data["project_sha256"] == hashlib.sha256(native_project.read_bytes()).hexdigest(),
+                "native project manifest hash mismatch")
+        require(native_manifest_data["generator_sha256"] == hashlib.sha256(native_generator.read_bytes()).hexdigest(),
+                "native generator manifest hash mismatch")
+        hierarchy = status.get("human_readable_hierarchy", {})
+        hierarchy_control = hierarchy.get("control", {})
+        require(
+            hierarchy.get("generator") == "tools/materialize_pcb_main_hierarchy_rev_a.py"
+            and hierarchy.get("connectivity_reader") == "tools/pcb_main_schematic_hierarchy.py"
+            and hierarchy.get("independent_audit") == "tools/audit_pcb_main_hierarchy_rev_a.py"
+            and hierarchy.get("review_record") ==
+            "hardware/reviews/PCB_MAIN_HIERARCHY_REVIEW_REV_A.md"
+            and (ROOT / hierarchy["review_record"]).is_file(),
+            "PCB-MAIN hierarchy toolchain binding drift",
+        )
+        require(
+            hierarchy_control.get("state") ==
+            "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_"
+            "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
+            and hierarchy_control.get("pages") == 10
+            and hierarchy_control.get("functional_child_sheets") == 9
+            and hierarchy_control.get("symbols") == 248
+            and hierarchy_control.get("physical_symbols") == 247
+            and hierarchy_control.get("logical_pad_numbers") == 1066
+            and hierarchy_control.get("physical_pad_occurrences") == 1077
+            and hierarchy_control.get("repeated_logical_pad_numbers") == 7
+            and hierarchy_control.get("duplicate_pad_occurrences") == 11
+            and hierarchy_control.get("connected_pin_wires") == 905
+            and hierarchy_control.get("explicit_nc") == 169
+            and hierarchy_control.get("pin_net_review_a_retained") is True
+            and all(hierarchy_control.get(field) is True for field in (
+                "native_kicad_9_erc_pass", "committed_erc_evidence",
+                "committed_pdf_evidence", "independent_human_review_complete",
+            ))
+            and all(hierarchy_control.get(field) is False for field in (
+                "routing_authorized", "manufacturing_release",
+            )),
+            "PCB-MAIN hierarchy review/release boundary drift",
+        )
+        hierarchy_sources = native_manifest_data.get("hierarchy_sources", [])
+        require(native_manifest_data.get("hierarchy_pages") == 10 and
+                native_manifest_data.get("hierarchy_functional_child_sheets") == 9 and
+                len(hierarchy_sources) == 10,
+                "PCB-MAIN hierarchy manifest page count drift")
+        for source in hierarchy_sources:
+            path = native_path.parent / source["path"]
+            require(path.is_file() and
+                    source["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest(),
+                    f"PCB-MAIN hierarchy source hash mismatch: {source.get('path')}")
+    else:
+        require(native["status"] == "ABSENT" and not native_path.exists(),
+                "native schematic filesystem/status mismatch")
+        require(native["schematic_derived_bom"] is False,
+                "schematic-derived BOM claimed without native source")
 
     readiness = status["capture_readiness"]
     closed_items = readiness["closed_authorities"]
@@ -1610,20 +1686,282 @@ def main() -> None:
     require(all("production_bom" in item["blocks"] for item in open_items), "open authority does not block production BOM")
     review_a = status["review_a"]
     review_b = status["review_b"]
-    require(review_a["complete"] is False and review_a["status"] == "BLOCKED_NATIVE_SCHEMATIC_ABSENT", "Review A must remain blocked on native schematic")
-    require(review_b["complete"] is False and review_b["status"] == "BLOCKED_REVIEW_A_NOT_COMPLETE", "Review B must remain blocked")
+    if review_a["complete"] is True:
+        require(status["release_state"] == "REVIEW_A_PASS" and native["status"] == "REVIEW_A_PASS",
+                "Review A PASS release state mismatch")
+        require(review_a["status"] == "PASS", "completed Review A must have PASS status")
+        require(all(review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
+                "completed Review A lacks reviewer/date/commit SHA")
+        require(review_b["complete"] is False and review_b["status"] in {
+                    "OPEN_LAYOUT_AND_EVIDENCE_PENDING",
+                    "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
+                    "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
+                },
+                "Review B must be open but incomplete after Review A PASS")
+    else:
+        expected_review_a_status = (
+            "NATIVE_SOURCE_AND_KICAD_ERC_PASS_HUMAN_REVIEW_PENDING"
+            if native_present else "BLOCKED_NATIVE_SCHEMATIC_ABSENT"
+        )
+        require(review_a["status"] == expected_review_a_status,
+                "Review A status does not match native-source state")
+        require(review_b["complete"] is False and review_b["status"] == "BLOCKED_REVIEW_A_NOT_COMPLETE",
+                "Review B must remain blocked before Review A completion")
     expected_review_a_evidence = {
-        "signed_checklist", "schematic_pdf", "cubemx_pin_report", "erc_report",
+        "checklist_template", "signed_checklist", "schematic_pdf", "cubemx_pin_report", "erc_report",
         "bom_diff", "net_name_diff",
     }
     require(set(review_a["evidence"]) == expected_review_a_evidence, "Review A evidence schema mismatch")
-    require(not any(review_a["evidence"].values()) and not review_b["evidence"], "review evidence present while review is incomplete")
+    if review_a["complete"] is True:
+        require(review_a["evidence"]["checklist_template"] is None,
+                "completed Review A must use signed checklist, not a template")
+        signed_checklist = ROOT / review_a["evidence"]["signed_checklist"]
+        require(signed_checklist.is_file() and signed_checklist.stat().st_size > 0,
+                "signed Review A checklist is missing")
+        for evidence_name in ("schematic_pdf", "cubemx_pin_report", "erc_report", "bom_diff", "net_name_diff"):
+            require(str(review_a["evidence"][evidence_name]).startswith("https://github.com/skif-ops/rs-zs-bpla/actions/runs/"),
+                    f"Review A {evidence_name} is not a commit-traceable GitHub Actions reference")
+        require(review_b["evidence"].get("carried_findings") == ["RA-003"],
+                "Review B must carry forward Review A finding RA-003")
+        if review_b["status"] in {
+                "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
+                "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
+        }:
+            required_layout_evidence = {
+                "native_layout_candidate", "layout_generator", "layout_independent_audit",
+                "placement_clearance_audit", "placement_clearance_record",
+                "mechanical_eco_candidate", "mechanical_eco_candidate_record",
+                "mechanical_eco_candidate_audit", "mechanical_eco_approval",
+                "mechanical_eco_approval_record", "mechanical_eco_review_commit_mapping",
+                "review_b_checklist", "ra_003_calculation", "ra_003_status",
+            }
+            if review_b["status"] in {
+                    "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
+            }:
+                required_layout_evidence |= {
+                    "placement_repack_manifest", "placement_repack_generator",
+                    "passive_courtyard_rule", "placement_repack_status",
+                }
+                require(review_b["evidence"].get("placement_repack_status") ==
+                        "PASS_STRICT_2D_CLEARANCE_AND_EXCLUSIVE_ZONES_"
+                        "ROUTING_AND_3D_REVIEW_PENDING",
+                        "PCB-MAIN placement-repack release boundary drift")
+            require(required_layout_evidence <= set(review_b["evidence"]),
+                    "placement-candidate Review B evidence schema incomplete")
+            for evidence_name in required_layout_evidence - {
+                    "ra_003_status", "placement_repack_status",
+            }:
+                evidence_path = ROOT / review_b["evidence"][evidence_name]
+                require(evidence_path.is_file() and evidence_path.stat().st_size > 0,
+                        f"Review B placement evidence missing: {evidence_name}")
+            require(review_b["evidence"]["ra_003_status"] == {
+                        "calculation": "CLOSED", "layout": "OPEN",
+                        "measurement": "OPEN", "overall": "OPEN",
+                    }, "RA-003 split disposition drift")
+            mechanical_eco_status = review_b["evidence"].get(
+                "mechanical_eco_candidate_status"
+            )
+            require(mechanical_eco_status in {
+                        "APPROVED_PENDING_APPLICATION",
+                        "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
+                        "APPROVED_APPLIED_PLACEMENT_REPACK_PASS",
+                    },
+                    "PCB-MAIN mechanical ECO candidate status drift")
+            mechanical_candidate = json.loads(
+                (ROOT / review_b["evidence"]["mechanical_eco_candidate"])
+                .read_text(encoding="utf-8")
+            )
+            require(mechanical_candidate.get("status") == "PROPOSED_NOT_APPROVED" and
+                    mechanical_candidate.get("manufacturing_release") is False and
+                    not any(mechanical_candidate.get("approval", {}).values()),
+                    "immutable PCB-MAIN mechanical ECO candidate drift")
+            mechanical_approval = json.loads(
+                (ROOT / review_b["evidence"]["mechanical_eco_approval"])
+                .read_text(encoding="utf-8")
+            )
+            require(mechanical_approval.get("reviewer") == "Скиф" and
+                    mechanical_approval.get("date") == "2026-09-15" and
+                    mechanical_approval.get("reviewed_commit_sha") ==
+                    "61cbe796de2f87560342a44b063ff6283a8ce1e8" and
+                    mechanical_approval.get("reviewed_candidate_sha256") ==
+                    "5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1" and
+                    mechanical_approval.get("decision") ==
+                    "ACCEPT_LIMITED_MECHANICAL_ECO" and
+                    mechanical_approval.get("scope") ==
+                    "LIMITED_MAIN_AUTH_011_MECHANICAL_ECO_ONLY" and
+                    mechanical_approval.get("implementation_authorized") is True and
+                    mechanical_approval.get("manufacturing_release") is False,
+                    "PCB-MAIN mechanical ECO approval binding drift")
+            candidate_path = ROOT / review_b["evidence"]["mechanical_eco_candidate"]
+            require(hashlib.sha256(candidate_path.read_bytes()).hexdigest() ==
+                    mechanical_approval["reviewed_candidate_sha256"],
+                    "approved PCB-MAIN mechanical ECO candidate SHA-256 drift")
+            review_commit_mapping = json.loads(
+                (ROOT / review_b["evidence"]["mechanical_eco_review_commit_mapping"])
+                .read_text(encoding="utf-8")
+            )
+            require(review_commit_mapping.get("reviewed_local_commit_sha") ==
+                    mechanical_approval["reviewed_commit_sha"] and
+                    review_commit_mapping.get("github_equivalent_commit_sha") ==
+                    "e265d1f1a0a74f94b9c887e12794a9b59fc2bfa0" and
+                    review_commit_mapping.get("reviewed_tree_sha") ==
+                    "f1fd423bbcfedefa830677ce2d8b3c54b2294caa" and
+                    review_commit_mapping.get("candidate_blob_sha") ==
+                    "b3dede3b466676bbab4e3bd737160cacfc57ad28" and
+                    review_commit_mapping.get("candidate_sha256") ==
+                    mechanical_approval["reviewed_candidate_sha256"] and
+                    review_commit_mapping.get("equivalence") ==
+                    "EXACT_TREE_AND_CANDIDATE_BLOB" and
+                    review_commit_mapping.get("manufacturing_release") is False,
+                    "PCB-MAIN mechanical ECO review-commit mapping drift")
+            mechanical_application = None
+            if mechanical_eco_status in {
+                    "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
+                    "APPROVED_APPLIED_PLACEMENT_REPACK_PASS",
+            }:
+                require("mechanical_eco_application" in review_b["evidence"],
+                        "PCB-MAIN mechanical ECO application record is missing")
+                application_path = ROOT / review_b["evidence"]["mechanical_eco_application"]
+                require(application_path.is_file() and application_path.stat().st_size > 0,
+                        "PCB-MAIN mechanical ECO application record is empty")
+                mechanical_application = json.loads(
+                    application_path.read_text(encoding="utf-8")
+                )
+                require(mechanical_application.get("status") ==
+                        "APPLIED_FULL_REPACK_REQUIRED" and
+                        mechanical_application.get("review_b_complete") is False and
+                        mechanical_application.get("manufacturing_release") is False,
+                        "PCB-MAIN mechanical ECO application interlock drift")
+            placement_control = review_b["evidence"].get("placement_clearance_control")
+            require(isinstance(placement_control, dict),
+                    "placement-clearance controlled baseline is missing")
+            require(set(placement_control) == {
+                        "state", "board_sha256", "authority_sha256",
+                        "assembly_footprints", "courtyard_footprints",
+                        "pad_screening_footprints", "confirmed_component_collisions",
+                        "screening_component_collisions",
+                        "confirmed_mounting_clearance_conflicts",
+                        "screening_mounting_clearance_conflicts",
+                        "confirmed_tool_clearance_conflicts",
+                        "screening_tool_clearance_conflicts",
+                        "locked_authority_component_conflicts",
+                        "locked_authority_mounting_conflicts",
+                        "locked_authority_tool_conflicts",
+                    }, "placement-clearance controlled baseline schema drift")
+            if mechanical_eco_status == "APPROVED_PENDING_APPLICATION":
+                require(placement_control["state"] == "BLOCKED_PLACEMENT_CLEARANCE",
+                        "pre-application PCB-MAIN placement must remain blocked")
+                require(placement_control["confirmed_component_collisions"] > 0 and
+                        placement_control["confirmed_mounting_clearance_conflicts"] > 0 and
+                        placement_control["confirmed_tool_clearance_conflicts"] > 0,
+                        "pre-application placement blocker counts drift")
+                require(placement_control["locked_authority_component_conflicts"] == [
+                            ["J8", "U8"], ["J_MIC1", "J_PWR"],
+                        ], "controlled locked component-conflict set drift")
+                require(placement_control["locked_authority_mounting_conflicts"] == [
+                            ["H1", "J_PWR"], ["H2", "J13"],
+                        ], "controlled locked mounting-conflict set drift")
+                require(placement_control["locked_authority_tool_conflicts"] == [
+                            ["J10", "U10"], ["J8", "U8"],
+                        ], "controlled locked U.FL tool-conflict set drift")
+            elif mechanical_eco_status == "APPROVED_APPLIED_FULL_REPACK_REQUIRED":
+                require(placement_control["state"] == "BLOCKED_PLACEMENT_CLEARANCE",
+                        "post-ECO PCB-MAIN placement must remain blocked until repack")
+                require(placement_control["confirmed_component_collisions"] == 15 and
+                        placement_control["screening_component_collisions"] == 67 and
+                        placement_control["confirmed_mounting_clearance_conflicts"] == 0 and
+                        placement_control["screening_mounting_clearance_conflicts"] == 1 and
+                        placement_control["confirmed_tool_clearance_conflicts"] == 0 and
+                        placement_control["screening_tool_clearance_conflicts"] == 0,
+                        "post-ECO placement inventory drift")
+                require(not placement_control["locked_authority_component_conflicts"] and
+                        not placement_control["locked_authority_mounting_conflicts"] and
+                        not placement_control["locked_authority_tool_conflicts"],
+                        "approved ECO did not clear the locked conflict set")
+                require(mechanical_application is not None and
+                        mechanical_application.get("post_application_clearance") == {
+                            key: placement_control[key]
+                            for key in (
+                                "confirmed_component_collisions",
+                                "screening_component_collisions",
+                                "confirmed_mounting_clearance_conflicts",
+                                "screening_mounting_clearance_conflicts",
+                                "confirmed_tool_clearance_conflicts",
+                                "screening_tool_clearance_conflicts",
+                                "locked_authority_component_conflicts",
+                                "locked_authority_mounting_conflicts",
+                                "locked_authority_tool_conflicts",
+                            )
+                        }, "PCB-MAIN mechanical ECO application inventory drift")
+                require(mechanical_application.get("applied", {}).get("board_sha256") ==
+                        placement_control["board_sha256"] and
+                        mechanical_application.get("applied", {}).get("authority_sha256") ==
+                        placement_control["authority_sha256"],
+                        "PCB-MAIN mechanical ECO application hash drift")
+            else:
+                require(placement_control["state"] == "PASS" and
+                        placement_control["assembly_footprints"] == 227 and
+                        placement_control["courtyard_footprints"] == 227 and
+                        placement_control["pad_screening_footprints"] == 0,
+                        "PCB-MAIN placement-repack controlled inventory drift")
+                zero_count_keys = (
+                    "confirmed_component_collisions",
+                    "screening_component_collisions",
+                    "confirmed_mounting_clearance_conflicts",
+                    "screening_mounting_clearance_conflicts",
+                    "confirmed_tool_clearance_conflicts",
+                    "screening_tool_clearance_conflicts",
+                )
+                require(all(placement_control[key] == 0 for key in zero_count_keys) and
+                        not placement_control["locked_authority_component_conflicts"] and
+                        not placement_control["locked_authority_mounting_conflicts"] and
+                        not placement_control["locked_authority_tool_conflicts"],
+                        "PCB-MAIN strict 2D placement-clearance PASS drift")
+                require(mechanical_application is not None and
+                        mechanical_application.get("post_application_clearance") == {
+                            "confirmed_component_collisions": 15,
+                            "screening_component_collisions": 67,
+                            "confirmed_mounting_clearance_conflicts": 0,
+                            "screening_mounting_clearance_conflicts": 1,
+                            "confirmed_tool_clearance_conflicts": 0,
+                            "screening_tool_clearance_conflicts": 0,
+                            "locked_authority_component_conflicts": [],
+                            "locked_authority_mounting_conflicts": [],
+                            "locked_authority_tool_conflicts": [],
+                        }, "PCB-MAIN mechanical ECO historical inventory drift")
+                require(mechanical_application.get("applied", {}).get("authority_sha256") ==
+                        placement_control["authority_sha256"],
+                        "PCB-MAIN repack authority differs from the accepted ECO authority")
+    elif native_present:
+        require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
+                "human Review A identity/date/SHA claimed before sign-off")
+        require(review_a["evidence"]["signed_checklist"] is None,
+                "signed Review A checklist claimed before sign-off")
+        checklist_template = ROOT / review_a["evidence"]["checklist_template"]
+        require(checklist_template.is_file() and checklist_template.stat().st_size > 0,
+                "Review A checklist template is missing")
+        require(str(review_a["evidence"]["bom_diff"]).startswith("CI artifact: "),
+                "schematic-derived BOM is not declared as CI evidence")
+        require(str(review_a["evidence"]["schematic_pdf"]).startswith("CI artifact: "),
+                "schematic PDF is not declared as CI evidence")
+        require(str(review_a["evidence"]["erc_report"]).startswith("CI artifact: "),
+                "ERC report is not declared as CI evidence")
+        require(str(review_a["evidence"]["net_name_diff"]).startswith("CI artifact: "),
+                "net audit is not declared as CI evidence")
+    else:
+        require(not any(review_a["evidence"].values()),
+                "review evidence present without native source")
+    if review_a["complete"] is False:
+        require(not review_b["evidence"], "Review B evidence present before Review A completion")
 
     result = {
         "configuration": status["configuration"],
         "assembly": status["assembly"],
-        "audit": "PCB-MAIN independent pre-schematic authority audit",
-        "status": "PASS_CAPTURE_INPUT_CONTROLLED",
+        "audit": "PCB-MAIN independent capture-input authority audit",
+        "status": "PASS_SCHEMATIC_REVIEW_INPUT_CONTROLLED" if native_present else "PASS_CAPTURE_INPUT_CONTROLLED",
         "mcu_assignments_verified": len(mcu_pins),
         "mcu_package_pins_verified": len(authority_rows),
         "storage_sensor_pads_verified": len(device_rows),
@@ -1638,14 +1976,36 @@ def main() -> None:
         "active_mpn_rows_verified": len(freeze),
         "logical_harness_pins_verified": len(main_power) + 24 + len(swd),
         "open_authorities": sorted(open_ids),
-        "native_schematic": "ABSENT",
-        "review_a": "BLOCKED",
-        "review_b": "BLOCKED",
+        "native_schematic": (
+            "PRESENT_REVIEW_A_PASS" if review_a["complete"] is True
+            else "PRESENT_REVIEW_PENDING" if native_present else "ABSENT"
+        ),
+        "review_a": "PASS" if review_a["complete"] is True else (
+            "PENDING" if native_present else "BLOCKED"
+        ),
+        "review_b": review_b["evidence"].get(
+            "placement_clearance_control", {}
+        ).get("state", "BLOCKED"),
+        "mechanical_authority_disposition": (
+            "CLOSED_CAPTURE_INPUT_LIMITED_MAIN_AUTH_011_ECO_APPLIED_PLACEMENT_REPACK_PASS"
+            if review_b["evidence"].get("mechanical_eco_candidate_status") ==
+            "APPROVED_APPLIED_PLACEMENT_REPACK_PASS"
+            else "CLOSED_CAPTURE_INPUT_LIMITED_MAIN_AUTH_011_ECO_APPLIED_REPACK_REQUIRED"
+            if review_b["evidence"].get("mechanical_eco_candidate_status") ==
+            "APPROVED_APPLIED_FULL_REPACK_REQUIRED"
+            else "CLOSED_CAPTURE_INPUT_LIMITED_MAIN_AUTH_011_ECO_APPROVED_PENDING_APPLICATION"
+            if review_b["evidence"].get("mechanical_eco_candidate_status") ==
+            "APPROVED_PENDING_APPLICATION"
+            else "CAPTURE_INPUT_CONTROLLED"
+        ),
         "production_bom": "BLOCKED",
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
-    print("PCB-MAIN Rev.A pre-schematic authority audit: PASS_CAPTURE_INPUT_CONTROLLED")
+    print(
+        "PCB-MAIN Rev.A capture authority audit: "
+        + ("PASS_SCHEMATIC_REVIEW_INPUT_CONTROLLED" if native_present else "PASS_CAPTURE_INPUT_CONTROLLED")
+    )
     print(f"- all {len(authority_rows)} U1 package positions and {len(mcu_pins)} functional assignments verified")
     print(f"- all {len(device_rows)} U2/U3/U4 physical pins or pads and three unique I2C2 addresses verified")
     print(f"- all {len(audio_rows)} U7/U17/U18 physical pins, dual-direction PDM translation and active-high AAD wake path verified")
@@ -1656,9 +2016,16 @@ def main() -> None:
     print(f"- all {len(ble_rows)} U11/TP_BLE_SWD contacts, fail-closed boot/reset, independent SWD and antenna keepout inputs verified")
     print(f"- all {len(connector_fixture_rows)} connector/card/RF/tamper/fixture contacts and domain-isolation rules verified")
     print(f"- all {len(passive_support_rows)} passive/support RefDes, MPNs, populations and physical pin sets verified")
-    print(f"- all {len(mechanical_rows)} outline, placement, zone, keepout and production fixture records verified")
+    print(
+        f"- all {len(mechanical_rows)} outline, placement, zone, keepout and production "
+        "fixture records structurally verified; strict 2D placement clearance is PASS"
+    )
     print(f"- {len(freeze)} active MPNs and 41 logical harness pins verified")
-    print("- all 11 capture authorities closed; native schematic and Reviews A/B remain production blockers")
+    print(
+        "- all 11 authorities remain closed as capture inputs; native schematic Review A "
+        "is signed PASS; the limited MAIN-AUTH-011 mechanical ECO and controlled placement "
+        "repack are applied; routing, 3D review, Review B and production evidence remain blockers"
+    )
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

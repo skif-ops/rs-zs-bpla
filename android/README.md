@@ -13,9 +13,15 @@
 - поддерживает resume, A/B status и rollback report;
 - USB-C используется как отдельный сервисный recovery path.
 
-Статус: `SOURCE_BASELINE / BLE_NOT_IMPLEMENTED / RELEASE_APK_NOT_BUILT`.
+Статус: `SOURCE_BASELINE / POSITION_HASH_READBACK_HOST_PASS / BLE_NOT_IMPLEMENTED / RELEASE_APK_NOT_BUILT`.
 
 В каталоге `app` находится минимальный Kotlin/Android проект с unit tests, но он не является commissioning APK: BLE UUID, authenticated pairing и формат OTA signature ещё не заморожены.
+
+Domain-слой installation commissioning независимо воспроизводит станционный
+58-byte SHA-256 contract, контролирует installer/service-engineer policy,
+monotonic recommission version и принимает read-back только при совпадении
+полей, hash, storage generation и `auditCommitted`. Он не передаёт hash как
+источник доверия станции и не реализует BLE transport.
 
 Debug source baseline успешно собран CI на commit `6e561637c03856b6bfb963a5b16a481888925991`, workflow run `34240158982`. APK не публиковался и не разрешён к установке на производстве.
 

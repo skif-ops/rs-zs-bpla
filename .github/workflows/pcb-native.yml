@@ -5,9 +5,21 @@ on:
   push:
     branches: [main, develop, evt-pre-20, "integration/**"]
     paths:
+      - ".github/workflows/ci.yml"
+      - ".github/workflows/pcb-native.yml"
       - "hardware/kicad/**"
+      - "hardware/reviews/**"
       - "hardware/*FREEZE_REV_A.csv"
       - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
+      - "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv"
+      - "hardware/HARNESS_MANUFACTURING_DRAWING_REV_A.md"
+      - "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.md"
+      - "hardware/EVT_PRE_20_BOM_DRAFT.csv"
+      - "hardware/EVT_PRE_20_BOM_REV_A.csv"
+      - "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+      - "hardware/EVT_PRE_20_BOM_REV_A.xlsx"
+      - "hardware/CHINA_PROCUREMENT_RFQ.csv"
       - "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv"
       - "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.md"
@@ -31,15 +43,31 @@ on:
       - "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md"
       - "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
       - "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md"
+      - "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv"
       - "hardware/DUAL_SIM_SINGLE_STANDBY.md"
       - "hardware/T5838_AAD_INTERFACE_REV_A.md"
       - "hardware/EVT_PRE_20_POWER_ARCHITECTURE.md"
       - "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv"
       - "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+      - "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+      - "hardware/PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A.md"
+      - "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.md"
+      - "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json"
       - "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
       - "hardware/PCB_PWR_PIN_AUTHORITY_REV_A.csv"
       - "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
+      - "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv"
+      - "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md"
+      - "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md"
+      - "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
       - "hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md"
+      - "hardware/PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md"
       - "hardware/POWER_DESIGN_BASELINE_REV_A.json"
       - "hardware/POWER_DESIGN_CALC_REV_A.md"
       - "mechanics/common/OPEN_DIMENSIONS.csv"
@@ -56,25 +84,63 @@ on:
       - "tools/verify_pcb_main_connector_fixture_authority_rev_a.py"
       - "tools/verify_pcb_main_passive_support_authority_rev_a.py"
       - "tools/verify_pcb_main_mechanical_placement_authority_rev_a.py"
+      - "tools/generate_pcb_main_schematic_rev_a.py"
+      - "tools/materialize_pcb_main_hierarchy_rev_a.py"
+      - "tools/pcb_main_schematic_hierarchy.py"
+      - "tools/audit_pcb_main_hierarchy_rev_a.py"
+      - "tools/generate_pcb_main_manufacturer_footprints_rev_a.py"
+      - "tools/materialize_pcb_main_manufacturer_footprints_rev_a.py"
+      - "tools/materialize_pcb_main_verified_library_footprints_rev_a.py"
+      - "tools/generate_pcb_main_layout_candidate_rev_a.py"
+      - "tools/audit_pcb_main_layout_candidate_rev_a.py"
+      - "tools/audit_pcb_main_placement_clearance_rev_a.py"
+      - "tools/generate_pcb_main_placement_repack_rev_a.py"
+      - "tools/generate_pcb_main_routing_authority_rev_a.py"
+      - "tools/audit_pcb_main_routing_authority_rev_a.py"
+      - "tools/audit_pcb_main_stackup_impedance_request_rev_a.py"
+      - "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py"
+      - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
+      - "tools/audit_pcb_main_native_schematic_rev_a.py"
+      - "tools/audit_pcb_layer_count_authority_rev_a.py"
+      - "tools/audit_harness_manufacturing_rev_a.py"
       - "tools/audit_pcb_pwr_design_rev_a.py"
       - "tools/audit_pcb_pwr_preschematic_rev_a.py"
       - "tools/audit_pcb_pwr_capture_authority_rev_a.py"
+      - "tools/audit_pcb_pwr_dft_authority_rev_a.py"
+      - "tools/audit_pcb_pwr_passive_authority_rev_a.py"
+      - "tools/generate_pcb_pwr_layout_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_layout_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_placement_clearance_rev_a.py"
+      - "tools/generate_pcb_pwr_routing_authority_rev_a.py"
+      - "tools/audit_pcb_pwr_routing_authority_rev_a.py"
+      - "tools/audit_pcb_pwr_dim_003_request_rev_a.py"
+      - "tools/audit_pcb_pwr_stackup_copper_request_rev_a.py"
+      - "tools/audit_pcb_pwr_input_protection_rev_a.py"
       - "tools/generate_pcb_pwr_schematic_rev_a.py"
       - "tools/finalize_pcb_pwr_symbol_types_rev_a.py"
       - "tools/finalize_pcb_pwr_schematic_completeness_rev_a.py"
+      - "tools/finalize_pcb_pwr_passive_authority_rev_a.py"
       - "tools/finalize_pcb_pwr_erc_power_model_rev_a.py"
       - "tools/materialize_pcb_pwr_libraries_rev_a.py"
+      - "tools/materialize_pcb_pwr_hierarchy_rev_a.py"
+      - "tools/pcb_pwr_schematic_hierarchy.py"
+      - "tools/audit_pcb_pwr_hierarchy_rev_a.py"
       - "tools/audit_pcb_pwr_native_schematic_rev_a.py"
       - "tools/audit_pcb_pwr_native_completeness_rev_a.py"
+      - "tools/audit_pcb_pwr_footprints_rev_a.py"
       - "tools/generate_pcb_mic_clean_rev_a.py"
-      - "tools/run_pcb_mic_no_zonefill.py"
       - "tools/finalize_pcb_mic_mechanical_rev_a.py"
       - "tools/finalize_pcb_mic_molex_rev_a.py"
       - "tools/generate_pcb_mic_schematic.py"
+      - "tools/audit_pcb_mic_native_schematic_rev_a.py"
       - "tools/inspect_pcb_mic_reference_cad.py"
       - "tools/materialize_pcb_mic_libraries.py"
       - "tools/export_pcb_mic_footprints.py"
       - "tools/audit_pcb_mic_native_geometry.py"
+      - "tools/audit_pcb_mic_review_a_geometry_rev_a.py"
+      - "tools/audit_pcb_mic_review_b_preflight_rev_a.py"
+      - "tools/audit_pcb_mic_copper_return_rev_a.py"
+      - "tools/audit_pcb_mic_manufacturing_handoff_rev_a.py"
       - "tools/audit_pcb_mic_mechanical_rev_a.py"
       - "tools/audit_pcb_mic_molex_rev_a.py"
       - ".github/workflows/pcb-native.yml"
@@ -82,17 +148,37 @@ on:
     branches: [main, develop, evt-pre-20]
     paths:
       - "hardware/kicad/**"
+      - "hardware/reviews/**"
       - "hardware/*FREEZE_REV_A.csv"
       - "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
+      - "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv"
+      - "hardware/HARNESS_MANUFACTURING_DRAWING_REV_A.md"
+      - "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
+      - "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.md"
+      - "hardware/EVT_PRE_20_BOM_DRAFT.csv"
+      - "hardware/EVT_PRE_20_BOM_REV_A.csv"
+      - "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+      - "hardware/EVT_PRE_20_BOM_REV_A.xlsx"
+      - "hardware/CHINA_PROCUREMENT_RFQ.csv"
       - "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv"
       - "hardware/PCB_MAIN_*AUTHORITY_REV_A.*"
+      - "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+      - "hardware/PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A.md"
       - "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+      - "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json"
       - "hardware/PCB_PWR_*.csv"
       - "hardware/PCB_PWR_*.md"
       - "hardware/POWER_*.json"
       - "hardware/POWER_*.md"
       - "mechanics/common/OPEN_DIMENSIONS.csv"
       - "tools/*pcb*_rev_a.py"
+      - "tools/materialize_pcb_main_hierarchy_rev_a.py"
+      - "tools/pcb_main_schematic_hierarchy.py"
+      - "tools/audit_pcb_main_hierarchy_rev_a.py"
+      - "tools/materialize_pcb_pwr_hierarchy_rev_a.py"
+      - "tools/pcb_pwr_schematic_hierarchy.py"
+      - "tools/audit_pcb_pwr_hierarchy_rev_a.py"
+      - "tools/audit_harness_manufacturing_rev_a.py"
       - "tools/kicad_native_gate.py"
       - ".github/workflows/pcb-native.yml"
 
@@ -102,11 +188,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Engineering preflight
         run: python tools/kicad_native_gate.py
+      - name: Independent PCB layer-count authority audit
+        run: python tools/audit_pcb_layer_count_authority_rev_a.py --output artifacts/kicad-native/pcb_layer_count_authority_rev_a.json
+      - name: Independent harness manufacturing drawing audit
+        run: python tools/audit_harness_manufacturing_rev_a.py --output artifacts/kicad-native/harness_manufacturing_rev_a.json
       - name: Independent PCB-MAIN capture-authority audit
         run: |
           python tools/audit_pcb_main_capture_authority_rev_a.py \
@@ -162,6 +254,9 @@ jobs:
           python tools/audit_pcb_pwr_preschematic_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/preschematic_audit.json
           python tools/audit_pcb_pwr_capture_authority_rev_a.py
+          python tools/audit_pcb_pwr_dft_authority_rev_a.py
+          python tools/audit_pcb_pwr_input_protection_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/input_protection_qualification_audit.json
       - name: Install official KiCad 9 stable toolchain
         shell: bash
         run: |
@@ -199,7 +294,7 @@ jobs:
           PY
       - name: Import PCB-MIC secondary reference CAD
         run: |
-          python -m pip install --disable-pip-version-check easyeda2kicad kiutils
+          python -m pip install --disable-pip-version-check easyeda2kicad 'kiutils==1.4.8'
           mkdir -p artifacts/kicad-reference/PCB-MIC
           ROOT="$PWD/artifacts/kicad-reference/PCB-MIC"
           easyeda2kicad --full --lcsc_id=C7230692 --output "$ROOT/t5838_ref" --project-relative
@@ -212,6 +307,143 @@ jobs:
             --t5838-root artifacts/kicad-reference/PCB-MIC/t5838_ref.pretty \
             --molex-root artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.pretty \
             --output artifacts/kicad-reference/PCB-MIC/reference_geometry_report.json
+      - name: Verify committed PCB-MIC and PCB-PWR native sources
+        run: |
+          mkdir -p artifacts/kicad-native/PCB-MIC
+          test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
+          test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+          test -s hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
+          /usr/bin/python3 tools/audit_pcb_mic_native_geometry.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            | tee artifacts/kicad-native/PCB-MIC/committed_native_geometry_pcbnew.txt
+          /usr/bin/python3 tools/audit_pcb_mic_molex_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            | tee artifacts/kicad-native/PCB-MIC/committed_molex_geometry_pcbnew.txt
+          /usr/bin/python3 tools/audit_pcb_mic_mechanical_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            | tee artifacts/kicad-native/PCB-MIC/committed_mechanical_geometry_pcbnew.txt
+          python tools/audit_pcb_mic_review_a_geometry_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            --output artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json \
+            --commit-sha "$GITHUB_SHA" \
+            --phase COMMITTED_SOURCE \
+            --require-clean-source
+          python tools/audit_pcb_mic_native_schematic_rev_a.py \
+            --schematic hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch \
+            --output artifacts/kicad-native/PCB-MIC/committed_native_schematic_audit.json
+          python tools/audit_pcb_pwr_native_schematic_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_hierarchy_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/committed_hierarchy_audit.json
+          python tools/audit_pcb_pwr_native_completeness_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_footprints_rev_a.py
+          python tools/audit_pcb_pwr_passive_authority_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_layout_candidate_rev_a.py
+          python tools/audit_pcb_pwr_placement_clearance_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/committed_placement_clearance_audit.json \
+            --strict
+          python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
+          python tools/audit_pcb_pwr_routing_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/committed_routing_authority_audit.json
+          python tools/audit_pcb_pwr_dim_003_request_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/committed_dim_003_request_audit.json \
+            --commit-sha "$GITHUB_SHA" \
+            --require-clean-source
+          python tools/audit_pcb_pwr_stackup_copper_request_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/committed_stackup_copper_request_audit.json \
+            --commit-sha "$GITHUB_SHA" \
+            --require-clean-source
+          python tools/kicad_native_gate.py --run-cli
+      - name: Verify committed native PCB-MAIN schematic
+        run: |
+          test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch
+          test "$(find hardware/kicad/native/PCB-MAIN -maxdepth 1 -name 'PCB-MAIN_*.kicad_sch' -type f | wc -l)" -eq 9
+          test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro
+          test -s hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json
+          test -s hardware/kicad/native/PCB-MAIN/sym-lib-table
+          test -s hardware/kicad/native/PCB-MAIN/fp-lib-table
+          test -s hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.kicad_sym
+          python tools/generate_pcb_main_manufacturer_footprints_rev_a.py --check
+          python tools/materialize_pcb_main_manufacturer_footprints_rev_a.py --check
+          python tools/materialize_pcb_main_verified_library_footprints_rev_a.py --check
+          python tools/generate_pcb_main_placement_repack_rev_a.py --check
+          python tools/generate_pcb_main_routing_authority_rev_a.py --check
+          python tools/audit_pcb_main_layout_candidate_rev_a.py
+          python tools/audit_pcb_main_placement_clearance_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/placement_clearance_audit.json \
+            --strict
+          python tools/audit_pcb_main_routing_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/routing_authority_audit.json
+          python tools/audit_pcb_main_stackup_impedance_request_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/stackup_impedance_request_audit.json \
+            --commit-sha "$GITHUB_SHA" \
+            --require-clean-source
+          python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/assembler_dfm_stencil_request_audit.json \
+            --commit-sha "$GITHUB_SHA" \
+            --require-clean-source
+          python tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/mechanical_eco_candidate_audit.json
+          python tools/generate_pcb_main_schematic_rev_a.py --check
+          python tools/audit_pcb_main_native_schematic_rev_a.py \
+            --schematic hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch \
+            --output artifacts/kicad-native/PCB-MAIN/native_schematic_audit.json \
+            --bom-output artifacts/kicad-native/PCB-MAIN/native_schematic_bom.csv
+          python tools/audit_pcb_main_hierarchy_rev_a.py \
+            --schematic hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch \
+            --output artifacts/kicad-native/PCB-MAIN/hierarchy_audit.json
+      - name: Parse PCB-MAIN placement candidate and controlled footprints with KiCad 9
+        run: |
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/generate_pcb_main_layout_candidate_rev_a.py \
+            --output /tmp/PCB-MAIN-generated.kicad_pcb
+          python tools/audit_pcb_main_placement_clearance_rev_a.py \
+            --board /tmp/PCB-MAIN-generated.kicad_pcb \
+            --no-status-check \
+            --strict
+          /usr/bin/python3 - <<'PY'
+          from pathlib import Path
+          import pcbnew
+
+          root = Path("hardware/kicad/native/PCB-MAIN")
+          board = pcbnew.LoadBoard(str(root / "PCB-MAIN.kicad_pcb"))
+          assert board is not None, "KiCad failed to parse PCB-MAIN"
+          assert len(board.GetFootprints()) == 251, "unexpected PCB-MAIN footprint count"
+          assert board.GetCopperLayerCount() == 6, "unexpected PCB-MAIN copper-layer count"
+          expected = {
+              "KEMET_T52X_D_7343-31_DensityB": 2,
+              "Hirose_U.FL-R-SMT-1": 6,
+              "ST_STM32U585_LQFP100_1L": 100,
+              "TI_PW0014A_TSSOP14": 14,
+              "TI_PW0024A_TSSOP24": 24,
+              "TI_DRL0006A_SOT6": 6,
+              "TI_DBV0005A_SOT23-5": 5,
+              "TI_DYA0002A_SOD523": 2,
+              "TI_DQA0010A_USON10": 12,
+              "Nexperia_PESD5V0S1UL_SOD882": 4,
+              "Nexperia_MMBT3904_SOT23": 6,
+              "ST_ESDALC6V1-5P6_SOT666": 6,
+              "Vishay_Si1016X_SC-89": 6,
+              "ST_LIS2DW12_LGA-12L": 12,
+              "Raytac_MDBT50Q-P1MV2": 61,
+              "Quectel_BG95-M3_LGA-102": 102,
+              "GCT_MEM2052-00-195-00-A": 13,
+              "Molex_504050-0291_PicoLock-2": 4,
+              "Molex_43045-1202_MicroFit-12_RA": 14,
+          }
+          library = root / "libs/DioneyaMain.pretty"
+          for name, pad_count in expected.items():
+              footprint = pcbnew.FootprintLoad(str(library), name)
+              assert footprint is not None, f"KiCad failed to parse {name}"
+              assert footprint.GetPadCount() == pad_count, f"{name}: pad-count drift"
+          print("PCB-MAIN KiCad 9 native parse: PASS")
+          PY
       - name: Materialize native PCB-PWR schematic
         run: |
           python tools/generate_pcb_pwr_schematic_rev_a.py \
@@ -220,11 +452,19 @@ jobs:
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/finalize_pcb_pwr_schematic_completeness_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/finalize_pcb_pwr_passive_authority_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/finalize_pcb_pwr_erc_power_model_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/materialize_pcb_pwr_libraries_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/materialize_pcb_pwr_hierarchy_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_hierarchy_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/hierarchy_audit.json
+          git diff --exit-code -- hardware/kicad/native/PCB-PWR/PCB-PWR*.kicad_sch
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          test "$(find hardware/kicad/native/PCB-PWR -maxdepth 1 -name 'PCB-PWR_*.kicad_sch' -type f | wc -l)" -eq 4
           test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
           test -s hardware/kicad/native/PCB-PWR/sym-lib-table
           test -s hardware/kicad/native/PCB-PWR/fp-lib-table
@@ -233,12 +473,57 @@ jobs:
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
           python tools/audit_pcb_pwr_native_completeness_rev_a.py \
             --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          python tools/audit_pcb_pwr_footprints_rev_a.py
+          python tools/audit_pcb_pwr_passive_authority_rev_a.py \
+            --schematic hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+          /usr/bin/python3 tools/generate_pcb_pwr_layout_candidate_rev_a.py
+          python tools/audit_pcb_pwr_layout_candidate_rev_a.py
+          python tools/audit_pcb_pwr_placement_clearance_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/placement_clearance_audit.json \
+            --strict
+          python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
+          python tools/audit_pcb_pwr_routing_authority_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/routing_authority_audit.json
+          python tools/audit_pcb_pwr_dim_003_request_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/dim_003_request_audit.json
+          python tools/audit_pcb_pwr_stackup_copper_request_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/stackup_copper_request_audit.json
+          test -s hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
+          /usr/bin/python3 - <<'PY'
+          import pcbnew
+          root = "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty"
+          expected = {
+              "CSD18540Q5B_DNK": 27,
+              "LMR60440_RAK0009A": 20,
+              "TI_DBV0006A_SOT23-6": 6,
+              "TI_DGS0010A_VSSOP10": 10,
+              "Molex_43045-0213_MicroFit-2_Vertical": 4,
+              "Vishay_WSK2512_4T_T1.19mm": 4,
+              "Coilcraft_XAL7030_472": 2,
+              "TestPoint_DFT_1.7mm_NoPaste": 1,
+          }
+          for name, pad_count in expected.items():
+              footprint = pcbnew.FootprintLoad(root, name)
+              assert footprint is not None, f"KiCad failed to parse {name}"
+              assert footprint.GetPadCount() == pad_count, f"{name}: pad/aperture count drift"
+          shared_root = "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
+          footprint = pcbnew.FootprintLoad(shared_root, "TI_DBV0005A_SOT23-5")
+          assert footprint is not None, "KiCad failed to parse shared TI_DBV0005A_SOT23-5"
+          assert footprint.GetPadCount() == 5, "shared TI_DBV0005A_SOT23-5 pad-count drift"
+          board = pcbnew.LoadBoard("hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb")
+          assert board is not None, "KiCad failed to parse PCB-PWR placement candidate"
+          assert len(board.GetFootprints()) == 60, "unexpected PCB-PWR footprint count"
+          assert board.GetCopperLayerCount() == 4, "unexpected provisional PCB-PWR layer count"
+          assert len(list(board.GetTracks())) == 0, "PCB-PWR placement candidate contains routing"
+          assert len(list(board.Zones())) == 0, "PCB-PWR placement candidate contains zones"
+          print("PCB-PWR controlled footprints KiCad 9 native parse: PASS")
+          PY
       - name: Materialize native PCB-MIC board and schematic
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p hardware/kicad/native/PCB-MIC
-          /usr/bin/python3 tools/run_pcb_mic_no_zonefill.py \
+          /usr/bin/python3 tools/generate_pcb_mic_clean_rev_a.py \
             --t5838-root artifacts/kicad-reference/PCB-MIC/t5838_ref.pretty \
             --molex-root artifacts/kicad-reference/PCB-MIC/molex_5040500691_ref.pretty \
             --reference-report artifacts/kicad-reference/PCB-MIC/reference_geometry_report.json \
@@ -265,18 +550,51 @@ jobs:
           test -s hardware/kicad/native/PCB-MIC/fabrication_metadata.json
           test -s hardware/kicad/native/PCB-MIC/sym-lib-table
           test -s hardware/kicad/native/PCB-MIC/fp-lib-table
+      - name: Independent PCB-MIC native schematic structural audit
+        run: |
+          python tools/audit_pcb_mic_native_schematic_rev_a.py \
+            --schematic hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch \
+            --output artifacts/kicad-native/PCB-MIC/native_schematic_audit.json
       - name: Independent PCB-MIC native geometry audit
         run: |
           /usr/bin/python3 tools/audit_pcb_mic_native_geometry.py \
-            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            | tee artifacts/kicad-native/PCB-MIC/materialized_native_geometry_pcbnew.txt
       - name: Independent PCB-MIC Molex manufacturer-pattern audit
         run: |
           /usr/bin/python3 tools/audit_pcb_mic_molex_rev_a.py \
-            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            | tee artifacts/kicad-native/PCB-MIC/materialized_molex_geometry_pcbnew.txt
       - name: Independent PCB-MIC mechanical audit
         run: |
           /usr/bin/python3 tools/audit_pcb_mic_mechanical_rev_a.py \
-            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            | tee artifacts/kicad-native/PCB-MIC/materialized_mechanical_geometry_pcbnew.txt
+      - name: Archive commit-bound PCB-MIC Review-A geometry evidence
+        run: |
+          python tools/audit_pcb_mic_review_a_geometry_rev_a.py \
+            --board hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            --output artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json \
+            --commit-sha "$GITHUB_SHA" \
+            --phase MATERIALIZED_SOURCE
+      - name: Restore commit-bound PCB-MIC sources after regeneration check
+        shell: bash
+        run: |
+          set -euo pipefail
+          regenerated=artifacts/kicad-native/PCB-MIC/regenerated-source
+          mkdir -p "$regenerated"
+          cp hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb "$regenerated/PCB-MIC.kicad_pcb"
+          cp hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch "$regenerated/PCB-MIC.kicad_sch"
+          git diff --binary -- \
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch \
+            > "$regenerated/regenerated_vs_commit.diff"
+          git restore --source="$GITHUB_SHA" -- \
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
+          git diff --exit-code -- \
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb \
+            hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
       - name: ERC DRC and fabrication export for every available board
         run: python tools/kicad_native_gate.py --run-cli
       - name: Upload native gate reference and generated source evidence
@@ -287,11 +605,37 @@ jobs:
           path: |
             artifacts/kicad-native/
             artifacts/kicad-reference/
+            hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch
+            hardware/kicad/native/PCB-MAIN/PCB-MAIN_*.kicad_sch
+            hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb
+            hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro
+            hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json
+            hardware/kicad/native/PCB-MAIN/sym-lib-table
+            hardware/kicad/native/PCB-MAIN/fp-lib-table
+            hardware/kicad/native/PCB-MAIN/libs/
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch
+            hardware/kicad/native/PCB-PWR/PCB-PWR_*.kicad_sch
+            hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb
             hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro
             hardware/kicad/native/PCB-PWR/sym-lib-table
             hardware/kicad/native/PCB-PWR/fp-lib-table
             hardware/kicad/native/PCB-PWR/libs/
+            hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv
+            hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md
+            hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv
+            hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md
+            hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json
+            hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md
+            hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json
+            hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md
+            hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv
+            hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
+            hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md
+            hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro
@@ -305,4 +649,26 @@ jobs:
             hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.md
+            hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv
+            hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.md
+            hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json
+            hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.md
+            hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json
+            hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.md
+            hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_RESPONSE_REV_A.csv
+            hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md
+            hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md
+            hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md
+            hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_MECHANICAL_ECO_REVIEW_COMMIT_MAPPING_REV_A.json
+            hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPLICATION_REV_A.json
+            hardware/reviews/PCB_MAIN_REVIEW_B_CHECKLIST_REV_A.md
+            hardware/reviews/PCB_MAIN_HIERARCHY_REVIEW_REV_A.md
+            hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.csv
+            hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md
+            hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv
           if-no-files-found: warn

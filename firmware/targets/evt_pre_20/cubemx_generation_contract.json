@@ -68,6 +68,7 @@
     "CubeMX opens the exact CPN without migration or package substitution",
     "all 67 source pin assignments import without conflict",
     "LORA_TXEN on PB15 and LORA_RXEN on PD8 both initialize LOW",
+    "CELL_PWRKEY_CMD, CELL_RESET_N_CMD, CELL_DTR, EN_MODEM, SIM_MUX_SEL and SIM_MUX_EN initialize LOW",
     "GPIO EXTI lines 2, 6, 7 and 8 have unique port sources",
     "generated GPIO alternate functions match the committed target contract",
     "external HSE remains disabled",

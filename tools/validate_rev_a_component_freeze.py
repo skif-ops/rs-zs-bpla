@@ -46,6 +46,8 @@ def main() -> None:
         "U-PWR2": "LMR604403SRAKR",
         "U-PWR3": "TPS7A2018PDBVR",
         "U-MON-01": "INA226AIDGSR",
+        "PWR-L": "XAL7030-472MEC",
+        "R-SHUNT-01": "WSK2512R0100FEA",
     }
     for key, mpn in expected_power.items():
         require(key in power, f"missing power component {key}")
@@ -57,6 +59,9 @@ def main() -> None:
     require("0x40" in monitor["Electrical_Baseline"], "INA226 Rev.A address 0x40 missing")
     require("I2C" in monitor["Electrical_Baseline"], "INA226 I2C baseline missing")
     require("pins 11/12" in monitor["Notes"], "INA226 is not bound to MAIN-PWR pins 11/12")
+    require("10.1 A" in power["PWR-L"]["Electrical_Baseline"], "PWR-L Isat authority missing")
+    require("6.9 A" in power["PWR-L"]["Electrical_Baseline"], "PWR-L Irms authority missing")
+    require("four-terminal" in power["R-SHUNT-01"]["Electrical_Baseline"], "shunt Kelvin construction missing")
 
     expected_main = {
         "U1": "STM32U585VIT6Q",
@@ -120,6 +125,13 @@ def main() -> None:
     ))
     require("ESP32-C3" not in text, "ESP32-C3 reappeared in active Rev.A freeze tables")
     require("JST_BM05B" not in text and "JST_GHR-05V" not in text, "-25 C JST GH reappeared after DEC-019")
+    require("CAB.01035" not in text, "superseded CAB.01035 reappeared in active Rev.A freeze tables")
+    require(decisions["DEC-060"]["Status"] == "LOCKED_EVT_CANDIDATE_SUPERSEDED_BEFORE_PROCUREMENT",
+            "DEC-060 CAB.0243 pre-procurement correction is not locked")
+    require("CAB.0243" in decisions["DEC-060"]["Impact"],
+            "DEC-060 does not bind the EVT pigtail to CAB.0243")
+    require("CAB.0243" in inputs["IN-013"]["Required_Input"],
+            "IN-013 does not expose the current CAB.0243 RF chain")
 
     mic = connectors["CON-MIC"]
     require(mic["Board_MPN"] == "Molex_5040500691", "MIC header is not 6-pin Molex Pico-Lock")
@@ -179,10 +191,23 @@ def main() -> None:
         require("PCB_MAIN_CONNECTOR_FIXTURE_PIN_AUTHORITY_REV_A.csv" in connectors[key]["Notes"], f"{key} lacks connector authority citation")
     for key in ("CON-RF-CELL", "CON-RF-GNSS", "CON-RF-LORA"):
         require("U.FL" in connectors[key]["Board_MPN"], f"{key} is not U.FL")
+        require(connectors[key]["Mating_Housing_MPN"] == "Taoglas_CAB.0243",
+                f"{key} is not bound to the selected CAB.0243 pigtail")
+        require(connectors[key]["Wire"] == "1.13_mm_50_ohm_microcoax_150mm",
+                f"{key} CAB.0243 cable construction or length drift")
         require(connectors[key]["Status"] == "LAYOUT_ZONE_FROZEN_PENDING_RF_VALIDATION",
                 f"{key} RF-zone/validation status mismatch")
         require("-40..90 board receptacle" in connectors[key]["Temperature_C"], f"{key} board receptacle rating is not frozen")
-        require("exact cable assembly temperature" in connectors[key]["Release_Blockers"], f"{key} cable temperature blocker was lost")
+        require("CAB.0243 -60..200 published" in connectors[key]["Temperature_C"],
+                f"{key} CAB.0243 published temperature range is not frozen")
+        require("mate and retention" in connectors[key]["Release_Blockers"],
+                f"{key} cross-mate validation blocker was lost")
+        require("6.8 mm minimum bend" in connectors[key]["Release_Blockers"],
+                f"{key} CAB.0243 bend-radius control was lost")
+        require("numeric IP classification" in connectors[key]["Release_Blockers"],
+                f"{key} bulkhead seal evidence blocker was lost")
+        require("SPE-24-8-147-A" in connectors[key]["Evidence"],
+                f"{key} CAB.0243 exact datasheet evidence was lost")
     require("PCB_MAIN_GNSS_PIN_AUTHORITY_REV_A.csv" in connectors["CON-RF-GNSS"]["Notes"], "GNSS connector freeze lacks authority citation")
     require("exact active antenna and cable" in connectors["CON-RF-GNSS"]["Release_Blockers"], "GNSS external antenna/cable blocker was lost")
     require("PCB_MAIN_LORA_PIN_AUTHORITY_REV_A.csv" in connectors["CON-RF-LORA"]["Notes"], "LoRa connector freeze lacks authority citation")

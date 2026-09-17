@@ -69,6 +69,12 @@ class StationModelsTest {
     }
 
     @Test
+    fun rejectsInstallationVersionOutsideStationUint32() {
+        val bad = validPosition().copy(version = 0x1_0000_0000L)
+        assertTrue("installation_position_version_overflow" in bad.validate())
+    }
+
+    @Test
     fun acceptsDefaultPositionTrustPolicy() {
         assertTrue(PositionTrustPolicy().validate().isEmpty())
     }

@@ -7,6 +7,9 @@
 #define ZS_FEATURE_COUNT 43u
 #define ZS_MAX_LORA_HOPS 5u
 #define ZS_MODEL_MAX_CLASSES 16u
+#define ZS_IMSI_CAPACITY 17u
+#define ZS_ICCID_CAPACITY 23u
+#define ZS_VERSION_CAPACITY 24u
 
 typedef enum {
   ZS_CLASS_UNKNOWN = 0,
@@ -159,6 +162,36 @@ typedef struct {
   int16_t rssi_dbm, snr_db10;
   uint32_t gateway_id;
 } zs_route_status_t;
+
+typedef struct {
+  char imsi[ZS_IMSI_CAPACITY];
+  char iccid[ZS_ICCID_CAPACITY];
+  char home_plmn[7];
+  char registered_operator[32];
+  char apn[64];
+  char local_address[64];
+  char gateway[64];
+  char primary_dns[64];
+  char secondary_dns[64];
+  uint8_t access_technology;
+  uint8_t apn_source; /* 0 none, 1 explicit, 2 network, 3 controlled catalog */
+  bool settings_valid;
+} zs_cellular_telemetry_t;
+
+typedef struct {
+  uint8_t schema_ver;
+  uint32_t station_id;
+  int64_t time_us;
+  zs_position_t station;
+  zs_gnss_t gnss;
+  zs_power_t power;
+  zs_route_status_t route;
+  zs_cellular_telemetry_t cellular;
+  char firmware_ver[ZS_VERSION_CAPACITY];
+  char model_ver[ZS_VERSION_CAPACITY];
+  char hardware_rev[ZS_VERSION_CAPACITY];
+  bool self_test_ok;
+} zs_heartbeat_t;
 
 typedef struct {
   uint8_t schema_ver;

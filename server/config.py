@@ -44,7 +44,13 @@ class Settings:
     # representative validation reference. FP-1 recordings are weakly labeled.
     ml_provisional_labels: tuple[str, ...] = ("Лютый",)
     ml_weak_labels: tuple[str, ...] = ("FP-1",)
-    temporal_type_window_seconds: tuple[float, ...] = (3.0, 5.0, 10.0)
+    # A hierarchy/type decision is based on a bounded series of 4-8 one-second
+    # feature windows. Detection itself remains immediate; this gate applies
+    # only to family/type identity.
+    hierarchy_min_evidence_windows: int = 4
+    hierarchy_max_evidence_windows: int = 8
+    hierarchy_min_consensus_ratio: float = 0.625
+    temporal_type_window_seconds: tuple[float, ...] = (4.0, 6.0, 8.0)
     temporal_type_hop_seconds: float = 1.0
     temporal_candidate_seconds: float = 2.0
     temporal_first_type_target_seconds: float = 8.0

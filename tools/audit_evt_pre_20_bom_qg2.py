@@ -9,11 +9,15 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
+from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
+PROCUREMENT_BOM = ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+LOT_SIZES = (4, 10, 20)
 
 
 def read(path: Path) -> list[dict[str, str]]:
@@ -36,6 +40,80 @@ def main() -> int:
         checks.append({"name": name, "pass": ok, "detail": detail})
         if not ok:
             blockers.append(detail)
+
+    lot_errors: list[str] = []
+    required_lot_fields = {
+        "Spare_policy",
+        *(
+            field
+            for lot_size in LOT_SIZES
+            for field in (
+                f"Qty_{lot_size}",
+                f"Spares_{lot_size}",
+                f"Procure_qty_{lot_size}",
+            )
+        ),
+    }
+    for row in rows:
+        missing = sorted(field for field in required_lot_fields if field not in row)
+        if missing:
+            lot_errors.append(f"{row.get('Item_ID', '?')}:missing={','.join(missing)}")
+            continue
+        try:
+            qty_per_station = int(row["Qty_per_station"])
+            spares_20 = int(row["Spares_20"])
+            for lot_size in LOT_SIZES:
+                quantity = int(row[f"Qty_{lot_size}"])
+                spares = int(row[f"Spares_{lot_size}"])
+                procure = int(row[f"Procure_qty_{lot_size}"])
+                if quantity != qty_per_station * lot_size or procure != quantity + spares:
+                    lot_errors.append(f"{row['Item_ID']}:lot={lot_size}:arithmetic")
+                policy = row["Spare_policy"]
+                expected_spares = {
+                    "NONE": 0,
+                    "FIXED_LOT_MIN": spares_20,
+                    "SCALE_CEIL_FROM_20_BASELINE": (spares_20 * lot_size + 19) // 20,
+                }.get(policy)
+                if expected_spares is None or spares != expected_spares:
+                    lot_errors.append(f"{row['Item_ID']}:lot={lot_size}:spare_policy")
+        except ValueError:
+            lot_errors.append(f"{row.get('Item_ID', '?')}:non_integer_quantity")
+
+    procurement_rows = read(PROCUREMENT_BOM) if PROCUREMENT_BOM.is_file() else []
+    if not procurement_rows:
+        lot_errors.append("procurement_rollup:missing_or_empty")
+    else:
+        procurement_ids = [row.get("Procurement_ID", "") for row in procurement_rows]
+        if not all(procurement_ids) or len(set(procurement_ids)) != len(procurement_ids):
+            lot_errors.append("procurement_rollup:duplicate_or_empty_id")
+        represented = {
+            item_id.strip()
+            for row in procurement_rows
+            for item_id in row.get("Item_IDs", "").split("|")
+            if item_id.strip()
+        }
+        if represented != set(by_id):
+            lot_errors.append("procurement_rollup:item_coverage")
+        for lot_size in LOT_SIZES:
+            try:
+                detailed_total = sum(int(row[f"Procure_qty_{lot_size}"]) for row in rows)
+                rollup_total = sum(int(row[f"Procure_qty_{lot_size}"]) for row in procurement_rows)
+                rollup_formula_ok = all(
+                    int(row[f"Procure_qty_{lot_size}"])
+                    == int(row[f"Qty_{lot_size}"]) + int(row[f"Spares_{lot_size}"])
+                    for row in procurement_rows
+                )
+                if detailed_total != rollup_total or not rollup_formula_ok:
+                    lot_errors.append(f"procurement_rollup:lot={lot_size}:reconciliation")
+            except (KeyError, ValueError):
+                lot_errors.append(f"procurement_rollup:lot={lot_size}:invalid_quantity")
+    check(
+        "procurement_lots_4_10_20",
+        not lot_errors,
+        "BOM 4/10/20 lot or procurement-rollup mismatch: " + ", ".join(lot_errors)
+        if lot_errors
+        else "engineering and procurement BOM quantities independently reconcile for 4, 10 and 20 stations",
+    )
 
     main_freeze = read(ROOT / "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv")
     main_item_for_ref = {
@@ -90,7 +168,7 @@ def main() -> int:
         "U-PWR3": ("U5", "TPS7A2018PDBVR"),
         "R-SHUNT-01": ("RSH1", "WSK2512R0100FEA"),
         "PWR-TVS-01": ("D1", "SMBJ18A"),
-        "PWR-FUSE-01": ("F1", "0451005.MRL"),
+        "PWR-FUSE-01": ("F1", "0451008.MRL"),
     }
     power_mismatch = [
         item for item, (ref, mpn) in power_expected.items()
@@ -98,6 +176,46 @@ def main() -> int:
     ]
     check("power_identity_and_refdes", not power_mismatch,
           "PCB-PWR identity/RefDes mismatch: " + ", ".join(power_mismatch) if power_mismatch else "power IC/protection identity and RefDes match")
+
+    pwr_passive_authority = read(ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
+    pwr_passive_groups: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for frozen in pwr_passive_authority:
+        if frozen["BOM_Item_ID"]:
+            pwr_passive_groups[frozen["BOM_Item_ID"]].append(frozen)
+    pwr_passive_mismatch = []
+    for item_id, frozen_rows in pwr_passive_groups.items():
+        first = frozen_rows[0]
+        row = by_id.get(item_id)
+        population = first["Population"]
+        expected_qty = "0" if population == "DNP" else str(len(frozen_rows))
+        expected_refs = ";".join(item["RefDes"] for item in frozen_rows)
+        if (
+            row is None
+            or row["Assembly"] != "PCB-PWR"
+            or row["RefDes"] != expected_refs
+            or row["Manufacturer"] != first["Manufacturer"]
+            or row["MPN"] != first["MPN"]
+            or row["Package"] != first["Package"]
+            or row["Value"] != first["Value"]
+            or row["Population"] != population
+            or row["Temperature_C"] != first["Temperature_C"]
+            or row["Qty_per_station"] != expected_qty
+            or first["Footprint"] not in row["Notes"]
+        ):
+            pwr_passive_mismatch.append(item_id)
+    dft_refs = {row["RefDes"] for row in pwr_passive_authority if not row["BOM_Item_ID"]}
+    leaked_dft = sorted(
+        ref for row in rows for ref in row["RefDes"].split(";") if ref in dft_refs
+    )
+    check(
+        "power_passive_authority_bom",
+        len(pwr_passive_authority) == 47 and len(pwr_passive_groups) == 17
+        and not pwr_passive_mismatch and not leaked_dft,
+        "PCB-PWR passive authority/BOM mismatch: "
+        + ", ".join(pwr_passive_mismatch + leaked_dft)
+        if pwr_passive_mismatch or leaked_dft
+        else "all 37 BOM passives/net-ties match authority; 10 DFT pads remain non-procured",
+    )
 
     mic_expected = {
         "MK1": "MMICT5838-00-012", "J-MIC": "5040500691",
@@ -107,10 +225,23 @@ def main() -> int:
     check("mic_native_component_identity", not mic_mismatch,
           "PCB-MIC component identity mismatch: " + ", ".join(mic_mismatch) if mic_mismatch else "four native PCB-MIC fitted identities match")
 
-    mic_native = ROOT / "hardware/kicad/native/PCB-MIC/PCB-MIC.sch"
+    mic_native = ROOT / "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch"
+    mic_legacy = ROOT / "hardware/kicad/native/PCB-MIC/PCB-MIC.sch"
     mic_native_text = mic_native.read_text(encoding="utf-8") if mic_native.is_file() else ""
-    check("mic_native_exact_orderable_mpn", "MMICT5838-00-012" in mic_native_text,
-          "native PCB-MIC does not bind MK1 to exact orderable MMICT5838-00-012")
+    mic_native_mpn_ok = (
+        mic_native.is_file()
+        and "MMICT5838-00-012" in mic_native_text
+        and "Dioneya:T5838_RevA" in mic_native_text
+        and "Dioneya:Molex_5040500691" in mic_native_text
+        and not mic_legacy.exists()
+    )
+    check(
+        "mic_native_exact_orderable_mpn",
+        mic_native_mpn_ok,
+        "single native KiCad-9 PCB-MIC source binds exact MK1/J1 identities and controlled footprints"
+        if mic_native_mpn_ok
+        else "PCB-MIC KiCad-9 source/footprint identity is incomplete or a competing legacy .sch remains",
+    )
 
     exact_fields_missing = []
     for row in rows:
@@ -190,7 +321,43 @@ def main() -> int:
     native_record = main_status.get("native_schematic", {}) if isinstance(main_status, dict) else {}
     native_relative = native_record.get("path", "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch") if isinstance(native_record, dict) else "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch"
     main_native = ROOT / str(native_relative)
-    native_text = main_native.read_text(encoding="utf-8", errors="replace") if main_native.is_file() else ""
+    native_manifest: dict[str, object] = {}
+    native_source_set_ok = False
+    native_source_error = ""
+    native_sources: list[Path] = []
+    try:
+        manifest_relative = native_record.get("manifest", "")
+        manifest_path = ROOT / str(manifest_relative)
+        native_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        hierarchy_sources = native_manifest.get("hierarchy_sources", [])
+        if not isinstance(hierarchy_sources, list):
+            raise ValueError("hierarchy_sources is not a list")
+        if (native_manifest.get("hierarchy_pages") != 10 or
+                native_manifest.get("hierarchy_functional_child_sheets") != 9 or
+                len(hierarchy_sources) != 10):
+            raise ValueError("hierarchy page/source count drift")
+        for source in hierarchy_sources:
+            if not isinstance(source, dict):
+                raise ValueError("hierarchy source record is not an object")
+            relative = str(source.get("path", ""))
+            if not relative or Path(relative).name != relative:
+                raise ValueError(f"invalid hierarchy source path: {relative!r}")
+            path = main_native.parent / relative
+            if not path.is_file():
+                raise ValueError(f"missing hierarchy source: {relative}")
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            if digest != source.get("sha256"):
+                raise ValueError(f"hierarchy source hash drift: {relative}")
+            native_sources.append(path)
+        if native_sources[0] != main_native:
+            raise ValueError("hierarchy manifest root source is not PCB-MAIN.kicad_sch")
+        native_source_set_ok = True
+    except (OSError, json.JSONDecodeError, ValueError) as exc:
+        native_source_error = str(exc)
+    native_text = "\n".join(
+        path.read_text(encoding="utf-8", errors="replace")
+        for path in native_sources
+    )
     pin_rows = read(ROOT / "hardware/PCB_MAIN_MCU_PIN_AUTHORITY_REV_A.csv")
     device_pin_rows = read(ROOT / "hardware/PCB_MAIN_STORAGE_SENSOR_PIN_AUTHORITY_REV_A.csv")
     audio_logic_pin_rows = read(ROOT / "hardware/PCB_MAIN_AUDIO_LOGIC_PIN_AUTHORITY_REV_A.csv")
@@ -221,16 +388,36 @@ def main() -> int:
         *(row["RevA_Net"] for row in ble_pin_rows if row["RevA_Net"] != "NC"),
         *(row["RevA_Net"] for row in connector_fixture_pin_rows if row["RevA_Net"] != "NC"),
     }
+    native_overlay_rows = read(ROOT / "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv")
+    overlay_logical_nets = {row["Logical_Net"] for row in native_overlay_rows}
+    required_native_tokens.difference_update(overlay_logical_nets)
+    required_native_tokens.update(row["Native_Net"] for row in native_overlay_rows)
+    # Pre-capture authorities use generic GND outside the modem domain. Native
+    # capture resolves it through the controlled ground-domain authority.
+    required_native_tokens.discard("GND")
+    required_native_tokens.update({"GND_MODEM", "GND_DIGITAL", "GND_MIC"})
     native_tokens_missing = sorted(token for token in required_native_tokens if token not in native_text)
     native_ok = (
         main_native.is_file()
+        and native_source_set_ok
         and isinstance(native_record, dict)
         and native_record.get("status") in {"PRESENT_REVIEW_PENDING", "REVIEW_A_PASS", "REVIEW_B_PASS"}
         and native_record.get("schematic_derived_bom") is True
         and not native_tokens_missing
     )
-    check("main_native_schematic_source", native_ok,
-          "native PCB-MAIN schematic, all frozen MPN/net tokens and declared schematic-derived BOM provenance are not all present" if not native_ok else "native PCB-MAIN source contains all frozen MPN/net tokens and schematic-derived BOM provenance")
+    check(
+        "main_native_schematic_source",
+        native_ok,
+        (
+            "native PCB-MAIN schematic, physical overlay/ground-domain tokens or declared "
+            "schematic-derived BOM provenance are incomplete: "
+            + (native_source_error + "; " if native_source_error else "")
+            + ", ".join(native_tokens_missing)
+        ) if not native_ok else (
+            "all 10 native PCB-MAIN hierarchy sources contain the frozen MPNs, controlled "
+            "physical-net overlay, three ground domains and schematic-derived BOM provenance"
+        ),
+    )
 
     review_a = main_status.get("review_a", {}) if isinstance(main_status, dict) else {}
     required_review_a_evidence = {
@@ -238,16 +425,23 @@ def main() -> int:
         "bom_diff", "net_name_diff",
     }
     review_a_evidence = review_a.get("evidence", {}) if isinstance(review_a, dict) else {}
-    review_a_evidence_paths = {
-        name: ROOT / str(path) for name, path in review_a_evidence.items() if path
+    review_a_evidence_refs = {
+        name: str(ref) for name, ref in review_a_evidence.items()
+        if name in required_review_a_evidence and ref
     } if isinstance(review_a_evidence, dict) else {}
+    evidence_available = all(
+        ((ROOT / ref).is_file() and (ROOT / ref).stat().st_size > 0)
+        if name == "signed_checklist"
+        else ref.startswith("https://github.com/skif-ops/rs-zs-bpla/actions/runs/")
+        for name, ref in review_a_evidence_refs.items()
+    )
     review_a_ok = (
         isinstance(review_a, dict)
         and review_a.get("complete") is True
         and review_a.get("status") == "PASS"
         and all(review_a.get(field) for field in ("reviewer", "date", "commit_sha"))
-        and set(review_a_evidence_paths) == required_review_a_evidence
-        and all(path.is_file() and path.stat().st_size > 0 for path in review_a_evidence_paths.values())
+        and set(review_a_evidence_refs) == required_review_a_evidence
+        and evidence_available
     )
     check("main_review_a_complete", review_a_ok,
           "PCB-MAIN Review A is not complete with signed identity, commit and all required evidence" if not review_a_ok else "PCB-MAIN Review A complete with required evidence")

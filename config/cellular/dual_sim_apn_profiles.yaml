@@ -23,6 +23,24 @@ pilot_operator_candidates:
     underlying_carrier_and_public_apn: TO_BE_PROVISIONED
 pilot_apn_policy: public_only
 tariff_is_evt_acceptance_input: false
+automatic_network_discovery:
+  firmware_status: IMPLEMENTED_HOST_TESTED_HARDWARE_VALIDATION_PENDING
+  command_sequence: [QCCID, CIMI, COPS_QUERY, CGNAPN, CGDCONT, CEREG_QUERY, QIACT, CGCONTRDP]
+  profile_match_key: longest_approved_imsi_prefix_5_or_6_digits
+  network_provided_apn: ALLOWED_ONLY_BY_MATCHED_PUBLIC_PROFILE
+  catalog_fallback: APPROVED_PUBLIC_PROFILE_ONLY
+  unknown_imsi_prefix: FAIL_CLOSED
+  missing_apn: FAIL_CLOSED
+  active_context_apn_mismatch: FAIL_CLOSED
+  required_post_activation_values: [apn, local_address, gateway, primary_dns]
+  optional_post_activation_values: [secondary_dns, registered_operator, access_technology]
+  station_identity_policy: FULL_IMSI_AND_ICCID_IN_VOLATILE_RUNTIME
+  protected_telemetry: FULL_IMSI_AND_ICCID_REQUIRED_IN_MTLS_HEARTBEAT
+  open_log_identity_policy: FORBIDDEN
+  server_general_api_identity_policy: REDACTED_ONLY
+  physical_sim_and_operator_evidence: DEFERRED_UNTIL_STATIONS_ASSEMBLED
+  mqtt_24h_evidence: DEFERRED_UNTIL_STATIONS_ASSEMBLED
+  graceful_shutdown: PORTABLE_AT_QPOWD_CELL_STATUS_CONFIRMATION_HOST_TESTED_TARGET_GPIO_PENDING
 apn_modes:
   public:
     allowed: true
@@ -33,27 +51,68 @@ apn_modes:
     allowed_in_pilot: false
     status: FUTURE_NOT_PROVISIONED
 profile_selection:
-  order_per_slot: PUBLIC_PROFILES_ONLY_TO_BE_PROVISIONED
+  firmware_status: PORTABLE_SAFE_SEQUENCE_BG95_PROFILE_MATCH_AND_EXACT_REV_A_GPIO_INTERLOCK_QG1_QG2_PASS_TARGET_HAL_PHYSICAL_PENDING
+  expected_iccid_per_slot: PROVISIONED_FULL_VALUE_REQUIRED
+  order_per_slot: APPROVED_PUBLIC_PLMN_PROFILES_ONLY_TO_BE_PROVISIONED
+  requested_profile_binding: BG95_SELECTED_INDEX_MUST_EQUAL_DUAL_SIM_PENDING_PROFILE
   automatic_failover_enabled: true
   failure_triggers: [attach_timeout, pdp_failure, dns_failure, tls_failure, sustained_link_loss]
   manual_override: authenticated_BLE_or_mTLS_server_command
   minimum_hold_time_s: 900
+  minimum_hold_applies_to: [automatic_failover, authenticated_manual_override]
   maximum_attempts_per_profile: 3
   preserve_store_and_forward_queue: true
 safe_slot_switch_sequence:
+  - record_audit_intent
   - stop_new_application_traffic
   - persist_queue_and_session_state
   - close_mqtt_https_and_detach
   - gracefully_power_off_BG95
   - disable_sim_mux_to_high_impedance
+  - verify_sim_mux_high_impedance
+  - disable_modem_power_rail
   - select_target_slot
+  - enable_modem_power_rail
+  - verify_power_good_stable_30_ms
   - enable_sim_mux
-  - power_on_BG95
+  - verify_sim_mux_enabled
+  - apply_BG95_PWRKEY_700_ms
+  - verify_BG95_cell_status_high
   - verify_iccid_matches_provisioned_slot
   - attach_and_validate_dns_tls_endpoint
+  - record_audit_commit
   - resume_queue_with_existing_event_ids
+failure_recovery_sequence:
+  fallback_pwrkey_pulse_ms_if_cell_status_high: 1000
+  allowed_hardware_window_ms: [650, 1500]
+  actions:
+    - request_graceful_modem_off_or_fallback_if_needed
+    - verify_cell_status_low
+    - disable_sim_mux_to_high_impedance
+    - verify_sim_mux_high_impedance
+    - disable_modem_power_rail
+  retry_failed_recovery_action_without_advancing: true
+target_gpio_binding:
+  firmware_status: PORTABLE_EXACT_REV_A_PIN_POLARITY_AND_INTERLOCK_HOST_TESTED
+  generated_named_pins: [CELL_PWRKEY_CMD, CELL_STATUS, SIM_MUX_SEL, SIM_MUX_EN, SIM1_DET, SIM2_DET, PWR_GOOD, EN_MODEM]
+  sim_mux_select: {low: SIM1, high: SIM2}
+  sim_mux_enable: {low: U13_HIGH_Z_BY_PULLUP_AND_OPEN_COLLECTOR, high: U13_ENABLED}
+  card_detect_present_level: high
+  modem_enable_level: high
+  cell_status_on_level: high
+  pwrkey_command_asserted_level: high
+  pwr_good_semantics: SYSTEM_3V3_POWER_GOOD_NOT_3V8_MODEM_SENSE
+  pwr_good_continuous_interlock_ms: 30
+  u13_enable_n_runtime_mcu_readback: NOT_ROUTED_ON_REV_A
+  u13_enable_n_fixture_readback: REQUIRED_FOR_PHYSICAL_EVT_EVIDENCE
+  stm32_hal_ll_binding: MISSING_BLOCKER
+  modem_3v8_measurement: DEFERRED_UNTIL_ASSEMBLED_STATIONS
 security:
   pin_puk_and_apn_passwords_in_repository: false
-  iccid_storage: redacted_reference_only
+  imsi_iccid_station_storage: volatile_runtime_only
+  imsi_iccid_server_storage: restricted_station_record
+  imsi_iccid_transport: mutual_tls_status_telemetry_only
+  imsi_iccid_open_logs: forbidden
+  imsi_iccid_general_api: redacted_only
   profile_changes_require_authentication: true
   profile_changes_audited: true

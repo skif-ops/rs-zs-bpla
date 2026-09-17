@@ -4,7 +4,7 @@ from __future__ import annotations
 from enum import IntEnum
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 FEATURE_COUNT = 43
 
@@ -297,6 +297,7 @@ class FeatureUpdateMessage(BaseModel):
     event_time_us: int
     features: list[float]
     detector_profile: Literal["piston", "reactive", "generic"] = "generic"
+    air_target_confirmed: bool = False
 
     @field_validator("features")
     @classmethod
@@ -310,7 +311,18 @@ class OnlineTypeStatusMessage(BaseModel):
     station_id: int
     event_id: int
     elapsed_seconds: float = Field(default=0.0, ge=0.0)
+    evidence_windows: int = Field(default=0, ge=0, le=8)
+    required_windows: int = 4
+    max_windows: int = 8
+    family_label: str = "UNKNOWN"
+    family_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    family_margin: float = 0.0
+    family_status: str = "unknown"
+    family_operational_validation_ready: bool = False
+    family_conditional_on_air_target: bool = False
+    family_model_version: str = "unknown"
     best_label: str = "UNKNOWN"
+    hierarchical_label: str = "UNKNOWN"
     confidence: float = Field(default=0.0, ge=0.0, le=1.0)
     margin: float = 0.0
     status: str = "unknown"
@@ -318,6 +330,21 @@ class OnlineTypeStatusMessage(BaseModel):
     first_type_hypothesis_seconds: float | None = None
     research_stable_seconds: float | None = None
     model_version: str = "unknown"
+
+
+class CellularTelemetry(BaseModel):
+    imsi: str = Field(pattern=r"^[0-9]{14,16}$")
+    iccid: str = Field(pattern=r"^[0-9]{18,22}$")
+    home_plmn: str = Field(default="", pattern=r"^(?:[0-9]{5,6})?$")
+    registered_operator: str = Field(default="", max_length=31)
+    apn: str = Field(min_length=1, max_length=63, pattern=r"^[A-Za-z0-9.-]+$")
+    local_address: str = Field(min_length=1, max_length=63)
+    gateway: str = Field(min_length=1, max_length=63)
+    primary_dns: str = Field(min_length=1, max_length=63)
+    secondary_dns: str = Field(default="", max_length=63)
+    access_technology: int = Field(default=0, ge=0, le=255)
+    apn_source: Literal["EXPLICIT", "NETWORK", "CATALOG"]
+    settings_valid: Literal[True]
 
 
 class HeartbeatMessage(BaseModel):
@@ -333,6 +360,7 @@ class HeartbeatMessage(BaseModel):
     hardware_rev: str = "EVT"
     self_test_ok: bool = True
     fault_flags: list[str] = Field(default_factory=list)
+    cellular: CellularTelemetry | None = None
 
 
 class SecurityEventMessage(BaseModel):
@@ -359,18 +387,31 @@ class SecurityEventMessage(BaseModel):
 
 
 class AudioRequest(BaseModel):
-    event_id: int
+    event_id: int = Field(strict=True, ge=1, le=0xFFFFFFFFFFFFFFFF)
     segment: Literal["pre", "post", "both", "range"] = "both"
-    start_offset_ms: int | None = None
-    duration_ms: int | None = None
+    start_offset_ms: int | None = Field(
+        default=None, strict=True, ge=-0x80000000, le=0x7FFFFFFF
+    )
+    duration_ms: int | None = Field(default=None, strict=True, ge=1, le=0xFFFFFFFF)
+
+    @model_validator(mode="after")
+    def validate_range_fields(self):
+        if self.segment == "range":
+            if self.start_offset_ms is None or self.duration_ms is None:
+                raise ValueError("range requires start_offset_ms and duration_ms")
+        elif self.start_offset_ms is not None or self.duration_ms is not None:
+            raise ValueError("offset and duration are allowed only for range")
+        return self
 
 
 class StationCommand(BaseModel):
-    command_id: str
-    station_id: int
+    command_id: str = Field(strict=True)
+    station_id: int = Field(strict=True, ge=1, le=0xFFFFFFFF)
     command: str
     payload: dict = Field(default_factory=dict)
-    created_time_us: int
+    created_time_us: int = Field(strict=True, ge=0)
+    expires_time_us: int = Field(strict=True, ge=1)
+    publish_count: int = Field(default=0, strict=True, ge=0)
 
 
 class TargetEstimate(BaseModel):

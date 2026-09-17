@@ -1,6 +1,8 @@
-# EVT PCB routing rules v0.3
+# EVT PCB routing rules v0.4
 
-- Main board target: 6 layers for EVT. Recommended stack: Signal/GND/Power/Signal/GND/Signal. Final stackup from PCB fabricator.
+- Rev.A copper-layer authority: PCB-MAIN 6, PCB-PWR 4 and PCB-MIC 2 layers; see `hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv`.
+- PCB-MAIN layer-function request basis: Signal/GND/Power/Signal/GND/Signal. Final dielectric construction, copper weights and numeric fabrication rules come from the selected PCB fabricator.
+- PCB-PWR uses four copper layers for continuous return and thermal spreading. Outer 2 oz and inner 1 oz are request targets only until current-density, thermal and fabricator DFM acceptance close.
 - Continuous GND reference under high-speed digital and RF routes. Do not split return paths under SPI/OCTOSPI/UART clocks.
 - Keep cellular V_CELL current loop short and wide; modem bulk capacitance adjacent to BG95 VBAT pins.
 - Separate cellular DC/DC, LTE antenna, and high-current switching from acoustic PCB and microphone rail.

@@ -1,0 +1,175 @@
+#!/usr/bin/env python3
+"""QG-1 completeness and traceability check for the BG95 MQTT/TLS host contract."""
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        raise AssertionError(message)
+
+
+def read(path: str) -> str:
+    return (ROOT / path).read_text(encoding="utf-8")
+
+
+def main() -> int:
+    header = read("firmware/include/zs_bg95.h")
+    source = read("firmware/src/zs_bg95.c")
+    test = read("firmware/tests/test_bg95_transport.c")
+    uplink_header = read("firmware/include/zs_bg95_event_uplink.h")
+    uplink_source = read("firmware/src/zs_bg95_event_uplink.c")
+    uplink_test = read("firmware/tests/test_bg95_event_uplink.c")
+    receipt_header = read("firmware/include/zs_bg95_event_receipt.h")
+    receipt_source = read("firmware/src/zs_bg95_event_receipt.c")
+    receipt_test = read("firmware/tests/test_bg95_event_receipt.c")
+    binary_header = read("firmware/include/zs_bg95_mqtt_binary.h")
+    binary_source = read("firmware/src/zs_bg95_mqtt_binary.c")
+    session_header = read("firmware/include/zs_bg95_mqtt_session.h")
+    session_source = read("firmware/src/zs_bg95_mqtt_session.c")
+    session_test = read("firmware/tests/test_bg95_mqtt_session.c")
+    cmake = read("firmware/CMakeLists.txt")
+    ci = read(".github/workflows/ci.yml")
+    policy = read("config/cellular/dual_sim_apn_profiles.yaml")
+    template = read("config/cellular/public_apn.example.yaml")
+    icd = read("protocols/MQTT_TLS_ICD_v0_1.md")
+    contract = read("firmware/BG95_MQTT_TLS_CONTRACT_REV_A.md")
+    decisions = read("docs/DECISION_LOG.csv")
+
+    for token in ("ZS_BG95_SIM_ICCID_QUERY", "ZS_BG95_SIM_IMSI_QUERY",
+                  "ZS_BG95_OPERATOR_QUERY", "ZS_BG95_APN_DISCOVERING",
+                  "ZS_BG95_PDP_ACTIVATING", "ZS_BG95_PDP_SETTINGS_QUERY",
+                  "ZS_BG95_TLS_CONFIGURING",
+                  "ZS_BG95_MQTT_OPENING", "ZS_BG95_MQTT_CONNECTING",
+                  "ZS_BG95_ONLINE", "ZS_BG95_POWERING_OFF",
+                  "zs_bg95_shutdown_result_t",
+                  "zs_bg95_request_graceful_power_off",
+                  "zs_bg95_confirm_power_off", "zs_bg95_power_off_pending",
+                  "zs_bg95_apn_profile_t",
+                  "zs_bg95_network_settings_t", "zs_bg95_configure_auto_network",
+                  "zs_bg95_configure_mqtt_tls", "zs_bg95_start_mqtt",
+                  "zs_bg95_get_network_settings", "zs_bg95_export_cellular_telemetry",
+                  "zs_bg95_online", "mqtt_receive_length_enabled"):
+        require(token in header, f"BG95 interface missing {token}")
+
+    for command in ('AT+QCCID', 'AT+CIMI', 'AT+COPS?', 'AT+CGNAPN', 'AT+QPOWD',
+                    'AT+QIACT=1', 'AT+CGCONTRDP=1', 'QSSLCFG=\\"sslversion\\"',
+                    'QSSLCFG=\\"seclevel\\"', 'QSSLCFG=\\"cacert\\"',
+                    'QMTCFG=\\"ssl\\"', 'QMTCFG=\\"recv/mode\\"',
+                    'AT+QMTOPEN=', 'AT+QMTCONN='):
+        require(command in source, f"BG95 command sequence missing {command}")
+    for guard in ("contains_private", "port != 443u && port != 8883u",
+                  'strpbrk(src, "\\r\\n\\\"")', 'strstr(line, "+QMTSTAT:")',
+                  "BG95_COMMAND_TIMEOUT_MS", "BG95_NO_PROFILE",
+                  "strcmp(apn, m->apn) != 0", "network_settings.valid = false",
+                  "result != 0 && result != (int)n",
+                  "m->state != ZS_BG95_OFF", "cell_status_low"):
+        require(guard in source, f"BG95 fail-closed guard missing {guard}")
+    require(source.index('QMTCFG=\\"recv/mode\\"') <
+            source.index('AT+QMTOPEN='),
+            "BG95 receive length mode is not configured before QMTOPEN")
+
+    for evidence in ("test_mqtt_tls_happy_path", "test_automatic_network_settings",
+                     "test_catalog_fallback_and_unknown_sim", "test_identity_query_fail_closed",
+                     "test_graceful_power_off_requires_status_confirmation",
+                     "test_graceful_power_off_busy_io_and_timeout",
+                     "+QMTSTAT: 0,1",
+                     "zs_bg95_export_cellular_telemetry", "250011234567890",
+                     "89701012345678901234",
+                     "private.apn", "wrong.apn", "1883u", "pilot.example\\\"",
+                     "+QMTOPEN: 0,3", "124000u", "short_uart_call",
+                     'AT+QMTCFG=\\"recv/mode\\",0,0,1'):
+        require(evidence in test, f"BG95 QG-2 scenario missing {evidence}")
+    require("zs_bg95_transport_tests" in cmake and "bg95_transport" in cmake,
+            "BG95 host test is not bound to CMake/CTest")
+    for token in ("zs_bg95_event_uplink_start", "zs_bg95_event_uplink_on_prompt",
+                  "zs_bg95_event_uplink_on_line", "ZS_BG95_EVENT_UPLINK_OUTCOME_BROKER_ACK"):
+        require(token in uplink_header, f"BG95 event uplink interface missing {token}")
+    for token in ("AT+QMTPUB=", "uart_write_all", "publication.payload_size",
+                  "zs_mqtt_event_transport_prepare"):
+        require(token in uplink_source, f"BG95 event uplink source missing {token}")
+    for token in ("test_fixed_length_binary_publish_and_broker_ack",
+                  "test_fixed_length_preserves_at_control_bytes",
+                  "test_uart_failures_preserve_pending_event",
+                  "Broker ACK is not the server application receipt"):
+        require(token in uplink_test, f"BG95 event uplink evidence missing {token}")
+    require("zs_bg95_event_uplink_tests" in cmake and "bg95_event_uplink" in cmake,
+            "BG95 event uplink test is not bound to CMake/CTest")
+    for token in ("zs_bg95_event_receipt_subscribe",
+                  "zs_bg95_event_receipt_on_line",
+                  "zs_bg95_event_receipt_on_frame",
+                  "authenticated_server_only_nonretained_route"):
+        require(token in receipt_header,
+                f"BG95 event receipt interface missing {token}")
+    for token in ("AT+QMTSUB=", "zs_bg95_mqtt_parse_receive_frame",
+                  "modem->mqtt_receive_length_enabled",
+                  "zs_mqtt_event_transport_handle_receipt",
+                  "Retain is not present in +QMTRECV"):
+        require(token in receipt_source,
+                f"BG95 event receipt source missing {token}")
+    for token in ("+QMTRECV: ", "reader_unsigned",
+                  "zs_bg95_mqtt_parse_receive_frame",
+                  "zs_bg95_mqtt_parse_subscribe_result",
+                  "zs_bg95_mqtt_parse_publish_result"):
+        require(token in binary_header + binary_source,
+                f"shared BG95 binary transport missing {token}")
+    for token in ("test_subscription_and_binary_receipt_lifecycle",
+                  "test_length_delimited_payload_preserves_control_bytes",
+                  "test_frame_topic_client_delivery_and_framing_guards",
+                  "test_setup_failures_and_policy_guard"):
+        require(token in receipt_test,
+                f"BG95 event receipt evidence missing {token}")
+    require("zs_bg95_event_receipt_tests" in cmake and
+            "bg95_event_receipt" in cmake and
+            "src/zs_bg95_mqtt_binary.c" in cmake,
+            "BG95 event receipt test is not bound to CMake/CTest")
+    for token in ("ZS_BG95_MQTT_SESSION_RX_BYTES 2304u",
+                  "ZS_BG95_MQTT_OWNER_EVENT_UPLINK",
+                  "ZS_BG95_MQTT_OWNER_COMMAND_ACK",
+                  "zs_bg95_mqtt_session_tick",
+                  "zs_bg95_mqtt_session_feed_uart",
+                  "Target USART/DMA/ISR ownership"):
+        require(token in session_header,
+                f"BG95 MQTT session interface missing {token}")
+    for token in ("qmt_frame_length", "parse_decimal", "route_prompt",
+                  "session->pending_command", "zs_bg95_mqtt_invalidate"):
+        require(token in session_source,
+                f"BG95 MQTT session guard missing {token}")
+    for token in ("test_serialized_fragmented_end_to_end_lifecycle",
+                  "test_binary_payload_and_protocol_guards",
+                  "test_disconnect_discards_ram_queue_and_resubscribes"):
+        require(token in session_test,
+                f"BG95 MQTT session evidence missing {token}")
+    require("zs_bg95_mqtt_session_tests" in cmake and
+            "bg95_mqtt_session" in cmake and
+            "src/zs_bg95_mqtt_session.c" in cmake,
+            "BG95 MQTT session is not bound to CMake/CTest")
+    require("validate_bg95_transport_contract_rev_a.py" in ci,
+            "BG95 QG-1 is not bound to CI")
+
+    require("pilot_apn_policy: public_only" in policy and
+            "allowed_in_pilot: false" in policy and
+            "unknown_imsi_prefix: FAIL_CLOSED" in policy and
+            "FULL_IMSI_AND_ICCID_REQUIRED_IN_MTLS_HEARTBEAT" in policy and
+            "mqtt_24h_evidence: DEFERRED_UNTIL_STATIONS_ASSEMBLED" in policy,
+            "automatic public-only APN policy drift")
+    require("apn_mode: PUBLIC" in template and "mqtt_port: 443" in template and
+            "alternate_mqtt_port: 8883" in template and
+            "allow_network_provided_apn:" in template, "public APN template drift")
+    require("TLS 1.2 minimum" in icd and "24 часа MQTT" in icd,
+            "MQTT/TLS ICD gate drift")
+    require("MODEM AND END-TO-END EVIDENCE OPEN" in contract and
+            "FW-005 remains draft" in contract, "contract overclaims readiness")
+    require("DEC-027" in decisions and "DEC-028" in decisions and
+            "IMPLEMENTED_HOST_HARDWARE_DEFERRED" in decisions,
+            "automatic network and protected identity decisions are not recorded")
+
+    print("BG95 MQTT/TLS transport QG-1 PASS")
+    print("automatic public APN + full protected SIM identity + TLS contract traced")
+    print("operator and 24-hour hardware evidence DEFERRED_UNTIL_STATIONS_ASSEMBLED")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

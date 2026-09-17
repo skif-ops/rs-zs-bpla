@@ -1,0 +1,747 @@
+#!/usr/bin/env python3
+"""Generate and materialize the controlled PCB-MAIN Rev.A placement repack.
+
+The signed MAIN-AUTH-011 connector/module anchors are immutable here.  Every
+other top-side footprint is placed deterministically inside a functional region
+with a 0.25 mm search grid, a 0.15 mm inter-courtyard planning gap, the locked
+M3 component exclusions and the three D8 U.FL tool cylinders enforced.
+
+This is still an unrouted engineering layout candidate.  The script deliberately
+does not create tracks, zones or fabrication output and never asserts Review B or
+manufacturing release.
+"""
+from __future__ import annotations
+
+import argparse
+import csv
+import io
+import math
+import re
+import sys
+import uuid
+from collections.abc import Iterable
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+from kiutils.board import Board
+from kiutils.items.common import Position
+from kiutils.utils import sexpr
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
+from audit_pcb_main_native_schematic_rev_a import expected_components  # noqa: E402
+from audit_pcb_main_placement_clearance_rev_a import (  # noqa: E402
+    Envelope,
+    envelope_of,
+    load_authority,
+    load_tool_clearances,
+    pad_screening_points,
+    ref_of,
+    rotate,
+)
+
+BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
+PASSIVE_AUTHORITY = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
+PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+
+PLACEMENT_GRID_MM = 0.25
+PLANNING_GAP_MM = 0.15
+MOVABLE_EDGE_CLEARANCE_MM = 1.0
+PASSIVE_COURTYARD_MARGIN_MM = 0.25
+PLACEMENT_SOURCE = "PCB_MAIN_PLACEMENT_REPACK_REV_A"
+PASSIVE_COURTYARD_STATUS = "CONTROLLED_PAD_ENVELOPE_PLUS_0.25_MM"
+PASSIVE_COURTYARD_SOURCE = "PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A"
+PASSIVE_PACKAGES = {"0402", "0603", "0805", "1206", "1210"}
+EXCLUSIVE_ZONE_GROUPS = {
+    "ZONE_CELL": "CELL",
+    "ZONE_GNSS": "GNSS",
+    "ZONE_LORA": "LORA",
+    "ZONE_BLE_BODY": "BLE",
+    "ZONE_AUDIO_DIGITAL": "AUDIO",
+}
+ANTENNA_BOARD_KEEP_OUT = "KO_BLE_ANT_BOARD"
+
+
+@dataclass(frozen=True)
+class Region:
+    bounds: tuple[float, float, float, float]
+    target: tuple[float, float]
+
+
+# These positions are layout choices, not MAIN-AUTH-011 capture anchors.  They
+# form the deterministic active-component skeleton around which the passives are
+# packed.  Moving one requires a reviewed update of the generated manifest.
+ACTIVE_POSITIONS: dict[str, tuple[float, float, float]] = {
+    "U1": (52.0, 30.0, 0.0),
+    "U2": (76.0, 31.5, 0.0),
+    "U3": (66.0, 30.5, 0.0),
+    "U4": (66.0, 36.5, 0.0),
+    "U5": (61.0, 57.0, 0.0),
+    "U6": (90.5, 35.5, 0.0),
+    "U7": (59.75, 45.25, 0.0),
+    "U13": (36.5, 18.0, 0.0),
+    "U14": (27.5, 12.0, 0.0),
+    "U15": (73.5, 12.0, 0.0),
+    "U16": (24.0, 32.75, 0.0),
+    "U17": (47.0, 46.0, 0.0),
+    "U18": (53.5, 46.0, 0.0),
+    "U19": (6.5, 42.5, 0.0),
+    "U20": (40.0, 68.5, 0.0),
+    "U21": (92.0, 68.0, 0.0),
+    "U22": (104.0, 54.0, 0.0),
+    "U23": (83.0, 13.0, 0.0),
+    "U24": (88.0, 13.0, 0.0),
+    "U25": (39.0, 6.5, 0.0),
+    "U26": (44.0, 6.5, 0.0),
+    "U27": (41.0, 65.0, 0.0),
+    "Q1": (13.0, 32.0, 0.0),
+    "Q2": (18.0, 32.0, 0.0),
+    "Q3": (27.5, 18.0, 0.0),
+    "Q4": (61.0, 65.0, 0.0),
+}
+
+REGIONS: dict[str, Region] = {
+    "PWR": Region((10.0, 23.0, 29.0, 36.5), (16.0, 29.0)),
+    "MCU": Region((27.0, 17.0, 69.0, 42.0), (52.0, 30.0)),
+    "STORAGE": Region((62.0, 20.0, 86.0, 44.0), (76.0, 31.5)),
+    "AUDIO": Region((36.75, 39.0, 66.0, 51.0), (54.0, 45.0)),
+    "CELL": Region((9.5, 28.0, 47.0, 69.0), (25.0, 50.0)),
+    "SIMCTRL": Region((26.0, 10.0, 50.0, 24.0), (36.5, 18.0)),
+    "SIM1": Region((9.5, 9.5, 32.0, 24.0), (20.0, 13.0)),
+    "SIM2": Region((54.0, 9.5, 78.0, 24.0), (65.0, 13.0)),
+    "GNSS": Region((44.0, 50.0, 64.0, 71.0), (53.5, 58.0)),
+    "LORA": Region((63.0, 44.0, 84.0, 71.0), (74.0, 55.0)),
+    "BLE": Region((85.5, 27.0, 106.0, 46.0), (95.0, 36.0)),
+    "MIC1": Region((4.0, 35.0, 12.0, 50.0), (6.5, 42.5)),
+    "MIC2": Region((31.0, 63.0, 49.0, 71.0), (40.0, 68.0)),
+    "MIC3": Region((83.0, 63.0, 101.0, 71.0), (92.0, 68.0)),
+    "MIC4": Region((97.0, 45.0, 106.0, 63.0), (103.0, 54.0)),
+    "USB": Region((30.0, 5.0, 54.0, 17.0), (42.0, 8.0)),
+    "SD": Region((77.0, 11.0, 99.0, 28.0), (87.0, 14.0)),
+    "TAMPER": Region((96.0, 10.0, 106.0, 28.0), (102.0, 18.0)),
+    "EOL": Region((17.0, 23.0, 42.0, 39.0), (29.0, 31.0)),
+}
+
+# RF components must be close to their two endpoints while remaining outside
+# the connector tool cylinder.  The points deliberately sit on the module side
+# of the D8 service exclusion.
+TARGET_OVERRIDES: dict[str, tuple[float, float, str]] = {
+    "D3": (24.0, 68.0, "U8/J8 RF path"),
+    "C79": (24.0, 68.0, "U8/J8 RF path"),
+    "C80": (24.0, 68.0, "U8/J8 RF path"),
+    "R43": (24.0, 68.0, "U8/J8 RF path"),
+    "D4": (61.0, 68.0, "U9/J9 RF path"),
+    "C64": (61.0, 68.0, "U9/J9 RF path"),
+    "L2": (61.0, 68.0, "U9/J9 bias path"),
+    "FL1": (61.0, 68.0, "U9/J9 RF path"),
+    "D5": (67.0, 68.0, "U10/J10 RF path"),
+    "C69": (67.0, 68.0, "U10/J10 RF path"),
+    "C70": (67.0, 68.0, "U10/J10 RF path"),
+    "R73": (67.0, 68.0, "U10/J10 RF path"),
+    "C19": (11.0, 29.0, "J_PWR 3V3 entry"),
+    "C20": (11.0, 27.0, "J_PWR 1V8 entry"),
+    "R101": (38.0, 31.0, "TP_EOL UART"),
+    "R102": (38.0, 33.0, "TP_EOL UART"),
+}
+
+
+def natural_key(value: str) -> tuple[Any, ...]:
+    return tuple(int(item) if item.isdigit() else item
+                 for item in re.split(r"(\d+)", value))
+
+
+def number_of(ref: str) -> int:
+    match = re.search(r"(\d+)$", ref)
+    return int(match.group(1)) if match else -1
+
+
+def functional_group(ref: str) -> str:
+    """Map every unlocked PCB-MAIN reference into one routing region."""
+    if ref in {"U1", "L1", "X1"}:
+        return "MCU"
+    if ref in {"U2", "U3", "U4"}:
+        return "STORAGE"
+    if ref in {"U7", "U17", "U18"}:
+        return "AUDIO"
+    if ref in {"U8", "U16", "Q1", "Q2", "U27"}:
+        return "CELL"
+    if ref in {"U13", "Q3"}:
+        return "SIMCTRL"
+    if ref == "U14":
+        return "SIM1"
+    if ref == "U15":
+        return "SIM2"
+    if ref in {"U9", "U5", "Q4"}:
+        return "GNSS"
+    if ref == "U10":
+        return "LORA"
+    if ref in {"U11", "U6"}:
+        return "BLE"
+    if ref in {"U19", "U20", "U21", "U22"}:
+        return f"MIC{number_of(ref) - 18}"
+    if ref in {"U23", "U24"}:
+        return "SD"
+    if ref in {"U25", "U26"}:
+        return "USB"
+
+    index = number_of(ref)
+    if ref.startswith("C"):
+        if 1 <= index <= 18:
+            return "MCU"
+        if 19 <= index <= 20:
+            return "PWR"
+        if 21 <= index <= 26:
+            return "STORAGE"
+        if 27 <= index <= 32:
+            return "AUDIO"
+        if 33 <= index <= 48 or index in {79, 80}:
+            return "CELL"
+        if index == 49:
+            return "SIMCTRL"
+        if index in {50, 52, 54, 55, 56}:
+            return "SIM1"
+        if index in {51, 53, 57, 58, 59}:
+            return "SIM2"
+        if 60 <= index <= 65:
+            return "GNSS"
+        if 66 <= index <= 70:
+            return "LORA"
+        if 71 <= index <= 73:
+            return "BLE"
+        if 74 <= index <= 76:
+            return "SD"
+        if index == 77:
+            return "USB"
+        if index == 78:
+            return "TAMPER"
+
+    if ref.startswith("R"):
+        if index in set(range(1, 17)) | {57, 69, 70, 71, 75, 79, 91, 92, 96, 103}:
+            return "MCU"
+        if index in {17, 18, 23}:
+            return "AUDIO"
+        if 19 <= index <= 22:
+            return f"MIC{index - 18}"
+        if 24 <= index <= 43:
+            return "CELL"
+        if index in {44, 45, 46, 47}:
+            return "SIMCTRL"
+        if index in {48, 50, 51, 52}:
+            return "SIM1"
+        if index in {49, 53, 54, 55}:
+            return "SIM2"
+        if index in {56, 58, 59, 60, 61, 62}:
+            return "GNSS"
+        if index in {63, 64, 65, 66, 67, 68, 72, 73}:
+            return "LORA"
+        if index in {74, 76, 77, 78}:
+            return "BLE"
+        if 80 <= index <= 90:
+            return "SD"
+        if 93 <= index <= 98:
+            return "USB"
+        if index in {99, 100}:
+            return "TAMPER"
+        if index in {101, 102}:
+            return "EOL"
+
+    special = {
+        "L2": "GNSS", "FL1": "GNSS", "D4": "GNSS",
+        "D3": "CELL", "D5": "LORA",
+        "D6": "USB", "D7": "USB", "D8": "USB",
+        "D9": "TAMPER", "D10": "CELL", "D11": "SD",
+        "D1": "CELL", "D2": "CELL", "FB1": "CELL",
+    }
+    if ref in special:
+        return special[ref]
+    raise AssertionError(f"{ref}: no functional placement group")
+
+
+def require(value: bool, message: str) -> None:
+    if not value:
+        raise AssertionError(message)
+
+
+def passive_rows() -> dict[str, dict[str, str]]:
+    with PASSIVE_AUTHORITY.open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    return {row["RefDes"]: row for row in rows}
+
+
+def placement_zones() -> tuple[dict[str, tuple[float, float, float, float]],
+                               tuple[float, float, float, float]]:
+    zones: dict[str, tuple[float, float, float, float]] = {}
+    keepout: tuple[float, float, float, float] | None = None
+    with AUTHORITY.open(encoding="utf-8", newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    for row in rows:
+        x = float(row["X_mm"])
+        y = float(row["Y_mm"])
+        bounds = (x, y, x + float(row["Extent_X_mm"]),
+                  y + float(row["Extent_Y_mm"]))
+        if row["RefDes"] in EXCLUSIVE_ZONE_GROUPS:
+            zones[EXCLUSIVE_ZONE_GROUPS[row["RefDes"]]] = bounds
+        elif row["RefDes"] == ANTENNA_BOARD_KEEP_OUT:
+            keepout = bounds
+    require(set(zones) == set(EXCLUSIVE_ZONE_GROUPS.values()),
+            "exclusive MAIN-AUTH-011 placement-zone set drift")
+    require(keepout is not None, "BLE all-layer antenna keepout is missing")
+    return zones, keepout
+
+
+def owner_refs(text: str, footprints: dict[str, Any]) -> list[str]:
+    candidates = re.findall(r"\b(?:U\d+|Q\d+|J\d+|J_MIC\d+|J_PWR)\b", text)
+    result: list[str] = []
+    for ref in candidates:
+        if ref in footprints and ref not in result:
+            result.append(ref)
+    return result
+
+
+def pad_target(footprint: Any, number: str) -> tuple[float, float] | None:
+    pads = [pad for pad in footprint.pads if pad.number == number]
+    if len(pads) != 1:
+        return None
+    pad = pads[0]
+    local_x, local_y = rotate(
+        (float(pad.position.X), float(pad.position.Y)),
+        float(footprint.position.angle or 0.0),
+    )
+    return (local_x + float(footprint.position.X),
+            local_y + float(footprint.position.Y))
+
+
+def placement_target(
+    ref: str,
+    footprints: dict[str, Any],
+    rows: dict[str, dict[str, str]],
+) -> tuple[float, float, str]:
+    if ref in TARGET_OVERRIDES:
+        return TARGET_OVERRIDES[ref]
+    row = rows.get(ref)
+    if row:
+        text = f"{row['Electrical_Path']} {row['Notes']}"
+        owners = owner_refs(text, footprints)
+        if len(owners) == 1:
+            owner = owners[0]
+            match = re.search(rf"\b{re.escape(owner)}\b[^.;]*?\bpin\s+(\d+)\b", text)
+            if match:
+                target = pad_target(footprints[owner], match.group(1))
+                if target is not None:
+                    return target[0], target[1], f"{owner}.{match.group(1)}"
+            owner_fp = footprints[owner]
+            return (float(owner_fp.position.X), float(owner_fp.position.Y), owner)
+        if owners:
+            x = sum(float(footprints[item].position.X) for item in owners) / len(owners)
+            y = sum(float(footprints[item].position.Y) for item in owners) / len(owners)
+            return x, y, "/".join(owners)
+    region = REGIONS[functional_group(ref)]
+    return region.target[0], region.target[1], functional_group(ref)
+
+
+def footprints_by_ref(board: Any) -> dict[str, Any]:
+    result = {ref_of(footprint): footprint for footprint in board.footprints}
+    require(len(result) == len(board.footprints), "duplicate or blank footprint reference")
+    return result
+
+
+def expected_movable_refs(components: dict[str, Any], locked_refs: set[str]) -> set[str]:
+    return {
+        ref for ref, component in components.items()
+        if component["on_board"]
+        and ref not in locked_refs
+        and not str(component["package"]).startswith("POGO_FIXTURE_")
+    }
+
+
+def overlaps(first: Envelope, second: Envelope, gap: float = PLANNING_GAP_MM) -> bool:
+    return not (
+        first.xmax + gap <= second.xmin
+        or second.xmax + gap <= first.xmin
+        or first.ymax + gap <= second.ymin
+        or second.ymax + gap <= first.ymin
+    )
+
+
+def rectangle_intersects_circle(
+    envelope: Envelope,
+    center_x: float,
+    center_y: float,
+    radius: float,
+    gap: float = PLANNING_GAP_MM,
+) -> bool:
+    nearest_x = max(envelope.xmin, min(center_x, envelope.xmax))
+    nearest_y = max(envelope.ymin, min(center_y, envelope.ymax))
+    return math.hypot(nearest_x - center_x, nearest_y - center_y) < radius + gap
+
+
+def rectangle_intersects_rectangle(
+    envelope: Envelope,
+    bounds: tuple[float, float, float, float],
+    gap: float = PLANNING_GAP_MM,
+) -> bool:
+    xmin, ymin, xmax, ymax = bounds
+    return not (
+        envelope.xmax + gap <= xmin
+        or xmax + gap <= envelope.xmin
+        or envelope.ymax + gap <= ymin
+        or ymax + gap <= envelope.ymin
+    )
+
+
+def grid_candidates(region: Region, target: tuple[float, float]) -> list[tuple[float, float]]:
+    x0, y0, x1, y1 = region.bounds
+    target_x, target_y = target
+    candidates: list[tuple[float, float, float]] = []
+    y = y0
+    while y <= y1 + 1e-9:
+        x = x0
+        while x <= x1 + 1e-9:
+            candidates.append((
+                round(x, 3),
+                round(y, 3),
+                (x - target_x) ** 2 + (y - target_y) ** 2,
+            ))
+            x += PLACEMENT_GRID_MM
+        y += PLACEMENT_GRID_MM
+    candidates.sort(key=lambda item: (item[2], item[1], item[0]))
+    return [(item[0], item[1]) for item in candidates]
+
+
+def build_plan(board: Any) -> list[dict[str, str]]:
+    components = expected_components()
+    footprints = footprints_by_ref(board)
+    locked_refs, mounting_holes = load_authority(AUTHORITY)
+    tool_clearances = load_tool_clearances(AUTHORITY)
+    exclusive_zones, antenna_keepout = placement_zones()
+    rows = passive_rows()
+    movable_refs = expected_movable_refs(components, locked_refs)
+    require(set(ACTIVE_POSITIONS) <= movable_refs,
+            "active placement skeleton contains a locked or off-board reference")
+
+    for ref, (x, y, angle) in ACTIVE_POSITIONS.items():
+        footprints[ref].position = Position(x, y, angle or None)
+
+    occupied = [
+        envelope_of(footprints[ref], locked_refs)
+        for ref in sorted(locked_refs, key=natural_key)
+        if footprints[ref].layer == "F.Cu"
+    ]
+
+    def valid(envelope: Envelope, group: str) -> bool:
+        if (envelope.xmin < MOVABLE_EDGE_CLEARANCE_MM
+                or envelope.xmax > 110.0 - MOVABLE_EDGE_CLEARANCE_MM
+                or envelope.ymin < MOVABLE_EDGE_CLEARANCE_MM
+                or envelope.ymax > 75.0 - MOVABLE_EDGE_CLEARANCE_MM):
+            return False
+        if any(overlaps(envelope, item) for item in occupied):
+            return False
+        for hole in mounting_holes:
+            if rectangle_intersects_circle(
+                envelope,
+                hole["x_mm"],
+                hole["y_mm"],
+                hole["component_exclusion_diameter_mm"] / 2.0,
+            ):
+                return False
+        for clearance in tool_clearances:
+            if rectangle_intersects_circle(
+                envelope,
+                clearance["x_mm"],
+                clearance["y_mm"],
+                clearance["diameter_mm"] / 2.0,
+            ):
+                return False
+        for owner_group, bounds in exclusive_zones.items():
+            if group != owner_group and rectangle_intersects_rectangle(envelope, bounds):
+                return False
+        if (envelope.ref != "U11"
+                and rectangle_intersects_rectangle(envelope, antenna_keepout)):
+            return False
+        return True
+
+    plan: dict[str, dict[str, str]] = {}
+    for ref, (x, y, angle) in sorted(ACTIVE_POSITIONS.items(), key=lambda item: natural_key(item[0])):
+        group = functional_group(ref)
+        envelope = envelope_of(footprints[ref], locked_refs)
+        require(valid(envelope, group),
+                f"{ref}: active skeleton placement violates a clearance or exclusive zone")
+        occupied.append(envelope)
+        plan[ref] = placement_row(ref, x, y, angle, group, group, "ACTIVE_SKELETON")
+
+    remaining: list[tuple[str, float]] = []
+    for ref in movable_refs - set(ACTIVE_POSITIONS):
+        footprint = footprints[ref]
+        require(footprint.layer == "F.Cu", f"{ref}: movable placement is not top-side")
+        envelope = envelope_of(footprint, locked_refs)
+        # Round before ordering so adding the equivalent explicit courtyard
+        # cannot reshuffle equal-package parts through floating-point noise.
+        area = round(
+            (envelope.xmax - envelope.xmin) * (envelope.ymax - envelope.ymin),
+            6,
+        )
+        remaining.append((ref, area))
+    remaining.sort(key=lambda item: (
+        functional_group(item[0]),
+        -item[1],
+        natural_key(item[0]),
+    ))
+
+    for ref, _area in remaining:
+        footprint = footprints[ref]
+        group = functional_group(ref)
+        target_x, target_y, target_source = placement_target(ref, footprints, rows)
+        found: tuple[float, float, Envelope] | None = None
+        for x, y in grid_candidates(REGIONS[group], (target_x, target_y)):
+            footprint.position = Position(x, y, None)
+            envelope = envelope_of(footprint, locked_refs)
+            if valid(envelope, group):
+                found = (x, y, envelope)
+                break
+        require(found is not None,
+                f"{ref}: functional region {group} has no collision-free placement")
+        x, y, envelope = found
+        occupied.append(envelope)
+        plan[ref] = placement_row(
+            ref, x, y, 0.0, group, target_source, "FUNCTIONAL_REGION_GREEDY",
+        )
+
+    require(set(plan) == movable_refs,
+            f"placement set mismatch: missing={sorted(movable_refs - set(plan))} "
+            f"extra={sorted(set(plan) - movable_refs)}")
+    return [plan[ref] for ref in sorted(plan, key=natural_key)]
+
+
+def placement_row(
+    ref: str,
+    x: float,
+    y: float,
+    angle: float,
+    group: str,
+    target: str,
+    method: str,
+) -> dict[str, str]:
+    return {
+        "RefDes": ref,
+        "X_mm": decimal(x),
+        "Y_mm": decimal(y),
+        "Rotation_deg": decimal(angle),
+        "Functional_Group": group,
+        "Target": target,
+        "Placement_Method": method,
+        "Placement_Class": "UNLOCKED_LAYOUT_CANDIDATE",
+        "Authority": "PCB-MAIN-PLACEMENT-REPACK-REV-A",
+        "Status": "ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
+    }
+
+
+PLACEMENT_FIELDS = [
+    "RefDes", "X_mm", "Y_mm", "Rotation_deg", "Functional_Group", "Target",
+    "Placement_Method", "Placement_Class", "Authority", "Status",
+]
+
+
+def placement_csv(rows: Iterable[dict[str, str]]) -> str:
+    output = io.StringIO(newline="")
+    writer = csv.DictWriter(output, fieldnames=PLACEMENT_FIELDS, lineterminator="\n")
+    writer.writeheader()
+    writer.writerows(rows)
+    return output.getvalue()
+
+
+def decimal(value: float) -> str:
+    rendered = f"{float(value):.3f}".rstrip("0").rstrip(".")
+    return "0" if rendered in {"", "-0"} else rendered
+
+
+def find_sexpr_end(text: str, start: int) -> int:
+    depth = 0
+    quoted = False
+    escaped = False
+    for index in range(start, len(text)):
+        char = text[index]
+        if quoted:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                quoted = False
+            continue
+        if char == '"':
+            quoted = True
+        elif char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth == 0:
+                return index + 1
+    raise AssertionError("unterminated s-expression")
+
+
+def footprint_blocks(text: str) -> list[tuple[int, int, str]]:
+    result: list[tuple[int, int, str]] = []
+    cursor = 0
+    marker = "  (footprint "
+    while True:
+        start = text.find(marker, cursor)
+        if start < 0:
+            return result
+        end = find_sexpr_end(text, start + 2)
+        block = text[start:end]
+        match = re.search(r'^    \(fp_text reference "([^"]+)"', block, re.MULTILINE)
+        require(match is not None, "footprint block has no reference")
+        result.append((start, end, match.group(1)))
+        cursor = end
+
+
+def passive_courtyard_line(ref: str, footprint: Any) -> str:
+    points = pad_screening_points(footprint)
+    xmin = min(point[0] for point in points)
+    ymin = min(point[1] for point in points)
+    xmax = max(point[0] for point in points)
+    ymax = max(point[1] for point in points)
+    tstamp = uuid.uuid5(uuid.NAMESPACE_URL, f"dioneya:pcb-main:{ref}:passive-courtyard:v1")
+    return (
+        f"    (fp_rect (start {decimal(xmin)} {decimal(ymin)}) "
+        f"(end {decimal(xmax)} {decimal(ymax)}) (layer \"F.CrtYd\") "
+        f"(stroke (width 0.05) (type default)) (fill none) (tstamp {tstamp}))\n"
+    )
+
+
+def remove_front_courtyard_rects(block: str) -> str:
+    spans: list[tuple[int, int]] = []
+    for match in re.finditer(r"(?m)^    \(fp_rect(?:\s|$)", block):
+        end = find_sexpr_end(block, match.start())
+        expression = block[match.start():end]
+        if re.search(r'\(layer "F\.CrtYd"\)', expression):
+            if block[end:end + 1] == "\n":
+                end += 1
+            spans.append((match.start(), end))
+    for start, end in reversed(spans):
+        block = block[:start] + block[end:]
+    return block
+
+
+def transform_footprint_block(
+    block: str,
+    ref: str,
+    row: dict[str, str] | None,
+    footprint: Any,
+) -> str:
+    transformed = re.sub(
+        r'^    \(property "DIONEA_(?:PLACEMENT_SOURCE|PLACEMENT_CLASS|COURTYARD_STATUS|COURTYARD_SOURCE)"[^\n]*\n',
+        "",
+        block,
+        flags=re.MULTILINE,
+    )
+    package = footprint.properties.get("DIONEA_PACKAGE", "")
+    if package in PASSIVE_PACKAGES:
+        transformed = remove_front_courtyard_rects(transformed)
+
+    additions = ""
+    if row is not None:
+        replacement = f"    (at {row['X_mm']} {row['Y_mm']}"
+        if float(row["Rotation_deg"]) != 0.0:
+            replacement += f" {row['Rotation_deg']}"
+        replacement += ")"
+        transformed, count = re.subn(
+            r'^    \(at [^\n]+\)$', replacement, transformed,
+            count=1, flags=re.MULTILINE,
+        )
+        require(count == 1, f"{ref}: footprint position is missing")
+        additions += f"    (property \"DIONEA_PLACEMENT_SOURCE\" \"{PLACEMENT_SOURCE}\")\n"
+        additions += "    (property \"DIONEA_PLACEMENT_CLASS\" \"UNLOCKED_LAYOUT_CANDIDATE\")\n"
+    if package in PASSIVE_PACKAGES:
+        additions += f"    (property \"DIONEA_COURTYARD_STATUS\" \"{PASSIVE_COURTYARD_STATUS}\")\n"
+        additions += f"    (property \"DIONEA_COURTYARD_SOURCE\" \"{PASSIVE_COURTYARD_SOURCE}\")\n"
+        additions += passive_courtyard_line(ref, footprint)
+
+    if additions:
+        population = re.search(
+            r'^    \(property "DIONEA_POPULATION"[^\n]*\n', transformed, re.MULTILINE,
+        )
+        require(population is not None, f"{ref}: DIONEA_POPULATION property is missing")
+        transformed = transformed[:population.end()] + additions + transformed[population.end():]
+    return transformed
+
+
+def materialized_board_text(source: str, rows: list[dict[str, str]]) -> str:
+    board = Board.from_sexpr(sexpr.parse_sexp(source))
+    footprints = footprints_by_ref(board)
+    by_ref = {row["RefDes"]: row for row in rows}
+    blocks = footprint_blocks(source)
+    require({ref for _, _, ref in blocks} == set(footprints),
+            "raw footprint block set differs from parsed board")
+    output: list[str] = []
+    cursor = 0
+    for start, end, ref in blocks:
+        output.append(source[cursor:start])
+        output.append(transform_footprint_block(
+            source[start:end], ref, by_ref.get(ref), footprints[ref],
+        ))
+        cursor = end
+    output.append(source[cursor:])
+    return "".join(output)
+
+
+def verify_materialized(board_text: str, rows: list[dict[str, str]]) -> None:
+    board = Board.from_sexpr(sexpr.parse_sexp(board_text))
+    footprints = footprints_by_ref(board)
+    for row in rows:
+        footprint = footprints[row["RefDes"]]
+        require(abs(float(footprint.position.X) - float(row["X_mm"])) < 0.001,
+                f"{row['RefDes']}: materialized X differs from manifest")
+        require(abs(float(footprint.position.Y) - float(row["Y_mm"])) < 0.001,
+                f"{row['RefDes']}: materialized Y differs from manifest")
+        require(abs(float(footprint.position.angle or 0.0)
+                    - float(row["Rotation_deg"])) < 0.001,
+                f"{row['RefDes']}: materialized rotation differs from manifest")
+        require(footprint.properties.get("DIONEA_PLACEMENT_SOURCE") == PLACEMENT_SOURCE,
+                f"{row['RefDes']}: placement source property is missing")
+    for ref, footprint in footprints.items():
+        if footprint.properties.get("DIONEA_PACKAGE") not in PASSIVE_PACKAGES:
+            continue
+        courtyard = [item for item in footprint.graphicItems
+                     if getattr(item, "layer", None) == "F.CrtYd"]
+        require(len(courtyard) == 1, f"{ref}: passive courtyard count differs from one")
+        require(footprint.properties.get("DIONEA_COURTYARD_STATUS") ==
+                PASSIVE_COURTYARD_STATUS, f"{ref}: passive courtyard status is missing")
+        require(footprint.properties.get("DIONEA_COURTYARD_SOURCE") ==
+                PASSIVE_COURTYARD_SOURCE, f"{ref}: passive courtyard source is missing")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--check", action="store_true",
+                        help="verify that manifest and native PCB already match generated content")
+    args = parser.parse_args()
+
+    original = BOARD.read_text(encoding="utf-8")
+    board = Board.from_sexpr(sexpr.parse_sexp(original))
+    rows = build_plan(board)
+    manifest = placement_csv(rows)
+    materialized = materialized_board_text(original, rows)
+    verify_materialized(materialized, rows)
+
+    if args.check:
+        require(PLACEMENT.is_file(), "placement manifest is missing")
+        require(PLACEMENT.read_text(encoding="utf-8") == manifest,
+                "placement manifest differs from deterministic repack")
+        require(original == materialized,
+                "native PCB differs from deterministic placement materialization")
+        print("PCB-MAIN placement repack: PASS / manifest and board are deterministic")
+    else:
+        PLACEMENT.write_text(manifest, encoding="utf-8")
+        BOARD.write_text(materialized, encoding="utf-8")
+        print(f"PCB-MAIN placement manifest: {PLACEMENT.relative_to(ROOT)}")
+        print(f"PCB-MAIN placement materialized: {BOARD.relative_to(ROOT)}")
+    print(f"movable_placements={len(rows)} passive_courtyard_margin_mm={PASSIVE_COURTYARD_MARGIN_MM:.2f}")
+    print("status=PLACEMENT_ENGINEERING_CANDIDATE / ROUTING_AND_REVIEW_B_PENDING")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

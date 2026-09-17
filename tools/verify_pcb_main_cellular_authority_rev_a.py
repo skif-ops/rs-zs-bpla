@@ -439,7 +439,7 @@ def main() -> None:
     print("- 24 U16 pins with two fixed direction groups and partial-power isolation verified")
     print("- two exact MMBT3904 open-collector stages and mandatory pulse windows verified")
     print("- guaranteed 1.8 V-domain margins and burst-power requirements verified")
-    print("- native capture and Reviews A/B keep the production BOM blocked")
+    print("- Reviews A/B keep the production BOM blocked")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

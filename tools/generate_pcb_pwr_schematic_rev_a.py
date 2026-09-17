@@ -4,7 +4,7 @@
 The reviewed CSV pin/net authorities are the design authority. This generator only
 materializes them into a native KiCad schematic. Manufacturer IC symbols are represented
 with controlled generic multi-pin symbols whose pin numbers/names are rewritten from the
-Review-A authority; exact footprints remain capture candidates until layout/DFM review.
+Review-A authority; controlled footprints remain subject to layout/DFM review.
 
 Output remains NOT FOR MANUFACTURE. Full schematic Review A, exact passive MPN freeze,
 layout Review B and EVT evidence remain mandatory.
@@ -168,29 +168,31 @@ def main() -> int:
 
     # Main functional blocks. Coordinates are schematic-only and intentionally grid aligned.
     J1 = make_instance(sch, j1sym, reference="J1", value="PWR_INPUT_43045-0213",
-                       footprint="Connector_Molex:Molex_Micro-Fit_3.0_43045-0212_1x02_P3.00mm_Horizontal",
-                       datasheet="Molex Micro-Fit 3.0", x=25.40, y=38.10)
+                       footprint="DioneyaPWR:Molex_43045-0213_MicroFit-2_Vertical",
+                       datasheet="Molex SD-43045-005 Rev.G1", x=25.40, y=38.10)
     F1 = make_instance(sch, fuse, reference="F1", value="0451005.MRL CANDIDATE",
                        footprint="Fuse:Fuse_1206_3216Metric", datasheet="Littelfuse 0451", x=48.26, y=35.56)
     D1 = make_instance(sch, tvs, reference="D1", value="SMBJ18A CANDIDATE",
                        footprint="Diode_SMD:D_SMB", datasheet="Littelfuse SMBJ", x=60.96, y=50.80)
     U1 = make_instance(sch, u1sym, reference="U1", value="LM74700QDBVRQ1",
-                       footprint="Package_TO_SOT_SMD:SOT-23-6", datasheet="TI LM74700-Q1 Rev.G", x=83.82, y=38.10)
+                       footprint="DioneyaPWR:TI_DBV0006A_SOT23-6", datasheet="TI LM74700-Q1 Rev.G", x=83.82, y=38.10)
     Q1 = make_instance(sch, q1sym, reference="Q1", value="CSD18540Q5B",
                        footprint="DioneyaPWR:CSD18540Q5B_DNK", datasheet="TI CSD18540Q5B Rev.B", x=109.22, y=38.10)
     C1 = make_instance(sch, capacitor, reference="C1", value="100nF VCAP",
                        footprint="Capacitor_SMD:C_0402_1005Metric", datasheet="~", x=83.82, y=58.42)
-    RSH1 = make_instance(sch, rshsym, reference="RSH1", value="10mOhm 4T >=1W MPN_TBD",
-                         footprint="DioneyaPWR:SHUNT_4T_TBD", datasheet="Review-A Kelvin authority", x=137.16, y=38.10)
+    RSH1 = make_instance(sch, rshsym, reference="RSH1", value="WSK2512R0100FEA 10mOhm 1% 1W 4T",
+                         footprint="DioneyaPWR:Vishay_WSK2512_4T_T1.19mm",
+                         datasheet="Vishay WSK2512 document 30108", x=137.16, y=38.10)
     U2 = make_instance(sch, u2sym, reference="U2", value="INA226AIDGSR",
-                       footprint="Package_SO:VSSOP-10_3x3mm_P0.5mm", datasheet="TI INA226 Rev.C", x=137.16, y=68.58)
+                       footprint="DioneyaPWR:TI_DGS0010A_VSSOP10", datasheet="TI INA226 Rev.C", x=137.16, y=68.58)
     C2 = make_instance(sch, capacitor, reference="C2", value="100nF INA226",
                        footprint="Capacitor_SMD:C_0402_1005Metric", datasheet="~", x=157.48, y=76.20)
 
     U3 = make_instance(sch, u34sym, reference="U3", value="LMR604403SRAKR 3V8",
-                       footprint="DioneyaPWR:LMR60440_RAK9", datasheet="TI LMR60440 SNAS877", x=55.88, y=101.60)
-    L1 = make_instance(sch, inductor, reference="L1", value="4.7uH >=6A MPN_TBD",
-                       footprint="DioneyaPWR:L_PWR_TBD", datasheet="~", x=81.28, y=96.52)
+                       footprint="DioneyaPWR:LMR60440_RAK0009A", datasheet="TI LMR60440 SNAS877", x=55.88, y=101.60)
+    L1 = make_instance(sch, inductor, reference="L1", value="XAL7030-472MEC 4.7uH",
+                       footprint="DioneyaPWR:Coilcraft_XAL7030_472",
+                       datasheet="Coilcraft XAL7030 document 863", x=81.28, y=96.52)
     C3 = make_instance(sch, capacitor, reference="C3", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
                        footprint="Capacitor_SMD:C_1210_3225Metric", datasheet="TDK CGA6P3X7R1E226M250AB", x=91.44, y=111.76)
     C14 = make_instance(sch, capacitor, reference="C14", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
@@ -215,9 +217,10 @@ def main() -> int:
                        footprint="Resistor_SMD:R_0402_1005Metric", datasheet="~", x=35.56, y=111.76)
 
     U4 = make_instance(sch, u34sym, reference="U4", value="LMR604403SRAKR 3V3 AON",
-                       footprint="DioneyaPWR:LMR60440_RAK9", datasheet="TI LMR60440 SNAS877", x=121.92, y=101.60)
-    L2 = make_instance(sch, inductor, reference="L2", value="4.7uH >=6A MPN_TBD",
-                       footprint="DioneyaPWR:L_PWR_TBD", datasheet="~", x=147.32, y=96.52)
+                       footprint="DioneyaPWR:LMR60440_RAK0009A", datasheet="TI LMR60440 SNAS877", x=121.92, y=101.60)
+    L2 = make_instance(sch, inductor, reference="L2", value="XAL7030-472MEC 4.7uH",
+                       footprint="DioneyaPWR:Coilcraft_XAL7030_472",
+                       datasheet="Coilcraft XAL7030 document 863", x=147.32, y=96.52)
     C5 = make_instance(sch, capacitor, reference="C5", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
                        footprint="Capacitor_SMD:C_1210_3225Metric", datasheet="TDK CGA6P3X7R1E226M250AB", x=152.40, y=111.76)
     C17 = make_instance(sch, capacitor, reference="C17", value="22uF 25V X7R CGA6P3X7R1E226M250AB",
@@ -238,7 +241,7 @@ def main() -> int:
                         footprint="Resistor_SMD:R_0402_1005Metric", datasheet="~", x=157.48, y=88.90)
 
     U5 = make_instance(sch, u5sym, reference="U5", value="TPS7A2018PDBVR 1V8_MIC",
-                       footprint="Package_TO_SOT_SMD:SOT-23-5", datasheet="TI TPS7A20 Rev.H", x=68.58, y=157.48)
+                       footprint="DioneyaMain:TI_DBV0005A_SOT23-5", datasheet="TI TPS7A20 Rev.H", x=68.58, y=157.48)
     C7 = make_instance(sch, capacitor, reference="C7", value="2.2uF IN",
                        footprint="Capacitor_SMD:C_0603_1608Metric", datasheet="~", x=50.80, y=172.72)
     C8 = make_instance(sch, capacitor, reference="C8", value="2.2uF OUT",
@@ -263,7 +266,8 @@ def main() -> int:
                         footprint="NetTie:NetTie-2_SMD_Pad0.5mm", datasheet="~", x=162.56, y=157.48)
 
     J2 = make_instance(sch, j2sym, reference="J2", value="MAIN_PWR_43045-1202_12PIN",
-                       footprint="DioneyaPWR:Molex_43045-1202", datasheet="Molex 43045-1202", x=198.12, y=109.22)
+                       footprint="DioneyaMain:Molex_43045-1202_MicroFit-12_RA",
+                       datasheet="Molex 43045-1202", x=198.12, y=109.22)
 
     sch.schematicSymbols.extend([J1,F1,D1,U1,Q1,C1,RSH1,U2,C2,U3,L1,C3,C14,C15,C16,C4,R1,R2,R3,R4,R5,R6,
                                  U4,L2,C5,C17,C18,C19,C6,R7,R8,R9,R10,U5,C7,C8,R11,R12,R13,R14,R15,NT1,NT2,NT3,J2])

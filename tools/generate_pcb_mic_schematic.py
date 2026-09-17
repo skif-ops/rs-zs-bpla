@@ -62,6 +62,15 @@ def set_pin_types(symbol: Symbol, mapping: dict[str, str]) -> None:
         pins[number].electricalType = electrical_type
 
 
+def set_symbol_property(symbol: Symbol, key: str, value: str) -> None:
+    matches = [item for item in symbol.properties if item.key == key]
+    if len(matches) != 1:
+        raise RuntimeError(
+            f"{symbol.libId}: expected exactly one {key} property, found {len(matches)}"
+        )
+    matches[0].value = value
+
+
 def prop(key: str, value: str, ident: int, x: float, y: float, *, hide: bool = False) -> Property:
     return Property(
         key=key,
@@ -150,6 +159,13 @@ def main() -> int:
     resistor = load_symbol(args.device_symbols, "R", "Device")
     capacitor = load_symbol(args.device_symbols, "C", "Device")
 
+    # Never retain secondary-reference library nicknames in the controlled source.
+    # Both embedded defaults and placed instances must resolve through the committed
+    # project-local footprint library so a later re-annotation cannot regress the
+    # already-correct board links.
+    set_symbol_property(t5838, "Footprint", "Dioneya:T5838_RevA")
+    set_symbol_property(molex, "Footprint", "Dioneya:Molex_5040500691")
+
     # Make ERC electrically meaningful for this leaf board. The external harness side
     # is modeled from the PCB-MIC point of view: MAIN sources 1V8/PDM_CLK/AAD_CFG and
     # receives PDM_DATA/MIC_WAKE.
@@ -193,14 +209,14 @@ def main() -> int:
     j1 = make_instance(
         sch, molex,
         reference="J1", value="5040500691",
-        footprint="CONN-SMD_6P-P1.50_A1501WRB-S-6P",
+        footprint="Dioneya:Molex_5040500691",
         datasheet="Molex 504050 series",
         x=35.56, y=69.85,
     )
     mk1 = make_instance(
         sch, t5838,
         reference="MK1", value="MMICT5838-00-012",
-        footprint="MIC-SMD_7P-L3.5-W2.7_MMICT5837-00-012",
+        footprint="Dioneya:T5838_RevA",
         datasheet="TDK DS-000383 v1.2",
         x=120.65, y=69.85,
     )

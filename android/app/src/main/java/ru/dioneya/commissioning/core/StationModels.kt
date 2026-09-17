@@ -75,6 +75,7 @@ data class InstallationPosition(
         if (altDm !in -50_000..100_000) add("invalid_installation_altitude")
         if (accuracyM !in 1..1000) add("invalid_installation_accuracy")
         if (version <= 0) add("invalid_installation_position_version")
+        if (version > 0xffff_ffffL) add("installation_position_version_overflow")
         if (!locked) add("installation_position_not_locked")
     }
 }

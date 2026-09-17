@@ -17,7 +17,7 @@ Authority CSV SHA-256: `5709e9d3ae8af4f77865891e5db8104d3f66e597f38194af0f95280d
 - TE controlled customer drawing `C-2336582`, Revision A2, released 14 March 2023: `https://www.te.com/commerce/DocumentDelivery/DDEController?Action=srchrtrv&DocNm=2336582&DocType=Customer%20Drawing&DocLang=English&DocFormat=pdf&PartCntxt=2336582-1`. Retrieved document SHA-256: `2bcf8b28017d5716a1659ad5ad401d6158b272458de43ed4b325a80c7f70d6fe`.
 - TE product specification `108-115163`, Revision A, 24 April 2019: `https://www.te.com/commerce/DocumentDelivery/DDEController?Action=srchrtrv&DocNm=108-115163&DocType=Specification%20Or%20Standard&DocLang=English&DocFormat=pdf&PartCntxt=2336582-1`. Retrieved document SHA-256: `2c46e4e52a95fc72314526df579e752e65cd02521eb1b9a074949d2ded866760`.
 - TE qualification report `501-115178`, Revision A, 31 May 2019: `https://www.te.com/commerce/DocumentDelivery/DDEController?Action=srchrtrv&DocNm=501-115178&DocType=Specification%20Or%20Standard&DocLang=English&DocFormat=pdf&PartCntxt=2336582-1`. Retrieved document SHA-256: `8dcedfc032be7e4f7f41bf5bcd13728926fa3009e7833e6a04ff58de9227ce37`.
-- Nexperia `MMBT3904` product data sheet, version 5, 8 April 2026: `https://assets.nexperia.com/documents/data-sheet/MMBT3904.pdf`.
+- Nexperia `MMBT3904` product data sheet, version 5, 8 April 2026: `https://assets.nexperia.com/documents/data-sheet/MMBT3904.pdf`. Retrieved document SHA-256: `ade27b408c77a94ea4448c8473a9e80096dd60da3e1914e004c52344e9cd8d00`.
 
 TE specification `108-115163` states that the controlled product drawing takes precedence if the documents conflict. The older specification gives an operating minimum of -30 C, while the A2 drawing and current product page specify -40 to +85 C. The Rev.A freeze follows the higher-priority drawing and current product page, while connector procurement remains blocked because TE reports the part as active but not currently available.
 
@@ -30,6 +30,11 @@ TE specification `108-115163` states that the controlled product drawing takes p
 - Only 1.8 V SIM cards are supported. A 3 V or 5 V card is not a valid Rev.A population.
 
 ## U13 switch topology
+
+The project-local `TI_PW0024A_TSSOP24` footprint follows TI 4220208/A: 24
+1.50 x 0.45 mm R0.05 lands at 0.65 mm pitch with 5.80 mm between row
+centers, equal-size stencil apertures, and 0.05 mm NSMD expansion. It replaces
+the incorrect 0.50 mm-pitch KiCad pattern previously assigned to U13.
 
 U13 is the exact `TS3A27518EPWR` 24-pin TSSOP. It is powered from `3V3_DIGITAL`. This satisfies TI's VCC-first sequencing rule because the 3.3 V domain is established before U8 presents any USIM analog signal, and it reduces the guaranteed worst-case single-channel resistance to 7.6 Ohm over -40 to +85 C.
 
@@ -54,6 +59,12 @@ Three channels are paralleled for the selected card's VDD path. The guaranteed w
 
 Q3 is Nexperia `MMBT3904,215` in SOT23 with pin 1 base, pin 2 emitter, and pin 3 collector.
 
+The project-local `Nexperia_MMBT3904_SOT23` footprint follows Figure 8:
+rectangular 0.60 x 0.70 mm copper lands, 0.50 x 0.60 mm stencil apertures,
+0.75 x 0.85 mm solder-resist openings, 1.90 mm lead pitch and 2.00 mm row
+spacing. It is rotated into the established board orientation while retaining
+the exact base/emitter/collector pin order.
+
 - `SIM_MUX_EN` drives the base through 10 kOhm; 100 kOhm from base to emitter holds Q3 off during MCU reset.
 - The emitter is connected to `GND_MODEM`.
 - The collector drives `U13_EN_N`. With Q3 off, the 47 kOhm pull-up makes U13 EN HIGH and all paths High-Z.
@@ -65,6 +76,12 @@ This inversion preserves the active-HIGH meaning of the existing MCU net and pre
 ## U14, U15, J6, and J7
 
 U14 protects J6 and U15 protects J7. Each exact `ESDALC6V1-5P6` uses pin 2 as the low-inductance `GND_MODEM` return and the other five pins for VDD, RST, CLK, DATA, and card detect. The device is rated -40 to +125 C, has 5 V reverse standoff, 70 nA maximum leakage at 3 V, 15 pF maximum capacitance, and IEC 61000-4-2 ratings of 8 kV contact and 15 kV air discharge.
+
+The project-local `ST_ESDALC6V1-5P6_SOT666` footprint follows Rev 3
+Figure 14: six rectangular 0.30 x 0.99 mm manufacturer lands at 0.50 mm
+pitch, with a 0.62 mm inner gap and 2.60 mm outer span. It is rotated into
+the established board orientation without changing pins 1 through 6. ST does
+not specify mask or stencil geometry in that figure; both remain DFM controls.
 
 J6 and J7 are identical TE `2336582-1` push-push 4FF sockets. Each electrical contact map is:
 

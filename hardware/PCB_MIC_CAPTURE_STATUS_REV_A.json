@@ -1,0 +1,395 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-MIC",
+  "release_state": "REVIEW_A_PASS",
+  "manufacturing_release": false,
+  "authoritative_inputs": [
+    "hardware/kicad/REV_A_CAPTURE_ADDENDUM_001_ENV_MIC.md",
+    "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
+    "hardware/T5838_AAD_INTERFACE_REV_A.md",
+    "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+    "hardware/CONNECTOR_FREEZE_REV_A.csv",
+    "hardware/EVT_PRE_20_BOM_REV_A.csv"
+  ],
+  "native_source": {
+    "schematic": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch",
+    "board": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
+    "project": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pro",
+    "fabrication_metadata": "hardware/kicad/native/PCB-MIC/fabrication_metadata.json",
+    "independent_schematic_audit": "artifacts/pcb_mic_native_schematic_rev_a.json",
+    "independent_geometry_audit": "tools/audit_pcb_mic_review_a_geometry_rev_a.py",
+    "ci_geometry_evidence": [
+      "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
+      "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
+      "artifacts/kicad-native/PCB-MIC/committed_native_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/committed_molex_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/committed_mechanical_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/materialized_native_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/materialized_molex_geometry_pcbnew.txt",
+      "artifacts/kicad-native/PCB-MIC/materialized_mechanical_geometry_pcbnew.txt"
+    ],
+    "ci_erc_evidence": [
+      "artifacts/kicad-native/PCB-MIC/erc.json",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_schematic.pdf",
+      "artifacts/kicad-native/sha256_manifest.json"
+    ],
+    "ci_review_b_preflight_evidence": [
+      "artifacts/kicad-native/PCB-MIC/review_b_preflight_audit.json",
+      "artifacts/kicad-native/PCB-MIC/cam_source_transform.json",
+      "artifacts/kicad-native/PCB-MIC/gerber/PCB-MIC-job.gbrjob",
+      "artifacts/kicad-native/PCB-MIC/drill/PCB-MIC.drl",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC.d356",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_pos.csv",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_manufacturing_bom.csv",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_assembly_fabrication.pdf",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_F_Cu_review.svg",
+      "artifacts/kicad-native/PCB-MIC/PCB-MIC_B_Cu_review.svg",
+      "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
+      "artifacts/kicad-native/sha256_manifest.json"
+    ],
+    "manufacturing_handoff_evidence": [
+      "artifacts/pcb_mic_manufacturing_handoff_rev_a.json",
+      "artifacts/kicad-native/PCB-MIC/manufacturing_handoff_audit.json",
+      "artifacts/kicad-native/PCB-MIC/manufacturing-handoff/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.md",
+      "artifacts/kicad-native/PCB-MIC/manufacturing-handoff/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json",
+      "artifacts/kicad-native/PCB-MIC/manufacturing-handoff/PCB_MIC_DFM_RESPONSE_REV_A.csv"
+    ],
+    "routing_status": "EXPLICIT_LOCAL_RETURN_REVIEW_A_SIGNED_REVIEW_B_OPEN"
+  },
+  "component_contract": {
+    "microphone": "TDK InvenSense MMICT5838-00-012",
+    "connector": "Molex 5040500691",
+    "decoupling": "TDK CGA2B3X7R1E104K050BB",
+    "data_tuning_resistor": "Panasonic ERJ-2GE0R00X",
+    "boards_per_station": 4
+  },
+  "mechanical_contract": {
+    "outline_mm": [24.0, 22.0],
+    "thickness_mm": 1.0,
+    "mounting_holes": "H1/H2 NPTH 2.2 mm at X4/X20 Y16.65",
+    "acoustic_port": "NPTH 0.8 mm at X12 Y16.65",
+    "authority": "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
+    "status": "DIM_004_CLOSED"
+  },
+  "review_a": {
+    "complete": true,
+    "status": "PASS",
+    "checklist": "hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
+    "structural_audit_status": "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
+    "geometry_audit_status": "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
+    "reviewer": "Скиф",
+    "date": "2026-09-14",
+    "commit_sha": "e17a86bc78ba979f74c5549b378e94f7f3447fe4",
+    "approval_scope": "REPEAT_PCB_MIC_REVIEW_A_AFTER_COPPER_ECO",
+    "approved_native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+    "evidence": {
+      "reviewed_commit_sha": "e17a86bc78ba979f74c5549b378e94f7f3447fe4",
+      "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+      "signed_checklist": "hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
+      "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34851983013",
+      "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34851982915",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34851983013/artifacts/10350269024",
+      "artifact_id": 10350269024,
+      "artifact_digest": "sha256:c54b6669b40fa4de3cd3b0515e4bdb742d90f4ab6f40a789eb1f7bb82dfd19ba",
+      "schematic_pdf": "artifacts/kicad-native/PCB-MIC/PCB-MIC_schematic.pdf",
+      "erc_report": "artifacts/kicad-native/PCB-MIC/erc.json",
+      "drc_report": "artifacts/kicad-native/PCB-MIC/drc.json",
+      "committed_geometry_audit": "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
+      "materialized_geometry_audit": "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
+      "review_b_preflight_audit": "artifacts/kicad-native/PCB-MIC/review_b_preflight_audit.json",
+      "review_b_preflight_audit_sha256": "c499522d06325b55629231901216774744390d7df15ddd7c85a58b0970ddfa80",
+      "copper_return_audit": "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
+      "copper_return_audit_sha256": "68ca43f851b7a98b1519bffe7f6de1cada0e0d17902d17bbd99bd05584724c10",
+      "copper_review_svg_sha256": {
+        "F.Cu": "fb5299746e8c6cc75bd71dd5915b05eae81e577aea1ac0b16d6262546143fe95",
+        "B.Cu": "66dc3609592146848e5f61cbd3a8a03ac56df8c3bb844164091cd6b9e195b901"
+      },
+      "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json",
+      "sha256_manifest_sha256": "6a7e59c2fa840f005d69863589829f8ee516f394fc11d4e0251545efe53ee4b8",
+      "archive_verification": {
+        "sha256_manifest_entries_verified": 62,
+        "controlled_source_hashes_verified": 12,
+        "pcb_mic_output_hashes_verified": 27,
+        "artifact_zip_sha256_verified": true,
+        "regenerated_preflight_byte_identical": true,
+        "regenerated_copper_audit_byte_identical": true
+      }
+    },
+    "superseded_signature": {
+      "status": "SUPERSEDED_BY_COPPER_ECO_BOARD_BYTE_CHANGE",
+      "reviewer": "Скиф",
+      "date": "2026-09-14",
+      "commit_sha": "3e215e26e0d4cb160b309de3d3fd5a3145a756bf",
+      "board_sha256": "aecd1a374b5f66d32a5ae056eb4ad452d68e2a2391e65f6068acc8cad37f2295"
+    },
+    "superseded_evidence": {
+      "signed_checklist_snapshot_commit": "ac124df132a911a2326c678d2ccebf37804c2444",
+      "signed_checklist": "ac124df132a911a2326c678d2ccebf37804c2444:hardware/reviews/PCB_MIC_REVIEW_A_CHECKLIST_REV_A.md",
+      "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34823813170",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34823813170/artifacts/10339034239",
+      "schematic_pdf": "artifacts/kicad-native/PCB-MIC/PCB-MIC_schematic.pdf",
+      "erc_report": "artifacts/kicad-native/PCB-MIC/erc.json",
+      "committed_geometry_audit": "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
+      "materialized_geometry_audit": "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
+      "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json"
+    },
+    "required_evidence": {
+      "status": "PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A",
+      "design_commit_sha": "159068f2743904fc366a4a65ede5fee829797ed2",
+      "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+      "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515",
+      "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294478",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34850294515/artifacts/10350416547",
+      "artifact_id": 10350416547,
+      "artifact_digest": "sha256:cc32b9f7327d9c1c8870c68f70419f96aa83b412973b2d7cde9ded711fb9f31d",
+      "kicad_cli": {
+        "version": "9.0.9",
+        "erc_violations": 0,
+        "drc_violations": 0,
+        "unrouted_items": 0,
+        "schematic_parity_items": 0
+      },
+      "archive_verification": {
+        "sha256_manifest_entries_verified": 62,
+        "controlled_source_hashes_verified": 12,
+        "pcb_mic_output_hashes_verified": 27,
+        "artifact_zip_sha256_verified": true,
+        "regenerated_preflight_byte_identical": true
+      },
+      "committed_geometry_audit": "artifacts/kicad-native/PCB-MIC/committed_review_a_geometry_audit.json",
+      "materialized_geometry_audit": "artifacts/kicad-native/PCB-MIC/materialized_review_a_geometry_audit.json",
+      "erc_report": "artifacts/kicad-native/PCB-MIC/erc.json",
+      "drc_report": "artifacts/kicad-native/PCB-MIC/drc.json",
+      "copper_return_audit": "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
+      "copper_return_audit_sha256": "05fd68dcfe1f7f65df306e30772ffb253ee4f0cb5b56df00e03020d9e4d1c6b9",
+      "review_b_preflight_audit": "artifacts/kicad-native/PCB-MIC/review_b_preflight_audit.json",
+      "review_b_preflight_audit_sha256": "5b5b392aa2c16c731d51a04531d82205e2bb83e12d73b43e8dacf58c647502b6",
+      "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json",
+      "sha256_manifest_sha256": "b60faa4ad917af0ceaa137fe7f5ca9447e01226420c1ca0f8fdba4d2c3e98aa8"
+    }
+  },
+  "review_b": {
+    "complete": false,
+    "status": "OPEN_REMAINING_REVIEW_B_GATES_AFTER_COPPER_RETURN_ACCEPTANCE",
+    "checklist": "hardware/reviews/PCB_MIC_REVIEW_B_CHECKLIST_REV_A.md",
+    "reviewer": null,
+    "date": null,
+    "commit_sha": null,
+    "copper_return_gate": {
+      "complete": true,
+      "status": "PASS_ACCEPT_COPPER_RETURN_REVIEW_B_REMAINS_OPEN",
+      "packet": "hardware/reviews/PCB_MIC_REVIEW_B_COPPER_RETURN_REV_A.md",
+      "audit": "artifacts/kicad-native/PCB-MIC/copper_return_review_audit.json",
+      "drawings": [
+        "artifacts/kicad-native/PCB-MIC/PCB-MIC_F_Cu_review.svg",
+        "artifacts/kicad-native/PCB-MIC/PCB-MIC_B_Cu_review.svg"
+      ],
+      "commit_bound_ci_status": "PASS_SIGNED_STATE_COMMIT_BOUND_CI_AND_HUMAN_ACCEPTANCE_RECORDED",
+      "commit_bound_evidence": {
+        "design_commit_sha": "159068f2743904fc366a4a65ede5fee829797ed2",
+        "review_a_reviewed_commit_sha": "e17a86bc78ba979f74c5549b378e94f7f3447fe4",
+        "signed_state_evidence_commit_sha": "7aeec13aa0c7ba1b3cd9095b800c6d08755912a3",
+        "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+        "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892890",
+        "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892866",
+        "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892890/artifacts/10360925100",
+        "artifact_id": 10360925100,
+        "artifact_digest": "sha256:1986effdd10fdef86d97ffecb139dd7beea13ff699adeff8f481440e74630321",
+        "sha256_manifest_entries_verified": 62,
+        "source_hashes_verified": 12,
+        "pcb_mic_output_hashes_verified": 27,
+        "sha256_manifest_sha256": "696fc45c6982c45780912e2e310882e21d863ff3624d6b2304b74b03a4b7e635",
+        "review_b_preflight_audit_sha256": "48eb46975dfb5d474332aed3348eb48a001e6d828eb451316673cd1c9e584173",
+        "copper_return_audit_sha256": "1641b5eb173698febd57b074d6e2f9dfc85418dadbdae6ca5e59e67e500befd7",
+        "copper_review_svg_sha256": {
+          "F.Cu": "5e4116ccb976c16d610fbf0d4dc0488836e7b5f91157bdb6560fd55c259f4994",
+          "B.Cu": "3967d710d9523a33bd513ce7bef4799289ddbecda6d2663deedfce7a3cef1f07"
+        },
+        "drawing_control": "PASS_BOARD_SIZED_ZOOMABLE_LAYER_DRAWINGS",
+        "kicad_version": "9.0.9",
+        "erc_violations": 0,
+        "drc_violations": 0,
+        "unrouted_items": 0,
+        "review_a_complete": true,
+        "review_b_complete": false,
+        "manufacturing_release": false
+      },
+      "acceptance_state_evidence": {
+        "evidence_commit_sha": "8aa4a3d21b55956625db643e22436f248f75b258",
+        "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+        "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34878120514",
+        "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34878120579",
+        "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34878120514/artifacts/10361911939",
+        "artifact_id": 10361911939,
+        "artifact_digest": "sha256:960f84ff068ddf881f01008a6844bfbbf7ed8b7f3e1720b73e6dadae11ee863e",
+        "sha256_manifest_entries_verified": 62,
+        "source_hashes_verified": 12,
+        "pcb_mic_output_hashes_verified": 27,
+        "sha256_manifest_sha256": "9f8e9c59d60970419370eeb29c2a9d4bb9549a43d2e8a1ea2db28ce482950e59",
+        "review_b_preflight_audit_sha256": "808779c6957ed8599d5226a94c48a54991806264392509fa1938b48f27056de6",
+        "copper_return_audit_sha256": "9fee77cc7ac5f697f32234072cdc74a2e7c9cda5ccd954bd53ed64ea386e6ab0",
+        "copper_review_svg_sha256": {
+          "F.Cu": "a77ce3b8b3cf09f771284acd68c3accc9b9744e5720af8447927fa128c4e0cc1",
+          "B.Cu": "0020c178abf814ec712cd40bb7dfd7e1e30db928ae6ad373153649b8905830ac"
+        },
+        "review_b_preflight_status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
+        "copper_return_disposition": "PASS_HUMAN_ACCEPTED_COPPER_RETURN_SUBGATE_REVIEW_B_REMAINS_OPEN",
+        "drawing_control": "PASS_BOARD_SIZED_ZOOMABLE_LAYER_DRAWINGS",
+        "kicad_version": "9.0.9",
+        "erc_violations": 0,
+        "drc_violations": 0,
+        "unrouted_items": 0,
+        "copper_return_gate_complete": true,
+        "review_b_complete": false,
+        "manufacturing_release": false
+      },
+      "baseline_commit_bound_evidence": {
+        "evidence_commit_sha": "cb69c0bbc1457b498ee4f44ee7da1d566033c23f",
+        "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015",
+        "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840245983",
+        "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015/artifacts/10345408977",
+        "artifact_id": 10345408977,
+        "artifact_digest": "sha256:f535c183a3feda6b4e2d38a636987b30aacaa0767103bec39379fbf042d95664",
+        "sha256_manifest_entries_verified": 62,
+        "source_hashes_verified": 10,
+        "pcb_mic_output_hashes_verified": 27,
+        "review_b_preflight_audit_sha256": "b509f8f87a556eecf5e2b5fe7ad81cc1f461780d89233933da75976e8af94bd4",
+        "copper_return_audit_sha256": "c59e21ae758939f9890704a05135166135e96fd646169ee77fbf0966a83af879",
+        "copper_review_svg_sha256": {
+          "F.Cu": "2c06fac7e7a52b394cc7376aabaff1b36b75646d39477cf93bfd66998ec8d951",
+          "B.Cu": "c50281869520748c37b2f3251f30d03ff95cdcb3fef69a66b4a373e8284c86b0"
+        },
+        "drawing_control": "PASS_BOARD_SIZED_ZOOMABLE_LAYER_DRAWINGS",
+        "review_b_complete": false,
+        "manufacturing_release": false
+      },
+      "baseline_cam_evidence": {
+        "evidence_commit_sha": "7d7776e67001c0cff00643f524ceff9d0f0536af",
+        "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34835113074",
+        "artifact_id": 10343758832,
+        "artifact_digest": "sha256:2867ce92728a8f7c490f4856155a1ceb987b92e47165c1c8627ace57030cffd8"
+      },
+      "baseline_machine_measurement": {
+        "c1_to_mk1_vdd_trace_length_mm": 1.658011,
+        "c1_to_mk1_ground_return_trace_length_mm": 22.248973,
+        "decoupling_loop_trace_length_mm": 23.906984,
+        "source_zone_cached_filled_polygons": 0,
+        "baseline_cam_gnd_regions": 0
+      },
+      "eco_candidate_design": {
+        "route": "DIRECT_BCU_C1_RETURN_VIA_TO_MIC_RETURN_VIA",
+        "local_bcu_segment_length_mm": 3.409178,
+        "c1_to_mk1_ground_return_trace_length_mm": 7.10815,
+        "decoupling_loop_trace_length_mm": 8.766161,
+        "ground_return_vias": 2,
+        "source_bcu_ground_zones": 0,
+        "manufacturing_copper_model": "EXPLICIT_ROUTING_ONLY",
+        "evidence_status": "PASS_COPPER_RETURN_SUBGATE_ACCEPTED_REVIEW_B_REMAINS_OPEN"
+      },
+      "repeat_review_a_approval": {
+        "reviewer": "Скиф",
+        "date": "2026-09-14",
+        "reviewed_commit_sha": "e17a86bc78ba979f74c5549b378e94f7f3447fe4",
+        "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+        "decision": "PASS"
+      },
+      "initial_eco_decision": {
+        "reviewer": "Скиф",
+        "date": "2026-09-14",
+        "reviewed_commit_sha": "cb69c0bbc1457b498ee4f44ee7da1d566033c23f",
+        "decision": "ECO_REQUIRED",
+        "decision_evidence_commit_sha": "cb69c0bbc1457b498ee4f44ee7da1d566033c23f"
+      },
+      "current_review_b_decision": {
+        "status": "ACCEPTED_INDEPENDENT_HUMAN_REVIEW",
+        "approval_scope": "PCB_MIC_REVIEW_B_COPPER_RETURN_SUBGATE_ONLY",
+        "engineering_recommendation": "ACCEPT_COPPER_RETURN_SUBGATE",
+        "basis": [
+          "explicit 0.50 mm B.Cu local return segment",
+          "C1.2-to-MK1.2 return reduced from 22.248973 mm to 7.108150 mm",
+          "decoupling loop reduced from 23.906984 mm to 8.766161 mm",
+          "minimum other-net B.Cu copper-edge clearance 0.802865 mm versus 0.2 mm rule",
+          "KiCad 9.0.9 ERC/DRC/unrouted/schematic-parity counts all zero",
+          "commit-bound explicit-routing-only CAM and signed Review-A source continuity"
+        ],
+        "reviewer": "Скиф",
+        "date": "2026-09-14",
+        "reviewed_commit_sha": "7aeec13aa0c7ba1b3cd9095b800c6d08755912a3",
+        "native_board_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+        "decision": "ACCEPT_COPPER_RETURN"
+      },
+      "reviewer": "Скиф",
+      "date": "2026-09-14",
+      "commit_sha": "7aeec13aa0c7ba1b3cd9095b800c6d08755912a3",
+      "decision": "ACCEPT_COPPER_RETURN",
+      "decision_evidence_commit_sha": "7aeec13aa0c7ba1b3cd9095b800c6d08755912a3",
+      "review_b_complete": false,
+      "manufacturing_release": false
+    },
+    "internal_preflight": {
+      "complete": true,
+      "status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
+      "archived_report_status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
+      "evidence_role": "COPPER_RETURN_DECISION_INPUT_REVIEW_B_OPEN",
+      "evidence_commit_sha": "7aeec13aa0c7ba1b3cd9095b800c6d08755912a3",
+      "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892890",
+      "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892866",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34873892890/artifacts/10360925100",
+      "artifact_id": 10360925100,
+      "artifact_digest": "sha256:1986effdd10fdef86d97ffecb139dd7beea13ff699adeff8f481440e74630321",
+      "audit": "artifacts/kicad-native/PCB-MIC/review_b_preflight_audit.json",
+      "audit_sha256": "48eb46975dfb5d474332aed3348eb48a001e6d828eb451316673cd1c9e584173",
+      "sha256_manifest": "artifacts/kicad-native/sha256_manifest.json",
+      "sha256_manifest_sha256": "696fc45c6982c45780912e2e310882e21d863ff3624d6b2304b74b03a4b7e635",
+      "sha256_manifest_entries": 62,
+      "source_hashes_verified": 12,
+      "pcb_mic_output_hashes_verified": 27,
+      "kicad_cli": {
+        "version": "9.0.9",
+        "erc_violations": 0,
+        "drc_violations": 0,
+        "unrouted_items": 0
+      },
+      "cam_source": {
+        "source_sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+        "derived_source_sha256": "0f2fb434731b969f241701aecf02fab4c18771580b8c6fe2a79f85dbcecad443",
+        "design_geometry_modified": false
+      },
+      "superseded_baseline_evidence": {
+        "status": "PASS_INTERNAL_CAM_PREFLIGHT_REVIEW_B_REMAINS_OPEN",
+        "evidence_commit_sha": "cb69c0bbc1457b498ee4f44ee7da1d566033c23f",
+        "workflow_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/34840246015",
+        "artifact_id": 10345408977,
+        "artifact_digest": "sha256:f535c183a3feda6b4e2d38a636987b30aacaa0767103bec39379fbf042d95664"
+      },
+      "review_b_complete": false,
+      "manufacturing_release": false
+    },
+    "manufacturing_handoff": {
+      "complete": false,
+      "status": "PACKET_READY_EXTERNAL_ACCEPTANCE_REQUIRED",
+      "internal_packet_complete": true,
+      "packet": "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.md",
+      "machine_contract": "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json",
+      "response_register": "hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv",
+      "audit": "artifacts/pcb_mic_manufacturing_handoff_rev_a.json",
+      "fabricator_dfm_acceptance": false,
+      "assembler_dfm_acceptance": false,
+      "panelization_acceptance": false,
+      "depanel_acceptance": false,
+      "assembler_process_keepout_acceptance": false,
+      "review_b_complete": false,
+      "manufacturing_release": false
+    }
+  },
+  "physical_evt": {
+    "status": "NOT_RUN",
+    "required_evidence": [
+      "assembled acoustic-port inspection",
+      "membrane and cavity tolerance stack",
+      "per-board sensitivity noise phase and delay calibration",
+      "panelization and depanel damage inspection"
+    ]
+  }
+}

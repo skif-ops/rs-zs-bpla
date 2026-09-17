@@ -10,4 +10,5 @@ void zs_cbor_uint(zs_cbor_t *c, uint64_t v);
 void zs_cbor_int(zs_cbor_t *c, int64_t v);
 void zs_cbor_bool(zs_cbor_t *c, bool v);
 void zs_cbor_bytes(zs_cbor_t *c, const void *data, size_t n);
+void zs_cbor_text(zs_cbor_t *c, const char *text);
 #endif

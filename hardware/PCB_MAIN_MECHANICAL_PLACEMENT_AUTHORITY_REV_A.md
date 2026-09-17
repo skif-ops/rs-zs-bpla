@@ -1,12 +1,32 @@
 # PCB-MAIN mechanical and placement authority - EVT-PRE-20 Rev.A
 
-Status: `MECHANICAL_PLACEMENT_AUTHORITY_PASS / PCB REVIEW A NOT STARTED / NOT FOR MANUFACTURE`
+Status: `MECHANICAL_PLACEMENT_AUTHORITY_PASS / LIMITED ECO APPLIED / PCB REVIEW B OPEN / NOT FOR MANUFACTURE`
 
 This record closes `MAIN-AUTH-011`. It freezes the PCB-MAIN outline, mounting pattern, connector/card access directions, RF and quiet-zone allocations, BLE and enclosure keepouts, module zone anchors, and every production pogo-pad coordinate needed to begin native Rev.A capture and layout. It does not assert that a native schematic or board exists, that the assembly fits a released enclosure, or that Review A, Review B, RF validation, fixture MSA, environmental tests, or any physical test has passed.
 
 Machine authority: `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv`.
 
-Authority CSV SHA-256: `2ea8da3b8469f616c469eb342127afd2e75b3b0ad04f3ab75154560211f353c9`.
+Authority CSV SHA-256: `6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44`.
+
+## Accepted limited mechanical ECO
+
+`PCB-MAIN-MECH-ECO-001` was accepted by reviewer `Скиф` on `15.09.2026`
+with decision `ACCEPT_LIMITED_MECHANICAL_ECO`. The decision is bound to commit
+`61cbe796de2f87560342a44b063ff6283a8ce1e8` and candidate SHA-256
+`5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1`.
+The machine-readable signature is
+`hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPROVAL_REV_A.json`.
+
+The accepted delta changes only nine records: J_PWR Y to 15.00 mm, J_MIC1 Y
+to 42.50 mm, J8 and J10 Y to 71.50 mm, J13 Y to 15.00 mm, U8 Y to 52.00 mm,
+ZONE_CELL to Y 34.00 mm and height 40.00 mm, ZONE_LORA height to 28.00 mm,
+and KO_MIC1_HARNESS to Y 37.50 mm with width 10.00 mm. All X coordinates,
+rotations, board outline, mounting holes, electrical connectivity and every
+other MAIN-AUTH-011 field remain unchanged.
+
+This ECO clears the six locked-authority geometry conflicts. It does not
+complete placement, routing, DRC, enclosure validation, Review B or
+manufacturing release.
 
 The authority contains 70 records: one board outline, one assembled-envelope allocation, four mounting holes, thirteen connector placements, four RF-module anchors, four exclusive RF zones, one audio/digital quiet zone, seven keepouts/cable corridors, one bottom fixture window, three fixture fiducials, and 31 individual pogo pads. Every record uses the PCB coordinate system defined below and is independently checked by `tools/verify_pcb_main_mechanical_placement_authority_rev_a.py`.
 
@@ -71,6 +91,13 @@ The fixture must not source `3V3_DIGITAL`, `3V8_MODEM`, `1V8_MIC`, `U8_VDD_EXT_1
 
 ## Review and release boundary
 
-Closing `MAIN-AUTH-011` completes the controlled pre-schematic input set. Native `PCB-MAIN.kicad_sch` and `PCB-MAIN.kicad_pcb` are still absent, so Review A remains blocked by the absent schematic and Review B remains blocked by Review A. The 110 x 75 x 12 mm envelope is a locked capture allocation, but `mechanics/common/OPEN_DIMENSIONS.csv` keeps the enclosure interface in `CONTROLLED_PENDING_NATIVE_STEP` until the generated STEP and service sweeps are checked.
+Closing `MAIN-AUTH-011` completes the controlled pre-schematic input set. Native
+`PCB-MAIN.kicad_sch` is present, independently net-audited, passes KiCad 9 ERC
+with zero violations and has signed Review A. Native `PCB-MAIN.kicad_pcb` is
+present as an unrouted placement candidate, so Review B remains blocked by
+routing, DRC, DFM and physical evidence. The 110 x 75 x 12 mm envelope is a
+locked capture allocation, but `mechanics/common/OPEN_DIMENSIONS.csv` keeps the
+enclosure interface in `CONTROLLED_PENDING_NATIVE_STEP` until the generated STEP
+and service sweeps are checked.
 
-All physical tests remain `NOT RUN`. No RF tuning, BLE range, GNSS sensitivity, modem burst margin, fixture MSA, insertion/pull, enclosure fit, IP, thermal, vibration, or environmental result is inferred. Production Gerbers, the production BOM and any `FOR_MANUFACTURE` state remain blocked by native capture and the two independent PCB reviews.
+All physical tests remain `NOT RUN`. No RF tuning, BLE range, GNSS sensitivity, modem burst margin, fixture MSA, insertion/pull, enclosure fit, IP, thermal, vibration, or environmental result is inferred. Production Gerbers, the production BOM and any `FOR_MANUFACTURE` state remain blocked by incomplete placement and routing, strict DRC/CAM/DFM evidence, native STEP review, independent PCB-MAIN Review B and physical EVT.

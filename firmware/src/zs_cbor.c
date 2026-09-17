@@ -9,3 +9,4 @@ void zs_cbor_uint(zs_cbor_t*c,uint64_t v){major(c,0,v);}
 void zs_cbor_int(zs_cbor_t*c,int64_t v){if(v>=0)major(c,0,(uint64_t)v);else major(c,1,(uint64_t)(-1-v));}
 void zs_cbor_bool(zs_cbor_t*c,bool v){uint8_t b=(uint8_t)(v?0xf5:0xf4);put(c,&b,1);}
 void zs_cbor_bytes(zs_cbor_t*c,const void*d,size_t n){major(c,2,n);put(c,d,n);}
+void zs_cbor_text(zs_cbor_t*c,const char*text){size_t n;if(!text){c->error=true;return;}n=strlen(text);major(c,3,n);put(c,text,n);}

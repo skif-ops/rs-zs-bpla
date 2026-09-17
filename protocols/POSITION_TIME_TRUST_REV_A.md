@@ -1,6 +1,6 @@
 # EVT-PRE-20 Rev.A — доверенные координаты установки и GNSS integrity
 
-Статус: `LOCKED ARCHITECTURE / IMPLEMENTATION IN PROGRESS`
+Статус: `LOCKED ARCHITECTURE / PORTABLE STORE+BLE GUARD IMPLEMENTED / FLASH+NRF GATT BINDING OPEN`
 
 Основание: `DEC-018`.
 
@@ -97,6 +97,73 @@ GNSS observed position передаётся только как diagnostic/integ
 10. Экспорт commissioning record с serial, координатами, источником, точностью, временем, версиями HW/FW/app и hash конфигурации.
 
 Повторное изменение координат допускается только после нового физического service mode и авторизованной роли. Оно создаёт отдельную audit запись и переводит станцию в `REVALIDATION_REQUIRED` до завершения self-test.
+
+### 6.1 Атомарное хранение на станции
+
+Portable firmware сохраняет запись в двух чередующихся слотах по 96 байт. Новая
+версия сначала записывается в стёртый неактивный слот с generation и CRC32, а
+commit-marker записывается последней операцией. После записи выполняются полный
+read-back, CRC и сравнение полей. При сбое питания до commit-marker предыдущий
+слот остаётся авторитетным.
+
+Storage format `2` требует не просто ненулевой commissioning hash, а точное
+совпадение со станционным каноническим SHA-256. Предыдущий host-only format `1`
+не мигрируется и отклоняется; серийных/EVT-станций с ним ещё не создавалось.
+
+Первая запись и recommission разрешены только при одновременно активном
+физическом service mode и подтверждённой локальной роли. Для locked-записи
+recommission должен быть указан явно, а `version` обязан монотонно увеличиваться.
+Нулевой commissioning hash и невалидные координаты/thresholds отклоняются до
+операции erase.
+
+CRC не заменяет BLE Secure Connections, авторизацию роли или commissioning
+hash. Текущий модуль задаёт переносимый формат и power-loss-safe алгоритм;
+STM32 Flash binding, адреса страниц, endurance и fault-injection на целевой плате
+остаются открытыми до target port и аппаратного EVT.
+
+### 6.2 Portable BLE commissioning guard
+
+Перед storage-модулем добавлена transport-independent граница, предназначенная
+для будущей привязки nRF52840 GATT к STM32. Она отклоняет MQTT/HTTPS origin,
+требует BLE Secure Connections, проверенного peer, авторизованной роли,
+физического service mode и возраста окна не более 600000 ms. Настройки trust,
+отличные от defaults 25/75/250 m и 3/10 fixes, доступны только engineer-роли.
+
+Приложение не назначает доверенный hash. Станция вычисляет SHA-256 по 58-байтной
+канонической big-endian записи с domain `ZS-INSTALLATION-V1`; storage generation
+и само поле hash в digest не входят. Audit intent обязан сохраниться до erase,
+после atomic commit выполняются load/read-back, повторная проверка hash и audit
+committed. Если audit finalize не подтверждён после уже выполненной записи,
+возвращается отдельное состояние, и FIELD_READY остаётся запрещённым.
+
+| Offset | Bytes | Поле |
+|---:|---:|---|
+| 0 | 18 | ASCII `ZS-INSTALLATION-V1` |
+| 18 | 1 | canonical hash format `1` |
+| 19 | 1 | configured = `1` |
+| 20 | 1 | locked = `1` |
+| 21 | 1 | source: manual `0`, phone `1`, station GNSS `2`, surveyed `3` |
+| 22 | 1 | altitude source = configured MSL `1` |
+| 23 | 1 | position source = configured install `1` |
+| 24 | 4 | configuration version, unsigned big-endian |
+| 28 | 4 | lat_e7, signed two's-complement big-endian |
+| 32 | 4 | lon_e7, signed two's-complement big-endian |
+| 36 | 4 | alt_dm, signed two's-complement big-endian |
+| 40 | 2 | accuracy_m, unsigned big-endian |
+| 42 | 2 | warning distance, unsigned big-endian |
+| 44 | 2 | suspect distance, unsigned big-endian |
+| 46 | 2 | gross-jump distance, unsigned big-endian |
+| 48 | 1 | warning consecutive fixes |
+| 49 | 1 | suspect consecutive fixes |
+| 50 | 8 | commissioned_time_us, unsigned big-endian |
+
+Operation initial/recommission, storage generation, audit phase and digest bytes
+не входят в эти 58 bytes. Они проверяются отдельно соответствующим state/store
+контрактом.
+
+Portable guard не подтверждает UUID/MTU, nRF52840 firmware, UART binding,
+реальный service-mode timer или durable audit storage. Эти части и аппаратное
+fault injection остаются открытыми.
 
 ## 7. BLE configuration objects
 

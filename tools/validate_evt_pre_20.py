@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import csv
+import json
+import re
 from pathlib import Path
 
 
@@ -23,49 +25,43 @@ def require(condition: bool, message: str) -> None:
 
 
 def validate_csv_shapes() -> None:
-    roots = (
-        ROOT / "android",
-        ROOT / "config",
-        ROOT / "docs",
-        ROOT / "hardware",
-        ROOT / "manufacturing",
-        ROOT / "mechanics",
-        ROOT / "protocols",
-        ROOT / "tests",
-    )
-    paths = sorted(path for root in roots for path in root.rglob("*.csv"))
-    for path in paths:
-        relative = path.relative_to(ROOT)
-        if relative.parts[:2] in (("docs", "evt-mb"), ("hardware", "evt-mb")):
+    for path in sorted(ROOT.rglob("*.csv")):
+        # Integration branches retain EVT-MB evidence under an isolated scope;
+        # that line has its own manifests and validation contract.
+        if "evt-mb" in path.parts:
             continue
         with path.open(encoding="utf-8-sig", newline="") as source:
             rows = list(csv.reader(source))
-        require(bool(rows), f"empty CSV: {relative}")
+        require(bool(rows), f"empty CSV: {path.relative_to(ROOT)}")
         width = len(rows[0])
         for line_number, row in enumerate(rows[1:], start=2):
             require(
                 len(row) == width,
-                f"CSV width mismatch: {relative}:{line_number}",
+                f"CSV width mismatch: {path.relative_to(ROOT)}:{line_number}",
             )
 
 
 def validate_lot() -> None:
     lot = read_csv("manufacturing/LOT_SERIAL_REGISTER.csv")
-    require([row["Serial"] for row in lot] == EXPECTED_SERIALS, "lot serial range mismatch")
-    require(len({row["Serial"] for row in lot}) == 20, "lot serials are not unique")
+    require([row["Serial"] for row in lot] == EXPECTED_SERIALS, "maximum-capacity serial range mismatch")
+    require(len({row["Serial"] for row in lot}) == 20, "reserved serials are not unique")
     require(
         all(row["Housing_Technology"] == "VACUUM_CASTING_PRIMARY" for row in lot),
-        "not all 20 units use the primary vacuum-casting allocation",
+        "reserved serial capacity does not retain the primary vacuum-casting process",
+    )
+    require(
+        all(row["Status"] == "SELECTED_EVT_LOT_AWAITING_BUILD" for row in lot),
+        "selected EVT-20 serial assignment is incomplete or incorrectly released",
     )
     require(all(row["APN_Mode"] == "PUBLIC_ONLY" for row in lot), "pilot APN is not PUBLIC_ONLY")
-    require(all(row["LoRa_Profile"] == "RU868_LOCKED" for row in lot), "pilot LoRa is not RU868")
+    require(all(row["LoRa_Profile"] == "RU868_LOCKED" for row in lot), "selected-lot LoRa is not RU868")
 
     housing = read_csv("manufacturing/HOUSING_LOT_PLAN.csv")
-    require([row["Serial"] for row in housing] == EXPECTED_SERIALS, "housing serial range mismatch")
-    require(sum(int(row["Primary_Qty"]) for row in housing) == 20, "primary housing total is not 20")
+    require([row["Serial"] for row in housing] == EXPECTED_SERIALS, "housing capacity serial range mismatch")
+    require(sum(int(row["Primary_Qty"]) for row in housing) == 20, "primary housing capacity is not 20")
     require(
         sum(int(row["Fallback_Qty_if_Activated"]) for row in housing) == 20,
-        "full-lot 3D fallback total is not 20",
+        "maximum 3D fallback capacity is not 20",
     )
     require(all(row["Primary_Process"] == "VACUUM_CASTING" for row in housing), "primary process mismatch")
     require(all(row["Fallback_Process"] == "3D_PRINT" for row in housing), "fallback process mismatch")
@@ -73,36 +69,268 @@ def validate_lot() -> None:
         all(row["Injection_Molding_Scope"] == "SOURCE_DATA_AND_DFM_ONLY" for row in housing),
         "injection molding exceeds source-data-only scope",
     )
+    require(
+        all(row["Status"] == "SELECTED_EVT_LOT_PRIMARY_NOT_RELEASED" for row in housing),
+        "selected EVT-20 housing assignment is incomplete or incorrectly released",
+    )
+
+    scenarios = read_csv("manufacturing/EVT_LOT_SELECTION_REV_A.csv")
+    require([row["Station_Qty"] for row in scenarios] == ["4", "10", "20"], "EVT lot options are not 4 10 20")
+    expected_selection = {4: "NOT_SELECTED", 10: "NOT_SELECTED", 20: "SELECTED"}
+    for row in scenarios:
+        quantity = int(row["Station_Qty"])
+        require(row["Serial_Start"] == "DIO-EVT-001", f"{quantity}-station lot does not start at serial 001")
+        require(row["Serial_End"] == f"DIO-EVT-{quantity:03d}", f"{quantity}-station lot serial end mismatch")
+        require(row["BOM_Quantity_Column"] == f"Qty_{quantity}", f"{quantity}-station BOM quantity binding mismatch")
+        require(row["BOM_Procurement_Column"] == f"Procure_qty_{quantity}", f"{quantity}-station BOM procurement binding mismatch")
+        require(row["Procurement_Status"] == "RFQ_READY", f"{quantity}-station RFQ is not ready")
+        require(
+            row["Selection_Status"] == expected_selection[quantity],
+            f"{quantity}-station selection status does not match locked EVT-20 decision",
+        )
+    selected = [row for row in scenarios if row["Selection_Status"] == "SELECTED"]
+    require(len(selected) == 1 and selected[0]["Scenario_ID"] == "EVT-20", "EVT-20 is not the single selected lot")
 
 
 def validate_procurement() -> None:
-    bom = {row["Item_ID"]: row for row in read_csv("hardware/EVT_PRE_20_BOM_DRAFT.csv")}
-    require(bom["HSG-VC"]["Qty_20"] == "20", "BOM vacuum housing quantity is not 20")
-    require(bom["HSG-VC"]["Procure_qty"] == "20", "BOM vacuum procurement quantity is not 20")
-    require(bom["HSG-3D"]["Procure_qty"] == "0", "3D fallback was ordered before activation")
-    require(bom["HSG-IM"]["Procure_qty"] == "0", "injection-molding pilot hardware was ordered")
+    bom = {row["Item_ID"]: row for row in read_csv("hardware/EVT_PRE_20_BOM_REV_A.csv")}
+    for lot_size in (4, 10, 20):
+        require(
+            bom["HSG-VC"][f"Qty_{lot_size}"] == str(lot_size),
+            f"BOM vacuum housing quantity is not {lot_size} for lot {lot_size}",
+        )
+        require(
+            bom["HSG-VC"][f"Procure_qty_{lot_size}"] == str(lot_size),
+            f"BOM vacuum housing procurement quantity is not {lot_size}",
+        )
+        require(
+            bom["HSG-3D"][f"Procure_qty_{lot_size}"] == "0",
+            f"3D fallback was ordered before activation for lot {lot_size}",
+        )
+        require(
+            bom["HSG-IM"][f"Procure_qty_{lot_size}"] == "0",
+            f"injection-molding pilot hardware was ordered for lot {lot_size}",
+        )
 
     rfq = {row["RFQ_ID"]: row for row in read_csv("hardware/CHINA_PROCUREMENT_RFQ.csv")}
-    require(rfq["RFQ-017"]["Required_qty"] == "20", "vacuum-casting RFQ quantity is not 20")
-    require(rfq["RFQ-018"]["Required_qty"] == "0", "3D fallback procurement is active")
-    require(rfq["RFQ-019"]["Required_qty"] == "0", "TPA procurement is active")
+    for lot_size in (4, 10, 20):
+        require(
+            rfq["RFQ-017"][f"Required_qty_{lot_size}"] == str(lot_size),
+            f"vacuum-casting RFQ quantity is not {lot_size}",
+        )
+        require(
+            rfq["RFQ-018"][f"Required_qty_{lot_size}"] == "0",
+            f"3D fallback procurement is active for lot {lot_size}",
+        )
+        require(
+            rfq["RFQ-019"][f"Required_qty_{lot_size}"] == "0",
+            f"injection-molding procurement is active for lot {lot_size}",
+        )
+    require(rfq["RFQ-006"]["Manufacturer"] == "Raytac", "RFQ BLE manufacturer is stale")
+    require(rfq["RFQ-006"]["MPN_or_spec"] == "MDBT50Q-P1MV2", "RFQ BLE MPN is stale")
+    require(rfq["RFQ-016"]["MPN_or_spec"] == "2336582-1", "RFQ SIM connector MPN is stale")
 
 
 def validate_decisions_and_tests() -> None:
     decisions = {row["Decision_ID"]: row for row in read_csv("docs/DECISION_LOG.csv")}
-    for decision_id in ("DEC-014", "DEC-015", "DEC-016", "DEC-017", "DEC-018"):
+    for decision_id in (
+        "DEC-015", "DEC-016", "DEC-017", "DEC-018", "DEC-037", "DEC-038",
+        "DEC-039", "DEC-040", "DEC-041", "DEC-042", "DEC-045",
+    ):
         require(decisions[decision_id]["Status"] == "LOCKED", f"{decision_id} is not locked")
+    require(
+        "3e215e26e0d4cb160b309de3d3fd5a3145a756bf" in decisions["DEC-039"]["Decision"],
+        "initial PCB-MIC Review-A decision binding is missing",
+    )
+    require(
+        "cb69c0bbc1457b498ee4f44ee7da1d566033c23f" in decisions["DEC-040"]["Decision"]
+        and "ECO_REQUIRED" in decisions["DEC-040"]["Impact"],
+        "PCB-MIC baseline copper ECO decision binding is missing",
+    )
+    require(
+        "e17a86bc78ba979f74c5549b378e94f7f3447fe4" in decisions["DEC-041"]["Decision"],
+        "repeat PCB-MIC Review-A decision binding is missing",
+    )
+    require(
+        "7aeec13aa0c7ba1b3cd9095b800c6d08755912a3" in decisions["DEC-042"]["Decision"]
+        and "copper-return subgate" in decisions["DEC-042"]["Decision"],
+        "PCB-MIC copper-return acceptance binding is missing",
+    )
+    require(
+        decisions["DEC-043"]["Status"] == "IMPLEMENTED_EXTERNAL_ACCEPTANCE_PENDING",
+        "PCB-MIC manufacturing-handoff separation decision is missing",
+    )
+    require(
+        decisions["DEC-044"]["Status"] == "IMPLEMENTED_2D_CLEARANCE_PASS"
+        and "MAIN-AUTH-011" in decisions["DEC-044"]["Decision"],
+        "PCB-MAIN placement-clearance ECO decision is missing",
+    )
+    require(
+        "61cbe796de2f87560342a44b063ff6283a8ce1e8" in decisions["DEC-045"]["Decision"]
+        and "5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1"
+        in decisions["DEC-045"]["Decision"]
+        and "ACCEPT_LIMITED_MECHANICAL_ECO" in decisions["DEC-045"]["Source"],
+        "PCB-MAIN limited mechanical ECO acceptance binding is missing",
+    )
+    require(
+        decisions["DEC-046"]["Status"] == "IMPLEMENTED_2D_CLEARANCE_PASS"
+        and "225-reference manifest" in decisions["DEC-046"]["Decision"]
+        and "227 controlled courtyards" in decisions["DEC-046"]["Impact"],
+        "PCB-MAIN deterministic placement-repack decision is missing",
+    )
+    require(
+        decisions["DEC-047"]["Status"] == "IMPLEMENTED_PRE_ROUTE_CONSTRAINT_PASS"
+        and "all 186 PCB-MAIN native nets" in decisions["DEC-047"]["Decision"]
+        and "numeric RF/USB geometry" in decisions["DEC-047"]["Impact"],
+        "PCB-MAIN pre-route constraint decision is missing or over-released",
+    )
+    require(
+        decisions["DEC-048"]["Status"] == "IMPLEMENTED_TWO_FABRICATOR_RESPONSES_PENDING"
+        and "fabricator acceptance and routing authority" in decisions["DEC-048"]["Decision"]
+        and "two independent fabricators" in decisions["DEC-048"]["Impact"]
+        and "manufacturing release open" in decisions["DEC-048"]["Impact"],
+        "PCB-MAIN stackup-request/fabricator-acceptance separation decision is missing",
+    )
+    require(
+        decisions["DEC-049"]["Status"] == "IMPLEMENTED_SELECTED_ASSEMBLER_RESPONSE_PENDING"
+        and "internal assembler-request readiness" in decisions["DEC-049"]["Decision"]
+        and "bounded 14-question request" in decisions["DEC-049"]["Impact"]
+        and "paste export USB SI whole-board DFM Review B and manufacturing release open"
+        in decisions["DEC-049"]["Impact"],
+        "PCB-MAIN assembler-request/process-acceptance separation decision is missing",
+    )
+    require(
+        decisions["DEC-054"]["Status"] == "IMPLEMENTED_DIM_003_EXTERNAL_ACCEPTANCE_PENDING"
+        and "mechanical acceptance and routing authority" in decisions["DEC-054"]["Decision"]
+        and "18-row" in decisions["DEC-054"]["Impact"]
+        and "0/18" in decisions["DEC-054"]["Impact"],
+        "PCB-PWR DIM-003 request/mechanical-acceptance separation decision is missing",
+    )
+    require(
+        decisions["DEC-055"]["Status"] == "IMPLEMENTED_TWO_FABRICATOR_RESPONSES_PENDING"
+        and "fabricator acceptance and numeric power geometry"
+        in decisions["DEC-055"]["Decision"]
+        and "24-row" in decisions["DEC-055"]["Impact"]
+        and "two independent fabricators" in decisions["DEC-055"]["Impact"]
+        and "0/24" in decisions["DEC-055"]["Impact"],
+        "PCB-PWR stackup/copper request and numeric-geometry separation decision is missing",
+    )
+    require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
+    require(decisions["DEC-014"]["Status"] == "SUPERSEDED", "fixed 20-housing decision remains active")
 
     inputs = {row["Input_ID"]: row for row in read_csv("docs/OPEN_INPUTS_FOR_FREEZE.csv")}
     require(inputs["IN-004"]["Status"] == "LOCKED", "three housing source packages are not locked")
     require(inputs["IN-005"]["Status"] == "LOCKED", "housing lot allocation is not locked")
+    require("EVT-20 is selected" in inputs["IN-005"]["Required_Input"], "20-station lot input is not explicit")
 
     tests = {row["Test_ID"]: row for row in read_csv("tests/EVT_MATRIX.csv")}
-    require(tests["EVT-MECH-VC"]["Population"] == "20_of_20", "vacuum housing EVT is not 20 of 20")
+    require(
+        tests["EVT-MECH-VC"]["Population"] == "SELECTED_EVT_LOT_ALL_UNITS",
+        "vacuum housing EVT does not cover every selected-lot unit",
+    )
     require(tests["EVT-MECH-IM"]["Population"] == "Source_package_only", "TPA test scope is not source-only")
     require("reject private APN" in tests["EVT-CELL-04"]["Method"], "private APN rejection test missing")
+
+
+def validate_deliverable_register() -> None:
+    rows = read_csv("docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv")
+    ids = [row["ID"] for row in rows]
+    require(len(ids) == len(set(ids)), "deliverable register contains duplicate IDs")
+    deliverables = {row["ID"]: row for row in rows}
+    require(deliverables["CM-002"]["QG-1 полнота"] == "PASS", "selectable-lot baseline is not QG-1 PASS")
+    require(
+        deliverables["HW-M-000"]["Статус"] == "CONTROLLED_ECO_APPLIED"
+        and deliverables["HW-M-000"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-M-000"]["QG-2 техника"] == "OPEN"
+        and "controlled full repack pass strict 2D clearance"
+        in deliverables["HW-M-000"]["Критерий выпуска"],
+        "PCB-MAIN mechanical authority does not record the controlled repack clearance state",
+    )
+    require(
+        "zero provisional footprints three controlled IPC candidates"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "strict 2D placement-clearance PASS"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "explicit pre-route constraints for all 186 native nets"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "factory stackup numeric RF/USB geometry"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "Review B remain open" in deliverables["HW-M-002"]["Критерий выпуска"],
+        "PCB-MAIN deliverable still reports a stale footprint disposition",
+    )
+    require(
+        deliverables["HW-M-011"]["Статус"] == "CONTROLLED_REQUEST"
+        and deliverables["HW-M-011"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-M-011"]["QG-2 техника"] == "OPEN"
+        and "two-fabricator packet and 22-row response template"
+        in deliverables["HW-M-011"]["Критерий выпуска"]
+        and "routing and manufacture are blocked"
+        in deliverables["HW-M-011"]["Критерий выпуска"],
+        "PCB-MAIN stackup/impedance request deliverable is missing or over-released",
+    )
+    require(
+        deliverables["HW-M-012"]["Статус"] == "CONTROLLED_REQUEST"
+        and deliverables["HW-M-012"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-M-012"]["QG-2 техника"] == "OPEN"
+        and "14-row response template" in deliverables["HW-M-012"]["Критерий выпуска"]
+        and "0 accepted responses" in deliverables["HW-M-012"]["Критерий выпуска"]
+        and "paste export Review B and manufacture are blocked"
+        in deliverables["HW-M-012"]["Критерий выпуска"],
+        "PCB-MAIN assembler DFM/stencil request deliverable is missing or over-released",
+    )
+    require(
+        deliverables["HW-P-005"]["Статус"] == "CONTROLLED_REQUEST"
+        and deliverables["HW-P-005"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-P-005"]["QG-2 техника"] == "OPEN"
+        and "two-fabricator 24-row" in deliverables["HW-P-005"]["Критерий выпуска"]
+        and "0/24 rows and 0/2 fabricator sets"
+        in deliverables["HW-P-005"]["Критерий выпуска"]
+        and "numeric power geometry routing Review B and manufacture remain blocked"
+        in deliverables["HW-P-005"]["Критерий выпуска"],
+        "PCB-PWR stackup/copper request deliverable is missing or over-released",
+    )
+    require(
+        deliverables["HW-A-002"]["Статус"] == "DRAFT"
+        and deliverables["HW-A-002"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-A-002"]["QG-2 техника"] == "OPEN"
+        and "manufacturing release remain open"
+        in deliverables["HW-A-002"]["Критерий выпуска"],
+        "PCB-MIC candidate CAM deliverable state is stale or over-released",
+    )
+    require(
+        "4 10 и 20" in deliverables["PROC-001"]["Поставочный объект"]
+        and deliverables["PROC-001"]["QG-1 полнота"] == "PASS",
+        "production BOM deliverable is not bound to validated 4 10 20 quantities",
+    )
+    require(
+        deliverables["MFG-008"]["QG-1 полнота"] == "PASS",
+        "selected-lot housing plan is not QG-1 PASS",
+    )
+    risks = {row["Risk_ID"]: row for row in read_csv("docs/RISK_REGISTER.csv")}
+    require(
+        "three project IPC candidates" in risks["R-025"]["Mitigation"]
+        and "audited 186-net pre-route authority" in risks["R-025"]["Mitigation"]
+        and "two attributable fabricator stackup responses" in risks["R-025"]["Mitigation"]
+        and "all 14 selected-assembler DFM/stencil responses" in risks["R-025"]["Mitigation"]
+        and "controlled U9 zero-paste-to-process gate" in risks["R-025"]["Mitigation"]
+        and "missing one or both signed stackup responses" in risks["R-025"]["Trigger"]
+        and "guessed or unaccepted RF/USB geometry" in risks["R-025"]["Trigger"]
+        and "fewer than 14 accepted selected-assembler responses" in risks["R-025"]["Trigger"]
+        and "premature U9 paste" in risks["R-025"]["Trigger"],
+        "PCB-MAIN footprint risk still reports the superseded provisional set",
+    )
+    require(
+        "selected EVT lot" in risks["R-018"]["Mitigation"],
+        "RU868 configuration risk still assumes a fixed 20-unit build",
+    )
+    require(
+        "stackup/copper register at 0/24 and 0/2" in risks["R-027"]["Mitigation"]
+        and "fewer than 24 accepted stackup/copper responses" in risks["R-027"]["Trigger"]
+        and "fewer than 2 accepted fabricator sets" in risks["R-027"]["Trigger"],
+        "PCB-PWR stackup/copper acceptance risk is not explicit",
+    )
 
 
 def validate_pinmap() -> None:
@@ -199,6 +427,381 @@ def validate_hardware_baseline() -> None:
     require("Review A" in gate and "Review B" in gate, "double-review PCB gate is incomplete")
     require("FOR_MANUFACTURE" in gate, "PCB release state is not defined")
 
+    main_status = json.loads(
+        (ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8")
+    )
+    require(main_status["assembly"] == "PCB-MAIN", "PCB-MAIN release-status identity mismatch")
+    require(main_status["review_b"]["complete"] is False
+            and main_status["manufacturing_release"] is False,
+            "PCB-MAIN was advanced by a pre-route stackup request")
+    main_hierarchy = main_status.get("human_readable_hierarchy", {})
+    main_hierarchy_control = main_hierarchy.get("control", {})
+    require(
+        main_hierarchy.get("generator") ==
+        "tools/materialize_pcb_main_hierarchy_rev_a.py"
+        and main_hierarchy.get("connectivity_reader") ==
+        "tools/pcb_main_schematic_hierarchy.py"
+        and main_hierarchy.get("independent_audit") ==
+        "tools/audit_pcb_main_hierarchy_rev_a.py"
+        and main_hierarchy.get("review_record") ==
+        "hardware/reviews/PCB_MAIN_HIERARCHY_REVIEW_REV_A.md"
+        and main_hierarchy_control.get("state") ==
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_"
+        "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
+        and main_hierarchy_control.get("pages") == 10
+        and main_hierarchy_control.get("functional_child_sheets") == 9
+        and main_hierarchy_control.get("symbols") == 248
+        and main_hierarchy_control.get("physical_symbols") == 247
+        and main_hierarchy_control.get("logical_pad_numbers") == 1066
+        and main_hierarchy_control.get("physical_pad_occurrences") == 1077
+        and main_hierarchy_control.get("repeated_logical_pad_numbers") == 7
+        and main_hierarchy_control.get("duplicate_pad_occurrences") == 11
+        and main_hierarchy_control.get("wire_segments") == 1073
+        and main_hierarchy_control.get("connected_pin_wires") == 905
+        and main_hierarchy_control.get("explicit_nc") == 169
+        and main_hierarchy_control.get("cross_sheet_nets") == 75
+        and main_hierarchy_control.get("hierarchical_labels") == 168
+        and main_hierarchy_control.get("pin_net_semantic_sha256") ==
+        "d320bdd98712a65f9736bd520a8f9197d4f53fedb4be3b798086810e7a8f4bf6"
+        and main_hierarchy_control.get("pin_net_review_a_retained") is True,
+        "PCB-MAIN human-readable hierarchy/electrical-equivalence control has drifted",
+    )
+    require(
+        all(main_hierarchy_control.get(key) is True for key in (
+            "native_kicad_9_erc_pass",
+            "committed_erc_evidence",
+            "committed_pdf_evidence",
+            "independent_human_review_complete",
+        ))
+        and all(main_hierarchy_control.get(key) is False for key in (
+            "routing_authorized",
+            "manufacturing_release",
+        )),
+        "PCB-MAIN hierarchy evidence, review, routing or release state has drifted",
+    )
+    main_hierarchy_sources = [
+        ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch",
+        *(ROOT / "hardware/kicad/native/PCB-MAIN" /
+          f"PCB-MAIN_{index:02d}_{suffix}.kicad_sch"
+          for index, suffix in enumerate((
+              "POWER", "MCU", "AUDIO", "GNSS", "CELLULAR", "LORA", "BLE",
+              "STORAGE_SENSORS", "CONNECTORS_TEST",
+          ), start=1)),
+    ]
+    require(all(path.is_file() for path in main_hierarchy_sources),
+            "PCB-MAIN hierarchy source set is incomplete")
+    require((ROOT / main_hierarchy["review_record"]).is_file(),
+            "PCB-MAIN hierarchy review record is missing")
+    main_handoff = main_status["review_b"].get("evidence", {}).get(
+        "stackup_impedance_handoff", {}
+    )
+    require(
+        main_handoff.get("status") == "PACKET_READY_TWO_FABRICATOR_RESPONSES_REQUIRED"
+        and main_handoff.get("internal_packet_complete") is True
+        and main_handoff.get("complete") is False
+        and main_handoff.get("required_fabricator_slots") == ["FAB-A", "FAB-B"]
+        and main_handoff.get("accepted_fabricator_response_count") == 0
+        and main_handoff.get("selected_fabricator_slot") is None,
+        "PCB-MAIN stackup/impedance handoff is not internally ready and externally blocked",
+    )
+    require(
+        all(main_handoff.get(key) is False for key in (
+            "stackup_accepted",
+            "rf_50ohm_numeric_geometry_accepted",
+            "usb_90ohm_numeric_geometry_accepted",
+            "routing_authorized",
+            "review_b_complete",
+            "manufacturing_release",
+        )),
+        "PCB-MAIN stackup request advanced an external, routing or release gate",
+    )
+    for relative in (
+        main_handoff.get("packet"),
+        main_handoff.get("machine_contract"),
+        main_handoff.get("response_register"),
+    ):
+        require(isinstance(relative, str) and (ROOT / relative).is_file(),
+                f"PCB-MAIN stackup/impedance handoff file is missing: {relative}")
+    main_responses = read_csv(main_handoff["response_register"])
+    require(len(main_responses) == 22
+            and {row["Fabricator_Slot"] for row in main_responses} == {"FAB-A", "FAB-B"}
+            and all(row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
+                    and row["Blocking"] == "YES" for row in main_responses),
+            "PCB-MAIN stackup response register is not the blank 2 x 11 blocking template")
+
+    main_assembler_handoff = main_status["review_b"].get("evidence", {}).get(
+        "assembler_dfm_stencil_handoff", {}
+    )
+    require(
+        main_assembler_handoff.get("status") ==
+        "PACKET_READY_SELECTED_ASSEMBLER_RESPONSE_REQUIRED"
+        and main_assembler_handoff.get("internal_packet_complete") is True
+        and main_assembler_handoff.get("complete") is False
+        and main_assembler_handoff.get("required_scope_references") ==
+        ["U2", "U25", "U26", "U9"]
+        and main_assembler_handoff.get("required_response_rows") == 14
+        and main_assembler_handoff.get("accepted_response_rows") == 0
+        and main_assembler_handoff.get("selected_assembler_legal_entity") is None
+        and main_assembler_handoff.get("selected_manufacturing_site") is None,
+        "PCB-MAIN assembler DFM/stencil handoff is not internally ready and externally blocked",
+    )
+    require(
+        all(main_assembler_handoff.get(key) is False for key in (
+            "u2_land_mask_stencil_accepted",
+            "u25_u26_land_mask_stencil_accepted",
+            "u9_stencil_reflow_inspection_accepted",
+            "pnp_polarity_accepted",
+            "first_article_plan_accepted",
+            "blocker_critical_dfm_closed",
+            "paste_export_authorized",
+            "review_b_complete",
+            "manufacturing_release",
+        )),
+        "PCB-MAIN assembler request advanced a process, paste or release gate",
+    )
+    for relative in (
+        main_assembler_handoff.get("packet"),
+        main_assembler_handoff.get("machine_contract"),
+        main_assembler_handoff.get("response_register"),
+    ):
+        require(isinstance(relative, str) and (ROOT / relative).is_file(),
+                f"PCB-MAIN assembler DFM/stencil handoff file is missing: {relative}")
+    main_assembler_responses = read_csv(
+        main_assembler_handoff["response_register"]
+    )
+    require(
+        len(main_assembler_responses) == 14
+        and len({row["Gate_ID"] for row in main_assembler_responses}) == 14
+        and all(
+            row["Gate_ID"].startswith("ASM-MAIN-")
+            and row["Assembler_Slot"] == "ASM-MAIN-CANDIDATE"
+            and row["Required_Party"] == "SELECTED_ASSEMBLER"
+            and row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
+            and row["Blocking"] == "YES"
+            and not any(row[field] for field in (
+                "Response_Value", "Response_Reference", "Responder", "Response_Date"
+            ))
+            for row in main_assembler_responses
+        ),
+        "PCB-MAIN assembler response register is not the blank 14-row blocking template",
+    )
+
+    pwr_status = json.loads(
+        (ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8")
+    )
+    require(pwr_status["assembly"] == "PCB-PWR", "PCB-PWR release-status identity mismatch")
+    require(
+        pwr_status["review_b"]["complete"] is False
+        and pwr_status["manufacturing_release"] is False,
+        "PCB-PWR was advanced by a pre-route stackup/copper request",
+    )
+    pwr_hierarchy = pwr_status.get("human_readable_hierarchy", {})
+    pwr_hierarchy_control = pwr_hierarchy.get("control", {})
+    require(
+        pwr_status.get("native_schematic", {}).get("page_count") == 5
+        and pwr_status.get("native_schematic", {}).get("functional_child_sheets") == 4
+        and pwr_hierarchy.get("generator") ==
+        "tools/materialize_pcb_pwr_hierarchy_rev_a.py"
+        and pwr_hierarchy.get("connectivity_reader") ==
+        "tools/pcb_pwr_schematic_hierarchy.py"
+        and pwr_hierarchy.get("independent_audit") ==
+        "tools/audit_pcb_pwr_hierarchy_rev_a.py"
+        and pwr_hierarchy_control.get("state") ==
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
+        and pwr_hierarchy_control.get("pages") == 5
+        and pwr_hierarchy_control.get("functional_child_sheets") == 4
+        and pwr_hierarchy_control.get("symbols") == 63
+        and pwr_hierarchy_control.get("physical_symbols") == 60
+        and pwr_hierarchy_control.get("wire_segments") == 185
+        and pwr_hierarchy_control.get("cross_sheet_nets") == 9
+        and pwr_hierarchy_control.get("hierarchical_labels") == 26
+        and pwr_hierarchy_control.get("pin_net_semantic_sha256") ==
+        "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a"
+        and pwr_hierarchy_control.get("pin_net_review_a_retained") is True,
+        "PCB-PWR human-readable hierarchy/electrical-equivalence control has drifted",
+    )
+    require(
+        all(pwr_hierarchy_control.get(key) is True for key in (
+            "native_kicad_9_erc_pass",
+            "committed_erc_evidence",
+            "committed_pdf_evidence",
+            "independent_human_review_complete",
+        ))
+        and all(pwr_hierarchy_control.get(key) is False for key in (
+            "routing_authorized",
+            "manufacturing_release",
+        )),
+        "PCB-PWR hierarchy evidence or pending human/routing/release state has drifted",
+    )
+    for relative in (
+        pwr_status.get("native_schematic", {}).get("path"),
+        *pwr_status.get("native_schematic", {}).get("child_paths", []),
+    ):
+        require(
+            isinstance(relative, str) and (ROOT / relative).is_file(),
+            f"PCB-PWR hierarchy source is missing: {relative}",
+        )
+    pwr_stackup = pwr_status.get("stackup_copper_handoff", {})
+    pwr_stackup_control = pwr_stackup.get("control", {})
+    require(
+        pwr_stackup_control.get("state") ==
+        "PASS_INTERNAL_STACKUP_COPPER_REQUEST_READY_EXTERNAL_RESPONSES_PENDING"
+        and pwr_stackup_control.get("required_fabricator_slots") == 2
+        and pwr_stackup_control.get("required_response_rows") == 24
+        and pwr_stackup_control.get("accepted_fabricator_slots") == 0
+        and pwr_stackup_control.get("accepted_response_rows") == 0
+        and pwr_stackup_control.get("selected_fabricator_slot") is None
+        and pwr_stackup_control.get("complete") is False,
+        "PCB-PWR stackup/copper handoff is not internally ready and externally blocked",
+    )
+    require(
+        all(pwr_stackup_control.get(key) is False for key in (
+            "stackup_accepted",
+            "copper_weights_and_plating_accepted",
+            "numeric_power_geometry_authorized",
+            "routing_authorized",
+            "review_b_complete",
+            "manufacturing_release",
+        )),
+        "PCB-PWR stackup request advanced an external, geometry, routing or release gate",
+    )
+    for relative in (
+        pwr_stackup.get("request_packet"),
+        pwr_stackup.get("machine_contract"),
+        pwr_stackup.get("response_register"),
+    ):
+        require(isinstance(relative, str) and (ROOT / relative).is_file(),
+                f"PCB-PWR stackup/copper handoff file is missing: {relative}")
+    pwr_stackup_responses = read_csv(pwr_stackup["response_register"])
+    require(
+        len(pwr_stackup_responses) == 24
+        and {row["Fabricator_Slot"] for row in pwr_stackup_responses} == {"FAB-A", "FAB-B"}
+        and all(
+            row["Required_Party"] == "FABRICATOR"
+            and row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
+            and row["Blocking"] == "YES"
+            and not any(row[field] for field in (
+                "Response_Value", "Response_Reference", "Responder", "Response_Date"
+            ))
+            for row in pwr_stackup_responses
+        ),
+        "PCB-PWR stackup/copper response register is not the blank 2 x 12 blocking template",
+    )
+
+    mic_status = json.loads((ROOT / "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8"))
+    require(mic_status["assembly"] == "PCB-MIC", "PCB-MIC release-status identity mismatch")
+    require(mic_status["manufacturing_release"] is False, "PCB-MIC was released without Review A/B evidence")
+    mic_review_a = mic_status["review_a"]
+    require(mic_status["review_b"]["complete"] is False, "PCB-MIC Review B was marked complete without manufacturing evidence")
+    if mic_status["release_state"] == "REVIEW_A_PASS":
+        require(mic_review_a["complete"] is True and mic_review_a["status"] == "PASS",
+                "PCB-MIC Review A is not a signed PASS")
+        require(all(mic_review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
+                "PCB-MIC signed Review A lacks reviewer/date/commit SHA")
+        require(re.fullmatch(r"[0-9a-f]{40}", mic_review_a["commit_sha"]) is not None,
+                "PCB-MIC signed Review A commit SHA is invalid")
+        require(
+            mic_review_a["structural_audit_status"] ==
+            "PASS_STRUCTURAL_EVIDENCE_REVIEW_A_SIGNED_PASS",
+            "PCB-MIC independent structural audit status does not match signed Review A",
+        )
+        require(
+            mic_review_a["geometry_audit_status"] ==
+            "PASS_COMMIT_MATCHED_REMOTE_ARCHIVE_REVIEW_A_SIGNED_PASS",
+            "PCB-MIC independent geometry audit status does not match signed Review A",
+        )
+        mic_review_a_evidence = mic_review_a.get("evidence", {})
+        required_mic_review_a_evidence = {
+            "signed_checklist", "workflow_run", "artifact", "schematic_pdf",
+            "erc_report", "committed_geometry_audit",
+            "materialized_geometry_audit", "sha256_manifest",
+        }
+        require(
+            isinstance(mic_review_a_evidence, dict) and
+            all(mic_review_a_evidence.get(key) for key in required_mic_review_a_evidence),
+            "PCB-MIC signed Review A evidence links are incomplete",
+        )
+    else:
+        require(mic_status["release_state"] == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO",
+                "PCB-MIC release state is neither signed nor an explicit post-ECO candidate")
+        require(mic_review_a["complete"] is False
+                and mic_review_a["status"] == "REVIEW_REQUIRED_AFTER_COPPER_ECO",
+                "PCB-MIC post-ECO Review A is not explicitly open")
+        require(all(mic_review_a.get(field) is None for field in ("reviewer", "date", "commit_sha")),
+                "PCB-MIC post-ECO Review A retains an active signature")
+        require(
+            mic_review_a["structural_audit_status"] ==
+            "PASS_STRUCTURAL_EVIDENCE_ECO_CANDIDATE_REPEAT_REVIEW_A_REQUIRED",
+            "PCB-MIC post-ECO structural audit state mismatch",
+        )
+        require(
+            mic_review_a["geometry_audit_status"] ==
+            "PASS_ECO_CANDIDATE_GEOMETRY_REPEAT_REVIEW_A_REQUIRED",
+            "PCB-MIC post-ECO geometry audit state mismatch",
+        )
+        prior = mic_review_a.get("superseded_signature", {})
+        require(prior.get("status") == "SUPERSEDED_BY_COPPER_ECO_BOARD_BYTE_CHANGE",
+                "PCB-MIC prior Review-A signature is not explicitly superseded")
+        require(re.fullmatch(r"[0-9a-f]{40}", str(prior.get("commit_sha", ""))) is not None,
+                "PCB-MIC superseded Review-A commit SHA is invalid")
+        require(re.fullmatch(r"[0-9a-f]{64}", str(prior.get("board_sha256", ""))) is not None,
+                "PCB-MIC superseded Review-A board hash is invalid")
+        required_evidence = mic_review_a.get("required_evidence", {})
+        require(required_evidence.get("status") in {
+            "PENDING_COMMIT_BOUND_CI", "PASS_COMMIT_BOUND_CI_READY_FOR_REVIEW_A"
+        }, "PCB-MIC post-ECO evidence state is invalid")
+        mic_review_b = mic_status["review_b"]
+        require(mic_review_b["status"] == "BLOCKED_PENDING_REPEAT_REVIEW_A_AFTER_COPPER_ECO",
+                "PCB-MIC Review B is not blocked on repeat Review A")
+        copper_gate = mic_review_b.get("copper_return_gate", {})
+        require(copper_gate.get("decision") == "ECO_REQUIRED"
+                and copper_gate.get("reviewer") and copper_gate.get("date"),
+                "PCB-MIC ECO_REQUIRED decision traceability is incomplete")
+    mic_handoff = mic_status["review_b"].get("manufacturing_handoff", {})
+    require(
+        mic_handoff.get("status") == "PACKET_READY_EXTERNAL_ACCEPTANCE_REQUIRED"
+        and mic_handoff.get("internal_packet_complete") is True
+        and mic_handoff.get("complete") is False,
+        "PCB-MIC manufacturing handoff is not internally ready and externally blocked",
+    )
+    require(
+        all(mic_handoff.get(key) is False for key in (
+            "fabricator_dfm_acceptance",
+            "assembler_dfm_acceptance",
+            "panelization_acceptance",
+            "depanel_acceptance",
+            "assembler_process_keepout_acceptance",
+            "review_b_complete",
+            "manufacturing_release",
+        )),
+        "PCB-MIC manufacturing handoff advanced an external or release gate",
+    )
+    for relative in (
+        mic_handoff.get("packet"),
+        mic_handoff.get("machine_contract"),
+        mic_handoff.get("response_register"),
+    ):
+        require(isinstance(relative, str) and (ROOT / relative).is_file(),
+                f"PCB-MIC manufacturing handoff file is missing: {relative}")
+    require(
+        mic_status["native_source"]["independent_schematic_audit"] ==
+        "artifacts/pcb_mic_native_schematic_rev_a.json",
+        "PCB-MIC independent schematic audit artifact path mismatch",
+    )
+    require(
+        (ROOT / "tools/audit_pcb_mic_native_schematic_rev_a.py").is_file(),
+        "PCB-MIC independent native schematic audit source is missing",
+    )
+    mic_metadata = json.loads(
+        (ROOT / "hardware/kicad/native/PCB-MIC/fabrication_metadata.json").read_text(encoding="utf-8")
+    )
+    mic_authority = ROOT / mic_metadata["authority"]
+    require(mic_authority.is_file(), "PCB-MIC fabrication metadata authority is unresolved")
+    require(
+        mic_metadata["authority"] == mic_status["mechanical_contract"]["authority"],
+        "PCB-MIC mechanical authority differs between release status and fabrication metadata",
+    )
+
     bom = {row["Item_ID"]: row for row in read_csv("hardware/EVT_PRE_20_BOM_DRAFT.csv")}
     require(bom["U1"]["MPN"] == "STM32U585VIT6Q", "BOM MCU does not match baseline")
     require(bom["U11"]["MPN"] == "MDBT50Q-P1MV2", "BOM BLE module does not match locked nRF52840 module")
@@ -229,8 +832,15 @@ def validate_hardware_baseline() -> None:
 def validate_policy_text() -> None:
     baseline = (ROOT / "config/EVT_PRE_20_BASELINE.yaml").read_text(encoding="utf-8")
     require("pilot_apn_policy: public_only" in baseline, "baseline public-only APN policy missing")
-    require("pilot_primary_quantity: 20" in baseline, "baseline vacuum quantity missing")
-    require("pilot_fallback_quantity_if_activated: 20" in baseline, "baseline 3D fallback quantity missing")
+    require("maximum_station_quantity: 20" in baseline, "baseline maximum serial capacity missing")
+    require("supported_procurement_quantities: [4, 10, 20]" in baseline, "baseline 4 10 20 procurement options missing")
+    require("selected_evt_quantity: 20" in baseline, "baseline does not select the locked 20-station EVT lot")
+    require("selection_status: LOCKED_CURRENT_CUSTOMER_EVT_20" in baseline, "EVT-20 selection status is not locked")
+    require("pilot_primary_quantity: 20" in baseline, "baseline vacuum quantity does not match selected EVT-20")
+    require(
+        "pilot_fallback_quantity_if_activated: 20" in baseline,
+        "baseline 3D fallback quantity does not match selected EVT-20",
+    )
     require("authoritative_position_source: configured_installation_coordinates" in baseline, "configured installation coordinates are not authoritative")
     require("wifi_positioning_required: false" in baseline, "Wi-Fi positioning unexpectedly required")
     require("server_tdoa_station_position_source: configured_installation_coordinates" in baseline, "TDOA position source is not configured installation position")
@@ -272,6 +882,7 @@ def main() -> None:
     validate_lot()
     validate_procurement()
     validate_decisions_and_tests()
+    validate_deliverable_register()
     validate_pinmap()
     validate_hardware_baseline()
     validate_policy_text()

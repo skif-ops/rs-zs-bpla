@@ -1,21 +1,27 @@
 #!/usr/bin/env python3
 """Generate the controlled EVT-PRE-20 Rev.A BOM from authoritative freezes.
 
-The draft keeps the system-level inventory. MAIN/POWER/CONNECTOR freeze tables are
-authoritative for selected MPNs and release blockers. This script deterministically
-merges them, fixes assembly reference/quantity mappings, expands connector consumables,
-and fails on known superseded parts. It is a controlled engineering BOM, not a release
-waiver: open and candidate rows remain visible until the strict BOM gates can pass.
+The draft keeps the system-level inventory. MAIN/POWER/CONNECTOR freeze tables and the
+PCB-PWR passive authority are authoritative for selected MPNs and release blockers.
+This script deterministically merges them, fixes assembly reference/quantity mappings,
+expands connector consumables, and fails on known superseded parts. It is a controlled
+engineering BOM, not a release waiver: open and candidate rows remain visible until
+the strict BOM gates can pass.
 """
 from __future__ import annotations
 
+import argparse
 import csv
+import io
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DRAFT = ROOT / "hardware/EVT_PRE_20_BOM_DRAFT.csv"
 OUT = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
+PROCUREMENT_OUT = ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
 MAIN_PASSIVE_SUPPORT = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
+PWR_PASSIVE_AUTHORITY = ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
+LOT_SIZES = (4, 10, 20)
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -32,10 +38,23 @@ def require(ok: bool, message: str) -> None:
         raise AssertionError(message)
 
 
-def main() -> None:
+def main(*, check_only: bool = False) -> None:
     rows = read_csv(DRAFT)
     require(rows, "draft BOM is empty")
-    fields = list(rows[0].keys())
+    fields: list[str] = []
+    for field in rows[0].keys():
+        if field == "Qty_20":
+            for lot_size in LOT_SIZES:
+                fields.extend(
+                    [
+                        f"Qty_{lot_size}",
+                        f"Spares_{lot_size}",
+                        f"Procure_qty_{lot_size}",
+                    ]
+                )
+            fields.append("Spare_policy")
+        elif field not in {"Spares", "Procure_qty"}:
+            fields.append(field)
     fields.extend(["Value", "Line_class", "Population", "Temperature_C", "BOM_disposition"])
     for row in rows:
         for field in fields:
@@ -48,17 +67,17 @@ def main() -> None:
     main_passive_support = freeze_map(
         "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv", "RefDes"
     )
+    pwr_passive_authority = read_csv(PWR_PASSIVE_AUTHORITY)
 
-    def set_quantities(row: dict[str, str], qty: int, spares: int) -> None:
+    def set_quantities(row: dict[str, str], qty: int, spares_20: int) -> None:
         row["Qty_per_station"] = str(qty)
-        row["Qty_20"] = str(qty * 20)
-        row["Spares"] = str(spares)
-        row["Procure_qty"] = str(qty * 20 + spares)
+        row["Spares"] = str(spares_20)
 
     def update_existing(item_id: str, *, manufacturer: str, mpn: str, package: str,
                         status: str, notes: str, refdes: str | None = None,
                         description: str | None = None, qty: int | None = None,
-                        spares: int | None = None, value: str | None = None) -> None:
+                        spares: int | None = None, value: str | None = None,
+                        spare_policy: str | None = None) -> None:
         require(item_id in by_id, f"draft BOM item missing: {item_id}")
         r = by_id[item_id]
         r["Manufacturer"] = manufacturer
@@ -72,6 +91,8 @@ def main() -> None:
             r["Description"] = description
         if value is not None:
             r["Value"] = value
+        if spare_policy is not None:
+            r["Spare_policy"] = spare_policy
         if qty is not None:
             set_quantities(r, qty, int(r["Spares"] if spares is None else spares))
 
@@ -116,11 +137,13 @@ def main() -> None:
             notes=f"Rev.A freeze source POWER_COMPONENT_FREEZE_REV_A.csv; {p['Electrical_Baseline']}; blockers: {p['Release_Blockers']}",
         )
 
+    shunt = power_parts["R-SHUNT-01"]
     update_existing(
-        "R-SHUNT-01", manufacturer="Vishay Dale", mpn="WSK2512R0100FEA",
-        package="WSK2512 4-terminal 6432 metric", status="SELECTED_PENDING_KELVIN_LAYOUT_SAMPLE",
+        "R-SHUNT-01", manufacturer=shunt["Manufacturer"], mpn=shunt["MPN"],
+        package=shunt["Package"], status=shunt["Status"],
         refdes="RSH1", value="10 mOhm 1% 1 W",
-        notes="10 mOhm, 1%, 1 W, four-terminal current-sense resistor; exact land pattern and Kelvin layout remain Review B blockers",
+        notes=("Rev.A freeze source POWER_COMPONENT_FREEZE_REV_A.csv; exact four-terminal "
+               f"land pattern controlled; blockers: {shunt['Release_Blockers']}"),
     )
 
     mic = connectors["CON-MIC"]
@@ -159,7 +182,7 @@ def main() -> None:
         c = connectors[cid]
         update_existing(
             item_id, manufacturer="Hirose", mpn="U.FL-R-SMT-1(60)", package="U.FL SMT receptacle",
-            status=c["Status"], notes=f"Rev.A connector freeze; exact coax assembly temperature/RF validation remains blocking: {c['Release_Blockers']}",
+            status=c["Status"], notes=f"Rev.A connector freeze; coax assembly and RF validation remain blocking: {c['Release_Blockers']}",
         )
 
     def append_item(*, item_id: str, assembly: str, refdes: str, category: str, description: str,
@@ -168,7 +191,8 @@ def main() -> None:
                     source_policy: str = "Authorized or traceable tier-1 channel",
                     incoming_control: str = "Marking MPN package orientation electrical functional sample",
                     value: str = "", line_class: str = "", population: str = "",
-                    temperature: str = "", disposition: str = "") -> None:
+                    temperature: str = "", disposition: str = "",
+                    spare_policy: str | None = None) -> None:
         if item_id in by_id:
             return
         row = {field: "" for field in fields}
@@ -176,8 +200,11 @@ def main() -> None:
             "Item_ID": item_id, "Assembly": assembly, "RefDes": refdes, "Category": category,
             "Description": description, "Manufacturer": manufacturer, "MPN": mpn, "Package": package,
             "Value": value,
-            "Qty_per_station": str(qty), "Qty_20": str(qty * 20), "Spares": str(spares),
-            "Procure_qty": str(qty * 20 + spares), "Variant": variant, "Status": status,
+            "Qty_per_station": str(qty), "Spares": str(spares),
+            "Spare_policy": spare_policy or (
+                "NONE" if spares == 0 else "SCALE_CEIL_FROM_20_BASELINE"
+            ),
+            "Variant": variant, "Status": status,
             "China_source_policy": source_policy,
             "Incoming_control": incoming_control,
             "Notes": notes,
@@ -288,6 +315,7 @@ def main() -> None:
         manufacturer="Molex", mpn="5040520098", package="Pico-Lock crimp terminal 28-24 AWG",
         qty=48, spares=48, status="SELECTED_PENDING_CRIMP_PULL_TEST",
         notes="6 contacts x 2 ends x 4 harnesses; procurement includes one-station terminal spare set",
+        spare_policy="FIXED_LOT_MIN",
     )
     append_item(
         item_id="H-PWR-MAIN", assembly="HARNESS-PWR-MAIN", refdes="H_PWR_MAIN:A/B",
@@ -318,6 +346,7 @@ def main() -> None:
         refdes="PCB-MIC:C1 x4", description="100 nF 25 V X7R microphone VDD decoupling",
         qty=4, spares=40, value="100 nF 25 V X7R",
         notes="One C1 per PCB-MIC leaf; exact native schematic reference and automotive-grade MLCC",
+        spare_policy="FIXED_LOT_MIN",
     )
     append_item(
         item_id="R-MIC", assembly="PCB-MIC", refdes="PCB-MIC:R1 x4", category="Passive",
@@ -325,48 +354,95 @@ def main() -> None:
         mpn="ERJ-2GE0R00X", package="0402 1005 metric", qty=4, spares=40,
         status="SELECTED_POPULATED_BASELINE_PENDING_SI",
         notes="One populated R1 per PCB-MIC leaf; any DNP/value change requires SI review and BOM revision", value="0 ohm",
+        spare_policy="FIXED_LOT_MIN",
     )
 
-    # PCB-PWR schematic parts. Each output bank is expanded to four individually
-    # referenced physical MLCCs in the native schematic.
-    pwr_lines = [
-        ("PWR-C-100N", "C1;C2;C4;C6", "100 nF 25 V X7R", "TDK", "CGA2B3X7R1E104K050BB", "0402", 4, "FITTED"),
-        ("PWR-C-LDO", "C7;C8", "2.2 uF 10 V X7R", "TDK", "CGA3E1X7R1A225K080AC", "0603", 2, "FITTED"),
-        ("PWR-C-CIN-HF", "C9", "100 nF 50 V X7R", "TDK", "CGA3E2X7R1H104K080AA", "0603", 1, "FITTED"),
-        ("PWR-C-INPUT", "C10;C11;C12", "4.7 uF 50 V X7R", "TDK", "CGA6P3X7R1H475K250AB", "1210", 3, "FITTED"),
-        ("PWR-C-BULK", "C13", "100 uF 35 V hybrid", "Panasonic Industry", "EEH-ZK1V101XP", "SMD can 6.3x8.0 mm", 1, "FITTED"),
-        ("PWR-COUT-3V8", "C3;C14;C15;C16", "22 uF 25 V X7R", "TDK", "CGA6P3X7R1E226M250AB", "1210", 4, "FITTED"),
-        ("PWR-COUT-3V3", "C5;C17;C18;C19", "22 uF 25 V X7R", "TDK", "CGA6P3X7R1E226M250AB", "1210", 4, "FITTED"),
-        ("PWR-L", "L1;L2", "4.7 uH +/-20%", "Coilcraft", "XAL7030-472MEC", "XAL7030 7.5x7.2 mm", 2, "FITTED"),
-        ("PWR-R-100K-01", "R1", "100 kOhm 0.1%", "Panasonic Industry", "ERA-2AEB104X", "0402", 1, "FITTED"),
-        ("PWR-R-35K7", "R2", "35.7 kOhm 0.1%", "Panasonic Industry", "ERA-2AEB3572X", "0402", 1, "FITTED"),
-        ("PWR-R-86K6", "R3;R7", "86.6 kOhm 0.1%", "Panasonic Industry", "ERA-2AEB8662X", "0402", 2, "FITTED"),
-        ("PWR-R-0R", "R4;R8", "0 ohm", "Panasonic Industry", "ERJ-2GE0R00X", "0402", 2, "FITTED"),
-        ("PWR-R-0R-DNP", "R5;R9", "0 ohm", "Panasonic Industry", "ERJ-2GE0R00X", "0402", 0, "DNP"),
-        ("PWR-R-100K", "R6;R11", "100 kOhm 1%", "Panasonic Industry", "ERJ-2RKF1003X", "0402", 2, "FITTED"),
-        ("PWR-R-10K", "R10;R12", "10 kOhm 1%", "Panasonic Industry", "ERJ-2RKF1002X", "0402", 2, "FITTED"),
-        ("PWR-R-4K7-DNP", "R13;R14", "4.7 kOhm 1%", "Panasonic Industry", "ERJ-2RKF4701X", "0402", 0, "DNP"),
-        ("PWR-R-10K-DNP", "R15", "10 kOhm 1%", "Panasonic Industry", "ERJ-2RKF1002X", "0402", 0, "DNP"),
-        ("PWR-NET-TIE", "NT1;NT2;NT3", "2-pad copper net tie", "PCB fabrication", "NET_TIE_COPPER_REV_A", "NetTie-2 SMD pad 0.5 mm", 3, "PCB_FEATURE"),
-    ]
-    for item_id, refdes, value, manufacturer, mpn, package, qty, population in pwr_lines:
+    # PCB-PWR passives come only from the per-reference authority. This prevents the
+    # generated BOM from silently outrunning schematic MPN, population or footprint
+    # control. DFT rows have no BOM_Item_ID and remain non-procured board features.
+    pwr_groups: dict[str, list[dict[str, str]]] = {}
+    for part in pwr_passive_authority:
+        item_id = part["BOM_Item_ID"]
+        if item_id:
+            pwr_groups.setdefault(item_id, []).append(part)
+    require(len(pwr_groups) == 17, "PCB-PWR passive authority group count drift")
+    for item_id, members in pwr_groups.items():
+        first = members[0]
+        invariant_fields = {
+            "Category", "Manufacturer", "MPN", "Package", "Value", "Population",
+            "Temperature_C", "Footprint",
+        }
+        for field in invariant_fields:
+            require(len({member[field] for member in members}) == 1,
+                    f"{item_id}: passive authority group {field} mismatch")
+        refdes = ";".join(member["RefDes"] for member in members)
+        population = first["Population"]
+        qty = 0 if population == "DNP" else len(members)
+        spares = 0 if population in {"DNP", "PCB_FEATURE"} else 40
         selected = population != "DNP"
-        if population in {"DNP", "PCB_FEATURE"}:
-            spares = 0
-        elif item_id == "PWR-L":
-            spares = 10
-        else:
-            spares = 40
-        append_item(
-            item_id=item_id, assembly="PCB-PWR", refdes=refdes, category="Passive" if not item_id.endswith("NET-TIE") else "PCB feature",
-            description=f"PCB-PWR {value}", manufacturer=manufacturer, mpn=mpn, package=package,
-            qty=qty, spares=spares, status="SELECTED_PENDING_NATIVE_FOOTPRINT_DERATING",
-            notes="Exact candidate identity frozen for BOM control; native footprint, DC-bias/thermal margin and Review B remain blocking",
-            value=value, population=population,
-            line_class="PCB_FEATURE" if population == "PCB_FEATURE" else "ELECTRICAL_COMPONENT",
-            temperature="N/A" if population == "PCB_FEATURE" else "-55..125",
-            disposition="CONTROLLED_PENDING_VERIFICATION" if selected else "CONTROLLED_DNP",
+        statuses = sorted({member["Authority_Status"] for member in members})
+        status = statuses[0] if len(statuses) == 1 else "CONTROLLED_CANDIDATE_PENDING_MULTIPLE_REVIEWS"
+        release_blockers = sorted({member["Release_Blockers"] for member in members})
+        notes = (
+            f"Rev.A source PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv; footprint {first['Footprint']}; "
+            f"blockers: {'; '.join(release_blockers)}"
         )
+        append_item(
+            item_id=item_id, assembly="PCB-PWR", refdes=refdes, category=first["Category"],
+            description=f"PCB-PWR {first['Value']}", manufacturer=first["Manufacturer"],
+            mpn=first["MPN"], package=first["Package"],
+            qty=qty, spares=spares, status=status, notes=notes,
+            value=first["Value"], population=population,
+            line_class="PCB_FEATURE" if population == "PCB_FEATURE" else "ELECTRICAL_COMPONENT",
+            temperature=first["Temperature_C"],
+            disposition="CONTROLLED_PENDING_VERIFICATION" if selected else "CONTROLLED_DNP",
+            spare_policy="NONE" if spares == 0 else "FIXED_LOT_MIN",
+        )
+
+    pwr_l = power_parts["PWR-L"]
+    append_item(
+        item_id="PWR-L", assembly="PCB-PWR", refdes="L1;L2", category="Passive",
+        description="PCB-PWR 4.7 uH +/-20%", manufacturer=pwr_l["Manufacturer"],
+        mpn=pwr_l["MPN"], package=pwr_l["Package"], qty=2, spares=10,
+        status=pwr_l["Status"],
+        notes=("Rev.A freeze source POWER_COMPONENT_FREEZE_REV_A.csv; exact land pattern "
+               f"controlled; blockers: {pwr_l['Release_Blockers']}"),
+        value="4.7 uH +/-20%", population="FITTED", line_class="ELECTRICAL_COMPONENT",
+        temperature=pwr_l["Temperature_C"], disposition="CONTROLLED_PENDING_VERIFICATION",
+        spare_policy="FIXED_LOT_MIN",
+    )
+
+    allowed_spare_policies = {
+        "NONE",
+        "SCALE_CEIL_FROM_20_BASELINE",
+        "FIXED_LOT_MIN",
+    }
+    for row in rows:
+        qty_per_station = int(row["Qty_per_station"])
+        spares_20 = int(row["Spares"])
+        policy = row["Spare_policy"] or (
+            "NONE" if spares_20 == 0 else "SCALE_CEIL_FROM_20_BASELINE"
+        )
+        require(
+            policy in allowed_spare_policies,
+            f"{row['Item_ID']}: unsupported spare policy {policy}",
+        )
+        require(
+            policy != "NONE" or spares_20 == 0,
+            f"{row['Item_ID']}: NONE spare policy carries non-zero 20-unit spares",
+        )
+        row["Spare_policy"] = policy
+        for lot_size in LOT_SIZES:
+            quantity = qty_per_station * lot_size
+            if policy == "NONE":
+                spares = 0
+            elif policy == "FIXED_LOT_MIN":
+                spares = spares_20
+            else:
+                spares = (spares_20 * lot_size + 19) // 20
+            row[f"Qty_{lot_size}"] = str(quantity)
+            row[f"Spares_{lot_size}"] = str(spares)
+            row[f"Procure_qty_{lot_size}"] = str(quantity + spares)
 
     full_text = "\n".join(",".join(r.get(f, "") for f in fields) for r in rows)
     for forbidden in ("ESP32-C3", "JST_BM05B", "GHR-05V-S", "5040500591", "5040510501"):
@@ -394,13 +470,20 @@ def main() -> None:
     for item_id, refdes in expected_refdes.items():
         require(by_id[item_id]["RefDes"] == refdes, f"{item_id} native PCB-PWR RefDes mismatch")
 
-    for r in rows:
-        qty = int(r["Qty_per_station"])
-        qty20 = int(r["Qty_20"])
-        spares = int(r["Spares"])
-        procure = int(r["Procure_qty"])
-        require(qty20 == qty * 20, f"{r['Item_ID']}: Qty_20 formula mismatch")
-        require(procure == qty20 + spares, f"{r['Item_ID']}: Procure_qty formula mismatch")
+    for row in rows:
+        qty_per_station = int(row["Qty_per_station"])
+        for lot_size in LOT_SIZES:
+            quantity = int(row[f"Qty_{lot_size}"])
+            spares = int(row[f"Spares_{lot_size}"])
+            procure = int(row[f"Procure_qty_{lot_size}"])
+            require(
+                quantity == qty_per_station * lot_size,
+                f"{row['Item_ID']}: Qty_{lot_size} formula mismatch",
+            )
+            require(
+                procure == quantity + spares,
+                f"{row['Item_ID']}: Procure_qty_{lot_size} formula mismatch",
+            )
     require(by_id["J-MIC"]["Qty_per_station"] == "4", "leaf MIC header quantity mismatch")
     require(by_id["J-MIC-MAIN"]["Qty_per_station"] == "4", "MAIN MIC header quantity mismatch")
     require(by_id["H-MIC"]["Qty_per_station"] == "8", "MIC housing quantity must be 8 per station")
@@ -418,6 +501,14 @@ def main() -> None:
         "ERJ-2GE0R00X": "-55..155",
         "MMICT5838-00-012": "-40..85",
         "U.FL-R-SMT-1(60)": "-40..90",
+        "RB40": "-20..60 discharge; -20..45 charge",
+        "SLP080S-12M": "-40..85",
+        "SCC075010060R": "-30..60",
+        "SBS050150200": "-10..60",
+        "G30.B.108111": "-40..85",
+        "AA.166.A.301111": "-40..85",
+        "TI.89.B.2111W": "-40..85",
+        "CAB.0243": "-60..200",
         "5040510601": "-40..105",
         "5040520098": "-40..105",
         "43025-1200": "-40..105",
@@ -430,7 +521,10 @@ def main() -> None:
 
     service_ids = {"ASM-MAIN", "ASM-PWR", "ASM-MIC"}
     pcb_ids = {"PCB-MAIN", "PCB-PWR", "PCB-MIC"}
-    system_ids = {"BAT1", "PV1", "MPPT1", "ANT-CELL", "ANT-GNSS", "ANT-LORA", "HARNESS"}
+    system_ids = {
+        "BAT1", "PV1", "MPPT1", "MPPT-TEMP", "ANT-CELL", "ANT-GNSS",
+        "ANT-LORA", "RF-PIGTAIL", "HARNESS",
+    }
     for row in rows:
         item_id = row["Item_ID"]
         if row["Line_class"] and row["Population"] and row["Temperature_C"] and row["BOM_disposition"]:
@@ -442,7 +536,8 @@ def main() -> None:
         elif item_id.startswith("HSG-"):
             row["Line_class"], row["Population"], row["Temperature_C"] = "MECHANICAL_OPTION", "N/A", "OPEN"
         elif item_id in system_ids:
-            row["Line_class"], row["Population"], row["Temperature_C"] = "SYSTEM_ITEM", "FITTED", "OPEN"
+            row["Line_class"], row["Population"] = "SYSTEM_ITEM", "FITTED"
+            row["Temperature_C"] = known_temp.get(row["MPN"], "OPEN")
         elif row["Assembly"].startswith("HARNESS-"):
             row["Line_class"], row["Population"] = "HARNESS_COMPONENT", "FITTED"
             row["Temperature_C"] = known_temp.get(row["MPN"], "OPEN")
@@ -458,7 +553,7 @@ def main() -> None:
             row["BOM_disposition"] = "CONDITIONAL_NOT_RELEASED"
         elif not exact_identity or status.startswith(("OPEN", "RFQ_REQUIRED", "SOURCE_PACKAGE_REQUIRED")):
             row["BOM_disposition"] = "BLOCKED_SELECTION"
-        elif status.startswith("CANDIDATE") or "REGION_OPERATOR" in status:
+        elif status.startswith("CANDIDATE"):
             row["BOM_disposition"] = "BLOCKED_ENGINEERING_SELECTION"
         elif row["Temperature_C"] in ("", "OPEN", "TBD") or "TEMP_VERIFY" in status:
             row["BOM_disposition"] = "BLOCKED_RATING_VERIFICATION"
@@ -467,14 +562,135 @@ def main() -> None:
         else:
             row["BOM_disposition"] = "CONTROLLED"
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    with OUT.open("w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")
-        writer.writeheader()
-        writer.writerows(rows)
+    procurement_fields = [
+        "Procurement_ID", "Assemblies", "Item_IDs", "RefDes", "Category",
+        "Manufacturer", "MPN", "Package", "Value", "Variant", "Population",
+    ]
+    for lot_size in LOT_SIZES:
+        procurement_fields.extend(
+            [
+                f"Qty_{lot_size}",
+                f"Spares_{lot_size}",
+                f"Procure_qty_{lot_size}",
+            ]
+        )
+    procurement_fields.extend(
+        [
+            "Spare_policy", "BOM_disposition", "Status", "China_source_policy",
+            "Incoming_control",
+        ]
+    )
 
-    print(f"Generated {OUT.relative_to(ROOT)} with {len(rows)} rows")
+    group_text_fields = {
+        "Assemblies": "Assembly",
+        "Item_IDs": "Item_ID",
+        "RefDes": "RefDes",
+        "Category": "Category",
+        "Manufacturer": "Manufacturer",
+        "MPN": "MPN",
+        "Package": "Package",
+        "Value": "Value",
+        "Variant": "Variant",
+        "Population": "Population",
+        "Spare_policy": "Spare_policy",
+        "BOM_disposition": "BOM_disposition",
+        "Status": "Status",
+        "China_source_policy": "China_source_policy",
+        "Incoming_control": "Incoming_control",
+    }
+    grouped: dict[tuple[str, ...], dict[str, object]] = {}
+    for row in rows:
+        exact_identity = row["Manufacturer"] not in {"", "TBD"} and row["MPN"] not in {"", "TBD"}
+        identity = row["MPN"] if exact_identity else row["Item_ID"]
+        key = (
+            "MPN" if exact_identity else "ITEM",
+            identity,
+            row["Manufacturer"],
+            row["Package"],
+            row["Value"],
+            row["Variant"],
+            row["Population"],
+        )
+        group = grouped.setdefault(
+            key,
+            {
+                **{field: set() for field in group_text_fields},
+                **{
+                    field: 0
+                    for lot_size in LOT_SIZES
+                    for field in (
+                        f"Qty_{lot_size}",
+                        f"Spares_{lot_size}",
+                        f"Procure_qty_{lot_size}",
+                    )
+                },
+            },
+        )
+        for output_field, source_field in group_text_fields.items():
+            value = row[source_field]
+            if value:
+                group[output_field].add(value)
+        for lot_size in LOT_SIZES:
+            for prefix in ("Qty", "Spares", "Procure_qty"):
+                field = f"{prefix}_{lot_size}"
+                group[field] += int(row[field])
+
+    procurement_rows: list[dict[str, str]] = []
+    for index, key in enumerate(sorted(grouped), start=1):
+        group = grouped[key]
+        output_row = {field: "" for field in procurement_fields}
+        output_row["Procurement_ID"] = f"PR-{index:03d}"
+        for field in group_text_fields:
+            output_row[field] = " | ".join(sorted(group[field]))
+        for lot_size in LOT_SIZES:
+            for prefix in ("Qty", "Spares", "Procure_qty"):
+                field = f"{prefix}_{lot_size}"
+                output_row[field] = str(group[field])
+        procurement_rows.append(output_row)
+
+    def render_csv(fieldnames: list[str], records: list[dict[str, str]]) -> str:
+        buffer = io.StringIO(newline="")
+        writer = csv.DictWriter(buffer, fieldnames=fieldnames, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(records)
+        return buffer.getvalue()
+
+    detail_text = render_csv(
+        fields,
+        [{field: row.get(field, "") for field in fields} for row in rows],
+    )
+    procurement_text = render_csv(procurement_fields, procurement_rows)
+    if check_only:
+        require(OUT.is_file(), f"generated BOM is missing: {OUT.relative_to(ROOT)}")
+        require(
+            PROCUREMENT_OUT.is_file(),
+            f"generated procurement BOM is missing: {PROCUREMENT_OUT.relative_to(ROOT)}",
+        )
+        require(
+            OUT.read_text(encoding="utf-8") == detail_text,
+            f"generated BOM drift: run {Path(__file__).relative_to(ROOT)}",
+        )
+        require(
+            PROCUREMENT_OUT.read_text(encoding="utf-8") == procurement_text,
+            f"generated procurement BOM drift: run {Path(__file__).relative_to(ROOT)}",
+        )
+    else:
+        OUT.parent.mkdir(parents=True, exist_ok=True)
+        OUT.write_text(detail_text, encoding="utf-8")
+        PROCUREMENT_OUT.write_text(procurement_text, encoding="utf-8")
+
+    print(
+        f"{'Verified' if check_only else 'Generated'} {OUT.relative_to(ROOT)} with "
+        f"{len(rows)} engineering rows and "
+        f"{PROCUREMENT_OUT.relative_to(ROOT)} with {len(procurement_rows)} procurement rows"
+    )
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="verify committed BOM outputs without rewriting them",
+    )
+    main(check_only=parser.parse_args().check)

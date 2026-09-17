@@ -74,6 +74,12 @@ def main() -> None:
         if "v06_user_sources" in src and meta.get("label") in TARGETS
         and (ROOT / src).exists() and (df["source_file"].astype(str) == src).any()
     ]
+    if not sources:
+        raise SystemExit(
+            "Whole-recording replay unavailable: no policy-listed raw v06 UAV audio "
+            "is present in this source checkout. Restore the traceable raw sources "
+            "before running the field replay gate."
+        )
     cached_v06 = {}
     old_csv = ROOT / "output" / "v06_benchmark" / "whole_recording_lofo.csv"
     if old_csv.exists():
@@ -148,7 +154,7 @@ def main() -> None:
         "",
         "## Политика v0.7",
         "",
-        "- Добавлен ранний 3 s temporal horizon; 5 s и 10 s сохранены.",
+        "- Решение использует ограниченную серию 4-8 окон и temporal horizons 4/6/8 s.",
         "- Противоречие горизонтов уменьшает confidence, а не усредняется в ложную уверенность.",
         "- Type lock дополнительно заблокирован dataset-readiness gate до появления подтверждённой и замороженной контрастной выборки каждого типа.",
         "- Raw diagnostics (1-3 Hz envelope modulation, 4-8/8-12 kHz relative bands) пока диагностические и не обучают тип: подтверждённого FP-1 ground truth нет.",

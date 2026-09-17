@@ -3,8 +3,8 @@
 #include <math.h>
 #include <stddef.h>
 
-#define ZS_EARTH_RADIUS_M 6371000.0f
-#define ZS_DEG_TO_RAD 0.01745329251994329577f
+#define ZS_EARTH_RADIUS_M 6371000.0
+#define ZS_DEG_TO_RAD 0.01745329251994329577
 
 static uint16_t clamp_u16(uint32_t value) {
   return value > 65535u ? 65535u : (uint16_t)value;
@@ -23,16 +23,16 @@ void zs_position_trust_init(zs_position_trust_state_t *state) {
 uint32_t zs_position_distance_m(const zs_position_t *a, const zs_position_t *b) {
   if (!a || !b) return 0u;
 
-  const float lat1 = ((float)a->lat_e7 / 10000000.0f) * ZS_DEG_TO_RAD;
-  const float lat2 = ((float)b->lat_e7 / 10000000.0f) * ZS_DEG_TO_RAD;
-  const float dlat = lat2 - lat1;
-  const float dlon = (((float)b->lon_e7 - (float)a->lon_e7) / 10000000.0f) * ZS_DEG_TO_RAD;
-  const float x = dlon * cosf((lat1 + lat2) * 0.5f);
-  const float y = dlat;
-  const float distance = ZS_EARTH_RADIUS_M * sqrtf(x * x + y * y);
-  if (!isfinite(distance) || distance <= 0.0f) return 0u;
-  if (distance >= 4294967295.0f) return UINT32_MAX;
-  return (uint32_t)(distance + 0.5f);
+  const double lat1 = ((double)a->lat_e7 / 10000000.0) * ZS_DEG_TO_RAD;
+  const double lat2 = ((double)b->lat_e7 / 10000000.0) * ZS_DEG_TO_RAD;
+  const double dlat = lat2 - lat1;
+  const double dlon = ((double)((int64_t)b->lon_e7 - (int64_t)a->lon_e7) / 10000000.0) * ZS_DEG_TO_RAD;
+  const double x = dlon * cos((lat1 + lat2) * 0.5);
+  const double y = dlat;
+  const double distance = ZS_EARTH_RADIUS_M * sqrt(x * x + y * y);
+  if (!isfinite(distance) || distance <= 0.0) return 0u;
+  if (distance >= 4294967295.0) return UINT32_MAX;
+  return (uint32_t)(distance + 0.5);
 }
 
 zs_position_trust_result_t zs_position_trust_update(

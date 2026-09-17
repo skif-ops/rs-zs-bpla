@@ -27,3 +27,10 @@ def isolate_station_store_after_collection():
     service.track_frames.clear()
     type_service.sessions.clear()
     yield
+
+
+@pytest.fixture
+def insecure_station_http_bench(monkeypatch):
+    """Enable the legacy station HTTP transport for an isolated test only."""
+
+    monkeypatch.setenv("ZS_STATION_HTTP_INSECURE_BENCH", "1")

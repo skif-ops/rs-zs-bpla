@@ -1,0 +1,215 @@
+{
+  "schema_version": "dioneya.pcb-main-mechanical-eco-candidate.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-MECH-ECO-001",
+  "status": "PROPOSED_NOT_APPROVED",
+  "scope": "LIMITED_MAIN_AUTH_011_MECHANICAL_ECO",
+  "baseline": {
+    "inspected_commit": "989ce217d44795ba2986453d1f37152af5a8e1fc",
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "aa35fe622b6a0761b9b25ae488e1a2c6e7160c285ab771b580f63513b83e4a22",
+    "authority": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+    "authority_sha256": "2ea8da3b8469f616c469eb342127afd2e75b3b0ad04f3ab75154560211f353c9"
+  },
+  "immutable_constraints": {
+    "board_outline_mm": [
+      110.0,
+      75.0
+    ],
+    "board_corner_radius_mm": 3.0,
+    "board_component_edge_clearance_mm": 1.0,
+    "mounting_holes_unchanged": true,
+    "component_exclusion_diameter_mm": 10.0,
+    "connector_and_module_rotations_unchanged": true,
+    "electrical_connectivity_unchanged": true
+  },
+  "changes": [
+    {
+      "record_id": "MECH-007",
+      "refdes": "J_PWR",
+      "fields": {
+        "Y_mm": {
+          "from": 13.0,
+          "to": 15.0
+        }
+      },
+      "reason": "Clear the unchanged H1 10 mm component exclusion."
+    },
+    {
+      "record_id": "MECH-008",
+      "refdes": "J_MIC1",
+      "fields": {
+        "Y_mm": {
+          "from": 30.0,
+          "to": 42.5
+        }
+      },
+      "reason": "Separate the west microphone connector courtyard from J_PWR."
+    },
+    {
+      "record_id": "MECH-014",
+      "refdes": "J8",
+      "fields": {
+        "Y_mm": {
+          "from": 68.0,
+          "to": 71.5
+        }
+      },
+      "reason": "Separate the cellular U.FL courtyard and D8 service cylinder from U8 while retaining north-side coax access and the board-edge component margin."
+    },
+    {
+      "record_id": "MECH-016",
+      "refdes": "J10",
+      "fields": {
+        "Y_mm": {
+          "from": 68.0,
+          "to": 71.5
+        }
+      },
+      "reason": "Clear the U10 courtyard from the J10 D8 service cylinder while retaining north-side coax access and the board-edge component margin."
+    },
+    {
+      "record_id": "MECH-019",
+      "refdes": "J13",
+      "fields": {
+        "Y_mm": {
+          "from": 13.0,
+          "to": 15.0
+        }
+      },
+      "reason": "Clear the unchanged H2 10 mm component exclusion."
+    },
+    {
+      "record_id": "MECH-020",
+      "refdes": "U8",
+      "fields": {
+        "Y_mm": {
+          "from": 53.0,
+          "to": 52.0
+        }
+      },
+      "reason": "Create positive clearance to the moved J8 D8 tool cylinder without changing BG95 orientation or its south-side RF endpoint."
+    },
+    {
+      "record_id": "MECH-024",
+      "refdes": "ZONE_CELL",
+      "fields": {
+        "Y_mm": {
+          "from": 42.0,
+          "to": 34.0
+        },
+        "Extent_Y_mm": {
+          "from": 30.0,
+          "to": 40.0
+        }
+      },
+      "reason": "Keep the moved J8 courtyard inside the cellular allocation and reserve a south-side strip for the U8 RF matching and bulk network."
+    },
+    {
+      "record_id": "MECH-026",
+      "refdes": "ZONE_LORA",
+      "fields": {
+        "Extent_Y_mm": {
+          "from": 26.0,
+          "to": 28.0
+        }
+      },
+      "reason": "Keep the moved J10 controlled courtyard inside the LoRa allocation."
+    },
+    {
+      "record_id": "MECH-032",
+      "refdes": "KO_MIC1_HARNESS",
+      "fields": {
+        "Y_mm": {
+          "from": 25.0,
+          "to": 37.5
+        },
+        "Extent_X_mm": {
+          "from": 12.0,
+          "to": 10.0
+        }
+      },
+      "reason": "Track J_MIC1 and retain the specified 10 mm inboard bend-start run without entering ZONE_CELL."
+    }
+  ],
+  "expected_audit": {
+    "baseline_locked_component_conflicts": [
+      [
+        "J8",
+        "U8"
+      ],
+      [
+        "J_MIC1",
+        "J_PWR"
+      ]
+    ],
+    "baseline_locked_mounting_conflicts": [
+      [
+        "H1",
+        "J_PWR"
+      ],
+      [
+        "H2",
+        "J13"
+      ]
+    ],
+    "baseline_locked_tool_conflicts": [
+      [
+        "J10",
+        "U10"
+      ],
+      [
+        "J8",
+        "U8"
+      ]
+    ],
+    "candidate_locked_component_conflicts": [],
+    "candidate_locked_mounting_conflicts": [],
+    "candidate_locked_tool_conflicts": [],
+    "candidate_unresolved_placement": {
+      "confirmed_component_collisions": 15,
+      "screening_component_collisions": 67,
+      "confirmed_mounting_clearance_conflicts": 0,
+      "screening_mounting_clearance_conflicts": 1,
+      "confirmed_tool_clearance_conflicts": 0,
+      "screening_tool_clearance_conflicts": 0
+    },
+    "margins_mm": {
+      "j_pwr_to_j_mic1_edge_gap": 0.94,
+      "j8_to_u8_edge_gap": 2.45,
+      "j10_to_u10_edge_gap": 4.0,
+      "h1_to_j_pwr_component_exclusion": 0.92,
+      "h2_to_j13_component_exclusion": 0.775846,
+      "mic1_corridor_to_u8_edge_gap": 1.05,
+      "cell_zone_to_audio_zone_gap": 1.0,
+      "cell_zone_to_north_board_edge": 1.0,
+      "lora_zone_to_north_board_edge": 1.0,
+      "cell_zone_south_strip_below_u8_courtyard": 3.2,
+      "j8_courtyard_to_north_board_edge": 1.25,
+      "j10_courtyard_to_north_board_edge": 1.25,
+      "j8_tool_to_u8_courtyard": 0.7,
+      "j9_tool_to_u9_courtyard": 0.9,
+      "j10_tool_to_u10_courtyard": 2.25,
+      "j8_tool_to_h4_component_exclusion": 2.101802
+    },
+    "service_geometry_mm": {
+      "ufl_tool_diameter": 8.0,
+      "ufl_tool_height": 15.0,
+      "j8_tool_north_overhang": 0.5,
+      "j10_tool_north_overhang": 0.5
+    }
+  },
+  "approval": {
+    "reviewer": null,
+    "date": null,
+    "decision": null,
+    "commit_sha": null
+  },
+  "open_validation": [
+    "Confirm the selected J_MIC1 mating harness, latch pull, cable outside diameter, bend radius and strain relief against the proposed 10.0 mm inboard corridor.",
+    "Repack all unlocked footprints using electrical-domain, decoupling, RF, return-current, thermal and service-volume constraints.",
+    "Replace pad-envelope screening with controlled courtyard or body evidence for the 169 screened fitted footprints.",
+    "Pass strict placement clearance, KiCad DRC with zero unrouted items, native STEP/enclosure review and independent PCB-MAIN Review B."
+  ],
+  "manufacturing_release": false
+}

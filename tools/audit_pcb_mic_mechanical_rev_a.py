@@ -20,6 +20,7 @@ EXPECTED_THICKNESS = 1.0
 EXPECTED_MATERIAL = "FR-4"
 EXPECTED_FINISH = "ENIG"
 EXPECTED_REV = "A"
+EXPECTED_AUTHORITY = "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md"
 EXPECTED_MOUNTS = {
     "H1": (4.0, 16.65),
     "H2": (20.0, 16.65),
@@ -87,6 +88,13 @@ def load_fabrication_metadata(board_path: Path) -> dict:
         raise RuntimeError(f"fabrication metadata copper layers: {metadata.get('copper_layers')!r} != 2")
     if metadata.get("status") != "NOT_FOR_MANUFACTURE":
         raise RuntimeError(f"unexpected PCB-MIC release state: {metadata.get('status')!r}")
+    if metadata.get("authority") != EXPECTED_AUTHORITY:
+        raise RuntimeError(
+            f"fabrication metadata authority: {metadata.get('authority')!r} != {EXPECTED_AUTHORITY!r}"
+        )
+    authority = Path(__file__).resolve().parents[1] / EXPECTED_AUTHORITY
+    if not authority.is_file():
+        raise RuntimeError(f"controlled PCB-MIC mechanical authority missing: {authority}")
     return metadata
 
 

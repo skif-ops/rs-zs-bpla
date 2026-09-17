@@ -67,8 +67,12 @@ SAFE_PIN_STATES = {
     "LORA_TXEN": "GPIO_PIN_RESET",
     "LORA_RXEN": "GPIO_PIN_RESET",
     "LORA_RESET_N": "GPIO_PIN_SET",
+    "CELL_PWRKEY_CMD": "GPIO_PIN_RESET",
+    "CELL_RESET_N_CMD": "GPIO_PIN_RESET",
+    "CELL_DTR": "GPIO_PIN_RESET",
     "EN_MODEM": "GPIO_PIN_RESET",
     "EN_AUX": "GPIO_PIN_RESET",
+    "SIM_MUX_SEL": "GPIO_PIN_RESET",
     "SIM_MUX_EN": "GPIO_PIN_RESET",
     "BLE_EN": "GPIO_PIN_RESET",
     "BLE_DFU_REQ": "GPIO_PIN_SET",
@@ -103,6 +107,13 @@ def sha256_file(relative: str) -> str:
 
 def c_string(value: str) -> str:
     return json.dumps(value, ensure_ascii=False)
+
+
+def c_identifier(value: str) -> str:
+    identifier = re.sub(r"[^A-Z0-9_]", "_", value.upper())
+    if not identifier or identifier[0].isdigit():
+        identifier = "NET_" + identifier
+    return identifier
 
 
 def read_rows() -> list[dict[str, str]]:
@@ -181,6 +192,17 @@ def render_board_header(rows: list[dict[str, str]]) -> str:
         "#define EVT_PRE_20_AF_SYS (-3)",
         "",
         "typedef enum {",
+    ]
+    for index, row in enumerate(rows):
+        output.append(
+            f"  EVT_PRE_20_PIN_{c_identifier(row['Net'])} = {index}u,"
+        )
+    output.extend(
+        [
+            "  EVT_PRE_20_PIN_COUNT = EVT_PRE_20_PIN_ASSIGNMENT_COUNT",
+            "} evt_pre_20_pin_id_t;",
+            "",
+        "typedef enum {",
         "  EVT_PRE_20_DIRECTION_IN = 0,",
         "  EVT_PRE_20_DIRECTION_OUT,",
         "  EVT_PRE_20_DIRECTION_BIDIR,",
@@ -200,7 +222,8 @@ def render_board_header(rows: list[dict[str, str]]) -> str:
         "} evt_pre_20_pin_contract_t;",
         "",
         "static const evt_pre_20_pin_contract_t evt_pre_20_pin_contract[] = {",
-    ]
+        ]
+    )
     for row in rows:
         port, gpio_pin = parse_gpio(row["MCU_Pin"])
         alternate_function = parse_af(row["AF"])
@@ -219,6 +242,8 @@ def render_board_header(rows: list[dict[str, str]]) -> str:
             "    sizeof(evt_pre_20_pin_contract) / sizeof(evt_pre_20_pin_contract[0]) ==",
             "        EVT_PRE_20_PIN_ASSIGNMENT_COUNT,",
             '    "EVT-PRE-20 pin contract count mismatch");',
+            "_Static_assert(EVT_PRE_20_PIN_COUNT == EVT_PRE_20_PIN_ASSIGNMENT_COUNT,",
+            '               "EVT-PRE-20 pin identifier count mismatch");',
             "",
             "#endif",
             "",

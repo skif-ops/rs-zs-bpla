@@ -22,11 +22,11 @@
     },
     {
       "path": "firmware/targets/evt_pre_20/target_status.yaml",
-      "sha256": "9ddb11effd609c066d1e221580986a960639562f4d53c1aa2f8d86cff4863872"
+      "sha256": "fe8be36ad2831a8323ec879390141ed45ac2e4bf1f92cc58e615ff508f6997ce"
     },
     {
       "path": "firmware/targets/evt_pre_20/cubemx_generation_contract.json",
-      "sha256": "70328b8fe5139d48b2c7cbaafb4c432d62278ece8d80350a288df03704e5af49"
+      "sha256": "ededd32fd81235b5abb0aa1aca4c1f1d86720ce3cda295a0bee14d850dfcc1aa"
     },
     {
       "path": "firmware/targets/evt_pre_20/vendor/stm32cubemx_db.lock.json",
@@ -36,7 +36,7 @@
   "generated_outputs": [
     {
       "path": "firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h",
-      "sha256": "4996c33902d339c2f881a834bfbd80ba4c15d9704778167b521212accef02206"
+      "sha256": "89d28545e2c0069df4525605c0a8ae7225e36f7ef25206a7de12108061825735"
     },
     {
       "path": "firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h",
@@ -44,7 +44,7 @@
     },
     {
       "path": "firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc",
-      "sha256": "6dce44100349acda6c33c495aeddebb595a01274439a9e24846f4d13668ceca4"
+      "sha256": "b838e4b060164581fbed90f427a75394e8b0be8a0baf13d1df9aabb15fad41e0"
     }
   ],
   "pin_assignment_count": 67,

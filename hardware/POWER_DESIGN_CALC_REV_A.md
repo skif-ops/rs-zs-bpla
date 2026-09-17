@@ -9,7 +9,16 @@ Component temperature capability target: at least `-40...+85 C`, with junction m
 
 Источник: 4S LiFePO4, номинально 12.8 V.
 
-Для расчёта DC/DC до фиксации конкретного аккумулятора используется рабочее окно 10.0...14.6 V. Реальные BMS cutoff/recovery voltages должны быть заменены паспортными значениями выбранного аккумуляторного SKU.
+EVT-кандидат аккумулятора зафиксирован как RELiON `RB40`, 12.8 V / 40 Ah /
+512 Wh. Для расчёта DC/DC до завершения sample/EVT проверки сохраняется
+консервативное рабочее окно 10.0...14.6 V. Паспортные и измеренные BMS
+cutoff/recovery voltages RB40 должны заменить это provisional окно перед выпуском.
+
+EVT-кандидат солнечного тракта: SLD Tech `SLP080S-12M` и Victron SmartSolar
+75/10 `SCC075010060R` с датчиком Smart Battery Sense `SBS050150200` (`0.45 m`
+провода, wireless range до `10 m`, M10 eyelets, рабочий диапазон `-10..60 C`).
+Для M10 eyelets на M8 терминалах RB40 нужен утверждённый washer/retention stack.
+Выбор точных MPN не заменяет измерение переходного процесса и конфигурационный audit.
 
 Входной transient envelope пока НЕ заморожен. До выпуска платы требуется измерить/утвердить:
 
@@ -21,6 +30,48 @@ Component temperature capability target: at least `-40...+85 C`, with junction m
 - допустимый импульс TVS.
 
 Поэтому `SMBJ18A` и PCB-fuse остаются кандидатами, а не release values.
+
+### 1.1 Fuse desk review and bounded value ECO
+
+Подписанная native-схема содержит `0451005.MRL` 5 A. Этот кандидат отклонён
+для непрерывной линии 5 A: Littelfuse требует стандартный derating 25% для
+continuous operation дополнительно к температурной кривой. Поэтому 5 A nominal
+даёт только `3.75 A` до температурного derating и не покрывает расчётный ток.
+
+Для EVT-квалификации выбран точный кандидат Littelfuse `0451008.MRL` в том же
+Nano2 451 land pattern:
+
+- nominal rating `8 A`;
+- nominal cold resistance `7.7 mOhm`;
+- nominal melting I²t `20.23 A²s`;
+- после только стандартного 25% derating остаётся `6.0 A`;
+- при 5 A nominal cold loss составляет `0.1925 W`.
+
+`7 A` не выбран: после стандартного derating он оставляет лишь `5.25 A` ещё
+до обязательного +70 C temperature rerating. `8 A` также остаётся ниже
+опубликованного Molex предела `8.5 A/contact` для J1 `43045-0213` и terminal
+`43030-0038`, но разница `0.5 A` не считается release margin. Нужны
+assembled thermal tests J1/harness/F1 при +70 C и подтверждённом 18 AWG проводе.
+
+Это двухступенчатое изменение. BOM и qualification contract переходят на
+`0451008.MRL`, но подписанные native schematic/PCB сохраняют старую value
+`0451005.MRL` до отдельного value-only ECO. До повторных KiCad 9 ERC/PDF,
+независимого hierarchy review и закрытия
+`PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv` запрещены PCBA procurement и
+manufacturing release. Топология и footprint не меняются.
+
+`SMBJ18A` сохраняется как точный EVT-кандидат: 18 V standoff,
+20.0...22.1 V breakdown, 29.2 V maximum clamp at 20.6 A и 600 W at
+10/1000 us. Его 29.2 V tabulated clamp даёт только 6.8 V до 36 V absolute
+maximum buck input, поэтому qualification требует измеренный максимум не более
+`32.0 V` на protected node и немедленный reject при любом измерении
+`>=36.0 V`. TVS не предназначен для длительного MPPT overvoltage.
+
+INA226 scaling остаётся `200 uA/bit` для нормального operating envelope до
+5 A. Его signed current register покрывает около `6.5534 A`; overload и
+fault-energy испытания выше этого тока обязаны использовать внешний
+калиброванный current probe и осциллограф. INA226 не является прибором
+fuse-clearing qualification.
 
 ## 2. Reverse polarity / reverse current
 
@@ -75,7 +126,22 @@ Release inductor requirement:
 - low DCR;
 - -40...+125 C preferred.
 
-Exact MPN remains procurement/thermal/EMI gated.
+Selected for both rails: Coilcraft `XAL7030-472MEC`, 4.7 uH +/-20%,
+AEC-Q200, DCR 26.1 mOhm typical / 30.0 mOhm maximum, Isat 10.1 A and
+Irms 6.9 A for 20 C rise. The controlled footprint follows Coilcraft document
+863-2: two `1.58 x 6.50 mm` lands separated by a `2.94 mm` inner gap. Pad 1 is
+the marked start/short lead and must face the SW/high-dV/dt node.
+
+At the provisional maximum input of 14.6 V and 400 kHz:
+
+- 3.8 V rail ripple is about 1.50 A p-p, so the 4 A full-load peak is about
+  4.75 A and calculated RMS is about 4.02 A;
+- 3.3 V rail ripple is about 1.36 A p-p, so the 4 A full-load peak is about
+  4.68 A and calculated RMS is about 4.02 A;
+- maximum winding loss from the 30.0 mOhm DCR limit is 0.48 W at 4 A.
+
+The exact MPN and land pattern are therefore frozen. In-application +70 C
+temperature rise, load-step behaviour and EMI remain release gates.
 
 ### 3.2 Feedback divider for 3.8 V
 
@@ -108,7 +174,10 @@ Quectel requires approximately 100 uF low-ESR bypass near VBAT and reserves sepa
 - Quectel-recommended HF MLCC arrays adjacent to the appropriate modem pins;
 - star split from the common 3.8 V source into VBAT_BB and VBAT_RF.
 
-The exact capacitor technology/MPN is frozen only after cold-temperature ESR, load-step and layout review.
+Exact PCB-PWR capacitor candidates are controlled in
+`PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv` so schematic capture and the engineering BOM use
+one identity. They are not released for manufacture until cold-temperature ESR,
+DC-bias derating, transient/load-step and layout review are closed.
 
 ## 4. 3.3 V digital rail
 
@@ -151,13 +220,20 @@ TPS7A20 has low-noise/high-PSRR characteristics and low Iq, suitable for the mic
 
 Monitor: `INA226AIDGSR`.
 
-Capture shunt proposal:
+Capture shunt selection:
 
 - RSHUNT = `10 mOhm`;
 - 4-terminal/Kelvin construction required;
 - >=1 W rating target;
 - <=1% tolerance, 0.5% or 0.1% preferred;
 - low TCR, <=50 ppm/C target.
+
+Selected: Vishay Dale `WSK2512R0100FEA`, true four-terminal construction,
+10 mOhm +/-1%, 1 W at 70 C and +/-35 ppm/C TCR. Its controlled footprint uses
+the current Vishay document 30108 land-pattern values for the 0.005...0.2 Ohm
+range: `a=2.29`, `b=3.30`, `c=0.76`, `d=0.51`, `e=1.70`, `l=3.68 mm`.
+Pads 1/2 are source/load current lands; pads 3/4 are the corresponding
+source/load Kelvin sense lands.
 
 Reasoning:
 
@@ -167,6 +243,8 @@ At 5 A input current:
 - P = 0.25 W;
 
 which remains inside INA226 shunt measurement range while providing useful resolution.
+The 1 W rating is exactly four times the 0.25 W nominal dissipation at 5 A.
+Final Kelvin routing, thermal evidence and reference-meter calibration remain blocking.
 
 Firmware scaling baseline for max expected 5 A:
 
@@ -175,7 +253,9 @@ Firmware scaling baseline for max expected 5 A:
 - CAL = 0.00512 / (0.0002 * 0.010) = `2560`;
 - Power_LSB = 25 * Current_LSB = `5 mW/bit`.
 
-These values are capture/firmware defaults and must be updated if final fuse/current envelope changes.
+These values remain the normal-operation telemetry baseline. They must be updated
+if the released operating-current envelope, rather than only the protective fuse
+rating, exceeds 5 A. Overload/fault qualification uses external instrumentation.
 
 ## 7. Required bench validation before release
 
@@ -218,19 +298,23 @@ Can proceed into native schematic capture now:
 - LMR60440 x2;
 - 3.8 V feedback 100k / 35.7k;
 - 400 kHz baseline, RT 86.6k;
-- 4.7 uH topology;
+- Coilcraft XAL7030-472MEC 4.7 uH inductors with controlled land pattern;
 - TPS7A2018;
-- INA226 with 10 mOhm capture shunt.
+- INA226 with Vishay WSK2512R0100FEA 10 mOhm four-terminal shunt and controlled land pattern.
 
 Still open before `FOR_MANUFACTURE`:
 
-- exact inductors;
-- exact MLCC/bulk capacitor MPNs after derating;
+- in-application inductor thermal/load-step/EMI evidence;
+- release of the controlled MLCC/bulk capacitor candidates after DC-bias,
+  cold-ESR, transient, load-step and package/assembly review;
 - TVS;
 - PCB fuse;
-- shunt exact MPN;
-- selected battery/BMS voltage limits;
-- selected MPPT transient envelope;
+- shunt Kelvin layout, temperature rise and reference-meter calibration;
+- measured RB40 BMS cutoff/recovery voltage limits and cold-system behavior;
+- measured `SCC075010060R` disconnect/reconnect transient envelope and exported
+  charge profile;
+- proof that `SBS050150200` remains in the VE.Smart network and disables charge
+  below the project `0 C` threshold;
 - thermal and load-step test evidence;
 - EMC/EMI evidence.
 

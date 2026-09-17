@@ -9,7 +9,7 @@
 | Общий заводской пароль | уникальный bootstrap secret на изделие, одноразовое погашение | duplicate/expired secret |
 | Перехват BLE | BLE Secure Connections плюс application transcript binding | MITM test |
 | Несанкционированная конфигурация | role, authenticated session, schema validation, atomic commit | fuzz и permission test |
-| Подмена координат станции | installation coordinates записываются только в физическом service mode, read-back/hash/lock, смена создаёт новую version/audit | remote write, modified app request, replay старой конфигурации |
+| Подмена координат станции | installation coordinates записываются только в физическом service mode; hash вычисляет станция; приложение независимо сверяет canonical hash/read-back/lock/audit; смена создаёт новую version | remote write, modified app request, replay старой конфигурации |
 | GNSS spoofing позиции | configured installation coordinates остаются authoritative, GNSS сравнивается с ними, receiver spoof/jam flags отображаются отдельно | drift/jump/spoof injection matrix |
 | GNSS spoofing времени | position trust и time trust разделены; подозрительный PPS переводит систему в TIME_SUSPECT/HOLDOVER | time jump/PPS injection |
 | Реальное перемещение станции | accelerometer/tamper переводит station position в REVALIDATION_REQUIRED без автоматической смены координат | physical relocation test |

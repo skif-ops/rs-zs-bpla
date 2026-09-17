@@ -221,7 +221,7 @@ def main() -> None:
     print("- all 20 physical contacts and independent module/connector maps verified")
     print("- supply choices, UART/PPS, SAFEBOOT and active-antenna supervisor verified")
     print("- RF/bias topology and controlled calculations verified")
-    print("- native capture and Reviews A/B keep the production BOM blocked")
+    print("- Reviews A/B keep the production BOM blocked")
     print(f"report: {args.output.relative_to(ROOT) if args.output.is_relative_to(ROOT) else args.output}")
 
 

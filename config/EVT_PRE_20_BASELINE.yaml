@@ -1,7 +1,7 @@
 project: Dioneya_ZS_BPLA
 configuration_id: EVT-PRE-20
-baseline_version: 0.1
-baseline_date: 2026-09-08
+baseline_version: 0.3
+baseline_date: 2026-09-13
 status: OPEN_NOT_RUN
 source_branch: evt
 source_commit: 2ec1d6dc81e3a16b7c127f1bbfe03f3945a72c45
@@ -12,11 +12,26 @@ branch_isolation:
   allowed_promotion_targets: [develop, main]
   promotion_rule: reviewed_common_changes_only
 
+authority_sync:
+  integration_source_commit: f3411e51938aa1423fdbaeeef9585aeea385c239
+  synchronized_blocks: [MAIN-AUTH-008, MAIN-AUTH-009, MAIN-AUTH-010, MAIN-AUTH-011]
+  complete_set: MAIN-AUTH-001_THROUGH_011_CLOSED
+  native_pcb_main: PRESENT_SCHEMATIC_ERC_PASS_REVIEW_A_PASS_LAYOUT_CANDIDATE_UNROUTED
+  review_a: PASS_SIGNED_COMMIT_35C9ED91
+  review_b: OPEN_ROUTING_DRC_CAM_DFM_AND_EVIDENCE_PENDING
+  production_bom: BLOCKED
+
 lot:
-  quantity: 20
+  maximum_station_quantity: 20
+  supported_procurement_quantities: [4, 10, 20]
+  selected_evt_quantity: 20
+  selection_required_before_purchase_release: true
+  selection_status: LOCKED_CURRENT_CUSTOMER_EVT_20
+  selected_serial_range: ["001", "020"]
   serial_prefix: DIO-EVT-
   serial_range: ["001", "020"]
-  allocation_status: LOCKED_CUSTOMER_RU868_ALL_20
+  serial_range_role: MAXIMUM_CAPACITY_RESERVATION
+  allocation_status: LOCKED_CUSTOMER_RU868_FOR_20_UNIT_EVT_LOT
   lora_allocation:
     RU868: ["001", "020"]
     EU868: []
@@ -113,10 +128,17 @@ communications:
     sim_architecture: dual_sim_single_standby
     physical_nano_sim_slots: 2
     simultaneously_active_sim_count: 1
+    dual_sim_failover_firmware: PORTABLE_SAFE_SEQUENCE_BG95_PROFILE_MATCH_AND_EXACT_REV_A_GPIO_INTERLOCK_QG1_QG2_PASS_TARGET_HAL_PHYSICAL_AUDIT_BINDING_PENDING
     pilot_operator_candidates: [MTS, MegaFon, Beeline, T2_Tele2, GLONASS_supplied_SIM]
     static_public_ip_required: false
     inbound_station_connection_required: false
     store_and_forward_required: true
+    full_imsi_iccid_in_protected_heartbeat: required
+    cellular_identity_transport: mqtt_mutual_tls_only
+    cellular_identity_open_logs: forbidden
+    cellular_identity_general_api: redacted_only
+    operator_validation_timing: after_station_assembly
+    mqtt_24h_evt_timing: after_station_assembly
   lora:
     role: backup_event_transport
     common_pcb: true
@@ -149,6 +171,8 @@ mechanics:
   pilot_housing_allocation_status: LOCKED_CUSTOMER
   pilot_primary_process: vacuum_casting
   pilot_primary_quantity: 20
+  supported_procurement_quantities: [4, 10, 20]
+  maximum_serial_capacity: 20
   pilot_fallback_process: 3d_print
   pilot_fallback_quantity_if_activated: 20
   fallback_activation: customer_approved_if_vacuum_casting_unavailable
