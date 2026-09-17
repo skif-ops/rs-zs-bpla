@@ -2,12 +2,12 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-PWR",
-  "release_state": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_NATIVE_ERC_PDF_EVIDENCE_PASS_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_COPPER_REQUESTS_READY_CANDIDATE",
+  "release_state": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS_F1_VALUE_ECO_APPLIED_REPEAT_NATIVE_ERC_PDF_HUMAN_REVIEW_PENDING_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_COPPER_REQUESTS_READY_CANDIDATE",
   "manufacturing_release": false,
   "native_schematic": {
     "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
     "status": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS",
-    "erc_status": "PASS_KICAD_9_ZERO_VIOLATIONS_COMMIT_BOUND_EVIDENCE",
+    "erc_status": "PENDING_REPEAT_KICAD_9_POST_F1_VALUE_ECO_COMMIT_BOUND_EVIDENCE",
     "page_count": 5,
     "functional_child_sheets": 4,
     "child_paths": [
@@ -22,7 +22,7 @@
     "connectivity_reader": "tools/pcb_pwr_schematic_hierarchy.py",
     "independent_audit": "tools/audit_pcb_pwr_hierarchy_rev_a.py",
     "control": {
-      "state": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
+      "state": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_F1_VALUE_ECO_APPLIED_REPEAT_NATIVE_KICAD_9_ERC_PDF_HUMAN_REVIEW_PENDING",
       "pages": 5,
       "functional_child_sheets": 4,
       "symbols": 63,
@@ -32,15 +32,32 @@
       "hierarchical_labels": 26,
       "pin_net_semantic_sha256": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
       "pin_net_review_a_retained": true,
-      "native_kicad_9_erc_pass": true,
-      "committed_erc_evidence": true,
-      "committed_pdf_evidence": true,
-      "independent_human_review_complete": true,
+      "native_kicad_9_erc_pass": false,
+      "committed_erc_evidence": false,
+      "committed_pdf_evidence": false,
+      "independent_human_review_complete": false,
+      "prior_evidence_superseded_by_f1_value_eco": true,
       "routing_authorized": false,
       "manufacturing_release": false
     },
-    "evidence": {
-      "status": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
+    "current_evidence": {
+      "status": "PENDING_COMMIT_BOUND_KICAD_9_ERC_PDF_AND_INDEPENDENT_HUMAN_REVIEW",
+      "eco": {
+        "change": "F1_0451005.MRL_TO_0451008.MRL",
+        "applied_date": "2026-09-17",
+        "value_only": true,
+        "pin_net_semantic_sha256_before": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
+        "pin_net_semantic_sha256_after": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a"
+      },
+      "source_commit_sha": null,
+      "erc": null,
+      "schematic_pdf": null,
+      "independent_human_review": null,
+      "routing_authorized": false,
+      "manufacturing_release": false
+    },
+    "historical_evidence": {
+      "status": "SUPERSEDED_BY_F1_VALUE_ECO_HISTORICAL_RECORD_ONLY",
       "source_commit_sha": "2a973f6856aa115aa59323d619be985578780682",
       "source_tree_sha": "c8cd8272c0ebe50a4e5fc30fd484427740dbda11",
       "schematic_gate_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35122481138",
@@ -167,7 +184,7 @@
   },
   "review_a": {
     "complete": true,
-    "status": "PASS_PIN_NET_AUTHORITY_HIERARCHY_NATIVE_ERC_PDF_EVIDENCE_PASS_HUMAN_ACCEPTED"
+    "status": "PASS_PIN_NET_AUTHORITY_HIERARCHY_INTERNAL_EQUIVALENCE_F1_VALUE_ECO_REPEAT_EVIDENCE_HUMAN_REVIEW_PENDING"
   },
   "pre_route_constraints": {
     "authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
@@ -216,7 +233,7 @@
     }
   },
   "input_protection_candidate_eco": {
-    "state": "TARGET_8A_SELECTED_SIGNED_NATIVE_5A_VALUE_ECO_PENDING",
+    "state": "TARGET_8A_NATIVE_VALUE_ECO_APPLIED_REPEAT_ERC_PDF_HUMAN_HIERARCHY_REVIEW_PENDING",
     "qualification_record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md",
     "machine_contract": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json",
     "test_matrix": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
@@ -227,7 +244,10 @@
     "target_tvs_mpn": "SMBJ18A",
     "topology_change": false,
     "footprint_change": false,
-    "native_value_eco_applied": false,
+    "native_value_eco_applied": true,
+    "value_only_change_verified": true,
+    "pin_net_semantic_sha256_before": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
+    "pin_net_semantic_sha256_after": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
     "repeat_native_kicad_9_erc_required": true,
     "repeat_pdf_evidence_required": true,
     "repeat_independent_human_hierarchy_review_required": true,
@@ -238,9 +258,9 @@
   },
   "review_b": {
     "complete": false,
-    "status": "OPEN_HIERARCHY_ACCEPTED_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_PENDING",
+    "status": "OPEN_F1_VALUE_ECO_REPEAT_ERC_PDF_HUMAN_REVIEW_PENDING_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_PENDING",
     "blockers": [
-      "target F1 0451008.MRL is selected only in BOM/qualification control; signed native value 0451005.MRL is rejected and requires a bounded value-only ECO plus repeat ERC PDF and human hierarchy review before PCBA procurement",
+      "target F1 0451008.MRL value-only native ECO is applied with topology footprint placement and nets retained; repeat commit-bound ERC PDF and independent human hierarchy review remain required before PCBA procurement",
       "DIM-003 mechanical freeze response register has 0/18 accepted rows; assembled envelope terminal zones mounting pattern and frozen PCB STEP remain open",
       "PCB-PWR stackup/copper response register has 0/24 accepted rows across 0/2 fabricator slots; no selected construction or accepted copper/plating authority",
       "high-current Kelvin hot-loop and switch-node routing",

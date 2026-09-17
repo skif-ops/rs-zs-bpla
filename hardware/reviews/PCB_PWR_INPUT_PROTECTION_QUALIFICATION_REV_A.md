@@ -1,18 +1,20 @@
 # PCB-PWR Rev.A input-protection qualification
 
-Status: `CONTROLLED PLAN / TARGET EVT CANDIDATES SELECTED / NATIVE VALUE ECO AND PHYSICAL EVIDENCE PENDING / NOT FOR MANUFACTURE`
+Status: `CONTROLLED PLAN / F1 NATIVE VALUE ECO APPLIED / REPEAT ERC, PDF, HUMAN REVIEW AND PHYSICAL EVIDENCE PENDING / NOT FOR MANUFACTURE`
 
 Configuration: `EVT-PRE-20 Rev.A`
 
-This packet controls the PCB-PWR input fuse and TVS decision without changing the
-previously accepted five-page native hierarchy. It selects the exact parts to
-qualify, records the desk calculations that reject the captured 5 A fuse, and
-defines the evidence required before any PCB assembly procurement.
+This packet controls the PCB-PWR input fuse and TVS decision. The bounded F1
+value-only ECO is applied without changing footprint, placement, topology, nets
+or pad mapping. The previously accepted five-page source remains historical
+evidence only; repeat commit-bound ERC/PDF evidence and a new independent human
+hierarchy decision are required before any PCB assembly procurement.
 
 ## 1. Controlled decision
 
-The signed native source and PDF contain F1 value `0451005.MRL`. That part is
-now rejected for the project 5 A continuous-current basis. Littelfuse specifies
+The prior signed native source and PDF contain F1 value `0451005.MRL`. That part
+is rejected for the project 5 A continuous-current basis. The active native
+schematic, PCB and their generators now contain `0451008.MRL`. Littelfuse specifies
 a standard 25% derating for continuous operation in addition to the temperature
 rerating curve:
 
@@ -26,7 +28,7 @@ The exact EVT qualification pair is:
 
 | Function | Candidate | Controlled rating | State |
 |---|---|---|---|
-| F1 PCB input fuse | Littelfuse `0451008.MRL` | 8 A; 7.7 mOhm nominal cold resistance; 20.23 A²s nominal melting I²t; 400 A at 32 VDC interrupting rating | Selected for qualification; native value ECO pending |
+| F1 PCB input fuse | Littelfuse `0451008.MRL` | 8 A; 7.7 mOhm nominal cold resistance; 20.23 A²s nominal melting I²t; 400 A at 32 VDC interrupting rating | Native value ECO applied; repeat ERC/PDF/human review and physical qualification pending |
 | D1 transient clamp | Littelfuse `SMBJ18A` | 18 V standoff; 20.0–22.1 V breakdown; 29.2 V maximum clamp at 20.6 A; 600 W at 10/1000 us | Selected for qualification; measured transient envelope pending |
 
 At 5 A the fuse's nominal cold loss is:
@@ -40,25 +42,25 @@ connector/crimp/wire path must pass the +70 C test.
 
 ## 2. Native-source interlock
 
-This is a two-stage ECO:
+This is a two-stage ECO gate:
 
 1. The controlled BOM and qualification contract select `0451008.MRL` and
    prohibit procurement of `0451005.MRL`.
-2. A later bounded value-only native ECO changes F1 in the generator,
-   `.kicad_sch` and `.kicad_pcb`. It must not alter the F1 footprint,
-   placement, topology, nets or pad mapping.
+2. The bounded value-only native ECO changes F1 in the generator,
+   `.kicad_sch` and `.kicad_pcb`. Independent semantic checks retain the exact
+   F1 footprint, placement, topology, nets and pad mapping.
 
-The existing commit-bound ERC, PDF and human acceptance remain the record for the
-unchanged signed source. They do not approve the target value. After the value
-ECO, fresh KiCad 9 ERC, a new five-page PDF, source hashes and a repeat
-independent hierarchy decision are mandatory.
+The existing commit-bound ERC, PDF and human acceptance remain the historical
+record for the superseded 5 A value. They do not approve the active 8 A value.
+Fresh KiCad 9 ERC, a new five-page PDF, source hashes and a repeat independent
+hierarchy decision are mandatory.
 
 Until then:
 
 - no PCB-PWR PCBA procurement is authorized;
 - no BOM line may claim `CONTROLLED` release for F1;
-- the native source may retain `0451005.MRL CANDIDATE` only as an explicitly
-  superseded signed value;
+- `0451005.MRL` may appear only in historical/provenance text, never in an
+  active native or generator value field;
 - manufacturing release remains false.
 
 ## 3. TVS acceptance boundary

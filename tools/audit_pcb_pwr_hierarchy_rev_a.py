@@ -375,10 +375,10 @@ def main() -> int:
         "cross_sheet_nets": len(cross_nets),
         "hierarchical_labels": total_hier_labels,
         "pin_net_semantic_sha256": semantic_sha256,
-        "erc_native_kicad_9": "PASS_COMMIT_BOUND_ZERO_VIOLATIONS",
-        "hierarchy_pdf_evidence": "PASS_COMMIT_BOUND_FIVE_PAGE_A3_VISUAL_PREFLIGHT",
+        "erc_native_kicad_9": "PENDING_REPEAT_POST_F1_VALUE_ECO",
+        "hierarchy_pdf_evidence": "PENDING_REPEAT_POST_F1_VALUE_ECO",
         "pin_net_review_a": "RETAINED_BY_EXACT_ELECTRICAL_EQUIVALENCE",
-        "hierarchy_human_review": "ACCEPTED_SKIF_ACCEPT_HIERARCHY_ONLY",
+        "hierarchy_human_review": "PENDING_REPEAT_INDEPENDENT_REVIEW_POST_F1_VALUE_ECO",
         "manufacturing_release": False,
     }
     status = json.loads(STATUS.read_text(encoding="utf-8"))
@@ -398,22 +398,40 @@ def main() -> int:
         "hierarchical_labels": 26,
         "pin_net_semantic_sha256": semantic_sha256,
         "pin_net_review_a_retained": True,
-        "native_kicad_9_erc_pass": True,
-        "committed_erc_evidence": True,
-        "committed_pdf_evidence": True,
-        "independent_human_review_complete": True,
+        "native_kicad_9_erc_pass": False,
+        "committed_erc_evidence": False,
+        "committed_pdf_evidence": False,
+        "independent_human_review_complete": False,
+        "prior_evidence_superseded_by_f1_value_eco": True,
         "routing_authorized": False,
         "manufacturing_release": False,
     }.items():
         require(control.get(key) == expected,
                 f"PCB-PWR hierarchy status {key} drift: {control.get(key)!r} != {expected!r}")
     require(control.get("state") ==
-            "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
+            "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_F1_VALUE_ECO_APPLIED_REPEAT_NATIVE_KICAD_9_ERC_PDF_HUMAN_REVIEW_PENDING",
             "PCB-PWR hierarchy control state drift")
-    evidence = hierarchy.get("evidence", {})
+    current_evidence = hierarchy.get("current_evidence", {})
+    require(current_evidence == {
+        "status": "PENDING_COMMIT_BOUND_KICAD_9_ERC_PDF_AND_INDEPENDENT_HUMAN_REVIEW",
+        "eco": {
+            "change": "F1_0451005.MRL_TO_0451008.MRL",
+            "applied_date": "2026-09-17",
+            "value_only": True,
+            "pin_net_semantic_sha256_before": semantic_sha256,
+            "pin_net_semantic_sha256_after": semantic_sha256,
+        },
+        "source_commit_sha": None,
+        "erc": None,
+        "schematic_pdf": None,
+        "independent_human_review": None,
+        "routing_authorized": False,
+        "manufacturing_release": False,
+    }, "PCB-PWR current post-ECO hierarchy evidence boundary drift")
+    evidence = hierarchy.get("historical_evidence", {})
     require(isinstance(evidence, dict) and evidence.get("status") ==
-            "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
-            "PCB-PWR hierarchy evidence status drift")
+            "SUPERSEDED_BY_F1_VALUE_ECO_HISTORICAL_RECORD_ONLY",
+            "PCB-PWR historical hierarchy evidence status drift")
     for key, expected in {
         "source_commit_sha": "2a973f6856aa115aa59323d619be985578780682",
         "source_tree_sha": "c8cd8272c0ebe50a4e5fc30fd484427740dbda11",
@@ -454,11 +472,8 @@ def main() -> int:
     }
     require(evidence.get("schematic_source_sha256") == expected_source_sha256,
             "PCB-PWR hierarchy evidence source-hash register drift")
-    for filename, expected_sha256 in expected_source_sha256.items():
-        path = args.schematic.parent / filename
-        actual_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
-        require(actual_sha256 == expected_sha256,
-                f"PCB-PWR hierarchy evidence source drift: {filename} {actual_sha256} != {expected_sha256}")
+    # These hashes bind the superseded 5 A source only. They must remain in the
+    # historical register but must not be compared with the active post-ECO source.
     require(evidence.get("independent_human_review") == {
         "status": "ACCEPTED_INDEPENDENT_HUMAN_REVIEW",
         "reviewer": "Скиф",

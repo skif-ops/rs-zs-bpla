@@ -273,10 +273,11 @@ Input: protected battery bus from LiFePO4/BMS/external MPPT. No MPPT charger is 
 Selected capture baseline:
 - reverse/reverse-current controller `LM74700QDBVRQ1` plus `CSD18540Q5B` 60 V N-MOSFET;
 - transient clamp `SMBJ18A` candidate pending measured transient envelope;
-- signed native PCB fuse value `0451005.MRL` is rejected for 5 A continuous
-  service; target EVT qualification candidate `0451008.MRL` uses the same
-  Nano2 451 footprint and remains blocked on a value-only native ECO, repeat
-  ERC/PDF/human hierarchy review and fuse/TVS/fault coordination;
+- prior signed native PCB fuse value `0451005.MRL` is rejected for 5 A continuous
+  service; active target EVT qualification candidate `0451008.MRL` uses the same
+  Nano2 451 footprint. Its value-only native ECO is applied without topology,
+  footprint, placement or net changes; repeat ERC/PDF/human hierarchy review and
+  fuse/TVS/fault coordination remain blocking;
 - `3V8_MODEM`: `LMR604403SRAKR`, 4 A adjustable synchronous buck;
 - `3V3_DIGITAL`: second `LMR604403SRAKR`, 4 A;
 - no separate 3V3_AON regulator in Rev.A unless measured S0 requires a configuration change;

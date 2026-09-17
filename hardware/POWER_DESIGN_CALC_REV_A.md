@@ -33,7 +33,7 @@ EVT-кандидат солнечного тракта: SLD Tech `SLP080S-12M` �
 
 ### 1.1 Fuse desk review and bounded value ECO
 
-Подписанная native-схема содержит `0451005.MRL` 5 A. Этот кандидат отклонён
+Ранее подписанная native-схема содержала `0451005.MRL` 5 A. Этот кандидат отклонён
 для непрерывной линии 5 A: Littelfuse требует стандартный derating 25% для
 continuous operation дополнительно к температурной кривой. Поэтому 5 A nominal
 даёт только `3.75 A` до температурного derating и не покрывает расчётный ток.
@@ -53,10 +53,11 @@ Nano2 451 land pattern:
 `43030-0038`, но разница `0.5 A` не считается release margin. Нужны
 assembled thermal tests J1/harness/F1 при +70 C и подтверждённом 18 AWG проводе.
 
-Это двухступенчатое изменение. BOM и qualification contract переходят на
-`0451008.MRL`, но подписанные native schematic/PCB сохраняют старую value
-`0451005.MRL` до отдельного value-only ECO. До повторных KiCad 9 ERC/PDF,
-независимого hierarchy review и закрытия
+Это двухступенчатое изменение. BOM и qualification contract перешли на
+`0451008.MRL`; bounded value-only ECO уже применён к native schematic/PCB и
+генераторам без изменения footprint, placement, topology, nets или pad map.
+Старые ERC/PDF/подпись относятся только к исторической value `0451005.MRL`.
+До повторных KiCad 9 ERC/PDF, независимого hierarchy review и закрытия
 `PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv` запрещены PCBA procurement и
 manufacturing release. Топология и footprint не меняются.
 

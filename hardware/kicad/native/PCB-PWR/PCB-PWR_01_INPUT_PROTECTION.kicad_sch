@@ -1170,7 +1170,7 @@
     (property "Reference" "F1" (id 0) (at 60.96 31.75 0)
       (effects (font (size 0.85 0.85)))
     )
-    (property "Value" "0451005.MRL CANDIDATE" (id 1) (at 60.96 59.69 0)
+    (property "Value" "0451008.MRL" (id 1) (at 60.96 59.69 0)
       (effects (font (size 0.85 0.85)))
     )
     (property "Footprint" "Fuse:Fuse_1206_3216Metric" (id 2) (at 60.96 56.72 0)
