@@ -88,12 +88,29 @@ def placement_candidate_audit(name: str) -> str | None:
             "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
             "tools/audit_pcb_main_layout_candidate_rev_a.py",
         ),
-        "PCB-PWR": (
-            PCB_PWR_STATUS,
-            "OPEN_F1_VALUE_ECO_LEGIBILITY_REMEDIATION_NATIVE_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_PENDING",
-            "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
-        ),
     }
+    if name == "PCB-PWR":
+        if not PCB_PWR_STATUS.is_file():
+            return None
+        status = json.loads(PCB_PWR_STATUS.read_text(encoding="utf-8"))
+        current_evidence = status.get("human_readable_hierarchy", {}).get(
+            "current_evidence", {}
+        )
+        evidence_complete = current_evidence.get("status") == (
+            "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING"
+        )
+        expected = (
+            "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING_"
+            "FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_"
+            "ROUTING_PENDING"
+            if evidence_complete else
+            "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_AND_HUMAN_REVIEW_PENDING_"
+            "FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_"
+            "ROUTING_PENDING"
+        )
+        if status.get("review_b", {}).get("status") != expected:
+            return None
+        return "tools/audit_pcb_pwr_layout_candidate_rev_a.py"
     if name not in controls:
         return None
     status_path, expected, audit = controls[name]
