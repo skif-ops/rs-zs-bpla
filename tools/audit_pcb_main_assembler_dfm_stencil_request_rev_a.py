@@ -507,8 +507,13 @@ def validate_authorities_and_release(contract: dict[str, Any]) -> None:
             "U25/U26 electrical authority differs")
 
     _, procurement_rows = read_csv(PROCUREMENT)
-    procurement = {row["Procurement_ID"]: row for row in procurement_rows}
-    assembly = procurement.get("PR-004", {})
+    assembly_rows = [
+        row for row in procurement_rows
+        if row.get("Assemblies") == "PCB-MAIN" and row.get("Item_IDs") == "ASM-MAIN"
+    ]
+    require(len(assembly_rows) == 1,
+            "PCB-MAIN assembly procurement row is missing or duplicated")
+    assembly = assembly_rows[0]
     require(assembly.get("Assemblies") == "PCB-MAIN"
             and assembly.get("Item_IDs") == "ASM-MAIN"
             and assembly.get("Manufacturer") == "Contract manufacturer"
@@ -516,7 +521,7 @@ def validate_authorities_and_release(contract: dict[str, Any]) -> None:
             and assembly.get("Status") == "RFQ_REQUIRED"
             and assembly.get("China_source_policy") == "Direct CM quotation"
             and "AOI" in assembly.get("Incoming_control", ""),
-            "PR-004 selected-assembler procurement boundary differs")
+            "PCB-MAIN selected-assembler procurement boundary differs")
     _, rfq_rows = read_csv(RFQ)
     rfq = {row["RFQ_ID"]: row for row in rfq_rows}
     main_assembly = rfq.get("RFQ-011", {})

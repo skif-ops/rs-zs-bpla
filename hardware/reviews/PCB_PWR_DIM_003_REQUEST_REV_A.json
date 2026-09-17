@@ -32,7 +32,7 @@
     "harness_logical_pinout": "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "harness_logical_pinout_sha256": "421b833fa809b099b310302fd942c2678d98f27da33a41d6e7b25176dfbab17d",
     "harness_manufacturing_schedule": "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv",
-    "harness_manufacturing_schedule_sha256": "ff70b7be1a86397b68d2ae45dc6d705e2d41892049a48327bdce7b0fa9eeae26",
+    "harness_manufacturing_schedule_sha256": "f17f90a2513592886cf4a98d966a4edc1b03b70b0bc4d304955f309da52e6e37",
     "open_dimensions": "mechanics/common/OPEN_DIMENSIONS.csv",
     "open_dimensions_sha256": "ebd7f420836455e641ec6b34e0152a2cfe965e5bee8a725af3029c0e569b6fa1"
   },

@@ -402,15 +402,20 @@ def validate_release_interlocks(contract: dict[str, Any]) -> None:
             "RFQ-023 does not preserve two-fabricator stackup/release interlocks")
 
     _, procurement_rows = read_csv(PROCUREMENT)
-    procurement = {row["Procurement_ID"]: row for row in procurement_rows}
-    bare_pcb = procurement.get("PR-013", {})
+    bare_pcb_rows = [
+        row for row in procurement_rows
+        if row.get("Assemblies") == "PCB-MAIN" and row.get("Item_IDs") == "PCB-MAIN"
+    ]
+    require(len(bare_pcb_rows) == 1,
+            "PCB-MAIN bare-PCB procurement row is missing or duplicated")
+    bare_pcb = bare_pcb_rows[0]
     require(bare_pcb.get("Assemblies") == "PCB-MAIN"
             and bare_pcb.get("MPN") == "TBD"
             and bare_pcb.get("Status") == "RFQ_REQUIRED"
             and bare_pcb.get("China_source_policy") == "Two independent fab quotations"
             and all(token in bare_pcb.get("Incoming_control", "")
                     for token in ("Coupon", "stackup", "impedance", "netlist test")),
-            "PR-013 does not preserve two-fabricator stackup evidence requirements")
+            "PCB-MAIN bare-PCB procurement boundary does not preserve two-fabricator stackup evidence requirements")
 
     double_review = DOUBLE_REVIEW.read_text(encoding="utf-8")
     require("Fabrication stackup, copper weights, minimum geometry and finish are accepted"
