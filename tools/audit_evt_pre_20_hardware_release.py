@@ -334,7 +334,7 @@ def audit() -> dict[str, object]:
         and pwr_input_protection.get("fuse", {}).get("target_evt_mpn") ==
         "0451008.MRL"
         and pwr_input_protection.get("required_rows") == 20
-        and pwr_input_protection.get("accepted_rows") == 2
+        and pwr_input_protection.get("accepted_rows") == 3
         and pwr_input_protection.get("physical_qualification_complete") is False
         and pwr_input_protection.get("pcba_procurement_authorized") is False
         and pwr_input_protection.get("manufacturing_release") is False

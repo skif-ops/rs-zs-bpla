@@ -78,10 +78,25 @@
     "pcba_procurement_authorized": false,
     "manufacturing_release": false
   },
+  "source_control": {
+    "complete": true,
+    "retrieved_utc_date": "2026-09-17",
+    "record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md",
+    "machine_record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json",
+    "independent_audit": "tools/audit_pcb_pwr_input_protection_sources_rev_a.py",
+    "evidence_sha256": "144a72f088e835d3b5c6e8f612d9b5ccb6d3769fe46df051b9987633a109a87f",
+    "exact_orderables": [
+      "0451008.MRL",
+      "SMBJ18A",
+      "43045-0213",
+      "43030-0038"
+    ],
+    "no_family_member_substitution": true
+  },
   "test_matrix": {
     "path": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
     "required_rows": 20,
-    "accepted_rows": 2,
+    "accepted_rows": 3,
     "complete": false
   },
   "source_evidence": [

@@ -76,7 +76,9 @@ manufacturing-release assertion.
 - Input protection: active native F1 is Littelfuse `0451008.MRL` and target D1
   remains `SMBJ18A`. The bounded value-only ECO is applied with footprint,
   placement, topology and nets retained. The later C20/C21 electrical ECO leaves
-  F1 unchanged. Its active-source ERC/PDF/human hierarchy gate passes; 18 of 20
+  F1 unchanged. Exact Littelfuse/Molex source payloads and order codes are
+  hash-bound in the controlled primary-source record. Its active-source
+  ERC/PDF/human hierarchy gate passes; 17 of 20
   input-protection qualification rows remain open.
   PCBA procurement is prohibited.
 
@@ -117,6 +119,10 @@ manufacturing-release assertion.
   and U4's direct FB-VOUT connection selects fixed 3.3 V.
 - [x] TI SNOSD17G Rev.G specifies C1's VCAP-to-ANODE value as 0.1 uF; no
   LM74700 VCAP ECO is required.
+- [x] `PWR-IPQ-001` source control binds exact `0451008.MRL`, `SMBJ18A`,
+  `43045-0213` and `43030-0038` to current official Littelfuse/Molex payloads,
+  retrieval date, byte sizes and SHA-256 values without accepting a family
+  substitute.
 - [x] C20/C21 local 100 nF/50 V CIN_HF are present at U3/U4, and the new
   five-page source passes commit-bound KiCad 9 ERC plus PDF visual preflight.
 - [ ] Routed C11/C20/U3 and C12/C21/U4 VIN-PGND hot loops prove direct

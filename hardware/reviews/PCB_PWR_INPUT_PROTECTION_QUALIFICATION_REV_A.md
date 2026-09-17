@@ -14,6 +14,11 @@ passes, and reviewer `Скиф` accepted the exact active source/PDF hierarchy o
 `2026-09-17`. Physical qualification remains required before any PCB assembly
 procurement.
 
+Manufacturer source control is now complete. The machine-audited
+`PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}` record binds
+the exact four orderables to six official Littelfuse/Molex payloads, retrieval
+date, byte sizes and SHA-256 values. This closes `PWR-IPQ-001` only.
+
 ## 1. Controlled decision
 
 The prior signed native source and PDF contain F1 value `0451005.MRL`. That part
@@ -43,6 +48,10 @@ The J1 `43045-0213` header and `43030-0038` 18 AWG / 0.75 mm² terminal each
 publish a maximum of 8.5 A per contact. This does not release an 8 A continuous
 system current. The operating envelope stays 5 A, and the complete
 connector/crimp/wire path must pass the +70 C test.
+
+The exact source payload hashes and ordering-code derivations are controlled in
+`PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}`. No adjacent
+family member is accepted as evidence for any of the four orderables.
 
 ## 2. Native-source interlock
 
@@ -118,7 +127,7 @@ register wrap or overflow as a plausible valid current.
 Tests run in the order controlled by
 `PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv`:
 
-1. source control, sample identity and bounded native ECO;
+1. source control (`PWR-IPQ-001 PASS`), then sample identity and bounded native ECO;
 2. repeat ERC/PDF/human hierarchy gate after the legibility remediation and C20/C21 ECO (`PASS`);
 3. 25 C, +70 C and -40 C operating tests;
 4. inrush and modem-burst tests;
@@ -144,7 +153,12 @@ date, every required artifact has a SHA-256, the native F1 value equals
 This packet never closes PCB-PWR routing, DIM-003, stackup/copper, DRC, CAM, DFM,
 Review B or manufacturing release.
 
+The current matrix state is `3/20 PASS`; 17 rows remain open.
+
 ## 7. Primary evidence
+
+- Controlled hash record:
+  `PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}`
 
 - [Littelfuse 0451008 product page](https://www.littelfuse.com/products/fuses-overcurrent-protection/fuses/surface-mount-fuses/nano-2-fuses/451/0451008)
 - [Littelfuse 451/453 series data sheet](https://www.littelfuse.com/assetdocs/fuse-451-and-453-datasheet?assetguid=533cd5cc-956c-4243-867f-6ab5a62f6ba1)

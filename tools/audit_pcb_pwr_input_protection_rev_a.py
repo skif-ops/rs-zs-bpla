@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -17,6 +18,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json"
 MATRIX = ROOT / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv"
+SOURCE_EVIDENCE = (
+    ROOT
+    / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json"
+)
+SOURCE_EVIDENCE_MD = (
+    ROOT
+    / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md"
+)
 FREEZE = ROOT / "hardware/POWER_COMPONENT_FREEZE_REV_A.csv"
 BASELINE = ROOT / "hardware/POWER_DESIGN_BASELINE_REV_A.json"
 BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
@@ -59,6 +68,8 @@ def main() -> int:
     args = parser.parse_args()
 
     contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
+    source_evidence = json.loads(SOURCE_EVIDENCE.read_text(encoding="utf-8"))
+    source_evidence_sha256 = hashlib.sha256(SOURCE_EVIDENCE.read_bytes()).hexdigest()
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
     capture_status = json.loads(STATUS.read_text(encoding="utf-8"))
     matrix = read_csv(MATRIX)
@@ -70,6 +81,28 @@ def main() -> int:
     require(contract["configuration"] == "EVT-PRE-20 Rev.A", "configuration drift")
     require(contract["assembly"] == "PCB-PWR", "assembly drift")
     require(contract["manufacturing_release"] is False, "qualification packet released manufacture")
+    require(
+        source_evidence["status"]
+        == "PASS_SOURCE_CONTROL_EXACT_ORDERABLES_HASH_BOUND_NOT_FOR_MANUFACTURE",
+        "input-protection source-control evidence drift",
+    )
+    source_control = contract.get("source_control", {})
+    require(source_control.get("complete") is True,
+            "input-protection source control is not complete")
+    require(source_control.get("record") == SOURCE_EVIDENCE_MD.relative_to(ROOT).as_posix(),
+            "source-control Markdown path drift")
+    require(source_control.get("machine_record") == SOURCE_EVIDENCE.relative_to(ROOT).as_posix(),
+            "source-control JSON path drift")
+    require(source_control.get("independent_audit") ==
+            "tools/audit_pcb_pwr_input_protection_sources_rev_a.py",
+            "source-control independent audit path drift")
+    require(source_control.get("evidence_sha256") == source_evidence_sha256,
+            "source-control evidence SHA-256 drift")
+    require(source_control.get("exact_orderables") ==
+            ["0451008.MRL", "SMBJ18A", "43045-0213", "43030-0038"],
+            "source-control exact orderable set drift")
+    require(source_control.get("no_family_member_substitution") is True,
+            "source-control family-substitution interlock removed")
     require(baseline["status"] == "CAPTURE_BASELINE_NOT_FOR_MANUFACTURE",
             "power baseline lost NOT FOR MANUFACTURE interlock")
     baseline_input = baseline.get("input_protection_qualification", {})
@@ -227,6 +260,12 @@ def main() -> int:
             status_eco.get("repeat_pdf_evidence_complete") is active_evidence_complete and
             status_eco.get("repeat_independent_human_hierarchy_review_complete") is active_evidence_complete,
             "PCB-PWR capture status repeat-evidence boundary drift")
+    require(status_eco.get("source_control_complete") is True and
+            status_eco.get("source_control_record") == source_control["record"] and
+            status_eco.get("source_control_machine_record") == source_control["machine_record"] and
+            status_eco.get("source_control_audit") == source_control["independent_audit"] and
+            status_eco.get("source_control_evidence_sha256") == source_evidence_sha256,
+            "PCB-PWR capture status source-control binding drift")
     require(status_eco.get("pcba_procurement_authorized") is False,
             "PCB-PWR capture status prematurely authorizes procurement")
     require(status_eco.get("manufacturing_release") is False,
@@ -252,6 +291,15 @@ def main() -> int:
                     f"{row['Test_ID']}: PASS lacks attributable evidence")
 
     matrix_by_id = {row["Test_ID"]: row for row in matrix}
+    require(matrix_by_id["PWR-IPQ-001"]["Status"] == "PASS" and
+            matrix_by_id["PWR-IPQ-001"]["Result"] ==
+            "Official Littelfuse/Molex payloads hash-bound; exact 0451008.MRL SMBJ18A 43045-0213 and 43030-0038 identities and controlled ratings match" and
+            matrix_by_id["PWR-IPQ-001"]["Operator"] ==
+            "Codex primary-source archive audit" and
+            matrix_by_id["PWR-IPQ-001"]["Date"] == "2026-09-17" and
+            matrix_by_id["PWR-IPQ-001"]["Artifact_SHA256"] ==
+            source_evidence_sha256,
+            "PWR-IPQ-001 primary-source evidence drift")
     require(matrix_by_id["PWR-IPQ-003"]["Status"] == "PASS" and
             matrix_by_id["PWR-IPQ-003"]["Result"] ==
             "F1=0451008.MRL in all active sources; pin/net and board semantic digests retained; post-ECO ERC/PDF artifact archived" and
@@ -282,9 +330,9 @@ def main() -> int:
                 and repeat_gate_complete)
     require(contract["test_matrix"]["required_rows"] == 20,
             "contract qualification row count drift")
-    require(contract["test_matrix"]["accepted_rows"] == 2,
-            "contract accepted-row count does not match post-ECO evidence")
-    require(status_eco.get("accepted_test_rows") == accepted_rows == 2,
+    require(contract["test_matrix"]["accepted_rows"] == 3,
+            "contract accepted-row count does not match controlled evidence")
+    require(status_eco.get("accepted_test_rows") == accepted_rows == 3,
             "capture-status qualification accepted-row count drift")
     require(contract["test_matrix"]["complete"] is False,
             "contract claims physical qualification complete")
@@ -318,6 +366,8 @@ def main() -> int:
         "pin_net_semantic_sha256": native_eco["post_eco_pin_net_semantic_sha256"],
         "board_semantic_sha256": native_eco["post_eco_board_semantic_sha256"],
         "repeat_erc_pdf_human_review_complete": repeat_gate_complete,
+        "source_control_complete": source_control["complete"],
+        "source_control_evidence_sha256": source_evidence_sha256,
         "accepted_rows": accepted_rows,
         "required_rows": 20,
         "failed_rows": failed_rows,

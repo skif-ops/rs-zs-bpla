@@ -121,8 +121,11 @@ PCB and generators with footprint, placement, topology, nets and pad mapping
 retained. This does not extend the prior hierarchy acceptance. The earlier
 post-ECO PDF is superseded by the legibility remediation, and the later C20/C21
 electrical ECO supersedes the first remediated artifact. Fresh active-source
-KiCad 9 ERC/PDF evidence and independent human hierarchy review now pass. The
-input-protection matrix has `2/20` accepted rows (`PWR-IPQ-003/004`); PCBA
+KiCad 9 ERC/PDF evidence and independent human hierarchy review now pass.
+Official Littelfuse/Molex payloads for exact `0451008.MRL`, `SMBJ18A`,
+`43045-0213` and `43030-0038` are retrieval-date and SHA-256 bound in
+`PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}`. The
+input-protection matrix has `3/20` accepted rows (`PWR-IPQ-001/003/004`); PCBA
 procurement and manufacturing release remain prohibited.
 
 PCB-PWR has also passed its bounded fitted-body 2D placement-clearance subgate.
@@ -172,8 +175,9 @@ blocked by `DIM-001`, `DIM-003` and `DIM-012`; the packet is not a build release
   numeric current-density/thermal geometry and physical power evidence; PCB-MIC independent Review B,
   CAM comparison, panelization and acoustic-stack review; all three boards'
   DFM and manufacturing release;
-- the remaining 18 PCB-PWR input-protection qualification rows after accepted
-  native-value and repeat-hierarchy gates, including +70 C 5 A thermal,
+- the remaining 17 PCB-PWR input-protection qualification rows after accepted
+  manufacturer source control, native-value and repeat-hierarchy gates,
+  including +70 C 5 A thermal,
   prospective-current, battery-side primary-fuse and SMBJ18A coordination;
 - selected-assembler acceptance of the PCB-MAIN U2/U25/U26 project IPC
   candidates, U9 process-dependent stencil adaptation, PnP polarity,

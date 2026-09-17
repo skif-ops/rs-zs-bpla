@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-PWR",
+  "retrieved_utc_date": "2026-09-17",
+  "status": "PASS_SOURCE_CONTROL_EXACT_ORDERABLES_HASH_BOUND_NOT_FOR_MANUFACTURE",
+  "archive_policy": {
+    "vendor_binaries_committed": false,
+    "reason": "Canonical URLs, retrieval date, byte sizes and SHA-256 values reproduce the reviewed vendor payloads without copying third-party binaries into the repository.",
+    "visual_pdf_review_complete": true,
+    "payloads_hash_bound": 6
+  },
+  "sources": {
+    "littelfuse_451_453_datasheet": {
+      "publisher": "Littelfuse",
+      "title": "451/453 Series Very Fast-Acting Fuse",
+      "revision": "GD",
+      "revision_date": "2025-12-01",
+      "canonical_url": "https://www.littelfuse.com/assetdocs/fuse-451-and-453-datasheet?assetguid=533cd5cc-956c-4243-867f-6ab5a62f6ba1",
+      "retrieved_filename": "Littelfuse-Fuse-451-453-Datasheet.pdf",
+      "media_type": "application/pdf",
+      "sha256": "399d3cc9da991aa3192638f807fb568f137407d10a4b0d35d106a82b5c2bace2",
+      "file_size_bytes": 491885,
+      "pages": 4,
+      "claims": {
+        "exact_orderable": {
+          "pdf_page": 4,
+          "series": "0451",
+          "amp_code": "008.",
+          "quantity_code": "M",
+          "quantity_pieces": 1000,
+          "packaging_code": "R",
+          "packaging": "Tape and Reel",
+          "compliance_suffix": "L",
+          "orderable_part_number": "0451008.MRL"
+        },
+        "electrical_rating": {
+          "pdf_page": 2,
+          "rating_a": 8.0,
+          "maximum_voltage_v": 125.0,
+          "interrupting_rating_a_at_32vdc": 400.0,
+          "nominal_cold_resistance_ohm": 0.0077,
+          "nominal_melting_i2t_a2s": 20.23
+        },
+        "temperature_and_continuous_use": {
+          "pdf_pages": [3, 4],
+          "operating_temperature_c": [-55, 125],
+          "continuous_current_derating_percent": 25.0
+        }
+      }
+    },
+    "littelfuse_smbj_datasheet": {
+      "publisher": "Littelfuse",
+      "title": "TVS Diodes Surface Mount - 600 W - SMBJ Series",
+      "revision": "JC v4",
+      "revision_date": "2025-07-04",
+      "canonical_url": "https://www.littelfuse.com/assetdocs/tvs-diodes-smbj-series-datasheet?assetguid=ba555e99-a12d-4f72-a0b6-86b06c67171e",
+      "retrieved_filename": "TVS-Diode-SMBJ-Datasheet.pdf",
+      "media_type": "application/pdf",
+      "sha256": "d7df155be4b1f612085401e8c946f065e284d65a0e7de22b9225a7b73946e51b",
+      "file_size_bytes": 947504,
+      "pages": 6,
+      "claims": {
+        "exact_orderable": {
+          "pdf_pages": [2, 6],
+          "orderable_part_number": "SMBJ18A",
+          "polarity": "UNI_DIRECTIONAL",
+          "package": "DO-214AA",
+          "quantity_pieces": 3000,
+          "packaging": "Tape and Reel - 12 mm tape / 13 inch reel"
+        },
+        "electrical_rating": {
+          "pdf_page": 2,
+          "reverse_standoff_v": 18.0,
+          "breakdown_min_v": 20.0,
+          "breakdown_max_v": 22.1,
+          "maximum_clamp_v": 29.2,
+          "maximum_clamp_test_current_a": 20.6,
+          "peak_pulse_power_w_10_1000us": 600.0
+        }
+      }
+    },
+    "molex_430450213_product_page": {
+      "publisher": "Molex",
+      "canonical_url": "https://www.molex.com/en-us/products/part-detail/430450213",
+      "retrieval_url": "https://www.molex.com/en-us/products/part-detail/430450213?display=pdf&download=true",
+      "retrieved_filename": "430450213.html",
+      "media_type": "text/html",
+      "sha256": "d4afc5cdd0705422c61ff5b5698e3479f6e9e0c1022782af2fe41c8d51902d1c",
+      "file_size_bytes": 387340,
+      "claims": {
+        "numeric_part_number": "430450213",
+        "formatted_orderable_part_number": "43045-0213",
+        "category": "PCB Headers and Receptacles",
+        "circuits": 2,
+        "rows": 2,
+        "orientation": "Vertical",
+        "mounting_style": "Through Hole",
+        "mating_plating": "Gold",
+        "maximum_current_per_contact_a": 8.5,
+        "maximum_voltage_v": 600.0,
+        "operating_temperature_c": [-40, 125],
+        "recommended_pcb_thickness_mm": 1.6
+      }
+    },
+    "molex_430450213_sales_drawing": {
+      "publisher": "Molex",
+      "document_number": "SD-43045-005",
+      "revision": "G1",
+      "canonical_url": "https://www.molex.com/content/dam/molex/molex-dot-com/products/automated/en-us/salesdrawingpdf/430/43045/430450213_sd.pdf",
+      "retrieved_filename": "430450213_sd.pdf",
+      "media_type": "application/pdf",
+      "sha256": "85db6fbcbbd05643bfebded1b14e02911930151d0234b130d3711ee5fde78ec7",
+      "file_size_bytes": 284379,
+      "pages": 2,
+      "claims": {
+        "pdf_page": 1,
+        "orderable_part_number": "43045-0213",
+        "circuits": 2,
+        "finish_code": "B",
+        "finish": "select gold in contact area and select matte tin on solder tails",
+        "connector_type": "Micro-Fit 3.0 dual-row vertical through-hole header"
+      }
+    },
+    "molex_430300038_product_page": {
+      "publisher": "Molex",
+      "canonical_url": "https://www.molex.com/en-us/products/part-detail/430300038",
+      "retrieval_url": "https://www.molex.com/en-us/products/part-detail/430300038?display=pdf&download=true",
+      "retrieved_filename": "430300038.html",
+      "media_type": "text/html",
+      "sha256": "594fa3506fc506446c6a8256839d039a2eeea6b60378a3ff14c693d916db1717",
+      "file_size_bytes": 384338,
+      "claims": {
+        "numeric_part_number": "430300038",
+        "formatted_orderable_part_number": "43030-0038",
+        "category": "Crimp Terminals",
+        "gender": "Female",
+        "material": "Phosphor Bronze",
+        "mating_plating": "Tin",
+        "packaging": "Reel",
+        "wire_awg": 18,
+        "wire_cross_section_mm2": 0.75,
+        "maximum_insulation_diameter_mm": 1.85,
+        "maximum_current_per_contact_a": 8.5
+      }
+    },
+    "molex_430300038_sales_drawing": {
+      "publisher": "Molex",
+      "document_number": "SD-43030-XXXX",
+      "revision": "N10",
+      "release_date": "2026-04-24",
+      "canonical_url": "https://www.molex.com/content/dam/molex/molex-dot-com/products/automated/en-us/salesdrawingpdf/430/43030/430300038_sd.pdf",
+      "retrieved_filename": "430300038_sd.pdf",
+      "media_type": "application/pdf",
+      "sha256": "87fd5d112565f429a63f4350e1ba37a889fba8310696d541124d460df5bb017d",
+      "file_size_bytes": 632077,
+      "pages": 1,
+      "claims": {
+        "pdf_page": 1,
+        "orderable_part_number": "43030-0038",
+        "plating_code": "A",
+        "plating": "hot tin dip",
+        "wire_awg": 18,
+        "wire_cross_section_mm2": 0.75,
+        "maximum_insulation_diameter_mm": 1.85,
+        "form": "CHAIN"
+      }
+    }
+  },
+  "qualification_binding": {
+    "fuse_orderable": "0451008.MRL",
+    "tvs_orderable": "SMBJ18A",
+    "input_header_orderable": "43045-0213",
+    "input_terminal_orderable": "43030-0038",
+    "no_family_member_substitution": true
+  },
+  "release_boundary": {
+    "source_control_complete": true,
+    "physical_qualification_complete": false,
+    "accepted_matrix_rows": 3,
+    "required_matrix_rows": 20,
+    "routing_authorized": false,
+    "pcba_procurement_authorized": false,
+    "manufacturing_release": false
+  }
+}
