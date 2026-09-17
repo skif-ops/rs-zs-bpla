@@ -607,7 +607,7 @@ def validate_hardware_baseline() -> None:
         and pwr_hierarchy.get("independent_audit") ==
         "tools/audit_pcb_pwr_hierarchy_rev_a.py"
         and pwr_hierarchy_control.get("state") ==
-        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_F1_VALUE_ECO_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING"
         and pwr_hierarchy_control.get("pages") == 5
         and pwr_hierarchy_control.get("functional_child_sheets") == 4
         and pwr_hierarchy_control.get("symbols") == 63
@@ -621,13 +621,14 @@ def validate_hardware_baseline() -> None:
         "PCB-PWR human-readable hierarchy/electrical-equivalence control has drifted",
     )
     require(
-        all(pwr_hierarchy_control.get(key) is True for key in (
+        pwr_hierarchy_control.get("prior_evidence_superseded_by_f1_value_eco") is True
+        and all(pwr_hierarchy_control.get(key) is True for key in (
             "native_kicad_9_erc_pass",
             "committed_erc_evidence",
             "committed_pdf_evidence",
-            "independent_human_review_complete",
         ))
         and all(pwr_hierarchy_control.get(key) is False for key in (
+            "independent_human_review_complete",
             "routing_authorized",
             "manufacturing_release",
         )),

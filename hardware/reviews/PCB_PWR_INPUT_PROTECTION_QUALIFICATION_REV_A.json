@@ -58,20 +58,30 @@
     "ina226_not_fault_energy_instrument": true
   },
   "native_value_eco": {
-    "applied": false,
+    "applied": true,
+    "applied_date": "2026-09-17",
+    "change": "0451005.MRL_TO_0451008.MRL",
     "topology_change": false,
+    "footprint_change": false,
+    "placement_change": false,
     "value_only_change": true,
-    "signed_source_must_remain_unchanged_until_eco": true,
+    "signed_source_value_superseded": true,
+    "pre_eco_pin_net_semantic_sha256": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
+    "post_eco_pin_net_semantic_sha256": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
+    "post_eco_board_semantic_sha256": "5f854a5276e8dfd6dc82516f61db1a158888b5343b82058e6024e5970b51e6c1",
     "repeat_native_kicad_9_erc_required": true,
+    "repeat_native_kicad_9_erc_complete": true,
     "repeat_pdf_evidence_required": true,
+    "repeat_pdf_evidence_complete": true,
     "repeat_independent_human_hierarchy_review_required": true,
+    "repeat_independent_human_hierarchy_review_complete": false,
     "pcba_procurement_authorized": false,
     "manufacturing_release": false
   },
   "test_matrix": {
     "path": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
     "required_rows": 20,
-    "accepted_rows": 0,
+    "accepted_rows": 1,
     "complete": false
   },
   "source_evidence": [

@@ -111,11 +111,11 @@ AAD wake переводит STM32 в активное состояние, зап
 - buck inductors L1/L2: Coilcraft `XAL7030-472MEC`, 4.7 uH, Isat 10.1 A,
   Irms 6.9 A at 20 C rise;
 - TVS `SMBJ18A` остаётся точным EVT-кандидатом до измеренного
-  transient/fault profile. Подписанная native-схема всё ещё содержит
-  `0451005.MRL`, но этот 5 A вариант отклонён desk review для непрерывных 5 A.
-  BOM/qualification target — `0451008.MRL` 8 A в том же Nano2 451 footprint;
-  value-only native ECO, repeat ERC/PDF/human review и физическая координация
-  остаются обязательными до PCBA procurement.
+  transient/fault profile. Ранее подписанная value `0451005.MRL` отклонена
+  desk review для непрерывных 5 A. Активная native value и BOM/qualification
+  target — `0451008.MRL` 8 A в том же Nano2 451 footprint; value-only ECO
+  применён без изменения topology/placement/nets. Repeat ERC/PDF evidence прошёл;
+  human review и физическая координация остаются обязательными до PCBA procurement.
 
 ## 6. Требования к MPPT/BMS до RFQ
 

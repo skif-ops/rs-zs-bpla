@@ -180,9 +180,10 @@ conversion contains 63 symbols, 185 explicit wire segments, 9 cross-sheet nets a
 pad/net on all 60 physical PCB positions and records semantic SHA-256
 `fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a`.
 
-This exact equivalence retains the `PASS - PIN/NET AUTHORITY` decision above. It does
-not yet accept the new drawing as complete review evidence: repeat native KiCad 9 ERC,
-the exported five-page PDF and JSON ERC report, and an independent human functional
+This exact equivalence retains the `PASS - PIN/NET AUTHORITY` decision above. Native
+KiCad 9.0.9 ERC now passes with zero violations on all five sheets, and the exported
+five-page A3 PDF plus JSON ERC report are commit-bound. This still does not accept the
+active post-ECO drawing as complete review evidence: an independent human functional
 review must be committed before routing starts.
 
 ## 9. Open items outside this Review A scope

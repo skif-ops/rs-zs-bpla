@@ -375,10 +375,10 @@ def main() -> int:
         "cross_sheet_nets": len(cross_nets),
         "hierarchical_labels": total_hier_labels,
         "pin_net_semantic_sha256": semantic_sha256,
-        "erc_native_kicad_9": "PASS_COMMIT_BOUND_ZERO_VIOLATIONS",
-        "hierarchy_pdf_evidence": "PASS_COMMIT_BOUND_FIVE_PAGE_A3_VISUAL_PREFLIGHT",
+        "erc_native_kicad_9": "PASS_COMMIT_BOUND_POST_F1_VALUE_ECO",
+        "hierarchy_pdf_evidence": "PASS_COMMIT_BOUND_POST_F1_VALUE_ECO",
         "pin_net_review_a": "RETAINED_BY_EXACT_ELECTRICAL_EQUIVALENCE",
-        "hierarchy_human_review": "ACCEPTED_SKIF_ACCEPT_HIERARCHY_ONLY",
+        "hierarchy_human_review": "PENDING_REPEAT_INDEPENDENT_REVIEW_POST_F1_VALUE_ECO",
         "manufacturing_release": False,
     }
     status = json.loads(STATUS.read_text(encoding="utf-8"))
@@ -401,19 +401,73 @@ def main() -> int:
         "native_kicad_9_erc_pass": True,
         "committed_erc_evidence": True,
         "committed_pdf_evidence": True,
-        "independent_human_review_complete": True,
+        "independent_human_review_complete": False,
+        "prior_evidence_superseded_by_f1_value_eco": True,
         "routing_authorized": False,
         "manufacturing_release": False,
     }.items():
         require(control.get(key) == expected,
                 f"PCB-PWR hierarchy status {key} drift: {control.get(key)!r} != {expected!r}")
     require(control.get("state") ==
-            "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
+            "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_F1_VALUE_ECO_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING",
             "PCB-PWR hierarchy control state drift")
-    evidence = hierarchy.get("evidence", {})
+    current_evidence = hierarchy.get("current_evidence", {})
+    require(current_evidence == {
+        "status": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING",
+        "eco": {
+            "change": "F1_0451005.MRL_TO_0451008.MRL",
+            "applied_date": "2026-09-17",
+            "value_only": True,
+            "pin_net_semantic_sha256_before": semantic_sha256,
+            "pin_net_semantic_sha256_after": semantic_sha256,
+        },
+        "source_commit_sha": "091a2eb223161cb4396fc6838921eeb79150c38d",
+        "source_tree_sha": "72ef5630c0952a287d503f1ab3dda9dcbbee2a33",
+        "schematic_gate_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35197150159",
+        "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35197150164",
+        "pcb_native_gate_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35197150191",
+        "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35197150159/artifacts/10486481159",
+        "artifact_id": 10486481159,
+        "artifact_digest": "sha256:bf80f07c9b20d93d610c3e8c124887becb4209f8d688f085fe68bac53e0ad0b9",
+        "erc": {
+            "path": "artifacts/kicad-native/PCB-PWR/erc.json",
+            "sha256": "a31be06d1a32bde0fad9ffa26cb90f8076c133450915494437e95a532659cece",
+            "kicad_version": "9.0.9",
+            "sheets": 5,
+            "violations": 0,
+        },
+        "schematic_pdf": {
+            "path": "artifacts/kicad-native/PCB-PWR/PCB-PWR_schematic.pdf",
+            "sha256": "9733a1df0026a53ecfc56355cf185e04fb372242a9dcdcb13ef214cced81c744",
+            "pages": 5,
+            "page_size": "A3",
+            "orientation": "landscape",
+            "file_size_bytes": 642059,
+            "pdf_version": "1.5",
+            "visual_preflight": "PASS_NO_CLIPPING_NO_VISIBLE_DUPLICATE_ROOT_LABELS",
+        },
+        "schematic_source_sha256": {
+            "PCB-PWR.kicad_sch": "16365f1c8be5a98eb5f2635f2740198998baf560db15b2ee761d65c9ade903a5",
+            "PCB-PWR_01_INPUT_PROTECTION.kicad_sch": "ede876600dec02b803645a0d2cb9dd182c53b565d1786421ce9b46773aaf035a",
+            "PCB-PWR_02_3V8_MODEM.kicad_sch": "c746b8a526c647d87c39c18163cb69f4fcf8952ec60859b95a2d7bb6718087e0",
+            "PCB-PWR_03_3V3_DIGITAL.kicad_sch": "53c1297232aa3932310d8f60135ff555516b45a4a5f31f29476d5b0bc26be724",
+            "PCB-PWR_04_AUX_HARNESS.kicad_sch": "b9a73ead5a7897857b8c57987cd79b65f66b4f13070a9023b15b0b00dece0c71",
+        },
+        "independent_human_review": None,
+        "routing_authorized": False,
+        "manufacturing_release": False,
+    }, "PCB-PWR current post-ECO hierarchy evidence boundary drift")
+    active_source_dir = ROOT / "hardware/kicad/native/PCB-PWR"
+    for filename, expected_sha256 in current_evidence["schematic_source_sha256"].items():
+        source_path = active_source_dir / filename
+        require(source_path.is_file(), f"PCB-PWR current evidence source is missing: {filename}")
+        actual_sha256 = hashlib.sha256(source_path.read_bytes()).hexdigest()
+        require(actual_sha256 == expected_sha256,
+                f"PCB-PWR current evidence source hash drift: {filename}")
+    evidence = hierarchy.get("historical_evidence", {})
     require(isinstance(evidence, dict) and evidence.get("status") ==
-            "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
-            "PCB-PWR hierarchy evidence status drift")
+            "SUPERSEDED_BY_F1_VALUE_ECO_HISTORICAL_RECORD_ONLY",
+            "PCB-PWR historical hierarchy evidence status drift")
     for key, expected in {
         "source_commit_sha": "2a973f6856aa115aa59323d619be985578780682",
         "source_tree_sha": "c8cd8272c0ebe50a4e5fc30fd484427740dbda11",
@@ -454,11 +508,8 @@ def main() -> int:
     }
     require(evidence.get("schematic_source_sha256") == expected_source_sha256,
             "PCB-PWR hierarchy evidence source-hash register drift")
-    for filename, expected_sha256 in expected_source_sha256.items():
-        path = args.schematic.parent / filename
-        actual_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
-        require(actual_sha256 == expected_sha256,
-                f"PCB-PWR hierarchy evidence source drift: {filename} {actual_sha256} != {expected_sha256}")
+    # These hashes bind the superseded 5 A source only. They must remain in the
+    # historical register but must not be compared with the active post-ECO source.
     require(evidence.get("independent_human_review") == {
         "status": "ACCEPTED_INDEPENDENT_HUMAN_REVIEW",
         "reviewer": "Скиф",

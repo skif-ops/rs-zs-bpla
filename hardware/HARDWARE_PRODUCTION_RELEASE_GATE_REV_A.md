@@ -70,21 +70,27 @@ current monitoring, 3V8 modem power, 3V3 digital power, and 1V8/harness interfac
 The independent hierarchy audit finds 63 symbols, 185 explicit wire segments,
 9 cross-sheet nets, 26 hierarchical labels, no cross-net wire collision and exact
 pad/net equivalence to all 60 PCB footprints. This retains the signed pin/net
-authority only. Repeat native KiCad 9 ERC/PDF evidence and independent human
-hierarchy review were accepted on `2026-09-16` for source commit
-`2a973f6856aa115aa59323d619be985578780682`. Routing and manufacturing release
-remain blocked by the separate open gates below.
+authority only. The KiCad 9 ERC/PDF evidence and independent hierarchy decision
+accepted on `2026-09-16` for source commit
+`2a973f6856aa115aa59323d619be985578780682` are historical evidence for the
+superseded F1 value. For the active post-ECO source, KiCad 9.0.9 ERC reports zero
+violations on all five sheets and the new five-page A3 PDF passes visual preflight;
+the source, ERC, PDF and artifact hashes are bound to commit
+`091a2eb223161cb4396fc6838921eeb79150c38d`. A new independent hierarchy decision
+is still open. Routing and manufacturing release remain blocked by the separate
+gates below.
 
 The PCB-PWR input-protection desk review rejects the signed native F1 value
 `0451005.MRL` for the 5 A continuous-current basis: Littelfuse's standard 25%
 continuous derating reduces it to 3.75 A before temperature rerating. The
 controlled BOM and qualification packet select exact candidate
 `0451008.MRL` 8 A in the same Nano2 451 land pattern and retain
-`SMBJ18A`. This does not modify or extend the prior hierarchy acceptance.
-The signed native bytes remain unchanged until a bounded value-only ECO receives
-fresh KiCad 9 ERC, a new five-page PDF and independent human hierarchy review.
-The input-protection matrix has `0/20` accepted rows; PCBA procurement and
-manufacturing release remain prohibited.
+`SMBJ18A`. The bounded value-only ECO is applied to the active native schematic,
+PCB and generators with footprint, placement, topology, nets and pad mapping
+retained. This does not extend the prior hierarchy acceptance. The fresh KiCad 9
+ERC and five-page PDF evidence pass, while independent human hierarchy review
+remains mandatory. The input-protection matrix has `1/20` accepted rows
+(`PWR-IPQ-003`); PCBA procurement and manufacturing release remain prohibited.
 
 PCB-PWR has also passed its bounded fitted-body 2D placement-clearance subgate.
 All 42 simultaneously fitted footprints have controlled courtyards, the required
@@ -133,9 +139,10 @@ blocked by `DIM-001`, `DIM-003` and `DIM-012`; the packet is not a build release
   numeric current-density/thermal geometry and physical power evidence; PCB-MIC independent Review B,
   CAM comparison, panelization and acoustic-stack review; all three boards'
   DFM and manufacturing release;
-- PCB-PWR F1 value-only ECO from rejected signed-native `0451005.MRL` to target
-  `0451008.MRL`, repeat commit-bound ERC/PDF/human hierarchy acceptance and
-  all 20 input-protection qualification rows including +70 C 5 A thermal,
+- PCB-PWR independent human hierarchy acceptance of the commit-bound ERC/PDF
+  evidence after the applied F1 value-only ECO from rejected historical
+  `0451005.MRL` to active target `0451008.MRL`, plus the remaining 19
+  input-protection qualification rows including +70 C 5 A thermal,
   prospective-current, battery-side primary-fuse and SMBJ18A coordination;
 - selected-assembler acceptance of the PCB-MAIN U2/U25/U26 project IPC
   candidates, U9 process-dependent stencil adaptation, PnP polarity,

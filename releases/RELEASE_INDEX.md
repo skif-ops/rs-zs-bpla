@@ -1,10 +1,10 @@
 # Интеграционный реестр актуальных материалов
 
-Версия контрольного среза: `DIONEA-INTEGRATION-v0.13`.
+Версия контрольного среза: `DIONEA-INTEGRATION-v0.14`.
 Дата: 17.09.2026.
 Статус: `OPEN / NOT FOR MANUFACTURE`.
 
-Описание интеграционного среза: [`releases/integration/v0.13/README.md`](integration/v0.13/README.md).
+Описание интеграционного среза: [`releases/integration/v0.14/README.md`](integration/v0.14/README.md).
 
 `main` и `develop` содержат согласованный интеграционный срез. Поставочные материалы
 `evt-mb` и `evt-pre-20` сохраняются в раздельных пространствах и не являются взаимозаменяемыми.
@@ -22,10 +22,10 @@
 ## Текущий инженерный baseline EVT-PRE-20
 
 - исходная ветка: `evt-pre-20`;
-- зафиксированный SHA: `df1f0657f48a0f717176173da3fc8476b45728d0`;
+- зафиксированный SHA: `7ed5b021b1e7eddfda616b54fbc79e1bf0221702`;
 - аппаратная конфигурация: `EVT-PRE-20 Rev.A`, 20 станций, собственные PCB;
 - `PCB-MAIN`: десятистраничная hierarchy и pad/net equivalence приняты только как `ACCEPT_HIERARCHY_ONLY`; routing и Review B открыты;
-- `PCB-PWR`: пятистраничная hierarchy принята; целевой F1 `0451008.MRL`, native value ECO не применён, evidence 0/20;
+- `PCB-PWR`: F1 `0451008.MRL` применён bounded value-only ECO; commit-bound KiCad 9 ERC/PDF evidence прошли, независимый post-ECO hierarchy review открыт, qualification 1/20;
 - `PCB-MIC`: copper-return subgate принят, но общий Review B и manufacturing handoff открыты;
 - контролируемый BOM: 295 engineering-строк и 124 procurement-строки; QG-1 `PASS`, QG-2 `BLOCKED`;
 - системные кандидаты: RB40, SLP080S-12M, SCC075010060R, SBS050150200,

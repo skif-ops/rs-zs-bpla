@@ -28,9 +28,9 @@
     "layer_count_authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
     "layer_count_authority_sha256": "3774347b5cca2b09ef1949f08af22ac2e319db7b0d99bb63034a28f1dc590b80",
     "power_design_baseline": "hardware/POWER_DESIGN_BASELINE_REV_A.json",
-    "power_design_baseline_sha256": "e5ebbb2664382ea76139513853e1555336ea8e6f2e3ab5fe05ec80b4898e3065",
+    "power_design_baseline_sha256": "3a63b453a0edd19e9411369c464e8125a64c0875e8f79102f765a9b0a339373e",
     "power_design_calculation": "hardware/POWER_DESIGN_CALC_REV_A.md",
-    "power_design_calculation_sha256": "29277ce95f758082e4681b7bed9d481f2fd37551035140e3bba2093c643bd1b3",
+    "power_design_calculation_sha256": "81985f0d6b798d55f5c8abdc961554b9435c16a651df2e37ac58cf18df810dda",
     "dim_003_request": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
     "dim_003_request_sha256": "c522fe4ed886117d2df1a4cdf5d4721aa7a02c1ceef00a6d7e042c6df992baa9"
   },

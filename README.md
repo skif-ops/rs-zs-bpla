@@ -5,7 +5,7 @@
 
 ## Текущий интеграционный baseline
 
-Версия: `DIONEA-INTEGRATION-v0.13`, дата среза 17.09.2026.
+Версия: `DIONEA-INTEGRATION-v0.14`, дата среза 17.09.2026.
 
 - рабочая архитектура: гибридная станция и сервер;
 - акустическая геометрия: четыре одинаковых микрофона, схема 3+1, база 120 мм,
@@ -26,9 +26,9 @@
 | Область | Подтверждённый статус |
 |---|---|
 | EVT-MB v1.3 | Документы, host/структурные проверки и программная часть подготовлены; аппаратный стенд не испытан |
-| EVT-PRE-20 | Контрольный source commit `df1f0657f48a`; конфигурация и воспроизводимые проверки актуальны |
+| EVT-PRE-20 | Контрольный source commit `7ed5b021b1e7`; конфигурация и воспроизводимые проверки актуальны |
 | PCB-MAIN | Десятистраничная hierarchy принята только на уровне `ACCEPT_HIERARCHY_ONLY`; routing, Review B и выпуск в изготовление открыты |
-| PCB-PWR | Пятистраничная hierarchy принята только на уровне hierarchy; native F1 ещё `0451005`, целевой `0451008.MRL`, физические тесты 0/20; `DIM-003` — 0/18, stackup/copper — 0/24 и 0/2 фабрик |
+| PCB-PWR | Активный F1 `0451008.MRL`; value-only ECO и commit-bound ERC/PDF evidence прошли, независимый post-ECO hierarchy review открыт; qualification 1/20; `DIM-003` — 0/18, stackup/copper — 0/24 и 0/2 фабрик |
 | PCB-MIC | Copper-return subgate принят; общий Review B, CAM/DFM и manufacturing release открыты |
 | «Мухоед» | Последний диагностический replay: 3/3 обнаружения и 15/15 положительных окон; operational type — UNKNOWN |
 | Производственный BOM | 295 engineering-строк и 124 procurement-строки; QG-1 `PASS`, QG-2 `BLOCKED` |

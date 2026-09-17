@@ -170,7 +170,7 @@ def main() -> int:
     J1 = make_instance(sch, j1sym, reference="J1", value="PWR_INPUT_43045-0213",
                        footprint="DioneyaPWR:Molex_43045-0213_MicroFit-2_Vertical",
                        datasheet="Molex SD-43045-005 Rev.G1", x=25.40, y=38.10)
-    F1 = make_instance(sch, fuse, reference="F1", value="0451005.MRL CANDIDATE",
+    F1 = make_instance(sch, fuse, reference="F1", value="0451008.MRL",
                        footprint="Fuse:Fuse_1206_3216Metric", datasheet="Littelfuse 0451", x=48.26, y=35.56)
     D1 = make_instance(sch, tvs, reference="D1", value="SMBJ18A CANDIDATE",
                        footprint="Diode_SMD:D_SMB", datasheet="Littelfuse SMBJ", x=60.96, y=50.80)

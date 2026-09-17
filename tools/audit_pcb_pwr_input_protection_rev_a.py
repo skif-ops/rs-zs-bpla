@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Audit the controlled PCB-PWR fuse/TVS qualification packet.
 
-Default mode validates that the exact EVT candidates, staged native-value ECO,
-test matrix and manufacturing interlocks are internally consistent. Strict mode
+Default mode validates that the exact EVT candidates, applied value-only ECO,
+repeat-evidence gate, test matrix and manufacturing interlocks are internally consistent. Strict mode
 is the physical qualification gate and remains non-zero until all matrix rows
 carry attributable PASS evidence.
 """
@@ -26,6 +26,8 @@ NATIVE_SCH = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR_01_INPUT_PROTECTION.k
 NATIVE_PCB = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 SCH_GENERATOR = ROOT / "tools/generate_pcb_pwr_schematic_rev_a.py"
 PCB_GENERATOR = ROOT / "tools/generate_pcb_pwr_layout_candidate_rev_a.py"
+PLACEMENT = ROOT / "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv"
+CAPTURE_NETS = ROOT / "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
 
 
 def require(condition: bool, message: str) -> None:
@@ -70,6 +72,13 @@ def main() -> int:
     require(contract["manufacturing_release"] is False, "qualification packet released manufacture")
     require(baseline["status"] == "CAPTURE_BASELINE_NOT_FOR_MANUFACTURE",
             "power baseline lost NOT FOR MANUFACTURE interlock")
+    baseline_input = baseline.get("input_protection_qualification", {})
+    require(baseline_input.get("status") ==
+            "TARGET_EVT_CANDIDATES_SELECTED_NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_AND_PHYSICAL_QUALIFICATION_PENDING" and
+            baseline_input.get("fuse", {}).get("native_value_eco_applied") is True and
+            baseline_input.get("fuse", {}).get(
+                "repeat_erc_pdf_human_hierarchy_review_complete") is False,
+            "power baseline does not expose the post-ECO repeat-evidence gate")
     require(capture_status["manufacturing_release"] is False,
             "PCB-PWR capture status released manufacture")
 
@@ -133,8 +142,8 @@ def main() -> int:
     require(frozen["MPN"] == fuse["target_evt_mpn"], "freeze/contract fuse MPN mismatch")
     require("CANDIDATE_SELECTED_FOR_EVT_QUALIFICATION" in frozen["Status"],
             "freeze does not identify selected qualification candidate")
-    require("NATIVE_VALUE_ECO_PENDING" in frozen["Status"],
-            "freeze lost native-value ECO interlock")
+    require("NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_PENDING" in frozen["Status"],
+            "freeze lost post-ECO repeat-evidence interlock")
 
     bom_fuse = bom["PWR-FUSE-01"]
     require(bom_fuse["MPN"] == fuse["target_evt_mpn"], "engineering BOM fuse MPN mismatch")
@@ -152,33 +161,67 @@ def main() -> int:
 
     native_eco = contract["native_value_eco"]
     require(native_eco == {
-        "applied": False,
+        "applied": True,
+        "applied_date": "2026-09-17",
+        "change": "0451005.MRL_TO_0451008.MRL",
         "topology_change": False,
+        "footprint_change": False,
+        "placement_change": False,
         "value_only_change": True,
-        "signed_source_must_remain_unchanged_until_eco": True,
+        "signed_source_value_superseded": True,
+        "pre_eco_pin_net_semantic_sha256":
+            "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
+        "post_eco_pin_net_semantic_sha256":
+            "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
+        "post_eco_board_semantic_sha256":
+            "5f854a5276e8dfd6dc82516f61db1a158888b5343b82058e6024e5970b51e6c1",
         "repeat_native_kicad_9_erc_required": True,
+        "repeat_native_kicad_9_erc_complete": True,
         "repeat_pdf_evidence_required": True,
+        "repeat_pdf_evidence_complete": True,
         "repeat_independent_human_hierarchy_review_required": True,
+        "repeat_independent_human_hierarchy_review_complete": False,
         "pcba_procurement_authorized": False,
         "manufacturing_release": False,
     }, "native value ECO control drift")
     for path in (NATIVE_SCH, NATIVE_PCB, SCH_GENERATOR, PCB_GENERATOR):
         text = path.read_text(encoding="utf-8")
-        require("0451005.MRL CANDIDATE" in text,
-                f"signed native 5 A value unexpectedly changed before controlled ECO: {path}")
-        require("0451008.MRL" not in text,
-                f"target 8 A value partially applied before controlled ECO: {path}")
+        require("0451008.MRL" in text,
+                f"target 8 A value is not applied in active source: {path}")
+        require("0451005.MRL CANDIDATE" not in text,
+                f"superseded 5 A value remains in active source: {path}")
+
+    placements = {row["RefDes"]: row for row in read_csv(PLACEMENT)}
+    f1_placement = placements.get("F1", {})
+    require((f1_placement.get("X_mm"), f1_placement.get("Y_mm"),
+             f1_placement.get("Rotation_deg"), f1_placement.get("Side")) ==
+            ("13.00", "29.00", "0", "TOP"),
+            "F1 placement authority changed during value-only ECO")
+    capture_nets = {row["Net"]: row for row in read_csv(CAPTURE_NETS)}
+    require(capture_nets.get("VBAT_RAW", {}).get("To") == "F1.1" and
+            capture_nets.get("VBAT_FUSED", {}).get("From") == "F1.2",
+            "F1 capture topology authority changed during value-only ECO")
 
     status_eco = capture_status.get("input_protection_candidate_eco", {})
     require(status_eco.get("state") ==
-            "TARGET_8A_SELECTED_SIGNED_NATIVE_5A_VALUE_ECO_PENDING",
-            "PCB-PWR capture status does not expose the staged fuse ECO")
+            "TARGET_8A_NATIVE_VALUE_ECO_APPLIED_REPEAT_ERC_PDF_EVIDENCE_PASS_HUMAN_HIERARCHY_REVIEW_PENDING",
+            "PCB-PWR capture status does not expose the post-ECO review gate")
     require(status_eco.get("target_fuse_mpn") == fuse["target_evt_mpn"],
             "PCB-PWR capture status target fuse mismatch")
     require(status_eco.get("signed_native_fuse_mpn") == fuse["signed_native_mpn"],
             "PCB-PWR capture status signed fuse mismatch")
-    require(status_eco.get("native_value_eco_applied") is False,
-            "PCB-PWR capture status prematurely applies native fuse ECO")
+    require(status_eco.get("native_value_eco_applied") is True and
+            status_eco.get("value_only_change_verified") is True,
+            "PCB-PWR capture status does not record the bounded value-only ECO")
+    require(status_eco.get("pin_net_semantic_sha256_before") ==
+            native_eco["pre_eco_pin_net_semantic_sha256"] and
+            status_eco.get("pin_net_semantic_sha256_after") ==
+            native_eco["post_eco_pin_net_semantic_sha256"],
+            "PCB-PWR capture status ECO semantic proof drift")
+    require(status_eco.get("repeat_native_kicad_9_erc_complete") is True and
+            status_eco.get("repeat_pdf_evidence_complete") is True and
+            status_eco.get("repeat_independent_human_hierarchy_review_complete") is False,
+            "PCB-PWR capture status repeat-evidence boundary drift")
     require(status_eco.get("pcba_procurement_authorized") is False,
             "PCB-PWR capture status prematurely authorizes procurement")
     require(status_eco.get("manufacturing_release") is False,
@@ -203,13 +246,34 @@ def main() -> int:
                         ("Result", "Operator", "Date", "Artifact_SHA256")),
                     f"{row['Test_ID']}: PASS lacks attributable evidence")
 
+    matrix_by_id = {row["Test_ID"]: row for row in matrix}
+    require(matrix_by_id["PWR-IPQ-003"]["Status"] == "PASS" and
+            matrix_by_id["PWR-IPQ-003"]["Result"] ==
+            "F1=0451008.MRL in all active sources; pin/net and board semantic digests retained; post-ECO ERC/PDF artifact archived" and
+            matrix_by_id["PWR-IPQ-003"]["Operator"] ==
+            "GitHub Actions run 35197150159 + Codex independent audit" and
+            matrix_by_id["PWR-IPQ-003"]["Date"] == "2026-09-17" and
+            matrix_by_id["PWR-IPQ-003"]["Artifact_SHA256"] ==
+            "bf80f07c9b20d93d610c3e8c124887becb4209f8d688f085fe68bac53e0ad0b9",
+            "PWR-IPQ-003 native-value ECO evidence drift")
+    require(matrix_by_id["PWR-IPQ-004"]["Status"] == "PENDING_EVIDENCE",
+            "PWR-IPQ-004 must remain pending until independent human hierarchy review")
+
     accepted_rows = sum(row["Status"] == "PASS" for row in matrix)
     failed_rows = [row["Test_ID"] for row in matrix if row["Status"] == "FAIL"]
-    complete = accepted_rows == 20 and not failed_rows and native_eco["applied"]
+    repeat_gate_complete = all((
+        native_eco["repeat_native_kicad_9_erc_complete"],
+        native_eco["repeat_pdf_evidence_complete"],
+        native_eco["repeat_independent_human_hierarchy_review_complete"],
+    ))
+    complete = (accepted_rows == 20 and not failed_rows and native_eco["applied"]
+                and repeat_gate_complete)
     require(contract["test_matrix"]["required_rows"] == 20,
             "contract qualification row count drift")
-    require(contract["test_matrix"]["accepted_rows"] == 0,
-            "contract claims accepted rows before evidence update")
+    require(contract["test_matrix"]["accepted_rows"] == 1,
+            "contract accepted-row count does not match post-ECO evidence")
+    require(status_eco.get("accepted_test_rows") == accepted_rows == 1,
+            "capture-status qualification accepted-row count drift")
     require(contract["test_matrix"]["complete"] is False,
             "contract claims physical qualification complete")
 
@@ -238,6 +302,10 @@ def main() -> int:
             "buck_absolute_max_input_v": tvs["buck_absolute_max_input_v"],
         },
         "native_value_eco_applied": native_eco["applied"],
+        "value_only_change_verified": True,
+        "pin_net_semantic_sha256": native_eco["post_eco_pin_net_semantic_sha256"],
+        "board_semantic_sha256": native_eco["post_eco_board_semantic_sha256"],
+        "repeat_erc_pdf_human_review_complete": repeat_gate_complete,
         "accepted_rows": accepted_rows,
         "required_rows": 20,
         "failed_rows": failed_rows,
@@ -256,7 +324,7 @@ def main() -> int:
     )
     print(
         f"Native value ECO applied={native_eco['applied']}; "
-        f"physical evidence={accepted_rows}/20 PASS"
+        f"qualification evidence={accepted_rows}/20 PASS"
     )
     print("PCBA procurement and manufacturing release remain BLOCKED")
     print(args.output)

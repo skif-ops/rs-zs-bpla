@@ -23,7 +23,7 @@
     "enable_policy": "always_on_EN_tied_to_ANODE_VBAT_FUSED"
   },
   "input_protection_qualification": {
-    "status": "TARGET_EVT_CANDIDATES_SELECTED_NATIVE_VALUE_ECO_AND_PHYSICAL_QUALIFICATION_PENDING",
+    "status": "TARGET_EVT_CANDIDATES_SELECTED_NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_AND_PHYSICAL_QUALIFICATION_PENDING",
     "system_continuous_current_a": 5.0,
     "fuse": {
       "signed_native_mpn": "0451005.MRL",
@@ -38,7 +38,8 @@
       "capacity_after_standard_derating_a": 6.0,
       "temperature_rerating_required": true,
       "package_land_pattern_change": false,
-      "native_value_eco_applied": false
+      "native_value_eco_applied": true,
+      "repeat_erc_pdf_human_hierarchy_review_complete": false
     },
     "input_connector": {
       "board_header_mpn": "43045-0213",
