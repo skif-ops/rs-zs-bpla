@@ -44,10 +44,10 @@ ROOT_UUID = str(uuid.uuid5(NAMESPACE, "PCB-PWR:root"))
 PROJECT = "PCB-PWR"
 PAGE_SIZE = "A3"
 GRID_MM = 2.54
-STUB_MM = 7.62
+STUB_MM = 10.16
 ROOT_LABEL_FONT_MM = 0.01
-PAGE_ORIGIN = (30.48, 38.10)
-PAGE_SCALE = 1.5
+LABEL_FONT_MM = 1.10
+PROPERTY_FONT_MM = 1.00
 
 
 @dataclass(frozen=True)
@@ -115,39 +115,42 @@ SHEETS = (
 # Functional pin geometry for the manufacturer-specific devices represented by
 # project-local generic bodies.  Coordinates are relative to the instance origin.
 SYMBOL_GEOMETRY: dict[str, tuple[tuple[float, float, float, float], dict[str, tuple[float, float, int]]]] = {
-    "DioneyaPWR:Conn_01x06": ((-5.08, 7.62, 5.08, -7.62), {
-        "1": (-7.62, -5.08, 0), "2": (0.0, -10.16, 90),
-        "3": (-7.62, 0.0, 0), "4": (7.62, 5.08, 180),
-        "5": (7.62, 0.0, 180), "6": (-7.62, 5.08, 0),
+    "DioneyaPWR:Conn_01x02": ((-10.16, 5.08, 10.16, -5.08), {
+        "1": (-12.70, 2.54, 0), "2": (-12.70, -2.54, 0),
     }),
-    "DioneyaPWR:Conn_01x08": ((-5.08, 8.89, 5.08, -8.89), {
-        "1": (-7.62, 6.35, 0), "2": (-7.62, 3.81, 0),
-        "3": (-7.62, 1.27, 0), "4": (0.0, -11.43, 90),
-        "5": (7.62, 6.35, 180), "6": (7.62, 3.81, 180),
-        "7": (7.62, 1.27, 180), "8": (7.62, -1.27, 180),
+    "DioneyaPWR:Conn_01x06": ((-15.24, 8.89, 15.24, -8.89), {
+        "1": (-17.78, -5.08, 0), "2": (0.0, -11.43, 90),
+        "3": (-17.78, 0.0, 0), "4": (17.78, 5.08, 180),
+        "5": (17.78, 0.0, 180), "6": (-17.78, 5.08, 0),
     }),
-    "DioneyaPWR:Conn_01x10": ((-6.35, 10.16, 6.35, -10.16), {
-        "1": (-2.54, -12.70, 90), "2": (2.54, -12.70, 90),
-        "3": (8.89, 0.0, 180), "4": (-8.89, -2.54, 0),
-        "5": (-8.89, 0.0, 0), "6": (0.0, 12.70, 270),
-        "7": (0.0, -12.70, 90), "8": (-8.89, 2.54, 0),
-        "9": (8.89, 6.35, 180), "10": (-8.89, 6.35, 0),
+    "DioneyaPWR:Conn_01x08": ((-12.70, 10.16, 12.70, -10.16), {
+        "1": (-15.24, 7.62, 0), "2": (-15.24, 2.54, 0),
+        "3": (-15.24, -2.54, 0), "4": (0.0, -12.70, 90),
+        "5": (15.24, 7.62, 180), "6": (15.24, 2.54, 180),
+        "7": (15.24, -2.54, 180), "8": (15.24, -7.62, 180),
     }),
-    "DioneyaPWR:Conn_01x09": ((-6.35, 10.16, 6.35, -10.16), {
-        "1": (-8.89, 6.35, 0), "2": (0.0, -12.70, 90),
-        "3": (8.89, 6.35, 180), "4": (8.89, 3.81, 180),
-        "5": (8.89, 0.0, 180), "6": (8.89, -5.08, 180),
-        "7": (-8.89, -2.54, 0), "8": (-2.54, -12.70, 90),
-        "9": (-8.89, 0.0, 0),
+    "DioneyaPWR:Conn_01x10": ((-17.78, 12.70, 17.78, -12.70), {
+        "1": (-10.16, -15.24, 90), "2": (0.0, -15.24, 90),
+        "3": (20.32, 0.0, 180), "4": (-20.32, -5.08, 0),
+        "5": (-20.32, 0.0, 0), "6": (0.0, 15.24, 270),
+        "7": (10.16, -15.24, 90), "8": (-20.32, 5.08, 0),
+        "9": (20.32, 7.62, 180), "10": (-20.32, 7.62, 0),
     }),
-    "DioneyaPWR:Conn_01x05": ((-5.08, 7.62, 5.08, -7.62), {
-        "1": (-7.62, 5.08, 0), "2": (0.0, -10.16, 90),
-        "3": (-7.62, 0.0, 0), "4": (7.62, -2.54, 180),
-        "5": (7.62, 5.08, 180),
+    "DioneyaPWR:Conn_01x09": ((-15.24, 12.70, 15.24, -12.70), {
+        "1": (-17.78, 7.62, 0), "2": (7.62, -15.24, 90),
+        "3": (17.78, 7.62, 180), "4": (17.78, 2.54, 180),
+        "5": (17.78, -2.54, 180), "6": (17.78, -7.62, 180),
+        "7": (-17.78, -5.08, 0), "8": (-7.62, -15.24, 90),
+        "9": (-17.78, 0.0, 0),
     }),
-    "DioneyaPWR:Conn_01x04": ((-10.16, 6.35, 10.16, -6.35), {
-        "1": (-12.70, 2.54, 0), "2": (12.70, 2.54, 180),
-        "3": (-12.70, -2.54, 0), "4": (12.70, -2.54, 180),
+    "DioneyaPWR:Conn_01x05": ((-12.70, 8.89, 12.70, -8.89), {
+        "1": (-15.24, 5.08, 0), "2": (0.0, -11.43, 90),
+        "3": (-15.24, 0.0, 0), "4": (15.24, -5.08, 180),
+        "5": (15.24, 5.08, 180),
+    }),
+    "DioneyaPWR:Conn_01x04": ((-25.40, 7.62, 25.40, -7.62), {
+        "1": (-27.94, 5.08, 0), "2": (27.94, 5.08, 180),
+        "3": (-27.94, -5.08, 0), "4": (27.94, -5.08, 180),
     }),
 }
 
@@ -162,36 +165,55 @@ HIDE_PIN_NAMES = {
 # separate functional groups and prevent wire/label collisions in the review drawing.
 SCHEMATIC_POSITIONS: dict[str, tuple[float, float]] = {
     # Input protection and current monitor.
-    "J1": (25.40, 40.64), "F1": (45.72, 40.64), "D1": (55.88, 71.12),
-    "U1": (83.82, 43.18), "C1": (83.82, 76.20), "C9": (55.88, 91.44),
-    "Q1": (119.38, 43.18), "C10": (119.38, 76.20),
-    "RSH1": (154.94, 43.18), "U2": (154.94, 96.52),
-    "C2": (185.42, 96.52), "C13": (195.58, 50.80),
-    "TP1": (226.06, 35.56), "TP2": (226.06, 50.80), "TP3": (226.06, 66.04),
-    "TP8": (226.06, 111.76), "TP9": (226.06, 127.00), "TP10": (226.06, 142.24),
-    "#FLG01": (30.48, 154.94), "#FLG02": (50.80, 154.94),
+    "J1": (55.88, 48.26), "F1": (152.40, 48.26),
+    "U1": (251.46, 50.80), "Q1": (350.52, 50.80),
+    "D1": (55.88, 96.52), "C1": (152.40, 96.52),
+    "C9": (251.46, 96.52), "C10": (350.52, 96.52),
+    "RSH1": (68.58, 147.32), "U2": (205.74, 147.32),
+    "C2": (304.80, 147.32), "C13": (370.84, 147.32),
+    "TP1": (55.88, 198.12), "TP2": (152.40, 198.12),
+    "TP3": (251.46, 198.12), "TP8": (350.52, 198.12),
+    "TP9": (55.88, 238.76), "TP10": (152.40, 238.76),
+    "#FLG01": (251.46, 238.76), "#FLG02": (350.52, 238.76),
     # 3V8 modem rail.
-    "U3": (68.58, 76.20), "L1": (101.60, 68.58), "C11": (38.10, 58.42),
-    "C4": (101.60, 45.72), "R1": (132.08, 50.80), "R2": (132.08, 81.28),
-    "C3": (149.86, 104.14), "C14": (165.10, 104.14),
-    "C15": (180.34, 104.14), "C16": (195.58, 104.14),
-    "R3": (48.26, 129.54), "R4": (68.58, 129.54), "R5": (88.90, 129.54),
-    "R6": (35.56, 101.60), "R15": (111.76, 129.54),
-    "TP4": (226.06, 58.42), "TP5": (226.06, 76.20),
+    "U3": (60.96, 50.80), "L1": (157.48, 50.80),
+    "C11": (254.00, 50.80), "C4": (350.52, 50.80),
+    "R1": (60.96, 99.06), "R2": (157.48, 99.06),
+    "C3": (254.00, 99.06), "C14": (350.52, 99.06),
+    "C15": (60.96, 147.32), "C16": (157.48, 147.32),
+    "R3": (254.00, 147.32), "R4": (350.52, 147.32),
+    "R5": (60.96, 195.58), "R6": (157.48, 195.58),
+    "R15": (254.00, 195.58), "TP4": (350.52, 195.58),
+    "TP5": (60.96, 238.76),
     # 3V3 digital rail.
-    "U4": (68.58, 76.20), "L2": (101.60, 68.58), "C12": (38.10, 58.42),
-    "C6": (101.60, 45.72), "R10": (132.08, 50.80),
-    "C5": (149.86, 104.14), "C17": (165.10, 104.14),
-    "C18": (180.34, 104.14), "C19": (195.58, 104.14),
-    "R7": (48.26, 129.54), "R8": (68.58, 129.54), "R9": (88.90, 129.54),
-    "R12": (149.86, 129.54), "R13": (170.18, 129.54), "R14": (190.50, 129.54),
-    "TP6": (226.06, 66.04), "#FLG03": (30.48, 154.94),
+    "U4": (60.96, 50.80), "L2": (157.48, 50.80),
+    "C12": (254.00, 50.80), "C6": (350.52, 50.80),
+    "R10": (60.96, 99.06), "C5": (157.48, 99.06),
+    "C17": (254.00, 99.06), "C18": (350.52, 99.06),
+    "C19": (60.96, 147.32), "R7": (157.48, 147.32),
+    "R8": (254.00, 147.32), "R9": (350.52, 147.32),
+    "R12": (60.96, 195.58), "R13": (157.48, 195.58),
+    "R14": (254.00, 195.58), "TP6": (350.52, 195.58),
+    "#FLG03": (60.96, 238.76),
     # 1V8 rail, net ties and MAIN harness connector.
-    "U5": (66.04, 55.88), "C7": (45.72, 86.36), "C8": (86.36, 86.36),
-    "R11": (66.04, 111.76), "NT1": (114.30, 55.88),
-    "NT2": (139.70, 55.88), "NT3": (165.10, 55.88),
-    "J2": (205.74, 96.52), "TP7": (231.14, 50.80),
+    "U5": (76.20, 60.96), "C7": (208.28, 60.96), "C8": (340.36, 60.96),
+    "R11": (76.20, 129.54), "NT1": (208.28, 129.54),
+    "NT2": (340.36, 129.54), "NT3": (76.20, 198.12),
+    "J2": (208.28, 198.12), "TP7": (340.36, 198.12),
 }
+
+
+# Rotate vertical two-terminal glyphs so their wire stubs and net names read
+# left-to-right.  This is a schematic presentation choice only; pin numbers and
+# their authoritative net assignment are unchanged.
+HORIZONTAL_SYMBOLS = {"Device:C", "Device:Fuse", "Device:L", "Device:R"}
+HEADER_PROPERTY_SYMBOLS = {
+    "DioneyaPWR:Conn_01x05",
+    "DioneyaPWR:Conn_01x06",
+    "DioneyaPWR:Conn_01x08",
+    "DioneyaPWR:Conn_01x09",
+}
+SIDE_PROPERTY_SYMBOLS = {"DioneyaPWR:Conn_01x10"}
 
 
 def stable_uuid(token: str) -> str:
@@ -233,10 +255,10 @@ def flat_pin_map(flat: Schematic) -> tuple[dict[str, dict[str, str]], set[tuple[
     return result, nc_pins
 
 
-def set_position(instance, x: float, y: float) -> None:
+def set_position(instance, x: float, y: float, angle: int = 0) -> None:
     dx = float(x) - float(instance.position.X)
     dy = float(y) - float(instance.position.Y)
-    instance.position = Position(X=x, Y=y, angle=instance.position.angle or 0)
+    instance.position = Position(X=x, Y=y, angle=angle)
     for item in instance.properties:
         item.position = Position(
             X=round(float(item.position.X) + dx, 4),
@@ -245,30 +267,37 @@ def set_position(instance, x: float, y: float) -> None:
         )
 
 
-def review_position(position: tuple[float, float]) -> tuple[float, float]:
-    """Expand the former A4 placement onto an A3 review grid."""
-    x, y = position
-    return (
-        round(PAGE_ORIGIN[0] + (x - 25.40) * PAGE_SCALE, 4),
-        round(PAGE_ORIGIN[1] + (y - 35.56) * PAGE_SCALE, 4),
-    )
-
-
 def layout_properties(instance, symbol) -> None:
     """Keep visible reference/value fields clear of pins and their net stubs."""
     pins = selected_pins(symbol, instance.unit or 1).values()
     vertical_extent = max((abs(float(pin.position.Y)) for pin in pins), default=2.54)
-    clearance = vertical_extent + STUB_MM + 2.54
+    if int(instance.position.angle or 0) % 180:
+        # Rotated passives have horizontal pins; only the glyph height matters.
+        clearance = 7.62
+    else:
+        clearance = vertical_extent + 5.08
     x = float(instance.position.X)
     y = float(instance.position.Y)
     for item in instance.properties:
-        if item.key == "Reference":
+        if instance.libId in HEADER_PROPERTY_SYMBOLS and item.key == "Reference":
+            item.position = Position(X=x, Y=round(y - clearance - 3.05, 4), angle=0)
+        elif instance.libId in HEADER_PROPERTY_SYMBOLS and item.key == "Value":
+            item.position = Position(X=x, Y=round(y - clearance, 4), angle=0)
+        elif instance.libId in SIDE_PROPERTY_SYMBOLS and item.key == "Reference":
+            item.position = Position(X=round(x + 33.02, 4), Y=round(y + 15.24, 4), angle=0)
+        elif instance.libId in SIDE_PROPERTY_SYMBOLS and item.key == "Value":
+            item.position = Position(X=round(x + 33.02, 4), Y=round(y + 18.29, 4), angle=0)
+        elif item.key == "Reference":
             item.position = Position(X=x, Y=round(y - clearance, 4), angle=0)
         elif item.key == "Value":
             item.position = Position(X=x, Y=round(y + clearance, 4), angle=0)
         if item.key in {"Reference", "Value"}:
-            item.effects.font = Font(height=0.85, width=0.85)
+            item.effects.font = Font(height=PROPERTY_FONT_MM, width=PROPERTY_FONT_MM)
             item.effects.hide = False
+        else:
+            # Footprint and datasheet strings remain in the native design, but
+            # do not belong on the human hierarchy drawing.
+            item.effects.hide = True
 
 
 def reshape_library_symbol(symbol) -> None:
@@ -325,7 +354,7 @@ def local_label(
     token: str,
     *,
     hidden: bool = False,
-    font_size: float = 0.9,
+    font_size: float = LABEL_FONT_MM,
 ) -> LocalLabel:
     return LocalLabel(
         text=net,
@@ -340,7 +369,7 @@ def hierarchy_label(net: str, at: tuple[float, float], angle: int, token: str) -
         text=net,
         shape="passive",
         position=Position(X=at[0], Y=at[1], angle=angle),
-        effects=Effects(font=Font(height=0.9, width=0.9)),
+        effects=Effects(font=Font(height=LABEL_FONT_MM, width=LABEL_FONT_MM)),
         uuid=stable_uuid(f"hier-label:{token}"),
     )
 
@@ -395,8 +424,9 @@ def make_child(
 
     for ref in sorted(spec.refs):
         instance = copy.deepcopy(flat_instances[ref])
-        target = review_position(SCHEMATIC_POSITIONS[ref])
-        set_position(instance, *target)
+        target = SCHEMATIC_POSITIONS[ref]
+        angle = 90 if instance.libId in HORIZONTAL_SYMBOLS else 0
+        set_position(instance, *target, angle=angle)
         instance.uuid = stable_uuid(f"symbol:{ref}")
         instance.pins = {
             number: stable_uuid(f"symbol:{ref}:pin:{number}")
@@ -423,7 +453,8 @@ def make_child(
                 ))
                 continue
             net = pin_map[ref][number]
-            end, label_angle = stub_endpoint(pin_at, pin.position.angle)
+            pin_angle = (int(pin.position.angle or 0) + angle) % 360
+            end, label_angle = stub_endpoint(pin_at, pin_angle)
             child.graphicalItems.append(wire(pin_at, end, f"{ref}:{number}"))
             token = f"{ref}:{number}:{net}"
             if primary_cross_pin.get(net) == (ref, number):

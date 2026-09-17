@@ -73,12 +73,14 @@ pad/net equivalence to all 60 PCB footprints. This retains the signed pin/net
 authority only. The KiCad 9 ERC/PDF evidence and independent hierarchy decision
 accepted on `2026-09-16` for source commit
 `2a973f6856aa115aa59323d619be985578780682` are historical evidence for the
-superseded F1 value. For the active post-ECO source, KiCad 9.0.9 ERC reports zero
-violations on all five sheets and the new five-page A3 PDF passes visual preflight;
-the source, ERC, PDF and artifact hashes are bound to commit
-`091a2eb223161cb4396fc6838921eeb79150c38d`. A new independent hierarchy decision
-is still open. Routing and manufacturing release remain blocked by the separate
-gates below.
+superseded F1 value. For the post-ECO source at commit
+`091a2eb223161cb4396fc6838921eeb79150c38d`, KiCad 9.0.9 ERC reported zero
+violations on all five sheets, but independent review found text overlapping
+symbols and connection marks in its five-page A3 PDF. That PDF is superseded as
+active review evidence. The presentation-only remediation retains exact pin/net
+equivalence; fresh commit-bound KiCad 9 ERC/PDF evidence and a new independent
+hierarchy decision are open. Routing and manufacturing release remain blocked
+by the separate gates below.
 
 The PCB-PWR input-protection desk review rejects the signed native F1 value
 `0451005.MRL` for the 5 A continuous-current basis: Littelfuse's standard 25%
@@ -87,9 +89,10 @@ controlled BOM and qualification packet select exact candidate
 `0451008.MRL` 8 A in the same Nano2 451 land pattern and retain
 `SMBJ18A`. The bounded value-only ECO is applied to the active native schematic,
 PCB and generators with footprint, placement, topology, nets and pad mapping
-retained. This does not extend the prior hierarchy acceptance. The fresh KiCad 9
-ERC and five-page PDF evidence pass, while independent human hierarchy review
-remains mandatory. The input-protection matrix has `1/20` accepted rows
+retained. This does not extend the prior hierarchy acceptance. The earlier
+post-ECO PDF is superseded by the legibility remediation; fresh KiCad 9 ERC and
+five-page PDF evidence plus independent human hierarchy review remain mandatory.
+The input-protection matrix has `1/20` accepted rows
 (`PWR-IPQ-003`); PCBA procurement and manufacturing release remain prohibited.
 
 PCB-PWR has also passed its bounded fitted-body 2D placement-clearance subgate.
