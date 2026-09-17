@@ -115,6 +115,7 @@ on:
       - "tools/audit_pcb_pwr_routing_authority_rev_a.py"
       - "tools/audit_pcb_pwr_dim_003_request_rev_a.py"
       - "tools/audit_pcb_pwr_stackup_copper_request_rev_a.py"
+      - "tools/audit_pcb_pwr_input_protection_rev_a.py"
       - "tools/generate_pcb_pwr_schematic_rev_a.py"
       - "tools/finalize_pcb_pwr_symbol_types_rev_a.py"
       - "tools/finalize_pcb_pwr_schematic_completeness_rev_a.py"
@@ -254,6 +255,8 @@ jobs:
             --output artifacts/kicad-native/PCB-PWR/preschematic_audit.json
           python tools/audit_pcb_pwr_capture_authority_rev_a.py
           python tools/audit_pcb_pwr_dft_authority_rev_a.py
+          python tools/audit_pcb_pwr_input_protection_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/input_protection_qualification_audit.json
       - name: Install official KiCad 9 stable toolchain
         shell: bash
         run: |
@@ -627,6 +630,9 @@ jobs:
             hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json
             hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md
             hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv
             hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
             hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md
             hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md

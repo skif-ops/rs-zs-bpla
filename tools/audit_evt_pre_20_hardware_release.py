@@ -284,6 +284,56 @@ def audit() -> dict[str, object]:
         "PCB-PWR hierarchy independent human acceptance remains open",
     )
 
+    pwr_input_protection = run_json_audit(
+        "audit_pcb_pwr_input_protection_rev_a.py"
+    )
+    pwr_input_protection_packet_ready = (
+        pwr_input_protection.get("status") ==
+        "PASS_CONTROLLED_QUALIFICATION_PLAN_PHYSICAL_EVIDENCE_PENDING"
+        and pwr_input_protection.get("fuse", {}).get("signed_native_mpn") ==
+        "0451005.MRL"
+        and pwr_input_protection.get("fuse", {}).get("target_evt_mpn") ==
+        "0451008.MRL"
+        and pwr_input_protection.get("required_rows") == 20
+        and pwr_input_protection.get("accepted_rows") == 0
+        and pwr_input_protection.get("physical_qualification_complete") is False
+        and pwr_input_protection.get("pcba_procurement_authorized") is False
+        and pwr_input_protection.get("manufacturing_release") is False
+    )
+    check(
+        "pcb_pwr_input_protection_qualification_packet",
+        pwr_input_protection_packet_ready,
+        str(pwr_input_protection.get("status", "MISSING")),
+        "PCB-PWR fuse/TVS input-protection qualification packet is incomplete or inconsistent",
+    )
+    accepted_input_protection_rows = int(
+        pwr_input_protection.get("accepted_rows", 0) or 0
+    )
+    required_input_protection_rows = int(
+        pwr_input_protection.get("required_rows", 20) or 20
+    )
+    pwr_input_protection_qualified = (
+        pwr_input_protection.get("status") == "PASS_QUALIFIED_FOR_RELEASE"
+        and pwr_input_protection.get("native_value_eco_applied") is True
+        and accepted_input_protection_rows == required_input_protection_rows
+        and pwr_input_protection.get("physical_qualification_complete") is True
+    )
+    check(
+        "pcb_pwr_input_protection_release",
+        pwr_input_protection_qualified,
+        (
+            f"native ECO={pwr_input_protection.get('native_value_eco_applied', False)}; "
+            f"qualification={accepted_input_protection_rows}/"
+            f"{required_input_protection_rows} PASS"
+        ),
+        (
+            "PCB-PWR input-protection release remains open: "
+            f"native value ECO={pwr_input_protection.get('native_value_eco_applied', False)}; "
+            f"qualification evidence={accepted_input_protection_rows}/"
+            f"{required_input_protection_rows} PASS"
+        ),
+    )
+
     pwr_clearance = run_json_audit("audit_pcb_pwr_placement_clearance_rev_a.py")
     pwr_clearance_summary = pwr_clearance.get("summary", {})
     pwr_clearance_controlled = (
@@ -418,12 +468,23 @@ def audit() -> dict[str, object]:
         harness.get("status") == "PASS_CONTROLLED_PRELIMINARY_LENGTHS_OPEN"
         and harness.get("packet_complete") is True
         and harness.get("controlled_conductors") == 38
+        and harness.get("supplier_request_status") ==
+        "PACKET_READY_16_ATTRIBUTABLE_RESPONSES_REQUIRED_FINAL_LENGTHS_OPEN_NOT_FOR_BUILD"
+        and isinstance(harness.get("supplier_request"), dict)
+        and harness["supplier_request"].get("required_response_rows") == 16
+        and harness["supplier_request"].get("accepted_response_rows") == 0
+        and harness["supplier_request"].get("selected_supplier") is None
+        and harness["supplier_request"].get("build_authorized") is False
     )
     check(
         "harness_controlled_preliminary_packet",
         harness_packet_ok,
-        str(harness.get("status", "MISSING")),
-        "internal harness drawing and point-to-point manufacturing schedule are incomplete",
+        (
+            f"{harness.get('status', 'MISSING')}; "
+            f"supplier responses="
+            f"{harness.get('supplier_request', {}).get('accepted_response_rows', 'MISSING')}/16"
+        ),
+        "internal harness drawing schedule or supplier capability request packet is incomplete",
     )
     harness_released = harness.get("manufacturing_release") is True
     harness_blockers = [str(item) for item in harness.get("open_blockers", [])]
@@ -789,6 +850,7 @@ def audit() -> dict[str, object]:
         "pcb_layer_count_authority": layer_authority,
         "pcb_main_hierarchy": main_hierarchy,
         "pcb_pwr_hierarchy": pwr_hierarchy,
+        "pcb_pwr_input_protection": pwr_input_protection,
         "pcb_pwr_dim_003": pwr_dim_003,
         "pcb_pwr_stackup_copper": pwr_stackup_copper,
         "harness": harness,

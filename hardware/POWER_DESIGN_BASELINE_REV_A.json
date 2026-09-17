@@ -1,7 +1,7 @@
 {
   "configuration": "EVT-PRE-20 Rev.A",
   "status": "CAPTURE_BASELINE_NOT_FOR_MANUFACTURE",
-  "verified_date": "2026-09-09",
+  "verified_date": "2026-09-17",
   "review_a_pin_net_status": "PASS",
   "input": {
     "working_min_v": 10.0,
@@ -21,6 +21,61 @@
     "mosfet_temp_min_c": -55,
     "mosfet_temp_max_c": 175,
     "enable_policy": "always_on_EN_tied_to_ANODE_VBAT_FUSED"
+  },
+  "input_protection_qualification": {
+    "status": "TARGET_EVT_CANDIDATES_SELECTED_NATIVE_VALUE_ECO_AND_PHYSICAL_QUALIFICATION_PENDING",
+    "system_continuous_current_a": 5.0,
+    "fuse": {
+      "signed_native_mpn": "0451005.MRL",
+      "signed_native_rating_a": 5.0,
+      "signed_native_disposition": "REJECTED_FOR_5A_CONTINUOUS_SERVICE_DO_NOT_PROCURE",
+      "target_evt_mpn": "0451008.MRL",
+      "target_rating_a": 8.0,
+      "nominal_cold_resistance_ohm": 0.0077,
+      "nominal_melting_i2t_a2s": 20.23,
+      "standard_continuous_derating_fraction": 0.75,
+      "minimum_nominal_rating_at_25c_a": 6.6666666667,
+      "capacity_after_standard_derating_a": 6.0,
+      "temperature_rerating_required": true,
+      "package_land_pattern_change": false,
+      "native_value_eco_applied": false
+    },
+    "input_connector": {
+      "board_header_mpn": "43045-0213",
+      "terminal_mpn": "43030-0038",
+      "wire_awg": 18,
+      "wire_cross_section_mm2": 0.75,
+      "maximum_current_per_contact_a": 8.5,
+      "plus70c_thermal_qualification_required": true
+    },
+    "tvs": {
+      "target_evt_mpn": "SMBJ18A",
+      "reverse_standoff_v": 18.0,
+      "breakdown_min_v": 20.0,
+      "breakdown_max_v": 22.1,
+      "maximum_clamp_v": 29.2,
+      "maximum_clamp_test_current_a": 20.6,
+      "peak_pulse_power_w_10_1000us": 600.0,
+      "buck_absolute_max_input_v": 36.0,
+      "project_candidate_clamp_limit_at_protected_node_v": 32.0
+    },
+    "telemetry_scope": {
+      "normal_operating_current_max_a": 5.0,
+      "ina226_current_lsb_a": 0.0002,
+      "ina226_signed_full_scale_a": 6.5534,
+      "overload_and_fault_energy_instrument": "EXTERNAL_CALIBRATED_CURRENT_PROBE_AND_OSCILLOSCOPE",
+      "ina226_not_fault_energy_instrument": true
+    },
+    "native_eco": {
+      "topology_change": false,
+      "value_only_change": true,
+      "repeat_native_kicad_9_erc_required": true,
+      "repeat_pdf_evidence_required": true,
+      "repeat_independent_human_hierarchy_review_required": true,
+      "manufacturing_release": false
+    },
+    "qualification_contract": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json",
+    "test_matrix": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv"
   },
   "buck_3v8": {
     "mpn": "LMR604403SRAKR",

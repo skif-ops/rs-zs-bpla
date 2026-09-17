@@ -182,7 +182,7 @@ def main(*, check_only: bool = False) -> None:
         c = connectors[cid]
         update_existing(
             item_id, manufacturer="Hirose", mpn="U.FL-R-SMT-1(60)", package="U.FL SMT receptacle",
-            status=c["Status"], notes=f"Rev.A connector freeze; exact coax assembly temperature/RF validation remains blocking: {c['Release_Blockers']}",
+            status=c["Status"], notes=f"Rev.A connector freeze; coax assembly and RF validation remain blocking: {c['Release_Blockers']}",
         )
 
     def append_item(*, item_id: str, assembly: str, refdes: str, category: str, description: str,
@@ -501,6 +501,14 @@ def main(*, check_only: bool = False) -> None:
         "ERJ-2GE0R00X": "-55..155",
         "MMICT5838-00-012": "-40..85",
         "U.FL-R-SMT-1(60)": "-40..90",
+        "RB40": "-20..60 discharge; -20..45 charge",
+        "SLP080S-12M": "-40..85",
+        "SCC075010060R": "-30..60",
+        "SBS050150200": "-10..60",
+        "G30.B.108111": "-40..85",
+        "AA.166.A.301111": "-40..85",
+        "TI.89.B.2111W": "-40..85",
+        "CAB.0243": "-60..200",
         "5040510601": "-40..105",
         "5040520098": "-40..105",
         "43025-1200": "-40..105",
@@ -513,7 +521,10 @@ def main(*, check_only: bool = False) -> None:
 
     service_ids = {"ASM-MAIN", "ASM-PWR", "ASM-MIC"}
     pcb_ids = {"PCB-MAIN", "PCB-PWR", "PCB-MIC"}
-    system_ids = {"BAT1", "PV1", "MPPT1", "ANT-CELL", "ANT-GNSS", "ANT-LORA", "HARNESS"}
+    system_ids = {
+        "BAT1", "PV1", "MPPT1", "MPPT-TEMP", "ANT-CELL", "ANT-GNSS",
+        "ANT-LORA", "RF-PIGTAIL", "HARNESS",
+    }
     for row in rows:
         item_id = row["Item_ID"]
         if row["Line_class"] and row["Population"] and row["Temperature_C"] and row["BOM_disposition"]:
@@ -525,7 +536,8 @@ def main(*, check_only: bool = False) -> None:
         elif item_id.startswith("HSG-"):
             row["Line_class"], row["Population"], row["Temperature_C"] = "MECHANICAL_OPTION", "N/A", "OPEN"
         elif item_id in system_ids:
-            row["Line_class"], row["Population"], row["Temperature_C"] = "SYSTEM_ITEM", "FITTED", "OPEN"
+            row["Line_class"], row["Population"] = "SYSTEM_ITEM", "FITTED"
+            row["Temperature_C"] = known_temp.get(row["MPN"], "OPEN")
         elif row["Assembly"].startswith("HARNESS-"):
             row["Line_class"], row["Population"] = "HARNESS_COMPONENT", "FITTED"
             row["Temperature_C"] = known_temp.get(row["MPN"], "OPEN")

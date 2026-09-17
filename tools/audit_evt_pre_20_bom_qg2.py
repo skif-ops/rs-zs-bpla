@@ -168,7 +168,7 @@ def main() -> int:
         "U-PWR3": ("U5", "TPS7A2018PDBVR"),
         "R-SHUNT-01": ("RSH1", "WSK2512R0100FEA"),
         "PWR-TVS-01": ("D1", "SMBJ18A"),
-        "PWR-FUSE-01": ("F1", "0451005.MRL"),
+        "PWR-FUSE-01": ("F1", "0451008.MRL"),
     }
     power_mismatch = [
         item for item, (ref, mpn) in power_expected.items()

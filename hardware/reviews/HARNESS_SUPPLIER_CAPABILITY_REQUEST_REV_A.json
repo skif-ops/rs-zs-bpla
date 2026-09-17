@@ -1,0 +1,108 @@
+{
+  "schema": "dioneya-harness-supplier-capability-request-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "revision": "A",
+  "status": "PACKET_READY_16_ATTRIBUTABLE_RESPONSES_REQUIRED_FINAL_LENGTHS_OPEN_NOT_FOR_BUILD",
+  "authority_inputs": [
+    "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+    "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv",
+    "hardware/HARNESS_MANUFACTURING_DRAWING_REV_A.md",
+    "hardware/CONNECTOR_FREEZE_REV_A.csv",
+    "hardware/EVT_PRE_20_BOM_REV_A.csv",
+    "hardware/CHINA_PROCUREMENT_RFQ.csv",
+    "manufacturing/EVT_LOT_SELECTION_REV_A.csv"
+  ],
+  "source_binding": [
+    {
+      "path": "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
+      "sha256": "421b833fa809b099b310302fd942c2678d98f27da33a41d6e7b25176dfbab17d"
+    },
+    {
+      "path": "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv",
+      "sha256": "f17f90a2513592886cf4a98d966a4edc1b03b70b0bc4d304955f309da52e6e37"
+    },
+    {
+      "path": "hardware/HARNESS_MANUFACTURING_DRAWING_REV_A.md",
+      "sha256": "b567ad06bc587d2a685ce9ec1a481361977561e0ff580e4b7ba6138d5fa057ed"
+    },
+    {
+      "path": "hardware/CONNECTOR_FREEZE_REV_A.csv",
+      "sha256": "6e1d5c066cd312542724dd400660a99e92ad85465556c017825893e62c3bf0d7"
+    },
+    {
+      "path": "hardware/EVT_PRE_20_BOM_REV_A.csv",
+      "sha256": "3bb754847e5a24f3495f56870e2fde4ec0e5eddea7a915d076bc6d3a191224cd"
+    },
+    {
+      "path": "hardware/CHINA_PROCUREMENT_RFQ.csv",
+      "sha256": "5223f297eec64a0249ee3747b76dc43bc4ae74a259ae79917c95e7bafdb9daae"
+    },
+    {
+      "path": "manufacturing/EVT_LOT_SELECTION_REV_A.csv",
+      "sha256": "259050cae5b12bd050a8cbaf5d837ab3e76ec7cae8bddb58032c10350d9bcb17"
+    }
+  ],
+  "controlled_scope": {
+    "harness_sets_per_station": 6,
+    "controlled_conductors": 38,
+    "selected_station_quantity": 20,
+    "rfq_complete_sets": 22,
+    "harness_ids": [
+      "H-MIC1",
+      "H-MIC2",
+      "H-MIC3",
+      "H-MIC4",
+      "H-MAIN-PWR",
+      "H-BAT-PWR"
+    ],
+    "supplier_slot": "HARNESS-CANDIDATE",
+    "cut_lengths": "OPEN_DIM_001_DIM_003_DIM_012"
+  },
+  "required_gate_ids": [
+    "HARNESS-SUPPLIER-IDENTITY",
+    "HARNESS-ASSEMBLY-IDENTITY",
+    "HARNESS-QMS-CAPABILITY",
+    "HARNESS-WIRE-AVL",
+    "HARNESS-TEMPERATURE-RATING",
+    "HARNESS-CONTACT-TRACEABILITY",
+    "HARNESS-CRIMP-TOOLING",
+    "HARNESS-CRIMP-PARAMETERS",
+    "HARNESS-CRIMP-VALIDATION",
+    "HARNESS-LENGTH-CAPABILITY",
+    "HARNESS-LABEL-MATERIALS",
+    "HARNESS-ROUTING-STRAIN-RELIEF",
+    "HARNESS-ELECTRICAL-TEST",
+    "HARNESS-FIRST-ARTICLE",
+    "HARNESS-TRACEABILITY-CHANGE",
+    "HARNESS-COMMERCIAL-QUOTE"
+  ],
+  "accepted_authority": {
+    "legal_entity": null,
+    "manufacturing_site": null,
+    "supplier_assembly_mpn": null,
+    "supplier_drawing_revision": null,
+    "temperature_range_c": null,
+    "wire_avl_reference": null,
+    "crimp_process_reference": null,
+    "quotation_reference": null,
+    "accepted_supplier": false
+  },
+  "external_response": {
+    "response_register": "hardware/reviews/HARNESS_SUPPLIER_CAPABILITY_RESPONSE_REV_A.csv",
+    "required_rows": 16,
+    "pending_rows": 16,
+    "accepted_rows": 0,
+    "complete": false
+  },
+  "release_interlock": {
+    "supplier_selected": false,
+    "assembly_identity_accepted": false,
+    "temperature_rating_accepted": false,
+    "wire_avl_accepted": false,
+    "crimp_process_qualified": false,
+    "final_lengths_accepted": false,
+    "external_endpoints_accepted": false,
+    "first_article_accepted": false,
+    "manufacturing_release": false
+  }
+}

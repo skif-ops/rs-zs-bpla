@@ -134,6 +134,8 @@ def main() -> None:
         "Q-MODEM-PWRKEY": 1,
         "Q-MODEM-RESET": 1,
         "Q-SIM-MUX-EN": 1,
+        "MPPT-TEMP": 1,
+        "RF-PIGTAIL": 3,
     }
     for item, qty in expected_quantities.items():
         require(item in by_id, f"missing quantity-controlled BOM item {item}")
@@ -217,7 +219,7 @@ def main() -> None:
             f"RFQ fields missing: {sorted(RFQ_REQUIRED_FIELDS - set(reader.fieldnames))}",
         )
         rfq_rows = list(reader)
-    require(len(rfq_rows) == 25, f"expected 25 controlled RFQ rows, got {len(rfq_rows)}")
+    require(len(rfq_rows) == 27, f"expected 27 controlled RFQ rows, got {len(rfq_rows)}")
     rfq_ids = [row["RFQ_ID"] for row in rfq_rows]
     require(all(rfq_ids) and len(set(rfq_ids)) == len(rfq_ids), "duplicate or empty RFQ_ID")
     mapped_items: list[str] = []
@@ -246,6 +248,8 @@ def main() -> None:
         "RFQ-020": "ANT-CELL",
         "RFQ-021": "ANT-GNSS",
         "RFQ-022": "ANT-LORA",
+        "RFQ-026": "MPPT-TEMP",
+        "RFQ-027": "RF-PIGTAIL",
     }
     require(
         all(rfq_items_by_id.get(rfq_id) == item for rfq_id, item in required_system_rfqs.items()),

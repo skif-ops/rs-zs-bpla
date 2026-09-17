@@ -26,9 +26,9 @@ SOURCES = {
     "RFQ": ROOT / "hardware/CHINA_PROCUREMENT_RFQ.csv",
 }
 EXPECTED_TABLE_REFS = {
-    "Engineering BOM": "A1:AC294",
-    "Procurement": "A1:Y123",
-    "RFQ": "A1:S26",
+    "Engineering BOM": "A1:AC296",
+    "Procurement": "A1:Y125",
+    "RFQ": "A1:S28",
 }
 MAIN_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
 DOC_REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -231,7 +231,7 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print("EVT-PRE-20 BOM workbook-to-CSV audit PASS")
-    print("Engineering BOM 293 rows; Procurement 122 rows; RFQ 25 rows; lots 4/10/20")
+    print("Engineering BOM 295 rows; Procurement 124 rows; RFQ 27 rows; lots 4/10/20")
     return 0
 
 

@@ -75,6 +75,17 @@ hierarchy review were accepted on `2026-09-16` for source commit
 `2a973f6856aa115aa59323d619be985578780682`. Routing and manufacturing release
 remain blocked by the separate open gates below.
 
+The PCB-PWR input-protection desk review rejects the signed native F1 value
+`0451005.MRL` for the 5 A continuous-current basis: Littelfuse's standard 25%
+continuous derating reduces it to 3.75 A before temperature rerating. The
+controlled BOM and qualification packet select exact candidate
+`0451008.MRL` 8 A in the same Nano2 451 land pattern and retain
+`SMBJ18A`. This does not modify or extend the prior hierarchy acceptance.
+The signed native bytes remain unchanged until a bounded value-only ECO receives
+fresh KiCad 9 ERC, a new five-page PDF and independent human hierarchy review.
+The input-protection matrix has `0/20` accepted rows; PCBA procurement and
+manufacturing release remain prohibited.
+
 PCB-PWR has also passed its bounded fitted-body 2D placement-clearance subgate.
 All 42 simultaneously fitted footprints have controlled courtyards, the required
 minimum is 0.20 mm, the observed minimum is 0.22 mm and conflicts are zero. This
@@ -107,14 +118,25 @@ no selected assembler legal entity, manufacturing site or controlled process.
 The blank response register does not approve U9 paste, any land/mask/stencil
 rule, PnP polarity, first-article assembly, Review B or manufacturing release.
 
+The harness supplier capability packet is internally complete, but it has
+`0/16` accepted responses and no selected legal entity, manufacturing site,
+supplier assembly MPN, assembly-level temperature rating or accepted wire/crimp
+process. It is a capability and quotation input only. Final cut lengths remain
+blocked by `DIM-001`, `DIM-003` and `DIM-012`; the packet is not a build release.
+
 ## Current blocker classes
 
-- exact and released BAT1, PV1, MPPT1, ANT-CELL, ANT-GNSS, ANT-LORA, HARNESS and
-  HSG-VC system identities;
+- sample-qualified and released BAT1, PV1, MPPT1, MPPT-TEMP, ANT-CELL,
+  ANT-GNSS, ANT-LORA, RF-PIGTAIL, HARNESS and HSG-VC system identities; the
+  exact EVT candidate MPNs do not by themselves satisfy this release gate;
 - PCB-MAIN and PCB-PWR routing, DRC and CAM; PCB-PWR `DIM-003`, final stackup,
   numeric current-density/thermal geometry and physical power evidence; PCB-MIC independent Review B,
   CAM comparison, panelization and acoustic-stack review; all three boards'
   DFM and manufacturing release;
+- PCB-PWR F1 value-only ECO from rejected signed-native `0451005.MRL` to target
+  `0451008.MRL`, repeat commit-bound ERC/PDF/human hierarchy acceptance and
+  all 20 input-protection qualification rows including +70 C 5 A thermal,
+  prospective-current, battery-side primary-fuse and SMBJ18A coordination;
 - selected-assembler acceptance of the PCB-MAIN U2/U25/U26 project IPC
   candidates, U9 process-dependent stencil adaptation, PnP polarity,
   first-article controls and closure of blocker/critical DFM findings;
@@ -124,6 +146,9 @@ rule, PnP polarity, first-article assembly, Review B or manufacturing release.
 - acceptance of both PCB-PWR stackup/copper fabricator sets in the 24-row
   `PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv`, selection of one construction,
   and separate current-density/DC-drop/fault/+70 °C thermal approval;
+- acceptance of all 16 attributable harness supplier responses in
+  `HARNESS_SUPPLIER_CAPABILITY_RESPONSE_REV_A.csv`, followed by final lengths,
+  external endpoints, FAI and physical electrical/SI/thermal validation;
 - supplier/fabricator/assembler quotation evidence for the selected 20-station
   purchase scenario.
 

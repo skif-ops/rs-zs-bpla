@@ -215,10 +215,32 @@
       "manufacturing_release": false
     }
   },
+  "input_protection_candidate_eco": {
+    "state": "TARGET_8A_SELECTED_SIGNED_NATIVE_5A_VALUE_ECO_PENDING",
+    "qualification_record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md",
+    "machine_contract": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json",
+    "test_matrix": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
+    "independent_audit": "tools/audit_pcb_pwr_input_protection_rev_a.py",
+    "signed_native_fuse_mpn": "0451005.MRL",
+    "signed_native_fuse_disposition": "REJECTED_FOR_5A_CONTINUOUS_SERVICE_DO_NOT_PROCURE",
+    "target_fuse_mpn": "0451008.MRL",
+    "target_tvs_mpn": "SMBJ18A",
+    "topology_change": false,
+    "footprint_change": false,
+    "native_value_eco_applied": false,
+    "repeat_native_kicad_9_erc_required": true,
+    "repeat_pdf_evidence_required": true,
+    "repeat_independent_human_hierarchy_review_required": true,
+    "accepted_test_rows": 0,
+    "required_test_rows": 20,
+    "pcba_procurement_authorized": false,
+    "manufacturing_release": false
+  },
   "review_b": {
     "complete": false,
     "status": "OPEN_HIERARCHY_ACCEPTED_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_PENDING",
     "blockers": [
+      "target F1 0451008.MRL is selected only in BOM/qualification control; signed native value 0451005.MRL is rejected and requires a bounded value-only ECO plus repeat ERC PDF and human hierarchy review before PCBA procurement",
       "DIM-003 mechanical freeze response register has 0/18 accepted rows; assembled envelope terminal zones mounting pattern and frozen PCB STEP remain open",
       "PCB-PWR stackup/copper response register has 0/24 accepted rows across 0/2 fabricator slots; no selected construction or accepted copper/plating authority",
       "high-current Kelvin hot-loop and switch-node routing",

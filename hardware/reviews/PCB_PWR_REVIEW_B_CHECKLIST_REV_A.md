@@ -38,6 +38,10 @@ manufacturing-release assertion.
   accepted and no construction is selected. The controlled template is
   `PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv`.
 - Manufacturing release: `HOLD`.
+- Input protection: target F1 is Littelfuse `0451008.MRL` and target D1 remains
+  `SMBJ18A`. The signed native source still carries rejected
+  `0451005.MRL`; the value-only ECO, repeat ERC/PDF/hierarchy review and all
+  20 qualification rows are open. PCBA procurement is prohibited.
 
 ## 2. Review-B gate
 
@@ -70,6 +74,12 @@ manufacturing-release assertion.
 - [ ] The selected fabricator construction freezes finished thickness, base and
   finished copper, hole-wall plating, via construction, minimum rules, mask and
   finish without silently changing the PCB source.
+- [ ] The bounded F1 value-only ECO changes signed-native `0451005.MRL` to
+  target `0451008.MRL` without changing topology, footprint, placement or nets;
+  repeat KiCad 9 ERC, five-page PDF and independent hierarchy review pass.
+- [ ] All 20 rows in `PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv` pass,
+  including +70 C 5 A connector/harness/fuse thermal, battery/MPPT transient,
+  SMBJ18A clamp, prospective-current, primary-fuse and fail-short coordination.
 - [ ] Input fault/transient envelope, fuse/TVS coordination and MOSFET SOA are
   closed against battery/BMS/MPPT evidence.
 - [ ] Numeric high-current widths, plane geometry and via arrays pass DC-drop,

@@ -9,7 +9,16 @@ Component temperature capability target: at least `-40...+85 C`, with junction m
 
 Источник: 4S LiFePO4, номинально 12.8 V.
 
-Для расчёта DC/DC до фиксации конкретного аккумулятора используется рабочее окно 10.0...14.6 V. Реальные BMS cutoff/recovery voltages должны быть заменены паспортными значениями выбранного аккумуляторного SKU.
+EVT-кандидат аккумулятора зафиксирован как RELiON `RB40`, 12.8 V / 40 Ah /
+512 Wh. Для расчёта DC/DC до завершения sample/EVT проверки сохраняется
+консервативное рабочее окно 10.0...14.6 V. Паспортные и измеренные BMS
+cutoff/recovery voltages RB40 должны заменить это provisional окно перед выпуском.
+
+EVT-кандидат солнечного тракта: SLD Tech `SLP080S-12M` и Victron SmartSolar
+75/10 `SCC075010060R` с датчиком Smart Battery Sense `SBS050150200` (`0.45 m`
+провода, wireless range до `10 m`, M10 eyelets, рабочий диапазон `-10..60 C`).
+Для M10 eyelets на M8 терминалах RB40 нужен утверждённый washer/retention stack.
+Выбор точных MPN не заменяет измерение переходного процесса и конфигурационный audit.
 
 Входной transient envelope пока НЕ заморожен. До выпуска платы требуется измерить/утвердить:
 
@@ -21,6 +30,48 @@ Component temperature capability target: at least `-40...+85 C`, with junction m
 - допустимый импульс TVS.
 
 Поэтому `SMBJ18A` и PCB-fuse остаются кандидатами, а не release values.
+
+### 1.1 Fuse desk review and bounded value ECO
+
+Подписанная native-схема содержит `0451005.MRL` 5 A. Этот кандидат отклонён
+для непрерывной линии 5 A: Littelfuse требует стандартный derating 25% для
+continuous operation дополнительно к температурной кривой. Поэтому 5 A nominal
+даёт только `3.75 A` до температурного derating и не покрывает расчётный ток.
+
+Для EVT-квалификации выбран точный кандидат Littelfuse `0451008.MRL` в том же
+Nano2 451 land pattern:
+
+- nominal rating `8 A`;
+- nominal cold resistance `7.7 mOhm`;
+- nominal melting I²t `20.23 A²s`;
+- после только стандартного 25% derating остаётся `6.0 A`;
+- при 5 A nominal cold loss составляет `0.1925 W`.
+
+`7 A` не выбран: после стандартного derating он оставляет лишь `5.25 A` ещё
+до обязательного +70 C temperature rerating. `8 A` также остаётся ниже
+опубликованного Molex предела `8.5 A/contact` для J1 `43045-0213` и terminal
+`43030-0038`, но разница `0.5 A` не считается release margin. Нужны
+assembled thermal tests J1/harness/F1 при +70 C и подтверждённом 18 AWG проводе.
+
+Это двухступенчатое изменение. BOM и qualification contract переходят на
+`0451008.MRL`, но подписанные native schematic/PCB сохраняют старую value
+`0451005.MRL` до отдельного value-only ECO. До повторных KiCad 9 ERC/PDF,
+независимого hierarchy review и закрытия
+`PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv` запрещены PCBA procurement и
+manufacturing release. Топология и footprint не меняются.
+
+`SMBJ18A` сохраняется как точный EVT-кандидат: 18 V standoff,
+20.0...22.1 V breakdown, 29.2 V maximum clamp at 20.6 A и 600 W at
+10/1000 us. Его 29.2 V tabulated clamp даёт только 6.8 V до 36 V absolute
+maximum buck input, поэтому qualification требует измеренный максимум не более
+`32.0 V` на protected node и немедленный reject при любом измерении
+`>=36.0 V`. TVS не предназначен для длительного MPPT overvoltage.
+
+INA226 scaling остаётся `200 uA/bit` для нормального operating envelope до
+5 A. Его signed current register покрывает около `6.5534 A`; overload и
+fault-energy испытания выше этого тока обязаны использовать внешний
+калиброванный current probe и осциллограф. INA226 не является прибором
+fuse-clearing qualification.
 
 ## 2. Reverse polarity / reverse current
 
@@ -202,7 +253,9 @@ Firmware scaling baseline for max expected 5 A:
 - CAL = 0.00512 / (0.0002 * 0.010) = `2560`;
 - Power_LSB = 25 * Current_LSB = `5 mW/bit`.
 
-These values are capture/firmware defaults and must be updated if final fuse/current envelope changes.
+These values remain the normal-operation telemetry baseline. They must be updated
+if the released operating-current envelope, rather than only the protective fuse
+rating, exceeds 5 A. Overload/fault qualification uses external instrumentation.
 
 ## 7. Required bench validation before release
 
@@ -257,8 +310,11 @@ Still open before `FOR_MANUFACTURE`:
 - TVS;
 - PCB fuse;
 - shunt Kelvin layout, temperature rise and reference-meter calibration;
-- selected battery/BMS voltage limits;
-- selected MPPT transient envelope;
+- measured RB40 BMS cutoff/recovery voltage limits and cold-system behavior;
+- measured `SCC075010060R` disconnect/reconnect transient envelope and exported
+  charge profile;
+- proof that `SBS050150200` remains in the VE.Smart network and disables charge
+  below the project `0 C` threshold;
 - thermal and load-step test evidence;
 - EMC/EMI evidence.
 

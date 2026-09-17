@@ -36,6 +36,8 @@ jobs:
         run: python tools/audit_harness_manufacturing_rev_a.py --output artifacts/harness_manufacturing_rev_a.json
       - name: QG-2 independent production BOM technical audit
         run: python tools/audit_evt_pre_20_bom_qg2.py
+      - name: PCB-PWR input-protection qualification control
+        run: python tools/audit_pcb_pwr_input_protection_rev_a.py --output artifacts/pcb_pwr_input_protection_qualification_rev_a.json
       - name: Hardware-only design and purchase release audit
         run: python tools/audit_evt_pre_20_hardware_release.py
       - name: Independent PCB-MIC native schematic structural audit
@@ -183,6 +185,7 @@ jobs:
             artifacts/evt_pre_20_bom_qg1.json
             artifacts/evt_pre_20_bom_workbook_audit.json
             artifacts/evt_pre_20_bom_qg2.json
+            artifacts/pcb_pwr_input_protection_qualification_rev_a.json
             artifacts/pcb_layer_count_authority_rev_a.json
             artifacts/harness_manufacturing_rev_a.json
             artifacts/pcb_mic_native_schematic_rev_a.json
@@ -206,6 +209,9 @@ jobs:
             hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json
             hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md
             hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv
             artifacts/pcb_main_mcu_pin_authority_rev_a.json
             artifacts/pcb_main_storage_sensor_authority_rev_a.json
             artifacts/pcb_main_audio_logic_authority_rev_a.json
@@ -223,6 +229,9 @@ jobs:
             hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.md
             hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv
             hardware/HARNESS_MANUFACTURING_DRAWING_REV_A.md
+            hardware/reviews/HARNESS_SUPPLIER_CAPABILITY_REQUEST_REV_A.json
+            hardware/reviews/HARNESS_SUPPLIER_CAPABILITY_REQUEST_REV_A.md
+            hardware/reviews/HARNESS_SUPPLIER_CAPABILITY_RESPONSE_REV_A.csv
             hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv
             hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.md
             hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv

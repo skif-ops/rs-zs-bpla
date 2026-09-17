@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-PWR",
+  "status": "PASS_CONTROLLED_QUALIFICATION_PLAN_PHYSICAL_EVIDENCE_PENDING",
+  "manufacturing_release": false,
+  "system_continuous_current_a": 5.0,
+  "fuse": {
+    "manufacturer": "Littelfuse",
+    "signed_native_mpn": "0451005.MRL",
+    "signed_native_rating_a": 5.0,
+    "signed_native_disposition": "REJECTED_FOR_5A_CONTINUOUS_SERVICE_DO_NOT_PROCURE",
+    "target_evt_mpn": "0451008.MRL",
+    "target_rating_a": 8.0,
+    "package": "Nano2_451_6.1x2.69mm",
+    "nominal_cold_resistance_ohm": 0.0077,
+    "nominal_melting_i2t_a2s": 20.23,
+    "interrupting_rating_a_at_32vdc": 400.0,
+    "standard_continuous_derating_fraction": 0.75,
+    "minimum_nominal_rating_at_25c_a": 6.6666666667,
+    "capacity_after_standard_derating_a": 6.0,
+    "nominal_loss_at_5a_w": 0.1925,
+    "temperature_rerating_required": true,
+    "package_land_pattern_change": false
+  },
+  "input_connector": {
+    "manufacturer": "Molex",
+    "board_header_mpn": "43045-0213",
+    "terminal_mpn": "43030-0038",
+    "wire_awg": 18,
+    "wire_cross_section_mm2": 0.75,
+    "maximum_current_per_contact_a": 8.5,
+    "board_header_temperature_c": "-40..125",
+    "housing_temperature_c": "-40..105",
+    "qualification_at_plus70c_required": true
+  },
+  "tvs": {
+    "manufacturer": "Littelfuse",
+    "target_evt_mpn": "SMBJ18A",
+    "package": "SMB_DO-214AA",
+    "reverse_standoff_v": 18.0,
+    "breakdown_min_v": 20.0,
+    "breakdown_max_v": 22.1,
+    "maximum_clamp_v": 29.2,
+    "maximum_clamp_test_current_a": 20.6,
+    "peak_pulse_power_w_10_1000us": 600.0,
+    "operating_temperature_c": "-65..150",
+    "buck_absolute_max_input_v": 36.0,
+    "project_candidate_clamp_limit_at_protected_node_v": 32.0,
+    "sustained_overvoltage_protection": false
+  },
+  "telemetry_scope": {
+    "monitor_mpn": "INA226AIDGSR",
+    "normal_operating_current_max_a": 5.0,
+    "current_lsb_a": 0.0002,
+    "signed_full_scale_a": 6.5534,
+    "overload_and_fault_energy_instrument": "EXTERNAL_CALIBRATED_CURRENT_PROBE_AND_OSCILLOSCOPE",
+    "ina226_not_fault_energy_instrument": true
+  },
+  "native_value_eco": {
+    "applied": false,
+    "topology_change": false,
+    "value_only_change": true,
+    "signed_source_must_remain_unchanged_until_eco": true,
+    "repeat_native_kicad_9_erc_required": true,
+    "repeat_pdf_evidence_required": true,
+    "repeat_independent_human_hierarchy_review_required": true,
+    "pcba_procurement_authorized": false,
+    "manufacturing_release": false
+  },
+  "test_matrix": {
+    "path": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
+    "required_rows": 20,
+    "accepted_rows": 0,
+    "complete": false
+  },
+  "source_evidence": [
+    "https://www.littelfuse.com/products/fuses-overcurrent-protection/fuses/surface-mount-fuses/nano-2-fuses/451/0451008",
+    "https://www.littelfuse.com/assetdocs/fuse-451-and-453-datasheet?assetguid=533cd5cc-956c-4243-867f-6ab5a62f6ba1",
+    "https://www.littelfuse.com/products/overvoltage-protection/tvs-diodes/surface-mount/smbj/smbj18a",
+    "https://www.littelfuse.com/assetdocs/tvs-diodes-smbj-series-datasheet?assetguid=ba555e99-a12d-4f72-a0b6-86b06c67171e",
+    "https://www.molex.com/en-us/products/part-detail/430450213",
+    "https://www.molex.com/en-us/products/part-detail/430300038"
+  ]
+}
