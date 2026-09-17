@@ -512,7 +512,7 @@ jobs:
           assert footprint.GetPadCount() == 5, "shared TI_DBV0005A_SOT23-5 pad-count drift"
           board = pcbnew.LoadBoard("hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb")
           assert board is not None, "KiCad failed to parse PCB-PWR placement candidate"
-          assert len(board.GetFootprints()) == 60, "unexpected PCB-PWR footprint count"
+          assert len(board.GetFootprints()) == 62, "unexpected PCB-PWR footprint count"
           assert board.GetCopperLayerCount() == 4, "unexpected provisional PCB-PWR layer count"
           assert len(list(board.GetTracks())) == 0, "PCB-PWR placement candidate contains routing"
           assert len(list(board.Zones())) == 0, "PCB-PWR placement candidate contains zones"
