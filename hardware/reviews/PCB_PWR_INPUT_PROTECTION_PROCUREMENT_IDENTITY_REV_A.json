@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-PWR",
+  "retrieved_utc_date": "2026-09-17",
+  "status": "PASS_PREPURCHASE_DOCUMENTARY_IDENTITY_FIRST_LOT_RECEIVING_INSPECTION_PENDING",
+  "decision": {
+    "standalone_engineering_sample_purchase_required": false,
+    "qualification_batch_may_supply_receiving_samples": true,
+    "prepurchase_documentary_identity_complete": true,
+    "actual_future_lot_date_code_available_online": false,
+    "first_lot_receiving_inspection_required": true,
+    "electrical_qualification_complete": false
+  },
+  "exact_orderables": [
+    "0451008.MRL",
+    "SMBJ18A",
+    "43045-0213",
+    "43030-0038"
+  ],
+  "targets": {
+    "0451008.MRL": {
+      "manufacturer": "Littelfuse",
+      "function": "F1 PCB input fuse",
+      "official_identity_source": "https://www.littelfuse.com/assetdocs/fuse-451-and-453-datasheet?assetguid=533cd5cc-956c-4243-867f-6ab5a62f6ba1",
+      "official_product_page": "https://www.littelfuse.com/products/fuses-overcurrent-protection/fuses/surface-mount-fuses/nano-2-fuses/451/0451008",
+      "representative_official_series_photo": {
+        "url": "https://cdn2.webdamdb.com/1280_zgItXhA5UB36gelf.jpg?1780344435",
+        "page_image_alt": "Fuse 451 453 Image",
+        "exact_rating_marking": false,
+        "scope": "Official 451/453 family photograph; use the data-sheet marking rule rather than the photographed rating to accept 0451008.MRL"
+      },
+      "individual_marking": {
+        "authority": "451/453 data sheet page 4 states Brand plus Ampere Rating and shows the family marking layout",
+        "expected": [
+          "Littelfuse F brand mark",
+          "8A ampere marking"
+        ],
+        "exact_full_mpn_on_body": false,
+        "lot_date_on_body": false,
+        "inference": "F plus 8A is derived from the official series marking rule and the exact 8 A orderable; the official figure itself uses a 7 A example"
+      },
+      "factory_packaging": {
+        "type": "12 mm tape and reel",
+        "quantity_pieces": 1000,
+        "specification": "EIA RS-481-2 (IEC 286 part 3)",
+        "ordering_code_binding": "0451 + 008. + M + R + L"
+      },
+      "receiving_identity_rule": "Body must show F and 8A; manufacturer or authorized-distributor label and paperwork must bind the received material to exact MPN 0451008.MRL and a traceable date/lot"
+    },
+    "SMBJ18A": {
+      "manufacturer": "Littelfuse",
+      "function": "D1 transient clamp",
+      "official_identity_source": "https://www.littelfuse.com/assetdocs/tvs-diodes-smbj-series-datasheet?assetguid=ba555e99-a12d-4f72-a0b6-86b06c67171e",
+      "official_product_page": "https://www.littelfuse.com/products/overvoltage-protection/tvs-diodes/surface-mount/smbj/smbj18a",
+      "representative_official_series_photo": {
+        "url": "https://cdn2.webdamdb.com/1280_6zIX8CKqMpw652t7.jpg?1732720291",
+        "page_image_alt": "SMBJ85A 008",
+        "exact_device_code": false,
+        "scope": "Official SMBJ family photograph; it is not an SMBJ18A marking reference, so acceptance uses exact data-sheet code LT"
+      },
+      "individual_marking": {
+        "exact_device_code": "LT",
+        "trace_format": "YMXXX",
+        "trace_fields": {
+          "Y": "year code",
+          "M": "month code",
+          "XXX": "lot code"
+        },
+        "polarity_feature": "Cathode band required for the unidirectional SMBJ18A",
+        "reject_adjacent_code": "BT is SMBJ18CA and is not acceptable"
+      },
+      "factory_packaging": {
+        "type": "12 mm tape on 13 inch reel",
+        "quantity_pieces": 3000,
+        "specification": "EIA STD RS-481"
+      },
+      "receiving_identity_rule": "Every inspected device must show LT, a legible YMXXX trace code and the cathode band; reel or authorized-distributor paperwork must state exact MPN SMBJ18A and preserve date/lot traceability"
+    },
+    "43045-0213": {
+      "manufacturer": "Molex",
+      "function": "J1 two-circuit vertical PCB header",
+      "official_product_page": "https://www.molex.com/en-us/products/part-detail/430450213",
+      "official_product_image": {
+        "url": "https://www.molex.com/content/dam/molex/molex-dot-com/products/manual/en-us/images/430/43045/0430450213_hires.jpg?wid=480&hei=327",
+        "sha256": "d0fdbe0b053d81cc0001bc228c8a30ef07962d9f3b6902f4518d1d037419d49c",
+        "file_size_bytes": 11140,
+        "pixel_dimensions": [480, 368],
+        "scope": "Exact manufacturer product image; geometry and color reference only"
+      },
+      "official_packaging_type": "Tray",
+      "upc": "800754370066",
+      "individual_marking": {
+        "exact_full_mpn_on_body_required": false,
+        "lot_date_on_body_required": false
+      },
+      "receiving_identity_rule": "Black two-circuit dual-row vertical header geometry must match the official image and sales drawing; tray or authorized-distributor label and paperwork must bind it to exact MPN 43045-0213 and a traceable date/lot"
+    },
+    "43030-0038": {
+      "manufacturer": "Molex",
+      "function": "18 AWG female crimp terminal",
+      "official_product_page": "https://www.molex.com/en-us/products/part-detail/430300038",
+      "official_product_image": {
+        "url": "https://www.molex.com/content/dam/molex/molex-dot-com/products/manual/en-us/images/430/43030/0430300038_hires.jpg?wid=480&hei=327",
+        "sha256": "3964a86c3efa3975f59f4ed95a92d85532617434f98f59f4ed95eff79cb32",
+        "file_size_bytes": 8401,
+        "pixel_dimensions": [480, 360],
+        "scope": "Exact manufacturer product image; geometry reference only"
+      },
+      "official_packaging_drawing": {
+        "document_number": "PK-43030-001-001",
+        "revision": "B1",
+        "release_date": "2022-10-07",
+        "url": "https://www.molex.com/content/dam/molex/molex-dot-com/products/automated/en-us/packagingdesigndrawing/430/43030/PK-43030-001-001.pdf",
+        "sha256": "2f60beee920157c12547322ae81cfcf13d62e084180fb67c3b0d9d1df38efb86",
+        "file_size_bytes": 319631,
+        "pages": 1,
+        "claims": {
+          "quantity_pieces_per_reel": 12000,
+          "reel_flange_diameter_in": 24,
+          "product_label_location_shown": true,
+          "reels_per_carton": 7
+        }
+      },
+      "illustrative_exact_mpn_reel_photo": {
+        "publisher": "Custom Connector Kits",
+        "authority": false,
+        "url": "https://www.customconnectorkits.com/cdn/shop/products/43030-0038__42466.1676073238.1200.1200.jpg?v=1686744312&width=760",
+        "sha256": "058f74c8b92e63f5b6509067988d8ef0cd8e9cd67123e1e35e2020ff012dd1c3",
+        "file_size_bytes": 73250,
+        "pixel_dimensions": [760, 760],
+        "scope": "Illustrative only; shows an exact-MPN Molex reel and label layout but cannot qualify the future received lot"
+      },
+      "official_packaging_type": "Reel",
+      "upc": "889056413237",
+      "individual_marking": {
+        "exact_full_mpn_on_body_required": false,
+        "lot_date_on_body_required": false
+      },
+      "receiving_identity_rule": "Terminal geometry must match the official image and sales drawing; original reel or authorized-distributor label and paperwork must bind it to exact MPN 43030-0038 and a traceable date/lot"
+    }
+  },
+  "channel_evidence": {
+    "exact_mpn_catalog_examples": [
+      {
+        "channel": "DigiKey",
+        "mpn": "0451008.MRL",
+        "url": "https://www.digikey.ca/en/products/detail/littelfuse-inc/0451008-MRL/700831",
+        "claims": [
+          "Exact manufacturer part number",
+          "Tape and reel, cut tape and Digi-Reel order options",
+          "Manufacturer standard pack of 1000"
+        ]
+      },
+      {
+        "channel": "DigiKey",
+        "mpn": "43045-0213",
+        "url": "https://www.digikey.com/en/products/detail/molex/0430450213/1635000",
+        "claims": [
+          "Exact manufacturer numeric part number 0430450213",
+          "Tray packaging",
+          "Small-quantity ordering available"
+        ]
+      },
+      {
+        "channel": "Newark",
+        "mpn": "43030-0038",
+        "url": "https://www.newark.com/molex/43030-0038/contact-socket-18awg-crimp/dp/56AC9968",
+        "claims": [
+          "Exact manufacturer part number",
+          "Product traceability advertised as Date/Lot Code"
+        ]
+      }
+    ],
+    "selection_rule": "Purchase only the exact MPN from the manufacturer or a manufacturer-listed authorized distributor that preserves date/lot traceability on the label, packing slip, invoice or certificate",
+    "forbidden": [
+      "Marketplace or broker stock without manufacturer-authorized chain of custody",
+      "Unlabeled loose parts",
+      "Adjacent family member substitution",
+      "Mixed lots delivered without segregation and per-lot traceability"
+    ]
+  },
+  "first_lot_receiving_gate": {
+    "status": "PENDING_ACTUAL_RECEIPT",
+    "timing": "Before any received component is released from quarantine to EVT kitting or assembly",
+    "package_inspection": "Inspect and photograph 100 percent of shipping packages, reels and trays",
+    "body_inspection": "Inspect and photograph at least five parts per MPN per date/lot, or all parts when the lot contains fewer than five",
+    "required_record_fields": [
+      "Purchase order and supplier",
+      "Manufacturer",
+      "Exact MPN",
+      "Received quantity",
+      "Manufacturer or distributor date/lot code",
+      "Country of origin when present",
+      "Factory pack versus distributor repack or cut tape",
+      "Photo filenames and SHA-256 values",
+      "Inspector and UTC date",
+      "Disposition and storage location"
+    ],
+    "required_photos": [
+      "Unopened outer package",
+      "Full reel, tray or distributor package",
+      "Label close-up showing exact MPN, quantity and date/lot traceability",
+      "Fuse F plus 8A marking close-up",
+      "SMBJ18A LT plus YMXXX marking and cathode-band close-up",
+      "Molex header and terminal geometry with the corresponding package label in the same receiving record"
+    ],
+    "cut_tape_or_repack_rule": "Accept only when the authorized distributor label or certificate preserves exact MPN and manufacturer date/lot traceability; the factory reel label is not required when an attributable distributor trace record is supplied",
+    "reject_conditions": [
+      "Exact MPN mismatch",
+      "Missing or illegible date/lot traceability",
+      "Body marking mismatch",
+      "Unexplained relabeling or repackaging",
+      "Mixed lots not physically segregated",
+      "Packaging damage or moisture/contamination that can affect assembly"
+    ]
+  },
+  "qualification_binding": {
+    "matrix_row": "PWR-IPQ-002",
+    "matrix_status": "PENDING_PHYSICAL_TEST",
+    "prepurchase_subgate_complete": true,
+    "first_lot_receiving_subgate_complete": false,
+    "internet_photos_are_not_future_lot_evidence": true
+  },
+  "release_boundary": {
+    "identity_evidence_allows_sample_only_purchase_to_be_omitted": true,
+    "exact_parts_may_be_bought_with_the_controlled_evt_test_batch_when_other_procurement_gates_allow": true,
+    "received_parts_released_to_evt_kitting": false,
+    "physical_qualification_complete": false,
+    "pcba_procurement_authorized": false,
+    "manufacturing_release": false
+  }
+}

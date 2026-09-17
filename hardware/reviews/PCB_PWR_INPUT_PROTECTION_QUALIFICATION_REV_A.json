@@ -93,6 +93,26 @@
     ],
     "no_family_member_substitution": true
   },
+  "procurement_identity": {
+    "prepurchase_documentary_identity_complete": true,
+    "standalone_engineering_sample_purchase_required": false,
+    "qualification_batch_may_supply_receiving_samples": true,
+    "actual_future_lot_date_code_available_online": false,
+    "first_lot_receiving_inspection_required": true,
+    "first_lot_receiving_inspection_complete": false,
+    "record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md",
+    "machine_record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json",
+    "independent_audit": "tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py",
+    "evidence_sha256": "f6baf0cc053396ef98d91d28b3f52c4839f7fb4d345a49f30cc3ef073dd532ae",
+    "matrix_row": "PWR-IPQ-002",
+    "matrix_status": "PENDING_PHYSICAL_TEST",
+    "exact_orderables": [
+      "0451008.MRL",
+      "SMBJ18A",
+      "43045-0213",
+      "43030-0038"
+    ]
+  },
   "test_matrix": {
     "path": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
     "required_rows": 20,

@@ -105,7 +105,7 @@ The four exact orderables match
 `PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json`; no family-member
 substitution is accepted. `PWR-IPQ-001` may therefore be marked `PASS`.
 
-Only `3/20` matrix rows are accepted. Sample identity and every physical fuse,
+Only `3/20` matrix rows are accepted. First-lot receiving identity and every physical fuse,
 connector/harness, transient, TVS, reverse-polarity, telemetry and final-release
 row remain open. Routing, PCBA procurement and manufacturing release remain
 false.

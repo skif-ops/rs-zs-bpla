@@ -117,6 +117,7 @@ on:
       - "tools/audit_pcb_pwr_stackup_copper_request_rev_a.py"
       - "tools/audit_pcb_pwr_input_protection_rev_a.py"
       - "tools/audit_pcb_pwr_input_protection_sources_rev_a.py"
+      - "tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py"
       - "tools/generate_pcb_pwr_schematic_rev_a.py"
       - "tools/finalize_pcb_pwr_symbol_types_rev_a.py"
       - "tools/finalize_pcb_pwr_schematic_completeness_rev_a.py"
@@ -258,6 +259,8 @@ jobs:
           python tools/audit_pcb_pwr_dft_authority_rev_a.py
           python tools/audit_pcb_pwr_input_protection_sources_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/input_protection_primary_source_audit.json
+          python tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/input_protection_procurement_identity_audit.json
           python tools/audit_pcb_pwr_input_protection_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/input_protection_qualification_audit.json
       - name: Install official KiCad 9 stable toolchain
@@ -638,6 +641,8 @@ jobs:
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md
             hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
             hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md
             hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md

@@ -40,6 +40,8 @@ jobs:
         run: |
           python tools/audit_pcb_pwr_input_protection_sources_rev_a.py \
             --output artifacts/pcb_pwr_input_protection_primary_source_evidence_rev_a.json
+          python tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py \
+            --output artifacts/pcb_pwr_input_protection_procurement_identity_rev_a.json
           python tools/audit_pcb_pwr_input_protection_rev_a.py \
             --output artifacts/pcb_pwr_input_protection_qualification_rev_a.json
       - name: Hardware-only design and purchase release audit
@@ -191,6 +193,7 @@ jobs:
             artifacts/evt_pre_20_bom_qg2.json
             artifacts/pcb_pwr_input_protection_qualification_rev_a.json
             artifacts/pcb_pwr_input_protection_primary_source_evidence_rev_a.json
+            artifacts/pcb_pwr_input_protection_procurement_identity_rev_a.json
             artifacts/pcb_layer_count_authority_rev_a.json
             artifacts/harness_manufacturing_rev_a.json
             artifacts/pcb_mic_native_schematic_rev_a.json
@@ -219,6 +222,8 @@ jobs:
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json
             hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json
+            hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md
             artifacts/pcb_main_mcu_pin_authority_rev_a.json
             artifacts/pcb_main_storage_sensor_authority_rev_a.json
             artifacts/pcb_main_audio_logic_authority_rev_a.json

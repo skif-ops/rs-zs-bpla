@@ -11,13 +11,24 @@ evidence only. The post-ECO PDF was superseded after independent review found
 text/symbol overlap. The later C20/C21 electrical ECO superseded the first
 remediated artifact. Fresh commit-bound ERC/PDF evidence for the active source
 passes, and reviewer `Скиф` accepted the exact active source/PDF hierarchy on
-`2026-09-17`. Physical qualification remains required before any PCB assembly
-procurement.
+`2026-09-17`. Physical qualification remains required before production PCBA
+or manufacturing release. A separate sample-only purchase is not required:
+the exact parts may be included in the controlled EVT test-batch order when
+other procurement gates permit, then held in quarantine until the first-lot
+receiving identity gate passes.
 
 Manufacturer source control is now complete. The machine-audited
 `PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}` record binds
 the exact four orderables to six official Littelfuse/Molex payloads, retrieval
 date, byte sizes and SHA-256 values. This closes `PWR-IPQ-001` only.
+
+The machine-audited
+`PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.{md,json}` record now
+closes the pre-purchase documentary subgate for `PWR-IPQ-002`. It binds online
+photos, exact body-marking rules, packaging formats and authorized-channel
+traceability requirements. The row itself remains `PENDING_PHYSICAL_TEST`
+because the actual date/lot code of the future shipment can only be recorded
+from the delivered EVT batch.
 
 ## 1. Controlled decision
 
@@ -127,7 +138,9 @@ register wrap or overflow as a plausible valid current.
 Tests run in the order controlled by
 `PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv`:
 
-1. source control (`PWR-IPQ-001 PASS`), then sample identity and bounded native ECO;
+1. source control (`PWR-IPQ-001 PASS`), pre-purchase identity evidence, then
+   first-lot receiving inspection using the quarantined EVT batch and the
+   bounded native ECO;
 2. repeat ERC/PDF/human hierarchy gate after the legibility remediation and C20/C21 ECO (`PASS`);
 3. 25 C, +70 C and -40 C operating tests;
 4. inrush and modem-burst tests;
@@ -155,10 +168,37 @@ Review B or manufacturing release.
 
 The current matrix state is `3/20 PASS`; 17 rows remain open.
 
-## 7. Primary evidence
+## 7. Procurement identity
+
+No stand-alone identity samples are purchased. The first controlled EVT batch
+is the inspected lot. Before kitting, photograph every received package/reel/
+tray, inspect at least five bodies per MPN per date/lot (or all when fewer than
+five), and bind the photos to the PO, exact MPN, quantity, supplier, date/lot,
+packing record and inspector.
+
+The key online identifiers are:
+
+- `0451008.MRL`: official family rule is brand plus ampere rating; expected
+  body marking is Littelfuse `F` plus `8A`, while the exact suffix and lot must
+  remain traceable through the label/paperwork;
+- `SMBJ18A`: exact code `LT`, trace format `YMXXX` (year, month, lot) and a
+  cathode band; `BT` is the rejected bidirectional `SMBJ18CA`;
+- `43045-0213`: exact official Molex product image and tray packaging; body
+  geometry cannot replace the labelled MPN/date-lot trace;
+- `43030-0038`: exact official Molex product image and packaging drawing
+  `PK-43030-001-001` Rev.B1, with 12,000 pieces per 24-inch reel and a defined
+  product-label location.
+
+Controlled JSON SHA-256:
+`f6baf0cc053396ef98d91d28b3f52c4839f7fb4d345a49f30cc3ef073dd532ae`.
+
+## 8. Primary evidence
 
 - Controlled hash record:
   `PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}`
+
+- Controlled procurement-identity record:
+  `PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.{md,json}`
 
 - [Littelfuse 0451008 product page](https://www.littelfuse.com/products/fuses-overcurrent-protection/fuses/surface-mount-fuses/nano-2-fuses/451/0451008)
 - [Littelfuse 451/453 series data sheet](https://www.littelfuse.com/assetdocs/fuse-451-and-453-datasheet?assetguid=533cd5cc-956c-4243-867f-6ab5a62f6ba1)

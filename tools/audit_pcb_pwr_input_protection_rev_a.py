@@ -26,6 +26,14 @@ SOURCE_EVIDENCE_MD = (
     ROOT
     / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md"
 )
+PROCUREMENT_IDENTITY = (
+    ROOT
+    / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json"
+)
+PROCUREMENT_IDENTITY_MD = (
+    ROOT
+    / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md"
+)
 FREEZE = ROOT / "hardware/POWER_COMPONENT_FREEZE_REV_A.csv"
 BASELINE = ROOT / "hardware/POWER_DESIGN_BASELINE_REV_A.json"
 BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
@@ -70,6 +78,12 @@ def main() -> int:
     contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
     source_evidence = json.loads(SOURCE_EVIDENCE.read_text(encoding="utf-8"))
     source_evidence_sha256 = hashlib.sha256(SOURCE_EVIDENCE.read_bytes()).hexdigest()
+    procurement_identity_evidence = json.loads(
+        PROCUREMENT_IDENTITY.read_text(encoding="utf-8")
+    )
+    procurement_identity_sha256 = hashlib.sha256(
+        PROCUREMENT_IDENTITY.read_bytes()
+    ).hexdigest()
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
     capture_status = json.loads(STATUS.read_text(encoding="utf-8"))
     matrix = read_csv(MATRIX)
@@ -103,6 +117,40 @@ def main() -> int:
             "source-control exact orderable set drift")
     require(source_control.get("no_family_member_substitution") is True,
             "source-control family-substitution interlock removed")
+    require(
+        procurement_identity_evidence["status"]
+        == "PASS_PREPURCHASE_DOCUMENTARY_IDENTITY_FIRST_LOT_RECEIVING_INSPECTION_PENDING",
+        "input-protection procurement-identity evidence drift",
+    )
+    procurement_identity = contract.get("procurement_identity", {})
+    require(procurement_identity.get("prepurchase_documentary_identity_complete") is True,
+            "pre-purchase identity subgate is not complete")
+    require(procurement_identity.get("standalone_engineering_sample_purchase_required") is False,
+            "qualification contract still requires a sample-only purchase")
+    require(procurement_identity.get("qualification_batch_may_supply_receiving_samples") is True,
+            "qualification batch cannot supply receiving samples")
+    require(procurement_identity.get("actual_future_lot_date_code_available_online") is False,
+            "contract incorrectly claims the future lot/date is known online")
+    require(procurement_identity.get("first_lot_receiving_inspection_required") is True and
+            procurement_identity.get("first_lot_receiving_inspection_complete") is False,
+            "first-lot receiving boundary drift")
+    require(procurement_identity.get("record") ==
+            PROCUREMENT_IDENTITY_MD.relative_to(ROOT).as_posix(),
+            "procurement-identity Markdown path drift")
+    require(procurement_identity.get("machine_record") ==
+            PROCUREMENT_IDENTITY.relative_to(ROOT).as_posix(),
+            "procurement-identity JSON path drift")
+    require(procurement_identity.get("independent_audit") ==
+            "tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py",
+            "procurement-identity independent audit path drift")
+    require(procurement_identity.get("evidence_sha256") == procurement_identity_sha256,
+            "procurement-identity evidence SHA-256 drift")
+    require(procurement_identity.get("matrix_row") == "PWR-IPQ-002" and
+            procurement_identity.get("matrix_status") == "PENDING_PHYSICAL_TEST",
+            "procurement-identity matrix binding drift")
+    require(procurement_identity.get("exact_orderables") ==
+            ["0451008.MRL", "SMBJ18A", "43045-0213", "43030-0038"],
+            "procurement-identity exact orderable set drift")
     require(baseline["status"] == "CAPTURE_BASELINE_NOT_FOR_MANUFACTURE",
             "power baseline lost NOT FOR MANUFACTURE interlock")
     baseline_input = baseline.get("input_protection_qualification", {})
@@ -266,6 +314,18 @@ def main() -> int:
             status_eco.get("source_control_audit") == source_control["independent_audit"] and
             status_eco.get("source_control_evidence_sha256") == source_evidence_sha256,
             "PCB-PWR capture status source-control binding drift")
+    require(status_eco.get("prepurchase_identity_complete") is True and
+            status_eco.get("standalone_engineering_sample_purchase_required") is False and
+            status_eco.get("first_lot_receiving_inspection_complete") is False and
+            status_eco.get("procurement_identity_record") ==
+            procurement_identity["record"] and
+            status_eco.get("procurement_identity_machine_record") ==
+            procurement_identity["machine_record"] and
+            status_eco.get("procurement_identity_audit") ==
+            procurement_identity["independent_audit"] and
+            status_eco.get("procurement_identity_evidence_sha256") ==
+            procurement_identity_sha256,
+            "PCB-PWR capture status procurement-identity binding drift")
     require(status_eco.get("pcba_procurement_authorized") is False,
             "PCB-PWR capture status prematurely authorizes procurement")
     require(status_eco.get("manufacturing_release") is False,
@@ -300,6 +360,14 @@ def main() -> int:
             matrix_by_id["PWR-IPQ-001"]["Artifact_SHA256"] ==
             source_evidence_sha256,
             "PWR-IPQ-001 primary-source evidence drift")
+    require(matrix_by_id["PWR-IPQ-002"]["Gate"] ==
+            "FIRST_LOT_RECEIVING_IDENTITY" and
+            matrix_by_id["PWR-IPQ-002"]["Status"] == "PENDING_PHYSICAL_TEST" and
+            "Controlled EVT test-batch" in
+            matrix_by_id["PWR-IPQ-002"]["Required_Input"] and
+            "F plus 8A" in matrix_by_id["PWR-IPQ-002"]["Pass_Criteria"] and
+            "LT plus YMXXX" in matrix_by_id["PWR-IPQ-002"]["Pass_Criteria"],
+            "PWR-IPQ-002 first-lot receiving control drift")
     require(matrix_by_id["PWR-IPQ-003"]["Status"] == "PASS" and
             matrix_by_id["PWR-IPQ-003"]["Result"] ==
             "F1=0451008.MRL in all active sources; pin/net and board semantic digests retained; post-ECO ERC/PDF artifact archived" and
@@ -368,6 +436,12 @@ def main() -> int:
         "repeat_erc_pdf_human_review_complete": repeat_gate_complete,
         "source_control_complete": source_control["complete"],
         "source_control_evidence_sha256": source_evidence_sha256,
+        "prepurchase_documentary_identity_complete": procurement_identity[
+            "prepurchase_documentary_identity_complete"
+        ],
+        "standalone_engineering_sample_purchase_required": False,
+        "procurement_identity_evidence_sha256": procurement_identity_sha256,
+        "first_lot_receiving_inspection_complete": False,
         "accepted_rows": accepted_rows,
         "required_rows": 20,
         "failed_rows": failed_rows,
@@ -388,6 +462,7 @@ def main() -> int:
         f"Native value ECO applied={native_eco['applied']}; "
         f"qualification evidence={accepted_rows}/20 PASS"
     )
+    print("Pre-purchase identity PASS; no sample-only purchase; first-lot receipt inspection PENDING")
     print("PCBA procurement and manufacturing release remain BLOCKED")
     print(args.output)
 

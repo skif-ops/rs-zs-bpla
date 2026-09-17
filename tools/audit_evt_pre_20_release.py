@@ -89,6 +89,8 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
         "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json",
         "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md",
+        "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json",
+        "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md",
         "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
         "hardware/kicad/native/PCB-PWR/PCB-PWR_01_INPUT_PROTECTION.kicad_sch",
         "hardware/kicad/native/PCB-PWR/PCB-PWR_02_3V8_MODEM.kicad_sch",
@@ -130,6 +132,7 @@ REQUIRED_GROUPS: dict[str, list[str]] = {
         "tools/audit_pcb_pwr_dim_003_request_rev_a.py",
         "tools/audit_pcb_pwr_stackup_copper_request_rev_a.py",
         "tools/audit_pcb_pwr_input_protection_sources_rev_a.py",
+        "tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py",
         "tools/audit_pcb_pwr_input_protection_rev_a.py",
     ],
     "firmware_source": [
