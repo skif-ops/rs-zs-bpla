@@ -26,7 +26,7 @@ This directory is the authoritative electrical-CAD source package for the EVT-PR
 2. `PCB-MIC`: one T5838 microphone leaf; four identical boards per station.
 3. `PCB-PWR`: protected battery interface and DC/DC rails for 3.8 V modem, 3.3 V digital/AON and 1.8 V microphone domains. External MPPT remains a separate assembly.
 
-PCB-PWR `C1-C19`, `R1-R15`, `NT1-NT3` and `TP1-TP10` are bound from
+PCB-PWR `C1-C21`, `R1-R15`, `NT1-NT3` and `TP1-TP10` are bound from
 `hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv`. This is a capture/placement input,
 not a manufacturing release; its electrical, package, fixture and environmental
 blockers remain explicit in the authority.
@@ -35,11 +35,11 @@ PCB-PWR now uses a human-readable five-page native hierarchy: one system overvie
 plus four functional child sheets for input protection/current monitoring, 3V8,
 3V3 and 1V8/harness interfaces. The controlled materializer gives every connected
 pin an explicit wire stub and the independent audit proves exact pad/net
-equivalence to the native PCB. Post-ECO KiCad 9 ERC/PDF evidence passes and is
-commit/SHA-256 bound; independent human acceptance of the active drawing remains
-open. The earlier acceptance for the superseded F1 value does not release it.
+equivalence to the native PCB. The C20/C21 local-CIN_HF ECO supersedes prior
+KiCad 9 ERC/PDF and human decisions for the active source; fresh commit-bound
+evidence and independent human acceptance remain open.
 
-PCB-PWR currently contains a native, unrouted 60-footprint electrical placement
+PCB-PWR currently contains a native, unrouted 62-footprint electrical placement
 canvas. Its `90 x 60 mm`, four-layer and `1.6 mm` assumptions are provisional;
 mounting holes, routing and copper zones are deliberately absent while `DIM-003`
 remains open. `hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json` is the machine-readable
@@ -52,7 +52,7 @@ assembled-height, enclosure/thermal, harness-datum and frozen-STEP evidence but
 does not release any of those values.
 
 The bounded fitted-body clearance repack passes a strict independent subgate:
-all 42 simultaneously fitted footprints have controlled courtyards, the required
+all 44 simultaneously fitted footprints have controlled courtyards, the required
 minimum gap is `0.20 mm`, the observed minimum is `0.22 mm`, and conflicts are
 zero. This result excludes DNP/PCB-feature service checks and does not approve
 the provisional J2 edge overhang, connector mating/bend volumes, mounting, DFT

@@ -14,7 +14,7 @@ accept any provisional geometry.
 
 ## Controlled candidate content
 
-- all 60 physical schematic references are present once and carry their exact native
+- all 62 physical schematic references are present once and carry their exact native
   footprint and net assignment;
 - J1 starts the west-side input/protection chain and J2 is provisionally oriented for
   an east-side harness exit;
@@ -26,7 +26,7 @@ accept any provisional geometry.
   `1.70 mm` target. Final side, fixture datum and probe access remain open;
 - there are no mounting holes because their number and coordinates belong to
   `DIM-003` rather than electrical design authority.
-- all 42 simultaneously fitted assembly bodies have controlled courtyards and
+- all 44 simultaneously fitted assembly bodies have controlled courtyards and
   pass the independent `0.20 mm` 2D clearance subgate; the minimum observed
   fitted-courtyard clearance is `0.22 mm`.
 

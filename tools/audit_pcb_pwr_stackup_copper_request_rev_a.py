@@ -61,8 +61,7 @@ CONTRACT_STATUS = (
     "NOT_FOR_ROUTING_OR_MANUFACTURE"
 )
 REVIEW_B_STATUS = (
-    "OPEN_F1_VALUE_ECO_LEGIBILITY_REMEDIATION_NATIVE_ERC_PDF_EVIDENCE_PASS_"
-    "HUMAN_REVIEW_PENDING_FITTED_2D_"
+    "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_AND_HUMAN_REVIEW_PENDING_FITTED_2D_"
     "CLEARANCE_PRE_ROUTE_DIM_003_AND_"
     "STACKUP_REQUESTS_READY_ROUTING_PENDING"
 )
@@ -219,8 +218,8 @@ def validate_board_and_bindings(contract: dict[str, Any]) -> dict[str, Any]:
             f"PCB-PWR copper layers differ: {copper_layers}")
     require(float(board.general.thickness) == 1.6,
             f"provisional PCB-PWR thickness differs: {board.general.thickness}")
-    require(len(board.footprints) == 60,
-            f"PCB-PWR footprint count is {len(board.footprints)}, expected 60")
+    require(len(board.footprints) == 62,
+            f"PCB-PWR footprint count is {len(board.footprints)}, expected 62")
     require(len(board_nets) == 31,
             f"PCB-PWR net count is {len(board_nets)}, expected 31")
     require(len(board.traceItems) == 0 and len(board.zones) == 0,

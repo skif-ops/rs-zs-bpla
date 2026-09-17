@@ -20,11 +20,17 @@
     "mosfet_rds_on_max_mohm_at_10v": 2.2,
     "mosfet_temp_min_c": -55,
     "mosfet_temp_max_c": 175,
-    "enable_policy": "always_on_EN_tied_to_ANODE_VBAT_FUSED"
+    "enable_policy": "always_on_EN_tied_to_ANODE_VBAT_FUSED",
+    "vcap_to_anode_f": 1e-7,
+    "vcap_requirement_source": "TI LM74700-Q1 Rev.G recommends 0.1 uF"
   },
   "input_protection_qualification": {
     "status": "TARGET_EVT_CANDIDATES_SELECTED_NATIVE_VALUE_ECO_APPLIED_REPEAT_EVIDENCE_AND_PHYSICAL_QUALIFICATION_PENDING",
     "system_continuous_current_a": 5.0,
+    "system_continuous_current_interpretation": "CONSERVATIVE_QUALIFICATION_AND_PROTECTION_ENVELOPE_NOT_PREDICTED_NORMAL_DRAW",
+    "two_buck_max_output_power_w": 28.4,
+    "estimated_input_current_a_at_12v8_90pct": 2.4653,
+    "estimated_input_current_a_at_10v_85pct": 3.3412,
     "fuse": {
       "signed_native_mpn": "0451005.MRL",
       "signed_native_rating_a": 5.0,
@@ -37,6 +43,7 @@
       "minimum_nominal_rating_at_25c_a": 6.6666666667,
       "capacity_after_standard_derating_a": 6.0,
       "temperature_rerating_required": true,
+      "fault_i2t_trace_harness_and_primary_fuse_coordination_required": true,
       "package_land_pattern_change": false,
       "native_value_eco_applied": true,
       "repeat_erc_pdf_human_hierarchy_review_complete": false
@@ -80,6 +87,11 @@
   },
   "buck_3v8": {
     "mpn": "LMR604403SRAKR",
+    "ordering_mode": "3V3_FIXED_OR_ADJUSTABLE",
+    "mode_verification_source": "TI SNAS877 device comparison and FB mode detection",
+    "mode": "ADJUSTABLE",
+    "fb_detection_parallel_resistance_min_ohm": 3000.0,
+    "fb_divider_parallel_resistance_ohm": 26308.0,
     "vin_min_v": 3.0,
     "vin_max_v": 36.0,
     "current_a": 4.0,
@@ -102,6 +114,11 @@
     "inductor_irms_min_a": 4.5,
     "cout_effective_min_f": 0.000054,
     "cin_min_f": 0.0000047,
+    "cin_ref": "C11",
+    "cin_hf_f": 1e-7,
+    "cin_hf_ref": "C20",
+    "cin_voltage_rating_min_v": 50.0,
+    "cin_effective_at_bias_verified": false,
     "cboot_f": 1e-7,
     "cboot_voltage_min_v": 10.0,
     "enable_net": "EN_MODEM",
@@ -109,6 +126,10 @@
   },
   "buck_3v3": {
     "mpn": "LMR604403SRAKR",
+    "ordering_mode": "3V3_FIXED_OR_ADJUSTABLE",
+    "mode_verification_source": "TI SNAS877 device comparison and FB mode detection",
+    "mode": "FIXED_3V3_FB_DIRECT_TO_OUTPUT",
+    "fb_to_vout_detection_resistance_max_ohm": 1.0,
     "current_a": 4.0,
     "fixed_output_v": 3.3,
     "switching_frequency_hz": 400000.0,
@@ -121,6 +142,11 @@
     "inductor_irms_20c_rise_a": 6.9,
     "cout_effective_min_f": 0.000054,
     "cin_min_f": 0.0000047,
+    "cin_ref": "C12",
+    "cin_hf_f": 1e-7,
+    "cin_hf_ref": "C21",
+    "cin_voltage_rating_min_v": 50.0,
+    "cin_effective_at_bias_verified": false,
     "cboot_f": 1e-7,
     "cboot_voltage_min_v": 10.0,
     "role": "always_on_MAIN_AON_bootstrap_rail",
@@ -138,7 +164,16 @@
     "vbat_rf_peak_a": 2.7,
     "local_bulk_bb_min_f": 0.0001,
     "local_bulk_rf_min_f": 0.0001,
-    "star_split_required": true
+    "local_bulk_bb_ref": "C36",
+    "local_bulk_rf_ref": "C44",
+    "star_split_required": true,
+    "main_harness_power_contacts": 1,
+    "main_harness_return_contacts": 1,
+    "main_harness_wire_awg": 18,
+    "main_harness_wire_cross_section_mm2": 0.75,
+    "rf_path_resistance_max_ohm_at_25c": 0.1,
+    "minimum_voltage_at_all_u8_vbat_pads_v": 3.3,
+    "burst_and_hot_harness_test_required": true
   },
   "mic_ldo": {
     "mpn": "TPS7A2018PDBVR",
@@ -196,7 +231,18 @@
     "cable_housing_mpn": "Molex 43025-1200",
     "power_contact_mpn": "Molex 43030-0038",
     "control_i2c_contact_mpn": "Molex 43030-0001",
+    "pg_3v8_transport": "NOT_TRANSPORTED_DIAGNOSTIC_TP5_ONLY",
+    "pwr_good_transport": "3V3_AON_STATUS_ONLY",
+    "direct_pg_3v8_requires_interboard_eco": true,
     "electrical_freeze": "hardware/PWR_MAIN_12PIN_I2C_FREEZE_REV_A.md"
+  },
+  "input_emi": {
+    "filter_fitted": false,
+    "blind_filter_addition_prohibited": true,
+    "reason": "input filters can destabilize LMR60440 without impedance and damping design",
+    "conducted_emissions_lisn_or_current_probe_test_required": true,
+    "gnss_lora_lte_coexistence_desense_test_required": true,
+    "filter_or_reservation_decision_required_before_routing": true
   },
   "release_open_items": [
     "battery_bms_voltage_limits",
@@ -214,6 +260,8 @@
     "standby_s0_measurement",
     "ina226_reference_meter_calibration_test",
     "emc_emi_evidence",
+    "input_filter_or_no_filter_reservation_decision_before_routing",
+    "c11_c12_effective_capacitance_at_10v_to_14v6",
     "review_a",
     "review_b"
   ],

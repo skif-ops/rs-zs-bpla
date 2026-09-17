@@ -67,7 +67,7 @@ harness datum и frozen STEP; принято `0/18`, поэтому ни раз�
 authority для силовых цепей, возвратов/net-tie, hot-loop, switch-node, Kelvin,
 feedback и I2C. Этот PASS закрывает только полноту ограничений: численная
 геометрия меди, трассировка, DRC и производство остаются запрещены. Отдельный
-строгий подгейт PCB-PWR теперь подтверждает `42/42` fitted-courtyard,
+строгий подгейт PCB-PWR теперь подтверждает `44/44` fitted-courtyard,
 минимальный зазор `0.22 mm` при требовании `0.20 mm` и ноль конфликтов; `DIM-003`,
 J1/J2/DFT service volumes, mounting, STEP и Review B остаются открыты. После
 ограниченного copper ECO повторный PCB-MIC Review A подписан
@@ -80,7 +80,7 @@ PCB-MAIN и PCB-PWR routing/Review B, оставшиеся PCB-MIC Review B gate
 На PCB-PWR уже контролируются J1 `Molex 43045-0213`, U1 `LM74700-Q1`,
 U2 `INA226`, Q1 `CSD18540Q5B`, RSH1 `WSK2512R0100FEA`, U3/U4
 `LMR60440`, L1/L2 `XAL7030-472MEC`, U5 `TPS7A20` и J2
-`Molex 43045-1202`. Все 47 пассивных, net-tie и DFT-позиции PCB-PWR имеют
+`Molex 43045-1202`. Все 49 пассивных, net-tie и DFT-позиций PCB-PWR имеют
 единый per-reference authority с точным candidate MPN/идентификатором, корпусом,
 состоянием установки и pin/net-привязкой; генератор BOM и независимый QG-2 читают
 этот источник без скрытых MPN-констант. Производственный выпуск кандидатов,

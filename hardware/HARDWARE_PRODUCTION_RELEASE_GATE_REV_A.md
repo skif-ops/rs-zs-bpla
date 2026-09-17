@@ -67,9 +67,9 @@ open.
 PCB-PWR is no longer a one-page label-only capture. Its native project now has a
 system overview and four bounded functional child sheets for input protection and
 current monitoring, 3V8 modem power, 3V3 digital power, and 1V8/harness interfaces.
-The independent hierarchy audit finds 63 symbols, 185 explicit wire segments,
+The independent hierarchy audit finds 65 symbols, 189 explicit wire segments,
 9 cross-sheet nets, 26 hierarchical labels, no cross-net wire collision and exact
-pad/net equivalence to all 60 PCB footprints. This retains the signed pin/net
+pad/net equivalence to all 62 PCB footprints. This retains the signed pin/net
 authority only. The KiCad 9 ERC/PDF evidence and independent hierarchy decision
 accepted on `2026-09-16` for source commit
 `2a973f6856aa115aa59323d619be985578780682` are historical evidence for the
@@ -85,7 +85,9 @@ passes KiCad 9.0.9 ERC with zero violations on all five sheets; the new A3 PDF
 SHA-256 is
 `16afef6ecb337109f2a61318c9459167c6d06f4b74534b656c97884c1fed57dd`
 and all five pages pass visual preflight without text/symbol/connection overlap
-or clipping. A new independent hierarchy decision is still open. Routing and
+or clipping. The later C20/C21 local-CIN_HF electrical ECO supersedes that
+artifact for the active source; fresh commit-bound ERC/PDF and a new independent
+hierarchy decision are open. Routing and
 manufacturing release remain blocked by the separate gates below.
 
 The PCB-PWR input-protection desk review rejects the signed native F1 value
@@ -96,13 +98,14 @@ controlled BOM and qualification packet select exact candidate
 `SMBJ18A`. The bounded value-only ECO is applied to the active native schematic,
 PCB and generators with footprint, placement, topology, nets and pad mapping
 retained. This does not extend the prior hierarchy acceptance. The earlier
-post-ECO PDF is superseded by the legibility remediation; fresh KiCad 9 ERC and
-five-page PDF evidence now pass, while independent human hierarchy review
-remains mandatory. The input-protection matrix has `1/20` accepted rows
+post-ECO PDF is superseded by the legibility remediation, and the later C20/C21
+electrical ECO supersedes the remediated artifact. Fresh active-source KiCad 9
+ERC/PDF evidence and independent human hierarchy review remain mandatory. The
+input-protection matrix has `1/20` accepted rows
 (`PWR-IPQ-003`); PCBA procurement and manufacturing release remain prohibited.
 
 PCB-PWR has also passed its bounded fitted-body 2D placement-clearance subgate.
-All 42 simultaneously fitted footprints have controlled courtyards, the required
+All 44 simultaneously fitted footprints have controlled courtyards, the required
 minimum is 0.20 mm, the observed minimum is 0.22 mm and conflicts are zero. This
 does not close `DIM-003`, mounting or connector/tool service volumes, DNP and DFT
 fixture access, assembled STEP, routing, DRC, CAM, DFM or Review B.

@@ -33,15 +33,19 @@ controlled `0.20 mm` planning minimum and was included in the same repack.
 | `C16` | `73.00 / 17.00` | `74.00 / 17.00` | 3V8 output-bank separation. |
 | `C17` | `73.00 / 38.00` | `74.00 / 38.00` | 3V3 output-bank separation. |
 | `C19` | `73.00 / 45.00` | `74.00 / 42.25` | Clear C18 and U5; remain in the 3V3 post-inductor bank. |
+| `C11` | `50.00 / 14.00` | `49.00 / 14.00` | Preserve clearance while adding U3 local CIN_HF. |
+| `C12` | `50.00 / 42.00` | `49.00 / 42.00` | Preserve clearance while adding U4 local CIN_HF. |
+| `C20` | new | `52.40 / 14.00`, 90 deg | U3 local 100 nF/50 V CIN_HF. |
+| `C21` | new | `52.40 / 42.00`, 90 deg | U4 local 100 nF/50 V CIN_HF. |
 
-No other placement coordinate or rotation changes. The native layout audit still
-binds all 60 references to the placement CSV and exact schematic pin/net set.
+No other placement coordinate or rotation changes. The native layout audit now
+binds all 62 references to the placement CSV and exact schematic pin/net set.
 
 ## Independent result and boundary
 
 `tools/audit_pcb_pwr_placement_clearance_rev_a.py --strict` verifies:
 
-- `42/42` fitted footprints have controlled front courtyards;
+- `44/44` fitted footprints have controlled front courtyards;
 - minimum required fitted-courtyard clearance is `0.20 mm`;
 - minimum observed clearance is `0.22 mm` (`D1 / F1`);
 - fitted-courtyard clearance conflicts are `0`;

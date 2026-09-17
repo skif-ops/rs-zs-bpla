@@ -20,19 +20,19 @@
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
-    "native_board_semantic_sha256": "5f854a5276e8dfd6dc82516f61db1a158888b5343b82058e6024e5970b51e6c1",
+    "native_board_semantic_sha256": "cd14ab230f309d71cef0f5bc8fd9beb9eca1f1875574a80e9c94cb334d8a4e3f",
     "placement_authority": "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
-    "placement_authority_sha256": "98a9bd0c221d880c53e95f8bb93d92ae93b3237f94293a9b7e145f31a2eeb64f",
+    "placement_authority_sha256": "ed25271eb31ff061fabf98e4a9a2b8046aaa6ac333727ed4d789f31f2052ab05",
     "routing_authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
     "routing_authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
     "layer_count_authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
     "layer_count_authority_sha256": "3774347b5cca2b09ef1949f08af22ac2e319db7b0d99bb63034a28f1dc590b80",
     "power_design_baseline": "hardware/POWER_DESIGN_BASELINE_REV_A.json",
-    "power_design_baseline_sha256": "3a63b453a0edd19e9411369c464e8125a64c0875e8f79102f765a9b0a339373e",
+    "power_design_baseline_sha256": "6cb8437cbb260126a3e722e87e25cc03fc675f6c62e438194446d62c2b3c119b",
     "power_design_calculation": "hardware/POWER_DESIGN_CALC_REV_A.md",
-    "power_design_calculation_sha256": "81985f0d6b798d55f5c8abdc961554b9435c16a651df2e37ac58cf18df810dda",
+    "power_design_calculation_sha256": "2264daa8c4de35827d9badda98c05faa9292cc6c30d5b8d9ab9924462175184a",
     "dim_003_request": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
-    "dim_003_request_sha256": "c522fe4ed886117d2df1a4cdf5d4721aa7a02c1ceef00a6d7e042c6df992baa9"
+    "dim_003_request_sha256": "77c3b9988d1f1b0f8bc49d2d4e9a45ffa6bec8241bb8c8cf1b4c5593a5e59c3c"
   },
   "board_request_basis": {
     "provisional_outline_mm": [

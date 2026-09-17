@@ -204,7 +204,7 @@ def main() -> int:
 
     status_eco = capture_status.get("input_protection_candidate_eco", {})
     require(status_eco.get("state") ==
-            "TARGET_8A_NATIVE_VALUE_ECO_APPLIED_LEGIBILITY_REMEDIATION_REPEAT_ERC_PDF_EVIDENCE_PASS_HUMAN_HIERARCHY_REVIEW_PENDING",
+            "TARGET_8A_NATIVE_VALUE_ECO_RETAINED_ACTIVE_CINHF_ECO_REPEAT_ERC_PDF_AND_HUMAN_HIERARCHY_REVIEW_PENDING",
             "PCB-PWR capture status does not expose the post-ECO review gate")
     require(status_eco.get("target_fuse_mpn") == fuse["target_evt_mpn"],
             "PCB-PWR capture status target fuse mismatch")
@@ -218,8 +218,12 @@ def main() -> int:
             status_eco.get("pin_net_semantic_sha256_after") ==
             native_eco["post_eco_pin_net_semantic_sha256"],
             "PCB-PWR capture status ECO semantic proof drift")
-    require(status_eco.get("repeat_native_kicad_9_erc_complete") is True and
-            status_eco.get("repeat_pdf_evidence_complete") is True and
+    active_hierarchy_evidence = capture_status.get("human_readable_hierarchy", {}).get(
+        "current_evidence", {})
+    active_evidence_complete = active_hierarchy_evidence.get("status") == \
+        "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING"
+    require(status_eco.get("repeat_native_kicad_9_erc_complete") is active_evidence_complete and
+            status_eco.get("repeat_pdf_evidence_complete") is active_evidence_complete and
             status_eco.get("repeat_independent_human_hierarchy_review_complete") is False,
             "PCB-PWR capture status repeat-evidence boundary drift")
     require(status_eco.get("pcba_procurement_authorized") is False,

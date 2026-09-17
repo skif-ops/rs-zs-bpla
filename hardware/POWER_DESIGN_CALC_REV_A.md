@@ -33,10 +33,18 @@ EVT-кандидат солнечного тракта: SLD Tech `SLP080S-12M` �
 
 ### 1.1 Fuse desk review and bounded value ECO
 
-Ранее подписанная native-схема содержала `0451005.MRL` 5 A. Этот кандидат отклонён
-для непрерывной линии 5 A: Littelfuse требует стандартный derating 25% для
-continuous operation дополнительно к температурной кривой. Поэтому 5 A nominal
-даёт только `3.75 A` до температурного derating и не покрывает расчётный ток.
+Ранее подписанная native-схема содержала `0451005.MRL` 5 A. Значение `5 A` в
+этом проекте является консервативной qualification/protection envelope, а не
+расчётным нормальным непрерывным потреблением станции. Даже одновременная
+теоретическая отдача двух buck на полном номинале составляет
+`3.8 V * 4 A + 3.3 V * 4 A = 28.4 W`: это примерно `2.47 A` от 12.8 V при
+90% КПД или `3.34 A` от 10.0 V при 85% КПД. Реальный envelope должен быть
+заморожен по измерениям нагрузки, пусковым процессам и fault coordination.
+
+Кандидат 5 A всё равно отклонён для принятой 5 A qualification envelope:
+Littelfuse требует стандартный derating 25% для continuous operation
+дополнительно к температурной кривой. Поэтому 5 A nominal даёт только `3.75 A`
+до температурного derating и не покрывает контрольную envelope.
 
 Для EVT-квалификации выбран точный кандидат Littelfuse `0451008.MRL` в том же
 Nano2 451 land pattern:
@@ -52,6 +60,8 @@ Nano2 451 land pattern:
 опубликованного Molex предела `8.5 A/contact` для J1 `43045-0213` и terminal
 `43030-0038`, но разница `0.5 A` не считается release margin. Нужны
 assembled thermal tests J1/harness/F1 при +70 C и подтверждённом 18 AWG проводе.
+Окончательный номинал должен также пройти I²t coordination с защищаемыми
+дорожками, жгутом 18 AWG / 0.75 mm2 и внешним первичным предохранителем батареи.
 
 Это двухступенчатое изменение. BOM и qualification contract перешли на
 `0451008.MRL`; bounded value-only ECO уже применён к native schematic/PCB и
@@ -82,6 +92,10 @@ Baseline:
 - U: Texas Instruments `LM74700QDBVRQ1`;
 - Q: Texas Instruments `CSD18540Q5B`, 60 V N-MOSFET;
 - topology: ideal diode on protected battery input ahead of both buck converters.
+
+Конденсатор `C1` между VCAP и ANODE равен `100 nF`. Это соответствует
+рекомендованным `0.1 uF` и условиям электрических характеристик LM74700-Q1
+Rev.G; замена на 1 uF не требуется.
 
 LM74700-Q1 работает при 3.2...65 V, предназначен для внешнего N-MOSFET и обеспечивает reverse polarity / reverse current blocking. Это соответствует 12.8 V battery architecture с большим запасом по DC input voltage.
 
@@ -118,6 +132,14 @@ TI reference values для 3.8 V / 4 A / 400 kHz:
 - CIN = `4.7 uF` minimum reference value;
 - CBOOT = `100 nF`, >=10 V;
 - RT = `86.6 kOhm`.
+
+TI Table 8-3 отдельно требует для каждого преобразователя `CIN_HF = 0.1 uF`
+непосредственно у VIN/PGND и `CIN = 4.7 uF` рядом с устройством, оба с rating
+не ниже 50 V. Поэтому Rev.A содержит `C20` у U3 и `C21` у U4, оба
+`100 nF / 50 V X7R`, дополнительно к `C11/C12 = 4.7 uF / 50 V X7R`.
+`C13 = 100 uF` остаётся общей демпфирующей ёмкостью VBAT_SYS, а не заменой
+локальных HF-петель. Effective capacitance C11/C12 при 10.0...14.6 V пока не
+считается подтверждённой: требуется кривая DC bias либо измерение/модель TDK.
 
 Release inductor requirement:
 
@@ -166,6 +188,14 @@ Capture value: `35.7 kOhm, 0.1%, low-TCR`.
 
 Nominal calculated VOUT with 100k / 35.7k is approximately 3.801 V before IC/reference tolerance.
 
+Точный orderable `LMR604403SRAKR` по SNAS877 прямо обозначен как
+`3.3 V fixed / adjustable`. Режим определяется соединением FB: сопротивление
+FB-VOUT менее 1 Ohm выбирает fixed 3.3 V, а параллельное сопротивление делителя
+более 3 kOhm выбирает adjustable mode. Для U3
+`100 kOhm || 35.7 kOhm = 26.3 kOhm`, поэтому это допустимый adjustable 3.8 V
+режим. У U4 FB соединён непосредственно с 3V3_DIGITAL, поэтому это fixed 3.3 V
+режим. Дополнительная замена MPN по этому вопросу не требуется.
+
 ### 3.3 Modem local bulk
 
 Quectel requires approximately 100 uF low-ESR bypass near VBAT and reserves separate RF/baseband decoupling networks. Rev.A shall therefore reserve:
@@ -176,6 +206,14 @@ Quectel requires approximately 100 uF low-ESR bypass near VBAT and reserves sepa
 - Quectel-recommended HF MLCC arrays adjacent to the appropriate modem pins;
 - star split from the common 3.8 V source into VBAT_BB and VBAT_RF.
 
+Межплатный путь использует одну пару контактов Micro-Fit: pin 1
+`3V8_MODEM` и pin 2 `GND_MODEM`, оба 18 AWG / 0.75 mm2. На PCB-MAIN
+`C36` и `C44` по `100 uF` каждый обязательны у ветвей VBAT_BB/VBAT_RF.
+При LTE/EGPRS burst требуется не менее `3.3 V` на всех четырёх VBAT pads U8,
+а end-to-end сопротивление RF power path при 25 C должно быть не более
+`100 mOhm`; окончательное подтверждение выполняется на реальном жгуте при
+номинальной и +70 C температуре.
+
 Exact PCB-PWR capacitor candidates are controlled in
 `PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv` so schematic capture and the engineering BOM use
 one identity. They are not released for manufacture until cold-temperature ESR,
@@ -185,7 +223,9 @@ DC-bias derating, transient/load-step and layout review are closed.
 
 Converter: second `LMR604403SRAKR`.
 
-For Rev.A the 3.3 V rail uses the fixed-3.3 configuration of the selected device variant, provided the final captured part-number option is verified against TI ordering data before BOM release.
+For Rev.A the 3.3 V rail uses the fixed-3.3 configuration of the selected
+`LMR604403SRAKR`. TI SNAS877 explicitly identifies this orderable as
+`3.3 V fixed / adjustable`; direct FB-to-output connection selects fixed mode.
 
 Initial switching baseline: `400 kHz`.
 
@@ -248,7 +288,7 @@ which remains inside INA226 shunt measurement range while providing useful resol
 The 1 W rating is exactly four times the 0.25 W nominal dissipation at 5 A.
 Final Kelvin routing, thermal evidence and reference-meter calibration remain blocking.
 
-Firmware scaling baseline for max expected 5 A:
+Firmware scaling baseline for the conservative 5 A qualification envelope:
 
 - minimum Current_LSB = 5 / 32768 = 152.6 uA;
 - choose Current_LSB = `200 uA/bit`;
@@ -291,6 +331,25 @@ Execute only with current-limited protected fixture. Verify LM74700-Q1, MOSFET, 
 
 Measure complete S0 current including both buck converters, TPS7A20, monitors and leakage paths. If merged 3V3 architecture misses the autonomy budget, raise an ECO rather than hiding the measured current.
 
+### PWR-07 - conducted EMI and input-filter decision
+
+Measure battery/MPPT harness common-mode and differential conducted emissions
+with LISN/current probe in worst buck, LTE and LoRa/GNSS coexistence modes.
+Near-field probe the two hot loops and check GNSS/LoRa/LTE desense. Rev.A does
+not add a ferrite or common-mode choke blindly: TI warns that an undamped input
+filter can destabilize the converter. Before routing, either freeze a simulated
+and measured stable filter plus damping network or explicitly reserve and approve
+the no-filter EVT configuration; any populated filter requires repeat load-step,
+startup and EMI tests.
+
+### PWR-08 - 3V8 diagnostic coverage
+
+`PG_3V8` remains diagnostic-only at `TP5`; `R15` is DNP and no dedicated
+PG_3V8 signal crosses J2. Firmware therefore infers modem-rail health from modem
+state and INA226 telemetry, while bench EVT probes TP5. A direct firmware PG_3V8
+input requires a separate interboard ECO; `PWR_GOOD` remains the 3V3 AON status
+because the modem rail may be intentionally disabled.
+
 ## 8. Freeze state
 
 Can proceed into native schematic capture now:
@@ -298,6 +357,8 @@ Can proceed into native schematic capture now:
 - LM74700-Q1 controller;
 - CSD18540Q5B concept;
 - LMR60440 x2;
+- verified dual fixed/adjustable use of exact `LMR604403SRAKR`;
+- local `C20/C21 = 100 nF / 50 V` CIN_HF plus `C11/C12 = 4.7 uF / 50 V`;
 - 3.8 V feedback 100k / 35.7k;
 - 400 kHz baseline, RT 86.6k;
 - Coilcraft XAL7030-472MEC 4.7 uH inductors with controlled land pattern;

@@ -2,7 +2,7 @@
 """Audit the bounded PCB-PWR Rev.A fitted-component 2D clearance subgate.
 
 This is deliberately narrower than mechanical Review B.  It verifies that the
-42 simultaneously fitted assembly bodies have controlled courtyards and at
+44 simultaneously fitted assembly bodies have controlled courtyards and at
 least 0.20 mm separation on the provisional placement canvas.  DNP footprints,
 PCB-only net-ties/test targets, mounting geometry, connector service volumes,
 3D envelopes and all routed-copper checks remain outside this subgate.
@@ -34,7 +34,7 @@ REQUIRED_CLEARANCE_MM = 0.20
 GEOMETRY_TOLERANCE_MM = 0.005
 BOARD_X_MM = 90.0
 BOARD_Y_MM = 60.0
-EXPECTED_POPULATION = Counter({"FITTED": 42, "PCB_FEATURE": 13, "DNP": 5})
+EXPECTED_POPULATION = Counter({"FITTED": 44, "PCB_FEATURE": 13, "DNP": 5})
 EXPECTED_PROVISIONAL_EDGE_OVERHANGS = ["J2"]
 
 
@@ -208,12 +208,12 @@ def verify_status(status_path: Path, report: dict[str, Any]) -> None:
 def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
     board = Board.from_file(str(board_path), encoding="utf-8")
     footprints = {ref_of(footprint): footprint for footprint in board.footprints}
-    require(len(footprints) == len(board.footprints) == 60,
-            "PCB-PWR board must contain 60 unique references")
+    require(len(footprints) == len(board.footprints) == 62,
+            "PCB-PWR board must contain 62 unique references")
 
     rows = read_csv(placement_path)
     by_ref = {row["RefDes"]: row for row in rows}
-    require(len(rows) == len(by_ref) == 60 and set(by_ref) == set(footprints),
+    require(len(rows) == len(by_ref) == 62 and set(by_ref) == set(footprints),
             "PCB-PWR placement authority/reference set differs from board")
     for ref, footprint in footprints.items():
         row = by_ref[ref]
@@ -256,7 +256,7 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
             "PCB-PWR placement-clearance candidate contains routed copper")
 
     minimum = min(observed)
-    passed = not findings and len(fitted) == 42
+    passed = not findings and len(fitted) == 44
     summary = {
         "state": ("PASS_FITTED_2D_PLACEMENT_CLEARANCE_DIM_003_OPEN"
                   if passed else "BLOCKED_FITTED_2D_PLACEMENT_CLEARANCE"),

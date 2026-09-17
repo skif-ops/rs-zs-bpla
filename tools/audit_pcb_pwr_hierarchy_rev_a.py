@@ -29,6 +29,7 @@ ROOT_LABEL_FONT_MAX_MM = 0.02
 REVIEW_TEXT_FONT_MIN_MM = 1.0
 REVIEW_STUB_LENGTH_MIN_MM = 10.0
 HORIZONTAL_REVIEW_SYMBOLS = {"Device:C", "Device:Fuse", "Device:L", "Device:R"}
+PRE_CINHF_SEMANTIC_SHA256 = "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a"
 
 EXPECTED_SHEETS = {
     "Input protection and monitor": {
@@ -44,7 +45,7 @@ EXPECTED_SHEETS = {
         "file": "PCB-PWR_02_3V8_MODEM.kicad_sch",
         "page": "3",
         "refs": {
-            "U3", "L1", "C3", "C4", "C11", "C14", "C15", "C16",
+            "U3", "L1", "C3", "C4", "C11", "C14", "C15", "C16", "C20",
             "R1", "R2", "R3", "R4", "R5", "R6", "R15", "TP4", "TP5",
         },
     },
@@ -52,7 +53,7 @@ EXPECTED_SHEETS = {
         "file": "PCB-PWR_03_3V3_DIGITAL.kicad_sch",
         "page": "4",
         "refs": {
-            "U4", "L2", "C5", "C6", "C12", "C17", "C18", "C19",
+            "U4", "L2", "C5", "C6", "C12", "C17", "C18", "C19", "C21",
             "R7", "R8", "R9", "R10", "R12", "R13", "R14", "TP6",
             "#FLG03",
         },
@@ -305,10 +306,10 @@ def main() -> int:
                         f"{name}: visible wire collision would join {net_a} and {net_b}")
 
     allocated = set().union(*sheet_refs.values())
-    require(len(allocated) == sum(len(items) for items in sheet_refs.values()) == 63,
-            "hierarchy must allocate 63 unique symbols exactly once")
+    require(len(allocated) == sum(len(items) for items in sheet_refs.values()) == 65,
+            "hierarchy must allocate 65 unique symbols exactly once")
     physical_refs = {ref for ref in allocated if not ref.startswith("#")}
-    require(len(physical_refs) == 60, "hierarchy physical reference count drift")
+    require(len(physical_refs) == 62, "hierarchy physical reference count drift")
 
     # Cross-sheet nets must be represented by one hierarchical label per participating sheet.
     net_sheets: dict[str, set[str]] = defaultdict(set)
@@ -371,7 +372,7 @@ def main() -> int:
     # Independent electrical equivalence: every physical schematic pin equals every PCB pad net.
     board = Board.from_file(str(PCB), encoding="utf-8")
     footprints = {board_ref(item): item for item in board.footprints}
-    require(len(footprints) == len(board.footprints) == 60 and
+    require(len(footprints) == len(board.footprints) == 62 and
             set(footprints) == physical_refs, "hierarchical schematic/PCB ref set mismatch")
     semantic_rows: list[str] = []
     for ref in sorted(physical_refs):
@@ -395,8 +396,8 @@ def main() -> int:
         "status": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE",
         "root_sheets": 4,
         "pages": 5,
-        "symbols": 63,
-        "physical_symbols": 60,
+        "symbols": 65,
+        "physical_symbols": 62,
         "wire_segments": sum(
             sum(1 for item in document.schematic.graphicalItems
                 if getattr(item, "type", None) == "wire")
@@ -406,10 +407,10 @@ def main() -> int:
         "hierarchical_labels": total_hier_labels,
         "pin_net_semantic_sha256": semantic_sha256,
         "readability_profile": "PASS_LARGER_TEXT_HORIZONTAL_PASSIVES_EXPANDED_FUNCTIONAL_BODIES",
-        "erc_native_kicad_9": "PASS_COMMIT_BOUND_POST_LEGIBILITY_REMEDIATION",
-        "hierarchy_pdf_evidence": "PASS_COMMIT_BOUND_POST_LEGIBILITY_REMEDIATION",
+        "erc_native_kicad_9": "PENDING_COMMIT_BOUND_POST_CINHF_ECO",
+        "hierarchy_pdf_evidence": "PENDING_COMMIT_BOUND_POST_CINHF_ECO",
         "pin_net_review_a": "RETAINED_BY_EXACT_ELECTRICAL_EQUIVALENCE",
-        "hierarchy_human_review": "PENDING_REPEAT_INDEPENDENT_REVIEW_POST_F1_VALUE_ECO",
+        "hierarchy_human_review": "PENDING_REPEAT_INDEPENDENT_REVIEW_POST_CINHF_ECO",
         "manufacturing_release": False,
     }
     status = json.loads(STATUS.read_text(encoding="utf-8"))
@@ -419,83 +420,110 @@ def main() -> int:
             hierarchy.get("connectivity_reader") == "tools/pcb_pwr_schematic_hierarchy.py" and
             hierarchy.get("independent_audit") == "tools/audit_pcb_pwr_hierarchy_rev_a.py",
             "PCB-PWR status does not bind the hierarchy toolchain")
+    current_evidence = hierarchy.get("current_evidence", {})
+    evidence_complete = current_evidence.get("status") == \
+        "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING"
     for key, expected in {
         "pages": 5,
         "functional_child_sheets": 4,
-        "symbols": 63,
-        "physical_symbols": 60,
-        "wire_segments": 185,
+        "symbols": 65,
+        "physical_symbols": 62,
+        "wire_segments": 189,
         "cross_sheet_nets": 9,
         "hierarchical_labels": 26,
         "pin_net_semantic_sha256": semantic_sha256,
         "pin_net_review_a_retained": True,
-        "native_kicad_9_erc_pass": True,
-        "committed_erc_evidence": True,
-        "committed_pdf_evidence": True,
+        "native_kicad_9_erc_pass": evidence_complete,
+        "committed_erc_evidence": evidence_complete,
+        "committed_pdf_evidence": evidence_complete,
         "independent_human_review_complete": False,
         "prior_evidence_superseded_by_f1_value_eco": True,
         "prior_evidence_superseded_by_legibility_remediation": True,
+        "prior_evidence_superseded_by_cinhf_eco": True,
         "routing_authorized": False,
         "manufacturing_release": False,
     }.items():
         require(control.get(key) == expected,
                 f"PCB-PWR hierarchy status {key} drift: {control.get(key)!r} != {expected!r}")
-    require(control.get("state") ==
-            "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_F1_VALUE_ECO_LEGIBILITY_REMEDIATION_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING",
+    expected_state = (
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_"
+        "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING"
+        if evidence_complete else
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_"
+        "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PENDING_HUMAN_REVIEW_PENDING"
+    )
+    require(control.get("state") == expected_state,
             "PCB-PWR hierarchy control state drift")
-    current_evidence = hierarchy.get("current_evidence", {})
-    require(current_evidence == {
-        "status": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING",
-        "change": {
-            "reason": "HUMAN_REVIEW_REPORTED_TEXT_SYMBOL_AND_CONNECTION_OVERLAP",
-            "presentation_only": True,
-            "electrical_change": False,
-            "pin_net_semantic_sha256_before": semantic_sha256,
-            "pin_net_semantic_sha256_after": semantic_sha256,
-        },
-        "source_commit_sha": "6ba3ba5d219b95cb7de12f37c4eb646f7f18cfa8",
-        "source_tree_sha": "7752b987f1c1a594b6fff8cb258fef20bf6c79b1",
-        "schematic_gate_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35209892756",
-        "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35209892670",
-        "pcb_native_gate_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35209892751",
-        "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35209892756/artifacts/10491239676",
-        "artifact_id": 10491239676,
-        "artifact_digest": "sha256:3e25fd6446a9595513cce00f2ee952cb87cef6f61e1c689fe6b6e1cfe4e501ce",
-        "erc": {
-            "path": "artifacts/kicad-native/PCB-PWR/erc.json",
-            "sha256": "fd43e07d16f622753365b8181c9e203536d8a90ff7dfe0d813c834b83d8a28b9",
-            "kicad_version": "9.0.9",
-            "sheets": 5,
-            "violations": 0,
-        },
-        "schematic_pdf": {
-            "path": "artifacts/kicad-native/PCB-PWR/PCB-PWR_schematic.pdf",
-            "sha256": "16afef6ecb337109f2a61318c9459167c6d06f4b74534b656c97884c1fed57dd",
-            "pages": 5,
-            "page_size": "A3",
-            "orientation": "landscape",
-            "file_size_bytes": 619156,
-            "pdf_version": "1.5",
-            "visual_preflight": "PASS_ALL_5_PAGES_NO_TEXT_SYMBOL_OR_CONNECTION_OVERLAP_NO_CLIPPING",
-        },
-        "schematic_source_sha256": {
-            "PCB-PWR.kicad_sch": "4f500944ab55fa98f68cd19e613e6eda73c7c07fcb5e72cebee4b6baf8f07601",
-            "PCB-PWR_01_INPUT_PROTECTION.kicad_sch": "00af3aa086a7ca0f35f37f916607f4b6f5e6198411467173ea1486a126e0aaf9",
-            "PCB-PWR_02_3V8_MODEM.kicad_sch": "d01bcda751256c7bcc5f94286772ce499a1146fb36c35b2f851b7e468d9f5c74",
-            "PCB-PWR_03_3V3_DIGITAL.kicad_sch": "111f7c060aa6d52c3c2dc244258139504529f519ccb6c88f5130617acc723612",
-            "PCB-PWR_04_AUX_HARNESS.kicad_sch": "63d742e9a1b51b1b87928cb2491ba719f2d2ad35c3f1f38cf353901c21f00e58",
-        },
-        "independent_human_review": None,
-        "routing_authorized": False,
-        "manufacturing_release": False,
-    }, "PCB-PWR current legibility-remediation evidence boundary drift")
+    expected_change = {
+        "reason": "TI_LMR60440_TABLE_8_3_LOCAL_CIN_HF_ECO",
+        "presentation_only": False,
+        "electrical_change": True,
+        "added_refs": ["C20", "C21"],
+        "pin_net_semantic_sha256_before": PRE_CINHF_SEMANTIC_SHA256,
+        "pin_net_semantic_sha256_after": semantic_sha256,
+    }
+    require(current_evidence.get("change") == expected_change,
+            "PCB-PWR active CIN_HF ECO evidence change boundary drift")
+    require(current_evidence.get("independent_human_review") is None and
+            current_evidence.get("routing_authorized") is False and
+            current_evidence.get("manufacturing_release") is False,
+            "PCB-PWR active CIN_HF ECO review/release interlock drift")
+    evidence_fields = (
+        "source_commit_sha", "source_tree_sha", "schematic_gate_run", "ci_run",
+        "pcb_native_gate_run", "artifact", "artifact_id", "artifact_digest",
+        "erc", "schematic_pdf", "schematic_source_sha256",
+    )
     active_source_dir = ROOT / "hardware/kicad/native/PCB-PWR"
-    for filename, expected_sha256 in current_evidence["schematic_source_sha256"].items():
-        source_path = active_source_dir / filename
-        require(source_path.is_file(), f"PCB-PWR current evidence source is missing: {filename}")
-        actual_sha256 = hashlib.sha256(source_path.read_bytes()).hexdigest()
-        require(actual_sha256 == expected_sha256,
-                f"PCB-PWR current evidence source hash drift: {filename}")
+    if evidence_complete:
+        require(all(current_evidence.get(key) is not None for key in evidence_fields),
+                "PCB-PWR completed CIN_HF ECO evidence has null commit/artifact fields")
+        require(len(str(current_evidence["source_commit_sha"])) == 40 and
+                len(str(current_evidence["source_tree_sha"])) == 40,
+                "PCB-PWR completed CIN_HF ECO evidence commit/tree SHA malformed")
+        require(all(str(current_evidence[key]).startswith("https://github.com/skif-ops/rs-zs-bpla/actions/runs/")
+                    for key in ("schematic_gate_run", "ci_run", "pcb_native_gate_run")),
+                "PCB-PWR completed CIN_HF ECO run URL drift")
+        erc = current_evidence["erc"]
+        require(erc.get("path") == "artifacts/kicad-native/PCB-PWR/erc.json" and
+                erc.get("sheets") == 5 and erc.get("violations") == 0 and
+                len(str(erc.get("sha256", ""))) == 64,
+                "PCB-PWR completed CIN_HF ECO ERC evidence drift")
+        pdf = current_evidence["schematic_pdf"]
+        require(pdf.get("path") == "artifacts/kicad-native/PCB-PWR/PCB-PWR_schematic.pdf" and
+                pdf.get("pages") == 5 and pdf.get("page_size") == "A3" and
+                pdf.get("orientation") == "landscape" and
+                pdf.get("visual_preflight") ==
+                "PASS_ALL_5_PAGES_NO_TEXT_SYMBOL_OR_CONNECTION_OVERLAP_NO_CLIPPING" and
+                len(str(pdf.get("sha256", ""))) == 64,
+                "PCB-PWR completed CIN_HF ECO PDF evidence drift")
+        source_hashes = current_evidence["schematic_source_sha256"]
+        expected_files = {"PCB-PWR.kicad_sch", *(spec["file"] for spec in EXPECTED_SHEETS.values())}
+        require(set(source_hashes) == expected_files,
+                "PCB-PWR completed CIN_HF ECO source-hash file set drift")
+        for filename, expected_sha256 in source_hashes.items():
+            source_path = active_source_dir / filename
+            require(source_path.is_file(), f"PCB-PWR current evidence source is missing: {filename}")
+            actual_sha256 = hashlib.sha256(source_path.read_bytes()).hexdigest()
+            require(actual_sha256 == expected_sha256,
+                    f"PCB-PWR current evidence source hash drift: {filename}")
+        result["erc_native_kicad_9"] = "PASS_COMMIT_BOUND_POST_CINHF_ECO"
+        result["hierarchy_pdf_evidence"] = "PASS_COMMIT_BOUND_POST_CINHF_ECO"
+    else:
+        require(current_evidence.get("status") ==
+                "PENDING_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE" and
+                all(current_evidence.get(key) is None for key in evidence_fields),
+                "PCB-PWR pending CIN_HF ECO evidence must keep commit/artifact fields null")
+
+    superseded_pre_cinhf = hierarchy.get("superseded_pre_cinhf_evidence", {})
+    require(superseded_pre_cinhf.get("status") ==
+            "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING" and
+            superseded_pre_cinhf.get("source_commit_sha") ==
+            "6ba3ba5d219b95cb7de12f37c4eb646f7f18cfa8" and
+            superseded_pre_cinhf.get("schematic_pdf", {}).get("sha256") ==
+            "16afef6ecb337109f2a61318c9459167c6d06f4b74534b656c97884c1fed57dd" and
+            superseded_pre_cinhf.get("change", {}).get("pin_net_semantic_sha256_after") ==
+            PRE_CINHF_SEMANTIC_SHA256,
+            "PCB-PWR superseded pre-CIN_HF evidence boundary drift")
     superseded_legibility = hierarchy.get("superseded_legibility_evidence", {})
     require(superseded_legibility == {
         "status": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING",
@@ -503,8 +531,8 @@ def main() -> int:
             "change": "F1_0451005.MRL_TO_0451008.MRL",
             "applied_date": "2026-09-17",
             "value_only": True,
-            "pin_net_semantic_sha256_before": semantic_sha256,
-            "pin_net_semantic_sha256_after": semantic_sha256,
+            "pin_net_semantic_sha256_before": PRE_CINHF_SEMANTIC_SHA256,
+            "pin_net_semantic_sha256_after": PRE_CINHF_SEMANTIC_SHA256,
         },
         "source_commit_sha": "091a2eb223161cb4396fc6838921eeb79150c38d",
         "source_tree_sha": "72ef5630c0952a287d503f1ab3dda9dcbbee2a33",

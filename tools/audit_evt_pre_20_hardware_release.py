@@ -236,13 +236,13 @@ def audit() -> dict[str, object]:
         "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE"
         and pwr_hierarchy.get("pages") == 5
         and pwr_hierarchy.get("root_sheets") == 4
-        and pwr_hierarchy.get("symbols") == 63
-        and pwr_hierarchy.get("physical_symbols") == 60
-        and pwr_hierarchy.get("wire_segments") == 185
+        and pwr_hierarchy.get("symbols") == 65
+        and pwr_hierarchy.get("physical_symbols") == 62
+        and pwr_hierarchy.get("wire_segments") == 189
         and pwr_hierarchy.get("cross_sheet_nets") == 9
         and pwr_hierarchy.get("hierarchical_labels") == 26
         and pwr_hierarchy.get("pin_net_semantic_sha256") ==
-        "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a"
+        "84a35aa607bac3ee65b5d8f60684e958277b2fa5a7ed01f810af32f0b52b73f7"
         and pwr_hierarchy.get("pin_net_review_a") ==
         "RETAINED_BY_EXACT_ELECTRICAL_EQUIVALENCE"
         and pwr_hierarchy.get("manufacturing_release") is False
@@ -251,7 +251,7 @@ def audit() -> dict[str, object]:
         "pcb_pwr_human_readable_hierarchy_internal_equivalence",
         pwr_hierarchy_internal_ok,
         str(pwr_hierarchy.get("status", "MISSING")),
-        "PCB-PWR five-page hierarchy or exact 60-position pad/net equivalence has regressed",
+        "PCB-PWR five-page hierarchy or exact 62-position pad/net equivalence has regressed",
     )
 
     pwr_hierarchy_record = pwr_status.get("human_readable_hierarchy", {})
@@ -340,8 +340,8 @@ def audit() -> dict[str, object]:
         isinstance(pwr_clearance_summary, dict)
         and pwr_clearance_summary.get("state") ==
         "PASS_FITTED_2D_PLACEMENT_CLEARANCE_DIM_003_OPEN"
-        and pwr_clearance_summary.get("fitted_footprints") == 42
-        and pwr_clearance_summary.get("courtyard_footprints") == 42
+        and pwr_clearance_summary.get("fitted_footprints") == 44
+        and pwr_clearance_summary.get("courtyard_footprints") == 44
         and pwr_clearance_summary.get("required_clearance_mm") == 0.2
         and pwr_clearance_summary.get("minimum_observed_clearance_mm", 0) >= 0.2
         and pwr_clearance_summary.get("clearance_conflicts") == 0

@@ -81,7 +81,7 @@ SHEETS = (
         "PCB-PWR_02_3V8_MODEM.kicad_sch",
         "3",
         frozenset({
-            "U3", "L1", "C3", "C4", "C11", "C14", "C15", "C16",
+            "U3", "L1", "C3", "C4", "C11", "C14", "C15", "C16", "C20",
             "R1", "R2", "R3", "R4", "R5", "R6", "R15", "TP4", "TP5",
         }),
         (157.48, 38.10),
@@ -93,7 +93,7 @@ SHEETS = (
         "PCB-PWR_03_3V3_DIGITAL.kicad_sch",
         "4",
         frozenset({
-            "U4", "L2", "C5", "C6", "C12", "C17", "C18", "C19",
+            "U4", "L2", "C5", "C6", "C12", "C17", "C18", "C19", "C21",
             "R7", "R8", "R9", "R10", "R12", "R13", "R14", "TP6",
             "#FLG03",
         }),
@@ -184,7 +184,7 @@ SCHEMATIC_POSITIONS: dict[str, tuple[float, float]] = {
     "R3": (254.00, 147.32), "R4": (350.52, 147.32),
     "R5": (60.96, 195.58), "R6": (157.48, 195.58),
     "R15": (254.00, 195.58), "TP4": (350.52, 195.58),
-    "TP5": (60.96, 238.76),
+    "TP5": (60.96, 238.76), "C20": (157.48, 238.76),
     # 3V3 digital rail.
     "U4": (60.96, 50.80), "L2": (157.48, 50.80),
     "C12": (254.00, 50.80), "C6": (350.52, 50.80),
@@ -194,7 +194,7 @@ SCHEMATIC_POSITIONS: dict[str, tuple[float, float]] = {
     "R8": (254.00, 147.32), "R9": (350.52, 147.32),
     "R12": (60.96, 195.58), "R13": (157.48, 195.58),
     "R14": (254.00, 195.58), "TP6": (350.52, 195.58),
-    "#FLG03": (60.96, 238.76),
+    "#FLG03": (60.96, 238.76), "C21": (157.48, 238.76),
     # 1V8 rail, net ties and MAIN harness connector.
     "U5": (76.20, 60.96), "C7": (208.28, 60.96), "C8": (340.36, 60.96),
     "R11": (76.20, 129.54), "NT1": (208.28, 129.54),
@@ -387,7 +387,7 @@ def hierarchy_label(net: str, at: tuple[float, float], angle: int, token: str) -
 def title_block(title: str, page_note: str) -> TitleBlock:
     return TitleBlock(
         title=title,
-        date="2026-09-16",
+        date="2026-09-17",
         revision="A",
         company="Dioneya / ZS-BPLA",
         comments={

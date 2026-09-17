@@ -195,7 +195,7 @@ def validate_board_and_sources(contract: dict[str, Any]) -> dict[str, Any]:
             f"PCB-PWR copper layers differ: {copper_layers}")
     require(float(board.general.thickness) == 1.6,
             f"provisional board thickness differs: {board.general.thickness}")
-    require(len(board.footprints) == 60, f"PCB-PWR footprint count is {len(board.footprints)}, expected 60")
+    require(len(board.footprints) == 62, f"PCB-PWR footprint count is {len(board.footprints)}, expected 62")
     require(len(board_nets) == 31, f"PCB-PWR net count is {len(board_nets)}, expected 31")
     require(len(board.traceItems) == 0 and len(board.zones) == 0,
             "DIM-003 request must be revised after copper routing or zones appear")
@@ -236,7 +236,7 @@ def validate_provisional_basis(contract: dict[str, Any]) -> dict[str, Any]:
     fields, rows = read_csv(PLACEMENT)
     require(fields[:5] == ["RefDes", "X_mm", "Y_mm", "Rotation_deg", "Side"],
             "placement authority columns differ")
-    require(len(rows) == 60, f"placement authority has {len(rows)} rows, expected 60")
+    require(len(rows) == 62, f"placement authority has {len(rows)} rows, expected 62")
     by_ref = {row["RefDes"]: row for row in rows}
     require(len(by_ref) == len(rows), "placement authority has duplicate references")
 

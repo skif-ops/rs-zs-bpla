@@ -6,7 +6,7 @@
 
   (title_block
     (title "Dioneya EVT-PRE-20 PCB-PWR Rev.A - System overview")
-    (date "2026-09-16")
+    (date "2026-09-17")
     (rev "A")
     (company "Dioneya / ZS-BPLA")
     (comment 1 "Human-readable hierarchy; exact pin/net equivalence enforced")

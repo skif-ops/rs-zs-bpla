@@ -107,7 +107,7 @@ def main() -> int:
 
     model = HierarchicalSchematic(args.schematic)
     instances = {ref: record.instance for ref, record in model.symbols.items()}
-    require(len(instances) == 63, "hierarchical PCB-PWR must contain 63 unique symbols")
+    require(len(instances) == 65, "hierarchical PCB-PWR must contain 65 unique symbols")
 
     # Pin names and pin-to-net mapping must match the reviewed authority exactly.
     for row in rows(PIN_AUTH):

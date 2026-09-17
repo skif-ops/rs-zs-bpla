@@ -19,7 +19,7 @@ Independent audit:
 ## Controlled source binding
 
 The request is bound to the unrouted four-layer PCB-PWR candidate, its exact
-60-footprint placement, all 31 pre-route net constraints, the Rev.A layer-count
+62-footprint placement, all 31 pre-route net constraints, the Rev.A layer-count
 authority, the power-design baseline and the still-open `DIM-003` request.
 
 The present 90 x 60 x 1.6 mm canvas is provisional. It has no mounting holes,

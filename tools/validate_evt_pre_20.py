@@ -593,6 +593,16 @@ def validate_hardware_baseline() -> None:
     )
     pwr_hierarchy = pwr_status.get("human_readable_hierarchy", {})
     pwr_hierarchy_control = pwr_hierarchy.get("control", {})
+    pwr_current_evidence = pwr_hierarchy.get("current_evidence", {})
+    pwr_evidence_complete = pwr_current_evidence.get("status") == \
+        "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING"
+    expected_pwr_hierarchy_state = (
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_"
+        "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING"
+        if pwr_evidence_complete else
+        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_"
+        "NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PENDING_HUMAN_REVIEW_PENDING"
+    )
     require(
         pwr_status.get("native_schematic", {}).get("page_count") == 5
         and pwr_status.get("native_schematic", {}).get("functional_child_sheets") == 4
@@ -602,24 +612,24 @@ def validate_hardware_baseline() -> None:
         "tools/pcb_pwr_schematic_hierarchy.py"
         and pwr_hierarchy.get("independent_audit") ==
         "tools/audit_pcb_pwr_hierarchy_rev_a.py"
-        and pwr_hierarchy_control.get("state") ==
-        "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_F1_VALUE_ECO_LEGIBILITY_REMEDIATION_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING"
+        and pwr_hierarchy_control.get("state") == expected_pwr_hierarchy_state
         and pwr_hierarchy_control.get("pages") == 5
         and pwr_hierarchy_control.get("functional_child_sheets") == 4
-        and pwr_hierarchy_control.get("symbols") == 63
-        and pwr_hierarchy_control.get("physical_symbols") == 60
-        and pwr_hierarchy_control.get("wire_segments") == 185
+        and pwr_hierarchy_control.get("symbols") == 65
+        and pwr_hierarchy_control.get("physical_symbols") == 62
+        and pwr_hierarchy_control.get("wire_segments") == 189
         and pwr_hierarchy_control.get("cross_sheet_nets") == 9
         and pwr_hierarchy_control.get("hierarchical_labels") == 26
         and pwr_hierarchy_control.get("pin_net_semantic_sha256") ==
-        "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a"
+        "84a35aa607bac3ee65b5d8f60684e958277b2fa5a7ed01f810af32f0b52b73f7"
         and pwr_hierarchy_control.get("pin_net_review_a_retained") is True,
         "PCB-PWR human-readable hierarchy/electrical-equivalence control has drifted",
     )
     require(
         pwr_hierarchy_control.get("prior_evidence_superseded_by_f1_value_eco") is True
         and pwr_hierarchy_control.get("prior_evidence_superseded_by_legibility_remediation") is True
-        and all(pwr_hierarchy_control.get(key) is True for key in (
+        and pwr_hierarchy_control.get("prior_evidence_superseded_by_cinhf_eco") is True
+        and all(pwr_hierarchy_control.get(key) is pwr_evidence_complete for key in (
             "native_kicad_9_erc_pass",
             "committed_erc_evidence",
             "committed_pdf_evidence",

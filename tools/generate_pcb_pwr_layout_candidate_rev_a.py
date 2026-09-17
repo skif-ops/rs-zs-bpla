@@ -88,7 +88,7 @@ def catalog() -> dict[str, dict[str, object]]:
             "value": value, "footprint": footprint, "population": "FITTED",
             "pins": pin_map(pins),
         }
-    require(len(components) == 60, f"expected 60 PCB-PWR physical components; got {len(components)}")
+    require(len(components) == 62, f"expected 62 PCB-PWR physical components; got {len(components)}")
     return components
 
 
@@ -142,7 +142,7 @@ def main() -> int:
     components = catalog()
     placements = read_csv(PLACEMENT)
     by_ref = {row["RefDes"]: row for row in placements}
-    require(len(placements) == 60 and len(by_ref) == 60, "placement table must contain 60 unique rows")
+    require(len(placements) == 62 and len(by_ref) == 62, "placement table must contain 62 unique rows")
     require(set(by_ref) == set(components), "placement table/component authority mismatch")
     require(all(row["Side"] == "TOP" and row["Placement_Status"].startswith("PROVISIONAL_")
                 for row in placements), "placement rows must remain provisional top-side candidates")
@@ -196,7 +196,7 @@ def main() -> int:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     pcbnew.SaveBoard(str(OUT), board)
     print(f"PCB-PWR provisional placement candidate: {OUT.relative_to(ROOT)}")
-    print(f"components=60 nets={len(net_names)} layers=4 outline=90x60 mounting_holes=0")
+    print(f"components=62 nets={len(net_names)} layers=4 outline=90x60 mounting_holes=0")
     print("routing=ABSENT zones=ABSENT CAM=PROHIBITED DIM-003=OPEN")
     return 0
 

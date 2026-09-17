@@ -19,8 +19,8 @@ STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 OPEN_DIMENSIONS = ROOT / "mechanics/common/OPEN_DIMENSIONS.csv"
 
 EXPECTED_ZONE_COUNTS = Counter({
-    "INPUT_PROTECTION": 7, "CURRENT_SENSE": 5, "BUCK_3V8": 15,
-    "BUCK_3V3": 12, "AUX_1V8": 4, "CONTROL_INTERFACE": 4,
+    "INPUT_PROTECTION": 7, "CURRENT_SENSE": 5, "BUCK_3V8": 16,
+    "BUCK_3V3": 13, "AUX_1V8": 4, "CONTROL_INTERFACE": 4,
     "GROUND_JOIN": 3, "DFT_EDGE": 10,
 })
 
@@ -75,11 +75,11 @@ def close(actual: float, expected: float, message: str, tolerance: float = 0.002
 
 def main() -> int:
     placements = read_csv(PLACEMENT)
-    require(len(placements) == 60, "placement authority must contain exactly 60 rows")
+    require(len(placements) == 62, "placement authority must contain exactly 62 rows")
     require(all(all(value.strip() for value in row.values()) for row in placements),
             "placement authority contains a blank field")
     by_ref = {row["RefDes"]: row for row in placements}
-    require(len(by_ref) == 60, "duplicate placement RefDes")
+    require(len(by_ref) == 62, "duplicate placement RefDes")
     require(all(row["Side"] == "TOP" and row["Placement_Status"].startswith("PROVISIONAL_")
                 for row in placements), "placement state must stay provisional and top-side")
     require(Counter(row["Functional_Zone"] for row in placements) == EXPECTED_ZONE_COUNTS,
@@ -103,7 +103,7 @@ def main() -> int:
             "value": prop(instance, "Value"), "footprint": prop(instance, "Footprint"),
             "population": "DNP" if instance.dnp else "FITTED", "pins": pins,
         }
-    require(len(expected) == 60 and set(expected) == set(by_ref),
+    require(len(expected) == 62 and set(expected) == set(by_ref),
             "native schematic and placement physical sets differ")
     require(all(item["footprint"] for item in expected.values()),
             "native schematic still has a blank physical footprint")
@@ -114,7 +114,7 @@ def main() -> int:
             f"unexpected provisional copper stack: {copper}")
     close(float(board.general.thickness), 1.6, "provisional board thickness")
     footprints = {ref_of(item): item for item in board.footprints}
-    require(len(footprints) == len(board.footprints) == 60, "board must contain 60 unique references")
+    require(len(footprints) == len(board.footprints) == 62, "board must contain 62 unique references")
     require(set(footprints) == set(expected), "board and schematic reference sets differ")
 
     for ref, wanted in expected.items():
@@ -196,7 +196,7 @@ def main() -> int:
             "PCB-PWR capture-status interlock drift")
 
     print("PCB-PWR provisional placement-candidate independent audit PASS")
-    print("60 footprints; exact schematic nets; 90x60 four-layer canvas; routing/zones/holes absent")
+    print("62 footprints; exact schematic nets; 90x60 four-layer canvas; routing/zones/holes absent")
     print("DIM-003 request ready with 0/18 accepted; DRC/CAM/Review B/manufacturing remain prohibited")
     return 0
 
