@@ -59,7 +59,7 @@
     },
     {
       "path": "hardware/CONNECTOR_FREEZE_REV_A.csv",
-      "sha256": "06978f227e106a46b7d773ae8cb3adc2547fb88bac89bcf6debb408b3f08ceda"
+      "sha256": "6e1d5c066cd312542724dd400660a99e92ad85465556c017825893e62c3bf0d7"
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",

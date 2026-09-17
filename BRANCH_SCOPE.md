@@ -24,8 +24,8 @@
 
 - интеграционная версия: `DIONEA-INTEGRATION-v0.13`;
 - EVT-MB: `v1.3`, статус `OPEN`;
-- EVT-PRE-20: Rev.A от `0ef02fd7805b19802bc5027bd9a2fe8b1ed514f2`, статус `OPEN`;
+- EVT-PRE-20: Rev.A от `df1f0657f48a0f717176173da3fc8476b45728d0`, статус `OPEN`;
 - PCB-MAIN: hierarchy принята только как `ACCEPT_HIERARCHY_ONLY`; routing, Review B и manufacture открыты;
-- PCB-PWR: hierarchy принята; bounded F1 ECO и 20/20 физических тестов не закрыты;
+- PCB-PWR: hierarchy принята; bounded F1 ECO и 20/20 физических тестов не закрыты; `DIM-003` — 0/18, stackup/copper — 0/24 и 0/2 фабрик;
 - PCB-MIC: copper-return subgate принят; общий Review B открыт;
 - аппаратный EVT: `NOT RUN`.

@@ -22,7 +22,7 @@
 ## Текущий инженерный baseline EVT-PRE-20
 
 - исходная ветка: `evt-pre-20`;
-- зафиксированный SHA: `0ef02fd7805b19802bc5027bd9a2fe8b1ed514f2`;
+- зафиксированный SHA: `df1f0657f48a0f717176173da3fc8476b45728d0`;
 - аппаратная конфигурация: `EVT-PRE-20 Rev.A`, 20 станций, собственные PCB;
 - `PCB-MAIN`: десятистраничная hierarchy и pad/net equivalence приняты только как `ACCEPT_HIERARCHY_ONLY`; routing и Review B открыты;
 - `PCB-PWR`: пятистраничная hierarchy принята; целевой F1 `0451008.MRL`, native value ECO не применён, evidence 0/20;

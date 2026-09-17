@@ -28,11 +28,11 @@
     "layer_count_authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
     "layer_count_authority_sha256": "3774347b5cca2b09ef1949f08af22ac2e319db7b0d99bb63034a28f1dc590b80",
     "power_design_baseline": "hardware/POWER_DESIGN_BASELINE_REV_A.json",
-    "power_design_baseline_sha256": "d8077ea641aad41f8853c2744f07e2e19d5d22a046135e6f4310899922a75336",
+    "power_design_baseline_sha256": "e5ebbb2664382ea76139513853e1555336ea8e6f2e3ab5fe05ec80b4898e3065",
     "power_design_calculation": "hardware/POWER_DESIGN_CALC_REV_A.md",
-    "power_design_calculation_sha256": "b8f26621d5b921efb0e7d327182c334d97719fe1502fb7802a45f78f99bbb8a9",
+    "power_design_calculation_sha256": "29277ce95f758082e4681b7bed9d481f2fd37551035140e3bba2093c643bd1b3",
     "dim_003_request": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
-    "dim_003_request_sha256": "5ec0e2b95719aee6f631337767120bc3ec2a78c7f32ad2a0c558df7b400c68e2"
+    "dim_003_request_sha256": "c522fe4ed886117d2df1a4cdf5d4721aa7a02c1ceef00a6d7e042c6df992baa9"
   },
   "board_request_basis": {
     "provisional_outline_mm": [

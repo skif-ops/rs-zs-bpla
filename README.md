@@ -26,9 +26,9 @@
 | Область | Подтверждённый статус |
 |---|---|
 | EVT-MB v1.3 | Документы, host/структурные проверки и программная часть подготовлены; аппаратный стенд не испытан |
-| EVT-PRE-20 | Контрольный source commit `0ef02fd7805b`; конфигурация и воспроизводимые проверки актуальны |
+| EVT-PRE-20 | Контрольный source commit `df1f0657f48a`; конфигурация и воспроизводимые проверки актуальны |
 | PCB-MAIN | Десятистраничная hierarchy принята только на уровне `ACCEPT_HIERARCHY_ONLY`; routing, Review B и выпуск в изготовление открыты |
-| PCB-PWR | Пятистраничная hierarchy принята только на уровне hierarchy; native F1 ещё `0451005`, целевой `0451008.MRL`, физические тесты 0/20 |
+| PCB-PWR | Пятистраничная hierarchy принята только на уровне hierarchy; native F1 ещё `0451005`, целевой `0451008.MRL`, физические тесты 0/20; `DIM-003` — 0/18, stackup/copper — 0/24 и 0/2 фабрик |
 | PCB-MIC | Copper-return subgate принят; общий Review B, CAM/DFM и manufacturing release открыты |
 | «Мухоед» | Последний диагностический replay: 3/3 обнаружения и 15/15 положительных окон; operational type — UNKNOWN |
 | Производственный BOM | 295 engineering-строк и 124 procurement-строки; QG-1 `PASS`, QG-2 `BLOCKED` |

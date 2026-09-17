@@ -14,7 +14,7 @@
 |---|---|---|
 | Предыдущий интеграционный baseline v0.12 | `main` / `develop` | `f3411e51938aa1423fdbaeeef9585aeea385c239` |
 | Макетный EVT-MB v1.3, без изменений | `evt-mb` | `7d0f7f182e342cd3a3c6ba6f28bc6f138c71c4e1` |
-| Предсерийный EVT-PRE-20 Rev.A | `evt-pre-20` | `0ef02fd7805b19802bc5027bd9a2fe8b1ed514f2` |
+| Предсерийный EVT-PRE-20 Rev.A | `evt-pre-20` | `df1f0657f48a0f717176173da3fc8476b45728d0` |
 
 ## Зафиксированная конфигурация
 
