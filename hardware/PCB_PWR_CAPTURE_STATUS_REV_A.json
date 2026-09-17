@@ -94,6 +94,7 @@
         "presentation_only": false,
         "electrical_change": true,
         "added_refs": ["C20", "C21"],
+        "presentation_remediation": "BOTTOM_JUSTIFIED_NET_LABELS_AND_COMPACT_TITLE_BLOCKS",
         "pin_net_semantic_sha256_before": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
         "pin_net_semantic_sha256_after": "84a35aa607bac3ee65b5d8f60684e958277b2fa5a7ed01f810af32f0b52b73f7"
       },

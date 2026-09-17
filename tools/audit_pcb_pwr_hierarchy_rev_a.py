@@ -35,6 +35,7 @@ EXPECTED_SHEETS = {
     "Input protection and monitor": {
         "file": "PCB-PWR_01_INPUT_PROTECTION.kicad_sch",
         "page": "2",
+        "title": "Input protection + monitor",
         "refs": {
             "J1", "F1", "D1", "U1", "Q1", "C1", "C9", "C10", "C13",
             "RSH1", "U2", "C2", "TP1", "TP2", "TP3", "TP8", "TP9",
@@ -44,6 +45,7 @@ EXPECTED_SHEETS = {
     "3V8 modem rail": {
         "file": "PCB-PWR_02_3V8_MODEM.kicad_sch",
         "page": "3",
+        "title": "3V8 modem rail",
         "refs": {
             "U3", "L1", "C3", "C4", "C11", "C14", "C15", "C16", "C20",
             "R1", "R2", "R3", "R4", "R5", "R6", "R15", "TP4", "TP5",
@@ -52,6 +54,7 @@ EXPECTED_SHEETS = {
     "3V3 digital rail": {
         "file": "PCB-PWR_03_3V3_DIGITAL.kicad_sch",
         "page": "4",
+        "title": "3V3 AON rail",
         "refs": {
             "U4", "L2", "C5", "C6", "C12", "C17", "C18", "C19", "C21",
             "R7", "R8", "R9", "R10", "R12", "R13", "R14", "TP6",
@@ -61,6 +64,7 @@ EXPECTED_SHEETS = {
     "1V8 auxiliary and MAIN harness": {
         "file": "PCB-PWR_04_AUX_HARNESS.kicad_sch",
         "page": "5",
+        "title": "1V8 + MAIN harness",
         "refs": {"U5", "C7", "C8", "R11", "NT1", "NT2", "NT3", "J2", "TP7"},
     },
 }
@@ -166,6 +170,9 @@ def main() -> int:
             "root overview must not bypass sheet pins with global/hierarchical labels")
     require(root.paper.paperSize == "A3" and not root.paper.portrait,
             "root overview must use the controlled A3 landscape review page")
+    require(root.titleBlock is not None and
+            root.titleBlock.title == "PCB-PWR system overview",
+            "root compact title-block control drift")
     require(root.texts and all(100.0 <= float(item.position.X) <= 320.0 for item in root.texts),
             "root review note is not centered inside the printable area")
 
@@ -184,8 +191,9 @@ def main() -> int:
                 f"extra={sorted(refs-expected['refs'])}")
         sheet_refs[name] = refs
         require(document.schematic.titleBlock is not None and
+                document.schematic.titleBlock.title == expected["title"] and
                 "Human-readable hierarchy" in document.schematic.titleBlock.comments.get(1, ""),
-                f"{name}: hierarchy/review title control missing")
+                f"{name}: compact hierarchy/review title control missing")
         require(document.schematic.texts and document.schematic.graphicalItems,
                 f"{name}: readable note or explicit wires missing")
         require(document.schematic.paper.paperSize == "A3" and
@@ -207,6 +215,11 @@ def main() -> int:
                                    document.schematic.hierarchicalLabels)
                     for label in labels),
                 f"{name}: pin/net label font regressed below the legibility floor")
+        require(all(label.effects.justify.vertically == "bottom"
+                    for labels in (document.schematic.labels,
+                                   document.schematic.hierarchicalLabels)
+                    for label in labels),
+                f"{name}: pin/net text must remain above its connection wire")
 
         root_sheet = root_sheet_by_name[name]
         instance_paths = [path for project in root_sheet.instances for path in project.paths]
@@ -229,6 +242,8 @@ def main() -> int:
             require(angle == expected_angle,
                     f"{name}.{pin.name}: KiCad sheet-pin orientation {angle} would move "
                     f"the electrical endpoint to the opposite edge (expected {expected_angle})")
+            require(pin.effects.justify.vertically == "bottom",
+                    f"{name}.{pin.name}: sheet-pin text must remain above its connection wire")
             require(on_grid(y), f"{name}.{pin.name}: sheet pin is off the 2.54 mm review grid")
             pin_y.append(y)
             require(root_pin_net(model, root_sheet, pin) == {str(pin.name)},
@@ -406,7 +421,7 @@ def main() -> int:
         "cross_sheet_nets": len(cross_nets),
         "hierarchical_labels": total_hier_labels,
         "pin_net_semantic_sha256": semantic_sha256,
-        "readability_profile": "PASS_LARGER_TEXT_HORIZONTAL_PASSIVES_EXPANDED_FUNCTIONAL_BODIES",
+        "readability_profile": "PASS_BOTTOM_JUSTIFIED_NET_TEXT_COMPACT_TITLES_HORIZONTAL_PASSIVES_EXPANDED_FUNCTIONAL_BODIES",
         "erc_native_kicad_9": "PENDING_COMMIT_BOUND_POST_CINHF_ECO",
         "hierarchy_pdf_evidence": "PENDING_COMMIT_BOUND_POST_CINHF_ECO",
         "pin_net_review_a": "RETAINED_BY_EXACT_ELECTRICAL_EQUIVALENCE",
@@ -459,6 +474,7 @@ def main() -> int:
         "presentation_only": False,
         "electrical_change": True,
         "added_refs": ["C20", "C21"],
+        "presentation_remediation": "BOTTOM_JUSTIFIED_NET_LABELS_AND_COMPACT_TITLE_BLOCKS",
         "pin_net_semantic_sha256_before": PRE_CINHF_SEMANTIC_SHA256,
         "pin_net_semantic_sha256_after": semantic_sha256,
     }

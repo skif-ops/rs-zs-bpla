@@ -29,3 +29,10 @@ Adding C20/C21 changes the electrical pin/net set and supersedes all earlier
 PCB-PWR ERC/PDF and hierarchy decisions for the active source. A fresh
 commit-bound KiCad 9 ERC, five-page PDF visual preflight and independent
 `ACCEPT_HIERARCHY_ONLY` are required. Routing and manufacturing remain false.
+
+The first post-ECO PDF candidate was rejected during visual preflight: net-label
+text still crossed its connection wire and long child-sheet titles entered the
+revision column. The deterministic hierarchy generator now bottom-justifies all
+visible local/hierarchical labels and uses compact title-block titles. This is a
+presentation-only remediation on top of the C20/C21 electrical ECO and still
+requires fresh commit-bound ERC/PDF evidence.

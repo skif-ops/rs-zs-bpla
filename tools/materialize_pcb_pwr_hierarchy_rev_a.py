@@ -19,7 +19,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
-from kiutils.items.common import Effects, Font, Position, Property, TitleBlock
+from kiutils.items.common import Effects, Font, Justify, Position, Property, TitleBlock
 from kiutils.items.schitems import (
     Connection,
     HierarchicalLabel,
@@ -110,6 +110,13 @@ SHEETS = (
         (96.52, 152.40),
     ),
 )
+
+COMPACT_TITLES = {
+    "input": "Input protection + monitor",
+    "modem": "3V8 modem rail",
+    "digital": "3V3 AON rail",
+    "harness": "1V8 + MAIN harness",
+}
 
 
 # Functional pin geometry for the manufacturer-specific devices represented by
@@ -369,7 +376,11 @@ def local_label(
     return LocalLabel(
         text=net,
         position=Position(X=at[0], Y=at[1], angle=angle),
-        effects=Effects(font=Font(height=font_size, width=font_size), hide=hidden),
+        effects=Effects(
+            font=Font(height=font_size, width=font_size),
+            justify=Justify(vertically="bottom"),
+            hide=hidden,
+        ),
         uuid=stable_uuid(f"label:{token}"),
     )
 
@@ -379,7 +390,10 @@ def hierarchy_label(net: str, at: tuple[float, float], angle: int, token: str) -
         text=net,
         shape="passive",
         position=Position(X=at[0], Y=at[1], angle=angle),
-        effects=Effects(font=Font(height=LABEL_FONT_MM, width=LABEL_FONT_MM)),
+        effects=Effects(
+            font=Font(height=LABEL_FONT_MM, width=LABEL_FONT_MM),
+            justify=Justify(vertically="bottom"),
+        ),
         uuid=stable_uuid(f"hier-label:{token}"),
     )
 
@@ -414,7 +428,7 @@ def make_child(
     child.paper.paperSize = PAGE_SIZE
     child.paper.portrait = False
     child.titleBlock = title_block(
-        f"Dioneya EVT-PRE-20 PCB-PWR Rev.A - {spec.name}",
+        COMPACT_TITLES[spec.key],
         f"Functional sheet {spec.page} of 5",
     )
 
@@ -549,7 +563,10 @@ def make_sheet(spec: SheetSpec, cross_nets: set[str], sheet_uuid: str) -> Hierar
                 name=net,
                 connectionType="passive",
                 position=Position(X=pin_x, Y=pin_y, angle=angle),
-                effects=Effects(font=Font(height=0.9, width=0.9)),
+                effects=Effects(
+                    font=Font(height=0.9, width=0.9),
+                    justify=Justify(vertically="bottom"),
+                ),
                 uuid=stable_uuid(f"sheet-pin:{spec.key}:{net}"),
             ))
     return sheet
@@ -564,7 +581,7 @@ def make_root(flat: Schematic, sheet_nets: dict[str, set[str]]) -> Schematic:
     root.paper.paperSize = PAGE_SIZE
     root.paper.portrait = False
     root.titleBlock = title_block(
-        "Dioneya EVT-PRE-20 PCB-PWR Rev.A - System overview",
+        "PCB-PWR system overview",
         "Root sheet 1 of 5",
     )
     root.sheetInstances = [HierarchicalSheetInstance(instancePath="/", page="1")]
