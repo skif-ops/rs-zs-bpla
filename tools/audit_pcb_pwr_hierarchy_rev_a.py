@@ -267,6 +267,10 @@ def main() -> int:
                         float(item.effects.font.width) >= REVIEW_TEXT_FONT_MIN_MM
                         for item in visible.values()),
                     f"{ref}: reference/value font regressed below the legibility floor")
+            require(all((int(item.position.angle or 0) +
+                         int(record.instance.position.angle or 0)) % 180 == 0
+                        for item in visible.values()),
+                    f"{ref}: reference/value fields do not render horizontally")
             require(all(item.key in {"Reference", "Value"} or item.effects.hide
                         for item in record.instance.properties),
                     f"{ref}: footprint/datasheet field leaked onto the review drawing")
@@ -461,10 +465,10 @@ def main() -> int:
         "schematic_pdf": None,
         "schematic_source_sha256": {
             "PCB-PWR.kicad_sch": "4f500944ab55fa98f68cd19e613e6eda73c7c07fcb5e72cebee4b6baf8f07601",
-            "PCB-PWR_01_INPUT_PROTECTION.kicad_sch": "e9d9bad37547b0551dcf09217bebfa346593bd74db97a10f151aa36ffee18b4d",
-            "PCB-PWR_02_3V8_MODEM.kicad_sch": "07c2dd0c0b56fe501606d5803ee18be0bcd6f34ffc2f4f3ddbf006e539ce0516",
-            "PCB-PWR_03_3V3_DIGITAL.kicad_sch": "0d7c961c05e8f6d22353647e5fc7e3b4a9a377bc9eb2466e9f13ba4d67c81194",
-            "PCB-PWR_04_AUX_HARNESS.kicad_sch": "69c96fdf07955ce630155078fe7b7cdbf84a9b66d05c710a917b33bacd9c1b90",
+            "PCB-PWR_01_INPUT_PROTECTION.kicad_sch": "00af3aa086a7ca0f35f37f916607f4b6f5e6198411467173ea1486a126e0aaf9",
+            "PCB-PWR_02_3V8_MODEM.kicad_sch": "d01bcda751256c7bcc5f94286772ce499a1146fb36c35b2f851b7e468d9f5c74",
+            "PCB-PWR_03_3V3_DIGITAL.kicad_sch": "111f7c060aa6d52c3c2dc244258139504529f519ccb6c88f5130617acc723612",
+            "PCB-PWR_04_AUX_HARNESS.kicad_sch": "63d742e9a1b51b1b87928cb2491ba719f2d2ad35c3f1f38cf353901c21f00e58",
         },
         "independent_human_review": None,
         "routing_authorized": False,

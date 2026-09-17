@@ -278,19 +278,29 @@ def layout_properties(instance, symbol) -> None:
         clearance = vertical_extent + 5.08
     x = float(instance.position.X)
     y = float(instance.position.Y)
+    # KiCad composes field rotation with the parent symbol rotation.  Counter-
+    # rotate fields so long MPN/value strings remain horizontal even when a
+    # passive glyph is rotated 90 degrees for left-to-right connectivity.
+    property_angle = (-int(instance.position.angle or 0)) % 360
     for item in instance.properties:
         if instance.libId in HEADER_PROPERTY_SYMBOLS and item.key == "Reference":
-            item.position = Position(X=x, Y=round(y - clearance - 3.05, 4), angle=0)
+            item.position = Position(
+                X=x, Y=round(y - clearance - 3.05, 4), angle=property_angle)
         elif instance.libId in HEADER_PROPERTY_SYMBOLS and item.key == "Value":
-            item.position = Position(X=x, Y=round(y - clearance, 4), angle=0)
+            item.position = Position(
+                X=x, Y=round(y - clearance, 4), angle=property_angle)
         elif instance.libId in SIDE_PROPERTY_SYMBOLS and item.key == "Reference":
-            item.position = Position(X=round(x + 33.02, 4), Y=round(y + 15.24, 4), angle=0)
+            item.position = Position(
+                X=round(x + 33.02, 4), Y=round(y + 15.24, 4), angle=property_angle)
         elif instance.libId in SIDE_PROPERTY_SYMBOLS and item.key == "Value":
-            item.position = Position(X=round(x + 33.02, 4), Y=round(y + 18.29, 4), angle=0)
+            item.position = Position(
+                X=round(x + 33.02, 4), Y=round(y + 18.29, 4), angle=property_angle)
         elif item.key == "Reference":
-            item.position = Position(X=x, Y=round(y - clearance, 4), angle=0)
+            item.position = Position(
+                X=x, Y=round(y - clearance, 4), angle=property_angle)
         elif item.key == "Value":
-            item.position = Position(X=x, Y=round(y + clearance, 4), angle=0)
+            item.position = Position(
+                X=x, Y=round(y + clearance, 4), angle=property_angle)
         if item.key in {"Reference", "Value"}:
             item.effects.font = Font(height=PROPERTY_FONT_MM, width=PROPERTY_FONT_MM)
             item.effects.hide = False
