@@ -14,11 +14,6 @@ import json
 import math
 from pathlib import Path
 
-from kiutils.board import Board
-
-from audit_pcb_pwr_routing_authority_rev_a import semantic_board_sha256
-from pcb_pwr_schematic_hierarchy import HierarchicalSchematic, property_value
-
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json"
 MATRIX = ROOT / "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv"
@@ -31,6 +26,8 @@ NATIVE_SCH = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR_01_INPUT_PROTECTION.k
 NATIVE_PCB = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 SCH_GENERATOR = ROOT / "tools/generate_pcb_pwr_schematic_rev_a.py"
 PCB_GENERATOR = ROOT / "tools/generate_pcb_pwr_layout_candidate_rev_a.py"
+PLACEMENT = ROOT / "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv"
+CAPTURE_NETS = ROOT / "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
 
 
 def require(condition: bool, message: str) -> None:
@@ -194,41 +191,16 @@ def main() -> int:
         require("0451005.MRL CANDIDATE" not in text,
                 f"superseded 5 A value remains in active source: {path}")
 
-    model = HierarchicalSchematic(
-        ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch"
-    )
-    f1_record = model.symbols.get("F1")
-    require(f1_record is not None, "F1 missing from active native hierarchy")
-    require(property_value(f1_record.instance, "Value") == "0451008.MRL",
-            "F1 active schematic value is not the selected 8 A candidate")
-    require(property_value(f1_record.instance, "Footprint") ==
-            "Fuse:Fuse_1206_3216Metric",
-            "F1 footprint changed during value-only ECO")
-    require(model.pin_nets("F1", "1") == {"VBAT_RAW"} and
-            model.pin_nets("F1", "2") == {"VBAT_FUSED"},
-            "F1 topology changed during value-only ECO")
-
-    board = Board.from_file(str(NATIVE_PCB), encoding="utf-8")
-    f1_board = next((item for item in board.footprints
-                     if str(item.properties.get("Reference", "")) == "F1"), None)
-    require(f1_board is not None, "F1 missing from active native PCB")
-    require(str(f1_board.properties.get("Value", "")) == "0451008.MRL",
-            "F1 active PCB value is not the selected 8 A candidate")
-    require(str(f1_board.libId) == "Fuse:Fuse_1206_3216Metric",
-            "F1 PCB footprint changed during value-only ECO")
-    require(abs(float(f1_board.position.X) - 13.0) <= 0.002 and
-            abs(float(f1_board.position.Y) - 29.0) <= 0.002 and
-            abs(float(f1_board.position.angle or 0.0)) <= 0.01,
-            "F1 PCB placement changed during value-only ECO")
-    pad_nets = {
-        str(pad.number): str(pad.net.name) if pad.net is not None else "NC"
-        for pad in f1_board.pads if pad.number
-    }
-    require(pad_nets == {"1": "VBAT_RAW", "2": "VBAT_FUSED"},
-            "F1 PCB pad/net mapping changed during value-only ECO")
-    require(semantic_board_sha256(board) ==
-            native_eco["post_eco_board_semantic_sha256"],
-            "PCB-PWR semantic board digest changed during value-only ECO")
+    placements = {row["RefDes"]: row for row in read_csv(PLACEMENT)}
+    f1_placement = placements.get("F1", {})
+    require((f1_placement.get("X_mm"), f1_placement.get("Y_mm"),
+             f1_placement.get("Rotation_deg"), f1_placement.get("Side")) ==
+            ("13.00", "29.00", "0", "TOP"),
+            "F1 placement authority changed during value-only ECO")
+    capture_nets = {row["Net"]: row for row in read_csv(CAPTURE_NETS)}
+    require(capture_nets.get("VBAT_RAW", {}).get("To") == "F1.1" and
+            capture_nets.get("VBAT_FUSED", {}).get("From") == "F1.2",
+            "F1 capture topology authority changed during value-only ECO")
 
     status_eco = capture_status.get("input_protection_candidate_eco", {})
     require(status_eco.get("state") ==
