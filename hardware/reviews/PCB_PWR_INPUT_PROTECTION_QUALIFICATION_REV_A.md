@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A input-protection qualification
 
-Status: `CONTROLLED PLAN / F1 NATIVE VALUE ECO APPLIED / HIERARCHY LEGIBILITY REMEDIATION COMMITTED / COMMIT-BOUND ERC AND PDF EVIDENCE PASS / HUMAN REVIEW AND PHYSICAL EVIDENCE PENDING / NOT FOR MANUFACTURE`
+Status: `CONTROLLED PLAN / F1 NATIVE VALUE ECO APPLIED / C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC AND PDF EVIDENCE PASS / HUMAN REVIEW AND PHYSICAL EVIDENCE PENDING / NOT FOR MANUFACTURE`
 
 Configuration: `EVT-PRE-20 Rev.A`
 
@@ -8,9 +8,10 @@ This packet controls the PCB-PWR input fuse and TVS decision. The bounded F1
 value-only ECO is applied without changing footprint, placement, topology, nets
 or pad mapping. The previously accepted five-page source remains historical
 evidence only. The post-ECO PDF was superseded after independent review found
-text/symbol overlap. Fresh commit-bound ERC/PDF evidence for the presentation-only
-legibility remediation now passes; a new independent human hierarchy decision
-is required before any PCB assembly procurement.
+text/symbol overlap. The later C20/C21 electrical ECO superseded the first
+remediated artifact. Fresh commit-bound ERC/PDF evidence for the active source
+now passes; a new independent human hierarchy decision is required before any
+PCB assembly procurement.
 
 ## 1. Controlled decision
 
@@ -30,7 +31,7 @@ The exact EVT qualification pair is:
 
 | Function | Candidate | Controlled rating | State |
 |---|---|---|---|
-| F1 PCB input fuse | Littelfuse `0451008.MRL` | 8 A; 7.7 mOhm nominal cold resistance; 20.23 A²s nominal melting I²t; 400 A at 32 VDC interrupting rating | Native value ECO and fresh post-legibility ERC/PDF evidence pass; human review and physical qualification pending |
+| F1 PCB input fuse | Littelfuse `0451008.MRL` | 8 A; 7.7 mOhm nominal cold resistance; 20.23 A²s nominal melting I²t; 400 A at 32 VDC interrupting rating | Native value ECO retained through C20/C21 ECO; active-source ERC/PDF evidence passes; human review and physical qualification pending |
 | D1 transient clamp | Littelfuse `SMBJ18A` | 18 V standoff; 20.0–22.1 V breakdown; 29.2 V maximum clamp at 20.6 A; 600 W at 10/1000 us | Selected for qualification; measured transient envelope pending |
 
 At 5 A the fuse's nominal cold loss is:
@@ -64,7 +65,15 @@ with zero violations on five sheets and PDF SHA-256
 `16afef6ecb337109f2a61318c9459167c6d06f4b74534b656c97884c1fed57dd`
 covers five visually preflighted A3 landscape pages without text/symbol/
 connection overlap or clipping. A repeat independent hierarchy decision remains
-mandatory.
+mandatory. The subsequent C20/C21 CIN_HF electrical ECO retains F1 and changes
+the active pin/net digest. For exact source commit
+`e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a`, Schematic Gate
+[#35217048575](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35217048575)
+passes KiCad 9.0.9 ERC with zero violations on five sheets. Its five-page A3
+PDF SHA-256 is
+`7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`
+and passes visual preflight without text/symbol/connection overlap or clipping.
+The repeat independent hierarchy decision remains mandatory.
 
 Until then:
 

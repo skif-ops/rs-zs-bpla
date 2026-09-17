@@ -1,6 +1,6 @@
 # PCB-PWR hierarchy review response - 2026-09-17
 
-Status: `CIN_HF ECO APPLIED / COMMIT-BOUND ERC+PDF PENDING / HUMAN REVIEW PENDING / NOT FOR MANUFACTURE`
+Status: `CIN_HF ECO APPLIED / COMMIT-BOUND ERC+PDF PASS / HUMAN REVIEW PENDING / NOT FOR MANUFACTURE`
 
 Scope: disposition of the independent read-only review of the five-sheet
 PCB-PWR hierarchy. This record does not authorize routing, procurement, CAM or
@@ -26,13 +26,20 @@ manufacture.
 ## Release boundary
 
 Adding C20/C21 changes the electrical pin/net set and supersedes all earlier
-PCB-PWR ERC/PDF and hierarchy decisions for the active source. A fresh
-commit-bound KiCad 9 ERC, five-page PDF visual preflight and independent
-`ACCEPT_HIERARCHY_ONLY` are required. Routing and manufacturing remain false.
+PCB-PWR ERC/PDF and hierarchy decisions for the active source. For source
+commit `e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a`, commit-bound KiCad 9.0.9
+ERC passes with zero violations across all five sheets. The five-page A3 PDF
+SHA-256 is
+`7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`;
+visual preflight passes without text/symbol/connection overlap or clipping. A
+new independent `ACCEPT_HIERARCHY_ONLY` remains required. Routing and
+manufacturing remain false.
 
 The first post-ECO PDF candidate was rejected during visual preflight: net-label
 text still crossed its connection wire and long child-sheet titles entered the
 revision column. The deterministic hierarchy generator now bottom-justifies all
 visible local/hierarchical labels and uses compact title-block titles. This is a
 presentation-only remediation on top of the C20/C21 electrical ECO and still
-requires fresh commit-bound ERC/PDF evidence.
+required fresh commit-bound ERC/PDF evidence. Schematic Gate
+[#35217048575](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35217048575)
+now supplies that evidence; independent human review is still open.

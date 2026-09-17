@@ -460,7 +460,7 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
 
     review_text = REVIEW_B.read_text(encoding="utf-8")
     for marker in (
-        "Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC AND PDF EVIDENCE PENDING / HUMAN HIERARCHY REVIEW PENDING / REVIEW B OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`",
+        "Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC AND PDF EVIDENCE PASS / HUMAN HIERARCHY REVIEW PENDING / REVIEW B OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`",
         "Historical commit-bound native KiCad 9.0.9 evidence",
         "decision `ACCEPT_HIERARCHY_ONLY`",
         "- [x] All 31 native/capture nets",

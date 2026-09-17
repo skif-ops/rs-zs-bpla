@@ -86,8 +86,14 @@ SHA-256 is
 `16afef6ecb337109f2a61318c9459167c6d06f4b74534b656c97884c1fed57dd`
 and all five pages pass visual preflight without text/symbol/connection overlap
 or clipping. The later C20/C21 local-CIN_HF electrical ECO supersedes that
-artifact for the active source; fresh commit-bound ERC/PDF and a new independent
-hierarchy decision are open. Routing and
+artifact. For active source commit
+`e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a`, Schematic Gate
+[#35217048575](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35217048575)
+passes KiCad 9.0.9 ERC with zero violations on all five sheets. Its five-page A3
+PDF SHA-256 is
+`7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`;
+all pages pass visual preflight without text/symbol/connection overlap or
+clipping. A new independent hierarchy decision remains open. Routing and
 manufacturing release remain blocked by the separate gates below.
 
 The PCB-PWR input-protection desk review rejects the signed native F1 value
@@ -99,8 +105,9 @@ controlled BOM and qualification packet select exact candidate
 PCB and generators with footprint, placement, topology, nets and pad mapping
 retained. This does not extend the prior hierarchy acceptance. The earlier
 post-ECO PDF is superseded by the legibility remediation, and the later C20/C21
-electrical ECO supersedes the remediated artifact. Fresh active-source KiCad 9
-ERC/PDF evidence and independent human hierarchy review remain mandatory. The
+electrical ECO supersedes the first remediated artifact. Fresh active-source
+KiCad 9 ERC/PDF evidence now passes; independent human hierarchy review remains
+mandatory. The
 input-protection matrix has `1/20` accepted rows
 (`PWR-IPQ-003`); PCBA procurement and manufacturing release remain prohibited.
 

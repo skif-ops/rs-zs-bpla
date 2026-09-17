@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A Review B checklist
 
-Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC AND PDF EVIDENCE PENDING / HUMAN HIERARCHY REVIEW PENDING / REVIEW B OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
+Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC AND PDF EVIDENCE PASS / HUMAN HIERARCHY REVIEW PENDING / REVIEW B OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
 
 Review B is independent from the completed pin/net Review A. Only the historical
 bounded hierarchy subgate is signed; the active C20/C21 ECO is unsigned and this
@@ -42,8 +42,15 @@ checklist contains no routing, CAM or manufacturing-release assertion.
   covers five A3 landscape pages; visual preflight found no text/symbol/
   connection overlap or clipping. Independent review of the remediated drawing
   is pending. The subsequent electrical ECO adds C20/C21 local 100 nF/50 V
-  input capacitors at U3/U4 and therefore supersedes the 6ba3ba5 evidence too;
-  fresh commit-bound ERC/PDF and independent human review are pending.
+  input capacitors at U3/U4 and therefore supersedes the 6ba3ba5 evidence too.
+  For active source commit
+  `e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a`, Schematic Gate
+  [#35217048575](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35217048575)
+  passes KiCad 9.0.9 ERC with zero violations on all five sheets. PDF SHA-256
+  `7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`
+  covers five A3 landscape pages; independent visual preflight found no
+  text/symbol/connection overlap or clipping. Independent human review of this
+  exact active source and PDF remains pending.
 - Native PCB: provisional 90 x 60 x 1.6 mm, four copper layers, 62 footprints,
   zero mounting holes, zero traces/vias/zones.
 - Fitted-body 2D clearance: `PASS`; 44/44 fitted footprints have courtyards,
@@ -62,8 +69,9 @@ checklist contains no routing, CAM or manufacturing-release assertion.
 - Input protection: active native F1 is Littelfuse `0451008.MRL` and target D1
   remains `SMBJ18A`. The bounded value-only ECO is applied with footprint,
   placement, topology and nets retained. The later C20/C21 electrical ECO leaves
-  F1 unchanged but requires a new active-source ERC/PDF artifact and hierarchy
-  review; 19 of 20 input-protection qualification rows remain open.
+  F1 unchanged. Its active-source ERC/PDF artifact passes, while the new human
+  hierarchy review remains open; 19 of 20 input-protection qualification rows
+  remain open.
   PCBA procurement is prohibited.
 
 ## 2. Review-B gate
@@ -100,9 +108,11 @@ checklist contains no routing, CAM or manufacturing-release assertion.
 - [x] TI SNAS877 confirms exact `LMR604403SRAKR` supports both fixed 3.3 V and
   adjustable modes; U3's 26.3 kOhm parallel divider selects adjustable 3.8 V
   and U4's direct FB-VOUT connection selects fixed 3.3 V.
-- [ ] C20/C21 local 100 nF/50 V CIN_HF are present at U3/U4; the new five-page
-  source passes commit-bound KiCad 9 ERC/PDF visual preflight and a new
-  independent hierarchy review accepts that exact commit and PDF hash.
+- [x] C20/C21 local 100 nF/50 V CIN_HF are present at U3/U4, and the new
+  five-page source passes commit-bound KiCad 9 ERC plus PDF visual preflight.
+- [ ] A new independent hierarchy review accepts exact source commit
+  `e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a` and PDF SHA-256
+  `7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`.
 - [ ] Conducted-emissions, RF coexistence and signed input-filter/no-filter
   decision rows `EVT-PWR-02/03/04` pass before routing.
 - [ ] All 20 rows in `PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv` pass,
@@ -140,8 +150,8 @@ checklist contains no routing, CAM or manufacturing-release assertion.
 `2026-09-16` for source commit `2a973f6856aa115aa59323d619be985578780682`
 and PDF SHA-256 `7a1eee774d6a0dd03e6cb72935824f5a7d2af4bebe0e37ad739f61eb8d32a1f4`.
 The active source includes the later C20/C21 electrical ECO and has a new exact
-pin/net semantic digest. Fresh commit-bound KiCad 9 ERC/PDF evidence and
-independent human review are pending. Fitted-body 2D
+pin/net semantic digest. Commit-bound KiCad 9 ERC/PDF evidence passes;
+independent human review remains pending. Fitted-body 2D
 clearance, constraint coverage and the
 internal DIM-003 and two-fabricator stackup/copper requests remain valid. The
 response registers remain `0/18` and `0/24` with `0/2` accepted fabricator sets.

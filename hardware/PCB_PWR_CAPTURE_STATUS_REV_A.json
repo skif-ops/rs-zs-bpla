@@ -2,12 +2,12 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-PWR",
-  "release_state": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS_CINHF_ECO_APPLIED_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PENDING_HUMAN_REVIEW_PENDING_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_COPPER_REQUESTS_READY_CANDIDATE",
+  "release_state": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS_CINHF_ECO_APPLIED_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_COPPER_REQUESTS_READY_CANDIDATE",
   "manufacturing_release": false,
   "native_schematic": {
     "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
     "status": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS",
-    "erc_status": "PENDING_KICAD_9_POST_CINHF_ECO_COMMIT_BOUND_EVIDENCE_HUMAN_REVIEW_PENDING",
+    "erc_status": "PASS_KICAD_9_POST_CINHF_ECO_COMMIT_BOUND_EVIDENCE_HUMAN_REVIEW_PENDING",
     "page_count": 5,
     "functional_child_sheets": 4,
     "child_paths": [
@@ -22,7 +22,7 @@
     "connectivity_reader": "tools/pcb_pwr_schematic_hierarchy.py",
     "independent_audit": "tools/audit_pcb_pwr_hierarchy_rev_a.py",
     "control": {
-      "state": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PENDING_HUMAN_REVIEW_PENDING",
+      "state": "PASS_HUMAN_READABLE_HIERARCHY_ELECTRICAL_EQUIVALENCE_CINHF_ECO_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING",
       "pages": 5,
       "functional_child_sheets": 4,
       "symbols": 65,
@@ -32,9 +32,9 @@
       "hierarchical_labels": 26,
       "pin_net_semantic_sha256": "84a35aa607bac3ee65b5d8f60684e958277b2fa5a7ed01f810af32f0b52b73f7",
       "pin_net_review_a_retained": true,
-      "native_kicad_9_erc_pass": false,
-      "committed_erc_evidence": false,
-      "committed_pdf_evidence": false,
+      "native_kicad_9_erc_pass": true,
+      "committed_erc_evidence": true,
+      "committed_pdf_evidence": true,
       "independent_human_review_complete": false,
       "prior_evidence_superseded_by_f1_value_eco": true,
       "prior_evidence_superseded_by_legibility_remediation": true,
@@ -88,7 +88,7 @@
       "manufacturing_release": false
     },
     "current_evidence": {
-      "status": "PENDING_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE",
+      "status": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_REVIEW_PENDING",
       "change": {
         "reason": "TI_LMR60440_TABLE_8_3_LOCAL_CIN_HF_ECO",
         "presentation_only": false,
@@ -98,17 +98,38 @@
         "pin_net_semantic_sha256_before": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
         "pin_net_semantic_sha256_after": "84a35aa607bac3ee65b5d8f60684e958277b2fa5a7ed01f810af32f0b52b73f7"
       },
-      "source_commit_sha": null,
-      "source_tree_sha": null,
-      "schematic_gate_run": null,
-      "ci_run": null,
-      "pcb_native_gate_run": null,
-      "artifact": null,
-      "artifact_id": null,
-      "artifact_digest": null,
-      "erc": null,
-      "schematic_pdf": null,
-      "schematic_source_sha256": null,
+      "source_commit_sha": "e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a",
+      "source_tree_sha": "0d5f87c81bbda962b53088d69cd433c810ef2fc4",
+      "schematic_gate_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35217048575",
+      "ci_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35218795600",
+      "pcb_native_gate_run": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35218795606",
+      "artifact": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35217048575/artifacts/10495663427",
+      "artifact_id": 10495663427,
+      "artifact_digest": "sha256:f29dfa4e0be9c25f8023e7d5218a97a28db70b0a1059eaca0141f699f46e64d3",
+      "erc": {
+        "path": "artifacts/kicad-native/PCB-PWR/erc.json",
+        "sha256": "68c18cb8e910ed05774766fa68fb2ed502cf425fc550cda0b4385ad2fb52e1ce",
+        "kicad_version": "9.0.9",
+        "sheets": 5,
+        "violations": 0
+      },
+      "schematic_pdf": {
+        "path": "artifacts/kicad-native/PCB-PWR/PCB-PWR_schematic.pdf",
+        "sha256": "7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130",
+        "pages": 5,
+        "page_size": "A3",
+        "orientation": "landscape",
+        "file_size_bytes": 616641,
+        "pdf_version": "1.5",
+        "visual_preflight": "PASS_ALL_5_PAGES_NO_TEXT_SYMBOL_OR_CONNECTION_OVERLAP_NO_CLIPPING"
+      },
+      "schematic_source_sha256": {
+        "PCB-PWR.kicad_sch": "003b715f48c4f234159877a8be705ff3b5bc716d1c280130d4e5c7ad1a0de325",
+        "PCB-PWR_01_INPUT_PROTECTION.kicad_sch": "247ced70e030d5dc9f4df2797fd00aae4fb55cb597066a6c560049e86c4d1278",
+        "PCB-PWR_02_3V8_MODEM.kicad_sch": "02de8365dadbb700b58203458514c44e961aebd16f1afd371058f5f9a58272cf",
+        "PCB-PWR_03_3V3_DIGITAL.kicad_sch": "d51ff6a624d7d99a6971406a41885b422ba2dd4e6f5baa63a211f12fa84e1605",
+        "PCB-PWR_04_AUX_HARNESS.kicad_sch": "7bac18a1db49dfc4fada07ec15cf8ce72958343048eddf29a4a7f1c832436db9"
+      },
       "independent_human_review": null,
       "routing_authorized": false,
       "manufacturing_release": false
@@ -286,7 +307,7 @@
   },
   "review_a": {
     "complete": true,
-    "status": "PASS_PIN_NET_AUTHORITY_HIERARCHY_INTERNAL_EQUIVALENCE_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_PENDING_HUMAN_REVIEW_PENDING"
+    "status": "PASS_PIN_NET_AUTHORITY_HIERARCHY_INTERNAL_EQUIVALENCE_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING"
   },
   "pre_route_constraints": {
     "authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
@@ -335,7 +356,7 @@
     }
   },
   "input_protection_candidate_eco": {
-    "state": "TARGET_8A_NATIVE_VALUE_ECO_RETAINED_ACTIVE_CINHF_ECO_REPEAT_ERC_PDF_AND_HUMAN_HIERARCHY_REVIEW_PENDING",
+    "state": "TARGET_8A_NATIVE_VALUE_ECO_RETAINED_ACTIVE_CINHF_ECO_REPEAT_ERC_PDF_EVIDENCE_PASS_HUMAN_HIERARCHY_REVIEW_PENDING",
     "qualification_record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.md",
     "machine_contract": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json",
     "test_matrix": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
@@ -351,9 +372,9 @@
     "pin_net_semantic_sha256_before": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
     "pin_net_semantic_sha256_after": "fb31a1880037c2d15873ef7a003b74967e0427ed767bc16de256a790b5320b5a",
     "repeat_native_kicad_9_erc_required": true,
-    "repeat_native_kicad_9_erc_complete": false,
+    "repeat_native_kicad_9_erc_complete": true,
     "repeat_pdf_evidence_required": true,
-    "repeat_pdf_evidence_complete": false,
+    "repeat_pdf_evidence_complete": true,
     "repeat_independent_human_hierarchy_review_required": true,
     "repeat_independent_human_hierarchy_review_complete": false,
     "accepted_test_rows": 1,
@@ -363,9 +384,9 @@
   },
   "review_b": {
     "complete": false,
-    "status": "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_AND_HUMAN_REVIEW_PENDING_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_PENDING",
+    "status": "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_PASS_HUMAN_REVIEW_PENDING_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_ROUTING_PENDING",
     "blockers": [
-      "C20/C21 local LMR60440 CIN_HF ECO is applied; commit-bound KiCad 9 ERC/PDF evidence and a new independent human hierarchy review remain required before PCBA procurement",
+      "C20/C21 local LMR60440 CIN_HF ECO is applied; commit-bound KiCad 9 ERC/PDF evidence passes, while a new independent human hierarchy review remains required before PCBA procurement",
       "DIM-003 mechanical freeze response register has 0/18 accepted rows; assembled envelope terminal zones mounting pattern and frozen PCB STEP remain open",
       "PCB-PWR stackup/copper response register has 0/24 accepted rows across 0/2 fabricator slots; no selected construction or accepted copper/plating authority",
       "high-current Kelvin hot-loop and switch-node routing",

@@ -204,7 +204,7 @@ def main() -> int:
 
     status_eco = capture_status.get("input_protection_candidate_eco", {})
     require(status_eco.get("state") ==
-            "TARGET_8A_NATIVE_VALUE_ECO_RETAINED_ACTIVE_CINHF_ECO_REPEAT_ERC_PDF_AND_HUMAN_HIERARCHY_REVIEW_PENDING",
+            "TARGET_8A_NATIVE_VALUE_ECO_RETAINED_ACTIVE_CINHF_ECO_REPEAT_ERC_PDF_EVIDENCE_PASS_HUMAN_HIERARCHY_REVIEW_PENDING",
             "PCB-PWR capture status does not expose the post-ECO review gate")
     require(status_eco.get("target_fuse_mpn") == fuse["target_evt_mpn"],
             "PCB-PWR capture status target fuse mismatch")
