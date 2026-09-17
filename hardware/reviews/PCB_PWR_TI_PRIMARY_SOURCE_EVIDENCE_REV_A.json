@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-PWR",
+  "retrieved_utc_date": "2026-09-17",
+  "status": "PASS_PRIMARY_SOURCE_BINDING_SCHEMATIC_UNCHANGED_NOT_FOR_MANUFACTURE",
+  "sources": {
+    "lmr60440_datasheet": {
+      "publisher": "Texas Instruments",
+      "document_id": "SNAS877",
+      "document_date": "2024-12",
+      "title": "LMR60440 3V to 36V, 4A, Synchronous, Buck Converter Optimized for High Power Density, Low EMI, and Low Output Capacitance",
+      "canonical_url": "https://www.ti.com/lit/ds/symlink/lmr60440.pdf",
+      "sha256": "d2feebeb32432de6f7d7da1e45d0d7dcad01f0ddd14fc1a403941efb2c0387db",
+      "file_size_bytes": 1675183,
+      "pages": 38,
+      "claims": {
+        "exact_orderable_mode": {
+          "pdf_page": 3,
+          "section": "4 Device Comparison Table",
+          "orderable_part_number": "LMR604403SRAKR",
+          "output_current_a": 4.0,
+          "output_voltage_option": "3.3V fixed / adjustable",
+          "spread_spectrum": true
+        },
+        "fixed_mode_selection": {
+          "pdf_page": 13,
+          "section": "7.3.5 Output Voltage Selection",
+          "fb_to_vout_max_ohm_exclusive": 1.0
+        },
+        "adjustable_mode_selection": {
+          "pdf_page": 13,
+          "section": "7.3.5 Output Voltage Selection",
+          "feedback_parallel_min_ohm_exclusive": 3000.0,
+          "vfb_typ_v": 1.0
+        },
+        "fixed_3v3_electrical_characteristic": {
+          "pdf_page": 6,
+          "section": "6.5 Electrical Characteristics",
+          "test_condition": "FB pin short to VOUT; FPWM mode",
+          "minimum_v": 3.24,
+          "typical_v": 3.3,
+          "maximum_v": 3.35
+        },
+        "input_capacitors": {
+          "pdf_page": 22,
+          "section": "8.2.2.4 Input Capacitor Selection / Table 8-3",
+          "cin_hf_f": 1e-07,
+          "cin_hf_min_voltage_rating_v": 50.0,
+          "cin_f": 4.7e-06,
+          "cin_min_voltage_rating_v": 50.0,
+          "placement_requirement": "adjacent_to_device_as_close_as_design_rules_allow"
+        }
+      }
+    },
+    "lmr60440_package_option_addendum": {
+      "publisher": "Texas Instruments",
+      "document_date": "2025-11-08",
+      "canonical_url": "https://www.ti.com/ods/sysadd/oa/symlink/lmr60440_oa.pdf",
+      "sha256": "9dfebc7b17b130ce20b3509dfa5992d8f86493511154632305df1160d03f40c5",
+      "file_size_bytes": 16856,
+      "pages": 2,
+      "pdf_page": 1,
+      "orderable_part_number": "LMR604403SRAKR",
+      "status": "Active",
+      "material_type": "Production",
+      "package": "WQFN-HR (RAK)",
+      "pins": 9,
+      "package_quantity": 3000,
+      "carrier": "LARGE T&R",
+      "operating_temperature_c": [-40, 125],
+      "part_marking": "4403S"
+    },
+    "lm74700_q1_datasheet": {
+      "publisher": "Texas Instruments",
+      "document_id": "SNOSD17G",
+      "revision": "G",
+      "document_date": "2020-12",
+      "title": "LM74700-Q1 Low IQ Reverse Battery Protection Ideal Diode Controller",
+      "canonical_url": "https://www.ti.com/lit/ds/symlink/lm74700-q1.pdf",
+      "sha256": "e16b3a8c0023201fafa5825436f5f2dd6f885b92b84e65602b3f50d741c58b6f",
+      "file_size_bytes": 2657068,
+      "pages": 36,
+      "claims": {
+        "vcap_recommended_operating_condition": {
+          "pdf_page": 5,
+          "section": "6.3 Recommended Operating Conditions",
+          "connection": "VCAP to ANODE",
+          "capacitance_f": 1e-07
+        },
+        "vcap_electrical_test_condition": {
+          "pdf_page": 6,
+          "section": "6.5 Electrical Characteristics",
+          "capacitance_f": 1e-07
+        }
+      }
+    }
+  },
+  "design_binding": {
+    "U3": {
+      "mpn": "LMR604403SRAKR",
+      "mode": "ADJUSTABLE",
+      "fb_pin": 6,
+      "fb_net": "FB_3V8",
+      "top_resistor": {
+        "refdes": "R1",
+        "ohm": 100000.0,
+        "nets": ["3V8_MODEM", "FB_3V8"]
+      },
+      "bottom_resistor": {
+        "refdes": "R2",
+        "ohm": 35700.0,
+        "nets": ["FB_3V8", "GND_PWR"]
+      },
+      "feedback_parallel_ohm": 26308.032424,
+      "nominal_output_v": 3.801120448,
+      "mode_threshold_pass": true
+    },
+    "U4": {
+      "mpn": "LMR604403SRAKR",
+      "mode": "FIXED_3V3",
+      "fb_pin": 6,
+      "fb_net": "3V3_DIGITAL",
+      "output_net": "3V3_DIGITAL",
+      "direct_fb_to_output": true,
+      "nominal_output_v": 3.3,
+      "mode_threshold_pass": true
+    },
+    "C1": {
+      "refdes": "C1",
+      "capacitance_f": 1e-07,
+      "voltage_rating_v": 25.0,
+      "nets": ["LM74700_VCAP", "VBAT_FUSED"],
+      "role": "LM74700_VCAP_TO_ANODE",
+      "datasheet_match": true
+    },
+    "local_input_networks": {
+      "U3": {
+        "cin": "C11",
+        "cin_hf": "C20",
+        "center_distance_cin_to_ic_mm": 6.0,
+        "center_distance_cin_hf_to_ic_mm": 2.6,
+        "routed_loop_acceptance": false
+      },
+      "U4": {
+        "cin": "C12",
+        "cin_hf": "C21",
+        "center_distance_cin_to_ic_mm": 6.0,
+        "center_distance_cin_hf_to_ic_mm": 2.6,
+        "routed_loop_acceptance": false
+      },
+      "central_bulk": {
+        "refdes": "C13",
+        "role": "VBAT_SYS_DAMPING_NOT_LOCAL_CIN_SUBSTITUTE",
+        "center_distance_to_u3_mm": 19.697716,
+        "center_distance_to_u4_mm": 12.806248
+      }
+    }
+  },
+  "release_boundary": {
+    "electrical_schematic_changed_by_this_record": false,
+    "native_schematic_source_commit": "e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a",
+    "review_pdf_sha256": "7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130",
+    "independent_human_hierarchy_acceptance_complete": false,
+    "routing_authorized": false,
+    "procurement_authorized": false,
+    "manufacturing_release": false,
+    "open_controls": [
+      "C11_C12_effective_capacitance_at_bias_and_temperature",
+      "C11_C12_C20_C21_routed_hot_loop_acceptance",
+      "input_filter_or_no_filter_pre_route_decision_EVT_PWR_02_03_04",
+      "F1_8A_thermal_I2t_harness_and_primary_fuse_coordination",
+      "BG95_end_to_end_burst_and_hot_harness_evidence",
+      "PG_3V8_remains_TP5_only_by_intent",
+      "DIM_003_stackup_routing_DRC_DFM_review_B"
+    ]
+  }
+}

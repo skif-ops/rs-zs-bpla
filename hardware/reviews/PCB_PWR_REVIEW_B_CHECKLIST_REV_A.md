@@ -53,6 +53,12 @@ checklist contains no routing, CAM or manufacturing-release assertion.
   exact active source and PDF remains pending.
 - Native PCB: provisional 90 x 60 x 1.6 mm, four copper layers, 62 footprints,
   zero mounting holes, zero traces/vias/zones.
+- TI primary-source binding: `PASS`. The machine-audited record
+  `PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}` binds exact
+  `LMR604403SRAKR` to SNAS877 pages 3/6/13/22 and the 2025-11-08 TI
+  package-option addendum, and binds C1 to LM74700-Q1 SNOSD17G pages 5/6.
+  This closes the part-mode and VCAP document questions without changing the
+  native schematic or any physical-release state.
 - Fitted-body 2D clearance: `PASS`; 44/44 fitted footprints have courtyards,
   minimum required/observed separation is 0.20/0.22 mm and conflicts are zero.
 - Mechanical authority: `DIM-003 OPEN`; the outline, mounting pattern, terminal
@@ -105,11 +111,17 @@ checklist contains no routing, CAM or manufacturing-release assertion.
 - [ ] The selected fabricator construction freezes finished thickness, base and
   finished copper, hole-wall plating, via construction, minimum rules, mask and
   finish without silently changing the PCB source.
-- [x] TI SNAS877 confirms exact `LMR604403SRAKR` supports both fixed 3.3 V and
-  adjustable modes; U3's 26.3 kOhm parallel divider selects adjustable 3.8 V
+- [x] The machine-audited TI primary-source record confirms exact
+  `LMR604403SRAKR` is an Active Production `3.3V fixed / adjustable`
+  orderable; U3's 26.308 kOhm parallel divider selects adjustable 3.801120 V
   and U4's direct FB-VOUT connection selects fixed 3.3 V.
+- [x] TI SNOSD17G Rev.G specifies C1's VCAP-to-ANODE value as 0.1 uF; no
+  LM74700 VCAP ECO is required.
 - [x] C20/C21 local 100 nF/50 V CIN_HF are present at U3/U4, and the new
   five-page source passes commit-bound KiCad 9 ERC plus PDF visual preflight.
+- [ ] Routed C11/C20/U3 and C12/C21/U4 VIN-PGND hot loops prove direct
+  pad-first geometry; C11/C12 effective capacitance at bias and temperature is
+  accepted. C13 remains central damping and is not a local-CIN substitute.
 - [ ] A new independent hierarchy review accepts exact source commit
   `e32c0aa9e510e8321e24ebb3ee2056100c5f3a1a` and PDF SHA-256
   `7abb5e83e5d8cc72178c37fbf559bd77ca0d915b1c92f94e12ed278ce83bf130`.

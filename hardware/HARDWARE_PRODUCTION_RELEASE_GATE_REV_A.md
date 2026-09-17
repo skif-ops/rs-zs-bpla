@@ -96,6 +96,20 @@ all pages pass visual preflight without text/symbol/connection overlap or
 clipping. A new independent hierarchy decision remains open. Routing and
 manufacturing release remain blocked by the separate gates below.
 
+The independent review's LMR60440 part-mode and LM74700 VCAP document questions
+are now closed by the machine-audited
+`PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}` record. TI SNAS877 page 3
+identifies exact `LMR604403SRAKR` as `3.3V fixed / adjustable`; page 13 defines
+the below-1-ohm fixed and above-3-kohm adjustable mode thresholds; TI's
+2025-11-08 package-option addendum lists the exact orderable as Active
+Production. U3's independently recomputed parallel divider is 26.308 kohm and
+its nominal output is 3.801120 V; U4's FB is directly on `3V3_DIGITAL` and
+selects fixed 3.3 V. TI SNOSD17G page 5 specifies 0.1 uF VCAP-to-ANODE, matching
+C1. This evidence-only change does not alter the native schematic. C11/C12
+effective capacitance, routed C11/C20/U3 and C12/C21/U4 hot loops, EMI/filter
+decision, F1 qualification, modem-feed physical evidence and all downstream
+release gates remain open.
+
 The PCB-PWR input-protection desk review rejects the signed native F1 value
 `0451005.MRL` for the 5 A continuous-current basis: Littelfuse's standard 25%
 continuous derating reduces it to 3.75 A before temperature rerating. The

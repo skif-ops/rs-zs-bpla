@@ -17,6 +17,28 @@
       "hardware/kicad/native/PCB-PWR/PCB-PWR_04_AUX_HARNESS.kicad_sch"
     ]
   },
+  "ti_primary_source_evidence": {
+    "record": "hardware/reviews/PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.md",
+    "machine_contract": "hardware/reviews/PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.json",
+    "independent_audit": "tools/audit_pcb_pwr_design_rev_a.py",
+    "control": {
+      "state": "PASS_TI_PRIMARY_SOURCE_BINDING_SCHEMATIC_UNCHANGED",
+      "exact_buck_mpn": "LMR604403SRAKR",
+      "exact_buck_orderable_status": "Active Production",
+      "u3_mode": "ADJUSTABLE_3V801120",
+      "u4_mode": "FIXED_3V3",
+      "lm74700_vcap_f": 1e-07,
+      "source_sha256": {
+        "SNAS877": "d2feebeb32432de6f7d7da1e45d0d7dcad01f0ddd14fc1a403941efb2c0387db",
+        "LMR60440_PACKAGE_OPTION_ADDENDUM": "9dfebc7b17b130ce20b3509dfa5992d8f86493511154632305df1160d03f40c5",
+        "SNOSD17G": "e16b3a8c0023201fafa5825436f5f2dd6f885b92b84e65602b3f50d741c58b6f"
+      },
+      "electrical_schematic_changed": false,
+      "independent_human_hierarchy_acceptance_complete": false,
+      "routing_authorized": false,
+      "manufacturing_release": false
+    }
+  },
   "human_readable_hierarchy": {
     "generator": "tools/materialize_pcb_pwr_hierarchy_rev_a.py",
     "connectivity_reader": "tools/pcb_pwr_schematic_hierarchy.py",

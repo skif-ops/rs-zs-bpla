@@ -30,6 +30,31 @@ accept any provisional geometry.
   pass the independent `0.20 mm` 2D clearance subgate; the minimum observed
   fitted-courtyard clearance is `0.22 mm`.
 
+## Local input-capacitor placement evidence
+
+TI SNAS877 Table 8-3 requires both local `CIN=4.7 uF` and
+`CIN_HF=0.1 uF`. The current provisional coordinates provide the following
+center-to-center distances:
+
+| Buck | Local `CIN` | Distance | Local `CIN_HF` | Distance |
+|---|---|---:|---|---:|
+| `U3` | `C11` | `6.00 mm` | `C20` | `2.60 mm` |
+| `U4` | `C12` | `6.00 mm` | `C21` | `2.60 mm` |
+
+These distances prove only that the intended parts occupy the correct local
+functional regions. They do not prove the final VIN-PGND loop geometry while the
+board has no traces or zones. C11/C12 effective capacitance at bias and
+temperature, direct pad-first routing of C20/C21, and routed hot-loop review
+remain mandatory.
+
+`C13` is central 100 uF `VBAT_SYS` damping, not local buck input-capacitor
+authority. Its provisional center distances are `19.70 mm` to U3 and `12.81 mm`
+to U4, so no release claim may rely on C13 as a substitute for C11/C20 or
+C12/C21. Exact TI source binding and the independently recomputed distances are
+controlled by
+`hardware/reviews/PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}` and
+`tools/audit_pcb_pwr_design_rev_a.py`.
+
 ## Hard interlocks
 
 The candidate must contain zero tracks, zero vias and zero copper zones. DRC, Gerber,

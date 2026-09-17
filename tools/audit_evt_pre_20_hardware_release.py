@@ -230,6 +230,45 @@ def audit() -> dict[str, object]:
     )
 
     pwr_status = read_json("hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json")
+    pwr_design = run_json_audit("audit_pcb_pwr_design_rev_a.py")
+    pwr_ti_primary_check = next(
+        (
+            item
+            for item in pwr_design.get("checks", [])
+            if item.get("check") == "ti_primary_source_binding"
+        ),
+        {},
+    )
+    pwr_ti_status = pwr_status.get("ti_primary_source_evidence", {})
+    pwr_ti_control = (
+        pwr_ti_status.get("control", {})
+        if isinstance(pwr_ti_status, dict)
+        else {}
+    )
+    pwr_ti_primary_ok = (
+        pwr_ti_primary_check.get("status") == "PASS"
+        and pwr_ti_primary_check.get("exact_orderable") == "LMR604403SRAKR"
+        and pwr_ti_primary_check.get("orderable_status") == "Active Production"
+        and pwr_ti_primary_check.get("modes") == {
+            "U3": "ADJUSTABLE_3V801",
+            "U4": "FIXED_3V3",
+        }
+        and pwr_ti_primary_check.get("vcap_f") == 1e-7
+        and pwr_ti_primary_check.get("schematic_changed") is False
+        and pwr_ti_primary_check.get("manufacturing_release") is False
+        and pwr_ti_control.get("state")
+        == "PASS_TI_PRIMARY_SOURCE_BINDING_SCHEMATIC_UNCHANGED"
+        and pwr_ti_control.get("electrical_schematic_changed") is False
+        and pwr_ti_control.get("independent_human_hierarchy_acceptance_complete") is False
+        and pwr_ti_control.get("routing_authorized") is False
+        and pwr_ti_control.get("manufacturing_release") is False
+    )
+    check(
+        "pcb_pwr_ti_primary_source_binding",
+        pwr_ti_primary_ok,
+        "LMR604403SRAKR U3 adjustable/U4 fixed and LM74700 VCAP primary evidence PASS",
+        "PCB-PWR TI primary-source orderable/mode/VCAP binding is missing or inconsistent",
+    )
     pwr_hierarchy = run_json_audit("audit_pcb_pwr_hierarchy_rev_a.py")
     pwr_hierarchy_internal_ok = (
         pwr_hierarchy.get("status") ==
