@@ -176,9 +176,9 @@ def main() -> int:
         "post_eco_board_semantic_sha256":
             "5f854a5276e8dfd6dc82516f61db1a158888b5343b82058e6024e5970b51e6c1",
         "repeat_native_kicad_9_erc_required": True,
-        "repeat_native_kicad_9_erc_complete": False,
+        "repeat_native_kicad_9_erc_complete": True,
         "repeat_pdf_evidence_required": True,
-        "repeat_pdf_evidence_complete": False,
+        "repeat_pdf_evidence_complete": True,
         "repeat_independent_human_hierarchy_review_required": True,
         "repeat_independent_human_hierarchy_review_complete": False,
         "pcba_procurement_authorized": False,
@@ -204,7 +204,7 @@ def main() -> int:
 
     status_eco = capture_status.get("input_protection_candidate_eco", {})
     require(status_eco.get("state") ==
-            "TARGET_8A_NATIVE_VALUE_ECO_APPLIED_LEGIBILITY_REMEDIATION_REPEAT_ERC_PDF_EVIDENCE_PENDING_HUMAN_HIERARCHY_REVIEW_PENDING",
+            "TARGET_8A_NATIVE_VALUE_ECO_APPLIED_LEGIBILITY_REMEDIATION_REPEAT_ERC_PDF_EVIDENCE_PASS_HUMAN_HIERARCHY_REVIEW_PENDING",
             "PCB-PWR capture status does not expose the post-ECO review gate")
     require(status_eco.get("target_fuse_mpn") == fuse["target_evt_mpn"],
             "PCB-PWR capture status target fuse mismatch")
@@ -218,8 +218,8 @@ def main() -> int:
             status_eco.get("pin_net_semantic_sha256_after") ==
             native_eco["post_eco_pin_net_semantic_sha256"],
             "PCB-PWR capture status ECO semantic proof drift")
-    require(status_eco.get("repeat_native_kicad_9_erc_complete") is False and
-            status_eco.get("repeat_pdf_evidence_complete") is False and
+    require(status_eco.get("repeat_native_kicad_9_erc_complete") is True and
+            status_eco.get("repeat_pdf_evidence_complete") is True and
             status_eco.get("repeat_independent_human_hierarchy_review_complete") is False,
             "PCB-PWR capture status repeat-evidence boundary drift")
     require(status_eco.get("pcba_procurement_authorized") is False,
