@@ -57,7 +57,8 @@ assembled thermal tests J1/harness/F1 при +70 C и подтверждённо
 `0451008.MRL`; bounded value-only ECO уже применён к native schematic/PCB и
 генераторам без изменения footprint, placement, topology, nets или pad map.
 Старые ERC/PDF/подпись относятся только к исторической value `0451005.MRL`.
-До повторных KiCad 9 ERC/PDF, независимого hierarchy review и закрытия
+Повторные KiCad 9 ERC/PDF evidence для активного ECO прошли и привязаны к commit
+и SHA-256. До независимого hierarchy review и закрытия
 `PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv` запрещены PCBA procurement и
 manufacturing release. Топология и footprint не меняются.
 

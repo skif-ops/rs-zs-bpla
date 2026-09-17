@@ -35,9 +35,9 @@ PCB-PWR now uses a human-readable five-page native hierarchy: one system overvie
 plus four functional child sheets for input protection/current monitoring, 3V8,
 3V3 and 1V8/harness interfaces. The controlled materializer gives every connected
 pin an explicit wire stub and the independent audit proves exact pad/net
-equivalence to the native PCB. Repeat KiCad 9 ERC/PDF evidence for this hierarchy
-and independent human acceptance remain open; the earlier one-page label-only ERC
-does not release the new representation.
+equivalence to the native PCB. Post-ECO KiCad 9 ERC/PDF evidence passes and is
+commit/SHA-256 bound; independent human acceptance of the active drawing remains
+open. The earlier acceptance for the superseded F1 value does not release it.
 
 PCB-PWR currently contains a native, unrouted 60-footprint electrical placement
 canvas. Its `90 x 60 mm`, four-layer and `1.6 mm` assumptions are provisional;

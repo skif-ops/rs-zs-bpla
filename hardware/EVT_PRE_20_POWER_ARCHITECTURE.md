@@ -114,8 +114,8 @@ AAD wake переводит STM32 в активное состояние, зап
   transient/fault profile. Ранее подписанная value `0451005.MRL` отклонена
   desk review для непрерывных 5 A. Активная native value и BOM/qualification
   target — `0451008.MRL` 8 A в том же Nano2 451 footprint; value-only ECO
-  применён без изменения topology/placement/nets, а repeat ERC/PDF/human review
-  и физическая координация остаются обязательными до PCBA procurement.
+  применён без изменения topology/placement/nets. Repeat ERC/PDF evidence прошёл;
+  human review и физическая координация остаются обязательными до PCBA procurement.
 
 ## 6. Требования к MPPT/BMS до RFQ
 

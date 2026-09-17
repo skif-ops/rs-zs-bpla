@@ -176,9 +176,9 @@ def main() -> int:
         "post_eco_board_semantic_sha256":
             "5f854a5276e8dfd6dc82516f61db1a158888b5343b82058e6024e5970b51e6c1",
         "repeat_native_kicad_9_erc_required": True,
-        "repeat_native_kicad_9_erc_complete": False,
+        "repeat_native_kicad_9_erc_complete": True,
         "repeat_pdf_evidence_required": True,
-        "repeat_pdf_evidence_complete": False,
+        "repeat_pdf_evidence_complete": True,
         "repeat_independent_human_hierarchy_review_required": True,
         "repeat_independent_human_hierarchy_review_complete": False,
         "pcba_procurement_authorized": False,
@@ -204,7 +204,7 @@ def main() -> int:
 
     status_eco = capture_status.get("input_protection_candidate_eco", {})
     require(status_eco.get("state") ==
-            "TARGET_8A_NATIVE_VALUE_ECO_APPLIED_REPEAT_ERC_PDF_HUMAN_HIERARCHY_REVIEW_PENDING",
+            "TARGET_8A_NATIVE_VALUE_ECO_APPLIED_REPEAT_ERC_PDF_EVIDENCE_PASS_HUMAN_HIERARCHY_REVIEW_PENDING",
             "PCB-PWR capture status does not expose the post-ECO review gate")
     require(status_eco.get("target_fuse_mpn") == fuse["target_evt_mpn"],
             "PCB-PWR capture status target fuse mismatch")
@@ -218,6 +218,10 @@ def main() -> int:
             status_eco.get("pin_net_semantic_sha256_after") ==
             native_eco["post_eco_pin_net_semantic_sha256"],
             "PCB-PWR capture status ECO semantic proof drift")
+    require(status_eco.get("repeat_native_kicad_9_erc_complete") is True and
+            status_eco.get("repeat_pdf_evidence_complete") is True and
+            status_eco.get("repeat_independent_human_hierarchy_review_complete") is False,
+            "PCB-PWR capture status repeat-evidence boundary drift")
     require(status_eco.get("pcba_procurement_authorized") is False,
             "PCB-PWR capture status prematurely authorizes procurement")
     require(status_eco.get("manufacturing_release") is False,
@@ -242,6 +246,19 @@ def main() -> int:
                         ("Result", "Operator", "Date", "Artifact_SHA256")),
                     f"{row['Test_ID']}: PASS lacks attributable evidence")
 
+    matrix_by_id = {row["Test_ID"]: row for row in matrix}
+    require(matrix_by_id["PWR-IPQ-003"]["Status"] == "PASS" and
+            matrix_by_id["PWR-IPQ-003"]["Result"] ==
+            "F1=0451008.MRL in all active sources; pin/net and board semantic digests retained; post-ECO ERC/PDF artifact archived" and
+            matrix_by_id["PWR-IPQ-003"]["Operator"] ==
+            "GitHub Actions run 35197150159 + Codex independent audit" and
+            matrix_by_id["PWR-IPQ-003"]["Date"] == "2026-09-17" and
+            matrix_by_id["PWR-IPQ-003"]["Artifact_SHA256"] ==
+            "bf80f07c9b20d93d610c3e8c124887becb4209f8d688f085fe68bac53e0ad0b9",
+            "PWR-IPQ-003 native-value ECO evidence drift")
+    require(matrix_by_id["PWR-IPQ-004"]["Status"] == "PENDING_EVIDENCE",
+            "PWR-IPQ-004 must remain pending until independent human hierarchy review")
+
     accepted_rows = sum(row["Status"] == "PASS" for row in matrix)
     failed_rows = [row["Test_ID"] for row in matrix if row["Status"] == "FAIL"]
     repeat_gate_complete = all((
@@ -253,8 +270,10 @@ def main() -> int:
                 and repeat_gate_complete)
     require(contract["test_matrix"]["required_rows"] == 20,
             "contract qualification row count drift")
-    require(contract["test_matrix"]["accepted_rows"] == 0,
-            "contract claims accepted rows before evidence update")
+    require(contract["test_matrix"]["accepted_rows"] == 1,
+            "contract accepted-row count does not match post-ECO evidence")
+    require(status_eco.get("accepted_test_rows") == accepted_rows == 1,
+            "capture-status qualification accepted-row count drift")
     require(contract["test_matrix"]["complete"] is False,
             "contract claims physical qualification complete")
 
@@ -305,7 +324,7 @@ def main() -> int:
     )
     print(
         f"Native value ECO applied={native_eco['applied']}; "
-        f"physical evidence={accepted_rows}/20 PASS"
+        f"qualification evidence={accepted_rows}/20 PASS"
     )
     print("PCBA procurement and manufacturing release remain BLOCKED")
     print(args.output)

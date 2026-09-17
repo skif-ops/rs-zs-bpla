@@ -1,14 +1,15 @@
 # PCB-PWR Rev.A input-protection qualification
 
-Status: `CONTROLLED PLAN / F1 NATIVE VALUE ECO APPLIED / REPEAT ERC, PDF, HUMAN REVIEW AND PHYSICAL EVIDENCE PENDING / NOT FOR MANUFACTURE`
+Status: `CONTROLLED PLAN / F1 NATIVE VALUE ECO APPLIED / COMMIT-BOUND ERC AND PDF EVIDENCE PASS / HUMAN REVIEW AND PHYSICAL EVIDENCE PENDING / NOT FOR MANUFACTURE`
 
 Configuration: `EVT-PRE-20 Rev.A`
 
 This packet controls the PCB-PWR input fuse and TVS decision. The bounded F1
 value-only ECO is applied without changing footprint, placement, topology, nets
 or pad mapping. The previously accepted five-page source remains historical
-evidence only; repeat commit-bound ERC/PDF evidence and a new independent human
-hierarchy decision are required before any PCB assembly procurement.
+evidence only. Post-ECO commit-bound ERC/PDF evidence now passes; a new
+independent human hierarchy decision is still required before any PCB assembly
+procurement.
 
 ## 1. Controlled decision
 
@@ -28,7 +29,7 @@ The exact EVT qualification pair is:
 
 | Function | Candidate | Controlled rating | State |
 |---|---|---|---|
-| F1 PCB input fuse | Littelfuse `0451008.MRL` | 8 A; 7.7 mOhm nominal cold resistance; 20.23 A²s nominal melting I²t; 400 A at 32 VDC interrupting rating | Native value ECO applied; repeat ERC/PDF/human review and physical qualification pending |
+| F1 PCB input fuse | Littelfuse `0451008.MRL` | 8 A; 7.7 mOhm nominal cold resistance; 20.23 A²s nominal melting I²t; 400 A at 32 VDC interrupting rating | Native value ECO and commit-bound ERC/PDF evidence pass; human review and physical qualification pending |
 | D1 transient clamp | Littelfuse `SMBJ18A` | 18 V standoff; 20.0–22.1 V breakdown; 29.2 V maximum clamp at 20.6 A; 600 W at 10/1000 us | Selected for qualification; measured transient envelope pending |
 
 At 5 A the fuse's nominal cold loss is:
@@ -50,10 +51,12 @@ This is a two-stage ECO gate:
    `.kicad_sch` and `.kicad_pcb`. Independent semantic checks retain the exact
    F1 footprint, placement, topology, nets and pad mapping.
 
-The existing commit-bound ERC, PDF and human acceptance remain the historical
+The earlier commit-bound ERC, PDF and human acceptance remain the historical
 record for the superseded 5 A value. They do not approve the active 8 A value.
-Fresh KiCad 9 ERC, a new five-page PDF, source hashes and a repeat independent
-hierarchy decision are mandatory.
+For the active value, KiCad 9.0.9 ERC passes with zero violations on five sheets,
+and the new five-page A3 PDF passes visual preflight. Source, ERC, PDF and
+artifact hashes are bound to commit `091a2eb223161cb4396fc6838921eeb79150c38d`.
+A repeat independent hierarchy decision remains mandatory.
 
 Until then:
 
@@ -97,7 +100,7 @@ Tests run in the order controlled by
 `PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv`:
 
 1. source control, sample identity and bounded native ECO;
-2. repeat ERC/PDF/human hierarchy gate;
+2. repeat ERC/PDF/human hierarchy gate (ERC/PDF evidence passes; human review pending);
 3. 25 C, +70 C and -40 C operating tests;
 4. inrush and modem-burst tests;
 5. overload, prospective-short and primary-fuse coordination using a

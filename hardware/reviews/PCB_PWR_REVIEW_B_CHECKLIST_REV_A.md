@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A Review B checklist
 
-Status: `F1 VALUE ECO APPLIED / REPEAT ERC, PDF AND HUMAN HIERARCHY REVIEW PENDING / REVIEW B OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
+Status: `F1 VALUE ECO APPLIED / COMMIT-BOUND ERC AND PDF EVIDENCE PASS / HUMAN HIERARCHY REVIEW PENDING / REVIEW B OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
 
 Review B is independent from the completed pin/net Review A. This checklist is
 signed only for the bounded hierarchy subgate and contains no routing, CAM or
@@ -23,7 +23,13 @@ manufacturing-release assertion.
   ERC JSON and PDF are SHA-256 bound in `PCB_PWR_CAPTURE_STATUS_REV_A.json`.
   Reviewer `Скиф` accepted that bounded hierarchy subgate on `2026-09-16` with
   decision `ACCEPT_HIERARCHY_ONLY`. The F1 value ECO supersedes that evidence
-  for the active source; repeat ERC/PDF and independent review are pending.
+  for the active source. Post-ECO Schematic Gate
+  [#35197150159](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35197150159)
+  passes KiCad 9.0.9 ERC with zero violations on five sheets; PDF SHA-256
+  `9733a1df0026a53ecfc56355cf185e04fb372242a9dcdcb13ef214cced81c744`
+  covers five visually preflighted A3 landscape pages. The source and artifact
+  evidence are bound to commit `091a2eb223161cb4396fc6838921eeb79150c38d`.
+  Independent review of this active drawing remains pending.
 - Native PCB: provisional 90 x 60 x 1.6 mm, four copper layers, 60 footprints,
   zero mounting holes, zero traces/vias/zones.
 - Fitted-body 2D clearance: `PASS`; 42/42 fitted footprints have courtyards,
@@ -41,8 +47,9 @@ manufacturing-release assertion.
 - Manufacturing release: `HOLD`.
 - Input protection: active native F1 is Littelfuse `0451008.MRL` and target D1
   remains `SMBJ18A`. The bounded value-only ECO is applied with footprint,
-  placement, topology and nets retained. Repeat ERC/PDF/hierarchy review and all
-  20 qualification rows are open. PCBA procurement is prohibited.
+  placement, topology and nets retained. Repeat ERC/PDF evidence passes;
+  independent hierarchy review and 19 of 20 qualification rows remain open.
+  PCBA procurement is prohibited.
 
 ## 2. Review-B gate
 
@@ -77,8 +84,8 @@ manufacturing-release assertion.
   finish without silently changing the PCB source.
 - [ ] The bounded F1 value-only ECO has changed historical `0451005.MRL` to
   active target `0451008.MRL` without changing topology, footprint, placement
-  or nets; this gate remains unchecked until repeat KiCad 9 ERC, five-page PDF
-  and independent hierarchy review pass.
+  or nets; repeat KiCad 9 ERC and the five-page PDF pass, but this combined gate
+  remains unchecked until independent hierarchy review passes.
 - [ ] All 20 rows in `PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv` pass,
   including +70 C 5 A connector/harness/fuse thermal, battery/MPPT transient,
   SMBJ18A clamp, prospective-current, primary-fuse and fail-short coordination.
@@ -114,8 +121,8 @@ manufacturing-release assertion.
 `2026-09-16` for source commit `2a973f6856aa115aa59323d619be985578780682`
 and PDF SHA-256 `7a1eee774d6a0dd03e6cb72935824f5a7d2af4bebe0e37ad739f61eb8d32a1f4`.
 The active source retains exact electrical equivalence after the F1 value-only
-ECO, but repeat commit-bound KiCad 9 ERC/PDF evidence and independent human
-review are pending. Fitted-body 2D clearance, constraint coverage and the
+ECO. Commit-bound KiCad 9 ERC/PDF evidence passes; independent human review is
+pending. Fitted-body 2D clearance, constraint coverage and the
 internal DIM-003 and two-fabricator stackup/copper requests remain valid. The
 response registers remain `0/18` and `0/24` with `0/2` accepted fabricator sets.
 Accepted mechanics/service volumes, DNP/PCB-feature access, selected construction,
