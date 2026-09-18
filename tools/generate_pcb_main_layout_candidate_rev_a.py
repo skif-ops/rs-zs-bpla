@@ -185,6 +185,18 @@ def set_pad_relative_position(pad: pcbnew.PAD, position: pcbnew.VECTOR2I) -> Non
         pad.SetPos0(position)
 
 
+def set_footprint_shape_rect(
+    shape: pcbnew.FP_SHAPE, start: pcbnew.VECTOR2I, end: pcbnew.VECTOR2I,
+) -> None:
+    """Set footprint-local rectangle endpoints across the KiCad 7/9 API split."""
+    if hasattr(shape, "SetStart0"):
+        shape.SetStart0(start)
+        shape.SetEnd0(end)
+    else:
+        shape.SetStart(start)
+        shape.SetEnd(end)
+
+
 def props(symbol: dict) -> tuple[str, str]:
     return str(symbol["mpn"]), str(symbol["package"])
 
@@ -262,12 +274,11 @@ def passive_footprint(board: pcbnew.BOARD, package: str) -> pcbnew.FOOTPRINT:
     shape_type = getattr(pcbnew, "FP_SHAPE", pcbnew.PCB_SHAPE)
     courtyard = shape_type(fp)
     courtyard.SetShape(pcbnew.SHAPE_T_RECT)
-    # FP_SHAPE keeps its local (footprint-relative) points separately in
-    # KiCad 7.  SetStart/SetEnd update only the temporary absolute position
-    # before the footprint is placed and serialize as a zero-size rectangle.
-    # SetStart0/SetEnd0 preserves the intended courtyard through placement.
-    courtyard.SetStart0(mm(-half_x, -half_y))
-    courtyard.SetEnd0(mm(half_x, half_y))
+    # KiCad 7 uses SetStart0/SetEnd0 for footprint-relative coordinates;
+    # current KiCad 9 exposes the equivalent through SetStart/SetEnd.
+    set_footprint_shape_rect(
+        courtyard, mm(-half_x, -half_y), mm(half_x, half_y)
+    )
     courtyard.SetLayer(pcbnew.F_CrtYd)
     courtyard.SetWidth(pcbnew.FromMM(0.05))
     fp.Add(courtyard)
@@ -317,8 +328,11 @@ def generic_footprint(board: pcbnew.BOARD, pin_numbers: list[str], package: str)
     shape_type = getattr(pcbnew, "FP_SHAPE", pcbnew.PCB_SHAPE)
     courtyard = shape_type(fp)
     courtyard.SetShape(pcbnew.SHAPE_T_RECT)
-    courtyard.SetStart0(mm(-width / 2 - 0.25, -height / 2 - 0.25))
-    courtyard.SetEnd0(mm(width / 2 + 0.25, height / 2 + 0.25))
+    set_footprint_shape_rect(
+        courtyard,
+        mm(-width / 2 - 0.25, -height / 2 - 0.25),
+        mm(width / 2 + 0.25, height / 2 + 0.25),
+    )
     courtyard.SetLayer(pcbnew.F_CrtYd)
     courtyard.SetWidth(pcbnew.FromMM(0.05))
     fp.Add(courtyard)
