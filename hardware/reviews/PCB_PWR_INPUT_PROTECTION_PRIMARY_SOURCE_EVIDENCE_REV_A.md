@@ -12,7 +12,7 @@ thermal behavior, transient performance, routing, procurement or manufacture.
 Machine-readable companion:
 `hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json`.
 Its SHA-256 is
-`144a72f088e835d3b5c6e8f612d9b5ccb6d3769fe46df051b9987633a109a87f`.
+`1ee7d72b7f71bfd53879c43031ba0bf184a0c5d3beb0558ca1e691c585424823`.
 
 The repository follows the existing TI source-evidence policy: third-party
 binaries are not copied into Git. Canonical URLs, retrieval date, exact byte
@@ -105,7 +105,8 @@ The four exact orderables match
 `PCB_PWR_INPUT_PROTECTION_QUALIFICATION_REV_A.json`; no family-member
 substitution is accepted. `PWR-IPQ-001` may therefore be marked `PASS`.
 
-Only `3/20` matrix rows are accepted. First-lot receiving identity and every physical fuse,
+Only `4/20` matrix rows are accepted. Documentary procurement identity is
+closed without an incoming quarantine or sampling gate; every physical fuse,
 connector/harness, transient, TVS, reverse-polarity, telemetry and final-release
-row remain open. Routing, PCBA procurement and manufacturing release remain
+row remains open. Routing, PCBA procurement and manufacturing release remain
 false.

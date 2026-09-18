@@ -125,8 +125,11 @@ KiCad 9 ERC/PDF evidence and independent human hierarchy review now pass.
 Official Littelfuse/Molex payloads for exact `0451008.MRL`, `SMBJ18A`,
 `43045-0213` and `43030-0038` are retrieval-date and SHA-256 bound in
 `PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}`. The
-input-protection matrix has `3/20` accepted rows (`PWR-IPQ-001/003/004`); PCBA
-procurement and manufacturing release remain prohibited.
+input-protection matrix has `4/20` accepted rows
+(`PWR-IPQ-001/002/003/004`). `PWR-IPQ-002` is closed from manufacturer
+documents and exact-MPN supplier catalogue records, without a receiving
+quarantine/photo/body-sample gate. PCBA procurement and manufacturing release
+remain prohibited by the remaining physical and release gates.
 
 PCB-PWR has also passed its bounded fitted-body 2D placement-clearance subgate.
 All 44 simultaneously fitted footprints have controlled courtyards, the required

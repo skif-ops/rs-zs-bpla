@@ -84,7 +84,7 @@
     "record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.md",
     "machine_record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.json",
     "independent_audit": "tools/audit_pcb_pwr_input_protection_sources_rev_a.py",
-    "evidence_sha256": "144a72f088e835d3b5c6e8f612d9b5ccb6d3769fe46df051b9987633a109a87f",
+    "evidence_sha256": "1ee7d72b7f71bfd53879c43031ba0bf184a0c5d3beb0558ca1e691c585424823",
     "exact_orderables": [
       "0451008.MRL",
       "SMBJ18A",
@@ -96,16 +96,17 @@
   "procurement_identity": {
     "prepurchase_documentary_identity_complete": true,
     "standalone_engineering_sample_purchase_required": false,
-    "qualification_batch_may_supply_receiving_samples": true,
-    "actual_future_lot_date_code_available_online": false,
-    "first_lot_receiving_inspection_required": true,
-    "first_lot_receiving_inspection_complete": false,
+    "qualification_batch_may_be_ordered_without_identity_samples": true,
+    "mandatory_receiving_quarantine_required": false,
+    "mandatory_receiving_photography_required": false,
+    "mandatory_body_sampling_required": false,
+    "certificate_of_conformance_required": false,
     "record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.md",
     "machine_record": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.json",
     "independent_audit": "tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py",
-    "evidence_sha256": "f6baf0cc053396ef98d91d28b3f52c4839f7fb4d345a49f30cc3ef073dd532ae",
+    "evidence_sha256": "2b3acbc5bcee5b08bb1a45f009d75d57210592d8488f2e5dc29358c072a62250",
     "matrix_row": "PWR-IPQ-002",
-    "matrix_status": "PENDING_PHYSICAL_TEST",
+    "matrix_status": "PASS",
     "exact_orderables": [
       "0451008.MRL",
       "SMBJ18A",
@@ -116,7 +117,7 @@
   "test_matrix": {
     "path": "hardware/reviews/PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv",
     "required_rows": 20,
-    "accepted_rows": 3,
+    "accepted_rows": 4,
     "complete": false
   },
   "source_evidence": [

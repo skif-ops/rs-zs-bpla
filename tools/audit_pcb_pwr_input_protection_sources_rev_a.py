@@ -276,7 +276,7 @@ def main() -> int:
     require(boundary == {
         "source_control_complete": True,
         "physical_qualification_complete": False,
-        "accepted_matrix_rows": 3,
+        "accepted_matrix_rows": 4,
         "required_matrix_rows": 20,
         "routing_authorized": False,
         "pcba_procurement_authorized": False,
@@ -291,7 +291,7 @@ def main() -> int:
         "43045-0213",
         "43030-0038",
         evidence_sha256,
-        "3/20",
+        "4/20",
         "NOT FOR MANUFACTURE",
     ):
         require(token in evidence_md, f"Markdown evidence missing {token}")

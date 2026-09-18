@@ -119,7 +119,7 @@ def main() -> int:
             "source-control family-substitution interlock removed")
     require(
         procurement_identity_evidence["status"]
-        == "PASS_PREPURCHASE_DOCUMENTARY_IDENTITY_FIRST_LOT_RECEIVING_INSPECTION_PENDING",
+        == "PASS_DOCUMENTARY_PROCUREMENT_IDENTITY_NO_RECEIVING_HOLD",
         "input-protection procurement-identity evidence drift",
     )
     procurement_identity = contract.get("procurement_identity", {})
@@ -127,13 +127,21 @@ def main() -> int:
             "pre-purchase identity subgate is not complete")
     require(procurement_identity.get("standalone_engineering_sample_purchase_required") is False,
             "qualification contract still requires a sample-only purchase")
-    require(procurement_identity.get("qualification_batch_may_supply_receiving_samples") is True,
-            "qualification batch cannot supply receiving samples")
-    require(procurement_identity.get("actual_future_lot_date_code_available_online") is False,
-            "contract incorrectly claims the future lot/date is known online")
-    require(procurement_identity.get("first_lot_receiving_inspection_required") is True and
-            procurement_identity.get("first_lot_receiving_inspection_complete") is False,
-            "first-lot receiving boundary drift")
+    require(
+        procurement_identity.get(
+            "qualification_batch_may_be_ordered_without_identity_samples"
+        ) is True,
+        "qualification batch still depends on identity samples",
+    )
+    require(
+        procurement_identity.get("mandatory_receiving_quarantine_required") is False
+        and procurement_identity.get(
+            "mandatory_receiving_photography_required"
+        ) is False
+        and procurement_identity.get("mandatory_body_sampling_required") is False
+        and procurement_identity.get("certificate_of_conformance_required") is False,
+        "receiving identity burden reintroduced",
+    )
     require(procurement_identity.get("record") ==
             PROCUREMENT_IDENTITY_MD.relative_to(ROOT).as_posix(),
             "procurement-identity Markdown path drift")
@@ -146,7 +154,7 @@ def main() -> int:
     require(procurement_identity.get("evidence_sha256") == procurement_identity_sha256,
             "procurement-identity evidence SHA-256 drift")
     require(procurement_identity.get("matrix_row") == "PWR-IPQ-002" and
-            procurement_identity.get("matrix_status") == "PENDING_PHYSICAL_TEST",
+            procurement_identity.get("matrix_status") == "PASS",
             "procurement-identity matrix binding drift")
     require(procurement_identity.get("exact_orderables") ==
             ["0451008.MRL", "SMBJ18A", "43045-0213", "43030-0038"],
@@ -316,7 +324,8 @@ def main() -> int:
             "PCB-PWR capture status source-control binding drift")
     require(status_eco.get("prepurchase_identity_complete") is True and
             status_eco.get("standalone_engineering_sample_purchase_required") is False and
-            status_eco.get("first_lot_receiving_inspection_complete") is False and
+            status_eco.get("documentary_procurement_identity_complete") is True and
+            status_eco.get("receiving_identity_hold_required") is False and
             status_eco.get("procurement_identity_record") ==
             procurement_identity["record"] and
             status_eco.get("procurement_identity_machine_record") ==
@@ -361,13 +370,17 @@ def main() -> int:
             source_evidence_sha256,
             "PWR-IPQ-001 primary-source evidence drift")
     require(matrix_by_id["PWR-IPQ-002"]["Gate"] ==
-            "FIRST_LOT_RECEIVING_IDENTITY" and
-            matrix_by_id["PWR-IPQ-002"]["Status"] == "PENDING_PHYSICAL_TEST" and
-            "Controlled EVT test-batch" in
+            "DOCUMENTARY_PROCUREMENT_IDENTITY" and
+            matrix_by_id["PWR-IPQ-002"]["Status"] == "PASS" and
+            "Current official manufacturer data" in
             matrix_by_id["PWR-IPQ-002"]["Required_Input"] and
-            "F plus 8A" in matrix_by_id["PWR-IPQ-002"]["Pass_Criteria"] and
-            "LT plus YMXXX" in matrix_by_id["PWR-IPQ-002"]["Pass_Criteria"],
-            "PWR-IPQ-002 first-lot receiving control drift")
+            "no sample-only order" in
+            matrix_by_id["PWR-IPQ-002"]["Pass_Criteria"] and
+            "receiving quarantine" in
+            matrix_by_id["PWR-IPQ-002"]["Pass_Criteria"] and
+            matrix_by_id["PWR-IPQ-002"]["Artifact_SHA256"] ==
+            procurement_identity_sha256,
+            "PWR-IPQ-002 documentary procurement control drift")
     require(matrix_by_id["PWR-IPQ-003"]["Status"] == "PASS" and
             matrix_by_id["PWR-IPQ-003"]["Result"] ==
             "F1=0451008.MRL in all active sources; pin/net and board semantic digests retained; post-ECO ERC/PDF artifact archived" and
@@ -398,9 +411,9 @@ def main() -> int:
                 and repeat_gate_complete)
     require(contract["test_matrix"]["required_rows"] == 20,
             "contract qualification row count drift")
-    require(contract["test_matrix"]["accepted_rows"] == 3,
+    require(contract["test_matrix"]["accepted_rows"] == 4,
             "contract accepted-row count does not match controlled evidence")
-    require(status_eco.get("accepted_test_rows") == accepted_rows == 3,
+    require(status_eco.get("accepted_test_rows") == accepted_rows == 4,
             "capture-status qualification accepted-row count drift")
     require(contract["test_matrix"]["complete"] is False,
             "contract claims physical qualification complete")
@@ -441,7 +454,7 @@ def main() -> int:
         ],
         "standalone_engineering_sample_purchase_required": False,
         "procurement_identity_evidence_sha256": procurement_identity_sha256,
-        "first_lot_receiving_inspection_complete": False,
+        "receiving_identity_hold_required": False,
         "accepted_rows": accepted_rows,
         "required_rows": 20,
         "failed_rows": failed_rows,
@@ -462,7 +475,7 @@ def main() -> int:
         f"Native value ECO applied={native_eco['applied']}; "
         f"qualification evidence={accepted_rows}/20 PASS"
     )
-    print("Pre-purchase identity PASS; no sample-only purchase; first-lot receipt inspection PENDING")
+    print("Documentary procurement identity PASS; no sample-only order or receiving identity hold")
     print("PCBA procurement and manufacturing release remain BLOCKED")
     print(args.output)
 

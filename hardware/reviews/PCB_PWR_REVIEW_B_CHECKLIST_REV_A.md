@@ -123,10 +123,11 @@ manufacturing-release assertion.
   `43045-0213` and `43030-0038` to current official Littelfuse/Molex payloads,
   retrieval date, byte sizes and SHA-256 values without accepting a family
   substitute.
-- [x] The pre-purchase identity subgate binds official/controlled photos,
-  body-marking rules, packaging and authorized-channel traceability for those
-  four exact orderables. No sample-only PO is required; `PWR-IPQ-002` remains
-  open for quarantine inspection of the first actual EVT test-batch lot.
+- [x] `PWR-IPQ-002` binds manufacturer documents and exact-MPN supplier
+  catalogue records for the four orderables before purchase. No sample-only
+  PO, receiving quarantine, mandatory photos, five-piece body sample, lot/date
+  record or CoC is required; normal PO/packing-slip discrepancy handling is not
+  a qualification gate.
 - [x] C20/C21 local 100 nF/50 V CIN_HF are present at U3/U4, and the new
   five-page source passes commit-bound KiCad 9 ERC plus PDF visual preflight.
 - [ ] Routed C11/C20/U3 and C12/C21/U4 VIN-PGND hot loops prove direct

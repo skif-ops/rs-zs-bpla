@@ -3,7 +3,7 @@
   "audit": "PCB-PWR Rev.A input-protection primary-source control",
   "status": "PASS_SOURCE_CONTROL_ONLY_PHYSICAL_QUALIFICATION_PENDING",
   "retrieved_utc_date": "2026-09-17",
-  "evidence_sha256": "144a72f088e835d3b5c6e8f612d9b5ccb6d3769fe46df051b9987633a109a87f",
+  "evidence_sha256": "1ee7d72b7f71bfd53879c43031ba0bf184a0c5d3beb0558ca1e691c585424823",
   "payloads_hash_bound": 6,
   "exact_orderables": [
     "0451008.MRL",
@@ -11,7 +11,7 @@
     "43045-0213",
     "43030-0038"
   ],
-  "accepted_matrix_rows": 3,
+  "accepted_matrix_rows": 4,
   "required_matrix_rows": 20,
   "physical_qualification_complete": false,
   "pcba_procurement_authorized": false,

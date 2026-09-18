@@ -177,7 +177,7 @@
   "release_boundary": {
     "source_control_complete": true,
     "physical_qualification_complete": false,
-    "accepted_matrix_rows": 3,
+    "accepted_matrix_rows": 4,
     "required_matrix_rows": 20,
     "routing_authorized": false,
     "pcba_procurement_authorized": false,

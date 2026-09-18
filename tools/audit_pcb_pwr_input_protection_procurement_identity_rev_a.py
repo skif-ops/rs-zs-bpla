@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Audit PCB-PWR pre-purchase identity and first-lot receiving controls.
+"""Audit the PCB-PWR documentary procurement-identity control.
 
-This audit closes only the documentary subgate of PWR-IPQ-002. The matrix row
-stays pending until the actual EVT lot is received, photographed and traced.
+PWR-IPQ-002 is closed before purchase from manufacturer authority and exact-MPN
+supplier catalogue records. It deliberately imposes no sample-only order,
+receiving quarantine, mandatory photographs, body sample, lot/date record or
+certificate of conformance.
 """
 from __future__ import annotations
 
@@ -60,13 +62,13 @@ def main() -> int:
     capture_status = json.loads(CAPTURE_STATUS.read_text(encoding="utf-8"))
     matrix = {row["Test_ID"]: row for row in read_csv(MATRIX)}
 
-    require(evidence["schema_version"] == 1, "identity-evidence schema drift")
+    require(evidence["schema_version"] == 2, "identity-evidence schema drift")
     require(evidence["configuration"] == "EVT-PRE-20 Rev.A", "configuration drift")
     require(evidence["assembly"] == "PCB-PWR", "assembly drift")
     require(evidence["retrieved_utc_date"] == "2026-09-17", "retrieval date drift")
     require(
         evidence["status"]
-        == "PASS_PREPURCHASE_DOCUMENTARY_IDENTITY_FIRST_LOT_RECEIVING_INSPECTION_PENDING",
+        == "PASS_DOCUMENTARY_PROCUREMENT_IDENTITY_NO_RECEIVING_HOLD",
         "procurement-identity status drift",
     )
 
@@ -75,13 +77,15 @@ def main() -> int:
         decision
         == {
             "standalone_engineering_sample_purchase_required": False,
-            "qualification_batch_may_supply_receiving_samples": True,
+            "qualification_batch_may_be_ordered_without_identity_samples": True,
             "prepurchase_documentary_identity_complete": True,
-            "actual_future_lot_date_code_available_online": False,
-            "first_lot_receiving_inspection_required": True,
+            "mandatory_receiving_quarantine_required": False,
+            "mandatory_receiving_photography_required": False,
+            "mandatory_body_sampling_required": False,
+            "certificate_of_conformance_required": False,
             "electrical_qualification_complete": False,
         },
-        "sample-purchase/receiving decision drift",
+        "documentary procurement decision drift",
     )
 
     exact_orderables = ["0451008.MRL", "SMBJ18A", "43045-0213", "43030-0038"]
@@ -92,41 +96,29 @@ def main() -> int:
 
     fuse = targets["0451008.MRL"]
     require(fuse["manufacturer"] == "Littelfuse", "fuse manufacturer drift")
-    require(fuse["individual_marking"]["expected"] ==
-            ["Littelfuse F brand mark", "8A ampere marking"],
-            "fuse expected body marking drift")
-    require(fuse["individual_marking"]["exact_full_mpn_on_body"] is False and
-            fuse["individual_marking"]["lot_date_on_body"] is False,
-            "fuse body marking overclaimed")
-    require(fuse["factory_packaging"] == {
-        "type": "12 mm tape and reel",
-        "quantity_pieces": 1000,
-        "specification": "EIA RS-481-2 (IEC 286 part 3)",
-        "ordering_code_binding": "0451 + 008. + M + R + L",
-    }, "fuse packaging identity drift")
+    require(fuse["documentary_identity"]["nominal_current_a"] == 8.0,
+            "fuse nominal current drift")
+    require(fuse["documentary_identity"]["voltage_rating_vdc"] == 125,
+            "fuse voltage rating drift")
+    require(fuse["documentary_identity"]["ordering_code_binding"]
+            == "0451 + 008. + M + R + L",
+            "fuse ordering-code binding drift")
 
     tvs = targets["SMBJ18A"]
-    require(tvs["individual_marking"] == {
-        "exact_device_code": "LT",
-        "trace_format": "YMXXX",
-        "trace_fields": {
-            "Y": "year code",
-            "M": "month code",
-            "XXX": "lot code",
-        },
-        "polarity_feature": "Cathode band required for the unidirectional SMBJ18A",
-        "reject_adjacent_code": "BT is SMBJ18CA and is not acceptable",
-    }, "TVS marking system drift")
-    require(tvs["factory_packaging"] == {
-        "type": "12 mm tape on 13 inch reel",
-        "quantity_pieces": 3000,
-        "specification": "EIA STD RS-481",
-    }, "TVS packaging identity drift")
+    require(tvs["manufacturer"] == "Littelfuse", "TVS manufacturer drift")
+    require(tvs["documentary_identity"]["reverse_standoff_v"] == 18.0 and
+            tvs["documentary_identity"]["maximum_clamp_v"] == 29.2,
+            "TVS controlled ratings drift")
+    require("BT identifies rejected SMBJ18CA" in
+            tvs["documentary_identity"]["body_marking_reference"],
+            "TVS adjacent-part rejection drift")
 
     header = targets["43045-0213"]
     require(header["manufacturer"] == "Molex", "header manufacturer drift")
-    require(header["official_packaging_type"] == "Tray", "header packaging drift")
-    require(header["upc"] == "800754370066", "header UPC drift")
+    require(header["documentary_identity"]["official_packaging_type"] == "Tray",
+            "header packaging drift")
+    require(header["documentary_identity"]["maximum_current_per_contact_a"] == 8.5,
+            "header current field drift")
     require(
         header["official_product_image"]["sha256"]
         == "d0fdbe0b053d81cc0001bc228c8a30ef07962d9f3b6902f4518d1d037419d49c",
@@ -135,8 +127,11 @@ def main() -> int:
 
     terminal = targets["43030-0038"]
     require(terminal["manufacturer"] == "Molex", "terminal manufacturer drift")
-    require(terminal["official_packaging_type"] == "Reel", "terminal packaging drift")
-    require(terminal["upc"] == "889056413237", "terminal UPC drift")
+    require(terminal["documentary_identity"]["official_packaging_type"] == "Reel",
+            "terminal packaging drift")
+    require(terminal["documentary_identity"]["wire_awg"] == 18 and
+            terminal["documentary_identity"]["wire_cross_section_mm2"] == 0.75,
+            "terminal wire range drift")
     require(
         terminal["official_product_image"]["sha256"]
         == "3964a86c3efa3975f59f4ed95a92d85532617434f98f59f4ed95eff79cb32",
@@ -158,48 +153,120 @@ def main() -> int:
         "product_label_location_shown": True,
         "reels_per_carton": 7,
     }, "terminal packaging claims drift")
-    illustrative = terminal["illustrative_exact_mpn_reel_photo"]
-    require(illustrative["authority"] is False,
-            "third-party reel photo promoted to authority")
+
+    supplier_bindings = {
+        mpn: [entry["supplier"] for entry in targets[mpn]["supplier_catalog_records"]]
+        for mpn in exact_orderables
+    }
+    require(supplier_bindings == {
+        "0451008.MRL": ["DigiKey"],
+        "SMBJ18A": ["Mouser"],
+        "43045-0213": ["DigiKey"],
+        "43030-0038": ["DigiKey", "Mouser"],
+    }, "exact-MPN supplier catalogue bindings drift")
+    for mpn in exact_orderables:
+        for entry in targets[mpn]["supplier_catalog_records"]:
+            require(entry["url"].startswith("https://"),
+                    f"{mpn}: supplier record is not HTTPS")
+            require(entry["claims_used"],
+                    f"{mpn}: supplier record lacks controlled claims")
+        require(mpn in targets[mpn]["purchase_order_identity_rule"],
+                f"{mpn}: purchase-order identity rule does not name exact MPN")
+
+    availability = evidence["nonbinding_supplier_availability_snapshot"]
     require(
-        illustrative["sha256"]
-        == "058f74c8b92e63f5b6509067988d8ef0cd8e9cd67123e1e35e2020ff012dd1c3",
-        "illustrative reel photo hash drift",
+        availability["observed_utc_date"] == evidence["retrieved_utc_date"],
+        "supplier availability snapshot date drift",
+    )
+    expected_availability = {
+        "0451008.MRL": (30, 14150, 23),
+        "SMBJ18A": (25, 12758, None),
+        "43045-0213": (25, 4507, 17),
+        "43030-0038": (252, 670806, 8),
+    }
+    require(
+        [record["mpn"] for record in availability["records"]] == exact_orderables,
+        "supplier availability MPN order drift",
+    )
+    for record in availability["records"]:
+        expected = expected_availability[record["mpn"]]
+        actual = (
+            record["evt_20_quantity_with_spares"],
+            record["displayed_in_stock"],
+            record["manufacturer_standard_lead_time_weeks"],
+        )
+        require(actual == expected,
+                f"{record['mpn']}: supplier availability snapshot drift")
+        require(record["displayed_in_stock"]
+                >= record["evt_20_quantity_with_spares"],
+                f"{record['mpn']}: displayed stock does not cover EVT-20 quantity")
+        require(record["supplier_page"].startswith("https://"),
+                f"{record['mpn']}: availability source is not HTTPS")
+    require(
+        availability["displayed_stock_covers_controlled_evt_20_quantities"] is True
+        and availability["two_week_delivery_guaranteed"] is False
+        and availability[
+            "cart_or_quote_destination_delivery_confirmation_required_at_order"
+        ] is True,
+        "supplier availability delivery boundary drift",
     )
 
-    channel = evidence["channel_evidence"]
-    require([item["mpn"] for item in channel["exact_mpn_catalog_examples"]]
-            == ["0451008.MRL", "43045-0213", "43030-0038"],
-            "authorized-channel examples drift")
-    for forbidden in ("Marketplace", "Unlabeled", "Adjacent", "Mixed"):
-        require(any(item.startswith(forbidden) for item in channel["forbidden"]),
-                f"missing procurement rejection rule: {forbidden}")
+    gate = evidence["documentary_procurement_gate"]
+    require(gate["status"] == "PASS", "documentary procurement gate is not PASS")
+    require(any("exact MPN" in item for item in gate["purchase_order_rule"]),
+            "purchase-order exact-MPN rule missing")
+    require(any("substitution" in item.lower() for item in gate["purchase_order_rule"]),
+            "purchase-order no-substitution rule missing")
+    require(gate["volatile_commercial_fields_confirm_at_order"] == [
+        "Orderable status",
+        "Available quantity",
+        "Price",
+        "Ship date and delivery date to destination",
+        "Packaging option when ordering less than the factory pack",
+    ], "volatile commercial field boundary drift")
+    for token in (
+        "A separate engineering sample order",
+        "Future shipment date or lot code",
+        "Certificate of conformance",
+        "Incoming package or body photographs",
+        "A minimum incoming body sample count",
+    ):
+        require(token in gate["not_required_for_gate"],
+                f"non-required incoming control missing: {token}")
 
-    receiving = evidence["first_lot_receiving_gate"]
-    require(receiving["status"] == "PENDING_ACTUAL_RECEIPT",
-            "first-lot gate prematurely closed")
-    require("100 percent" in receiving["package_inspection"],
-            "package inspection is not exhaustive")
-    require("at least five" in receiving["body_inspection"],
-            "body inspection sample floor drift")
-    for token in ("Exact MPN", "Manufacturer or distributor date/lot code",
-                  "Photo filenames and SHA-256 values", "Inspector and UTC date"):
-        require(token in receiving["required_record_fields"],
-                f"receiving record missing {token}")
+    receipt = evidence["non_blocking_receipt_reconciliation"]
+    require(receipt == {
+        "status": "NOT_A_QUALIFICATION_OR_RELEASE_GATE",
+        "quarantine_required": False,
+        "mandatory_photographs_required": False,
+        "minimum_body_sample_count": 0,
+        "certificate_of_conformance_required": False,
+        "actions_using_existing_commercial_data": [
+            "Reconcile delivered quantity and supplier line against the purchase order or packing slip",
+            "Escalate an obvious MPN, quantity or transit-damage discrepancy through normal procurement nonconformance handling",
+            "Proceed directly to kitting when no discrepancy is reported",
+        ],
+        "new_receiving_evidence_package_required": False,
+    }, "non-blocking receipt boundary drift")
 
     binding = evidence["qualification_binding"]
     require(binding == {
         "matrix_row": "PWR-IPQ-002",
-        "matrix_status": "PENDING_PHYSICAL_TEST",
-        "prepurchase_subgate_complete": True,
-        "first_lot_receiving_subgate_complete": False,
-        "internet_photos_are_not_future_lot_evidence": True,
+        "matrix_status": "PASS",
+        "documentary_gate_complete": True,
+        "physical_lot_identity_gate_required": False,
+        "functional_confirmation_routes": [
+            "PWR-IPQ-005 through PWR-IPQ-020",
+            "Assembly inspection and AOI",
+            "PCB-PWR electrical end-of-line test",
+            "EVT thermal, inrush, fault and transient tests",
+        ],
     }, "qualification binding drift")
     boundary = evidence["release_boundary"]
     require(boundary == {
-        "identity_evidence_allows_sample_only_purchase_to_be_omitted": True,
+        "identity_control_allows_sample_only_purchase_to_be_omitted": True,
         "exact_parts_may_be_bought_with_the_controlled_evt_test_batch_when_other_procurement_gates_allow": True,
-        "received_parts_released_to_evt_kitting": False,
+        "identity_control_allows_direct_evt_kitting_without_receiving_hold": True,
         "physical_qualification_complete": False,
         "pcba_procurement_authorized": False,
         "manufacturing_release": False,
@@ -208,25 +275,27 @@ def main() -> int:
     identity = contract["procurement_identity"]
     require(identity["prepurchase_documentary_identity_complete"] is True and
             identity["standalone_engineering_sample_purchase_required"] is False and
-            identity["qualification_batch_may_supply_receiving_samples"] is True and
-            identity["actual_future_lot_date_code_available_online"] is False and
-            identity["first_lot_receiving_inspection_required"] is True and
-            identity["first_lot_receiving_inspection_complete"] is False,
-            "qualification contract identity decision drift")
+            identity["qualification_batch_may_be_ordered_without_identity_samples"] is True and
+            identity["mandatory_receiving_quarantine_required"] is False and
+            identity["mandatory_receiving_photography_required"] is False and
+            identity["mandatory_body_sampling_required"] is False and
+            identity["certificate_of_conformance_required"] is False,
+            "qualification contract documentary identity decision drift")
     require(identity["record"] == EVIDENCE_MD.relative_to(ROOT).as_posix() and
             identity["machine_record"] == EVIDENCE.relative_to(ROOT).as_posix() and
             identity["independent_audit"] ==
             "tools/audit_pcb_pwr_input_protection_procurement_identity_rev_a.py" and
             identity["evidence_sha256"] == evidence_sha256 and
             identity["matrix_row"] == "PWR-IPQ-002" and
-            identity["matrix_status"] == "PENDING_PHYSICAL_TEST" and
+            identity["matrix_status"] == "PASS" and
             identity["exact_orderables"] == exact_orderables,
             "qualification contract identity binding drift")
 
     status = capture_status["input_protection_candidate_eco"]
     require(status["prepurchase_identity_complete"] is True and
             status["standalone_engineering_sample_purchase_required"] is False and
-            status["first_lot_receiving_inspection_complete"] is False and
+            status["documentary_procurement_identity_complete"] is True and
+            status["receiving_identity_hold_required"] is False and
             status["procurement_identity_record"] == identity["record"] and
             status["procurement_identity_machine_record"] == identity["machine_record"] and
             status["procurement_identity_audit"] == identity["independent_audit"] and
@@ -234,43 +303,57 @@ def main() -> int:
             "capture-status procurement identity binding drift")
 
     row = matrix["PWR-IPQ-002"]
-    require(row["Gate"] == "FIRST_LOT_RECEIVING_IDENTITY",
+    require(row["Gate"] == "DOCUMENTARY_PROCUREMENT_IDENTITY",
             "PWR-IPQ-002 gate drift")
-    require(row["Status"] == "PENDING_PHYSICAL_TEST",
-            "PWR-IPQ-002 prematurely closed")
-    require("Controlled EVT test-batch" in row["Required_Input"] and
-            all(mpn in row["Procedure"] for mpn in exact_orderables) and
-            "F plus 8A" in row["Pass_Criteria"] and
-            "LT plus YMXXX" in row["Pass_Criteria"],
-            "PWR-IPQ-002 receiving criteria drift")
-    require(not any(row[field] for field in
-                    ("Result", "Operator", "Date", "Artifact_SHA256")),
-            "pending PWR-IPQ-002 carries unaudited receipt evidence")
+    require(row["Status"] == "PASS", "PWR-IPQ-002 is not PASS")
+    require(all(mpn in row["Procedure"] for mpn in exact_orderables),
+            "PWR-IPQ-002 procedure does not name all exact orderables")
+    require("no sample-only order" in row["Pass_Criteria"] and
+            "receiving quarantine" in row["Pass_Criteria"] and
+            "body sampling" in row["Pass_Criteria"] and
+            "CoC" in row["Pass_Criteria"],
+            "PWR-IPQ-002 no-receiving-hold criteria drift")
+    require(row["Result"] ==
+            "Four exact orderables bound to current manufacturer and supplier records; documentary identity closes without a receiving hold" and
+            row["Operator"] == "Codex manufacturer/supplier documentary audit" and
+            row["Date"] == "2026-09-17" and
+            row["Artifact_SHA256"] == evidence_sha256,
+            "PWR-IPQ-002 attributable evidence drift")
 
     for token in (
         "0451008.MRL",
         "SMBJ18A",
         "43045-0213",
         "43030-0038",
-        "F` plus `8A",
-        "`LT`",
-        "`YMXXX`",
-        "12,000",
+        "NO SUBSTITUTION",
+        "minimum inspected bodies per MPN/lot: `0`",
+        "DigiKey 14,150",
+        "Mouser 12,758",
+        "DigiKey 4,507",
+        "DigiKey 670,806",
         evidence_sha256,
-        "PENDING_PHYSICAL_TEST",
+        "PWR-IPQ-002`: `PASS",
         "NOT FOR MANUFACTURE",
     ):
         require(token in evidence_md, f"Markdown identity record missing {token}")
 
     result = {
         "configuration": evidence["configuration"],
-        "audit": "PCB-PWR Rev.A pre-purchase and receiving identity control",
-        "status": "PASS_PREPURCHASE_DOCUMENTARY_IDENTITY_FIRST_LOT_PENDING",
+        "audit": "PCB-PWR Rev.A documentary procurement identity control",
+        "status": "PASS_DOCUMENTARY_PROCUREMENT_IDENTITY_NO_RECEIVING_HOLD",
         "retrieved_utc_date": evidence["retrieved_utc_date"],
         "evidence_sha256": evidence_sha256,
         "exact_orderables": exact_orderables,
+        "supplier_catalogue_bindings": supplier_bindings,
+        "supplier_availability_snapshot_date": availability["observed_utc_date"],
+        "displayed_stock_covers_controlled_evt_20_quantities": True,
+        "two_week_delivery_guaranteed": False,
+        "destination_delivery_confirmation_required_at_order": True,
         "standalone_engineering_sample_purchase_required": False,
-        "first_lot_receiving_inspection_complete": False,
+        "receiving_quarantine_required": False,
+        "mandatory_receiving_photography_required": False,
+        "minimum_body_sample_count": 0,
+        "certificate_of_conformance_required": False,
         "matrix_row": "PWR-IPQ-002",
         "matrix_status": row["Status"],
         "physical_qualification_complete": False,
@@ -280,10 +363,10 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
 
-    print("PCB-PWR pre-purchase identity audit PASS")
-    print("No sample-only purchase; first actual EVT lot remains quarantined pending receipt inspection")
+    print("PCB-PWR documentary procurement-identity audit PASS")
+    print("PWR-IPQ-002 PASS; no sample-only order or receiving identity hold")
     print(f"Evidence SHA-256: {evidence_sha256}")
-    print("PWR-IPQ-002 remains PENDING_PHYSICAL_TEST; manufacturing release remains BLOCKED")
+    print("Physical qualification and manufacturing release remain BLOCKED")
     print(args.output)
     return 0
 

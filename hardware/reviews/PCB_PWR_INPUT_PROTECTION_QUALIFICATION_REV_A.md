@@ -14,8 +14,8 @@ passes, and reviewer `Скиф` accepted the exact active source/PDF hierarchy o
 `2026-09-17`. Physical qualification remains required before production PCBA
 or manufacturing release. A separate sample-only purchase is not required:
 the exact parts may be included in the controlled EVT test-batch order when
-other procurement gates permit, then held in quarantine until the first-lot
-receiving identity gate passes.
+other procurement gates permit and may proceed to kitting without an incoming
+identity hold.
 
 Manufacturer source control is now complete. The machine-audited
 `PCB_PWR_INPUT_PROTECTION_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}` record binds
@@ -24,11 +24,11 @@ date, byte sizes and SHA-256 values. This closes `PWR-IPQ-001` only.
 
 The machine-audited
 `PCB_PWR_INPUT_PROTECTION_PROCUREMENT_IDENTITY_REV_A.{md,json}` record now
-closes the pre-purchase documentary subgate for `PWR-IPQ-002`. It binds online
-photos, exact body-marking rules, packaging formats and authorized-channel
-traceability requirements. The row itself remains `PENDING_PHYSICAL_TEST`
-because the actual date/lot code of the future shipment can only be recorded
-from the delivered EVT batch.
+closes `PWR-IPQ-002` as a documentary procurement gate. It binds manufacturer
+data sheets, product pages and drawings to exact-MPN supplier catalogue
+records. It requires no quarantine, incoming photographs, minimum body sample,
+future date/lot record or CoC. Inventory and delivery are reconfirmed at PO
+placement because they are volatile commercial fields.
 
 ## 1. Controlled decision
 
@@ -138,9 +138,8 @@ register wrap or overflow as a plausible valid current.
 Tests run in the order controlled by
 `PCB_PWR_INPUT_PROTECTION_TEST_MATRIX_REV_A.csv`:
 
-1. source control (`PWR-IPQ-001 PASS`), pre-purchase identity evidence, then
-   first-lot receiving inspection using the quarantined EVT batch and the
-   bounded native ECO;
+1. source control (`PWR-IPQ-001 PASS`), documentary procurement identity
+   (`PWR-IPQ-002 PASS`) and the bounded native ECO;
 2. repeat ERC/PDF/human hierarchy gate after the legibility remediation and C20/C21 ECO (`PASS`);
 3. 25 C, +70 C and -40 C operating tests;
 4. inrush and modem-burst tests;
@@ -166,31 +165,36 @@ date, every required artifact has a SHA-256, the native F1 value equals
 This packet never closes PCB-PWR routing, DIM-003, stackup/copper, DRC, CAM, DFM,
 Review B or manufacturing release.
 
-The current matrix state is `3/20 PASS`; 17 rows remain open.
+The current matrix state is `4/20 PASS`; 16 rows remain open.
 
 ## 7. Procurement identity
 
-No stand-alone identity samples are purchased. The first controlled EVT batch
-is the inspected lot. Before kitting, photograph every received package/reel/
-tray, inspect at least five bodies per MPN per date/lot (or all when fewer than
-five), and bind the photos to the PO, exact MPN, quantity, supplier, date/lot,
-packing record and inspector.
+No stand-alone identity samples are purchased. Identity is controlled before
+purchase from official manufacturer documents and exact-MPN supplier catalogue
+records. Each PO line states manufacturer, exact MPN and `NO SUBSTITUTION` and
+retains the supplier URL or quote line that maps the seller entry to that MPN.
+Inventory, price, packaging option and delivery date are checked in the cart or
+quote at order time against the two-week schedule.
 
-The key online identifiers are:
+The controlled source data are:
 
-- `0451008.MRL`: official family rule is brand plus ampere rating; expected
-  body marking is Littelfuse `F` plus `8A`, while the exact suffix and lot must
-  remain traceable through the label/paperwork;
-- `SMBJ18A`: exact code `LT`, trace format `YMXXX` (year, month, lot) and a
-  cathode band; `BT` is the rejected bidirectional `SMBJ18CA`;
-- `43045-0213`: exact official Molex product image and tray packaging; body
-  geometry cannot replace the labelled MPN/date-lot trace;
+- `0451008.MRL`: Littelfuse 451/453 data sheet, official product page and
+  DigiKey exact-MPN catalogue record;
+- `SMBJ18A`: Littelfuse SMBJ data sheet, official product page and Mouser
+  exact-MPN catalogue record; `BT` remains the rejected `SMBJ18CA` code;
+- `43045-0213`: exact Molex product page and DigiKey exact numeric-MPN record;
 - `43030-0038`: exact official Molex product image and packaging drawing
-  `PK-43030-001-001` Rev.B1, with 12,000 pieces per 24-inch reel and a defined
-  product-label location.
+  `PK-43030-001-001` Rev.B1 plus DigiKey and Mouser exact-MPN records.
+
+There is no input-protection receiving quarantine, mandatory package or body
+photography, five-piece inspection, lot/date record, CoC or new receiving
+evidence package. Existing PO or packing-slip data may be used for routine
+quantity and obvious-discrepancy reconciliation; otherwise parts proceed to
+kitting. Electrical and functional confirmation remains in assembly/EOL and
+physical rows `PWR-IPQ-005` through `PWR-IPQ-020`.
 
 Controlled JSON SHA-256:
-`f6baf0cc053396ef98d91d28b3f52c4839f7fb4d345a49f30cc3ef073dd532ae`.
+`2b3acbc5bcee5b08bb1a45f009d75d57210592d8488f2e5dc29358c072a62250`.
 
 ## 8. Primary evidence
 
