@@ -498,7 +498,14 @@ def main() -> int:
     # with 0.075 mm intra-footprint gaps pass native DRC; no routed netclass is
     # permitted below 0.10 mm.
     design.m_MinClearance = pcbnew.FromMM(0.05)
-    default_class = design.m_NetSettings.m_DefaultNetClass
+    net_settings = design.m_NetSettings
+    # KiCad 9.0.6 exposed the default netclass as a SWIG member; current
+    # KiCad 9 stable exposes the same object through the public accessor.
+    default_class = (
+        net_settings.m_DefaultNetClass
+        if hasattr(net_settings, "m_DefaultNetClass")
+        else net_settings.GetDefaultNetclass()
+    )
     default_class.SetClearance(pcbnew.FromMM(0.10))
     default_class.SetTrackWidth(pcbnew.FromMM(0.15))
     default_class.SetViaDiameter(pcbnew.FromMM(0.50))
