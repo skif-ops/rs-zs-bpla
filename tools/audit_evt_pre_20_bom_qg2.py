@@ -11,6 +11,9 @@ import argparse
 import csv
 import hashlib
 import json
+import subprocess
+import sys
+import tempfile
 from collections import defaultdict
 from pathlib import Path
 
@@ -23,6 +26,29 @@ LOT_SIZES = (4, 10, 20)
 def read(path: Path) -> list[dict[str, str]]:
     with path.open(encoding="utf-8-sig", newline="") as source:
         return list(csv.DictReader(source))
+
+
+def run_json_audit(script_name: str) -> dict[str, object]:
+    with tempfile.TemporaryDirectory(prefix="evt-pre-20-bom-qg2-") as temp_dir:
+        output = Path(temp_dir) / "audit.json"
+        process = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / f"tools/{script_name}"),
+                "--output",
+                str(output),
+            ],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if process.returncode != 0 or not output.is_file():
+            return {
+                "status": "ERROR",
+                "error": process.stderr.strip() or process.stdout.strip() or f"exit {process.returncode}",
+            }
+        return json.loads(output.read_text(encoding="utf-8"))
 
 
 def main() -> int:
@@ -209,12 +235,12 @@ def main() -> int:
     )
     check(
         "power_passive_authority_bom",
-        len(pwr_passive_authority) == 47 and len(pwr_passive_groups) == 17
+        len(pwr_passive_authority) == 49 and len(pwr_passive_groups) == 17
         and not pwr_passive_mismatch and not leaked_dft,
         "PCB-PWR passive authority/BOM mismatch: "
         + ", ".join(pwr_passive_mismatch + leaked_dft)
         if pwr_passive_mismatch or leaked_dft
-        else "all 37 BOM passives/net-ties match authority; 10 DFT pads remain non-procured",
+        else "all 39 BOM passives/net-ties match authority; 10 DFT pads remain non-procured",
     )
 
     mic_expected = {
@@ -446,6 +472,28 @@ def main() -> int:
     check("main_review_a_complete", review_a_ok,
           "PCB-MAIN Review A is not complete with signed identity, commit and all required evidence" if not review_a_ok else "PCB-MAIN Review A complete with required evidence")
 
+    system_ots_identity = run_json_audit(
+        "audit_evt_system_ots_procurement_identity_rev_a.py"
+    )
+    system_ots_identity_ok = (
+        system_ots_identity.get("status")
+        == "PASS_DOCUMENTARY_PURCHASE_IDENTITY_PHYSICAL_VALIDATION_DURING_ASSEMBLY_EOL_EVT"
+        and system_ots_identity.get("documentary_purchase_identity_complete") is True
+        and system_ots_identity.get("controlled_item_count") == 8
+        and system_ots_identity.get("standalone_preorder_qualification_unit_required") is False
+        and system_ots_identity.get("receiving_hold_required") is False
+        and system_ots_identity.get("physical_qualification_complete") is False
+        and system_ots_identity.get("manufacturing_release") is False
+    )
+    check(
+        "system_ots_documentary_procurement_identity",
+        system_ots_identity_ok,
+        "system OTS documentary purchase identity is missing or inconsistent: "
+        + str(system_ots_identity.get("error", system_ots_identity.get("status", "MISSING")))
+        if not system_ots_identity_ok
+        else "eight exact system OTS MPNs have documentary purchase control; physical assembly/EOL/EVT validation remains open",
+    )
+
     system_open = [
         row["Item_ID"] for row in rows
         if row["Line_class"] in {"SYSTEM_ITEM", "MECHANICAL_OPTION"}
@@ -461,6 +509,7 @@ def main() -> int:
         "production_bom_complete": not blockers,
         "checks": checks,
         "blockers": blockers,
+        "system_ots_procurement_identity": system_ots_identity,
     }
     output = ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)

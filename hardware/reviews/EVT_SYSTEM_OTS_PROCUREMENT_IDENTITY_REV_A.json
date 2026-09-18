@@ -1,0 +1,415 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20 Rev.A",
+  "scope": "SYSTEM_OTS_DOCUMENTARY_PURCHASE_IDENTITY",
+  "retrieved_utc_date": "2026-09-18",
+  "status": "PASS_DOCUMENTARY_PURCHASE_IDENTITY_PHYSICAL_VALIDATION_DURING_ASSEMBLY_EOL_EVT",
+  "decision": {
+    "standalone_preorder_qualification_unit_required": false,
+    "selected_evt_lot_is_qualification_batch": true,
+    "prepurchase_documentary_identity_complete": true,
+    "mandatory_receiving_quarantine_required": false,
+    "mandatory_receiving_photography_required": false,
+    "mandatory_body_sampling_required": false,
+    "manufacturer_lot_or_date_capture_required": false,
+    "certificate_of_conformance_required": false,
+    "battery_transport_documents_when_applicable_required": true,
+    "physical_qualification_complete": false
+  },
+  "exact_item_ids": [
+    "BAT1",
+    "PV1",
+    "MPPT1",
+    "MPPT-TEMP",
+    "ANT-CELL",
+    "ANT-GNSS",
+    "ANT-LORA",
+    "RF-PIGTAIL"
+  ],
+  "targets": {
+    "BAT1": {
+      "manufacturer": "RELiON",
+      "mpn": "RB40",
+      "evt_20_quantity_with_spares": 21,
+      "official_sources": [
+        "https://www.relionbattery.com/products/lithium/rb40"
+      ],
+      "supplier_catalog_records": [
+        {
+          "supplier": "Ameresco Solar",
+          "url": "https://www.amerescosolar.com/relion-rb40-lithium-iron-phosphate-128v-40ah-battery",
+          "claims_used": [
+            "Exact RELiON RB40 manufacturer-model binding",
+            "Supplier quotation route"
+          ]
+        }
+      ],
+      "controlled_facts": {
+        "nominal_voltage_v": 12.8,
+        "capacity_ah": 40,
+        "energy_wh": 512,
+        "dimensions_mm": [197, 166, 173],
+        "terminal": "M8 x 1.25",
+        "ingress_rating": "IP66",
+        "discharge_temperature_c": [-20, 60],
+        "charge_temperature_c": [-20, 45]
+      },
+      "purchase_order_rule": "RELiON RB40 only; NO SUBSTITUTION; retain applicable UN38.3/SDS/route documents",
+      "physical_validation_routes": [
+        "Every-unit polarity and open-circuit voltage at installation",
+        "Capacity, DCIR and BMS behavior during station assembly and EVT",
+        "Cold enclosure and charge-inhibit validation during EVT"
+      ]
+    },
+    "PV1": {
+      "manufacturer": "SLD Tech / Solarland",
+      "mpn": "SLP080S-12M",
+      "evt_20_quantity_with_spares": 21,
+      "official_sources": [
+        "https://sldtechinc.com/80w-12v-monocrystalline-solar-panel-s/"
+      ],
+      "supplier_catalog_records": [
+        {
+          "supplier": "MrSolar",
+          "url": "https://www.mrsolar.com/solarland-slp080s-12m-80-watt-solar-panel/",
+          "claims_used": [
+            "Exact SLP080S-12M model binding",
+            "80 W monocrystalline product listing"
+          ]
+        }
+      ],
+      "controlled_facts": {
+        "pmax_w": 80.0,
+        "vmp_v": 18.46,
+        "imp_a": 4.33,
+        "voc_v": 22.52,
+        "isc_a": 4.56,
+        "dimensions_mm": [1475, 342, 40],
+        "operating_temperature_c": [-40, 85]
+      },
+      "purchase_order_rule": "SLP080S-12M only; NO SUBSTITUTION including SLP080-12M, SLP080S-12U or any adjacent model",
+      "physical_validation_routes": [
+        "Every-unit transit-damage, dimensions, polarity and Voc check at installation",
+        "IV, insulation, wet-leakage and cold-Voc validation during EVT",
+        "Bracket, cable, connector and transport validation during assembly and EVT"
+      ]
+    },
+    "MPPT1": {
+      "manufacturer": "Victron Energy",
+      "mpn": "SCC075010060R",
+      "evt_20_quantity_with_spares": 21,
+      "official_sources": [
+        "https://www.victronenergy.com/media/pg/Manual_SmartSolar_MPPT_75-10_up_to_100-20/en/technical-specifications.html"
+      ],
+      "supplier_catalog_records": [
+        {
+          "supplier": "Ameresco Solar",
+          "url": "https://www.amerescosolar.com/victron-charge-controller-mppt-75-10-scc075010060r",
+          "claims_used": [
+            "Exact SCC075010060R article binding",
+            "Victron SmartSolar MPPT 75/10 supplier quotation route"
+          ]
+        },
+        {
+          "supplier": "DigiKey",
+          "url": "https://www.digikey.com/en/products/detail/spartan-power/SCC075010060R/16035431",
+          "claims_used": [
+            "Exact SCC075010060R catalogue entry",
+            "Active orderable status snapshot"
+          ]
+        }
+      ],
+      "controlled_facts": {
+        "battery_voltage_v": "12/24",
+        "rated_charge_current_a": 10,
+        "maximum_pv_open_circuit_voltage_v": 75,
+        "nominal_pv_power_at_12v_w": 145,
+        "operating_temperature_c": [-30, 60],
+        "ingress_rating": "IP43 electronics / IP22 terminals"
+      },
+      "purchase_order_rule": "Victron Energy SCC075010060R only; NO SUBSTITUTION with any adjacent SmartSolar current or voltage variant",
+      "physical_validation_routes": [
+        "Article and firmware identity at installation",
+        "RB40 charge-profile export plus VE.Smart binding during assembly and EOL",
+        "Reverse current, quiescent current, thermal, transient and cold-cutoff validation during EVT"
+      ]
+    },
+    "MPPT-TEMP": {
+      "manufacturer": "Victron Energy",
+      "mpn": "SBS050150200",
+      "evt_20_quantity_with_spares": 21,
+      "official_sources": [
+        "https://www.victronenergy.com/media/pg/Smart_Battery_Sense/en/technical-specifications.html",
+        "https://www.victronenergy.com/meters-and-sensors/smart-battery-sense"
+      ],
+      "supplier_catalog_records": [
+        {
+          "supplier": "SVB",
+          "url": "https://www.svb24.com/en/victron-smart-battery-sense-voltage-and-temperature-sensor-12-24-v.html",
+          "claims_used": [
+            "Manufacturer number SBS050150200",
+            "Exact Smart Battery Sense catalogue binding"
+          ]
+        }
+      ],
+      "controlled_facts": {
+        "dimensions_mm": [14, 38, 38],
+        "cable_length_m": 0.45,
+        "eyelet_hole": "M10",
+        "operating_temperature_c": [-10, 60],
+        "operating_voltage_v": [8, 60],
+        "connected_current_at_12v_ma": 1.6
+      },
+      "purchase_order_rule": "Victron Energy SBS050150200 only; NO SUBSTITUTION; 10 m denotes wireless range and must not be represented as lead length",
+      "physical_validation_routes": [
+        "M10-eyelet to RB40-M8 retention stack during station assembly",
+        "Battery voltage and temperature accuracy plus VE.Smart pairing at EOL",
+        "0 C cutoff, reconnect and network retention during cold EVT"
+      ]
+    },
+    "ANT-CELL": {
+      "manufacturer": "Taoglas",
+      "mpn": "G30.B.108111",
+      "evt_20_quantity_with_spares": 22,
+      "official_sources": [
+        "https://www.taoglas.com/product/olympian-g30-2g3g4g-lte-antenna/"
+      ],
+      "supplier_catalog_records": [
+        {
+          "supplier": "RS",
+          "url": "https://no.rs-online.com/web/p/multi-band-antennas/2884458",
+          "claims_used": [
+            "Exact G30.B.108111 manufacturer part number",
+            "Taoglas manufacturer binding"
+          ]
+        }
+      ],
+      "controlled_facts": {
+        "headline_frequency_ranges_mhz": [[698, 960], [1710, 2700]],
+        "connector": "SMA male",
+        "cable_length_m": 1.0,
+        "ingress_rating": "IP67",
+        "operating_temperature_c": [-40, 85],
+        "cable_construction": "UNRESOLVED_MANUFACTURER_PAGE_CONFLICT_RG316_VS_RG178"
+      },
+      "purchase_order_rule": "Taoglas G30.B.108111 only; NO SUBSTITUTION; quote must record the ordered cable construction without inferring a resolution to the manufacturer-page conflict",
+      "physical_validation_routes": [
+        "Cable length, connector mate, route and seal during station assembly",
+        "Installed VSWR, loss, BG95 attach and coexistence during EOL and EVT"
+      ]
+    },
+    "ANT-GNSS": {
+      "manufacturer": "Taoglas",
+      "mpn": "AA.166.A.301111",
+      "evt_20_quantity_with_spares": 22,
+      "official_sources": [
+        "https://www.taoglas.com/product/aa-166-a-301111-ulysses-miniature-magnetic-mount-beidougpsglonassgalileo-antenna-with-3000mm-rg-174-smam/",
+        "https://www.taoglas.com/datasheets/AA.166.301111.pdf"
+      ],
+      "supplier_catalog_records": [
+        {
+          "supplier": "RS",
+          "url": "https://ie.rs-online.com/web/p/multi-band-antennas/2884328",
+          "claims_used": [
+            "Exact AA.166.A.301111 manufacturer part number",
+            "Taoglas manufacturer binding"
+          ]
+        }
+      ],
+      "controlled_facts": {
+        "frequency_range_mhz": [1559, 1610],
+        "supply_voltage_v": [3, 5],
+        "dimensions_mm": [37.8, 40.4, 10],
+        "cable": "3 m RG-174",
+        "connector": "SMA male",
+        "ingress_rating": "IP67",
+        "operating_temperature_c": [-40, 85]
+      },
+      "purchase_order_rule": "Taoglas AA.166.A.301111 only; NO SUBSTITUTION of connector, cable length or adjacent GNSS antenna",
+      "physical_validation_routes": [
+        "Cable route, connector mate, mounting and seal during station assembly",
+        "Current at 3.3 V, sensitivity, PPS and coexistence during EOL and EVT"
+      ]
+    },
+    "ANT-LORA": {
+      "manufacturer": "Taoglas",
+      "mpn": "TI.89.B.2111W",
+      "evt_20_quantity_with_spares": 22,
+      "official_sources": [
+        "https://www.taoglas.com/product/ti-89-b-ism-lora-860-930-mhz-white-terminal-mount-antenna-2dbi-smam-fixed-straight-waterproof-enclosure/",
+        "https://www.taoglas.com/datasheets/TI.89.B.2111W.pdf"
+      ],
+      "supplier_catalog_records": [
+        {
+          "supplier": "Newark",
+          "url": "https://www.newark.com/taoglas/ti-89-b-2111w/external-antenna-910-920mhz-wht/dp/15AN2917",
+          "claims_used": [
+            "Exact TI.89.B.2111W manufacturer part number",
+            "Taoglas manufacturer binding"
+          ]
+        }
+      ],
+      "controlled_facts": {
+        "frequency_range_mhz": [860, 930],
+        "dimensions_mm": [13, 180],
+        "connector": "SMA male",
+        "ingress_rating": "IP67",
+        "operating_temperature_c": [-40, 85]
+      },
+      "purchase_order_rule": "Taoglas TI.89.B.2111W only; NO SUBSTITUTION; white suffix and normal SMA male are part of the controlled identity",
+      "physical_validation_routes": [
+        "Connector mate, mechanical support and seal during station assembly",
+        "Installed VSWR, conducted power, sensitivity, coexistence and RU868 radiated compliance during EOL and EVT"
+      ]
+    },
+    "RF-PIGTAIL": {
+      "manufacturer": "Taoglas",
+      "mpn": "CAB.0243",
+      "evt_20_quantity_with_spares": 66,
+      "official_sources": [
+        "https://www.taoglas.com/product/cab-0243-i-pex-mhf-i-u-fl-to-150mm-1-13-cable-to-smafbk-st-waterproof/",
+        "https://www.taoglas.com/datasheets/CAB.0243.pdf"
+      ],
+      "supplier_catalog_records": [
+        {
+          "supplier": "DigiKey",
+          "url": "https://www.digikey.com/en/products/detail/taoglas-limited/CAB-0243/24770240",
+          "claims_used": [
+            "Exact CAB.0243 manufacturer part number",
+            "Taoglas manufacturer binding"
+          ]
+        }
+      ],
+      "controlled_facts": {
+        "cable": "1.13 mm micro-coax",
+        "length_mm": 150,
+        "device_end": "I-PEX MHF I / U.FL-compatible right angle",
+        "bulkhead_end": "normal-polarity SMA female",
+        "minimum_bend_radius_mm": 6.8,
+        "operating_temperature_c": [-60, 200],
+        "numeric_bulkhead_ip_rating_published": false
+      },
+      "purchase_order_rule": "Taoglas CAB.0243 to SPE-24-8-147-A only; NO SUBSTITUTION of polarity, connector family, length or cable",
+      "physical_validation_routes": [
+        "Every installed cable continuity, polarity, length and route check",
+        "Hirose U.FL mate retention, bend, bulkhead torque and seal during assembly",
+        "Installed insertion loss and VSWR during EOL and EVT"
+      ]
+    }
+  },
+  "nonbinding_supplier_availability_snapshot": {
+    "observed_utc_date": "2026-09-18",
+    "purpose": "Two-week EVT-20 sourcing triage only; not a frozen qualification fact or delivery guarantee",
+    "records": [
+      {
+        "item_id": "BAT1",
+        "required_quantity": 21,
+        "supplier": "Ameresco Solar / RELiON",
+        "displayed_available_quantity": null,
+        "quantity_coverage_confirmed": false,
+        "source": "https://www.amerescosolar.com/relion-rb40-lithium-iron-phosphate-128v-40ah-battery"
+      },
+      {
+        "item_id": "PV1",
+        "required_quantity": 21,
+        "supplier": "SLD Tech / distributor quote",
+        "displayed_available_quantity": null,
+        "quantity_coverage_confirmed": false,
+        "source": "https://sldtechinc.com/80w-12v-monocrystalline-solar-panel-s/"
+      },
+      {
+        "item_id": "MPPT1",
+        "required_quantity": 21,
+        "supplier": "DigiKey",
+        "displayed_available_quantity": 0,
+        "quantity_coverage_confirmed": false,
+        "source": "https://www.digikey.com/en/products/detail/spartan-power/SCC075010060R/16035431"
+      },
+      {
+        "item_id": "MPPT-TEMP",
+        "required_quantity": 21,
+        "supplier": "SVB",
+        "displayed_available_quantity": 73,
+        "quantity_coverage_confirmed": true,
+        "source": "https://www.svb24.com/en/victron-smart-battery-sense-voltage-and-temperature-sensor-12-24-v.html"
+      },
+      {
+        "item_id": "ANT-CELL",
+        "required_quantity": 22,
+        "supplier": "RS",
+        "displayed_available_quantity": 167,
+        "quantity_coverage_confirmed": true,
+        "source": "https://no.rs-online.com/web/p/multi-band-antennas/2884458"
+      },
+      {
+        "item_id": "ANT-GNSS",
+        "required_quantity": 22,
+        "supplier": "RS",
+        "displayed_available_quantity": 105,
+        "quantity_coverage_confirmed": true,
+        "source": "https://ie.rs-online.com/web/p/multi-band-antennas/2884328"
+      },
+      {
+        "item_id": "ANT-LORA",
+        "required_quantity": 22,
+        "supplier": "Mouser via Taoglas buy-now listing",
+        "displayed_available_quantity": 50,
+        "quantity_coverage_confirmed": true,
+        "source": "https://www.taoglas.com/product/ti-89-b-ism-lora-860-930-mhz-white-terminal-mount-antenna-2dbi-smam-fixed-straight-waterproof-enclosure/"
+      },
+      {
+        "item_id": "RF-PIGTAIL",
+        "required_quantity": 66,
+        "supplier": "Mouser",
+        "displayed_available_quantity": 204,
+        "quantity_coverage_confirmed": true,
+        "source": "https://www.taoglas.com/product/cab-0243-i-pex-mhf-i-u-fl-to-150mm-1-13-cable-to-smafbk-st-waterproof/"
+      }
+    ],
+    "rf_chain_displayed_stock_covers_evt_20_quantities": true,
+    "power_chain_full_quantity_coverage_confirmed": false,
+    "full_evt_20_quantity_coverage_confirmed": false,
+    "two_week_delivery_to_destination_guaranteed": false,
+    "cart_or_quote_destination_delivery_confirmation_required_at_order": true
+  },
+  "documentary_procurement_gate": {
+    "status": "PASS",
+    "authority_order": [
+      "Official manufacturer product page and current data sheet or technical manual",
+      "Exact manufacturer and MPN in the controlled BOM, RFQ and purchase order",
+      "Supplier catalogue record or quotation binding the seller entry to the exact MPN"
+    ],
+    "purchase_order_rules": [
+      "State manufacturer, exact MPN and NO SUBSTITUTION on every line",
+      "Retain the supplier product URL or quotation line that maps to the exact MPN",
+      "Confirm quantity, price, orderable status and destination delivery date when placing the order",
+      "Buy new unused material from the manufacturer or an established distributor"
+    ],
+    "not_required_for_gate": [
+      "A separate pre-order qualification unit",
+      "Receiving quarantine of a conforming shipment",
+      "Mandatory package or body photographs",
+      "A fixed incoming body count",
+      "Future manufacturer lot or date code",
+      "Certificate of conformance"
+    ]
+  },
+  "non_blocking_receipt_reconciliation": {
+    "status": "NOT_A_TECHNICAL_QUALIFICATION_OR_RELEASE_GATE",
+    "actions": [
+      "Reconcile purchase-order line, packing slip and delivered quantity",
+      "Check for obvious transit damage",
+      "Isolate only an obvious discrepant or unsafe unit and expand scope only for a systemic discrepancy",
+      "Proceed to normal kitting and assembly when no discrepancy is reported"
+    ],
+    "new_receiving_evidence_package_required": false
+  },
+  "release_boundary": {
+    "documentary_purchase_identity_complete": true,
+    "commercial_quote_and_destination_delivery_complete": false,
+    "physical_qualification_complete": false,
+    "hardware_design_release": false,
+    "purchase_release": false,
+    "manufacturing_release": false
+  }
+}

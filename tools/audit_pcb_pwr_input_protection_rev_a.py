@@ -237,8 +237,8 @@ def main() -> int:
 
     bom_fuse = bom["PWR-FUSE-01"]
     require(bom_fuse["MPN"] == fuse["target_evt_mpn"], "engineering BOM fuse MPN mismatch")
-    require(bom_fuse["BOM_disposition"] == "BLOCKED_ENGINEERING_SELECTION",
-            "engineering BOM prematurely released F1")
+    require(bom_fuse["BOM_disposition"] == "CONTROLLED_PENDING_VERIFICATION",
+            "engineering BOM lost the controlled F1 verification interlock")
     procurement_fuse = [
         row for row in procurement
         if "PWR-FUSE-01" in row.get("Item_IDs", "").split("|")
@@ -246,8 +246,8 @@ def main() -> int:
     require(len(procurement_fuse) == 1, "procurement rollup must have one F1 row")
     require(procurement_fuse[0]["MPN"] == fuse["target_evt_mpn"],
             "procurement rollup fuse MPN mismatch")
-    require(procurement_fuse[0]["BOM_disposition"] == "BLOCKED_ENGINEERING_SELECTION",
-            "procurement rollup prematurely released F1")
+    require(procurement_fuse[0]["BOM_disposition"] == "CONTROLLED_PENDING_VERIFICATION",
+            "procurement rollup lost the controlled F1 verification interlock")
 
     native_eco = contract["native_value_eco"]
     require(native_eco == {

@@ -149,6 +149,26 @@ def audit() -> dict[str, object]:
         "production BOM QG-2 remains BLOCKED: " + " | ".join(qg2_blockers),
     )
 
+    system_ots_identity = run_json_audit(
+        "audit_evt_system_ots_procurement_identity_rev_a.py"
+    )
+    system_ots_identity_ok = (
+        system_ots_identity.get("status")
+        == "PASS_DOCUMENTARY_PURCHASE_IDENTITY_PHYSICAL_VALIDATION_DURING_ASSEMBLY_EOL_EVT"
+        and system_ots_identity.get("documentary_purchase_identity_complete") is True
+        and system_ots_identity.get("controlled_item_count") == 8
+        and system_ots_identity.get("standalone_preorder_qualification_unit_required") is False
+        and system_ots_identity.get("receiving_hold_required") is False
+        and system_ots_identity.get("physical_qualification_complete") is False
+        and system_ots_identity.get("manufacturing_release") is False
+    )
+    check(
+        "system_ots_documentary_procurement_identity",
+        system_ots_identity_ok,
+        str(system_ots_identity.get("status", "MISSING")),
+        "exact system OTS documentary purchase identity is incomplete or inconsistent",
+    )
+
     layer_authority = run_json_audit("audit_pcb_layer_count_authority_rev_a.py")
     layer_authority_ok = (
         layer_authority.get("status") == "PASS_CONTROLLED_LAYER_COUNTS_FINAL_STACKUPS_OPEN"
@@ -334,7 +354,7 @@ def audit() -> dict[str, object]:
         and pwr_input_protection.get("fuse", {}).get("target_evt_mpn") ==
         "0451008.MRL"
         and pwr_input_protection.get("required_rows") == 20
-        and pwr_input_protection.get("accepted_rows") == 3
+        and pwr_input_protection.get("accepted_rows") == 4
         and pwr_input_protection.get("physical_qualification_complete") is False
         and pwr_input_protection.get("pcba_procurement_authorized") is False
         and pwr_input_protection.get("manufacturing_release") is False
@@ -886,6 +906,7 @@ def audit() -> dict[str, object]:
         },
         "boards": board_results,
         "bom_qg2": bom_qg2,
+        "system_ots_procurement_identity": system_ots_identity,
         "pcb_layer_count_authority": layer_authority,
         "pcb_main_hierarchy": main_hierarchy,
         "pcb_pwr_hierarchy": pwr_hierarchy,

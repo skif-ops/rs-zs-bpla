@@ -61,6 +61,17 @@ def main(*, check_only: bool = False) -> None:
             row.setdefault(field, "")
     by_id = {r["Item_ID"]: r for r in rows}
 
+    # User-approved board reserve: every supported lot carries exactly two spare
+    # boards of each design.  This applies independently to the bare-PCB and
+    # assembled-PCBA procurement tracks; it must not scale as a percentage of lot size.
+    for board_item_id in (
+        "ASM-MAIN", "ASM-PWR", "ASM-MIC",
+        "PCB-MAIN", "PCB-PWR", "PCB-MIC",
+    ):
+        require(board_item_id in by_id, f"draft BOM board item missing: {board_item_id}")
+        by_id[board_item_id]["Spares"] = "2"
+        by_id[board_item_id]["Spare_policy"] = "FIXED_LOT_MIN"
+
     main_parts = freeze_map("hardware/MAIN_COMPONENT_FREEZE_REV_A.csv", "RefDes")
     power_parts = freeze_map("hardware/POWER_COMPONENT_FREEZE_REV_A.csv", "Component_ID")
     connectors = freeze_map("hardware/CONNECTOR_FREEZE_REV_A.csv", "Connector_ID")
@@ -525,6 +536,7 @@ def main(*, check_only: bool = False) -> None:
         "BAT1", "PV1", "MPPT1", "MPPT-TEMP", "ANT-CELL", "ANT-GNSS",
         "ANT-LORA", "RF-PIGTAIL", "HARNESS",
     }
+    controlled_qualification_orderables = {"PWR-TVS-01", "PWR-FUSE-01"}
     for row in rows:
         item_id = row["Item_ID"]
         if row["Line_class"] and row["Population"] and row["Temperature_C"] and row["BOM_disposition"]:
@@ -553,6 +565,8 @@ def main(*, check_only: bool = False) -> None:
             row["BOM_disposition"] = "CONDITIONAL_NOT_RELEASED"
         elif not exact_identity or status.startswith(("OPEN", "RFQ_REQUIRED", "SOURCE_PACKAGE_REQUIRED")):
             row["BOM_disposition"] = "BLOCKED_SELECTION"
+        elif item_id in controlled_qualification_orderables:
+            row["BOM_disposition"] = "CONTROLLED_PENDING_VERIFICATION"
         elif status.startswith("CANDIDATE"):
             row["BOM_disposition"] = "BLOCKED_ENGINEERING_SELECTION"
         elif row["Temperature_C"] in ("", "OPEN", "TBD") or "TEMP_VERIFY" in status:

@@ -24,6 +24,17 @@ The selected lot is `EVT-20` for 20 stations. This closes only the lot-selection
 condition. It does not release purchasing while hardware design or supplier
 evidence remains blocked.
 
+The eight selected OTS system identities `RB40`, `SLP080S-12M`,
+`SCC075010060R`, `SBS050150200`, `G30.B.108111`, `AA.166.A.301111`,
+`TI.89.B.2111W` and `CAB.0243` pass their documentary purchase-identity gate.
+They are ordered as exact manufacturer MPNs with `NO SUBSTITUTION`; the selected
+EVT lot is the qualification batch. This gate requires no stand-alone pre-order
+qualification unit, receiving quarantine, mandatory photographs, fixed body count,
+future lot/date code or CoC. Commercial availability, price and destination delivery
+date remain order-time quote/cart fields. Physical fit, electrical, thermal, RF and
+environmental evidence remains open at assembly, EOL and EVT and still blocks the
+hardware design release where applicable.
+
 The production interlock is implemented by:
 
 ```bash
@@ -171,9 +182,10 @@ blocked by `DIM-001`, `DIM-003` and `DIM-012`; the packet is not a build release
 
 ## Current blocker classes
 
-- sample-qualified and released BAT1, PV1, MPPT1, MPPT-TEMP, ANT-CELL,
-  ANT-GNSS, ANT-LORA, RF-PIGTAIL, HARNESS and HSG-VC system identities; the
-  exact EVT candidate MPNs do not by themselves satisfy this release gate;
+- physical assembly/EOL/EVT qualification of the documentarily controlled exact
+  `BAT1`, `PV1`, `MPPT1`, `MPPT-TEMP`, `ANT-CELL`, `ANT-GNSS`, `ANT-LORA` and
+  `RF-PIGTAIL` items; exact supplier/manufacturing identities and release evidence
+  for `HARNESS` and `HSG-VC` remain open;
 - PCB-MAIN and PCB-PWR routing, DRC and CAM; PCB-PWR `DIM-003`, final stackup,
   numeric current-density/thermal geometry and physical power evidence; PCB-MIC independent Review B,
   CAM comparison, panelization and acoustic-stack review; all three boards'

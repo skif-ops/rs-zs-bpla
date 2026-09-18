@@ -267,6 +267,27 @@ def main() -> None:
         all(rfq_items_by_id.get(rfq_id) == item for rfq_id, item in required_pcb_rfqs.items()),
         "PCBA service and bare-PCB fabrication RFQ coverage mismatch",
     )
+    rfq_by_id = {row["RFQ_ID"]: row for row in rfq_rows}
+    for rfq_id in ("RFQ-011", "RFQ-012", "RFQ-013"):
+        require(
+            "PRIMARY PROCUREMENT TRACK" in rfq_by_id[rfq_id]["Blocking_check"],
+            f"{rfq_id}: full-PCBA primary procurement selection missing",
+        )
+    for rfq_id in ("RFQ-023", "RFQ-024", "RFQ-025"):
+        require(
+            "ALTERNATIVE QUOTATION TRACK ONLY" in rfq_by_id[rfq_id]["Blocking_check"],
+            f"{rfq_id}: bare-PCB alternative-only selection missing",
+        )
+    for item_id in ("ASM-MAIN", "ASM-MIC", "ASM-PWR"):
+        require(
+            "PRIMARY procurement track" in by_id[item_id]["Notes"],
+            f"{item_id}: full-PCBA primary procurement note missing",
+        )
+    for item_id in ("PCB-MAIN", "PCB-MIC", "PCB-PWR"):
+        require(
+            "ALTERNATIVE quotation track only" in by_id[item_id]["Notes"],
+            f"{item_id}: bare-PCB alternative-only note missing",
+        )
 
     serialized = "\n".join(",".join(row.values()) for row in rows)
     for forbidden in ("ESP32-C3", "JST_BM05B", "GHR-05V-S", "5040500591", "5040510501"):

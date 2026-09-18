@@ -1,0 +1,25 @@
+{
+  "status": "PASS_DOCUMENTARY_PURCHASE_IDENTITY_PHYSICAL_VALIDATION_DURING_ASSEMBLY_EOL_EVT",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "documentary_purchase_identity_complete": true,
+  "controlled_item_ids": [
+    "BAT1",
+    "PV1",
+    "MPPT1",
+    "MPPT-TEMP",
+    "ANT-CELL",
+    "ANT-GNSS",
+    "ANT-LORA",
+    "RF-PIGTAIL"
+  ],
+  "controlled_item_count": 8,
+  "standalone_preorder_qualification_unit_required": false,
+  "receiving_hold_required": false,
+  "commercial_quote_and_destination_delivery_complete": false,
+  "physical_qualification_complete": false,
+  "hardware_design_release": false,
+  "purchase_release": false,
+  "manufacturing_release": false,
+  "record": "hardware/reviews/EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.json",
+  "record_sha256": "6d985fa9260b47a3f52b21a615f146f424be8ccfe3d7c4c74030a913454ac7ad"
+}
