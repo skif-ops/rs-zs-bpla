@@ -130,8 +130,11 @@ and receipt plan. Passing this documentary audit does not mark any physical test
 
 `tools/audit_evt_pre_20_bom_workbook.py` reads the XLSX package independently with
 the Python standard library. It compares every displayed value in the Engineering
-BOM, Procurement and RFQ worksheets with their CSV authorities and verifies the
-native Excel-table ranges, summary lot quantities and gate statuses.
+BOM, Procurement, RFQ and Cost estimate worksheets with their CSV authorities and
+verifies the native Excel-table ranges, summary lot quantities and gate statuses.
+It also recomputes the bare-PCB and primary full-PCBA tracks for lots 4, 10 and 20,
+requires exactly two spare boards per design, checks the full-PCBA per-station value
+and enforces the approved 15% ceiling against the customer-presented direct BOM.
 
 The actual factory gate is:
 
