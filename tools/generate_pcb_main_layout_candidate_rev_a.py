@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import math
 import os
 import sys
 import uuid
@@ -31,6 +32,22 @@ KICAD_FP = Path(os.environ.get("DIONEYA_KICAD_FOOTPRINT_DIR", "/usr/share/kicad/
 PROJECT_FP = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
 PASSIVE_COURTYARD_STATUS = "CONTROLLED_PAD_ENVELOPE_PLUS_0.25_MM"
 PASSIVE_COURTYARD_SOURCE = "PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A"
+
+# Manufacturer land patterns whose intra-package copper spacing is below the
+# board's 0.20 mm general routing clearance.  These overrides apply only inside
+# the named footprint; all routed copper remains governed by the board/netclass
+# rules.  Values are at or below the minimum separation in the controlled land
+# pattern and are carried into native DRC instead of blanket exclusions.
+FOOTPRINT_LOCAL_CLEARANCE_MM = {
+    "U3": 0.12,   # ST LIS2DW12 LGA-12; 0.15 mm pad-to-pad minimum
+    "U4": 0.18,   # ST STTS22H Figure 10; 0.19 mm lead-to-EP minimum
+    "J6": 0.05,   # TE 2336582-1 Nano-SIM customer land pattern
+    "J7": 0.05,
+    "D3": 0.10,   # Nexperia SOD962 manufacturer land pattern
+    "D5": 0.10,
+    "FL1": 0.05,  # Abracon ABSES5AF 1109-5 manufacturer land pattern
+    "X1": 0.12,   # SiTime SiT1552 JE CSP-4 manufacturer land pattern
+}
 
 KICAD_DRAWING_VERIFIED = {
     (
@@ -104,6 +121,46 @@ BODY = {
     "7343-31": (7.3, 4.3),
 }
 
+# MAIN-AUTH-011 records connector/card anchors at the physical mating or card
+# opening, while KiCad footprints use manufacturer land-pattern origins.  The
+# two datums are not interchangeable.  Each tuple is the mating-face centre in
+# local footprint coordinates plus the rotation offset needed to align the
+# footprint's actual mating vector with the authority's normalized +Y vector.
+# Values come from the controlled Fab/body geometry in the exact footprints.
+CONNECTOR_FACE_DATUM = {
+    "J_PWR": (7.500, -8.920, 180.0),
+    # 3.795 is the board-edge datum: the 3.315 mm mating face is recessed
+    # 0.480 mm so the 1.8 mm mounting lands retain 0.50 mm routed-edge copper
+    # clearance.  The service direction/face centre remains the authority
+    # anchor; the recess is a fabrication allowance.
+    "J_MIC1": (0.000, 3.795, 0.0),
+    "J_MIC2": (0.000, 3.795, 0.0),
+    "J_MIC3": (0.000, 3.795, 0.0),
+    "J_MIC4": (0.000, 3.795, 0.0),
+    "J6": (0.000, 6.000, 0.0),
+    "J7": (0.000, 6.000, 0.0),
+    "J11": (0.000, 3.675, 0.0),
+    "J12": (0.000, 7.625, 0.0),
+    "J13": (0.000, 3.795, 0.0),
+}
+
+
+def authority_anchor_to_footprint_origin(
+    ref: str, anchor_x: float, anchor_y: float, normalized_angle: float,
+) -> tuple[float, float, float]:
+    """Convert a mechanical mating-face anchor to a KiCad footprint origin."""
+    if ref not in CONNECTOR_FACE_DATUM:
+        return anchor_x, anchor_y, normalized_angle
+    face_x, face_y, rotation_offset = CONNECTOR_FACE_DATUM[ref]
+    # MAIN-AUTH uses mathematical CCW rotation in a +Y-up board frame.  KiCad
+    # stores footprint angles in its +Y-down drawing frame, hence the sign
+    # inversion here.
+    footprint_angle = (-(normalized_angle + rotation_offset)) % 360.0
+    radians = math.radians(footprint_angle)
+    rotated_x = face_x * math.cos(radians) + face_y * math.sin(radians)
+    rotated_y = -face_x * math.sin(radians) + face_y * math.cos(radians)
+    return anchor_x - rotated_x, anchor_y - rotated_y, footprint_angle
+
 
 def mm(x: float, y: float) -> pcbnew.VECTOR2I:
     return pcbnew.VECTOR2I_MM(float(x), float(y))
@@ -115,6 +172,17 @@ def set_footprint_property(fp: pcbnew.FOOTPRINT, key: str, value: str) -> None:
         fp.SetField(key, value)
     else:
         fp.SetProperty(key, value)
+
+
+def set_pad_relative_position(pad: pcbnew.PAD, position: pcbnew.VECTOR2I) -> None:
+    """Place a pad within its footprint across the KiCad 7/9 API split."""
+    if hasattr(pad, "SetFPRelativePosition"):
+        pad.SetFPRelativePosition(position)
+    else:
+        # KiCad 7 stores the footprint-relative coordinate in Pos0.  Calling
+        # SetPosition before the parent footprint is on the board is discarded
+        # when the footprint later receives its absolute placement.
+        pad.SetPos0(position)
 
 
 def props(symbol: dict) -> tuple[str, str]:
@@ -154,12 +222,21 @@ def placement_manifest() -> dict[str, tuple[float, float, float]]:
 
 
 def passive_footprint(board: pcbnew.BOARD, package: str) -> pcbnew.FOOTPRINT:
+    # IPC-density-B style rectangular lands.  The previous placement-only
+    # generator made each land as long as the centre-to-centre pitch on 0402
+    # parts, so the two pads touched and KiCad correctly reported a zero-copper
+    # clearance error on every small passive.  Keep an explicit 0.20 mm nominal
+    # toe-to-toe gap (0.40 mm on 1206/1210) so the generated native board is a
+    # routable manufacturing source rather than only a body-placement sketch.
+    # tuple: body length, body width, pad pitch, pad X, pad Y
     dims = {
-        "0402": (1.0, 0.5, 0.55), "0603": (1.6, 0.8, 0.9),
-        "0805": (2.0, 1.25, 1.05), "1206": (3.2, 1.6, 1.55),
-        "1210": (3.2, 2.5, 1.55),
+        "0402": (1.0, 0.5, 0.65, 0.45, 0.50),
+        "0603": (1.6, 0.8, 0.90, 0.70, 0.80),
+        "0805": (2.0, 1.25, 1.20, 1.00, 1.20),
+        "1206": (3.2, 1.6, 1.80, 1.40, 1.60),
+        "1210": (3.2, 2.5, 1.80, 1.40, 2.40),
     }
-    length, width, pitch = dims[package]
+    length, width, pitch, pad_x, pad_y = dims[package]
     fp = pcbnew.FOOTPRINT(board)
     for number, x in (("1", -pitch / 2), ("2", pitch / 2)):
         pad = pcbnew.PAD(fp)
@@ -167,20 +244,30 @@ def passive_footprint(board: pcbnew.BOARD, package: str) -> pcbnew.FOOTPRINT:
         pad.SetAttribute(pcbnew.PAD_ATTRIB_SMD)
         pad.SetShape(pcbnew.PAD_SHAPE_ROUNDRECT)
         pad.SetRoundRectRadiusRatio(0.2)
-        pad.SetSize(mm(max(0.55, length / 2), width))
-        pad.SetFPRelativePosition(mm(x, 0))
+        pad.SetSize(mm(pad_x, pad_y))
+        set_pad_relative_position(pad, mm(x, 0))
         layers = pcbnew.LSET()
         for layer in (pcbnew.F_Cu, pcbnew.F_Paste, pcbnew.F_Mask):
             layers.AddLayer(layer)
         pad.SetLayerSet(layers)
         fp.Add(pad)
-    pad_width = max(0.55, length / 2)
-    half_x = pitch / 2 + pad_width / 2 + 0.25
-    half_y = width / 2 + 0.25
-    courtyard = pcbnew.PCB_SHAPE(fp)
+    half_x = pitch / 2 + pad_x / 2 + 0.25
+    half_y = pad_y / 2 + 0.25
+    # KiCad 7 distinguishes footprint graphics (FP_SHAPE/MGRAPHIC) from
+    # board-level PCB_SHAPE items.  Passing a PCB_SHAPE to FOOTPRINT.Add()
+    # only emits an assertion and silently drops the courtyard, while KiCad 9
+    # accepts the newer board-item wrapper.  Construct the native footprint
+    # graphic when that API is available so the generated source is identical
+    # across the local KiCad 7 generator and the KiCad 9 CI reader.
+    shape_type = getattr(pcbnew, "FP_SHAPE", pcbnew.PCB_SHAPE)
+    courtyard = shape_type(fp)
     courtyard.SetShape(pcbnew.SHAPE_T_RECT)
-    courtyard.SetStart(mm(-half_x, -half_y))
-    courtyard.SetEnd(mm(half_x, half_y))
+    # FP_SHAPE keeps its local (footprint-relative) points separately in
+    # KiCad 7.  SetStart/SetEnd update only the temporary absolute position
+    # before the footprint is placed and serialize as a zero-size rectangle.
+    # SetStart0/SetEnd0 preserves the intended courtyard through placement.
+    courtyard.SetStart0(mm(-half_x, -half_y))
+    courtyard.SetEnd0(mm(half_x, half_y))
     courtyard.SetLayer(pcbnew.F_CrtYd)
     courtyard.SetWidth(pcbnew.FromMM(0.05))
     fp.Add(courtyard)
@@ -217,12 +304,24 @@ def generic_footprint(board: pcbnew.BOARD, pin_numbers: list[str], package: str)
         if str(number) != "1":
             pad.SetRoundRectRadiusRatio(0.2)
         pad.SetSize(mm(0.55, 0.9))
-        pad.SetFPRelativePosition(mm(x, y))
+        set_pad_relative_position(pad, mm(x, y))
         layers = pcbnew.LSET()
         for layer in (pcbnew.F_Cu, pcbnew.F_Paste, pcbnew.F_Mask):
             layers.AddLayer(layer)
         pad.SetLayerSet(layers)
         fp.Add(pad)
+    # A generic land-pattern candidate still needs a conservative, explicit
+    # assembly envelope.  This makes the native placement review useful for
+    # the five library-unavailable connectors instead of silently falling back
+    # to pad-only collision screening.
+    shape_type = getattr(pcbnew, "FP_SHAPE", pcbnew.PCB_SHAPE)
+    courtyard = shape_type(fp)
+    courtyard.SetShape(pcbnew.SHAPE_T_RECT)
+    courtyard.SetStart0(mm(-width / 2 - 0.25, -height / 2 - 0.25))
+    courtyard.SetEnd0(mm(width / 2 + 0.25, height / 2 + 0.25))
+    courtyard.SetLayer(pcbnew.F_CrtYd)
+    courtyard.SetWidth(pcbnew.FromMM(0.05))
+    fp.Add(courtyard)
     return fp
 
 
@@ -250,7 +349,7 @@ def fixture_footprint(board: pcbnew.BOARD, ref: str, pins: list[str]) -> tuple[p
         pad.SetShape(pcbnew.PAD_SHAPE_CIRCLE)
         pad.SetSize(mm(1.70, 1.70))
         relative = mm(float(row["X_mm"]) - x0, float(row["Y_mm"]) - y0)
-        pad.SetFPRelativePosition(relative)
+        set_pad_relative_position(pad, relative)
         pad.SetLocalSolderMaskMargin(pcbnew.FromMM(0.20))
         layers = pcbnew.LSET()
         for layer in (pcbnew.B_Cu, pcbnew.B_Mask):
@@ -391,9 +490,28 @@ def main() -> int:
 
     components = expected_components()
     board = pcbnew.BOARD(); board.SetCopperLayerCount(6)
-    board.GetDesignSettings().SetBoardThickness(pcbnew.FromMM(1.6))
+    design = board.GetDesignSettings()
+    design.SetBoardThickness(pcbnew.FromMM(1.6))
+    # Release fabrication capability: 0.10 mm routed-copper spacing with
+    # 0.15 mm default signal traces and 0.50/0.30 mm through vias.  The board
+    # absolute floor is 0.05 mm solely so controlled manufacturer land patterns
+    # with 0.075 mm intra-footprint gaps pass native DRC; no routed netclass is
+    # permitted below 0.10 mm.
+    design.m_MinClearance = pcbnew.FromMM(0.05)
+    default_class = design.m_NetSettings.m_DefaultNetClass
+    default_class.SetClearance(pcbnew.FromMM(0.10))
+    default_class.SetTrackWidth(pcbnew.FromMM(0.15))
+    default_class.SetViaDiameter(pcbnew.FromMM(0.50))
+    default_class.SetViaDrill(pcbnew.FromMM(0.30))
+    default_class.SetDiffPairWidth(pcbnew.FromMM(0.15))
+    default_class.SetDiffPairGap(pcbnew.FromMM(0.10))
+    # The GCT USB4105 locating stakes have a controlled 0.194 mm
+    # stake-hole-to-copper separation.  Keep a 0.15 mm fabrication minimum;
+    # this is narrower than the general plated-hole rule only for the exact
+    # manufacturer pattern.
+    design.m_HoleClearance = pcbnew.FromMM(0.15)
     add_outline(board)
-    for ref, x, y in (("H1", 5, 5), ("H2", 105, 5), ("H3", 105, 70), ("H4", 5, 70)):
+    for ref, x, y in (("H1", 8, 5), ("H2", 105, 5), ("H3", 105, 70), ("H4", 5, 70)):
         add_mounting_hole(board, ref, x, y)
 
     nets = sorted({p["native"] for c in components.values() for p in c["pins"].values()
@@ -443,10 +561,26 @@ def main() -> int:
             if pin["native"] != "NC":
                 for pad in by_number[number]:
                     pad.SetNet(net_items[pin["native"]])
+        if ref in FOOTPRINT_LOCAL_CLEARANCE_MM:
+            local_clearance = pcbnew.FromMM(FOOTPRINT_LOCAL_CLEARANCE_MM[ref])
+            for pad in fp.Pads():
+                pad.SetLocalClearance(local_clearance)
         if fixture_position is not None:
             x, y = fixture_position; angle = 0
         elif ref in fixed:
-            x, y, angle = fixed[ref]
+            anchor_x, anchor_y, normalized_angle = fixed[ref]
+            x, y, angle = authority_anchor_to_footprint_origin(
+                ref, anchor_x, anchor_y, normalized_angle
+            )
+            set_footprint_property(
+                fp, "DIONEA_MECHANICAL_ANCHOR",
+                f"{anchor_x:.3f},{anchor_y:.3f},{normalized_angle:.3f}",
+            )
+            set_footprint_property(
+                fp, "DIONEA_PLACEMENT_DATUM",
+                "MATING_FACE_TO_MANUFACTURER_FOOTPRINT_ORIGIN"
+                if ref in CONNECTOR_FACE_DATUM else "MANUFACTURER_FOOTPRINT_ORIGIN",
+            )
         else:
             x, y, angle = placement[ref]
             set_footprint_property(

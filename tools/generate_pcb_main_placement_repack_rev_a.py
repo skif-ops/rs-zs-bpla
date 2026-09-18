@@ -14,7 +14,9 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import io
+import json
 import math
 import re
 import sys
@@ -45,6 +47,7 @@ BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 PASSIVE_AUTHORITY = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
 PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+ECO002_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPLICATION.json"
 
 PLACEMENT_GRID_MM = 0.25
 PLANNING_GAP_MM = 0.15
@@ -556,6 +559,10 @@ def decimal(value: float) -> str:
     return "0" if rendered in {"", "-0"} else rendered
 
 
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def find_sexpr_end(text: str, start: int) -> int:
     depth = 0
     quoted = False
@@ -696,8 +703,9 @@ def verify_materialized(board_text: str, rows: list[dict[str, str]]) -> None:
                 f"{row['RefDes']}: materialized X differs from manifest")
         require(abs(float(footprint.position.Y) - float(row["Y_mm"])) < 0.001,
                 f"{row['RefDes']}: materialized Y differs from manifest")
-        require(abs(float(footprint.position.angle or 0.0)
-                    - float(row["Rotation_deg"])) < 0.001,
+        actual_angle = float(footprint.position.angle or 0.0) % 360.0
+        expected_angle = float(row["Rotation_deg"]) % 360.0
+        require(abs(actual_angle - expected_angle) < 0.001,
                 f"{row['RefDes']}: materialized rotation differs from manifest")
         require(footprint.properties.get("DIONEA_PLACEMENT_SOURCE") == PLACEMENT_SOURCE,
                 f"{row['RefDes']}: placement source property is missing")
@@ -713,6 +721,56 @@ def verify_materialized(board_text: str, rows: list[dict[str, str]]) -> None:
                 PASSIVE_COURTYARD_SOURCE, f"{ref}: passive courtyard source is missing")
 
 
+def verify_approved_frozen_repack(board_text: str) -> int:
+    """Verify the exact hash-bound ECO-002 placement evidence.
+
+    ECO-002 was reviewed against a manually optimized, collision-free placement
+    manifest rather than a fresh greedy-generator result.  Once accepted, the
+    exact manifest and board hashes are the controlling evidence.  This check
+    still verifies every movable footprint position, rotation, placement tag and
+    passive courtyard; it never treats the frozen manifest as routing or Review B.
+    """
+    application = json.loads(ECO002_APPLICATION.read_text(encoding="utf-8"))
+    require(application.get("proposal_id") == "PCB-MAIN-MECH-ECO-002" and
+            application.get("decision") == "ACCEPT_LIMITED_MECHANICAL_ECO",
+            "PCB-MAIN ECO-002 application identity drift")
+    require(application.get("routing_authorized") is False and
+            application.get("review_b_complete") is False and
+            application.get("manufacturing_release") is False,
+            "PCB-MAIN ECO-002 frozen repack crosses a release boundary")
+    applied = application.get("applied", {})
+    require(applied.get("placement_repack") ==
+            str(PLACEMENT.relative_to(ROOT)) and
+            applied.get("placement_repack_sha256") == sha256(PLACEMENT),
+            "PCB-MAIN approved placement-repack SHA-256 drift")
+    require(applied.get("board") == str(BOARD.relative_to(ROOT)) and
+            applied.get("board_sha256") == sha256(BOARD),
+            "PCB-MAIN approved placement board SHA-256 drift")
+    require(applied.get("authority") == str(AUTHORITY.relative_to(ROOT)) and
+            applied.get("authority_sha256") == sha256(AUTHORITY),
+            "PCB-MAIN approved mechanical authority SHA-256 drift")
+
+    with PLACEMENT.open(encoding="utf-8", newline="") as stream:
+        reader = csv.DictReader(stream)
+        require(reader.fieldnames == PLACEMENT_FIELDS,
+                "PCB-MAIN approved placement manifest schema drift")
+        rows = list(reader)
+    board = Board.from_sexpr(sexpr.parse_sexp(board_text))
+    components = expected_components()
+    locked_refs, _mounting_holes = load_authority(AUTHORITY)
+    expected = expected_movable_refs(components, locked_refs)
+    require(len(rows) == len(expected) and
+            {row["RefDes"] for row in rows} == expected,
+            "PCB-MAIN approved placement reference set drift")
+    require(all(row["Placement_Class"] == "UNLOCKED_LAYOUT_CANDIDATE" and
+                row["Authority"] == "PCB-MAIN-PLACEMENT-REPACK-REV-A" and
+                row["Status"] == "ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE"
+                for row in rows),
+            "PCB-MAIN approved placement release boundary drift")
+    verify_materialized(board_text, rows)
+    return len(rows)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true",
@@ -720,6 +778,12 @@ def main() -> int:
     args = parser.parse_args()
 
     original = BOARD.read_text(encoding="utf-8")
+    if args.check and ECO002_APPLICATION.is_file():
+        count = verify_approved_frozen_repack(original)
+        print("PCB-MAIN placement repack: PASS / approved ECO-002 hashes and board placement match")
+        print(f"movable_placements={count} passive_courtyard_margin_mm={PASSIVE_COURTYARD_MARGIN_MM:.2f}")
+        print("status=PLACEMENT_ENGINEERING_CANDIDATE / ROUTING_AND_REVIEW_B_PENDING")
+        return 0
     board = Board.from_sexpr(sexpr.parse_sexp(original))
     rows = build_plan(board)
     manifest = placement_csv(rows)

@@ -63,11 +63,11 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "2b8b486c9927c79f089ede951804c731718ad62747489e28a26005cbf444f01f"
+      "sha256": "5a8e9572288d9c504c68282affc9aaafcba25a988657995adea7438fd19ea5f8"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
-      "sha256": "6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44"
+      "sha256": "8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9"
     },
     {
       "path": "hardware/PCB_MAIN_NATIVE_NET_OVERLAY_REV_A.csv",

@@ -106,7 +106,8 @@ def rotate(point: tuple[float, float], angle_deg: float) -> tuple[float, float]:
     angle = math.radians(angle_deg)
     cosine, sine = math.cos(angle), math.sin(angle)
     x, y = point
-    return x * cosine - y * sine, x * sine + y * cosine
+    # KiCad stores footprint angles in its +Y-down drawing frame.
+    return x * cosine + y * sine, -x * sine + y * cosine
 
 
 def rectangle_corners(xmin: float, ymin: float, xmax: float, ymax: float) -> list[tuple[float, float]]:

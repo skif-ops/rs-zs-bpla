@@ -32,6 +32,11 @@ no routing or manufacturing-release assertion.
   `5ef7d0390da97796febbef6a69f0206a06efe00782e238bf7c8f32bf29d08fc1`,
   then applied exactly. The previously locked component, mounting and U.FL
   tool-cylinder conflict sets are empty.
+- MAIN-AUTH-011 limited ECO-002: reviewer `Скиф` accepted the exact hash-bound
+  two-record J_PWR/J6 translation on `18.09.2026` with decision
+  `ACCEPT_LIMITED_MECHANICAL_ECO`. H1 at `(8.00,5.00)` mm is retained from
+  ECO-001. The applied authority, PCB and repack hashes pass the dedicated
+  ECO-002 audit; routing, 3D/service review and Review B remain open.
 - Board: 110 x 75 x 1.6 mm, six copper layers, rounded R3 outline, four M3 NPTH holes.
 - Population represented: 247 on-board components plus four mounting holes; 186 native nets.
 - Routing/copper zones: absent.
@@ -79,9 +84,9 @@ no routing or manufacturing-release assertion.
   and independently confirms no locked conflict after the proposed overlay.
 - [ ] U9 paste stencil is adapted and approved for the selected assembly process.
 - [ ] The selected assembler approves copper, mask and stencil rules for the `U2/U25/U26` project IPC candidates.
-- [x] The accepted limited mechanical ECO supersedes the six internally
-  conflicting MAIN-AUTH-011 component placements, mounting exclusions and
-  U.FL service cylinders and passes its independent geometry/application audit.
+- [x] The accepted limited mechanical ECO chain, including the bounded ECO-002
+  J_PWR/J6 translation, supersedes the internally conflicting MAIN-AUTH-011
+  geometry and passes its independent application audits.
 - [x] All 169 pad-envelope screening footprints receive controlled courtyard/body
   disposition or are placed with equivalent independently reviewed evidence.
 - [x] The 2D placement is collision-free and all controlled courtyard,

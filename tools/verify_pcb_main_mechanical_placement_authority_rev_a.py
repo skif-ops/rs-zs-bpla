@@ -46,12 +46,12 @@ EXPECTED_COUNTS = Counter({
 })
 
 EXPECTED_CONNECTORS = {
-    "J_PWR": (0.0, 15.0, 90.0, "OUTBOARD_WEST"),
+    "J_PWR": (0.0, 22.0, 90.0, "OUTBOARD_WEST"),
     "J_MIC1": (0.0, 42.5, 90.0, "OUTBOARD_WEST"),
     "J_MIC2": (40.0, 75.0, 0.0, "OUTBOARD_NORTH"),
     "J_MIC3": (92.0, 75.0, 0.0, "OUTBOARD_NORTH"),
     "J_MIC4": (110.0, 54.0, 270.0, "OUTBOARD_EAST"),
-    "J6": (18.0, 2.5, 180.0, "OUTBOARD_SOUTH"),
+    "J6": (21.0, 2.5, 180.0, "OUTBOARD_SOUTH"),
     "J7": (64.0, 2.5, 180.0, "OUTBOARD_SOUTH"),
     "J8": (16.0, 71.5, 0.0, "UP_Z"),
     "J9": (53.5, 68.0, 0.0, "UP_Z"),
@@ -174,7 +174,7 @@ def main() -> None:
     close(number(envelope, "Z_Max_mm"), 12.0, "assembled envelope Z")
 
     holes = {row["RefDes"]: row for row in rows if row["Feature_Type"] == "MOUNTING_HOLE"}
-    expected_holes = {"H1": (5.0, 5.0), "H2": (105.0, 5.0), "H3": (105.0, 70.0), "H4": (5.0, 70.0)}
+    expected_holes = {"H1": (8.0, 5.0), "H2": (105.0, 5.0), "H3": (105.0, 70.0), "H4": (5.0, 70.0)}
     require(set(holes) == set(expected_holes), "mounting-hole identity mismatch")
     for refdes, (x, y) in expected_holes.items():
         row = holes[refdes]

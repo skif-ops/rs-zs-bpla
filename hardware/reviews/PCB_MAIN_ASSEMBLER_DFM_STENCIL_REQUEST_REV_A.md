@@ -22,8 +22,8 @@ Independent audit:
 
 | Item | Controlled SHA-256 |
 |---|---|
-| Native PCB-MAIN board | `855fb727cdddddedeec4fcb630fbe30321900e2108648710be696070742c111d` |
-| Placement manifest | `0fe702d03af4457a3d44aae93ea6ddc539040f38546d4b09f200612627890e35` |
+| Native PCB-MAIN board | `e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e` |
+| Placement manifest | `dbc433cb36b0bec612f55dbb96e6dce34d502728e488810c115207ffbbebc1d1` |
 | U2 project footprint | `78a67dda268e971a3463c41a8fb8170c3c59a1d3af145c65ed6b7212d1d8af83` |
 | U25/U26 project footprint | `b82af2a8e0eb455b430115ea8d9f2c4aeae30cc71de92823573d4f2d092bc6b9` |
 | U9 project footprint | `9c38091a434fb82f84dac437901e0d544c8b2be6e5aa4ee0cfced36c6aa95d87` |

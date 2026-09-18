@@ -80,8 +80,9 @@ final current/fault envelopes, stackup/copper weights and thermal review close.
 
 - Pre-schematic PCB-MAIN authorities `MAIN-AUTH-001…011` are closed; the 110 x 75 mm outline, connector/module anchors, RF/keepout regions and 31 production pogo-pad coordinates are frozen by `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv`.
 - Treat that frozen PCB-MAIN placement as a capture baseline, not a released
-  placement: the accepted limited mechanical ECO clears the six conflicts that
-  were inside MAIN-AUTH-011. The controlled 225-reference functional repack and
+  placement: the accepted limited mechanical ECO-001/002 chain clears the
+  conflicts that were inside MAIN-AUTH-011, including the bounded J_PWR/J6/H1
+  geometry. The controlled 225-reference functional repack and
   explicit generic-passive courtyards now pass the independent strict 2D audit:
   227/227 fitted assembly footprints have courtyards and all component,
   mounting-exclusion and U.FL tool-zone conflict sets are empty. Routing,

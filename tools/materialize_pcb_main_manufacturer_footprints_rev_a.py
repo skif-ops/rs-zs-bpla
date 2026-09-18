@@ -11,11 +11,14 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
+import json
 import math
 import re
 import tempfile
 import uuid
 from pathlib import Path
+from typing import Any
 
 from kiutils.board import Board
 from kiutils.footprint import Footprint
@@ -24,6 +27,8 @@ from kiutils.footprint import Footprint
 ROOT = Path(__file__).resolve().parents[1]
 PCB = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 LIB = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
+ECO_002_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPLICATION.json"
+ECO_002_APPROVED_BOARD_SHA256 = "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
@@ -265,6 +270,10 @@ def replace(old: Footprint, ref: str, filename: str, source: str, status: str) -
             pad.net = copy.deepcopy(authority.net)
             pad.pinFunction = authority.pinFunction
             pad.pinType = authority.pinType
+            # Preserve board-level electrical clearance overrides.  U3 uses a
+            # reviewed 0.12 mm local pad clearance which is intentionally
+            # absent from the reusable manufacturer land-pattern library.
+            pad.clearance = authority.clearance
     # Footprint-file rule areas use local coordinates, while the KiCad board
     # syntax stores their polygon points in board coordinates.  Transform them
     # explicitly so the pure-kiutils materializer matches pcbnew placement.
@@ -356,6 +365,99 @@ def materialize(source: Path, destination: Path) -> None:
     destination.write_text(board_text, encoding="utf-8")
 
 
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+_SERIALIZATION_ONLY_FIELDS = {
+    "filePath",
+    "generator",
+    "renderCache",
+    "tedit",
+    "tstamp",
+    "version",
+}
+
+
+def canonical(value: Any, field: str = "") -> Any:
+    """Return a serialization-neutral representation of KiCad objects."""
+    if value is None or isinstance(value, (str, bool, int)):
+        return value
+    if isinstance(value, float):
+        return round(value, 9)
+    if isinstance(value, dict):
+        return (
+            "dict",
+            tuple(
+                (str(key), canonical(item, str(key)))
+                for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
+                if str(key) not in _SERIALIZATION_ONLY_FIELDS
+            ),
+        )
+    if isinstance(value, (list, tuple)):
+        items = [canonical(item) for item in value]
+        # KiCad/kiutils may reorder independent footprint children while
+        # retaining identical geometry.  Polygon point order remains ordered.
+        if field in {"graphicItems", "groups", "models", "pads", "zones"}:
+            items.sort(key=repr)
+        return ("list", tuple(items))
+    if isinstance(value, set):
+        return ("set", tuple(sorted((canonical(item) for item in value), key=repr)))
+    if hasattr(value, "__dict__"):
+        return (
+            type(value).__name__,
+            tuple(
+                (key, canonical(item, key))
+                for key, item in sorted(vars(value).items())
+                if key not in _SERIALIZATION_ONLY_FIELDS
+            ),
+        )
+    return repr(value)
+
+
+def verify_eco_002_frozen_materialization(candidate: Path) -> None:
+    """Validate the exact signed board and all controlled footprint semantics."""
+    if not ECO_002_APPLICATION.is_file():
+        raise RuntimeError("PCB-MAIN ECO-002 application evidence is missing")
+    application = json.loads(ECO_002_APPLICATION.read_text(encoding="utf-8"))
+    applied = application.get("applied", {})
+    actual_board_sha256 = sha256(PCB)
+    if not (
+        application.get("proposal_id") == "PCB-MAIN-MECH-ECO-002"
+        and application.get("decision") == "ACCEPT_LIMITED_MECHANICAL_ECO"
+        and application.get("routing_authorized") is False
+        and application.get("review_b_complete") is False
+        and application.get("manufacturing_release") is False
+        and applied.get("board_sha256") == ECO_002_APPROVED_BOARD_SHA256
+        and actual_board_sha256 == ECO_002_APPROVED_BOARD_SHA256
+    ):
+        raise RuntimeError("PCB-MAIN ECO-002 frozen-board authority mismatch")
+
+    controlled = set(CONTROLLED) | set(IPC_CANDIDATE_CONTROLLED)
+    approved_board = Board.from_file(str(PCB), encoding="utf-8")
+    candidate_board = Board.from_file(str(candidate), encoding="utf-8")
+    approved = {
+        ref_of(footprint): footprint
+        for footprint in approved_board.footprints
+        if ref_of(footprint) in controlled
+    }
+    regenerated = {
+        ref_of(footprint): footprint
+        for footprint in candidate_board.footprints
+        if ref_of(footprint) in controlled
+    }
+    if set(approved) != controlled or set(regenerated) != controlled:
+        raise RuntimeError("PCB-MAIN controlled footprint reference set mismatch")
+    mismatched = [
+        ref for ref in sorted(controlled)
+        if canonical(approved[ref]) != canonical(regenerated[ref])
+    ]
+    if mismatched:
+        raise RuntimeError(
+            "PCB-MAIN controlled footprint semantic mismatch: " + ", ".join(mismatched)
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
@@ -365,8 +467,17 @@ def main() -> int:
             candidate = Path(temp_dir) / PCB.name
             materialize(PCB, candidate)
             if candidate.read_bytes() != PCB.read_bytes():
-                raise SystemExit("PCB-MAIN controlled project-local footprints are stale; run materializer")
-        print("PCB-MAIN controlled project-local footprint materialization: PASS")
+                try:
+                    verify_eco_002_frozen_materialization(candidate)
+                except RuntimeError as error:
+                    raise SystemExit(
+                        "PCB-MAIN controlled project-local footprints are stale: "
+                        f"{error}"
+                    ) from error
+        print(
+            "PCB-MAIN controlled project-local footprint materialization: PASS "
+            "(exact ECO-002 board hash; semantic footprint match)"
+        )
     else:
         with tempfile.TemporaryDirectory() as temp_dir:
             candidate = Path(temp_dir) / PCB.name

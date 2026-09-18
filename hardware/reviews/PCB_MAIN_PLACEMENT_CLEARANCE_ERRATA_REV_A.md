@@ -122,6 +122,18 @@ finding in the unlocked placement scope. That inventory is retained in
 `PCB_MAIN_MECHANICAL_ECO_APPLICATION_REV_A.json` as historical application
 evidence.
 
+Reviewer `Скиф` subsequently accepted `PCB-MAIN-MECH-ECO-002` on 2026-09-18
+with the same bounded decision `ACCEPT_LIMITED_MECHANICAL_ECO`. It changes only
+`MECH-007` (J_PWR mating-face Y 15.00 to 22.00 mm) and `MECH-012` (J6
+card-opening X 18.00 to 21.00 mm), with both rotations unchanged. H1 at
+`(8.00,5.00)` mm is retained from ECO-001 and is not an ECO-002 delta. The
+reviewed candidate SHA-256 is
+`5164195ebf6a9a66b6a30197abfcb314655bfe059d0aea5f3782a744069780ff`;
+the separate signature and application records are
+`PCB_MAIN_MECH_ECO_002_APPROVAL.json` and
+`PCB_MAIN_MECH_ECO_002_APPLICATION.json`. This remains a 2D mechanical subgate,
+not routing, Review B or fabrication authorization.
+
 ## Controlled post-repack result
 
 `hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv` fixes all 225 movable top-side
@@ -145,14 +157,15 @@ including 169 fitted and 15 DNP footprints.
 
 Controlled hashes:
 
-- native PCB SHA-256: `855fb727cdddddedeec4fcb630fbe30321900e2108648710be696070742c111d`
-- placement manifest SHA-256: `0fe702d03af4457a3d44aae93ea6ddc539040f38546d4b09f200612627890e35`
-- MAIN-AUTH-011 CSV SHA-256: `6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44`
+- native PCB SHA-256: `e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e`
+- placement manifest SHA-256: `dbc433cb36b0bec612f55dbb96e6dce34d502728e488810c115207ffbbebc1d1`
+- MAIN-AUTH-011 CSV SHA-256: `8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9`
 
-The two independent controls now pass on the same source state:
+The three independent controls now pass on the same source state:
 
 1. `python tools/audit_pcb_main_layout_candidate_rev_a.py`
 2. `python tools/audit_pcb_main_placement_clearance_rev_a.py --strict`
+3. `python tools/audit_pcb_main_mech_eco_002_rev_a.py`
 
 ## Remaining release boundary
 

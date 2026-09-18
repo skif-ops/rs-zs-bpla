@@ -313,10 +313,17 @@
       "mechanical_eco_review_commit_mapping": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_REVIEW_COMMIT_MAPPING_REV_A.json",
       "mechanical_eco_application": "hardware/reviews/PCB_MAIN_MECHANICAL_ECO_APPLICATION_REV_A.json",
       "mechanical_eco_candidate_status": "APPROVED_APPLIED_PLACEMENT_REPACK_PASS",
+      "mechanical_eco_002_candidate": "hardware/reviews/PCB_MAIN_MECH_ECO_002_CANDIDATE.md",
+      "mechanical_eco_002_approval": "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPROVAL.json",
+      "mechanical_eco_002_approval_record": "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPROVAL.md",
+      "mechanical_eco_002_review_commit_mapping": "hardware/reviews/PCB_MAIN_MECH_ECO_002_REVIEW_COMMIT_MAPPING.json",
+      "mechanical_eco_002_application": "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPLICATION.json",
+      "mechanical_eco_002_audit": "tools/audit_pcb_main_mech_eco_002_rev_a.py",
+      "mechanical_eco_002_status": "APPROVED_APPLIED_PLACEMENT_REPACK_PASS",
       "placement_clearance_control": {
         "state": "PASS",
-        "board_sha256": "855fb727cdddddedeec4fcb630fbe30321900e2108648710be696070742c111d",
-        "authority_sha256": "6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44",
+        "board_sha256": "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e",
+        "authority_sha256": "8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9",
         "assembly_footprints": 227,
         "courtyard_footprints": 227,
         "pad_screening_footprints": 0,
@@ -337,7 +344,7 @@
       "routing_constraint_status": "PASS_ALL_186_NETS_CLASSIFIED_FACTORY_STACKUP_AND_ROUTING_PENDING",
       "routing_constraint_control": {
         "state": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE",
-        "board_sha256": "855fb727cdddddedeec4fcb630fbe30321900e2108648710be696070742c111d",
+        "board_sha256": "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e",
         "authority_sha256": "f77948c4837448fbc6c3d0cfd6820354a0a8cab12925457bf90768704cb9e1dc",
         "net_count": 186,
         "class_counts": {

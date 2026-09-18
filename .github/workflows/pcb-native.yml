@@ -100,6 +100,7 @@ on:
       - "tools/audit_pcb_main_stackup_impedance_request_rev_a.py"
       - "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py"
       - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
+      - "tools/audit_pcb_main_mech_eco_002_rev_a.py"
       - "tools/audit_pcb_main_native_schematic_rev_a.py"
       - "tools/audit_pcb_layer_count_authority_rev_a.py"
       - "tools/audit_harness_manufacturing_rev_a.py"
@@ -395,6 +396,8 @@ jobs:
             --require-clean-source
           python tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/mechanical_eco_candidate_audit.json
+          python tools/audit_pcb_main_mech_eco_002_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/mechanical_eco_002_audit.json
           python tools/generate_pcb_main_schematic_rev_a.py --check
           python tools/audit_pcb_main_native_schematic_rev_a.py \
             --schematic hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_sch \

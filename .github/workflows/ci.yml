@@ -109,6 +109,8 @@ jobs:
             --require-clean-source
           python tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py \
             --output artifacts/pcb_main_mechanical_eco_candidate_rev_a.json
+          python tools/audit_pcb_main_mech_eco_002_rev_a.py \
+            --output artifacts/pcb_main_mech_eco_002_rev_a.json
       - name: Audit PCB-PWR placement and pre-route constraint interlocks
         run: |
           python tools/audit_pcb_pwr_hierarchy_rev_a.py \
@@ -206,6 +208,7 @@ jobs:
             artifacts/pcb_main_stackup_impedance_request_rev_a.json
             artifacts/pcb_main_assembler_dfm_stencil_request_rev_a.json
             artifacts/pcb_main_mechanical_eco_candidate_rev_a.json
+            artifacts/pcb_main_mech_eco_002_rev_a.json
             artifacts/pcb_pwr_placement_clearance_rev_a.json
             artifacts/pcb_pwr_hierarchy_rev_a.json
             artifacts/pcb_pwr_routing_authority_rev_a.json

@@ -29,11 +29,37 @@ EXCLUSIVE_ZONE_GROUPS = {
 
 PASSIVE_COURTYARDS = {
     "0402": (-0.800, -0.500, 0.800, 0.500),
-    "0603": (-1.100, -0.650, 1.100, 0.650),
-    "0805": (-1.275, -0.875, 1.275, 0.875),
-    "1206": (-1.825, -1.050, 1.825, 1.050),
-    "1210": (-1.825, -1.500, 1.825, 1.500),
+    "0603": (-1.050, -0.650, 1.050, 0.650),
+    "0805": (-1.350, -0.850, 1.350, 0.850),
+    "1206": (-1.850, -1.050, 1.850, 1.050),
+    "1210": (-1.850, -1.450, 1.850, 1.450),
 }
+
+CONNECTOR_FACE_DATUM = {
+    "J_PWR": (7.500, -8.920, 180.0),
+    "J_MIC1": (0.000, 3.795, 0.0),
+    "J_MIC2": (0.000, 3.795, 0.0),
+    "J_MIC3": (0.000, 3.795, 0.0),
+    "J_MIC4": (0.000, 3.795, 0.0),
+    "J6": (0.000, 6.000, 0.0),
+    "J7": (0.000, 6.000, 0.0),
+    "J11": (0.000, 3.675, 0.0),
+    "J12": (0.000, 7.625, 0.0),
+    "J13": (0.000, 3.795, 0.0),
+}
+
+
+def authority_anchor_to_footprint_origin(
+    ref: str, anchor_x: float, anchor_y: float, normalized_angle: float,
+) -> tuple[float, float, float]:
+    if ref not in CONNECTOR_FACE_DATUM:
+        return anchor_x, anchor_y, normalized_angle
+    face_x, face_y, rotation_offset = CONNECTOR_FACE_DATUM[ref]
+    footprint_angle = (-(normalized_angle + rotation_offset)) % 360.0
+    radians = math.radians(footprint_angle)
+    rotated_x = face_x * math.cos(radians) + face_y * math.sin(radians)
+    rotated_y = -face_x * math.sin(radians) + face_y * math.cos(radians)
+    return anchor_x - rotated_x, anchor_y - rotated_y, footprint_angle
 
 
 def require(value: bool, message: str) -> None:
@@ -72,8 +98,8 @@ def absolute_courtyard_bounds(fp) -> tuple[float, float, float, float]:
                     f"{ref_of(fp)}: unsupported F.CrtYd primitive")
             local_x, local_y = float(point.X), float(point.Y)
             points.append((
-                local_x * cosine - local_y * sine + float(fp.position.X),
-                local_x * sine + local_y * cosine + float(fp.position.Y),
+                local_x * cosine + local_y * sine + float(fp.position.X),
+                -local_x * sine + local_y * cosine + float(fp.position.Y),
             ))
     return (
         min(point[0] for point in points), min(point[1] for point in points),
@@ -163,10 +189,15 @@ def main() -> int:
     require(antenna_keepout is not None, "BLE all-layer antenna keepout is missing")
     for ref, (x, y, angle) in locked.items():
         fp = footprints[ref]
-        require(abs(fp.position.X - x) < 0.002 and abs(fp.position.Y - y) < 0.002,
+        expected_x, expected_y, expected_angle = authority_anchor_to_footprint_origin(
+            ref, x, y, angle
+        )
+        require(abs(fp.position.X - expected_x) < 0.002 and
+                abs(fp.position.Y - expected_y) < 0.002,
                 f"{ref}: locked anchor drift")
         actual_angle = float(fp.position.angle or 0.0) % 360.0
-        require(abs(actual_angle - angle) < 0.01, f"{ref}: locked orientation drift")
+        require(abs(actual_angle - expected_angle) < 0.01,
+                f"{ref}: locked orientation drift")
 
     placement_rows = list(csv.DictReader(PLACEMENT.open(encoding="utf-8", newline="")))
     placement = {row["RefDes"]: row for row in placement_rows}
@@ -201,9 +232,11 @@ def main() -> int:
             grid_units = float(row[coordinate]) / PLACEMENT_GRID_MM
             require(abs(grid_units - round(grid_units)) < 1e-6,
                     f"{ref}: {coordinate} is off the 0.25 mm placement grid")
+        actual_angle = float(fp.position.angle or 0.0) % 360.0
+        expected_angle = float(row["Rotation_deg"]) % 360.0
         require(abs(fp.position.X - float(row["X_mm"])) < 0.002 and
                 abs(fp.position.Y - float(row["Y_mm"])) < 0.002 and
-                abs(float(fp.position.angle or 0.0) - float(row["Rotation_deg"])) < 0.01,
+                abs(actual_angle - expected_angle) < 0.01,
                 f"{ref}: native position differs from placement manifest")
         require(fp.properties.get("DIONEA_PLACEMENT_SOURCE") ==
                 "PCB_MAIN_PLACEMENT_REPACK_REV_A" and

@@ -1,0 +1,55 @@
+{
+  "schema_version": "dioneya.pcb-main-mech-eco-002-application.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-MECH-ECO-002",
+  "approval": "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPROVAL.json",
+  "application_date": "2026-09-18",
+  "reviewed_candidate_commit_sha": "b3ab796bcdee727798a121d114605e7ba84d683a",
+  "approval_commit_sha": "228ceef4dc90e23603befaf9ae57608bc2e1190e",
+  "reviewed_candidate_sha256": "5164195ebf6a9a66b6a30197abfcb314655bfe059d0aea5f3782a744069780ff",
+  "decision": "ACCEPT_LIMITED_MECHANICAL_ECO",
+  "scope": "LIMITED_MECH_007_MECH_012_TRANSLATION_ONLY",
+  "applied": {
+    "authority": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+    "authority_sha256": "8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9",
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e",
+    "placement_repack": "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
+    "placement_repack_sha256": "dbc433cb36b0bec612f55dbb96e6dce34d502728e488810c115207ffbbebc1d1",
+    "changed_records": [
+      "MECH-007",
+      "MECH-012"
+    ],
+    "retained_eco_001_baseline": {
+      "record": "MECH-003",
+      "refdes": "H1",
+      "position_mm": [8.0, 5.0]
+    }
+  },
+  "engineering_candidate_evidence": {
+    "layout_generator": "tools/generate_pcb_main_layout_candidate_rev_a.py",
+    "placement_repack_control": "tools/generate_pcb_main_placement_repack_rev_a.py",
+    "layout_independent_audit": "tools/audit_pcb_main_layout_candidate_rev_a.py",
+    "placement_clearance_audit": "tools/audit_pcb_main_placement_clearance_rev_a.py",
+    "eco_002_audit": "tools/audit_pcb_main_mech_eco_002_rev_a.py",
+    "routing_present": false
+  },
+  "post_application_clearance": {
+    "assembly_footprints": 227,
+    "courtyard_footprints": 227,
+    "pad_screening_footprints": 0,
+    "confirmed_component_collisions": 0,
+    "screening_component_collisions": 0,
+    "confirmed_mounting_clearance_conflicts": 0,
+    "screening_mounting_clearance_conflicts": 0,
+    "confirmed_tool_clearance_conflicts": 0,
+    "screening_tool_clearance_conflicts": 0,
+    "locked_authority_component_conflicts": [],
+    "locked_authority_mounting_conflicts": [],
+    "locked_authority_tool_conflicts": []
+  },
+  "status": "APPLIED_STRICT_2D_CLEARANCE_PASS_ROUTING_AND_3D_REVIEW_PENDING",
+  "routing_authorized": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

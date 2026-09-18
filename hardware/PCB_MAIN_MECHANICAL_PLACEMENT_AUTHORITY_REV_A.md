@@ -6,7 +6,7 @@ This record closes `MAIN-AUTH-011`. It freezes the PCB-MAIN outline, mounting pa
 
 Machine authority: `hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv`.
 
-Authority CSV SHA-256: `6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44`.
+Authority CSV SHA-256: `8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9`.
 
 ## Accepted limited mechanical ECO
 
@@ -28,6 +28,30 @@ This ECO clears the six locked-authority geometry conflicts. It does not
 complete placement, routing, DRC, enclosure validation, Review B or
 manufacturing release.
 
+## Accepted limited mechanical ECO-002
+
+`PCB-MAIN-MECH-ECO-002` was accepted by reviewer `Скиф` on `18.09.2026`
+with decision `ACCEPT_LIMITED_MECHANICAL_ECO`. The decision is bound to the
+exact candidate SHA-256
+`5164195ebf6a9a66b6a30197abfcb314655bfe059d0aea5f3782a744069780ff`,
+authority SHA-256
+`8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9`
+and generated-PCB SHA-256
+`e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e`.
+The machine-readable signature is
+`hardware/reviews/PCB_MAIN_MECH_ECO_002_APPROVAL.json`.
+
+The accepted delta changes only `MECH-007` and `MECH-012`: the J_PWR
+mating-face centre moves from `(0.00,15.00)` to `(0.00,22.00)` mm and the J6
+card-opening centre moves from `(18.00,2.50)` to `(21.00,2.50)` mm. Both
+rotations and all other authority fields remain unchanged. H1 at
+`(8.00,5.00)` mm is retained from the accepted ECO-001 baseline and is not a
+new ECO-002 change.
+
+ECO-002 closes only the bounded J6/J_PWR/H1 2D geometry conflict. It does not
+authorize routing, CAM, fabrication, assembly, Review B or manufacturing
+release. The generated board is still an unrouted engineering candidate.
+
 The authority contains 70 records: one board outline, one assembled-envelope allocation, four mounting holes, thirteen connector placements, four RF-module anchors, four exclusive RF zones, one audio/digital quiet zone, seven keepouts/cable corridors, one bottom fixture window, three fixture fiducials, and 31 individual pogo pads. Every record uses the PCB coordinate system defined below and is independently checked by `tools/verify_pcb_main_mechanical_placement_authority_rev_a.py`.
 
 ## Primary evidence and upstream constraints
@@ -47,7 +71,7 @@ Manufacturer land patterns and component drawings remain authoritative for pad, 
 
 - Top view: board origin is the south-west tangent corner of `Edge.Cuts`; +X points east, +Y points north, and +Z points from bottom to top.
 - The bare PCB is a 110.00 x 75.00 mm rounded rectangle with four tangent R3.00 mm corners and nominal thickness 1.60 mm.
-- H1-H4 are 3.20 mm NPTH at `(5,5)`, `(105,5)`, `(105,70)`, and `(5,70)` mm. Each has an all-layer copper exclusion diameter of 8.0 mm and component exclusion diameter of 10.0 mm.
+- H1-H4 are 3.20 mm NPTH at `(8,5)`, `(105,5)`, `(105,70)`, and `(5,70)` mm. H1 is shifted 3 mm east by `PCB-MAIN-ECO-001` to clear the J_PWR through-hole field; each hole has an all-layer copper exclusion diameter of 8.0 mm and component exclusion diameter of 10.0 mm.
 - Card and edge-connector anchors are their mating/card-opening face centres. U.FL anchors are centre contact 1. Module anchors are manufacturer body centres. Test and fiducial anchors are copper centres.
 - Connector rotation is normalized with the local mating/insertion vector along +Y at 0 degrees and increases counter-clockwise. Module rotation uses the normalized manufacturer top-view footprint; the U11 normalized antenna end is local +Y, so rotation 270 degrees points it east.
 - The allocated unmated PCBA body envelope is 110 x 75 x 12 mm. Removable connector mates, card withdrawal, service-tool motion and cable bend volumes are excluded and controlled separately by the access rules in the CSV. The envelope must be checked against the generated native PCB STEP before enclosure release.

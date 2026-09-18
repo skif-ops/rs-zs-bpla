@@ -21,9 +21,9 @@ Independent audit:
 | Item | Controlled value |
 |---|---|
 | Native PCB | `hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb` |
-| Native PCB SHA-256 | `855fb727cdddddedeec4fcb630fbe30321900e2108648710be696070742c111d` |
-| Mechanical authority SHA-256 | `6a28821413fb631d299574e0a86fd87be4fa2b20606b60947700fc6e37ab3e44` |
-| Placement manifest SHA-256 | `0fe702d03af4457a3d44aae93ea6ddc539040f38546d4b09f200612627890e35` |
+| Native PCB SHA-256 | `e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e` |
+| Mechanical authority SHA-256 | `8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9` |
+| Placement manifest SHA-256 | `dbc433cb36b0bec612f55dbb96e6dce34d502728e488810c115207ffbbebc1d1` |
 | Routing authority SHA-256 | `f77948c4837448fbc6c3d0cfd6820354a0a8cab12925457bf90768704cb9e1dc` |
 
 The request basis is the controlled 110 x 75 x 1.6 mm six-layer engineering

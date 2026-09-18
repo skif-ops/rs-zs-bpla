@@ -1402,7 +1402,7 @@ def main() -> None:
     holes = [row for row in mechanical_rows if row["Feature_Type"] == "MOUNTING_HOLE"]
     require(
         {(row["RefDes"], row["X_mm"], row["Y_mm"]) for row in holes}
-        == {("H1", "5.00", "5.00"), ("H2", "105.00", "5.00"),
+        == {("H1", "8.00", "5.00"), ("H2", "105.00", "5.00"),
             ("H3", "105.00", "70.00"), ("H4", "5.00", "70.00")},
         "PCB-MAIN mounting pattern mismatch",
     )
@@ -1735,6 +1735,10 @@ def main() -> None:
                 "mechanical_eco_candidate", "mechanical_eco_candidate_record",
                 "mechanical_eco_candidate_audit", "mechanical_eco_approval",
                 "mechanical_eco_approval_record", "mechanical_eco_review_commit_mapping",
+                "mechanical_eco_002_candidate", "mechanical_eco_002_approval",
+                "mechanical_eco_002_approval_record",
+                "mechanical_eco_002_review_commit_mapping",
+                "mechanical_eco_002_application", "mechanical_eco_002_audit",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
             if review_b["status"] in {
@@ -1817,6 +1821,69 @@ def main() -> None:
                     "EXACT_TREE_AND_CANDIDATE_BLOB" and
                     review_commit_mapping.get("manufacturing_release") is False,
                     "PCB-MAIN mechanical ECO review-commit mapping drift")
+            mechanical_eco_002_status = review_b["evidence"].get(
+                "mechanical_eco_002_status"
+            )
+            require(mechanical_eco_002_status ==
+                    "APPROVED_APPLIED_PLACEMENT_REPACK_PASS",
+                    "PCB-MAIN mechanical ECO-002 status drift")
+            eco_002_candidate_path = (
+                ROOT / review_b["evidence"]["mechanical_eco_002_candidate"]
+            )
+            eco_002_approval = json.loads(
+                (ROOT / review_b["evidence"]["mechanical_eco_002_approval"])
+                .read_text(encoding="utf-8")
+            )
+            require(eco_002_approval.get("proposal_id") ==
+                    "PCB-MAIN-MECH-ECO-002" and
+                    eco_002_approval.get("reviewer") == "Скиф" and
+                    eco_002_approval.get("date") == "2026-09-18" and
+                    eco_002_approval.get("decision") ==
+                    "ACCEPT_LIMITED_MECHANICAL_ECO" and
+                    eco_002_approval.get("scope") ==
+                    "LIMITED_MECH_007_MECH_012_TRANSLATION_ONLY" and
+                    eco_002_approval.get("approved_change_records") ==
+                    ["MECH-007", "MECH-012"] and
+                    eco_002_approval.get("implementation_authorized") is True and
+                    eco_002_approval.get("routing_authorized") is False and
+                    eco_002_approval.get("review_b_complete") is False and
+                    eco_002_approval.get("manufacturing_release") is False,
+                    "PCB-MAIN mechanical ECO-002 approval binding drift")
+            require(hashlib.sha256(eco_002_candidate_path.read_bytes()).hexdigest() ==
+                    eco_002_approval.get("reviewed_candidate_sha256"),
+                    "approved PCB-MAIN mechanical ECO-002 candidate SHA-256 drift")
+            eco_002_mapping = json.loads(
+                (ROOT / review_b["evidence"]["mechanical_eco_002_review_commit_mapping"])
+                .read_text(encoding="utf-8")
+            )
+            require(eco_002_mapping.get("github_equivalent_commit_sha") ==
+                    "b3ab796bcdee727798a121d114605e7ba84d683a" and
+                    eco_002_mapping.get("reviewed_tree_sha") ==
+                    "b5c2892d795389eb07a216139dc50f725a13e849" and
+                    eco_002_mapping.get("candidate_blob_sha") ==
+                    "8706f629af1b42418f7a6d9046af6d6816b39480" and
+                    eco_002_mapping.get("candidate_sha256") ==
+                    eco_002_approval.get("reviewed_candidate_sha256") and
+                    eco_002_mapping.get("equivalence") ==
+                    "EXACT_TREE_AND_CANDIDATE_BLOB" and
+                    eco_002_mapping.get("routing_authorized") is False and
+                    eco_002_mapping.get("review_b_complete") is False and
+                    eco_002_mapping.get("manufacturing_release") is False,
+                    "PCB-MAIN mechanical ECO-002 review mapping drift")
+            eco_002_application = json.loads(
+                (ROOT / review_b["evidence"]["mechanical_eco_002_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(eco_002_application.get("proposal_id") ==
+                    "PCB-MAIN-MECH-ECO-002" and
+                    eco_002_application.get("decision") ==
+                    "ACCEPT_LIMITED_MECHANICAL_ECO" and
+                    eco_002_application.get("status") ==
+                    "APPLIED_STRICT_2D_CLEARANCE_PASS_ROUTING_AND_3D_REVIEW_PENDING" and
+                    eco_002_application.get("routing_authorized") is False and
+                    eco_002_application.get("review_b_complete") is False and
+                    eco_002_application.get("manufacturing_release") is False,
+                    "PCB-MAIN mechanical ECO-002 application interlock drift")
             mechanical_application = None
             if mechanical_eco_status in {
                     "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
@@ -1932,9 +1999,11 @@ def main() -> None:
                             "locked_authority_mounting_conflicts": [],
                             "locked_authority_tool_conflicts": [],
                         }, "PCB-MAIN mechanical ECO historical inventory drift")
-                require(mechanical_application.get("applied", {}).get("authority_sha256") ==
+                require(eco_002_application.get("applied", {}).get("board_sha256") ==
+                        placement_control["board_sha256"] and
+                        eco_002_application.get("applied", {}).get("authority_sha256") ==
                         placement_control["authority_sha256"],
-                        "PCB-MAIN repack authority differs from the accepted ECO authority")
+                        "PCB-MAIN repack differs from the accepted ECO-002 evidence")
     elif native_present:
         require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
                 "human Review A identity/date/SHA claimed before sign-off")
