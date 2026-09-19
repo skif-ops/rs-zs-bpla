@@ -898,6 +898,9 @@ jobs:
             hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pcb
             hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_CANDIDATE_REV_A.json
             hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_REVIEW_COMMIT_MAPPING.json
             hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb
             hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md

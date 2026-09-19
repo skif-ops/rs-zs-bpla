@@ -1,0 +1,33 @@
+{
+  "schema_version": "dioneya.pcb-main-octospi-r8-eco-002-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-OCTOSPI-R8-ECO-002",
+  "reviewer": "Скиф",
+  "decision_date": "2026-09-19",
+  "decision": "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE",
+  "decision_input": "утверждаю и продолжай",
+  "reviewed_github_commit_sha": "0104cf1bddd28f6bd4b0abc52d8b12bc6cc8cf67",
+  "reviewed_tree_sha": "8a6d4b82727df6449db731a5aea47290e01cc1df",
+  "review_mapping": "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_REVIEW_COMMIT_MAPPING.json",
+  "reviewed_proposal_sha256": "32fae30b0f4da789f584d56c5ed0e5bb09521ed64749a0069a0a295d6971ec12",
+  "reviewed_proposal_record_sha256": "476b9c497a5cd7ea9b887f3c1bab9cd0f4e2b1ae89197f57679ee06ada48a4b9",
+  "reviewed_candidate_board_sha256": "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f",
+  "machine_gate": {
+    "pcb_native_run_id": 35459421992,
+    "pcb_native_conclusion": "success",
+    "kicad_9_comparative_drc_step": "success",
+    "ci_run_id": 35459421983,
+    "ci_conclusion": "success"
+  },
+  "authorization": {
+    "apply_exact_hash_bound_r8_placement_and_octospi_routes": true,
+    "continue_remaining_signal_and_power_routing_engineering": true,
+    "alter_reviewed_geometry_without_new_controlled_review": false,
+    "routing_complete": false,
+    "return_path_review_complete": false,
+    "si_review_complete": false,
+    "pi_review_complete": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}
