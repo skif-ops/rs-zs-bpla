@@ -1699,6 +1699,8 @@ def main() -> None:
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
                     "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "SIGNAL_HARD_NETS_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
                 },
                 "Review B must be open but incomplete after Review A PASS")
     else:
@@ -1732,6 +1734,8 @@ def main() -> None:
                 "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
                 "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
                 "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                "SIGNAL_HARD_NETS_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
         }:
             required_layout_evidence = {
                 "native_layout_candidate", "layout_generator", "layout_independent_audit",
@@ -1758,6 +1762,14 @@ def main() -> None:
                 "ground_domain_routing_application",
                 "ground_domain_routing_audit",
                 "ground_domain_routing_status",
+                "signal_hard_nets_routing_candidate",
+                "signal_hard_nets_routing_candidate_record",
+                "signal_hard_nets_routing_approval",
+                "signal_hard_nets_routing_approval_record",
+                "signal_hard_nets_routing_review_commit_mapping",
+                "signal_hard_nets_routing_application",
+                "signal_hard_nets_routing_audit",
+                "signal_hard_nets_routing_status",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
             if review_b["status"] in {
@@ -1765,6 +1777,8 @@ def main() -> None:
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
                     "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "SIGNAL_HARD_NETS_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
             }:
                 required_layout_evidence |= {
                     "placement_repack_manifest", "placement_repack_generator",
@@ -1783,9 +1797,14 @@ def main() -> None:
                     "APPROVED_APPLIED_BOUNDED_GROUND_DOMAIN_SUBGATE_"
                     "REMAINING_ROUTING_ENGINEERING_CONTINUES",
                     "PCB-MAIN ground-domain routing status drift")
+            require(review_b["evidence"].get("signal_hard_nets_routing_status") ==
+                    "APPROVED_APPLIED_BOUNDED_SIGNAL_SUBGATE_"
+                    "REMAINING_ROUTING_ENGINEERING_CONTINUES",
+                    "PCB-MAIN signal hard-nets routing status drift")
             for evidence_name in required_layout_evidence - {
                     "ra_003_status", "placement_repack_status",
                     "ground_domain_routing_status",
+                    "signal_hard_nets_routing_status",
             }:
                 evidence_path = ROOT / review_b["evidence"][evidence_name]
                 require(evidence_path.is_file() and evidence_path.stat().st_size > 0,
@@ -2049,6 +2068,23 @@ def main() -> None:
                         "cam_or_manufacturing_release"
                     ) is False,
                     "PCB-MAIN ground-domain application interlock drift")
+            signal_hard_nets_application = json.loads(
+                (ROOT / review_b["evidence"]["signal_hard_nets_routing_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(signal_hard_nets_application.get("proposal_id") ==
+                    "PCB-MAIN-SIGNAL-HARD-NETS-001" and
+                    signal_hard_nets_application.get("decision") ==
+                    "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE" and
+                    signal_hard_nets_application.get("status") ==
+                    "APPLIED_ACCEPTED_SIGNAL_HARD_NETS_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+                    signal_hard_nets_application.get("routing_complete") is False and
+                    signal_hard_nets_application.get("return_path_review_complete") is False and
+                    signal_hard_nets_application.get("si_review_complete") is False and
+                    signal_hard_nets_application.get("pi_review_complete") is False and
+                    signal_hard_nets_application.get("review_b_complete") is False and
+                    signal_hard_nets_application.get("cam_or_manufacturing_release") is False,
+                    "PCB-MAIN signal hard-nets application interlock drift")
             mechanical_application = None
             if mechanical_eco_status in {
                     "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
@@ -2164,9 +2200,17 @@ def main() -> None:
                             "locked_authority_mounting_conflicts": [],
                             "locked_authority_tool_conflicts": [],
                         }, "PCB-MAIN mechanical ECO historical inventory drift")
-                require(ground_domain_application.get("applied", {}).get(
+                require(signal_hard_nets_application.get("applied", {}).get(
                             "board_sha256"
                         ) == placement_control["board_sha256"] and
+                        signal_hard_nets_application.get("applied", {}).get(
+                            "exact_candidate_byte_identity"
+                        ) is True and
+                        ground_domain_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) == signal_hard_nets_application.get(
+                            "historical_baseline", {}
+                        ).get("board_sha256") and
                         ground_domain_application.get("applied", {}).get(
                             "exact_candidate_byte_identity"
                         ) is True and
@@ -2197,7 +2241,7 @@ def main() -> None:
                         rf_eco_003_application.get("applied", {}).get(
                             "copper_zones"
                         ) == 0,
-                        "PCB-MAIN active ground subgate or historical repack/ECO evidence differs")
+                        "PCB-MAIN active routing subgate or historical repack/ECO evidence differs")
     elif native_present:
         require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
                 "human Review A identity/date/SHA claimed before sign-off")
