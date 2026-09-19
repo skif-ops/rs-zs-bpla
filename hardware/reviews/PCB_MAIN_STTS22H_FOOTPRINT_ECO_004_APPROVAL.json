@@ -1,0 +1,31 @@
+{
+  "schema_version": "dioneya.pcb-main-stts22h-footprint-eco-004-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004",
+  "reviewer": "Скиф",
+  "decision_date": "2026-09-19",
+  "decision": "ACCEPT_STTS22H_FOOTPRINT_ECO_004",
+  "decision_input": "подтверждаю и продолжаем",
+  "decision_input_interpretation": "ACCEPT_VALUE_REQUESTED_IN_IMMEDIATELY_PRECEDING_REVIEW_REQUEST",
+  "reviewed_github_commit_sha": "059ecd0e2e35fc56a56f48d62cce4f72a93755c0",
+  "reviewed_tree_sha": "d6805c8f15ce319410a996f143132c6f8f58f35e",
+  "review_mapping": "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_REVIEW_COMMIT_MAPPING.json",
+  "reviewed_proposal_sha256": "4b7da50ef11415385317f4811a26301c189988e349d3fcef0b0107692a443df8",
+  "reviewed_proposal_record_sha256": "35b7c9455fad54013959b2f589fa3068830b8d2dbb812ce924fb42ebd6d4e772",
+  "reviewed_candidate_footprint_sha256": "e06136e5f2ebd67798141ff1ef99db94d895d139d20b3c98a671e34bbbfa277f",
+  "reviewed_materialized_board_sha256": "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8",
+  "machine_gate": {
+    "pcb_native_run_id": 35435603064,
+    "pcb_native_conclusion": "success",
+    "ci_run_id": 35435603054,
+    "ci_conclusion": "success"
+  },
+  "authorization": {
+    "apply_bounded_u4_land_pattern_correction": true,
+    "update_controlled_library_generator_register_audits_and_unrouted_board": true,
+    "continue_pcb_main_routing_engineering": true,
+    "candidate_or_future_copper_final_authorized": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}

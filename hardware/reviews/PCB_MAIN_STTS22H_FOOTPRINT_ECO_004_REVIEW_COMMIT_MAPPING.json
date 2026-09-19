@@ -1,0 +1,28 @@
+{
+  "schema_version": "dioneya.pcb-main-stts22h-footprint-eco-004-review-commit-mapping.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004",
+  "reviewed_github_commit_sha": "059ecd0e2e35fc56a56f48d62cce4f72a93755c0",
+  "reviewed_tree_sha": "d6805c8f15ce319410a996f143132c6f8f58f35e",
+  "proposal_path": "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_CANDIDATE_REV_A.json",
+  "proposal_blob_sha": "612dd5e86df658d8ffbb27452965347413572ac9",
+  "proposal_sha256": "4b7da50ef11415385317f4811a26301c189988e349d3fcef0b0107692a443df8",
+  "proposal_record_path": "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_CANDIDATE_REV_A.md",
+  "proposal_record_blob_sha": "5c26894aaad16ad3ff36bf55c74708bd501c7a21",
+  "proposal_record_sha256": "35b7c9455fad54013959b2f589fa3068830b8d2dbb812ce924fb42ebd6d4e772",
+  "candidate_footprint_path": "hardware/kicad/candidates/PCB-MAIN-STTS22H-ECO-004/STTS22H_UDFN-6L_ECO_004.kicad_mod",
+  "candidate_footprint_blob_sha": "4d86d583554d3770d137ab826faf59b1cc70762a",
+  "candidate_footprint_sha256": "e06136e5f2ebd67798141ff1ef99db94d895d139d20b3c98a671e34bbbfa277f",
+  "materialized_candidate_board_sha256": "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8",
+  "audit_blob_sha": "996b3f9cfecc3e04016421bf75407fe8cd9cb4b8",
+  "machine_gate": {
+    "pcb_native_run_id": 35435603064,
+    "pcb_native_conclusion": "success",
+    "ci_run_id": 35435603054,
+    "ci_conclusion": "success"
+  },
+  "equivalence": "EXACT_REVIEWED_TREE_AND_BLOBS",
+  "transport": "GITHUB_APP_GIT_DATABASE_API",
+  "review_b_complete": false,
+  "manufacturing_release": false
+}
