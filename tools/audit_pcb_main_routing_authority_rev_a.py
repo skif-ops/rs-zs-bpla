@@ -3,8 +3,8 @@
 
 This control proves that every native net has an explicit reviewed routing
 classification and that the authoritative board is the exact accepted bounded
-ground-domain subgate candidate.  A PASS does not claim completion of signal or
-power routing, Review B, CAM, or manufacturing release.
+signal-routing successor to the ground-domain subgate.  A PASS does not claim
+completion of signal or power routing, Review B, CAM, or manufacturing release.
 """
 from __future__ import annotations
 
@@ -34,12 +34,23 @@ GROUND_CANDIDATE = (
 GROUND_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json"
 )
+SIGNAL_CANDIDATE = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001"
+    / "PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
+)
+SIGNAL_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json"
+)
 
-STATE = "PASS_CONSTRAINT_COVERAGE_AND_ACCEPTED_GROUND_DOMAIN_SUBGATE"
+STATE = "PASS_CONSTRAINT_COVERAGE_AND_ACCEPTED_SIGNAL_HARD_NETS_SUBGATE"
 ROW_STATUS = "PRE_ROUTE_CONSTRAINT_CONTROLLED_ROUTING_NOT_COMPLETE"
 STACKUP_STATE = "OPEN_REQUIRED_BEFORE_NUMERIC_RF_USB_GEOMETRY"
 GROUND_CANDIDATE_SHA256 = (
     "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
+)
+SIGNAL_CANDIDATE_SHA256 = (
+    "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
 )
 
 FIELDS = [
@@ -422,9 +433,10 @@ def expected_status_control(
         "rf_50ohm_net_count": 7,
         "usb_90ohm_pair_count": 4,
         "cross_domain_review_net_count": 18,
-        "trace_items": 573,
+        "trace_items": 684,
         "copper_zones": 7,
         "ground_domain_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "signal_hard_nets_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "factory_stackup": STACKUP_STATE,
         "routing_complete": False,
         "manufacturing_release": False,
@@ -440,6 +452,10 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             f"accepted ground-domain candidate is missing: {GROUND_CANDIDATE}")
     require(GROUND_APPLICATION.is_file(),
             f"ground-domain application record is missing: {GROUND_APPLICATION}")
+    require(SIGNAL_CANDIDATE.is_file(),
+            f"accepted signal candidate is missing: {SIGNAL_CANDIDATE}")
+    require(SIGNAL_APPLICATION.is_file(),
+            f"signal application record is missing: {SIGNAL_APPLICATION}")
 
     with authority_path.open(encoding="utf-8", newline="") as stream:
         reader = csv.DictReader(stream)
@@ -514,14 +530,16 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
 
     trace_items = len(board.traceItems)
     copper_zones = len(board.zones)
-    require(trace_items == 573 and copper_zones == 7,
-            "authoritative board does not contain the bounded accepted ground-domain subgate")
+    require(trace_items == 684 and copper_zones == 7,
+            "authoritative board does not contain the bounded accepted signal subgate")
     board_digest = sha256(board_path)
-    require(board_digest == GROUND_CANDIDATE_SHA256,
-            "authoritative board SHA-256 differs from the accepted ground-domain candidate")
-    require(sha256(GROUND_CANDIDATE) == GROUND_CANDIDATE_SHA256 and
-            board_path.read_bytes() == GROUND_CANDIDATE.read_bytes(),
-            "authoritative board is not byte-identical to the accepted ground-domain candidate")
+    require(board_digest == SIGNAL_CANDIDATE_SHA256,
+            "authoritative board SHA-256 differs from the accepted signal candidate")
+    require(sha256(GROUND_CANDIDATE) == GROUND_CANDIDATE_SHA256,
+            "accepted ground-domain candidate hash drift")
+    require(sha256(SIGNAL_CANDIDATE) == SIGNAL_CANDIDATE_SHA256 and
+            board_path.read_bytes() == SIGNAL_CANDIDATE.read_bytes(),
+            "authoritative board is not byte-identical to the accepted signal candidate")
     application = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
     require(application.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE"
             and application.get("status") ==
@@ -543,6 +561,19 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
                 "native_connectivity_baseline_to_candidate": [718, 464],
                 "new_comparative_drc_error_counts": {},
             }, "ground-domain application geometry or release boundary differs")
+    signal_application = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
+    require(signal_application.get("decision") ==
+            "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE" and
+            signal_application.get("status") ==
+            "APPLIED_ACCEPTED_SIGNAL_HARD_NETS_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+            signal_application.get("reviewed_candidate_board_sha256") ==
+            SIGNAL_CANDIDATE_SHA256 and
+            signal_application.get("applied", {}).get("board_sha256") ==
+            SIGNAL_CANDIDATE_SHA256 and
+            signal_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
+            signal_application.get("review_b_complete") is False and
+            signal_application.get("cam_or_manufacturing_release") is False,
+            "signal application decision, geometry, or release boundary differs")
 
     authority_digest = sha256(authority_path)
     control = expected_status_control(board_digest, authority_digest)
@@ -557,7 +588,7 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             "routing_authority_generator": "tools/generate_pcb_main_routing_authority_rev_a.py",
             "routing_authority_audit": "tools/audit_pcb_main_routing_authority_rev_a.py",
             "routing_constraint_status": (
-                "PASS_ALL_186_NETS_CLASSIFIED_GROUND_DOMAIN_SUBGATE_APPLIED_"
+                "PASS_ALL_186_NETS_CLASSIFIED_SIGNAL_HARD_NETS_SUBGATE_APPLIED_"
                 "FACTORY_STACKUP_AND_REMAINING_ROUTING_PENDING"
             ),
         }
@@ -596,6 +627,7 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
         },
         "factory_stackup_status": STACKUP_STATE,
         "ground_domain_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "signal_hard_nets_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "routing_complete": False,
         "manufacturing_release": False,
     }
@@ -623,7 +655,8 @@ def main() -> int:
     print("PCB-MAIN routing authority audit: PASS")
     print(
         "nets=186 classes=15 rf_50ohm=7 usb_pairs=4 "
-        "trace_items=573 copper_zones=7 ground_subgate=applied routing_complete=false"
+        "trace_items=684 copper_zones=7 ground_subgate=applied "
+        "signal_hard_nets_subgate=applied routing_complete=false"
     )
     return 0
 

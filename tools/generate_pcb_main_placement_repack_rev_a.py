@@ -65,6 +65,13 @@ GROUND_CANDIDATE = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/"
     "PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb"
 )
+SIGNAL_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json"
+)
+SIGNAL_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/"
+    "PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
+)
 
 ECO003_POSES = {
     "FL1": (60.5, 68.0, 0.0),
@@ -834,18 +841,21 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
     verify_materialized(board_text, rows)
     if GROUND_APPLICATION.is_file():
         ground = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
+        signal = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
         require(ground.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE" and
                 ground.get("status") ==
                 "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
                 ground.get("applied", {}).get("exact_candidate_byte_identity") is True and
-                sha256(BOARD) == sha256(GROUND_CANDIDATE) and
-                BOARD.read_bytes() == GROUND_CANDIDATE.read_bytes() and
-                len(getattr(board, "traceItems", [])) == 573 and
+                signal.get("decision") == "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE" and
+                signal.get("applied", {}).get("exact_candidate_byte_identity") is True and
+                sha256(BOARD) == sha256(SIGNAL_CANDIDATE) and
+                BOARD.read_bytes() == SIGNAL_CANDIDATE.read_bytes() and
+                len(getattr(board, "traceItems", [])) == 684 and
                 len(getattr(board, "zones", [])) == 7 and
                 ground.get("routing_complete") is False and
                 ground.get("review_b_complete") is False and
                 ground.get("cam_or_manufacturing_release") is False,
-                "PCB-MAIN ground-domain application or copper inventory drift")
+                "PCB-MAIN accepted routing-subgate application or copper inventory drift")
     else:
         require(len(getattr(board, "traceItems", [])) == 0 and
                 len(getattr(board, "zones", [])) == 0,

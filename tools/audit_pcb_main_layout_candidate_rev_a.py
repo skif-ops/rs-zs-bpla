@@ -23,6 +23,13 @@ GROUND_CANDIDATE = (
 GROUND_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json"
 )
+SIGNAL_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/"
+    "PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
+)
+SIGNAL_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json"
+)
 MECH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 FOOTPRINT_REVIEW = ROOT / "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv"
 PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
@@ -318,17 +325,22 @@ def main() -> int:
 
     edge_items = [item for item in board.graphicItems if getattr(item, "layer", None) == "Edge.Cuts"]
     require(len(edge_items) == 8, f"rounded outline must contain 4 lines + 4 arcs, got {len(edge_items)}")
-    require(GROUND_CANDIDATE.is_file() and GROUND_APPLICATION.is_file(),
-            "accepted ground-domain application evidence is missing")
+    require(GROUND_CANDIDATE.is_file() and GROUND_APPLICATION.is_file() and
+            SIGNAL_CANDIDATE.is_file() and SIGNAL_APPLICATION.is_file(),
+            "accepted routing subgate application evidence is missing")
     ground_application = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
-    require(PCB.read_bytes() == GROUND_CANDIDATE.read_bytes() and
+    signal_application = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
+    require(PCB.read_bytes() == SIGNAL_CANDIDATE.read_bytes() and
             hashlib.sha256(PCB.read_bytes()).hexdigest() ==
-            "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e" and
+            "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3" and
             ground_application.get("status") ==
             "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
             ground_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
-            len(board.traceItems) == 573 and len(board.zones) == 7,
-            "authoritative board ground-domain application drift")
+            signal_application.get("status") ==
+            "APPLIED_ACCEPTED_SIGNAL_HARD_NETS_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+            signal_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
+            len(board.traceItems) == 684 and len(board.zones) == 7,
+            "authoritative board accepted routing-subgate application drift")
     provisional = sorted(ref for ref, fp in footprints.items()
                          if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
                          "PROVISIONAL_REQUIRES_MANUFACTURER_DRAWING")
@@ -1184,7 +1196,7 @@ def main() -> int:
           f"project_ipc_candidates_dfm_required={len(ipc_candidates)} "
           f"kicad_library_drawing_verified={len(library_verified)} "
           f"manufacturer_controlled={len(manufacturer_controlled)} "
-          "routing=GROUND_DOMAIN_SUBGATE_ONLY review_b=BLOCKED")
+          "routing=GROUND_AND_SIGNAL_HARD_NETS_SUBGATES_APPLIED review_b=BLOCKED")
     return 0
 
 

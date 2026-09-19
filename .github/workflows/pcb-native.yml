@@ -576,7 +576,7 @@ jobs:
           candidate_project="$(mktemp -d)"
           cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
             "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pro"
-          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb \
+          cp hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb \
             "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb"
           cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
             "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pro"
@@ -840,6 +840,14 @@ jobs:
             hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json
             hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json
+            hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb
             hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md
             hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md
             hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md

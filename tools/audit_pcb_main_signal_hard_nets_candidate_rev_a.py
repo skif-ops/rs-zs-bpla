@@ -16,12 +16,19 @@ from kiutils.board import Board
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+BASE = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001"
+    / "PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb"
+)
 CANDIDATE = (
     ROOT
     / "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001"
     / "PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
 )
+ACTIVE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPROVAL_REV_A.json"
+APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json"
 BASE_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
 CANDIDATE_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
 EXPECTED = {
@@ -137,6 +144,9 @@ def native_connectivity(base_path: Path, candidate_path: Path) -> dict[str, Any]
 def static_audit() -> dict[str, Any]:
     require(sha256(BASE) == BASE_SHA256, "authoritative base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "candidate SHA-256 drift")
+    require(sha256(ACTIVE) == CANDIDATE_SHA256 and
+            ACTIVE.read_bytes() == CANDIDATE.read_bytes(),
+            "authoritative PCB-MAIN is not the exact accepted signal candidate")
     base = Board.from_file(str(BASE), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")
     for field in (
@@ -191,15 +201,35 @@ def static_audit() -> dict[str, Any]:
         }
         require(actual_layers == expected_layers, f"{net}: layer inventory drift")
 
+    approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
+    require(approval.get("reviewer") == "Скиф" and
+            approval.get("decision") == "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE" and
+            approval.get("reviewed_github_commit_sha") ==
+            "4f3e5b18a49ebe2d11a33fcb833e57e18c56e34d" and
+            approval.get("reviewed_candidate_board_sha256") == CANDIDATE_SHA256 and
+            approval.get("machine_gate", {}).get("pcb_native_run_id") == 35446985180 and
+            approval.get("machine_gate", {}).get("ci_run_id") == 35446985202,
+            "signal routing approval identity or machine evidence drift")
+    application = json.loads(APPLICATION.read_text(encoding="utf-8"))
+    require(application.get("decision") == "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE" and
+            application.get("approval_commit_sha") ==
+            "9a6a5c0f86b2a6cbf597e9d0dcba57c394c42033" and
+            application.get("reviewed_candidate_board_sha256") == CANDIDATE_SHA256 and
+            application.get("status") ==
+            "APPLIED_ACCEPTED_SIGNAL_HARD_NETS_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+            application.get("review_b_complete") is False and
+            application.get("cam_or_manufacturing_release") is False,
+            "signal routing application binding or release boundary drift")
+
     return {
         "schema_version": "dioneya.pcb-main-signal-hard-nets-candidate-audit.v1",
-        "status": "PASS_STATIC_CANDIDATE_ISOLATION",
+        "status": "PASS_ACCEPTED_SIGNAL_SUBGATE_APPLIED",
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "added_segments": sum(segments.values()),
         "added_vias": sum(vias.values()),
         "routed_nets": sorted(EXPECTED),
-        "applied_to_authoritative_board": False,
+        "applied_to_authoritative_board": True,
         "review_b_complete": False,
         "manufacturing_release": False,
     }

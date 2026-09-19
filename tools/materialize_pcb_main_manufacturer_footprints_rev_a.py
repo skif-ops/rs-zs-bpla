@@ -39,6 +39,10 @@ GROUND_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json"
 )
 GROUND_APPROVED_BOARD_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
+SIGNAL_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json"
+)
+SIGNAL_APPROVED_BOARD_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
@@ -444,6 +448,8 @@ def verify_frozen_materialization(candidate: Path) -> None:
     ground = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
     ground_baseline = ground.get("historical_baseline", {})
     ground_applied = ground.get("applied", {})
+    signal = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
+    signal_applied = signal.get("applied", {})
     actual_board_sha256 = sha256(PCB)
     if not (
         eco003.get("proposal_id") == "PCB-MAIN-RF-ROUTEABILITY-ECO-003"
@@ -469,7 +475,13 @@ def verify_frozen_materialization(candidate: Path) -> None:
         and ground.get("routing_complete") is False
         and ground.get("review_b_complete") is False
         and ground.get("cam_or_manufacturing_release") is False
-        and actual_board_sha256 == GROUND_APPROVED_BOARD_SHA256
+        and signal.get("decision") == "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE"
+        and signal_applied.get("board_sha256") == SIGNAL_APPROVED_BOARD_SHA256
+        and signal_applied.get("exact_candidate_byte_identity") is True
+        and signal.get("routing_complete") is False
+        and signal.get("review_b_complete") is False
+        and signal.get("cam_or_manufacturing_release") is False
+        and actual_board_sha256 == SIGNAL_APPROVED_BOARD_SHA256
     ):
         raise RuntimeError(
             "PCB-MAIN ECO-003/ECO-004/ground-domain frozen-board authority mismatch"
