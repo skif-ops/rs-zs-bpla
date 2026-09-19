@@ -100,6 +100,8 @@ on:
       - "tools/audit_pcb_main_stackup_impedance_request_rev_a.py"
       - "tools/audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py"
       - "tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py"
+      - "tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py"
+      - "tools/materialize_pcb_main_stts22h_footprint_eco_004_rev_a.py"
       - "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py"
       - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
       - "tools/audit_pcb_main_mech_eco_002_rev_a.py"
@@ -396,6 +398,8 @@ jobs:
             --output artifacts/kicad-native/PCB-MAIN/jlc06161h_3313_routing_basis_audit.json
           python tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/rf_routeability_eco_003_static_audit.json
+          python tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/stts22h_footprint_eco_004_static_audit.json
           python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/assembler_dfm_stencil_request_audit.json \
             --commit-sha "$GITHUB_SHA" \
@@ -480,6 +484,35 @@ jobs:
           PYTHONPATH="$DIONEYA_PYTHON_SITE" \
             /usr/bin/python3 tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py \
             --kicad-connectivity \
+            --base-drc "$evidence/baseline_drc.rpt" \
+            --candidate-drc "$evidence/candidate_drc.rpt" \
+            --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN STTS22H ECO-004 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/stts22h-footprint-eco-004
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pro"
+          python tools/materialize_pcb_main_stts22h_footprint_eco_004_rev_a.py \
+            --output "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pcb"
+          python tools/audit_pcb_main_placement_clearance_rev_a.py \
+            --board "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pcb" \
+            --no-status-check \
+            --strict
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/baseline_drc.rpt" \
+            hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/candidate_drc.rpt" \
+            "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py \
+            --kicad-connectivity \
+            --candidate-board "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pcb" \
             --base-drc "$evidence/baseline_drc.rpt" \
             --candidate-drc "$evidence/candidate_drc.rpt" \
             --output "$evidence/comparative_audit.json"

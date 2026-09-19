@@ -1,0 +1,135 @@
+{
+  "schema_version": "dioneya.pcb-main-stts22h-footprint-eco-candidate.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004",
+  "status": "READY_FOR_MACHINE_GATE_AND_INDEPENDENT_HUMAN_REVIEW",
+  "scope": "BOUNDED_U4_STTS22H_LAND_PATTERN_CORRECTION",
+  "date_utc": "2026-09-19",
+  "manufacturer_evidence": {
+    "manufacturer": "STMicroelectronics",
+    "part": "STTS22HTR",
+    "package": "UDFN-6L 2 x 2 mm",
+    "document": "DS12606 Rev 8",
+    "page": 22,
+    "figures": [10, 11],
+    "datasheet_url": "https://www.st.com/resource/en/datasheet/stts22h.pdf",
+    "product_url": "https://www.st.com/en/mems-and-sensors/stts22h.html"
+  },
+  "baseline": {
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684",
+    "footprint": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/STTS22H_UDFN-6L.kicad_mod",
+    "footprint_sha256": "d3421087f45b39626defa0608f8fd269f02033f4c4b7ff15bb708af18b573a93",
+    "u4_pose": {"x_mm": 66.0, "y_mm": 36.5, "rotation_deg": 0.0},
+    "signal_pad_row_y_mm": [-0.54, 0.54],
+    "signal_pad_size_mm": [0.27, 0.70],
+    "ep_size_mm": [1.45, 0.65],
+    "computed_signal_to_ep_copper_overlap_mm": 0.135,
+    "local_clearance_mm": 0.18,
+    "footprint_register": {
+      "path": "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv",
+      "rows": 19,
+      "registered_instances": 44,
+      "u4_present": false
+    }
+  },
+  "correction_derivation": {
+    "required_signal_to_ep_copper_gap_mm": 0.19,
+    "ep_half_height_mm": 0.325,
+    "signal_pad_half_height_mm": 0.35,
+    "row_center_absolute_y_mm": 0.865,
+    "formula": "0.325 + 0.350 + 0.190 = 0.865 mm",
+    "classification": "PROJECT_LAND_PATTERN_TRANSCRIPTION_ERROR"
+  },
+  "bounded_delta": {
+    "u4_pose_changed": false,
+    "pads": [
+      {"number": "1", "from_mm": [-0.65, 0.54], "to_mm": [-0.65, 0.865]},
+      {"number": "2", "from_mm": [0.0, 0.54], "to_mm": [0.0, 0.865]},
+      {"number": "3", "from_mm": [0.65, 0.54], "to_mm": [0.65, 0.865]},
+      {"number": "4", "from_mm": [0.65, -0.54], "to_mm": [0.65, -0.865]},
+      {"number": "5", "from_mm": [0.0, -0.54], "to_mm": [0.0, -0.865]},
+      {"number": "6", "from_mm": [-0.65, -0.54], "to_mm": [-0.65, -0.865]}
+    ],
+    "ep_changed": false,
+    "courtyard_from_mm": [-1.25, -1.25, 1.25, 1.25],
+    "courtyard_to_mm": [-1.25, -1.5, 1.25, 1.5],
+    "reference_text_from_mm": [0.0, -1.2],
+    "reference_text_to_mm": [0.0, -1.8],
+    "pad_sizes_shapes_layers_nets_and_clearances_changed": false,
+    "all_other_board_content_changed": false
+  },
+  "candidate": {
+    "board": "MATERIALIZED:PCB-MAIN_STTS22H_ECO_004.kicad_pcb",
+    "board_sha256": "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8",
+    "materializer": "tools/materialize_pcb_main_stts22h_footprint_eco_004_rev_a.py",
+    "footprint": "hardware/kicad/candidates/PCB-MAIN-STTS22H-ECO-004/STTS22H_UDFN-6L_ECO_004.kicad_mod",
+    "footprint_sha256": "e06136e5f2ebd67798141ff1ef99db94d895d139d20b3c98a671e34bbbfa277f",
+    "footprints": 251,
+    "tracks": 0,
+    "zones": 0,
+    "u4_signal_to_ep_copper_gap_mm": 0.19
+  },
+  "preliminary_validation": {
+    "strict_2d_placement_clearance": {
+      "tool": "tools/audit_pcb_main_placement_clearance_rev_a.py",
+      "result": "PASS",
+      "assembly_envelopes": 227,
+      "component_conflicts": 0,
+      "mounting_conflicts": 0,
+      "tool_conflicts": 0
+    },
+    "native_connectivity": {
+      "toolchain": "KiCad 7.0.11 pcbnew",
+      "baseline_unconnected_count": 718,
+      "candidate_unconnected_count": 718,
+      "result": "PASS_NO_CHANGE"
+    },
+    "comparative_drc": {
+      "toolchain": "KiCad 7.0.11",
+      "baseline_drc_violations": 440,
+      "candidate_drc_violations": 427,
+      "baseline_error_counts": {
+        "clearance": 6,
+        "solder_mask_bridge": 6,
+        "unconnected_items": 499
+      },
+      "candidate_error_counts": {
+        "unconnected_items": 499
+      },
+      "removed_u4_error_count": 12,
+      "new_error_count": 0,
+      "result": "PASS_EXACT_U4_ERROR_REMOVAL_NO_NEW_ERROR"
+    },
+    "kicad_9_ci_comparative_drc": "PENDING_ON_PROPOSAL_COMMIT"
+  },
+  "required_application_changes_after_acceptance": [
+    "Correct the controlled STTS22H_UDFN-6L library footprint.",
+    "Regenerate the unrouted authoritative PCB-MAIN board without changing U4 placement.",
+    "Add U4 to the controlled footprint review register and disposition record.",
+    "Add exact U4 geometry assertions to the independent layout audit.",
+    "Update deterministic capture hashes and ECO lineage records.",
+    "Repeat strict placement, capture, DRC, and native KiCad gates before routing continues."
+  ],
+  "review_request": {
+    "requested_decision": "ACCEPT_STTS22H_FOOTPRINT_ECO_004_OR_REJECT",
+    "accept_value": "ACCEPT_STTS22H_FOOTPRINT_ECO_004",
+    "reject_value": "REJECT_STTS22H_FOOTPRINT_ECO_004",
+    "acceptance_authorizes": [
+      "Apply only the bounded U4 land-pattern correction to controlled sources.",
+      "Continue PCB-MAIN routing engineering from the corrected unrouted geometry."
+    ],
+    "acceptance_does_not_authorize": [
+      "Approve any routing candidate as production copper.",
+      "Complete PCB-MAIN Review B.",
+      "Generate release CAM or manufacture PCB-MAIN."
+    ]
+  },
+  "decision_boundary": {
+    "proposal_only": true,
+    "applied_to_authoritative_board": false,
+    "routing_complete": false,
+    "review_b_complete": false,
+    "manufacturing_release": false
+  }
+}
