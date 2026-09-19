@@ -102,6 +102,7 @@ on:
       - "tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py"
       - "tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py"
       - "tools/materialize_pcb_main_stts22h_footprint_eco_004_rev_a.py"
+      - "tools/audit_pcb_main_ground_domain_routing_candidate_rev_a.py"
       - "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py"
       - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
       - "tools/audit_pcb_main_mech_eco_002_rev_a.py"
@@ -400,6 +401,8 @@ jobs:
             --output artifacts/kicad-native/PCB-MAIN/rf_routeability_eco_003_static_audit.json
           python tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/stts22h_footprint_eco_004_static_audit.json
+          python tools/audit_pcb_main_ground_domain_routing_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/ground_domain_routing_candidate_static_audit.json
           python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/assembler_dfm_stencil_request_audit.json \
             --commit-sha "$GITHUB_SHA" \
@@ -522,6 +525,45 @@ jobs:
             /usr/bin/python3 tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py \
             --kicad-connectivity \
             --candidate-board "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pcb" \
+            --base-drc "$evidence/baseline_drc.rpt" \
+            --candidate-drc "$evidence/candidate_drc.rpt" \
+            --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN ground-domain candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/ground-domain-routing-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_BASE.kicad_pro"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_BASE.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          path = sys.argv[1]
+          board = pcbnew.LoadBoard(path)
+          pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+          pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN ground-domain candidate zone refill: PASS")
+          PY
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/baseline_drc.rpt" \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_BASE.kicad_pcb"
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/candidate_drc.rpt" \
+            "$candidate_project/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_ground_domain_routing_candidate_rev_a.py \
+            --kicad-connectivity \
             --base-drc "$evidence/baseline_drc.rpt" \
             --candidate-drc "$evidence/candidate_drc.rpt" \
             --output "$evidence/comparative_audit.json"
@@ -748,6 +790,9 @@ jobs:
             hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_CANDIDATE_REV_A.json
             hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_CANDIDATE_REV_A.md
             hardware/kicad/candidates/PCB-MAIN-RF-ECO-003/PCB-MAIN_RF_ECO_003.kicad_pcb
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb
             hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md
             hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md
             hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md

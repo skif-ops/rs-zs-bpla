@@ -111,6 +111,8 @@ jobs:
             --output artifacts/pcb_main_jlc06161h_3313_routing_basis_rev_a.json
           python tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py \
             --output artifacts/pcb_main_rf_routeability_eco_003_rev_a.json
+          python tools/audit_pcb_main_ground_domain_routing_candidate_rev_a.py \
+            --output artifacts/pcb_main_ground_domain_routing_candidate_rev_a.json
           python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
             --output artifacts/pcb_main_assembler_dfm_stencil_request_rev_a.json \
             --commit-sha "$GITHUB_SHA" \
@@ -216,6 +218,7 @@ jobs:
             artifacts/pcb_main_stackup_impedance_request_rev_a.json
             artifacts/pcb_main_jlc06161h_3313_routing_basis_rev_a.json
             artifacts/pcb_main_rf_routeability_eco_003_rev_a.json
+            artifacts/pcb_main_ground_domain_routing_candidate_rev_a.json
             artifacts/pcb_main_assembler_dfm_stencil_request_rev_a.json
             artifacts/pcb_main_mechanical_eco_candidate_rev_a.json
             artifacts/pcb_main_mech_eco_002_rev_a.json
@@ -278,6 +281,9 @@ jobs:
             hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_CANDIDATE_REV_A.json
             hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_CANDIDATE_REV_A.md
             hardware/kicad/candidates/PCB-MAIN-RF-ECO-003/PCB-MAIN_RF_ECO_003.kicad_pcb
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb
             hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json
             hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md
             hardware/reviews/PCB_MAIN_MECHANICAL_ECO_CANDIDATE_REV_A.json

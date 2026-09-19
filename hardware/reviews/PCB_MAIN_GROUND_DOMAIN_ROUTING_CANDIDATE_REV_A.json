@@ -1,0 +1,178 @@
+{
+  "schema_version": "dioneya.pcb-main-ground-domain-routing-candidate.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-GROUND-DOMAIN-ROUTING-001",
+  "status": "READY_FOR_MACHINE_GATE_AND_INDEPENDENT_HUMAN_REVIEW",
+  "scope": "BOUNDED_RETURN_DOMAIN_FANOUT_VIAS_RULE_AREAS_AND_SHAPED_PLANE_CANDIDATE",
+  "date_utc": "2026-09-19",
+  "authorities": {
+    "ground_domains": "hardware/PCB_MAIN_GROUND_DOMAIN_AUTHORITY_REV_A.md",
+    "routing": "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv",
+    "mechanical": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+    "layer_count": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
+  },
+  "baseline": {
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8",
+    "footprints": 251,
+    "named_nets": 186,
+    "track_segments": 0,
+    "vias": 0,
+    "copper_zones": 0,
+    "rule_areas": 0
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb",
+    "board_sha256": "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e",
+    "footprints": 251,
+    "named_nets": 186,
+    "track_segments": 319,
+    "track_length_mm": 226.515879672367,
+    "vias": 254,
+    "copper_zones": 3,
+    "rule_areas": 4,
+    "committed_zone_fill_state": "UNFILLED_CI_AND_REVIEW_TOOLS_MUST_REFILL_BEFORE_DRC",
+    "all_other_board_semantics_changed": false
+  },
+  "fanout_geometry": {
+    "neck_width_mm": 0.15,
+    "through_via_diameter_mm": 0.5,
+    "through_via_drill_mm": 0.3,
+    "through_via_layers": ["F.Cu", "B.Cu"],
+    "domains": [
+      {
+        "net": "GND_DIGITAL",
+        "zone_layer": "In1.Cu",
+        "layer_function": "REFERENCE",
+        "endpoints": 139,
+        "fanout_vias": 138,
+        "direct_pads": 1,
+        "track_segments": 187,
+        "track_length_mm": 120.38630718156,
+        "failed_endpoints": 0
+      },
+      {
+        "net": "GND_MODEM",
+        "zone_layer": "In4.Cu",
+        "layer_function": "REFERENCE",
+        "endpoints": 96,
+        "fanout_vias": 95,
+        "direct_pads": 1,
+        "track_segments": 106,
+        "track_length_mm": 88.636931803688,
+        "failed_endpoints": 0
+      },
+      {
+        "net": "GND_MIC",
+        "zone_layer": "In2.Cu",
+        "layer_function": "POWER_DOMAINS",
+        "endpoints": 22,
+        "fanout_vias": 21,
+        "direct_pads": 1,
+        "track_segments": 26,
+        "track_length_mm": 17.492640687119,
+        "failed_endpoints": 0
+      }
+    ],
+    "explicit_plane_tree_tracks_added": false,
+    "plane_tree_omission_reason": "FILLED_ZONES_ALREADY_CONNECT_DOMAIN_VIAS; 1158 EXTRA_TREE_SEGMENTS DID_NOT_REDUCE_UNCONNECTED_COUNT_AND_WOULD_PREMATURELY_CONSUME_ROUTING_AREA"
+  },
+  "domain_plane_geometry": {
+    "zone_clearance_mm": 0.1,
+    "zone_min_thickness_mm": 0.15,
+    "board_edge_inset_mm": 0.65,
+    "zone_names": {
+      "GND_DIGITAL": "PCB_MAIN_GND_DIGITAL_In1_Cu",
+      "GND_MODEM": "PCB_MAIN_GND_MODEM_In4_Cu",
+      "GND_MIC": "PCB_MAIN_GND_MIC_In2_Cu"
+    },
+    "exclusive_zone_exclusions": {
+      "GND_DIGITAL": ["ZONE_CELL"],
+      "GND_MODEM": ["ZONE_GNSS", "ZONE_LORA", "ZONE_BLE_BODY", "ZONE_AUDIO_DIGITAL"],
+      "GND_MIC": ["ZONE_CELL", "ZONE_GNSS", "ZONE_LORA", "ZONE_BLE_BODY"]
+    },
+    "ble_antenna_all_layer_keepout_preserved": true,
+    "unintended_cross_domain_joins": 0
+  },
+  "mounting_copper_keepouts": {
+    "authority_rule": "NO_COPPER_D8.0_NO_COMPONENT_D10.0",
+    "references": ["H1", "H2", "H3", "H4"],
+    "layers": ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "B.Cu"],
+    "polygon_vertices": 64,
+    "vertex_radius_mm": 4.01,
+    "minimum_edge_apothem_mm": 4.005169779383,
+    "tracks_forbidden": true,
+    "vias_forbidden": true,
+    "copper_pours_forbidden": true,
+    "pads_allowed_for_existing_npth_hole": true,
+    "footprints_allowed_for_existing_mounting_footprint": true
+  },
+  "clean_rule_reroute": {
+    "copper_clearance_mm": 0.2,
+    "finished_hole_clearance_mm": 0.25,
+    "previous_candidate_rejected": true,
+    "previous_candidate_clearance_errors": 49,
+    "previous_candidate_additional_hole_clearance_errors": 21,
+    "baseline_hole_clearance_errors": 4,
+    "candidate_hole_clearance_errors": 4,
+    "new_clearance_errors": 0,
+    "new_hole_clearance_errors": 0
+  },
+  "preliminary_validation": {
+    "native_connectivity": {
+      "toolchain": "KiCad 7.0.11 pcbnew after zone refill",
+      "baseline_unconnected_count": 718,
+      "candidate_unconnected_count": 464,
+      "actual_reduction": 254,
+      "expected_reduction_for_fanout_vias": 254,
+      "result": "PASS_EXACT_FANOUT_REDUCTION"
+    },
+    "comparative_geometry_drc": {
+      "toolchain": "KiCad 7.0.11 pcbnew after zone refill",
+      "baseline_unconnected_items": 499,
+      "candidate_unconnected_items": 464,
+      "baseline_clearance_errors": 0,
+      "candidate_clearance_errors": 0,
+      "new_clearance_errors": 0,
+      "baseline_hole_clearance_errors": 4,
+      "candidate_hole_clearance_errors": 4,
+      "new_hole_clearance_errors": 0,
+      "candidate_solder_mask_bridge_errors": 0,
+      "candidate_keepout_errors": 0,
+      "candidate_dangling_via_warnings": 0,
+      "result": "PASS_NO_NEW_GEOMETRY_ERROR_INHERITED_BASELINE_HOLE_ERRORS_UNCHANGED_ROUTING_REMAINS_INCOMPLETE"
+    },
+    "static_authority_checks": {
+      "foreign_copper_in_exclusive_zones": 0,
+      "ground_copper_in_ble_antenna_keepout": 0,
+      "ground_copper_in_mounting_d8_keepouts": 0,
+      "ground_copper_edge_clearance_below_0_5_mm": 0,
+      "result": "PASS"
+    },
+    "kicad_9_ci_comparative_drc": "PENDING_ON_PROPOSAL_COMMIT"
+  },
+  "review_request": {
+    "requested_decision": "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE_OR_REJECT",
+    "accept_value": "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE",
+    "reject_value": "REJECT_GROUND_DOMAIN_ROUTING_SUBGATE",
+    "acceptance_authorizes": [
+      "Apply only the exact hash-bound fanout, via, D8 rule-area and shaped return-plane candidate to the authoritative PCB-MAIN board.",
+      "Continue signal and power routing engineering from the accepted ground-domain geometry."
+    ],
+    "acceptance_does_not_authorize": [
+      "Treat remaining PCB-MAIN routing as complete.",
+      "Close return-path, SI, PI, thermal, DFM or Review B evidence.",
+      "Generate release CAM or manufacture PCB-MAIN."
+    ]
+  },
+  "decision_boundary": {
+    "proposal_only": true,
+    "applied_to_authoritative_board": false,
+    "routing_complete": false,
+    "return_path_review_complete": false,
+    "si_review_complete": false,
+    "pi_review_complete": false,
+    "review_b_complete": false,
+    "manufacturing_release": false
+  }
+}
