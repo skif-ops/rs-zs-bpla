@@ -1,0 +1,47 @@
+{
+  "schema_version": "dioneya.pcb-main-octospi-routing-candidate.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "candidate_id": "PCB-MAIN-OCTOSPI-ROUTING-001",
+  "date": "2026-09-19",
+  "base_board": "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_BASE_REV_A.kicad_pcb",
+  "base_board_sha256": "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3",
+  "candidate_board": "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pcb",
+  "candidate_board_sha256": "e956b67dbe932f0eb1fb60b3fcbe462306bcb0e5ba73a151954cf037a9643c99",
+  "scope": {
+    "functional_block": "OCTOSPI_NOR_STORAGE_ONLY",
+    "routed_nets": [
+      "NOR_CLK_U1", "NOR_CLK_U2", "NOR_IO0_U1", "NOR_IO0_U2",
+      "NOR_IO1_U1", "NOR_IO1_U2", "NOR_IO2_U1", "NOR_IO2_U2",
+      "NOR_IO3_U1", "NOR_IO3_U2", "NOR_NCS_U2"
+    ],
+    "added_segments": 139,
+    "added_vias": 21,
+    "added_track_length_mm": 285.29394,
+    "unfilled_native_connectivity": {
+      "base_unconnected": 707,
+      "candidate_unconnected": 697,
+      "reduction": 10
+    },
+    "accepted_copper_removed_or_modified": 0,
+    "non_routing_board_fields_modified": 0
+  },
+  "generation": {
+    "tool": "tools/route_pcb_release_candidate_rev_a.py",
+    "tool_sha256": "36a5add890f94acff5b16c736304e4941b274119182d11138d75d5f67ce55a89",
+    "grid_step_mm": 0.25,
+    "copper_clearance_mm": 0.1,
+    "preserve_existing": true,
+    "negotiated_routing": true,
+    "ripups": 0,
+    "failed_connections": []
+  },
+  "status": "PROPOSAL_LOCAL_STRUCTURAL_AND_CONNECTIVITY_PASS_PENDING_KICAD9_COMPARATIVE_DRC_AND_HUMAN_REVIEW",
+  "applied_to_authoritative_board": false,
+  "routing_complete": false,
+  "return_path_review_complete": false,
+  "si_review_complete": false,
+  "pi_review_complete": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false,
+  "procurement_availability_owner": "CUSTOMER"
+}
