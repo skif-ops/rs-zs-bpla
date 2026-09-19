@@ -1,0 +1,56 @@
+{
+  "schema_version": "dioneya.pcb-main-signal-hard-nets-candidate.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "candidate_id": "PCB-MAIN-SIGNAL-HARD-NETS-001",
+  "date": "2026-09-19",
+  "base_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+  "base_board_sha256": "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e",
+  "candidate_board": "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb",
+  "candidate_board_sha256": "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3",
+  "scope": {
+    "routed_nets": [
+      "BLE_RX_U1",
+      "BOOT0",
+      "CELL_RX_U16",
+      "EN_MODEM",
+      "NOR_IO0_U1",
+      "NOR_IO2_U1",
+      "SD_CMD_U1",
+      "SD_D2_U1"
+    ],
+    "previously_reported_open_fragments": 9,
+    "added_segments": 102,
+    "added_vias": 9,
+    "unfilled_native_connectivity": {
+      "base_unconnected": 717,
+      "candidate_unconnected": 707,
+      "reduction": 10
+    },
+    "accepted_copper_removed_or_modified": 0,
+    "non_routing_board_fields_modified": 0
+  },
+  "generation": {
+    "grid_step_mm": 0.25,
+    "grid_edge_offset_mm": 0.5,
+    "copper_clearance_mm": 0.2,
+    "finished_hole_clearance_mm": 0.25,
+    "negotiated_routing": true,
+    "ripups": 0,
+    "failed_connections": []
+  },
+  "local_kicad_7_preflight": {
+    "zone_refill": "PASS",
+    "connectivity": "464_TO_454_REDUCTION_10",
+    "new_drc_error_counts": {},
+    "note": "Preflight only; commit-bound KiCad 9 comparative DRC remains mandatory"
+  },
+  "status": "PROPOSAL_LOCAL_PREFLIGHT_PASS_PENDING_KICAD9_COMPARATIVE_DRC_AND_REVIEW_B",
+  "applied_to_authoritative_board": false,
+  "routing_complete": false,
+  "return_path_review_complete": false,
+  "si_review_complete": false,
+  "pi_review_complete": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false,
+  "procurement_availability_owner": "CUSTOMER"
+}

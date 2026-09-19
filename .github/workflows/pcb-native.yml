@@ -567,6 +567,48 @@ jobs:
             --base-drc "$evidence/baseline_drc.rpt" \
             --candidate-drc "$evidence/candidate_drc.rpt" \
             --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN hard signal nets candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/signal-hard-nets-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN signal hard-nets base/candidate zone refill: PASS")
+          PY
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/baseline_drc.rpt" \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --severity-all \
+            -o "$evidence/candidate_drc.rpt" \
+            "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_signal_hard_nets_candidate_rev_a.py \
+            --kicad-connectivity \
+            --connectivity-base "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_BASE_REV_A.kicad_pcb" \
+            --connectivity-candidate "$candidate_project/PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb" \
+            --base-drc "$evidence/baseline_drc.rpt" \
+            --candidate-drc "$evidence/candidate_drc.rpt" \
+            --output "$evidence/comparative_audit.json"
       - name: Materialize native PCB-PWR schematic
         run: |
           python tools/generate_pcb_pwr_schematic_rev_a.py \
