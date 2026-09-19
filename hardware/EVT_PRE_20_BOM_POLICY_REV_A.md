@@ -15,13 +15,16 @@ requirements remain mandatory; a buyer may select another established supplier.
 Published prices are dated snapshots and all other values are explicitly marked as
 engineering estimates. Cost columns are planning values only: displayed stock is not
 a delivery guarantee, and final VAT, customs, dangerous-goods handling, destination
-delivery and payment terms are controlled by the cart or commercial quotation.
+delivery and payment terms are controlled by the customer in the cart or commercial
+quotation. Empty quote, stock, MOQ, price, lead-time or delivery fields do not block
+the engineering release or the customer procurement handoff.
 
 `manufacturing/EVT_LOT_SELECTION_REV_A.csv` is the scenario-selection authority.
 `EVT-20` is selected for the current customer. The 4- and 10-station columns remain
 controlled comparison scenarios only; quantities and spare columns from different
-scenarios must never be mixed. Selection alone does not authorize purchasing while
-QG-2 or supplier release evidence remains open.
+scenarios must never be mixed. The customer owns purchase execution. Selection does
+not authorize PCB/PCBA, harness or housing manufacture while QG-2, job-specific DFM
+or the applicable technical manufacturing release remains open.
 
 ## Required line data
 
@@ -103,7 +106,7 @@ spare-policy application, engineering-to-procurement reconciliation, native PCB-
 major RefDes mapping, connector MPNs and quantity invariants. Every controlled RFQ
 also names its source BOM item or items; QG-1 independently sums their
 `Procure_qty_4/10/20` values and requires an exact match to the RFQ quantities.
-Dedicated RFQs are mandatory for the ten purchase-release system/mechanical items
+Dedicated sourcing rows are mandatory for the ten system/mechanical items
 `BAT1`, `PV1`, `MPPT1`, `MPPT-TEMP`, `ANT-CELL`, `ANT-GNSS`, `ANT-LORA`,
 `RF-PIGTAIL`, `HARNESS` and `HSG-VC`.
 The three PCBA service lines `ASM-MAIN`, `ASM-MIC` and `ASM-PWR` and the three bare-PCB
@@ -115,6 +118,12 @@ bare-PCB quotations remain non-selected alternatives. A PCB-PWR fabrication RFQ 
 collect a clearly marked provisional budgetary response, but it is not build
 authorization while `DIM-003`, the final stackup/copper weight, routing, CAM and
 Review B remain open.
+
+These rows preserve exact scope and 4/10/20 arithmetic for the customer. Their
+commercial response fields are optional in the engineering repository. Technical
+fabricator, assembler and harness responses are controlled separately by the
+job-specific response registers and remain blocking where the design depends on
+the selected process.
 
 QG-2 (`tools/audit_evt_pre_20_bom_qg2.py`) independently compares freeze tables,
 checks exact fitted-line fields, independently reconstructs the 17 PCB-PWR passive

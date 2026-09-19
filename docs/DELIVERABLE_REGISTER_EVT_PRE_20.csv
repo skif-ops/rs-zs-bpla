@@ -1,6 +1,6 @@
 ID,Раздел,Поставочный объект,Формат,Критичность,Статус,QG-1 полнота,QG-2 техника,Критерий выпуска
 CM-001,Управление,Ведомость документов,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Все позиции реестра имеют владельца версию статус и путь
-CM-002,Управление,Конфигурационная база EVT-PRE-20,YAML+DOCX,P0,DRAFT,PASS,OPEN,Выбран EVT-20; варианты 4 и 10 сохранены только для сравнения; purchase release остаётся под QG-2
+CM-002,Управление,Конфигурационная база EVT-PRE-20,YAML+DOCX,P0,DRAFT,PASS,OPEN,Выбран EVT-20; варианты 4 и 10 сохранены только для сравнения; customer procurement handoff остаётся под техническим QG-2
 CM-003,Управление,Матрица требований и трассировки,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Каждое требование связано с проверкой и evidence
 CM-004,Управление,Журнал решений и изменений,XLSX+CSV,P1,DRAFT,OPEN,OPEN,Все изменения имеют основание и влияние
 CM-005,Управление,Реестр рисков и отклонений,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Блокирующие риски имеют владельца и действие
@@ -12,7 +12,7 @@ SYS-004,Архитектура,Энергобаланс EVT-20 для 40 Ач и
 SYS-005,Архитектура,Threat model и управление ключами,DOCX,P0,PLANNED,OPEN,OPEN,Ключи не включены в пакет; процессы provisioning описаны
 HW-M-000,PCB main,Комплект входных authority MAIN-AUTH-001..011,CSV+MD+JSON,P0,CONTROLLED_ECO_APPLIED,PASS,OPEN,Electrical capture input is complete; the accepted limited PCB-MAIN-MECH-ECO-001/002 chain and controlled full repack pass strict 2D clearance while routing 3D service evidence and independent Review B remain open
 HW-M-001,PCB main,Схема электрическая принципиальная,KICAD_SCH+PDF,P0,CONTROLLED_REVIEW_A,PASS,OPEN,Native label/netlist schematic and signed pin-net Review A plus commit-matched KiCad 9 ERC pass; human-readable hierarchical review PDF and independent design review remain required before release
-HW-M-002,PCB main,Разводка основной платы,KICAD_PCB+STEP,P0,DRAFT,PASS,OPEN,Six-layer candidate has zero provisional footprints three controlled IPC candidates strict 2D placement-clearance PASS and explicit pre-route constraints for all 186 native nets; factory stackup numeric RF/USB geometry routing copper zones DRC STEP service-volume review and Review B remain open
+HW-M-002,PCB main,Разводка основной платы,KICAD_PCB+STEP,P0,DRAFT,PASS,OPEN,Six-layer candidate has zero provisional footprints three controlled IPC candidates strict 2D placement-clearance PASS explicit pre-route constraints for all 186 native nets and a public JLC06161H-3313 numeric RF/USB routing basis; pair-aware routing copper zones DRC final job stackup STEP service-volume review and Review B remain open
 HW-M-003,PCB main,Gerber и сверловка,GERBER+DRILL,P0,PLANNED,OPEN,OPEN,Сверены с source и просмотрены CAM
 HW-M-004,PCB main,IPC netlist и тестовые точки,IPC356+CSV,P0,PLANNED,OPEN,OPEN,Netlist совпадает; coverage тестов подтверждён
 HW-M-005,PCB main,Сборочные чертежи TOP/BOTTOM,PDF+SVG,P0,PLANNED,OPEN,OPEN,Полярность pin-1 и DNP видимы
@@ -21,7 +21,7 @@ HW-M-007,PCB main,Производственный BOM и AVL,XLSX+CSV,P0,DRAFT,
 HW-M-008,PCB main,Stackup и fabrication notes,PDF+TXT,P0,PLANNED,OPEN,OPEN,Согласовано с фабрикой и impedance notes
 HW-M-009,PCB main,ERC DRC DFM отчёт,HTML+PDF,P0,PLANNED,OPEN,OPEN,Нет открытых blocker/critical
 HW-M-010,PCB main,Dual SIM Single Standby схема и отчёт,DOCX+PDF+CSV,P0,DRAFT,OPEN,OPEN,Два ICCID 100 переключений ESD SI и power-fault tests PASS
-HW-M-011,PCB main,Pre-route stackup and impedance request,JSON+MD+CSV,P0,CONTROLLED_REQUEST,PASS,OPEN,Internal two-fabricator packet and 22-row response template are complete; both attributable responses construction selection numeric 50-ohm and 90-ohm geometry and RF/SI review remain required; routing and manufacture are blocked
+HW-M-011,PCB main,Pre-route stackup and impedance request,JSON+MD+CSV,P0,CONTROLLED_REQUEST_WITH_PUBLIC_NUMERIC_BASIS,PASS,OPEN,Official JLC06161H-3313 calculator output controls candidate 50-ohm and 90-ohm geometry while the internal two-fabricator packet retains all 22 pending rows; final job construction production tolerance coupon RF/SI review and manufacture remain blocked
 HW-M-012,PCB main,Assembler DFM and stencil request,JSON+MD+CSV,P0,CONTROLLED_REQUEST,PASS,OPEN,Internal bounded U2 U25 U26 and U9 packet and 14-row response template are complete; 0 accepted responses and no selected assembler paste stencil reflow inspection or first-article process; paste export Review B and manufacture are blocked
 HW-A-001,PCB microphones,Схема и PCB микрофонного leaf,KICAD+PDF+STEP,P0,CONTROLLED_REVIEW_A_COPPER_SUBGATE,PASS,OPEN,Four identical boards; signed Review A and accepted explicit copper-return subgate with native tracks and vias; final DRC CAM assembler/fabricator DFM STEP and Review B remain mandatory
 HW-A-002,PCB microphones,Gerber drill PnP BOM,ZIP+CSV,P0,DRAFT,PASS,OPEN,Commit-bound candidate CAM package and controlled vendor-handoff response set are reproducible; external panelization assembler DFM final Review B and manufacturing release remain open
@@ -34,8 +34,8 @@ HW-P-005,Power,PCB-PWR stackup and copper-process request,JSON+MD+CSV,P0,CONTROL
 HW-C-001,Кабели,Схема соединения всех элементов,MD+CSV+PDF,P0,CONTROLLED_LOGICAL_PINOUT_AND_EVT_RF_PURCHASE_CHAIN,PASS,OPEN,Internal interfaces map to controlled nets; three CAB.0243 SMA bulkhead chains and exact antennas are purchase-controlled with no substitution; published cable temperature and bend radius are controlled while mate route shielding seal and installed RF validation remain open for assembly EOL and EVT
 HW-C-002,Кабели,Чертежи жгутов и распайка,MD+CSV+PDF,P0,CONTROLLED_PRELIMINARY_SUPPLIER_PACKET_READY,PASS,OPEN,"Manufacturing schedule fixes connector cavities terminals gauges colors labels continuity and inspection; the 16-row supplier capability response register is ready at 0/16 accepted; cut lengths remain blocked by DIM-001 DIM-003 and DIM-012"
 HW-C-003,Кабели,Таблица разъёмов и mating parts,CSV+XLSX,P1,CONTROLLED,PASS,OPEN,CONNECTOR_FREEZE_REV_A is the sole connector authority; external RF power and enclosure endpoints plus crimp applicator validation remain open
-PROC-001,Закупка,Сводный BOM для 4 10 и 20 изделий и запас,XLSX+CSV,P0,DRAFT,PASS,OPEN,Engineering и procurement quantities воспроизводимы; EVT-20 выбран; purchase release блокируется QG-2 и supplier evidence
-PROC-002,Закупка,China sourcing snapshot,XLSX+CSV,P0,DRAFT,OPEN,OPEN,Поставщик ссылка дата MOQ lead time stock
+PROC-001,Закупка,Сводный BOM для 4 10 и 20 изделий и запас,XLSX+CSV,P0,DRAFT,PASS,OPEN,Engineering и procurement quantities воспроизводимы; EVT-20 выбран; коммерческая закупка на стороне заказчика; manufacturing release блокируется QG-2 и техническими gate
+PROC-002,Закупка,China sourcing snapshot,XLSX+CSV,P0,NON_BLOCKING_CUSTOMER_INPUT,PASS,N/A,Поставщик ссылка дата MOQ lead time stock являются необязательными коммерческими полями заказчика и не блокируют engineering release
 PROC-003,Закупка,Approved vendor list и аналоги,XLSX+CSV,P0,PLANNED,OPEN,OPEN,Аналоги не снижают функциональность
 PROC-004,Закупка,План входного контроля,DOCX+forms,P0,DRAFT,OPEN,OPEN,Counterfeit ESD MSL functional sampling
 MECH-3D-001,Корпус 3D,Параметрическая сборка корпуса,FCSTD_or_BLEND+STEP,P0,PLANNED,OPEN,OPEN,Сборка без пересечений и с сервисным доступом
@@ -73,7 +73,7 @@ MFG-005,Производство,Калибровка микрофонов и з
 MFG-006,Производство,Маркировка и паспорт изделия,DOCX+LABEL,P0,DRAFT,OPEN,OPEN,Serial HW FW RU868 и обе ICCID refs однозначны
 MFG-007,Производство,Упаковка транспорт хранение,DOCX,P1,PLANNED,OPEN,OPEN,ESD moisture battery transport требования учтены
 MFG-008,Производство,План корпусов выбранного EVT-лота,CSV+DOCX,P0,DRAFT,PASS,OPEN,EVT-20 привязан к DIO-EVT-001..020; вакуумное литьё основное; 20 комплектов 3D резерва условны; ТПА без пилотной оснастки
-MFG-009,Производство,Пакет запросов внешних ответов,ZIP+JSON+MD+CSV,P0,CONTROLLED_REQUEST_BUNDLE,PASS,OPEN,Шесть готовых stackup DFM DIM-003 PCB-MIC и harness пакетов собраны воспроизводимо с SHA-256 manifest; все внешние ответы остаются pending и пакет не является заказом или производственным выпуском
+MFG-009,Производство,Пакет запросов внешних ответов,ZIP+JSON+MD+CSV,P0,CONTROLLED_REQUEST_BUNDLE,PASS,OPEN,Шесть готовых stackup DFM DIM-003 PCB-MIC и harness пакетов плюс публичный PCB-MAIN numeric basis собраны воспроизводимо с SHA-256 manifest; все внешние ответы остаются pending и пакет не является заказом или производственным выпуском
 EVT-001,Испытания,ПМИ предсерийной партии,DOCX+PDF,P0,DRAFT,OPEN,OPEN,Матрица и выборки утверждены для каждого изделия выбранного лота 4 10 или 20
 EVT-002,Испытания,Формы протоколов выбранного EVT-лота,DOCX+XLSX+CSV,P0,DRAFT,OPEN,OPEN,Serial и evidence links обязательны для каждого изделия выбранного лота
 EVT-003,Испытания,Аудио DSP классификация,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Pd FAR и negative set определены

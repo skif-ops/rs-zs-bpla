@@ -98,6 +98,7 @@ on:
       - "tools/generate_pcb_main_routing_authority_rev_a.py"
       - "tools/audit_pcb_main_routing_authority_rev_a.py"
       - "tools/audit_pcb_main_stackup_impedance_request_rev_a.py"
+      - "tools/audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py"
       - "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py"
       - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
       - "tools/audit_pcb_main_mech_eco_002_rev_a.py"
@@ -390,6 +391,8 @@ jobs:
             --output artifacts/kicad-native/PCB-MAIN/stackup_impedance_request_audit.json \
             --commit-sha "$GITHUB_SHA" \
             --require-clean-source
+          python tools/audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/jlc06161h_3313_routing_basis_audit.json
           python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/assembler_dfm_stencil_request_audit.json \
             --commit-sha "$GITHUB_SHA" \
@@ -668,6 +671,8 @@ jobs:
             hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json
             hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.md
             hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json
+            hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.md
             hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json
             hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.md
             hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_RESPONSE_REV_A.csv

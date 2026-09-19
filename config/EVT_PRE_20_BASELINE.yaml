@@ -27,6 +27,11 @@ lot:
   selected_evt_quantity: 20
   selection_required_before_purchase_release: true
   selection_status: LOCKED_CURRENT_CUSTOMER_EVT_20
+  commercial_procurement_owner: CUSTOMER
+  supplier_stock_price_moq_and_delivery_gate: NON_BLOCKING_CUSTOMER_ACTION
+  engineering_procurement_handoff_requires_quote_fields: false
+  exact_mpn_and_no_substitution_required: true
+  job_specific_manufacturing_technical_responses_required: true
   selected_serial_range: ["001", "020"]
   serial_prefix: DIO-EVT-
   serial_range: ["001", "020"]

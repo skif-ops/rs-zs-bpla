@@ -42,11 +42,15 @@ no routing or manufacturing-release assertion.
 - Routing/copper zones: absent.
 - Pre-route constraint coverage: `PASS` for all 186 native nets. The controlled
   manifest assigns one explicit class, return domain, topology, priority and
-  source authority to every net; numeric RF/USB geometry remains blocked on the
-  selected fabricator stackup.
+  source authority to every net. The official JLCPCB public
+  `JLC06161H-3313` calculator result now controls candidate RF/USB geometry at
+  `0.1509 mm` for 50 ohm and `0.1537/0.2032 mm` width/gap for 90 ohm on L1/L2.
+  Final production geometry remains blocked on job-specific fabricator
+  acceptance and RF/SI review.
 - Stackup/impedance request: controlled packet and blank 22-row response
-  register are ready, with 0/2 accepted fabricator responses. No construction,
-  numeric RF/USB geometry or route rule has been accepted.
+  register are ready, with 0/2 accepted fabricator responses. No final job
+  construction, production tolerance, coupon plan or manufacturing route rule
+  has been accepted; the public numeric basis does not populate a response row.
 - Assembler DFM/stencil request: the bounded `U2/U25/U26/U9` packet and blank
   14-row response register are ready, with 0/14 accepted assembler responses.
   No assembler legal entity, manufacturing site, paste/stencil/reflow process,
@@ -99,13 +103,16 @@ no routing or manufacturing-release assertion.
   topology; the generator and independent audit fail on missing, extra,
   overlapping or reclassified nets.
 - [x] A machine-audited stackup/impedance request and identical 11-question
-  templates for `FAB-A` and `FAB-B` are ready without guessed numeric geometry.
+  templates for `FAB-A` and `FAB-B` are ready.
+- [x] The official public `JLC06161H-3313` calculator result is recorded as a
+  bounded engineering-candidate input with exact 50-ohm and 90-ohm geometry;
+  all 22 job-specific response rows remain pending.
 - [x] A machine-audited bounded assembler DFM/stencil request and blank
   14-question response template for `U2/U25/U26/U9` are ready without guessed
   paste, stencil, reflow, inspection or first-article process parameters.
 - [ ] Two attributable fabricator responses are complete, compared and accepted;
-  one construction and its 50-ohm/90-ohm numeric geometry are selected through
-  project RF/SI review.
+  one final construction, its production 50-ohm/90-ohm geometry and tolerance,
+  and its coupon plan are selected through project RF/SI review.
 - [ ] All 14 attributable assembler responses are accepted for a named legal
   entity and manufacturing site; the process baseline, U2/U25/U26 land/mask/
   stencil decisions, U9 stencil adaptation, PnP polarity, first-article plan and
@@ -128,10 +135,12 @@ no routing or manufacturing-release assertion.
 for source commit `9aceca9531f0b9c18679bee1a8050ae7cd94308a` and PDF SHA-256
 `7e6ef20a989ec66c55b3e1a32de0a914b9e37a6e70cc5835d36f3260b65ff8d9`.
 The candidate is 2D placement-complete and its 186-net pre-route constraint
-coverage is controlled, but the board is unrouted and has not passed 3D/service,
-DRC, CAM, DFM or Review B.
+coverage plus public numeric routing basis are controlled, but the board is
+unrouted and has not passed pair-geometry audit, 3D/service, DRC, CAM, DFM or
+Review B.
 The exact current clearance result and
 release boundary are recorded in
-`hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md`; the routing input
-is recorded in `hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.md`. Production outputs
-are prohibited until every unchecked item passes.
+`hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md`; the routing
+inputs are recorded in `hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.md` and
+`hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.md`. Production
+outputs are prohibited until every unchecked item passes.

@@ -383,6 +383,27 @@
         "routing_complete": false,
         "manufacturing_release": false
       },
+      "routing_design_basis": {
+        "complete": true,
+        "status": "PASS_PUBLIC_STANDARD_NUMERIC_ROUTING_INPUT_FINAL_FABRICATOR_ACCEPTANCE_PENDING",
+        "record": "hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.md",
+        "machine_contract": "hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json",
+        "audit": "tools/audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py",
+        "fabricator": "JLCPCB",
+        "public_stackup_id": "JLC06161H-3313",
+        "signal_layer": "L1",
+        "reference_layer": "L2",
+        "rf_50ohm_trace_width_mm": 0.1509,
+        "usb_90ohm_trace_width_mm": 0.1537,
+        "usb_90ohm_pair_gap_mm": 0.2032,
+        "engineering_candidate_numeric_input_authorized": true,
+        "pair_aware_routing_and_audit_required": true,
+        "final_job_stackup_accepted": false,
+        "production_impedance_tolerance_accepted": false,
+        "coupon_plan_accepted": false,
+        "review_b_complete": false,
+        "manufacturing_release": false
+      },
       "stackup_impedance_handoff": {
         "complete": false,
         "status": "PACKET_READY_TWO_FABRICATOR_RESPONSES_REQUIRED",

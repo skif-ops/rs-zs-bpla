@@ -139,6 +139,26 @@ def audit() -> dict[str, object]:
         "hardware baseline does not control all 4/10/20 procurement scenarios",
     )
 
+    customer_procurement_boundary_ok = all(
+        token in baseline
+        for token in (
+            "commercial_procurement_owner: CUSTOMER",
+            "supplier_stock_price_moq_and_delivery_gate: NON_BLOCKING_CUSTOMER_ACTION",
+            "engineering_procurement_handoff_requires_quote_fields: false",
+            "exact_mpn_and_no_substitution_required: true",
+            "job_specific_manufacturing_technical_responses_required: true",
+        )
+    )
+    check(
+        "customer_commercial_procurement_boundary",
+        customer_procurement_boundary_ok,
+        (
+            "stock, price, MOQ, payment and delivery are non-blocking customer actions; "
+            "exact MPN and job-specific technical manufacturing gates remain mandatory"
+        ),
+        "customer procurement boundary is missing or weakens exact-MPN/technical manufacturing controls",
+    )
+
     bom_qg2 = run_bom_qg2()
     qg2_ok = bom_qg2.get("production_bom_complete") is True
     qg2_blockers = [str(item) for item in bom_qg2.get("blockers", [])]
@@ -616,6 +636,43 @@ def audit() -> dict[str, object]:
         "PCB-MAIN placement has unresolved courtyard/pad-envelope, mounting-exclusion or U.FL tool/service conflicts",
     )
     main_evidence = main_review_b.get("evidence", {}) if isinstance(main_review_b, dict) else {}
+    main_routing_basis_evidence = (
+        main_evidence.get("routing_design_basis", {})
+        if isinstance(main_evidence, dict) else {}
+    )
+    main_routing_basis = run_json_audit(
+        "audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py"
+    )
+    main_routing_basis_ok = (
+        isinstance(main_routing_basis_evidence, dict)
+        and main_routing_basis_evidence.get("status") ==
+        "PASS_PUBLIC_STANDARD_NUMERIC_ROUTING_INPUT_FINAL_FABRICATOR_ACCEPTANCE_PENDING"
+        and main_routing_basis_evidence.get("public_stackup_id") == "JLC06161H-3313"
+        and main_routing_basis_evidence.get("rf_50ohm_trace_width_mm") == 0.1509
+        and main_routing_basis_evidence.get("usb_90ohm_trace_width_mm") == 0.1537
+        and main_routing_basis_evidence.get("usb_90ohm_pair_gap_mm") == 0.2032
+        and main_routing_basis_evidence.get("engineering_candidate_numeric_input_authorized") is True
+        and main_routing_basis_evidence.get("pair_aware_routing_and_audit_required") is True
+        and main_routing_basis_evidence.get("final_job_stackup_accepted") is False
+        and main_routing_basis_evidence.get("manufacturing_release") is False
+        and main_routing_basis.get("status") ==
+        "PASS_PUBLIC_STANDARD_NUMERIC_ROUTING_INPUT_FINAL_FABRICATOR_ACCEPTANCE_PENDING"
+        and main_routing_basis.get("stackup_id") == "JLC06161H-3313"
+        and main_routing_basis.get("rf_50ohm_trace_width_mm") == 0.1509
+        and main_routing_basis.get("usb_90ohm_trace_width_mm") == 0.1537
+        and main_routing_basis.get("usb_90ohm_pair_gap_mm") == 0.2032
+        and main_routing_basis.get("pending_fabricator_response_rows") == 22
+        and main_routing_basis.get("manufacturing_release") is False
+    )
+    check(
+        "pcb_main_public_numeric_routing_basis",
+        main_routing_basis_ok,
+        (
+            "JLC06161H-3313 candidate RF=0.1509 mm USB=0.1537/0.2032 mm; "
+            "22 final fabricator response rows remain pending"
+        ),
+        "PCB-MAIN public numeric routing basis is missing, drifted or improperly promoted",
+    )
     main_stackup = (
         main_evidence.get("stackup_impedance_handoff", {})
         if isinstance(main_evidence, dict) else {}
@@ -875,12 +932,16 @@ def audit() -> dict[str, object]:
         if any(not row[field].strip() for field in quote_fields)
     ]
     check(
-        "supplier_rfq_release",
-        not incomplete_rfq,
-        "all required RFQs contain supplier evidence" if not incomplete_rfq else "incomplete: " + ", ".join(incomplete_rfq),
-        "supplier RFQ evidence is incomplete: " + ", ".join(incomplete_rfq),
+        "customer_commercial_rfq_fields",
+        True,
+        (
+            "customer-owned quote/stock fields populated for all sourcing rows"
+            if not incomplete_rfq
+            else f"non-blocking customer fields remain blank in {len(incomplete_rfq)} sourcing rows"
+        ),
+        "commercial RFQ fields are advisory and must never become an engineering blocker",
         design=False,
-        purchase=True,
+        purchase=False,
     )
 
     design_ready = not design_blockers
@@ -890,7 +951,18 @@ def audit() -> dict[str, object]:
         "configuration": "EVT-PRE-20 Rev.A",
         "scope": {
             "included": ["BOM", "PCB-MAIN", "PCB-MIC", "PCB-PWR", "mechanics", "harness", "supplier_DFM", "purchase_lot"],
-            "excluded": ["application_firmware", "server", "Android"],
+            "excluded": [
+                "application_firmware",
+                "server",
+                "Android",
+                "customer_supplier_selection",
+                "supplier_stock",
+                "commercial_price",
+                "MOQ",
+                "payment_terms",
+                "freight",
+                "destination_delivery",
+            ],
             "software_rule": "software is included only when an explicit hardware interface or production-test dependency requires it",
         },
         "hardware_design_release": {
@@ -901,6 +973,10 @@ def audit() -> dict[str, object]:
         "purchase_release": {
             "ready": purchase_ready,
             "status": "PASS" if purchase_ready else "BLOCKED",
+            "meaning": "engineering handoff for customer-owned procurement; not an executed purchase order",
+            "owner": "CUSTOMER",
+            "commercial_quote_or_availability_required": False,
+            "job_specific_technical_manufacturing_responses_required": True,
             "selected_station_quantity": selected_quantity,
             "blockers": purchase_blockers,
         },
@@ -909,6 +985,7 @@ def audit() -> dict[str, object]:
         "system_ots_procurement_identity": system_ots_identity,
         "pcb_layer_count_authority": layer_authority,
         "pcb_main_hierarchy": main_hierarchy,
+        "pcb_main_public_numeric_routing_basis": main_routing_basis,
         "pcb_pwr_hierarchy": pwr_hierarchy,
         "pcb_pwr_input_protection": pwr_input_protection,
         "pcb_pwr_dim_003": pwr_dim_003,
@@ -920,7 +997,11 @@ def audit() -> dict[str, object]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--strict", action="store_true", help="return non-zero until hardware purchase release is ready")
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="return non-zero until the hardware design and customer procurement handoff are ready",
+    )
     parser.add_argument("--output", default="artifacts/evt_pre_20_hardware_release_audit.json")
     args = parser.parse_args()
 
@@ -937,7 +1018,7 @@ def main() -> int:
     print(f"- hardware design release: {design['status']}")
     for blocker in design["blockers"]:
         print(f"  - {blocker}")
-    print(f"- purchase release: {purchase['status']}")
+    print(f"- customer procurement handoff: {purchase['status']}")
     for blocker in purchase["blockers"]:
         if blocker not in design["blockers"]:
             print(f"  - {blocker}")

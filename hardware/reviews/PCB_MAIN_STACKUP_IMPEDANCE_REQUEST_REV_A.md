@@ -3,9 +3,11 @@
 Status: `PACKET READY / TWO FABRICATOR RESPONSES REQUIRED / ROUTING NOT AUTHORIZED / NOT FOR MANUFACTURE`
 
 This packet requests the external data needed to replace provisional PCB-MAIN
-stackup assumptions with a selected-fabricator construction. It is a capability
-and quotation input, not a Gerber package, purchase order, panel approval or
-fabrication release.
+manufacturing assumptions with a selected job-specific fabricator construction.
+It is a capability and quotation input, not a Gerber package, purchase order,
+panel approval or fabrication release. The separate public
+`JLC06161H-3313` numeric overlay may be used for an engineering routing
+candidate, but it does not answer this request or change any pending row.
 
 Machine contract:
 `hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json`
@@ -65,7 +67,7 @@ Both `FAB-A` and `FAB-B` must independently provide:
 
 The response may identify a limitation or proposed ECO. It must not silently
 modify the board, substitute its standard stack without disclosure or insert
-numeric geometry directly into KiCad.
+returned production geometry directly into KiCad before project review.
 
 ## Controlled-impedance scope
 
@@ -80,9 +82,12 @@ The 90-ohm request covers four isolated USB pair groups:
 - `USB_CELL_MODEM_SEGMENT`: `CELL_USB_DM_U8` / `CELL_USB_DP_U8`;
 - `USB_CELL_FIXTURE_SEGMENT`: `CELL_USB_DM_TP` / `CELL_USB_DP_TP`.
 
-The project does not prescribe width, pair gap, dielectric height, solver
-frequency or impedance tolerance before the external responses are compared.
-Those fields remain explicitly `null` in the machine contract.
+This final job-specific request does not prescribe production width, pair gap,
+dielectric height, solver frequency or impedance tolerance before the external
+responses are compared. Those response fields remain explicitly `null` in the
+machine contract. The bounded public candidate basis is separately controlled
+in `PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json`; it does not populate or
+accept these final manufacturing fields.
 
 ## Ground-domain and routing interlock
 
@@ -92,9 +97,10 @@ nets or routing across an unreviewed plane split. Their only controlled joins
 remain on PCB-PWR through `NT1`, `NT2` and `NT3`.
 
 Receiving two completed response sets still does not automatically authorize
-routing. The project must select one construction, record the comparison and
-accept the RF/USB geometry through RF/SI review. Any resulting board rules or
-source changes are a controlled ECO and invalidate the current board hash.
+routing for production or fabrication. The project must select one
+construction, record the comparison and accept the RF/USB production geometry
+through RF/SI review. Any resulting board rules or source changes are a
+controlled ECO and invalidate the current board hash.
 
 ## Response and release rule
 

@@ -8,21 +8,23 @@ Android deliverables. Software becomes part of this gate only when an explicit
 pinout, power sequence, hardware interface or production-test dependency requires
 it.
 
-## Two release decisions
+## Engineering release and customer procurement boundary
 
 `hardware design release` proves that the three PCBAs, system components,
 mechanics and harness are technically complete and independently reviewed.
 It requires production BOM QG-2, completed routing, DRC, CAM, DFM, Review B and
 closed mechanical dimensions.
 
-`purchase release` additionally requires exactly one selected lot quantity from
-4, 10 or 20 stations and traceable supplier quotations. Comparable RFQs may be
-collected for all three quantities before that selection; mixing their quantity
-columns is prohibited.
+`customer procurement handoff` additionally requires exactly one selected lot
+quantity from 4, 10 or 20 stations and a technically controlled procurement
+package. Mixing quantity columns is prohibited. Supplier stock, price, MOQ,
+payment, freight and destination delivery are customer order-time fields; they
+may remain blank and do not block this engineering gate.
 
-The selected lot is `EVT-20` for 20 stations. This closes only the lot-selection
-condition. It does not release purchasing while hardware design or supplier
-evidence remains blocked.
+The selected lot is `EVT-20` for 20 stations. This closes the lot-selection
+condition. Actual purchase execution is owned by the customer. PCB/PCBA,
+harness and housing manufacture remains prohibited while technical design,
+job-specific DFM or manufacturing-release evidence is blocked.
 
 The eight selected OTS system identities `RB40`, `SLP080S-12M`,
 `SCC075010060R`, `SBS050150200`, `G30.B.108111`, `AA.166.A.301111`,
@@ -31,7 +33,7 @@ They are ordered as exact manufacturer MPNs with `NO SUBSTITUTION`; the selected
 EVT lot is the qualification batch. This gate requires no stand-alone pre-order
 qualification unit, receiving quarantine, mandatory photographs, fixed body count,
 future lot/date code or CoC. Commercial availability, price and destination delivery
-date remain order-time quote/cart fields. Physical fit, electrical, thermal, RF and
+date are non-blocking customer order-time fields. Physical fit, electrical, thermal, RF and
 environmental evidence remains open at assembly, EOL and EVT and still blocks the
 hardware design release where applicable.
 
@@ -62,9 +64,13 @@ authorize routing, fabrication, assembly, Review B or manufacturing release.
 PCB-MAIN also has explicit pre-route constraint coverage for all 186 native
 nets. The independent audit enforces disjoint route classes, ground-domain
 references, four USB differential-pair segments, seven 50-ohm RF nets and the
-controlled modem-feed minimum widths. Numeric RF/USB geometry remains blocked
-until the fabricator stackup is accepted, and the constraint PASS does not close
-routing, copper, DRC, CAM, DFM or Review B.
+controlled modem-feed minimum widths. The official JLCPCB public
+`JLC06161H-3313` calculator result is now a bounded numeric engineering routing
+basis: `0.1509 mm` for 50-ohm single-ended traces and `0.1537/0.2032 mm` for
+90-ohm differential width/gap on L1 over L2. This permits an engineering
+candidate only. Pair-aware routing and audit, the returned job stackup,
+production tolerance, coupon plan, routed copper, DRC, CAM, DFM and Review B
+remain open.
 
 PCB-PWR has explicit pre-route constraint coverage for all 31 native nets. The
 independent audit binds the 5 A system basis, both 4 A buck channels, the 3.3 A
@@ -165,8 +171,9 @@ not authorize numeric current geometry, routing or fabrication.
 
 The PCB-MAIN stackup/impedance request packet is internally ready, but it has
 0/2 fabricator responses accepted and no selected construction. Its 22-row
-register is a quotation/capability input only; it is not Gerber, a purchase
-order, routing authority or fabrication release.
+register remains the final job-specific manufacturing-acceptance path. The
+separate public numeric routing basis does not populate any response row and is
+not Gerber, a purchase order or a fabrication release.
 
 The bounded PCB-MAIN assembler request for `U2`, `U25`, `U26` and `U9` is also
 internally ready, but it has 0/14 assembler DFM/stencil responses accepted and
@@ -217,8 +224,9 @@ release.
 - acceptance of all 16 attributable harness supplier responses in
   `HARNESS_SUPPLIER_CAPABILITY_RESPONSE_REV_A.csv`, followed by final lengths,
   external endpoints, FAI and physical electrical/SI/thermal validation;
-- supplier/fabricator/assembler quotation evidence for the selected 20-station
-  purchase scenario.
+- attributable fabricator, assembler and harness technical responses required
+  for the selected construction and build process; commercial quotation,
+  availability and delivery fields are customer-owned and non-blocking here.
 
 Physical EVT and operator/SIM evidence remain later acceptance evidence after
 stations are assembled; they are not replaced by this pre-production audit.

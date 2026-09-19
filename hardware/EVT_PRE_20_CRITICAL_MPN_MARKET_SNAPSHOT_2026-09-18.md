@@ -1,5 +1,7 @@
 # EVT-PRE-20 critical MPN market snapshot — 2026-09-18
 
+Status: `HISTORICAL COMMERCIAL SNAPSHOT / NON-BLOCKING CUSTOMER INPUT`
+
 ## Scope
 
 This is a public-market planning snapshot for the exact EVT-PRE-20 MPNs below.
@@ -22,19 +24,20 @@ quotation.
 | `TI.89.B.2111W` | 22 | [DigiKey exact-MPN listing](https://www.digikey.ee/en/products/detail/taoglas-limited/TI-89-B-2111W/29407998) | 49 units in stock; listing states average ship time 1–3 days; manufacturer standard lead time 13 weeks | EUR 9.673 each at quantity 10 | `COVERED_BY_DISPLAYED_STOCK` |
 | `CAB.0243` | 66 | [DigiKey exact-MPN listing](https://www.digikey.com/en/products/detail/taoglas-limited/CAB-0243/24770240) | 1,504 units in stock; listing states average ship time 1–3 days; manufacturer standard lead time 16 weeks | USD 5.2068 each at quantity 50 | `COVERED_BY_DISPLAYED_STOCK` |
 
-## Set-closure result
+## Historical set-closure observation
 
 - Four of the eight monitored exact-MPN lines have a public listing whose
   displayed stock covers the complete EVT-20 quantity: `G30.B.108111`,
   `AA.166.A.301111`, `TI.89.B.2111W`, and `CAB.0243`.
 - `RB40`, `SCC075010060R`, and `SBS050150200` have usable public price references,
   but the complete required quantity is not confirmed by the public pages.
-- `SLP080S-12M` remains the hard commercial blocker because the exact-MPN listing
-  is explicitly discontinued/unavailable.  Its displayed USD 177.63 is a budget
-  reference, not an orderable offer.
+- The observed `SLP080S-12M` listing was explicitly discontinued/unavailable.
+  Its displayed USD 177.63 is a historical budget reference, not an orderable
+  offer and not an engineering release blocker.
 - A complete procurement set is therefore **not yet confirmed** from public
-  listings.  Do not interpret the four stock-covered rows as authorization for a
-  partial purchase.
+  listings. Customer procurement must resolve any order-time alternative through
+  the controlled no-substitution/ECO process; the engineering project does not
+  wait for availability replies.
 
 ## Budget linkage
 

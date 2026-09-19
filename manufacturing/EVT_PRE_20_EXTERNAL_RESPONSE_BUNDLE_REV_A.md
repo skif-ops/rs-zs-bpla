@@ -17,7 +17,10 @@ material.
 - Quantities for `EVT-4`, `EVT-10` and `EVT-20`, including the controlled board
   reserve, come only from `EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv` and
   `CHINA_PROCUREMENT_RFQ.csv`.
-- This archive is a request for technical response and quotation. It is not a
+- Supplier stock, price, MOQ, payment, freight and destination delivery are
+  customer-owned order-time fields and are not awaited by the engineering gate.
+- This archive is primarily a request for technical manufacturing response; a
+  recipient may also return a quotation for customer use. It is not a
   fabrication release, assembly release, purchase order or authorization to
   edit source/CAM data.
 
@@ -60,7 +63,11 @@ Two Chinese fabricators are suitable candidates for the identical `FAB-A` and
   4- and 6-layer stackups, a 1.6 mm 6-layer option including
   `JLC06161H-3313`, and headline capability of 3.5 mil minimum track/space and
   0.20 mm minimum via. Source:
-  <https://jlcpcb.com/impedance>.
+  <https://jlcpcb.com/impedance>. Its official calculator recommends that public
+  stack and returns L1/L2 candidate geometry of `0.1509 mm` for 50 ohm and
+  `0.1537/0.2032 mm` width/gap for 90 ohm under the controlled inputs recorded
+  in `PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json`. Calculator:
+  <https://jlcpcb.com/pcb-impedance-calculator>.
 - `FAB-B` candidate: PCBWay. Its official stackup pages publish standard
   multilayer constructions and state that job-specific/custom impedance
   constructions may be adjusted for manufacturing capability or material
@@ -68,10 +75,11 @@ Two Chinese fabricators are suitable candidates for the identical `FAB-A` and
   <https://www.pcbway.com/multi-layer-laminated-structure.html> and
   <https://www.pcbway.com/pcb_prototype/_Stack_up_for_Prototypes.html>.
 
-These public pages support candidate screening only. They do not provide the
-site-specific signed stackup, impedance geometry, coupon plan, DFM closure,
-plating tolerances, panel assumptions or quotation evidence required by the
-response registers.
+These public pages support candidate screening and a bounded PCB-MAIN
+engineering routing basis only. They do not provide the site-specific signed
+job stackup, production impedance tolerance, coupon plan, DFM closure, plating
+tolerances or panel assumptions required by the response registers. All 22
+PCB-MAIN fabricator response rows remain pending.
 
 ## Archive control
 

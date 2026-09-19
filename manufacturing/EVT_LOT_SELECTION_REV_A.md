@@ -11,7 +11,7 @@ The selected scenario controls the corresponding `Qty_N`, `Spares_N` and
 from different scenarios is prohibited.
 
 All 20 reserved serials are assigned to the selected EVT lot and remain in
-`AWAITING_BUILD` state until the hardware purchase gate passes. Every assembled
+`AWAITING_BUILD` state until the hardware manufacturing gate passes. Every assembled
 station receives 100 percent EOL and every applicable all-unit EVT test.
 
 Vacuum casting is the primary housing process for every selected-lot station.
@@ -21,6 +21,8 @@ pilot tooling or molded-part quantity.
 
 Selection is `SELECTED: EVT-20`. Comparable RFQs may still be collected for 4,
 10 and 20 stations, but only `Procure_qty_20` and `Required_qty_20` are eligible
-for the selected-lot purchase package. Selection does not authorize purchasing:
-strict BOM QG-2, released PCB/mechanical data and supplier evidence remain
-blocking.
+for the selected-lot purchase package. The customer owns supplier selection,
+stock, price, MOQ, payment and delivery confirmation and the project does not
+wait for those commercial fields. Selection does not authorize fabrication or
+assembly: strict BOM QG-2, released PCB/mechanical data and applicable
+job-specific technical manufacturing evidence remain blocking.

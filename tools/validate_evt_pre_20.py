@@ -211,6 +211,26 @@ def validate_decisions_and_tests() -> None:
         and "0/24" in decisions["DEC-055"]["Impact"],
         "PCB-PWR stackup/copper request and numeric-geometry separation decision is missing",
     )
+    require(
+        decisions["DEC-069"]["Status"] ==
+        "LOCKED_CUSTOMER_PROCUREMENT_BOUNDARY_TECHNICAL_GATES_RETAINED"
+        and "commercial procurement execution to the customer"
+        in decisions["DEC-069"]["Decision"]
+        and "job-specific stackup DFM stencil panel harness and mechanical technical responses"
+        in decisions["DEC-069"]["Impact"],
+        "customer procurement boundary decision is missing or weakens technical gates",
+    )
+    require(
+        decisions["DEC-070"]["Status"] ==
+        "LOCKED_PUBLIC_NUMERIC_ENGINEERING_BASIS_FINAL_FABRICATOR_ACCEPTANCE_PENDING"
+        and "JLC06161H-3313" in decisions["DEC-070"]["Decision"]
+        and "0.1509 mm" in decisions["DEC-070"]["Impact"]
+        and "0.1537 mm" in decisions["DEC-070"]["Impact"]
+        and "0.2032 mm" in decisions["DEC-070"]["Impact"]
+        and "do not populate FAB-A or FAB-B response rows"
+        in decisions["DEC-070"]["Impact"],
+        "PCB-MAIN public numeric routing-basis decision is missing or over-released",
+    )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
@@ -251,18 +271,23 @@ def validate_deliverable_register() -> None:
         in deliverables["HW-M-002"]["Критерий выпуска"]
         and "explicit pre-route constraints for all 186 native nets"
         in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "factory stackup numeric RF/USB geometry"
+        and "public JLC06161H-3313 numeric RF/USB routing basis"
         in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "pair-aware routing" in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "final job stackup" in deliverables["HW-M-002"]["Критерий выпуска"]
         and "Review B remain open" in deliverables["HW-M-002"]["Критерий выпуска"],
         "PCB-MAIN deliverable still reports a stale footprint disposition",
     )
     require(
-        deliverables["HW-M-011"]["Статус"] == "CONTROLLED_REQUEST"
+        deliverables["HW-M-011"]["Статус"] ==
+        "CONTROLLED_REQUEST_WITH_PUBLIC_NUMERIC_BASIS"
         and deliverables["HW-M-011"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-M-011"]["QG-2 техника"] == "OPEN"
-        and "two-fabricator packet and 22-row response template"
+        and "Official JLC06161H-3313 calculator output"
         in deliverables["HW-M-011"]["Критерий выпуска"]
-        and "routing and manufacture are blocked"
+        and "all 22 pending rows"
+        in deliverables["HW-M-011"]["Критерий выпуска"]
+        and "final job construction production tolerance coupon RF/SI review and manufacture remain blocked"
         in deliverables["HW-M-011"]["Критерий выпуска"],
         "PCB-MAIN stackup/impedance request deliverable is missing or over-released",
     )

@@ -1,6 +1,6 @@
 # PCB-MAIN Rev.A pre-route constraint authority
 
-Status: `PASS / 186 NETS CLASSIFIED / ROUTING AND FACTORY STACKUP OPEN / NOT FOR MANUFACTURE`
+Status: `PASS / 186 NETS CLASSIFIED / PUBLIC NUMERIC ROUTING BASIS CONTROLLED / FINAL FABRICATOR ACCEPTANCE AND ROUTING OPEN / NOT FOR MANUFACTURE`
 
 Machine authority: `hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv`
 
@@ -20,17 +20,27 @@ copper zones; therefore routing, DRC, CAM, Review B and manufacturing release
 remain open.
 
 The manifest deliberately does not assign a guessed controlled-impedance trace
-width. The selected fabricator must provide the final six-layer stackup,
-dielectric data, copper thickness and impedance construction before numeric RF
-or USB geometry is entered into KiCad.
+width. A separate controlled overlay now selects the official JLCPCB public
+`JLC06161H-3313` construction as the numeric basis for an engineering routing
+candidate: `0.1509 mm` for 50-ohm single-ended traces and `0.1537 mm` width with
+`0.2032 mm` pair gap for 90-ohm differential traces, all on L1 referenced to
+L2. The selected fabricator must still return the final job-specific stackup,
+dielectric data, copper thickness, production tolerance and coupon plan before
+manufacturing acceptance.
+
+The overlay and its independent audit are
+`hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json`,
+`hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.md` and
+`tools/audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py`.
 
 The controlled two-fabricator request is
 `hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json`; its
 human-readable packet and blank 22-row response register are
 `hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.md` and
 `hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv`. Both
-fabricator slots remain pending, so this handoff has zero accepted constructions
-and does not authorize routing.
+fabricator slots remain pending, so this handoff has zero accepted final
+job-specific constructions. The public numeric overlay permits only a bounded
+engineering routing candidate; it does not authorize fabrication or assembly.
 
 ## Controlled class inventory
 
@@ -71,10 +81,12 @@ independent audit fail until its route class is reviewed explicitly.
 
 ## Controlled-impedance handoff
 
-The seven RF nets have target `50_OHM_SINGLE_ENDED_FACTORY_STACKUP_PENDING`.
-Signal-via count has a zero target; any exception requires a reviewed transition
-and adjacent return vias. J8/J9/J10 remain the conducted ports, and no RF tee or
-probe stub is allowed.
+The seven RF nets retain target token
+`50_OHM_SINGLE_ENDED_FACTORY_STACKUP_PENDING` for final job-specific acceptance.
+Their engineering-candidate geometry is `0.1509 mm` on L1 over L2 against the
+named public construction. Signal-via count has a zero target; any exception
+requires a reviewed transition and adjacent return vias. J8/J9/J10 remain the
+conducted ports, and no RF tee or probe stub is allowed.
 
 The four USB pair groups are independent:
 
@@ -83,9 +95,13 @@ The four USB pair groups are independent:
 - `USB_CELL_MODEM_SEGMENT`: `CELL_USB_DP_U8` / `CELL_USB_DM_U8`;
 - `USB_CELL_FIXTURE_SEGMENT`: `CELL_USB_DP_TP` / `CELL_USB_DM_TP`.
 
-Each group has target `90_OHM_DIFFERENTIAL_FACTORY_STACKUP_PENDING`. Numeric
-width, gap and allowable skew remain open until the fabricator stackup and SI
-review are available. Main USB and BG95 recovery USB never share copper nets.
+Each group retains target `90_OHM_DIFFERENTIAL_FACTORY_STACKUP_PENDING` for
+final job-specific acceptance. The engineering-candidate geometry is
+`0.1537 mm` trace width and `0.2032 mm` pair gap on L1 over L2. Allowable skew
+and final production tolerance remain open until SI review and the returned
+fabricator construction are accepted. Main USB and BG95 recovery USB never
+share copper nets. The pair geometry must be enforced by a differential-pair-
+aware router and independently audited.
 
 The request packet asks `FAB-A` and `FAB-B` the same 11 construction,
 impedance, capability and DFM questions. Selection requires two attributable
@@ -111,7 +127,9 @@ must preserve the 2D placement-clearance PASS already recorded in Review B.
 Constraint coverage may be called PASS only while the following remain explicit
 blockers:
 
-- final fabricator stackup and numeric 50-ohm/90-ohm geometry;
+- final job-specific fabricator stackup, production impedance tolerances,
+  solver evidence and coupon plan; the public numeric candidate basis does not
+  close this item;
 - routed copper, domain pours, stitching and impedance coupons;
 - zero-unrouted KiCad 9 DRC and schematic parity;
 - native STEP/service-volume review;

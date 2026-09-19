@@ -1,0 +1,67 @@
+{
+  "schema": "dioneya-pcb-main-routing-design-basis-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "board": "PCB-MAIN",
+  "status": "PASS_PUBLIC_STANDARD_NUMERIC_ROUTING_INPUT_FINAL_FABRICATOR_ACCEPTANCE_PENDING",
+  "retrieval_utc_date": "2026-09-19",
+  "fabricator": "JLCPCB",
+  "official_sources": [
+    "https://jlcpcb.com/impedance",
+    "https://jlcpcb.com/pcb-impedance-calculator"
+  ],
+  "calculator_inputs": {
+    "board_type": "Rigid",
+    "copper_layers": 6,
+    "nominal_board_thickness_mm": 1.6,
+    "inner_copper_weight_oz": 0.5,
+    "outer_copper_weight_oz": 1.0,
+    "unit": "mm"
+  },
+  "selected_public_standard": {
+    "stackup_id": "JLC06161H-3313",
+    "page_label": "Standard",
+    "page_recommendation": "recommend",
+    "displayed_finished_thickness_mm": 1.54,
+    "displayed_finished_thickness_tolerance_percent": 10.0,
+    "layers": [
+      {"name": "L1", "kind": "copper", "thickness_mm": 0.0350},
+      {"name": "PP1", "kind": "prepreg", "material": "3313 RC57%", "thickness_mm": 0.0994},
+      {"name": "L2", "kind": "copper", "thickness_mm": 0.0152},
+      {"name": "CORE1", "kind": "core", "material": "H/H without copper", "thickness_mm": 0.5500},
+      {"name": "L3", "kind": "copper", "thickness_mm": 0.0152},
+      {"name": "PP2", "kind": "prepreg", "material": "2116 RC54%", "thickness_mm": 0.1088},
+      {"name": "L4", "kind": "copper", "thickness_mm": 0.0152},
+      {"name": "CORE2", "kind": "core", "material": "H/H without copper", "thickness_mm": 0.5500},
+      {"name": "L5", "kind": "copper", "thickness_mm": 0.0152},
+      {"name": "PP3", "kind": "prepreg", "material": "3313 RC57%", "thickness_mm": 0.0994},
+      {"name": "L6", "kind": "copper", "thickness_mm": 0.0350}
+    ]
+  },
+  "numeric_geometry": {
+    "rf_50ohm": {
+      "target_ohm": 50.0,
+      "type": "Single Ended (Non coplanar)",
+      "signal_layer": "L1",
+      "reference_layer": "L2",
+      "trace_width_mm": 0.1509
+    },
+    "usb_90ohm": {
+      "target_ohm": 90.0,
+      "type": "Differential Pair (Non coplanar)",
+      "signal_layer": "L1",
+      "reference_layer": "L2",
+      "trace_width_mm": 0.1537,
+      "pair_gap_mm": 0.2032
+    }
+  },
+  "acceptance_boundary": {
+    "numeric_input_for_engineering_routing_candidate": true,
+    "published_standard_selected_as_final_job_stackup": false,
+    "production_impedance_tolerance_percent": null,
+    "coupon_plan_accepted": false,
+    "job_specific_fabricator_response_required": true,
+    "job_specific_dfm_required": true,
+    "review_b_complete": false,
+    "manufacturing_release": false
+  }
+}

@@ -92,6 +92,12 @@ def audit_contract(contract: dict) -> dict:
         "bare-PCB alternative-track interlock drift",
     )
     require(
+        contract["commercial_procurement_owner"] == "CUSTOMER"
+        and contract["commercial_quote_or_availability_required_by_engineering"] is False
+        and contract["job_specific_technical_manufacturing_responses_required"] is True,
+        "customer commercial-procurement or technical-response boundary drift",
+    )
+    require(
         contract["hardware_design_release"] is False
         and contract["purchase_release"] is False
         and contract["manufacturing_release"] is False,
@@ -223,6 +229,9 @@ def main() -> int:
         "manufacturing_release": False,
         "selected_station_quantity": contract["selected_station_quantity"],
         "primary_procurement_track": contract["primary_procurement_track"],
+        "commercial_procurement_owner": contract["commercial_procurement_owner"],
+        "commercial_quote_or_availability_required_by_engineering": False,
+        "job_specific_technical_manufacturing_responses_required": True,
         "controlled_file_count": control["controlled_file_count"],
         "response_registers": control["response_registers"],
         "archive": None,
