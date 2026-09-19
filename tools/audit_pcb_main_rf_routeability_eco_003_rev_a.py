@@ -211,7 +211,9 @@ def native_connectivity() -> dict[str, Any]:
     versions: list[str] = []
     with tempfile.TemporaryDirectory(prefix="pcb-main-rf-eco003-") as temp_dir:
         baseline = Path(temp_dir) / "PCB-MAIN_RF_ECO_003_APPLIED_BASE.kicad_pcb"
-        baseline.write_text(git_text(APPLICATION_COMMIT, BASE_BOARD), encoding="utf-8")
+        baseline.write_text(
+            git_text(APPLICATION_COMMIT, NATIVE_BOARD_PATH), encoding="utf-8"
+        )
         for label, path in (("baseline", baseline), ("candidate", CANDIDATE_BOARD)):
             board = pcbnew.LoadBoard(str(path))
             require(board is not None, f"KiCad cannot load {path}")
