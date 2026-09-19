@@ -6,7 +6,7 @@
   "base_board": "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_BASE_REV_A.kicad_pcb",
   "base_board_sha256": "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3",
   "candidate_board": "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pcb",
-  "candidate_board_sha256": "e956b67dbe932f0eb1fb60b3fcbe462306bcb0e5ba73a151954cf037a9643c99",
+  "candidate_board_sha256": "758c9bfdf2d91a7dd4f69f00b94ac7d7cccff15f1415c6c72e68d5604ee67193",
   "scope": {
     "functional_block": "OCTOSPI_NOR_STORAGE_ONLY",
     "routed_nets": [
@@ -14,9 +14,9 @@
       "NOR_IO1_U1", "NOR_IO1_U2", "NOR_IO2_U1", "NOR_IO2_U2",
       "NOR_IO3_U1", "NOR_IO3_U2", "NOR_NCS_U2"
     ],
-    "added_segments": 139,
-    "added_vias": 21,
-    "added_track_length_mm": 285.29394,
+    "added_segments": 121,
+    "added_vias": 25,
+    "added_track_length_mm": 282.362979395,
     "unfilled_native_connectivity": {
       "base_unconnected": 707,
       "candidate_unconnected": 697,
@@ -27,9 +27,10 @@
   },
   "generation": {
     "tool": "tools/route_pcb_release_candidate_rev_a.py",
-    "tool_sha256": "36a5add890f94acff5b16c736304e4941b274119182d11138d75d5f67ce55a89",
-    "grid_step_mm": 0.25,
-    "copper_clearance_mm": 0.1,
+    "tool_sha256": "ee645376472edfe093447b306c6c85f68f2963ae2a0833a82060f7e7dd225a9b",
+    "grid_step_mm": 0.125,
+    "copper_clearance_mm": 0.2,
+    "deterministic_r8_clock_guide": true,
     "preserve_existing": true,
     "negotiated_routing": true,
     "ripups": 0,

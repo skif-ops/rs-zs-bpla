@@ -176,7 +176,7 @@ class GridRouter:
         via_items = 0
         future_track_radius_mm = 0.075
         future_via_radius_mm = 0.25
-        copper_clearance_mm = 0.10
+        copper_clearance_mm = 0.20
         future_drill_radius_mm = 0.20
         drill_to_drill_mm = 0.2495
 
@@ -315,7 +315,7 @@ class GridRouter:
         return tuple(layer for layer in self.route_layers if pad.IsOnLayer(layer))
 
     def _index_pads(self) -> None:
-        clearance = 0.10
+        clearance = 0.20
         track_radius = 0.075
         for footprint in self.board.GetFootprints():
             ref = footprint.GetReference()
@@ -953,15 +953,15 @@ class GridRouter:
                     via_positions.add(key)
 
         # Reserve enough centre-line space for the committed trace plus the
-        # 0.10 mm routing clearance and a future default 0.15 mm trace.  A
+        # 0.20 mm routing clearance and a future default 0.15 mm trace.  A
         # floor with a tiny epsilon permits an exactly-on-limit grid node.
         width_radius = max(
             0.0,
-            (policy.width_mm / 2 + 0.10 + 0.075) / self.step,
+            (policy.width_mm / 2 + 0.20 + 0.075) / self.step,
         )
         via_radius = max(
             1.0,
-            (policy.via_diameter_mm / 2 + 0.10 + 0.075) / self.step,
+            (policy.via_diameter_mm / 2 + 0.20 + 0.075) / self.step,
         )
         via_points = {
             (point.x, point.y)
@@ -994,13 +994,13 @@ class GridRouter:
 
         # Reserve through-via centre positions independently of layer.  A
         # future 0.50 mm via needs 0.425 mm from a 0.15 mm trace centre and
-        # 0.600 mm from another 0.50 mm via centre at 0.10 mm clearance.
+        # 0.700 mm from another 0.50 mm via centre at 0.20 mm clearance.
         for point in path:
             is_via = (point.x, point.y) in via_points
             centre_radius = (
-                policy.via_diameter_mm / 2 + 0.10 + 0.25
+                policy.via_diameter_mm / 2 + 0.20 + 0.25
                 if is_via else
-                policy.width_mm / 2 + 0.10 + 0.25
+                policy.width_mm / 2 + 0.20 + 0.25
             ) / self.step
             extent = int(math.ceil(centre_radius))
             radius_squared = centre_radius * centre_radius
@@ -1238,6 +1238,58 @@ def remove_existing_copper(board: pcbnew.BOARD) -> None:
         board.Remove(item)
 
 
+def add_main_octospi_clock_guide(board: pcbnew.BOARD) -> None:
+    """Add the reviewed dense escape for the two R8 OctoSPI clocks.
+
+    The two 0402 lands are only 0.65 mm apart.  Letting the negotiated router
+    choose both escapes independently makes each clock select the same via
+    corridor and oscillate during rip-up.  This deterministic guide sends U1
+    to In2.Cu on the left and U2 to In3.Cu on the right while retaining the
+    normal 0.20 mm copper clearance used by the rest of the router.
+    """
+    def point(x_mm: float, y_mm: float) -> pcbnew.VECTOR2I:
+        return vec(x_mm, y_mm)
+
+    def add_track(net_name: str, layer: int, start: tuple[float, float], end: tuple[float, float]) -> None:
+        track = pcbnew.PCB_TRACK(board)
+        track.SetStart(point(*start)); track.SetEnd(point(*end))
+        track.SetWidth(pcbnew.FromMM(0.15))
+        track.SetLayer(layer)
+        track.SetNetCode(board.FindNet(net_name).GetNetCode())
+        board.Add(track)
+
+    def add_via(net_name: str, x_mm: float, y_mm: float) -> None:
+        via = pcbnew.PCB_VIA(board)
+        via.SetPosition(point(x_mm, y_mm))
+        via.SetWidth(pcbnew.FromMM(0.50))
+        via.SetDrill(pcbnew.FromMM(0.30))
+        via.SetViaType(pcbnew.VIATYPE_THROUGH)
+        via.SetLayerPair(pcbnew.F_Cu, pcbnew.B_Cu)
+        via.SetNetCode(board.FindNet(net_name).GetNetCode())
+        board.Add(via)
+
+    u1 = "NOR_CLK_U1"
+    add_track(u1, pcbnew.F_Cu, (54.675, 19.500), (54.600, 19.475))
+    add_track(u1, pcbnew.F_Cu, (54.600, 19.475), (54.100, 18.975))
+    add_via(u1, 54.100, 18.975)
+    add_track(u1, pcbnew.In2_Cu, (54.100, 18.975), (52.725, 20.350))
+    add_track(u1, pcbnew.In2_Cu, (52.725, 20.350), (52.725, 24.350))
+    add_track(u1, pcbnew.In2_Cu, (52.725, 24.350), (51.975, 25.100))
+    add_track(u1, pcbnew.In2_Cu, (51.975, 25.100), (51.975, 36.600))
+    add_via(u1, 51.975, 36.600)
+    add_track(u1, pcbnew.F_Cu, (51.975, 36.600), (52.000, 37.750))
+
+    u2 = "NOR_CLK_U2"
+    add_track(u2, pcbnew.F_Cu, (55.325, 19.500), (55.650, 19.175))
+    add_track(u2, pcbnew.F_Cu, (55.650, 19.175), (56.000, 18.825))
+    add_via(u2, 56.000, 18.825)
+    add_track(u2, pcbnew.In3_Cu, (56.000, 18.825), (60.000, 22.825))
+    add_track(u2, pcbnew.In3_Cu, (60.000, 22.825), (64.000, 26.825))
+    add_track(u2, pcbnew.In3_Cu, (64.000, 26.825), (79.100, 26.825))
+    add_via(u2, 79.100, 26.825)
+    add_track(u2, pcbnew.F_Cu, (79.100, 26.825), (80.650, 27.055))
+
+
 def route_board(
     board_name: str,
     input_path: Path,
@@ -1253,16 +1305,23 @@ def route_board(
     max_ripup_attempts: int = 4,
     max_blockers: int = 8,
     preserve_existing: bool = False,
+    main_octospi_clock_guide: bool = False,
 ) -> dict[str, object]:
     board = load_board_compat(input_path)
     if not preserve_existing:
         remove_existing_copper(board)
     authority_path = MAIN_AUTHORITY if board_name == "PCB-MAIN" else PWR_AUTHORITY
     authority = read_authority(authority_path)
-    router = GridRouter(board, board_name, grid_step_mm)
     # New BOARD_ITEM UUIDs must be reproducible so a reviewed candidate can be
     # regenerated byte-for-byte from the same controlled base and arguments.
     pcbnew.KIID.SeedGenerator(0xD10E7EA)
+    if main_octospi_clock_guide:
+        if board_name != "PCB-MAIN" or not preserve_existing:
+            raise ValueError("OctoSPI clock guide requires PCB-MAIN --preserve-existing")
+        add_main_octospi_clock_guide(board)
+        guided = {"NOR_CLK_U1", "NOR_CLK_U2"}
+        only_nets = (set(only_nets) - guided) if only_nets is not None else None
+    router = GridRouter(board, board_name, grid_step_mm)
     existing_copper = (
         router.index_existing_copper()
         if preserve_existing else
@@ -1514,6 +1573,10 @@ def main() -> int:
             "explicit --only-net routes, including negotiated local rip-up"
         ),
     )
+    parser.add_argument(
+        "--main-octospi-clock-guide", action="store_true",
+        help="apply the deterministic R8 clock escape used by the PCB-MAIN OctoSPI subgate",
+    )
     args = parser.parse_args()
     default = ROOT / f"hardware/kicad/native/{args.board}/{args.board}.kicad_pcb"
     input_path = args.input or default
@@ -1533,6 +1596,7 @@ def main() -> int:
         args.max_ripup_attempts,
         args.max_blockers,
         args.preserve_existing,
+        args.main_octospi_clock_guide,
     )
     print(result)
     return 1 if result["failed_connections"] else 0
