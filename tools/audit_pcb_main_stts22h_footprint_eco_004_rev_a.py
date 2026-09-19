@@ -191,7 +191,12 @@ def parse_drc(path: Path) -> dict[str, Any]:
     for index in range(1, len(parts), 2):
         category = parts[index]
         body = parts[index + 1]
-        match = re.search(r"Severity:\s*([A-Za-z]+)", body)
+        # KiCad 7 emits ``Severity: error`` while KiCad 9 emits a terminal
+        # ``; error`` on the rule/local-override line.
+        match = re.search(
+            r"(?mi)(?:Severity:\s*|;\s*)(error|warning|exclusion)\s*$",
+            body,
+        )
         severity = match.group(1).lower() if match else "unknown"
         counts[(category, severity)] += 1
     require(counts, f"DRC report contains no parseable violations: {path}")
