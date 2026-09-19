@@ -20,7 +20,16 @@ from kiutils.board import Board
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+NATIVE_BOARD_BINDING = "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+ACTIVE_BOARD = ROOT / NATIVE_BOARD_BINDING
+BOARD = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001"
+    / "PCB-MAIN_GROUND_DOMAIN_BASE_REV_A.kicad_pcb"
+)
+GROUND_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json"
+)
 RULES = ROOT / "hardware/kicad/PCB_RULES.md"
 LAYER_AUTHORITY = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
 MECHANICAL = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
@@ -114,7 +123,9 @@ QUESTION_TOKENS = {
 }
 
 CONTROLLED_SOURCES = [
+    ACTIVE_BOARD,
     BOARD,
+    GROUND_APPLICATION,
     RULES,
     LAYER_AUTHORITY,
     MECHANICAL,
@@ -190,7 +201,7 @@ def validate_board_and_bindings(contract: dict[str, Any]) -> dict[str, Any]:
         require((ROOT / item).is_file(), f"authority input is missing: {item}")
 
     expected_binding = {
-        "native_board": relative(BOARD),
+        "native_board": NATIVE_BOARD_BINDING,
         "native_board_sha256": sha256(BOARD),
         "mechanical_authority": relative(MECHANICAL),
         "mechanical_authority_sha256": sha256(MECHANICAL),
@@ -201,6 +212,15 @@ def validate_board_and_bindings(contract: dict[str, Any]) -> dict[str, Any]:
     }
     require(contract.get("source_binding") == expected_binding,
             "stackup request source-hash binding mismatch")
+    application = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
+    require(application.get("historical_baseline") == {
+                "board": relative(BOARD),
+                "board_sha256": sha256(BOARD),
+                "track_segments": 0,
+                "vias": 0,
+                "copper_zones": 0,
+            } and application.get("applied", {}).get("board") == NATIVE_BOARD_BINDING,
+            "historical request baseline is not preserved by the ground-domain application")
 
     board = Board.from_file(str(BOARD), encoding="utf-8")
     copper_layers = [layer.name for layer in board.layers if layer.name.endswith(".Cu")]
@@ -249,7 +269,8 @@ def validate_board_and_bindings(contract: dict[str, Any]) -> dict[str, Any]:
         "native_copper_zones": 0,
     }, "board request basis or provisional/frozen interlock differs")
     return {
-        "path": relative(BOARD),
+        "path": NATIVE_BOARD_BINDING,
+        "historical_archive_path": relative(BOARD),
         "sha256": sha256(BOARD),
         "outline_mm": [110.0, 75.0],
         "finished_thickness_mm": 1.6,

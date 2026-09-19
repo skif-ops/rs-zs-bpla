@@ -30,7 +30,12 @@ from materialize_pcb_main_stts22h_footprint_eco_004_rev_a import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE_BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+HISTORICAL_NATIVE_BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+BASE_BOARD = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001"
+    / "PCB-MAIN_GROUND_DOMAIN_BASE_REV_A.kicad_pcb"
+)
 BASE_FOOTPRINT = (
     ROOT
     / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/STTS22H_UDFN-6L.kicad_mod"
@@ -56,6 +61,7 @@ PROPOSAL_RECORD_SHA256 = "35b7c9455fad54013959b2f589fa3068830b8d2dbb812ce924fb42
 REVIEWED_GITHUB_COMMIT = "059ecd0e2e35fc56a56f48d62cce4f72a93755c0"
 REVIEWED_TREE = "d6805c8f15ce319410a996f143132c6f8f58f35e"
 APPROVAL_COMMIT = "3f133c2cb2075b4bdc8d4044366014f1b9d17add"
+APPLICATION_COMMIT = "6bbcc0a1179bc945c9ee915fd89d299c2808ad10"
 EXPECTED_UNCONNECTED = 718
 EXPECTED_SIGNAL_TO_EP_GAP_MM = 0.190
 
@@ -503,7 +509,9 @@ def static_audit() -> dict[str, Any]:
             applied.get("controlled_footprint_sha256") == CANDIDATE_FOOTPRINT_SHA256 and
             applied.get("footprint_review_register_sha256") == sha256(FOOTPRINT_REGISTER) and
             applied.get("footprint_disposition_sha256") == sha256(FOOTPRINT_DISPOSITION) and
-            applied.get("capture_manifest_sha256") == sha256(CAPTURE_MANIFEST) and
+            applied.get("capture_manifest_sha256") == hashlib.sha256(
+                git_bytes(APPLICATION_COMMIT, CAPTURE_MANIFEST)
+            ).hexdigest() and
             applied.get("changed_references") == ["U4"] and
             applied.get("exact_board_line_replacements") == len(BOARD_REPLACEMENTS) and
             applied.get("track_segments") == 0 and
@@ -517,7 +525,7 @@ def static_audit() -> dict[str, Any]:
         "proposal_id": proposal["proposal_id"],
         "status": "PASS_APPROVED_APPLIED_BOUNDED_U4_CORRECTION",
         "baseline": {
-            "board": f"GIT:{REVIEWED_GITHUB_COMMIT}:{BASE_BOARD.relative_to(ROOT)}",
+            "board": f"GIT:{REVIEWED_GITHUB_COMMIT}:{HISTORICAL_NATIVE_BOARD.relative_to(ROOT)}",
             "board_sha256": BASE_BOARD_SHA256,
             "u4_signal_to_ep_overlap_mm": round(-baseline_gap, 6),
         },

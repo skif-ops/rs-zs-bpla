@@ -35,6 +35,10 @@ ECO_004_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPLICATION.json"
 )
 ECO_004_APPROVED_BOARD_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
+GROUND_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json"
+)
+GROUND_APPROVED_BOARD_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
@@ -431,10 +435,15 @@ def verify_frozen_materialization(candidate: Path) -> None:
         raise RuntimeError("PCB-MAIN ECO-003 application evidence is missing")
     if not ECO_004_APPLICATION.is_file():
         raise RuntimeError("PCB-MAIN ECO-004 application evidence is missing")
+    if not GROUND_APPLICATION.is_file():
+        raise RuntimeError("PCB-MAIN ground-domain application evidence is missing")
     eco003 = json.loads(ECO_003_APPLICATION.read_text(encoding="utf-8"))
     eco003_applied = eco003.get("applied", {})
     eco004 = json.loads(ECO_004_APPLICATION.read_text(encoding="utf-8"))
     eco004_applied = eco004.get("applied", {})
+    ground = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
+    ground_baseline = ground.get("historical_baseline", {})
+    ground_applied = ground.get("applied", {})
     actual_board_sha256 = sha256(PCB)
     if not (
         eco003.get("proposal_id") == "PCB-MAIN-RF-ROUTEABILITY-ECO-003"
@@ -450,9 +459,21 @@ def verify_frozen_materialization(candidate: Path) -> None:
         and eco004_applied.get("track_segments") == 0
         and eco004_applied.get("copper_zones") == 0
         and eco004_applied.get("board_sha256") == ECO_004_APPROVED_BOARD_SHA256
-        and actual_board_sha256 == ECO_004_APPROVED_BOARD_SHA256
+        and ground.get("proposal_id") == "PCB-MAIN-GROUND-DOMAIN-ROUTING-001"
+        and ground.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE"
+        and ground.get("status") ==
+        "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES"
+        and ground_baseline.get("board_sha256") == ECO_004_APPROVED_BOARD_SHA256
+        and ground_applied.get("board_sha256") == GROUND_APPROVED_BOARD_SHA256
+        and ground_applied.get("exact_candidate_byte_identity") is True
+        and ground.get("routing_complete") is False
+        and ground.get("review_b_complete") is False
+        and ground.get("cam_or_manufacturing_release") is False
+        and actual_board_sha256 == GROUND_APPROVED_BOARD_SHA256
     ):
-        raise RuntimeError("PCB-MAIN ECO-003/ECO-004 frozen-board authority mismatch")
+        raise RuntimeError(
+            "PCB-MAIN ECO-003/ECO-004/ground-domain frozen-board authority mismatch"
+        )
 
     controlled = set(CONTROLLED) | set(IPC_CANDIDATE_CONTROLLED)
     approved_board = Board.from_file(str(PCB), encoding="utf-8")
@@ -497,7 +518,7 @@ def main() -> int:
                     ) from error
         print(
             "PCB-MAIN controlled project-local footprint materialization: PASS "
-            "(signed ECO-004 board hash; semantic footprint match)"
+            "(accepted ground-domain board hash; semantic footprint match)"
         )
     else:
         with tempfile.TemporaryDirectory() as temp_dir:

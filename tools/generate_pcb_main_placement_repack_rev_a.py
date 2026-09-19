@@ -54,6 +54,17 @@ ECO003_APPLICATION = (
 ECO004_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPLICATION.json"
 )
+GROUND_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json"
+)
+GROUND_BASE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/"
+    "PCB-MAIN_GROUND_DOMAIN_BASE_REV_A.kicad_pcb"
+)
+GROUND_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001/"
+    "PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb"
+)
 
 ECO003_POSES = {
     "FL1": (60.5, 68.0, 0.0),
@@ -793,8 +804,9 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
             str(PLACEMENT.relative_to(ROOT)) and
             applied.get("placement_repack_sha256") == sha256(PLACEMENT),
             "PCB-MAIN approved placement-repack SHA-256 drift")
+    approved_board = GROUND_BASE if GROUND_APPLICATION.is_file() else BOARD
     require(board_applied.get("board") == str(BOARD.relative_to(ROOT)) and
-            board_applied.get("board_sha256") == sha256(BOARD),
+            board_applied.get("board_sha256") == sha256(approved_board),
             "PCB-MAIN approved placement board SHA-256 drift")
     require(applied.get("mechanical_authority", applied.get("authority")) ==
             str(AUTHORITY.relative_to(ROOT)) and
@@ -820,9 +832,24 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
                 for row in rows),
             "PCB-MAIN approved placement release boundary drift")
     verify_materialized(board_text, rows)
-    require(len(getattr(board, "traceItems", [])) == 0 and
-            len(getattr(board, "zones", [])) == 0,
-            "PCB-MAIN approved placement board unexpectedly contains copper")
+    if GROUND_APPLICATION.is_file():
+        ground = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
+        require(ground.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE" and
+                ground.get("status") ==
+                "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+                ground.get("applied", {}).get("exact_candidate_byte_identity") is True and
+                sha256(BOARD) == sha256(GROUND_CANDIDATE) and
+                BOARD.read_bytes() == GROUND_CANDIDATE.read_bytes() and
+                len(getattr(board, "traceItems", [])) == 573 and
+                len(getattr(board, "zones", [])) == 7 and
+                ground.get("routing_complete") is False and
+                ground.get("review_b_complete") is False and
+                ground.get("cam_or_manufacturing_release") is False,
+                "PCB-MAIN ground-domain application or copper inventory drift")
+    else:
+        require(len(getattr(board, "traceItems", [])) == 0 and
+                len(getattr(board, "zones", [])) == 0,
+                "PCB-MAIN approved placement board unexpectedly contains copper")
     if ECO003_APPLICATION.is_file():
         by_ref = {row["RefDes"]: row for row in rows}
         for ref, expected in ECO003_POSES.items():

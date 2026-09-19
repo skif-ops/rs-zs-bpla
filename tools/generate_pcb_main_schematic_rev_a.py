@@ -679,7 +679,10 @@ def build(output: Path) -> tuple[Path, ...]:
         ],
         "review_a": "SIGNED_PIN_NET_PASS_RETAINED_BY_EXACT_HIERARCHY_EQUIVALENCE",
         "hierarchy_review": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
-        "review_b": "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
+        "review_b": (
+            "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+            "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING"
+        ),
     }
     manifest.write_text(json.dumps(manifest_payload, indent=2) + "\n", encoding="utf-8")
     return (*hierarchy_sources, project, symbol_library, sym_table, fp_table, manifest)

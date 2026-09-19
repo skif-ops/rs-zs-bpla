@@ -24,7 +24,12 @@ from kiutils.utils import sexpr
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE_BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+NATIVE_BOARD_PATH = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+BASE_BOARD = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001"
+    / "PCB-MAIN_GROUND_DOMAIN_BASE_REV_A.kicad_pcb"
+)
 CANDIDATE_BOARD = (
     ROOT
     / "hardware/kicad/candidates/PCB-MAIN-RF-ECO-003/PCB-MAIN_RF_ECO_003.kicad_pcb"
@@ -256,10 +261,10 @@ def static_audit() -> dict[str, Any]:
     ).returncode == 0:
         require(git_tree(REVIEWED_LOCAL_COMMIT) == REVIEWED_TREE,
                 "PCB-MAIN ECO-003 reviewed local tree drift")
-    historical_text = git_text(REVIEWED_GITHUB_COMMIT, BASE_BOARD)
+    historical_text = git_text(REVIEWED_GITHUB_COMMIT, NATIVE_BOARD_PATH)
     require(bytes_sha256(historical_text.encode("utf-8")) == HISTORICAL_BASE_SHA256,
             "PCB-MAIN ECO-003 historical baseline SHA-256 drift")
-    applied_text = git_text(APPLICATION_COMMIT, BASE_BOARD)
+    applied_text = git_text(APPLICATION_COMMIT, NATIVE_BOARD_PATH)
     require(bytes_sha256(applied_text.encode("utf-8")) == APPLIED_BASE_SHA256,
             "PCB-MAIN ECO-003 historical applied-board SHA-256 drift")
 

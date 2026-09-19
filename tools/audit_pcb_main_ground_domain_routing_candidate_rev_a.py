@@ -22,7 +22,12 @@ from kiutils.board import Board
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE_BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+BASE_BOARD = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001"
+    / "PCB-MAIN_GROUND_DOMAIN_BASE_REV_A.kicad_pcb"
+)
+ACTIVE_BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 CANDIDATE_BOARD = (
     ROOT
     / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001"
@@ -33,6 +38,7 @@ PROPOSAL_RECORD = ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDID
 APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPROVAL_REV_A.json"
 APPROVAL_RECORD = ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPROVAL_REV_A.md"
 REVIEW_MAPPING = ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_REVIEW_COMMIT_MAPPING.json"
+APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json"
 MECHANICAL = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 LAYER_AUTHORITY = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
 
@@ -314,13 +320,17 @@ def native_connectivity() -> dict[str, Any]:
 
 def static_audit() -> dict[str, Any]:
     for path in (
-        BASE_BOARD, CANDIDATE_BOARD, PROPOSAL, PROPOSAL_RECORD, APPROVAL,
-        APPROVAL_RECORD, REVIEW_MAPPING, MECHANICAL, LAYER_AUTHORITY,
+        BASE_BOARD, ACTIVE_BOARD, CANDIDATE_BOARD, PROPOSAL, PROPOSAL_RECORD,
+        APPROVAL, APPROVAL_RECORD, REVIEW_MAPPING, APPLICATION, MECHANICAL,
+        LAYER_AUTHORITY,
     ):
         require(path.is_file() and path.stat().st_size > 0, f"missing candidate input: {path}")
     require(sha256(BASE_BOARD) == BASE_SHA256, "PCB-MAIN authoritative baseline SHA-256 drift")
     require(sha256(CANDIDATE_BOARD) == CANDIDATE_SHA256,
             "PCB-MAIN ground candidate SHA-256 drift")
+    require(sha256(ACTIVE_BOARD) == CANDIDATE_SHA256 and
+            ACTIVE_BOARD.read_bytes() == CANDIDATE_BOARD.read_bytes(),
+            "authoritative PCB-MAIN is not the exact accepted ground candidate")
     require(sha256(PROPOSAL) == PROPOSAL_SHA256 and
             sha256(PROPOSAL_RECORD) == PROPOSAL_RECORD_SHA256,
             "PCB-MAIN ground proposal record SHA-256 drift")
@@ -631,12 +641,58 @@ def static_audit() -> dict[str, Any]:
                 "manufacturing_release": False,
             }, "ground-domain reviewed commit mapping drift")
 
+    application = json.loads(APPLICATION.read_text(encoding="utf-8"))
+    require(application == {
+                "schema_version": "dioneya.pcb-main-ground-domain-routing-application.v1",
+                "configuration": "EVT-PRE-20 Rev.A",
+                "proposal_id": "PCB-MAIN-GROUND-DOMAIN-ROUTING-001",
+                "approval": str(APPROVAL.relative_to(ROOT)),
+                "application_date": "2026-09-19",
+                "reviewed_proposal_commit_sha": REVIEWED_GITHUB_COMMIT,
+                "approval_commit_sha": "cf768952bb870c6284563908714d043274852354",
+                "approval_sha256": "a3dbab5b0de1b5bc6a459f8d18d2ffafbe7da197170894839960d79dc5601c54",
+                "reviewed_candidate_board_sha256": CANDIDATE_SHA256,
+                "decision": "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE",
+                "scope": "EXACT_GROUND_DOMAIN_FANOUT_VIAS_RULE_AREAS_AND_SHAPED_PLANES_ONLY",
+                "historical_baseline": {
+                    "board": str(BASE_BOARD.relative_to(ROOT)),
+                    "board_sha256": BASE_SHA256,
+                    "track_segments": 0,
+                    "vias": 0,
+                    "copper_zones": 0,
+                },
+                "applied": {
+                    "board": str(ACTIVE_BOARD.relative_to(ROOT)),
+                    "board_sha256": CANDIDATE_SHA256,
+                    "exact_candidate_byte_identity": True,
+                    "track_segments": 319,
+                    "track_length_mm": 226.515879672367,
+                    "vias": 254,
+                    "copper_zones": 3,
+                    "mounting_rule_areas": 4,
+                    "committed_zone_fill_state":
+                    "UNFILLED_CI_AND_REVIEW_TOOLS_MUST_REFILL_BEFORE_DRC",
+                    "native_connectivity_baseline_to_candidate": [718, 464],
+                    "new_comparative_drc_error_counts": {},
+                },
+                "status":
+                "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES",
+                "signal_and_power_routing_continuation_authorized": True,
+                "routing_complete": False,
+                "return_path_review_complete": False,
+                "si_review_complete": False,
+                "pi_review_complete": False,
+                "review_b_complete": False,
+                "cam_or_manufacturing_release": False,
+            }, "ground-domain application binding or release boundary drift")
+
     return {
         "schema_version": "dioneya.pcb-main-ground-domain-routing-candidate-audit.v1",
         "proposal_id": "PCB-MAIN-GROUND-DOMAIN-ROUTING-001",
-        "status": "PASS_ACCEPTED_SUBGATE_NOT_APPLIED",
+        "status": "PASS_ACCEPTED_SUBGATE_APPLIED",
         "base_board_sha256": BASE_SHA256,
         "candidate_board_sha256": CANDIDATE_SHA256,
+        "active_board_sha256": CANDIDATE_SHA256,
         "track_segments": sum(segments.values()),
         "track_length_mm": round(sum(lengths.values()), 12),
         "vias": sum(vias.values()),
@@ -681,7 +737,7 @@ def main() -> int:
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
-    print("PCB-MAIN ground-domain routing candidate audit: PASS_ACCEPTED_SUBGATE_NOT_APPLIED")
+    print("PCB-MAIN ground-domain routing candidate audit: PASS_ACCEPTED_SUBGATE_APPLIED")
     print("segments=319 vias=254 copper_zones=3 mounting_rule_areas=4")
     print("exclusive_zone_hits=0 ble_keepout_hits=0 mounting_keepout_hits=0 edge_hits=0")
     if args.kicad_connectivity:

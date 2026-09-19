@@ -20,7 +20,16 @@ from kiutils.board import Board
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+NATIVE_BOARD_BINDING = "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+ACTIVE_BOARD = ROOT / NATIVE_BOARD_BINDING
+BOARD = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001"
+    / "PCB-MAIN_GROUND_DOMAIN_BASE_REV_A.kicad_pcb"
+)
+GROUND_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPLICATION_REV_A.json"
+)
 PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
 U2_FOOTPRINT = (
     ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/"
@@ -157,7 +166,9 @@ QUESTION_TOKENS = {
 }
 
 CONTROLLED_SOURCES = [
+    ACTIVE_BOARD,
     BOARD,
+    GROUND_APPLICATION,
     PLACEMENT,
     U2_FOOTPRINT,
     DRT_FOOTPRINT,
@@ -259,7 +270,7 @@ def validate_source_binding(contract: dict[str, Any]) -> None:
     for item in AUTHORITY_INPUTS:
         require((ROOT / item).is_file(), f"authority input is missing: {item}")
     require(contract.get("source_binding") == {
-        "native_board": relative(BOARD),
+        "native_board": NATIVE_BOARD_BINDING,
         "native_board_sha256": sha256(BOARD),
         "placement_manifest": relative(PLACEMENT),
         "placement_manifest_sha256": sha256(PLACEMENT),
@@ -276,6 +287,15 @@ def validate_source_binding(contract: dict[str, Any]) -> None:
         "footprint_review_register": relative(FOOTPRINT_REVIEW),
         "footprint_review_register_sha256": sha256(FOOTPRINT_REVIEW),
     }, "assembler request source-hash binding mismatch")
+    application = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
+    require(application.get("historical_baseline") == {
+                "board": relative(BOARD),
+                "board_sha256": sha256(BOARD),
+                "track_segments": 0,
+                "vias": 0,
+                "copper_zones": 0,
+            } and application.get("applied", {}).get("board") == NATIVE_BOARD_BINDING,
+            "historical request baseline is not preserved by the ground-domain application")
 
 
 def validate_board_geometry(contract: dict[str, Any]) -> dict[str, Any]:
@@ -439,7 +459,8 @@ def validate_board_geometry(contract: dict[str, Any]) -> dict[str, Any]:
             "U9 external process gate advanced internally")
 
     return {
-        "path": relative(BOARD),
+        "path": NATIVE_BOARD_BINDING,
+        "historical_archive_path": relative(BOARD),
         "sha256": sha256(BOARD),
         "trace_items": len(board.traceItems),
         "copper_zones": len(board.zones),

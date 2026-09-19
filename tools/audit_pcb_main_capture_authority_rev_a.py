@@ -1697,6 +1697,8 @@ def main() -> None:
                     "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
                     "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
                 },
                 "Review B must be open but incomplete after Review A PASS")
     else:
@@ -1728,6 +1730,8 @@ def main() -> None:
                 "OPEN_PLACEMENT_CANDIDATE_ROUTING_AND_EVIDENCE_PENDING",
                 "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
                 "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
         }:
             required_layout_evidence = {
                 "native_layout_candidate", "layout_generator", "layout_independent_audit",
@@ -1746,11 +1750,21 @@ def main() -> None:
                 "rf_routeability_eco_003_review_commit_mapping",
                 "rf_routeability_eco_003_application",
                 "rf_routeability_eco_003_audit",
+                "ground_domain_routing_candidate",
+                "ground_domain_routing_candidate_record",
+                "ground_domain_routing_approval",
+                "ground_domain_routing_approval_record",
+                "ground_domain_routing_review_commit_mapping",
+                "ground_domain_routing_application",
+                "ground_domain_routing_audit",
+                "ground_domain_routing_status",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
             if review_b["status"] in {
                     "OPEN_PLACEMENT_CLEARANCE_PASS_ROUTING_AND_EVIDENCE_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
             }:
                 required_layout_evidence |= {
                     "placement_repack_manifest", "placement_repack_generator",
@@ -1765,8 +1779,13 @@ def main() -> None:
             require(review_b["evidence"].get("rf_routeability_eco_003_status") ==
                     "APPROVED_APPLIED_PLACEMENT_ONLY_ROUTING_ENGINEERING_CONTINUES",
                     "PCB-MAIN RF routeability ECO-003 status drift")
+            require(review_b["evidence"].get("ground_domain_routing_status") ==
+                    "APPROVED_APPLIED_BOUNDED_GROUND_DOMAIN_SUBGATE_"
+                    "REMAINING_ROUTING_ENGINEERING_CONTINUES",
+                    "PCB-MAIN ground-domain routing status drift")
             for evidence_name in required_layout_evidence - {
                     "ra_003_status", "placement_repack_status",
+                    "ground_domain_routing_status",
             }:
                 evidence_path = ROOT / review_b["evidence"][evidence_name]
                 require(evidence_path.is_file() and evidence_path.stat().st_size > 0,
@@ -2008,6 +2027,28 @@ def main() -> None:
                         "cam_or_manufacturing_release"
                     ) is False,
                     "PCB-MAIN STTS22H footprint ECO-004 application interlock drift")
+            ground_domain_application = json.loads(
+                (ROOT / review_b["evidence"]["ground_domain_routing_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(ground_domain_application.get("proposal_id") ==
+                    "PCB-MAIN-GROUND-DOMAIN-ROUTING-001" and
+                    ground_domain_application.get("decision") ==
+                    "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE" and
+                    ground_domain_application.get("status") ==
+                    "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
+                    ground_domain_application.get(
+                        "signal_and_power_routing_continuation_authorized"
+                    ) is True and
+                    ground_domain_application.get("routing_complete") is False and
+                    ground_domain_application.get("return_path_review_complete") is False and
+                    ground_domain_application.get("si_review_complete") is False and
+                    ground_domain_application.get("pi_review_complete") is False and
+                    ground_domain_application.get("review_b_complete") is False and
+                    ground_domain_application.get(
+                        "cam_or_manufacturing_release"
+                    ) is False,
+                    "PCB-MAIN ground-domain application interlock drift")
             mechanical_application = None
             if mechanical_eco_status in {
                     "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
@@ -2123,10 +2164,18 @@ def main() -> None:
                             "locked_authority_mounting_conflicts": [],
                             "locked_authority_tool_conflicts": [],
                         }, "PCB-MAIN mechanical ECO historical inventory drift")
-                require(stts22h_eco_004_application.get("applied", {}).get(
+                require(ground_domain_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) == placement_control["board_sha256"] and
+                        ground_domain_application.get("applied", {}).get(
+                            "exact_candidate_byte_identity"
+                        ) is True and
+                        stts22h_eco_004_application.get("applied", {}).get(
                             "board_sha256"
                         ) ==
-                        placement_control["board_sha256"] and
+                        ground_domain_application.get("historical_baseline", {}).get(
+                            "board_sha256"
+                        ) and
                         stts22h_eco_004_application.get("applied", {}).get(
                             "changed_references"
                         ) == ["U4"] and
@@ -2148,7 +2197,7 @@ def main() -> None:
                         rf_eco_003_application.get("applied", {}).get(
                             "copper_zones"
                         ) == 0,
-                        "PCB-MAIN repack differs from the accepted ECO-003 evidence")
+                        "PCB-MAIN active ground subgate or historical repack/ECO evidence differs")
     elif native_present:
         require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
                 "human Review A identity/date/SHA claimed before sign-off")

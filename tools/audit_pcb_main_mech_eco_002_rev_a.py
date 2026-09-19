@@ -36,6 +36,7 @@ BOARD_SHA256 = "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e
 PLACEMENT_SHA256 = "dbc433cb36b0bec612f55dbb96e6dce34d502728e488810c115207ffbbebc1d1"
 ECO003_BOARD_SHA256 = "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684"
 CURRENT_BOARD_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
+ACTIVE_BOARD_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
 CURRENT_PLACEMENT_SHA256 = "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4"
 REVIEWED_LOCAL_COMMIT = "16ee36b9432508b539736a8ee78890ad99ce0788"
 REVIEWED_GITHUB_COMMIT = "b3ab796bcdee727798a121d114605e7ba84d683a"
@@ -143,7 +144,7 @@ def audit() -> dict[str, Any]:
             eco004.get("cam_or_manufacturing_release") is False and
             eco004.get("applied", {}).get("board_sha256") == CURRENT_BOARD_SHA256 and
             eco004.get("applied", {}).get("changed_references") == ["U4"] and
-            sha256(BOARD) == CURRENT_BOARD_SHA256 and
+            sha256(BOARD) == ACTIVE_BOARD_SHA256 and
             sha256(PLACEMENT) == CURRENT_PLACEMENT_SHA256,
             "PCB-MAIN post-ECO-003 footprint lineage drift")
 
@@ -260,9 +261,9 @@ def audit() -> dict[str, Any]:
             j6.properties.get("DIONEA_MECHANICAL_ANCHOR") ==
             "21.000,2.500,180.000",
             "J6 ECO-002 anchor or footprint datum drift")
-    require(len(getattr(board, "traceItems", [])) == 0 and
-            len(getattr(board, "zones", [])) == 0,
-            "PCB-MAIN ECO-002 evidence unexpectedly contains routing or zones")
+    require(len(getattr(board, "traceItems", [])) == 573 and
+            len(getattr(board, "zones", [])) == 7,
+            "PCB-MAIN post-ground-subgate routing inventory drift")
 
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     evidence = status["review_b"]["evidence"]
@@ -270,7 +271,7 @@ def audit() -> dict[str, Any]:
     require(evidence.get("mechanical_eco_002_status") ==
             "APPROVED_APPLIED_PLACEMENT_REPACK_PASS" and
             control.get("state") == "PASS" and
-            control.get("board_sha256") == CURRENT_BOARD_SHA256 and
+            control.get("board_sha256") == ACTIVE_BOARD_SHA256 and
             control.get("authority_sha256") == AUTHORITY_SHA256 and
             status["review_b"].get("complete") is False and
             status.get("manufacturing_release") is False,
@@ -287,7 +288,7 @@ def audit() -> dict[str, Any]:
         "authority_sha256": AUTHORITY_SHA256,
         "historical_board_sha256": BOARD_SHA256,
         "historical_placement_repack_sha256": PLACEMENT_SHA256,
-        "current_board_sha256": CURRENT_BOARD_SHA256,
+        "current_board_sha256": ACTIVE_BOARD_SHA256,
         "current_placement_repack_sha256": CURRENT_PLACEMENT_SHA256,
         "routing_authorized": False,
         "review_b_complete": False,
