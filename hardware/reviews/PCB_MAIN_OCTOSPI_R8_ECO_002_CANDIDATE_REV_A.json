@@ -6,7 +6,7 @@
   "base_board": "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb",
   "base_board_sha256": "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3",
   "candidate_board": "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb",
-  "candidate_board_sha256": "946b52f40fac863e80ba476374707821f330c0d5c31c1b487cbc6a5d20cb7b43",
+  "candidate_board_sha256": "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f",
   "supersedes_rejected_candidate": "PCB-MAIN-OCTOSPI-ROUTING-001",
   "scope": {
     "functional_block": "OCTOSPI_NOR_STORAGE_ONLY",
@@ -22,9 +22,9 @@
       "NOR_IO1_U1", "NOR_IO1_U2", "NOR_IO2_U1", "NOR_IO2_U2",
       "NOR_IO3_U1", "NOR_IO3_U2", "NOR_NCS_U2"
     ],
-    "added_segments": 140,
+    "added_segments": 132,
     "added_vias": 22,
-    "added_track_length_mm": 290.374522443,
+    "added_track_length_mm": 286.379725677,
     "unfilled_native_connectivity": {
       "base_unconnected": 707,
       "candidate_unconnected": 697,
@@ -41,7 +41,7 @@
     "routing_guard_mm": 0.25,
     "preserve_existing": true,
     "negotiated_routing": true,
-    "ripups": 1,
+    "ripups": 0,
     "failed_connections": []
   },
   "status": "PROPOSAL_LOCAL_STRUCTURAL_AND_CONNECTIVITY_PASS_PENDING_KICAD9_COMPARATIVE_DRC_AND_HUMAN_REVIEW",

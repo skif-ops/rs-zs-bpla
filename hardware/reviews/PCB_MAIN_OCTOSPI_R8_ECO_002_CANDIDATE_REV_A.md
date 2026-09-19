@@ -11,14 +11,14 @@ routes the same eleven OctoSPI nets. Every accepted track and via is preserved.
 | Control | Value |
 |---|---:|
 | Reviewed base SHA-256 | `7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3` |
-| Candidate SHA-256 | `946b52f40fac863e80ba476374707821f330c0d5c31c1b487cbc6a5d20cb7b43` |
+| Candidate SHA-256 | `04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f` |
 | R8 displacement | `(-0.5, -3.5) mm` |
 | Other footprints changed | `0` |
-| Added segments / vias | `140 / 22` |
-| Added track length | `290.374522443 mm` |
+| Added segments / vias | `132 / 22` |
+| Added track length | `286.379725677 mm` |
 | Native unconnected count | `707 -> 697` |
 | Existing copper removed or modified | `0` |
-| Rip-ups / failed connections | `1 / 0` |
+| Rip-ups / failed connections | `0 / 0` |
 | Board clearance / routing guard | `0.20 / 0.25 mm` |
 
 Human acceptance, commit-bound KiCad 9 comparative DRC, SI/return-path review,

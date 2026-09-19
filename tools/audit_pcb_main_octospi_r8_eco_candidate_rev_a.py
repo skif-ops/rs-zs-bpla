@@ -18,14 +18,14 @@ CANDIDATE = ROOT / "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MA
 PROPOSAL = ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_CANDIDATE_REV_A.json"
 ROUTER = ROOT / "tools/route_pcb_release_candidate_rev_a.py"
 BASE_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
-CANDIDATE_SHA256 = "946b52f40fac863e80ba476374707821f330c0d5c31c1b487cbc6a5d20cb7b43"
+CANDIDATE_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 ROUTER_SHA256 = "d685e0a89b86c413d20be02a1498196415d84970e1541e0729805e39caa115ed"
 EXPECTED = {
-    "NOR_CLK_U1": (8, 2), "NOR_CLK_U2": (17, 2),
-    "NOR_IO0_U1": (10, 2), "NOR_IO0_U2": (14, 2),
-    "NOR_IO1_U1": (20, 2), "NOR_IO1_U2": (8, 3),
-    "NOR_IO2_U1": (4, 2), "NOR_IO2_U2": (12, 2),
-    "NOR_IO3_U1": (17, 2), "NOR_IO3_U2": (9, 3),
+    "NOR_CLK_U1": (6, 2), "NOR_CLK_U2": (17, 2),
+    "NOR_IO0_U1": (4, 2), "NOR_IO0_U2": (9, 2),
+    "NOR_IO1_U1": (20, 2), "NOR_IO1_U2": (10, 3),
+    "NOR_IO2_U1": (4, 2), "NOR_IO2_U2": (16, 2),
+    "NOR_IO3_U1": (16, 2), "NOR_IO3_U2": (9, 3),
     "NOR_NCS_U2": (21, 0),
 }
 
@@ -138,9 +138,9 @@ def static_audit() -> dict[str, object]:
                     f"{name}: via geometry drift")
     require({name: (segments[name], vias[name]) for name in EXPECTED} == EXPECTED,
             "per-net OctoSPI copper inventory drift")
-    require(sum(segments.values()) == 140 and sum(vias.values()) == 22,
+    require(sum(segments.values()) == 132 and sum(vias.values()) == 22,
             "total OctoSPI copper inventory drift")
-    require(abs(length - 290.374522443) < 1e-6, "OctoSPI track length drift")
+    require(abs(length - 286.379725677) < 1e-6, "OctoSPI track length drift")
     proposal = json.loads(PROPOSAL.read_text(encoding="utf-8"))
     require(proposal.get("candidate_board_sha256") == CANDIDATE_SHA256 and
             proposal.get("applied_to_authoritative_board") is False and
@@ -154,7 +154,7 @@ def static_audit() -> dict[str, object]:
         "candidate_sha256": CANDIDATE_SHA256,
         "routed_nets": sorted(EXPECTED),
         "r8_position_mm": [54.5, 16.0],
-        "added_segments": 140,
+        "added_segments": 132,
         "added_vias": 22,
         "added_track_length_mm": length,
         "applied_to_authoritative_board": False,
@@ -184,7 +184,7 @@ def main() -> int:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     print("PCB-MAIN OctoSPI R8 ECO candidate audit: PASS")
-    print(f"r8_position_mm=54.5,16.0 added_segments=140 added_vias=22 routed_nets={len(EXPECTED)}")
+    print(f"r8_position_mm=54.5,16.0 added_segments=132 added_vias=22 routed_nets={len(EXPECTED)}")
     print("release_boundary=PENDING_HUMAN_REVIEW_AND_REVIEW_B")
     return 0
 
