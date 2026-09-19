@@ -1,0 +1,126 @@
+{
+  "schema_version": "dioneya.pcb-main-rf-routeability-eco-candidate.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-RF-ROUTEABILITY-ECO-003",
+  "status": "READY_FOR_MACHINE_GATE_AND_INDEPENDENT_HUMAN_REVIEW",
+  "scope": "BOUNDED_UNLOCKED_GNSS_PLACEMENT_AND_SEVEN_RF_NET_ENGINEERING_ROUTE_CANDIDATE",
+  "date_utc": "2026-09-19",
+  "baseline": {
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e",
+    "footprints": 251,
+    "named_nets": 186,
+    "tracks": 0,
+    "zones": 0
+  },
+  "routing_basis": {
+    "authority": "hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json",
+    "stackup_id": "JLC06161H-3313",
+    "structure": "50_OHM_SINGLE_ENDED_NON_COPLANAR_L1_OVER_L2",
+    "signal_layer": "F.Cu",
+    "reference_layer": "In1.Cu",
+    "trace_width_mm": 0.1509,
+    "signal_vias": 0,
+    "final_job_specific_fabricator_acceptance_pending": true
+  },
+  "bounded_placement_delta": [
+    {
+      "refdes": "FL1",
+      "placement_class": "UNLOCKED_LAYOUT_CANDIDATE",
+      "from": {"x_mm": 61.0, "y_mm": 69.5, "rotation_deg": 0.0},
+      "to": {"x_mm": 60.5, "y_mm": 68.0, "rotation_deg": 0.0}
+    },
+    {
+      "refdes": "D4",
+      "placement_class": "UNLOCKED_LAYOUT_CANDIDATE",
+      "from": {"x_mm": 61.0, "y_mm": 68.0, "rotation_deg": 0.0},
+      "to": {"x_mm": 58.25, "y_mm": 70.0, "rotation_deg": 90.0}
+    },
+    {
+      "refdes": "L2",
+      "placement_class": "UNLOCKED_LAYOUT_CANDIDATE",
+      "from": {"x_mm": 59.25, "y_mm": 69.5, "rotation_deg": 0.0},
+      "to": {"x_mm": 59.75, "y_mm": 70.25, "rotation_deg": 90.0}
+    }
+  ],
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-MAIN-RF-ECO-003/PCB-MAIN_RF_ECO_003.kicad_pcb",
+    "board_sha256": "3561f334476259f4e2aa6143a49dcc945da7eb1a292400449b60d204ac421c5d",
+    "footprints": 251,
+    "named_nets": 186,
+    "track_segments": 89,
+    "track_length_mm": 103.481866172679,
+    "vias": 0,
+    "zones": 0,
+    "all_tracks_on_f_cu": true,
+    "all_track_widths_mm": [0.1509],
+    "routed_nets": [
+      {"net": "CELL_RF", "segments": 15, "length_mm": 31.713834471939},
+      {"net": "CELL_RF_ANT", "segments": 23, "length_mm": 17.631727983645},
+      {"net": "GNSS_RF_ANT_BIASED", "segments": 13, "length_mm": 10.34099025767},
+      {"net": "GNSS_RF_DC_BLOCK", "segments": 1, "length_mm": 1.0},
+      {"net": "GNSS_RF_FILTERED", "segments": 12, "length_mm": 18.644291116569},
+      {"net": "LORA_RF_ANT", "segments": 15, "length_mm": 13.088836886152},
+      {"net": "LORA_RF_MODULE", "segments": 10, "length_mm": 11.062185456703}
+    ]
+  },
+  "preliminary_validation": {
+    "strict_2d_placement_clearance": {
+      "tool": "tools/audit_pcb_main_placement_clearance_rev_a.py",
+      "result": "PASS",
+      "assembly_envelopes": 227,
+      "component_conflicts": 0,
+      "mounting_conflicts": 0,
+      "tool_conflicts": 0
+    },
+    "native_connectivity": {
+      "toolchain": "KiCad 7.0.11 pcbnew",
+      "baseline_unconnected_count": 718,
+      "candidate_unconnected_count": 703,
+      "actual_reduction": 15,
+      "expected_reduction_for_seven_rf_nets": 15,
+      "result": "PASS"
+    },
+    "comparative_drc": {
+      "toolchain": "KiCad 7.0.11",
+      "baseline_drc_violations": 440,
+      "candidate_drc_violations": 440,
+      "baseline_error_counts": {
+        "clearance": 6,
+        "solder_mask_bridge": 6
+      },
+      "candidate_error_counts": {
+        "clearance": 6,
+        "solder_mask_bridge": 6
+      },
+      "new_error_count": 0,
+      "result": "PASS_NO_NEW_ERROR"
+    },
+    "kicad_9_ci_comparative_drc": "PENDING_ON_PROPOSAL_COMMIT"
+  },
+  "review_request": {
+    "requested_decision": "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO_OR_REJECT",
+    "accept_value": "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO",
+    "reject_value": "REJECT_RF_ROUTEABILITY_ECO",
+    "acceptance_authorizes": [
+      "Apply only the FL1/D4/L2 placement delta to controlled placement sources.",
+      "Continue RF routing engineering from this candidate geometry."
+    ],
+    "acceptance_does_not_authorize": [
+      "Treat the candidate copper as final production routing.",
+      "Complete Review B.",
+      "Generate release CAM or manufacture PCB-MAIN."
+    ]
+  },
+  "decision_boundary": {
+    "proposal_only": true,
+    "applied_to_authoritative_board": false,
+    "placement_authority_changed": false,
+    "routing_authority_changed": false,
+    "routing_complete": false,
+    "return_path_review_complete": false,
+    "si_review_complete": false,
+    "review_b_complete": false,
+    "manufacturing_release": false
+  }
+}
