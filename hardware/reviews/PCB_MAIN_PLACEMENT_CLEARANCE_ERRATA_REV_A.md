@@ -134,6 +134,12 @@ the separate signature and application records are
 `PCB_MAIN_MECH_ECO_002_APPLICATION.json`. This remains a 2D mechanical subgate,
 not routing, Review B or fabrication authorization.
 
+Reviewer `Скиф` accepted `PCB-MAIN-RF-ROUTEABILITY-ECO-003` on 2026-09-19
+with decision `ACCEPT_LIMITED_RF_ROUTEABILITY_ECO`. Only FL1, D4 and L2 were
+moved in the controlled placement source. The 89-segment RF feasibility route
+was not copied to the authoritative board, which remains at zero tracks, zero
+vias and zero copper zones.
+
 ## Controlled post-repack result
 
 `hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv` fixes all 225 movable top-side
@@ -157,15 +163,16 @@ including 169 fitted and 15 DNP footprints.
 
 Controlled hashes:
 
-- native PCB SHA-256: `e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e`
-- placement manifest SHA-256: `dbc433cb36b0bec612f55dbb96e6dce34d502728e488810c115207ffbbebc1d1`
+- native PCB SHA-256: `dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684`
+- placement manifest SHA-256: `34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4`
 - MAIN-AUTH-011 CSV SHA-256: `8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9`
 
-The three independent controls now pass on the same source state:
+The four independent controls now pass on the same source state:
 
 1. `python tools/audit_pcb_main_layout_candidate_rev_a.py`
 2. `python tools/audit_pcb_main_placement_clearance_rev_a.py --strict`
 3. `python tools/audit_pcb_main_mech_eco_002_rev_a.py`
+4. `python tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py`
 
 ## Remaining release boundary
 

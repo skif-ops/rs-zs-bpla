@@ -1,0 +1,70 @@
+{
+  "schema_version": "dioneya.pcb-main-rf-routeability-eco-003-application.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-RF-ROUTEABILITY-ECO-003",
+  "approval": "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPROVAL.json",
+  "application_date": "2026-09-19",
+  "reviewed_proposal_commit_sha": "23d4195c15a380f4e12337094be0d09d022be065",
+  "approval_commit_sha": "ac7439dce989915f4a56a52168ef426d8cfc9700",
+  "reviewed_proposal_sha256": "81c71958796e816fd28360562c1034a96c67d1c314bc645210ebc249065dc831",
+  "reviewed_candidate_board_sha256": "3561f334476259f4e2aa6143a49dcc945da7eb1a292400449b60d204ac421c5d",
+  "decision": "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO",
+  "scope": "FL1_D4_L2_PLACEMENT_DELTA_AND_RF_ROUTING_ENGINEERING_CONTINUATION_ONLY",
+  "applied": {
+    "placement_repack": "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
+    "placement_repack_sha256": "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4",
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684",
+    "mechanical_authority": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
+    "mechanical_authority_sha256": "8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9",
+    "changed_references": ["D4", "FL1", "L2"],
+    "placement_delta": {
+      "FL1": {
+        "from": [61.0, 69.5, 0.0],
+        "to": [60.5, 68.0, 0.0]
+      },
+      "D4": {
+        "from": [61.0, 68.0, 0.0],
+        "to": [58.25, 70.0, 90.0]
+      },
+      "L2": {
+        "from": [59.25, 69.5, 0.0],
+        "to": [59.75, 70.25, 90.0]
+      }
+    },
+    "track_segments": 0,
+    "vias": 0,
+    "copper_zones": 0
+  },
+  "reviewed_candidate_copper": {
+    "purpose": "ROUTEABILITY_EVIDENCE_ONLY",
+    "routed_nets": 7,
+    "track_segments": 89,
+    "copied_to_authoritative_board": false,
+    "final_authorized": false
+  },
+  "post_application_clearance": {
+    "state": "PASS",
+    "assembly_footprints": 227,
+    "courtyard_footprints": 227,
+    "pad_screening_footprints": 0,
+    "confirmed_component_collisions": 0,
+    "screening_component_collisions": 0,
+    "confirmed_mounting_clearance_conflicts": 0,
+    "screening_mounting_clearance_conflicts": 0,
+    "confirmed_tool_clearance_conflicts": 0,
+    "screening_tool_clearance_conflicts": 0,
+    "locked_authority_component_conflicts": [],
+    "locked_authority_mounting_conflicts": [],
+    "locked_authority_tool_conflicts": []
+  },
+  "status": "APPLIED_PLACEMENT_ONLY_STRICT_2D_CLEARANCE_PASS_ROUTING_ENGINEERING_CONTINUES",
+  "placement_implementation_authorized": true,
+  "routing_engineering_continuation_authorized": true,
+  "candidate_copper_final_authorized": false,
+  "routing_complete": false,
+  "return_path_review_complete": false,
+  "si_review_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

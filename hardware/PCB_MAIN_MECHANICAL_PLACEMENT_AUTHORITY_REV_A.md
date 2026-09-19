@@ -52,6 +52,23 @@ ECO-002 closes only the bounded J6/J_PWR/H1 2D geometry conflict. It does not
 authorize routing, CAM, fabrication, assembly, Review B or manufacturing
 release. The generated board is still an unrouted engineering candidate.
 
+## Accepted limited RF routeability ECO-003
+
+`PCB-MAIN-RF-ROUTEABILITY-ECO-003` was accepted by reviewer `Скиф` on
+`19.09.2026` with decision `ACCEPT_LIMITED_RF_ROUTEABILITY_ECO`. The reviewed
+proposal is bound to GitHub commit
+`23d4195c15a380f4e12337094be0d09d022be065`, proposal SHA-256
+`81c71958796e816fd28360562c1034a96c67d1c314bc645210ebc249065dc831`
+and candidate-board SHA-256
+`3561f334476259f4e2aa6143a49dcc945da7eb1a292400449b60d204ac421c5d`.
+
+The applied delta moves only three unlocked GNSS references: FL1 to
+`(60.50,68.00,0°)`, D4 to `(58.25,70.00,90°)` and L2 to
+`(59.75,70.25,90°)`. MAIN-AUTH-011 remains unchanged. The authoritative board
+remains unrouted; the reviewed 89-segment RF route is feasibility evidence and
+was not copied into it. Routing engineering may continue, but return-path/SI
+review, complete routing, Review B and manufacturing release remain open.
+
 The authority contains 70 records: one board outline, one assembled-envelope allocation, four mounting holes, thirteen connector placements, four RF-module anchors, four exclusive RF zones, one audio/digital quiet zone, seven keepouts/cable corridors, one bottom fixture window, three fixture fiducials, and 31 individual pogo pads. Every record uses the PCB coordinate system defined below and is independently checked by `tools/verify_pcb_main_mechanical_placement_authority_rev_a.py`.
 
 ## Primary evidence and upstream constraints

@@ -1739,6 +1739,13 @@ def main() -> None:
                 "mechanical_eco_002_approval_record",
                 "mechanical_eco_002_review_commit_mapping",
                 "mechanical_eco_002_application", "mechanical_eco_002_audit",
+                "rf_routeability_eco_003_candidate",
+                "rf_routeability_eco_003_candidate_record",
+                "rf_routeability_eco_003_approval",
+                "rf_routeability_eco_003_approval_record",
+                "rf_routeability_eco_003_review_commit_mapping",
+                "rf_routeability_eco_003_application",
+                "rf_routeability_eco_003_audit",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
             if review_b["status"] in {
@@ -1755,6 +1762,9 @@ def main() -> None:
                         "PCB-MAIN placement-repack release boundary drift")
             require(required_layout_evidence <= set(review_b["evidence"]),
                     "placement-candidate Review B evidence schema incomplete")
+            require(review_b["evidence"].get("rf_routeability_eco_003_status") ==
+                    "APPROVED_APPLIED_PLACEMENT_ONLY_ROUTING_ENGINEERING_CONTINUES",
+                    "PCB-MAIN RF routeability ECO-003 status drift")
             for evidence_name in required_layout_evidence - {
                     "ra_003_status", "placement_repack_status",
             }:
@@ -1884,6 +1894,54 @@ def main() -> None:
                     eco_002_application.get("review_b_complete") is False and
                     eco_002_application.get("manufacturing_release") is False,
                     "PCB-MAIN mechanical ECO-002 application interlock drift")
+            rf_eco_003_approval = json.loads(
+                (ROOT / review_b["evidence"]["rf_routeability_eco_003_approval"])
+                .read_text(encoding="utf-8")
+            )
+            require(rf_eco_003_approval.get("proposal_id") ==
+                    "PCB-MAIN-RF-ROUTEABILITY-ECO-003" and
+                    rf_eco_003_approval.get("reviewer") == "Скиф" and
+                    rf_eco_003_approval.get("date") == "2026-09-19" and
+                    rf_eco_003_approval.get("decision") ==
+                    "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO" and
+                    rf_eco_003_approval.get("placement_implementation_authorized") is True and
+                    rf_eco_003_approval.get("routing_engineering_continuation_authorized") is True and
+                    rf_eco_003_approval.get("candidate_copper_final_authorized") is False and
+                    rf_eco_003_approval.get("routing_complete") is False and
+                    rf_eco_003_approval.get("review_b_complete") is False and
+                    rf_eco_003_approval.get("manufacturing_release") is False,
+                    "PCB-MAIN RF routeability ECO-003 approval interlock drift")
+            rf_eco_003_mapping = json.loads(
+                (ROOT / review_b["evidence"]["rf_routeability_eco_003_review_commit_mapping"])
+                .read_text(encoding="utf-8")
+            )
+            require(rf_eco_003_mapping.get("github_equivalent_commit_sha") ==
+                    "23d4195c15a380f4e12337094be0d09d022be065" and
+                    rf_eco_003_mapping.get("reviewed_tree_sha") ==
+                    "82467c29399fddec21458e169ed00c6d02a1e856" and
+                    rf_eco_003_mapping.get("equivalence") ==
+                    "EXACT_TREE_AND_REVIEWED_BLOBS" and
+                    rf_eco_003_mapping.get("candidate_copper_final_authorized") is False and
+                    rf_eco_003_mapping.get("review_b_complete") is False and
+                    rf_eco_003_mapping.get("manufacturing_release") is False,
+                    "PCB-MAIN RF routeability ECO-003 review mapping drift")
+            rf_eco_003_application = json.loads(
+                (ROOT / review_b["evidence"]["rf_routeability_eco_003_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(rf_eco_003_application.get("proposal_id") ==
+                    "PCB-MAIN-RF-ROUTEABILITY-ECO-003" and
+                    rf_eco_003_application.get("decision") ==
+                    "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO" and
+                    rf_eco_003_application.get("status") ==
+                    "APPLIED_PLACEMENT_ONLY_STRICT_2D_CLEARANCE_PASS_ROUTING_ENGINEERING_CONTINUES" and
+                    rf_eco_003_application.get("placement_implementation_authorized") is True and
+                    rf_eco_003_application.get("routing_engineering_continuation_authorized") is True and
+                    rf_eco_003_application.get("candidate_copper_final_authorized") is False and
+                    rf_eco_003_application.get("routing_complete") is False and
+                    rf_eco_003_application.get("review_b_complete") is False and
+                    rf_eco_003_application.get("manufacturing_release") is False,
+                    "PCB-MAIN RF routeability ECO-003 application interlock drift")
             mechanical_application = None
             if mechanical_eco_status in {
                     "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
@@ -1999,11 +2057,21 @@ def main() -> None:
                             "locked_authority_mounting_conflicts": [],
                             "locked_authority_tool_conflicts": [],
                         }, "PCB-MAIN mechanical ECO historical inventory drift")
-                require(eco_002_application.get("applied", {}).get("board_sha256") ==
+                require(rf_eco_003_application.get("applied", {}).get("board_sha256") ==
                         placement_control["board_sha256"] and
-                        eco_002_application.get("applied", {}).get("authority_sha256") ==
-                        placement_control["authority_sha256"],
-                        "PCB-MAIN repack differs from the accepted ECO-002 evidence")
+                        rf_eco_003_application.get("applied", {}).get(
+                            "mechanical_authority_sha256"
+                        ) == placement_control["authority_sha256"] and
+                        rf_eco_003_application.get("applied", {}).get(
+                            "changed_references"
+                        ) == ["D4", "FL1", "L2"] and
+                        rf_eco_003_application.get("applied", {}).get(
+                            "track_segments"
+                        ) == 0 and
+                        rf_eco_003_application.get("applied", {}).get(
+                            "copper_zones"
+                        ) == 0,
+                        "PCB-MAIN repack differs from the accepted ECO-003 evidence")
     elif native_present:
         require(review_a["reviewer"] is None and review_a["date"] is None and review_a["commit_sha"] is None,
                 "human Review A identity/date/SHA claimed before sign-off")

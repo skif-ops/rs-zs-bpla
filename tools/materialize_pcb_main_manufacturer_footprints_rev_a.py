@@ -27,8 +27,10 @@ from kiutils.footprint import Footprint
 ROOT = Path(__file__).resolve().parents[1]
 PCB = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 LIB = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
-ECO_002_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPLICATION.json"
-ECO_002_APPROVED_BOARD_SHA256 = "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e"
+ECO_003_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPLICATION.json"
+)
+ECO_003_APPROVED_BOARD_SHA256 = "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
@@ -415,23 +417,27 @@ def canonical(value: Any, field: str = "") -> Any:
     return repr(value)
 
 
-def verify_eco_002_frozen_materialization(candidate: Path) -> None:
+def verify_eco_003_frozen_materialization(candidate: Path) -> None:
     """Validate the exact signed board and all controlled footprint semantics."""
-    if not ECO_002_APPLICATION.is_file():
-        raise RuntimeError("PCB-MAIN ECO-002 application evidence is missing")
-    application = json.loads(ECO_002_APPLICATION.read_text(encoding="utf-8"))
+    if not ECO_003_APPLICATION.is_file():
+        raise RuntimeError("PCB-MAIN ECO-003 application evidence is missing")
+    application = json.loads(ECO_003_APPLICATION.read_text(encoding="utf-8"))
     applied = application.get("applied", {})
     actual_board_sha256 = sha256(PCB)
     if not (
-        application.get("proposal_id") == "PCB-MAIN-MECH-ECO-002"
-        and application.get("decision") == "ACCEPT_LIMITED_MECHANICAL_ECO"
-        and application.get("routing_authorized") is False
+        application.get("proposal_id") == "PCB-MAIN-RF-ROUTEABILITY-ECO-003"
+        and application.get("decision") == "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO"
+        and application.get("placement_implementation_authorized") is True
+        and application.get("candidate_copper_final_authorized") is False
+        and application.get("routing_complete") is False
         and application.get("review_b_complete") is False
         and application.get("manufacturing_release") is False
-        and applied.get("board_sha256") == ECO_002_APPROVED_BOARD_SHA256
-        and actual_board_sha256 == ECO_002_APPROVED_BOARD_SHA256
+        and applied.get("track_segments") == 0
+        and applied.get("copper_zones") == 0
+        and applied.get("board_sha256") == ECO_003_APPROVED_BOARD_SHA256
+        and actual_board_sha256 == ECO_003_APPROVED_BOARD_SHA256
     ):
-        raise RuntimeError("PCB-MAIN ECO-002 frozen-board authority mismatch")
+        raise RuntimeError("PCB-MAIN ECO-003 frozen-board authority mismatch")
 
     controlled = set(CONTROLLED) | set(IPC_CANDIDATE_CONTROLLED)
     approved_board = Board.from_file(str(PCB), encoding="utf-8")
@@ -468,7 +474,7 @@ def main() -> int:
             materialize(PCB, candidate)
             if candidate.read_bytes() != PCB.read_bytes():
                 try:
-                    verify_eco_002_frozen_materialization(candidate)
+                    verify_eco_003_frozen_materialization(candidate)
                 except RuntimeError as error:
                     raise SystemExit(
                         "PCB-MAIN controlled project-local footprints are stale: "
@@ -476,7 +482,7 @@ def main() -> int:
                     ) from error
         print(
             "PCB-MAIN controlled project-local footprint materialization: PASS "
-            "(exact ECO-002 board hash; semantic footprint match)"
+            "(exact ECO-003 board hash; semantic footprint match)"
         )
     else:
         with tempfile.TemporaryDirectory() as temp_dir:

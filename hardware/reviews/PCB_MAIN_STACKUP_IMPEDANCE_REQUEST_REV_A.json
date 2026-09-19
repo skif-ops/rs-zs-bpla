@@ -18,11 +18,11 @@
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
-    "native_board_sha256": "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e",
+    "native_board_sha256": "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684",
     "mechanical_authority": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
     "mechanical_authority_sha256": "8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9",
     "placement_manifest": "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
-    "placement_manifest_sha256": "dbc433cb36b0bec612f55dbb96e6dce34d502728e488810c115207ffbbebc1d1",
+    "placement_manifest_sha256": "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4",
     "routing_authority": "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv",
     "routing_authority_sha256": "f77948c4837448fbc6c3d0cfd6820354a0a8cab12925457bf90768704cb9e1dc"
   },

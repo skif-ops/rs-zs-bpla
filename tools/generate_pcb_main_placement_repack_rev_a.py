@@ -48,6 +48,15 @@ AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 PASSIVE_AUTHORITY = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
 PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
 ECO002_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPLICATION.json"
+ECO003_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPLICATION.json"
+)
+
+ECO003_POSES = {
+    "FL1": (60.5, 68.0, 0.0),
+    "D4": (58.25, 70.0, 90.0),
+    "L2": (59.75, 70.25, 90.0),
+}
 
 PLACEMENT_GRID_MM = 0.25
 PLANNING_GAP_MM = 0.15
@@ -721,24 +730,43 @@ def verify_materialized(board_text: str, rows: list[dict[str, str]]) -> None:
                 PASSIVE_COURTYARD_SOURCE, f"{ref}: passive courtyard source is missing")
 
 
-def verify_approved_frozen_repack(board_text: str) -> int:
-    """Verify the exact hash-bound ECO-002 placement evidence.
+def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
+    """Verify the latest exact hash-bound approved placement evidence.
 
-    ECO-002 was reviewed against a manually optimized, collision-free placement
-    manifest rather than a fresh greedy-generator result.  Once accepted, the
-    exact manifest and board hashes are the controlling evidence.  This check
-    still verifies every movable footprint position, rotation, placement tag and
-    passive courtyard; it never treats the frozen manifest as routing or Review B.
+    ECO-002 froze the manually optimized collision-free placement.  ECO-003
+    subsequently authorized only the FL1/D4/L2 pose delta.  The exact latest
+    manifest and unrouted board hashes therefore control this check; neither
+    approval turns the routeability-candidate copper into production routing.
     """
-    application = json.loads(ECO002_APPLICATION.read_text(encoding="utf-8"))
-    require(application.get("proposal_id") == "PCB-MAIN-MECH-ECO-002" and
-            application.get("decision") == "ACCEPT_LIMITED_MECHANICAL_ECO",
-            "PCB-MAIN ECO-002 application identity drift")
-    require(application.get("routing_authorized") is False and
-            application.get("review_b_complete") is False and
-            application.get("manufacturing_release") is False,
-            "PCB-MAIN ECO-002 frozen repack crosses a release boundary")
-    applied = application.get("applied", {})
+    if ECO003_APPLICATION.is_file():
+        application = json.loads(ECO003_APPLICATION.read_text(encoding="utf-8"))
+        proposal_id = "PCB-MAIN-RF-ROUTEABILITY-ECO-003"
+        require(application.get("proposal_id") == proposal_id and
+                application.get("decision") == "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO" and
+                application.get("placement_implementation_authorized") is True and
+                application.get("routing_engineering_continuation_authorized") is True and
+                application.get("candidate_copper_final_authorized") is False and
+                application.get("routing_complete") is False and
+                application.get("review_b_complete") is False and
+                application.get("manufacturing_release") is False,
+                "PCB-MAIN ECO-003 application identity or release boundary drift")
+        applied = application.get("applied", {})
+        require(applied.get("track_segments") == 0 and
+                applied.get("vias") == 0 and
+                applied.get("copper_zones") == 0 and
+                applied.get("changed_references") == ["D4", "FL1", "L2"],
+                "PCB-MAIN ECO-003 placement-only application drift")
+    else:
+        application = json.loads(ECO002_APPLICATION.read_text(encoding="utf-8"))
+        proposal_id = "PCB-MAIN-MECH-ECO-002"
+        require(application.get("proposal_id") == proposal_id and
+                application.get("decision") == "ACCEPT_LIMITED_MECHANICAL_ECO",
+                "PCB-MAIN ECO-002 application identity drift")
+        require(application.get("routing_authorized") is False and
+                application.get("review_b_complete") is False and
+                application.get("manufacturing_release") is False,
+                "PCB-MAIN ECO-002 frozen repack crosses a release boundary")
+        applied = application.get("applied", {})
     require(applied.get("placement_repack") ==
             str(PLACEMENT.relative_to(ROOT)) and
             applied.get("placement_repack_sha256") == sha256(PLACEMENT),
@@ -746,8 +774,10 @@ def verify_approved_frozen_repack(board_text: str) -> int:
     require(applied.get("board") == str(BOARD.relative_to(ROOT)) and
             applied.get("board_sha256") == sha256(BOARD),
             "PCB-MAIN approved placement board SHA-256 drift")
-    require(applied.get("authority") == str(AUTHORITY.relative_to(ROOT)) and
-            applied.get("authority_sha256") == sha256(AUTHORITY),
+    require(applied.get("mechanical_authority", applied.get("authority")) ==
+            str(AUTHORITY.relative_to(ROOT)) and
+            applied.get("mechanical_authority_sha256", applied.get("authority_sha256")) ==
+            sha256(AUTHORITY),
             "PCB-MAIN approved mechanical authority SHA-256 drift")
 
     with PLACEMENT.open(encoding="utf-8", newline="") as stream:
@@ -768,7 +798,21 @@ def verify_approved_frozen_repack(board_text: str) -> int:
                 for row in rows),
             "PCB-MAIN approved placement release boundary drift")
     verify_materialized(board_text, rows)
-    return len(rows)
+    require(len(getattr(board, "traceItems", [])) == 0 and
+            len(getattr(board, "zones", [])) == 0,
+            "PCB-MAIN approved placement board unexpectedly contains copper")
+    if proposal_id == "PCB-MAIN-RF-ROUTEABILITY-ECO-003":
+        by_ref = {row["RefDes"]: row for row in rows}
+        for ref, expected in ECO003_POSES.items():
+            actual = (
+                float(by_ref[ref]["X_mm"]),
+                float(by_ref[ref]["Y_mm"]),
+                float(by_ref[ref]["Rotation_deg"]) % 360.0,
+            )
+            require(all(abs(first - second) < 0.001
+                        for first, second in zip(actual, expected)),
+                    f"{ref}: approved ECO-003 pose drift")
+    return len(rows), proposal_id
 
 
 def main() -> int:
@@ -778,9 +822,9 @@ def main() -> int:
     args = parser.parse_args()
 
     original = BOARD.read_text(encoding="utf-8")
-    if args.check and ECO002_APPLICATION.is_file():
-        count = verify_approved_frozen_repack(original)
-        print("PCB-MAIN placement repack: PASS / approved ECO-002 hashes and board placement match")
+    if args.check and (ECO003_APPLICATION.is_file() or ECO002_APPLICATION.is_file()):
+        count, proposal_id = verify_approved_frozen_repack(original)
+        print(f"PCB-MAIN placement repack: PASS / approved {proposal_id} hashes and board placement match")
         print(f"movable_placements={count} passive_courtyard_margin_mm={PASSIVE_COURTYARD_MARGIN_MM:.2f}")
         print("status=PLACEMENT_ENGINEERING_CANDIDATE / ROUTING_AND_REVIEW_B_PENDING")
         return 0

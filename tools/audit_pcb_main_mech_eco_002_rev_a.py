@@ -27,16 +27,20 @@ AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
 STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+ECO003_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPLICATION.json"
 
 CANDIDATE_SHA256 = "5164195ebf6a9a66b6a30197abfcb314655bfe059d0aea5f3782a744069780ff"
 AUTHORITY_SHA256 = "8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9"
 BOARD_SHA256 = "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e"
 PLACEMENT_SHA256 = "dbc433cb36b0bec612f55dbb96e6dce34d502728e488810c115207ffbbebc1d1"
+CURRENT_BOARD_SHA256 = "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684"
+CURRENT_PLACEMENT_SHA256 = "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4"
 REVIEWED_LOCAL_COMMIT = "16ee36b9432508b539736a8ee78890ad99ce0788"
 REVIEWED_GITHUB_COMMIT = "b3ab796bcdee727798a121d114605e7ba84d683a"
 REVIEWED_TREE = "b5c2892d795389eb07a216139dc50f725a13e849"
 CANDIDATE_BLOB = "8706f629af1b42418f7a6d9046af6d6816b39480"
 APPROVAL_COMMIT = "228ceef4dc90e23603befaf9ae57608bc2e1190e"
+APPLICATION_COMMIT = "f8884613729faa7d796649b661797cd920042b5d"
 
 
 def require(value: bool, message: str) -> None:
@@ -107,10 +111,28 @@ def audit() -> dict[str, Any]:
             "PCB-MAIN ECO-002 candidate SHA-256 drift")
     require(sha256(AUTHORITY) == AUTHORITY_SHA256,
             "PCB-MAIN ECO-002 authority SHA-256 drift")
-    require(sha256(BOARD) == BOARD_SHA256,
-            "PCB-MAIN ECO-002 generated-board SHA-256 drift")
-    require(sha256(PLACEMENT) == PLACEMENT_SHA256,
-            "PCB-MAIN ECO-002 placement-repack SHA-256 drift")
+    historical_board = git_text(APPLICATION_COMMIT, str(BOARD.relative_to(ROOT))).encode("utf-8")
+    historical_placement = git_text(
+        APPLICATION_COMMIT, str(PLACEMENT.relative_to(ROOT))
+    ).encode("utf-8")
+    require(hashlib.sha256(historical_board).hexdigest() == BOARD_SHA256,
+            "PCB-MAIN ECO-002 historical generated-board SHA-256 drift")
+    require(hashlib.sha256(historical_placement).hexdigest() == PLACEMENT_SHA256,
+            "PCB-MAIN ECO-002 historical placement-repack SHA-256 drift")
+    require(ECO003_APPLICATION.is_file(),
+            "PCB-MAIN ECO-003 application is missing from the current placement lineage")
+    eco003 = json.loads(ECO003_APPLICATION.read_text(encoding="utf-8"))
+    require(eco003.get("proposal_id") == "PCB-MAIN-RF-ROUTEABILITY-ECO-003" and
+            eco003.get("decision") == "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO" and
+            eco003.get("candidate_copper_final_authorized") is False and
+            eco003.get("review_b_complete") is False and
+            eco003.get("manufacturing_release") is False and
+            eco003.get("applied", {}).get("board_sha256") == CURRENT_BOARD_SHA256 and
+            eco003.get("applied", {}).get("placement_repack_sha256") ==
+            CURRENT_PLACEMENT_SHA256 and
+            sha256(BOARD) == CURRENT_BOARD_SHA256 and
+            sha256(PLACEMENT) == CURRENT_PLACEMENT_SHA256,
+            "PCB-MAIN post-ECO-002 placement lineage drift")
 
     candidate = CANDIDATE.read_text(encoding="utf-8")
     require("PCB-MAIN mechanical ECO-002 candidate" in candidate and
@@ -235,7 +257,7 @@ def audit() -> dict[str, Any]:
     require(evidence.get("mechanical_eco_002_status") ==
             "APPROVED_APPLIED_PLACEMENT_REPACK_PASS" and
             control.get("state") == "PASS" and
-            control.get("board_sha256") == BOARD_SHA256 and
+            control.get("board_sha256") == CURRENT_BOARD_SHA256 and
             control.get("authority_sha256") == AUTHORITY_SHA256 and
             status["review_b"].get("complete") is False and
             status.get("manufacturing_release") is False,
@@ -250,8 +272,10 @@ def audit() -> dict[str, Any]:
         "changed_records": ["MECH-007", "MECH-012"],
         "retained_eco_001_record": "MECH-003",
         "authority_sha256": AUTHORITY_SHA256,
-        "board_sha256": BOARD_SHA256,
-        "placement_repack_sha256": PLACEMENT_SHA256,
+        "historical_board_sha256": BOARD_SHA256,
+        "historical_placement_repack_sha256": PLACEMENT_SHA256,
+        "current_board_sha256": CURRENT_BOARD_SHA256,
+        "current_placement_repack_sha256": CURRENT_PLACEMENT_SHA256,
         "routing_authorized": False,
         "review_b_complete": False,
         "manufacturing_release": False,

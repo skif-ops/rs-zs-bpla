@@ -2126,7 +2126,7 @@
 
   (footprint "Abracon_ABSES5AF_1109-5" (layer "F.Cu")
     (tstamp 2f112456-e5c8-40b9-be2d-5f187e4bc2e9)
-    (at 61 69.5)
+    (at 60.5 68)
     (descr "Abracon ABSES5AF-L100KM 1.1x0.9 mm 5-pad SAW; datasheet 2025-09-16 recommended land pattern")
     (tags "Abracon ABSES5AF SAW 1109-5 GNSS")
     (property "DIONEA_FOOTPRINT_SOURCE" "Abracon_ABSES5AF-L100KM_2025-09-16_LandPattern")
@@ -3439,7 +3439,7 @@
 
   (footprint "TI_DYA0002A_SOD523" (layer "F.Cu")
     (tstamp 60f8fe82-24ab-427f-b746-71ecba60ba97)
-    (at 61 68)
+    (at 58.25 70 90)
     (descr "TI DYA0002A 2-pin SOD-523; 4224978/B 09/2021 example board layout")
     (tags "Texas Instruments DYA0002A SOD-523 2-pin")
     (property "DIONEA_FOOTPRINT_SOURCE" "TI_DYA0002A_4224978B_2021-09_RecommendedLandPattern")
@@ -3449,11 +3449,11 @@
     (property "DIONEA_PLACEMENT_SOURCE" "PCB_MAIN_PLACEMENT_REPACK_REV_A")
     (property "DIONEA_POPULATION" "FITTED")
     (attr smd)
-    (fp_text reference "D4" (at 0 -1.2) (layer "F.SilkS")
+    (fp_text reference "D4" (at 0 -1.2 90) (layer "F.SilkS")
         (effects (font (size 0.8 0.8) (thickness 0.12)))
       (tstamp d09a7b3d-45b3-4379-bb33-d7ead4c8cd40)
     )
-    (fp_text value "TPD1E05U06DYAR" (at 0 1.2) (layer "F.Fab") hide
+    (fp_text value "TPD1E05U06DYAR" (at 0 1.2 90) (layer "F.Fab") hide
         (effects (font (size 0.8 0.8) (thickness 0.12)))
       (tstamp 452d8c86-b089-4651-b5c2-5a46aab342a3)
     )
@@ -3476,9 +3476,9 @@
       )
 
       (stroke (width 0.1) (type default)) (fill none) (layer "F.Fab") (tstamp 23ba171c-d309-45a1-9049-6190cef070a1))
-    (pad "1" smd roundrect (at -0.74 0) (size 0.67 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
+    (pad "1" smd roundrect (at -0.74 0 90) (size 0.67 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 57 "GNSS_RF_ANT_BIASED") (solder_mask_margin 0.05) (tstamp d0817762-5029-4f57-9b74-13650d55a1d0))
-    (pad "2" smd roundrect (at 0.74 0) (size 0.67 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
+    (pad "2" smd roundrect (at 0.74 0 90) (size 0.67 0.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 45 "GND_DIGITAL") (solder_mask_margin 0.05) (tstamp 117f0387-ef54-400e-a3b7-2b519a06952e))
   )
 
@@ -6520,26 +6520,26 @@
 
   (footprint "" (layer "F.Cu")
     (tstamp bc7b281b-f763-4ff6-b853-d5212ce8be13)
-    (at 59.25 69.5)
+    (at 59.75 70.25 90)
     (property "DIONEA_COURTYARD_SOURCE" "PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A")
     (property "DIONEA_COURTYARD_STATUS" "CONTROLLED_PAD_ENVELOPE_PLUS_0.25_MM")
     (property "DIONEA_PACKAGE" "0402")
     (property "DIONEA_PLACEMENT_CLASS" "UNLOCKED_LAYOUT_CANDIDATE")
     (property "DIONEA_PLACEMENT_SOURCE" "PCB_MAIN_PLACEMENT_REPACK_REV_A")
     (property "DIONEA_POPULATION" "FITTED")
-    (fp_text reference "L2" (at 0 -1.2) (layer "F.SilkS")
+    (fp_text reference "L2" (at 0 -1.2 90) (layer "F.SilkS")
         (effects (font (size 0.8 0.8) (thickness 0.12)))
       (tstamp 940b9dbe-28a0-43f4-a7f9-3276668b60b8)
     )
-    (fp_text value "LQW15AN27NJ00D" (at 0 0) (layer "F.SilkS") hide
+    (fp_text value "LQW15AN27NJ00D" (at 0 0 90) (layer "F.SilkS") hide
         (effects (font (size 1.27 1.27) (thickness 0.15)))
       (tstamp 84f732fe-5544-4a4b-affe-db7b6c4465ab)
     )
     (fp_rect (start -0.8 -0.5) (end 0.8 0.5)
       (stroke (width 0.05) (type default)) (fill none) (layer "F.CrtYd") (tstamp bbbc33b2-693e-4f86-a837-d85ea7427947))
-    (pad "1" smd roundrect (at -0.325 0) (size 0.45 0.5) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.2)
+    (pad "1" smd roundrect (at -0.325 0 90) (size 0.45 0.5) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.2)
       (net 53 "GNSS_ANT_SHORT_N") (thermal_bridge_angle 45) (tstamp 02d34589-487b-43b9-baa4-01811de4c4b9))
-    (pad "2" smd roundrect (at 0.325 0) (size 0.45 0.5) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.2)
+    (pad "2" smd roundrect (at 0.325 0 90) (size 0.45 0.5) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.2)
       (net 57 "GNSS_RF_ANT_BIASED") (thermal_bridge_angle 45) (tstamp 2c97d265-13fd-4443-8c6e-0f2821db16e9))
   )
 
