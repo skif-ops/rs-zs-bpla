@@ -44,7 +44,15 @@
     "ripups": 0,
     "failed_connections": []
   },
-  "status": "PROPOSAL_LOCAL_STRUCTURAL_AND_CONNECTIVITY_PASS_PENDING_KICAD9_COMPARATIVE_DRC_AND_HUMAN_REVIEW",
+  "kicad9_comparative_drc": {
+    "workflow_run": 35459249932,
+    "result": "PASS_NO_NEW_ERRORS",
+    "base_violations": 228,
+    "candidate_violations": 226,
+    "base_unconnected_items": 454,
+    "candidate_unconnected_items": 444
+  },
+  "status": "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW",
   "applied_to_authoritative_board": false,
   "routing_complete": false,
   "return_path_review_complete": false,

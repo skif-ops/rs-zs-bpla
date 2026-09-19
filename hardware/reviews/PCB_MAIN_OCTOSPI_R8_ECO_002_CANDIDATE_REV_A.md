@@ -20,6 +20,10 @@ routes the same eleven OctoSPI nets. Every accepted track and via is preserved.
 | Existing copper removed or modified | `0` |
 | Rip-ups / failed connections | `0 / 0` |
 | Board clearance / routing guard | `0.20 / 0.25 mm` |
+| KiCad 9 comparative DRC | `PASS_NO_NEW_ERRORS` |
+| KiCad 9 violations | `228 -> 226` |
+| KiCad 9 unconnected items | `454 -> 444` |
+| Evidence workflow run | `35459249932` |
 
-Human acceptance, commit-bound KiCad 9 comparative DRC, SI/return-path review,
-remaining routing, Review B and manufacturing release remain mandatory.
+Human acceptance, SI/return-path review, remaining routing, Review B and
+manufacturing release remain mandatory.
