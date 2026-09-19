@@ -75,7 +75,11 @@ def native_connectivity(base_path: Path, candidate_path: Path) -> dict[str, obje
         board.BuildListOfNets()
         board.BuildConnectivity()
         counts[label] = int(board.GetConnectivity().GetUnconnectedCount(False))
-    require(counts == {"base": 707, "candidate": 697},
+    accepted_pairs = (
+        {"base": 707, "candidate": 697},  # KiCad 7 local pcbnew
+        {"base": 454, "candidate": 444},  # KiCad 9 after deterministic zone refill
+    )
+    require(counts in accepted_pairs and counts["base"] - counts["candidate"] == 10,
             f"native connectivity drift: {counts}")
     return {"status": "PASS_EXACT_10_CONNECTION_REDUCTION", **counts}
 
