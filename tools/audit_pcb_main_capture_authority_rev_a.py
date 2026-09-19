@@ -1701,6 +1701,8 @@ def main() -> None:
                     "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
                     "SIGNAL_HARD_NETS_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
                 },
                 "Review B must be open but incomplete after Review A PASS")
     else:
@@ -1736,6 +1738,8 @@ def main() -> None:
                 "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
                 "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
                 "SIGNAL_HARD_NETS_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
         }:
             required_layout_evidence = {
                 "native_layout_candidate", "layout_generator", "layout_independent_audit",
@@ -1770,6 +1774,14 @@ def main() -> None:
                 "signal_hard_nets_routing_application",
                 "signal_hard_nets_routing_audit",
                 "signal_hard_nets_routing_status",
+                "octospi_r8_eco_002_candidate",
+                "octospi_r8_eco_002_candidate_record",
+                "octospi_r8_eco_002_approval",
+                "octospi_r8_eco_002_approval_record",
+                "octospi_r8_eco_002_review_commit_mapping",
+                "octospi_r8_eco_002_application",
+                "octospi_r8_eco_002_audit",
+                "octospi_r8_eco_002_status",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
             if review_b["status"] in {
@@ -1779,6 +1791,8 @@ def main() -> None:
                     "GROUND_DOMAIN_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
                     "SIGNAL_HARD_NETS_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
+                    "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
             }:
                 required_layout_evidence |= {
                     "placement_repack_manifest", "placement_repack_generator",
@@ -1801,10 +1815,15 @@ def main() -> None:
                     "APPROVED_APPLIED_BOUNDED_SIGNAL_SUBGATE_"
                     "REMAINING_ROUTING_ENGINEERING_CONTINUES",
                     "PCB-MAIN signal hard-nets routing status drift")
+            require(review_b["evidence"].get("octospi_r8_eco_002_status") ==
+                    "APPROVED_APPLIED_BOUNDED_R8_PLACEMENT_AND_OCTOSPI_ROUTING_"
+                    "SUBGATE_REMAINING_ROUTING_ENGINEERING_CONTINUES",
+                    "PCB-MAIN OctoSPI R8 ECO-002 status drift")
             for evidence_name in required_layout_evidence - {
                     "ra_003_status", "placement_repack_status",
                     "ground_domain_routing_status",
                     "signal_hard_nets_routing_status",
+                    "octospi_r8_eco_002_status",
             }:
                 evidence_path = ROOT / review_b["evidence"][evidence_name]
                 require(evidence_path.is_file() and evidence_path.stat().st_size > 0,
@@ -2085,6 +2104,31 @@ def main() -> None:
                     signal_hard_nets_application.get("review_b_complete") is False and
                     signal_hard_nets_application.get("cam_or_manufacturing_release") is False,
                     "PCB-MAIN signal hard-nets application interlock drift")
+            octospi_r8_eco_002_application = json.loads(
+                (ROOT / review_b["evidence"]["octospi_r8_eco_002_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(octospi_r8_eco_002_application.get("proposal_id") ==
+                    "PCB-MAIN-OCTOSPI-R8-ECO-002" and
+                    octospi_r8_eco_002_application.get("decision") ==
+                    "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE" and
+                    octospi_r8_eco_002_application.get("status") ==
+                    "APPLIED_ACCEPTED_OCTOSPI_R8_ECO_002_SUBGATE_"
+                    "ROUTING_ENGINEERING_CONTINUES" and
+                    octospi_r8_eco_002_application.get(
+                        "remaining_signal_and_power_routing_continuation_authorized"
+                    ) is True and
+                    octospi_r8_eco_002_application.get("routing_complete") is False and
+                    octospi_r8_eco_002_application.get(
+                        "return_path_review_complete"
+                    ) is False and
+                    octospi_r8_eco_002_application.get("si_review_complete") is False and
+                    octospi_r8_eco_002_application.get("pi_review_complete") is False and
+                    octospi_r8_eco_002_application.get("review_b_complete") is False and
+                    octospi_r8_eco_002_application.get(
+                        "cam_or_manufacturing_release"
+                    ) is False,
+                    "PCB-MAIN OctoSPI R8 ECO-002 application interlock drift")
             mechanical_application = None
             if mechanical_eco_status in {
                     "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
@@ -2200,9 +2244,17 @@ def main() -> None:
                             "locked_authority_mounting_conflicts": [],
                             "locked_authority_tool_conflicts": [],
                         }, "PCB-MAIN mechanical ECO historical inventory drift")
-                require(signal_hard_nets_application.get("applied", {}).get(
+                require(octospi_r8_eco_002_application.get("applied", {}).get(
                             "board_sha256"
                         ) == placement_control["board_sha256"] and
+                        octospi_r8_eco_002_application.get("applied", {}).get(
+                            "exact_candidate_byte_identity"
+                        ) is True and
+                        signal_hard_nets_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) == octospi_r8_eco_002_application.get(
+                            "historical_baseline", {}
+                        ).get("board_sha256") and
                         signal_hard_nets_application.get("applied", {}).get(
                             "exact_candidate_byte_identity"
                         ) is True and

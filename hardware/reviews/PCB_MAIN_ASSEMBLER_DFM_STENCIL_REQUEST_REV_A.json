@@ -21,7 +21,7 @@
     "native_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
     "native_board_sha256": "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8",
     "placement_manifest": "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
-    "placement_manifest_sha256": "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4",
+    "placement_manifest_sha256": "70b453c77745580f16d571c999eeb0cde3f5581db69568668131dbe84ab20925",
     "u2_footprint": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Winbond_W25Q512JV_PackageF_IPC_Candidate.kicad_mod",
     "u2_footprint_sha256": "78a67dda268e971a3463c41a8fb8170c3c59a1d3af145c65ed6b7212d1d8af83",
     "u25_u26_footprint": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/TI_DRT0003A_IPC_Candidate.kicad_mod",

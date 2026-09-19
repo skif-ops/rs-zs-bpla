@@ -117,6 +117,8 @@ jobs:
             --output artifacts/pcb_main_signal_hard_nets_candidate_rev_a.json
           python tools/audit_pcb_main_octospi_r8_eco_candidate_rev_a.py \
             --output artifacts/pcb_main_octospi_r8_eco_candidate_rev_a.json
+          python tools/audit_pcb_main_octospi_r8_eco_application_rev_a.py \
+            --output artifacts/pcb_main_octospi_r8_eco_application_rev_a.json
           python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
             --output artifacts/pcb_main_assembler_dfm_stencil_request_rev_a.json \
             --commit-sha "$GITHUB_SHA" \
@@ -225,6 +227,7 @@ jobs:
             artifacts/pcb_main_ground_domain_routing_candidate_rev_a.json
             artifacts/pcb_main_signal_hard_nets_candidate_rev_a.json
             artifacts/pcb_main_octospi_r8_eco_candidate_rev_a.json
+            artifacts/pcb_main_octospi_r8_eco_application_rev_a.json
             artifacts/pcb_main_assembler_dfm_stencil_request_rev_a.json
             artifacts/pcb_main_mechanical_eco_candidate_rev_a.json
             artifacts/pcb_main_mech_eco_002_rev_a.json
@@ -312,6 +315,7 @@ jobs:
             hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPROVAL_REV_A.json
             hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPROVAL_REV_A.md
             hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json
             hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb
             hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json

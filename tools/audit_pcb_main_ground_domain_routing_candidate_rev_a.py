@@ -44,7 +44,7 @@ LAYER_AUTHORITY = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
 
 BASE_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
 CANDIDATE_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
-ACTIVE_SIGNAL_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
+ACTIVE_BOARD_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 PROPOSAL_SHA256 = "6ad0446ea98a44863cef91be137da3e5dcff92303ac9e395e260773e8cebc314"
 PROPOSAL_RECORD_SHA256 = "12f5ffafaa90cf3d796e08f17c333ac7701d0b17f286af487c31b8410673cb19"
 REVIEWED_GITHUB_COMMIT = "830139e8875e4e67738cf88b938a8d0ff91e2798"
@@ -329,8 +329,8 @@ def static_audit() -> dict[str, Any]:
     require(sha256(BASE_BOARD) == BASE_SHA256, "PCB-MAIN authoritative baseline SHA-256 drift")
     require(sha256(CANDIDATE_BOARD) == CANDIDATE_SHA256,
             "PCB-MAIN ground candidate SHA-256 drift")
-    require(sha256(ACTIVE_BOARD) == ACTIVE_SIGNAL_SHA256,
-            "authoritative PCB-MAIN is not the accepted signal-routing successor")
+    require(sha256(ACTIVE_BOARD) == ACTIVE_BOARD_SHA256,
+            "authoritative PCB-MAIN is not the accepted OctoSPI-routing successor")
     require(sha256(PROPOSAL) == PROPOSAL_SHA256 and
             sha256(PROPOSAL_RECORD) == PROPOSAL_RECORD_SHA256,
             "PCB-MAIN ground proposal record SHA-256 drift")
@@ -354,9 +354,9 @@ def static_audit() -> dict[str, Any]:
     active_items = {item.tstamp: item for item in active.traceItems}
     require(not (set(candidate_items) - set(active_items)) and
             all(candidate_items[key] == active_items[key] for key in candidate_items),
-            "accepted ground copper was removed or modified by the signal subgate")
+            "accepted ground copper was removed or modified by a later routing subgate")
     require(candidate.zones == active.zones,
-            "accepted ground zones or rule areas changed in the signal subgate")
+            "accepted ground zones or rule areas changed in a later routing subgate")
 
     with LAYER_AUTHORITY.open(encoding="utf-8", newline="") as stream:
         main_rows = [row for row in csv.DictReader(stream) if row["Board"] == "PCB-MAIN"]
@@ -700,7 +700,7 @@ def static_audit() -> dict[str, Any]:
         "status": "PASS_ACCEPTED_SUBGATE_APPLIED",
         "base_board_sha256": BASE_SHA256,
         "candidate_board_sha256": CANDIDATE_SHA256,
-        "active_board_sha256": ACTIVE_SIGNAL_SHA256,
+        "active_board_sha256": ACTIVE_BOARD_SHA256,
         "track_segments": sum(segments.values()),
         "track_length_mm": round(sum(lengths.values()), 12),
         "vias": sum(vias.values()),

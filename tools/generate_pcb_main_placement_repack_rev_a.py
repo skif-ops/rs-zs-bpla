@@ -72,6 +72,13 @@ SIGNAL_CANDIDATE = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001/"
     "PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
 )
+OCTOSPI_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json"
+)
+OCTOSPI_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/"
+    "PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb"
+)
 
 ECO003_POSES = {
     "FL1": (60.5, 68.0, 0.0),
@@ -808,9 +815,29 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
         applied = application.get("applied", {})
         board_applied = applied
     require(applied.get("placement_repack") ==
+            str(PLACEMENT.relative_to(ROOT)),
+            "PCB-MAIN approved placement-repack path drift")
+    if OCTOSPI_APPLICATION.is_file():
+        octospi_placement = json.loads(
+            OCTOSPI_APPLICATION.read_text(encoding="utf-8")
+        )
+        proposal_id = "PCB-MAIN-OCTOSPI-R8-ECO-002"
+        octospi_applied = octospi_placement.get("applied", {})
+        require(
+            applied.get("placement_repack_sha256") ==
+            "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4" and
+            octospi_placement.get("proposal_id") == proposal_id and
+            octospi_placement.get("decision") ==
+            "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE" and
+            octospi_applied.get("placement_manifest") ==
             str(PLACEMENT.relative_to(ROOT)) and
-            applied.get("placement_repack_sha256") == sha256(PLACEMENT),
-            "PCB-MAIN approved placement-repack SHA-256 drift")
+            octospi_applied.get("placement_manifest_sha256") == sha256(PLACEMENT) and
+            octospi_applied.get("r8_position_mm") == [54.5, 16.0],
+            "PCB-MAIN approved OctoSPI R8 placement successor drift",
+        )
+    else:
+        require(applied.get("placement_repack_sha256") == sha256(PLACEMENT),
+                "PCB-MAIN approved placement-repack SHA-256 drift")
     approved_board = GROUND_BASE if GROUND_APPLICATION.is_file() else BOARD
     require(board_applied.get("board") == str(BOARD.relative_to(ROOT)) and
             board_applied.get("board_sha256") == sha256(approved_board),
@@ -842,19 +869,28 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
     if GROUND_APPLICATION.is_file():
         ground = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
         signal = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
+        octospi = json.loads(OCTOSPI_APPLICATION.read_text(encoding="utf-8"))
         require(ground.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE" and
                 ground.get("status") ==
                 "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
                 ground.get("applied", {}).get("exact_candidate_byte_identity") is True and
                 signal.get("decision") == "ACCEPT_SIGNAL_HARD_NETS_ROUTING_SUBGATE" and
                 signal.get("applied", {}).get("exact_candidate_byte_identity") is True and
-                sha256(BOARD) == sha256(SIGNAL_CANDIDATE) and
-                BOARD.read_bytes() == SIGNAL_CANDIDATE.read_bytes() and
-                len(getattr(board, "traceItems", [])) == 684 and
+                octospi.get("decision") ==
+                "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE" and
+                octospi.get("applied", {}).get("exact_candidate_byte_identity") is True and
+                sha256(SIGNAL_CANDIDATE) ==
+                octospi.get("historical_baseline", {}).get("board_sha256") and
+                sha256(BOARD) == sha256(OCTOSPI_CANDIDATE) and
+                BOARD.read_bytes() == OCTOSPI_CANDIDATE.read_bytes() and
+                len(getattr(board, "traceItems", [])) == 838 and
                 len(getattr(board, "zones", [])) == 7 and
                 ground.get("routing_complete") is False and
                 ground.get("review_b_complete") is False and
-                ground.get("cam_or_manufacturing_release") is False,
+                ground.get("cam_or_manufacturing_release") is False and
+                octospi.get("routing_complete") is False and
+                octospi.get("review_b_complete") is False and
+                octospi.get("cam_or_manufacturing_release") is False,
                 "PCB-MAIN accepted routing-subgate application or copper inventory drift")
     else:
         require(len(getattr(board, "traceItems", [])) == 0 and

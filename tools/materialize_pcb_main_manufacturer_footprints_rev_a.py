@@ -43,6 +43,10 @@ SIGNAL_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json"
 )
 SIGNAL_APPROVED_BOARD_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
+OCTOSPI_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json"
+)
+OCTOSPI_APPROVED_BOARD_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
@@ -441,6 +445,8 @@ def verify_frozen_materialization(candidate: Path) -> None:
         raise RuntimeError("PCB-MAIN ECO-004 application evidence is missing")
     if not GROUND_APPLICATION.is_file():
         raise RuntimeError("PCB-MAIN ground-domain application evidence is missing")
+    if not OCTOSPI_APPLICATION.is_file():
+        raise RuntimeError("PCB-MAIN OctoSPI application evidence is missing")
     eco003 = json.loads(ECO_003_APPLICATION.read_text(encoding="utf-8"))
     eco003_applied = eco003.get("applied", {})
     eco004 = json.loads(ECO_004_APPLICATION.read_text(encoding="utf-8"))
@@ -450,6 +456,8 @@ def verify_frozen_materialization(candidate: Path) -> None:
     ground_applied = ground.get("applied", {})
     signal = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
     signal_applied = signal.get("applied", {})
+    octospi = json.loads(OCTOSPI_APPLICATION.read_text(encoding="utf-8"))
+    octospi_applied = octospi.get("applied", {})
     actual_board_sha256 = sha256(PCB)
     if not (
         eco003.get("proposal_id") == "PCB-MAIN-RF-ROUTEABILITY-ECO-003"
@@ -481,7 +489,16 @@ def verify_frozen_materialization(candidate: Path) -> None:
         and signal.get("routing_complete") is False
         and signal.get("review_b_complete") is False
         and signal.get("cam_or_manufacturing_release") is False
-        and actual_board_sha256 == SIGNAL_APPROVED_BOARD_SHA256
+        and octospi.get("decision") ==
+        "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE"
+        and octospi.get("historical_baseline", {}).get("board_sha256") ==
+        SIGNAL_APPROVED_BOARD_SHA256
+        and octospi_applied.get("board_sha256") == OCTOSPI_APPROVED_BOARD_SHA256
+        and octospi_applied.get("exact_candidate_byte_identity") is True
+        and octospi.get("routing_complete") is False
+        and octospi.get("review_b_complete") is False
+        and octospi.get("cam_or_manufacturing_release") is False
+        and actual_board_sha256 == OCTOSPI_APPROVED_BOARD_SHA256
     ):
         raise RuntimeError(
             "PCB-MAIN ECO-003/ECO-004/ground-domain frozen-board authority mismatch"
@@ -530,7 +547,7 @@ def main() -> int:
                     ) from error
         print(
             "PCB-MAIN controlled project-local footprint materialization: PASS "
-            "(accepted ground-domain board hash; semantic footprint match)"
+            "(accepted routing-lineage board hash; semantic footprint match)"
         )
     else:
         with tempfile.TemporaryDirectory() as temp_dir:

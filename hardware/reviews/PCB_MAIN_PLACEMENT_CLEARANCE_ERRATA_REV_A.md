@@ -146,6 +146,14 @@ corrects only U4 signal-pad row centres, courtyard height and reference-text
 position. U4 placement and all other footprints remain unchanged; the board
 remains at zero tracks, zero vias and zero copper zones.
 
+Reviewer `Скиф` then accepted `PCB-MAIN-OCTOSPI-R8-ECO-002` on 2026-09-19
+with decision
+`ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE`. The exact
+application moves only R8 from (55.0, 19.5) mm to (54.5, 16.0) mm and applies
+the reviewed eleven-net OctoSPI routing candidate. Strict 2D clearance remains
+PASS; routing, return-path, SI/PI, Review B and manufacturing release remain
+open.
+
 ## Controlled post-repack result
 
 `hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv` fixes all 225 movable top-side
@@ -169,17 +177,23 @@ including 169 fitted and 15 DNP footprints.
 
 Controlled hashes:
 
-- native PCB SHA-256: `a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8`
-- placement manifest SHA-256: `34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4`
+- active native PCB SHA-256: `04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f`
+- active placement manifest SHA-256: `70b453c77745580f16d571c999eeb0cde3f5581db69568668131dbe84ab20925`
 - MAIN-AUTH-011 CSV SHA-256: `8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9`
 
-The five independent controls now pass on the same source state:
+The original zero-copper post-repack board and placement hashes remain preserved
+in the signed ECO application lineage. The active hashes above include the
+accepted R8 move and exact OctoSPI routing candidate; they do not close Review B
+or authorize manufacture.
+
+The six independent controls now pass on the same source state:
 
 1. `python tools/audit_pcb_main_layout_candidate_rev_a.py`
 2. `python tools/audit_pcb_main_placement_clearance_rev_a.py --strict`
 3. `python tools/audit_pcb_main_mech_eco_002_rev_a.py`
 4. `python tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py`
 5. `python tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py`
+6. `python tools/audit_pcb_main_octospi_r8_eco_application_rev_a.py`
 
 ## Remaining release boundary
 
