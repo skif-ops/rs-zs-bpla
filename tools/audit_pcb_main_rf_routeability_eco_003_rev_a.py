@@ -14,6 +14,7 @@ import json
 import math
 import re
 import subprocess
+import tempfile
 from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
@@ -33,9 +34,11 @@ PROPOSAL_RECORD = ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_CAND
 APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPROVAL.json"
 MAPPING = ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_REVIEW_COMMIT_MAPPING.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPLICATION.json"
+ECO004_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPLICATION.json"
 
 HISTORICAL_BASE_SHA256 = "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e"
 APPLIED_BASE_SHA256 = "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684"
+CURRENT_BOARD_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
 APPLIED_PLACEMENT_SHA256 = "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4"
 CANDIDATE_SHA256 = "3561f334476259f4e2aa6143a49dcc945da7eb1a292400449b60d204ac421c5d"
 PROPOSAL_SHA256 = "81c71958796e816fd28360562c1034a96c67d1c314bc645210ebc249065dc831"
@@ -44,6 +47,7 @@ REVIEWED_LOCAL_COMMIT = "dc7921fa08714ae9ad997b9c54ce24491e9672da"
 REVIEWED_GITHUB_COMMIT = "23d4195c15a380f4e12337094be0d09d022be065"
 REVIEWED_TREE = "82467c29399fddec21458e169ed00c6d02a1e856"
 APPROVAL_COMMIT = "ac7439dce989915f4a56a52168ef426d8cfc9700"
+APPLICATION_COMMIT = "909fc1e86c8b3711c8b00358c9892a09609279e4"
 TRACE_WIDTH_MM = 0.1509
 TRACK_SEGMENTS = 89
 TOTAL_LENGTH_MM = 103.481866172679
@@ -200,12 +204,15 @@ def native_connectivity() -> dict[str, Any]:
 
     counts: dict[str, int] = {}
     versions: list[str] = []
-    for label, path in (("baseline", BASE_BOARD), ("candidate", CANDIDATE_BOARD)):
-        board = pcbnew.LoadBoard(str(path))
-        require(board is not None, f"KiCad cannot load {path}")
-        board.BuildConnectivity()
-        counts[label] = int(board.GetConnectivity().GetUnconnectedCount(False))
-        versions.append(str(pcbnew.GetBuildVersion()))
+    with tempfile.TemporaryDirectory(prefix="pcb-main-rf-eco003-") as temp_dir:
+        baseline = Path(temp_dir) / "PCB-MAIN_RF_ECO_003_APPLIED_BASE.kicad_pcb"
+        baseline.write_text(git_text(APPLICATION_COMMIT, BASE_BOARD), encoding="utf-8")
+        for label, path in (("baseline", baseline), ("candidate", CANDIDATE_BOARD)):
+            board = pcbnew.LoadBoard(str(path))
+            require(board is not None, f"KiCad cannot load {path}")
+            board.BuildConnectivity()
+            counts[label] = int(board.GetConnectivity().GetUnconnectedCount(False))
+            versions.append(str(pcbnew.GetBuildVersion()))
     reduction = counts["baseline"] - counts["candidate"]
     require(reduction == EXPECTED_CONNECTIVITY_REDUCTION,
             f"RF connectivity reduction is {reduction}, expected {EXPECTED_CONNECTIVITY_REDUCTION}")
@@ -228,10 +235,11 @@ def static_audit() -> dict[str, Any]:
         APPROVAL,
         MAPPING,
         APPLICATION,
+        ECO004_APPLICATION,
     ):
         require(path.is_file() and path.stat().st_size > 0, f"missing ECO-003 input: {path}")
-    require(sha256(BASE_BOARD) == APPLIED_BASE_SHA256,
-            "PCB-MAIN ECO-003 applied authoritative board SHA-256 drift")
+    require(sha256(BASE_BOARD) == CURRENT_BOARD_SHA256,
+            "PCB-MAIN current post-ECO-004 authoritative board SHA-256 drift")
     require(sha256(CANDIDATE_BOARD) == CANDIDATE_SHA256, "PCB-MAIN ECO-003 candidate SHA-256 drift")
     require(sha256(PROPOSAL) == PROPOSAL_SHA256,
             "PCB-MAIN ECO-003 reviewed proposal SHA-256 drift")
@@ -251,9 +259,12 @@ def static_audit() -> dict[str, Any]:
     historical_text = git_text(REVIEWED_GITHUB_COMMIT, BASE_BOARD)
     require(bytes_sha256(historical_text.encode("utf-8")) == HISTORICAL_BASE_SHA256,
             "PCB-MAIN ECO-003 historical baseline SHA-256 drift")
+    applied_text = git_text(APPLICATION_COMMIT, BASE_BOARD)
+    require(bytes_sha256(applied_text.encode("utf-8")) == APPLIED_BASE_SHA256,
+            "PCB-MAIN ECO-003 historical applied-board SHA-256 drift")
 
     base = Board.from_sexpr(sexpr.parse_sexp(historical_text))
-    applied_base = Board.from_file(str(BASE_BOARD), encoding="utf-8")
+    applied_base = Board.from_sexpr(sexpr.parse_sexp(applied_text))
     candidate = Board.from_file(str(CANDIDATE_BOARD), encoding="utf-8")
     base_footprints = {ref_of(item): item for item in base.footprints}
     applied_footprints = {ref_of(item): item for item in applied_base.footprints}
@@ -464,12 +475,29 @@ def static_audit() -> dict[str, Any]:
             applied.get("copper_zones") == 0,
             "ECO-003 applied source/hash record drift")
 
+    eco004 = json.loads(ECO004_APPLICATION.read_text(encoding="utf-8"))
+    eco004_applied = eco004.get("applied", {})
+    require(eco004.get("proposal_id") == "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004" and
+            eco004.get("decision") == "ACCEPT_STTS22H_FOOTPRINT_ECO_004" and
+            eco004.get("routing_engineering_continuation_authorized") is True and
+            eco004.get("candidate_or_future_copper_final_authorized") is False and
+            eco004.get("routing_complete") is False and
+            eco004.get("review_b_complete") is False and
+            eco004.get("cam_or_manufacturing_release") is False and
+            eco004_applied.get("board_sha256") == CURRENT_BOARD_SHA256 and
+            eco004_applied.get("changed_references") == ["U4"] and
+            eco004_applied.get("track_segments") == 0 and
+            eco004_applied.get("vias") == 0 and
+            eco004_applied.get("copper_zones") == 0,
+            "ECO-004 continuation lineage or release boundary drift")
+
     return {
         "schema_version": "dioneya.pcb-main-rf-routeability-eco-003-audit.v1",
         "proposal_id": "PCB-MAIN-RF-ROUTEABILITY-ECO-003",
         "status": "PASS_APPROVED_APPLIED_PLACEMENT_ONLY",
         "historical_base_board_sha256": HISTORICAL_BASE_SHA256,
         "applied_board_sha256": APPLIED_BASE_SHA256,
+        "current_board_sha256": CURRENT_BOARD_SHA256,
         "applied_placement_sha256": APPLIED_PLACEMENT_SHA256,
         "candidate_board_sha256": CANDIDATE_SHA256,
         "changed_footprints": sorted(changed),

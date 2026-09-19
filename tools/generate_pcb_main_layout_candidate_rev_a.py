@@ -490,7 +490,8 @@ def normalize_text(fp: pcbnew.FOOTPRINT) -> None:
     fp.Reference().SetVisible(True)
     fp.Reference().SetTextSize(mm(0.8, 0.8))
     fp.Reference().SetTextThickness(pcbnew.FromMM(0.12))
-    fp.Reference().SetPosition(fp.GetPosition() + mm(0, -1.2))
+    reference_y = -1.8 if fp.GetReference() == "U4" else -1.2
+    fp.Reference().SetPosition(fp.GetPosition() + mm(0, reference_y))
 
 
 def main() -> int:

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Audit the isolated PCB-MAIN STTS22H footprint ECO-004 candidate.
+"""Audit the reviewed and applied PCB-MAIN STTS22H footprint ECO-004.
 
-The candidate corrects only the U4 land-pattern row spacing, courtyard height,
-and reference-text position.  It remains separate from the authoritative board
-until an independent reviewer accepts the bounded ECO.
+The signed candidate corrects only the U4 land-pattern row spacing, courtyard
+height and reference-text position.  The audit reconstructs the historical
+baseline and proves that the authoritative board is the exact reviewed result.
 """
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ import hashlib
 import json
 import math
 import re
+import subprocess
 import tempfile
 from collections import Counter
 from pathlib import Path
@@ -24,6 +25,7 @@ from kiutils.utils import sexpr
 from materialize_pcb_main_stts22h_footprint_eco_004_rev_a import (
     BOARD_REPLACEMENTS,
     candidate_bytes,
+    historical_base_bytes,
 )
 
 
@@ -37,10 +39,23 @@ CANDIDATE_ROOT = ROOT / "hardware/kicad/candidates/PCB-MAIN-STTS22H-ECO-004"
 CANDIDATE_BOARD_NAME = "PCB-MAIN_STTS22H_ECO_004.kicad_pcb"
 CANDIDATE_FOOTPRINT = CANDIDATE_ROOT / "STTS22H_UDFN-6L_ECO_004.kicad_mod"
 PROPOSAL = ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_CANDIDATE_REV_A.json"
+PROPOSAL_RECORD = ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_CANDIDATE_REV_A.md"
+APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPROVAL.json"
+MAPPING = ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_REVIEW_COMMIT_MAPPING.json"
+APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPLICATION.json"
+FOOTPRINT_REGISTER = ROOT / "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv"
+FOOTPRINT_DISPOSITION = ROOT / "hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md"
+CAPTURE_MANIFEST = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN_capture_manifest.json"
 
 BASE_BOARD_SHA256 = "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684"
+BASE_FOOTPRINT_SHA256 = "d3421087f45b39626defa0608f8fd269f02033f4c4b7ff15bb708af18b573a93"
 CANDIDATE_BOARD_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
 CANDIDATE_FOOTPRINT_SHA256 = "e06136e5f2ebd67798141ff1ef99db94d895d139d20b3c98a671e34bbbfa277f"
+PROPOSAL_SHA256 = "4b7da50ef11415385317f4811a26301c189988e349d3fcef0b0107692a443df8"
+PROPOSAL_RECORD_SHA256 = "35b7c9455fad54013959b2f589fa3068830b8d2dbb812ce924fb42ebd6d4e772"
+REVIEWED_GITHUB_COMMIT = "059ecd0e2e35fc56a56f48d62cce4f72a93755c0"
+REVIEWED_TREE = "d6805c8f15ce319410a996f143132c6f8f58f35e"
+APPROVAL_COMMIT = "3f133c2cb2075b4bdc8d4044366014f1b9d17add"
 EXPECTED_UNCONNECTED = 718
 EXPECTED_SIGNAL_TO_EP_GAP_MM = 0.190
 
@@ -93,6 +108,35 @@ def sha256(path: Path) -> str:
         for block in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def git_bytes(commit: str, path: Path) -> bytes:
+    relative = path.relative_to(ROOT)
+    completed = subprocess.run(
+        ["git", "show", f"{commit}:{relative}"],
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+    )
+    require(completed.returncode == 0, f"cannot read {relative} from {commit}")
+    return completed.stdout
+
+
+def git_tree(commit: str) -> str:
+    completed = subprocess.run(
+        ["git", "rev-parse", f"{commit}^{{tree}}"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    require(completed.returncode == 0, f"cannot resolve reviewed tree for {commit}")
+    return completed.stdout.strip()
+
+
+def git_blob_sha(payload: bytes) -> str:
+    header = f"blob {len(payload)}\0".encode("ascii")
+    return hashlib.sha1(header + payload).hexdigest()
 
 
 def close(first: float, second: float, tolerance: float = 1e-6) -> bool:
@@ -248,20 +292,21 @@ def native_connectivity(candidate_path: Path | None) -> dict[str, Any]:
     except ImportError as exc:  # pragma: no cover - depends on KiCad system Python
         raise AssertionError("--kicad-connectivity requires the KiCad pcbnew module") from exc
 
-    temporary: tempfile.TemporaryDirectory[str] | None = None
-    if candidate_path is None:
-        temporary = tempfile.TemporaryDirectory(prefix="pcb-main-stts22h-eco004-")
-        candidate_path = Path(temporary.name) / CANDIDATE_BOARD_NAME
-        candidate_path.write_bytes(candidate_bytes())
-    require(candidate_path.is_file(), f"missing materialized candidate: {candidate_path}")
-    require(sha256(candidate_path) == CANDIDATE_BOARD_SHA256,
-            "materialized candidate SHA-256 drift")
-    counts: dict[str, int] = {}
-    for label, path in (("baseline", BASE_BOARD), ("candidate", candidate_path)):
-        board = pcbnew.LoadBoard(str(path))
-        require(board is not None, f"KiCad cannot load {path}")
-        board.BuildConnectivity()
-        counts[label] = int(board.GetConnectivity().GetUnconnectedCount(False))
+    with tempfile.TemporaryDirectory(prefix="pcb-main-stts22h-eco004-") as temp_dir:
+        baseline_path = Path(temp_dir) / "PCB-MAIN_STTS22H_ECO_004_BASE.kicad_pcb"
+        baseline_path.write_bytes(historical_base_bytes())
+        if candidate_path is None:
+            candidate_path = Path(temp_dir) / CANDIDATE_BOARD_NAME
+            candidate_path.write_bytes(candidate_bytes())
+        require(candidate_path.is_file(), f"missing materialized candidate: {candidate_path}")
+        require(sha256(candidate_path) == CANDIDATE_BOARD_SHA256,
+                "materialized candidate SHA-256 drift")
+        counts: dict[str, int] = {}
+        for label, path in (("baseline", baseline_path), ("candidate", candidate_path)):
+            board = pcbnew.LoadBoard(str(path))
+            require(board is not None, f"KiCad cannot load {path}")
+            board.BuildConnectivity()
+            counts[label] = int(board.GetConnectivity().GetUnconnectedCount(False))
     require(counts == {"baseline": EXPECTED_UNCONNECTED, "candidate": EXPECTED_UNCONNECTED},
             f"unexpected connectivity counts: {counts}")
     result = {
@@ -269,29 +314,56 @@ def native_connectivity(candidate_path: Path | None) -> dict[str, Any]:
         "baseline_unconnected_count": counts["baseline"],
         "candidate_unconnected_count": counts["candidate"],
     }
-    if temporary is not None:
-        temporary.cleanup()
     return result
 
 
 def static_audit() -> dict[str, Any]:
-    for path in (BASE_BOARD, BASE_FOOTPRINT, CANDIDATE_FOOTPRINT, PROPOSAL):
+    for path in (
+        BASE_BOARD,
+        BASE_FOOTPRINT,
+        CANDIDATE_FOOTPRINT,
+        PROPOSAL,
+        PROPOSAL_RECORD,
+        APPROVAL,
+        MAPPING,
+        APPLICATION,
+        FOOTPRINT_REGISTER,
+        FOOTPRINT_DISPOSITION,
+        CAPTURE_MANIFEST,
+    ):
         require(path.is_file() and path.stat().st_size > 0, f"missing ECO-004 input: {path}")
-    require(sha256(BASE_BOARD) == BASE_BOARD_SHA256, "ECO-004 baseline board SHA-256 drift")
+    require(sha256(BASE_BOARD) == CANDIDATE_BOARD_SHA256,
+            "ECO-004 applied authoritative board SHA-256 drift")
+    require(sha256(BASE_FOOTPRINT) == CANDIDATE_FOOTPRINT_SHA256,
+            "ECO-004 applied controlled footprint SHA-256 drift")
     require(sha256(CANDIDATE_FOOTPRINT) == CANDIDATE_FOOTPRINT_SHA256,
             "ECO-004 candidate footprint SHA-256 drift")
+    require(sha256(PROPOSAL) == PROPOSAL_SHA256,
+            "ECO-004 reviewed proposal SHA-256 drift")
+    require(sha256(PROPOSAL_RECORD) == PROPOSAL_RECORD_SHA256,
+            "ECO-004 reviewed proposal record SHA-256 drift")
 
+    baseline_payload = historical_base_bytes()
+    require(hashlib.sha256(baseline_payload).hexdigest() == BASE_BOARD_SHA256,
+            "ECO-004 historical baseline board SHA-256 drift")
     candidate_payload = candidate_bytes()
     candidate_sha256 = hashlib.sha256(candidate_payload).hexdigest()
     require(candidate_sha256 == CANDIDATE_BOARD_SHA256,
             "ECO-004 generated candidate board SHA-256 drift")
+    require(candidate_payload == BASE_BOARD.read_bytes(),
+            "authoritative board differs from the exact reviewed ECO-004 candidate")
+    baseline_footprint = git_bytes(REVIEWED_GITHUB_COMMIT, BASE_FOOTPRINT)
+    require(hashlib.sha256(baseline_footprint).hexdigest() == BASE_FOOTPRINT_SHA256,
+            "ECO-004 historical baseline footprint SHA-256 drift")
     transformed_footprint = apply_exact_replacements(
-        BASE_FOOTPRINT.read_text(encoding="utf-8"), FOOTPRINT_REPLACEMENTS, "footprint"
+        baseline_footprint.decode("utf-8"), FOOTPRINT_REPLACEMENTS, "footprint"
     )
     require(transformed_footprint == CANDIDATE_FOOTPRINT.read_text(encoding="utf-8"),
             "candidate library footprint contains changes outside the bounded U4 delta")
+    require(BASE_FOOTPRINT.read_bytes() == CANDIDATE_FOOTPRINT.read_bytes(),
+            "applied controlled footprint differs from the reviewed candidate footprint")
 
-    base = Board.from_file(str(BASE_BOARD), encoding="utf-8")
+    base = Board.from_sexpr(sexpr.parse_sexp(baseline_payload.decode("utf-8")))
     candidate = Board.from_sexpr(sexpr.parse_sexp(candidate_payload.decode("utf-8")))
     require(len(base.footprints) == len(candidate.footprints) == 251,
             "PCB-MAIN footprint-count drift")
@@ -328,7 +400,7 @@ def static_audit() -> dict[str, Any]:
             close(reference_items[0].position.Y, -1.8),
             "candidate U4 reference-text position drift")
 
-    library = Footprint.from_file(str(CANDIDATE_FOOTPRINT), encoding="utf-8")
+    library = Footprint.from_file(str(BASE_FOOTPRINT), encoding="utf-8")
     require(library.entryName == "STTS22H_UDFN-6L",
             f"candidate footprint identity drift: {library.entryName!r}")
     library_geometry = audit_u4(library, board_instance=False)
@@ -356,21 +428,104 @@ def static_audit() -> dict[str, Any]:
         "manufacturing_release": False,
     }, "ECO-004 decision boundary drift")
 
+    require(git_tree(REVIEWED_GITHUB_COMMIT) == REVIEWED_TREE,
+            "ECO-004 reviewed GitHub tree drift")
+    reviewed_payloads = {
+        PROPOSAL: (PROPOSAL_SHA256, "612dd5e86df658d8ffbb27452965347413572ac9"),
+        PROPOSAL_RECORD: (PROPOSAL_RECORD_SHA256, "5c26894aaad16ad3ff36bf55c74708bd501c7a21"),
+        CANDIDATE_FOOTPRINT: (CANDIDATE_FOOTPRINT_SHA256,
+                              "4d86d583554d3770d137ab826faf59b1cc70762a"),
+    }
+    for path, (expected_sha256, expected_blob) in reviewed_payloads.items():
+        payload = git_bytes(REVIEWED_GITHUB_COMMIT, path)
+        require(hashlib.sha256(payload).hexdigest() == expected_sha256 and
+                git_blob_sha(payload) == expected_blob,
+                f"reviewed ECO-004 blob drift: {path.relative_to(ROOT)}")
+    require(git_blob_sha(git_bytes(REVIEWED_GITHUB_COMMIT, Path(__file__))) ==
+            "996b3f9cfecc3e04016421bf75407fe8cd9cb4b8",
+            "reviewed ECO-004 audit blob drift")
+
+    approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
+    authorization = approval.get("authorization", {})
+    require(approval.get("proposal_id") == "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004" and
+            approval.get("reviewer") == "Скиф" and
+            approval.get("decision_date") == "2026-09-19" and
+            approval.get("decision") == "ACCEPT_STTS22H_FOOTPRINT_ECO_004" and
+            approval.get("reviewed_github_commit_sha") == REVIEWED_GITHUB_COMMIT and
+            approval.get("reviewed_tree_sha") == REVIEWED_TREE and
+            approval.get("reviewed_proposal_sha256") == PROPOSAL_SHA256 and
+            approval.get("reviewed_proposal_record_sha256") == PROPOSAL_RECORD_SHA256 and
+            approval.get("reviewed_candidate_footprint_sha256") ==
+            CANDIDATE_FOOTPRINT_SHA256 and
+            approval.get("reviewed_materialized_board_sha256") == CANDIDATE_BOARD_SHA256 and
+            authorization.get("apply_bounded_u4_land_pattern_correction") is True and
+            authorization.get("continue_pcb_main_routing_engineering") is True and
+            authorization.get("candidate_or_future_copper_final_authorized") is False and
+            authorization.get("review_b_complete") is False and
+            authorization.get("cam_or_manufacturing_release") is False,
+            "ECO-004 approval binding or release boundary drift")
+
+    mapping = json.loads(MAPPING.read_text(encoding="utf-8"))
+    require(mapping.get("reviewed_github_commit_sha") == REVIEWED_GITHUB_COMMIT and
+            mapping.get("reviewed_tree_sha") == REVIEWED_TREE and
+            mapping.get("proposal_blob_sha") == "612dd5e86df658d8ffbb27452965347413572ac9" and
+            mapping.get("proposal_record_blob_sha") == "5c26894aaad16ad3ff36bf55c74708bd501c7a21" and
+            mapping.get("candidate_footprint_blob_sha") ==
+            "4d86d583554d3770d137ab826faf59b1cc70762a" and
+            mapping.get("materialized_candidate_board_sha256") == CANDIDATE_BOARD_SHA256 and
+            mapping.get("audit_blob_sha") == "996b3f9cfecc3e04016421bf75407fe8cd9cb4b8" and
+            mapping.get("equivalence") == "EXACT_REVIEWED_TREE_AND_BLOBS" and
+            mapping.get("review_b_complete") is False and
+            mapping.get("manufacturing_release") is False,
+            "ECO-004 review-commit mapping drift")
+
+    application = json.loads(APPLICATION.read_text(encoding="utf-8"))
+    applied = application.get("applied", {})
+    require(application.get("proposal_id") == "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004" and
+            application.get("approval") == str(APPROVAL.relative_to(ROOT)) and
+            application.get("reviewed_proposal_commit_sha") == REVIEWED_GITHUB_COMMIT and
+            application.get("approval_commit_sha") == APPROVAL_COMMIT and
+            application.get("reviewed_proposal_sha256") == PROPOSAL_SHA256 and
+            application.get("reviewed_candidate_footprint_sha256") ==
+            CANDIDATE_FOOTPRINT_SHA256 and
+            application.get("reviewed_materialized_board_sha256") ==
+            CANDIDATE_BOARD_SHA256 and
+            application.get("decision") == "ACCEPT_STTS22H_FOOTPRINT_ECO_004" and
+            application.get("status") ==
+            "APPLIED_BOUNDED_U4_CORRECTION_ROUTING_ENGINEERING_CONTINUES" and
+            application.get("routing_engineering_continuation_authorized") is True and
+            application.get("candidate_or_future_copper_final_authorized") is False and
+            application.get("routing_complete") is False and
+            application.get("review_b_complete") is False and
+            application.get("cam_or_manufacturing_release") is False,
+            "ECO-004 application binding or release boundary drift")
+    require(applied.get("board_sha256") == CANDIDATE_BOARD_SHA256 and
+            applied.get("controlled_footprint_sha256") == CANDIDATE_FOOTPRINT_SHA256 and
+            applied.get("footprint_review_register_sha256") == sha256(FOOTPRINT_REGISTER) and
+            applied.get("footprint_disposition_sha256") == sha256(FOOTPRINT_DISPOSITION) and
+            applied.get("capture_manifest_sha256") == sha256(CAPTURE_MANIFEST) and
+            applied.get("changed_references") == ["U4"] and
+            applied.get("exact_board_line_replacements") == len(BOARD_REPLACEMENTS) and
+            applied.get("track_segments") == 0 and
+            applied.get("vias") == 0 and
+            applied.get("copper_zones") == 0,
+            "ECO-004 applied source/hash record drift")
+
     return {
         "schema_version": "dioneya.pcb-main-stts22h-footprint-eco-audit.v1",
         "configuration": "EVT-PRE-20 Rev.A",
         "proposal_id": proposal["proposal_id"],
-        "status": "PASS_STATIC_BOUNDED_CANDIDATE",
+        "status": "PASS_APPROVED_APPLIED_BOUNDED_U4_CORRECTION",
         "baseline": {
-            "board": str(BASE_BOARD.relative_to(ROOT)),
-            "board_sha256": sha256(BASE_BOARD),
+            "board": f"GIT:{REVIEWED_GITHUB_COMMIT}:{BASE_BOARD.relative_to(ROOT)}",
+            "board_sha256": BASE_BOARD_SHA256,
             "u4_signal_to_ep_overlap_mm": round(-baseline_gap, 6),
         },
         "candidate": {
-            "board": f"MATERIALIZED:{CANDIDATE_BOARD_NAME}",
+            "board": str(BASE_BOARD.relative_to(ROOT)),
             "board_sha256": candidate_sha256,
-            "footprint": str(CANDIDATE_FOOTPRINT.relative_to(ROOT)),
-            "footprint_sha256": sha256(CANDIDATE_FOOTPRINT),
+            "footprint": str(BASE_FOOTPRINT.relative_to(ROOT)),
+            "footprint_sha256": sha256(BASE_FOOTPRINT),
             "board_geometry": board_geometry,
             "library_geometry": library_geometry,
             "exact_board_line_replacements": len(BOARD_REPLACEMENTS),
@@ -378,7 +533,13 @@ def static_audit() -> dict[str, Any]:
             "tracks": len(candidate.traceItems),
             "zones": len(candidate.zones),
         },
-        "decision_boundary": proposal["decision_boundary"],
+        "authorization_boundary": {
+            "routing_engineering_continuation_authorized": True,
+            "candidate_or_future_copper_final_authorized": False,
+            "routing_complete": False,
+            "review_b_complete": False,
+            "cam_or_manufacturing_release": False,
+        },
     }
 
 

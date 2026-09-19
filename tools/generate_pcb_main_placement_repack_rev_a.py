@@ -51,6 +51,9 @@ ECO002_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPLICATION.
 ECO003_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPLICATION.json"
 )
+ECO004_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPLICATION.json"
+)
 
 ECO003_POSES = {
     "FL1": (60.5, 68.0, 0.0),
@@ -733,10 +736,10 @@ def verify_materialized(board_text: str, rows: list[dict[str, str]]) -> None:
 def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
     """Verify the latest exact hash-bound approved placement evidence.
 
-    ECO-002 froze the manually optimized collision-free placement.  ECO-003
-    subsequently authorized only the FL1/D4/L2 pose delta.  The exact latest
-    manifest and unrouted board hashes therefore control this check; neither
-    approval turns the routeability-candidate copper into production routing.
+    ECO-002 froze the manually optimized collision-free placement, ECO-003
+    authorized only the FL1/D4/L2 pose delta, and ECO-004 changed only U4's
+    internal land geometry.  Exact lineage hashes control this check; none of
+    the approvals turns candidate copper into production routing.
     """
     if ECO003_APPLICATION.is_file():
         application = json.loads(ECO003_APPLICATION.read_text(encoding="utf-8"))
@@ -756,6 +759,24 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
                 applied.get("copper_zones") == 0 and
                 applied.get("changed_references") == ["D4", "FL1", "L2"],
                 "PCB-MAIN ECO-003 placement-only application drift")
+        board_applied = applied
+        if ECO004_APPLICATION.is_file():
+            eco004 = json.loads(ECO004_APPLICATION.read_text(encoding="utf-8"))
+            proposal_id = "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004"
+            require(eco004.get("proposal_id") == proposal_id and
+                    eco004.get("decision") == "ACCEPT_STTS22H_FOOTPRINT_ECO_004" and
+                    eco004.get("routing_engineering_continuation_authorized") is True and
+                    eco004.get("candidate_or_future_copper_final_authorized") is False and
+                    eco004.get("routing_complete") is False and
+                    eco004.get("review_b_complete") is False and
+                    eco004.get("cam_or_manufacturing_release") is False,
+                    "PCB-MAIN ECO-004 application identity or release boundary drift")
+            board_applied = eco004.get("applied", {})
+            require(board_applied.get("changed_references") == ["U4"] and
+                    board_applied.get("track_segments") == 0 and
+                    board_applied.get("vias") == 0 and
+                    board_applied.get("copper_zones") == 0,
+                    "PCB-MAIN ECO-004 footprint-only application drift")
     else:
         application = json.loads(ECO002_APPLICATION.read_text(encoding="utf-8"))
         proposal_id = "PCB-MAIN-MECH-ECO-002"
@@ -767,12 +788,13 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
                 application.get("manufacturing_release") is False,
                 "PCB-MAIN ECO-002 frozen repack crosses a release boundary")
         applied = application.get("applied", {})
+        board_applied = applied
     require(applied.get("placement_repack") ==
             str(PLACEMENT.relative_to(ROOT)) and
             applied.get("placement_repack_sha256") == sha256(PLACEMENT),
             "PCB-MAIN approved placement-repack SHA-256 drift")
-    require(applied.get("board") == str(BOARD.relative_to(ROOT)) and
-            applied.get("board_sha256") == sha256(BOARD),
+    require(board_applied.get("board") == str(BOARD.relative_to(ROOT)) and
+            board_applied.get("board_sha256") == sha256(BOARD),
             "PCB-MAIN approved placement board SHA-256 drift")
     require(applied.get("mechanical_authority", applied.get("authority")) ==
             str(AUTHORITY.relative_to(ROOT)) and
@@ -801,7 +823,7 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
     require(len(getattr(board, "traceItems", [])) == 0 and
             len(getattr(board, "zones", [])) == 0,
             "PCB-MAIN approved placement board unexpectedly contains copper")
-    if proposal_id == "PCB-MAIN-RF-ROUTEABILITY-ECO-003":
+    if ECO003_APPLICATION.is_file():
         by_ref = {row["RefDes"]: row for row in rows}
         for ref, expected in ECO003_POSES.items():
             actual = (

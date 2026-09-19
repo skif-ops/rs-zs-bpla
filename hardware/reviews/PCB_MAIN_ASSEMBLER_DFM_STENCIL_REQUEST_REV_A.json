@@ -19,7 +19,7 @@
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
-    "native_board_sha256": "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684",
+    "native_board_sha256": "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8",
     "placement_manifest": "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
     "placement_manifest_sha256": "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4",
     "u2_footprint": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/Winbond_W25Q512JV_PackageF_IPC_Candidate.kicad_mod",
@@ -31,9 +31,9 @@
     "ipc_candidate_authority": "hardware/PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md",
     "ipc_candidate_authority_sha256": "c93adc8d4f00235fa571e1aae39e6ddaffd33c6d8fd751e0105035bc7ddee360",
     "footprint_disposition": "hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md",
-    "footprint_disposition_sha256": "d979df98c7e12cd70e9b49d8fe1f9955d303cafd4fdf4088121bf1691436db97",
+    "footprint_disposition_sha256": "560aa54c81f0b44bbaac0967abeefff362b8cd1751324d516aecb36350157811",
     "footprint_review_register": "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv",
-    "footprint_review_register_sha256": "8ddb512f9bf5dcc7df4c9be8a9099e93154d1276fb930403e8020cc030dc3b56"
+    "footprint_review_register_sha256": "e1fa9f08d8e055c57240b0cdef11a404f367926a5bbe29909ca13994a2c2f09b"
   },
   "request_scope": {
     "assembler_slot": "ASM-MAIN-CANDIDATE",

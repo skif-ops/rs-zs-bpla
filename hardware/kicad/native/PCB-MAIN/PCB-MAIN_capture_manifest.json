@@ -63,7 +63,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "e25cf032f7f66db7b6e1a9fd8552dd47bc029ff8adae1247786d5f94baa5329e"
+      "sha256": "b5c64fb1c35433d6f5d13828137d8e3ee1dd5bf674e2bd98c55a4922b9ea75c5"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -79,7 +79,7 @@
     },
     {
       "path": "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv",
-      "sha256": "8ddb512f9bf5dcc7df4c9be8a9099e93154d1276fb930403e8020cc030dc3b56"
+      "sha256": "e1fa9f08d8e055c57240b0cdef11a404f367926a5bbe29909ca13994a2c2f09b"
     },
     {
       "path": "hardware/PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md",
@@ -206,7 +206,7 @@
     },
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/STTS22H_UDFN-6L.kicad_mod",
-      "sha256": "d3421087f45b39626defa0608f8fd269f02033f4c4b7ff15bb708af18b573a93"
+      "sha256": "e06136e5f2ebd67798141ff1ef99db94d895d139d20b3c98a671e34bbbfa277f"
     },
     {
       "path": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/LT6000_DCB-7.kicad_mod",

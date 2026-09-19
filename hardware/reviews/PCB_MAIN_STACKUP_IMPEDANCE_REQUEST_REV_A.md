@@ -23,7 +23,7 @@ Independent audit:
 | Item | Controlled value |
 |---|---|
 | Native PCB | `hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb` |
-| Native PCB SHA-256 | `dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684` |
+| Native PCB SHA-256 | `a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8` |
 | Mechanical authority SHA-256 | `8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9` |
 | Placement manifest SHA-256 | `34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4` |
 | Routing authority SHA-256 | `f77948c4837448fbc6c3d0cfd6820354a0a8cab12925457bf90768704cb9e1dc` |

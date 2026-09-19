@@ -1942,6 +1942,72 @@ def main() -> None:
                     rf_eco_003_application.get("review_b_complete") is False and
                     rf_eco_003_application.get("manufacturing_release") is False,
                     "PCB-MAIN RF routeability ECO-003 application interlock drift")
+            require(review_b["evidence"].get("stts22h_footprint_eco_004_status") ==
+                    "APPROVED_APPLIED_BOUNDED_U4_CORRECTION_ROUTING_ENGINEERING_CONTINUES",
+                    "PCB-MAIN STTS22H footprint ECO-004 status drift")
+            stts22h_eco_004_approval = json.loads(
+                (ROOT / review_b["evidence"]["stts22h_footprint_eco_004_approval"])
+                .read_text(encoding="utf-8")
+            )
+            stts22h_authorization = stts22h_eco_004_approval.get("authorization", {})
+            require(stts22h_eco_004_approval.get("proposal_id") ==
+                    "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004" and
+                    stts22h_eco_004_approval.get("reviewer") == "Скиф" and
+                    stts22h_eco_004_approval.get("decision_date") == "2026-09-19" and
+                    stts22h_eco_004_approval.get("decision") ==
+                    "ACCEPT_STTS22H_FOOTPRINT_ECO_004" and
+                    stts22h_eco_004_approval.get("reviewed_github_commit_sha") ==
+                    "059ecd0e2e35fc56a56f48d62cce4f72a93755c0" and
+                    stts22h_authorization.get(
+                        "apply_bounded_u4_land_pattern_correction"
+                    ) is True and
+                    stts22h_authorization.get(
+                        "continue_pcb_main_routing_engineering"
+                    ) is True and
+                    stts22h_authorization.get(
+                        "candidate_or_future_copper_final_authorized"
+                    ) is False and
+                    stts22h_authorization.get("review_b_complete") is False and
+                    stts22h_authorization.get(
+                        "cam_or_manufacturing_release"
+                    ) is False,
+                    "PCB-MAIN STTS22H footprint ECO-004 approval interlock drift")
+            stts22h_eco_004_mapping = json.loads(
+                (ROOT / review_b["evidence"][
+                    "stts22h_footprint_eco_004_review_commit_mapping"
+                ]).read_text(encoding="utf-8")
+            )
+            require(stts22h_eco_004_mapping.get("reviewed_github_commit_sha") ==
+                    "059ecd0e2e35fc56a56f48d62cce4f72a93755c0" and
+                    stts22h_eco_004_mapping.get("reviewed_tree_sha") ==
+                    "d6805c8f15ce319410a996f143132c6f8f58f35e" and
+                    stts22h_eco_004_mapping.get("equivalence") ==
+                    "EXACT_REVIEWED_TREE_AND_BLOBS" and
+                    stts22h_eco_004_mapping.get("review_b_complete") is False and
+                    stts22h_eco_004_mapping.get("manufacturing_release") is False,
+                    "PCB-MAIN STTS22H footprint ECO-004 review mapping drift")
+            stts22h_eco_004_application = json.loads(
+                (ROOT / review_b["evidence"]["stts22h_footprint_eco_004_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(stts22h_eco_004_application.get("proposal_id") ==
+                    "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004" and
+                    stts22h_eco_004_application.get("decision") ==
+                    "ACCEPT_STTS22H_FOOTPRINT_ECO_004" and
+                    stts22h_eco_004_application.get("status") ==
+                    "APPLIED_BOUNDED_U4_CORRECTION_ROUTING_ENGINEERING_CONTINUES" and
+                    stts22h_eco_004_application.get(
+                        "routing_engineering_continuation_authorized"
+                    ) is True and
+                    stts22h_eco_004_application.get(
+                        "candidate_or_future_copper_final_authorized"
+                    ) is False and
+                    stts22h_eco_004_application.get("routing_complete") is False and
+                    stts22h_eco_004_application.get("review_b_complete") is False and
+                    stts22h_eco_004_application.get(
+                        "cam_or_manufacturing_release"
+                    ) is False,
+                    "PCB-MAIN STTS22H footprint ECO-004 application interlock drift")
             mechanical_application = None
             if mechanical_eco_status in {
                     "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
@@ -2057,8 +2123,19 @@ def main() -> None:
                             "locked_authority_mounting_conflicts": [],
                             "locked_authority_tool_conflicts": [],
                         }, "PCB-MAIN mechanical ECO historical inventory drift")
-                require(rf_eco_003_application.get("applied", {}).get("board_sha256") ==
+                require(stts22h_eco_004_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) ==
                         placement_control["board_sha256"] and
+                        stts22h_eco_004_application.get("applied", {}).get(
+                            "changed_references"
+                        ) == ["U4"] and
+                        stts22h_eco_004_application.get("applied", {}).get(
+                            "track_segments"
+                        ) == 0 and
+                        stts22h_eco_004_application.get("applied", {}).get(
+                            "copper_zones"
+                        ) == 0 and
                         rf_eco_003_application.get("applied", {}).get(
                             "mechanical_authority_sha256"
                         ) == placement_control["authority_sha256"] and

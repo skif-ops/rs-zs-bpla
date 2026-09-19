@@ -328,9 +328,17 @@
       "rf_routeability_eco_003_application": "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPLICATION.json",
       "rf_routeability_eco_003_audit": "tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py",
       "rf_routeability_eco_003_status": "APPROVED_APPLIED_PLACEMENT_ONLY_ROUTING_ENGINEERING_CONTINUES",
+      "stts22h_footprint_eco_004_candidate": "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_CANDIDATE_REV_A.json",
+      "stts22h_footprint_eco_004_candidate_record": "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_CANDIDATE_REV_A.md",
+      "stts22h_footprint_eco_004_approval": "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPROVAL.json",
+      "stts22h_footprint_eco_004_approval_record": "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPROVAL.md",
+      "stts22h_footprint_eco_004_review_commit_mapping": "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_REVIEW_COMMIT_MAPPING.json",
+      "stts22h_footprint_eco_004_application": "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPLICATION.json",
+      "stts22h_footprint_eco_004_audit": "tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py",
+      "stts22h_footprint_eco_004_status": "APPROVED_APPLIED_BOUNDED_U4_CORRECTION_ROUTING_ENGINEERING_CONTINUES",
       "placement_clearance_control": {
         "state": "PASS",
-        "board_sha256": "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684",
+        "board_sha256": "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8",
         "authority_sha256": "8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9",
         "assembly_footprints": 227,
         "courtyard_footprints": 227,
@@ -352,7 +360,7 @@
       "routing_constraint_status": "PASS_ALL_186_NETS_CLASSIFIED_FACTORY_STACKUP_AND_ROUTING_PENDING",
       "routing_constraint_control": {
         "state": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE",
-        "board_sha256": "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684",
+        "board_sha256": "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8",
         "authority_sha256": "f77948c4837448fbc6c3d0cfd6820354a0a8cab12925457bf90768704cb9e1dc",
         "net_count": 186,
         "class_counts": {

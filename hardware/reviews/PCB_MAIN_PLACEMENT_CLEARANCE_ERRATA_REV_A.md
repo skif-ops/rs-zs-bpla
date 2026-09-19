@@ -140,6 +140,12 @@ moved in the controlled placement source. The 89-segment RF feasibility route
 was not copied to the authoritative board, which remains at zero tracks, zero
 vias and zero copper zones.
 
+Reviewer `Скиф` accepted `PCB-MAIN-STTS22H-FOOTPRINT-ECO-004` on 2026-09-19
+with decision `ACCEPT_STTS22H_FOOTPRINT_ECO_004`. The bounded application
+corrects only U4 signal-pad row centres, courtyard height and reference-text
+position. U4 placement and all other footprints remain unchanged; the board
+remains at zero tracks, zero vias and zero copper zones.
+
 ## Controlled post-repack result
 
 `hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv` fixes all 225 movable top-side
@@ -163,16 +169,17 @@ including 169 fitted and 15 DNP footprints.
 
 Controlled hashes:
 
-- native PCB SHA-256: `dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684`
+- native PCB SHA-256: `a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8`
 - placement manifest SHA-256: `34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4`
 - MAIN-AUTH-011 CSV SHA-256: `8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9`
 
-The four independent controls now pass on the same source state:
+The five independent controls now pass on the same source state:
 
 1. `python tools/audit_pcb_main_layout_candidate_rev_a.py`
 2. `python tools/audit_pcb_main_placement_clearance_rev_a.py --strict`
 3. `python tools/audit_pcb_main_mech_eco_002_rev_a.py`
 4. `python tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py`
+5. `python tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py`
 
 ## Remaining release boundary
 

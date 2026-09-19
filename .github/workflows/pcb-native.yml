@@ -450,6 +450,7 @@ jobs:
               "ST_ESDALC6V1-5P6_SOT666": 6,
               "Vishay_Si1016X_SC-89": 6,
               "ST_LIS2DW12_LGA-12L": 12,
+              "STTS22H_UDFN-6L": 7,
               "Raytac_MDBT50Q-P1MV2": 61,
               "Quectel_BG95-M3_LGA-102": 102,
               "GCT_MEM2052-00-195-00-A": 13,
@@ -470,13 +471,18 @@ jobs:
           evidence=artifacts/kicad-native/PCB-MAIN/rf-routeability-eco-003
           mkdir -p "$evidence"
           candidate_project="$(mktemp -d)"
+          git show \
+            909fc1e86c8b3711c8b00358c9892a09609279e4:hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb \
+            > "$candidate_project/PCB-MAIN_RF_ECO_003_APPLIED_BASE.kicad_pcb"
           cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
             "$candidate_project/PCB-MAIN_RF_ECO_003.kicad_pro"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_RF_ECO_003_APPLIED_BASE.kicad_pro"
           cp hardware/kicad/candidates/PCB-MAIN-RF-ECO-003/PCB-MAIN_RF_ECO_003.kicad_pcb \
             "$candidate_project/PCB-MAIN_RF_ECO_003.kicad_pcb"
           kicad-cli pcb drc --severity-all \
             -o "$evidence/baseline_drc.rpt" \
-            hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb
+            "$candidate_project/PCB-MAIN_RF_ECO_003_APPLIED_BASE.kicad_pcb"
           kicad-cli pcb drc --severity-all \
             -o "$evidence/candidate_drc.rpt" \
             "$candidate_project/PCB-MAIN_RF_ECO_003.kicad_pcb"
@@ -496,7 +502,10 @@ jobs:
           candidate_project="$(mktemp -d)"
           cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
             "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pro"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_STTS22H_ECO_004_BASE.kicad_pro"
           python tools/materialize_pcb_main_stts22h_footprint_eco_004_rev_a.py \
+            --baseline-output "$candidate_project/PCB-MAIN_STTS22H_ECO_004_BASE.kicad_pcb" \
             --output "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pcb"
           python tools/audit_pcb_main_placement_clearance_rev_a.py \
             --board "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pcb" \
@@ -504,7 +513,7 @@ jobs:
             --strict
           kicad-cli pcb drc --severity-all \
             -o "$evidence/baseline_drc.rpt" \
-            hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb
+            "$candidate_project/PCB-MAIN_STTS22H_ECO_004_BASE.kicad_pcb"
           kicad-cli pcb drc --severity-all \
             -o "$evidence/candidate_drc.rpt" \
             "$candidate_project/PCB-MAIN_STTS22H_ECO_004.kicad_pcb"

@@ -347,7 +347,7 @@ def main() -> int:
             f"unexpected manufacturer-controlled set: {manufacturer_controlled}")
 
     register_rows = list(csv.DictReader(FOOTPRINT_REVIEW.open(encoding="utf-8", newline="")))
-    require(len(register_rows) == 19, "KiCad footprint-review register must contain 19 patterns")
+    require(len(register_rows) == 20, "KiCad footprint-review register must contain 20 patterns")
     registered: set[str] = set()
     registered_by_status: dict[str, set[str]] = {}
     for row in register_rows:
@@ -374,7 +374,7 @@ def main() -> int:
                     f"{ref}: board/register footprint status mismatch")
             require(footprints[ref].properties.get("DIONEA_FOOTPRINT_SOURCE") == row["Board_Source"],
                     f"{ref}: board/register footprint source mismatch")
-    require(len(registered) == 44, "footprint-review register must cover 44 original instances")
+    require(len(registered) == 45, "footprint-review register must cover 45 original instances")
     require(registered_by_status.get("PENDING", set()) == set(library_pending),
             "register pending references differ from board")
     require(registered_by_status.get("PACKAGE_ONLY_IPC_CONTROL_REQUIRED", set()) ==
@@ -389,8 +389,47 @@ def main() -> int:
             {"J8", "J9", "J10", "U1", "U3", "U7", "U11", "U13", "U14", "U15", "U16", "U17",
              "U18", "U19", "U20", "U21", "U22", "U23", "U24", "U27",
              "D1", "D2", "D4", "D6", "D7", "D8", "D9", "D10", "D11",
-             "Q1", "Q2", "Q3", "Q4", "U6", "C36", "C44"},
+             "Q1", "Q2", "Q3", "Q4", "U4", "U6", "C36", "C44"},
             "register project-controlled replacement set differs from board")
+
+    # ECO-004 fixes a transposed U4 row-centre dimension.  The exact ST land
+    # contract is asserted here so a future library or generator drift cannot
+    # recreate the signal-pad-to-EP overlap.
+    u4 = footprints["U4"]
+    u4_pads = {pad.number: pad for pad in u4.pads if pad.number}
+    expected_u4 = {
+        "1": (-0.65, 0.865), "2": (0.0, 0.865), "3": (0.65, 0.865),
+        "4": (0.65, -0.865), "5": (0.0, -0.865), "6": (-0.65, -0.865),
+        "EP": (0.0, 0.0),
+    }
+    require(set(u4_pads) == set(expected_u4), "U4: STTS22H pad set drift")
+    for number, (x, y) in expected_u4.items():
+        pad = u4_pads[number]
+        expected_size = (1.45, 0.65) if number == "EP" else (0.27, 0.70)
+        expected_shape = "rect" if number in {"1", "EP"} else "roundrect"
+        require(abs(pad.position.X - x) < 0.002 and
+                abs(pad.position.Y - y) < 0.002 and
+                abs(pad.size.X - expected_size[0]) < 0.002 and
+                abs(pad.size.Y - expected_size[1]) < 0.002 and
+                pad.shape == expected_shape and
+                pad.layers == ["F.Cu", "F.Paste", "F.Mask"] and
+                abs(float(pad.clearance or 0.0) - 0.18) < 0.002,
+                f"U4.{number}: ECO-004 controlled pad geometry drift")
+        if number not in {"1", "EP"}:
+            require(abs(float(pad.roundrectRatio or 0.0) - 0.20) < 0.002,
+                    f"U4.{number}: round-rect ratio drift")
+        if number != "EP":
+            gap = abs(float(pad.position.Y)) - float(pad.size.Y) / 2.0 \
+                - float(u4_pads["EP"].size.Y) / 2.0
+            require(abs(gap - 0.190) < 0.002,
+                    f"U4.{number}: signal-to-EP gap is {gap:.6f} mm")
+    require(courtyard_bounds(u4) == (-1.25, -1.5, 1.25, 1.5),
+            "U4: ECO-004 courtyard drift")
+    u4_refs = [item for item in u4.graphicItems
+               if getattr(item, "type", None) == "reference"]
+    require(len(u4_refs) == 1 and abs(u4_refs[0].position.X) < 0.002 and
+            abs(u4_refs[0].position.Y + 1.8) < 0.002,
+            "U4: ECO-004 reference-text position drift")
 
     # These project-local lands freeze the package-compatible KiCad IPC
     # candidates so library drift cannot alter routing. Winbond Rev B package F
@@ -912,7 +951,7 @@ def main() -> int:
             "U4: lead land differs from ST Figure 10")
     require(abs(u4["EP"].size.X - 1.45) < 0.002 and abs(u4["EP"].size.Y - 0.65) < 0.002,
             "U4: exposed pad differs from ST Figure 10")
-    require(abs(abs(u4["1"].position.Y - u4["6"].position.Y) - 1.08) < 0.002,
+    require(abs(abs(u4["1"].position.Y - u4["6"].position.Y) - 1.73) < 0.002,
             "U4: row spacing differs from ST Figure 10")
     u5 = {pad.number: pad for pad in footprints["U5"].pads if pad.number}
     require(set(u5) == {"1", "2", "3", "4", "5", "6", "EP"}, "U5: DCB pad set")

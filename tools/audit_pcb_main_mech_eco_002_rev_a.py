@@ -28,12 +28,14 @@ BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
 STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 ECO003_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPLICATION.json"
+ECO004_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPLICATION.json"
 
 CANDIDATE_SHA256 = "5164195ebf6a9a66b6a30197abfcb314655bfe059d0aea5f3782a744069780ff"
 AUTHORITY_SHA256 = "8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9"
 BOARD_SHA256 = "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e"
 PLACEMENT_SHA256 = "dbc433cb36b0bec612f55dbb96e6dce34d502728e488810c115207ffbbebc1d1"
-CURRENT_BOARD_SHA256 = "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684"
+ECO003_BOARD_SHA256 = "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684"
+CURRENT_BOARD_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
 CURRENT_PLACEMENT_SHA256 = "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4"
 REVIEWED_LOCAL_COMMIT = "16ee36b9432508b539736a8ee78890ad99ce0788"
 REVIEWED_GITHUB_COMMIT = "b3ab796bcdee727798a121d114605e7ba84d683a"
@@ -121,18 +123,29 @@ def audit() -> dict[str, Any]:
             "PCB-MAIN ECO-002 historical placement-repack SHA-256 drift")
     require(ECO003_APPLICATION.is_file(),
             "PCB-MAIN ECO-003 application is missing from the current placement lineage")
+    require(ECO004_APPLICATION.is_file(),
+            "PCB-MAIN ECO-004 application is missing from the current footprint lineage")
     eco003 = json.loads(ECO003_APPLICATION.read_text(encoding="utf-8"))
     require(eco003.get("proposal_id") == "PCB-MAIN-RF-ROUTEABILITY-ECO-003" and
             eco003.get("decision") == "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO" and
             eco003.get("candidate_copper_final_authorized") is False and
             eco003.get("review_b_complete") is False and
             eco003.get("manufacturing_release") is False and
-            eco003.get("applied", {}).get("board_sha256") == CURRENT_BOARD_SHA256 and
+            eco003.get("applied", {}).get("board_sha256") == ECO003_BOARD_SHA256 and
             eco003.get("applied", {}).get("placement_repack_sha256") ==
-            CURRENT_PLACEMENT_SHA256 and
+            CURRENT_PLACEMENT_SHA256,
+            "PCB-MAIN post-ECO-002 placement lineage drift")
+    eco004 = json.loads(ECO004_APPLICATION.read_text(encoding="utf-8"))
+    require(eco004.get("proposal_id") == "PCB-MAIN-STTS22H-FOOTPRINT-ECO-004" and
+            eco004.get("decision") == "ACCEPT_STTS22H_FOOTPRINT_ECO_004" and
+            eco004.get("candidate_or_future_copper_final_authorized") is False and
+            eco004.get("review_b_complete") is False and
+            eco004.get("cam_or_manufacturing_release") is False and
+            eco004.get("applied", {}).get("board_sha256") == CURRENT_BOARD_SHA256 and
+            eco004.get("applied", {}).get("changed_references") == ["U4"] and
             sha256(BOARD) == CURRENT_BOARD_SHA256 and
             sha256(PLACEMENT) == CURRENT_PLACEMENT_SHA256,
-            "PCB-MAIN post-ECO-002 placement lineage drift")
+            "PCB-MAIN post-ECO-003 footprint lineage drift")
 
     candidate = CANDIDATE.read_text(encoding="utf-8")
     require("PCB-MAIN mechanical ECO-002 candidate" in candidate and

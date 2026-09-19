@@ -22,14 +22,14 @@ Independent audit:
 
 | Item | Controlled SHA-256 |
 |---|---|
-| Native PCB-MAIN board | `dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684` |
+| Native PCB-MAIN board | `a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8` |
 | Placement manifest | `34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4` |
 | U2 project footprint | `78a67dda268e971a3463c41a8fb8170c3c59a1d3af145c65ed6b7212d1d8af83` |
 | U25/U26 project footprint | `b82af2a8e0eb455b430115ea8d9f2c4aeae30cc71de92823573d4f2d092bc6b9` |
 | U9 project footprint | `9c38091a434fb82f84dac437901e0d544c8b2be6e5aa4ee0cfced36c6aa95d87` |
 | IPC-candidate authority | `c93adc8d4f00235fa571e1aae39e6ddaffd33c6d8fd751e0105035bc7ddee360` |
-| Footprint-disposition record | `d979df98c7e12cd70e9b49d8fe1f9955d303cafd4fdf4088121bf1691436db97` |
-| Footprint-review register | `8ddb512f9bf5dcc7df4c9be8a9099e93154d1276fb930403e8020cc030dc3b56` |
+| Footprint-disposition record | `560aa54c81f0b44bbaac0967abeefff362b8cd1751324d516aecb36350157811` |
+| Footprint-review register | `e1fa9f08d8e055c57240b0cdef11a404f367926a5bbe29909ca13994a2c2f09b` |
 
 The bound native board is still unrouted and has no copper zones. No Gerber,
 paste Gerber, centroid or assembly drawing from it is released by this packet.
