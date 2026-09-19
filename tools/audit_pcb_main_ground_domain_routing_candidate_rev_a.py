@@ -29,11 +29,23 @@ CANDIDATE_BOARD = (
     / "PCB-MAIN_GROUND_DOMAIN_CANDIDATE_REV_A.kicad_pcb"
 )
 PROPOSAL = ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDIDATE_REV_A.json"
+PROPOSAL_RECORD = ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_CANDIDATE_REV_A.md"
+APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPROVAL_REV_A.json"
+APPROVAL_RECORD = ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_APPROVAL_REV_A.md"
+REVIEW_MAPPING = ROOT / "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_REVIEW_COMMIT_MAPPING.json"
 MECHANICAL = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 LAYER_AUTHORITY = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
 
 BASE_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
 CANDIDATE_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
+PROPOSAL_SHA256 = "6ad0446ea98a44863cef91be137da3e5dcff92303ac9e395e260773e8cebc314"
+PROPOSAL_RECORD_SHA256 = "12f5ffafaa90cf3d796e08f17c333ac7701d0b17f286af487c31b8410673cb19"
+REVIEWED_GITHUB_COMMIT = "830139e8875e4e67738cf88b938a8d0ff91e2798"
+REVIEWED_TREE = "7670dea776097a70381792ad4efadc349d6537df"
+PROPOSAL_BLOB = "406857fb53f4ea0f46f6a91cba3b0ee27b4e2433"
+PROPOSAL_RECORD_BLOB = "093e023575b6ab45b20b674d0e3405edda6a36ae"
+CANDIDATE_BLOB = "ab8e886297b1f611be6f20225d600556af97555f"
+AUDIT_BLOB = "4cbeca9dbb3194643c7d2652827b91b2165086d3"
 GROUND_NETS = {"GND_DIGITAL", "GND_MODEM", "GND_MIC"}
 ALL_COPPER_LAYERS = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "B.Cu"]
 TRACK_WIDTH_MM = 0.15
@@ -301,11 +313,17 @@ def native_connectivity() -> dict[str, Any]:
 
 
 def static_audit() -> dict[str, Any]:
-    for path in (BASE_BOARD, CANDIDATE_BOARD, PROPOSAL, MECHANICAL, LAYER_AUTHORITY):
+    for path in (
+        BASE_BOARD, CANDIDATE_BOARD, PROPOSAL, PROPOSAL_RECORD, APPROVAL,
+        APPROVAL_RECORD, REVIEW_MAPPING, MECHANICAL, LAYER_AUTHORITY,
+    ):
         require(path.is_file() and path.stat().st_size > 0, f"missing candidate input: {path}")
     require(sha256(BASE_BOARD) == BASE_SHA256, "PCB-MAIN authoritative baseline SHA-256 drift")
     require(sha256(CANDIDATE_BOARD) == CANDIDATE_SHA256,
             "PCB-MAIN ground candidate SHA-256 drift")
+    require(sha256(PROPOSAL) == PROPOSAL_SHA256 and
+            sha256(PROPOSAL_RECORD) == PROPOSAL_RECORD_SHA256,
+            "PCB-MAIN ground proposal record SHA-256 drift")
 
     base = Board.from_file(str(BASE_BOARD), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE_BOARD), encoding="utf-8")
@@ -538,10 +556,85 @@ def static_audit() -> dict[str, Any]:
                 "manufacturing_release": False,
             }, "ground-domain decision boundary drift")
 
+    approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
+    approval_record = APPROVAL_RECORD.read_text(encoding="utf-8")
+    mapping = json.loads(REVIEW_MAPPING.read_text(encoding="utf-8"))
+    expected_gate = {
+        "pcb_native_run_id": 35439569309,
+        "pcb_native_conclusion": "success",
+        "ci_run_id": 35439569334,
+        "ci_conclusion": "success",
+    }
+    require(approval.get("schema_version") ==
+            "dioneya.pcb-main-ground-domain-routing-approval.v1" and
+            approval.get("configuration") == "EVT-PRE-20 Rev.A" and
+            approval.get("proposal_id") == "PCB-MAIN-GROUND-DOMAIN-ROUTING-001" and
+            approval.get("reviewer") == "Скиф" and
+            approval.get("decision_date") == "2026-09-19" and
+            approval.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE" and
+            approval.get("decision_input") == "подтверждаю и продолжаем" and
+            approval.get("decision_input_interpretation") ==
+            "ACCEPT_VALUE_REQUESTED_IN_IMMEDIATELY_PRECEDING_REVIEW_REQUEST" and
+            approval.get("reviewed_github_commit_sha") == REVIEWED_GITHUB_COMMIT and
+            approval.get("reviewed_tree_sha") == REVIEWED_TREE and
+            approval.get("review_mapping") == str(REVIEW_MAPPING.relative_to(ROOT)) and
+            approval.get("reviewed_proposal_sha256") == PROPOSAL_SHA256 and
+            approval.get("reviewed_proposal_record_sha256") == PROPOSAL_RECORD_SHA256 and
+            approval.get("reviewed_candidate_board_sha256") == CANDIDATE_SHA256 and
+            approval.get("machine_gate") == expected_gate,
+            "ground-domain approval identity or reviewed evidence drift")
+    require(approval.get("authorization") == {
+                "apply_exact_hash_bound_fanout_vias_rule_areas_and_shaped_planes": True,
+                "continue_signal_and_power_routing_engineering": True,
+                "alter_reviewed_ground_geometry_without_new_controlled_review": False,
+                "routing_complete": False,
+                "return_path_review_complete": False,
+                "si_review_complete": False,
+                "pi_review_complete": False,
+                "review_b_complete": False,
+                "cam_or_manufacturing_release": False,
+            }, "ground-domain approval authorization boundary drift")
+    for token in (
+        "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE",
+        REVIEWED_GITHUB_COMMIT,
+        REVIEWED_TREE,
+        PROPOSAL_SHA256,
+        PROPOSAL_RECORD_SHA256,
+        CANDIDATE_SHA256,
+        "PCB Native Gate `35439569309`: `success`",
+        "CI `35439569334`: `success`",
+        "does not close PCB-MAIN Review B",
+    ):
+        require(token in approval_record,
+                f"ground-domain approval record missing binding token: {token}")
+    require(mapping == {
+                "schema_version": "dioneya.pcb-main-ground-domain-routing-review-commit-mapping.v1",
+                "configuration": "EVT-PRE-20 Rev.A",
+                "proposal_id": "PCB-MAIN-GROUND-DOMAIN-ROUTING-001",
+                "reviewed_github_commit_sha": REVIEWED_GITHUB_COMMIT,
+                "reviewed_tree_sha": REVIEWED_TREE,
+                "proposal_path": str(PROPOSAL.relative_to(ROOT)),
+                "proposal_blob_sha": PROPOSAL_BLOB,
+                "proposal_sha256": PROPOSAL_SHA256,
+                "proposal_record_path": str(PROPOSAL_RECORD.relative_to(ROOT)),
+                "proposal_record_blob_sha": PROPOSAL_RECORD_BLOB,
+                "proposal_record_sha256": PROPOSAL_RECORD_SHA256,
+                "candidate_board_path": str(CANDIDATE_BOARD.relative_to(ROOT)),
+                "candidate_board_blob_sha": CANDIDATE_BLOB,
+                "candidate_board_sha256": CANDIDATE_SHA256,
+                "audit_path": str(Path(__file__).resolve().relative_to(ROOT)),
+                "audit_blob_sha": AUDIT_BLOB,
+                "machine_gate": expected_gate,
+                "equivalence": "EXACT_REVIEWED_TREE_AND_BLOBS",
+                "transport": "GITHUB_APP_GIT_DATABASE_API",
+                "review_b_complete": False,
+                "manufacturing_release": False,
+            }, "ground-domain reviewed commit mapping drift")
+
     return {
         "schema_version": "dioneya.pcb-main-ground-domain-routing-candidate-audit.v1",
         "proposal_id": "PCB-MAIN-GROUND-DOMAIN-ROUTING-001",
-        "status": "PASS_PROPOSAL_ONLY",
+        "status": "PASS_ACCEPTED_SUBGATE_NOT_APPLIED",
         "base_board_sha256": BASE_SHA256,
         "candidate_board_sha256": CANDIDATE_SHA256,
         "track_segments": sum(segments.values()),
@@ -555,6 +648,13 @@ def static_audit() -> dict[str, Any]:
         "ground_copper_in_ble_keepout": len(antenna_hits),
         "ground_copper_in_mounting_keepouts": len(mounting_hits),
         "ground_copper_edge_violations": len(edge_hits),
+        "approval": {
+            "reviewer": approval["reviewer"],
+            "decision_date": approval["decision_date"],
+            "decision": approval["decision"],
+            "reviewed_github_commit_sha": approval["reviewed_github_commit_sha"],
+            "reviewed_tree_sha": approval["reviewed_tree_sha"],
+        },
         "routing_complete": False,
         "review_b_complete": False,
         "manufacturing_release": False,
@@ -581,7 +681,7 @@ def main() -> int:
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
-    print("PCB-MAIN ground-domain routing candidate audit: PASS_PROPOSAL_ONLY")
+    print("PCB-MAIN ground-domain routing candidate audit: PASS_ACCEPTED_SUBGATE_NOT_APPLIED")
     print("segments=319 vias=254 copper_zones=3 mounting_rule_areas=4")
     print("exclusive_zone_hits=0 ble_keepout_hits=0 mounting_keepout_hits=0 edge_hits=0")
     if args.kicad_connectivity:

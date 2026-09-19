@@ -1,0 +1,33 @@
+{
+  "schema_version": "dioneya.pcb-main-ground-domain-routing-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-GROUND-DOMAIN-ROUTING-001",
+  "reviewer": "Скиф",
+  "decision_date": "2026-09-19",
+  "decision": "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE",
+  "decision_input": "подтверждаю и продолжаем",
+  "decision_input_interpretation": "ACCEPT_VALUE_REQUESTED_IN_IMMEDIATELY_PRECEDING_REVIEW_REQUEST",
+  "reviewed_github_commit_sha": "830139e8875e4e67738cf88b938a8d0ff91e2798",
+  "reviewed_tree_sha": "7670dea776097a70381792ad4efadc349d6537df",
+  "review_mapping": "hardware/reviews/PCB_MAIN_GROUND_DOMAIN_ROUTING_REVIEW_COMMIT_MAPPING.json",
+  "reviewed_proposal_sha256": "6ad0446ea98a44863cef91be137da3e5dcff92303ac9e395e260773e8cebc314",
+  "reviewed_proposal_record_sha256": "12f5ffafaa90cf3d796e08f17c333ac7701d0b17f286af487c31b8410673cb19",
+  "reviewed_candidate_board_sha256": "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e",
+  "machine_gate": {
+    "pcb_native_run_id": 35439569309,
+    "pcb_native_conclusion": "success",
+    "ci_run_id": 35439569334,
+    "ci_conclusion": "success"
+  },
+  "authorization": {
+    "apply_exact_hash_bound_fanout_vias_rule_areas_and_shaped_planes": true,
+    "continue_signal_and_power_routing_engineering": true,
+    "alter_reviewed_ground_geometry_without_new_controlled_review": false,
+    "routing_complete": false,
+    "return_path_review_complete": false,
+    "si_review_complete": false,
+    "pi_review_complete": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}
