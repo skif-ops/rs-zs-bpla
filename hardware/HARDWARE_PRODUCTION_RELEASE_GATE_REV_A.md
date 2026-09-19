@@ -180,6 +180,17 @@ supplier assembly MPN, assembly-level temperature rating or accepted wire/crimp
 process. It is a capability and quotation input only. Final cut lengths remain
 blocked by `DIM-001`, `DIM-003` and `DIM-012`; the packet is not a build release.
 
+All six internally ready external-response packets are now assembled into one
+deterministic, source-only request archive controlled by
+`manufacturing/EVT_PRE_20_EXTERNAL_RESPONSE_BUNDLE_REV_A.{md,json}`. The archive
+contains the two-fabricator PCB-MAIN request, PCB-MAIN assembler request,
+PCB-PWR DIM-003 request, two-fabricator PCB-PWR request, PCB-MIC DFM request and
+harness-supplier request, plus the selected-lot procurement tables. Its
+embedded SHA-256 manifest is machine-audited, while every response register
+remains pending. This closes only the packaging/issuance preparation subgate;
+it is not a quotation, purchase order, routing authority or manufacturing
+release.
+
 ## Current blocker classes
 
 - physical assembly/EOL/EVT qualification of the documentarily controlled exact

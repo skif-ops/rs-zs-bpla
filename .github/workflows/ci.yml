@@ -46,6 +46,10 @@ jobs:
             --output artifacts/pcb_pwr_input_protection_qualification_rev_a.json
       - name: Hardware-only design and purchase release audit
         run: python tools/audit_evt_pre_20_hardware_release.py
+      - name: Audit controlled external-response request bundle inputs
+        run: |
+          python tools/audit_evt_pre_20_external_response_bundle.py \
+            --output artifacts/evt_pre_20_external_response_bundle_audit.json
       - name: Independent PCB-MIC native schematic structural audit
         run: |
           python tools/audit_pcb_mic_native_schematic_rev_a.py \
@@ -414,6 +418,12 @@ jobs:
         run: python tools/generate_evt_pre_20_bom_rev_a.py
       - name: Build reproducible current-state archives
         run: python tools/build_evt_pre_20_packages.py
+      - name: Audit external-response request archive and checksums
+        run: |
+          python tools/audit_evt_pre_20_external_response_bundle.py \
+            --archive artifacts/evt-pre-20-current/Dioneya_EVT_PRE_20_EXTERNAL_RESPONSE_REQUESTS_CURRENT.zip \
+            --sums artifacts/evt-pre-20-current/SHA256SUMS.txt \
+            --output artifacts/evt-pre-20-current/EXTERNAL_RESPONSE_BUNDLE_AUDIT.json
       - name: Upload engineering and separate PMI/report archives
         uses: actions/upload-artifact@v4
         with:
