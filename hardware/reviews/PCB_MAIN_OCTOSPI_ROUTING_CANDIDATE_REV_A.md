@@ -1,7 +1,7 @@
 # PCB-MAIN OctoSPI routing candidate Rev.A
 
 Candidate: `PCB-MAIN-OCTOSPI-ROUTING-001`  
-Status: `ENGINEERING PROPOSAL / NOT APPLIED / NOT FOR MANUFACTURE`
+Status: `REJECTED BY KICAD 9 DRC / NOT APPLIED / SUPERSEDED BY ECO-002`
 
 This bounded candidate adds routing only for the eleven nets between STM32U585,
 the series-damping network and W25Q512JV. It preserves every previously accepted
@@ -21,5 +21,6 @@ The corrected candidate uses the board-rule `0.20 mm` copper clearance.  A
 deterministic R8 escape places `NOR_CLK_U1` on In2.Cu and `NOR_CLK_U2` on
 In3.Cu before the remaining nine nets are grid-routed at `0.125 mm`.
 
-Human acceptance, commit-bound KiCad 9 comparative DRC, SI/return-path review,
-remaining routing, Review B and manufacturing release remain mandatory.
+GitHub Actions run `35456851202` rejected this candidate with 15 new errors:
+1 track crossing, 10 shorting-item errors and 4 clearance errors. It is retained
+only as failure evidence and is superseded by `PCB-MAIN-OCTOSPI-R8-ECO-002`.

@@ -36,7 +36,16 @@
     "ripups": 0,
     "failed_connections": []
   },
-  "status": "PROPOSAL_LOCAL_STRUCTURAL_AND_CONNECTIVITY_PASS_PENDING_KICAD9_COMPARATIVE_DRC_AND_HUMAN_REVIEW",
+  "status": "REJECTED_KICAD9_COMPARATIVE_DRC_SUPERSEDED_BY_PCB_MAIN_OCTOSPI_R8_ECO_002",
+  "kicad9_comparative_drc": {
+    "workflow_run": 35456851202,
+    "result": "FAIL",
+    "new_errors": {
+      "tracks_crossing": 1,
+      "shorting_items": 10,
+      "clearance": 4
+    }
+  },
   "applied_to_authoritative_board": false,
   "routing_complete": false,
   "return_path_review_complete": false,

@@ -104,6 +104,7 @@ on:
       - "tools/materialize_pcb_main_stts22h_footprint_eco_004_rev_a.py"
       - "tools/audit_pcb_main_ground_domain_routing_candidate_rev_a.py"
       - "tools/audit_pcb_main_octospi_routing_candidate_rev_a.py"
+      - "tools/audit_pcb_main_octospi_r8_eco_candidate_rev_a.py"
       - "tools/route_pcb_release_candidate_rev_a.py"
       - "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py"
       - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
@@ -611,24 +612,24 @@ jobs:
             --base-drc "$evidence/baseline_drc.rpt" \
             --candidate-drc "$evidence/candidate_drc.rpt" \
             --output "$evidence/comparative_audit.json"
-      - name: KiCad 9 comparative DRC for PCB-MAIN OctoSPI candidate
+      - name: KiCad 9 comparative DRC for PCB-MAIN OctoSPI R8 ECO-002 candidate
         shell: bash
         run: |
           set -euo pipefail
-          evidence=artifacts/kicad-native/PCB-MAIN/octospi-routing-001
+          evidence=artifacts/kicad-native/PCB-MAIN/octospi-r8-eco-002
           mkdir -p "$evidence"
           candidate_project="$(mktemp -d)"
           cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
-            "$candidate_project/PCB-MAIN_OCTOSPI_BASE_REV_A.kicad_pro"
-          cp hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_BASE_REV_A.kicad_pcb \
-            "$candidate_project/PCB-MAIN_OCTOSPI_BASE_REV_A.kicad_pcb"
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb"
           cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
-            "$candidate_project/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pro"
-          cp hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pcb \
-            "$candidate_project/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pcb"
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb"
           /usr/bin/python3 - \
-            "$candidate_project/PCB-MAIN_OCTOSPI_BASE_REV_A.kicad_pcb" \
-            "$candidate_project/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb" <<'PY'
           import sys
           import pcbnew
 
@@ -636,19 +637,19 @@ jobs:
               board = pcbnew.LoadBoard(path)
               pcbnew.ZONE_FILLER(board).Fill(board.Zones())
               pcbnew.SaveBoard(path, board)
-          print("PCB-MAIN OctoSPI base/candidate zone refill: PASS")
+          print("PCB-MAIN OctoSPI R8 ECO-002 base/candidate zone refill: PASS")
           PY
           kicad-cli pcb drc --format json --severity-all \
             -o "$evidence/baseline_drc.json" \
-            "$candidate_project/PCB-MAIN_OCTOSPI_BASE_REV_A.kicad_pcb"
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb"
           kicad-cli pcb drc --format json --severity-all \
             -o "$evidence/candidate_drc.json" \
-            "$candidate_project/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pcb"
+            "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb"
           DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
           PYTHONPATH="$DIONEYA_PYTHON_SITE" \
-            /usr/bin/python3 tools/audit_pcb_main_octospi_routing_candidate_rev_a.py \
-            --connectivity-base "$candidate_project/PCB-MAIN_OCTOSPI_BASE_REV_A.kicad_pcb" \
-            --connectivity-candidate "$candidate_project/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pcb" \
+            /usr/bin/python3 tools/audit_pcb_main_octospi_r8_eco_candidate_rev_a.py \
+            --connectivity-base "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb" \
+            --connectivity-candidate "$candidate_project/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb" \
             --drc-base "$evidence/baseline_drc.json" \
             --drc-candidate "$evidence/candidate_drc.json" \
             --output "$evidence/comparative_audit.json"
@@ -895,6 +896,10 @@ jobs:
             hardware/reviews/PCB_MAIN_OCTOSPI_ROUTING_CANDIDATE_REV_A.md
             hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb
             hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md
             hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md
             hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md

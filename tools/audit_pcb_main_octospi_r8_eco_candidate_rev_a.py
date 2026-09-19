@@ -1,31 +1,32 @@
 #!/usr/bin/env python3
-"""Audit the bounded PCB-MAIN OctoSPI routing proposal."""
+"""Audit the bounded PCB-MAIN OctoSPI R8 placement/routing ECO proposal."""
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
 import math
+import copy
 from collections import Counter
 from pathlib import Path
 
 from kiutils.board import Board
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_BASE_REV_A.kicad_pcb"
-CANDIDATE = ROOT / "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-ROUTING-001/PCB-MAIN_OCTOSPI_CANDIDATE_REV_A.kicad_pcb"
-PROPOSAL = ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_ROUTING_CANDIDATE_REV_A.json"
+BASE = ROOT / "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb"
+CANDIDATE = ROOT / "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb"
+PROPOSAL = ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_CANDIDATE_REV_A.json"
 ROUTER = ROOT / "tools/route_pcb_release_candidate_rev_a.py"
 BASE_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
-CANDIDATE_SHA256 = "758c9bfdf2d91a7dd4f69f00b94ac7d7cccff15f1415c6c72e68d5604ee67193"
-ROUTER_SHA256 = "ee645376472edfe093447b306c6c85f68f2963ae2a0833a82060f7e7dd225a9b"
+CANDIDATE_SHA256 = "946b52f40fac863e80ba476374707821f330c0d5c31c1b487cbc6a5d20cb7b43"
+ROUTER_SHA256 = "d685e0a89b86c413d20be02a1498196415d84970e1541e0729805e39caa115ed"
 EXPECTED = {
-    "NOR_CLK_U1": (7, 2), "NOR_CLK_U2": (6, 2),
-    "NOR_IO0_U1": (14, 2), "NOR_IO0_U2": (13, 2),
-    "NOR_IO1_U1": (15, 2), "NOR_IO1_U2": (8, 3),
-    "NOR_IO2_U1": (12, 3), "NOR_IO2_U2": (17, 2),
-    "NOR_IO3_U1": (9, 2), "NOR_IO3_U2": (9, 3),
-    "NOR_NCS_U2": (11, 2),
+    "NOR_CLK_U1": (8, 2), "NOR_CLK_U2": (17, 2),
+    "NOR_IO0_U1": (10, 2), "NOR_IO0_U2": (14, 2),
+    "NOR_IO1_U1": (20, 2), "NOR_IO1_U2": (8, 3),
+    "NOR_IO2_U1": (4, 2), "NOR_IO2_U2": (12, 2),
+    "NOR_IO3_U1": (17, 2), "NOR_IO3_U2": (9, 3),
+    "NOR_NCS_U2": (21, 0),
 }
 
 
@@ -82,15 +83,32 @@ def native_connectivity(base_path: Path, candidate_path: Path) -> dict[str, obje
 def static_audit() -> dict[str, object]:
     require(sha256(BASE) == BASE_SHA256, "OctoSPI base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "OctoSPI candidate SHA-256 drift")
+    require(sha256(ROUTER) == ROUTER_SHA256, "routing generator SHA-256 drift")
     base = Board().from_file(str(BASE))
     candidate = Board().from_file(str(CANDIDATE))
     for field in (
         "version", "generator", "general", "paper", "titleBlock", "layers",
-        "setup", "properties", "nets", "footprints", "graphicItems", "zones",
+        "setup", "properties", "nets", "graphicItems", "zones",
         "groups", "dimensions", "targets",
     ):
         require(getattr(base, field) == getattr(candidate, field),
                 f"non-routing field changed: {field}")
+
+    base_footprints = {str(fp.tstamp): fp for fp in base.footprints}
+    candidate_footprints = {str(fp.tstamp): fp for fp in candidate.footprints}
+    require(base_footprints.keys() == candidate_footprints.keys(),
+            "footprint identity set changed")
+    r8_uuid = "ffe16d6d-d31c-4b63-9ec3-6ad89fcbd6ea"
+    changed = [key for key in base_footprints
+               if base_footprints[key] != candidate_footprints[key]]
+    require(changed == [r8_uuid], f"footprint changes exceed R8 ECO: {changed}")
+    normalized_r8 = copy.deepcopy(candidate_footprints[r8_uuid])
+    normalized_r8.position = copy.deepcopy(base_footprints[r8_uuid].position)
+    require(normalized_r8 == base_footprints[r8_uuid],
+            "R8 changed beyond footprint position")
+    r8_position = candidate_footprints[r8_uuid].position
+    require((float(r8_position.X), float(r8_position.Y)) == (54.5, 16.0),
+            "R8 ECO position drift")
 
     base_items = {str(item.tstamp): item for item in base.traceItems}
     candidate_items = {str(item.tstamp): item for item in candidate.traceItems}
@@ -120,25 +138,24 @@ def static_audit() -> dict[str, object]:
                     f"{name}: via geometry drift")
     require({name: (segments[name], vias[name]) for name in EXPECTED} == EXPECTED,
             "per-net OctoSPI copper inventory drift")
-    require(sum(segments.values()) == 121 and sum(vias.values()) == 25,
+    require(sum(segments.values()) == 140 and sum(vias.values()) == 22,
             "total OctoSPI copper inventory drift")
-    require(abs(length - 282.362979395) < 1e-6, "OctoSPI track length drift")
+    require(abs(length - 290.374522443) < 1e-6, "OctoSPI track length drift")
     proposal = json.loads(PROPOSAL.read_text(encoding="utf-8"))
     require(proposal.get("candidate_board_sha256") == CANDIDATE_SHA256 and
-            proposal.get("generation", {}).get("tool_sha256") == ROUTER_SHA256 and
-            proposal.get("status", "").startswith("REJECTED_KICAD9_COMPARATIVE_DRC") and
             proposal.get("applied_to_authoritative_board") is False and
             proposal.get("review_b_complete") is False and
             proposal.get("cam_or_manufacturing_release") is False,
-            "rejected proposal identity or release boundary drift")
+            "proposal identity or release boundary drift")
     return {
-        "schema_version": "dioneya.pcb-main-octospi-routing-candidate-audit.v1",
+        "schema_version": "dioneya.pcb-main-octospi-r8-eco-candidate-audit.v1",
         "status": "PASS_STATIC_CANDIDATE_ISOLATION",
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "routed_nets": sorted(EXPECTED),
-        "added_segments": 121,
-        "added_vias": 25,
+        "r8_position_mm": [54.5, 16.0],
+        "added_segments": 140,
+        "added_vias": 22,
         "added_track_length_mm": length,
         "applied_to_authoritative_board": False,
         "review_b_complete": False,
@@ -166,8 +183,8 @@ def main() -> int:
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
-    print("PCB-MAIN OctoSPI routing candidate audit: PASS")
-    print(f"added_segments=121 added_vias=25 routed_nets={len(EXPECTED)}")
+    print("PCB-MAIN OctoSPI R8 ECO candidate audit: PASS")
+    print(f"r8_position_mm=54.5,16.0 added_segments=140 added_vias=22 routed_nets={len(EXPECTED)}")
     print("release_boundary=PENDING_HUMAN_REVIEW_AND_REVIEW_B")
     return 0
 
