@@ -1,15 +1,15 @@
 {
   "schema_version": "dioneya.pcb-main-rf-p0-candidate.v1",
   "candidate_id": "PCB-MAIN-RF-P0-001",
-  "date": "2026-09-19",
+  "date": "2026-09-20",
   "configuration": "EVT-PRE-20 Rev.A",
   "status": "PROPOSAL_STATIC_AUDIT_PASS_KICAD9_COMPARATIVE_DRC_PENDING",
   "base_board": "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb",
   "base_board_sha256": "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f",
   "candidate_board": "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb",
-  "candidate_board_sha256": "718e26555529f4076035ea2306826d8f2cd90b621b91bdff7d4e8f49962f1c43",
+  "candidate_board_sha256": "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040",
   "generator": "tools/generate_pcb_main_rf_p0_candidate_rev_a.py",
-  "generator_sha256": "c764be80c70c9f8aff3966367a064131d67ada9a6f42c900390fd45aa244a4c4",
+  "generator_sha256": "fe2051d54444d961cf3106b9a0b7862b3a929179c27d07fcd40232952ca2991a",
   "audit": "tools/audit_pcb_main_rf_p0_candidate_rev_a.py",
   "routing_basis": "hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json",
   "stackup_id": "JLC06161H-3313",
@@ -44,6 +44,17 @@
     "base_unique_trace_uuids": 838,
     "candidate_unique_trace_uuids": 976,
     "candidate_specific_seed": "0x52465030"
+  },
+  "cell_rf_clearance_fixup": {
+    "source_gate": "PCB Native Gate #260",
+    "targeted_candidate_only_clearance_violations": 4,
+    "moved_internal_vertices": 4,
+    "movement_mm": 0.0625,
+    "adjacent_pads": [
+      "C79.2",
+      "R43.2"
+    ],
+    "verification": "PENDING_KICAD9_CI"
   },
   "comparative_kicad9_drc": "PENDING_CI",
   "final_job_stackup_accepted": false,

@@ -61,6 +61,12 @@ GNSS_GUIDE = (
     (61.950, 68.250),
     (60.875, 68.250),
 )
+CELL_RF_CLEARANCE_VERTEX_FIXUPS = (
+    ((24.1625, 67.6000), (24.2250, 67.6625)),
+    ((24.1625, 67.7875), (24.2250, 67.8500)),
+    ((25.9125, 68.1625), (25.9750, 68.1000)),
+    ((25.9125, 68.4125), (25.9750, 68.3500)),
+)
 
 
 def require(value: bool, message: str) -> None:
@@ -103,6 +109,33 @@ def add_gnss_guide(board: pcbnew.BOARD) -> int:
         board.Add(track)
         count += 1
     return count
+
+
+def apply_cell_rf_clearance_fixups(board: pcbnew.BOARD) -> int:
+    """Move four internal route vertices one grid step clear of adjacent pads."""
+    net_code = board.FindNet("CELL_RF").GetNetCode()
+    require(bool(net_code), "missing native net: CELL_RF")
+    targets = {
+        (vec(*old).x, vec(*old).y): vec(*new)
+        for old, new in CELL_RF_CLEARANCE_VERTEX_FIXUPS
+    }
+    touches = {key: 0 for key in targets}
+    for item in board.GetTracks():
+        if isinstance(item, pcbnew.PCB_VIA) or item.GetNetCode() != net_code:
+            continue
+        for getter, setter in (
+            (item.GetStart, item.SetStart),
+            (item.GetEnd, item.SetEnd),
+        ):
+            point = getter()
+            key = (point.x, point.y)
+            if key not in targets:
+                continue
+            setter(targets[key])
+            touches[key] += 1
+    require(all(count == 2 for count in touches.values()),
+            f"CELL_RF clearance-fixup topology drift: {touches}")
+    return len(touches)
 
 
 def generate(output: Path) -> dict[str, object]:
@@ -157,6 +190,7 @@ def generate(output: Path) -> dict[str, object]:
         )
     require(not failures, f"RF candidate routing failures: {failures}")
 
+    clearance_fixups = apply_cell_rf_clearance_fixups(board)
     board.BuildListOfNets()
     board.BuildConnectivity()
     require_unique_trace_uuids(board, "candidate")
@@ -167,6 +201,7 @@ def generate(output: Path) -> dict[str, object]:
         "output": str(output.relative_to(ROOT)) if output.is_relative_to(ROOT) else str(output),
         "routed_nets": list(ROUTED_NETS),
         "guide_segments": guide_segments,
+        "cell_rf_clearance_vertex_fixups": clearance_fixups,
         "router_segments": router.tracks_added,
         "added_segments": guide_segments + router.tracks_added,
         "added_vias": router.vias_added,

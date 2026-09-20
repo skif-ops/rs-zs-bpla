@@ -1,6 +1,6 @@
 # PCB-MAIN P0 RF-routing candidate Rev.A
 
-Date: 2026-09-19  
+Date: 2026-09-20
 Configuration: EVT-PRE-20 Rev.A  
 Candidate: `PCB-MAIN-RF-P0-001`
 
@@ -31,11 +31,19 @@ escapes.  The guide leaves U9 normal to the module edge, passes east of the GNSS
 bias/supervisor cluster and enters `FL1.A` from the east without changing the
 accepted ground copper.
 
+KiCad 9 gate `#260` confirmed exact semantic regeneration of all 976 copper
+objects and the expected `444 -> 429` connectivity reduction, then identified
+four candidate-only clearance errors on the `CELL_RF` approaches to `C79.1`
+and `R43.1`.  Four internal vertices were moved by one `0.0625 mm` grid step
+away from adjacent pads `C79.2` and `R43.2`.  Segment count, total route length,
+F.Cu-only topology, controlled width and zero-via inventory are unchanged;
+comparative KiCad 9 DRC of the corrected candidate remains pending CI.
+
 ## Identity
 
 - Base SHA-256: `04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f`
-- Candidate SHA-256: `718e26555529f4076035ea2306826d8f2cd90b621b91bdff7d4e8f49962f1c43`
-- Generator SHA-256: `c764be80c70c9f8aff3966367a064131d67ada9a6f42c900390fd45aa244a4c4`
+- Candidate SHA-256: `9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040`
+- Generator SHA-256: `fe2051d54444d961cf3106b9a0b7862b3a929179c27d07fcd40232952ca2991a`
 - Candidate: `hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb`
 - Static audit: `tools/audit_pcb_main_rf_p0_candidate_rev_a.py`
 

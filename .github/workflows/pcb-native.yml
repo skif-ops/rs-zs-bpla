@@ -712,14 +712,15 @@ jobs:
 
 
           def copper_signature(item: object) -> tuple[object, ...]:
+              is_via = isinstance(item, pcbnew.PCB_VIA)
               common = (
                   str(item.GetNetname()),
                   int(item.GetNetCode()),
-                  int(item.GetWidth()),
+                  int(item.GetFrontWidth()) if is_via else int(item.GetWidth()),
                   bool(item.IsLocked()),
                   optional_int(item.GetLocalClearance()),
               )
-              if isinstance(item, pcbnew.PCB_VIA):
+              if is_via:
                   return (
                       "via", *common, point(item.GetPosition()),
                       int(item.GetDrillValue()), int(item.GetViaType()),
