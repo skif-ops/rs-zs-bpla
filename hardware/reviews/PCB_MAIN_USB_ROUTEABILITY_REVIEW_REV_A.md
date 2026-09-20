@@ -1,8 +1,8 @@
 # PCB-MAIN USB routeability review — Rev.A
 
-Status: `MCU SOURCE + CELL MODEM APPLIED / COMMIT-BOUND GATES PASS / MAIN CONNECTOR DFM BLOCKED / REVIEW_B OPEN`
+Status: `MCU SOURCE + CELL MODEM APPLIED / CELL FIXTURE STATIC PASS / MAIN CONNECTOR DFM BLOCKED / REVIEW_B OPEN`
 
-Reviewed source commit: `2c67acaeb93c05b1bb7a6d9267275ff9fc260204`.
+Reviewed source commit: `69642979f8b93e20d122d8e717c0d606ecbc8384`.
 
 The authoritative PCB retains the accepted combined RF remediation and is not
 modified by this review.  The next controlled routing class was evaluated as
@@ -105,6 +105,19 @@ zero new errors were introduced and unconnected items remained `427→425`.
 Artifact `10612868581` is bound by digest
 `sha256:6f37e792d7f0f7e09c22e5746743976e3953f6b12a5ccfa8f86e1ccd16f5b615`.
 
-The main connector pair and cellular fixture pair remain separate open
-subgates. Final stackup/tolerance/coupon acceptance, Review B, CAM, DFM and
-manufacturing release remain blocked.
+## Cellular fixture-routing proposal
+
+Candidate `PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001` connects R39/R40 pad 2 and
+U26 pads 1/2 to TP_CELL_USB contacts 2/3. It adds 27 segments and two signal
+vias without changing existing copper, placement or zones. Both complete
+primary paths are exactly `76.293814073931 mm`; both ESD shunts are exactly
+`1.007782218537 mm`; minimum pair edge gap is `0.2032 mm`. The B.Cu trunk is
+fully sampled over the accepted `GND_MODEM` In4.Cu zone, and each transition
+has an existing adjacent `GND_MODEM` return via. Candidate SHA-256 is
+`2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273`.
+Static regeneration and independent topology/clearance/reference checks pass;
+commit-bound comparative KiCad 9 DRC is pending.
+
+The main connector pair remains the only USB routing segment without a
+clearance-supported candidate. Final stackup/tolerance/coupon acceptance,
+Review B, CAM, DFM and manufacturing release remain blocked.

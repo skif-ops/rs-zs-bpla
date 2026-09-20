@@ -170,6 +170,11 @@ manufacturing release.
   errors and unconnected `427→425`. The exact candidate is accepted and
   applied; application commit `4c9a2a85` passed CI #566 and PCB Native #293
   with the same `232→232`, zero-new-error and `427→425` result.
+- [ ] `PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001` now has a bounded static-pass
+  candidate for R39/R40/U26 to TP_CELL_USB: 27 segments, two signal vias,
+  exact `76.293814073931 mm` primary matching, exact matched ESD shunts and
+  continuous `GND_MODEM` In4.Cu reference for the B.Cu trunk. Commit-bound
+  comparative KiCad 9 DRC and exact application are pending.
 - [ ] Main-connector USB escape remains blocked pending job-specific via,
   annular-ring and clearance acceptance or a separately reviewed local ECO.
   The official single-row J11 contact mapping is retained.

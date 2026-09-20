@@ -1,0 +1,62 @@
+{
+  "schema": "pcb-main-usb-cell-fixture-routing-001-candidate.rev-a",
+  "candidate_id": "PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001",
+  "status": "STATIC_PASS_KICAD9_GATE_PENDING",
+  "reviewed_source_commit": "69642979f8b93e20d122d8e717c0d606ecbc8384",
+  "base_board_sha256": "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5",
+  "candidate_board_sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273",
+  "scope": {
+    "routed_pair_group": "USB_CELL_FIXTURE_SEGMENT",
+    "routed_nets": [
+      "CELL_USB_DP_TP",
+      "CELL_USB_DM_TP"
+    ],
+    "endpoints": {
+      "CELL_USB_DP_TP": ["R39.2", "U26.1", "TP_CELL_USB.2"],
+      "CELL_USB_DM_TP": ["R40.2", "U26.2", "TP_CELL_USB.3"]
+    },
+    "added_segments": 27,
+    "added_signal_vias": 2,
+    "changed_footprints": [],
+    "changed_zones": [],
+    "changed_existing_copper": []
+  },
+  "engineering_geometry": {
+    "basis": "JLC06161H-3313_PUBLIC_ENGINEERING_CANDIDATE",
+    "layers": ["F.Cu", "B.Cu"],
+    "long_trunk_reference": "GND_MODEM_In4.Cu",
+    "trace_width_mm": 0.1537,
+    "minimum_pair_edge_gap_mm": 0.2032,
+    "minimum_conservative_obstacle_edge_gap_mm": 0.23625,
+    "via_size_mm": 0.5,
+    "via_drill_mm": 0.3,
+    "CELL_USB_DP_TP_primary_length_mm": 76.293814073931,
+    "CELL_USB_DM_TP_primary_length_mm": 76.293814073931,
+    "primary_pair_length_mismatch_mm": 0.0,
+    "CELL_USB_DP_TP_esd_stub_length_mm": 1.007782218537,
+    "CELL_USB_DM_TP_esd_stub_length_mm": 1.007782218537,
+    "esd_stub_length_mismatch_mm": 0.0,
+    "nearest_return_via_mm": {
+      "CELL_USB_DP_TP": 1.04432992871,
+      "CELL_USB_DM_TP": 0.865975306344
+    }
+  },
+  "machine_gate": {
+    "static_regeneration": "PASS",
+    "independent_static_audit": "PASS",
+    "commit_bound_ci": "PENDING",
+    "commit_bound_kicad9_comparative_drc": "PENDING",
+    "expected_unconnected_reduction": 4
+  },
+  "acceptance_basis": "USER_AUTHORIZED_MOST_RATIONAL_DECISIONS_AND_REQUESTED_NO_ADDITIONAL_QUERY_EXCEPT_EXTREME_CASE",
+  "human_acceptance": "PENDING",
+  "authoritative_board_modified": false,
+  "remaining_usb_routing_after_application": [
+    "USB_MAIN_CONNECTOR_SEGMENT"
+  ],
+  "final_job_stackup_accepted": false,
+  "production_impedance_tolerance_accepted": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false,
+  "manufacturing_release": false
+}
