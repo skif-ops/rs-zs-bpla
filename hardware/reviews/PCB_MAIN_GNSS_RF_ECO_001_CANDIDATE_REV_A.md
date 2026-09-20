@@ -23,9 +23,9 @@ No other footprint moves.
 | Net | Base segments / length | Candidate segments / length |
 |---|---:|---:|
 | `GNSS_RF_ANT_BIASED` | 17 / 10.205267 mm | 22 / 34.114752 mm |
-| `GNSS_RF_DC_BLOCK` | 1 / 1.000000 mm | 1 / 1.187960 mm |
+| `GNSS_RF_DC_BLOCK` | 1 / 1.000000 mm | 2 / 1.304117 mm |
 | `GNSS_RF_FILTERED` | 6 / 25.325357 mm | 2 / 1.150694 mm |
-| Total | 24 / 36.530624 mm | 25 / 36.453406 mm |
+| Total | 24 / 36.530624 mm | 26 / 36.569563 mm |
 
 The overall connector-to-receiver copper length is effectively unchanged, but
 the SAW is now adjacent to U9 RF_IN. The post-SAW route is reduced by
@@ -42,8 +42,8 @@ untouched.
 ## Identity and required gate
 
 - Base SHA-256: `9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040`
-- Candidate SHA-256: `5ea568e782658fe7b5eb00fc414381cc7fe31a4d1f4fde109d722e0dd872c079`
-- Generator SHA-256: `c5498193e7c94e57dcccf1eef4863d30833bec3051615717ae35500a0345bd28`
+- Candidate SHA-256: `40c67cf8f32a46fb7de16c0267079c546002349ce3ffb6a8096782af025fd5ea`
+- Generator SHA-256: `9362439d733b46732aebc1b8833faddfe91edd7469b979d2d397bb9fee17d8b4`
 - Generator: `tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py`
 - Independent audit: `tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py`
 

@@ -14,10 +14,10 @@
   },
   "candidate": {
     "board": "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb",
-    "board_sha256": "5ea568e782658fe7b5eb00fc414381cc7fe31a4d1f4fde109d722e0dd872c079",
+    "board_sha256": "40c67cf8f32a46fb7de16c0267079c546002349ce3ffb6a8096782af025fd5ea",
     "generator": "tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py",
-    "generator_sha256": "c5498193e7c94e57dcccf1eef4863d30833bec3051615717ae35500a0345bd28",
-    "trace_items": 974,
+    "generator_sha256": "9362439d733b46732aebc1b8833faddfe91edd7469b979d2d397bb9fee17d8b4",
+    "trace_items": 975,
     "footprints": 251,
     "accepted_base_bytes_modified": false
   },
@@ -46,9 +46,9 @@
     },
     "candidate": {
       "GNSS_RF_ANT_BIASED": {"segments": 22, "length_mm": 34.114751790743},
-      "GNSS_RF_DC_BLOCK": {"segments": 1, "length_mm": 1.187960437052},
+      "GNSS_RF_DC_BLOCK": {"segments": 2, "length_mm": 1.304117074098},
       "GNSS_RF_FILTERED": {"segments": 2, "length_mm": 1.150693909433},
-      "total_length_mm": 36.453406137228,
+      "total_length_mm": 36.569562774274,
       "signal_layer": "F.Cu",
       "reference_layer": "In1.Cu",
       "trace_width_mm": 0.1509,

@@ -33,8 +33,8 @@ CAPTURE_STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 PLACEMENT_AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 
 BASE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-CANDIDATE_SHA256 = "5ea568e782658fe7b5eb00fc414381cc7fe31a4d1f4fde109d722e0dd872c079"
-GENERATOR_SHA256 = "c5498193e7c94e57dcccf1eef4863d30833bec3051615717ae35500a0345bd28"
+CANDIDATE_SHA256 = "40c67cf8f32a46fb7de16c0267079c546002349ce3ffb6a8096782af025fd5ea"
+GENERATOR_SHA256 = "9362439d733b46732aebc1b8833faddfe91edd7469b979d2d397bb9fee17d8b4"
 RF_WIDTH_MM = 0.1509
 GND_ZONE_NAME = "PCB_MAIN_GND_DIGITAL_In1_Cu"
 SAMPLE_PITCH_MM = 0.1
@@ -54,7 +54,7 @@ EXPECTED_BASE_ROUTES = {
 }
 EXPECTED_CANDIDATE_ROUTES = {
     "GNSS_RF_ANT_BIASED": (22, 34.11475179074332),
-    "GNSS_RF_DC_BLOCK": (1, 1.187960437051677),
+    "GNSS_RF_DC_BLOCK": (2, 1.3041170740980155),
     "GNSS_RF_FILTERED": (2, 1.1506939094330015),
 }
 FILTERED_PAD_DISTANCE_MM = 1.1036870027322085
@@ -162,7 +162,8 @@ EXPECTED_ADDED_TRACE_SIGNATURES = Counter({
     ("segment", "GNSS_RF_ANT_BIASED", (63.2, 67.0), (63.2, 54.7), RF_WIDTH_MM, "F.Cu"): 1,
     ("segment", "GNSS_RF_ANT_BIASED", (63.2, 54.7), (59.5, 51.0), RF_WIDTH_MM, "F.Cu"): 1,
     ("segment", "GNSS_RF_ANT_BIASED", (59.5, 51.0), (58.625, 51.6), RF_WIDTH_MM, "F.Cu"): 1,
-    ("segment", "GNSS_RF_DC_BLOCK", (57.975, 51.6), (56.8, 51.425), RF_WIDTH_MM, "F.Cu"): 1,
+    ("segment", "GNSS_RF_DC_BLOCK", (57.975, 51.6), (57.45, 51.25), RF_WIDTH_MM, "F.Cu"): 1,
+    ("segment", "GNSS_RF_DC_BLOCK", (57.45, 51.25), (56.8, 51.425), RF_WIDTH_MM, "F.Cu"): 1,
     ("segment", "GNSS_RF_FILTERED", (56.8, 53.25), (56.8, 52.55), RF_WIDTH_MM, "F.Cu"): 1,
     ("segment", "GNSS_RF_FILTERED", (56.8, 52.55), (56.55, 52.175), RF_WIDTH_MM, "F.Cu"): 1,
     ("segment", "GND_DIGITAL", (56.55, 51.8), (55.725, 51.85), 0.15, "F.Cu"): 1,
@@ -390,8 +391,8 @@ def static_audit() -> dict[str, object]:
     added = set(candidate_traces) - set(base_traces)
     require(removed == REMOVED_TRACE_TSTAMPS,
             f"GNSS ECO removed trace inventory drift: {removed}")
-    require(len(added) == 13 and len(base.traceItems) == 976 and
-            len(candidate.traceItems) == 974,
+    require(len(added) == 14 and len(base.traceItems) == 976 and
+            len(candidate.traceItems) == 975,
             "GNSS ECO trace-item count drift")
     for tstamp in set(base_traces) & set(candidate_traces):
         require(base_traces[tstamp] == candidate_traces[tstamp],
