@@ -1,0 +1,47 @@
+{
+  "schema_version": "dioneya.pcb-main-usb-placement-eco-001-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-USB-PLACEMENT-ECO-001",
+  "reviewer": "Скиф",
+  "decision_date": "2026-09-20",
+  "decision": "ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE",
+  "decision_input": "решение принимается, после продолжай работу",
+  "decision_normalization": "The user explicitly accepted the pending USB source-termination placement decision; it is normalized to ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE.",
+  "reviewed_github_commit_sha": "a3d774c8e7b0bd0634a60cf44b1cdf3f828a3e8d",
+  "reviewed_tree_sha": "fa9bfd800e79eadc56d379ee4a1591c06a5f9b48",
+  "review_mapping": "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_REVIEW_COMMIT_MAPPING.json",
+  "reviewed_proposal_sha256": "f84d2778b79ba6b1366460f9c1f366d6f49253beeba24d32e77548839137caef",
+  "reviewed_proposal_record_sha256": "ae882cb74835ea1c71874e6885a26cab899387e5de613173aa3f06a185f4cf13",
+  "reviewed_candidate_board_sha256": "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e",
+  "reviewed_generator_sha256": "0c6e47636dadefe77e8e960f05269f175741d4d2217460d39be60eef54d90c17",
+  "reviewed_audit_sha256": "fcb9b0da396031b45b6e0bcf5c05f80fbbc0cc5eb473069472b17598b9101974",
+  "approved_geometry": {
+    "R91": {"from": [49.0, 18.25, 180.0], "to": [64.0, 25.25, 0.0]},
+    "R92": {"from": [55.0, 18.25, 180.0], "to": [64.0, 26.25, 0.0]}
+  },
+  "machine_gate": {
+    "pcb_native_run_id": 35523547766,
+    "pcb_native_run_number": 281,
+    "pcb_native_conclusion": "success",
+    "kicad_9_comparative_drc_step": "success",
+    "ci_run_id": 35523547763,
+    "ci_run_number": 554,
+    "ci_conclusion": "success",
+    "artifact_id": 10609108665,
+    "artifact_digest": "sha256:2d450a717585fcba580851059ed278a0db8f8a3974d3f911993df31e08d6e24f",
+    "base_unconnected": 429,
+    "candidate_unconnected": 429,
+    "new_errors": 0,
+    "placement_clearance": "PASS"
+  },
+  "authorization": {
+    "apply_exact_hash_bound_r91_r92_placement_delta": true,
+    "preserve_u1_j11_u25_and_all_copper": true,
+    "preserve_accepted_rf_remediation": true,
+    "alter_reviewed_geometry_without_new_controlled_review": false,
+    "usb_pair_routing_complete": false,
+    "final_fabricator_stackup_accepted": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}
