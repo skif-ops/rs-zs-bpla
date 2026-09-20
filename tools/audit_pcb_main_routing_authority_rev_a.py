@@ -3,7 +3,7 @@
 
 This control proves that every native net has an explicit reviewed routing
 classification and that the authoritative board is the exact accepted bounded
-OctoSPI/R8 successor to the signal-hard-nets subgate.  A PASS does not claim
+RF-P0 successor to the OctoSPI/R8 subgate.  A PASS does not claim
 completion of signal or power routing, Review B, CAM, or manufacturing release.
 """
 from __future__ import annotations
@@ -50,8 +50,14 @@ OCTOSPI_CANDIDATE = (
 OCTOSPI_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json"
 )
+RF_CANDIDATE = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-MAIN-RF-P0-001"
+    / "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
+)
+RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
 
-STATE = "PASS_CONSTRAINT_COVERAGE_AND_ACCEPTED_OCTOSPI_R8_ECO_002_SUBGATE"
+STATE = "PASS_CONSTRAINT_COVERAGE_AND_ACCEPTED_RF_P0_SUBGATE"
 ROW_STATUS = "PRE_ROUTE_CONSTRAINT_CONTROLLED_ROUTING_NOT_COMPLETE"
 STACKUP_STATE = "OPEN_REQUIRED_BEFORE_NUMERIC_RF_USB_GEOMETRY"
 GROUND_CANDIDATE_SHA256 = (
@@ -62,6 +68,9 @@ SIGNAL_CANDIDATE_SHA256 = (
 )
 OCTOSPI_CANDIDATE_SHA256 = (
     "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
+)
+RF_CANDIDATE_SHA256 = (
+    "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
 )
 
 FIELDS = [
@@ -444,11 +453,12 @@ def expected_status_control(
         "rf_50ohm_net_count": 7,
         "usb_90ohm_pair_count": 4,
         "cross_domain_review_net_count": 18,
-        "trace_items": 838,
+        "trace_items": 976,
         "copper_zones": 7,
         "ground_domain_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "signal_hard_nets_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "octospi_r8_eco_002_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "rf_p0_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "factory_stackup": STACKUP_STATE,
         "routing_complete": False,
         "manufacturing_release": False,
@@ -472,6 +482,10 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             f"accepted OctoSPI candidate is missing: {OCTOSPI_CANDIDATE}")
     require(OCTOSPI_APPLICATION.is_file(),
             f"OctoSPI application record is missing: {OCTOSPI_APPLICATION}")
+    require(RF_CANDIDATE.is_file(),
+            f"accepted RF candidate is missing: {RF_CANDIDATE}")
+    require(RF_APPLICATION.is_file(),
+            f"RF application record is missing: {RF_APPLICATION}")
 
     with authority_path.open(encoding="utf-8", newline="") as stream:
         reader = csv.DictReader(stream)
@@ -546,17 +560,18 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
 
     trace_items = len(board.traceItems)
     copper_zones = len(board.zones)
-    require(trace_items == 838 and copper_zones == 7,
-            "authoritative board does not contain the bounded accepted OctoSPI subgate")
+    require(trace_items == 976 and copper_zones == 7,
+            "authoritative board does not contain the bounded accepted RF subgate")
     board_digest = sha256(board_path)
-    require(board_digest == OCTOSPI_CANDIDATE_SHA256,
-            "authoritative board SHA-256 differs from the accepted OctoSPI candidate")
+    require(board_digest == RF_CANDIDATE_SHA256,
+            "authoritative board SHA-256 differs from the accepted RF candidate")
     require(sha256(GROUND_CANDIDATE) == GROUND_CANDIDATE_SHA256,
             "accepted ground-domain candidate hash drift")
     require(sha256(SIGNAL_CANDIDATE) == SIGNAL_CANDIDATE_SHA256 and
             sha256(OCTOSPI_CANDIDATE) == OCTOSPI_CANDIDATE_SHA256 and
-            board_path.read_bytes() == OCTOSPI_CANDIDATE.read_bytes(),
-            "authoritative board is not byte-identical to the accepted OctoSPI candidate")
+            sha256(RF_CANDIDATE) == RF_CANDIDATE_SHA256 and
+            board_path.read_bytes() == RF_CANDIDATE.read_bytes(),
+            "authoritative board is not byte-identical to the accepted RF candidate")
     application = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
     require(application.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE"
             and application.get("status") ==
@@ -607,6 +622,21 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             octospi_application.get("review_b_complete") is False and
             octospi_application.get("cam_or_manufacturing_release") is False,
             "OctoSPI application decision, geometry, or release boundary differs")
+    rf_application = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
+    require(rf_application.get("decision") == "ACCEPT_RF_P0_ROUTING_SUBGATE" and
+            rf_application.get("status") ==
+            "APPLIED_ACCEPTED_RF_P0_ROUTING_SUBGATE_REMAINING_ROUTING_AND_REVIEWS_OPEN" and
+            rf_application.get("historical_baseline", {}).get("board_sha256") ==
+            OCTOSPI_CANDIDATE_SHA256 and
+            rf_application.get("reviewed_candidate_board_sha256") ==
+            RF_CANDIDATE_SHA256 and
+            rf_application.get("applied", {}).get("board_sha256") ==
+            RF_CANDIDATE_SHA256 and
+            rf_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
+            rf_application.get("routing_complete") is False and
+            rf_application.get("review_b_complete") is False and
+            rf_application.get("cam_or_manufacturing_release") is False,
+            "RF application decision, geometry, or release boundary differs")
 
     authority_digest = sha256(authority_path)
     control = expected_status_control(board_digest, authority_digest)
@@ -621,7 +651,7 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             "routing_authority_generator": "tools/generate_pcb_main_routing_authority_rev_a.py",
             "routing_authority_audit": "tools/audit_pcb_main_routing_authority_rev_a.py",
             "routing_constraint_status": (
-                "PASS_ALL_186_NETS_CLASSIFIED_OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_"
+                "PASS_ALL_186_NETS_CLASSIFIED_RF_P0_SUBGATE_APPLIED_"
                 "FACTORY_STACKUP_AND_REMAINING_ROUTING_PENDING"
             ),
         }
@@ -662,6 +692,7 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
         "ground_domain_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "signal_hard_nets_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "octospi_r8_eco_002_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "rf_p0_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "routing_complete": False,
         "manufacturing_release": False,
     }
@@ -689,8 +720,9 @@ def main() -> int:
     print("PCB-MAIN routing authority audit: PASS")
     print(
         "nets=186 classes=15 rf_50ohm=7 usb_pairs=4 "
-        "trace_items=838 copper_zones=7 ground_subgate=applied "
+        "trace_items=976 copper_zones=7 ground_subgate=applied "
         "signal_hard_nets_subgate=applied octospi_r8_eco_002_subgate=applied "
+        "rf_p0_subgate=applied "
         "routing_complete=false"
     )
     return 0

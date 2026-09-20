@@ -154,6 +154,13 @@ the reviewed eleven-net OctoSPI routing candidate. Strict 2D clearance remains
 PASS; routing, return-path, SI/PI, Review B and manufacturing release remain
 open.
 
+Reviewer `Скиф` accepted `PCB-MAIN-RF-P0-001` on 2026-09-20 with decision
+`ACCEPT_RF_P0_ROUTING_SUBGATE`. The exact application adds 138 F.Cu segments
+for the seven controlled RF nets, adds no signal vias and preserves all 838
+previously accepted copper objects. Strict 2D placement clearance remains
+PASS; final RF return-path/SI review, Review B and manufacturing release remain
+open.
+
 ## Controlled post-repack result
 
 `hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv` fixes all 225 movable top-side
@@ -177,16 +184,16 @@ including 169 fitted and 15 DNP footprints.
 
 Controlled hashes:
 
-- active native PCB SHA-256: `04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f`
+- active native PCB SHA-256: `9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040`
 - active placement manifest SHA-256: `70b453c77745580f16d571c999eeb0cde3f5581db69568668131dbe84ab20925`
 - MAIN-AUTH-011 CSV SHA-256: `8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9`
 
 The original zero-copper post-repack board and placement hashes remain preserved
 in the signed ECO application lineage. The active hashes above include the
-accepted R8 move and exact OctoSPI routing candidate; they do not close Review B
-or authorize manufacture.
+accepted R8 move, exact OctoSPI routing and exact RF P0 routing candidate; they
+do not close Review B or authorize manufacture.
 
-The six independent controls now pass on the same source state:
+The seven independent controls now pass on the same source state:
 
 1. `python tools/audit_pcb_main_layout_candidate_rev_a.py`
 2. `python tools/audit_pcb_main_placement_clearance_rev_a.py --strict`
@@ -194,13 +201,14 @@ The six independent controls now pass on the same source state:
 4. `python tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py`
 5. `python tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py`
 6. `python tools/audit_pcb_main_octospi_r8_eco_application_rev_a.py`
+7. `python tools/audit_pcb_main_rf_p0_application_rev_a.py`
 
 ## Remaining release boundary
 
-The 2D placement-clearance subgate is closed. The board still has no routing or
-copper zones, and the 2D envelope method cannot approve component height,
-connector mates, cards, coax access or harness sweeps. The following remain
-mandatory:
+The 2D placement-clearance subgate is closed. The accepted ground, bounded
+signal, OctoSPI and RF P0 routing subgates are applied, but routing is not yet
+complete. The 2D envelope method cannot approve component height, connector
+mates, cards, coax access or harness sweeps. The following remain mandatory:
 
 1. electrically and RF-constrained routing, return planes, stitching and stackup;
 2. KiCad 9 DRC with zero blocker/critical violations and zero unrouted items;

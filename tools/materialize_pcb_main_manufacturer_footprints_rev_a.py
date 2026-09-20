@@ -47,6 +47,8 @@ OCTOSPI_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json"
 )
 OCTOSPI_APPROVED_BOARD_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
+RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
+RF_APPROVED_BOARD_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
@@ -447,6 +449,8 @@ def verify_frozen_materialization(candidate: Path) -> None:
         raise RuntimeError("PCB-MAIN ground-domain application evidence is missing")
     if not OCTOSPI_APPLICATION.is_file():
         raise RuntimeError("PCB-MAIN OctoSPI application evidence is missing")
+    if not RF_APPLICATION.is_file():
+        raise RuntimeError("PCB-MAIN RF application evidence is missing")
     eco003 = json.loads(ECO_003_APPLICATION.read_text(encoding="utf-8"))
     eco003_applied = eco003.get("applied", {})
     eco004 = json.loads(ECO_004_APPLICATION.read_text(encoding="utf-8"))
@@ -458,6 +462,8 @@ def verify_frozen_materialization(candidate: Path) -> None:
     signal_applied = signal.get("applied", {})
     octospi = json.loads(OCTOSPI_APPLICATION.read_text(encoding="utf-8"))
     octospi_applied = octospi.get("applied", {})
+    rf = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
+    rf_applied = rf.get("applied", {})
     actual_board_sha256 = sha256(PCB)
     if not (
         eco003.get("proposal_id") == "PCB-MAIN-RF-ROUTEABILITY-ECO-003"
@@ -498,7 +504,15 @@ def verify_frozen_materialization(candidate: Path) -> None:
         and octospi.get("routing_complete") is False
         and octospi.get("review_b_complete") is False
         and octospi.get("cam_or_manufacturing_release") is False
-        and actual_board_sha256 == OCTOSPI_APPROVED_BOARD_SHA256
+        and rf.get("decision") == "ACCEPT_RF_P0_ROUTING_SUBGATE"
+        and rf.get("historical_baseline", {}).get("board_sha256") ==
+        OCTOSPI_APPROVED_BOARD_SHA256
+        and rf_applied.get("board_sha256") == RF_APPROVED_BOARD_SHA256
+        and rf_applied.get("exact_candidate_byte_identity") is True
+        and rf.get("routing_complete") is False
+        and rf.get("review_b_complete") is False
+        and rf.get("cam_or_manufacturing_release") is False
+        and actual_board_sha256 == RF_APPROVED_BOARD_SHA256
     ):
         raise RuntimeError(
             "PCB-MAIN ECO-003/ECO-004/ground-domain frozen-board authority mismatch"

@@ -37,9 +37,15 @@ OCTOSPI_CANDIDATE = (
 OCTOSPI_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json"
 )
+RF_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/"
+    "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
+)
+RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
 BASE_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
 CANDIDATE_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
-ACTIVE_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
+OCTOSPI_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
+ACTIVE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
 EXPECTED = {
     "BLE_RX_U1": (17, 0, 50.571067811865, {"F.Cu": 17}),
     "BOOT0": (14, 2, 19.038582233138, {"B.Cu": 9, "F.Cu": 5}),
@@ -153,10 +159,11 @@ def native_connectivity(base_path: Path, candidate_path: Path) -> dict[str, Any]
 def static_audit() -> dict[str, Any]:
     require(sha256(BASE) == BASE_SHA256, "authoritative base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "candidate SHA-256 drift")
-    require(sha256(OCTOSPI_CANDIDATE) == ACTIVE_SHA256 and
+    require(sha256(OCTOSPI_CANDIDATE) == OCTOSPI_SHA256 and
+            sha256(RF_CANDIDATE) == ACTIVE_SHA256 and
             sha256(ACTIVE) == ACTIVE_SHA256 and
-            ACTIVE.read_bytes() == OCTOSPI_CANDIDATE.read_bytes(),
-            "authoritative PCB-MAIN is not the exact accepted OctoSPI successor")
+            ACTIVE.read_bytes() == RF_CANDIDATE.read_bytes(),
+            "authoritative PCB-MAIN is not the exact accepted RF successor")
     base = Board.from_file(str(BASE), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")
     active = Board.from_file(str(ACTIVE), encoding="utf-8")
@@ -177,7 +184,7 @@ def static_audit() -> dict[str, Any]:
             all(candidate_items[key] == active_items[key] for key in candidate_items),
             "accepted signal-hard-nets copper was removed or modified by its successor")
     require(candidate.zones == active.zones,
-            "accepted ground zones or rule areas changed in the OctoSPI successor")
+            "accepted ground zones or rule areas changed in the RF successor")
     additions = [item for key, item in candidate_items.items() if key not in base_items]
     require(len(additions) == 111, "candidate added-copper item count drift")
 
@@ -240,12 +247,21 @@ def static_audit() -> dict[str, Any]:
     octospi_application = json.loads(OCTOSPI_APPLICATION.read_text(encoding="utf-8"))
     require(octospi_application.get("historical_baseline", {}).get("board_sha256") ==
             CANDIDATE_SHA256 and
-            octospi_application.get("applied", {}).get("board_sha256") == ACTIVE_SHA256 and
+            octospi_application.get("applied", {}).get("board_sha256") == OCTOSPI_SHA256 and
             octospi_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
             octospi_application.get("routing_complete") is False and
             octospi_application.get("review_b_complete") is False and
             octospi_application.get("cam_or_manufacturing_release") is False,
             "OctoSPI successor application binding or release boundary drift")
+    rf_application = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
+    require(rf_application.get("historical_baseline", {}).get("board_sha256") ==
+            OCTOSPI_SHA256 and
+            rf_application.get("applied", {}).get("board_sha256") == ACTIVE_SHA256 and
+            rf_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
+            rf_application.get("routing_complete") is False and
+            rf_application.get("review_b_complete") is False and
+            rf_application.get("cam_or_manufacturing_release") is False,
+            "RF successor application binding or release boundary drift")
 
     return {
         "schema_version": "dioneya.pcb-main-signal-hard-nets-candidate-audit.v1",

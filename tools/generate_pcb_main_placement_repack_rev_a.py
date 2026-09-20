@@ -79,6 +79,11 @@ OCTOSPI_CANDIDATE = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/"
     "PCB-MAIN_OCTOSPI_R8_ECO_CANDIDATE_REV_A.kicad_pcb"
 )
+RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
+RF_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/"
+    "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
+)
 
 ECO003_POSES = {
     "FL1": (60.5, 68.0, 0.0),
@@ -870,6 +875,7 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
         ground = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
         signal = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
         octospi = json.loads(OCTOSPI_APPLICATION.read_text(encoding="utf-8"))
+        rf = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
         require(ground.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE" and
                 ground.get("status") ==
                 "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
@@ -881,17 +887,25 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
                 octospi.get("applied", {}).get("exact_candidate_byte_identity") is True and
                 sha256(SIGNAL_CANDIDATE) ==
                 octospi.get("historical_baseline", {}).get("board_sha256") and
-                sha256(BOARD) == sha256(OCTOSPI_CANDIDATE) and
-                BOARD.read_bytes() == OCTOSPI_CANDIDATE.read_bytes() and
-                len(getattr(board, "traceItems", [])) == 838 and
+                rf.get("decision") == "ACCEPT_RF_P0_ROUTING_SUBGATE" and
+                rf.get("historical_baseline", {}).get("board_sha256") ==
+                sha256(OCTOSPI_CANDIDATE) and
+                rf.get("applied", {}).get("exact_candidate_byte_identity") is True and
+                sha256(BOARD) == sha256(RF_CANDIDATE) and
+                BOARD.read_bytes() == RF_CANDIDATE.read_bytes() and
+                len(getattr(board, "traceItems", [])) == 976 and
                 len(getattr(board, "zones", [])) == 7 and
                 ground.get("routing_complete") is False and
                 ground.get("review_b_complete") is False and
                 ground.get("cam_or_manufacturing_release") is False and
                 octospi.get("routing_complete") is False and
                 octospi.get("review_b_complete") is False and
-                octospi.get("cam_or_manufacturing_release") is False,
+                octospi.get("cam_or_manufacturing_release") is False and
+                rf.get("routing_complete") is False and
+                rf.get("review_b_complete") is False and
+                rf.get("cam_or_manufacturing_release") is False,
                 "PCB-MAIN accepted routing-subgate application or copper inventory drift")
+        proposal_id = "PCB-MAIN-RF-P0-001"
     else:
         require(len(getattr(board, "traceItems", [])) == 0 and
                 len(getattr(board, "zones", [])) == 0,
@@ -921,7 +935,7 @@ def main() -> int:
         count, proposal_id = verify_approved_frozen_repack(original)
         print(f"PCB-MAIN placement repack: PASS / approved {proposal_id} hashes and board placement match")
         print(f"movable_placements={count} passive_courtyard_margin_mm={PASSIVE_COURTYARD_MARGIN_MM:.2f}")
-        print("status=PLACEMENT_ENGINEERING_CANDIDATE / ROUTING_AND_REVIEW_B_PENDING")
+        print("status=RF_P0_SUBGATE_APPLIED / REMAINING_ROUTING_AND_REVIEW_B_PENDING")
         return 0
     board = Board.from_sexpr(sexpr.parse_sexp(original))
     rows = build_plan(board)

@@ -37,6 +37,11 @@ OCTOSPI_CANDIDATE = (
 OCTOSPI_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json"
 )
+RF_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/"
+    "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
+)
+RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
 MECH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 FOOTPRINT_REVIEW = ROOT / "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv"
 PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
@@ -334,14 +339,16 @@ def main() -> int:
     require(len(edge_items) == 8, f"rounded outline must contain 4 lines + 4 arcs, got {len(edge_items)}")
     require(GROUND_CANDIDATE.is_file() and GROUND_APPLICATION.is_file() and
             SIGNAL_CANDIDATE.is_file() and SIGNAL_APPLICATION.is_file() and
-            OCTOSPI_CANDIDATE.is_file() and OCTOSPI_APPLICATION.is_file(),
+            OCTOSPI_CANDIDATE.is_file() and OCTOSPI_APPLICATION.is_file() and
+            RF_CANDIDATE.is_file() and RF_APPLICATION.is_file(),
             "accepted routing subgate application evidence is missing")
     ground_application = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
     signal_application = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
     octospi_application = json.loads(OCTOSPI_APPLICATION.read_text(encoding="utf-8"))
-    require(PCB.read_bytes() == OCTOSPI_CANDIDATE.read_bytes() and
+    rf_application = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
+    require(PCB.read_bytes() == RF_CANDIDATE.read_bytes() and
             hashlib.sha256(PCB.read_bytes()).hexdigest() ==
-            "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f" and
+            "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040" and
             ground_application.get("status") ==
             "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
             ground_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
@@ -351,7 +358,10 @@ def main() -> int:
             octospi_application.get("status") ==
             "APPLIED_ACCEPTED_OCTOSPI_R8_ECO_002_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
             octospi_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
-            len(board.traceItems) == 838 and len(board.zones) == 7,
+            rf_application.get("status") ==
+            "APPLIED_ACCEPTED_RF_P0_ROUTING_SUBGATE_REMAINING_ROUTING_AND_REVIEWS_OPEN" and
+            rf_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
+            len(board.traceItems) == 976 and len(board.zones) == 7,
             "authoritative board accepted routing-subgate application drift")
     provisional = sorted(ref for ref, fp in footprints.items()
                          if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
@@ -1208,7 +1218,8 @@ def main() -> int:
           f"project_ipc_candidates_dfm_required={len(ipc_candidates)} "
           f"kicad_library_drawing_verified={len(library_verified)} "
           f"manufacturer_controlled={len(manufacturer_controlled)} "
-          "routing=GROUND_SIGNAL_HARD_NETS_AND_OCTOSPI_R8_SUBGATES_APPLIED review_b=BLOCKED")
+          "routing=GROUND_SIGNAL_HARD_NETS_OCTOSPI_R8_AND_RF_P0_SUBGATES_APPLIED "
+          "review_b=BLOCKED")
     return 0
 
 

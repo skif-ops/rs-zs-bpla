@@ -29,11 +29,17 @@ APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_R
 SIGNAL_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json"
 )
+RF_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/"
+    "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
+)
+RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
 PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
 STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 
 BASE_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
 CANDIDATE_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
+RF_CANDIDATE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
 PLACEMENT_SHA256 = "70b453c77745580f16d571c999eeb0cde3f5581db69568668131dbe84ab20925"
 APPROVAL_SHA256 = "55058d20783f99d129f68c1f107537fe8661919aad6e4aaf7557a0f2d0606ebf"
 REVIEWED_COMMIT = "0104cf1bddd28f6bd4b0abc52d8b12bc6cc8cf67"
@@ -73,14 +79,16 @@ def ref_of(footprint: Any) -> str:
 def audit() -> dict[str, Any]:
     for path in (
         BOARD, BASE, CANDIDATE, PROPOSAL, APPROVAL, MAPPING, APPLICATION,
-        SIGNAL_APPLICATION, PLACEMENT, STATUS,
+        SIGNAL_APPLICATION, RF_CANDIDATE, RF_APPLICATION, PLACEMENT, STATUS,
     ):
         require(path.is_file() and path.stat().st_size > 0, f"missing application input: {path}")
 
     require(sha256(BASE) == BASE_SHA256, "reviewed OctoSPI base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "reviewed OctoSPI candidate SHA-256 drift")
-    require(sha256(BOARD) == CANDIDATE_SHA256 and BOARD.read_bytes() == CANDIDATE.read_bytes(),
-            "authoritative PCB-MAIN is not the exact accepted OctoSPI candidate")
+    require(sha256(RF_CANDIDATE) == RF_CANDIDATE_SHA256 and
+            sha256(BOARD) == RF_CANDIDATE_SHA256 and
+            BOARD.read_bytes() == RF_CANDIDATE.read_bytes(),
+            "authoritative PCB-MAIN is not the exact accepted RF successor")
     require(sha256(PLACEMENT) == PLACEMENT_SHA256, "active placement manifest SHA-256 drift")
     require(sha256(APPROVAL) == APPROVAL_SHA256, "signed approval SHA-256 drift")
 
@@ -164,6 +172,17 @@ def audit() -> dict[str, Any]:
         and signal.get("review_b_complete") is False,
         "accepted signal-hard-nets predecessor evidence drift",
     )
+    rf_application = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
+    require(
+        rf_application.get("historical_baseline", {}).get("board_sha256") ==
+        CANDIDATE_SHA256
+        and rf_application.get("applied", {}).get("board_sha256") ==
+        RF_CANDIDATE_SHA256
+        and rf_application.get("applied", {}).get("exact_candidate_byte_identity") is True
+        and rf_application.get("routing_complete") is False
+        and rf_application.get("review_b_complete") is False,
+        "accepted RF successor evidence drift",
+    )
 
     with PLACEMENT.open(encoding="utf-8", newline="") as stream:
         placement = {row["RefDes"]: row for row in csv.DictReader(stream)}
@@ -175,6 +194,14 @@ def audit() -> dict[str, Any]:
     )
 
     board = Board.from_file(str(BOARD), encoding="utf-8")
+    octospi_candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")
+    accepted_items = {str(item.tstamp): item for item in octospi_candidate.traceItems}
+    active_items = {str(item.tstamp): item for item in board.traceItems}
+    require(set(accepted_items) <= set(active_items) and
+            all(accepted_items[key] == active_items[key] for key in accepted_items),
+            "accepted OctoSPI copper was removed or modified by the RF successor")
+    require(octospi_candidate.zones == board.zones,
+            "accepted ground zones changed in the RF successor")
     segments = [item for item in board.traceItems if type(item).__name__ == "Segment"]
     vias = [item for item in board.traceItems if type(item).__name__ == "Via"]
     length = sum(
@@ -187,13 +214,13 @@ def audit() -> dict[str, Any]:
     footprints = {ref_of(fp): fp for fp in board.footprints}
     r8 = footprints["R8"]
     require(
-        len(board.traceItems) == 838
-        and len(segments) == 553
+        len(board.traceItems) == 976
+        and len(segments) == 691
         and len(vias) == 285
         and len(board.zones) == 7
-        and abs(length - 774.724555484344) < 1e-9
+        and abs(length - 886.332347987082) < 1e-9
         and (float(r8.position.X), float(r8.position.Y)) == (54.5, 16.0),
-        "authoritative OctoSPI board inventory or R8 position drift",
+        "authoritative RF successor board inventory or R8 position drift",
     )
 
     status = json.loads(STATUS.read_text(encoding="utf-8"))
@@ -204,14 +231,15 @@ def audit() -> dict[str, Any]:
         review_b.get("complete") is False
         and review_b.get("status") ==
         "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
-        "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING"
+        "RF_P0_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING"
         and evidence.get("octospi_r8_eco_002_application") == str(APPLICATION.relative_to(ROOT))
         and evidence.get("octospi_r8_eco_002_status") ==
         "APPROVED_APPLIED_BOUNDED_R8_PLACEMENT_AND_OCTOSPI_ROUTING_"
         "SUBGATE_REMAINING_ROUTING_ENGINEERING_CONTINUES"
-        and evidence.get("placement_clearance_control", {}).get("board_sha256") == CANDIDATE_SHA256
-        and control.get("board_sha256") == CANDIDATE_SHA256
-        and control.get("trace_items") == 838
+        and evidence.get("placement_clearance_control", {}).get("board_sha256") ==
+        RF_CANDIDATE_SHA256
+        and control.get("board_sha256") == RF_CANDIDATE_SHA256
+        and control.get("trace_items") == 976
         and control.get("octospi_r8_eco_002_subgate") ==
         "APPLIED_EXACT_ACCEPTED_CANDIDATE"
         and control.get("routing_complete") is False
@@ -223,8 +251,9 @@ def audit() -> dict[str, Any]:
     return {
         "schema_version": "dioneya.pcb-main-octospi-r8-eco-002-application-audit.v1",
         "proposal_id": "PCB-MAIN-OCTOSPI-R8-ECO-002",
-        "status": "PASS_EXACT_ACCEPTED_CANDIDATE_APPLIED",
-        "board_sha256": CANDIDATE_SHA256,
+        "status": "PASS_ACCEPTED_OCTOSPI_COPPER_PRESERVED_IN_RF_SUCCESSOR",
+        "board_sha256": RF_CANDIDATE_SHA256,
+        "octospi_candidate_sha256": CANDIDATE_SHA256,
         "placement_manifest_sha256": PLACEMENT_SHA256,
         "r8_position_mm": [54.5, 16.0],
         "track_segments": len(segments),
@@ -249,7 +278,7 @@ def main() -> int:
             encoding="utf-8",
         )
     print("PCB-MAIN OctoSPI R8 ECO-002 application audit: PASS")
-    print("r8_position_mm=54.5,16.0 trace_items=838 routed_nets=11 routing_complete=false")
+    print("r8_position_mm=54.5,16.0 trace_items=976 routed_nets=11 routing_complete=false")
     return 0
 
 

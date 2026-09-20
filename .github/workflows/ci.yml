@@ -121,6 +121,8 @@ jobs:
             --output artifacts/pcb_main_octospi_r8_eco_application_rev_a.json
           python tools/audit_pcb_main_rf_p0_candidate_rev_a.py \
             --output artifacts/pcb_main_rf_p0_candidate_rev_a.json
+          python tools/audit_pcb_main_rf_p0_application_rev_a.py \
+            --output artifacts/pcb_main_rf_p0_application_rev_a.json
           python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
             --output artifacts/pcb_main_assembler_dfm_stencil_request_rev_a.json \
             --commit-sha "$GITHUB_SHA" \

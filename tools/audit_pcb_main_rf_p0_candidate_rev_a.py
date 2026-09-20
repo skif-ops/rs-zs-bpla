@@ -27,6 +27,7 @@ CANDIDATE = (
 ACTIVE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 GENERATOR = ROOT / "tools/generate_pcb_main_rf_p0_candidate_rev_a.py"
 PROPOSAL = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_CANDIDATE_REV_A.json"
+APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
 BASE_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 CANDIDATE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
 GENERATOR_SHA256 = "fe2051d54444d961cf3106b9a0b7862b3a929179c27d07fcd40232952ca2991a"
@@ -108,8 +109,9 @@ def static_audit() -> dict[str, object]:
     require(sha256(BASE) == BASE_SHA256, "RF base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "RF candidate SHA-256 drift")
     require(sha256(GENERATOR) == GENERATOR_SHA256, "RF generator SHA-256 drift")
-    require(sha256(ACTIVE) == BASE_SHA256 and ACTIVE.read_bytes() == BASE.read_bytes(),
-            "authoritative PCB-MAIN is not the exact accepted RF base")
+    require(sha256(ACTIVE) == CANDIDATE_SHA256 and
+            ACTIVE.read_bytes() == CANDIDATE.read_bytes(),
+            "authoritative PCB-MAIN is not the exact accepted RF candidate")
 
     base = Board().from_file(str(BASE), encoding="utf-8")
     candidate = Board().from_file(str(CANDIDATE), encoding="utf-8")
@@ -196,9 +198,23 @@ def static_audit() -> dict[str, object]:
         "comparative_audit_sha256":
             "a489451be7ca4023fdf36d6b3ec4ebd0add47e13b73a366d706425f24a65ddd7",
     }, "RF comparative KiCad 9 evidence drift")
+    application = json.loads(APPLICATION.read_text(encoding="utf-8"))
+    require(
+        application.get("proposal_id") == "PCB-MAIN-RF-P0-001"
+        and application.get("decision") == "ACCEPT_RF_P0_ROUTING_SUBGATE"
+        and application.get("approval_commit_sha") ==
+        "af4f8dc88ac442bcf2d46d1409467e8086c4b4d8"
+        and application.get("reviewed_candidate_board_sha256") == CANDIDATE_SHA256
+        and application.get("applied", {}).get("board_sha256") == CANDIDATE_SHA256
+        and application.get("applied", {}).get("exact_candidate_byte_identity") is True
+        and application.get("routing_complete") is False
+        and application.get("review_b_complete") is False
+        and application.get("cam_or_manufacturing_release") is False,
+        "RF application binding or release boundary drift",
+    )
     return {
         "schema_version": "dioneya.pcb-main-rf-p0-candidate-audit.v1",
-        "status": "PASS_STATIC_CANDIDATE_ISOLATION_MACHINE_EVIDENCE_BOUND",
+        "status": "PASS_ACCEPTED_RF_CANDIDATE_APPLIED_MACHINE_EVIDENCE_BOUND",
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "generator_sha256": GENERATOR_SHA256,
@@ -237,7 +253,7 @@ def main() -> int:
         args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     print("PCB-MAIN P0 RF candidate audit: PASS")
     print("routed_nets=7 added_segments=138 added_vias=0 width_mm=0.1509")
-    print("release_boundary=PENDING_HUMAN_RF_SI_RETURN_PATH_REVIEW_AND_REVIEW_B")
+    print("release_boundary=RF_SI_RETURN_PATH_REVIEW_B_AND_MANUFACTURING_RELEASE_OPEN")
     return 0
 
 

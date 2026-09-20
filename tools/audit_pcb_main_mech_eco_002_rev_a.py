@@ -30,6 +30,7 @@ STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 ECO003_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPLICATION.json"
 ECO004_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPLICATION.json"
 OCTOSPI_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_OCTOSPI_R8_ECO_002_APPLICATION_REV_A.json"
+RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
 
 CANDIDATE_SHA256 = "5164195ebf6a9a66b6a30197abfcb314655bfe059d0aea5f3782a744069780ff"
 AUTHORITY_SHA256 = "8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9"
@@ -37,7 +38,8 @@ BOARD_SHA256 = "e81daf6d8cf0220f762c64f1fc637f65d71d6bc99128ab8c4993a540431e461e
 PLACEMENT_SHA256 = "dbc433cb36b0bec612f55dbb96e6dce34d502728e488810c115207ffbbebc1d1"
 ECO003_BOARD_SHA256 = "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684"
 CURRENT_BOARD_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
-ACTIVE_BOARD_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
+OCTOSPI_BOARD_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
+ACTIVE_BOARD_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
 CURRENT_PLACEMENT_SHA256 = "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4"
 ACTIVE_PLACEMENT_SHA256 = "70b453c77745580f16d571c999eeb0cde3f5581db69568668131dbe84ab20925"
 REVIEWED_LOCAL_COMMIT = "16ee36b9432508b539736a8ee78890ad99ce0788"
@@ -130,6 +132,8 @@ def audit() -> dict[str, Any]:
             "PCB-MAIN ECO-004 application is missing from the current footprint lineage")
     require(OCTOSPI_APPLICATION.is_file(),
             "PCB-MAIN OctoSPI application is missing from the current routing lineage")
+    require(RF_APPLICATION.is_file(),
+            "PCB-MAIN RF application is missing from the current routing lineage")
     eco003 = json.loads(ECO003_APPLICATION.read_text(encoding="utf-8"))
     require(eco003.get("proposal_id") == "PCB-MAIN-RF-ROUTEABILITY-ECO-003" and
             eco003.get("decision") == "ACCEPT_LIMITED_RF_ROUTEABILITY_ECO" and
@@ -153,12 +157,21 @@ def audit() -> dict[str, Any]:
     require(octospi.get("proposal_id") == "PCB-MAIN-OCTOSPI-R8-ECO-002" and
             octospi.get("decision") ==
             "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE" and
-            octospi.get("applied", {}).get("board_sha256") == ACTIVE_BOARD_SHA256 and
+            octospi.get("applied", {}).get("board_sha256") == OCTOSPI_BOARD_SHA256 and
             octospi.get("applied", {}).get("placement_manifest_sha256") ==
-            ACTIVE_PLACEMENT_SHA256 and
+            ACTIVE_PLACEMENT_SHA256,
+            "PCB-MAIN OctoSPI placement/routing successor lineage drift")
+    rf_application = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
+    require(rf_application.get("proposal_id") == "PCB-MAIN-RF-P0-001" and
+            rf_application.get("decision") == "ACCEPT_RF_P0_ROUTING_SUBGATE" and
+            rf_application.get("historical_baseline", {}).get("board_sha256") ==
+            OCTOSPI_BOARD_SHA256 and
+            rf_application.get("applied", {}).get("board_sha256") ==
+            ACTIVE_BOARD_SHA256 and
+            rf_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
             sha256(BOARD) == ACTIVE_BOARD_SHA256 and
             sha256(PLACEMENT) == ACTIVE_PLACEMENT_SHA256,
-            "PCB-MAIN OctoSPI placement/routing successor lineage drift")
+            "PCB-MAIN RF routing successor lineage drift")
 
     candidate = CANDIDATE.read_text(encoding="utf-8")
     require("PCB-MAIN mechanical ECO-002 candidate" in candidate and
@@ -273,7 +286,7 @@ def audit() -> dict[str, Any]:
             j6.properties.get("DIONEA_MECHANICAL_ANCHOR") ==
             "21.000,2.500,180.000",
             "J6 ECO-002 anchor or footprint datum drift")
-    require(len(getattr(board, "traceItems", [])) == 838 and
+    require(len(getattr(board, "traceItems", [])) == 976 and
             len(getattr(board, "zones", [])) == 7,
             "PCB-MAIN post-ground-subgate routing inventory drift")
 

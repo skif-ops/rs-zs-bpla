@@ -108,6 +108,7 @@ on:
       - "tools/audit_pcb_main_octospi_r8_eco_application_rev_a.py"
       - "tools/generate_pcb_main_rf_p0_candidate_rev_a.py"
       - "tools/audit_pcb_main_rf_p0_candidate_rev_a.py"
+      - "tools/audit_pcb_main_rf_p0_application_rev_a.py"
       - "tools/route_pcb_release_candidate_rev_a.py"
       - "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py"
       - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
@@ -411,6 +412,8 @@ jobs:
             --output artifacts/kicad-native/PCB-MAIN/ground_domain_routing_candidate_static_audit.json
           python tools/audit_pcb_main_octospi_r8_eco_application_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/octospi_r8_eco_002_application_audit.json
+          python tools/audit_pcb_main_rf_p0_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/rf_p0_application_audit.json
           python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/assembler_dfm_stencil_request_audit.json \
             --commit-sha "$GITHUB_SHA" \
