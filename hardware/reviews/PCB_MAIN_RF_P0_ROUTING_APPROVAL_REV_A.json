@@ -1,0 +1,36 @@
+{
+  "schema_version": "dioneya.pcb-main-rf-p0-routing-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-RF-P0-001",
+  "reviewer": "Скиф",
+  "decision_date": "2026-09-20",
+  "decision": "ACCEPT_RF_P0_ROUTING_SUBGATE",
+  "decision_input": "Утверждаю PCB-MAIN-RF-P0-001 по commit ae92a08a1a530e9d10eb6294481842ed68008469 и candidate SHA-256 9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040. Решение ACCEPT_RF_P0_ROUTING_SUBGATE. Разрешаю оформить подпись, применить кандидат к authoritative PCB-MAIN и выполнить push в evt-pre-20.",
+  "reviewed_github_commit_sha": "ae92a08a1a530e9d10eb6294481842ed68008469",
+  "reviewed_tree_sha": "7eee7230005bddae5b3e389110d2204cac43ad8e",
+  "review_mapping": "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_REVIEW_COMMIT_MAPPING.json",
+  "reviewed_proposal_sha256": "b155bd20c9c40aa0fd43e3465e87d8d1659626baca63ffa30747f7e53de97062",
+  "reviewed_proposal_record_sha256": "1b3db02454fce6b0aa4f6b928ff6ef2dd00a9c6fdd6c209aa4fe891dbc33be30",
+  "reviewed_candidate_board_sha256": "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040",
+  "reviewed_generator_sha256": "fe2051d54444d961cf3106b9a0b7862b3a929179c27d07fcd40232952ca2991a",
+  "machine_gate": {
+    "pcb_native_run_id": 35503671184,
+    "pcb_native_run_number": 262,
+    "pcb_native_conclusion": "success",
+    "kicad_9_comparative_drc_step": "success",
+    "ci_run_id": 35503671273,
+    "ci_run_number": 534,
+    "ci_conclusion": "success"
+  },
+  "authorization": {
+    "apply_exact_hash_bound_seven_net_rf_routes": true,
+    "preserve_previously_accepted_copper": true,
+    "alter_reviewed_rf_geometry_without_new_controlled_review": false,
+    "routing_complete": false,
+    "return_path_review_complete": false,
+    "si_review_complete": false,
+    "pi_review_complete": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}
