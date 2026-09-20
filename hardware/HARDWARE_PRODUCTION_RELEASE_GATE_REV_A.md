@@ -86,7 +86,8 @@ The exact accepted R91/R92 USB placement successor SHA-256
 changes no copper and application commit `1f8c0bad` passed CI `#557` and PCB
 Native `#284`. Its accepted USB MCU-source routing successor is authoritative
 SHA-256 `76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5`;
-the fresh application gate remains pending.
+application commit `6c27d3ae` passed CI `#562` and PCB Native `#289` with
+violations `232→232`, zero new errors and unconnected `429→427`.
 Commit-bound source commit `7ee9cfc9` passed CI `#550` and PCB Native Gate
 `#277`: comparative DRC added no errors or unconnected regression, and both
 filled-reference audits cover every cellular and GNSS sample. The bounded
@@ -233,7 +234,9 @@ release.
 - PCB-MAIN USB source-termination routeability: the bounded R91/R92 placement
   ECO was accepted and applied exactly after proposal PCB Native #281; U1/J11/
   U25 and accepted RF copper remain fixed; its application commit-bound gate
-  passed, while controlled 90-ohm pair routing remains open;
+  passed; the bounded MCU-source pair application gate also passed on PCB
+  Native #289, while main-connector and cellular controlled 90-ohm segments
+  remain open;
 - the remaining 17 PCB-PWR input-protection qualification rows after accepted
   manufacturer source control, native-value and repeat-hierarchy gates,
   including +70 C 5 A thermal,

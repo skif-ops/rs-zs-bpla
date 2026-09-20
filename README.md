@@ -77,9 +77,11 @@ impedance-геометрия пока не разрешены. Следующи�
 топологии. Proposal commit `f4ed1a4d` прошёл static gate, CI `#559` и PCB
 Native `#286`: violations `232→232`, новых errors нет, unconnected `429→427`.
 Machine gate закрыт; решение `ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE` записано,
-и точный кандидат применён к authoritative PCB. Свежий commit-bound
-application gate ещё ожидается; main-connector и cellular USB остаются
-отдельными незакрытыми сегментами.
+и точный кандидат применён к authoritative PCB. Точный application commit
+`6c27d3ae` прошёл CI `#562` и PCB Native `#289`:
+violations `232→232`, новых errors нет, unconnected `429→427`. MCU-source
+application gate закрыт; main-connector и cellular USB остаются отдельными
+незакрытыми сегментами.
 Отдельно подготовлен ограниченный запрос для будущего
 выбранного сборщика по DFM/трафарету `U2/U25/U26/U9` и пустой 14-строчный реестр: принято
 `0/14` ответов, сборщик и процесс не выбраны, паста U9 и производственный выпуск

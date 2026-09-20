@@ -34,6 +34,14 @@ APPROVAL_SHA256 = "3e12b820b1fd488cd44d57131fd9fc0c6c8c75e7321c1c8855eef9c0ba86a
 MAPPING_SHA256 = "d98c0f0f5c74c3a6777f34d6f68b823cadbd57d89f4114926181f5b3c45b8eca"
 GENERATOR_SHA256 = "91e16d5fb317721485a24a324f49d835ac900f95e43bab1268ded10fd25ec02a"
 APPROVAL_COMMIT = "98b53498eda8cc5d6070d2d702c14119fa20781d"
+APPLICATION_COMMIT = "6c27d3ae148a613fa07243dd09c26d8c2accad8e"
+APPLICATION_TREE = "9c44688dcd1db6c51609ffd4efcf17502b5e9458"
+CI_RUN_ID = 35533128214
+PCB_NATIVE_RUN_ID = 35533128125
+ARTIFACT_ID = 10611393138
+ARTIFACT_DIGEST = (
+    "sha256:7fba5414f2fc3e1df3938f12b98e0468c44cd50cf29b64e65342eed0612768ff"
+)
 
 
 def require(value: bool, message: str) -> None:
@@ -152,10 +160,30 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and application.get("manufacturing_release") is False,
         "USB source application identity, geometry, or release boundary drift",
     )
-    require(gate.get("status") in {
-        "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
-        "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
-    }, "USB source application gate state drift")
+    require(
+        application.get("application_commit_sha") == APPLICATION_COMMIT
+        and gate.get("status") == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+        and gate.get("source_commit_sha") == APPLICATION_COMMIT
+        and gate.get("source_tree_sha") == APPLICATION_TREE
+        and gate.get("ci_run_id") == CI_RUN_ID
+        and gate.get("ci_run_number") == 562
+        and gate.get("ci_conclusion") == "success"
+        and gate.get("pcb_native_run_id") == PCB_NATIVE_RUN_ID
+        and gate.get("pcb_native_run_number") == 289
+        and gate.get("pcb_native_conclusion") == "success"
+        and gate.get("application_audit") ==
+        "PASS_EXACT_ACCEPTED_USB_MCU_SOURCE_ROUTING_APPLICATION"
+        and gate.get("comparative_drc") ==
+        "PASS_NO_NEW_ERRORS_EXACT_TWO_CONNECTION_REDUCTION"
+        and gate.get("base_violations") == 232
+        and gate.get("active_violations") == 232
+        and gate.get("base_unconnected") == 429
+        and gate.get("active_unconnected") == 427
+        and gate.get("new_errors") == 0
+        and gate.get("artifact_id") == ARTIFACT_ID
+        and gate.get("artifact_digest") == ARTIFACT_DIGEST,
+        "USB source application commit-bound evidence drift",
+    )
 
     board = Board.from_file(str(BOARD), encoding="utf-8")
     segments = [item for item in board.traceItems if type(item).__name__ == "Segment"]
@@ -169,10 +197,8 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
     control = evidence.get("usb_source_routing_001_control", {})
     route_control = evidence.get("routing_constraint_control", {})
     require(
-        evidence.get("usb_source_routing_001_status") in {
-            "APPROVED_APPLIED_EXACT_MCU_SOURCE_PAIR_PENDING_COMMIT_BOUND_KICAD9_GATE",
-            "APPROVED_APPLIED_EXACT_MCU_SOURCE_PAIR_COMMIT_BOUND_KICAD9_GATE_PASS",
-        }
+        evidence.get("usb_source_routing_001_status") ==
+        "APPROVED_APPLIED_EXACT_MCU_SOURCE_PAIR_COMMIT_BOUND_KICAD9_GATE_PASS"
         and control.get("active_board_sha256") == CANDIDATE_SHA256
         and control.get("exact_candidate_byte_identity") is True
         and control.get("trace_items") == 988
@@ -180,10 +206,8 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and control.get("manufacturing_release") is False
         and route_control.get("board_sha256") == CANDIDATE_SHA256
         and route_control.get("trace_items") == 988
-        and route_control.get("usb_mcu_source_routing_subgate") in {
-            "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PENDING",
-            "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
-        }
+        and route_control.get("usb_mcu_source_routing_subgate") ==
+        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS"
         and status.get("review_b", {}).get("complete") is False
         and status.get("manufacturing_release") is False,
         "capture-status USB source application traceability drift",
@@ -199,7 +223,10 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         "added_signal_vias": 0,
         "trace_items": 988,
         "machine_gate": gate.get("status"),
-        "application_commit_sha": application.get("application_commit_sha"),
+        "application_commit_sha": APPLICATION_COMMIT,
+        "ci_run_id": CI_RUN_ID,
+        "pcb_native_run_id": PCB_NATIVE_RUN_ID,
+        "artifact_id": ARTIFACT_ID,
         "review_b_complete": False,
         "manufacturing_release": False,
     }

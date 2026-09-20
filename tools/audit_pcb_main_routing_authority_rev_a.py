@@ -484,7 +484,7 @@ def expected_status_control(
         "usb_source_termination_placement_subgate":
         "APPLIED_EXACT_ACCEPTED_R91_R92_DELTA_COMMIT_BOUND_GATE_PASS",
         "usb_mcu_source_routing_subgate":
-        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PENDING",
+        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
         "factory_stackup": STACKUP_STATE,
         "routing_complete": False,
         "manufacturing_release": False,

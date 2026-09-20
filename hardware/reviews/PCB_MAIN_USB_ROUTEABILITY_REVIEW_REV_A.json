@@ -1,7 +1,7 @@
 {
   "schema": "pcb-main-usb-routeability-review.rev-a",
-  "status": "PLACEMENT_APPLIED_USB_MCU_SOURCE_ROUTING_MACHINE_GATE_PASS_HUMAN_REVIEW_PENDING",
-  "decision": "BOUNDED_USB_MCU_SOURCE_ROUTING_PROPOSAL_REQUIRES_HUMAN_ACCEPTANCE",
+  "status": "PLACEMENT_APPLIED_USB_MCU_SOURCE_ROUTING_APPLIED_COMMIT_BOUND_GATE_PASS_REMAINING_USB_OPEN",
+  "decision": "USB_MCU_SOURCE_ROUTING_APPLICATION_PASS_MAIN_CONNECTOR_PROPOSAL_NEXT",
   "reviewed_source_commit": "2c67acaeb93c05b1bb7a6d9267275ff9fc260204",
   "authoritative_board_changed": false,
   "fixed_anchors": ["U1", "J11", "U25"],
@@ -39,7 +39,7 @@
   "source_routing_candidate": {
     "id": "PCB-MAIN-USB-SOURCE-ROUTING-001",
     "sha256": "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5",
-    "status": "KICAD9_COMPARATIVE_PASS_HUMAN_REVIEW_PENDING",
+    "status": "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PASS",
     "routed_nets": ["USB_DP_U1", "USB_DM_U1"],
     "pair_length_mismatch_mm": 0.0,
     "minimum_pair_edge_gap_mm": 0.2032,
@@ -49,8 +49,14 @@
     "base_unconnected": 429,
     "candidate_unconnected": 427,
     "new_errors": 0,
-    "authoritative_board_modified": false,
-    "human_acceptance": "PENDING"
+    "application_commit": "6c27d3ae148a613fa07243dd09c26d8c2accad8e",
+    "application_tree": "9c44688dcd1db6c51609ffd4efcf17502b5e9458",
+    "application_ci_run": 35533128214,
+    "application_pcb_native_run": 35533128125,
+    "application_artifact_id": 10611393138,
+    "application_artifact_digest": "sha256:7fba5414f2fc3e1df3938f12b98e0468c44cd50cf29b64e65342eed0612768ff",
+    "authoritative_board_modified": true,
+    "human_acceptance": "ACCEPTED"
   },
   "manufacturing_release": false,
   "review_b_complete": false

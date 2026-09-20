@@ -383,7 +383,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
 
     report: dict[str, object] = {
         "schema": "dioneya.pcb-main-usb-source-routing-001-audit.v1",
-        "status": "PASS_STATIC_RECORDED_KICAD9_EVIDENCE_PENDING_HUMAN_REVIEW",
+        "status": "PASS_STATIC_RECORDED_KICAD9_EVIDENCE_ACCEPTED_AND_APPLIED",
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "routed_nets": sorted(EXPECTED_ROUTES),
@@ -394,7 +394,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         "minimum_pair_edge_gap_mm": round(edge_gap, 12),
         "reference_samples": reference_samples,
         "authoritative_board_modified": False,
-        "human_acceptance": "PENDING",
+        "human_acceptance": "ACCEPTED",
         "active_board_sha256": active_sha256,
         "application_state": application_state,
         "review_b_complete": False,
@@ -404,7 +404,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
             "both comparative DRC paths are required together")
     if drc_base is not None and drc_candidate is not None:
         report["comparative_drc"] = audit_drc(drc_base, drc_candidate)
-        report["status"] = "PASS_KICAD9_COMPARATIVE_PENDING_HUMAN_REVIEW"
+        report["status"] = "PASS_KICAD9_COMPARATIVE_ACCEPTED_AND_APPLIED"
     return report
 
 
