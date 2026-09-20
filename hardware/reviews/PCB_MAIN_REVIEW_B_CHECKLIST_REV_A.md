@@ -150,7 +150,8 @@ manufacturing release.
   Revised candidate `PCB-MAIN-USB-PLACEMENT-ECO-001` moves only R91/R92 and
   passes static regeneration plus strict clearance. The superseded
   four-footprint candidate failed PCB Native #280 because C12/R3 already own
-  accepted fanout; repeat KiCad 9 and human review remain pending, and the
+  accepted fanout. Revised commit `ad3745e7` passed PCB Native #281 with zero
+  new errors and unconnected `429→429`; human review remains pending and the
   authoritative board is unchanged.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.
 - [ ] KiCad 9 DRC passes with zero blocker/critical violations and zero unrouted items.

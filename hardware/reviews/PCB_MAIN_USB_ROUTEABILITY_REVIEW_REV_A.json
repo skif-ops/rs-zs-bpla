@@ -32,7 +32,9 @@
   "candidate": {
     "id": "PCB-MAIN-USB-PLACEMENT-ECO-001",
     "sha256": "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e",
-    "status": "STATIC_PASS_KICAD9_AND_HUMAN_REVIEW_PENDING"
+    "status": "KICAD9_PASS_HUMAN_REVIEW_PENDING",
+    "source_commit": "ad3745e719c7c21dade8d0120075d20d629274c8",
+    "pcb_native_run": 35523547766
   },
   "manufacturing_release": false,
   "review_b_complete": false

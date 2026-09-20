@@ -59,6 +59,12 @@ engineering-геометрию RF/USB; финальная production-геоме�
 gate прошли. PCB Native `#277` подтвердил ноль новых DRC errors, отсутствие
 регрессии `429` unconnected items и полное L2-покрытие всех `623` cellular и
 `406` GNSS контрольных точек; bounded repeat RF/SI return-path review закрыт.
+Для следующего USB-подэтапа proposal `PCB-MAIN-USB-PLACEMENT-ECO-001`
+переносит только неразведённые `R91/R92`; authoritative PCB не изменён.
+Commit `ad3745e7` прошёл CI `#554` и PCB Native `#281`: новых DRC errors нет,
+unconnected остаётся `429`, strict clearance — PASS. Применение ожидает
+отдельного human-решения; USB-трассировка и финальная impedance-геометрия пока
+не разрешены.
 Отдельно подготовлен ограниченный запрос для будущего
 выбранного сборщика по DFM/трафарету `U2/U25/U26/U9` и пустой 14-строчный реестр: принято
 `0/14` ответов, сборщик и процесс не выбраны, паста U9 и производственный выпуск

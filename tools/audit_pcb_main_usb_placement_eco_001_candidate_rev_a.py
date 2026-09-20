@@ -143,10 +143,26 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
 
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
     require(review["candidate_board_sha256"] == CANDIDATE_SHA256 and
-            review["status"] == "PROPOSAL_PENDING_KICAD9_AND_HUMAN_REVIEW" and
+            review["status"] == "KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW" and
             review["authoritative_board_modified"] is False and
             review["manufacturing_release"] is False,
             "USB placement ECO proposal boundary drift")
+    gate = review.get("machine_gate", {})
+    require(gate.get("source_commit") ==
+            "ad3745e719c7c21dade8d0120075d20d629274c8" and
+            gate.get("source_tree") ==
+            "92c4da4694cda9a545765a6bec10f86d47a49d4f" and
+            gate.get("pcb_native_run_id") == 35523547766 and
+            gate.get("pcb_native_run_number") == 281 and
+            gate.get("ci_run_id") == 35523547763 and
+            gate.get("ci_run_number") == 554 and
+            gate.get("artifact_id") == 10609108665 and
+            gate.get("artifact_digest") ==
+            "sha256:2d450a717585fcba580851059ed278a0db8f8a3974d3f911993df31e08d6e24f" and
+            gate.get("base_unconnected") == 429 and
+            gate.get("candidate_unconnected") == 429 and
+            gate.get("new_errors") == 0,
+            "USB placement ECO commit-bound machine evidence drift")
 
     report: dict[str, object] = {
         "status": "PASS_STATIC_PROPOSAL_ONLY",

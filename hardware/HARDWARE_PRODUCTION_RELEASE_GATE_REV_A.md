@@ -227,8 +227,8 @@ release.
 - PCB-MAIN USB source-termination routeability: R91/R92 require a bounded local
   placement ECO before controlled 90-ohm pair routing; U1/J11/U25 and accepted
   RF copper remain fixed; revised two-footprint candidate
-  `PCB-MAIN-USB-PLACEMENT-ECO-001` is static-PASS but remains unapplied pending
-  commit-bound KiCad 9 and human review;
+  `PCB-MAIN-USB-PLACEMENT-ECO-001` passed commit-bound KiCad 9 on PCB Native
+  #281 but remains unapplied pending human review;
 - the remaining 17 PCB-PWR input-protection qualification rows after accepted
   manufacturer source control, native-value and repeat-hierarchy gates,
   including +70 C 5 A thermal,

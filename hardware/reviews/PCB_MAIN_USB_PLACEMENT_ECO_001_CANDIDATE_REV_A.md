@@ -1,6 +1,6 @@
 # PCB-MAIN USB source-termination placement ECO-001 candidate — Rev.A
 
-Status: `PROPOSAL / KICAD9 AND HUMAN REVIEW PENDING / NOT APPLIED`.
+Status: `KICAD9 COMPARATIVE DRC PASS / HUMAN REVIEW PENDING / NOT APPLIED`.
 
 Base authoritative PCB SHA-256:
 `f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9`.
@@ -28,10 +28,16 @@ to 431 and introduced one clearance plus one hole-clearance error at the
 existing GND via `(62.725, 24.35)`.
 
 The strict 2D model reports 227/227 fitted assembly footprints with zero
-component, mounting-exclusion or U.FL tool-clearance conflicts. This is only a
-placement proposal. KiCad 9 zone refill/comparative DRC, human acceptance,
-USB pair routing, final fabricator impedance acceptance, Review B, CAM and
-manufacturing release remain open.
+component, mounting-exclusion or U.FL tool-clearance conflicts. Commit
+`ad3745e719c7c21dade8d0120075d20d629274c8` (tree `92c4da46…`) passed CI
+`#554` and PCB Native Gate `#281`. KiCad 9 comparative DRC recorded zero new
+errors, `429→429` unconnected items and `227→232` total violations. Evidence is
+artifact `10609108665`, digest
+`sha256:2d450a717585fcba580851059ed278a0db8f8a3974d3f911993df31e08d6e24f`.
+
+This remains only a placement proposal. Human acceptance, application to the
+authoritative board, USB pair routing, final fabricator impedance acceptance,
+Review B, CAM and manufacturing release remain open.
 
 Requested future decision token after a green commit-bound gate:
 `ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE`.
