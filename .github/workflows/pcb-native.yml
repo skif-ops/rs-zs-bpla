@@ -109,6 +109,8 @@ on:
       - "tools/generate_pcb_main_rf_p0_candidate_rev_a.py"
       - "tools/audit_pcb_main_rf_p0_candidate_rev_a.py"
       - "tools/audit_pcb_main_rf_p0_application_rev_a.py"
+      - "tools/generate_pcb_main_rf_return_001_candidate_rev_a.py"
+      - "tools/audit_pcb_main_rf_return_001_candidate_rev_a.py"
       - "tools/route_pcb_release_candidate_rev_a.py"
       - "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py"
       - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
