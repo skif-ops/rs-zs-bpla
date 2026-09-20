@@ -163,12 +163,13 @@ manufacturing release.
   is recorded; application commit `6c27d3ae` passed CI #562 and PCB Native
   #289 with violations `232→232`, zero new errors and unconnected `429→427`.
   Main-connector and fixture USB segments are still unrouted.
-- [ ] `PCB-MAIN-USB-CELL-MODEM-ROUTING-001` routes only U8.9/U8.10 to
+- [x] `PCB-MAIN-USB-CELL-MODEM-ROUTING-001` routes only U8.9/U8.10 to
   R39.1/R40.1 with six F.Cu segments, no vias, exact `4.765484866498 mm`
   matching and continuous `GND_MODEM` L2 reference. Proposal `5c73ffe5`
   passed CI #564 and PCB Native #291 with violations `232→232`, zero new
   errors and unconnected `427→425`. The exact candidate is accepted and
-  applied; its fresh commit-bound application gate remains pending.
+  applied; application commit `4c9a2a85` passed CI #566 and PCB Native #293
+  with the same `232→232`, zero-new-error and `427→425` result.
 - [ ] Main-connector USB escape remains blocked pending job-specific via,
   annular-ring and clearance acceptance or a separately reviewed local ECO.
   The official single-row J11 contact mapping is retained.

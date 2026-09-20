@@ -309,7 +309,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     require(
         review.get("candidate_board_sha256") == CANDIDATE_SHA256
         and review.get("base_board_sha256") == BASE_SHA256
-        and review.get("status") == "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PENDING"
+        and review.get("status") == "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PASS"
         and machine_gate.get("static_regeneration") == "PASS"
         and machine_gate.get("independent_static_audit") == "PASS"
         and machine_gate.get("commit_bound_ci") == {
@@ -365,7 +365,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
             "both comparative DRC paths are required together")
     if drc_base is not None and drc_candidate is not None:
         report["comparative_drc"] = audit_drc(drc_base, drc_candidate)
-        report["status"] = "PASS_KICAD9_COMPARATIVE_PENDING_APPLICATION"
+        report["status"] = "PASS_KICAD9_COMPARATIVE_ACCEPTED_AND_APPLIED"
     return report
 
 

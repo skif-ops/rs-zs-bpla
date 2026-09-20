@@ -25,6 +25,15 @@ BASE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
 CANDIDATE_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
 APPROVAL_SHA256 = "771c1f8d4b0fad0a78785ac280b3c02c5d9764a706384a902fddb153e94e8301"
 MAPPING_SHA256 = "b117715ef83872d5443d6067112b38ce8037993d02d7a52197d7f6af3e0b00fe"
+APPROVAL_COMMIT = "4c9a2a8561fd5cf25ba4d2cb334a158b8a33cb88"
+APPLICATION_COMMIT = "4c9a2a8561fd5cf25ba4d2cb334a158b8a33cb88"
+APPLICATION_TREE = "0cf141aea24c77fe19f89aa28fd00b7547a66ca4"
+CI_RUN_ID = 35538085583
+PCB_NATIVE_RUN_ID = 35538085389
+ARTIFACT_ID = 10612868581
+ARTIFACT_DIGEST = (
+    "sha256:6f37e792d7f0f7e09c22e5746743976e3953f6b12a5ccfa8f86e1ccd16f5b615"
+)
 AUTHORIZED_NETS = {"CELL_USB_DP_U8", "CELL_USB_DM_U8"}
 
 
@@ -83,17 +92,40 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         approval.get("decision") == "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
         and approval.get("reviewed_candidate_board_sha256") == CANDIDATE_SHA256
         and application.get("decision") == "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
+        and application.get("approval_commit_sha") == APPROVAL_COMMIT
+        and application.get("application_commit_sha") == APPLICATION_COMMIT
         and application.get("approval_sha256") == APPROVAL_SHA256
         and application.get("review_mapping_sha256") == MAPPING_SHA256
         and application.get("applied", {}).get("board_sha256") == CANDIDATE_SHA256
         and application.get("applied", {}).get("exact_candidate_byte_identity") is True
-        and gate.get("status") in {
-            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
-            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
-        }
+        and application.get("status") ==
+        "APPLIED_EXACT_ACCEPTED_USB_CELL_MODEM_ROUTING_COMMIT_BOUND_KICAD9_GATE_PASS"
         and application.get("review_b_complete") is False
         and application.get("manufacturing_release") is False,
         "cellular USB modem application identity or release boundary drift",
+    )
+    require(
+        gate.get("status") == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+        and gate.get("source_commit_sha") == APPLICATION_COMMIT
+        and gate.get("source_tree_sha") == APPLICATION_TREE
+        and gate.get("ci_run_id") == CI_RUN_ID
+        and gate.get("ci_run_number") == 566
+        and gate.get("ci_conclusion") == "success"
+        and gate.get("pcb_native_run_id") == PCB_NATIVE_RUN_ID
+        and gate.get("pcb_native_run_number") == 293
+        and gate.get("pcb_native_conclusion") == "success"
+        and gate.get("application_audit") ==
+        "PASS_EXACT_APPLICATION_KICAD9_COMPARATIVE"
+        and gate.get("comparative_drc") ==
+        "PASS_NO_NEW_ERRORS_EXACT_TWO_CONNECTION_REDUCTION"
+        and gate.get("base_violations") == 232
+        and gate.get("active_violations") == 232
+        and gate.get("base_unconnected") == 427
+        and gate.get("active_unconnected") == 425
+        and gate.get("new_errors") == 0
+        and gate.get("artifact_id") == ARTIFACT_ID
+        and gate.get("artifact_digest") == ARTIFACT_DIGEST,
+        "cellular USB modem application commit-bound evidence drift",
     )
 
     base = Board.from_file(str(BASE), encoding="utf-8")
@@ -121,14 +153,14 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
     route_control = evidence.get("routing_constraint_control", {})
     require(
         evidence.get("usb_cell_modem_routing_001_status") ==
-        "APPROVED_APPLIED_EXACT_CELL_MODEM_PAIR_COMMIT_BOUND_GATE_PENDING"
+        "APPROVED_APPLIED_EXACT_CELL_MODEM_PAIR_COMMIT_BOUND_GATE_PASS"
         and control.get("active_board_sha256") == CANDIDATE_SHA256
         and control.get("exact_candidate_byte_identity") is True
         and control.get("trace_items") == 994
         and route_control.get("board_sha256") == CANDIDATE_SHA256
         and route_control.get("trace_items") == 994
         and route_control.get("usb_cell_modem_routing_subgate") ==
-        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PENDING"
+        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS"
         and status.get("review_b", {}).get("complete") is False
         and status.get("manufacturing_release") is False,
         "capture-status cellular USB modem application traceability drift",
@@ -144,6 +176,10 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         "added_signal_vias": 0,
         "trace_items": 994,
         "machine_gate": gate.get("status"),
+        "application_commit_sha": APPLICATION_COMMIT,
+        "ci_run_id": CI_RUN_ID,
+        "pcb_native_run_id": PCB_NATIVE_RUN_ID,
+        "artifact_id": ARTIFACT_ID,
         "review_b_complete": False,
         "manufacturing_release": False,
     }

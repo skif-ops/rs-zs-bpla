@@ -90,7 +90,8 @@ application commit `6c27d3ae` passed CI `#562` and PCB Native `#289` with
 violations `232→232`, zero new errors and unconnected `429→427`.
 Its exact cellular-modem USB successor is authoritative SHA-256
 `4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5`;
-the fresh commit-bound application gate remains pending.
+application commit `4c9a2a85` passed CI `#566` and PCB Native `#293` with
+violations `232→232`, zero new errors and unconnected `427→425`.
 Commit-bound source commit `7ee9cfc9` passed CI `#550` and PCB Native Gate
 `#277`: comparative DRC added no errors or unconnected regression, and both
 filled-reference audits cover every cellular and GNSS sample. The bounded

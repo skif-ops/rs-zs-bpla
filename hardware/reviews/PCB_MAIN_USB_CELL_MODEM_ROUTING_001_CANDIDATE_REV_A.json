@@ -1,7 +1,7 @@
 {
   "schema": "pcb-main-usb-cell-modem-routing-001-candidate.rev-a",
   "candidate_id": "PCB-MAIN-USB-CELL-MODEM-ROUTING-001",
-  "status": "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PENDING",
+  "status": "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PASS",
   "reviewed_source_commit": "455dfb18d91fae2c1104b04b51fe5e87b22838bc",
   "base_board_sha256": "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5",
   "candidate_board_sha256": "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5",

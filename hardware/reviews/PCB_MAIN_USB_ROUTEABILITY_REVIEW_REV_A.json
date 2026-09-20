@@ -1,7 +1,7 @@
 {
   "schema": "pcb-main-usb-routeability-review.rev-a",
-  "status": "USB_MCU_SOURCE_APPLIED_CELL_MODEM_APPLIED_GATE_PENDING_MAIN_CONNECTOR_DFM_BLOCKED",
-  "decision": "USB_CELL_MODEM_EXACT_APPLICATION_COMMIT_BOUND_GATE_PENDING",
+  "status": "USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_COMMIT_BOUND_GATES_PASS_MAIN_CONNECTOR_DFM_BLOCKED",
+  "decision": "USB_CELL_MODEM_APPLICATION_PASS_FIXTURE_OR_DFM_INPUT_NEXT",
   "reviewed_source_commit": "2c67acaeb93c05b1bb7a6d9267275ff9fc260204",
   "authoritative_board_changed": true,
   "fixed_anchors": ["U1", "J11", "U25"],
@@ -71,7 +71,7 @@
   "cell_modem_routing_candidate": {
     "id": "PCB-MAIN-USB-CELL-MODEM-ROUTING-001",
     "sha256": "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5",
-    "status": "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PENDING",
+    "status": "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PASS",
     "routed_nets": ["CELL_USB_DP_U8", "CELL_USB_DM_U8"],
     "pair_length_mismatch_mm": 0.0,
     "minimum_pair_edge_gap_mm": 0.2032,
@@ -87,6 +87,12 @@
     "base_unconnected": 427,
     "candidate_unconnected": 425,
     "new_errors": 0,
+    "application_commit": "4c9a2a8561fd5cf25ba4d2cb334a158b8a33cb88",
+    "application_tree": "0cf141aea24c77fe19f89aa28fd00b7547a66ca4",
+    "application_ci_run": 35538085583,
+    "application_pcb_native_run": 35538085389,
+    "application_artifact_id": 10612868581,
+    "application_artifact_digest": "sha256:6f37e792d7f0f7e09c22e5746743976e3953f6b12a5ccfa8f86e1ccd16f5b615",
     "authoritative_board_modified": true,
     "human_acceptance": "ACCEPTED"
   },
