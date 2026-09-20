@@ -1,8 +1,8 @@
 # PCB-MAIN USB routeability review — Rev.A
 
-Status: `ECO_REQUIRED / ROUTING_NOT_AUTHORIZED / REVIEW_B_OPEN`
+Status: `PLACEMENT ECO APPLIED / MCU SOURCE ROUTING PROPOSAL GATE PENDING / REVIEW_B OPEN`
 
-Reviewed source commit: `fd2cfb324be9ef4a97acc538adee681e9770b2eb`.
+Reviewed source commit: `2c67acaeb93c05b1bb7a6d9267275ff9fc260204`.
 
 The authoritative PCB retains the accepted combined RF remediation and is not
 modified by this review.  The next controlled routing class was evaluated as
@@ -42,16 +42,35 @@ length for each controlled segment, continuous `GND_DIGITAL` reference, and
 comparative KiCad 9 DRC.  Final geometry remains subject to the selected
 fabricator's job-specific stackup/impedance response.
 
-Decision: `ECO_REQUIRED_USB_SOURCE_TERMINATION_CLUSTER`.
+Historical decision: `ECO_REQUIRED_USB_SOURCE_TERMINATION_CLUSTER`.
 
-## Candidate disposition
+## Placement disposition
 
-`PCB-MAIN-USB-PLACEMENT-ECO-001` now supplies the bounded four-footprint
-proposal requested above.  Its board SHA-256 is
+`PCB-MAIN-USB-PLACEMENT-ECO-001` supplied the bounded proposal requested
+above. Its board SHA-256 is
 `d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e`.
 It supersedes the failed four-footprint candidate from PCB Native Gate #280
-and now moves only the previously unrouted R91/R92. Static regeneration,
-strict clearance and commit-bound KiCad 9 comparative DRC pass on commit
-`ad3745e7` / PCB Native Gate #281, with errors `0→0` and unconnected
-`429→429`. Human acceptance remains pending. The routeability decision remains
-open and the candidate is not applied to authoritative PCB-MAIN.
+and moves only the previously unrouted R91/R92. Reviewer `Скиф` accepted the
+exact delta; application commit `1f8c0bad` passed CI #557 and PCB Native #284
+with zero new errors and unconnected `429→429`. The placement subgate is
+closed, but it does not authorize USB copper.
+
+## MCU source-routing proposal
+
+The accepted placement exposed one additional local copper constraint: the
+`GND_DIGITAL` via at `(62.1, 26.475)` occupies the only clearance-clean pair
+channel between `C12` and `R3`. Candidate
+`PCB-MAIN-USB-SOURCE-ROUTING-001` therefore routes only `USB_DP_U1` and
+`USB_DM_U1` and relocates that exact via plus its attached ground segment.
+Candidate SHA-256 is
+`76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5`.
+Static regeneration, exact length matching, `0.1537/0.2032 mm` geometry and
+continuous `GND_DIGITAL` L2-reference sampling pass. Commit-bound KiCad 9 DRC
+and human acceptance are pending; authoritative PCB-MAIN is unchanged.
+
+Current decision:
+`BOUNDED_USB_MCU_SOURCE_ROUTING_PROPOSAL_REQUIRES_MACHINE_GATE_AND_HUMAN_ACCEPTANCE`.
+
+The main connector pair and both cellular pair groups remain separate open
+subgates. Final stackup/tolerance/coupon acceptance, Review B, CAM, DFM and
+manufacturing release remain blocked.

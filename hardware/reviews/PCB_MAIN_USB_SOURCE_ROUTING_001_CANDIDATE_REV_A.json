@@ -1,0 +1,63 @@
+{
+  "schema": "pcb-main-usb-source-routing-001-candidate.rev-a",
+  "candidate_id": "PCB-MAIN-USB-SOURCE-ROUTING-001",
+  "status": "STATIC_PASS_KICAD9_GATE_PENDING",
+  "reviewed_source_commit": "2c67acaeb93c05b1bb7a6d9267275ff9fc260204",
+  "base_board_sha256": "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e",
+  "candidate_board_sha256": "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5",
+  "scope": {
+    "routed_pair_group": "USB_MAIN_MCU_SEGMENT",
+    "routed_nets": [
+      "USB_DP_U1",
+      "USB_DM_U1"
+    ],
+    "endpoints": {
+      "USB_DP_U1": ["U1.71", "R91.1"],
+      "USB_DM_U1": ["U1.70", "R92.1"]
+    },
+    "added_segments": 13,
+    "added_signal_vias": 0,
+    "changed_footprints": [],
+    "changed_zones": []
+  },
+  "engineering_geometry": {
+    "basis": "JLC06161H-3313_PUBLIC_ENGINEERING_CANDIDATE_L1_OVER_L2",
+    "layer": "F.Cu",
+    "reference": "GND_DIGITAL_In1.Cu",
+    "trace_width_mm": 0.1537,
+    "minimum_pair_edge_gap_mm": 0.2032,
+    "USB_DP_U1_length_mm": 4.178827774173,
+    "USB_DM_U1_length_mm": 4.178827774173,
+    "pair_length_mismatch_mm": 0.0
+  },
+  "bounded_return_fanout_delta": {
+    "reason": "The accepted GND_DIGITAL via at 62.1/26.475 occupies the only clearance-clean pair channel between C12 and R3",
+    "segment_tstamp": "fb9ade5d-8496-4617-9d20-390d44c347c4",
+    "via_tstamp": "bbd350c1-609d-43b7-9dd0-824ee009466f",
+    "old_via_xy_mm": [62.1, 26.475],
+    "new_via_xy_mm": [62.5, 26.75],
+    "via_geometry_unchanged": true,
+    "net_unchanged": "GND_DIGITAL",
+    "return_domain_join_changed": false
+  },
+  "machine_gate": {
+    "static_regeneration": "PASS",
+    "independent_static_audit": "PASS",
+    "commit_bound_ci": "PENDING",
+    "commit_bound_kicad9_comparative_drc": "PENDING",
+    "expected_unconnected_reduction": 2
+  },
+  "human_acceptance": "PENDING",
+  "required_acceptance_token_after_green_gate": "ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE",
+  "authoritative_board_modified": false,
+  "remaining_usb_routing": [
+    "USB_MAIN_CONNECTOR_SEGMENT",
+    "USB_CELL_MODEM_SEGMENT",
+    "USB_CELL_FIXTURE_SEGMENT"
+  ],
+  "final_job_stackup_accepted": false,
+  "production_impedance_tolerance_accepted": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false,
+  "manufacturing_release": false
+}

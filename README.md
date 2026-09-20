@@ -67,7 +67,14 @@ Commit `ad3745e7` прошёл CI `#554` и PCB Native `#281`: новых DRC er
 unconnected остаётся `429`, strict clearance — PASS. Точный application commit
 `1f8c0bad` прошёл CI `#557` и PCB Native `#284`: новых ошибок нет,
 `429→429` unconnected. Placement subgate закрыт; USB-трассировка и финальная
-impedance-геометрия пока не разрешены.
+impedance-геометрия пока не разрешены. Следующий ограниченный кандидат
+`PCB-MAIN-USB-SOURCE-ROUTING-001` соединяет только MCU-side пару
+`U1.71/U1.70 → R91.1/R92.1`: 13 сегментов `F.Cu`, без signal-via, оба плеча
+по `4.178827774173 mm`, minimum pair gap `0.2032 mm`. Для освобождения
+единственного clearance-clean канала предложение локально переносит один
+`GND_DIGITAL` via и его сегмент без изменения геометрии via или ground-domain
+топологии. Static gate прошёл; commit-bound KiCad 9 DRC и human acceptance
+ожидаются, authoritative PCB не изменён.
 Отдельно подготовлен ограниченный запрос для будущего
 выбранного сборщика по DFM/трафарету `U2/U25/U26/U9` и пустой 14-строчный реестр: принято
 `0/14` ответов, сборщик и процесс не выбраны, паста U9 и производственный выпуск

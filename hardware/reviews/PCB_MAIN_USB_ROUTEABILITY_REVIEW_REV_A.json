@@ -1,8 +1,8 @@
 {
   "schema": "pcb-main-usb-routeability-review.rev-a",
-  "status": "ECO_REQUIRED",
-  "decision": "ECO_REQUIRED_USB_SOURCE_TERMINATION_CLUSTER",
-  "reviewed_source_commit": "fd2cfb324be9ef4a97acc538adee681e9770b2eb",
+  "status": "PLACEMENT_APPLIED_USB_MCU_SOURCE_ROUTING_PROPOSAL_GATE_PENDING",
+  "decision": "BOUNDED_USB_MCU_SOURCE_ROUTING_PROPOSAL_REQUIRES_MACHINE_GATE_AND_HUMAN_ACCEPTANCE",
+  "reviewed_source_commit": "2c67acaeb93c05b1bb7a6d9267275ff9fc260204",
   "authoritative_board_changed": false,
   "fixed_anchors": ["U1", "J11", "U25"],
   "source_pads": {
@@ -11,9 +11,9 @@
     "pitch_mm": 0.5
   },
   "terminations": {
-    "R92": [55.0, 18.25],
-    "R91": [49.0, 18.25],
-    "centre_separation_mm": 6.0
+    "R92": [64.0, 26.25],
+    "R91": [64.0, 25.25],
+    "centre_separation_mm": 1.0
   },
   "local_escape_occupants": ["C4", "C12", "R3"],
   "candidate_geometry_mm": {
@@ -29,12 +29,22 @@
     "CONTINUOUS_GND_DIGITAL_L2_REFERENCE",
     "COMPARATIVE_KICAD9_DRC"
   ],
-  "candidate": {
+  "placement_application": {
     "id": "PCB-MAIN-USB-PLACEMENT-ECO-001",
     "sha256": "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e",
-    "status": "KICAD9_PASS_HUMAN_REVIEW_PENDING",
-    "source_commit": "ad3745e719c7c21dade8d0120075d20d629274c8",
-    "pcb_native_run": 35523547766
+    "status": "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PASS",
+    "application_commit": "1f8c0bad8a7825adb8324dc36976141eab78a645",
+    "pcb_native_run": 35526956229
+  },
+  "source_routing_candidate": {
+    "id": "PCB-MAIN-USB-SOURCE-ROUTING-001",
+    "sha256": "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5",
+    "status": "STATIC_PASS_KICAD9_GATE_PENDING",
+    "routed_nets": ["USB_DP_U1", "USB_DM_U1"],
+    "pair_length_mismatch_mm": 0.0,
+    "minimum_pair_edge_gap_mm": 0.2032,
+    "authoritative_board_modified": false,
+    "human_acceptance": "PENDING"
   },
   "manufacturing_release": false,
   "review_b_complete": false

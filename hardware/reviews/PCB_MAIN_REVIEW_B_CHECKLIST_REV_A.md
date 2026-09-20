@@ -144,9 +144,8 @@ manufacturing release.
   blocker/critical DFM closure are approved through controlled review.
 - [ ] RF, power, PDM, USB and SIM routing is complete.
 - [x] USB source-termination placement ECO commit-bound application gate is closed. Routeability review
-  `PCB_MAIN_USB_ROUTEABILITY_REVIEW_REV_A.md` records that R91/R92 are 6.00 mm
-  apart while U1 D-/D+ pads are on 0.50 mm pitch; routing is prohibited until
-  the bounded local U1 cluster passes clearance and pair-geometry review.
+  `PCB_MAIN_USB_ROUTEABILITY_REVIEW_REV_A.md` records the original 6.00 mm
+  separation of R91/R92 against the 0.50 mm U1 D-/D+ pad pitch.
   Revised candidate `PCB-MAIN-USB-PLACEMENT-ECO-001` moves only R91/R92 and
   passes static regeneration plus strict clearance. The superseded
   four-footprint candidate failed PCB Native #280 because C12/R3 already own
@@ -155,7 +154,12 @@ manufacturing release.
   `R91/R92` delta; candidate SHA-256 `d060e090…d9e` is now authoritative, with
   application commit `1f8c0bad` passed CI #557 and PCB Native #284 with zero
   new errors and `429→429` unconnected. This closes placement only; USB copper
-  remains open.
+  remains open. Applied R91/R92 centre separation is 1.00 mm.
+- [ ] Bounded candidate `PCB-MAIN-USB-SOURCE-ROUTING-001` routes only the local
+  U1-to-R91/R92 USB pair, relocates one existing `GND_DIGITAL` via/segment and
+  leaves the authoritative board unchanged. Static regeneration and geometry
+  audits pass; KiCad 9 comparative DRC and explicit human acceptance remain
+  mandatory before any application commit.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.
 - [ ] KiCad 9 DRC passes with zero blocker/critical violations and zero unrouted items.
 - [ ] Gerber/Excellon is generated only from that DRC-clean commit.
