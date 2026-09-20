@@ -1,0 +1,57 @@
+{
+  "schema_version": "dioneya.pcb-main-rf-p0-candidate.v1",
+  "candidate_id": "PCB-MAIN-RF-P0-001",
+  "date": "2026-09-19",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "status": "PROPOSAL_STATIC_AUDIT_PASS_KICAD9_COMPARATIVE_DRC_PENDING",
+  "base_board": "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb",
+  "base_board_sha256": "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f",
+  "candidate_board": "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb",
+  "candidate_board_sha256": "718e26555529f4076035ea2306826d8f2cd90b621b91bdff7d4e8f49962f1c43",
+  "generator": "tools/generate_pcb_main_rf_p0_candidate_rev_a.py",
+  "generator_sha256": "d4f6bc24dd58bdeee8b4377df2002597a3eccd49d4a7b4cea138bd0ae20defd4",
+  "audit": "tools/audit_pcb_main_rf_p0_candidate_rev_a.py",
+  "routing_basis": "hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json",
+  "stackup_id": "JLC06161H-3313",
+  "candidate_geometry": {
+    "layer": "F.Cu",
+    "reference_layer": "L2",
+    "rf_50ohm_width_mm": 0.1509,
+    "signal_vias": 0,
+    "grid_step_mm": 0.0625
+  },
+  "routed_nets": [
+    "CELL_RF",
+    "CELL_RF_ANT",
+    "GNSS_RF_ANT_BIASED",
+    "GNSS_RF_DC_BLOCK",
+    "GNSS_RF_FILTERED",
+    "LORA_RF_ANT",
+    "LORA_RF_MODULE"
+  ],
+  "added_segments": 138,
+  "added_vias": 0,
+  "added_track_length_mm": 111.607792502738,
+  "local_connectivity": {
+    "kicad_version": "7.0.11",
+    "base_unconnected": 697,
+    "candidate_unconnected": 682,
+    "reduction": 15
+  },
+  "uuid_control": {
+    "base_trace_items": 838,
+    "candidate_trace_items": 976,
+    "base_unique_trace_uuids": 838,
+    "candidate_unique_trace_uuids": 976,
+    "candidate_specific_seed": "0x52465030"
+  },
+  "comparative_kicad9_drc": "PENDING_CI",
+  "final_job_stackup_accepted": false,
+  "production_impedance_tolerance_accepted": false,
+  "coupon_plan_accepted": false,
+  "si_return_path_review_complete": false,
+  "applied_to_authoritative_board": false,
+  "routing_complete": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}
