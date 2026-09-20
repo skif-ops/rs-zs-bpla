@@ -15,6 +15,7 @@ import hashlib
 from pathlib import Path
 
 import pcbnew
+import route_pcb_release_candidate_rev_a as release_router
 
 from route_pcb_release_candidate_rev_a import (
     GridRouter,
@@ -39,6 +40,7 @@ BASE_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 RF_WIDTH_MM = 0.1509
 GRID_STEP_MM = 0.0625
 UUID_SEED = 0x52465030
+_ROUTER_MM = release_router.mm
 GUIDED_NET = "GNSS_RF_FILTERED"
 ROUTED_NETS = (
     "CELL_RF",
@@ -79,6 +81,14 @@ def require_unique_trace_uuids(board: pcbnew.BOARD, label: str) -> None:
     require(len(uuids) == len(set(uuids)), f"{label}: duplicate track/via UUID")
 
 
+def enable_kicad9_router_compatibility() -> None:
+    """Normalize KiCad 9's unset pad-clearance value for this proposal only."""
+    def mm_compat(value: object) -> float:
+        return 0.0 if value is None else _ROUTER_MM(value)
+
+    release_router.mm = mm_compat
+
+
 def add_gnss_guide(board: pcbnew.BOARD) -> int:
     net_code = board.FindNet(GUIDED_NET).GetNetCode()
     require(bool(net_code), f"missing native net: {GUIDED_NET}")
@@ -105,6 +115,7 @@ def generate(output: Path) -> dict[str, object]:
     # router's historical seed, whose output is already present in the base.
     pcbnew.KIID.SeedGenerator(UUID_SEED)
     guide_segments = add_gnss_guide(board)
+    enable_kicad9_router_compatibility()
     router = GridRouter(board, "PCB-MAIN", GRID_STEP_MM)
     preserved = router.index_existing_copper()
     policy = NetPolicy(

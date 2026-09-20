@@ -35,7 +35,7 @@ accepted ground copper.
 
 - Base SHA-256: `04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f`
 - Candidate SHA-256: `718e26555529f4076035ea2306826d8f2cd90b621b91bdff7d4e8f49962f1c43`
-- Generator SHA-256: `d4f6bc24dd58bdeee8b4377df2002597a3eccd49d4a7b4cea138bd0ae20defd4`
+- Generator SHA-256: `c764be80c70c9f8aff3966367a064131d67ada9a6f42c900390fd45aa244a4c4`
 - Candidate: `hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb`
 - Static audit: `tools/audit_pcb_main_rf_p0_candidate_rev_a.py`
 

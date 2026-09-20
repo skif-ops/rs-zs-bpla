@@ -357,15 +357,7 @@ class GridRouter:
                 box = pad.GetBoundingBox()
                 left, top = mm(box.GetX()), mm(box.GetY())
                 right, bottom = mm(box.GetRight()), mm(box.GetBottom())
-                # KiCad 9 returns ``None`` when a pad has no local clearance
-                # override; KiCad 7 returned the integer value 0.  Treat both
-                # representations identically and retain the controlled
-                # 0.20 mm router clearance floor.
-                local_clearance = pad.GetLocalClearance()
-                pad_clearance = max(
-                    clearance,
-                    mm(local_clearance) if local_clearance is not None else 0.0,
-                )
+                pad_clearance = max(clearance, mm(pad.GetLocalClearance()))
                 obstacle_margin = pad_clearance + track_radius
                 expanded = self._grid_bounds(
                     left - obstacle_margin,
