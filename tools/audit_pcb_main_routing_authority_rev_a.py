@@ -69,8 +69,14 @@ GNSS_APPLICATION = (
 USB_SOURCE_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPLICATION_REV_A.json"
 )
+USB_CELL_MODEM_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPLICATION_REV_A.json"
+)
 
-STATE = "PASS_CONSTRAINT_COVERAGE_ACCEPTED_RF_REMEDIATIONS_AND_USB_MCU_SOURCE_APPLIED"
+STATE = (
+    "PASS_CONSTRAINT_COVERAGE_ACCEPTED_RF_REMEDIATIONS_USB_MCU_SOURCE_"
+    "AND_CELL_MODEM_APPLIED"
+)
 ROW_STATUS = "PRE_ROUTE_CONSTRAINT_CONTROLLED_ROUTING_NOT_COMPLETE"
 STACKUP_STATE = "OPEN_REQUIRED_BEFORE_NUMERIC_RF_USB_GEOMETRY"
 GROUND_CANDIDATE_SHA256 = (
@@ -89,6 +95,9 @@ RF_REMEDIATION_SHA256 = (
     "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
 )
 ACTIVE_BOARD_SHA256 = (
+    "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
+)
+USB_SOURCE_BOARD_SHA256 = (
     "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
 )
 
@@ -472,7 +481,7 @@ def expected_status_control(
         "rf_50ohm_net_count": 7,
         "usb_90ohm_pair_count": 4,
         "cross_domain_review_net_count": 18,
-        "trace_items": 988,
+        "trace_items": 994,
         "copper_zones": 8,
         "ground_domain_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "signal_hard_nets_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
@@ -485,6 +494,8 @@ def expected_status_control(
         "APPLIED_EXACT_ACCEPTED_R91_R92_DELTA_COMMIT_BOUND_GATE_PASS",
         "usb_mcu_source_routing_subgate":
         "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
+        "usb_cell_modem_routing_subgate":
+        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PENDING",
         "factory_stackup": STACKUP_STATE,
         "routing_complete": False,
         "manufacturing_release": False,
@@ -586,7 +597,7 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
 
     trace_items = len(board.traceItems)
     copper_zones = len(board.zones)
-    require(trace_items == 988 and copper_zones == 8,
+    require(trace_items == 994 and copper_zones == 8,
             "authoritative board does not contain the accepted RF remediations")
     board_digest = sha256(board_path)
     require(board_digest == ACTIVE_BOARD_SHA256,
@@ -670,6 +681,9 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
     usb_source_application = json.loads(
         USB_SOURCE_APPLICATION.read_text(encoding="utf-8")
     )
+    usb_cell_modem_application = json.loads(
+        USB_CELL_MODEM_APPLICATION.read_text(encoding="utf-8")
+    )
     require(
         rf_return_application.get("decision") ==
         "ACCEPT_CELLULAR_L2_RETURN_PLANE_SUBGATE"
@@ -692,13 +706,28 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
         usb_source_application.get("decision") ==
         "ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE"
         and usb_source_application.get("applied", {}).get("board_sha256") ==
-        ACTIVE_BOARD_SHA256
+        USB_SOURCE_BOARD_SHA256
         and usb_source_application.get("applied", {}).get(
             "exact_candidate_byte_identity"
         ) is True
         and usb_source_application.get("review_b_complete") is False
         and usb_source_application.get("manufacturing_release") is False,
         "USB MCU source-routing application boundary differs",
+    )
+    require(
+        usb_cell_modem_application.get("decision") ==
+        "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
+        and usb_cell_modem_application.get("predecessor", {}).get(
+            "board_sha256"
+        ) == USB_SOURCE_BOARD_SHA256
+        and usb_cell_modem_application.get("applied", {}).get("board_sha256") ==
+        ACTIVE_BOARD_SHA256
+        and usb_cell_modem_application.get("applied", {}).get(
+            "exact_candidate_byte_identity"
+        ) is True
+        and usb_cell_modem_application.get("review_b_complete") is False
+        and usb_cell_modem_application.get("manufacturing_release") is False,
+        "USB cellular-modem routing application boundary differs",
     )
 
     authority_digest = sha256(authority_path)
@@ -715,7 +744,8 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             "routing_authority_audit": "tools/audit_pcb_main_routing_authority_rev_a.py",
             "routing_constraint_status": (
                 "PASS_ALL_186_NETS_CLASSIFIED_RF_REMEDIATION_REPEAT_REVIEW_PASS_"
-                "USB_MCU_SOURCE_APPLIED_FACTORY_STACKUP_AND_REMAINING_ROUTING_PENDING"
+                "USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_FACTORY_STACKUP_AND_"
+                "REMAINING_ROUTING_PENDING"
             ),
         }
         require(all(evidence.get(key) == value
@@ -786,7 +816,7 @@ def main() -> int:
     print("PCB-MAIN routing authority audit: PASS")
     print(
         "nets=186 classes=15 rf_50ohm=7 usb_pairs=4 "
-        "trace_items=988 copper_zones=8 ground_subgate=applied "
+        "trace_items=994 copper_zones=8 ground_subgate=applied "
         "signal_hard_nets_subgate=applied octospi_r8_eco_002_subgate=applied "
         "rf_p0_subgate=applied rf_remediations=applied "
         "routing_complete=false"

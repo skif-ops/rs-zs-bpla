@@ -1,6 +1,6 @@
 # PCB-MAIN USB routeability review — Rev.A
 
-Status: `MCU SOURCE APPLIED / CELL MODEM PROPOSAL READY / MAIN CONNECTOR DFM BLOCKED / REVIEW_B OPEN`
+Status: `MCU SOURCE APPLIED / CELL MODEM APPLIED-GATE-PENDING / MAIN CONNECTOR DFM BLOCKED / REVIEW_B OPEN`
 
 Reviewed source commit: `2c67acaeb93c05b1bb7a6d9267275ff9fc260204`.
 
@@ -73,7 +73,7 @@ Native #289 repeated violations `232→232`, zero new errors and unconnected
 `429→427`.
 
 Current decision:
-`USB_MCU_SOURCE_ROUTING_APPLICATION_PASS_CELL_MODEM_PROPOSAL_READY_MAIN_CONNECTOR_DFM_BLOCKED`.
+`USB_MCU_SOURCE_ROUTING_APPLICATION_PASS_CELL_MODEM_APPLIED_GATE_PENDING_MAIN_CONNECTOR_DFM_BLOCKED`.
 
 ## Main-connector escape disposition
 
@@ -98,6 +98,9 @@ Static regeneration and independent geometry checks pass. Proposal commit
 zero new errors were introduced and unconnected items changed `427→425`.
 Artifact `10613537447` is bound by digest
 `sha256:fa9f1ab6357ad4ad2e356194e05ae999a6a8358641082a860228e0e4cfe04e90`.
+The exact hash-bound candidate has been accepted under the user's standing
+authorization and applied to the authoritative board; its fresh application
+gate is pending.
 
 The main connector pair and cellular fixture pair remain separate open
 subgates. Final stackup/tolerance/coupon acceptance, Review B, CAM, DFM and

@@ -40,7 +40,7 @@ STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 BASE_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
 CANDIDATE_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 RF_CANDIDATE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-ACTIVE_BOARD_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
+ACTIVE_BOARD_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
 USB_AUTHORIZED_MODIFIED_TSTAMPS = {
     "bbd350c1-609d-43b7-9dd0-824ee009466f",
     "fb9ade5d-8496-4617-9d20-390d44c347c4",
@@ -241,11 +241,11 @@ def audit() -> dict[str, Any]:
     footprints = {ref_of(fp): fp for fp in board.footprints}
     r8 = footprints["R8"]
     require(
-        len(board.traceItems) == 988
-        and len(segments) == 705
+        len(board.traceItems) == 994
+        and len(segments) == 711
         and len(vias) == 283
         and len(board.zones) == 8
-        and abs(length - 895.319845557592) < 1e-9
+        and abs(length - 904.850815290587) < 1e-9
         and (float(r8.position.X), float(r8.position.Y)) == (54.5, 16.0),
         "authoritative RF successor board inventory or R8 position drift",
     )
@@ -258,7 +258,8 @@ def audit() -> dict[str, Any]:
         review_b.get("complete") is False
         and review_b.get("status") ==
         "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
-        "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_APPLIED_REMAINING_ROUTING_PENDING"
+        "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_"
+        "REMAINING_ROUTING_PENDING"
         and evidence.get("octospi_r8_eco_002_application") == str(APPLICATION.relative_to(ROOT))
         and evidence.get("octospi_r8_eco_002_status") ==
         "APPROVED_APPLIED_BOUNDED_R8_PLACEMENT_AND_OCTOSPI_ROUTING_"
@@ -266,7 +267,7 @@ def audit() -> dict[str, Any]:
         and evidence.get("placement_clearance_control", {}).get("board_sha256") ==
         ACTIVE_BOARD_SHA256
         and control.get("board_sha256") == ACTIVE_BOARD_SHA256
-        and control.get("trace_items") == 988
+        and control.get("trace_items") == 994
         and control.get("octospi_r8_eco_002_subgate") ==
         "APPLIED_EXACT_ACCEPTED_CANDIDATE"
         and control.get("routing_complete") is False
@@ -305,7 +306,7 @@ def main() -> int:
             encoding="utf-8",
         )
     print("PCB-MAIN OctoSPI R8 ECO-002 application audit: PASS")
-    print("r8_position_mm=54.5,16.0 trace_items=988 routed_nets=11 routing_complete=false")
+    print("r8_position_mm=54.5,16.0 trace_items=994 routed_nets=13 routing_complete=false")
     return 0
 
 

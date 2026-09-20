@@ -50,10 +50,10 @@ routing subgates, or successful software tests.
 PCB-MAIN has passed its bounded 2D placement-clearance subgate: the controlled
 225-reference repack gives all 227 fitted assembly footprints an explicit
 courtyard and the strict audit reports zero component, mounting-exclusion and
-U.FL tool-zone conflicts. The authoritative board is now partially routed: 705
+U.FL tool-zone conflicts. The authoritative board is now partially routed: 711
 segments plus 283 vias, with four copper zones and four rule areas, reflect
-accepted bounded ground-domain, hard-signal, OctoSPI, seven-net RF P0 and USB
-MCU-source subgates. This is engineering progress only; remaining routing, final DRC,
+accepted bounded ground-domain, hard-signal, OctoSPI, seven-net RF P0, USB
+MCU-source and cellular-modem subgates. This is engineering progress only; remaining routing, final DRC,
 3D/service evidence, CAM, DFM and independent Review B remain required.
 
 PCB-MAIN also has an accepted human-readable hierarchy-only subgate. Source
@@ -88,6 +88,9 @@ Native `#284`. Its accepted USB MCU-source routing successor is authoritative
 SHA-256 `76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5`;
 application commit `6c27d3ae` passed CI `#562` and PCB Native `#289` with
 violations `232→232`, zero new errors and unconnected `429→427`.
+Its exact cellular-modem USB successor is authoritative SHA-256
+`4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5`;
+the fresh commit-bound application gate remains pending.
 Commit-bound source commit `7ee9cfc9` passed CI `#550` and PCB Native Gate
 `#277`: comparative DRC added no errors or unconnected regression, and both
 filled-reference audits cover every cellular and GNSS sample. The bounded
@@ -235,7 +238,7 @@ release.
   ECO was accepted and applied exactly after proposal PCB Native #281; U1/J11/
   U25 and accepted RF copper remain fixed; its application commit-bound gate
   passed; the bounded MCU-source pair application gate also passed on PCB
-  Native #289, while main-connector and cellular controlled 90-ohm segments
+  Native #289, while main-connector and fixture controlled 90-ohm segments
   remain open;
 - the remaining 17 PCB-PWR input-protection qualification rows after accepted
   manufacturer source control, native-value and repeat-hierarchy gates,

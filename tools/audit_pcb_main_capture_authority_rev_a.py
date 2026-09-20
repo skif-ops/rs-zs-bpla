@@ -1709,6 +1709,9 @@ def main() -> None:
                     "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
                     "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_"
+                    "REMAINING_ROUTING_PENDING",
                 },
                 "Review B must be open but incomplete after Review A PASS")
     else:
@@ -1752,6 +1755,9 @@ def main() -> None:
                 "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING",
                 "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
                 "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_APPLIED_REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_"
+                "REMAINING_ROUTING_PENDING",
         }:
             required_layout_evidence = {
                 "native_layout_candidate", "layout_generator", "layout_independent_audit",
@@ -1845,6 +1851,9 @@ def main() -> None:
                     "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
                     "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_"
+                    "REMAINING_ROUTING_PENDING",
             }:
                 required_layout_evidence |= {
                     "placement_repack_manifest", "placement_repack_generator",
@@ -2306,6 +2315,34 @@ def main() -> None:
                 and usb_source_application.get("manufacturing_release") is False,
                 "PCB-MAIN USB source-routing application interlock drift",
             )
+            usb_cell_modem_application = json.loads(
+                (ROOT / review_b["evidence"][
+                    "usb_cell_modem_routing_001_application"
+                ]).read_text(encoding="utf-8")
+            )
+            require(
+                usb_cell_modem_application.get("proposal_id") ==
+                "PCB-MAIN-USB-CELL-MODEM-ROUTING-001"
+                and usb_cell_modem_application.get("decision") ==
+                "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
+                and usb_cell_modem_application.get("applied", {}).get(
+                    "exact_candidate_byte_identity"
+                ) is True
+                and usb_cell_modem_application.get("applied", {}).get(
+                    "routed_nets"
+                ) == ["CELL_USB_DM_U8", "CELL_USB_DP_U8"]
+                and usb_cell_modem_application.get("applied", {}).get(
+                    "added_segments"
+                ) == 6
+                and usb_cell_modem_application.get("applied", {}).get(
+                    "added_signal_vias"
+                ) == 0
+                and usb_cell_modem_application.get("review_b_complete") is False
+                and usb_cell_modem_application.get(
+                    "manufacturing_release"
+                ) is False,
+                "PCB-MAIN cellular USB modem-routing application interlock drift",
+            )
             mechanical_application = None
             if mechanical_eco_status in {
                     "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
@@ -2421,9 +2458,14 @@ def main() -> None:
                             "locked_authority_mounting_conflicts": [],
                             "locked_authority_tool_conflicts": [],
                         }, "PCB-MAIN mechanical ECO historical inventory drift")
-                require(usb_source_application.get("applied", {}).get(
+                require(usb_cell_modem_application.get("applied", {}).get(
                             "board_sha256"
                         ) == placement_control["board_sha256"] and
+                        usb_cell_modem_application.get("predecessor", {}).get(
+                            "board_sha256"
+                        ) == usb_source_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) and
                         usb_source_application.get("predecessor", {}).get(
                             "board_sha256"
                         ) == usb_placement_application.get("applied", {}).get(

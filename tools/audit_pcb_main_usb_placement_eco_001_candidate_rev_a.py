@@ -24,10 +24,12 @@ ACTIVE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPROVAL_REV_A.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPLICATION_REV_A.json"
 SOURCE_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPLICATION_REV_A.json"
+CELL_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPLICATION_REV_A.json"
 AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 BASE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
 CANDIDATE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
 SOURCE_SUCCESSOR_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
+CELL_SUCCESSOR_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
 EXPECTED_POSES = {
     "R91": ((49.0, 18.25, 180.0), (64.0, 25.25, 0.0)),
     "R92": ((55.0, 18.25, 180.0), (64.0, 26.25, 0.0)),
@@ -103,7 +105,9 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     require(sha256(BASE) == BASE_SHA256, "USB ECO base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "USB ECO candidate SHA-256 drift")
     active_sha256 = sha256(ACTIVE)
-    require(active_sha256 in {CANDIDATE_SHA256, SOURCE_SUCCESSOR_SHA256},
+    require(active_sha256 in {
+        CANDIDATE_SHA256, SOURCE_SUCCESSOR_SHA256, CELL_SUCCESSOR_SHA256,
+    },
             "authoritative PCB-MAIN USB placement lineage drift")
     if active_sha256 == CANDIDATE_SHA256:
         require(ACTIVE.read_bytes() == CANDIDATE.read_bytes(),
@@ -123,6 +127,22 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
             and source_application.get("manufacturing_release") is False,
             "authoritative USB source-routing successor boundary drift",
         )
+        if active_sha256 == CELL_SUCCESSOR_SHA256:
+            cell_application = json.loads(
+                CELL_APPLICATION.read_text(encoding="utf-8")
+            )
+            require(
+                cell_application.get("decision") ==
+                "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
+                and cell_application.get("predecessor", {}).get(
+                    "board_sha256"
+                ) == SOURCE_SUCCESSOR_SHA256
+                and cell_application.get("applied", {}).get("board_sha256") ==
+                CELL_SUCCESSOR_SHA256
+                and cell_application.get("review_b_complete") is False
+                and cell_application.get("manufacturing_release") is False,
+                "authoritative cellular USB modem successor boundary drift",
+            )
 
     base = Board.from_file(str(BASE), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")

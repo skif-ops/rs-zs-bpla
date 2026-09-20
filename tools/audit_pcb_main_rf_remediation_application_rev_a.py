@@ -73,7 +73,7 @@ BASE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
 CELLULAR_SHA256 = "22ddd8c56ceabf397ed033a44235b439625d3104fa2cf798bb57b782d24b1352"
 GNSS_SHA256 = "d4c0eaa95bb62c7b9ae15b110fb3a76e6a056f462f0a36a734b3fa63730d2aee"
 COMPOSED_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
-ACTIVE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
+ACTIVE_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
 USB_AUTHORIZED_MODIFIED_TSTAMPS = {
     "bbd350c1-609d-43b7-9dd0-824ee009466f",
     "fb9ade5d-8496-4617-9d20-390d44c347c4",
@@ -92,6 +92,12 @@ USB_AUTHORIZED_ADDED_TSTAMPS = {
     "a411bc79-cd05-5b14-acbe-112f23afef06",
     "a62064eb-2462-50e5-94d4-ad7150b8851a",
     "d36ee5aa-6489-5aa0-8ac6-14582e96fd07",
+    "117982d1-a11b-5d95-b219-86928a0c4f59",
+    "56b59dac-af0e-5b69-b7e9-c9026ce454ec",
+    "7d3b792f-85af-5750-8baa-409358f8ba0e",
+    "b282150b-0266-55d1-8e65-3d4d8a3de3f5",
+    "bd5752bc-fe7e-5fef-ae3a-1c27265cd5b9",
+    "e57d54c6-ac22-5dd8-99ee-f165f3767946",
 }
 GENERATOR_SHA256 = "9014e03d6dbd3fe6f153d1a5a557ac2832904e264f165b03ba0cdca38a7fe3fa"
 CELLULAR_APPROVAL_SHA256 = "000e323f116d9b4aa371142c9efe37d85241563ea8db41c2f9b23bfca6bee079"
@@ -334,7 +340,7 @@ def static_audit() -> dict[str, object]:
             key for key in predecessor_items
             if predecessor_items[key] != active_items[key]
         } == USB_AUTHORIZED_MODIFIED_TSTAMPS,
-        "USB source-routing successor copper delta drift",
+        "accepted USB routing successors copper delta drift",
     )
     predecessor_footprints = {ref_of(item): item for item in rf_composed.footprints}
     active_footprints = {ref_of(item): item for item in active.footprints}
@@ -397,11 +403,11 @@ def static_audit() -> dict[str, object]:
         for item in segments
     )
     require(
-        len(active.traceItems) == 988
-        and len(segments) == 705
+        len(active.traceItems) == 994
+        and len(segments) == 711
         and len(vias) == 283
         and len(active.zones) == 8
-        and math.isclose(length, 895.319845557592, abs_tol=1e-9),
+        and math.isclose(length, 904.850815290587, abs_tol=1e-9),
         "composed authoritative board inventory drift",
     )
 
@@ -478,7 +484,7 @@ def main() -> int:
                           encoding="utf-8")
     print("PCB-MAIN composed RF-remediation application audit: PASS")
     print(f"board_sha256={ACTIVE_SHA256} rf_predecessor_sha256={COMPOSED_SHA256} "
-          "trace_items=988 zones=8")
+          "trace_items=994 zones=8")
     print("release_boundary=FINAL_SI_REMAINING_ROUTING_REVIEW_B_AND_MANUFACTURING_OPEN")
     return 0
 

@@ -105,6 +105,13 @@ USB_SOURCE_CANDIDATE = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-SOURCE-ROUTING-001/"
     "PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pcb"
 )
+USB_CELL_MODEM_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPLICATION_REV_A.json"
+)
+USB_CELL_MODEM_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-CELL-MODEM-ROUTING-001/"
+    "PCB-MAIN_USB_CELL_MODEM_CANDIDATE_REV_A.kicad_pcb"
+)
 
 ACTIVE_APPROVED_POSES = {
     "FL1": (56.8, 51.6, 270.0),
@@ -879,6 +886,9 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
         )
         usb = json.loads(USB_APPLICATION.read_text(encoding="utf-8"))
         usb_source = json.loads(USB_SOURCE_APPLICATION.read_text(encoding="utf-8"))
+        usb_cell_modem = json.loads(
+            USB_CELL_MODEM_APPLICATION.read_text(encoding="utf-8")
+        )
         require(
             usb.get("decision") ==
             "ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE"
@@ -899,6 +909,20 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
             and usb_source.get("review_b_complete") is False
             and usb_source.get("manufacturing_release") is False,
             "PCB-MAIN accepted USB source-routing successor drift",
+        )
+        require(
+            usb_cell_modem.get("decision") ==
+            "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
+            and usb_cell_modem.get("predecessor", {}).get("board_sha256") ==
+            sha256(USB_SOURCE_CANDIDATE)
+            and usb_cell_modem.get("applied", {}).get("board_sha256") ==
+            sha256(USB_CELL_MODEM_CANDIDATE)
+            and usb_cell_modem.get("applied", {}).get(
+                "exact_candidate_byte_identity"
+            ) is True
+            and usb_cell_modem.get("review_b_complete") is False
+            and usb_cell_modem.get("manufacturing_release") is False,
+            "PCB-MAIN accepted cellular USB modem-routing successor drift",
         )
     else:
         require(applied.get("placement_repack_sha256") == sha256(PLACEMENT),
@@ -953,9 +977,9 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
                 rf.get("applied", {}).get("exact_candidate_byte_identity") is True and
                 sha256(RF_REMEDIATION_COMPOSED) ==
                 "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9" and
-                sha256(BOARD) == sha256(USB_SOURCE_CANDIDATE) and
-                BOARD.read_bytes() == USB_SOURCE_CANDIDATE.read_bytes() and
-                len(getattr(board, "traceItems", [])) == 988 and
+                sha256(BOARD) == sha256(USB_CELL_MODEM_CANDIDATE) and
+                BOARD.read_bytes() == USB_CELL_MODEM_CANDIDATE.read_bytes() and
+                len(getattr(board, "traceItems", [])) == 994 and
                 len(getattr(board, "zones", [])) == 8 and
                 ground.get("routing_complete") is False and
                 ground.get("review_b_complete") is False and

@@ -40,7 +40,7 @@ ECO003_BOARD_SHA256 = "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce6
 CURRENT_BOARD_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
 OCTOSPI_BOARD_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 RF_P0_BOARD_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-ACTIVE_BOARD_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
+ACTIVE_BOARD_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
 CURRENT_PLACEMENT_SHA256 = "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4"
 RF_P0_PLACEMENT_SHA256 = "70b453c77745580f16d571c999eeb0cde3f5581db69568668131dbe84ab20925"
 ACTIVE_PLACEMENT_SHA256 = "df7cdbfc2ac023d43ac040b14eb99440fc392d402793d5a3b03f2fd560af6a6f"
@@ -288,7 +288,7 @@ def audit() -> dict[str, Any]:
             j6.properties.get("DIONEA_MECHANICAL_ANCHOR") ==
             "21.000,2.500,180.000",
             "J6 ECO-002 anchor or footprint datum drift")
-    require(len(getattr(board, "traceItems", [])) == 988 and
+    require(len(getattr(board, "traceItems", [])) == 994 and
             len(getattr(board, "zones", [])) == 8,
             "PCB-MAIN post-ground-subgate routing inventory drift")
 

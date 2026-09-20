@@ -24,6 +24,7 @@ DEFAULT_BASE_OUTPUT = CANDIDATE_DIR / "PCB-MAIN_USB_CELL_MODEM_BASE_REV_A.kicad_
 DEFAULT_OUTPUT = CANDIDATE_DIR / "PCB-MAIN_USB_CELL_MODEM_CANDIDATE_REV_A.kicad_pcb"
 
 BASE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
+CANDIDATE_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
 TRACE_WIDTH_MM = 0.1537
 PAIR_GAP_MM = 0.2032
 
@@ -107,10 +108,14 @@ def generate(base_output: Path, output: Path, check: bool) -> dict[str, object]:
     if active_sha256 == BASE_SHA256:
         base_payload = active_payload
     else:
+        require(active_sha256 == CANDIDATE_SHA256,
+                "authoritative cellular USB modem-routing lineage drift")
         base_payload = DEFAULT_BASE_OUTPUT.read_bytes()
         require(sha256_bytes(base_payload) == BASE_SHA256,
                 "committed cellular USB modem-routing base SHA-256 drift")
     candidate_payload = candidate_bytes(base_payload)
+    require(sha256_bytes(candidate_payload) == CANDIDATE_SHA256,
+            "cellular USB modem candidate SHA-256 drift")
     require(candidate_payload != base_payload, "cellular USB modem candidate is unchanged")
     if check:
         require(base_output.read_bytes() == base_payload,

@@ -29,6 +29,7 @@ PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
 AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 SOURCE_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPLICATION_REV_A.json"
+CELL_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPLICATION_REV_A.json"
 RF_COMPOSED = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
     "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
@@ -37,6 +38,7 @@ RF_COMPOSED = (
 BASE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
 CANDIDATE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
 SOURCE_SUCCESSOR_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
+CELL_SUCCESSOR_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
 APPROVAL_SHA256 = "d071f6e0993d225ddab094b8e9d3cc4a24e52045286ca3f43d9929cb7597bf35"
 MAPPING_SHA256 = "f7a5345facf484d1eb7ae3cb650f70a8a872f7c6148149bbc818b74666fa15ba"
 GENERATOR_SHA256 = "e3914cc8aad95e4b249aaed1788903043122d88a66b3006e6541daf7e321743a"
@@ -101,7 +103,9 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
     require(sha256(CANDIDATE) == CANDIDATE_SHA256,
             "accepted USB placement candidate SHA-256 drift")
     active_sha256 = sha256(BOARD)
-    require(active_sha256 in {CANDIDATE_SHA256, SOURCE_SUCCESSOR_SHA256},
+    require(active_sha256 in {
+        CANDIDATE_SHA256, SOURCE_SUCCESSOR_SHA256, CELL_SUCCESSOR_SHA256,
+    },
             "authoritative PCB-MAIN USB placement lineage drift")
     if active_sha256 == CANDIDATE_SHA256:
         require(BOARD.read_bytes() == CANDIDATE.read_bytes(),
@@ -121,6 +125,22 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
             and source_application.get("manufacturing_release") is False,
             "accepted USB source-routing successor boundary drift",
         )
+        if active_sha256 == CELL_SUCCESSOR_SHA256:
+            cell_application = json.loads(
+                CELL_APPLICATION.read_text(encoding="utf-8")
+            )
+            require(
+                cell_application.get("decision") ==
+                "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
+                and cell_application.get("predecessor", {}).get(
+                    "board_sha256"
+                ) == SOURCE_SUCCESSOR_SHA256
+                and cell_application.get("applied", {}).get("board_sha256") ==
+                CELL_SUCCESSOR_SHA256
+                and cell_application.get("review_b_complete") is False
+                and cell_application.get("manufacturing_release") is False,
+                "accepted cellular USB modem successor boundary drift",
+            )
     require(sha256(APPROVAL) == APPROVAL_SHA256, "USB approval SHA-256 drift")
     require(sha256(MAPPING) == MAPPING_SHA256, "USB review mapping SHA-256 drift")
     require(sha256(GENERATOR) == GENERATOR_SHA256, "USB application generator drift")
@@ -205,8 +225,14 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
     )
     segments = [item for item in board.traceItems if type(item).__name__ == "Segment"]
     vias = [item for item in board.traceItems if type(item).__name__ == "Via"]
-    require(len(board.traceItems) == (988 if active_sha256 == SOURCE_SUCCESSOR_SHA256 else 975)
-            and len(segments) == (705 if active_sha256 == SOURCE_SUCCESSOR_SHA256 else 692)
+    require(len(board.traceItems) == (
+                994 if active_sha256 == CELL_SUCCESSOR_SHA256
+                else 988 if active_sha256 == SOURCE_SUCCESSOR_SHA256 else 975
+            )
+            and len(segments) == (
+                711 if active_sha256 == CELL_SUCCESSOR_SHA256
+                else 705 if active_sha256 == SOURCE_SUCCESSOR_SHA256 else 692
+            )
             and len(vias) == 283
             and len(board.zones) == 8,
             "USB application unexpectedly changes copper inventory")

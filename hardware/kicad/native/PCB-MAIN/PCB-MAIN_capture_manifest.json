@@ -3,7 +3,7 @@
   "board": "PCB-MAIN",
   "state": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE",
   "generator": "tools/generate_pcb_main_schematic_rev_a.py",
-  "generator_sha256": "ad64b46005fca974943b24a90e8e93ae0760bef15bd8f72206b0b437bc2da206",
+  "generator_sha256": "1c2bb6dad226c4609a17747e9212bda6ec51f962cda22b19b5061a067513a9bf",
   "hierarchy_materializer": "tools/materialize_pcb_main_hierarchy_rev_a.py",
   "hierarchy_materializer_sha256": "0c04a3d07878ac613679175504fb1bc9e66303ed4d2190436655792ba0c5122b",
   "hierarchy_connectivity_reader": "tools/pcb_main_schematic_hierarchy.py",
@@ -63,7 +63,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "92c849938165074a437b23ac84fbeab5eef3ff9065a83f93b54c3861886121af"
+      "sha256": "2422754bdb19ce6a7c78fe5d32d216f908aba6b026205218fdd0ccacfd8164f6"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -259,5 +259,5 @@
   ],
   "review_a": "SIGNED_PIN_NET_PASS_RETAINED_BY_EXACT_HIERARCHY_EQUIVALENCE",
   "hierarchy_review": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
-  "review_b": "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_REPEAT_REVIEW_PASS_USB_MCU_SOURCE_APPLIED_REMAINING_ROUTING_PENDING"
+  "review_b": "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_REMAINING_ROUTING_PENDING"
 }

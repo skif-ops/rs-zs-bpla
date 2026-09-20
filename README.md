@@ -49,10 +49,10 @@ engineering-геометрию RF/USB; финальная production-геоме�
 22-строчный реестр ответов; принято `0/2` ответов, конструкция не выбрана.
 В authoritative PCB приняты ограниченные ground-domain, hard-signal, OctoSPI,
 семисетевой RF P0, оба RF-remediation subgate, точная placement-дельта
-`R91/R92` и MCU-side USB-пара. Текущий successor содержит 705 сегментов,
+`R91/R92`, MCU-side USB-пара и cellular-modem USB-пара. Текущий successor содержит 711 сегментов,
 283 via, 4 copper zones и
 4 rule areas; SHA-256
-`76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5`.
+`4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5`.
 `PCB-MAIN-RF-RETURN-001` добавлен первым как точный кандидат с локальной
 `GND_MODEM` L2-зоной. Затем точная принятая дельта
 `PCB-MAIN-GNSS-RF-ECO-001` оставила U9/J9 на месте, переставила только FL1/C64
@@ -80,7 +80,7 @@ Machine gate закрыт; решение `ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE
 и точный кандидат применён к authoritative PCB. Точный application commit
 `6c27d3ae` прошёл CI `#562` и PCB Native `#289`:
 violations `232→232`, новых errors нет, unconnected `429→427`. MCU-source
-application gate закрыт; main-connector и cellular USB остаются отдельными
+application gate закрыт; main-connector и fixture USB остаются отдельными
 незакрытыми сегментами. Следующий bounded proposal
 `PCB-MAIN-USB-CELL-MODEM-ROUTING-001` закрывает BG95-side участок
 `U8.9/U8.10 → R39.1/R40.1`: шесть сегментов F.Cu, без via, оба плеча по
@@ -91,7 +91,8 @@ Proposal `5c73ffe5` прошёл CI `#564` и PCB Native `#291`: violations
 удерживается до подтверждённой фабрикой via/annular/clearance-геометрии:
 официальная однорядная распиновка J11 корректна, но стандартные `0.5/0.3 mm`
 via не дают clearance-clean escape между чередующимися D+/D- контактами с
-шагом 0.5 mm.
+шагом 0.5 mm. Точный cellular-modem кандидат принят и применён; fresh
+commit-bound application gate ожидается.
 Отдельно подготовлен ограниченный запрос для будущего
 выбранного сборщика по DFM/трафарету `U2/U25/U26/U9` и пустой 14-строчный реестр: принято
 `0/14` ответов, сборщик и процесс не выбраны, паста U9 и производственный выпуск

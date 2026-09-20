@@ -1,6 +1,6 @@
 # PCB-MAIN cellular USB modem routing candidate 001
 
-Status: `COMMIT-BOUND KICAD 9 PASS / APPLICATION AUTHORIZATION RECORDED / NOT FOR MANUFACTURE`
+Status: `ACCEPTED / EXACT CANDIDATE APPLIED / APPLICATION GATE PENDING / NOT FOR MANUFACTURE`
 
 This bounded proposal closes only the BG95-side differential segment between
 U8 pads 9/10 and R39/R40 pad 1. The authoritative board remains unchanged.
@@ -23,9 +23,10 @@ passed CI #564 and PCB Native #291. Comparative KiCad 9 DRC retained
 from `427` to `425`. Artifact `10613537447` has digest
 `sha256:fa9f1ab6357ad4ad2e356194e05ae999a6a8358641082a860228e0e4cfe04e90`.
 
-The machine gate is closed. The user's standing instruction to approve the
-most rational decisions and avoid additional questions authorizes recording
-the bounded acceptance separately before exact application.
+The machine gate is closed. The user's standing instruction authorizes this
+bounded acceptance, and the exact candidate is now the authoritative board.
+A fresh commit-bound application gate remains required before this subgate is
+closed.
 
 This is an engineering routing candidate only. Final fabricator impedance,
 coupon, DFM, Review B, CAM and manufacturing release remain open.

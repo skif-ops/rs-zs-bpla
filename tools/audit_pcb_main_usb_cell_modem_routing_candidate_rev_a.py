@@ -25,6 +25,8 @@ CANDIDATE = (
 )
 ACTIVE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 REVIEW = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_CANDIDATE_REV_A.json"
+APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPROVAL_REV_A.json"
+APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPLICATION_REV_A.json"
 
 BASE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
 CANDIDATE_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
@@ -301,11 +303,13 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
                 reference_samples += 1
 
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
+    approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
+    application = json.loads(APPLICATION.read_text(encoding="utf-8"))
     machine_gate = review.get("machine_gate", {})
     require(
         review.get("candidate_board_sha256") == CANDIDATE_SHA256
         and review.get("base_board_sha256") == BASE_SHA256
-        and review.get("status") == "KICAD9_COMPARATIVE_PASS_HUMAN_REVIEW_PENDING"
+        and review.get("status") == "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PENDING"
         and machine_gate.get("static_regeneration") == "PASS"
         and machine_gate.get("independent_static_audit") == "PASS"
         and machine_gate.get("commit_bound_ci") == {
@@ -329,8 +333,13 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
             "new_errors": 0,
             "unconnected_reduction": 2,
         }
-        and review.get("authoritative_board_modified") is False
-        and review.get("human_acceptance") == "PENDING"
+        and review.get("authoritative_board_modified") is True
+        and review.get("human_acceptance") == "ACCEPTED"
+        and approval.get("decision") == "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
+        and approval.get("reviewed_candidate_board_sha256") == CANDIDATE_SHA256
+        and application.get("decision") == "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
+        and application.get("applied", {}).get("board_sha256") == CANDIDATE_SHA256
+        and application.get("applied", {}).get("exact_candidate_byte_identity") is True
         and review.get("review_b_complete") is False
         and review.get("manufacturing_release") is False,
         "cellular USB modem proposal review boundary drift",
@@ -338,7 +347,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
 
     report: dict[str, object] = {
         "schema": "dioneya.pcb-main-usb-cell-modem-routing-001-audit.v1",
-        "status": "PASS_STATIC_RECORDED_KICAD9_EVIDENCE_PENDING_APPLICATION",
+        "status": "PASS_STATIC_RECORDED_KICAD9_EVIDENCE_ACCEPTED_AND_APPLIED",
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "routed_nets": sorted(EXPECTED_ROUTES),
@@ -348,7 +357,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         "minimum_pair_edge_gap_mm": round(edge_gap, 12),
         "reference_samples": reference_samples,
         "authoritative_board_modified": active_sha256 == CANDIDATE_SHA256,
-        "human_acceptance": "PENDING",
+        "human_acceptance": "ACCEPTED",
         "review_b_complete": False,
         "manufacturing_release": False,
     }
