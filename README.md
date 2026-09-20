@@ -85,8 +85,9 @@ application gate закрыт; main-connector и cellular USB остаются �
 `PCB-MAIN-USB-CELL-MODEM-ROUTING-001` закрывает BG95-side участок
 `U8.9/U8.10 → R39.1/R40.1`: шесть сегментов F.Cu, без via, оба плеча по
 `4.765484866498 mm` над непрерывной `GND_MODEM` L2-зоной. Статическая
-регенерация, точное совпадение длин и minimum pair gap `0.2032 mm` проходят;
-commit-bound KiCad 9 comparative DRC ещё ожидается. Main-connector отдельно
+регенерация, точное совпадение длин и minimum pair gap `0.2032 mm` проходят.
+Proposal `5c73ffe5` прошёл CI `#564` и PCB Native `#291`: violations
+`232→232`, новых errors нет, unconnected `427→425`. Main-connector отдельно
 удерживается до подтверждённой фабрикой via/annular/clearance-геометрии:
 официальная однорядная распиновка J11 корректна, но стандартные `0.5/0.3 mm`
 via не дают clearance-clean escape между чередующимися D+/D- контактами с

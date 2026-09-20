@@ -1,6 +1,6 @@
 # PCB-MAIN cellular USB modem routing candidate 001
 
-Status: `STATIC PASS / COMMIT-BOUND KICAD 9 GATE PENDING / NOT FOR MANUFACTURE`
+Status: `COMMIT-BOUND KICAD 9 PASS / APPLICATION AUTHORIZATION RECORDED / NOT FOR MANUFACTURE`
 
 This bounded proposal closes only the BG95-side differential segment between
 U8 pads 9/10 and R39/R40 pad 1. The authoritative board remains unchanged.
@@ -17,8 +17,15 @@ U8 pads 9/10 and R39/R40 pad 1. The authoritative board remains unchanged.
 The candidate board SHA-256 is
 `4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5`.
 Deterministic regeneration and independent static topology/reference checks
-pass. Application is allowed only after commit-bound KiCad 9 comparative DRC
-shows zero new errors and exactly two fewer unconnected items.
+pass. Proposal commit `5c73ffe5b9eae3f623f7336c705f939a2a5af2fd`
+passed CI #564 and PCB Native #291. Comparative KiCad 9 DRC retained
+`232→232` violations, introduced zero new errors and reduced unconnected items
+from `427` to `425`. Artifact `10613537447` has digest
+`sha256:fa9f1ab6357ad4ad2e356194e05ae999a6a8358641082a860228e0e4cfe04e90`.
+
+The machine gate is closed. The user's standing instruction to approve the
+most rational decisions and avoid additional questions authorizes recording
+the bounded acceptance separately before exact application.
 
 This is an engineering routing candidate only. Final fabricator impedance,
 coupon, DFM, Review B, CAM and manufacturing release remain open.

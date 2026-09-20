@@ -1,7 +1,7 @@
 {
   "schema": "pcb-main-usb-cell-modem-routing-001-candidate.rev-a",
   "candidate_id": "PCB-MAIN-USB-CELL-MODEM-ROUTING-001",
-  "status": "STATIC_PASS_KICAD9_GATE_PENDING",
+  "status": "KICAD9_COMPARATIVE_PASS_HUMAN_REVIEW_PENDING",
   "reviewed_source_commit": "455dfb18d91fae2c1104b04b51fe5e87b22838bc",
   "base_board_sha256": "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5",
   "candidate_board_sha256": "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5",
@@ -34,12 +34,31 @@
   "machine_gate": {
     "static_regeneration": "PASS",
     "independent_static_audit": "PASS",
-    "commit_bound_ci": "PENDING",
-    "commit_bound_kicad9_comparative_drc": "PENDING",
-    "expected_unconnected_reduction": 2
+    "commit_bound_ci": {
+      "status": "PASS",
+      "commit": "5c73ffe5b9eae3f623f7336c705f939a2a5af2fd",
+      "run_number": 564,
+      "run_id": 35536788206
+    },
+    "commit_bound_kicad9_comparative_drc": {
+      "status": "PASS_NO_NEW_ERRORS_EXACT_TWO_CONNECTION_REDUCTION",
+      "commit": "5c73ffe5b9eae3f623f7336c705f939a2a5af2fd",
+      "run_number": 291,
+      "run_id": 35536788193,
+      "artifact_name": "evt-pre-20-kicad-native-gate",
+      "artifact_id": 10613537447,
+      "artifact_digest": "sha256:fa9f1ab6357ad4ad2e356194e05ae999a6a8358641082a860228e0e4cfe04e90",
+      "base_violations": 232,
+      "candidate_violations": 232,
+      "base_unconnected": 427,
+      "candidate_unconnected": 425,
+      "new_errors": 0,
+      "unconnected_reduction": 2
+    }
   },
   "acceptance_basis": "USER_AUTHORIZED_MOST_RATIONAL_DECISIONS_AND_REQUESTED_NO_ADDITIONAL_QUERY_EXCEPT_EXTREME_CASE",
   "human_acceptance": "PENDING",
+  "required_acceptance_token_after_green_gate": "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE",
   "authoritative_board_modified": false,
   "remaining_usb_routing": [
     "USB_MAIN_CONNECTOR_SEGMENT",

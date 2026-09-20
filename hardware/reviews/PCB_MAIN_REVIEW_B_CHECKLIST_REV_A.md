@@ -165,8 +165,9 @@ manufacturing release.
   Main-connector and cellular USB segments are still unrouted.
 - [ ] `PCB-MAIN-USB-CELL-MODEM-ROUTING-001` routes only U8.9/U8.10 to
   R39.1/R40.1 with six F.Cu segments, no vias, exact `4.765484866498 mm`
-  matching and continuous `GND_MODEM` L2 reference. Static audit passes;
-  commit-bound comparative KiCad 9 DRC and exact application are pending.
+  matching and continuous `GND_MODEM` L2 reference. Proposal `5c73ffe5`
+  passed CI #564 and PCB Native #291 with violations `232→232`, zero new
+  errors and unconnected `427→425`; exact application remains pending.
 - [ ] Main-connector USB escape remains blocked pending job-specific via,
   annular-ring and clearance acceptance or a separately reviewed local ECO.
   The official single-row J11 contact mapping is retained.

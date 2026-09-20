@@ -93,8 +93,11 @@ It adds six F.Cu segments, no vias and no other delta. Both routes are exactly
 `4.765484866498 mm`; minimum pair edge gap is `0.2032 mm`; all sampled points
 remain over the accepted `GND_MODEM` In1.Cu reference zone. Candidate SHA-256
 is `4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5`.
-Static regeneration and independent geometry checks pass; commit-bound KiCad 9
-comparative DRC is pending.
+Static regeneration and independent geometry checks pass. Proposal commit
+`5c73ffe5` passed CI #564 and PCB Native #291: violations remained `232→232`,
+zero new errors were introduced and unconnected items changed `427→425`.
+Artifact `10613537447` is bound by digest
+`sha256:fa9f1ab6357ad4ad2e356194e05ae999a6a8358641082a860228e0e4cfe04e90`.
 
 The main connector pair and cellular fixture pair remain separate open
 subgates. Final stackup/tolerance/coupon acceptance, Review B, CAM, DFM and
