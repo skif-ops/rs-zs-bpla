@@ -673,12 +673,24 @@ jobs:
             "$candidate_project/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pro"
           cp hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb \
             "$candidate_project/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
+          cp hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_P0_EXPECTED_REV_A.kicad_pcb"
           DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
           PYTHONPATH="$DIONEYA_PYTHON_SITE" \
             /usr/bin/python3 tools/generate_pcb_main_rf_p0_candidate_rev_a.py \
             --output "$candidate_project/PCB-MAIN_RF_P0_REGENERATED_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_RF_P0_EXPECTED_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          path = sys.argv[1]
+          board = pcbnew.LoadBoard(path)
+          pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN P0 RF expected candidate KiCad 9 normalization: PASS")
+          PY
           cmp \
-            hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_P0_EXPECTED_REV_A.kicad_pcb" \
             "$candidate_project/PCB-MAIN_RF_P0_REGENERATED_REV_A.kicad_pcb"
           /usr/bin/python3 - \
             "$candidate_project/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb" \
