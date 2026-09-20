@@ -1,0 +1,59 @@
+{
+  "schema_version": "dioneya.pcb-main-usb-source-routing-001-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-USB-SOURCE-ROUTING-001",
+  "reviewer": "Скиф",
+  "decision_date": "2026-09-20",
+  "decision": "ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE",
+  "decision_input": "ответ подтверждаю. далее идем по наиболее целесообразным решениям решения одобряю нужно максимально быстро завершать работу по проекту. дополнительные запросы только в крайнем случае",
+  "decision_normalization": "The user explicitly confirmed the pending answer and approved continuing with the most rational engineering decisions; this bounded decision is normalized to ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE.",
+  "reviewed_github_commit_sha": "8fdb96c684a935cadeda6ae6ec8c78db32cbd610",
+  "reviewed_tree_sha": "4fcd1f3a8aeafe9628fabacc03e328ae0c5928d3",
+  "review_mapping": "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_REVIEW_COMMIT_MAPPING.json",
+  "reviewed_proposal_sha256": "02b9f19cbfbbbb1fbc583f043b707b57e3f3b0a1a25b865d282aebffaa7c2e7a",
+  "reviewed_proposal_record_sha256": "827b1d90cf97cedfac3a1a3b0c0484e26813a7fe950fa4f224b88b4606f10ab2",
+  "reviewed_candidate_board_sha256": "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5",
+  "reviewed_generator_sha256": "be095a4afe687894feb0a90f525230634ba68972a16620d26bba7c51481e658f",
+  "reviewed_audit_sha256": "53c293611dfac8abb94ceecd61cb20b40cac486a521798c244a54d9d1876fcad",
+  "approved_scope": {
+    "routed_nets": ["USB_DP_U1", "USB_DM_U1"],
+    "endpoints": {
+      "USB_DP_U1": ["U1.71", "R91.1"],
+      "USB_DM_U1": ["U1.70", "R92.1"]
+    },
+    "added_segments": 13,
+    "added_signal_vias": 0,
+    "trace_width_mm": 0.1537,
+    "minimum_pair_edge_gap_mm": 0.2032,
+    "pair_length_mismatch_mm": 0.0,
+    "relocated_ground_segment_tstamp": "fb9ade5d-8496-4617-9d20-390d44c347c4",
+    "relocated_ground_via_tstamp": "bbd350c1-609d-43b7-9dd0-824ee009466f"
+  },
+  "machine_gate": {
+    "proposal_commit_sha": "f4ed1a4d0365ce19ff7e68799662ed9886cc49e3",
+    "ci_run_id": 35530524569,
+    "ci_run_number": 559,
+    "ci_conclusion": "success",
+    "pcb_native_run_id": 35530524588,
+    "pcb_native_run_number": 286,
+    "pcb_native_conclusion": "success",
+    "artifact_id": 10611360741,
+    "artifact_digest": "sha256:9cf6e29f613e84f1cea0234987bc14e82467567e042d53c67d97abae761b7cfb",
+    "base_violations": 232,
+    "candidate_violations": 232,
+    "base_unconnected": 429,
+    "candidate_unconnected": 427,
+    "new_errors": 0
+  },
+  "authorization": {
+    "apply_exact_hash_bound_usb_mcu_source_routing_delta": true,
+    "preserve_all_unlisted_footprints_nets_copper_zones_keepouts_and_outline": true,
+    "continue_routing_engineering_after_green_application_gate": true,
+    "main_connector_usb_segment_complete": false,
+    "cellular_usb_segments_complete": false,
+    "final_fabricator_stackup_accepted": false,
+    "production_impedance_tolerance_accepted": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}
