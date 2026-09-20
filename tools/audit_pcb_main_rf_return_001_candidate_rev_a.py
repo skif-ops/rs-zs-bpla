@@ -173,7 +173,11 @@ def point_in_polygon(
 def audit_filled_reference(path: Path) -> dict[str, object]:
     """Prove the KiCad-filled local L2 plane exists below both cellular RF routes."""
     board = Board().from_file(str(path), encoding="utf-8")
-    zones = [zone for zone in board.zones if str(zone.tstamp) == ZONE_TSTAMP]
+    # KiCad 9 rewrites the zone identifier token on save, while kiutils 1.4.8
+    # does not expose that rewritten UUID as ``tstamp``.  The committed source
+    # identity is already locked by static_audit(); select the post-fill copy by
+    # its unique controlled name and then re-check its electrical identity.
+    zones = [zone for zone in board.zones if zone.name == ZONE_NAME]
     require(len(zones) == 1, "filled candidate is missing the controlled L2 zone")
     zone = zones[0]
     require(

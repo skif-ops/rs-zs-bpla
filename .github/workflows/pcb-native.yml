@@ -825,6 +825,8 @@ jobs:
               pcbnew.SaveBoard(path, board)
           print("PCB-MAIN cellular L2 return base/candidate zone refill: PASS")
           PY
+          cp "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb" \
+            "$evidence/filled_candidate.kicad_pcb"
           kicad-cli pcb drc --format json --severity-all \
             -o "$evidence/baseline_drc.json" \
             "$candidate_project/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb"
