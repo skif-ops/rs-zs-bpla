@@ -23,7 +23,7 @@ CANDIDATE_DIR = (
 DEFAULT_BASE_OUTPUT = CANDIDATE_DIR / "PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb"
 DEFAULT_OUTPUT = CANDIDATE_DIR / "PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb"
 BASE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-CANDIDATE_SHA256 = "eeb5689abd3ddc79c3efd88f4f197aebc070c4175d90eefde4690b0f26142295"
+CANDIDATE_SHA256 = "5ea568e782658fe7b5eb00fc414381cc7fe31a4d1f4fde109d722e0dd872c079"
 RF_WIDTH_MM = 0.1509
 GROUND_WIDTH_MM = 0.15
 UUID_NAMESPACE = uuid.UUID("6b7d32f9-8e31-4a45-9f83-ecae7e20cc2f")
@@ -69,10 +69,13 @@ ADDED_SEGMENTS = (
     # Short post-filter route from U9.11 RF_IN to FL1.A.
     (59, "GNSS_RF_FILTERED", (56.8, 53.25), (56.8, 52.55), RF_WIDTH_MM),
     (59, "GNSS_RF_FILTERED", (56.8, 52.55), (56.55, 52.175), RF_WIDTH_MM),
-    # FL1 B/D/E ground fanout; B reuses the adjacent U9.12 ground via.
+    # FL1 B/D/E ground fanout; B reuses the adjacent U9.12 ground via. E
+    # returns through D, whose two-segment escape stays between the DC-block
+    # route and U9.11 before reaching the new via beside U9.10.
     (45, "GND_DIGITAL", (56.55, 51.8), (55.725, 51.85), GROUND_WIDTH_MM),
-    (45, "GND_DIGITAL", (57.05, 51.8), (57.75, 52.55), GROUND_WIDTH_MM),
-    (45, "GND_DIGITAL", (57.05, 52.175), (57.75, 52.55), GROUND_WIDTH_MM),
+    (45, "GND_DIGITAL", (57.05, 52.175), (57.05, 51.8), GROUND_WIDTH_MM),
+    (45, "GND_DIGITAL", (57.05, 51.8), (57.45, 51.95), GROUND_WIDTH_MM),
+    (45, "GND_DIGITAL", (57.45, 51.95), (57.75, 52.55), GROUND_WIDTH_MM),
 )
 ADDED_VIAS = (
     (45, "GND_DIGITAL", (57.75, 52.55), 0.5, 0.3),

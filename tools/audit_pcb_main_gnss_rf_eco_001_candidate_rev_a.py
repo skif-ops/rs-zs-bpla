@@ -33,8 +33,8 @@ CAPTURE_STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 PLACEMENT_AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 
 BASE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-CANDIDATE_SHA256 = "eeb5689abd3ddc79c3efd88f4f197aebc070c4175d90eefde4690b0f26142295"
-GENERATOR_SHA256 = "f53e927ffd22dd340f5990db476319747d770821828bcc3b72173553f518fd3c"
+CANDIDATE_SHA256 = "5ea568e782658fe7b5eb00fc414381cc7fe31a4d1f4fde109d722e0dd872c079"
+GENERATOR_SHA256 = "c5498193e7c94e57dcccf1eef4863d30833bec3051615717ae35500a0345bd28"
 RF_WIDTH_MM = 0.1509
 GND_ZONE_NAME = "PCB_MAIN_GND_DIGITAL_In1_Cu"
 SAMPLE_PITCH_MM = 0.1
@@ -166,8 +166,9 @@ EXPECTED_ADDED_TRACE_SIGNATURES = Counter({
     ("segment", "GNSS_RF_FILTERED", (56.8, 53.25), (56.8, 52.55), RF_WIDTH_MM, "F.Cu"): 1,
     ("segment", "GNSS_RF_FILTERED", (56.8, 52.55), (56.55, 52.175), RF_WIDTH_MM, "F.Cu"): 1,
     ("segment", "GND_DIGITAL", (56.55, 51.8), (55.725, 51.85), 0.15, "F.Cu"): 1,
-    ("segment", "GND_DIGITAL", (57.05, 51.8), (57.75, 52.55), 0.15, "F.Cu"): 1,
-    ("segment", "GND_DIGITAL", (57.05, 52.175), (57.75, 52.55), 0.15, "F.Cu"): 1,
+    ("segment", "GND_DIGITAL", (57.05, 52.175), (57.05, 51.8), 0.15, "F.Cu"): 1,
+    ("segment", "GND_DIGITAL", (57.05, 51.8), (57.45, 51.95), 0.15, "F.Cu"): 1,
+    ("segment", "GND_DIGITAL", (57.45, 51.95), (57.75, 52.55), 0.15, "F.Cu"): 1,
     ("via", "GND_DIGITAL", (57.75, 52.55), 0.5, 0.3, ("F.Cu", "B.Cu")): 1,
 })
 
@@ -389,8 +390,8 @@ def static_audit() -> dict[str, object]:
     added = set(candidate_traces) - set(base_traces)
     require(removed == REMOVED_TRACE_TSTAMPS,
             f"GNSS ECO removed trace inventory drift: {removed}")
-    require(len(added) == 12 and len(base.traceItems) == 976 and
-            len(candidate.traceItems) == 973,
+    require(len(added) == 13 and len(base.traceItems) == 976 and
+            len(candidate.traceItems) == 974,
             "GNSS ECO trace-item count drift")
     for tstamp in set(base_traces) & set(candidate_traces):
         require(base_traces[tstamp] == candidate_traces[tstamp],

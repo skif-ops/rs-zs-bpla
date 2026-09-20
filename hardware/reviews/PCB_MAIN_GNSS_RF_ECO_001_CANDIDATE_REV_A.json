@@ -14,10 +14,10 @@
   },
   "candidate": {
     "board": "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb",
-    "board_sha256": "eeb5689abd3ddc79c3efd88f4f197aebc070c4175d90eefde4690b0f26142295",
+    "board_sha256": "5ea568e782658fe7b5eb00fc414381cc7fe31a4d1f4fde109d722e0dd872c079",
     "generator": "tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py",
-    "generator_sha256": "f53e927ffd22dd340f5990db476319747d770821828bcc3b72173553f518fd3c",
-    "trace_items": 973,
+    "generator_sha256": "c5498193e7c94e57dcccf1eef4863d30833bec3051615717ae35500a0345bd28",
+    "trace_items": 974,
     "footprints": 251,
     "accepted_base_bytes_modified": false
   },
@@ -61,7 +61,7 @@
   "ground_fanout_delta": {
     "removed_obsolete_fl1_segments": 5,
     "removed_obsolete_fl1_vias": 3,
-    "added_fl1_segments": 3,
+    "added_fl1_segments": 4,
     "added_fl1_vias": 1,
     "reused_adjacent_u9_ground_via": [55.725, 51.85]
   },

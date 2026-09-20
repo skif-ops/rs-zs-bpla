@@ -35,15 +35,15 @@ the antenna side of the SAW. All three RF nets remain on `F.Cu` at the bounded
 `0.1509 mm` L1-over-L2 engineering width with zero signal vias.
 
 The obsolete FL1 ground fanout removes five segments and three vias. The new
-fanout uses three short segments, one new via, and the adjacent existing U9.12
+fanout uses four short segments, one new via, and the adjacent existing U9.12
 ground via at `(55.725, 51.850)` mm. U9 and all its non-RF connections remain
 untouched.
 
 ## Identity and required gate
 
 - Base SHA-256: `9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040`
-- Candidate SHA-256: `eeb5689abd3ddc79c3efd88f4f197aebc070c4175d90eefde4690b0f26142295`
-- Generator SHA-256: `f53e927ffd22dd340f5990db476319747d770821828bcc3b72173553f518fd3c`
+- Candidate SHA-256: `5ea568e782658fe7b5eb00fc414381cc7fe31a4d1f4fde109d722e0dd872c079`
+- Generator SHA-256: `c5498193e7c94e57dcccf1eef4863d30833bec3051615717ae35500a0345bd28`
 - Generator: `tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py`
 - Independent audit: `tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py`
 
