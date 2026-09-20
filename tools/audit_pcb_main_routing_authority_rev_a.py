@@ -503,7 +503,7 @@ def expected_status_control(
         "usb_cell_modem_routing_subgate":
         "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
         "usb_cell_fixture_routing_subgate":
-        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PENDING",
+        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
         "factory_stackup": STACKUP_STATE,
         "routing_complete": False,
         "manufacturing_release": False,
@@ -751,6 +751,10 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
         and usb_cell_fixture_application.get("applied", {}).get(
             "exact_candidate_byte_identity"
         ) is True
+        and usb_cell_fixture_application.get("status") ==
+        "APPLIED_EXACT_ACCEPTED_USB_CELL_FIXTURE_ROUTING_COMMIT_BOUND_KICAD9_GATE_PASS"
+        and usb_cell_fixture_application.get("machine_gate", {}).get("status") ==
+        "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
         and usb_cell_fixture_application.get("review_b_complete") is False
         and usb_cell_fixture_application.get("manufacturing_release") is False,
         "USB cellular-fixture routing application boundary differs",
@@ -816,7 +820,7 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
         "gnss_rf_placement_routeability_subgate": "APPLIED_EXACT_ACCEPTED_DELTA",
         "combined_rf_remediation_gate": "PASS_COMMIT_BOUND_KICAD9_DRC_AND_FILLED_L2_REFERENCES",
         "usb_cell_fixture_routing_subgate":
-        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PENDING",
+        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
         "routing_complete": False,
         "manufacturing_release": False,
     }

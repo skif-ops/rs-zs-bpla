@@ -1,6 +1,6 @@
 # PCB-MAIN cellular USB fixture-routing candidate 001
 
-Status: `ACCEPTED / EXACT CANDIDATE APPLIED / APPLICATION GATE PENDING / NOT FOR MANUFACTURE`
+Status: `ACCEPTED / EXACT CANDIDATE APPLIED / APPLICATION GATE PASS / NOT FOR MANUFACTURE`
 
 This bounded proposal connects the already-routed BG95 USB series links to the
 dedicated recovery fixture. The exact candidate is now the authoritative board.
@@ -31,9 +31,13 @@ passed CI #568 and PCB Native #295. Comparative KiCad 9 DRC retained
 from `425` to `421`. Artifact `10614043819` has digest
 `sha256:0a2bd9269a99a517716182f84fa280f3807c1f56045731a6a2253f4f434b7680`.
 
-The user's standing authorization accepts this exact hash-bound delta. It is
-applied to the authoritative board; the commit-bound application gate is
-pending.
+The user's standing authorization accepts this exact hash-bound delta. It was
+applied in commit `8acd65791c5d68ff758fa8d3a43298825e6f688f`. Gate-source
+commit `c48217af5a6f74064491fb2aaa184548bd0ffbfb` passed CI #570 and PCB
+Native #297 with the same `232→232` violations, zero new errors and
+`425→421` unconnected result. Artifact `10615386189` has digest
+`sha256:39b47e938a23aece20d62a269352334af1ca3d5b0e3f37d156726eac840eaabd`.
+The commit-bound application gate is closed.
 
 This remains engineering geometry. The main-connector escape still requires
 job-specific via/drill/annular/clearance evidence or a separate local ECO.

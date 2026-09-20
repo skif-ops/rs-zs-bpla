@@ -25,6 +25,16 @@ BASE_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
 CANDIDATE_SHA256 = "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273"
 APPROVAL_SHA256 = "ceec87a1ef444f417cc0817df4ba089808284aa42d10cb47771d0c31b8f76307"
 MAPPING_SHA256 = "00f9793cb95feb781812c00da181262d5252741e80601671b0e97ddff3de6698"
+APPROVAL_COMMIT = "8acd65791c5d68ff758fa8d3a43298825e6f688f"
+APPLICATION_COMMIT = "8acd65791c5d68ff758fa8d3a43298825e6f688f"
+GATE_SOURCE_COMMIT = "c48217af5a6f74064491fb2aaa184548bd0ffbfb"
+GATE_SOURCE_TREE = "c2b7771853b40b673691e9e52cfe40b75867918c"
+CI_RUN_ID = 35541888985
+PCB_NATIVE_RUN_ID = 35541888979
+ARTIFACT_ID = 10615386189
+ARTIFACT_DIGEST = (
+    "sha256:39b47e938a23aece20d62a269352334af1ca3d5b0e3f37d156726eac840eaabd"
+)
 AUTHORIZED_NETS = {"CELL_USB_DP_TP", "CELL_USB_DM_TP"}
 
 
@@ -86,17 +96,40 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         approval.get("decision") == "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE"
         and approval.get("reviewed_candidate_board_sha256") == CANDIDATE_SHA256
         and application.get("decision") == "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE"
+        and application.get("approval_commit_sha") == APPROVAL_COMMIT
+        and application.get("application_commit_sha") == APPLICATION_COMMIT
         and application.get("approval_sha256") == APPROVAL_SHA256
         and application.get("review_mapping_sha256") == MAPPING_SHA256
         and application.get("applied", {}).get("board_sha256") == CANDIDATE_SHA256
         and application.get("applied", {}).get("exact_candidate_byte_identity") is True
-        and gate.get("status") in {
-            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
-            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
-        }
+        and application.get("status") ==
+        "APPLIED_EXACT_ACCEPTED_USB_CELL_FIXTURE_ROUTING_COMMIT_BOUND_KICAD9_GATE_PASS"
         and application.get("review_b_complete") is False
         and application.get("manufacturing_release") is False,
         "cellular USB fixture application identity or release boundary drift",
+    )
+    require(
+        gate.get("status") == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+        and gate.get("source_commit_sha") == GATE_SOURCE_COMMIT
+        and gate.get("source_tree_sha") == GATE_SOURCE_TREE
+        and gate.get("ci_run_id") == CI_RUN_ID
+        and gate.get("ci_run_number") == 570
+        and gate.get("ci_conclusion") == "success"
+        and gate.get("pcb_native_run_id") == PCB_NATIVE_RUN_ID
+        and gate.get("pcb_native_run_number") == 297
+        and gate.get("pcb_native_conclusion") == "success"
+        and gate.get("application_audit") ==
+        "PASS_EXACT_APPLICATION_KICAD9_COMPARATIVE"
+        and gate.get("comparative_drc") ==
+        "PASS_NO_NEW_ERRORS_EXACT_FOUR_CONNECTION_REDUCTION"
+        and gate.get("base_violations") == 232
+        and gate.get("active_violations") == 232
+        and gate.get("base_unconnected") == 425
+        and gate.get("active_unconnected") == 421
+        and gate.get("new_errors") == 0
+        and gate.get("artifact_id") == ARTIFACT_ID
+        and gate.get("artifact_digest") == ARTIFACT_DIGEST,
+        "cellular USB fixture application commit-bound evidence drift",
     )
 
     base = Board.from_file(str(BASE), encoding="utf-8")
@@ -125,14 +158,14 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
     route_control = evidence.get("routing_constraint_control", {})
     require(
         evidence.get("usb_cell_fixture_routing_001_status") ==
-        "APPROVED_APPLIED_EXACT_CELL_FIXTURE_PAIR_COMMIT_BOUND_GATE_PENDING"
+        "APPROVED_APPLIED_EXACT_CELL_FIXTURE_PAIR_COMMIT_BOUND_GATE_PASS"
         and control.get("active_board_sha256") == CANDIDATE_SHA256
         and control.get("exact_candidate_byte_identity") is True
         and control.get("trace_items") == 1023
         and route_control.get("board_sha256") == CANDIDATE_SHA256
         and route_control.get("trace_items") == 1023
         and route_control.get("usb_cell_fixture_routing_subgate") ==
-        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PENDING"
+        "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS"
         and status.get("review_b", {}).get("complete") is False
         and status.get("manufacturing_release") is False,
         "capture-status cellular USB fixture application traceability drift",
@@ -148,6 +181,11 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         "added_signal_vias": 2,
         "trace_items": 1023,
         "machine_gate": gate.get("status"),
+        "application_commit_sha": APPLICATION_COMMIT,
+        "gate_source_commit_sha": GATE_SOURCE_COMMIT,
+        "ci_run_id": CI_RUN_ID,
+        "pcb_native_run_id": PCB_NATIVE_RUN_ID,
+        "artifact_id": ARTIFACT_ID,
         "review_b_complete": False,
         "manufacturing_release": False,
     }

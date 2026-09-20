@@ -1,7 +1,7 @@
 {
   "schema": "pcb-main-usb-cell-fixture-routing-001-candidate.rev-a",
   "candidate_id": "PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001",
-  "status": "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PENDING",
+  "status": "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PASS",
   "reviewed_source_commit": "69642979f8b93e20d122d8e717c0d606ecbc8384",
   "base_board_sha256": "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5",
   "candidate_board_sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273",
@@ -64,6 +64,23 @@
       "candidate_unconnected": 421,
       "new_errors": 0,
       "unconnected_reduction": 4
+    },
+    "application_commit_bound_gate": {
+      "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+      "application_commit": "8acd65791c5d68ff758fa8d3a43298825e6f688f",
+      "gate_source_commit": "c48217af5a6f74064491fb2aaa184548bd0ffbfb",
+      "gate_source_tree": "c2b7771853b40b673691e9e52cfe40b75867918c",
+      "ci_run_number": 570,
+      "ci_run_id": 35541888985,
+      "pcb_native_run_number": 297,
+      "pcb_native_run_id": 35541888979,
+      "artifact_id": 10615386189,
+      "artifact_digest": "sha256:39b47e938a23aece20d62a269352334af1ca3d5b0e3f37d156726eac840eaabd",
+      "base_violations": 232,
+      "active_violations": 232,
+      "base_unconnected": 425,
+      "active_unconnected": 421,
+      "new_errors": 0
     }
   },
   "acceptance_basis": "USER_AUTHORIZED_MOST_RATIONAL_DECISIONS_AND_REQUESTED_NO_ADDITIONAL_QUERY_EXCEPT_EXTREME_CASE",

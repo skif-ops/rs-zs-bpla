@@ -96,7 +96,11 @@ Its exact cellular-fixture USB successor is authoritative SHA-256
 `2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273`.
 Proposal commit `11af5c9d` passed CI `#568` and PCB Native `#295` with
 violations `232→232`, zero new errors and unconnected `425→421`; the exact
-candidate is applied and its fresh commit-bound application gate is pending.
+candidate is applied in commit `8acd6579`. Gate-source commit `c48217af`
+passed CI `#570` and PCB Native `#297` with the same `232→232`, zero-new-error
+and `425→421` result. Artifact `10615386189` has digest
+`sha256:39b47e938a23aece20d62a269352334af1ca3d5b0e3f37d156726eac840eaabd`;
+the fixture application gate is closed.
 Commit-bound source commit `7ee9cfc9` passed CI `#550` and PCB Native Gate
 `#277`: comparative DRC added no errors or unconnected regression, and both
 filled-reference audits cover every cellular and GNSS sample. The bounded
@@ -243,9 +247,9 @@ release.
 - PCB-MAIN USB source-termination routeability: the bounded R91/R92 placement
   ECO was accepted and applied exactly after proposal PCB Native #281; U1/J11/
   U25 and accepted RF copper remain fixed; its application commit-bound gate
-  passed; the bounded MCU-source pair application gate also passed on PCB
-  Native #289, while main-connector and fixture controlled 90-ohm segments
-  remain open;
+  passed; the bounded MCU-source pair application gate passed on PCB Native
+  #289, cellular-modem on #293 and cellular-fixture on #297; only the
+  main-connector controlled 90-ohm segment remains open and DFM-blocked;
 - the remaining 17 PCB-PWR input-protection qualification rows after accepted
   manufacturer source control, native-value and repeat-hierarchy gates,
   including +70 C 5 A thermal,

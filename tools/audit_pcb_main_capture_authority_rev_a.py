@@ -1919,12 +1919,9 @@ def main() -> None:
                     "PCB-MAIN GNSS RF ECO-001 candidate status drift")
             require(review_b["evidence"].get(
                         "usb_cell_fixture_routing_001_status"
-                    ) in {
-                        "APPROVED_APPLIED_EXACT_CELL_FIXTURE_PAIR_"
-                        "COMMIT_BOUND_GATE_PENDING",
-                        "APPROVED_APPLIED_EXACT_CELL_FIXTURE_PAIR_"
-                        "COMMIT_BOUND_GATE_PASS",
-                    },
+                    ) ==
+                    "APPROVED_APPLIED_EXACT_CELL_FIXTURE_PAIR_"
+                    "COMMIT_BOUND_GATE_PASS",
                     "PCB-MAIN cellular USB fixture-routing status drift")
             rf_evidence = review_b["evidence"].get(
                 "rf_remediation_commit_bound_evidence", {}
@@ -2396,6 +2393,12 @@ def main() -> None:
                 and usb_cell_fixture_application.get("applied", {}).get(
                     "added_signal_vias"
                 ) == 2
+                and usb_cell_fixture_application.get("status") ==
+                "APPLIED_EXACT_ACCEPTED_USB_CELL_FIXTURE_ROUTING_"
+                "COMMIT_BOUND_KICAD9_GATE_PASS"
+                and usb_cell_fixture_application.get("machine_gate", {}).get(
+                    "status"
+                ) == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
                 and usb_cell_fixture_application.get("review_b_complete") is False
                 and usb_cell_fixture_application.get(
                     "manufacturing_release"

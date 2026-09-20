@@ -1,8 +1,8 @@
 {
   "schema": "pcb-main-usb-routeability-review.rev-a",
   "status": "USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_APPLIED_MAIN_CONNECTOR_DFM_BLOCKED",
-  "decision": "USB_CELL_FIXTURE_APPLICATION_COMMIT_BOUND_KICAD9_GATE_PENDING",
-  "reviewed_source_commit": "11af5c9df9ac8e4fd68ba78dbbd5c067bd3fe23f",
+  "decision": "USB_CELL_FIXTURE_APPLICATION_COMMIT_BOUND_KICAD9_GATE_PASS_MAIN_CONNECTOR_DFM_BLOCKED",
+  "reviewed_source_commit": "c48217af5a6f74064491fb2aaa184548bd0ffbfb",
   "authoritative_board_changed": true,
   "fixed_anchors": ["U1", "J11", "U25"],
   "source_pads": {
@@ -99,7 +99,7 @@
   "cell_fixture_routing_candidate": {
     "id": "PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001",
     "sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273",
-    "status": "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PENDING",
+    "status": "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PASS",
     "routed_nets": ["CELL_USB_DP_TP", "CELL_USB_DM_TP"],
     "primary_pair_length_mismatch_mm": 0.0,
     "esd_stub_length_mismatch_mm": 0.0,
@@ -118,7 +118,14 @@
     "base_unconnected": 425,
     "candidate_unconnected": 421,
     "new_errors": 0,
-    "application_gate": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+    "application_commit": "8acd65791c5d68ff758fa8d3a43298825e6f688f",
+    "application_gate_source_commit": "c48217af5a6f74064491fb2aaa184548bd0ffbfb",
+    "application_gate_source_tree": "c2b7771853b40b673691e9e52cfe40b75867918c",
+    "application_ci_run": 35541888985,
+    "application_pcb_native_run": 35541888979,
+    "application_artifact_id": 10615386189,
+    "application_artifact_digest": "sha256:39b47e938a23aece20d62a269352334af1ca3d5b0e3f37d156726eac840eaabd",
+    "application_gate": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
     "authoritative_board_modified": true,
     "human_acceptance": "ACCEPTED"
   },

@@ -81,8 +81,8 @@ Machine gate закрыт; решение `ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE
 и точный кандидат применён к authoritative PCB. Точный application commit
 `6c27d3ae` прошёл CI `#562` и PCB Native `#289`:
 violations `232→232`, новых errors нет, unconnected `429→427`. MCU-source
-application gate закрыт; main-connector и fixture USB остаются отдельными
-незакрытыми сегментами. Следующий bounded proposal
+application gate закрыт; на этом этапе main-connector и fixture USB оставались
+отдельными незакрытыми сегментами. Следующий bounded proposal
 `PCB-MAIN-USB-CELL-MODEM-ROUTING-001` закрывает BG95-side участок
 `U8.9/U8.10 → R39.1/R40.1`: шесть сегментов F.Cu, без via, оба плеча по
 `4.765484866498 mm` над непрерывной `GND_MODEM` L2-зоной. Статическая
@@ -100,8 +100,12 @@ commit `4c9a2a85` прошёл CI `#566` и PCB Native `#293`: violations `232�
 `0.50/0.30 mm` signal-via, точно равные основные пути
 `76.293814073931 mm` и ESD-шунты `1.007782218537 mm`. Proposal commit
 `11af5c9d` прошёл CI `#568` и PCB Native `#295`: violations `232→232`,
-новых errors нет, unconnected `425→421`. Точный кандидат принят и применён;
-его application gate выполняется. Только main-connector USB-сегмент остаётся
+новых errors нет, unconnected `425→421`. Точный кандидат принят и применён в
+commit `8acd6579`; gate-source commit `c48217af` прошёл CI `#570` и PCB Native
+`#297` с теми же `232→232`, без новых errors и с `425→421` unconnected.
+Artifact `10615386189` имеет digest
+`sha256:39b47e938a23aece20d62a269352334af1ca3d5b0e3f37d156726eac840eaabd`.
+Application gate закрыт. Только main-connector USB-сегмент остаётся
 DFM-заблокирован до job-specific via/drill/annular/clearance evidence или
 отдельного локального ECO.
 Отдельно подготовлен ограниченный запрос для будущего

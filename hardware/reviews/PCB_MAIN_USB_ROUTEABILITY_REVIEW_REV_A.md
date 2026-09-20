@@ -1,8 +1,8 @@
 # PCB-MAIN USB routeability review — Rev.A
 
-Status: `MCU SOURCE + CELL MODEM + CELL FIXTURE APPLIED / APPLICATION GATE PENDING / MAIN CONNECTOR DFM BLOCKED / REVIEW_B OPEN`
+Status: `MCU SOURCE + CELL MODEM + CELL FIXTURE APPLIED / APPLICATION GATE PASS / MAIN CONNECTOR DFM BLOCKED / REVIEW_B OPEN`
 
-Reviewed source commit: `11af5c9df9ac8e4fd68ba78dbbd5c067bd3fe23f`.
+Reviewed source commit: `c48217af5a6f74064491fb2aaa184548bd0ffbfb`.
 
 The authoritative PCB retains the accepted combined RF remediation and is not
 modified by this review.  The next controlled routing class was evaluated as
@@ -121,8 +121,11 @@ remained `232→232`, zero new errors were introduced and unconnected items
 changed `425→421`. Artifact `10614043819` is bound by digest
 `sha256:0a2bd9269a99a517716182f84fa280f3807c1f56045731a6a2253f4f434b7680`.
 The exact hash-bound candidate was accepted under the user's standing
-authorization and applied to the authoritative board. Its application gate is
-pending.
+authorization and applied in commit `8acd6579`. Gate-source commit `c48217af`
+passed CI #570 and PCB Native #297 with the same `232→232`, zero-new-error and
+`425→421` result. Artifact `10615386189` is bound by digest
+`sha256:39b47e938a23aece20d62a269352334af1ca3d5b0e3f37d156726eac840eaabd`.
+The application gate is closed.
 
 The main connector pair remains the only USB routing segment without a
 clearance-supported candidate. Final stackup/tolerance/coupon acceptance,

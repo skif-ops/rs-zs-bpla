@@ -171,14 +171,18 @@ manufacturing release.
   errors and unconnected `427→425`. The exact candidate is accepted and
   applied; application commit `4c9a2a85` passed CI #566 and PCB Native #293
   with the same `232→232`, zero-new-error and `427→425` result.
-- [ ] `PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001` routes R39/R40/U26 to
+- [x] `PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001` routes R39/R40/U26 to
   TP_CELL_USB with 27 segments, two signal vias, exact
   `76.293814073931 mm` primary matching, exact matched ESD shunts and
   continuous `GND_MODEM` In4.Cu reference for the B.Cu trunk. Proposal commit
   `11af5c9d` passed CI #568 and PCB Native #295 with violations `232→232`,
   zero new errors and unconnected `425→421`. The exact candidate is accepted
-  and applied; its commit-bound application gate is pending.
-- [ ] Main-connector USB escape remains blocked pending job-specific via,
+  and applied in commit `8acd6579`; gate-source commit `c48217af` passed CI
+  #570 and PCB Native #297 with the same `232→232`, zero-new-error and
+  `425→421` result. Artifact `10615386189` is bound by digest
+  `sha256:39b47e938a23aece20d62a269352334af1ca3d5b0e3f37d156726eac840eaabd`.
+- [ ] Main-connector USB escape is the only remaining USB routing segment and
+  remains blocked pending job-specific via,
   annular-ring and clearance acceptance or a separately reviewed local ECO.
   The official single-row J11 contact mapping is retained.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.
