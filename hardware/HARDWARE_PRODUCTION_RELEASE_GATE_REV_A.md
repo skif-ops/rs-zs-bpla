@@ -81,9 +81,11 @@ local `GND_MODEM` L2 zone accepted after PCB Native Gate `#267`.
 the post-SAW route to 1.326997 mm; its reviewed candidate passed PCB Native
 Gate `#273`. The deterministic composition is authoritative PCB SHA-256
 `f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9`.
-Commit-bound combined refill/DRC, both filled-reference audits and repeat
-RF/SI review remain pending. Neither application authorizes manufacture;
-remaining routing, final SI/PI, final fabricator stackup/tolerance/coupon,
+Commit-bound source commit `7ee9cfc9` passed CI `#550` and PCB Native Gate
+`#277`: comparative DRC added no errors or unconnected regression, and both
+filled-reference audits cover every cellular and GNSS sample. The bounded
+repeat return-path review is therefore complete. Neither application authorizes
+manufacture; remaining routing, final SI/PI, final fabricator stackup/tolerance/coupon,
 Review B, CAM and DFM remain open.
 
 PCB-PWR has explicit pre-route constraint coverage for all 31 native nets. The

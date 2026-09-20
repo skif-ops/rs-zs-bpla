@@ -455,7 +455,7 @@ def static_audit() -> dict[str, object]:
         and evidence.get("rf_si_return_path_review_audit") ==
         "tools/audit_pcb_main_rf_remediation_application_rev_a.py"
         and evidence.get("rf_si_return_path_status") ==
-        "BOTH_REMEDIATIONS_APPLIED_COMBINED_MACHINE_GATE_AND_REPEAT_REVIEW_PENDING"
+        "PASS_BOUNDED_REMEDIATIONS_COMBINED_KICAD9_GATE_FINAL_SI_AND_REVIEW_B_OPEN"
         and evidence.get("rf_return_001_candidate") ==
         str(CANDIDATE.relative_to(ROOT))
         and evidence.get("rf_return_001_candidate_record") ==

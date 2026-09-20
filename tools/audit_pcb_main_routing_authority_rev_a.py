@@ -474,7 +474,7 @@ def expected_status_control(
         "rf_p0_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "cellular_l2_return_subgate": "APPLIED_EXACT_ACCEPTED_ZONE",
         "gnss_rf_placement_routeability_subgate": "APPLIED_EXACT_ACCEPTED_DELTA",
-        "combined_rf_remediation_gate": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+        "combined_rf_remediation_gate": "PASS_COMMIT_BOUND_KICAD9_DRC_AND_FILLED_L2_REFERENCES",
         "factory_stackup": STACKUP_STATE,
         "routing_complete": False,
         "manufacturing_release": False,
@@ -690,8 +690,8 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             "routing_authority_generator": "tools/generate_pcb_main_routing_authority_rev_a.py",
             "routing_authority_audit": "tools/audit_pcb_main_routing_authority_rev_a.py",
             "routing_constraint_status": (
-                "PASS_ALL_186_NETS_CLASSIFIED_RF_P0_SUBGATE_APPLIED_"
-                "FACTORY_STACKUP_AND_REMAINING_ROUTING_PENDING"
+                "PASS_ALL_186_NETS_CLASSIFIED_RF_REMEDIATION_REPEAT_REVIEW_"
+                "PASS_FACTORY_STACKUP_AND_REMAINING_ROUTING_PENDING"
             ),
         }
         require(all(evidence.get(key) == value
@@ -734,7 +734,7 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
         "rf_p0_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "cellular_l2_return_subgate": "APPLIED_EXACT_ACCEPTED_ZONE",
         "gnss_rf_placement_routeability_subgate": "APPLIED_EXACT_ACCEPTED_DELTA",
-        "combined_rf_remediation_gate": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+        "combined_rf_remediation_gate": "PASS_COMMIT_BOUND_KICAD9_DRC_AND_FILLED_L2_REFERENCES",
         "routing_complete": False,
         "manufacturing_release": False,
     }

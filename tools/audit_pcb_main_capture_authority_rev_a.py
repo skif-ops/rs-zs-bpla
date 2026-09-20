@@ -1705,8 +1705,8 @@ def main() -> None:
                     "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
                     "RF_P0_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
-                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATIONS_"
-                    "APPLIED_COMBINED_GATE_PENDING_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING",
                 },
                 "Review B must be open but incomplete after Review A PASS")
     else:
@@ -1746,8 +1746,8 @@ def main() -> None:
                 "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
                 "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
                 "RF_P0_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
-                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATIONS_"
-                "APPLIED_COMBINED_GATE_PENDING_REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING",
         }:
             required_layout_evidence = {
                 "native_layout_candidate", "layout_generator", "layout_independent_audit",
@@ -1837,8 +1837,8 @@ def main() -> None:
                     "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
                     "RF_P0_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
-                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATIONS_"
-                    "APPLIED_COMBINED_GATE_PENDING_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING",
             }:
                 required_layout_evidence |= {
                     "placement_repack_manifest", "placement_repack_generator",
@@ -1870,8 +1870,8 @@ def main() -> None:
                     "REMAINING_ROUTING_AND_REVIEWS_OPEN",
                     "PCB-MAIN RF P0 routing status drift")
             require(review_b["evidence"].get("rf_si_return_path_status") ==
-                    "BOTH_REMEDIATIONS_APPLIED_COMBINED_MACHINE_GATE_AND_"
-                    "REPEAT_REVIEW_PENDING",
+                    "PASS_BOUNDED_REMEDIATIONS_COMBINED_KICAD9_GATE_FINAL_SI_"
+                    "AND_REVIEW_B_OPEN",
                     "PCB-MAIN RF/SI return-path status drift")
             require(review_b["evidence"].get("rf_return_001_status") ==
                     "APPROVED_APPLIED_EXACT_CELLULAR_L2_RETURN_ZONE_"
@@ -1879,8 +1879,25 @@ def main() -> None:
                     "PCB-MAIN RF-return-001 candidate status drift")
             require(review_b["evidence"].get("gnss_rf_eco_001_status") ==
                     "APPROVED_APPLIED_EXACT_REVIEWED_DELTA_WITH_CELLULAR_L2_"
-                    "ZONE_COMBINED_GATE_PENDING",
+                    "ZONE_COMBINED_GATE_PASS",
                     "PCB-MAIN GNSS RF ECO-001 candidate status drift")
+            rf_evidence = review_b["evidence"].get(
+                "rf_remediation_commit_bound_evidence", {}
+            )
+            require(
+                rf_evidence.get("source_commit_sha") ==
+                "7ee9cfc9b4059dc7e487ca5513704b78c22da4e0"
+                and rf_evidence.get("source_tree_sha") ==
+                "fbffec8ca34f283b5c689818780a6ab10495f843"
+                and rf_evidence.get("artifact_digest") ==
+                "sha256:c392194b55903562ee0eb50255a0cce2b2816026338b3141c09ca3f6c8ab0aae"
+                and rf_evidence.get("return_path_remediation_review_complete") is True
+                and rf_evidence.get("final_si_review_complete") is False
+                and rf_evidence.get("remaining_routing_complete") is False
+                and rf_evidence.get("review_b_complete") is False
+                and rf_evidence.get("manufacturing_release") is False,
+                "PCB-MAIN commit-bound RF-remediation evidence or release boundary drift",
+            )
             for evidence_name in required_layout_evidence - {
                     "ra_003_status", "placement_repack_status",
                     "ground_domain_routing_status",

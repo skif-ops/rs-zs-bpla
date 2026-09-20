@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "review_id": "PCB-MAIN-RF-SI-RETURN-002",
   "date_utc": "2026-09-20",
-  "status": "PENDING_COMMIT_BOUND_COMBINED_KICAD9_GATE",
+  "status": "PASS_BOUNDED_RETURN_PATH_REMEDIATIONS_FINAL_SI_AND_REVIEW_B_OPEN",
   "reviewed_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
   "reviewed_board_sha256": "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9",
   "predecessor_review": "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.json",
@@ -22,14 +22,14 @@
   "static_findings": [
     {
       "finding_id": "RF-RP-002",
-      "result": "REMEDIATION_APPLIED_COMBINED_FILLED_REFERENCE_GATE_PENDING",
+      "result": "PASS_REMEDIATION_APPLIED_AND_FILLED_REFERENCE_VERIFIED",
       "zone": "PCB_MAIN_GND_MODEM_CELL_In1_Cu",
       "net": "GND_MODEM",
       "layer": "In1.Cu"
     },
     {
       "finding_id": "RF-SI-003",
-      "result": "REMEDIATION_APPLIED_STRICT_CLEARANCE_PASS_COMBINED_DRC_PENDING",
+      "result": "PASS_REMEDIATION_APPLIED_STRICT_CLEARANCE_AND_COMBINED_DRC",
       "fixed_anchors": ["U9", "J9"],
       "moved_footprints": ["C64", "FL1"],
       "gnss_rf_filtered_length_mm": 1.326996810199,
@@ -45,12 +45,63 @@
     "filled_gnd_modem_l2_cellular_coverage": true,
     "filled_gnd_digital_l2_gnss_coverage": true
   },
-  "commit_bound_machine_gate": null,
-  "decision": "PENDING_COMMIT_BOUND_COMBINED_MACHINE_GATE",
+  "commit_bound_machine_gate": {
+    "source_commit_sha": "7ee9cfc9b4059dc7e487ca5513704b78c22da4e0",
+    "source_tree_sha": "fbffec8ca34f283b5c689818780a6ab10495f843",
+    "ci_run": {
+      "number": 550,
+      "run_id": 35516448578,
+      "conclusion": "success",
+      "url": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35516448578"
+    },
+    "pcb_native_gate": {
+      "number": 277,
+      "run_id": 35516448594,
+      "conclusion": "success",
+      "url": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35516448594"
+    },
+    "artifact": {
+      "id": 10606594205,
+      "name": "evt-pre-20-kicad-native-gate",
+      "digest": "sha256:c392194b55903562ee0eb50255a0cce2b2816026338b3141c09ca3f6c8ab0aae",
+      "url": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35516448594/artifacts/10606594205"
+    },
+    "evidence_sha256": {
+      "baseline_drc.json": "a71a12dd448e7035828b123968bb4c4bc65eac73eae952ec562c8d96bb3b201b",
+      "candidate_drc.json": "fd41a163b2e5516fc06edd2f0ee08bb8497cd6cb2683186f0c2cefde53f73b3e",
+      "comparative_audit.json": "aa6d784bced85ec85c78bf2e15741c37e6c64d4152c3821098ed03832cf6aac8",
+      "filled_candidate.kicad_pcb": "83d1ee2aef17bc2f5ecb2490047665e79d2c34a0e88a7c02bb551b8e5ba60b78",
+      "placement_clearance.json": "9e64706e7d9dd0970c85b6e0ae82036096452c8ea5c4cddec13b501ab5fc4be5"
+    },
+    "comparative_drc": {
+      "status": "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION",
+      "base_violations": 226,
+      "candidate_violations": 227,
+      "base_errors": 0,
+      "candidate_errors": 0,
+      "base_unconnected_items": 429,
+      "candidate_unconnected_items": 429,
+      "new_error_count": 0
+    },
+    "cellular_filled_reference": {
+      "status": "PASS_FILLED_GND_MODEM_L2_UNDER_CELLULAR_RF_CENTRELINES",
+      "filled_polygon_count": 1,
+      "sample_count": 623,
+      "uncovered_samples": 0
+    },
+    "gnss_filled_reference": {
+      "status": "PASS_FILLED_GND_DIGITAL_L2_UNDER_GNSS_RF_CENTRELINES",
+      "filled_polygon_count": 1,
+      "sample_count": 406,
+      "uncovered_samples": 0
+    },
+    "strict_2d_placement_clearance": "PASS"
+  },
+  "decision": "PASS_BOUNDED_RETURN_PATH_REMEDIATIONS_FINAL_SI_AND_REVIEW_B_OPEN",
   "decision_boundary": {
     "cellular_l2_return_application_complete": true,
     "gnss_rf_placement_routeability_application_complete": true,
-    "return_path_remediation_review_complete": false,
+    "return_path_remediation_review_complete": true,
     "final_si_review_complete": false,
     "remaining_routing_complete": false,
     "final_job_stackup_accepted": false,

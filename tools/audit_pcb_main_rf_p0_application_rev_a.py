@@ -293,8 +293,8 @@ def audit() -> dict[str, Any]:
     require(
         review_b.get("complete") is False
         and review_b.get("status") ==
-        "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATIONS_"
-        "APPLIED_COMBINED_GATE_PENDING_REMAINING_ROUTING_PENDING"
+        "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+        "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING"
         and evidence.get("rf_p0_routing_application") == str(APPLICATION.relative_to(ROOT))
         and evidence.get("rf_p0_routing_status") ==
         "APPROVED_APPLIED_EXACT_SEVEN_NET_RF_ROUTING_SUBGATE_"

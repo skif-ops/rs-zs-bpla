@@ -1,6 +1,6 @@
 # PCB-MAIN RF/SI return-path repeat review 002 — Rev.A
 
-Status: `PENDING COMMIT-BOUND COMBINED KICAD 9 GATE / NOT FOR MANUFACTURE`
+Status: `PASS BOUNDED RETURN-PATH REMEDIATIONS / FINAL SI AND REVIEW B OPEN / NOT FOR MANUFACTURE`
 
 Reviewed authoritative PCB SHA-256:
 `f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9`.
@@ -18,10 +18,23 @@ clearance is clear, and `GNSS_RF_FILTERED` is `1.326997 mm` over a
 `1.299279 mm` pad span. The unfilled source contains exactly one accepted
 `GND_MODEM` `In1.Cu` cellular zone.
 
-Closure is intentionally deferred until the commit-bound combined gate refills
-the final board, proves both cellular and GNSS L2 centreline coverage, and runs
-comparative KiCad 9 DRC against the accepted RF-P0 baseline with no new errors
-or unconnected regression.
+The combined gate is commit-bound to source commit
+`7ee9cfc9b4059dc7e487ca5513704b78c22da4e0` and tree
+`fbffec8ca34f283b5c689818780a6ab10495f843`. CI `#550` and PCB Native Gate
+`#277` both succeeded. Comparative KiCad 9 DRC held errors at zero and
+unconnected items at `429`; total reported violations changed from `226` to
+`227` with no new error class. The refilled board has one connected
+`GND_MODEM` L2 polygon covering all `623` sampled cellular RF centreline
+points and one connected `GND_DIGITAL` L2 polygon covering all `406` sampled
+GNSS RF centreline points, with zero uncovered samples. Strict 2D placement
+clearance also passes.
+
+Evidence is archived as artifact `10606594205`, digest
+`sha256:c392194b55903562ee0eb50255a0cce2b2816026338b3141c09ca3f6c8ab0aae`,
+from PCB Native Gate run
+`https://github.com/skif-ops/rs-zs-bpla/actions/runs/35516448594`.
+
+Decision: `PASS_BOUNDED_RETURN_PATH_REMEDIATIONS_FINAL_SI_AND_REVIEW_B_OPEN`.
 
 Remaining routing, final job-specific stackup/tolerance/coupon acceptance,
 final SI/PI, both fabricator responses, selected-assembler DFM/stencil response,

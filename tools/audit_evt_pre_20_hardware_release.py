@@ -736,7 +736,7 @@ def audit() -> dict[str, object]:
     )
     main_rf_application_controlled = (
         main_rf_application.get("status") ==
-        "PASS_BOTH_ACCEPTED_RF_REMEDIATIONS_DETERMINISTICALLY_COMPOSED"
+        "PASS_BOTH_ACCEPTED_RF_REMEDIATIONS_COMPOSED_COMBINED_KICAD9_GATE_BOUND"
         and main_rf_application.get("composed_board_sha256") ==
         "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
         and main_rf_application.get("strict_placement_clearance") == "PASS"

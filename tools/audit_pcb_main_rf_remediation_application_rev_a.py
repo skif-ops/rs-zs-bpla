@@ -55,6 +55,9 @@ GNSS_MAPPING = (
 GNSS_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json"
 )
+REPEAT_REVIEW = (
+    ROOT / "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_002_REV_A.json"
+)
 GENERATOR = ROOT / "tools/generate_pcb_main_rf_remediation_application_rev_a.py"
 PLACEMENT_AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 CAPTURE_STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
@@ -130,7 +133,7 @@ def static_audit() -> dict[str, object]:
     for path in (
         BOARD, BASE, GNSS_CANDIDATE, CELLULAR_CANDIDATE, COMPOSED,
         CELLULAR_APPROVAL, CELLULAR_MAPPING, CELLULAR_APPLICATION,
-        GNSS_APPROVAL, GNSS_MAPPING, GNSS_APPLICATION, GENERATOR,
+        GNSS_APPROVAL, GNSS_MAPPING, GNSS_APPLICATION, REPEAT_REVIEW, GENERATOR,
         PLACEMENT_AUTHORITY, CAPTURE_STATUS,
     ):
         require(path.is_file() and path.stat().st_size > 0,
@@ -209,6 +212,9 @@ def static_audit() -> dict[str, object]:
         and cellular_application.get("applied_intermediate", {}).get(
             "exact_candidate_byte_identity"
         ) is True
+        and cellular_application.get("successor_composition", {}).get(
+            "combined_machine_gate_status"
+        ) == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
         and cellular_application.get("routing_complete") is False
         and cellular_application.get("review_b_complete") is False
         and cellular_application.get("cam_or_manufacturing_release") is False,
@@ -231,11 +237,48 @@ def static_audit() -> dict[str, object]:
         and applied.get("board_sha256") == COMPOSED_SHA256
         and applied.get("exact_composed_board_byte_identity") is True
         and applied.get("exact_reviewed_gnss_delta_identity") is True
+        and applied.get("combined_machine_gate_status") ==
+        "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+        and gnss_application.get("combined_machine_gate_review") ==
+        str(REPEAT_REVIEW.relative_to(ROOT))
         and gnss_application.get("routing_complete") is False
         and gnss_application.get("rf_si_review_complete") is False
         and gnss_application.get("review_b_complete") is False
         and gnss_application.get("cam_or_manufacturing_release") is False,
         "GNSS application identity, composition, or boundary drift",
+    )
+    repeat_review = json.loads(REPEAT_REVIEW.read_text(encoding="utf-8"))
+    repeat_boundary = repeat_review.get("decision_boundary", {})
+    machine_gate = repeat_review.get("commit_bound_machine_gate", {})
+    require(
+        repeat_review.get("status") ==
+        "PASS_BOUNDED_RETURN_PATH_REMEDIATIONS_FINAL_SI_AND_REVIEW_B_OPEN"
+        and repeat_review.get("reviewed_board_sha256") == COMPOSED_SHA256
+        and repeat_review.get("decision") ==
+        "PASS_BOUNDED_RETURN_PATH_REMEDIATIONS_FINAL_SI_AND_REVIEW_B_OPEN"
+        and machine_gate.get("source_commit_sha") ==
+        "7ee9cfc9b4059dc7e487ca5513704b78c22da4e0"
+        and machine_gate.get("source_tree_sha") ==
+        "fbffec8ca34f283b5c689818780a6ab10495f843"
+        and machine_gate.get("pcb_native_gate", {}).get("run_id") == 35516448594
+        and machine_gate.get("ci_run", {}).get("run_id") == 35516448578
+        and machine_gate.get("artifact", {}).get("id") == 10606594205
+        and machine_gate.get("comparative_drc", {}).get("new_error_count") == 0
+        and machine_gate.get("comparative_drc", {}).get(
+            "candidate_unconnected_items"
+        ) == 429
+        and machine_gate.get("cellular_filled_reference", {}).get(
+            "uncovered_samples"
+        ) == 0
+        and machine_gate.get("gnss_filled_reference", {}).get(
+            "uncovered_samples"
+        ) == 0
+        and repeat_boundary.get("return_path_remediation_review_complete") is True
+        and repeat_boundary.get("final_si_review_complete") is False
+        and repeat_boundary.get("remaining_routing_complete") is False
+        and repeat_boundary.get("review_b_complete") is False
+        and repeat_boundary.get("cam_or_manufacturing_release") is False,
+        "commit-bound combined RF-remediation gate or release boundary drift",
     )
 
     reviewed_gnss = Board.from_file(str(GNSS_CANDIDATE), encoding="utf-8")
@@ -306,11 +349,11 @@ def static_audit() -> dict[str, object]:
     evidence = status.get("review_b", {}).get("evidence", {})
     require(
         evidence.get("rf_si_return_path_status") ==
-        "BOTH_REMEDIATIONS_APPLIED_COMBINED_MACHINE_GATE_AND_REPEAT_REVIEW_PENDING"
+        "PASS_BOUNDED_REMEDIATIONS_COMBINED_KICAD9_GATE_FINAL_SI_AND_REVIEW_B_OPEN"
         and evidence.get("rf_return_001_status") ==
         "APPROVED_APPLIED_EXACT_CELLULAR_L2_RETURN_ZONE_COMPOSED_WITH_GNSS_ECO"
         and evidence.get("gnss_rf_eco_001_status") ==
-        "APPROVED_APPLIED_EXACT_REVIEWED_DELTA_WITH_CELLULAR_L2_ZONE_COMBINED_GATE_PENDING"
+        "APPROVED_APPLIED_EXACT_REVIEWED_DELTA_WITH_CELLULAR_L2_ZONE_COMBINED_GATE_PASS"
         and status.get("review_b", {}).get("complete") is False
         and status.get("manufacturing_release") is False,
         "capture-status RF-remediation traceability or release boundary drift",
@@ -318,7 +361,7 @@ def static_audit() -> dict[str, object]:
 
     return {
         "schema_version": "dioneya.pcb-main-rf-remediation-application-audit.v1",
-        "status": "PASS_BOTH_ACCEPTED_RF_REMEDIATIONS_DETERMINISTICALLY_COMPOSED",
+        "status": "PASS_BOTH_ACCEPTED_RF_REMEDIATIONS_COMPOSED_COMBINED_KICAD9_GATE_BOUND",
         "base_sha256": BASE_SHA256,
         "cellular_candidate_sha256": CELLULAR_SHA256,
         "gnss_candidate_sha256": GNSS_SHA256,
@@ -328,7 +371,9 @@ def static_audit() -> dict[str, object]:
         "vias": len(vias),
         "zones": len(active.zones),
         "strict_placement_clearance": "PASS",
-        "combined_machine_gate": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+        "combined_machine_gate": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+        "return_path_remediation_review_complete": True,
+        "final_si_review_complete": False,
         "routing_complete": False,
         "rf_si_review_complete": False,
         "review_b_complete": False,
@@ -363,7 +408,7 @@ def main() -> int:
                           encoding="utf-8")
     print("PCB-MAIN composed RF-remediation application audit: PASS")
     print(f"board_sha256={COMPOSED_SHA256} trace_items=975 zones=8")
-    print("release_boundary=COMBINED_MACHINE_GATE_RF_SI_REVIEW_B_AND_MANUFACTURING_OPEN")
+    print("release_boundary=FINAL_SI_REMAINING_ROUTING_REVIEW_B_AND_MANUFACTURING_OPEN")
     return 0
 
 

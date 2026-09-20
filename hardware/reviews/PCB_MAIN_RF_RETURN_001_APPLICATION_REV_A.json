@@ -33,9 +33,11 @@
   "successor_composition": {
     "allowed_proposal_id": "PCB-MAIN-GNSS-RF-ECO-001",
     "must_preserve_added_zone_exactly": true,
-    "must_prove_combined_kicad9_drc_and_both_filled_references": true
+    "must_prove_combined_kicad9_drc_and_both_filled_references": true,
+    "combined_machine_gate_status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+    "repeat_review": "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_002_REV_A.json"
   },
-  "status": "APPLIED_ACCEPTED_CELLULAR_L2_RETURN_PLANE_SUBGATE_GNSS_ECO_AND_REPEAT_REVIEW_OPEN",
+  "status": "APPLIED_ACCEPTED_CELLULAR_L2_RETURN_PLANE_SUBGATE_COMBINED_GATE_PASS_FINAL_SI_OPEN",
   "routing_complete": false,
   "rf_si_review_complete": false,
   "final_job_stackup_accepted": false,

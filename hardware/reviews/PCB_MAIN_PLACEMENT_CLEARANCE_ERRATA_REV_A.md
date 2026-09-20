@@ -167,7 +167,9 @@ GNSS delta then moved only FL1 to `(56.8, 51.6, 270)` and C64 to
 `(58.3, 51.6, 180)`, retained U9/J9, and preserved the cellular zone.
 Strict 2D placement clearance remains PASS on composed board SHA-256
 `f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9`;
-combined KiCad 9 and repeat RF/SI review remain pending.
+combined KiCad 9 and bounded repeat RF/SI return-path review pass on source
+commit `7ee9cfc9`; remaining routing, final SI, Review B and manufacture remain
+open.
 
 ## Controlled post-repack result
 

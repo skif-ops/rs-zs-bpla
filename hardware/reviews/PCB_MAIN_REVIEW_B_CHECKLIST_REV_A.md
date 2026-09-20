@@ -1,6 +1,6 @@
 # PCB-MAIN Rev.A Review B checklist
 
-Status: `HIERARCHY ACCEPTED / PARTIAL ROUTING / BOTH RF REMEDIATIONS APPLIED / COMBINED GATE PENDING / REVIEW B OPEN / NOT FOR MANUFACTURE`
+Status: `HIERARCHY ACCEPTED / PARTIAL ROUTING / RF REMEDIATION REPEAT REVIEW PASS / REVIEW B OPEN / NOT FOR MANUFACTURE`
 
 Review B is independent from the signed Review A. This record is intentionally not
 signed for Review B. The hierarchy, placement and several bounded routing subgates
@@ -58,8 +58,10 @@ manufacturing release.
   `GND_MODEM` L2 zone; `PCB-MAIN-GNSS-RF-ECO-001` keeps U9/J9 fixed, moves only
   FL1/C64 and reduces the post-SAW route to `1.326997 mm`. The composed board is
   SHA-256 `f8797a1055…f4f9`; deterministic regeneration and strict placement
-  clearance pass. Commit-bound combined KiCad 9 refill/DRC, both filled-L2
-  coverage checks and repeat RF/SI review remain pending.
+  clearance pass. Commit-bound source `7ee9cfc9` passed CI `#550` and PCB
+  Native `#277`: errors remain zero, unconnected items remain `429`, and all
+  `623` cellular plus `406` GNSS filled-L2 samples are covered. The bounded
+  repeat return-path review passes; final SI and Review B remain open.
 - Stackup/impedance request: controlled packet and blank 22-row response
   register are ready, with 0/2 accepted fabricator responses. No final job
   construction, production tolerance, coupon plan or manufacturing route rule
@@ -131,7 +133,7 @@ manufacturing release.
 - [x] `PCB-MAIN-GNSS-RF-ECO-001` was independently accepted and its exact
   FL1/C64 plus GNSS-copper delta was composed without changing U9/J9 or the
   accepted cellular zone.
-- [ ] The final composed board passes commit-bound combined KiCad 9 refill/DRC,
+- [x] The final composed board passes commit-bound combined KiCad 9 refill/DRC,
   both filled-reference coverage audits and repeat RF/SI return-path review.
 - [ ] Two attributable fabricator responses are complete, compared and accepted;
   one final construction, its production 50-ohm/90-ohm geometry and tolerance,
@@ -160,9 +162,9 @@ for source commit `9aceca9531f0b9c18679bee1a8050ae7cd94308a` and PDF SHA-256
 The candidate is 2D placement-complete and partially routed. Its 186-net
 pre-route constraint coverage, public numeric routing basis and accepted RF P0
 subgate are controlled. Both bounded RF/SI remediations are independently
-accepted and applied in the exact deterministic composition, while the
-commit-bound combined KiCad 9 gate and repeat return-path review remain open.
-Remaining routing, pair-geometry
+accepted and applied in the exact deterministic composition. The commit-bound
+combined KiCad 9 gate and bounded repeat return-path review pass on source
+commit `7ee9cfc9`; final SI remains open. Remaining routing, pair-geometry
 audit, 3D/service review, final DRC, CAM, DFM and Review B are open.
 The exact current clearance result and
 release boundary are recorded in
