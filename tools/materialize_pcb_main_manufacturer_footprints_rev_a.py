@@ -49,6 +49,10 @@ OCTOSPI_APPLICATION = (
 OCTOSPI_APPROVED_BOARD_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
 RF_APPROVED_BOARD_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
+RF_REMEDIATION_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json"
+)
+RF_REMEDIATION_BOARD_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
@@ -451,6 +455,8 @@ def verify_frozen_materialization(candidate: Path) -> None:
         raise RuntimeError("PCB-MAIN OctoSPI application evidence is missing")
     if not RF_APPLICATION.is_file():
         raise RuntimeError("PCB-MAIN RF application evidence is missing")
+    if not RF_REMEDIATION_APPLICATION.is_file():
+        raise RuntimeError("PCB-MAIN RF remediation application evidence is missing")
     eco003 = json.loads(ECO_003_APPLICATION.read_text(encoding="utf-8"))
     eco003_applied = eco003.get("applied", {})
     eco004 = json.loads(ECO_004_APPLICATION.read_text(encoding="utf-8"))
@@ -464,6 +470,10 @@ def verify_frozen_materialization(candidate: Path) -> None:
     octospi_applied = octospi.get("applied", {})
     rf = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
     rf_applied = rf.get("applied", {})
+    remediation = json.loads(
+        RF_REMEDIATION_APPLICATION.read_text(encoding="utf-8")
+    )
+    remediation_applied = remediation.get("applied", {})
     actual_board_sha256 = sha256(PCB)
     if not (
         eco003.get("proposal_id") == "PCB-MAIN-RF-ROUTEABILITY-ECO-003"
@@ -512,7 +522,15 @@ def verify_frozen_materialization(candidate: Path) -> None:
         and rf.get("routing_complete") is False
         and rf.get("review_b_complete") is False
         and rf.get("cam_or_manufacturing_release") is False
-        and actual_board_sha256 == RF_APPROVED_BOARD_SHA256
+        and remediation.get("decision") ==
+        "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE"
+        and remediation_applied.get("board_sha256") ==
+        RF_REMEDIATION_BOARD_SHA256
+        and remediation_applied.get("exact_reviewed_gnss_delta_identity") is True
+        and remediation.get("routing_complete") is False
+        and remediation.get("review_b_complete") is False
+        and remediation.get("cam_or_manufacturing_release") is False
+        and actual_board_sha256 == RF_REMEDIATION_BOARD_SHA256
     ):
         raise RuntimeError(
             "PCB-MAIN ECO-003/ECO-004/ground-domain frozen-board authority mismatch"

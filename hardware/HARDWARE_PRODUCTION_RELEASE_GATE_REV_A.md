@@ -50,8 +50,8 @@ routing subgates, or successful software tests.
 PCB-MAIN has passed its bounded 2D placement-clearance subgate: the controlled
 225-reference repack gives all 227 fitted assembly footprints an explicit
 courtyard and the strict audit reports zero component, mounting-exclusion and
-U.FL tool-zone conflicts. The authoritative board is now partially routed: 691
-segments plus 285 vias, with three copper zones and four rule areas, reflect
+U.FL tool-zone conflicts. The authoritative board is now partially routed: 692
+segments plus 283 vias, with four copper zones and four rule areas, reflect
 accepted bounded ground-domain, hard-signal, OctoSPI and seven-net RF P0
 subgates. This is engineering progress only; remaining routing, final DRC,
 3D/service evidence, CAM, DFM and independent Review B remain required.
@@ -74,21 +74,17 @@ candidate only. Pair-aware routing and audit, the returned job stackup,
 production tolerance, coupon plan, routed copper, DRC, CAM, DFM and Review B
 remain open.
 
-The independent RF/SI return-path review of authoritative PCB SHA-256
-`9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040`
-is `ECO_REQUIRED`. `CELL_RF` and `CELL_RF_ANT` lack the `GND_MODEM` L2
-reference assumed by the L1-over-L2 geometry; `PCB-MAIN-RF-RETURN-001`
-proposes one bounded local L2 zone. Commit-bound PCB Native Gate `#267` passed
-comparative KiCad 9 refill/DRC with 226 -> 226 violations, 429 -> 429
-unconnected items and 623/623 covered cellular RF centreline samples. The
-candidate is not applied and still requires independent acceptance.
-`PCB-MAIN-GNSS-RF-ECO-001` separately keeps U9/J9 fixed and proposes moving
-only FL1/C64 so the post-SAW route is 1.326997 mm instead of 25.325357 mm. Its
-commit-bound PCB Native Gate `#273` passed comparative KiCad 9 DRC with
-226 -> 227 warning-level violations, 0 -> 0 errors, 429 -> 429 unconnected
-items and 406/406 covered GNSS RF centreline samples. Independent acceptance
-and application remain open. Neither the accepted RF P0 subgate nor either
-proposal closes RF/SI review or authorizes manufacture.
+The two remediations raised by RF/SI return-path review 001 are independently
+accepted and applied. `PCB-MAIN-RF-RETURN-001` contributes the exact bounded
+local `GND_MODEM` L2 zone accepted after PCB Native Gate `#267`.
+`PCB-MAIN-GNSS-RF-ECO-001` keeps U9/J9 fixed, moves only FL1/C64 and reduces
+the post-SAW route to 1.326997 mm; its reviewed candidate passed PCB Native
+Gate `#273`. The deterministic composition is authoritative PCB SHA-256
+`f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9`.
+Commit-bound combined refill/DRC, both filled-reference audits and repeat
+RF/SI review remain pending. Neither application authorizes manufacture;
+remaining routing, final SI/PI, final fabricator stackup/tolerance/coupon,
+Review B, CAM and DFM remain open.
 
 PCB-PWR has explicit pre-route constraint coverage for all 31 native nets. The
 independent audit binds the 5 A system basis, both 4 A buck channels, the 3.3 A

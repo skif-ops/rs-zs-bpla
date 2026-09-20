@@ -47,24 +47,21 @@ engineering-геометрию RF/USB; финальная production-геоме�
 заблокированной до согласования job-specific stackup. Для этого подготовлен
 машинно-проверяемый одинаковый запрос двум независимым фабрикам и пустой
 22-строчный реестр ответов; принято `0/2` ответов, конструкция не выбрана.
-В authoritative PCB уже приняты ограниченные ground-domain, hard-signal, OctoSPI и
-семисетевой RF P0 subgates: 691 сегмент, 285 via, 3 copper zones и
-4 rule areas. Независимый RF/SI return-path review при этом зафиксировал
-`ECO_REQUIRED`: cellular RF нужен локальный `GND_MODEM` на L2, а
-`GNSS_RF_FILTERED` — отдельный placement/routing ECO. Кандидат
-`PCB-MAIN-RF-RETURN-001` добавляет только локальную L2-зону; он не
-применён, но прошёл commit-bound KiCad 9 comparative DRC в PCB Native Gate
-`#267`: 623/623 выборки RF-centreline имеют связную L2-опору, новых DRC-ошибок
-и unconnected-регрессии нет. Кандидат ждёт независимого решения.
-`PCB-MAIN-GNSS-RF-ECO-001` оставляет U9/J9 на месте и переставляет только
-FL1/C64: пост-SAW участок сокращён до 1.327 mm, а commit-bound PCB Native Gate
-`#273` подтвердил строгий clearance, отсутствие новых DRC-ошибок и
-unconnected-регрессии и 406/406 покрытых L2 RF-centreline samples. Кандидат не
-применён и ждёт независимой приёмки. Отдельно подготовлен ограниченный запрос для будущего
+В authoritative PCB приняты ограниченные ground-domain, hard-signal, OctoSPI,
+семисетевой RF P0 и оба RF-remediation subgate. Текущая композиция содержит
+692 сегмента, 283 via, 4 copper zones и 4 rule areas; SHA-256
+`f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9`.
+`PCB-MAIN-RF-RETURN-001` добавлен первым как точный кандидат с локальной
+`GND_MODEM` L2-зоной. Затем точная принятая дельта
+`PCB-MAIN-GNSS-RF-ECO-001` оставила U9/J9 на месте, переставила только FL1/C64
+и сократила пост-SAW участок до 1.327 mm, не стирая cellular-зону.
+Детерминированная композиция и строгий clearance уже проверены локально;
+commit-bound combined KiCad 9 refill/DRC и повторный RF/SI return-path review
+ещё ожидаются. Отдельно подготовлен ограниченный запрос для будущего
 выбранного сборщика по DFM/трафарету `U2/U25/U26/U9` и пустой 14-строчный реестр: принято
 `0/14` ответов, сборщик и процесс не выбраны, паста U9 и производственный выпуск
 не разрешены. Это закрывает только перечисленные bounded subgates:
-оставшаяся трассировка, RF/SI return-path closure, финальный KiCad DRC, STEP-проверка
+оставшаяся трассировка, combined RF/SI return-path closure, финальный KiCad DRC, STEP-проверка
 высот/доступов, CAM/DFM и Review B остаются заблокированными. Подписанный
 электрический Review A сохраняется. Полный native source set PCB-MIC и
 PCB-PWR также отслеживается и проверяется в CI: все девять обязательных

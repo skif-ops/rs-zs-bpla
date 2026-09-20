@@ -42,6 +42,13 @@ RF_CANDIDATE = (
     "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
 )
 RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
+RF_REMEDIATION_COMPOSED = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
+    "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
+)
+RF_REMEDIATION_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json"
+)
 MECH = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 FOOTPRINT_REVIEW = ROOT / "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv"
 PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
@@ -254,12 +261,14 @@ def main() -> int:
                 f"{ref}: unknown functional placement group")
         require(row["Placement_Method"] in {
                     "ACTIVE_SKELETON", "FUNCTIONAL_REGION_GREEDY",
+                    "ACCEPTED_GNSS_RF_ECO_001",
                 } and bool(row["Target"]),
                 f"{ref}: placement method or target is not controlled")
         for coordinate in ("X_mm", "Y_mm"):
-            grid_units = float(row[coordinate]) / PLACEMENT_GRID_MM
+            grid = 0.1 if ref in {"FL1", "C64"} else PLACEMENT_GRID_MM
+            grid_units = float(row[coordinate]) / grid
             require(abs(grid_units - round(grid_units)) < 1e-6,
-                    f"{ref}: {coordinate} is off the 0.25 mm placement grid")
+                    f"{ref}: {coordinate} is off the controlled placement grid")
         actual_angle = float(fp.position.angle or 0.0) % 360.0
         expected_angle = float(row["Rotation_deg"]) % 360.0
         require(abs(fp.position.X - float(row["X_mm"])) < 0.002 and
@@ -340,15 +349,20 @@ def main() -> int:
     require(GROUND_CANDIDATE.is_file() and GROUND_APPLICATION.is_file() and
             SIGNAL_CANDIDATE.is_file() and SIGNAL_APPLICATION.is_file() and
             OCTOSPI_CANDIDATE.is_file() and OCTOSPI_APPLICATION.is_file() and
-            RF_CANDIDATE.is_file() and RF_APPLICATION.is_file(),
+            RF_CANDIDATE.is_file() and RF_APPLICATION.is_file() and
+            RF_REMEDIATION_COMPOSED.is_file() and
+            RF_REMEDIATION_APPLICATION.is_file(),
             "accepted routing subgate application evidence is missing")
     ground_application = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
     signal_application = json.loads(SIGNAL_APPLICATION.read_text(encoding="utf-8"))
     octospi_application = json.loads(OCTOSPI_APPLICATION.read_text(encoding="utf-8"))
     rf_application = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
-    require(PCB.read_bytes() == RF_CANDIDATE.read_bytes() and
+    remediation_application = json.loads(
+        RF_REMEDIATION_APPLICATION.read_text(encoding="utf-8")
+    )
+    require(PCB.read_bytes() == RF_REMEDIATION_COMPOSED.read_bytes() and
             hashlib.sha256(PCB.read_bytes()).hexdigest() ==
-            "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040" and
+            "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9" and
             ground_application.get("status") ==
             "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and
             ground_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
@@ -361,7 +375,12 @@ def main() -> int:
             rf_application.get("status") ==
             "APPLIED_ACCEPTED_RF_P0_ROUTING_SUBGATE_REMAINING_ROUTING_AND_REVIEWS_OPEN" and
             rf_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
-            len(board.traceItems) == 976 and len(board.zones) == 7,
+            remediation_application.get("decision") ==
+            "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE" and
+            remediation_application.get("applied", {}).get(
+                "exact_composed_board_byte_identity"
+            ) is True and
+            len(board.traceItems) == 975 and len(board.zones) == 8,
             "authoritative board accepted routing-subgate application drift")
     provisional = sorted(ref for ref, fp in footprints.items()
                          if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
@@ -1218,7 +1237,7 @@ def main() -> int:
           f"project_ipc_candidates_dfm_required={len(ipc_candidates)} "
           f"kicad_library_drawing_verified={len(library_verified)} "
           f"manufacturer_controlled={len(manufacturer_controlled)} "
-          "routing=GROUND_SIGNAL_HARD_NETS_OCTOSPI_R8_AND_RF_P0_SUBGATES_APPLIED "
+          "routing=GROUND_SIGNAL_HARD_NETS_OCTOSPI_R8_RF_P0_AND_RF_REMEDIATIONS_APPLIED "
           "review_b=BLOCKED")
     return 0
 

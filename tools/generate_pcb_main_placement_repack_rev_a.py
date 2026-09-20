@@ -84,9 +84,17 @@ RF_CANDIDATE = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/"
     "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
 )
+RF_REMEDIATION_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json"
+)
+RF_REMEDIATION_COMPOSED = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
+    "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
+)
 
-ECO003_POSES = {
-    "FL1": (60.5, 68.0, 0.0),
+ACTIVE_APPROVED_POSES = {
+    "FL1": (56.8, 51.6, 270.0),
+    "C64": (58.3, 51.6, 180.0),
     "D4": (58.25, 70.0, 90.0),
     "L2": (59.75, 70.25, 90.0),
 }
@@ -836,9 +844,22 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
             "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE" and
             octospi_applied.get("placement_manifest") ==
             str(PLACEMENT.relative_to(ROOT)) and
-            octospi_applied.get("placement_manifest_sha256") == sha256(PLACEMENT) and
+            octospi_applied.get("placement_manifest_sha256") ==
+            "70b453c77745580f16d571c999eeb0cde3f5581db69568668131dbe84ab20925" and
             octospi_applied.get("r8_position_mm") == [54.5, 16.0],
             "PCB-MAIN approved OctoSPI R8 placement successor drift",
+        )
+        remediation = json.loads(
+            RF_REMEDIATION_APPLICATION.read_text(encoding="utf-8")
+        )
+        require(
+            remediation.get("decision") ==
+            "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE"
+            and remediation.get("applied", {}).get("placement_manifest") ==
+            str(PLACEMENT.relative_to(ROOT))
+            and remediation.get("applied", {}).get("placement_manifest_sha256") ==
+            sha256(PLACEMENT),
+            "PCB-MAIN accepted GNSS placement-manifest successor drift",
         )
     else:
         require(applied.get("placement_repack_sha256") == sha256(PLACEMENT),
@@ -891,10 +912,10 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
                 rf.get("historical_baseline", {}).get("board_sha256") ==
                 sha256(OCTOSPI_CANDIDATE) and
                 rf.get("applied", {}).get("exact_candidate_byte_identity") is True and
-                sha256(BOARD) == sha256(RF_CANDIDATE) and
-                BOARD.read_bytes() == RF_CANDIDATE.read_bytes() and
-                len(getattr(board, "traceItems", [])) == 976 and
-                len(getattr(board, "zones", [])) == 7 and
+                sha256(BOARD) == sha256(RF_REMEDIATION_COMPOSED) and
+                BOARD.read_bytes() == RF_REMEDIATION_COMPOSED.read_bytes() and
+                len(getattr(board, "traceItems", [])) == 975 and
+                len(getattr(board, "zones", [])) == 8 and
                 ground.get("routing_complete") is False and
                 ground.get("review_b_complete") is False and
                 ground.get("cam_or_manufacturing_release") is False and
@@ -912,7 +933,7 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
                 "PCB-MAIN approved placement board unexpectedly contains copper")
     if ECO003_APPLICATION.is_file():
         by_ref = {row["RefDes"]: row for row in rows}
-        for ref, expected in ECO003_POSES.items():
+        for ref, expected in ACTIVE_APPROVED_POSES.items():
             actual = (
                 float(by_ref[ref]["X_mm"]),
                 float(by_ref[ref]["Y_mm"]),
@@ -920,7 +941,7 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
             )
             require(all(abs(first - second) < 0.001
                         for first, second in zip(actual, expected)),
-                    f"{ref}: approved ECO-003 pose drift")
+                    f"{ref}: approved placement-successor pose drift")
     return len(rows), proposal_id
 
 

@@ -1705,6 +1705,8 @@ def main() -> None:
                     "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
                     "RF_P0_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATIONS_"
+                    "APPLIED_COMBINED_GATE_PENDING_REMAINING_ROUTING_PENDING",
                 },
                 "Review B must be open but incomplete after Review A PASS")
     else:
@@ -1744,6 +1746,8 @@ def main() -> None:
                 "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
                 "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
                 "RF_P0_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATIONS_"
+                "APPLIED_COMBINED_GATE_PENDING_REMAINING_ROUTING_PENDING",
         }:
             required_layout_evidence = {
                 "native_layout_candidate", "layout_generator", "layout_independent_audit",
@@ -1796,16 +1800,29 @@ def main() -> None:
                 "rf_p0_routing_status",
                 "rf_si_return_path_review",
                 "rf_si_return_path_review_record",
+                "rf_si_return_path_repeat_review",
+                "rf_si_return_path_repeat_review_record",
                 "rf_si_return_path_review_audit",
                 "rf_si_return_path_status",
                 "rf_return_001_candidate",
                 "rf_return_001_candidate_record",
                 "rf_return_001_candidate_review",
+                "rf_return_001_approval",
+                "rf_return_001_approval_record",
+                "rf_return_001_review_commit_mapping",
+                "rf_return_001_application",
                 "rf_return_001_status",
                 "gnss_rf_eco_001_candidate",
                 "gnss_rf_eco_001_candidate_record",
                 "gnss_rf_eco_001_candidate_review",
                 "gnss_rf_eco_001_audit",
+                "gnss_rf_eco_001_approval",
+                "gnss_rf_eco_001_approval_record",
+                "gnss_rf_eco_001_review_commit_mapping",
+                "gnss_rf_eco_001_application",
+                "rf_remediation_composition_generator",
+                "rf_remediation_composed_board",
+                "rf_remediation_application_audit",
                 "gnss_rf_eco_001_status",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
@@ -1820,6 +1837,8 @@ def main() -> None:
                     "OCTOSPI_R8_ECO_002_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
                     "RF_P0_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATIONS_"
+                    "APPLIED_COMBINED_GATE_PENDING_REMAINING_ROUTING_PENDING",
             }:
                 required_layout_evidence |= {
                     "placement_repack_manifest", "placement_repack_generator",
@@ -1851,16 +1870,16 @@ def main() -> None:
                     "REMAINING_ROUTING_AND_REVIEWS_OPEN",
                     "PCB-MAIN RF P0 routing status drift")
             require(review_b["evidence"].get("rf_si_return_path_status") ==
-                    "ECO_REQUIRED_CELLULAR_L2_RETURN_AND_GNSS_PLACEMENT_"
-                    "ROUTING_OPEN",
+                    "BOTH_REMEDIATIONS_APPLIED_COMBINED_MACHINE_GATE_AND_"
+                    "REPEAT_REVIEW_PENDING",
                     "PCB-MAIN RF/SI return-path status drift")
             require(review_b["evidence"].get("rf_return_001_status") ==
-                    "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_"
-                    "REVIEW_NOT_APPLIED",
+                    "APPROVED_APPLIED_EXACT_CELLULAR_L2_RETURN_ZONE_"
+                    "COMPOSED_WITH_GNSS_ECO",
                     "PCB-MAIN RF-return-001 candidate status drift")
             require(review_b["evidence"].get("gnss_rf_eco_001_status") ==
-                    "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_"
-                    "REVIEW_NOT_APPLIED",
+                    "APPROVED_APPLIED_EXACT_REVIEWED_DELTA_WITH_CELLULAR_L2_"
+                    "ZONE_COMBINED_GATE_PENDING",
                     "PCB-MAIN GNSS RF ECO-001 candidate status drift")
             for evidence_name in required_layout_evidence - {
                     "ra_003_status", "placement_repack_status",
@@ -2193,6 +2212,27 @@ def main() -> None:
                     rf_p0_application.get("review_b_complete") is False and
                     rf_p0_application.get("cam_or_manufacturing_release") is False,
                     "PCB-MAIN RF P0 application interlock drift")
+            gnss_rf_application = json.loads(
+                (ROOT / review_b["evidence"]["gnss_rf_eco_001_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(
+                gnss_rf_application.get("proposal_id") ==
+                "PCB-MAIN-GNSS-RF-ECO-001"
+                and gnss_rf_application.get("decision") ==
+                "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE"
+                and gnss_rf_application.get("applied", {}).get(
+                    "exact_composed_board_byte_identity"
+                ) is True
+                and gnss_rf_application.get("applied", {}).get(
+                    "exact_reviewed_gnss_delta_identity"
+                ) is True
+                and gnss_rf_application.get("routing_complete") is False
+                and gnss_rf_application.get("rf_si_review_complete") is False
+                and gnss_rf_application.get("review_b_complete") is False
+                and gnss_rf_application.get("cam_or_manufacturing_release") is False,
+                "PCB-MAIN GNSS RF application interlock drift",
+            )
             mechanical_application = None
             if mechanical_eco_status in {
                     "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
@@ -2308,9 +2348,17 @@ def main() -> None:
                             "locked_authority_mounting_conflicts": [],
                             "locked_authority_tool_conflicts": [],
                         }, "PCB-MAIN mechanical ECO historical inventory drift")
-                require(rf_p0_application.get("applied", {}).get(
+                require(gnss_rf_application.get("applied", {}).get(
                             "board_sha256"
                         ) == placement_control["board_sha256"] and
+                        gnss_rf_application.get("applied", {}).get(
+                            "exact_composed_board_byte_identity"
+                        ) is True and
+                        rf_p0_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) == gnss_rf_application.get(
+                            "reviewed_baseline", {}
+                        ).get("board_sha256") and
                         rf_p0_application.get("applied", {}).get(
                             "exact_candidate_byte_identity"
                         ) is True and

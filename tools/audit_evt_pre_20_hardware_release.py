@@ -688,6 +688,12 @@ def audit() -> dict[str, object]:
     main_gnss_rf_candidate = read_json(
         "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.json"
     )
+    main_rf_application = run_json_audit(
+        "audit_pcb_main_rf_remediation_application_rev_a.py"
+    )
+    main_rf_repeat_review = read_json(
+        "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_002_REV_A.json"
+    )
     main_rf_controlled = (
         main_rf_return_control.get("status") ==
         "PASS_STATIC_ECO_REQUIRED_AND_CELLULAR_L2_RETURN_PROPOSAL_CONTROLLED"
@@ -705,8 +711,8 @@ def audit() -> dict[str, object]:
         "pcb_main_rf_si_return_path_control",
         main_rf_controlled,
         (
-            "ECO_REQUIRED is hash-bound; cellular L2 proposal is controlled and "
-            "the GNSS ECO remains separate"
+            "historical ECO_REQUIRED finding and cellular L2 proposal remain "
+            "hash-bound after bounded application"
         ),
         "PCB-MAIN RF/SI return-path review or bounded remediation control is missing",
     )
@@ -725,21 +731,32 @@ def audit() -> dict[str, object]:
     check(
         "pcb_main_gnss_rf_eco_control",
         main_gnss_rf_controlled,
-        "FL1/C64-only GNSS RF ECO-001 proposal is hash-bound and unapplied",
+        "historical FL1/C64-only GNSS RF ECO-001 proposal remains hash-bound after bounded application",
         "PCB-MAIN GNSS RF placement/routeability proposal control is missing",
     )
-    main_rf_boundary = main_rf_review.get("decision_boundary", {})
-    main_rf_candidate_boundary = main_rf_return_candidate.get(
-        "decision_boundary", {}
+    main_rf_application_controlled = (
+        main_rf_application.get("status") ==
+        "PASS_BOTH_ACCEPTED_RF_REMEDIATIONS_DETERMINISTICALLY_COMPOSED"
+        and main_rf_application.get("composed_board_sha256") ==
+        "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
+        and main_rf_application.get("strict_placement_clearance") == "PASS"
+        and main_rf_application.get("routing_complete") is False
+        and main_rf_application.get("review_b_complete") is False
+        and main_rf_application.get("manufacturing_release") is False
     )
+    check(
+        "pcb_main_rf_remediation_application_control",
+        main_rf_application_controlled,
+        str(main_rf_application.get("status", "MISSING")),
+        "PCB-MAIN accepted cellular/GNSS RF remediations are not deterministically composed and bounded",
+    )
+    main_rf_repeat_boundary = main_rf_repeat_review.get("decision_boundary", {})
     cellular_l2_return_complete = (
-        isinstance(main_rf_boundary, dict)
-        and main_rf_boundary.get("cellular_l2_return_subgate_complete") is True
-        and isinstance(main_rf_candidate_boundary, dict)
-        and main_rf_candidate_boundary.get("applied_to_authoritative_board") is True
-        and main_rf_candidate_boundary.get("cellular_l2_return_subgate_complete") is True
-        and main_rf_return_control.get("kicad9_comparative_drc") ==
-        "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION"
+        main_rf_application_controlled
+        and isinstance(main_rf_repeat_boundary, dict)
+        and main_rf_repeat_boundary.get(
+            "cellular_l2_return_application_complete"
+        ) is True
     )
     check(
         "pcb_main_cellular_l2_return_acceptance",
@@ -747,29 +764,41 @@ def audit() -> dict[str, object]:
         (
             "accepted and applied"
             if cellular_l2_return_complete
-            else "PCB-MAIN-RF-RETURN-001 passed commit-bound KiCad 9 comparative DRC but remains a non-applied proposal pending human acceptance"
+            else "PCB-MAIN-RF-RETURN-001 acceptance/application is incomplete"
         ),
         "PCB-MAIN cellular RF lacks an accepted and applied GND_MODEM L2 return plane",
     )
     gnss_rf_routeability_complete = (
-        isinstance(main_rf_boundary, dict)
-        and main_rf_boundary.get("gnss_rf_placement_routeability_complete") is True
-        and main_rf_boundary.get("rf_si_return_path_review_complete") is True
-        and main_gnss_rf_candidate.get("decision_boundary", {}).get(
-            "applied_to_authoritative_board"
+        main_rf_application_controlled
+        and isinstance(main_rf_repeat_boundary, dict)
+        and main_rf_repeat_boundary.get(
+            "gnss_rf_placement_routeability_application_complete"
         ) is True
-        and main_gnss_rf_control.get("kicad9_comparative_drc") ==
-        "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION"
     )
     check(
         "pcb_main_gnss_rf_placement_routeability",
         gnss_rf_routeability_complete,
         (
-            "GNSS placement/routing and repeat RF/SI review complete"
+            "GNSS placement/routeability delta accepted and applied"
             if gnss_rf_routeability_complete
-            else "PCB-MAIN-GNSS-RF-ECO-001 passed commit-bound KiCad 9 comparative DRC but remains an unapplied proposal pending human acceptance; repeat RF/SI review remains open"
+            else "PCB-MAIN-GNSS-RF-ECO-001 acceptance/application is incomplete"
         ),
-        "PCB-MAIN GNSS RF placement/routeability ECO and repeat return-path review remain open",
+        "PCB-MAIN GNSS RF placement/routeability ECO acceptance/application remains open",
+    )
+    main_rf_repeat_review_complete = (
+        isinstance(main_rf_repeat_boundary, dict)
+        and main_rf_repeat_boundary.get(
+            "return_path_remediation_review_complete"
+        ) is True
+        and isinstance(main_rf_repeat_review.get("commit_bound_machine_gate"), dict)
+        and main_rf_repeat_review.get("decision") !=
+        "PENDING_COMMIT_BOUND_COMBINED_MACHINE_GATE"
+    )
+    check(
+        "pcb_main_rf_si_return_path_repeat_review",
+        main_rf_repeat_review_complete,
+        str(main_rf_repeat_review.get("status", "MISSING")),
+        "PCB-MAIN combined cellular/GNSS commit-bound KiCad 9 gate and repeat return-path review remain open",
     )
     main_stackup = (
         main_evidence.get("stackup_impedance_handoff", {})

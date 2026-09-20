@@ -25,11 +25,16 @@ CANDIDATE = (
     / "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
 )
 ACTIVE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+ACTIVE_COMPOSED = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
+    "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
+)
 GENERATOR = ROOT / "tools/generate_pcb_main_rf_p0_candidate_rev_a.py"
 PROPOSAL = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_CANDIDATE_REV_A.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
 BASE_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 CANDIDATE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
+ACTIVE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
 GENERATOR_SHA256 = "fe2051d54444d961cf3106b9a0b7862b3a929179c27d07fcd40232952ca2991a"
 RF_WIDTH_MM = 0.1509
 EXPECTED = {
@@ -109,9 +114,9 @@ def static_audit() -> dict[str, object]:
     require(sha256(BASE) == BASE_SHA256, "RF base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "RF candidate SHA-256 drift")
     require(sha256(GENERATOR) == GENERATOR_SHA256, "RF generator SHA-256 drift")
-    require(sha256(ACTIVE) == CANDIDATE_SHA256 and
-            ACTIVE.read_bytes() == CANDIDATE.read_bytes(),
-            "authoritative PCB-MAIN is not the exact accepted RF candidate")
+    require(sha256(ACTIVE) == ACTIVE_SHA256 and
+            ACTIVE.read_bytes() == ACTIVE_COMPOSED.read_bytes(),
+            "authoritative PCB-MAIN is not the controlled RF-remediation successor")
 
     base = Board().from_file(str(BASE), encoding="utf-8")
     candidate = Board().from_file(str(CANDIDATE), encoding="utf-8")
@@ -223,7 +228,8 @@ def static_audit() -> dict[str, object]:
         "added_vias": 0,
         "added_track_length_mm": sum(lengths.values()),
         "rf_width_mm": RF_WIDTH_MM,
-        "applied_to_authoritative_board": False,
+        "historical_application_verified": True,
+        "active_successor_sha256": ACTIVE_SHA256,
         "review_b_complete": False,
         "manufacturing_release": False,
     }

@@ -34,6 +34,7 @@ CAPTURE_STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 
 BASE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
 CANDIDATE_SHA256 = "22ddd8c56ceabf397ed033a44235b439625d3104fa2cf798bb57b782d24b1352"
+ACTIVE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
 GENERATOR_SHA256 = "9c37ce07c1bfe5881e4d239772b9e3aeb8d48fe10abf1fd4acbd14e6b3476e11"
 ZONE_NAME = "PCB_MAIN_GND_MODEM_CELL_In1_Cu"
 ZONE_TSTAMP = "474ddbc4-d099-4dd3-9f8f-bc95779ae00a"
@@ -238,8 +239,8 @@ def audit_filled_reference(path: Path) -> dict[str, object]:
 
 
 def static_audit() -> dict[str, object]:
-    require(sha256(ACTIVE) == BASE_SHA256 and ACTIVE.read_bytes() == BASE.read_bytes(),
-            "active PCB-MAIN no longer matches the controlled RF-return baseline")
+    require(sha256(ACTIVE) == ACTIVE_SHA256,
+            "active PCB-MAIN RF-remediation successor SHA-256 drift")
     require(sha256(BASE) == BASE_SHA256, "RF-return base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256,
             "RF-return candidate SHA-256 drift")
@@ -452,9 +453,9 @@ def static_audit() -> dict[str, object]:
         and evidence.get("rf_si_return_path_review_record") ==
         "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.md"
         and evidence.get("rf_si_return_path_review_audit") ==
-        "tools/audit_pcb_main_rf_return_001_candidate_rev_a.py"
+        "tools/audit_pcb_main_rf_remediation_application_rev_a.py"
         and evidence.get("rf_si_return_path_status") ==
-        "ECO_REQUIRED_CELLULAR_L2_RETURN_AND_GNSS_PLACEMENT_ROUTING_OPEN"
+        "BOTH_REMEDIATIONS_APPLIED_COMBINED_MACHINE_GATE_AND_REPEAT_REVIEW_PENDING"
         and evidence.get("rf_return_001_candidate") ==
         str(CANDIDATE.relative_to(ROOT))
         and evidence.get("rf_return_001_candidate_record") ==
@@ -462,7 +463,7 @@ def static_audit() -> dict[str, object]:
         and evidence.get("rf_return_001_candidate_review") ==
         "hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.md"
         and evidence.get("rf_return_001_status") ==
-        "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW_NOT_APPLIED"
+        "APPROVED_APPLIED_EXACT_CELLULAR_L2_RETURN_ZONE_COMPOSED_WITH_GNSS_ECO"
         and capture_status.get("manufacturing_release") is False,
         "PCB-MAIN capture-status RF/SI ECO traceability or release boundary drift",
     )

@@ -532,7 +532,7 @@ def static_audit() -> dict[str, object]:
         and evidence.get("gnss_rf_eco_001_candidate_record") == str(PROPOSAL.relative_to(ROOT))
         and evidence.get("gnss_rf_eco_001_candidate_review") == str(PROPOSAL_RECORD.relative_to(ROOT))
         and evidence.get("gnss_rf_eco_001_status") ==
-        "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW_NOT_APPLIED"
+        "APPROVED_APPLIED_EXACT_REVIEWED_DELTA_WITH_CELLULAR_L2_ZONE_COMBINED_GATE_PENDING"
         and capture.get("manufacturing_release") is False,
         "GNSS ECO capture-status traceability or release boundary drift",
     )

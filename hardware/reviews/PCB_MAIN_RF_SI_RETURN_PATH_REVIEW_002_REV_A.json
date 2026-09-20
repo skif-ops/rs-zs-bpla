@@ -1,0 +1,62 @@
+{
+  "schema_version": "dioneya.pcb-main-rf-si-return-path-review-002.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "review_id": "PCB-MAIN-RF-SI-RETURN-002",
+  "date_utc": "2026-09-20",
+  "status": "PENDING_COMMIT_BOUND_COMBINED_KICAD9_GATE",
+  "reviewed_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+  "reviewed_board_sha256": "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9",
+  "predecessor_review": "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.json",
+  "accepted_applications": [
+    "hardware/reviews/PCB_MAIN_RF_RETURN_001_APPLICATION_REV_A.json",
+    "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json"
+  ],
+  "deterministic_composition": {
+    "generator": "tools/generate_pcb_main_rf_remediation_application_rev_a.py",
+    "generator_sha256": "9014e03d6dbd3fe6f153d1a5a557ac2832904e264f165b03ba0cdca38a7fe3fa",
+    "composed_board": "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb",
+    "composed_board_sha256": "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9",
+    "cellular_zone_preserved_exactly": true,
+    "gnss_delta_regenerated_exactly": true
+  },
+  "static_findings": [
+    {
+      "finding_id": "RF-RP-002",
+      "result": "REMEDIATION_APPLIED_COMBINED_FILLED_REFERENCE_GATE_PENDING",
+      "zone": "PCB_MAIN_GND_MODEM_CELL_In1_Cu",
+      "net": "GND_MODEM",
+      "layer": "In1.Cu"
+    },
+    {
+      "finding_id": "RF-SI-003",
+      "result": "REMEDIATION_APPLIED_STRICT_CLEARANCE_PASS_COMBINED_DRC_PENDING",
+      "fixed_anchors": ["U9", "J9"],
+      "moved_footprints": ["C64", "FL1"],
+      "gnss_rf_filtered_length_mm": 1.326996810199,
+      "gnss_rf_filtered_pad_distance_mm": 1.299278646019,
+      "gnss_rf_filtered_stretch_ratio": 1.021333502452
+    }
+  ],
+  "required_combined_machine_gate": {
+    "exact_regeneration": true,
+    "strict_2d_placement_clearance": true,
+    "comparative_kicad9_drc_new_error_count": 0,
+    "unconnected_item_regression_allowed": false,
+    "filled_gnd_modem_l2_cellular_coverage": true,
+    "filled_gnd_digital_l2_gnss_coverage": true
+  },
+  "commit_bound_machine_gate": null,
+  "decision": "PENDING_COMMIT_BOUND_COMBINED_MACHINE_GATE",
+  "decision_boundary": {
+    "cellular_l2_return_application_complete": true,
+    "gnss_rf_placement_routeability_application_complete": true,
+    "return_path_remediation_review_complete": false,
+    "final_si_review_complete": false,
+    "remaining_routing_complete": false,
+    "final_job_stackup_accepted": false,
+    "production_impedance_tolerance_accepted": false,
+    "coupon_plan_accepted": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}

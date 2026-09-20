@@ -44,7 +44,17 @@ LAYER_AUTHORITY = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
 
 BASE_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
 CANDIDATE_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
-ACTIVE_BOARD_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
+ACTIVE_BOARD_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
+GNSS_AUTHORIZED_REMOVED_GROUND_TSTAMPS = {
+    "8bb16eba-0c23-436c-83cb-15711942aa13",
+    "97b4ffd7-640c-458b-a674-df70012edd9e",
+    "e4d5b871-eae5-40c8-bc94-33070afaccfd",
+    "ed333547-457e-4a27-b04c-76eefac1703b",
+    "f0cf6fbe-b2d3-49cb-ac31-38e0b70d131a",
+    "1b0fbb03-8a78-4e3f-b887-5b3096c609de",
+    "3b6e7ac6-f2af-49e1-bbb9-dd1c158f1517",
+    "72553cba-285e-40e8-afa0-669c5c279833",
+}
 PROPOSAL_SHA256 = "6ad0446ea98a44863cef91be137da3e5dcff92303ac9e395e260773e8cebc314"
 PROPOSAL_RECORD_SHA256 = "12f5ffafaa90cf3d796e08f17c333ac7701d0b17f286af487c31b8410673cb19"
 REVIEWED_GITHUB_COMMIT = "830139e8875e4e67738cf88b938a8d0ff91e2798"
@@ -352,11 +362,22 @@ def static_audit() -> dict[str, Any]:
             "authoritative baseline unexpectedly contains routing or zones")
     candidate_items = {item.tstamp: item for item in candidate.traceItems}
     active_items = {item.tstamp: item for item in active.traceItems}
-    require(not (set(candidate_items) - set(active_items)) and
-            all(candidate_items[key] == active_items[key] for key in candidate_items),
-            "accepted ground copper was removed or modified by a later routing subgate")
-    require(candidate.zones == active.zones,
-            "accepted ground zones or rule areas changed in a later routing subgate")
+    missing_candidate_items = set(candidate_items) - set(active_items)
+    require(
+        missing_candidate_items == GNSS_AUTHORIZED_REMOVED_GROUND_TSTAMPS
+        and all(
+            candidate_items[key] == active_items[key]
+            for key in set(candidate_items) & set(active_items)
+        ),
+        "accepted ground copper changed outside the authorized GNSS fanout delta",
+    )
+    candidate_zones = {str(item.tstamp): item for item in candidate.zones}
+    active_zones = {str(item.tstamp): item for item in active.zones}
+    require(
+        set(candidate_zones) <= set(active_zones)
+        and all(candidate_zones[key] == active_zones[key] for key in candidate_zones),
+        "accepted ground zones or rule areas changed outside cellular L2 composition",
+    )
 
     with LAYER_AUTHORITY.open(encoding="utf-8", newline="") as stream:
         main_rows = [row for row in csv.DictReader(stream) if row["Board"] == "PCB-MAIN"]

@@ -1,0 +1,61 @@
+{
+  "schema_version": "dioneya.pcb-main-gnss-rf-eco-001-application.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-GNSS-RF-ECO-001",
+  "approval": "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPROVAL_REV_A.json",
+  "application_date": "2026-09-20",
+  "reviewed_proposal_commit_sha": "67538ba5dfea4cde08c06738cc6b537847a25398",
+  "approval_commit_sha": "8840ef36653e1d62d80c128f21934e4f4c1a5e91",
+  "approval_sha256": "3668c63ab845186cbfc669f63765b98ffe70b281a59e58f00a4f26841ff69127",
+  "reviewed_candidate_board_sha256": "d4c0eaa95bb62c7b9ae15b110fb3a76e6a056f462f0a36a734b3fa63730d2aee",
+  "decision": "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE",
+  "scope": "EXACT_FL1_C64_PLACEMENT_GNSS_RF_AND_FL1_GROUND_FANOUT_DELTA_ONLY",
+  "predecessor_application": {
+    "record": "hardware/reviews/PCB_MAIN_RF_RETURN_001_APPLICATION_REV_A.json",
+    "commit_sha": "3a309159db6479144ac2eb0a72c1a12742036ab9",
+    "board_sha256": "22ddd8c56ceabf397ed033a44235b439625d3104fa2cf798bb57b782d24b1352"
+  },
+  "reviewed_baseline": {
+    "board": "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb",
+    "board_sha256": "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040",
+    "trace_items": 976,
+    "footprints": 251
+  },
+  "composition": {
+    "generator": "tools/generate_pcb_main_rf_remediation_application_rev_a.py",
+    "generator_sha256": "9014e03d6dbd3fe6f153d1a5a557ac2832904e264f165b03ba0cdca38a7fe3fa",
+    "composed_board": "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb",
+    "composed_board_sha256": "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9",
+    "remove_exact_cellular_zone_yields_reviewed_gnss_candidate": true,
+    "reviewed_gnss_delta_regenerates_exactly": true,
+    "cellular_l2_zone_preserved_exactly": true
+  },
+  "applied": {
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9",
+    "exact_composed_board_byte_identity": true,
+    "exact_reviewed_gnss_delta_identity": true,
+    "trace_items": 975,
+    "track_segments": 692,
+    "vias": 283,
+    "total_track_length_mm": 887.091202891827,
+    "copper_zones": 4,
+    "rule_areas": 4,
+    "fl1_position": [56.8, 51.6, 270.0],
+    "c64_position": [58.3, 51.6, 180.0],
+    "u9_position": [53.5, 58.0, 0.0],
+    "j9_position": [53.5, 68.0, 0.0],
+    "placement_manifest": "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
+    "placement_manifest_sha256": "0c32b3818ae1fbf9c0552d3734f1d6390f753e4f1b044d7c96dc8831d2d5f8a0",
+    "gnss_rf_filtered_length_mm": 1.326996810199,
+    "combined_machine_gate_status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+  },
+  "status": "APPLIED_ACCEPTED_GNSS_RF_ECO_WITH_CELLULAR_L2_ZONE_REPEAT_RF_SI_REVIEW_PENDING",
+  "routing_complete": false,
+  "rf_si_review_complete": false,
+  "final_job_stackup_accepted": false,
+  "production_impedance_tolerance_accepted": false,
+  "coupon_plan_accepted": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}

@@ -42,10 +42,25 @@ RF_CANDIDATE = (
     "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
 )
 RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
+RF_REMEDIATION_COMPOSED = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
+    "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
+)
 BASE_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
 CANDIDATE_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
 OCTOSPI_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
-ACTIVE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
+RF_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
+ACTIVE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
+GNSS_AUTHORIZED_REMOVED_GROUND_TSTAMPS = {
+    "8bb16eba-0c23-436c-83cb-15711942aa13",
+    "97b4ffd7-640c-458b-a674-df70012edd9e",
+    "e4d5b871-eae5-40c8-bc94-33070afaccfd",
+    "ed333547-457e-4a27-b04c-76eefac1703b",
+    "f0cf6fbe-b2d3-49cb-ac31-38e0b70d131a",
+    "1b0fbb03-8a78-4e3f-b887-5b3096c609de",
+    "3b6e7ac6-f2af-49e1-bbb9-dd1c158f1517",
+    "72553cba-285e-40e8-afa0-669c5c279833",
+}
 EXPECTED = {
     "BLE_RX_U1": (17, 0, 50.571067811865, {"F.Cu": 17}),
     "BOOT0": (14, 2, 19.038582233138, {"B.Cu": 9, "F.Cu": 5}),
@@ -160,10 +175,10 @@ def static_audit() -> dict[str, Any]:
     require(sha256(BASE) == BASE_SHA256, "authoritative base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "candidate SHA-256 drift")
     require(sha256(OCTOSPI_CANDIDATE) == OCTOSPI_SHA256 and
-            sha256(RF_CANDIDATE) == ACTIVE_SHA256 and
+            sha256(RF_CANDIDATE) == RF_SHA256 and
             sha256(ACTIVE) == ACTIVE_SHA256 and
-            ACTIVE.read_bytes() == RF_CANDIDATE.read_bytes(),
-            "authoritative PCB-MAIN is not the exact accepted RF successor")
+            ACTIVE.read_bytes() == RF_REMEDIATION_COMPOSED.read_bytes(),
+            "authoritative PCB-MAIN RF-remediation successor identity drift")
     base = Board.from_file(str(BASE), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")
     active = Board.from_file(str(ACTIVE), encoding="utf-8")
@@ -180,11 +195,22 @@ def static_audit() -> dict[str, Any]:
     require(not (set(base_items) - set(candidate_items)), "candidate removes accepted copper")
     require(all(base_items[key] == candidate_items[key] for key in base_items),
             "candidate modifies accepted ground copper")
-    require(not (set(candidate_items) - set(active_items)) and
-            all(candidate_items[key] == active_items[key] for key in candidate_items),
-            "accepted signal-hard-nets copper was removed or modified by its successor")
-    require(candidate.zones == active.zones,
-            "accepted ground zones or rule areas changed in the RF successor")
+    missing_candidate_items = set(candidate_items) - set(active_items)
+    require(
+        missing_candidate_items == GNSS_AUTHORIZED_REMOVED_GROUND_TSTAMPS
+        and all(
+            candidate_items[key] == active_items[key]
+            for key in set(candidate_items) & set(active_items)
+        ),
+        "accepted signal/ground copper changed outside the authorized GNSS delta",
+    )
+    candidate_zones = {str(item.tstamp): item for item in candidate.zones}
+    active_zones = {str(item.tstamp): item for item in active.zones}
+    require(
+        set(candidate_zones) <= set(active_zones)
+        and all(candidate_zones[key] == active_zones[key] for key in candidate_zones),
+        "accepted ground zones or rule areas changed outside cellular L2 composition",
+    )
     additions = [item for key, item in candidate_items.items() if key not in base_items]
     require(len(additions) == 111, "candidate added-copper item count drift")
 
@@ -256,7 +282,7 @@ def static_audit() -> dict[str, Any]:
     rf_application = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
     require(rf_application.get("historical_baseline", {}).get("board_sha256") ==
             OCTOSPI_SHA256 and
-            rf_application.get("applied", {}).get("board_sha256") == ACTIVE_SHA256 and
+            rf_application.get("applied", {}).get("board_sha256") == RF_SHA256 and
             rf_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
             rf_application.get("routing_complete") is False and
             rf_application.get("review_b_complete") is False and

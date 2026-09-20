@@ -1,6 +1,6 @@
 # PCB-MAIN Rev.A Review B checklist
 
-Status: `HIERARCHY ACCEPTED / PARTIAL ROUTING / RF/SI ECO REQUIRED / REVIEW B OPEN / NOT FOR MANUFACTURE`
+Status: `HIERARCHY ACCEPTED / PARTIAL ROUTING / BOTH RF REMEDIATIONS APPLIED / COMBINED GATE PENDING / REVIEW B OPEN / NOT FOR MANUFACTURE`
 
 Review B is independent from the signed Review A. This record is intentionally not
 signed for Review B. The hierarchy, placement and several bounded routing subgates
@@ -21,8 +21,8 @@ manufacturing release.
   `ACCEPT_HIERARCHY_ONLY` against PDF SHA-256
   `7e6ef20a989ec66c55b3e1a32de0a914b9e37a6e70cc5835d36f3260b65ff8d9`.
 - Native PCB: partially routed, 2D placement-complete engineering candidate
-  present. The authoritative board contains 691 segments and 285 vias (976
-  track/via objects), three copper zones and four rule areas. KiCad 9 comparative
+  present. The authoritative board contains 692 segments and 283 vias (975
+  track/via objects), four copper zones and four rule areas. KiCad 9 comparative
   gates accepted bounded ground-domain, hard-signal, OctoSPI and seven-net RF P0
   subgates; 429 unconnected items remain after deterministic zone refill.
 - Placement clearance: `PASS` for the bounded 2D subgate. The deterministic
@@ -53,19 +53,13 @@ manufacturing release.
   `0.1509 mm` for 50 ohm and `0.1537/0.2032 mm` width/gap for 90 ohm on L1/L2.
   Final production geometry remains blocked on job-specific fabricator
   acceptance and RF/SI review.
-- RF/SI return-path review: `ECO_REQUIRED`. `CELL_RF` and `CELL_RF_ANT` use the
-  L1-over-L2 width but currently lack their required `GND_MODEM` reference on
-  L2. `PCB-MAIN-RF-RETURN-001` proposes one bounded local `GND_MODEM` L2 zone;
-  commit-bound PCB Native Gate `#267` passed comparative KiCad 9 DRC and
-  covered all 623 sampled RF-centreline points. It is not applied and still
-  requires independent acceptance.
-  Separately, `GNSS_RF_FILTERED` is 25.325357 mm for a 15.543668 mm pad-to-pad
-  span and wraps around U9 because RF_IN faces away from FL1; a dedicated
-  placement/routing ECO remains required. Proposal `PCB-MAIN-GNSS-RF-ECO-001`
-  keeps U9/J9 fixed, moves only FL1/C64 and reduces the post-SAW route to
-  1.326997 mm. Commit-bound PCB Native Gate `#273` passed strict clearance,
-  comparative KiCad 9 DRC and 406/406 filled-L2 centreline coverage, but
-  independent acceptance and application are still pending.
+- RF/SI return-path remediation: both bounded subgates are independently
+  accepted and applied. `PCB-MAIN-RF-RETURN-001` contributes exactly one local
+  `GND_MODEM` L2 zone; `PCB-MAIN-GNSS-RF-ECO-001` keeps U9/J9 fixed, moves only
+  FL1/C64 and reduces the post-SAW route to `1.326997 mm`. The composed board is
+  SHA-256 `f8797a1055…f4f9`; deterministic regeneration and strict placement
+  clearance pass. Commit-bound combined KiCad 9 refill/DRC, both filled-L2
+  coverage checks and repeat RF/SI review remain pending.
 - Stackup/impedance request: controlled packet and blank 22-row response
   register are ready, with 0/2 accepted fabricator responses. No final job
   construction, production tolerance, coupon plan or manufacturing route rule
@@ -132,11 +126,13 @@ manufacturing release.
 - [x] The exact seven-net RF P0 candidate was accepted and applied as a bounded
   engineering subgate; its comparative KiCad 9 DRC introduced no new errors and
   reduced unconnected items from 444 to 429.
-- [ ] `PCB-MAIN-RF-RETURN-001` passes comparative KiCad 9 refill/DRC and is
-  independently accepted before its local `GND_MODEM` L2 zone is applied.
-- [ ] A separate GNSS placement/routing ECO places FL1 demonstrably close to
-  U9 RF_IN, avoids signal copper under U9 and repeats placement, DRC and RF/SI
-  return-path review.
+- [x] `PCB-MAIN-RF-RETURN-001` passed its independent comparative gate, was
+  accepted and applied as the exact local `GND_MODEM` L2-zone candidate.
+- [x] `PCB-MAIN-GNSS-RF-ECO-001` was independently accepted and its exact
+  FL1/C64 plus GNSS-copper delta was composed without changing U9/J9 or the
+  accepted cellular zone.
+- [ ] The final composed board passes commit-bound combined KiCad 9 refill/DRC,
+  both filled-reference coverage audits and repeat RF/SI return-path review.
 - [ ] Two attributable fabricator responses are complete, compared and accepted;
   one final construction, its production 50-ohm/90-ohm geometry and tolerance,
   and its coupon plan are selected through project RF/SI review.
@@ -163,10 +159,10 @@ for source commit `9aceca9531f0b9c18679bee1a8050ae7cd94308a` and PDF SHA-256
 `7e6ef20a989ec66c55b3e1a32de0a914b9e37a6e70cc5835d36f3260b65ff8d9`.
 The candidate is 2D placement-complete and partially routed. Its 186-net
 pre-route constraint coverage, public numeric routing basis and accepted RF P0
-subgate are controlled, but the RF/SI return-path review is `ECO_REQUIRED`:
-the cellular L2-return and separate GNSS placement/routing proposals passed
-their machine gates but neither is independently accepted or applied. Repeat
-RF/SI review remains open. Remaining routing, pair-geometry
+subgate are controlled. Both bounded RF/SI remediations are independently
+accepted and applied in the exact deterministic composition, while the
+commit-bound combined KiCad 9 gate and repeat return-path review remain open.
+Remaining routing, pair-geometry
 audit, 3D/service review, final DRC, CAM, DFM and Review B are open.
 The exact current clearance result and
 release boundary are recorded in

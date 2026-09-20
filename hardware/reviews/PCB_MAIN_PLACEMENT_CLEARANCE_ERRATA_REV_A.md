@@ -161,13 +161,23 @@ previously accepted copper objects. Strict 2D placement clearance remains
 PASS; final RF return-path/SI review, Review B and manufacturing release remain
 open.
 
+Reviewer `Скиф` then accepted both RF remediation subgates on 2026-09-20.
+The exact cellular L2-zone candidate was applied first. The exact reviewed
+GNSS delta then moved only FL1 to `(56.8, 51.6, 270)` and C64 to
+`(58.3, 51.6, 180)`, retained U9/J9, and preserved the cellular zone.
+Strict 2D placement clearance remains PASS on composed board SHA-256
+`f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9`;
+combined KiCad 9 and repeat RF/SI review remain pending.
+
 ## Controlled post-repack result
 
 `hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv` fixes all 225 movable top-side
-references on a 0.25 mm grid by functional group while leaving the 17
+references by functional group while leaving the 17
 MAIN-AUTH-011 connector/module anchors unchanged. Non-owner movable footprints
 are excluded from the locked CELL, GNSS, LoRa, BLE-body and audio allocations,
 and every movable footprint stays outside the BLE all-layer antenna keepout.
+The accepted GNSS RF ECO provides the bounded `0.1 mm`-grid exception for
+FL1/C64; other movable placements retain the original `0.25 mm` grid.
 The five generic passive packages receive the controlled rule in
 `hardware/PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A.md`: 184 explicit courtyards,
 including 169 fitted and 15 DNP footprints.

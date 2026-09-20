@@ -39,9 +39,11 @@ PLACEMENT_SHA256 = "dbc433cb36b0bec612f55dbb96e6dce34d502728e488810c115207ffbbeb
 ECO003_BOARD_SHA256 = "dfcd8780cb3f189fe89cca98f32e3ee9693947a9a28d25e0154f7cce65d51684"
 CURRENT_BOARD_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
 OCTOSPI_BOARD_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
-ACTIVE_BOARD_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
+RF_P0_BOARD_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
+ACTIVE_BOARD_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
 CURRENT_PLACEMENT_SHA256 = "34abe08f925ec03f045b295d5c40a0391e0597a09ecdad5a7e563c93f53a62c4"
-ACTIVE_PLACEMENT_SHA256 = "70b453c77745580f16d571c999eeb0cde3f5581db69568668131dbe84ab20925"
+RF_P0_PLACEMENT_SHA256 = "70b453c77745580f16d571c999eeb0cde3f5581db69568668131dbe84ab20925"
+ACTIVE_PLACEMENT_SHA256 = "0c32b3818ae1fbf9c0552d3734f1d6390f753e4f1b044d7c96dc8831d2d5f8a0"
 REVIEWED_LOCAL_COMMIT = "16ee36b9432508b539736a8ee78890ad99ce0788"
 REVIEWED_GITHUB_COMMIT = "b3ab796bcdee727798a121d114605e7ba84d683a"
 REVIEWED_TREE = "b5c2892d795389eb07a216139dc50f725a13e849"
@@ -159,7 +161,7 @@ def audit() -> dict[str, Any]:
             "ACCEPT_LIMITED_OCTOSPI_R8_PLACEMENT_ECO_AND_ROUTING_SUBGATE" and
             octospi.get("applied", {}).get("board_sha256") == OCTOSPI_BOARD_SHA256 and
             octospi.get("applied", {}).get("placement_manifest_sha256") ==
-            ACTIVE_PLACEMENT_SHA256,
+            RF_P0_PLACEMENT_SHA256,
             "PCB-MAIN OctoSPI placement/routing successor lineage drift")
     rf_application = json.loads(RF_APPLICATION.read_text(encoding="utf-8"))
     require(rf_application.get("proposal_id") == "PCB-MAIN-RF-P0-001" and
@@ -167,7 +169,7 @@ def audit() -> dict[str, Any]:
             rf_application.get("historical_baseline", {}).get("board_sha256") ==
             OCTOSPI_BOARD_SHA256 and
             rf_application.get("applied", {}).get("board_sha256") ==
-            ACTIVE_BOARD_SHA256 and
+            RF_P0_BOARD_SHA256 and
             rf_application.get("applied", {}).get("exact_candidate_byte_identity") is True and
             sha256(BOARD) == ACTIVE_BOARD_SHA256 and
             sha256(PLACEMENT) == ACTIVE_PLACEMENT_SHA256,
@@ -286,8 +288,8 @@ def audit() -> dict[str, Any]:
             j6.properties.get("DIONEA_MECHANICAL_ANCHOR") ==
             "21.000,2.500,180.000",
             "J6 ECO-002 anchor or footprint datum drift")
-    require(len(getattr(board, "traceItems", [])) == 976 and
-            len(getattr(board, "zones", [])) == 7,
+    require(len(getattr(board, "traceItems", [])) == 975 and
+            len(getattr(board, "zones", [])) == 8,
             "PCB-MAIN post-ground-subgate routing inventory drift")
 
     status = json.loads(STATUS.read_text(encoding="utf-8"))

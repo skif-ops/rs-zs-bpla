@@ -56,8 +56,18 @@ RF_CANDIDATE = (
     / "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
 )
 RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
+RF_REMEDIATION_COMPOSED = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
+    "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
+)
+RF_RETURN_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_RF_RETURN_001_APPLICATION_REV_A.json"
+)
+GNSS_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json"
+)
 
-STATE = "PASS_CONSTRAINT_COVERAGE_AND_ACCEPTED_RF_P0_SUBGATE"
+STATE = "PASS_CONSTRAINT_COVERAGE_AND_ACCEPTED_RF_REMEDIATIONS_APPLIED"
 ROW_STATUS = "PRE_ROUTE_CONSTRAINT_CONTROLLED_ROUTING_NOT_COMPLETE"
 STACKUP_STATE = "OPEN_REQUIRED_BEFORE_NUMERIC_RF_USB_GEOMETRY"
 GROUND_CANDIDATE_SHA256 = (
@@ -71,6 +81,9 @@ OCTOSPI_CANDIDATE_SHA256 = (
 )
 RF_CANDIDATE_SHA256 = (
     "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
+)
+RF_REMEDIATION_SHA256 = (
+    "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
 )
 
 FIELDS = [
@@ -453,12 +466,15 @@ def expected_status_control(
         "rf_50ohm_net_count": 7,
         "usb_90ohm_pair_count": 4,
         "cross_domain_review_net_count": 18,
-        "trace_items": 976,
-        "copper_zones": 7,
+        "trace_items": 975,
+        "copper_zones": 8,
         "ground_domain_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "signal_hard_nets_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "octospi_r8_eco_002_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "rf_p0_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "cellular_l2_return_subgate": "APPLIED_EXACT_ACCEPTED_ZONE",
+        "gnss_rf_placement_routeability_subgate": "APPLIED_EXACT_ACCEPTED_DELTA",
+        "combined_rf_remediation_gate": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
         "factory_stackup": STACKUP_STATE,
         "routing_complete": False,
         "manufacturing_release": False,
@@ -560,18 +576,19 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
 
     trace_items = len(board.traceItems)
     copper_zones = len(board.zones)
-    require(trace_items == 976 and copper_zones == 7,
-            "authoritative board does not contain the bounded accepted RF subgate")
+    require(trace_items == 975 and copper_zones == 8,
+            "authoritative board does not contain the accepted RF remediations")
     board_digest = sha256(board_path)
-    require(board_digest == RF_CANDIDATE_SHA256,
-            "authoritative board SHA-256 differs from the accepted RF candidate")
+    require(board_digest == RF_REMEDIATION_SHA256,
+            "authoritative board SHA-256 differs from the composed RF remediation")
     require(sha256(GROUND_CANDIDATE) == GROUND_CANDIDATE_SHA256,
             "accepted ground-domain candidate hash drift")
     require(sha256(SIGNAL_CANDIDATE) == SIGNAL_CANDIDATE_SHA256 and
             sha256(OCTOSPI_CANDIDATE) == OCTOSPI_CANDIDATE_SHA256 and
             sha256(RF_CANDIDATE) == RF_CANDIDATE_SHA256 and
-            board_path.read_bytes() == RF_CANDIDATE.read_bytes(),
-            "authoritative board is not byte-identical to the accepted RF candidate")
+            sha256(RF_REMEDIATION_COMPOSED) == RF_REMEDIATION_SHA256 and
+            board_path.read_bytes() == RF_REMEDIATION_COMPOSED.read_bytes(),
+            "authoritative board is not byte-identical to the composed RF remediation")
     application = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
     require(application.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE"
             and application.get("status") ==
@@ -637,6 +654,28 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             rf_application.get("review_b_complete") is False and
             rf_application.get("cam_or_manufacturing_release") is False,
             "RF application decision, geometry, or release boundary differs")
+    rf_return_application = json.loads(
+        RF_RETURN_APPLICATION.read_text(encoding="utf-8")
+    )
+    gnss_application = json.loads(GNSS_APPLICATION.read_text(encoding="utf-8"))
+    require(
+        rf_return_application.get("decision") ==
+        "ACCEPT_CELLULAR_L2_RETURN_PLANE_SUBGATE"
+        and rf_return_application.get("applied_intermediate", {}).get(
+            "exact_candidate_byte_identity"
+        ) is True
+        and gnss_application.get("decision") ==
+        "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE"
+        and gnss_application.get("applied", {}).get("board_sha256") ==
+        RF_REMEDIATION_SHA256
+        and gnss_application.get("applied", {}).get(
+            "exact_composed_board_byte_identity"
+        ) is True
+        and gnss_application.get("routing_complete") is False
+        and gnss_application.get("review_b_complete") is False
+        and gnss_application.get("cam_or_manufacturing_release") is False,
+        "RF remediation application decision, composition, or boundary differs",
+    )
 
     authority_digest = sha256(authority_path)
     control = expected_status_control(board_digest, authority_digest)
@@ -693,6 +732,9 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
         "signal_hard_nets_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "octospi_r8_eco_002_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "rf_p0_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
+        "cellular_l2_return_subgate": "APPLIED_EXACT_ACCEPTED_ZONE",
+        "gnss_rf_placement_routeability_subgate": "APPLIED_EXACT_ACCEPTED_DELTA",
+        "combined_rf_remediation_gate": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
         "routing_complete": False,
         "manufacturing_release": False,
     }
@@ -720,9 +762,9 @@ def main() -> int:
     print("PCB-MAIN routing authority audit: PASS")
     print(
         "nets=186 classes=15 rf_50ohm=7 usb_pairs=4 "
-        "trace_items=976 copper_zones=7 ground_subgate=applied "
+        "trace_items=975 copper_zones=8 ground_subgate=applied "
         "signal_hard_nets_subgate=applied octospi_r8_eco_002_subgate=applied "
-        "rf_p0_subgate=applied "
+        "rf_p0_subgate=applied rf_remediations=applied "
         "routing_complete=false"
     )
     return 0
