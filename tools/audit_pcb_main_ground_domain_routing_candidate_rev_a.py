@@ -44,7 +44,11 @@ LAYER_AUTHORITY = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
 
 BASE_SHA256 = "a50aa153d1dad2ccc9f0759213932767c9950c441a887aaf5ab2d3d9fb59a2d8"
 CANDIDATE_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
-ACTIVE_BOARD_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
+ACTIVE_BOARD_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
+USB_AUTHORIZED_MODIFIED_TSTAMPS = {
+    "bbd350c1-609d-43b7-9dd0-824ee009466f",
+    "fb9ade5d-8496-4617-9d20-390d44c347c4",
+}
 GNSS_AUTHORIZED_REMOVED_GROUND_TSTAMPS = {
     "8bb16eba-0c23-436c-83cb-15711942aa13",
     "97b4ffd7-640c-458b-a674-df70012edd9e",
@@ -368,6 +372,7 @@ def static_audit() -> dict[str, Any]:
         and all(
             candidate_items[key] == active_items[key]
             for key in set(candidate_items) & set(active_items)
+            if str(key) not in USB_AUTHORIZED_MODIFIED_TSTAMPS
         ),
         "accepted ground copper changed outside the authorized GNSS fanout delta",
     )

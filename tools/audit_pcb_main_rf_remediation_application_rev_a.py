@@ -73,7 +73,26 @@ BASE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
 CELLULAR_SHA256 = "22ddd8c56ceabf397ed033a44235b439625d3104fa2cf798bb57b782d24b1352"
 GNSS_SHA256 = "d4c0eaa95bb62c7b9ae15b110fb3a76e6a056f462f0a36a734b3fa63730d2aee"
 COMPOSED_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
-ACTIVE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
+ACTIVE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
+USB_AUTHORIZED_MODIFIED_TSTAMPS = {
+    "bbd350c1-609d-43b7-9dd0-824ee009466f",
+    "fb9ade5d-8496-4617-9d20-390d44c347c4",
+}
+USB_AUTHORIZED_ADDED_TSTAMPS = {
+    "06fe4c38-5162-555f-affd-58c330060b05",
+    "0a89ed57-6e9b-5361-9b91-a1f39cf210c6",
+    "1335e808-f975-5d1f-abd3-2eb196825d03",
+    "14387f50-65d2-5efb-b132-760a32c4176f",
+    "19d4e816-eaa4-5e01-8ab8-14d89f986899",
+    "314325de-b7be-572b-9b18-a5868e1123b3",
+    "40bb856b-332d-5883-9f08-8fed5a68ab62",
+    "50f5efde-a09f-5ecb-afe0-2c1398472420",
+    "70e0eec9-9a0b-5876-aa9c-25eacffdd10c",
+    "96afee58-fc3a-5c21-9790-7e34c9b2df5c",
+    "a411bc79-cd05-5b14-acbe-112f23afef06",
+    "a62064eb-2462-50e5-94d4-ad7150b8851a",
+    "d36ee5aa-6489-5aa0-8ac6-14582e96fd07",
+}
 GENERATOR_SHA256 = "9014e03d6dbd3fe6f153d1a5a557ac2832904e264f165b03ba0cdca38a7fe3fa"
 CELLULAR_APPROVAL_SHA256 = "000e323f116d9b4aa371142c9efe37d85241563ea8db41c2f9b23bfca6bee079"
 GNSS_APPROVAL_SHA256 = "3668c63ab845186cbfc669f63765b98ffe70b281a59e58f00a4f26841ff69127"
@@ -156,10 +175,8 @@ def static_audit() -> dict[str, object]:
     require(sha256(COMPOSED) == COMPOSED_SHA256 and
             COMPOSED.read_bytes() == generator.composed_bytes(),
             "historical RF board is not the exact deterministic composition")
-    require(sha256(BOARD) == ACTIVE_SHA256 and
-            sha256(USB_CANDIDATE) == ACTIVE_SHA256 and
-            BOARD.read_bytes() == USB_CANDIDATE.read_bytes(),
-            "authoritative board is not the exact accepted USB placement successor")
+    require(sha256(BOARD) == ACTIVE_SHA256,
+            "authoritative board is not the exact accepted USB source-routing successor")
     require(sha256(GENERATOR) == GENERATOR_SHA256,
             "RF-remediation composition generator SHA-256 drift")
     require(sha256(CELLULAR_APPROVAL) == CELLULAR_APPROVAL_SHA256,
@@ -304,10 +321,21 @@ def static_audit() -> dict[str, object]:
                 f"composed application changes GNSS-reviewed field: {field}")
     for field in (
         "general", "layers", "setup", "properties", "graphicItems",
-        "dimensions", "groups", "targets", "nets", "traceItems", "zones",
+        "dimensions", "groups", "targets", "nets", "zones",
     ):
         require(getattr(rf_composed, field) == getattr(active, field),
-                f"USB placement successor changes RF-composed field: {field}")
+                f"USB successor changes RF-composed field: {field}")
+    predecessor_items = {str(item.tstamp): item for item in rf_composed.traceItems}
+    active_items = {str(item.tstamp): item for item in active.traceItems}
+    require(
+        set(active_items) - set(predecessor_items) == USB_AUTHORIZED_ADDED_TSTAMPS
+        and not (set(predecessor_items) - set(active_items))
+        and {
+            key for key in predecessor_items
+            if predecessor_items[key] != active_items[key]
+        } == USB_AUTHORIZED_MODIFIED_TSTAMPS,
+        "USB source-routing successor copper delta drift",
+    )
     predecessor_footprints = {ref_of(item): item for item in rf_composed.footprints}
     active_footprints = {ref_of(item): item for item in active.footprints}
     require(predecessor_footprints.keys() == active_footprints.keys(),
@@ -369,11 +397,11 @@ def static_audit() -> dict[str, object]:
         for item in segments
     )
     require(
-        len(active.traceItems) == 975
-        and len(segments) == 692
+        len(active.traceItems) == 988
+        and len(segments) == 705
         and len(vias) == 283
         and len(active.zones) == 8
-        and math.isclose(length, 887.091202891827, abs_tol=1e-9),
+        and math.isclose(length, 895.319845557592, abs_tol=1e-9),
         "composed authoritative board inventory drift",
     )
 
@@ -450,7 +478,7 @@ def main() -> int:
                           encoding="utf-8")
     print("PCB-MAIN composed RF-remediation application audit: PASS")
     print(f"board_sha256={ACTIVE_SHA256} rf_predecessor_sha256={COMPOSED_SHA256} "
-          "trace_items=975 zones=8")
+          "trace_items=988 zones=8")
     print("release_boundary=FINAL_SI_REMAINING_ROUTING_REVIEW_B_AND_MANUFACTURING_OPEN")
     return 0
 

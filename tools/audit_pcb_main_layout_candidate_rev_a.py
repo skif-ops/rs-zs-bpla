@@ -361,7 +361,7 @@ def main() -> int:
         RF_REMEDIATION_APPLICATION.read_text(encoding="utf-8")
     )
     require(hashlib.sha256(PCB.read_bytes()).hexdigest() ==
-            "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e" and
+            "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5" and
             hashlib.sha256(RF_REMEDIATION_COMPOSED.read_bytes()).hexdigest() ==
             "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9" and
             ground_application.get("status") ==
@@ -381,7 +381,7 @@ def main() -> int:
             remediation_application.get("applied", {}).get(
                 "exact_composed_board_byte_identity"
             ) is True and
-            len(board.traceItems) == 975 and len(board.zones) == 8,
+            len(board.traceItems) == 988 and len(board.zones) == 8,
             "authoritative board accepted routing-subgate application drift")
     provisional = sorted(ref for ref, fp in footprints.items()
                          if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==

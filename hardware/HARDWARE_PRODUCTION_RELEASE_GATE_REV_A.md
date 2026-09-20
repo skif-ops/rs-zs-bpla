@@ -50,10 +50,10 @@ routing subgates, or successful software tests.
 PCB-MAIN has passed its bounded 2D placement-clearance subgate: the controlled
 225-reference repack gives all 227 fitted assembly footprints an explicit
 courtyard and the strict audit reports zero component, mounting-exclusion and
-U.FL tool-zone conflicts. The authoritative board is now partially routed: 692
+U.FL tool-zone conflicts. The authoritative board is now partially routed: 705
 segments plus 283 vias, with four copper zones and four rule areas, reflect
-accepted bounded ground-domain, hard-signal, OctoSPI and seven-net RF P0
-subgates. This is engineering progress only; remaining routing, final DRC,
+accepted bounded ground-domain, hard-signal, OctoSPI, seven-net RF P0 and USB
+MCU-source subgates. This is engineering progress only; remaining routing, final DRC,
 3D/service evidence, CAM, DFM and independent Review B remain required.
 
 PCB-MAIN also has an accepted human-readable hierarchy-only subgate. Source
@@ -81,10 +81,12 @@ local `GND_MODEM` L2 zone accepted after PCB Native Gate `#267`.
 the post-SAW route to 1.326997 mm; its reviewed candidate passed PCB Native
 Gate `#273`. The deterministic RF composition is predecessor PCB SHA-256
 `f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9`.
-The exact accepted R91/R92 USB placement successor is authoritative SHA-256
-`d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e`;
-it changes no copper and application commit `1f8c0bad` passed CI `#557` and
-PCB Native `#284`.
+The exact accepted R91/R92 USB placement successor SHA-256
+`d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e`
+changes no copper and application commit `1f8c0bad` passed CI `#557` and PCB
+Native `#284`. Its accepted USB MCU-source routing successor is authoritative
+SHA-256 `76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5`;
+the fresh application gate remains pending.
 Commit-bound source commit `7ee9cfc9` passed CI `#550` and PCB Native Gate
 `#277`: comparative DRC added no errors or unconnected regression, and both
 filled-reference audits cover every cellular and GNSS sample. The bounded

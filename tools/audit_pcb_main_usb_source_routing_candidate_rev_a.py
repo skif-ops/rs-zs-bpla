@@ -25,6 +25,8 @@ CANDIDATE = (
 )
 ACTIVE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 REVIEW = ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_CANDIDATE_REV_A.json"
+APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPROVAL_REV_A.json"
+APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPLICATION_REV_A.json"
 
 BASE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
 CANDIDATE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
@@ -217,8 +219,29 @@ def audit_drc(base_path: Path, candidate_path: Path) -> dict[str, object]:
 def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> dict[str, object]:
     require(sha256(BASE) == BASE_SHA256, "USB source base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "USB source candidate SHA-256 drift")
-    require(sha256(ACTIVE) == BASE_SHA256 and ACTIVE.read_bytes() == BASE.read_bytes(),
-            "authoritative PCB-MAIN must remain the exact proposal base")
+    active_sha256 = sha256(ACTIVE)
+    require(active_sha256 in {BASE_SHA256, CANDIDATE_SHA256},
+            "authoritative PCB-MAIN USB source-routing lineage drift")
+    if active_sha256 == BASE_SHA256:
+        require(ACTIVE.read_bytes() == BASE.read_bytes(),
+                "authoritative PCB-MAIN proposal base byte identity drift")
+        application_state = "PROPOSAL_NOT_APPLIED"
+    else:
+        require(ACTIVE.read_bytes() == CANDIDATE.read_bytes(),
+                "authoritative PCB-MAIN is not the exact accepted candidate")
+        approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
+        application = json.loads(APPLICATION.read_text(encoding="utf-8"))
+        require(
+            approval.get("decision") == "ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE"
+            and approval.get("reviewed_candidate_board_sha256") == CANDIDATE_SHA256
+            and application.get("decision") == "ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE"
+            and application.get("applied", {}).get("board_sha256") == CANDIDATE_SHA256
+            and application.get("applied", {}).get("exact_candidate_byte_identity") is True
+            and application.get("review_b_complete") is False
+            and application.get("manufacturing_release") is False,
+            "accepted USB source-routing application boundary drift",
+        )
+        application_state = "ACCEPTED_EXACT_CANDIDATE_APPLIED"
 
     base = Board.from_file(str(BASE), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")
@@ -372,6 +395,8 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         "reference_samples": reference_samples,
         "authoritative_board_modified": False,
         "human_acceptance": "PENDING",
+        "active_board_sha256": active_sha256,
+        "application_state": application_state,
         "review_b_complete": False,
         "manufacturing_release": False,
     }

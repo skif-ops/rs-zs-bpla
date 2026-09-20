@@ -48,10 +48,11 @@ engineering-геометрию RF/USB; финальная production-геоме�
 машинно-проверяемый одинаковый запрос двум независимым фабрикам и пустой
 22-строчный реестр ответов; принято `0/2` ответов, конструкция не выбрана.
 В authoritative PCB приняты ограниченные ground-domain, hard-signal, OctoSPI,
-семисетевой RF P0, оба RF-remediation subgate и точная placement-дельта
-`R91/R92`. Текущий successor содержит 692 сегмента, 283 via, 4 copper zones и
+семисетевой RF P0, оба RF-remediation subgate, точная placement-дельта
+`R91/R92` и MCU-side USB-пара. Текущий successor содержит 705 сегментов,
+283 via, 4 copper zones и
 4 rule areas; SHA-256
-`d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e`.
+`76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5`.
 `PCB-MAIN-RF-RETURN-001` добавлен первым как точный кандидат с локальной
 `GND_MODEM` L2-зоной. Затем точная принятая дельта
 `PCB-MAIN-GNSS-RF-ECO-001` оставила U9/J9 на месте, переставила только FL1/C64
@@ -75,8 +76,10 @@ impedance-геометрия пока не разрешены. Следующи�
 `GND_DIGITAL` via и его сегмент без изменения геометрии via или ground-domain
 топологии. Proposal commit `f4ed1a4d` прошёл static gate, CI `#559` и PCB
 Native `#286`: violations `232→232`, новых errors нет, unconnected `429→427`.
-Machine gate закрыт, authoritative PCB не изменён; применение требует точного
-human token `ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE`.
+Machine gate закрыт; решение `ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE` записано,
+и точный кандидат применён к authoritative PCB. Свежий commit-bound
+application gate ещё ожидается; main-connector и cellular USB остаются
+отдельными незакрытыми сегментами.
 Отдельно подготовлен ограниченный запрос для будущего
 выбранного сборщика по DFM/трафарету `U2/U25/U26/U9` и пустой 14-строчный реестр: принято
 `0/14` ответов, сборщик и процесс не выбраны, паста U9 и производственный выпуск

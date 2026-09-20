@@ -50,7 +50,11 @@ BASE_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
 CANDIDATE_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
 OCTOSPI_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 RF_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-ACTIVE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
+ACTIVE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
+USB_AUTHORIZED_MODIFIED_TSTAMPS = {
+    "bbd350c1-609d-43b7-9dd0-824ee009466f",
+    "fb9ade5d-8496-4617-9d20-390d44c347c4",
+}
 GNSS_AUTHORIZED_REMOVED_GROUND_TSTAMPS = {
     "8bb16eba-0c23-436c-83cb-15711942aa13",
     "97b4ffd7-640c-458b-a674-df70012edd9e",
@@ -202,6 +206,7 @@ def static_audit() -> dict[str, Any]:
         and all(
             candidate_items[key] == active_items[key]
             for key in set(candidate_items) & set(active_items)
+            if str(key) not in USB_AUTHORIZED_MODIFIED_TSTAMPS
         ),
         "accepted signal/ground copper changed outside the authorized GNSS delta",
     )

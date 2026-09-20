@@ -681,7 +681,7 @@ def build(output: Path) -> tuple[Path, ...]:
         "hierarchy_review": "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED",
         "review_b": (
             "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
-            "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING"
+            "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_APPLIED_REMAINING_ROUTING_PENDING"
         ),
     }
     manifest.write_text(json.dumps(manifest_payload, indent=2) + "\n", encoding="utf-8")

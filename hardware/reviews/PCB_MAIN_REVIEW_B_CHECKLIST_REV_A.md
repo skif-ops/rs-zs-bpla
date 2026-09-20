@@ -155,12 +155,13 @@ manufacturing release.
   application commit `1f8c0bad` passed CI #557 and PCB Native #284 with zero
   new errors and `429→429` unconnected. This closes placement only; USB copper
   remains open. Applied R91/R92 centre separation is 1.00 mm.
-- [ ] Bounded candidate `PCB-MAIN-USB-SOURCE-ROUTING-001` routes only the local
+- [ ] Accepted application `PCB-MAIN-USB-SOURCE-ROUTING-001` routes only the local
   U1-to-R91/R92 USB pair, relocates one existing `GND_DIGITAL` via/segment and
-  leaves the authoritative board unchanged. Static regeneration and geometry
-  audits pass; proposal commit `f4ed1a4d` passed CI #559 and PCB Native #286
-  with zero new errors and unconnected `429→427`. Explicit human acceptance
-  remains mandatory before any application commit.
+  is now the exact authoritative board successor. Static regeneration and
+  geometry audits pass; proposal commit `f4ed1a4d` passed CI #559 and PCB
+  Native #286 with zero new errors and unconnected `429→427`. Human acceptance
+  is recorded; the fresh application commit-bound CI/PCB Native gate remains
+  open. Main-connector and cellular USB segments are still unrouted.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.
 - [ ] KiCad 9 DRC passes with zero blocker/critical violations and zero unrouted items.
 - [ ] Gerber/Excellon is generated only from that DRC-clean commit.

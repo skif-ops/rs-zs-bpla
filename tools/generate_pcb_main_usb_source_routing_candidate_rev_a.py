@@ -26,6 +26,7 @@ DEFAULT_BASE_OUTPUT = CANDIDATE_DIR / "PCB-MAIN_USB_SOURCE_BASE_REV_A.kicad_pcb"
 DEFAULT_OUTPUT = CANDIDATE_DIR / "PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pcb"
 
 BASE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
+CANDIDATE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
 TRACE_WIDTH_MM = 0.1537
 PAIR_GAP_MM = 0.2032
 
@@ -139,8 +140,19 @@ def candidate_bytes(base_payload: bytes) -> bytes:
 
 
 def generate(base_output: Path, output: Path, check: bool) -> dict[str, object]:
-    base_payload = SOURCE.read_bytes()
+    active_payload = SOURCE.read_bytes()
+    active_sha256 = sha256_bytes(active_payload)
+    if active_sha256 == BASE_SHA256:
+        base_payload = active_payload
+    else:
+        require(active_sha256 == CANDIDATE_SHA256,
+                "authoritative USB source-routing lineage drift")
+        base_payload = DEFAULT_BASE_OUTPUT.read_bytes()
+        require(sha256_bytes(base_payload) == BASE_SHA256,
+                "committed USB source-routing base SHA-256 drift")
     candidate_payload = candidate_bytes(base_payload)
+    require(sha256_bytes(candidate_payload) == CANDIDATE_SHA256,
+            "USB source candidate SHA-256 drift")
     require(candidate_payload != base_payload, "USB source candidate is unchanged")
     if check:
         require(base_output.read_bytes() == base_payload,

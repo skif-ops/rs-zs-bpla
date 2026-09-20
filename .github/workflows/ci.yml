@@ -130,9 +130,17 @@ jobs:
           python tools/generate_pcb_main_usb_placement_eco_001_candidate_rev_a.py --check
           python tools/audit_pcb_main_usb_placement_eco_001_candidate_rev_a.py \
             --output artifacts/pcb_main_usb_placement_eco_001_candidate_rev_a.json
-          python tools/generate_pcb_main_usb_placement_eco_001_application_rev_a.py --check
+          python tools/generate_pcb_main_usb_placement_eco_001_application_rev_a.py \
+            --check \
+            --output hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb
           python tools/audit_pcb_main_usb_placement_eco_001_application_rev_a.py \
             --output artifacts/pcb_main_usb_placement_eco_001_application_rev_a.json
+          python tools/generate_pcb_main_usb_source_routing_candidate_rev_a.py --check
+          python tools/audit_pcb_main_usb_source_routing_candidate_rev_a.py \
+            --output artifacts/pcb_main_usb_source_routing_001_candidate_rev_a.json
+          python tools/generate_pcb_main_usb_source_routing_001_application_rev_a.py --check
+          python tools/audit_pcb_main_usb_source_routing_001_application_rev_a.py \
+            --output artifacts/pcb_main_usb_source_routing_001_application_rev_a.json
           python tools/generate_pcb_main_rf_remediation_application_rev_a.py --check
           python tools/audit_pcb_main_rf_remediation_application_rev_a.py \
             --output artifacts/pcb_main_rf_remediation_application_rev_a.json
