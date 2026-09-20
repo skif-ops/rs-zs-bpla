@@ -726,14 +726,14 @@ jobs:
                       int(item.TopLayer()), int(item.BottomLayer()),
                       bool(item.GetIsFree()), bool(item.GetRemoveUnconnected()),
                       bool(item.GetKeepStartEnd()),
-                      int(item.GetFrontTentingMode()),
-                      int(item.GetBackTentingMode()),
+                      optional_int(item.GetFrontTentingMode()),
+                      optional_int(item.GetBackTentingMode()),
                   )
               endpoints = tuple(sorted((point(item.GetStart()), point(item.GetEnd()))))
               return (
                   "segment", *common, endpoints, int(item.GetLayer()),
                   bool(item.HasSolderMask()),
-                  int(item.GetLocalSolderMaskMargin()),
+                  optional_int(item.GetLocalSolderMaskMargin()),
               )
 
 
