@@ -86,7 +86,8 @@ def placement_candidate_audit(name: str) -> str | None:
         "PCB-MAIN": (
             PCB_MAIN_STATUS,
             "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_"
-            "RF_P0_SUBGATE_APPLIED_REMAINING_ROUTING_PENDING",
+            "RF_REMEDIATIONS_APPLIED_COMBINED_GATE_PENDING_"
+            "REMAINING_ROUTING_PENDING",
             "tools/audit_pcb_main_layout_candidate_rev_a.py",
         ),
     }
@@ -792,8 +793,9 @@ def main() -> int:
                         report["boards"][name]["routing_constraint_state"] = \
                             routing_report["state"]
                         report["boards"][name]["pcb_state"] = (
-                            "PLACEMENT_AND_ACCEPTED_OCTOSPI_R8_ECO_002_SUBGATE_PASS_"
-                            "REMAINING_ROUTING_DRC_AND_FAB_EXPORT_PROHIBITED"
+                            "PLACEMENT_AND_ACCEPTED_RF_REMEDIATIONS_APPLIED_"
+                            "COMBINED_GATE_AND_REMAINING_ROUTING_PENDING_"
+                            "FAB_EXPORT_PROHIBITED"
                         )
                     elif name == "PCB-PWR":
                         clearance_output = ART / name / "placement_clearance_audit.json"
