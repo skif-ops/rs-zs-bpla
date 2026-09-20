@@ -33,8 +33,8 @@ CAPTURE_STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 PLACEMENT_AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 
 BASE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-CANDIDATE_SHA256 = "40c67cf8f32a46fb7de16c0267079c546002349ce3ffb6a8096782af025fd5ea"
-GENERATOR_SHA256 = "9362439d733b46732aebc1b8833faddfe91edd7469b979d2d397bb9fee17d8b4"
+CANDIDATE_SHA256 = "d4c0eaa95bb62c7b9ae15b110fb3a76e6a056f462f0a36a734b3fa63730d2aee"
+GENERATOR_SHA256 = "da949bfd6acd35876af7cd97837801354c101d351438cc620153cf50884716f0"
 RF_WIDTH_MM = 0.1509
 GND_ZONE_NAME = "PCB_MAIN_GND_DIGITAL_In1_Cu"
 SAMPLE_PITCH_MM = 0.1
@@ -44,7 +44,7 @@ GNSS_RF_NETS = {
     "GNSS_RF_FILTERED",
 }
 EXPECTED_POSES = {
-    "FL1": ((60.5, 68.0, 0.0), (56.8, 51.8, 270.0)),
+    "FL1": ((60.5, 68.0, 0.0), (56.8, 51.6, 270.0)),
     "C64": ((58.75, 68.0, 0.0), (58.3, 51.6, 180.0)),
 }
 EXPECTED_BASE_ROUTES = {
@@ -54,11 +54,11 @@ EXPECTED_BASE_ROUTES = {
 }
 EXPECTED_CANDIDATE_ROUTES = {
     "GNSS_RF_ANT_BIASED": (22, 34.11475179074332),
-    "GNSS_RF_DC_BLOCK": (2, 1.3041170740980155),
-    "GNSS_RF_FILTERED": (2, 1.1506939094330015),
+    "GNSS_RF_DC_BLOCK": (2, 1.3869101147436909),
+    "GNSS_RF_FILTERED": (2, 1.3269968101992187),
 }
-FILTERED_PAD_DISTANCE_MM = 1.1036870027322085
-FILTERED_STRETCH_RATIO = 1.042590794839865
+FILTERED_PAD_DISTANCE_MM = 1.299278646018627
+FILTERED_STRETCH_RATIO = 1.02133350245194
 REMOVED_TRACE_TSTAMPS = {
     "1dfbdae1-2515-4a74-ac93-32252bfff0bc",
     "0de81ed9-e21d-4a77-8665-1c6f9f233bb5",
@@ -162,13 +162,13 @@ EXPECTED_ADDED_TRACE_SIGNATURES = Counter({
     ("segment", "GNSS_RF_ANT_BIASED", (63.2, 67.0), (63.2, 54.7), RF_WIDTH_MM, "F.Cu"): 1,
     ("segment", "GNSS_RF_ANT_BIASED", (63.2, 54.7), (59.5, 51.0), RF_WIDTH_MM, "F.Cu"): 1,
     ("segment", "GNSS_RF_ANT_BIASED", (59.5, 51.0), (58.625, 51.6), RF_WIDTH_MM, "F.Cu"): 1,
-    ("segment", "GNSS_RF_DC_BLOCK", (57.975, 51.6), (57.45, 51.25), RF_WIDTH_MM, "F.Cu"): 1,
-    ("segment", "GNSS_RF_DC_BLOCK", (57.45, 51.25), (56.8, 51.425), RF_WIDTH_MM, "F.Cu"): 1,
+    ("segment", "GNSS_RF_DC_BLOCK", (57.975, 51.6), (57.45, 51.1), RF_WIDTH_MM, "F.Cu"): 1,
+    ("segment", "GNSS_RF_DC_BLOCK", (57.45, 51.1), (56.8, 51.225), RF_WIDTH_MM, "F.Cu"): 1,
     ("segment", "GNSS_RF_FILTERED", (56.8, 53.25), (56.8, 52.55), RF_WIDTH_MM, "F.Cu"): 1,
-    ("segment", "GNSS_RF_FILTERED", (56.8, 52.55), (56.55, 52.175), RF_WIDTH_MM, "F.Cu"): 1,
-    ("segment", "GND_DIGITAL", (56.55, 51.8), (55.725, 51.85), 0.15, "F.Cu"): 1,
-    ("segment", "GND_DIGITAL", (57.05, 52.175), (57.05, 51.8), 0.15, "F.Cu"): 1,
-    ("segment", "GND_DIGITAL", (57.05, 51.8), (57.45, 51.95), 0.15, "F.Cu"): 1,
+    ("segment", "GNSS_RF_FILTERED", (56.8, 52.55), (56.55, 51.975), RF_WIDTH_MM, "F.Cu"): 1,
+    ("segment", "GND_DIGITAL", (56.55, 51.6), (55.725, 51.85), 0.15, "F.Cu"): 1,
+    ("segment", "GND_DIGITAL", (57.05, 51.975), (57.05, 51.6), 0.15, "F.Cu"): 1,
+    ("segment", "GND_DIGITAL", (57.05, 51.6), (57.45, 51.95), 0.15, "F.Cu"): 1,
     ("segment", "GND_DIGITAL", (57.45, 51.95), (57.75, 52.55), 0.15, "F.Cu"): 1,
     ("via", "GND_DIGITAL", (57.75, 52.55), 0.5, 0.3, ("F.Cu", "B.Cu")): 1,
 })
@@ -537,7 +537,10 @@ def main() -> int:
         output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n",
                           encoding="utf-8")
     print("PCB-MAIN GNSS RF ECO-001 audit: PASS_STATIC_PROPOSAL_CONTROLLED")
-    print("changed_footprints=['C64', 'FL1'] filtered_route=1.150694_mm")
+    print(
+        "changed_footprints=['C64', 'FL1'] "
+        f"filtered_route={report['filtered_route_length_mm']:.6f}_mm"
+    )
     print("release_boundary=HUMAN_REVIEW_RF_SI_REVIEW_B_AND_MANUFACTURING_OPEN")
     return 0
 

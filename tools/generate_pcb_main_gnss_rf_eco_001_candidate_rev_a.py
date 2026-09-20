@@ -23,13 +23,13 @@ CANDIDATE_DIR = (
 DEFAULT_BASE_OUTPUT = CANDIDATE_DIR / "PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb"
 DEFAULT_OUTPUT = CANDIDATE_DIR / "PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb"
 BASE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-CANDIDATE_SHA256 = "40c67cf8f32a46fb7de16c0267079c546002349ce3ffb6a8096782af025fd5ea"
+CANDIDATE_SHA256 = "d4c0eaa95bb62c7b9ae15b110fb3a76e6a056f462f0a36a734b3fa63730d2aee"
 RF_WIDTH_MM = 0.1509
 GROUND_WIDTH_MM = 0.15
 UUID_NAMESPACE = uuid.UUID("6b7d32f9-8e31-4a45-9f83-ecae7e20cc2f")
 
 PLACEMENT_REPLACEMENTS = {
-    "FL1": ("    (at 60.5 68)", "    (at 56.8 51.8 270)"),
+    "FL1": ("    (at 60.5 68)", "    (at 56.8 51.6 270)"),
     "C64": ("    (at 58.75 68)", "    (at 58.3 51.6 180)"),
 }
 
@@ -65,17 +65,17 @@ ADDED_SEGMENTS = (
     (57, "GNSS_RF_ANT_BIASED", (63.2, 54.7), (59.5, 51.0), RF_WIDTH_MM),
     (57, "GNSS_RF_ANT_BIASED", (59.5, 51.0), (58.625, 51.6), RF_WIDTH_MM),
     # Relocated C64.2 to FL1.C.
-    (58, "GNSS_RF_DC_BLOCK", (57.975, 51.6), (57.45, 51.25), RF_WIDTH_MM),
-    (58, "GNSS_RF_DC_BLOCK", (57.45, 51.25), (56.8, 51.425), RF_WIDTH_MM),
+    (58, "GNSS_RF_DC_BLOCK", (57.975, 51.6), (57.45, 51.1), RF_WIDTH_MM),
+    (58, "GNSS_RF_DC_BLOCK", (57.45, 51.1), (56.8, 51.225), RF_WIDTH_MM),
     # Short post-filter route from U9.11 RF_IN to FL1.A.
     (59, "GNSS_RF_FILTERED", (56.8, 53.25), (56.8, 52.55), RF_WIDTH_MM),
-    (59, "GNSS_RF_FILTERED", (56.8, 52.55), (56.55, 52.175), RF_WIDTH_MM),
+    (59, "GNSS_RF_FILTERED", (56.8, 52.55), (56.55, 51.975), RF_WIDTH_MM),
     # FL1 B/D/E ground fanout; B reuses the adjacent U9.12 ground via. E
     # returns through D, whose two-segment escape stays between the DC-block
     # route and U9.11 before reaching the new via beside U9.10.
-    (45, "GND_DIGITAL", (56.55, 51.8), (55.725, 51.85), GROUND_WIDTH_MM),
-    (45, "GND_DIGITAL", (57.05, 52.175), (57.05, 51.8), GROUND_WIDTH_MM),
-    (45, "GND_DIGITAL", (57.05, 51.8), (57.45, 51.95), GROUND_WIDTH_MM),
+    (45, "GND_DIGITAL", (56.55, 51.6), (55.725, 51.85), GROUND_WIDTH_MM),
+    (45, "GND_DIGITAL", (57.05, 51.975), (57.05, 51.6), GROUND_WIDTH_MM),
+    (45, "GND_DIGITAL", (57.05, 51.6), (57.45, 51.95), GROUND_WIDTH_MM),
     (45, "GND_DIGITAL", (57.45, 51.95), (57.75, 52.55), GROUND_WIDTH_MM),
 )
 ADDED_VIAS = (

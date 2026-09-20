@@ -63,7 +63,7 @@ manufacturing release.
   span and wraps around U9 because RF_IN faces away from FL1; a dedicated
   placement/routing ECO remains required. Proposal `PCB-MAIN-GNSS-RF-ECO-001`
   keeps U9/J9 fixed, moves only FL1/C64, passes strict static clearance and
-  reduces the post-SAW route to 1.150694 mm, but its KiCad 9 comparative gate
+  reduces the post-SAW route to 1.326997 mm, but its KiCad 9 comparative gate
   and independent acceptance are still pending.
 - Stackup/impedance request: controlled packet and blank 22-row response
   register are ready, with 0/2 accepted fabricator responses. No final job

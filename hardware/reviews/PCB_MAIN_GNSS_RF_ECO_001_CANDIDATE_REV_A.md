@@ -11,7 +11,7 @@ copper and obsolete FL1 ground fanout.
 
 | Ref | From `(x, y, rot)` mm/deg | To `(x, y, rot)` mm/deg |
 |---|---:|---:|
-| `FL1` | `(60.50, 68.00, 0)` | `(56.80, 51.80, 270)` |
+| `FL1` | `(60.50, 68.00, 0)` | `(56.80, 51.60, 270)` |
 | `C64` | `(58.75, 68.00, 0)` | `(58.30, 51.60, 180)` |
 
 The strict 2D audit remains `PASS`: all 227 fitted assembly footprints retain
@@ -23,13 +23,13 @@ No other footprint moves.
 | Net | Base segments / length | Candidate segments / length |
 |---|---:|---:|
 | `GNSS_RF_ANT_BIASED` | 17 / 10.205267 mm | 22 / 34.114752 mm |
-| `GNSS_RF_DC_BLOCK` | 1 / 1.000000 mm | 2 / 1.304117 mm |
-| `GNSS_RF_FILTERED` | 6 / 25.325357 mm | 2 / 1.150694 mm |
-| Total | 24 / 36.530624 mm | 26 / 36.569563 mm |
+| `GNSS_RF_DC_BLOCK` | 1 / 1.000000 mm | 2 / 1.386910 mm |
+| `GNSS_RF_FILTERED` | 6 / 25.325357 mm | 2 / 1.326997 mm |
+| Total | 24 / 36.530624 mm | 26 / 36.828659 mm |
 
 The overall connector-to-receiver copper length is effectively unchanged, but
 the SAW is now adjacent to U9 RF_IN. The post-SAW route is reduced by
-24.174663 mm, has a 1.103687 mm pad span and 1.042591 stretch ratio, and exits
+23.998360 mm, has a 1.299279 mm pad span and 1.021334 stretch ratio, and exits
 the U9 edge without signal copper under its body. The long portion is moved to
 the antenna side of the SAW. All three RF nets remain on `F.Cu` at the bounded
 `0.1509 mm` L1-over-L2 engineering width with zero signal vias.
@@ -42,8 +42,8 @@ untouched.
 ## Identity and required gate
 
 - Base SHA-256: `9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040`
-- Candidate SHA-256: `40c67cf8f32a46fb7de16c0267079c546002349ce3ffb6a8096782af025fd5ea`
-- Generator SHA-256: `9362439d733b46732aebc1b8833faddfe91edd7469b979d2d397bb9fee17d8b4`
+- Candidate SHA-256: `d4c0eaa95bb62c7b9ae15b110fb3a76e6a056f462f0a36a734b3fa63730d2aee`
+- Generator SHA-256: `da949bfd6acd35876af7cd97837801354c101d351438cc620153cf50884716f0`
 - Generator: `tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py`
 - Independent audit: `tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py`
 

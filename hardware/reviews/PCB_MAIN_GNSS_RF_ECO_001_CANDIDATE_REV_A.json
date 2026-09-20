@@ -14,9 +14,9 @@
   },
   "candidate": {
     "board": "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb",
-    "board_sha256": "40c67cf8f32a46fb7de16c0267079c546002349ce3ffb6a8096782af025fd5ea",
+    "board_sha256": "d4c0eaa95bb62c7b9ae15b110fb3a76e6a056f462f0a36a734b3fa63730d2aee",
     "generator": "tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py",
-    "generator_sha256": "9362439d733b46732aebc1b8833faddfe91edd7469b979d2d397bb9fee17d8b4",
+    "generator_sha256": "da949bfd6acd35876af7cd97837801354c101d351438cc620153cf50884716f0",
     "trace_items": 975,
     "footprints": 251,
     "accepted_base_bytes_modified": false
@@ -25,7 +25,7 @@
     {
       "refdes": "FL1",
       "from": {"x_mm": 60.5, "y_mm": 68.0, "rotation_deg": 0.0},
-      "to": {"x_mm": 56.8, "y_mm": 51.8, "rotation_deg": 270.0}
+      "to": {"x_mm": 56.8, "y_mm": 51.6, "rotation_deg": 270.0}
     },
     {
       "refdes": "C64",
@@ -46,17 +46,17 @@
     },
     "candidate": {
       "GNSS_RF_ANT_BIASED": {"segments": 22, "length_mm": 34.114751790743},
-      "GNSS_RF_DC_BLOCK": {"segments": 2, "length_mm": 1.304117074098},
-      "GNSS_RF_FILTERED": {"segments": 2, "length_mm": 1.150693909433},
-      "total_length_mm": 36.569562774274,
+      "GNSS_RF_DC_BLOCK": {"segments": 2, "length_mm": 1.386910114744},
+      "GNSS_RF_FILTERED": {"segments": 2, "length_mm": 1.326996810199},
+      "total_length_mm": 36.828658715686,
       "signal_layer": "F.Cu",
       "reference_layer": "In1.Cu",
       "trace_width_mm": 0.1509,
       "signal_vias": 0
     },
-    "filtered_pad_to_pad_distance_mm": 1.103687002732,
-    "filtered_stretch_ratio": 1.04259079484,
-    "filtered_length_reduction_mm": 24.174663224314
+    "filtered_pad_to_pad_distance_mm": 1.299278646019,
+    "filtered_stretch_ratio": 1.021333502452,
+    "filtered_length_reduction_mm": 23.998360323548
   },
   "ground_fanout_delta": {
     "removed_obsolete_fl1_segments": 5,

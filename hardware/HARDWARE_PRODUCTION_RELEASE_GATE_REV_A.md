@@ -83,7 +83,7 @@ comparative KiCad 9 refill/DRC with 226 -> 226 violations, 429 -> 429
 unconnected items and 623/623 covered cellular RF centreline samples. The
 candidate is not applied and still requires independent acceptance.
 `PCB-MAIN-GNSS-RF-ECO-001` separately keeps U9/J9 fixed and proposes moving
-only FL1/C64 so the post-SAW route is 1.150694 mm instead of 25.325357 mm. Its
+only FL1/C64 so the post-SAW route is 1.326997 mm instead of 25.325357 mm. Its
 strict 2D clearance passes, but comparative KiCad 9 DRC and independent
 acceptance remain open. Neither the accepted RF P0 subgate nor either proposal
 closes RF/SI review or authorizes manufacture.
