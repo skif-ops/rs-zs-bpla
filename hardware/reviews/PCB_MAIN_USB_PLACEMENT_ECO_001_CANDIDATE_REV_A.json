@@ -1,0 +1,20 @@
+{
+  "schema": "pcb-main-usb-placement-eco-001-candidate.rev-a",
+  "status": "PROPOSAL_PENDING_KICAD9_AND_HUMAN_REVIEW",
+  "base_board_sha256": "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9",
+  "candidate_board_sha256": "e92d3a65a9b716d4940d5ebf91fc516240afb62974a666e040594cc78a8dc424",
+  "fixed_anchors": ["U1", "J11", "U25"],
+  "moved_footprints": {
+    "R91": {"from": [49.0, 18.25, 180.0], "to": [61.75, 25.75, 0.0]},
+    "R92": {"from": [55.0, 18.25, 180.0], "to": [61.75, 26.75, 0.0]},
+    "C12": {"from": [61.75, 25.25, 0.0], "to": [63.5, 24.0, 0.0]},
+    "R3": {"from": [61.75, 27.25, 0.0], "to": [63.5, 25.25, 0.0]}
+  },
+  "source_side_direct_length_mm": 1.693553955,
+  "source_side_length_mismatch_mm": 0.0,
+  "copper_changed": false,
+  "authoritative_board_modified": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}
+

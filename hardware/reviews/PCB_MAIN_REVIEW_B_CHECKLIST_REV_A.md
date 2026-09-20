@@ -147,6 +147,9 @@ manufacturing release.
   `PCB_MAIN_USB_ROUTEABILITY_REVIEW_REV_A.md` records that R91/R92 are 6.00 mm
   apart while U1 D-/D+ pads are on 0.50 mm pitch; routing is prohibited until
   the bounded local U1 cluster passes clearance and pair-geometry review.
+  Candidate `PCB-MAIN-USB-PLACEMENT-ECO-001` moves only R91/R92/C12/R3 and
+  passes static regeneration plus strict clearance; KiCad 9 and human review
+  remain pending, and the authoritative board is unchanged.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.
 - [ ] KiCad 9 DRC passes with zero blocker/critical violations and zero unrouted items.
 - [ ] Gerber/Excellon is generated only from that DRC-clean commit.
