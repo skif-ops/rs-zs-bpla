@@ -50,10 +50,10 @@ routing subgates, or successful software tests.
 PCB-MAIN has passed its bounded 2D placement-clearance subgate: the controlled
 225-reference repack gives all 227 fitted assembly footprints an explicit
 courtyard and the strict audit reports zero component, mounting-exclusion and
-U.FL tool-zone conflicts. The authoritative board is now partially routed: 711
-segments plus 283 vias, with four copper zones and four rule areas, reflect
+U.FL tool-zone conflicts. The authoritative board is now partially routed: 738
+segments plus 285 vias, with four copper zones and four rule areas, reflect
 accepted bounded ground-domain, hard-signal, OctoSPI, seven-net RF P0, USB
-MCU-source and cellular-modem subgates. This is engineering progress only; remaining routing, final DRC,
+MCU-source, cellular-modem and cellular-fixture subgates. This is engineering progress only; remaining routing, final DRC,
 3D/service evidence, CAM, DFM and independent Review B remain required.
 
 PCB-MAIN also has an accepted human-readable hierarchy-only subgate. Source
@@ -92,6 +92,11 @@ Its exact cellular-modem USB successor is authoritative SHA-256
 `4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5`;
 application commit `4c9a2a85` passed CI `#566` and PCB Native `#293` with
 violations `232→232`, zero new errors and unconnected `427→425`.
+Its exact cellular-fixture USB successor is authoritative SHA-256
+`2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273`.
+Proposal commit `11af5c9d` passed CI `#568` and PCB Native `#295` with
+violations `232→232`, zero new errors and unconnected `425→421`; the exact
+candidate is applied and its fresh commit-bound application gate is pending.
 Commit-bound source commit `7ee9cfc9` passed CI `#550` and PCB Native Gate
 `#277`: comparative DRC added no errors or unconnected regression, and both
 filled-reference audits cover every cellular and GNSS sample. The bounded

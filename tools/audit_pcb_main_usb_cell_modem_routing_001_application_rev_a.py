@@ -19,10 +19,12 @@ BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPROVAL_REV_A.json"
 MAPPING = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_REVIEW_COMMIT_MAPPING.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPLICATION_REV_A.json"
+FIXTURE_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_FIXTURE_ROUTING_001_APPLICATION_REV_A.json"
 STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 
 BASE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
 CANDIDATE_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
+FIXTURE_SUCCESSOR_SHA256 = "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273"
 APPROVAL_SHA256 = "771c1f8d4b0fad0a78785ac280b3c02c5d9764a706384a902fddb153e94e8301"
 MAPPING_SHA256 = "b117715ef83872d5443d6067112b38ce8037993d02d7a52197d7f6af3e0b00fe"
 APPROVAL_COMMIT = "4c9a2a8561fd5cf25ba4d2cb334a158b8a33cb88"
@@ -80,8 +82,30 @@ def audit_drc(base_path: Path, active_path: Path) -> dict[str, object]:
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[str, object]:
     require(sha256(BASE) == BASE_SHA256, "cellular USB modem base drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "cellular USB modem candidate drift")
-    require(sha256(BOARD) == CANDIDATE_SHA256 and BOARD.read_bytes() == CANDIDATE.read_bytes(),
-            "authoritative PCB-MAIN is not exact accepted cellular USB modem candidate")
+    active_sha256 = sha256(BOARD)
+    require(active_sha256 in {CANDIDATE_SHA256, FIXTURE_SUCCESSOR_SHA256},
+            "authoritative PCB-MAIN is outside accepted cellular USB modem lineage")
+    if active_sha256 == CANDIDATE_SHA256:
+        require(BOARD.read_bytes() == CANDIDATE.read_bytes(),
+                "authoritative PCB-MAIN is not exact accepted cellular USB modem candidate")
+    else:
+        fixture_application = json.loads(
+            FIXTURE_APPLICATION.read_text(encoding="utf-8")
+        )
+        require(
+            fixture_application.get("decision") ==
+            "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE"
+            and fixture_application.get("predecessor", {}).get("board_sha256") ==
+            CANDIDATE_SHA256
+            and fixture_application.get("applied", {}).get("board_sha256") ==
+            FIXTURE_SUCCESSOR_SHA256
+            and fixture_application.get("applied", {}).get(
+                "exact_candidate_byte_identity"
+            ) is True
+            and fixture_application.get("review_b_complete") is False
+            and fixture_application.get("manufacturing_release") is False,
+            "cellular USB fixture successor boundary drift",
+        )
     require(sha256(APPROVAL) == APPROVAL_SHA256, "cellular USB modem approval drift")
     require(sha256(MAPPING) == MAPPING_SHA256, "cellular USB modem mapping drift")
 
@@ -129,22 +153,28 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
     )
 
     base = Board.from_file(str(BASE), encoding="utf-8")
+    accepted = Board.from_file(str(CANDIDATE), encoding="utf-8")
     active = Board.from_file(str(BOARD), encoding="utf-8")
     base_items = {item.tstamp: item for item in base.traceItems}
-    active_items = {item.tstamp: item for item in active.traceItems}
-    require(set(base_items) <= set(active_items)
-            and all(base_items[key] == active_items[key] for key in base_items),
+    accepted_items = {item.tstamp: item for item in accepted.traceItems}
+    require(set(base_items) <= set(accepted_items)
+            and all(base_items[key] == accepted_items[key] for key in base_items),
             "cellular USB modem application changes accepted predecessor copper")
-    net_names = {item.number: item.name for item in active.nets}
-    additions = [item for key, item in active_items.items() if key not in base_items]
+    net_names = {item.number: item.name for item in accepted.nets}
+    additions = [item for key, item in accepted_items.items() if key not in base_items]
     require(len(additions) == 6
             and all(type(item).__name__ == "Segment" for item in additions)
             and {net_names[item.net] for item in additions} == AUTHORIZED_NETS,
             "cellular USB modem application added-copper inventory drift")
     segments = [item for item in active.traceItems if type(item).__name__ == "Segment"]
     vias = [item for item in active.traceItems if type(item).__name__ == "Via"]
-    require(len(active.traceItems) == 994 and len(segments) == 711
-            and len(vias) == 283 and len(active.zones) == 8,
+    require(len(active.traceItems) == (
+                1023 if active_sha256 == FIXTURE_SUCCESSOR_SHA256 else 994
+            ) and len(segments) == (
+                738 if active_sha256 == FIXTURE_SUCCESSOR_SHA256 else 711
+            ) and len(vias) == (
+                285 if active_sha256 == FIXTURE_SUCCESSOR_SHA256 else 283
+            ) and len(active.zones) == 8,
             "cellular USB modem authoritative copper inventory drift")
 
     status = json.loads(STATUS.read_text(encoding="utf-8"))
@@ -157,8 +187,10 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and control.get("active_board_sha256") == CANDIDATE_SHA256
         and control.get("exact_candidate_byte_identity") is True
         and control.get("trace_items") == 994
-        and route_control.get("board_sha256") == CANDIDATE_SHA256
-        and route_control.get("trace_items") == 994
+        and route_control.get("board_sha256") == active_sha256
+        and route_control.get("trace_items") == (
+            1023 if active_sha256 == FIXTURE_SUCCESSOR_SHA256 else 994
+        )
         and route_control.get("usb_cell_modem_routing_subgate") ==
         "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS"
         and status.get("review_b", {}).get("complete") is False
@@ -170,11 +202,11 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         "schema": "dioneya.pcb-main-usb-cell-modem-routing-001-application-audit.v1",
         "status": "PASS_EXACT_ACCEPTED_USB_CELL_MODEM_ROUTING_APPLICATION",
         "predecessor_sha256": BASE_SHA256,
-        "active_board_sha256": CANDIDATE_SHA256,
+        "active_board_sha256": active_sha256,
         "routed_nets": sorted(AUTHORIZED_NETS),
         "added_segments": 6,
         "added_signal_vias": 0,
-        "trace_items": 994,
+        "trace_items": len(active.traceItems),
         "machine_gate": gate.get("status"),
         "application_commit_sha": APPLICATION_COMMIT,
         "ci_run_id": CI_RUN_ID,
@@ -202,7 +234,8 @@ def main() -> int:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print("PCB-MAIN cellular USB modem application audit:", report["status"])
-    print("active_board_sha256=" + CANDIDATE_SHA256 + " trace_items=994")
+    print("active_board_sha256=" + report["active_board_sha256"]
+          + f" trace_items={report['trace_items']}")
     return 0
 
 

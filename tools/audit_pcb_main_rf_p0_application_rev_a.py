@@ -39,7 +39,7 @@ STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 
 BASE_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 CANDIDATE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-ACTIVE_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
+ACTIVE_SHA256 = "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273"
 USB_AUTHORIZED_MODIFIED_TSTAMPS = {
     "bbd350c1-609d-43b7-9dd0-824ee009466f",
     "fb9ade5d-8496-4617-9d20-390d44c347c4",
@@ -283,11 +283,11 @@ def audit() -> dict[str, Any]:
         for item in all_segments
     )
     require(
-        len(active.traceItems) == 994
-        and len(all_segments) == 711
-        and len(all_vias) == 283
+        len(active.traceItems) == 1023
+        and len(all_segments) == 738
+        and len(all_vias) == 285
         and len(active.zones) == 8
-        and math.isclose(total_length, 904.850815290587, abs_tol=1e-9),
+        and math.isclose(total_length, 1059.4540078755238, abs_tol=1e-9),
         "authoritative RF board aggregate inventory drift",
     )
 
@@ -300,8 +300,8 @@ def audit() -> dict[str, Any]:
         review_b.get("complete") is False
         and review_b.get("status") ==
         "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
-        "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_"
-        "REMAINING_ROUTING_PENDING"
+        "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_"
+        "APPLIED_MAIN_CONNECTOR_ROUTING_PENDING"
         and evidence.get("rf_p0_routing_application") == str(APPLICATION.relative_to(ROOT))
         and evidence.get("rf_p0_routing_status") ==
         "APPROVED_APPLIED_EXACT_SEVEN_NET_RF_ROUTING_SUBGATE_"
@@ -309,9 +309,9 @@ def audit() -> dict[str, Any]:
         and placement.get("board_sha256") == ACTIVE_SHA256
         and control.get("state") ==
         "PASS_CONSTRAINT_COVERAGE_ACCEPTED_RF_REMEDIATIONS_USB_MCU_SOURCE_"
-        "AND_CELL_MODEM_APPLIED"
+        "CELL_MODEM_AND_CELL_FIXTURE_APPLIED"
         and control.get("board_sha256") == ACTIVE_SHA256
-        and control.get("trace_items") == 994
+        and control.get("trace_items") == 1023
         and control.get("rf_p0_subgate") == "APPLIED_EXACT_ACCEPTED_CANDIDATE"
         and control.get("routing_complete") is False
         and control.get("manufacturing_release") is False
@@ -346,7 +346,7 @@ def main() -> int:
             encoding="utf-8",
         )
     print("PCB-MAIN RF P0 routing application audit: PASS")
-    print("trace_items=994 routed_nets=7 accepted_p0_segments=138 remediation_successor=true")
+    print("trace_items=1023 routed_nets=7 accepted_p0_segments=138 remediation_successor=true")
     print("release_boundary=ROUTING_AND_RF_SI_RETURN_PATH_REVIEW_B_OPEN")
     return 0
 

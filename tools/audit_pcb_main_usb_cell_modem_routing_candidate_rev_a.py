@@ -27,9 +27,11 @@ ACTIVE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 REVIEW = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_CANDIDATE_REV_A.json"
 APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPROVAL_REV_A.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPLICATION_REV_A.json"
+FIXTURE_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_FIXTURE_ROUTING_001_APPLICATION_REV_A.json"
 
 BASE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
 CANDIDATE_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
+FIXTURE_SUCCESSOR_SHA256 = "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273"
 TRACE_WIDTH_MM = 0.1537
 PAIR_GAP_MM = 0.2032
 PROPOSAL_COMMIT = "5c73ffe5b9eae3f623f7336c705f939a2a5af2fd"
@@ -214,8 +216,26 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     require(sha256(CANDIDATE) == CANDIDATE_SHA256,
             "cellular USB modem candidate SHA-256 drift")
     active_sha256 = sha256(ACTIVE)
-    require(active_sha256 in {BASE_SHA256, CANDIDATE_SHA256},
+    require(active_sha256 in {BASE_SHA256, CANDIDATE_SHA256, FIXTURE_SUCCESSOR_SHA256},
             "authoritative PCB-MAIN cellular USB modem lineage drift")
+    if active_sha256 == FIXTURE_SUCCESSOR_SHA256:
+        fixture_application = json.loads(
+            FIXTURE_APPLICATION.read_text(encoding="utf-8")
+        )
+        require(
+            fixture_application.get("decision") ==
+            "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE"
+            and fixture_application.get("predecessor", {}).get("board_sha256") ==
+            CANDIDATE_SHA256
+            and fixture_application.get("applied", {}).get("board_sha256") ==
+            FIXTURE_SUCCESSOR_SHA256
+            and fixture_application.get("applied", {}).get(
+                "exact_candidate_byte_identity"
+            ) is True
+            and fixture_application.get("review_b_complete") is False
+            and fixture_application.get("manufacturing_release") is False,
+            "cellular USB fixture successor boundary drift",
+        )
 
     base = Board.from_file(str(BASE), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")
@@ -356,7 +376,9 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         "pair_length_mismatch_mm": round(mismatch, 12),
         "minimum_pair_edge_gap_mm": round(edge_gap, 12),
         "reference_samples": reference_samples,
-        "authoritative_board_modified": active_sha256 == CANDIDATE_SHA256,
+        "authoritative_board_modified": active_sha256 in {
+            CANDIDATE_SHA256, FIXTURE_SUCCESSOR_SHA256,
+        },
         "human_acceptance": "ACCEPTED",
         "review_b_complete": False,
         "manufacturing_release": False,

@@ -73,7 +73,7 @@ BASE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
 CELLULAR_SHA256 = "22ddd8c56ceabf397ed033a44235b439625d3104fa2cf798bb57b782d24b1352"
 GNSS_SHA256 = "d4c0eaa95bb62c7b9ae15b110fb3a76e6a056f462f0a36a734b3fa63730d2aee"
 COMPOSED_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
-ACTIVE_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
+ACTIVE_SHA256 = "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273"
 USB_AUTHORIZED_MODIFIED_TSTAMPS = {
     "bbd350c1-609d-43b7-9dd0-824ee009466f",
     "fb9ade5d-8496-4617-9d20-390d44c347c4",
@@ -98,6 +98,35 @@ USB_AUTHORIZED_ADDED_TSTAMPS = {
     "b282150b-0266-55d1-8e65-3d4d8a3de3f5",
     "bd5752bc-fe7e-5fef-ae3a-1c27265cd5b9",
     "e57d54c6-ac22-5dd8-99ee-f165f3767946",
+    "2296052b-7f93-5c9b-ac53-2ac949e2fa0c",
+    "8a8ea30f-8fb3-5004-890d-ca31f8a67a89",
+    "a85561bd-d3b0-5d9c-9adf-b05ef20acd18",
+    "edef0d81-7bdb-5ae6-8307-80a8b9c24c37",
+    "21c39200-7f89-536e-94b5-99190adba4ac",
+    "2cd3bb07-fb9b-5be1-bff4-82d1630a77a2",
+    "7f4d78d4-8204-5f1f-99c5-783cd8e68320",
+    "df96a73e-0795-56e6-b472-351ddfec8b4e",
+    "746c3b47-1551-559e-9cc5-024bc96e2f94",
+    "f3e8e271-e78a-59b4-b1bf-f9c26d1af266",
+    "91a896cb-70b1-51c7-864a-f395698b5aff",
+    "4c1a8fe5-19f1-5718-89f3-b121433c6ee6",
+    "5567b334-1e7d-52cf-aed2-5ffaed68bd74",
+    "eb000234-c5a0-5564-b986-2769f94f8cc6",
+    "4533f29e-cab9-5a5c-9246-aa2c9e965bce",
+    "86480531-af5e-50e8-8c1d-dd772511790d",
+    "20b18dfc-ce79-5c84-b8cf-f277f66443b1",
+    "b7bc8630-a1c6-540a-8c9d-a7cb6ba4ac71",
+    "2d8cc9e0-f775-51d8-8b08-5ec2e4a8f040",
+    "d0279e21-a993-5585-814f-8b2c6123d5f4",
+    "e28e3428-a37a-5a9e-ae13-4d37ae58ff99",
+    "e322ae0e-7ca0-5dbb-abb1-af85ba1715aa",
+    "f3772e08-ffb3-578a-9bf0-c1c7d1f8ac57",
+    "70b908c4-00cd-52f3-92c3-dc799a3e13a3",
+    "6b635fb6-6ab4-55be-a683-b7d75ea9b722",
+    "3107fed7-7e4c-5fd8-88cc-4a114f0bc0b6",
+    "1cb79228-e580-5108-8245-f26d292fb9c4",
+    "8b3c1604-6393-5564-97d6-92d44e43c140",
+    "39fb615b-3f0d-550b-9fc2-487148ad4b9c",
 }
 GENERATOR_SHA256 = "9014e03d6dbd3fe6f153d1a5a557ac2832904e264f165b03ba0cdca38a7fe3fa"
 CELLULAR_APPROVAL_SHA256 = "000e323f116d9b4aa371142c9efe37d85241563ea8db41c2f9b23bfca6bee079"
@@ -403,11 +432,11 @@ def static_audit() -> dict[str, object]:
         for item in segments
     )
     require(
-        len(active.traceItems) == 994
-        and len(segments) == 711
-        and len(vias) == 283
+        len(active.traceItems) == 1023
+        and len(segments) == 738
+        and len(vias) == 285
         and len(active.zones) == 8
-        and math.isclose(length, 904.850815290587, abs_tol=1e-9),
+        and math.isclose(length, 1059.4540078755238, abs_tol=1e-9),
         "composed authoritative board inventory drift",
     )
 
@@ -484,7 +513,7 @@ def main() -> int:
                           encoding="utf-8")
     print("PCB-MAIN composed RF-remediation application audit: PASS")
     print(f"board_sha256={ACTIVE_SHA256} rf_predecessor_sha256={COMPOSED_SHA256} "
-          "trace_items=994 zones=8")
+          "trace_items=1023 zones=8")
     print("release_boundary=FINAL_SI_REMAINING_ROUTING_REVIEW_B_AND_MANUFACTURING_OPEN")
     return 0
 

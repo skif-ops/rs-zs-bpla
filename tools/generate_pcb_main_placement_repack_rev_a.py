@@ -112,6 +112,13 @@ USB_CELL_MODEM_CANDIDATE = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-CELL-MODEM-ROUTING-001/"
     "PCB-MAIN_USB_CELL_MODEM_CANDIDATE_REV_A.kicad_pcb"
 )
+USB_CELL_FIXTURE_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_FIXTURE_ROUTING_001_APPLICATION_REV_A.json"
+)
+USB_CELL_FIXTURE_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001/"
+    "PCB-MAIN_USB_CELL_FIXTURE_CANDIDATE_REV_A.kicad_pcb"
+)
 
 ACTIVE_APPROVED_POSES = {
     "FL1": (56.8, 51.6, 270.0),
@@ -889,6 +896,9 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
         usb_cell_modem = json.loads(
             USB_CELL_MODEM_APPLICATION.read_text(encoding="utf-8")
         )
+        usb_cell_fixture = json.loads(
+            USB_CELL_FIXTURE_APPLICATION.read_text(encoding="utf-8")
+        )
         require(
             usb.get("decision") ==
             "ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE"
@@ -923,6 +933,20 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
             and usb_cell_modem.get("review_b_complete") is False
             and usb_cell_modem.get("manufacturing_release") is False,
             "PCB-MAIN accepted cellular USB modem-routing successor drift",
+        )
+        require(
+            usb_cell_fixture.get("decision") ==
+            "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE"
+            and usb_cell_fixture.get("predecessor", {}).get("board_sha256") ==
+            sha256(USB_CELL_MODEM_CANDIDATE)
+            and usb_cell_fixture.get("applied", {}).get("board_sha256") ==
+            sha256(USB_CELL_FIXTURE_CANDIDATE)
+            and usb_cell_fixture.get("applied", {}).get(
+                "exact_candidate_byte_identity"
+            ) is True
+            and usb_cell_fixture.get("review_b_complete") is False
+            and usb_cell_fixture.get("manufacturing_release") is False,
+            "PCB-MAIN accepted cellular USB fixture-routing successor drift",
         )
     else:
         require(applied.get("placement_repack_sha256") == sha256(PLACEMENT),
@@ -977,9 +1001,9 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
                 rf.get("applied", {}).get("exact_candidate_byte_identity") is True and
                 sha256(RF_REMEDIATION_COMPOSED) ==
                 "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9" and
-                sha256(BOARD) == sha256(USB_CELL_MODEM_CANDIDATE) and
-                BOARD.read_bytes() == USB_CELL_MODEM_CANDIDATE.read_bytes() and
-                len(getattr(board, "traceItems", [])) == 994 and
+                sha256(BOARD) == sha256(USB_CELL_FIXTURE_CANDIDATE) and
+                BOARD.read_bytes() == USB_CELL_FIXTURE_CANDIDATE.read_bytes() and
+                len(getattr(board, "traceItems", [])) == 1023 and
                 len(getattr(board, "zones", [])) == 8 and
                 ground.get("routing_complete") is False and
                 ground.get("review_b_complete") is False and
@@ -1021,7 +1045,7 @@ def main() -> int:
         count, proposal_id = verify_approved_frozen_repack(original)
         print(f"PCB-MAIN placement repack: PASS / approved {proposal_id} hashes and board placement match")
         print(f"movable_placements={count} passive_courtyard_margin_mm={PASSIVE_COURTYARD_MARGIN_MM:.2f}")
-        print("status=USB_PLACEMENT_SUBGATE_APPLIED / REMAINING_ROUTING_AND_REVIEW_B_PENDING")
+        print("status=USB_CELL_FIXTURE_ROUTING_APPLIED / MAIN_CONNECTOR_AND_REVIEW_B_PENDING")
         return 0
     board = Board.from_sexpr(sexpr.parse_sexp(original))
     rows = build_plan(board)

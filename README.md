@@ -49,10 +49,11 @@ engineering-геометрию RF/USB; финальная production-геоме�
 22-строчный реестр ответов; принято `0/2` ответов, конструкция не выбрана.
 В authoritative PCB приняты ограниченные ground-domain, hard-signal, OctoSPI,
 семисетевой RF P0, оба RF-remediation subgate, точная placement-дельта
-`R91/R92`, MCU-side USB-пара и cellular-modem USB-пара. Текущий successor содержит 711 сегментов,
-283 via, 4 copper zones и
+`R91/R92`, MCU-side USB-пара, cellular-modem USB-пара и cellular-fixture
+USB-пара. Текущий successor содержит 738 сегментов,
+285 via, 4 copper zones и
 4 rule areas; SHA-256
-`4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5`.
+`2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273`.
 `PCB-MAIN-RF-RETURN-001` добавлен первым как точный кандидат с локальной
 `GND_MODEM` L2-зоной. Затем точная принятая дельта
 `PCB-MAIN-GNSS-RF-ECO-001` оставила U9/J9 на месте, переставила только FL1/C64
@@ -94,6 +95,15 @@ via не дают clearance-clean escape между чередующимися D
 шагом 0.5 mm. Точный cellular-modem кандидат принят и применён; application
 commit `4c9a2a85` прошёл CI `#566` и PCB Native `#293`: violations `232→232`,
 новых errors нет, unconnected `427→425`. Этот application gate закрыт.
+Следующий кандидат `PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001` соединяет
+`R39/R40.2` через U26 с `TP_CELL_USB.2/.3`: 27 сегментов, две
+`0.50/0.30 mm` signal-via, точно равные основные пути
+`76.293814073931 mm` и ESD-шунты `1.007782218537 mm`. Proposal commit
+`11af5c9d` прошёл CI `#568` и PCB Native `#295`: violations `232→232`,
+новых errors нет, unconnected `425→421`. Точный кандидат принят и применён;
+его application gate выполняется. Только main-connector USB-сегмент остаётся
+DFM-заблокирован до job-specific via/drill/annular/clearance evidence или
+отдельного локального ECO.
 Отдельно подготовлен ограниченный запрос для будущего
 выбранного сборщика по DFM/трафарету `U2/U25/U26/U9` и пустой 14-строчный реестр: принято
 `0/14` ответов, сборщик и процесс не выбраны, паста U9 и производственный выпуск

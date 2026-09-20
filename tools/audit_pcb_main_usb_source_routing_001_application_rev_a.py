@@ -26,12 +26,14 @@ APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPROVAL_REV
 MAPPING = ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_REVIEW_COMMIT_MAPPING.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPLICATION_REV_A.json"
 CELL_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_MODEM_ROUTING_001_APPLICATION_REV_A.json"
+FIXTURE_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_FIXTURE_ROUTING_001_APPLICATION_REV_A.json"
 GENERATOR = ROOT / "tools/generate_pcb_main_usb_source_routing_001_application_rev_a.py"
 STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 
 BASE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
 CANDIDATE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
 CELL_SUCCESSOR_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
+FIXTURE_SUCCESSOR_SHA256 = "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273"
 APPROVAL_SHA256 = "3e12b820b1fd488cd44d57131fd9fc0c6c8c75e7321c1c8855eef9c0ba86a284"
 MAPPING_SHA256 = "d98c0f0f5c74c3a6777f34d6f68b823cadbd57d89f4114926181f5b3c45b8eca"
 GENERATOR_SHA256 = "91e16d5fb317721485a24a324f49d835ac900f95e43bab1268ded10fd25ec02a"
@@ -96,7 +98,9 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
     require(sha256(CANDIDATE) == CANDIDATE_SHA256,
             "USB source candidate SHA-256 drift")
     active_sha256 = sha256(BOARD)
-    require(active_sha256 in {CANDIDATE_SHA256, CELL_SUCCESSOR_SHA256},
+    require(active_sha256 in {
+        CANDIDATE_SHA256, CELL_SUCCESSOR_SHA256, FIXTURE_SUCCESSOR_SHA256,
+    },
             "authoritative PCB-MAIN USB source-routing lineage drift")
     if active_sha256 == CANDIDATE_SHA256:
         require(BOARD.read_bytes() == CANDIDATE.read_bytes(),
@@ -117,6 +121,25 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
             and cell_application.get("manufacturing_release") is False,
             "accepted cellular USB modem successor boundary drift",
         )
+        if active_sha256 == FIXTURE_SUCCESSOR_SHA256:
+            fixture_application = json.loads(
+                FIXTURE_APPLICATION.read_text(encoding="utf-8")
+            )
+            require(
+                fixture_application.get("decision") ==
+                "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE"
+                and fixture_application.get("predecessor", {}).get(
+                    "board_sha256"
+                ) == CELL_SUCCESSOR_SHA256
+                and fixture_application.get("applied", {}).get("board_sha256") ==
+                FIXTURE_SUCCESSOR_SHA256
+                and fixture_application.get("applied", {}).get(
+                    "exact_candidate_byte_identity"
+                ) is True
+                and fixture_application.get("review_b_complete") is False
+                and fixture_application.get("manufacturing_release") is False,
+                "accepted cellular USB fixture successor boundary drift",
+            )
     require(sha256(APPROVAL) == APPROVAL_SHA256,
             "USB source approval SHA-256 drift")
     require(sha256(MAPPING) == MAPPING_SHA256,
@@ -209,9 +232,17 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
     board = Board.from_file(str(BOARD), encoding="utf-8")
     segments = [item for item in board.traceItems if type(item).__name__ == "Segment"]
     vias = [item for item in board.traceItems if type(item).__name__ == "Via"]
-    require(len(board.traceItems) == (994 if active_sha256 == CELL_SUCCESSOR_SHA256 else 988)
-            and len(segments) == (711 if active_sha256 == CELL_SUCCESSOR_SHA256 else 705) and
-            len(vias) == 283 and len(board.zones) == 8,
+    require(len(board.traceItems) == (
+                1023 if active_sha256 == FIXTURE_SUCCESSOR_SHA256
+                else 994 if active_sha256 == CELL_SUCCESSOR_SHA256 else 988
+            )
+            and len(segments) == (
+                738 if active_sha256 == FIXTURE_SUCCESSOR_SHA256
+                else 711 if active_sha256 == CELL_SUCCESSOR_SHA256 else 705
+            )
+            and len(vias) == (
+                285 if active_sha256 == FIXTURE_SUCCESSOR_SHA256 else 283
+            ) and len(board.zones) == 8,
             "USB source authoritative copper inventory drift")
 
     status = json.loads(STATUS.read_text(encoding="utf-8"))
@@ -228,7 +259,8 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and control.get("manufacturing_release") is False
         and route_control.get("board_sha256") == active_sha256
         and route_control.get("trace_items") == (
-            994 if active_sha256 == CELL_SUCCESSOR_SHA256 else 988
+            1023 if active_sha256 == FIXTURE_SUCCESSOR_SHA256
+            else 994 if active_sha256 == CELL_SUCCESSOR_SHA256 else 988
         )
         and route_control.get("usb_mcu_source_routing_subgate") ==
         "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS"

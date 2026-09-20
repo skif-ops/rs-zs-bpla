@@ -1,0 +1,58 @@
+{
+  "schema_version": "dioneya.pcb-main-usb-cell-fixture-routing-001-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001",
+  "reviewer": "Скиф",
+  "decision_date": "2026-09-20",
+  "decision": "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE",
+  "decision_input": "ответ подтверждаю. далее идем по наиболее целесообразным решениям решения одобряю нужно максимально быстро завершать работу по проекту. дополнительные запросы только в крайнем случае; Разрешаю отправить содержимое локального commit 55c47965151316ac0a3f6134f0f4614c967251cb в https://github.com/skif-ops/rs-zs-bpla.git, ветку evt-pre-20. И я же сказал запросы только в крайнем случае",
+  "decision_normalization": "The user approved continuing with the most rational engineering decisions, authorized publication to evt-pre-20 and requested no additional question except in an extreme case; after the green proposal gate this bounded decision is normalized to ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE.",
+  "reviewed_github_commit_sha": "11af5c9df9ac8e4fd68ba78dbbd5c067bd3fe23f",
+  "reviewed_tree_sha": "a64cd97e57170ab3c881f8f48c3ddd24fbb052d7",
+  "review_mapping": "hardware/reviews/PCB_MAIN_USB_CELL_FIXTURE_ROUTING_001_REVIEW_COMMIT_MAPPING.json",
+  "reviewed_proposal_sha256": "72e27991dcb4d880fc19d683dd6782026af82878d2f381c56900c6d744358b01",
+  "reviewed_proposal_record_sha256": "8fa99f485e155cc261fb0157a4b7b58dcdbfbf86d7d33caa81de39cc4226015f",
+  "reviewed_candidate_board_sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273",
+  "reviewed_generator_sha256": "38870d635a8a402f7ee101e466c6c683e00a55e5cbdab768fcec919fc3ecd84e",
+  "reviewed_audit_sha256": "ff1d6efa4ba66bcc828ccab16aafd684029431948b19d6cff675cf1cc292a861",
+  "approved_scope": {
+    "routed_nets": ["CELL_USB_DP_TP", "CELL_USB_DM_TP"],
+    "endpoints": {
+      "CELL_USB_DP_TP": ["R39.2", "U26.1", "TP_CELL_USB.2"],
+      "CELL_USB_DM_TP": ["R40.2", "U26.2", "TP_CELL_USB.3"]
+    },
+    "added_segments": 27,
+    "added_signal_vias": 2,
+    "trace_width_mm": 0.1537,
+    "minimum_pair_edge_gap_mm": 0.2032,
+    "primary_pair_length_mismatch_mm": 0.0,
+    "esd_stub_length_mismatch_mm": 0.0,
+    "changed_existing_copper": false
+  },
+  "machine_gate": {
+    "proposal_commit_sha": "11af5c9df9ac8e4fd68ba78dbbd5c067bd3fe23f",
+    "ci_run_id": 35540146804,
+    "ci_run_number": 568,
+    "ci_conclusion": "success",
+    "pcb_native_run_id": 35540146802,
+    "pcb_native_run_number": 295,
+    "pcb_native_conclusion": "success",
+    "artifact_id": 10614043819,
+    "artifact_digest": "sha256:0a2bd9269a99a517716182f84fa280f3807c1f56045731a6a2253f4f434b7680",
+    "base_violations": 232,
+    "candidate_violations": 232,
+    "base_unconnected": 425,
+    "candidate_unconnected": 421,
+    "new_errors": 0
+  },
+  "authorization": {
+    "apply_exact_hash_bound_usb_cell_fixture_routing_delta": true,
+    "preserve_all_unlisted_footprints_nets_copper_zones_keepouts_and_outline": true,
+    "continue_routing_engineering_after_green_application_gate": true,
+    "main_connector_usb_segment_complete": false,
+    "final_fabricator_stackup_accepted": false,
+    "production_impedance_tolerance_accepted": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}

@@ -43,6 +43,13 @@ REVIEW = (
 
 COPPER_CLEARANCE_MM = 0.2
 EXPECTED_UNCONNECTED_REDUCTION = 4
+PROPOSAL_COMMIT = "11af5c9df9ac8e4fd68ba78dbbd5c067bd3fe23f"
+CI_RUN_ID = 35540146804
+PCB_NATIVE_RUN_ID = 35540146802
+ARTIFACT_ID = 10614043819
+ARTIFACT_DIGEST = (
+    "sha256:0a2bd9269a99a517716182f84fa280f3807c1f56045731a6a2253f4f434b7680"
+)
 
 
 def require(value: bool, message: str) -> None:
@@ -282,7 +289,8 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     require(sha256(BASE) == BASE_SHA256, "cellular USB fixture base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256,
             "cellular USB fixture candidate SHA-256 drift")
-    require(sha256(ACTIVE) == BASE_SHA256,
+    active_sha256 = sha256(ACTIVE)
+    require(active_sha256 in {BASE_SHA256, CANDIDATE_SHA256},
             "authoritative PCB-MAIN cellular USB fixture proposal lineage drift")
 
     base = Board.from_file(str(BASE), encoding="utf-8")
@@ -409,20 +417,56 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     obstacle_clearance = candidate_obstacle_clearance(base)
 
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
+    machine_gate = review.get("machine_gate", {})
     require(
         review.get("candidate_board_sha256") == CANDIDATE_SHA256
         and review.get("base_board_sha256") == BASE_SHA256
-        and review.get("status") == "STATIC_PASS_KICAD9_GATE_PENDING"
-        and review.get("authoritative_board_modified") is False
-        and review.get("human_acceptance") == "PENDING"
+        and review.get("status") in {
+            "STATIC_PASS_KICAD9_GATE_PENDING",
+            "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PENDING",
+            "ACCEPTED_APPLIED_COMMIT_BOUND_GATE_PASS",
+        }
+        and review.get("authoritative_board_modified") is (active_sha256 == CANDIDATE_SHA256)
+        and review.get("human_acceptance") in {"PENDING", "ACCEPTED"}
         and review.get("review_b_complete") is False
         and review.get("manufacturing_release") is False,
         "cellular USB fixture proposal review boundary drift",
     )
+    if review.get("human_acceptance") == "ACCEPTED":
+        require(
+            machine_gate.get("static_regeneration") == "PASS"
+            and machine_gate.get("independent_static_audit") == "PASS"
+            and machine_gate.get("commit_bound_ci") == {
+                "status": "PASS",
+                "commit": PROPOSAL_COMMIT,
+                "run_number": 568,
+                "run_id": CI_RUN_ID,
+            }
+            and machine_gate.get("commit_bound_kicad9_comparative_drc") == {
+                "status": "PASS_NO_NEW_ERRORS_EXACT_FOUR_CONNECTION_REDUCTION",
+                "commit": PROPOSAL_COMMIT,
+                "run_number": 295,
+                "run_id": PCB_NATIVE_RUN_ID,
+                "artifact_name": "evt-pre-20-kicad-native-gate",
+                "artifact_id": ARTIFACT_ID,
+                "artifact_digest": ARTIFACT_DIGEST,
+                "base_violations": 232,
+                "candidate_violations": 232,
+                "base_unconnected": 425,
+                "candidate_unconnected": 421,
+                "new_errors": 0,
+                "unconnected_reduction": 4,
+            },
+            "cellular USB fixture proposal commit-bound evidence drift",
+        )
 
     report: dict[str, object] = {
         "schema": "dioneya.pcb-main-usb-cell-fixture-routing-001-audit.v1",
-        "status": "PASS_STATIC_KICAD9_GATE_PENDING",
+        "status": (
+            "PASS_STATIC_RECORDED_KICAD9_EVIDENCE_ACCEPTED_AND_APPLIED"
+            if review.get("human_acceptance") == "ACCEPTED"
+            else "PASS_STATIC_KICAD9_GATE_PENDING"
+        ),
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "routed_nets": sorted(F_ROUTES),
@@ -442,8 +486,8 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         "nearest_return_via_mm": {
             name: round(value, 12) for name, value in nearest_returns.items()
         },
-        "authoritative_board_modified": False,
-        "human_acceptance": "PENDING",
+        "authoritative_board_modified": active_sha256 == CANDIDATE_SHA256,
+        "human_acceptance": review.get("human_acceptance"),
         "review_b_complete": False,
         "manufacturing_release": False,
     }
@@ -451,7 +495,11 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
             "both comparative DRC paths are required together")
     if drc_base is not None and drc_candidate is not None:
         report["comparative_drc"] = audit_drc(drc_base, drc_candidate)
-        report["status"] = "PASS_KICAD9_COMPARATIVE_PENDING_APPLICATION"
+        report["status"] = (
+            "PASS_KICAD9_COMPARATIVE_ACCEPTED_AND_APPLIED"
+            if review.get("human_acceptance") == "ACCEPTED"
+            else "PASS_KICAD9_COMPARATIVE_PENDING_APPLICATION"
+        )
     return report
 
 

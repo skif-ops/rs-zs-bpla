@@ -27,9 +27,14 @@ MAPPING = (
     ROOT / "hardware/reviews/"
     "PCB_MAIN_USB_CELL_MODEM_ROUTING_001_REVIEW_COMMIT_MAPPING.json"
 )
+FIXTURE_APPLICATION = (
+    ROOT / "hardware/reviews/"
+    "PCB_MAIN_USB_CELL_FIXTURE_ROUTING_001_APPLICATION_REV_A.json"
+)
 
 BASE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
 CANDIDATE_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
+FIXTURE_SUCCESSOR_SHA256 = "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273"
 APPROVAL_SHA256 = "771c1f8d4b0fad0a78785ac280b3c02c5d9764a706384a902fddb153e94e8301"
 MAPPING_SHA256 = "b117715ef83872d5443d6067112b38ce8037993d02d7a52197d7f6af3e0b00fe"
 REVIEWED_EVIDENCE_COMMIT = "88292432cee87cec4e209ed2d0e4d142071af2cb"
@@ -76,8 +81,33 @@ def accepted_payload() -> bytes:
 def apply(output: Path, check: bool) -> dict[str, object]:
     payload = accepted_payload()
     if check:
-        require(output.is_file() and output.read_bytes() == payload,
-                "authoritative PCB-MAIN is not the exact accepted cellular USB modem candidate")
+        require(output.is_file(), "cellular USB modem application output is missing")
+        output_sha256 = sha256(output)
+        require(output_sha256 in {CANDIDATE_SHA256, FIXTURE_SUCCESSOR_SHA256},
+                "authoritative PCB-MAIN is outside accepted cellular USB modem lineage")
+        if output_sha256 == CANDIDATE_SHA256:
+            require(output.read_bytes() == payload,
+                    "authoritative PCB-MAIN is not the exact accepted cellular USB modem candidate")
+        else:
+            fixture_application = json.loads(
+                FIXTURE_APPLICATION.read_text(encoding="utf-8")
+            )
+            require(
+                fixture_application.get("decision") ==
+                "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE"
+                and fixture_application.get("predecessor", {}).get(
+                    "board_sha256"
+                ) == CANDIDATE_SHA256
+                and fixture_application.get("applied", {}).get(
+                    "board_sha256"
+                ) == FIXTURE_SUCCESSOR_SHA256
+                and fixture_application.get("applied", {}).get(
+                    "exact_candidate_byte_identity"
+                ) is True
+                and fixture_application.get("review_b_complete") is False
+                and fixture_application.get("manufacturing_release") is False,
+                "cellular USB fixture successor boundary drift",
+            )
     else:
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_bytes(payload)

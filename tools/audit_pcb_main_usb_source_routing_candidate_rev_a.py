@@ -32,10 +32,16 @@ CELL_CANDIDATE = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-CELL-MODEM-ROUTING-001/"
     "PCB-MAIN_USB_CELL_MODEM_CANDIDATE_REV_A.kicad_pcb"
 )
+FIXTURE_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_FIXTURE_ROUTING_001_APPLICATION_REV_A.json"
+FIXTURE_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001/"
+    "PCB-MAIN_USB_CELL_FIXTURE_CANDIDATE_REV_A.kicad_pcb"
+)
 
 BASE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
 CANDIDATE_SHA256 = "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5"
 CELL_SUCCESSOR_SHA256 = "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5"
+FIXTURE_SUCCESSOR_SHA256 = "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273"
 TRACE_WIDTH_MM = 0.1537
 PAIR_GAP_MM = 0.2032
 GROUND_SEGMENT_TSTAMP = "fb9ade5d-8496-4617-9d20-390d44c347c4"
@@ -226,7 +232,10 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     require(sha256(BASE) == BASE_SHA256, "USB source base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "USB source candidate SHA-256 drift")
     active_sha256 = sha256(ACTIVE)
-    require(active_sha256 in {BASE_SHA256, CANDIDATE_SHA256, CELL_SUCCESSOR_SHA256},
+    require(active_sha256 in {
+        BASE_SHA256, CANDIDATE_SHA256, CELL_SUCCESSOR_SHA256,
+        FIXTURE_SUCCESSOR_SHA256,
+    },
             "authoritative PCB-MAIN USB source-routing lineage drift")
     if active_sha256 == BASE_SHA256:
         require(ACTIVE.read_bytes() == BASE.read_bytes(),
@@ -249,7 +258,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
             require(ACTIVE.read_bytes() == CANDIDATE.read_bytes(),
                     "authoritative PCB-MAIN USB source candidate byte drift")
             application_state = "ACCEPTED_EXACT_CANDIDATE_APPLIED"
-        else:
+        elif active_sha256 == CELL_SUCCESSOR_SHA256:
             require(ACTIVE.read_bytes() == CELL_CANDIDATE.read_bytes(),
                     "authoritative PCB-MAIN cellular USB successor byte drift")
             cell_application = json.loads(
@@ -268,6 +277,38 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
                 "cellular USB modem successor boundary drift",
             )
             application_state = "ACCEPTED_EXACT_CANDIDATE_WITH_CELL_MODEM_SUCCESSOR"
+        else:
+            require(ACTIVE.read_bytes() == FIXTURE_CANDIDATE.read_bytes(),
+                    "authoritative PCB-MAIN cellular USB fixture successor byte drift")
+            cell_application = json.loads(
+                CELL_APPLICATION.read_text(encoding="utf-8")
+            )
+            fixture_application = json.loads(
+                FIXTURE_APPLICATION.read_text(encoding="utf-8")
+            )
+            require(
+                cell_application.get("decision") ==
+                "ACCEPT_USB_CELL_MODEM_ROUTING_SUBGATE"
+                and cell_application.get("predecessor", {}).get(
+                    "board_sha256"
+                ) == CANDIDATE_SHA256
+                and cell_application.get("applied", {}).get("board_sha256") ==
+                CELL_SUCCESSOR_SHA256
+                and fixture_application.get("decision") ==
+                "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE"
+                and fixture_application.get("predecessor", {}).get(
+                    "board_sha256"
+                ) == CELL_SUCCESSOR_SHA256
+                and fixture_application.get("applied", {}).get("board_sha256") ==
+                FIXTURE_SUCCESSOR_SHA256
+                and fixture_application.get("applied", {}).get(
+                    "exact_candidate_byte_identity"
+                ) is True
+                and fixture_application.get("review_b_complete") is False
+                and fixture_application.get("manufacturing_release") is False,
+                "cellular USB fixture successor boundary drift",
+            )
+            application_state = "ACCEPTED_EXACT_CANDIDATE_WITH_CELL_FIXTURE_SUCCESSOR"
 
     base = Board.from_file(str(BASE), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")

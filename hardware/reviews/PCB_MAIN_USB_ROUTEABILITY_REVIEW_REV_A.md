@@ -1,8 +1,8 @@
 # PCB-MAIN USB routeability review — Rev.A
 
-Status: `MCU SOURCE + CELL MODEM APPLIED / CELL FIXTURE STATIC PASS / MAIN CONNECTOR DFM BLOCKED / REVIEW_B OPEN`
+Status: `MCU SOURCE + CELL MODEM + CELL FIXTURE APPLIED / APPLICATION GATE PENDING / MAIN CONNECTOR DFM BLOCKED / REVIEW_B OPEN`
 
-Reviewed source commit: `69642979f8b93e20d122d8e717c0d606ecbc8384`.
+Reviewed source commit: `11af5c9df9ac8e4fd68ba78dbbd5c067bd3fe23f`.
 
 The authoritative PCB retains the accepted combined RF remediation and is not
 modified by this review.  The next controlled routing class was evaluated as
@@ -115,8 +115,14 @@ primary paths are exactly `76.293814073931 mm`; both ESD shunts are exactly
 fully sampled over the accepted `GND_MODEM` In4.Cu zone, and each transition
 has an existing adjacent `GND_MODEM` return via. Candidate SHA-256 is
 `2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273`.
-Static regeneration and independent topology/clearance/reference checks pass;
-commit-bound comparative KiCad 9 DRC is pending.
+Static regeneration and independent topology/clearance/reference checks pass.
+Proposal commit `11af5c9d` passed CI #568 and PCB Native #295: violations
+remained `232→232`, zero new errors were introduced and unconnected items
+changed `425→421`. Artifact `10614043819` is bound by digest
+`sha256:0a2bd9269a99a517716182f84fa280f3807c1f56045731a6a2253f4f434b7680`.
+The exact hash-bound candidate was accepted under the user's standing
+authorization and applied to the authoritative board. Its application gate is
+pending.
 
 The main connector pair remains the only USB routing segment without a
 clearance-supported candidate. Final stackup/tolerance/coupon acceptance,

@@ -162,7 +162,8 @@ manufacturing release.
   Native #286 with zero new errors and unconnected `429→427`. Human acceptance
   is recorded; application commit `6c27d3ae` passed CI #562 and PCB Native
   #289 with violations `232→232`, zero new errors and unconnected `429→427`.
-  Main-connector and fixture USB segments are still unrouted.
+  This historical source subgate is preserved; later modem and fixture
+  successors are applied, while the main-connector segment remains unrouted.
 - [x] `PCB-MAIN-USB-CELL-MODEM-ROUTING-001` routes only U8.9/U8.10 to
   R39.1/R40.1 with six F.Cu segments, no vias, exact `4.765484866498 mm`
   matching and continuous `GND_MODEM` L2 reference. Proposal `5c73ffe5`
@@ -170,11 +171,13 @@ manufacturing release.
   errors and unconnected `427→425`. The exact candidate is accepted and
   applied; application commit `4c9a2a85` passed CI #566 and PCB Native #293
   with the same `232→232`, zero-new-error and `427→425` result.
-- [ ] `PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001` now has a bounded static-pass
-  candidate for R39/R40/U26 to TP_CELL_USB: 27 segments, two signal vias,
-  exact `76.293814073931 mm` primary matching, exact matched ESD shunts and
-  continuous `GND_MODEM` In4.Cu reference for the B.Cu trunk. Commit-bound
-  comparative KiCad 9 DRC and exact application are pending.
+- [ ] `PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001` routes R39/R40/U26 to
+  TP_CELL_USB with 27 segments, two signal vias, exact
+  `76.293814073931 mm` primary matching, exact matched ESD shunts and
+  continuous `GND_MODEM` In4.Cu reference for the B.Cu trunk. Proposal commit
+  `11af5c9d` passed CI #568 and PCB Native #295 with violations `232→232`,
+  zero new errors and unconnected `425→421`. The exact candidate is accepted
+  and applied; its commit-bound application gate is pending.
 - [ ] Main-connector USB escape remains blocked pending job-specific via,
   annular-ring and clearance acceptance or a separately reviewed local ECO.
   The official single-row J11 contact mapping is retained.

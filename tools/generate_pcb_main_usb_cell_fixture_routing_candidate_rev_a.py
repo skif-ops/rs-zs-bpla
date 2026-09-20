@@ -163,9 +163,16 @@ def candidate_bytes(base_payload: bytes) -> bytes:
 
 
 def generate(base_output: Path, output: Path, check: bool) -> dict[str, object]:
-    base_payload = SOURCE.read_bytes()
-    require(sha256_bytes(base_payload) == BASE_SHA256,
-            "authoritative cellular USB fixture-routing lineage drift")
+    active_payload = SOURCE.read_bytes()
+    active_sha256 = sha256_bytes(active_payload)
+    if active_sha256 == BASE_SHA256:
+        base_payload = active_payload
+    else:
+        require(active_sha256 == CANDIDATE_SHA256,
+                "authoritative cellular USB fixture-routing lineage drift")
+        base_payload = DEFAULT_BASE_OUTPUT.read_bytes()
+        require(sha256_bytes(base_payload) == BASE_SHA256,
+                "committed cellular USB fixture predecessor drift")
     candidate_payload = candidate_bytes(base_payload)
     candidate_sha256 = sha256_bytes(candidate_payload)
     if CANDIDATE_SHA256 != "TO_BE_MATERIALIZED":

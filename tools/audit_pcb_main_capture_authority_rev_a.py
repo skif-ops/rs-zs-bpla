@@ -1712,6 +1712,9 @@ def main() -> None:
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
                     "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_"
                     "REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_"
+                    "APPLIED_MAIN_CONNECTOR_ROUTING_PENDING",
                 },
                 "Review B must be open but incomplete after Review A PASS")
     else:
@@ -1758,6 +1761,9 @@ def main() -> None:
                 "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
                 "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_"
                 "REMAINING_ROUTING_PENDING",
+                "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_"
+                "APPLIED_MAIN_CONNECTOR_ROUTING_PENDING",
         }:
             required_layout_evidence = {
                 "native_layout_candidate", "layout_generator", "layout_independent_audit",
@@ -1834,6 +1840,18 @@ def main() -> None:
                 "rf_remediation_composed_board",
                 "rf_remediation_application_audit",
                 "gnss_rf_eco_001_status",
+                "usb_cell_fixture_routing_001_candidate",
+                "usb_cell_fixture_routing_001_candidate_record",
+                "usb_cell_fixture_routing_001_candidate_review",
+                "usb_cell_fixture_routing_001_approval",
+                "usb_cell_fixture_routing_001_approval_record",
+                "usb_cell_fixture_routing_001_review_commit_mapping",
+                "usb_cell_fixture_routing_001_application",
+                "usb_cell_fixture_routing_001_candidate_generator",
+                "usb_cell_fixture_routing_001_application_generator",
+                "usb_cell_fixture_routing_001_candidate_audit",
+                "usb_cell_fixture_routing_001_application_audit",
+                "usb_cell_fixture_routing_001_status",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
             if review_b["status"] in {
@@ -1854,6 +1872,9 @@ def main() -> None:
                     "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
                     "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_AND_CELL_MODEM_APPLIED_"
                     "REMAINING_ROUTING_PENDING",
+                    "OPEN_HIERARCHY_ACCEPTED_PLACEMENT_CLEARANCE_PASS_RF_REMEDIATION_"
+                    "REPEAT_REVIEW_PASS_USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_"
+                    "APPLIED_MAIN_CONNECTOR_ROUTING_PENDING",
             }:
                 required_layout_evidence |= {
                     "placement_repack_manifest", "placement_repack_generator",
@@ -1896,6 +1917,15 @@ def main() -> None:
                     "APPROVED_APPLIED_EXACT_REVIEWED_DELTA_WITH_CELLULAR_L2_"
                     "ZONE_COMBINED_GATE_PASS",
                     "PCB-MAIN GNSS RF ECO-001 candidate status drift")
+            require(review_b["evidence"].get(
+                        "usb_cell_fixture_routing_001_status"
+                    ) in {
+                        "APPROVED_APPLIED_EXACT_CELL_FIXTURE_PAIR_"
+                        "COMMIT_BOUND_GATE_PENDING",
+                        "APPROVED_APPLIED_EXACT_CELL_FIXTURE_PAIR_"
+                        "COMMIT_BOUND_GATE_PASS",
+                    },
+                    "PCB-MAIN cellular USB fixture-routing status drift")
             rf_evidence = review_b["evidence"].get(
                 "rf_remediation_commit_bound_evidence", {}
             )
@@ -1922,6 +1952,7 @@ def main() -> None:
                     "rf_si_return_path_status",
                     "rf_return_001_status",
                     "gnss_rf_eco_001_status",
+                    "usb_cell_fixture_routing_001_status",
             }:
                 evidence_path = ROOT / review_b["evidence"][evidence_name]
                 require(evidence_path.is_file() and evidence_path.stat().st_size > 0,
@@ -2343,6 +2374,34 @@ def main() -> None:
                 ) is False,
                 "PCB-MAIN cellular USB modem-routing application interlock drift",
             )
+            usb_cell_fixture_application = json.loads(
+                (ROOT / review_b["evidence"][
+                    "usb_cell_fixture_routing_001_application"
+                ]).read_text(encoding="utf-8")
+            )
+            require(
+                usb_cell_fixture_application.get("proposal_id") ==
+                "PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001"
+                and usb_cell_fixture_application.get("decision") ==
+                "ACCEPT_USB_CELL_FIXTURE_ROUTING_SUBGATE"
+                and usb_cell_fixture_application.get("applied", {}).get(
+                    "exact_candidate_byte_identity"
+                ) is True
+                and usb_cell_fixture_application.get("applied", {}).get(
+                    "routed_nets"
+                ) == ["CELL_USB_DM_TP", "CELL_USB_DP_TP"]
+                and usb_cell_fixture_application.get("applied", {}).get(
+                    "added_segments"
+                ) == 27
+                and usb_cell_fixture_application.get("applied", {}).get(
+                    "added_signal_vias"
+                ) == 2
+                and usb_cell_fixture_application.get("review_b_complete") is False
+                and usb_cell_fixture_application.get(
+                    "manufacturing_release"
+                ) is False,
+                "PCB-MAIN cellular USB fixture-routing application interlock drift",
+            )
             mechanical_application = None
             if mechanical_eco_status in {
                     "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
@@ -2458,9 +2517,14 @@ def main() -> None:
                             "locked_authority_mounting_conflicts": [],
                             "locked_authority_tool_conflicts": [],
                         }, "PCB-MAIN mechanical ECO historical inventory drift")
-                require(usb_cell_modem_application.get("applied", {}).get(
+                require(usb_cell_fixture_application.get("applied", {}).get(
                             "board_sha256"
                         ) == placement_control["board_sha256"] and
+                        usb_cell_fixture_application.get("predecessor", {}).get(
+                            "board_sha256"
+                        ) == usb_cell_modem_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) and
                         usb_cell_modem_application.get("predecessor", {}).get(
                             "board_sha256"
                         ) == usb_source_application.get("applied", {}).get(
