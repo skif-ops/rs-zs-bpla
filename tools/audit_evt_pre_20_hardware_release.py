@@ -723,7 +723,7 @@ def audit() -> dict[str, object]:
         (
             "accepted and applied"
             if cellular_l2_return_complete
-            else "PCB-MAIN-RF-RETURN-001 is a non-applied proposal; KiCad 9 comparative DRC and acceptance remain open"
+            else "PCB-MAIN-RF-RETURN-001 passed commit-bound KiCad 9 comparative DRC but remains a non-applied proposal pending human acceptance"
         ),
         "PCB-MAIN cellular RF lacks an accepted and applied GND_MODEM L2 return plane",
     )

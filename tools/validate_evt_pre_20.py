@@ -286,9 +286,13 @@ def validate_deliverable_register() -> None:
         in deliverables["HW-M-002"]["Критерий выпуска"]
         and "seven-net RF P0 subgates are applied"
         in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "independent RF/SI review is ECO_REQUIRED"
+        and "cellular L2 return proposal passed commit-bound comparative KiCad 9 DRC"
         in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "cellular L2 return and GNSS placement/routing remain open"
+        and "623 of 623 centreline samples covered but remains unaccepted and unapplied"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "independent RF/SI review stays ECO_REQUIRED"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "GNSS placement/routing and cellular acceptance remain open"
         in deliverables["HW-M-002"]["Критерий выпуска"]
         and "pair-aware routing" in deliverables["HW-M-002"]["Критерий выпуска"]
         and "final job stackup" in deliverables["HW-M-002"]["Критерий выпуска"]

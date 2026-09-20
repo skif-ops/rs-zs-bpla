@@ -55,7 +55,9 @@
   subgates (691 segment, 285 via, 3 copper zones, 4 rule areas);
 - независимый PCB-MAIN RF/SI return-path review имеет статус
   `ECO_REQUIRED`: cellular L2-return candidate `PCB-MAIN-RF-RETURN-001` не
-  применён и ждёт KiCad 9 comparative DRC, а GNSS требует отдельный
+  применён; commit-bound KiCad 9 comparative DRC в gate `#267` пройден,
+  623/623 RF-centreline samples покрыты связной L2-зоной, но независимая
+  приёмка ещё не дана; GNSS требует отдельный
   placement/routing ECO; remaining routing, STEP, CAM/DFM и Review B открыты;
 - повторный PCB-MIC Review A после copper ECO подписан `PASS` по commit `e17a86bc`;
   copper-return subgate Review B принят по commit `7aeec13a`, но panelization,

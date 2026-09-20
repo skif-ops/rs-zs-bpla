@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "proposal_id": "PCB-MAIN-RF-RETURN-001",
   "date_utc": "2026-09-20",
-  "status": "PROPOSAL_STATIC_AUDIT_READY_KICAD9_COMPARATIVE_DRC_PENDING",
+  "status": "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW",
   "scope": "ONE_LOCAL_GND_MODEM_IN1_CU_ZONE_INSIDE_LOCKED_ZONE_CELL",
   "review_input": "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.json",
   "base": {
@@ -50,6 +50,42 @@
     "unconnected_item_regression_allowed": false,
     "filled_gnd_modem_l2_cellular_rf_centreline_coverage_required": true,
     "maximum_coverage_sample_pitch_mm": 0.1
+  },
+  "commit_bound_machine_gate": {
+    "head_commit_sha": "239016fdd295426766cc88209822be39610297db",
+    "head_tree_sha": "7a6e0c226318bd85e6456d17bae119b489d2aff1",
+    "pcb_native_run_id": 35508574131,
+    "pcb_native_run_number": 267,
+    "pcb_native_conclusion": "success",
+    "comparative_drc_step": "success",
+    "ci_run_id": 35508574124,
+    "ci_run_number": 540,
+    "ci_conclusion": "success",
+    "artifact_id": 10603873750,
+    "artifact_name": "evt-pre-20-kicad-native-gate",
+    "artifact_digest": "sha256:65adbdc2a6f9b2803645fe6df17cd8ee2b6eb6d4ab0b03be76322626ec814ded",
+    "baseline_drc_sha256": "36c07ab710f2b9ac429b2b2e76369be3fe9235b67abd3532e946411310570a2d",
+    "candidate_drc_sha256": "d1d337fe2dccf6818e9e1e76a869d25b345bd2d0a93c4e3e6b0177f1aad4a9ea",
+    "comparative_audit_sha256": "73bf1b365b06c4091e3dae18cab6412b1b4c90705d609c8659da1ac64c45a3db",
+    "filled_candidate_sha256": "c0b1aa4555a754420e2002a07f25bb0639c5f2c886e11948e0b243671d175e78"
+  },
+  "comparative_kicad9_drc": {
+    "status": "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION",
+    "base_violations": 226,
+    "candidate_violations": 226,
+    "base_errors": 0,
+    "candidate_errors": 0,
+    "base_unconnected_items": 429,
+    "candidate_unconnected_items": 429,
+    "new_error_counts": {}
+  },
+  "filled_reference": {
+    "status": "PASS_FILLED_GND_MODEM_L2_UNDER_CELLULAR_RF_CENTRELINES",
+    "filled_polygon_count": 1,
+    "maximum_sample_pitch_mm": 0.1,
+    "cell_rf_samples": 385,
+    "cell_rf_ant_samples": 238,
+    "uncovered_samples": 0
   },
   "review_request": {
     "requested_after_green_machine_gate": "ACCEPT_CELLULAR_L2_RETURN_PLANE_SUBGATE_OR_REJECT",

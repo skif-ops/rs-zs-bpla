@@ -78,8 +78,11 @@ The independent RF/SI return-path review of authoritative PCB SHA-256
 `9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040`
 is `ECO_REQUIRED`. `CELL_RF` and `CELL_RF_ANT` lack the `GND_MODEM` L2
 reference assumed by the L1-over-L2 geometry; `PCB-MAIN-RF-RETURN-001`
-proposes one bounded local L2 zone but is not applied and requires comparative
-KiCad 9 refill/DRC plus independent acceptance. `GNSS_RF_FILTERED` separately
+proposes one bounded local L2 zone. Commit-bound PCB Native Gate `#267` passed
+comparative KiCad 9 refill/DRC with 226 -> 226 violations, 429 -> 429
+unconnected items and 623/623 covered cellular RF centreline samples. The
+candidate is not applied and still requires independent acceptance.
+`GNSS_RF_FILTERED` separately
 requires a U9/FL1/C64 placement/routing ECO. Neither the accepted RF P0 subgate
 nor the cellular proposal closes RF/SI review or authorizes manufacture.
 

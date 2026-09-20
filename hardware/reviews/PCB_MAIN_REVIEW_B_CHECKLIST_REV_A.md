@@ -56,7 +56,9 @@ manufacturing release.
 - RF/SI return-path review: `ECO_REQUIRED`. `CELL_RF` and `CELL_RF_ANT` use the
   L1-over-L2 width but currently lack their required `GND_MODEM` reference on
   L2. `PCB-MAIN-RF-RETURN-001` proposes one bounded local `GND_MODEM` L2 zone;
-  it is not applied and still requires comparative KiCad 9 DRC and acceptance.
+  commit-bound PCB Native Gate `#267` passed comparative KiCad 9 DRC and
+  covered all 623 sampled RF-centreline points. It is not applied and still
+  requires independent acceptance.
   Separately, `GNSS_RF_FILTERED` is 25.325357 mm for a 15.543668 mm pad-to-pad
   span and wraps around U9 because RF_IN faces away from FL1; a dedicated
   placement/routing ECO remains required.
@@ -158,7 +160,8 @@ for source commit `9aceca9531f0b9c18679bee1a8050ae7cd94308a` and PDF SHA-256
 The candidate is 2D placement-complete and partially routed. Its 186-net
 pre-route constraint coverage, public numeric routing basis and accepted RF P0
 subgate are controlled, but the RF/SI return-path review is `ECO_REQUIRED`:
-the cellular L2-return proposal is not applied and the separate GNSS
+the cellular L2-return proposal passed its machine gate but is not independently
+accepted or applied, and the separate GNSS
 placement/routing ECO has not been prepared. Remaining routing, pair-geometry
 audit, 3D/service review, final DRC, CAM, DFM and Review B are open.
 The exact current clearance result and

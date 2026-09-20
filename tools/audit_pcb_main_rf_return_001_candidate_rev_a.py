@@ -373,6 +373,8 @@ def static_audit() -> dict[str, object]:
 
     proposal = json.loads(PROPOSAL.read_text(encoding="utf-8"))
     require(proposal.get("proposal_id") == "PCB-MAIN-RF-RETURN-001" and
+            proposal.get("status") ==
+            "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW" and
             proposal.get("base", {}).get("board_sha256") == BASE_SHA256 and
             proposal.get("candidate", {}).get("board_sha256") == CANDIDATE_SHA256 and
             proposal.get("added_zone", {}).get("gnd_modem_vias_inside_polygon") == 50 and
@@ -390,6 +392,58 @@ def static_audit() -> dict[str, object]:
             proposal.get("decision_boundary", {}).get("review_b_complete") is False and
             proposal.get("decision_boundary", {}).get("cam_or_manufacturing_release") is False,
             "RF-return proposal identity or release boundary drift")
+    require(
+        proposal.get("commit_bound_machine_gate") == {
+            "head_commit_sha": "239016fdd295426766cc88209822be39610297db",
+            "head_tree_sha": "7a6e0c226318bd85e6456d17bae119b489d2aff1",
+            "pcb_native_run_id": 35508574131,
+            "pcb_native_run_number": 267,
+            "pcb_native_conclusion": "success",
+            "comparative_drc_step": "success",
+            "ci_run_id": 35508574124,
+            "ci_run_number": 540,
+            "ci_conclusion": "success",
+            "artifact_id": 10603873750,
+            "artifact_name": "evt-pre-20-kicad-native-gate",
+            "artifact_digest": (
+                "sha256:65adbdc2a6f9b2803645fe6df17cd8ee2b6eb6d4ab0b03be76322626ec814ded"
+            ),
+            "baseline_drc_sha256": (
+                "36c07ab710f2b9ac429b2b2e76369be3fe9235b67abd3532e946411310570a2d"
+            ),
+            "candidate_drc_sha256": (
+                "d1d337fe2dccf6818e9e1e76a869d25b345bd2d0a93c4e3e6b0177f1aad4a9ea"
+            ),
+            "comparative_audit_sha256": (
+                "73bf1b365b06c4091e3dae18cab6412b1b4c90705d609c8659da1ac64c45a3db"
+            ),
+            "filled_candidate_sha256": (
+                "c0b1aa4555a754420e2002a07f25bb0639c5f2c886e11948e0b243671d175e78"
+            ),
+        },
+        "RF-return commit-bound machine-gate evidence drift",
+    )
+    require(
+        proposal.get("comparative_kicad9_drc") == {
+            "status": "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION",
+            "base_violations": 226,
+            "candidate_violations": 226,
+            "base_errors": 0,
+            "candidate_errors": 0,
+            "base_unconnected_items": 429,
+            "candidate_unconnected_items": 429,
+            "new_error_counts": {},
+        }
+        and proposal.get("filled_reference") == {
+            "status": "PASS_FILLED_GND_MODEM_L2_UNDER_CELLULAR_RF_CENTRELINES",
+            "filled_polygon_count": 1,
+            "maximum_sample_pitch_mm": 0.1,
+            "cell_rf_samples": 385,
+            "cell_rf_ant_samples": 238,
+            "uncovered_samples": 0,
+        },
+        "RF-return KiCad 9 DRC or filled-reference evidence drift",
+    )
 
     capture_status = json.loads(CAPTURE_STATUS.read_text(encoding="utf-8"))
     evidence = capture_status.get("review_b", {}).get("evidence", {})
@@ -408,7 +462,7 @@ def static_audit() -> dict[str, object]:
         and evidence.get("rf_return_001_candidate_review") ==
         "hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.md"
         and evidence.get("rf_return_001_status") ==
-        "PROPOSAL_STATIC_AUDIT_READY_KICAD9_COMPARATIVE_DRC_PENDING_NOT_APPLIED"
+        "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW_NOT_APPLIED"
         and capture_status.get("manufacturing_release") is False,
         "PCB-MAIN capture-status RF/SI ECO traceability or release boundary drift",
     )
@@ -428,7 +482,9 @@ def static_audit() -> dict[str, object]:
         "gnss_rf_filtered_pad_distance_mm": direct,
         "gnss_rf_filtered_stretch_ratio": stretch,
         "decision": "ECO_REQUIRED",
-        "kicad9_comparative_drc": "PENDING",
+        "kicad9_comparative_drc": (
+            "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION"
+        ),
         "review_b_complete": False,
         "manufacturing_release": False,
     }

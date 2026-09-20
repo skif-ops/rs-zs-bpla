@@ -1850,8 +1850,8 @@ def main() -> None:
                     "ROUTING_OPEN",
                     "PCB-MAIN RF/SI return-path status drift")
             require(review_b["evidence"].get("rf_return_001_status") ==
-                    "PROPOSAL_STATIC_AUDIT_READY_KICAD9_COMPARATIVE_DRC_"
-                    "PENDING_NOT_APPLIED",
+                    "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_"
+                    "REVIEW_NOT_APPLIED",
                     "PCB-MAIN RF-return-001 candidate status drift")
             for evidence_name in required_layout_evidence - {
                     "ra_003_status", "placement_repack_status",
