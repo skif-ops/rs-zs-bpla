@@ -118,6 +118,20 @@ def audit_drc(base_path: Path, candidate_path: Path) -> dict[str, object]:
         for key in candidate_errors
         if candidate_errors[key] > base_errors[key]
     }
+    require(not added_errors,
+            f"cellular L2 return candidate introduces KiCad 9 errors: {added_errors}")
+    require(candidate_unconnected <= base_unconnected,
+            "cellular L2 return candidate increases unconnected items")
+    return {
+        "status": "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION",
+        "base_violations": base_violations,
+        "candidate_violations": candidate_violations,
+        "base_errors": dict(base_errors),
+        "candidate_errors": dict(candidate_errors),
+        "base_unconnected_items": base_unconnected,
+        "candidate_unconnected_items": candidate_unconnected,
+        "new_error_counts": added_errors,
+    }
 
 
 def point_on_segment(
@@ -216,20 +230,6 @@ def audit_filled_reference(path: Path) -> dict[str, object]:
         "sample_pitch_mm_max": sample_pitch_mm,
         "samples_by_net": dict(sample_counts),
         "uncovered_samples": 0,
-    }
-    require(not added_errors,
-            f"cellular L2 return candidate introduces KiCad 9 errors: {added_errors}")
-    require(candidate_unconnected <= base_unconnected,
-            "cellular L2 return candidate increases unconnected items")
-    return {
-        "status": "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION",
-        "base_violations": base_violations,
-        "candidate_violations": candidate_violations,
-        "base_errors": dict(base_errors),
-        "candidate_errors": dict(candidate_errors),
-        "base_unconnected_items": base_unconnected,
-        "candidate_unconnected_items": candidate_unconnected,
-        "new_error_counts": added_errors,
     }
 
 
