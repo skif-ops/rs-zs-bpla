@@ -219,7 +219,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
             "both comparative DRC paths are required together")
     if drc_base is not None and drc_candidate is not None:
         report["comparative_drc"] = audit_drc(drc_base, drc_candidate)
-        report["status"] = "PASS_KICAD9_COMPARATIVE_PROPOSAL_ONLY"
+        report["status"] = "PASS_KICAD9_COMPARATIVE_ACCEPTED_AND_APPLIED"
     return report
 
 

@@ -176,7 +176,8 @@ On 2026-09-20 reviewer `Скиф` also accepted
 moves only R91/R92 to `(64.0, 25.25, 0)` / `(64.0, 26.25, 0)` and is now the
 authoritative successor SHA-256
 `d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e`.
-Strict 2D clearance remains PASS; the application machine gate, USB copper,
+Strict 2D clearance remains PASS. Application commit `1f8c0bad` passed CI #557
+and PCB Native #284 with zero new errors and `429→429` unconnected. USB copper,
 Review B and manufacturing release remain open.
 
 ## Controlled post-repack result

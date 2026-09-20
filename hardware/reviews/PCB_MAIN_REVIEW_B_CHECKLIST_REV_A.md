@@ -143,7 +143,7 @@ manufacturing release.
   stencil decisions, U9 stencil adaptation, PnP polarity, first-article plan and
   blocker/critical DFM closure are approved through controlled review.
 - [ ] RF, power, PDM, USB and SIM routing is complete.
-- [ ] USB source-termination placement ECO commit-bound application gate is closed. Routeability review
+- [x] USB source-termination placement ECO commit-bound application gate is closed. Routeability review
   `PCB_MAIN_USB_ROUTEABILITY_REVIEW_REV_A.md` records that R91/R92 are 6.00 mm
   apart while U1 D-/D+ pads are on 0.50 mm pitch; routing is prohibited until
   the bounded local U1 cluster passes clearance and pair-geometry review.
@@ -153,7 +153,9 @@ manufacturing release.
   accepted fanout. Revised commit `ad3745e7` passed PCB Native #281 with zero
   new errors and unconnected `429→429`. Human review accepted the exact
   `R91/R92` delta; candidate SHA-256 `d060e090…d9e` is now authoritative, with
-  the application commit-bound CI/KiCad 9 gate still pending.
+  application commit `1f8c0bad` passed CI #557 and PCB Native #284 with zero
+  new errors and `429→429` unconnected. This closes placement only; USB copper
+  remains open.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.
 - [ ] KiCad 9 DRC passes with zero blocker/critical violations and zero unrouted items.
 - [ ] Gerber/Excellon is generated only from that DRC-clean commit.

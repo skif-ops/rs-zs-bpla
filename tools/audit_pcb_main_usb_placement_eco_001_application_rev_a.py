@@ -42,6 +42,8 @@ PLACEMENT_SHA256 = "df7cdbfc2ac023d43ac040b14eb99440fc392d402793d5a3b03f2fd560af
 REVIEWED_COMMIT = "a3d774c8e7b0bd0634a60cf44b1cdf3f828a3e8d"
 REVIEWED_TREE = "fa9bfd800e79eadc56d379ee4a1591c06a5f9b48"
 APPROVAL_COMMIT = "20632248d9c70b6456d8fe5e3a30d99b25dd39f8"
+APPLICATION_COMMIT = "1f8c0bad8a7825adb8324dc36976141eab78a645"
+APPLICATION_TREE = "1f3d9147cf8d133ae81397af56e4bd83ea7cc243"
 
 
 def require(value: bool, message: str) -> None:
@@ -145,10 +147,26 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and applied.get("changed_references") == ["R91", "R92"]
         and applied.get("copper_changed") is False
         and applied.get("placement_manifest_sha256") == PLACEMENT_SHA256
-        and gate.get("status") in {
-            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
-            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
-        }
+        and application.get("application_commit_sha") == APPLICATION_COMMIT
+        and gate.get("status") == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+        and gate.get("source_commit_sha") == APPLICATION_COMMIT
+        and gate.get("source_tree_sha") == APPLICATION_TREE
+        and gate.get("ci_run_id") == 35526956245
+        and gate.get("ci_run_number") == 557
+        and gate.get("ci_conclusion") == "success"
+        and gate.get("pcb_native_run_id") == 35526956229
+        and gate.get("pcb_native_run_number") == 284
+        and gate.get("pcb_native_conclusion") == "success"
+        and gate.get("application_audit") ==
+        "PASS_EXACT_ACCEPTED_USB_PLACEMENT_APPLICATION"
+        and gate.get("base_violations") == 227
+        and gate.get("active_violations") == 232
+        and gate.get("base_unconnected") == 429
+        and gate.get("active_unconnected") == 429
+        and gate.get("new_errors") == 0
+        and gate.get("artifact_id") == 10609668700
+        and gate.get("artifact_digest") ==
+        "sha256:3757976a26955c4e25a3905f7054fbc9f88331823e0d1a99aefe9e7555096387"
         and application.get("usb_pair_routing_complete") is False
         and application.get("review_b_complete") is False
         and application.get("cam_or_manufacturing_release") is False,
@@ -213,6 +231,10 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         "copper_changed": False,
         "strict_placement_clearance": "PASS",
         "machine_gate": gate.get("status"),
+        "application_commit_sha": APPLICATION_COMMIT,
+        "pcb_native_run_id": 35526956229,
+        "ci_run_id": 35526956245,
+        "artifact_id": 10609668700,
         "usb_pair_routing_complete": False,
         "review_b_complete": False,
         "manufacturing_release": False,

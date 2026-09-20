@@ -64,8 +64,9 @@ gate прошли. PCB Native `#277` подтвердил ноль новых DR
 неразведённые `R91/R92`. Решение принято и точный кандидат применён к
 authoritative PCB; вся медь и RF-remediation predecessor сохранены.
 Commit `ad3745e7` прошёл CI `#554` и PCB Native `#281`: новых DRC errors нет,
-unconnected остаётся `429`, strict clearance — PASS. Application successor
-ожидает собственный commit-bound CI/KiCad 9 gate; USB-трассировка и финальная
+unconnected остаётся `429`, strict clearance — PASS. Точный application commit
+`1f8c0bad` прошёл CI `#557` и PCB Native `#284`: новых ошибок нет,
+`429→429` unconnected. Placement subgate закрыт; USB-трассировка и финальная
 impedance-геометрия пока не разрешены.
 Отдельно подготовлен ограниченный запрос для будущего
 выбранного сборщика по DFM/трафарету `U2/U25/U26/U9` и пустой 14-строчный реестр: принято

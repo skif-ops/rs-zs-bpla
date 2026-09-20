@@ -83,7 +83,8 @@ Gate `#273`. The deterministic RF composition is predecessor PCB SHA-256
 `f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9`.
 The exact accepted R91/R92 USB placement successor is authoritative SHA-256
 `d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e`;
-it changes no copper and its application gate is pending.
+it changes no copper and application commit `1f8c0bad` passed CI `#557` and
+PCB Native `#284`.
 Commit-bound source commit `7ee9cfc9` passed CI `#550` and PCB Native Gate
 `#277`: comparative DRC added no errors or unconnected regression, and both
 filled-reference audits cover every cellular and GNSS sample. The bounded
@@ -230,7 +231,7 @@ release.
 - PCB-MAIN USB source-termination routeability: the bounded R91/R92 placement
   ECO was accepted and applied exactly after proposal PCB Native #281; U1/J11/
   U25 and accepted RF copper remain fixed; its application commit-bound gate
-  and the controlled 90-ohm pair routing remain open;
+  passed, while controlled 90-ohm pair routing remains open;
 - the remaining 17 PCB-PWR input-protection qualification rows after accepted
   manufacturer source control, native-value and repeat-hierarchy gates,
   including +70 C 5 A thermal,
