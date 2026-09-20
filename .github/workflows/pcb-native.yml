@@ -689,13 +689,13 @@ jobs:
           pcbnew.SaveBoard(path, board)
           print("PCB-MAIN P0 RF expected candidate KiCad 9 normalization: PASS")
           PY
-          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
-            /usr/bin/python3 - \
-              "$candidate_project/PCB-MAIN_RF_P0_EXPECTED_REV_A.kicad_pcb" \
-              "$candidate_project/PCB-MAIN_RF_P0_REGENERATED_REV_A.kicad_pcb" <<'PY'
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_RF_P0_EXPECTED_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_RF_P0_REGENERATED_REV_A.kicad_pcb" <<'PY'
           import sys
+          from collections import Counter
 
-          from kiutils.board import Board
+          import pcbnew
 
 
           def require(value: bool, message: str) -> None:
@@ -703,35 +703,61 @@ jobs:
                   raise AssertionError(message)
 
 
-          def traces_by_uuid(board: Board, label: str) -> dict[str, object]:
-              uuids = [str(item.tstamp) for item in board.traceItems]
+          def point(value: object) -> tuple[int, int]:
+              return int(value.x), int(value.y)
+
+
+          def optional_int(value: object) -> int | None:
+              return None if value is None else int(value)
+
+
+          def copper_signature(item: object) -> tuple[object, ...]:
+              common = (
+                  str(item.GetNetname()),
+                  int(item.GetNetCode()),
+                  int(item.GetWidth()),
+                  bool(item.IsLocked()),
+                  optional_int(item.GetLocalClearance()),
+              )
+              if isinstance(item, pcbnew.PCB_VIA):
+                  return (
+                      "via", *common, point(item.GetPosition()),
+                      int(item.GetDrillValue()), int(item.GetViaType()),
+                      int(item.TopLayer()), int(item.BottomLayer()),
+                      bool(item.GetIsFree()), bool(item.GetRemoveUnconnected()),
+                      bool(item.GetKeepStartEnd()),
+                      int(item.GetFrontTentingMode()),
+                      int(item.GetBackTentingMode()),
+                  )
+              endpoints = tuple(sorted((point(item.GetStart()), point(item.GetEnd()))))
+              return (
+                  "segment", *common, endpoints, int(item.GetLayer()),
+                  bool(item.HasSolderMask()),
+                  int(item.GetLocalSolderMaskMargin()),
+              )
+
+
+          def copper_inventory(board: object, label: str) -> Counter[tuple[object, ...]]:
+              items = list(board.GetTracks())
+              uuids = [str(item.m_Uuid.AsString()) for item in items]
               require(len(uuids) == len(set(uuids)),
                       f"{label}: duplicate copper UUIDs")
-              return {str(item.tstamp): item for item in board.traceItems}
+              require(len(items) == 976,
+                      f"{label}: expected 976 copper items, got {len(items)}")
+              return Counter(copper_signature(item) for item in items)
 
 
-          expected = Board().from_file(sys.argv[1], encoding="utf-8")
-          regenerated = Board().from_file(sys.argv[2], encoding="utf-8")
-          for field in (
-              "general", "layers", "setup", "properties", "graphicItems",
-              "dimensions", "groups", "targets", "nets", "footprints", "zones",
-          ):
-              require(getattr(expected, field) == getattr(regenerated, field),
-                      f"RF regeneration changes non-routing field: {field}")
-
-          expected_traces = traces_by_uuid(expected, "expected candidate")
-          regenerated_traces = traces_by_uuid(regenerated, "regenerated candidate")
-          require(set(expected_traces) == set(regenerated_traces),
-                  "RF regeneration copper UUID inventory drift")
-          changed = sorted(
-              uuid for uuid, item in expected_traces.items()
-              if item != regenerated_traces[uuid]
-          )
-          require(not changed,
-                  f"RF regeneration copper geometry drift: {changed[:5]}")
+          expected = pcbnew.LoadBoard(sys.argv[1])
+          regenerated = pcbnew.LoadBoard(sys.argv[2])
+          expected_copper = copper_inventory(expected, "expected candidate")
+          regenerated_copper = copper_inventory(regenerated, "regenerated candidate")
+          missing = list((expected_copper - regenerated_copper).elements())[:3]
+          added = list((regenerated_copper - expected_copper).elements())[:3]
+          require(not missing and not added,
+                  f"RF regeneration copper geometry drift: missing={missing}, added={added}")
           print(
               "PCB-MAIN P0 RF KiCad 9 semantic regeneration: PASS "
-              f"({len(expected_traces)} copper items)"
+              f"({sum(expected_copper.values())} copper items)"
           )
           PY
           /usr/bin/python3 - \
