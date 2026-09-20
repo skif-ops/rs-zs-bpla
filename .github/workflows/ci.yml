@@ -130,6 +130,9 @@ jobs:
           python tools/generate_pcb_main_usb_placement_eco_001_candidate_rev_a.py --check
           python tools/audit_pcb_main_usb_placement_eco_001_candidate_rev_a.py \
             --output artifacts/pcb_main_usb_placement_eco_001_candidate_rev_a.json
+          python tools/generate_pcb_main_usb_placement_eco_001_application_rev_a.py --check
+          python tools/audit_pcb_main_usb_placement_eco_001_application_rev_a.py \
+            --output artifacts/pcb_main_usb_placement_eco_001_application_rev_a.json
           python tools/generate_pcb_main_rf_remediation_application_rev_a.py --check
           python tools/audit_pcb_main_rf_remediation_application_rev_a.py \
             --output artifacts/pcb_main_rf_remediation_application_rev_a.json
@@ -246,6 +249,7 @@ jobs:
             artifacts/pcb_main_rf_return_001_candidate_rev_a.json
             artifacts/pcb_main_gnss_rf_eco_001_candidate_rev_a.json
             artifacts/pcb_main_usb_placement_eco_001_candidate_rev_a.json
+            artifacts/pcb_main_usb_placement_eco_001_application_rev_a.json
             artifacts/pcb_main_rf_remediation_application_rev_a.json
             artifacts/pcb_main_assembler_dfm_stencil_request_rev_a.json
             artifacts/pcb_main_mechanical_eco_candidate_rev_a.json

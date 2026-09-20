@@ -85,6 +85,9 @@ RF_CANDIDATE_SHA256 = (
 RF_REMEDIATION_SHA256 = (
     "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
 )
+ACTIVE_BOARD_SHA256 = (
+    "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
+)
 
 FIELDS = [
     "Net_Name",
@@ -475,6 +478,8 @@ def expected_status_control(
         "cellular_l2_return_subgate": "APPLIED_EXACT_ACCEPTED_ZONE",
         "gnss_rf_placement_routeability_subgate": "APPLIED_EXACT_ACCEPTED_DELTA",
         "combined_rf_remediation_gate": "PASS_COMMIT_BOUND_KICAD9_DRC_AND_FILLED_L2_REFERENCES",
+        "usb_source_termination_placement_subgate":
+        "APPLIED_EXACT_ACCEPTED_R91_R92_DELTA_COMMIT_BOUND_GATE_PENDING",
         "factory_stackup": STACKUP_STATE,
         "routing_complete": False,
         "manufacturing_release": False,
@@ -579,16 +584,15 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
     require(trace_items == 975 and copper_zones == 8,
             "authoritative board does not contain the accepted RF remediations")
     board_digest = sha256(board_path)
-    require(board_digest == RF_REMEDIATION_SHA256,
-            "authoritative board SHA-256 differs from the composed RF remediation")
+    require(board_digest == ACTIVE_BOARD_SHA256,
+            "authoritative board SHA-256 differs from the accepted USB placement successor")
     require(sha256(GROUND_CANDIDATE) == GROUND_CANDIDATE_SHA256,
             "accepted ground-domain candidate hash drift")
     require(sha256(SIGNAL_CANDIDATE) == SIGNAL_CANDIDATE_SHA256 and
             sha256(OCTOSPI_CANDIDATE) == OCTOSPI_CANDIDATE_SHA256 and
             sha256(RF_CANDIDATE) == RF_CANDIDATE_SHA256 and
-            sha256(RF_REMEDIATION_COMPOSED) == RF_REMEDIATION_SHA256 and
-            board_path.read_bytes() == RF_REMEDIATION_COMPOSED.read_bytes(),
-            "authoritative board is not byte-identical to the composed RF remediation")
+            sha256(RF_REMEDIATION_COMPOSED) == RF_REMEDIATION_SHA256,
+            "accepted routing predecessor identity drift")
     application = json.loads(GROUND_APPLICATION.read_text(encoding="utf-8"))
     require(application.get("decision") == "ACCEPT_GROUND_DOMAIN_ROUTING_SUBGATE"
             and application.get("status") ==

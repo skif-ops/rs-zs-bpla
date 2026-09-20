@@ -22,7 +22,7 @@
     "mechanical_authority": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
     "mechanical_authority_sha256": "8b3dbcb5b3fffe8ce393850e4fa65b178ea79c03b584c2f8b54e6fdfd93e42f9",
     "placement_manifest": "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
-    "placement_manifest_sha256": "0c32b3818ae1fbf9c0552d3734f1d6390f753e4f1b044d7c96dc8831d2d5f8a0",
+    "placement_manifest_sha256": "df7cdbfc2ac023d43ac040b14eb99440fc392d402793d5a3b03f2fd560af6a6f",
     "routing_authority": "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv",
     "routing_authority_sha256": "f77948c4837448fbc6c3d0cfd6820354a0a8cab12925457bf90768704cb9e1dc"
   },

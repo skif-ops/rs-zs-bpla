@@ -37,6 +37,13 @@ COMPOSED = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
     "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
 )
+USB_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/"
+    "PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb"
+)
+USB_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPLICATION_REV_A.json"
+)
 CELLULAR_APPROVAL = (
     ROOT / "hardware/reviews/PCB_MAIN_RF_RETURN_001_APPROVAL_REV_A.json"
 )
@@ -66,6 +73,7 @@ BASE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
 CELLULAR_SHA256 = "22ddd8c56ceabf397ed033a44235b439625d3104fa2cf798bb57b782d24b1352"
 GNSS_SHA256 = "d4c0eaa95bb62c7b9ae15b110fb3a76e6a056f462f0a36a734b3fa63730d2aee"
 COMPOSED_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
+ACTIVE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
 GENERATOR_SHA256 = "9014e03d6dbd3fe6f153d1a5a557ac2832904e264f165b03ba0cdca38a7fe3fa"
 CELLULAR_APPROVAL_SHA256 = "000e323f116d9b4aa371142c9efe37d85241563ea8db41c2f9b23bfca6bee079"
 GNSS_APPROVAL_SHA256 = "3668c63ab845186cbfc669f63765b98ffe70b281a59e58f00a4f26841ff69127"
@@ -134,6 +142,7 @@ def static_audit() -> dict[str, object]:
         BOARD, BASE, GNSS_CANDIDATE, CELLULAR_CANDIDATE, COMPOSED,
         CELLULAR_APPROVAL, CELLULAR_MAPPING, CELLULAR_APPLICATION,
         GNSS_APPROVAL, GNSS_MAPPING, GNSS_APPLICATION, REPEAT_REVIEW, GENERATOR,
+        USB_CANDIDATE, USB_APPLICATION,
         PLACEMENT_AUTHORITY, CAPTURE_STATUS,
     ):
         require(path.is_file() and path.stat().st_size > 0,
@@ -145,9 +154,12 @@ def static_audit() -> dict[str, object]:
     require(sha256(GNSS_CANDIDATE) == GNSS_SHA256,
             "reviewed GNSS candidate SHA-256 drift")
     require(sha256(COMPOSED) == COMPOSED_SHA256 and
-            sha256(BOARD) == COMPOSED_SHA256 and
-            BOARD.read_bytes() == COMPOSED.read_bytes() == generator.composed_bytes(),
-            "authoritative board is not the exact deterministic composition")
+            COMPOSED.read_bytes() == generator.composed_bytes(),
+            "historical RF board is not the exact deterministic composition")
+    require(sha256(BOARD) == ACTIVE_SHA256 and
+            sha256(USB_CANDIDATE) == ACTIVE_SHA256 and
+            BOARD.read_bytes() == USB_CANDIDATE.read_bytes(),
+            "authoritative board is not the exact accepted USB placement successor")
     require(sha256(GENERATOR) == GENERATOR_SHA256,
             "RF-remediation composition generator SHA-256 drift")
     require(sha256(CELLULAR_APPROVAL) == CELLULAR_APPROVAL_SHA256,
@@ -282,13 +294,35 @@ def static_audit() -> dict[str, object]:
     )
 
     reviewed_gnss = Board.from_file(str(GNSS_CANDIDATE), encoding="utf-8")
+    rf_composed = Board.from_file(str(COMPOSED), encoding="utf-8")
     active = Board.from_file(str(BOARD), encoding="utf-8")
     for field in (
         "general", "layers", "setup", "properties", "graphicItems",
         "dimensions", "groups", "targets", "nets", "footprints", "traceItems",
     ):
-        require(getattr(reviewed_gnss, field) == getattr(active, field),
+        require(getattr(reviewed_gnss, field) == getattr(rf_composed, field),
                 f"composed application changes GNSS-reviewed field: {field}")
+    for field in (
+        "general", "layers", "setup", "properties", "graphicItems",
+        "dimensions", "groups", "targets", "nets", "traceItems", "zones",
+    ):
+        require(getattr(rf_composed, field) == getattr(active, field),
+                f"USB placement successor changes RF-composed field: {field}")
+    predecessor_footprints = {ref_of(item): item for item in rf_composed.footprints}
+    active_footprints = {ref_of(item): item for item in active.footprints}
+    require(predecessor_footprints.keys() == active_footprints.keys(),
+            "USB successor footprint set drift")
+    moved: set[str] = set()
+    for reference, first in predecessor_footprints.items():
+        second = active_footprints[reference]
+        if first.position != second.position:
+            moved.add(reference)
+        require(
+            {key: value for key, value in first.__dict__.items() if key != "position"} ==
+            {key: value for key, value in second.__dict__.items() if key != "position"},
+            f"USB successor changes non-placement footprint data: {reference}",
+        )
+    require(moved == {"R91", "R92"}, f"unexpected USB placement delta: {moved}")
     reviewed_zones = {str(item.tstamp): item for item in reviewed_gnss.zones}
     active_zones = {str(item.tstamp): item for item in active.zones}
     require(
@@ -317,6 +351,13 @@ def static_audit() -> dict[str, object]:
         and (float(footprints["J9"].position.X),
              float(footprints["J9"].position.Y)) == (53.5, 68.0),
         "applied GNSS placement or fixed anchors drift",
+    )
+    require(
+        (float(footprints["R91"].position.X), float(footprints["R91"].position.Y),
+         float(footprints["R91"].position.angle or 0.0)) == (64.0, 25.25, 0.0)
+        and (float(footprints["R92"].position.X), float(footprints["R92"].position.Y),
+             float(footprints["R92"].position.angle or 0.0)) == (64.0, 26.25, 0.0),
+        "accepted USB placement successor pose drift",
     )
     segments = [item for item in active.traceItems if type(item).__name__ == "Segment"]
     vias = [item for item in active.traceItems if type(item).__name__ == "Via"]
@@ -366,6 +407,7 @@ def static_audit() -> dict[str, object]:
         "cellular_candidate_sha256": CELLULAR_SHA256,
         "gnss_candidate_sha256": GNSS_SHA256,
         "composed_board_sha256": COMPOSED_SHA256,
+        "active_successor_sha256": ACTIVE_SHA256,
         "trace_items": len(active.traceItems),
         "track_segments": len(segments),
         "vias": len(vias),
@@ -407,7 +449,8 @@ def main() -> int:
         output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n",
                           encoding="utf-8")
     print("PCB-MAIN composed RF-remediation application audit: PASS")
-    print(f"board_sha256={COMPOSED_SHA256} trace_items=975 zones=8")
+    print(f"board_sha256={ACTIVE_SHA256} rf_predecessor_sha256={COMPOSED_SHA256} "
+          "trace_items=975 zones=8")
     print("release_boundary=FINAL_SI_REMAINING_ROUTING_REVIEW_B_AND_MANUFACTURING_OPEN")
     return 0
 

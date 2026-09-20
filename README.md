@@ -48,9 +48,10 @@ engineering-геометрию RF/USB; финальная production-геоме�
 машинно-проверяемый одинаковый запрос двум независимым фабрикам и пустой
 22-строчный реестр ответов; принято `0/2` ответов, конструкция не выбрана.
 В authoritative PCB приняты ограниченные ground-domain, hard-signal, OctoSPI,
-семисетевой RF P0 и оба RF-remediation subgate. Текущая композиция содержит
-692 сегмента, 283 via, 4 copper zones и 4 rule areas; SHA-256
-`f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9`.
+семисетевой RF P0, оба RF-remediation subgate и точная placement-дельта
+`R91/R92`. Текущий successor содержит 692 сегмента, 283 via, 4 copper zones и
+4 rule areas; SHA-256
+`d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e`.
 `PCB-MAIN-RF-RETURN-001` добавлен первым как точный кандидат с локальной
 `GND_MODEM` L2-зоной. Затем точная принятая дельта
 `PCB-MAIN-GNSS-RF-ECO-001` оставила U9/J9 на месте, переставила только FL1/C64
@@ -59,12 +60,13 @@ engineering-геометрию RF/USB; финальная production-геоме�
 gate прошли. PCB Native `#277` подтвердил ноль новых DRC errors, отсутствие
 регрессии `429` unconnected items и полное L2-покрытие всех `623` cellular и
 `406` GNSS контрольных точек; bounded repeat RF/SI return-path review закрыт.
-Для следующего USB-подэтапа proposal `PCB-MAIN-USB-PLACEMENT-ECO-001`
-переносит только неразведённые `R91/R92`; authoritative PCB не изменён.
+Для следующего USB-подэтапа `PCB-MAIN-USB-PLACEMENT-ECO-001` переносит только
+неразведённые `R91/R92`. Решение принято и точный кандидат применён к
+authoritative PCB; вся медь и RF-remediation predecessor сохранены.
 Commit `ad3745e7` прошёл CI `#554` и PCB Native `#281`: новых DRC errors нет,
-unconnected остаётся `429`, strict clearance — PASS. Применение ожидает
-отдельного human-решения; USB-трассировка и финальная impedance-геометрия пока
-не разрешены.
+unconnected остаётся `429`, strict clearance — PASS. Application successor
+ожидает собственный commit-bound CI/KiCad 9 gate; USB-трассировка и финальная
+impedance-геометрия пока не разрешены.
 Отдельно подготовлен ограниченный запрос для будущего
 выбранного сборщика по DFM/трафарету `U2/U25/U26/U9` и пустой 14-строчный реестр: принято
 `0/14` ответов, сборщик и процесс не выбраны, паста U9 и производственный выпуск

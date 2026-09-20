@@ -13,10 +13,10 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 CANDIDATE_DIR = ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001"
 DEFAULT_BASE_OUTPUT = CANDIDATE_DIR / "PCB-MAIN_USB_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb"
 DEFAULT_OUTPUT = CANDIDATE_DIR / "PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb"
+BASE = DEFAULT_BASE_OUTPUT
 BASE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
 
 PLACEMENT_REPLACEMENTS = {
@@ -57,7 +57,7 @@ def move_footprint(source: str, reference: str, old: str, new: str) -> str:
 
 def candidate_bytes(base_payload: bytes) -> bytes:
     require(sha256_bytes(base_payload) == BASE_SHA256,
-            "authoritative PCB-MAIN SHA-256 drift")
+            "historical USB placement ECO base SHA-256 drift")
     source = base_payload.decode("utf-8")
     for reference, (old, new) in PLACEMENT_REPLACEMENTS.items():
         source = move_footprint(source, reference, old, new)
@@ -81,7 +81,7 @@ def generate(base_output: Path, output: Path, check: bool) -> dict[str, object]:
         "candidate_sha256": sha256_bytes(candidate_payload),
         "moved_footprints": sorted(PLACEMENT_REPLACEMENTS),
         "copper_changed": False,
-        "authoritative_board_modified": False,
+        "historical_candidate_regeneration": True,
     }
 
 

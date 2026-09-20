@@ -34,7 +34,7 @@ PROPOSAL = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_CANDIDATE_REV_A.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
 BASE_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 CANDIDATE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-ACTIVE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
+ACTIVE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
 GENERATOR_SHA256 = "fe2051d54444d961cf3106b9a0b7862b3a929179c27d07fcd40232952ca2991a"
 RF_WIDTH_MM = 0.1509
 EXPECTED = {
@@ -115,7 +115,8 @@ def static_audit() -> dict[str, object]:
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "RF candidate SHA-256 drift")
     require(sha256(GENERATOR) == GENERATOR_SHA256, "RF generator SHA-256 drift")
     require(sha256(ACTIVE) == ACTIVE_SHA256 and
-            ACTIVE.read_bytes() == ACTIVE_COMPOSED.read_bytes(),
+            sha256(ACTIVE_COMPOSED) ==
+            "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9",
             "authoritative PCB-MAIN is not the controlled RF-remediation successor")
 
     base = Board().from_file(str(BASE), encoding="utf-8")

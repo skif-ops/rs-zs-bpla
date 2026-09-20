@@ -50,7 +50,7 @@ BASE_SHA256 = "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
 CANDIDATE_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
 OCTOSPI_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 RF_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-ACTIVE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
+ACTIVE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
 GNSS_AUTHORIZED_REMOVED_GROUND_TSTAMPS = {
     "8bb16eba-0c23-436c-83cb-15711942aa13",
     "97b4ffd7-640c-458b-a674-df70012edd9e",
@@ -177,7 +177,8 @@ def static_audit() -> dict[str, Any]:
     require(sha256(OCTOSPI_CANDIDATE) == OCTOSPI_SHA256 and
             sha256(RF_CANDIDATE) == RF_SHA256 and
             sha256(ACTIVE) == ACTIVE_SHA256 and
-            ACTIVE.read_bytes() == RF_REMEDIATION_COMPOSED.read_bytes(),
+            sha256(RF_REMEDIATION_COMPOSED) ==
+            "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9",
             "authoritative PCB-MAIN RF-remediation successor identity drift")
     base = Board.from_file(str(BASE), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")

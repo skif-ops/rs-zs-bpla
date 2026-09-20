@@ -115,6 +115,8 @@ on:
       - "tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py"
       - "tools/generate_pcb_main_usb_placement_eco_001_candidate_rev_a.py"
       - "tools/audit_pcb_main_usb_placement_eco_001_candidate_rev_a.py"
+      - "tools/generate_pcb_main_usb_placement_eco_001_application_rev_a.py"
+      - "tools/audit_pcb_main_usb_placement_eco_001_application_rev_a.py"
       - "tools/generate_pcb_main_rf_remediation_application_rev_a.py"
       - "tools/audit_pcb_main_rf_remediation_application_rev_a.py"
       - "tools/route_pcb_release_candidate_rev_a.py"
@@ -429,6 +431,9 @@ jobs:
           python tools/generate_pcb_main_usb_placement_eco_001_candidate_rev_a.py --check
           python tools/audit_pcb_main_usb_placement_eco_001_candidate_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/usb_placement_eco_001_candidate_audit.json
+          python tools/generate_pcb_main_usb_placement_eco_001_application_rev_a.py --check
+          python tools/audit_pcb_main_usb_placement_eco_001_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/usb_placement_eco_001_application_audit.json
           python tools/generate_pcb_main_rf_remediation_application_rev_a.py --check
           python tools/audit_pcb_main_rf_remediation_application_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/rf_remediation_application_audit.json
@@ -973,6 +978,11 @@ jobs:
             --drc-base "$evidence/baseline_drc.json" \
             --drc-candidate "$evidence/candidate_drc.json" \
             --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_usb_placement_eco_001_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
       - name: KiCad 9 combined gate for accepted PCB-MAIN RF remediations
         shell: bash
         run: |
@@ -994,7 +1004,7 @@ jobs:
             hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb \
             "$candidate_project/PCB-MAIN_RF_REMEDIATION_REGENERATED_REV_A.kicad_pcb"
           cmp \
-            hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb \
+            hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb \
             "$candidate_project/PCB-MAIN_RF_REMEDIATION_REGENERATED_REV_A.kicad_pcb"
           python tools/audit_pcb_main_placement_clearance_rev_a.py \
             --board "$candidate_project/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb" \
@@ -1303,6 +1313,10 @@ jobs:
             hardware/reviews/PCB_MAIN_USB_ROUTEABILITY_REVIEW_REV_A.md
             hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.json
             hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPROVAL_REV_A.md
+            hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPLICATION_REV_A.json
             hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb

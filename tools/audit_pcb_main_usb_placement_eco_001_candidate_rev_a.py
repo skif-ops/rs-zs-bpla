@@ -20,6 +20,9 @@ ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb"
 CANDIDATE = ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb"
 REVIEW = ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.json"
+ACTIVE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPROVAL_REV_A.json"
+APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPLICATION_REV_A.json"
 AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 BASE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
 CANDIDATE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
@@ -97,8 +100,9 @@ def audit_drc(base_path: Path, candidate_path: Path) -> dict[str, object]:
 def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> dict[str, object]:
     require(sha256(BASE) == BASE_SHA256, "USB ECO base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "USB ECO candidate SHA-256 drift")
-    require(BASE.read_bytes() == (ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb").read_bytes(),
-            "USB ECO base is not authoritative PCB-MAIN")
+    require(sha256(ACTIVE) == CANDIDATE_SHA256 and
+            ACTIVE.read_bytes() == CANDIDATE.read_bytes(),
+            "authoritative PCB-MAIN is not the exact accepted USB ECO candidate")
 
     base = Board.from_file(str(BASE), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")
@@ -164,8 +168,39 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
             gate.get("new_errors") == 0,
             "USB placement ECO commit-bound machine evidence drift")
 
+    approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
+    application = json.loads(APPLICATION.read_text(encoding="utf-8"))
+    require(
+        approval.get("decision") ==
+        "ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE"
+        and approval.get("reviewed_candidate_board_sha256") == CANDIDATE_SHA256
+        and approval.get("authorization", {}).get(
+            "apply_exact_hash_bound_r91_r92_placement_delta"
+        ) is True
+        and approval.get("authorization", {}).get(
+            "cam_or_manufacturing_release"
+        ) is False,
+        "USB placement ECO approval identity or boundary drift",
+    )
+    require(
+        application.get("decision") ==
+        "ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE"
+        and application.get("applied", {}).get("board_sha256") ==
+        CANDIDATE_SHA256
+        and application.get("applied", {}).get("exact_candidate_byte_identity")
+        is True
+        and application.get("machine_gate", {}).get("status") in {
+            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+        }
+        and application.get("usb_pair_routing_complete") is False
+        and application.get("review_b_complete") is False
+        and application.get("cam_or_manufacturing_release") is False,
+        "USB placement ECO application identity or release boundary drift",
+    )
+
     report: dict[str, object] = {
-        "status": "PASS_STATIC_PROPOSAL_ONLY",
+        "status": "PASS_STATIC_ACCEPTED_AND_APPLIED",
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "moved_footprints": sorted(changed),
@@ -175,7 +210,8 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         },
         "source_side_length_mismatch_mm": round(abs(dp_length - dm_length), 9),
         "placement_clearance_state": summary["state"],
-        "authoritative_board_modified": False,
+        "historical_proposal_authoritative_board_modified": False,
+        "active_successor_sha256": CANDIDATE_SHA256,
         "review_b_complete": False,
         "manufacturing_release": False,
     }

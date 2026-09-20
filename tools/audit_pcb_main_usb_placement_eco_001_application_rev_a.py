@@ -1,0 +1,244 @@
+#!/usr/bin/env python3
+"""Audit the accepted and exactly applied PCB-MAIN USB placement ECO-001."""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import hashlib
+import json
+from collections import Counter
+from pathlib import Path
+from typing import Any
+
+from kiutils.board import Board
+
+import audit_pcb_main_placement_clearance_rev_a as clearance_audit
+import audit_pcb_main_usb_placement_eco_001_candidate_rev_a as candidate_audit
+
+
+ROOT = Path(__file__).resolve().parents[1]
+BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+BASE = candidate_audit.BASE
+CANDIDATE = candidate_audit.CANDIDATE
+APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPROVAL_REV_A.json"
+MAPPING = ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_REVIEW_COMMIT_MAPPING.json"
+APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPLICATION_REV_A.json"
+GENERATOR = ROOT / "tools/generate_pcb_main_usb_placement_eco_001_application_rev_a.py"
+PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
+STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+RF_COMPOSED = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
+    "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
+)
+
+BASE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
+CANDIDATE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
+APPROVAL_SHA256 = "d071f6e0993d225ddab094b8e9d3cc4a24e52045286ca3f43d9929cb7597bf35"
+MAPPING_SHA256 = "f7a5345facf484d1eb7ae3cb650f70a8a872f7c6148149bbc818b74666fa15ba"
+GENERATOR_SHA256 = "e3914cc8aad95e4b249aaed1788903043122d88a66b3006e6541daf7e321743a"
+PLACEMENT_SHA256 = "df7cdbfc2ac023d43ac040b14eb99440fc392d402793d5a3b03f2fd560af6a6f"
+REVIEWED_COMMIT = "a3d774c8e7b0bd0634a60cf44b1cdf3f828a3e8d"
+REVIEWED_TREE = "fa9bfd800e79eadc56d379ee4a1591c06a5f9b48"
+APPROVAL_COMMIT = "20632248d9c70b6456d8fe5e3a30d99b25dd39f8"
+
+
+def require(value: bool, message: str) -> None:
+    if not value:
+        raise AssertionError(message)
+
+
+def sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def ref_of(footprint: Any) -> str:
+    value = footprint.properties.get("Reference")
+    if value:
+        return str(value)
+    return next(str(item.text) for item in footprint.graphicItems
+                if getattr(item, "type", None) == "reference")
+
+
+def drc_inventory(path: Path) -> tuple[Counter[str], int, int]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    errors = Counter(item.get("type", "UNKNOWN") for item in data.get("violations", [])
+                     if item.get("severity") == "error")
+    return errors, len(data.get("violations", [])), len(data.get("unconnected_items", []))
+
+
+def audit_drc(base_path: Path, candidate_path: Path) -> dict[str, object]:
+    base_errors, base_violations, base_unconnected = drc_inventory(base_path)
+    active_errors, active_violations, active_unconnected = drc_inventory(candidate_path)
+    added = {kind: active_errors[kind] - base_errors[kind]
+             for kind in active_errors if active_errors[kind] > base_errors[kind]}
+    require(not added, f"applied USB placement adds KiCad 9 errors: {added}")
+    require(active_unconnected <= base_unconnected,
+            "applied USB placement increases unconnected items")
+    return {
+        "status": "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION",
+        "base_violations": base_violations,
+        "active_violations": active_violations,
+        "base_unconnected": base_unconnected,
+        "active_unconnected": active_unconnected,
+        "new_error_counts": added,
+    }
+
+
+def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[str, object]:
+    for path in (BOARD, BASE, CANDIDATE, APPROVAL, MAPPING, APPLICATION,
+                 GENERATOR, PLACEMENT, AUTHORITY, STATUS, RF_COMPOSED):
+        require(path.is_file() and path.stat().st_size > 0,
+                f"missing USB placement application input: {path}")
+    require(sha256(BASE) == BASE_SHA256 and sha256(RF_COMPOSED) == BASE_SHA256 and
+            BASE.read_bytes() == RF_COMPOSED.read_bytes(),
+            "accepted RF-remediation predecessor identity drift")
+    require(sha256(CANDIDATE) == CANDIDATE_SHA256 and
+            sha256(BOARD) == CANDIDATE_SHA256 and
+            BOARD.read_bytes() == CANDIDATE.read_bytes(),
+            "authoritative PCB-MAIN is not the exact accepted USB candidate")
+    require(sha256(APPROVAL) == APPROVAL_SHA256, "USB approval SHA-256 drift")
+    require(sha256(MAPPING) == MAPPING_SHA256, "USB review mapping SHA-256 drift")
+    require(sha256(GENERATOR) == GENERATOR_SHA256, "USB application generator drift")
+    require(sha256(PLACEMENT) == PLACEMENT_SHA256, "USB placement manifest drift")
+
+    historical = candidate_audit.audit()
+    require(historical.get("placement_clearance_state") == "PASS",
+            "accepted USB candidate static audit drift")
+
+    approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
+    mapping = json.loads(MAPPING.read_text(encoding="utf-8"))
+    application = json.loads(APPLICATION.read_text(encoding="utf-8"))
+    require(
+        approval.get("reviewed_github_commit_sha") == REVIEWED_COMMIT
+        and approval.get("reviewed_tree_sha") == REVIEWED_TREE
+        and approval.get("decision") ==
+        "ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE"
+        and approval.get("reviewed_candidate_board_sha256") == CANDIDATE_SHA256
+        and approval.get("authorization", {}).get(
+            "cam_or_manufacturing_release"
+        ) is False,
+        "USB approval identity or boundary drift",
+    )
+    require(
+        mapping.get("reviewed_github_commit_sha") == REVIEWED_COMMIT
+        and mapping.get("reviewed_tree_sha") == REVIEWED_TREE
+        and mapping.get("candidate_board_sha256") == CANDIDATE_SHA256
+        and mapping.get("equivalence") == "EXACT_REVIEWED_TREE_AND_BLOBS"
+        and mapping.get("cam_or_manufacturing_release") is False,
+        "USB review commit mapping drift",
+    )
+    applied = application.get("applied", {})
+    gate = application.get("machine_gate", {})
+    require(
+        application.get("approval_commit_sha") == APPROVAL_COMMIT
+        and application.get("approval_sha256") == APPROVAL_SHA256
+        and application.get("decision") ==
+        "ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE"
+        and application.get("scope") == "EXACT_R91_R92_PLACEMENT_DELTA_ONLY"
+        and application.get("predecessor", {}).get("board_sha256") == BASE_SHA256
+        and application.get("application_generator", {}).get("sha256") ==
+        GENERATOR_SHA256
+        and applied.get("board_sha256") == CANDIDATE_SHA256
+        and applied.get("exact_candidate_byte_identity") is True
+        and applied.get("changed_references") == ["R91", "R92"]
+        and applied.get("copper_changed") is False
+        and applied.get("placement_manifest_sha256") == PLACEMENT_SHA256
+        and gate.get("status") in {
+            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+        }
+        and application.get("usb_pair_routing_complete") is False
+        and application.get("review_b_complete") is False
+        and application.get("cam_or_manufacturing_release") is False,
+        "USB application identity, geometry, or release boundary drift",
+    )
+
+    board = Board.from_file(str(BOARD), encoding="utf-8")
+    footprints = {ref_of(item): item for item in board.footprints}
+    require(
+        (float(footprints["R91"].position.X), float(footprints["R91"].position.Y),
+         float(footprints["R91"].position.angle or 0.0)) == (64.0, 25.25, 0.0)
+        and (float(footprints["R92"].position.X), float(footprints["R92"].position.Y),
+             float(footprints["R92"].position.angle or 0.0)) == (64.0, 26.25, 0.0),
+        "applied R91/R92 poses drift",
+    )
+    segments = [item for item in board.traceItems if type(item).__name__ == "Segment"]
+    vias = [item for item in board.traceItems if type(item).__name__ == "Via"]
+    require(len(board.traceItems) == 975 and len(segments) == 692 and len(vias) == 283
+            and len(board.zones) == 8,
+            "USB application unexpectedly changes copper inventory")
+
+    with PLACEMENT.open(encoding="utf-8", newline="") as stream:
+        rows = {row["RefDes"]: row for row in csv.DictReader(stream)}
+    for reference, expected in {"R91": (64.0, 25.25, 0.0),
+                                "R92": (64.0, 26.25, 0.0)}.items():
+        row = rows[reference]
+        actual = (float(row["X_mm"]), float(row["Y_mm"]),
+                  float(row["Rotation_deg"]) % 360.0)
+        require(actual == expected, f"{reference}: placement manifest pose drift")
+
+    clearance = clearance_audit.audit(BOARD, AUTHORITY)
+    summary = clearance.get("summary", {})
+    require(summary.get("state") == "PASS" and
+            summary.get("confirmed_component_collisions") == 0 and
+            summary.get("confirmed_mounting_clearance_conflicts") == 0 and
+            summary.get("confirmed_tool_clearance_conflicts") == 0,
+            "applied USB placement strict-clearance drift")
+
+    status = json.loads(STATUS.read_text(encoding="utf-8"))
+    evidence = status.get("review_b", {}).get("evidence", {})
+    require(
+        evidence.get("usb_placement_eco_001_status") in {
+            "APPROVED_APPLIED_EXACT_R91_R92_PLACEMENT_PENDING_COMMIT_BOUND_KICAD9_GATE",
+            "APPROVED_APPLIED_EXACT_R91_R92_PLACEMENT_COMMIT_BOUND_KICAD9_GATE_PASS",
+        }
+        and evidence.get("placement_clearance_control", {}).get("board_sha256") ==
+        CANDIDATE_SHA256
+        and evidence.get("routing_constraint_control", {}).get("board_sha256") ==
+        CANDIDATE_SHA256
+        and status.get("review_b", {}).get("complete") is False
+        and status.get("manufacturing_release") is False,
+        "capture-status USB application traceability or release boundary drift",
+    )
+
+    report: dict[str, object] = {
+        "schema_version": "dioneya.pcb-main-usb-placement-eco-001-application-audit.v1",
+        "status": "PASS_EXACT_ACCEPTED_USB_PLACEMENT_APPLICATION",
+        "predecessor_sha256": BASE_SHA256,
+        "active_board_sha256": CANDIDATE_SHA256,
+        "placement_manifest_sha256": PLACEMENT_SHA256,
+        "changed_references": ["R91", "R92"],
+        "copper_changed": False,
+        "strict_placement_clearance": "PASS",
+        "machine_gate": gate.get("status"),
+        "usb_pair_routing_complete": False,
+        "review_b_complete": False,
+        "manufacturing_release": False,
+    }
+    require((drc_base is None) == (drc_active is None),
+            "both comparative DRC paths are required together")
+    if drc_base is not None and drc_active is not None:
+        report["comparative_drc"] = audit_drc(drc_base, drc_active)
+    return report
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--drc-base", type=Path)
+    parser.add_argument("--drc-active", type=Path)
+    parser.add_argument("--output", type=Path)
+    args = parser.parse_args()
+    report = audit(args.drc_base, args.drc_active)
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n",
+                               encoding="utf-8")
+    print("PCB-MAIN USB placement ECO-001 application audit:", report["status"])
+    print(f"active_board_sha256={CANDIDATE_SHA256} moved=['R91', 'R92']")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

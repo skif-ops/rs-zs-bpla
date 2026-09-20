@@ -261,7 +261,7 @@ def main() -> int:
                 f"{ref}: unknown functional placement group")
         require(row["Placement_Method"] in {
                     "ACTIVE_SKELETON", "FUNCTIONAL_REGION_GREEDY",
-                    "ACCEPTED_GNSS_RF_ECO_001",
+                    "ACCEPTED_GNSS_RF_ECO_001", "USB_SOURCE_TERMINATION_ECO_001",
                 } and bool(row["Target"]),
                 f"{ref}: placement method or target is not controlled")
         for coordinate in ("X_mm", "Y_mm"):
@@ -360,8 +360,9 @@ def main() -> int:
     remediation_application = json.loads(
         RF_REMEDIATION_APPLICATION.read_text(encoding="utf-8")
     )
-    require(PCB.read_bytes() == RF_REMEDIATION_COMPOSED.read_bytes() and
-            hashlib.sha256(PCB.read_bytes()).hexdigest() ==
+    require(hashlib.sha256(PCB.read_bytes()).hexdigest() ==
+            "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e" and
+            hashlib.sha256(RF_REMEDIATION_COMPOSED.read_bytes()).hexdigest() ==
             "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9" and
             ground_application.get("status") ==
             "APPLIED_ACCEPTED_GROUND_DOMAIN_SUBGATE_ROUTING_ENGINEERING_CONTINUES" and

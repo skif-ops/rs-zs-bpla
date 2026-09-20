@@ -79,8 +79,11 @@ accepted and applied. `PCB-MAIN-RF-RETURN-001` contributes the exact bounded
 local `GND_MODEM` L2 zone accepted after PCB Native Gate `#267`.
 `PCB-MAIN-GNSS-RF-ECO-001` keeps U9/J9 fixed, moves only FL1/C64 and reduces
 the post-SAW route to 1.326997 mm; its reviewed candidate passed PCB Native
-Gate `#273`. The deterministic composition is authoritative PCB SHA-256
+Gate `#273`. The deterministic RF composition is predecessor PCB SHA-256
 `f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9`.
+The exact accepted R91/R92 USB placement successor is authoritative SHA-256
+`d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e`;
+it changes no copper and its application gate is pending.
 Commit-bound source commit `7ee9cfc9` passed CI `#550` and PCB Native Gate
 `#277`: comparative DRC added no errors or unconnected regression, and both
 filled-reference audits cover every cellular and GNSS sample. The bounded
@@ -224,11 +227,10 @@ release.
   numeric current-density/thermal geometry and physical power evidence; PCB-MIC independent Review B,
   CAM comparison, panelization and acoustic-stack review; all three boards'
   DFM and manufacturing release;
-- PCB-MAIN USB source-termination routeability: R91/R92 require a bounded local
-  placement ECO before controlled 90-ohm pair routing; U1/J11/U25 and accepted
-  RF copper remain fixed; revised two-footprint candidate
-  `PCB-MAIN-USB-PLACEMENT-ECO-001` passed commit-bound KiCad 9 on PCB Native
-  #281 but remains unapplied pending human review;
+- PCB-MAIN USB source-termination routeability: the bounded R91/R92 placement
+  ECO was accepted and applied exactly after proposal PCB Native #281; U1/J11/
+  U25 and accepted RF copper remain fixed; its application commit-bound gate
+  and the controlled 90-ohm pair routing remain open;
 - the remaining 17 PCB-PWR input-protection qualification rows after accepted
   manufacturer source control, native-value and repeat-hierarchy gates,
   including +70 C 5 A thermal,

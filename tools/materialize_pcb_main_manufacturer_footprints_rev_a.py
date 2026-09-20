@@ -53,6 +53,7 @@ RF_REMEDIATION_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_APPLICATION_REV_A.json"
 )
 RF_REMEDIATION_BOARD_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
+ACTIVE_BOARD_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
 UUID_NAMESPACE = uuid.UUID("f699db62-94ee-57ef-b2df-eb7590723bf8")
 
 CONTROLLED = {
@@ -530,7 +531,7 @@ def verify_frozen_materialization(candidate: Path) -> None:
         and remediation.get("routing_complete") is False
         and remediation.get("review_b_complete") is False
         and remediation.get("cam_or_manufacturing_release") is False
-        and actual_board_sha256 == RF_REMEDIATION_BOARD_SHA256
+        and actual_board_sha256 == ACTIVE_BOARD_SHA256
     ):
         raise RuntimeError(
             "PCB-MAIN ECO-003/ECO-004/ground-domain frozen-board authority mismatch"

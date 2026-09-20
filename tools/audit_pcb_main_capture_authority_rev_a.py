@@ -2250,6 +2250,31 @@ def main() -> None:
                 and gnss_rf_application.get("cam_or_manufacturing_release") is False,
                 "PCB-MAIN GNSS RF application interlock drift",
             )
+            usb_placement_application = json.loads(
+                (ROOT / review_b["evidence"]["usb_placement_eco_001_application"])
+                .read_text(encoding="utf-8")
+            )
+            require(
+                usb_placement_application.get("proposal_id") ==
+                "PCB-MAIN-USB-PLACEMENT-ECO-001"
+                and usb_placement_application.get("decision") ==
+                "ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE"
+                and usb_placement_application.get("applied", {}).get(
+                    "exact_candidate_byte_identity"
+                ) is True
+                and usb_placement_application.get("applied", {}).get(
+                    "changed_references"
+                ) == ["R91", "R92"]
+                and usb_placement_application.get("applied", {}).get(
+                    "copper_changed"
+                ) is False
+                and usb_placement_application.get("usb_pair_routing_complete") is False
+                and usb_placement_application.get("review_b_complete") is False
+                and usb_placement_application.get(
+                    "cam_or_manufacturing_release"
+                ) is False,
+                "PCB-MAIN USB placement application interlock drift",
+            )
             mechanical_application = None
             if mechanical_eco_status in {
                     "APPROVED_APPLIED_FULL_REPACK_REQUIRED",
@@ -2365,9 +2390,14 @@ def main() -> None:
                             "locked_authority_mounting_conflicts": [],
                             "locked_authority_tool_conflicts": [],
                         }, "PCB-MAIN mechanical ECO historical inventory drift")
-                require(gnss_rf_application.get("applied", {}).get(
+                require(usb_placement_application.get("applied", {}).get(
                             "board_sha256"
                         ) == placement_control["board_sha256"] and
+                        usb_placement_application.get("predecessor", {}).get(
+                            "board_sha256"
+                        ) == gnss_rf_application.get("applied", {}).get(
+                            "board_sha256"
+                        ) and
                         gnss_rf_application.get("applied", {}).get(
                             "exact_composed_board_byte_identity"
                         ) is True and

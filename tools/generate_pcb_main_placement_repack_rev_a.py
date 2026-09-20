@@ -91,12 +91,21 @@ RF_REMEDIATION_COMPOSED = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
     "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"
 )
+USB_APPLICATION = (
+    ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPLICATION_REV_A.json"
+)
+USB_CANDIDATE = (
+    ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/"
+    "PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb"
+)
 
 ACTIVE_APPROVED_POSES = {
     "FL1": (56.8, 51.6, 270.0),
     "C64": (58.3, 51.6, 180.0),
     "D4": (58.25, 70.0, 90.0),
     "L2": (59.75, 70.25, 90.0),
+    "R91": (64.0, 25.25, 0.0),
+    "R92": (64.0, 26.25, 0.0),
 }
 
 PLACEMENT_GRID_MM = 0.25
@@ -858,8 +867,21 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
             and remediation.get("applied", {}).get("placement_manifest") ==
             str(PLACEMENT.relative_to(ROOT))
             and remediation.get("applied", {}).get("placement_manifest_sha256") ==
-            sha256(PLACEMENT),
+            "0c32b3818ae1fbf9c0552d3734f1d6390f753e4f1b044d7c96dc8831d2d5f8a0",
             "PCB-MAIN accepted GNSS placement-manifest successor drift",
+        )
+        usb = json.loads(USB_APPLICATION.read_text(encoding="utf-8"))
+        require(
+            usb.get("decision") ==
+            "ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE"
+            and usb.get("applied", {}).get("board_sha256") == sha256(USB_CANDIDATE)
+            and usb.get("applied", {}).get("exact_candidate_byte_identity") is True
+            and usb.get("applied", {}).get("placement_manifest_sha256") ==
+            sha256(PLACEMENT)
+            and usb.get("usb_pair_routing_complete") is False
+            and usb.get("review_b_complete") is False
+            and usb.get("cam_or_manufacturing_release") is False,
+            "PCB-MAIN accepted USB placement-manifest successor drift",
         )
     else:
         require(applied.get("placement_repack_sha256") == sha256(PLACEMENT),
@@ -912,8 +934,10 @@ def verify_approved_frozen_repack(board_text: str) -> tuple[int, str]:
                 rf.get("historical_baseline", {}).get("board_sha256") ==
                 sha256(OCTOSPI_CANDIDATE) and
                 rf.get("applied", {}).get("exact_candidate_byte_identity") is True and
-                sha256(BOARD) == sha256(RF_REMEDIATION_COMPOSED) and
-                BOARD.read_bytes() == RF_REMEDIATION_COMPOSED.read_bytes() and
+                sha256(RF_REMEDIATION_COMPOSED) ==
+                "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9" and
+                sha256(BOARD) == sha256(USB_CANDIDATE) and
+                BOARD.read_bytes() == USB_CANDIDATE.read_bytes() and
                 len(getattr(board, "traceItems", [])) == 975 and
                 len(getattr(board, "zones", [])) == 8 and
                 ground.get("routing_complete") is False and
@@ -956,7 +980,7 @@ def main() -> int:
         count, proposal_id = verify_approved_frozen_repack(original)
         print(f"PCB-MAIN placement repack: PASS / approved {proposal_id} hashes and board placement match")
         print(f"movable_placements={count} passive_courtyard_margin_mm={PASSIVE_COURTYARD_MARGIN_MM:.2f}")
-        print("status=RF_P0_SUBGATE_APPLIED / REMAINING_ROUTING_AND_REVIEW_B_PENDING")
+        print("status=USB_PLACEMENT_SUBGATE_APPLIED / REMAINING_ROUTING_AND_REVIEW_B_PENDING")
         return 0
     board = Board.from_sexpr(sexpr.parse_sexp(original))
     rows = build_plan(board)

@@ -39,7 +39,7 @@ STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 
 BASE_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
 CANDIDATE_SHA256 = "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
-ACTIVE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
+ACTIVE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
 APPROVAL_SHA256 = "9c015c966c642afc9b2b2b174a7b059ffe3ecb00116eb171c18f94a8a0418b57"
 REVIEWED_COMMIT = "ae92a08a1a530e9d10eb6294481842ed68008469"
 REVIEWED_TREE = "7eee7230005bddae5b3e389110d2204cac43ad8e"
@@ -103,7 +103,8 @@ def audit() -> dict[str, Any]:
     require(sha256(CANDIDATE) == CANDIDATE_SHA256,
             "reviewed RF candidate SHA-256 drift")
     require(sha256(BOARD) == ACTIVE_SHA256 and
-            BOARD.read_bytes() == COMPOSED.read_bytes(),
+            sha256(COMPOSED) ==
+            "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9",
             "authoritative PCB-MAIN is not the controlled RF-remediation successor")
     require(sha256(APPROVAL) == APPROVAL_SHA256, "signed RF approval SHA-256 drift")
 

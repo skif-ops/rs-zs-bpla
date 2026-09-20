@@ -4563,7 +4563,7 @@
 
   (footprint "" (layer "F.Cu")
     (tstamp 83b5edcc-a9f8-4c40-ac2c-a71d4ff3580d)
-    (at 55 18.25 180)
+    (at 64 26.25)
     (property "DIONEA_COURTYARD_SOURCE" "PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A")
     (property "DIONEA_COURTYARD_STATUS" "CONTROLLED_PAD_ENVELOPE_PLUS_0.25_MM")
     (property "DIONEA_PACKAGE" "0402")
@@ -5332,7 +5332,7 @@
 
   (footprint "" (layer "F.Cu")
     (tstamp 978d9f25-0615-4fc7-be0b-9b6762bb559b)
-    (at 49 18.25 180)
+    (at 64 25.25)
     (property "DIONEA_COURTYARD_SOURCE" "PCB_MAIN_PASSIVE_COURTYARD_RULE_REV_A")
     (property "DIONEA_COURTYARD_STATUS" "CONTROLLED_PAD_ENVELOPE_PLUS_0.25_MM")
     (property "DIONEA_PACKAGE" "0402")

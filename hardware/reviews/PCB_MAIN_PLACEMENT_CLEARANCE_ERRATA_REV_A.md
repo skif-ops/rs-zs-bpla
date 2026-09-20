@@ -171,6 +171,14 @@ combined KiCad 9 and bounded repeat RF/SI return-path review pass on source
 commit `7ee9cfc9`; remaining routing, final SI, Review B and manufacture remain
 open.
 
+On 2026-09-20 reviewer `Скиф` also accepted
+`ACCEPT_USB_SOURCE_TERMINATION_PLACEMENT_SUBGATE`. The exact reviewed candidate
+moves only R91/R92 to `(64.0, 25.25, 0)` / `(64.0, 26.25, 0)` and is now the
+authoritative successor SHA-256
+`d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e`.
+Strict 2D clearance remains PASS; the application machine gate, USB copper,
+Review B and manufacturing release remain open.
+
 ## Controlled post-repack result
 
 `hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv` fixes all 225 movable top-side
