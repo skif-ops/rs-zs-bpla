@@ -1,10 +1,11 @@
 # PCB-MAIN Rev.A Review B checklist
 
-Status: `HIERARCHY ACCEPTED / REVIEW B OPEN / LAYOUT ENGINEERING CANDIDATE / NOT FOR MANUFACTURE`
+Status: `HIERARCHY ACCEPTED / PARTIAL ROUTING / RF/SI ECO REQUIRED / REVIEW B OPEN / NOT FOR MANUFACTURE`
 
 Review B is independent from the signed Review A. This record is intentionally not
-signed for Review B; only its bounded hierarchy subgate is signed, and it contains
-no routing or manufacturing-release assertion.
+signed for Review B. The hierarchy, placement and several bounded routing subgates
+are accepted independently; none asserts complete routing, Review B or
+manufacturing release.
 
 ## 1. Current controlled baseline
 
@@ -19,7 +20,11 @@ no routing or manufacturing-release assertion.
   Reviewer `Скиф` accepted this bounded subgate on `2026-09-16` with decision
   `ACCEPT_HIERARCHY_ONLY` against PDF SHA-256
   `7e6ef20a989ec66c55b3e1a32de0a914b9e37a6e70cc5835d36f3260b65ff8d9`.
-- Native PCB: unrouted, 2D placement-complete engineering candidate present.
+- Native PCB: partially routed, 2D placement-complete engineering candidate
+  present. The authoritative board contains 691 segments and 285 vias (976
+  track/via objects), three copper zones and four rule areas. KiCad 9 comparative
+  gates accepted bounded ground-domain, hard-signal, OctoSPI and seven-net RF P0
+  subgates; 429 unconnected items remain after deterministic zone refill.
 - Placement clearance: `PASS` for the bounded 2D subgate. The deterministic
   225-reference repack and controlled passive courtyards give 227/227 fitted
   assembly footprints explicit courtyards; the strict audit records zero
@@ -39,7 +44,8 @@ no routing or manufacturing-release assertion.
   ECO-002 audit; routing, 3D/service review and Review B remain open.
 - Board: 110 x 75 x 1.6 mm, six copper layers, rounded R3 outline, four M3 NPTH holes.
 - Population represented: 247 on-board components plus four mounting holes; 186 native nets.
-- Routing/copper zones: absent.
+- Routing/copper zones: partial and explicitly not final. The accepted RF P0
+  inventory is 138 `F.Cu` segments at `0.1509 mm` with zero RF signal vias.
 - Pre-route constraint coverage: `PASS` for all 186 native nets. The controlled
   manifest assigns one explicit class, return domain, topology, priority and
   source authority to every net. The official JLCPCB public
@@ -47,6 +53,13 @@ no routing or manufacturing-release assertion.
   `0.1509 mm` for 50 ohm and `0.1537/0.2032 mm` width/gap for 90 ohm on L1/L2.
   Final production geometry remains blocked on job-specific fabricator
   acceptance and RF/SI review.
+- RF/SI return-path review: `ECO_REQUIRED`. `CELL_RF` and `CELL_RF_ANT` use the
+  L1-over-L2 width but currently lack their required `GND_MODEM` reference on
+  L2. `PCB-MAIN-RF-RETURN-001` proposes one bounded local `GND_MODEM` L2 zone;
+  it is not applied and still requires comparative KiCad 9 DRC and acceptance.
+  Separately, `GNSS_RF_FILTERED` is 25.325357 mm for a 15.543668 mm pad-to-pad
+  span and wraps around U9 because RF_IN faces away from FL1; a dedicated
+  placement/routing ECO remains required.
 - Stackup/impedance request: controlled packet and blank 22-row response
   register are ready, with 0/2 accepted fabricator responses. No final job
   construction, production tolerance, coupon plan or manufacturing route rule
@@ -110,6 +123,14 @@ no routing or manufacturing-release assertion.
 - [x] A machine-audited bounded assembler DFM/stencil request and blank
   14-question response template for `U2/U25/U26/U9` are ready without guessed
   paste, stencil, reflow, inspection or first-article process parameters.
+- [x] The exact seven-net RF P0 candidate was accepted and applied as a bounded
+  engineering subgate; its comparative KiCad 9 DRC introduced no new errors and
+  reduced unconnected items from 444 to 429.
+- [ ] `PCB-MAIN-RF-RETURN-001` passes comparative KiCad 9 refill/DRC and is
+  independently accepted before its local `GND_MODEM` L2 zone is applied.
+- [ ] A separate GNSS placement/routing ECO places FL1 demonstrably close to
+  U9 RF_IN, avoids signal copper under U9 and repeats placement, DRC and RF/SI
+  return-path review.
 - [ ] Two attributable fabricator responses are complete, compared and accepted;
   one final construction, its production 50-ohm/90-ohm geometry and tolerance,
   and its coupon plan are selected through project RF/SI review.
@@ -134,10 +155,12 @@ no routing or manufacturing-release assertion.
 `HOLD`. Reviewer `Скиф` accepted the hierarchy-only subgate on `2026-09-16`
 for source commit `9aceca9531f0b9c18679bee1a8050ae7cd94308a` and PDF SHA-256
 `7e6ef20a989ec66c55b3e1a32de0a914b9e37a6e70cc5835d36f3260b65ff8d9`.
-The candidate is 2D placement-complete and its 186-net pre-route constraint
-coverage plus public numeric routing basis are controlled, but the board is
-unrouted and has not passed pair-geometry audit, 3D/service, DRC, CAM, DFM or
-Review B.
+The candidate is 2D placement-complete and partially routed. Its 186-net
+pre-route constraint coverage, public numeric routing basis and accepted RF P0
+subgate are controlled, but the RF/SI return-path review is `ECO_REQUIRED`:
+the cellular L2-return proposal is not applied and the separate GNSS
+placement/routing ECO has not been prepared. Remaining routing, pair-geometry
+audit, 3D/service review, final DRC, CAM, DFM and Review B are open.
 The exact current clearance result and
 release boundary are recorded in
 `hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md`; the routing

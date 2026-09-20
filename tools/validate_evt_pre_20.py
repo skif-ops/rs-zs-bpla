@@ -231,6 +231,17 @@ def validate_decisions_and_tests() -> None:
         in decisions["DEC-070"]["Impact"],
         "PCB-MAIN public numeric routing-basis decision is missing or over-released",
     )
+    require(
+        decisions["DEC-071"]["Status"] ==
+        "ENGINEERING_HOLD_CELLULAR_L2_CANDIDATE_READY_GNSS_ECO_PENDING"
+        and "RF/SI return-path review as ECO_REQUIRED"
+        in decisions["DEC-071"]["Decision"]
+        and "PCB-MAIN-RF-RETURN-001" in decisions["DEC-071"]["Impact"]
+        and "GNSS U9/FL1/C64 placement and routing ECO separate"
+        in decisions["DEC-071"]["Impact"]
+        and "manufacturing blocks" in decisions["DEC-071"]["Impact"],
+        "PCB-MAIN RF/SI ECO split decision is missing or over-released",
+    )
     require(decisions["DEC-009"]["Status"] == "SUPERSEDED", "fixed 20-station LoRa decision remains active")
     require(decisions["DEC-010"]["Status"] == "SUPERSEDED", "old housing decision remains active")
     require(decisions["DEC-012"]["Status"] == "SUPERSEDED", "old private APN decision remains active")
@@ -272,6 +283,12 @@ def validate_deliverable_register() -> None:
         and "explicit pre-route constraints for all 186 native nets"
         in deliverables["HW-M-002"]["Критерий выпуска"]
         and "public JLC06161H-3313 numeric RF/USB routing basis"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "seven-net RF P0 subgates are applied"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "independent RF/SI review is ECO_REQUIRED"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "cellular L2 return and GNSS placement/routing remain open"
         in deliverables["HW-M-002"]["Критерий выпуска"]
         and "pair-aware routing" in deliverables["HW-M-002"]["Критерий выпуска"]
         and "final job stackup" in deliverables["HW-M-002"]["Критерий выпуска"]
@@ -336,6 +353,10 @@ def validate_deliverable_register() -> None:
         and "two attributable fabricator stackup responses" in risks["R-025"]["Mitigation"]
         and "all 14 selected-assembler DFM/stencil responses" in risks["R-025"]["Mitigation"]
         and "controlled U9 zero-paste-to-process gate" in risks["R-025"]["Mitigation"]
+        and "cellular GND_MODEM L2 return" in risks["R-025"]["Mitigation"]
+        and "separate GNSS placement/routing ECO" in risks["R-025"]["Mitigation"]
+        and "missing cellular GND_MODEM L2 return" in risks["R-025"]["Trigger"]
+        and "unclosed GNSS RF placement/routing finding" in risks["R-025"]["Trigger"]
         and "missing one or both signed stackup responses" in risks["R-025"]["Trigger"]
         and "guessed or unaccepted RF/USB geometry" in risks["R-025"]["Trigger"]
         and "fewer than 14 accepted selected-assembler responses" in risks["R-025"]["Trigger"]

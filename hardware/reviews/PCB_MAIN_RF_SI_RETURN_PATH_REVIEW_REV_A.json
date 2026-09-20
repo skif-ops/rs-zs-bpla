@@ -1,0 +1,81 @@
+{
+  "schema_version": "dioneya.pcb-main-rf-si-return-path-review.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "review_id": "PCB-MAIN-RF-SI-RETURN-001",
+  "date_utc": "2026-09-20",
+  "reviewed_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+  "reviewed_board_sha256": "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040",
+  "reviewed_application": "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json",
+  "reviewed_application_sha256": "eb1a41379bab2fe38a3c4edceed67b524c2e25b64dac9b851691858e76df0626",
+  "routing_basis": {
+    "record": "hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json",
+    "record_sha256": "8ef94edc81fb230ee791c1cdba64316c29f85ea1dfa7bde8c18443cdf8973b18",
+    "stackup_id": "JLC06161H-3313",
+    "structure": "50_OHM_SINGLE_ENDED_NON_COPLANAR_L1_OVER_L2",
+    "signal_layer": "F.Cu",
+    "reference_layer": "In1.Cu",
+    "trace_width_mm": 0.1509
+  },
+  "accepted_rf_p0_inventory": {
+    "controlled_nets": 7,
+    "segments": 138,
+    "signal_vias": 0,
+    "all_segments_on_f_cu": true,
+    "all_segment_widths_mm": [0.1509]
+  },
+  "return_domain_findings": [
+    {
+      "finding_id": "RF-RP-001",
+      "scope": ["GNSS_RF_FILTERED", "GNSS_RF_DC_BLOCK", "GNSS_RF_ANT_BIASED", "LORA_RF_MODULE", "LORA_RF_ANT"],
+      "required_domain": "GND_DIGITAL",
+      "required_reference_layer": "In1.Cu",
+      "observed_zone": "PCB_MAIN_GND_DIGITAL_In1_Cu",
+      "outline_coverage": "PRESENT",
+      "result": "PASS_OUTLINE_LEVEL_ONLY_FINAL_FILLED_PLANE_AND_SI_REVIEW_OPEN"
+    },
+    {
+      "finding_id": "RF-RP-002",
+      "scope": ["CELL_RF", "CELL_RF_ANT"],
+      "required_domain": "GND_MODEM",
+      "required_reference_layer": "In1.Cu",
+      "observed_zone": "PCB_MAIN_GND_MODEM_In4_Cu",
+      "observed_reference_layer": "In4.Cu",
+      "result": "FAIL_L1_OVER_L2_GEOMETRY_HAS_NO_GND_MODEM_L2_REFERENCE"
+    }
+  ],
+  "gnss_routeability_finding": {
+    "finding_id": "RF-SI-003",
+    "net": "GNSS_RF_FILTERED",
+    "from": "U9.11 RF_IN",
+    "to": "FL1.A",
+    "pad_to_pad_distance_mm": 15.543668325077,
+    "routed_length_mm": 25.325357133747,
+    "stretch_ratio": 1.629303752763,
+    "topology": "RF_IN_FACES_AWAY_FROM_SAW_ROUTE_LEAVES_MODULE_EDGE_AND_WRAPS_AROUND_U9",
+    "authority_conflict": "PCB_MAIN_GNSS_AUTHORITY_REV_A_REQUIRES_SAW_CLOSE_TO_U9_RF_IN_AND_NO_TOP_OR_L2_SIGNAL_UNDER_U9",
+    "result": "FAIL_PLACEMENT_ROUTING_ECO_REQUIRED"
+  },
+  "decision": "ECO_REQUIRED",
+  "required_remediation": [
+    {
+      "proposal_id": "PCB-MAIN-RF-RETURN-001",
+      "action": "Add one bounded GND_MODEM zone on In1.Cu wholly inside ZONE_CELL and prove comparative KiCad 9 DRC plus filled-plane continuity.",
+      "closes_only": "RF-RP-002_CELLULAR_L2_REFERENCE_SUBGATE"
+    },
+    {
+      "proposal_id": "PCB-MAIN-GNSS-RF-PLACEMENT-ECO-TBD",
+      "action": "Re-orient or locally repack U9/FL1/C64 and regenerate only affected ground fanout and GNSS RF copper so the SAW is demonstrably close to RF_IN without routing under U9.",
+      "closes_only": "RF-SI-003_GNSS_PLACEMENT_AND_ROUTEABILITY_SUBGATE"
+    }
+  ],
+  "decision_boundary": {
+    "rf_p0_acceptance_revoked": false,
+    "rf_p0_remains_engineering_subgate_only": true,
+    "cellular_l2_return_subgate_complete": false,
+    "gnss_rf_placement_routeability_complete": false,
+    "rf_si_return_path_review_complete": false,
+    "remaining_routing_authorized_as_final": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}

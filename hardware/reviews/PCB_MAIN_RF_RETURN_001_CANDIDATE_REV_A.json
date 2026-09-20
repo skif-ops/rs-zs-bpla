@@ -1,0 +1,69 @@
+{
+  "schema_version": "dioneya.pcb-main-rf-return-001-candidate.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-RF-RETURN-001",
+  "date_utc": "2026-09-20",
+  "status": "PROPOSAL_STATIC_AUDIT_READY_KICAD9_COMPARATIVE_DRC_PENDING",
+  "scope": "ONE_LOCAL_GND_MODEM_IN1_CU_ZONE_INSIDE_LOCKED_ZONE_CELL",
+  "review_input": "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.json",
+  "base": {
+    "board": "hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb",
+    "board_sha256": "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040",
+    "trace_items": 976,
+    "copper_zones": 3,
+    "rule_areas": 4
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb",
+    "board_sha256": "22ddd8c56ceabf397ed033a44235b439625d3104fa2cf798bb57b782d24b1352",
+    "trace_items": 976,
+    "copper_zones": 4,
+    "rule_areas": 4,
+    "accepted_base_bytes_modified": false
+  },
+  "added_zone": {
+    "name": "PCB_MAIN_GND_MODEM_CELL_In1_Cu",
+    "tstamp": "474ddbc4-d099-4dd3-9f8f-bc95779ae00a",
+    "net": "GND_MODEM",
+    "net_code": 47,
+    "layer": "In1.Cu",
+    "clearance_mm": 0.1,
+    "minimum_thickness_mm": 0.15,
+    "polygon_mm": [[10.0, 34.0], [36.0, 34.0], [36.0, 74.0], [10.0, 74.0]],
+    "committed_fill_state": "UNFILLED_CI_AND_REVIEW_TOOLS_MUST_REFILL_BEFORE_DRC",
+    "gnd_modem_vias_inside_polygon": 50,
+    "minimum_cell_rf_centreline_margin_to_polygon_edge_mm": 2.525
+  },
+  "static_validation": {
+    "base_semantics_preserved": true,
+    "existing_zones_preserved": true,
+    "gnd_digital_in1_cellular_cutout_preserved": true,
+    "cross_domain_join_added": false,
+    "rf_tracks_or_vias_changed": false,
+    "footprints_or_placement_changed": false,
+    "outline_or_stackup_changed": false
+  },
+  "required_machine_gate": {
+    "kicad_version": "9.x",
+    "refill_base_and_candidate": true,
+    "comparative_drc_new_error_count": 0,
+    "unconnected_item_regression_allowed": false,
+    "filled_gnd_modem_l2_cellular_rf_centreline_coverage_required": true,
+    "maximum_coverage_sample_pitch_mm": 0.1
+  },
+  "review_request": {
+    "requested_after_green_machine_gate": "ACCEPT_CELLULAR_L2_RETURN_PLANE_SUBGATE_OR_REJECT",
+    "accept_value": "ACCEPT_CELLULAR_L2_RETURN_PLANE_SUBGATE",
+    "reject_value": "REJECT_CELLULAR_L2_RETURN_PLANE_SUBGATE"
+  },
+  "decision_boundary": {
+    "proposal_only": true,
+    "applied_to_authoritative_board": false,
+    "cellular_l2_return_subgate_complete": false,
+    "gnss_rf_placement_routeability_complete": false,
+    "rf_si_return_path_review_complete": false,
+    "routing_complete": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}

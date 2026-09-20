@@ -1794,6 +1794,14 @@ def main() -> None:
                 "rf_p0_routing_application",
                 "rf_p0_routing_audit",
                 "rf_p0_routing_status",
+                "rf_si_return_path_review",
+                "rf_si_return_path_review_record",
+                "rf_si_return_path_review_audit",
+                "rf_si_return_path_status",
+                "rf_return_001_candidate",
+                "rf_return_001_candidate_record",
+                "rf_return_001_candidate_review",
+                "rf_return_001_status",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
             if review_b["status"] in {
@@ -1837,12 +1845,22 @@ def main() -> None:
                     "APPROVED_APPLIED_EXACT_SEVEN_NET_RF_ROUTING_SUBGATE_"
                     "REMAINING_ROUTING_AND_REVIEWS_OPEN",
                     "PCB-MAIN RF P0 routing status drift")
+            require(review_b["evidence"].get("rf_si_return_path_status") ==
+                    "ECO_REQUIRED_CELLULAR_L2_RETURN_AND_GNSS_PLACEMENT_"
+                    "ROUTING_OPEN",
+                    "PCB-MAIN RF/SI return-path status drift")
+            require(review_b["evidence"].get("rf_return_001_status") ==
+                    "PROPOSAL_STATIC_AUDIT_READY_KICAD9_COMPARATIVE_DRC_"
+                    "PENDING_NOT_APPLIED",
+                    "PCB-MAIN RF-return-001 candidate status drift")
             for evidence_name in required_layout_evidence - {
                     "ra_003_status", "placement_repack_status",
                     "ground_domain_routing_status",
                     "signal_hard_nets_routing_status",
                     "octospi_r8_eco_002_status",
                     "rf_p0_routing_status",
+                    "rf_si_return_path_status",
+                    "rf_return_001_status",
             }:
                 evidence_path = ROOT / review_b["evidence"][evidence_name]
                 require(evidence_path.is_file() and evidence_path.stat().st_size > 0,

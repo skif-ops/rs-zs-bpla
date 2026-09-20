@@ -44,15 +44,17 @@ python tools/audit_evt_pre_20_hardware_release.py --strict
 ```
 
 Default mode records the same blockers without failing engineering CI. A PASS
-must not be inferred from source completeness, BOM QG-1, unrouted placement
-candidates or successful software tests.
+must not be inferred from source completeness, BOM QG-1, placement or partial
+routing subgates, or successful software tests.
 
 PCB-MAIN has passed its bounded 2D placement-clearance subgate: the controlled
 225-reference repack gives all 227 fitted assembly footprints an explicit
 courtyard and the strict audit reports zero component, mounting-exclusion and
-U.FL tool-zone conflicts. This is engineering progress only; the unrouted board
-has no copper zones and still requires routed-board DRC, 3D/service evidence,
-CAM, DFM and independent Review B.
+U.FL tool-zone conflicts. The authoritative board is now partially routed: 691
+segments plus 285 vias, with three copper zones and four rule areas, reflect
+accepted bounded ground-domain, hard-signal, OctoSPI and seven-net RF P0
+subgates. This is engineering progress only; remaining routing, final DRC,
+3D/service evidence, CAM, DFM and independent Review B remain required.
 
 PCB-MAIN also has an accepted human-readable hierarchy-only subgate. Source
 commit `9aceca9531f0b9c18679bee1a8050ae7cd94308a` has commit-bound KiCad 9.0.9
@@ -71,6 +73,15 @@ basis: `0.1509 mm` for 50-ohm single-ended traces and `0.1537/0.2032 mm` for
 candidate only. Pair-aware routing and audit, the returned job stackup,
 production tolerance, coupon plan, routed copper, DRC, CAM, DFM and Review B
 remain open.
+
+The independent RF/SI return-path review of authoritative PCB SHA-256
+`9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040`
+is `ECO_REQUIRED`. `CELL_RF` and `CELL_RF_ANT` lack the `GND_MODEM` L2
+reference assumed by the L1-over-L2 geometry; `PCB-MAIN-RF-RETURN-001`
+proposes one bounded local L2 zone but is not applied and requires comparative
+KiCad 9 refill/DRC plus independent acceptance. `GNSS_RF_FILTERED` separately
+requires a U9/FL1/C64 placement/routing ECO. Neither the accepted RF P0 subgate
+nor the cellular proposal closes RF/SI review or authorizes manufacture.
 
 PCB-PWR has explicit pre-route constraint coverage for all 31 native nets. The
 independent audit binds the 5 A system basis, both 4 A buck channels, the 3.3 A

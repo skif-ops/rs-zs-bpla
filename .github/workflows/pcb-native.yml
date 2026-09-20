@@ -414,6 +414,8 @@ jobs:
             --output artifacts/kicad-native/PCB-MAIN/octospi_r8_eco_002_application_audit.json
           python tools/audit_pcb_main_rf_p0_application_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/rf_p0_application_audit.json
+          python tools/audit_pcb_main_rf_return_001_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/rf_return_001_candidate_audit.json
           python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/assembler_dfm_stencil_request_audit.json \
             --commit-sha "$GITHUB_SHA" \
@@ -789,6 +791,51 @@ jobs:
             --drc-base "$evidence/baseline_drc.json" \
             --drc-candidate "$evidence/candidate_drc.json" \
             --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN cellular L2 return candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/rf-return-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb"
+          python tools/generate_pcb_main_rf_return_001_candidate_rev_a.py \
+            --output "$candidate_project/PCB-MAIN_RF_RETURN_REGENERATED_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_RF_RETURN_REGENERATED_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN cellular L2 return base/candidate zone refill: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_rf_return_001_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --filled-candidate "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb" \
+            --output "$evidence/comparative_audit.json"
       - name: Materialize native PCB-PWR schematic
         run: |
           python tools/generate_pcb_pwr_schematic_rev_a.py \
@@ -1044,6 +1091,12 @@ jobs:
             hardware/reviews/PCB_MAIN_RF_P0_ROUTING_CANDIDATE_REV_A.md
             hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.json
+            hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.md
+            hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb
             hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md
             hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md
             hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md

@@ -41,16 +41,22 @@
 - `MAIN-AUTH-001…011` закрыты и проходят основной и независимые authority-аудиты;
 - все девять native `.kicad_sch/.kicad_pcb/.kicad_pro` файлов PCB-MAIN,
   PCB-MIC и PCB-PWR присутствуют и контролируются CI;
-- native-схемы PCB-MAIN и PCB-PWR прошли Review A; PCB-MAIN и PCB-PWR имеют
-  только неразведённые placement-кандидаты, причём геометрия PCB-PWR остаётся
+- native-схемы PCB-MAIN и PCB-PWR прошли Review A; PCB-MAIN имеет
+  частично разведённый engineering-кандидат, а PCB-PWR — только
+  неразведённый placement-кандидат, геометрия которого остаётся
   условной до закрытия `DIM-003`; внутренний 18-строчный запрос готов, но
   принятие остаётся `0/18`;
 - внутренний PCB-PWR stackup/copper-запрос двум фабрикам готов, но все 24 строки
   остаются пустыми (`0/24`), принято `0/2` комплектов, конструкция не выбрана;
 - PCB-MAIN placement-кандидат после принятого ограниченного ECO и полного
   репака проходит строгий 2D clearance: 227/227 fitted footprint имеют
-  courtyard, component/mounting/U.FL-tool конфликты равны нулю; routing, DRC,
-  STEP, CAM/DFM и Review B остаются открыты;
+  courtyard, component/mounting/U.FL-tool конфликты равны нулю; приняты
+  bounded ground-domain, hard-signal, OctoSPI и seven-net RF P0 routing
+  subgates (691 segment, 285 via, 3 copper zones, 4 rule areas);
+- независимый PCB-MAIN RF/SI return-path review имеет статус
+  `ECO_REQUIRED`: cellular L2-return candidate `PCB-MAIN-RF-RETURN-001` не
+  применён и ждёт KiCad 9 comparative DRC, а GNSS требует отдельный
+  placement/routing ECO; remaining routing, STEP, CAM/DFM и Review B открыты;
 - повторный PCB-MIC Review A после copper ECO подписан `PASS` по commit `e17a86bc`;
   copper-return subgate Review B принят по commit `7aeec13a`, но panelization,
   DFM, acoustic-stack, physical-EVT, общий Review B и manufacturing release открыты;

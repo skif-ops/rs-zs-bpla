@@ -673,6 +673,75 @@ def audit() -> dict[str, object]:
         ),
         "PCB-MAIN public numeric routing basis is missing, drifted or improperly promoted",
     )
+    main_rf_return_control = run_json_audit(
+        "audit_pcb_main_rf_return_001_candidate_rev_a.py"
+    )
+    main_rf_review = read_json(
+        "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.json"
+    )
+    main_rf_return_candidate = read_json(
+        "hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.json"
+    )
+    main_rf_controlled = (
+        main_rf_return_control.get("status") ==
+        "PASS_STATIC_ECO_REQUIRED_AND_CELLULAR_L2_RETURN_PROPOSAL_CONTROLLED"
+        and main_rf_return_control.get("decision") == "ECO_REQUIRED"
+        and main_rf_review.get("reviewed_board_sha256") ==
+        "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040"
+        and main_rf_review.get("decision") == "ECO_REQUIRED"
+        and main_rf_return_candidate.get("proposal_id") ==
+        "PCB-MAIN-RF-RETURN-001"
+        and main_rf_return_candidate.get("decision_boundary", {}).get(
+            "proposal_only"
+        ) is True
+    )
+    check(
+        "pcb_main_rf_si_return_path_control",
+        main_rf_controlled,
+        (
+            "ECO_REQUIRED is hash-bound; cellular L2 proposal is controlled and "
+            "the GNSS ECO remains separate"
+        ),
+        "PCB-MAIN RF/SI return-path review or bounded remediation control is missing",
+    )
+    main_rf_boundary = main_rf_review.get("decision_boundary", {})
+    main_rf_candidate_boundary = main_rf_return_candidate.get(
+        "decision_boundary", {}
+    )
+    cellular_l2_return_complete = (
+        isinstance(main_rf_boundary, dict)
+        and main_rf_boundary.get("cellular_l2_return_subgate_complete") is True
+        and isinstance(main_rf_candidate_boundary, dict)
+        and main_rf_candidate_boundary.get("applied_to_authoritative_board") is True
+        and main_rf_candidate_boundary.get("cellular_l2_return_subgate_complete") is True
+        and main_rf_return_control.get("kicad9_comparative_drc") ==
+        "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION"
+    )
+    check(
+        "pcb_main_cellular_l2_return_acceptance",
+        cellular_l2_return_complete,
+        (
+            "accepted and applied"
+            if cellular_l2_return_complete
+            else "PCB-MAIN-RF-RETURN-001 is a non-applied proposal; KiCad 9 comparative DRC and acceptance remain open"
+        ),
+        "PCB-MAIN cellular RF lacks an accepted and applied GND_MODEM L2 return plane",
+    )
+    gnss_rf_routeability_complete = (
+        isinstance(main_rf_boundary, dict)
+        and main_rf_boundary.get("gnss_rf_placement_routeability_complete") is True
+        and main_rf_boundary.get("rf_si_return_path_review_complete") is True
+    )
+    check(
+        "pcb_main_gnss_rf_placement_routeability",
+        gnss_rf_routeability_complete,
+        (
+            "GNSS placement/routing and repeat RF/SI review complete"
+            if gnss_rf_routeability_complete
+            else "GNSS_RF_FILTERED U9/FL1/C64 placement/routing ECO and repeat RF/SI review remain open"
+        ),
+        "PCB-MAIN GNSS RF placement/routeability ECO and repeat return-path review remain open",
+    )
     main_stackup = (
         main_evidence.get("stackup_impedance_handoff", {})
         if isinstance(main_evidence, dict) else {}
