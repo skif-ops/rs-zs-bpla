@@ -1,0 +1,46 @@
+{
+  "schema_version": "dioneya.pcb-main-rf-return-001-application.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-RF-RETURN-001",
+  "approval": "hardware/reviews/PCB_MAIN_RF_RETURN_001_APPROVAL_REV_A.json",
+  "application_date": "2026-09-20",
+  "reviewed_proposal_commit_sha": "239016fdd295426766cc88209822be39610297db",
+  "approval_commit_sha": "404f18316bcf3659f3afe787420ed1711aa9c019",
+  "approval_sha256": "000e323f116d9b4aa371142c9efe37d85241563ea8db41c2f9b23bfca6bee079",
+  "reviewed_candidate_board_sha256": "22ddd8c56ceabf397ed033a44235b439625d3104fa2cf798bb57b782d24b1352",
+  "decision": "ACCEPT_CELLULAR_L2_RETURN_PLANE_SUBGATE",
+  "scope": "EXACT_ONE_LOCAL_GND_MODEM_IN1_CU_ZONE_ONLY",
+  "historical_baseline": {
+    "board": "hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb",
+    "board_sha256": "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040",
+    "trace_items": 976,
+    "copper_zones": 3,
+    "rule_areas": 4
+  },
+  "applied_intermediate": {
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "22ddd8c56ceabf397ed033a44235b439625d3104fa2cf798bb57b782d24b1352",
+    "exact_candidate_byte_identity": true,
+    "trace_items": 976,
+    "copper_zones": 4,
+    "rule_areas": 4,
+    "added_zone_name": "PCB_MAIN_GND_MODEM_CELL_In1_Cu",
+    "added_zone_tstamp": "474ddbc4-d099-4dd3-9f8f-bc95779ae00a",
+    "added_zone_net": "GND_MODEM",
+    "added_zone_layer": "In1.Cu",
+    "committed_zone_fill_state": "UNFILLED_CI_AND_REVIEW_TOOLS_MUST_REFILL_BEFORE_DRC"
+  },
+  "successor_composition": {
+    "allowed_proposal_id": "PCB-MAIN-GNSS-RF-ECO-001",
+    "must_preserve_added_zone_exactly": true,
+    "must_prove_combined_kicad9_drc_and_both_filled_references": true
+  },
+  "status": "APPLIED_ACCEPTED_CELLULAR_L2_RETURN_PLANE_SUBGATE_GNSS_ECO_AND_REPEAT_REVIEW_OPEN",
+  "routing_complete": false,
+  "rf_si_review_complete": false,
+  "final_job_stackup_accepted": false,
+  "production_impedance_tolerance_accepted": false,
+  "coupon_plan_accepted": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}

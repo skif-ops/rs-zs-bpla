@@ -10074,4 +10074,17 @@
       )
     )
   )
+  (zone (net 47) (net_name "GND_MODEM") (layer "In1.Cu") (tstamp 474ddbc4-d099-4dd3-9f8f-bc95779ae00a) (name "PCB_MAIN_GND_MODEM_CELL_In1_Cu") (hatch edge 0.5)
+    (connect_pads yes (clearance 0.1))
+    (min_thickness 0.15) (filled_areas_thickness no)
+    (fill (thermal_gap 0.5) (thermal_bridge_width 0.5))
+    (polygon
+      (pts
+        (xy 10 34)
+        (xy 36 34)
+        (xy 36 74)
+        (xy 10 74)
+      )
+    )
+  )
 )
