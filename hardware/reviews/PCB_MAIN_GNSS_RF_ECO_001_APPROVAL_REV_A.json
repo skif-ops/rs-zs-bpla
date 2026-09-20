@@ -1,0 +1,36 @@
+{
+  "schema_version": "dioneya.pcb-main-gnss-rf-eco-001-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-GNSS-RF-ECO-001",
+  "reviewer": "Скиф",
+  "decision_date": "2026-09-20",
+  "decision": "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE",
+  "decision_input": "принимаем оба и продолжаем",
+  "decision_normalization": "The user explicitly accepted both pending subgates; for this proposal that is ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE.",
+  "reviewed_github_commit_sha": "67538ba5dfea4cde08c06738cc6b537847a25398",
+  "reviewed_tree_sha": "f45c0923461b299eb3ccfaa97eb9ca2cf069a285",
+  "review_mapping": "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_REVIEW_COMMIT_MAPPING.json",
+  "reviewed_proposal_sha256": "7039971cbacd4ace518433387309d80d3786a61d485ed7cf3e61543ba5ff693d",
+  "reviewed_proposal_record_sha256": "64209a66e2ee21d8ff331fcd68b1b1e750c6395068665eb34091126aa8b3ac48",
+  "reviewed_candidate_board_sha256": "d4c0eaa95bb62c7b9ae15b110fb3a76e6a056f462f0a36a734b3fa63730d2aee",
+  "reviewed_generator_sha256": "da949bfd6acd35876af7cd97837801354c101d351438cc620153cf50884716f0",
+  "machine_gate": {
+    "pcb_native_run_id": 35511383587,
+    "pcb_native_run_number": 273,
+    "pcb_native_conclusion": "success",
+    "kicad_9_comparative_drc_step": "success",
+    "ci_run_id": 35511383579,
+    "ci_run_number": 546,
+    "ci_conclusion": "success"
+  },
+  "authorization": {
+    "apply_exact_hash_bound_fl1_c64_and_gnss_delta": true,
+    "preserve_u9_j9_and_unrelated_accepted_geometry": true,
+    "compose_with_separately_accepted_cellular_l2_zone_only_with_machine_proof": true,
+    "alter_reviewed_gnss_geometry_without_new_controlled_review": false,
+    "routing_complete": false,
+    "rf_si_review_complete": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}
