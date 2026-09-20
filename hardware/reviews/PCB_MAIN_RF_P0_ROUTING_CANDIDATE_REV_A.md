@@ -36,8 +36,29 @@ objects and the expected `444 -> 429` connectivity reduction, then identified
 four candidate-only clearance errors on the `CELL_RF` approaches to `C79.1`
 and `R43.1`.  Four internal vertices were moved by one `0.0625 mm` grid step
 away from adjacent pads `C79.2` and `R43.2`.  Segment count, total route length,
-F.Cu-only topology, controlled width and zero-via inventory are unchanged;
-comparative KiCad 9 DRC of the corrected candidate remains pending CI.
+F.Cu-only topology, controlled width and zero-via inventory are unchanged.
+
+The corrected candidate passed commit-bound PCB Native Gate
+[#261](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35503166684) at
+commit `06ba3959abf71c40e78731f9b0f6beb12e04a1e7` and tree
+`7d85b7b20a698d3f94f559060e683061fdd7fe3e`.  KiCad 9 exact semantic
+regeneration passed for all 976 copper objects, base/candidate zone refill
+passed, total violations remained `226 -> 226` with `0 -> 0` errors, and
+unconnected items fell exactly `444 -> 429`.  The comparative audit reports
+`PASS_NO_NEW_KICAD9_DRC_ERRORS` with an empty new-error map.  General CI
+[#533](https://github.com/skif-ops/rs-zs-bpla/actions/runs/35503166719) also
+concluded successfully for the same commit.
+
+## Commit-bound machine evidence
+
+| Control | Value |
+|---|---:|
+| PCB Native Gate | `#261`, run `35503166684`, `success` |
+| General CI | `#533`, run `35503166719`, `success` |
+| Native artifact | `evt-pre-20-kicad-native-gate`, ID `10602564959` |
+| Baseline DRC SHA-256 | `dc1c628e44d15893c9ca6af0da864a4721691d95f1d6b7236f32e8ff2ed0c54e` |
+| Candidate DRC SHA-256 | `79130958c0fa2d69724a60528263cf86d90ba92d28eb9271c0ae1b350060d9ff` |
+| Comparative audit SHA-256 | `a489451be7ca4023fdf36d6b3ec4ebd0add47e13b73a366d706425f24a65ddd7` |
 
 ## Identity
 
@@ -49,8 +70,9 @@ comparative KiCad 9 DRC of the corrected candidate remains pending CI.
 
 ## Decision boundary
 
-The authoritative PCB-MAIN is unchanged.  KiCad 9 zone refill, comparative DRC,
-independent RF/SI and return-path review, final fabricator stackup acceptance,
-Review B, CAM, DFM and manufacturing release remain open.  This proposal must
-not be applied until the commit-bound machine gate is green and reviewer Скиф
-issues an explicit acceptance decision against the exact candidate hash.
+The authoritative PCB-MAIN is unchanged.  The commit-bound KiCad 9 zone-refill
+and comparative-DRC gate is green.  Independent RF/SI and return-path review,
+final fabricator stackup acceptance, Review B, CAM, DFM and manufacturing
+release remain open.  This proposal must not be applied until reviewer Скиф
+issues an explicit acceptance decision against candidate SHA-256
+`9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040`.

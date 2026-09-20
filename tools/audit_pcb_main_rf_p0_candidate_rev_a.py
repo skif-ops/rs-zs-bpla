@@ -155,16 +155,50 @@ def static_audit() -> dict[str, object]:
                 f"{name}: route-length drift")
 
     proposal = json.loads(PROPOSAL.read_text(encoding="utf-8"))
+    machine_gate = proposal.get("commit_bound_machine_gate", {})
+    comparative_drc = proposal.get("comparative_kicad9_drc", {})
     require(proposal.get("candidate_id") == "PCB-MAIN-RF-P0-001" and
             proposal.get("base_board_sha256") == BASE_SHA256 and
             proposal.get("candidate_board_sha256") == CANDIDATE_SHA256 and
+            proposal.get("status") ==
+            "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW" and
             proposal.get("applied_to_authoritative_board") is False and
             proposal.get("review_b_complete") is False and
             proposal.get("cam_or_manufacturing_release") is False,
             "RF proposal identity or release boundary drift")
+    require(machine_gate == {
+        "head_commit_sha": "06ba3959abf71c40e78731f9b0f6beb12e04a1e7",
+        "head_tree_sha": "7d85b7b20a698d3f94f559060e683061fdd7fe3e",
+        "pcb_native_run_id": 35503166684,
+        "pcb_native_run_number": 261,
+        "pcb_native_conclusion": "success",
+        "comparative_drc_step": "success",
+        "ci_run_id": 35503166719,
+        "ci_run_number": 533,
+        "ci_conclusion": "success",
+        "artifact_id": 10602564959,
+        "artifact_name": "evt-pre-20-kicad-native-gate",
+    }, "RF commit-bound machine-gate evidence drift")
+    require(comparative_drc == {
+        "status": "PASS_NO_NEW_KICAD9_DRC_ERRORS",
+        "base_violations": 226,
+        "candidate_violations": 226,
+        "base_errors": 0,
+        "candidate_errors": 0,
+        "base_unconnected_items": 444,
+        "candidate_unconnected_items": 429,
+        "reduction": 15,
+        "new_error_counts": {},
+        "baseline_drc_sha256":
+            "dc1c628e44d15893c9ca6af0da864a4721691d95f1d6b7236f32e8ff2ed0c54e",
+        "candidate_drc_sha256":
+            "79130958c0fa2d69724a60528263cf86d90ba92d28eb9271c0ae1b350060d9ff",
+        "comparative_audit_sha256":
+            "a489451be7ca4023fdf36d6b3ec4ebd0add47e13b73a366d706425f24a65ddd7",
+    }, "RF comparative KiCad 9 evidence drift")
     return {
         "schema_version": "dioneya.pcb-main-rf-p0-candidate-audit.v1",
-        "status": "PASS_STATIC_CANDIDATE_ISOLATION_DRC_PENDING",
+        "status": "PASS_STATIC_CANDIDATE_ISOLATION_MACHINE_EVIDENCE_BOUND",
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "generator_sha256": GENERATOR_SHA256,
@@ -203,7 +237,7 @@ def main() -> int:
         args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     print("PCB-MAIN P0 RF candidate audit: PASS")
     print("routed_nets=7 added_segments=138 added_vias=0 width_mm=0.1509")
-    print("release_boundary=PENDING_KICAD9_COMPARATIVE_DRC_AND_HUMAN_REVIEW")
+    print("release_boundary=PENDING_HUMAN_RF_SI_RETURN_PATH_REVIEW_AND_REVIEW_B")
     return 0
 
 

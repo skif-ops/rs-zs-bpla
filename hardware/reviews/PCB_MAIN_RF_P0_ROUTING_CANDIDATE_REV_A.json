@@ -3,7 +3,7 @@
   "candidate_id": "PCB-MAIN-RF-P0-001",
   "date": "2026-09-20",
   "configuration": "EVT-PRE-20 Rev.A",
-  "status": "PROPOSAL_STATIC_AUDIT_PASS_KICAD9_COMPARATIVE_DRC_PENDING",
+  "status": "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW",
   "base_board": "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb",
   "base_board_sha256": "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f",
   "candidate_board": "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb",
@@ -54,9 +54,35 @@
       "C79.2",
       "R43.2"
     ],
-    "verification": "PENDING_KICAD9_CI"
+    "verification": "PASS_KICAD9_COMPARATIVE_DRC_RUN_35503166684"
   },
-  "comparative_kicad9_drc": "PENDING_CI",
+  "commit_bound_machine_gate": {
+    "head_commit_sha": "06ba3959abf71c40e78731f9b0f6beb12e04a1e7",
+    "head_tree_sha": "7d85b7b20a698d3f94f559060e683061fdd7fe3e",
+    "pcb_native_run_id": 35503166684,
+    "pcb_native_run_number": 261,
+    "pcb_native_conclusion": "success",
+    "comparative_drc_step": "success",
+    "ci_run_id": 35503166719,
+    "ci_run_number": 533,
+    "ci_conclusion": "success",
+    "artifact_id": 10602564959,
+    "artifact_name": "evt-pre-20-kicad-native-gate"
+  },
+  "comparative_kicad9_drc": {
+    "status": "PASS_NO_NEW_KICAD9_DRC_ERRORS",
+    "base_violations": 226,
+    "candidate_violations": 226,
+    "base_errors": 0,
+    "candidate_errors": 0,
+    "base_unconnected_items": 444,
+    "candidate_unconnected_items": 429,
+    "reduction": 15,
+    "new_error_counts": {},
+    "baseline_drc_sha256": "dc1c628e44d15893c9ca6af0da864a4721691d95f1d6b7236f32e8ff2ed0c54e",
+    "candidate_drc_sha256": "79130958c0fa2d69724a60528263cf86d90ba92d28eb9271c0ae1b350060d9ff",
+    "comparative_audit_sha256": "a489451be7ca4023fdf36d6b3ec4ebd0add47e13b73a366d706425f24a65ddd7"
+  },
   "final_job_stackup_accepted": false,
   "production_impedance_tolerance_accepted": false,
   "coupon_plan_accepted": false,
