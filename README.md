@@ -73,8 +73,10 @@ impedance-геометрия пока не разрешены. Следующи�
 по `4.178827774173 mm`, minimum pair gap `0.2032 mm`. Для освобождения
 единственного clearance-clean канала предложение локально переносит один
 `GND_DIGITAL` via и его сегмент без изменения геометрии via или ground-domain
-топологии. Static gate прошёл; commit-bound KiCad 9 DRC и human acceptance
-ожидаются, authoritative PCB не изменён.
+топологии. Proposal commit `f4ed1a4d` прошёл static gate, CI `#559` и PCB
+Native `#286`: violations `232→232`, новых errors нет, unconnected `429→427`.
+Machine gate закрыт, authoritative PCB не изменён; применение требует точного
+human token `ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE`.
 Отдельно подготовлен ограниченный запрос для будущего
 выбранного сборщика по DFM/трафарету `U2/U25/U26/U9` и пустой 14-строчный реестр: принято
 `0/14` ответов, сборщик и процесс не выбраны, паста U9 и производственный выпуск

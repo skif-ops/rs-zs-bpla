@@ -158,8 +158,9 @@ manufacturing release.
 - [ ] Bounded candidate `PCB-MAIN-USB-SOURCE-ROUTING-001` routes only the local
   U1-to-R91/R92 USB pair, relocates one existing `GND_DIGITAL` via/segment and
   leaves the authoritative board unchanged. Static regeneration and geometry
-  audits pass; KiCad 9 comparative DRC and explicit human acceptance remain
-  mandatory before any application commit.
+  audits pass; proposal commit `f4ed1a4d` passed CI #559 and PCB Native #286
+  with zero new errors and unconnected `429→427`. Explicit human acceptance
+  remains mandatory before any application commit.
 - [ ] Return planes, stitching, antenna keepouts and impedance coupons are complete.
 - [ ] KiCad 9 DRC passes with zero blocker/critical violations and zero unrouted items.
 - [ ] Gerber/Excellon is generated only from that DRC-clean commit.

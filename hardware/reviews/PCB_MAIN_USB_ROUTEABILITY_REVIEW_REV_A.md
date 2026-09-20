@@ -1,6 +1,6 @@
 # PCB-MAIN USB routeability review — Rev.A
 
-Status: `PLACEMENT ECO APPLIED / MCU SOURCE ROUTING PROPOSAL GATE PENDING / REVIEW_B OPEN`
+Status: `PLACEMENT ECO APPLIED / MCU SOURCE ROUTING MACHINE GATE PASS / HUMAN REVIEW PENDING / REVIEW_B OPEN`
 
 Reviewed source commit: `2c67acaeb93c05b1bb7a6d9267275ff9fc260204`.
 
@@ -65,11 +65,13 @@ channel between `C12` and `R3`. Candidate
 Candidate SHA-256 is
 `76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5`.
 Static regeneration, exact length matching, `0.1537/0.2032 mm` geometry and
-continuous `GND_DIGITAL` L2-reference sampling pass. Commit-bound KiCad 9 DRC
-and human acceptance are pending; authoritative PCB-MAIN is unchanged.
+continuous `GND_DIGITAL` L2-reference sampling pass. Proposal commit
+`f4ed1a4d` passed CI #559 and PCB Native #286: zero new errors, total
+violations `232→232` and unconnected `429→427`. Human acceptance remains
+pending; authoritative PCB-MAIN is unchanged.
 
 Current decision:
-`BOUNDED_USB_MCU_SOURCE_ROUTING_PROPOSAL_REQUIRES_MACHINE_GATE_AND_HUMAN_ACCEPTANCE`.
+`BOUNDED_USB_MCU_SOURCE_ROUTING_PROPOSAL_REQUIRES_HUMAN_ACCEPTANCE`.
 
 The main connector pair and both cellular pair groups remain separate open
 subgates. Final stackup/tolerance/coupon acceptance, Review B, CAM, DFM and

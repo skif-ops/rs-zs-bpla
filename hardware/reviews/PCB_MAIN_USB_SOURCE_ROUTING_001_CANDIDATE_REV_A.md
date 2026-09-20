@@ -1,6 +1,6 @@
 # PCB-MAIN USB MCU source routing candidate 001 — Rev.A
 
-Status: `STATIC PASS / COMMIT-BOUND KICAD 9 GATE PENDING / HUMAN ACCEPTANCE PENDING / NOT FOR MANUFACTURE`
+Status: `KICAD 9 COMPARATIVE PASS / HUMAN ACCEPTANCE PENDING / NOT FOR MANUFACTURE`
 
 Candidate `PCB-MAIN-USB-SOURCE-ROUTING-001` is a bounded proposal based on
 authoritative PCB SHA-256
@@ -41,9 +41,16 @@ still require two attributable fabricator responses and project RF/SI review.
 ## Gate and boundary
 
 Static regeneration and the independent topology/reference audit pass.
-Commit-bound KiCad 9 comparative DRC must still prove zero new errors and an
-exact two-connection reduction. Only after that evidence is recorded may the
-reviewer consider token `ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE`.
+Proposal commit `f4ed1a4d0365ce19ff7e68799662ed9886cc49e3` passed CI #559
+and PCB Native #286. The commit-bound KiCad 9 comparison retained `232→232`
+total violations, introduced zero new errors and reduced unconnected items
+from `429` to `427`, exactly closing the two intended pad connections. Evidence
+is archived as artifact `10611360741`, digest
+`sha256:9cf6e29f613e84f1cea0234987bc14e82467567e042d53c67d97abae761b7cfb`.
+
+The machine gate is closed. Human acceptance remains pending and requires the
+exact token `ACCEPT_USB_MCU_SOURCE_ROUTING_SUBGATE` before any application
+commit may be created.
 
 This proposal does not route the main connector segment or either cellular
 USB segment. Review B, final SI, DFM, CAM and manufacturing release remain

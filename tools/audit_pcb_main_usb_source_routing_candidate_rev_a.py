@@ -32,6 +32,13 @@ TRACE_WIDTH_MM = 0.1537
 PAIR_GAP_MM = 0.2032
 GROUND_SEGMENT_TSTAMP = "fb9ade5d-8496-4617-9d20-390d44c347c4"
 GROUND_VIA_TSTAMP = "bbd350c1-609d-43b7-9dd0-824ee009466f"
+PROPOSAL_COMMIT = "f4ed1a4d0365ce19ff7e68799662ed9886cc49e3"
+CI_RUN_ID = 35530524569
+PCB_NATIVE_RUN_ID = 35530524588
+ARTIFACT_ID = 10611360741
+ARTIFACT_DIGEST = (
+    "sha256:9cf6e29f613e84f1cea0234987bc14e82467567e042d53c67d97abae761b7cfb"
+)
 
 EXPECTED_ROUTES: dict[str, tuple[tuple[float, float], ...]] = {
     "USB_DP_U1": (
@@ -316,9 +323,35 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
                 reference_samples += 1
 
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
+    machine_gate = review.get("machine_gate", {})
+    recorded_ci = machine_gate.get("commit_bound_ci")
+    recorded_drc = machine_gate.get("commit_bound_kicad9_comparative_drc")
     require(review.get("candidate_board_sha256") == CANDIDATE_SHA256
             and review.get("base_board_sha256") == BASE_SHA256
-            and review.get("status") == "STATIC_PASS_KICAD9_GATE_PENDING"
+            and review.get("status") == "KICAD9_COMPARATIVE_PASS_HUMAN_REVIEW_PENDING"
+            and machine_gate.get("static_regeneration") == "PASS"
+            and machine_gate.get("independent_static_audit") == "PASS"
+            and recorded_ci == {
+                "status": "PASS",
+                "commit": PROPOSAL_COMMIT,
+                "run_number": 559,
+                "run_id": CI_RUN_ID,
+            }
+            and recorded_drc == {
+                "status": "PASS_NO_NEW_ERRORS_EXACT_TWO_CONNECTION_REDUCTION",
+                "commit": PROPOSAL_COMMIT,
+                "run_number": 286,
+                "run_id": PCB_NATIVE_RUN_ID,
+                "artifact_name": "evt-pre-20-kicad-native-gate",
+                "artifact_id": ARTIFACT_ID,
+                "artifact_digest": ARTIFACT_DIGEST,
+                "base_violations": 232,
+                "candidate_violations": 232,
+                "base_unconnected": 429,
+                "candidate_unconnected": 427,
+                "new_errors": 0,
+                "unconnected_reduction": 2,
+            }
             and review.get("authoritative_board_modified") is False
             and review.get("human_acceptance") == "PENDING"
             and review.get("review_b_complete") is False
@@ -327,7 +360,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
 
     report: dict[str, object] = {
         "schema": "dioneya.pcb-main-usb-source-routing-001-audit.v1",
-        "status": "PASS_STATIC_KICAD9_GATE_PENDING",
+        "status": "PASS_STATIC_RECORDED_KICAD9_EVIDENCE_PENDING_HUMAN_REVIEW",
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "routed_nets": sorted(EXPECTED_ROUTES),
