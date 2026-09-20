@@ -61,7 +61,10 @@ manufacturing release.
   requires independent acceptance.
   Separately, `GNSS_RF_FILTERED` is 25.325357 mm for a 15.543668 mm pad-to-pad
   span and wraps around U9 because RF_IN faces away from FL1; a dedicated
-  placement/routing ECO remains required.
+  placement/routing ECO remains required. Proposal `PCB-MAIN-GNSS-RF-ECO-001`
+  keeps U9/J9 fixed, moves only FL1/C64, passes strict static clearance and
+  reduces the post-SAW route to 1.150694 mm, but its KiCad 9 comparative gate
+  and independent acceptance are still pending.
 - Stackup/impedance request: controlled packet and blank 22-row response
   register are ready, with 0/2 accepted fabricator responses. No final job
   construction, production tolerance, coupon plan or manufacturing route rule
@@ -161,8 +164,9 @@ The candidate is 2D placement-complete and partially routed. Its 186-net
 pre-route constraint coverage, public numeric routing basis and accepted RF P0
 subgate are controlled, but the RF/SI return-path review is `ECO_REQUIRED`:
 the cellular L2-return proposal passed its machine gate but is not independently
-accepted or applied, and the separate GNSS
-placement/routing ECO has not been prepared. Remaining routing, pair-geometry
+accepted or applied, and the separate GNSS placement/routing proposal has only
+static clearance evidence. Its KiCad 9 gate, acceptance and application remain
+open. Remaining routing, pair-geometry
 audit, 3D/service review, final DRC, CAM, DFM and Review B are open.
 The exact current clearance result and
 release boundary are recorded in

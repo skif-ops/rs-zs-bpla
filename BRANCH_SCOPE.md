@@ -57,8 +57,10 @@
   `ECO_REQUIRED`: cellular L2-return candidate `PCB-MAIN-RF-RETURN-001` не
   применён; commit-bound KiCad 9 comparative DRC в gate `#267` пройден,
   623/623 RF-centreline samples покрыты связной L2-зоной, но независимая
-  приёмка ещё не дана; GNSS требует отдельный
-  placement/routing ECO; remaining routing, STEP, CAM/DFM и Review B открыты;
+  приёмка ещё не дана; отдельный GNSS proposal
+  `PCB-MAIN-GNSS-RF-ECO-001` переставляет только FL1/C64, проходит статический
+  clearance и ждёт comparative KiCad 9 DRC; remaining routing, STEP, CAM/DFM
+  и Review B открыты;
 - повторный PCB-MIC Review A после copper ECO подписан `PASS` по commit `e17a86bc`;
   copper-return subgate Review B принят по commit `7aeec13a`, но panelization,
   DFM, acoustic-stack, physical-EVT, общий Review B и manufacturing release открыты;

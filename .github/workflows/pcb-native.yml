@@ -111,6 +111,8 @@ on:
       - "tools/audit_pcb_main_rf_p0_application_rev_a.py"
       - "tools/generate_pcb_main_rf_return_001_candidate_rev_a.py"
       - "tools/audit_pcb_main_rf_return_001_candidate_rev_a.py"
+      - "tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py"
+      - "tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py"
       - "tools/route_pcb_release_candidate_rev_a.py"
       - "tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py"
       - "tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py"
@@ -418,6 +420,8 @@ jobs:
             --output artifacts/kicad-native/PCB-MAIN/rf_p0_application_audit.json
           python tools/audit_pcb_main_rf_return_001_candidate_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/rf_return_001_candidate_audit.json
+          python tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/gnss_rf_eco_001_candidate_audit.json
           python tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/assembler_dfm_stencil_request_audit.json \
             --commit-sha "$GITHUB_SHA" \
@@ -840,6 +844,60 @@ jobs:
             --drc-candidate "$evidence/candidate_drc.json" \
             --filled-candidate "$candidate_project/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb" \
             --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-MAIN GNSS RF ECO-001 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-MAIN/gnss-rf-eco-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pro \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb"
+          python tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py \
+            --base-output "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_REGENERATED_BASE_REV_A.kicad_pcb" \
+            --output "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_REGENERATED_BASE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_REGENERATED_CANDIDATE_REV_A.kicad_pcb"
+          python tools/audit_pcb_main_placement_clearance_rev_a.py \
+            --board "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb" \
+            --no-status-check --strict --output "$evidence/placement_clearance.json"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              pcbnew.SaveBoard(path, board)
+          print("PCB-MAIN GNSS RF ECO-001 base/candidate zone refill: PASS")
+          PY
+          cp "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb" \
+            "$evidence/filled_candidate.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --filled-candidate "$candidate_project/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb" \
+            --output "$evidence/comparative_audit.json"
       - name: Materialize native PCB-PWR schematic
         run: |
           python tools/generate_pcb_pwr_schematic_rev_a.py \
@@ -1101,6 +1159,10 @@ jobs:
             hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.md
             hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-MAIN-RF-RETURN-001/PCB-MAIN_RF_RETURN_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb
             hardware/PCB_MAIN_POWER_INTEGRITY_CALC_REV_A.md
             hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md
             hardware/reviews/PCB_MAIN_PLACEMENT_CLEARANCE_ERRATA_REV_A.md

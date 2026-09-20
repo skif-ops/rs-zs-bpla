@@ -376,6 +376,11 @@
       "rf_return_001_candidate_record": "hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.json",
       "rf_return_001_candidate_review": "hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.md",
       "rf_return_001_status": "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW_NOT_APPLIED",
+      "gnss_rf_eco_001_candidate": "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb",
+      "gnss_rf_eco_001_candidate_record": "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.json",
+      "gnss_rf_eco_001_candidate_review": "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.md",
+      "gnss_rf_eco_001_audit": "tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py",
+      "gnss_rf_eco_001_status": "PROPOSAL_STATIC_AUDIT_READY_KICAD9_COMPARATIVE_DRC_PENDING_NOT_APPLIED",
       "placement_clearance_control": {
         "state": "PASS",
         "board_sha256": "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040",

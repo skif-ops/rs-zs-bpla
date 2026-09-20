@@ -63,8 +63,8 @@
       "closes_only": "RF-RP-002_CELLULAR_L2_REFERENCE_SUBGATE"
     },
     {
-      "proposal_id": "PCB-MAIN-GNSS-RF-PLACEMENT-ECO-TBD",
-      "action": "Re-orient or locally repack U9/FL1/C64 and regenerate only affected ground fanout and GNSS RF copper so the SAW is demonstrably close to RF_IN without routing under U9.",
+      "proposal_id": "PCB-MAIN-GNSS-RF-ECO-001",
+      "action": "Evaluate the controlled proposal that keeps U9/J9 fixed, repacks only FL1/C64, and regenerates only affected ground fanout and GNSS RF copper so the SAW is demonstrably close to RF_IN without routing under U9.",
       "closes_only": "RF-SI-003_GNSS_PLACEMENT_AND_ROUTEABILITY_SUBGATE"
     }
   ],

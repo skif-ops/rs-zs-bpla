@@ -1802,6 +1802,11 @@ def main() -> None:
                 "rf_return_001_candidate_record",
                 "rf_return_001_candidate_review",
                 "rf_return_001_status",
+                "gnss_rf_eco_001_candidate",
+                "gnss_rf_eco_001_candidate_record",
+                "gnss_rf_eco_001_candidate_review",
+                "gnss_rf_eco_001_audit",
+                "gnss_rf_eco_001_status",
                 "review_b_checklist", "ra_003_calculation", "ra_003_status",
             }
             if review_b["status"] in {
@@ -1853,6 +1858,10 @@ def main() -> None:
                     "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_"
                     "REVIEW_NOT_APPLIED",
                     "PCB-MAIN RF-return-001 candidate status drift")
+            require(review_b["evidence"].get("gnss_rf_eco_001_status") ==
+                    "PROPOSAL_STATIC_AUDIT_READY_KICAD9_COMPARATIVE_DRC_"
+                    "PENDING_NOT_APPLIED",
+                    "PCB-MAIN GNSS RF ECO-001 candidate status drift")
             for evidence_name in required_layout_evidence - {
                     "ra_003_status", "placement_repack_status",
                     "ground_domain_routing_status",
@@ -1861,6 +1870,7 @@ def main() -> None:
                     "rf_p0_routing_status",
                     "rf_si_return_path_status",
                     "rf_return_001_status",
+                    "gnss_rf_eco_001_status",
             }:
                 evidence_path = ROOT / review_b["evidence"][evidence_name]
                 require(evidence_path.is_file() and evidence_path.stat().st_size > 0,

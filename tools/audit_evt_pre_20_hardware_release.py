@@ -682,6 +682,12 @@ def audit() -> dict[str, object]:
     main_rf_return_candidate = read_json(
         "hardware/reviews/PCB_MAIN_RF_RETURN_001_CANDIDATE_REV_A.json"
     )
+    main_gnss_rf_control = run_json_audit(
+        "audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py"
+    )
+    main_gnss_rf_candidate = read_json(
+        "hardware/reviews/PCB_MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.json"
+    )
     main_rf_controlled = (
         main_rf_return_control.get("status") ==
         "PASS_STATIC_ECO_REQUIRED_AND_CELLULAR_L2_RETURN_PROPOSAL_CONTROLLED"
@@ -703,6 +709,24 @@ def audit() -> dict[str, object]:
             "the GNSS ECO remains separate"
         ),
         "PCB-MAIN RF/SI return-path review or bounded remediation control is missing",
+    )
+    main_gnss_rf_controlled = (
+        main_gnss_rf_control.get("status") ==
+        "PASS_STATIC_GNSS_RF_PLACEMENT_ROUTEABILITY_PROPOSAL_CONTROLLED"
+        and main_gnss_rf_candidate.get("proposal_id") ==
+        "PCB-MAIN-GNSS-RF-ECO-001"
+        and main_gnss_rf_candidate.get("decision_boundary", {}).get(
+            "proposal_only"
+        ) is True
+        and main_gnss_rf_candidate.get("decision_boundary", {}).get(
+            "applied_to_authoritative_board"
+        ) is False
+    )
+    check(
+        "pcb_main_gnss_rf_eco_control",
+        main_gnss_rf_controlled,
+        "FL1/C64-only GNSS RF ECO-001 proposal is hash-bound and unapplied",
+        "PCB-MAIN GNSS RF placement/routeability proposal control is missing",
     )
     main_rf_boundary = main_rf_review.get("decision_boundary", {})
     main_rf_candidate_boundary = main_rf_return_candidate.get(
@@ -731,6 +755,11 @@ def audit() -> dict[str, object]:
         isinstance(main_rf_boundary, dict)
         and main_rf_boundary.get("gnss_rf_placement_routeability_complete") is True
         and main_rf_boundary.get("rf_si_return_path_review_complete") is True
+        and main_gnss_rf_candidate.get("decision_boundary", {}).get(
+            "applied_to_authoritative_board"
+        ) is True
+        and main_gnss_rf_control.get("kicad9_comparative_drc") ==
+        "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION"
     )
     check(
         "pcb_main_gnss_rf_placement_routeability",
@@ -738,7 +767,7 @@ def audit() -> dict[str, object]:
         (
             "GNSS placement/routing and repeat RF/SI review complete"
             if gnss_rf_routeability_complete
-            else "GNSS_RF_FILTERED U9/FL1/C64 placement/routing ECO and repeat RF/SI review remain open"
+            else "PCB-MAIN-GNSS-RF-ECO-001 is an unapplied proposal pending KiCad 9 comparative DRC and human acceptance; repeat RF/SI review remains open"
         ),
         "PCB-MAIN GNSS RF placement/routeability ECO and repeat return-path review remain open",
     )

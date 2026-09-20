@@ -1,0 +1,105 @@
+{
+  "schema_version": "dioneya.pcb-main-gnss-rf-eco-001-candidate.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-MAIN-GNSS-RF-ECO-001",
+  "date_utc": "2026-09-20",
+  "status": "PROPOSAL_STATIC_AUDIT_READY_KICAD9_COMPARATIVE_DRC_PENDING",
+  "scope": "MOVE_ONLY_FL1_C64_AND_REGENERATE_AFFECTED_GNSS_RF_AND_FL1_GROUND_FANOUT",
+  "review_input": "hardware/reviews/PCB_MAIN_RF_SI_RETURN_PATH_REVIEW_REV_A.json",
+  "base": {
+    "board": "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_BASE_REV_A.kicad_pcb",
+    "board_sha256": "9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040",
+    "trace_items": 976,
+    "footprints": 251
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb",
+    "board_sha256": "eeb5689abd3ddc79c3efd88f4f197aebc070c4175d90eefde4690b0f26142295",
+    "generator": "tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py",
+    "generator_sha256": "5f97cdee0922627cd0293adc93b901d63110f97d1cc2970a7ce929a6213e1989",
+    "trace_items": 973,
+    "footprints": 251,
+    "accepted_base_bytes_modified": false
+  },
+  "bounded_placement_delta": [
+    {
+      "refdes": "FL1",
+      "from": {"x_mm": 60.5, "y_mm": 68.0, "rotation_deg": 0.0},
+      "to": {"x_mm": 56.8, "y_mm": 51.8, "rotation_deg": 270.0}
+    },
+    {
+      "refdes": "C64",
+      "from": {"x_mm": 58.75, "y_mm": 68.0, "rotation_deg": 0.0},
+      "to": {"x_mm": 58.3, "y_mm": 51.6, "rotation_deg": 180.0}
+    }
+  ],
+  "fixed_anchors": {
+    "U9": {"x_mm": 53.5, "y_mm": 58.0, "rotation_deg": 0.0},
+    "J9": {"x_mm": 53.5, "y_mm": 68.0, "rotation_deg": 0.0}
+  },
+  "gnss_rf_route_delta": {
+    "base": {
+      "GNSS_RF_ANT_BIASED": {"segments": 17, "length_mm": 10.205266952966},
+      "GNSS_RF_DC_BLOCK": {"segments": 1, "length_mm": 1.0},
+      "GNSS_RF_FILTERED": {"segments": 6, "length_mm": 25.325357133747},
+      "total_length_mm": 36.530624086713
+    },
+    "candidate": {
+      "GNSS_RF_ANT_BIASED": {"segments": 22, "length_mm": 34.114751790743},
+      "GNSS_RF_DC_BLOCK": {"segments": 1, "length_mm": 1.187960437052},
+      "GNSS_RF_FILTERED": {"segments": 2, "length_mm": 1.150693909433},
+      "total_length_mm": 36.453406137228,
+      "signal_layer": "F.Cu",
+      "reference_layer": "In1.Cu",
+      "trace_width_mm": 0.1509,
+      "signal_vias": 0
+    },
+    "filtered_pad_to_pad_distance_mm": 1.103687002732,
+    "filtered_stretch_ratio": 1.04259079484,
+    "filtered_length_reduction_mm": 24.174663224314
+  },
+  "ground_fanout_delta": {
+    "removed_obsolete_fl1_segments": 5,
+    "removed_obsolete_fl1_vias": 3,
+    "added_fl1_segments": 3,
+    "added_fl1_vias": 1,
+    "reused_adjacent_u9_ground_via": [55.725, 51.85]
+  },
+  "static_validation": {
+    "strict_2d_placement_clearance": "PASS",
+    "assembly_footprints": 227,
+    "confirmed_component_collisions": 0,
+    "mounting_clearance_conflicts": 0,
+    "ufl_tool_clearance_conflicts": 0,
+    "u9_or_j9_moved": false,
+    "other_footprints_moved": false,
+    "unrelated_trace_items_modified": false,
+    "zones_outline_or_stackup_changed": false,
+    "gnss_signal_copper_under_u9_body": false
+  },
+  "required_machine_gate": {
+    "kicad_version": "9.x",
+    "regenerate_exact_candidate": true,
+    "refill_base_and_candidate": true,
+    "strict_2d_placement_clearance_required": true,
+    "comparative_drc_new_error_count": 0,
+    "unconnected_item_regression_allowed": false,
+    "filled_gnd_digital_l2_gnss_rf_centreline_coverage_required": true,
+    "maximum_coverage_sample_pitch_mm": 0.1
+  },
+  "review_request": {
+    "requested_after_green_machine_gate": "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE_OR_REJECT",
+    "accept_value": "ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE",
+    "reject_value": "REJECT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE"
+  },
+  "decision_boundary": {
+    "proposal_only": true,
+    "applied_to_authoritative_board": false,
+    "cellular_l2_return_subgate_complete": false,
+    "gnss_rf_placement_routeability_complete": false,
+    "rf_si_return_path_review_complete": false,
+    "routing_complete": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}
