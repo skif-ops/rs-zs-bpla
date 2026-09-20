@@ -43,7 +43,7 @@ untouched.
 
 - Base SHA-256: `9557f74faa21105bdcdfb859cf5380f93e441aa8f863a7bad3bdb671a930c040`
 - Candidate SHA-256: `eeb5689abd3ddc79c3efd88f4f197aebc070c4175d90eefde4690b0f26142295`
-- Generator SHA-256: `5f97cdee0922627cd0293adc93b901d63110f97d1cc2970a7ce929a6213e1989`
+- Generator SHA-256: `f53e927ffd22dd340f5990db476319747d770821828bcc3b72173553f518fd3c`
 - Generator: `tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py`
 - Independent audit: `tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py`
 

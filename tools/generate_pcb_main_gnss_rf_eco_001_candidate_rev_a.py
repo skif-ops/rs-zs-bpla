@@ -186,8 +186,16 @@ def generate(base_output: Path, output: Path) -> dict[str, object]:
     return {
         "base_sha256": BASE_SHA256,
         "candidate_sha256": sha256_bytes(candidate_payload),
-        "base_output": str(base_output.relative_to(ROOT)),
-        "candidate_output": str(output.relative_to(ROOT)),
+        "base_output": (
+            str(base_output.relative_to(ROOT))
+            if base_output.is_relative_to(ROOT)
+            else str(base_output)
+        ),
+        "candidate_output": (
+            str(output.relative_to(ROOT))
+            if output.is_relative_to(ROOT)
+            else str(output)
+        ),
         "moved_footprints": sorted(PLACEMENT_REPLACEMENTS),
         "removed_trace_items": len(REMOVED_TRACE_TSTAMPS),
         "added_segments": len(ADDED_SEGMENTS),

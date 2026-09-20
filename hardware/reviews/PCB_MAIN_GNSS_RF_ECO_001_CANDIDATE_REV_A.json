@@ -16,7 +16,7 @@
     "board": "hardware/kicad/candidates/PCB-MAIN-GNSS-RF-ECO-001/PCB-MAIN_GNSS_RF_ECO_001_CANDIDATE_REV_A.kicad_pcb",
     "board_sha256": "eeb5689abd3ddc79c3efd88f4f197aebc070c4175d90eefde4690b0f26142295",
     "generator": "tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py",
-    "generator_sha256": "5f97cdee0922627cd0293adc93b901d63110f97d1cc2970a7ce929a6213e1989",
+    "generator_sha256": "f53e927ffd22dd340f5990db476319747d770821828bcc3b72173553f518fd3c",
     "trace_items": 973,
     "footprints": 251,
     "accepted_base_bytes_modified": false
