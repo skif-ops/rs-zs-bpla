@@ -1,0 +1,34 @@
+{
+  "schema": "pcb-main-usb-routeability-review.rev-a",
+  "status": "ECO_REQUIRED",
+  "decision": "ECO_REQUIRED_USB_SOURCE_TERMINATION_CLUSTER",
+  "reviewed_source_commit": "fd2cfb324be9ef4a97acc538adee681e9770b2eb",
+  "authoritative_board_changed": false,
+  "fixed_anchors": ["U1", "J11", "U25"],
+  "source_pads": {
+    "USB_DM_U1": [59.75, 26.5],
+    "USB_DP_U1": [59.75, 26.0],
+    "pitch_mm": 0.5
+  },
+  "terminations": {
+    "R92": [55.0, 18.25],
+    "R91": [49.0, 18.25],
+    "centre_separation_mm": 6.0
+  },
+  "local_escape_occupants": ["C4", "C12", "R3"],
+  "candidate_geometry_mm": {
+    "width": 0.1537,
+    "gap": 0.2032,
+    "reference": "L1_OVER_L2_ENGINEERING_CANDIDATE"
+  },
+  "required_proofs": [
+    "STRICT_2D_CLEARANCE",
+    "ADJACENT_SOURCE_SIDE_PRESENTATION",
+    "DIFFERENTIAL_SERIES_TOPOLOGY",
+    "PAIR_LENGTH_MATCH",
+    "CONTINUOUS_GND_DIGITAL_L2_REFERENCE",
+    "COMPARATIVE_KICAD9_DRC"
+  ],
+  "manufacturing_release": false,
+  "review_b_complete": false
+}
