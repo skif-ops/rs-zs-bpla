@@ -312,7 +312,7 @@ jobs:
           PY
       - name: Import PCB-MIC secondary reference CAD
         run: |
-          python -m pip install --disable-pip-version-check easyeda2kicad 'kiutils==1.4.8'
+          python -m pip install --disable-pip-version-check easyeda2kicad 'kiutils==1.4.8' 'numpy==2.0.2'
           mkdir -p artifacts/kicad-reference/PCB-MIC
           ROOT="$PWD/artifacts/kicad-reference/PCB-MIC"
           easyeda2kicad --full --lcsc_id=C7230692 --output "$ROOT/t5838_ref" --project-relative
