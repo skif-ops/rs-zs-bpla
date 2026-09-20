@@ -446,7 +446,7 @@ def static_audit() -> dict[str, object]:
     boundary = proposal.get("decision_boundary", {})
     require(proposal.get("proposal_id") == "PCB-MAIN-GNSS-RF-ECO-001" and
             proposal.get("status") ==
-            "PROPOSAL_STATIC_AUDIT_READY_KICAD9_COMPARATIVE_DRC_PENDING" and
+            "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW" and
             proposal.get("base", {}).get("board_sha256") == BASE_SHA256 and
             proposal.get("candidate", {}).get("board_sha256") == CANDIDATE_SHA256 and
             proposal.get("candidate", {}).get("generator_sha256") == GENERATOR_SHA256 and
@@ -456,6 +456,55 @@ def static_audit() -> dict[str, object]:
                 "filled_gnd_digital_l2_gnss_rf_centreline_coverage_required"
             ) is True,
             "GNSS ECO proposal identity or machine-gate contract drift")
+    require(proposal.get("commit_bound_machine_gate") == {
+        "head_commit_sha": "67538ba5dfea4cde08c06738cc6b537847a25398",
+        "head_tree_sha": "f45c0923461b299eb3ccfaa97eb9ca2cf069a285",
+        "pcb_native_run_id": 35511383587,
+        "pcb_native_run_number": 273,
+        "pcb_native_conclusion": "success",
+        "comparative_drc_step": "success",
+        "ci_run_id": 35511383579,
+        "ci_run_number": 546,
+        "ci_conclusion": "success",
+        "artifact_id": 10605856993,
+        "artifact_name": "evt-pre-20-kicad-native-gate",
+        "artifact_digest": (
+            "sha256:3e08973033e263876c833abc220196daf1b6cbfc60d2476924032131c96b9056"
+        ),
+        "baseline_drc_sha256": (
+            "0ed9ee12912d34c5fedbb0bcd2dd5d3069d62dc26bff6d705f6dbff5b071a157"
+        ),
+        "candidate_drc_sha256": (
+            "58c39848989df2a4eb96cd4b69358811fd04d6e66f8434ca9cd02c2ab58573f7"
+        ),
+        "comparative_audit_sha256": (
+            "c8e72c07e9e51f2f7617baf604e79256b03b8bb360c1cf69d6a91f43831c2bf8"
+        ),
+        "filled_candidate_sha256": (
+            "085a750207f5a2de668d986c210ed348884afa84eb5229a163161b355550b839"
+        ),
+        "placement_clearance_sha256": (
+            "49af2a5051748183d91399feaf32b73ceb06e3ee540f437d1e4dd20d2251ac28"
+        ),
+    }, "GNSS ECO commit-bound machine-gate evidence drift")
+    require(proposal.get("comparative_kicad9_drc") == {
+        "status": "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION",
+        "base_violations": 226,
+        "candidate_violations": 227,
+        "base_errors": 0,
+        "candidate_errors": 0,
+        "base_unconnected_items": 429,
+        "candidate_unconnected_items": 429,
+        "new_error_counts": {},
+    } and proposal.get("filled_reference") == {
+        "status": "PASS_FILLED_GND_DIGITAL_L2_UNDER_GNSS_RF_CENTRELINES",
+        "filled_polygon_count": 1,
+        "maximum_sample_pitch_mm": 0.1,
+        "gnss_rf_ant_biased_samples": 372,
+        "gnss_rf_dc_block_samples": 17,
+        "gnss_rf_filtered_samples": 17,
+        "uncovered_samples": 0,
+    }, "GNSS ECO KiCad 9 DRC or filled-reference evidence drift")
     require(boundary == {
         "proposal_only": True,
         "applied_to_authoritative_board": False,
@@ -483,7 +532,7 @@ def static_audit() -> dict[str, object]:
         and evidence.get("gnss_rf_eco_001_candidate_record") == str(PROPOSAL.relative_to(ROOT))
         and evidence.get("gnss_rf_eco_001_candidate_review") == str(PROPOSAL_RECORD.relative_to(ROOT))
         and evidence.get("gnss_rf_eco_001_status") ==
-        "PROPOSAL_STATIC_AUDIT_READY_KICAD9_COMPARATIVE_DRC_PENDING_NOT_APPLIED"
+        "PROPOSAL_KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW_NOT_APPLIED"
         and capture.get("manufacturing_release") is False,
         "GNSS ECO capture-status traceability or release boundary drift",
     )
@@ -502,7 +551,9 @@ def static_audit() -> dict[str, object]:
         "filtered_stretch_ratio": filtered_length / direct,
         "under_u9_audit_samples": under_u9_samples,
         "strict_2d_placement_clearance": "PASS",
-        "kicad9_comparative_drc": "PENDING",
+        "kicad9_comparative_drc": (
+            "PASS_NO_NEW_KICAD9_DRC_ERRORS_OR_UNCONNECTED_REGRESSION"
+        ),
         "gnss_rf_placement_routeability_complete": False,
         "rf_si_return_path_review_complete": False,
         "review_b_complete": False,

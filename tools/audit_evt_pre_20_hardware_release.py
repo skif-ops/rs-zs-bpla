@@ -767,7 +767,7 @@ def audit() -> dict[str, object]:
         (
             "GNSS placement/routing and repeat RF/SI review complete"
             if gnss_rf_routeability_complete
-            else "PCB-MAIN-GNSS-RF-ECO-001 is an unapplied proposal pending KiCad 9 comparative DRC and human acceptance; repeat RF/SI review remains open"
+            else "PCB-MAIN-GNSS-RF-ECO-001 passed commit-bound KiCad 9 comparative DRC but remains an unapplied proposal pending human acceptance; repeat RF/SI review remains open"
         ),
         "PCB-MAIN GNSS RF placement/routeability ECO and repeat return-path review remain open",
     )

@@ -290,9 +290,13 @@ def validate_deliverable_register() -> None:
         in deliverables["HW-M-002"]["Критерий выпуска"]
         and "623 of 623 centreline samples covered but remains unaccepted and unapplied"
         in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "GNSS RF ECO-001"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
+        and "passed commit-bound comparative KiCad 9 DRC with 406 of 406 centreline samples covered but remains unaccepted and unapplied"
+        in deliverables["HW-M-002"]["Критерий выпуска"]
         and "independent RF/SI review stays ECO_REQUIRED"
         in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "GNSS placement/routing and cellular acceptance remain open"
+        and "both proposal acceptances and applications remain open"
         in deliverables["HW-M-002"]["Критерий выпуска"]
         and "pair-aware routing" in deliverables["HW-M-002"]["Критерий выпуска"]
         and "final job stackup" in deliverables["HW-M-002"]["Критерий выпуска"]

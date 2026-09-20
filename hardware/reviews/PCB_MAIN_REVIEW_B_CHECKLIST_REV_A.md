@@ -62,9 +62,10 @@ manufacturing release.
   Separately, `GNSS_RF_FILTERED` is 25.325357 mm for a 15.543668 mm pad-to-pad
   span and wraps around U9 because RF_IN faces away from FL1; a dedicated
   placement/routing ECO remains required. Proposal `PCB-MAIN-GNSS-RF-ECO-001`
-  keeps U9/J9 fixed, moves only FL1/C64, passes strict static clearance and
-  reduces the post-SAW route to 1.326997 mm, but its KiCad 9 comparative gate
-  and independent acceptance are still pending.
+  keeps U9/J9 fixed, moves only FL1/C64 and reduces the post-SAW route to
+  1.326997 mm. Commit-bound PCB Native Gate `#273` passed strict clearance,
+  comparative KiCad 9 DRC and 406/406 filled-L2 centreline coverage, but
+  independent acceptance and application are still pending.
 - Stackup/impedance request: controlled packet and blank 22-row response
   register are ready, with 0/2 accepted fabricator responses. No final job
   construction, production tolerance, coupon plan or manufacturing route rule
@@ -163,10 +164,9 @@ for source commit `9aceca9531f0b9c18679bee1a8050ae7cd94308a` and PDF SHA-256
 The candidate is 2D placement-complete and partially routed. Its 186-net
 pre-route constraint coverage, public numeric routing basis and accepted RF P0
 subgate are controlled, but the RF/SI return-path review is `ECO_REQUIRED`:
-the cellular L2-return proposal passed its machine gate but is not independently
-accepted or applied, and the separate GNSS placement/routing proposal has only
-static clearance evidence. Its KiCad 9 gate, acceptance and application remain
-open. Remaining routing, pair-geometry
+the cellular L2-return and separate GNSS placement/routing proposals passed
+their machine gates but neither is independently accepted or applied. Repeat
+RF/SI review remains open. Remaining routing, pair-geometry
 audit, 3D/service review, final DRC, CAM, DFM and Review B are open.
 The exact current clearance result and
 release boundary are recorded in

@@ -43,8 +43,10 @@ hash-bound engineering routing subgate, but it is not final RF copper.
   L2-reference subgate after comparative KiCad 9 DRC and human acceptance.
 - Separate proposal `PCB-MAIN-GNSS-RF-ECO-001` keeps `U9/J9` fixed, locally
   repacks only `FL1/C64`, regenerates the affected ground fanout and GNSS RF
-  copper, and must repeat placement, DRC and RF return-path review. It remains
-  unapplied and must not be hidden inside the cellular plane change.
+  copper, and passed commit-bound placement, comparative DRC and filled-L2
+  coverage in PCB Native Gate `#273`. It remains unaccepted and unapplied;
+  repeat RF return-path review is still required after any application, and
+  the ECO must not be hidden inside the cellular plane change.
 
 Final job-specific stackup/tolerance/coupon acceptance, both fabricator
 responses, selected-assembler DFM/stencil response, remaining routing, complete

@@ -1,6 +1,6 @@
 # PCB-MAIN GNSS RF placement/routeability ECO-001 — Rev.A
 
-Status: `PROPOSAL / STATIC CLEARANCE PASS / KICAD 9 GATE REQUIRED / NOT FOR MANUFACTURE`
+Status: `PROPOSAL / KICAD 9 COMPARATIVE DRC PASS / HUMAN ACCEPTANCE PENDING / NOT FOR MANUFACTURE`
 
 `PCB-MAIN-GNSS-RF-ECO-001` is the bounded response to finding `RF-SI-003`.
 It keeps locked GNSS anchors `U9` and `J9` fixed, moves only unlocked `FL1`
@@ -47,10 +47,22 @@ untouched.
 - Generator: `tools/generate_pcb_main_gnss_rf_eco_001_candidate_rev_a.py`
 - Independent audit: `tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py`
 
-CI must regenerate the candidate byte-for-byte, refill base and candidate with
-KiCad 9, prove strict placement clearance, run comparative DRC/connectivity,
-and find connected `GND_DIGITAL` L2 copper below every sampled centreline point
-of all three GNSS RF nets at a maximum `0.1 mm` pitch.
+The commit-bound machine gate regenerated the candidate byte-for-byte, refilled
+base and candidate with KiCad 9, proved strict placement clearance, ran
+comparative DRC/connectivity, and sampled the filled L2 reference:
+
+- source commit/tree: `67538ba5dfea4cde08c06738cc6b537847a25398` /
+  `f45c0923461b299eb3ccfaa97eb9ca2cf069a285`;
+- PCB Native Gate `#273` (`35511383587`): `success`, including the GNSS
+  comparative DRC and filled-reference step;
+- CI `#546` (`35511383579`): `success`;
+- DRC: 226 -> 227 total warning-level violations, 0 -> 0 errors and
+  429 -> 429 unconnected items;
+- filled reference: one connected `GND_DIGITAL` polygon, 372
+  `GNSS_RF_ANT_BIASED`, 17 `GNSS_RF_DC_BLOCK` and 17 `GNSS_RF_FILTERED`
+  centreline samples at no more than `0.1 mm`, zero uncovered;
+- artifact `10605856993`, `evt-pre-20-kicad-native-gate`, digest
+  `sha256:3e08973033e263876c833abc220196daf1b6cbfc60d2476924032131c96b9056`.
 
 Even after a green machine gate, this proposal requires the exact independent
 decision `ACCEPT_GNSS_RF_PLACEMENT_ROUTEABILITY_SUBGATE` before application.
