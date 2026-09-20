@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Generate the bounded PCB-MAIN USB source-termination placement ECO-001.
 
-The proposal moves only R91/R92 and the two local support parts C12/R3.  It
-does not add or remove copper and never modifies the authoritative PCB.
+The proposal moves only the previously unrouted R91/R92 series terminations.
+It does not add or remove copper and never modifies the authoritative PCB.
 """
 
 from __future__ import annotations
@@ -20,10 +20,8 @@ DEFAULT_OUTPUT = CANDIDATE_DIR / "PCB-MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A
 BASE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
 
 PLACEMENT_REPLACEMENTS = {
-    "R91": ("    (at 49 18.25 180)", "    (at 61.75 25.75)"),
-    "R92": ("    (at 55 18.25 180)", "    (at 61.75 26.75)"),
-    "C12": ("    (at 61.75 25.25)", "    (at 63.5 24)"),
-    "R3": ("    (at 61.75 27.25)", "    (at 63.5 25.25)"),
+    "R91": ("    (at 49 18.25 180)", "    (at 64 25.25)"),
+    "R92": ("    (at 55 18.25 180)", "    (at 64 26.25)"),
 }
 
 

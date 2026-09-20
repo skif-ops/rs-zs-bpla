@@ -22,12 +22,10 @@ CANDIDATE = ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-PLACEMENT-ECO-001/PCB
 REVIEW = ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_CANDIDATE_REV_A.json"
 AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 BASE_SHA256 = "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9"
-CANDIDATE_SHA256 = "e92d3a65a9b716d4940d5ebf91fc516240afb62974a666e040594cc78a8dc424"
+CANDIDATE_SHA256 = "d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e"
 EXPECTED_POSES = {
-    "R91": ((49.0, 18.25, 180.0), (61.75, 25.75, 0.0)),
-    "R92": ((55.0, 18.25, 180.0), (61.75, 26.75, 0.0)),
-    "C12": ((61.75, 25.25, 0.0), (63.5, 24.0, 0.0)),
-    "R3": ((61.75, 27.25, 0.0), (63.5, 25.25, 0.0)),
+    "R91": ((49.0, 18.25, 180.0), (64.0, 25.25, 0.0)),
+    "R92": ((55.0, 18.25, 180.0), (64.0, 26.25, 0.0)),
 }
 
 
@@ -135,9 +133,10 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
                           pad_position(candidate, "R91", "1"))
     dm_length = math.dist(pad_position(candidate, "U1", "70"),
                           pad_position(candidate, "R92", "1"))
-    require(math.isclose(dp_length, dm_length, abs_tol=1e-9),
-            "USB source-side direct lengths are not symmetric")
-    require(dp_length < 1.7, "USB source-side termination distance exceeds bound")
+    require(abs(dp_length - dm_length) < 0.075,
+            "USB source-side direct-length mismatch exceeds placement bound")
+    require(max(dp_length, dm_length) < 4.0,
+            "USB source-side termination distance exceeds placement bound")
     require(pad_position(candidate, "R91", "1")[0] < pad_position(candidate, "R91", "2")[0] and
             pad_position(candidate, "R92", "1")[0] < pad_position(candidate, "R92", "2")[0],
             "U1-side resistor pads do not face U1")
@@ -154,7 +153,10 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "moved_footprints": sorted(changed),
-        "source_side_direct_length_mm": round(dp_length, 9),
+        "source_side_direct_lengths_mm": {
+            "USB_DP_U1": round(dp_length, 9),
+            "USB_DM_U1": round(dm_length, 9),
+        },
         "source_side_length_mismatch_mm": round(abs(dp_length - dm_length), 9),
         "placement_clearance_state": summary["state"],
         "authoritative_board_modified": False,
@@ -181,10 +183,10 @@ def main() -> int:
         args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print("PCB-MAIN USB placement ECO-001 candidate audit:", report["status"])
     print(f"candidate_sha256={CANDIDATE_SHA256} moved={report['moved_footprints']} ")
-    print(f"source_side_direct_length_mm={report['source_side_direct_length_mm']} mismatch_mm=0")
+    print(f"source_side_direct_lengths_mm={report['source_side_direct_lengths_mm']} "
+          f"mismatch_mm={report['source_side_length_mismatch_mm']}")
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

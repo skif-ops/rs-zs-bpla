@@ -48,7 +48,9 @@ Decision: `ECO_REQUIRED_USB_SOURCE_TERMINATION_CLUSTER`.
 
 `PCB-MAIN-USB-PLACEMENT-ECO-001` now supplies the bounded four-footprint
 proposal requested above.  Its board SHA-256 is
-`e92d3a65a9b716d4940d5ebf91fc516240afb62974a666e040594cc78a8dc424`.
-Static regeneration and strict clearance pass; commit-bound KiCad 9 DRC and
-human acceptance remain pending.  The routeability decision remains open and
-the candidate is not applied to authoritative PCB-MAIN.
+`d060e09062fd60b750b09cda029b6529711aab4c14f31c8b3036c21f55cd8d9e`.
+It supersedes the failed four-footprint candidate from PCB Native Gate #280
+and now moves only the previously unrouted R91/R92. Static regeneration and
+strict clearance pass; repeat commit-bound KiCad 9 DRC and human acceptance
+remain pending. The routeability decision remains open and the candidate is
+not applied to authoritative PCB-MAIN.
