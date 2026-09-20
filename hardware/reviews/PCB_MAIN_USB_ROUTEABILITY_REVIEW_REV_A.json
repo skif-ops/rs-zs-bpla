@@ -1,7 +1,7 @@
 {
   "schema": "pcb-main-usb-routeability-review.rev-a",
-  "status": "PLACEMENT_APPLIED_USB_MCU_SOURCE_ROUTING_APPLIED_COMMIT_BOUND_GATE_PASS_REMAINING_USB_OPEN",
-  "decision": "USB_MCU_SOURCE_ROUTING_APPLICATION_PASS_MAIN_CONNECTOR_PROPOSAL_NEXT",
+  "status": "USB_MCU_SOURCE_APPLIED_CELL_MODEM_PROPOSAL_READY_MAIN_CONNECTOR_DFM_BLOCKED",
+  "decision": "USB_MCU_SOURCE_ROUTING_APPLICATION_PASS_CELL_MODEM_PROPOSAL_READY_MAIN_CONNECTOR_DFM_BLOCKED",
   "reviewed_source_commit": "2c67acaeb93c05b1bb7a6d9267275ff9fc260204",
   "authoritative_board_changed": false,
   "fixed_anchors": ["U1", "J11", "U25"],
@@ -57,6 +57,28 @@
     "application_artifact_digest": "sha256:7fba5414f2fc3e1df3938f12b98e0468c44cd50cf29b64e65342eed0612768ff",
     "authoritative_board_modified": true,
     "human_acceptance": "ACCEPTED"
+  },
+  "main_connector_routeability": {
+    "status": "DFM_ESCAPE_GEOMETRY_PENDING",
+    "official_single_row_contact_mapping_retained": true,
+    "contact_pitch_mm": 0.5,
+    "current_via_diameter_mm": 0.5,
+    "current_via_drill_mm": 0.3,
+    "general_clearance_mm": 0.2,
+    "smaller_via_assumed": false,
+    "required_next_input": "JOB_SPECIFIC_FINISHED_DRILL_ANNULAR_RING_CLEARANCE_OR_SEPARATE_LOCAL_ECO"
+  },
+  "cell_modem_routing_candidate": {
+    "id": "PCB-MAIN-USB-CELL-MODEM-ROUTING-001",
+    "sha256": "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5",
+    "status": "STATIC_PASS_KICAD9_GATE_PENDING",
+    "routed_nets": ["CELL_USB_DP_U8", "CELL_USB_DM_U8"],
+    "pair_length_mismatch_mm": 0.0,
+    "minimum_pair_edge_gap_mm": 0.2032,
+    "added_segments": 6,
+    "added_signal_vias": 0,
+    "authoritative_board_modified": false,
+    "human_acceptance": "PENDING"
   },
   "manufacturing_release": false,
   "review_b_complete": false

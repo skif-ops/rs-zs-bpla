@@ -1,6 +1,6 @@
 # PCB-MAIN USB routeability review — Rev.A
 
-Status: `PLACEMENT ECO APPLIED / MCU SOURCE ROUTING APPLIED / COMMIT-BOUND GATE PASS / REVIEW_B OPEN`
+Status: `MCU SOURCE APPLIED / CELL MODEM PROPOSAL READY / MAIN CONNECTOR DFM BLOCKED / REVIEW_B OPEN`
 
 Reviewed source commit: `2c67acaeb93c05b1bb7a6d9267275ff9fc260204`.
 
@@ -73,8 +73,29 @@ Native #289 repeated violations `232→232`, zero new errors and unconnected
 `429→427`.
 
 Current decision:
-`USB_MCU_SOURCE_ROUTING_APPLICATION_PASS_MAIN_CONNECTOR_PROPOSAL_NEXT`.
+`USB_MCU_SOURCE_ROUTING_APPLICATION_PASS_CELL_MODEM_PROPOSAL_READY_MAIN_CONNECTOR_DFM_BLOCKED`.
 
-The main connector pair and both cellular pair groups remain separate open
+## Main-connector escape disposition
+
+The GCT/KiCad single-row J11 contact mapping is retained: the duplicated USB2
+contacts alternate D+/D- at 0.50 mm pitch. With the current general 0.20 mm
+clearance, a 0.50/0.30 mm through-via cannot make a clearance-clean escape
+between adjacent opposite-net pads/traces. No smaller via is introduced before
+the job-specific fabricator returns finished-drill and annular-ring acceptance.
+The connector segment therefore remains a separate DFM/escape ECO instead of
+receiving speculative copper.
+
+## Cellular modem-segment proposal
+
+Candidate `PCB-MAIN-USB-CELL-MODEM-ROUTING-001` routes only
+`CELL_USB_DP_U8` / `CELL_USB_DM_U8` between U8.9/U8.10 and R39.1/R40.1.
+It adds six F.Cu segments, no vias and no other delta. Both routes are exactly
+`4.765484866498 mm`; minimum pair edge gap is `0.2032 mm`; all sampled points
+remain over the accepted `GND_MODEM` In1.Cu reference zone. Candidate SHA-256
+is `4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5`.
+Static regeneration and independent geometry checks pass; commit-bound KiCad 9
+comparative DRC is pending.
+
+The main connector pair and cellular fixture pair remain separate open
 subgates. Final stackup/tolerance/coupon acceptance, Review B, CAM, DFM and
 manufacturing release remain blocked.

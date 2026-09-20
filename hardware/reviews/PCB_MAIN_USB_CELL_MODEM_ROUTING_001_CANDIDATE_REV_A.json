@@ -1,0 +1,53 @@
+{
+  "schema": "pcb-main-usb-cell-modem-routing-001-candidate.rev-a",
+  "candidate_id": "PCB-MAIN-USB-CELL-MODEM-ROUTING-001",
+  "status": "STATIC_PASS_KICAD9_GATE_PENDING",
+  "reviewed_source_commit": "455dfb18d91fae2c1104b04b51fe5e87b22838bc",
+  "base_board_sha256": "76f7a6ef35b3f168e8b32f1ff97e650404546e6b839ddd7fdde9a061ede3d7a5",
+  "candidate_board_sha256": "4e93ca089047ffb84e0f2667897cb9a04d580e925f3c39ed37cec22e4820a5b5",
+  "scope": {
+    "routed_pair_group": "USB_CELL_MODEM_SEGMENT",
+    "routed_nets": [
+      "CELL_USB_DP_U8",
+      "CELL_USB_DM_U8"
+    ],
+    "endpoints": {
+      "CELL_USB_DP_U8": ["U8.9", "R39.1"],
+      "CELL_USB_DM_U8": ["U8.10", "R40.1"]
+    },
+    "added_segments": 6,
+    "added_signal_vias": 0,
+    "changed_footprints": [],
+    "changed_zones": [],
+    "changed_existing_copper": []
+  },
+  "engineering_geometry": {
+    "basis": "JLC06161H-3313_PUBLIC_ENGINEERING_CANDIDATE_L1_OVER_L2",
+    "layer": "F.Cu",
+    "reference": "GND_MODEM_In1.Cu",
+    "trace_width_mm": 0.1537,
+    "minimum_pair_edge_gap_mm": 0.2032,
+    "CELL_USB_DP_U8_length_mm": 4.765484866498,
+    "CELL_USB_DM_U8_length_mm": 4.765484866498,
+    "pair_length_mismatch_mm": 0.0
+  },
+  "machine_gate": {
+    "static_regeneration": "PASS",
+    "independent_static_audit": "PASS",
+    "commit_bound_ci": "PENDING",
+    "commit_bound_kicad9_comparative_drc": "PENDING",
+    "expected_unconnected_reduction": 2
+  },
+  "acceptance_basis": "USER_AUTHORIZED_MOST_RATIONAL_DECISIONS_AND_REQUESTED_NO_ADDITIONAL_QUERY_EXCEPT_EXTREME_CASE",
+  "human_acceptance": "PENDING",
+  "authoritative_board_modified": false,
+  "remaining_usb_routing": [
+    "USB_MAIN_CONNECTOR_SEGMENT",
+    "USB_CELL_FIXTURE_SEGMENT"
+  ],
+  "final_job_stackup_accepted": false,
+  "production_impedance_tolerance_accepted": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false,
+  "manufacturing_release": false
+}
