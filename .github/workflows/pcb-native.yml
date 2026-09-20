@@ -689,9 +689,51 @@ jobs:
           pcbnew.SaveBoard(path, board)
           print("PCB-MAIN P0 RF expected candidate KiCad 9 normalization: PASS")
           PY
-          cmp \
-            "$candidate_project/PCB-MAIN_RF_P0_EXPECTED_REV_A.kicad_pcb" \
-            "$candidate_project/PCB-MAIN_RF_P0_REGENERATED_REV_A.kicad_pcb"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 - \
+              "$candidate_project/PCB-MAIN_RF_P0_EXPECTED_REV_A.kicad_pcb" \
+              "$candidate_project/PCB-MAIN_RF_P0_REGENERATED_REV_A.kicad_pcb" <<'PY'
+          import sys
+
+          from kiutils.board import Board
+
+
+          def require(value: bool, message: str) -> None:
+              if not value:
+                  raise AssertionError(message)
+
+
+          def traces_by_uuid(board: Board, label: str) -> dict[str, object]:
+              uuids = [str(item.tstamp) for item in board.traceItems]
+              require(len(uuids) == len(set(uuids)),
+                      f"{label}: duplicate copper UUIDs")
+              return {str(item.tstamp): item for item in board.traceItems}
+
+
+          expected = Board().from_file(sys.argv[1], encoding="utf-8")
+          regenerated = Board().from_file(sys.argv[2], encoding="utf-8")
+          for field in (
+              "general", "layers", "setup", "properties", "graphicItems",
+              "dimensions", "groups", "targets", "nets", "footprints", "zones",
+          ):
+              require(getattr(expected, field) == getattr(regenerated, field),
+                      f"RF regeneration changes non-routing field: {field}")
+
+          expected_traces = traces_by_uuid(expected, "expected candidate")
+          regenerated_traces = traces_by_uuid(regenerated, "regenerated candidate")
+          require(set(expected_traces) == set(regenerated_traces),
+                  "RF regeneration copper UUID inventory drift")
+          changed = sorted(
+              uuid for uuid, item in expected_traces.items()
+              if item != regenerated_traces[uuid]
+          )
+          require(not changed,
+                  f"RF regeneration copper geometry drift: {changed[:5]}")
+          print(
+              "PCB-MAIN P0 RF KiCad 9 semantic regeneration: PASS "
+              f"({len(expected_traces)} copper items)"
+          )
+          PY
           /usr/bin/python3 - \
             "$candidate_project/PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb" \
             "$candidate_project/PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb" <<'PY'
