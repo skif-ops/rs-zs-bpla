@@ -88,7 +88,10 @@ def candidate_bytes(base_payload: bytes) -> bytes:
 
 
 def generate(base_output: Path, output: Path, check: bool) -> dict[str, object]:
-    base_payload = SOURCE.read_bytes()
+    source_payload = SOURCE.read_bytes()
+    base_payload = (base_output.read_bytes()
+                    if sha256_bytes(source_payload) == CANDIDATE_SHA256
+                    else source_payload)
     candidate_payload = candidate_bytes(base_payload)
     candidate_sha256 = sha256_bytes(candidate_payload)
     if CANDIDATE_SHA256.startswith("TO_BE_"):

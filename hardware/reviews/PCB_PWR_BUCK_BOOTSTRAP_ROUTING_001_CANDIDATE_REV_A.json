@@ -27,11 +27,11 @@
   },
   "source_binding": {
     "generator": "tools/generate_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py",
-    "generator_sha256": "4bf22bef4a9ffb74c7e7289734422192017e6f615fd43cfeb878a0c6656554ae",
+    "generator_sha256": "b156b71cfb9ec712e7420dc4fdc0dee93daed1f6bc02fba13fbd97a84f6c081a",
     "routing_rules": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
     "routing_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
     "evt_stackup_basis": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
-    "evt_stackup_basis_sha256": "8f68fcdf63e9c66f75599887486c6efeb5a77172f7c666296f1612af82cb52fd"
+    "evt_stackup_basis_sha256": "f420a20a7385cc9bd3d057e8d029246e8ebd64d7104511c677d628b7caf39230"
   },
   "invariants": {
     "authoritative_board_modified": false,

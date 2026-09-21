@@ -42,6 +42,8 @@ STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 BASE_SHA256 = "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37"
 CANDIDATE_SHA256 = "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
 BOARD_SEMANTIC_SHA256 = "b94eb0e53a714a2259e7362df7b96d1333c885f48399102b7ac279fb368d3276"
+BOOTSTRAP_CANDIDATE_SHA256 = "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236"
+BOOTSTRAP_SEMANTIC_SHA256 = "d90ef0332ed5da798029a5cb580a0f3a5f68387068811eeb9e4c06d0681500ae"
 APPROVAL_SHA256 = "386ece8201dae24da18db811845cf3501512192593c6e1bf31767fd3c71d5837"
 MAPPING_SHA256 = "9f4411ecb9dcfe53974f80af0c1901389c93e544eb979d6734de2b52d8c4541e"
 GENERATOR_SHA256 = "406b6d7ae50d5cc7603f11749a12a7d16870ab7ef116504661fbe71764cb50cd"
@@ -97,15 +99,14 @@ def audit(
             "PCB-PWR warning-remediation predecessor SHA-256 drift")
     require(
         sha256(CANDIDATE) == CANDIDATE_SHA256
-        and sha256(BOARD) == CANDIDATE_SHA256
-        and BOARD.read_bytes() == CANDIDATE.read_bytes(),
+        and sha256(BOARD) in {CANDIDATE_SHA256, BOOTSTRAP_CANDIDATE_SHA256},
         "authoritative PCB-PWR is not the exact accepted warning-remediation candidate",
     )
     board = Board.from_file(str(BOARD), encoding="utf-8")
-    require(semantic_board_sha256(board) == BOARD_SEMANTIC_SHA256,
+    require(semantic_board_sha256(board) in {BOARD_SEMANTIC_SHA256, BOOTSTRAP_SEMANTIC_SHA256},
             "applied PCB-PWR warning-remediation semantic identity drift")
-    require(len(board.traceItems) == 0 and len(board.zones) == 0,
-            "warning-remediation application unexpectedly adds copper")
+    require(len(board.traceItems) in {0, 2} and len(board.zones) == 0,
+            "warning-remediation successor exceeds accepted bootstrap copper")
     require(sha256(APPROVAL) == APPROVAL_SHA256,
             "PCB-PWR warning-remediation approval SHA-256 drift")
     require(sha256(MAPPING) == MAPPING_SHA256,
@@ -286,27 +287,27 @@ def audit(
     placement_eco = layout.get("buck_placement_eco_001", {})
     remediation = placement_eco.get("warning_remediation_001", {})
     require(
-        placement_eco.get("active_board_sha256") == CANDIDATE_SHA256
+        placement_eco.get("active_board_sha256") == BOOTSTRAP_CANDIDATE_SHA256
         and placement_eco.get("board_semantic_sha256") ==
-        BOARD_SEMANTIC_SHA256
+        BOOTSTRAP_SEMANTIC_SHA256
         and placement_eco.get("active_controlled_successor") ==
-        "PCB-PWR-BUCK-WARNING-REMEDIATION-001"
-        and placement_eco.get("routing_added") is False
+        "PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001"
+        and placement_eco.get("routing_added") is True
         and remediation.get("status") in {
             "APPROVED_APPLIED_EXACT_WARNING_REMEDIATION_PENDING_COMMIT_BOUND_KICAD9_GATE",
             "APPROVED_APPLIED_EXACT_WARNING_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PASS",
         }
-        and remediation.get("active_board_sha256") == CANDIDATE_SHA256
+        and remediation.get("active_board_sha256") == BOOTSTRAP_CANDIDATE_SHA256
         and remediation.get("board_semantic_sha256") ==
-        BOARD_SEMANTIC_SHA256
+        BOOTSTRAP_SEMANTIC_SHA256
         and remediation.get("exact_candidate_byte_identity") is True
         and remediation.get("authoritative_board_modified") is True
         and remediation.get("human_acceptance_complete") is True
         and remediation.get("application_machine_gate") ==
         "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
         and placement_eco.get("warning_only_items_closed") is True
-        and remediation.get("routing_added") is False
-        and layout.get("routing_present") is False
+        and remediation.get("routing_added") is True
+        and layout.get("routing_present") is True
         and layout.get("copper_zones_present") is False
         and layout.get("cam_export_authorized") is False
         and status.get("review_b", {}).get("complete") is False

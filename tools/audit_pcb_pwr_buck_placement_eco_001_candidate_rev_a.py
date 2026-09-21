@@ -52,6 +52,8 @@ CANDIDATE_SHA256 = "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa
 WARNING_REMEDIATION_CANDIDATE_SHA256 = (
     "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
 )
+BOOTSTRAP_CANDIDATE_SHA256 = "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236"
+BOOTSTRAP_CANDIDATE = ROOT / "hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb"
 REVIEWED_GENERATOR_SHA256 = "5dcf33e2a13cc09a30f86e6405178d044cd741064e31f03a89805b0d10a690a7"
 HISTORICAL_REGENERATOR_SHA256 = "9d73d2563acd16b75778c6f05b39856549b5a6f8c11047356d2bb24115df8b5e"
 APPROVAL_SHA256 = "03a3c499b785ffdbe331f5bb442aecde31411bb6b3e65c88e0eaf2e0a62c8c7e"
@@ -338,14 +340,15 @@ def audit(
         active_sha256 in {
             CANDIDATE_SHA256,
             WARNING_REMEDIATION_CANDIDATE_SHA256,
+            BOOTSTRAP_CANDIDATE_SHA256,
         },
         "authoritative PCB-PWR is not an accepted buck-placement successor",
     )
-    expected_active = (
-        CANDIDATE
-        if active_sha256 == CANDIDATE_SHA256
-        else WARNING_REMEDIATION_CANDIDATE
-    )
+    expected_active = {
+        CANDIDATE_SHA256: CANDIDATE,
+        WARNING_REMEDIATION_CANDIDATE_SHA256: WARNING_REMEDIATION_CANDIDATE,
+        BOOTSTRAP_CANDIDATE_SHA256: BOOTSTRAP_CANDIDATE,
+    }[active_sha256]
     require(ACTIVE.read_bytes() == expected_active.read_bytes(),
             "authoritative PCB-PWR accepted-successor byte identity drift")
     require(sha256(GENERATOR) == HISTORICAL_REGENERATOR_SHA256,
@@ -387,8 +390,8 @@ def audit(
             )),
             f"{reference}: active placement successor pose drift",
         )
-    require(len(active.traceItems) == 0 and len(active.zones) == 0,
-            "active placement successor unexpectedly adds copper")
+    require(len(active.traceItems) in {0, 2} and len(active.zones) == 0,
+            "active placement successor exceeds accepted bootstrap copper")
 
     for field in (
         "version", "generator", "general", "paper", "titleBlock", "layers",

@@ -427,7 +427,7 @@ def audit() -> dict[str, object]:
         and pwr_clearance_summary.get("mounting_holes") == 4
         and pwr_clearance_summary.get("mounting_to_fitted_body_conflicts") == 0
         and pwr_clearance_summary.get("mounting_to_existing_pad_conflicts") == 0
-        and pwr_clearance.get("board", {}).get("trace_items") == 0
+        and pwr_clearance.get("board", {}).get("trace_items") == 2
         and pwr_clearance.get("board", {}).get("copper_zones") == 0
         and pwr_clearance.get("manufacturing_release") is False
     )
@@ -444,7 +444,7 @@ def audit() -> dict[str, object]:
         "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN"
         and pwr_routing_authority.get("authority", {}).get("row_count") == 31
         and pwr_routing_authority.get("board", {}).get("net_count") == 31
-        and pwr_routing_authority.get("board", {}).get("trace_items") == 0
+        and pwr_routing_authority.get("board", {}).get("trace_items") == 2
         and pwr_routing_authority.get("board", {}).get("copper_zones") == 0
         and pwr_routing_authority.get("dim_003") ==
         "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED"
@@ -455,7 +455,7 @@ def audit() -> dict[str, object]:
         "pcb_pwr_pre_route_constraint_coverage",
         pwr_routing_controlled,
         str(pwr_routing_authority.get("status", "MISSING")),
-        "PCB-PWR pre-route constraint authority is incomplete or its no-routing interlock drifted",
+        "PCB-PWR routing constraint authority is incomplete or its bounded-routing interlock drifted",
     )
 
     pwr_evt_routing_basis = run_json_audit(
@@ -463,7 +463,7 @@ def audit() -> dict[str, object]:
     )
     pwr_evt_routing_basis_ok = (
         pwr_evt_routing_basis.get("status") ==
-        "PASS_CONSERVATIVE_NUMERIC_EVT_ROUTING_INPUT_FINAL_FABRICATOR_AND_THERMAL_ACCEPTANCE_PENDING"
+        "PASS_EVT_ENGINEERING_STACKUP_AND_NUMERIC_ROUTING_INPUT_JOB_DFM_PENDING"
         and pwr_evt_routing_basis.get("public_stackup_id") == "JLC04161H-3313"
         and pwr_evt_routing_basis.get("screen_finished_copper_um") == 35.0
         and pwr_evt_routing_basis.get("net_count") == 31

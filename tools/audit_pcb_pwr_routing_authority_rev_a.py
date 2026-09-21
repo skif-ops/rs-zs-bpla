@@ -419,8 +419,8 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             f"PCB-PWR layer-count drift: {copper_layers}")
     trace_items = len(board.traceItems)
     copper_zones = len(board.zones)
-    require(trace_items == 0 and copper_zones == 0,
-            "pre-route authority must be revised when routing or copper zones appear")
+    require(trace_items in {0, 2} and copper_zones == 0,
+            "routing authority does not cover copper beyond bootstrap routing 001")
 
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
     require(baseline["input"]["actual_battery_bms_limits_frozen"] is False and
@@ -462,7 +462,7 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
 
     review_text = REVIEW_B.read_text(encoding="utf-8")
     for marker in (
-        "Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / C4 C6 L1 L2 PLACEMENT ECO GATE PASS / EXACT WARNING REMEDIATION APPLIED WITH FRESH APPLICATION GATE PENDING / REVIEW B OPEN / FITTED + EVT MOUNTING CLEARANCE, PRE-ROUTE CONSTRAINT AND DIM-003 ACCEPTANCE PASS / STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`",
+        "Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / C4 C6 L1 L2 PLACEMENT ECO GATE PASS / EXACT WARNING REMEDIATION GATE PASS / EXACT BOOTSTRAP ROUTING 001 APPLIED WITH FRESH APPLICATION GATE PENDING / REVIEW B OPEN / FITTED + EVT MOUNTING CLEARANCE, ROUTING CONSTRAINT AND DIM-003 ACCEPTANCE PASS / STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`",
         "Historical commit-bound native KiCad 9.0.9 evidence",
         "decision `ACCEPT_HIERARCHY_ONLY`",
         "- [x] All 31 native/capture nets",
@@ -490,7 +490,8 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
         require(traceability.get("control") == control,
                 "PCB_PWR_CAPTURE_STATUS pre-route control differs from audit")
         require(status.get("manufacturing_release") is False and
-                status.get("native_layout", {}).get("routing_present") is False and
+                status.get("native_layout", {}).get("routing_present") ==
+                (trace_items == 2) and
                 status.get("native_layout", {}).get("copper_zones_present") is False and
                 status.get("review_b", {}).get("complete") is False,
                 "PCB-PWR release interlock drift")

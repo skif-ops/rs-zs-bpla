@@ -278,6 +278,18 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR bootstrap routing acceptance boundary is missing",
     )
     require(
+        decisions["DEC-114"]["Status"] ==
+        "APPLICATION_EXACT_BOOTSTRAP_DELTA_COMMIT_BOUND_GATE_PENDING"
+        and "57d7b571" in decisions["DEC-114"]["Reason"]
+        and "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236"
+        in decisions["DEC-114"]["Impact"]
+        and "fresh commit-bound CI and PCB Native application gate"
+        in decisions["DEC-114"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-114"]["Impact"],
+        "PCB-PWR bootstrap routing application boundary is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]

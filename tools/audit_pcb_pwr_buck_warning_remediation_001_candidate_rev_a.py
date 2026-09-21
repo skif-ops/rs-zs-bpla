@@ -47,6 +47,8 @@ BASE_SHA256 = "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37"
 CANDIDATE_SHA256 = "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
 BASE_SEMANTIC_SHA256 = "5994f22cdce03bc60779fcf120177bb82f6ecb88b2afdbe9bf4c0c2819af7337"
 CANDIDATE_SEMANTIC_SHA256 = "b94eb0e53a714a2259e7362df7b96d1333c885f48399102b7ac279fb368d3276"
+BOOTSTRAP_CANDIDATE_SHA256 = "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236"
+BOOTSTRAP_CANDIDATE = ROOT / "hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb"
 GENERATOR_SHA256 = "30041af847360568ed8ab43f34e0cc194d61683da95bacba02eead15946d5eb1"
 REVIEWED_GITHUB_COMMIT_SHA = "63d87153e441d956117323ed8d9887568c5033ac"
 REVIEWED_TREE_SHA = "87b2c7ab4d8fbc1b5d0d3c88c703994abef773bf"
@@ -257,12 +259,16 @@ def audit(
     require(sha256(BASE) == BASE_SHA256,
             "PCB-PWR warning-remediation base SHA-256 drift")
     active_sha256 = sha256(ACTIVE)
-    require(active_sha256 in {BASE_SHA256, CANDIDATE_SHA256},
+    require(active_sha256 in {BASE_SHA256, CANDIDATE_SHA256, BOOTSTRAP_CANDIDATE_SHA256},
             "authoritative PCB-PWR is neither the controlled predecessor nor candidate")
-    expected_active = BASE if active_sha256 == BASE_SHA256 else CANDIDATE
+    expected_active = {
+        BASE_SHA256: BASE,
+        CANDIDATE_SHA256: CANDIDATE,
+        BOOTSTRAP_CANDIDATE_SHA256: BOOTSTRAP_CANDIDATE,
+    }[active_sha256]
     require(ACTIVE.read_bytes() == expected_active.read_bytes(),
             "authoritative PCB-PWR does not match its controlled byte identity")
-    applied = active_sha256 == CANDIDATE_SHA256
+    applied = active_sha256 in {CANDIDATE_SHA256, BOOTSTRAP_CANDIDATE_SHA256}
     require(sha256(CANDIDATE) == CANDIDATE_SHA256,
             "PCB-PWR warning-remediation candidate SHA-256 drift")
     require(sha256(GENERATOR) == GENERATOR_SHA256,

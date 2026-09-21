@@ -185,8 +185,8 @@ def main() -> int:
     expected_nets = {net for item in expected.values() for net in item["pins"].values() if net != "NC"}
     board_nets = {net.name for net in board.nets if net.number != 0}
     require(board_nets == expected_nets, "board net set differs from native schematic")
-    require(len(board.traceItems) == 0 and len(board.zones) == 0,
-            "provisional placement candidate contains routing or copper zones")
+    require(len(board.traceItems) in {0, 2} and len(board.zones) == 0,
+            "PCB-PWR contains copper beyond the accepted bootstrap successor")
 
     edges = [item for item in board.graphicItems if getattr(item, "layer", None) == "Edge.Cuts"]
     require(len(edges) == 4, "provisional outline must contain four line segments")
@@ -220,13 +220,13 @@ def main() -> int:
             layout["status"] == "EVT_FITTED_2D_AND_MOUNTING_CLEARANCE_PASS_DIM_003_ACCEPTED" and
             layout["layer_count_authority"] == "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv" and
             layout["layer_count_status"] == "FROZEN_REV_A_FINAL_STACKUP_OPEN" and
-            layout["routing_present"] is False and layout["copper_zones_present"] is False and
+            layout["routing_present"] is True and layout["copper_zones_present"] is False and
             layout["cam_export_authorized"] is False and layout["mounting_holes"] == 4 and
             layout["mounting_status"] == "EVT_DIM_003_ACCEPTED_H1_H4_NPTH_3P4",
             "PCB-PWR capture-status interlock drift")
 
     print("PCB-PWR EVT placement-candidate independent audit PASS")
-    print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; routing/zones absent")
+    print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; exact bootstrap routing successor")
     print("DIM-003 18/18 EVT accepted; DRC/CAM/Review B/manufacturing remain prohibited")
     return 0
 

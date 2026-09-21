@@ -356,8 +356,8 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
                         "pad_bounds_mm": envelope.bounds(),
                     })
 
-    require(len(board.traceItems) == 0 and len(board.zones) == 0,
-            "PCB-PWR placement-clearance candidate contains routed copper")
+    require(len(board.traceItems) in {0, 2} and len(board.zones) == 0,
+            "PCB-PWR copper exceeds the accepted bootstrap successor boundary")
 
     minimum = min(observed)
     passed = (not findings and not mounting_body_findings and

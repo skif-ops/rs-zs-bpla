@@ -152,8 +152,8 @@ def audit() -> dict[str, Any]:
     board = Board.from_file(str(BOARD), encoding="utf-8")
     require(binding["native_board_semantic_sha256"] == semantic_board_sha256(board),
             "native board semantic SHA-256 drift")
-    require(len(board.traceItems) == 0 and len(board.zones) == 0,
-            "numeric pre-route basis must be revised after copper appears")
+    require(len(board.traceItems) in {0, 2} and len(board.zones) == 0,
+            "numeric routing basis does not cover copper beyond bootstrap routing 001")
 
     public = basis["public_four_layer_reference"]
     require(public["stackup_id"] == "JLC04161H-3313", "public stackup ID drift")

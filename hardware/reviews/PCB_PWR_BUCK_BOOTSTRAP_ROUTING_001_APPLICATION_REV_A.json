@@ -1,0 +1,24 @@
+{
+  "schema": "dioneya-pcb-pwr-buck-bootstrap-routing-001-application-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001",
+  "decision": "ACCEPT_PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_SUBGATE",
+  "approval_commit_sha": "57d7b571ed2bb82feea7288fea1d7f4b99ac0ae8",
+  "approval_sha256": "30b26ade4edf0a2f357fb93e1ce95dea7628a7c382003578ebf07c74a7465e0b",
+  "predecessor_board_sha256": "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957",
+  "applied_board_sha256": "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236",
+  "exact_candidate_byte_identity": true,
+  "connections": ["U3.4-C4.1", "U4.4-C6.1"],
+  "routed_nets": ["BOOT_3V8", "BOOT_3V3"],
+  "trace_items": 2,
+  "vias": 0,
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+    "required_violations": [86, 86],
+    "required_unconnected": [126, 124],
+    "required_drc_fingerprint_delta": 0
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}
