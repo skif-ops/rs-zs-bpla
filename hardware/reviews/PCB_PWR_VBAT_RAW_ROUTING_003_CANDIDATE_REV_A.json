@@ -15,7 +15,7 @@
   },
   "candidate": {
     "board": "hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb",
-    "sha256": "8e527054129d1110eb3cdcde18a5012dccd176a944392cde2e008bfa8c806da5",
+    "sha256": "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3",
     "semantic_sha256": "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d",
     "trace_items": 4,
     "copper_zones": 0,
@@ -24,14 +24,14 @@
     "layer": "F.Cu",
     "width_mm": 4.0,
     "vias": 0,
-    "added_route_length_mm": 4.884565,
-    "segment_start_mm": [6.0, 31.0],
-    "segment_end_mm": [10.6, 29.357143],
+    "added_route_length_mm": 2.9,
+    "segment_start_mm": [7.7, 31.25],
+    "segment_end_mm": [10.6, 31.25],
     "destination_pad_center_mm": [11.6, 29.0]
   },
   "source_binding": {
     "generator": "tools/generate_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py",
-    "generator_sha256": "3a973e430e05e40a95839caccfb72dcfcf4afeec46ce2296d404e22b6a77b4fc",
+    "generator_sha256": "b7a73f836ddbb74b7115f50a743d18bc98ac44ee1e5270eafd0cbc23f3ea7eaa",
     "routing_rules": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
     "routing_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
     "evt_stackup_basis": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",

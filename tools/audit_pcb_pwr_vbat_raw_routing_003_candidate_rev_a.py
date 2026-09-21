@@ -25,14 +25,14 @@ ROUTING_RULES = ROOT / "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv"
 STACKUP_BASIS = ROOT / "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json"
 
 BASE_SHA256 = "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5"
-CANDIDATE_SHA256 = "8e527054129d1110eb3cdcde18a5012dccd176a944392cde2e008bfa8c806da5"
+CANDIDATE_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"
 BASE_SEMANTIC_SHA256 = "07ce41bb361e68dd3a5310a6879030f097e4498e9397f2506ea5b78f49c47234"
 CANDIDATE_SEMANTIC_SHA256 = "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d"
-GENERATOR_SHA256 = "3a973e430e05e40a95839caccfb72dcfcf4afeec46ce2296d404e22b6a77b4fc"
+GENERATOR_SHA256 = "b7a73f836ddbb74b7115f50a743d18bc98ac44ee1e5270eafd0cbc23f3ea7eaa"
 ROUTING_RULES_SHA256 = "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988"
 STACKUP_BASIS_SHA256 = "dbb41a7fb0ee5eea01f7bbebaa542061d1c9d7b102c0cb4a912a974b03ab3dc3"
-EXPECTED_START = (6.0, 31.0)
-EXPECTED_END = (10.6, 29.357143)
+EXPECTED_START = (7.7, 31.25)
+EXPECTED_END = (10.6, 31.25)
 
 
 def require(value: bool, message: str) -> None:
@@ -97,7 +97,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     require(net_names[int(item.net)] == "VBAT_RAW" and
             str(item.layer) == "F.Cu" and float(item.width) == 4.0 and
             start == EXPECTED_START and end == EXPECTED_END and
-            math.isclose(math.dist(start, end), 4.884565, abs_tol=1e-6),
+            math.isclose(math.dist(start, end), 2.9, abs_tol=1e-6),
             "candidate-003 segment identity or geometry drift")
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
     require(

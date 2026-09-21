@@ -8895,8 +8895,8 @@
 		(uuid "73e41801-75d1-5d93-bae8-d2c6a96a6c2c")
 	)
 	(segment
-		(start 6 31)
-		(end 10.6 29.357143)
+		(start 7.7 31.25)
+		(end 10.6 31.25)
 		(width 4)
 		(layer "F.Cu")
 		(net 30)
