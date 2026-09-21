@@ -382,6 +382,25 @@
       },
       "review_b_complete": false,
       "manufacturing_release": false
+    },
+    "buck_bootstrap_routing_001": {
+      "proposal": "hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.json",
+      "record": "hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.md",
+      "generator": "tools/generate_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py",
+      "audit": "tools/audit_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py",
+      "status": "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+      "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_001_CREATION_SUBGATE",
+      "base_board_sha256": "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957",
+      "candidate_board_sha256": "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236",
+      "routed_nets": ["BOOT_3V3", "BOOT_3V8"],
+      "trace_items": 2,
+      "vias": 0,
+      "authoritative_board_modified": false,
+      "machine_gate_complete": false,
+      "human_acceptance_complete": false,
+      "routing_complete": false,
+      "review_b_complete": false,
+      "manufacturing_release": false
     }
   },
   "mechanical_freeze_input": {

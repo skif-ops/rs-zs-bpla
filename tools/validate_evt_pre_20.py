@@ -242,6 +242,18 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR EVT stackup/order profile decision is missing or over-released",
     )
     require(
+        decisions["DEC-111"]["Status"] ==
+        "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "U3.4 to C4.1" in decisions["DEC-111"]["Impact"]
+        and "U4.4 to C6.1" in decisions["DEC-111"]["Impact"]
+        and "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236"
+        in decisions["DEC-111"]["Impact"]
+        and "authoritative board unchanged" in decisions["DEC-111"]["Impact"]
+        and "exact human acceptance before application" in decisions["DEC-111"]["Impact"]
+        and "Review B CAM and manufacturing blocks" in decisions["DEC-111"]["Impact"],
+        "PCB-PWR bootstrap routing candidate boundary is missing or over-released",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]

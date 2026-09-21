@@ -1,0 +1,59 @@
+{
+  "schema": "dioneya-pcb-pwr-buck-bootstrap-routing-001-candidate-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001",
+  "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_001_CREATION_SUBGATE",
+  "status": "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+  "scope": "ONLY_U3_C4_AND_U4_C6_BOOTSTRAP_CONNECTIONS",
+  "base": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pcb",
+    "sha256": "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957",
+    "semantic_sha256": "b94eb0e53a714a2259e7362df7b96d1333c885f48399102b7ac279fb368d3276",
+    "trace_items": 0,
+    "copper_zones": 0
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb",
+    "sha256": "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236",
+    "semantic_sha256": "d90ef0332ed5da798029a5cb580a0f3a5f68387068811eeb9e4c06d0681500ae",
+    "trace_items": 2,
+    "copper_zones": 0,
+    "routed_nets": ["BOOT_3V3", "BOOT_3V8"],
+    "connections": ["U4.4-C6.1", "U3.4-C4.1"],
+    "layer": "F.Cu",
+    "width_mm": 0.5,
+    "vias": 0,
+    "total_route_length_mm": 2.563221
+  },
+  "source_binding": {
+    "generator": "tools/generate_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py",
+    "generator_sha256": "4bf22bef4a9ffb74c7e7289734422192017e6f615fd43cfeb878a0c6656554ae",
+    "routing_rules": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
+    "routing_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
+    "evt_stackup_basis": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+    "evt_stackup_basis_sha256": "8f68fcdf63e9c66f75599887486c6efeb5a77172f7c666296f1612af82cb52fd"
+  },
+  "invariants": {
+    "authoritative_board_modified": false,
+    "component_poses_changed": false,
+    "pad_geometry_or_nets_changed": false,
+    "outline_or_layers_changed": false,
+    "non_bootstrap_copper_added": false,
+    "switch_node_routing_added": false,
+    "power_rail_or_return_routing_added": false,
+    "net_tie_or_control_routing_added": false
+  },
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "required_new_errors": 0,
+    "required_unconnected_reduction": 2,
+    "required_other_drc_fingerprint_delta": 0
+  },
+  "human_gate_after_machine_pass": {
+    "accept_value": "ACCEPT_PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_SUBGATE",
+    "reject_value": "REJECT_PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_SUBGATE"
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}
