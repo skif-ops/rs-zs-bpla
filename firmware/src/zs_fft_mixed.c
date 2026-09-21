@@ -3,6 +3,10 @@
 #include <math.h>
 #include <string.h>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #define TWIDDLE_RESYNC 32u
 
 bool zs_fft_mixed_supported(unsigned n) {
