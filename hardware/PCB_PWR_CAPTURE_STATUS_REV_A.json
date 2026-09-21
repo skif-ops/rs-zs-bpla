@@ -549,6 +549,34 @@
       "application_artifact_id": 10657859914,
       "application_artifact_digest": "sha256:9992df866d70396d758c838897ae315aff312ff6c6263bf37da4560f8c3cfbc1",
       "application_comparative_drc": "PASS_86_TO_86_VIOLATIONS_123_TO_122_UNCONNECTED_ZERO_FINGERPRINT_DELTA"
+    },
+    "rev_gate_routing_004": {
+      "proposal": "hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.json",
+      "record": "hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.md",
+      "generator": "tools/generate_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py",
+      "audit": "tools/audit_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py",
+      "status": "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+      "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_004_CREATION_SUBGATE",
+      "base_board_sha256": "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3",
+      "candidate_board_sha256": "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c",
+      "routed_nets": [
+        "REV_GATE"
+      ],
+      "connections": [
+        "U1.5-Q1.4"
+      ],
+      "trace_items": 8,
+      "added_trace_items": 4,
+      "route_length_mm": 12.565,
+      "width_mm": 0.5,
+      "vias": 0,
+      "authoritative_board_modified": false,
+      "machine_gate_complete": false,
+      "human_acceptance_complete": false,
+      "required_human_acceptance": "ACCEPT_PCB_PWR_REV_GATE_ROUTING_004_SUBGATE",
+      "routing_complete": false,
+      "review_b_complete": false,
+      "manufacturing_release": false
     }
   },
   "mechanical_freeze_input": {

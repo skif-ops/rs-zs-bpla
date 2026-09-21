@@ -1,0 +1,74 @@
+{
+  "schema": "dioneya-pcb-pwr-rev-gate-routing-004-candidate-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-REV-GATE-ROUTING-004",
+  "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_004_CREATION_SUBGATE",
+  "status": "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+  "scope": "ONLY_U1_5_TO_Q1_4_REV_GATE_CONNECTION",
+  "selection_rationale": "COMPLETE_TWO_PAD_REVERSE_PROTECTION_GATE_DRIVE_NET_WITH_A_CLEARANCE_SCREENED_F_CU_CORRIDOR_BEFORE_HIGH_CURRENT_INPUT_AND_BUCK_HOT_LOOP_ROUTING",
+  "base": {
+    "board": "hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_BASE_REV_A.kicad_pcb",
+    "sha256": "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3",
+    "semantic_sha256": "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d",
+    "trace_items": 4,
+    "copper_zones": 0
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pcb",
+    "sha256": "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c",
+    "semantic_sha256": "f7a659d0740e78d40eddae7016724bd8e616baf9fb425f06ace70ec9acca4d3d",
+    "trace_items": 8,
+    "copper_zones": 0,
+    "routed_nets": ["REV_GATE"],
+    "connections": ["U1.5-Q1.4"],
+    "layer": "F.Cu",
+    "width_mm": 0.5,
+    "vias": 0,
+    "added_segments": 4,
+    "added_route_length_mm": 12.565,
+    "route_points_mm": [
+      [21.3, 30.0],
+      [22.6, 30.0],
+      [22.6, 27.0],
+      [29.77, 27.0],
+      [29.77, 28.095]
+    ],
+    "minimum_screened_centerline_to_foreign_pad_envelope_mm": 0.65
+  },
+  "source_binding": {
+    "generator": "tools/generate_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py",
+    "generator_sha256": "09bf8fad5220447de78cba70e2ebf5786089fc29e89ff2dfe001ba7826b6af36",
+    "routing_rules": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
+    "routing_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
+    "evt_stackup_basis": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+    "evt_stackup_basis_sha256": "300c2c6998704fae554c6f30ddb7bcb6eabb2060973c90f2b1d2ecc4ab76b1fc"
+  },
+  "deferred_boundary": {
+    "power_input_load_copper": ["VBAT_FUSED", "VBAT_PROTECTED", "VBAT_SYS"],
+    "buck_hot_loop_and_switch_node_routes": ["SW_3V8", "SW_3V3", "GND_PWR"],
+    "kelvin_and_feedback_routes": ["SHUNT_SOURCE_SENSE", "SHUNT_LOAD_SENSE", "FB_3V8"],
+    "reason": "REQUIRES_SEPARATE_HIGH_CURRENT_HIGH_DI_DT_KELVIN_OR_QUIET_CORRIDOR_REVIEW",
+    "application_authorized": false
+  },
+  "invariants": {
+    "authoritative_board_modified": false,
+    "predecessor_copper_changed": false,
+    "component_poses_changed": false,
+    "pad_geometry_or_nets_changed": false,
+    "outline_or_layers_changed": false,
+    "non_rev_gate_copper_added": false
+  },
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "required_new_errors": 0,
+    "required_unconnected_reduction": 1,
+    "required_other_drc_fingerprint_delta": 0
+  },
+  "human_gate_after_machine_pass": {
+    "accept_value": "ACCEPT_PCB_PWR_REV_GATE_ROUTING_004_SUBGATE",
+    "reject_value": "REJECT_PCB_PWR_REV_GATE_ROUTING_004_SUBGATE"
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}
