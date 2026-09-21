@@ -56,7 +56,8 @@ data class StationIdentity(
     }
 
     companion object {
-        private val SERIAL_PATTERN = Regex("DIO-EVT-(00[1-9]|01[0-9]|020)")
+        /** EVT pilot: lot 1 = 001..020, lot 2 = 021..040, bench unit = B01 (station_id 901). */
+        private val SERIAL_PATTERN = Regex("DIO-EVT-(00[1-9]|0[1-3][0-9]|040|B01)")
     }
 }
 
