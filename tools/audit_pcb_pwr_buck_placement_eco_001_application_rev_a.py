@@ -38,6 +38,8 @@ PLACEMENT_SHA256 = "257fee5898b5d44970115220a485d40b01c4fefad14b5c3b1a4ffb43b7b5
 REVIEWED_COMMIT = "38d629c2e7f9a9956a93c8b9666b17e69905eeb6"
 REVIEWED_TREE = "b935ed765133297099dee6af4799f598df832ab2"
 APPROVAL_COMMIT = "82dbcf2a0318d79c73ad4c59e1f58158b453605f"
+APPLICATION_COMMIT = "878425d26641d1bdaf53e5287649677630a3938b"
+APPLICATION_TREE = "a62acc90939c0e250c0e1a430c40c4205b356abc"
 EXPECTED_POSES = {
     "C4": (54.575, 16.4, 180.0),
     "C6": (54.575, 44.4, 180.0),
@@ -167,10 +169,28 @@ def audit(
         and applied.get("copper_zones") == 0
         and applied.get("copper_changed") is False
         and applied.get("placement_manifest_sha256") == PLACEMENT_SHA256
-        and gate.get("status") in {
-            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
-            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
-        }
+        and application.get("application_commit_sha") == APPLICATION_COMMIT
+        and gate.get("status") == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+        and gate.get("source_commit_sha") == APPLICATION_COMMIT
+        and gate.get("source_tree_sha") == APPLICATION_TREE
+        and gate.get("ci_run_id") == 35589990694
+        and gate.get("ci_run_number") == 583
+        and gate.get("ci_conclusion") == "success"
+        and gate.get("pcb_native_run_id") == 35589990634
+        and gate.get("pcb_native_run_number") == 310
+        and gate.get("pcb_native_conclusion") == "success"
+        and gate.get("application_audit") ==
+        "PASS_EXACT_ACCEPTED_PCB_PWR_BUCK_PLACEMENT_APPLICATION"
+        and gate.get("comparative_drc") ==
+        "PASS_NO_NEW_KICAD9_ERRORS_NO_CONNECTIVITY_REGRESSION"
+        and gate.get("base_violations") == 87
+        and gate.get("active_violations") == 90
+        and gate.get("base_unconnected") == 126
+        and gate.get("active_unconnected") == 126
+        and gate.get("new_errors") == 0
+        and gate.get("artifact_id") == 10633864128
+        and gate.get("artifact_digest") ==
+        "sha256:5fcdfc856f009d05b490bd124168b8ea42322c0b08c6211743cbc1208f35d526"
         and warning_disposition.get("lib_footprint_mismatch_C4_C6") ==
         "OPEN_WARNING_ONLY_MUST_CLOSE_BEFORE_REVIEW_B_OR_CAM"
         and warning_disposition.get("silk_overlap_L2_R10") ==
@@ -248,6 +268,10 @@ def audit(
         "copper_changed": False,
         "strict_placement_clearance": "PASS_MINIMUM_0P22_MM",
         "machine_gate": gate.get("status"),
+        "application_commit_sha": APPLICATION_COMMIT,
+        "pcb_native_run_id": 35589990634,
+        "ci_run_id": 35589990694,
+        "artifact_id": 10633864128,
         "warning_only_items_closed": False,
         "routing_complete": False,
         "review_b_complete": False,

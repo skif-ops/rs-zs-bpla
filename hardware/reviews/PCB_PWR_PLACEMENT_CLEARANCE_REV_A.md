@@ -56,9 +56,11 @@ these poses and adds no tracks, vias or zones:
 | `L2` | `62.00 / 42.00 / 0°` | `60.75 / 42.00 / 180°` | U4 SW-to-inductor distance reduced by `56.630%`. |
 
 The application retains all `44/44` fitted courtyards and the board-wide
-`0.22 mm` minimum. Its fresh commit-bound CI/PCB Native gate is pending. The
-two C4/C6 `lib_footprint_mismatch` warnings and the L2/R10 `silk_overlap`
-warning remain explicit blockers that must be closed before Review B or CAM.
+`0.22 mm` minimum. CI #583 and PCB Native #310 pass for source commit
+`878425d26641d1bdaf53e5287649677630a3938b`; comparative KiCad 9 DRC adds
+zero error classes and retains `126 -> 126` unconnected items. The two C4/C6
+`lib_footprint_mismatch` warnings and the L2/R10 `silk_overlap` warning remain
+explicit blockers that must be closed before Review B or CAM.
 
 ## Independent result and boundary
 

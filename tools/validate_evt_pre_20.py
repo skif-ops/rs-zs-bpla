@@ -377,15 +377,15 @@ def validate_deliverable_register() -> None:
         "PCB-PWR numeric EVT routing-basis deliverable is missing or over-released",
     )
     require(
-        deliverables["HW-P-007"]["Статус"] == "CONTROLLED_APPLICATION_PENDING_GATE"
+        deliverables["HW-P-007"]["Статус"] == "CONTROLLED_APPLICATION_GATE_PASS"
         and deliverables["HW-P-007"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-P-007"]["QG-2 техника"] == "OPEN"
         and "moves only C4 C6 L1 L2"
         in deliverables["HW-P-007"]["Критерий выпуска"]
         and "adds zero copper" in deliverables["HW-P-007"]["Критерий выпуска"]
-        and "fresh commit-bound application gate"
+        and "fresh commit-bound application gate passes"
         in deliverables["HW-P-007"]["Критерий выпуска"]
-        and "warning closure"
+        and "library-warning"
         in deliverables["HW-P-007"]["Критерий выпуска"]
         and "manufacture remain open"
         in deliverables["HW-P-007"]["Критерий выпуска"],

@@ -34,8 +34,10 @@ transition requires a repeat mechanical/STEP review.
 
 The exact accepted ECO-001 board is applied byte-for-byte with SHA-256
 `9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37`.
-Its fresh commit-bound application gate is pending. Two C4/C6 footprint-library
-warnings and one L2/R10 silkscreen warning remain open and block Review B/CAM.
+Its fresh commit-bound application gate passes at source commit `878425d2` with
+zero new error classes and unchanged `126` unconnected items. Two C4/C6
+footprint-library warnings and one L2/R10 silkscreen warning remain open and
+block Review B/CAM.
 
 ## Local input-capacitor placement evidence
 

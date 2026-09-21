@@ -17,7 +17,7 @@
     "routing_authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
     "routing_authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
     "stackup_request": "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json",
-    "stackup_request_sha256": "84a1a587417f986dd73372230f9d9e132579fd2d1ce53154a20239af97a1b434",
+    "stackup_request_sha256": "c9a709c89e729e4e9bc94c39647fb8be2550839310d7b6e7450057dc0ce52358",
     "stackup_response": "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv",
     "stackup_response_sha256": "d3add8d7185f64f10d381cff28504c408e29472b12e0aa76e49489ef4648741d",
     "rule_manifest": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",

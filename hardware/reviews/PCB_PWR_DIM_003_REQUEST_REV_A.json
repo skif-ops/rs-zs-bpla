@@ -27,7 +27,7 @@
     "placement_authority": "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
     "placement_authority_sha256": "257fee5898b5d44970115220a485d40b01c4fefad14b5c3b1a4ffb43b7b5b2d6",
     "placement_clearance_record": "hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md",
-    "placement_clearance_record_sha256": "f964eaa4eaa2e8c4a60af6d53e3a86c3b6a50e04ef622644b9a12e84f2d4920b",
+    "placement_clearance_record_sha256": "e7b015e7b892740dc346917b3ec9ad9f9b925791ad32af936c027a58a68364e3",
     "routing_authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
     "routing_authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
     "footprint_authority": "hardware/PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md",

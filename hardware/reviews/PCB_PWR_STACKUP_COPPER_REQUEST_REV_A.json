@@ -32,7 +32,7 @@
     "power_design_calculation": "hardware/POWER_DESIGN_CALC_REV_A.md",
     "power_design_calculation_sha256": "2264daa8c4de35827d9badda98c05faa9292cc6c30d5b8d9ab9924462175184a",
     "dim_003_request": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
-    "dim_003_request_sha256": "13044066d0caaa7d0ee3b4e031d8b75c3d96ae59adc4c97f40c90b5f54ea7122"
+    "dim_003_request_sha256": "a3b5ddd17372141fb44ce4de5a206afdfe63755d6feb18b74380d86956863a5d"
   },
   "board_request_basis": {
     "evt_outline_mm": [
