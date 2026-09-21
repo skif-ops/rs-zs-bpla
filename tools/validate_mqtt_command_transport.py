@@ -143,24 +143,25 @@ def main() -> int:
         else:
             require(current is not None, "ACL rule appears before a user")
             sections[current].add(line)
+    # Pilot identity (protocols/MQTT_TLS_ICD_v0_1_ADDENDUM_A_PILOT_IDENTITY.md): certificate CN = serial,
+    # DIO-EVT-001..020 -> tenant pilot1 (station_id = number), 021..040 -> pilot2, B01 -> bench/901.
+    pilot_units = {f"DIO-EVT-{i:03d}": ("pilot1" if i <= 20 else "pilot2", i) for i in range(1, 41)}
+    pilot_units["DIO-EVT-B01"] = ("bench", 901)
+    tenants = ("bench", "pilot1", "pilot2")
     require(sections.get("bridge") == {
-        "topic read zs/v1/evt/+/up",
-        "topic read zs/v1/evt/+/status",
-        "topic write zs/v1/evt/+/down",
-        "topic read zs/v1/evt/+/ack",
-        "topic write zs/v1/evt/+/receipt",
+        f"topic {op} zs/v1/{tenant}/+/{suffix}"
+        for tenant in tenants
+        for op, suffix in (("read", "up"), ("read", "status"), ("write", "down"), ("read", "ack"), ("write", "receipt"))
     }, "bridge ACL has missing or excessive rights")
-    for station_id in range(1, 21):
-        user = f"station{station_id:02d}"
-        require(sections.get(user) == {
-            f"topic write zs/v1/evt/{station_id}/up",
-            f"topic write zs/v1/evt/{station_id}/status",
-            f"topic read zs/v1/evt/{station_id}/down",
-            f"topic write zs/v1/evt/{station_id}/ack",
-            f"topic read zs/v1/evt/{station_id}/receipt",
-        }, f"station {station_id} ACL has missing or excessive rights")
-    require(set(sections) == {"bridge"} | {f"station{i:02d}" for i in range(1, 21)},
-            "unexpected MQTT ACL identity")
+    for serial, (tenant, station_id) in pilot_units.items():
+        require(sections.get(serial) == {
+            f"topic write zs/v1/{tenant}/{station_id}/up",
+            f"topic write zs/v1/{tenant}/{station_id}/status",
+            f"topic read zs/v1/{tenant}/{station_id}/down",
+            f"topic write zs/v1/{tenant}/{station_id}/ack",
+            f"topic read zs/v1/{tenant}/{station_id}/receipt",
+        }, f"station {serial} ACL has missing or excessive rights")
+    require(set(sections) == {"bridge"} | set(pilot_units), "unexpected MQTT ACL identity")
 
     for token in (
         "ZS_COMMAND_MAX_BYTES 2048u",
