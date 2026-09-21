@@ -22,7 +22,7 @@ EXPECTED = {
     "PCB-PWR": {
         "layers": ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"],
         "thickness": 1.6,
-        "thickness_status": "PROVISIONAL_DIM_003_OPEN",
+        "thickness_status": "FROZEN_EVT_DIM_003_1P6_PLUS_MINUS_0P16",
     },
     "PCB-MIC": {
         "layers": ["F.Cu", "B.Cu"],
@@ -114,8 +114,8 @@ def audit() -> dict[str, object]:
     require(layout["copper_layers"] == 4, "PCB-PWR status layer count drift")
     require(layout["layer_count_status"] == "FROZEN_REV_A_FINAL_STACKUP_OPEN",
             "PCB-PWR status must separate frozen layer count from open final stackup")
-    require(layout["thickness_status"] == "PROVISIONAL_DIM_003_OPEN",
-            "PCB-PWR thickness must remain provisional")
+    require(layout["thickness_status"] == "FROZEN_EVT_DIM_003_1P6_PLUS_MINUS_0P16",
+            "PCB-PWR EVT thickness authority differs")
 
     pcb_set = (ROOT / "hardware/EVT_PRE_20_PCB_SET.md").read_text(encoding="utf-8")
     rules = (ROOT / "hardware/kicad/PCB_RULES.md").read_text(encoding="utf-8")

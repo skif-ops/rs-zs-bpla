@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Audit the controlled EVT-PRE-20 external-response request bundle.
 
-The default audit validates the source contract and keeps every external
-response pending.  With --archive it independently compares every ZIP member
+The default audit validates the source contract, preserves the accepted EVT
+DIM-003 evidence and keeps every other external response pending. With --archive it independently compares every ZIP member
 and byte against the controlled source set and validates the embedded SHA-256
 manifest.  This is a request-package gate, never a manufacturing-release gate.
 """
@@ -32,6 +32,7 @@ PENDING_DISPOSITIONS = {
     "PENDING_EXTERNAL_RESPONSE",
     "PENDING_EXTERNAL_ACCEPTANCE",
 }
+ACCEPTED_DIM_003_DISPOSITION = "ACCEPTED_EVT_ENGINEERING"
 EVIDENCE_FIELDS = {
     "Response_Value",
     "Response_Reference",
@@ -119,26 +120,39 @@ def audit_contract(contract: dict) -> dict:
             len(rows) == expected_rows,
             f"{group_id}: response rows={len(rows)} expected={expected_rows}",
         )
+        accepted = group_id == "PCB-PWR-DIM003"
         for row in rows:
             gate_id = row.get("Gate_ID", "<missing>")
-            require(
-                row.get("Disposition") in PENDING_DISPOSITIONS,
-                f"{group_id}/{gate_id}: non-pending disposition requires a returned-evidence release flow",
-            )
             populated = [field for field in EVIDENCE_FIELDS if row.get(field, "").strip()]
-            require(
-                not populated,
-                f"{group_id}/{gate_id}: pending row has populated evidence fields {populated}",
-            )
-            require(row.get("Blocking") == "YES", f"{group_id}/{gate_id}: blocker removed")
+            if accepted:
+                require(
+                    row.get("Disposition") == ACCEPTED_DIM_003_DISPOSITION,
+                    f"{group_id}/{gate_id}: EVT acceptance disposition differs",
+                )
+                require(
+                    set(populated) == EVIDENCE_FIELDS,
+                    f"{group_id}/{gate_id}: accepted row lacks attribution fields",
+                )
+                require(row.get("Blocking") == "NO",
+                        f"{group_id}/{gate_id}: accepted EVT row remains blocking")
+            else:
+                require(
+                    row.get("Disposition") in PENDING_DISPOSITIONS,
+                    f"{group_id}/{gate_id}: non-pending disposition requires a returned-evidence release flow",
+                )
+                require(
+                    not populated,
+                    f"{group_id}/{gate_id}: pending row has populated evidence fields {populated}",
+                )
+                require(row.get("Blocking") == "YES", f"{group_id}/{gate_id}: blocker removed")
         register_summary[group_id] = {
             "rows": len(rows),
-            "accepted": 0,
-            "pending": len(rows),
+            "accepted": len(rows) if accepted else 0,
+            "pending": 0 if accepted else len(rows),
         }
 
     rules = " ".join(contract["release_rules"])
-    for token in ("not a purchase order", "unrouted", "pending", "Full-PCBA", "Review B"):
+    for token in ("not a purchase order", "unrouted", "pending", "Full-PCBA", "Review B", "18/18"):
         require(token in rules, f"release rule missing token: {token}")
 
     paths = controlled_paths(contract)
@@ -223,7 +237,7 @@ def main() -> int:
     report = {
         "schema": "dioneya-external-response-bundle-audit-v1",
         "configuration": contract["configuration"],
-        "status": "PASS_REQUEST_BUNDLE_CONTROL_EXTERNAL_RESPONSES_PENDING_NOT_FOR_MANUFACTURE",
+        "status": "PASS_REQUEST_BUNDLE_CONTROL_DIM_003_ACCEPTED_OTHER_EXTERNAL_RESPONSES_PENDING_NOT_FOR_MANUFACTURE",
         "hardware_design_release": False,
         "purchase_release": False,
         "manufacturing_release": False,
@@ -250,7 +264,7 @@ def main() -> int:
     print(
         "EVT-PRE-20 external-response request bundle audit PASS: "
         f"{control['controlled_file_count']} files; "
-        "response registers remain pending; NOT FOR MANUFACTURE"
+        "DIM-003 accepted; other response registers remain pending; NOT FOR MANUFACTURE"
     )
     return 0
 

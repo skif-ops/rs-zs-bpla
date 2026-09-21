@@ -4,8 +4,9 @@ Status: `PACKET READY / TWO FABRICATOR RESPONSES REQUIRED / 0 OF 24 ROWS ACCEPTE
 
 This packet requests the external construction and process data required before
 PCB-PWR current-carrying geometry can be calculated. It is a capability and
-quotation input only. It is not a released outline, Gerber package, purchase
-order, panel approval, routing authorization or fabrication release.
+quotation input only. The accepted EVT outline is not a fabrication release;
+this packet is not a Gerber package, purchase order, panel approval, routing
+authorization or fabrication release.
 
 Machine contract:
 `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json`
@@ -19,13 +20,15 @@ Independent audit:
 ## Controlled source binding
 
 The request is bound to the unrouted four-layer PCB-PWR candidate, its exact
-62-footprint placement, all 31 pre-route net constraints, the Rev.A layer-count
-authority, the power-design baseline and the still-open `DIM-003` request.
+62-footprint electrical placement plus four board-only mounting holes, all 31
+pre-route net constraints, the Rev.A layer-count authority, the power-design
+baseline and the EVT-accepted `DIM-003` authority.
 
-The present 90 x 60 x 1.6 mm canvas is provisional. It has no mounting holes,
-tracks, vias or copper zones. Neither fabricator may treat those provisional
-dimensions as fabrication authority. Any quotation using them must identify the
-basis as provisional and must be refreshed after `DIM-003` acceptance.
+The 90 x 60 x 1.6 mm EVT canvas and round H1-H4 NPTH pattern are mechanically
+accepted, with serial revalidation required. The board has no tracks, vias or
+copper zones. Neither fabricator may treat the EVT mechanical authority as a
+complete fabrication release; the final stackup, copper and process values in
+this request remain subject to attributable acceptance.
 
 ## Request basis, not accepted construction
 
@@ -40,7 +43,7 @@ Both `FAB-A` and `FAB-B` must independently return all twelve requested items:
 - complete four-layer cross-section and actual core/prepreg construction;
 - laminate thermal/material properties and lot-control basis;
 - finished-thickness capability and tolerance, explicitly conditional on
-  `DIM-003`;
+  the accepted EVT `DIM-003` thickness requirement;
 - base and finished copper plus hole-wall plating values and tolerances;
 - thick-copper etch allowance and achievable final feature tolerance;
 - preferred standard through-via construction and plating limits;
@@ -77,8 +80,9 @@ sets, `0/24` accepted rows and no selected construction.
 
 Receiving both responses does not by itself authorize numeric geometry or
 routing. The project must compare the offers, select and accept one
-construction, close `DIM-003`, freeze current/fault envelopes, and approve
-current-density, DC-drop, via-array, fault-energy and +70 °C thermal analyses.
+construction, preserve the accepted EVT `DIM-003` geometry, freeze current/fault
+envelopes, and approve current-density, DC-drop, via-array, fault-energy and
++70 °C thermal analyses. Serial mechanical revalidation remains separate.
 Routing, KiCad DRC, native STEP/service review, CAM comparison, assembler DFM,
 physical power evidence, signed Review B and manufacturing release remain
 separate blocking gates.

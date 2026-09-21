@@ -1,16 +1,15 @@
 # Дионея EVT-PRE-20 Rev.A - PCB-PWR provisional placement candidate
 
-Status: `FITTED 2D CLEARANCE PASS / DIM-003 OPEN / ROUTING ABSENT / NOT FOR MANUFACTURE`
+Status: `FITTED 2D + EVT MOUNTING CLEARANCE PASS / DIM-003 18/18 EVT ACCEPTED / ROUTING ABSENT / NOT FOR MANUFACTURE`
 
 This authority creates a reviewable native-board canvas without claiming enclosure or
 fabrication approval. The four-copper-layer count is frozen for Rev.A by
-`hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv`. The `90 x 60 mm` outline and
-`1.6 mm` thickness remain deliberately provisional working values. They are not a
-mechanical freeze and must be replaced or explicitly accepted after `DIM-003`
-supplies the assembled envelope, terminal zones, mounting pattern and frozen PCB STEP.
-The bounded request and blank `0/18` response register are controlled in
-`hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md`; packet readiness does not
-accept any provisional geometry.
+`hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv`. The `90 x 60 mm` outline,
+`1.60 +/-0.16 mm` thickness, four round M3 mounting holes, assembled envelope,
+terminal zones and fixture datum are accepted for the EVT test batch by
+`hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.{md,json}`. This is a
+mechanical routing input, not a serial-enclosure or manufacturing release; serial
+transition requires a repeat mechanical/STEP review.
 
 ## Controlled candidate content
 
@@ -24,8 +23,9 @@ accept any provisional geometry.
 - the INA226 and shunt occupy one Kelvin-review region;
 - TP1-TP10 form a top-side `2.54 mm` pitch review row using the controlled no-paste
   `1.70 mm` target. Final side, fixture datum and probe access remain open;
-- there are no mounting holes because their number and coordinates belong to
-  `DIM-003` rather than electrical design authority.
+- four board-only round `NPTH 3.4 mm` mounting holes are present at
+  H1 `(5,5)`, H2 `(82,5)`, H3 `(68,55)`, H4 `(5,55) mm`; each enforces a
+  `D8.0 mm` all-copper exclusion and `D10.0 mm` fitted-body exclusion;
 - all 44 simultaneously fitted assembly bodies have controlled courtyards and
   pass the independent `0.20 mm` 2D clearance subgate; the minimum observed
   fitted-courtyard clearance is `0.22 mm`.
@@ -57,10 +57,11 @@ controlled by
 
 ## Hard interlocks
 
-The candidate must contain zero tracks, zero vias and zero copper zones. DRC, Gerber,
-drill, position, IPC-356 and STEP export are prohibited for this state. The independent
+The candidate must contain zero tracks, zero vias and zero copper zones. Gerber,
+drill, position and IPC-356 fabrication export remain prohibited. The controlled
+EVT envelope STEP is the sole permitted mechanical export in this state. The independent
 audit checks the complete reference/net/footprint set, every candidate coordinate,
-the frozen layer count, provisional outline/thickness assumptions and the open
+the frozen layer count, accepted EVT outline/thickness and the closed EVT
 `DIM-003` record.
 
 The bounded fitted-body clearance repack and its independent strict audit are
@@ -72,9 +73,9 @@ overhang is not a mating, cable-bend, enclosure or 3D clearance approval.
 All 31 native nets now have controlled pre-route coverage in
 `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv`. That manifest adds current,
 return-domain, topology, layer/via and separation inputs without relaxing this
-placement interlock: actual routing remains prohibited until `DIM-003`, the
-fabricator stackup/copper weights and numeric current-density/thermal geometry
-are accepted.
+placement interlock: `DIM-003` is accepted for EVT routing input, while actual
+routing remains prohibited until the fabricator stackup/copper weights and numeric
+current-density/thermal geometry are accepted.
 
 The two-fabricator stackup/copper request is controlled in
 `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`. Its blank register

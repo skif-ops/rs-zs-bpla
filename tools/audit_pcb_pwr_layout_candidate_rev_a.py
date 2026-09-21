@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independently audit the unrouted PCB-PWR Rev.A placement candidate."""
+"""Independently audit the unrouted PCB-PWR Rev.A EVT placement candidate."""
 from __future__ import annotations
 
 import csv
@@ -23,6 +23,12 @@ EXPECTED_ZONE_COUNTS = Counter({
     "BUCK_3V3": 13, "AUX_1V8": 4, "CONTROL_INTERFACE": 4,
     "GROUND_JOIN": 3, "DFT_EDGE": 10,
 })
+EXPECTED_MOUNTS = {
+    "H1": (5.0, 5.0),
+    "H2": (82.0, 5.0),
+    "H3": (68.0, 55.0),
+    "H4": (5.0, 55.0),
+}
 
 
 def require(ok: bool, message: str) -> None:
@@ -111,11 +117,13 @@ def main() -> int:
     board = Board.from_file(str(PCB), encoding="utf-8")
     copper = [layer.name for layer in board.layers if layer.name.endswith(".Cu")]
     require(copper == ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"],
-            f"unexpected provisional copper stack: {copper}")
-    close(float(board.general.thickness), 1.6, "provisional board thickness")
+            f"unexpected controlled copper-layer count: {copper}")
+    close(float(board.general.thickness), 1.6, "EVT board thickness")
     footprints = {ref_of(item): item for item in board.footprints}
-    require(len(footprints) == len(board.footprints) == 62, "board must contain 62 unique references")
-    require(set(footprints) == set(expected), "board and schematic reference sets differ")
+    require(len(footprints) == len(board.footprints) == 66,
+            "board must contain 62 electrical and four mounting references")
+    require(set(footprints) == set(expected) | set(EXPECTED_MOUNTS),
+            "board electrical/mounting reference set differs")
 
     for ref, wanted in expected.items():
         footprint = footprints[ref]
@@ -138,8 +146,8 @@ def main() -> int:
             f"authority={row['Source_Authority']}",
         ))
         require(footprint.description == description, f"{ref}: placement metadata drift")
-        require(footprint.tags == "DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN",
-                f"{ref}: provisional interlock tags drift")
+        require(footprint.tags == "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE",
+                f"{ref}: EVT mechanical/release tags drift")
         excluded = population in {"DNP", "PCB_FEATURE"}
         require(footprint.attributes.excludeFromPosFiles is excluded and
                 footprint.attributes.excludeFromBom is excluded,
@@ -153,6 +161,26 @@ def main() -> int:
         for number, net in wanted["pins"].items():
             actual = {pad.net.name if pad.net is not None else "NC" for pad in pads[number]}
             require(actual == {net}, f"{ref}.{number}: board net {sorted(actual)} != {net}")
+
+    for ref, expected_xy in EXPECTED_MOUNTS.items():
+        footprint = footprints[ref]
+        close(float(footprint.position.X), expected_xy[0], f"{ref} X")
+        close(float(footprint.position.Y), expected_xy[1], f"{ref} Y")
+        require(footprint.libId == "DioneyaPWR:MountingHole_M3_3.4_EVT",
+                f"{ref}: mounting footprint binding differs")
+        require(footprint.attributes.boardOnly and
+                footprint.attributes.excludeFromPosFiles and
+                footprint.attributes.excludeFromBom,
+                f"{ref}: board-only/BOM/PnP attributes differ")
+        require(len(footprint.pads) == 1, f"{ref}: expected one mounting pad")
+        pad = footprint.pads[0]
+        require(pad.type == "np_thru_hole" and pad.shape == "circle" and
+                abs(float(pad.size.X) - 3.4) <= 0.001 and
+                abs(float(pad.size.Y) - 3.4) <= 0.001 and
+                pad.drill is not None and
+                abs(float(pad.drill.diameter) - 3.4) <= 0.001 and
+                abs(float(pad.clearance) - 2.3) <= 0.001,
+                f"{ref}: NPTH drill or D8 copper exclusion differs")
 
     expected_nets = {net for item in expected.values() for net in item["pins"].values() if net != "NC"}
     board_nets = {net.name for net in board.nets if net.number != 0}
@@ -182,22 +210,24 @@ def main() -> int:
         close(float(row["Y_mm"]), 56.0, f"TP{index} row")
 
     dim_rows = {row["ID"]: row for row in read_csv(OPEN_DIMENSIONS)}
-    require(dim_rows["DIM-003"]["Status"] == "CONTROLLED_REQUEST_READY_0_OF_18_ACCEPTED"
+    require(dim_rows["DIM-003"]["Status"] ==
+            "CLOSED_EVT_ENGINEERING_18_OF_18_ACCEPTED_SERIAL_REVALIDATION_REQUIRED"
             and dim_rows["DIM-003"]["Owner"] == "EE_ME",
-            "DIM-003 must remain at the controlled 0/18 EE_ME request state")
+            "DIM-003 EVT acceptance state differs")
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     layout = status["native_layout"]
     require(status["manufacturing_release"] is False and
-            layout["status"] == "PROVISIONAL_FITTED_2D_CLEARANCE_PASS_DIM_003_OPEN" and
+            layout["status"] == "EVT_FITTED_2D_AND_MOUNTING_CLEARANCE_PASS_DIM_003_ACCEPTED" and
             layout["layer_count_authority"] == "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv" and
             layout["layer_count_status"] == "FROZEN_REV_A_FINAL_STACKUP_OPEN" and
             layout["routing_present"] is False and layout["copper_zones_present"] is False and
-            layout["cam_export_authorized"] is False and layout["mounting_holes"] == 0,
+            layout["cam_export_authorized"] is False and layout["mounting_holes"] == 4 and
+            layout["mounting_status"] == "EVT_DIM_003_ACCEPTED_H1_H4_NPTH_3P4",
             "PCB-PWR capture-status interlock drift")
 
-    print("PCB-PWR provisional placement-candidate independent audit PASS")
-    print("62 footprints; exact schematic nets; 90x60 four-layer canvas; routing/zones/holes absent")
-    print("DIM-003 request ready with 0/18 accepted; DRC/CAM/Review B/manufacturing remain prohibited")
+    print("PCB-PWR EVT placement-candidate independent audit PASS")
+    print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; routing/zones absent")
+    print("DIM-003 18/18 EVT accepted; DRC/CAM/Review B/manufacturing remain prohibited")
     return 0
 
 

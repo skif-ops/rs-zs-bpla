@@ -30,12 +30,13 @@ material.
 |---|---|---:|
 | PCB-MAIN stackup and impedance | Two independent PCB fabricators | 0/2 complete fabricator sets |
 | PCB-MAIN DFM/stencil | Selected full-PCBA assembler candidate | 0/14 rows accepted |
-| PCB-PWR DIM-003 | Project mechanical/enclosure authority | 0/18 rows accepted |
+| PCB-PWR DIM-003 | Project mechanical/enclosure authority | 18/18 EVT engineering accepted; serial revalidation required |
 | PCB-PWR stackup and copper | Two independent PCB fabricators | 0/24 rows and 0/2 sets accepted |
 | PCB-MIC DFM/acoustic process | PCB fabricator and assembler | 0/9 rows accepted |
 | Complete harness set | Harness supplier candidate | 0/16 rows accepted |
 
-Every returned item must retain its `Gate_ID`, identify the legal entity and
+The PCB-PWR DIM-003 packet is retained as accepted EVT traceability; the other
+five response packets remain pending. Every returned item must retain its `Gate_ID`, identify the legal entity and
 manufacturing site where requested, name the responder and date, and cite the
 returned drawing, quotation, calculation or process record. A generic sales
 page does not close a job-specific row.
@@ -49,7 +50,8 @@ copper, but its manufacturing handoff and Review B remain open; the separate
 commit-bound PCB Native Gate CAM artifact is still required for an actual DFM
 handoff.
 
-No supplier may silently modify a footprint, outline, drill, layer count,
+No supplier may silently modify a footprint, accepted EVT outline or mounting
+drill, layer count,
 stackup, copper rule, panel, paste aperture or source file. Every proposed
 change returns as a uniquely identified DFM finding and is applied only through
 a controlled project ECO.

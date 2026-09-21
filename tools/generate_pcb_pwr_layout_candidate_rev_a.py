@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Generate the unrouted PCB-PWR Rev.A electrical placement candidate.
+"""Generate the unrouted PCB-PWR Rev.A EVT mechanical placement candidate.
 
-The output is a provisional canvas while DIM-003 is open. It intentionally has no
-mounting holes, tracks, vias or zones and must never be used for CAM export.
+The output contains the accepted DIM-003 EVT outline and four board-only mounting
+holes, but intentionally has no tracks, vias or zones and is not a CAM release.
 """
 from __future__ import annotations
 
@@ -21,6 +21,14 @@ PASSIVE_AUTHORITY = ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
 PWR_FP = ROOT / "hardware/kicad/native/PCB-PWR/libs/DioneyaPWR.pretty"
 MAIN_FP = ROOT / "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty"
 KICAD_FP = Path(os.environ.get("DIONEYA_KICAD_FOOTPRINT_DIR", "/usr/share/kicad/footprints"))
+
+MOUNTING_FOOTPRINT = "DioneyaPWR:MountingHole_M3_3.4_EVT"
+MOUNTING_HOLES = (
+    ("H1", 5.0, 5.0),
+    ("H2", 82.0, 5.0),
+    ("H3", 68.0, 55.0),
+    ("H4", 5.0, 55.0),
+)
 
 MAJOR_FOOTPRINTS = {
     "U1": "DioneyaPWR:TI_DBV0006A_SOT23-6",
@@ -138,6 +146,28 @@ def authority_description(component: dict[str, object], row: dict[str, str]) -> 
     ))
 
 
+def add_mounting_holes(board: pcbnew.BOARD) -> None:
+    description = (
+        "DIONEA_PCB_PWR_EVT_MOUNT|population=PCB_FEATURE|"
+        "mechanics=DIM_003_ACCEPTED|hole=NPTH_3P4|copper_exclusion=D8|"
+        "fitted_component_exclusion=D10"
+    )
+    for reference, x, y in MOUNTING_HOLES:
+        footprint = load_footprint(MOUNTING_FOOTPRINT)
+        footprint.SetReference(reference)
+        footprint.SetValue("M3_CLEARANCE_NPTH_3.4")
+        footprint.SetFPIDAsString(MOUNTING_FOOTPRINT)
+        footprint.SetLibDescription(description)
+        footprint.SetKeywords("DIONEA PCB-PWR EVT M3 NPTH DIM-003 ACCEPTED")
+        footprint.SetPosition(mm(x, y))
+        footprint.SetBoardOnly(True)
+        footprint.SetExcludedFromBOM(True)
+        footprint.SetExcludedFromPosFiles(True)
+        footprint.Reference().SetVisible(False)
+        footprint.Value().SetVisible(False)
+        board.Add(footprint)
+
+
 def main() -> int:
     components = catalog()
     placements = read_csv(PLACEMENT)
@@ -167,7 +197,7 @@ def main() -> int:
         footprint.SetReference(ref); footprint.SetValue(str(component["value"]))
         footprint.SetFPIDAsString(str(component["footprint"]))
         footprint.SetLibDescription(authority_description(component, row))
-        footprint.SetKeywords("DIONEA PCB-PWR PROVISIONAL DIM-003 OPEN")
+        footprint.SetKeywords("DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
         if component["population"] in {"DNP", "PCB_FEATURE"}:
             footprint.SetExcludedFromPosFiles(True)
             footprint.SetExcludedFromBOM(True)
@@ -190,14 +220,16 @@ def main() -> int:
         normalize_text(footprint)
         board.Add(footprint)
 
+    add_mounting_holes(board)
+
     board.BuildListOfNets()
     require(len(list(board.GetTracks())) == 0 and len(list(board.Zones())) == 0,
             "placement generator must not create routing or zones")
     OUT.parent.mkdir(parents=True, exist_ok=True)
     pcbnew.SaveBoard(str(OUT), board)
-    print(f"PCB-PWR provisional placement candidate: {OUT.relative_to(ROOT)}")
-    print(f"components=62 nets={len(net_names)} layers=4 outline=90x60 mounting_holes=0")
-    print("routing=ABSENT zones=ABSENT CAM=PROHIBITED DIM-003=OPEN")
+    print(f"PCB-PWR EVT mechanical placement candidate: {OUT.relative_to(ROOT)}")
+    print(f"electrical_components=62 mounting_holes=4 nets={len(net_names)} layers=4 outline=90x60")
+    print("routing=ABSENT zones=ABSENT CAM=PROHIBITED DIM-003=EVT_ACCEPTED")
     return 0
 
 

@@ -418,12 +418,15 @@ def audit() -> dict[str, object]:
     pwr_clearance_controlled = (
         isinstance(pwr_clearance_summary, dict)
         and pwr_clearance_summary.get("state") ==
-        "PASS_FITTED_2D_PLACEMENT_CLEARANCE_DIM_003_OPEN"
+        "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED"
         and pwr_clearance_summary.get("fitted_footprints") == 44
         and pwr_clearance_summary.get("courtyard_footprints") == 44
         and pwr_clearance_summary.get("required_clearance_mm") == 0.2
         and pwr_clearance_summary.get("minimum_observed_clearance_mm", 0) >= 0.2
         and pwr_clearance_summary.get("clearance_conflicts") == 0
+        and pwr_clearance_summary.get("mounting_holes") == 4
+        and pwr_clearance_summary.get("mounting_to_fitted_body_conflicts") == 0
+        and pwr_clearance_summary.get("mounting_to_existing_pad_conflicts") == 0
         and pwr_clearance.get("board", {}).get("trace_items") == 0
         and pwr_clearance.get("board", {}).get("copper_zones") == 0
         and pwr_clearance.get("manufacturing_release") is False
@@ -444,7 +447,7 @@ def audit() -> dict[str, object]:
         and pwr_routing_authority.get("board", {}).get("trace_items") == 0
         and pwr_routing_authority.get("board", {}).get("copper_zones") == 0
         and pwr_routing_authority.get("dim_003") ==
-        "CONTROLLED_REQUEST_READY_0_OF_18_ACCEPTED_REQUIRED_BEFORE_ROUTING"
+        "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED"
         and pwr_routing_authority.get("routing_complete") is False
         and pwr_routing_authority.get("manufacturing_release") is False
     )
@@ -458,12 +461,14 @@ def audit() -> dict[str, object]:
     pwr_dim_003 = run_json_audit("audit_pcb_pwr_dim_003_request_rev_a.py")
     pwr_dim_003_packet_ready = (
         pwr_dim_003.get("status") ==
-        "PASS_INTERNAL_DIM_003_REQUEST_READY_EXTERNAL_RESPONSE_PENDING"
+        "PASS_DIM_003_EVT_ENGINEERING_ACCEPTED_SERIAL_REVALIDATION_REQUIRED"
         and pwr_dim_003.get("internal_packet_complete") is True
         and pwr_dim_003.get("required_response_rows") == 18
-        and pwr_dim_003.get("accepted_response_rows") == 0
-        and pwr_dim_003.get("routing_authorized") is False
-        and pwr_dim_003.get("harness_length_release_authorized") is False
+        and pwr_dim_003.get("accepted_response_rows") == 18
+        and pwr_dim_003.get("routing_authorized") is True
+        and pwr_dim_003.get("harness_board_datum_authorized") is True
+        and pwr_dim_003.get("final_harness_cut_lengths_authorized") is False
+        and pwr_dim_003.get("serial_revalidation_required") is True
         and pwr_dim_003.get("manufacturing_release") is False
     )
     check(
@@ -477,14 +482,16 @@ def audit() -> dict[str, object]:
         pwr_dim_003.get("dim_003_accepted") is True
         and accepted_response_rows == 18
         and pwr_dim_003.get("routing_authorized") is True
-        and pwr_dim_003.get("harness_length_release_authorized") is True
+        and pwr_dim_003.get("harness_board_datum_authorized") is True
+        and pwr_dim_003.get("final_harness_cut_lengths_authorized") is False
+        and pwr_dim_003.get("serial_revalidation_required") is True
     )
     check(
         "pcb_pwr_dim_003_acceptance",
         pwr_dim_003_accepted,
         f"{accepted_response_rows}/18 responses accepted",
         (
-            "PCB-PWR DIM-003 mechanical acceptance remains open: "
+            "PCB-PWR DIM-003 EVT acceptance evidence is incomplete or inconsistent: "
             f"{accepted_response_rows}/18 attributable responses accepted"
         ),
     )
@@ -955,7 +962,7 @@ def audit() -> dict[str, object]:
         "pcb_pwr_review_b_release",
         pwr_released,
         str(pwr_review_b.get("status", "MISSING")) if isinstance(pwr_review_b, dict) else "MISSING",
-        "PCB-PWR DIM-003/routing/DRC/CAM/DFM Review B release is not complete",
+        "PCB-PWR serial mechanics/routing/DRC/CAM/DFM Review B release is not complete",
     )
 
     mic_status = read_json("hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json")

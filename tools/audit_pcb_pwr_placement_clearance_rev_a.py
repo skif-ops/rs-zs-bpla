@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""Audit the bounded PCB-PWR Rev.A fitted-component 2D clearance subgate.
+"""Audit PCB-PWR Rev.A fitted-body and accepted EVT mounting clearance.
 
-This is deliberately narrower than mechanical Review B.  It verifies that the
-44 simultaneously fitted assembly bodies have controlled courtyards and at
-least 0.20 mm separation on the provisional placement canvas.  DNP footprints,
-PCB-only net-ties/test targets, mounting geometry, connector service volumes,
-3D envelopes and all routed-copper checks remain outside this subgate.
+This verifies that the 44 simultaneously fitted assembly bodies retain at least
+0.20 mm courtyard separation and that the four DIM-003 mounting exclusions do
+not intersect a fitted body or existing copper pad.  DNP body population and all
+routed-copper checks remain outside this bounded subgate.
 """
 from __future__ import annotations
 
@@ -36,6 +35,15 @@ BOARD_X_MM = 90.0
 BOARD_Y_MM = 60.0
 EXPECTED_POPULATION = Counter({"FITTED": 44, "PCB_FEATURE": 13, "DNP": 5})
 EXPECTED_PROVISIONAL_EDGE_OVERHANGS = ["J2"]
+EXPECTED_MOUNTING_HOLES = {
+    "H1": (5.0, 5.0),
+    "H2": (82.0, 5.0),
+    "H3": (68.0, 55.0),
+    "H4": (5.0, 55.0),
+}
+MOUNTING_DRILL_MM = 3.4
+MOUNTING_COPPER_EXCLUSION_RADIUS_MM = 4.0
+MOUNTING_FITTED_EXCLUSION_RADIUS_MM = 5.0
 
 
 @dataclass(frozen=True)
@@ -167,6 +175,56 @@ def rectangle_distance(first: Envelope, second: Envelope) -> tuple[float, float,
     return math.hypot(gap_x, gap_y), gap_x, gap_y
 
 
+def point_rectangle_distance(x: float, y: float, envelope: Envelope) -> float:
+    gap_x = max(envelope.xmin - x, x - envelope.xmax, 0.0)
+    gap_y = max(envelope.ymin - y, y - envelope.ymax, 0.0)
+    return math.hypot(gap_x, gap_y)
+
+
+def pad_envelope(footprint: Any, pad: Any) -> Envelope:
+    fp_angle = float(footprint.position.angle or 0.0)
+    local_x = float(pad.position.X)
+    local_y = float(pad.position.Y)
+    center_x, center_y = rotate((local_x, local_y), fp_angle)
+    center_x += float(footprint.position.X)
+    center_y += float(footprint.position.Y)
+    pad_angle = fp_angle + float(pad.position.angle or 0.0)
+    half_x = float(pad.size.X) / 2.0
+    half_y = float(pad.size.Y) / 2.0
+    corners = [
+        rotate((dx, dy), pad_angle)
+        for dx in (-half_x, half_x)
+        for dy in (-half_y, half_y)
+    ]
+    xs = [center_x + point[0] for point in corners]
+    ys = [center_y + point[1] for point in corners]
+    return Envelope(ref_of(footprint), min(xs), min(ys), max(xs), max(ys))
+
+
+def validate_mounting_hole(footprint: Any, reference: str,
+                           expected_xy: tuple[float, float]) -> None:
+    require(str(footprint.libId) == "DioneyaPWR:MountingHole_M3_3.4_EVT",
+            f"{reference}: mounting footprint binding differs")
+    require(abs(float(footprint.position.X) - expected_xy[0]) <= 0.002 and
+            abs(float(footprint.position.Y) - expected_xy[1]) <= 0.002,
+            f"{reference}: mounting coordinate differs")
+    attributes = footprint.attributes
+    require(bool(attributes.boardOnly) and bool(attributes.excludeFromPosFiles)
+            and bool(attributes.excludeFromBom),
+            f"{reference}: mounting footprint release attributes differ")
+    require(len(footprint.pads) == 1, f"{reference}: expected one NPTH pad")
+    pad = footprint.pads[0]
+    require(str(pad.type) == "np_thru_hole" and str(pad.shape) == "circle",
+            f"{reference}: mounting pad type/shape differs")
+    require(abs(float(pad.size.X) - MOUNTING_DRILL_MM) <= 0.001 and
+            abs(float(pad.size.Y) - MOUNTING_DRILL_MM) <= 0.001 and
+            pad.drill is not None and
+            abs(float(pad.drill.diameter) - MOUNTING_DRILL_MM) <= 0.001,
+            f"{reference}: mounting drill differs")
+    require(abs(float(pad.clearance) - 2.3) <= 0.001,
+            f"{reference}: D8 all-copper exclusion differs")
+
+
 def expected_control(report: dict[str, Any]) -> dict[str, Any]:
     summary = report["summary"]
     return {
@@ -181,8 +239,16 @@ def expected_control(report: dict[str, Any]) -> dict[str, Any]:
         "minimum_observed_clearance_mm": summary["minimum_observed_clearance_mm"],
         "clearance_conflicts": summary["clearance_conflicts"],
         "provisional_edge_overhangs": summary["provisional_edge_overhangs"],
-        "mounting_pattern": "OPEN_DIM_003",
-        "connector_and_probe_service_clearance": "OPEN_DIM_003_AND_FIXTURE_REVIEW",
+        "mounting_holes": summary["mounting_holes"],
+        "mounting_pattern": "EVT_DIM_003_ACCEPTED_H1_H4_NPTH_3P4",
+        "mounting_fitted_exclusion_diameter_mm": 10.0,
+        "minimum_mounting_to_fitted_body_margin_mm":
+            summary["minimum_mounting_to_fitted_body_margin_mm"],
+        "mounting_to_fitted_body_conflicts":
+            summary["mounting_to_fitted_body_conflicts"],
+        "mounting_to_existing_pad_conflicts":
+            summary["mounting_to_existing_pad_conflicts"],
+        "connector_and_probe_service_clearance": "EVT_DIM_003_ACCEPTED_SERIAL_REVALIDATION_REQUIRED",
         "routing_complete": False,
         "manufacturing_release": False,
     }
@@ -208,25 +274,30 @@ def verify_status(status_path: Path, report: dict[str, Any]) -> None:
 def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
     board = Board.from_file(str(board_path), encoding="utf-8")
     footprints = {ref_of(footprint): footprint for footprint in board.footprints}
-    require(len(footprints) == len(board.footprints) == 62,
-            "PCB-PWR board must contain 62 unique references")
+    require(len(footprints) == len(board.footprints) == 66,
+            "PCB-PWR board must contain 62 electrical and four mounting references")
 
     rows = read_csv(placement_path)
     by_ref = {row["RefDes"]: row for row in rows}
-    require(len(rows) == len(by_ref) == 62 and set(by_ref) == set(footprints),
-            "PCB-PWR placement authority/reference set differs from board")
-    for ref, footprint in footprints.items():
-        row = by_ref[ref]
+    require(len(rows) == len(by_ref) == 62 and
+            set(footprints) == set(by_ref) | set(EXPECTED_MOUNTING_HOLES),
+            "PCB-PWR electrical/mounting reference set differs from authority")
+    for ref, row in by_ref.items():
+        footprint = footprints[ref]
         require(abs(float(footprint.position.X) - float(row["X_mm"])) <= 0.002 and
                 abs(float(footprint.position.Y) - float(row["Y_mm"])) <= 0.002 and
                 abs((float(footprint.position.angle or 0.0) % 360.0) -
                     (float(row["Rotation_deg"]) % 360.0)) <= 0.01,
                 f"{ref}: board position differs from placement authority")
 
-    populations = Counter(population_of(footprint) for footprint in footprints.values())
+    for ref, xy in EXPECTED_MOUNTING_HOLES.items():
+        validate_mounting_hole(footprints[ref], ref, xy)
+
+    electrical = [footprints[ref] for ref in by_ref]
+    populations = Counter(population_of(footprint) for footprint in electrical)
     require(populations == EXPECTED_POPULATION,
             f"PCB-PWR population set drift: {dict(populations)}")
-    fitted = [envelope_of(footprint) for footprint in footprints.values()
+    fitted = [envelope_of(footprint) for footprint in electrical
               if population_of(footprint) == "FITTED"]
     fitted.sort(key=lambda item: item.ref)
 
@@ -252,13 +323,47 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
                        item.xmax > BOARD_X_MM or item.ymax > BOARD_Y_MM)
     require(overhangs == EXPECTED_PROVISIONAL_EDGE_OVERHANGS,
             f"unexpected provisional edge-overhang set: {overhangs}")
+
+    mounting_body_findings: list[dict[str, Any]] = []
+    mounting_margins: list[float] = []
+    for hole, (x, y) in EXPECTED_MOUNTING_HOLES.items():
+        for body in fitted:
+            margin = point_rectangle_distance(x, y, body) - \
+                MOUNTING_FITTED_EXCLUSION_RADIUS_MM
+            mounting_margins.append(margin)
+            if margin + GEOMETRY_TOLERANCE_MM < REQUIRED_CLEARANCE_MM:
+                mounting_body_findings.append({
+                    "hole": hole,
+                    "reference": body.ref,
+                    "margin_mm": rounded(margin),
+                    "required_margin_mm": REQUIRED_CLEARANCE_MM,
+                    "body_bounds_mm": body.bounds(),
+                })
+
+    mounting_pad_findings: list[dict[str, Any]] = []
+    for hole, (x, y) in EXPECTED_MOUNTING_HOLES.items():
+        for footprint in electrical:
+            for pad in footprint.pads:
+                envelope = pad_envelope(footprint, pad)
+                margin = point_rectangle_distance(x, y, envelope) - \
+                    MOUNTING_COPPER_EXCLUSION_RADIUS_MM
+                if margin + GEOMETRY_TOLERANCE_MM < 0.0:
+                    mounting_pad_findings.append({
+                        "hole": hole,
+                        "reference": ref_of(footprint),
+                        "pad": str(pad.number),
+                        "margin_mm": rounded(margin),
+                        "pad_bounds_mm": envelope.bounds(),
+                    })
+
     require(len(board.traceItems) == 0 and len(board.zones) == 0,
             "PCB-PWR placement-clearance candidate contains routed copper")
 
     minimum = min(observed)
-    passed = not findings and len(fitted) == 44
+    passed = (not findings and not mounting_body_findings and
+              not mounting_pad_findings and len(fitted) == 44)
     summary = {
-        "state": ("PASS_FITTED_2D_PLACEMENT_CLEARANCE_DIM_003_OPEN"
+        "state": ("PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED"
                   if passed else "BLOCKED_FITTED_2D_PLACEMENT_CLEARANCE"),
         "fitted_footprints": len(fitted),
         "courtyard_footprints": len(fitted),
@@ -268,6 +373,10 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
         "minimum_observed_clearance_mm": rounded(minimum),
         "clearance_conflicts": len(findings),
         "provisional_edge_overhangs": overhangs,
+        "mounting_holes": len(EXPECTED_MOUNTING_HOLES),
+        "minimum_mounting_to_fitted_body_margin_mm": rounded(min(mounting_margins)),
+        "mounting_to_fitted_body_conflicts": len(mounting_body_findings),
+        "mounting_to_existing_pad_conflicts": len(mounting_pad_findings),
     }
     return {
         "schema": "dioneya-pcb-pwr-placement-clearance-audit-v1",
@@ -294,15 +403,15 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
         },
         "summary": summary,
         "clearance_conflicts": findings,
+        "mounting_to_fitted_body_conflicts": mounting_body_findings,
+        "mounting_to_existing_pad_conflicts": mounting_pad_findings,
         "open_boundaries": [
-            "DIM-003 outline mounting pattern terminal and tool zones",
-            "J1/J2 mating and harness bend service volumes",
-            "TP1-TP10 fixture datum probe access and wear",
-            "assembled STEP height enclosure and thermal interface",
+            "serial enclosure and exact vendor component STEP revalidation",
+            "fabricator stackup copper weights and numeric power geometry",
             "routing DRC CAM DFM physical evidence and independent Review B",
         ],
         "release_disposition": (
-            "PASS_2D_FITTED_CLEARANCE_MECHANICS_ROUTING_AND_REVIEW_B_OPEN"
+            "PASS_EVT_2D_FITTED_AND_MOUNTING_CLEARANCE_ROUTING_AND_REVIEW_B_OPEN"
             if passed else "HOLD_PLACEMENT_CLEARANCE_REWORK_REQUIRED"
         ),
         "manufacturing_release": False,
@@ -336,18 +445,22 @@ def main() -> int:
                           encoding="utf-8")
 
     summary = report["summary"]
-    print(f"PCB-PWR fitted 2D placement-clearance audit: {summary['state']}")
+    print(f"PCB-PWR fitted 2D and EVT mounting-clearance audit: {summary['state']}")
     print(
         f"fitted={summary['fitted_footprints']} "
         f"courtyard={summary['courtyard_footprints']} "
         f"required_gap_mm={summary['required_clearance_mm']:.2f} "
         f"minimum_gap_mm={summary['minimum_observed_clearance_mm']:.3f} "
         f"conflicts={summary['clearance_conflicts']} "
+        f"mounting_holes={summary['mounting_holes']} "
+        f"mounting_margin_mm={summary['minimum_mounting_to_fitted_body_margin_mm']:.3f} "
+        f"mounting_body_conflicts={summary['mounting_to_fitted_body_conflicts']} "
+        f"mounting_pad_conflicts={summary['mounting_to_existing_pad_conflicts']} "
         f"provisional_edge_overhangs={summary['provisional_edge_overhangs']}"
     )
-    print("DIM-003/service/fixture/3D/routing/DRC/CAM/DFM/Review B remain open")
+    print("DIM-003 EVT mechanics accepted; routing/DRC/CAM/DFM/Review B remain open")
     if args.strict and summary["state"] != \
-            "PASS_FITTED_2D_PLACEMENT_CLEARANCE_DIM_003_OPEN":
+            "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED":
         print("strict PCB-PWR fitted placement-clearance gate: FAIL", file=sys.stderr)
         return 2
     return 0

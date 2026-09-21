@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A Review B checklist
 
-Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / REVIEW B OPEN / FITTED 2D CLEARANCE, PRE-ROUTE CONSTRAINT, DIM-003 REQUEST AND STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
+Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / REVIEW B OPEN / FITTED + EVT MOUNTING CLEARANCE, PRE-ROUTE CONSTRAINT AND DIM-003 ACCEPTANCE PASS / STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
 
 Review B is independent from the completed pin/net Review A. The active C20/C21
 hierarchy subgate is signed, but this checklist contains no routing, CAM or
@@ -52,8 +52,8 @@ manufacturing-release assertion.
   text/symbol/connection overlap or clipping. Reviewer `Скиф` accepted this
   exact active source/PDF pair on `2026-09-17` with decision
   `ACCEPT_HIERARCHY_ONLY`.
-- Native PCB: provisional 90 x 60 x 1.6 mm, four copper layers, 62 footprints,
-  zero mounting holes, zero traces/vias/zones.
+- Native PCB: EVT-frozen 90 x 60 x 1.6 mm, four copper layers, 62 electrical
+  footprints plus four board-only mounting holes, zero traces/vias/zones.
 - TI primary-source binding: `PASS`. The machine-audited record
   `PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}` binds exact
   `LMR604403SRAKR` to SNAS877 pages 3/6/13/22 and the 2025-11-08 TI
@@ -62,10 +62,9 @@ manufacturing-release assertion.
   native schematic or any physical-release state.
 - Fitted-body 2D clearance: `PASS`; 44/44 fitted footprints have courtyards,
   minimum required/observed separation is 0.20/0.22 mm and conflicts are zero.
-- Mechanical authority: `DIM-003 OPEN`; the outline, mounting pattern, terminal
-  zones, tool access and assembled STEP are not frozen.
-- DIM-003 request packet: internally complete; the response register is `0/18`
-  accepted, so no provisional dimension or service volume is authorized.
+- Mechanical authority: `DIM-003 18/18 EVT ACCEPTED`; the outline, round H1-H4
+  pattern, terminal zones, tool access, fixture datum and conservative assembled
+  STEP envelope are frozen for EVT. Serial revalidation remains mandatory.
 - Pre-route constraint coverage: `PASS` for all 31 native nets. Numeric widths,
   copper weights, via arrays and thermal geometry remain open.
 - Stackup/copper request: internally complete for `FAB-A` and `FAB-B`; the
@@ -90,7 +89,8 @@ manufacturing-release assertion.
   cross-net wire collisions and exact electrical equivalence to all 62 PCB
   footprints/pads.
 - [x] All 44 fitted assembly courtyards pass the bounded 0.20 mm 2D clearance
-  subgate; DNP/PCB-feature service and fixture checks remain open.
+  subgate; H1-H4 D10 fitted-body and D8 existing-pad checks also pass with zero
+  conflicts and `0.53 mm` minimum fitted-body margin.
 - [x] Four-layer count is frozen for Rev.A and agrees with the native board.
 - [x] All 31 native/capture nets have one explicit route class, return domain,
   topology, current basis and source authority.
@@ -104,9 +104,10 @@ manufacturing-release assertion.
 - [x] Independent reviewer `Скиф` accepted that historical five-page drawing on
   `2026-09-16` with decision `ACCEPT_HIERARCHY_ONLY`; it is not acceptance of
   the active post-ECO source.
-- [ ] `DIM-003` has all 18 attributable response rows accepted and freezes the
+- [x] `DIM-003` has all 18 attributable response rows accepted and freezes the
   board outline, mounting holes, terminal/tool zones, assembled envelope and
-  PCB STEP in `PCB_PWR_DIM_003_RESPONSE_REV_A.csv`.
+  EVT PCB STEP in `PCB_PWR_DIM_003_RESPONSE_REV_A.csv`; serial mechanics require
+  repeat validation.
 - [ ] Both independent fabricators return all 24 attributable stackup/copper
   rows, the project accepts both complete response sets, compares them and
   selects one four-layer dielectric construction.
@@ -157,8 +158,10 @@ manufacturing-release assertion.
 - [ ] All power, control, status and I²C routing plus return/thermal copper is
   complete with zero unrouted items.
 - [ ] KiCad 9 DRC passes with zero blocker/critical violations.
-- [ ] Native STEP proves terminal mating, tool access, harness bend/service
-  volumes, enclosure clearance and thermal interface.
+- [x] The frozen EVT STEP binds the board, mounting pattern, conservative Z
+  envelope and J1/J2 service volumes without fitted-body/mounting conflicts.
+- [ ] Post-route native component STEP and final serial enclosure prove exact
+  terminal mating, tool access, harness bend/service, enclosure and thermal fit.
 - [ ] Load-step, BG95 burst, -40 °C cold-start, +70 °C thermal, standby,
   INA226 calibration, fault/transient and EMC/EMI evidence passes.
 - [ ] Gerber/Excellon, IPC-356, PnP, production BOM and fabrication/assembly
@@ -175,10 +178,9 @@ manufacturing-release assertion.
 and PDF SHA-256 `7a1eee774d6a0dd03e6cb72935824f5a7d2af4bebe0e37ad739f61eb8d32a1f4`.
 The active source includes the later C20/C21 electrical ECO and has a new exact
 pin/net semantic digest. Commit-bound KiCad 9 ERC/PDF evidence and independent
-human hierarchy acceptance pass. Fitted-body 2D
-clearance, constraint coverage and the
-internal DIM-003 and two-fabricator stackup/copper requests remain valid. The
-response registers remain `0/18` and `0/24` with `0/2` accepted fabricator sets.
-Accepted mechanics/service volumes, DNP/PCB-feature access, selected construction,
-numeric copper geometry, routing, physical evidence, DRC, CAM, DFM and independent
-Review B are open. Production outputs remain prohibited.
+human hierarchy acceptance pass. Fitted-body and H1-H4 mounting clearance,
+constraint coverage and `DIM-003` EVT acceptance remain valid. The mechanical
+register is `18/18`; the stackup register remains `0/24` with `0/2` accepted
+fabricator sets. Selected construction, numeric copper geometry, routing, physical
+evidence, DRC, CAM, DFM, final serial mechanics and independent Review B are open.
+Production outputs remain prohibited.

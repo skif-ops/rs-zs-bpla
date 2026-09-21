@@ -111,9 +111,10 @@ Review B, CAM and DFM remain open.
 PCB-PWR has explicit pre-route constraint coverage for all 31 native nets. The
 independent audit binds the 5 A system basis, both 4 A buck channels, the 3.3 A
 BG95 BB+RF peak basis, three separate harness returns/net ties, two switch nodes,
-two bootstrap loops, two Kelvin lines, feedback and 100 kHz I2C. Numeric widths,
-via arrays and plane geometry remain blocked on `DIM-003`, final current/fault
-envelopes, selected stackup/copper weights and thermal/current-density review.
+two bootstrap loops, two Kelvin lines, feedback and 100 kHz I2C. `DIM-003` is
+accepted `18/18` for EVT; numeric widths, via arrays and plane geometry remain
+blocked on final current/fault envelopes, selected stackup/copper weights and
+thermal/current-density review.
 The board remains unrouted with zero copper zones; DRC, CAM, DFM and Review B are
 open.
 
@@ -186,16 +187,18 @@ remain prohibited by the remaining physical and release gates.
 
 PCB-PWR has also passed its bounded fitted-body 2D placement-clearance subgate.
 All 44 simultaneously fitted footprints have controlled courtyards, the required
-minimum is 0.20 mm, the observed minimum is 0.22 mm and conflicts are zero. This
-does not close `DIM-003`, mounting or connector/tool service volumes, DNP and DFT
-fixture access, assembled STEP, routing, DRC, CAM, DFM or Review B.
+minimum is 0.20 mm, the observed minimum is 0.22 mm and conflicts are zero. The
+four accepted H1-H4 mounting exclusions also have zero fitted-body/pad conflicts
+and 0.53 mm minimum fitted-body margin. DNP service review, exact serial enclosure
+fit, routing, DRC, CAM, DFM and Review B remain open.
 
-The PCB-PWR `DIM-003` mechanical-freeze request is now internally complete and
-machine-audited, but its response register has `0/18` accepted rows. The packet
-requires final outline and mounting authority, J1/J2 mating and cable volumes,
-DFT fixture/probe access, assembled height, enclosure/thermal keep-outs, harness
-length datums and a hash-bound frozen STEP. It is an input request only; no
-provisional dimension, routing or harness cut length is released.
+The PCB-PWR `DIM-003` mechanical authority is machine-audited and accepted
+`18/18` for the EVT test batch. It binds the 90 x 60 x 1.6 mm basis, four round
+NPTH M3 holes, J1/J2 mating and cable volumes, DFT fixture/probe access,
+assembled-height and enclosure/thermal keep-outs, harness board datums and a
+hash-bound frozen STEP. It authorizes those inputs for EVT routing only. Final
+harness cut lengths remain blocked by `DIM-001`, `DIM-012` and the enclosure
+route; serial enclosure revalidation and all manufacturing gates remain required.
 
 The PCB-PWR stackup/copper request is internally complete and machine-audited,
 but it has `0/24` accepted rows across `0/2` independent fabricator slots and no
@@ -221,16 +224,18 @@ The harness supplier capability packet is internally complete, but it has
 `0/16` accepted responses and no selected legal entity, manufacturing site,
 supplier assembly MPN, assembly-level temperature rating or accepted wire/crimp
 process. It is a capability and quotation input only. Final cut lengths remain
-blocked by `DIM-001`, `DIM-003` and `DIM-012`; the packet is not a build release.
+blocked by `DIM-001`, `DIM-012` and the final enclosure route; the packet is not
+a build release.
 
-All six internally ready external-response packets are now assembled into one
-deterministic, source-only request archive controlled by
+All six controlled response-packet records are assembled into one deterministic,
+source-only archive controlled by
 `manufacturing/EVT_PRE_20_EXTERNAL_RESPONSE_BUNDLE_REV_A.{md,json}`. The archive
 contains the two-fabricator PCB-MAIN request, PCB-MAIN assembler request,
 PCB-PWR DIM-003 request, two-fabricator PCB-PWR request, PCB-MIC DFM request and
 harness-supplier request, plus the selected-lot procurement tables. Its
 embedded SHA-256 manifest is machine-audited, while every response register
-remains pending. This closes only the packaging/issuance preparation subgate;
+except the internally accepted EVT `DIM-003` register remains pending. This
+closes only the packaging/issuance preparation subgate;
 it is not a quotation, purchase order, routing authority or manufacturing
 release.
 
@@ -240,7 +245,7 @@ release.
   `BAT1`, `PV1`, `MPPT1`, `MPPT-TEMP`, `ANT-CELL`, `ANT-GNSS`, `ANT-LORA` and
   `RF-PIGTAIL` items; exact supplier/manufacturing identities and release evidence
   for `HARNESS` and `HSG-VC` remain open;
-- PCB-MAIN and PCB-PWR routing, DRC and CAM; PCB-PWR `DIM-003`, final stackup,
+- PCB-MAIN and PCB-PWR routing, DRC and CAM; PCB-PWR final stackup,
   numeric current-density/thermal geometry and physical power evidence; PCB-MIC independent Review B,
   CAM comparison, panelization and acoustic-stack review; all three boards'
   DFM and manufacturing release;
@@ -257,9 +262,9 @@ release.
 - selected-assembler acceptance of the PCB-MAIN U2/U25/U26 project IPC
   candidates, U9 process-dependent stencil adaptation, PnP polarity,
   first-article controls and closure of blocker/critical DFM findings;
-- acceptance of all 18 PCB-PWR `DIM-003` rows in
-  `PCB_PWR_DIM_003_RESPONSE_REV_A.csv`, plus the remaining enclosure, antenna,
-  harness, installation and environmental mechanical inputs;
+- serial revalidation of the EVT-accepted PCB-PWR `DIM-003` geometry against the
+  final enclosure, exact component models, harness routing, installation and
+  environmental inputs;
 - acceptance of both PCB-PWR stackup/copper fabricator sets in the 24-row
   `PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv`, selection of one construction,
   and separate current-density/DC-drop/fault/+70 °C thermal approval;

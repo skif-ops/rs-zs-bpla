@@ -843,8 +843,8 @@ def main() -> int:
                         report["boards"][name]["stackup_copper_request_state"] = \
                             stackup_report["status"]
                         report["boards"][name]["pcb_state"] = (
-                            "FITTED_2D_CLEARANCE_AND_PRE_ROUTE_CONSTRAINT_PASS_"
-                            "ROUTING_DRC_AND_FAB_EXPORT_PROHIBITED"
+                            "EVT_DIM_003_MOUNTING_FITTED_2D_CLEARANCE_AND_PRE_ROUTE_"
+                            "CONSTRAINT_PASS_ROUTING_DRC_AND_FAB_EXPORT_PROHIBITED"
                         )
                     else:
                         report["boards"][name]["pcb_state"] = \

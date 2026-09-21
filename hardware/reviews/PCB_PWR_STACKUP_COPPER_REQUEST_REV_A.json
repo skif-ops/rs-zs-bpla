@@ -20,28 +20,28 @@
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
-    "native_board_semantic_sha256": "cd14ab230f309d71cef0f5bc8fd9beb9eca1f1875574a80e9c94cb334d8a4e3f",
+    "native_board_semantic_sha256": "df4d3b6db526ebd42cab018a6d521d76ebdd3cc0c577f898d0a5df854bcc75e4",
     "placement_authority": "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
     "placement_authority_sha256": "ed25271eb31ff061fabf98e4a9a2b8046aaa6ac333727ed4d789f31f2052ab05",
     "routing_authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
     "routing_authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
     "layer_count_authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
-    "layer_count_authority_sha256": "3774347b5cca2b09ef1949f08af22ac2e319db7b0d99bb63034a28f1dc590b80",
+    "layer_count_authority_sha256": "560dcfe2430a0b2bb4572fc9305ca1f66a5f49061b26f61313e37fcf6d8c6be2",
     "power_design_baseline": "hardware/POWER_DESIGN_BASELINE_REV_A.json",
     "power_design_baseline_sha256": "ee0625816b651faa802d5ec2d7b5a1346cec9d9dc5199afc94e86726b3a6d382",
     "power_design_calculation": "hardware/POWER_DESIGN_CALC_REV_A.md",
     "power_design_calculation_sha256": "2264daa8c4de35827d9badda98c05faa9292cc6c30d5b8d9ab9924462175184a",
     "dim_003_request": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
-    "dim_003_request_sha256": "77c3b9988d1f1b0f8bc49d2d4e9a45ffa6bec8241bb8c8cf1b4c5593a5e59c3c"
+    "dim_003_request_sha256": "d23abdd33ebd2299f2c2649bb289b9063dac4d9fe51a9584be90b72374be8c0b"
   },
   "board_request_basis": {
-    "provisional_outline_mm": [
+    "evt_outline_mm": [
       90.0,
       60.0
     ],
-    "outline_status": "PROVISIONAL_DIM_003_OPEN_NOT_A_FABRICATION_DIMENSION",
-    "finished_thickness_target_mm": 1.6,
-    "finished_thickness_status": "PROVISIONAL_DIM_003_OPEN",
+    "outline_status": "FROZEN_EVT_DIM_003_SERIAL_REVALIDATION_REQUIRED",
+    "finished_thickness_evt_mm": 1.6,
+    "finished_thickness_status": "FROZEN_EVT_DIM_003_1P6_PLUS_MINUS_0P16",
     "copper_layers": 4,
     "native_layer_order": [
       "F.Cu",
@@ -64,12 +64,13 @@
     },
     "final_stackup_frozen": false,
     "material_system_frozen": false,
-    "finished_thickness_frozen": false,
+    "finished_thickness_frozen": true,
     "copper_weights_frozen": false,
     "surface_finish_frozen": false,
     "numeric_fabrication_rules_frozen": false,
     "native_trace_items": 0,
-    "native_copper_zones": 0
+    "native_copper_zones": 0,
+    "dim_003_accepted": true
   },
   "power_geometry_boundary": {
     "system_expected_max_input_current_a": 5.0,
@@ -134,7 +135,7 @@
     "stackup_accepted": false,
     "copper_weights_and_plating_accepted": false,
     "manufacturing_minimums_accepted": false,
-    "dim_003_accepted": false,
+    "dim_003_accepted": true,
     "current_density_dc_drop_fault_thermal_calculation_accepted": false,
     "numeric_power_geometry_authorized": false,
     "routing_authorized": false,

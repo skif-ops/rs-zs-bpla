@@ -132,6 +132,37 @@ def audit_remaining_power_components(library: Path) -> None:
                             "TestPoint_DFT_1.7mm_NoPaste", testpoint)
 
 
+def audit_evt_mounting_hole(library: Path) -> None:
+    path = library / "MountingHole_M3_3.4_EVT.kicad_mod"
+    if not path.is_file():
+        raise RuntimeError(f"controlled EVT mounting footprint missing: {path}")
+    fp = Footprint.from_file(str(path), encoding="utf-8")
+    if str(fp.entryName) != "MountingHole_M3_3.4_EVT" or len(fp.pads) != 1:
+        raise RuntimeError("EVT mounting footprint identity/pad count drift")
+    pad = fp.pads[0]
+    if not (
+        str(pad.number) == ""
+        and str(pad.type) == "np_thru_hole"
+        and str(pad.shape) == "circle"
+        and round(float(pad.size.X), 4) == 3.4
+        and round(float(pad.size.Y), 4) == 3.4
+        and pad.drill is not None
+        and round(float(pad.drill.diameter), 4) == 3.4
+        and tuple(str(layer) for layer in pad.layers) == ("*.Cu", "*.Mask")
+        and round(float(pad.clearance), 4) == 2.3
+    ):
+        raise RuntimeError("EVT mounting NPTH or D8 copper exclusion drift")
+    courtyards = [item for item in fp.graphicItems
+                  if getattr(item, "layer", None) == "F.CrtYd"]
+    if len(courtyards) != 1 or type(courtyards[0]).__name__ != "FpCircle":
+        raise RuntimeError("EVT mounting D10 fitted-body courtyard missing")
+    circle = courtyards[0]
+    radius = ((float(circle.end.X) - float(circle.center.X)) ** 2 +
+              (float(circle.end.Y) - float(circle.center.Y)) ** 2) ** 0.5
+    if round(radius, 4) != 5.0:
+        raise RuntimeError(f"EVT mounting courtyard radius drift: {radius}")
+
+
 def audit_lmr60440(library: Path) -> None:
     path = library / "LMR60440_RAK0009A.kicad_mod"
     if not path.is_file():
@@ -238,12 +269,14 @@ def main() -> int:
     audit_lmr60440(args.library)
     audit_ti_support_ics(args.library, args.shared_library)
     audit_remaining_power_components(args.library)
+    audit_evt_mounting_hole(args.library)
     print("PCB-PWR manufacturer footprint audit PASS")
     print("Q1 CSD18540Q5B: TI SLPS488B copper + 16-aperture stencil exact")
     print("U3/U4 LMR60440: TI SNAS877 RAK0009A copper/mask/stencil exact")
     print("U1/U2/U5: TI DBV0006A/DGS0010A/DBV0005A lands, mask and stencil exact")
     print("J1/RSH1/L1/L2: Molex/Vishay/Coilcraft manufacturer geometry exact")
     print("TP1-TP10: project DFT target 1.70 mm copper / 2.10 mm mask / no paste exact")
+    print("H1-H4: project EVT M3 NPTH 3.40 mm / D8 copper / D10 fitted-body exclusion exact")
     return 0
 
 

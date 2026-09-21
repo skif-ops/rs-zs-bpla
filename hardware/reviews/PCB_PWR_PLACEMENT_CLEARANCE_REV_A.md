@@ -1,10 +1,10 @@
 # PCB-PWR Rev.A fitted 2D placement-clearance record
 
-Status: `PASS SUBGATE / DIM-003 AND REVIEW B OPEN / NOT FOR MANUFACTURE`
+Status: `PASS FITTED + EVT MOUNTING SUBGATE / DIM-003 EVT ACCEPTED / REVIEW B OPEN / NOT FOR MANUFACTURE`
 
-This record closes only the simultaneously fitted assembly-body clearance defect
-on the provisional PCB-PWR canvas. It does not freeze the outline, mounting
-pattern, connector/tool volumes, DFT fixture, height envelope or routed copper.
+This record closes the simultaneously fitted assembly-body clearance defect and
+verifies the accepted EVT mounting exclusions. It does not approve routed copper,
+fabricator stackup, DFM, Review B or serial mechanics.
 
 ## Input finding
 
@@ -49,6 +49,12 @@ binds all 62 references to the placement CSV and exact schematic pin/net set.
 - minimum required fitted-courtyard clearance is `0.20 mm`;
 - minimum observed clearance is `0.22 mm` (`D1 / F1`);
 - fitted-courtyard clearance conflicts are `0`;
+- H1-H4 are round `NPTH 3.4 mm` board-only features at `(5,5)`, `(82,5)`,
+  `(68,55)`, `(5,55) mm` with `D8.0 mm` all-copper and `D10.0 mm` fitted-body
+  exclusions;
+- the minimum fitted-body margin outside a mounting `D10` exclusion is
+  `0.53 mm`; mounting-to-fitted-body conflicts are `0`, and mounting-to-existing-
+  pad conflicts are `0`;
 - five DNP footprints and thirteen PCB features are excluded from the assembly
   body calculation; their pad, fixture and service validation remains open;
 - the provisional east-edge J2 overhang remains an explicit intent, not a
@@ -57,8 +63,7 @@ binds all 62 references to the placement CSV and exact schematic pin/net set.
 
 The machine control uses a UUID/order-independent board digest so the committed
 board and a fresh KiCad 9 materialization must produce the same placement result.
-`DIM-003`, mounting holes, J1/J2 service volumes, TP1-TP10 fixture access,
-assembled STEP, stackup, numeric power geometry, routing, DRC, CAM, DFM, physical
+`DIM-003` is accepted for the EVT test batch at `18/18`, including J1/J2 service
+volumes, TP1-TP10 fixture access and the frozen envelope STEP. Serial-enclosure
+revalidation, stackup, numeric power geometry, routing, DRC, CAM, DFM, physical
 evidence and independent Review B remain blocking.
-The controlled DIM-003 request packet is ready, but its response register is
-still `0/18`; no item in that list is accepted by this clearance result.

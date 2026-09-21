@@ -19,7 +19,7 @@
     },
     {
       "path": "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv",
-      "sha256": "f17f90a2513592886cf4a98d966a4edc1b03b70b0bc4d304955f309da52e6e37"
+      "sha256": "7c7181ff814f05db1d94c0a9f9bd3a60fcebd4de0a00cec5312c2a0f23c0035c"
     },
     {
       "path": "hardware/HARNESS_MANUFACTURING_DRAWING_REV_A.md",
@@ -35,7 +35,7 @@
     },
     {
       "path": "hardware/CHINA_PROCUREMENT_RFQ.csv",
-      "sha256": "2d629a24255bdfc28993de578c6d7c67a543307f6aabe10178dae01266d4beac"
+      "sha256": "2acb800dd15535748d34b760328a4dfa1906c75589e06909eb64240dda2d4861"
     },
     {
       "path": "manufacturing/EVT_LOT_SELECTION_REV_A.csv",
@@ -56,7 +56,7 @@
       "H-BAT-PWR"
     ],
     "supplier_slot": "HARNESS-CANDIDATE",
-    "cut_lengths": "OPEN_DIM_001_DIM_003_DIM_012"
+    "cut_lengths": "OPEN_DIM_001_DIM_005_DIM_006_DIM_012_ENCLOSURE_ROUTE_DIM_003_BOARD_DATUM_ACCEPTED"
   },
   "required_gate_ids": [
     "HARNESS-SUPPLIER-IDENTITY",

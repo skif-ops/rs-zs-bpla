@@ -387,8 +387,14 @@ def main() -> int:
 
     # Independent electrical equivalence: every physical schematic pin equals every PCB pad net.
     board = Board.from_file(str(PCB), encoding="utf-8")
-    footprints = {board_ref(item): item for item in board.footprints}
-    require(len(footprints) == len(board.footprints) == 62 and
+    all_footprints = {board_ref(item): item for item in board.footprints}
+    footprints = {
+        reference: item for reference, item in all_footprints.items()
+        if not item.attributes.boardOnly
+    }
+    require(len(all_footprints) == len(board.footprints) == 66 and
+            set(all_footprints) - set(footprints) == {"H1", "H2", "H3", "H4"} and
+            len(footprints) == 62 and
             set(footprints) == physical_refs, "hierarchical schematic/PCB ref set mismatch")
     semantic_rows: list[str] = []
     for ref in sorted(physical_refs):

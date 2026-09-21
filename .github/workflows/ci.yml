@@ -290,6 +290,9 @@ jobs:
             hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json
             hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md
             hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv
+            hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.json
+            hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.md
+            mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_A.step
             hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json
             hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md
             hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv

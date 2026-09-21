@@ -203,6 +203,14 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR DIM-003 request/mechanical-acceptance separation decision is missing",
     )
     require(
+        decisions["DEC-097"]["Status"] ==
+        "ACCEPTED_EVT_DIM_003_SERIAL_REVALIDATION_REQUIRED"
+        and "DIM-003 18/18" in decisions["DEC-097"]["Impact"]
+        and "four round" in decisions["DEC-097"]["Impact"]
+        and "serial enclosure revalidation" in decisions["DEC-097"]["Impact"],
+        "PCB-PWR DIM-003 EVT acceptance or serial-revalidation boundary is missing",
+    )
+    require(
         decisions["DEC-055"]["Status"] == "IMPLEMENTED_TWO_FABRICATOR_RESPONSES_PENDING"
         and "fabricator acceptance and numeric power geometry"
         in decisions["DEC-055"]["Decision"]

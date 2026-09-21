@@ -138,7 +138,8 @@ def validate_supplier_request() -> dict[str, object]:
             "harness supplier request selected quantity or spare quantity drift")
     require(scope.get("supplier_slot") == "HARNESS-CANDIDATE",
             "harness supplier slot drift")
-    require(scope.get("cut_lengths") == "OPEN_DIM_001_DIM_003_DIM_012",
+    require(scope.get("cut_lengths") ==
+            "OPEN_DIM_001_DIM_005_DIM_006_DIM_012_ENCLOSURE_ROUTE_DIM_003_BOARD_DATUM_ACCEPTED",
             "harness cut-length interlock drift")
     require(contract.get("required_gate_ids") == SUPPLIER_GATE_IDS,
             "harness supplier required gate set drift")
@@ -201,7 +202,8 @@ def validate_supplier_request() -> dict[str, object]:
     packet_text = SUPPLIER_REQUEST.read_text(encoding="utf-8")
     for token in (
         "0 OF 16 RESPONSES ACCEPTED", "NOT FOR BUILD", "DIM-001", "DIM-003",
-        "DIM-012", "supplier assembly MPN", "wire AVL", "100 %", "first article",
+        "DIM-005", "DIM-006", "DIM-012", "supplier assembly MPN", "wire AVL",
+        "100 %", "first article",
     ):
         require(token in packet_text, f"harness supplier request missing: {token}")
 
@@ -359,7 +361,7 @@ def audit() -> dict[str, object]:
         "supplier_request_status": supplier_request["status"],
         "supplier_request": supplier_request,
         "open_blockers": [
-            "cut lengths and tolerances after DIM-001 DIM-003 and DIM-012",
+            "cut lengths and tolerances after DIM-001 DIM-005 DIM-006 DIM-012 and final enclosure routes; DIM-003 board datums accepted",
             "selected supplier legal entity assembly MPN revision and assembly temperature range; 0/16 responses accepted",
             "exact wire manufacturer and MPN AVL from the selected supplier",
             "qualified crimp tooling height pull-force and section evidence",

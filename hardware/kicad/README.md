@@ -39,30 +39,34 @@ equivalence to the native PCB. The C20/C21 local-CIN_HF ECO supersedes prior
 KiCad 9 ERC/PDF and human decisions for the active source; fresh commit-bound
 evidence and independent human acceptance remain open.
 
-PCB-PWR currently contains a native, unrouted 62-footprint electrical placement
-canvas. Its `90 x 60 mm`, four-layer and `1.6 mm` assumptions are provisional;
-mounting holes, routing and copper zones are deliberately absent while `DIM-003`
-remains open. `hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json` is the machine-readable
-release interlock for this state.
+PCB-PWR currently contains a native, unrouted placement canvas with 62 electrical
+footprints plus four board-only mounting holes. `DIM-003` is accepted `18/18`
+for the EVT batch: the `90 x 60 x 1.6 mm` basis, round H1-H4 NPTH pattern,
+connector/fixture service volumes and conservative STEP envelope are controlled.
+Routing and copper zones remain absent; serial enclosure revalidation is mandatory.
+`hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json` is the machine-readable release
+interlock for this state.
 
-The bounded `DIM-003` request is now controlled by
-`hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json`; its 18-row response
-register remains `0/18` accepted. It requests outline, mounting, J1/J2, DFT,
-assembled-height, enclosure/thermal, harness-datum and frozen-STEP evidence but
-does not release any of those values.
+The bounded `DIM-003` authority is controlled by
+`hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json`; all 18 response rows are
+accepted for EVT. It freezes the EVT outline, mounting, J1/J2, DFT,
+assembled-height, enclosure/thermal, harness-datum and frozen-STEP inputs without
+authorizing serial mechanics or manufacture.
 
 The bounded fitted-body clearance repack passes a strict independent subgate:
 all 44 simultaneously fitted footprints have controlled courtyards, the required
 minimum gap is `0.20 mm`, the observed minimum is `0.22 mm`, and conflicts are
 zero. This result excludes DNP/PCB-feature service checks and does not approve
-the provisional J2 edge overhang, connector mating/bend volumes, mounting, DFT
-fixture access, assembled STEP, routing or Review B.
+the serial enclosure and exact component 3D fit; EVT connector mating/bend
+volumes, mounting, DFT fixture access and assembled envelope are accepted.
+Routing and Review B remain open.
 
 `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv` classifies all 31 native nets as a
 pre-route input, including high-current paths, three controlled net-tie returns,
 switch/bootstrap loops, Kelvin sense, feedback and I2C. Its PASS does not permit
-routing: numeric width, via-array and plane geometry remain open until `DIM-003`,
-final current/fault envelopes, stackup/copper weights and thermal review close.
+routing: `DIM-003` is accepted for EVT, while numeric width, via-array and plane
+geometry remain open until final current/fault envelopes, stackup/copper weights
+and thermal review close.
 
 ## Logical sheet plan
 

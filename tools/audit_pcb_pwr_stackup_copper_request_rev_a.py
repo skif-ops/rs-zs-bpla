@@ -3,8 +3,8 @@
 
 This audit proves only that a source-bound two-fabricator request and blank
 response register are ready. It must never promote target copper weights,
-provisional dimensions or vendor capability into numeric power geometry,
-routing authority or manufacturing release.
+the accepted EVT mechanical basis or vendor capability into numeric power
+geometry, routing authority or manufacturing release.
 """
 from __future__ import annotations
 
@@ -61,9 +61,8 @@ CONTRACT_STATUS = (
     "NOT_FOR_ROUTING_OR_MANUFACTURE"
 )
 REVIEW_B_STATUS = (
-    "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_FITTED_2D_"
-    "CLEARANCE_PRE_ROUTE_DIM_003_AND_"
-    "STACKUP_REQUESTS_READY_ROUTING_PENDING"
+    "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_EVT_MECHANICS_"
+    "AND_FITTED_2D_CLEARANCE_PRE_ROUTE_STACKUP_REQUEST_READY_ROUTING_PENDING"
 )
 
 AUTHORITY_INPUTS = [
@@ -217,9 +216,9 @@ def validate_board_and_bindings(contract: dict[str, Any]) -> dict[str, Any]:
     require(copper_layers == ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"],
             f"PCB-PWR copper layers differ: {copper_layers}")
     require(float(board.general.thickness) == 1.6,
-            f"provisional PCB-PWR thickness differs: {board.general.thickness}")
-    require(len(board.footprints) == 62,
-            f"PCB-PWR footprint count is {len(board.footprints)}, expected 62")
+            f"EVT PCB-PWR thickness differs: {board.general.thickness}")
+    require(len(board.footprints) == 66,
+            f"PCB-PWR footprint count is {len(board.footprints)}, expected 66")
     require(len(board_nets) == 31,
             f"PCB-PWR net count is {len(board_nets)}, expected 31")
     require(len(board.traceItems) == 0 and len(board.zones) == 0,
@@ -264,7 +263,7 @@ def validate_request_basis(contract: dict[str, Any]) -> dict[str, Any]:
         and layer.get("Native_Layer_Order") == "F.Cu;In1.Cu;In2.Cu;B.Cu"
         and layer.get("Layer_Count_Status") == "FROZEN_REV_A"
         and layer.get("Board_Thickness_mm") == "1.6"
-        and layer.get("Thickness_Status") == "PROVISIONAL_DIM_003_OPEN"
+        and layer.get("Thickness_Status") == "FROZEN_EVT_DIM_003_1P6_PLUS_MINUS_0P16"
         and layer.get("Copper_Weight_Target") == "outer 2 oz target; inner 1 oz target"
         and layer.get("Copper_Weight_Status") == "TARGET_ONLY_NOT_FROZEN"
         and layer.get("Layer_Function_Intent") == "POWER_SIGNAL;REFERENCE;POWER_RETURN;POWER_SIGNAL",
@@ -272,10 +271,10 @@ def validate_request_basis(contract: dict[str, Any]) -> dict[str, Any]:
     )
 
     expected_basis = {
-        "provisional_outline_mm": [90.0, 60.0],
-        "outline_status": "PROVISIONAL_DIM_003_OPEN_NOT_A_FABRICATION_DIMENSION",
-        "finished_thickness_target_mm": 1.6,
-        "finished_thickness_status": "PROVISIONAL_DIM_003_OPEN",
+        "evt_outline_mm": [90.0, 60.0],
+        "outline_status": "FROZEN_EVT_DIM_003_SERIAL_REVALIDATION_REQUIRED",
+        "finished_thickness_evt_mm": 1.6,
+        "finished_thickness_status": "FROZEN_EVT_DIM_003_1P6_PLUS_MINUS_0P16",
         "copper_layers": 4,
         "native_layer_order": ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"],
         "layer_function_intent": ["POWER_SIGNAL", "REFERENCE", "POWER_RETURN", "POWER_SIGNAL"],
@@ -288,15 +287,16 @@ def validate_request_basis(contract: dict[str, Any]) -> dict[str, Any]:
         },
         "final_stackup_frozen": False,
         "material_system_frozen": False,
-        "finished_thickness_frozen": False,
+        "finished_thickness_frozen": True,
         "copper_weights_frozen": False,
         "surface_finish_frozen": False,
         "numeric_fabrication_rules_frozen": False,
         "native_trace_items": 0,
         "native_copper_zones": 0,
+        "dim_003_accepted": True,
     }
     require(contract.get("board_request_basis") == expected_basis,
-            "PCB-PWR provisional stackup request basis differs")
+            "PCB-PWR EVT stackup request basis differs")
     return expected_basis
 
 
@@ -413,7 +413,7 @@ def validate_release_interlocks(contract: dict[str, Any]) -> None:
         "stackup_accepted": False,
         "copper_weights_and_plating_accepted": False,
         "manufacturing_minimums_accepted": False,
-        "dim_003_accepted": False,
+        "dim_003_accepted": True,
         "current_density_dc_drop_fault_thermal_calculation_accepted": False,
         "numeric_power_geometry_authorized": False,
         "routing_authorized": False,
@@ -445,6 +445,7 @@ def validate_integrations() -> None:
         "stackup_accepted": False,
         "copper_weights_and_plating_accepted": False,
         "numeric_power_geometry_authorized": False,
+        "dim_003_accepted": True,
         "routing_authorized": False,
         "review_b_complete": False,
         "manufacturing_release": False,
@@ -479,7 +480,7 @@ def validate_integrations() -> None:
     packet_text = " ".join(PACKET.read_text(encoding="utf-8").split())
     for token in (
         "0 OF 24 ROWS ACCEPTED",
-        "not a released outline",
+        "accepted EVT outline is not a fabrication release",
         "contains no accepted trace width",
         "does not by itself authorize numeric geometry or routing",
     ):

@@ -118,7 +118,7 @@
   "release_rules": [
     "The archive requests attributable external responses; it is not a purchase order.",
     "PCB-MAIN and PCB-PWR native boards remain unrouted and are supplied only as engineering context.",
-    "No response register may be promoted from pending without attributable returned evidence.",
+    "PCB-PWR DIM-003 is accepted 18/18 from owner-authorized EVT engineering evidence; no remaining pending response register may be promoted without attributable returned evidence.",
     "Full-PCBA is the primary quotation track; bare PCB rows are alternatives and must not be added to full-PCBA totals.",
     "Gerber, drill, IPC-356, stencil, panel and fabrication outputs become orderable only after the applicable Review B and release gates pass."
   ]

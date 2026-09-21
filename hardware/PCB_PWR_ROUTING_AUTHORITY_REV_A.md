@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A pre-route constraint authority
 
-Status: `PASS / 31 NETS CLASSIFIED / DIM-003, STACKUP, ROUTING AND THERMAL EVIDENCE OPEN / NOT FOR MANUFACTURE`
+Status: `PASS / 31 NETS CLASSIFIED / DIM-003 EVT ACCEPTED / STACKUP, ROUTING AND THERMAL EVIDENCE OPEN / NOT FOR MANUFACTURE`
 
 Machine authority: `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv`
 
@@ -15,10 +15,11 @@ CSV SHA-256: `53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1`
 Every one of the 31 non-empty PCB-PWR native nets has one explicit route class,
 return/reference-domain rule, topology, current basis, geometry rule, layer/via
 rule, aggressor-separation rule, priority and source authority. This closes only
-pre-route constraint coverage. It does not authorize routing while the outline,
-mounting pattern and terminal zones remain open under `DIM-003`.
-The internal `DIM-003` request packet is ready, but its attributable response
-register remains `0/18`; this is still an open routing prerequisite.
+pre-route constraint coverage. `DIM-003` is accepted `18/18` for the EVT test
+batch, including the outline, H1-H4 mounting pattern, terminal/service zones,
+fixture datum and conservative STEP envelope. Serial mechanical revalidation is
+mandatory. Actual routing remains blocked by the stackup/copper and numeric power-
+geometry gates below.
 
 The internal two-fabricator stackup/copper packet is also ready at
 `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`, but
@@ -80,7 +81,7 @@ the deterministic generator and the separately maintained audit.
 
 P0 covers return geometry, the complete power path, switch/boot loops, Kelvin
 sense and feedback. P1 covers local analog/gate/mode networks plus control,
-status and I²C. Within P0 the practical order is: freeze mechanics and stackup;
+status and I²C. Within P0 the practical order is: retain accepted EVT mechanics and accept stackup;
 plan `GND_PWR` and net-tie joins; close hot loops; route Kelvin/feedback; then
 size and route the high-current input and output paths.
 
@@ -88,7 +89,8 @@ size and route the high-current input and output paths.
 
 Constraint coverage may remain PASS only while all of these are explicit:
 
-- `DIM-003` frozen outline, mounting pattern, terminal/tool zones and PCB STEP;
+- preservation of the accepted EVT `DIM-003` outline, H1-H4 exclusions,
+  terminal/tool zones and STEP envelope, plus serial revalidation before series;
 - two complete attributable fabricator response sets, selected four-layer
   dielectric construction and accepted copper/plating authority;
 - current-density, DC-drop, via-array, fault-energy and +70 °C thermal analysis;
