@@ -154,6 +154,8 @@ on:
       - "tools/audit_pcb_pwr_buck_bootstrap_routing_001_application_rev_a.py"
       - "tools/generate_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py"
       - "tools/audit_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py"
+      - "tools/audit_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py"
       - "tools/audit_pcb_main_native_schematic_rev_a.py"
       - "tools/audit_pcb_layer_count_authority_rev_a.py"
       - "tools/audit_harness_manufacturing_rev_a.py"
@@ -1332,6 +1334,9 @@ jobs:
           python tools/generate_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py --check
           python tools/audit_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/lm74700_vcap_routing_002_static_audit.json
+          python tools/generate_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py --check
+          python tools/audit_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/lm74700_vcap_routing_002_application_audit.json
           python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/routing_authority_audit.json
@@ -1369,7 +1374,7 @@ jobs:
           assert board is not None, "KiCad failed to parse PCB-PWR placement candidate"
           assert len(board.GetFootprints()) == 66, "unexpected PCB-PWR electrical-plus-mounting footprint count"
           assert board.GetCopperLayerCount() == 4, "unexpected PCB-PWR layer count"
-          assert len(list(board.GetTracks())) == 2, "PCB-PWR exact bootstrap application missing or out of scope"
+          assert len(list(board.GetTracks())) == 3, "PCB-PWR exact VCAP application missing or out of scope"
           assert len(list(board.Zones())) == 0, "PCB-PWR placement candidate contains zones"
           print("PCB-PWR controlled footprints KiCad 9 native parse: PASS")
           PY
@@ -1552,7 +1557,7 @@ jobs:
           cp hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb \
             "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb"
           cmp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb \
-            "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb"
+            "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb"
           /usr/bin/python3 - \
             "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb" \
             "$candidate_project/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb" <<'PY'
@@ -1580,6 +1585,11 @@ jobs:
             --drc-base "$evidence/baseline_drc.json" \
             --drc-candidate "$evidence/candidate_drc.json" \
             --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
       - name: Materialize native PCB-MIC board and schematic
         shell: bash
         run: |
@@ -1734,6 +1744,7 @@ jobs:
             hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_REVIEW_COMMIT_MAPPING.json
             hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_APPROVAL_REV_A.json
             hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_APPROVAL_REV_A.md
+            hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_APPLICATION_REV_A.json
             hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pcb

@@ -185,7 +185,7 @@ def main() -> int:
     expected_nets = {net for item in expected.values() for net in item["pins"].values() if net != "NC"}
     board_nets = {net.name for net in board.nets if net.number != 0}
     require(board_nets == expected_nets, "board net set differs from native schematic")
-    require(len(board.traceItems) in {0, 2} and len(board.zones) == 0,
+    require(len(board.traceItems) in {0, 2, 3} and len(board.zones) == 0,
             "PCB-PWR contains copper beyond the accepted bootstrap successor")
 
     edges = [item for item in board.graphicItems if getattr(item, "layer", None) == "Edge.Cuts"]

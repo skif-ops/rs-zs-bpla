@@ -20,7 +20,7 @@
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
-    "native_board_semantic_sha256": "d90ef0332ed5da798029a5cb580a0f3a5f68387068811eeb9e4c06d0681500ae",
+    "native_board_semantic_sha256": "07ce41bb361e68dd3a5310a6879030f097e4498e9397f2506ea5b78f49c47234",
     "placement_authority": "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
     "placement_authority_sha256": "257fee5898b5d44970115220a485d40b01c4fefad14b5c3b1a4ffb43b7b5b2d6",
     "routing_authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
@@ -32,7 +32,7 @@
     "power_design_calculation": "hardware/POWER_DESIGN_CALC_REV_A.md",
     "power_design_calculation_sha256": "2264daa8c4de35827d9badda98c05faa9292cc6c30d5b8d9ab9924462175184a",
     "dim_003_request": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
-    "dim_003_request_sha256": "02f2cf8b1cb8959d120ed83507a491aacc7d0c3a833e73bf784365027d4799d6"
+    "dim_003_request_sha256": "eab867d9ee4891ae74bd61bb6be07eda8709a4b5b4bb265cfec5a1259d62f0c9"
   },
   "board_request_basis": {
     "evt_outline_mm": [

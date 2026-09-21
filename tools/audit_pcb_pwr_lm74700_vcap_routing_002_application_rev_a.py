@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit exact application of PCB-PWR bootstrap routing candidate 001."""
+"""Audit exact application of PCB-PWR LM74700 VCAP routing candidate 002."""
 
 from __future__ import annotations
 
@@ -10,20 +10,18 @@ from pathlib import Path
 
 from kiutils.board import Board
 
-import audit_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a as candidate_audit
+import audit_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a as candidate_audit
 from audit_pcb_pwr_routing_authority_rev_a import semantic_board_sha256
 
 
 ROOT = Path(__file__).resolve().parents[1]
 BOARD = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
-APPROVAL = ROOT / "hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_APPROVAL_REV_A.json"
-APPLICATION = ROOT / "hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_APPLICATION_REV_A.json"
+APPROVAL = ROOT / "hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_APPROVAL_REV_A.json"
+APPLICATION = ROOT / "hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_APPLICATION_REV_A.json"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
-BOARD_SHA256 = "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236"
-SEMANTIC_SHA256 = "d90ef0332ed5da798029a5cb580a0f3a5f68387068811eeb9e4c06d0681500ae"
-SUCCESSOR_SHA256 = "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5"
-SUCCESSOR_SEMANTIC_SHA256 = "07ce41bb361e68dd3a5310a6879030f097e4498e9397f2506ea5b78f49c47234"
-APPROVAL_SHA256 = "30b26ade4edf0a2f357fb93e1ce95dea7628a7c382003578ebf07c74a7465e0b"
+BOARD_SHA256 = candidate_audit.CANDIDATE_SHA256
+SEMANTIC_SHA256 = candidate_audit.CANDIDATE_SEMANTIC_SHA256
+APPROVAL_SHA256 = "b9578a4d6691a1a5d7f0bfaafc08d6939af70acf1b4d86add1c00c0b816099ea"
 
 
 def require(value: bool, message: str) -> None:
@@ -36,28 +34,29 @@ def sha256(path: Path) -> str:
 
 
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[str, object]:
-    require(sha256(BOARD) in {BOARD_SHA256, SUCCESSOR_SHA256},
-            "authoritative PCB-PWR is not accepted bootstrap or controlled successor")
-    require(sha256(APPROVAL) == APPROVAL_SHA256, "bootstrap approval drift")
+    require(sha256(BOARD) == BOARD_SHA256 and
+            BOARD.read_bytes() == candidate_audit.CANDIDATE.read_bytes(),
+            "authoritative PCB-PWR is not exact accepted VCAP candidate")
+    require(sha256(APPROVAL) == APPROVAL_SHA256, "VCAP approval drift")
     board = Board.from_file(str(BOARD), encoding="utf-8")
-    require(semantic_board_sha256(board) in {SEMANTIC_SHA256, SUCCESSOR_SEMANTIC_SHA256},
-            "applied bootstrap semantic identity drift")
-    require(len(board.traceItems) in {2, 3} and len(board.zones) == 0,
-            "applied bootstrap copper inventory drift")
+    require(semantic_board_sha256(board) == SEMANTIC_SHA256,
+            "applied VCAP semantic identity drift")
+    require(len(board.traceItems) == 3 and len(board.zones) == 0,
+            "applied VCAP copper inventory drift")
     proposal = candidate_audit.audit()
     require(proposal["status"] ==
-            "PASS_STATIC_PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE",
-            "historical bootstrap proposal audit drift")
+            "PASS_STATIC_PCB_PWR_LM74700_VCAP_ROUTING_002_CANDIDATE",
+            "historical VCAP proposal audit drift")
     approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
     application = json.loads(APPLICATION.read_text(encoding="utf-8"))
     status = json.loads(STATUS.read_text(encoding="utf-8"))
-    route = status["native_layout"]["buck_bootstrap_routing_001"]
+    route = status["native_layout"]["lm74700_vcap_routing_002"]
     require(
-        approval["decision"] == "ACCEPT_PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_SUBGATE"
+        approval["decision"] == "ACCEPT_PCB_PWR_LM74700_VCAP_ROUTING_002_SUBGATE"
         and application["decision"] == approval["decision"]
         and application["predecessor_board_sha256"] == candidate_audit.BASE_SHA256
         and application["applied_board_sha256"] == BOARD_SHA256
-        and application["trace_items"] == 2
+        and application["trace_items"] == 3
         and application["vias"] == 0
         and application["machine_gate"]["status"] in {
             "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
@@ -66,17 +65,17 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and application["routing_complete"] is False
         and application["review_b_complete"] is False
         and application["cam_or_manufacturing_release"] is False
-        and route["active_board_sha256"] in {BOARD_SHA256, SUCCESSOR_SHA256}
+        and route["active_board_sha256"] == BOARD_SHA256
         and route["authoritative_board_modified"] is True
         and route["routing_complete"] is False
         and route["review_b_complete"] is False
         and route["manufacturing_release"] is False,
-        "bootstrap application boundary drift",
+        "VCAP application boundary drift",
     )
     report: dict[str, object] = {
-        "status": "PASS_EXACT_ACCEPTED_PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_APPLICATION",
+        "status": "PASS_EXACT_ACCEPTED_PCB_PWR_LM74700_VCAP_ROUTING_002_APPLICATION",
         "board_sha256": BOARD_SHA256,
-        "trace_items": 2,
+        "trace_items": 3,
         "vias": 0,
         "routing_complete": False,
         "review_b_complete": False,
@@ -99,7 +98,7 @@ def main() -> int:
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    print("PCB-PWR bootstrap routing 001 application audit:", report["status"])
+    print("PCB-PWR LM74700 VCAP routing 002 application audit:", report["status"])
     return 0
 
 

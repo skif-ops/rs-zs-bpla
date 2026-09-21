@@ -1,0 +1,24 @@
+{
+  "schema": "dioneya-pcb-pwr-lm74700-vcap-routing-002-application-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-LM74700-VCAP-ROUTING-002",
+  "decision": "ACCEPT_PCB_PWR_LM74700_VCAP_ROUTING_002_SUBGATE",
+  "approval_commit_sha": "b4b1ca81ffca63b389c3e34b3ba1be17ac9a590f",
+  "approval_sha256": "b9578a4d6691a1a5d7f0bfaafc08d6939af70acf1b4d86add1c00c0b816099ea",
+  "predecessor_board_sha256": "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236",
+  "applied_board_sha256": "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5",
+  "exact_candidate_byte_identity": true,
+  "connections": ["U1.1-C1.1"],
+  "routed_nets": ["LM74700_VCAP"],
+  "trace_items": 3,
+  "vias": 0,
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+    "required_violations": [86, 86],
+    "required_unconnected": [124, 123],
+    "required_drc_fingerprint_delta": 0
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}

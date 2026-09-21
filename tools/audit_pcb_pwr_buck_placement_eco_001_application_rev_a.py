@@ -44,6 +44,8 @@ WARNING_REMEDIATION_SEMANTIC_SHA256 = (
 )
 BOOTSTRAP_CANDIDATE_SHA256 = "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236"
 BOOTSTRAP_SEMANTIC_SHA256 = "d90ef0332ed5da798029a5cb580a0f3a5f68387068811eeb9e4c06d0681500ae"
+VCAP_CANDIDATE_SHA256 = "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5"
+VCAP_SEMANTIC_SHA256 = "07ce41bb361e68dd3a5310a6879030f097e4498e9397f2506ea5b78f49c47234"
 APPROVAL_SHA256 = "03a3c499b785ffdbe331f5bb442aecde31411bb6b3e65c88e0eaf2e0a62c8c7e"
 MAPPING_SHA256 = "26b4376b851d4dd5082bfd02182e243d7d0d9161a7b72c53a7112db9c21c2c85"
 GENERATOR_SHA256 = "8ed0ebf6cf3aed26c7f6ef9d7746424defcb467674ce69e353c3b8f2c39f3752"
@@ -123,6 +125,7 @@ def audit(
             CANDIDATE_SHA256,
             WARNING_REMEDIATION_CANDIDATE_SHA256,
             BOOTSTRAP_CANDIDATE_SHA256,
+            VCAP_CANDIDATE_SHA256,
         },
         "authoritative PCB-PWR is not an accepted buck-placement successor",
     )
@@ -131,6 +134,8 @@ def audit(
         WARNING_REMEDIATION_CANDIDATE_SHA256: WARNING_REMEDIATION_CANDIDATE,
         BOOTSTRAP_CANDIDATE_SHA256:
         ROOT / "hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb",
+        VCAP_CANDIDATE_SHA256:
+        ROOT / "hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb",
     }[active_sha256]
     require(BOARD.read_bytes() == expected_active.read_bytes(),
             "authoritative PCB-PWR accepted-successor byte identity drift")
@@ -139,6 +144,7 @@ def audit(
         CANDIDATE_SHA256: BOARD_SEMANTIC_SHA256,
         WARNING_REMEDIATION_CANDIDATE_SHA256: WARNING_REMEDIATION_SEMANTIC_SHA256,
         BOOTSTRAP_CANDIDATE_SHA256: BOOTSTRAP_SEMANTIC_SHA256,
+        VCAP_CANDIDATE_SHA256: VCAP_SEMANTIC_SHA256,
     }[active_sha256]
     require(semantic_board_sha256(board) == active_semantic_sha256,
             "applied PCB-PWR semantic board identity drift")
@@ -240,7 +246,7 @@ def audit(
         require(all(candidate_audit.close(first, second)
                     for first, second in zip(actual, expected)),
                 f"{reference}: applied pose drift")
-    require(len(board.traceItems) in {0, 2} and len(board.zones) == 0,
+    require(len(board.traceItems) in {0, 2, 3} and len(board.zones) == 0,
             "PCB-PWR buck placement successor exceeds accepted bootstrap copper")
 
     with PLACEMENT.open(encoding="utf-8-sig", newline="") as stream:
@@ -283,10 +289,13 @@ def audit(
             "PCB-PWR-BUCK-PLACEMENT-ECO-001",
             "PCB-PWR-BUCK-WARNING-REMEDIATION-001",
             "PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001",
+            "PCB-PWR-LM74700-VCAP-ROUTING-002",
         }
-        and eco.get("routing_added") == (active_sha256 == BOOTSTRAP_CANDIDATE_SHA256)
+        and eco.get("routing_added") ==
+        (active_sha256 in {BOOTSTRAP_CANDIDATE_SHA256, VCAP_CANDIDATE_SHA256})
         and eco.get("warning_only_items_closed") in {False, True}
-        and layout.get("routing_present") == (active_sha256 == BOOTSTRAP_CANDIDATE_SHA256)
+        and layout.get("routing_present") ==
+        (active_sha256 in {BOOTSTRAP_CANDIDATE_SHA256, VCAP_CANDIDATE_SHA256})
         and layout.get("copper_zones_present") is False
         and layout.get("cam_export_authorized") is False
         and status.get("review_b", {}).get("complete") is False

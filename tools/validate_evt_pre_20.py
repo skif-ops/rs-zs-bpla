@@ -342,6 +342,19 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR routing candidate 002 acceptance boundary is missing",
     )
     require(
+        decisions["DEC-119"]["Status"] ==
+        "APPLICATION_EXACT_LM74700_VCAP_DELTA_COMMIT_BOUND_GATE_PENDING"
+        and "b4b1ca81" in decisions["DEC-119"]["Reason"]
+        and "U1.1-C1.1" in decisions["DEC-119"]["Impact"]
+        and "prohibit narrow SW_3V8 or SW_3V3 substitution"
+        in decisions["DEC-119"]["Impact"]
+        and "fresh commit-bound CI and PCB Native application gate"
+        in decisions["DEC-119"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-119"]["Impact"],
+        "PCB-PWR routing candidate 002 application boundary is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]
