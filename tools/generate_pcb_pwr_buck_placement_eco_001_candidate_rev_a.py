@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Generate the bounded PCB-PWR dual-buck placement ECO-001 candidate.
 
-The proposal moves only the two bootstrap capacitors and the two inductors.
-It adds no copper and never modifies the authoritative PCB-PWR board.
+The historical proposal moves only the two bootstrap capacitors and the two
+inductors. It adds no copper and regenerates from the frozen reviewed base.
 """
 
 from __future__ import annotations
@@ -13,7 +13,6 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 CANDIDATE_DIR = (
     ROOT / "hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001"
 )
@@ -23,6 +22,7 @@ DEFAULT_BASE_OUTPUT = (
 DEFAULT_OUTPUT = (
     CANDIDATE_DIR / "PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb"
 )
+SOURCE = DEFAULT_BASE_OUTPUT
 
 BASE_SHA256 = "fdd53e669a167df8925c38e289993c38b818c231eddd0be54de378b51538bf48"
 CANDIDATE_SHA256 = "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37"
@@ -76,7 +76,7 @@ def move_footprint(source: str, reference: str, old: str, new: str) -> str:
 
 def candidate_bytes(base_payload: bytes) -> bytes:
     require(sha256_bytes(base_payload) == BASE_SHA256,
-            "authoritative PCB-PWR base SHA-256 drift")
+            "historical PCB-PWR buck placement base SHA-256 drift")
     source = base_payload.decode("utf-8")
     for reference, (old, new) in PLACEMENT_REPLACEMENTS.items():
         source = move_footprint(source, reference, old, new)
@@ -86,7 +86,7 @@ def candidate_bytes(base_payload: bytes) -> bytes:
 def generate(base_output: Path, output: Path, check: bool) -> dict[str, object]:
     base_payload = SOURCE.read_bytes()
     require(sha256_bytes(base_payload) == BASE_SHA256,
-            "authoritative PCB-PWR SHA-256 drift")
+            "historical PCB-PWR buck placement base SHA-256 drift")
     candidate_payload = candidate_bytes(base_payload)
     require(candidate_payload != base_payload,
             "PCB-PWR buck placement candidate is unchanged")
@@ -108,7 +108,7 @@ def generate(base_output: Path, output: Path, check: bool) -> dict[str, object]:
         "candidate_sha256": candidate_sha256,
         "moved_footprints": sorted(PLACEMENT_REPLACEMENTS),
         "copper_changed": False,
-        "authoritative_board_modified": False,
+        "historical_candidate_regeneration": True,
         "manufacturing_release": False,
     }
 

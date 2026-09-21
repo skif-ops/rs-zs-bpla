@@ -1,0 +1,57 @@
+{
+  "schema_version": "dioneya.pcb-pwr-buck-placement-eco-001-application.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-BUCK-PLACEMENT-ECO-001",
+  "approval": "hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPROVAL_REV_A.json",
+  "application_date": "2026-09-21",
+  "reviewed_proposal_commit_sha": "38d629c2e7f9a9956a93c8b9666b17e69905eeb6",
+  "approval_commit_sha": "82dbcf2a0318d79c73ad4c59e1f58158b453605f",
+  "approval_sha256": "03a3c499b785ffdbe331f5bb442aecde31411bb6b3e65c88e0eaf2e0a62c8c7e",
+  "reviewed_candidate_board_sha256": "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37",
+  "decision": "ACCEPT_PCB_PWR_BUCK_PLACEMENT_ECO_001_SUBGATE",
+  "scope": "EXACT_C4_C6_L1_L2_PLACEMENT_DELTA_ONLY",
+  "predecessor": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb",
+    "board_sha256": "fdd53e669a167df8925c38e289993c38b818c231eddd0be54de378b51538bf48",
+    "trace_items": 0,
+    "copper_zones": 0
+  },
+  "application_generator": {
+    "path": "tools/generate_pcb_pwr_buck_placement_eco_001_application_rev_a.py",
+    "sha256": "8ed0ebf6cf3aed26c7f6ef9d7746424defcb467674ce69e353c3b8f2c39f3752"
+  },
+  "applied": {
+    "board": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
+    "board_sha256": "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37",
+    "board_semantic_sha256": "5994f22cdce03bc60779fcf120177bb82f6ecb88b2afdbe9bf4c0c2819af7337",
+    "exact_candidate_byte_identity": true,
+    "changed_references": ["C4", "C6", "L1", "L2"],
+    "poses": {
+      "C4": [54.575, 16.4, 180.0],
+      "C6": [54.575, 44.4, 180.0],
+      "L1": [60.75, 14.0, 180.0],
+      "L2": [60.75, 42.0, 180.0]
+    },
+    "trace_items": 0,
+    "copper_zones": 0,
+    "copper_changed": false,
+    "placement_manifest": "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
+    "placement_manifest_sha256": "257fee5898b5d44970115220a485d40b01c4fefad14b5c3b1a4ffb43b7b5b2d6"
+  },
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+    "proposal_ci_run_id": 35586152428,
+    "proposal_pcb_native_run_id": 35586152390,
+    "proposal_artifact_id": 10632656386,
+    "proposal_artifact_digest": "sha256:c111a2146c6c07afb53686ea75c172dd8b7f445d2bed87ea3963fbf42e38d512"
+  },
+  "warning_disposition": {
+    "lib_footprint_mismatch_C4_C6": "OPEN_WARNING_ONLY_MUST_CLOSE_BEFORE_REVIEW_B_OR_CAM",
+    "silk_overlap_L2_R10": "OPEN_WARNING_ONLY_MUST_CLOSE_BEFORE_REVIEW_B_OR_CAM"
+  },
+  "status": "APPLIED_EXACT_ACCEPTED_C4_C6_L1_L2_PLACEMENT_PENDING_COMMIT_BOUND_KICAD9_GATE",
+  "routing_complete": false,
+  "final_fabricator_stackup_accepted": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}

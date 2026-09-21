@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A Review B checklist
 
-Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / REVIEW B OPEN / FITTED + EVT MOUNTING CLEARANCE, PRE-ROUTE CONSTRAINT AND DIM-003 ACCEPTANCE PASS / STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
+Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / C4 C6 L1 L2 PLACEMENT ECO APPLIED WITH APPLICATION GATE AND WARNING CLOSURE PENDING / REVIEW B OPEN / FITTED + EVT MOUNTING CLEARANCE, PRE-ROUTE CONSTRAINT AND DIM-003 ACCEPTANCE PASS / STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
 
 Review B is independent from the completed pin/net Review A. The active C20/C21
 hierarchy subgate is signed, but this checklist contains no routing, CAM or
@@ -62,6 +62,10 @@ manufacturing-release assertion.
   native schematic or any physical-release state.
 - Fitted-body 2D clearance: `PASS`; 44/44 fitted footprints have courtyards,
   minimum required/observed separation is 0.20/0.22 mm and conflicts are zero.
+- Dual-buck placement ECO-001: exact accepted candidate `9e67236d...` is
+  applied byte-for-byte and moves only C4, C6, L1 and L2 with no copper. The
+  fresh application gate is pending; C4/C6 library mismatches and the L2/R10
+  silkscreen overlap remain warning-only blockers before Review B/CAM.
 - Mechanical authority: `DIM-003 18/18 EVT ACCEPTED`; the outline, round H1-H4
   pattern, terminal zones, tool access, fixture datum and conservative assembled
   STEP envelope are frozen for EVT. Serial revalidation remains mandatory.
@@ -93,6 +97,10 @@ manufacturing-release assertion.
 - [x] All 44 fitted assembly courtyards pass the bounded 0.20 mm 2D clearance
   subgate; H1-H4 D10 fitted-body and D8 existing-pad checks also pass with zero
   conflicts and `0.53 mm` minimum fitted-body margin.
+- [ ] The exact accepted C4/C6/L1/L2 placement application passes fresh
+  commit-bound CI and PCB Native comparative DRC with unchanged connectivity.
+- [ ] The two C4/C6 `lib_footprint_mismatch` warnings and the L2/R10
+  `silk_overlap` warning are closed before Review B or CAM.
 - [x] Four-layer count is frozen for Rev.A and agrees with the native board.
 - [x] All 31 native/capture nets have one explicit route class, return domain,
   topology, current basis and source authority.
@@ -189,6 +197,8 @@ human hierarchy acceptance pass. Fitted-body and H1-H4 mounting clearance,
 constraint coverage and `DIM-003` EVT acceptance remain valid. The mechanical
 register is `18/18`; the bounded 35 µm numeric EVT routing input passes, while
 the stackup register remains `0/24` with `0/2` accepted fabricator sets.
-Selected construction, final copper/plating and via-current geometry, routing,
+The exact C4/C6/L1/L2 placement is applied, but its fresh application gate and
+three warning closures remain open. Selected construction, final copper/plating
+and via-current geometry, routing,
 physical evidence, DRC, CAM, DFM, final serial mechanics and independent Review B are open.
 Production outputs remain prohibited.

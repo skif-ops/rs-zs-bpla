@@ -19,7 +19,9 @@ transition requires a repeat mechanical/STEP review.
   an east-side harness exit;
 - the 3V8 and 3V3 buck channels occupy separate upper and lower functional regions;
 - the two LMR60440 input/bootstrap/inductor/output groups are kept close enough for
-  power-loop review, but no copper geometry is inferred from placement alone;
+  power-loop review; accepted ECO-001 places C4/C6 at `(54.575,16.40/44.40)`
+  with 180° rotation and L1/L2 at `(60.75,14.00/42.00)` with 180° rotation,
+  but no copper geometry is inferred from placement alone;
 - the INA226 and shunt occupy one Kelvin-review region;
 - TP1-TP10 form a top-side `2.54 mm` pitch review row using the controlled no-paste
   `1.70 mm` target. Final side, fixture datum and probe access remain open;
@@ -29,6 +31,11 @@ transition requires a repeat mechanical/STEP review.
 - all 44 simultaneously fitted assembly bodies have controlled courtyards and
   pass the independent `0.20 mm` 2D clearance subgate; the minimum observed
   fitted-courtyard clearance is `0.22 mm`.
+
+The exact accepted ECO-001 board is applied byte-for-byte with SHA-256
+`9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37`.
+Its fresh commit-bound application gate is pending. Two C4/C6 footprint-library
+warnings and one L2/R10 silkscreen warning remain open and block Review B/CAM.
 
 ## Local input-capacitor placement evidence
 

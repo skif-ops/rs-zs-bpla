@@ -41,6 +41,25 @@ controlled `0.20 mm` planning minimum and was included in the same repack.
 No other placement coordinate or rotation changes. The native layout audit now
 binds all 62 references to the placement CSV and exact schematic pin/net set.
 
+## Accepted dual-buck placement ECO-001
+
+The exact accepted candidate SHA-256
+`9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37`
+is now applied byte-for-byte to the authoritative PCB-PWR board. It changes only
+these poses and adds no tracks, vias or zones:
+
+| RefDes | Previous X/Y/rotation | Applied X/Y/rotation | Controlled result |
+|---|---:|---:|---|
+| `C4` | `53.00 / 10.00 / 0°` | `54.575 / 16.40 / 180°` | U3 BOOT-to-CBOOT distance reduced by `77.362%`. |
+| `C6` | `53.00 / 38.00 / 0°` | `54.575 / 44.40 / 180°` | U4 BOOT-to-CBOOT distance reduced by `77.362%`. |
+| `L1` | `62.00 / 14.00 / 0°` | `60.75 / 14.00 / 180°` | U3 SW-to-inductor distance reduced by `56.630%`. |
+| `L2` | `62.00 / 42.00 / 0°` | `60.75 / 42.00 / 180°` | U4 SW-to-inductor distance reduced by `56.630%`. |
+
+The application retains all `44/44` fitted courtyards and the board-wide
+`0.22 mm` minimum. Its fresh commit-bound CI/PCB Native gate is pending. The
+two C4/C6 `lib_footprint_mismatch` warnings and the L2/R10 `silk_overlap`
+warning remain explicit blockers that must be closed before Review B or CAM.
+
 ## Independent result and boundary
 
 `tools/audit_pcb_pwr_placement_clearance_rev_a.py --strict` verifies:

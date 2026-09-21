@@ -1106,7 +1106,7 @@
 	(footprint "Capacitor_SMD:C_0402_1005Metric"
 		(layer "F.Cu")
 		(uuid "13bb7723-9626-432d-a033-4a468ca183b5")
-		(at 53 10)
+		(at 54.575 16.4 180)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C4"
@@ -1453,7 +1453,7 @@
 	(footprint "Capacitor_SMD:C_0402_1005Metric"
 		(layer "F.Cu")
 		(uuid "295360c4-fe8a-42a3-846a-bac95ca509c2")
-		(at 53 38)
+		(at 54.575 44.4 180)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C6"
@@ -4792,7 +4792,7 @@
 	(footprint "DioneyaPWR:Coilcraft_XAL7030_472"
 		(layer "F.Cu")
 		(uuid "9dfb95c2-e64e-4d3e-a05d-d46c0f740220")
-		(at 62 42)
+		(at 60.75 42 180)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "L2"
@@ -8308,7 +8308,7 @@
 	(footprint "DioneyaPWR:Coilcraft_XAL7030_472"
 		(layer "F.Cu")
 		(uuid "e721b151-6673-4d74-872b-8c9bd0080d80")
-		(at 62 14)
+		(at 60.75 14 180)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "L1"

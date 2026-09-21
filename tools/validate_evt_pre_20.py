@@ -377,13 +377,15 @@ def validate_deliverable_register() -> None:
         "PCB-PWR numeric EVT routing-basis deliverable is missing or over-released",
     )
     require(
-        deliverables["HW-P-007"]["Статус"] == "CONTROLLED_STATIC_PROPOSAL"
+        deliverables["HW-P-007"]["Статус"] == "CONTROLLED_APPLICATION_PENDING_GATE"
         and deliverables["HW-P-007"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-P-007"]["QG-2 техника"] == "OPEN"
         and "moves only C4 C6 L1 L2"
         in deliverables["HW-P-007"]["Критерий выпуска"]
         and "adds zero copper" in deliverables["HW-P-007"]["Критерий выпуска"]
-        and "commit-bound comparative KiCad 9 gate"
+        and "fresh commit-bound application gate"
+        in deliverables["HW-P-007"]["Критерий выпуска"]
+        and "warning closure"
         in deliverables["HW-P-007"]["Критерий выпуска"]
         and "manufacture remain open"
         in deliverables["HW-P-007"]["Критерий выпуска"],
@@ -445,6 +447,8 @@ def validate_deliverable_register() -> None:
         "hash-bound C4 C6 L1 L2 ECO" in risks["R-034"]["Mitigation"]
         and "comparative KiCad 9 DRC" in risks["R-034"]["Mitigation"]
         and "exact human acceptance" in risks["R-034"]["Mitigation"]
+        and "fresh application gate" in risks["R-034"]["Mitigation"]
+        and "library warnings" in risks["R-034"]["Mitigation"]
         and "switch or bootstrap copper added"
         in risks["R-034"]["Trigger"]
         and "any unrelated footprint moved" in risks["R-034"]["Trigger"],

@@ -201,6 +201,14 @@ four accepted H1-H4 mounting exclusions also have zero fitted-body/pad conflicts
 and 0.53 mm minimum fitted-body margin. DNP service review, exact serial enclosure
 fit, routing, DRC, CAM, DFM and Review B remain open.
 
+The exact accepted PCB-PWR dual-buck placement ECO-001 is applied byte-for-byte:
+only C4, C6, L1 and L2 move, the board remains unrouted, all 44 fitted
+courtyards still pass and the minimum clearance remains 0.22 mm. A fresh
+commit-bound CI/PCB Native application gate is pending. The two C4/C6
+footprint-library warnings and the L2/R10 silkscreen warning remain blockers
+before Review B or CAM; this placement subgate is not a routing or manufacturing
+release.
+
 The PCB-PWR `DIM-003` mechanical authority is machine-audited and accepted
 `18/18` for the EVT test batch. It binds the 90 x 60 x 1.6 mm basis, four round
 NPTH M3 holes, J1/J2 mating and cable volumes, DFT fixture/probe access,

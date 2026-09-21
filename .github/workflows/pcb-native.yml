@@ -142,6 +142,8 @@ on:
       - "tools/audit_pcb_main_mech_eco_002_rev_a.py"
       - "tools/generate_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py"
       - "tools/audit_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_buck_placement_eco_001_application_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_placement_eco_001_application_rev_a.py"
       - "tools/audit_pcb_main_native_schematic_rev_a.py"
       - "tools/audit_pcb_layer_count_authority_rev_a.py"
       - "tools/audit_harness_manufacturing_rev_a.py"
@@ -1306,6 +1308,10 @@ jobs:
             --check
           python tools/audit_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/buck_placement_eco_001_static_audit.json
+          python tools/generate_pcb_pwr_buck_placement_eco_001_application_rev_a.py \
+            --check
+          python tools/audit_pcb_pwr_buck_placement_eco_001_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_placement_eco_001_application_audit.json
           python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/routing_authority_audit.json
@@ -1397,6 +1403,11 @@ jobs:
             --drc-base "$evidence/baseline_drc.json" \
             --drc-candidate "$evidence/candidate_drc.json" \
             --output "$evidence/comparative_audit.json"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_buck_placement_eco_001_application_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-active "$evidence/candidate_drc.json" \
+            --output "$evidence/application_audit.json"
       - name: Materialize native PCB-MIC board and schematic
         shell: bash
         run: |
@@ -1526,6 +1537,10 @@ jobs:
             hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md
             hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.json
             hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPROVAL_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPLICATION_REV_A.json
             hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb
             hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md

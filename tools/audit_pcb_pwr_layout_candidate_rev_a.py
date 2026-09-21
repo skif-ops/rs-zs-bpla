@@ -200,10 +200,10 @@ def main() -> int:
             "input/harness edge-anchor intent drift")
     require((float(by_ref["U3"]["X_mm"]), float(by_ref["U3"]["Y_mm"]),
              float(by_ref["L1"]["X_mm"]), float(by_ref["L1"]["Y_mm"])) ==
-            (55.0, 14.0, 62.0, 14.0), "3V8 power-stage anchor drift")
+            (55.0, 14.0, 60.75, 14.0), "3V8 power-stage anchor drift")
     require((float(by_ref["U4"]["X_mm"]), float(by_ref["U4"]["Y_mm"]),
              float(by_ref["L2"]["X_mm"]), float(by_ref["L2"]["Y_mm"])) ==
-            (55.0, 42.0, 62.0, 42.0), "3V3 power-stage anchor drift")
+            (55.0, 42.0, 60.75, 42.0), "3V3 power-stage anchor drift")
     for index in range(1, 11):
         row = by_ref[f"TP{index}"]
         close(float(row["X_mm"]), 25.0 + (index - 1) * 2.54, f"TP{index} pitch")

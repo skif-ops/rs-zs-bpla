@@ -32,10 +32,25 @@ GENERATOR = (
 REVIEW = (
     ROOT / "hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.json"
 )
+APPROVAL = (
+    ROOT / "hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPROVAL_REV_A.json"
+)
+MAPPING = (
+    ROOT / "hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_REVIEW_COMMIT_MAPPING.json"
+)
+APPLICATION = (
+    ROOT / "hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPLICATION_REV_A.json"
+)
 
 BASE_SHA256 = "fdd53e669a167df8925c38e289993c38b818c231eddd0be54de378b51538bf48"
 CANDIDATE_SHA256 = "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37"
-GENERATOR_SHA256 = "5dcf33e2a13cc09a30f86e6405178d044cd741064e31f03a89805b0d10a690a7"
+REVIEWED_GENERATOR_SHA256 = "5dcf33e2a13cc09a30f86e6405178d044cd741064e31f03a89805b0d10a690a7"
+HISTORICAL_REGENERATOR_SHA256 = "9d73d2563acd16b75778c6f05b39856549b5a6f8c11047356d2bb24115df8b5e"
+APPROVAL_SHA256 = "03a3c499b785ffdbe331f5bb442aecde31411bb6b3e65c88e0eaf2e0a62c8c7e"
+MAPPING_SHA256 = "26b4376b851d4dd5082bfd02182e243d7d0d9161a7b72c53a7112db9c21c2c85"
+REVIEWED_COMMIT = "38d629c2e7f9a9956a93c8b9666b17e69905eeb6"
+REVIEWED_TREE = "b935ed765133297099dee6af4799f598df832ab2"
+APPROVAL_COMMIT = "82dbcf2a0318d79c73ad4c59e1f58158b453605f"
 
 EXPECTED_POSES = {
     "C4": ((53.0, 10.0, 0.0), (54.575, 16.4, 180.0)),
@@ -310,10 +325,11 @@ def audit(
             "PCB-PWR buck placement base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256,
             "PCB-PWR buck placement candidate SHA-256 drift")
-    require(sha256(ACTIVE) == BASE_SHA256 and ACTIVE.read_bytes() == BASE.read_bytes(),
-            "authoritative PCB-PWR proposal base byte identity drift")
-    require(sha256(GENERATOR) == GENERATOR_SHA256,
-            "PCB-PWR buck placement generator SHA-256 drift")
+    require(sha256(ACTIVE) == CANDIDATE_SHA256 and
+            ACTIVE.read_bytes() == CANDIDATE.read_bytes(),
+            "authoritative PCB-PWR is not the exact accepted buck placement candidate")
+    require(sha256(GENERATOR) == HISTORICAL_REGENERATOR_SHA256,
+            "PCB-PWR buck placement historical regenerator SHA-256 drift")
 
     base = Board.from_file(str(BASE), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")
@@ -362,7 +378,7 @@ def audit(
         and review.get("base", {}).get("board_sha256") == BASE_SHA256
         and review.get("candidate", {}).get("board_sha256") == CANDIDATE_SHA256
         and review.get("candidate", {}).get("generator_sha256") ==
-        GENERATOR_SHA256
+        REVIEWED_GENERATOR_SHA256
         and review.get("decision_boundary", {}).get("proposal_only") is True
         and review.get("decision_boundary", {}).get(
             "applied_to_authoritative_board"
@@ -404,16 +420,67 @@ def audit(
         "PCB-PWR buck placement proposal static-result drift",
     )
 
+    require(sha256(APPROVAL) == APPROVAL_SHA256,
+            "PCB-PWR buck placement approval SHA-256 drift")
+    require(sha256(MAPPING) == MAPPING_SHA256,
+            "PCB-PWR buck placement review mapping SHA-256 drift")
+    approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
+    mapping = json.loads(MAPPING.read_text(encoding="utf-8"))
+    application = json.loads(APPLICATION.read_text(encoding="utf-8"))
+    authorization = approval.get("authorization", {})
+    require(
+        approval.get("reviewed_github_commit_sha") == REVIEWED_COMMIT
+        and approval.get("reviewed_tree_sha") == REVIEWED_TREE
+        and approval.get("decision") ==
+        "ACCEPT_PCB_PWR_BUCK_PLACEMENT_ECO_001_SUBGATE"
+        and approval.get("reviewed_candidate_board_sha256") == CANDIDATE_SHA256
+        and authorization.get(
+            "apply_exact_hash_bound_c4_c6_l1_l2_placement_delta"
+        ) is True
+        and authorization.get("routing_complete") is False
+        and authorization.get("cam_or_manufacturing_release") is False,
+        "PCB-PWR buck placement approval identity or boundary drift",
+    )
+    require(
+        mapping.get("reviewed_github_commit_sha") == REVIEWED_COMMIT
+        and mapping.get("reviewed_tree_sha") == REVIEWED_TREE
+        and mapping.get("candidate_board_sha256") == CANDIDATE_SHA256
+        and mapping.get("generator_sha256") == REVIEWED_GENERATOR_SHA256
+        and mapping.get("equivalence") == "EXACT_REVIEWED_TREE_AND_BLOBS"
+        and mapping.get("cam_or_manufacturing_release") is False,
+        "PCB-PWR buck placement review mapping drift",
+    )
+    require(
+        application.get("approval_commit_sha") == APPROVAL_COMMIT
+        and application.get("approval_sha256") == APPROVAL_SHA256
+        and application.get("decision") ==
+        "ACCEPT_PCB_PWR_BUCK_PLACEMENT_ECO_001_SUBGATE"
+        and application.get("applied", {}).get("board_sha256") ==
+        CANDIDATE_SHA256
+        and application.get("applied", {}).get("exact_candidate_byte_identity")
+        is True
+        and application.get("machine_gate", {}).get("status") in {
+            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+        }
+        and application.get("routing_complete") is False
+        and application.get("review_b_complete") is False
+        and application.get("cam_or_manufacturing_release") is False,
+        "PCB-PWR buck placement application identity or boundary drift",
+    )
+
     report: dict[str, object] = {
-        "status": "PASS_STATIC_PROPOSAL_MACHINE_GATE_PENDING",
+        "status": "PASS_STATIC_ACCEPTED_AND_APPLIED",
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
-        "generator_sha256": GENERATOR_SHA256,
+        "reviewed_generator_sha256": REVIEWED_GENERATOR_SHA256,
+        "historical_regenerator_sha256": HISTORICAL_REGENERATOR_SHA256,
         "moved_footprints": sorted(changed),
         "placement_clearance": clearance,
         "topology_metrics": topology,
         "routed_copper_added": False,
-        "authoritative_board_modified": False,
+        "historical_proposal_authoritative_board_modified": False,
+        "active_successor_sha256": CANDIDATE_SHA256,
         "review_b_complete": False,
         "manufacturing_release": False,
     }
