@@ -51,6 +51,7 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
     application = json.loads(APPLICATION.read_text(encoding="utf-8"))
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     route = status["native_layout"]["vbat_raw_routing_003"]
+    gate = application["machine_gate"]
     require(
         approval["decision"] == "ACCEPT_PCB_PWR_VBAT_RAW_ROUTING_003_SUBGATE"
         and application["decision"] == approval["decision"]
@@ -73,6 +74,48 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and route["manufacturing_release"] is False,
         "VBAT_RAW application boundary drift",
     )
+    if gate["status"] == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE":
+        require(
+            gate["application_source_commit_sha"] ==
+            "514696e87540cac1c92012fc06711d74e5d2ed59"
+            and gate["application_source_tree_sha"] ==
+            "3c64a57fb8c95e89024021dd6d030433088d4785"
+            and gate["board_application_commit_sha"] ==
+            "514696e87540cac1c92012fc06711d74e5d2ed59"
+            and gate["ci_run_number"] == 621
+            and gate["ci_run_id"] == 35640984924
+            and gate["pcb_pwr_schematic_run_number"] == 89
+            and gate["pcb_pwr_schematic_run_id"] == 35640984910
+            and gate["pcb_native_run_number"] == 342
+            and gate["pcb_native_run_id"] == 35640984921
+            and gate["artifact_id"] == 10657859914
+            and gate["artifact_digest"] ==
+            "sha256:9992df866d70396d758c838897ae315aff312ff6c6263bf37da4560f8c3cfbc1"
+            and gate["required_violations"] == [86, 86]
+            and gate["required_unconnected"] == [123, 122]
+            and gate["required_drc_fingerprint_delta"] == 0
+            and gate["comparative_drc"] ==
+            "PASS_86_TO_86_VIOLATIONS_123_TO_122_UNCONNECTED_ZERO_FINGERPRINT_DELTA"
+            and route["status"] ==
+            "APPROVED_APPLIED_EXACT_VBAT_RAW_ROUTING_COMMIT_BOUND_KICAD9_GATE_PASS"
+            and route["application_machine_gate"] ==
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+            and route["application_source_commit_sha"] ==
+            gate["application_source_commit_sha"]
+            and route["application_source_tree_sha"] ==
+            gate["application_source_tree_sha"]
+            and route["application_board_commit_sha"] ==
+            gate["board_application_commit_sha"]
+            and route["application_ci_run_number"] == gate["ci_run_number"]
+            and route["application_pcb_pwr_schematic_run_number"] ==
+            gate["pcb_pwr_schematic_run_number"]
+            and route["application_pcb_native_run_number"] ==
+            gate["pcb_native_run_number"]
+            and route["application_artifact_id"] == gate["artifact_id"]
+            and route["application_artifact_digest"] == gate["artifact_digest"]
+            and route["application_comparative_drc"] == gate["comparative_drc"],
+            "VBAT_RAW commit-bound application evidence drift",
+        )
     report: dict[str, object] = {
         "status": "PASS_EXACT_ACCEPTED_PCB_PWR_VBAT_RAW_ROUTING_003_APPLICATION",
         "board_sha256": BOARD_SHA256,

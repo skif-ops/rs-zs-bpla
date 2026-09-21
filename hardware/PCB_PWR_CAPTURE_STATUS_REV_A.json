@@ -504,7 +504,7 @@
       "record": "hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.md",
       "generator": "tools/generate_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py",
       "audit": "tools/audit_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py",
-      "status": "APPROVED_APPLIED_EXACT_VBAT_RAW_ROUTING_APPLICATION_GATE_PENDING",
+      "status": "APPROVED_APPLIED_EXACT_VBAT_RAW_ROUTING_COMMIT_BOUND_KICAD9_GATE_PASS",
       "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_003_CREATION_SUBGATE",
       "base_board_sha256": "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5",
       "candidate_board_sha256": "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3",
@@ -539,7 +539,16 @@
       "application_audit": "tools/audit_pcb_pwr_vbat_raw_routing_003_application_rev_a.py",
       "active_board_sha256": "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3",
       "active_board_semantic_sha256": "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d",
-      "application_machine_gate": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+      "application_machine_gate": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+      "application_source_commit_sha": "514696e87540cac1c92012fc06711d74e5d2ed59",
+      "application_source_tree_sha": "3c64a57fb8c95e89024021dd6d030433088d4785",
+      "application_board_commit_sha": "514696e87540cac1c92012fc06711d74e5d2ed59",
+      "application_ci_run_number": 621,
+      "application_pcb_pwr_schematic_run_number": 89,
+      "application_pcb_native_run_number": 342,
+      "application_artifact_id": 10657859914,
+      "application_artifact_digest": "sha256:9992df866d70396d758c838897ae315aff312ff6c6263bf37da4560f8c3cfbc1",
+      "application_comparative_drc": "PASS_86_TO_86_VIOLATIONS_123_TO_122_UNCONNECTED_ZERO_FINGERPRINT_DELTA"
     }
   },
   "mechanical_freeze_input": {
