@@ -27,12 +27,27 @@ Host results (test_fft_mixed):
 - memory for the global spectrum: work (128 KB) + mag/packed input (128 KB) = 256 KB, host 320 KB.
   An in-place iterative variant (128 KB total) is a follow-up.
 
+## Step 2 (done): `zs_dsp_mcu` - the 43 features on the MCU
+
+Same definitions, band limits, thresholds and ordering as zs_dsp.c; float32 only (chunked
+accumulation, int64 for the DC sum); YIN 8192 and STFT 2048 through zs_fft_mixed_complex
+(inverse via conj/FFT/1/N); MFCC DCT and STFT window as tables built once; peaks as uint16 list
++ byte state overlaid on the tail of the magnitude buffer, mel matrix overlaid there after the
+harmonics; median scratch in the FFT work buffer. Static scratch 278 KB (work 128 + mag 128 +
+tables/small arrays).
+
+Host A/B test (test_dsp_mcu, 16 synthetic windows x 43 features vs zs_dsp): median normalized
+error 0.0000, p95 0.0000, max 3e-4 (fundamental_variation) - the two implementations agree far
+inside the golden acceptance. Host time per window 26 ms vs 28 ms (x86 hides the trig cost that
+dominates on the M33).
+
+Target: linked into the B1 app behind the console command `dsp` (last 1 s of channel 0, DWT
+cycle count). Image: 68 KB flash, 708 KB RAM (90 % of SRAM1-3: audio ring 256 KB, DSP 278 KB,
+1 s mono copy 64 KB, heap 64 KB, DMA 10 KB). RAM relief for later: feed the extractor from the
+ring without the 64 KB copy, in-place FFT (-128 KB), prehistory to NOR (B3).
+
 ## Remaining steps
 
-2. `zs_dsp_mcu.c`: same 43 features on top of zs_fft_mixed, all accumulations in float or int64,
-   peak search without the int[16001] array (bit-set state + streaming peak list, ~4 KB),
-   STFT 2048/512 and YIN 8192 through zs_fft_mixed_complex (8192 = 2^13, radix 4/2),
-   scratch overlay: mag (64 KB) persists while YIN/STFT reuse the second 64 KB of `work`.
 3. Golden check: `zs_eval_golden` run on the 100 windows (PCM inputs are outside the repository:
    the customer audio must be present locally) with the acceptance thresholds above; a host
    A/B test zs_dsp vs zs_dsp_mcu on synthetic signals is added to ctest as a proxy.

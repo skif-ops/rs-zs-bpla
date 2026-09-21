@@ -35,10 +35,10 @@ extern uint32_t SystemCoreClock;
 #define configSTACK_DEPTH_TYPE                    uint16_t
 #define configMESSAGE_BUFFER_LENGTH_TYPE          size_t
 
-/* Memory: static heap_4 of 96 KB out of the 768 KB SRAM1-3 block. */
+/* Memory: static heap_4 of 64 KB (task stacks/queues); the audio ring, DMA buffers and the DSP scratch are static. */
 #define configSUPPORT_STATIC_ALLOCATION           1
 #define configSUPPORT_DYNAMIC_ALLOCATION          1
-#define configTOTAL_HEAP_SIZE                     ((size_t)(96 * 1024))
+#define configTOTAL_HEAP_SIZE                     ((size_t)(64 * 1024))
 #define configAPPLICATION_ALLOCATED_HEAP          0
 
 /* Hooks and diagnostics. */
@@ -68,7 +68,7 @@ extern uint32_t SystemCoreClock;
 #define configASSERT(x) do { if ((x) == 0) { taskDISABLE_INTERRUPTS(); for (;;) {} } } while (0)
 
 #define INCLUDE_vTaskPrioritySet                  1
-#define INCLUDE_uxTaskPriorityGet                  1
+#define INCLUDE_uxTaskPriorityGet                 1
 #define INCLUDE_vTaskDelete                       1
 #define INCLUDE_vTaskSuspend                      1
 #define INCLUDE_xTaskDelayUntil                   1
