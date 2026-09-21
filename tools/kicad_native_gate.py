@@ -103,12 +103,12 @@ def placement_candidate_audit(name: str) -> str | None:
         )
         expected = (
             "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_"
-            "FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_"
-            "ROUTING_PENDING"
+            "EVT_MECHANICS_AND_FITTED_2D_CLEARANCE_PRE_ROUTE_"
+            "STACKUP_REQUEST_READY_ROUTING_PENDING"
             if evidence_complete else
             "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_AND_HUMAN_REVIEW_PENDING_"
-            "FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_REQUESTS_READY_"
-            "ROUTING_PENDING"
+            "EVT_MECHANICS_AND_FITTED_2D_CLEARANCE_PRE_ROUTE_"
+            "STACKUP_REQUEST_READY_ROUTING_PENDING"
         )
         if status.get("review_b", {}).get("status") != expected:
             return None
