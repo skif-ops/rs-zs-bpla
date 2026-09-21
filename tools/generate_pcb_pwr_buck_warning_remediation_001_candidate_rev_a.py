@@ -3,9 +3,10 @@
 
 The proposal starts from the accepted and applied buck-placement ECO-001 board.
 It canonicalizes only the rotated C4/C6 instance data that KiCad 9 compares
-against the system footprint library and moves only the visible R10 reference
-field away from the L2 pin-1 silkscreen marker. Component poses, copper geometry,
-nets, outline, tracks, vias, and zones are unchanged.
+against the system footprint library, retains the original physical C4/C6
+reference centres, and moves only the visible R10 reference field away from the
+L2 pin-1 silkscreen marker and solder-mask openings. Component poses, copper
+geometry, nets, outline, tracks, vias, and zones are unchanged.
 """
 
 from __future__ import annotations
@@ -30,7 +31,7 @@ DEFAULT_OUTPUT = (
 SOURCE = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 
 BASE_SHA256 = "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37"
-CANDIDATE_SHA256 = "9800e4cca2892c759db5a49b52fc3cbc527b4ecd756786ed999e9eca0d1ca0ad"
+CANDIDATE_SHA256 = "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
 
 
 def require(value: bool, message: str) -> None:
@@ -74,7 +75,7 @@ def normalize_rotated_capacitor(source: str, reference: str) -> str:
     block = replace_count(
         block,
         "\t\t\t(at 0 -1.4 0)",
-        "\t\t\t(at 0 1.4 180)",
+        "\t\t\t(at 0 -1.4 180)",
         1,
         reference,
     )

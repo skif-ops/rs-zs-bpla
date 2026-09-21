@@ -40,10 +40,10 @@ REVIEW = (
 )
 
 BASE_SHA256 = "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37"
-CANDIDATE_SHA256 = "9800e4cca2892c759db5a49b52fc3cbc527b4ecd756786ed999e9eca0d1ca0ad"
+CANDIDATE_SHA256 = "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
 BASE_SEMANTIC_SHA256 = "5994f22cdce03bc60779fcf120177bb82f6ecb88b2afdbe9bf4c0c2819af7337"
 CANDIDATE_SEMANTIC_SHA256 = "b94eb0e53a714a2259e7362df7b96d1333c885f48399102b7ac279fb368d3276"
-GENERATOR_SHA256 = "20b9c19b219692dbba3a712c18536dd989f5c3c09ce269eb33c3bbbb48c0d92a"
+GENERATOR_SHA256 = "30041af847360568ed8ab43f34e0cc194d61683da95bacba02eead15946d5eb1"
 TARGET_REFERENCES = {"C4", "C6", "R10"}
 EXPECTED_POSES = {
     "C4": (54.575, 16.4, 180.0),
@@ -115,7 +115,7 @@ def changed_line_pairs(first: str, second: str) -> Counter[tuple[str, str]]:
 
 def expected_c4_c6_pairs() -> Counter[tuple[str, str]]:
     return Counter({
-        ("\t\t\t(at 0 -1.4 0)", "\t\t\t(at 0 1.4 180)"): 1,
+        ("\t\t\t(at 0 -1.4 0)", "\t\t\t(at 0 -1.4 180)"): 1,
         ("\t\t\t(at 0 1.16 0)", "\t\t\t(at 0 1.16 180)"): 1,
         ("\t\t\t(at 0 0 0)", "\t\t\t(at 0 0 180)"): 3,
         ("\t\t\t(at -0.48 0)", "\t\t\t(at -0.48 0 180)"): 1,
@@ -171,6 +171,10 @@ def is_target_warning(violation: dict[str, Any]) -> bool:
                     "Reference field of R10",
                 }
             )
+            or (
+                violation.get("type") == "silk_over_copper"
+                and descriptions == {"Reference field of R10"}
+            )
         )
     )
 
@@ -184,10 +188,10 @@ def audit_drc(base_path: Path, candidate_path: Path) -> dict[str, object]:
     candidate_targets = [
         item for item in candidate_violations if is_target_warning(item)
     ]
-    require(len(base_targets) == 3,
-            f"expected three base warning targets; got {len(base_targets)}")
+    require(len(base_targets) == 4,
+            f"expected four base warning targets; got {len(base_targets)}")
     require(not candidate_targets,
-            "candidate retains a C4/C6 library or L2/R10 silk target warning")
+            "candidate retains a C4/C6 library, L2/R10 overlap, or R10 mask target warning")
 
     base_remaining = Counter(
         drc_fingerprint(item)
@@ -198,9 +202,9 @@ def audit_drc(base_path: Path, candidate_path: Path) -> dict[str, object]:
         drc_fingerprint(item) for item in candidate_violations
     )
     require(candidate_remaining == base_remaining,
-            "candidate changes DRC findings outside the three warning targets")
-    require(len(candidate_violations) == len(base_violations) - 3,
-            "candidate does not remove exactly three DRC warnings")
+            "candidate changes DRC findings outside the four warning targets")
+    require(len(candidate_violations) == len(base_violations) - 4,
+            "candidate does not remove exactly four DRC warnings")
     require(
         len(candidate_data.get("unconnected_items", [])) ==
         len(base_data.get("unconnected_items", [])),
@@ -219,12 +223,13 @@ def audit_drc(base_path: Path, candidate_path: Path) -> dict[str, object]:
         "warning-only remediation changes error inventory",
     )
     return {
-        "status": "PASS_EXACT_THREE_WARNING_CLOSURE_NO_OTHER_DRC_DELTA",
+        "status": "PASS_EXACT_FOUR_WARNING_CLOSURE_NO_OTHER_DRC_DELTA",
         "base_violations": len(base_violations),
         "candidate_violations": len(candidate_violations),
         "warnings_removed": {
             "lib_footprint_mismatch_C4_C6": 2,
             "silk_overlap_L2_R10": 1,
+            "silk_over_copper_R10": 1,
         },
         "base_unconnected": len(base_data.get("unconnected_items", [])),
         "candidate_unconnected": len(candidate_data.get("unconnected_items", [])),

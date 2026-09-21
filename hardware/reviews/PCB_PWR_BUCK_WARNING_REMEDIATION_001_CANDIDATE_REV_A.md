@@ -3,17 +3,18 @@
 Status: `STATIC PROPOSAL READY / COMMIT-BOUND KICAD 9 GATE PENDING / NOT APPLIED / NOT FOR MANUFACTURE`
 
 `PCB-PWR-BUCK-WARNING-REMEDIATION-001` is a separate, bounded follow-on to the
-accepted and applied C4/C6/L1/L2 placement ECO. It addresses only the three
-warning-only findings explicitly retained by that application. The authoritative
-PCB-PWR board remains byte-identical to SHA-256
+accepted and applied C4/C6/L1/L2 placement ECO. It addresses the three
+warning-only findings explicitly retained by that application and the
+pre-existing R10 silkscreen-to-mask warning affected by the same bounded text
+move. The authoritative PCB-PWR board remains byte-identical to SHA-256
 `9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37`.
 
 ## Exact delta
 
 | Object | Base | Candidate | Electrical or component-pose effect |
 |---|---|---|---|
-| `C4` | Rotated footprint retained pre-rotation child text/pad angles | Child text and pad angles serialized canonically at `180°`; visible reference retained above the part | None; footprint pose, pad centres, sizes, shapes, layers, nets and UUIDs are unchanged |
-| `C6` | Same representation issue as C4 | Same canonical KiCad 9 serialization as C4 | None; footprint pose, pad centres, sizes, shapes, layers, nets and UUIDs are unchanged |
+| `C4` | Rotated footprint retained pre-rotation child text/pad angles | Child text and pad angles serialized canonically at `180°`; reference centre remains at global `(54.575, 17.8) mm` | None; footprint pose, pad centres, sizes, shapes, layers, nets and UUIDs are unchanged |
+| `C6` | Same representation issue as C4 | Same canonical KiCad 9 serialization; reference centre remains at global `(54.575, 45.8) mm` | None; footprint pose, pad centres, sizes, shapes, layers, nets and UUIDs are unchanged |
 | `R10` reference | Local `(0, -1.4, 0)`, global `(58.0, 45.6) mm` | Local `(0, 1.4, 0)`, global `(58.0, 48.4) mm` | Presentation only; R10 remains at `(58.0, 47.0, 0°)` |
 
 All 66 footprint poses are unchanged. The accepted positions of C4, C6, L1 and
@@ -27,15 +28,24 @@ run `35589990634` (run number 310, artifact `10633864128`, digest
 `sha256:5fcdfc856f009d05b490bd124168b8ea42322c0b08c6211743cbc1208f35d526`).
 That evidence isolates the library mismatch to child orientation serialization
 left behind by the earlier text-only footprint rotation. R10's reference moves
-to the free side of the resistor, away from L2's pin-1 silkscreen marker.
+to the free side of the resistor, away from L2's pin-1 silkscreen marker and
+solder-mask openings.
+
+The first commit-bound Native attempt for this proposal, run `35593035062`
+(run number 312, rerun attempt 2, artifact `10635391911`, digest
+`sha256:5e134fd6653882c53127e0a445c6ee6df4290d0681583ceb2ba69882fd15aaf1`),
+provided a useful negative result. The initial candidate removed four base
+warnings—not three—but introduced two C4/C6 reference-to-mask warnings because
+their reference centres moved. This corrected candidate keeps the canonical
+child angles while restoring the original physical C4/C6 reference centres.
 
 ## Static result and identity
 
 - Base SHA-256: `9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37`
-- Candidate SHA-256: `9800e4cca2892c759db5a49b52fc3cbc527b4ecd756786ed999e9eca0d1ca0ad`
+- Candidate SHA-256: `b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957`
 - Base semantic SHA-256: `5994f22cdce03bc60779fcf120177bb82f6ecb88b2afdbe9bf4c0c2819af7337`
 - Candidate semantic SHA-256: `b94eb0e53a714a2259e7362df7b96d1333c885f48399102b7ac279fb368d3276`
-- Generator SHA-256: `20b9c19b219692dbba3a712c18536dd989f5c3c09ce269eb33c3bbbb48c0d92a`
+- Generator SHA-256: `30041af847360568ed8ab43f34e0cc194d61683da95bacba02eead15946d5eb1`
 - Generator: `tools/generate_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py`
 - Independent audit: `tools/audit_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py`
 
@@ -50,13 +60,15 @@ use KiCad 9 comparative DRC to prove all of the following:
 
 - the base has the known `90` violations and `126` unconnected items;
 - the candidate removes exactly the two C4/C6 `lib_footprint_mismatch`
-  warnings and the one L2/R10 `silk_overlap` warning;
+  warnings, the one L2/R10 `silk_overlap` warning, and the pre-existing R10
+  `silk_over_copper` warning;
+- the violation count changes from `90` to `86`;
 - every other DRC finding remains fingerprint-identical;
 - no new error or warning is introduced and the unconnected count stays `126`;
 - strict fitted and mounting clearance remains green.
 
 Even after a green machine gate, application requires the exact decision
 `ACCEPT_PCB_PWR_BUCK_WARNING_REMEDIATION_001_SUBGATE`. Acceptance would
-authorize only candidate SHA-256 `9800e4cca2892c759db5a49b52fc3cbc527b4ecd756786ed999e9eca0d1ca0ad`.
+authorize only candidate SHA-256 `b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957`.
 It would not authorize routing, Review B, CAM, fabrication, assembly or
 manufacturing release.

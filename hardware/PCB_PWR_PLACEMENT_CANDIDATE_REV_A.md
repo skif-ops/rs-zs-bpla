@@ -36,14 +36,17 @@ The exact accepted ECO-001 board is applied byte-for-byte with SHA-256
 `9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37`.
 Its fresh commit-bound application gate passes at source commit `878425d2` with
 zero new error classes and unchanged `126` unconnected items. Two C4/C6
-footprint-library warnings and one L2/R10 silkscreen warning remain open and
-block Review B/CAM.
+footprint-library warnings, one L2/R10 silkscreen overlap and the pre-existing
+R10 silkscreen-to-mask warning remain open and block Review B/CAM.
 
 `PCB-PWR-BUCK-WARNING-REMEDIATION-001` now contains an isolated follow-on
 candidate that preserves every component pose and all pad copper geometry,
 normalizes only C4/C6 rotated child serialization and moves only the R10 visible
 reference. It is not applied: commit-bound KiCad 9 comparative DRC and exact
-human subgate acceptance remain mandatory before these warnings may be closed.
+human subgate acceptance remain mandatory before these four warnings may be
+closed. Native run 312 rejected the initial serialization because it introduced
+two replacement C4/C6 reference-to-mask warnings; the corrected candidate keeps
+their original physical reference centres.
 
 ## Local input-capacitor placement evidence
 

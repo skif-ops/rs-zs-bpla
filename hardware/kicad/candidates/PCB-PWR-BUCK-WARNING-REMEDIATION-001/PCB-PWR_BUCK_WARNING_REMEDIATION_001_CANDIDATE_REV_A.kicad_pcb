@@ -1110,7 +1110,7 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C4"
-			(at 0 1.4 180)
+			(at 0 -1.4 180)
 			(layer "F.SilkS")
 			(uuid "b91ff3bf-c408-4bc6-89c2-19bb311e13e6")
 			(effects
@@ -1457,7 +1457,7 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C6"
-			(at 0 1.4 180)
+			(at 0 -1.4 180)
 			(layer "F.SilkS")
 			(uuid "caa1618d-0419-4f0e-a958-49f370fe226b")
 			(effects
