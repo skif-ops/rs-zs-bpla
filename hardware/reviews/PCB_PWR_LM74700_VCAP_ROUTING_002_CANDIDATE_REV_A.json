@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "proposal_id": "PCB-PWR-LM74700-VCAP-ROUTING-002",
   "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_002_CREATION_SUBGATE",
-  "status": "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+  "status": "KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW",
   "scope": "ONLY_U1_1_TO_C1_1_LM74700_VCAP_CONNECTION",
   "selection_rationale": "LOW_RISK_LOCAL_ANALOG_TIMING_CONNECTION_BEFORE_SEPARATE_2P1MM_SWITCH_NODE_ROUTEABILITY_OR_PLACEMENT_GATE",
   "base": {
@@ -50,7 +50,8 @@
     "switch_node_or_power_routing_added": false
   },
   "machine_gate": {
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "mapping": "hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_REVIEW_COMMIT_MAPPING.json",
     "required_new_errors": 0,
     "required_unconnected_reduction": 1,
     "required_other_drc_fingerprint_delta": 0

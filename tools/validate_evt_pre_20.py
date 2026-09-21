@@ -316,6 +316,19 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR routing candidate 002 boundary is missing or over-released",
     )
     require(
+        decisions["DEC-117"]["Status"] ==
+        "PASS_COMMIT_BOUND_KICAD9_GATE_HUMAN_SUBGATE_PENDING"
+        and "186ad093" in decisions["DEC-117"]["Reason"]
+        and "86 to 86" in decisions["DEC-117"]["Reason"]
+        and "124 to 123" in decisions["DEC-117"]["Reason"]
+        and "ACCEPT_PCB_PWR_LM74700_VCAP_ROUTING_002_SUBGATE"
+        in decisions["DEC-117"]["Impact"]
+        and "authoritative PCB-PWR board unchanged" in decisions["DEC-117"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-117"]["Impact"],
+        "PCB-PWR routing candidate 002 machine-gate closure is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]

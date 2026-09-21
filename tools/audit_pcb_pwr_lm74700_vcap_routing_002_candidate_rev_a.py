@@ -108,7 +108,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         and review["deferred_boundary"]["narrow_substitution_authorized"] is False
         and review["invariants"]["authoritative_board_modified"] is False
         and review["machine_gate"]["status"] ==
-        "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"
+        "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"
         and review["routing_complete"] is False
         and review["review_b_complete"] is False
         and review["cam_or_manufacturing_release"] is False,
