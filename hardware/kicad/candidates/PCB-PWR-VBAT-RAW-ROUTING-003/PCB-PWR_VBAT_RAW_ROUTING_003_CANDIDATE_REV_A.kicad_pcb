@@ -8896,7 +8896,7 @@
 	)
 	(segment
 		(start 6 31)
-		(end 11.6 29)
+		(end 10.6 29)
 		(width 4)
 		(layer "F.Cu")
 		(net 30)

@@ -5,15 +5,17 @@ Creation is authorized by
 
 ## Exact bounded delta
 
-- Add one 4.0 mm `F.Cu` segment from `J1.1` to `F1.1` on `VBAT_RAW`.
-- Added length: 5.946428 mm.
+- Add one 4.0 mm `F.Cu` segment from `J1.1` into the `F1.1` pad copper on
+  `VBAT_RAW`; terminate 1.0 mm inside the pad from its left edge direction.
+- Added length: 5.015974 mm.
 - Add no vias or zones.
 - Preserve all three accepted predecessor segments and every other object.
 
 ## Engineering selection
 
 `VBAT_RAW` is a short two-pad 5 A input connection. The candidate uses the
-full 4.0 mm rule width and avoids a layer transition. Complex buck hot-loop,
+full 4.0 mm rule width, overlaps the destination pad copper, preserves the
+0.3 mm clearance to `F1.2`, and avoids a layer transition. Complex buck hot-loop,
 switch-node, Kelvin and return routing remains outside this candidate.
 
 ## Gates retained

@@ -5,7 +5,7 @@
   "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_003_CREATION_SUBGATE",
   "status": "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
   "scope": "ONLY_J1_1_TO_F1_1_VBAT_RAW_CONNECTION",
-  "selection_rationale": "SHORT_TWO_PAD_5A_INPUT_CONNECTION_AT_FULL_4P0MM_RULE_WIDTH_BEFORE_COMPLEX_BUCK_HOT_LOOP_ROUTING",
+  "selection_rationale": "SHORT_TWO_PAD_5A_INPUT_CONNECTION_AT_FULL_4P0MM_RULE_WIDTH_WITH_DESTINATION_PAD_OVERLAP_AND_F1_2_CLEARANCE_BEFORE_COMPLEX_BUCK_HOT_LOOP_ROUTING",
   "base": {
     "board": "hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_BASE_REV_A.kicad_pcb",
     "sha256": "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5",
@@ -15,7 +15,7 @@
   },
   "candidate": {
     "board": "hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb",
-    "sha256": "f24421e727595d754b7396fdc2941e5a7ac9265148d9ed80a8866c7852624591",
+    "sha256": "d5edb247d2201020bf89445945096930b9461c3c390987e0e816c9baf772ea80",
     "semantic_sha256": "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d",
     "trace_items": 4,
     "copper_zones": 0,
@@ -24,11 +24,14 @@
     "layer": "F.Cu",
     "width_mm": 4.0,
     "vias": 0,
-    "added_route_length_mm": 5.946428
+    "added_route_length_mm": 5.015974,
+    "segment_start_mm": [6.0, 31.0],
+    "segment_end_mm": [10.6, 29.0],
+    "destination_pad_center_mm": [11.6, 29.0]
   },
   "source_binding": {
     "generator": "tools/generate_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py",
-    "generator_sha256": "871ede881a241f8b78b76e1dc88426736a2afc27a5d8f361959e84513ac16b9b",
+    "generator_sha256": "8030103ceea6c750a7bdf23690b3aa6e32b5df12c8e8e5049ee593f30e211b82",
     "routing_rules": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
     "routing_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
     "evt_stackup_basis": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
