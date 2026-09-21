@@ -256,8 +256,13 @@ def audit(
                 f"missing PCB-PWR warning-remediation input: {path}")
     require(sha256(BASE) == BASE_SHA256,
             "PCB-PWR warning-remediation base SHA-256 drift")
-    require(sha256(ACTIVE) == BASE_SHA256 and ACTIVE.read_bytes() == BASE.read_bytes(),
-            "authoritative PCB-PWR changed while remediation remains a proposal")
+    active_sha256 = sha256(ACTIVE)
+    require(active_sha256 in {BASE_SHA256, CANDIDATE_SHA256},
+            "authoritative PCB-PWR is neither the controlled predecessor nor candidate")
+    expected_active = BASE if active_sha256 == BASE_SHA256 else CANDIDATE
+    require(ACTIVE.read_bytes() == expected_active.read_bytes(),
+            "authoritative PCB-PWR does not match its controlled byte identity")
+    applied = active_sha256 == CANDIDATE_SHA256
     require(sha256(CANDIDATE) == CANDIDATE_SHA256,
             "PCB-PWR warning-remediation candidate SHA-256 drift")
     require(sha256(GENERATOR) == GENERATOR_SHA256,
@@ -439,7 +444,11 @@ def audit(
     report: dict[str, object] = {
         "schema_version":
         "dioneya.pcb-pwr-buck-warning-remediation-001-candidate-audit.v1",
-        "status": "PASS_COMMIT_BOUND_KICAD9_WARNING_REMEDIATION_HUMAN_REVIEW_PENDING",
+        "status": (
+            "PASS_STATIC_ACCEPTED_AND_APPLIED"
+            if applied else
+            "PASS_COMMIT_BOUND_KICAD9_WARNING_REMEDIATION_HUMAN_REVIEW_PENDING"
+        ),
         "base_sha256": BASE_SHA256,
         "base_semantic_sha256": BASE_SEMANTIC_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
@@ -452,8 +461,8 @@ def audit(
         "trace_items": 0,
         "copper_zones": 0,
         "strict_placement_clearance": "PASS_MINIMUM_0P22_MM",
-        "authoritative_board_modified": False,
-        "human_subgate_pending": True,
+        "authoritative_board_modified": applied,
+        "human_subgate_pending": not applied,
         "routing_complete": False,
         "review_b_complete": False,
         "manufacturing_release": False,
@@ -463,6 +472,8 @@ def audit(
     if drc_base is not None and drc_candidate is not None:
         report["comparative_drc"] = audit_drc(drc_base, drc_candidate)
         report["status"] = (
+            "PASS_KICAD9_COMPARATIVE_ACCEPTED_AND_APPLIED"
+            if applied else
             "PASS_KICAD9_COMPARATIVE_WARNING_REMEDIATION_HUMAN_REVIEW_PENDING"
         )
     return report

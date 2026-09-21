@@ -26,6 +26,11 @@ CANDIDATE = (
     CANDIDATE_DIR / "PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb"
 )
 ACTIVE = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
+WARNING_REMEDIATION_CANDIDATE = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/"
+    "PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb"
+)
 GENERATOR = (
     ROOT / "tools/generate_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py"
 )
@@ -44,6 +49,9 @@ APPLICATION = (
 
 BASE_SHA256 = "fdd53e669a167df8925c38e289993c38b818c231eddd0be54de378b51538bf48"
 CANDIDATE_SHA256 = "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37"
+WARNING_REMEDIATION_CANDIDATE_SHA256 = (
+    "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
+)
 REVIEWED_GENERATOR_SHA256 = "5dcf33e2a13cc09a30f86e6405178d044cd741064e31f03a89805b0d10a690a7"
 HISTORICAL_REGENERATOR_SHA256 = "9d73d2563acd16b75778c6f05b39856549b5a6f8c11047356d2bb24115df8b5e"
 APPROVAL_SHA256 = "03a3c499b785ffdbe331f5bb442aecde31411bb6b3e65c88e0eaf2e0a62c8c7e"
@@ -325,14 +333,27 @@ def audit(
             "PCB-PWR buck placement base SHA-256 drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256,
             "PCB-PWR buck placement candidate SHA-256 drift")
-    require(sha256(ACTIVE) == CANDIDATE_SHA256 and
-            ACTIVE.read_bytes() == CANDIDATE.read_bytes(),
-            "authoritative PCB-PWR is not the exact accepted buck placement candidate")
+    active_sha256 = sha256(ACTIVE)
+    require(
+        active_sha256 in {
+            CANDIDATE_SHA256,
+            WARNING_REMEDIATION_CANDIDATE_SHA256,
+        },
+        "authoritative PCB-PWR is not an accepted buck-placement successor",
+    )
+    expected_active = (
+        CANDIDATE
+        if active_sha256 == CANDIDATE_SHA256
+        else WARNING_REMEDIATION_CANDIDATE
+    )
+    require(ACTIVE.read_bytes() == expected_active.read_bytes(),
+            "authoritative PCB-PWR accepted-successor byte identity drift")
     require(sha256(GENERATOR) == HISTORICAL_REGENERATOR_SHA256,
             "PCB-PWR buck placement historical regenerator SHA-256 drift")
 
     base = Board.from_file(str(BASE), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")
+    active = Board.from_file(str(ACTIVE), encoding="utf-8")
     base_footprints = {ref_of(item): item for item in base.footprints}
     candidate_footprints = {ref_of(item): item for item in candidate.footprints}
     require(base_footprints.keys() == candidate_footprints.keys(),
@@ -355,6 +376,19 @@ def audit(
         require(all(close(a, b) for a, b in zip(
                     pose_of(candidate_footprints[reference]), new)),
                 f"{reference}: candidate pose drift")
+    active_footprints = {ref_of(item): item for item in active.footprints}
+    require(active_footprints.keys() == candidate_footprints.keys(),
+            "active placement successor footprint set drift")
+    for reference in candidate_footprints:
+        require(
+            all(close(a, b) for a, b in zip(
+                pose_of(active_footprints[reference]),
+                pose_of(candidate_footprints[reference]),
+            )),
+            f"{reference}: active placement successor pose drift",
+        )
+    require(len(active.traceItems) == 0 and len(active.zones) == 0,
+            "active placement successor unexpectedly adds copper")
 
     for field in (
         "version", "generator", "general", "paper", "titleBlock", "layers",
@@ -480,7 +514,7 @@ def audit(
         "topology_metrics": topology,
         "routed_copper_added": False,
         "historical_proposal_authoritative_board_modified": False,
-        "active_successor_sha256": CANDIDATE_SHA256,
+        "active_successor_sha256": active_sha256,
         "review_b_complete": False,
         "manufacturing_release": False,
     }

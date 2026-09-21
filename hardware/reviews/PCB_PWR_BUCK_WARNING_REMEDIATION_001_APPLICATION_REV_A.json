@@ -1,0 +1,61 @@
+{
+  "schema_version": "dioneya.pcb-pwr-buck-warning-remediation-001-application.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-BUCK-WARNING-REMEDIATION-001",
+  "approval": "hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_APPROVAL_REV_A.json",
+  "application_date": "2026-09-21",
+  "reviewed_proposal_commit_sha": "63d87153e441d956117323ed8d9887568c5033ac",
+  "gate_evidence_commit_sha": "036787a5674242de94d6dd455acf8ec6bf741952",
+  "approval_commit_sha": "54083a35e0c6c33a34dd9ddc1cf2d4255409b7d7",
+  "approval_sha256": "386ece8201dae24da18db811845cf3501512192593c6e1bf31767fd3c71d5837",
+  "reviewed_candidate_board_sha256": "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957",
+  "decision": "ACCEPT_PCB_PWR_BUCK_WARNING_REMEDIATION_001_SUBGATE",
+  "scope": "EXACT_C4_C6_REPRESENTATION_NORMALIZATION_AND_R10_REFERENCE_MOVE_ONLY",
+  "predecessor": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb",
+    "board_sha256": "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37",
+    "board_semantic_sha256": "5994f22cdce03bc60779fcf120177bb82f6ecb88b2afdbe9bf4c0c2819af7337",
+    "trace_items": 0,
+    "copper_zones": 0
+  },
+  "application_generator": {
+    "path": "tools/generate_pcb_pwr_buck_warning_remediation_001_application_rev_a.py",
+    "sha256": "406b6d7ae50d5cc7603f11749a12a7d16870ab7ef116504661fbe71764cb50cd"
+  },
+  "applied": {
+    "board": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
+    "board_sha256": "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957",
+    "board_semantic_sha256": "b94eb0e53a714a2259e7362df7b96d1333c885f48399102b7ac279fb368d3276",
+    "exact_candidate_byte_identity": true,
+    "normalized_instances": ["C4", "C6"],
+    "moved_reference_fields": ["R10"],
+    "component_poses_changed": false,
+    "pad_centres_sizes_layers_nets_changed": false,
+    "copper_geometry_changed": false,
+    "trace_items": 0,
+    "copper_zones": 0
+  },
+  "authorized_warning_closure": {
+    "lib_footprint_mismatch_C4_C6": 2,
+    "silk_overlap_L2_R10": 1,
+    "silk_over_copper_R10": 1
+  },
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+    "required_application_audit": "PASS_EXACT_ACCEPTED_PCB_PWR_BUCK_WARNING_REMEDIATION_APPLICATION",
+    "required_comparative_drc": "PASS_EXACT_FOUR_WARNING_CLOSURE_NO_OTHER_DRC_DELTA",
+    "expected_base_violations": 90,
+    "expected_active_violations": 86,
+    "expected_base_unconnected": 126,
+    "expected_active_unconnected": 126,
+    "expected_new_errors": 0,
+    "expected_new_warnings": 0,
+    "all_other_drc_fingerprints_must_match": true,
+    "minimum_observed_clearance_mm": 0.22
+  },
+  "status": "APPLIED_EXACT_ACCEPTED_WARNING_REMEDIATION_PENDING_COMMIT_BOUND_KICAD9_GATE",
+  "routing_complete": false,
+  "final_fabricator_stackup_accepted": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}

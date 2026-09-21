@@ -1110,7 +1110,7 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C4"
-			(at 0 -1.4 0)
+			(at 0 -1.4 180)
 			(layer "F.SilkS")
 			(uuid "b91ff3bf-c408-4bc6-89c2-19bb311e13e6")
 			(effects
@@ -1121,7 +1121,7 @@
 			)
 		)
 		(property "Value" "100 nF 25 V X7R CGA2B3X7R1E104K050BB"
-			(at 0 1.16 0)
+			(at 0 1.16 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "be55c3bf-4ba4-4397-9341-31235883065b")
@@ -1133,7 +1133,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "c59c8d56-2951-4b86-9450-e73faea7de5b")
@@ -1145,7 +1145,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "f77b047c-1d8f-4525-bfd0-5ddd6c674850")
@@ -1200,7 +1200,7 @@
 			(uuid "924d673c-22b9-4e03-bb90-f745c057d751")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(uuid "e3192ca1-5fc1-4520-a9a7-6f36ff0bc0ce")
 			(effects
@@ -1211,7 +1211,7 @@
 			)
 		)
 		(pad "1" smd roundrect
-			(at -0.48 0)
+			(at -0.48 0 180)
 			(size 0.56 0.62)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(roundrect_rratio 0.25)
@@ -1219,7 +1219,7 @@
 			(uuid "38c29d3d-2529-4d0b-be7c-3fc0366ce491")
 		)
 		(pad "2" smd roundrect
-			(at 0.48 0)
+			(at 0.48 0 180)
 			(size 0.56 0.62)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(roundrect_rratio 0.25)
@@ -1457,7 +1457,7 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C6"
-			(at 0 -1.4 0)
+			(at 0 -1.4 180)
 			(layer "F.SilkS")
 			(uuid "caa1618d-0419-4f0e-a958-49f370fe226b")
 			(effects
@@ -1468,7 +1468,7 @@
 			)
 		)
 		(property "Value" "100 nF 25 V X7R CGA2B3X7R1E104K050BB"
-			(at 0 1.16 0)
+			(at 0 1.16 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "7c6e64f9-715a-424a-883e-d5c623adea55")
@@ -1480,7 +1480,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "440301cd-3ab0-4eeb-ae32-9373f4049124")
@@ -1492,7 +1492,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "7427e4be-cbbc-4bfa-8417-e0166073075a")
@@ -1547,7 +1547,7 @@
 			(uuid "411401a5-a455-4146-8de5-0a34079b030d")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 0)
+			(at 0 0 180)
 			(layer "F.Fab")
 			(uuid "0c6f94f3-e280-4f38-bf97-207210aa8233")
 			(effects
@@ -1558,7 +1558,7 @@
 			)
 		)
 		(pad "1" smd roundrect
-			(at -0.48 0)
+			(at -0.48 0 180)
 			(size 0.56 0.62)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(roundrect_rratio 0.25)
@@ -1566,7 +1566,7 @@
 			(uuid "9bc6bbe7-1dea-4cc2-982d-5a8129db563e")
 		)
 		(pad "2" smd roundrect
-			(at 0.48 0)
+			(at 0.48 0 180)
 			(size 0.56 0.62)
 			(layers "F.Cu" "F.Mask" "F.Paste")
 			(roundrect_rratio 0.25)
@@ -1593,7 +1593,7 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "R10"
-			(at 0 -1.4 0)
+			(at 0 1.4 0)
 			(layer "F.SilkS")
 			(uuid "fc4003f8-eef5-437c-9ba2-36483d0a8e38")
 			(effects

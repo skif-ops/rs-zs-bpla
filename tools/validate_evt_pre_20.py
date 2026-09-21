@@ -240,6 +240,24 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR buck placement ECO proposal decision is missing or over-released",
     )
     require(
+        decisions["DEC-107"]["Status"] ==
+        "ACCEPT_PCB_PWR_BUCK_WARNING_REMEDIATION_001_SUBGATE_APPLICATION_PENDING"
+        and "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
+        in decisions["DEC-107"]["Impact"]
+        and "fresh commit-bound application gate" in decisions["DEC-107"]["Impact"],
+        "PCB-PWR warning-remediation acceptance boundary is missing",
+    )
+    require(
+        decisions["DEC-108"]["Status"] ==
+        "APPLICATION_EXACT_WARNING_REMEDIATION_COMMIT_BOUND_GATE_PENDING"
+        and "54083a35" in decisions["DEC-108"]["Reason"]
+        and "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
+        in decisions["DEC-108"]["Impact"]
+        and "preserve every component pose" in decisions["DEC-108"]["Impact"]
+        and "fresh commit-bound CI and PCB Native" in decisions["DEC-108"]["Impact"],
+        "PCB-PWR warning-remediation application boundary is missing",
+    )
+    require(
         decisions["DEC-069"]["Status"] ==
         "LOCKED_CUSTOMER_PROCUREMENT_BOUNDARY_TECHNICAL_GATES_RETAINED"
         and "commercial procurement execution to the customer"
@@ -377,15 +395,15 @@ def validate_deliverable_register() -> None:
         "PCB-PWR numeric EVT routing-basis deliverable is missing or over-released",
     )
     require(
-        deliverables["HW-P-007"]["Статус"] == "CONTROLLED_APPLICATION_GATE_PASS"
+        deliverables["HW-P-007"]["Статус"] ==
+        "CONTROLLED_WARNING_REMEDIATION_APPLICATION_GATE_PENDING"
         and deliverables["HW-P-007"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-P-007"]["QG-2 техника"] == "OPEN"
-        and "moves only C4 C6 L1 L2"
+        and "placement candidate moved only C4 C6 L1 L2"
         in deliverables["HW-P-007"]["Критерий выпуска"]
-        and "adds zero copper" in deliverables["HW-P-007"]["Критерий выпуска"]
-        and "fresh commit-bound application gate passes"
+        and "successor b1d221d5 is accepted and applied byte-for-byte"
         in deliverables["HW-P-007"]["Критерий выпуска"]
-        and "library-warning"
+        and "fresh commit-bound application gate remains pending"
         in deliverables["HW-P-007"]["Критерий выпуска"]
         and "manufacture remain open"
         in deliverables["HW-P-007"]["Критерий выпуска"],

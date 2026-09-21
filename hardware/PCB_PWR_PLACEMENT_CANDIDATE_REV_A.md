@@ -32,22 +32,21 @@ transition requires a repeat mechanical/STEP review.
   pass the independent `0.20 mm` 2D clearance subgate; the minimum observed
   fitted-courtyard clearance is `0.22 mm`.
 
-The exact accepted ECO-001 board is applied byte-for-byte with SHA-256
+The historical exact ECO-001 placement board has SHA-256
 `9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37`.
-Its fresh commit-bound application gate passes at source commit `878425d2` with
-zero new error classes and unchanged `126` unconnected items. Two C4/C6
-footprint-library warnings, one L2/R10 silkscreen overlap and the pre-existing
-R10 silkscreen-to-mask warning remain open and block Review B/CAM.
+Its fresh commit-bound application gate passed at source commit `878425d2` with
+zero new error classes and unchanged `126` unconnected items.
 
-`PCB-PWR-BUCK-WARNING-REMEDIATION-001` now contains an isolated follow-on
-candidate that preserves every component pose and all pad copper geometry,
-normalizes only C4/C6 rotated child serialization and moves only the R10 visible
-reference. It is not applied. Native run 312 rejected the initial serialization
-because it introduced
-two replacement C4/C6 reference-to-mask warnings. The corrected candidate keeps
-their original physical reference centres and passes CI #586, PCB-PWR Schematic
-#65 and PCB Native #313 with exact `90 -> 86` violation and `126 -> 126`
-unconnected-item results. Only exact human acceptance remains pending.
+The separately reviewed `PCB-PWR-BUCK-WARNING-REMEDIATION-001` successor is now
+applied byte-for-byte as the authoritative board with SHA-256
+`b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957`.
+It preserves every component pose and all pad copper geometry, normalizes only
+C4/C6 rotated child serialization, retains their physical reference centres and
+moves only the R10 visible reference. The corrected candidate passed CI #586,
+PCB-PWR Schematic #65 and PCB Native #313 with exact `90 -> 86` violation and
+`126 -> 126` unconnected-item results; reviewer `Скиф` supplied the exact
+acceptance token. A fresh commit-bound application gate is pending, so the four
+warning closures remain blocked from Review B/CAM until that gate passes.
 
 ## Local input-capacitor placement evidence
 

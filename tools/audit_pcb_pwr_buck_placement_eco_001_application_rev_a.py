@@ -21,6 +21,11 @@ ROOT = Path(__file__).resolve().parents[1]
 BOARD = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 BASE = candidate_audit.BASE
 CANDIDATE = candidate_audit.CANDIDATE
+WARNING_REMEDIATION_CANDIDATE = (
+    ROOT
+    / "hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/"
+    "PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb"
+)
 APPROVAL = ROOT / "hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPROVAL_REV_A.json"
 MAPPING = ROOT / "hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_REVIEW_COMMIT_MAPPING.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPLICATION_REV_A.json"
@@ -31,6 +36,12 @@ STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 BASE_SHA256 = "fdd53e669a167df8925c38e289993c38b818c231eddd0be54de378b51538bf48"
 CANDIDATE_SHA256 = "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37"
 BOARD_SEMANTIC_SHA256 = "5994f22cdce03bc60779fcf120177bb82f6ecb88b2afdbe9bf4c0c2819af7337"
+WARNING_REMEDIATION_CANDIDATE_SHA256 = (
+    "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
+)
+WARNING_REMEDIATION_SEMANTIC_SHA256 = (
+    "b94eb0e53a714a2259e7362df7b96d1333c885f48399102b7ac279fb368d3276"
+)
 APPROVAL_SHA256 = "03a3c499b785ffdbe331f5bb442aecde31411bb6b3e65c88e0eaf2e0a62c8c7e"
 MAPPING_SHA256 = "26b4376b851d4dd5082bfd02182e243d7d0d9161a7b72c53a7112db9c21c2c85"
 GENERATOR_SHA256 = "8ed0ebf6cf3aed26c7f6ef9d7746424defcb467674ce69e353c3b8f2c39f3752"
@@ -102,12 +113,30 @@ def audit(
                 f"missing PCB-PWR buck placement application input: {path}")
     require(sha256(BASE) == BASE_SHA256,
             "PCB-PWR application predecessor SHA-256 drift")
-    require(sha256(CANDIDATE) == CANDIDATE_SHA256 and
-            sha256(BOARD) == CANDIDATE_SHA256 and
-            BOARD.read_bytes() == CANDIDATE.read_bytes(),
-            "authoritative PCB-PWR is not the exact accepted candidate")
+    require(sha256(CANDIDATE) == CANDIDATE_SHA256,
+            "accepted PCB-PWR buck-placement candidate SHA-256 drift")
+    active_sha256 = sha256(BOARD)
+    require(
+        active_sha256 in {
+            CANDIDATE_SHA256,
+            WARNING_REMEDIATION_CANDIDATE_SHA256,
+        },
+        "authoritative PCB-PWR is not an accepted buck-placement successor",
+    )
+    expected_active = (
+        CANDIDATE
+        if active_sha256 == CANDIDATE_SHA256
+        else WARNING_REMEDIATION_CANDIDATE
+    )
+    require(BOARD.read_bytes() == expected_active.read_bytes(),
+            "authoritative PCB-PWR accepted-successor byte identity drift")
     board = Board.from_file(str(BOARD), encoding="utf-8")
-    require(semantic_board_sha256(board) == BOARD_SEMANTIC_SHA256,
+    active_semantic_sha256 = (
+        BOARD_SEMANTIC_SHA256
+        if active_sha256 == CANDIDATE_SHA256
+        else WARNING_REMEDIATION_SEMANTIC_SHA256
+    )
+    require(semantic_board_sha256(board) == active_semantic_sha256,
             "applied PCB-PWR semantic board identity drift")
     require(sha256(APPROVAL) == APPROVAL_SHA256,
             "PCB-PWR buck placement approval SHA-256 drift")
@@ -243,11 +272,15 @@ def audit(
             "APPROVED_APPLIED_EXACT_C4_C6_L1_L2_PLACEMENT_PENDING_COMMIT_BOUND_KICAD9_GATE",
             "APPROVED_APPLIED_EXACT_C4_C6_L1_L2_PLACEMENT_COMMIT_BOUND_KICAD9_GATE_PASS",
         }
-        and eco.get("active_board_sha256") == CANDIDATE_SHA256
-        and eco.get("board_semantic_sha256") == BOARD_SEMANTIC_SHA256
-        and eco.get("exact_candidate_byte_identity") is True
+        and eco.get("active_board_sha256") == active_sha256
+        and eco.get("board_semantic_sha256") == active_semantic_sha256
+        and eco.get("historical_exact_candidate_byte_identity") is True
+        and eco.get("active_controlled_successor") in {
+            "PCB-PWR-BUCK-PLACEMENT-ECO-001",
+            "PCB-PWR-BUCK-WARNING-REMEDIATION-001",
+        }
         and eco.get("routing_added") is False
-        and eco.get("warning_only_items_closed") is False
+        and eco.get("warning_only_items_closed") in {False, True}
         and layout.get("routing_present") is False
         and layout.get("copper_zones_present") is False
         and layout.get("cam_export_authorized") is False
@@ -261,8 +294,8 @@ def audit(
         "dioneya.pcb-pwr-buck-placement-eco-001-application-audit.v1",
         "status": "PASS_EXACT_ACCEPTED_PCB_PWR_BUCK_PLACEMENT_APPLICATION",
         "predecessor_sha256": BASE_SHA256,
-        "active_board_sha256": CANDIDATE_SHA256,
-        "board_semantic_sha256": BOARD_SEMANTIC_SHA256,
+        "active_board_sha256": active_sha256,
+        "board_semantic_sha256": active_semantic_sha256,
         "placement_manifest_sha256": PLACEMENT_SHA256,
         "changed_references": ["C4", "C6", "L1", "L2"],
         "copper_changed": False,
@@ -272,7 +305,7 @@ def audit(
         "pcb_native_run_id": 35589990634,
         "ci_run_id": 35589990694,
         "artifact_id": 10633864128,
-        "warning_only_items_closed": False,
+        "warning_only_items_closed": eco.get("warning_only_items_closed"),
         "routing_complete": False,
         "review_b_complete": False,
         "manufacturing_release": False,
@@ -299,7 +332,7 @@ def main() -> int:
         )
     print("PCB-PWR buck placement ECO-001 application audit:", report["status"])
     print(
-        f"active_board_sha256={CANDIDATE_SHA256} "
+        f"active_board_sha256={report['active_board_sha256']} "
         "moved=['C4', 'C6', 'L1', 'L2'] minimum_clearance_mm=0.22"
     )
     return 0
