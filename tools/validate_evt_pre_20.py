@@ -370,6 +370,18 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR routing candidate 002 application closure is missing",
     )
     require(
+        decisions["DEC-121"]["Status"] ==
+        "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_003_CREATION_SUBGATE"
+        in decisions["DEC-121"]["Reason"]
+        and "J1.1-F1.1" in decisions["DEC-121"]["Impact"]
+        and "4.0 mm F.Cu" in decisions["DEC-121"]["Impact"]
+        and "exact human acceptance" in decisions["DEC-121"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-121"]["Impact"],
+        "PCB-PWR routing candidate 003 creation boundary is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]
