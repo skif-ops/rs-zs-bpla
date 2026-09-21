@@ -13,10 +13,21 @@
   "trace_items": 2,
   "vias": 0,
   "machine_gate": {
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+    "application_source_commit_sha": "ca27482abf27f988ffefb59e00d0f51c2a225f2c",
+    "application_source_tree_sha": "c8bf220322147c7df0c8132db770461381456928",
+    "ci_run_number": 598,
+    "ci_run_id": 35618389538,
+    "pcb_pwr_schematic_run_number": 76,
+    "pcb_pwr_schematic_run_id": 35618389483,
+    "pcb_native_run_number": 325,
+    "pcb_native_run_id": 35618389527,
+    "artifact_id": 10647087197,
+    "artifact_digest": "sha256:d98a6e6184af5ab14f33c77580a22451d18424203114e9f34db4b29697fce5ff",
     "required_violations": [86, 86],
     "required_unconnected": [126, 124],
-    "required_drc_fingerprint_delta": 0
+    "required_drc_fingerprint_delta": 0,
+    "comparative_drc": "PASS_86_TO_86_VIOLATIONS_126_TO_124_UNCONNECTED_ZERO_FINGERPRINT_DELTA"
   },
   "routing_complete": false,
   "review_b_complete": false,

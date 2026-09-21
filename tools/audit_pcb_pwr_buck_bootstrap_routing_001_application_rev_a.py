@@ -58,8 +58,10 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and application["applied_board_sha256"] == BOARD_SHA256
         and application["trace_items"] == 2
         and application["vias"] == 0
-        and application["machine_gate"]["status"] ==
-        "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE"
+        and application["machine_gate"]["status"] in {
+            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+        }
         and application["routing_complete"] is False
         and application["review_b_complete"] is False
         and application["cam_or_manufacturing_release"] is False

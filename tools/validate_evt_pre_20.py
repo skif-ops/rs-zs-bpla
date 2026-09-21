@@ -290,6 +290,18 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR bootstrap routing application boundary is missing",
     )
     require(
+        decisions["DEC-115"]["Status"] ==
+        "PASS_EXACT_BOOTSTRAP_APPLICATION_REMAINING_ROUTING_NEXT"
+        and "ca27482a" in decisions["DEC-115"]["Reason"]
+        and "CI 598" in decisions["DEC-115"]["Reason"]
+        and "PCB Native 325" in decisions["DEC-115"]["Reason"]
+        and "86 to 86" in decisions["DEC-115"]["Reason"]
+        and "126 to 124" in decisions["DEC-115"]["Reason"]
+        and "neither overall routing nor Review B CAM DFM thermal or manufacturing complete"
+        in decisions["DEC-115"]["Impact"],
+        "PCB-PWR bootstrap routing application closure is missing or over-released",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]
