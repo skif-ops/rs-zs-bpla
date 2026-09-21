@@ -1,0 +1,32 @@
+{
+  "include": [
+    {
+      "name": "firmware-host-and-target",
+      "runner": "ubuntu-24.04",
+      "shell": "bash",
+      "script": "ci/firmware.sh",
+      "artifacts": "build-target/dioneya_evt_pre_20.*"
+    },
+    {
+      "name": "server-pki",
+      "runner": "ubuntu-24.04",
+      "shell": "bash",
+      "script": "ci/server_pki.sh",
+      "artifacts": ""
+    },
+    {
+      "name": "pki-windows-x64",
+      "runner": "windows-latest",
+      "shell": "pwsh",
+      "script": "ci/pki_windows.ps1",
+      "artifacts": "server/dist/*"
+    },
+    {
+      "name": "pki-windows-arm64",
+      "runner": "windows-11-arm",
+      "shell": "pwsh",
+      "script": "ci/pki_windows.ps1",
+      "artifacts": "server/dist/*"
+    }
+  ]
+}
