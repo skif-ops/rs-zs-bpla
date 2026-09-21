@@ -92,6 +92,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Trust container checkout for commit-bound audits
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
       - name: Install audit parser dependency
         run: |
           apt-get -o APT::Update::Error-Mode=any update

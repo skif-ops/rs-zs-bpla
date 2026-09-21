@@ -252,6 +252,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Trust container checkout for commit-bound audits
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Install Python audit dependencies
         run: |
           apt-get -o APT::Update::Error-Mode=any update
