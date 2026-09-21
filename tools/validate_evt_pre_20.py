@@ -455,6 +455,23 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR routing candidate 004 creation boundary is missing",
     )
     require(
+        decisions["DEC-127"]["Status"] ==
+        "PASS_COMMIT_BOUND_KICAD9_GATE_HUMAN_SUBGATE_PENDING"
+        and "987a8fd4" in decisions["DEC-127"]["Reason"]
+        and "CI 623" in decisions["DEC-127"]["Reason"]
+        and "PCB-PWR Schematic 91" in decisions["DEC-127"]["Reason"]
+        and "PCB Native 344" in decisions["DEC-127"]["Reason"]
+        and "86 to 86" in decisions["DEC-127"]["Reason"]
+        and "122 to 121" in decisions["DEC-127"]["Reason"]
+        and "ACCEPT_PCB_PWR_REV_GATE_ROUTING_004_SUBGATE"
+        in decisions["DEC-127"]["Impact"]
+        and "authoritative PCB-PWR board unchanged"
+        in decisions["DEC-127"]["Impact"]
+        and "input load copper buck hot-loop switch-node Kelvin feedback return Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-127"]["Impact"],
+        "PCB-PWR routing candidate 004 machine-gate closure is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]

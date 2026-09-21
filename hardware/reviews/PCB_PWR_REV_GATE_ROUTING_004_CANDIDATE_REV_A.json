@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "proposal_id": "PCB-PWR-REV-GATE-ROUTING-004",
   "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_004_CREATION_SUBGATE",
-  "status": "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+  "status": "KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW",
   "scope": "ONLY_U1_5_TO_Q1_4_REV_GATE_CONNECTION",
   "selection_rationale": "COMPLETE_TWO_PAD_REVERSE_PROTECTION_GATE_DRIVE_NET_WITH_A_CLEARANCE_SCREENED_F_CU_CORRIDOR_BEFORE_HIGH_CURRENT_INPUT_AND_BUCK_HOT_LOOP_ROUTING",
   "base": {
@@ -59,7 +59,8 @@
     "non_rev_gate_copper_added": false
   },
   "machine_gate": {
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "mapping": "hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_REVIEW_COMMIT_MAPPING.json",
     "required_new_errors": 0,
     "required_unconnected_reduction": 1,
     "required_other_drc_fingerprint_delta": 0
