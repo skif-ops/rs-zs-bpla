@@ -1,0 +1,33 @@
+# server/pki - Muhoed internal PKI
+
+Root CA offline, issuing CA on the server, station certificates by CSR (CN = serial),
+registry for the 41-unit pilot (2 lots x 20 + bench), generated mosquitto ACL.
+
+```
+pip install -r requirements-pki.txt
+python -m pki.cli --help
+```
+
+Offline machine (root only):
+```
+python -m pki.offline_tool root-init --out /media/offline/dioneya-root
+python -m pki.offline_tool issuing-sign --root /media/offline/dioneya-root/root --csr issuing.csr.pem --out issuing.crt.pem
+```
+
+Server:
+```
+python -m pki.cli issuing-request
+python -m pki.cli issuing-install --cert issuing.crt.pem --root-cert root.crt.pem
+python -m pki.cli server-cert --dns muhoed.example.ru --ip 203.0.113.10
+python -m pki.cli bridge-cert
+python -m pki.cli station-add --all-lots
+python -m pki.cli station-sign DIO-EVT-012 --csr DIO-EVT-012.csr.pem
+python -m pki.cli bundle --mqtt-host muhoed.example.ru
+python -m pki.cli station-package DIO-EVT-012 --out /media/eol
+python -m pki.cli mosquitto-acl --out deploy/mosquitto/station_acl.conf
+```
+
+Windows executables: `pki\build_windows.ps1` or the `pki-windows-exe` GitHub Actions workflow
+(`muhoed-pki.exe`, `dioneya-root-offline.exe`, x64 and arm64, with SHA256SUMS.txt).
+
+Full procedure, roles, backups and rotation: document "Инструкция PKI ключи и сертификаты Мухоед Дионея v0.1".
