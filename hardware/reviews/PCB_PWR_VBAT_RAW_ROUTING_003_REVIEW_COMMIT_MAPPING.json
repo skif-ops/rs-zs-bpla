@@ -1,0 +1,30 @@
+{
+  "schema": "dioneya-pcb-pwr-vbat-raw-routing-003-review-mapping-v1",
+  "proposal_id": "PCB-PWR-VBAT-RAW-ROUTING-003",
+  "reviewed_commit_sha": "4a1114ff952e263fa3d2001556ddefd69f5ec3bf",
+  "reviewed_tree_sha": "fe23fa669ce75427335867fba4378608c72f0e8e",
+  "candidate_sha256": "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3",
+  "ci_run_number": 612,
+  "pcb_pwr_schematic_run_number": 86,
+  "pcb_native_run_number": 339,
+  "pcb_native_run_id": 35632323324,
+  "artifact_id": 10655031830,
+  "artifact_digest": "sha256:f96713f9e1cf878fb0ba9cf84716ffd1ca7ca27ad4bd7498648d0420159433c4",
+  "comparative_drc": {
+    "status": "PASS_ZERO_NEW_DRC_EXACT_ONE_CONNECTION_REDUCTION",
+    "base_violations": 86,
+    "candidate_violations": 86,
+    "base_unconnected": 123,
+    "candidate_unconnected": 122,
+    "new_drc_fingerprints": 0,
+    "removed_drc_fingerprints": 0
+  },
+  "human_gate": {
+    "status": "PENDING",
+    "accept_value": "ACCEPT_PCB_PWR_VBAT_RAW_ROUTING_003_SUBGATE"
+  },
+  "authoritative_board_modified": false,
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

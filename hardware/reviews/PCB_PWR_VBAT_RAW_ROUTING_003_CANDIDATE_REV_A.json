@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "proposal_id": "PCB-PWR-VBAT-RAW-ROUTING-003",
   "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_003_CREATION_SUBGATE",
-  "status": "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+  "status": "KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW",
   "scope": "ONLY_J1_1_TO_F1_1_VBAT_RAW_CONNECTION",
   "selection_rationale": "SHORT_TWO_PAD_5A_INPUT_CONNECTION_AT_FULL_4P0MM_RULE_WIDTH_WITH_DESTINATION_PAD_OVERLAP_AND_F1_2_CLEARANCE_BEFORE_COMPLEX_BUCK_HOT_LOOP_ROUTING",
   "base": {
@@ -51,7 +51,8 @@
     "non_vbat_raw_copper_added": false
   },
   "machine_gate": {
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "mapping": "hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_REVIEW_COMMIT_MAPPING.json",
     "required_new_errors": 0,
     "required_unconnected_reduction": 1,
     "required_other_drc_fingerprint_delta": 0
