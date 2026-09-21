@@ -209,6 +209,12 @@ and `126 -> 126` unconnected items. The two C4/C6 footprint-library warnings
 and the L2/R10 silkscreen warning remain blockers before Review B or CAM; this
 placement subgate is not a routing or manufacturing release.
 
+A separate hash-bound warning-remediation proposal preserves all component
+poses and pad copper geometry, canonically normalizes only C4/C6 rotated child
+data and moves only the visible R10 reference. Its static clearance gate passes,
+but commit-bound KiCad 9 comparative DRC and exact human acceptance remain
+pending. It therefore changes neither the active board nor any release state.
+
 The PCB-PWR `DIM-003` mechanical authority is machine-audited and accepted
 `18/18` for the EVT test batch. It binds the 90 x 60 x 1.6 mm basis, four round
 NPTH M3 holes, J1/J2 mating and cable volumes, DFT fixture/probe access,

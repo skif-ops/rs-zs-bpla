@@ -67,6 +67,12 @@ manufacturing-release assertion.
   fresh application gate passes at source commit `878425d2` with zero new
   error classes and unchanged 126 unconnected items; C4/C6 library mismatches
   and the L2/R10 silkscreen overlap remain warning-only blockers before Review B/CAM.
+- Warning remediation 001 is isolated as proposal SHA-256 `9800e4cca...`.
+  It keeps all component poses and pad copper geometry fixed, canonically
+  serializes only the rotated C4/C6 child data and moves only the R10 reference
+  from global `(58.0, 45.6)` to `(58.0, 48.4) mm`. Static clearance remains
+  `0.22 mm`; commit-bound KiCad 9 proof and exact human acceptance are pending,
+  so the authoritative board and all three warning blockers remain unchanged.
 - Mechanical authority: `DIM-003 18/18 EVT ACCEPTED`; the outline, round H1-H4
   pattern, terminal zones, tool access, fixture datum and conservative assembled
   STEP envelope are frozen for EVT. Serial revalidation remains mandatory.
@@ -102,7 +108,9 @@ manufacturing-release assertion.
   commit-bound CI #583 and PCB Native #310 comparative DRC with zero new error
   classes and unchanged `126 -> 126` unconnected items.
 - [ ] The two C4/C6 `lib_footprint_mismatch` warnings and the L2/R10
-  `silk_overlap` warning are closed before Review B or CAM.
+  `silk_overlap` warning are closed before Review B or CAM. Bounded remediation
+  candidate `9800e4cca...` is proposal-only until its comparative machine gate
+  and exact human subgate both pass.
 - [x] Four-layer count is frozen for Rev.A and agrees with the native board.
 - [x] All 31 native/capture nets have one explicit route class, return domain,
   topology, current basis and source authority.
@@ -199,8 +207,10 @@ human hierarchy acceptance pass. Fitted-body and H1-H4 mounting clearance,
 constraint coverage and `DIM-003` EVT acceptance remain valid. The mechanical
 register is `18/18`; the bounded 35 µm numeric EVT routing input passes, while
 the stackup register remains `0/24` with `0/2` accepted fabricator sets.
-The exact C4/C6/L1/L2 placement application gate passes, but its three warning
-closures remain open. Selected construction, final copper/plating and
+The exact C4/C6/L1/L2 placement application gate passes. Its separate
+three-warning remediation candidate is static-clean but still awaits the
+commit-bound comparative KiCad 9 gate and exact human subgate, so those closures
+remain open. Selected construction, final copper/plating and
 via-current geometry, routing,
 physical evidence, DRC, CAM, DFM, final serial mechanics and independent Review B are open.
 Production outputs remain prohibited.

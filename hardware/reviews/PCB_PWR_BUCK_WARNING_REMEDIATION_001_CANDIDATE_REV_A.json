@@ -1,0 +1,110 @@
+{
+  "schema_version": "dioneya.pcb-pwr-buck-warning-remediation-001-candidate.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-BUCK-WARNING-REMEDIATION-001",
+  "date_utc": "2026-09-21",
+  "status": "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+  "scope": "NORMALIZE_C4_C6_ROTATED_INSTANCE_DATA_AND_MOVE_R10_REFERENCE_ONLY_NO_COMPONENT_POSE_OR_COPPER_CHANGE",
+  "engineering_basis": {
+    "trigger": "Close the three warning-only findings explicitly retained by the accepted PCB-PWR buck-placement ECO-001 application before Review B or CAM.",
+    "source_application": "hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPLICATION_REV_A.json",
+    "kicad9_regeneration_evidence": {
+      "source_commit_sha": "878425d26641d1bdaf53e5287649677630a3938b",
+      "pcb_native_run_id": 35589990634,
+      "pcb_native_run_number": 310,
+      "artifact_id": 10633864128,
+      "artifact_digest": "sha256:5fcdfc856f009d05b490bd124168b8ea42322c0b08c6211743cbc1208f35d526",
+      "finding": "KiCad 9 full regeneration serializes C4/C6 child pad and text orientation at 180 degrees; the accepted text-only placement edit retained their pre-rotation child representation."
+    }
+  },
+  "base": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb",
+    "board_sha256": "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37",
+    "board_semantic_sha256": "5994f22cdce03bc60779fcf120177bb82f6ecb88b2afdbe9bf4c0c2819af7337",
+    "exact_authoritative_board_identity": true,
+    "footprints": 66,
+    "trace_items": 0,
+    "zones": 0,
+    "known_target_warnings": {
+      "lib_footprint_mismatch_C4_C6": 2,
+      "silk_overlap_L2_R10": 1
+    }
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb",
+    "board_sha256": "9800e4cca2892c759db5a49b52fc3cbc527b4ecd756786ed999e9eca0d1ca0ad",
+    "board_semantic_sha256": "b94eb0e53a714a2259e7362df7b96d1333c885f48399102b7ac279fb368d3276",
+    "generator": "tools/generate_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py",
+    "generator_sha256": "20b9c19b219692dbba3a712c18536dd989f5c3c09ce269eb33c3bbbb48c0d92a",
+    "independent_audit": "tools/audit_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py",
+    "footprints": 66,
+    "trace_items": 0,
+    "zones": 0
+  },
+  "bounded_delta": {
+    "normalized_instances": ["C4", "C6"],
+    "c4_c6_change": "Canonical KiCad 9 child text and pad 180-degree serialization only; footprint position, pad centre, pad size, layer, shape, net, UUID, and physical copper geometry remain unchanged.",
+    "moved_reference_fields": ["R10"],
+    "r10_reference_from_local": [0.0, -1.4, 0.0],
+    "r10_reference_to_local": [0.0, 1.4, 0.0],
+    "r10_reference_from_global_mm": [58.0, 45.6],
+    "r10_reference_to_global_mm": [58.0, 48.4],
+    "component_poses_changed": false,
+    "pad_centres_sizes_layers_nets_changed": false,
+    "outline_or_layer_stack_changed": false,
+    "copper_geometry_changed": false,
+    "tracks_vias_or_zones_added": false,
+    "raw_changed_lines": 15
+  },
+  "fixed_component_poses": {
+    "C4": [54.575, 16.4, 180.0],
+    "C6": [54.575, 44.4, 180.0],
+    "L1": [60.75, 14.0, 180.0],
+    "L2": [60.75, 42.0, 180.0],
+    "R10": [58.0, 47.0, 0.0]
+  },
+  "static_validation": {
+    "exact_changed_footprint_blocks": ["C4", "C6", "R10"],
+    "all_66_component_poses_equal_base": true,
+    "pad_centres_sizes_layers_nets_equal_base": true,
+    "non_target_footprint_blocks_byte_identical": true,
+    "non_footprint_board_fields_equal_base": true,
+    "fitted_footprints": 44,
+    "required_clearance_mm": 0.2,
+    "minimum_observed_clearance_mm": 0.22,
+    "component_conflicts": 0,
+    "mounting_body_conflicts": 0,
+    "mounting_pad_conflicts": 0,
+    "authoritative_board_modified": false
+  },
+  "required_machine_gate": {
+    "kicad_version": "9.x",
+    "regenerate_exact_base_and_candidate": true,
+    "native_parse_required": true,
+    "base_violation_count_expected": 90,
+    "candidate_violation_count_expected": 87,
+    "remove_exactly": {
+      "lib_footprint_mismatch_C4_C6": 2,
+      "silk_overlap_L2_R10": 1
+    },
+    "all_other_drc_fingerprints_must_match_base": true,
+    "new_error_count": 0,
+    "new_warning_count": 0,
+    "unconnected_item_count_must_equal_base": true,
+    "strict_fitted_and_mounting_clearance_required": true
+  },
+  "review_request": {
+    "requested_after_green_machine_gate": "ACCEPT_PCB_PWR_BUCK_WARNING_REMEDIATION_001_SUBGATE_OR_REJECT",
+    "accept_value": "ACCEPT_PCB_PWR_BUCK_WARNING_REMEDIATION_001_SUBGATE",
+    "reject_value": "REJECT_PCB_PWR_BUCK_WARNING_REMEDIATION_001_SUBGATE"
+  },
+  "decision_boundary": {
+    "proposal_only": true,
+    "applied_to_authoritative_board": false,
+    "accepted_c4_c6_l1_l2_component_poses_reopened": false,
+    "routing_complete": false,
+    "review_b_complete": false,
+    "cam_or_fabrication_authorized": false,
+    "manufacturing_release": false
+  }
+}

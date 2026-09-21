@@ -39,6 +39,12 @@ zero new error classes and unchanged `126` unconnected items. Two C4/C6
 footprint-library warnings and one L2/R10 silkscreen warning remain open and
 block Review B/CAM.
 
+`PCB-PWR-BUCK-WARNING-REMEDIATION-001` now contains an isolated follow-on
+candidate that preserves every component pose and all pad copper geometry,
+normalizes only C4/C6 rotated child serialization and moves only the R10 visible
+reference. It is not applied: commit-bound KiCad 9 comparative DRC and exact
+human subgate acceptance remain mandatory before these warnings may be closed.
+
 ## Local input-capacitor placement evidence
 
 TI SNAS877 Table 8-3 requires both local `CIN=4.7 uF` and

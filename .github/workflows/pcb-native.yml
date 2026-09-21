@@ -1313,6 +1313,10 @@ jobs:
             --check
           python tools/audit_pcb_pwr_buck_placement_eco_001_application_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/buck_placement_eco_001_application_audit.json
+          python tools/generate_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py \
+            --check
+          python tools/audit_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_warning_remediation_001_static_audit.json
           python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/routing_authority_audit.json
@@ -1409,6 +1413,57 @@ jobs:
             --drc-base "$evidence/baseline_drc.json" \
             --drc-active "$evidence/candidate_drc.json" \
             --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR buck warning remediation 001
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/buck-warning-remediation-001
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pro"
+          python tools/generate_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py \
+            --base-output "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb" \
+            --output "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb"
+          cmp \
+            hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path in sys.argv[1:]:
+              board = pcbnew.LoadBoard(path)
+              assert board is not None, f"KiCad failed to parse {path}"
+              assert len(board.GetFootprints()) == 66, f"unexpected footprint count: {path}"
+              assert len(list(board.GetTracks())) == 0, f"warning remediation contains routing: {path}"
+              assert len(list(board.Zones())) == 0, f"warning remediation contains zones: {path}"
+          print("PCB-PWR buck warning-remediation base/candidate KiCad 9 parse: PASS")
+          PY
+          python tools/audit_pcb_pwr_placement_clearance_rev_a.py \
+            --board "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb" \
+            --no-status-check \
+            --strict \
+            --output "$evidence/placement_clearance.json"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
       - name: Materialize native PCB-MIC board and schematic
         shell: bash
         run: |
@@ -1544,6 +1599,10 @@ jobs:
             hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_APPLICATION_REV_A.json
             hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb
             hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md
             hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md
             hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch
