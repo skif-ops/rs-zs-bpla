@@ -415,7 +415,7 @@ def validate_release_interlocks(contract: dict[str, Any]) -> None:
     main_fab = rfq.get("RFQ-023", {})
     require(main_fab.get("BOM_Item_IDs") == "PCB-MAIN"
             and main_fab.get("Preferred_channel") ==
-            "Two independent qualified PCB fabricators"
+            "Two customer-selected qualified PCB fabricators"
             and "controlled six-layer stackup" in main_fab.get("Blocking_check", "")
             and "impedance coupon" in main_fab.get("Blocking_check", "")
             and "no fabrication while routing Review B DRC CAM or DFM is open"
@@ -431,9 +431,12 @@ def validate_release_interlocks(contract: dict[str, Any]) -> None:
             "PCB-MAIN bare-PCB procurement row is missing or duplicated")
     bare_pcb = bare_pcb_rows[0]
     require(bare_pcb.get("Assemblies") == "PCB-MAIN"
-            and bare_pcb.get("MPN") == "TBD"
-            and bare_pcb.get("Status") == "RFQ_REQUIRED"
-            and bare_pcb.get("China_source_policy") == "Two independent fab quotations"
+            and bare_pcb.get("Manufacturer") == "Dioneya controlled design"
+            and bare_pcb.get("MPN") == "DIO-PCB-MAIN-REV-A"
+            and bare_pcb.get("Status") ==
+            "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_FAB_SELECTION_PENDING"
+            and bare_pcb.get("China_source_policy") ==
+            "Customer-selected qualified PCB fabricator; quotation and purchase outside the engineering repository"
             and all(token in bare_pcb.get("Incoming_control", "")
                     for token in ("Coupon", "stackup", "impedance", "netlist test")),
             "PCB-MAIN bare-PCB procurement boundary does not preserve two-fabricator stackup evidence requirements")

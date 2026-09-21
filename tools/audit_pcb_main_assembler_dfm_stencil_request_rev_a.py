@@ -537,18 +537,23 @@ def validate_authorities_and_release(contract: dict[str, Any]) -> None:
     assembly = assembly_rows[0]
     require(assembly.get("Assemblies") == "PCB-MAIN"
             and assembly.get("Item_IDs") == "ASM-MAIN"
-            and assembly.get("Manufacturer") == "Contract manufacturer"
-            and assembly.get("MPN") == "TBD"
-            and assembly.get("Status") == "RFQ_REQUIRED"
-            and assembly.get("China_source_policy") == "Direct CM quotation"
+            and assembly.get("Manufacturer") == "Dioneya controlled design"
+            and assembly.get("MPN") == "DIO-ASM-MAIN-REV-A"
+            and assembly.get("Status") ==
+            "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_EMS_SELECTION_PENDING"
+            and assembly.get("China_source_policy") ==
+            "Customer-selected qualified EMS; quotation and purchase outside the engineering repository"
             and "AOI" in assembly.get("Incoming_control", ""),
             "PCB-MAIN selected-assembler procurement boundary differs")
     _, rfq_rows = read_csv(RFQ)
     rfq = {row["RFQ_ID"]: row for row in rfq_rows}
     main_assembly = rfq.get("RFQ-011", {})
     require(main_assembly.get("BOM_Item_IDs") == "ASM-MAIN"
-            and main_assembly.get("Manufacturer") == "TBD"
-            and main_assembly.get("Preferred_channel") == "Qualified CM with AOI"
+            and main_assembly.get("Manufacturer") == "Dioneya controlled design"
+            and main_assembly.get("MPN_or_spec", "").startswith(
+                "DIO-ASM-MAIN-REV-A ")
+            and main_assembly.get("Preferred_channel") ==
+            "Customer-selected qualified EMS with AOI"
             and main_assembly.get("Status") == "RFQ_REQUIRED"
             and all(token in main_assembly.get("Blocking_check", "")
                     for token in ("DFM", "stencil", "traceability", "test coverage")),
