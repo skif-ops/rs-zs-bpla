@@ -1,3 +1,4 @@
+# tls/: ca-chain.pem, server.crt.pem, server.key.pem, crl.pem, bridge.crt.pem, bridge.key.pem (from server/pki)
 services:
   mqtt:
     image: eclipse-mosquitto:2.0
@@ -16,10 +17,9 @@ services:
     environment:
       ZS_MQTT_HOST: mqtt
       ZS_MQTT_PORT: "8883"
-      ZS_MQTT_CA: /run/tls/ca.crt
-      ZS_MQTT_CERT: /run/tls/bridge.crt
-      ZS_MQTT_KEY: /run/tls/bridge.key
-      ZS_TENANT: ${ZS_TENANT:-evt}
+      ZS_MQTT_CA: /run/tls/ca-chain.pem
+      ZS_MQTT_CERT: /run/tls/bridge.crt.pem
+      ZS_MQTT_KEY: /run/tls/bridge.key.pem
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
@@ -28,13 +28,41 @@ services:
       - ./tls:/run/tls:ro
     depends_on:
       - mqtt
-  mqtt_bridge:
+  mqtt_bridge_pilot1:
     build:
       context: ..
     restart: unless-stopped
-    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--ca", "/run/tls/ca.crt", "--cert", "/run/tls/bridge.crt", "--key", "/run/tls/bridge.key"]
+    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "pilot1", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem"]
     environment:
-      ZS_TENANT: ${ZS_TENANT:-evt}
+      ZS_TENANT: pilot1
+      ZS_COMMAND_SIGNING_KEY: /run/tls/command-signing.key
+    volumes:
+      - ../data:/app/data
+      - ./tls:/run/tls:ro
+    depends_on:
+      - mqtt
+      - server
+  mqtt_bridge_pilot2:
+    build:
+      context: ..
+    restart: unless-stopped
+    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "pilot2", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem"]
+    environment:
+      ZS_TENANT: pilot2
+      ZS_COMMAND_SIGNING_KEY: /run/tls/command-signing.key
+    volumes:
+      - ../data:/app/data
+      - ./tls:/run/tls:ro
+    depends_on:
+      - mqtt
+      - server
+  mqtt_bridge_bench:
+    build:
+      context: ..
+    restart: unless-stopped
+    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "bench", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem"]
+    environment:
+      ZS_TENANT: bench
       ZS_COMMAND_SIGNING_KEY: /run/tls/command-signing.key
     volumes:
       - ../data:/app/data
