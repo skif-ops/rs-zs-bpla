@@ -18,7 +18,13 @@ for suffix in ('','-wal','-shm'):
 def isolate_station_store_after_collection():
     """Clear rows after test modules import the application-level store."""
 
-    from station.router import service, store, type_service
+    try:
+        from station.router import service, store, type_service
+    except ModuleNotFoundError:
+        # PKI-only environments (e.g. the Windows executable build) install
+        # requirements-pki.txt only; no station API tests are collected there.
+        yield
+        return
 
     with store.lock, store._conn() as connection:
         for table in ("audio", "commands", "security_events", "system_events", "detections", "stations"):
