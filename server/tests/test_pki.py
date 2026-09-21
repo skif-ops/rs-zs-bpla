@@ -182,7 +182,8 @@ def test_cli_end_to_end(tmp_path, monkeypatch):
 
     assert cli(["root-init", "--out", str(offline)]) == 0
     assert cli(["root-init", "--out", str(offline)]) == 2            # refuses to overwrite
-    assert oct(os.stat(offline / "root" / "root.key.pem").st_mode & 0o777) == "0o600"
+    if os.name != "nt":  # POSIX mode bits; Windows protects the file via ACLs instead
+        assert oct(os.stat(offline / "root" / "root.key.pem").st_mode & 0o777) == "0o600"
 
     assert cli(["issuing-request", "--pki", str(server)]) == 0
     assert cli(["issuing-sign", "--root", str(offline / "root"), "--csr", str(server / "issuing" / "issuing.csr.pem"),
