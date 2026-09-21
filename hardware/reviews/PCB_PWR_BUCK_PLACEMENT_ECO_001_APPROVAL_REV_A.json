@@ -1,0 +1,55 @@
+{
+  "schema_version": "dioneya.pcb-pwr-buck-placement-eco-001-approval.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-BUCK-PLACEMENT-ECO-001",
+  "reviewer": "Скиф",
+  "decision_date": "2026-09-21",
+  "decision": "ACCEPT_PCB_PWR_BUCK_PLACEMENT_ECO_001_SUBGATE",
+  "decision_input": "Endth;lf.",
+  "decision_normalization": "The keyboard-layout-swapped input decodes exactly to «Утверждаю.» and accepts the explicitly pending PCB-PWR buck placement subgate.",
+  "reviewed_github_commit_sha": "38d629c2e7f9a9956a93c8b9666b17e69905eeb6",
+  "reviewed_tree_sha": "b935ed765133297099dee6af4799f598df832ab2",
+  "review_mapping": "hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_REVIEW_COMMIT_MAPPING.json",
+  "reviewed_proposal_sha256": "6373d9ef39a51aac84884faabfcbedb6a4397f48e919e6f58acd02e9a3bbd091",
+  "reviewed_proposal_record_sha256": "842514334672425828622779e985fdbde1b2d9d995c851904606669964ccedcc",
+  "reviewed_candidate_board_sha256": "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37",
+  "reviewed_generator_sha256": "5dcf33e2a13cc09a30f86e6405178d044cd741064e31f03a89805b0d10a690a7",
+  "reviewed_audit_sha256": "5c92de31505c5de45eeacdd8e502fafc1fdbf1d3f8d1b562169d1e50d9f085de",
+  "approved_geometry": {
+    "C4": {"from": [53.0, 10.0, 0.0], "to": [54.575, 16.4, 180.0]},
+    "C6": {"from": [53.0, 38.0, 0.0], "to": [54.575, 44.4, 180.0]},
+    "L1": {"from": [62.0, 14.0, 0.0], "to": [60.75, 14.0, 180.0]},
+    "L2": {"from": [62.0, 42.0, 0.0], "to": [60.75, 42.0, 180.0]}
+  },
+  "machine_gate": {
+    "pcb_native_run_id": 35586152390,
+    "pcb_native_run_number": 307,
+    "pcb_native_conclusion": "success",
+    "kicad_9_comparative_drc_step": "success",
+    "ci_run_id": 35586152428,
+    "ci_run_number": 580,
+    "ci_conclusion": "success",
+    "artifact_id": 10632656386,
+    "artifact_digest": "sha256:c111a2146c6c07afb53686ea75c172dd8b7f445d2bed87ea3963fbf42e38d512",
+    "base_violations": 87,
+    "candidate_violations": 90,
+    "base_unconnected": 126,
+    "candidate_unconnected": 126,
+    "new_errors": 0,
+    "placement_clearance": "PASS_MINIMUM_0P22_MM"
+  },
+  "warning_disposition": {
+    "lib_footprint_mismatch_C4_C6": "WARNING_ONLY_POSE_DELTA_NON_POSE_FOOTPRINT_DATA_IDENTICAL_CLOSE_BEFORE_REVIEW_B_OR_CAM",
+    "silk_overlap_L2_R10": "WARNING_ONLY_CLOSE_BEFORE_REVIEW_B_OR_CAM"
+  },
+  "authorization": {
+    "apply_exact_hash_bound_c4_c6_l1_l2_placement_delta": true,
+    "preserve_all_unlisted_footprints_nets_outline_and_copper": true,
+    "close_warning_only_items_before_review_b_or_cam": true,
+    "alter_reviewed_geometry_without_new_controlled_review": false,
+    "routing_complete": false,
+    "final_fabricator_stackup_accepted": false,
+    "review_b_complete": false,
+    "cam_or_manufacturing_release": false
+  }
+}
