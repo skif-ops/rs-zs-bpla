@@ -94,6 +94,7 @@ def generate(base_output: Path, output: Path, check: bool) -> dict[str, object]:
         BASE_SHA256,
         CANDIDATE_SHA256,
         "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5",
+        "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3",
     }, "authoritative PCB-PWR is not a controlled bootstrap successor")
     base_payload = (source_payload if source_sha256 == BASE_SHA256
                     else base_output.read_bytes())

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit exact application of PCB-PWR LM74700 VCAP routing candidate 002."""
+"""Audit exact application of PCB-PWR VBAT_RAW routing candidate 003."""
 
 from __future__ import annotations
 
@@ -10,21 +10,18 @@ from pathlib import Path
 
 from kiutils.board import Board
 
-import audit_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a as candidate_audit
+import audit_pcb_pwr_vbat_raw_routing_003_candidate_rev_a as candidate_audit
 from audit_pcb_pwr_routing_authority_rev_a import semantic_board_sha256
 
 
 ROOT = Path(__file__).resolve().parents[1]
 BOARD = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
-APPROVAL = ROOT / "hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_APPROVAL_REV_A.json"
-APPLICATION = ROOT / "hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_APPLICATION_REV_A.json"
+APPROVAL = ROOT / "hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_APPROVAL_REV_A.json"
+APPLICATION = ROOT / "hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_APPLICATION_REV_A.json"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 BOARD_SHA256 = candidate_audit.CANDIDATE_SHA256
 SEMANTIC_SHA256 = candidate_audit.CANDIDATE_SEMANTIC_SHA256
-VBAT_RAW_SUCCESSOR_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"
-VBAT_RAW_SUCCESSOR_SEMANTIC_SHA256 = "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d"
-VBAT_RAW_SUCCESSOR = ROOT / "hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb"
-APPROVAL_SHA256 = "b9578a4d6691a1a5d7f0bfaafc08d6939af70acf1b4d86add1c00c0b816099ea"
+APPROVAL_SHA256 = "c7064ff198b4668aa486ce76a0552c7c76f67193d3a63d25c99019d5d03d5bc5"
 
 
 def require(value: bool, message: str) -> None:
@@ -37,36 +34,30 @@ def sha256(path: Path) -> str:
 
 
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[str, object]:
-    active_sha256 = sha256(BOARD)
-    require(active_sha256 in {BOARD_SHA256, VBAT_RAW_SUCCESSOR_SHA256},
-            "authoritative PCB-PWR is not accepted VCAP or controlled successor")
-    expected_active = {
-        BOARD_SHA256: candidate_audit.CANDIDATE,
-        VBAT_RAW_SUCCESSOR_SHA256: VBAT_RAW_SUCCESSOR,
-    }[active_sha256]
-    require(BOARD.read_bytes() == expected_active.read_bytes(),
-            "authoritative PCB-PWR VCAP successor byte identity drift")
-    require(sha256(APPROVAL) == APPROVAL_SHA256, "VCAP approval drift")
+    require(sha256(BOARD) == BOARD_SHA256 and
+            BOARD.read_bytes() == candidate_audit.CANDIDATE.read_bytes(),
+            "authoritative PCB-PWR is not exact accepted VBAT_RAW candidate")
+    require(sha256(APPROVAL) == APPROVAL_SHA256, "VBAT_RAW approval drift")
     board = Board.from_file(str(BOARD), encoding="utf-8")
-    require(semantic_board_sha256(board) in {
-                SEMANTIC_SHA256, VBAT_RAW_SUCCESSOR_SEMANTIC_SHA256},
-            "applied VCAP semantic identity drift")
-    require(len(board.traceItems) in {3, 4} and len(board.zones) == 0,
-            "applied VCAP copper inventory drift")
+    require(semantic_board_sha256(board) == SEMANTIC_SHA256,
+            "applied VBAT_RAW semantic identity drift")
+    require(len(board.traceItems) == 4 and len(board.zones) == 0,
+            "applied VBAT_RAW copper inventory drift")
     proposal = candidate_audit.audit()
     require(proposal["status"] ==
-            "PASS_STATIC_PCB_PWR_LM74700_VCAP_ROUTING_002_CANDIDATE",
-            "historical VCAP proposal audit drift")
+            "PASS_STATIC_PCB_PWR_VBAT_RAW_ROUTING_003_CANDIDATE",
+            "historical VBAT_RAW proposal audit drift")
     approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
     application = json.loads(APPLICATION.read_text(encoding="utf-8"))
     status = json.loads(STATUS.read_text(encoding="utf-8"))
-    route = status["native_layout"]["lm74700_vcap_routing_002"]
+    route = status["native_layout"]["vbat_raw_routing_003"]
     require(
-        approval["decision"] == "ACCEPT_PCB_PWR_LM74700_VCAP_ROUTING_002_SUBGATE"
+        approval["decision"] == "ACCEPT_PCB_PWR_VBAT_RAW_ROUTING_003_SUBGATE"
         and application["decision"] == approval["decision"]
         and application["predecessor_board_sha256"] == candidate_audit.BASE_SHA256
         and application["applied_board_sha256"] == BOARD_SHA256
-        and application["trace_items"] == 3
+        and application["trace_items"] == 4
+        and application["width_mm"] == 4.0
         and application["vias"] == 0
         and application["machine_gate"]["status"] in {
             "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
@@ -75,18 +66,17 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and application["routing_complete"] is False
         and application["review_b_complete"] is False
         and application["cam_or_manufacturing_release"] is False
-        and route["active_board_sha256"] in {
-            BOARD_SHA256, VBAT_RAW_SUCCESSOR_SHA256}
+        and route["active_board_sha256"] == BOARD_SHA256
         and route["authoritative_board_modified"] is True
         and route["routing_complete"] is False
         and route["review_b_complete"] is False
         and route["manufacturing_release"] is False,
-        "VCAP application boundary drift",
+        "VBAT_RAW application boundary drift",
     )
     report: dict[str, object] = {
-        "status": "PASS_EXACT_ACCEPTED_PCB_PWR_LM74700_VCAP_ROUTING_002_APPLICATION",
+        "status": "PASS_EXACT_ACCEPTED_PCB_PWR_VBAT_RAW_ROUTING_003_APPLICATION",
         "board_sha256": BOARD_SHA256,
-        "trace_items": 3,
+        "trace_items": 4,
         "vias": 0,
         "routing_complete": False,
         "review_b_complete": False,
@@ -109,7 +99,7 @@ def main() -> int:
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    print("PCB-PWR LM74700 VCAP routing 002 application audit:", report["status"])
+    print("PCB-PWR VBAT_RAW routing 003 application audit:", report["status"])
     return 0
 
 

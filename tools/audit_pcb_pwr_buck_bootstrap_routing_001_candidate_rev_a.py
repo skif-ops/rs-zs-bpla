@@ -31,9 +31,12 @@ SEMANTIC_SHA256 = "b94eb0e53a714a2259e7362df7b96d1333c885f48399102b7ac279fb368d3
 CANDIDATE_SEMANTIC_SHA256 = "d90ef0332ed5da798029a5cb580a0f3a5f68387068811eeb9e4c06d0681500ae"
 GENERATOR_SHA256 = "b156b71cfb9ec712e7420dc4fdc0dee93daed1f6bc02fba13fbd97a84f6c081a"
 ACTIVE_GENERATOR_SHA256 = "4ba8f1da54f605b9140b1a6f87d0ba55ee49f3a7e4089390da1a4e67e0ba2c8d"
+VBAT_RAW_GENERATOR_SHA256 = "77fa1c2919376523410322edc30cb259d9c7a57ef88a84d55180cd4ea8946b5f"
 ROUTING_RULES_SHA256 = "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988"
 STACKUP_BASIS_SHA256 = "f420a20a7385cc9bd3d057e8d029246e8ebd64d7104511c677d628b7caf39230"
 ACTIVE_STACKUP_BASIS_SHA256 = "dbb41a7fb0ee5eea01f7bbebaa542061d1c9d7b102c0cb4a912a974b03ab3dc3"
+VBAT_RAW_SUCCESSOR_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"
+VBAT_RAW_STACKUP_BASIS_SHA256 = "300c2c6998704fae554c6f30ddb7bcb6eabb2060973c90f2b1d2ecc4ab76b1fc"
 EXPECTED = {
     "BOOT_3V8": ((54.925, 15.125), (55.055, 16.4)),
     "BOOT_3V3": ((54.925, 43.125), (55.055, 44.4)),
@@ -84,7 +87,8 @@ def audit(drc_base: Path | None = None,
           drc_candidate: Path | None = None) -> dict[str, object]:
     require(sha256(BASE) == BASE_SHA256, "bootstrap base SHA-256 drift")
     require(sha256(ACTIVE) in {BASE_SHA256, CANDIDATE_SHA256,
-            "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5"},
+            "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5",
+            VBAT_RAW_SUCCESSOR_SHA256},
             "authoritative board is neither reviewed predecessor nor exact candidate")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "bootstrap candidate SHA-256 drift")
     base = Board.from_file(str(BASE), encoding="utf-8")
@@ -111,9 +115,17 @@ def audit(drc_base: Path | None = None,
     require(math.isclose(total_length, 2.563221, abs_tol=1e-6),
             "bootstrap total route length drift")
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
-    require(sha256(GENERATOR) in {GENERATOR_SHA256, ACTIVE_GENERATOR_SHA256} and
+    require(sha256(GENERATOR) in {
+                GENERATOR_SHA256,
+                ACTIVE_GENERATOR_SHA256,
+                VBAT_RAW_GENERATOR_SHA256,
+            } and
             sha256(ROUTING_RULES) == ROUTING_RULES_SHA256 and
-            sha256(STACKUP_BASIS) in {STACKUP_BASIS_SHA256, ACTIVE_STACKUP_BASIS_SHA256},
+        sha256(STACKUP_BASIS) in {
+            STACKUP_BASIS_SHA256,
+            ACTIVE_STACKUP_BASIS_SHA256,
+            VBAT_RAW_STACKUP_BASIS_SHA256,
+        },
             "bootstrap source binding drift")
     require(review["creation_authorization"] ==
             "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_001_CREATION_SUBGATE" and

@@ -65,7 +65,11 @@ def candidate_bytes(base_payload: bytes) -> bytes:
 def generate(base_output: Path, output: Path, check: bool) -> dict[str, object]:
     source_payload = SOURCE.read_bytes()
     source_sha256 = sha256_bytes(source_payload)
-    require(source_sha256 in {BASE_SHA256, CANDIDATE_SHA256},
+    require(source_sha256 in {
+                BASE_SHA256,
+                CANDIDATE_SHA256,
+                "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3",
+            },
             "authoritative PCB-PWR is not a controlled VCAP successor")
     base_payload = (source_payload if source_sha256 == BASE_SHA256
                     else base_output.read_bytes())

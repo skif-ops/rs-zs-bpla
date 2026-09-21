@@ -23,7 +23,7 @@
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
-    "native_board_semantic_sha256": "07ce41bb361e68dd3a5310a6879030f097e4498e9397f2506ea5b78f49c47234",
+    "native_board_semantic_sha256": "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d",
     "placement_authority": "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
     "placement_authority_sha256": "257fee5898b5d44970115220a485d40b01c4fefad14b5c3b1a4ffb43b7b5b2d6",
     "placement_clearance_record": "hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md",

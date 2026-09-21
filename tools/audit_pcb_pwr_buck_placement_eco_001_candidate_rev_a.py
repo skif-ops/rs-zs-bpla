@@ -342,6 +342,7 @@ def audit(
             WARNING_REMEDIATION_CANDIDATE_SHA256,
             BOOTSTRAP_CANDIDATE_SHA256,
             "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5",
+            "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3",
         },
         "authoritative PCB-PWR is not an accepted buck-placement successor",
     )
@@ -351,6 +352,8 @@ def audit(
         BOOTSTRAP_CANDIDATE_SHA256: BOOTSTRAP_CANDIDATE,
         "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5":
         ROOT / "hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb",
+        "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3":
+        ROOT / "hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb",
     }[active_sha256]
     require(ACTIVE.read_bytes() == expected_active.read_bytes(),
             "authoritative PCB-PWR accepted-successor byte identity drift")
@@ -393,8 +396,8 @@ def audit(
             )),
             f"{reference}: active placement successor pose drift",
         )
-    require(len(active.traceItems) in {0, 2, 3} and len(active.zones) == 0,
-            "active placement successor exceeds accepted bootstrap copper")
+    require(len(active.traceItems) in {0, 2, 3, 4} and len(active.zones) == 0,
+            "active placement successor exceeds accepted VBAT_RAW copper")
 
     for field in (
         "version", "generator", "general", "paper", "titleBlock", "layers",

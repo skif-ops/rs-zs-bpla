@@ -8894,5 +8894,13 @@
 		(net 16)
 		(uuid "73e41801-75d1-5d93-bae8-d2c6a96a6c2c")
 	)
+	(segment
+		(start 7.7 31.25)
+		(end 10.6 31.25)
+		(width 4)
+		(layer "F.Cu")
+		(net 30)
+		(uuid "af339ac5-850a-5eca-bf27-2df19ee204ab")
+	)
 	(embedded_fonts no)
 )

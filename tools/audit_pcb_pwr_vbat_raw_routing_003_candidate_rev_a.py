@@ -29,8 +29,10 @@ CANDIDATE_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba708
 BASE_SEMANTIC_SHA256 = "07ce41bb361e68dd3a5310a6879030f097e4498e9397f2506ea5b78f49c47234"
 CANDIDATE_SEMANTIC_SHA256 = "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d"
 GENERATOR_SHA256 = "b7a73f836ddbb74b7115f50a743d18bc98ac44ee1e5270eafd0cbc23f3ea7eaa"
+ACTIVE_GENERATOR_SHA256 = "84a426f84789b5be5a0db64180e8689bc8ac14543d7fb844e7e91575239eed61"
 ROUTING_RULES_SHA256 = "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988"
 STACKUP_BASIS_SHA256 = "dbb41a7fb0ee5eea01f7bbebaa542061d1c9d7b102c0cb4a912a974b03ab3dc3"
+ACTIVE_STACKUP_BASIS_SHA256 = "300c2c6998704fae554c6f30ddb7bcb6eabb2060973c90f2b1d2ecc4ab76b1fc"
 EXPECTED_START = (7.7, 31.25)
 EXPECTED_END = (10.6, 31.25)
 
@@ -73,12 +75,16 @@ def audit_drc(base_path: Path, candidate_path: Path) -> dict[str, object]:
 
 
 def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> dict[str, object]:
-    require(sha256(BASE) == BASE_SHA256 and sha256(ACTIVE) == BASE_SHA256,
-            "candidate-003 base or authoritative board drift")
+    require(sha256(BASE) == BASE_SHA256 and
+            sha256(ACTIVE) in {BASE_SHA256, CANDIDATE_SHA256},
+            "candidate-003 base or controlled authoritative board drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "candidate-003 SHA-256 drift")
-    require(sha256(GENERATOR) == GENERATOR_SHA256 and
+    require(sha256(GENERATOR) in {GENERATOR_SHA256, ACTIVE_GENERATOR_SHA256} and
             sha256(ROUTING_RULES) == ROUTING_RULES_SHA256 and
-            sha256(STACKUP_BASIS) == STACKUP_BASIS_SHA256,
+            sha256(STACKUP_BASIS) in {
+                STACKUP_BASIS_SHA256,
+                ACTIVE_STACKUP_BASIS_SHA256,
+            },
             "candidate-003 source binding drift")
     base = Board.from_file(str(BASE), encoding="utf-8")
     candidate = Board.from_file(str(CANDIDATE), encoding="utf-8")
