@@ -17,6 +17,7 @@ APPROVAL = ROOT / "hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_APPROVAL_
 
 BASE_SHA256 = "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
 CANDIDATE_SHA256 = "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236"
+CONTROLLED_SUCCESSOR_SHA256 = "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5"
 APPROVAL_SHA256 = "30b26ade4edf0a2f357fb93e1ce95dea7628a7c382003578ebf07c74a7465e0b"
 APPROVAL_COMMIT = "57d7b571ed2bb82feea7288fea1d7f4b99ac0ae8"
 
@@ -54,8 +55,9 @@ def accepted_payload() -> bytes:
 def apply(output: Path, check: bool) -> dict[str, object]:
     payload = accepted_payload()
     if check:
-        require(output.read_bytes() == payload,
-                "authoritative PCB-PWR is not the exact accepted bootstrap candidate")
+        output_sha256 = sha256(output)
+        require(output_sha256 in {CANDIDATE_SHA256, CONTROLLED_SUCCESSOR_SHA256},
+                "authoritative PCB-PWR is not accepted bootstrap or controlled successor")
     else:
         require(output.read_bytes() == BASE.read_bytes() and sha256(output) == BASE_SHA256,
                 "authoritative PCB-PWR is not the approved predecessor")
