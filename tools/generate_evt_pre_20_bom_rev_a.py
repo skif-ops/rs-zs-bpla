@@ -24,6 +24,79 @@ PWR_PASSIVE_AUTHORITY = ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
 LOT_SIZES = (4, 10, 20)
 
 
+# These are project-owned build-to-print article identities.  They make the
+# engineering/procurement BOM deterministic without pretending that the
+# customer has already selected a PCB fabricator, EMS, harness assembler or
+# vacuum-casting legal entity.  Supplier selection and every technical
+# manufacturing gate remain separate release inputs.
+BUILD_TO_PRINT_SCOPES = {
+    "ASM-MAIN": {
+        "mpn": "DIO-ASM-MAIN-REV-A",
+        "package": "6-layer PCBA build-to-print service scope",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_EMS_SELECTION_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified EMS; quotation and purchase outside the engineering repository",
+        "notes": "PRIMARY procurement track; internal assembled-article identity only; routing DRC CAM DFM stencil Review B and EOL scope remain mandatory before build",
+    },
+    "PCB-MAIN": {
+        "mpn": "DIO-PCB-MAIN-REV-A",
+        "package": "6-layer FR-4 110x75x1.6 mm build-to-print fabrication scope",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_FAB_SELECTION_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified PCB fabricator; quotation and purchase outside the engineering repository",
+        "notes": "ALTERNATIVE quotation track only; internal bare-board identity only; final stackup impedance routing DRC CAM DFM coupon and Review B remain mandatory before fabrication",
+    },
+    "ASM-PWR": {
+        "mpn": "DIO-ASM-PWR-REV-A",
+        "package": "assembled 4-layer power PCB build-to-print service scope; EVT DIM-003 90x60x1.6 mm and H1-H4 accepted; outer 2 oz target; inner 1 oz target; final stackup pending DFM",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_EMS_SELECTION_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified EMS; quotation and purchase outside the engineering repository",
+        "notes": "PRIMARY procurement track; internal assembled-article identity only; final copper routing DRC CAM DFM Review B and current thermal fault EOL scope remain mandatory before build",
+    },
+    "PCB-PWR": {
+        "mpn": "DIO-PCB-PWR-REV-A",
+        "package": "4-layer FR-4 90x60x1.6 mm build-to-print fabrication scope; EVT DIM-003 and H1-H4 accepted; outer 2 oz target; inner 1 oz target; final stackup pending DFM",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_FAB_SELECTION_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified PCB fabricator; quotation and purchase outside the engineering repository",
+        "notes": "ALTERNATIVE quotation track only; internal bare-board identity only; selected copper and plating routing DRC CAM DFM serial mechanical revalidation and Review B remain mandatory before fabrication",
+    },
+    "ASM-MIC": {
+        "mpn": "DIO-ASM-MIC-REV-A",
+        "package": "2-layer microphone PCBA build-to-print service scope",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_EMS_SELECTION_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified EMS; quotation and purchase outside the engineering repository",
+        "notes": "PRIMARY procurement track; internal assembled-article identity only; final Review B CAM DFM acoustic-port process and selected-lot EOL remain mandatory before build",
+    },
+    "PCB-MIC": {
+        "mpn": "DIO-PCB-MIC-REV-A",
+        "package": "2-layer FR-4 microphone PCB build-to-print fabrication scope",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_CUSTOMER_FAB_SELECTION_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified PCB fabricator; quotation and purchase outside the engineering repository",
+        "notes": "ALTERNATIVE quotation track only; internal bare-board identity only; panelization final Review B CAM DFM net test and acoustic opening control remain mandatory before fabrication",
+    },
+    "HARNESS": {
+        "mpn": "DIO-HARNESS-SET-REV-A",
+        "package": "Controlled labeled station harness set Rev.A",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_PHYSICAL_RELEASE_PENDING",
+        "disposition": "CONTROLLED_BUILD_TO_PRINT_IDENTITY",
+        "channel": "Customer-selected qualified harness assembler; build only to the controlled drawing and schedule",
+        "notes": "Internal harness-set identity binds the controlled pinout drawing schedule housings and contacts; final cut lengths exact wire AVL crimp tooling physical electrical SI thermal FAI and selected assembler remain release gates",
+    },
+    "HSG-VC": {
+        "mpn": "DIO-HSG-VC-REV-A",
+        "package": "Vacuum-cast polyurethane housing set build-to-print scope",
+        "status": "CONTROLLED_INTERNAL_ARTICLE_MECHANICAL_RELEASE_PENDING",
+        "disposition": "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+        "channel": "Customer-selected qualified vacuum-casting supplier; quotation and purchase outside the engineering repository",
+        "notes": "Internal housing-set identity only; released source geometry material shrink inserts seals FAI leak fit acoustic RF and environmental evidence remain mandatory before build",
+    },
+}
+
+
 def read_csv(path: Path) -> list[dict[str, str]]:
     with path.open(encoding="utf-8-sig", newline="") as f:
         return list(csv.DictReader(f))
@@ -106,6 +179,18 @@ def main(*, check_only: bool = False) -> None:
             r["Spare_policy"] = spare_policy
         if qty is not None:
             set_quantities(r, qty, int(r["Spares"] if spares is None else spares))
+
+    for item_id, scope in BUILD_TO_PRINT_SCOPES.items():
+        current = by_id[item_id]
+        update_existing(
+            item_id,
+            manufacturer="Dioneya controlled design",
+            mpn=scope["mpn"],
+            package=scope["package"],
+            status=scope["status"],
+            notes=scope["notes"],
+        )
+        current["China_source_policy"] = scope["channel"]
 
     for item_id, ref in {
         "U1": "U1", "U2": "U2", "U3": "U3", "U4": "U4", "U7": "U7",
@@ -520,6 +605,7 @@ def main(*, check_only: bool = False) -> None:
         "AA.166.A.301111": "-40..85",
         "TI.89.B.2111W": "-40..85",
         "CAB.0243": "-60..200",
+        "DIO-HARNESS-SET-REV-A": "-40..105 selected connector/contact envelope; station -40..70 qualification pending",
         "5040510601": "-40..105",
         "5040520098": "-40..105",
         "43025-1200": "-40..105",
@@ -546,7 +632,11 @@ def main(*, check_only: bool = False) -> None:
         elif item_id in pcb_ids:
             row["Line_class"], row["Population"], row["Temperature_C"] = "BARE_PCB", "N/A", "N/A"
         elif item_id.startswith("HSG-"):
-            row["Line_class"], row["Population"], row["Temperature_C"] = "MECHANICAL_OPTION", "N/A", "OPEN"
+            row["Line_class"], row["Population"] = "MECHANICAL_OPTION", "N/A"
+            row["Temperature_C"] = (
+                "-40..70 target; material and assembled-housing qualification pending"
+                if item_id == "HSG-VC" else "OPEN"
+            )
         elif item_id in system_ids:
             row["Line_class"], row["Population"] = "SYSTEM_ITEM", "FITTED"
             row["Temperature_C"] = known_temp.get(row["MPN"], "OPEN")
@@ -559,7 +649,9 @@ def main(*, check_only: bool = False) -> None:
 
         status = row["Status"]
         exact_identity = row["Manufacturer"] not in ("", "TBD") and row["MPN"] not in ("", "TBD")
-        if row["Line_class"] in {"PCBA_SERVICE", "BARE_PCB"}:
+        if item_id in BUILD_TO_PRINT_SCOPES:
+            row["BOM_disposition"] = BUILD_TO_PRINT_SCOPES[item_id]["disposition"]
+        elif row["Line_class"] in {"PCBA_SERVICE", "BARE_PCB"}:
             row["BOM_disposition"] = "BLOCKED_SUPPLIER_RELEASE" if status == "RFQ_REQUIRED" else "CONTROLLED"
         elif row["Line_class"] == "MECHANICAL_OPTION":
             row["BOM_disposition"] = "CONDITIONAL_NOT_RELEASED"
@@ -615,9 +707,10 @@ def main(*, check_only: bool = False) -> None:
     grouped: dict[tuple[str, ...], dict[str, object]] = {}
     for row in rows:
         exact_identity = row["Manufacturer"] not in {"", "TBD"} and row["MPN"] not in {"", "TBD"}
-        identity = row["MPN"] if exact_identity else row["Item_ID"]
+        build_to_print_scope = row["Item_ID"] in BUILD_TO_PRINT_SCOPES
+        identity = row["MPN"] if exact_identity and not build_to_print_scope else row["Item_ID"]
         key = (
-            "MPN" if exact_identity else "ITEM",
+            "MPN" if exact_identity and not build_to_print_scope else "ITEM",
             identity,
             row["Manufacturer"],
             row["Package"],

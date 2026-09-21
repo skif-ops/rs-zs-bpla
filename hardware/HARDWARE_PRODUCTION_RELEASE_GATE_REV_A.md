@@ -12,8 +12,8 @@ it.
 
 `hardware design release` proves that the three PCBAs, system components,
 mechanics and harness are technically complete and independently reviewed.
-It requires production BOM QG-2, completed routing, DRC, CAM, DFM, Review B and
-closed mechanical dimensions.
+It requires technical BOM QG-2 `PASS`, completed routing, DRC, CAM, DFM, Review B
+and closed mechanical dimensions.
 
 `customer procurement handoff` additionally requires exactly one selected lot
 quantity from 4, 10 or 20 stations and a technically controlled procurement
@@ -36,6 +36,12 @@ future lot/date code or CoC. Commercial availability, price and destination deli
 date are non-blocking customer order-time fields. Physical fit, electrical, thermal, RF and
 environmental evidence remains open at assembly, EOL and EVT and still blocks the
 hardware design release where applicable.
+
+Technical BOM QG-2 also controls eight project-owned build-to-print identities for
+the six PCB/PCBA scopes, harness set and selected vacuum-cast housing. These internal
+article numbers close BOM identity only. The customer-selected supplier legal entity,
+quotation and commercial order remain open by design, while selected-process responses,
+routing, CAM/DFM, Review B, mechanics and physical evidence remain blocking here.
 
 The production interlock is implemented by:
 
@@ -249,8 +255,9 @@ release.
 
 - physical assembly/EOL/EVT qualification of the documentarily controlled exact
   `BAT1`, `PV1`, `MPPT1`, `MPPT-TEMP`, `ANT-CELL`, `ANT-GNSS`, `ANT-LORA` and
-  `RF-PIGTAIL` items; exact supplier/manufacturing identities and release evidence
-  for `HARNESS` and `HSG-VC` remain open;
+  `RF-PIGTAIL` items; `HARNESS` and `HSG-VC` internal article identities are
+  controlled, while final design inputs, selected supplier/process responses and
+  physical release evidence remain open;
 - PCB-MAIN and PCB-PWR routing, DRC and CAM; PCB-PWR final stackup,
   job-specific current-density/thermal geometry and physical power evidence
   beyond the bounded 35 µm EVT routing input; PCB-MIC independent Review B,

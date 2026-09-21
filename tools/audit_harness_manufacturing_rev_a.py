@@ -209,11 +209,14 @@ def validate_supplier_request() -> dict[str, object]:
 
     rfq_rows = {row["RFQ_ID"]: row for row in read_csv(RFQ)}
     rfq = rfq_rows.get("RFQ-014", {})
-    require(rfq.get("BOM_Item_IDs") == "HARNESS" and rfq.get("Manufacturer") == "TBD",
+    require(rfq.get("BOM_Item_IDs") == "HARNESS" and
+            rfq.get("Manufacturer") == "Dioneya controlled design" and
+            "DIO-HARNESS-SET-REV-A" in rfq.get("MPN_or_spec", ""),
             "RFQ-014 harness identity drift")
     require(rfq.get("Required_qty_20") == "22" and rfq.get("Status") == "RFQ_REQUIRED",
             "RFQ-014 selected-lot quantity or status drift")
-    require("supplier assembly MPN" in rfq.get("MPN_or_spec", "") and
+    require("selected assembler" in rfq.get("MPN_or_spec", "") and
+            "assembly MPN" in rfq.get("Blocking_check", "") and
             "HARNESS_SUPPLIER_CAPABILITY_RESPONSE_REV_A.csv" in rfq.get("Blocking_check", ""),
             "RFQ-014 does not bind the supplier response packet")
 

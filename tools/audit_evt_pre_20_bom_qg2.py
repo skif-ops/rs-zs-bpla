@@ -279,6 +279,54 @@ def main() -> int:
     check("fitted_line_exact_fields", not exact_fields_missing,
           "fitted lines missing exact production fields: " + ", ".join(exact_fields_missing) if exact_fields_missing else "all fitted lines have exact identity/package/rating")
 
+    build_to_print_expected = {
+        "ASM-MAIN": ("DIO-ASM-MAIN-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "PCB-MAIN": ("DIO-PCB-MAIN-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "ASM-PWR": ("DIO-ASM-PWR-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "PCB-PWR": ("DIO-PCB-PWR-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "ASM-MIC": ("DIO-ASM-MIC-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "PCB-MIC": ("DIO-PCB-MIC-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+        "HARNESS": ("DIO-HARNESS-SET-REV-A", "CONTROLLED_BUILD_TO_PRINT_IDENTITY"),
+        "HSG-VC": ("DIO-HSG-VC-REV-A", "CONTROLLED_CUSTOMER_RFQ_SCOPE"),
+    }
+    build_to_print_errors = []
+    for item_id, (mpn, disposition) in build_to_print_expected.items():
+        row = by_id.get(item_id)
+        if (
+            row is None
+            or row["Manufacturer"] != "Dioneya controlled design"
+            or row["MPN"] != mpn
+            or row["BOM_disposition"] != disposition
+            or not row["Status"].startswith("CONTROLLED_INTERNAL_ARTICLE_")
+            or not row["Package"]
+        ):
+            build_to_print_errors.append(item_id)
+
+    rfq_rows = read(ROOT / "hardware/CHINA_PROCUREMENT_RFQ.csv")
+    rfq_by_item = {row["BOM_Item_IDs"]: row for row in rfq_rows}
+    for item_id, (mpn, _) in build_to_print_expected.items():
+        row = rfq_by_item.get(item_id)
+        if (
+            row is None
+            or row["Manufacturer"] != "Dioneya controlled design"
+            or mpn not in row["MPN_or_spec"]
+            or row["Status"] != "RFQ_REQUIRED"
+            or row["Supplier"]
+            or row["Quote_date"]
+        ):
+            build_to_print_errors.append(f"{item_id}:RFQ_BOUNDARY")
+    check(
+        "build_to_print_internal_article_identity",
+        not build_to_print_errors,
+        "build-to-print identity or customer-supplier boundary mismatch: "
+        + ", ".join(build_to_print_errors)
+        if build_to_print_errors
+        else (
+            "eight internal article identities are controlled while customer-selected "
+            "supplier quote and legal-entity fields remain intentionally open"
+        ),
+    )
+
     passive_value_missing = [
         row["Item_ID"] for row in rows
         if row["Population"] in {"FITTED", "DNP"}
@@ -290,7 +338,8 @@ def main() -> int:
 
     blocked_rows = [row["Item_ID"] for row in rows if row["BOM_disposition"].startswith("BLOCKED")]
     check("bom_dispositions_released", not blocked_rows,
-          "BOM selections or supplier releases still blocked: " + ", ".join(blocked_rows) if blocked_rows else "all BOM dispositions released")
+          "BOM identities or controlled procurement scopes still blocked: " + ", ".join(blocked_rows)
+          if blocked_rows else "all BOM identities and customer-owned procurement scopes are controlled")
 
     # This independent list comes from the native PCB-PWR generator. Every physical
     # fitted/DNP designator must be represented before a factory BOM can be released.
@@ -494,14 +543,20 @@ def main() -> int:
         else "eight exact system OTS MPNs have documentary purchase control; physical assembly/EOL/EVT validation remains open",
     )
 
+    released_system_dispositions = {
+        "CONTROLLED",
+        "CONTROLLED_BUILD_TO_PRINT_IDENTITY",
+        "CONTROLLED_CUSTOMER_RFQ_SCOPE",
+    }
     system_open = [
         row["Item_ID"] for row in rows
         if row["Line_class"] in {"SYSTEM_ITEM", "MECHANICAL_OPTION"}
         and int(row["Qty_per_station"]) > 0
-        and row["BOM_disposition"] != "CONTROLLED"
+        and row["BOM_disposition"] not in released_system_dispositions
     ]
     check("system_sku_release", not system_open,
-          "system/mechanical SKUs not released: " + ", ".join(system_open) if system_open else "system SKUs released")
+          "system/mechanical article identities not controlled: " + ", ".join(system_open)
+          if system_open else "system SKUs and build-to-print article identities are controlled")
 
     result = {
         "gate": "QG-2",

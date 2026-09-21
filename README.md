@@ -145,7 +145,8 @@ engineering-кандидат и не меняет `0/24`, не принимае�
 `7aeec13a` и PCB SHA-256 `a292a6ec…e4031`. Контролируемый manufacturing-handoff
 packet готов, но все ответы фабрики и сборщика остаются `PENDING`. Это не разрешает производство:
 PCB-MAIN и PCB-PWR routing/Review B, оставшиеся PCB-MIC Review B gates и
-производственный выпуск BOM/Gerber заблокированы. Firmware
+технический BOM QG-2 контролируется отдельно; Gerber и аппаратный
+производственный выпуск заблокированы. Firmware
 сохраняет статус `TARGET_PORT_REQUIRED`.
 На PCB-PWR уже контролируются J1 `Molex 43045-0213`, U1 `LM74700-Q1`,
 U2 `INA226`, Q1 `CSD18540Q5B`, RSH1 `WSK2512R0100FEA`, U3/U4

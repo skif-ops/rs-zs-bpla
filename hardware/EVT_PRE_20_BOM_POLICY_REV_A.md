@@ -1,14 +1,16 @@
 # EVT-PRE-20 Rev.A production BOM policy
 
-Status: `ACTIVE / PRODUCTION BOM BLOCKED`
+Status: `ACTIVE / TECHNICAL BOM QG-2 CONTROLLED / HARDWARE RELEASE BLOCKED`
 
 `hardware/EVT_PRE_20_BOM_REV_A.csv` is the generated controlled engineering BOM.
 `hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv` is its MPN-level procurement roll-up.
 `hardware/EVT_PRE_20_BOM_PRICE_ESTIMATE_REV_A.csv` is the non-binding budgetary
 price layer for the same procurement rows.
-Both contain explicit lot calculations for 4, 10 and 20 stations. They may be used for
-sourcing work and design review, but they are not a factory release while QG-2 reports
-`BLOCKED`.
+Both contain explicit lot calculations for 4, 10 and 20 stations. Technical BOM QG-2
+reports `PASS` when exact component identities, project-owned build-to-print article
+identities and quantity arithmetic are controlled. That result is not a factory release:
+supplier selection, job-specific manufacturing evidence and the hardware release gate
+remain separate.
 
 Supplier identity is advisory in the price layer. The exact MPN and technical
 requirements remain mandatory; a buyer may select another established supplier.
@@ -17,21 +19,22 @@ engineering estimates. Cost columns are planning values only: displayed stock is
 a delivery guarantee, and final VAT, customs, dangerous-goods handling, destination
 delivery and payment terms are controlled by the customer in the cart or commercial
 quotation. Empty quote, stock, MOQ, price, lead-time or delivery fields do not block
-the engineering release or the customer procurement handoff.
+technical BOM QG-2 or the customer procurement handoff.
 
 `manufacturing/EVT_LOT_SELECTION_REV_A.csv` is the scenario-selection authority.
 `EVT-20` is selected for the current customer. The 4- and 10-station columns remain
 controlled comparison scenarios only; quantities and spare columns from different
 scenarios must never be mixed. The customer owns purchase execution. Selection does
-not authorize PCB/PCBA, harness or housing manufacture while QG-2, job-specific DFM
-or the applicable technical manufacturing release remains open.
+not authorize PCB/PCBA, harness or housing manufacture while job-specific DFM or the
+applicable technical hardware release remains open.
 
 ## Required line data
 
 Every fitted electrical, harness and system line must contain:
 
 - one unambiguous assembly and reference designation;
-- manufacturer and exact orderable MPN;
+- manufacturer and exact orderable MPN, or a project-owned build-to-print article
+  identity for a custom fabrication/assembly scope;
 - value where applicable, exact package or mechanical form;
 - population state, quantity per station, lot quantities, spares and procurement totals
   for 4, 10 and 20 stations;
@@ -56,17 +59,21 @@ technical qualification gate; functional, fit, thermal, RF and environmental che
 remain at assembly, EOL and EVT. Battery transport documents remain required where
 the chosen SKU and route make them applicable.
 
-PCBA service and bare-PCB lines use the released fabrication/assembly specification and
-approved supplier instead of an electronic-component MPN. Conditional housing options
-must have zero quantity unless that variant is formally selected.
+The six PCBA/bare-PCB scopes, the harness set and the selected vacuum-cast housing use
+the project-owned identities `DIO-ASM-MAIN-REV-A`, `DIO-PCB-MAIN-REV-A`,
+`DIO-ASM-PWR-REV-A`, `DIO-PCB-PWR-REV-A`, `DIO-ASM-MIC-REV-A`,
+`DIO-PCB-MIC-REV-A`, `DIO-HARNESS-SET-REV-A` and `DIO-HSG-VC-REV-A`.
+These identify controlled build-to-print scopes; they are not supplier part numbers,
+selected legal entities, accepted process responses or permission to build. Conditional
+housing options must have zero quantity unless that variant is formally selected.
 
 The selected procurement route for Rev.A is the **full-PCBA track**: the contract
 manufacturer supplies assembled PCB-MAIN, PCB-PWR and PCB-MIC boards with the
 specified assembly inspection and EOL controls. Bare-PCB RFQs remain active only as
 an alternative quotation and schedule fallback. They are not part of the selected
 purchase set and may not be ordered in addition to the PCBA quantities without a new
-documented procurement decision. This selection does not bypass QG-2, Review B,
-CAM/DFM or supplier-release gates.
+documented procurement decision. This selection does not bypass Review B, CAM/DFM,
+selected-process acceptance or the hardware release gate.
 
 ## Quantity authority
 
@@ -128,8 +135,10 @@ the selected process.
 QG-2 (`tools/audit_evt_pre_20_bom_qg2.py`) independently compares freeze tables,
 checks exact fitted-line fields, independently reconstructs the 17 PCB-PWR passive
 groups from the 49-row authority, repeats the 4/10/20 lot and roll-up reconciliation,
-verifies schematic RefDes coverage and refuses a production release while native
-schematic or system SKU evidence is incomplete.
+verifies schematic RefDes coverage and binds all eight custom build-to-print identities
+to the supplier-open RFQ boundary. A QG-2 `PASS` releases the technical BOM identity
+and quantities only. It does not release routing, fabrication, assembly, harness or
+housing manufacture.
 
 `tools/audit_evt_system_ots_procurement_identity_rev_a.py` independently binds the
 eight exact OTS identities to the BOM, their RFQs, manufacturer sources, supplier
@@ -145,7 +154,7 @@ It also recomputes the bare-PCB and primary full-PCBA tracks for lots 4, 10 and 
 requires exactly two spare boards per design, checks the full-PCBA per-station value
 and enforces the approved 15% ceiling against the customer-presented direct BOM.
 
-The actual factory gate is:
+The release-gate sequence is:
 
 ```bash
 python tools/generate_evt_pre_20_bom_rev_a.py --check
@@ -156,5 +165,7 @@ python tools/audit_evt_pre_20_bom_qg2.py --strict
 python tools/audit_evt_pre_20_hardware_release.py --strict
 ```
 
-No spreadsheet cleanup, RFQ response or supplier substitution may bypass the strict
-gate or the independent PCB Review A and Review B requirements.
+The BOM QG-2 command is expected to pass; the final hardware-release command remains
+blocking until routing, DRC, CAM, job-specific DFM, Review B, mechanics, harness and
+physical evidence are complete. No spreadsheet cleanup, RFQ response or supplier
+substitution may bypass those controls.

@@ -1,11 +1,11 @@
 # EVT-PRE-20 Rev.A BOM component evidence
 
-Status: `CONTROLLED INPUT / NOT A PRODUCTION RELEASE`
+Status: `TECHNICAL BOM QG-2 CONTROLLED / NOT A HARDWARE PRODUCTION RELEASE`
 
 This register records the source used to normalize exact orderable identity, package,
 and temperature data in the Rev.A BOM. Electrical suitability, layout, physical
 assembly/EOL/EVT validation and manufacturing release remain governed by the line
-blockers and QG-2.
+blockers and the independent hardware release gate.
 
 | BOM item | Exact identity | Controlled fact | Primary evidence |
 |---|---|---|---|
@@ -38,6 +38,26 @@ blockers and QG-2.
 | ANT-LORA | Taoglas `TI.89.B.2111W` | exact EVT purchase identity: IP67 SMA(M) terminal antenna, 860-930 MHz with specified 862-874 MHz 868-band measurement, 180 x 13 mm, `-40..85 C` | [Taoglas exact product page](https://www.taoglas.com/product/ti-89-b-ism-lora-860-930-mhz-white-terminal-mount-antenna-2dbi-smam-fixed-straight-waterproof-enclosure/) and [datasheet](https://www.taoglas.com/datasheets/TI.89.B.2111W.pdf); documentary purchase identity is released, while installed S11/VSWR, conducted sensitivity/power and RU868 radiated evidence remain assembly/EOL/EVT validation |
 | RF-PIGTAIL | Taoglas `CAB.0243` | exact common EVT purchase identity for J8/J9/J10: 150 mm 1.13 mm micro-coax, right-angle I-PEX MHF I (U.FL-compatible) end to normal-polarity waterproof SMA(F) bulkhead; published operating range `-60..200 C` and minimum bend radius 6.8 mm | [Taoglas exact product page](https://www.taoglas.com/product/cab-0243-i-pex-mhf-i-u-fl-to-150mm-1-13-cable-to-smafbk-st-waterproof/) and [SPE-24-8-147-A](https://www.taoglas.com/datasheets/CAB.0243.pdf); documentary purchase identity is released, while mate/retention, route, numeric seal/IP evidence and installed VNA remain assembly/EOL/EVT validation |
 | J-RF-CELL/GNSS/LORA | `U.FL-R-SMT-1(60)` | board receptacle `-40..90 C`; common cable candidate is separate BOM line `RF-PIGTAIL` and remains physically unqualified | [Hirose exact product page](https://www.hirose.com/en/product/p/CL0331-0472-2-60) and [U.FL series catalog](https://www.hirose.com/en/product/document?clcode=&documentid=ed_U.FL_CAT&documenttype=Catalog&lang=en&productname=&series=U.FL) |
+
+## Project-owned build-to-print identities
+
+These identities make the technical and procurement BOMs deterministic without
+claiming that a fabricator, EMS, harness assembler or vacuum-casting supplier has
+been selected. All corresponding RFQ supplier and quote-date fields remain empty.
+
+| BOM item | Internal article identity | Controlled scope | Still required before manufacture |
+|---|---|---|---|
+| `ASM-MAIN` | `DIO-ASM-MAIN-REV-A` | PCB-MAIN assembled build-to-print scope | Completed routing, DRC, CAM, selected EMS response, DFM, stencil/process acceptance and Review B |
+| `PCB-MAIN` | `DIO-PCB-MAIN-REV-A` | PCB-MAIN bare-board build-to-print scope | Completed routing, DRC, CAM, selected stackup/coupon response, DFM and Review B |
+| `ASM-PWR` | `DIO-ASM-PWR-REV-A` | PCB-PWR assembled build-to-print scope | Completed routing, power/thermal evidence, DRC, CAM, selected EMS response, DFM and Review B |
+| `PCB-PWR` | `DIO-PCB-PWR-REV-A` | PCB-PWR bare-board build-to-print scope | Selected stackup/copper/plating, completed routing, power/thermal evidence, DRC, CAM, DFM and Review B |
+| `ASM-MIC` | `DIO-ASM-MIC-REV-A` | PCB-MIC assembled build-to-print scope | Remaining Review B, CAM comparison, acoustic/process DFM and selected EMS acceptance |
+| `PCB-MIC` | `DIO-PCB-MIC-REV-A` | PCB-MIC bare-board build-to-print scope | Remaining Review B, CAM comparison, panelization/acoustic DFM and selected fabricator acceptance |
+| `HARNESS` | `DIO-HARNESS-SET-REV-A` | Controlled labeled station harness set | Final routes and cut lengths, exact wire AVL, accepted crimp process, selected assembler, FAI and physical validation |
+| `HSG-VC` | `DIO-HSG-VC-REV-A` | Vacuum-cast housing set build-to-print scope | Released source geometry, material/process response, selected caster, fit/seal/thermal/RF first-article evidence |
+
+Passing the build-to-print identity check releases none of the still-required evidence
+listed above; it only closes ambiguous `TBD` identity inside the technical BOM.
 
 The eight system OTS lines above are additionally controlled by
 `hardware/reviews/EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.{md,json}`. Their

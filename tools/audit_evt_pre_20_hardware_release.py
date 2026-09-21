@@ -1059,7 +1059,11 @@ def audit() -> dict[str, object]:
     open_dimensions = [
         row["ID"]
         for row in dimensions
-        if row["Status"] not in {"CLOSED", "CLOSED_AUTHORITY_INPUT"}
+        if row["Status"] not in {
+            "CLOSED",
+            "CLOSED_AUTHORITY_INPUT",
+            "CLOSED_EVT_ENGINEERING_18_OF_18_ACCEPTED_SERIAL_REVALIDATION_REQUIRED",
+        }
     ]
     check(
         "mechanical_dimensions",

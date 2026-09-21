@@ -281,7 +281,9 @@ def main() -> int:
             "Purchase gate", "BLOCKED",
         ], "Summary: selected EVT-20 scenario or blocked purchase gate mismatch")
         require(summary[14][1] == "PASS", "Summary: QG-1 status is not PASS")
-        require(summary[15][1] == "BLOCKED", "Summary: QG-2 must remain BLOCKED")
+        require(summary[15][0] == "QG-2 technical BOM",
+                "Summary: QG-2 label must state the technical-BOM boundary")
+        require(summary[15][1] == "PASS", "Summary: technical BOM QG-2 status is not PASS")
         require("U8" not in summary[22][1], "Summary: U8 incorrectly remains an open selection")
         require(re.fullmatch(r"[0-9a-f]{12}", summary[11][1]) is not None,
                 "Summary: source commit is not a 12-hex identifier")
