@@ -1,0 +1,137 @@
+{
+  "schema_version": "dioneya.pcb-pwr-buck-placement-eco-001-candidate.v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-BUCK-PLACEMENT-ECO-001",
+  "date_utc": "2026-09-21",
+  "status": "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+  "scope": "MOVE_ONLY_C4_C6_L1_L2_NO_COPPER",
+  "engineering_basis": {
+    "device": "LMR604403SRAKR",
+    "primary_source": "TI LMR60440 data sheet SNAS877, section 8.4",
+    "primary_source_url": "https://www.ti.com/document-viewer/LMR60440/datasheet/GUID-BAF92739-0CA9-4578-99BE-026DEB792C01",
+    "requirements": [
+      "place CBOOT close to the device with short and wide BOOT/SW paths",
+      "keep SW-to-inductor copper short, wide, and minimum area",
+      "retain close VIN/GND input capacitors and quiet feedback routing"
+    ],
+    "numeric_route_basis": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+    "mechanical_basis": "hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.json"
+  },
+  "base": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb",
+    "board_sha256": "fdd53e669a167df8925c38e289993c38b818c231eddd0be54de378b51538bf48",
+    "footprints": 66,
+    "trace_items": 0,
+    "zones": 0
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb",
+    "board_sha256": "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37",
+    "generator": "tools/generate_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py",
+    "generator_sha256": "5dcf33e2a13cc09a30f86e6405178d044cd741064e31f03a89805b0d10a690a7",
+    "independent_audit": "tools/audit_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py",
+    "footprints": 66,
+    "trace_items": 0,
+    "zones": 0,
+    "accepted_base_bytes_modified": false
+  },
+  "bounded_placement_delta": [
+    {
+      "refdes": "C4",
+      "from": {"x_mm": 53.0, "y_mm": 10.0, "rotation_deg": 0.0},
+      "to": {"x_mm": 54.575, "y_mm": 16.4, "rotation_deg": 180.0},
+      "purpose": "put BOOT pad 1 and SW pad 2 directly below the matching U3 edge"
+    },
+    {
+      "refdes": "C6",
+      "from": {"x_mm": 53.0, "y_mm": 38.0, "rotation_deg": 0.0},
+      "to": {"x_mm": 54.575, "y_mm": 44.4, "rotation_deg": 180.0},
+      "purpose": "put BOOT pad 1 and SW pad 2 directly below the matching U4 edge"
+    },
+    {
+      "refdes": "L1",
+      "from": {"x_mm": 62.0, "y_mm": 14.0, "rotation_deg": 0.0},
+      "to": {"x_mm": 60.75, "y_mm": 14.0, "rotation_deg": 180.0},
+      "purpose": "face SW pad 1 toward U3 and output pad 2 toward the 3V8 capacitor bank"
+    },
+    {
+      "refdes": "L2",
+      "from": {"x_mm": 62.0, "y_mm": 42.0, "rotation_deg": 0.0},
+      "to": {"x_mm": 60.75, "y_mm": 42.0, "rotation_deg": 180.0},
+      "purpose": "face SW pad 1 toward U4 and output pad 2 toward the 3V3 capacitor bank"
+    }
+  ],
+  "fixed_anchors": [
+    "U3",
+    "U4",
+    "C11",
+    "C12",
+    "C20",
+    "C21",
+    "C3",
+    "C5",
+    "C14",
+    "C15",
+    "C16",
+    "C17",
+    "C18",
+    "C19",
+    "H1",
+    "H2",
+    "H3",
+    "H4",
+    "J1",
+    "J2"
+  ],
+  "static_validation": {
+    "fitted_footprints": 44,
+    "required_clearance_mm": 0.2,
+    "minimum_observed_clearance_mm": 0.22,
+    "component_conflicts": 0,
+    "mounting_body_conflicts": 0,
+    "mounting_pad_conflicts": 0,
+    "c4_u3_gap_mm": 0.24,
+    "c6_u4_gap_mm": 0.24,
+    "l1_u3_gap_mm": 0.25,
+    "l2_u4_gap_mm": 0.25,
+    "outline_mounting_or_stackup_changed": false,
+    "unrelated_footprints_moved": false,
+    "copper_changed": false
+  },
+  "topology_metrics": {
+    "3V8": {
+      "controller_boot_to_cboot_mm": {"base": 5.661241, "candidate": 1.28161, "improvement_percent": 77.362},
+      "controller_sw_to_cboot_mm": {"base": 4.966352, "candidate": 1.309926, "improvement_percent": 73.624},
+      "controller_sw_to_inductor_mm": {"base": 10.045682, "candidate": 4.356803, "improvement_percent": 56.63},
+      "inductor_to_nearest_output_cap_mm": {"base": 8.343035, "candidate": 5.420814, "improvement_percent": 35.026}
+    },
+    "3V3": {
+      "controller_boot_to_cboot_mm": {"base": 5.661241, "candidate": 1.28161, "improvement_percent": 77.362},
+      "controller_sw_to_cboot_mm": {"base": 4.966352, "candidate": 1.309926, "improvement_percent": 73.624},
+      "controller_sw_to_inductor_mm": {"base": 10.045682, "candidate": 4.356803, "improvement_percent": 56.63},
+      "inductor_to_nearest_output_cap_mm": {"base": 8.343035, "candidate": 5.420814, "improvement_percent": 35.026}
+    }
+  },
+  "required_machine_gate": {
+    "kicad_version": "9.x",
+    "regenerate_exact_candidate": true,
+    "native_parse_required": true,
+    "comparative_drc_new_error_count": 0,
+    "unconnected_item_count_must_equal_base": true,
+    "strict_fitted_and_mounting_clearance_required": true
+  },
+  "review_request": {
+    "requested_after_green_machine_gate": "ACCEPT_PCB_PWR_BUCK_PLACEMENT_ECO_001_SUBGATE_OR_REJECT",
+    "accept_value": "ACCEPT_PCB_PWR_BUCK_PLACEMENT_ECO_001_SUBGATE",
+    "reject_value": "REJECT_PCB_PWR_BUCK_PLACEMENT_ECO_001_SUBGATE"
+  },
+  "decision_boundary": {
+    "proposal_only": true,
+    "applied_to_authoritative_board": false,
+    "routing_complete": false,
+    "fabricator_stackup_response_sets_accepted": 0,
+    "review_b_complete": false,
+    "cam_or_fabrication_authorized": false,
+    "manufacturing_release": false
+  }
+}

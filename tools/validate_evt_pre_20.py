@@ -230,6 +230,16 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR conservative numeric EVT routing decision is missing or over-released",
     )
     require(
+        decisions["DEC-100"]["Status"] ==
+        "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]
+        and "77.362 percent" in decisions["DEC-100"]["Impact"]
+        and "56.630 percent" in decisions["DEC-100"]["Impact"]
+        and "add no copper" in decisions["DEC-100"]["Impact"]
+        and "human subgate acceptance" in decisions["DEC-100"]["Impact"],
+        "PCB-PWR buck placement ECO proposal decision is missing or over-released",
+    )
+    require(
         decisions["DEC-069"]["Status"] ==
         "LOCKED_CUSTOMER_PROCUREMENT_BOUNDARY_TECHNICAL_GATES_RETAINED"
         and "commercial procurement execution to the customer"
@@ -367,6 +377,19 @@ def validate_deliverable_register() -> None:
         "PCB-PWR numeric EVT routing-basis deliverable is missing or over-released",
     )
     require(
+        deliverables["HW-P-007"]["Статус"] == "CONTROLLED_STATIC_PROPOSAL"
+        and deliverables["HW-P-007"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-P-007"]["QG-2 техника"] == "OPEN"
+        and "moves only C4 C6 L1 L2"
+        in deliverables["HW-P-007"]["Критерий выпуска"]
+        and "adds zero copper" in deliverables["HW-P-007"]["Критерий выпуска"]
+        and "commit-bound comparative KiCad 9 gate"
+        in deliverables["HW-P-007"]["Критерий выпуска"]
+        and "manufacture remain open"
+        in deliverables["HW-P-007"]["Критерий выпуска"],
+        "PCB-PWR buck placement ECO deliverable is missing or over-released",
+    )
+    require(
         deliverables["HW-A-002"]["Статус"] == "DRAFT"
         and deliverables["HW-A-002"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-A-002"]["QG-2 техника"] == "OPEN"
@@ -417,6 +440,15 @@ def validate_deliverable_register() -> None:
         and "manufacturing output generated from the engineering-only basis"
         in risks["R-032"]["Trigger"],
         "PCB-PWR engineering-basis promotion risk is not controlled",
+    )
+    require(
+        "hash-bound C4 C6 L1 L2 ECO" in risks["R-034"]["Mitigation"]
+        and "comparative KiCad 9 DRC" in risks["R-034"]["Mitigation"]
+        and "exact human acceptance" in risks["R-034"]["Mitigation"]
+        and "switch or bootstrap copper added"
+        in risks["R-034"]["Trigger"]
+        and "any unrelated footprint moved" in risks["R-034"]["Trigger"],
+        "PCB-PWR dual-buck placement-before-routing risk is not controlled",
     )
 
 

@@ -175,6 +175,10 @@ jobs:
           python tools/audit_pcb_pwr_placement_clearance_rev_a.py \
             --output artifacts/pcb_pwr_placement_clearance_rev_a.json \
             --strict
+          python tools/generate_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py \
+            --check
+          python tools/audit_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py \
+            --output artifacts/pcb_pwr_buck_placement_eco_001_candidate_rev_a.json
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/pcb_pwr_routing_authority_rev_a.json
           python tools/generate_pcb_pwr_evt_route_rules_rev_a.py --check
@@ -286,6 +290,7 @@ jobs:
             artifacts/pcb_main_mechanical_eco_candidate_rev_a.json
             artifacts/pcb_main_mech_eco_002_rev_a.json
             artifacts/pcb_pwr_placement_clearance_rev_a.json
+            artifacts/pcb_pwr_buck_placement_eco_001_candidate_rev_a.json
             artifacts/pcb_pwr_hierarchy_rev_a.json
             artifacts/pcb_pwr_routing_authority_rev_a.json
             artifacts/pcb_pwr_evt_routing_basis_rev_a.json
@@ -340,6 +345,10 @@ jobs:
             hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md
             hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
             hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb
             hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md
             hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md
             hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json

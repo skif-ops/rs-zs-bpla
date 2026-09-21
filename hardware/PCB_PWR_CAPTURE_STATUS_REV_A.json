@@ -298,6 +298,20 @@
         "routing_complete": false,
         "manufacturing_release": false
       }
+    },
+    "buck_placement_eco_001": {
+      "proposal": "hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.json",
+      "record": "hardware/reviews/PCB_PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.md",
+      "generator": "tools/generate_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py",
+      "independent_audit": "tools/audit_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py",
+      "status": "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+      "candidate_sha256": "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37",
+      "moved_footprints": ["C4", "C6", "L1", "L2"],
+      "authoritative_board_modified": false,
+      "routing_added": false,
+      "human_acceptance_complete": false,
+      "review_b_complete": false,
+      "manufacturing_release": false
     }
   },
   "mechanical_freeze_input": {
