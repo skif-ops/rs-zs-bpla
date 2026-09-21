@@ -1514,10 +1514,6 @@ jobs:
             "$candidate_project/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb"
           cmp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb \
             hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb
-            hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.json
-            hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.md
-            hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_BASE_REV_A.kicad_pcb
-            hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb
           /usr/bin/python3 - \
             "$candidate_project/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pcb" \
             "$candidate_project/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb" <<'PY'
