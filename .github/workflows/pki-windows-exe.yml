@@ -1,0 +1,42 @@
+name: pki-windows-exe
+on:
+  workflow_dispatch:
+  push:
+    paths: ["server/pki/**", "server/tests/test_pki.py", "server/requirements-pki.txt"]
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - runner: windows-latest
+            arch: x64
+          - runner: windows-11-arm
+            arch: arm64
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -r requirements-pki.txt pyinstaller pytest
+      - run: python -m pytest -q tests/test_pki.py
+      - run: pyinstaller --clean --noconfirm pki/pyinstaller_muhoed_pki.spec
+      - run: pyinstaller --clean --noconfirm pki/pyinstaller_root_offline.spec
+      - run: .\dist\muhoed-pki.exe --help
+      - run: .\dist\dioneya-root-offline.exe --help
+      - shell: pwsh
+        run: |
+          Get-FileHash dist\muhoed-pki.exe, dist\dioneya-root-offline.exe -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash.ToLower())  $(Split-Path $_.Path -Leaf)" } | Set-Content dist\SHA256SUMS.txt
+          Get-Content dist\SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: muhoed-pki-windows-${{ matrix.arch }}
+          path: |
+            server/dist/muhoed-pki.exe
+            server/dist/dioneya-root-offline.exe
+            server/dist/SHA256SUMS.txt
+          retention-days: 30
