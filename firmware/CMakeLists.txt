@@ -56,6 +56,7 @@ add_library(zs_core
   src/zs_pps_sync.c
   src/zs_selftest.c
   src/zs_fft_mixed.c
+  src/zs_dsp_mcu.c
   src/zs_ina226.c
 )
 target_include_directories(zs_core PUBLIC include generated)
@@ -136,6 +137,8 @@ add_executable(zs_platform_tests tests/test_platform.c)
 target_link_libraries(zs_platform_tests zs_core m)
 add_executable(zs_fft_mixed_tests tests/test_fft_mixed.c)
 target_link_libraries(zs_fft_mixed_tests zs_core m)
+add_executable(zs_dsp_mcu_tests tests/test_dsp_mcu.c)
+target_link_libraries(zs_dsp_mcu_tests zs_core m)
 add_executable(zs_ina226_tests tests/test_ina226.c)
 target_link_libraries(zs_ina226_tests zs_core m)
 add_executable(evt_pre_20_target_contract_tests tests/test_evt_pre_20_target_contract.c)
@@ -182,6 +185,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_bg95_provision_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_platform_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_fft_mixed_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_dsp_mcu_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_ina226_tests PRIVATE -UNDEBUG)
   target_compile_options(evt_pre_20_target_contract_tests PRIVATE -UNDEBUG)
   target_compile_options(evt_pre_20_dual_sim_gpio_tests PRIVATE -UNDEBUG)
@@ -222,6 +226,7 @@ add_test(NAME station_config COMMAND zs_station_config_tests)
 add_test(NAME bg95_provision COMMAND zs_bg95_provision_tests)
 add_test(NAME platform COMMAND zs_platform_tests)
 add_test(NAME fft_mixed COMMAND zs_fft_mixed_tests)
+add_test(NAME dsp_mcu COMMAND zs_dsp_mcu_tests)
 add_test(NAME ina226 COMMAND zs_ina226_tests)
 add_test(NAME evt_pre_20_target_contract COMMAND evt_pre_20_target_contract_tests)
 add_test(NAME evt_pre_20_dual_sim_gpio COMMAND evt_pre_20_dual_sim_gpio_tests)
