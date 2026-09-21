@@ -1,0 +1,65 @@
+{
+  "schema": "dioneya-pcb-pwr-lm74700-vcap-routing-002-candidate-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-LM74700-VCAP-ROUTING-002",
+  "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_002_CREATION_SUBGATE",
+  "status": "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+  "scope": "ONLY_U1_1_TO_C1_1_LM74700_VCAP_CONNECTION",
+  "selection_rationale": "LOW_RISK_LOCAL_ANALOG_TIMING_CONNECTION_BEFORE_SEPARATE_2P1MM_SWITCH_NODE_ROUTEABILITY_OR_PLACEMENT_GATE",
+  "base": {
+    "board": "hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb",
+    "sha256": "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236",
+    "semantic_sha256": "d90ef0332ed5da798029a5cb580a0f3a5f68387068811eeb9e4c06d0681500ae",
+    "trace_items": 2,
+    "copper_zones": 0
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb",
+    "sha256": "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5",
+    "semantic_sha256": "07ce41bb361e68dd3a5310a6879030f097e4498e9397f2506ea5b78f49c47234",
+    "trace_items": 3,
+    "copper_zones": 0,
+    "routed_nets": ["LM74700_VCAP"],
+    "connections": ["U1.1-C1.1"],
+    "layer": "F.Cu",
+    "width_mm": 0.5,
+    "vias": 0,
+    "added_route_length_mm": 3.158307
+  },
+  "source_binding": {
+    "generator": "tools/generate_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py",
+    "generator_sha256": "610269071be79bfb5e2fa46b0e3154e2f39d3bf2da6df9013fd6e3c6f88bc8b7",
+    "routing_rules": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
+    "routing_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
+    "evt_stackup_basis": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+    "evt_stackup_basis_sha256": "f420a20a7385cc9bd3d057e8d029246e8ebd64d7104511c677d628b7caf39230"
+  },
+  "deferred_boundary": {
+    "switch_node_routes": ["SW_3V8", "SW_3V3"],
+    "required_width_mm": 2.1,
+    "reason": "QFN_ESCAPE_ADJACENT_TO_BOOT_AND_GND_REQUIRES_SEPARATE_ROUTEABILITY_OR_PLACEMENT_REVIEW",
+    "narrow_substitution_authorized": false
+  },
+  "invariants": {
+    "authoritative_board_modified": false,
+    "predecessor_copper_changed": false,
+    "component_poses_changed": false,
+    "pad_geometry_or_nets_changed": false,
+    "outline_or_layers_changed": false,
+    "non_vcap_copper_added": false,
+    "switch_node_or_power_routing_added": false
+  },
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "required_new_errors": 0,
+    "required_unconnected_reduction": 1,
+    "required_other_drc_fingerprint_delta": 0
+  },
+  "human_gate_after_machine_pass": {
+    "accept_value": "ACCEPT_PCB_PWR_LM74700_VCAP_ROUTING_002_SUBGATE",
+    "reject_value": "REJECT_PCB_PWR_LM74700_VCAP_ROUTING_002_SUBGATE"
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}
