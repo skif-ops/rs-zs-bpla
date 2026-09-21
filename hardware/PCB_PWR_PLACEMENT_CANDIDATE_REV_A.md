@@ -42,11 +42,12 @@ R10 silkscreen-to-mask warning remain open and block Review B/CAM.
 `PCB-PWR-BUCK-WARNING-REMEDIATION-001` now contains an isolated follow-on
 candidate that preserves every component pose and all pad copper geometry,
 normalizes only C4/C6 rotated child serialization and moves only the R10 visible
-reference. It is not applied: commit-bound KiCad 9 comparative DRC and exact
-human subgate acceptance remain mandatory before these four warnings may be
-closed. Native run 312 rejected the initial serialization because it introduced
-two replacement C4/C6 reference-to-mask warnings; the corrected candidate keeps
-their original physical reference centres.
+reference. It is not applied. Native run 312 rejected the initial serialization
+because it introduced
+two replacement C4/C6 reference-to-mask warnings. The corrected candidate keeps
+their original physical reference centres and passes CI #586, PCB-PWR Schematic
+#65 and PCB Native #313 with exact `90 -> 86` violation and `126 -> 126`
+unconnected-item results. Only exact human acceptance remains pending.
 
 ## Local input-capacitor placement evidence
 

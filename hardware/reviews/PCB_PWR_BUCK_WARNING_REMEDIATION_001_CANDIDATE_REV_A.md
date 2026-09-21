@@ -1,6 +1,6 @@
 # PCB-PWR buck warning remediation 001 — Rev.A
 
-Status: `STATIC PROPOSAL READY / COMMIT-BOUND KICAD 9 GATE PENDING / NOT APPLIED / NOT FOR MANUFACTURE`
+Status: `COMMIT-BOUND KICAD 9 GATE PASS / HUMAN SUBGATE PENDING / NOT APPLIED / NOT FOR MANUFACTURE`
 
 `PCB-PWR-BUCK-WARNING-REMEDIATION-001` is a separate, bounded follow-on to the
 accepted and applied C4/C6/L1/L2 placement ECO. It addresses the three
@@ -53,10 +53,15 @@ The independent static audit confirms the exact raw delta, unchanged component
 poses and physical pad data, zero routed copper, `44/44` fitted courtyards,
 zero fitted or mounting conflicts and the unchanged `0.22 mm` board minimum.
 
-## Required gate and decision boundary
+## Commit-bound gate result and decision boundary
 
-The commit-bound PCB Native gate must regenerate both files byte for byte and
-use KiCad 9 comparative DRC to prove all of the following:
+Corrected proposal commit `63d87153e441d956117323ed8d9887568c5033ac`
+(tree `87b2c7ab4d8fbc1b5d0d3c88c703994abef773bf`) passed CI `#586`,
+PCB-PWR Schematic Gate `#65`, and PCB Native Gate `#313`. Native artifact
+`10636550793` has digest
+`sha256:77a1d81b3e03e896c248992ae607c89b2158d7e8692331e45635abcb3f3a84a1`.
+The commit-bound gate regenerated both files byte for byte and KiCad 9
+comparative DRC proved all of the following:
 
 - the base has the known `90` violations and `126` unconnected items;
 - the candidate removes exactly the two C4/C6 `lib_footprint_mismatch`
@@ -66,6 +71,10 @@ use KiCad 9 comparative DRC to prove all of the following:
 - every other DRC finding remains fingerprint-identical;
 - no new error or warning is introduced and the unconnected count stays `126`;
 - strict fitted and mounting clearance remains green.
+
+The exact reviewed commit, tree, proposal, candidate, generator, audit and
+artifact identities are bound in
+`PCB_PWR_BUCK_WARNING_REMEDIATION_001_REVIEW_COMMIT_MAPPING.json`.
 
 Even after a green machine gate, application requires the exact decision
 `ACCEPT_PCB_PWR_BUCK_WARNING_REMEDIATION_001_SUBGATE`. Acceptance would

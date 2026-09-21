@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "proposal_id": "PCB-PWR-BUCK-WARNING-REMEDIATION-001",
   "date_utc": "2026-09-21",
-  "status": "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+  "status": "COMMIT_BOUND_KICAD9_GATE_PASS_HUMAN_SUBGATE_PENDING",
   "scope": "NORMALIZE_C4_C6_ROTATED_INSTANCE_DATA_AND_MOVE_R10_REFERENCE_ONLY_NO_COMPONENT_POSE_OR_COPPER_CHANGE",
   "engineering_basis": {
     "trigger": "Close the three warning-only findings explicitly retained by the accepted PCB-PWR buck-placement ECO-001 application plus the pre-existing R10 silkscreen-to-mask finding before Review B or CAM.",
@@ -48,6 +48,7 @@
     "generator": "tools/generate_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py",
     "generator_sha256": "30041af847360568ed8ab43f34e0cc194d61683da95bacba02eead15946d5eb1",
     "independent_audit": "tools/audit_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py",
+    "review_commit_mapping": "hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_REVIEW_COMMIT_MAPPING.json",
     "footprints": 66,
     "trace_items": 0,
     "zones": 0
@@ -106,6 +107,31 @@
     "new_warning_count": 0,
     "unconnected_item_count_must_equal_base": true,
     "strict_fitted_and_mounting_clearance_required": true
+  },
+  "commit_bound_machine_gate": {
+    "status": "PASS_EXACT_FOUR_WARNING_CLOSURE_NO_OTHER_DRC_DELTA",
+    "head_commit_sha": "63d87153e441d956117323ed8d9887568c5033ac",
+    "head_tree_sha": "87b2c7ab4d8fbc1b5d0d3c88c703994abef773bf",
+    "pcb_native_run_id": 35595182381,
+    "pcb_native_run_number": 313,
+    "pcb_native_conclusion": "success",
+    "comparative_drc_step": "success",
+    "ci_run_id": 35595182283,
+    "ci_run_number": 586,
+    "ci_conclusion": "success",
+    "pcb_pwr_schematic_run_id": 35595182499,
+    "pcb_pwr_schematic_run_number": 65,
+    "pcb_pwr_schematic_conclusion": "success",
+    "artifact_id": 10636550793,
+    "artifact_digest": "sha256:77a1d81b3e03e896c248992ae607c89b2158d7e8692331e45635abcb3f3a84a1",
+    "base_violations": 90,
+    "candidate_violations": 86,
+    "base_unconnected": 126,
+    "candidate_unconnected": 126,
+    "new_errors": 0,
+    "new_warnings": 0,
+    "all_other_drc_fingerprints_match": true,
+    "minimum_observed_clearance_mm": 0.22
   },
   "review_request": {
     "requested_after_green_machine_gate": "ACCEPT_PCB_PWR_BUCK_WARNING_REMEDIATION_001_SUBGATE_OR_REJECT",

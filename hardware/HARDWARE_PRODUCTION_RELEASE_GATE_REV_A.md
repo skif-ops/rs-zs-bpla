@@ -215,9 +215,11 @@ poses and pad copper geometry, canonically normalizes only C4/C6 rotated child
 data, retains both C4/C6 reference centres and moves only the visible R10
 reference. Its static clearance gate passes. Native run 312 rejected the first
 serialization after detecting two replacement reference-to-mask warnings; the
-corrected candidate still requires a green commit-bound comparative DRC and
-exact human acceptance. It therefore changes neither the active board nor any
-release state.
+corrected candidate passes CI #586, PCB-PWR Schematic #65 and PCB Native #313.
+The comparative result is exact: `90 -> 86` violations, `126 -> 126`
+unconnected items, four intended warning removals and no other DRC fingerprint
+change. Exact human acceptance is still pending, so it changes neither the
+active board nor any release state.
 
 The PCB-PWR `DIM-003` mechanical authority is machine-audited and accepted
 `18/18` for the EVT test batch. It binds the 90 x 60 x 1.6 mm basis, four round

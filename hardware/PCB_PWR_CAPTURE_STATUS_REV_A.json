@@ -332,7 +332,8 @@
         "record": "hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.md",
         "generator": "tools/generate_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py",
         "audit": "tools/audit_pcb_pwr_buck_warning_remediation_001_candidate_rev_a.py",
-        "status": "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+        "mapping": "hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_REVIEW_COMMIT_MAPPING.json",
+        "status": "COMMIT_BOUND_KICAD9_GATE_PASS_HUMAN_SUBGATE_PENDING",
         "base_board_sha256": "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37",
         "candidate_board_sha256": "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957",
         "normalized_instances": ["C4", "C6"],
@@ -342,7 +343,17 @@
         "component_poses_changed": false,
         "copper_changed": false,
         "authoritative_board_modified": false,
-        "machine_gate_complete": false,
+        "machine_gate_complete": true,
+        "machine_gate": {
+          "reviewed_commit_sha": "63d87153e441d956117323ed8d9887568c5033ac",
+          "reviewed_tree_sha": "87b2c7ab4d8fbc1b5d0d3c88c703994abef773bf",
+          "ci_run_number": 586,
+          "pcb_native_run_number": 313,
+          "pcb_pwr_schematic_run_number": 65,
+          "artifact_id": 10636550793,
+          "artifact_digest": "sha256:77a1d81b3e03e896c248992ae607c89b2158d7e8692331e45635abcb3f3a84a1",
+          "comparative_drc": "PASS_EXACT_FOUR_WARNING_CLOSURE_NO_OTHER_DRC_DELTA_90_TO_86_126_TO_126"
+        },
         "human_acceptance_complete": false,
         "review_b_complete": false,
         "manufacturing_release": false

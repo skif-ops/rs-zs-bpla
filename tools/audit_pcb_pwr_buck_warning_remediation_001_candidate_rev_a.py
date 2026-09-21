@@ -38,12 +38,21 @@ REVIEW = (
     ROOT
     / "hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.json"
 )
+MAPPING = (
+    ROOT
+    / "hardware/reviews/PCB_PWR_BUCK_WARNING_REMEDIATION_001_REVIEW_COMMIT_MAPPING.json"
+)
 
 BASE_SHA256 = "9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37"
 CANDIDATE_SHA256 = "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957"
 BASE_SEMANTIC_SHA256 = "5994f22cdce03bc60779fcf120177bb82f6ecb88b2afdbe9bf4c0c2819af7337"
 CANDIDATE_SEMANTIC_SHA256 = "b94eb0e53a714a2259e7362df7b96d1333c885f48399102b7ac279fb368d3276"
 GENERATOR_SHA256 = "30041af847360568ed8ab43f34e0cc194d61683da95bacba02eead15946d5eb1"
+REVIEWED_GITHUB_COMMIT_SHA = "63d87153e441d956117323ed8d9887568c5033ac"
+REVIEWED_TREE_SHA = "87b2c7ab4d8fbc1b5d0d3c88c703994abef773bf"
+MACHINE_GATE_ARTIFACT_DIGEST = (
+    "sha256:77a1d81b3e03e896c248992ae607c89b2158d7e8692331e45635abcb3f3a84a1"
+)
 TARGET_REFERENCES = {"C4", "C6", "R10"}
 EXPECTED_POSES = {
     "C4": (54.575, 16.4, 180.0),
@@ -242,7 +251,7 @@ def audit(
     drc_base: Path | None = None,
     drc_candidate: Path | None = None,
 ) -> dict[str, object]:
-    for path in (BASE, CANDIDATE, ACTIVE, PLACEMENT, GENERATOR, REVIEW):
+    for path in (BASE, CANDIDATE, ACTIVE, PLACEMENT, GENERATOR, REVIEW, MAPPING):
         require(path.is_file() and path.stat().st_size > 0,
                 f"missing PCB-PWR warning-remediation input: {path}")
     require(sha256(BASE) == BASE_SHA256,
@@ -361,11 +370,76 @@ def audit(
         and review.get("decision_boundary", {}).get("manufacturing_release") is False,
         "PCB-PWR warning-remediation proposal boundary drift",
     )
+    mapping = json.loads(MAPPING.read_text(encoding="utf-8"))
+    gate = mapping.get("machine_gate", {})
+    review_gate = review.get("commit_bound_machine_gate", {})
+    require(
+        mapping.get("proposal_id") ==
+        "PCB-PWR-BUCK-WARNING-REMEDIATION-001"
+        and mapping.get("reviewed_github_commit_sha") ==
+        REVIEWED_GITHUB_COMMIT_SHA
+        and mapping.get("reviewed_tree_sha") == REVIEWED_TREE_SHA
+        and mapping.get("proposal_blob_sha") ==
+        "eae224fc642ee39d650cae26858b0c6d304e3c7e"
+        and mapping.get("proposal_sha256") ==
+        "195d439e320cc00327f38fa584712e6e4f41b9685a1108a7df046fef9d0739d4"
+        and mapping.get("proposal_record_blob_sha") ==
+        "d78b9ae2a5e13b73a6380a18ef9fe1d4d05fc1fa"
+        and mapping.get("candidate_board_blob_sha") ==
+        "1d023412761183a37d596cfa2ad4843945b9dc26"
+        and mapping.get("candidate_board_sha256") == CANDIDATE_SHA256
+        and mapping.get("generator_blob_sha") ==
+        "016b84ffc9a3afbe86838ef2fd6bb8b5b67611c5"
+        and mapping.get("generator_sha256") == GENERATOR_SHA256
+        and mapping.get("audit_blob_sha") ==
+        "9bc71f3a81bfdf08d16e31fd91c22bb4be7a4ca6"
+        and mapping.get("audit_sha256") ==
+        "473741f73c21cf64039fb700feaf3ad582ab1669e58f65728b67f6f5d40f8059"
+        and gate.get("status") ==
+        "PASS_EXACT_FOUR_WARNING_CLOSURE_NO_OTHER_DRC_DELTA"
+        and gate.get("pcb_native_run_id") == 35595182381
+        and gate.get("pcb_native_run_number") == 313
+        and gate.get("pcb_native_conclusion") == "success"
+        and gate.get("ci_run_id") == 35595182283
+        and gate.get("ci_run_number") == 586
+        and gate.get("ci_conclusion") == "success"
+        and gate.get("artifact_id") == 10636550793
+        and gate.get("artifact_digest") == MACHINE_GATE_ARTIFACT_DIGEST
+        and gate.get("base_violations") == 90
+        and gate.get("candidate_violations") == 86
+        and gate.get("base_unconnected") == 126
+        and gate.get("candidate_unconnected") == 126
+        and gate.get("new_errors") == 0
+        and gate.get("new_warnings") == 0
+        and gate.get("all_other_drc_fingerprints_match") is True
+        and mapping.get("human_subgate_pending") is True
+        and mapping.get("applied_to_authoritative_board") is False,
+        "PCB-PWR warning-remediation review mapping drift",
+    )
+    require(
+        review_gate.get("status") == gate.get("status")
+        and review_gate.get("head_commit_sha") == REVIEWED_GITHUB_COMMIT_SHA
+        and review_gate.get("head_tree_sha") == REVIEWED_TREE_SHA
+        and review_gate.get("pcb_native_run_id") == gate.get("pcb_native_run_id")
+        and review_gate.get("ci_run_id") == gate.get("ci_run_id")
+        and review_gate.get("artifact_id") == gate.get("artifact_id")
+        and review_gate.get("artifact_digest") == MACHINE_GATE_ARTIFACT_DIGEST
+        and review_gate.get("base_violations") == gate.get("base_violations")
+        and review_gate.get("candidate_violations") ==
+        gate.get("candidate_violations")
+        and review_gate.get("base_unconnected") == gate.get("base_unconnected")
+        and review_gate.get("candidate_unconnected") ==
+        gate.get("candidate_unconnected")
+        and review_gate.get("new_errors") == 0
+        and review_gate.get("new_warnings") == 0
+        and review_gate.get("all_other_drc_fingerprints_match") is True,
+        "PCB-PWR warning-remediation machine-gate evidence drift",
+    )
 
     report: dict[str, object] = {
         "schema_version":
         "dioneya.pcb-pwr-buck-warning-remediation-001-candidate-audit.v1",
-        "status": "PASS_STATIC_WARNING_REMEDIATION_PROPOSAL_MACHINE_GATE_PENDING",
+        "status": "PASS_COMMIT_BOUND_KICAD9_WARNING_REMEDIATION_HUMAN_REVIEW_PENDING",
         "base_sha256": BASE_SHA256,
         "base_semantic_sha256": BASE_SEMANTIC_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
