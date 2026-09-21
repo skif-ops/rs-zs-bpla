@@ -63,10 +63,12 @@ Routing and Review B remain open.
 
 `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv` classifies all 31 native nets as a
 pre-route input, including high-current paths, three controlled net-tie returns,
-switch/bootstrap loops, Kelvin sense, feedback and I2C. Its PASS does not permit
-routing: `DIM-003` is accepted for EVT, while numeric width, via-array and plane
-geometry remain open until final current/fault envelopes, stackup/copper weights
-and thermal review close.
+switch/bootstrap loops, Kelvin sense, feedback and I2C. The separate
+`PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json` plus the 31-row
+`PCB_PWR_EVT_ROUTE_RULES_REV_A.csv` now permit a bounded engineering routing
+candidate using a conservative 35 µm screen. `DIM-003` is accepted for EVT;
+final copper/plating, via-current capacity, fault energy, physical thermal
+evidence, routing completion and manufacture remain open.
 
 ## Logical sheet plan
 
@@ -105,12 +107,15 @@ and thermal review close.
   The current `0/14` accepted state does not select an assembler or process,
   create U9 paste apertures, close USB SI/whole-board DFM or permit manufacture.
 - Use `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv` as the 31-net PCB-PWR
-  pre-route input. Freeze `DIM-003`, current/fault envelopes, stackup/copper
-  weights and numeric thermal/current-density geometry before routing any copper.
+  pre-route input and `hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv` as the bounded
+  numeric EVT overlay. Preserve `DIM-003`; route an engineering candidate only
+  against the 35 µm rules. Final job geometry still requires current/fault,
+  selected stackup/copper/plating and physical thermal acceptance.
 - Use `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json` and its blank
   24-row register only to collect comparable stackup/copper inputs from two
   fabricators. The current `0/24` and `0/2` state selects no construction and
-  authorizes no numeric power geometry, routing or fabrication.
+  authorizes no final job-specific power geometry or fabrication; it does not
+  revoke the separately bounded engineering-candidate overlay.
 - Preserve the strict PCB-PWR fitted-body clearance PASS and its six-reference
   coordinate delta; repeat the audit after any placement or footprint change.
 - Freeze CubeMX pin/peripheral assignment for STM32U585VIT6Q; no unresolved AF conflicts.

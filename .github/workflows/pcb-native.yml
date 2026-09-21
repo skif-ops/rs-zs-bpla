@@ -65,7 +65,10 @@ on:
       - "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md"
       - "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv"
       - "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md"
+      - "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv"
       - "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
+      - "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json"
+      - "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md"
       - "hardware/PCB_PWR_REVIEW_A_PIN_NET_REV_A.md"
       - "hardware/PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md"
       - "hardware/POWER_DESIGN_BASELINE_REV_A.json"
@@ -150,6 +153,8 @@ on:
       - "tools/audit_pcb_pwr_placement_clearance_rev_a.py"
       - "tools/generate_pcb_pwr_routing_authority_rev_a.py"
       - "tools/audit_pcb_pwr_routing_authority_rev_a.py"
+      - "tools/generate_pcb_pwr_evt_route_rules_rev_a.py"
+      - "tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py"
       - "tools/audit_pcb_pwr_dim_003_request_rev_a.py"
       - "tools/generate_pcb_pwr_evt_mechanical_step_rev_a.py"
       - "tools/audit_pcb_pwr_stackup_copper_request_rev_a.py"
@@ -396,6 +401,9 @@ jobs:
           python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/committed_routing_authority_audit.json
+          python tools/generate_pcb_pwr_evt_route_rules_rev_a.py --check
+          python tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/committed_evt_routing_basis_audit.json
           python tools/audit_pcb_pwr_dim_003_request_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/committed_dim_003_request_audit.json \
             --commit-sha "$GITHUB_SHA" \
@@ -1280,6 +1288,9 @@ jobs:
           python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/routing_authority_audit.json
+          python tools/generate_pcb_pwr_evt_route_rules_rev_a.py --check
+          python tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/evt_routing_basis_audit.json
           python tools/audit_pcb_pwr_dim_003_request_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/dim_003_request_audit.json
           python tools/audit_pcb_pwr_stackup_copper_request_rev_a.py \
@@ -1421,6 +1432,9 @@ jobs:
             hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md
             hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv
             hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md
+            hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv
+            hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json
+            hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md
             hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json
             hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.md
             hardware/reviews/PCB_PWR_DIM_003_RESPONSE_REV_A.csv

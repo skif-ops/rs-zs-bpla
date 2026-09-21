@@ -37,6 +37,9 @@ PCB_MAIN_CLEARANCE_AUDIT = ROOT / "tools" / "audit_pcb_main_placement_clearance_
 PCB_MAIN_ROUTING_AUDIT = ROOT / "tools" / "audit_pcb_main_routing_authority_rev_a.py"
 PCB_PWR_CLEARANCE_AUDIT = ROOT / "tools" / "audit_pcb_pwr_placement_clearance_rev_a.py"
 PCB_PWR_ROUTING_AUDIT = ROOT / "tools" / "audit_pcb_pwr_routing_authority_rev_a.py"
+PCB_PWR_EVT_ROUTING_BASIS_AUDIT = (
+    ROOT / "tools" / "audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py"
+)
 PCB_PWR_DIM_003_AUDIT = ROOT / "tools" / "audit_pcb_pwr_dim_003_request_rev_a.py"
 PCB_PWR_STACKUP_COPPER_AUDIT = ROOT / "tools" / "audit_pcb_pwr_stackup_copper_request_rev_a.py"
 PCB_MIC_STATUS = ROOT / "hardware" / "PCB_MIC_CAPTURE_STATUS_REV_A.json"
@@ -820,6 +823,17 @@ def main() -> int:
                         )
                         report["boards"][name]["routing_constraint_state"] = \
                             routing_report["status"]
+                        evt_basis_output = ART / name / "evt_routing_basis_audit.json"
+                        run([
+                            sys.executable,
+                            str(PCB_PWR_EVT_ROUTING_BASIS_AUDIT.relative_to(ROOT)),
+                            "--output", str(evt_basis_output),
+                        ])
+                        evt_basis_report = json.loads(
+                            evt_basis_output.read_text(encoding="utf-8")
+                        )
+                        report["boards"][name]["evt_routing_basis_state"] = \
+                            evt_basis_report["status"]
                         dim_003_output = ART / name / "dim_003_request_audit.json"
                         run([
                             sys.executable,
@@ -843,8 +857,9 @@ def main() -> int:
                         report["boards"][name]["stackup_copper_request_state"] = \
                             stackup_report["status"]
                         report["boards"][name]["pcb_state"] = (
-                            "EVT_DIM_003_MOUNTING_FITTED_2D_CLEARANCE_AND_PRE_ROUTE_"
-                            "CONSTRAINT_PASS_ROUTING_DRC_AND_FAB_EXPORT_PROHIBITED"
+                            "EVT_DIM_003_MOUNTING_FITTED_2D_CLEARANCE_PRE_ROUTE_"
+                            "CONSTRAINT_AND_NUMERIC_EVT_BASIS_PASS_ROUTING_DRC_"
+                            "AND_FAB_EXPORT_PROHIBITED"
                         )
                     else:
                         report["boards"][name]["pcb_state"] = \

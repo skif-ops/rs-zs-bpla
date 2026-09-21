@@ -2,7 +2,7 @@
 
 Status: `CANDIDATE SCREEN PASS / JOB-SPECIFIC RESPONSES REQUIRED / NOT FOR MANUFACTURE`
 
-Retrieval date: `2026-09-19`
+Retrieval date: `2026-09-21`
 
 This record identifies two candidates to receive the identical `FAB-A` and
 `FAB-B` request packets. It does not populate an acceptance row, select a
@@ -14,12 +14,20 @@ Official source: <https://jlcpcb.com/impedance>
 
 Official calculator: <https://jlcpcb.com/pcb-impedance-calculator>
 
+Official capability table: <https://jlcpcb.com/capabilities/pcb-capabilities>
+
 The published controlled-impedance page states headline multilayer capability
 of 3.5 mil minimum track/space, 0.20 mm minimum via and 0.25 mm minimum BGA. It
 publishes 4-layer and 6-layer controlled-impedance constructions, outer copper
 options of 1 oz and 2 oz, inner copper options of 0.5 oz, 1 oz and 2 oz, and
 multiple 1.6 mm six-layer constructions. One named published construction is
 `JLC06161H-3313`.
+
+The same page publishes four-layer `JLC04161H-3313` with 35 µm outer copper,
+15.2 µm displayed inner copper, 99.4 µm 3313 prepreg on each side and a
+1.265 mm core. This is the dielectric/capability reference for the separate
+PCB-PWR 35 µm conservative engineering screen; it is not the selected 2 oz / 1 oz
+finished job construction.
 
 Using the official calculator with rigid board, six layers, nominal 1.6 mm,
 0.5 oz inner copper, 1 oz outer copper and millimetres selected the recommended
@@ -61,5 +69,7 @@ job-specific stackup or as routing authority.
 - PCB-MAIN may use the bounded JLC public RF/USB numbers for an engineering
   routing candidate only. Pair-aware routing, independent geometry audit and
   all final job-specific response gates remain mandatory.
-- Numeric power copper/via geometry on PCB-PWR remains prohibited until the
-  applicable returned response set and project review are accepted.
+- PCB-PWR may use the bounded `JLC04161H-3313` / 35 µm screen for an engineering
+  routing candidate only. Finished-job copper/plating, via-current capacity,
+  fault energy, +70 °C thermal acceptance and manufacture remain prohibited until
+  the attributable response and project-review gates close.

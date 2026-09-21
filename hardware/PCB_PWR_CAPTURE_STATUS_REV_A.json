@@ -2,7 +2,7 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-PWR",
-  "release_state": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS_CINHF_ECO_APPLIED_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_AND_STACKUP_COPPER_REQUESTS_READY_CANDIDATE",
+  "release_state": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS_CINHF_ECO_APPLIED_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_STACKUP_REQUEST_AND_CONSERVATIVE_EVT_ROUTING_BASIS_READY_CANDIDATE",
   "manufacturing_release": false,
   "native_schematic": {
     "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
@@ -348,6 +348,30 @@
       "manufacturing_release": false
     }
   },
+  "evt_routing_basis": {
+    "record": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md",
+    "machine_contract": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+    "rule_manifest": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
+    "generator": "tools/generate_pcb_pwr_evt_route_rules_rev_a.py",
+    "independent_audit": "tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py",
+    "control": {
+      "state": "PASS_CONSERVATIVE_NUMERIC_EVT_ROUTING_INPUT_FINAL_FABRICATOR_AND_THERMAL_ACCEPTANCE_PENDING",
+      "public_dielectric_reference": "JLC04161H-3313",
+      "screen_finished_copper_um": 35.0,
+      "screen_temperature_rise_c": 10.0,
+      "job_target_outer_copper_oz": 2.0,
+      "job_target_inner_copper_oz": 1.0,
+      "net_count": 31,
+      "numeric_class_count": 8,
+      "rule_manifest_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
+      "engineering_routing_candidate_authorized": true,
+      "final_stackup_accepted": false,
+      "final_numeric_power_geometry_authorized": false,
+      "routing_complete": false,
+      "review_b_complete": false,
+      "manufacturing_release": false
+    }
+  },
   "review_a": {
     "complete": true,
     "status": "PASS_PIN_NET_AUTHORITY_HIERARCHY_INTERNAL_EQUIVALENCE_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
@@ -393,7 +417,7 @@
       "trace_items": 0,
       "copper_zones": 0,
       "dim_003": "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED",
-      "numeric_power_geometry": "CONTROLLED_STACKUP_COPPER_REQUEST_READY_0_OF_2_FABRICATORS_ACCEPTED_THERMAL_CURRENT_DENSITY_OPEN",
+      "numeric_power_geometry": "CONSERVATIVE_35UM_EVT_ENGINEERING_BASIS_PASS_FINAL_STACKUP_COPPER_PLATING_FAULT_THERMAL_ACCEPTANCE_OPEN",
       "routing_complete": false,
       "manufacturing_release": false
     }

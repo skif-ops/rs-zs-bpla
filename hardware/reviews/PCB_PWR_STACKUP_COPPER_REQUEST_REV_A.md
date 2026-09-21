@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A stackup and copper-process request
 
-Status: `PACKET READY / TWO FABRICATOR RESPONSES REQUIRED / 0 OF 24 ROWS ACCEPTED / ROUTING NOT AUTHORIZED / NOT FOR MANUFACTURE`
+Status: `PACKET READY / TWO FABRICATOR RESPONSES REQUIRED / 0 OF 24 ROWS ACCEPTED / FINAL JOB ROUTING NOT AUTHORIZED BY THIS PACKET / NOT FOR MANUFACTURE`
 
 This packet requests the external construction and process data required before
 PCB-PWR current-carrying geometry can be calculated. It is a capability and
@@ -65,6 +65,12 @@ The 5 A expected system basis, two 4 A buck ratings, 3.3 A modem peak basis and
 copper. The input fault/transient envelope, voltage-drop budget and allowable
 conductor temperature rise remain open. Consequently this request contains no
 accepted trace width, plane neck, via diameter, via count or thermal-via array.
+
+A separate `PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A` overlay now applies
+a conservative 35 µm / 10 °C-rise screen to permit a bounded engineering routing
+candidate. That overlay does not modify this request, accept the 2 oz / 1 oz job
+target, populate a response row or turn provisional via arrays into finished-job
+authority.
 
 Fabricator DFM can establish what construction can be built. It cannot approve
 electrical current density, fault energy, Kelvin accuracy, converter stability

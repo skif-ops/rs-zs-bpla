@@ -106,6 +106,12 @@ def audit_contract(contract: dict) -> dict:
     )
     groups = {group["id"]: group for group in contract["groups"]}
     require(set(groups) == set(EXPECTED_GROUPS), "external-response group set drift")
+    require({
+        "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md",
+        "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+        "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
+    }.issubset(set(groups["PCB-PWR-FAB"]["files"])),
+        "PCB-PWR fabricator packet lacks the bounded numeric EVT routing context")
 
     register_summary = {}
     for group_id, expected_rows in EXPECTED_GROUPS.items():
@@ -152,7 +158,10 @@ def audit_contract(contract: dict) -> dict:
         }
 
     rules = " ".join(contract["release_rules"])
-    for token in ("not a purchase order", "unrouted", "pending", "Full-PCBA", "Review B", "18/18"):
+    for token in (
+        "not a purchase order", "unrouted", "partially routed", "public numeric bases",
+        "pending", "Full-PCBA", "Review B", "18/18",
+    ):
         require(token in rules, f"release rule missing token: {token}")
 
     paths = controlled_paths(contract)

@@ -458,6 +458,31 @@ def audit() -> dict[str, object]:
         "PCB-PWR pre-route constraint authority is incomplete or its no-routing interlock drifted",
     )
 
+    pwr_evt_routing_basis = run_json_audit(
+        "audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py"
+    )
+    pwr_evt_routing_basis_ok = (
+        pwr_evt_routing_basis.get("status") ==
+        "PASS_CONSERVATIVE_NUMERIC_EVT_ROUTING_INPUT_FINAL_FABRICATOR_AND_THERMAL_ACCEPTANCE_PENDING"
+        and pwr_evt_routing_basis.get("public_stackup_id") == "JLC04161H-3313"
+        and pwr_evt_routing_basis.get("screen_finished_copper_um") == 35.0
+        and pwr_evt_routing_basis.get("net_count") == 31
+        and pwr_evt_routing_basis.get("numeric_class_count") == 8
+        and pwr_evt_routing_basis.get("input_5a_width_mm") == 4.0
+        and pwr_evt_routing_basis.get("rail_4a_width_mm") == 3.0
+        and pwr_evt_routing_basis.get("accepted_fabricator_response_rows") == 0
+        and pwr_evt_routing_basis.get("engineering_routing_candidate_authorized") is True
+        and pwr_evt_routing_basis.get("final_stackup_accepted") is False
+        and pwr_evt_routing_basis.get("routing_complete") is False
+        and pwr_evt_routing_basis.get("manufacturing_release") is False
+    )
+    check(
+        "pcb_pwr_conservative_evt_numeric_routing_basis",
+        pwr_evt_routing_basis_ok,
+        str(pwr_evt_routing_basis.get("status", "MISSING")),
+        "PCB-PWR bounded 35 um numeric EVT routing basis is missing, drifted or over-released",
+    )
+
     pwr_dim_003 = run_json_audit("audit_pcb_pwr_dim_003_request_rev_a.py")
     pwr_dim_003_packet_ready = (
         pwr_dim_003.get("status") ==

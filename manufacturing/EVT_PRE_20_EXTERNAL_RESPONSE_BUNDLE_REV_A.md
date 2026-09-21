@@ -44,9 +44,10 @@ page does not close a job-specific row.
 ## Native-board boundary
 
 The archive includes native board candidates only to support capability,
-mechanical and DFM review. `PCB-MAIN` and `PCB-PWR` are unrouted. Their files
-must not be converted into CAM or fabricated. `PCB-MIC` has routed candidate
-copper, but its manufacturing handoff and Review B remain open; the separate
+mechanical and DFM review. `PCB-MAIN` is partially routed and `PCB-PWR` remains
+unrouted. Their files and numeric engineering bases must not be converted into
+CAM or fabricated. `PCB-MIC` has routed candidate copper, but its manufacturing
+handoff and Review B remain open; the separate
 commit-bound PCB Native Gate CAM artifact is still required for an actual DFM
 handoff.
 
@@ -82,6 +83,13 @@ engineering routing basis only. They do not provide the site-specific signed
 job stackup, production impedance tolerance, coupon plan, DFM closure, plating
 tolerances or panel assumptions required by the response registers. All 22
 PCB-MAIN fabricator response rows remain pending.
+
+The bundle also includes the bounded PCB-PWR `JLC04161H-3313` / 35 µm numeric
+EVT routing basis and its 31-net rule manifest. Those files expose the candidate
+4.0 mm / 5 A and 3.0 mm / 4 A assumptions for fabricator review; they neither
+accept the 2 oz / 1 oz job target nor populate any of the 24 PCB-PWR response
+rows. Final copper, plating, via-current, fault and thermal acceptance remain
+job-specific.
 
 ## Archive control
 

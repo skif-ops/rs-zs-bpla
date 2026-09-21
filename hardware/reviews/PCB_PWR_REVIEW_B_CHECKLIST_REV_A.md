@@ -65,8 +65,10 @@ manufacturing-release assertion.
 - Mechanical authority: `DIM-003 18/18 EVT ACCEPTED`; the outline, round H1-H4
   pattern, terminal zones, tool access, fixture datum and conservative assembled
   STEP envelope are frozen for EVT. Serial revalidation remains mandatory.
-- Pre-route constraint coverage: `PASS` for all 31 native nets. Numeric widths,
-  copper weights, via arrays and thermal geometry remain open.
+- Pre-route constraint coverage: `PASS` for all 31 native nets. The separate
+  conservative 35 µm overlay passes as numeric input for a bounded EVT routing
+  candidate; finished-job copper, via-current capacity, fault energy and thermal
+  geometry remain open.
 - Stackup/copper request: internally complete for `FAB-A` and `FAB-B`; the
   24-row response register is `0/24` accepted, `0/2` fabricator sets are
   accepted and no construction is selected. The controlled template is
@@ -96,6 +98,10 @@ manufacturing-release assertion.
   topology, current basis and source authority.
 - [x] Switch-node, bootstrap, Kelvin, feedback and net-tie constraints are
   explicit without invented final geometry.
+- [x] The `JLC04161H-3313` public reference plus 35 µm / 10 °C-rise screen
+  controls all 31 candidate rules: 5 A input/return at 4.0 mm, 4 A rails/returns
+  at 3.0 mm and local switch nodes at 2.1 mm. This passes only the bounded EVT
+  engineering input and leaves the response register unchanged at `0/24`.
 - [x] I²C remains 100 kHz initially with authoritative pull-ups on PCB-MAIN and
   PCB-PWR pull-up footprints DNP.
 - [x] Historical KiCad 9 evidence for the superseded F1 value has zero ERC
@@ -145,8 +151,9 @@ manufacturing-release assertion.
   SMBJ18A clamp, prospective-current, primary-fuse and fail-short coordination.
 - [ ] Input fault/transient envelope, fuse/TVS coordination and MOSFET SOA are
   closed against battery/BMS/MPPT evidence.
-- [ ] Numeric high-current widths, plane geometry and via arrays pass DC-drop,
-  current-density, fault-energy and +70 °C thermal calculation.
+- [ ] Final job-specific high-current widths, plane geometry and via arrays pass
+  selected-copper/plating, DC-drop, current-density, fault-energy and +70 °C
+  physical thermal acceptance; provisional EVT candidate rules do not close it.
 - [ ] Both buck hot loops and switch nodes are routed compactly and isolated
   from Kelvin, feedback, I²C, connector and edge regions.
 - [ ] Shunt sense is true Kelvin with no load current in either sense route and
@@ -180,7 +187,8 @@ The active source includes the later C20/C21 electrical ECO and has a new exact
 pin/net semantic digest. Commit-bound KiCad 9 ERC/PDF evidence and independent
 human hierarchy acceptance pass. Fitted-body and H1-H4 mounting clearance,
 constraint coverage and `DIM-003` EVT acceptance remain valid. The mechanical
-register is `18/18`; the stackup register remains `0/24` with `0/2` accepted
-fabricator sets. Selected construction, numeric copper geometry, routing, physical
-evidence, DRC, CAM, DFM, final serial mechanics and independent Review B are open.
+register is `18/18`; the bounded 35 µm numeric EVT routing input passes, while
+the stackup register remains `0/24` with `0/2` accepted fabricator sets.
+Selected construction, final copper/plating and via-current geometry, routing,
+physical evidence, DRC, CAM, DFM, final serial mechanics and independent Review B are open.
 Production outputs remain prohibited.

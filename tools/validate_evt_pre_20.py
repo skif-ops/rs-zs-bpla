@@ -220,6 +220,16 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR stackup/copper request and numeric-geometry separation decision is missing",
     )
     require(
+        decisions["DEC-098"]["Status"] ==
+        "LOCKED_NUMERIC_EVT_ENGINEERING_INPUT_FINAL_JOB_ACCEPTANCE_PENDING"
+        and "JLC04161H-3313" in decisions["DEC-098"]["Impact"]
+        and "all 31 nets" in decisions["DEC-098"]["Impact"]
+        and "4.0 mm at 5 A" in decisions["DEC-098"]["Impact"]
+        and "3.0 mm at 4 A" in decisions["DEC-098"]["Impact"]
+        and "do not populate FAB-A or FAB-B rows" in decisions["DEC-098"]["Impact"],
+        "PCB-PWR conservative numeric EVT routing decision is missing or over-released",
+    )
+    require(
         decisions["DEC-069"]["Status"] ==
         "LOCKED_CUSTOMER_PROCUREMENT_BOUNDARY_TECHNICAL_GATES_RETAINED"
         and "commercial procurement execution to the customer"
@@ -346,6 +356,17 @@ def validate_deliverable_register() -> None:
         "PCB-PWR stackup/copper request deliverable is missing or over-released",
     )
     require(
+        deliverables["HW-P-006"]["Статус"] == "CONTROLLED_ENGINEERING_INPUT"
+        and deliverables["HW-P-006"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-P-006"]["QG-2 техника"] == "OPEN"
+        and "all 31 nets to eight numeric classes"
+        in deliverables["HW-P-006"]["Критерий выпуска"]
+        and "4.0 mm at 5 A" in deliverables["HW-P-006"]["Критерий выпуска"]
+        and "0/24 fabricator rows" in deliverables["HW-P-006"]["Критерий выпуска"]
+        and "manufacture remain open" in deliverables["HW-P-006"]["Критерий выпуска"],
+        "PCB-PWR numeric EVT routing-basis deliverable is missing or over-released",
+    )
+    require(
         deliverables["HW-A-002"]["Статус"] == "DRAFT"
         and deliverables["HW-A-002"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-A-002"]["QG-2 техника"] == "OPEN"
@@ -388,6 +409,14 @@ def validate_deliverable_register() -> None:
         and "fewer than 24 accepted stackup/copper responses" in risks["R-027"]["Trigger"]
         and "fewer than 2 accepted fabricator sets" in risks["R-027"]["Trigger"],
         "PCB-PWR stackup/copper acceptance risk is not explicit",
+    )
+    require(
+        "bounded engineering candidate" in risks["R-032"]["Mitigation"]
+        and "preserve 0/24 and 0/2" in risks["R-032"]["Mitigation"]
+        and "public stackup promoted to final job" in risks["R-032"]["Trigger"]
+        and "manufacturing output generated from the engineering-only basis"
+        in risks["R-032"]["Trigger"],
+        "PCB-PWR engineering-basis promotion risk is not controlled",
     )
 
 
@@ -760,6 +789,41 @@ def validate_hardware_baseline() -> None:
         ),
         "PCB-PWR stackup/copper response register is not the blank 2 x 12 blocking template",
     )
+    pwr_evt_basis = pwr_status.get("evt_routing_basis", {})
+    pwr_evt_basis_control = pwr_evt_basis.get("control", {})
+    require(
+        pwr_evt_basis.get("record") ==
+        "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md"
+        and pwr_evt_basis.get("machine_contract") ==
+        "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json"
+        and pwr_evt_basis.get("rule_manifest") ==
+        "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv"
+        and pwr_evt_basis.get("independent_audit") ==
+        "tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py"
+        and pwr_evt_basis_control.get("state") ==
+        "PASS_CONSERVATIVE_NUMERIC_EVT_ROUTING_INPUT_FINAL_FABRICATOR_AND_THERMAL_ACCEPTANCE_PENDING"
+        and pwr_evt_basis_control.get("public_dielectric_reference") == "JLC04161H-3313"
+        and pwr_evt_basis_control.get("screen_finished_copper_um") == 35.0
+        and pwr_evt_basis_control.get("screen_temperature_rise_c") == 10.0
+        and pwr_evt_basis_control.get("net_count") == 31
+        and pwr_evt_basis_control.get("numeric_class_count") == 8
+        and pwr_evt_basis_control.get("engineering_routing_candidate_authorized") is True
+        and all(pwr_evt_basis_control.get(key) is False for key in (
+            "final_stackup_accepted",
+            "final_numeric_power_geometry_authorized",
+            "routing_complete",
+            "review_b_complete",
+            "manufacturing_release",
+        )),
+        "PCB-PWR bounded EVT routing basis is missing, drifted or over-released",
+    )
+    for relative in (
+        pwr_evt_basis.get("record"),
+        pwr_evt_basis.get("machine_contract"),
+        pwr_evt_basis.get("rule_manifest"),
+    ):
+        require(isinstance(relative, str) and (ROOT / relative).is_file(),
+                f"PCB-PWR EVT routing-basis file is missing: {relative}")
 
     mic_status = json.loads((ROOT / "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8"))
     require(mic_status["assembly"] == "PCB-MIC", "PCB-MIC release-status identity mismatch")

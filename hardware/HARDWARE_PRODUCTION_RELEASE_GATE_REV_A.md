@@ -112,9 +112,12 @@ PCB-PWR has explicit pre-route constraint coverage for all 31 native nets. The
 independent audit binds the 5 A system basis, both 4 A buck channels, the 3.3 A
 BG95 BB+RF peak basis, three separate harness returns/net ties, two switch nodes,
 two bootstrap loops, two Kelvin lines, feedback and 100 kHz I2C. `DIM-003` is
-accepted `18/18` for EVT; numeric widths, via arrays and plane geometry remain
-blocked on final current/fault envelopes, selected stackup/copper weights and
-thermal/current-density review.
+accepted `18/18` for EVT. A separate public `JLC04161H-3313` reference and
+conservative 35 µm / 10 °C-rise screen now pass as a bounded numeric EVT routing
+input: 4.0 mm at 5 A, 3.0 mm at 4 A, 2.1 mm for local switch nodes and 0.5 mm
+at 0.3 A across a 31-net manifest. Final job widths, via-current capacity and
+plane geometry remain blocked on current/fault envelopes, selected
+stackup/copper/plating and physical thermal/current-density review.
 The board remains unrouted with zero copper zones; DRC, CAM, DFM and Review B are
 open.
 
@@ -206,7 +209,9 @@ selected construction. It requests the actual four-layer cross-section,
 material, finished thickness, base/finished copper, hole-wall plating, via and
 heavy-copper process limits, mask/finish, panel controls, net test and DFM
 traceability. This establishes a controlled external input path only; it does
-not authorize numeric current geometry, routing or fabrication.
+not authorize final job-specific current geometry or fabrication. The separate
+35 µm overlay permits only a bounded engineering routing candidate and leaves
+all 24 response rows pending.
 
 The PCB-MAIN stackup/impedance request packet is internally ready, but it has
 0/2 fabricator responses accepted and no selected construction. Its 22-row
@@ -232,7 +237,8 @@ source-only archive controlled by
 `manufacturing/EVT_PRE_20_EXTERNAL_RESPONSE_BUNDLE_REV_A.{md,json}`. The archive
 contains the two-fabricator PCB-MAIN request, PCB-MAIN assembler request,
 PCB-PWR DIM-003 request, two-fabricator PCB-PWR request, PCB-MIC DFM request and
-harness-supplier request, plus the selected-lot procurement tables. Its
+harness-supplier request, both bounded public numeric routing bases and the
+selected-lot procurement tables. Its
 embedded SHA-256 manifest is machine-audited, while every response register
 except the internally accepted EVT `DIM-003` register remains pending. This
 closes only the packaging/issuance preparation subgate;
@@ -246,7 +252,8 @@ release.
   `RF-PIGTAIL` items; exact supplier/manufacturing identities and release evidence
   for `HARNESS` and `HSG-VC` remain open;
 - PCB-MAIN and PCB-PWR routing, DRC and CAM; PCB-PWR final stackup,
-  numeric current-density/thermal geometry and physical power evidence; PCB-MIC independent Review B,
+  job-specific current-density/thermal geometry and physical power evidence
+  beyond the bounded 35 µm EVT routing input; PCB-MIC independent Review B,
   CAM comparison, panelization and acoustic-stack review; all three boards'
   DFM and manufacturing release;
 - PCB-MAIN USB source-termination routeability: the bounded R91/R92 placement

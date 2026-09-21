@@ -549,7 +549,10 @@ def main() -> int:
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print("PCB-PWR stackup/copper request audit PASS")
-    print("24/24 blocking questions present; 0 accepted; numeric power geometry, routing and manufacture remain prohibited")
+    print(
+        "24/24 blocking questions present; 0 accepted; final job geometry and "
+        "manufacture remain prohibited; bounded engineering overlay is separate"
+    )
     return 0
 
 

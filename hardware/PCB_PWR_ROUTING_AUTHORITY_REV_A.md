@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A pre-route constraint authority
 
-Status: `PASS / 31 NETS CLASSIFIED / DIM-003 EVT ACCEPTED / STACKUP, ROUTING AND THERMAL EVIDENCE OPEN / NOT FOR MANUFACTURE`
+Status: `PASS / 31 NETS CLASSIFIED / DIM-003 EVT ACCEPTED / CONSERVATIVE NUMERIC EVT BASIS PASS / FINAL STACKUP, ROUTING AND THERMAL EVIDENCE OPEN / NOT FOR MANUFACTURE`
 
 Machine authority: `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv`
 
@@ -18,8 +18,16 @@ rule, aggressor-separation rule, priority and source authority. This closes only
 pre-route constraint coverage. `DIM-003` is accepted `18/18` for the EVT test
 batch, including the outline, H1-H4 mounting pattern, terminal/service zones,
 fixture datum and conservative STEP envelope. Serial mechanical revalidation is
-mandatory. Actual routing remains blocked by the stackup/copper and numeric power-
-geometry gates below.
+mandatory. A separate conservative numeric overlay now authorizes a bounded EVT
+engineering routing candidate; final job-specific copper geometry and
+manufacturing routing remain blocked by the stackup/copper, fault-energy and
+physical thermal gates below.
+
+Numeric overlay:
+`hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json`
+
+Per-net numeric rules:
+`hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv`
 
 The internal two-fabricator stackup/copper packet is also ready at
 `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`, but
@@ -28,10 +36,13 @@ The internal two-fabricator stackup/copper packet is also ready at
 plating, via or manufacturing-minimum authority.
 
 The committed board still has zero traces, zero vias and zero copper zones. The
-manifest does not guess final trace widths, copper weights, via-array counts or
-thermal geometry. Those values require the actual current envelope, DC-drop and
-fault-energy calculations, +70 °C thermal evidence and an accepted four-layer
-fabricator stackup.
+numeric overlay uses a deliberately conservative 35 µm / 10 °C-rise engineering
+screen: 4.0 mm for the 5 A input/primary return, 3.0 mm for 4 A rails/returns,
+2.1 mm for local 4 A switch nodes and 0.5 mm for the 0.3 A rail/return. It also
+defines provisional transition arrays and DC-drop length ceilings for a candidate.
+These are not final trace, plane, via-current or thermal authority. Final values
+still require the actual current/fault envelope, accepted finished copper and
+plating, +70 °C evidence and a selected four-layer fabricator stackup.
 
 The machine status binds a UUID/order-independent semantic board digest covering
 the layer stack, outline, complete footprint placement, pad/net assignment and
@@ -73,17 +84,20 @@ the deterministic generator and the separately maintained audit.
   output-capacitor node to U4 FB, never from the switch node.
 - The 1V8 path uses the 0.3 A TPS7A20 rating; acoustic noise, actual load and
   +70 °C performance still require physical evidence.
-- Outer 2 oz / inner 1 oz remain request targets only. No numeric width, via
-  count or plane geometry becomes authoritative until stackup, copper weight,
-  current-density and thermal review are accepted.
+- Outer 2 oz / inner 1 oz remain request targets only. The 35 µm overlay is
+  authoritative only for a bounded EVT engineering candidate. No final width,
+  via-current capacity, plane geometry or manufacturing claim becomes
+  authoritative until stackup, copper/plating, fault-energy, current-density and
+  physical thermal review are accepted.
 
 ## Route-order input
 
 P0 covers return geometry, the complete power path, switch/boot loops, Kelvin
 sense and feedback. P1 covers local analog/gate/mode networks plus control,
-status and I²C. Within P0 the practical order is: retain accepted EVT mechanics and accept stackup;
-plan `GND_PWR` and net-tie joins; close hot loops; route Kelvin/feedback; then
-size and route the high-current input and output paths.
+status and I²C. Within P0 the practical order is: preserve accepted EVT
+mechanics; plan `GND_PWR` and net-tie joins; close hot loops; route
+Kelvin/feedback; then route the high-current input and output paths against the
+numeric overlay. Final production geometry remains a later acceptance step.
 
 ## Exit criteria still open
 
@@ -107,7 +121,9 @@ Run the controls with:
 ```bash
 python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
 python tools/audit_pcb_pwr_routing_authority_rev_a.py
+python tools/generate_pcb_pwr_evt_route_rules_rev_a.py --check
+python tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py
 python tools/audit_pcb_pwr_dim_003_request_rev_a.py
 ```
 
-Neither command authorizes fabrication.
+None of these commands authorizes fabrication.

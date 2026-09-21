@@ -72,6 +72,9 @@
         "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md",
         "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json",
         "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv",
+        "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md",
+        "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+        "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
         "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md",
         "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
         "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
@@ -117,7 +120,7 @@
   ],
   "release_rules": [
     "The archive requests attributable external responses; it is not a purchase order.",
-    "PCB-MAIN and PCB-PWR native boards remain unrouted and are supplied only as engineering context.",
+    "PCB-MAIN is partially routed and PCB-PWR remains unrouted; both native boards and both public numeric bases are supplied only as engineering context.",
     "PCB-PWR DIM-003 is accepted 18/18 from owner-authorized EVT engineering evidence; no remaining pending response register may be promoted without attributable returned evidence.",
     "Full-PCBA is the primary quotation track; bare PCB rows are alternatives and must not be added to full-PCBA totals.",
     "Gerber, drill, IPC-356, stencil, panel and fabrication outputs become orderable only after the applicable Review B and release gates pass."
