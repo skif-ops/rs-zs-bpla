@@ -48,8 +48,10 @@
   повторной проверки. Консервативная 35 µm числовая база разрешает только
   bounded EVT engineering routing candidate; плата пока не разведена и
   производство не разрешено;
-- внутренний PCB-PWR stackup/copper-запрос двум фабрикам готов, но все 24 строки
-  остаются пустыми (`0/24`), принято `0/2` комплектов, конструкция не выбрана;
+- для PCB-PWR stackup/copper выбран стандартный EVT ordering profile
+  `JLC04161H-3313`, 1.6 mm,
+  outer 2 oz / inner 1 oz; 24 строки остаются пустыми (`0/24`, `0/2`) как
+  job-specific DFM-канал и не блокируют engineering-routing;
 - PCB-MAIN placement-кандидат после принятого ограниченного ECO и полного
   репака проходит строгий 2D clearance: 227/227 fitted footprint имеют
   courtyard, component/mounting/U.FL-tool конфликты равны нулю; приняты

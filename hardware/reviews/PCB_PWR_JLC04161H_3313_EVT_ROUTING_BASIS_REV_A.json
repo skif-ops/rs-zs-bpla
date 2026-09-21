@@ -2,7 +2,7 @@
   "schema": "dioneya-pcb-pwr-evt-routing-design-basis-v1",
   "configuration": "EVT-PRE-20 Rev.A",
   "board": "PCB-PWR",
-  "status": "PASS_CONSERVATIVE_NUMERIC_EVT_ROUTING_INPUT_FINAL_FABRICATOR_AND_THERMAL_ACCEPTANCE_PENDING",
+  "status": "PASS_EVT_ENGINEERING_STACKUP_AND_NUMERIC_ROUTING_INPUT_JOB_DFM_PENDING",
   "retrieval_utc_date": "2026-09-21",
   "fabricator_public_reference": "JLCPCB",
   "official_sources": [
@@ -42,7 +42,12 @@
     "published_inner_copper_options_oz": [0.5, 1.0, 2.0],
     "project_job_target_outer_copper_oz": 2.0,
     "project_job_target_inner_copper_oz": 1.0,
-    "job_specific_stackup_selected": false
+    "job_specific_stackup_selected": true,
+    "selection_scope": "EVT_ENGINEERING_AND_ORDERING_PROFILE",
+    "selection_basis": "PROJECT_OWNER_AUTHORIZED_STANDARD_PROCESS_AND_CALCULATED_VALUES",
+    "routing_design_copper_lower_bound_um": 35.0,
+    "ordering_profile_requires_outer_copper_oz": 2.0,
+    "ordering_profile_requires_inner_copper_oz": 1.0
   },
   "calculation_assumptions": {
     "conductor_method": "LEGACY_IPC_2221_EXTERNAL_CONDUCTOR_EMPIRICAL_SCREEN_ENGINEERING_ONLY",
@@ -185,9 +190,10 @@
   "acceptance_boundary": {
     "numeric_input_for_evt_engineering_routing_candidate": true,
     "conservative_35um_screen_pass": true,
-    "public_reference_selected_as_final_job_stackup": false,
-    "target_2oz_1oz_selected_as_finished_job_copper": false,
-    "job_specific_fabricator_response_required": true,
+    "public_reference_selected_as_evt_ordering_profile": true,
+    "target_2oz_1oz_selected_as_evt_ordering_profile": true,
+    "two_fabricator_responses_required_before_routing": false,
+    "job_specific_dfm_required_before_fabrication": true,
     "two_fabricator_response_sets_accepted": false,
     "fault_energy_calculation_accepted": false,
     "plus70c_physical_thermal_evidence_accepted": false,

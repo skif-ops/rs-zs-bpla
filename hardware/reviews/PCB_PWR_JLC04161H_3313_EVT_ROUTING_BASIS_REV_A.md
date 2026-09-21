@@ -1,12 +1,13 @@
 # PCB-PWR JLC04161H-3313 conservative EVT routing basis — Rev.A
 
-Status: `NUMERIC EVT ENGINEERING ROUTING INPUT PASS / FINAL FABRICATOR, FAULT AND THERMAL ACCEPTANCE PENDING / NOT FOR MANUFACTURE`
+Status: `EVT ENGINEERING STACKUP AND NUMERIC ROUTING INPUT PASS / JOB DFM, FAULT AND THERMAL ACCEPTANCE PENDING / NOT FOR MANUFACTURE`
 
 This record converts a public four-layer manufacturing reference and a deliberately
 conservative 35 µm copper screen into bounded numeric input for a PCB-PWR EVT
-engineering routing candidate. It is not a returned RFQ, selected job stackup,
-current-capacity certification, DFM disposition, physical thermal result or
-fabrication release.
+engineering routing candidate. Under the project-owner decision to use a
+standard process and calculated values for EVT, it also selects the ordering
+profile below. It is not a DFM disposition, current-capacity certification,
+physical thermal result or fabrication release.
 
 Machine contract:
 `hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json`
@@ -25,11 +26,12 @@ capabilities pages. The public four-layer `JLC04161H-3313` reference uses
 each side and a 1.265 mm core. JLCPCB publicly lists 1 oz and 2 oz outer options
 and 0.5 oz, 1 oz and 2 oz inner options for four-layer construction.
 
-The project job target remains outer 2 oz / inner 1 oz. That target is not an
-accepted finished-copper declaration. The public `JLC04161H-3313` construction
-is a reproducible dielectric/capability reference only; the 24-row response
-register remains `0/24` across `0/2` fabricators, and no final job stackup is
-selected.
+The EVT ordering profile is `JLC04161H-3313`, 1.6 mm, outer 2 oz / inner 1 oz.
+The routing calculation deliberately retains 35 µm as its lower-bound copper
+screen, so it does not rely on the heavier order target for width compliance.
+The 24-row response register remains `0/24` across `0/2` fabricators as the
+customer-order job-specific DFM and process-deviation channel; it is no longer
+a prerequisite for engineering routing.
 
 ## Conservative conductor screen
 
@@ -76,13 +78,16 @@ thermal review and DFM.
 ## Acceptance boundary
 
 - Numeric input for a bounded EVT engineering routing candidate: `PASS`.
-- Public reference selected as the final job stackup: `false`.
-- Outer 2 oz / inner 1 oz accepted as finished job copper: `false`.
+- Public reference selected as the EVT ordering profile: `true`.
+- Outer 2 oz / inner 1 oz selected as the EVT ordering profile: `true`.
+- Routing design copper lower bound: `35 µm`.
+- Two-fabricator responses required before routing: `false`.
 - Two complete fabricator response sets: `0/2`; accepted rows: `0/24`.
 - Fault-energy and +70 °C physical thermal acceptance: `OPEN`.
 - Routed copper, KiCad DRC, CAM, DFM and independent Review B: `OPEN`.
 - Manufacturing release: `false`.
 
 The blank fabricator response register is unchanged. This record permits the next
-engineering-candidate step; it does not populate any `FAB-A` or `FAB-B` response
-row and cannot authorize fabrication.
+engineering-candidate step; the selected fabricator must still return and close
+job-specific DFM deviations before fabrication. It does not populate any
+`FAB-A` or `FAB-B` response row and cannot authorize fabrication by itself.

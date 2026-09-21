@@ -230,15 +230,17 @@ hash-bound frozen STEP. It authorizes those inputs for EVT routing only. Final
 harness cut lengths remain blocked by `DIM-001`, `DIM-012` and the enclosure
 route; serial enclosure revalidation and all manufacturing gates remain required.
 
-The PCB-PWR stackup/copper request is internally complete and machine-audited,
-but it has `0/24` accepted rows across `0/2` independent fabricator slots and no
-selected construction. It requests the actual four-layer cross-section,
+The PCB-PWR stackup/copper request is internally complete and machine-audited.
+For EVT engineering and ordering, the selected standard profile is JLCPCB
+`JLC04161H-3313`, 1.6 mm, outer 2 oz / inner 1 oz; routing remains conservatively
+sized against only 35 µm copper. The separate register remains at `0/24` across
+`0/2` independent fabricator slots for job-specific DFM deviations. It requests
+the actual four-layer cross-section,
 material, finished thickness, base/finished copper, hole-wall plating, via and
 heavy-copper process limits, mask/finish, panel controls, net test and DFM
-traceability. This establishes a controlled external input path only; it does
-not authorize final job-specific current geometry or fabrication. The separate
-35 µm overlay permits only a bounded engineering routing candidate and leaves
-all 24 response rows pending.
+traceability. Those external rows no longer block engineering routing, but the
+selected fabricator's DFM deviations must be closed before fabrication. The
+profile does not authorize fabrication, and all 24 response rows remain pending.
 
 The PCB-MAIN stackup/impedance request packet is internally ready, but it has
 0/2 fabricator responses accepted and no selected construction. Its 22-row

@@ -94,14 +94,14 @@ overhang is not a mating, cable-bend, enclosure or 3D clearance approval.
 All 31 native nets now have controlled pre-route coverage in
 `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv`. That manifest adds current,
 return-domain, topology, layer/via and separation inputs without relaxing this
-placement interlock: `DIM-003` is accepted for EVT routing input, while actual
-routing remains prohibited until the fabricator stackup/copper weights and numeric
-current-density/thermal geometry are accepted.
+placement interlock. `DIM-003` and the standard `JLC04161H-3313`, 1.6 mm,
+outer 2 oz / inner 1 oz EVT ordering profile are accepted as routing input;
+the routing candidate itself still requires its own controlled subgate.
 
 The two-fabricator stackup/copper request is controlled in
 `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`. Its blank register
-remains `0/24` rows and `0/2` accepted fabricator sets; request readiness does
-not freeze copper weights, plating, via rules or numeric geometry.
+remains `0/24` rows and `0/2` accepted fabricator sets as a job-specific DFM
+deviation channel. It does not block engineering routing or authorize fabrication.
 
 Review B still requires frozen mechanics, final stack-up and copper weight; high-current and
 Kelvin routing; hot-loop and switch-node control; thermal/current-density calculation;

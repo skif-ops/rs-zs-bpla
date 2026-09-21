@@ -33,8 +33,8 @@ RESPONSE = ROOT / "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 
 STATE = (
-    "PASS_CONSERVATIVE_NUMERIC_EVT_ROUTING_INPUT_"
-    "FINAL_FABRICATOR_AND_THERMAL_ACCEPTANCE_PENDING"
+    "PASS_EVT_ENGINEERING_STACKUP_AND_NUMERIC_ROUTING_INPUT_"
+    "JOB_DFM_PENDING"
 )
 ROW_STATUS = (
     "EVT_ENGINEERING_CANDIDATE_ONLY_FINAL_FABRICATOR_"
@@ -168,8 +168,14 @@ def audit() -> dict[str, Any]:
             "published copper option drift")
     require(public["project_job_target_outer_copper_oz"] == 2.0 and
             public["project_job_target_inner_copper_oz"] == 1.0 and
-            public["job_specific_stackup_selected"] is False,
-            "job target/final stackup boundary drift")
+            public["job_specific_stackup_selected"] is True and
+            public["selection_scope"] == "EVT_ENGINEERING_AND_ORDERING_PROFILE" and
+            public["selection_basis"] ==
+            "PROJECT_OWNER_AUTHORIZED_STANDARD_PROCESS_AND_CALCULATED_VALUES" and
+            public["routing_design_copper_lower_bound_um"] == 35.0 and
+            public["ordering_profile_requires_outer_copper_oz"] == 2.0 and
+            public["ordering_profile_requires_inner_copper_oz"] == 1.0,
+            "EVT stackup/order profile boundary drift")
     require(public["layers"] == [
         {"name": "L1", "kind": "copper", "thickness_mm": 0.0350},
         {"name": "PP1", "kind": "prepreg", "material": "3313", "thickness_mm": 0.0994},
@@ -288,9 +294,12 @@ def audit() -> dict[str, Any]:
     require(boundary["numeric_input_for_evt_engineering_routing_candidate"] is True and
             boundary["conservative_35um_screen_pass"] is True,
             "EVT numeric engineering input was not released")
+    require(boundary["public_reference_selected_as_evt_ordering_profile"] is True and
+            boundary["target_2oz_1oz_selected_as_evt_ordering_profile"] is True and
+            boundary["two_fabricator_responses_required_before_routing"] is False and
+            boundary["job_specific_dfm_required_before_fabrication"] is True,
+            "EVT ordering profile or job-DFM boundary drift")
     for field in (
-        "public_reference_selected_as_final_job_stackup",
-        "target_2oz_1oz_selected_as_finished_job_copper",
         "two_fabricator_response_sets_accepted",
         "fault_energy_calculation_accepted",
         "plus70c_physical_thermal_evidence_accepted",
@@ -300,9 +309,6 @@ def audit() -> dict[str, Any]:
         "manufacturing_release",
     ):
         require(boundary[field] is False, f"{field} was incorrectly promoted")
-    require(boundary["job_specific_fabricator_response_required"] is True,
-            "job-specific fabricator interlock removed")
-
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     trace = status.get("evt_routing_basis", {})
     require(trace.get("record") == str(RECORD.relative_to(ROOT)) and
@@ -325,6 +331,7 @@ def audit() -> dict[str, Any]:
         "numeric_class_count": 8,
         "rule_manifest_sha256": sha256(RULES),
         "engineering_routing_candidate_authorized": True,
+        "evt_ordering_profile_selected": True,
         "final_stackup_accepted": False,
         "final_numeric_power_geometry_authorized": False,
         "routing_complete": False,
@@ -352,6 +359,7 @@ def audit() -> dict[str, Any]:
         "rail_4a_width_mm": classes["PWR_RAIL_4A"]["selected_width_mm"],
         "accepted_fabricator_response_rows": 0,
         "engineering_routing_candidate_authorized": True,
+        "evt_ordering_profile_selected": True,
         "final_stackup_accepted": False,
         "routing_complete": False,
         "manufacturing_release": False,

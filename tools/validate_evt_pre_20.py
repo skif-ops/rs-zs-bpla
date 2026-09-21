@@ -230,6 +230,18 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR conservative numeric EVT routing decision is missing or over-released",
     )
     require(
+        decisions["DEC-110"]["Status"] ==
+        "PASS_EVT_ENGINEERING_STACKUP_PROFILE_ROUTING_INPUT_AUTHORIZED_JOB_DFM_PENDING"
+        and "JLC04161H-3313 1.6 mm outer 2 oz inner 1 oz"
+        in decisions["DEC-110"]["Impact"]
+        and "35 um routing calculation lower bound"
+        in decisions["DEC-110"]["Impact"]
+        and "job-specific DFM deviation channel"
+        in decisions["DEC-110"]["Impact"]
+        and "manufacturing blocks" in decisions["DEC-110"]["Impact"],
+        "PCB-PWR EVT stackup/order profile decision is missing or over-released",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]
@@ -386,13 +398,15 @@ def validate_deliverable_register() -> None:
         "PCB-MAIN assembler DFM/stencil request deliverable is missing or over-released",
     )
     require(
-        deliverables["HW-P-005"]["Статус"] == "CONTROLLED_REQUEST"
+        deliverables["HW-P-005"]["Статус"] == "EVT_ENGINEERING_PROFILE_SELECTED"
         and deliverables["HW-P-005"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-P-005"]["QG-2 техника"] == "OPEN"
-        and "two-fabricator 24-row" in deliverables["HW-P-005"]["Критерий выпуска"]
+        and "24-row two-fabricator" in deliverables["HW-P-005"]["Критерий выпуска"]
         and "0/24 rows and 0/2 fabricator sets"
         in deliverables["HW-P-005"]["Критерий выпуска"]
-        and "numeric power geometry routing Review B and manufacture remain blocked"
+        and "does not block engineering routing"
+        in deliverables["HW-P-005"]["Критерий выпуска"]
+        and "fabrication Review B and manufacture remain blocked"
         in deliverables["HW-P-005"]["Критерий выпуска"],
         "PCB-PWR stackup/copper request deliverable is missing or over-released",
     )
@@ -403,7 +417,8 @@ def validate_deliverable_register() -> None:
         and "all 31 nets to eight numeric classes"
         in deliverables["HW-P-006"]["Критерий выпуска"]
         and "4.0 mm at 5 A" in deliverables["HW-P-006"]["Критерий выпуска"]
-        and "0/24 fabricator rows" in deliverables["HW-P-006"]["Критерий выпуска"]
+        and "Selected JLC04161H-3313 1.6 mm outer 2 oz inner 1 oz"
+        in deliverables["HW-P-006"]["Критерий выпуска"]
         and "manufacture remain open" in deliverables["HW-P-006"]["Критерий выпуска"],
         "PCB-PWR numeric EVT routing-basis deliverable is missing or over-released",
     )
@@ -463,16 +478,18 @@ def validate_deliverable_register() -> None:
         "RU868 configuration risk still assumes a fixed 20-unit build",
     )
     require(
-        "stackup/copper register at 0/24 and 0/2" in risks["R-027"]["Mitigation"]
-        and "fewer than 24 accepted stackup/copper responses" in risks["R-027"]["Trigger"]
-        and "fewer than 2 accepted fabricator sets" in risks["R-027"]["Trigger"],
+        "JLC04161H-3313 1.6 mm outer 2 oz inner 1 oz EVT profile"
+        in risks["R-027"]["Mitigation"]
+        and "35 um copper lower bound" in risks["R-027"]["Mitigation"]
+        and "selected-job DFM deviation closure" in risks["R-027"]["Trigger"],
         "PCB-PWR stackup/copper acceptance risk is not explicit",
     )
     require(
-        "bounded engineering candidate" in risks["R-032"]["Mitigation"]
-        and "preserve 0/24 and 0/2" in risks["R-032"]["Mitigation"]
-        and "public stackup promoted to final job" in risks["R-032"]["Trigger"]
-        and "manufacturing output generated from the engineering-only basis"
+        "JLC04161H-3313 1.6 mm outer 2 oz inner 1 oz profile"
+        in risks["R-032"]["Mitigation"]
+        and "35 um" in risks["R-032"]["Mitigation"]
+        and "routing below the 35 um basis" in risks["R-032"]["Trigger"]
+        and "manufacturing output generated from the engineering-only authority"
         in risks["R-032"]["Trigger"],
         "PCB-PWR engineering-basis promotion risk is not controlled",
     )
@@ -871,13 +888,14 @@ def validate_hardware_baseline() -> None:
         and pwr_evt_basis.get("independent_audit") ==
         "tools/audit_pcb_pwr_jlc04161h_3313_evt_routing_basis_rev_a.py"
         and pwr_evt_basis_control.get("state") ==
-        "PASS_CONSERVATIVE_NUMERIC_EVT_ROUTING_INPUT_FINAL_FABRICATOR_AND_THERMAL_ACCEPTANCE_PENDING"
+        "PASS_EVT_ENGINEERING_STACKUP_AND_NUMERIC_ROUTING_INPUT_JOB_DFM_PENDING"
         and pwr_evt_basis_control.get("public_dielectric_reference") == "JLC04161H-3313"
         and pwr_evt_basis_control.get("screen_finished_copper_um") == 35.0
         and pwr_evt_basis_control.get("screen_temperature_rise_c") == 10.0
         and pwr_evt_basis_control.get("net_count") == 31
         and pwr_evt_basis_control.get("numeric_class_count") == 8
         and pwr_evt_basis_control.get("engineering_routing_candidate_authorized") is True
+        and pwr_evt_basis_control.get("evt_ordering_profile_selected") is True
         and all(pwr_evt_basis_control.get(key) is False for key in (
             "final_stackup_accepted",
             "final_numeric_power_geometry_authorized",

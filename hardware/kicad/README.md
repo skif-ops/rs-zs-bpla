@@ -109,13 +109,14 @@ evidence, routing completion and manufacture remain open.
 - Use `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv` as the 31-net PCB-PWR
   pre-route input and `hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv` as the bounded
   numeric EVT overlay. Preserve `DIM-003`; route an engineering candidate only
-  against the 35 µm rules. Final job geometry still requires current/fault,
-  selected stackup/copper/plating and physical thermal acceptance.
+  against the 35 µm rules and the selected EVT ordering profile
+  `JLC04161H-3313`, 1.6 mm, outer 2 oz / inner 1 oz. Fabrication still requires
+  current/fault, job-specific DFM/plating and physical thermal acceptance.
 - Use `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json` and its blank
   24-row register only to collect comparable stackup/copper inputs from two
-  fabricators. The current `0/24` and `0/2` state selects no construction and
-  authorizes no final job-specific power geometry or fabrication; it does not
-  revoke the separately bounded engineering-candidate overlay.
+  fabricators. The current `0/24` and `0/2` state is a job-specific DFM
+  deviation channel; it authorizes no fabrication and does not revoke or block
+  the separately bounded engineering-candidate overlay.
 - Preserve the strict PCB-PWR fitted-body clearance PASS and its six-reference
   coordinate delta; repeat the audit after any placement or footprint change.
 - Freeze CubeMX pin/peripheral assignment for STM32U585VIT6Q; no unresolved AF conflicts.

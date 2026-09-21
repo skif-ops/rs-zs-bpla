@@ -81,13 +81,13 @@ manufacturing-release assertion.
 - Mechanical authority: `DIM-003 18/18 EVT ACCEPTED`; the outline, round H1-H4
   pattern, terminal zones, tool access, fixture datum and conservative assembled
   STEP envelope are frozen for EVT. Serial revalidation remains mandatory.
-- Pre-route constraint coverage: `PASS` for all 31 native nets. The separate
-  conservative 35 µm overlay passes as numeric input for a bounded EVT routing
-  candidate; finished-job copper, via-current capacity, fault energy and thermal
-  geometry remain open.
-- Stackup/copper request: internally complete for `FAB-A` and `FAB-B`; the
-  24-row response register is `0/24` accepted, `0/2` fabricator sets are
-  accepted and no construction is selected. The controlled template is
+- Pre-route constraint coverage: `PASS` for all 31 native nets. The selected
+  `JLC04161H-3313`, 1.6 mm, outer 2 oz / inner 1 oz EVT profile and conservative
+  35 µm overlay pass as input for a bounded routing candidate; via-current,
+  fault energy and physical thermal evidence remain open.
+- Stackup/copper request: internally complete for `FAB-A` and `FAB-B`; its
+  24-row response register remains `0/24` and `0/2` as a job-specific DFM
+  deviation channel, not an engineering-routing blocker. The template is
   `PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv`.
 - Manufacturing release: `HOLD`.
 - Input protection: active native F1 is Littelfuse `0451008.MRL` and target D1
@@ -125,8 +125,8 @@ manufacturing-release assertion.
   explicit without invented final geometry.
 - [x] The `JLC04161H-3313` public reference plus 35 µm / 10 °C-rise screen
   controls all 31 candidate rules: 5 A input/return at 4.0 mm, 4 A rails/returns
-  at 3.0 mm and local switch nodes at 2.1 mm. This passes only the bounded EVT
-  engineering input and leaves the response register unchanged at `0/24`.
+  at 3.0 mm and local switch nodes at 2.1 mm. This passes the bounded EVT
+  engineering input and leaves the job-DFM register unchanged at `0/24`.
 - [x] I²C remains 100 kHz initially with authoritative pull-ups on PCB-MAIN and
   PCB-PWR pull-up footprints DNP.
 - [x] Historical KiCad 9 evidence for the superseded F1 value has zero ERC
@@ -212,12 +212,12 @@ The active source includes the later C20/C21 electrical ECO and has a new exact
 pin/net semantic digest. Commit-bound KiCad 9 ERC/PDF evidence and independent
 human hierarchy acceptance pass. Fitted-body and H1-H4 mounting clearance,
 constraint coverage and `DIM-003` EVT acceptance remain valid. The mechanical
-register is `18/18`; the bounded 35 µm numeric EVT routing input passes, while
-the stackup register remains `0/24` with `0/2` accepted fabricator sets.
+register is `18/18`; the selected EVT ordering profile and bounded 35 µm numeric
+routing input pass. The `0/24`, `0/2` register remains for job-specific DFM.
 The exact C4/C6/L1/L2 placement application gate passes. Its separate corrected
 four-warning remediation candidate passes the commit-bound comparative KiCad 9
-gate, has exact human acceptance and is applied byte-for-byte. Its fresh
-application gate remains pending, so those closures are not yet credited.
+gate, has exact human acceptance, is applied byte-for-byte and its fresh
+application gate passes; all four warning-only closures are credited.
 Selected construction, final copper/plating and
 via-current geometry, routing,
 physical evidence, DRC, CAM, DFM, final serial mechanics and independent Review B are open.
