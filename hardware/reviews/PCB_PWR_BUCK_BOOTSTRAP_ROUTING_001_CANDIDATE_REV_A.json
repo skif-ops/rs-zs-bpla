@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "proposal_id": "PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001",
   "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_001_CREATION_SUBGATE",
-  "status": "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+  "status": "KICAD9_COMPARATIVE_DRC_PASS_PENDING_HUMAN_REVIEW",
   "scope": "ONLY_U3_C4_AND_U4_C6_BOOTSTRAP_CONNECTIONS",
   "base": {
     "board": "hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pcb",
@@ -44,7 +44,8 @@
     "net_tie_or_control_routing_added": false
   },
   "machine_gate": {
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "mapping": "hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_REVIEW_COMMIT_MAPPING.json",
     "required_new_errors": 0,
     "required_unconnected_reduction": 2,
     "required_other_drc_fingerprint_delta": 0
