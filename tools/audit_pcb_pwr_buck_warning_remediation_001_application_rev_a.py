@@ -50,6 +50,28 @@ REVIEWED_TREE = "87b2c7ab4d8fbc1b5d0d3c88c703994abef773bf"
 EVIDENCE_COMMIT = "036787a5674242de94d6dd455acf8ec6bf741952"
 EVIDENCE_TREE = "f672828fac47e373f7b34a081f95e11bd8c345b6"
 APPROVAL_COMMIT = "54083a35e0c6c33a34dd9ddc1cf2d4255409b7d7"
+APPLICATION_SOURCE_COMMIT = "d22eb808f16058f1d90547b87a64aeb5de0c7cbc"
+APPLICATION_SOURCE_TREE = "b6bae322dcbefa806fb3bb20ccfc1906ad689a6d"
+APPLICATION_EVIDENCE_COMMIT = "f027aea4c546ff5d475b792d70526767eefbf844"
+APPLICATION_EVIDENCE_TREE = "9cfacbf2e855a524489af2a5669fb3277816afc9"
+APPLICATION_ARTIFACT_DIGEST = \
+    "sha256:eae868305524381942f3b06e8de156b1954f17c194efc42fae5f56aff2907b02"
+SCHEMATIC_ARTIFACT_DIGEST = \
+    "sha256:20d40319e45a2b5bfed173383253f25b263910a9518c20abcde22bab33cfbf1c"
+KICAD_CONTAINER_DIGEST = \
+    "sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729"
+EVIDENCE_SHA256 = {
+    "application_audit.json":
+    "ae8a0bebcd5ae8993b91f13acdb741293d2a14330ffa14a04182dc4e1786a302",
+    "baseline_drc.json":
+    "265967678bda12e8a139c53117fa551bb7d12eca3055b5a50aa873ecc98bc5b9",
+    "candidate_drc.json":
+    "6e49dcb937375e9b5526fd1f7fffe019469edeb6f09687bfb315505851e54c5f",
+    "comparative_audit.json":
+    "51506afefbd8e7c26b3beeee104c983299d64d98c02357cfd28c4a78cbe983ff",
+    "placement_clearance.json":
+    "66a97f8c0406612b86b65aa23aac05fbfd6dcbd07caff3f22660d78fba8ca2bc",
+}
 
 
 def require(value: bool, message: str) -> None:
@@ -150,6 +172,14 @@ def audit(
         application.get("reviewed_proposal_commit_sha") == REVIEWED_COMMIT
         and application.get("gate_evidence_commit_sha") == EVIDENCE_COMMIT
         and application.get("approval_commit_sha") == APPROVAL_COMMIT
+        and application.get("application_source_commit_sha") ==
+        APPLICATION_SOURCE_COMMIT
+        and application.get("application_source_tree_sha") ==
+        APPLICATION_SOURCE_TREE
+        and application.get("gate_evidence_application_commit_sha") ==
+        APPLICATION_EVIDENCE_COMMIT
+        and application.get("gate_evidence_application_tree_sha") ==
+        APPLICATION_EVIDENCE_TREE
         and application.get("approval_sha256") == APPROVAL_SHA256
         and application.get("decision") ==
         "ACCEPT_PCB_PWR_BUCK_WARNING_REMEDIATION_001_SUBGATE"
@@ -174,34 +204,70 @@ def audit(
             "silk_overlap_L2_R10": 1,
             "silk_over_copper_R10": 1,
         }
-        and application_gate.get("status") in {
-            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
-            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
-        }
+        and application_gate.get("status") ==
+        "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
         and application.get("routing_complete") is False
         and application.get("review_b_complete") is False
         and application.get("cam_or_manufacturing_release") is False,
         "PCB-PWR warning-remediation application boundary drift",
     )
-    if application_gate.get("status") == \
-            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE":
-        require(
-            application_gate.get("required_application_audit") ==
-            "PASS_EXACT_ACCEPTED_PCB_PWR_BUCK_WARNING_REMEDIATION_APPLICATION"
-            and application_gate.get("required_comparative_drc") ==
-            "PASS_EXACT_FOUR_WARNING_CLOSURE_NO_OTHER_DRC_DELTA"
-            and application_gate.get("expected_base_violations") == 90
-            and application_gate.get("expected_active_violations") == 86
-            and application_gate.get("expected_base_unconnected") == 126
-            and application_gate.get("expected_active_unconnected") == 126
-            and application_gate.get("expected_new_errors") == 0
-            and application_gate.get("expected_new_warnings") == 0
-            and application_gate.get(
-                "all_other_drc_fingerprints_must_match"
-            ) is True
-            and application_gate.get("minimum_observed_clearance_mm") == 0.22,
-            "pending application-gate contract drift",
-        )
+    toolchain = application_gate.get("toolchain", {})
+    ci = application_gate.get("ci", {})
+    native = application_gate.get("pcb_native", {})
+    schematic = application_gate.get("pcb_pwr_schematic", {})
+    comparative = application_gate.get("comparative_drc", {})
+    require(
+        application_gate.get("required_application_audit") ==
+        "PASS_EXACT_ACCEPTED_PCB_PWR_BUCK_WARNING_REMEDIATION_APPLICATION"
+        and application_gate.get("required_comparative_drc") ==
+        "PASS_EXACT_FOUR_WARNING_CLOSURE_NO_OTHER_DRC_DELTA"
+        and application_gate.get("expected_base_violations") == 90
+        and application_gate.get("expected_active_violations") == 86
+        and application_gate.get("expected_base_unconnected") == 126
+        and application_gate.get("expected_active_unconnected") == 126
+        and application_gate.get("expected_new_errors") == 0
+        and application_gate.get("expected_new_warnings") == 0
+        and application_gate.get("all_other_drc_fingerprints_must_match")
+        is True
+        and application_gate.get("minimum_observed_clearance_mm") == 0.22
+        and toolchain.get("kicad_version") == "9.0.9"
+        and toolchain.get("container") == "ghcr.io/kicad/kicad:9.0.9"
+        and toolchain.get("container_digest") == KICAD_CONTAINER_DIGEST
+        and ci == {
+            "run_number": 592,
+            "run_id": 35603311617,
+            "url": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35603311617",
+            "conclusion": "success",
+        }
+        and native.get("run_number") == 319
+        and native.get("run_id") == 35603311534
+        and native.get("job_id") == 106344331014
+        and native.get("conclusion") == "success"
+        and native.get("artifact_id") == 10640361017
+        and native.get("artifact_digest") == APPLICATION_ARTIFACT_DIGEST
+        and schematic.get("run_number") == 70
+        and schematic.get("run_id") == 35603311708
+        and schematic.get("conclusion") == "success"
+        and schematic.get("artifact_id") == 10639907320
+        and schematic.get("artifact_digest") == SCHEMATIC_ARTIFACT_DIGEST
+        and application_gate.get("evidence_sha256") == EVIDENCE_SHA256
+        and comparative == {
+            "status": "PASS_EXACT_FOUR_WARNING_CLOSURE_NO_OTHER_DRC_DELTA",
+            "base_violations": 90,
+            "active_violations": 86,
+            "base_unconnected": 126,
+            "active_unconnected": 126,
+            "new_errors": 0,
+            "new_warnings": 0,
+            "all_other_drc_fingerprints_match": True,
+            "removed_warnings": {
+                "lib_footprint_mismatch_C4_C6": 2,
+                "silk_overlap_L2_R10": 1,
+                "silk_over_copper_R10": 1,
+            },
+        },
+        "passed application-gate evidence contract drift",
+    )
 
     clearance = clearance_audit.audit(BOARD, PLACEMENT)
     summary = clearance.get("summary", {})
@@ -236,6 +302,9 @@ def audit(
         and remediation.get("exact_candidate_byte_identity") is True
         and remediation.get("authoritative_board_modified") is True
         and remediation.get("human_acceptance_complete") is True
+        and remediation.get("application_machine_gate") ==
+        "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+        and placement_eco.get("warning_only_items_closed") is True
         and remediation.get("routing_added") is False
         and layout.get("routing_present") is False
         and layout.get("copper_zones_present") is False
@@ -259,8 +328,7 @@ def audit(
         "pad_copper_changed": False,
         "strict_placement_clearance": "PASS_MINIMUM_0P22_MM",
         "machine_gate": application_gate.get("status"),
-        "warning_only_items_closed": application_gate.get("status") ==
-        "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+        "warning_only_items_closed": True,
         "routing_complete": False,
         "review_b_complete": False,
         "manufacturing_release": False,

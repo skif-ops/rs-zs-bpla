@@ -258,6 +258,19 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR warning-remediation application boundary is missing",
     )
     require(
+        decisions["DEC-109"]["Status"] ==
+        "PASS_EXACT_WARNING_REMEDIATION_APPLICATION_ROUTING_AND_REVIEW_B_OPEN"
+        and "d22eb808" in decisions["DEC-109"]["Reason"]
+        and "f027aea4" in decisions["DEC-109"]["Reason"]
+        and "CI 592" in decisions["DEC-109"]["Reason"]
+        and "PCB Native 319" in decisions["DEC-109"]["Reason"]
+        and "violations 90 to 86" in decisions["DEC-109"]["Impact"]
+        and "unconnected 126 to 126" in decisions["DEC-109"]["Impact"]
+        and "Review B CAM and manufacturing blocks"
+        in decisions["DEC-109"]["Impact"],
+        "PCB-PWR warning-remediation application closure is missing or over-released",
+    )
+    require(
         decisions["DEC-069"]["Status"] ==
         "LOCKED_CUSTOMER_PROCUREMENT_BOUNDARY_TECHNICAL_GATES_RETAINED"
         and "commercial procurement execution to the customer"
@@ -396,14 +409,16 @@ def validate_deliverable_register() -> None:
     )
     require(
         deliverables["HW-P-007"]["Статус"] ==
-        "CONTROLLED_WARNING_REMEDIATION_APPLICATION_GATE_PENDING"
+        "CONTROLLED_WARNING_REMEDIATION_GATE_PASS_ROUTING_OPEN"
         and deliverables["HW-P-007"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-P-007"]["QG-2 техника"] == "OPEN"
         and "placement candidate moved only C4 C6 L1 L2"
         in deliverables["HW-P-007"]["Критерий выпуска"]
         and "successor b1d221d5 is accepted and applied byte-for-byte"
         in deliverables["HW-P-007"]["Критерий выпуска"]
-        and "fresh commit-bound application gate remains pending"
+        and "passed fresh CI 592 schematic 70 and Native 319"
+        in deliverables["HW-P-007"]["Критерий выпуска"]
+        and "warning-only closure is credited"
         in deliverables["HW-P-007"]["Критерий выпуска"]
         and "manufacture remain open"
         in deliverables["HW-P-007"]["Критерий выпуска"],
@@ -463,13 +478,14 @@ def validate_deliverable_register() -> None:
     )
     require(
         "hash-bound C4 C6 L1 L2 ECO" in risks["R-034"]["Mitigation"]
-        and "comparative KiCad 9 DRC" in risks["R-034"]["Mitigation"]
-        and "exact human acceptance" in risks["R-034"]["Mitigation"]
-        and "fresh application gate" in risks["R-034"]["Mitigation"]
-        and "library warnings" in risks["R-034"]["Mitigation"]
-        and "switch or bootstrap copper added"
+        and "CI 592 schematic 70 and Native 319"
+        in risks["R-034"]["Mitigation"]
+        and "exact four-warning closure" in risks["R-034"]["Mitigation"]
+        and "accepted stackup and controlled routing"
+        in risks["R-034"]["Mitigation"]
+        and "uncontrolled switch bootstrap feedback or power copper"
         in risks["R-034"]["Trigger"]
-        and "any unrelated footprint moved" in risks["R-034"]["Trigger"],
+        and "any unrelated footprint move" in risks["R-034"]["Trigger"],
         "PCB-PWR dual-buck placement-before-routing risk is not controlled",
     )
 

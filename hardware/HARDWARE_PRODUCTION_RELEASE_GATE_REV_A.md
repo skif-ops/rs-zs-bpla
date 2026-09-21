@@ -217,9 +217,10 @@ PCB-PWR Schematic #65 and PCB Native #313. The comparative result is exact:
 `90 -> 86` violations, `126 -> 126` unconnected items, four intended warning
 removals and no other DRC fingerprint change. Reviewer `Скиф` accepted the exact
 candidate, and SHA-256 `b1d221d5...` is now applied byte-for-byte. Its fresh
-commit-bound application gate remains pending; until that gate passes the four
-warning closures still block Review B/CAM. Routing and manufacturing release
-remain prohibited.
+application gate passes at CI #592, PCB-PWR Schematic #70 and PCB Native #319
+with the exact `90 -> 86`, `126 -> 126` comparison and no other DRC fingerprint
+delta, so the four intended warning-only items are closed. Review B, routing,
+CAM and manufacturing release remain prohibited by their independent gates.
 
 The PCB-PWR `DIM-003` mechanical authority is machine-audited and accepted
 `18/18` for the EVT test batch. It binds the 90 x 60 x 1.6 mm basis, four round

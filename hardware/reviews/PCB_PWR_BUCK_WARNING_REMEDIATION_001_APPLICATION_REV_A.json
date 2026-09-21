@@ -7,6 +7,10 @@
   "reviewed_proposal_commit_sha": "63d87153e441d956117323ed8d9887568c5033ac",
   "gate_evidence_commit_sha": "036787a5674242de94d6dd455acf8ec6bf741952",
   "approval_commit_sha": "54083a35e0c6c33a34dd9ddc1cf2d4255409b7d7",
+  "application_source_commit_sha": "d22eb808f16058f1d90547b87a64aeb5de0c7cbc",
+  "application_source_tree_sha": "b6bae322dcbefa806fb3bb20ccfc1906ad689a6d",
+  "gate_evidence_application_commit_sha": "f027aea4c546ff5d475b792d70526767eefbf844",
+  "gate_evidence_application_tree_sha": "9cfacbf2e855a524489af2a5669fb3277816afc9",
   "approval_sha256": "386ece8201dae24da18db811845cf3501512192593c6e1bf31767fd3c71d5837",
   "reviewed_candidate_board_sha256": "b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957",
   "decision": "ACCEPT_PCB_PWR_BUCK_WARNING_REMEDIATION_001_SUBGATE",
@@ -41,7 +45,7 @@
     "silk_over_copper_R10": 1
   },
   "machine_gate": {
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE",
     "required_application_audit": "PASS_EXACT_ACCEPTED_PCB_PWR_BUCK_WARNING_REMEDIATION_APPLICATION",
     "required_comparative_drc": "PASS_EXACT_FOUR_WARNING_CLOSURE_NO_OTHER_DRC_DELTA",
     "expected_base_violations": 90,
@@ -51,9 +55,60 @@
     "expected_new_errors": 0,
     "expected_new_warnings": 0,
     "all_other_drc_fingerprints_must_match": true,
-    "minimum_observed_clearance_mm": 0.22
+    "minimum_observed_clearance_mm": 0.22,
+    "toolchain": {
+      "kicad_version": "9.0.9",
+      "container": "ghcr.io/kicad/kicad:9.0.9",
+      "container_digest": "sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729"
+    },
+    "ci": {
+      "run_number": 592,
+      "run_id": 35603311617,
+      "url": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35603311617",
+      "conclusion": "success"
+    },
+    "pcb_native": {
+      "run_number": 319,
+      "run_id": 35603311534,
+      "job_id": 106344331014,
+      "url": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35603311534",
+      "conclusion": "success",
+      "artifact_id": 10640361017,
+      "artifact_url": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35603311534/artifacts/10640361017",
+      "artifact_digest": "sha256:eae868305524381942f3b06e8de156b1954f17c194efc42fae5f56aff2907b02"
+    },
+    "pcb_pwr_schematic": {
+      "run_number": 70,
+      "run_id": 35603311708,
+      "url": "https://github.com/skif-ops/rs-zs-bpla/actions/runs/35603311708",
+      "conclusion": "success",
+      "artifact_id": 10639907320,
+      "artifact_digest": "sha256:20d40319e45a2b5bfed173383253f25b263910a9518c20abcde22bab33cfbf1c"
+    },
+    "evidence_sha256": {
+      "application_audit.json": "ae8a0bebcd5ae8993b91f13acdb741293d2a14330ffa14a04182dc4e1786a302",
+      "baseline_drc.json": "265967678bda12e8a139c53117fa551bb7d12eca3055b5a50aa873ecc98bc5b9",
+      "candidate_drc.json": "6e49dcb937375e9b5526fd1f7fffe019469edeb6f09687bfb315505851e54c5f",
+      "comparative_audit.json": "51506afefbd8e7c26b3beeee104c983299d64d98c02357cfd28c4a78cbe983ff",
+      "placement_clearance.json": "66a97f8c0406612b86b65aa23aac05fbfd6dcbd07caff3f22660d78fba8ca2bc"
+    },
+    "comparative_drc": {
+      "status": "PASS_EXACT_FOUR_WARNING_CLOSURE_NO_OTHER_DRC_DELTA",
+      "base_violations": 90,
+      "active_violations": 86,
+      "base_unconnected": 126,
+      "active_unconnected": 126,
+      "new_errors": 0,
+      "new_warnings": 0,
+      "all_other_drc_fingerprints_match": true,
+      "removed_warnings": {
+        "lib_footprint_mismatch_C4_C6": 2,
+        "silk_overlap_L2_R10": 1,
+        "silk_over_copper_R10": 1
+      }
+    }
   },
-  "status": "APPLIED_EXACT_ACCEPTED_WARNING_REMEDIATION_PENDING_COMMIT_BOUND_KICAD9_GATE",
+  "status": "APPLIED_EXACT_ACCEPTED_WARNING_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PASS",
   "routing_complete": false,
   "final_fabricator_stackup_accepted": false,
   "review_b_complete": false,

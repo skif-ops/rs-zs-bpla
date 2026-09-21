@@ -45,8 +45,11 @@ C4/C6 rotated child serialization, retains their physical reference centres and
 moves only the R10 visible reference. The corrected candidate passed CI #586,
 PCB-PWR Schematic #65 and PCB Native #313 with exact `90 -> 86` violation and
 `126 -> 126` unconnected-item results; reviewer `Скиф` supplied the exact
-acceptance token. A fresh commit-bound application gate is pending, so the four
-warning closures remain blocked from Review B/CAM until that gate passes.
+acceptance token. Its fresh commit-bound application gate passed at CI #592,
+PCB-PWR Schematic #70 and PCB Native #319 with exact `90 -> 86` violations,
+unchanged `126 -> 126` unconnected items and no other DRC fingerprint delta.
+The four warning-only items are therefore closed; routing, Review B and CAM
+remain blocked by their independent gates.
 
 ## Local input-capacitor placement evidence
 

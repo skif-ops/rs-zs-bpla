@@ -74,9 +74,10 @@ manufacturing-release assertion.
   `0.22 mm`; the corrected candidate also retains the original physical C4/C6
   reference centres. CI #586, PCB-PWR Schematic #65 and PCB Native #313 pass;
   comparative DRC is exact at `90 -> 86` violations and `126 -> 126`
-  unconnected items. Reviewer `Скиф` supplied the exact acceptance token; a
-  fresh commit-bound application gate is pending, so the four closures remain
-  blocked from Review B/CAM until that gate passes.
+  unconnected items. Reviewer `Скиф` supplied the exact acceptance token. The
+  fresh application gate passes at CI #592, PCB-PWR Schematic #70 and PCB
+  Native #319, so these four warning-only items are closed; the independent
+  routing, stackup, DFM, Review B and CAM gates remain open.
 - Mechanical authority: `DIM-003 18/18 EVT ACCEPTED`; the outline, round H1-H4
   pattern, terminal zones, tool access, fixture datum and conservative assembled
   STEP envelope are frozen for EVT. Serial revalidation remains mandatory.
@@ -111,11 +112,12 @@ manufacturing-release assertion.
 - [x] The exact accepted C4/C6/L1/L2 placement application passes fresh
   commit-bound CI #583 and PCB Native #310 comparative DRC with zero new error
   classes and unchanged `126 -> 126` unconnected items.
-- [ ] The two C4/C6 `lib_footprint_mismatch` warnings, the L2/R10
+- [x] The two C4/C6 `lib_footprint_mismatch` warnings, the L2/R10
   `silk_overlap` warning and the R10 `silk_over_copper` warning are closed before
   Review B or CAM. Exact candidate `b1d221d5...` is accepted and applied with
-  its proposal comparison passed; the fresh commit-bound application gate is
-  still pending.
+  its proposal comparison and fresh application gates passed at CI #592,
+  PCB-PWR Schematic #70 and PCB Native #319: exact `90 -> 86` violations,
+  unchanged `126 -> 126` unconnected items and no other DRC fingerprint delta.
 - [x] Four-layer count is frozen for Rev.A and agrees with the native board.
 - [x] All 31 native/capture nets have one explicit route class, return domain,
   topology, current basis and source authority.
