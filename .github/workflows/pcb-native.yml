@@ -241,13 +241,24 @@ jobs:
   native-kicad:
     name: Native KiCad per-board ERC DRC and fabrication export
     runs-on: ubuntu-latest
+    container:
+      # Official KiCad CI image: https://www.kicad.org/download/docker/
+      image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
+      options: --user root
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      - name: Install Python audit dependencies
+        run: |
+          apt-get -o APT::Update::Error-Mode=any update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            python3-pip python-is-python3
+          python3 -m pip install --break-system-packages --disable-pip-version-check \
+            easyeda2kicad 'kiutils==1.4.8' 'numpy==2.0.2'
       - name: Engineering preflight
         run: python tools/kicad_native_gate.py
       - name: Independent PCB layer-count authority audit
@@ -316,48 +327,15 @@ jobs:
             --output artifacts/kicad-native/PCB-PWR/input_protection_procurement_identity_audit.json
           python tools/audit_pcb_pwr_input_protection_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/input_protection_qualification_audit.json
-      - name: Install official KiCad 9 stable toolchain
-        shell: bash
+      - name: Verify official KiCad 9.0.9 container toolchain
         run: |
           set -euo pipefail
-          retry() {
-            local max=3
-            local attempt=1
-            while true; do
-              if "$@"; then
-                return 0
-              fi
-              if [ "$attempt" -ge "$max" ]; then
-                echo "command failed after $attempt attempts: $*" >&2
-                return 1
-              fi
-              echo "transient package/repository failure; retry $attempt/$max for: $*" >&2
-              sleep $((attempt * 15))
-              attempt=$((attempt + 1))
-            done
-          }
-          while IFS= read -r chrome_source; do
-            sudo mv "$chrome_source" "${chrome_source}.disabled"
-          done < <(grep -Rsl 'dl.google.com/linux/chrome-stable' /etc/apt/sources.list.d || true)
-          retry sudo apt-get -o APT::Update::Error-Mode=any update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
-          retry sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
-          retry sudo apt-get -o APT::Update::Error-Mode=any update
-          kicad_candidate="$(apt-cache policy kicad | awk '/Candidate:/ { print $2; exit }')"
-          case "$kicad_candidate" in
-            9.*) ;;
-            *)
-              echo "KiCad 9 package candidate unavailable; refusing fallback candidate: $kicad_candidate" >&2
-              exit 1
-              ;;
-          esac
-          retry sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
           kicad_version="$(kicad-cli version)"
           echo "KiCad CLI version: $kicad_version"
           case "$kicad_version" in
-            9.*) ;;
+            9.0.9*) ;;
             *)
-              echo "KiCad 9 required; refusing installed version: $kicad_version" >&2
+              echo "Pinned KiCad 9.0.9 required; refusing installed version: $kicad_version" >&2
               exit 1
               ;;
           esac
@@ -369,7 +347,6 @@ jobs:
           PY
       - name: Import PCB-MIC secondary reference CAD
         run: |
-          python -m pip install --disable-pip-version-check easyeda2kicad 'kiutils==1.4.8' 'numpy==2.0.2'
           mkdir -p artifacts/kicad-reference/PCB-MIC
           ROOT="$PWD/artifacts/kicad-reference/PCB-MIC"
           easyeda2kicad --full --lcsc_id=C7230692 --output "$ROOT/t5838_ref" --project-relative

@@ -82,14 +82,23 @@ jobs:
   pwr-schematic:
     name: PCB-PWR Rev.A native schematic ERC
     runs-on: ubuntu-latest
+    container:
+      # Official KiCad CI image: https://www.kicad.org/download/docker/
+      image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
+      options: --user root
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
 
       - name: Install audit parser dependency
-        run: python -m pip install --disable-pip-version-check 'kiutils==1.4.8'
+        run: |
+          apt-get -o APT::Update::Error-Mode=any update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            python3-pip python-is-python3
+          python3 -m pip install --break-system-packages --disable-pip-version-check \
+            'kiutils==1.4.8'
 
       - name: Review-A authorities and DFT freeze
         run: |
@@ -114,43 +123,26 @@ jobs:
             --commit-sha "$GITHUB_SHA" \
             --require-clean-source
 
-      - name: Install official KiCad 9 stable toolchain
-        shell: bash
+      - name: Verify official KiCad 9.0.9 container toolchain
         run: |
           set -euo pipefail
-          retry() {
-            local max=3
-            local attempt=1
-            while true; do
-              if "$@"; then return 0; fi
-              if [ "$attempt" -ge "$max" ]; then return 1; fi
-              echo "transient package/repository failure; retry $attempt/$max: $*" >&2
-              sleep $((attempt * 15))
-              attempt=$((attempt + 1))
-            done
-          }
-          retry sudo apt-get -o APT::Update::Error-Mode=any update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
-          retry sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
-          retry sudo apt-get -o APT::Update::Error-Mode=any update
-          kicad_candidate="$(apt-cache policy kicad | awk '/Candidate:/ { print $2; exit }')"
-          case "$kicad_candidate" in
-            9.*) ;;
-            *)
-              echo "KiCad 9 package candidate unavailable; refusing fallback candidate: $kicad_candidate" >&2
-              exit 1
-              ;;
-          esac
-          retry sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
           kicad_version="$(kicad-cli version)"
           echo "KiCad CLI version: $kicad_version"
           case "$kicad_version" in
-            9.*) ;;
+            9.0.9*) ;;
             *)
-              echo "KiCad 9 required; refusing installed version: $kicad_version" >&2
+              echo "Pinned KiCad 9.0.9 required; refusing installed version: $kicad_version" >&2
               exit 1
               ;;
           esac
+          test -s /usr/share/kicad/symbols/Connector_Generic.kicad_sym
+          test -s /usr/share/kicad/symbols/Device.kicad_sym
+          /usr/bin/python3 - <<'PY'
+          import pcbnew
+          version = pcbnew.GetBuildVersion()
+          assert version.startswith("9.0.9"), version
+          print("PCBNEW_PYTHON_AVAILABLE", version)
+          PY
 
       - name: Materialize complete PCB-PWR native schematic
         run: |
