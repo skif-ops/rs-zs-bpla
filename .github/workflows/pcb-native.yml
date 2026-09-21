@@ -1670,6 +1670,8 @@ jobs:
             hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.json
             hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.md
             hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_REVIEW_COMMIT_MAPPING.json
+            hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_APPROVAL_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_APPROVAL_REV_A.md
             hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb
             hardware/reviews/PCB_PWR_HIERARCHY_REVIEW_REV_A.md

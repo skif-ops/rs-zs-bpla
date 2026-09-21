@@ -266,6 +266,18 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR bootstrap routing machine-gate closure is missing or over-released",
     )
     require(
+        decisions["DEC-113"]["Status"] ==
+        "ACCEPT_PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_SUBGATE_APPLICATION_PENDING"
+        and "ACCEPT_PCB_PWR_BUCK_BOOTSTRAP_ROUTING_001_SUBGATE"
+        in decisions["DEC-113"]["Reason"]
+        and "U3.4-C4.1" in decisions["DEC-113"]["Impact"]
+        and "U4.4-C6.1" in decisions["DEC-113"]["Impact"]
+        and "fresh commit-bound application gate" in decisions["DEC-113"]["Impact"]
+        and "Review B CAM DFM thermal and manufacturing blocks"
+        in decisions["DEC-113"]["Impact"],
+        "PCB-PWR bootstrap routing acceptance boundary is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]
