@@ -339,12 +339,28 @@ jobs:
           while IFS= read -r chrome_source; do
             sudo mv "$chrome_source" "${chrome_source}.disabled"
           done < <(grep -Rsl 'dl.google.com/linux/chrome-stable' /etc/apt/sources.list.d || true)
-          retry sudo apt-get update
+          retry sudo apt-get -o APT::Update::Error-Mode=any update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common
           retry sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
-          retry sudo apt-get update
+          retry sudo apt-get -o APT::Update::Error-Mode=any update
+          kicad_candidate="$(apt-cache policy kicad | awk '/Candidate:/ { print $2; exit }')"
+          case "$kicad_candidate" in
+            9.*) ;;
+            *)
+              echo "KiCad 9 package candidate unavailable; refusing fallback candidate: $kicad_candidate" >&2
+              exit 1
+              ;;
+          esac
           retry sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kicad kicad-symbols kicad-footprints
-          kicad-cli version
+          kicad_version="$(kicad-cli version)"
+          echo "KiCad CLI version: $kicad_version"
+          case "$kicad_version" in
+            9.*) ;;
+            *)
+              echo "KiCad 9 required; refusing installed version: $kicad_version" >&2
+              exit 1
+              ;;
+          esac
           kicad-cli pcb drc --help
           kicad-cli sch erc --help
           /usr/bin/python3 - <<'PY'
