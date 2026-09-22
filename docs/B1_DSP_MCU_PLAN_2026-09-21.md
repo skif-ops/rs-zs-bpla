@@ -46,11 +46,17 @@ cycle count). Image: 68 KB flash, 708 KB RAM (90 % of SRAM1-3: audio ring 256 KB
 1 s mono copy 64 KB, heap 64 KB, DMA 10 KB). RAM relief for later: feed the extractor from the
 ring without the 64 KB copy, in-place FFT (-128 KB), prehistory to NOR (B3).
 
+## Step 3 (done 2026-09-22): golden check on customer audio
+
+The «Лютый» recording of 2026-09-20 (three 32 kHz WAVs, confirmed by video) replaces the missing June
+archive: `server/tools/generate_golden_vectors.py` cut 100 windows and computed the server reference,
+`server/tools/check_golden_vectors.py` ran both firmware extractors (`zs_eval_golden`, new
+`zs_eval_golden_mcu`) over them. Result: `zs_dsp_mcu` median/p95 normalized error 0.0000/0.0000, max
+0.0034; F0, harmonic step and harmonic count exact in 100 % of windows (`server/tools/golden_lyuty/`).
+The MCU port reproduces the server features on real drone audio; what remains is the time budget.
+
 ## Remaining steps
 
-3. Golden check: `zs_eval_golden` run on the 100 windows (PCM inputs are outside the repository:
-   the customer audio must be present locally) with the acceptance thresholds above; a host
-   A/B test zs_dsp vs zs_dsp_mcu on synthetic signals is added to ctest as a proxy.
 4. Target: link zs_dsp_mcu into the app, measure S2 window time and audio task CPU share on the
    NUCLEO-U575; target budget for one 1 s window < 250 ms at 160 MHz.
 5. Retire zs_fft.c / zs_dsp.c from the target library once 3-4 pass; keep them for the host tools.
