@@ -1,6 +1,6 @@
 # Дионея EVT-PRE-20 Rev.A - PCB-PWR provisional placement candidate
 
-Status: `FITTED 2D + EVT MOUNTING CLEARANCE PASS / DIM-003 18/18 EVT ACCEPTED / THREE CONTROLLED ROUTING SEGMENTS APPLIED / ROUTING INCOMPLETE / NOT FOR MANUFACTURE`
+Status: `FITTED 2D + EVT MOUNTING CLEARANCE PASS / DIM-003 18/18 EVT ACCEPTED / EIGHT CONTROLLED ROUTING SEGMENTS APPLIED / ROUTING INCOMPLETE / NOT FOR MANUFACTURE`
 
 This authority creates a reviewable native-board canvas without claiming enclosure or
 fabrication approval. The four-copper-layer count is frozen for Rev.A by
@@ -37,8 +37,8 @@ The historical exact ECO-001 placement board has SHA-256
 Its fresh commit-bound application gate passed at source commit `878425d2` with
 zero new error classes and unchanged `126` unconnected items.
 
-The separately reviewed `PCB-PWR-BUCK-WARNING-REMEDIATION-001` successor is now
-applied byte-for-byte as the authoritative board with SHA-256
+The separately reviewed `PCB-PWR-BUCK-WARNING-REMEDIATION-001` successor is
+applied byte-for-byte in the controlled predecessor chain with SHA-256
 `b1d221d50c379e3b47df7a52b25846892e8fb028a5535bd93f567dd19a940957`.
 It preserves every component pose and all pad copper geometry, normalizes only
 C4/C6 rotated child serialization, retains their physical reference centres and
@@ -51,12 +51,13 @@ unchanged `126 -> 126` unconnected items and no other DRC fingerprint delta.
 The four warning-only items are therefore closed; routing, Review B and CAM
 remain blocked by their independent gates.
 
-The authoritative successor is SHA-256
-`05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3`.
-It contains exactly four accepted F.Cu segments: both bootstrap connections,
-the LM74700 VCAP connection and the `VBAT_RAW` connection. It has zero vias and
-zero copper zones. The separate `PCB-PWR-REV-GATE-ROUTING-004` artifact is
-accepted but is not applied to the active board.
+The active authoritative successor is SHA-256
+`f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c`.
+It contains exactly eight accepted F.Cu segments: both bootstrap connections,
+the LM74700 VCAP connection, the `VBAT_RAW` connection and four `REV_GATE`
+segments. It has zero vias and zero copper zones. The exact
+`PCB-PWR-REV-GATE-ROUTING-004` artifact is applied byte-for-byte and its
+application gate is closed.
 
 ## Local input-capacitor placement evidence
 
@@ -70,7 +71,7 @@ center-to-center distances:
 | `U4` | `C12` | `6.00 mm` | `C21` | `2.60 mm` |
 
 These distances prove only that the intended parts occupy the correct local
-functional regions. The four accepted partial-routing segments do not implement
+functional regions. The eight accepted partial-routing segments do not implement
 or prove the final VIN-PGND loop geometry. C11/C12 effective capacitance at bias and
 temperature, direct pad-first routing of C20/C21, and routed hot-loop review
 remain mandatory.
@@ -85,9 +86,9 @@ controlled by
 
 ## Hard interlocks
 
-The active candidate must contain only the four accepted bootstrap/VCAP/VBAT_RAW
-segments, zero vias and zero copper zones; any other active copper fails this
-gate. Gerber, drill, position and IPC-356 fabrication export remain prohibited. The controlled
+The active candidate must contain only the eight accepted
+bootstrap/VCAP/VBAT_RAW/REV_GATE segments, zero vias and zero copper zones; any
+other active copper fails this gate. Gerber, drill, position and IPC-356 fabrication export remain prohibited. The controlled
 EVT envelope STEP is the sole permitted mechanical export in this state. The independent
 audit checks the complete reference/net/footprint set, every candidate coordinate,
 the frozen layer count, accepted EVT outline/thickness and the closed EVT

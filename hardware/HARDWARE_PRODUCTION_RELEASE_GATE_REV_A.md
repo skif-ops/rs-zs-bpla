@@ -127,10 +127,10 @@ input: 4.0 mm at 5 A, 3.0 mm at 4 A, 2.1 mm for local switch nodes and 0.5 mm
 at 0.3 A across a 31-net manifest. JLC04161H-3313A, 70/35 µm copper and minimum
 18 µm average hole-wall plating are accepted for EVT; via sharing, current/fault
 envelopes and physical thermal/current-density evidence remain open. The active
-board contains exactly four accepted trace segments: two bootstrap, LM74700 VCAP
-and `VBAT_RAW`, with zero copper zones. The accepted `REV_GATE` routing 004
-candidate is not yet applied; all remaining routing, DRC, CAM, checkout DFM and
-Review B are open.
+board contains exactly eight accepted trace segments: two bootstrap, LM74700
+VCAP, `VBAT_RAW` and four `REV_GATE`, with zero vias and zero copper zones. The
+exact `REV_GATE` routing 004 application gate is closed; all remaining routing,
+DRC, CAM, checkout DFM and Review B are open.
 
 PCB-PWR is no longer a one-page label-only capture. Its native project now has a
 system overview and four bounded functional child sheets for input protection and

@@ -53,8 +53,9 @@
   трассировка, SI, DRC, CAM, checkout DFM и Review B открыты;
 - PCB-PWR: `DIM-003` принят `18/18` для EVT; `JLC04161H-3313A`, 70/35 µm
   copper, минимум 18 µm hole wall и расчётная силовая геометрия приняты;
-  активны два bootstrap, один LM74700 VCAP и один `VBAT_RAW` сегмент, zero
-  zones; `REV_GATE` routing 004 принят, но ещё не применён;
+  активны два bootstrap, один LM74700 VCAP, один `VBAT_RAW` и четыре
+  `REV_GATE` сегмента — всего восемь, zero vias/zones; application gate 004
+  закрыт, оставшаяся трассировка открыта;
 - PCB-MIC: стандартный двухслойный/PCBA процесс и все 9 инженерных строк
   приняты; first-panel bore inspection, CAM comparison, общий Review B и
   physical EVT открыты;

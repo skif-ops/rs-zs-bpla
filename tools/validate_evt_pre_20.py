@@ -723,6 +723,15 @@ def validate_deliverable_register() -> None:
         in deliverables["HW-M-012"]["Критерий выпуска"],
         "PCB-MAIN accepted assembler-process deliverable is missing or stale",
     )
+    pwr_layout = deliverables["HW-P-002"]["Критерий выпуска"]
+    require(
+        deliverables["HW-P-002"]["QG-1 полнота"] == "PASS"
+        and deliverables["HW-P-002"]["QG-2 техника"] == "OPEN"
+        and "applied REV_GATE routing 004 total eight trace items" in pwr_layout
+        and "zero vias and zero copper zones" in pwr_layout
+        and "remaining routing DRC CAM checkout DFM" in pwr_layout,
+        "PCB-PWR deliverable does not match the active eight-segment routing state",
+    )
     require(
         deliverables["HW-P-005"]["Статус"] == "EVT_ENGINEERING_BASELINE_ACCEPTED"
         and deliverables["HW-P-005"]["QG-1 полнота"] == "PASS"
@@ -821,11 +830,13 @@ def validate_deliverable_register() -> None:
         and "CI 592 schematic 70 and Native 319"
         in risks["R-034"]["Mitigation"]
         and "exact four-warning closure" in risks["R-034"]["Mitigation"]
-        and "four accepted bootstrap VCAP or VBAT_RAW segments"
+        and "eight accepted bootstrap VCAP VBAT_RAW and REV_GATE segments"
         in risks["R-034"]["Mitigation"]
-        and "change outside the accepted four segments"
+        and "CI 641 and PCB Native 347 exact application evidence"
+        in risks["R-034"]["Mitigation"]
+        and "change outside the accepted eight segments"
         in risks["R-034"]["Trigger"]
-        and "premature REV_GATE application" in risks["R-034"]["Trigger"]
+        and "REV_GATE application identity regression" in risks["R-034"]["Trigger"]
         and "any unrelated footprint move" in risks["R-034"]["Trigger"],
         "PCB-PWR dual-buck placement-before-routing risk is not controlled",
     )
@@ -920,6 +931,37 @@ def validate_hardware_baseline() -> None:
     require("ESP32-C3-MINI-1-N4` is superseded" in kicad_readme, "superseded ESP32-C3 history is not documented")
     require("STM32U585CIU6" in kicad_readme and "superseded" in kicad_readme, "superseded 48-pin MCU history is not documented")
     require("Do not reintroduce" in kicad_readme and "BQ24650/CN3791" in kicad_readme, "obsolete charger prohibition is missing")
+    require(
+        "eight accepted bootstrap/VCAP/VBAT_RAW/REV_GATE segments" in kicad_readme
+        and "REV_GATE` routing 004 application gate is closed" in kicad_readme,
+        "KiCad overview does not match the active PCB-PWR REV_GATE successor",
+    )
+    active_pwr_docs = {
+        ROOT / "README.md": (
+            "8 принятых сегментов",
+            "`REV_GATE` routing 004 применены",
+        ),
+        ROOT / "BRANCH_SCOPE.md": (
+            "`REV_GATE` сегмента — всего восемь",
+            "application gate 004",
+        ),
+        ROOT / "hardware/HARDWARE_PRODUCTION_RELEASE_GATE_REV_A.md": (
+            "exactly eight accepted trace segments",
+            "`REV_GATE` routing 004 application gate is closed",
+        ),
+        ROOT / "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md": (
+            "EIGHT CONTROLLED ROUTING SEGMENTS APPLIED",
+            "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c",
+        ),
+        ROOT / "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md": (
+            "eight accepted F.Cu segments",
+            "exact `REV_GATE` application gate is closed",
+        ),
+    }
+    for path, markers in active_pwr_docs.items():
+        text = path.read_text(encoding="utf-8")
+        for marker in markers:
+            require(marker in text, f"{path.relative_to(ROOT)} missing {marker!r}")
     require("STM32U585VIT6Q" in capture_spec, "capture spec missing current MCU")
     require("12-pin" in pwr_addendum and "INA226" in pwr_addendum, "Rev.A 12-pin/INA226 capture addendum missing")
     require("Review A" in gate and "Review B" in gate, "double-review PCB gate is incomplete")

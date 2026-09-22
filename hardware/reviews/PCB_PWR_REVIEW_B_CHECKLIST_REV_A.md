@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A Review B checklist
 
-Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / C4 C6 L1 L2 PLACEMENT ECO GATE PASS / EXACT WARNING REMEDIATION GATE PASS / EXACT BOOTSTRAP AND LM74700 VCAP ROUTING APPLIED / REVIEW B OPEN / FITTED + EVT MOUNTING CLEARANCE, ROUTING CONSTRAINT, DIM-003 AND EVT STACKUP ACCEPTANCE PASS / NOT FOR MANUFACTURE`
+Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / C4 C6 L1 L2 PLACEMENT ECO GATE PASS / EXACT WARNING REMEDIATION GATE PASS / EXACT BOOTSTRAP, LM74700 VCAP, VBAT_RAW AND REV_GATE ROUTING APPLIED / REVIEW B OPEN / FITTED + EVT MOUNTING CLEARANCE, ROUTING CONSTRAINT, DIM-003 AND EVT STACKUP ACCEPTANCE PASS / NOT FOR MANUFACTURE`
 
 Review B is independent from the completed pin/net Review A. The active C20/C21
 hierarchy subgate is signed, but this checklist contains no routing, CAM or
@@ -53,9 +53,10 @@ manufacturing-release assertion.
   exact active source/PDF pair on `2026-09-17` with decision
   `ACCEPT_HIERARCHY_ONLY`.
 - Native PCB: EVT-frozen 90 x 60 x 1.6 mm, four copper layers, 62 electrical
-  footprints plus four board-only mounting holes, exactly four accepted trace
-  segments (bootstrap, VCAP and `VBAT_RAW`), zero vias and zero zones. Accepted
-  `REV_GATE` routing 004 remains unapplied pending its exact application gate.
+  footprints plus four board-only mounting holes, exactly eight accepted trace
+  segments (bootstrap, VCAP, `VBAT_RAW` and four `REV_GATE`), zero vias and zero
+  zones. Exact `REV_GATE` routing 004 is applied and its application gate is
+  closed; remaining routing is open.
 - TI primary-source binding: `PASS`. The machine-audited record
   `PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}` binds exact
   `LMR604403SRAKR` to SNAS877 pages 3/6/13/22 and the 2025-11-08 TI

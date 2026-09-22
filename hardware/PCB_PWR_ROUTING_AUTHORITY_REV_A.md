@@ -35,10 +35,10 @@ closed by project engineering under customer EVT authority. No factory reply is
 required; selected values are 1.6 mm, outer 70 µm, inner 35 µm, minimum average
 hole-wall plating 18 µm and ENIG.
 
-The committed board has four accepted F.Cu segments for the two bootstrap nets,
-LM74700 VCAP and `VBAT_RAW`, with zero vias and zero copper zones. All other
-routing remains open; `REV_GATE` routing 004 is accepted but remains a separate
-unapplied candidate. The
+The committed board has eight accepted F.Cu segments for the two bootstrap nets,
+LM74700 VCAP, `VBAT_RAW` and the four-segment `REV_GATE` routing 004, with zero
+vias and zero copper zones. The exact `REV_GATE` application gate is closed; all
+other routing remains open. The
 numeric overlay uses a deliberately conservative 35 µm / 10 °C-rise engineering
 screen: 4.0 mm for the 5 A input/primary return, 3.0 mm for 4 A rails/returns,
 2.1 mm for local 4 A switch nodes and 0.5 mm for the 0.3 A rail/return. It also
@@ -49,7 +49,7 @@ rail-drop/load-step checks and +70 °C evidence.
 
 The machine status binds a UUID/order-independent semantic board digest covering
 the layer stack, outline, complete footprint placement, pad/net assignment and
-the exact bounded four-segment routing state. The audit still reports the raw file SHA-256 for evidence, but
+the exact bounded eight-segment routing state. The audit still reports the raw file SHA-256 for evidence, but
 does not mistake KiCad-generated UUID/order changes for an electrical or layout
 change.
 

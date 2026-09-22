@@ -226,7 +226,7 @@ def main() -> int:
             "PCB-PWR capture-status interlock drift")
 
     print("PCB-PWR EVT placement-candidate independent audit PASS")
-    print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; exact bootstrap routing successor")
+    print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; exact REV_GATE routing successor")
     print("DIM-003 18/18 EVT accepted; DRC/CAM/Review B/manufacturing remain prohibited")
     return 0
 

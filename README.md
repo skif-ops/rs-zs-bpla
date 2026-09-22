@@ -33,7 +33,7 @@
 | Область | Принято | Остаётся открытым |
 |---|---|---|
 | PCB-MAIN | 186-net authority; `JLC06161H-3313`; 50 Ω `0.1509 mm`; 90 Ω `0.1537/0.2032 mm`; 1023 trace items; 8 zones | оставшаяся трассировка, final SI, DRC, CAM, checkout DFM, STEP/service review, Review B |
-| PCB-PWR | `DIM-003` `18/18`; 90×60×1.6 mm; H1-H4 M3 NPTH; `JLC04161H-3313A`; 70/35 µm copper; ≥18 µm hole wall; расчётная силовая геометрия; 4 принятых сегмента, включая `VBAT_RAW` | применение принятого `REV_GATE` candidate 004, input-protection qualification, оставшаяся трассировка, rail-drop/load-step/fault/+70 °C evidence, DRC, CAM, checkout DFM, Review B |
+| PCB-PWR | `DIM-003` `18/18`; 90×60×1.6 mm; H1-H4 M3 NPTH; `JLC04161H-3313A`; 70/35 µm copper; ≥18 µm hole wall; расчётная силовая геометрия; 8 принятых сегментов, включая применённый `REV_GATE` routing 004 | input-protection qualification, оставшаяся трассировка, rail-drop/load-step/fault/+70 °C evidence, DRC, CAM, checkout DFM, Review B |
 | PCB-MIC | copper subgate и стандартный двухслойный/PCBA процесс; 9/9 engineering closures | first-panel bore/acoustic inspection, CAM comparison, общий Review B и physical EVT |
 | Жгуты | 38 проводников; точные wire MPN; длины `275/440/330 mm` с 10% запасом; 16/16 engineering closures | first-off crimp height/pull, 100% continuity/polarity/cross-short/resistance, installed-route SI/thermal/cold/strain EVT |
 | BOM | QG-1 PASS; technical QG-2 PASS; per-lot 4/10/20 и aggregate 41-station procurement plan | коммерческий заказ и hardware manufacturing release |
@@ -44,9 +44,9 @@
 тестовой EVT-программы; при переходе в серию повторяются supplier/site, tooling,
 DFM и process qualification.
 
-PCB-PWR `VBAT_RAW` routing 003 применён и прошёл application gate. Следующий
-`REV_GATE` routing 004 принят человеком и остаётся отдельным неприменённым
-кандидатом до точного application gate.
+PCB-PWR `VBAT_RAW` routing 003 и `REV_GATE` routing 004 применены и прошли
+точные application gates. Активная плата содержит восемь принятых сегментов,
+ноль vias и ноль zones; оставшаяся трассировка и все выпускные гейты открыты.
 
 Серверная часть включает обновлённую обработку подтверждённого класса «лютый» в
 трёх проверенных аудиосценариях «Мухоеда»; это программное изменение не закрывает
