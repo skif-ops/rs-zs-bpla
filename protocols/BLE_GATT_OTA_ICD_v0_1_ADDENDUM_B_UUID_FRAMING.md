@@ -1,6 +1,6 @@
 # ICD BLE v0.1 — Addendum B (proposal): UUID, MTU, framing, config/self-test characteristics
 
-Статус: `PROPOSAL 2026-09-22 / ANDROID SIDE IMPLEMENTED (core + BluetoothGatt binding) / NRF52840 SIDE OPEN`.
+Статус: `PROPOSAL 2026-09-22 / ANDROID SIDE IMPLEMENTED (core + BluetoothGatt binding) / STM32 SIDE IMPLEMENTED (zs_ipc_service, addendum C) / NRF52840 APP WRITTEN (Zephyr, firmware/targets/nrf52840_ble, not built in CI)`.
 Заморозка — после совместного прототипа Android/прошивка (ICD §3). Это предложение реализовано в Android
 (`core/ble/GattContractV01.kt`, `core/ble/LongValueFraming.kt`, `core/ble/BleSession.kt`,
 `ble/AndroidBleTransport.kt`, экран `ui/ServerActivity.kt`) и проверено юнит‑тестами с эмулированной станцией.
@@ -95,8 +95,31 @@ Read‑back (станция → телефон): ключи 2…14 как выш
 17 audit_committed (bool). Пустая карта `0xa0` — записи нет. Приложение сверяет позицию, политику, время,
 поколение хранения, хеш и флаг аудита; любое расхождение — «не подтверждено».
 
-## B.7 Что остаётся открытым до прототипа
+## B.7 Связывание по секрету этикетки (предложение к прототипу)
 
-- pairing/QR‑секрет и роль (installer/engineer) — «authenticated» здесь означает BLE Secure Connections + роль на стороне прошивки;
-- межпроцессорный протокол STM32U585 ↔ nRF52840 (UART) для проксирования этих характеристик;
-- таймер сервисного окна и трактовка TAMPER_IN как сервисного триггера (решение 2026‑09‑21).
+LE Secure Connections, метод Passkey Entry с фиксированным ключом на стороне станции:
+
+```
+passkey = BE32( SHA-256( "DIO-PAIR-V1" || secret16 )[0..3] ) mod 1 000 000
+```
+`secret16` — 16 байт секрета этикетки (`K` в QR, base32). Известный ответ для секрета из вектора этикетки
+(`JBSWY3DPEHPK3PXPJBSWY3DPEH`): дайджест начинается с `e6f81f0f`, passkey `020559` (тесты Android и nRF).
+
+- STM32 передаёт секрет мосту сообщением `PAIRING_SECRET_SET` (addendum C) после провижининга; nRF
+  вызывает `bt_passkey_set`.
+- Все характеристики, кроме `identity`, требуют аутентифицированной связи (MITM): первый доступ к
+  `config_read`/`config_write` вызывает системный диалог сопряжения на телефоне; приложение показывает
+  код, вычисленный из отсканированной этикетки (`StationLabel.pairingPasskey()`). Без этикетки код неизвестен.
+- Бондинг выключен (`CONFIG_BT_BONDABLE=n`): сопряжение на каждый сервисный сеанс; уровень безопасности
+  ≥ L3 → `LINK_STATE = 2` → STM32 считает пира защищённым (`peer_secure`).
+- Сверка секрета на уровне приложения (HMAC‑челлендж) остаётся вариантом на случай, если UX passkey не устроит.
+
+## B.8 Что остаётся открытым до прототипа
+
+- роль installer/engineer на стороне прошивки (B1: installer; выбор роли по сеансу — после прототипа);
+- подтверждение B.7 на реальном UX Android‑диалога сопряжения; способ применения секрета зафиксировать в ICD v0.2;
+- таймер сервисного окна и трактовка TAMPER_IN как сервисного триггера (решение 2026‑09‑21) — реализовано в B1
+  (600 с с S4 SERVICE), подтвердить на железе;
+- межпроцессорный протокол — реализован (addendum C), заморозить после прототипа;
+- плата nRF52840 для Rev.A (U11 Raytac MDBT50Q-P1MV2, UARTE P0.06/P0.08, nRESET P0.18 от BLE_EN, BLE_DFU_REQ P0.15) —
+  описана в `firmware/targets/nrf52840_ble/boards/dioneya/evt_pre_20_ble/`; MCUboot/DFU по BLE_DFU_REQ — отдельный шаг.
