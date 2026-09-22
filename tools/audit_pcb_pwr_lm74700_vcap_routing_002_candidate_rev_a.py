@@ -39,6 +39,7 @@ VBAT_RAW_SUCCESSOR_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf6476
 VBAT_RAW_STACKUP_BASIS_SHA256 = "300c2c6998704fae554c6f30ddb7bcb6eabb2060973c90f2b1d2ecc4ab76b1fc"
 REV_GATE_SUCCESSOR_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
 REV_GATE_STACKUP_BASIS_SHA256 = "78ea37897803675337612eedbdcaf3922b53fbe2330cb8f12f09f48412b26531"
+ENGINEERING_BASELINE_STACKUP_BASIS_SHA256 = "41733d7d27e2c3ab831e602ee81b072146944da0a5efe8a2c805eeed46ecd1ca"
 EXPECTED_START = (18.7, 29.05)
 EXPECTED_END = (19.52, 26.0)
 
@@ -99,6 +100,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
                 ACTIVE_STACKUP_BASIS_SHA256,
                 VBAT_RAW_STACKUP_BASIS_SHA256,
                 REV_GATE_STACKUP_BASIS_SHA256,
+                ENGINEERING_BASELINE_STACKUP_BASIS_SHA256,
             },
             "candidate-002 source binding drift")
     base = Board.from_file(str(BASE), encoding="utf-8")
