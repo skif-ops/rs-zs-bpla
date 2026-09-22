@@ -304,19 +304,38 @@ static void bind_record_stores(void) {
   }
 }
 
+static volatile bool ble_recovery_request;   /* console "bledfu": restart the nRF with BLE_DFU_REQ asserted */
+
+/* Controlled nRF recovery entry (pin authority: P0.15 sampled by the bootloader at reset release):
+   hold reset via BLE_EN, assert DFU_REQ, release reset, keep the request during boot, then release it. */
+static void ble_enter_recovery(void) {
+  bsp_gpio_ble_enable(false);
+  bsp_gpio_ble_dfu_request(true);
+  vTaskDelay(pdMS_TO_TICKS(20));
+  bsp_gpio_ble_enable(true);
+  vTaskDelay(pdMS_TO_TICKS(500));
+  bsp_gpio_ble_dfu_request(false);
+  console_printf("ble: recovery requested (BLE_DFU_REQ held through reset release)\r\n");
+}
+
 static void ble_task_fn(void *arg) {
   bool window_open = false;
+  uint32_t last_ping = 0u;
   (void)arg;
   bind_record_stores();
   (void)bsp_uart_init(BSP_UART_BLE, APP_UART_BLE_BAUD);
   bsp_gpio_ble_enable(true);
   vTaskDelay(pdMS_TO_TICKS(200));                  /* nRF boot */
   (void)zs_ipc_service_init(&ipc, &ipc_port);
+  (void)zs_ipc_service_ping(&ipc);
   for (;;) {
     uint8_t buf[64];
     size_t n;
     (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(250));
     while ((n = bsp_uart_read(BSP_UART_BLE, buf, sizeof(buf))) > 0u) zs_ipc_service_on_uart_rx(&ipc, buf, n);
+    if (ble_recovery_request) { ble_recovery_request = false; ble_enter_recovery(); (void)zs_ipc_service_init(&ipc, &ipc_port); }
+    /* until the bridge has answered once, repeat the link check every 2 s (nRF boot / re-flash on the bench) */
+    if (ipc.pongs_seen == 0u && (uint32_t)(xTaskGetTickCount() - last_ping) >= 2000u) { last_ping = xTaskGetTickCount(); (void)zs_ipc_service_ping(&ipc); }
     const bool want = modes.mode == ZS_MODE_S4_SERVICE;
     if (want && !window_open) { service_started_ms = xTaskGetTickCount(); (void)zs_ipc_service_set_window(&ipc, true, APP_BLE_SERVICE_WINDOW_S); }
     else if (!want && window_open) (void)zs_ipc_service_set_window(&ipc, false, 0u);
@@ -362,14 +381,19 @@ static void console_exec(const char *cmd) {
     for (uint8_t i = 0u; i < n; i++)
       console_printf("  %8lu %s -> %s (ev %u)\r\n", (unsigned long)j[i].at_ms, zs_mode_name((zs_mode_t)j[i].from), zs_mode_name((zs_mode_t)j[i].to), j[i].event);
   } else if (strcmp(cmd, "ble") == 0) {
-    console_printf("ble link %u window %s config v%lu%s (%s) writes ok %lu rejected %lu audits %lu uart overruns %lu\r\n",
+    console_printf("ble bridge %s (v%u, ping %lu/pong %lu) link %u window %s config v%lu%s (%s) writes ok %lu rejected %lu audits %lu uart overruns %lu\r\n",
+                   ipc.pongs_seen ? "alive" : "silent", ipc.peer_protocol_version, (unsigned long)ipc.pings_sent, (unsigned long)ipc.pongs_seen,
                    ipc.link_state, modes.mode == ZS_MODE_S4_SERVICE ? "open" : "closed", (unsigned long)ipc.config.version,
                    ipc.config_loaded ? "" : " (none)", stores_on_nor ? "nor" : "ram", (unsigned long)ipc.writes_ok,
                    (unsigned long)ipc.writes_rejected, (unsigned long)ble_audit_events, (unsigned long)bsp_uart_rx_overruns(BSP_UART_BLE));
+  } else if (strcmp(cmd, "ping") == 0) {
+    (void)zs_ipc_service_ping(&ipc);
+  } else if (strcmp(cmd, "bledfu") == 0) {
+    ble_recovery_request = true;
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio svc modes ble heap\r\n");
+    console_printf("commands: st lag pps audio svc modes ble ping bledfu heap\r\n");
   }
 }
 
