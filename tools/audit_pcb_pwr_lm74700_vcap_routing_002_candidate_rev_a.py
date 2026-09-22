@@ -31,11 +31,14 @@ CANDIDATE_SEMANTIC_SHA256 = "07ce41bb361e68dd3a5310a6879030f097e4498e9397f2506ea
 GENERATOR_SHA256 = "610269071be79bfb5e2fa46b0e3154e2f39d3bf2da6df9013fd6e3c6f88bc8b7"
 ACTIVE_GENERATOR_SHA256 = "29ba06e0fc4e8fd6ea9ae23398739afd6a6b84d729e78f72ae15ae993c486b70"
 VBAT_RAW_GENERATOR_SHA256 = "bc7688923e9373f9adb180e080f81a28580e4ff63b54bee711d0b77018038321"
+REV_GATE_GENERATOR_SHA256 = "515d0a79726d70fb894a75f17bff04944fd3bd715715825b27398eeb2c72a624"
 ROUTING_RULES_SHA256 = "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988"
 STACKUP_BASIS_SHA256 = "f420a20a7385cc9bd3d057e8d029246e8ebd64d7104511c677d628b7caf39230"
 ACTIVE_STACKUP_BASIS_SHA256 = "dbb41a7fb0ee5eea01f7bbebaa542061d1c9d7b102c0cb4a912a974b03ab3dc3"
 VBAT_RAW_SUCCESSOR_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"
 VBAT_RAW_STACKUP_BASIS_SHA256 = "300c2c6998704fae554c6f30ddb7bcb6eabb2060973c90f2b1d2ecc4ab76b1fc"
+REV_GATE_SUCCESSOR_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
+REV_GATE_STACKUP_BASIS_SHA256 = "78ea37897803675337612eedbdcaf3922b53fbe2330cb8f12f09f48412b26531"
 EXPECTED_START = (18.7, 29.05)
 EXPECTED_END = (19.52, 26.0)
 
@@ -80,19 +83,22 @@ def audit_drc(base_path: Path, candidate_path: Path) -> dict[str, object]:
 def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> dict[str, object]:
     require(sha256(BASE) == BASE_SHA256 and
             sha256(ACTIVE) in {BASE_SHA256, CANDIDATE_SHA256,
-                               VBAT_RAW_SUCCESSOR_SHA256},
+                               VBAT_RAW_SUCCESSOR_SHA256,
+                               REV_GATE_SUCCESSOR_SHA256},
             "candidate-002 base or controlled authoritative board drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "candidate-002 SHA-256 drift")
     require(sha256(GENERATOR) in {
                 GENERATOR_SHA256,
                 ACTIVE_GENERATOR_SHA256,
                 VBAT_RAW_GENERATOR_SHA256,
+                REV_GATE_GENERATOR_SHA256,
             } and
             sha256(ROUTING_RULES) == ROUTING_RULES_SHA256 and
             sha256(STACKUP_BASIS) in {
                 STACKUP_BASIS_SHA256,
                 ACTIVE_STACKUP_BASIS_SHA256,
                 VBAT_RAW_STACKUP_BASIS_SHA256,
+                REV_GATE_STACKUP_BASIS_SHA256,
             },
             "candidate-002 source binding drift")
     base = Board.from_file(str(BASE), encoding="utf-8")

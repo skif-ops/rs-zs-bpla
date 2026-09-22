@@ -419,8 +419,8 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             f"PCB-PWR layer-count drift: {copper_layers}")
     trace_items = len(board.traceItems)
     copper_zones = len(board.zones)
-    require(trace_items in {0, 2, 3, 4} and copper_zones == 0,
-            "routing authority does not cover copper beyond accepted VBAT_RAW routing 003")
+    require(trace_items in {0, 2, 3, 4, 8} and copper_zones == 0,
+            "routing authority does not cover copper beyond accepted REV_GATE routing 004")
 
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
     require(baseline["input"]["actual_battery_bms_limits_frozen"] is False and

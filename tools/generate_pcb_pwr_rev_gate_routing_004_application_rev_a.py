@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply/check the exact accepted PCB-PWR LM74700 VCAP routing candidate 002."""
+"""Apply/check the exact accepted PCB-PWR REV_GATE routing candidate 004."""
 
 from __future__ import annotations
 
@@ -10,17 +10,15 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / "hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb"
-CANDIDATE = ROOT / "hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb"
+BASE = ROOT / "hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_BASE_REV_A.kicad_pcb"
+CANDIDATE = ROOT / "hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pcb"
 BOARD = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
-APPROVAL = ROOT / "hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_APPROVAL_REV_A.json"
+APPROVAL = ROOT / "hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_APPROVAL_REV_A.json"
 
-BASE_SHA256 = "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236"
-CANDIDATE_SHA256 = "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5"
-CONTROLLED_SUCCESSOR_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"
-REV_GATE_SUCCESSOR_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
-APPROVAL_SHA256 = "b9578a4d6691a1a5d7f0bfaafc08d6939af70acf1b4d86add1c00c0b816099ea"
-APPROVAL_COMMIT = "b4b1ca81ffca63b389c3e34b3ba1be17ac9a590f"
+BASE_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"
+CANDIDATE_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
+APPROVAL_SHA256 = "de211f42bf5a0256f89f06b93e5bd0715dca4609fd5c113312e1b01a139671cb"
+APPROVAL_COMMIT = "15e2a253e99cf1456f4a5f00b1bb0a8335031ba4"
 
 
 def require(value: bool, message: str) -> None:
@@ -33,23 +31,24 @@ def sha256(path: Path) -> str:
 
 
 def accepted_payload() -> bytes:
-    require(sha256(BASE) == BASE_SHA256, "VCAP predecessor SHA-256 drift")
-    require(sha256(CANDIDATE) == CANDIDATE_SHA256, "VCAP candidate SHA-256 drift")
-    require(sha256(APPROVAL) == APPROVAL_SHA256, "VCAP approval SHA-256 drift")
+    require(sha256(BASE) == BASE_SHA256, "REV_GATE predecessor SHA-256 drift")
+    require(sha256(CANDIDATE) == CANDIDATE_SHA256,
+            "REV_GATE candidate SHA-256 drift")
+    require(sha256(APPROVAL) == APPROVAL_SHA256, "REV_GATE approval SHA-256 drift")
     approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
     authorization = approval["authorization"]
     require(
-        approval["decision"] == "ACCEPT_PCB_PWR_LM74700_VCAP_ROUTING_002_SUBGATE"
+        approval["decision"] == "ACCEPT_PCB_PWR_REV_GATE_ROUTING_004_SUBGATE"
         and approval["reviewed_candidate_board_sha256"] == CANDIDATE_SHA256
-        and authorization["apply_exact_hash_bound_vcap_routing_candidate"] is True
+        and authorization["apply_exact_hash_bound_rev_gate_routing_candidate"] is True
         and authorization["expected_authoritative_predecessor_sha256"] == BASE_SHA256
         and authorization["authorized_applied_board_sha256"] == CANDIDATE_SHA256
-        and authorization["add_only_the_reviewed_vcap_segment"] is True
-        and authorization["authorize_narrow_switch_node_substitution"] is False
+        and authorization["add_only_the_reviewed_rev_gate_segments"] is True
+        and authorization["authorize_power_input_load_or_buck_hot_loop_routing"] is False
         and authorization["routing_complete"] is False
         and authorization["review_b_complete"] is False
         and authorization["cam_or_manufacturing_release"] is False,
-        "VCAP approval identity or boundary drift",
+        "REV_GATE approval identity or boundary drift",
     )
     return CANDIDATE.read_bytes()
 
@@ -57,23 +56,19 @@ def accepted_payload() -> bytes:
 def apply(output: Path, check: bool) -> dict[str, object]:
     payload = accepted_payload()
     if check:
-        require(sha256(output) in {
-                    CANDIDATE_SHA256,
-                    CONTROLLED_SUCCESSOR_SHA256,
-                    REV_GATE_SUCCESSOR_SHA256,
-                },
-                "authoritative PCB-PWR is not accepted VCAP or controlled successor")
+        require(output.read_bytes() == payload,
+                "authoritative PCB-PWR is not the exact accepted REV_GATE candidate")
     else:
         require(output.read_bytes() == BASE.read_bytes() and sha256(output) == BASE_SHA256,
                 "authoritative PCB-PWR is not the approved predecessor")
         output.write_bytes(payload)
     return {
-        "status": "PASS_EXACT_ACCEPTED_PCB_PWR_LM74700_VCAP_ROUTING_002_APPLICATION",
+        "status": "PASS_EXACT_ACCEPTED_PCB_PWR_REV_GATE_ROUTING_004_APPLICATION",
         "approval_commit": APPROVAL_COMMIT,
         "approval_sha256": APPROVAL_SHA256,
         "predecessor_sha256": BASE_SHA256,
         "applied_sha256": CANDIDATE_SHA256,
-        "trace_items": 3,
+        "trace_items": 8,
         "vias": 0,
         "routing_complete": False,
         "review_b_complete": False,

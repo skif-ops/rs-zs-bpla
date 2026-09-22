@@ -261,7 +261,8 @@ def audit(
     active_sha256 = sha256(ACTIVE)
     require(active_sha256 in {BASE_SHA256, CANDIDATE_SHA256, BOOTSTRAP_CANDIDATE_SHA256,
             "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5",
-            "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"},
+            "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3",
+            "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"},
             "authoritative PCB-PWR is neither the controlled predecessor nor candidate")
     expected_active = {
         BASE_SHA256: BASE,
@@ -271,6 +272,8 @@ def audit(
         ROOT / "hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb",
         "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3":
         ROOT / "hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb",
+        "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c":
+        ROOT / "hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pcb",
     }[active_sha256]
     require(ACTIVE.read_bytes() == expected_active.read_bytes(),
             "authoritative PCB-PWR does not match its controlled byte identity")

@@ -1,0 +1,27 @@
+{
+  "schema": "dioneya-pcb-pwr-rev-gate-routing-004-application-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-REV-GATE-ROUTING-004",
+  "decision": "ACCEPT_PCB_PWR_REV_GATE_ROUTING_004_SUBGATE",
+  "approval_commit_sha": "15e2a253e99cf1456f4a5f00b1bb0a8335031ba4",
+  "approval_sha256": "de211f42bf5a0256f89f06b93e5bd0715dca4609fd5c113312e1b01a139671cb",
+  "predecessor_board_sha256": "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3",
+  "applied_board_sha256": "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c",
+  "exact_candidate_byte_identity": true,
+  "connections": ["U1.5-Q1.4"],
+  "routed_nets": ["REV_GATE"],
+  "trace_items": 8,
+  "added_trace_items": 4,
+  "added_route_length_mm": 12.565,
+  "width_mm": 0.5,
+  "vias": 0,
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+    "required_violations": [86, 86],
+    "required_unconnected": [122, 121],
+    "required_drc_fingerprint_delta": 0
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}

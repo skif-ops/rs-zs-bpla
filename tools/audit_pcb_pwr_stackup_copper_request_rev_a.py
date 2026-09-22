@@ -221,8 +221,8 @@ def validate_board_and_bindings(contract: dict[str, Any]) -> dict[str, Any]:
             f"PCB-PWR footprint count is {len(board.footprints)}, expected 66")
     require(len(board_nets) == 31,
             f"PCB-PWR net count is {len(board_nets)}, expected 31")
-    require(len(board.traceItems) in {0, 2, 3, 4} and len(board.zones) == 0,
-            "stackup request does not cover copper beyond accepted VBAT_RAW routing 003")
+    require(len(board.traceItems) in {0, 2, 3, 4, 8} and len(board.zones) == 0,
+            "stackup request does not cover copper beyond accepted REV_GATE routing 004")
 
     expected_binding = {
         "native_board": relative(BOARD),

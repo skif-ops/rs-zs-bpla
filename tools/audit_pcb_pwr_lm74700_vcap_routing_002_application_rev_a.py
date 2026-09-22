@@ -24,6 +24,9 @@ SEMANTIC_SHA256 = candidate_audit.CANDIDATE_SEMANTIC_SHA256
 VBAT_RAW_SUCCESSOR_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"
 VBAT_RAW_SUCCESSOR_SEMANTIC_SHA256 = "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d"
 VBAT_RAW_SUCCESSOR = ROOT / "hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb"
+REV_GATE_SUCCESSOR_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
+REV_GATE_SUCCESSOR_SEMANTIC_SHA256 = "f7a659d0740e78d40eddae7016724bd8e616baf9fb425f06ace70ec9acca4d3d"
+REV_GATE_SUCCESSOR = ROOT / "hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pcb"
 APPROVAL_SHA256 = "b9578a4d6691a1a5d7f0bfaafc08d6939af70acf1b4d86add1c00c0b816099ea"
 
 
@@ -38,20 +41,24 @@ def sha256(path: Path) -> str:
 
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[str, object]:
     active_sha256 = sha256(BOARD)
-    require(active_sha256 in {BOARD_SHA256, VBAT_RAW_SUCCESSOR_SHA256},
+    require(active_sha256 in {
+                BOARD_SHA256, VBAT_RAW_SUCCESSOR_SHA256,
+                REV_GATE_SUCCESSOR_SHA256},
             "authoritative PCB-PWR is not accepted VCAP or controlled successor")
     expected_active = {
         BOARD_SHA256: candidate_audit.CANDIDATE,
         VBAT_RAW_SUCCESSOR_SHA256: VBAT_RAW_SUCCESSOR,
+        REV_GATE_SUCCESSOR_SHA256: REV_GATE_SUCCESSOR,
     }[active_sha256]
     require(BOARD.read_bytes() == expected_active.read_bytes(),
             "authoritative PCB-PWR VCAP successor byte identity drift")
     require(sha256(APPROVAL) == APPROVAL_SHA256, "VCAP approval drift")
     board = Board.from_file(str(BOARD), encoding="utf-8")
     require(semantic_board_sha256(board) in {
-                SEMANTIC_SHA256, VBAT_RAW_SUCCESSOR_SEMANTIC_SHA256},
+                SEMANTIC_SHA256, VBAT_RAW_SUCCESSOR_SEMANTIC_SHA256,
+                REV_GATE_SUCCESSOR_SEMANTIC_SHA256},
             "applied VCAP semantic identity drift")
-    require(len(board.traceItems) in {3, 4} and len(board.zones) == 0,
+    require(len(board.traceItems) in {3, 4, 8} and len(board.zones) == 0,
             "applied VCAP copper inventory drift")
     proposal = candidate_audit.audit()
     require(proposal["status"] ==
@@ -76,7 +83,8 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and application["review_b_complete"] is False
         and application["cam_or_manufacturing_release"] is False
         and route["active_board_sha256"] in {
-            BOARD_SHA256, VBAT_RAW_SUCCESSOR_SHA256}
+            BOARD_SHA256, VBAT_RAW_SUCCESSOR_SHA256,
+            REV_GATE_SUCCESSOR_SHA256}
         and route["authoritative_board_modified"] is True
         and route["routing_complete"] is False
         and route["review_b_complete"] is False

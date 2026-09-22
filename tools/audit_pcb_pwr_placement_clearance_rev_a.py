@@ -356,8 +356,8 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
                         "pad_bounds_mm": envelope.bounds(),
                     })
 
-    require(len(board.traceItems) in {0, 2, 3, 4} and len(board.zones) == 0,
-            "PCB-PWR copper exceeds the accepted VBAT_RAW successor boundary")
+    require(len(board.traceItems) in {0, 2, 3, 4, 8} and len(board.zones) == 0,
+            "PCB-PWR copper exceeds the accepted REV_GATE successor boundary")
 
     minimum = min(observed)
     passed = (not findings and not mounting_body_findings and

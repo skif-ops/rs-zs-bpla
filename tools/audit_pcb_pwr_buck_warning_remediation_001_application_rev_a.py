@@ -48,6 +48,8 @@ VCAP_CANDIDATE_SHA256 = "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18
 VCAP_SEMANTIC_SHA256 = "07ce41bb361e68dd3a5310a6879030f097e4498e9397f2506ea5b78f49c47234"
 VBAT_RAW_CANDIDATE_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"
 VBAT_RAW_SEMANTIC_SHA256 = "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d"
+REV_GATE_CANDIDATE_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
+REV_GATE_SEMANTIC_SHA256 = "f7a659d0740e78d40eddae7016724bd8e616baf9fb425f06ace70ec9acca4d3d"
 APPROVAL_SHA256 = "386ece8201dae24da18db811845cf3501512192593c6e1bf31767fd3c71d5837"
 MAPPING_SHA256 = "9f4411ecb9dcfe53974f80af0c1901389c93e544eb979d6734de2b52d8c4541e"
 GENERATOR_SHA256 = "406b6d7ae50d5cc7603f11749a12a7d16870ab7ef116504661fbe71764cb50cd"
@@ -101,19 +103,26 @@ def audit(
                 f"missing PCB-PWR warning-remediation application input: {path}")
     require(sha256(BASE) == BASE_SHA256,
             "PCB-PWR warning-remediation predecessor SHA-256 drift")
+    active_sha256 = sha256(BOARD)
     require(
         sha256(CANDIDATE) == CANDIDATE_SHA256
-        and sha256(BOARD) in {CANDIDATE_SHA256, BOOTSTRAP_CANDIDATE_SHA256,
-                             VCAP_CANDIDATE_SHA256, VBAT_RAW_CANDIDATE_SHA256},
+        and active_sha256 in {
+            CANDIDATE_SHA256,
+            BOOTSTRAP_CANDIDATE_SHA256,
+            VCAP_CANDIDATE_SHA256,
+            VBAT_RAW_CANDIDATE_SHA256,
+            REV_GATE_CANDIDATE_SHA256,
+        },
         "authoritative PCB-PWR is not the exact accepted warning-remediation candidate",
     )
     board = Board.from_file(str(BOARD), encoding="utf-8")
-    require(semantic_board_sha256(board) in {BOARD_SEMANTIC_SHA256,
+    active_semantic_sha256 = semantic_board_sha256(board)
+    require(active_semantic_sha256 in {BOARD_SEMANTIC_SHA256,
             BOOTSTRAP_SEMANTIC_SHA256, VCAP_SEMANTIC_SHA256,
-            VBAT_RAW_SEMANTIC_SHA256},
+            VBAT_RAW_SEMANTIC_SHA256, REV_GATE_SEMANTIC_SHA256},
             "applied PCB-PWR warning-remediation semantic identity drift")
-    require(len(board.traceItems) in {0, 2, 3, 4} and len(board.zones) == 0,
-            "warning-remediation successor exceeds accepted VBAT_RAW copper")
+    require(len(board.traceItems) in {0, 2, 3, 4, 8} and len(board.zones) == 0,
+            "warning-remediation successor exceeds accepted REV_GATE copper")
     require(sha256(APPROVAL) == APPROVAL_SHA256,
             "PCB-PWR warning-remediation approval SHA-256 drift")
     require(sha256(MAPPING) == MAPPING_SHA256,
@@ -294,19 +303,19 @@ def audit(
     placement_eco = layout.get("buck_placement_eco_001", {})
     remediation = placement_eco.get("warning_remediation_001", {})
     require(
-        placement_eco.get("active_board_sha256") == VBAT_RAW_CANDIDATE_SHA256
+        placement_eco.get("active_board_sha256") == REV_GATE_CANDIDATE_SHA256
         and placement_eco.get("board_semantic_sha256") ==
-        VBAT_RAW_SEMANTIC_SHA256
+        REV_GATE_SEMANTIC_SHA256
         and placement_eco.get("active_controlled_successor") ==
-        "PCB-PWR-VBAT-RAW-ROUTING-003"
+        "PCB-PWR-REV-GATE-ROUTING-004"
         and placement_eco.get("routing_added") is True
         and remediation.get("status") in {
             "APPROVED_APPLIED_EXACT_WARNING_REMEDIATION_PENDING_COMMIT_BOUND_KICAD9_GATE",
             "APPROVED_APPLIED_EXACT_WARNING_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PASS",
         }
-        and remediation.get("active_board_sha256") == VBAT_RAW_CANDIDATE_SHA256
+        and remediation.get("active_board_sha256") == REV_GATE_CANDIDATE_SHA256
         and remediation.get("board_semantic_sha256") ==
-        VBAT_RAW_SEMANTIC_SHA256
+        REV_GATE_SEMANTIC_SHA256
         and remediation.get("exact_candidate_byte_identity") is True
         and remediation.get("authoritative_board_modified") is True
         and remediation.get("human_acceptance_complete") is True
@@ -328,8 +337,8 @@ def audit(
         "status":
         "PASS_EXACT_ACCEPTED_PCB_PWR_BUCK_WARNING_REMEDIATION_APPLICATION",
         "predecessor_sha256": BASE_SHA256,
-        "active_board_sha256": CANDIDATE_SHA256,
-        "board_semantic_sha256": BOARD_SEMANTIC_SHA256,
+        "active_board_sha256": active_sha256,
+        "board_semantic_sha256": active_semantic_sha256,
         "normalized_instances": ["C4", "C6"],
         "moved_reference_fields": ["R10"],
         "component_poses_changed": False,
@@ -367,7 +376,7 @@ def main() -> int:
     print("PCB-PWR buck warning-remediation 001 application audit:",
           report["status"])
     print(
-        f"active_board_sha256={CANDIDATE_SHA256} "
+        f"active_board_sha256={report['active_board_sha256']} "
         "poses_changed=False copper_changed=False minimum_clearance_mm=0.22"
     )
     return 0

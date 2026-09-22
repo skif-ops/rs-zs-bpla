@@ -209,6 +209,9 @@ jobs:
           python tools/generate_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py --check
           python tools/audit_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py \
             --output artifacts/pcb_pwr_rev_gate_routing_004_candidate_rev_a.json
+          python tools/generate_pcb_pwr_rev_gate_routing_004_application_rev_a.py --check
+          python tools/audit_pcb_pwr_rev_gate_routing_004_application_rev_a.py \
+            --output artifacts/pcb_pwr_rev_gate_routing_004_application_rev_a.json
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/pcb_pwr_routing_authority_rev_a.json
           python tools/generate_pcb_pwr_evt_route_rules_rev_a.py --check
@@ -331,6 +334,7 @@ jobs:
             artifacts/pcb_pwr_vbat_raw_routing_003_candidate_rev_a.json
             artifacts/pcb_pwr_vbat_raw_routing_003_application_rev_a.json
             artifacts/pcb_pwr_rev_gate_routing_004_candidate_rev_a.json
+            artifacts/pcb_pwr_rev_gate_routing_004_application_rev_a.json
             artifacts/pcb_pwr_hierarchy_rev_a.json
             artifacts/pcb_pwr_routing_authority_rev_a.json
             artifacts/pcb_pwr_evt_routing_basis_rev_a.json
