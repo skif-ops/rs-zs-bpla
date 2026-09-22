@@ -34,5 +34,6 @@ android {
 }
 
 dependencies {
+    implementation("com.google.zxing:core:3.5.3")   // QR decoding without Play Services (pure Java)
     testImplementation("junit:junit:4.13.2")
 }
