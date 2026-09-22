@@ -104,16 +104,26 @@ def placement_candidate_audit(name: str) -> str | None:
         evidence_complete = current_evidence.get("status") == (
             "PASS_COMMIT_BOUND_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED"
         )
-        expected = (
-            "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_"
-            "EVT_MECHANICS_AND_FITTED_2D_CLEARANCE_PRE_ROUTE_"
-            "STACKUP_REQUEST_READY_ROUTING_PENDING"
-            if evidence_complete else
-            "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_AND_HUMAN_REVIEW_PENDING_"
-            "EVT_MECHANICS_AND_FITTED_2D_CLEARANCE_PRE_ROUTE_"
-            "STACKUP_REQUEST_READY_ROUTING_PENDING"
-        )
-        if status.get("review_b", {}).get("status") != expected:
+        expected = {
+            (
+                "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_"
+                "EVT_MECHANICS_AND_FITTED_2D_CLEARANCE_PRE_ROUTE_"
+                "STACKUP_REQUEST_READY_ROUTING_PENDING"
+                if evidence_complete else
+                "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_AND_HUMAN_REVIEW_PENDING_"
+                "EVT_MECHANICS_AND_FITTED_2D_CLEARANCE_PRE_ROUTE_"
+                "STACKUP_REQUEST_READY_ROUTING_PENDING"
+            )
+        }
+        if evidence_complete:
+            # The accepted engineering baseline authorizes bounded routing but does
+            # not make this partially routed board a final-DRC or fabrication source.
+            expected.add(
+                "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_"
+                "FITTED_2D_CLEARANCE_DIM_003_AND_EVT_STACKUP_GEOMETRY_"
+                "ACCEPTED_ROUTING_PENDING"
+            )
+        if status.get("review_b", {}).get("status") not in expected:
             return None
         return "tools/audit_pcb_pwr_layout_candidate_rev_a.py"
     if name not in controls:
