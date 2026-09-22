@@ -2,5 +2,29 @@
 <resources>
     <string name="app_name">Дионея: настройка</string>
     <string name="baseline_title">Инженерный baseline Android</string>
-    <string name="baseline_status">BLE-подключение отключено до заморозки UUID, аутентификации и формата OTA-подписи.</string>
+    <string name="baseline_status">BLE GATT по предложению v0.1 (UUID, MTU 247, кадрирование): экран «Сервер» работает в проверочном режиме до совместного прототипа с прошивкой nRF52840.</string>
+    <string name="open_server_screen">Экран «Сервер»</string>
+    <string name="server_title">Сервер «Мухоед»</string>
+    <string name="server_host_port">Хост[:порт MQTT] (IPv4, IPv6 или имя, без схемы)</string>
+    <string name="server_https_port">Порт HTTPS (0 = не используется)</string>
+    <string name="server_ca_reference">Ссылка на CA (имя цепочки)</string>
+    <string name="server_fingerprint">Отпечаток SHA-256 сертификата сервера (64 hex, пусто = без пиннинга)</string>
+    <string name="server_tenant">Tenant (pilot1 / pilot2 / bench)</string>
+    <string name="server_topic_prefix">Префикс топиков</string>
+    <string name="server_version">Версия конфигурации (больше текущей на станции)</string>
+    <string name="server_apn1">APN SIM1</string>
+    <string name="server_apn2">APN SIM2</string>
+    <string name="server_sim">Приоритетная SIM: %1$s</string>
+    <string name="server_validate">Проверить поля</string>
+    <string name="server_apply">Записать в станцию и сверить</string>
+    <string name="server_self_test">Самотест станции</string>
+    <string name="server_no_device">Станция не выбрана: доступна только проверка полей</string>
+    <string name="server_valid">Поля корректны, патч сформирован</string>
+    <string name="server_invalid">Ошибки: %1$s</string>
+    <string name="server_connecting">Подключение к станции…</string>
+    <string name="server_writing">Запись конфигурации…</string>
+    <string name="server_reading_back">Обратное чтение и проверка хеша…</string>
+    <string name="server_verified">Записано и сверено: %1$s</string>
+    <string name="server_mismatch">Обратное чтение не совпало с намерением — конфигурация не подтверждена</string>
+    <string name="server_self_test_running">Самотест выполняется…</string>
 </resources>
