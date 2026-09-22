@@ -96,7 +96,7 @@ class StationPickerActivity : Activity() {
         label = l
         serialInput.setText(l.serial)
         controller.setExpectedSerial(l.serial)
-        status.text = getString(R.string.picker_label_scanned, l.serial, l.tenant)
+        status.text = getString(R.string.picker_label_scanned, l.serial, l.tenant, l.pairingPasskey())
     }
 
     override fun onResume() { super.onResume(); startScan(); handler.post(expireTick) }

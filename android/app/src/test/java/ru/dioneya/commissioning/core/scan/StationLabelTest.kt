@@ -20,6 +20,7 @@ class StationLabelTest {
         assertEquals(l, StationLabel.decode("  $vector\n"))
         assertArrayEquals("Hello!\u00de\u00ad\u00be\u00efHello!".toByteArray(Charsets.ISO_8859_1), l.pairingSecretBytes())   // 26 base32 chars = 16 bytes
         assertEquals(16, l.pairingSecretBytes().size)
+        assertEquals("020559", l.pairingPasskey())                                   // shared with the nRF52840 bridge (SHA-256 e6f81f0f...)
         val bench = StationLabel("DIO-EVT-B01", 901, "bench", "JBSWY3DPEHPK3PXPJBSWY3DPEH")
         assertEquals(bench, StationLabel.decode(bench.encode()))
     }

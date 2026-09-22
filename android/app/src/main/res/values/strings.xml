@@ -20,7 +20,7 @@
     <string name="picker_scan_failed">Сканирование не запустилось (код %1$d)</string>
     <string name="picker_bluetooth_off">Bluetooth выключен</string>
     <string name="picker_scan_qr">Сканировать QR этикетки</string>
-    <string name="picker_label_scanned">Этикетка: %1$s, tenant %2$s — ищем эту станцию</string>
+    <string name="picker_label_scanned">Этикетка: %1$s, tenant %2$s — ищем эту станцию. Код сопряжения BLE: %3$s</string>
     <string name="qr_hint">Наведите камеру на QR этикетки станции</string>
     <string name="qr_no_permission">Нет доступа к камере — введите серийник вручную</string>
     <string name="qr_no_camera">Камера не найдена</string>
