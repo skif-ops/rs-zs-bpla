@@ -238,5 +238,7 @@ target_link_libraries(zs_emit_heartbeat PRIVATE zs_core m)
 
 add_executable(zs_eval_golden tools/eval_golden.c)
 target_link_libraries(zs_eval_golden PRIVATE zs_core m)
+add_executable(zs_eval_golden_mcu tools/eval_golden_mcu.c)
+target_link_libraries(zs_eval_golden_mcu PRIVATE zs_core m)
 add_executable(zs_dump_spectrum tools/dump_spectrum.c)
 target_link_libraries(zs_dump_spectrum PRIVATE zs_core m)
