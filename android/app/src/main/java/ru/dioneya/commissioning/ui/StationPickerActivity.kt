@@ -23,6 +23,7 @@ import android.widget.TextView
 import ru.dioneya.commissioning.R
 import ru.dioneya.commissioning.ble.AndroidBleTransport
 import ru.dioneya.commissioning.core.ble.BleSession
+import ru.dioneya.commissioning.core.scan.StationLabel
 import ru.dioneya.commissioning.core.scan.StationScanController
 import java.util.concurrent.Executors
 
@@ -43,6 +44,7 @@ class StationPickerActivity : Activity() {
     private lateinit var status: TextView
     private lateinit var continueButton: Button
     private lateinit var serialInput: EditText
+    private var label: StationLabel? = null
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -66,6 +68,10 @@ class StationPickerActivity : Activity() {
         serialInput = EditText(this).apply { hint = getString(R.string.picker_expected_serial); inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS }
         serialInput.setOnFocusChangeListener { _, focused -> if (!focused && !controller.setExpectedSerial(serialInput.text.toString())) status.text = getString(R.string.picker_bad_serial) }
         root.addView(serialInput)
+        root.addView(Button(this).apply {
+            text = getString(R.string.picker_scan_qr)
+            setOnClickListener { startActivityForResult(Intent(this@StationPickerActivity, QrScanActivity::class.java), REQUEST_QR) }
+        })
         status = TextView(this).apply { textSize = 15f; setPadding(0, pad / 2, 0, pad / 2) }
         root.addView(status)
         list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
@@ -74,11 +80,23 @@ class StationPickerActivity : Activity() {
         continueButton.setOnClickListener {
             val sel = controller.state.selected ?: return@setOnClickListener
             startActivity(Intent(this, ServerActivity::class.java).putExtra(ServerActivity.EXTRA_DEVICE_ADDRESS, sel.address)
-                .putExtra(ServerActivity.EXTRA_STATION_SERIAL, controller.state.identity?.serial))
+                .putExtra(ServerActivity.EXTRA_STATION_SERIAL, controller.state.identity?.serial)
+                .putExtra(ServerActivity.EXTRA_TENANT, label?.tenant)
+                .putExtra(ServerActivity.EXTRA_PAIRING_SECRET, label?.pairingSecretB32))
         }
         root.addView(continueButton)
         root.addView(Button(this).apply { text = getString(R.string.picker_rescan); setOnClickListener { controller.resume(); startScan() } })
         setContentView(ScrollView(this).apply { addView(root) })
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != REQUEST_QR || resultCode != RESULT_OK) return
+        val l = data?.getStringExtra(QrScanActivity.EXTRA_LABEL_TEXT)?.let { StationLabel.decode(it) } ?: return
+        label = l
+        serialInput.setText(l.serial)
+        controller.setExpectedSerial(l.serial)
+        status.text = getString(R.string.picker_label_scanned, l.serial, l.tenant)
     }
 
     override fun onResume() { super.onResume(); startScan(); handler.post(expireTick) }
@@ -146,5 +164,8 @@ class StationPickerActivity : Activity() {
         else status.text = getString(R.string.picker_permission_denied)
     }
 
-    companion object { private const val REQUEST_PERMISSIONS = 42 }
+    companion object {
+        private const val REQUEST_PERMISSIONS = 42
+        private const val REQUEST_QR = 44
+    }
 }

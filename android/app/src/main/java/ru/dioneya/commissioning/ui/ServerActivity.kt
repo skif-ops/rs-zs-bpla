@@ -47,7 +47,7 @@ class ServerActivity : Activity() {
             text = if (serial.isEmpty()) getString(ru.dioneya.commissioning.R.string.server_title) else getString(ru.dioneya.commissioning.R.string.server_title_for, serial)
             textSize = 22f
         })
-        val defaults = ServerScreenController.Fields()
+        val defaults = ServerScreenController.Fields(tenant = intent.getStringExtra(EXTRA_TENANT).orEmpty())
         val specs = listOf(
             "hostPort" to (getString(ru.dioneya.commissioning.R.string.server_host_port) to defaults.hostPort),
             "httpsPort" to (getString(ru.dioneya.commissioning.R.string.server_https_port) to defaults.httpsPort),
@@ -163,6 +163,10 @@ class ServerActivity : Activity() {
     companion object {
         const val EXTRA_DEVICE_ADDRESS = "ru.dioneya.commissioning.DEVICE_ADDRESS"
         const val EXTRA_STATION_SERIAL = "ru.dioneya.commissioning.STATION_SERIAL"
+        /** Tenant from the label QR, used as the default of the tenant field. */
+        const val EXTRA_TENANT = "ru.dioneya.commissioning.TENANT"
+        /** Label pairing secret (base32) for the pairing step of the joint prototype; held in the intent only, never persisted. */
+        const val EXTRA_PAIRING_SECRET = "ru.dioneya.commissioning.PAIRING_SECRET"
         private const val REQUEST_BLUETOOTH = 41
     }
 }

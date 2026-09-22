@@ -19,6 +19,12 @@
     <string name="picker_rescan">Искать заново</string>
     <string name="picker_scan_failed">Сканирование не запустилось (код %1$d)</string>
     <string name="picker_bluetooth_off">Bluetooth выключен</string>
+    <string name="picker_scan_qr">Сканировать QR этикетки</string>
+    <string name="picker_label_scanned">Этикетка: %1$s, tenant %2$s — ищем эту станцию</string>
+    <string name="qr_hint">Наведите камеру на QR этикетки станции</string>
+    <string name="qr_no_permission">Нет доступа к камере — введите серийник вручную</string>
+    <string name="qr_no_camera">Камера не найдена</string>
+    <string name="qr_camera_error">Ошибка камеры (%1$d)</string>
     <string name="picker_permission_denied">Нет разрешения на BLE — сканирование недоступно</string>
     <string name="server_title">Сервер «Мухоед»</string>
     <string name="server_host_port">Хост[:порт MQTT] (IPv4, IPv6 или имя, без схемы)</string>
