@@ -1,0 +1,85 @@
+/*
+ * Dioneya EVT-PRE-20 Rev.A, BLE bridge: Raytac MDBT50Q-P1MV2 (nRF52840 QIAA) = U11 on PCB-MAIN.
+ * Wiring from hardware/PCB_MAIN_BLE_PIN_AUTHORITY_REV_A.csv (authority: Raytac Ver.L + Rev.A netlist):
+ *   pad 22 P0.06  nRF UARTE TX  -> STM32 PB11 USART3_RX   (net BLE_RX, 22 R series at U11)
+ *   pad 24 P0.08  nRF UARTE RX  <- STM32 PB10 USART3_TX   (net BLE_TX, 22 R series at STM32)
+ *   pad 39 P0.15  BLE_DFU_REQ   <- STM32 PB2 open-drain, 10 k pull-up, active LOW, sampled by the bootloader at reset release
+ *   pad 40 P0.18/nRESET         <- reset buffer from STM32 BLE_EN (LOW = held in reset), 10 k pull-up
+ *   VDD = VDDH = 3V3_DIGITAL (normal-voltage mode, Reg0 DC/DC unused), no 32.768 kHz crystal, no NFC, no USB, no flow control.
+ *   SWDIO/SWDCLK -> TP_BLE_SWD fixture pads (separate from the STM32 SWD).
+ */
+/dts-v1/;
+#include <nordic/nrf52840_qiaa.dtsi>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include "evt_pre_20_ble-pinctrl.dtsi"
+
+/ {
+	model = "Dioneya EVT-PRE-20 BLE bridge (Raytac MDBT50Q-P1MV2)";
+	compatible = "dioneya,evt-pre-20-ble";
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
+		dioneya,ipc-uart = &uart0;
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		dfu_request: dfu_request {
+			gpios = <&gpio0 15 GPIO_ACTIVE_LOW>;
+			label = "BLE_DFU_REQ from STM32 (pad 39, P0.15)";
+			zephyr,code = <INPUT_KEY_0>;
+		};
+	};
+
+	aliases {
+		mcuboot-button0 = &dfu_request;
+	};
+};
+
+&gpiote {
+	status = "okay";
+};
+
+&gpio0 {
+	status = "okay";
+};
+
+&gpio1 {
+	status = "okay";
+};
+
+&uart0 {
+	compatible = "nordic,nrf-uarte";
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&uart0_default>;
+	pinctrl-1 = <&uart0_sleep>;
+	pinctrl-names = "default", "sleep";
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x0000C000>;
+		};
+		slot0_partition: partition@c000 {
+			label = "image-0";
+			reg = <0x0000C000 0x00076000>;
+		};
+		slot1_partition: partition@82000 {
+			label = "image-1";
+			reg = <0x00082000 0x00076000>;
+		};
+		storage_partition: partition@f8000 {
+			label = "storage";
+			reg = <0x000F8000 0x00008000>;
+		};
+	};
+};
