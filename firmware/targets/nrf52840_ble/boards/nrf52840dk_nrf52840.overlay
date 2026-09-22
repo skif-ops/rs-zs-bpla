@@ -1,0 +1,25 @@
+/* Bring-up on the nRF52840 DK: uart1 on P1.01 (TX) / P1.02 (RX) toward the STM32U585 USART3 (PB10 TX / PB11 RX).
+   The Rev.A station carrier assigns the module pins in the board contract; add an overlay per board there. */
+&pinctrl {
+	uart1_default: uart1_default {
+		group1 { psels = <NRF_PSEL(UART_TX, 1, 1)>; };
+		group2 { psels = <NRF_PSEL(UART_RX, 1, 2)>; bias-pull-up; };
+	};
+	uart1_sleep: uart1_sleep {
+		group1 { psels = <NRF_PSEL(UART_TX, 1, 1)>, <NRF_PSEL(UART_RX, 1, 2)>; low-power-enable; };
+	};
+};
+
+&uart1 {
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&uart1_default>;
+	pinctrl-1 = <&uart1_sleep>;
+	pinctrl-names = "default", "sleep";
+};
+
+/ {
+	chosen {
+		dioneya,ipc-uart = &uart1;
+	};
+};
