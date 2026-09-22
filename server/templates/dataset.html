@@ -54,6 +54,16 @@
             <input class="form-control" id="distance_max_m" name="distance_max_m" type="number" min="0" step="0.5" placeholder="5">
           </div>
         </div>
+        <div class="row g-3 mt-1">
+          <div class="col-sm-6">
+            <label class="form-label" for="altitude_min_m">Высота от, м</label>
+            <input class="form-control" id="altitude_min_m" name="altitude_min_m" type="number" min="0" step="0.5" placeholder="0">
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label" for="altitude_max_m">Высота до, м</label>
+            <input class="form-control" id="altitude_max_m" name="altitude_max_m" type="number" min="0" step="0.5" placeholder="90">
+          </div>
+        </div>
         <label class="form-label mt-2" for="flight_mode">Режим полёта</label>
         <input class="form-control" id="flight_mode" name="flight_mode" list="flight-options" placeholder="зависание / пролёт / приближение">
         <datalist id="flight-options">
@@ -62,6 +72,9 @@
         <label class="form-label mt-2" for="target_intervals">Интервалы, где БПЛА реально слышен, сек</label>
         <input class="form-control" id="target_intervals" name="target_intervals" placeholder="например: 12.5-28, 41-56">
         <div class="form-text">Для записи пролёта указывайте только участки с целью. Хвост/городской фон не попадёт в класс БПЛА.</div>
+        <label class="form-label mt-2" for="source_group">Группа источника (один пролёт / один вылет)</label>
+        <input class="form-control" id="source_group" name="source_group" placeholder="например: lutyi-flight-2026-09-20-a">
+        <div class="form-text">Укажите одинаковую группу для нескольких файлов одного события: они будут обучать модель как один источник и не попадут по разные стороны LOFO.</div>
         <div class="form-check mt-2">
           <input class="form-check-input" type="checkbox" name="target_present_full_recording" id="target_present_full_recording" value="true">
           <label class="form-check-label" for="target_present_full_recording">БПЛА действительно слышен всю запись</label>

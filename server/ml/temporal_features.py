@@ -138,7 +138,9 @@ class TemporalFeatureBuilder:
                 "window_seconds": float(window_seconds),
             }
             for meta in (
+                "meta_source_group",
                 "meta_dataset_role",
+                "meta_validation_eligible",
                 "meta_recording_quality",
                 "meta_recording_quality_score",
                 "meta_label_confidence",

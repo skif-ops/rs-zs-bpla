@@ -18,6 +18,7 @@ from audio.loader import AudioLoader
 from audio.separation import DroneSeparator
 from ml.online_type_classifier import OnlineTemporalTypeClassifier
 from ml.raw_temporal_diagnostics import RAW_DIAGNOSTIC_COLUMNS, raw_temporal_diagnostics
+from ml.source_identity import SOURCE_ID_COLUMN, with_source_identity
 from ml.type_readiness import assess_type_readiness
 
 DATASET = ROOT / "dataset" / "features.csv"
@@ -65,7 +66,7 @@ def raw_source_summary(path: Path) -> dict[str, float]:
 
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    df = pd.read_csv(DATASET)
+    df = with_source_identity(pd.read_csv(DATASET))
     manifest = json.loads(POLICY.read_text(encoding="utf-8"))["sources"]
     # Benchmark the six latest user recordings. Older confirmed Lutyi sources
     # remain in training but do not need the expensive detection replay again.
@@ -97,12 +98,14 @@ def main() -> None:
     for src in sorted(sources):
         meta = manifest[src]
         test = df[df["source_file"].astype(str) == src].copy()
+        source_group = str(test[SOURCE_ID_COLUMN].iloc[0])
         raw = ROOT / src
         if src in cached_v06:
             detect_s, best_det, present, total = cached_v06[src]
         else:
             detect_s, best_det, present, total = candidate_time(raw)
-        train = df[df["source_file"].astype(str) != src].copy()
+        # Hold out every view of the same physical flight together.
+        train = df[df[SOURCE_ID_COLUMN].astype(str) != source_group].copy()
         with tempfile.TemporaryDirectory() as td:
             clf = OnlineTemporalTypeClassifier(model_path=Path(td) / "temporal.json")
             model = clf.train(train)
@@ -110,6 +113,7 @@ def main() -> None:
         audio = AudioLoader().load_audio(raw)
         records.append({
             "source_file": src,
+            "source_group": source_group,
             "file_name": raw.name,
             "label": meta["label"],
             "label_confidence": meta.get("label_confidence", "unknown"),

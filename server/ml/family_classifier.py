@@ -19,6 +19,7 @@ from config import settings
 from ml.acoustic_family import AcousticFamily, family_for_label, known_family_labels
 from ml.feature_vector import FEATURE_COLUMNS, feature_set_to_row
 from ml.online_type_classifier import source_training_weight
+from ml.source_identity import SOURCE_ID_COLUMN, with_source_identity
 from models.schemas import AudioFeatureSet, FamilyClassificationResult, FamilyClassificationScore
 from utils.serialization import write_json
 
@@ -26,24 +27,50 @@ _TRAIN_ROLES = {"training", "training_provisional", "training_provisional_weak"}
 
 
 def _source_balanced_rows(frame: pd.DataFrame, *, spacing_seconds: float = 2.0, max_rows: int = 24) -> pd.DataFrame:
-    """Decorrelate overlapping windows so one recording cannot dominate."""
+    """Decorrelate windows so one recording group cannot dominate."""
 
     selected: list[pd.DataFrame] = []
     if frame.empty:
         return frame.copy()
-    for _, group in frame.groupby("source_file", sort=False):
-        g = group.sort_values("start_seconds").reset_index(drop=True)
-        keep: list[int] = []
-        last = -1e12
-        for idx, row in g.iterrows():
-            start = float(row.get("start_seconds", 0.0))
-            if start - last + 1e-9 >= spacing_seconds:
-                keep.append(idx)
-                last = start
-            if len(keep) >= max_rows:
-                break
-        if keep:
-            selected.append(g.loc[keep])
+    work = with_source_identity(frame)
+    family_column = "family" if "family" in work.columns else "label"
+    for _, group in work.groupby([family_column, SOURCE_ID_COLUMN], sort=False):
+        # Preserve the accepted v0.8 sampling contract for ordinary one-file
+        # sources. Group-aware allocation is needed only for multi-view events.
+        if group["source_file"].astype(str).nunique() == 1:
+            g = group.sort_values("start_seconds").reset_index(drop=True)
+            keep: list[int] = []
+            last = -1e12
+            for idx, row in g.iterrows():
+                start = float(row.get("start_seconds", 0.0))
+                if start - last + 1e-9 >= spacing_seconds:
+                    keep.append(idx)
+                    last = start
+                if len(keep) >= max_rows:
+                    break
+            if keep:
+                selected.append(g.loc[keep])
+            continue
+
+        file_parts: list[pd.DataFrame] = []
+        for _, recording in group.groupby("source_file", sort=False):
+            g = recording.sort_values("start_seconds").reset_index(drop=True)
+            keep: list[int] = []
+            last = -1e12
+            for idx, row in g.iterrows():
+                start = float(row.get("start_seconds", 0.0))
+                if start - last + 1e-9 >= spacing_seconds:
+                    keep.append(idx)
+                    last = start
+            if keep:
+                file_parts.append(g.loc[keep])
+        if not file_parts:
+            continue
+        g = pd.concat(file_parts, ignore_index=True).sort_values(["source_file", "start_seconds"])
+        if len(g) > max_rows:
+            positions = np.linspace(0, len(g) - 1, max_rows)
+            g = g.iloc[sorted(set(int(round(value)) for value in positions))]
+        selected.append(g)
     return pd.concat(selected, ignore_index=True) if selected else frame.iloc[0:0].copy()
 
 
@@ -78,12 +105,13 @@ class AcousticFamilyClassifier:
         training = training.reset_index(drop=True)
 
         source_items: list[dict[str, Any]] = []
-        for (family, source_file), indices in training.groupby(["family", "source_file"], sort=False).groups.items():
+        for (family, source_id), indices in training.groupby(["family", SOURCE_ID_COLUMN], sort=False).groups.items():
             idx = np.asarray(list(indices), dtype=int)
             group = training.loc[idx]
             source_items.append({
                 "family": str(family),
-                "source_file": str(source_file),
+                "source_id": str(source_id),
+                "source_files": sorted(set(group["source_file"].astype(str))),
                 "centroid": np.median(z[idx], axis=0),
                 "weight": source_training_weight(group),
                 "confirmed": self._source_confirmed(group),
@@ -126,10 +154,13 @@ class AcousticFamilyClassifier:
             "unsupported_families": [AcousticFamily.TURBINE_JET.value],
             "training": {
                 "source_balanced": True,
+                "source_group_aware": True,
                 "spacing_seconds": 2.0,
                 "max_rows_per_source": 24,
                 "rows": int(len(training)),
-                "sources": int(training["source_file"].nunique()),
+                "sources": int(
+                    len(training[["family", SOURCE_ID_COLUMN]].drop_duplicates())
+                ),
             },
         }
         write_json(self.model_path, payload)

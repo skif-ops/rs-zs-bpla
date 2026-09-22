@@ -13,6 +13,8 @@ from typing import Iterable
 
 import pandas as pd
 
+from ml.source_identity import SOURCE_ID_COLUMN, with_source_identity
+
 
 @dataclass(frozen=True, slots=True)
 class LabelReadiness:
@@ -65,7 +67,8 @@ def assess_type_readiness(
         subset = frame[frame.get("label", pd.Series(dtype=str)).astype(str) == str(label)].copy()
         total = confirmed = weak = validation = representative = 0
         if not subset.empty and "source_file" in subset.columns:
-            for _, group in subset.groupby("source_file", sort=False):
+            subset = with_source_identity(subset)
+            for _, group in subset.groupby(SOURCE_ID_COLUMN, sort=False):
                 total += 1
                 role = _first(group, "meta_dataset_role", "training")
                 default_conf = "weak" if role == "training_provisional_weak" else "confirmed"

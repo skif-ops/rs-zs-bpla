@@ -101,6 +101,54 @@
       "label_confidence_score": 1.0,
       "source_origin": "pre_v06_dataset",
       "validation_eligible": false
+    },
+    "dataset/raw/Лютый/lutyi_20260920_varied_range_altitude_le_90m/video_2026-09-20_21-07-06.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "user_video_audio",
+      "source_group": "lutyi_20260920_varied_range_altitude_le_90m",
+      "distance_profile": "variable_unknown",
+      "altitude_max_m": 90.0,
+      "verification": "user_verified_2026-09-20",
+      "wav_sha256": "792a692a58e0194274222844f00b785877d1a70184aa79e5872f3182e8e6dc46",
+      "original_video_sha256": "12edb8225cd846ca50dacaa78ca82aa9c4e5c564e99d494bbc7b777d5a723fdb",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/lutyi_20260920_varied_range_altitude_le_90m/video_2026-09-20_21-07-20.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "user_video_audio",
+      "source_group": "lutyi_20260920_varied_range_altitude_le_90m",
+      "distance_profile": "variable_unknown",
+      "altitude_max_m": 90.0,
+      "verification": "user_verified_2026-09-20",
+      "wav_sha256": "92f47c1dac8aeca32f2784bb8f030907a84fbb9bc81260e49e4c4a1830ac60f8",
+      "original_video_sha256": "d6cbf6d8d7f91ab8b818ab32ce24c8c178fe7f826b6778cb927ab6bb7900c96b",
+      "validation_eligible": false
+    },
+    "dataset/raw/Лютый/lutyi_20260920_varied_range_altitude_le_90m/video_2026-09-20_21-07-26.wav": {
+      "label": "Лютый",
+      "dataset_role": "training_provisional",
+      "recording_quality": "unknown",
+      "recording_quality_score": 0.65,
+      "label_confidence": "confirmed",
+      "label_confidence_score": 1.0,
+      "source_origin": "user_video_audio",
+      "source_group": "lutyi_20260920_varied_range_altitude_le_90m",
+      "distance_profile": "variable_unknown",
+      "altitude_max_m": 90.0,
+      "verification": "user_verified_2026-09-20",
+      "wav_sha256": "6233b487fa5ad303b3e04582833502482663f7e59a33e3b114fe87ff0d3ad275",
+      "original_video_sha256": "8a56410f19f505662a315fe4ad26fb426d40cb2880092db8e10c2ad936232de3",
+      "validation_eligible": false
     }
   }
 }

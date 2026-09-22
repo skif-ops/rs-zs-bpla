@@ -7,17 +7,25 @@
       "is_drone": true,
       "image_path": null,
       "description": "Предварительная обучающая выборка: используется при обучении модели, но не считается эталонной и исключена из контрольной валидации до накопления релевантной независимой выборки.",
+      "status": "training_provisional",
       "last_metadata": {
         "category": "drone",
         "is_drone": true,
         "distance_min_m": null,
         "distance_max_m": null,
+        "altitude_min_m": null,
+        "altitude_max_m": 90.0,
+        "source_group": "lutyi_20260920_varied_range_altitude_le_90m",
         "background": "полевой/городской пользовательский материал",
-        "flight_mode": "пролёт",
-        "notes": "Материалы пользователя используются в обучении как provisional-класс; не являются эталоном и не учитываются в контрольной accuracy/LOFO до dataset freeze.",
-        "dataset_role": "training_provisional"
-      },
-      "status": "training_provisional"
+        "flight_mode": "пролёт/удаление; переменное удаление до цели",
+        "notes": "Тип подтверждён пользователем во всех трёх файлах; один вариант/вылет с разным удалением до цели и высотой до 90 м. Точные дистанции не указаны.",
+        "dataset_role": "training_provisional",
+        "recording_quality": "unknown",
+        "recording_quality_score": 0.65,
+        "label_confidence": "confirmed",
+        "label_confidence_score": 1.0,
+        "validation_eligible": false
+      }
     }
   }
 }

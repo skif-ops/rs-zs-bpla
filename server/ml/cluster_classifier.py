@@ -13,6 +13,7 @@ import pandas as pd
 
 from config import settings
 from ml.feature_vector import FEATURE_COLUMNS, feature_set_to_vector
+from ml.source_identity import SOURCE_ID_COLUMN, source_identity_series, with_source_identity
 from models.schemas import (
     AudioFeatureSet,
     MLClassificationResult,
@@ -88,7 +89,8 @@ class CentroidAudioClassifier:
             label_mask = train_labels == label
             vectors = normalized[label_mask]
             if "source_file" in training.columns:
-                sources = training.loc[label_mask, "source_file"].astype(str).to_numpy()
+                label_rows = training.loc[label_mask]
+                sources = source_identity_series(label_rows).to_numpy()
                 unique_sources = sorted(set(sources.tolist()))
                 source_counts[str(label)] = len(unique_sources)
                 source_centroids = np.asarray([vectors[sources == src].mean(axis=0) for src in unique_sources])
@@ -117,9 +119,11 @@ class CentroidAudioClassifier:
                 "labels": training["label"].astype(str).tolist(),
                 "vectors": normalized.tolist(),
                 "source_files": training["source_file"].astype(str).tolist() if "source_file" in training.columns else [],
+                "source_ids": source_identity_series(training).astype(str).tolist(),
             },
             "training_guard": {
                 "source_balanced": True,
+                "source_group_aware": True,
                 "max_prototypes_per_source": int(settings.ml_max_prototypes_per_source),
                 "min_prototype_spacing_seconds": float(settings.ml_min_prototype_spacing_seconds),
                 "sources_per_label": source_counts,
@@ -372,31 +376,41 @@ class CentroidAudioClassifier:
 
     @staticmethod
     def _source_balanced_rows(dataset: pd.DataFrame) -> pd.DataFrame:
-        """Return decorrelated rows with bounded, equal influence per source."""
+        """Return decorrelated rows with bounded influence per physical group."""
 
         if "source_file" not in dataset.columns:
             return dataset.copy().reset_index(drop=True)
+        work = with_source_identity(dataset)
         selected: list[pd.DataFrame] = []
         max_per_source = max(int(settings.ml_max_prototypes_per_source), 1)
         min_spacing = max(float(settings.ml_min_prototype_spacing_seconds), 0.0)
-        for _, group in dataset.groupby(["label", "source_file"], sort=False):
-            g = group.copy()
-            if "start_seconds" in g.columns:
-                g = g.sort_values("start_seconds")
-                keep = []
-                last = -float("inf")
-                for idx, row in g.iterrows():
-                    t = float(row.get("start_seconds", 0.0))
-                    if t - last + 1e-9 >= min_spacing:
-                        keep.append(idx)
-                        last = t
-                g = g.loc[keep]
+        for _, group in work.groupby(["label", SOURCE_ID_COLUMN], sort=False):
+            # Apply temporal spacing within each physical file first. Multiple
+            # views in one source group can share the same local time axis.
+            file_parts: list[pd.DataFrame] = []
+            for _, recording in group.groupby("source_file", sort=False):
+                g = recording.copy()
+                if "start_seconds" in g.columns:
+                    g = g.sort_values("start_seconds")
+                    keep = []
+                    last = -float("inf")
+                    for idx, row in g.iterrows():
+                        t = float(row.get("start_seconds", 0.0))
+                        if t - last + 1e-9 >= min_spacing:
+                            keep.append(idx)
+                            last = t
+                    g = g.loc[keep]
+                file_parts.append(g)
+            g = pd.concat(file_parts, ignore_index=True)
+            order = [column for column in ("source_file", "start_seconds") if column in g.columns]
+            if order:
+                g = g.sort_values(order)
             if len(g) > max_per_source:
                 positions = np.linspace(0, len(g) - 1, max_per_source)
                 g = g.iloc[sorted(set(int(round(x)) for x in positions))]
             selected.append(g)
         if not selected:
-            return dataset.copy().reset_index(drop=True)
+            return work.reset_index(drop=True)
         return pd.concat(selected, ignore_index=True)
 
     @staticmethod

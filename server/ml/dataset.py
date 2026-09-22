@@ -17,6 +17,7 @@ from audio.preprocessing import adaptive_window_rms_threshold
 from config import settings
 from ml.cluster_classifier import CentroidAudioClassifier
 from ml.feature_vector import FEATURE_COLUMNS, feature_set_to_row
+from ml.source_identity import source_identity_series
 from ml.label_registry import load_registry, remove_label, upsert_label
 from models.schemas import (
     DatasetAddResult,
@@ -328,11 +329,7 @@ class SoundDatasetManager:
                 labels_total=len(classes),
                 message="Нужно минимум 2 класса для оценки точности.",
             )
-        groups = (
-            df["source_file"].astype(str).to_numpy()
-            if "source_file" in df.columns
-            else None
-        )
+        groups = source_identity_series(df).to_numpy() if "source_file" in df.columns else None
         files_per_label = {}
         if groups is not None:
             for label in classes:

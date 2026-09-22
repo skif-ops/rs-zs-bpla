@@ -125,3 +125,32 @@ def test_training_balances_overlapping_windows_per_source(tmp_path):
     assert model["prototype_samples_total"] < len(rows)
     labels = model["prototypes"]["labels"]
     assert labels.count("FP-1") <= 24
+
+
+def test_training_counts_grouped_views_as_one_source(tmp_path):
+    rows = []
+    for source in ("view-a.wav", "view-b.wav", "view-c.wav"):
+        for index in range(8):
+            row = labeled_row("FP-1", make_features(fundamental_hz=120.0 + index), index)
+            row.update(
+                {
+                    "source_file": source,
+                    "meta_source_group": "same-flight",
+                    "start_seconds": index * 0.5,
+                }
+            )
+            rows.append(row)
+    for index in range(8):
+        row = labeled_row("ветер", make_features(fundamental_hz=45.0 + index), index)
+        row.update({"source_file": "wind.wav", "start_seconds": index * 0.5})
+        rows.append(row)
+    dataset_path = tmp_path / "features.csv"
+    model_path = tmp_path / "model.json"
+    pd.DataFrame(rows).to_csv(dataset_path, index=False)
+
+    trained = CentroidAudioClassifier(dataset_path=dataset_path, model_path=model_path).train()
+    model = __import__("json").loads(model_path.read_text())
+
+    assert trained.trained
+    assert model["training_guard"]["sources_per_label"]["FP-1"] == 1
+    assert set(model["prototypes"]["source_ids"]) == {"same-flight", "wind.wav"}

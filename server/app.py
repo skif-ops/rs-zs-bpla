@@ -162,6 +162,9 @@ async def add_dataset_audio(
     is_drone: bool = Form(False),
     distance_min_m: str | None = Form(None),
     distance_max_m: str | None = Form(None),
+    altitude_min_m: str | None = Form(None),
+    altitude_max_m: str | None = Form(None),
+    source_group: str | None = Form(None),
     background: str | None = Form(None),
     flight_mode: str | None = Form(None),
     notes: str | None = Form(None),
@@ -191,16 +194,33 @@ async def add_dataset_audio(
                 "либо явно отметьте, что БПЛА присутствует всю запись. "
                 "Полная запись больше не размечается как БПЛА автоматически."
             )
-        dataset_role = "research" if clean_label in settings.ml_provisional_labels else "training"
+        if clean_label in settings.ml_weak_labels:
+            dataset_role = "training_provisional_weak"
+            label_confidence = "weak"
+            label_confidence_score = 0.4
+        elif clean_label in settings.ml_provisional_labels:
+            dataset_role = "training_provisional"
+            label_confidence = "confirmed"
+            label_confidence_score = 1.0
+        else:
+            dataset_role = "training"
+            label_confidence = "confirmed"
+            label_confidence_score = 1.0
         metadata = RecordingMetadata(
             category=category,
             is_drone=bool(is_drone) or category == "drone",
             distance_min_m=_form_float(distance_min_m),
             distance_max_m=_form_float(distance_max_m),
+            altitude_min_m=_form_float(altitude_min_m),
+            altitude_max_m=_form_float(altitude_max_m),
+            source_group=_clean_text(source_group),
             background=_clean_text(background),
             flight_mode=_clean_text(flight_mode),
             notes=_clean_text(notes),
             dataset_role=dataset_role,
+            label_confidence=label_confidence,
+            label_confidence_score=label_confidence_score,
+            validation_eligible=False,
         )
 
         results = []

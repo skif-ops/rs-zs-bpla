@@ -307,6 +307,9 @@ class RecordingMetadata(BaseModel):
     is_drone: bool = False
     distance_min_m: float | None = None
     distance_max_m: float | None = None
+    altitude_min_m: float | None = None
+    altitude_max_m: float | None = None
+    source_group: str | None = None
     background: str | None = None
     flight_mode: str | None = None
     notes: str | None = None
@@ -321,14 +324,18 @@ class RecordingMetadata(BaseModel):
     recording_quality_score: float | None = Field(default=None, ge=0.0, le=1.0)
     label_confidence: Literal["confirmed", "weak", "unknown"] = "confirmed"
     label_confidence_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    validation_eligible: bool = False
 
     @model_validator(mode="after")
-    def _order_distance(self):
-        """Swap reversed distance bounds rather than rejecting the upload."""
+    def _order_ranges(self):
+        """Swap reversed distance/altitude bounds rather than rejecting them."""
 
         lo, hi = self.distance_min_m, self.distance_max_m
         if lo is not None and hi is not None and lo > hi:
             self.distance_min_m, self.distance_max_m = hi, lo
+        lo, hi = self.altitude_min_m, self.altitude_max_m
+        if lo is not None and hi is not None and lo > hi:
+            self.altitude_min_m, self.altitude_max_m = hi, lo
         return self
 
     def to_row(self) -> dict[str, object]:
@@ -339,6 +346,9 @@ class RecordingMetadata(BaseModel):
             "meta_is_drone": bool(self.is_drone),
             "meta_distance_min_m": self.distance_min_m,
             "meta_distance_max_m": self.distance_max_m,
+            "meta_altitude_min_m": self.altitude_min_m,
+            "meta_altitude_max_m": self.altitude_max_m,
+            "meta_source_group": self.source_group,
             "meta_background": self.background,
             "meta_flight_mode": self.flight_mode,
             "meta_notes": self.notes,
@@ -347,6 +357,7 @@ class RecordingMetadata(BaseModel):
             "meta_recording_quality_score": self.recording_quality_score,
             "meta_label_confidence": self.label_confidence,
             "meta_label_confidence_score": self.label_confidence_score,
+            "meta_validation_eligible": bool(self.validation_eligible),
         }
 
 

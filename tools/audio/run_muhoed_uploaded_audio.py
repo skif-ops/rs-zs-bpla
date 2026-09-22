@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import csv
 import hashlib
 import json
@@ -95,7 +96,12 @@ def raw_diagnostics(path: Path) -> dict[str, float]:
     }
 
 
-def summary_from(report: dict[str, object], replay: dict[str, object], wav: Path) -> dict[str, object]:
+def summary_from(
+    report: dict[str, object],
+    replay: dict[str, object],
+    wav: Path,
+    ground_truth: dict[str, object],
+) -> dict[str, object]:
     decision = report["decision"]
     separation = report["separation"]
     family = report.get("family_classification") or {}
@@ -104,8 +110,13 @@ def summary_from(report: dict[str, object], replay: dict[str, object], wav: Path
     quality = report["quality"]
     return {
         "file": wav.name,
-        "ground_truth": "UAV_CONFIRMED",
-        "ground_truth_source": "user_verified_2026-09-07",
+        "ground_truth": "UAV_CONFIRMED" if ground_truth["target_present"] else "TARGET_ABSENT",
+        "ground_truth_type": ground_truth["exact_type"],
+        "ground_truth_source": ground_truth["verification"],
+        "source_group": ground_truth.get("source_group"),
+        "dataset_role": ground_truth.get("dataset_role"),
+        "altitude_max_m": ground_truth.get("altitude_max_m"),
+        "distance_profile": ground_truth.get("distance_profile"),
         "detection_outcome": "TRUE_POSITIVE" if bool(decision["drone_present"]) else "FALSE_NEGATIVE",
         "wav_sha256": sha256(wav),
         "duration_seconds": round(float(quality["duration_seconds"]), 3),
@@ -137,13 +148,44 @@ def summary_from(report: dict[str, object], replay: dict[str, object], wav: Path
     }
 
 
-def run() -> None:
-    OUTPUT.mkdir(parents=True, exist_ok=True)
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Replay WAV files through Muhoed without forcing ground truth into predictions."
+    )
+    parser.add_argument("--input-dir", type=Path, default=INPUT)
+    parser.add_argument("--output-dir", type=Path, default=OUTPUT)
+    parser.add_argument("--ground-truth-type", default="UNKNOWN")
+    parser.add_argument("--verification", default="unverified")
+    parser.add_argument("--source-group", default=None)
+    parser.add_argument(
+        "--dataset-role",
+        choices=("training", "training_provisional", "training_provisional_weak", "research", "validation"),
+        default="research",
+    )
+    parser.add_argument("--altitude-max-m", type=float, default=None)
+    parser.add_argument("--distance-profile", default="unknown")
+    return parser.parse_args()
+
+
+def run(args: argparse.Namespace) -> None:
+    input_dir = args.input_dir.resolve()
+    output_dir = args.output_dir.resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    ground_truth = {
+        "target_present": True,
+        "target_class": "UAV",
+        "exact_type": str(args.ground_truth_type),
+        "verification": str(args.verification),
+        "source_group": args.source_group,
+        "dataset_role": args.dataset_role,
+        "altitude_max_m": args.altitude_max_m,
+        "distance_profile": str(args.distance_profile),
+    }
     service = AudioAnalysisService()
     summaries: list[dict[str, object]] = []
-    for wav in sorted(INPUT.glob("*.wav")):
+    for wav in sorted(input_dir.glob("*.wav")):
         analysis_id = wav.stem
-        out_dir = OUTPUT / analysis_id
+        out_dir = output_dir / analysis_id
         out_dir.mkdir(parents=True, exist_ok=True)
         source = UploadedFileInfo(
             original_name=wav.name,
@@ -154,14 +196,13 @@ def run() -> None:
         report = report_model.model_dump(mode="json")
         replay = candidate_windows(wav)
         raw = raw_diagnostics(wav)
+        detection_outcome = (
+            "TRUE_POSITIVE" if report["decision"]["drone_present"] else "FALSE_NEGATIVE"
+        )
         combined = {
-            "ground_truth": {
-                "target_present": True,
-                "target_class": "UAV",
-                "exact_type": "UNKNOWN",
-                "verification": "user_verified_2026-09-07",
-                "detection_outcome": "TRUE_POSITIVE" if report["decision"]["drone_present"] else "FALSE_NEGATIVE",
-            },
+            # Annotation and prediction are intentionally separate.  The
+            # confirmed label must never be copied into the model verdict.
+            "ground_truth": {**ground_truth, "detection_outcome": detection_outcome},
             "report": report,
             "candidate_replay": replay,
             "raw_diagnostics": raw,
@@ -169,13 +210,13 @@ def run() -> None:
         (out_dir / "complete_result.json").write_text(
             json.dumps(combined, ensure_ascii=False, indent=2), encoding="utf-8"
         )
-        summaries.append(summary_from(report, replay, wav))
+        summaries.append(summary_from(report, replay, wav, ground_truth))
 
-    (OUTPUT / "summary.json").write_text(
+    (output_dir / "summary.json").write_text(
         json.dumps(summaries, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     if summaries:
-        with (OUTPUT / "summary.csv").open("w", newline="", encoding="utf-8-sig") as stream:
+        with (output_dir / "summary.csv").open("w", newline="", encoding="utf-8-sig") as stream:
             writer = csv.DictWriter(stream, fieldnames=list(summaries[0]))
             writer.writeheader()
             writer.writerows(summaries)
@@ -183,4 +224,4 @@ def run() -> None:
 
 
 if __name__ == "__main__":
-    run()
+    run(parse_args())

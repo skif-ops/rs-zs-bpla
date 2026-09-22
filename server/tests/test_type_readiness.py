@@ -14,3 +14,22 @@ def test_confirmed_lutyi_and_weak_fp1_are_research_only():
     assert ready.confirmed_contrast_ready is False
     assert ready.operational_validation_ready is False
     assert ready.mode == "weak_contrast_research_only"
+
+
+def test_multiple_files_in_one_source_group_count_once():
+    rows = [
+        {
+            "label": "Лютый",
+            "source_file": f"view-{index}.wav",
+            "meta_source_group": "same-flight",
+            "meta_label_confidence": "confirmed",
+            "meta_dataset_role": "training_provisional",
+            "meta_validation_eligible": False,
+        }
+        for index in range(3)
+    ]
+
+    ready = assess_type_readiness(pd.DataFrame(rows), ("Лютый",))
+
+    assert ready.labels[0].total_sources == 1
+    assert ready.labels[0].confirmed_sources == 1

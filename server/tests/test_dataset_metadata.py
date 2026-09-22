@@ -30,7 +30,14 @@ def test_metadata_written_as_meta_columns(tmp_path, monkeypatch):
     monkeypatch.setattr(label_registry, "registry_path", lambda: tmp_path / "label_meta.json")
     manager = _manager(tmp_path)
     metadata = RecordingMetadata(
-        category="drone", is_drone=True, distance_min_m=0.5, distance_max_m=5.0, background="лес"
+        category="drone",
+        is_drone=True,
+        distance_min_m=0.5,
+        distance_max_m=5.0,
+        altitude_max_m=90.0,
+        source_group="flight-a",
+        background="лес",
+        validation_eligible=False,
     )
     result = manager.add_recording("DJI Test", _tone_file(tmp_path), metadata=metadata)
     assert result.windows_added > 0
@@ -38,6 +45,9 @@ def test_metadata_written_as_meta_columns(tmp_path, monkeypatch):
     df = pd.read_csv(tmp_path / "features.csv")
     assert (df["meta_category"] == "drone").all()
     assert (df["meta_distance_min_m"] == 0.5).all()
+    assert (df["meta_altitude_max_m"] == 90.0).all()
+    assert (df["meta_source_group"] == "flight-a").all()
+    assert not df["meta_validation_eligible"].astype(bool).any()
     assert (df["meta_background"] == "лес").all()
     # registry now flags the class as a drone (no config edit needed)
     assert "DJI Test" in label_registry.drone_labels(tmp_path / "label_meta.json")
