@@ -3,4 +3,4 @@
 set -euo pipefail
 cd server
 python -m pip install -q -r requirements-pki.txt
-python -m pytest -q tests/test_pki.py
+python -m pytest -q tests/test_pki.py tests/test_pki_labels.py

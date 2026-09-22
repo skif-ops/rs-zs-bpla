@@ -28,6 +28,9 @@ def test_label_payload_crc_and_roundtrip():
 
 
 def test_registry_pairing_secret_and_label_commands(tmp_path, monkeypatch):
+    # Rendering needs `qrcode`, which lives in requirements-pki.txt (admin tool / muhoed-pki.exe),
+    # not in the server runtime lock: the full-server job skips this test, the PKI job runs it.
+    pytest.importorskip("qrcode")
     from pki.label import StationLabel
     reg = Registry(tmp_path / "r.sqlite3")
     reg.add_all_lots()
