@@ -4,7 +4,8 @@
  *   supervisor  - zs_power_modes scheduler, self-tests, rail enables, console status line
  *   console     - LPUART1 line commands for the bench: "st" (self-test), "lag", "svc", "modes", "pps"
  *   gnss        - NMEA RMC parser stub: extracts UTC seconds for PPS labelling
- * The comms task (BG95) and the service task (nRF UART) are created in B2 on top of zs_bg95 / zs_bg95_provision.
+ *   ble         - zs_ipc_service over USART3 to the nRF52840 bridge (ICD addendum C), window with S4 SERVICE
+ * The comms task (BG95) is created in B2 on top of zs_bg95 / zs_bg95_provision.
  */
 #include "tasks.h"
 
@@ -18,6 +19,7 @@
 #include "queue.h"
 #include "task.h"
 #include "zs_audio.h"
+#include "zs_ipc_service.h"
 #include "zs_pdm_capture.h"
 #include "zs_power_modes.h"
 #include "zs_pps_sync.h"
@@ -40,7 +42,7 @@ static zs_pps_sync_t pps;
 static zs_mode_scheduler_t modes;
 static zs_selftest_registry_t selftests;
 
-static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task;
+static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task, ble_task;
 
 /* ---- ISR notifications ----------------------------------------------------- */
 void app_audio_block_notify_from_isr(void) {
@@ -51,7 +53,7 @@ void app_audio_block_notify_from_isr(void) {
 
 void app_uart_rx_notify_from_isr(bsp_uart_id_t id) {
   BaseType_t woken = pdFALSE;
-  TaskHandle_t t = id == BSP_UART_CONSOLE ? console_task : id == BSP_UART_GNSS ? gnss_task : NULL;
+  TaskHandle_t t = id == BSP_UART_CONSOLE ? console_task : id == BSP_UART_GNSS ? gnss_task : id == BSP_UART_BLE ? ble_task : NULL;
   if (t) vTaskNotifyGiveFromISR(t, &woken);
   portYIELD_FROM_ISR(woken);
 }
@@ -136,6 +138,7 @@ static void apply_power(zs_mode_t mode) {
   /* clock profile switching (S0 STOP2 etc.) lands with the low-power work; B1 keeps 160 MHz */
   (void)zs_mode_clock_profile(mode);
 }
+
 
 static uint32_t tamper_events;
 
@@ -227,6 +230,75 @@ static void gnss_task_fn(void *arg) {
   }
 }
 
+
+/* ---- BLE service window: STM32 side of the GATT contract over the nRF52840 bridge (USART3) ------------
+   B1: configuration and installation records live in RAM-backed slots (NOR binding is B3); the role is
+   the installer and "secure" follows the link state reported by the nRF (LESC + label secret on the
+   prototype).  The advertising window opens with S4 SERVICE and closes when the mode leaves it. */
+static zs_ipc_service_t ipc;
+static uint8_t cfg_slots[ZS_STATION_CONFIG_SLOT_COUNT][ZS_STATION_CONFIG_SLOT_BYTES];
+static uint8_t pos_slots[ZS_INSTALLATION_STORE_SLOT_COUNT][ZS_INSTALLATION_STORE_SLOT_BYTES];
+static uint32_t service_started_ms, ble_audit_events;
+
+static bool ram_read(void *ctx, uint8_t slot, uint32_t off, uint8_t *d, size_t n) {
+  const size_t bytes = ctx == cfg_slots ? ZS_STATION_CONFIG_SLOT_BYTES : ZS_INSTALLATION_STORE_SLOT_BYTES;
+  if (slot >= 2u || off + n > bytes) return false;
+  memcpy(d, (uint8_t *)ctx + slot * bytes + off, n);
+  return true;
+}
+static bool ram_erase(void *ctx, uint8_t slot) {
+  const size_t bytes = ctx == cfg_slots ? ZS_STATION_CONFIG_SLOT_BYTES : ZS_INSTALLATION_STORE_SLOT_BYTES;
+  if (slot >= 2u) return false;
+  memset((uint8_t *)ctx + slot * bytes, 0xff, bytes);
+  return true;
+}
+static bool ram_write(void *ctx, uint8_t slot, uint32_t off, const uint8_t *d, size_t n) {
+  const size_t bytes = ctx == cfg_slots ? ZS_STATION_CONFIG_SLOT_BYTES : ZS_INSTALLATION_STORE_SLOT_BYTES;
+  uint8_t *p = (uint8_t *)ctx + slot * bytes + off;
+  if (slot >= 2u || off + n > bytes) return false;
+  for (size_t i = 0u; i < n; i++) { if ((p[i] & d[i]) != d[i]) return false; p[i] = d[i]; }
+  return true;
+}
+static bool ble_audit(void *ctx, const zs_commissioning_audit_event_t *e) {
+  (void)ctx;
+  ble_audit_events++;
+  console_printf("install audit phase %u op %u role %u result %u v%lu\r\n", e->phase, e->operation, e->role, e->result, (unsigned long)e->version);
+  return true;
+}
+static bool ble_uart_send(void *ctx, const uint8_t *w, size_t n) { (void)ctx; return bsp_uart_write(BSP_UART_BLE, w, n) == (int)n; }
+static uint32_t ble_now_ms(void *ctx) { (void)ctx; return xTaskGetTickCount(); }
+static bool ble_service_mode(void *ctx, uint32_t *started) { (void)ctx; *started = service_started_ms; return modes.mode == ZS_MODE_S4_SERVICE; }
+static zs_commissioning_role_t ble_peer_role(void *ctx) { (void)ctx; return ZS_COMMISSIONING_ROLE_INSTALLER; }
+static bool ble_peer_secure(void *ctx) { (void)ctx; return ipc.link_state == 2u; }
+
+static const zs_station_config_io_t cfg_io = {cfg_slots, ram_read, ram_erase, ram_write};
+static const zs_installation_store_io_t pos_io = {pos_slots, ram_read, ram_erase, ram_write};
+static const zs_commissioning_audit_io_t audit_io = {NULL, ble_audit};
+static const zs_ipc_identity_t identity = {APP_STATION_SERIAL, APP_STATION_HW_REV, APP_STATION_FW_VERSION, APP_STATION_BL_VERSION, APP_STATION_ID, ZS_STATION_CONFIG_REGION_RU868};
+static const zs_ipc_service_port_t ipc_port = {NULL, ble_uart_send, ble_now_ms, ble_service_mode, ble_peer_role, ble_peer_secure,
+                                               &cfg_io, &pos_io, &audit_io, &selftests, &identity};
+
+static void ble_task_fn(void *arg) {
+  bool window_open = false;
+  (void)arg;
+  memset(cfg_slots, 0xff, sizeof(cfg_slots));
+  memset(pos_slots, 0xff, sizeof(pos_slots));
+  (void)bsp_uart_init(BSP_UART_BLE, APP_UART_BLE_BAUD);
+  bsp_gpio_ble_enable(true);
+  vTaskDelay(pdMS_TO_TICKS(200));                  /* nRF boot */
+  (void)zs_ipc_service_init(&ipc, &ipc_port);
+  for (;;) {
+    uint8_t buf[64];
+    size_t n;
+    (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(250));
+    while ((n = bsp_uart_read(BSP_UART_BLE, buf, sizeof(buf))) > 0u) zs_ipc_service_on_uart_rx(&ipc, buf, n);
+    const bool want = modes.mode == ZS_MODE_S4_SERVICE;
+    if (want && !window_open) { service_started_ms = xTaskGetTickCount(); (void)zs_ipc_service_set_window(&ipc, true, APP_BLE_SERVICE_WINDOW_S); }
+    else if (!want && window_open) (void)zs_ipc_service_set_window(&ipc, false, 0u);
+    window_open = want;
+  }
+}
+
 static void console_exec(const char *cmd) {
   if (strcmp(cmd, "st") == 0) {
     uint8_t rep[64];
@@ -264,10 +336,15 @@ static void console_exec(const char *cmd) {
     console_printf("mode %s, tamper events %lu\r\n", zs_mode_name(modes.mode), (unsigned long)tamper_events);
     for (uint8_t i = 0u; i < n; i++)
       console_printf("  %8lu %s -> %s (ev %u)\r\n", (unsigned long)j[i].at_ms, zs_mode_name((zs_mode_t)j[i].from), zs_mode_name((zs_mode_t)j[i].to), j[i].event);
+  } else if (strcmp(cmd, "ble") == 0) {
+    console_printf("ble link %u window %s config v%lu%s writes ok %lu rejected %lu audits %lu uart overruns %lu\r\n",
+                   ipc.link_state, modes.mode == ZS_MODE_S4_SERVICE ? "open" : "closed", (unsigned long)ipc.config.version,
+                   ipc.config_loaded ? "" : " (none)", (unsigned long)ipc.writes_ok, (unsigned long)ipc.writes_rejected,
+                   (unsigned long)ble_audit_events, (unsigned long)bsp_uart_rx_overruns(BSP_UART_BLE));
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio svc modes heap\r\n");
+    console_printf("commands: st lag pps audio svc modes ble heap\r\n");
   }
 }
 
@@ -317,5 +394,6 @@ bool app_tasks_create(void) {
   if (xTaskCreate(supervisor_task_fn, "superv", APP_STACK_SUPERVISOR, NULL, APP_PRIO_SUPERVISOR, &supervisor_task) != pdPASS) return false;
   if (xTaskCreate(gnss_task_fn, "gnss", APP_STACK_SERVICE, NULL, APP_PRIO_SERVICE, &gnss_task) != pdPASS) return false;
   if (xTaskCreate(console_task_fn, "console", APP_STACK_CONSOLE, NULL, APP_PRIO_CONSOLE, &console_task) != pdPASS) return false;
+  if (xTaskCreate(ble_task_fn, "ble", APP_STACK_BLE, NULL, APP_PRIO_BLE, &ble_task) != pdPASS) return false;
   return true;
 }
