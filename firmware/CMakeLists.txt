@@ -61,6 +61,7 @@ add_library(zs_core
   src/zs_ipc_link.c
   src/zs_ble_bridge.c
   src/zs_ipc_service.c
+  src/zs_nor_slot_store.c
 )
 target_include_directories(zs_core PUBLIC include generated)
 target_link_libraries(zs_core m)
@@ -142,6 +143,8 @@ add_executable(zs_ina226_tests tests/test_ina226.c)
 target_link_libraries(zs_ina226_tests zs_core m)
 add_executable(zs_ble_bridge_tests tests/test_ble_bridge.c)
 target_link_libraries(zs_ble_bridge_tests zs_core m)
+add_executable(zs_nor_slot_store_tests tests/test_nor_slot_store.c)
+target_link_libraries(zs_nor_slot_store_tests zs_core m)
 add_executable(evt_pre_20_target_contract_tests tests/test_evt_pre_20_target_contract.c)
 target_link_libraries(evt_pre_20_target_contract_tests PRIVATE evt_pre_20_target_contract)
 add_executable(evt_pre_20_dual_sim_gpio_tests tests/test_evt_pre_20_dual_sim_gpio.c)
@@ -187,6 +190,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_platform_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_ina226_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_ble_bridge_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_nor_slot_store_tests PRIVATE -UNDEBUG)
   target_compile_options(evt_pre_20_target_contract_tests PRIVATE -UNDEBUG)
   target_compile_options(evt_pre_20_dual_sim_gpio_tests PRIVATE -UNDEBUG)
 endif()
@@ -227,6 +231,7 @@ add_test(NAME bg95_provision COMMAND zs_bg95_provision_tests)
 add_test(NAME platform COMMAND zs_platform_tests)
 add_test(NAME ina226 COMMAND zs_ina226_tests)
 add_test(NAME ble_bridge COMMAND zs_ble_bridge_tests)
+add_test(NAME nor_slot_store COMMAND zs_nor_slot_store_tests)
 add_test(NAME evt_pre_20_target_contract COMMAND evt_pre_20_target_contract_tests)
 add_test(NAME evt_pre_20_dual_sim_gpio COMMAND evt_pre_20_dual_sim_gpio_tests)
 

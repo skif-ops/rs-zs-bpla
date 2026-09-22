@@ -20,6 +20,7 @@ extern "C" {
 #define HAL_GPIO_MODULE_ENABLED
 #define HAL_ICACHE_MODULE_ENABLED
 #define HAL_MDF_MODULE_ENABLED
+#define HAL_OSPI_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
 #define HAL_TIM_MODULE_ENABLED
@@ -68,6 +69,7 @@ extern "C" {
 #define USE_HAL_MDF_REGISTER_CALLBACKS   0U
 #define USE_HAL_TIM_REGISTER_CALLBACKS   0U
 #define USE_HAL_UART_REGISTER_CALLBACKS  0U
+#define USE_HAL_OSPI_REGISTER_CALLBACKS  0U
 
 /* ---- driver headers (order as in the template) ---- */
 #ifdef HAL_RCC_MODULE_ENABLED
@@ -99,6 +101,9 @@ extern "C" {
 #endif
 #ifdef HAL_TIM_MODULE_ENABLED
 #include "stm32u5xx_hal_tim.h"
+#endif
+#ifdef HAL_OSPI_MODULE_ENABLED
+#include "stm32u5xx_hal_ospi.h"
 #endif
 #ifdef HAL_UART_MODULE_ENABLED
 #include "stm32u5xx_hal_uart.h"

@@ -13,6 +13,7 @@
 #include "app_config.h"
 #include "bsp_gpio.h"
 #include "bsp_mdf.h"
+#include "bsp_nor.h"
 #include "bsp_tim2_pps.h"
 #include "bsp_uart.h"
 #include "evt_pre_20_clock_policy.h"
@@ -20,6 +21,7 @@
 #include "task.h"
 #include "zs_audio.h"
 #include "zs_ipc_service.h"
+#include "zs_nor_storage_layout.h"
 #include "zs_pdm_capture.h"
 #include "zs_power_modes.h"
 #include "zs_pps_sync.h"
@@ -232,13 +234,21 @@ static void gnss_task_fn(void *arg) {
 
 
 /* ---- BLE service window: STM32 side of the GATT contract over the nRF52840 bridge (USART3) ------------
-   B1: configuration and installation records live in RAM-backed slots (NOR binding is B3); the role is
-   the installer and "secure" follows the link state reported by the nRF (LESC + label secret on the
-   prototype).  The advertising window opens with S4 SERVICE and closes when the mode leaves it. */
+   B3: configuration and installation records live in the NOR record stores (zs_nor_storage_layout_make_stores:
+   the last four 4 KiB blocks of the W25Q512JV); if the NOR probe fails on the bench the task falls back to
+   RAM-backed slots so BLE bring-up still works.  The role is the installer and "secure" follows the link
+   state reported by the nRF (LESC passkey from the label secret, B.7).  The advertising window opens with
+   S4 SERVICE and closes when the mode leaves it. */
 static zs_ipc_service_t ipc;
 static uint8_t cfg_slots[ZS_STATION_CONFIG_SLOT_COUNT][ZS_STATION_CONFIG_SLOT_BYTES];
 static uint8_t pos_slots[ZS_INSTALLATION_STORE_SLOT_COUNT][ZS_INSTALLATION_STORE_SLOT_BYTES];
 static uint32_t service_started_ms, ble_audit_events;
+static zs_nor_t nor;
+static zs_nor_storage_bindings_t nor_bindings;
+static zs_archive_storage_t nor_archive_storage;      /* handed to the prehistory archive with the rest of B3 */
+static zs_command_journal_io_t nor_command_io;
+static zs_event_outbox_io_t nor_outbox_io;
+static bool stores_on_nor;
 
 static bool ram_read(void *ctx, uint8_t slot, uint32_t off, uint8_t *d, size_t n) {
   const size_t bytes = ctx == cfg_slots ? ZS_STATION_CONFIG_SLOT_BYTES : ZS_INSTALLATION_STORE_SLOT_BYTES;
@@ -271,18 +281,33 @@ static bool ble_service_mode(void *ctx, uint32_t *started) { (void)ctx; *started
 static zs_commissioning_role_t ble_peer_role(void *ctx) { (void)ctx; return ZS_COMMISSIONING_ROLE_INSTALLER; }
 static bool ble_peer_secure(void *ctx) { (void)ctx; return ipc.link_state == 2u; }
 
-static const zs_station_config_io_t cfg_io = {cfg_slots, ram_read, ram_erase, ram_write};
-static const zs_installation_store_io_t pos_io = {pos_slots, ram_read, ram_erase, ram_write};
+static zs_station_config_io_t cfg_io = {cfg_slots, ram_read, ram_erase, ram_write};
+static zs_installation_store_io_t pos_io = {pos_slots, ram_read, ram_erase, ram_write};
 static const zs_commissioning_audit_io_t audit_io = {NULL, ble_audit};
 static const zs_ipc_identity_t identity = {APP_STATION_SERIAL, APP_STATION_HW_REV, APP_STATION_FW_VERSION, APP_STATION_BL_VERSION, APP_STATION_ID, ZS_STATION_CONFIG_REGION_RU868};
 static const zs_ipc_service_port_t ipc_port = {NULL, ble_uart_send, ble_now_ms, ble_service_mode, ble_peer_role, ble_peer_secure,
                                                &cfg_io, &pos_io, &audit_io, &selftests, &identity};
 
+static void bind_record_stores(void) {
+  memset(cfg_slots, 0xff, sizeof(cfg_slots));
+  memset(pos_slots, 0xff, sizeof(pos_slots));
+  if (bsp_nor_init(&nor) &&
+      zs_nor_storage_bind_stores(&nor_bindings, &nor, APP_NOR_COMMAND_SLOTS, APP_NOR_OUTBOX_SLOTS, &nor_archive_storage,
+                                 &nor_command_io, &nor_outbox_io, &cfg_io, &pos_io)) {
+    stores_on_nor = true;
+    console_printf("nor: W25Q512JV bound, config @0x%08lx installation @0x%08lx\r\n",
+                   (unsigned long)nor_bindings.layout.config_base_address, (unsigned long)nor_bindings.layout.installation_base_address);
+  } else {
+    cfg_io = (zs_station_config_io_t){cfg_slots, ram_read, ram_erase, ram_write};
+    pos_io = (zs_installation_store_io_t){pos_slots, ram_read, ram_erase, ram_write};
+    console_printf("nor: bind/probe failed, record stores in RAM for this session\r\n");
+  }
+}
+
 static void ble_task_fn(void *arg) {
   bool window_open = false;
   (void)arg;
-  memset(cfg_slots, 0xff, sizeof(cfg_slots));
-  memset(pos_slots, 0xff, sizeof(pos_slots));
+  bind_record_stores();
   (void)bsp_uart_init(BSP_UART_BLE, APP_UART_BLE_BAUD);
   bsp_gpio_ble_enable(true);
   vTaskDelay(pdMS_TO_TICKS(200));                  /* nRF boot */
@@ -337,10 +362,10 @@ static void console_exec(const char *cmd) {
     for (uint8_t i = 0u; i < n; i++)
       console_printf("  %8lu %s -> %s (ev %u)\r\n", (unsigned long)j[i].at_ms, zs_mode_name((zs_mode_t)j[i].from), zs_mode_name((zs_mode_t)j[i].to), j[i].event);
   } else if (strcmp(cmd, "ble") == 0) {
-    console_printf("ble link %u window %s config v%lu%s writes ok %lu rejected %lu audits %lu uart overruns %lu\r\n",
+    console_printf("ble link %u window %s config v%lu%s (%s) writes ok %lu rejected %lu audits %lu uart overruns %lu\r\n",
                    ipc.link_state, modes.mode == ZS_MODE_S4_SERVICE ? "open" : "closed", (unsigned long)ipc.config.version,
-                   ipc.config_loaded ? "" : " (none)", (unsigned long)ipc.writes_ok, (unsigned long)ipc.writes_rejected,
-                   (unsigned long)ble_audit_events, (unsigned long)bsp_uart_rx_overruns(BSP_UART_BLE));
+                   ipc.config_loaded ? "" : " (none)", stores_on_nor ? "nor" : "ram", (unsigned long)ipc.writes_ok,
+                   (unsigned long)ipc.writes_rejected, (unsigned long)ble_audit_events, (unsigned long)bsp_uart_rx_overruns(BSP_UART_BLE));
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
