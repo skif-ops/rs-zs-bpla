@@ -600,6 +600,36 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR routing candidate 005 creation boundary is missing",
     )
     require(
+        decisions["DEC-134"]["Status"] ==
+        "PASS_MACHINE_GATE_PAD_ENTRY_REJECTED_SUPERSEDED_NO_APPLICATION"
+        and "ed93386d" in decisions["DEC-134"]["Reason"]
+        and "CI 652" in decisions["DEC-134"]["Reason"]
+        and "PCB Native 352" in decisions["DEC-134"]["Reason"]
+        and "86 to 86" in decisions["DEC-134"]["Reason"]
+        and "121 to 117" in decisions["DEC-134"]["Reason"]
+        and "4.578427 mm of 0.5 mm copper" in decisions["DEC-134"]["Reason"]
+        and "Do not accept or apply" in decisions["DEC-134"]["Impact"]
+        and "do not authorize production EVT" in decisions["DEC-134"]["Impact"],
+        "PCB-PWR routing candidate 005 pad-entry rejection is missing",
+    )
+    require(
+        decisions["DEC-135"]["Status"] ==
+        "PASS_STATIC_ECO_002_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "project owner directed continue" in decisions["DEC-135"]["Reason"]
+        and "eliminates the former 4.578427 mm external 0.5 mm neck"
+        in decisions["DEC-135"]["Reason"]
+        and "U3 U4 C4 C6 C20 C21 L1 and L2" in decisions["DEC-135"]["Impact"]
+        and "dd4c38c191b3087be8a58e9a4b7de4f7974de89797fba4583edbe674340ebda8"
+        in decisions["DEC-135"]["Impact"]
+        and "minimum external SW routed width is 2.1 mm"
+        in decisions["DEC-135"]["Impact"]
+        and "15.042756 mW" in decisions["DEC-135"]["Impact"]
+        and "commit-bound KiCad 9 exact acceptance and application"
+        in decisions["DEC-135"]["Impact"]
+        and "physical plus70C first-article" in decisions["DEC-135"]["Impact"],
+        "PCB-PWR buck power-stage ECO-002 creation boundary is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]

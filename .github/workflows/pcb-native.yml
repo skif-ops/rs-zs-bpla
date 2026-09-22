@@ -166,6 +166,8 @@ on:
       - "tools/audit_pcb_pwr_rev_gate_routing_004_application_rev_a.py"
       - "tools/generate_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py"
       - "tools/audit_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py"
+      - "tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py"
       - "tools/audit_pcb_main_native_schematic_rev_a.py"
       - "tools/audit_pcb_layer_count_authority_rev_a.py"
       - "tools/audit_harness_manufacturing_rev_a.py"
@@ -1362,6 +1364,9 @@ jobs:
           python tools/generate_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py --check
           python tools/audit_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/buck_switch_node_routing_005_static_audit.json
+          python tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py --check
+          python tools/audit_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/buck_power_stage_eco_002_static_audit.json
           python tools/generate_pcb_pwr_routing_authority_rev_a.py --check
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/routing_authority_audit.json
@@ -1757,6 +1762,50 @@ jobs:
             --drc-base "$evidence/baseline_drc.json" \
             --drc-candidate "$evidence/candidate_drc.json" \
             --output "$evidence/comparative_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR buck power-stage ECO-002
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/buck-power-stage-eco-002
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pro"
+          cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pro"
+          cp hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb"
+          cp hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb"
+          cmp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb"
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          base = pcbnew.LoadBoard(sys.argv[1])
+          candidate = pcbnew.LoadBoard(sys.argv[2])
+          assert base is not None and candidate is not None
+          assert len(base.GetFootprints()) == len(candidate.GetFootprints()) == 66
+          assert len(list(base.GetTracks())) == 8
+          assert len(list(candidate.GetTracks())) == 14
+          assert len(list(base.Zones())) == len(list(candidate.Zones())) == 0
+          print("PCB-PWR buck power-stage ECO-002 KiCad 9 parse: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
       - name: Materialize native PCB-MIC board and schematic
         shell: bash
         run: |
@@ -1932,6 +1981,10 @@ jobs:
             hardware/reviews/PCB_PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.md
             hardware/kicad/candidates/PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.kicad_pcb
+            hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.json
+            hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.md
+            hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb
+            hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb
             hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pcb

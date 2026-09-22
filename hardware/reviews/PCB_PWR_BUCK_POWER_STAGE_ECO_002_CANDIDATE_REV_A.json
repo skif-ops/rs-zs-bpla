@@ -1,0 +1,145 @@
+{
+  "schema": "dioneya-pcb-pwr-buck-power-stage-eco-002-candidate-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-BUCK-POWER-STAGE-ECO-002",
+  "creation_direction": "PROJECT_OWNER_CONTINUE_AFTER_CANDIDATE_005_PAD_ENTRY_REVIEW",
+  "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+  "scope": "SYMMETRIC_DUAL_BUCK_PLACEMENT_BOOTSTRAP_AND_SWITCH_NODE_REMEDIATION",
+  "supersedes_if_accepted": [
+    "PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005",
+    "PCB-PWR-BUCK-PLACEMENT-ECO-001_APPLIED_C4_C6_L1_L2_POSES",
+    "THE_TWO_ACCEPTED_BOOTSTRAP_SEGMENTS_REPLACED_BY_EQUIVALENT_SHORT_ROUTES"
+  ],
+  "documentation_basis": {
+    "component": "Texas Instruments LMR60440",
+    "official_datasheet": "https://www.ti.com/document-viewer/LMR60440/datasheet/GUID-BAF92739-0CA9-4578-99BE-026DEB792C01",
+    "layout_requirements_applied": [
+      "KEEP_BOOTSTRAP_CAPACITOR_AND_BOOT_SW_CONNECTIONS_SHORT_AND_WIDE",
+      "KEEP_SW_TO_INDUCTOR_COPPER_SHORT_AND_MINIMUM_AREA",
+      "PLACE_INPUT_BYPASS_CLOSE_TO_VIN_AND_GND"
+    ]
+  },
+  "base": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb",
+    "sha256": "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c",
+    "semantic_sha256": "f7a659d0740e78d40eddae7016724bd8e616baf9fb425f06ace70ec9acca4d3d",
+    "trace_items": 8,
+    "copper_zones": 0
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb",
+    "sha256": "dd4c38c191b3087be8a58e9a4b7de4f7974de89797fba4583edbe674340ebda8",
+    "semantic_sha256": "78d8ac5b4ccf731f9d5de31a5e379a97e695d19fbed08fe6142f9a2a0e57fe40",
+    "trace_items": 14,
+    "copper_zones": 0,
+    "moved_footprints": [
+      "C20",
+      "C21",
+      "C4",
+      "C6",
+      "L1",
+      "L2",
+      "U3",
+      "U4"
+    ],
+    "removed_bootstrap_segments": 2,
+    "retained_unrelated_predecessor_segments": 6,
+    "added_segments": 8,
+    "routed_nets": [
+      "BOOT_3V8",
+      "BOOT_3V3",
+      "SW_3V8",
+      "SW_3V3"
+    ],
+    "vias": 0,
+    "minimum_fitted_body_clearance_mm": 0.2,
+    "minimum_switch_node_foreign_copper_edge_clearance_mm": 0.564474,
+    "required_switch_node_clearance_mm": 0.4,
+    "minimum_bootstrap_foreign_copper_edge_clearance_mm": 0.25,
+    "required_bootstrap_clearance_mm": 0.25
+  },
+  "pad_entry_disposition": {
+    "candidate_005_narrow_width_mm": 0.5,
+    "candidate_005_narrow_length_mm": 4.578427,
+    "eco_002_minimum_external_routed_width_mm": 2.1,
+    "eco_002_narrow_external_length_mm": 0.0,
+    "external_neck_eliminated": true,
+    "device_pad_limited_transition_only": true,
+    "switch_node_segment_length_mm": 2.65,
+    "conservative_pad_edge_to_inductor_path_length_mm": 3.35,
+    "controller_pad_copper_overlap_mm": 0.140935,
+    "bootstrap_capacitor_sw_pad_copper_overlap_mm": 0.06,
+    "conservative_35um_minimum_width_mm": 2.032863,
+    "target_70um_minimum_width_or_neck_mm": 1.5,
+    "numeric_width_requirements_pass": true,
+    "screen_current_a": 4.0,
+    "screen_temperature_c": 70.0,
+    "screen_35um": {
+      "resistance_mohm": 0.940172,
+      "drop_mv": 3.760689,
+      "loss_mw": 15.042756
+    },
+    "target_70um": {
+      "resistance_mohm": 0.470086,
+      "drop_mv": 1.880345,
+      "loss_mw": 7.521378
+    },
+    "calculated_evt_screen_pass": true,
+    "physical_plus70c_validation_required": true,
+    "production_evt_criterion_disposition": "SUFFICIENT_AFTER_COMMIT_BOUND_MACHINE_GATE_EXACT_HUMAN_ACCEPTANCE_AND_APPLICATION_GATE"
+  },
+  "topology": {
+    "per_channel_mm": {
+      "boot_to_cboot": 1.755349,
+      "sw_to_cboot": 1.711061,
+      "sw_to_inductor": 4.200539,
+      "vin_to_input_cap": 1.548308,
+      "gnd_to_input_cap": 2.761001
+    },
+    "symmetric_channels": true
+  },
+  "source_binding": {
+    "generator": "tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py",
+    "generator_sha256": "ef9de2a8bf576e2625b8ee0f680237ea2f3dd177fd82fcfa14c3c44e9be5dbfd",
+    "routing_rules": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
+    "routing_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
+    "evt_stackup_basis": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+    "evt_stackup_basis_sha256": "41733d7d27e2c3ab831e602ee81b072146944da0a5efe8a2c805eeed46ecd1ca",
+    "current_geometry_basis": "hardware/PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv",
+    "current_geometry_basis_sha256": "4cecbe529987146078ce233d600ed047495a50d1228407e94b0380f88ca56cb2"
+  },
+  "invariants": {
+    "authoritative_board_modified": false,
+    "unrelated_predecessor_copper_changed": false,
+    "pad_geometry_or_nets_changed": false,
+    "outline_or_layers_changed": false,
+    "zones_or_vias_added": false
+  },
+  "machine_gate": {
+    "complete": false,
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "required_unconnected": [
+      121,
+      117
+    ],
+    "required_new_drc_fingerprint_counts": 0,
+    "candidate_violations_must_not_exceed_base": true
+  },
+  "human_gate": {
+    "accepted": false,
+    "accept_value": "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE",
+    "reject_value": "REJECT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE"
+  },
+  "deferred_boundary": {
+    "vin_pgnd_hot_loop_and_return_copper": true,
+    "output_rail_and_return_copper": true,
+    "kelvin_and_feedback_routes": true,
+    "review_b": true,
+    "job_dfm_and_cam": true,
+    "plus70c_first_article_thermal_validation": true
+  },
+  "application_authorized": false,
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}
