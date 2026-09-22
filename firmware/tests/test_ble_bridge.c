@@ -226,6 +226,7 @@ static void test_end_to_end(void) {
   const uint8_t secret[16] = {0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x21, 0xde, 0xad, 0xbe, 0xef, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x21};
   assert(zs_ipc_service_set_pairing_secret(&W.service, secret) && W.secret_set && memcmp(W.secret, secret, 16u) == 0);
   assert(zs_ble_pairing_passkey(secret) == 20559u);                    /* B.7 vector shared with StationLabelTest ("020559") */
+  assert(zs_ipc_service_ping(&W.service) && W.service.pings_sent == 1u && W.service.pongs_seen == 1u && W.service.peer_protocol_version == ZS_IPC_PROTOCOL_VERSION);
 
   /* connection: caches for identity + installation (empty) are pushed; config is absent on a fresh station */
   zs_ble_bridge_on_link(&W.bridge, 2u);
