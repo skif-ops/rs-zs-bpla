@@ -238,8 +238,53 @@ def cmd_station_package(a):
         "server_fingerprint_sha256": bundle["server_fingerprint_sha256"],
         "ca_reference": bundle["ca_reference"], "topic_prefix": "zs/v1",
         "cert_not_after": r.cert_not_after,
+        "pairing_secret_b32": reg.ensure_pairing_secret(a.serial),
     }, indent=2))
     print(f"station package for {a.serial} written to {out} (private key is NOT included by design)")
+
+
+def _label(reg: Registry, serial: str):
+    from .label import StationLabel
+    r = reg.get(serial)
+    return StationLabel(r.serial, r.station_id, r.tenant, reg.ensure_pairing_secret(serial))
+
+
+def cmd_label_qr(a):
+    """Label QR for one station: SVG (and PNG when Pillow is present) + the payload text."""
+    from .label import render_svg
+    reg = _registry(Path(a.pki))
+    lab = _label(reg, a.serial)
+    out = Path(a.out)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / f"{a.serial}.svg").write_text(render_svg(lab), encoding="utf-8")
+    (out / f"{a.serial}.txt").write_text(lab.encode() + "\n", encoding="ascii")
+    if a.png:
+        try:
+            import qrcode
+            qrcode.make(lab.encode(), error_correction=qrcode.constants.ERROR_CORRECT_M).save(out / f"{a.serial}.png")
+        except ImportError:
+            print("PNG skipped: Pillow is not installed (SVG written)")
+    print(f"label for {a.serial} written to {out} ({lab.encode()})")
+
+
+def cmd_label_sheet(a):
+    """A4 sheet with labels for every registered station (or one lot)."""
+    from .label import render_sheet_svg
+    reg = _registry(Path(a.pki))
+    rows = reg.list(lot=a.lot)
+    if not rows:
+        raise pki.PkiError("no stations registered")
+    labels = [_label(reg, r.serial) for r in rows]
+    out = Path(a.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(render_sheet_svg(labels, columns=a.columns), encoding="utf-8")
+    print(f"label sheet with {len(labels)} stations written to {out}")
+
+
+def cmd_pairing_secret_rotate(a):
+    reg = _registry(Path(a.pki))
+    reg.rotate_pairing_secret(a.serial, a.reason)
+    print(f"pairing secret of {a.serial} rotated; reprint the label and reload the station package")
 
 
 def cmd_list(a):
@@ -291,6 +336,12 @@ def main(argv=None):
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--mqtt-host", required=True); s.add_argument("--mqtt-port", type=int, default=8883); s.add_argument("--out")
     s = add("station-package", cmd_station_package, help="export one station's cert+chain+endpoint for the EOL fixture")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--out", required=True)
+    s = add("label-qr", cmd_label_qr, help="render the enclosure label QR (SVG/PNG) for one station")
+    s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--out", required=True); s.add_argument("--png", action="store_true")
+    s = add("label-sheet", cmd_label_sheet, help="render an A4 SVG sheet of labels for all (or one lot's) stations")
+    s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--out", required=True); s.add_argument("--lot"); s.add_argument("--columns", type=int, default=4)
+    s = add("pairing-secret-rotate", cmd_pairing_secret_rotate, help="generate a new label secret for a station (reprint + reload)")
+    s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--reason", required=True)
     s = add("list", cmd_list, help="list stations");                                           s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--lot"); s.add_argument("--status")
     s = add("audit", cmd_audit, help="print the audit log");                                    s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--limit", type=int, default=200)
 
