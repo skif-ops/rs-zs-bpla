@@ -281,6 +281,39 @@ def cmd_label_sheet(a):
     print(f"label sheet with {len(labels)} stations written to {out}")
 
 
+def cmd_server_qr(a):
+    """QR with the server profile (host/ports, CA reference, pinned fingerprint) for the installer app."""
+    from .server_qr import ServerProfile
+    d = Path(a.pki)
+    profile = ServerProfile.from_bundle(d / "bundle" / "bundle.json", https_port=a.https_port, topic_prefix=a.topic_prefix)
+    out = Path(a.out)
+    out.mkdir(parents=True, exist_ok=True)
+    text = profile.encode()
+    (out / "server-profile.txt").write_text(text + "\n", encoding="ascii")
+    try:
+        import qrcode
+        qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M, box_size=10, border=2)
+        qr.add_data(text)
+        qr.make(fit=True)
+        modules = qr.get_matrix()
+        n = len(modules)
+        px = 40.0 / n
+        cells = "".join(f'<rect x="{x * px:.3f}" y="{y * px:.3f}" width="{px:.3f}" height="{px:.3f}"/>'
+                        for y, row in enumerate(modules) for x, dark in enumerate(row) if dark)
+        (out / "server-profile.svg").write_text(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="44mm" height="52mm" viewBox="0 0 44 52">'
+            '<rect width="44" height="52" fill="white"/>'
+            f'<g transform="translate(2,2)" fill="black">{cells}</g>'
+            f'<text x="22" y="46.5" font-family="monospace" font-size="2.6" text-anchor="middle">{profile.host}:{profile.mqtt_port}  {profile.ca_reference}</text>'
+            f'<text x="22" y="49.5" font-family="monospace" font-size="2.0" text-anchor="middle">sha256 {profile.fingerprint_hex[:32]}…</text></svg>',
+            encoding="utf-8")
+        if a.png:
+            qrcode.make(text, error_correction=qrcode.constants.ERROR_CORRECT_M).save(out / "server-profile.png")
+    except ImportError:
+        print("SVG/PNG skipped: qrcode is not installed (payload text written)")
+    print(f"server profile QR written to {out} ({text})")
+
+
 def cmd_pairing_secret_rotate(a):
     reg = _registry(Path(a.pki))
     reg.rotate_pairing_secret(a.serial, a.reason)
@@ -340,6 +373,9 @@ def main(argv=None):
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--out", required=True); s.add_argument("--png", action="store_true")
     s = add("label-sheet", cmd_label_sheet, help="render an A4 SVG sheet of labels for all (or one lot's) stations")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--out", required=True); s.add_argument("--lot"); s.add_argument("--columns", type=int, default=4)
+    s = add("server-qr", cmd_server_qr, help="render the server profile QR (host, ports, CA, fingerprint) for the installer app")
+    s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--out", required=True); s.add_argument("--https-port", type=int, default=0)
+    s.add_argument("--topic-prefix", default="zs/v1"); s.add_argument("--png", action="store_true")
     s = add("pairing-secret-rotate", cmd_pairing_secret_rotate, help="generate a new label secret for a station (reprint + reload)")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--reason", required=True)
     s = add("list", cmd_list, help="list stations");                                           s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--lot"); s.add_argument("--status")
