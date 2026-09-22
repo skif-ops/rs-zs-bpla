@@ -77,6 +77,14 @@ class ServerActivity : Activity() {
         val selfTest = Button(this).apply { text = getString(ru.dioneya.commissioning.R.string.server_self_test) }
         val validate = Button(this).apply { text = getString(ru.dioneya.commissioning.R.string.server_validate) }
         root.addView(validate); root.addView(apply); root.addView(selfTest)
+        root.addView(Button(this).apply {
+            text = getString(ru.dioneya.commissioning.R.string.server_next_installation)
+            setOnClickListener {
+                startActivity(android.content.Intent(this@ServerActivity, InstallationActivity::class.java)
+                    .putExtra(InstallationActivity.EXTRA_DEVICE_ADDRESS, intent.getStringExtra(EXTRA_DEVICE_ADDRESS))
+                    .putExtra(InstallationActivity.EXTRA_STATION_SERIAL, intent.getStringExtra(EXTRA_STATION_SERIAL)))
+            }
+        })
         status = TextView(this).apply { textSize = 16f; setPadding(0, pad, 0, 0) }
         details = TextView(this).apply { textSize = 13f; setPadding(0, pad / 2, 0, 0) }
         root.addView(status); root.addView(details)
