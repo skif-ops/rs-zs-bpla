@@ -1,13 +1,13 @@
 {
   "schema": "dioneya-external-response-bundle-v1",
   "configuration": "EVT-PRE-20 Rev.A",
-  "status": "READY_TO_BUILD_EXTERNAL_RESPONSE_REQUEST_ARCHIVE",
+  "status": "SUPERSEDED_BY_EVT_ENGINEERING_BASELINE_EXTERNAL_REPLIES_NOT_REQUIRED",
   "selected_station_quantity": 20,
   "primary_procurement_track": "FULL_PCBA",
   "bare_pcb_track": "ALTERNATIVE_QUOTATION_ONLY_DO_NOT_COMBINE_WITH_FULL_PCBA",
   "commercial_procurement_owner": "CUSTOMER",
   "commercial_quote_or_availability_required_by_engineering": false,
-  "job_specific_technical_manufacturing_responses_required": true,
+  "job_specific_technical_manufacturing_responses_required": false,
   "hardware_design_release": false,
   "purchase_release": false,
   "manufacturing_release": false,
@@ -20,7 +20,11 @@
     "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv",
     "hardware/EVT_PRE_20_BOM_POLICY_REV_A.md",
     "hardware/CHINA_PROCUREMENT_RFQ.csv",
-    "hardware/reviews/FABRICATOR_PUBLIC_CAPABILITY_SCREEN_REV_A.md"
+    "hardware/reviews/FABRICATOR_PUBLIC_CAPABILITY_SCREEN_REV_A.md",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md",
+    "hardware/HARNESS_EVT_LENGTH_BASIS_REV_A.csv",
+    "hardware/PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv"
   ],
   "groups": [
     {
@@ -119,10 +123,12 @@
     "outputs/"
   ],
   "release_rules": [
-    "The archive requests attributable external responses; it is not a purchase order.",
-    "PCB-MAIN is partially routed and PCB-PWR remains unrouted; both native boards and both public numeric bases are supplied only as engineering context.",
-    "PCB-PWR DIM-003 is accepted 18/18 from owner-authorized EVT engineering evidence; no remaining pending response register may be promoted without attributable returned evidence.",
-    "Full-PCBA is the primary quotation track; bare PCB rows are alternatives and must not be added to full-PCBA totals.",
-    "Gerber, drill, IPC-356, stencil, panel and fabrication outputs become orderable only after the applicable Review B and release gates pass."
-  ]
+    "This historical packet is superseded; no factory e-mail or signed response is required for EVT.",
+    "Customer order checkout must match the engineering baseline and have no unresolved parser or DFM error.",
+    "PCB-MAIN and PCB-PWR remain unrouted and require DRC, CAM and Review B before order upload.",
+    "Physical first-article and EVT tests remain mandatory.",
+    "Series transfer requires renewed supplier, tooling, DFM and process qualification."
+  ],
+  "engineering_baseline": "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json",
+  "external_response_wait_gates_closed": true
 }

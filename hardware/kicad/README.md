@@ -96,33 +96,32 @@ evidence, routing completion and manufacture remain open.
 - Use `hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv` as the controlled pre-route
   input. It explicitly classifies all 186 native nets and preserves separate
   `GND_MODEM`, `GND_DIGITAL` and `GND_MIC` references. Its PASS is constraint
-  coverage only: final stackup-dependent RF/USB geometry, routed copper, pours,
+  coverage plus accepted EVT numeric geometry, not complete routing. The active
+  board has 1023 trace items and eight copper zones; final SI, remaining routing,
   DRC and manufacturing evidence remain open.
-- Use `hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json` and its
-  blank response register only to obtain comparable construction data from
-  `FAB-A` and `FAB-B`. The current `0/2` accepted response state does not select
-  a stackup, authorize numeric 50-ohm/90-ohm rules or permit routing.
+- `hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json` is a retained
+  historical checklist. Its 22/22 rows are engineering-baseline closures;
+  `JLC06161H-3313` and the controlled 50/90-ohm geometry are accepted for EVT.
 - Use `hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json` and
-  its blank 14-row register only for the bounded `U2/U25/U26/U9` process review.
-  The current `0/14` accepted state does not select an assembler or process,
-  create U9 paste apertures, close USB SI/whole-board DFM or permit manufacture.
+  its 14/14 engineering-closure register for the bounded `U2/U25/U26/U9`
+  standard-process review. Controlled paste export still waits for native DRC
+  and CAM; first article and Review B remain mandatory.
 - Use `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv` as the 31-net PCB-PWR
   pre-route input and `hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv` as the bounded
   numeric EVT overlay. Preserve `DIM-003`; route an engineering candidate only
-  against the 35 µm rules and the selected EVT ordering profile
-  `JLC04161H-3313`, 1.6 mm, outer 2 oz / inner 1 oz. Fabrication still requires
-  current/fault, job-specific DFM/plating and physical thermal acceptance.
-- Use `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json` and its blank
-  24-row register only to collect comparable stackup/copper inputs from two
-  fabricators. The current `0/24` and `0/2` state is a job-specific DFM
-  deviation channel; it authorizes no fabrication and does not revoke or block
-  the separately bounded engineering-candidate overlay.
+  against the 35 µm lower-bound rules and accepted EVT ordering profile
+  `JLC04161H-3313A`, 1.6 mm, outer 2 oz / inner 1 oz. The active board has only
+  four accepted bootstrap/VCAP/VBAT_RAW segments and zero zones; accepted
+  `REV_GATE` routing 004 remains unapplied. Fabrication still
+  requires remaining routing, current/fault and physical thermal evidence.
+- `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json` is retained for
+  traceability. Its 24/24 rows are engineering-baseline closures and no factory
+  reply is required. Any checkout DFM deviation must be resolved by ECO.
 - Preserve the strict PCB-PWR fitted-body clearance PASS and its six-reference
   coordinate delta; repeat the audit after any placement or footprint change.
 - Freeze CubeMX pin/peripheral assignment for STM32U585VIT6Q; no unresolved AF conflicts.
-- Replace provisional MAIN/PWR placement candidates with mechanically frozen,
-  reviewed and routed boards; keep all native `.kicad_sch/.kicad_pcb/.kicad_pro`
-  sources under CI control.
+- Complete and review MAIN/PWR routing; keep all native
+  `.kicad_sch/.kicad_pcb/.kicad_pro` sources under CI control.
 - Datasheet/reference-design review for STM32U585, T5838, BG95, MAX-M10S, E22/SX1262, nRF52840/Raytac module and all power ICs.
 - ERC: zero unexplained errors.
 - DRC: zero blocker/critical violations.

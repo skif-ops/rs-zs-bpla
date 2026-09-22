@@ -1,10 +1,11 @@
 # PCB-MAIN JLC06161H-3313 public routing design basis — Rev.A
 
-Status: `NUMERIC ENGINEERING ROUTING INPUT PASS / FINAL FABRICATOR ACCEPTANCE PENDING / NOT FOR MANUFACTURE`
+Status: `EVT JOB STACKUP ACCEPTED / NUMERIC ROUTING INPUT PASS / DRC-CAM-REVIEW B OPEN / NOT FOR MANUFACTURE`
 
-This record converts current official JLCPCB public data into a bounded numeric
-input for the PCB-MAIN engineering routing candidate. It is not a returned RFQ,
-a signed job stackup, a DFM disposition, a coupon plan or a fabrication release.
+This record converts current official JLCPCB public data into the selected
+numeric stackup and routing input for the PCB-MAIN EVT candidate. A factory
+e-mail or signed job stackup is not required for this customer-ordered test lot.
+It is not Gerber, CAM approval or a fabrication release.
 
 Machine authority:
 `hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json`
@@ -57,13 +58,15 @@ single-net autorouter result cannot claim USB geometry PASS.
 ## Acceptance boundary
 
 - Numeric RF/USB input for the engineering routing candidate: `PASS`.
-- Final production impedance tolerance: `OPEN`.
-- Job-specific stackup, material declaration, solver report and coupon plan:
-  `OPEN`.
-- Fabricator DFM and assembler DFM: `OPEN`.
+- Published construction selected as the EVT job stackup: `PASS`.
+- Production impedance tolerance: `±10%`, accepted for EVT.
+- Standard controlled-impedance coupon/TDR report: accepted when offered by
+  checkout; absence of a bespoke coupon plan is not an EVT blocker.
+- Customer checkout/file-parser DFM: mandatory stop gate.
 - KiCad DRC, routed return-path review, SI review and Review B: `OPEN`.
 - Manufacturing release: `false`.
 
-The two-slot response register remains the final manufacturing acceptance path.
-Public standard data allows engineering work to continue; it does not populate
-or accept any `FAB-A` or `FAB-B` response row.
+The former two-slot response register is retained as decision history. Its 22
+rows are closed by the customer-authorized engineering baseline, not represented
+as factory replies. Supplier selection at checkout is non-blocking; any portal
+DFM error or mismatch against this construction stops the order.

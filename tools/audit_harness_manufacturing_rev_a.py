@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit the controlled preliminary EVT-PRE-20 internal harness drawing."""
+"""Audit the EVT-PRE-20 harness drawing and accepted build baseline."""
 
 from __future__ import annotations
 
@@ -24,6 +24,10 @@ SUPPLIER_RESPONSE = ROOT / "hardware/reviews/HARNESS_SUPPLIER_CAPABILITY_RESPONS
 RFQ = ROOT / "hardware/CHINA_PROCUREMENT_RFQ.csv"
 BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
 LOT_SELECTION = ROOT / "manufacturing/EVT_LOT_SELECTION_REV_A.csv"
+EVT_BASELINE = ROOT / "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json"
+EVT_BASELINE_MANUAL = ROOT / "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md"
+LENGTH_BASIS = ROOT / "hardware/HARNESS_EVT_LENGTH_BASIS_REV_A.csv"
+PROGRAM_PROCUREMENT = ROOT / "hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv"
 
 SUPPLIER_REQUEST_STATUS = (
     "PACKET_READY_16_ATTRIBUTABLE_RESPONSES_REQUIRED_"
@@ -240,10 +244,152 @@ def validate_supplier_request() -> dict[str, object]:
     }
 
 
+def audit_evt_accepted(contract: dict[str, object]) -> dict[str, object]:
+    from audit_evt_engineering_manufacturing_baseline_rev_a import audit as audit_baseline
+
+    baseline = audit_baseline()
+    harness = baseline["harness"]
+    require(harness["controlled_conductors"] == 38
+            and harness["final_lengths_accepted"] is True
+            and harness["wire_avl_accepted"] is True
+            and harness["build_authorized"] is True
+            and harness["first_article_accepted"] is False,
+            "central harness EVT authority differs")
+    authority_inputs = contract.get("authority_inputs", [])
+    for source in (EVT_BASELINE, EVT_BASELINE_MANUAL, LENGTH_BASIS):
+        require(str(source.relative_to(ROOT)) in authority_inputs,
+                f"accepted harness authority input missing: {source.relative_to(ROOT)}")
+    expected_binding = [
+        {"path": relative, "sha256": sha256(ROOT / relative)}
+        for relative in SUPPLIER_AUTHORITY_INPUTS
+    ]
+    require(contract.get("source_binding") == expected_binding,
+            "accepted harness source binding differs")
+
+    logical = [row for row in read_csv(LOGICAL) if row["Connector_Ref"] in CONNECTOR_TO_HARNESS]
+    schedule = read_csv(SCHEDULE)
+    require(len(logical) == len(schedule) == 38,
+            "accepted harness conductor count differs")
+    schedule_key = {(row["Harness_ID"], row["To_Cavity"]): row for row in schedule}
+    require(len(schedule_key) == 38 and all(all(value.strip() for value in row.values())
+                                             for row in schedule),
+            "accepted harness schedule is incomplete or duplicated")
+    expected_lengths = {
+        "H-MIC1": "275", "H-MIC2": "275", "H-MIC3": "275", "H-MIC4": "275",
+        "H-MAIN-PWR": "440", "H-BAT-PWR": "330",
+    }
+    for source in logical:
+        harness_id = CONNECTOR_TO_HARNESS[source["Connector_Ref"]]
+        key = (harness_id, source["Pin"])
+        require(key in schedule_key, f"missing accepted manufacturing row for {key}")
+        row = schedule_key[key]
+        require(row["Net"] == source["Net"]
+                and row["Cut_Length_mm"] == expected_lengths[harness_id]
+                and row["Length_Tolerance_mm"] == "5"
+                and row["Release_Status"] == "EVT_BUILD_RELEASED_FIRST_ARTICLE_REQUIRED"
+                and row["Continuity_Test"].startswith("100_PERCENT_"),
+                f"{key}: accepted length/test state differs")
+        if harness_id.startswith("H-MIC"):
+            require(row["Wire_Gauge"].startswith("AWG24_TE_55A0111-24")
+                    and row["From_Terminal_MPN"] == "5040520098"
+                    and row["To_Terminal_MPN"] == "5040520098",
+                    f"{key}: accepted microphone wire/terminal differs")
+        elif harness_id == "H-MAIN-PWR" and int(row["From_Cavity"]) <= 6:
+            require(row["Wire_Gauge"].startswith("AWG18_TE_55A0111-18")
+                    and row["From_Terminal_MPN"] == "430300038"
+                    and row["To_Terminal_MPN"] == "430300038",
+                    f"{key}: accepted MAIN-PWR power conductor differs")
+        elif harness_id == "H-MAIN-PWR":
+            require(row["Wire_Gauge"].startswith("AWG22_ALPHA_3051")
+                    and row["From_Terminal_MPN"] == "430300001"
+                    and row["To_Terminal_MPN"] == "430300001",
+                    f"{key}: accepted MAIN-PWR control conductor differs")
+        else:
+            require(row["Wire_Gauge"].startswith("AWG18_TE_55A0111-18")
+                    and row["From_Terminal_MPN"] == "TE_8-34114-1_M8"
+                    and row["To_Terminal_MPN"] == "430300038",
+                    f"{key}: accepted battery conductor differs")
+
+    rows = read_csv(SUPPLIER_RESPONSE)
+    require(len(rows) == 16
+            and all(row["Disposition"] == "CLOSED_EVT_ENGINEERING_BASELINE"
+                    and row["Blocking"] == "NO"
+                    and all(row[field] for field in (
+                        "Response_Value", "Response_Reference", "Responder", "Response_Date"
+                    )) for row in rows),
+            "harness external wait rows are not closed by EVT evidence")
+    require(contract.get("external_response") == {
+        "response_register": str(SUPPLIER_RESPONSE.relative_to(ROOT)),
+        "required_rows": 16,
+        "closed_rows": 16,
+        "pending_rows": 0,
+        "external_reply_required": False,
+        "complete": True,
+    }, "accepted harness external-response state differs")
+    interlock = contract.get("release_interlock", {})
+    require(interlock.get("supplier_selected") is False
+            and all(interlock.get(key) is True for key in (
+                "assembly_identity_accepted", "temperature_rating_accepted",
+                "wire_avl_accepted", "final_lengths_accepted",
+                "external_endpoints_accepted", "supplier_selection_nonblocking_customer_action",
+                "build_authorized", "first_article_required_before_remaining_lot",
+            ))
+            and all(interlock.get(key) is False for key in (
+                "crimp_process_qualified", "first_article_accepted", "manufacturing_release",
+            )), "accepted harness first-article/release boundary differs")
+    rfq = {row["RFQ_ID"]: row for row in read_csv(RFQ)}["RFQ-014"]
+    require(rfq["Manufacturer"] == "Project engineering under customer EVT authority"
+            and "DIO-HARNESS-SET-EVT-A" in rfq["MPN_or_spec"]
+            and rfq["Required_qty_20"] == "22",
+            "accepted per-lot harness RFQ identity differs")
+    program = {row["Item_IDs"]: row for row in read_csv(PROGRAM_PROCUREMENT)}
+    require(program.get("HARNESS", {}).get("Total_stations") == "41"
+            and program.get("HARNESS", {}).get("Procure_qty_2x20_plus_1") == "45",
+            "2x20+1 harness program quantity differs")
+    drawing = DRAWING.read_text(encoding="utf-8")
+    for token in ("275", "440", "330", "10%", "first article"):
+        require(token.lower() in drawing.lower(), f"harness drawing missing accepted token {token}")
+    counts = Counter(row["Harness_ID"] for row in schedule)
+    return {
+        "schema": "dioneya-harness-manufacturing-audit-v2",
+        "configuration": "EVT-PRE-20 Rev.A",
+        "status": "PASS_EVT_BUILD_BASELINE_ACCEPTED_FIRST_ARTICLE_OPEN",
+        "packet_complete": True,
+        "manufacturing_release": False,
+        "build_authorized": True,
+        "first_article_accepted": False,
+        "final_lengths_accepted": True,
+        "wire_avl_accepted": True,
+        "controlled_conductors": 38,
+        "harness_counts": dict(sorted(counts.items())),
+        "selected_evt20_complete_sets": 22,
+        "program_2x20_plus_1_complete_sets": 45,
+        "supplier_request_status": contract["status"],
+        "supplier_request": {
+            "required_response_rows": 16,
+            "accepted_response_rows": 16,
+            "selected_supplier": None,
+            "external_reply_required": False,
+            "build_authorized": True,
+        },
+        "open_blockers": [
+            "first-off crimp height and destructive pull qualification",
+            "100 percent continuity polarity cross-short and resistance records",
+            "installed-route PDM/AAD I2C rail-drop thermal cold and strain validation",
+        ],
+    }
+
+
 def audit() -> dict[str, object]:
     require(DRAWING.is_file(), "controlled harness drawing missing")
     require(not STALE_REGISTER.exists(),
             "obsolete CONNECTOR_REGISTER_DRAFT.csv competes with connector authority")
+
+    contract = json.loads(SUPPLIER_CONTRACT.read_text(encoding="utf-8"))
+    if contract.get("status") == (
+        "EVT_BUILD_BASELINE_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED_FIRST_ARTICLE_OPEN"
+    ):
+        return audit_evt_accepted(contract)
 
     logical = [row for row in read_csv(LOGICAL) if row["Connector_Ref"] in CONNECTOR_TO_HARNESS]
     schedule = read_csv(SCHEDULE)

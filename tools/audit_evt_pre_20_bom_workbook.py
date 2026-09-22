@@ -2,7 +2,8 @@
 """Verify the controlled BOM workbook against its CSV source authorities.
 
 The audit uses only Python's standard library and reads XLSX Open Packaging XML
-directly. It compares every value in the Engineering BOM, Procurement and RFQ
+directly. It compares every value in the Engineering BOM, Procurement, 2x20+1
+program aggregate and RFQ
 worksheets, checks the complete budgetary price table and verifies that each native
 Excel table covers the complete source range.  The customer-comparable bare-PCB and
 full-PCBA cost tracks are checked independently so the two alternatives cannot drift
@@ -27,11 +28,13 @@ PRICE_ESTIMATE = ROOT / "hardware/EVT_PRE_20_BOM_PRICE_ESTIMATE_REV_A.csv"
 SOURCES = {
     "Engineering BOM": ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv",
     "Procurement": ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv",
+    "Program 41": ROOT / "hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv",
     "RFQ": ROOT / "hardware/CHINA_PROCUREMENT_RFQ.csv",
 }
 EXPECTED_TABLE_REFS = {
     "Engineering BOM": "A1:AC296",
     "Procurement": "A1:Y125",
+    "Program 41": "A1:Y125",
     "RFQ": "A1:S28",
     "Cost estimate": "A12:R136",
 }
@@ -319,7 +322,7 @@ def main() -> int:
         },
         "lot_sizes": [4, 10, 20],
         "qg1": "PASS",
-        "qg2": "BLOCKED",
+        "qg2": "PASS",
         "cost_tracks": {
             "selected": "PRIMARY_FULL_PCBA",
             "alternative": "BARE_PCB_QUOTATION_ONLY",
@@ -333,7 +336,7 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print("EVT-PRE-20 BOM workbook-to-CSV audit PASS")
-    print("Engineering BOM 295 rows; Procurement 124 rows; RFQ 27 rows; priced rows 124")
+    print("Engineering BOM 295 rows; Procurement 124 rows; Program 41 124 rows; RFQ 27 rows; priced rows 124")
     print(
         "EVT-20 full-PCBA direct "
         f"{evt20_full_direct:,.2f} RUB; delta {full_pcba_delta:.2%}; ceiling 15.00%"

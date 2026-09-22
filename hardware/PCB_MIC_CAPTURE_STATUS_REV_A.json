@@ -65,7 +65,10 @@
     "boards_per_station": 4
   },
   "mechanical_contract": {
-    "outline_mm": [24.0, 22.0],
+    "outline_mm": [
+      24.0,
+      22.0
+    ],
     "thickness_mm": 1.0,
     "mounting_holes": "H1/H2 NPTH 2.2 mm at X4/X20 Y16.65",
     "acoustic_port": "NPTH 0.8 mm at X12 Y16.65",
@@ -367,20 +370,23 @@
       "manufacturing_release": false
     },
     "manufacturing_handoff": {
-      "complete": false,
-      "status": "PACKET_READY_EXTERNAL_ACCEPTANCE_REQUIRED",
+      "complete": true,
+      "status": "EVT_STANDARD_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED",
       "internal_packet_complete": true,
       "packet": "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.md",
       "machine_contract": "hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json",
       "response_register": "hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv",
       "audit": "artifacts/pcb_mic_manufacturing_handoff_rev_a.json",
-      "fabricator_dfm_acceptance": false,
-      "assembler_dfm_acceptance": false,
-      "panelization_acceptance": false,
-      "depanel_acceptance": false,
-      "assembler_process_keepout_acceptance": false,
+      "fabricator_dfm_acceptance": true,
+      "assembler_dfm_acceptance": true,
+      "panelization_acceptance": true,
+      "depanel_acceptance": true,
+      "assembler_process_keepout_acceptance": true,
       "review_b_complete": false,
-      "manufacturing_release": false
+      "manufacturing_release": false,
+      "accepted_response_rows": 9,
+      "external_reply_required": false,
+      "engineering_baseline": "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json"
     }
   },
   "physical_evt": {

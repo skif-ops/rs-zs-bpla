@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Generate the PCB-MAIN Rev.A pre-route constraint manifest.
 
-The manifest classifies every non-empty native net without inventing stackup-
-dependent trace geometry.  It is a controlled Review-B input, not evidence that
+The manifest classifies every non-empty native net and applies the accepted EVT
+public-stackup geometry. It is a controlled Review-B input, not evidence that
 the board is routed or manufacturable.
 """
 from __future__ import annotations
@@ -253,16 +253,16 @@ def row_for(net: str) -> dict[str, str]:
         "LOW_SPEED_CONTROL": "POINT_TO_POINT_OR_STATIC_STRAP",
     }[cls]
     impedance = {
-        "RF_50OHM": "50_OHM_SINGLE_ENDED_FACTORY_STACKUP_PENDING",
-        "USB_90OHM_DIFF": "90_OHM_DIFFERENTIAL_FACTORY_STACKUP_PENDING",
+        "RF_50OHM": "50_OHM_SINGLE_ENDED_EVT_STACKUP_ACCEPTED",
+        "USB_90OHM_DIFF": "90_OHM_DIFFERENTIAL_EVT_STACKUP_ACCEPTED",
     }.get(cls, "NOT_CONTROLLED_IMPEDANCE")
     geometry = "FABRICATOR_MINIMUMS_AND_REVIEW_B"
     if cls == "RETURN_PLANE":
         geometry = "PLANE_GEOMETRY_AND_VOID_REVIEW_B"
     elif cls == "RF_50OHM":
-        geometry = "NO_NUMERIC_WIDTH_UNTIL_FACTORY_STACKUP"
+        geometry = "WIDTH_0P1509MM_JLC06161H_3313_L1_OVER_L2"
     elif cls == "USB_90OHM_DIFF":
-        geometry = "NO_NUMERIC_WIDTH_OR_GAP_UNTIL_FACTORY_STACKUP"
+        geometry = "WIDTH_0P1537MM_GAP_0P2032MM_JLC06161H_3313_L1_OVER_L2"
     elif net == "3V8_MODEM_BB":
         geometry = "MIN_EQUIVALENT_WIDTH_0.60_MM_WIDEN_IF_LONG"
     elif net == "3V8_MODEM_RF":
@@ -278,7 +278,7 @@ def row_for(net: str) -> dict[str, str]:
     group = length_group(net)
     length_rule = "NOT_APPLICABLE"
     if pair_group:
-        length_rule = "PAIR_SKEW_LIMIT_REQUIRES_FINAL_STACKUP_AND_SI_REVIEW"
+        length_rule = "PAIR_SKEW_LIMIT_REQUIRES_SI_REVIEW"
     elif group:
         length_rule = "GROUP_SKEW_BUDGET_REQUIRES_TIMING_AND_SI_REVIEW"
     elif cls == "RF_50OHM":

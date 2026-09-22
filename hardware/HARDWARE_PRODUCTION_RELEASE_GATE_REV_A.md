@@ -15,14 +15,16 @@ mechanics and harness are technically complete and independently reviewed.
 It requires technical BOM QG-2 `PASS`, completed routing, DRC, CAM, DFM, Review B
 and closed mechanical dimensions.
 
-`customer procurement handoff` additionally requires exactly one selected lot
-quantity from 4, 10 or 20 stations and a technically controlled procurement
-package. Mixing quantity columns is prohibited. Supplier stock, price, MOQ,
+`customer procurement handoff` uses one controlled `EVT-20` quantity column per
+build lot and a separate aggregate program plan. Mixing per-lot quantity columns
+is prohibited. Supplier stock, price, MOQ,
 payment, freight and destination delivery are customer order-time fields; they
 may remain blank and do not block this engineering gate.
 
-The selected lot is `EVT-20` for 20 stations. This closes the lot-selection
-condition. Actual purchase execution is owned by the customer. PCB/PCBA,
+The controlled lot is `EVT-20` for 20 stations. The current program contains two
+such lots plus one bench station, 41 stations total, with two independent EVT-20
+reserve pools and no third reserve pool for the bench unit. Actual purchase
+execution is owned by the customer. PCB/PCBA,
 harness and housing manufacture remains prohibited while technical design,
 job-specific DFM or manufacturing-release evidence is blocked.
 
@@ -40,8 +42,9 @@ hardware design release where applicable.
 Technical BOM QG-2 also controls eight project-owned build-to-print identities for
 the six PCB/PCBA scopes, harness set and selected vacuum-cast housing. These internal
 article numbers close BOM identity only. The customer-selected supplier legal entity,
-quotation and commercial order remain open by design, while selected-process responses,
-routing, CAM/DFM, Review B, mechanics and physical evidence remain blocking here.
+quotation and commercial order remain open by design. Standard-process technical
+baselines are accepted; routing, checkout DFM, CAM, Review B, mechanics and
+physical evidence remain blocking here.
 
 The production interlock is implemented by:
 
@@ -57,7 +60,7 @@ PCB-MAIN has passed its bounded 2D placement-clearance subgate: the controlled
 225-reference repack gives all 227 fitted assembly footprints an explicit
 courtyard and the strict audit reports zero component, mounting-exclusion and
 U.FL tool-zone conflicts. The authoritative board is now partially routed: 738
-segments plus 285 vias, with four copper zones and four rule areas, reflect
+segments plus 285 vias (1023 trace items), with eight copper zones and four rule areas, reflect
 accepted bounded ground-domain, hard-signal, OctoSPI, seven-net RF P0, USB
 MCU-source, cellular-modem and cellular-fixture subgates. This is engineering progress only; remaining routing, final DRC,
 3D/service evidence, CAM, DFM and independent Review B remain required.
@@ -76,9 +79,9 @@ controlled modem-feed minimum widths. The official JLCPCB public
 `JLC06161H-3313` calculator result is now a bounded numeric engineering routing
 basis: `0.1509 mm` for 50-ohm single-ended traces and `0.1537/0.2032 mm` for
 90-ohm differential width/gap on L1 over L2. This permits an engineering
-candidate only. Pair-aware routing and audit, the returned job stackup,
-production tolerance, coupon plan, routed copper, DRC, CAM, DFM and Review B
-remain open.
+candidate only. The EVT stackup and ±10% impedance target are accepted;
+pair-aware remaining routing, routed-copper review, DRC, CAM, checkout DFM and
+Review B remain open.
 
 The two remediations raised by RF/SI return-path review 001 are independently
 accepted and applied. `PCB-MAIN-RF-RETURN-001` contributes the exact bounded
@@ -111,21 +114,23 @@ Commit-bound source commit `7ee9cfc9` passed CI `#550` and PCB Native Gate
 `#277`: comparative DRC added no errors or unconnected regression, and both
 filled-reference audits cover every cellular and GNSS sample. The bounded
 repeat return-path review is therefore complete. Neither application authorizes
-manufacture; remaining routing, final SI/PI, final fabricator stackup/tolerance/coupon,
-Review B, CAM and DFM remain open.
+manufacture; remaining routing, final SI/PI, checkout DFM, Review B and CAM
+remain open.
 
 PCB-PWR has explicit pre-route constraint coverage for all 31 native nets. The
 independent audit binds the 5 A system basis, both 4 A buck channels, the 3.3 A
 BG95 BB+RF peak basis, three separate harness returns/net ties, two switch nodes,
 two bootstrap loops, two Kelvin lines, feedback and 100 kHz I2C. `DIM-003` is
-accepted `18/18` for EVT. A separate public `JLC04161H-3313` reference and
+accepted `18/18` for EVT. A separate public `JLC04161H-3313A` reference and
 conservative 35 µm / 10 °C-rise screen now pass as a bounded numeric EVT routing
 input: 4.0 mm at 5 A, 3.0 mm at 4 A, 2.1 mm for local switch nodes and 0.5 mm
-at 0.3 A across a 31-net manifest. Final job widths, via-current capacity and
-plane geometry remain blocked on current/fault envelopes, selected
-stackup/copper/plating and physical thermal/current-density review.
-The board remains unrouted with zero copper zones; DRC, CAM, DFM and Review B are
-open.
+at 0.3 A across a 31-net manifest. JLC04161H-3313A, 70/35 µm copper and minimum
+18 µm average hole-wall plating are accepted for EVT; via sharing, current/fault
+envelopes and physical thermal/current-density evidence remain open. The active
+board contains exactly four accepted trace segments: two bootstrap, LM74700 VCAP
+and `VBAT_RAW`, with zero copper zones. The accepted `REV_GATE` routing 004
+candidate is not yet applied; all remaining routing, DRC, CAM, checkout DFM and
+Review B are open.
 
 PCB-PWR is no longer a one-page label-only capture. Its native project now has a
 system overview and four bounded functional child sheets for input protection and
@@ -201,8 +206,8 @@ four accepted H1-H4 mounting exclusions also have zero fitted-body/pad conflicts
 and 0.53 mm minimum fitted-body margin. DNP service review, exact serial enclosure
 fit, routing, DRC, CAM, DFM and Review B remain open.
 
-The exact accepted PCB-PWR dual-buck placement ECO-001 is applied byte-for-byte:
-only C4, C6, L1 and L2 move, the board remains unrouted, all 44 fitted
+The exact accepted PCB-PWR dual-buck placement ECO-001 was applied byte-for-byte:
+only C4, C6, L1 and L2 moved, that historical placement candidate was unrouted, and all 44 fitted
 courtyards still pass and the minimum clearance remains 0.22 mm. CI #583 and
 PCB Native #310 pass for source commit `878425d2`, with zero new error classes
 and `126 -> 126` unconnected items. This placement subgate is not a routing or
@@ -226,51 +231,45 @@ The PCB-PWR `DIM-003` mechanical authority is machine-audited and accepted
 `18/18` for the EVT test batch. It binds the 90 x 60 x 1.6 mm basis, four round
 NPTH M3 holes, J1/J2 mating and cable volumes, DFT fixture/probe access,
 assembled-height and enclosure/thermal keep-outs, harness board datums and a
-hash-bound frozen STEP. It authorizes those inputs for EVT routing only. Final
-harness cut lengths remain blocked by `DIM-001`, `DIM-012` and the enclosure
-route; serial enclosure revalidation and all manufacturing gates remain required.
+hash-bound frozen STEP. It authorizes those inputs for EVT routing only. Harness
+cut lengths are accepted at 275/440/330 mm with a 10% service allowance;
+installed-route validation, serial enclosure revalidation and all manufacturing
+gates remain required.
 
 The PCB-PWR stackup/copper request is internally complete and machine-audited.
 For EVT engineering and ordering, the selected standard profile is JLCPCB
-`JLC04161H-3313`, 1.6 mm, outer 2 oz / inner 1 oz; routing remains conservatively
-sized against only 35 µm copper. The separate register remains at `0/24` across
-`0/2` independent fabricator slots for job-specific DFM deviations. It requests
-the actual four-layer cross-section,
-material, finished thickness, base/finished copper, hole-wall plating, via and
-heavy-copper process limits, mask/finish, panel controls, net test and DFM
-traceability. Those external rows no longer block engineering routing, but the
-selected fabricator's DFM deviations must be closed before fabrication. The
-profile does not authorize fabrication, and all 24 response rows remain pending.
+`JLC04161H-3313A`, 1.6 mm, outer 2 oz / inner 1 oz; routing remains
+conservatively sized against only 35 µm copper. All `24/24` historical response
+rows are closed by the engineering baseline and no factory reply is required.
+Any actual checkout parser/DFM deviation must be closed by ECO. The profile does
+not authorize fabrication.
 
-The PCB-MAIN stackup/impedance request packet is internally ready, but it has
-0/2 fabricator responses accepted and no selected construction. Its 22-row
-register remains the final job-specific manufacturing-acceptance path. The
-separate public numeric routing basis does not populate any response row and is
-not Gerber, a purchase order or a fabrication release.
+The PCB-MAIN stackup/impedance request is a retained historical packet. All
+`22/22` rows are engineering-baseline closures and JLC06161H-3313 controls EVT
+geometry. It is not Gerber, a purchase order or a fabrication release.
 
 The bounded PCB-MAIN assembler request for `U2`, `U25`, `U26` and `U9` is also
-internally ready, but it has 0/14 assembler DFM/stencil responses accepted and
-no selected assembler legal entity, manufacturing site or controlled process.
-The blank response register does not approve U9 paste, any land/mask/stencil
-rule, PnP polarity, first-article assembly, Review B or manufacturing release.
+retained historically. All `14/14` rows are engineering-baseline closures for
+the standard process. Selected assembler identity remains a customer checkout
+field; controlled paste export still requires DRC/CAM, and first-article,
+Review B and manufacturing release remain open.
 
-The harness supplier capability packet is internally complete, but it has
-`0/16` accepted responses and no selected legal entity, manufacturing site,
-supplier assembly MPN, assembly-level temperature rating or accepted wire/crimp
-process. It is a capability and quotation input only. Final cut lengths remain
-blocked by `DIM-001`, `DIM-012` and the final enclosure route; the packet is not
-a build release.
+The harness supplier capability packet is retained historically. All `16/16`
+rows are engineering-baseline closures; exact wire MPNs and 275/440/330 mm
+lengths are accepted for EVT. Supplier identity is a customer order field.
+First-off crimp/pull qualification, 100% electrical tests and installed-route
+EVT validation still block manufacturing release.
 
-All six controlled response-packet records are assembled into one deterministic,
-source-only archive controlled by
+All six controlled response-packet records are retained in one deterministic,
+source-only historical archive controlled by
 `manufacturing/EVT_PRE_20_EXTERNAL_RESPONSE_BUNDLE_REV_A.{md,json}`. The archive
 contains the two-fabricator PCB-MAIN request, PCB-MAIN assembler request,
 PCB-PWR DIM-003 request, two-fabricator PCB-PWR request, PCB-MIC DFM request and
 harness-supplier request, both bounded public numeric routing bases and the
 selected-lot procurement tables. Its
-embedded SHA-256 manifest is machine-audited, while every response register
-except the internally accepted EVT `DIM-003` register remains pending. This
-closes only the packaging/issuance preparation subgate;
+embedded SHA-256 manifest is machine-audited. The five former external registers
+contain 85 engineering-baseline closures and DIM-003 remains accepted 18/18.
+This closes the external-wait subgate only;
 it is not a quotation, purchase order, routing authority or manufacturing
 release.
 
@@ -279,11 +278,10 @@ release.
 - physical assembly/EOL/EVT qualification of the documentarily controlled exact
   `BAT1`, `PV1`, `MPPT1`, `MPPT-TEMP`, `ANT-CELL`, `ANT-GNSS`, `ANT-LORA` and
   `RF-PIGTAIL` items; `HARNESS` and `HSG-VC` internal article identities are
-  controlled, while final design inputs, selected supplier/process responses and
-  physical release evidence remain open;
-- PCB-MAIN and PCB-PWR routing, DRC and CAM; PCB-PWR final stackup,
-  job-specific current-density/thermal geometry and physical power evidence
-  beyond the bounded 35 µm EVT routing input; PCB-MIC independent Review B,
+  controlled, while final design inputs and physical release evidence remain open;
+- PCB-MAIN and PCB-PWR remaining routing, DRC and CAM; PCB-PWR physical
+  current-density/thermal/fault and rail-drop evidence beyond the accepted
+  numeric EVT routing input; PCB-MIC independent Review B,
   CAM comparison, panelization and acoustic-stack review; all three boards'
   DFM and manufacturing release;
 - PCB-MAIN USB source-termination routeability: the bounded R91/R92 placement
@@ -292,25 +290,21 @@ release.
   passed; the bounded MCU-source pair application gate passed on PCB Native
   #289, cellular-modem on #293 and cellular-fixture on #297; only the
   main-connector controlled 90-ohm segment remains open and DFM-blocked;
-- the remaining 17 PCB-PWR input-protection qualification rows after accepted
+- the remaining 16 PCB-PWR input-protection qualification rows after accepted
   manufacturer source control, native-value and repeat-hierarchy gates,
   including +70 C 5 A thermal,
   prospective-current, battery-side primary-fuse and SMBJ18A coordination;
-- selected-assembler acceptance of the PCB-MAIN U2/U25/U26 project IPC
-  candidates, U9 process-dependent stencil adaptation, PnP polarity,
-  first-article controls and closure of blocker/critical DFM findings;
+- controlled PCB-MAIN paste/CAM implementation, checkout DFM, two-board
+  first-article evidence and closure of blocker/critical findings;
 - serial revalidation of the EVT-accepted PCB-PWR `DIM-003` geometry against the
   final enclosure, exact component models, harness routing, installation and
   environmental inputs;
-- acceptance of both PCB-PWR stackup/copper fabricator sets in the 24-row
-  `PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv`, selection of one construction,
-  and separate current-density/DC-drop/fault/+70 °C thermal approval;
-- acceptance of all 16 attributable harness supplier responses in
-  `HARNESS_SUPPLIER_CAPABILITY_RESPONSE_REV_A.csv`, followed by final lengths,
-  external endpoints, FAI and physical electrical/SI/thermal validation;
-- attributable fabricator, assembler and harness technical responses required
-  for the selected construction and build process; commercial quotation,
-  availability and delivery fields are customer-owned and non-blocking here.
+- PCB-PWR checkout DFM plus physical current-density/DC-drop/fault/+70 °C
+  thermal approval;
+- harness first-off crimp/pull qualification, 100% electrical records and
+  installed-route electrical/SI/thermal validation;
+- commercial quotation, availability, selected factory identity and delivery
+  fields are customer-owned and non-blocking here.
 
 Physical EVT and operator/SIM evidence remain later acceptance evidence after
 stations are assembled; they are not replaced by this pre-production audit.

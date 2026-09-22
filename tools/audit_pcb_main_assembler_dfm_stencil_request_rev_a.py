@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit the bounded PCB-MAIN assembler DFM/stencil request packet.
+"""Audit the PCB-MAIN assembler request or accepted EVT process baseline.
 
 A PASS proves only that a source-bound request and blank external-response
 register are ready.  It must never synthesize process parameters, release a
@@ -59,6 +59,8 @@ RELEASE_GATE = ROOT / "hardware/HARDWARE_PRODUCTION_RELEASE_GATE_REV_A.md"
 CONTRACT = ROOT / "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.json"
 PACKET = ROOT / "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_REQUEST_REV_A.md"
 RESPONSE = ROOT / "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_RESPONSE_REV_A.csv"
+EVT_BASELINE = ROOT / "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json"
+EVT_BASELINE_MANUAL = ROOT / "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md"
 CI_WORKFLOW = ROOT / ".github/workflows/ci.yml"
 NATIVE_WORKFLOW = ROOT / ".github/workflows/pcb-native.yml"
 HARDWARE_RELEASE_AUDIT = ROOT / "tools/audit_evt_pre_20_hardware_release.py"
@@ -189,6 +191,8 @@ CONTROLLED_SOURCES = [
     CONTRACT,
     PACKET,
     RESPONSE,
+    EVT_BASELINE,
+    EVT_BASELINE_MANUAL,
     CI_WORKFLOW,
     NATIVE_WORKFLOW,
     HARDWARE_RELEASE_AUDIT,
@@ -757,6 +761,94 @@ def validate_status_packet_and_ci(contract: dict[str, Any]) -> None:
             "hardware production-release audit does not enforce assembler acceptance")
 
 
+def audit_evt_accepted(contract: dict[str, Any], commit_sha: str) -> dict[str, Any]:
+    from audit_evt_engineering_manufacturing_baseline_rev_a import audit as audit_baseline
+
+    baseline = audit_baseline()
+    require(baseline["pcba"]["standard_process_accepted"] is True
+            and baseline["pcba"]["first_article_quantity"] == 2,
+            "central EVT PCBA process authority differs")
+    require(relative(EVT_BASELINE) in contract.get("authority_inputs", [])
+            and relative(EVT_BASELINE_MANUAL) in contract.get("authority_inputs", []),
+            "accepted EVT baseline is absent from assembler authority inputs")
+    source = contract.get("source_binding", {})
+    require(source.get("native_board_sha256") == sha256(BOARD)
+            and source.get("placement_manifest_sha256") == sha256(PLACEMENT)
+            and source.get("u2_footprint_sha256") == sha256(U2_FOOTPRINT)
+            and source.get("u25_u26_footprint_sha256") == sha256(DRT_FOOTPRINT)
+            and source.get("u9_footprint_sha256") == sha256(U9_FOOTPRINT),
+            "accepted assembler source binding differs")
+    fields, rows = read_csv(RESPONSE)
+    require(fields == RESPONSE_FIELDS and len(rows) == 14,
+            "accepted assembler response-register structure differs")
+    require(all(row["Disposition"] == "CLOSED_EVT_ENGINEERING_BASELINE"
+                and row["Blocking"] == "NO"
+                and all(row[field] for field in (
+                    "Response_Value", "Response_Reference", "Responder", "Response_Date"
+                )) for row in rows),
+            "assembler process rows are not closed by attributed EVT evidence")
+    require(contract.get("external_response") == {
+        "response_register": relative(RESPONSE),
+        "required_rows": 14,
+        "closed_rows": 14,
+        "pending_rows": 0,
+        "external_reply_required": False,
+        "assembler_selection": "CUSTOMER_ORDER_TIME_NON_BLOCKING",
+        "complete": True,
+    }, "accepted assembler external-response state differs")
+    interlock = contract.get("release_interlock", {})
+    require(interlock.get("selected_assembler_identified") is False
+            and all(interlock.get(key) is True for key in (
+                "u2_land_mask_stencil_accepted", "u25_u26_land_mask_stencil_accepted",
+                "u9_stencil_reflow_inspection_accepted", "pnp_polarity_accepted",
+                "first_article_plan_accepted", "blocker_critical_dfm_closed",
+            ))
+            and all(interlock.get(key) is False for key in (
+                "paste_export_authorized", "review_b_complete", "manufacturing_release",
+                "fabrication_authorized",
+            ))
+            and interlock.get("paste_export_condition") ==
+            "NATIVE_DRC_PASS_AND_CONTROLLED_CAM",
+            "accepted PCBA process/release boundary differs")
+    status = json.loads(STATUS.read_text(encoding="utf-8"))
+    handoff = status.get("review_b", {}).get("evidence", {}).get(
+        "assembler_dfm_stencil_handoff", {}
+    )
+    require(handoff.get("complete") is True
+            and handoff.get("accepted_response_rows") == 14
+            and handoff.get("external_reply_required") is False
+            and handoff.get("assembler_selection_nonblocking_customer_action") is True
+            and handoff.get("paste_export_authorized") is False
+            and handoff.get("review_b_complete") is False
+            and handoff.get("manufacturing_release") is False,
+            "PCB-MAIN accepted assembler handoff differs")
+    _, rfq_rows = read_csv(RFQ)
+    rfq = {row["RFQ_ID"]: row for row in rfq_rows}.get("RFQ-011", {})
+    require(rfq.get("Manufacturer") == "Customer-selected standard PCBA service"
+            and "DIO-PCBA-MAIN-EVT-A" in rfq.get("MPN_or_spec", "")
+            and "first articles" in rfq.get("Blocking_check", ""),
+            "PCB-MAIN EVT PCBA RFQ boundary differs")
+    packet = PACKET.read_text(encoding="utf-8")
+    require(all(token in packet for token in (
+        "SAC305", "100 um", "CLOSED_EVT_ENGINEERING_BASELINE",
+        "first-article", "NOT FOR MANUFACTURE",
+    )), "accepted assembler process manual is incomplete")
+    return {
+        "schema": "dioneya-pcb-main-assembler-dfm-stencil-audit-v2",
+        "configuration": "EVT-PRE-20 Rev.A",
+        "assembly": "PCB-MAIN",
+        "status": "PASS_EVT_STANDARD_PCBA_PROCESS_ACCEPTED",
+        "evidence_commit_sha": commit_sha,
+        "external_response_register": {"rows": 14, "closed_rows": 14, "pending_rows": 0},
+        "selected_assembler_identified": False,
+        "assembler_selection_nonblocking_customer_action": True,
+        "paste_export_authorized": False,
+        "review_b_complete": False,
+        "manufacturing_release": False,
+        "fabrication_authorized": False,
+    }
+
+
 def audit(commit_sha: str, require_clean_source: bool) -> dict[str, Any]:
     validate_git_binding(commit_sha, require_clean_source)
     contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
@@ -765,6 +857,10 @@ def audit(commit_sha: str, require_clean_source: bool) -> dict[str, Any]:
             and contract.get("assembly") == "PCB-MAIN"
             and contract.get("revision") == "A",
             "assembler DFM/stencil request identity mismatch")
+    if contract.get("status") == (
+        "EVT_STANDARD_PCBA_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED_NOT_FOR_MANUFACTURE"
+    ):
+        return audit_evt_accepted(contract, commit_sha)
     require(contract.get("status") ==
             "PACKET_READY_SELECTED_ASSEMBLER_RESPONSE_REQUIRED_NOT_FOR_PASTE_RELEASE_OR_MANUFACTURE",
             "assembler DFM/stencil request status is not bounded")
@@ -826,11 +922,17 @@ def main() -> int:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print("PCB-MAIN assembler DFM/stencil request audit: PASS")
-    print(
-        "references=4 response_rows=14 accepted=0 selected_assembler=false "
-        "u9_native_paste_apertures=0 paste_export_authorized=false "
-        "manufacturing_release=false"
-    )
+    if report["status"] == "PASS_EVT_STANDARD_PCBA_PROCESS_ACCEPTED":
+        print(
+            "response_rows=14 closed=14 first_articles=2 selected_assembler=false "
+            "paste_export_authorized=false manufacturing_release=false"
+        )
+    else:
+        print(
+            "references=4 response_rows=14 accepted=0 selected_assembler=false "
+            "u9_native_paste_apertures=0 paste_export_authorized=false "
+            "manufacturing_release=false"
+        )
     return 0
 
 

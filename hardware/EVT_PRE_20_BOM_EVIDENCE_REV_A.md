@@ -41,19 +41,24 @@ blockers and the independent hardware release gate.
 
 ## Project-owned build-to-print identities
 
+Per-lot quantities remain controlled as `EVT-20`. The aggregate procurement
+authority is `hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv`: two lots
+of 20 plus one bench station, 41 stations total, with two independent EVT-20
+reserve pools. The bench station adds no third reserve pool.
+
 These identities make the technical and procurement BOMs deterministic without
 claiming that a fabricator, EMS, harness assembler or vacuum-casting supplier has
 been selected. All corresponding RFQ supplier and quote-date fields remain empty.
 
 | BOM item | Internal article identity | Controlled scope | Still required before manufacture |
 |---|---|---|---|
-| `ASM-MAIN` | `DIO-ASM-MAIN-REV-A` | PCB-MAIN assembled build-to-print scope | Completed routing, DRC, CAM, selected EMS response, DFM, stencil/process acceptance and Review B |
-| `PCB-MAIN` | `DIO-PCB-MAIN-REV-A` | PCB-MAIN bare-board build-to-print scope | Completed routing, DRC, CAM, selected stackup/coupon response, DFM and Review B |
-| `ASM-PWR` | `DIO-ASM-PWR-REV-A` | PCB-PWR assembled build-to-print scope | Completed routing, power/thermal evidence, DRC, CAM, selected EMS response, DFM and Review B |
-| `PCB-PWR` | `DIO-PCB-PWR-REV-A` | PCB-PWR bare-board build-to-print scope | Selected stackup/copper/plating, completed routing, power/thermal evidence, DRC, CAM, DFM and Review B |
-| `ASM-MIC` | `DIO-ASM-MIC-REV-A` | PCB-MIC assembled build-to-print scope | Remaining Review B, CAM comparison, acoustic/process DFM and selected EMS acceptance |
-| `PCB-MIC` | `DIO-PCB-MIC-REV-A` | PCB-MIC bare-board build-to-print scope | Remaining Review B, CAM comparison, panelization/acoustic DFM and selected fabricator acceptance |
-| `HARNESS` | `DIO-HARNESS-SET-REV-A` | Controlled labeled station harness set | Final routes and cut lengths, exact wire AVL, accepted crimp process, selected assembler, FAI and physical validation |
+| `ASM-MAIN` | `DIO-ASM-MAIN-REV-A` | PCB-MAIN assembled build-to-print scope | Completed routing, DRC, controlled CAM, checkout DFM, first article and Review B |
+| `PCB-MAIN` | `DIO-PCB-MAIN-REV-A` | PCB-MAIN bare-board build-to-print scope | Completed routing, DRC, controlled CAM, checkout DFM and Review B |
+| `ASM-PWR` | `DIO-ASM-PWR-REV-A` | PCB-PWR assembled build-to-print scope | Completed routing, power/thermal evidence, DRC, controlled CAM, checkout DFM, first article and Review B |
+| `PCB-PWR` | `DIO-PCB-PWR-REV-A` | PCB-PWR bare-board build-to-print scope | Completed routing, physical power/thermal evidence, DRC, controlled CAM, checkout DFM and Review B |
+| `ASM-MIC` | `DIO-ASM-MIC-REV-A` | PCB-MIC assembled build-to-print scope | Remaining Review B, CAM comparison, first-panel bore inspection and acoustic validation |
+| `PCB-MIC` | `DIO-PCB-MIC-REV-A` | PCB-MIC bare-board build-to-print scope | Remaining Review B, CAM comparison, first-panel bore inspection and acoustic validation |
+| `HARNESS` | `DIO-HARNESS-SET-EVT-A` | Controlled labeled station harness set | First-off crimp/pull, 100% electrical records, installed-route and EVT physical validation |
 | `HSG-VC` | `DIO-HSG-VC-REV-A` | Vacuum-cast housing set build-to-print scope | Released source geometry, material/process response, selected caster, fit/seal/thermal/RF first-article evidence |
 
 Passing the build-to-print identity check releases none of the still-required evidence

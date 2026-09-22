@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A Review B checklist
 
-Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / C4 C6 L1 L2 PLACEMENT ECO GATE PASS / EXACT WARNING REMEDIATION GATE PASS / EXACT BOOTSTRAP ROUTING 001 APPLIED WITH FRESH APPLICATION GATE PENDING / REVIEW B OPEN / FITTED + EVT MOUNTING CLEARANCE, ROUTING CONSTRAINT AND DIM-003 ACCEPTANCE PASS / STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`
+Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / C4 C6 L1 L2 PLACEMENT ECO GATE PASS / EXACT WARNING REMEDIATION GATE PASS / EXACT BOOTSTRAP AND LM74700 VCAP ROUTING APPLIED / REVIEW B OPEN / FITTED + EVT MOUNTING CLEARANCE, ROUTING CONSTRAINT, DIM-003 AND EVT STACKUP ACCEPTANCE PASS / NOT FOR MANUFACTURE`
 
 Review B is independent from the completed pin/net Review A. The active C20/C21
 hierarchy subgate is signed, but this checklist contains no routing, CAM or
@@ -53,7 +53,9 @@ manufacturing-release assertion.
   exact active source/PDF pair on `2026-09-17` with decision
   `ACCEPT_HIERARCHY_ONLY`.
 - Native PCB: EVT-frozen 90 x 60 x 1.6 mm, four copper layers, 62 electrical
-  footprints plus four board-only mounting holes, zero traces/vias/zones.
+  footprints plus four board-only mounting holes, exactly four accepted trace
+  segments (bootstrap, VCAP and `VBAT_RAW`), zero vias and zero zones. Accepted
+  `REV_GATE` routing 004 remains unapplied pending its exact application gate.
 - TI primary-source binding: `PASS`. The machine-audited record
   `PCB_PWR_TI_PRIMARY_SOURCE_EVIDENCE_REV_A.{md,json}` binds exact
   `LMR604403SRAKR` to SNAS877 pages 3/6/13/22 and the 2025-11-08 TI
@@ -77,25 +79,25 @@ manufacturing-release assertion.
   unconnected items. Reviewer `Скиф` supplied the exact acceptance token. The
   fresh application gate passes at CI #592, PCB-PWR Schematic #70 and PCB
   Native #319, so these four warning-only items are closed; the independent
-  routing, stackup, DFM, Review B and CAM gates remain open.
+  remaining-routing, checkout DFM, Review B and CAM gates remain open.
 - Mechanical authority: `DIM-003 18/18 EVT ACCEPTED`; the outline, round H1-H4
   pattern, terminal zones, tool access, fixture datum and conservative assembled
   STEP envelope are frozen for EVT. Serial revalidation remains mandatory.
 - Pre-route constraint coverage: `PASS` for all 31 native nets. The selected
-  `JLC04161H-3313`, 1.6 mm, outer 2 oz / inner 1 oz EVT profile and conservative
+  `JLC04161H-3313A`, 1.6 mm, outer 2 oz / inner 1 oz EVT profile and conservative
   35 µm overlay pass as input for a bounded routing candidate; via-current,
   fault energy and physical thermal evidence remain open.
-- Stackup/copper request: internally complete for `FAB-A` and `FAB-B`; its
-  24-row response register remains `0/24` and `0/2` as a job-specific DFM
-  deviation channel, not an engineering-routing blocker. The template is
-  `PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv`.
+- Stackup/copper baseline: all `24/24` historical rows are engineering-baseline
+  closures; no factory reply is required. JLC04161H-3313A, 70/35 µm copper,
+  minimum 18 µm hole-wall plating and ENIG are accepted for EVT. Actual checkout
+  DFM deviations remain ECO inputs.
 - Manufacturing release: `HOLD`.
 - Input protection: active native F1 is Littelfuse `0451008.MRL` and target D1
   remains `SMBJ18A`. The bounded value-only ECO is applied with footprint,
   placement, topology and nets retained. The later C20/C21 electrical ECO leaves
   F1 unchanged. Exact Littelfuse/Molex source payloads and order codes are
   hash-bound in the controlled primary-source record. Its active-source
-  ERC/PDF/human hierarchy gate passes; 17 of 20
+  ERC/PDF/human hierarchy gate passes; 16 of 20
   input-protection qualification rows remain open.
   PCBA procurement is prohibited.
 
@@ -123,10 +125,11 @@ manufacturing-release assertion.
   topology, current basis and source authority.
 - [x] Switch-node, bootstrap, Kelvin, feedback and net-tie constraints are
   explicit without invented final geometry.
-- [x] The `JLC04161H-3313` public reference plus 35 µm / 10 °C-rise screen
+- [x] The `JLC04161H-3313A` public reference plus 35 µm / 10 °C-rise screen
   controls all 31 candidate rules: 5 A input/return at 4.0 mm, 4 A rails/returns
   at 3.0 mm and local switch nodes at 2.1 mm. This passes the bounded EVT
-  engineering input and leaves the job-DFM register unchanged at `0/24`.
+  engineering input; all `24/24` historical response rows are controlled
+  engineering-baseline closures.
 - [x] I²C remains 100 kHz initially with authoritative pull-ups on PCB-MAIN and
   PCB-PWR pull-up footprints DNP.
 - [x] Historical KiCad 9 evidence for the superseded F1 value has zero ERC
@@ -139,12 +142,10 @@ manufacturing-release assertion.
   board outline, mounting holes, terminal/tool zones, assembled envelope and
   EVT PCB STEP in `PCB_PWR_DIM_003_RESPONSE_REV_A.csv`; serial mechanics require
   repeat validation.
-- [ ] Both independent fabricators return all 24 attributable stackup/copper
-  rows, the project accepts both complete response sets, compares them and
-  selects one four-layer dielectric construction.
-- [ ] The selected fabricator construction freezes finished thickness, base and
-  finished copper, hole-wall plating, via construction, minimum rules, mask and
-  finish without silently changing the PCB source.
+- [x] The standard EVT construction is selected without waiting for factory
+  replies; all 24 historical stackup/copper rows cite the controlled baseline.
+- [x] Finished thickness, 70/35 µm copper, minimum 18 µm average hole-wall
+  plating, minimum rules, green LPI mask and ENIG are frozen for EVT ordering.
 - [x] The machine-audited TI primary-source record confirms exact
   `LMR604403SRAKR` is an Active Production `3.3V fixed / adjustable`
   orderable; U3's 26.308 kOhm parallel divider selects adjustable 3.801120 V
@@ -176,9 +177,10 @@ manufacturing-release assertion.
   SMBJ18A clamp, prospective-current, primary-fuse and fail-short coordination.
 - [ ] Input fault/transient envelope, fuse/TVS coordination and MOSFET SOA are
   closed against battery/BMS/MPPT evidence.
-- [ ] Final job-specific high-current widths, plane geometry and via arrays pass
-  selected-copper/plating, DC-drop, current-density, fault-energy and +70 °C
-  physical thermal acceptance; provisional EVT candidate rules do not close it.
+- [x] Calculated high-current widths and provisional via-array rules are accepted
+  as routing input against the conservative 35 µm lower bound.
+- [ ] Physical DC-drop, via sharing, current density, fault energy and +70 °C
+  thermal evidence passes on the EVT hardware.
 - [ ] Both buck hot loops and switch nodes are routed compactly and isolated
   from Kelvin, feedback, I²C, connector and edge regions.
 - [ ] Shunt sense is true Kelvin with no load current in either sense route and
@@ -213,12 +215,12 @@ pin/net semantic digest. Commit-bound KiCad 9 ERC/PDF evidence and independent
 human hierarchy acceptance pass. Fitted-body and H1-H4 mounting clearance,
 constraint coverage and `DIM-003` EVT acceptance remain valid. The mechanical
 register is `18/18`; the selected EVT ordering profile and bounded 35 µm numeric
-routing input pass. The `0/24`, `0/2` register remains for job-specific DFM.
+routing input pass. All `24/24` historical response rows are engineering-baseline
+closures; checkout DFM remains mandatory.
 The exact C4/C6/L1/L2 placement application gate passes. Its separate corrected
 four-warning remediation candidate passes the commit-bound comparative KiCad 9
 gate, has exact human acceptance, is applied byte-for-byte and its fresh
 application gate passes; all four warning-only closures are credited.
-Selected construction, final copper/plating and
-via-current geometry, routing,
-physical evidence, DRC, CAM, DFM, final serial mechanics and independent Review B are open.
+Remaining routing, physical via-sharing/current/thermal/fault evidence, DRC,
+CAM, checkout DFM, final serial mechanics and independent Review B are open.
 Production outputs remain prohibited.

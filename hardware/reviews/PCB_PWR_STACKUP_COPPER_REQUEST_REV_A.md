@@ -1,17 +1,18 @@
 # PCB-PWR Rev.A stackup and copper-process request
 
-Status: `PACKET READY / TWO FABRICATOR RESPONSES REQUIRED / 0 OF 24 ROWS ACCEPTED / FINAL JOB ROUTING NOT AUTHORIZED BY THIS PACKET / NOT FOR MANUFACTURE`
+Status: `SUPERSEDED REQUEST / EVT STACKUP AND CALCULATED GEOMETRY ACCEPTED / ROUTING INPUT AUTHORIZED / NOT FOR MANUFACTURE`
 
-This packet requests the external construction and process data required before
-PCB-PWR current-carrying geometry can be calculated. It is a capability and
-quotation input only. The accepted EVT outline is not a fabrication release;
-this packet is not a Gerber package, purchase order, panel approval, routing
-authorization or fabrication release.
+Decision `2026-09-21`: `JLC04161H-3313A`, outer/inner copper `70/35 um`,
+plating floor `18 um`, and the calculated current/via table in
+`PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv` replace the wait for two factory
+answers. Customer checkout DFM is a stop gate. Routing, DRC, CAM, thermal EVT
+and Review B remain open. This historical request is retained as a capability
+checklist, not as a Gerber package, purchase order or fabrication release.
 
 Machine contract:
 `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json`
 
-Blank response register:
+Engineering-closure register:
 `hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv`
 
 Independent audit:
@@ -19,26 +20,27 @@ Independent audit:
 
 ## Controlled source binding
 
-The request is bound to the unrouted four-layer PCB-PWR candidate, its exact
+The request originated from the unrouted four-layer PCB-PWR candidate, its exact
 62-footprint electrical placement plus four board-only mounting holes, all 31
 pre-route net constraints, the Rev.A layer-count authority, the power-design
 baseline and the EVT-accepted `DIM-003` authority.
 
 The 90 x 60 x 1.6 mm EVT canvas and round H1-H4 NPTH pattern are mechanically
-accepted, with serial revalidation required. The board has no tracks, vias or
-copper zones. Neither fabricator may treat the EVT mechanical authority as a
-complete fabrication release; the final stackup, copper and process values in
-this request remain subject to attributable acceptance.
+accepted, with serial revalidation required. The active controlled successor has
+three routed trace items for the accepted bootstrap and LM74700 VCAP subgates and
+zero copper zones; the remaining routing is incomplete. No party may treat the
+EVT mechanical or stackup authority as a complete fabrication release.
 
-## Request basis, not accepted construction
+## Accepted EVT construction
 
 The controlled layer count is four: `F.Cu`, `In1.Cu`, `In2.Cu`, `B.Cu`. The
-functional request intent is power/signal, reference, power/return and
-power/signal. Outer 2 oz and inner 1 oz are targets only. Core/prepreg identity,
-finished thickness, base and finished copper, hole-wall plating, material,
-surface finish and numeric manufacturing rules remain unaccepted.
+functional intent is power/signal, reference, power/return and power/signal.
+For EVT, `JLC04161H-3313A`, 2 oz outer/1 oz inner copper, `1.6 mm ±10%`, ENIG,
+green LPI and at least `18 um` average hole-wall plating are accepted. Numeric
+routing values are controlled by `hardware/PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv`.
 
-Both `FAB-A` and `FAB-B` must independently return all twelve requested items:
+The retained twelve-question lists for `FAB-A` and `FAB-B` are historical
+capability/series-transfer checklists:
 
 - complete four-layer cross-section and actual core/prepreg construction;
 - laminate thermal/material properties and lot-control basis;
@@ -61,16 +63,14 @@ controlled project review input.
 ## Electrical and thermal boundary
 
 The 5 A expected system basis, two 4 A buck ratings, 3.3 A modem peak basis and
--40...+70 °C ambient requirement are sizing inputs, not proof of acceptable
-copper. The input fault/transient envelope, voltage-drop budget and allowable
-conductor temperature rise remain open. Consequently this request contains no
-accepted trace width, plane neck, via diameter, via count or thermal-via array.
+-40...+70 °C ambient requirement define the calculated EVT routing minimums.
+Widths, necks and via arrays are accepted as routing inputs, but are not proof of
+fault energy, rail drop or powered +70 °C thermal performance.
 
-A separate `PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A` overlay now applies
-a conservative 35 µm / 10 °C-rise screen to permit a bounded engineering routing
-candidate. That overlay does not modify this request, accept the 2 oz / 1 oz job
-target, populate a response row or turn provisional via arrays into finished-job
-authority.
+The `PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A` overlay applies a
+conservative 35 µm / 10 °C-rise screen to bounded engineering routing. Checkout
+must still match the selected 2 oz / 1 oz construction and stop on any parser or
+DFM mismatch.
 
 Fabricator DFM can establish what construction can be built. It cannot approve
 electrical current density, fault energy, Kelvin accuracy, converter stability
@@ -79,16 +79,12 @@ gates after one construction is selected.
 
 ## Response and release rule
 
-The response register contains 24 blocking rows: twelve for each independent
-fabricator. All begin at `PENDING_EXTERNAL_RESPONSE`; response value, evidence,
-responder and date are blank. The current state is `0/2` accepted fabricator
-sets, `0/24` accepted rows and no selected construction.
+The response register retains 24 historical rows, twelve for each former
+fabricator slot. All 24 are `CLOSED_EVT_ENGINEERING_BASELINE`, cite the central
+baseline and are non-blocking. No row is represented as a factory reply.
 
-Receiving both responses does not by itself authorize numeric geometry or
-routing. The project must compare the offers, select and accept one
-construction, preserve the accepted EVT `DIM-003` geometry, freeze current/fault
-envelopes, and approve current-density, DC-drop, via-array, fault-energy and
-+70 °C thermal analyses. Serial mechanical revalidation remains separate.
-Routing, KiCad DRC, native STEP/service review, CAM comparison, assembler DFM,
-physical power evidence, signed Review B and manufacturing release remain
-separate blocking gates.
+The engineering decision authorizes numeric geometry and routing against the
+selected public construction. KiCad DRC, native STEP/service review, CAM
+comparison, checkout DFM, physical rail-drop/fault/+70 °C evidence, signed
+Review B and manufacturing release remain separate blocking gates. Serial
+mechanical revalidation remains mandatory for series transfer.

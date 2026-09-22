@@ -29,9 +29,10 @@ and 0.5 oz, 1 oz and 2 oz inner options for four-layer construction.
 The EVT ordering profile is `JLC04161H-3313`, 1.6 mm, outer 2 oz / inner 1 oz.
 The routing calculation deliberately retains 35 µm as its lower-bound copper
 screen, so it does not rely on the heavier order target for width compliance.
-The 24-row response register remains `0/24` across `0/2` fabricators as the
-customer-order job-specific DFM and process-deviation channel; it is no longer
-a prerequisite for engineering routing.
+The 24-row response register is closed `24/24` by the project-owner-authorized
+EVT engineering baseline. No factory e-mail or signed reply is required. The
+customer-order checkout DFM channel remains available for job-specific parser
+or process deviations, but it is not a prerequisite for engineering routing.
 
 ## Conservative conductor screen
 
@@ -82,12 +83,12 @@ thermal review and DFM.
 - Outer 2 oz / inner 1 oz selected as the EVT ordering profile: `true`.
 - Routing design copper lower bound: `35 µm`.
 - Two-fabricator responses required before routing: `false`.
-- Two complete fabricator response sets: `0/2`; accepted rows: `0/24`.
+- EVT engineering-baseline closures: `24/24`; external fabricator replies required: `false`.
 - Fault-energy and +70 °C physical thermal acceptance: `OPEN`.
 - Routed copper, KiCad DRC, CAM, DFM and independent Review B: `OPEN`.
 - Manufacturing release: `false`.
 
-The blank fabricator response register is unchanged. This record permits the next
-engineering-candidate step; the selected fabricator must still return and close
-job-specific DFM deviations before fabrication. It does not populate any
-`FAB-A` or `FAB-B` response row and cannot authorize fabrication by itself.
+The response register is populated by the controlled EVT engineering baseline,
+not by a claimed factory reply. This record permits the next engineering-candidate
+step. At customer order checkout, any actual parser or DFM error must still be
+resolved; this record cannot authorize fabrication by itself.

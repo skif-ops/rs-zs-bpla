@@ -30,8 +30,8 @@ REVIEW_B = ROOT / "hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md"
 STATE = "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN"
 ROW_STATUS = "PRE_ROUTE_CONSTRAINT_CONTROLLED_ROUTING_NOT_COMPLETE"
 NUMERIC_GEOMETRY = (
-    "CONSERVATIVE_35UM_EVT_ENGINEERING_BASIS_PASS_FINAL_STACKUP_COPPER_"
-    "PLATING_FAULT_THERMAL_ACCEPTANCE_OPEN"
+    "EVT_PUBLIC_STACKUP_AND_CALCULATED_CURRENT_GEOMETRY_ACCEPTED_"
+    "PHYSICAL_FAULT_THERMAL_VALIDATION_OPEN"
 )
 
 FIELDS = [
@@ -357,7 +357,8 @@ def validate_row(row: dict[str, str], route_class: str) -> None:
 
 def expected_status_control(board_semantic_digest: str, authority_digest: str,
                             class_counts: dict[str, int],
-                            domain_counts: dict[str, int]) -> dict[str, Any]:
+                            domain_counts: dict[str, int], trace_items: int,
+                            copper_zones: int) -> dict[str, Any]:
     return {
         "state": STATE,
         "board_semantic_sha256": board_semantic_digest,
@@ -365,8 +366,8 @@ def expected_status_control(board_semantic_digest: str, authority_digest: str,
         "net_count": 31,
         "class_counts": class_counts,
         "reference_domain_counts": domain_counts,
-        "trace_items": 0,
-        "copper_zones": 0,
+        "trace_items": trace_items,
+        "copper_zones": copper_zones,
         "dim_003": "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED",
         "numeric_power_geometry": NUMERIC_GEOMETRY,
         "routing_complete": False,
@@ -450,9 +451,9 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
     layer_rows = {row["Board"]: row for row in read_csv(LAYERS)}
     pwr_layer = layer_rows["PCB-PWR"]
     require(pwr_layer["Copper_Layers"] == "4" and
-            pwr_layer["Copper_Weight_Status"] == "TARGET_ONLY_NOT_FROZEN" and
+            pwr_layer["Copper_Weight_Status"] == "FROZEN_EVT_PUBLIC_STANDARD" and
             pwr_layer["Thickness_Status"] == "FROZEN_EVT_DIM_003_1P6_PLUS_MINUS_0P16" and
-            pwr_layer["Final_Stackup_Status"] == "OPEN_FABRICATOR_THERMAL_DFM",
+            pwr_layer["Final_Stackup_Status"] == "EVT_ACCEPTED_JLC04161H_3313A",
             "PCB-PWR layer/stackup release boundary drift")
     dimensions = {row["ID"]: row for row in read_csv(OPEN_DIMENSIONS)}
     require(dimensions["DIM-003"]["Status"] ==
@@ -462,12 +463,12 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
 
     review_text = REVIEW_B.read_text(encoding="utf-8")
     for marker in (
-        "Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / C4 C6 L1 L2 PLACEMENT ECO GATE PASS / EXACT WARNING REMEDIATION GATE PASS / EXACT BOOTSTRAP ROUTING 001 APPLIED WITH FRESH APPLICATION GATE PENDING / REVIEW B OPEN / FITTED + EVT MOUNTING CLEARANCE, ROUTING CONSTRAINT AND DIM-003 ACCEPTANCE PASS / STACKUP/COPPER REQUEST PASS / NOT FOR MANUFACTURE`",
+        "Status: `C20/C21 CIN_HF ECO APPLIED / COMMIT-BOUND ERC, PDF AND HUMAN HIERARCHY EVIDENCE PASS / C4 C6 L1 L2 PLACEMENT ECO GATE PASS / EXACT WARNING REMEDIATION GATE PASS / EXACT BOOTSTRAP AND LM74700 VCAP ROUTING APPLIED / REVIEW B OPEN / FITTED + EVT MOUNTING CLEARANCE, ROUTING CONSTRAINT, DIM-003 AND EVT STACKUP ACCEPTANCE PASS / NOT FOR MANUFACTURE`",
         "Historical commit-bound native KiCad 9.0.9 evidence",
         "decision `ACCEPT_HIERARCHY_ONLY`",
         "- [x] All 31 native/capture nets",
         "- [x] `DIM-003` has all 18 attributable response rows accepted",
-        "0/24",
+        "24/24",
         "- [ ] KiCad 9 DRC passes",
         "`HOLD`",
     ):
@@ -477,7 +478,8 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
     board_semantic_digest = semantic_board_sha256(board)
     authority_digest = sha256(authority_path)
     control = expected_status_control(
-        board_semantic_digest, authority_digest, class_counts, domain_counts
+        board_semantic_digest, authority_digest, class_counts, domain_counts,
+        trace_items, copper_zones
     )
     if status_path is not None:
         status = json.loads(status_path.resolve().read_text(encoding="utf-8"))
@@ -545,7 +547,11 @@ def main() -> int:
         output.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
                           encoding="utf-8")
     print("PCB-PWR routing authority audit: PASS")
-    print("nets=31 classes=15 trace_items=0 copper_zones=0 DIM-003=18/18 EVT accepted routing_complete=false")
+    print(
+        f"nets=31 classes=15 trace_items={report['board']['trace_items']} "
+        f"copper_zones={report['board']['copper_zones']} "
+        "DIM-003=18/18 EVT accepted routing_complete=false"
+    )
     return 0
 
 

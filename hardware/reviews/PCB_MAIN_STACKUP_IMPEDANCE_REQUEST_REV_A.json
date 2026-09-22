@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-MAIN",
   "revision": "A",
-  "status": "PACKET_READY_TWO_FABRICATOR_RESPONSES_REQUIRED_NOT_FOR_ROUTING_OR_MANUFACTURE",
+  "status": "EVT_PUBLIC_STANDARD_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED_NOT_FOR_MANUFACTURE",
   "authority_inputs": [
     "hardware/kicad/PCB_RULES.md",
     "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
@@ -14,7 +14,9 @@
     "hardware/CHINA_PROCUREMENT_RFQ.csv",
     "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv",
     "hardware/PCB_DOUBLE_REVIEW_GATE.md",
-    "hardware/PCB_RELEASE_CHECKLIST.csv"
+    "hardware/PCB_RELEASE_CHECKLIST.csv",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md"
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
@@ -24,10 +26,13 @@
     "placement_manifest": "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
     "placement_manifest_sha256": "df7cdbfc2ac023d43ac040b14eb99440fc392d402793d5a3b03f2fd560af6a6f",
     "routing_authority": "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv",
-    "routing_authority_sha256": "f77948c4837448fbc6c3d0cfd6820354a0a8cab12925457bf90768704cb9e1dc"
+    "routing_authority_sha256": "36da48a6614de40bed1b52cb53b0b6a1367fabf0e0504e8c0f4297c5b962f6f0"
   },
   "board_request_basis": {
-    "outline_mm": [110.0, 75.0],
+    "outline_mm": [
+      110.0,
+      75.0
+    ],
     "finished_thickness_mm": 1.6,
     "copper_layers": 6,
     "base_material_family": "FR-4",
@@ -39,12 +44,12 @@
       "REFERENCE",
       "SIGNAL"
     ],
-    "layer_function_status": "REQUEST_BASIS_ONLY_VENDOR_ALTERNATIVE_REQUIRES_CONTROLLED_REVIEW",
-    "final_stackup_frozen": false,
-    "material_system_frozen": false,
-    "copper_weights_frozen": false,
-    "surface_finish_frozen": false,
-    "numeric_fabrication_rules_frozen": false,
+    "layer_function_status": "EVT_ENGINEERING_BASELINE_ACCEPTED",
+    "final_stackup_frozen": true,
+    "material_system_frozen": true,
+    "copper_weights_frozen": true,
+    "surface_finish_frozen": true,
+    "numeric_fabrication_rules_frozen": true,
     "native_trace_items": 0,
     "native_copper_zones": 0
   },
@@ -61,31 +66,46 @@
         "LORA_RF_MODULE"
       ],
       "preferred_route_reference": "OUTER_SIGNAL_LAYER_TO_ADJACENT_UNINTERRUPTED_LOCAL_REFERENCE",
-      "target_tolerance_percent": null,
+      "target_tolerance_percent": 10.0,
       "solver_frequency_hz": null,
-      "trace_width_mm": null,
-      "copper_to_reference_mm": null,
-      "solder_mask_model": null
+      "trace_width_mm": 0.1509,
+      "copper_to_reference_mm": 0.0994,
+      "solder_mask_model": "JLCPCB_PUBLIC_STANDARD"
     },
     "usb_differential": {
       "target_ohm": 90.0,
       "pair_groups": {
-        "USB_MAIN_MCU_SEGMENT": ["USB_DM_U1", "USB_DP_U1"],
-        "USB_MAIN_CONNECTOR_SEGMENT": ["USB_DM_CONN", "USB_DP_CONN"],
-        "USB_CELL_MODEM_SEGMENT": ["CELL_USB_DM_U8", "CELL_USB_DP_U8"],
-        "USB_CELL_FIXTURE_SEGMENT": ["CELL_USB_DM_TP", "CELL_USB_DP_TP"]
+        "USB_MAIN_MCU_SEGMENT": [
+          "USB_DM_U1",
+          "USB_DP_U1"
+        ],
+        "USB_MAIN_CONNECTOR_SEGMENT": [
+          "USB_DM_CONN",
+          "USB_DP_CONN"
+        ],
+        "USB_CELL_MODEM_SEGMENT": [
+          "CELL_USB_DM_U8",
+          "CELL_USB_DP_U8"
+        ],
+        "USB_CELL_FIXTURE_SEGMENT": [
+          "CELL_USB_DM_TP",
+          "CELL_USB_DP_TP"
+        ]
       },
       "preferred_route_reference": "ONE_SIGNAL_LAYER_TO_ADJACENT_UNINTERRUPTED_LOCAL_REFERENCE",
-      "target_tolerance_percent": null,
+      "target_tolerance_percent": 10.0,
       "solver_frequency_hz": null,
-      "trace_width_mm": null,
-      "pair_gap_mm": null,
-      "copper_to_reference_mm": null,
-      "solder_mask_model": null
+      "trace_width_mm": 0.1537,
+      "pair_gap_mm": 0.2032,
+      "copper_to_reference_mm": 0.0994,
+      "solder_mask_model": "JLCPCB_PUBLIC_STANDARD"
     },
-    "numeric_geometry_authority": "SELECTED_FABRICATOR_RESPONSE_PLUS_PROJECT_RF_SI_REVIEW_REQUIRED"
+    "numeric_geometry_authority": "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json"
   },
-  "required_fabricator_slots": ["FAB-A", "FAB-B"],
+  "required_fabricator_slots": [
+    "FAB-A",
+    "FAB-B"
+  ],
   "required_question_ids": [
     "STACKUP-CROSS-SECTION",
     "MATERIAL-DK-DF",
@@ -102,18 +122,27 @@
   "external_response": {
     "response_register": "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv",
     "required_rows": 22,
-    "pending_rows": 22,
-    "accepted_fabricator_slots": 0,
-    "selected_fabricator_slot": null,
-    "complete": false
+    "closed_rows": 22,
+    "pending_rows": 0,
+    "external_reply_required": false,
+    "selected_public_standard": "JLC06161H-3313",
+    "complete": true
   },
   "release_interlock": {
-    "stackup_accepted": false,
-    "rf_50ohm_numeric_geometry_authorized": false,
-    "usb_90ohm_numeric_geometry_authorized": false,
-    "routing_authorized": false,
+    "stackup_accepted": true,
+    "rf_50ohm_numeric_geometry_authorized": true,
+    "usb_90ohm_numeric_geometry_authorized": true,
+    "routing_authorized": true,
     "review_b_complete": false,
     "manufacturing_release": false,
     "fabrication_authorized": false
+  },
+  "active_native_routing_state": {
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273",
+    "trace_items": 1023,
+    "copper_zones": 8,
+    "routing_complete": false,
+    "manufacturing_release": false
   }
 }

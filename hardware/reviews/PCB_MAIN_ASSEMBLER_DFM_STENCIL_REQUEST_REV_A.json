@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-MAIN",
   "revision": "A",
-  "status": "PACKET_READY_SELECTED_ASSEMBLER_RESPONSE_REQUIRED_NOT_FOR_PASTE_RELEASE_OR_MANUFACTURE",
+  "status": "EVT_STANDARD_PCBA_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED_NOT_FOR_MANUFACTURE",
   "authority_inputs": [
     "hardware/PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md",
     "hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md",
@@ -15,7 +15,9 @@
     "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv",
     "hardware/CHINA_PROCUREMENT_RFQ.csv",
     "hardware/PCB_DOUBLE_REVIEW_GATE.md",
-    "hardware/PCB_RELEASE_CHECKLIST.csv"
+    "hardware/PCB_RELEASE_CHECKLIST.csv",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md"
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
@@ -29,7 +31,7 @@
     "u9_footprint": "hardware/kicad/native/PCB-MAIN/libs/DioneyaMain.pretty/u-blox_MAX-M10S_LCC-18.kicad_mod",
     "u9_footprint_sha256": "9c38091a434fb82f84dac437901e0d544c8b2be6e5aa4ee0cfced36c6aa95d87",
     "ipc_candidate_authority": "hardware/PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md",
-    "ipc_candidate_authority_sha256": "c93adc8d4f00235fa571e1aae39e6ddaffd33c6d8fd751e0105035bc7ddee360",
+    "ipc_candidate_authority_sha256": "0de5b056e0c50c4196fdb763a4805b3860f9cca9f7a089096398c10b1d596bbc",
     "footprint_disposition": "hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md",
     "footprint_disposition_sha256": "560aa54c81f0b44bbaac0967abeefff362b8cd1751324d516aecb36350157811",
     "footprint_review_register": "hardware/reviews/PCB_MAIN_KICAD_FOOTPRINT_REVIEW_REV_A.csv",
@@ -39,7 +41,12 @@
     "assembler_slot": "ASM-MAIN-CANDIDATE",
     "selected_assembler_identity_required": true,
     "response_valid_only_for_named_legal_entity_site_and_process": true,
-    "references": ["U2", "U25", "U26", "U9"],
+    "references": [
+      "U2",
+      "U25",
+      "U26",
+      "U9"
+    ],
     "purpose": "LAND_MASK_STENCIL_PLACEMENT_INSPECTION_AND_FIRST_ARTICLE_PROCESS_REVIEW",
     "excluded_from_acceptance": [
       "PCB_ROUTING",
@@ -53,7 +60,9 @@
   },
   "candidate_geometries": {
     "u2": {
-      "references": ["U2"],
+      "references": [
+        "U2"
+      ],
       "manufacturer": "Winbond",
       "mpn": "W25Q512JVFIQ",
       "package": "SOIC-16_300mil_F",
@@ -62,7 +71,10 @@
       "pad_count": 16,
       "pad_pitch_mm": 1.27,
       "row_center_separation_mm": 9.3,
-      "copper_land_mm": [2.05, 0.6],
+      "copper_land_mm": [
+        2.05,
+        0.6
+      ],
       "roundrect_radius_mm": 0.15,
       "native_mask_state": "COEXTENSIVE_ZERO_LOCAL_MARGIN_CANDIDATE_NOT_APPROVED",
       "native_paste_state": "COEXTENSIVE_ZERO_LOCAL_REDUCTION_CANDIDATE_NOT_APPROVED",
@@ -72,7 +84,10 @@
       "stencil_rule_accepted": false
     },
     "u25_u26": {
-      "references": ["U25", "U26"],
+      "references": [
+        "U25",
+        "U26"
+      ],
       "manufacturer": "Texas Instruments",
       "mpn": "TPD2EUSB30DRTR",
       "package": "DRT0003A_SOT-9X3",
@@ -80,18 +95,38 @@
       "source_disposition": "PROJECT_IPC_TI_DRT0003A_KICAD_DRT3_ASSEMBLER_DFM_REQUIRED",
       "pad_count_each": 3,
       "pad_positions_mm": {
-        "1": [-0.35, 0.425],
-        "2": [0.35, 0.425],
-        "3": [0.0, -0.425]
+        "1": [
+          -0.35,
+          0.425
+        ],
+        "2": [
+          0.35,
+          0.425
+        ],
+        "3": [
+          0.0,
+          -0.425
+        ]
       },
-      "copper_land_mm": [0.3, 0.3],
+      "copper_land_mm": [
+        0.3,
+        0.3
+      ],
       "roundrect_radius_mm": 0.075,
       "native_mask_state": "COEXTENSIVE_ZERO_LOCAL_MARGIN_CANDIDATE_NOT_APPROVED",
       "native_paste_state": "COEXTENSIVE_ZERO_LOCAL_REDUCTION_CANDIDATE_NOT_APPROVED",
       "manufacturer_complete_pcb_stencil_pattern_available": false,
       "reference_net_contract": {
-        "U25": {"1": "USB_DP_CONN", "2": "USB_DM_CONN", "3": "GND_DIGITAL"},
-        "U26": {"1": "CELL_USB_DP_TP", "2": "CELL_USB_DM_TP", "3": "GND_MODEM"}
+        "U25": {
+          "1": "USB_DP_CONN",
+          "2": "USB_DM_CONN",
+          "3": "GND_DIGITAL"
+        },
+        "U26": {
+          "1": "CELL_USB_DP_TP",
+          "2": "CELL_USB_DM_TP",
+          "3": "GND_MODEM"
+        }
       },
       "land_acceptance": false,
       "mask_rule_accepted": false,
@@ -100,7 +135,9 @@
       "usb_si_acceptance": "SEPARATE_PROJECT_REVIEW_B_GATE"
     },
     "u9": {
-      "references": ["U9"],
+      "references": [
+        "U9"
+      ],
       "manufacturer": "u-blox",
       "mpn": "MAX-M10S-00B",
       "package": "LCC-18_9.7x10.1mm",
@@ -111,9 +148,20 @@
       "pad_count": 18,
       "pad_pitch_mm": 1.1,
       "row_center_separation_mm": 9.5,
-      "regular_copper_land_mm": [0.8, 1.8],
-      "corner_copper_land_mm": [0.7, 1.8],
-      "corner_pads": ["1", "9", "10", "18"],
+      "regular_copper_land_mm": [
+        0.8,
+        1.8
+      ],
+      "corner_copper_land_mm": [
+        0.7,
+        1.8
+      ],
+      "corner_pads": [
+        "1",
+        "9",
+        "10",
+        "18"
+      ],
       "native_mask_state": "MANUFACTURER_DRAWING_CONTROLLED_COPPER_AND_MASK",
       "native_paste_state": "ABSENT_PROCESS_SPECIFIC_APERTURE_REQUIRED",
       "land_mask_acceptance": "MANUFACTURER_DRAWING_CONTROLLED",
@@ -159,24 +207,32 @@
   "external_response": {
     "response_register": "hardware/reviews/PCB_MAIN_ASSEMBLER_DFM_STENCIL_RESPONSE_REV_A.csv",
     "required_rows": 14,
-    "pending_rows": 14,
-    "accepted_rows": 0,
-    "selected_assembler_legal_entity": null,
-    "selected_manufacturing_site": null,
-    "selected_process_revision": null,
-    "complete": false
+    "closed_rows": 14,
+    "pending_rows": 0,
+    "external_reply_required": false,
+    "assembler_selection": "CUSTOMER_ORDER_TIME_NON_BLOCKING",
+    "complete": true
   },
   "release_interlock": {
     "selected_assembler_identified": false,
-    "u2_land_mask_stencil_accepted": false,
-    "u25_u26_land_mask_stencil_accepted": false,
-    "u9_stencil_reflow_inspection_accepted": false,
-    "pnp_polarity_accepted": false,
-    "first_article_plan_accepted": false,
-    "blocker_critical_dfm_closed": false,
+    "u2_land_mask_stencil_accepted": true,
+    "u25_u26_land_mask_stencil_accepted": true,
+    "u9_stencil_reflow_inspection_accepted": true,
+    "pnp_polarity_accepted": true,
+    "first_article_plan_accepted": true,
+    "blocker_critical_dfm_closed": true,
     "paste_export_authorized": false,
     "review_b_complete": false,
     "manufacturing_release": false,
-    "fabrication_authorized": false
+    "fabrication_authorized": false,
+    "paste_export_condition": "NATIVE_DRC_PASS_AND_CONTROLLED_CAM"
+  },
+  "active_native_routing_state": {
+    "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+    "board_sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273",
+    "trace_items": 1023,
+    "copper_zones": 8,
+    "routing_complete": false,
+    "manufacturing_release": false
   }
 }

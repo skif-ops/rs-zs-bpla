@@ -1,6 +1,6 @@
 # PCB-PWR Rev.A pre-route constraint authority
 
-Status: `PASS / 31 NETS CLASSIFIED / DIM-003 EVT ACCEPTED / CONSERVATIVE NUMERIC EVT BASIS PASS / FINAL STACKUP, ROUTING AND THERMAL EVIDENCE OPEN / NOT FOR MANUFACTURE`
+Status: `PASS / 31 NETS CLASSIFIED / DIM-003 AND EVT STACKUP ACCEPTED / NUMERIC EVT BASIS PASS / ROUTING AND PHYSICAL THERMAL EVIDENCE OPEN / NOT FOR MANUFACTURE`
 
 Machine authority: `hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv`
 
@@ -18,10 +18,10 @@ rule, aggressor-separation rule, priority and source authority. This closes only
 pre-route constraint coverage. `DIM-003` is accepted `18/18` for the EVT test
 batch, including the outline, H1-H4 mounting pattern, terminal/service zones,
 fixture datum and conservative STEP envelope. Serial mechanical revalidation is
-mandatory. A separate conservative numeric overlay now authorizes a bounded EVT
-engineering routing candidate; final job-specific copper geometry and
-manufacturing routing remain blocked by the stackup/copper, fault-energy and
-physical thermal gates below.
+mandatory. A separate conservative numeric overlay and the accepted
+`JLC04161H-3313A` process authorize bounded EVT engineering routing. Remaining
+routing and manufacturing release remain blocked by physical fault/thermal,
+DRC, CAM, checkout DFM and Review B gates below.
 
 Numeric overlay:
 `hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json`
@@ -29,24 +29,27 @@ Numeric overlay:
 Per-net numeric rules:
 `hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv`
 
-The internal two-fabricator stackup/copper packet is also ready at
-`hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`, but
-`PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv` remains `0/24` accepted across
-`0/2` fabricator slots. It provides no selected construction, copper weight,
-plating, via or manufacturing-minimum authority.
+The historical two-fabricator stackup/copper packet is retained at
+`hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`. Its `24/24` rows are
+closed by project engineering under customer EVT authority. No factory reply is
+required; selected values are 1.6 mm, outer 70 µm, inner 35 µm, minimum average
+hole-wall plating 18 µm and ENIG.
 
-The committed board still has zero traces, zero vias and zero copper zones. The
+The committed board has four accepted F.Cu segments for the two bootstrap nets,
+LM74700 VCAP and `VBAT_RAW`, with zero vias and zero copper zones. All other
+routing remains open; `REV_GATE` routing 004 is accepted but remains a separate
+unapplied candidate. The
 numeric overlay uses a deliberately conservative 35 µm / 10 °C-rise engineering
 screen: 4.0 mm for the 5 A input/primary return, 3.0 mm for 4 A rails/returns,
 2.1 mm for local 4 A switch nodes and 0.5 mm for the 0.3 A rail/return. It also
 defines provisional transition arrays and DC-drop length ceilings for a candidate.
-These are not final trace, plane, via-current or thermal authority. Final values
-still require the actual current/fault envelope, accepted finished copper and
-plating, +70 °C evidence and a selected four-layer fabricator stackup.
+These rules are accepted for EVT routing but are not physical current-capacity or
+thermal proof. Final release still requires the actual current/fault envelope,
+rail-drop/load-step checks and +70 °C evidence.
 
 The machine status binds a UUID/order-independent semantic board digest covering
 the layer stack, outline, complete footprint placement, pad/net assignment and
-absence of copper. The audit still reports the raw file SHA-256 for evidence, but
+the exact bounded four-segment routing state. The audit still reports the raw file SHA-256 for evidence, but
 does not mistake KiCad-generated UUID/order changes for an electrical or layout
 change.
 
@@ -84,11 +87,10 @@ the deterministic generator and the separately maintained audit.
   output-capacitor node to U4 FB, never from the switch node.
 - The 1V8 path uses the 0.3 A TPS7A20 rating; acoustic noise, actual load and
   +70 °C performance still require physical evidence.
-- Outer 2 oz / inner 1 oz remain request targets only. The 35 µm overlay is
-  authoritative only for a bounded EVT engineering candidate. No final width,
-  via-current capacity, plane geometry or manufacturing claim becomes
-  authoritative until stackup, copper/plating, fault-energy, current-density and
-  physical thermal review are accepted.
+- Outer 2 oz / inner 1 oz and minimum 18 µm average hole-wall plating are the
+  accepted EVT order values. The 35 µm screen remains the conservative routing
+  lower bound. Numeric routing geometry is authorized, while via sharing,
+  fault-energy and physical thermal performance remain EVT validation items.
 
 ## Route-order input
 
@@ -105,9 +107,9 @@ Constraint coverage may remain PASS only while all of these are explicit:
 
 - preservation of the accepted EVT `DIM-003` outline, H1-H4 exclusions,
   terminal/tool zones and STEP envelope, plus serial revalidation before series;
-- two complete attributable fabricator response sets, selected four-layer
-  dielectric construction and accepted copper/plating authority;
-- current-density, DC-drop, via-array, fault-energy and +70 °C thermal analysis;
+- preservation of the accepted `JLC04161H-3313A` checkout values with no
+  unresolved parser or DFM error;
+- physical DC-drop, via-sharing, fault-energy and +70 °C thermal evidence;
 - routed hot loops, switch nodes, Kelvin pair, feedback pickup, rail/return
   copper and all remaining nets;
 - zero-unrouted KiCad 9 DRC, native STEP and connector/tool-access review;

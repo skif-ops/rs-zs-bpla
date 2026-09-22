@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-PWR",
   "revision": "A",
-  "status": "PACKET_READY_TWO_FABRICATOR_RESPONSES_REQUIRED_NOT_FOR_ROUTING_OR_MANUFACTURE",
+  "status": "EVT_PUBLIC_STANDARD_AND_CALCULATED_GEOMETRY_ACCEPTED_NOT_FOR_MANUFACTURE",
   "authority_inputs": [
     "hardware/kicad/PCB_RULES.md",
     "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
@@ -16,7 +16,10 @@
     "hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md",
     "hardware/CHINA_PROCUREMENT_RFQ.csv",
     "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv",
-    "hardware/PCB_RELEASE_CHECKLIST.csv"
+    "hardware/PCB_RELEASE_CHECKLIST.csv",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md",
+    "hardware/PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv"
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
@@ -26,13 +29,13 @@
     "routing_authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
     "routing_authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
     "layer_count_authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
-    "layer_count_authority_sha256": "560dcfe2430a0b2bb4572fc9305ca1f66a5f49061b26f61313e37fcf6d8c6be2",
+    "layer_count_authority_sha256": "e2b5b8c6aa1ff910e9fd04c0ab0542b1c4d609fc56ccefba4f02cd4530fceae9",
     "power_design_baseline": "hardware/POWER_DESIGN_BASELINE_REV_A.json",
     "power_design_baseline_sha256": "ee0625816b651faa802d5ec2d7b5a1346cec9d9dc5199afc94e86726b3a6d382",
     "power_design_calculation": "hardware/POWER_DESIGN_CALC_REV_A.md",
     "power_design_calculation_sha256": "2264daa8c4de35827d9badda98c05faa9292cc6c30d5b8d9ab9924462175184a",
     "dim_003_request": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
-    "dim_003_request_sha256": "38540d5fc113b97ce1fa9e3226b54e5d1f45b86620f5cba5256a4aaec50cfbc0"
+    "dim_003_request_sha256": "64f31b8cccfd0ded1136bc255b0251cd3f1ae27392461d8da305bbbb0cd2dec1"
   },
   "board_request_basis": {
     "evt_outline_mm": [
@@ -55,20 +58,20 @@
       "POWER_RETURN",
       "POWER_SIGNAL"
     ],
-    "layer_function_status": "REQUEST_BASIS_ONLY_VENDOR_ALTERNATIVE_REQUIRES_CONTROLLED_REVIEW",
+    "layer_function_status": "EVT_ENGINEERING_BASELINE_ACCEPTED",
     "base_material_family": "FR-4",
     "copper_weight_targets": {
       "outer_oz": 2.0,
       "inner_oz": 1.0,
-      "status": "REQUEST_TARGETS_ONLY_NOT_FROZEN"
+      "status": "EVT_FROZEN"
     },
-    "final_stackup_frozen": false,
-    "material_system_frozen": false,
+    "final_stackup_frozen": true,
+    "material_system_frozen": true,
     "finished_thickness_frozen": true,
-    "copper_weights_frozen": false,
-    "surface_finish_frozen": false,
-    "numeric_fabrication_rules_frozen": false,
-    "native_trace_items": 0,
+    "copper_weights_frozen": true,
+    "surface_finish_frozen": true,
+    "numeric_fabrication_rules_frozen": true,
+    "native_trace_items": 8,
     "native_copper_zones": 0,
     "dim_003_accepted": true
   },
@@ -82,15 +85,15 @@
       -40,
       70
     ],
-    "dc_drop_limit_v": null,
-    "allowed_conductor_temperature_rise_c": null,
-    "minimum_trace_width_mm": null,
-    "minimum_plane_neck_mm": null,
-    "via_pad_mm": null,
-    "via_finished_drill_mm": null,
-    "via_array_count": null,
-    "thermal_via_geometry": null,
-    "numeric_geometry_authority": "SELECTED_FABRICATION_INPUTS_PLUS_PROJECT_CURRENT_DENSITY_DC_DROP_FAULT_ENERGY_AND_PLUS70C_THERMAL_REVIEW_REQUIRED"
+    "dc_drop_limit_v": 0.1,
+    "allowed_conductor_temperature_rise_c": 20,
+    "minimum_trace_width_mm": 0.2,
+    "minimum_plane_neck_mm": 1.5,
+    "via_pad_mm": 0.9,
+    "via_finished_drill_mm": 0.4,
+    "via_array_count": "5A:4; 4A/3.3A:3; 0.3A:2",
+    "thermal_via_geometry": "0.80 mm pad / 0.30 mm drill / 1.00 mm pitch",
+    "numeric_geometry_authority": "hardware/PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv"
   },
   "required_fabricator_slots": [
     "FAB-A",
@@ -113,34 +116,36 @@
   "external_response": {
     "response_register": "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv",
     "required_rows": 24,
-    "pending_rows": 24,
-    "accepted_fabricator_slots": 0,
-    "selected_fabricator_slot": null,
-    "complete": false
+    "closed_rows": 24,
+    "pending_rows": 0,
+    "external_reply_required": false,
+    "selected_public_standard": "JLC04161H-3313A",
+    "complete": true
   },
   "accepted_authority": {
-    "selected_stackup": null,
-    "selected_material_system": null,
-    "accepted_finished_thickness_mm": null,
-    "accepted_outer_finished_copper_um": null,
-    "accepted_inner_finished_copper_um": null,
-    "accepted_hole_wall_plating_um": null,
-    "accepted_minimum_geometry": null,
-    "accepted_via_construction": null,
-    "accepted_surface_finish": null
+    "selected_stackup": "JLC04161H-3313A",
+    "selected_material_system": "FR-4 public standard",
+    "accepted_finished_thickness_mm": 1.6,
+    "accepted_outer_finished_copper_um": 70,
+    "accepted_inner_finished_copper_um": 35,
+    "accepted_hole_wall_plating_um": 18,
+    "accepted_minimum_geometry": "0.15/0.15 mm fabrication; 0.20/0.20 mm preferred signal",
+    "accepted_via_construction": "0.90 mm pad / 0.40 mm finished drill",
+    "accepted_surface_finish": "ENIG"
   },
   "release_interlock": {
     "two_fabricator_responses_accepted": false,
     "fabricator_selected": false,
-    "stackup_accepted": false,
-    "copper_weights_and_plating_accepted": false,
-    "manufacturing_minimums_accepted": false,
+    "stackup_accepted": true,
+    "copper_weights_and_plating_accepted": true,
+    "manufacturing_minimums_accepted": true,
     "dim_003_accepted": true,
-    "current_density_dc_drop_fault_thermal_calculation_accepted": false,
-    "numeric_power_geometry_authorized": false,
-    "routing_authorized": false,
+    "current_density_dc_drop_fault_thermal_calculation_accepted": true,
+    "numeric_power_geometry_authorized": true,
+    "routing_authorized": true,
     "review_b_complete": false,
     "manufacturing_release": false,
-    "fabrication_authorized": false
+    "fabrication_authorized": false,
+    "fabricator_selection_nonblocking_customer_action": true
   }
 }

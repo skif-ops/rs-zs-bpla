@@ -219,7 +219,7 @@ def main() -> int:
     require(status["manufacturing_release"] is False and
             layout["status"] == "EVT_FITTED_2D_AND_MOUNTING_CLEARANCE_PASS_DIM_003_ACCEPTED" and
             layout["layer_count_authority"] == "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv" and
-            layout["layer_count_status"] == "FROZEN_REV_A_FINAL_STACKUP_OPEN" and
+            layout["layer_count_status"] == "FROZEN_REV_A_EVT_STACKUP_ACCEPTED" and
             layout["routing_present"] is True and layout["copper_zones_present"] is False and
             layout["cam_export_authorized"] is False and layout["mounting_holes"] == 4 and
             layout["mounting_status"] == "EVT_DIM_003_ACCEPTED_H1_H4_NPTH_3P4",

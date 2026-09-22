@@ -17,9 +17,9 @@
     "routing_authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
     "routing_authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
     "stackup_request": "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json",
-    "stackup_request_sha256": "4557b8d395b5cc462ad1ce80f2f7c03d4b104493aeeac5a7320b6141c97b850f",
+    "stackup_request_sha256": "1c81037443843f73f638fc1549ccc80778ace6203f1d3a798ccab80fa09e5a3e",
     "stackup_response": "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv",
-    "stackup_response_sha256": "d3add8d7185f64f10d381cff28504c408e29472b12e0aa76e49489ef4648741d",
+    "stackup_response_sha256": "e025ece97e052ec0e0e56ccae714d0e7144d73dfdda06cbf9a5ffd563ee464da",
     "rule_manifest": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
     "rule_manifest_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988"
   },
@@ -30,16 +30,54 @@
     "displayed_outer_copper_oz": 1.0,
     "displayed_inner_copper_oz": 0.5,
     "layers": [
-      {"name": "L1", "kind": "copper", "thickness_mm": 0.0350},
-      {"name": "PP1", "kind": "prepreg", "material": "3313", "thickness_mm": 0.0994},
-      {"name": "L2", "kind": "copper", "thickness_mm": 0.0152},
-      {"name": "CORE", "kind": "core", "material": "H/H without copper", "thickness_mm": 1.2650},
-      {"name": "L3", "kind": "copper", "thickness_mm": 0.0152},
-      {"name": "PP2", "kind": "prepreg", "material": "3313", "thickness_mm": 0.0994},
-      {"name": "L4", "kind": "copper", "thickness_mm": 0.0350}
+      {
+        "name": "L1",
+        "kind": "copper",
+        "thickness_mm": 0.035
+      },
+      {
+        "name": "PP1",
+        "kind": "prepreg",
+        "material": "3313",
+        "thickness_mm": 0.0994
+      },
+      {
+        "name": "L2",
+        "kind": "copper",
+        "thickness_mm": 0.0152
+      },
+      {
+        "name": "CORE",
+        "kind": "core",
+        "material": "H/H without copper",
+        "thickness_mm": 1.265
+      },
+      {
+        "name": "L3",
+        "kind": "copper",
+        "thickness_mm": 0.0152
+      },
+      {
+        "name": "PP2",
+        "kind": "prepreg",
+        "material": "3313",
+        "thickness_mm": 0.0994
+      },
+      {
+        "name": "L4",
+        "kind": "copper",
+        "thickness_mm": 0.035
+      }
     ],
-    "published_outer_copper_options_oz": [1.0, 2.0],
-    "published_inner_copper_options_oz": [0.5, 1.0, 2.0],
+    "published_outer_copper_options_oz": [
+      1.0,
+      2.0
+    ],
+    "published_inner_copper_options_oz": [
+      0.5,
+      1.0,
+      2.0
+    ],
     "project_job_target_outer_copper_oz": 2.0,
     "project_job_target_inner_copper_oz": 1.0,
     "job_specific_stackup_selected": true,
@@ -66,10 +104,22 @@
     "via_plating_is_job_specific_and_unaccepted": true
   },
   "current_width_screens": [
-    {"current_a": 5.0, "minimum_width_mm": 2.765521},
-    {"current_a": 4.0, "minimum_width_mm": 2.032863},
-    {"current_a": 3.3, "minimum_width_mm": 1.559093},
-    {"current_a": 0.3, "minimum_width_mm": 0.057078}
+    {
+      "current_a": 5.0,
+      "minimum_width_mm": 2.765521
+    },
+    {
+      "current_a": 4.0,
+      "minimum_width_mm": 2.032863
+    },
+    {
+      "current_a": 3.3,
+      "minimum_width_mm": 1.559093
+    },
+    {
+      "current_a": 0.3,
+      "minimum_width_mm": 0.057078
+    }
   ],
   "numeric_classes": [
     {
@@ -178,14 +228,53 @@
     }
   ],
   "netclass_assignments": {
-    "PWR_INPUT_5A": ["VBAT_RAW", "VBAT_FUSED", "VBAT_PROTECTED", "VBAT_SYS"],
-    "PWR_RETURN_5A": ["GND_PWR"],
-    "PWR_RAIL_4A": ["3V3_DIGITAL", "3V8_MODEM", "GND_DIGITAL", "GND_MODEM"],
-    "PWR_RAIL_0P3A": ["1V8_MIC", "GND_MIC"],
-    "PWR_SWITCH_4A": ["SW_3V3", "SW_3V8"],
-    "PWR_LOCAL": ["BOOT_3V3", "BOOT_3V8", "LM74700_VCAP", "MODE_3V3", "MODE_3V8", "REV_GATE", "RT_3V3", "RT_3V8"],
-    "PWR_SENSE": ["FB_3V8", "SHUNT_LOAD_SENSE", "SHUNT_SOURCE_SENSE"],
-    "CONTROL": ["EN_AUX", "EN_MODEM", "FAULT", "I2C2_SCL", "I2C2_SDA", "PG_3V8", "PWR_GOOD"]
+    "PWR_INPUT_5A": [
+      "VBAT_RAW",
+      "VBAT_FUSED",
+      "VBAT_PROTECTED",
+      "VBAT_SYS"
+    ],
+    "PWR_RETURN_5A": [
+      "GND_PWR"
+    ],
+    "PWR_RAIL_4A": [
+      "3V3_DIGITAL",
+      "3V8_MODEM",
+      "GND_DIGITAL",
+      "GND_MODEM"
+    ],
+    "PWR_RAIL_0P3A": [
+      "1V8_MIC",
+      "GND_MIC"
+    ],
+    "PWR_SWITCH_4A": [
+      "SW_3V3",
+      "SW_3V8"
+    ],
+    "PWR_LOCAL": [
+      "BOOT_3V3",
+      "BOOT_3V8",
+      "LM74700_VCAP",
+      "MODE_3V3",
+      "MODE_3V8",
+      "REV_GATE",
+      "RT_3V3",
+      "RT_3V8"
+    ],
+    "PWR_SENSE": [
+      "FB_3V8",
+      "SHUNT_LOAD_SENSE",
+      "SHUNT_SOURCE_SENSE"
+    ],
+    "CONTROL": [
+      "EN_AUX",
+      "EN_MODEM",
+      "FAULT",
+      "I2C2_SCL",
+      "I2C2_SDA",
+      "PG_3V8",
+      "PWR_GOOD"
+    ]
   },
   "acceptance_boundary": {
     "numeric_input_for_evt_engineering_routing_candidate": true,

@@ -61,9 +61,8 @@ def native_board_state(board: str) -> dict[str, object]:
 def require_pwr_spec(value: str, context: str) -> None:
     normalized = value.lower()
     require("4-layer" in normalized, f"{context}: four-layer statement missing")
-    require("outer 2 oz target" in normalized, f"{context}: outer-copper target missing")
-    require("inner 1 oz target" in normalized, f"{context}: inner-copper target missing")
-    require("pending dfm" in normalized, f"{context}: final-stackup DFM interlock missing")
+    require("outer 2 oz" in normalized, f"{context}: outer-copper value missing")
+    require("inner 1 oz" in normalized, f"{context}: inner-copper value missing")
 
 
 def audit() -> dict[str, object]:
@@ -87,8 +86,8 @@ def audit() -> dict[str, object]:
                 f"{board}: authority thickness drift")
         require(row["Thickness_Status"] == expected["thickness_status"],
                 f"{board}: thickness-status drift")
-        require(row["Final_Stackup_Status"].startswith("OPEN_"),
-                f"{board}: final stackup must remain explicitly open")
+        require(row["Final_Stackup_Status"].startswith("EVT_ACCEPTED_"),
+                f"{board}: EVT stackup/process is not accepted")
         require(bool(row["Release_Blockers"].strip()),
                 f"{board}: release blockers missing")
 
@@ -100,20 +99,20 @@ def audit() -> dict[str, object]:
                 f"{board}: native thickness differs from authority")
 
     pwr_row = by_board["PCB-PWR"]
-    require(pwr_row["Copper_Weight_Status"] == "TARGET_ONLY_NOT_FROZEN",
-            "PCB-PWR copper weights must remain target-only")
-    require("outer 2 oz target" in pwr_row["Copper_Weight_Target"],
-            "PCB-PWR outer-copper target missing")
-    require("inner 1 oz target" in pwr_row["Copper_Weight_Target"],
-            "PCB-PWR inner-copper target missing")
+    require(pwr_row["Copper_Weight_Status"] == "FROZEN_EVT_PUBLIC_STANDARD",
+            "PCB-PWR copper weights are not frozen for EVT")
+    require("outer 2 oz" in pwr_row["Copper_Weight_Target"],
+            "PCB-PWR outer-copper value missing")
+    require("inner 1 oz" in pwr_row["Copper_Weight_Target"],
+            "PCB-PWR inner-copper value missing")
 
     pwr_status = json.loads(
         (ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json").read_text(encoding="utf-8")
     )
     layout = pwr_status["native_layout"]
     require(layout["copper_layers"] == 4, "PCB-PWR status layer count drift")
-    require(layout["layer_count_status"] == "FROZEN_REV_A_FINAL_STACKUP_OPEN",
-            "PCB-PWR status must separate frozen layer count from open final stackup")
+    require(layout["layer_count_status"] == "FROZEN_REV_A_EVT_STACKUP_ACCEPTED",
+            "PCB-PWR status does not record accepted EVT stackup")
     require(layout["thickness_status"] == "FROZEN_EVT_DIM_003_1P6_PLUS_MINUS_0P16",
             "PCB-PWR EVT thickness authority differs")
 
@@ -160,7 +159,7 @@ def audit() -> dict[str, object]:
     return {
         "schema": "dioneya-pcb-layer-count-authority-audit-v1",
         "configuration": "EVT-PRE-20 Rev.A",
-        "status": "PASS_CONTROLLED_LAYER_COUNTS_FINAL_STACKUPS_OPEN",
+        "status": "PASS_CONTROLLED_LAYER_COUNTS_EVT_STACKUPS_ACCEPTED",
         "manufacturing_release": False,
         "authority": str(AUTHORITY.relative_to(ROOT)),
         "native_boards": native,

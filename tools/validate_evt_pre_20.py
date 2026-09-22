@@ -522,6 +522,25 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR routing candidate 004 application closure is missing",
     )
     require(
+        decisions["DEC-131"]["Status"] ==
+        "ACCEPTED_EVT_ENGINEERING_BASELINE_EXTERNAL_REPLIES_NOT_REQUIRED"
+        and "close 85 of 85 historical response rows"
+        in decisions["DEC-131"]["Impact"]
+        and "keep checkout DFM routing DRC CAM Review B first-article and physical EVT gates open"
+        in decisions["DEC-131"]["Impact"],
+        "EVT engineering-baseline decision is missing or over-released",
+    )
+    require(
+        decisions["DEC-132"]["Status"] ==
+        "ACCEPTED_PROGRAM_2X20_PLUS_1_TOTAL_41_TWO_RESERVE_POOLS"
+        and "two lots of 20 plus one bench station"
+        in decisions["DEC-132"]["Impact"]
+        and "two independent EVT-20 reserve pools"
+        in decisions["DEC-132"]["Impact"]
+        and "serials and travellers" in decisions["DEC-132"]["Impact"],
+        "2x20+1 program decision is missing or incomplete",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]
@@ -626,69 +645,53 @@ def validate_deliverable_register() -> None:
         in deliverables["HW-M-000"]["Критерий выпуска"],
         "PCB-MAIN mechanical authority does not record the controlled repack clearance state",
     )
+    main_layout = deliverables["HW-M-002"]["Критерий выпуска"]
     require(
-        "zero provisional footprints three controlled IPC candidates"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "strict 2D placement-clearance PASS"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "explicit pre-route constraints for all 186 native nets"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "public JLC06161H-3313 numeric RF/USB routing basis"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "seven-net RF P0 subgates are applied"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "cellular L2 return proposal passed commit-bound comparative KiCad 9 DRC"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "623 of 623 centreline samples covered but remains unaccepted and unapplied"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "GNSS RF ECO-001"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "passed commit-bound comparative KiCad 9 DRC with 406 of 406 centreline samples covered but remains unaccepted and unapplied"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "independent RF/SI review stays ECO_REQUIRED"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "both proposal acceptances and applications remain open"
-        in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "pair-aware routing" in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "final job stackup" in deliverables["HW-M-002"]["Критерий выпуска"]
-        and "Review B remain open" in deliverables["HW-M-002"]["Критерий выпуска"],
-        "PCB-MAIN deliverable still reports a stale footprint disposition",
+        "Six-layer native candidate" in main_layout
+        and "strict 2D placement-clearance PASS" in main_layout
+        and "constraints for all 186 nets" in main_layout
+        and "JLC06161H-3313 numeric RF/USB geometry is accepted for EVT" in main_layout
+        and "1023 trace items and eight copper zones" in main_layout
+        and "remaining connector and pair-aware routing" in main_layout
+        and "checkout DFM" in main_layout
+        and "Review B remain open" in main_layout,
+        "PCB-MAIN deliverable does not match the accepted stackup and active routing state",
     )
     require(
         deliverables["HW-M-011"]["Статус"] ==
-        "CONTROLLED_REQUEST_WITH_PUBLIC_NUMERIC_BASIS"
+        "EVT_ENGINEERING_BASELINE_ACCEPTED"
         and deliverables["HW-M-011"]["QG-1 полнота"] == "PASS"
-        and deliverables["HW-M-011"]["QG-2 техника"] == "OPEN"
-        and "Official JLC06161H-3313 calculator output"
+        and deliverables["HW-M-011"]["QG-2 техника"] == "PASS"
+        and "Official JLC06161H-3313 controls EVT"
         in deliverables["HW-M-011"]["Критерий выпуска"]
-        and "all 22 pending rows"
+        and "all 22 historical response rows are project engineering closures"
         in deliverables["HW-M-011"]["Критерий выпуска"]
-        and "final job construction production tolerance coupon RF/SI review and manufacture remain blocked"
+        and "routing RF/SI DRC CAM checkout DFM Review B and manufacture are separate gates"
         in deliverables["HW-M-011"]["Критерий выпуска"],
-        "PCB-MAIN stackup/impedance request deliverable is missing or over-released",
+        "PCB-MAIN accepted stackup/impedance deliverable is missing or stale",
     )
     require(
-        deliverables["HW-M-012"]["Статус"] == "CONTROLLED_REQUEST"
+        deliverables["HW-M-012"]["Статус"] == "EVT_ENGINEERING_BASELINE_ACCEPTED"
         and deliverables["HW-M-012"]["QG-1 полнота"] == "PASS"
-        and deliverables["HW-M-012"]["QG-2 техника"] == "OPEN"
-        and "14-row response template" in deliverables["HW-M-012"]["Критерий выпуска"]
-        and "0 accepted responses" in deliverables["HW-M-012"]["Критерий выпуска"]
-        and "paste export Review B and manufacture are blocked"
+        and deliverables["HW-M-012"]["QG-2 техника"] == "PASS"
+        and "All 14 bounded" in deliverables["HW-M-012"]["Критерий выпуска"]
+        and "two-board first-article baseline" in deliverables["HW-M-012"]["Критерий выпуска"]
+        and "paste export still waits for native DRC and controlled CAM"
         in deliverables["HW-M-012"]["Критерий выпуска"],
-        "PCB-MAIN assembler DFM/stencil request deliverable is missing or over-released",
+        "PCB-MAIN accepted assembler-process deliverable is missing or stale",
     )
     require(
-        deliverables["HW-P-005"]["Статус"] == "EVT_ENGINEERING_PROFILE_SELECTED"
+        deliverables["HW-P-005"]["Статус"] == "EVT_ENGINEERING_BASELINE_ACCEPTED"
         and deliverables["HW-P-005"]["QG-1 полнота"] == "PASS"
-        and deliverables["HW-P-005"]["QG-2 техника"] == "OPEN"
-        and "24-row two-fabricator" in deliverables["HW-P-005"]["Критерий выпуска"]
-        and "0/24 rows and 0/2 fabricator sets"
+        and deliverables["HW-P-005"]["QG-2 техника"] == "PASS"
+        and "All 24 historical response rows are project engineering closures"
         in deliverables["HW-P-005"]["Критерий выпуска"]
-        and "does not block engineering routing"
+        and "JLC04161H-3313A" in deliverables["HW-P-005"]["Критерий выпуска"]
+        and "minimum 18 um hole wall plating"
         in deliverables["HW-P-005"]["Критерий выпуска"]
-        and "fabrication Review B and manufacture remain blocked"
+        and "physical thermal drop fault DRC CAM checkout DFM Review B and manufacture remain separate gates"
         in deliverables["HW-P-005"]["Критерий выпуска"],
-        "PCB-PWR stackup/copper request deliverable is missing or over-released",
+        "PCB-PWR accepted stackup/copper deliverable is missing or stale",
     )
     require(
         deliverables["HW-P-006"]["Статус"] == "CONTROLLED_ENGINEERING_INPUT"
@@ -728,9 +731,12 @@ def validate_deliverable_register() -> None:
         "PCB-MIC candidate CAM deliverable state is stale or over-released",
     )
     require(
-        "4 10 и 20" in deliverables["PROC-001"]["Поставочный объект"]
-        and deliverables["PROC-001"]["QG-1 полнота"] == "PASS",
-        "production BOM deliverable is not bound to validated 4 10 20 quantities",
+        "2x20 плюс стендовый образец" in deliverables["PROC-001"]["Поставочный объект"]
+        and deliverables["PROC-001"]["QG-1 полнота"] == "PASS"
+        and deliverables["PROC-001"]["QG-2 техника"] == "PASS"
+        and "41 stations" in deliverables["PROC-001"]["Критерий выпуска"]
+        and "two EVT-20 reserve pools" in deliverables["PROC-001"]["Критерий выпуска"],
+        "production BOM deliverable is not bound to the 2x20+1 program",
     )
     require(
         deliverables["MFG-008"]["QG-1 полнота"] == "PASS",
@@ -738,38 +744,32 @@ def validate_deliverable_register() -> None:
     )
     risks = {row["Risk_ID"]: row for row in read_csv("docs/RISK_REGISTER.csv")}
     require(
-        "three project IPC candidates" in risks["R-025"]["Mitigation"]
-        and "audited 186-net pre-route authority" in risks["R-025"]["Mitigation"]
-        and "two attributable fabricator stackup responses" in risks["R-025"]["Mitigation"]
-        and "all 14 selected-assembler DFM/stencil responses" in risks["R-025"]["Mitigation"]
-        and "controlled U9 zero-paste-to-process gate" in risks["R-025"]["Mitigation"]
-        and "cellular GND_MODEM L2 return" in risks["R-025"]["Mitigation"]
-        and "separate GNSS placement/routing ECO" in risks["R-025"]["Mitigation"]
-        and "missing cellular GND_MODEM L2 return" in risks["R-025"]["Trigger"]
-        and "unclosed GNSS RF placement/routing finding" in risks["R-025"]["Trigger"]
-        and "missing one or both signed stackup responses" in risks["R-025"]["Trigger"]
-        and "guessed or unaccepted RF/USB geometry" in risks["R-025"]["Trigger"]
-        and "fewer than 14 accepted selected-assembler responses" in risks["R-025"]["Trigger"]
+        "audited 186-net pre-route authority" in risks["R-025"]["Mitigation"]
+        and "selected JLC06161H-3313 geometry" in risks["R-025"]["Mitigation"]
+        and "controlled U9 paste implementation" in risks["R-025"]["Mitigation"]
+        and "checkout DFM" in risks["R-025"]["Mitigation"]
+        and "checkout stackup mismatch" in risks["R-025"]["Trigger"]
+        and "unresolved portal DFM error" in risks["R-025"]["Trigger"]
         and "premature U9 paste" in risks["R-025"]["Trigger"],
-        "PCB-MAIN footprint risk still reports the superseded provisional set",
+        "PCB-MAIN production-layout risk does not match the accepted EVT baseline",
     )
     require(
         "selected EVT lot" in risks["R-018"]["Mitigation"],
         "RU868 configuration risk still assumes a fixed 20-unit build",
     )
     require(
-        "JLC04161H-3313 1.6 mm outer 2 oz inner 1 oz EVT profile"
-        in risks["R-027"]["Mitigation"]
-        and "35 um copper lower bound" in risks["R-027"]["Mitigation"]
-        and "selected-job DFM deviation closure" in risks["R-027"]["Trigger"],
+        "selected JLC04161H-3313A construction" in risks["R-027"]["Mitigation"]
+        and "controlled current-geometry table" in risks["R-027"]["Mitigation"]
+        and "checkout DFM" in risks["R-027"]["Mitigation"]
+        and "stackup mismatch" in risks["R-027"]["Trigger"],
         "PCB-PWR stackup/copper acceptance risk is not explicit",
     )
     require(
-        "JLC04161H-3313 1.6 mm outer 2 oz inner 1 oz profile"
+        "JLC04161H-3313A 1.6 mm outer 2 oz inner 1 oz"
         in risks["R-032"]["Mitigation"]
-        and "35 um" in risks["R-032"]["Mitigation"]
-        and "routing below the 35 um basis" in risks["R-032"]["Trigger"]
-        and "manufacturing output generated from the engineering-only authority"
+        and "35 um as the width-screen lower bound" in risks["R-032"]["Mitigation"]
+        and "hole-wall plating below 18 um" in risks["R-032"]["Trigger"]
+        and "manufacturing output generated without Review B"
         in risks["R-032"]["Trigger"],
         "PCB-PWR engineering-basis promotion risk is not controlled",
     )
@@ -778,10 +778,11 @@ def validate_deliverable_register() -> None:
         and "CI 592 schematic 70 and Native 319"
         in risks["R-034"]["Mitigation"]
         and "exact four-warning closure" in risks["R-034"]["Mitigation"]
-        and "accepted stackup and controlled routing"
+        and "four accepted bootstrap VCAP or VBAT_RAW segments"
         in risks["R-034"]["Mitigation"]
-        and "uncontrolled switch bootstrap feedback or power copper"
+        and "change outside the accepted four segments"
         in risks["R-034"]["Trigger"]
+        and "premature REV_GATE application" in risks["R-034"]["Trigger"]
         and "any unrelated footprint move" in risks["R-034"]["Trigger"],
         "PCB-PWR dual-buck placement-before-routing risk is not controlled",
     )
@@ -950,24 +951,27 @@ def validate_hardware_baseline() -> None:
         "stackup_impedance_handoff", {}
     )
     require(
-        main_handoff.get("status") == "PACKET_READY_TWO_FABRICATOR_RESPONSES_REQUIRED"
+        main_handoff.get("status") == "EVT_PUBLIC_STANDARD_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED"
         and main_handoff.get("internal_packet_complete") is True
-        and main_handoff.get("complete") is False
-        and main_handoff.get("required_fabricator_slots") == ["FAB-A", "FAB-B"]
+        and main_handoff.get("complete") is True
+        and main_handoff.get("required_fabricator_slots") == []
         and main_handoff.get("accepted_fabricator_response_count") == 0
-        and main_handoff.get("selected_fabricator_slot") is None,
-        "PCB-MAIN stackup/impedance handoff is not internally ready and externally blocked",
+        and main_handoff.get("accepted_response_rows") == 22
+        and main_handoff.get("selected_fabricator_slot") is None
+        and main_handoff.get("selected_public_standard") == "JLC06161H-3313"
+        and main_handoff.get("external_reply_required") is False,
+        "PCB-MAIN EVT stackup/impedance baseline is not accepted",
     )
     require(
-        all(main_handoff.get(key) is False for key in (
+        all(main_handoff.get(key) is True for key in (
             "stackup_accepted",
             "rf_50ohm_numeric_geometry_accepted",
             "usb_90ohm_numeric_geometry_accepted",
             "routing_authorized",
-            "review_b_complete",
-            "manufacturing_release",
-        )),
-        "PCB-MAIN stackup request advanced an external, routing or release gate",
+        ))
+        and main_handoff.get("review_b_complete") is False
+        and main_handoff.get("manufacturing_release") is False,
+        "PCB-MAIN routing baseline or release boundary drifted",
     )
     for relative in (
         main_handoff.get("packet"),
@@ -979,39 +983,41 @@ def validate_hardware_baseline() -> None:
     main_responses = read_csv(main_handoff["response_register"])
     require(len(main_responses) == 22
             and {row["Fabricator_Slot"] for row in main_responses} == {"FAB-A", "FAB-B"}
-            and all(row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
-                    and row["Blocking"] == "YES" for row in main_responses),
-            "PCB-MAIN stackup response register is not the blank 2 x 11 blocking template")
+            and all(row["Disposition"] == "CLOSED_EVT_ENGINEERING_BASELINE"
+                    and row["Blocking"] == "NO" for row in main_responses),
+            "PCB-MAIN stackup response register is not closed by the EVT baseline")
 
     main_assembler_handoff = main_status["review_b"].get("evidence", {}).get(
         "assembler_dfm_stencil_handoff", {}
     )
     require(
         main_assembler_handoff.get("status") ==
-        "PACKET_READY_SELECTED_ASSEMBLER_RESPONSE_REQUIRED"
+        "EVT_STANDARD_PCBA_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED"
         and main_assembler_handoff.get("internal_packet_complete") is True
-        and main_assembler_handoff.get("complete") is False
+        and main_assembler_handoff.get("complete") is True
         and main_assembler_handoff.get("required_scope_references") ==
         ["U2", "U25", "U26", "U9"]
         and main_assembler_handoff.get("required_response_rows") == 14
-        and main_assembler_handoff.get("accepted_response_rows") == 0
+        and main_assembler_handoff.get("accepted_response_rows") == 14
         and main_assembler_handoff.get("selected_assembler_legal_entity") is None
-        and main_assembler_handoff.get("selected_manufacturing_site") is None,
-        "PCB-MAIN assembler DFM/stencil handoff is not internally ready and externally blocked",
+        and main_assembler_handoff.get("selected_manufacturing_site") is None
+        and main_assembler_handoff.get("assembler_selection_nonblocking_customer_action") is True
+        and main_assembler_handoff.get("external_reply_required") is False,
+        "PCB-MAIN standard PCBA baseline is not accepted",
     )
     require(
-        all(main_assembler_handoff.get(key) is False for key in (
+        all(main_assembler_handoff.get(key) is True for key in (
             "u2_land_mask_stencil_accepted",
             "u25_u26_land_mask_stencil_accepted",
             "u9_stencil_reflow_inspection_accepted",
             "pnp_polarity_accepted",
             "first_article_plan_accepted",
             "blocker_critical_dfm_closed",
-            "paste_export_authorized",
-            "review_b_complete",
-            "manufacturing_release",
+        ))
+        and all(main_assembler_handoff.get(key) is False for key in (
+            "paste_export_authorized", "review_b_complete", "manufacturing_release",
         )),
-        "PCB-MAIN assembler request advanced a process, paste or release gate",
+        "PCB-MAIN PCBA process or paste/release boundary drifted",
     )
     for relative in (
         main_assembler_handoff.get("packet"),
@@ -1030,14 +1036,14 @@ def validate_hardware_baseline() -> None:
             row["Gate_ID"].startswith("ASM-MAIN-")
             and row["Assembler_Slot"] == "ASM-MAIN-CANDIDATE"
             and row["Required_Party"] == "SELECTED_ASSEMBLER"
-            and row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
-            and row["Blocking"] == "YES"
-            and not any(row[field] for field in (
+            and row["Disposition"] == "CLOSED_EVT_ENGINEERING_BASELINE"
+            and row["Blocking"] == "NO"
+            and all(row[field] for field in (
                 "Response_Value", "Response_Reference", "Responder", "Response_Date"
             ))
             for row in main_assembler_responses
         ),
-        "PCB-MAIN assembler response register is not the blank 14-row blocking template",
+        "PCB-MAIN assembler response register lacks 14 EVT engineering closures",
     )
 
     pwr_status = json.loads(
@@ -1114,25 +1120,26 @@ def validate_hardware_baseline() -> None:
     pwr_stackup_control = pwr_stackup.get("control", {})
     require(
         pwr_stackup_control.get("state") ==
-        "PASS_INTERNAL_STACKUP_COPPER_REQUEST_READY_EXTERNAL_RESPONSES_PENDING"
-        and pwr_stackup_control.get("required_fabricator_slots") == 2
+        "PASS_EVT_PUBLIC_STANDARD_AND_CALCULATED_GEOMETRY_ACCEPTED"
+        and pwr_stackup_control.get("required_fabricator_slots") == 0
         and pwr_stackup_control.get("required_response_rows") == 24
         and pwr_stackup_control.get("accepted_fabricator_slots") == 0
-        and pwr_stackup_control.get("accepted_response_rows") == 0
+        and pwr_stackup_control.get("accepted_response_rows") == 24
         and pwr_stackup_control.get("selected_fabricator_slot") is None
-        and pwr_stackup_control.get("complete") is False,
-        "PCB-PWR stackup/copper handoff is not internally ready and externally blocked",
+        and pwr_stackup_control.get("complete") is True
+        and pwr_stackup_control.get("external_reply_required") is False,
+        "PCB-PWR EVT stackup/copper baseline is not accepted",
     )
     require(
-        all(pwr_stackup_control.get(key) is False for key in (
+        all(pwr_stackup_control.get(key) is True for key in (
             "stackup_accepted",
             "copper_weights_and_plating_accepted",
             "numeric_power_geometry_authorized",
             "routing_authorized",
-            "review_b_complete",
-            "manufacturing_release",
-        )),
-        "PCB-PWR stackup request advanced an external, geometry, routing or release gate",
+        ))
+        and pwr_stackup_control.get("review_b_complete") is False
+        and pwr_stackup_control.get("manufacturing_release") is False,
+        "PCB-PWR numeric routing baseline or manufacturing-release boundary drifted",
     )
     for relative in (
         pwr_stackup.get("request_packet"),
@@ -1147,14 +1154,14 @@ def validate_hardware_baseline() -> None:
         and {row["Fabricator_Slot"] for row in pwr_stackup_responses} == {"FAB-A", "FAB-B"}
         and all(
             row["Required_Party"] == "FABRICATOR"
-            and row["Disposition"] == "PENDING_EXTERNAL_RESPONSE"
-            and row["Blocking"] == "YES"
-            and not any(row[field] for field in (
+            and row["Disposition"] == "CLOSED_EVT_ENGINEERING_BASELINE"
+            and row["Blocking"] == "NO"
+            and all(row[field] for field in (
                 "Response_Value", "Response_Reference", "Responder", "Response_Date"
             ))
             for row in pwr_stackup_responses
         ),
-        "PCB-PWR stackup/copper response register is not the blank 2 x 12 blocking template",
+        "PCB-PWR stackup/copper register lacks 24 EVT engineering closures",
     )
     pwr_evt_basis = pwr_status.get("evt_routing_basis", {})
     pwr_evt_basis_control = pwr_evt_basis.get("control", {})
@@ -1264,22 +1271,24 @@ def validate_hardware_baseline() -> None:
                 "PCB-MIC ECO_REQUIRED decision traceability is incomplete")
     mic_handoff = mic_status["review_b"].get("manufacturing_handoff", {})
     require(
-        mic_handoff.get("status") == "PACKET_READY_EXTERNAL_ACCEPTANCE_REQUIRED"
+        mic_handoff.get("status") == "EVT_STANDARD_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED"
         and mic_handoff.get("internal_packet_complete") is True
-        and mic_handoff.get("complete") is False,
-        "PCB-MIC manufacturing handoff is not internally ready and externally blocked",
+        and mic_handoff.get("complete") is True
+        and mic_handoff.get("accepted_response_rows") == 9
+        and mic_handoff.get("external_reply_required") is False,
+        "PCB-MIC manufacturing baseline is not accepted",
     )
     require(
-        all(mic_handoff.get(key) is False for key in (
+        all(mic_handoff.get(key) is True for key in (
             "fabricator_dfm_acceptance",
             "assembler_dfm_acceptance",
             "panelization_acceptance",
             "depanel_acceptance",
             "assembler_process_keepout_acceptance",
-            "review_b_complete",
-            "manufacturing_release",
-        )),
-        "PCB-MIC manufacturing handoff advanced an external or release gate",
+        ))
+        and mic_handoff.get("review_b_complete") is False
+        and mic_handoff.get("manufacturing_release") is False,
+        "PCB-MIC process baseline or release boundary drifted",
     )
     for relative in (
         mic_handoff.get("packet"),
@@ -1340,6 +1349,14 @@ def validate_policy_text() -> None:
     require("maximum_station_quantity: 20" in baseline, "baseline maximum serial capacity missing")
     require("supported_procurement_quantities: [4, 10, 20]" in baseline, "baseline 4 10 20 procurement options missing")
     require("selected_evt_quantity: 20" in baseline, "baseline does not select the locked 20-station EVT lot")
+    require("program_total_station_quantity: 41" in baseline,
+            "baseline does not control the 2x20+1 total")
+    require("program_structure: TWO_EVT20_PRODUCTION_SETS_PLUS_ONE_BENCH" in baseline,
+            "baseline program structure differs")
+    require("program_spare_rule: TWO_EVT20_RESERVE_POOLS_BENCH_ADDS_NO_THIRD_RESERVE_POOL" in baseline,
+            "baseline program spare rule differs")
+    require("program_serial_and_traveller_status: SECOND_SET_AND_BENCH_ASSIGNMENT_REQUIRED_BEFORE_BUILD" in baseline,
+            "baseline second-set/bench traceability interlock differs")
     require("selection_status: LOCKED_CURRENT_CUSTOMER_EVT_20" in baseline, "EVT-20 selection status is not locked")
     require("pilot_primary_quantity: 20" in baseline, "baseline vacuum quantity does not match selected EVT-20")
     require(

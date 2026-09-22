@@ -35,7 +35,7 @@
     "harness_logical_pinout": "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "harness_logical_pinout_sha256": "421b833fa809b099b310302fd942c2678d98f27da33a41d6e7b25176dfbab17d",
     "harness_manufacturing_schedule": "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv",
-    "harness_manufacturing_schedule_sha256": "7c7181ff814f05db1d94c0a9f9bd3a60fcebd4de0a00cec5312c2a0f23c0035c",
+    "harness_manufacturing_schedule_sha256": "f9f09a006f1d9cb4d74747bd239f7b22b4c55ac2d8d073dc1224922666dd55ea",
     "open_dimensions": "mechanics/common/OPEN_DIMENSIONS.csv",
     "open_dimensions_sha256": "44e3f597f65981c35f5d0657172bc1ba9ce87ee680e7fe25d3eea15c9cda8f10",
     "accepted_evt_authority": "hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.json",
@@ -46,33 +46,71 @@
     "frozen_evt_step_sha256": "28482b57e8e8db09b198add6fefbbb88386f10c46ea6740cc84ab20e13c6a949"
   },
   "accepted_evt_basis": {
-    "outline_mm": [90.0, 60.0],
+    "outline_mm": [
+      90.0,
+      60.0
+    ],
     "outline_tolerance_mm": 0.15,
     "finished_thickness_mm": 1.6,
     "finished_thickness_tolerance_mm": 0.16,
     "mounting_holes": 4,
     "mounting_hole_diameter_mm": 3.4,
     "mounting_hole_coordinates_mm": {
-      "H1": [5.0, 5.0],
-      "H2": [82.0, 5.0],
-      "H3": [68.0, 55.0],
-      "H4": [5.0, 55.0]
+      "H1": [
+        5.0,
+        5.0
+      ],
+      "H2": [
+        82.0,
+        5.0
+      ],
+      "H3": [
+        68.0,
+        55.0
+      ],
+      "H4": [
+        5.0,
+        55.0
+      ]
     },
     "mounting_copper_exclusion_diameter_mm": 8.0,
     "mounting_fitted_component_exclusion_diameter_mm": 10.0,
     "copper_layers": 4,
     "native_trace_items": 0,
     "native_copper_zones": 0,
-    "j1_reference_position_mm": [6.0, 28.0],
+    "j1_reference_position_mm": [
+      6.0,
+      28.0
+    ],
     "j1_reference_rotation_deg": 0.0,
     "j1_service_status": "EVT_TOP_ENTRY_AND_CABLE_VOLUME_ACCEPTED",
-    "j2_reference_position_mm": [90.0, 56.0],
+    "j2_reference_position_mm": [
+      90.0,
+      56.0
+    ],
     "j2_reference_rotation_deg": 270.0,
     "j2_service_status": "EVT_EAST_EXIT_AND_CABLE_VOLUME_ACCEPTED",
     "dft_reference_row": {
-      "references": ["TP1", "TP2", "TP3", "TP4", "TP5", "TP6", "TP7", "TP8", "TP9", "TP10"],
-      "first_xy_mm": [25.0, 56.0],
-      "last_xy_mm": [47.86, 56.0],
+      "references": [
+        "TP1",
+        "TP2",
+        "TP3",
+        "TP4",
+        "TP5",
+        "TP6",
+        "TP7",
+        "TP8",
+        "TP9",
+        "TP10"
+      ],
+      "first_xy_mm": [
+        25.0,
+        56.0
+      ],
+      "last_xy_mm": [
+        47.86,
+        56.0
+      ],
       "pitch_mm": 2.54,
       "side": "TOP",
       "status": "EVT_FIXTURE_DATUM_AND_PROBE_ACCESS_ACCEPTED"
@@ -101,10 +139,16 @@
   ],
   "accepted_authority": {
     "authority": "hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_A.json",
-    "final_outline_mm": [90.0, 60.0],
+    "final_outline_mm": [
+      90.0,
+      60.0
+    ],
     "finished_thickness_mm": 1.6,
     "mounting_pattern": "H1_H4_ROUND_NPTH_3P4_D8_COPPER_D10_FITTED_BODY",
-    "assembled_z_envelope_mm": [-3.0, 18.0],
+    "assembled_z_envelope_mm": [
+      -3.0,
+      18.0
+    ],
     "j1_mating_and_cable_volume": "ACCEPTED_EVT_TOP_ENTRY_PLUS_Z_THEN_WEST",
     "j2_mating_and_cable_volume": "ACCEPTED_EVT_EAST_EXIT_PLUS_X",
     "dft_fixture_and_probe_volume": "ACCEPTED_EVT_H1_H2_DATUM_TOP_POGO",

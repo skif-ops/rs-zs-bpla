@@ -1,12 +1,19 @@
 # PCB-MIC Rev.A manufacturing handoff
 
-Status: `PACKET READY / EXTERNAL ACCEPTANCE REQUIRED / REVIEW B OPEN / NOT FOR MANUFACTURE`
+Status: `EVT STANDARD PROCESS ACCEPTED / EXTERNAL REPLY NOT REQUIRED / REVIEW B OPEN / NOT FOR MANUFACTURE`
 
-This packet is the controlled input for PCB fabricator and PCBA assembler DFM. It is
+Decision `2026-09-21`: the standard two-layer/PCBA process and the tightly
+bounded MK1 acoustic-land exception are accepted in
+`EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md`. The nine register rows are
+engineering-baseline closures, not claimed factory replies. First-panel bore
+inspection, native DRC/CAM and Review B remain mandatory.
+
+Historically, this packet was the controlled input for PCB fabricator and PCBA assembler DFM. It is
 not a quotation acceptance, purchase release, panel approval or fabrication order.
 The returned response must be recorded in
-`hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv`. Internal packet readiness cannot
-change Review B or manufacturing release to `PASS`.
+`hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv`. Its nine technical rows are
+now project engineering closures for EVT. This cannot change Review B or
+manufacturing release to `PASS`.
 
 ## Source binding
 
@@ -41,9 +48,11 @@ The coordinate origin is the lower-left corner of the unit-board outline.
 | H2 | 2.2 mm NPTH at X=20.0 mm, Y=16.65 mm |
 | Fitted side | C1, J1, MK1 and R1 on top; no fitted bottom references |
 
-The MK1-local design rule is 0.125 mm minimum copper clearance and 0.10 mm minimum
-NPTH-to-copper clearance. The selected fabricator must explicitly accept this
-capability. A zero-violation internal DRC does not replace that acceptance.
+The MK1-local design rule is 0.125 mm minimum copper clearance. Ordinary
+NPTH-to-copper clearance is 0.20 mm; the sole 0.10 mm exception applies only to
+the manufacturer-derived MK1 ground land around the acoustic bore, never to a
+signal trace or zone. First-panel inspection must confirm a clean bore without
+copper breakout. A zero-violation internal DRC does not replace that inspection.
 
 ## Controlled candidate outputs
 
@@ -51,8 +60,8 @@ The handoff must use one commit-bound archive containing the Gerber job and laye
 Excellon drill, IPC-356, pick-and-place CSV, manufacturing BOM, assembly/fabrication
 PDF and board-sized F.Cu/B.Cu review SVGs. Every file must match the archive SHA-256
 manifest. The PCB Native Gate artifact also carries the handoff audit, this packet,
-the machine contract and the blank response register under `PCB-MIC/`. These outputs
-remain candidates until all response rows and Review B close.
+the machine contract and the engineering-closure register under `PCB-MIC/`.
+These outputs remain candidates until Review B closes.
 
 ## Panelization and depanel response
 
@@ -82,10 +91,11 @@ against the assembly drawing.
 
 ## Response and release rule
 
-All nine rows in `PCB_MIC_DFM_RESPONSE_REV_A.csv` start at
-`PENDING_EXTERNAL_ACCEPTANCE`. For each row, the responsible party supplies a response
-reference, responder and date. A proposed exception or source change remains open
-until it is dispositioned through the project ECO process.
+All nine rows in `PCB_MIC_DFM_RESPONSE_REV_A.csv` are
+`CLOSED_EVT_ENGINEERING_BASELINE`, cite the controlling manual and are
+non-blocking. They are not claimed factory replies. A checkout DFM error,
+first-panel defect or source change remains open until dispositioned through the
+project ECO process.
 
 Even after fabricator and assembler DFM acceptance, the membrane/cavity tolerance
 stack, assembled acoustic inspection, physical EVT calibration, independent Review-B

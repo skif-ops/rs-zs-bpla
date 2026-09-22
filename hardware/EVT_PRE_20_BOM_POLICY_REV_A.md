@@ -4,9 +4,13 @@ Status: `ACTIVE / TECHNICAL BOM QG-2 CONTROLLED / HARDWARE RELEASE BLOCKED`
 
 `hardware/EVT_PRE_20_BOM_REV_A.csv` is the generated controlled engineering BOM.
 `hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv` is its MPN-level procurement roll-up.
+`hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv` is the controlled aggregate
+for the actual program demand: two production sets of 20 stations plus one bench
+station, 41 stations total.
 `hardware/EVT_PRE_20_BOM_PRICE_ESTIMATE_REV_A.csv` is the non-binding budgetary
 price layer for the same procurement rows.
-Both contain explicit lot calculations for 4, 10 and 20 stations. Technical BOM QG-2
+The per-lot files contain explicit calculations for 4, 10 and 20 stations. The
+program aggregate derives every line from the 20-station authority. Technical BOM QG-2
 reports `PASS` when exact component identities, project-owned build-to-print article
 identities and quantity arithmetic are controlled. That result is not a factory release:
 supplier selection, job-specific manufacturing evidence and the hardware release gate
@@ -25,8 +29,17 @@ technical BOM QG-2 or the customer procurement handoff.
 `EVT-20` is selected for the current customer. The 4- and 10-station columns remain
 controlled comparison scenarios only; quantities and spare columns from different
 scenarios must never be mixed. The customer owns purchase execution. Selection does
-not authorize PCB/PCBA, harness or housing manufacture while job-specific DFM or the
-applicable technical hardware release remains open.
+not authorize PCB/PCBA, harness or housing manufacture while checkout DFM,
+first-article or the applicable technical hardware release remains open.
+
+`EVT-PRE-20` remains the configuration and traceability unit for one production
+set; it is not the total program quantity. The procurement program contains two
+separate EVT-20 sets and one bench station. The aggregate therefore uses 41 times
+each per-station quantity and two complete EVT-20 spare pools. The bench station
+does not create a third lot-level reserve. Serial/traveller allocation for the second
+set and bench station must be completed before either is built; the existing
+`DIO-EVT-001..020` register remains the first-set register until that controlled
+allocation is issued.
 
 ## Required line data
 
@@ -84,6 +97,10 @@ selected-process acceptance or the hardware release gate.
   terminals `43030-0038` and 12 control/I2C terminals `43030-0001`;
 - `Qty_N = Qty_per_station x N` and `Procure_qty_N = Qty_N + Spares_N` for
   `N = 4, 10, 20` on every engineering and procurement row.
+- For the program aggregate, `Base_qty_2x20_plus_1 = Qty_per_station x 41`,
+  `Spare_qty_two_evt20_lots = 2 x Spares_20`, and
+  `Procure_qty_2x20_plus_1` is their sum. Thus the selected full-PCBA track carries
+  45 PCB-MAIN assemblies, 45 PCB-PWR assemblies and 168 PCB-MIC assemblies.
 - The bare-PCB and assembled-PCBA tracks each carry exactly two spare boards of
   every design for every supported lot. Procurement quantities are therefore
   PCB-MAIN/PCB-PWR `N + 2` and PCB-MIC `4N + 2`; the two tracks are alternative
@@ -122,19 +139,21 @@ The PCBA and bare-PCB quantities must not be merged because they represent separ
 supplier quotations and alternative cost tracks, even though both now use the same
 fixed reserve of two boards per design. The full-PCBA quotation is the selected route;
 bare-PCB quotations remain non-selected alternatives. A PCB-PWR fabrication RFQ may
-collect a clearly marked provisional budgetary response, but it is not build
-authorization while `DIM-003`, the final stackup/copper weight, routing, CAM and
-Review B remain open.
+use the accepted EVT-only DIM-003 and `JLC04161H-3313A` copper baseline, but it is
+not build authorization while routing, DRC, CAM, checkout DFM and Review B remain
+open.
 
 These rows preserve exact scope and 4/10/20 arithmetic for the customer. Their
-commercial response fields are optional in the engineering repository. Technical
-fabricator, assembler and harness responses are controlled separately by the
-job-specific response registers and remain blocking where the design depends on
-the selected process.
+commercial response fields are optional in the engineering repository. For the
+test lot, technical PCB/PCBA/harness values are controlled by
+`EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md`; named-site replies are not
+blocking. Checkout DFM, first-article evidence and physical EVT gates remain
+mandatory. Series transfer restores supplier/process qualification.
 
 QG-2 (`tools/audit_evt_pre_20_bom_qg2.py`) independently compares freeze tables,
 checks exact fitted-line fields, independently reconstructs the 17 PCB-PWR passive
 groups from the 49-row authority, repeats the 4/10/20 lot and roll-up reconciliation,
+verifies the 2x20+1 program aggregate and its two-reserve-pool rule,
 verifies schematic RefDes coverage and binds all eight custom build-to-print identities
 to the supplier-open RFQ boundary. A QG-2 `PASS` releases the technical BOM identity
 and quantities only. It does not release routing, fabrication, assembly, harness or

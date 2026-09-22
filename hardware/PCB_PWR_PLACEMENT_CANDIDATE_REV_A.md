@@ -1,6 +1,6 @@
 # Дионея EVT-PRE-20 Rev.A - PCB-PWR provisional placement candidate
 
-Status: `FITTED 2D + EVT MOUNTING CLEARANCE PASS / DIM-003 18/18 EVT ACCEPTED / ROUTING ABSENT / NOT FOR MANUFACTURE`
+Status: `FITTED 2D + EVT MOUNTING CLEARANCE PASS / DIM-003 18/18 EVT ACCEPTED / THREE CONTROLLED ROUTING SEGMENTS APPLIED / ROUTING INCOMPLETE / NOT FOR MANUFACTURE`
 
 This authority creates a reviewable native-board canvas without claiming enclosure or
 fabrication approval. The four-copper-layer count is frozen for Rev.A by
@@ -51,6 +51,13 @@ unchanged `126 -> 126` unconnected items and no other DRC fingerprint delta.
 The four warning-only items are therefore closed; routing, Review B and CAM
 remain blocked by their independent gates.
 
+The authoritative successor is SHA-256
+`05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3`.
+It contains exactly four accepted F.Cu segments: both bootstrap connections,
+the LM74700 VCAP connection and the `VBAT_RAW` connection. It has zero vias and
+zero copper zones. The separate `PCB-PWR-REV-GATE-ROUTING-004` artifact is
+accepted but is not applied to the active board.
+
 ## Local input-capacitor placement evidence
 
 TI SNAS877 Table 8-3 requires both local `CIN=4.7 uF` and
@@ -63,8 +70,8 @@ center-to-center distances:
 | `U4` | `C12` | `6.00 mm` | `C21` | `2.60 mm` |
 
 These distances prove only that the intended parts occupy the correct local
-functional regions. They do not prove the final VIN-PGND loop geometry while the
-board has no traces or zones. C11/C12 effective capacitance at bias and
+functional regions. The four accepted partial-routing segments do not implement
+or prove the final VIN-PGND loop geometry. C11/C12 effective capacitance at bias and
 temperature, direct pad-first routing of C20/C21, and routed hot-loop review
 remain mandatory.
 
@@ -78,8 +85,9 @@ controlled by
 
 ## Hard interlocks
 
-The candidate must contain zero tracks, zero vias and zero copper zones. Gerber,
-drill, position and IPC-356 fabrication export remain prohibited. The controlled
+The active candidate must contain only the four accepted bootstrap/VCAP/VBAT_RAW
+segments, zero vias and zero copper zones; any other active copper fails this
+gate. Gerber, drill, position and IPC-356 fabrication export remain prohibited. The controlled
 EVT envelope STEP is the sole permitted mechanical export in this state. The independent
 audit checks the complete reference/net/footprint set, every candidate coordinate,
 the frozen layer count, accepted EVT outline/thickness and the closed EVT
@@ -98,11 +106,12 @@ placement interlock. `DIM-003` and the standard `JLC04161H-3313`, 1.6 mm,
 outer 2 oz / inner 1 oz EVT ordering profile are accepted as routing input;
 the routing candidate itself still requires its own controlled subgate.
 
-The two-fabricator stackup/copper request is controlled in
-`hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`. Its blank register
-remains `0/24` rows and `0/2` accepted fabricator sets as a job-specific DFM
-deviation channel. It does not block engineering routing or authorize fabrication.
+The historical stackup/copper request is controlled in
+`hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`. All `24/24` rows are
+closed by the EVT engineering baseline; no fabricator reply is required. Actual
+checkout DFM deviations still return as ECOs and this does not authorize fabrication.
 
-Review B still requires frozen mechanics, final stack-up and copper weight; high-current and
-Kelvin routing; hot-loop and switch-node control; thermal/current-density calculation;
+Review B still requires preservation of the accepted EVT stackup and mechanics;
+high-current and Kelvin routing; hot-loop and switch-node control; physical
+thermal/current-density evidence;
 TVS/fuse coordination; DRC; DFM; load-step, cold-start, fault, EMI and fixture evidence.

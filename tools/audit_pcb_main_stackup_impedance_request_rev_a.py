@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit the bounded PCB-MAIN stackup/impedance request packet.
+"""Audit the PCB-MAIN stackup/impedance request or accepted EVT basis.
 
 The packet may prove only that a controlled request and blank two-fabricator
 response register are ready.  It must never promote provisional construction
@@ -46,6 +46,8 @@ RELEASE_GATE = ROOT / "hardware/HARDWARE_PRODUCTION_RELEASE_GATE_REV_A.md"
 CONTRACT = ROOT / "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json"
 PACKET = ROOT / "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.md"
 RESPONSE = ROOT / "hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv"
+EVT_BASELINE = ROOT / "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json"
+EVT_BASELINE_MANUAL = ROOT / "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md"
 CI_WORKFLOW = ROOT / ".github/workflows/ci.yml"
 NATIVE_WORKFLOW = ROOT / ".github/workflows/pcb-native.yml"
 HARDWARE_RELEASE_AUDIT = ROOT / "tools/audit_evt_pre_20_hardware_release.py"
@@ -142,6 +144,8 @@ CONTROLLED_SOURCES = [
     CONTRACT,
     PACKET,
     RESPONSE,
+    EVT_BASELINE,
+    EVT_BASELINE_MANUAL,
     CI_WORKFLOW,
     NATIVE_WORKFLOW,
     HARDWARE_RELEASE_AUDIT,
@@ -549,6 +553,109 @@ def validate_status_packet_and_ci(contract: dict[str, Any]) -> None:
             "hardware production-release audit does not enforce stackup acceptance")
 
 
+def audit_evt_accepted(contract: dict[str, Any], commit_sha: str) -> dict[str, Any]:
+    from audit_evt_engineering_manufacturing_baseline_rev_a import audit as audit_baseline
+
+    baseline = audit_baseline()
+    main = baseline["pcb_main"]
+    require(main["stackup"] == "JLC06161H-3313"
+            and main["stackup_accepted"] is True
+            and main["routing_authorized"] is True,
+            "central PCB-MAIN EVT stackup authority differs")
+    require(relative(EVT_BASELINE) in contract.get("authority_inputs", [])
+            and relative(EVT_BASELINE_MANUAL) in contract.get("authority_inputs", []),
+            "accepted EVT baseline is absent from the authority set")
+    binding = contract.get("source_binding", {})
+    require(binding.get("native_board") == NATIVE_BOARD_BINDING
+            and binding.get("native_board_sha256") == sha256(BOARD)
+            and binding.get("mechanical_authority_sha256") == sha256(MECHANICAL)
+            and binding.get("placement_manifest_sha256") == sha256(PLACEMENT)
+            and binding.get("routing_authority_sha256") == sha256(ROUTING),
+            "accepted stackup source binding differs")
+
+    active = Board.from_file(str(ACTIVE_BOARD), encoding="utf-8")
+    layers = [layer.name for layer in active.layers if layer.name.endswith(".Cu")]
+    require(layers == ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "B.Cu"]
+            and float(active.general.thickness) == 1.6,
+            "active PCB-MAIN layer/thickness state differs")
+    routing_fields, routing_rows = read_csv(ROUTING)
+    require(routing_fields[:3] == ["Net_Name", "Route_Class", "Reference_Domain"]
+            and len(routing_rows) == 186,
+            "accepted routing-authority structure differs")
+    by_net = {row["Net_Name"]: row for row in routing_rows}
+    require(all(by_net[name]["Impedance_Target"] == "50_OHM_SINGLE_ENDED_EVT_STACKUP_ACCEPTED"
+                and by_net[name]["Geometry_Rule"] ==
+                "WIDTH_0P1509MM_JLC06161H_3313_L1_OVER_L2" for name in RF_NETS),
+            "accepted 50-ohm routing geometry differs")
+    require(all(by_net[name]["Impedance_Target"] == "90_OHM_DIFFERENTIAL_EVT_STACKUP_ACCEPTED"
+                and by_net[name]["Geometry_Rule"] ==
+                "WIDTH_0P1537MM_GAP_0P2032MM_JLC06161H_3313_L1_OVER_L2"
+                for names in USB_PAIR_GROUPS.values() for name in names),
+            "accepted 90-ohm routing geometry differs")
+
+    fields, rows = read_csv(RESPONSE)
+    require(fields == RESPONSE_FIELDS and len(rows) == 22,
+            "accepted response-register structure differs")
+    require(all(row["Disposition"] == "CLOSED_EVT_ENGINEERING_BASELINE"
+                and row["Blocking"] == "NO"
+                and all(row[field] for field in (
+                    "Response_Value", "Response_Reference", "Responder", "Response_Date"
+                )) for row in rows),
+            "PCB-MAIN stackup rows are not closed by attributed EVT evidence")
+    require(contract.get("external_response") == {
+        "response_register": relative(RESPONSE),
+        "required_rows": 22,
+        "closed_rows": 22,
+        "pending_rows": 0,
+        "external_reply_required": False,
+        "selected_public_standard": "JLC06161H-3313",
+        "complete": True,
+    }, "accepted stackup external-response state differs")
+    interlock = contract.get("release_interlock", {})
+    require(all(interlock.get(key) is True for key in (
+        "stackup_accepted", "rf_50ohm_numeric_geometry_authorized",
+        "usb_90ohm_numeric_geometry_authorized", "routing_authorized",
+    )) and all(interlock.get(key) is False for key in (
+        "review_b_complete", "manufacturing_release", "fabrication_authorized",
+    )), "accepted stackup release boundary differs")
+
+    status = json.loads(STATUS.read_text(encoding="utf-8"))
+    handoff = status.get("review_b", {}).get("evidence", {}).get(
+        "stackup_impedance_handoff", {}
+    )
+    require(handoff.get("complete") is True
+            and handoff.get("accepted_response_rows") == 22
+            and handoff.get("selected_public_standard") == "JLC06161H-3313"
+            and handoff.get("external_reply_required") is False
+            and handoff.get("routing_authorized") is True
+            and handoff.get("review_b_complete") is False
+            and handoff.get("manufacturing_release") is False,
+            "PCB-MAIN accepted stackup handoff differs")
+    packet = PACKET.read_text(encoding="utf-8")
+    require(all(token in packet for token in (
+        "JLC06161H-3313", "0.1509 mm", "0.1537/0.2032 mm",
+        "CLOSED_EVT_ENGINEERING_BASELINE", "NOT FOR MANUFACTURE",
+    )), "accepted stackup manual is incomplete")
+    return {
+        "schema": "dioneya-pcb-main-stackup-impedance-audit-v2",
+        "configuration": "EVT-PRE-20 Rev.A",
+        "assembly": "PCB-MAIN",
+        "status": "PASS_EVT_PUBLIC_STANDARD_STACKUP_IMPEDANCE_ACCEPTED",
+        "evidence_commit_sha": commit_sha,
+        "active_board": {
+            "path": relative(ACTIVE_BOARD),
+            "trace_items": len(active.traceItems),
+            "copper_zones": len(active.zones),
+        },
+        "external_response_register": {"rows": 22, "closed_rows": 22, "pending_rows": 0},
+        "stackup_accepted": True,
+        "routing_authorized": True,
+        "review_b_complete": False,
+        "manufacturing_release": False,
+        "fabrication_authorized": False,
+    }
+
+
 def audit(commit_sha: str, require_clean_source: bool) -> dict[str, Any]:
     validate_git_binding(commit_sha, require_clean_source)
     contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
@@ -557,6 +664,10 @@ def audit(commit_sha: str, require_clean_source: bool) -> dict[str, Any]:
             and contract.get("assembly") == "PCB-MAIN"
             and contract.get("revision") == "A",
             "stackup/impedance request identity mismatch")
+    if contract.get("status") == (
+        "EVT_PUBLIC_STANDARD_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED_NOT_FOR_MANUFACTURE"
+    ):
+        return audit_evt_accepted(contract, commit_sha)
     require(contract.get("status") ==
             "PACKET_READY_TWO_FABRICATOR_RESPONSES_REQUIRED_NOT_FOR_ROUTING_OR_MANUFACTURE",
             "stackup/impedance request status is not bounded")
@@ -622,11 +733,17 @@ def main() -> int:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print("PCB-MAIN stackup/impedance request audit: PASS")
-    print(
-        "fabricators=2 questions_per_fabricator=11 response_rows=22 "
-        "accepted=0 stackup_accepted=false routing_authorized=false "
-        "manufacturing_release=false"
-    )
+    if report["status"] == "PASS_EVT_PUBLIC_STANDARD_STACKUP_IMPEDANCE_ACCEPTED":
+        print(
+            "public_stackup=JLC06161H-3313 response_rows=22 closed=22 "
+            "routing_authorized=true review_b_complete=false manufacturing_release=false"
+        )
+    else:
+        print(
+            "fabricators=2 questions_per_fabricator=11 response_rows=22 "
+            "accepted=0 stackup_accepted=false routing_authorized=false "
+            "manufacturing_release=false"
+        )
     return 0
 
 

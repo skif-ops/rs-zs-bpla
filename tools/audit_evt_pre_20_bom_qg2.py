@@ -141,6 +141,57 @@ def main() -> int:
         else "engineering and procurement BOM quantities independently reconcile for 4, 10 and 20 stations",
     )
 
+    program_path = ROOT / "hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv"
+    program_errors: list[str] = []
+    program_rows = read(program_path) if program_path.is_file() else []
+    procurement_by_id = {row.get("Procurement_ID", ""): row for row in procurement_rows}
+    program_by_id = {row.get("Procurement_ID", ""): row for row in program_rows}
+    if len(program_rows) != len(procurement_rows) or set(program_by_id) != set(procurement_by_id):
+        program_errors.append("row_or_procurement_id_coverage")
+    else:
+        for procurement_id, source in procurement_by_id.items():
+            aggregate = program_by_id[procurement_id]
+            try:
+                quantity_20 = int(source["Qty_20"])
+                if quantity_20 % 20:
+                    program_errors.append(f"{procurement_id}:qty20_not_divisible")
+                    continue
+                per_station = quantity_20 // 20
+                base = per_station * 41
+                spares = int(source["Spares_20"]) * 2
+                if (
+                    aggregate.get("Qty_per_station") != str(per_station)
+                    or aggregate.get("Production_lots_20") != "2"
+                    or aggregate.get("Bench_stations") != "1"
+                    or aggregate.get("Total_stations") != "41"
+                    or aggregate.get("Base_qty_2x20_plus_1") != str(base)
+                    or aggregate.get("Spare_qty_two_evt20_lots") != str(spares)
+                    or aggregate.get("Procure_qty_2x20_plus_1") != str(base + spares)
+                    or "no third reserve pool for bench" not in aggregate.get("Program_scope", "")
+                ):
+                    program_errors.append(f"{procurement_id}:2x20_plus_1_arithmetic")
+            except (KeyError, ValueError):
+                program_errors.append(f"{procurement_id}:invalid_program_quantity")
+    program_key_totals = {
+        row.get("Item_IDs", ""): row.get("Procure_qty_2x20_plus_1", "")
+        for row in program_rows
+    }
+    expected_program_key_totals = {
+        "ASM-MAIN": "45", "ASM-PWR": "45", "ASM-MIC": "168",
+        "PCB-MAIN": "45", "PCB-PWR": "45", "PCB-MIC": "168",
+        "HARNESS": "45",
+    }
+    if any(program_key_totals.get(item) != value
+           for item, value in expected_program_key_totals.items()):
+        program_errors.append("key_scope_totals")
+    check(
+        "program_procurement_2x20_plus_1",
+        not program_errors,
+        "2x20+1 program procurement mismatch: " + ", ".join(program_errors)
+        if program_errors
+        else "41-station program demand reconciles as two EVT-20 lots plus one bench with two reserve pools",
+    )
+
     main_freeze = read(ROOT / "hardware/MAIN_COMPONENT_FREEZE_REV_A.csv")
     main_item_for_ref = {
         **{f"U{i}": f"U{i}" for i in (1, 2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18)},
@@ -302,14 +353,24 @@ def main() -> int:
         ):
             build_to_print_errors.append(item_id)
 
+    rfq_expected = {
+        "ASM-MAIN": ("Customer-selected standard PCBA service", "DIO-PCBA-MAIN-EVT-A"),
+        "PCB-MAIN": ("JLCPCB or equivalent meeting EVT baseline", "DIO-PCB-MAIN-EVT-A_JLC06161H-3313"),
+        "ASM-PWR": ("Customer-selected standard PCBA service", "DIO-PCBA-PWR-EVT-A"),
+        "PCB-PWR": ("JLCPCB or equivalent meeting EVT baseline", "DIO-PCB-PWR-EVT-A_JLC04161H-3313A"),
+        "ASM-MIC": ("Customer-selected standard PCBA service", "DIO-PCBA-MIC-EVT-A"),
+        "PCB-MIC": ("JLCPCB or equivalent meeting EVT baseline", "DIO-PCB-MIC-EVT-A"),
+        "HARNESS": ("Project engineering under customer EVT authority", "DIO-HARNESS-SET-EVT-A"),
+        "HSG-VC": ("Dioneya controlled design", "DIO-HSG-VC-REV-A"),
+    }
     rfq_rows = read(ROOT / "hardware/CHINA_PROCUREMENT_RFQ.csv")
     rfq_by_item = {row["BOM_Item_IDs"]: row for row in rfq_rows}
-    for item_id, (mpn, _) in build_to_print_expected.items():
+    for item_id, (manufacturer, article) in rfq_expected.items():
         row = rfq_by_item.get(item_id)
         if (
             row is None
-            or row["Manufacturer"] != "Dioneya controlled design"
-            or mpn not in row["MPN_or_spec"]
+            or row["Manufacturer"] != manufacturer
+            or article not in row["MPN_or_spec"]
             or row["Status"] != "RFQ_REQUIRED"
             or row["Supplier"]
             or row["Quote_date"]
@@ -322,8 +383,8 @@ def main() -> int:
         + ", ".join(build_to_print_errors)
         if build_to_print_errors
         else (
-            "eight internal article identities are controlled while customer-selected "
-            "supplier quote and legal-entity fields remain intentionally open"
+            "eight internal BOM identities and EVT order specifications are controlled "
+            "while customer-selected supplier and quote fields remain open"
         ),
     )
 

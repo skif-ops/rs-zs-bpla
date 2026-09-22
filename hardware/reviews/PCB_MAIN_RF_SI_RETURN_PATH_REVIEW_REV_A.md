@@ -48,6 +48,9 @@ hash-bound engineering routing subgate, but it is not final RF copper.
   repeat RF return-path review is still required after any application, and
   the ECO must not be hidden inside the cellular plane change.
 
-Final job-specific stackup/tolerance/coupon acceptance, both fabricator
-responses, selected-assembler DFM/stencil response, remaining routing, complete
-SI/PI review, Review B, CAM and manufacture remain blocked.
+The later customer-authorized EVT baseline selects
+`JLC06161H-3313`, `±10%` impedance and the standard coupon option, and accepts
+the standard PCBA process without factory reply letters. The defects identified
+in this historical review were handled by the later bounded remediation chain.
+Remaining routing, complete SI/PI review, checkout DFM, Review B, CAM and
+manufacture remain blocked.

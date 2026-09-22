@@ -146,7 +146,10 @@ def audit() -> dict[str, object]:
             "supplier_stock_price_moq_and_delivery_gate: NON_BLOCKING_CUSTOMER_ACTION",
             "engineering_procurement_handoff_requires_quote_fields: false",
             "exact_mpn_and_no_substitution_required: true",
-            "job_specific_manufacturing_technical_responses_required: true",
+            "job_specific_manufacturing_technical_responses_required: false",
+            "evt_public_engineering_baseline_authorized: true",
+            "customer_order_checkout_dfm_must_pass: true",
+            "series_transfer_manufacturing_revalidation_required: true",
         )
     )
     check(
@@ -154,7 +157,7 @@ def audit() -> dict[str, object]:
         customer_procurement_boundary_ok,
         (
             "stock, price, MOQ, payment and delivery are non-blocking customer actions; "
-            "exact MPN and job-specific technical manufacturing gates remain mandatory"
+            "exact MPN, checkout DFM and physical EVT gates remain mandatory; external replies do not"
         ),
         "customer procurement boundary is missing or weakens exact-MPN/technical manufacturing controls",
     )
@@ -191,7 +194,7 @@ def audit() -> dict[str, object]:
 
     layer_authority = run_json_audit("audit_pcb_layer_count_authority_rev_a.py")
     layer_authority_ok = (
-        layer_authority.get("status") == "PASS_CONTROLLED_LAYER_COUNTS_FINAL_STACKUPS_OPEN"
+        layer_authority.get("status") == "PASS_CONTROLLED_LAYER_COUNTS_EVT_STACKUPS_ACCEPTED"
         and layer_authority.get("manufacturing_release") is False
         and layer_authority.get("controlled_counts") == {
             "PCB-MAIN": 6,
@@ -526,21 +529,22 @@ def audit() -> dict[str, object]:
     )
     pwr_stackup_packet_ready = (
         pwr_stackup_copper.get("status") ==
-        "PASS_INTERNAL_STACKUP_COPPER_REQUEST_READY_EXTERNAL_RESPONSES_PENDING"
+        "PASS_EVT_PUBLIC_STACKUP_AND_CALCULATED_POWER_GEOMETRY_ACCEPTED"
         and pwr_stackup_copper.get("internal_packet_complete") is True
-        and pwr_stackup_copper.get("required_fabricator_slots") == ["FAB-A", "FAB-B"]
+        and pwr_stackup_copper.get("required_fabricator_slots") == []
         and pwr_stackup_copper.get("required_response_rows") == 24
         and pwr_stackup_copper.get("accepted_fabricator_slots") == 0
-        and pwr_stackup_copper.get("accepted_response_rows") == 0
-        and pwr_stackup_copper.get("numeric_power_geometry_authorized") is False
-        and pwr_stackup_copper.get("routing_authorized") is False
+        and pwr_stackup_copper.get("accepted_response_rows") == 24
+        and pwr_stackup_copper.get("external_reply_required") is False
+        and pwr_stackup_copper.get("numeric_power_geometry_authorized") is True
+        and pwr_stackup_copper.get("routing_authorized") is True
         and pwr_stackup_copper.get("manufacturing_release") is False
     )
     check(
         "pcb_pwr_stackup_copper_request_packet",
         pwr_stackup_packet_ready,
         str(pwr_stackup_copper.get("status", "MISSING")),
-        "PCB-PWR controlled two-fabricator stackup/copper request packet is not ready",
+        "PCB-PWR EVT public stackup/calculated-geometry packet is not ready",
     )
     accepted_fabricator_slots = int(
         pwr_stackup_copper.get("accepted_fabricator_slots", 0) or 0
@@ -551,9 +555,9 @@ def audit() -> dict[str, object]:
     selected_pwr_fabricator = pwr_stackup_copper.get("selected_fabricator_slot")
     pwr_stackup_accepted = (
         pwr_stackup_copper.get("complete") is True
-        and accepted_fabricator_slots == 2
         and accepted_stackup_rows == 24
-        and selected_pwr_fabricator in {"FAB-A", "FAB-B"}
+        and pwr_stackup_copper.get("external_reply_required") is False
+        and pwr_stackup_copper.get("selected_public_standard") == "JLC04161H-3313A"
         and pwr_stackup_copper.get("stackup_accepted") is True
         and pwr_stackup_copper.get("copper_weights_and_plating_accepted") is True
         and pwr_stackup_copper.get("numeric_power_geometry_authorized") is True
@@ -563,29 +567,31 @@ def audit() -> dict[str, object]:
         pwr_stackup_accepted,
         (
             f"accepted_rows={accepted_stackup_rows}/24 "
-            f"fabricators={accepted_fabricator_slots}/2 "
-            f"selected={selected_pwr_fabricator or 'NONE'}"
+            f"external_reply_required=false "
+            f"stackup={pwr_stackup_copper.get('selected_public_standard', 'NONE')}"
         ),
         (
             "PCB-PWR stackup/copper acceptance remains open: "
             f"{accepted_stackup_rows}/24 responses and "
-            f"{accepted_fabricator_slots}/2 fabricator sets accepted; "
-            f"selected construction={selected_pwr_fabricator or 'NONE'}"
+            "public stackup or calculated numeric geometry is not accepted"
         ),
     )
 
     harness = run_json_audit("audit_harness_manufacturing_rev_a.py")
     harness_packet_ok = (
-        harness.get("status") == "PASS_CONTROLLED_PRELIMINARY_LENGTHS_OPEN"
+        harness.get("status") == "PASS_EVT_BUILD_BASELINE_ACCEPTED_FIRST_ARTICLE_OPEN"
         and harness.get("packet_complete") is True
         and harness.get("controlled_conductors") == 38
         and harness.get("supplier_request_status") ==
-        "PACKET_READY_16_ATTRIBUTABLE_RESPONSES_REQUIRED_FINAL_LENGTHS_OPEN_NOT_FOR_BUILD"
+        "EVT_BUILD_BASELINE_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED_FIRST_ARTICLE_OPEN"
         and isinstance(harness.get("supplier_request"), dict)
         and harness["supplier_request"].get("required_response_rows") == 16
-        and harness["supplier_request"].get("accepted_response_rows") == 0
+        and harness["supplier_request"].get("accepted_response_rows") == 16
         and harness["supplier_request"].get("selected_supplier") is None
-        and harness["supplier_request"].get("build_authorized") is False
+        and harness["supplier_request"].get("external_reply_required") is False
+        and harness["supplier_request"].get("build_authorized") is True
+        and harness.get("final_lengths_accepted") is True
+        and harness.get("wire_avl_accepted") is True
     )
     check(
         "harness_controlled_preliminary_packet",
@@ -595,7 +601,7 @@ def audit() -> dict[str, object]:
             f"supplier responses="
             f"{harness.get('supplier_request', {}).get('accepted_response_rows', 'MISSING')}/16"
         ),
-        "internal harness drawing schedule or supplier capability request packet is incomplete",
+        "EVT harness drawing, lengths, wire AVL or build baseline is incomplete",
     )
     harness_released = harness.get("manufacturing_release") is True
     harness_blockers = [str(item) for item in harness.get("open_blockers", [])]
@@ -678,30 +684,33 @@ def audit() -> dict[str, object]:
     main_routing_basis_ok = (
         isinstance(main_routing_basis_evidence, dict)
         and main_routing_basis_evidence.get("status") ==
-        "PASS_PUBLIC_STANDARD_NUMERIC_ROUTING_INPUT_FINAL_FABRICATOR_ACCEPTANCE_PENDING"
+        "PASS_PUBLIC_STANDARD_SELECTED_AS_EVT_JOB_STACKUP_NOT_FOR_MANUFACTURE"
         and main_routing_basis_evidence.get("public_stackup_id") == "JLC06161H-3313"
         and main_routing_basis_evidence.get("rf_50ohm_trace_width_mm") == 0.1509
         and main_routing_basis_evidence.get("usb_90ohm_trace_width_mm") == 0.1537
         and main_routing_basis_evidence.get("usb_90ohm_pair_gap_mm") == 0.2032
         and main_routing_basis_evidence.get("engineering_candidate_numeric_input_authorized") is True
         and main_routing_basis_evidence.get("pair_aware_routing_and_audit_required") is True
-        and main_routing_basis_evidence.get("final_job_stackup_accepted") is False
+        and main_routing_basis_evidence.get("final_job_stackup_accepted") is True
+        and main_routing_basis_evidence.get("production_impedance_tolerance_accepted") is True
+        and main_routing_basis_evidence.get("coupon_plan_accepted") is True
+        and main_routing_basis_evidence.get("external_reply_required") is False
         and main_routing_basis_evidence.get("manufacturing_release") is False
         and main_routing_basis.get("status") ==
-        "PASS_PUBLIC_STANDARD_NUMERIC_ROUTING_INPUT_FINAL_FABRICATOR_ACCEPTANCE_PENDING"
+        "PASS_PUBLIC_STANDARD_SELECTED_AS_EVT_JOB_STACKUP_NOT_FOR_MANUFACTURE"
         and main_routing_basis.get("stackup_id") == "JLC06161H-3313"
         and main_routing_basis.get("rf_50ohm_trace_width_mm") == 0.1509
         and main_routing_basis.get("usb_90ohm_trace_width_mm") == 0.1537
         and main_routing_basis.get("usb_90ohm_pair_gap_mm") == 0.2032
-        and main_routing_basis.get("pending_fabricator_response_rows") == 22
+        and main_routing_basis.get("external_reply_required") is False
         and main_routing_basis.get("manufacturing_release") is False
     )
     check(
         "pcb_main_public_numeric_routing_basis",
         main_routing_basis_ok,
         (
-            "JLC06161H-3313 candidate RF=0.1509 mm USB=0.1537/0.2032 mm; "
-            "22 final fabricator response rows remain pending"
+            "JLC06161H-3313 EVT stackup RF=0.1509 mm USB=0.1537/0.2032 mm; "
+            "external reply not required"
         ),
         "PCB-MAIN public numeric routing basis is missing, drifted or improperly promoted",
     )
@@ -844,7 +853,9 @@ def audit() -> dict[str, object]:
     main_stackup_packet_ready = (
         isinstance(main_stackup, dict)
         and main_stackup.get("internal_packet_complete") is True
-        and main_stackup.get("required_fabricator_slots") == ["FAB-A", "FAB-B"]
+        and main_stackup.get("required_fabricator_slots") == []
+        and main_stackup.get("external_reply_required") is False
+        and main_stackup.get("accepted_response_rows") == 22
         and all(isinstance(path, str) and (ROOT / path).is_file()
                 for path in main_stackup_files)
     )
@@ -865,8 +876,8 @@ def audit() -> dict[str, object]:
     main_stackup_accepted = (
         isinstance(main_stackup, dict)
         and main_stackup.get("complete") is True
-        and accepted_fabricator_count == 2
-        and selected_fabricator in {"FAB-A", "FAB-B"}
+        and main_stackup.get("external_reply_required") is False
+        and main_stackup.get("selected_public_standard") == "JLC06161H-3313"
         and main_stackup.get("stackup_accepted") is True
         and main_stackup.get("rf_50ohm_numeric_geometry_accepted") is True
         and main_stackup.get("usb_90ohm_numeric_geometry_accepted") is True
@@ -874,11 +885,10 @@ def audit() -> dict[str, object]:
     check(
         "pcb_main_stackup_impedance_acceptance",
         main_stackup_accepted,
-        f"accepted={accepted_fabricator_count}/2 selected={selected_fabricator or 'NONE'}",
+        "22/22 engineering-baseline closures; JLC06161H-3313 selected",
         (
             "PCB-MAIN stackup/impedance acceptance remains open: "
-            f"{accepted_fabricator_count}/2 fabricator responses accepted and "
-            f"selected construction={selected_fabricator or 'NONE'}"
+            "public stackup or numeric impedance geometry is not accepted"
         ),
     )
     main_assembler = (
@@ -912,7 +922,8 @@ def audit() -> dict[str, object]:
                 for path in main_assembler_files)
         and len(main_assembler_rows) == 14
         and all(row.get("Gate_ID", "").startswith("ASM-MAIN-")
-                and row.get("Blocking") == "YES"
+                and row.get("Disposition") == "CLOSED_EVT_ENGINEERING_BASELINE"
+                and row.get("Blocking") == "NO"
                 for row in main_assembler_rows)
     )
     check(
@@ -938,8 +949,8 @@ def audit() -> dict[str, object]:
         isinstance(main_assembler, dict)
         and main_assembler.get("complete") is True
         and accepted_response_rows == 14
-        and isinstance(selected_assembler, str) and bool(selected_assembler.strip())
-        and isinstance(selected_site, str) and bool(selected_site.strip())
+        and main_assembler.get("external_reply_required") is False
+        and main_assembler.get("assembler_selection_nonblocking_customer_action") is True
         and all(main_assembler.get(key) is True for key in (
             "u2_land_mask_stencil_accepted",
             "u25_u26_land_mask_stencil_accepted",
@@ -954,13 +965,12 @@ def audit() -> dict[str, object]:
         main_assembler_accepted,
         (
             f"accepted={accepted_response_rows}/14 "
-            f"assembler={selected_assembler or 'NONE'} "
-            f"site={selected_site or 'NONE'}"
+            "assembler/site selected by customer at order time"
         ),
         (
             "PCB-MAIN assembler DFM/stencil acceptance remains open: "
             f"{accepted_response_rows}/14 responses accepted and selected "
-            f"assembler={selected_assembler or 'NONE'} site={selected_site or 'NONE'}"
+            "standard EVT PCBA process is not accepted"
         ),
     )
     main_released = (
@@ -1018,14 +1028,15 @@ def audit() -> dict[str, object]:
     mic_handoff = mic_review_b.get("manufacturing_handoff", {})
     mic_handoff_ready = (
         isinstance(mic_handoff, dict)
-        and mic_handoff.get("status") == "PACKET_READY_EXTERNAL_ACCEPTANCE_REQUIRED"
+        and mic_handoff.get("status") == "EVT_STANDARD_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED"
         and mic_handoff.get("internal_packet_complete") is True
-        and mic_handoff.get("complete") is False
-        and mic_handoff.get("fabricator_dfm_acceptance") is False
-        and mic_handoff.get("assembler_dfm_acceptance") is False
-        and mic_handoff.get("panelization_acceptance") is False
-        and mic_handoff.get("depanel_acceptance") is False
-        and mic_handoff.get("assembler_process_keepout_acceptance") is False
+        and mic_handoff.get("complete") is True
+        and mic_handoff.get("external_reply_required") is False
+        and mic_handoff.get("fabricator_dfm_acceptance") is True
+        and mic_handoff.get("assembler_dfm_acceptance") is True
+        and mic_handoff.get("panelization_acceptance") is True
+        and mic_handoff.get("depanel_acceptance") is True
+        and mic_handoff.get("assembler_process_keepout_acceptance") is True
     )
     check(
         "pcb_mic_manufacturing_handoff_packet",
@@ -1139,7 +1150,7 @@ def audit() -> dict[str, object]:
             "meaning": "engineering handoff for customer-owned procurement; not an executed purchase order",
             "owner": "CUSTOMER",
             "commercial_quote_or_availability_required": False,
-            "job_specific_technical_manufacturing_responses_required": True,
+            "job_specific_technical_manufacturing_responses_required": False,
             "selected_station_quantity": selected_quantity,
             "blockers": purchase_blockers,
         },

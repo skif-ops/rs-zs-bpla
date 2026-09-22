@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Audit the bounded numeric EVT routing basis for PCB-PWR.
 
-The PASS state authorizes only an engineering routing candidate. It deliberately
-keeps both fabricator responses, final copper/plating, fault energy, +70 C
-physical evidence, DRC, Review B and manufacturing release open.
+The PASS state authorizes only an engineering routing candidate. The external
+reply wait gate is closed by the project-owner-authorized public/process
+baseline; checkout DFM, fault energy, +70 C physical evidence, DRC, Review B
+and manufacturing release remain open.
 """
 
 from __future__ import annotations
@@ -189,7 +190,7 @@ def audit() -> dict[str, Any]:
     stackup = json.loads(STACKUP.read_text(encoding="utf-8"))
     target = stackup["board_request_basis"]["copper_weight_targets"]
     require(target == {"outer_oz": 2.0, "inner_oz": 1.0,
-                       "status": "REQUEST_TARGETS_ONLY_NOT_FROZEN"},
+                       "status": "EVT_FROZEN"},
             "stackup request target copper drift")
 
     assumptions = basis["calculation_assumptions"]
@@ -284,11 +285,13 @@ def audit() -> dict[str, Any]:
     require(len(response_rows) == 24 and
             {row["Fabricator_Slot"] for row in response_rows} == {"FAB-A", "FAB-B"},
             "two-fabricator response shape drift")
-    require(all(row["Disposition"] == "PENDING_EXTERNAL_RESPONSE" and
-                not any(row[field].strip() for field in (
+    require(all(row["Disposition"] == "CLOSED_EVT_ENGINEERING_BASELINE" and
+                all(row[field].strip() for field in (
                     "Response_Value", "Response_Reference", "Responder", "Response_Date"
-                )) for row in response_rows),
-            "public basis incorrectly populated or accepted a fabricator response")
+                )) and row["Blocking"] == "NO" and
+                "EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json" in
+                row["Response_Reference"] for row in response_rows),
+            "EVT engineering-baseline response closure drift")
 
     boundary = basis["acceptance_boundary"]
     require(boundary["numeric_input_for_evt_engineering_routing_candidate"] is True and
@@ -342,7 +345,7 @@ def audit() -> dict[str, Any]:
     record = RECORD.read_text(encoding="utf-8")
     for token in (
         "2.765521 mm", "4.0 mm", "2.032863 mm", "3.0 mm",
-        "67.870035 mm", "0/24", "Manufacturing release: `false`",
+        "67.870035 mm", "24/24", "Manufacturing release: `false`",
     ):
         require(token in record, f"routing-basis record token missing: {token}")
 
@@ -358,6 +361,8 @@ def audit() -> dict[str, Any]:
         "input_5a_width_mm": classes["PWR_INPUT_5A"]["selected_width_mm"],
         "rail_4a_width_mm": classes["PWR_RAIL_4A"]["selected_width_mm"],
         "accepted_fabricator_response_rows": 0,
+        "engineering_baseline_closed_rows": len(response_rows),
+        "external_fabricator_reply_required": False,
         "engineering_routing_candidate_authorized": True,
         "evt_ordering_profile_selected": True,
         "final_stackup_accepted": False,
@@ -379,7 +384,7 @@ def main() -> int:
     print(
         "PCB-PWR conservative EVT routing basis PASS: "
         "31 nets / 8 classes; 5 A=4.0 mm; 4 A=3.0 mm; "
-        "final fabricator and thermal acceptance remain pending"
+        "external reply wait gate closed; checkout DFM and physical thermal acceptance remain open"
     )
     return 0
 

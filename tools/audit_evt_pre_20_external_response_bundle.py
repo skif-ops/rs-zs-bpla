@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Audit the controlled EVT-PRE-20 external-response request bundle.
+"""Audit the superseded request bundle and closed EVT response-wait gates.
 
-The default audit validates the source contract, preserves the accepted EVT
-DIM-003 evidence and keeps every other external response pending. With --archive it independently compares every ZIP member
-and byte against the controlled source set and validates the embedded SHA-256
-manifest.  This is a request-package gate, never a manufacturing-release gate.
+The archive remains controlled for traceability.  Public engineering data and
+calculated values close the former wait-for-reply gates, but do not constitute
+a manufacturing release.
 """
 
 from __future__ import annotations
@@ -28,10 +27,7 @@ EXPECTED_GROUPS = {
     "PCB-MIC-DFM": 9,
     "HARNESS-SUPPLIER": 16,
 }
-PENDING_DISPOSITIONS = {
-    "PENDING_EXTERNAL_RESPONSE",
-    "PENDING_EXTERNAL_ACCEPTANCE",
-}
+CLOSED_DISPOSITION = "CLOSED_EVT_ENGINEERING_BASELINE"
 ACCEPTED_DIM_003_DISPOSITION = "ACCEPTED_EVT_ENGINEERING"
 EVIDENCE_FIELDS = {
     "Response_Value",
@@ -82,7 +78,8 @@ def audit_contract(contract: dict) -> dict:
     )
     require(contract["configuration"] == "EVT-PRE-20 Rev.A", "configuration drift")
     require(
-        contract["status"] == "READY_TO_BUILD_EXTERNAL_RESPONSE_REQUEST_ARCHIVE",
+        contract["status"] ==
+        "SUPERSEDED_BY_EVT_ENGINEERING_BASELINE_EXTERNAL_REPLIES_NOT_REQUIRED",
         "request-bundle status drift",
     )
     require(contract["selected_station_quantity"] == 20, "selected lot drift")
@@ -95,7 +92,10 @@ def audit_contract(contract: dict) -> dict:
     require(
         contract["commercial_procurement_owner"] == "CUSTOMER"
         and contract["commercial_quote_or_availability_required_by_engineering"] is False
-        and contract["job_specific_technical_manufacturing_responses_required"] is True,
+        and contract["job_specific_technical_manufacturing_responses_required"] is False
+        and contract.get("external_response_wait_gates_closed") is True
+        and contract.get("engineering_baseline") ==
+        "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json",
         "customer commercial-procurement or technical-response boundary drift",
     )
     require(
@@ -126,11 +126,11 @@ def audit_contract(contract: dict) -> dict:
             len(rows) == expected_rows,
             f"{group_id}: response rows={len(rows)} expected={expected_rows}",
         )
-        accepted = group_id == "PCB-PWR-DIM003"
+        dim_003 = group_id == "PCB-PWR-DIM003"
         for row in rows:
             gate_id = row.get("Gate_ID", "<missing>")
             populated = [field for field in EVIDENCE_FIELDS if row.get(field, "").strip()]
-            if accepted:
+            if dim_003:
                 require(
                     row.get("Disposition") == ACCEPTED_DIM_003_DISPOSITION,
                     f"{group_id}/{gate_id}: EVT acceptance disposition differs",
@@ -143,24 +143,26 @@ def audit_contract(contract: dict) -> dict:
                         f"{group_id}/{gate_id}: accepted EVT row remains blocking")
             else:
                 require(
-                    row.get("Disposition") in PENDING_DISPOSITIONS,
-                    f"{group_id}/{gate_id}: non-pending disposition requires a returned-evidence release flow",
+                    row.get("Disposition") == CLOSED_DISPOSITION,
+                    f"{group_id}/{gate_id}: EVT engineering closure is missing",
                 )
                 require(
-                    not populated,
-                    f"{group_id}/{gate_id}: pending row has populated evidence fields {populated}",
+                    {"Response_Reference", "Responder", "Response_Date"}.issubset(populated),
+                    f"{group_id}/{gate_id}: engineering closure attribution is incomplete",
                 )
-                require(row.get("Blocking") == "YES", f"{group_id}/{gate_id}: blocker removed")
+                require(row.get("Blocking") == "NO",
+                        f"{group_id}/{gate_id}: obsolete external blocker remains")
         register_summary[group_id] = {
             "rows": len(rows),
-            "accepted": len(rows) if accepted else 0,
-            "pending": 0 if accepted else len(rows),
+            "accepted": len(rows),
+            "pending": 0,
+            "external_reply_required": False,
         }
 
     rules = " ".join(contract["release_rules"])
     for token in (
-        "not a purchase order", "unrouted", "partially routed", "public numeric bases",
-        "pending", "Full-PCBA", "Review B", "18/18",
+        "superseded", "Customer order checkout", "unrouted",
+        "Physical first-article", "Series transfer",
     ):
         require(token in rules, f"release rule missing token: {token}")
 
@@ -246,7 +248,7 @@ def main() -> int:
     report = {
         "schema": "dioneya-external-response-bundle-audit-v1",
         "configuration": contract["configuration"],
-        "status": "PASS_REQUEST_BUNDLE_CONTROL_DIM_003_ACCEPTED_OTHER_EXTERNAL_RESPONSES_PENDING_NOT_FOR_MANUFACTURE",
+        "status": "PASS_EXTERNAL_REQUEST_BUNDLE_SUPERSEDED_EVT_GATES_CLOSED_NOT_FOR_MANUFACTURE",
         "hardware_design_release": False,
         "purchase_release": False,
         "manufacturing_release": False,
@@ -254,7 +256,8 @@ def main() -> int:
         "primary_procurement_track": contract["primary_procurement_track"],
         "commercial_procurement_owner": contract["commercial_procurement_owner"],
         "commercial_quote_or_availability_required_by_engineering": False,
-        "job_specific_technical_manufacturing_responses_required": True,
+        "job_specific_technical_manufacturing_responses_required": False,
+        "external_response_wait_gates_closed": True,
         "controlled_file_count": control["controlled_file_count"],
         "response_registers": control["response_registers"],
         "archive": None,
@@ -271,9 +274,9 @@ def main() -> int:
             encoding="utf-8",
         )
     print(
-        "EVT-PRE-20 external-response request bundle audit PASS: "
+        "EVT-PRE-20 superseded external-response bundle audit PASS: "
         f"{control['controlled_file_count']} files; "
-        "DIM-003 accepted; other response registers remain pending; NOT FOR MANUFACTURE"
+        "DIM-003 18/18 accepted; 85 engineering-baseline closures; NOT FOR MANUFACTURE"
     )
     return 0
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit the bounded PCB-PWR stackup and copper-process request.
+"""Audit the PCB-PWR stackup request or accepted EVT geometry baseline.
 
 This audit proves only that a source-bound two-fabricator request and blank
 response register are ready. It must never promote target copper weights,
@@ -40,6 +40,9 @@ RELEASE_CHECKLIST = ROOT / "hardware/PCB_RELEASE_CHECKLIST.csv"
 CONTRACT = ROOT / "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json"
 PACKET = ROOT / "hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md"
 RESPONSE = ROOT / "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv"
+EVT_BASELINE = ROOT / "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json"
+EVT_BASELINE_MANUAL = ROOT / "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md"
+CURRENT_GEOMETRY = ROOT / "hardware/PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv"
 RELEASE_GATE = ROOT / "hardware/HARDWARE_PRODUCTION_RELEASE_GATE_REV_A.md"
 DECISIONS = ROOT / "docs/DECISION_LOG.csv"
 DELIVERABLES = ROOT / "docs/DELIVERABLE_REGISTER_EVT_PRE_20.csv"
@@ -143,6 +146,9 @@ CONTROLLED_SOURCES = [
     CONTRACT,
     PACKET,
     RESPONSE,
+    EVT_BASELINE,
+    EVT_BASELINE_MANUAL,
+    CURRENT_GEOMETRY,
     RELEASE_GATE,
     DECISIONS,
     DELIVERABLES,
@@ -488,6 +494,127 @@ def validate_integrations() -> None:
                 f"PCB-PWR stackup packet missing boundary statement {token!r}")
 
 
+def audit_evt_accepted(contract: dict[str, Any]) -> dict[str, Any]:
+    from audit_evt_engineering_manufacturing_baseline_rev_a import audit as audit_baseline
+
+    baseline = audit_baseline()
+    pwr = baseline["pcb_pwr"]
+    require(pwr["stackup"] == "JLC04161H-3313A"
+            and pwr["stackup_accepted"] is True
+            and pwr["numeric_power_geometry_authorized"] is True
+            and pwr["routing_authorized"] is True,
+            "central PCB-PWR EVT stackup authority differs")
+    for source in (EVT_BASELINE, EVT_BASELINE_MANUAL, CURRENT_GEOMETRY):
+        require(relative(source) in contract.get("authority_inputs", []),
+                f"accepted authority input missing: {relative(source)}")
+    board = Board.from_file(str(BOARD), encoding="utf-8")
+    copper_layers = [str(layer.name) for layer in board.layers if str(layer.name).endswith(".Cu")]
+    require(copper_layers == ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"]
+            and float(board.general.thickness) == 1.6
+            and len(board.traceItems) in {0, 2, 3}
+            and len(board.zones) == 0,
+            "active PCB-PWR board exceeds the accepted bounded routing state")
+    binding = contract.get("source_binding", {})
+    require(binding.get("native_board") == relative(BOARD)
+            and binding.get("native_board_semantic_sha256") == semantic_board_sha256(board)
+            and binding.get("placement_authority_sha256") == sha256(PLACEMENT)
+            and binding.get("routing_authority_sha256") == sha256(ROUTING)
+            and binding.get("layer_count_authority_sha256") == sha256(LAYER_AUTHORITY)
+            and binding.get("power_design_baseline_sha256") == sha256(POWER_BASELINE)
+            and binding.get("power_design_calculation_sha256") == sha256(POWER_CALC)
+            and binding.get("dim_003_request_sha256") == sha256(DIM_003_CONTRACT),
+            "accepted PCB-PWR source binding differs")
+    basis = contract.get("board_request_basis", {})
+    require(basis.get("layer_function_status") == "EVT_ENGINEERING_BASELINE_ACCEPTED"
+            and basis.get("copper_weight_targets") == {
+                "outer_oz": 2.0, "inner_oz": 1.0, "status": "EVT_FROZEN"
+            }
+            and all(basis.get(key) is True for key in (
+                "final_stackup_frozen", "material_system_frozen",
+                "finished_thickness_frozen", "copper_weights_frozen",
+                "surface_finish_frozen", "numeric_fabrication_rules_frozen",
+            ))
+            and basis.get("native_trace_items") == len(board.traceItems)
+            and basis.get("native_copper_zones") == len(board.zones)
+            and basis.get("dim_003_accepted") is True,
+            "accepted PCB-PWR request basis differs")
+
+    fields, rows = read_csv(RESPONSE)
+    require(fields == RESPONSE_FIELDS and len(rows) == 24,
+            "accepted PCB-PWR response-register structure differs")
+    require(all(row["Disposition"] == "CLOSED_EVT_ENGINEERING_BASELINE"
+                and row["Blocking"] == "NO"
+                and all(row[field] for field in (
+                    "Response_Value", "Response_Reference", "Responder", "Response_Date"
+                )) for row in rows),
+            "PCB-PWR stackup rows are not closed by attributed EVT evidence")
+    require(contract.get("external_response") == {
+        "response_register": relative(RESPONSE),
+        "required_rows": 24,
+        "closed_rows": 24,
+        "pending_rows": 0,
+        "external_reply_required": False,
+        "selected_public_standard": "JLC04161H-3313A",
+        "complete": True,
+    }, "accepted PCB-PWR external-response state differs")
+    accepted = contract.get("accepted_authority", {})
+    require(accepted.get("selected_stackup") == "JLC04161H-3313A"
+            and accepted.get("accepted_outer_finished_copper_um") == 70
+            and accepted.get("accepted_inner_finished_copper_um") == 35
+            and accepted.get("accepted_hole_wall_plating_um") == 18
+            and accepted.get("accepted_surface_finish") == "ENIG",
+            "accepted PCB-PWR construction values differ")
+    interlock = contract.get("release_interlock", {})
+    require(interlock.get("two_fabricator_responses_accepted") is False
+            and interlock.get("fabricator_selected") is False
+            and all(interlock.get(key) is True for key in (
+                "stackup_accepted", "copper_weights_and_plating_accepted",
+                "manufacturing_minimums_accepted", "dim_003_accepted",
+                "current_density_dc_drop_fault_thermal_calculation_accepted",
+                "numeric_power_geometry_authorized", "routing_authorized",
+                "fabricator_selection_nonblocking_customer_action",
+            ))
+            and all(interlock.get(key) is False for key in (
+                "review_b_complete", "manufacturing_release", "fabrication_authorized",
+            )), "accepted PCB-PWR routing/release boundary differs")
+    status = json.loads(STATUS.read_text(encoding="utf-8"))
+    control = status.get("stackup_copper_handoff", {}).get("control", {})
+    require(control.get("state") == "PASS_EVT_PUBLIC_STANDARD_AND_CALCULATED_GEOMETRY_ACCEPTED"
+            and control.get("accepted_response_rows") == 24
+            and control.get("external_reply_required") is False
+            and control.get("routing_authorized") is True
+            and control.get("review_b_complete") is False
+            and control.get("manufacturing_release") is False,
+            "PCB-PWR accepted stackup handoff differs")
+    packet = PACKET.read_text(encoding="utf-8")
+    require(all(token in packet for token in (
+        "JLC04161H-3313A", "70/35 um", "18 um",
+        "CLOSED_EVT_ENGINEERING_BASELINE", "NOT FOR MANUFACTURE",
+    )), "accepted PCB-PWR stackup manual is incomplete")
+    return {
+        "schema": "dioneya-pcb-pwr-stackup-copper-audit-v2",
+        "configuration": "EVT-PRE-20 Rev.A",
+        "assembly": "PCB-PWR",
+        "status": "PASS_EVT_PUBLIC_STACKUP_AND_CALCULATED_POWER_GEOMETRY_ACCEPTED",
+        "internal_packet_complete": True,
+        "complete": True,
+        "required_fabricator_slots": [],
+        "required_response_rows": 24,
+        "accepted_fabricator_slots": 0,
+        "accepted_response_rows": 24,
+        "selected_public_standard": "JLC04161H-3313A",
+        "external_reply_required": False,
+        "board": {"trace_items": len(board.traceItems), "copper_zones": len(board.zones)},
+        "stackup_accepted": True,
+        "copper_weights_and_plating_accepted": True,
+        "numeric_power_geometry_authorized": True,
+        "routing_authorized": True,
+        "review_b_complete": False,
+        "manufacturing_release": False,
+        "fabrication_authorized": False,
+    }
+
+
 def audit() -> dict[str, Any]:
     contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
     require(contract.get("schema") == "dioneya-pcb-pwr-stackup-copper-request-v1",
@@ -498,6 +625,10 @@ def audit() -> dict[str, Any]:
         and contract.get("revision") == "A",
         "PCB-PWR stackup contract identity differs",
     )
+    if contract.get("status") == (
+        "EVT_PUBLIC_STANDARD_AND_CALCULATED_GEOMETRY_ACCEPTED_NOT_FOR_MANUFACTURE"
+    ):
+        return audit_evt_accepted(contract)
     require(contract.get("status") == CONTRACT_STATUS,
             "PCB-PWR stackup contract status differs")
     board = validate_board_and_bindings(contract)
@@ -549,10 +680,16 @@ def main() -> int:
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print("PCB-PWR stackup/copper request audit PASS")
-    print(
-        "24/24 blocking questions present; 0 accepted; final job geometry and "
-        "manufacture remain prohibited; bounded engineering overlay is separate"
-    )
+    if result["status"] == "PASS_EVT_PUBLIC_STACKUP_AND_CALCULATED_POWER_GEOMETRY_ACCEPTED":
+        print(
+            "public_stackup=JLC04161H-3313A response_rows=24 closed=24 "
+            "routing_authorized=true review_b_complete=false manufacturing_release=false"
+        )
+    else:
+        print(
+            "24/24 blocking questions present; 0 accepted; final job geometry and "
+            "manufacture remain prohibited; bounded engineering overlay is separate"
+        )
     return 0
 
 

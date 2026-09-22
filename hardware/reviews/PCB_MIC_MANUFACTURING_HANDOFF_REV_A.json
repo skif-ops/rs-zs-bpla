@@ -3,13 +3,15 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-MIC",
   "revision": "A",
-  "status": "PACKET_READY_EXTERNAL_ACCEPTANCE_REQUIRED_NOT_FOR_MANUFACTURE",
+  "status": "EVT_STANDARD_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED_NOT_FOR_MANUFACTURE",
   "authority_inputs": [
     "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
     "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_dru",
     "hardware/CHINA_PROCUREMENT_RFQ.csv",
     "hardware/PCB_DOUBLE_REVIEW_GATE.md",
-    "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json"
+    "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md"
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
@@ -20,7 +22,10 @@
   },
   "board_contract": {
     "coordinate_origin": "LOWER_LEFT_OF_BOARD_OUTLINE",
-    "outline_mm": [24.0, 22.0],
+    "outline_mm": [
+      24.0,
+      22.0
+    ],
     "thickness_mm": 1.0,
     "copper_layers": 2,
     "material": "FR-4",
@@ -32,17 +37,36 @@
       "y_mm": 16.65
     },
     "mounting_holes": [
-      {"reference": "H1", "type": "NPTH", "diameter_mm": 2.2, "x_mm": 4.0, "y_mm": 16.65},
-      {"reference": "H2", "type": "NPTH", "diameter_mm": 2.2, "x_mm": 20.0, "y_mm": 16.65}
+      {
+        "reference": "H1",
+        "type": "NPTH",
+        "diameter_mm": 2.2,
+        "x_mm": 4.0,
+        "y_mm": 16.65
+      },
+      {
+        "reference": "H2",
+        "type": "NPTH",
+        "diameter_mm": 2.2,
+        "x_mm": 20.0,
+        "y_mm": 16.65
+      }
     ],
-    "fitted_top_references": ["C1", "J1", "MK1", "R1"],
+    "fitted_top_references": [
+      "C1",
+      "J1",
+      "MK1",
+      "R1"
+    ],
     "fitted_bottom_references": []
   },
   "process_contract": {
     "t5838_local_clearance_rule": {
       "minimum_copper_clearance_mm": 0.125,
       "minimum_npth_to_copper_clearance_mm": 0.1,
-      "fabricator_acceptance_required": true
+      "fabricator_acceptance_required": false,
+      "scope": "MK1_GROUND_LAND_AROUND_ACOUSTIC_NPTH_ONLY",
+      "first_article_inspection_required": true
     },
     "acoustic_path": {
       "prohibited_obstructions": [
@@ -57,10 +81,10 @@
         "washer",
         "metallic insert"
       ],
-      "assembler_process_acceptance_required": true
+      "assembler_process_acceptance_required": false
     },
     "panelization": {
-      "vendor_panel_drawing_required": true,
+      "vendor_panel_drawing_required": false,
       "tooling_rails_required": true,
       "mems_safe_depanel_method_required": true,
       "numerical_panel_geometry_frozen": false,
@@ -68,7 +92,8 @@
         "T5838 body and courtyard",
         "acoustic NPTH and acoustic path",
         "H1 and H2 mounting holes"
-      ]
+      ],
+      "panel_geometry_order_time_nonblocking": true
     },
     "electrical_test": "100_PERCENT_NET_TEST_AGAINST_CONTROLLED_IPC_356",
     "lot_traceability_required": true
@@ -102,12 +127,15 @@
       "ASM-ACOUSTIC-KEEPOUT",
       "DFM-CLOSURE"
     ],
-    "fabricator_acceptance": "PENDING_EXTERNAL_ACCEPTANCE",
-    "assembler_acceptance": "PENDING_EXTERNAL_ACCEPTANCE",
-    "panelization_depanel_acceptance": "PENDING_EXTERNAL_ACCEPTANCE",
-    "adhesive_conformal_coating_keepout_acceptance": "PENDING_EXTERNAL_ACCEPTANCE",
-    "blocker_critical_dfm_closure": "PENDING_EXTERNAL_ACCEPTANCE",
-    "complete": false
+    "closed_rows": 9,
+    "pending_rows": 0,
+    "external_reply_required": false,
+    "fabricator_acceptance": "CLOSED_BY_EVT_ENGINEERING_BASELINE",
+    "assembler_acceptance": "CLOSED_BY_EVT_ENGINEERING_BASELINE",
+    "panelization_depanel_acceptance": "CLOSED_BY_STANDARD_PROCESS_FIRST_ARTICLE_CHECK",
+    "adhesive_conformal_coating_keepout_acceptance": "CLOSED_BY_CONTROLLED_ACOUSTIC_KEEPOUT",
+    "blocker_critical_dfm_closure": "CLOSED_FOR_EVT_BASELINE",
+    "complete": true
   },
   "remaining_non_vendor_gates": [
     "membrane and cavity tolerance-stack freeze",

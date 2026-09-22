@@ -81,7 +81,7 @@ STATE = (
     "CELL_MODEM_AND_CELL_FIXTURE_APPLIED"
 )
 ROW_STATUS = "PRE_ROUTE_CONSTRAINT_CONTROLLED_ROUTING_NOT_COMPLETE"
-STACKUP_STATE = "OPEN_REQUIRED_BEFORE_NUMERIC_RF_USB_GEOMETRY"
+STACKUP_STATE = "EVT_JLC06161H_3313_ACCEPTED_CHECKOUT_DFM_REQUIRED"
 GROUND_CANDIDATE_SHA256 = (
     "9c8abfabc18fa22b53c94b6b4d7946dbe1dfab797fbff9d00d7c3408aece1b9e"
 )
@@ -334,9 +334,9 @@ def expected_geometry(net: str, route_class: str) -> str:
     if route_class == "RETURN_PLANE":
         return "PLANE_GEOMETRY_AND_VOID_REVIEW_B"
     if route_class == "RF_50OHM":
-        return "NO_NUMERIC_WIDTH_UNTIL_FACTORY_STACKUP"
+        return "WIDTH_0P1509MM_JLC06161H_3313_L1_OVER_L2"
     if route_class == "USB_90OHM_DIFF":
-        return "NO_NUMERIC_WIDTH_OR_GAP_UNTIL_FACTORY_STACKUP"
+        return "WIDTH_0P1537MM_GAP_0P2032MM_JLC06161H_3313_L1_OVER_L2"
     if net == "3V8_MODEM_BB":
         return "MIN_EQUIVALENT_WIDTH_0.60_MM_WIDEN_IF_LONG"
     if net == "3V8_MODEM_RF":
@@ -409,9 +409,9 @@ def validate_row(row: dict[str, str], route_class: str) -> None:
     require(row["Topology"] == TOPOLOGY[route_class], f"{net}: topology rule drift")
 
     impedance = (
-        "50_OHM_SINGLE_ENDED_FACTORY_STACKUP_PENDING"
+        "50_OHM_SINGLE_ENDED_EVT_STACKUP_ACCEPTED"
         if route_class == "RF_50OHM"
-        else "90_OHM_DIFFERENTIAL_FACTORY_STACKUP_PENDING"
+        else "90_OHM_DIFFERENTIAL_EVT_STACKUP_ACCEPTED"
         if route_class == "USB_90OHM_DIFF"
         else "NOT_CONTROLLED_IMPEDANCE"
     )
@@ -425,7 +425,7 @@ def validate_row(row: dict[str, str], route_class: str) -> None:
     length_group = expected_length_group(net)
     require(row["Length_Group"] == length_group, f"{net}: length-group rule drift")
     length_rule = (
-        "PAIR_SKEW_LIMIT_REQUIRES_FINAL_STACKUP_AND_SI_REVIEW"
+        "PAIR_SKEW_LIMIT_REQUIRES_SI_REVIEW"
         if pair_group
         else "GROUP_SKEW_BUDGET_REQUIRES_TIMING_AND_SI_REVIEW"
         if length_group
@@ -773,9 +773,8 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             "routing_authority_generator": "tools/generate_pcb_main_routing_authority_rev_a.py",
             "routing_authority_audit": "tools/audit_pcb_main_routing_authority_rev_a.py",
             "routing_constraint_status": (
-                "PASS_ALL_186_NETS_CLASSIFIED_RF_REMEDIATION_REPEAT_REVIEW_PASS_"
-                "USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_APPLIED_FACTORY_"
-                "STACKUP_AND_MAIN_CONNECTOR_ROUTING_PENDING"
+                "PASS_ALL_186_NETS_CLASSIFIED_EVT_STACKUP_ACCEPTED_RF_REMEDIATION_"
+                "REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING"
             ),
         }
         require(all(evidence.get(key) == value

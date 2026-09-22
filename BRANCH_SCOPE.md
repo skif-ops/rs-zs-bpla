@@ -2,7 +2,8 @@
 
 ## Включается
 
-- конфигурационная база предсерийного EVT на 20 изделий;
+- конфигурационная база одного управляемого лота EVT-20;
+- сводная программа закупки двух EVT-20 лотов и одного стендового образца;
 - исходники и производственные файлы собственных PCB;
 - BOM, AVL, закупка в Китае и входной контроль;
 - firmware STM32, modem/LoRa/BLE profiles и воспроизводимая сборка;
@@ -37,41 +38,33 @@
 
 ## Текущий контрольный срез
 
-- версия ветки: `EVT-PRE-20 Rev.A v0.3` от 14.09.2026;
-- `MAIN-AUTH-001…011` закрыты и проходят основной и независимые authority-аудиты;
+- конфигурация: `EVT-PRE-20 Rev.A`; единица управления производством — один лот
+  20 станций;
+- программа: два отдельных EVT-20 лота плюс один стендовый образец, всего 41
+  станция; предусмотрены два EVT-20 резервных пула, без третьего резерва для
+  стендового образца;
+- серийные номера и travellers второго лота и стендового образца должны быть
+  выделены до начала сборки;
 - все девять native `.kicad_sch/.kicad_pcb/.kicad_pro` файлов PCB-MAIN,
   PCB-MIC и PCB-PWR присутствуют и контролируются CI;
-- native-схемы PCB-MAIN и PCB-PWR прошли Review A; PCB-MAIN имеет
-  частично разведённый engineering-кандидат, а PCB-PWR — неразведённый
-  placement-кандидат с принятым для EVT `DIM-003`: `18/18`, контур 90 x 60 mm,
-  четыре круглых NPTH M3 H1-H4 и hash-bound STEP. Серийная механика требует
-  повторной проверки. Консервативная 35 µm числовая база разрешает только
-  bounded EVT engineering routing candidate; плата пока не разведена и
-  производство не разрешено;
-- для PCB-PWR stackup/copper выбран стандартный EVT ordering profile
-  `JLC04161H-3313`, 1.6 mm,
-  outer 2 oz / inner 1 oz; 24 строки остаются пустыми (`0/24`, `0/2`) как
-  job-specific DFM-канал и не блокируют engineering-routing;
-- PCB-MAIN placement-кандидат после принятого ограниченного ECO и полного
-  репака проходит строгий 2D clearance: 227/227 fitted footprint имеют
-  courtyard, component/mounting/U.FL-tool конфликты равны нулю; приняты
-  bounded ground-domain, hard-signal, OctoSPI и seven-net RF P0 routing
-  subgates (691 segment, 285 via, 3 copper zones, 4 rule areas);
-- независимый PCB-MAIN RF/SI return-path review имеет статус
-  `ECO_REQUIRED`: cellular L2-return candidate `PCB-MAIN-RF-RETURN-001` не
-  применён; commit-bound KiCad 9 comparative DRC в gate `#267` пройден,
-  623/623 RF-centreline samples покрыты связной L2-зоной, но независимая
-  приёмка ещё не дана; отдельный GNSS proposal
-  `PCB-MAIN-GNSS-RF-ECO-001` переставляет только FL1/C64 и прошёл commit-bound
-  KiCad 9 comparative DRC в gate `#273`: новых ошибок и unconnected-регрессии
-  нет, 406/406 RF-centreline samples покрыты связной L2-зоной; независимая
-  приёмка и применение ещё открыты, как и remaining routing, STEP, CAM/DFM и
-  Review B;
-- повторный PCB-MIC Review A после copper ECO подписан `PASS` по commit `e17a86bc`;
-  copper-return subgate Review B принят по commit `7aeec13a`, но panelization,
-  DFM, acoustic-stack, physical-EVT, общий Review B и manufacturing release открыты;
-- PCB-MIC manufacturing-handoff packet подготовлен; все fabricator/assembler
-  response rows остаются `PENDING_EXTERNAL_ACCEPTANCE`;
-- производственный BOM, Gerber и статус `FOR_MANUFACTURE` заблокированы;
+- PCB-MAIN: 186-сетевой authority PASS, `JLC06161H-3313` и геометрия 50/90 Ом
+  приняты для EVT, активны 1023 trace items и восемь copper zones; оставшаяся
+  трассировка, SI, DRC, CAM, checkout DFM и Review B открыты;
+- PCB-PWR: `DIM-003` принят `18/18` для EVT; `JLC04161H-3313A`, 70/35 µm
+  copper, минимум 18 µm hole wall и расчётная силовая геометрия приняты;
+  активны два bootstrap, один LM74700 VCAP и один `VBAT_RAW` сегмент, zero
+  zones; `REV_GATE` routing 004 принят, но ещё не применён;
+- PCB-MIC: стандартный двухслойный/PCBA процесс и все 9 инженерных строк
+  приняты; first-panel bore inspection, CAM comparison, общий Review B и
+  physical EVT открыты;
+- жгуты: точные wire MPN и cut lengths `275/440/330 mm` с 10% сервисным
+  запасом приняты; first-off crimp/pull, 100% electrical records и
+  installed-route EVT validation открыты;
+- бывшие внешние wait gates закрыты инженерным baseline: 85/85 строк; это не
+  выдаётся за ответы фабрик и не отменяет checkout DFM или first article;
+- BOM QG-1 и технический QG-2 проходят; per-lot таблицы 4/10/20 сохранены, а
+  отдельная aggregate-таблица закупки покрывает 41 станцию;
+- hardware manufacturing release остаётся `BLOCKED` до завершения routing,
+  DRC/CAM/Review B, механических входов и физических EVT-проверок;
 - firmware имеет статус `TARGET_PORT_REQUIRED`;
 - аппаратный EVT имеет статус `NOT RUN`.

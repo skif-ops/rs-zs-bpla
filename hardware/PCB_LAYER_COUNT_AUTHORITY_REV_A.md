@@ -1,6 +1,6 @@
 # Дионея EVT-PRE-20 Rev.A — authority числа медных слоёв
 
-Статус: `CONTROLLED LAYER COUNT / FINAL STACKUPS OPEN / NOT FOR MANUFACTURE`
+Статус: `CONTROLLED LAYER COUNT / EVT STACKUPS ACCEPTED / NOT FOR MANUFACTURE`
 
 Дата: 2026-09-15
 
@@ -8,9 +8,9 @@
 
 | Плата | Число слоёв | Толщина платы | Состояние |
 |---|---:|---:|---|
-| PCB-MAIN | 6 | 1,6 мм | число слоёв и толщина зафиксированы; конструкция фабрики открыта |
-| PCB-PWR | 4 | 1,60 +/-0,16 мм | число слоёв, EVT-габарит и толщина зафиксированы DIM-003; медь и конструкция фабрики открыты |
-| PCB-MIC | 2 | 1,0 мм | число слоёв и толщина зафиксированы; DFM/Review B открыты |
+| PCB-MAIN | 6 | заказ 1,6 мм; public stack 1,54 мм ±10% | `JLC06161H-3313` принят для EVT; routing/DRC/CAM/Review B открыты |
+| PCB-PWR | 4 | 1,60 мм ±10%, EVT-only | `JLC04161H-3313A`, 70/35 мкм и расчётная геометрия приняты; thermal/Review B открыты |
+| PCB-MIC | 2 | 1,0 мм ±10% | стандартный FR-4/1 oz/ENIG принят; Review B и first-panel inspection открыты |
 
 Машинным источником является `hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv`.
 Он заменяет прежние конфликтующие упоминания четырёх слоёв для PCB-MAIN и двух
@@ -18,14 +18,10 @@
 
 ## Граница решения
 
-Число слоёв не означает утверждённый stackup и не разрешает трассировку или
-производство. Для PCB-MAIN фабрика должна вернуть полный шестислойный разрез и
-численные геометрии 50 Ом/90 Ом согласно контролируемому запросу. Для PCB-PWR
-целевыми значениями являются 2 oz на внешних и 1 oz на внутренних слоях, но эти
-значения не заморожены до расчёта токовой плотности, тепла и ответа фабрики.
-Контролируемый запрос двум фабрикам находится в
-`hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.md`; его состояние
-`0/24` строк и `0/2` комплектов ответов не выбирает конструкцию.
+Принятые stackup разрешают трассировку, но не производство. Для PCB-MAIN
+зафиксированы геометрии 50 Ом/90 Ом и `±10%`; для PCB-PWR — 2 oz/1 oz,
+минимальное plating и расчётная токовая геометрия. Ответы конкретных фабрик не
+нужны для EVT; checkout DFM, native DRC, CAM и Review B остаются стоп-гейтами.
 
 Четырёхслойная PCB-PWR выбрана для непрерывных возвратных плоскостей и отвода
 тепла от двух LMR60440. Это соответствует рекомендации TI использовать несколько
@@ -35,12 +31,9 @@
 
 ## Межблокировки выпуска
 
-- PCB-MAIN: два ответа фабрик, выбранная конструкция, медь, материал, покрытие,
-  impedance geometry, routing, DRC, STEP, CAM/DFM и Review B.
-- PCB-PWR: силовая/Kelvin/thermal routing, расчёты тока и температуры,
-  выбранная конструкция и медь, DRC, CAM/DFM, Review B и повторная проверка
-  механики при переходе к серийному корпусу. EVT DIM-003 и его STEP-огибающая
-  приняты отдельно.
-- PCB-MIC: внешний DFM, panelization/depanel, assembly process и Review B.
+- PCB-MAIN: routing, RF/SI, DRC, STEP, CAM/checkout DFM и Review B.
+- PCB-PWR: силовая/Kelvin/thermal routing, проверка drop/температуры/аварий,
+  DRC, STEP, CAM/checkout DFM и Review B.
+- PCB-MIC: first-panel acoustic inspection, panelization/depanel, CAM и Review B.
 
 Ни одна строка этого authority не является разрешением на Gerber или заказ плат.

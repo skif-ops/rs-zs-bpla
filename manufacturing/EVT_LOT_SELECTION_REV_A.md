@@ -5,6 +5,14 @@ customer-selected procurement scenario is `EVT-20`: 20 stations using serials
 `DIO-EVT-001` through `DIO-EVT-020`. The 4- and 10-station columns remain
 controlled comparison and contingency calculations only.
 
+The wider program demand is two EVT-20 production sets plus one bench station
+(`20 + 20 + 1 = 41`). This does not rename the controlled per-set configuration or
+mix scenario columns. Its aggregate quantities are controlled separately in
+`hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv`: two EVT-20 spare pools
+are included and the bench station adds no third pool. The present serial and housing
+registers cover the first 20-station set; the second set and bench serial/traveller
+allocation remains a required configuration action before their build.
+
 The selected scenario controls the corresponding `Qty_N`, `Spares_N` and
 `Procure_qty_N` columns in `hardware/EVT_PRE_20_BOM_REV_A.csv` and the matching
 `Required_qty_N` column in `hardware/CHINA_PROCUREMENT_RFQ.csv`. Mixing columns
@@ -24,5 +32,6 @@ Selection is `SELECTED: EVT-20`. Comparable RFQs may still be collected for 4,
 for the selected-lot purchase package. The customer owns supplier selection,
 stock, price, MOQ, payment and delivery confirmation and the project does not
 wait for those commercial fields. Selection does not authorize fabrication or
-assembly: strict BOM QG-2, released PCB/mechanical data and applicable
-job-specific technical manufacturing evidence remain blocking.
+assembly: strict BOM QG-2, released PCB/mechanical data, checkout DFM,
+first-article evidence and applicable physical EVT qualification remain
+blocking. Named-site technical reply letters are not required for this test lot.

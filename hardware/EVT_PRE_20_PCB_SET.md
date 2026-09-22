@@ -1,16 +1,17 @@
 # EVT-PRE-20 - состав PCB и правила выпуска
 
-Статус: `CONTROLLED DESIGN BASIS / MANUFACTURING RELEASE HOLD`
+Статус: `EVT STACKUPS CONTROLLED / MANUFACTURING RELEASE HOLD`
 
 Единый authority числа медных слоёв: `hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv`.
-Число слоёв зафиксировано для Rev.A; конкретные конструкции фабрик, толщины меди
-и численные impedance-геометрии остаются открытыми до соответствующих DFM-гейтов.
+Число слоёв, EVT-конструкции, медь и численные impedance/силовые геометрии
+зафиксированы в `EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md`. До заказа
+обязательны routing, DRC, CAM, checkout DFM и Review B.
 
 ## PCB-MAIN
 
 - Количество на изделие: 1.
-- Технология Rev.A: 6 медных слоёв, FR-4, 1.6 мм; окончательные материал,
-  медь, покрытие и controlled-impedance конструкция принимаются по двум ответам фабрик.
+- Технология Rev.A: 6 медных слоёв, `JLC06161H-3313`, заказ 1.6 мм,
+  1 oz/0.5 oz, ENIG; 50/90 Ом по принятой публичной конструкции `±10%`.
 - Целевая зона: ориентировочно до 100 x 80 мм, окончательно после компоновки корпуса.
 - Разделение зон: RF cellular, RF GNSS, RF LoRa, quiet digital/audio, modem power, service/debug.
 - Антенны внешние, отдельные разъёмы cellular/GNSS/LoRa. Межпортовая развязка проверяется на макете корпуса.
@@ -34,10 +35,10 @@
 ## PCB-PWR
 
 - Количество на изделие: 1.
-- Технология Rev.A: 4 медных слоя. EVT `DIM-003` фиксирует контур 90 x 60 мм,
-  толщину 1,60 +/-0,16 мм и четыре круглых NPTH M3; серийная механика требует
-  повторной проверки. Цель для запроса фабрике — внешние слои 2 oz, внутренние
-  1 oz; медь и диэлектрики остаются открыты до токового/теплового расчёта и DFM.
+- Технология Rev.A: 4 медных слоя, `JLC04161H-3313A`, внешние 2 oz,
+  внутренние 1 oz; `1,60 мм ±10%`, не менее 18 мкм среднего plating. DIM-003 и
+  расчётная токовая геометрия приняты EVT-only; физическая thermal/drop/fault
+  проверка остаётся обязательной.
 - Вход только от защищённой батарейной шины после внешнего MPPT/BMS.
 - Функции: предохранитель, reverse protection, TVS, current/voltage monitor, load disconnect, 3.8 V modem rail, 3.3 V digital rail, 1.8 V microphone rail.
 - Силовые разъёмы должны исключать переполюсовку и иметь запас по току/температуре.
@@ -64,4 +65,4 @@
 
 ## Производственный release gate
 
-Каждая плата должна иметь исходники KiCad, PDF схемы, Gerber, drill, IPC-356, pick-and-place, BOM/AVL, assembly drawing TOP/BOTTOM, fabrication notes, 3D STEP, ERC/DRC отчёты и письменный DFM review фабрики. Gerber сверяется отдельным CAM viewer со схемой и исходной PCB.
+Каждая плата должна иметь исходники KiCad, PDF схемы, Gerber, drill, IPC-356, pick-and-place, BOM/AVL, assembly drawing TOP/BOTTOM, fabrication notes, 3D STEP и ERC/DRC отчёты. Checkout/file-parser DFM должен пройти без открытых ошибок; отдельное письмо фабрики для EVT не требуется. Gerber сверяется отдельным CAM viewer со схемой и исходной PCB.

@@ -51,8 +51,8 @@ manufacturing release.
   source authority to every net. The official JLCPCB public
   `JLC06161H-3313` calculator result now controls candidate RF/USB geometry at
   `0.1509 mm` for 50 ohm and `0.1537/0.2032 mm` width/gap for 90 ohm on L1/L2.
-  Final production geometry remains blocked on job-specific fabricator
-  acceptance and RF/SI review.
+  The geometry and `±10%` tolerance are accepted for EVT; RF/SI review remains
+  open.
 - RF/SI return-path remediation: both bounded subgates are independently
   accepted and applied. `PCB-MAIN-RF-RETURN-001` contributes exactly one local
   `GND_MODEM` L2 zone; `PCB-MAIN-GNSS-RF-ECO-001` keeps U9/J9 fixed, moves only
@@ -62,19 +62,17 @@ manufacturing release.
   Native `#277`: errors remain zero, unconnected items remain `429`, and all
   `623` cellular plus `406` GNSS filled-L2 samples are covered. The bounded
   repeat return-path review passes; final SI and Review B remain open.
-- Stackup/impedance request: controlled packet and blank 22-row response
-  register are ready, with 0/2 accepted fabricator responses. No final job
-  construction, production tolerance, coupon plan or manufacturing route rule
-  has been accepted; the public numeric basis does not populate a response row.
-- Assembler DFM/stencil request: the bounded `U2/U25/U26/U9` packet and blank
-  14-row response register are ready, with 0/14 accepted assembler responses.
-  No assembler legal entity, manufacturing site, paste/stencil/reflow process,
-  footprint acceptance or U9 paste aperture has been selected or approved.
+- Stackup/impedance: all 22 rows are closed by the EVT engineering baseline;
+  `JLC06161H-3313`, controlled geometry and `±10%` are selected. Checkout DFM
+  and routed RF/SI review remain mandatory.
+- Assembler process: all 14 rows are closed by the standard EVT PCBA baseline.
+  Supplier/site selection is non-blocking; U9 paste export still waits for
+  native DRC and controlled CAM.
 - Provisional manufacturer-specific footprints: 0 instances (reduced from 52).
 - Manufacturer-drawing controlled project-local footprints: 50 instances.
 - Drawing-verified KiCad library patterns: 5 instances (`J11`, `J_MIC1..J_MIC4`).
 - KiCad library patterns pending drawing review: 0 instances.
-- Project-controlled package-derived IPC candidates: 3 instances (`U2`, `U25`, `U26`); assembler DFM is mandatory.
+- Project-controlled package-derived IPC candidates: 3 instances (`U2`, `U25`, `U26`); checkout DFM and first-article inspection are mandatory.
 - Production pogo groups: 5 controlled footprints, 31 bottom pads verified from MAIN-AUTH-011.
 - Footprint disposition register: `hardware/reviews/PCB_MAIN_FOOTPRINT_DISPOSITION_REV_A.md`.
 
@@ -101,8 +99,10 @@ manufacturing release.
   `tools/audit_pcb_main_placement_clearance_rev_a.py`.
 - [x] A bounded mechanical ECO candidate is machine-readable, baseline-hash-bound
   and independently confirms no locked conflict after the proposed overlay.
-- [ ] U9 paste stencil is adapted and approved for the selected assembly process.
-- [ ] The selected assembler approves copper, mask and stencil rules for the `U2/U25/U26` project IPC candidates.
+- [x] U9 stencil geometry and the no-automatic-1:1 rule are controlled by the
+  standard EVT process; paste export remains conditional on native DRC/CAM.
+- [x] EVT copper, mask and stencil rules for the `U2/U25/U26` project IPC
+  candidates are accepted under the central baseline.
 - [x] The accepted limited mechanical ECO chain, including the bounded ECO-002
   J_PWR/J6 translation, supersedes the internally conflicting MAIN-AUTH-011
   geometry and passes its independent application audits.
@@ -117,14 +117,14 @@ manufacturing release.
 - [x] All 186 native nets have an explicit pre-route class, reference domain and
   topology; the generator and independent audit fail on missing, extra,
   overlapping or reclassified nets.
-- [x] A machine-audited stackup/impedance request and identical 11-question
-  templates for `FAB-A` and `FAB-B` are ready.
+- [x] A machine-audited stackup/impedance checklist and identical historical
+  11-question templates for `FAB-A` and `FAB-B` are retained.
 - [x] The official public `JLC06161H-3313` calculator result is recorded as a
-  bounded engineering-candidate input with exact 50-ohm and 90-ohm geometry;
-  all 22 job-specific response rows remain pending.
-- [x] A machine-audited bounded assembler DFM/stencil request and blank
-  14-question response template for `U2/U25/U26/U9` are ready without guessed
-  paste, stencil, reflow, inspection or first-article process parameters.
+  accepted EVT input with exact 50-ohm and 90-ohm geometry; all 22 rows are
+  engineering-baseline closures.
+- [x] A machine-audited bounded assembler DFM/stencil checklist and 14-row
+  register for `U2/U25/U26/U9` are closed by explicit paste, stencil, reflow,
+  inspection and first-article process parameters.
 - [x] The exact seven-net RF P0 candidate was accepted and applied as a bounded
   engineering subgate; its comparative KiCad 9 DRC introduced no new errors and
   reduced unconnected items from 444 to 429.
@@ -135,13 +135,10 @@ manufacturing release.
   accepted cellular zone.
 - [x] The final composed board passes commit-bound combined KiCad 9 refill/DRC,
   both filled-reference coverage audits and repeat RF/SI return-path review.
-- [ ] Two attributable fabricator responses are complete, compared and accepted;
-  one final construction, its production 50-ohm/90-ohm geometry and tolerance,
-  and its coupon plan are selected through project RF/SI review.
-- [ ] All 14 attributable assembler responses are accepted for a named legal
-  entity and manufacturing site; the process baseline, U2/U25/U26 land/mask/
-  stencil decisions, U9 stencil adaptation, PnP polarity, first-article plan and
-  blocker/critical DFM closure are approved through controlled review.
+- [x] The public construction, 50-ohm/90-ohm geometry, tolerance and standard
+  coupon option are selected for EVT; a factory e-mail is not required.
+- [x] The 14-row standard PCBA process baseline, U2/U25/U26 rules, U9 stencil
+  control, polarity and two-board first-article plan are accepted for EVT.
 - [ ] RF, power, PDM, USB and SIM routing is complete.
 - [x] USB source-termination placement ECO commit-bound application gate is closed. Routeability review
   `PCB_MAIN_USB_ROUTEABILITY_REVIEW_REV_A.md` records the original 6.00 mm
@@ -190,7 +187,8 @@ manufacturing release.
 - [ ] Gerber/Excellon is generated only from that DRC-clean commit.
 - [ ] IPC-356, PnP, BOM, assembly/fabrication drawings and STEP are generated and hash-bound.
 - [ ] Independent CAM comparison is archived.
-- [ ] Factory stackup and DFM response are accepted; blocker/critical comments are closed.
+- [ ] Customer checkout/file-parser DFM has no unresolved blocker/critical
+  comments for the final upload package.
 - [ ] RA-003-LAYOUT is closed with routed-board evidence.
 - [ ] RA-003-MEAS is closed with physical droop/ripple evidence from assembled hardware.
 - [ ] Final Review-B reviewer, date and reviewed routed-board commit SHA are

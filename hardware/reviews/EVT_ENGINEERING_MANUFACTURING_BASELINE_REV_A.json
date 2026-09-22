@@ -1,0 +1,226 @@
+{
+  "schema": "dioneya-evt-engineering-manufacturing-baseline-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "revision": "A",
+  "decision_date": "2026-09-21",
+  "status": "ACCEPTED_EVT_ENGINEERING_BASELINE_EXTERNAL_REPLIES_NOT_REQUIRED",
+  "authority": "CUSTOMER_AUTHORIZED_STANDARD_ENGINEERING_PROCESS",
+  "scope": "test lot up to 20 stations plus controlled spares",
+  "policy": {
+    "customer_places_pcb_and_pcba_orders": true,
+    "public_manufacturer_data_may_close_external_answer_gates": true,
+    "job_specific_email_or_signed_factory_reply_required": false,
+    "order_portal_dfm_and_file_parser_must_pass": true,
+    "factory_detected_geometry_or_process_error_is_stop_gate": true,
+    "evt_physical_validation_required": true,
+    "series_transfer_requires_revalidation": true,
+    "manufacturing_release_implied": false
+  },
+  "official_sources": [
+    {
+      "id": "JLC-PCB-CAP",
+      "url": "https://jlcpcb.com/capabilities/pcb-capabilities",
+      "use": "layer count, copper, finish, drill, plating and minimum geometry"
+    },
+    {
+      "id": "JLC-IMP",
+      "url": "https://jlcpcb.com/impedance",
+      "use": "published controlled-impedance stackups"
+    },
+    {
+      "id": "JLC-PCBA-CAP",
+      "url": "https://jlcpcb.com/capabilities/pcb-assembly-capabilities",
+      "use": "standard PCBA process and inspection capability"
+    },
+    {
+      "id": "MOLEX-PICOLOCK-5040520098",
+      "url": "https://www.molex.com/en-us/products/part-detail/5040520098",
+      "use": "Pico-Lock conductor and insulation range"
+    },
+    {
+      "id": "MOLEX-MICROFIT-430300038",
+      "url": "https://www.molex.com/en-us/products/part-detail/430300038",
+      "use": "Micro-Fit 18 AWG terminal rating and insulation range"
+    },
+    {
+      "id": "MOLEX-MICROFIT-430300001",
+      "url": "https://www.molex.com/en-us/products/part-detail/430300001",
+      "use": "Micro-Fit 20 to 24 AWG terminal rating and insulation range"
+    },
+    {
+      "id": "MOLEX-MICROFIT-ATS-638190000",
+      "url": "https://www.molex.com/content/dam/molex/molex-dot-com/products/automated/en-us/applicationtoolingspecificationpdf/638/63819/ATS-638190000-001.pdf?inline=",
+      "use": "20 to 24 AWG strip, crimp-height and pull-force process values"
+    },
+    {
+      "id": "TE-SPEC55-18",
+      "url": "https://www.te.com/en/product-2162473001.html",
+      "use": "18 AWG wire construction, outside diameter and temperature"
+    },
+    {
+      "id": "TE-SPEC55-24",
+      "url": "https://www.te.com/en/product-2160463004.html",
+      "use": "24 AWG wire construction, outside diameter and temperature"
+    },
+    {
+      "id": "ALPHA-3051",
+      "url": "https://www.alphawire.com/products/wire/hook-up-wire/premium/3051",
+      "use": "22 AWG control wire outside diameter and temperature"
+    },
+    {
+      "id": "TE-SOLISTRAND-M8",
+      "url": "https://www.te.com/en/product-8-34114-1.html",
+      "use": "M8 battery ring terminal identity and conductor range"
+    }
+  ],
+  "pcb_main": {
+    "fabrication_process": "JLCPCB public standard or customer-selected equivalent meeting every value below",
+    "stackup_id": "JLC06161H-3313",
+    "layers": 6,
+    "nominal_order_thickness_mm": 1.6,
+    "published_finished_thickness_mm": 1.54,
+    "finished_thickness_tolerance_percent": 10,
+    "outer_copper_oz": 1.0,
+    "inner_copper_oz": 0.5,
+    "surface_finish": "ENIG",
+    "solder_mask": "green LPI",
+    "impedance_tolerance_percent": 10,
+    "rf_50ohm": {
+      "layer": "L1 referenced to continuous L2",
+      "trace_width_mm": 0.1509,
+      "target_ohm": 50
+    },
+    "usb_90ohm": {
+      "layer": "L1 referenced to continuous L2",
+      "trace_width_mm": 0.1537,
+      "pair_gap_mm": 0.2032,
+      "target_ohm": 90
+    },
+    "coupon": "fabricator standard controlled-impedance coupon and TDR report when offered by checkout",
+    "external_reply_required": false,
+    "routing_authorized": true,
+    "manufacturing_release": false
+  },
+  "pcb_pwr": {
+    "fabrication_process": "JLCPCB public standard or customer-selected equivalent meeting every value below",
+    "stackup_id": "JLC04161H-3313A",
+    "layers": 4,
+    "nominal_order_thickness_mm": 1.6,
+    "finished_thickness_tolerance_percent": 10,
+    "outer_finished_copper_um": 70,
+    "inner_finished_copper_um": 35,
+    "minimum_average_hole_wall_plating_um": 18,
+    "surface_finish": "ENIG",
+    "solder_mask": "green LPI",
+    "general_minimum_trace_space_mm": [0.15, 0.15],
+    "preferred_signal_trace_space_mm": [0.20, 0.20],
+    "current_geometry_table": "hardware/PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv",
+    "external_reply_required": false,
+    "numeric_power_geometry_authorized": true,
+    "routing_authorized": true,
+    "manufacturing_release": false
+  },
+  "pcb_mic": {
+    "fabrication_process": "standard two-layer FR-4 prototype PCB plus standard PCBA",
+    "layers": 2,
+    "nominal_order_thickness_mm": 1.0,
+    "finished_thickness_tolerance_percent": 10,
+    "outer_copper_oz": 1.0,
+    "surface_finish": "ENIG",
+    "solder_mask": "green LPI",
+    "general_minimum_copper_clearance_mm": 0.125,
+    "general_minimum_npth_to_copper_mm": 0.20,
+    "acoustic_land_pattern_exception": {
+      "minimum_npth_to_ground_land_mm": 0.10,
+      "scope": "MK1 manufacturer-derived ground land only; no signal trace or zone",
+      "first_article_required": true,
+      "acceptance": "clean 0.8 mm acoustic bore, no copper breakout, no plating, no burr, no solder/paste/adhesive obstruction"
+    },
+    "panelization": "vendor standard tooling rails; V-score prohibited through leaf; route tabs outside MK1 acoustic and H1/H2 zones",
+    "depanel": "supported low-stress routed-tab removal followed by 100 percent acoustic-port inspection",
+    "external_reply_required": false,
+    "dfm_baseline_accepted": true,
+    "manufacturing_release": false
+  },
+  "pcba": {
+    "service_class": "standard PCBA",
+    "paste": "SAC305 no-clean Type 4",
+    "stencil": {
+      "material": "laser-cut electropolished stainless steel",
+      "thickness_um": 100
+    },
+    "reflow": {
+      "peak_c": 240,
+      "peak_tolerance_c": 5,
+      "time_above_217c_s": [45, 75],
+      "ramp_c_per_s": [0.5, 1.5],
+      "maximum_cool_c_per_s": 4
+    },
+    "inspection": [
+      "100 percent SPI",
+      "100 percent AOI",
+      "X-ray hidden LGA/QFN joints",
+      "visual inspection of polarity, connector seating and PCB-MIC acoustic path"
+    ],
+    "main_apertures": {
+      "U2": "1.85 x 0.55 mm per pad, long axis follows land",
+      "U25_U26": "0.27 x 0.27 mm per pad",
+      "U9": "use exact controlled footprint apertures from the component land-pattern drawing; no automatic 1:1 paste substitution"
+    },
+    "first_article": {
+      "quantity": 2,
+      "remaining_lot_hold_quantity": 20,
+      "release_after": "SPI/AOI/X-ray disposition plus rail-current-limited smoke and interface tests"
+    },
+    "external_reply_required": false,
+    "paste_export_authorized_after_native_DRC": true,
+    "manufacturing_release": false
+  },
+  "harness": {
+    "length_table": "hardware/HARNESS_EVT_LENGTH_BASIS_REV_A.csv",
+    "length_margin_percent": 10,
+    "wire_selections": {
+      "microphone_24awg": {
+        "manufacturer": "TE Connectivity Raychem",
+        "mpn": "55A0111-24",
+        "nominal_od_mm": 0.94,
+        "temperature_c": [-65, 150],
+        "terminal": "Molex 5040520098"
+      },
+      "main_power_and_battery_18awg": {
+        "manufacturer": "TE Connectivity Raychem",
+        "mpn": "55A0111-18",
+        "nominal_od_mm": 1.52,
+        "temperature_c": [-65, 150],
+        "terminal": "Molex 430300038"
+      },
+      "main_control_22awg": {
+        "manufacturer": "Alpha Wire",
+        "mpn": "3051",
+        "nominal_od_mm": 1.575,
+        "temperature_c": [-40, 105],
+        "terminal": "Molex 430300001"
+      },
+      "battery_ring": {
+        "manufacturer": "TE Connectivity",
+        "mpn": "8-34114-1",
+        "stud": "M8",
+        "conductor_range_awg": "22-16",
+        "evt_cold_qualification_required": true
+      }
+    },
+    "assembly_temperature_c": [-40, 105],
+    "external_reply_required": false,
+    "build_authorized": true,
+    "manufacturing_release": false
+  },
+  "evt_acceptance": {
+    "order_checkout": "customer confirms stackup, copper, finish, impedance option and zero unresolved file-parser/DFM errors",
+    "harness": "100 percent continuity, polarity and cross-short; first-off crimp height and destructive pull; end-to-end resistance; strain relief and flex",
+    "electrical": "rail drop, startup, modem burst, I2C at 100 kHz and four-channel PDM/AAD",
+    "thermal": "+70 C powered thermal run at representative maximum load",
+    "cold": "-40 C continuity and functional start; includes M8 ring-terminal joint",
+    "acoustic": "four-channel phase/gain/noise and unobstructed PCB-MIC acoustic path",
+    "series_transfer": "repeat DFM, process-capability, environmental and supplier/tooling qualification before serial lot"
+  }
+}

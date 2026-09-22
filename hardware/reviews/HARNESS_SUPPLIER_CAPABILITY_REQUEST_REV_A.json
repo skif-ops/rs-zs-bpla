@@ -2,7 +2,7 @@
   "schema": "dioneya-harness-supplier-capability-request-v1",
   "configuration": "EVT-PRE-20 Rev.A",
   "revision": "A",
-  "status": "PACKET_READY_16_ATTRIBUTABLE_RESPONSES_REQUIRED_FINAL_LENGTHS_OPEN_NOT_FOR_BUILD",
+  "status": "EVT_BUILD_BASELINE_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED_FIRST_ARTICLE_OPEN",
   "authority_inputs": [
     "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv",
     "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv",
@@ -10,7 +10,10 @@
     "hardware/CONNECTOR_FREEZE_REV_A.csv",
     "hardware/EVT_PRE_20_BOM_REV_A.csv",
     "hardware/CHINA_PROCUREMENT_RFQ.csv",
-    "manufacturing/EVT_LOT_SELECTION_REV_A.csv"
+    "manufacturing/EVT_LOT_SELECTION_REV_A.csv",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json",
+    "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md",
+    "hardware/HARNESS_EVT_LENGTH_BASIS_REV_A.csv"
   ],
   "source_binding": [
     {
@@ -19,11 +22,11 @@
     },
     {
       "path": "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv",
-      "sha256": "7c7181ff814f05db1d94c0a9f9bd3a60fcebd4de0a00cec5312c2a0f23c0035c"
+      "sha256": "f9f09a006f1d9cb4d74747bd239f7b22b4c55ac2d8d073dc1224922666dd55ea"
     },
     {
       "path": "hardware/HARNESS_MANUFACTURING_DRAWING_REV_A.md",
-      "sha256": "b567ad06bc587d2a685ce9ec1a481361977561e0ff580e4b7ba6138d5fa057ed"
+      "sha256": "59e2847abfb9f80be1f452c6b1c0f7d0a9cd2c00043cb49e30b5c8f1c54c69dc"
     },
     {
       "path": "hardware/CONNECTOR_FREEZE_REV_A.csv",
@@ -35,7 +38,7 @@
     },
     {
       "path": "hardware/CHINA_PROCUREMENT_RFQ.csv",
-      "sha256": "0d1b96f67713d0fe2c8e3c580b29f82d7e12fb625e24467ce2cbbe10b9ec995f"
+      "sha256": "cb73fe45fca620be75de31de87ba50a2be8842dcd66303612d62352c769bd68f"
     },
     {
       "path": "manufacturing/EVT_LOT_SELECTION_REV_A.csv",
@@ -56,7 +59,7 @@
       "H-BAT-PWR"
     ],
     "supplier_slot": "HARNESS-CANDIDATE",
-    "cut_lengths": "OPEN_DIM_001_DIM_005_DIM_006_DIM_012_ENCLOSURE_ROUTE_DIM_003_BOARD_DATUM_ACCEPTED"
+    "cut_lengths": "EVT_RELEASED_WITH_10_PERCENT_ROUTE_MARGIN"
   },
   "required_gate_ids": [
     "HARNESS-SUPPLIER-IDENTITY",
@@ -77,32 +80,40 @@
     "HARNESS-COMMERCIAL-QUOTE"
   ],
   "accepted_authority": {
-    "legal_entity": null,
-    "manufacturing_site": null,
-    "supplier_assembly_mpn": null,
-    "supplier_drawing_revision": null,
-    "temperature_range_c": null,
-    "wire_avl_reference": null,
-    "crimp_process_reference": null,
-    "quotation_reference": null,
-    "accepted_supplier": false
+    "legal_entity": "CUSTOMER_SELECTED_AT_ORDER",
+    "manufacturing_site": "CUSTOMER_SELECTED_AT_ORDER",
+    "supplier_assembly_mpn": "DIO-HARNESS-SET-EVT-A",
+    "supplier_drawing_revision": "A",
+    "temperature_range_c": [
+      -40,
+      105
+    ],
+    "wire_avl_reference": "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json",
+    "crimp_process_reference": "terminal manufacturer instructions plus first-off qualification",
+    "quotation_reference": "CUSTOMER_COMMERCIAL_ACTION",
+    "accepted_supplier": false,
+    "supplier_selection_nonblocking_customer_action": true
   },
   "external_response": {
     "response_register": "hardware/reviews/HARNESS_SUPPLIER_CAPABILITY_RESPONSE_REV_A.csv",
     "required_rows": 16,
-    "pending_rows": 16,
-    "accepted_rows": 0,
-    "complete": false
+    "closed_rows": 16,
+    "pending_rows": 0,
+    "external_reply_required": false,
+    "complete": true
   },
   "release_interlock": {
     "supplier_selected": false,
-    "assembly_identity_accepted": false,
-    "temperature_rating_accepted": false,
-    "wire_avl_accepted": false,
+    "assembly_identity_accepted": true,
+    "temperature_rating_accepted": true,
+    "wire_avl_accepted": true,
     "crimp_process_qualified": false,
-    "final_lengths_accepted": false,
-    "external_endpoints_accepted": false,
+    "final_lengths_accepted": true,
+    "external_endpoints_accepted": true,
     "first_article_accepted": false,
-    "manufacturing_release": false
+    "manufacturing_release": false,
+    "supplier_selection_nonblocking_customer_action": true,
+    "build_authorized": true,
+    "first_article_required_before_remaining_lot": true
   }
 }

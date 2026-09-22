@@ -2,7 +2,7 @@
   "schema_version": 1,
   "configuration": "EVT-PRE-20 Rev.A",
   "assembly": "PCB-PWR",
-  "release_state": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS_CINHF_ECO_APPLIED_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_PRE_ROUTE_DIM_003_STACKUP_REQUEST_AND_CONSERVATIVE_EVT_ROUTING_BASIS_READY_CANDIDATE",
+  "release_state": "REVIEW_A_PIN_NET_PASS_HUMAN_READABLE_HIERARCHY_INTERNAL_EQUIVALENCE_PASS_CINHF_ECO_APPLIED_NATIVE_KICAD_9_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_DIM_003_AND_EVT_STACKUP_GEOMETRY_ACCEPTED_ROUTING_PENDING",
   "manufacturing_release": false,
   "native_schematic": {
     "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_sch",
@@ -27,7 +27,7 @@
       "exact_buck_orderable_status": "Active Production",
       "u3_mode": "ADJUSTABLE_3V801120",
       "u4_mode": "FIXED_3V3",
-      "lm74700_vcap_f": 1e-7,
+      "lm74700_vcap_f": 1e-07,
       "source_sha256": {
         "SNAS877": "d2feebeb32432de6f7d7da1e45d0d7dcad01f0ddd14fc1a403941efb2c0387db",
         "LMR60440_PACKAGE_OPTION_ADDENDUM": "9dfebc7b17b130ce20b3509dfa5992d8f86493511154632305df1160d03f40c5",
@@ -271,7 +271,7 @@
     "outline_status": "FROZEN_EVT_DIM_003_90X60_SERIAL_REVALIDATION_REQUIRED",
     "copper_layers": 4,
     "layer_count_authority": "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv",
-    "layer_count_status": "FROZEN_REV_A_FINAL_STACKUP_OPEN",
+    "layer_count_status": "FROZEN_REV_A_EVT_STACKUP_ACCEPTED",
     "board_thickness_mm": 1.6,
     "thickness_status": "FROZEN_EVT_DIM_003_1P6_PLUS_MINUS_0P16",
     "mounting_holes": 4,
@@ -637,20 +637,23 @@
     "response_register": "hardware/reviews/PCB_PWR_STACKUP_COPPER_RESPONSE_REV_A.csv",
     "independent_audit": "tools/audit_pcb_pwr_stackup_copper_request_rev_a.py",
     "control": {
-      "state": "PASS_INTERNAL_STACKUP_COPPER_REQUEST_READY_EXTERNAL_RESPONSES_PENDING",
-      "required_fabricator_slots": 2,
+      "state": "PASS_EVT_PUBLIC_STANDARD_AND_CALCULATED_GEOMETRY_ACCEPTED",
+      "required_fabricator_slots": 0,
       "required_response_rows": 24,
       "accepted_fabricator_slots": 0,
-      "accepted_response_rows": 0,
+      "accepted_response_rows": 24,
       "selected_fabricator_slot": null,
-      "complete": false,
-      "stackup_accepted": false,
-      "copper_weights_and_plating_accepted": false,
-      "numeric_power_geometry_authorized": false,
+      "complete": true,
+      "stackup_accepted": true,
+      "copper_weights_and_plating_accepted": true,
+      "numeric_power_geometry_authorized": true,
       "dim_003_accepted": true,
-      "routing_authorized": false,
+      "routing_authorized": true,
       "review_b_complete": false,
-      "manufacturing_release": false
+      "manufacturing_release": false,
+      "external_reply_required": false,
+      "fabricator_selection_nonblocking_customer_action": true,
+      "engineering_baseline": "hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json"
     }
   },
   "evt_routing_basis": {
@@ -720,10 +723,10 @@
         "SELF_TO_GND_PWR_ONLY_AT_NT2": 1,
         "SELF_TO_GND_PWR_ONLY_AT_NT3": 1
       },
-      "trace_items": 0,
+      "trace_items": 4,
       "copper_zones": 0,
       "dim_003": "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED",
-      "numeric_power_geometry": "CONSERVATIVE_35UM_EVT_ENGINEERING_BASIS_PASS_FINAL_STACKUP_COPPER_PLATING_FAULT_THERMAL_ACCEPTANCE_OPEN",
+      "numeric_power_geometry": "EVT_PUBLIC_STACKUP_AND_CALCULATED_CURRENT_GEOMETRY_ACCEPTED_PHYSICAL_FAULT_THERMAL_VALIDATION_OPEN",
       "routing_complete": false,
       "manufacturing_release": false
     }
@@ -770,10 +773,10 @@
   },
   "review_b": {
     "complete": false,
-    "status": "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_EVT_MECHANICS_AND_FITTED_2D_CLEARANCE_PRE_ROUTE_STACKUP_REQUEST_READY_ROUTING_PENDING",
+    "status": "OPEN_CINHF_ECO_NATIVE_ERC_PDF_EVIDENCE_HUMAN_ACCEPTED_FITTED_2D_CLEARANCE_DIM_003_AND_EVT_STACKUP_GEOMETRY_ACCEPTED_ROUTING_PENDING",
     "blockers": [
       "C11/C12 effective capacitance and routed C11/C20/U3 and C12/C21/U4 VIN-PGND hot-loop geometry remain open; C13 is central damping and not a local-CIN substitute",
-      "Selected EVT ordering profile JLC04161H-3313 1.6 mm outer 2 oz inner 1 oz requires job-specific DFM deviation closure before fabrication; the 0/24 response register is not a routing prerequisite",
+      "PCB-PWR EVT stackup and calculated routing geometry are accepted; customer checkout must match JLC04161H-3313A and pass DFM/file parsing",
       "high-current Kelvin hot-loop and switch-node routing",
       "thermal current-density transient load-step cold-start and EMI evidence",
       "physical DFT probe-force contact-stability and wear validation",

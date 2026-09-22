@@ -19,9 +19,16 @@ ROOT = Path(__file__).resolve().parents[1]
 DRAFT = ROOT / "hardware/EVT_PRE_20_BOM_DRAFT.csv"
 OUT = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
 PROCUREMENT_OUT = ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+PROGRAM_OUT = ROOT / "hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv"
 MAIN_PASSIVE_SUPPORT = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
 PWR_PASSIVE_AUTHORITY = ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
 LOT_SIZES = (4, 10, 20)
+PROGRAM_PRODUCTION_LOTS = 2
+PROGRAM_LOT_STATIONS = 20
+PROGRAM_BENCH_STATIONS = 1
+PROGRAM_TOTAL_STATIONS = (
+    PROGRAM_PRODUCTION_LOTS * PROGRAM_LOT_STATIONS + PROGRAM_BENCH_STATIONS
+)
 
 
 # These are project-owned build-to-print article identities.  They make the
@@ -611,6 +618,7 @@ def main(*, check_only: bool = False) -> None:
         "43025-1200": "-40..105",
         "43030-0038": "-40..105",
         "43030-0001": "-40..105",
+        "DIO-HARNESS-SET-EVT-A": "-40..105 EVT qualification",
     }
     known_temp.update(main_temp)
     known_temp.update(power_temp)
@@ -755,6 +763,57 @@ def main(*, check_only: bool = False) -> None:
                 output_row[field] = str(group[field])
         procurement_rows.append(output_row)
 
+    program_fields = [
+        "Program_Procurement_ID", "Procurement_ID", "Assemblies", "Item_IDs",
+        "Category", "Manufacturer", "MPN", "Package", "Value", "Variant",
+        "Population", "Qty_per_station", "Production_lots_20", "Bench_stations",
+        "Total_stations", "Base_qty_2x20_plus_1", "Spare_qty_two_evt20_lots",
+        "Procure_qty_2x20_plus_1", "Spare_policy", "Procurement_track",
+        "BOM_disposition", "Status", "China_source_policy", "Incoming_control",
+        "Program_scope",
+    ]
+    program_rows: list[dict[str, str]] = []
+    for procurement_row in procurement_rows:
+        quantity_20 = int(procurement_row["Qty_20"])
+        require(
+            quantity_20 % PROGRAM_LOT_STATIONS == 0,
+            f"{procurement_row['Procurement_ID']}: Qty_20 is not divisible by 20",
+        )
+        quantity_per_station = quantity_20 // PROGRAM_LOT_STATIONS
+        base_quantity = quantity_per_station * PROGRAM_TOTAL_STATIONS
+        program_spares = int(procurement_row["Spares_20"]) * PROGRAM_PRODUCTION_LOTS
+        item_ids = set(procurement_row["Item_IDs"].split(" | "))
+        if item_ids.issubset({"ASM-MAIN", "ASM-PWR", "ASM-MIC"}):
+            track = "PRIMARY_FULL_PCBA"
+        elif item_ids.issubset({"PCB-MAIN", "PCB-PWR", "PCB-MIC"}):
+            track = "ALTERNATIVE_BARE_PCB_QUOTATION_ONLY"
+        else:
+            track = "COMMON_PROGRAM_PROCUREMENT"
+        program_rows.append({
+            "Program_Procurement_ID": f"PG-{len(program_rows) + 1:03d}",
+            "Procurement_ID": procurement_row["Procurement_ID"],
+            **{
+                field: procurement_row[field]
+                for field in (
+                    "Assemblies", "Item_IDs", "Category", "Manufacturer", "MPN",
+                    "Package", "Value", "Variant", "Population", "Spare_policy",
+                    "BOM_disposition", "Status", "China_source_policy", "Incoming_control",
+                )
+            },
+            "Qty_per_station": str(quantity_per_station),
+            "Production_lots_20": str(PROGRAM_PRODUCTION_LOTS),
+            "Bench_stations": str(PROGRAM_BENCH_STATIONS),
+            "Total_stations": str(PROGRAM_TOTAL_STATIONS),
+            "Base_qty_2x20_plus_1": str(base_quantity),
+            "Spare_qty_two_evt20_lots": str(program_spares),
+            "Procure_qty_2x20_plus_1": str(base_quantity + program_spares),
+            "Procurement_track": track,
+            "Program_scope": (
+                "TWO_EVT20_PRODUCTION_SETS_PLUS_ONE_BENCH; "
+                "two EVT-20 reserve pools; no third reserve pool for bench"
+            ),
+        })
+
     def render_csv(fieldnames: list[str], records: list[dict[str, str]]) -> str:
         buffer = io.StringIO(newline="")
         writer = csv.DictWriter(buffer, fieldnames=fieldnames, lineterminator="\n")
@@ -767,6 +826,7 @@ def main(*, check_only: bool = False) -> None:
         [{field: row.get(field, "") for field in fields} for row in rows],
     )
     procurement_text = render_csv(procurement_fields, procurement_rows)
+    program_text = render_csv(program_fields, program_rows)
     if check_only:
         require(OUT.is_file(), f"generated BOM is missing: {OUT.relative_to(ROOT)}")
         require(
@@ -781,15 +841,21 @@ def main(*, check_only: bool = False) -> None:
             PROCUREMENT_OUT.read_text(encoding="utf-8") == procurement_text,
             f"generated procurement BOM drift: run {Path(__file__).relative_to(ROOT)}",
         )
+        require(
+            PROGRAM_OUT.is_file() and PROGRAM_OUT.read_text(encoding="utf-8") == program_text,
+            f"generated 2x20+1 program procurement drift: run {Path(__file__).relative_to(ROOT)}",
+        )
     else:
         OUT.parent.mkdir(parents=True, exist_ok=True)
         OUT.write_text(detail_text, encoding="utf-8")
         PROCUREMENT_OUT.write_text(procurement_text, encoding="utf-8")
+        PROGRAM_OUT.write_text(program_text, encoding="utf-8")
 
     print(
         f"{'Verified' if check_only else 'Generated'} {OUT.relative_to(ROOT)} with "
         f"{len(rows)} engineering rows and "
-        f"{PROCUREMENT_OUT.relative_to(ROOT)} with {len(procurement_rows)} procurement rows"
+        f"{PROCUREMENT_OUT.relative_to(ROOT)} with {len(procurement_rows)} procurement rows; "
+        f"{PROGRAM_OUT.relative_to(ROOT)} with {len(program_rows)} program rows"
     )
 
 

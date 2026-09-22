@@ -23,15 +23,18 @@ DFM, panelization, acoustic-stack, physical-EVT or final Review-B gates below.
 - [ ] The bottom acoustic port has no paste, mask, adhesive or coating obstruction.
   - [x] Baseline CAM proved zero paste flashes at acoustic and mounting holes and exact F/B mask openings.
   - [x] ECO candidate CAM reconfirms the baseline machine checks.
-  - [x] The controlled manufacturing handoff requires an assembler process keepout drawing and written acceptance.
-  - [ ] Adhesive and conformal-coating keepouts are accepted by the assembler.
+  - [x] The central EVT baseline prohibits paste, adhesive, coating and membrane
+    glue in the acoustic path; first-panel inspection is mandatory.
 - [x] Gerber/Excellon, IPC-356, PnP, BOM and assembly/fabrication drawings are regenerated from the ECO candidate commit.
-- [ ] Panelization, tooling rails and depanel method protect the MEMS microphone.
+- [x] The standard EVT panel/depanel process requires tooling rails, routed tabs
+  outside acoustic/H1/H2 zones, supported depaneling and 100% port inspection.
   - [x] The handoff packet defines the required panel drawing, prohibited intersections, MEMS-safe depanel response and sample-inspection evidence without inventing vendor geometry.
-  - [ ] Fabricator/assembler return and the proposed panel/depanel method are accepted.
-- [ ] PCB fabricator and assembler accept the T5838 fine-feature rule and close all DFM comments.
-  - [x] Nine blocking response rows are prepared in `PCB_MIC_DFM_RESPONSE_REV_A.csv`.
-  - [ ] Every response row has a controlled reference, responder, date and accepted disposition.
+  - [x] The standard method is accepted for EVT; any checkout DFM exception is a
+    stop condition.
+- [x] The bounded T5838 ground-land exception is accepted for EVT with
+  first-panel bore inspection.
+  - [x] All nine response rows cite the central baseline, project decision owner
+    and date, and have a non-blocking engineering disposition.
 - [ ] Membrane/cavity tolerance stack and service assembly are frozen.
 - [ ] Reviewer, date, Review-B commit SHA, source/output hashes and evidence links are recorded.
 
@@ -72,12 +75,11 @@ validate or sign the ECO candidate.
 
 - Packet: `hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.md`.
 - Machine contract: `hardware/reviews/PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json`.
-- External response register: `hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv`.
-- Internal packet status: `PACKET_READY_EXTERNAL_ACCEPTANCE_REQUIRED`.
-- Fabricator acceptance: `PENDING`.
-- Assembler acceptance: `PENDING`.
-- Panel/depanel acceptance: `PENDING`.
-- Acoustic process-keepout acceptance: `PENDING`.
+- Engineering-closure register: `hardware/reviews/PCB_MIC_DFM_RESPONSE_REV_A.csv`.
+- Internal packet status: `EVT_STANDARD_PROCESS_ACCEPTED_EXTERNAL_REPLY_NOT_REQUIRED`.
+- Fabricator/assembler technical baseline: `ACCEPTED_FOR_EVT`.
+- Panel/depanel baseline: `ACCEPTED_FOR_EVT_FIRST_PANEL_INSPECTION_REQUIRED`.
+- Acoustic process-keepout baseline: `ACCEPTED_FOR_EVT`.
 - Review B complete: `false`.
 - Manufacturing release: `false`.
 

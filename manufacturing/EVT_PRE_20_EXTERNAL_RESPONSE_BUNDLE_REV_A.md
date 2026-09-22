@@ -1,116 +1,80 @@
-# EVT-PRE-20 external-response request bundle — Rev.A
+# EVT-PRE-20 external-response bundle — Rev.A
 
-Status: `READY TO ISSUE FOR ATTRIBUTABLE RESPONSES / NOT A PURCHASE ORDER / NOT FOR MANUFACTURE`
+Status: `SUPERSEDED / EVT ENGINEERING BASELINE ACCEPTED / NOT FOR MANUFACTURE`
 
-This controlled bundle consolidates the external inputs that now block the
-production hardware release. It is intentionally narrower than the full
-engineering archive and contains no firmware, server, Android or provisioning
-material.
+Decision date: `2026-09-21`
 
-## Procurement boundary
+The original outbound request set is retained only for traceability. The
+customer owns PCB/PCBA checkout and authorized use of public manufacturer data,
+standard engineering processes and calculated values for this test program.
+Therefore a factory e-mail, signed response or named-site quotation is no longer
+an engineering prerequisite.
 
-- The selected lot remains `EVT-20`.
-- The primary quotation track is full PCBA for `PCB-MAIN`, `PCB-PWR` and
-  `PCB-MIC`.
-- Bare-board quotations are alternatives only. They are never added to the
-  full-PCBA total.
-- Quantities for `EVT-4`, `EVT-10` and `EVT-20`, including the controlled board
-  reserve, come only from `EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv` and
-  `CHINA_PROCUREMENT_RFQ.csv`.
-- Supplier stock, price, MOQ, payment, freight and destination delivery are
-  customer-owned order-time fields and are not awaited by the engineering gate.
-- This archive is primarily a request for technical manufacturing response; a
-  recipient may also return a quotation for customer use. It is not a
-  fabrication release, assembly release, purchase order or authorization to
-  edit source/CAM data.
+The controlling replacement is:
 
-## Included response packets
+- `hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.json`;
+- `hardware/reviews/EVT_ENGINEERING_MANUFACTURING_BASELINE_REV_A.md`;
+- `hardware/PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv`;
+- `hardware/HARNESS_EVT_LENGTH_BASIS_REV_A.csv`.
 
-| Packet | Recipient | Current acceptance state |
-|---|---|---:|
-| PCB-MAIN stackup and impedance | Two independent PCB fabricators | 0/2 complete fabricator sets |
-| PCB-MAIN DFM/stencil | Selected full-PCBA assembler candidate | 0/14 rows accepted |
-| PCB-PWR DIM-003 | Project mechanical/enclosure authority | 18/18 EVT engineering accepted; serial revalidation required |
-| PCB-PWR stackup and copper | Two independent PCB fabricators | 0/24 rows and 0/2 sets accepted |
-| PCB-MIC DFM/acoustic process | PCB fabricator and assembler | 0/9 rows accepted |
-| Complete harness set | Harness supplier candidate | 0/16 rows accepted |
+## Program and lot boundary
 
-The PCB-PWR DIM-003 packet is retained as accepted EVT traceability; the other
-five response packets remain pending. Every returned item must retain its `Gate_ID`, identify the legal entity and
-manufacturing site where requested, name the responder and date, and cite the
-returned drawing, quotation, calculation or process record. A generic sales
-page does not close a job-specific row.
+The configuration remains `EVT-PRE-20`: every production lot is controlled as
+20 stations. The procurement program contains two independent EVT-20 lots plus
+one bench station, 41 stations total. Each EVT-20 lot receives its own reserve
+pool; the bench station does not create a third reserve pool. Serial allocation
+and travellers for the second lot and bench station must be issued before build.
 
-## Native-board boundary
+## Closed response registers
 
-The archive includes native board candidates only to support capability,
-mechanical and DFM review. `PCB-MAIN` is partially routed and `PCB-PWR` remains
-unrouted. Their files and numeric engineering bases must not be converted into
-CAM or fabricated. `PCB-MIC` has routed candidate copper, but its manufacturing
-handoff and Review B remain open; the separate
-commit-bound PCB Native Gate CAM artifact is still required for an actual DFM
-handoff.
+| Packet | Rows closed | External reply required |
+|---|---:|---:|
+| PCB-MAIN stackup/impedance | 22/22 | no |
+| PCB-MAIN assembly/DFM/stencil | 14/14 | no |
+| PCB-PWR stackup/copper | 24/24 | no |
+| PCB-MIC DFM/acoustic process | 9/9 | no |
+| Harness process/capability | 16/16 | no |
 
-No supplier may silently modify a footprint, accepted EVT outline or mounting
-drill, layer count,
-stackup, copper rule, panel, paste aperture or source file. Every proposed
-change returns as a uniquely identified DFM finding and is applied only through
-a controlled project ECO.
+The `Responder` fields identify the project engineering decision, not a factory
+reply. No supplier statement has been fabricated.
 
-## Public capability pre-screen
+## Order boundary
 
-Two Chinese fabricators are suitable candidates for the identical `FAB-A` and
-`FAB-B` requests, but neither is selected or accepted by this pre-screen:
+- Full PCBA remains the primary order track; bare-board rows are alternatives
+  and must not be added to the same quantity total.
+- At checkout the customer must select the stackup, copper, finish, impedance
+  and assembly options from the controlled baseline.
+- Any upload parser or DFM error, mismatch in stackup/copper, or proposed source
+  edit is a stop condition and returns as a controlled ECO.
+- PCB-MAIN and PCB-PWR contain accepted partial-routing subgates, but routing is
+  incomplete. DRC, CAM review and independent Review B are mandatory before
+  their files may be uploaded.
+- PCB-MIC likewise requires current native DRC/CAM evidence and Review B.
+- Two PCBA first articles per build lot and harness first-off crimp qualification
+  precede the remainder of that lot.
 
-- `FAB-A` candidate: JLCPCB. Its official controlled-impedance page publishes
-  4- and 6-layer stackups, a 1.6 mm 6-layer option including
-  `JLC06161H-3313`, and headline capability of 3.5 mil minimum track/space and
-  0.20 mm minimum via. Source:
-  <https://jlcpcb.com/impedance>. Its official calculator recommends that public
-  stack and returns L1/L2 candidate geometry of `0.1509 mm` for 50 ohm and
-  `0.1537/0.2032 mm` width/gap for 90 ohm under the controlled inputs recorded
-  in `PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json`. Calculator:
-  <https://jlcpcb.com/pcb-impedance-calculator>.
-- `FAB-B` candidate: PCBWay. Its official stackup pages publish standard
-  multilayer constructions and state that job-specific/custom impedance
-  constructions may be adjusted for manufacturing capability or material
-  stock. Sources:
-  <https://www.pcbway.com/multi-layer-laminated-structure.html> and
-  <https://www.pcbway.com/pcb_prototype/_Stack_up_for_Prototypes.html>.
+## What remains open
 
-These public pages support candidate screening and a bounded PCB-MAIN
-engineering routing basis only. They do not provide the site-specific signed
-job stackup, production impedance tolerance, coupon plan, DFM closure, plating
-tolerances or panel assumptions required by the response registers. All 22
-PCB-MAIN fabricator response rows remain pending.
+External reply waiting is closed. The following are intentionally not waived:
 
-The bundle also includes the bounded PCB-PWR `JLC04161H-3313` / 35 µm numeric
-EVT routing basis and its 31-net rule manifest. Those files expose the candidate
-4.0 mm / 5 A and 3.0 mm / 4 A assumptions for fabricator review; they neither
-accept the 2 oz / 1 oz job target nor populate any of the 24 PCB-PWR response
-rows. Final copper, plating, via-current, fault and thermal acceptance remain
-job-specific.
+1. remaining native routing, DRC and CAM evidence;
+2. independent Review B and manufacturing-release signatures;
+3. first-article inspection and functional smoke tests;
+4. PCB-PWR current/thermal and protection qualification;
+5. harness continuity, crimp pull, resistance, strain, `+70 C`/`-40 C`, I2C
+   and PDM/AAD checks;
+6. full assembled EVT electrical, RF, acoustic and environmental validation.
+
+At series transfer, repeat supplier/site, DFM, process-capability, tooling and
+environmental qualification. The EVT closure is not a serial-production waiver.
 
 ## Archive control
 
-Build the deterministic request archive with:
+The deterministic historical archive may still be built with:
 
 ```bash
 python tools/build_evt_pre_20_packages.py
 ```
 
-The expected file is
-`artifacts/evt-pre-20-current/Dioneya_EVT_PRE_20_EXTERNAL_RESPONSE_REQUESTS_CURRENT.zip`.
-It contains `BUNDLE_MANIFEST.sha256`, which binds every included source byte.
-Validate both the archive and `SHA256SUMS.txt` with:
-
-```bash
-python tools/audit_evt_pre_20_external_response_bundle.py \
-  --archive artifacts/evt-pre-20-current/Dioneya_EVT_PRE_20_EXTERNAL_RESPONSE_REQUESTS_CURRENT.zip \
-  --sums artifacts/evt-pre-20-current/SHA256SUMS.txt
-```
-
-Archive integrity is not design release. Hardware design release, purchase
-release and manufacturing release remain `BLOCKED` until the returned evidence
-is accepted and all separate routing, DRC, CAM, DFM, mechanical, physical-test
-and Review B gates pass.
+It is evidence of the controlled source set, not an order or a manufacturing
+release.

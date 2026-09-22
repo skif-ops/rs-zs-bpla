@@ -39,8 +39,8 @@ zone and the GNSS remediation must remain unchanged.
 The proposal must prove strict 2D clearance, adjacent source-side presentation,
 pair topology, `0.1537/0.2032 mm` candidate width/gap on L1 over L2, matched
 length for each controlled segment, continuous `GND_DIGITAL` reference, and
-comparative KiCad 9 DRC.  Final geometry remains subject to the selected
-fabricator's job-specific stackup/impedance response.
+comparative KiCad 9 DRC. Final geometry uses the accepted
+`JLC06161H-3313` EVT basis and remains subject to SI review and checkout DFM.
 
 Historical decision: `ECO_REQUIRED_USB_SOURCE_TERMINATION_CLUSTER`.
 

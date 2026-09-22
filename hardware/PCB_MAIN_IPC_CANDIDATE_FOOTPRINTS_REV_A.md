@@ -1,11 +1,12 @@
 # PCB-MAIN project-controlled IPC candidates — Rev.A
 
-Status: `ROUTING CANDIDATE CONTROLLED / ASSEMBLY DFM REQUIRED / NOT FOR MANUFACTURE`
+Status: `ROUTING CANDIDATE CONTROLLED / EVT ASSEMBLY BASELINE ACCEPTED / FIRST ARTICLE REQUIRED / NOT FOR MANUFACTURE`
 
 This control removes workstation-library drift from the three package-only
 PCB-MAIN instances. It does not claim that a component manufacturer supplied a
-land pattern and it does not waive assembly-house DFM, stencil adaptation,
-Review B, DRC or physical process validation.
+land pattern. The central EVT baseline accepts the controlled mask/stencil
+process, but checkout DFM, Review B, DRC and physical first-article validation
+remain required.
 
 ## U2 — W25Q512JVFIQ package F
 
@@ -20,9 +21,9 @@ by the reviewed placement snapshot:
 - copper, mask and nominal paste are coextensive in the candidate;
 - source disposition: `PROJECT_IPC_W25Q512JV_F_KICAD_GULLWING_ASSEMBLER_DFM_REQUIRED`.
 
-Before fabrication release, the selected assembler must check heel/toe/side
-allowance against the ordered package tolerance, choose solder-mask expansion
-and approve the stencil aperture for the actual paste and stencil thickness.
+The EVT process uses the controlled aperture and mask values from the central
+baseline. Checkout must preserve them; the first two assemblies verify paste
+transfer, heel/toe/side wetting and absence of bridges/opens.
 
 ## U25/U26 — TPD2EUSB30DRTR package DRT0003A
 
@@ -39,9 +40,10 @@ candidate:
 - copper, mask and nominal paste are coextensive in the candidate;
 - source disposition: `PROJECT_IPC_TI_DRT0003A_KICAD_DRT3_ASSEMBLER_DFM_REQUIRED`.
 
-Before fabrication release, the selected assembler must approve mask and
-stencil rules at its minimum feature capability. Review B must additionally
-confirm direct flow-through placement, no branch stub, continuous reference
+The EVT process uses the controlled mask/stencil values from the central
+baseline. Checkout DFM must support the feature size, and first-article
+inspection must confirm paste release and joint quality. Review B additionally
+confirms direct flow-through placement, no branch stub, continuous reference
 plane and post-route USB differential-impedance/SI evidence.
 
 ## Reproducibility and release interlock

@@ -1,6 +1,6 @@
 # PCB-MAIN Rev.A pre-route constraint authority
 
-Status: `PASS / 186 NETS CLASSIFIED / PUBLIC NUMERIC ROUTING BASIS CONTROLLED / FINAL FABRICATOR ACCEPTANCE AND ROUTING OPEN / NOT FOR MANUFACTURE`
+Status: `PASS / 186 NETS CLASSIFIED / EVT STACKUP AND NUMERIC ROUTING BASIS ACCEPTED / ROUTING OPEN / NOT FOR MANUFACTURE`
 
 Machine authority: `hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv`
 
@@ -8,39 +8,38 @@ Generator: `tools/generate_pcb_main_routing_authority_rev_a.py`
 
 Independent audit: `tools/audit_pcb_main_routing_authority_rev_a.py`
 
-CSV SHA-256: `f77948c4837448fbc6c3d0cfd6820354a0a8cab12925457bf90768704cb9e1dc`
+CSV SHA-256: `36da48a6614de40bed1b52cb53b0b6a1367fabf0e0504e8c0f4297c5b962f6f0`
 
 ## Decision
 
 Every one of the 186 non-empty PCB-MAIN native nets has one explicit route
 class, reference-domain rule, topology, layer/via rule, priority and source
-authority. This closes only the constraint-coverage input needed to begin
-routing. The committed board still has zero tracks, zero vias and zero board
-copper zones; therefore routing, DRC, CAM, Review B and manufacturing release
-remain open.
+authority. This closes the constraint-coverage input and records the accepted
+EVT geometry. The committed board is partially routed with 1023 trace items and
+eight copper zones; remaining routing, DRC, CAM, Review B and manufacturing
+release remain open.
 
-The manifest deliberately does not assign a guessed controlled-impedance trace
-width. A separate controlled overlay now selects the official JLCPCB public
+The manifest does not use a guessed controlled-impedance trace width. A
+controlled overlay selects the official JLCPCB public
 `JLC06161H-3313` construction as the numeric basis for an engineering routing
 candidate: `0.1509 mm` for 50-ohm single-ended traces and `0.1537 mm` width with
 `0.2032 mm` pair gap for 90-ohm differential traces, all on L1 referenced to
-L2. The selected fabricator must still return the final job-specific stackup,
-dielectric data, copper thickness, production tolerance and coupon plan before
-manufacturing acceptance.
+L2. These values and `±10%` impedance tolerance are accepted for the EVT job.
+The customer must select the matching construction at checkout; any parser or
+DFM mismatch is a stop condition.
 
 The overlay and its independent audit are
 `hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.json`,
 `hardware/reviews/PCB_MAIN_JLC06161H_3313_ROUTING_BASIS_REV_A.md` and
 `tools/audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py`.
 
-The controlled two-fabricator request is
+The historical two-fabricator request is
 `hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.json`; its
-human-readable packet and blank 22-row response register are
+human-readable packet and 22-row engineering-closure register are
 `hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_REQUEST_REV_A.md` and
-`hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv`. Both
-fabricator slots remain pending, so this handoff has zero accepted final
-job-specific constructions. The public numeric overlay permits only a bounded
-engineering routing candidate; it does not authorize fabrication or assembly.
+`hardware/reviews/PCB_MAIN_STACKUP_IMPEDANCE_RESPONSE_REV_A.csv`. All rows are
+closed by the customer-authorized EVT baseline without claiming factory replies.
+This authorizes routing, but not fabrication or assembly.
 
 ## Controlled class inventory
 
@@ -81,10 +80,9 @@ independent audit fail until its route class is reviewed explicitly.
 
 ## Controlled-impedance handoff
 
-The seven RF nets retain target token
-`50_OHM_SINGLE_ENDED_FACTORY_STACKUP_PENDING` for final job-specific acceptance.
-Their engineering-candidate geometry is `0.1509 mm` on L1 over L2 against the
-named public construction. Signal-via count has a zero target; any exception
+The seven RF nets carry the accepted EVT target token in the CSV; controlling
+geometry is `0.1509 mm` on L1 over L2
+against the named public construction. Signal-via count has a zero target; any exception
 requires a reviewed transition and adjacent return vias. J8/J9/J10 remain the
 conducted ports, and no RF tee or probe stub is allowed.
 
@@ -95,18 +93,15 @@ The four USB pair groups are independent:
 - `USB_CELL_MODEM_SEGMENT`: `CELL_USB_DP_U8` / `CELL_USB_DM_U8`;
 - `USB_CELL_FIXTURE_SEGMENT`: `CELL_USB_DP_TP` / `CELL_USB_DM_TP`.
 
-Each group retains target `90_OHM_DIFFERENTIAL_FACTORY_STACKUP_PENDING` for
-final job-specific acceptance. The engineering-candidate geometry is
+Each group carries the accepted EVT target token in the CSV. The accepted EVT geometry is
 `0.1537 mm` trace width and `0.2032 mm` pair gap on L1 over L2. Allowable skew
-and final production tolerance remain open until SI review and the returned
-fabricator construction are accepted. Main USB and BG95 recovery USB never
+remains open until SI review; production tolerance is `±10%`. Main USB and BG95 recovery USB never
 share copper nets. The pair geometry must be enforced by a differential-pair-
 aware router and independently audited.
 
-The request packet asks `FAB-A` and `FAB-B` the same 11 construction,
-impedance, capability and DFM questions. Selection requires two attributable
-responses plus project RF/SI review; the response template currently records
-`0/2` accepted fabricators.
+The former request packet asked `FAB-A` and `FAB-B` the same 11 construction,
+impedance, capability and DFM questions. Its 22 rows are now non-blocking
+engineering closures; project RF/SI review and checkout DFM remain mandatory.
 
 ## Route-order input
 
@@ -127,9 +122,8 @@ must preserve the 2D placement-clearance PASS already recorded in Review B.
 Constraint coverage may be called PASS only while the following remain explicit
 blockers:
 
-- final job-specific fabricator stackup, production impedance tolerances,
-  solver evidence and coupon plan; the public numeric candidate basis does not
-  close this item;
+- checkout selection of `JLC06161H-3313`, controlled impedance and zero
+  unresolved parser/DFM errors;
 - routed copper, domain pours, stitching and impedance coupons;
 - zero-unrouted KiCad 9 DRC and schematic parity;
 - native STEP/service-volume review;

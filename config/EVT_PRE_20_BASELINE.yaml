@@ -25,13 +25,23 @@ lot:
   maximum_station_quantity: 20
   supported_procurement_quantities: [4, 10, 20]
   selected_evt_quantity: 20
+  program_total_station_quantity: 41
+  program_structure: TWO_EVT20_PRODUCTION_SETS_PLUS_ONE_BENCH
+  program_production_set_quantities: [20, 20]
+  program_bench_station_quantity: 1
+  program_procurement_authority: hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv
+  program_spare_rule: TWO_EVT20_RESERVE_POOLS_BENCH_ADDS_NO_THIRD_RESERVE_POOL
+  program_serial_and_traveller_status: SECOND_SET_AND_BENCH_ASSIGNMENT_REQUIRED_BEFORE_BUILD
   selection_required_before_purchase_release: true
   selection_status: LOCKED_CURRENT_CUSTOMER_EVT_20
   commercial_procurement_owner: CUSTOMER
   supplier_stock_price_moq_and_delivery_gate: NON_BLOCKING_CUSTOMER_ACTION
   engineering_procurement_handoff_requires_quote_fields: false
   exact_mpn_and_no_substitution_required: true
-  job_specific_manufacturing_technical_responses_required: true
+  job_specific_manufacturing_technical_responses_required: false
+  evt_public_engineering_baseline_authorized: true
+  customer_order_checkout_dfm_must_pass: true
+  series_transfer_manufacturing_revalidation_required: true
   selected_serial_range: ["001", "020"]
   serial_prefix: DIO-EVT-
   serial_range: ["001", "020"]

@@ -36,6 +36,7 @@ from PCB Native Gate run
 
 Decision: `PASS_BOUNDED_RETURN_PATH_REMEDIATIONS_FINAL_SI_AND_REVIEW_B_OPEN`.
 
-Remaining routing, final job-specific stackup/tolerance/coupon acceptance,
-final SI/PI, both fabricator responses, selected-assembler DFM/stencil response,
-Review B, CAM and manufacturing release remain open.
+The customer-authorized EVT baseline now selects `JLC06161H-3313`, `±10%`
+impedance, the standard coupon option and the standard PCBA process without
+factory reply letters. Remaining routing, final SI/PI, checkout DFM, Review B,
+CAM and manufacturing release remain open.

@@ -2,7 +2,7 @@
   "schema": "dioneya-pcb-main-routing-design-basis-v1",
   "configuration": "EVT-PRE-20 Rev.A",
   "board": "PCB-MAIN",
-  "status": "PASS_PUBLIC_STANDARD_NUMERIC_ROUTING_INPUT_FINAL_FABRICATOR_ACCEPTANCE_PENDING",
+  "status": "PASS_PUBLIC_STANDARD_SELECTED_AS_EVT_JOB_STACKUP_NOT_FOR_MANUFACTURE",
   "retrieval_utc_date": "2026-09-19",
   "fabricator": "JLCPCB",
   "official_sources": [
@@ -24,17 +24,66 @@
     "displayed_finished_thickness_mm": 1.54,
     "displayed_finished_thickness_tolerance_percent": 10.0,
     "layers": [
-      {"name": "L1", "kind": "copper", "thickness_mm": 0.0350},
-      {"name": "PP1", "kind": "prepreg", "material": "3313 RC57%", "thickness_mm": 0.0994},
-      {"name": "L2", "kind": "copper", "thickness_mm": 0.0152},
-      {"name": "CORE1", "kind": "core", "material": "H/H without copper", "thickness_mm": 0.5500},
-      {"name": "L3", "kind": "copper", "thickness_mm": 0.0152},
-      {"name": "PP2", "kind": "prepreg", "material": "2116 RC54%", "thickness_mm": 0.1088},
-      {"name": "L4", "kind": "copper", "thickness_mm": 0.0152},
-      {"name": "CORE2", "kind": "core", "material": "H/H without copper", "thickness_mm": 0.5500},
-      {"name": "L5", "kind": "copper", "thickness_mm": 0.0152},
-      {"name": "PP3", "kind": "prepreg", "material": "3313 RC57%", "thickness_mm": 0.0994},
-      {"name": "L6", "kind": "copper", "thickness_mm": 0.0350}
+      {
+        "name": "L1",
+        "kind": "copper",
+        "thickness_mm": 0.035
+      },
+      {
+        "name": "PP1",
+        "kind": "prepreg",
+        "material": "3313 RC57%",
+        "thickness_mm": 0.0994
+      },
+      {
+        "name": "L2",
+        "kind": "copper",
+        "thickness_mm": 0.0152
+      },
+      {
+        "name": "CORE1",
+        "kind": "core",
+        "material": "H/H without copper",
+        "thickness_mm": 0.55
+      },
+      {
+        "name": "L3",
+        "kind": "copper",
+        "thickness_mm": 0.0152
+      },
+      {
+        "name": "PP2",
+        "kind": "prepreg",
+        "material": "2116 RC54%",
+        "thickness_mm": 0.1088
+      },
+      {
+        "name": "L4",
+        "kind": "copper",
+        "thickness_mm": 0.0152
+      },
+      {
+        "name": "CORE2",
+        "kind": "core",
+        "material": "H/H without copper",
+        "thickness_mm": 0.55
+      },
+      {
+        "name": "L5",
+        "kind": "copper",
+        "thickness_mm": 0.0152
+      },
+      {
+        "name": "PP3",
+        "kind": "prepreg",
+        "material": "3313 RC57%",
+        "thickness_mm": 0.0994
+      },
+      {
+        "name": "L6",
+        "kind": "copper",
+        "thickness_mm": 0.035
+      }
     ]
   },
   "numeric_geometry": {
@@ -56,12 +105,13 @@
   },
   "acceptance_boundary": {
     "numeric_input_for_engineering_routing_candidate": true,
-    "published_standard_selected_as_final_job_stackup": false,
-    "production_impedance_tolerance_percent": null,
-    "coupon_plan_accepted": false,
-    "job_specific_fabricator_response_required": true,
-    "job_specific_dfm_required": true,
+    "published_standard_selected_as_final_job_stackup": true,
+    "production_impedance_tolerance_percent": 10.0,
+    "coupon_plan_accepted": true,
+    "job_specific_fabricator_response_required": false,
+    "job_specific_dfm_required": false,
     "review_b_complete": false,
-    "manufacturing_release": false
+    "manufacturing_release": false,
+    "order_checkout_dfm_must_pass": true
   }
 }
