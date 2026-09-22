@@ -1,4 +1,5 @@
 #include "zs_nor_slot_store.h"
+#include "zs_nor_storage_layout.h"
 
 #include <string.h>
 
@@ -60,5 +61,55 @@ bool zs_nor_slot_store_installation_io(zs_nor_slot_store_t *store, zs_installati
   memset(out_io, 0, sizeof(*out_io));
   if (!store_valid(store) || store->slot_count != ZS_INSTALLATION_STORE_SLOT_COUNT || store->record_bytes < ZS_INSTALLATION_STORE_SLOT_BYTES) return false;
   out_io->ctx = store; out_io->read = slot_read; out_io->erase = slot_erase; out_io->write = slot_write;
+  return true;
+}
+
+/* ---- B3 layout binding (declared in zs_nor_storage_layout.h) ----------------------------- */
+
+bool zs_nor_storage_bind_stores(zs_nor_storage_bindings_t *bindings,
+                                zs_nor_t *nor,
+                                uint16_t command_slot_count,
+                                uint16_t outbox_slot_count,
+                                zs_archive_storage_t *out_archive_storage,
+                                zs_command_journal_io_t *out_command_io,
+                                zs_event_outbox_io_t *out_outbox_io,
+                                zs_station_config_io_t *out_config_io,
+                                zs_installation_store_io_t *out_installation_io) {
+  if (bindings) memset(bindings, 0, sizeof(*bindings));
+  if (out_archive_storage) memset(out_archive_storage, 0, sizeof(*out_archive_storage));
+  if (out_command_io) memset(out_command_io, 0, sizeof(*out_command_io));
+  if (out_outbox_io) memset(out_outbox_io, 0, sizeof(*out_outbox_io));
+  if (out_config_io) memset(out_config_io, 0, sizeof(*out_config_io));
+  if (out_installation_io) memset(out_installation_io, 0, sizeof(*out_installation_io));
+  if (!bindings || !nor || !out_archive_storage || !out_command_io || !out_outbox_io ||
+      !out_config_io || !out_installation_io)
+    return false;
+
+  if (!zs_nor_storage_layout_make_stores(nor->geometry.capacity_bytes, nor->geometry.erase_bytes,
+                                         command_slot_count, outbox_slot_count, &bindings->layout) ||
+      zs_nor_probe_w25q512jv(nor, &bindings->nor_probe) != ZS_NOR_PROBE_OK ||
+      !zs_nor_archive_storage_init(&bindings->archive_adapter, nor, out_archive_storage) ||
+      !zs_nor_command_journal_io_init(&bindings->command_adapter, nor,
+                                      bindings->layout.command_base_address,
+                                      bindings->layout.command_slot_count, out_command_io) ||
+      !zs_nor_event_outbox_io_init(&bindings->outbox_adapter, nor,
+                                   bindings->layout.outbox_base_address,
+                                   bindings->layout.outbox_slot_count, out_outbox_io) ||
+      !zs_nor_slot_store_init(&bindings->config_store, nor, bindings->layout.config_base_address,
+                              ZS_STATION_CONFIG_SLOT_COUNT, ZS_STATION_CONFIG_SLOT_BYTES) ||
+      !zs_nor_slot_store_config_io(&bindings->config_store, out_config_io) ||
+      !zs_nor_slot_store_init(&bindings->installation_store, nor, bindings->layout.installation_base_address,
+                              ZS_INSTALLATION_STORE_SLOT_COUNT, ZS_INSTALLATION_STORE_SLOT_BYTES) ||
+      !zs_nor_slot_store_installation_io(&bindings->installation_store, out_installation_io)) {
+    memset(bindings, 0, sizeof(*bindings));
+    memset(out_archive_storage, 0, sizeof(*out_archive_storage));
+    memset(out_command_io, 0, sizeof(*out_command_io));
+    memset(out_outbox_io, 0, sizeof(*out_outbox_io));
+    memset(out_config_io, 0, sizeof(*out_config_io));
+    memset(out_installation_io, 0, sizeof(*out_installation_io));
+    return false;
+  }
+
+  out_archive_storage->size_bytes = bindings->layout.command_base_address;
   return true;
 }
