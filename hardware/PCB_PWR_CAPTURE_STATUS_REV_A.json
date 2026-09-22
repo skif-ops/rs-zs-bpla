@@ -603,6 +603,40 @@
       "routing_complete": false,
       "review_b_complete": false,
       "manufacturing_release": false
+    },
+    "buck_switch_node_routing_005": {
+      "proposal": "hardware/reviews/PCB_PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.json",
+      "record": "hardware/reviews/PCB_PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.md",
+      "generator": "tools/generate_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py",
+      "audit": "tools/audit_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py",
+      "status": "STATIC_CANDIDATE_COMMIT_BOUND_KICAD9_GATE_PENDING",
+      "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_005_CREATION_SUBGATE",
+      "base_board_sha256": "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c",
+      "candidate_board_sha256": "5d135a38774c4e223c1db8d6a3fc0e8c9c492fe3ba24f5e2ec4c1b00ab2166d7",
+      "candidate_board_semantic_sha256": "465f5b41265a7f8ccb80a6f7edbb937b2eebad0333730e7586e8f76e3d1d8391",
+      "routed_nets": [
+        "SW_3V8",
+        "SW_3V3"
+      ],
+      "connections": [
+        "U3.3-C4.2-L1.1",
+        "U4.3-C6.2-L2.1"
+      ],
+      "trace_items": 22,
+      "added_trace_items": 14,
+      "per_net_route_length_mm": 7.469896,
+      "nominal_width_mm": 2.1,
+      "explicit_pad_entry_neckdown_width_mm": 0.5,
+      "minimum_screened_edge_clearance_mm": 0.403,
+      "vias": 0,
+      "authoritative_board_modified": false,
+      "machine_gate_complete": false,
+      "human_acceptance_complete": false,
+      "application_authorized": false,
+      "pad_entry_thermal_qualified": false,
+      "routing_complete": false,
+      "review_b_complete": false,
+      "manufacturing_release": false
     }
   },
   "mechanical_freeze_input": {

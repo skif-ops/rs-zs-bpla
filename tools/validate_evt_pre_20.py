@@ -584,6 +584,22 @@ def validate_decisions_and_tests() -> None:
         "2x20+1 program decision is missing or incomplete",
     )
     require(
+        decisions["DEC-133"]["Status"] ==
+        "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_005_CREATION_SUBGATE"
+        in decisions["DEC-133"]["Reason"]
+        and "full 2.1 mm copper cannot terminate" in decisions["DEC-133"]["Reason"]
+        and "fourteen F.Cu segments" in decisions["DEC-133"]["Impact"]
+        and "U3.3-C4.2-L1.1" in decisions["DEC-133"]["Impact"]
+        and "U4.3-C6.2-L2.1" in decisions["DEC-133"]["Impact"]
+        and "5d135a38774c4e223c1db8d6a3fc0e8c9c492fe3ba24f5e2ec4c1b00ab2166d7"
+        in decisions["DEC-133"]["Impact"]
+        and "86 to 86" in decisions["DEC-133"]["Impact"]
+        and "121 to 117" in decisions["DEC-133"]["Impact"]
+        and "pad-entry thermal qualification" in decisions["DEC-133"]["Impact"],
+        "PCB-PWR routing candidate 005 creation boundary is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]
