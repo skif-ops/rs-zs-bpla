@@ -3,7 +3,23 @@
     <string name="app_name">Дионея: настройка</string>
     <string name="baseline_title">Инженерный baseline Android</string>
     <string name="baseline_status">BLE GATT по предложению v0.1 (UUID, MTU 247, кадрирование): экран «Сервер» работает в проверочном режиме до совместного прототипа с прошивкой nRF52840.</string>
-    <string name="open_server_screen">Экран «Сервер»</string>
+    <string name="open_station_picker">Выбрать станцию (BLE)</string>
+    <string name="open_server_screen">Экран «Сервер» без станции (проверка полей)</string>
+    <string name="server_title_for">Сервер «Мухоед» — %1$s</string>
+    <string name="picker_title">Выбор станции</string>
+    <string name="picker_expected_serial">Ожидаемый серийник с этикетки (DIO-EVT-001…040, B01), необязательно</string>
+    <string name="picker_bad_serial">Серийник не входит в пилотный состав</string>
+    <string name="picker_scanning">Поиск станций по BLE…</string>
+    <string name="picker_found">Найдено станций: %1$d — выберите</string>
+    <string name="picker_candidate">%1$s\n%2$s   RSSI %3$d dBm</string>
+    <string name="picker_unnamed">(без имени)</string>
+    <string name="picker_confirming">Чтение identity %1$s…</string>
+    <string name="picker_confirmed">Подтверждено: %1$s</string>
+    <string name="picker_continue">Перейти к настройке сервера</string>
+    <string name="picker_rescan">Искать заново</string>
+    <string name="picker_scan_failed">Сканирование не запустилось (код %1$d)</string>
+    <string name="picker_bluetooth_off">Bluetooth выключен</string>
+    <string name="picker_permission_denied">Нет разрешения на BLE — сканирование недоступно</string>
     <string name="server_title">Сервер «Мухоед»</string>
     <string name="server_host_port">Хост[:порт MQTT] (IPv4, IPv6 или имя, без схемы)</string>
     <string name="server_https_port">Порт HTTPS (0 = не используется)</string>
