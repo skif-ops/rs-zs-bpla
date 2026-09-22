@@ -506,6 +506,22 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR routing candidate 004 exact application boundary is missing",
     )
     require(
+        decisions["DEC-130"]["Status"] ==
+        "PASS_EXACT_REV_GATE_APPLICATION_REMAINING_ROUTING_NEXT"
+        and "b33de676" in decisions["DEC-130"]["Reason"]
+        and "57011fb5" in decisions["DEC-130"]["Reason"]
+        and "CI 641" in decisions["DEC-130"]["Reason"]
+        and "PCB-PWR Schematic 94" in decisions["DEC-130"]["Reason"]
+        and "PCB Native 347" in decisions["DEC-130"]["Reason"]
+        and "86 to 86" in decisions["DEC-130"]["Reason"]
+        and "122 to 121" in decisions["DEC-130"]["Reason"]
+        and "U1.5-Q1.4 REV_GATE" in decisions["DEC-130"]["Impact"]
+        and "neither overall routing nor Review B CAM DFM thermal or manufacturing complete"
+        in decisions["DEC-130"]["Impact"]
+        and "separate exact human gate" in decisions["DEC-130"]["Impact"],
+        "PCB-PWR routing candidate 004 application closure is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]

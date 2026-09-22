@@ -51,6 +51,7 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
     application = json.loads(APPLICATION.read_text(encoding="utf-8"))
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     route = status["native_layout"]["rev_gate_routing_004"]
+    gate = application["machine_gate"]
     require(
         approval["decision"] == "ACCEPT_PCB_PWR_REV_GATE_ROUTING_004_SUBGATE"
         and application["decision"] == approval["decision"]
@@ -61,7 +62,7 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and application["added_route_length_mm"] == 12.565
         and application["width_mm"] == 0.5
         and application["vias"] == 0
-        and application["machine_gate"]["status"] in {
+        and gate["status"] in {
             "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
             "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
         }
@@ -86,11 +87,67 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and route["manufacturing_release"] is False,
         "REV_GATE application boundary drift",
     )
+    if gate["status"] == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE":
+        require(
+            gate["application_source_commit_sha"] ==
+            "b33de67652bafb07f059d8c5dfa69d056a44a6bd"
+            and gate["application_source_tree_sha"] ==
+            "57011fb59e9d2e3ed05b9edf4f97cad6dec754bd"
+            and gate["board_application_commit_sha"] ==
+            "b33de67652bafb07f059d8c5dfa69d056a44a6bd"
+            and gate["ci_run_number"] == 641
+            and gate["ci_run_id"] == 35692517016
+            and gate["pcb_pwr_schematic_run_number"] == 94
+            and gate["pcb_pwr_schematic_run_id"] == 35692517010
+            and gate["pcb_native_run_number"] == 347
+            and gate["pcb_native_run_id"] == 35692517037
+            and gate["pcb_native_job_id"] == 106632325949
+            and gate["artifact_id"] == 10678553469
+            and gate["artifact_digest"] ==
+            "sha256:6c5fe93ecb13ffb07706c5af8f5f90364a61ce2bdca42e10b612f5624b78b7ee"
+            and gate["required_violations"] == [86, 86]
+            and gate["required_unconnected"] == [122, 121]
+            and gate["required_drc_fingerprint_delta"] == 0
+            and gate["comparative_drc"] ==
+            "PASS_86_TO_86_VIOLATIONS_122_TO_121_UNCONNECTED_ZERO_FINGERPRINT_DELTA"
+            and gate["evidence_sha256"] == {
+                "application_audit.json":
+                "130da37dc91b3c225e21dfdaba1711bc4b412e48c05d2044b67c36a173e5ee04",
+                "baseline_drc.json":
+                "6dce93d4bef62172a187bbded7e39138d137915234edd3a8357fe3904ad208bd",
+                "candidate_drc.json":
+                "721fbb50f991cd4f3932b74354cac1857573a640aac5f75bd8b64566d987fd35",
+                "comparative_audit.json":
+                "7efbf21ba0072d957992430d40c91fa3389fe43644f2f8f297583c6b9de771fc",
+            }
+            and route["status"] ==
+            "APPROVED_APPLIED_EXACT_REV_GATE_ROUTING_COMMIT_BOUND_KICAD9_GATE_PASS"
+            and route["application_machine_gate"] ==
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_GATE"
+            and route["application_source_commit_sha"] ==
+            gate["application_source_commit_sha"]
+            and route["application_source_tree_sha"] ==
+            gate["application_source_tree_sha"]
+            and route["application_board_commit_sha"] ==
+            gate["board_application_commit_sha"]
+            and route["application_ci_run_number"] == gate["ci_run_number"]
+            and route["application_pcb_pwr_schematic_run_number"] ==
+            gate["pcb_pwr_schematic_run_number"]
+            and route["application_pcb_native_run_number"] ==
+            gate["pcb_native_run_number"]
+            and route["application_artifact_id"] == gate["artifact_id"]
+            and route["application_artifact_digest"] ==
+            gate["artifact_digest"]
+            and route["application_comparative_drc"] ==
+            gate["comparative_drc"],
+            "REV_GATE commit-bound application evidence drift",
+        )
     report: dict[str, object] = {
         "status": "PASS_EXACT_ACCEPTED_PCB_PWR_REV_GATE_ROUTING_004_APPLICATION",
         "board_sha256": BOARD_SHA256,
         "trace_items": 8,
         "vias": 0,
+        "machine_gate": gate["status"],
         "routing_complete": False,
         "review_b_complete": False,
         "manufacturing_release": False,

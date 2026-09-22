@@ -16,10 +16,29 @@
   "width_mm": 0.5,
   "vias": 0,
   "machine_gate": {
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+    "application_source_commit_sha": "b33de67652bafb07f059d8c5dfa69d056a44a6bd",
+    "application_source_tree_sha": "57011fb59e9d2e3ed05b9edf4f97cad6dec754bd",
+    "board_application_commit_sha": "b33de67652bafb07f059d8c5dfa69d056a44a6bd",
+    "ci_run_number": 641,
+    "ci_run_id": 35692517016,
+    "pcb_pwr_schematic_run_number": 94,
+    "pcb_pwr_schematic_run_id": 35692517010,
+    "pcb_native_run_number": 347,
+    "pcb_native_run_id": 35692517037,
+    "pcb_native_job_id": 106632325949,
+    "artifact_id": 10678553469,
+    "artifact_digest": "sha256:6c5fe93ecb13ffb07706c5af8f5f90364a61ce2bdca42e10b612f5624b78b7ee",
     "required_violations": [86, 86],
     "required_unconnected": [122, 121],
-    "required_drc_fingerprint_delta": 0
+    "required_drc_fingerprint_delta": 0,
+    "comparative_drc": "PASS_86_TO_86_VIOLATIONS_122_TO_121_UNCONNECTED_ZERO_FINGERPRINT_DELTA",
+    "evidence_sha256": {
+      "application_audit.json": "130da37dc91b3c225e21dfdaba1711bc4b412e48c05d2044b67c36a173e5ee04",
+      "baseline_drc.json": "6dce93d4bef62172a187bbded7e39138d137915234edd3a8357fe3904ad208bd",
+      "candidate_drc.json": "721fbb50f991cd4f3932b74354cac1857573a640aac5f75bd8b64566d987fd35",
+      "comparative_audit.json": "7efbf21ba0072d957992430d40c91fa3389fe43644f2f8f297583c6b9de771fc"
+    }
   },
   "routing_complete": false,
   "review_b_complete": false,
