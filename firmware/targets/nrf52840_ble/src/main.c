@@ -14,6 +14,9 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <string.h>
+#ifdef CONFIG_MCUBOOT_IMG_MANAGER
+#include <zephyr/dfu/mcuboot.h>
+#endif
 
 LOG_MODULE_REGISTER(dio_bridge, LOG_LEVEL_INF);
 
@@ -52,10 +55,23 @@ void app_advertise(bool on, uint16_t seconds) {
   }
 }
 
+/* A freshly swapped-in image is confirmed only after the STM32 has talked to it (IDENTITY_SET arrives at the
+   service init and after every recovery); an image that never hears the STM32 is reverted by MCUboot on the
+   next reset, which is how a broken bridge update heals itself (addendum C.6). */
+static void confirm_running_image(void) {
+#ifdef CONFIG_MCUBOOT_IMG_MANAGER
+  if (!boot_is_img_confirmed()) {
+    const int err = boot_write_img_confirmed();
+    LOG_INF("image confirmed (%d)", err);
+  }
+#endif
+}
+
 void app_set_local_name(const char *name) {
   strncpy(local_name, name, sizeof(local_name) - 1u);
   local_name[sizeof(local_name) - 1u] = '\0';
   (void)bt_set_name(local_name);
+  confirm_running_image();
 }
 
 void app_set_pairing_secret(const uint8_t secret[16]) {

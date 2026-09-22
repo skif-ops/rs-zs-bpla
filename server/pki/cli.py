@@ -314,6 +314,15 @@ def cmd_server_qr(a):
     print(f"server profile QR written to {out} ({text})")
 
 
+def cmd_nrf_boot_key(a):
+    """ECDSA P-256 signing key for the nRF52840 bridge images (MCUboot, firmware/targets/nrf52840_ble)."""
+    from . import nrf_boot_key
+    k = nrf_boot_key.create(Path(a.pki), force=a.force) if not a.show else nrf_boot_key.load(Path(a.pki))
+    print(f"nRF boot key: {k.key_path}")
+    print(f"public key sha256: {k.public_fingerprint_hex}")
+    print(f'build: west build -b evt_pre_20_ble firmware/targets/nrf52840_ble -- -DSB_CONFIG_BOOT_SIGNATURE_KEY_FILE=\\"{k.key_path.as_posix()}\\"')
+
+
 def cmd_pairing_secret_rotate(a):
     reg = _registry(Path(a.pki))
     reg.rotate_pairing_secret(a.serial, a.reason)
@@ -376,6 +385,8 @@ def main(argv=None):
     s = add("server-qr", cmd_server_qr, help="render the server profile QR (host, ports, CA, fingerprint) for the installer app")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--out", required=True); s.add_argument("--https-port", type=int, default=0)
     s.add_argument("--topic-prefix", default="zs/v1"); s.add_argument("--png", action="store_true")
+    s = add("nrf-boot-key", cmd_nrf_boot_key, help="create (or --show) the MCUboot signing key for the nRF52840 bridge images")
+    s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--force", action="store_true"); s.add_argument("--show", action="store_true")
     s = add("pairing-secret-rotate", cmd_pairing_secret_rotate, help="generate a new label secret for a station (reprint + reload)")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--reason", required=True)
     s = add("list", cmd_list, help="list stations");                                           s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--lot"); s.add_argument("--status")

@@ -1,0 +1,6 @@
+/* MCUboot serial recovery talks SMP over the IPC UART; the STM32 is the mcumgr client (addendum C.6). */
+/ {
+	chosen {
+		zephyr,uart-mcumgr = &uart0;
+	};
+};

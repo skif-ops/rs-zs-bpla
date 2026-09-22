@@ -95,3 +95,21 @@ def test_server_profile_qr_payload_and_command(tmp_path, monkeypatch):
     fp = (server / "bundle" / "server-fingerprint.txt").read_text().strip()
     assert profile.host == "muhoed.example.ru" and profile.mqtt_port == 8883 and profile.https_port == 443 and profile.fingerprint_hex == fp
     assert (tmp_path / "qr" / "server-profile.svg").read_text().startswith("<svg")
+
+
+def test_nrf_boot_key_create_show_and_refuse_overwrite(tmp_path, capsys):
+    from pki import nrf_boot_key
+    cli(["nrf-boot-key", "--pki", str(tmp_path)])
+    out = capsys.readouterr().out
+    k = nrf_boot_key.load(tmp_path)
+    assert k.key_path.exists() and (tmp_path / "nrf-boot" / "nrf-boot.pub.pem").exists()
+    assert oct(k.key_path.stat().st_mode & 0o777) == "0o600"
+    assert k.public_fingerprint_hex in out and "SB_CONFIG_BOOT_SIGNATURE_KEY_FILE" in out
+    meta = (tmp_path / "nrf-boot" / "nrf-boot.json").read_text()
+    assert k.public_fingerprint_hex in meta and "secp256r1" in meta
+    assert cli(["nrf-boot-key", "--pki", str(tmp_path)]) == 2         # refuses to replace a fielded key without --force
+    assert nrf_boot_key.load(tmp_path).public_fingerprint_hex == k.public_fingerprint_hex
+    cli(["nrf-boot-key", "--pki", str(tmp_path), "--show"])
+    assert k.public_fingerprint_hex in capsys.readouterr().out
+    cli(["nrf-boot-key", "--pki", str(tmp_path), "--force"])
+    assert nrf_boot_key.load(tmp_path).public_fingerprint_hex != k.public_fingerprint_hex
