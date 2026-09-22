@@ -19,6 +19,9 @@ import android.widget.TextView
 import ru.dioneya.commissioning.ble.AndroidBleTransport
 import ru.dioneya.commissioning.core.SimSlot
 import ru.dioneya.commissioning.core.ble.BleSession
+import ru.dioneya.commissioning.core.profile.ServerProfile
+import ru.dioneya.commissioning.core.profile.ServerProfileStore
+import ru.dioneya.commissioning.ble.PreferencesServerProfileStore
 import ru.dioneya.commissioning.core.server.ServerScreenController
 import java.util.concurrent.Executors
 
@@ -37,6 +40,7 @@ class ServerActivity : Activity() {
     private lateinit var details: TextView
     private lateinit var inputs: Map<String, EditText>
     private var simSlot = SimSlot.SIM1
+    private lateinit var profiles: ServerProfileStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +51,10 @@ class ServerActivity : Activity() {
             text = if (serial.isEmpty()) getString(ru.dioneya.commissioning.R.string.server_title) else getString(ru.dioneya.commissioning.R.string.server_title_for, serial)
             textSize = 22f
         })
-        val defaults = ServerScreenController.Fields(tenant = intent.getStringExtra(EXTRA_TENANT).orEmpty())
+        profiles = PreferencesServerProfileStore(this)
+        val saved = profiles.load()
+        val defaults = (saved?.toFields() ?: ServerScreenController.Fields()).copy(tenant = intent.getStringExtra(EXTRA_TENANT).orEmpty())
+        simSlot = defaults.preferredSim
         val specs = listOf(
             "hostPort" to (getString(ru.dioneya.commissioning.R.string.server_host_port) to defaults.hostPort),
             "httpsPort" to (getString(ru.dioneya.commissioning.R.string.server_https_port) to defaults.httpsPort),
@@ -76,6 +83,9 @@ class ServerActivity : Activity() {
         val apply = Button(this).apply { text = getString(ru.dioneya.commissioning.R.string.server_apply) }
         val selfTest = Button(this).apply { text = getString(ru.dioneya.commissioning.R.string.server_self_test) }
         val validate = Button(this).apply { text = getString(ru.dioneya.commissioning.R.string.server_validate) }
+        val scanProfile = Button(this).apply { text = getString(ru.dioneya.commissioning.R.string.server_scan_profile) }
+        val saveProfile = Button(this).apply { text = getString(ru.dioneya.commissioning.R.string.server_save_profile) }
+        root.addView(scanProfile); root.addView(saveProfile)
         root.addView(validate); root.addView(apply); root.addView(selfTest)
         root.addView(Button(this).apply {
             text = getString(ru.dioneya.commissioning.R.string.server_next_installation)
@@ -103,9 +113,34 @@ class ServerActivity : Activity() {
             c.sessionConnectedProbe = { transport?.isConnected ?: false }
         }
 
+        scanProfile.setOnClickListener { startActivityForResult(android.content.Intent(this, QrScanActivity::class.java), REQUEST_PROFILE_QR) }
+        saveProfile.setOnClickListener {
+            val p = ServerProfile.fromFields(readFields())
+            if (p == null) status.text = getString(ru.dioneya.commissioning.R.string.server_profile_not_savable)
+            else { profiles.save(p); status.text = getString(ru.dioneya.commissioning.R.string.server_profile_saved, p.host, p.mqttPort) }
+        }
+        if (saved != null) status.text = getString(ru.dioneya.commissioning.R.string.server_profile_loaded, saved.host, saved.mqttPort)
         validate.setOnClickListener { controller?.let { c -> c.edit(readFields()); c.buildPatch()?.let { status.text = getString(ru.dioneya.commissioning.R.string.server_valid) } } }
         apply.setOnClickListener { if (ensurePermission()) { controller?.edit(readFields()); executor.execute { controller?.apply() } } }
         selfTest.setOnClickListener { if (ensurePermission()) executor.execute { controller?.runSelfTest() } }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != REQUEST_PROFILE_QR || resultCode != RESULT_OK) return
+        val p = data?.getStringExtra(QrScanActivity.EXTRA_PROFILE_TEXT)?.let { ServerProfile.decode(it) } ?: return
+        val current = readFields()
+        val merged = p.copy(apn1 = current.apn1, apn2 = current.apn2, preferredSim = current.preferredSim)
+        applyFields(merged.toFields(current))
+        profiles.save(merged)
+        status.text = getString(ru.dioneya.commissioning.R.string.server_profile_scanned, p.host, p.mqttPort)
+    }
+
+    private fun applyFields(f: ServerScreenController.Fields) {
+        inputs.getValue("hostPort").setText(f.hostPort); inputs.getValue("httpsPort").setText(f.httpsPort)
+        inputs.getValue("caReference").setText(f.caReference); inputs.getValue("fingerprintHex").setText(f.fingerprintHex)
+        inputs.getValue("topicPrefix").setText(f.topicPrefix); inputs.getValue("apn1").setText(f.apn1); inputs.getValue("apn2").setText(f.apn2)
+        simSlot = f.preferredSim
     }
 
     private fun readFields() = ServerScreenController.Fields(
@@ -176,5 +211,6 @@ class ServerActivity : Activity() {
         /** Label pairing secret (base32) for the pairing step of the joint prototype; held in the intent only, never persisted. */
         const val EXTRA_PAIRING_SECRET = "ru.dioneya.commissioning.PAIRING_SECRET"
         private const val REQUEST_BLUETOOTH = 41
+        private const val REQUEST_PROFILE_QR = 46
     }
 }
