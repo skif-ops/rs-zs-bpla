@@ -80,7 +80,22 @@ Android после `0x00` обязательно выполняет read‑back 
 (`DIO-EVT-012`); приложение принимает любой из двух признаков, поэтому итоговую раскладку рекламного
 пакета (31 байт: 128‑битный UUID занимает 18) выбираем на прототипе nRF52840.
 
-## B.6 Что остаётся открытым до прототипа
+## B.6 installation_position (0x0203) — запись и read‑back
+
+Каноническая CBOR‑карта, целые ключи, координаты — знаковые целые (major 0/1), флаги — bool.
+Android: `core/position/InstallationPositionCodec.kt`; проверка по `InstallationCommissioningContract` (канонический
+хеш `ZS-INSTALLATION-V1`, 58 байт).
+
+Запись (телефон → станция), 14 ключей: 1 operation (0 INITIAL, 1 RECOMMISSION), 2 lat_e7, 3 lon_e7, 4 alt_dm,
+5 accuracy_m, 6 source (0 manual, 1 phone, 2 station gnss, 3 surveyed), 7 version, 8 locked, 9 commissioned_time_us,
+10 warning_m, 11 suspect_m, 12 gross_jump_m, 13 warning_fixes, 14 suspect_fixes. Ответ — байт статуса по notify
+(B.3) плюс `0x06` = позиция заблокирована (INITIAL при существующей записи; нужна RECOMMISSION инженера).
+
+Read‑back (станция → телефон): ключи 2…14 как выше плюс 15 storage_generation, 16 commissioning_hash (32 байта),
+17 audit_committed (bool). Пустая карта `0xa0` — записи нет. Приложение сверяет позицию, политику, время,
+поколение хранения, хеш и флаг аудита; любое расхождение — «не подтверждено».
+
+## B.7 Что остаётся открытым до прототипа
 
 - pairing/QR‑секрет и роль (installer/engineer) — «authenticated» здесь означает BLE Secure Connections + роль на стороне прошивки;
 - межпроцессорный протокол STM32U585 ↔ nRF52840 (UART) для проксирования этих характеристик;

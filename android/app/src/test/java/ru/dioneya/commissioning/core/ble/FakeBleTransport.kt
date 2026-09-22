@@ -12,6 +12,8 @@ class FakeBleTransport(var mtu: Int = GattContractV01.MTU_REQUEST) : BleTranspor
     val subscriptions = mutableMapOf<UUID, Boolean>()
     /** Values served by read(): a queue of frames per characteristic. */
     val readFrames = mutableMapOf<UUID, ArrayDeque<ByteArray>>()
+    /** Dynamic long values: consulted when the frame queue of a characteristic is empty (re-served on every read). */
+    var longValueProvider: ((UUID) -> ByteArray?)? = null
     /** Handler invoked after every write; may notify through [notify]. */
     var onWrite: ((UUID, ByteArray) -> Unit)? = null
     var connectFails = false
@@ -50,6 +52,7 @@ class FakeBleTransport(var mtu: Int = GattContractV01.MTU_REQUEST) : BleTranspor
     override fun read(characteristic: UUID, timeoutMs: Long): ByteArray {
         if (!isConnected) throw BleException("not connected", BleError.DISCONNECTED)
         if (readFails) throw BleException("read failed 0x85", 0x85)
+        if (readFrames[characteristic].isNullOrEmpty()) longValueProvider?.invoke(characteristic)?.let { serveLong(characteristic, it) }
         return readFrames[characteristic]?.removeFirstOrNull() ?: throw BleException("nothing to read", BleError.NOT_FOUND)
     }
     override fun setNotifications(characteristic: UUID, enabled: Boolean, timeoutMs: Long) { subscriptions[characteristic] = enabled }

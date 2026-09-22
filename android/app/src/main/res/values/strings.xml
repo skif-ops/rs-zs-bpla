@@ -48,5 +48,22 @@
     <string name="server_reading_back">Обратное чтение и проверка хеша…</string>
     <string name="server_verified">Записано и сверено: %1$s</string>
     <string name="server_mismatch">Обратное чтение не совпало с намерением — конфигурация не подтверждена</string>
+    <string name="server_next_installation">Далее: координаты установки</string>
+    <string name="install_title">Координаты установки — %1$s</string>
+    <string name="install_latitude">Широта, градусы (например 55.7558000)</string>
+    <string name="install_longitude">Долгота, градусы (например 37.6173000)</string>
+    <string name="install_altitude">Высота, м</string>
+    <string name="install_accuracy">Точность, м (1…1000)</string>
+    <string name="install_source">Источник: %1$s</string>
+    <string name="install_role">Роль: %1$s</string>
+    <string name="install_use_phone_location">Взять координаты телефона</string>
+    <string name="install_read">Прочитать со станции</string>
+    <string name="install_apply">Записать и сверить</string>
+    <string name="install_waiting_fix">Ожидание фиксации GNSS телефона…</string>
+    <string name="install_no_fix">Координаты телефона недоступны</string>
+    <string name="install_reading">Чтение записи со станции…</string>
+    <string name="install_writing">Запись (%1$s)…</string>
+    <string name="install_verified">Записано и сверено: %1$s</string>
+    <string name="install_mismatch">Обратное чтение не прошло проверку: %1$s</string>
     <string name="server_self_test_running">Самотест выполняется…</string>
 </resources>
