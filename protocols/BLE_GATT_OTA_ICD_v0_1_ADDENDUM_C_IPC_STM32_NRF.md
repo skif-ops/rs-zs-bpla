@@ -1,7 +1,7 @@
 # ICD BLE v0.1 — Addendum C: межпроцессорный протокол STM32U585 ↔ nRF52840
 
-Статус: `IMPLEMENTED 2026-09-22 — portable core + host tests (firmware/tests/test_ble_bridge.c) + STM32 app task;
-nRF52840 application (Zephyr) — следующий шаг`.
+Статус: `IMPLEMENTED 2026-09-22 — portable core + host tests (firmware/tests/test_ble_bridge.c) + STM32 app task +
+nRF52840 application (Zephyr, firmware/targets/nrf52840_ble, плата evt_pre_20_ble); C.6 — MCUboot recovery path, STM32 mcumgr client — следующий шаг`.
 
 ## C.1 Роли
 
@@ -55,3 +55,26 @@ CRC‑16/CCITT‑FALSE по `type..payload` (то же семейство, чт�
 - Нотификации: split по текущему `MTU − 3`; если подписки нет — счётчик `dropped_notifications`.
 - Проверка: `firmware/tests/test_ble_bridge.c` гоняет Android‑подобного клиента через мост, канал и сервис на
   реальных модулях станции (config store, commissioning + audit, selftest) при MTU 247 и 23.
+
+## C.6 Обновление прошивки nRF52840 (MCUboot serial recovery по IPC UART)
+
+Мост не имеет собственного канала обновления: образ nRF приходит на станцию по штатному OTA STM32 и
+загружается в модуль через тот же UART, что и IPC.
+
+1. STM32 держит новый образ nRF (подписан ключом `nrf-boot.key.pem` из PKI: `muhoed-pki nrf-boot-key`, ECDSA P‑256;
+   публичный ключ вшит в MCUboot модуля).
+2. Вход в recovery — только по проводу (pin authority): `BLE_EN` ↓ (nRESET удерживается) → `BLE_DFU_REQ` ↓ (P0.15,
+   open‑drain, active LOW) → 20 мс → `BLE_EN` ↑ → MCUboot стартует, видит LOW на P0.15 (`CONFIG_BOOT_SERIAL_ENTRANCE_GPIO`,
+   задержка обнаружения 50 мс) и остаётся в serial recovery на `uart0` → через 500 мс STM32 отпускает `BLE_DFU_REQ`
+   (`bledfu` в консоли B1). Без запроса MCUboot проверяет подпись `slot0` и запускает приложение.
+3. В recovery STM32 — клиент mcumgr SMP по UART (кадры «06 09» + base64 + CRC16, как в `mcumgr` serial transport):
+   `image upload` в `slot1` частями ≤ 512 байт, затем `image test` (или `confirm`) и `reset`. Эта клиентская часть на
+   STM32 (`zs_mcumgr_serial`) — отдельный портируемый модуль с хост‑тестом против серверной реализации в Zephyr.
+4. MCUboot (swap‑using‑move) переносит образ в `slot0` и запускает его в режиме «test». Приложение подтверждает себя
+   (`boot_write_img_confirmed`) только после первого `IDENTITY_SET` от STM32 — то есть когда IPC реально работает.
+   Образ, который не заговорил с STM32, откатывается MCUboot при следующем сбросе (STM32 делает сброс по `BLE_EN`, если
+   мост «silent» дольше тайм‑аута).
+5. Карта флеша: MCUboot 48 KiB @0 | primary 472 KiB @0xC000 | secondary 472 KiB @0x82000 | settings 32 KiB @0xF8000
+   (`pm_static.yml` = `fixed-partitions` платы).
+
+Версия протокола IPC (`PING`/`PONG`) — первый признак несовместимости после обновления: STM32 показывает её в `ble`.
