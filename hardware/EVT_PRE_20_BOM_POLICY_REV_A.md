@@ -36,10 +36,11 @@ first-article or the applicable technical hardware release remains open.
 set; it is not the total program quantity. The procurement program contains two
 separate EVT-20 sets and one bench station. The aggregate therefore uses 41 times
 each per-station quantity and two complete EVT-20 spare pools. The bench station
-does not create a third lot-level reserve. Serial/traveller allocation for the second
-set and bench station must be completed before either is built; the existing
-`DIO-EVT-001..020` register remains the first-set register until that controlled
-allocation is issued.
+does not create a third lot-level reserve. Serial identities for the second set
+and bench station are reserved in
+`manufacturing/LOT_SERIAL_REGISTER_LOT2_AND_BENCH.csv`; individual travellers
+must be completed before either is built. The existing
+`DIO-EVT-001..020` register remains the authoritative first-set register.
 
 ## Required line data
 

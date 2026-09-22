@@ -11,6 +11,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SERIALS = [f"DIO-EVT-{index:03d}" for index in range(1, 21)]
+EXPECTED_PROGRAM_EXTENSION_SERIALS = [
+    *[f"DIO-EVT-{index:03d}" for index in range(21, 41)],
+    "DIO-EVT-B01",
+]
 
 
 def read_csv(relative_path: str) -> list[dict[str, str]]:
@@ -51,6 +55,45 @@ def validate_lot() -> None:
     )
     require(all(row["APN_Mode"] == "PUBLIC_ONLY" for row in lot), "pilot APN is not PUBLIC_ONLY")
     require(all(row["LoRa_Profile"] == "RU868_LOCKED" for row in lot), "selected-lot LoRa is not RU868")
+
+    program_extension = read_csv("manufacturing/LOT_SERIAL_REGISTER_LOT2_AND_BENCH.csv")
+    require(
+        [row["Serial"] for row in program_extension] == EXPECTED_PROGRAM_EXTENSION_SERIALS,
+        "second-set and bench serial range mismatch",
+    )
+    require(
+        len({row["Serial"] for row in [*lot, *program_extension]}) == 41,
+        "program serial identities are not unique across 2x20+1",
+    )
+    second_set = program_extension[:20]
+    bench = program_extension[20:]
+    require(
+        all(row["Lot"] == "EVT-PRE-20-LOT-2" for row in second_set),
+        "second EVT-20 set is not bound to its own lot",
+    )
+    require(
+        all(row["Housing_Technology"] == "VACUUM_CASTING_PRIMARY" for row in second_set),
+        "second EVT-20 set does not retain the primary vacuum-casting process",
+    )
+    require(
+        all(row["Status"] == "SECOND_GROUP_RESERVED_AWAITING_BUILD" for row in second_set),
+        "second EVT-20 serial reservation is incomplete or incorrectly released",
+    )
+    require(
+        len(bench) == 1
+        and bench[0]["Lot"] == "BENCH"
+        and bench[0]["Housing_Technology"] == "BENCH_FIXTURE"
+        and bench[0]["Status"] == "BENCH_UNIT_RESERVED",
+        "bench serial reservation differs from the controlled program",
+    )
+    require(
+        all(row["APN_Mode"] == "PUBLIC_ONLY" for row in program_extension),
+        "second-set or bench APN is not PUBLIC_ONLY",
+    )
+    require(
+        all(row["LoRa_Profile"] == "RU868_LOCKED" for row in program_extension),
+        "second-set or bench LoRa profile is not RU868",
+    )
 
     housing = read_csv("manufacturing/HOUSING_LOT_PLAN.csv")
     require([row["Serial"] for row in housing] == EXPECTED_SERIALS, "housing capacity serial range mismatch")
@@ -1355,8 +1398,11 @@ def validate_policy_text() -> None:
             "baseline program structure differs")
     require("program_spare_rule: TWO_EVT20_RESERVE_POOLS_BENCH_ADDS_NO_THIRD_RESERVE_POOL" in baseline,
             "baseline program spare rule differs")
-    require("program_serial_and_traveller_status: SECOND_SET_AND_BENCH_ASSIGNMENT_REQUIRED_BEFORE_BUILD" in baseline,
-            "baseline second-set/bench traceability interlock differs")
+    require("program_serial_register: manufacturing/LOT_SERIAL_REGISTER_LOT2_AND_BENCH.csv" in baseline
+            and "program_serial_status: RESERVED_DIO_EVT_021_THROUGH_040_AND_DIO_EVT_B01" in baseline
+            and "program_traveller_status: REQUIRED_BEFORE_BUILD" in baseline
+            and "program_serial_and_traveller_status: SERIALS_RESERVED_TRAVELLERS_REQUIRED_BEFORE_BUILD" in baseline,
+            "baseline second-set/bench traceability control differs")
     require("selection_status: LOCKED_CURRENT_CUSTOMER_EVT_20" in baseline, "EVT-20 selection status is not locked")
     require("pilot_primary_quantity: 20" in baseline, "baseline vacuum quantity does not match selected EVT-20")
     require(

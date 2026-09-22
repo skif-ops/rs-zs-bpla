@@ -1,5 +1,5 @@
 Requirement_ID,Requirement,Source,Implementation,Verification,Population,Status,Evidence
-REQ-CONF-001,One traceable EVT lot selected from 4 10 or 20 stations with serial capacity reserved through 20,Customer,EVT-20 selection plus LOT_SERIAL_REGISTER and travellers,EVT-CM-01,20_SELECTED_EVT_UNITS,PARTIAL_PASS_CONFIGURATION,EVT-20 and DIO-EVT-001 through DIO-EVT-020 assigned; build travellers remain unpopulated until hardware release
+REQ-CONF-001,Two traceable EVT-20 production sets plus one bench station with each set retaining the 4 10 or 20 controlled lot model,Customer,EVT-20 selection plus both serial registers and individual travellers,EVT-CM-01,PROGRAM_2X20_PLUS_1,PARTIAL_PASS_CONFIGURATION,DIO-EVT-001 through DIO-EVT-040 plus DIO-EVT-B01 are assigned without overlap; build travellers remain unpopulated until hardware release
 REQ-HW-001,Station uses custom PCB not WeAct,Customer,PCB_MAIN PCB_MIC PCB_PWR released design,ERC DRC DFM plus inspection,All_revisions,OPEN,
 REQ-AUD-001,Four matched microphones in 3 plus 1 geometry,Project baseline,PCB_MIC and acoustic head,EVT-AUD-01,SELECTED_EVT_LOT_ALL_UNITS,OPEN,
 REQ-AUD-002,Lower triangle side is 120 mm and MIC4 is plus 150 mm,Project baseline,ACOUSTIC_GEOMETRY.csv,Dimensional measurement,SELECTED_EVT_LOT_ALL_UNITS,OPEN,

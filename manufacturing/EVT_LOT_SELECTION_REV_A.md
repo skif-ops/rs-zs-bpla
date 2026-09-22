@@ -9,9 +9,10 @@ The wider program demand is two EVT-20 production sets plus one bench station
 (`20 + 20 + 1 = 41`). This does not rename the controlled per-set configuration or
 mix scenario columns. Its aggregate quantities are controlled separately in
 `hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv`: two EVT-20 spare pools
-are included and the bench station adds no third pool. The present serial and housing
-registers cover the first 20-station set; the second set and bench serial/traveller
-allocation remains a required configuration action before their build.
+are included and the bench station adds no third pool. Serial identities for the
+second set (`DIO-EVT-021` through `DIO-EVT-040`) and bench (`DIO-EVT-B01`) are
+reserved in `manufacturing/LOT_SERIAL_REGISTER_LOT2_AND_BENCH.csv`; individual
+build travellers remain required before assembly starts.
 
 The selected scenario controls the corresponding `Qty_N`, `Spares_N` and
 `Procure_qty_N` columns in `hardware/EVT_PRE_20_BOM_REV_A.csv` and the matching

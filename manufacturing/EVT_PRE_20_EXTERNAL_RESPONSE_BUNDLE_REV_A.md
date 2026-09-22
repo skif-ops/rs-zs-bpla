@@ -23,7 +23,8 @@ The configuration remains `EVT-PRE-20`: every production lot is controlled as
 20 stations. The procurement program contains two independent EVT-20 lots plus
 one bench station, 41 stations total. Each EVT-20 lot receives its own reserve
 pool; the bench station does not create a third reserve pool. Serial allocation
-and travellers for the second lot and bench station must be issued before build.
+is reserved in `LOT_SERIAL_REGISTER_LOT2_AND_BENCH.csv`; individual travellers
+for the second lot and bench station must be issued before build.
 
 ## Closed response registers
 

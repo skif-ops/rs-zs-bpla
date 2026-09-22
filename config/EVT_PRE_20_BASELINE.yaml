@@ -31,7 +31,10 @@ lot:
   program_bench_station_quantity: 1
   program_procurement_authority: hardware/EVT_PROGRAM_2X20_PLUS_1_PROCUREMENT_REV_A.csv
   program_spare_rule: TWO_EVT20_RESERVE_POOLS_BENCH_ADDS_NO_THIRD_RESERVE_POOL
-  program_serial_and_traveller_status: SECOND_SET_AND_BENCH_ASSIGNMENT_REQUIRED_BEFORE_BUILD
+  program_serial_register: manufacturing/LOT_SERIAL_REGISTER_LOT2_AND_BENCH.csv
+  program_serial_status: RESERVED_DIO_EVT_021_THROUGH_040_AND_DIO_EVT_B01
+  program_traveller_status: REQUIRED_BEFORE_BUILD
+  program_serial_and_traveller_status: SERIALS_RESERVED_TRAVELLERS_REQUIRED_BEFORE_BUILD
   selection_required_before_purchase_release: true
   selection_status: LOCKED_CURRENT_CUSTOMER_EVT_20
   commercial_procurement_owner: CUSTOMER

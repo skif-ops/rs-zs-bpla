@@ -27,8 +27,8 @@ baseline and the EVT-accepted `DIM-003` authority.
 
 The 90 x 60 x 1.6 mm EVT canvas and round H1-H4 NPTH pattern are mechanically
 accepted, with serial revalidation required. The active controlled successor has
-three routed trace items for the accepted bootstrap and LM74700 VCAP subgates and
-zero copper zones; the remaining routing is incomplete. No party may treat the
+four routed trace items for the accepted bootstrap, LM74700 VCAP and VBAT_RAW
+subgates and zero copper zones; the remaining routing is incomplete. No party may treat the
 EVT mechanical or stackup authority as a complete fabrication release.
 
 ## Accepted EVT construction

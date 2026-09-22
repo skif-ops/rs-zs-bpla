@@ -33,6 +33,7 @@ ACTIVE_GENERATOR_SHA256 = "eabf8aca015bb48447b211649cc26b7bc454a9560e6e1e59c906f
 ROUTING_RULES_SHA256 = "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988"
 STACKUP_BASIS_SHA256 = "300c2c6998704fae554c6f30ddb7bcb6eabb2060973c90f2b1d2ecc4ab76b1fc"
 ACTIVE_STACKUP_BASIS_SHA256 = "78ea37897803675337612eedbdcaf3922b53fbe2330cb8f12f09f48412b26531"
+ENGINEERING_BASELINE_STACKUP_BASIS_SHA256 = "41733d7d27e2c3ab831e602ee81b072146944da0a5efe8a2c805eeed46ecd1ca"
 EXPECTED_POINTS = (
     (21.3, 30.0),
     (22.6, 30.0),
@@ -91,6 +92,7 @@ def audit(drc_base: Path | None = None,
             sha256(STACKUP_BASIS) in {
                 STACKUP_BASIS_SHA256,
                 ACTIVE_STACKUP_BASIS_SHA256,
+                ENGINEERING_BASELINE_STACKUP_BASIS_SHA256,
             },
             "candidate-004 source binding drift")
     base = Board.from_file(str(BASE), encoding="utf-8")

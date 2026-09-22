@@ -511,7 +511,7 @@ def audit_evt_accepted(contract: dict[str, Any]) -> dict[str, Any]:
     copper_layers = [str(layer.name) for layer in board.layers if str(layer.name).endswith(".Cu")]
     require(copper_layers == ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"]
             and float(board.general.thickness) == 1.6
-            and len(board.traceItems) in {0, 2, 3}
+            and len(board.traceItems) in {0, 2, 3, 4}
             and len(board.zones) == 0,
             "active PCB-PWR board exceeds the accepted bounded routing state")
     binding = contract.get("source_binding", {})
