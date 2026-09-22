@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS stations (
   commissioned_at TEXT,
   revoked_at TEXT,
   revoke_reason TEXT,
-  note TEXT
+  note TEXT,
+  pairing_secret TEXT
 );
 CREATE TABLE IF NOT EXISTS audit (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,6 +67,7 @@ class StationRow:
     revoked_at: str | None
     revoke_reason: str | None
     note: str | None
+    pairing_secret: str | None = None
 
 
 def _now() -> str:
@@ -82,6 +84,9 @@ class Registry:
         self.lock = threading.Lock()
         with self._conn() as c:
             c.executescript(_SCHEMA)
+            columns = {r[1] for r in c.execute("PRAGMA table_info(stations)")}
+            if "pairing_secret" not in columns:  # registries created before labels (2026-09-22)
+                c.execute("ALTER TABLE stations ADD COLUMN pairing_secret TEXT")
 
     def _conn(self) -> sqlite3.Connection:
         c = sqlite3.connect(self.path, timeout=10)
@@ -140,6 +145,30 @@ class Registry:
         query += " ORDER BY station_id"
         with self._conn() as c:
             return [StationRow(**dict(r)) for r in c.execute(query, args).fetchall()]
+
+    # ---- label / pairing secret
+    def ensure_pairing_secret(self, serial: str) -> str:
+        """Returns the unit's pairing secret, generating it on first use (audited)."""
+        from .label import new_pairing_secret
+        with self.lock, self._conn() as c:
+            row = c.execute("SELECT pairing_secret FROM stations WHERE serial=?", (serial,)).fetchone()
+            if row is None:
+                raise PkiError(f"{serial} is not registered")
+            if row["pairing_secret"]:
+                return row["pairing_secret"]
+            secret = new_pairing_secret()
+            c.execute("UPDATE stations SET pairing_secret=? WHERE serial=?", (secret, serial))
+            self._audit(c, serial, "pairing_secret", "generated")
+        return secret
+
+    def rotate_pairing_secret(self, serial: str, reason: str) -> str:
+        from .label import new_pairing_secret
+        secret = new_pairing_secret()
+        with self.lock, self._conn() as c:
+            if c.execute("UPDATE stations SET pairing_secret=? WHERE serial=?", (secret, serial)).rowcount != 1:
+                raise PkiError(f"{serial} is not registered")
+            self._audit(c, serial, "pairing_secret", f"rotated: {reason}")
+        return secret
 
     def active(self) -> list[StationRow]:
         return [r for r in self.list() if r.status in ("provisioned", "commissioned")]
