@@ -63,7 +63,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json",
-      "sha256": "c21cdb00502867ab3566c6119b53a6ccf4001c6f4600f5579431f5b821ac5150"
+      "sha256": "1d8f81d09a93a9e1910faa7ee24130e634e46600c4033daef9ca3bdea2fd30ab"
     },
     {
       "path": "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv",
@@ -83,7 +83,7 @@
     },
     {
       "path": "hardware/PCB_MAIN_IPC_CANDIDATE_FOOTPRINTS_REV_A.md",
-      "sha256": "c93adc8d4f00235fa571e1aae39e6ddaffd33c6d8fd751e0105035bc7ddee360"
+      "sha256": "0de5b056e0c50c4196fdb763a4805b3860f9cca9f7a089096398c10b1d596bbc"
     }
   ],
   "component_count": 248,
