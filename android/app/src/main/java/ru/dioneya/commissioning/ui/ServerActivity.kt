@@ -42,7 +42,11 @@ class ServerActivity : Activity() {
         super.onCreate(savedInstanceState)
         val pad = (16 * resources.displayMetrics.density).toInt()
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(pad, pad, pad, pad) }
-        root.addView(TextView(this).apply { text = getString(ru.dioneya.commissioning.R.string.server_title); textSize = 22f })
+        val serial = intent.getStringExtra(EXTRA_STATION_SERIAL).orEmpty()
+        root.addView(TextView(this).apply {
+            text = if (serial.isEmpty()) getString(ru.dioneya.commissioning.R.string.server_title) else getString(ru.dioneya.commissioning.R.string.server_title_for, serial)
+            textSize = 22f
+        })
         val defaults = ServerScreenController.Fields()
         val specs = listOf(
             "hostPort" to (getString(ru.dioneya.commissioning.R.string.server_host_port) to defaults.hostPort),
@@ -158,6 +162,7 @@ class ServerActivity : Activity() {
 
     companion object {
         const val EXTRA_DEVICE_ADDRESS = "ru.dioneya.commissioning.DEVICE_ADDRESS"
+        const val EXTRA_STATION_SERIAL = "ru.dioneya.commissioning.STATION_SERIAL"
         private const val REQUEST_BLUETOOTH = 41
     }
 }
