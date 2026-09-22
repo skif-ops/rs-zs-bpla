@@ -4,8 +4,14 @@ Transparent GATT ↔ UART bridge of ICD BLE addendum B/C on top of the host-test
 (`firmware/src/zs_ble_bridge.c`, `zs_ipc_link.c`, `zs_ble_framing.c`).
 
 * Not built by the repository CI (no NCS toolchain there). Build with NCS v2.7+:
-  `west build -b nrf52840dk/nrf52840 firmware/targets/nrf52840_ble` (DK bring-up: uart1 P1.01/P1.02),
-  then flash with `west flash`. The Rev.A carrier gets its own board overlay once the module pinout is fixed.
+  * Rev.A carrier: `west build -b evt_pre_20_ble firmware/targets/nrf52840_ble` — board definition in
+    `boards/dioneya/evt_pre_20_ble/` (U11 Raytac MDBT50Q-P1MV2: UARTE TX P0.06 / RX P0.08, P0.18 = nRESET from BLE_EN,
+    P0.15 = BLE_DFU_REQ, LFRC clock, no UART console — logs over RTT on the TP_BLE_SWD pads);
+  * bench: `west build -b nrf52840dk/nrf52840 firmware/targets/nrf52840_ble` (uart1 P1.01/P1.02 overlay);
+  then `west flash` (nrfjprog / J-Link / pyOCD through the separate nRF SWD pads).
+* Flash map reserves MCUboot (48 KiB) + two 472 KiB image slots + 32 KiB storage so the STM32-driven
+  BLE_DFU_REQ (P0.15, active LOW, sampled by the bootloader at reset release) can enter recovery later;
+  the application itself runs from `slot0`. MCUboot is not part of this step.
 * All station logic stays on the STM32U585 (`zs_ipc_service`); this application only advertises when told to,
   frames values, keeps read caches and forwards writes.
 * Pairing: LE Secure Connections, passkey entry with a fixed passkey derived from the label secret

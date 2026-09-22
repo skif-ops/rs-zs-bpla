@@ -1,0 +1,5 @@
+board:
+  name: evt_pre_20_ble
+  vendor: dioneya
+  socs:
+    - name: nrf52840
