@@ -723,7 +723,7 @@
         "SELF_TO_GND_PWR_ONLY_AT_NT2": 1,
         "SELF_TO_GND_PWR_ONLY_AT_NT3": 1
       },
-      "trace_items": 4,
+      "trace_items": 8,
       "copper_zones": 0,
       "dim_003": "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED",
       "numeric_power_geometry": "EVT_PUBLIC_STACKUP_AND_CALCULATED_CURRENT_GEOMETRY_ACCEPTED_PHYSICAL_FAULT_THERMAL_VALIDATION_OPEN",
