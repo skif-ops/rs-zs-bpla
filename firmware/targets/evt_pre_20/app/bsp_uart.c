@@ -13,8 +13,8 @@ typedef struct {
 
 static uart_t u[BSP_UART_COUNT];
 
-static USART_TypeDef *const instance[BSP_UART_COUNT] = {USART1, USART2, LPUART1};
-static const IRQn_Type irq[BSP_UART_COUNT] = {USART1_IRQn, USART2_IRQn, LPUART1_IRQn};
+static USART_TypeDef *const instance[BSP_UART_COUNT] = {USART1, USART2, LPUART1, USART3};
+static const IRQn_Type irq[BSP_UART_COUNT] = {USART1_IRQn, USART2_IRQn, LPUART1_IRQn, USART3_IRQn};
 
 bool bsp_uart_init(bsp_uart_id_t id, uint32_t baud) {
   uart_t *p;
@@ -88,6 +88,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *h) {
 void USART1_IRQHandler(void) { HAL_UART_IRQHandler(&u[BSP_UART_CELL].h); }
 void USART2_IRQHandler(void) { HAL_UART_IRQHandler(&u[BSP_UART_GNSS].h); }
 void LPUART1_IRQHandler(void) { HAL_UART_IRQHandler(&u[BSP_UART_CONSOLE].h); }
+void USART3_IRQHandler(void) { HAL_UART_IRQHandler(&u[BSP_UART_BLE].h); }
 
 void HAL_UART_MspInit(UART_HandleTypeDef *h) {
   GPIO_InitTypeDef g = {0};
@@ -106,6 +107,12 @@ void HAL_UART_MspInit(UART_HandleTypeDef *h) {
     g.Pin = GPIO_PIN_2 | GPIO_PIN_3;
     g.Alternate = GPIO_AF7_USART2;
     HAL_GPIO_Init(GPIOA, &g);
+  } else if (h->Instance == USART3) {   /* BLE_TX PB10 / BLE_RX PB11, AF7 (nRF52840) */
+    __HAL_RCC_USART3_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    g.Pin = GPIO_PIN_10 | GPIO_PIN_11;
+    g.Alternate = GPIO_AF7_USART3;
+    HAL_GPIO_Init(GPIOB, &g);
   } else if (h->Instance == LPUART1) {  /* TEST_UART_RX PC0 / TEST_UART_TX PC1, AF8 */
     __HAL_RCC_LPUART1_CLK_ENABLE();
     __HAL_RCC_GPIOC_CLK_ENABLE();

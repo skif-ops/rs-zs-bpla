@@ -8,6 +8,8 @@
 #define PIN_MIC_WAKE        GPIO_PIN_8
 #define PIN_EN_MODEM_PORT   GPIOD
 #define PIN_EN_MODEM        GPIO_PIN_4    /* EN_MODEM (PD4, pin 85) -> PCB-PWR 3V8 rail */
+#define PIN_BLE_EN_PORT     GPIOE
+#define PIN_BLE_EN          GPIO_PIN_6    /* BLE_EN (PE6, pin 5): nRF52840 active-HIGH run request */
 #define PIN_EN_AUX_PORT     GPIOD
 #define PIN_EN_AUX          GPIO_PIN_5    /* EN_AUX (PD5, pin 86) -> 1V8_MIC / aux RF */
 #define PIN_PWR_GOOD_PORT   GPIOD
@@ -32,6 +34,7 @@ void bsp_gpio_init(void) {
 
   /* Rail enables: default off. */
   HAL_GPIO_WritePin(PIN_EN_MODEM_PORT, PIN_EN_MODEM, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(PIN_BLE_EN_PORT, PIN_BLE_EN, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(PIN_EN_AUX_PORT, PIN_EN_AUX, GPIO_PIN_RESET);
   g.Pin = PIN_EN_MODEM;
   g.Mode = GPIO_MODE_OUTPUT_PP;
@@ -40,6 +43,8 @@ void bsp_gpio_init(void) {
   HAL_GPIO_Init(PIN_EN_MODEM_PORT, &g);
   g.Pin = PIN_EN_AUX;
   HAL_GPIO_Init(PIN_EN_AUX_PORT, &g);
+  g.Pin = PIN_BLE_EN;
+  HAL_GPIO_Init(PIN_BLE_EN_PORT, &g);
 
   /* MIC_WAKE: EXTI8 rising edge (AAD wake), pulled down (T5838 WAKE is push-pull high on detect). */
   g.Pin = PIN_MIC_WAKE;
@@ -70,6 +75,7 @@ void bsp_gpio_init(void) {
 }
 
 void bsp_gpio_mic_rail(bool on) { HAL_GPIO_WritePin(PIN_EN_AUX_PORT, PIN_EN_AUX, on ? GPIO_PIN_SET : GPIO_PIN_RESET); }
+void bsp_gpio_ble_enable(bool on) { HAL_GPIO_WritePin(PIN_BLE_EN_PORT, PIN_BLE_EN, on ? GPIO_PIN_SET : GPIO_PIN_RESET); }
 void bsp_gpio_modem_power(bool on) { HAL_GPIO_WritePin(PIN_EN_MODEM_PORT, PIN_EN_MODEM, on ? GPIO_PIN_SET : GPIO_PIN_RESET); }
 bool bsp_gpio_mic_wake(void) { return HAL_GPIO_ReadPin(PIN_MIC_WAKE_PORT, PIN_MIC_WAKE) == GPIO_PIN_SET; }
 bool bsp_gpio_service_button(void) { return HAL_GPIO_ReadPin(PIN_TAMPER_PORT, PIN_TAMPER) == GPIO_PIN_RESET; }
