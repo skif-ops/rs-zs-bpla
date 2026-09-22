@@ -210,7 +210,10 @@ static void handle_self_test(zs_ipc_service_t *s, const uint8_t *p, size_t len) 
 
 static void on_ipc(zs_ipc_service_t *s, uint8_t type, const uint8_t *p, size_t len) {
   switch (type) {
-    case ZS_IPC_PONG: break;
+    case ZS_IPC_PONG:
+      if (len >= 1u) { s->pongs_seen++; s->peer_protocol_version = p[0]; }
+      break;
+    case ZS_IPC_PING: { const uint8_t v = ZS_IPC_PROTOCOL_VERSION; (void)send_ipc(s, ZS_IPC_PONG, &v, 1u); break; }
     case ZS_IPC_LINK_STATE:
       if (len >= 1u) {
         s->link_state = p[0];
@@ -256,6 +259,12 @@ bool zs_ipc_service_set_window(zs_ipc_service_t *s, bool open, uint16_t seconds)
   p[0] = open ? 1u : 0u; zs_ipc_put_u16(&p[1], seconds);
   if (open) (void)push_identity(s);
   return send_ipc(s, ZS_IPC_SERVICE_WINDOW, p, 3u);
+}
+
+bool zs_ipc_service_ping(zs_ipc_service_t *s) {
+  const uint8_t v = ZS_IPC_PROTOCOL_VERSION;
+  s->pings_sent++;
+  return send_ipc(s, ZS_IPC_PING, &v, 1u);
 }
 
 bool zs_ipc_service_set_pairing_secret(zs_ipc_service_t *s, const uint8_t secret[16]) {

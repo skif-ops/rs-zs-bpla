@@ -7,6 +7,7 @@ void bsp_gpio_init(void);
 void bsp_gpio_mic_rail(bool on);        /* 1V8_MIC enable (EN_AUX on PCB-PWR harness) */
 void bsp_gpio_modem_power(bool on);     /* EN_MODEM to PCB-PWR 3V8 rail */
 void bsp_gpio_ble_enable(bool on);      /* BLE_EN (PE6): nRF52840 run request */
+void bsp_gpio_ble_dfu_request(bool on); /* BLE_DFU_REQ (PB2, open-drain, active LOW): on = pull LOW, off = release */
 bool bsp_gpio_mic_wake(void);           /* PA8 aggregated AAD wake level */
 bool bsp_gpio_service_button(void);     /* TAMPER_IN (PC7) active: enclosure open = service trigger candidate */
 bool bsp_gpio_tamper_active(void);

@@ -56,11 +56,15 @@ typedef struct {
   zs_ipc_decoder_t rx;
   uint8_t rx_buf[ZS_IPC_PAYLOAD_MAX + 4u];
   uint32_t writes_ok, writes_rejected;
+  uint32_t pings_sent, pongs_seen;
+  uint8_t peer_protocol_version; /* from the last PONG, 0 until the bridge answered */
 } zs_ipc_service_t;
 
 bool zs_ipc_service_init(zs_ipc_service_t *s, const zs_ipc_service_port_t *port);
 /* Opens/closes the advertising window on the nRF and pushes identity + caches. */
 bool zs_ipc_service_set_window(zs_ipc_service_t *s, bool open, uint16_t seconds);
+/* Link check: PING with our protocol version; the bridge answers PONG (pongs_seen / peer_protocol_version). */
+bool zs_ipc_service_ping(zs_ipc_service_t *s);
 /* Pushes the label pairing secret (from station.json / provisioning) to the nRF for OOB. */
 bool zs_ipc_service_set_pairing_secret(zs_ipc_service_t *s, const uint8_t secret[16]);
 void zs_ipc_service_on_uart_rx(zs_ipc_service_t *s, const uint8_t *data, size_t len);
