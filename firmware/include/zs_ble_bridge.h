@@ -81,6 +81,9 @@ void zs_ble_bridge_on_link(zs_ble_bridge_t *b, uint8_t state);
 /* UART bytes from the STM32. */
 void zs_ble_bridge_on_uart_rx(zs_ble_bridge_t *b, const uint8_t *data, size_t len);
 
+/* Pairing passkey of addendum B.7: BE32(SHA-256("DIO-PAIR-V1" || secret16)[0..3]) mod 1e6. */
+uint32_t zs_ble_pairing_passkey(const uint8_t secret[16]);
+
 /* Introspection for tests / diagnostics. */
 const zs_ble_bridge_cache_t *zs_ble_bridge_cache(const zs_ble_bridge_t *b, uint16_t char_id);
 

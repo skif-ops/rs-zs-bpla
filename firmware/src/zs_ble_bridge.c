@@ -1,4 +1,5 @@
 #include "zs_ble_bridge.h"
+#include "zs_sha256.h"
 #include <string.h>
 
 static bool send_ipc(zs_ble_bridge_t *b, uint8_t type, const uint8_t *payload, size_t len) {
@@ -122,4 +123,12 @@ void zs_ble_bridge_on_uart_rx(zs_ble_bridge_t *b, const uint8_t *data, size_t le
 const zs_ble_bridge_cache_t *zs_ble_bridge_cache(const zs_ble_bridge_t *b, uint16_t char_id) {
   for (size_t i = 0u; i < ZS_BLE_BRIDGE_CACHE_SLOTS; i++) if (b->cache[i].char_id == char_id && b->cache[i].valid) return &b->cache[i];
   return NULL;
+}
+
+uint32_t zs_ble_pairing_passkey(const uint8_t secret[16]) {
+  uint8_t material[11u + 16u], digest[32];
+  memcpy(material, "DIO-PAIR-V1", 11u);
+  memcpy(&material[11], secret, 16u);
+  zs_sha256_digest(material, sizeof(material), digest);
+  return (((uint32_t)digest[0] << 24) | ((uint32_t)digest[1] << 16) | ((uint32_t)digest[2] << 8) | digest[3]) % 1000000u;
 }
