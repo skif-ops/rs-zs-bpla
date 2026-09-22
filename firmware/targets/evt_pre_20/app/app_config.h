@@ -22,7 +22,13 @@
 /* UARTs. */
 #define APP_UART_CELL_BAUD           115200u   /* BG95 main UART, USART1 PB6/PB7 */
 #define APP_UART_GNSS_BAUD           9600u     /* USART2 PA2/PA3 */
-#define APP_UART_BLE_BAUD            115200u   /* USART3 PB10/PB11 (nRF52840), not started in B1 */
+#define APP_UART_BLE_BAUD            115200u   /* USART3 PB10/PB11 (nRF52840 bridge, IPC link addendum C) */
+#define APP_BLE_SERVICE_WINDOW_S     600u      /* advertising window opened with S4 SERVICE */
+#define APP_STATION_SERIAL           "DIO-EVT-B01"   /* B1 bench identity until provisioning lands the label data */
+#define APP_STATION_ID               901u
+#define APP_STATION_HW_REV           "Rev.A"
+#define APP_STATION_FW_VERSION       "0.1.0-b1"
+#define APP_STATION_BL_VERSION       "0.1.0"
 #define APP_UART_CONSOLE_BAUD        115200u   /* LPUART1 PC0/PC1 diagnostic console */
 #define APP_UART_RX_RING             512u
 
@@ -40,6 +46,8 @@
 #define APP_STACK_COMMS              1536
 #define APP_STACK_SERVICE            768
 #define APP_STACK_CONSOLE            512
+#define APP_PRIO_BLE                 3
+#define APP_STACK_BLE                1024
 
 /* NVIC priorities (0 = highest). FreeRTOS syscall ceiling is 5: ISRs at 5..15 may call FromISR APIs. */
 #define APP_IRQ_PRIO_TIM2_PPS        4   /* timestamp capture: above the RTOS ceiling, no RTOS calls inside */
