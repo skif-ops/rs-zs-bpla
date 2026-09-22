@@ -28,12 +28,13 @@ import com.google.zxing.NotFoundException
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import ru.dioneya.commissioning.R
+import ru.dioneya.commissioning.core.profile.ServerProfile
 import ru.dioneya.commissioning.core.scan.StationLabel
 
 /**
- * Scans the enclosure label QR with camera2 + ZXing core (no Play Services).
- * Returns the raw payload in [EXTRA_LABEL_TEXT] once it decodes as a valid
- * [StationLabel]; other QR codes are ignored and the preview keeps running.
+ * Scans a Dioneya QR with camera2 + ZXing core (no Play Services): a station label
+ * (returned in [EXTRA_LABEL_TEXT]) or a server profile (returned in [EXTRA_PROFILE_TEXT]).
+ * Other QR codes are ignored and the preview keeps running.
  */
 class QrScanActivity : Activity() {
     private lateinit var preview: TextureView
@@ -123,12 +124,15 @@ class QrScanActivity : Activity() {
     private fun decode(luma: ByteArray, rowStride: Int, height: Int) {
         val source = PlanarYUVLuminanceSource(luma, rowStride, height, 0, 0, rowStride, height, false)
         val text = try { decoder.decodeWithState(BinaryBitmap(HybridBinarizer(source))).text } catch (_: NotFoundException) { null } finally { decoder.reset() }
-        val label = text?.let { StationLabel.decode(it) } ?: return
-        done = true
-        runOnUiThread {
-            setResult(RESULT_OK, Intent().putExtra(EXTRA_LABEL_TEXT, label.encode()))
-            finish()
+        val result = Intent()
+        when {
+            text == null -> return
+            StationLabel.decode(text) != null -> result.putExtra(EXTRA_LABEL_TEXT, StationLabel.decode(text)!!.encode())
+            ServerProfile.decode(text) != null -> result.putExtra(EXTRA_PROFILE_TEXT, ServerProfile.decode(text)!!.encode())
+            else -> return
         }
+        done = true
+        runOnUiThread { setResult(RESULT_OK, result); finish() }
     }
 
     private fun closeCamera() {
@@ -141,6 +145,7 @@ class QrScanActivity : Activity() {
 
     companion object {
         const val EXTRA_LABEL_TEXT = "ru.dioneya.commissioning.LABEL_TEXT"
+        const val EXTRA_PROFILE_TEXT = "ru.dioneya.commissioning.PROFILE_TEXT"
         private const val REQUEST_CAMERA = 43
         private const val WIDTH = 1280
         private const val HEIGHT = 720

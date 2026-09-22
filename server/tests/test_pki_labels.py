@@ -64,3 +64,34 @@ def test_registry_pairing_secret_and_label_commands(tmp_path, monkeypatch):
     assert cli(["pairing-secret-rotate", "--pki", str(pki_dir), "DIO-EVT-012", "--reason", "reprint"]) == 0
     assert StationLabel.decode((tmp_path / "labels" / "DIO-EVT-012.txt").read_text()).pairing_secret_b32 != \
         Registry(pki_dir / "registry.sqlite3").get("DIO-EVT-012").pairing_secret
+
+
+def test_server_profile_qr_payload_and_command(tmp_path, monkeypatch):
+    from pki.server_qr import ServerProfile
+    known = ServerProfile("muhoed.example.ru", 8883, 443, "dioneya-root", "ab" * 32)
+    text = known.encode()
+    assert text == ("DIOS1;H=muhoed.example.ru:8883;P=443;CA=dioneya-root;F=" + "ab" * 32 + ";T=zs/v1;C=F27A")   # shared with Android
+    assert ServerProfile.decode(text) == known
+    v6 = ServerProfile("[2001:db8::10]", 8883, 0, "dioneya-root", "cd" * 32)
+    assert ServerProfile.decode(v6.encode()) == v6
+    for bad in (text[:-1] + "B", text.replace("DIOS1", "DIOS2"), text.replace(";T=zs/v1", ""), text.replace("8883", "88831")):
+        with pytest.raises(pki.PkiError):
+            ServerProfile.decode(bad)
+    with pytest.raises(pki.PkiError):
+        ServerProfile("muhoed.example.ru", 8883, 443, "dioneya-root", "zz" * 32).encode()
+    # end to end through the CLI: root -> issuing -> server cert -> bundle -> server-qr
+    pytest.importorskip("qrcode")
+    offline, server = tmp_path / "offline", tmp_path / "pki"
+    monkeypatch.setenv("ZS_PKI_ROOT_PASSPHRASE", "root-passphrase-for-tests")
+    monkeypatch.setenv("ZS_PKI_ISSUING_PASSPHRASE", "issuing-pass-123")
+    assert cli(["root-init", "--out", str(offline)]) == 0
+    assert cli(["issuing-request", "--pki", str(server)]) == 0
+    assert cli(["issuing-sign", "--root", str(offline / "root"), "--csr", str(server / "issuing" / "issuing.csr.pem"), "--out", str(offline / "issuing.crt.pem")]) == 0
+    assert cli(["issuing-install", "--pki", str(server), "--cert", str(offline / "issuing.crt.pem"), "--root-cert", str(offline / "root" / "root.crt.pem")]) == 0
+    assert cli(["server-cert", "--pki", str(server), "--dns", "muhoed.example.ru"]) == 0
+    assert cli(["bundle", "--pki", str(server), "--mqtt-host", "muhoed.example.ru"]) == 0
+    assert cli(["server-qr", "--pki", str(server), "--out", str(tmp_path / "qr"), "--https-port", "443"]) == 0
+    profile = ServerProfile.decode((tmp_path / "qr" / "server-profile.txt").read_text())
+    fp = (server / "bundle" / "server-fingerprint.txt").read_text().strip()
+    assert profile.host == "muhoed.example.ru" and profile.mqtt_port == 8883 and profile.https_port == 443 and profile.fingerprint_hex == fp
+    assert (tmp_path / "qr" / "server-profile.svg").read_text().startswith("<svg")
