@@ -19,6 +19,19 @@ data class StationLabel(val serial: String, val stationId: Long, val tenant: Str
     /** 16 secret bytes decoded from base32 (no padding). */
     fun pairingSecretBytes(): ByteArray = base32Decode(pairingSecretB32)
 
+    /**
+     * BLE pairing passkey (ICD addendum B.7): the station fixes its LESC passkey to
+     * BE32(SHA-256("DIO-PAIR-V1" || secret)[0..3]) mod 1_000_000; the installer types this
+     * six-digit number into the system pairing dialog.
+     */
+    fun pairingPasskey(): String {
+        val md = java.security.MessageDigest.getInstance("SHA-256")
+        md.update("DIO-PAIR-V1".toByteArray(Charsets.US_ASCII))
+        val d = md.digest(pairingSecretBytes())
+        val v = ((d[0].toLong() and 0xff) shl 24) or ((d[1].toLong() and 0xff) shl 16) or ((d[2].toLong() and 0xff) shl 8) or (d[3].toLong() and 0xff)
+        return "%06d".format(v % 1_000_000L)
+    }
+
     companion object {
         const val VERSION_TAG = "DIO1"
         private val SERIAL = Regex("DIO-EVT-(00[1-9]|0[1-3][0-9]|040|B01)")
