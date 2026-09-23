@@ -38,6 +38,20 @@ static float peak_near(const float *p, float target, float tol, unsigned *at) {
   return best;
 }
 
+/* Line prominence: peak power over the mean of ±32 Hz around it (±2.5 Hz guarded); a tooth is "real" at >= 2 (3 dB). */
+static float prominence_at(const float *p, unsigned bin) {
+  const unsigned half = (unsigned)(32.0f / BIN_HZ), guard = (unsigned)(2.5f / BIN_HZ);
+  unsigned lo = bin > half ? bin - half : 0u, hi = bin + half < BINS ? bin + half : BINS - 1u;
+  double local = 0.0; unsigned n_local = 0u;
+  for (unsigned j = lo; j <= hi; j++) { if (j + guard >= bin && j <= bin + guard) continue; local += p[j]; n_local++; }
+  const float lf = n_local ? (float)(local / n_local) : 1e-30f;
+  return p[bin] / (lf > 1e-30f ? lf : 1e-30f);
+}
+static bool tooth_prominent(const float *p, float target, float tol) {
+  unsigned at = 0u;
+  return peak_near(p, target, tol, &at) > 0.0f && prominence_at(p, at) >= 2.0f;
+}
+
 static float comb_power_at(const float *p, float f0) {
   float tol = fmaxf(1.5f * BIN_HZ, f0 * 0.05f), total = 0.0f;
   for (unsigned k = 1u; k <= MAX_HARMONICS; k++) { float t = f0 * (float)k; if (t > BAND_HIGH_HZ) break; float pk = peak_near(p, t, tol, NULL); if (pk > 0.0f) total += pk; }
@@ -95,14 +109,10 @@ static void fit_comb(const float *lp, float *f0_out, float *anchor_out) {
   const float floor_log = band_median_log(lp, B_LO, B_HI);
   /* anchor: the most prominent bin (power over the mean of ±32 Hz around it, ±2.5 Hz guarded) */
   unsigned dom = B_LO; float best_prom = -1.0f;
-  const unsigned half = (unsigned)(32.0f / BIN_HZ), guard = (unsigned)(2.5f / BIN_HZ);
   for (unsigned i = B_LO; i <= B_HI; i++) {
-    unsigned lo = i > half ? i - half : 0u, hi = i + half < BINS ? i + half : BINS - 1u;
-    double local = 0.0; unsigned n_local = 0u;
-    for (unsigned j = lo; j <= hi; j++) { if (j + guard >= i && j <= i + guard) continue; local += p[j]; n_local++; }
-    const float lf = n_local ? (float)(local / n_local) : 1e-30f;
-    const float prom = p[i] / (lf > 1e-30f ? lf : 1e-30f);
-    if (lp[i] >= floor_log && prom > best_prom) { best_prom = prom; dom = i; }
+    if (lp[i] < floor_log) continue;
+    const float prom = prominence_at(p, i);
+    if (prom > best_prom) { best_prom = prom; dom = i; }
   }
   *f0_out = 0.0f; *anchor_out = 0.0f;
   if (best_prom < 2.0f) return;                              /* nothing line-like: < 3 dB over its surroundings */
@@ -113,7 +123,13 @@ static void fit_comb(const float *lp, float *f0_out, float *anchor_out) {
     float cand = dominant / (float)k;
     if (cand < F0_MIN_HZ) break;
     unsigned hits = 0u, low = 0u; float tol = fmaxf(1.5f * BIN_HZ, cand * 0.04f);
-    for (unsigned h = 1u; h <= 4u; h++) { float t = cand * (float)h; if (t > BAND_HIGH_HZ) break; if (peak_near(p, t, tol, NULL) >= floor8) { hits++; if (h <= 2u) low++; } }
+    for (unsigned h = 1u; h <= 4u; h++) {
+      float t = cand * (float)h;
+      if (t > BAND_HIGH_HZ) break;
+      /* a tooth of the lower comb must be a real line: above the floor AND prominent against its surroundings
+         (wind rumble is above the global floor everywhere below 40 Hz, which used to pull the fit to 12 Hz) */
+      if (peak_near(p, t, tol, NULL) >= floor8 && tooth_prominent(p, t, tol)) { hits++; if (h <= 2u) low++; }
+    }
     if (hits >= 3u && low >= 1u) {   /* a real lower fundamental shows its 1st or 2nd tooth, not only the dominant's neighbours */ float pw = comb_power_at(p, cand); if (pw > best_pw) { best_pw = pw; best_f0 = cand; } }
   }
   { float gbest = best_f0, gpw = -1.0f;
@@ -141,14 +157,16 @@ static void measure_window(const float *p, float f0_avg, float anchor_hz, zs_air
   const float floor6 = expf(band_median_log(lp, B_LO, B_HI)) * 3.981f;
   const float tol = fmaxf(1.5f * BIN_HZ, f0 * 0.06f);
   float peaks = 0.0f, half = 0.0f; unsigned np = 0u, nh = 0u;
+  unsigned low_teeth = 0u;
   for (unsigned k = 1u; k <= MAX_HARMONICS; k++) {
     float t = f0 * (float)k;
     if (t > BAND_HIGH_HZ) break;
     int lo = (int)floorf((t - tol) / BIN_HZ), hi = (int)ceilf((t + tol) / BIN_HZ);
     for (int i = lo < 0 ? 0 : lo; i <= hi && i < (int)BINS; i++) mask[i] = 1u;
     float pk = peak_near(p, t, tol, NULL);
-    if (pk > 0.0f) { peaks += pk; np++; if (pk >= floor6) w->harmonic_count++; }
+    if (pk > 0.0f) { peaks += pk; np++; if (pk >= floor6) w->harmonic_count++; if (k <= 4u && pk >= floor6 && tooth_prominent(p, t, tol)) low_teeth++; }
   }
+  w->low_teeth = (uint8_t)low_teeth;
   for (unsigned k = 0u; k < MAX_HARMONICS; k++) { float t = f0 * ((float)k + 0.5f); if (t > BAND_HIGH_HZ) break; float pk = peak_near(p, t, tol, NULL); if (pk > 0.0f) { half += pk; nh++; } }
   w->integer_order_ratio = (peaks + half) > 0.0f ? peaks / (peaks + half) : 0.0f;
   const float level = np ? peaks / (float)np : 0.0f, between = nh ? half / (float)nh : 0.0f;
@@ -161,7 +179,9 @@ static void measure_window(const float *p, float f0_avg, float anchor_hz, zs_air
     const float noise = m ? expf(band_median_log(noise_lp, 0u, m - 1u)) : 0.0f;
     w->snr_db = (noise > 1e-30f && level > 0.0f) ? 10.0f * log10f(level / noise) : 0.0f;
   }
-  w->comb = w->snr_db >= PRESENT_SNR_DB && w->contrast_db >= PRESENT_CONTRAST_DB && w->harmonic_count >= 2u;
+  /* a propulsion comb is strong at the bottom: two real teeth among the first four (a bird trill at 1.5 kHz
+     fitted as a 16th harmonic has nothing there, nor has an MP3-high-passed recording) */
+  w->comb = w->snr_db >= PRESENT_SNR_DB && w->contrast_db >= PRESENT_CONTRAST_DB && w->harmonic_count >= 2u && low_teeth >= 2u;
   w->f0_hz = f0;
   if (anchor_hz > 0.0f) { float k = floorf(anchor_hz / f0_avg + 0.5f); if (k < 1.0f) k = 1.0f; w->dominant_hz = f0 * k; }
 }
@@ -208,7 +228,7 @@ zs_air_gate_result_t zs_air_gate_evaluate(const zs_air_gate_t *g) {
   }
   const float order_ratio = ncomb ? median_of(ratios, ncomb) : 0.0f;
   float cv_max = STEADINESS_CV_MAX;
-  if (r.median_contrast_db >= RELAX_CONTRAST_DB) cv_max = fminf(cv_max * 2.0f, 0.25f);
+  if (r.median_contrast_db >= RELAX_CONTRAST_DB) cv_max = fminf(cv_max * 2.0f, 0.20f);   /* server caps at 0.25; a 30 %/s glide reaches 0.24 */
   for (unsigned m = 50u; m <= 60u; m += 10u)
     if (r.f0_hz > 0.0f && fabsf(r.f0_hz - (float)m) <= 2.0f && (r.steadiness_cv <= 0.02f || order_ratio >= 0.95f)) r.mains = true;
   const bool strong = r.persistence >= 0.6f && r.median_contrast_db >= STRONG_CONTRAST_DB;
@@ -218,7 +238,7 @@ zs_air_gate_result_t zs_air_gate_evaluate(const zs_air_gate_t *g) {
   const zs_air_window_t *prev = &g->hist[(g->next + ZS_AIR_HISTORY - 2u) % ZS_AIR_HISTORY];
   const bool current = last->comb || (n >= 2u && prev->comb);
   const bool airborne = r.f0_hz >= AIR_F0_MIN_HZ && r.f0_hz <= AIR_F0_MAX_HZ;
-  r.present = n >= 2u && current && airborne && r.persistence >= PERSISTENCE_MIN && r.median_contrast_db >= PRESENT_CONTRAST_DB && r.steadiness_cv <= cv_max && hmax >= min_h && !r.mains;
+  r.present = n >= 2u && ncomb >= 3u && current && airborne && r.persistence >= PERSISTENCE_MIN && r.median_contrast_db >= PRESENT_CONTRAST_DB && r.steadiness_cv <= cv_max && hmax >= min_h && !r.mains;
   float score = 0.40f * fminf(r.persistence / 0.6f, 1.0f) + 0.30f * fminf(fmaxf(r.median_contrast_db, 0.0f) / 10.0f, 1.0f) +
                 0.20f * (1.0f - fminf(r.steadiness_cv / 0.1f, 1.0f)) + 0.10f * fminf((float)hmax / 8.0f, 1.0f);
   if (!r.present) score *= 0.5f;

@@ -18,12 +18,12 @@ int main(int argc, char **argv) {
   fclose(f);
   zs_air_gate_init(&gate);
   const size_t hop = ZS_AIR_WINDOW_SAMPLES / 2u;
-  printf("window,start_s,f0_hz,contrast_db,snr_db,harmonics,comb,persistence,steadiness_cv,present,confidence\n");
+  printf("window,start_s,f0_hz,contrast_db,snr_db,harmonics,low_teeth,comb,persistence,steadiness_cv,present,confidence\n");
   for (size_t start = 0u, i = 0u; start + ZS_AIR_WINDOW_SAMPLES <= n; start += hop, i++) {
     zs_air_gate_result_t r;
     if (!zs_air_gate_push(&gate, pcm + start, ZS_AIR_WINDOW_SAMPLES, scratch, &r)) return 5;
     const zs_air_window_t *w = zs_air_gate_last(&gate);
-    printf("%zu,%.1f,%.2f,%.2f,%.2f,%u,%d,%.3f,%.4f,%d,%u\n", i, (double)start / ZS_AIR_SAMPLE_RATE, w->f0_hz, w->contrast_db, w->snr_db, w->harmonic_count, w->comb, r.persistence, r.steadiness_cv, r.present, r.confidence_u8);
+    printf("%zu,%.1f,%.2f,%.2f,%.2f,%u,%u,%d,%.3f,%.4f,%d,%u\n", i, (double)start / ZS_AIR_SAMPLE_RATE, w->f0_hz, w->contrast_db, w->snr_db, w->harmonic_count, w->low_teeth, w->comb, r.persistence, r.steadiness_cv, r.present, r.confidence_u8);
   }
   free(pcm);
   return 0;
