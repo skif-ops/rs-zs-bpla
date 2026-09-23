@@ -40,8 +40,10 @@ zero zones; its ECO-002 commit-bound application gate passed at CI #692,
 PCB-PWR Schematic #103 and PCB Native
 #357. The authoritative successor now exactly matches accepted hot-loop
 candidate 006: 35 trace items (including eight 0.60/0.30 mm vias) and two
-bounded In1.Cu local return zones. Its new commit-bound application gate is
-pending. Via-current and via-under-pad fabrication qualification, physical
+bounded In1.Cu local return zones. Its commit-bound application gate passes
+at CI #715 and PCB Native #364 (KiCad 9 DRC 85 → 85; unconnected 117 → 108;
+zero DRC fingerprint delta). Via-current and via-under-pad fabrication
+qualification, physical
 +70 °C first-article validation and all other routing remain open. The
 numeric overlay uses a deliberately conservative 35 µm / 10 °C-rise engineering
 screen: 4.0 mm for the 5 A input/primary return, 3.0 mm for 4 A rails/returns,

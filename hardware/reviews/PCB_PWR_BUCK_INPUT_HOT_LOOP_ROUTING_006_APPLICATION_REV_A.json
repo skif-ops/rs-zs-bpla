@@ -13,18 +13,37 @@
   "added_segments": 13,
   "added_vias": 8,
   "added_local_in1_cu_planes": 2,
-  "routed_nets": ["VBAT_SYS", "GND_PWR"],
+  "routed_nets": [
+    "VBAT_SYS",
+    "GND_PWR"
+  ],
   "generic_twelve_via_rule_satisfied": false,
   "via_current_capacity_qualified": false,
   "via_under_pad_process_qualified": false,
   "machine_gate": {
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
-    "application_source_commit_sha": null,
-    "ci_run_number": null,
-    "pcb_native_run_number": null,
-    "required_violations": [85, 85],
-    "required_unconnected": [117, 108],
-    "required_drc_fingerprint_delta": 0
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+    "application_source_commit_sha": "0b821758bc073326594154039f5631e4f5a784f5",
+    "ci_run_number": 715,
+    "pcb_native_run_number": 364,
+    "required_violations": [
+      85,
+      85
+    ],
+    "required_unconnected": [
+      117,
+      108
+    ],
+    "required_drc_fingerprint_delta": 0,
+    "application_source_tree_sha": "05478176fc80ae9e33d8dcbcc11469705a2588e4",
+    "board_application_commit_sha": "4875f63f86d0eb2cd00a8a43dcdd97bdd89d7a93",
+    "ci_run_id": 35897520174,
+    "pcb_pwr_schematic_run_number": 108,
+    "pcb_pwr_schematic_run_id": 35896832119,
+    "pcb_native_run_id": 35897520103,
+    "pcb_native_job_id": 107305041180,
+    "artifact_id": 10766709699,
+    "artifact_digest": "sha256:1e5c6e1a0aa4571a86b05694cbb1b448029995e60edef15a31744d896080f7e0",
+    "comparative_drc": "PASS_85_TO_85_VIOLATIONS_117_TO_108_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA"
   },
   "routing_complete": false,
   "review_b_complete": false,

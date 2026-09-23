@@ -49,7 +49,9 @@ with `ACCEPT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE`.
 Reviewer Скиф supplied that exact token on 2026-09-23. The hash-bound candidate
 has now been applied byte-for-byte to the authoritative board. The separate
 application record and commit-bound KiCad gate control the credit for this
-application. Acceptance alone does not release manufacture.
+application. CI #715 and PCB Native #364 passed with 85 → 85 DRC violations,
+117 → 108 unconnected items and zero DRC fingerprint delta. Acceptance and
+these machine results do not release manufacture.
 
 `C13`, the upstream `RSH1 -> VBAT_SYS` trunk, the global GND plane, output
 rails, Kelvin/feedback routes and all other copper remain outside this

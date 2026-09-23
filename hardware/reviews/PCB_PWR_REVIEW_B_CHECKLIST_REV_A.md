@@ -224,7 +224,8 @@ gate, has exact human acceptance, is applied byte-for-byte and its fresh
 application gate passes; all four warning-only closures are credited.
 The accepted hot-loop routing candidate 006 is applied to the authoritative
 PCB-PWR byte-for-byte (SHA-256 `9a836eee…87dfd0`). Its separate
-commit-bound application gate is pending. The board has 35 trace items,
+commit-bound application gate passes at CI #715 and PCB Native #364. The board
+has 35 trace items,
 including eight GND_PWR vias, and two local In1.Cu return zones. These local
 zones do not complete the global return plane.
 Remaining routing, physical via-sharing/current/thermal/fault evidence, DRC,

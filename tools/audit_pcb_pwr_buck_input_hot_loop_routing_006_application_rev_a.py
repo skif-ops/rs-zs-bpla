@@ -65,6 +65,34 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
     assert gate["required_violations"] == [85, 85]
     assert gate["required_unconnected"] == [117, 108]
     assert gate["required_drc_fingerprint_delta"] == 0
+    if gate["status"] == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE":
+        assert gate["board_application_commit_sha"] == "4875f63f86d0eb2cd00a8a43dcdd97bdd89d7a93"
+        assert gate["application_source_commit_sha"] == "0b821758bc073326594154039f5631e4f5a784f5"
+        assert gate["application_source_tree_sha"] == "05478176fc80ae9e33d8dcbcc11469705a2588e4"
+        assert gate["ci_run_number"] == 715 and gate["ci_run_id"] == 35897520174
+        assert gate["pcb_pwr_schematic_run_number"] == 108
+        assert gate["pcb_native_run_number"] == 364
+        assert gate["pcb_native_run_id"] == 35897520103
+        assert gate["pcb_native_job_id"] == 107305041180
+        assert gate["artifact_id"] == 10766709699
+        assert gate["artifact_digest"] == (
+            "sha256:1e5c6e1a0aa4571a86b05694cbb1b448029995e60edef15a31744d896080f7e0"
+        )
+        assert gate["comparative_drc"] == (
+            "PASS_85_TO_85_VIOLATIONS_117_TO_108_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA"
+        )
+        assert route["status"] == (
+            "APPROVED_APPLIED_EXACT_BUCK_INPUT_HOT_LOOP_ROUTING_006_COMMIT_BOUND_KICAD9_GATE_PASS"
+        )
+        for key in ("source_commit_sha", "source_tree_sha", "board_commit_sha",
+                    "ci_run_number", "pcb_pwr_schematic_run_number",
+                    "pcb_native_run_number", "artifact_id", "artifact_digest",
+                    "comparative_drc"):
+            assert route["application_" + key] == gate[
+                ("board_application_commit_sha" if key == "board_commit_sha"
+                 else "application_" + key if key in
+                 ("source_commit_sha", "source_tree_sha") else key)
+            ]
     assert (drc_base is None) == (drc_active is None)
     result: dict[str, object] = {
         "status": "PASS_EXACT_ACCEPTED_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_APPLICATION",

@@ -968,7 +968,10 @@ def validate_deliverable_register() -> None:
         "accepted hot-loop 006 is now applied exactly with 35 trace items"
         in pwr_layout
         and "eight vias and two bounded In1.Cu return zones" in pwr_layout
-        and "separate commit-bound application gate is pending" in pwr_layout,
+        and "separate application gate passed at CI 715 PCB Native 364"
+        in pwr_layout
+        and "85-to-85 DRC violations and 117-to-108 unconnected items"
+        in pwr_layout,
         "PCB-PWR hot-loop application deliverable is missing",
     )
     require(
@@ -1383,13 +1386,15 @@ def validate_hardware_baseline() -> None:
     hot_loop = pwr_status["native_layout"]["buck_input_hot_loop_routing_006"]
     require(
         hot_loop["status"] ==
-        "APPROVED_APPLIED_EXACT_BUCK_INPUT_HOT_LOOP_ROUTING_006_APPLICATION_GATE_PENDING"
+        "APPROVED_APPLIED_EXACT_BUCK_INPUT_HOT_LOOP_ROUTING_006_COMMIT_BOUND_KICAD9_GATE_PASS"
         and hot_loop["active_board_sha256"] ==
         "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
         and hot_loop["exact_candidate_byte_identity"] is True
         and hot_loop["authoritative_board_modified"] is True
         and hot_loop["application_machine_gate"] ==
-        "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE"
+        "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE"
+        and hot_loop["application_ci_run_number"] == 715
+        and hot_loop["application_pcb_native_run_number"] == 364
         and pwr_status["native_layout"]["copper_zones_present"] is True
         and all(hot_loop[k] is False for k in
                 ("routing_complete", "review_b_complete", "manufacturing_release")),
