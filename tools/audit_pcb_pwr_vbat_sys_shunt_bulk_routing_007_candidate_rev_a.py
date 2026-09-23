@@ -102,6 +102,19 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     assert review["authoritative_board_modified"] is False
     assert review["manufacturing_release"] is False
     assert review["application_authorized"] is False
+    assert review["comparative_kicad9_drc"] == (
+        "PASS_85_TO_85_VIOLATIONS_108_TO_107_UNCONNECTED_UNCHANGED_SEVERITY_TYPE_COUNTS"
+    )
+    gate = review["machine_gate"]
+    assert gate["candidate_source_commit_sha"] == "d962bf7cd9ef36c2b85363527a45ca467d059625"
+    assert gate["candidate_source_tree_sha"] == "7a9b7eaf12db43e7ea4ebb45b20ed9be5d492a7c"
+    assert gate["ci_run_number"] == 718 and gate["ci_run_id"] == 35901302115
+    assert gate["pcb_native_run_number"] == 366 and gate["pcb_native_run_id"] == 35901302273
+    assert gate["pcb_native_job_id"] == 107317899278
+    assert gate["artifact_id"] == 10769511337
+    assert gate["artifact_digest"] == (
+        "sha256:ed71910195c912c4bd1fba46088e3d48869c9bee2e20dd5055f86a1cd4ad04fb"
+    )
     result = {
         "status": "PASS_STATIC_PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_CANDIDATE",
         "base_sha256": BASE_SHA256,
