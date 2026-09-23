@@ -28,8 +28,13 @@ Time is `zs_time_for_sample(window_end)` (0 until PPS trust); `event_id = boot_i
 - RAM: the AIR gate scratch (`ZS_AIR_SCRATCH_COMPLEX` ≈ 105 KB: FFT + per-window work areas, which used
   to be statics in zs_air_gate.c) overlays the DSP work buffer (`zs_dsp_mcu_borrow_work`), the 1 s mono
   window is the former `dsp_pcm`; the ring grew to 1.125 s (288 KB) to cover the fetch latency; heap 40 KB.
-  Image: 114 KB flash, 754 KB RAM (95.9 % of SRAM1-3). Relief when needed: in-place FFT in zs_dsp_mcu
-  (−128 KB), 2-channel ring outside the spatial duty.
+  Image: 114 KB flash, 754 KB RAM (95.9 % of SRAM1-3) at merge; with the B2 comms task 763 KB (97.0 %).
+  2026-09-23 RAM relief (after #48): in-place global FFT in zs_dsp_mcu (`zs_fft_mixed_real_magnitude_inplace`,
+  the magnitude buffer shrinks to 64 KB and the peak/mel tail moves into the upper half of the work buffer),
+  the AIR gate keeps only its running average (the window spectrum lives in the scratch tail), the channel-lag
+  self-test correlates straight out of the ring, and one 2 KB quarter-wave cosine table replaces the Hann
+  window and DCT tables: 658 KB RAM (83.6 %), 140 KB flash. Remaining relief if needed: 2-channel ring outside
+  the spatial duty, heap trim after the bench `heap` reading.
 - `zs_fft.c` (float radix-2) is now part of the target library for the gate; `zs_dsp.c` stays host-only.
 - Ring range check fixed in `zs_audio.c`: a copy whose *start* the ring has already overwritten is refused.
 
@@ -44,5 +49,5 @@ classifier + fusion < 0.1 ms (x86); the M33 figure for the whole window is the a
 ## Open
 
 - boot_id from a NOR boot counter (B3) — the bench uses `APP_BOOT_ID = 1`;
-- outbox drain to the BG95 uplink (B2) — events are enqueued only;
+- ~~outbox drain to the BG95 uplink (B2)~~ — done in #48 (`zs_station_comms`, `app_comms`);
 - heartbeat with the pipeline counters (SUSPECT/ENGINE shares) for the server.

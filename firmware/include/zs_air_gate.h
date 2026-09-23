@@ -16,8 +16,9 @@
  * fundamental (folded by integer ratios so an octave slip of the fit does not count as motion; all teeth
  * of a comb move with f0, so this is the server's line steadiness), decision as in
  * DroneSeparator._build_findings.
- * Scratch is caller-provided (ZS_AIR_SCRATCH_COMPLEX: the 8192-point FFT plus the per-window work areas,
- * ~105 KB) so the target can overlay it on the DSP work buffer; the gate itself keeps two band spectra (2 x 12 KB).
+ * Scratch is caller-provided (ZS_AIR_SCRATCH_COMPLEX: the 8192-point FFT plus the per-window work areas
+ * including the window's own power spectrum, ~118 KB) so the target can overlay it on the DSP work buffer;
+ * the gate itself keeps one band spectrum (the 12 KB running log-average) and the window history.
  */
 #include "zs_fft.h"
 #include <stdbool.h>
@@ -30,8 +31,9 @@
 #define ZS_AIR_FFT 8192u
 #define ZS_AIR_BINS 3074u        /* bins up to 2400 Hz at 0.78125 Hz */
 #define ZS_AIR_HISTORY 8u
-/* scratch for zs_air_gate_push: the FFT plus three band-sized float work areas and a byte mask (~105 KB) */
-#define ZS_AIR_SCRATCH_COMPLEX (ZS_AIR_FFT + (3u * ZS_AIR_BINS * 4u + ZS_AIR_BINS + 7u) / 8u)
+/* scratch for zs_air_gate_push: the FFT plus four band-sized float work areas (window spectrum, p, lp, noise)
+   and a byte mask (~118 KB) */
+#define ZS_AIR_SCRATCH_COMPLEX (ZS_AIR_FFT + (4u * ZS_AIR_BINS * 4u + ZS_AIR_BINS + 7u) / 8u)
 
 typedef struct {
   float snr_db;         /* server definition: mean harmonic peak / median of the band floor (harmonic bins excluded) */
@@ -45,7 +47,6 @@ typedef struct {
 } zs_air_window_t;
 
 typedef struct {
-  float spectrum[ZS_AIR_BINS];     /* power spectrum of the last window */
   float avg_log[ZS_AIR_BINS];      /* running mean of log power over the history (geometric mean) */
   zs_air_window_t hist[ZS_AIR_HISTORY];
   uint8_t next, count;
