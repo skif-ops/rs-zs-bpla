@@ -138,3 +138,38 @@ class AudioLoader:
         if suffix in {".m4a", ".aac"}:
             try:
                 data, sample_rate = librosa.load(str(path), sr=None, mono=False, dtype=np.float32)
+            except Exception as error:
+                raise ValueError(
+                    f"Could not read {path.name} as audio. For M4A/AAC, make sure "
+                    "ffmpeg/audioread support is available."
+                ) from error
+            data_2d = data[:, np.newaxis] if data.ndim == 1 else data.T
+            return np.asarray(data_2d, dtype=np.float32), int(sample_rate), warnings
+
+        try:
+            data, sample_rate = sf.read(path, always_2d=True)
+            return np.asarray(data, dtype=np.float32), int(sample_rate), warnings
+        except Exception as sf_error:
+            try:
+                data, sample_rate = librosa.load(
+                    path=str(path),
+                    sr=None,
+                    mono=False,
+                    dtype=np.float32,
+                )
+            except Exception as librosa_error:
+                raise ValueError(
+                    f"Could not read {path.name} as audio. "
+                    "For compressed formats (MP3/M4A/AAC), make sure ffmpeg/audioread "
+                    "support is available."
+                ) from librosa_error
+
+            if data.ndim == 1:
+                data_2d = data[:, np.newaxis]
+            else:
+                data_2d = data.T
+            warnings.append(
+                f"{path.name}: decoded through Librosa fallback after SoundFile failed "
+                f"({sf_error.__class__.__name__})."
+            )
+            return np.asarray(data_2d, dtype=np.float32), int(sample_rate), warnings
