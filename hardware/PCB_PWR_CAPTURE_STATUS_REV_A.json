@@ -277,14 +277,14 @@
     "mounting_holes": 4,
     "mounting_status": "EVT_DIM_003_ACCEPTED_H1_H4_NPTH_3P4",
     "routing_present": true,
-    "copper_zones_present": false,
+    "copper_zones_present": true,
     "cam_export_authorized": false,
     "placement_clearance": {
       "audit": "tools/audit_pcb_pwr_placement_clearance_rev_a.py",
       "record": "hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md",
       "control": {
         "state": "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED",
-        "board_semantic_sha256": "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555",
+        "board_semantic_sha256": "4da495603ca0c4ed2f7c4a3cb1197a133856408ac6f262ac976c1dab5667f687",
         "placement_authority_sha256": "257fee5898b5d44970115220a485d40b01c4fefad14b5c3b1a4ffb43b7b5b2d6",
         "fitted_footprints": 44,
         "courtyard_footprints": 44,
@@ -298,7 +298,7 @@
         ],
         "mounting_holes": 4,
         "mounting_pattern": "EVT_DIM_003_ACCEPTED_H1_H4_NPTH_3P4",
-        "mounting_fitted_exclusion_diameter_mm": 10,
+        "mounting_fitted_exclusion_diameter_mm": 10.0,
         "minimum_mounting_to_fitted_body_margin_mm": 0.53,
         "mounting_to_fitted_body_conflicts": 0,
         "mounting_to_existing_pad_conflicts": 0,
@@ -758,7 +758,7 @@
       "record": "hardware/reviews/PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.md",
       "generator": "tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.py",
       "audit": "tools/audit_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.py",
-      "status": "ACCEPT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE_APPLICATION_PENDING",
+      "status": "APPROVED_APPLIED_EXACT_BUCK_INPUT_HOT_LOOP_ROUTING_006_APPLICATION_GATE_PENDING",
       "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_006_CREATION_SUBGATE",
       "scope_revision_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_006_VIA_PLANE_SCOPE_REVISION_SUBGATE",
       "base_board_sha256": "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c",
@@ -782,7 +782,7 @@
       "generic_twelve_via_rule_satisfied": false,
       "via_current_capacity_qualified": false,
       "physical_evt_validation_required": true,
-      "authoritative_board_modified": false,
+      "authoritative_board_modified": true,
       "machine_gate_complete": true,
       "machine_gate_source_commit_sha": "702ed8c9ae88832105e07d3278d112c10bf4c4d5",
       "machine_gate_source_tree_sha": "b3a256c68788de455946bf972b63c92d9bfdd694",
@@ -798,7 +798,14 @@
       "application_authorized": true,
       "routing_complete": false,
       "review_b_complete": false,
-      "manufacturing_release": false
+      "manufacturing_release": false,
+      "application": "hardware/reviews/PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_APPLICATION_REV_A.json",
+      "application_generator": "tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py",
+      "application_audit": "tools/audit_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py",
+      "active_board_sha256": "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0",
+      "active_board_semantic_sha256": "4da495603ca0c4ed2f7c4a3cb1197a133856408ac6f262ac976c1dab5667f687",
+      "exact_candidate_byte_identity": true,
+      "application_machine_gate": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE"
     }
   },
   "mechanical_freeze_input": {
@@ -888,7 +895,7 @@
     "independent_audit": "tools/audit_pcb_pwr_routing_authority_rev_a.py",
     "control": {
       "state": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN",
-      "board_semantic_sha256": "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555",
+      "board_semantic_sha256": "4da495603ca0c4ed2f7c4a3cb1197a133856408ac6f262ac976c1dab5667f687",
       "authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
       "net_count": 31,
       "class_counts": {
@@ -919,8 +926,8 @@
         "SELF_TO_GND_PWR_ONLY_AT_NT2": 1,
         "SELF_TO_GND_PWR_ONLY_AT_NT3": 1
       },
-      "trace_items": 14,
-      "copper_zones": 0,
+      "trace_items": 35,
+      "copper_zones": 2,
       "dim_003": "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED",
       "numeric_power_geometry": "EVT_PUBLIC_STACKUP_AND_CALCULATED_CURRENT_GEOMETRY_ACCEPTED_PHYSICAL_FAULT_THERMAL_VALIDATION_OPEN",
       "routing_complete": false,

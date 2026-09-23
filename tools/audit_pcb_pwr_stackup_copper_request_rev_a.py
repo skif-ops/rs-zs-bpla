@@ -22,6 +22,8 @@ from kiutils.board import Board
 from audit_pcb_pwr_routing_authority_rev_a import semantic_board_sha256
 
 
+from pcb_pwr_hot_loop_006_board import historical_basis_board
+
 ROOT = Path(__file__).resolve().parents[1]
 BOARD = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 RULES = ROOT / "hardware/kicad/PCB_RULES.md"
@@ -213,7 +215,7 @@ def validate_board_and_bindings(contract: dict[str, Any]) -> dict[str, Any]:
     for item in AUTHORITY_INPUTS:
         require((ROOT / item).is_file(), f"authority input missing: {item}")
 
-    board = Board.from_file(str(BOARD), encoding="utf-8")
+    board = Board.from_file(str(historical_basis_board(BOARD)), encoding="utf-8")
     copper_layers = [str(layer.name) for layer in board.layers if str(layer.name).endswith(".Cu")]
     board_nets = {
         str(net.name) for net in board.nets
@@ -507,7 +509,7 @@ def audit_evt_accepted(contract: dict[str, Any]) -> dict[str, Any]:
     for source in (EVT_BASELINE, EVT_BASELINE_MANUAL, CURRENT_GEOMETRY):
         require(relative(source) in contract.get("authority_inputs", []),
                 f"accepted authority input missing: {relative(source)}")
-    board = Board.from_file(str(BOARD), encoding="utf-8")
+    board = Board.from_file(str(historical_basis_board(BOARD)), encoding="utf-8")
     copper_layers = [str(layer.name) for layer in board.layers if str(layer.name).endswith(".Cu")]
     require(copper_layers == ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"]
             and float(board.general.thickness) == 1.6

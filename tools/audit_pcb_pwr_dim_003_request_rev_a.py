@@ -22,6 +22,8 @@ from audit_pcb_pwr_placement_clearance_rev_a import audit as clearance_audit
 from audit_pcb_pwr_routing_authority_rev_a import semantic_board_sha256
 
 
+from pcb_pwr_hot_loop_006_board import historical_basis_board
+
 ROOT = Path(__file__).resolve().parents[1]
 BOARD = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 PLACEMENT = ROOT / "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv"
@@ -202,7 +204,7 @@ def validate_board_and_sources(contract: dict[str, Any]) -> dict[str, Any]:
     require(contract.get("authority_inputs") == AUTHORITY_INPUTS,
             "DIM-003 authority-input set differs")
 
-    board = Board.from_file(str(BOARD), encoding="utf-8")
+    board = Board.from_file(str(historical_basis_board(BOARD)), encoding="utf-8")
     copper_layers = [str(layer.name) for layer in board.layers if str(layer.name).endswith(".Cu")]
     board_nets = {str(net.name) for net in board.nets
                   if int(net.number) != 0 and str(net.name)}

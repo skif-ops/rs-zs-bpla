@@ -22,6 +22,8 @@ from kiutils.board import Board
 from audit_pcb_pwr_routing_authority_rev_a import semantic_board_sha256
 
 
+from pcb_pwr_hot_loop_006_board import historical_basis_board
+
 ROOT = Path(__file__).resolve().parents[1]
 BASIS = ROOT / "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json"
 RECORD = ROOT / "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.md"
@@ -150,7 +152,7 @@ def audit() -> dict[str, Any]:
         require(binding[key] == str(path.relative_to(ROOT)), f"{key} path drift")
         require(binding[f"{key}_sha256"] == sha256(path), f"{key} SHA-256 drift")
 
-    board = Board.from_file(str(BOARD), encoding="utf-8")
+    board = Board.from_file(str(historical_basis_board(BOARD)), encoding="utf-8")
     require(binding["native_board_semantic_sha256"] == semantic_board_sha256(board),
             "native board semantic SHA-256 drift")
     require(len(board.traceItems) in {0, 2, 3, 4, 8, 14} and len(board.zones) == 0,

@@ -16,6 +16,8 @@ from kiutils.board import Board
 import audit_pcb_pwr_placement_clearance_rev_a as clearance_audit
 
 
+from pcb_pwr_hot_loop_006_board import historical_basis_board
+
 ROOT = Path(__file__).resolve().parents[1]
 CANDIDATE_DIR = (
     ROOT / "hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001"
@@ -28,7 +30,7 @@ CANDIDATE = (
     CANDIDATE_DIR
     / "PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb"
 )
-ACTIVE = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
+ACTIVE = historical_basis_board(ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb")
 PLACEMENT = ROOT / "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv"
 GENERATOR = (
     ROOT

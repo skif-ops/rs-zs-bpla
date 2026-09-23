@@ -1,0 +1,32 @@
+{
+  "schema": "dioneya-pcb-pwr-buck-input-hot-loop-routing-006-application-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006",
+  "decision": "ACCEPT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE",
+  "approval_commit_sha": "7dfad6ec0bc2df51a6c0f65a16e6c381573947db",
+  "approval_sha256": "3738c1235f805acb01fccda413a379eac13b60d5d6f7ebaae12c72969c53ae1f",
+  "predecessor_board_sha256": "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c",
+  "applied_board_sha256": "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0",
+  "applied_board_semantic_sha256": "4da495603ca0c4ed2f7c4a3cb1197a133856408ac6f262ac976c1dab5667f687",
+  "exact_candidate_byte_identity": true,
+  "trace_items": 35,
+  "added_segments": 13,
+  "added_vias": 8,
+  "added_local_in1_cu_planes": 2,
+  "routed_nets": ["VBAT_SYS", "GND_PWR"],
+  "generic_twelve_via_rule_satisfied": false,
+  "via_current_capacity_qualified": false,
+  "via_under_pad_process_qualified": false,
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+    "application_source_commit_sha": null,
+    "ci_run_number": null,
+    "pcb_native_run_number": null,
+    "required_violations": [85, 85],
+    "required_unconnected": [117, 108],
+    "required_drc_fingerprint_delta": 0
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

@@ -420,8 +420,9 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             f"PCB-PWR layer-count drift: {copper_layers}")
     trace_items = len(board.traceItems)
     copper_zones = len(board.zones)
-    require(trace_items in {0, 2, 3, 4, 8, 14} and copper_zones == 0,
-            "routing authority does not cover copper beyond accepted buck power-stage ECO-002")
+    require((trace_items, copper_zones) in
+            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2)},
+            "routing authority does not cover copper beyond accepted hot-loop 006")
 
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
     require(baseline["input"]["actual_battery_bms_limits_frozen"] is False and
@@ -494,7 +495,8 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
         require(status.get("manufacturing_release") is False and
                 status.get("native_layout", {}).get("routing_present") ==
                 (trace_items > 0) and
-                status.get("native_layout", {}).get("copper_zones_present") is False and
+                status.get("native_layout", {}).get("copper_zones_present") is
+                (copper_zones > 0) and
                 status.get("review_b", {}).get("complete") is False,
                 "PCB-PWR release interlock drift")
 

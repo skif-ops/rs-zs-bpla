@@ -311,7 +311,9 @@ def audit(
     drc_base: Path | None = None, drc_candidate: Path | None = None
 ) -> dict[str, object]:
     require(
-        sha256(BASE) == sha256(ACTIVE) == BASE_SHA256,
+        sha256(BASE) == BASE_SHA256
+        and sha256(ACTIVE) in {BASE_SHA256, CANDIDATE_SHA256}
+        and ACTIVE.read_bytes() in {BASE.read_bytes(), CANDIDATE.read_bytes()},
         "candidate-006 base or authoritative PCB-PWR drift",
     )
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "candidate-006 SHA-256 drift")

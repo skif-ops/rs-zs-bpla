@@ -25,11 +25,13 @@ from generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a import (
 )
 
 
+from pcb_pwr_hot_loop_006_board import historical_basis_board
+
 ROOT = Path(__file__).resolve().parents[1]
 CANDIDATE_DIR = ROOT / "hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002"
 BASE = CANDIDATE_DIR / "PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb"
 CANDIDATE = CANDIDATE_DIR / "PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb"
-ACTIVE = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
+ACTIVE = historical_basis_board(ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb")
 REVIEW = ROOT / "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.json"
 REVIEW_MAPPING = ROOT / "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_REVIEW_COMMIT_MAPPING.json"
 APPROVAL = ROOT / "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_APPROVAL_REV_A.json"

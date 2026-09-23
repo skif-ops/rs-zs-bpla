@@ -965,6 +965,13 @@ def validate_deliverable_register() -> None:
         "PCB-PWR deliverable does not match the active ECO-002 routing state",
     )
     require(
+        "accepted hot-loop 006 is now applied exactly with 35 trace items"
+        in pwr_layout
+        and "eight vias and two bounded In1.Cu return zones" in pwr_layout
+        and "separate commit-bound application gate is pending" in pwr_layout,
+        "PCB-PWR hot-loop application deliverable is missing",
+    )
+    require(
         deliverables["HW-P-005"]["Статус"] == "EVT_ENGINEERING_BASELINE_ACCEPTED"
         and deliverables["HW-P-005"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-P-005"]["QG-2 техника"] == "PASS"
@@ -1372,6 +1379,21 @@ def validate_hardware_baseline() -> None:
         pwr_status["review_b"]["complete"] is False
         and pwr_status["manufacturing_release"] is False,
         "PCB-PWR was advanced by a pre-route stackup/copper request",
+    )
+    hot_loop = pwr_status["native_layout"]["buck_input_hot_loop_routing_006"]
+    require(
+        hot_loop["status"] ==
+        "APPROVED_APPLIED_EXACT_BUCK_INPUT_HOT_LOOP_ROUTING_006_APPLICATION_GATE_PENDING"
+        and hot_loop["active_board_sha256"] ==
+        "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
+        and hot_loop["exact_candidate_byte_identity"] is True
+        and hot_loop["authoritative_board_modified"] is True
+        and hot_loop["application_machine_gate"] ==
+        "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE"
+        and pwr_status["native_layout"]["copper_zones_present"] is True
+        and all(hot_loop[k] is False for k in
+                ("routing_complete", "review_b_complete", "manufacturing_release")),
+        "PCB-PWR hot-loop 006 application or manufacturing boundary drifted",
     )
     pwr_hierarchy = pwr_status.get("human_readable_hierarchy", {})
     pwr_hierarchy_control = pwr_hierarchy.get("control", {})

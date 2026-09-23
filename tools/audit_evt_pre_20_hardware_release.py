@@ -430,8 +430,8 @@ def audit() -> dict[str, object]:
         and pwr_clearance_summary.get("mounting_holes") == 4
         and pwr_clearance_summary.get("mounting_to_fitted_body_conflicts") == 0
         and pwr_clearance_summary.get("mounting_to_existing_pad_conflicts") == 0
-        and pwr_clearance.get("board", {}).get("trace_items") == 14
-        and pwr_clearance.get("board", {}).get("copper_zones") == 0
+        and pwr_clearance.get("board", {}).get("trace_items") == 35
+        and pwr_clearance.get("board", {}).get("copper_zones") == 2
         and pwr_clearance.get("manufacturing_release") is False
     )
     check(
@@ -447,8 +447,8 @@ def audit() -> dict[str, object]:
         "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN"
         and pwr_routing_authority.get("authority", {}).get("row_count") == 31
         and pwr_routing_authority.get("board", {}).get("net_count") == 31
-        and pwr_routing_authority.get("board", {}).get("trace_items") == 14
-        and pwr_routing_authority.get("board", {}).get("copper_zones") == 0
+        and pwr_routing_authority.get("board", {}).get("trace_items") == 35
+        and pwr_routing_authority.get("board", {}).get("copper_zones") == 2
         and pwr_routing_authority.get("dim_003") ==
         "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED"
         and pwr_routing_authority.get("routing_complete") is False
@@ -459,6 +459,20 @@ def audit() -> dict[str, object]:
         pwr_routing_controlled,
         str(pwr_routing_authority.get("status", "MISSING")),
         "PCB-PWR routing constraint authority is incomplete or its bounded-routing interlock drifted",
+    )
+    pwr_hot_loop = run_json_audit(
+        "audit_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py"
+    )
+    check(
+        "pcb_pwr_hot_loop_006_application",
+        pwr_hot_loop.get("status") ==
+        "PASS_EXACT_ACCEPTED_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_APPLICATION"
+        and pwr_hot_loop.get("active_board_sha256") ==
+        "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
+        and pwr_hot_loop.get("routing_complete") is False
+        and pwr_hot_loop.get("manufacturing_release") is False,
+        str(pwr_hot_loop.get("status", "MISSING")),
+        "PCB-PWR hot-loop 006 application differs from the exact accepted board",
     )
 
     pwr_evt_routing_basis = run_json_audit(

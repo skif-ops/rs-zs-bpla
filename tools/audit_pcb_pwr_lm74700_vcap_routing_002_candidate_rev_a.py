@@ -15,10 +15,12 @@ from kiutils.board import Board
 from audit_pcb_pwr_routing_authority_rev_a import semantic_board_sha256
 
 
+from pcb_pwr_hot_loop_006_board import historical_basis_board
+
 ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / "hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb"
 CANDIDATE = ROOT / "hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb"
-ACTIVE = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
+ACTIVE = historical_basis_board(ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb")
 REVIEW = ROOT / "hardware/reviews/PCB_PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.json"
 GENERATOR = ROOT / "tools/generate_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py"
 ROUTING_RULES = ROOT / "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv"

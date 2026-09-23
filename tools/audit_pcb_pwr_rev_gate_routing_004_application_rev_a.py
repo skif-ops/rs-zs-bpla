@@ -14,8 +14,10 @@ import audit_pcb_pwr_rev_gate_routing_004_candidate_rev_a as candidate_audit
 from audit_pcb_pwr_routing_authority_rev_a import semantic_board_sha256
 
 
+from pcb_pwr_hot_loop_006_board import historical_basis_board
+
 ROOT = Path(__file__).resolve().parents[1]
-BOARD = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
+BOARD = historical_basis_board(ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb")
 APPROVAL = ROOT / "hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_APPROVAL_REV_A.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_APPLICATION_REV_A.json"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"

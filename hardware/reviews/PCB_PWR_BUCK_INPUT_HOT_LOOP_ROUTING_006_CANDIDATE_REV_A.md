@@ -46,10 +46,10 @@ introduce no DRC fingerprint delta and reduce unconnected items exactly
 The owner may now accept the exact candidate
 with `ACCEPT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE`.
 
-Reviewer Скиф supplied that exact token on 2026-09-23. Application of the
-hash-bound candidate is authorized, subject to a fresh commit-bound
-application gate; this acceptance does not itself modify the authoritative
-board or release manufacture.
+Reviewer Скиф supplied that exact token on 2026-09-23. The hash-bound candidate
+has now been applied byte-for-byte to the authoritative board. The separate
+application record and commit-bound KiCad gate control the credit for this
+application. Acceptance alone does not release manufacture.
 
 `C13`, the upstream `RSH1 -> VBAT_SYS` trunk, the global GND plane, output
 rails, Kelvin/feedback routes and all other copper remain outside this

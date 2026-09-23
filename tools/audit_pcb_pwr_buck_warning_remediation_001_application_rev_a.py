@@ -16,8 +16,10 @@ import audit_pcb_pwr_placement_clearance_rev_a as clearance_audit
 from audit_pcb_pwr_routing_authority_rev_a import semantic_board_sha256
 
 
+from pcb_pwr_hot_loop_006_board import historical_basis_board
+
 ROOT = Path(__file__).resolve().parents[1]
-BOARD = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
+BOARD = historical_basis_board(ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb")
 BASE = candidate_audit.BASE
 CANDIDATE = candidate_audit.CANDIDATE
 APPROVAL = (
@@ -329,7 +331,7 @@ def audit(
         and placement_eco.get("warning_only_items_closed") is True
         and remediation.get("routing_added") is True
         and layout.get("routing_present") is True
-        and layout.get("copper_zones_present") is False
+        and layout.get("copper_zones_present") is True
         and layout.get("cam_export_authorized") is False
         and status.get("review_b", {}).get("complete") is False
         and status.get("manufacturing_release") is False,

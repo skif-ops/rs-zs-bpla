@@ -31,6 +31,7 @@ EXPECTED_MOUNTS = {
     "H4": (5.0, 55.0),
 }
 ECO_002_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
+HOT_LOOP_006_SHA256 = "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
 ECO_002_POSES = {
     "U3": (55.0, 14.0, 90.0),
     "U4": (55.0, 42.0, 90.0),
@@ -143,7 +144,7 @@ def main() -> int:
         row = by_ref[ref]
         wanted_pose = (
             ECO_002_POSES[ref]
-            if board_sha256 == ECO_002_SHA256 and ref in ECO_002_POSES
+            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256} and ref in ECO_002_POSES
             else (float(row["X_mm"]), float(row["Y_mm"]),
                   float(row["Rotation_deg"]) % 360.0)
         )
@@ -204,8 +205,9 @@ def main() -> int:
     expected_nets = {net for item in expected.values() for net in item["pins"].values() if net != "NC"}
     board_nets = {net.name for net in board.nets if net.number != 0}
     require(board_nets == expected_nets, "board net set differs from native schematic")
-    require(len(board.traceItems) in {0, 2, 3, 4, 8, 14} and len(board.zones) == 0,
-            "PCB-PWR contains copper beyond the accepted ECO-002 successor")
+    require((len(board.traceItems), len(board.zones)) in
+            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2)},
+            "PCB-PWR contains copper beyond the accepted hot-loop 006 successor")
 
     edges = [item for item in board.graphicItems if getattr(item, "layer", None) == "Edge.Cuts"]
     require(len(edges) == 4, "provisional outline must contain four line segments")
@@ -239,13 +241,13 @@ def main() -> int:
             layout["status"] == "EVT_FITTED_2D_AND_MOUNTING_CLEARANCE_PASS_DIM_003_ACCEPTED" and
             layout["layer_count_authority"] == "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv" and
             layout["layer_count_status"] == "FROZEN_REV_A_EVT_STACKUP_ACCEPTED" and
-            layout["routing_present"] is True and layout["copper_zones_present"] is False and
+            layout["routing_present"] is True and layout["copper_zones_present"] is True and
             layout["cam_export_authorized"] is False and layout["mounting_holes"] == 4 and
             layout["mounting_status"] == "EVT_DIM_003_ACCEPTED_H1_H4_NPTH_3P4",
             "PCB-PWR capture-status interlock drift")
 
     print("PCB-PWR EVT placement-candidate independent audit PASS")
-    print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; exact ECO-002 successor")
+    print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; accepted hot-loop 006 successor")
     print("DIM-003 18/18 EVT accepted; DRC/CAM/Review B/manufacturing remain prohibited")
     return 0
 
