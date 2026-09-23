@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
 import hashlib
 import json
@@ -34,10 +35,10 @@ STACKUP_BASIS = ROOT / "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASI
 CURRENT_BASIS = ROOT / "hardware/PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv"
 
 BASE_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
-CANDIDATE_SHA256 = "dd4c38c191b3087be8a58e9a4b7de4f7974de89797fba4583edbe674340ebda8"
+CANDIDATE_SHA256 = "516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d"
 BASE_SEMANTIC_SHA256 = "f7a659d0740e78d40eddae7016724bd8e616baf9fb425f06ace70ec9acca4d3d"
-CANDIDATE_SEMANTIC_SHA256 = "78d8ac5b4ccf731f9d5de31a5e379a97e695d19fbed08fe6142f9a2a0e57fe40"
-GENERATOR_SHA256 = "ef9de2a8bf576e2625b8ee0f680237ea2f3dd177fd82fcfa14c3c44e9be5dbfd"
+CANDIDATE_SEMANTIC_SHA256 = "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555"
+GENERATOR_SHA256 = "005b79adcefe43d1b6d4e30d53e27989aceed5d09a9915cce807af2b7bef31cf"
 ROUTING_RULES_SHA256 = "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988"
 STACKUP_BASIS_SHA256 = "41733d7d27e2c3ab831e602ee81b072146944da0a5efe8a2c805eeed46ecd1ca"
 CURRENT_BASIS_SHA256 = "4cecbe529987146078ce233d600ed047495a50d1228407e94b0380f88ca56cb2"
@@ -83,7 +84,15 @@ def pose_of(footprint: Any) -> tuple[float, float, float]:
 
 
 def without_pose(footprint: Any) -> dict[str, Any]:
-    return {key: value for key, value in footprint.__dict__.items() if key != "position"}
+    normalized = copy.deepcopy(footprint)
+    footprint_angle = float(normalized.position.angle or 0.0)
+    children = list(normalized.pads) + [
+        item for item in normalized.graphicItems if hasattr(item, "position")
+    ]
+    for item in children:
+        relative_angle = (float(item.position.angle or 0.0) - footprint_angle) % 360.0
+        item.position.angle = None if math.isclose(relative_angle, 0.0, abs_tol=1e-9) else relative_angle
+    return {key: value for key, value in normalized.__dict__.items() if key != "position"}
 
 
 def rotate_clockwise(value: tuple[float, float], angle_deg: float) -> tuple[float, float]:
@@ -194,7 +203,9 @@ def pad_rectangle(footprint: Any, pad: Any) -> tuple[float, float, float, float]
     footprint_angle = float(footprint.position.angle or 0.0)
     local_center = rotate_clockwise(point(pad.position), footprint_angle)
     center = (float(footprint.position.X) + local_center[0], float(footprint.position.Y) + local_center[1])
-    pad_angle = footprint_angle + float(pad.position.angle or 0.0)
+    # KiCad serializes pad orientation in board coordinates, while pad position
+    # remains local to the footprint origin.
+    pad_angle = float(pad.position.angle or 0.0)
     half_x, half_y = float(pad.size.X) / 2.0, float(pad.size.Y) / 2.0
     corners = [rotate_clockwise((x, y), pad_angle) for x in (-half_x, half_x) for y in (-half_y, half_y)]
     xs = [center[0] + value[0] for value in corners]
@@ -520,7 +531,8 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
     require(
         review["proposal_id"] == "PCB-PWR-BUCK-POWER-STAGE-ECO-002"
-        and review["status"] == "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"
+        and review["status"] ==
+        "PENDING_ROTATION_SERIALIZATION_REMEDIATION_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"
         and review["base"]["sha256"] == BASE_SHA256
         and review["candidate"]["sha256"] == CANDIDATE_SHA256
         and review["candidate"]["trace_items"] == 14
@@ -531,6 +543,20 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
             abs_tol=1e-9,
         )
         and review["source_binding"]["generator_sha256"] == GENERATOR_SHA256
+        and review["rotation_serialization_remediation"] == {
+            "rejected_candidate_sha256":
+                "dd4c38c191b3087be8a58e9a4b7de4f7974de89797fba4583edbe674340ebda8",
+            "rejected_commit": "85f50d0374298f32177ecf10e935a6f541aadb88",
+            "rejected_pcb_native_run": 353,
+            "rejected_pcb_native_run_id": 35773072678,
+            "rejected_drc_violations": [86, 124],
+            "rejected_unconnected_items": [121, 116],
+            "failure": "PARENT_ONLY_FOOTPRINT_ROTATION_LEFT_CHILD_ORIENTATIONS_UNCHANGED",
+            "correction":
+                "ROTATE_SERIALIZED_PAD_PROPERTY_AND_FOOTPRINT_TEXT_ORIENTATIONS_WITH_PARENT",
+            "drc_rules_relaxed": False,
+            "authoritative_board_modified": False,
+        }
         and review["pad_entry_disposition"]["calculated_evt_screen_pass"] is True
         and review["pad_entry_disposition"]["external_neck_eliminated"] is True
         and math.isclose(
@@ -542,6 +568,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         and review["pad_entry_disposition"]["physical_plus70c_validation_required"] is True
         and review["invariants"]["authoritative_board_modified"] is False
         and review["machine_gate"]["complete"] is False
+        and review["machine_gate"]["status"] == review["status"]
         and review["human_gate"]["accepted"] is False
         and review["application_authorized"] is False
         and review["manufacturing_release"] is False,
@@ -549,7 +576,8 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     )
 
     report: dict[str, object] = {
-        "status": "PASS_STATIC_ECO_002_COMMIT_BOUND_KICAD9_GATE_PENDING",
+        "status":
+            "PASS_STATIC_ECO_002_ROTATION_SERIALIZATION_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PENDING",
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "candidate_semantic_sha256": CANDIDATE_SEMANTIC_SHA256,

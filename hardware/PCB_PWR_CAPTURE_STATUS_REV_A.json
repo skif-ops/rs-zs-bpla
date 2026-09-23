@@ -650,16 +650,25 @@
       "record": "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.md",
       "generator": "tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py",
       "audit": "tools/audit_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py",
-      "status": "PASS_STATIC_ECO_002_COMMIT_BOUND_KICAD9_GATE_PENDING",
-      "creation_direction": "PROJECT_OWNER_CONTINUE_AFTER_CANDIDATE_005_PAD_ENTRY_REVIEW",
+      "status": "PASS_STATIC_ECO_002_ROTATION_SERIALIZATION_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PENDING",
+      "creation_direction": "PROJECT_OWNER_CONTINUE_AFTER_COMMIT_BOUND_DRC_REJECTION",
       "supersedes_if_accepted": [
         "PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005",
         "PCB-PWR-BUCK-PLACEMENT-ECO-001_APPLIED_C4_C6_L1_L2_POSES",
         "THE_TWO_ACCEPTED_BOOTSTRAP_SEGMENTS_REPLACED_BY_EQUIVALENT_SHORT_ROUTES"
       ],
       "base_board_sha256": "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c",
-      "candidate_board_sha256": "dd4c38c191b3087be8a58e9a4b7de4f7974de89797fba4583edbe674340ebda8",
-      "candidate_board_semantic_sha256": "78d8ac5b4ccf731f9d5de31a5e379a97e695d19fbed08fe6142f9a2a0e57fe40",
+      "candidate_board_sha256": "516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d",
+      "candidate_board_semantic_sha256": "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555",
+      "rejected_serialization_candidate": {
+        "sha256": "dd4c38c191b3087be8a58e9a4b7de4f7974de89797fba4583edbe674340ebda8",
+        "commit": "85f50d0374298f32177ecf10e935a6f541aadb88",
+        "pcb_native_run_number": 353,
+        "pcb_native_run_id": 35773072678,
+        "comparative_drc": "FAIL_86_TO_124_VIOLATIONS_121_TO_116_UNCONNECTED_NEW_U3_U4_DRC_FINGERPRINTS",
+        "application_authorized": false,
+        "manufacturing_release": false
+      },
       "moved_footprints": [
         "C20",
         "C21",

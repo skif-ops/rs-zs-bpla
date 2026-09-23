@@ -18,7 +18,7 @@ DEFAULT_BASE_OUTPUT = CANDIDATE_DIR / "PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV
 DEFAULT_OUTPUT = CANDIDATE_DIR / "PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb"
 
 BASE_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
-CANDIDATE_SHA256 = "dd4c38c191b3087be8a58e9a4b7de4f7974de89797fba4583edbe674340ebda8"
+CANDIDATE_SHA256 = "516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d"
 
 # Rotate both regulators so SW faces the inductors and VIN faces the local input
 # capacitors.  The remaining moves keep the two channels symmetric and preserve
@@ -123,11 +123,49 @@ def footprint_block(source: str, reference: str) -> tuple[int, int, str]:
     return start, end, source[start:end]
 
 
+def placement_angle(placement: str) -> float:
+    found = re.fullmatch(
+        r"\t\t\(at\s+[-+]?\d+(?:\.\d+)?\s+[-+]?\d+(?:\.\d+)?"
+        r"(?:\s+([-+]?\d+(?:\.\d+)?))?\)",
+        placement,
+    )
+    require(found is not None, f"invalid placement expression: {placement!r}")
+    return float(found.group(1) or 0.0)
+
+
+def rotate_child_orientations(block: str, delta_deg: float) -> str:
+    """Apply a KiCad footprint rotation to serialized child orientations.
+
+    KiCad board files store pad, property, and footprint-text orientations in
+    board coordinates.  Changing only the parent footprint ``(at ...)`` angle
+    rotates child positions but leaves their shapes at the old board angle.
+    That malformed serialization was rejected by the commit-bound KiCad 9 DRC.
+    """
+    if math.isclose(delta_deg % 360.0, 0.0, abs_tol=1e-9):
+        return block
+
+    child_at = re.compile(
+        r"(?m)^(\t{3,}\(at\s+[-+]?\d+(?:\.\d+)?\s+[-+]?\d+(?:\.\d+)?)"
+        r"(?:\s+([-+]?\d+(?:\.\d+)?))?(\))$"
+    )
+
+    def replace(match: re.Match[str]) -> str:
+        angle = (float(match.group(2) or 0.0) + delta_deg) % 360.0
+        return f"{match.group(1)} {number(angle)}{match.group(3)}"
+
+    rotated, count = child_at.subn(replace, block)
+    require(count > 0, "rotated footprint has no serialized child orientations")
+    return rotated
+
+
 def move_footprint(source: str, reference: str, old: str, new: str) -> str:
     start, end, block = footprint_block(source, reference)
     require(block.count(old) == 1, f"{reference}: source placement drift")
     require(new not in block, f"{reference}: target placement already present")
-    return source[:start] + block.replace(old, new, 1) + source[end:]
+    moved = block.replace(old, new, 1)
+    delta = placement_angle(new) - placement_angle(old)
+    moved = rotate_child_orientations(moved, delta)
+    return source[:start] + moved + source[end:]
 
 
 def segment_text(net: int, net_name: str, connection: str, index: int,

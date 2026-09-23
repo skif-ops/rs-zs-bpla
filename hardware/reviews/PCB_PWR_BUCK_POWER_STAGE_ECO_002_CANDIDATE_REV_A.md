@@ -24,7 +24,24 @@ the following symmetric changes:
   the controller and bootstrap-capacitor SW pads as a compact pad-entry flare.
 
 Candidate SHA-256:
-`dd4c38c191b3087be8a58e9a4b7de4f7974de89797fba4583edbe674340ebda8`.
+`516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d`.
+
+## Commit-bound rejection and serialization remediation
+
+The first serialized candidate
+`dd4c38c191b3087be8a58e9a4b7de4f7974de89797fba4583edbe674340ebda8`
+was rejected by PCB Native run 353 at commit `85f50d0`. KiCad 9 reported
+`86 -> 124` violations and `121 -> 116` unconnected items. All new electrical
+errors were localized to the rotated `U3/U4` footprints.
+
+The cause was a parent-only text replacement: the footprint `(at ... 90)`
+angle changed while the serialized pad, property, and footprint-text board
+orientations retained their previous angles. The remediated generator rotates
+those child orientations together with the parent, matching KiCad's native
+board serialization. It does not suppress or relax any DRC rule, change pad
+geometry or nets, or modify the authoritative PCB-PWR board. The corrected
+candidate therefore requires a fresh commit-bound KiCad 9 comparative DRC and
+new exact human acceptance.
 
 ## Pad-entry and EVT calculation
 

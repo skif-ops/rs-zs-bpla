@@ -1,9 +1,9 @@
 {
-  "schema": "dioneya-pcb-pwr-buck-power-stage-eco-002-candidate-v1",
+  "schema": "dioneya-pcb-pwr-buck-power-stage-eco-002-candidate-v2",
   "configuration": "EVT-PRE-20 Rev.A",
   "proposal_id": "PCB-PWR-BUCK-POWER-STAGE-ECO-002",
-  "creation_direction": "PROJECT_OWNER_CONTINUE_AFTER_CANDIDATE_005_PAD_ENTRY_REVIEW",
-  "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+  "creation_direction": "PROJECT_OWNER_CONTINUE_AFTER_COMMIT_BOUND_DRC_REJECTION",
+  "status": "PENDING_ROTATION_SERIALIZATION_REMEDIATION_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
   "scope": "SYMMETRIC_DUAL_BUCK_PLACEMENT_BOOTSTRAP_AND_SWITCH_NODE_REMEDIATION",
   "supersedes_if_accepted": [
     "PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005",
@@ -28,8 +28,8 @@
   },
   "candidate": {
     "board": "hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb",
-    "sha256": "dd4c38c191b3087be8a58e9a4b7de4f7974de89797fba4583edbe674340ebda8",
-    "semantic_sha256": "78d8ac5b4ccf731f9d5de31a5e379a97e695d19fbed08fe6142f9a2a0e57fe40",
+    "sha256": "516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d",
+    "semantic_sha256": "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555",
     "trace_items": 14,
     "copper_zones": 0,
     "moved_footprints": [
@@ -57,6 +57,24 @@
     "required_switch_node_clearance_mm": 0.4,
     "minimum_bootstrap_foreign_copper_edge_clearance_mm": 0.25,
     "required_bootstrap_clearance_mm": 0.25
+  },
+  "rotation_serialization_remediation": {
+    "rejected_candidate_sha256": "dd4c38c191b3087be8a58e9a4b7de4f7974de89797fba4583edbe674340ebda8",
+    "rejected_commit": "85f50d0374298f32177ecf10e935a6f541aadb88",
+    "rejected_pcb_native_run": 353,
+    "rejected_pcb_native_run_id": 35773072678,
+    "rejected_drc_violations": [
+      86,
+      124
+    ],
+    "rejected_unconnected_items": [
+      121,
+      116
+    ],
+    "failure": "PARENT_ONLY_FOOTPRINT_ROTATION_LEFT_CHILD_ORIENTATIONS_UNCHANGED",
+    "correction": "ROTATE_SERIALIZED_PAD_PROPERTY_AND_FOOTPRINT_TEXT_ORIENTATIONS_WITH_PARENT",
+    "drc_rules_relaxed": false,
+    "authoritative_board_modified": false
   },
   "pad_entry_disposition": {
     "candidate_005_narrow_width_mm": 0.5,
@@ -100,7 +118,7 @@
   },
   "source_binding": {
     "generator": "tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py",
-    "generator_sha256": "ef9de2a8bf576e2625b8ee0f680237ea2f3dd177fd82fcfa14c3c44e9be5dbfd",
+    "generator_sha256": "005b79adcefe43d1b6d4e30d53e27989aceed5d09a9915cce807af2b7bef31cf",
     "routing_rules": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
     "routing_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
     "evt_stackup_basis": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
@@ -117,7 +135,7 @@
   },
   "machine_gate": {
     "complete": false,
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "status": "PENDING_ROTATION_SERIALIZATION_REMEDIATION_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
     "required_unconnected": [
       121,
       117

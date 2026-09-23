@@ -630,6 +630,32 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR buck power-stage ECO-002 creation boundary is missing",
     )
     require(
+        decisions["DEC-136"]["Status"] ==
+        "REJECTED_COMMIT_BOUND_KICAD9_DRC_NOT_FOR_APPLICATION"
+        and "85f50d0" in decisions["DEC-136"]["Reason"]
+        and "PCB Native run 353" in decisions["DEC-136"]["Reason"]
+        and "violations 86 to 124" in decisions["DEC-136"]["Reason"]
+        and "unconnected items 121 to 116" in decisions["DEC-136"]["Reason"]
+        and "Do not accept or apply" in decisions["DEC-136"]["Impact"]
+        and "do not authorize production EVT" in decisions["DEC-136"]["Impact"]
+        and "without relaxing DRC" in decisions["DEC-136"]["Impact"],
+        "PCB-PWR ECO-002 rejected serialization evidence is missing",
+    )
+    require(
+        decisions["DEC-137"]["Status"] ==
+        "PASS_STATIC_ECO_002_ROTATION_SERIALIZATION_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "project owner directed continue" in decisions["DEC-137"]["Reason"]
+        and "pad property and footprint-text" in decisions["DEC-137"]["Reason"]
+        and "516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d"
+        in decisions["DEC-137"]["Impact"]
+        and "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555"
+        in decisions["DEC-137"]["Impact"]
+        and "relax no DRC rule" in decisions["DEC-137"]["Impact"]
+        and "121 to 117" in decisions["DEC-137"]["Impact"]
+        and "new exact human acceptance" in decisions["DEC-137"]["Impact"],
+        "PCB-PWR ECO-002 rotation-serialization remediation boundary is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]
