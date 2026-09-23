@@ -1803,6 +1803,8 @@ jobs:
           assert len(list(candidate.GetTracks())) == 35
           assert len(list(base.Zones())) == 0
           assert len(list(candidate.Zones())) == 2
+          pcbnew.ZONE_FILLER(candidate).Fill(candidate.Zones())
+          candidate.Save(sys.argv[2])
           print("PCB-PWR buck input hot-loop routing 006 KiCad 9 parse: PASS")
           PY
           kicad-cli pcb drc --format json --severity-all \
