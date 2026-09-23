@@ -17,6 +17,7 @@
 #define STEADINESS_CV_MAX 0.12f
 #define MAINS_NOTCH_HZ 1.2f
 #define MAINS_NOTCH_MAX_HZ 200.0f
+#define ZS_AIR_TWO_PI 6.28318530717958647692f /* strict C11 on the target has no M_PI */
 
 #define DEC_SAMPLES (ZS_AIR_WINDOW_SAMPLES / ZS_AIR_DECIMATION) /* 6400 */
 #define BIN_HZ ((float)ZS_AIR_SAMPLE_RATE / (float)ZS_AIR_DECIMATION / (float)ZS_AIR_FFT) /* 0.78125 */
@@ -67,7 +68,7 @@ static bool window_spectrum(const int16_t *pcm, zs_complex_t *x, float *p) {
     int c = (int)(m * ZS_AIR_DECIMATION);
     float acc = 0.0f;
     for (int t = -4; t <= 4; t++) { int i = c + t; if (i >= 0 && i < (int)ZS_AIR_WINDOW_SAMPLES) acc += tri[t + 4] * ((float)pcm[i] - dc); }
-    float w = 0.5f - 0.5f * cosf(2.0f * (float)M_PI * (float)m / (float)DEC_SAMPLES);
+    float w = 0.5f - 0.5f * cosf(ZS_AIR_TWO_PI * (float)m / (float)DEC_SAMPLES);
     x[m].re = acc * (1.0f / 25.0f) * (1.0f / 32768.0f) * w;
     x[m].im = 0.0f;
   }
