@@ -175,7 +175,7 @@ jobs:
           python tools/audit_pcb_pwr_placement_clearance_rev_a.py \
             --output artifacts/pcb_pwr_placement_clearance_rev_a.json \
             --strict
-          python tools/generate_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py \
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py \
             --check
           python tools/audit_pcb_pwr_buck_placement_eco_001_candidate_rev_a.py \
             --output artifacts/pcb_pwr_buck_placement_eco_001_candidate_rev_a.json
@@ -187,44 +187,44 @@ jobs:
             --output hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb --check
           python tools/audit_pcb_pwr_buck_warning_remediation_001_application_rev_a.py \
             --output artifacts/pcb_pwr_buck_warning_remediation_001_application_rev_a.json
-          python tools/generate_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py \
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py \
             --check
           python tools/audit_pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.py \
             --output artifacts/pcb_pwr_buck_bootstrap_routing_001_candidate_rev_a.json
-          python tools/generate_pcb_pwr_buck_bootstrap_routing_001_application_rev_a.py --check
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_bootstrap_routing_001_application_rev_a.py --check
           python tools/audit_pcb_pwr_buck_bootstrap_routing_001_application_rev_a.py \
             --output artifacts/pcb_pwr_buck_bootstrap_routing_001_application_rev_a.json
-          python tools/generate_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py --check
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py --check
           python tools/audit_pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.py \
             --output artifacts/pcb_pwr_lm74700_vcap_routing_002_candidate_rev_a.json
-          python tools/generate_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py --check
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py --check
           python tools/audit_pcb_pwr_lm74700_vcap_routing_002_application_rev_a.py \
             --output artifacts/pcb_pwr_lm74700_vcap_routing_002_application_rev_a.json
-          python tools/generate_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py --check
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py --check
           python tools/audit_pcb_pwr_vbat_raw_routing_003_candidate_rev_a.py \
             --output artifacts/pcb_pwr_vbat_raw_routing_003_candidate_rev_a.json
-          python tools/generate_pcb_pwr_vbat_raw_routing_003_application_rev_a.py --check
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_vbat_raw_routing_003_application_rev_a.py --check
           python tools/audit_pcb_pwr_vbat_raw_routing_003_application_rev_a.py \
             --output artifacts/pcb_pwr_vbat_raw_routing_003_application_rev_a.json
-          python tools/generate_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py --check
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py --check
           python tools/audit_pcb_pwr_rev_gate_routing_004_candidate_rev_a.py \
             --output artifacts/pcb_pwr_rev_gate_routing_004_candidate_rev_a.json
-          python tools/generate_pcb_pwr_rev_gate_routing_004_application_rev_a.py --check
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_rev_gate_routing_004_application_rev_a.py --check
           python tools/audit_pcb_pwr_rev_gate_routing_004_application_rev_a.py \
             --output artifacts/pcb_pwr_rev_gate_routing_004_application_rev_a.json
-          python tools/generate_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py --check
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py --check
           python tools/audit_pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.py \
             --output artifacts/pcb_pwr_buck_switch_node_routing_005_candidate_rev_a.json
-          python tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.py --check
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.py --check
           python tools/audit_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.py \
             --output artifacts/pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.json
           python tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py --check
           python tools/audit_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py \
             --output artifacts/pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.json
-          python tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py --check
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py --check
           python tools/audit_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py \
             --output artifacts/pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.json
-          python tools/generate_pcb_pwr_buck_power_stage_eco_002_application_rev_a.py --check
+          python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_power_stage_eco_002_application_rev_a.py --check
           python tools/audit_pcb_pwr_buck_power_stage_eco_002_application_rev_a.py \
             --output artifacts/pcb_pwr_buck_power_stage_eco_002_application_rev_a.json
           python tools/audit_pcb_pwr_routing_authority_rev_a.py \
