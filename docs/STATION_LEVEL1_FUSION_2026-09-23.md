@@ -9,6 +9,7 @@ the last 4 s). `zs_presence_evaluate` turns them into one level-1 verdict:
 |---|---|
 | UAV majority (5/8 votes at conf >= 128) | CONFIRMED — with or without the comb (distant target: Lyuty file 3, Mavic far away) |
 | comb + >= 2 UAV votes | CONFIRMED |
+| comb + weak UAV majority (right class, confidence >= 48/255 = distance <= 1.2 radius) | CONFIRMED — a maneuvering or distant target sits outside its centroid's core; the comb supplies the missing confidence (Lyuty file 2: 0 -> 79 % confirmed) |
 | comb + ground-engine majority (road traffic, agricultural, generator) | ENGINE_UNCONFIRMED — the one false-positive shape the gate cannot resolve alone |
 | comb, no classifier support | SUSPECT |
 | >= 2 UAV votes, no comb | SUSPECT |
@@ -49,3 +50,41 @@ Preview with only the DJI recording rebuilt (in-sample for DJI, out-of-sample fo
 
 `tests/test_station_presence_model.py::test_dataset_rows_are_at_the_station_rate` prints how much of the dataset
 still predates the rebuild.
+
+## Rebuild done (2026-09-23, from the owner's June archive + separate uploads)
+Raw audio found for 13 of the 27 recordings referenced by the CSV: DJI Mini 3 Pro, the September Lyuty files (3),
+cicadas (2), natural background, gunfire, the short APC recording, birds (3 of 5), tractor (1 of 2). Rebuilt at 32 kHz
+with per-window normalization (689 windows); rows of the 14 recordings without raw audio kept as they were
+(`--keep-missing`): FP-1 (172 rows, 48 kHz / blank rate), the six June Lyuty files (already 32 kHz), two bird files,
+one tractor and the road-traffic recording (44.1 kHz). Added: five bird MP3s of 2026-09-23 (347 windows; three carry
+a distant engine on some seconds, noted in the metadata), the long APC recording (79 windows), and the four field
+recordings of the **DJI Mavic 3 Pro** as a new label (248 windows). The short APC recording moved from «стрельба» to
+«стрельба из бронетранспортера» (its own raw folder); both APC recordings map to the ground-engine class.
+Dataset: 1998 rows, 1233 of them at 32 kHz.
+
+Station table regenerated with up to **5 centroids per label** (43 centroids, 28 KB; k=5 beat 3 and 4 on the holdout):
+
+| | in-sample | temporal holdout (last 30 % of every file) |
+|---|---|---|
+| UAV recall | 0.980 | **0.977** |
+| background FPR | 0.047 | **0.037** |
+| per label (in-sample) | Mavic 0.96, Mini 0.99, FP-1 0.98, Лютый 0.95; traffic 0.05, birds 0.05, tractor 0.06, nature 0.03, cicadas 0.00, APC 0.02, gunfire 0.46 | |
+
+The remaining in-sample false positives: 31 bird windows (the engine passages of the MP3s) and 12 of the 26 gunfire
+windows (the library sample is mostly the APC engine, per the owner) — both are ground engines, the shape the family
+classifier and the gate leave to the consensus.
+
+End-to-end level 1 on the recordings with the new table (in-sample for the dataset files; `eval_presence_wavs.py`):
+
+| label | confirmed / engine / suspect |
+|---|---|
+| DJI Mini 3 Pro | 94 % / 0 / 6 % |
+| DJI Mavic 3 Pro | 91 % / 0 / 8 % |
+| Лютый (3 files) | 87 % / 0 / 13 % (93 % / 79 % / 89 % per file) |
+| природный фон, цикады | 0 % / 0 / 0 % |
+| птицы (MP3s) | 0 % / 0 / 10 % (the engine passages) |
+| стрельба из бронетранспортера | 0 % / 0 / 14 % |
+| стрельба (14 s sample with the APC) | 17 % / 0 / 33 % |
+
+Still needed from the field: FP-1 raw audio (the 172 rows are the last ones not at the station rate), road traffic and
+a second tractor recording (their raw files are lost), and the six June Lyuty recordings if they still exist.
