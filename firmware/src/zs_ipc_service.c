@@ -1,4 +1,5 @@
 #include "zs_ipc_service.h"
+#include "zs_sha256.h"
 #include "zs_cbor.h"
 #include "zs_cbor_read.h"
 #include <string.h>
@@ -115,12 +116,80 @@ static bool push_config(zs_ipc_service_t *s) {
   return n != 0u && push_value(s, ZS_IPC_READ_VALUE, ZS_CHAR_CONFIG_READ, buf, n);
 }
 
+zs_commissioning_role_t zs_ipc_service_role(const zs_ipc_service_t *s) {
+  if (!s || !s->port->peer_secure(s->port->ctx)) return ZS_COMMISSIONING_ROLE_NONE;
+  if (s->session_role == ZS_COMMISSIONING_ROLE_ENGINEER) return ZS_COMMISSIONING_ROLE_ENGINEER;
+  return s->port->peer_role ? s->port->peer_role(s->port->ctx) : ZS_COMMISSIONING_ROLE_INSTALLER;
+}
+
+void zs_ipc_role_tag(const uint8_t key[32], const char *serial, const uint8_t nonce[ZS_ROLE_NONCE_BYTES], uint8_t tag[ZS_ROLE_TAG_BYTES]) {
+  uint8_t msg[sizeof(ZS_ROLE_CONTEXT) - 1u + 16u + ZS_ROLE_NONCE_BYTES], mac[32];
+  size_t n = 0u;
+  const size_t sl = strlen(serial) < 16u ? strlen(serial) : 16u;
+  memcpy(msg, ZS_ROLE_CONTEXT, sizeof(ZS_ROLE_CONTEXT) - 1u); n += sizeof(ZS_ROLE_CONTEXT) - 1u;
+  memcpy(msg + n, serial, sl); n += sl;
+  memcpy(msg + n, nonce, ZS_ROLE_NONCE_BYTES); n += ZS_ROLE_NONCE_BYTES;
+  zs_hmac_sha256(key, 32u, msg, n, mac);
+  memcpy(tag, mac, ZS_ROLE_TAG_BYTES);
+}
+
+static bool push_role(zs_ipc_service_t *s) {
+  const uint8_t role = (uint8_t)zs_ipc_service_role(s);
+  return push_value(s, ZS_IPC_READ_VALUE, ZS_CHAR_SESSION_ROLE, &role, 1u);
+}
+
+static void role_reset(zs_ipc_service_t *s) {
+  s->session_role = ZS_COMMISSIONING_ROLE_NONE;
+  s->role_nonce_valid = false;
+  s->role_failures = 0u;
+  memset(s->role_nonce, 0, sizeof(s->role_nonce));
+}
+
+static void handle_role_write(zs_ipc_service_t *s, const uint8_t *p, size_t len) {
+  uint32_t started = 0u;
+  if (len == 0u) { (void)send_status(s, ZS_CHAR_SESSION_ROLE, ZS_BLE_STATUS_REJECTED_VALIDATION); return; }
+  if (!s->port->service_mode(s->port->ctx, &started)) { (void)send_status(s, ZS_CHAR_SESSION_ROLE, ZS_BLE_STATUS_NOT_IN_SERVICE_MODE); return; }
+  if (!s->port->peer_secure(s->port->ctx) || !s->port->engineer_key || !s->port->random || s->role_failures >= ZS_ROLE_MAX_FAILURES) {
+    s->role_rejections++;
+    (void)send_status(s, ZS_CHAR_SESSION_ROLE, ZS_BLE_STATUS_NOT_AUTHORIZED);
+    return;
+  }
+  if (p[0] == ZS_ROLE_OP_CHALLENGE && len == 1u) {
+    uint8_t out[1u + ZS_ROLE_NONCE_BYTES];
+    if (!s->port->random(s->port->ctx, s->role_nonce, ZS_ROLE_NONCE_BYTES)) { (void)send_status(s, ZS_CHAR_SESSION_ROLE, ZS_BLE_STATUS_STORAGE_ERROR); return; }
+    s->role_nonce_valid = true;
+    out[0] = ZS_ROLE_OP_CHALLENGE; memcpy(out + 1, s->role_nonce, ZS_ROLE_NONCE_BYTES);
+    (void)push_value(s, ZS_IPC_NOTIFY, ZS_CHAR_SESSION_ROLE, out, sizeof(out));
+    (void)send_status(s, ZS_CHAR_SESSION_ROLE, ZS_BLE_STATUS_OK);
+    return;
+  }
+  if (p[0] == ZS_ROLE_OP_RESPONSE && len == 1u + ZS_ROLE_TAG_BYTES) {
+    uint8_t tag[ZS_ROLE_TAG_BYTES], out[2];
+    if (!s->role_nonce_valid) { s->role_rejections++; (void)send_status(s, ZS_CHAR_SESSION_ROLE, ZS_BLE_STATUS_NOT_AUTHORIZED); return; }
+    s->role_nonce_valid = false;                                   /* one attempt per nonce */
+    zs_ipc_role_tag(s->port->engineer_key, s->port->identity->serial, s->role_nonce, tag);
+    if (!zs_sha256_equal(tag, p + 1, ZS_ROLE_TAG_BYTES)) {
+      s->role_failures++; s->role_rejections++;
+      (void)send_status(s, ZS_CHAR_SESSION_ROLE, ZS_BLE_STATUS_NOT_AUTHORIZED);
+      return;
+    }
+    s->session_role = ZS_COMMISSIONING_ROLE_ENGINEER;
+    s->role_elevations++;
+    out[0] = ZS_ROLE_OP_RESULT; out[1] = (uint8_t)ZS_COMMISSIONING_ROLE_ENGINEER;
+    (void)push_value(s, ZS_IPC_NOTIFY, ZS_CHAR_SESSION_ROLE, out, sizeof(out));
+    (void)push_role(s);
+    (void)send_status(s, ZS_CHAR_SESSION_ROLE, ZS_BLE_STATUS_OK);
+    return;
+  }
+  (void)send_status(s, ZS_CHAR_SESSION_ROLE, ZS_BLE_STATUS_REJECTED_VALIDATION);
+}
+
 static zs_commissioning_context_t context(zs_ipc_service_t *s) {
   zs_commissioning_context_t c;
   uint32_t started = 0u;
   memset(&c, 0, sizeof(c));
   c.origin = ZS_COMMISSIONING_ORIGIN_BLE_LOCAL;
-  c.role = s->port->peer_role(s->port->ctx);
+  c.role = zs_ipc_service_role(s);
   c.ble_secure_connections = s->port->peer_secure(s->port->ctx);
   c.peer_identity_verified = c.ble_secure_connections;
   c.physical_service_mode = s->port->service_mode(s->port->ctx, &started);
@@ -217,7 +286,8 @@ static void on_ipc(zs_ipc_service_t *s, uint8_t type, const uint8_t *p, size_t l
     case ZS_IPC_LINK_STATE:
       if (len >= 1u) {
         s->link_state = p[0];
-        if (p[0] != 0u) { (void)push_identity(s); (void)push_config(s); (void)push_installation(s, true); }
+        if (p[0] == 0u) role_reset(s);                              /* the role lives with the link (B.9) */
+        else { (void)push_identity(s); (void)push_config(s); (void)push_installation(s, true); (void)push_role(s); }
       }
       break;
     case ZS_IPC_READ_REQUEST: {
@@ -226,6 +296,7 @@ static void on_ipc(zs_ipc_service_t *s, uint8_t type, const uint8_t *p, size_t l
       if (id == ZS_CHAR_IDENTITY) (void)push_identity(s);
       else if (id == ZS_CHAR_CONFIG_READ) (void)push_config(s);
       else if (id == ZS_CHAR_INSTALLATION_POSITION) (void)push_installation(s, true);
+      else if (id == ZS_CHAR_SESSION_ROLE) (void)push_role(s);
       break;
     }
     case ZS_IPC_CHAR_WRITE: {
@@ -234,6 +305,7 @@ static void on_ipc(zs_ipc_service_t *s, uint8_t type, const uint8_t *p, size_t l
       if (id == ZS_CHAR_CONFIG_WRITE) handle_config_write(s, &p[2], len - 2u);
       else if (id == ZS_CHAR_INSTALLATION_POSITION) handle_installation_write(s, &p[2], len - 2u);
       else if (id == ZS_CHAR_SELF_TEST) handle_self_test(s, &p[2], len - 2u);
+      else if (id == ZS_CHAR_SESSION_ROLE) handle_role_write(s, &p[2], len - 2u);
       else (void)send_status(s, id, ZS_BLE_STATUS_REJECTED_VALIDATION);
       break;
     }

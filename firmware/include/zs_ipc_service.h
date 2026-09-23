@@ -44,7 +44,23 @@ typedef struct {
   const zs_commissioning_audit_io_t *audit_io;
   zs_selftest_registry_t *selftest;
   const zs_ipc_identity_t *identity;
+  /* B.9 session role. engineer_key: 32-byte per-station key from provisioning (station.json), NULL = engineer
+     elevation refused; random: nonce source (hardware RNG), NULL = elevation refused. Both optional for B1. */
+  const uint8_t *engineer_key;
+  bool (*random)(void *ctx, uint8_t *out, size_t len);
 } zs_ipc_service_port_t;
+
+/* B.9 session_role characteristic (0x0205): read = [role]; write [0x01] asks for a challenge, the station notifies
+   [0x01][nonce16]; write [0x02][tag16] with tag = HMAC-SHA256(engineer_key, "DIO-ROLE-V1" || serial || nonce)[0..15]
+   elevates the session to engineer (notify [0x03][role]); status byte as for the other writes. The role lives with
+   the link: LINK_STATE 0 drops it. Three failed tags lock elevation for the rest of the link. */
+#define ZS_ROLE_OP_CHALLENGE 0x01u
+#define ZS_ROLE_OP_RESPONSE 0x02u
+#define ZS_ROLE_OP_RESULT 0x03u
+#define ZS_ROLE_NONCE_BYTES 16u
+#define ZS_ROLE_TAG_BYTES 16u
+#define ZS_ROLE_MAX_FAILURES 3u
+#define ZS_ROLE_CONTEXT "DIO-ROLE-V1"
 
 typedef struct {
   const zs_ipc_service_port_t *port;
@@ -58,7 +74,18 @@ typedef struct {
   uint32_t writes_ok, writes_rejected;
   uint32_t pings_sent, pongs_seen;
   uint8_t peer_protocol_version; /* from the last PONG, 0 until the bridge answered */
+  /* B.9 session role */
+  uint8_t session_role;          /* zs_commissioning_role_t: NONE until secure, INSTALLER by pairing, ENGINEER by challenge */
+  uint8_t role_nonce[ZS_ROLE_NONCE_BYTES];
+  bool role_nonce_valid;
+  uint8_t role_failures;
+  uint32_t role_elevations, role_rejections;
 } zs_ipc_service_t;
+
+/* Effective role of the current BLE peer (used for commissioning; exposed for the console). */
+zs_commissioning_role_t zs_ipc_service_role(const zs_ipc_service_t *s);
+/* Computes the engineer response tag for a nonce (shared with tests and the Android/PKI side). */
+void zs_ipc_role_tag(const uint8_t key[32], const char *serial, const uint8_t nonce[ZS_ROLE_NONCE_BYTES], uint8_t tag[ZS_ROLE_TAG_BYTES]);
 
 bool zs_ipc_service_init(zs_ipc_service_t *s, const zs_ipc_service_port_t *port);
 /* Opens/closes the advertising window on the nRF and pushes identity + caches. */
