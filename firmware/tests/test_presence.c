@@ -35,8 +35,12 @@ int main(void) {
   assert(p.level == ZS_PRESENCE_NONE && p.uav_votes == 0u);
   v = votes_of(three, 3u, 220u); g = gate_of(false, 0u); p = zs_presence_evaluate(&v, &g);         /* fewer than 4 windows: no majority yet */
   assert(p.level == ZS_PRESENCE_SUSPECT && p.windows == 3u);
-  v = votes_of(uav8, 8u, 100u); g = gate_of(true, 240u); p = zs_presence_evaluate(&v, &g);          /* low-confidence votes do not count */
-  assert(p.level == ZS_PRESENCE_SUSPECT && p.uav_votes == 0u);
+  v = votes_of(uav8, 8u, 100u); g = gate_of(true, 240u); p = zs_presence_evaluate(&v, &g);          /* right class, far from the centroid: the comb confirms */
+  assert(p.level == ZS_PRESENCE_CONFIRMED && p.uav_votes == 0u && p.uav_weak_votes == 8u && p.confidence_u8 == 184u);
+  v = votes_of(uav8, 8u, 100u); g = gate_of(false, 0u); p = zs_presence_evaluate(&v, &g);           /* ... and alone it is only a suspect */
+  assert(p.level == ZS_PRESENCE_SUSPECT && p.confidence_u8 == 24u);
+  v = votes_of(uav8, 8u, 40u); g = gate_of(true, 240u); p = zs_presence_evaluate(&v, &g);           /* below the weak threshold: no classifier support */
+  assert(p.level == ZS_PRESENCE_SUSPECT && p.uav_weak_votes == 0u);
   p = zs_presence_evaluate(NULL, NULL);
   assert(p.level == ZS_PRESENCE_NONE);
   printf("presence tests passed\n");

@@ -37,7 +37,7 @@ def test_uav_presence_on_dataset(dataset):
     m = esm.presence_metrics(cid, conf, labels)
     assert m["recall"] >= 0.85, m                      # in-sample: the table must at least fit its own data
     assert m["fpr"] <= 0.05, m
-    for label in ("Лютый", "FP-1", "DJI Mini 3 Pro"):
+    for label in ("Лютый", "FP-1", "DJI Mini 3 Pro", "DJI Mavic 3 Pro"):
         assert m["per_label"][label] >= 0.80, m["per_label"]
     for label in ("трактор", "городской транспорт", "природный фон", "цикады и насекомые"):
         assert m["per_label"][label] <= 0.10, m["per_label"]
