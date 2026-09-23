@@ -757,6 +757,29 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR ECO-002 application closure is missing",
     )
     require(
+        decisions["DEC-144"]["Status"] ==
+        "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_006_CREATION_SUBGATE"
+        in decisions["DEC-144"]["Reason"]
+        and "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_006_VIA_PLANE_SCOPE_REVISION_SUBGATE"
+        in decisions["DEC-144"]["Reason"]
+        and "no DRC-clean F.Cu PGND escape corridor"
+        in decisions["DEC-144"]["Reason"]
+        and "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
+        in decisions["DEC-144"]["Impact"]
+        and "thirteen F.Cu" in decisions["DEC-144"]["Impact"]
+        and "eight project-standard 0.60/0.30 mm GND vias"
+        in decisions["DEC-144"]["Impact"]
+        and "two bounded In1.Cu local return planes"
+        in decisions["DEC-144"]["Impact"]
+        and "generic twelve-via 5 A rule is not satisfied"
+        in decisions["DEC-144"]["Impact"]
+        and "85 to 85" in decisions["DEC-144"]["Impact"]
+        and "117 to 108" in decisions["DEC-144"]["Impact"]
+        and "manufacturing blocks" in decisions["DEC-144"]["Impact"],
+        "PCB-PWR routing candidate 006 creation boundary is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]

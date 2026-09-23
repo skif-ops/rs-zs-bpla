@@ -752,6 +752,43 @@
       "routing_complete": false,
       "review_b_complete": false,
       "manufacturing_release": false
+    },
+    "buck_input_hot_loop_routing_006": {
+      "proposal": "hardware/reviews/PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.json",
+      "record": "hardware/reviews/PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.md",
+      "generator": "tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.py",
+      "audit": "tools/audit_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.py",
+      "status": "STATIC_CANDIDATE_READY_COMMIT_BOUND_KICAD9_GATE_PENDING",
+      "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_006_CREATION_SUBGATE",
+      "scope_revision_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_006_VIA_PLANE_SCOPE_REVISION_SUBGATE",
+      "base_board_sha256": "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c",
+      "candidate_board_sha256": "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0",
+      "candidate_board_semantic_sha256": "4da495603ca0c4ed2f7c4a3cb1197a133856408ac6f262ac976c1dab5667f687",
+      "routed_nets": [
+        "VBAT_SYS",
+        "GND_PWR"
+      ],
+      "connections": [
+        "C11-C20-U3 VIN/PGND",
+        "C12-C21-U4 VIN/PGND and U4.EN"
+      ],
+      "trace_items": 35,
+      "added_segments": 13,
+      "added_vias": 8,
+      "added_local_in1_cu_planes": 2,
+      "via_diameter_mm": 0.6,
+      "via_drill_mm": 0.3,
+      "minimum_screened_edge_clearance_mm": 0.3,
+      "generic_twelve_via_rule_satisfied": false,
+      "via_current_capacity_qualified": false,
+      "physical_evt_validation_required": true,
+      "authoritative_board_modified": false,
+      "machine_gate_complete": false,
+      "human_acceptance_complete": false,
+      "application_authorized": false,
+      "routing_complete": false,
+      "review_b_complete": false,
+      "manufacturing_release": false
     }
   },
   "mechanical_freeze_input": {

@@ -1,0 +1,103 @@
+{
+  "schema": "dioneya-pcb-pwr-buck-input-hot-loop-routing-006-candidate-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006",
+  "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_006_CREATION_SUBGATE",
+  "scope_revision_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_006_VIA_PLANE_SCOPE_REVISION_SUBGATE",
+  "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+  "scope": "ONLY_DUAL_BUCK_INPUT_HOT_LOOPS_WITH_BOUNDED_LOCAL_RETURN_PLANES",
+  "selection_rationale": "CLOSE_THE_TWO_SYMMETRIC_VIN_PGND_HOT_LOOPS_AFTER_ECO_002_WHILE_USING_THE_TI_RAK_OPTIONAL_PGND_VIA_TOPOLOGY_AND_WITHOUT_ADDING_A_GLOBAL_GROUND_PLANE",
+  "base": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_BASE_REV_A.kicad_pcb",
+    "sha256": "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c",
+    "semantic_sha256": "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555",
+    "trace_items": 14,
+    "copper_zones": 0
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.kicad_pcb",
+    "sha256": "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0",
+    "semantic_sha256": "4da495603ca0c4ed2f7c4a3cb1197a133856408ac6f262ac976c1dab5667f687",
+    "trace_items": 35,
+    "copper_zones": 2,
+    "routed_nets": [
+      "VBAT_SYS",
+      "GND_PWR"
+    ],
+    "connections": [
+      "C11-C20-U3 VIN/PGND",
+      "C12-C21-U4 VIN/PGND and U4.EN"
+    ],
+    "f_cu_segments_added": 13,
+    "gnd_vias_added": 8,
+    "local_in1_cu_planes_added": 2,
+    "via_diameter_mm": 0.6,
+    "via_drill_mm": 0.3,
+    "minimum_screened_edge_clearance_mm": 0.3
+  },
+  "via_plane_disposition": {
+    "f_cu_pgnd_escape_possible_without_clearance_violation": false,
+    "reason": "TI_RAK_PAD_2_IS_AN_INTERNAL_POWERPAD_WITH_NO_DRC_CLEAN_F_CU_ESCAPE_CORRIDOR_IN_THE_ACCEPTED_ORIENTATION",
+    "implementation": "TWO_PROJECT_STANDARD_0P6_0P3_VIAS_IN_EACH_U3_U4_PAD_2_PLUS_ONE_VIA_AT_EACH_MAIN_AND_HF_INPUT_CAPACITOR_AND_ONE_BOUNDED_IN1_CU_LOCAL_RETURN_PLANE_PER_CHANNEL",
+    "ti_optional_via_topology_followed": true,
+    "global_ground_plane_added": false,
+    "generic_twelve_via_rule_satisfied": false,
+    "generic_rule_exception_basis": "LOCAL_4A_BUCK_RETURN_BRANCH_AND_TI_POWERPAD_GEOMETRY_CANNOT_HOST_THE_GENERIC_5A_TWELVE_VIA_ARRAY",
+    "via_current_capacity_qualified": false,
+    "via_under_pad_process_qualified": false,
+    "physical_evt_validation_required": true
+  },
+  "source_binding": {
+    "generator": "tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a.py",
+    "generator_sha256": "97dc3b8f0051482370771cc22b133bef8bef05c7f320a210ce5c9c803695dd72",
+    "routing_rules": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
+    "routing_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
+    "evt_stackup_basis": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+    "evt_stackup_basis_sha256": "c417669cab385eb702c53a1912ad5973bda3ca0fec8cbc5c3e331a511178afad",
+    "ti_lmr60440_datasheet": "https://www.ti.com/lit/gpn/LMR60440",
+    "ti_package_drawing": "RAK0009A 4229353/J 04/2025"
+  },
+  "deferred_boundary": {
+    "central_bulk_capacitor": "C13_UNCHANGED_AND_NOT_A_LOCAL_CIN_SUBSTITUTE",
+    "upstream_vbat_sys_trunk": "RSH1_TO_LOCAL_BRANCHES_NOT_ROUTED",
+    "global_gnd_pwr_plane": "NOT_ADDED",
+    "output_routes": [
+      "3V8_MODEM",
+      "3V3_DIGITAL"
+    ],
+    "kelvin_and_feedback_routes": [
+      "SHUNT_SOURCE_SENSE",
+      "SHUNT_LOAD_SENSE",
+      "FB_3V8"
+    ],
+    "application_authorized": false
+  },
+  "invariants": {
+    "authoritative_board_modified": false,
+    "predecessor_copper_changed": false,
+    "component_poses_changed": false,
+    "pad_geometry_or_nets_changed": false,
+    "outline_or_layers_changed": false,
+    "non_hot_loop_copper_added": false
+  },
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "required_violations": [
+      85,
+      85
+    ],
+    "required_unconnected": [
+      117,
+      108
+    ],
+    "required_new_errors": 0,
+    "required_other_drc_fingerprint_delta": 0
+  },
+  "human_gate_after_machine_pass": {
+    "accept_value": "ACCEPT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE",
+    "reject_value": "REJECT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE"
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "cam_or_manufacturing_release": false
+}
