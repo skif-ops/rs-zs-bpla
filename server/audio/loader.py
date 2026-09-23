@@ -39,6 +39,8 @@ class AudioLoader:
         data, sample_rate, read_warnings = self._read_audio(path)
         channels = int(data.shape[1])
         mono = np.mean(data, axis=1)
+        mono, sample_rate, resample_warnings = self.resample_to_analysis_rate(mono, sample_rate)
+        read_warnings = read_warnings + resample_warnings
         signal, warnings = self.preprocessor.prepare(mono, sample_rate)
         warnings = read_warnings + warnings
         duration = len(signal) / float(sample_rate)
@@ -50,6 +52,20 @@ class AudioLoader:
             duration_seconds=duration,
             warnings=warnings,
         )
+
+    @staticmethod
+    def resample_to_analysis_rate(mono: np.ndarray, sample_rate: int) -> tuple[np.ndarray, int, list[str]]:
+        """Bring a recording to settings.target_analysis_sample_rate_hz (the station's 32 kHz) before analysis."""
+
+        target = settings.target_analysis_sample_rate_hz
+        if not target or int(sample_rate) == int(target) or mono.size == 0:
+            return mono, int(sample_rate), []
+        resampled = librosa.resample(
+            np.asarray(mono, dtype=np.float32), orig_sr=int(sample_rate), target_sr=int(target), res_type="soxr_hq"
+        )
+        return np.asarray(resampled, dtype=np.float32), int(target), [
+            f"Sample rate {int(sample_rate)} Hz was resampled to the analysis rate {int(target)} Hz (station rate)."
+        ]
 
     def load_wav(self, path: Path) -> LoadedAudio:
         """Backward-compatible wrapper for older WAV-oriented call sites."""
@@ -122,38 +138,3 @@ class AudioLoader:
         if suffix in {".m4a", ".aac"}:
             try:
                 data, sample_rate = librosa.load(str(path), sr=None, mono=False, dtype=np.float32)
-            except Exception as error:
-                raise ValueError(
-                    f"Could not read {path.name} as audio. For M4A/AAC, make sure "
-                    "ffmpeg/audioread support is available."
-                ) from error
-            data_2d = data[:, np.newaxis] if data.ndim == 1 else data.T
-            return np.asarray(data_2d, dtype=np.float32), int(sample_rate), warnings
-
-        try:
-            data, sample_rate = sf.read(path, always_2d=True)
-            return np.asarray(data, dtype=np.float32), int(sample_rate), warnings
-        except Exception as sf_error:
-            try:
-                data, sample_rate = librosa.load(
-                    path=str(path),
-                    sr=None,
-                    mono=False,
-                    dtype=np.float32,
-                )
-            except Exception as librosa_error:
-                raise ValueError(
-                    f"Could not read {path.name} as audio. "
-                    "For compressed formats (MP3/M4A/AAC), make sure ffmpeg/audioread "
-                    "support is available."
-                ) from librosa_error
-
-            if data.ndim == 1:
-                data_2d = data[:, np.newaxis]
-            else:
-                data_2d = data.T
-            warnings.append(
-                f"{path.name}: decoded through Librosa fallback after SoundFile failed "
-                f"({sf_error.__class__.__name__})."
-            )
-            return np.asarray(data_2d, dtype=np.float32), int(sample_rate), warnings
