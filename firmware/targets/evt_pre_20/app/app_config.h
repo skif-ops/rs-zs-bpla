@@ -13,7 +13,7 @@
 #define APP_AUDIO_RING_FRAMES        (APP_AUDIO_SAMPLE_RATE_HZ * 3u)   /* 3 s prehistory, 4 ch x int16 = 768 KB? no: 3 s x 32000 x 4 x 2 = 768 KB */
 /* The 3 s prehistory does not fit SRAM together with everything else; B1 keeps 1 s (256 KB) and moves the
    prehistory to NOR in B3 (zs_prehistory / zs_nor_archive). */
-#define APP_AUDIO_RING_FRAMES_B1     (APP_AUDIO_SAMPLE_RATE_HZ * 1u)
+#define APP_AUDIO_RING_FRAMES_B1     (APP_AUDIO_SAMPLE_RATE_HZ * 9u / 8u)   /* 1.125 s: a 1 s window plus the fetch latency of the pipeline (<= 100 ms) */
 
 /* PPS timestamping: TIM2 free-running 32-bit at 16 MHz (62.5 ns), input capture on CH1 (PA0). */
 #define APP_TIM2_CLOCK_HZ            16000000u
@@ -51,6 +51,9 @@
 #define APP_STACK_SERVICE            768
 #define APP_STACK_CONSOLE            1024     /* nrfimg: NOR erase/verify and printf on the console stack */
 #define APP_PRIO_BLE                 3
+#define APP_PRIO_DSP                 2        /* station pipeline: below capture and the service tasks, above the console */
+#define APP_STACK_DSP                1536
+#define APP_BOOT_ID                  1u       /* B1 bench: a boot counter in NOR lands with B3 */
 #define APP_STACK_BLE                1024
 
 /* NVIC priorities (0 = highest). FreeRTOS syscall ceiling is 5: ISRs at 5..15 may call FromISR APIs. */

@@ -35,10 +35,10 @@ extern uint32_t SystemCoreClock;
 #define configSTACK_DEPTH_TYPE                    uint16_t
 #define configMESSAGE_BUFFER_LENGTH_TYPE          size_t
 
-/* Memory: static heap_4 of 64 KB (task stacks/queues); the audio ring, DMA buffers and the DSP scratch are static. */
+/* Memory: static heap_4 of 40 KB (task stacks ~27 KB + queues); the audio ring, DMA buffers and the DSP scratch are static. */
 #define configSUPPORT_STATIC_ALLOCATION           1
 #define configSUPPORT_DYNAMIC_ALLOCATION          1
-#define configTOTAL_HEAP_SIZE                     ((size_t)(64 * 1024))
+#define configTOTAL_HEAP_SIZE                     ((size_t)(40 * 1024))
 #define configAPPLICATION_ALLOCATED_HEAP          0
 
 /* Hooks and diagnostics. */

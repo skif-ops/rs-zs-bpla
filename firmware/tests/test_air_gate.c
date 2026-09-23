@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static zs_complex_t scratch[ZS_AIR_FFT];
+static zs_complex_t scratch[ZS_AIR_SCRATCH_COMPLEX];
 static int16_t pcm[ZS_AIR_WINDOW_SAMPLES];
 static uint32_t rng = 12345u;
 static float noise(void) { rng = rng * 1664525u + 1013904223u; return ((float)(rng >> 8) / 16777216.0f - 0.5f) * 2.0f; }
