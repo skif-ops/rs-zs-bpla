@@ -18,6 +18,10 @@
 #define MAINS_NOTCH_HZ 1.2f
 #define MAINS_NOTCH_MAX_HZ 200.0f
 #define ZS_AIR_TWO_PI 6.28318530717958647692f /* strict C11 on the target has no M_PI */
+/* station-only plausibility of an *airborne* propulsion comb (server has none): a ground engine idles below
+   30 Hz (APC at 15 Hz on the Muhoed recording), cicadas chorus at 500+ Hz; UAV props/engines sit in between */
+#define AIR_F0_MIN_HZ 30.0f
+#define AIR_F0_MAX_HZ 300.0f
 
 #define DEC_SAMPLES (ZS_AIR_WINDOW_SAMPLES / ZS_AIR_DECIMATION) /* 6400 */
 #define BIN_HZ ((float)ZS_AIR_SAMPLE_RATE / (float)ZS_AIR_DECIMATION / (float)ZS_AIR_FFT) /* 0.78125 */
@@ -193,10 +197,11 @@ zs_air_gate_result_t zs_air_gate_evaluate(const zs_air_gate_t *g) {
     for (unsigned i = 0u; i < ncomb; i++) if (f0s[i] > ref) ref = f0s[i];
     float mean = 0.0f;
     for (unsigned i = 0u; i < ncomb; i++) {
-      for (unsigned k = 2u; k <= 3u; k++) { float up = f0s[i] * (float)k; if (fabsf(up - ref) <= 0.06f * ref) { f0s[i] = up; break; } }
+      for (unsigned k = 2u; k <= 3u; k++) { float up = f0s[i] * (float)k; if (fabsf(up - ref) <= 0.10f * ref) { f0s[i] = up; break; } }
       mean += f0s[i];
     }
-    (void)sorted;
+    memcpy(sorted, f0s, ncomb * sizeof(float));
+    r.f0_hz = median_of(sorted, ncomb);   /* folded median of the comb windows: what the source actually runs at */
     mean /= (float)ncomb;
     float var = 0.0f; for (unsigned i = 0u; i < ncomb; i++) { float d = f0s[i] - mean; var += d * d; } var /= (float)ncomb;
     r.steadiness_cv = mean > 0.0f ? sqrtf(var) / mean : 1.0f;
@@ -208,7 +213,12 @@ zs_air_gate_result_t zs_air_gate_evaluate(const zs_air_gate_t *g) {
     if (r.f0_hz > 0.0f && fabsf(r.f0_hz - (float)m) <= 2.0f && (r.steadiness_cv <= 0.02f || order_ratio >= 0.95f)) r.mains = true;
   const bool strong = r.persistence >= 0.6f && r.median_contrast_db >= STRONG_CONTRAST_DB;
   const unsigned min_h = strong ? 2u : MIN_HARMONICS;
-  r.present = n >= 2u && r.persistence >= PERSISTENCE_MIN && r.median_contrast_db >= PRESENT_CONTRAST_DB && r.steadiness_cv <= cv_max && hmax >= min_h && !r.mains;
+  /* the comb must still be there now: without this the history keeps "present" for seconds after the source stopped */
+  const zs_air_window_t *last = &g->hist[(g->next + ZS_AIR_HISTORY - 1u) % ZS_AIR_HISTORY];
+  const zs_air_window_t *prev = &g->hist[(g->next + ZS_AIR_HISTORY - 2u) % ZS_AIR_HISTORY];
+  const bool current = last->comb || (n >= 2u && prev->comb);
+  const bool airborne = r.f0_hz >= AIR_F0_MIN_HZ && r.f0_hz <= AIR_F0_MAX_HZ;
+  r.present = n >= 2u && current && airborne && r.persistence >= PERSISTENCE_MIN && r.median_contrast_db >= PRESENT_CONTRAST_DB && r.steadiness_cv <= cv_max && hmax >= min_h && !r.mains;
   float score = 0.40f * fminf(r.persistence / 0.6f, 1.0f) + 0.30f * fminf(fmaxf(r.median_contrast_db, 0.0f) / 10.0f, 1.0f) +
                 0.20f * (1.0f - fminf(r.steadiness_cv / 0.1f, 1.0f)) + 0.10f * fminf((float)hmax / 8.0f, 1.0f);
   if (!r.present) score *= 0.5f;

@@ -57,7 +57,7 @@ typedef struct {
   float median_snr_db;      /* server-definition SNR, report only */
   float median_contrast_db; /* the gate's SNR (half-order contrast) */
   float steadiness_cv;  /* std/mean of the folded per-window fundamental over comb windows */
-  float f0_hz;          /* current fitted fundamental */
+  float f0_hz;          /* folded median fundamental of the comb windows (fit value when none) */
   uint8_t harmonic_count;
   uint8_t confidence_u8; /* server _confidence blend without the separation-gain term */
 } zs_air_gate_result_t;
