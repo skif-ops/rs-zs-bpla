@@ -11,6 +11,7 @@
 
 #include "FreeRTOS.h"
 #include "app_config.h"
+#include "app_nrf_update.h"
 #include "bsp_gpio.h"
 #include "bsp_mdf.h"
 #include "bsp_nor.h"
@@ -295,8 +296,10 @@ static void bind_record_stores(void) {
       zs_nor_storage_bind_stores(&nor_bindings, &nor, APP_NOR_COMMAND_SLOTS, APP_NOR_OUTBOX_SLOTS, &nor_archive_storage,
                                  &nor_command_io, &nor_outbox_io, &cfg_io, &pos_io)) {
     stores_on_nor = true;
-    console_printf("nor: W25Q512JV bound, config @0x%08lx installation @0x%08lx\r\n",
-                   (unsigned long)nor_bindings.layout.config_base_address, (unsigned long)nor_bindings.layout.installation_base_address);
+    app_nrf_update_bind(&nor, &nor_bindings.layout, console_printf);
+    console_printf("nor: W25Q512JV bound, nrf image @0x%08lx config @0x%08lx installation @0x%08lx\r\n",
+                   (unsigned long)nor_bindings.layout.nrf_image_base_address, (unsigned long)nor_bindings.layout.config_base_address,
+                   (unsigned long)nor_bindings.layout.installation_base_address);
   } else {
     cfg_io = (zs_station_config_io_t){cfg_slots, ram_read, ram_erase, ram_write};
     pos_io = (zs_installation_store_io_t){pos_slots, ram_read, ram_erase, ram_write};
@@ -334,6 +337,7 @@ static void ble_task_fn(void *arg) {
     (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(250));
     while ((n = bsp_uart_read(BSP_UART_BLE, buf, sizeof(buf))) > 0u) zs_ipc_service_on_uart_rx(&ipc, buf, n);
     if (ble_recovery_request) { ble_recovery_request = false; ble_enter_recovery(); (void)zs_ipc_service_init(&ipc, &ipc_port); }
+    if (app_nrf_update_pending()) { app_nrf_update_run(); (void)zs_ipc_service_init(&ipc, &ipc_port); (void)zs_ipc_service_ping(&ipc); }
     /* until the bridge has answered once, repeat the link check every 2 s (nRF boot / re-flash on the bench) */
     if (ipc.pongs_seen == 0u && (uint32_t)(xTaskGetTickCount() - last_ping) >= 2000u) { last_ping = xTaskGetTickCount(); (void)zs_ipc_service_ping(&ipc); }
     const bool want = modes.mode == ZS_MODE_S4_SERVICE;
@@ -344,6 +348,7 @@ static void ble_task_fn(void *arg) {
 }
 
 static void console_exec(const char *cmd) {
+  if (app_nrf_console(cmd)) return;                     /* nrfimg ... / nrfupd (addendum C.6) */
   if (strcmp(cmd, "st") == 0) {
     uint8_t rep[64];
     size_t n;
@@ -393,12 +398,12 @@ static void console_exec(const char *cmd) {
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio svc modes ble ping bledfu heap\r\n");
+    console_printf("commands: st lag pps audio svc modes ble ping bledfu nrfimg nrfupd heap\r\n");
   }
 }
 
 static void console_task_fn(void *arg) {
-  static char line[64];
+  static char line[192];                               /* nrfimg put <off> <base64 of 96 bytes> is ~150 chars */
   size_t len = 0u;
   (void)arg;
   console_printf("\r\nDioneya EVT-PRE-20 B1 bring-up, clock policy %s, %lu Hz\r\n", EVT_PRE_20_CLOCK_POLICY_ID, (unsigned long)SystemCoreClock);
