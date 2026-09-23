@@ -38,7 +38,8 @@ typedef struct {
   float dominant_hz;    /* strongest tooth of the average comb followed at this window's f0 */
   float integer_order_ratio;
   uint8_t harmonic_count;
-  bool comb;            /* snr_db >= 6 dB (server), contrast_db >= 3 dB, >= 2 harmonics */
+  uint8_t low_teeth;    /* prominent teeth among the first four (a propulsion comb is strong at the bottom) */
+  bool comb;            /* snr_db >= 6 dB (server), contrast_db >= 3 dB, >= 2 harmonics, low_teeth >= 2 */
 } zs_air_window_t;
 
 typedef struct {
