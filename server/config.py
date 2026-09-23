@@ -14,7 +14,15 @@ class Settings:
     app_version: str = "1.2.0-evt-pre-20.1"
     base_dir: Path = field(default_factory=lambda: Path(__file__).resolve().parent)
     min_sample_rate_hz: int = 20_000
-    target_analysis_sample_rate_hz: int | None = None
+    # Every analysis (features, dataset, separation) runs at the station's rate: the EVT-PRE-20 station samples the
+    # T5838 array at 32 kHz and computes the same 43 features on the MCU (zs_dsp / zs_dsp_mcu), so features extracted
+    # at a recording's native 44.1/48 kHz are not comparable with the station's (YIN, MFCC and the mel filter bank
+    # are rate-dependent: the DJI Mini 3 Pro file at 48 kHz gave a halved f0 and a shifted MFCC-0 versus the same
+    # audio at 32 kHz). Files are resampled on load; None disables the resampling.
+    target_analysis_sample_rate_hz: int | None = 32_000
+    # Dataset windows are DC-removed and peak-normalized individually before feature extraction, exactly as the
+    # station does per 1 s window (the RMS gate above still runs on the file-normalized signal).
+    ml_window_peak_normalize: bool = True
     fft_max_frequency_hz: float = 12_000.0
     drone_low_frequency_hz: float = 40.0
     drone_high_frequency_hz: float = 500.0
