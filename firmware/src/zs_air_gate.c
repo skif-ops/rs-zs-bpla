@@ -103,8 +103,7 @@ static bool window_spectrum(const int16_t *pcm, zs_complex_t *x, float *p) {
 }
 
 /* Comb fit on the averaged log spectrum (server DroneSeparator._fit_comb_fundamental on the median spectrum). */
-static void fit_comb(const float *lp, float *f0_out, float *anchor_out) {
-  static float p[BINS];
+static void fit_comb(const float *lp, float *p, float *f0_out, float *anchor_out) {
   for (unsigned i = 0u; i < BINS; i++) p[i] = expf(lp[i]);
   const float floor_log = band_median_log(lp, B_LO, B_HI);
   /* anchor: the most prominent bin (power over the mean of ±32 Hz around it, ±2.5 Hz guarded) */
@@ -144,15 +143,13 @@ static void fit_comb(const float *lp, float *f0_out, float *anchor_out) {
 
 /* Per-window measurement at the fixed f0 (server _window_harmonic_snr / _count_harmonics with the
    half-order comparison, see the header). */
-static void measure_window(const float *p, float f0_avg, float anchor_hz, zs_air_window_t *w) {
+static void measure_window(const float *p, float f0_avg, float anchor_hz, float *lp, uint8_t *mask, float *noise_lp, zs_air_window_t *w) {
   memset(w, 0, sizeof(*w));
   if (f0_avg <= 0.0f) return;
   /* refine the fundamental on this window (±10 %, BIN/2 steps): a real propulsion line drifts with RPM and
      Doppler by several percent per second, which would misalign the high teeth of a fixed comb */
   float f0 = f0_avg, best_pw = -1.0f;
   for (float g = f0_avg * 0.9f; g <= f0_avg * 1.1f; g += BIN_HZ * 0.5f) { if (g < F0_MIN_HZ) continue; float pw = comb_power_at(p, g); if (pw > best_pw) { best_pw = pw; f0 = g; } }
-  static float lp[BINS];
-  static uint8_t mask[BINS];
   for (unsigned i = 0u; i < BINS; i++) { lp[i] = logf(p[i]); mask[i] = 0u; }
   const float floor6 = expf(band_median_log(lp, B_LO, B_HI)) * 3.981f;
   const float tol = fmaxf(1.5f * BIN_HZ, f0 * 0.06f);
@@ -174,7 +171,6 @@ static void measure_window(const float *p, float f0_avg, float anchor_hz, zs_air
   /* server _window_harmonic_snr: median of the band from 0.5 f0 with the harmonic bins excluded */
   {
     unsigned n_lo = (unsigned)fmaxf((float)B_LO, f0 * 0.5f / BIN_HZ), m = 0u;
-    static float noise_lp[BINS];
     for (unsigned i = n_lo; i <= B_HI; i++) if (!mask[i]) noise_lp[m++] = lp[i];
     const float noise = m ? expf(band_median_log(noise_lp, 0u, m - 1u)) : 0.0f;
     w->snr_db = (noise > 1e-30f && level > 0.0f) ? 10.0f * log10f(level / noise) : 0.0f;
@@ -252,9 +248,12 @@ bool zs_air_gate_push(zs_air_gate_t *g, const int16_t *pcm, size_t n, zs_complex
   /* running geometric mean over the history depth */
   const float alpha = 1.0f / (float)(g->count < ZS_AIR_HISTORY ? g->count + 1u : ZS_AIR_HISTORY);
   for (unsigned i = 0u; i < BINS; i++) { float l = logf(g->spectrum[i]); g->avg_log[i] += (l - g->avg_log[i]) * alpha; }
-  fit_comb(g->avg_log, &g->f0_hz, &g->anchor_hz);
+  /* per-window work areas live in the scratch tail (beyond the FFT), so the target can overlay everything on DSP memory */
+  float *tmp_p = (float *)(void *)(scratch + ZS_AIR_FFT), *tmp_lp = tmp_p + BINS, *tmp_noise = tmp_lp + BINS;
+  uint8_t *tmp_mask = (uint8_t *)(void *)(tmp_noise + BINS);
+  fit_comb(g->avg_log, tmp_p, &g->f0_hz, &g->anchor_hz);
   zs_air_window_t w;
-  measure_window(g->spectrum, g->f0_hz, g->anchor_hz, &w);
+  measure_window(g->spectrum, g->f0_hz, g->anchor_hz, tmp_lp, tmp_mask, tmp_noise, &w);
   g->hist[g->next] = w;
   g->next = (uint8_t)((g->next + 1u) % ZS_AIR_HISTORY);
   if (g->count < ZS_AIR_HISTORY) g->count++;

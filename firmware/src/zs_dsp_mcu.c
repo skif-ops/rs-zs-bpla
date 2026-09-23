@@ -422,6 +422,11 @@ void zs_dsp_mcu_init(zs_dsp_ctx_t *ctx) {
   build_tables();
 }
 
+zs_complex_t *zs_dsp_mcu_borrow_work(size_t *complex_count) {
+  if (complex_count) *complex_count = WORK_COMPLEX;
+  return g_work;
+}
+
 size_t zs_dsp_mcu_scratch_bytes(void) {
   return sizeof(g_work) + sizeof(g_magbuf) + sizeof(g_yin) + sizeof(g_f0) + sizeof(g_harmonics) + sizeof(g_stft_window) + sizeof(g_dct) + sizeof(g_mel_edges);
 }

@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-static zs_complex_t scratch[ZS_AIR_FFT];
+static zs_complex_t scratch[ZS_AIR_SCRATCH_COMPLEX];
 static zs_air_gate_t gate;
 static const char *level_name(uint8_t l) { return l == ZS_PRESENCE_CONFIRMED ? "confirmed" : l == ZS_PRESENCE_ENGINE_UNCONFIRMED ? "engine" : l == ZS_PRESENCE_SUSPECT ? "suspect" : "none"; }
 int main(int argc, char **argv) {
