@@ -93,6 +93,7 @@ add_executable(dioneya_evt_pre_20.elf
   bsp_uart.c
   bsp_nor.c
   tasks.c
+  app_nrf_update.c
   hal_msp.c
   stm32u5xx_it.c
   syscalls.c
