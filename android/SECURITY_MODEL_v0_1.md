@@ -9,6 +9,7 @@
 | Общий заводской пароль | уникальный bootstrap secret на изделие, одноразовое погашение | duplicate/expired secret |
 | Перехват BLE | BLE Secure Connections плюс application transcript binding | MITM test |
 | Несанкционированная конфигурация | role, authenticated session, schema validation, atomic commit | fuzz и permission test |
+| Подмена роли инженера (B.9) | роль выдаёт станция по HMAC‑челленджу ключом инженера; ключ импортируется из аудируемого экспорта реестра и хранится запечатанным ключом Android Keystore (`EngineerKeyStore`), в UI/логах не показывается; роль живёт только в BLE‑линке | `EngineerKeyTest` (вектор ICD), `SessionRoleControllerTest` (неверный ключ, чужой серийник, 3 ошибки → блокировка, вне сервисного режима) |
 | Подмена координат станции | installation coordinates записываются только в физическом service mode; hash вычисляет станция; приложение независимо сверяет canonical hash/read-back/lock/audit; смена создаёт новую version | remote write, modified app request, replay старой конфигурации |
 | GNSS spoofing позиции | configured installation coordinates остаются authoritative, GNSS сравнивается с ними, receiver spoof/jam flags отображаются отдельно | drift/jump/spoof injection matrix |
 | GNSS spoofing времени | position trust и time trust разделены; подозрительный PPS переводит систему в TIME_SUSPECT/HOLDOVER | time jump/PPS injection |
