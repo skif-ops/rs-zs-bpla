@@ -3,9 +3,10 @@
  * re-implemented for the STM32U585:
  *   - zs_fft_mixed instead of the recursive cosf/sinf FFT;
  *   - no double precision (float with chunked accumulation, int64 for the DC sum);
- *   - one 128 KB complex work buffer and one 128 KB float buffer with overlays
+ *   - one 128 KB complex work buffer (in-place global FFT, YIN, STFT, median
+ *     scratch, peak/mel tail in its upper half) and one 64 KB magnitude buffer
  *     instead of ~430 KB of separate static arrays;
- *   - MFCC DCT and STFT window from tables built once.
+ *   - MFCC DCT and STFT window from one 2 KB quarter-wave cosine table built once.
  * Feature definitions, band limits, thresholds and ordering are those of zs_dsp.c.
  * The host A/B test (test_dsp_mcu) keeps both implementations within the golden
  * acceptance (median normalized error <= 3 %, p95 <= 5 %).
@@ -40,19 +41,42 @@
 #define WORK_COMPLEX 16384u   /* >= 2 * YIN_FFT and >= N_GLOBAL/2 */
 #define MAX_PEAKS 8192u
 
-/* ---- scratch memory (260 KB) -------------------------------------------------- */
-static zs_complex_t g_work[WORK_COMPLEX];      /* 128 KB: FFT scratch, YIN, STFT, median tmp */
-static float g_magbuf[N_GLOBAL];               /* 128 KB: packed FFT input, then |X| in [0, GLOBAL_BINS) */
+/* ---- scratch memory (~200 KB) --------------------------------------------------
+   g_work timeline within one window: packed input + in-place global FFT (16000 complex) -> free ->
+   YIN (2 x 8192 complex) -> lower half: median tmp (<= GLOBAL_BINS floats) then STFT frames (2 x 2048
+   complex); upper half (from complex 8192 = float 16384): peaks/state during harmonics, mel during STFT.
+   The AIR gate overlays g_work (ZS_AIR_SCRATCH_COMPLEX) between two extract calls (zs_dsp_mcu_borrow_work). */
+static zs_complex_t g_work[WORK_COMPLEX];      /* 128 KB */
+static float g_magbuf[GLOBAL_BINS];            /* 64 KB: |X| in [0, GLOBAL_BINS) */
 #define g_mag g_magbuf
-static float *const g_tail = g_magbuf + GLOBAL_BINS;             /* 15999 floats after the magnitudes */
+#define TAIL_FLOAT_OFFSET (WORK_COMPLEX)                              /* = 2 * (WORK_COMPLEX / 2) floats */
+static float *const g_tail = (float *)(void *)g_work + TAIL_FLOAT_OFFSET;   /* 16384 floats in the upper half of g_work */
 #define g_peaks ((uint16_t *)(void *)g_tail)                     /* MAX_PEAKS entries = 4096 floats */
 #define g_peak_state ((uint8_t *)(void *)(g_tail + 4096u))       /* GLOBAL_BINS bytes ~ 4001 floats */
 #define g_mel ((float (*)[N_MELS])(void *)g_tail)                /* STFT_FRAMES x N_MELS = 8064 floats, after harmonics */
+_Static_assert(N_GLOBAL / 2u <= WORK_COMPLEX, "packed global FFT must fit g_work");
+_Static_assert(2u * YIN_FFT <= WORK_COMPLEX, "YIN x + scratch must fit g_work");
+_Static_assert(GLOBAL_BINS <= TAIL_FLOAT_OFFSET, "median scratch (lower half of g_work) must not reach the tail");
+_Static_assert(2u * STFT_N <= WORK_COMPLEX / 2u, "STFT frame + scratch must stay in the lower half of g_work");
+_Static_assert(4096u + (GLOBAL_BINS + 3u) / 4u <= 2u * (WORK_COMPLEX - WORK_COMPLEX / 2u), "peaks + state must fit the tail");
+_Static_assert(STFT_FRAMES * N_MELS <= 2u * (WORK_COMPLEX - WORK_COMPLEX / 2u), "mel frames must fit the tail");
 static float g_yin[YIN_MAXP + 1u];
 static float g_f0[YIN_FRAMES];
 static float g_harmonics[MAX_HARMONICS];
-static float g_stft_window[STFT_N];
-static float g_dct[N_MFCC][N_MELS];
+/* cos(2 pi j / STFT_N) for j = 0..STFT_N/4 (2 KB): serves the periodic Hann window (2048-periodic) and the MFCC
+   DCT-II cos(pi k (m + 1/2) / 128) = cos(2 pi (4 k (2m+1)) / 2048) instead of an 8 KB window and a 6.5 KB DCT table. */
+#define COS_Q (STFT_N / 4u)
+#define DCT_NORM0 0.08838834764831845f   /* sqrt(1/128) */
+#define DCT_NORMK 0.125f                 /* sqrt(2/128) */
+static float g_cos_q[COS_Q + 1u];
+_Static_assert(STFT_N == 2048u && N_MELS == 128u, "g_cos_q indexing assumes a 2048-periodic table with the 128-band DCT");
+static float cos_2048(unsigned j) {            /* cos(2 pi j / 2048), any j */
+  j &= STFT_N - 1u;
+  if (j > STFT_N / 2u) j = STFT_N - j;         /* cos(2 pi (N - j)/N) = cos(2 pi j/N) */
+  return j <= COS_Q ? g_cos_q[j] : -g_cos_q[STFT_N / 2u - j];   /* cos(pi - t) = -cos(t) */
+}
+static float stft_window(unsigned i) { return 0.5f - 0.5f * cos_2048(i); }
+static float dct_coef(unsigned k, unsigned m) { return (k == 0u ? DCT_NORM0 : DCT_NORMK) * cos_2048(4u * k * (2u * m + 1u)); }
 static float g_mel_edges[N_MELS + 2u];
 static bool g_tables_ready;
 
@@ -77,11 +101,7 @@ static float mel_to_hz(float mel) {
 static void build_tables(void) {
   float mel0 = hz_to_mel(0.0f), mel1 = hz_to_mel((float)SR * 0.5f);
   if (g_tables_ready) return;
-  for (unsigned i = 0u; i < STFT_N; i++) g_stft_window[i] = 0.5f - 0.5f * cosf(2.0f * (float)M_PI * (float)i / (float)STFT_N);
-  for (unsigned k = 0u; k < N_MFCC; k++) {
-    float norm = (k == 0u) ? sqrtf(1.0f / (float)N_MELS) : sqrtf(2.0f / (float)N_MELS);
-    for (unsigned m = 0u; m < N_MELS; m++) g_dct[k][m] = norm * cosf((float)M_PI * (float)k * ((float)m + 0.5f) / (float)N_MELS);
-  }
+  for (unsigned j = 0u; j <= COS_Q; j++) g_cos_q[j] = cosf(2.0f * (float)M_PI * (float)j / (float)STFT_N);
   for (unsigned i = 0u; i < N_MELS + 2u; i++) g_mel_edges[i] = mel_to_hz(mel0 + (mel1 - mel0) * (float)i / (float)(N_MELS + 1u));
   g_tables_ready = true;
 }
@@ -113,7 +133,7 @@ static float quickselect(float *a, unsigned n, unsigned k) {
     if (k <= j) r = j; else if (k >= i) l = i; else return a[k];
   }
 }
-/* Median of a[i0..i1)/maxv using g_work as scratch (must be free at call time). */
+/* Median of a[i0..i1)/maxv using the lower half of g_work as scratch (n <= GLOBAL_BINS floats; must be free). */
 static float exact_median_normalized(const float *a, unsigned i0, unsigned i1, float maxv) {
   float *tmp = (float *)(void *)g_work;
   unsigned n;
@@ -182,7 +202,7 @@ static float global_sample(const void *ctx, unsigned i) {
   return sample_norm(s, (int)i) * w;
 }
 static bool global_spectrum(const sig_t *s, float *max_mag) {
-  return zs_fft_mixed_real_magnitude(global_sample, s, N_GLOBAL, g_work, g_magbuf, max_mag);
+  return zs_fft_mixed_real_magnitude_inplace(global_sample, s, N_GLOBAL, g_work, g_magbuf, max_mag);
 }
 
 /* ---- YIN f0 track ------------------------------------------------------------- */
@@ -359,7 +379,7 @@ static void stft_and_mfcc(const sig_t *s, float *zcr_frame_mean, float *centroid
     float geo, arith;
     for (unsigned i = 1u; i < STFT_N; i++) { float cur = sample_edge(s, start + (int)i); if ((cur >= 0.0f) != (prev >= 0.0f)) zc++; prev = cur; }
     zsum += (float)zc / (float)STFT_N;
-    for (unsigned i = 0u; i < STFT_N; i++) { frame[i].re = sample_norm(s, start + (int)i) * g_stft_window[i]; frame[i].im = 0.0f; }
+    for (unsigned i = 0u; i < STFT_N; i++) { frame[i].re = sample_norm(s, start + (int)i) * stft_window(i); frame[i].im = 0.0f; }
     if (!zs_fft_mixed_complex(frame, scratch, STFT_N)) continue;
     /* magnitudes reused below: keep them in the scratch half as floats */
     {
@@ -405,7 +425,7 @@ static void stft_and_mfcc(const sig_t *s, float *zcr_frame_mean, float *centroid
     for (unsigned mel = 0u; mel < N_MELS; mel++) { float v = 10.0f * log10f(fmaxf(g_mel[fr][mel], 1e-10f)); if (v < floor_db) v = floor_db; db[mel] = v; }
     for (unsigned k = 0u; k < N_MFCC; k++) {
       float coef = 0.0f;
-      for (unsigned mel = 0u; mel < N_MELS; mel++) coef += db[mel] * g_dct[k][mel];
+      for (unsigned mel = 0u; mel < N_MELS; mel++) coef += db[mel] * dct_coef(k, mel);
       sum[k] += coef; sumsq[k] += coef * coef;
     }
   }
@@ -428,7 +448,7 @@ zs_complex_t *zs_dsp_mcu_borrow_work(size_t *complex_count) {
 }
 
 size_t zs_dsp_mcu_scratch_bytes(void) {
-  return sizeof(g_work) + sizeof(g_magbuf) + sizeof(g_yin) + sizeof(g_f0) + sizeof(g_harmonics) + sizeof(g_stft_window) + sizeof(g_dct) + sizeof(g_mel_edges);
+  return sizeof(g_work) + sizeof(g_magbuf) + sizeof(g_yin) + sizeof(g_f0) + sizeof(g_harmonics) + sizeof(g_cos_q) + sizeof(g_mel_edges);
 }
 
 bool zs_dsp_mcu_extract_1s(zs_dsp_ctx_t *ctx, const int16_t *pcm, size_t n, float out[ZS_FEATURE_COUNT]) {
