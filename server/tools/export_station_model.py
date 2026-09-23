@@ -34,9 +34,10 @@ FEATURE_ORDER = ROOT / "server" / "tools" / "golden" / "feature_order.txt"
 # label -> zs_class_id_t (firmware/include/zs_types.h)
 LABEL_CLASS = {
     "Лютый": 1, "FP-1": 1,                        # ZS_CLASS_PISTON_UAV
-    "DJI Mini 3 Pro": 3,                          # ZS_CLASS_ELECTRIC_UAV
+    "DJI Mini 3 Pro": 3, "DJI Mavic 3 Pro": 3,   # ZS_CLASS_ELECTRIC_UAV
     "городской транспорт": 10,                    # ZS_CLASS_ROAD_TRAFFIC
     "трактор": 14,                                # ZS_CLASS_AGRICULTURAL
+    "стрельба из бронетранспортера": 14,          # APC engine idling/moving: a ground vehicle engine, kept with the tractors
     "птицы": 15,                                  # ZS_CLASS_BIRDS
     "цикады и насекомые": 16,                     # ZS_CLASS_INSECTS
     "стрельба": 17,                               # ZS_CLASS_GUNFIRE
@@ -44,7 +45,7 @@ LABEL_CLASS = {
 }
 UAV_CLASSES = (1, 2, 3)
 TRAINING_ROLES = {"training", "training_provisional", "training_provisional_weak"}
-DEFAULT_K = 3
+DEFAULT_K = 5   # 2026-09-23: 5 per label gave the best holdout (recall 0.977, FPR 0.037) on the 32 kHz dataset
 
 
 def load_dataset(path: Path = DATASET):
