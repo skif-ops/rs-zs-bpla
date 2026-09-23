@@ -14,7 +14,8 @@
 | Message type heartbeat | 3 | Значение ключа 1 внутри compact heartbeat |
 | LoRa regional profile | v0.1 | RU868 для всех 20 пилотных изделий; EU868 future template; TX disabled до RF gate |
 | Cellular SIM/APN policy | v0.2 | Dual SIM Single Standby; только публичные APN и bounded failover между двумя SIM |
-| BLE GATT | v0.1 | Черновой сервис конфигурации/OTA |
+| BLE GATT | v0.2 | Заморожен 2026-09-23 (`BLE_GATT_OTA_ICD_v0_2.md`): identity, config, installation, session_role, self_test, IPC C.1–C.6; status/gnss/log/OTA STM32 зарезервированы до v0.3 |
+| IPC STM32 ↔ nRF52840 | 1 | Версия в PING/PONG (addendum C.3) |
 
 Названия `protocol v1.3` в комментариях старого compact-CBOR кода обозначают
 историческую редакцию payload. Текущий detection использует `schema_ver=4`,
