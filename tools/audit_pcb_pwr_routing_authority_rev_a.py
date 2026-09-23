@@ -421,8 +421,8 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
     trace_items = len(board.traceItems)
     copper_zones = len(board.zones)
     require((trace_items, copper_zones) in
-            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2)},
-            "routing authority does not cover copper beyond accepted hot-loop 006")
+            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2)},
+            "routing authority does not cover copper beyond accepted shunt-bulk 007")
 
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
     require(baseline["input"]["actual_battery_bms_limits_frozen"] is False and

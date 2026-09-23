@@ -46,6 +46,7 @@ MOUNTING_COPPER_EXCLUSION_RADIUS_MM = 4.0
 MOUNTING_FITTED_EXCLUSION_RADIUS_MM = 5.0
 ECO_002_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
 HOT_LOOP_006_SHA256 = "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
+SHUNT_BULK_007_SHA256 = "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b"
 ECO_002_POSES = {
     "U3": (55.0, 14.0, 90.0),
     "U4": (55.0, 42.0, 90.0),
@@ -299,7 +300,7 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
         footprint = footprints[ref]
         expected = (
             ECO_002_POSES[ref]
-            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256} and ref in ECO_002_POSES
+            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256} and ref in ECO_002_POSES
             else (float(row["X_mm"]), float(row["Y_mm"]),
                   float(row["Rotation_deg"]) % 360.0)
         )
@@ -376,8 +377,8 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
                     })
 
     require((len(board.traceItems), len(board.zones)) in
-            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2)},
-            "PCB-PWR copper exceeds the accepted hot-loop 006 successor boundary")
+            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2)},
+            "PCB-PWR copper exceeds the accepted shunt-bulk 007 successor boundary")
 
     minimum = min(observed)
     passed = (not findings and not mounting_body_findings and

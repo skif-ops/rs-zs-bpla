@@ -38,11 +38,14 @@ hole-wall plating 18 µm and ENIG.
 The historical ECO-002 board has 14 accepted F.Cu trace items, zero vias and
 zero zones; its ECO-002 commit-bound application gate passed at CI #692,
 PCB-PWR Schematic #103 and PCB Native
-#357. The authoritative successor now exactly matches accepted hot-loop
-candidate 006: 35 trace items (including eight 0.60/0.30 mm vias) and two
-bounded In1.Cu local return zones. Its commit-bound application gate passes
+#357. The accepted hot-loop candidate 006 has 35 trace items (including eight
+0.60/0.30 mm vias) and two bounded In1.Cu local return zones. Its commit-bound application gate passes
 at CI #715 and PCB Native #364 (KiCad 9 DRC 85 → 85; unconnected 117 → 108;
-zero DRC fingerprint delta). Via-current and via-under-pad fabrication
+zero DRC fingerprint delta). The authoritative successor now exactly matches
+accepted shunt-to-bulk candidate 007, adding only two F.Cu `VBAT_SYS` segments
+from `RSH1.2` to `C13.1` for 37 total trace items. Its candidate gate passed at
+CI #720 and PCB Native #367 (85 → 85 violations; unconnected 108 → 107); the
+separate application gate is pending. Via-current and via-under-pad fabrication
 qualification, physical
 +70 °C first-article validation and all other routing remain open. The
 numeric overlay uses a deliberately conservative 35 µm / 10 °C-rise engineering
@@ -55,7 +58,7 @@ rail-drop/load-step checks and +70 °C evidence.
 
 The machine status binds a UUID/order-independent semantic board digest covering
 the layer stack, outline, complete footprint placement, pad/net assignment and
-the exact bounded eight-segment routing state. The audit still reports the raw file SHA-256 for evidence, but
+the exact bounded routing state. The audit still reports the raw file SHA-256 for evidence, but
 does not mistake KiCad-generated UUID/order changes for an electrical or layout
 change.
 

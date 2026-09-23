@@ -12,11 +12,12 @@ from kiutils.board import Board
 
 import audit_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a as proposal_audit
 from audit_pcb_pwr_routing_authority_rev_a import semantic_board_sha256
-from pcb_pwr_hot_loop_006_board import is_exact_application
+from pcb_pwr_hot_loop_006_board import hot_loop_application_board, is_exact_application
+from run_pcb_pwr_hot_loop_006_historical_candidate_audit import historical_candidate_audit
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BOARD = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
+BOARD = hot_loop_application_board(ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb")
 APPROVAL = ROOT / "hardware/reviews/PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_APPROVAL_REV_A.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_APPLICATION_REV_A.json"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
@@ -29,7 +30,7 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
     board = Board.from_file(str(BOARD), encoding="utf-8")
     assert semantic_board_sha256(board) == proposal_audit.CANDIDATE_SEMANTIC_SHA256
     assert len(board.traceItems) == 35 and len(board.zones) == 2
-    proposal = proposal_audit.audit()
+    proposal = historical_candidate_audit()
     assert proposal["status"] == "PASS_STATIC_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE"
     approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
     application = json.loads(APPLICATION.read_text(encoding="utf-8"))

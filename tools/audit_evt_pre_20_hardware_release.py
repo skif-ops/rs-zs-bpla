@@ -430,7 +430,7 @@ def audit() -> dict[str, object]:
         and pwr_clearance_summary.get("mounting_holes") == 4
         and pwr_clearance_summary.get("mounting_to_fitted_body_conflicts") == 0
         and pwr_clearance_summary.get("mounting_to_existing_pad_conflicts") == 0
-        and pwr_clearance.get("board", {}).get("trace_items") == 35
+        and pwr_clearance.get("board", {}).get("trace_items") == 37
         and pwr_clearance.get("board", {}).get("copper_zones") == 2
         and pwr_clearance.get("manufacturing_release") is False
     )
@@ -447,7 +447,7 @@ def audit() -> dict[str, object]:
         "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN"
         and pwr_routing_authority.get("authority", {}).get("row_count") == 31
         and pwr_routing_authority.get("board", {}).get("net_count") == 31
-        and pwr_routing_authority.get("board", {}).get("trace_items") == 35
+        and pwr_routing_authority.get("board", {}).get("trace_items") == 37
         and pwr_routing_authority.get("board", {}).get("copper_zones") == 2
         and pwr_routing_authority.get("dim_003") ==
         "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED"
@@ -473,6 +473,20 @@ def audit() -> dict[str, object]:
         and pwr_hot_loop.get("manufacturing_release") is False,
         str(pwr_hot_loop.get("status", "MISSING")),
         "PCB-PWR hot-loop 006 application differs from the exact accepted board",
+    )
+    pwr_shunt_bulk = run_json_audit(
+        "audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py"
+    )
+    check(
+        "pcb_pwr_shunt_bulk_007_application",
+        pwr_shunt_bulk.get("status") ==
+        "PASS_EXACT_ACCEPTED_PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_APPLICATION"
+        and pwr_shunt_bulk.get("active_board_sha256") ==
+        "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b"
+        and pwr_shunt_bulk.get("routing_complete") is False
+        and pwr_shunt_bulk.get("manufacturing_release") is False,
+        str(pwr_shunt_bulk.get("status", "MISSING")),
+        "PCB-PWR shunt-bulk 007 application differs from the exact accepted board",
     )
 
     pwr_evt_routing_basis = run_json_audit(

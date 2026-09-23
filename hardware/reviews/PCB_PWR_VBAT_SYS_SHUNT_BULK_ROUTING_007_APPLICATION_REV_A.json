@@ -1,0 +1,28 @@
+{
+  "schema": "dioneya-pcb-pwr-vbat-sys-shunt-bulk-routing-007-application-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-VBAT-SYS-SHUNT-BULK-ROUTING-007",
+  "decision": "ACCEPT_PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_SUBGATE",
+  "approval_commit_sha": "0891cd4a9de71701ddedaa41d13d7ac340608407",
+  "approval_sha256": "ad5a6f459cd80eebac05d622e361b8e8ea9e9b453176f2f4dc454abc982a87db",
+  "predecessor_board_sha256": "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0",
+  "applied_board_sha256": "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b",
+  "applied_board_semantic_sha256": "a3f4e65be713c3ed2518ffab78b1adad2fc0cf7814e0069b50b08fbe64d8d613",
+  "exact_candidate_byte_identity": true,
+  "trace_items": 37,
+  "predecessor_trace_items": 35,
+  "added_segments": 2,
+  "added_vias": 0,
+  "added_zones": 0,
+  "routed_nets": ["VBAT_SYS"],
+  "connections": ["RSH1.2-C13.1"],
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+    "required_violations": [85, 85],
+    "required_unconnected": [108, 107],
+    "required_drc_fingerprint_delta": 0
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

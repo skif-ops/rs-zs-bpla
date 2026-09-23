@@ -13,7 +13,9 @@ import importlib
 import sys
 from pathlib import Path
 
-from pcb_pwr_hot_loop_006_board import PREDECESSOR, ROOT, is_exact_application
+from pcb_pwr_hot_loop_006_board import (
+    PREDECESSOR, ROOT, is_controlled_application_or_successor,
+)
 
 
 ALLOWED = {
@@ -46,7 +48,8 @@ def main() -> int:
         for flag in ("--base-output", "--output"):
             dest = Path(args[args.index(flag) + 1]).resolve()
             assert not dest.is_relative_to(ROOT), "historical regeneration must use temporary outputs"
-    assert is_exact_application(ACTIVE), "authoritative 006 board identity drift"
+    assert is_controlled_application_or_successor(ACTIVE), \
+        "authoritative 006/007 controlled board identity drift"
     assert hashlib.sha256(PREDECESSOR.read_bytes()).hexdigest() == PREDECESSOR_SHA
     module = importlib.import_module(module_name)
     if getattr(module, "SOURCE", None) == ACTIVE:
