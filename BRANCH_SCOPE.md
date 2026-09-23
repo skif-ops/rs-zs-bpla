@@ -54,8 +54,8 @@
 - PCB-PWR: `DIM-003` принят `18/18` для EVT; `JLC04161H-3313A`, 70/35 µm
   copper, минимум 18 µm hole wall и расчётная силовая геометрия приняты;
   точный power-stage ECO-002 применён, активны 14 trace items при zero
-  vias/zones; application gate ECO-002 ожидает свежего commit-bound прогона,
-  физическая +70 °C проверка и оставшаяся трассировка открыты;
+  vias/zones; application gate ECO-002 прошёл CI #692, PCB-PWR Schematic #103
+  и PCB Native #357, физическая +70 °C проверка и оставшаяся трассировка открыты;
 - PCB-MIC: стандартный двухслойный/PCBA процесс и все 9 инженерных строк
   приняты; first-panel bore inspection, CAM comparison, общий Review B и
   physical EVT открыты;

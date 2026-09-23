@@ -58,7 +58,9 @@ It is byte-identical to the accepted `PCB-PWR-BUCK-POWER-STAGE-ECO-002`
 candidate and contains exactly 14 accepted F.Cu trace items, zero vias and zero
 copper zones. Six unrelated predecessor traces are retained byte-for-byte, two
 former BOOT traces are replaced and eight reviewed BOOT/SW traces are added.
-The fresh commit-bound ECO-002 application gate remains pending.
+The fresh commit-bound ECO-002 application gate passed at source commit
+`a7af5d2f`, tree `58a64273`, CI #692, PCB-PWR Schematic #103 and PCB Native
+#357. This does not close remaining routing or any physical/release gate.
 
 ## Local input-capacitor placement evidence
 

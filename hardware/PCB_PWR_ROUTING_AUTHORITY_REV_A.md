@@ -37,8 +37,9 @@ hole-wall plating 18 µm and ENIG.
 
 The committed board has 14 accepted F.Cu trace items after exact power-stage
 ECO-002 application, with zero vias and zero copper zones. The predecessor
-`REV_GATE` application gate is closed; the ECO-002 commit-bound application gate,
-physical +70 °C first-article validation and all other routing remain open. The
+`REV_GATE` application gate is closed; the ECO-002 commit-bound application gate
+passed at CI #692, PCB-PWR Schematic #103 and PCB Native #357. Physical +70 °C
+first-article validation and all other routing remain open. The
 numeric overlay uses a deliberately conservative 35 µm / 10 °C-rise engineering
 screen: 4.0 mm for the 5 A input/primary return, 3.0 mm for 4 A rails/returns,
 2.1 mm for local 4 A switch nodes and 0.5 mm for the 0.3 A rail/return. It also

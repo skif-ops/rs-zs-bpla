@@ -740,6 +740,23 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR ECO-002 exact application boundary is missing",
     )
     require(
+        decisions["DEC-143"]["Status"] ==
+        "PASS_EXACT_BUCK_POWER_STAGE_ECO_002_APPLICATION_REMAINING_ROUTING_NEXT"
+        and "a7af5d2f" in decisions["DEC-143"]["Reason"]
+        and "58a64273" in decisions["DEC-143"]["Reason"]
+        and "CI 692" in decisions["DEC-143"]["Reason"]
+        and "PCB-PWR Schematic 103" in decisions["DEC-143"]["Reason"]
+        and "PCB Native 357" in decisions["DEC-143"]["Reason"]
+        and "violations 86 to 85" in decisions["DEC-143"]["Reason"]
+        and "unconnected 121 to 117" in decisions["DEC-143"]["Reason"]
+        and "zero new DRC fingerprint counts" in decisions["DEC-143"]["Reason"]
+        and "exact 14-trace ECO-002 state" in decisions["DEC-143"]["Impact"]
+        and "neither overall routing nor Review B CAM DFM physical plus70C validation or manufacturing complete"
+        in decisions["DEC-143"]["Impact"]
+        and "separate exact human gate" in decisions["DEC-143"]["Impact"],
+        "PCB-PWR ECO-002 application closure is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]
@@ -885,7 +902,8 @@ def validate_deliverable_register() -> None:
         and deliverables["HW-P-002"]["QG-2 техника"] == "OPEN"
         and "exact applied power-stage ECO-002 totals 14 trace items" in pwr_layout
         and "zero vias and zero copper zones" in pwr_layout
-        and "fresh commit-bound application gate" in pwr_layout
+        and "commit-bound application gate passed at CI 692 PCB-PWR Schematic 103 and PCB Native 357"
+        in pwr_layout
         and "remaining routing DRC CAM checkout DFM" in pwr_layout,
         "PCB-PWR deliverable does not match the active ECO-002 routing state",
     )
@@ -988,6 +1006,8 @@ def validate_deliverable_register() -> None:
         and "six retained predecessor traces" in risks["R-034"]["Mitigation"]
         and "eight replacement or new BOOT and SW traces"
         in risks["R-034"]["Mitigation"]
+        and "passed commit-bound application evidence at a7af5d2f"
+        in risks["R-034"]["Mitigation"]
         and "physical plus70C first-article" in risks["R-034"]["Mitigation"]
         and "change outside the accepted 14 trace items"
         in risks["R-034"]["Trigger"]
@@ -1089,7 +1109,7 @@ def validate_hardware_baseline() -> None:
     require("Do not reintroduce" in kicad_readme and "BQ24650/CN3791" in kicad_readme, "obsolete charger prohibition is missing")
     require(
         "exactly 14 accepted trace items" in kicad_readme
-        and "ECO-002 commit-bound application gate is pending" in kicad_readme,
+        and "ECO-002 commit-bound application gate passed at CI #692" in kicad_readme,
         "KiCad overview does not match the active PCB-PWR ECO-002 successor",
     )
     active_pwr_docs = {

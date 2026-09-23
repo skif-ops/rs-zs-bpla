@@ -130,8 +130,9 @@ envelopes and physical thermal/current-density evidence remain open. The active
 board contains exactly 14 accepted trace items after exact power-stage ECO-002
 application, with zero vias and zero copper zones. The predecessor `REV_GATE`
 routing 004 application gate is closed; the ECO-002 commit-bound application
-gate, physical +70 °C first-article validation, all remaining routing, DRC, CAM,
-checkout DFM and Review B are open.
+gate passed at CI #692, PCB-PWR Schematic #103 and PCB Native #357. Physical
++70 °C first-article validation, all remaining routing, DRC, CAM, checkout DFM
+and Review B are open.
 
 PCB-PWR is no longer a one-page label-only capture. Its native project now has a
 system overview and four bounded functional child sheets for input protection and

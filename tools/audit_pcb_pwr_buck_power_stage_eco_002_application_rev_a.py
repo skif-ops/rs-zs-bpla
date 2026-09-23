@@ -77,25 +77,25 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and application["zones"] == 0
         and application["pad_geometry_or_nets_changed"] is False
         and application["drc_rules_relaxed"] is False
-        and gate["status"] == "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE"
+        and gate["status"] in {
+            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+        }
         and gate["required_violations"] == [86, 85]
         and gate["required_unconnected"] == [121, 117]
         and gate["required_new_drc_fingerprint_counts"] == 0
-        and gate["comparative_drc"] ==
-        "PENDING_EXACT_86_TO_85_VIOLATIONS_121_TO_117_UNCONNECTED_ZERO_NEW_FINGERPRINT_COUNTS"
-        and all(gate[key] is None for key in (
-            "application_source_commit_sha", "application_source_tree_sha",
-            "board_application_commit_sha", "ci_run_number", "ci_run_id",
-            "pcb_pwr_schematic_run_number", "pcb_pwr_schematic_run_id",
-            "pcb_native_run_number", "pcb_native_run_id", "pcb_native_job_id",
-            "artifact_id", "artifact_digest", "evidence_sha256",
-        ))
+        and gate["comparative_drc"] in {
+            "PENDING_EXACT_86_TO_85_VIOLATIONS_121_TO_117_UNCONNECTED_ZERO_NEW_FINGERPRINT_COUNTS",
+            "PASS_86_TO_85_VIOLATIONS_121_TO_117_UNCONNECTED_ZERO_NEW_FINGERPRINT_COUNTS",
+        }
         and application["physical_plus70c_first_article_validation_required"] is True
         and application["routing_complete"] is False
         and application["review_b_complete"] is False
         and application["cam_or_manufacturing_release"] is False
-        and route["status"] ==
-        "APPROVED_APPLIED_EXACT_BUCK_POWER_STAGE_ECO_002_APPLICATION_GATE_PENDING"
+        and route["status"] in {
+            "APPROVED_APPLIED_EXACT_BUCK_POWER_STAGE_ECO_002_APPLICATION_GATE_PENDING",
+            "APPROVED_APPLIED_EXACT_BUCK_POWER_STAGE_ECO_002_COMMIT_BOUND_KICAD9_GATE_PASS",
+        }
         and route["application"] ==
         "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_APPLICATION_REV_A.json"
         and route["application_generator"] ==
@@ -107,8 +107,10 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and route["exact_candidate_byte_identity"] is True
         and route["human_acceptance_complete"] is True
         and route["application_authorized"] is True
-        and route["application_machine_gate"] ==
-        "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE"
+        and route["application_machine_gate"] in {
+            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+        }
         and route["authoritative_board_modified"] is True
         and route["physical_plus70c_first_article_validation_required"] is True
         and route["routing_complete"] is False
@@ -116,6 +118,67 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and route["manufacturing_release"] is False,
         "ECO-002 application boundary drift",
     )
+
+    if gate["status"] == "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE":
+        require(
+            all(gate[key] is None for key in (
+                "application_source_commit_sha", "application_source_tree_sha",
+                "board_application_commit_sha", "ci_run_number", "ci_run_id",
+                "pcb_pwr_schematic_run_number", "pcb_pwr_schematic_run_id",
+                "pcb_native_run_number", "pcb_native_run_id", "pcb_native_job_id",
+                "artifact_id", "artifact_digest", "evidence_sha256",
+            )),
+            "ECO-002 pending application evidence drift",
+        )
+    else:
+        require(
+            gate["application_source_commit_sha"] ==
+            "a7af5d2f97eecf808fb0a77a5fa3b64298325f9e"
+            and gate["application_source_tree_sha"] ==
+            "58a6427321743cee9d058334a0633d8ceb73e54d"
+            and gate["board_application_commit_sha"] ==
+            "a7af5d2f97eecf808fb0a77a5fa3b64298325f9e"
+            and gate["ci_run_number"] == 692
+            and gate["ci_run_id"] == 35849523830
+            and gate["pcb_pwr_schematic_run_number"] == 103
+            and gate["pcb_pwr_schematic_run_id"] == 35849523844
+            and gate["pcb_native_run_number"] == 357
+            and gate["pcb_native_run_id"] == 35849523837
+            and gate["pcb_native_job_id"] == 107143618435
+            and gate["artifact_id"] == 10745137503
+            and gate["artifact_digest"] ==
+            "sha256:b0e5c96907df563d2dc7a95f2d660e6b2a6238d3ebe9965ad0e499a7e2dc86f6"
+            and gate["evidence_sha256"] == {
+                "application_audit.json":
+                "a46c3f48499135e82ec0070a70afbad51073b49da82322e11b565c2981e9c09e",
+                "baseline_drc.json":
+                "e33b98aeb85fbde952e97b5ffe53adb26c13f31fad3742fa7e97e4fabef56524",
+                "candidate_drc.json":
+                "967df782d2fdd67f42d725413e0dea49421dd17d15bfd9079774426aca7c0d04",
+                "comparative_audit.json":
+                "80606b1ba92e5c0d26ecf2f26fd38d2065bb352578cfdca5f8fcfdfc37404986",
+            }
+            and route["status"] ==
+            "APPROVED_APPLIED_EXACT_BUCK_POWER_STAGE_ECO_002_COMMIT_BOUND_KICAD9_GATE_PASS"
+            and route["application_machine_gate"] ==
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE"
+            and route["application_source_commit_sha"] ==
+            gate["application_source_commit_sha"]
+            and route["application_source_tree_sha"] ==
+            gate["application_source_tree_sha"]
+            and route["application_board_commit_sha"] ==
+            gate["board_application_commit_sha"]
+            and route["application_ci_run_number"] == gate["ci_run_number"]
+            and route["application_pcb_pwr_schematic_run_number"] ==
+            gate["pcb_pwr_schematic_run_number"]
+            and route["application_pcb_native_run_number"] ==
+            gate["pcb_native_run_number"]
+            and route["application_artifact_id"] == gate["artifact_id"]
+            and route["application_artifact_digest"] ==
+            gate["artifact_digest"]
+            and route["application_comparative_drc"] == gate["comparative_drc"],
+            "ECO-002 commit-bound application evidence drift",
+        )
 
     report: dict[str, object] = {
         "status": "PASS_EXACT_ACCEPTED_PCB_PWR_BUCK_POWER_STAGE_ECO_002_APPLICATION",
