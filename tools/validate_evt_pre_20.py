@@ -688,6 +688,44 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR ECO-002 silkscreen-reference remediation boundary is missing",
     )
     require(
+        decisions["DEC-140"]["Status"] ==
+        "PASS_COMMIT_BOUND_KICAD9_GATE_HUMAN_SUBGATE_PENDING"
+        and "75363101" in decisions["DEC-140"]["Reason"]
+        and "978d4ac9" in decisions["DEC-140"]["Reason"]
+        and "CI 678" in decisions["DEC-140"]["Reason"]
+        and "PCB-PWR Schematic 101" in decisions["DEC-140"]["Reason"]
+        and "PCB Native 355" in decisions["DEC-140"]["Reason"]
+        and "violations 86 to 85" in decisions["DEC-140"]["Reason"]
+        and "unconnected items 121 to 117" in decisions["DEC-140"]["Reason"]
+        and "zero new DRC fingerprint counts" in decisions["DEC-140"]["Reason"]
+        and "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
+        in decisions["DEC-140"]["Impact"]
+        and "keep the authoritative PCB-PWR board unchanged"
+        in decisions["DEC-140"]["Impact"]
+        and "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE"
+        in decisions["DEC-140"]["Impact"],
+        "PCB-PWR ECO-002 machine-gate closure is missing",
+    )
+    require(
+        decisions["DEC-141"]["Status"] ==
+        "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE_APPLICATION_PENDING"
+        and "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE"
+        in decisions["DEC-141"]["Reason"]
+        and "44bbcd77" in decisions["DEC-141"]["Reason"]
+        and "CI 678" in decisions["DEC-141"]["Reason"]
+        and "PCB-PWR Schematic 101" in decisions["DEC-141"]["Reason"]
+        and "PCB Native 355" in decisions["DEC-141"]["Reason"]
+        and "move U3 U4 C4 C6 C20 C21 L1 and L2"
+        in decisions["DEC-141"]["Impact"]
+        and "eight reviewed F.Cu BOOT and SW segments"
+        in decisions["DEC-141"]["Impact"]
+        and "only C4 C6 R2 silkscreen reference anchors"
+        in decisions["DEC-141"]["Impact"]
+        and "fresh commit-bound application gate" in decisions["DEC-141"]["Impact"]
+        and "do not authorize production EVT" in decisions["DEC-141"]["Impact"],
+        "PCB-PWR ECO-002 exact acceptance boundary is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]

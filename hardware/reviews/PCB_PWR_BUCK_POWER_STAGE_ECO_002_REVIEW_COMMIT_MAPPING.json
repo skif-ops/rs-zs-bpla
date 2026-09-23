@@ -1,0 +1,45 @@
+{
+  "schema": "dioneya-pcb-pwr-buck-power-stage-eco-002-review-mapping-v1",
+  "proposal_id": "PCB-PWR-BUCK-POWER-STAGE-ECO-002",
+  "reviewed_commit_sha": "753631012b5b20a46452998e9ad46502e3e1e4e1",
+  "reviewed_tree_sha": "978d4ac932f8b8deeb965b595a226ab8e3e6cae8",
+  "candidate_sha256": "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c",
+  "candidate_semantic_sha256": "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555",
+  "ci_run_number": 678,
+  "ci_run_id": 35825148575,
+  "pcb_pwr_schematic_run_number": 101,
+  "pcb_pwr_schematic_run_id": 35825148553,
+  "pcb_native_run_number": 355,
+  "pcb_native_run_id": 35825148569,
+  "pcb_native_job_id": 107065142085,
+  "artifact_id": 10735196330,
+  "artifact_digest": "sha256:f56da044252faf9f85587605d249c594f47dd8ca1cb0ad245283843526b0cd8c",
+  "comparative_drc": {
+    "status": "PASS_NO_NEW_DRC_FINGERPRINT_COUNTS_EXACT_FOUR_CONNECTION_REDUCTION",
+    "base_violations": 86,
+    "candidate_violations": 85,
+    "base_unconnected": 121,
+    "candidate_unconnected": 117,
+    "new_drc_fingerprint_counts": 0,
+    "removed_drc_fingerprint_counts": 1,
+    "silk_over_copper": [
+      38,
+      37
+    ],
+    "silk_overlap": [
+      14,
+      14
+    ]
+  },
+  "human_gate": {
+    "status": "ACCEPTED",
+    "accept_value": "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE",
+    "reviewer": "Скиф",
+    "decision_date": "2026-09-23"
+  },
+  "authoritative_board_modified": false,
+  "application_authorized": true,
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

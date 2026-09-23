@@ -31,6 +31,8 @@ BASE = CANDIDATE_DIR / "PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb"
 CANDIDATE = CANDIDATE_DIR / "PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb"
 ACTIVE = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 REVIEW = ROOT / "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.json"
+REVIEW_MAPPING = ROOT / "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_REVIEW_COMMIT_MAPPING.json"
+APPROVAL = ROOT / "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_APPROVAL_REV_A.json"
 GENERATOR = ROOT / "tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py"
 ROUTING_RULES = ROOT / "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv"
 STACKUP_BASIS = ROOT / "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json"
@@ -44,6 +46,7 @@ GENERATOR_SHA256 = "e4ab7290920f0b8c6f229e4701d2b82b78dc7638465a552d664221692ad4
 ROUTING_RULES_SHA256 = "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988"
 STACKUP_BASIS_SHA256 = "41733d7d27e2c3ab831e602ee81b072146944da0a5efe8a2c805eeed46ecd1ca"
 CURRENT_BASIS_SHA256 = "4cecbe529987146078ce233d600ed047495a50d1228407e94b0380f88ca56cb2"
+REVIEW_MAPPING_SHA256 = "66051f7c8f83f074e1447719dc37106b90f751d87a032e3d949a9551f0400658"
 
 EXPECTED_POSES = {
     "U3": ((55.0, 14.0, 0.0), (55.0, 14.0, 90.0)),
@@ -557,10 +560,12 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     thermal = current_screen()
 
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
+    mapping = json.loads(REVIEW_MAPPING.read_text(encoding="utf-8"))
+    approval = json.loads(APPROVAL.read_text(encoding="utf-8"))
     require(
         review["proposal_id"] == "PCB-PWR-BUCK-POWER-STAGE-ECO-002"
         and review["status"] ==
-        "PENDING_SILK_REFERENCE_REMEDIATION_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"
+        "KICAD9_COMPARATIVE_DRC_PASS_HUMAN_ACCEPTED_APPLICATION_PENDING"
         and review["base"]["sha256"] == BASE_SHA256
         and review["candidate"]["sha256"] == CANDIDATE_SHA256
         and review["candidate"]["trace_items"] == 14
@@ -617,17 +622,94 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         and review["pad_entry_disposition"]["physical_plus70c_validation_required"] is True
         and review["invariants"]["authoritative_board_modified"] is False
         and review["invariants"]["silkscreen_reference_anchors_changed"] == ["C4", "C6", "R2"]
-        and review["machine_gate"]["complete"] is False
-        and review["machine_gate"]["status"] == review["status"]
-        and review["human_gate"]["accepted"] is False
-        and review["application_authorized"] is False
+        and review["machine_gate"]["complete"] is True
+        and review["machine_gate"]["status"] ==
+        "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"
+        and review["machine_gate"]["mapping"] ==
+        "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_REVIEW_COMMIT_MAPPING.json"
+        and review["human_gate"]["accepted"] is True
+        and review["human_gate"]["decision"] ==
+        "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE"
+        and review["human_gate"]["reviewer"] == "Скиф"
+        and review["human_gate"]["decision_date"] == "2026-09-23"
+        and review["human_gate"]["approval"] ==
+        "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_APPROVAL_REV_A.json"
+        and review["application_authorized"] is True
         and review["manufacturing_release"] is False,
         "ECO-002 proposal boundary drift",
+    )
+    require(
+        sha256(REVIEW_MAPPING) == REVIEW_MAPPING_SHA256
+        and mapping["proposal_id"] == review["proposal_id"]
+        and mapping["reviewed_commit_sha"] ==
+        "753631012b5b20a46452998e9ad46502e3e1e4e1"
+        and mapping["reviewed_tree_sha"] ==
+        "978d4ac932f8b8deeb965b595a226ab8e3e6cae8"
+        and mapping["candidate_sha256"] == CANDIDATE_SHA256
+        and mapping["candidate_semantic_sha256"] == CANDIDATE_SEMANTIC_SHA256
+        and mapping["ci_run_number"] == 678
+        and mapping["ci_run_id"] == 35825148575
+        and mapping["pcb_pwr_schematic_run_number"] == 101
+        and mapping["pcb_pwr_schematic_run_id"] == 35825148553
+        and mapping["pcb_native_run_number"] == 355
+        and mapping["pcb_native_run_id"] == 35825148569
+        and mapping["pcb_native_job_id"] == 107065142085
+        and mapping["artifact_id"] == 10735196330
+        and mapping["artifact_digest"] ==
+        "sha256:f56da044252faf9f85587605d249c594f47dd8ca1cb0ad245283843526b0cd8c"
+        and mapping["comparative_drc"] == {
+            "status": "PASS_NO_NEW_DRC_FINGERPRINT_COUNTS_EXACT_FOUR_CONNECTION_REDUCTION",
+            "base_violations": 86,
+            "candidate_violations": 85,
+            "base_unconnected": 121,
+            "candidate_unconnected": 117,
+            "new_drc_fingerprint_counts": 0,
+            "removed_drc_fingerprint_counts": 1,
+            "silk_over_copper": [38, 37],
+            "silk_overlap": [14, 14],
+        }
+        and mapping["human_gate"]["status"] == "ACCEPTED"
+        and mapping["human_gate"]["accept_value"] ==
+        "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE"
+        and mapping["authoritative_board_modified"] is False
+        and mapping["application_authorized"] is True
+        and mapping["manufacturing_release"] is False,
+        "ECO-002 commit-bound review mapping drift",
+    )
+    require(
+        approval["proposal_id"] == review["proposal_id"]
+        and approval["reviewer"] == "Скиф"
+        and approval["decision_date"] == "2026-09-23"
+        and approval["decision"] ==
+        "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE"
+        and approval["decision_input"] == approval["decision"]
+        and approval["reviewed_github_commit_sha"] == mapping["reviewed_commit_sha"]
+        and approval["reviewed_tree_sha"] == mapping["reviewed_tree_sha"]
+        and approval["review_mapping_sha256"] == REVIEW_MAPPING_SHA256
+        and approval["reviewed_proposal_sha256"] ==
+        "cde73461c70b18d71002f5ea7c4f28ff8d9a03ccf9919d62a0cb9b62bd155eb3"
+        and approval["reviewed_proposal_record_sha256"] ==
+        "aede29883dc94211411121c0a992208b0bdc52e8afcaee0fd37da5b04c745738"
+        and approval["reviewed_candidate_board_sha256"] == CANDIDATE_SHA256
+        and approval["reviewed_candidate_semantic_sha256"] == CANDIDATE_SEMANTIC_SHA256
+        and approval["reviewed_generator_sha256"] == GENERATOR_SHA256
+        and approval["reviewed_audit_sha256"] ==
+        "ba6aa2bf1724740695636fa9984fbd2b4eeb1ee04f7066d1234653573c199ebb"
+        and approval["machine_gate"]["candidate_violations"] == 85
+        and approval["machine_gate"]["candidate_unconnected"] == 117
+        and approval["machine_gate"]["new_drc_fingerprint_counts"] == 0
+        and approval["authorization"]["apply_exact_hash_bound_buck_power_stage_candidate"] is True
+        and approval["authorization"]["expected_authoritative_predecessor_sha256"] == BASE_SHA256
+        and approval["authorization"]["authorized_applied_board_sha256"] == CANDIDATE_SHA256
+        and approval["authorization"]["routing_complete"] is False
+        and approval["authorization"]["review_b_complete"] is False
+        and approval["authorization"]["cam_or_manufacturing_release"] is False,
+        "ECO-002 exact approval identity or boundary drift",
     )
 
     report: dict[str, object] = {
         "status":
-            "PASS_STATIC_ECO_002_SILK_REFERENCE_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PENDING",
+            "PASS_ACCEPTED_ECO_002_EXACT_APPLICATION_PENDING",
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "candidate_semantic_sha256": CANDIDATE_SEMANTIC_SHA256,
@@ -642,7 +724,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         "pad_entry_current_screen": thermal,
         "candidate_005_superseded": True,
         "authoritative_board_modified": False,
-        "application_authorized": False,
+        "application_authorized": True,
         "physical_evt_validation_required": True,
         "manufacturing_release": False,
     }
@@ -650,7 +732,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
             "both comparative DRC paths are required together")
     if drc_base is not None and drc_candidate is not None:
         report["comparative_drc"] = audit_drc(drc_base, drc_candidate)
-        report["status"] = "PASS_COMMIT_BOUND_KICAD9_GATE_HUMAN_SUBGATE_PENDING"
+        report["status"] = "PASS_COMMIT_BOUND_KICAD9_GATE_ACCEPTED_APPLICATION_PENDING"
     return report
 
 

@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "proposal_id": "PCB-PWR-BUCK-POWER-STAGE-ECO-002",
   "creation_direction": "PROJECT_OWNER_ACCEPT_PCB_PWR_ECO_002_SILK_REMEDIATION_CREATION_SUBGATE",
-  "status": "PENDING_SILK_REFERENCE_REMEDIATION_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+  "status": "KICAD9_COMPARATIVE_DRC_PASS_HUMAN_ACCEPTED_APPLICATION_PENDING",
   "scope": "SYMMETRIC_DUAL_BUCK_PLACEMENT_BOOTSTRAP_AND_SWITCH_NODE_REMEDIATION",
   "supersedes_if_accepted": [
     "PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005",
@@ -204,8 +204,9 @@
     ]
   },
   "machine_gate": {
-    "complete": false,
-    "status": "PENDING_SILK_REFERENCE_REMEDIATION_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "complete": true,
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "mapping": "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_REVIEW_COMMIT_MAPPING.json",
     "required_unconnected": [
       121,
       117
@@ -214,9 +215,13 @@
     "candidate_violations_must_not_exceed_base": true
   },
   "human_gate": {
-    "accepted": false,
+    "accepted": true,
     "accept_value": "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE",
-    "reject_value": "REJECT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE"
+    "reject_value": "REJECT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE",
+    "decision": "ACCEPT_PCB_PWR_BUCK_POWER_STAGE_ECO_002_SUBGATE",
+    "reviewer": "Скиф",
+    "decision_date": "2026-09-23",
+    "approval": "hardware/reviews/PCB_PWR_BUCK_POWER_STAGE_ECO_002_APPROVAL_REV_A.json"
   },
   "deferred_boundary": {
     "vin_pgnd_hot_loop_and_return_copper": true,
@@ -226,7 +231,7 @@
     "job_dfm_and_cam": true,
     "plus70c_first_article_thermal_validation": true
   },
-  "application_authorized": false,
+  "application_authorized": true,
   "routing_complete": false,
   "review_b_complete": false,
   "manufacturing_release": false
