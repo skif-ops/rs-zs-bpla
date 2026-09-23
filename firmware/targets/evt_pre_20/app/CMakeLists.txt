@@ -79,7 +79,7 @@ target_compile_options(stm32u5_hal PRIVATE -Os -w)
 
 # ---- portable station core (host-proven modules) ----
 file(GLOB ZS_CORE_SOURCES ${ZS_FW_ROOT}/src/zs_*.c)
-list(FILTER ZS_CORE_SOURCES EXCLUDE REGEX "zs_dsp\\.c$|zs_fft\\.c$")   # double-precision host DSP: not for the target yet (plan B1)
+list(FILTER ZS_CORE_SOURCES EXCLUDE REGEX "zs_dsp\\.c$")   # double-precision host extractor stays on the host (zs_dsp_mcu on the target); zs_fft.c (float radix-2) serves the AIR gate
 add_library(zs_core_target STATIC ${ZS_CORE_SOURCES})
 target_include_directories(zs_core_target PUBLIC ${ZS_FW_ROOT}/include ${ZS_FW_ROOT}/generated ${ZS_TARGET_ROOT}/include)
 target_compile_options(zs_core_target PRIVATE -Os -Wall -Wextra -Wpedantic)
