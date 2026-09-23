@@ -64,6 +64,7 @@ add_library(stm32u5_hal STATIC
   ${HAL_SRC}/stm32u5xx_hal_icache.c
   ${HAL_SRC}/stm32u5xx_hal_exti.c
   ${HAL_SRC}/stm32u5xx_hal_ospi.c
+  ${HAL_SRC}/stm32u5xx_hal_rng.c
   ${HAL_SRC}/stm32u5xx_hal_timebase_tim_template.c
 )
 target_include_directories(stm32u5_hal PUBLIC
@@ -92,6 +93,7 @@ add_executable(dioneya_evt_pre_20.elf
   bsp_tim2_pps.c
   bsp_uart.c
   bsp_nor.c
+  bsp_rng.c
   tasks.c
   app_nrf_update.c
   hal_msp.c
