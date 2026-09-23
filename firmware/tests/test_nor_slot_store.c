@@ -193,17 +193,20 @@ static void test_layout_with_stores(void) {
   const uint32_t cap = 64u * 1024u * 1024u, blk = 4096u;
   assert(zs_nor_storage_layout_make(cap, blk, 16u, 256u, &v1));
   assert(zs_nor_storage_layout_make_stores(cap, blk, 16u, 256u, &v2));
-  assert(v2.capacity_bytes == cap && v2.stores_partition_bytes == 4u * blk);
-  assert(v2.outbox_base_address + v2.outbox_partition_bytes == v2.config_base_address);
+  const uint32_t stores = (2u + 2u + ZS_NOR_STORAGE_NRF_IMAGE_BLOCKS) * blk;
+  assert(v2.capacity_bytes == cap && v2.stores_partition_bytes == stores);
+  assert(v2.outbox_base_address + v2.outbox_partition_bytes == v2.nrf_image_base_address);
+  assert(v2.nrf_image_partition_bytes == ZS_NOR_STORAGE_NRF_IMAGE_BLOCKS * blk && v2.nrf_image_partition_bytes >= 472u * 1024u + blk);
+  assert(v2.nrf_image_base_address + v2.nrf_image_partition_bytes == v2.config_base_address);
   assert(v2.config_base_address + 2u * blk == v2.installation_base_address);
   assert(v2.installation_base_address + 2u * blk == cap);
-  assert(v2.config_base_address == v1.outbox_base_address + v1.outbox_partition_bytes - 4u * blk);
-  assert(v2.command_base_address == v1.command_base_address - 4u * blk);   /* everything below moves down by four blocks */
+  assert(v2.nrf_image_base_address == v1.outbox_base_address + v1.outbox_partition_bytes - stores);
+  assert(v2.command_base_address == v1.command_base_address - stores);   /* everything below moves down by the stores */
   assert(v2.archive.base_address == 0u && v2.archive.total_bytes == v2.command_base_address);
   assert(v1.config_base_address == 0u && v1.stores_partition_bytes == 0u); /* v1 map untouched */
-  assert(v2.config_base_address == 0x03ffc000u && v2.installation_base_address == 0x03ffe000u); /* W25Q512JV map, B3 */
-  printf("layout with stores ok (config @0x%08x installation @0x%08x)\n", v2.config_base_address, v2.installation_base_address);
-  assert(!zs_nor_storage_layout_make_stores(4u * blk, blk, 2u, 1u, &v2));  /* no room left for the archive */
+  assert(v2.nrf_image_base_address == 0x03f7c000u && v2.config_base_address == 0x03ffc000u && v2.installation_base_address == 0x03ffe000u); /* W25Q512JV map, B3 + C.6 */
+  printf("layout with stores ok (nrf image @0x%08x config @0x%08x installation @0x%08x)\n", v2.nrf_image_base_address, v2.config_base_address, v2.installation_base_address);
+  assert(!zs_nor_storage_layout_make_stores(stores + blk, blk, 2u, 1u, &v2));  /* no room left for the archive */
 }
 
 int main(void) {

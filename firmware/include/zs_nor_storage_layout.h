@@ -20,7 +20,11 @@ typedef struct {
   uint32_t outbox_base_address;
   uint32_t outbox_partition_bytes;
   zs_archive_layout_t archive;
-  /* B3 record stores (zs_nor_storage_layout_make_stores only): two erase blocks each, after the outbox. */
+  /* B3 record stores (zs_nor_storage_layout_make_stores only), after the outbox: the nRF52840 bridge image slot
+     (ZS_NOR_STORAGE_NRF_IMAGE_BLOCKS erase blocks, addendum C.6), then two erase blocks each for the station
+     configuration and the installation record. */
+  uint32_t nrf_image_base_address;
+  uint32_t nrf_image_partition_bytes;
   uint32_t config_base_address;
   uint32_t installation_base_address;
   uint32_t stores_partition_bytes;
@@ -63,13 +67,15 @@ bool zs_nor_storage_bind(zs_nor_storage_bindings_t *bindings,
                          zs_event_outbox_io_t *out_outbox_io);
 
 /*
- * B3 layout: the v1 map above plus four erase blocks at the very end of NOR for the
- * station configuration (2 slots) and the installation record (2 slots):
- *   archive | command journal | event outbox | config x2 | installation x2
+ * B3 layout: the v1 map above plus, at the very end of NOR, the nRF52840 bridge image slot
+ * (128 erase blocks: MCUboot's 472 KiB secondary slot plus one header block, addendum C.6) and
+ * four erase blocks for the station configuration (2 slots) and the installation record (2 slots):
+ *   archive | command journal | event outbox | nrf image | config x2 | installation x2
  * The v1 function and its addresses are untouched; targets that carry the record
  * stores in NOR call this one and zs_nor_storage_bind_stores.
  */
-#define ZS_NOR_STORAGE_STORE_BLOCKS (ZS_STATION_CONFIG_SLOT_COUNT + ZS_INSTALLATION_STORE_SLOT_COUNT)
+#define ZS_NOR_STORAGE_NRF_IMAGE_BLOCKS 128u
+#define ZS_NOR_STORAGE_STORE_BLOCKS (ZS_STATION_CONFIG_SLOT_COUNT + ZS_INSTALLATION_STORE_SLOT_COUNT + ZS_NOR_STORAGE_NRF_IMAGE_BLOCKS)
 
 bool zs_nor_storage_layout_make_stores(uint32_t capacity_bytes,
                                        uint32_t erase_block_bytes,

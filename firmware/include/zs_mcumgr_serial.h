@@ -59,18 +59,25 @@ typedef struct {
 void zs_mcumgr_decoder_init(zs_mcumgr_decoder_t *d);
 bool zs_mcumgr_decoder_feed(zs_mcumgr_decoder_t *d, uint8_t byte, const uint8_t **packet, size_t *len);
 
-/* Image upload client. */
+/* Image upload client. The image is read through a callback (NOR slot, zs_nor_image_store) or from memory. */
+typedef bool (*zs_mcumgr_image_read_fn)(void *ctx, size_t offset, uint8_t *dst, size_t len);
+
 typedef struct {
-  const uint8_t *image;
+  zs_mcumgr_image_read_fn read;
+  void *read_ctx;
+  const uint8_t *image;    /* in-memory source when read == NULL */
   size_t size, offset;
   uint8_t sha[32];
   uint8_t seq;
   uint8_t retries;         /* consecutive rejected/mismatched replies */
   bool done, failed;
   int last_rc;
+  uint8_t chunk[ZS_MCUMGR_UPLOAD_CHUNK];
 } zs_mcumgr_upload_t;
 
 void zs_mcumgr_upload_init(zs_mcumgr_upload_t *u, const uint8_t *image, size_t size);
+/* Reader-based source; sha256 must be the digest of the whole image (the NOR slot header carries it). */
+void zs_mcumgr_upload_init_reader(zs_mcumgr_upload_t *u, zs_mcumgr_image_read_fn read, void *ctx, size_t size, const uint8_t sha256[32]);
 /* Next upload request as serial frames (0 when done/failed or out of space). */
 size_t zs_mcumgr_upload_request(zs_mcumgr_upload_t *u, uint8_t *serial, size_t cap);
 /* Feeds a decoded reply packet; returns false when the reply is not an upload reply for the outstanding request. */

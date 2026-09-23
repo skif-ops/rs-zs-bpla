@@ -151,12 +151,20 @@ void zs_mcumgr_upload_init(zs_mcumgr_upload_t *u, const uint8_t *image, size_t s
   zs_sha256_digest(image, size, u->sha);
 }
 
+void zs_mcumgr_upload_init_reader(zs_mcumgr_upload_t *u, zs_mcumgr_image_read_fn read, void *ctx, size_t size, const uint8_t sha256[32]) {
+  memset(u, 0, sizeof(*u));
+  u->read = read; u->read_ctx = ctx; u->size = size;
+  memcpy(u->sha, sha256, 32u);
+}
+
 size_t zs_mcumgr_upload_request(zs_mcumgr_upload_t *u, uint8_t *serial, size_t cap) {
-  if (!u || u->done || u->failed || !u->image) return 0u;
+  if (!u || u->done || u->failed || (!u->image && !u->read)) return 0u;
   uint8_t cbor[ZS_MCUMGR_PACKET_MAX], pkt[ZS_MCUMGR_PACKET_MAX];
   zs_cbor_t c; zs_cbor_init(&c, cbor, sizeof(cbor));
   size_t n = u->size - u->offset;
   if (n > ZS_MCUMGR_UPLOAD_CHUNK) n = ZS_MCUMGR_UPLOAD_CHUNK;
+  const uint8_t *src = u->image ? u->image + u->offset : u->chunk;
+  if (!u->image && !u->read(u->read_ctx, u->offset, u->chunk, n)) { u->failed = true; return 0u; }
   if (u->offset == 0u) {
     zs_cbor_map(&c, 5u);
     zs_cbor_text(&c, "image"); zs_cbor_uint(&c, 0u);
@@ -166,7 +174,7 @@ size_t zs_mcumgr_upload_request(zs_mcumgr_upload_t *u, uint8_t *serial, size_t c
     zs_cbor_map(&c, 2u);
   }
   zs_cbor_text(&c, "off"); zs_cbor_uint(&c, u->offset);
-  zs_cbor_text(&c, "data"); zs_cbor_bytes(&c, u->image + u->offset, n);
+  zs_cbor_text(&c, "data"); zs_cbor_bytes(&c, src, n);
   if (c.error) { u->failed = true; return 0u; }
   const size_t plen = zs_mcumgr_smp_build(ZS_MCUMGR_OP_WRITE, ZS_MCUMGR_GROUP_IMAGE, ZS_MCUMGR_IMAGE_ID_UPLOAD, u->seq, cbor, c.len, pkt, sizeof(pkt));
   return plen ? zs_mcumgr_frame_encode(pkt, plen, serial, cap) : 0u;
