@@ -239,6 +239,7 @@ def cmd_station_package(a):
         "ca_reference": bundle["ca_reference"], "topic_prefix": "zs/v1",
         "cert_not_after": r.cert_not_after,
         "pairing_secret_b32": reg.ensure_pairing_secret(a.serial),
+        "engineer_key_hex": reg.ensure_engineer_key(a.serial),
     }, indent=2))
     print(f"station package for {a.serial} written to {out} (private key is NOT included by design)")
 
@@ -323,6 +324,24 @@ def cmd_nrf_boot_key(a):
     print(f'build: west build -b evt_pre_20_ble firmware/targets/nrf52840_ble -- -DSB_CONFIG_BOOT_SIGNATURE_KEY_FILE=\\"{k.key_path.as_posix()}\\"')
 
 
+def cmd_engineer_key(a):
+    """B.9 engineer key of one station for the engineer's app (audited export) or a rotation."""
+    reg = _registry(Path(a.pki))
+    if a.rotate:
+        key = reg.rotate_engineer_key(a.serial, a.rotate)
+        print(f"engineer key of {a.serial} rotated; reload the station package and re-issue to the engineers")
+    else:
+        key = reg.ensure_engineer_key(a.serial)
+        reg.audit_engineer_key_export(a.serial, a.to)
+    if a.out:
+        out = Path(a.out)
+        out.mkdir(parents=True, exist_ok=True)
+        (out / f"{a.serial}.engineer-key.json").write_text(json.dumps({"serial": a.serial, "engineer_key_hex": key, "context": "DIO-ROLE-V1"}, indent=2))
+        print(f"written {out / (a.serial + '.engineer-key.json')} (hand it to {a.to} out of band, never on the label)")
+    else:
+        print(key)
+
+
 def cmd_pairing_secret_rotate(a):
     reg = _registry(Path(a.pki))
     reg.rotate_pairing_secret(a.serial, a.reason)
@@ -387,6 +406,8 @@ def main(argv=None):
     s.add_argument("--topic-prefix", default="zs/v1"); s.add_argument("--png", action="store_true")
     s = add("nrf-boot-key", cmd_nrf_boot_key, help="create (or --show) the MCUboot signing key for the nRF52840 bridge images")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--force", action="store_true"); s.add_argument("--show", action="store_true")
+    s = add("engineer-key", cmd_engineer_key, help="B.9 engineer key of a station: print/export (audited) or --rotate <reason>")
+    s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--to", default="engineer"); s.add_argument("--out"); s.add_argument("--rotate")
     s = add("pairing-secret-rotate", cmd_pairing_secret_rotate, help="generate a new label secret for a station (reprint + reload)")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--reason", required=True)
     s = add("list", cmd_list, help="list stations");                                           s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--lot"); s.add_argument("--status")
