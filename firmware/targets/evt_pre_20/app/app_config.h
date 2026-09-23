@@ -32,7 +32,7 @@
 #define APP_UART_CONSOLE_BAUD        115200u   /* LPUART1 PC0/PC1 diagnostic console */
 #define APP_UART_RX_RING             512u
 
-/* NOR map (zs_nor_storage_layout_make_stores): archive | command journal | event outbox | config x2 | installation x2. */
+/* NOR map (zs_nor_storage_layout_make_stores): archive | command journal | event outbox | nrf image | config x2 | installation x2. */
 #define APP_NOR_COMMAND_SLOTS        16u
 #define APP_NOR_OUTBOX_SLOTS         256u
 
@@ -49,7 +49,7 @@
 #define APP_STACK_SUPERVISOR         768
 #define APP_STACK_COMMS              1536
 #define APP_STACK_SERVICE            768
-#define APP_STACK_CONSOLE            512
+#define APP_STACK_CONSOLE            1024     /* nrfimg: NOR erase/verify and printf on the console stack */
 #define APP_PRIO_BLE                 3
 #define APP_STACK_BLE                1024
 
