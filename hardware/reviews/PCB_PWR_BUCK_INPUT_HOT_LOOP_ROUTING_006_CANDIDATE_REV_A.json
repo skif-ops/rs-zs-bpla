@@ -103,9 +103,13 @@
     "comparative_drc": "PASS_85_TO_85_VIOLATIONS_117_TO_108_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA"
   },
   "human_gate_after_machine_pass": {
+    "status": "ACCEPTED",
+    "reviewer": "Скиф",
+    "decision_date": "2026-09-23",
     "accept_value": "ACCEPT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE",
     "reject_value": "REJECT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE"
   },
+  "application_authorized": true,
   "routing_complete": false,
   "review_b_complete": false,
   "cam_or_manufacturing_release": false
