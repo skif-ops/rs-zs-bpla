@@ -1,7 +1,7 @@
 # ICD BLE v0.1 — Addendum C: межпроцессорный протокол STM32U585 ↔ nRF52840
 
 Статус: `IMPLEMENTED 2026-09-22 — portable core + host tests (firmware/tests/test_ble_bridge.c) + STM32 app task +
-nRF52840 application (Zephyr, firmware/targets/nrf52840_ble, плата evt_pre_20_ble); C.6 — MCUboot recovery path, STM32 mcumgr client — следующий шаг`.
+nRF52840 application (Zephyr, firmware/targets/nrf52840_ble, плата evt_pre_20_ble); C.6 — MCUboot recovery path (sysbuild) + STM32 mcumgr client (zs_mcumgr_serial, host-tested) — console `nrfupd` and image storage — следующий шаг`.
 
 ## C.1 Роли
 
@@ -67,9 +67,12 @@ CRC‑16/CCITT‑FALSE по `type..payload` (то же семейство, чт�
    open‑drain, active LOW) → 20 мс → `BLE_EN` ↑ → MCUboot стартует, видит LOW на P0.15 (`CONFIG_BOOT_SERIAL_ENTRANCE_GPIO`,
    задержка обнаружения 50 мс) и остаётся в serial recovery на `uart0` → через 500 мс STM32 отпускает `BLE_DFU_REQ`
    (`bledfu` в консоли B1). Без запроса MCUboot проверяет подпись `slot0` и запускает приложение.
-3. В recovery STM32 — клиент mcumgr SMP по UART (кадры «06 09» + base64 + CRC16, как в `mcumgr` serial transport):
-   `image upload` в `slot1` частями ≤ 512 байт, затем `image test` (или `confirm`) и `reset`. Эта клиентская часть на
-   STM32 (`zs_mcumgr_serial`) — отдельный портируемый модуль с хост‑тестом против серверной реализации в Zephyr.
+3. В recovery STM32 — клиент mcumgr SMP по UART: `firmware/src/zs_mcumgr_serial.c` (кадры «06 09»/«04 14» + base64 +
+   CRC‑16/XMODEM, строки ≤ 127 байт; SMP‑заголовок 8 байт; `image upload` частями по 384 байта в пакетах ≤ 512 байт с
+   `len`/`sha` в первом запросе, ответ `{rc, off}` — клиент продолжает с `off`, который сообщил модуль, потерянный или
+   искажённый ответ просто ведёт к повтору; затем `os reset`). Хост‑тест `firmware/tests/test_mcumgr_serial.c` гоняет
+   клиента против имитации `boot_serial` (образ 64 КиБ за 171 запрос, потерянный и искажённый ответы, сброс).
+   MCUboot помечает загруженный образ pending, `image test/confirm` не нужен.
 4. MCUboot (swap‑using‑move) переносит образ в `slot0` и запускает его в режиме «test». Приложение подтверждает себя
    (`boot_write_img_confirmed`) только после первого `IDENTITY_SET` от STM32 — то есть когда IPC реально работает.
    Образ, который не заговорил с STM32, откатывается MCUboot при следующем сбросе (STM32 делает сброс по `BLE_EN`, если
