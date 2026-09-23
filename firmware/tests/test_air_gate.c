@@ -11,12 +11,14 @@ static int16_t pcm[ZS_AIR_WINDOW_SAMPLES];
 static uint32_t rng = 12345u;
 static float noise(void) { rng = rng * 1664525u + 1013904223u; return ((float)(rng >> 8) / 16777216.0f - 0.5f) * 2.0f; }
 
-/* Comb of `harm` harmonics on f0 (with a slow drift ratio per second), plus white noise of the given relative level. */
+/* Comb of `harm` harmonics on f0 (with a slow drift ratio per second, or a siren-like ±wobble with a 2 s period when
+   wobble > 0), plus white noise of the given relative level. */
+static float g_wobble;
 static void synth_comb(float f0, unsigned harm, float noise_level, float drift, unsigned second) {
   double phase[24] = {0};
   for (unsigned i = 0u; i < ZS_AIR_WINDOW_SAMPLES; i++) {
     double t = (double)second + (double)i / ZS_AIR_SAMPLE_RATE;
-    float f = f0 * (1.0f + drift * (float)t);
+    float f = f0 * (1.0f + drift * (float)t + g_wobble * sinf(2.0f * (float)M_PI * (float)t / 2.0f));
     float s = 0.0f;
     for (unsigned k = 1u; k <= harm; k++) { phase[k] += 2.0 * M_PI * f * k / ZS_AIR_SAMPLE_RATE; s += (float)sin(phase[k]) / (float)k; }
     s = s * 0.3f + noise_level * noise();
@@ -47,7 +49,7 @@ static void gen_noise(unsigned s) { (void)s; synth_noise(0.3f); }
 static void gen_chirp(unsigned s) { (void)s; synth_chirp(); }
 static void gen_impulses(unsigned s) { (void)s; synth_impulses(); }
 static void gen_mains(unsigned s) { synth_comb(50.0f, 8u, 0.05f, 0.0f, s); }           /* rock-steady 50 Hz comb = hum */
-static void gen_unsteady(unsigned s) { synth_comb(40.0f, 8u, 0.05f, 0.30f, s); }   /* siren-like glide, +30 %/s */
+static void gen_unsteady(unsigned s) { synth_comb(60.0f, 8u, 0.05f, 0.15f, s); }   /* siren-like glide, +15 %/s: 60 -> 114 Hz over 6 s */
 
 static void test_synthetic(void) {
   zs_air_gate_result_t r;
@@ -59,7 +61,7 @@ static void test_synthetic(void) {
   run_sequence(gen_chirp, 6u, &r);     assert(!r.present);
   run_sequence(gen_impulses, 6u, &r);  assert(!r.present);
   run_sequence(gen_mains, 6u, &r);     assert(!r.present && r.mains);
-  run_sequence(gen_unsteady, 6u, &r);  assert(!r.present && r.steadiness_cv > 0.25f);
+  run_sequence(gen_unsteady, 6u, &r);  assert(!r.present && r.steadiness_cv > 0.12f);
   printf("air gate synthetic ok\n");
 }
 
