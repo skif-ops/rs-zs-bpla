@@ -5,6 +5,8 @@
  *   console     - LPUART1 line commands for the bench: "st" (self-test), "lag", "svc", "modes", "pps"
  *   gnss        - NMEA RMC parser stub: extracts UTC seconds for PPS labelling
  *   ble         - zs_ipc_service over USART3 to the nRF52840 bridge (ICD addendum C), window with S4 SERVICE
+ *   dsp         - zs_station_pipeline: 1 s windows at a 0.5 s hop -> zs_dsp_mcu -> votes + AIR gate -> level 1 ->
+ *                 detection events into the NOR outbox (fetch in the audio task, analysis here)
  * The comms task (BG95) is created in B2 on top of zs_bg95 / zs_bg95_provision.
  */
 #include "tasks.h"
@@ -29,7 +31,9 @@
 #include "zs_power_modes.h"
 #include "zs_pps_sync.h"
 #include "zs_selftest.h"
+#include "zs_station_pipeline.h"
 #include "zs_time.h"
+#include "zs_event_outbox.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -46,10 +50,12 @@ static zs_time_sync_t time_sync;
 static zs_pps_sync_t pps;
 static zs_mode_scheduler_t modes;
 static zs_selftest_registry_t selftests;
-static int16_t dsp_pcm[APP_AUDIO_SAMPLE_RATE_HZ] __attribute__((section(".bss"), aligned(4)));   /* 1 s mono window for the DSP bench command */
+static int16_t dsp_pcm[APP_AUDIO_SAMPLE_RATE_HZ] __attribute__((section(".bss"), aligned(4)));   /* 1 s mono window of the pipeline */
 static zs_dsp_ctx_t dsp_ctx;
+static zs_station_pipeline_t pipeline;
+static uint32_t pipeline_last_ms, pipeline_max_ms, pipeline_events_ram;
 
-static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task, ble_task;
+static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task, ble_task, dsp_task;
 
 /* ---- ISR notifications ----------------------------------------------------- */
 void app_audio_block_notify_from_isr(void) {
@@ -134,6 +140,29 @@ static void audio_task_fn(void *arg) {
     while (zs_pdm_capture_process(&capture)) {}
     (void)zs_pps_sync_poll(&pps, bsp_tim2_pps_now());
     (void)zs_time_update(&time_sync, zs_pdm_capture_sample_counter(&capture));
+    /* detection duty (S2 and above): copy the next complete window out of the ring while it is still there,
+       hand it to the DSP task; a window that is still pending when the next one completes is skipped (dropped) */
+    if (modes.mode >= ZS_MODE_S2_DSP && modes.mode != ZS_MODE_SHUTDOWN && dsp_task && zs_station_pipeline_fetch(&pipeline, &audio_ring))
+      xTaskNotifyGive(dsp_task);
+  }
+}
+
+/* ---- station pipeline ports ------------------------------------------------ */
+static bool pl_extract(void *ctx, const int16_t *pcm, size_t n, float out[ZS_FEATURE_COUNT]) { (void)ctx; return zs_dsp_mcu_extract_1s(&dsp_ctx, pcm, n, out); }
+static int64_t pl_sample_time(void *ctx, uint64_t sample) { (void)ctx; return zs_time_for_sample(&time_sync, sample); }
+static bool pl_emit(void *ctx, const zs_detection_t *d);
+static const zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, APP_STATION_ID, APP_BOOT_ID, 0u, 0u};
+
+static void dsp_task_fn(void *arg) {
+  (void)arg;
+  for (;;) {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    while (pipeline.pending) {
+      const uint32_t t0 = xTaskGetTickCount();
+      (void)zs_station_pipeline_run_pending(&pipeline);
+      pipeline_last_ms = xTaskGetTickCount() - t0;
+      if (pipeline_last_ms > pipeline_max_ms) pipeline_max_ms = pipeline_last_ms;
+    }
   }
 }
 
@@ -315,6 +344,14 @@ static void bind_record_stores(void) {
   }
 }
 
+/* Detection events go to the NOR outbox (B3 map) when it is bound; on the RAM fallback they are only counted. */
+static bool pl_emit(void *ctx, const zs_detection_t *d) {
+  static uint8_t workspace[ZS_EVENT_OUTBOX_PAYLOAD_MAX_BYTES + 64u];
+  (void)ctx;
+  if (!stores_on_nor) { pipeline_events_ram++; return true; }
+  return zs_event_outbox_enqueue_detection(&nor_outbox_io, d, 2u, workspace, sizeof(workspace)) == ZS_EVENT_OUTBOX_OK;
+}
+
 static volatile bool ble_recovery_request;   /* console "bledfu": restart the nRF with BLE_DFU_REQ asserted */
 
 /* Controlled nRF recovery entry (pin authority: P0.15 sampled by the bootloader at reset release):
@@ -419,25 +456,15 @@ static void console_exec(const char *cmd) {
       if (ok) { ipc_port.engineer_key = engineer_key; console_printf("engkey: set\r\n"); } else console_printf("engkey: bad hex\r\n");
     }
   } else if (strcmp(cmd, "dsp") == 0) {
-    /* S2 dry run: last 1 s of channel 0 through the MCU feature extractor, timed with the DWT cycle counter */
-    float feat[ZS_FEATURE_COUNT];
-    uint64_t end = zs_pdm_capture_sample_counter(&capture);
-    if (end < APP_AUDIO_SAMPLE_RATE_HZ || !zs_audio_ring_copy_mono(&audio_ring, end, APP_AUDIO_SAMPLE_RATE_HZ, dsp_pcm, 0u)) {
-      console_printf("dsp: not enough audio yet\r\n");
-    } else {
-      uint32_t t0, cycles;
-      CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-      DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-      t0 = DWT->CYCCNT;
-      if (zs_dsp_mcu_extract_1s(&dsp_ctx, dsp_pcm, APP_AUDIO_SAMPLE_RATE_HZ, feat)) {
-        cycles = DWT->CYCCNT - t0;
-        console_printf("dsp: %lu ms  f0 %d Hz harmonics %d step %d Hz stab %d%% centroid %d Hz flat %d%% noise %d%% rough %d%%\r\n",
-                       (unsigned long)(cycles / (SystemCoreClock / 1000u)), (int)feat[0], (int)feat[1], (int)feat[2], (int)(feat[3] * 100.0f),
-                       (int)feat[7], (int)(feat[8] * 100.0f), (int)(feat[10] * 100.0f), (int)(feat[15] * 100.0f));
-      } else {
-        console_printf("dsp: extract failed\r\n");
-      }
-    }
+    const zs_presence_t *pr = &pipeline.presence;
+    console_printf("pipeline windows %lu dropped %lu last %lu ms max %lu ms | level %u conf %u uav %u/%u weak %u ground %u comb %d f0 %d Hz | class %u conf %u | events %lu refused %lu (ram %lu)\r\n",
+                   (unsigned long)pipeline.windows, (unsigned long)pipeline.windows_dropped, (unsigned long)pipeline_last_ms, (unsigned long)pipeline_max_ms,
+                   pr->level, pr->confidence_u8, pr->uav_votes, pr->windows, pr->uav_weak_votes, pr->ground_votes, pr->comb, (int)pipeline.last_gate.f0_hz,
+                   pipeline.last_window.class_id, pipeline.last_window.confidence_u8, (unsigned long)pipeline.events_emitted, (unsigned long)pipeline.events_refused,
+                   (unsigned long)pipeline_events_ram);
+    console_printf("  features f0 %d Hz harmonics %d step %d Hz stab %d%% centroid %d Hz flat %d%% noise %d%% rough %d%%\r\n",
+                   (int)pipeline.features[0], (int)pipeline.features[1], (int)pipeline.features[2], (int)(pipeline.features[3] * 100.0f),
+                   (int)pipeline.features[7], (int)(pipeline.features[8] * 100.0f), (int)(pipeline.features[10] * 100.0f), (int)(pipeline.features[15] * 100.0f));
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
@@ -481,6 +508,11 @@ bool app_tasks_create(void) {
   if (!bsp_tim2_pps_init(&pps)) return false;
 
   zs_dsp_mcu_init(&dsp_ctx);
+  {
+    size_t work;
+    zs_complex_t *scratch = zs_dsp_mcu_borrow_work(&work);        /* the AIR gate scratch overlays the DSP work buffer */
+    if (work < ZS_AIR_SCRATCH_COMPLEX || !zs_station_pipeline_init(&pipeline, &pipeline_port, scratch, dsp_pcm)) return false;
+  }
   zs_selftest_init(&selftests);
   (void)zs_selftest_register(&selftests, ZS_ST_ID_POWER_INA226, "power_good", st_power_good, NULL, true);
   (void)zs_selftest_register(&selftests, ZS_ST_ID_MIC_CAPTURE, "mic_capture", st_mic_capture, &capture, true);
@@ -493,5 +525,6 @@ bool app_tasks_create(void) {
   if (xTaskCreate(gnss_task_fn, "gnss", APP_STACK_SERVICE, NULL, APP_PRIO_SERVICE, &gnss_task) != pdPASS) return false;
   if (xTaskCreate(console_task_fn, "console", APP_STACK_CONSOLE, NULL, APP_PRIO_CONSOLE, &console_task) != pdPASS) return false;
   if (xTaskCreate(ble_task_fn, "ble", APP_STACK_BLE, NULL, APP_PRIO_BLE, &ble_task) != pdPASS) return false;
+  if (xTaskCreate(dsp_task_fn, "dsp", APP_STACK_DSP, NULL, APP_PRIO_DSP, &dsp_task) != pdPASS) return false;
   return true;
 }
