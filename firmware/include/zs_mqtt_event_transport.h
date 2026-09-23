@@ -25,6 +25,8 @@ typedef struct {
   uint32_t station_id;
   uint8_t up_topic[ZS_MQTT_EVENT_TOPIC_MAX_BYTES];
   size_t up_topic_size;
+  uint8_t status_topic[ZS_MQTT_EVENT_TOPIC_MAX_BYTES];   /* zs/v1/{tenant}/{station_id}/status: heartbeat schema 1 */
+  size_t status_topic_size;
   zs_event_receipt_transport_t receipt;
   zs_event_outbox_item_t publication_item;
 } zs_mqtt_event_transport_t;

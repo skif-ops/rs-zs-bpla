@@ -55,6 +55,8 @@
 #define APP_STACK_DSP                1536
 #define APP_BOOT_ID                  1u       /* B1 bench: a boot counter in NOR lands with B3 */
 #define APP_STACK_BLE                1024
+#define APP_COMMS_HEARTBEAT_MS       60000u   /* zs_station_comms heartbeat period */
+#define APP_COMMS_PUBLIC_APN         1        /* pilot policy: public APNs only (CELLULAR_CONNECTIVITY_BASELINE) */
 
 /* NVIC priorities (0 = highest). FreeRTOS syscall ceiling is 5: ISRs at 5..15 may call FromISR APIs. */
 #define APP_IRQ_PRIO_TIM2_PPS        4   /* timestamp capture: above the RTOS ceiling, no RTOS calls inside */

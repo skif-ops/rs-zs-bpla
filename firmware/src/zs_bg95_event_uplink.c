@@ -115,6 +115,37 @@ zs_bg95_event_uplink_start_result_t zs_bg95_event_uplink_start(
   return ZS_BG95_EVENT_UPLINK_STARTED;
 }
 
+zs_bg95_event_uplink_start_result_t zs_bg95_event_uplink_start_message(
+    zs_bg95_event_uplink_t *uplink,
+    uint16_t message_id,
+    const zs_mqtt_event_message_t *message,
+    uint32_t now_ms) {
+  if (!uplink || !uplink->modem || message_id == 0u || !message)
+    return ZS_BG95_EVENT_UPLINK_INVALID_ARGUMENT;
+  if (uplink->state != ZS_BG95_EVENT_UPLINK_IDLE)
+    return ZS_BG95_EVENT_UPLINK_BUSY;
+  if (!zs_bg95_online(uplink->modem)) {
+    uplink->last_outcome = ZS_BG95_EVENT_UPLINK_OUTCOME_OFFLINE;
+    return ZS_BG95_EVENT_UPLINK_OFFLINE;
+  }
+  if (!zs_bg95_mqtt_topic_is_at_safe(message->topic, message->topic_size,
+                                     ZS_MQTT_EVENT_TOPIC_MAX_BYTES) ||
+      !message->payload || message->payload_size == 0u ||
+      message->payload_size > BG95_QMTPUB_MAX_PAYLOAD_BYTES ||
+      message->qos != 1u || message->retained)
+    return ZS_BG95_EVENT_UPLINK_INVALID_ARGUMENT;
+  uplink->publication = *message;
+  uplink->message_id = message_id;
+  uplink->last_outcome = ZS_BG95_EVENT_UPLINK_OUTCOME_NONE;
+  if (!send_publish_command(uplink)) {
+    finish(uplink, ZS_BG95_EVENT_UPLINK_OUTCOME_IO_ERROR);
+    return ZS_BG95_EVENT_UPLINK_IO_ERROR;
+  }
+  uplink->state = ZS_BG95_EVENT_UPLINK_WAIT_PROMPT;
+  uplink->deadline_ms = now_ms + ZS_BG95_EVENT_UPLINK_TIMEOUT_MS;
+  return ZS_BG95_EVENT_UPLINK_STARTED;
+}
+
 bool zs_bg95_event_uplink_on_prompt(zs_bg95_event_uplink_t *uplink,
                                     uint32_t now_ms) {
   if (!uplink || !uplink->modem ||

@@ -447,3 +447,21 @@ zs_bg95_event_uplink_start_result_t zs_bg95_mqtt_session_start_event(
     session->owner = ZS_BG95_MQTT_OWNER_EVENT_UPLINK;
   return result;
 }
+
+zs_bg95_event_uplink_start_result_t zs_bg95_mqtt_session_start_message(
+    zs_bg95_mqtt_session_t *session,
+    const zs_mqtt_event_message_t *message,
+    uint32_t now_ms) {
+  zs_bg95_event_uplink_start_result_t result;
+  if (!session || !session->uplink || !message)
+    return ZS_BG95_EVENT_UPLINK_INVALID_ARGUMENT;
+  if (!zs_bg95_mqtt_session_ready(session) ||
+      session->owner != ZS_BG95_MQTT_OWNER_NONE ||
+      session->pending_command_size != 0u)
+    return ZS_BG95_EVENT_UPLINK_BUSY;
+  result = zs_bg95_event_uplink_start_message(
+      session->uplink, take_message_id(session), message, now_ms);
+  if (result == ZS_BG95_EVENT_UPLINK_STARTED)
+    session->owner = ZS_BG95_MQTT_OWNER_EVENT_UPLINK;
+  return result;
+}

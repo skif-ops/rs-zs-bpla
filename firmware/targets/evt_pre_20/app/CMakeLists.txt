@@ -96,6 +96,7 @@ add_executable(dioneya_evt_pre_20.elf
   bsp_rng.c
   tasks.c
   app_nrf_update.c
+  app_comms.c
   hal_msp.c
   stm32u5xx_it.c
   syscalls.c
