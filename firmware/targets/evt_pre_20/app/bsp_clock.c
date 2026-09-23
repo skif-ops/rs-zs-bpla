@@ -16,8 +16,9 @@ bool bsp_clock_init_160mhz(void) {
   HAL_PWREx_ConfigSupply(PWR_SMPS_SUPPLY);
 
   /* LSE: SiT1552 drives OSC32_IN -> bypass mode; MSIS 4 MHz with PLL-mode locked to LSE; HSI16 on for peripherals. */
-  osc.OscillatorType = RCC_OSCILLATORTYPE_MSI | RCC_OSCILLATORTYPE_LSE | RCC_OSCILLATORTYPE_HSI;
+  osc.OscillatorType = RCC_OSCILLATORTYPE_MSI | RCC_OSCILLATORTYPE_LSE | RCC_OSCILLATORTYPE_HSI | RCC_OSCILLATORTYPE_HSI48;
   osc.LSEState = RCC_LSE_BYPASS;
+  osc.HSI48State = RCC_HSI48_ON;                 /* RNG kernel clock (B.9 session-role nonces) */
   osc.MSIState = RCC_MSI_ON;
   osc.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
   osc.MSIClockRange = RCC_MSIRANGE_4;            /* MSIS 4 MHz */
@@ -47,7 +48,8 @@ bool bsp_clock_init_160mhz(void) {
 
   /* Kernel clocks: MDF1 from PLL1P (3.2 MHz), UARTs and TIM from HSI16-independent APB (default PCLK). */
   pclk.PeriphClockSelection = RCC_PERIPHCLK_MDF1 | RCC_PERIPHCLK_USART1 | RCC_PERIPHCLK_USART2 |
-                              RCC_PERIPHCLK_USART3 | RCC_PERIPHCLK_LPUART1;
+                              RCC_PERIPHCLK_USART3 | RCC_PERIPHCLK_LPUART1 | RCC_PERIPHCLK_RNG;
+  pclk.RngClockSelection = RCC_RNGCLKSOURCE_HSI48;
   pclk.Mdf1ClockSelection = RCC_MDF1CLKSOURCE_PLL1;
   pclk.Usart1ClockSelection = RCC_USART1CLKSOURCE_HSI;
   pclk.Usart2ClockSelection = RCC_USART2CLKSOURCE_HSI;
