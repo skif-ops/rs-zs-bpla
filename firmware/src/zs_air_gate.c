@@ -244,16 +244,17 @@ zs_air_gate_result_t zs_air_gate_evaluate(const zs_air_gate_t *g) {
 
 bool zs_air_gate_push(zs_air_gate_t *g, const int16_t *pcm, size_t n, zs_complex_t *scratch, zs_air_gate_result_t *out) {
   if (!g || !pcm || !scratch || n < ZS_AIR_WINDOW_SAMPLES || !out) { if (out) memset(out, 0, sizeof(*out)); return false; }
-  if (!window_spectrum(pcm, scratch, g->spectrum)) { memset(out, 0, sizeof(*out)); return false; }
+  /* per-window work areas (the window's power spectrum included) live in the scratch tail beyond the FFT,
+     so the target overlays everything on DSP memory and the gate state keeps only the running average */
+  float *spectrum = (float *)(void *)(scratch + ZS_AIR_FFT), *tmp_p = spectrum + BINS, *tmp_lp = tmp_p + BINS, *tmp_noise = tmp_lp + BINS;
+  uint8_t *tmp_mask = (uint8_t *)(void *)(tmp_noise + BINS);
+  if (!window_spectrum(pcm, scratch, spectrum)) { memset(out, 0, sizeof(*out)); return false; }
   /* running geometric mean over the history depth */
   const float alpha = 1.0f / (float)(g->count < ZS_AIR_HISTORY ? g->count + 1u : ZS_AIR_HISTORY);
-  for (unsigned i = 0u; i < BINS; i++) { float l = logf(g->spectrum[i]); g->avg_log[i] += (l - g->avg_log[i]) * alpha; }
-  /* per-window work areas live in the scratch tail (beyond the FFT), so the target can overlay everything on DSP memory */
-  float *tmp_p = (float *)(void *)(scratch + ZS_AIR_FFT), *tmp_lp = tmp_p + BINS, *tmp_noise = tmp_lp + BINS;
-  uint8_t *tmp_mask = (uint8_t *)(void *)(tmp_noise + BINS);
+  for (unsigned i = 0u; i < BINS; i++) { float l = logf(spectrum[i]); g->avg_log[i] += (l - g->avg_log[i]) * alpha; }
   fit_comb(g->avg_log, tmp_p, &g->f0_hz, &g->anchor_hz);
   zs_air_window_t w;
-  measure_window(g->spectrum, g->f0_hz, g->anchor_hz, tmp_lp, tmp_mask, tmp_noise, &w);
+  measure_window(spectrum, g->f0_hz, g->anchor_hz, tmp_lp, tmp_mask, tmp_noise, &w);
   g->hist[g->next] = w;
   g->next = (uint8_t)((g->next + 1u) % ZS_AIR_HISTORY);
   if (g->count < ZS_AIR_HISTORY) g->count++;
