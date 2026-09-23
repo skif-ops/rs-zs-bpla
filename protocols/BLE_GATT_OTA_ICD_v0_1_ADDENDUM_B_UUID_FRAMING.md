@@ -18,6 +18,7 @@
 | 0x0202 | config_write | authenticated write, notify | CBOR‑патч 11 ключей, кадрированный; ответ — 1 байт статуса по notify |
 | 0x0203 | installation_position | authenticated read/write | ICD §3.1 |
 | 0x0204 | position_trust_policy | authenticated read/write | ICD §3.2 |
+| 0x0205 | session_role *(B.9)* | authenticated read/write/notify | роль сеанса: чтение `[role]`, запись `01` (челлендж) / `02 tag16` (ответ), notify `01 nonce16` / `03 role`, статус по B.3 |
 | 0x0300 | Service Diagnostics | | |
 | 0x0301 | status | read, notify | питание, GNSS, modem, LoRa, storage, faults |
 | 0x0302 | gnss_integrity | read, notify | ICD §3 |
@@ -116,10 +117,43 @@ passkey = BE32( SHA-256( "DIO-PAIR-V1" || secret16 )[0..3] ) mod 1 000 000
 
 ## B.8 Что остаётся открытым до прототипа
 
-- роль installer/engineer на стороне прошивки (B1: installer; выбор роли по сеансу — после прототипа);
+- роль installer/engineer — реализована по B.9 (STM32 + мост + PKI); подтвердить UX на Android;
 - подтверждение B.7 на реальном UX Android‑диалога сопряжения; способ применения секрета зафиксировать в ICD v0.2;
 - таймер сервисного окна и трактовка TAMPER_IN как сервисного триггера (решение 2026‑09‑21) — реализовано в B1
   (600 с с S4 SERVICE), подтвердить на железе;
 - межпроцессорный протокол — реализован (addendum C), заморозить после прототипа;
 - плата nRF52840 для Rev.A (U11 Raytac MDBT50Q-P1MV2, UARTE P0.06/P0.08, nRESET P0.18 от BLE_EN, BLE_DFU_REQ P0.15) —
   описана в `firmware/targets/nrf52840_ble/boards/dioneya/evt_pre_20_ble/`; MCUboot/DFU по BLE_DFU_REQ — отдельный шаг.
+
+## B.9 Роль сеанса: installer по сопряжению, engineer по челленджу (реализовано 2026‑09‑23)
+
+Роль привязана к BLE‑линку и физическому сервисному режиму; она не хранится и не переживает разрыв связи.
+
+- **installer** — автоматически, как только линк защищён по B.7 (LESC, passkey из секрета этикетки; `LINK_STATE = 2`)
+  и станция в S4 SERVICE. Достаточно для конфигурации и ввода позиции с политикой по умолчанию.
+- **engineer** — дополнительное доказательство владения *ключом инженера станции* (`engineer_key`, 32 байта,
+  генерируется в реестре «Мухоеда» на станцию: `muhoed-pki engineer-key <serial>`; попадает на станцию в
+  `station.json` (`engineer_key_hex`) и инженеру — аудируемым экспортом `--to <кто> --out <папка>`; **на этикетке
+  его нет**; `--rotate <причина>` меняет ключ для обеих сторон). Нужен для изменения политики position‑trust
+  (ICD §3.2) и других действий, помеченных «engineer».
+
+Характеристика `0x0205 session_role` (authenticated read/write/notify):
+
+| действие | запись | ответ |
+|---|---|---|
+| узнать роль | read | `[role]`: 0 none, 1 installer, 2 engineer |
+| запросить челлендж | `01` | notify `01 ‖ nonce16` (аппаратный RNG STM32), затем статус `00` |
+| ответить | `02 ‖ tag16` | notify `03 ‖ 02` при успехе, статус `00`; иначе статус `04` |
+
+```
+tag16 = HMAC-SHA256( engineer_key, "DIO-ROLE-V1" ‖ serial_ascii ‖ nonce16 )[0..15]
+```
+Вектор для тестов (прошивка `test_ble_bridge.c`, PKI `test_pki_engineer_key.py`, Android): ключ `a0 a1 … bf`, серийник
+`DIO-EVT-012`, nonce `00 01 … 0f` → `e3f70cf47e0a591490b501d6ba31be7b`.
+
+Правила на станции (`zs_ipc_service`): nonce одноразовый (повтор того же ответа отклоняется); три неверных ответа
+блокируют повышение до конца линка; ключ не загружен, RNG недоступен, линк не защищён → статус `04`; вне S4 SERVICE →
+`03`. Роль сбрасывается по `LINK_STATE = 0`. Счётчики `role_elevations`/`role_rejections` видны в консоли `ble`.
+На стенде B1 до появления provisioning на STM32 ключ вводится командой `engkey <64 hex>` (только RAM сеанса).
+Android: диалог «Инженер» → чтение nonce → расчёт tag по ключу из файла экспорта → запись; после `03 02` кнопки
+изменения политики становятся активными. UX и хранение ключа на телефоне (Keystore) — задача приложения.
