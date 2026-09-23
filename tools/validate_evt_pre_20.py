@@ -656,6 +656,38 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR ECO-002 rotation-serialization remediation boundary is missing",
     )
     require(
+        decisions["DEC-138"]["Status"] ==
+        "REJECTED_COMMIT_BOUND_KICAD9_SILK_WARNING_DELTA_NOT_FOR_APPLICATION"
+        and "142c234" in decisions["DEC-138"]["Reason"]
+        and "PCB Native run 354" in decisions["DEC-138"]["Reason"]
+        and "516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d"
+        in decisions["DEC-138"]["Reason"]
+        and "unconnected items 121 to 117" in decisions["DEC-138"]["Reason"]
+        and "violations 86 to 88" in decisions["DEC-138"]["Reason"]
+        and "silk_over_copper and silk_overlap" in decisions["DEC-138"]["Reason"]
+        and "Do not accept or apply" in decisions["DEC-138"]["Impact"]
+        and "do not authorize production EVT" in decisions["DEC-138"]["Impact"]
+        and "only the C4 C6 and R2 reference anchors" in decisions["DEC-138"]["Impact"],
+        "PCB-PWR ECO-002 rejected silkscreen-warning evidence is missing",
+    )
+    require(
+        decisions["DEC-139"]["Status"] ==
+        "PASS_STATIC_ECO_002_SILK_REFERENCE_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PENDING"
+        and "ACCEPT_PCB_PWR_ECO_002_SILK_REMEDIATION_CREATION_SUBGATE"
+        in decisions["DEC-139"]["Reason"]
+        and "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
+        in decisions["DEC-139"]["Impact"]
+        and "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555"
+        in decisions["DEC-139"]["Impact"]
+        and "only the C4 C6 and R2 F.SilkS reference anchors"
+        in decisions["DEC-139"]["Impact"]
+        and "change no copper pads nets component poses or DRC rules"
+        in decisions["DEC-139"]["Impact"]
+        and "121 to 117" in decisions["DEC-139"]["Impact"]
+        and "new exact human acceptance" in decisions["DEC-139"]["Impact"],
+        "PCB-PWR ECO-002 silkscreen-reference remediation boundary is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]

@@ -24,7 +24,7 @@ the following symmetric changes:
   the controller and bootstrap-capacitor SW pads as a compact pad-entry flare.
 
 Candidate SHA-256:
-`516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d`.
+`44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c`.
 
 ## Commit-bound rejection and serialization remediation
 
@@ -42,6 +42,25 @@ board serialization. It does not suppress or relax any DRC rule, change pad
 geometry or nets, or modify the authoritative PCB-PWR board. The corrected
 candidate therefore requires a fresh commit-bound KiCad 9 comparative DRC and
 new exact human acceptance.
+
+## Commit-bound silkscreen rejection and reference remediation
+
+The rotation-corrected candidate
+`516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d`
+was rejected by PCB Native run 354 at commit `142c234`. Its electrical result
+was correct: unconnected items fell exactly from `121` to `117`, and the four
+error-level `clearance`, three `copper_edge_clearance`, and one
+`courtyards_overlap` violations were unchanged. Total violations nevertheless
+rose from `86` to `88` because the strict warning-fingerprint gate observed
+`silk_over_copper` at `38 -> 39` and `silk_overlap` at `14 -> 15`.
+
+The three added warnings were the `C4` and `C6` references over switch-node
+copper and the `L1` polygon over the `R2` reference; the prior `R2` reference
+over solder mask warning disappeared. The remediated candidate changes only
+three serialized `F.SilkS` reference anchors: local `C4/C6 (0,-1.4,270)` move
+to `(-2.5,0,270)`, and local `R2 (0,-1.4,0)` moves to `(0,1.4,0)`. Copper,
+pads, nets, component poses, DRC rules, and the authoritative PCB-PWR board are
+unchanged. A fresh commit-bound KiCad 9 comparative DRC remains mandatory.
 
 ## Pad-entry and EVT calculation
 

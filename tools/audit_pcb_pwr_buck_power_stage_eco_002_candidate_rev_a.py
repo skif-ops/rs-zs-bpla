@@ -9,6 +9,7 @@ import csv
 import hashlib
 import json
 import math
+import re
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -20,6 +21,7 @@ from audit_pcb_pwr_routing_authority_rev_a import ref_of, semantic_board_sha256
 from generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a import (
     PLACEMENT_REPLACEMENTS,
     ROUTES,
+    SILK_REFERENCE_REPLACEMENTS,
 )
 
 
@@ -35,10 +37,10 @@ STACKUP_BASIS = ROOT / "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASI
 CURRENT_BASIS = ROOT / "hardware/PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv"
 
 BASE_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
-CANDIDATE_SHA256 = "516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d"
+CANDIDATE_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
 BASE_SEMANTIC_SHA256 = "f7a659d0740e78d40eddae7016724bd8e616baf9fb425f06ace70ec9acca4d3d"
 CANDIDATE_SEMANTIC_SHA256 = "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555"
-GENERATOR_SHA256 = "005b79adcefe43d1b6d4e30d53e27989aceed5d09a9915cce807af2b7bef31cf"
+GENERATOR_SHA256 = "e4ab7290920f0b8c6f229e4701d2b82b78dc7638465a552d664221692ad40d1c"
 ROUTING_RULES_SHA256 = "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988"
 STACKUP_BASIS_SHA256 = "41733d7d27e2c3ab831e602ee81b072146944da0a5efe8a2c805eeed46ecd1ca"
 CURRENT_BASIS_SHA256 = "4cecbe529987146078ce233d600ed047495a50d1228407e94b0380f88ca56cb2"
@@ -52,6 +54,11 @@ EXPECTED_POSES = {
     "C21": ((52.4, 42.0, 90.0), (52.35, 42.0, 90.0)),
     "L1": ((60.75, 14.0, 180.0), (62.5, 14.0, 180.0)),
     "L2": ((60.75, 42.0, 180.0), (62.5, 42.0, 180.0)),
+}
+EXPECTED_REFERENCE_ANCHORS = {
+    "C4": ((0.0, -1.4, 180.0), (-2.5, 0.0, 270.0)),
+    "C6": ((0.0, -1.4, 180.0), (-2.5, 0.0, 270.0)),
+    "R2": ((0.0, -1.4, 0.0), (0.0, 1.4, 0.0)),
 }
 CHANNELS = {
     "3V8": {"controller": "U3", "bootstrap": "C4", "input": "C20", "inductor": "L1"},
@@ -93,6 +100,17 @@ def without_pose(footprint: Any) -> dict[str, Any]:
         relative_angle = (float(item.position.angle or 0.0) - footprint_angle) % 360.0
         item.position.angle = None if math.isclose(relative_angle, 0.0, abs_tol=1e-9) else relative_angle
     return {key: value for key, value in normalized.__dict__.items() if key != "position"}
+
+
+def reference_anchor(source: str, reference: str) -> tuple[float, float, float]:
+    found = re.search(
+        rf'\(property "Reference" "{re.escape(reference)}"\s*'
+        rf'\(at\s+([-+]?\d+(?:\.\d+)?)\s+([-+]?\d+(?:\.\d+)?)'
+        rf'(?:\s+([-+]?\d+(?:\.\d+)?))?\)',
+        source,
+    )
+    require(found is not None, f"{reference}: serialized reference anchor missing")
+    return float(found.group(1)), float(found.group(2)), float(found.group(3) or 0.0)
 
 
 def rotate_clockwise(value: tuple[float, float], angle_deg: float) -> tuple[float, float]:
@@ -492,6 +510,16 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         require(pose_of(base_footprints[reference]) == old, f"{reference}: base pose drift")
         require(pose_of(candidate_footprints[reference]) == new, f"{reference}: candidate pose drift")
 
+    base_source = BASE.read_text(encoding="utf-8")
+    candidate_source = CANDIDATE.read_text(encoding="utf-8")
+    require(set(SILK_REFERENCE_REPLACEMENTS) == set(EXPECTED_REFERENCE_ANCHORS),
+            "silkscreen-reference replacement inventory drift")
+    for reference, (old, new) in EXPECTED_REFERENCE_ANCHORS.items():
+        require(reference_anchor(base_source, reference) == old,
+                f"{reference}: base reference anchor drift")
+        require(reference_anchor(candidate_source, reference) == new,
+                f"{reference}: candidate reference anchor drift")
+
     for field in ("version", "generator", "general", "paper", "titleBlock", "layers",
                   "setup", "properties", "nets", "zones", "graphicItems", "dimensions",
                   "targets", "groups"):
@@ -532,7 +560,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     require(
         review["proposal_id"] == "PCB-PWR-BUCK-POWER-STAGE-ECO-002"
         and review["status"] ==
-        "PENDING_ROTATION_SERIALIZATION_REMEDIATION_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"
+        "PENDING_SILK_REFERENCE_REMEDIATION_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"
         and review["base"]["sha256"] == BASE_SHA256
         and review["candidate"]["sha256"] == CANDIDATE_SHA256
         and review["candidate"]["trace_items"] == 14
@@ -557,6 +585,27 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
             "drc_rules_relaxed": False,
             "authoritative_board_modified": False,
         }
+        and review["silkscreen_reference_remediation"] == {
+            "rejected_candidate_sha256":
+                "516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d",
+            "rejected_commit": "142c234299a61b99e3fb66c8774518d9fa57af30",
+            "rejected_pcb_native_run": 354,
+            "rejected_pcb_native_run_id": 35812529894,
+            "rejected_drc_violations": [86, 88],
+            "rejected_unconnected_items": [121, 117],
+            "warning_fingerprint_deltas": {
+                "silk_over_copper": [38, 39],
+                "silk_overlap": [14, 15],
+            },
+            "moved_reference_anchors": {
+                "C4": {"from": [0.0, -1.4, 270.0], "to": [-2.5, 0.0, 270.0]},
+                "C6": {"from": [0.0, -1.4, 270.0], "to": [-2.5, 0.0, 270.0]},
+                "R2": {"from": [0.0, -1.4, 0.0], "to": [0.0, 1.4, 0.0]},
+            },
+            "copper_pads_nets_or_component_poses_changed": False,
+            "drc_rules_relaxed": False,
+            "authoritative_board_modified": False,
+        }
         and review["pad_entry_disposition"]["calculated_evt_screen_pass"] is True
         and review["pad_entry_disposition"]["external_neck_eliminated"] is True
         and math.isclose(
@@ -567,6 +616,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
         and review["pad_entry_disposition"]["numeric_width_requirements_pass"] is True
         and review["pad_entry_disposition"]["physical_plus70c_validation_required"] is True
         and review["invariants"]["authoritative_board_modified"] is False
+        and review["invariants"]["silkscreen_reference_anchors_changed"] == ["C4", "C6", "R2"]
         and review["machine_gate"]["complete"] is False
         and review["machine_gate"]["status"] == review["status"]
         and review["human_gate"]["accepted"] is False
@@ -577,7 +627,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
 
     report: dict[str, object] = {
         "status":
-            "PASS_STATIC_ECO_002_ROTATION_SERIALIZATION_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PENDING",
+            "PASS_STATIC_ECO_002_SILK_REFERENCE_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PENDING",
         "base_sha256": BASE_SHA256,
         "candidate_sha256": CANDIDATE_SHA256,
         "candidate_semantic_sha256": CANDIDATE_SEMANTIC_SHA256,

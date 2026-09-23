@@ -18,7 +18,7 @@ DEFAULT_BASE_OUTPUT = CANDIDATE_DIR / "PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV
 DEFAULT_OUTPUT = CANDIDATE_DIR / "PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb"
 
 BASE_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
-CANDIDATE_SHA256 = "516a2e0b99f2855e0b1542559b1f844d10e694893896568ef054095b79a5fa3d"
+CANDIDATE_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
 
 # Rotate both regulators so SW faces the inductors and VIN faces the local input
 # capacitors.  The remaining moves keep the two channels symmetric and preserve
@@ -32,6 +32,15 @@ PLACEMENT_REPLACEMENTS = {
     "C21": ("\t\t(at 52.4 42 90)", "\t\t(at 52.35 42 90)"),
     "L1": ("\t\t(at 60.75 14 180)", "\t\t(at 62.5 14 180)"),
     "L2": ("\t\t(at 60.75 42 180)", "\t\t(at 62.5 42 180)"),
+}
+
+# Keep assembly references on F.SilkS while moving only their text anchors away
+# from the three warning locations proven by commit-bound KiCad 9 DRC.  C4/C6
+# use post-rotation serialized angles here; R2 itself is not moved.
+SILK_REFERENCE_REPLACEMENTS = {
+    "C4": ("\t\t\t(at 0 -1.4 270)", "\t\t\t(at -2.5 0 270)"),
+    "C6": ("\t\t\t(at 0 -1.4 270)", "\t\t\t(at -2.5 0 270)"),
+    "R2": ("\t\t\t(at 0 -1.4 0)", "\t\t\t(at 0 1.4 0)"),
 }
 
 # These are the only accepted traces invalidated by the controller/capacitor
@@ -168,6 +177,20 @@ def move_footprint(source: str, reference: str, old: str, new: str) -> str:
     return source[:start] + moved + source[end:]
 
 
+def move_reference_text(source: str, reference: str, old: str, new: str) -> str:
+    start, end, block = footprint_block(source, reference)
+    marker = f'(property "Reference" "{reference}"'
+    property_start = block.index(marker)
+    property_end = block.find("\n\t\t(property ", property_start + len(marker))
+    require(property_end > property_start, f"{reference}: reference property boundary missing")
+    property_block = block[property_start:property_end]
+    require(property_block.count(old) == 1, f"{reference}: reference anchor drift")
+    require(new not in property_block, f"{reference}: target reference anchor already present")
+    property_block = property_block.replace(old, new, 1)
+    moved = block[:property_start] + property_block + block[property_end:]
+    return source[:start] + moved + source[end:]
+
+
 def segment_text(net: int, net_name: str, connection: str, index: int,
                  start: tuple[float, float], end: tuple[float, float],
                  width: float) -> str:
@@ -193,6 +216,8 @@ def candidate_bytes(base_payload: bytes) -> bytes:
     source = base_payload.decode("utf-8")
     for reference, (old, new) in PLACEMENT_REPLACEMENTS.items():
         source = move_footprint(source, reference, old, new)
+    for reference, (old, new) in SILK_REFERENCE_REPLACEMENTS.items():
+        source = move_reference_text(source, reference, old, new)
     for segment in REMOVED_BOOT_SEGMENTS:
         require(source.count(segment) == 1, "accepted BOOT segment identity drift")
         source = source.replace(segment, "", 1)
