@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-static zs_complex_t scratch[ZS_AIR_FFT];
+static zs_complex_t scratch[ZS_AIR_SCRATCH_COMPLEX];
 static zs_air_gate_t gate;
 int main(int argc, char **argv) {
   if (argc != 2) { fprintf(stderr, "usage: air_gate_eval <pcm16le-32k-mono>\n"); return 2; }

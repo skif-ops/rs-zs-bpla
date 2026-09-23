@@ -16,8 +16,8 @@
  * fundamental (folded by integer ratios so an octave slip of the fit does not count as motion; all teeth
  * of a comb move with f0, so this is the server's line steadiness), decision as in
  * DroneSeparator._build_findings.
- * Scratch is caller-provided (8192 complex floats = 64 KB) so the target can overlay it on DSP memory;
- * the gate itself keeps two band spectra (2 x 12 KB).
+ * Scratch is caller-provided (ZS_AIR_SCRATCH_COMPLEX: the 8192-point FFT plus the per-window work areas,
+ * ~105 KB) so the target can overlay it on the DSP work buffer; the gate itself keeps two band spectra (2 x 12 KB).
  */
 #include "zs_fft.h"
 #include <stdbool.h>
@@ -30,6 +30,8 @@
 #define ZS_AIR_FFT 8192u
 #define ZS_AIR_BINS 3074u        /* bins up to 2400 Hz at 0.78125 Hz */
 #define ZS_AIR_HISTORY 8u
+/* scratch for zs_air_gate_push: the FFT plus three band-sized float work areas and a byte mask (~105 KB) */
+#define ZS_AIR_SCRATCH_COMPLEX (ZS_AIR_FFT + (3u * ZS_AIR_BINS * 4u + ZS_AIR_BINS + 7u) / 8u)
 
 typedef struct {
   float snr_db;         /* server definition: mean harmonic peak / median of the band floor (harmonic bins excluded) */
@@ -65,7 +67,7 @@ typedef struct {
 
 void zs_air_gate_init(zs_air_gate_t *g);
 /* Analyses one 32000-sample window (any channel), pushes it into the history and evaluates the gate.
-   scratch >= ZS_AIR_FFT complex.  Returns false only on bad arguments. */
+   scratch >= ZS_AIR_SCRATCH_COMPLEX complex.  Returns false only on bad arguments. */
 bool zs_air_gate_push(zs_air_gate_t *g, const int16_t *pcm, size_t n, zs_complex_t *scratch, zs_air_gate_result_t *out);
 /* Evaluates the current history (diagnostics). */
 zs_air_gate_result_t zs_air_gate_evaluate(const zs_air_gate_t *g);
