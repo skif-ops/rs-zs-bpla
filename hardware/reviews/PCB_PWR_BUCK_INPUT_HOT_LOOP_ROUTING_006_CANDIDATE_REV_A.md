@@ -40,7 +40,10 @@ EMI and powered `+70 °C` behavior remain physical EVT/DFM gates.
 
 Commit-bound KiCad 9 comparative DRC must preserve `85 -> 85` violations,
 introduce no DRC fingerprint delta and reduce unconnected items exactly
-`117 -> 108`. Only after that result may the owner accept the exact candidate
+`117 -> 108`. This machine gate passed at source commit `702ed8c9`, tree
+`b3a256c6`, CI #703 and PCB Native #360; artifact `10757125937` has digest
+`sha256:52440fa5c89cae291c91bf406df85509d31c68041ed669fa1ab156bfa7ca8eb5`.
+The owner may now accept the exact candidate
 with `ACCEPT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE`.
 
 `C13`, the upstream `RSH1 -> VBAT_SYS` trunk, the global GND plane, output

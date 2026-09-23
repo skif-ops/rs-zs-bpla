@@ -4,7 +4,7 @@
   "proposal_id": "PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006",
   "creation_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_006_CREATION_SUBGATE",
   "scope_revision_authorization": "ACCEPT_PCB_PWR_ROUTING_CANDIDATE_006_VIA_PLANE_SCOPE_REVISION_SUBGATE",
-  "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+  "status": "PASS_COMMIT_BOUND_KICAD9_GATE_HUMAN_SUBGATE_PENDING",
   "scope": "ONLY_DUAL_BUCK_INPUT_HOT_LOOPS_WITH_BOUNDED_LOCAL_RETURN_PLANES",
   "selection_rationale": "CLOSE_THE_TWO_SYMMETRIC_VIN_PGND_HOT_LOOPS_AFTER_ECO_002_WHILE_USING_THE_TI_RAK_OPTIONAL_PGND_VIA_TOPOLOGY_AND_WITHOUT_ADDING_A_GLOBAL_GROUND_PLANE",
   "base": {
@@ -81,7 +81,15 @@
     "non_hot_loop_copper_added": false
   },
   "machine_gate": {
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "source_commit_sha": "702ed8c9ae88832105e07d3278d112c10bf4c4d5",
+    "source_tree_sha": "b3a256c68788de455946bf972b63c92d9bfdd694",
+    "ci_run_number": 703,
+    "ci_run_id": 35873626608,
+    "pcb_native_run_number": 360,
+    "pcb_native_run_id": 35873626649,
+    "artifact_id": 10757125937,
+    "artifact_digest": "sha256:52440fa5c89cae291c91bf406df85509d31c68041ed669fa1ab156bfa7ca8eb5",
     "required_violations": [
       85,
       85
@@ -91,7 +99,8 @@
       108
     ],
     "required_new_errors": 0,
-    "required_other_drc_fingerprint_delta": 0
+    "required_other_drc_fingerprint_delta": 0,
+    "comparative_drc": "PASS_85_TO_85_VIOLATIONS_117_TO_108_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA"
   },
   "human_gate_after_machine_pass": {
     "accept_value": "ACCEPT_PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_SUBGATE",
