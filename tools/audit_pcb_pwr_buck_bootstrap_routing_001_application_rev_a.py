@@ -27,6 +27,8 @@ VBAT_RAW_SUCCESSOR_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf6476
 VBAT_RAW_SUCCESSOR_SEMANTIC_SHA256 = "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d"
 REV_GATE_SUCCESSOR_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
 REV_GATE_SUCCESSOR_SEMANTIC_SHA256 = "f7a659d0740e78d40eddae7016724bd8e616baf9fb425f06ace70ec9acca4d3d"
+ECO_002_SUCCESSOR_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
+ECO_002_SUCCESSOR_SEMANTIC_SHA256 = "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555"
 APPROVAL_SHA256 = "30b26ade4edf0a2f357fb93e1ce95dea7628a7c382003578ebf07c74a7465e0b"
 
 
@@ -42,7 +44,7 @@ def sha256(path: Path) -> str:
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[str, object]:
     require(sha256(BOARD) in {
                 BOARD_SHA256, SUCCESSOR_SHA256, VBAT_RAW_SUCCESSOR_SHA256,
-                REV_GATE_SUCCESSOR_SHA256},
+                REV_GATE_SUCCESSOR_SHA256, ECO_002_SUCCESSOR_SHA256},
             "authoritative PCB-PWR is not accepted bootstrap or controlled successor")
     require(sha256(APPROVAL) == APPROVAL_SHA256, "bootstrap approval drift")
     board = Board.from_file(str(BOARD), encoding="utf-8")
@@ -51,9 +53,10 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
                 SUCCESSOR_SEMANTIC_SHA256,
                 VBAT_RAW_SUCCESSOR_SEMANTIC_SHA256,
                 REV_GATE_SUCCESSOR_SEMANTIC_SHA256,
+                ECO_002_SUCCESSOR_SEMANTIC_SHA256,
             },
             "applied bootstrap semantic identity drift")
-    require(len(board.traceItems) in {2, 3, 4, 8} and len(board.zones) == 0,
+    require(len(board.traceItems) in {2, 3, 4, 8, 14} and len(board.zones) == 0,
             "applied bootstrap copper inventory drift")
     proposal = candidate_audit.audit()
     require(proposal["status"] ==
@@ -79,7 +82,7 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
         and application["cam_or_manufacturing_release"] is False
         and route["active_board_sha256"] in {
             BOARD_SHA256, SUCCESSOR_SHA256, VBAT_RAW_SUCCESSOR_SHA256,
-            REV_GATE_SUCCESSOR_SHA256}
+            REV_GATE_SUCCESSOR_SHA256, ECO_002_SUCCESSOR_SHA256}
         and route["authoritative_board_modified"] is True
         and route["routing_complete"] is False
         and route["review_b_complete"] is False

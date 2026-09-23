@@ -23,7 +23,7 @@
   ],
   "source_binding": {
     "native_board": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
-    "native_board_semantic_sha256": "f7a659d0740e78d40eddae7016724bd8e616baf9fb425f06ace70ec9acca4d3d",
+    "native_board_semantic_sha256": "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555",
     "placement_authority": "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv",
     "placement_authority_sha256": "257fee5898b5d44970115220a485d40b01c4fefad14b5c3b1a4ffb43b7b5b2d6",
     "routing_authority": "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.csv",
@@ -35,7 +35,7 @@
     "power_design_calculation": "hardware/POWER_DESIGN_CALC_REV_A.md",
     "power_design_calculation_sha256": "2264daa8c4de35827d9badda98c05faa9292cc6c30d5b8d9ab9924462175184a",
     "dim_003_request": "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json",
-    "dim_003_request_sha256": "64f31b8cccfd0ded1136bc255b0251cd3f1ae27392461d8da305bbbb0cd2dec1"
+    "dim_003_request_sha256": "1520d0e37022bbf6aab1b8356f274bf65a5efc7b4894e614497410369b3511a5"
   },
   "board_request_basis": {
     "evt_outline_mm": [
@@ -71,7 +71,7 @@
     "copper_weights_frozen": true,
     "surface_finish_frozen": true,
     "numeric_fabrication_rules_frozen": true,
-    "native_trace_items": 8,
+    "native_trace_items": 14,
     "native_copper_zones": 0,
     "dim_003_accepted": true
   },

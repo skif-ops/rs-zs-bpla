@@ -726,6 +726,20 @@ def validate_decisions_and_tests() -> None:
         "PCB-PWR ECO-002 exact acceptance boundary is missing",
     )
     require(
+        decisions["DEC-142"]["Status"] ==
+        "APPLICATION_EXACT_BUCK_POWER_STAGE_ECO_002_DELTA_COMMIT_BOUND_GATE_PENDING"
+        and "100f8123" in decisions["DEC-142"]["Reason"]
+        and "c1f5e11c" in decisions["DEC-142"]["Reason"]
+        and "44bbcd77" in decisions["DEC-142"]["Reason"]
+        and "byte-for-byte" in decisions["DEC-142"]["Impact"]
+        and "six unrelated predecessor traces" in decisions["DEC-142"]["Impact"]
+        and "violations 86 to 85" in decisions["DEC-142"]["Impact"]
+        and "unconnected 121 to 117" in decisions["DEC-142"]["Impact"]
+        and "zero new DRC fingerprint counts" in decisions["DEC-142"]["Impact"]
+        and "physical plus70C first-article" in decisions["DEC-142"]["Impact"],
+        "PCB-PWR ECO-002 exact application boundary is missing",
+    )
+    require(
         decisions["DEC-100"]["Status"] ==
         "STATIC_PROPOSAL_READY_COMMIT_BOUND_KICAD9_GATE_PENDING"
         and "C4 C6 L1 and L2" in decisions["DEC-100"]["Impact"]
@@ -869,10 +883,11 @@ def validate_deliverable_register() -> None:
     require(
         deliverables["HW-P-002"]["QG-1 полнота"] == "PASS"
         and deliverables["HW-P-002"]["QG-2 техника"] == "OPEN"
-        and "applied REV_GATE routing 004 total eight trace items" in pwr_layout
+        and "exact applied power-stage ECO-002 totals 14 trace items" in pwr_layout
         and "zero vias and zero copper zones" in pwr_layout
+        and "fresh commit-bound application gate" in pwr_layout
         and "remaining routing DRC CAM checkout DFM" in pwr_layout,
-        "PCB-PWR deliverable does not match the active eight-segment routing state",
+        "PCB-PWR deliverable does not match the active ECO-002 routing state",
     )
     require(
         deliverables["HW-P-005"]["Статус"] == "EVT_ENGINEERING_BASELINE_ACCEPTED"
@@ -968,18 +983,17 @@ def validate_deliverable_register() -> None:
         "PCB-PWR engineering-basis promotion risk is not controlled",
     )
     require(
-        "hash-bound C4 C6 L1 L2 ECO" in risks["R-034"]["Mitigation"]
-        and "CI 592 schematic 70 and Native 319"
+        "exact hash-bound power-stage ECO-002 candidate 44bbcd77"
         in risks["R-034"]["Mitigation"]
-        and "exact four-warning closure" in risks["R-034"]["Mitigation"]
-        and "eight accepted bootstrap VCAP VBAT_RAW and REV_GATE segments"
+        and "six retained predecessor traces" in risks["R-034"]["Mitigation"]
+        and "eight replacement or new BOOT and SW traces"
         in risks["R-034"]["Mitigation"]
-        and "CI 641 and PCB Native 347 exact application evidence"
-        in risks["R-034"]["Mitigation"]
-        and "change outside the accepted eight segments"
+        and "physical plus70C first-article" in risks["R-034"]["Mitigation"]
+        and "change outside the accepted 14 trace items"
         in risks["R-034"]["Trigger"]
-        and "REV_GATE application identity regression" in risks["R-034"]["Trigger"]
-        and "any unrelated footprint move" in risks["R-034"]["Trigger"],
+        and "ECO-002 application identity regression" in risks["R-034"]["Trigger"]
+        and "any unrelated footprint or silkscreen move"
+        in risks["R-034"]["Trigger"],
         "PCB-PWR dual-buck placement-before-routing risk is not controlled",
     )
 
@@ -1074,30 +1088,30 @@ def validate_hardware_baseline() -> None:
     require("STM32U585CIU6" in kicad_readme and "superseded" in kicad_readme, "superseded 48-pin MCU history is not documented")
     require("Do not reintroduce" in kicad_readme and "BQ24650/CN3791" in kicad_readme, "obsolete charger prohibition is missing")
     require(
-        "eight accepted bootstrap/VCAP/VBAT_RAW/REV_GATE segments" in kicad_readme
-        and "REV_GATE` routing 004 application gate is closed" in kicad_readme,
-        "KiCad overview does not match the active PCB-PWR REV_GATE successor",
+        "exactly 14 accepted trace items" in kicad_readme
+        and "ECO-002 commit-bound application gate is pending" in kicad_readme,
+        "KiCad overview does not match the active PCB-PWR ECO-002 successor",
     )
     active_pwr_docs = {
         ROOT / "README.md": (
-            "8 принятых сегментов",
-            "`REV_GATE` routing 004 применены",
+            "14 принятых сегментов",
+            "`PCB-PWR-BUCK-POWER-STAGE-ECO-002` теперь",
         ),
         ROOT / "BRANCH_SCOPE.md": (
-            "`REV_GATE` сегмента — всего восемь",
-            "application gate 004",
+            "активны 14 trace items",
+            "application gate ECO-002",
         ),
         ROOT / "hardware/HARDWARE_PRODUCTION_RELEASE_GATE_REV_A.md": (
-            "exactly eight accepted trace segments",
-            "`REV_GATE` routing 004 application gate is closed",
+            "exactly 14 accepted trace items",
+            "ECO-002 commit-bound application",
         ),
         ROOT / "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.md": (
-            "EIGHT CONTROLLED ROUTING SEGMENTS APPLIED",
-            "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c",
+            "FOURTEEN CONTROLLED TRACE ITEMS",
+            "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c",
         ),
         ROOT / "hardware/PCB_PWR_ROUTING_AUTHORITY_REV_A.md": (
-            "eight accepted F.Cu segments",
-            "exact `REV_GATE` application gate is closed",
+            "14 accepted F.Cu trace items",
+            "ECO-002 commit-bound application gate",
         ),
     }
     for path, markers in active_pwr_docs.items():

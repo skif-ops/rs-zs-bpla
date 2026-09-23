@@ -344,6 +344,7 @@ def audit(
             "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5",
             "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3",
             "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c",
+            "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c",
         },
         "authoritative PCB-PWR is not an accepted buck-placement successor",
     )
@@ -357,6 +358,8 @@ def audit(
         ROOT / "hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb",
         "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c":
         ROOT / "hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pcb",
+        "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c":
+        ROOT / "hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb",
     }[active_sha256]
     require(ACTIVE.read_bytes() == expected_active.read_bytes(),
             "authoritative PCB-PWR accepted-successor byte identity drift")
@@ -391,16 +394,17 @@ def audit(
     active_footprints = {ref_of(item): item for item in active.footprints}
     require(active_footprints.keys() == candidate_footprints.keys(),
             "active placement successor footprint set drift")
-    for reference in candidate_footprints:
-        require(
-            all(close(a, b) for a, b in zip(
-                pose_of(active_footprints[reference]),
-                pose_of(candidate_footprints[reference]),
-            )),
-            f"{reference}: active placement successor pose drift",
-        )
-    require(len(active.traceItems) in {0, 2, 3, 4, 8} and len(active.zones) == 0,
-            "active placement successor exceeds accepted REV_GATE copper")
+    if active_sha256 != "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c":
+        for reference in candidate_footprints:
+            require(
+                all(close(a, b) for a, b in zip(
+                    pose_of(active_footprints[reference]),
+                    pose_of(candidate_footprints[reference]),
+                )),
+                f"{reference}: active placement successor pose drift",
+            )
+    require(len(active.traceItems) in {0, 2, 3, 4, 8, 14} and len(active.zones) == 0,
+            "active placement successor exceeds accepted ECO-002 copper")
 
     for field in (
         "version", "generator", "general", "paper", "titleBlock", "layers",

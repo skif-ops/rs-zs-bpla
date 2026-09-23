@@ -111,9 +111,10 @@ evidence, routing completion and manufacture remain open.
   numeric EVT overlay. Preserve `DIM-003`; route an engineering candidate only
   against the 35 µm lower-bound rules and accepted EVT ordering profile
   `JLC04161H-3313A`, 1.6 mm, outer 2 oz / inner 1 oz. The active board has only
-  eight accepted bootstrap/VCAP/VBAT_RAW/REV_GATE segments and zero vias/zones;
-  the exact `REV_GATE` routing 004 application gate is closed. Fabrication still
-  requires remaining routing, current/fault and physical thermal evidence.
+  exactly 14 accepted trace items after hash-bound power-stage ECO-002 application
+  and zero vias/zones; the ECO-002 commit-bound application gate is pending.
+  Fabrication still requires remaining routing, current/fault and physical +70 °C
+  thermal evidence.
 - `hardware/reviews/PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.json` is retained for
   traceability. Its 24/24 rows are engineering-baseline closures and no factory
   reply is required. Any checkout DFM deviation must be resolved by ECO.

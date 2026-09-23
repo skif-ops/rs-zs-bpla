@@ -238,9 +238,15 @@ def candidate_bytes(base_payload: bytes) -> bytes:
 
 
 def generate(base_output: Path, output: Path, check: bool) -> dict[str, object]:
-    base_payload = SOURCE.read_bytes()
+    source_payload = SOURCE.read_bytes()
+    source_sha256 = sha256_bytes(source_payload)
+    require(source_sha256 in {BASE_SHA256, CANDIDATE_SHA256},
+            "authoritative PCB-PWR is not the controlled ECO-002 base or exact candidate")
+    base_payload = (
+        source_payload if source_sha256 == BASE_SHA256 else base_output.read_bytes()
+    )
     require(sha256_bytes(base_payload) == BASE_SHA256,
-            "authoritative PCB-PWR is not the controlled ECO-002 base")
+            "committed ECO-002 base SHA-256 drift")
     candidate_payload = candidate_bytes(base_payload)
     candidate_sha256 = sha256_bytes(candidate_payload)
     if CANDIDATE_SHA256 != "TO_BE_BOUND":

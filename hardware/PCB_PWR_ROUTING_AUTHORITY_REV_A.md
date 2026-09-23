@@ -35,10 +35,10 @@ closed by project engineering under customer EVT authority. No factory reply is
 required; selected values are 1.6 mm, outer 70 µm, inner 35 µm, minimum average
 hole-wall plating 18 µm and ENIG.
 
-The committed board has eight accepted F.Cu segments for the two bootstrap nets,
-LM74700 VCAP, `VBAT_RAW` and the four-segment `REV_GATE` routing 004, with zero
-vias and zero copper zones. The exact `REV_GATE` application gate is closed; all
-other routing remains open. The
+The committed board has 14 accepted F.Cu trace items after exact power-stage
+ECO-002 application, with zero vias and zero copper zones. The predecessor
+`REV_GATE` application gate is closed; the ECO-002 commit-bound application gate,
+physical +70 °C first-article validation and all other routing remain open. The
 numeric overlay uses a deliberately conservative 35 µm / 10 °C-rise engineering
 screen: 4.0 mm for the 5 A input/primary return, 3.0 mm for 4 A rails/returns,
 2.1 mm for local 4 A switch nodes and 0.5 mm for the 0.3 A rail/return. It also

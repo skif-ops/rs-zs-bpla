@@ -43,8 +43,10 @@ CANDIDATE_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0
 BASE_SEMANTIC_SHA256 = "f7a659d0740e78d40eddae7016724bd8e616baf9fb425f06ace70ec9acca4d3d"
 CANDIDATE_SEMANTIC_SHA256 = "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555"
 GENERATOR_SHA256 = "e4ab7290920f0b8c6f229e4701d2b82b78dc7638465a552d664221692ad40d1c"
+ACTIVE_GENERATOR_SHA256 = "463b6a24f5066017da11a4cbdb82cf2b445f0dccbe3560188653cd1a105c254c"
 ROUTING_RULES_SHA256 = "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988"
 STACKUP_BASIS_SHA256 = "41733d7d27e2c3ab831e602ee81b072146944da0a5efe8a2c805eeed46ecd1ca"
+ACTIVE_STACKUP_BASIS_SHA256 = "c417669cab385eb702c53a1912ad5973bda3ca0fec8cbc5c3e331a511178afad"
 CURRENT_BASIS_SHA256 = "4cecbe529987146078ce233d600ed047495a50d1228407e94b0380f88ca56cb2"
 REVIEW_MAPPING_SHA256 = "66051f7c8f83f074e1447719dc37106b90f751d87a032e3d949a9551f0400658"
 
@@ -482,13 +484,19 @@ def audit_drc(base_path: Path, candidate_path: Path) -> dict[str, object]:
 
 
 def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> dict[str, object]:
-    require(sha256(BASE) == BASE_SHA256 and sha256(ACTIVE) == BASE_SHA256,
-            "ECO-002 base or authoritative PCB-PWR drift")
+    require(
+        sha256(BASE) == BASE_SHA256
+        and sha256(ACTIVE) in {BASE_SHA256, CANDIDATE_SHA256},
+        "ECO-002 base or controlled authoritative PCB-PWR drift",
+    )
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "ECO-002 candidate SHA-256 drift")
     require(
-        sha256(GENERATOR) == GENERATOR_SHA256
+        sha256(GENERATOR) in {GENERATOR_SHA256, ACTIVE_GENERATOR_SHA256}
         and sha256(ROUTING_RULES) == ROUTING_RULES_SHA256
-        and sha256(STACKUP_BASIS) == STACKUP_BASIS_SHA256
+        and sha256(STACKUP_BASIS) in {
+            STACKUP_BASIS_SHA256,
+            ACTIVE_STACKUP_BASIS_SHA256,
+        }
         and sha256(CURRENT_BASIS) == CURRENT_BASIS_SHA256,
         "ECO-002 source binding drift",
     )

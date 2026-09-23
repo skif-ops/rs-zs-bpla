@@ -18,6 +18,7 @@ APPROVAL = ROOT / "hardware/reviews/PCB_PWR_VBAT_RAW_ROUTING_003_APPROVAL_REV_A.
 BASE_SHA256 = "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5"
 CANDIDATE_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"
 CONTROLLED_SUCCESSOR_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
+ECO_002_SUCCESSOR_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
 APPROVAL_SHA256 = "c7064ff198b4668aa486ce76a0552c7c76f67193d3a63d25c99019d5d03d5bc5"
 APPROVAL_COMMIT = "4356f40dd80e7fb183db13bd3844d3bf30dd40b3"
 
@@ -57,7 +58,9 @@ def accepted_payload() -> bytes:
 def apply(output: Path, check: bool) -> dict[str, object]:
     payload = accepted_payload()
     if check:
-        require(sha256(output) in {CANDIDATE_SHA256, CONTROLLED_SUCCESSOR_SHA256},
+        require(sha256(output) in {
+                    CANDIDATE_SHA256, CONTROLLED_SUCCESSOR_SHA256,
+                    ECO_002_SUCCESSOR_SHA256},
                 "authoritative PCB-PWR is not accepted VBAT_RAW or controlled successor")
     else:
         require(output.read_bytes() == BASE.read_bytes() and sha256(output) == BASE_SHA256,

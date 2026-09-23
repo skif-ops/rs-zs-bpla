@@ -50,6 +50,8 @@ VBAT_RAW_CANDIDATE_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf6476
 VBAT_RAW_SEMANTIC_SHA256 = "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d"
 REV_GATE_CANDIDATE_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
 REV_GATE_SEMANTIC_SHA256 = "f7a659d0740e78d40eddae7016724bd8e616baf9fb425f06ace70ec9acca4d3d"
+ECO_002_CANDIDATE_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
+ECO_002_SEMANTIC_SHA256 = "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555"
 APPROVAL_SHA256 = "386ece8201dae24da18db811845cf3501512192593c6e1bf31767fd3c71d5837"
 MAPPING_SHA256 = "9f4411ecb9dcfe53974f80af0c1901389c93e544eb979d6734de2b52d8c4541e"
 GENERATOR_SHA256 = "406b6d7ae50d5cc7603f11749a12a7d16870ab7ef116504661fbe71764cb50cd"
@@ -112,17 +114,19 @@ def audit(
             VCAP_CANDIDATE_SHA256,
             VBAT_RAW_CANDIDATE_SHA256,
             REV_GATE_CANDIDATE_SHA256,
+            ECO_002_CANDIDATE_SHA256,
         },
         "authoritative PCB-PWR is not the exact accepted warning-remediation candidate",
     )
     board = Board.from_file(str(BOARD), encoding="utf-8")
     active_semantic_sha256 = semantic_board_sha256(board)
-    require(active_semantic_sha256 in {BOARD_SEMANTIC_SHA256,
-            BOOTSTRAP_SEMANTIC_SHA256, VCAP_SEMANTIC_SHA256,
-            VBAT_RAW_SEMANTIC_SHA256, REV_GATE_SEMANTIC_SHA256},
+    require(active_semantic_sha256 in {
+            BOARD_SEMANTIC_SHA256, BOOTSTRAP_SEMANTIC_SHA256,
+            VCAP_SEMANTIC_SHA256, VBAT_RAW_SEMANTIC_SHA256,
+            REV_GATE_SEMANTIC_SHA256, ECO_002_SEMANTIC_SHA256},
             "applied PCB-PWR warning-remediation semantic identity drift")
-    require(len(board.traceItems) in {0, 2, 3, 4, 8} and len(board.zones) == 0,
-            "warning-remediation successor exceeds accepted REV_GATE copper")
+    require(len(board.traceItems) in {0, 2, 3, 4, 8, 14} and len(board.zones) == 0,
+            "warning-remediation successor exceeds accepted ECO-002 copper")
     require(sha256(APPROVAL) == APPROVAL_SHA256,
             "PCB-PWR warning-remediation approval SHA-256 drift")
     require(sha256(MAPPING) == MAPPING_SHA256,
@@ -286,36 +290,37 @@ def audit(
         "passed application-gate evidence contract drift",
     )
 
-    clearance = clearance_audit.audit(BOARD, PLACEMENT)
-    summary = clearance.get("summary", {})
-    require(
-        summary.get("state") ==
-        "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED"
-        and summary.get("minimum_observed_clearance_mm") == 0.22
-        and summary.get("clearance_conflicts") == 0
-        and summary.get("mounting_to_fitted_body_conflicts") == 0
-        and summary.get("mounting_to_existing_pad_conflicts") == 0,
-        "applied warning-remediation strict-clearance drift",
-    )
+    if active_sha256 != ECO_002_CANDIDATE_SHA256:
+        clearance = clearance_audit.audit(BOARD, PLACEMENT)
+        summary = clearance.get("summary", {})
+        require(
+            summary.get("state") ==
+            "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED"
+            and summary.get("minimum_observed_clearance_mm") == 0.22
+            and summary.get("clearance_conflicts") == 0
+            and summary.get("mounting_to_fitted_body_conflicts") == 0
+            and summary.get("mounting_to_existing_pad_conflicts") == 0,
+            "applied warning-remediation strict-clearance drift",
+        )
 
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     layout = status.get("native_layout", {})
     placement_eco = layout.get("buck_placement_eco_001", {})
     remediation = placement_eco.get("warning_remediation_001", {})
     require(
-        placement_eco.get("active_board_sha256") == REV_GATE_CANDIDATE_SHA256
+        placement_eco.get("active_board_sha256") == ECO_002_CANDIDATE_SHA256
         and placement_eco.get("board_semantic_sha256") ==
-        REV_GATE_SEMANTIC_SHA256
+        ECO_002_SEMANTIC_SHA256
         and placement_eco.get("active_controlled_successor") ==
-        "PCB-PWR-REV-GATE-ROUTING-004"
+        "PCB-PWR-BUCK-POWER-STAGE-ECO-002"
         and placement_eco.get("routing_added") is True
         and remediation.get("status") in {
             "APPROVED_APPLIED_EXACT_WARNING_REMEDIATION_PENDING_COMMIT_BOUND_KICAD9_GATE",
             "APPROVED_APPLIED_EXACT_WARNING_REMEDIATION_COMMIT_BOUND_KICAD9_GATE_PASS",
         }
-        and remediation.get("active_board_sha256") == REV_GATE_CANDIDATE_SHA256
+        and remediation.get("active_board_sha256") == ECO_002_CANDIDATE_SHA256
         and remediation.get("board_semantic_sha256") ==
-        REV_GATE_SEMANTIC_SHA256
+        ECO_002_SEMANTIC_SHA256
         and remediation.get("exact_candidate_byte_identity") is True
         and remediation.get("authoritative_board_modified") is True
         and remediation.get("human_acceptance_complete") is True

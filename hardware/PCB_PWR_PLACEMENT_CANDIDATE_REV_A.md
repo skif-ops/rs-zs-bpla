@@ -1,6 +1,6 @@
 # Дионея EVT-PRE-20 Rev.A - PCB-PWR provisional placement candidate
 
-Status: `FITTED 2D + EVT MOUNTING CLEARANCE PASS / DIM-003 18/18 EVT ACCEPTED / EIGHT CONTROLLED ROUTING SEGMENTS APPLIED / ROUTING INCOMPLETE / NOT FOR MANUFACTURE`
+Status: `FITTED 2D + EVT MOUNTING CLEARANCE PASS / DIM-003 18/18 EVT ACCEPTED / EXACT POWER-STAGE ECO-002 APPLIED / FOURTEEN CONTROLLED TRACE ITEMS / ROUTING INCOMPLETE / NOT FOR MANUFACTURE`
 
 This authority creates a reviewable native-board canvas without claiming enclosure or
 fabrication approval. The four-copper-layer count is frozen for Rev.A by
@@ -18,10 +18,11 @@ transition requires a repeat mechanical/STEP review.
 - J1 starts the west-side input/protection chain and J2 is provisionally oriented for
   an east-side harness exit;
 - the 3V8 and 3V3 buck channels occupy separate upper and lower functional regions;
-- the two LMR60440 input/bootstrap/inductor/output groups are kept close enough for
-  power-loop review; accepted ECO-001 places C4/C6 at `(54.575,16.40/44.40)`
-  with 180° rotation and L1/L2 at `(60.75,14.00/42.00)` with 180° rotation,
-  but no copper geometry is inferred from placement alone;
+- the exact accepted ECO-002 rotates U3/U4 to 90°, places C4/C6 at
+  `(57.80,14.03/42.03)` with 270° rotation, C20/C21 at
+  `(52.35,14.00/42.00)` with 90° rotation and L1/L2 at
+  `(62.50,14.00/42.00)` with 180° rotation; this supersedes only the historical
+  ECO-001 C4/C6/L1/L2 poses and remains subject to physical power-loop review;
 - the INA226 and shunt occupy one Kelvin-review region;
 - TP1-TP10 form a top-side `2.54 mm` pitch review row using the controlled no-paste
   `1.70 mm` target. Final side, fixture datum and probe access remain open;
@@ -30,7 +31,7 @@ transition requires a repeat mechanical/STEP review.
   `D8.0 mm` all-copper exclusion and `D10.0 mm` fitted-body exclusion;
 - all 44 simultaneously fitted assembly bodies have controlled courtyards and
   pass the independent `0.20 mm` 2D clearance subgate; the minimum observed
-  fitted-courtyard clearance is `0.22 mm`.
+  fitted-courtyard clearance is `0.20 mm`.
 
 The historical exact ECO-001 placement board has SHA-256
 `9e67236d55b9429c78362b1540634f74ab22b50c0ec65c41e8be74488cfa1e37`.
@@ -52,12 +53,12 @@ The four warning-only items are therefore closed; routing, Review B and CAM
 remain blocked by their independent gates.
 
 The active authoritative successor is SHA-256
-`f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c`.
-It contains exactly eight accepted F.Cu segments: both bootstrap connections,
-the LM74700 VCAP connection, the `VBAT_RAW` connection and four `REV_GATE`
-segments. It has zero vias and zero copper zones. The exact
-`PCB-PWR-REV-GATE-ROUTING-004` artifact is applied byte-for-byte and its
-application gate is closed.
+`44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c`.
+It is byte-identical to the accepted `PCB-PWR-BUCK-POWER-STAGE-ECO-002`
+candidate and contains exactly 14 accepted F.Cu trace items, zero vias and zero
+copper zones. Six unrelated predecessor traces are retained byte-for-byte, two
+former BOOT traces are replaced and eight reviewed BOOT/SW traces are added.
+The fresh commit-bound ECO-002 application gate remains pending.
 
 ## Local input-capacitor placement evidence
 
@@ -71,7 +72,7 @@ center-to-center distances:
 | `U4` | `C12` | `6.00 mm` | `C21` | `2.60 mm` |
 
 These distances prove only that the intended parts occupy the correct local
-functional regions. The eight accepted partial-routing segments do not implement
+functional regions. The 14 accepted partial-routing trace items do not implement
 or prove the final VIN-PGND loop geometry. C11/C12 effective capacitance at bias and
 temperature, direct pad-first routing of C20/C21, and routed hot-loop review
 remain mandatory.
@@ -86,9 +87,10 @@ controlled by
 
 ## Hard interlocks
 
-The active candidate must contain only the eight accepted
-bootstrap/VCAP/VBAT_RAW/REV_GATE segments, zero vias and zero copper zones; any
-other active copper fails this gate. Gerber, drill, position and IPC-356 fabrication export remain prohibited. The controlled
+The active candidate must be byte-identical to the accepted ECO-002 SHA-256
+`44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c`,
+with exactly 14 trace items, zero vias and zero copper zones; any other active
+copper fails this gate. Gerber, drill, position and IPC-356 fabrication export remain prohibited. The controlled
 EVT envelope STEP is the sole permitted mechanical export in this state. The independent
 audit checks the complete reference/net/footprint set, every candidate coordinate,
 the frozen layer count, accepted EVT outline/thickness and the closed EVT

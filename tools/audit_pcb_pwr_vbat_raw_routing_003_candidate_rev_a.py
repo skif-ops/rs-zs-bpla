@@ -31,12 +31,15 @@ CANDIDATE_SEMANTIC_SHA256 = "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e9848
 GENERATOR_SHA256 = "b7a73f836ddbb74b7115f50a743d18bc98ac44ee1e5270eafd0cbc23f3ea7eaa"
 ACTIVE_GENERATOR_SHA256 = "84a426f84789b5be5a0db64180e8689bc8ac14543d7fb844e7e91575239eed61"
 REV_GATE_GENERATOR_SHA256 = "9721b1ecd9e0991a4f820aaf6c39e4bb90bcb493546a6b2a4dbe9c4b469c99d4"
+ECO_002_GENERATOR_SHA256 = "9a38ce94a62b6d8274a7c3af937242658e3ecfa0752c0f2e806ab87e90d049e4"
 ROUTING_RULES_SHA256 = "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988"
 STACKUP_BASIS_SHA256 = "dbb41a7fb0ee5eea01f7bbebaa542061d1c9d7b102c0cb4a912a974b03ab3dc3"
 ACTIVE_STACKUP_BASIS_SHA256 = "300c2c6998704fae554c6f30ddb7bcb6eabb2060973c90f2b1d2ecc4ab76b1fc"
 REV_GATE_SUCCESSOR_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
 REV_GATE_STACKUP_BASIS_SHA256 = "78ea37897803675337612eedbdcaf3922b53fbe2330cb8f12f09f48412b26531"
 ENGINEERING_BASELINE_STACKUP_BASIS_SHA256 = "41733d7d27e2c3ab831e602ee81b072146944da0a5efe8a2c805eeed46ecd1ca"
+ECO_002_SUCCESSOR_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
+ECO_002_STACKUP_BASIS_SHA256 = "c417669cab385eb702c53a1912ad5973bda3ca0fec8cbc5c3e331a511178afad"
 EXPECTED_START = (7.7, 31.25)
 EXPECTED_END = (10.6, 31.25)
 
@@ -81,13 +84,15 @@ def audit_drc(base_path: Path, candidate_path: Path) -> dict[str, object]:
 def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> dict[str, object]:
     require(sha256(BASE) == BASE_SHA256 and
             sha256(ACTIVE) in {
-                BASE_SHA256, CANDIDATE_SHA256, REV_GATE_SUCCESSOR_SHA256},
+                BASE_SHA256, CANDIDATE_SHA256, REV_GATE_SUCCESSOR_SHA256,
+                ECO_002_SUCCESSOR_SHA256},
             "candidate-003 base or controlled authoritative board drift")
     require(sha256(CANDIDATE) == CANDIDATE_SHA256, "candidate-003 SHA-256 drift")
     require(sha256(GENERATOR) in {
                 GENERATOR_SHA256,
                 ACTIVE_GENERATOR_SHA256,
                 REV_GATE_GENERATOR_SHA256,
+                ECO_002_GENERATOR_SHA256,
             } and
             sha256(ROUTING_RULES) == ROUTING_RULES_SHA256 and
             sha256(STACKUP_BASIS) in {
@@ -95,6 +100,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
                 ACTIVE_STACKUP_BASIS_SHA256,
                 REV_GATE_STACKUP_BASIS_SHA256,
                 ENGINEERING_BASELINE_STACKUP_BASIS_SHA256,
+                ECO_002_STACKUP_BASIS_SHA256,
             },
             "candidate-003 source binding drift")
     base = Board.from_file(str(BASE), encoding="utf-8")

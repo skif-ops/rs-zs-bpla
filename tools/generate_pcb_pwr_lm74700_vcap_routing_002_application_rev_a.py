@@ -19,6 +19,7 @@ BASE_SHA256 = "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae05236"
 CANDIDATE_SHA256 = "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5"
 CONTROLLED_SUCCESSOR_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"
 REV_GATE_SUCCESSOR_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
+ECO_002_SUCCESSOR_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
 APPROVAL_SHA256 = "b9578a4d6691a1a5d7f0bfaafc08d6939af70acf1b4d86add1c00c0b816099ea"
 APPROVAL_COMMIT = "b4b1ca81ffca63b389c3e34b3ba1be17ac9a590f"
 
@@ -61,6 +62,7 @@ def apply(output: Path, check: bool) -> dict[str, object]:
                     CANDIDATE_SHA256,
                     CONTROLLED_SUCCESSOR_SHA256,
                     REV_GATE_SUCCESSOR_SHA256,
+                    ECO_002_SUCCESSOR_SHA256,
                 },
                 "authoritative PCB-PWR is not accepted VCAP or controlled successor")
     else:

@@ -17,6 +17,7 @@ APPROVAL = ROOT / "hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_APPROVAL_REV_A.
 
 BASE_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"
 CANDIDATE_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
+ECO_002_SUCCESSOR_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
 APPROVAL_SHA256 = "de211f42bf5a0256f89f06b93e5bd0715dca4609fd5c113312e1b01a139671cb"
 APPROVAL_COMMIT = "15e2a253e99cf1456f4a5f00b1bb0a8335031ba4"
 
@@ -56,8 +57,8 @@ def accepted_payload() -> bytes:
 def apply(output: Path, check: bool) -> dict[str, object]:
     payload = accepted_payload()
     if check:
-        require(output.read_bytes() == payload,
-                "authoritative PCB-PWR is not the exact accepted REV_GATE candidate")
+        require(sha256(output) in {CANDIDATE_SHA256, ECO_002_SUCCESSOR_SHA256},
+                "authoritative PCB-PWR is not accepted REV_GATE or controlled successor")
     else:
         require(output.read_bytes() == BASE.read_bytes() and sha256(output) == BASE_SHA256,
                 "authoritative PCB-PWR is not the approved predecessor")

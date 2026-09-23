@@ -20,6 +20,7 @@ CANDIDATE_SHA256 = "a8782a437b7ca6ea4929bd839fb3244c4a05e0a12bd4908321d6cc3a7ae0
 CONTROLLED_SUCCESSOR_SHA256 = "3d779f947f882c23edec277ab9e898c87cfa960ec69eacf2170cd18d28fab2e5"
 LATEST_SUCCESSOR_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf647628b6ba70826c3"
 REV_GATE_SUCCESSOR_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
+ECO_002_SUCCESSOR_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
 APPROVAL_SHA256 = "30b26ade4edf0a2f357fb93e1ce95dea7628a7c382003578ebf07c74a7465e0b"
 APPROVAL_COMMIT = "57d7b571ed2bb82feea7288fea1d7f4b99ac0ae8"
 
@@ -63,6 +64,7 @@ def apply(output: Path, check: bool) -> dict[str, object]:
                     CONTROLLED_SUCCESSOR_SHA256,
                     LATEST_SUCCESSOR_SHA256,
                     REV_GATE_SUCCESSOR_SHA256,
+                    ECO_002_SUCCESSOR_SHA256,
                 },
                 "authoritative PCB-PWR is not accepted bootstrap or controlled successor")
     else:

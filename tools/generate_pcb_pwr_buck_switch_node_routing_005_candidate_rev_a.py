@@ -111,7 +111,11 @@ def generate(base_output: Path, output: Path, check: bool) -> dict[str, object]:
     source_payload = SOURCE.read_bytes()
     source_sha256 = sha256_bytes(source_payload)
     require(
-        source_sha256 in {BASE_SHA256, CANDIDATE_SHA256},
+        source_sha256 in {
+            BASE_SHA256,
+            CANDIDATE_SHA256,
+            "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c",
+        },
         "authoritative PCB-PWR is not a controlled candidate-005 successor",
     )
     base_payload = (

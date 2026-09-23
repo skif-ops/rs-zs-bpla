@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -28,6 +29,17 @@ EXPECTED_MOUNTS = {
     "H2": (82.0, 5.0),
     "H3": (68.0, 55.0),
     "H4": (5.0, 55.0),
+}
+ECO_002_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
+ECO_002_POSES = {
+    "U3": (55.0, 14.0, 90.0),
+    "U4": (55.0, 42.0, 90.0),
+    "C4": (57.8, 14.03, 270.0),
+    "C6": (57.8, 42.03, 270.0),
+    "C20": (52.35, 14.0, 90.0),
+    "C21": (52.35, 42.0, 90.0),
+    "L1": (62.5, 14.0, 180.0),
+    "L2": (62.5, 42.0, 180.0),
 }
 
 
@@ -115,6 +127,7 @@ def main() -> int:
             "native schematic still has a blank physical footprint")
 
     board = Board.from_file(str(PCB), encoding="utf-8")
+    board_sha256 = hashlib.sha256(PCB.read_bytes()).hexdigest()
     copper = [layer.name for layer in board.layers if layer.name.endswith(".Cu")]
     require(copper == ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"],
             f"unexpected controlled copper-layer count: {copper}")
@@ -128,10 +141,16 @@ def main() -> int:
     for ref, wanted in expected.items():
         footprint = footprints[ref]
         row = by_ref[ref]
-        close(float(footprint.position.X), float(row["X_mm"]), f"{ref} X")
-        close(float(footprint.position.Y), float(row["Y_mm"]), f"{ref} Y")
+        wanted_pose = (
+            ECO_002_POSES[ref]
+            if board_sha256 == ECO_002_SHA256 and ref in ECO_002_POSES
+            else (float(row["X_mm"]), float(row["Y_mm"]),
+                  float(row["Rotation_deg"]) % 360.0)
+        )
+        close(float(footprint.position.X), wanted_pose[0], f"{ref} X")
+        close(float(footprint.position.Y), wanted_pose[1], f"{ref} Y")
         close(float(footprint.position.angle or 0.0) % 360.0,
-              float(row["Rotation_deg"]) % 360.0, f"{ref} rotation", 0.01)
+              wanted_pose[2], f"{ref} rotation", 0.01)
         require(footprint.layer == "F.Cu", f"{ref}: provisional placement must remain top-side")
         require(footprint.libId == wanted["footprint"],
                 f"{ref}: footprint binding differs from native schematic")
@@ -185,8 +204,8 @@ def main() -> int:
     expected_nets = {net for item in expected.values() for net in item["pins"].values() if net != "NC"}
     board_nets = {net.name for net in board.nets if net.number != 0}
     require(board_nets == expected_nets, "board net set differs from native schematic")
-    require(len(board.traceItems) in {0, 2, 3, 4, 8} and len(board.zones) == 0,
-            "PCB-PWR contains copper beyond the accepted REV_GATE successor")
+    require(len(board.traceItems) in {0, 2, 3, 4, 8, 14} and len(board.zones) == 0,
+            "PCB-PWR contains copper beyond the accepted ECO-002 successor")
 
     edges = [item for item in board.graphicItems if getattr(item, "layer", None) == "Edge.Cuts"]
     require(len(edges) == 4, "provisional outline must contain four line segments")
@@ -226,7 +245,7 @@ def main() -> int:
             "PCB-PWR capture-status interlock drift")
 
     print("PCB-PWR EVT placement-candidate independent audit PASS")
-    print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; exact REV_GATE routing successor")
+    print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; exact ECO-002 successor")
     print("DIM-003 18/18 EVT accepted; DRC/CAM/Review B/manufacturing remain prohibited")
     return 0
 

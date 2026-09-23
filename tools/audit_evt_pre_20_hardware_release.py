@@ -430,7 +430,7 @@ def audit() -> dict[str, object]:
         and pwr_clearance_summary.get("mounting_holes") == 4
         and pwr_clearance_summary.get("mounting_to_fitted_body_conflicts") == 0
         and pwr_clearance_summary.get("mounting_to_existing_pad_conflicts") == 0
-        and pwr_clearance.get("board", {}).get("trace_items") == 8
+        and pwr_clearance.get("board", {}).get("trace_items") == 14
         and pwr_clearance.get("board", {}).get("copper_zones") == 0
         and pwr_clearance.get("manufacturing_release") is False
     )
@@ -447,7 +447,7 @@ def audit() -> dict[str, object]:
         "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN"
         and pwr_routing_authority.get("authority", {}).get("row_count") == 31
         and pwr_routing_authority.get("board", {}).get("net_count") == 31
-        and pwr_routing_authority.get("board", {}).get("trace_items") == 8
+        and pwr_routing_authority.get("board", {}).get("trace_items") == 14
         and pwr_routing_authority.get("board", {}).get("copper_zones") == 0
         and pwr_routing_authority.get("dim_003") ==
         "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED"

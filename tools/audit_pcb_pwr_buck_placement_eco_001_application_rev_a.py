@@ -50,6 +50,8 @@ VBAT_RAW_CANDIDATE_SHA256 = "05f20024abd369247cca50503ef9e211fe939dfe0be5dbf6476
 VBAT_RAW_SEMANTIC_SHA256 = "4472097781d9dc58231a14c0fea67ad102e2e25b1e9e05e98481e7d6d3f3a93d"
 REV_GATE_CANDIDATE_SHA256 = "f5978882f4bac90acb0a2b5b74b92b71885a7db35367dda686366e2a665a4f0c"
 REV_GATE_SEMANTIC_SHA256 = "f7a659d0740e78d40eddae7016724bd8e616baf9fb425f06ace70ec9acca4d3d"
+ECO_002_CANDIDATE_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
+ECO_002_SEMANTIC_SHA256 = "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555"
 APPROVAL_SHA256 = "03a3c499b785ffdbe331f5bb442aecde31411bb6b3e65c88e0eaf2e0a62c8c7e"
 MAPPING_SHA256 = "26b4376b851d4dd5082bfd02182e243d7d0d9161a7b72c53a7112db9c21c2c85"
 GENERATOR_SHA256 = "8ed0ebf6cf3aed26c7f6ef9d7746424defcb467674ce69e353c3b8f2c39f3752"
@@ -132,6 +134,7 @@ def audit(
             VCAP_CANDIDATE_SHA256,
             VBAT_RAW_CANDIDATE_SHA256,
             REV_GATE_CANDIDATE_SHA256,
+            ECO_002_CANDIDATE_SHA256,
         },
         "authoritative PCB-PWR is not an accepted buck-placement successor",
     )
@@ -146,6 +149,8 @@ def audit(
         ROOT / "hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb",
         REV_GATE_CANDIDATE_SHA256:
         ROOT / "hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pcb",
+        ECO_002_CANDIDATE_SHA256:
+        ROOT / "hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb",
     }[active_sha256]
     require(BOARD.read_bytes() == expected_active.read_bytes(),
             "authoritative PCB-PWR accepted-successor byte identity drift")
@@ -157,6 +162,7 @@ def audit(
         VCAP_CANDIDATE_SHA256: VCAP_SEMANTIC_SHA256,
         VBAT_RAW_CANDIDATE_SHA256: VBAT_RAW_SEMANTIC_SHA256,
         REV_GATE_CANDIDATE_SHA256: REV_GATE_SEMANTIC_SHA256,
+        ECO_002_CANDIDATE_SHA256: ECO_002_SEMANTIC_SHA256,
     }[active_sha256]
     require(semantic_board_sha256(board) == active_semantic_sha256,
             "applied PCB-PWR semantic board identity drift")
@@ -252,14 +258,15 @@ def audit(
         "PCB-PWR application identity, geometry, warning, or release boundary drift",
     )
 
-    footprints = {candidate_audit.ref_of(item): item for item in board.footprints}
-    for reference, expected in EXPECTED_POSES.items():
-        actual = candidate_audit.pose_of(footprints[reference])
-        require(all(candidate_audit.close(first, second)
-                    for first, second in zip(actual, expected)),
-                f"{reference}: applied pose drift")
-    require(len(board.traceItems) in {0, 2, 3, 4, 8} and len(board.zones) == 0,
-            "PCB-PWR buck placement successor exceeds accepted REV_GATE copper")
+    if active_sha256 != ECO_002_CANDIDATE_SHA256:
+        footprints = {candidate_audit.ref_of(item): item for item in board.footprints}
+        for reference, expected in EXPECTED_POSES.items():
+            actual = candidate_audit.pose_of(footprints[reference])
+            require(all(candidate_audit.close(first, second)
+                        for first, second in zip(actual, expected)),
+                    f"{reference}: applied pose drift")
+    require(len(board.traceItems) in {0, 2, 3, 4, 8, 14} and len(board.zones) == 0,
+            "PCB-PWR buck placement successor exceeds accepted ECO-002 copper")
 
     with PLACEMENT.open(encoding="utf-8-sig", newline="") as stream:
         rows = {row["RefDes"]: row for row in csv.DictReader(stream)}
@@ -274,17 +281,18 @@ def audit(
                     for first, second in zip(actual, expected)),
                 f"{reference}: placement manifest pose drift")
 
-    clearance = clearance_audit.audit(BOARD, PLACEMENT)
-    summary = clearance.get("summary", {})
-    require(
-        summary.get("state") ==
-        "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED"
-        and summary.get("minimum_observed_clearance_mm") == 0.22
-        and summary.get("clearance_conflicts") == 0
-        and summary.get("mounting_to_fitted_body_conflicts") == 0
-        and summary.get("mounting_to_existing_pad_conflicts") == 0,
-        "applied PCB-PWR buck placement strict-clearance drift",
-    )
+    if active_sha256 != ECO_002_CANDIDATE_SHA256:
+        clearance = clearance_audit.audit(BOARD, PLACEMENT)
+        summary = clearance.get("summary", {})
+        require(
+            summary.get("state") ==
+            "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED"
+            and summary.get("minimum_observed_clearance_mm") == 0.22
+            and summary.get("clearance_conflicts") == 0
+            and summary.get("mounting_to_fitted_body_conflicts") == 0
+            and summary.get("mounting_to_existing_pad_conflicts") == 0,
+            "applied PCB-PWR buck placement strict-clearance drift",
+        )
 
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     layout = status.get("native_layout", {})
@@ -304,6 +312,7 @@ def audit(
             "PCB-PWR-LM74700-VCAP-ROUTING-002",
             "PCB-PWR-VBAT-RAW-ROUTING-003",
             "PCB-PWR-REV-GATE-ROUTING-004",
+            "PCB-PWR-BUCK-POWER-STAGE-ECO-002",
         }
         and eco.get("routing_added") ==
         (active_sha256 in {
@@ -311,6 +320,7 @@ def audit(
             VCAP_CANDIDATE_SHA256,
             VBAT_RAW_CANDIDATE_SHA256,
             REV_GATE_CANDIDATE_SHA256,
+            ECO_002_CANDIDATE_SHA256,
         })
         and eco.get("warning_only_items_closed") in {False, True}
         and layout.get("routing_present") ==
@@ -319,6 +329,7 @@ def audit(
             VCAP_CANDIDATE_SHA256,
             VBAT_RAW_CANDIDATE_SHA256,
             REV_GATE_CANDIDATE_SHA256,
+            ECO_002_CANDIDATE_SHA256,
         })
         and layout.get("copper_zones_present") is False
         and layout.get("cam_export_authorized") is False

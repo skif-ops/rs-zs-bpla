@@ -21,6 +21,9 @@ APPLICATION = ROOT / "hardware/reviews/PCB_PWR_REV_GATE_ROUTING_004_APPLICATION_
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 BOARD_SHA256 = candidate_audit.CANDIDATE_SHA256
 SEMANTIC_SHA256 = candidate_audit.CANDIDATE_SEMANTIC_SHA256
+ECO_002_SUCCESSOR_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
+ECO_002_SUCCESSOR_SEMANTIC_SHA256 = "0e52d4cbc80104691e3793a579c7c7a8570e3640fabc2fb02bd7ea2e65643555"
+ECO_002_SUCCESSOR = ROOT / "hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb"
 APPROVAL_SHA256 = "de211f42bf5a0256f89f06b93e5bd0715dca4609fd5c113312e1b01a139671cb"
 
 
@@ -34,14 +37,21 @@ def sha256(path: Path) -> str:
 
 
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[str, object]:
-    require(sha256(BOARD) == BOARD_SHA256 and
-            BOARD.read_bytes() == candidate_audit.CANDIDATE.read_bytes(),
-            "authoritative PCB-PWR is not exact accepted REV_GATE candidate")
+    active_sha256 = sha256(BOARD)
+    require(active_sha256 in {BOARD_SHA256, ECO_002_SUCCESSOR_SHA256},
+            "authoritative PCB-PWR is not accepted REV_GATE or controlled successor")
+    expected_active = {
+        BOARD_SHA256: candidate_audit.CANDIDATE,
+        ECO_002_SUCCESSOR_SHA256: ECO_002_SUCCESSOR,
+    }[active_sha256]
+    require(BOARD.read_bytes() == expected_active.read_bytes(),
+            "authoritative PCB-PWR REV_GATE successor byte identity drift")
     require(sha256(APPROVAL) == APPROVAL_SHA256, "REV_GATE approval drift")
     board = Board.from_file(str(BOARD), encoding="utf-8")
-    require(semantic_board_sha256(board) == SEMANTIC_SHA256,
+    require(semantic_board_sha256(board) in {
+                SEMANTIC_SHA256, ECO_002_SUCCESSOR_SEMANTIC_SHA256},
             "applied REV_GATE semantic identity drift")
-    require(len(board.traceItems) == 8 and len(board.zones) == 0,
+    require(len(board.traceItems) in {8, 14} and len(board.zones) == 0,
             "applied REV_GATE copper inventory drift")
     proposal = candidate_audit.audit()
     require(proposal["status"] ==
@@ -73,8 +83,10 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict[
             "APPROVED_APPLIED_EXACT_REV_GATE_ROUTING_APPLICATION_GATE_PENDING",
             "APPROVED_APPLIED_EXACT_REV_GATE_ROUTING_COMMIT_BOUND_KICAD9_GATE_PASS",
         }
-        and route["active_board_sha256"] == BOARD_SHA256
-        and route["active_board_semantic_sha256"] == SEMANTIC_SHA256
+        and route["active_board_sha256"] in {
+            BOARD_SHA256, ECO_002_SUCCESSOR_SHA256}
+        and route["active_board_semantic_sha256"] in {
+            SEMANTIC_SHA256, ECO_002_SUCCESSOR_SEMANTIC_SHA256}
         and route["exact_candidate_byte_identity"] is True
         and route["human_acceptance_complete"] is True
         and route["application_machine_gate"] in {
