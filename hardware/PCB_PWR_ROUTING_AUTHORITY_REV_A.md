@@ -44,8 +44,9 @@ at CI #715 and PCB Native #364 (KiCad 9 DRC 85 → 85; unconnected 117 → 108;
 zero DRC fingerprint delta). The authoritative successor now exactly matches
 accepted shunt-to-bulk candidate 007, adding only two F.Cu `VBAT_SYS` segments
 from `RSH1.2` to `C13.1` for 37 total trace items. Its candidate gate passed at
-CI #720 and PCB Native #367 (85 → 85 violations; unconnected 108 → 107); the
-separate application gate is pending. Via-current and via-under-pad fabrication
+CI #720 and PCB Native #367 (85 → 85 violations; unconnected 108 → 107); its
+separate application gate passes at CI #725, PCB-PWR Schematic #110 and PCB
+Native #370 with the same DRC comparison and zero fingerprint delta. Via-current and via-under-pad fabrication
 qualification, physical
 +70 °C first-article validation and all other routing remain open. The
 numeric overlay uses a deliberately conservative 35 µm / 10 °C-rise engineering

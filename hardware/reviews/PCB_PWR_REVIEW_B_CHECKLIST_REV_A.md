@@ -228,7 +228,9 @@ commit-bound application gate passes at CI #715 and PCB Native #364. The board
 then had 35 trace items, including eight GND_PWR vias, and two local In1.Cu
 return zones. Accepted shunt-to-bulk candidate 007 is now applied byte-for-byte
 (SHA-256 `bb17dbea…a3876b`), adding only two F.Cu `VBAT_SYS` segments from
-`RSH1.2` to `C13.1`; its separate application gate is pending. These local
+`RSH1.2` to `C13.1`; its separate application gate passes at CI #725,
+PCB-PWR Schematic #110 and PCB Native #370 (85 → 85 violations, 108 → 107
+unconnected, zero DRC fingerprint delta). These local
 zones do not complete the global return plane.
 Remaining routing, physical via-sharing/current/thermal/fault evidence, DRC,
 CAM, checkout DFM, final serial mechanics and independent Review B are open.
