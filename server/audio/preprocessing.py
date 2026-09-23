@@ -93,3 +93,19 @@ def adaptive_window_rms_threshold(
     robust = 0.25 * float(np.median(finite))
     floor = 0.10 * float(configured_threshold)
     return float(min(configured_threshold, max(floor, robust)))
+
+
+def normalize_window_like_station(segment: np.ndarray) -> np.ndarray:
+    """DC-remove and peak-normalize one analysis window, as the station does per 1 s window (zs_dsp preprocess).
+
+    The loader normalizes the peak of the whole recording; the station never sees a whole recording, so dataset
+    windows and analysis windows go through this before feature extraction when
+    ``settings.ml_window_peak_normalize`` is on — otherwise the level features (average_energy, rms,
+    mfcc_mean_0) would depend on the loudest event of the file rather than on the window itself.
+    """
+
+    if not settings.ml_window_peak_normalize or segment.size == 0:
+        return segment
+    centered = np.asarray(segment, dtype=np.float32) - np.float32(np.mean(segment))
+    peak = float(np.max(np.abs(centered)))
+    return centered / peak if peak > 1e-9 else centered

@@ -13,7 +13,7 @@ import pandas as pd
 
 from audio.features import FeatureExtractor
 from audio.loader import AudioLoader
-from audio.preprocessing import adaptive_window_rms_threshold
+from audio.preprocessing import adaptive_window_rms_threshold, normalize_window_like_station
 from config import settings
 from ml.cluster_classifier import CentroidAudioClassifier
 from ml.feature_vector import FEATURE_COLUMNS, feature_set_to_row
@@ -109,7 +109,7 @@ class SoundDatasetManager:
             rms = float(np.sqrt(np.mean(np.square(segment)))) if segment.size else 0.0
             if rms < effective_min_window_rms:
                 continue
-            extraction = self.extractor.extract(segment.astype(np.float32), loaded.sample_rate)
+            extraction = self.extractor.extract(normalize_window_like_station(segment.astype(np.float32)), loaded.sample_rate)
             row: dict[str, object] = {
                 "record_id": uuid.uuid4().hex,
                 "label": clean_label,
