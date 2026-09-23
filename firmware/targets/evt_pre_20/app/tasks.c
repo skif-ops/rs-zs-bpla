@@ -7,12 +7,13 @@
  *   ble         - zs_ipc_service over USART3 to the nRF52840 bridge (ICD addendum C), window with S4 SERVICE
  *   dsp         - zs_station_pipeline: 1 s windows at a 0.5 s hop -> zs_dsp_mcu -> votes + AIR gate -> level 1 ->
  *                 detection events into the NOR outbox (fetch in the audio task, analysis here)
- * The comms task (BG95) is created in B2 on top of zs_bg95 / zs_bg95_provision.
+ *   comms       - app_comms: BG95 bring-up from the station configuration, MQTT session, outbox drain + heartbeat (B2)
  */
 #include "tasks.h"
 
 #include "FreeRTOS.h"
 #include "app_config.h"
+#include "app_comms.h"
 #include "app_nrf_update.h"
 #include "bsp_gpio.h"
 #include "bsp_mdf.h"
@@ -55,7 +56,7 @@ static zs_dsp_ctx_t dsp_ctx;
 static zs_station_pipeline_t pipeline;
 static uint32_t pipeline_last_ms, pipeline_max_ms, pipeline_events_ram;
 
-static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task, ble_task, dsp_task;
+static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task, ble_task, dsp_task, comms_task;
 
 /* ---- ISR notifications ----------------------------------------------------- */
 void app_audio_block_notify_from_isr(void) {
@@ -66,7 +67,7 @@ void app_audio_block_notify_from_isr(void) {
 
 void app_uart_rx_notify_from_isr(bsp_uart_id_t id) {
   BaseType_t woken = pdFALSE;
-  TaskHandle_t t = id == BSP_UART_CONSOLE ? console_task : id == BSP_UART_GNSS ? gnss_task : id == BSP_UART_BLE ? ble_task : NULL;
+  TaskHandle_t t = id == BSP_UART_CONSOLE ? console_task : id == BSP_UART_GNSS ? gnss_task : id == BSP_UART_BLE ? ble_task : id == BSP_UART_CELL ? comms_task : NULL;
   if (t) vTaskNotifyGiveFromISR(t, &woken);
   portYIELD_FROM_ISR(woken);
 }
@@ -326,6 +327,23 @@ static const zs_ipc_identity_t identity = {APP_STATION_SERIAL, APP_STATION_HW_RE
 static zs_ipc_service_port_t ipc_port = {NULL, ble_uart_send, ble_now_ms, ble_service_mode, ble_peer_role, ble_peer_secure,
                                          &cfg_io, &pos_io, &audit_io, &selftests, &identity, NULL, ble_random};
 
+/* Heartbeat (schema 1): identity, time, power/route placeholders of B1, self-test verdict, pipeline health in route hop_count. */
+static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
+  (void)ctx;
+  hb->time_us = zs_time_for_sample(&time_sync, zs_pdm_capture_sample_counter(&capture));
+  hb->power.battery_pct = 100u; hb->power.battery_mv = 12000u;           /* INA226 binding lands with the power task */
+  hb->power.monitor_status = 1u;                                          /* nonzero: no live power monitor */
+  hb->route.transport = ZS_ROUTE_LTE;
+  strncpy(hb->firmware_ver, APP_STATION_FW_VERSION, sizeof(hb->firmware_ver) - 1u);
+  strncpy(hb->model_ver, "c46", sizeof(hb->model_ver) - 1u);
+  strncpy(hb->hardware_rev, APP_STATION_HW_REV, sizeof(hb->hardware_rev) - 1u);
+  hb->self_test_ok = zs_selftest_required_ok(&selftests);
+  hb->gnss.time_trust = (uint8_t)time_sync.trust;
+  hb->gnss.expected_time_error_us = time_sync.expected_error_us;
+  return true;
+}
+static const app_comms_hooks_t comms_hooks = {comms_fill_heartbeat, NULL, console_printf};
+
 static void bind_record_stores(void) {
   memset(cfg_slots, 0xff, sizeof(cfg_slots));
   memset(pos_slots, 0xff, sizeof(pos_slots));
@@ -334,6 +352,7 @@ static void bind_record_stores(void) {
                                  &nor_command_io, &nor_outbox_io, &cfg_io, &pos_io)) {
     stores_on_nor = true;
     app_nrf_update_bind(&nor, &nor_bindings.layout, console_printf);
+    app_comms_bind(&nor_outbox_io, &nor_command_io, &comms_hooks);        /* comms needs the durable stores */
     console_printf("nor: W25Q512JV bound, nrf image @0x%08lx config @0x%08lx installation @0x%08lx\r\n",
                    (unsigned long)nor_bindings.layout.nrf_image_base_address, (unsigned long)nor_bindings.layout.config_base_address,
                    (unsigned long)nor_bindings.layout.installation_base_address);
@@ -377,10 +396,12 @@ static void ble_task_fn(void *arg) {
   vTaskDelay(pdMS_TO_TICKS(200));                  /* nRF boot */
   (void)zs_ipc_service_init(&ipc, &ipc_port);
   (void)zs_ipc_service_ping(&ipc);
+  if (ipc.config_loaded) app_comms_set_config(&ipc.config, APP_BOOT_ID);
   for (;;) {
     uint8_t buf[64];
     size_t n;
     (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(250));
+    { static uint32_t seen_version; if (ipc.config_loaded && ipc.config.version != seen_version) { seen_version = ipc.config.version; app_comms_set_config(&ipc.config, APP_BOOT_ID); } }
     while ((n = bsp_uart_read(BSP_UART_BLE, buf, sizeof(buf))) > 0u) zs_ipc_service_on_uart_rx(&ipc, buf, n);
     if (ble_recovery_request) { ble_recovery_request = false; ble_enter_recovery(); (void)zs_ipc_service_init(&ipc, &ipc_port); }
     if (app_nrf_update_pending()) { app_nrf_update_run(); (void)zs_ipc_service_init(&ipc, &ipc_port); (void)zs_ipc_service_ping(&ipc); }
@@ -465,10 +486,14 @@ static void console_exec(const char *cmd) {
     console_printf("  features f0 %d Hz harmonics %d step %d Hz stab %d%% centroid %d Hz flat %d%% noise %d%% rough %d%%\r\n",
                    (int)pipeline.features[0], (int)pipeline.features[1], (int)pipeline.features[2], (int)(pipeline.features[3] * 100.0f),
                    (int)pipeline.features[7], (int)(pipeline.features[8] * 100.0f), (int)(pipeline.features[10] * 100.0f), (int)(pipeline.features[15] * 100.0f));
+  } else if (strcmp(cmd, "comms") == 0) {
+    app_comms_status(console_printf);
+  } else if (strcmp(cmd, "comms on") == 0 || strcmp(cmd, "comms off") == 0) {
+    app_comms_request(cmd[6] == 'o' && cmd[7] == 'n');
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey nrfimg nrfupd heap\r\n");
+    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey nrfimg nrfupd comms [on|off] heap\r\n");
   }
 }
 
@@ -526,5 +551,6 @@ bool app_tasks_create(void) {
   if (xTaskCreate(console_task_fn, "console", APP_STACK_CONSOLE, NULL, APP_PRIO_CONSOLE, &console_task) != pdPASS) return false;
   if (xTaskCreate(ble_task_fn, "ble", APP_STACK_BLE, NULL, APP_PRIO_BLE, &ble_task) != pdPASS) return false;
   if (xTaskCreate(dsp_task_fn, "dsp", APP_STACK_DSP, NULL, APP_PRIO_DSP, &dsp_task) != pdPASS) return false;
+  if (xTaskCreate(app_comms_task, "comms", APP_STACK_COMMS, NULL, APP_PRIO_COMMS, &comms_task) != pdPASS) return false;
   return true;
 }
