@@ -76,10 +76,14 @@ OTA STM32 (§2, зарезервировано); на стенде — `nrfimg`/
 |---|---|---|
 | STM32 | `zs_ipc_service`, `zs_station_config`, `zs_installation_commissioning`, `zs_selftest`, `zs_mcumgr_serial`, `zs_nor_image_store` | `test_ble_bridge.c` (сквозной клиент ↔ мост ↔ сервис, MTU 247/23, роль B.9), `test_station_config.c`, `test_installation_commissioning.c`, `test_mcumgr_serial.c`, `test_nor_image_store.c` |
 | nRF52840 | `zs_ble_bridge`, `firmware/targets/nrf52840_ble` (Zephyr, плата `evt_pre_20_ble`, MCUboot sysbuild) | хост‑тест моста; сборка NCS — приёмка партии |
-| Android | `core/ble/*`, `core/scan/*`, `core/position/*`, `ServerActivity`, `InstallationActivity`, `StationPickerActivity` | JUnit с эмулятором станции (общие векторы B.4/B.6/B.7, CRC этикетки) |
+| Android | `core/ble/*`, `core/scan/*`, `core/position/*`, `core/role/*`, `security/EngineerKeyStore`, `ServerActivity`, `InstallationActivity`, `StationPickerActivity` | JUnit с эмулятором станции (общие векторы B.4/B.6/B.7/B.9, CRC этикетки) |
 | PKI | `muhoed-pki label-qr / server-qr / engineer-key / nrf-boot-key` | `test_pki_labels.py`, `test_pki_engineer_key.py` |
 
-Android ещё не реализует диалог «Инженер» (B.9) — задача приложения, формат не меняется.
+Android реализует диалог «Инженер» (B.9) с 2026‑09‑23: `core/role/EngineerKey` (импорт экспорта реестра
+`<serial>.engineer-key.json`, тег по вектору), `core/role/SessionRoleController` (челлендж → nonce → `02‖tag16` →
+`03‖02`; коды 03/04, блокировка после трёх ошибок), ключ на телефоне запечатан AES‑GCM ключом Android Keystore
+(`security/EngineerKeyStore`, один файл на серийник, наружу не выдаётся); роль экрана установки берётся со станции,
+локального переключателя роли больше нет. Формат не изменился.
 
 ## 8. Подтверждается только на железе (не меняет формат)
 
