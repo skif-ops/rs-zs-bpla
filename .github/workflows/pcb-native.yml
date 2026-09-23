@@ -172,6 +172,8 @@ on:
       - "tools/audit_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py"
       - "tools/pcb_pwr_hot_loop_006_board.py"
       - "tools/run_pcb_pwr_historical_generation_check.py"
+      - "tools/generate_pcb_pwr_vbat_sys_shunt_bulk_routing_007_candidate_rev_a.py"
+      - "tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_candidate_rev_a.py"
       - "tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py"
       - "tools/audit_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py"
       - "tools/generate_pcb_pwr_buck_power_stage_eco_002_application_rev_a.py"
@@ -1821,6 +1823,47 @@ jobs:
             --drc-base "$evidence/baseline_drc.json" \
             --drc-active "$evidence/candidate_drc.json" \
             --output "$evidence/application_audit.json"
+      - name: KiCad 9 comparative DRC for PCB-PWR shunt-to-bulk candidate 007
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence=artifacts/kicad-native/PCB-PWR/vbat-sys-shunt-bulk-routing-007
+          mkdir -p "$evidence"
+          candidate_project="$(mktemp -d)"
+          for kind in BASE CANDIDATE; do
+            cp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pro \
+              "$candidate_project/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_${kind}_REV_A.kicad_pro"
+            cp "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-SHUNT-BULK-ROUTING-007/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_${kind}_REV_A.kicad_pcb" \
+              "$candidate_project/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_${kind}_REV_A.kicad_pcb"
+          done
+          /usr/bin/python3 - \
+            "$candidate_project/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_BASE_REV_A.kicad_pcb" \
+            "$candidate_project/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_CANDIDATE_REV_A.kicad_pcb" <<'PY'
+          import sys
+          import pcbnew
+
+          for path, expected_tracks in zip(sys.argv[1:], (35, 37)):
+              board = pcbnew.LoadBoard(path)
+              assert board is not None
+              assert len(board.GetFootprints()) == 66
+              assert len(list(board.GetTracks())) == expected_tracks
+              assert len(list(board.Zones())) == 2
+              pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+              board.Save(path)
+          print("PCB-PWR shunt-to-bulk 007 KiCad 9 parse and fill: PASS")
+          PY
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/baseline_drc.json" \
+            "$candidate_project/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_BASE_REV_A.kicad_pcb"
+          kicad-cli pcb drc --format json --severity-all \
+            -o "$evidence/candidate_drc.json" \
+            "$candidate_project/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_CANDIDATE_REV_A.kicad_pcb"
+          DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_candidate_rev_a.py \
+            --drc-base "$evidence/baseline_drc.json" \
+            --drc-candidate "$evidence/candidate_drc.json" \
+            --output "$evidence/comparative_audit.json"
       - name: KiCad 9 comparative DRC for PCB-PWR buck power-stage ECO-002
         shell: bash
         run: |

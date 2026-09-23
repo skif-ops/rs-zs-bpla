@@ -1,0 +1,20 @@
+{
+  "candidate_id": "PCB-PWR-VBAT-SYS-SHUNT-BULK-ROUTING-007",
+  "base_sha256": "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0",
+  "candidate_sha256": "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b",
+  "route_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
+  "stackup_sha256": "c417669cab385eb702c53a1912ad5973bda3ca0fec8cbc5c3e331a511178afad",
+  "scope": "RSH1.2 to C13.1, VBAT_SYS F.Cu, two traces only; no vias, zones, footprint or net changes",
+  "pad_escape_width_mm": 1.0,
+  "pad_escape_length_mm": 3.0,
+  "expanded_width_mm": 4.0,
+  "reason": "The RSH1.4 Kelvin pickup prevents a 4 mm track directly off the load pad; pad escape retains >=0.3 mm foreign-copper clearance.",
+  "comparative_kicad9_drc": "PENDING_COMMIT_BOUND_GATE",
+  "thermal_current_density_qualification": false,
+  "kelvin_error_qualification": false,
+  "authoritative_board_modified": false,
+  "application_authorized": false,
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}
