@@ -37,13 +37,12 @@ static size_t write_station_id(uint32_t station_id, uint8_t *output) {
   return size;
 }
 
-static bool build_up_topic(uint8_t *topic, size_t *topic_size,
-                           const uint8_t *tenant, size_t tenant_size,
-                           uint32_t station_id) {
+static bool build_topic(uint8_t *topic, size_t *topic_size,
+                        const uint8_t *tenant, size_t tenant_size,
+                        uint32_t station_id, const uint8_t *suffix, size_t suffix_size) {
   static const uint8_t prefix[] = {'z', 's', '/', 'v', '1', '/'};
-  static const uint8_t suffix[] = {'/', 'u', 'p'};
   size_t offset = 0u;
-  if (sizeof(prefix) + tenant_size + 1u + 10u + sizeof(suffix) >
+  if (sizeof(prefix) + tenant_size + 1u + 10u + suffix_size >
       ZS_MQTT_EVENT_TOPIC_MAX_BYTES)
     return false;
   memcpy(&topic[offset], prefix, sizeof(prefix));
@@ -52,10 +51,24 @@ static bool build_up_topic(uint8_t *topic, size_t *topic_size,
   offset += tenant_size;
   topic[offset++] = (uint8_t)'/';
   offset += write_station_id(station_id, &topic[offset]);
-  memcpy(&topic[offset], suffix, sizeof(suffix));
-  offset += sizeof(suffix);
+  memcpy(&topic[offset], suffix, suffix_size);
+  offset += suffix_size;
   *topic_size = offset;
   return true;
+}
+
+static bool build_up_topic(uint8_t *topic, size_t *topic_size,
+                           const uint8_t *tenant, size_t tenant_size,
+                           uint32_t station_id) {
+  static const uint8_t suffix[] = {'/', 'u', 'p'};
+  return build_topic(topic, topic_size, tenant, tenant_size, station_id, suffix, sizeof(suffix));
+}
+
+static bool build_status_topic(uint8_t *topic, size_t *topic_size,
+                               const uint8_t *tenant, size_t tenant_size,
+                               uint32_t station_id) {
+  static const uint8_t suffix[] = {'/', 's', 't', 'a', 't', 'u', 's'};
+  return build_topic(topic, topic_size, tenant, tenant_size, station_id, suffix, sizeof(suffix));
 }
 
 bool zs_mqtt_event_transport_init(
@@ -70,6 +83,8 @@ bool zs_mqtt_event_transport_init(
       !tenant_is_valid(tenant, tenant_size) ||
       !build_up_topic(transport->up_topic, &transport->up_topic_size,
                       tenant, tenant_size, station_id) ||
+      !build_status_topic(transport->status_topic, &transport->status_topic_size,
+                          tenant, tenant_size, station_id) ||
       !zs_event_receipt_transport_init(&transport->receipt, station_id, tenant,
                                        tenant_size)) {
     memset(transport, 0, sizeof(*transport));
