@@ -1,7 +1,7 @@
 # ICD BLE v0.1 — Addendum C: межпроцессорный протокол STM32U585 ↔ nRF52840
 
 Статус: `IMPLEMENTED 2026-09-22 — portable core + host tests (firmware/tests/test_ble_bridge.c) + STM32 app task +
-nRF52840 application (Zephyr, firmware/targets/nrf52840_ble, плата evt_pre_20_ble); C.6 — MCUboot recovery path (sysbuild) + STM32 mcumgr client (zs_mcumgr_serial, host-tested) — console `nrfupd` and image storage — следующий шаг`.
+nRF52840 application (Zephyr, firmware/targets/nrf52840_ble, плата evt_pre_20_ble); C.6 — MCUboot recovery path (sysbuild) + STM32 mcumgr client (zs_mcumgr_serial) + NOR image slot (zs_nor_image_store) + console `nrfimg`/`nrfupd` (tools/nrf_image_push.py); bench run on Rev.A pending`.
 
 ## C.1 Роли
 
@@ -61,8 +61,10 @@ CRC‑16/CCITT‑FALSE по `type..payload` (то же семейство, чт�
 Мост не имеет собственного канала обновления: образ nRF приходит на станцию по штатному OTA STM32 и
 загружается в модуль через тот же UART, что и IPC.
 
-1. STM32 держит новый образ nRF (подписан ключом `nrf-boot.key.pem` из PKI: `muhoed-pki nrf-boot-key`, ECDSA P‑256;
-   публичный ключ вшит в MCUboot модуля).
+1. STM32 держит новый образ nRF в слоте NOR (карта B3: 128 блоков @0x03F7C000, `zs_nor_image_store`: заголовок с
+   SHA‑256 пишется после сверки записанного). На стенде образ загружается по консоли: `tools/nrf_image_push.py COM7
+   zephyr.signed.bin --version N [--update]` → `nrfimg begin/put/end`; образ подписан ключом `nrf-boot.key.pem` из PKI
+   (`muhoed-pki nrf-boot-key`, ECDSA P‑256; публичный ключ вшит в MCUboot модуля). Штатный путь доставки — OTA STM32.
 2. Вход в recovery — только по проводу (pin authority): `BLE_EN` ↓ (nRESET удерживается) → `BLE_DFU_REQ` ↓ (P0.15,
    open‑drain, active LOW) → 20 мс → `BLE_EN` ↑ → MCUboot стартует, видит LOW на P0.15 (`CONFIG_BOOT_SERIAL_ENTRANCE_GPIO`,
    задержка обнаружения 50 мс) и остаётся в serial recovery на `uart0` → через 500 мс STM32 отпускает `BLE_DFU_REQ`
@@ -72,7 +74,9 @@ CRC‑16/CCITT‑FALSE по `type..payload` (то же семейство, чт�
    `len`/`sha` в первом запросе, ответ `{rc, off}` — клиент продолжает с `off`, который сообщил модуль, потерянный или
    искажённый ответ просто ведёт к повтору; затем `os reset`). Хост‑тест `firmware/tests/test_mcumgr_serial.c` гоняет
    клиента против имитации `boot_serial` (образ 64 КиБ за 171 запрос, потерянный и искажённый ответы, сброс).
-   MCUboot помечает загруженный образ pending, `image test/confirm` не нужен.
+   MCUboot помечает загруженный образ pending, `image test/confirm` не нужен. На стенде всё это — команда `nrfupd`
+   (`app_nrf_update.c`, задача ble): вход в recovery, выгрузка из слота с тайм‑аутом 2 с и 5 повторами, `os reset`,
+   переинициализация IPC; прогресс по 10 % в консоль.
 4. MCUboot (swap‑using‑move) переносит образ в `slot0` и запускает его в режиме «test». Приложение подтверждает себя
    (`boot_write_img_confirmed`) только после первого `IDENTITY_SET` от STM32 — то есть когда IPC реально работает.
    Образ, который не заговорил с STM32, откатывается MCUboot при следующем сбросе (STM32 делает сброс по `BLE_EN`, если
