@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS stations (
   revoked_at TEXT,
   revoke_reason TEXT,
   note TEXT,
-  pairing_secret TEXT
+  pairing_secret TEXT,
+  engineer_key TEXT
 );
 CREATE TABLE IF NOT EXISTS audit (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -68,6 +69,7 @@ class StationRow:
     revoke_reason: str | None
     note: str | None
     pairing_secret: str | None = None
+    engineer_key: str | None = None
 
 
 def _now() -> str:
@@ -87,6 +89,8 @@ class Registry:
             columns = {r[1] for r in c.execute("PRAGMA table_info(stations)")}
             if "pairing_secret" not in columns:  # registries created before labels (2026-09-22)
                 c.execute("ALTER TABLE stations ADD COLUMN pairing_secret TEXT")
+            if "engineer_key" not in columns:  # registries created before the B.9 session role (2026-09-23)
+                c.execute("ALTER TABLE stations ADD COLUMN engineer_key TEXT")
 
     def _conn(self) -> sqlite3.Connection:
         c = sqlite3.connect(self.path, timeout=10)
@@ -160,6 +164,34 @@ class Registry:
             c.execute("UPDATE stations SET pairing_secret=? WHERE serial=?", (secret, serial))
             self._audit(c, serial, "pairing_secret", "generated")
         return secret
+
+    # ---- B.9 engineer key: 32 random bytes per station, hex. Goes to the station (station.json) and to the
+    # engineer's app export; never on the label. Rotation invalidates both sides at once.
+    def ensure_engineer_key(self, serial: str) -> str:
+        import secrets
+        with self.lock, self._conn() as c:
+            row = c.execute("SELECT engineer_key FROM stations WHERE serial=?", (serial,)).fetchone()
+            if row is None:
+                raise PkiError(f"{serial} is not registered")
+            if row["engineer_key"]:
+                return row["engineer_key"]
+            key = secrets.token_hex(32)
+            c.execute("UPDATE stations SET engineer_key=? WHERE serial=?", (key, serial))
+            self._audit(c, serial, "engineer_key", "generated")
+        return key
+
+    def rotate_engineer_key(self, serial: str, reason: str) -> str:
+        import secrets
+        key = secrets.token_hex(32)
+        with self.lock, self._conn() as c:
+            if c.execute("UPDATE stations SET engineer_key=? WHERE serial=?", (key, serial)).rowcount != 1:
+                raise PkiError(f"{serial} is not registered")
+            self._audit(c, serial, "engineer_key", f"rotated: {reason}")
+        return key
+
+    def audit_engineer_key_export(self, serial: str, who: str) -> None:
+        with self.lock, self._conn() as c:
+            self._audit(c, serial, "engineer_key", f"exported to {who}")
 
     def rotate_pairing_secret(self, serial: str, reason: str) -> str:
         from .label import new_pairing_secret
