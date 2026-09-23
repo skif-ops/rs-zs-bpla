@@ -89,6 +89,7 @@ static void test_lyuty(const char *dir) {
   printf("air gate lyuty: comb windows %u/100; present: file 1 %u/14, file 2 %u/14, file 3 %u/66\n", comb_windows, present_file1, present_file2, present_file3);
   assert(comb_windows >= 30u);
   assert(present_file1 >= 12u);
+  assert(present_file2 >= 8u);
 }
 
 int main(int argc, char **argv) {
