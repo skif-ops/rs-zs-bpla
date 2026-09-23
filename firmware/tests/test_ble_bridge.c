@@ -105,6 +105,8 @@ typedef struct {
   uint16_t notify_char;
   unsigned notify_complete;
   uint8_t last_notify[ZS_BLE_VALUE_MAX]; size_t last_notify_len;
+  uint8_t prev_notify[ZS_BLE_VALUE_MAX]; size_t prev_notify_len;    /* the notify before the last one (role challenge + status) */
+  uint8_t engineer_key[32]; uint32_t rnd_counter;
   bool subscribed;
   size_t att;
   char local_name[32];
@@ -127,7 +129,11 @@ static bool gatt_notify(void *ctx, uint16_t id, const uint8_t *f, size_t n) {
   if (!W->subscribed) return false;
   if (W->notify_char != id) { zs_ble_reassembler_reset(&W->notify_rx); W->notify_char = id; }
   assert(zs_ble_reassembler_feed(&W->notify_rx, f, n));
-  if (W->notify_rx.complete) { W->notify_complete++; W->last_notify_len = W->notify_rx.filled; memcpy(W->last_notify, W->notify_buf, W->last_notify_len); zs_ble_reassembler_reset(&W->notify_rx); }
+  if (W->notify_rx.complete) {
+    W->notify_complete++;
+    memcpy(W->prev_notify, W->last_notify, W->last_notify_len); W->prev_notify_len = W->last_notify_len;
+    W->last_notify_len = W->notify_rx.filled; memcpy(W->last_notify, W->notify_buf, W->last_notify_len); zs_ble_reassembler_reset(&W->notify_rx);
+  }
   return true;
 }
 static size_t att_payload(void *ctx) { return ((world_t *)ctx)->att; }
@@ -138,6 +144,7 @@ static uint32_t now_ms(void *ctx) { return ((world_t *)ctx)->now; }
 static bool service_mode(void *ctx, uint32_t *started) { *started = 1000u; return ((world_t *)ctx)->service_mode; }
 static zs_commissioning_role_t peer_role(void *ctx) { return ((world_t *)ctx)->role; }
 static bool peer_secure(void *ctx) { return ((world_t *)ctx)->secure; }
+static bool rnd(void *ctx, uint8_t *out, size_t n) { world_t *W = ctx; for (size_t i = 0u; i < n; i++) out[i] = (uint8_t)(0x5au + i + W->rnd_counter); W->rnd_counter += 17u; return true; }
 static zs_selftest_code_t st_pass(void *ctx, uint32_t *d) { (void)ctx; *d = 3900u; return ZS_ST_PASS; }
 static zs_selftest_code_t st_fail(void *ctx, uint32_t *d) { (void)ctx; *d = 7u; return ZS_ST_FAIL; }
 
@@ -156,7 +163,8 @@ static void world_init(world_t *W) {
   zs_selftest_register(&W->selftest, ZS_ST_ID_POWER_INA226, "power", st_pass, NULL, true);
   zs_selftest_register(&W->selftest, ZS_ST_ID_LORA_SPI, "lora_spi", st_fail, NULL, false);
   W->bport = (zs_ble_bridge_port_t){W, nrf_uart_send, gatt_notify, att_payload, advertise, set_name, set_secret};
-  W->sport = (zs_ipc_service_port_t){W, stm_uart_send, now_ms, service_mode, peer_role, peer_secure, &W->cfg_io, &W->pos_io, &W->audit_io, &W->selftest, &W->identity};
+  for (unsigned i = 0u; i < 32u; i++) W->engineer_key[i] = (uint8_t)(0xa0u + i);
+  W->sport = (zs_ipc_service_port_t){W, stm_uart_send, now_ms, service_mode, peer_role, peer_secure, &W->cfg_io, &W->pos_io, &W->audit_io, &W->selftest, &W->identity, W->engineer_key, rnd};
   zs_ble_bridge_init(&W->bridge, &W->bport);
   assert(zs_ipc_service_init(&W->service, &W->sport));
 }
@@ -288,10 +296,71 @@ static void test_end_to_end(void) {
   printf("end to end ok (writes ok=%u rejected=%u audits=%u)\n", W.service.writes_ok, W.service.writes_rejected, W.audits);
 }
 
+/* B.9: installer by pairing, engineer by HMAC challenge; the policy change needs the engineer. */
+static uint8_t role_write(world_t *W, const uint8_t *v, size_t n) {   /* like client_write_long but tolerates the extra notify */
+  zs_ble_splitter_t s; uint8_t frame[244];
+  assert(zs_ble_splitter_init(&s, v, n));
+  for (;;) { const size_t k = zs_ble_splitter_next(&s, W->att, frame, sizeof(frame)); if (!k) break; assert(zs_ble_bridge_on_gatt_write(&W->bridge, ZS_CHAR_SESSION_ROLE, frame, k)); }
+  assert(W->notify_char == ZS_CHAR_SESSION_ROLE && W->last_notify_len == 1u);
+  return W->last_notify[0];
+}
+
+static void test_session_role(void) {
+  static world_t W;
+  uint8_t out[64], req[256], tag[ZS_ROLE_TAG_BYTES], resp[1u + ZS_ROLE_TAG_BYTES]; size_t n;
+  const uint8_t challenge = ZS_ROLE_OP_CHALLENGE;
+  world_init(&W);
+  zs_ble_bridge_on_link(&W.bridge, 2u);
+  assert(client_read_long(&W, ZS_CHAR_SESSION_ROLE, out, sizeof(out), &n) && n == 1u && out[0] == ZS_COMMISSIONING_ROLE_INSTALLER);
+  /* a policy that is not the locked default needs the engineer: rejected as installer */
+  n = installation_request(req, sizeof(req), false, 1u, 557558000); req[n - 11u] = 30u;    /* key 10 warning distance 25 -> 30 (0x18 0x1e) */
+  assert(client_write_long(&W, ZS_CHAR_INSTALLATION_POSITION, req, n) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  /* response without a challenge, then a challenge, then the right tag */
+  memset(resp, 0, sizeof(resp)); resp[0] = ZS_ROLE_OP_RESPONSE;
+  assert(role_write(&W, resp, sizeof(resp)) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_OK);
+  assert(W.prev_notify_len == 1u + ZS_ROLE_NONCE_BYTES && W.prev_notify[0] == ZS_ROLE_OP_CHALLENGE);
+  zs_ipc_role_tag(W.engineer_key, W.identity.serial, W.prev_notify + 1, tag);
+  memcpy(resp + 1, tag, sizeof(tag));
+  assert(role_write(&W, resp, sizeof(resp)) == ZS_BLE_STATUS_OK && W.prev_notify_len == 2u && W.prev_notify[0] == ZS_ROLE_OP_RESULT && W.prev_notify[1] == ZS_COMMISSIONING_ROLE_ENGINEER);
+  assert(client_read_long(&W, ZS_CHAR_SESSION_ROLE, out, sizeof(out), &n) && n == 1u && out[0] == ZS_COMMISSIONING_ROLE_ENGINEER);
+  assert(zs_ipc_service_role(&W.service) == ZS_COMMISSIONING_ROLE_ENGINEER && W.service.role_elevations == 1u);
+  n = installation_request(req, sizeof(req), false, 1u, 557558000); req[n - 11u] = 30u;
+  assert(client_write_long(&W, ZS_CHAR_INSTALLATION_POSITION, req, n) == ZS_BLE_STATUS_OK);   /* the same non-default policy, now as engineer */
+  /* a nonce is single-use: replaying the same tag fails */
+  assert(role_write(&W, resp, sizeof(resp)) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  /* the role dies with the link; three wrong tags lock elevation for the link */
+  zs_ble_bridge_on_link(&W.bridge, 0u);
+  zs_ble_bridge_on_link(&W.bridge, 2u);
+  assert(zs_ipc_service_role(&W.service) == ZS_COMMISSIONING_ROLE_INSTALLER);
+  for (unsigned i = 0u; i < ZS_ROLE_MAX_FAILURES; i++) {
+    assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_OK);
+    memset(resp + 1, (int)i, sizeof(tag));
+    assert(role_write(&W, resp, sizeof(resp)) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  }
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_NOT_AUTHORIZED && W.service.role_failures == ZS_ROLE_MAX_FAILURES);
+  zs_ble_bridge_on_link(&W.bridge, 0u); zs_ble_bridge_on_link(&W.bridge, 2u);
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_OK);                          /* a new link starts clean */
+  /* no key provisioned / not secure / not in service mode */
+  W.sport.engineer_key = NULL;
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  W.sport.engineer_key = W.engineer_key; W.secure = false;
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  W.secure = true; W.service_mode = false;
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_NOT_IN_SERVICE_MODE);
+  /* the tag is deterministic for the Android/PKI vector: key a0..bf, serial DIO-EVT-012, nonce 00..0f */
+  uint8_t nonce[16]; for (unsigned i = 0u; i < 16u; i++) nonce[i] = (uint8_t)i;
+  zs_ipc_role_tag(W.engineer_key, "DIO-EVT-012", nonce, tag);
+  printf("session role ok, vector tag ");
+  for (unsigned i = 0u; i < 16u; i++) printf("%02x", tag[i]);
+  printf("\n");
+}
+
 int main(void) {
   test_framing_vectors();
   test_ipc_link();
   test_end_to_end();
+  test_session_role();
   printf("ble bridge tests passed\n");
   return 0;
 }
