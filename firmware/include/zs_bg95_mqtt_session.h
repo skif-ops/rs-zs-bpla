@@ -89,6 +89,12 @@ zs_bg95_event_uplink_start_result_t zs_bg95_mqtt_session_start_event(
     zs_bg95_mqtt_session_t *session,
     uint32_t now_ms);
 
+/* Publish a caller-owned message (heartbeat) under the same serialization as events. */
+zs_bg95_event_uplink_start_result_t zs_bg95_mqtt_session_start_message(
+    zs_bg95_mqtt_session_t *session,
+    const zs_mqtt_event_message_t *message,
+    uint32_t now_ms);
+
 bool zs_bg95_mqtt_session_ready(const zs_bg95_mqtt_session_t *session);
 
 #endif

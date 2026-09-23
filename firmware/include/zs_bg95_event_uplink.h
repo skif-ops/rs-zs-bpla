@@ -60,6 +60,17 @@ zs_bg95_event_uplink_start_result_t zs_bg95_event_uplink_start(
     uint16_t message_id,
     uint32_t now_ms);
 
+/*
+ * Publish a caller-owned message (heartbeat on the status topic) through the same
+ * QMTPUB flow; nothing is persisted. The message and its buffers must stay valid
+ * until the uplink returns to IDLE.
+ */
+zs_bg95_event_uplink_start_result_t zs_bg95_event_uplink_start_message(
+    zs_bg95_event_uplink_t *uplink,
+    uint16_t message_id,
+    const zs_mqtt_event_message_t *message,
+    uint32_t now_ms);
+
 /* Send exactly msglen payload bytes after the modem's `>` prompt. */
 bool zs_bg95_event_uplink_on_prompt(zs_bg95_event_uplink_t *uplink,
                                     uint32_t now_ms);
