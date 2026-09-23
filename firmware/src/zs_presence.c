@@ -12,6 +12,7 @@ zs_presence_t zs_presence_evaluate(const zs_classifier_consensus_t *votes, const
   if (votes) {
     p.windows = votes->count;
     for (uint8_t i = 0u; i < votes->count; i++) {
+      if (uav_class(votes->class_id[i]) && votes->confidence_u8[i] >= ZS_PRESENCE_WEAK_CONFIDENCE_U8) p.uav_weak_votes++;
       if (votes->confidence_u8[i] < ZS_CLASSIFICATION_MIN_CONFIDENCE_U8) continue;
       if (uav_class(votes->class_id[i])) { p.uav_votes++; uav_conf = (uint16_t)(uav_conf + votes->confidence_u8[i]); }
       else if (ground_engine_class(votes->class_id[i])) p.ground_votes++;
@@ -22,6 +23,7 @@ zs_presence_t zs_presence_evaluate(const zs_classifier_consensus_t *votes, const
   const uint8_t mean_uav = p.uav_votes ? (uint8_t)(uav_conf / p.uav_votes) : 0u;
   const bool enough = p.windows >= ZS_CLASSIFICATION_MIN_WINDOWS;
   const bool uav_majority = enough && p.uav_votes >= majority_of(p.windows);
+  const bool weak_majority = enough && p.uav_weak_votes >= majority_of(p.windows);
   const bool ground_majority = enough && p.ground_votes >= majority_of(p.windows);
   p.comb = comb;
   if (uav_majority) {
@@ -33,12 +35,15 @@ zs_presence_t zs_presence_evaluate(const zs_classifier_consensus_t *votes, const
   } else if (comb && p.uav_votes >= 2u) {
     p.level = ZS_PRESENCE_CONFIRMED;
     p.confidence_u8 = (uint8_t)(((uint16_t)gate_conf + mean_uav) / 2u);
+  } else if (comb && weak_majority) {
+    p.level = ZS_PRESENCE_CONFIRMED;
+    p.confidence_u8 = (uint8_t)(((uint16_t)gate_conf + ZS_CLASSIFICATION_MIN_CONFIDENCE_U8) / 2u);
   } else if (comb) {
     p.level = ZS_PRESENCE_SUSPECT;
     p.confidence_u8 = (uint8_t)(gate_conf / 2u);
-  } else if (p.uav_votes >= 2u) {
+  } else if (p.uav_votes >= 2u || weak_majority) {
     p.level = ZS_PRESENCE_SUSPECT;
-    p.confidence_u8 = (uint8_t)(mean_uav / 2u);
+    p.confidence_u8 = (uint8_t)((p.uav_votes ? mean_uav : ZS_PRESENCE_WEAK_CONFIDENCE_U8) / 2u);
   } else {
     p.level = ZS_PRESENCE_NONE;
     p.confidence_u8 = 0u;
