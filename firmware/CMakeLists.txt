@@ -55,6 +55,8 @@ add_library(zs_core
   src/zs_pdm_capture.c
   src/zs_pps_sync.c
   src/zs_selftest.c
+  src/zs_fft_mixed.c
+  src/zs_dsp_mcu.c
   src/zs_ina226.c
   src/zs_cbor_read.c
   src/zs_ble_framing.c
@@ -143,6 +145,10 @@ add_executable(zs_bg95_provision_tests tests/test_bg95_provision.c)
 target_link_libraries(zs_bg95_provision_tests zs_core m)
 add_executable(zs_platform_tests tests/test_platform.c)
 target_link_libraries(zs_platform_tests zs_core m)
+add_executable(zs_fft_mixed_tests tests/test_fft_mixed.c)
+target_link_libraries(zs_fft_mixed_tests zs_core m)
+add_executable(zs_dsp_mcu_tests tests/test_dsp_mcu.c)
+target_link_libraries(zs_dsp_mcu_tests zs_core m)
 add_executable(zs_ina226_tests tests/test_ina226.c)
 target_link_libraries(zs_ina226_tests zs_core m)
 add_executable(zs_ble_bridge_tests tests/test_ble_bridge.c)
@@ -200,6 +206,8 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_station_config_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_bg95_provision_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_platform_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_fft_mixed_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_dsp_mcu_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_ina226_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_ble_bridge_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_nor_slot_store_tests PRIVATE -UNDEBUG)
@@ -245,6 +253,8 @@ add_test(NAME installation_commissioning COMMAND zs_installation_commissioning_t
 add_test(NAME station_config COMMAND zs_station_config_tests)
 add_test(NAME bg95_provision COMMAND zs_bg95_provision_tests)
 add_test(NAME platform COMMAND zs_platform_tests)
+add_test(NAME fft_mixed COMMAND zs_fft_mixed_tests)
+add_test(NAME dsp_mcu COMMAND zs_dsp_mcu_tests)
 add_test(NAME ina226 COMMAND zs_ina226_tests)
 add_test(NAME ble_bridge COMMAND zs_ble_bridge_tests)
 add_test(NAME nor_slot_store COMMAND zs_nor_slot_store_tests)
@@ -266,5 +276,7 @@ add_executable(zs_air_gate_eval tools/air_gate_eval.c)
 target_link_libraries(zs_air_gate_eval PRIVATE zs_core m)
 add_executable(zs_presence_eval tools/presence_eval.c)
 target_link_libraries(zs_presence_eval PRIVATE zs_core m)
+add_executable(zs_eval_golden_mcu tools/eval_golden_mcu.c)
+target_link_libraries(zs_eval_golden_mcu PRIVATE zs_core m)
 add_executable(zs_dump_spectrum tools/dump_spectrum.c)
 target_link_libraries(zs_dump_spectrum PRIVATE zs_core m)
