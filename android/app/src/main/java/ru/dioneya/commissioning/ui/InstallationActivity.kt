@@ -2,6 +2,8 @@ package ru.dioneya.commissioning.ui
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
@@ -20,14 +22,19 @@ import ru.dioneya.commissioning.core.CoordinateSource
 import ru.dioneya.commissioning.core.InstallationCommissioningRole
 import ru.dioneya.commissioning.core.PhoneLocationProvider
 import ru.dioneya.commissioning.core.ble.BleSession
+import ru.dioneya.commissioning.core.ble.GattContractV01
 import ru.dioneya.commissioning.core.position.InstallationScreenController
+import ru.dioneya.commissioning.core.role.EngineerKey
+import ru.dioneya.commissioning.core.role.SessionRoleController
+import ru.dioneya.commissioning.security.EngineerKeyStore
 import java.util.concurrent.Executors
 
 /**
  * "Координаты установки" (ICD §3.1): reads the stored record, fills the fields from the
  * phone fix or the keyboard, writes INITIAL / RECOMMISSION, reads back and verifies.
  * Requires [EXTRA_DEVICE_ADDRESS]; the trust policy is shown but editable only in the
- * service-engineer role.
+ * service-engineer role, which the station grants over `session_role` (B.9) after the
+ * HMAC challenge with the station's engineer key ("Инженер" dialog, [SessionRoleController]).
  */
 class InstallationActivity : Activity() {
     private val executor = Executors.newSingleThreadExecutor()
@@ -42,13 +49,18 @@ class InstallationActivity : Activity() {
     private var source = CoordinateSource.MANUAL
     private var role = InstallationCommissioningRole.INSTALLER
     private lateinit var location: PhoneLocationProvider
+    private lateinit var keyStore: EngineerKeyStore
+    private lateinit var roleButton: Button
+    private var stationSerial: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         location = PhoneLocationProvider(this)
+        keyStore = EngineerKeyStore(this)
         val pad = (16 * resources.displayMetrics.density).toInt()
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(pad, pad, pad, pad) }
         val serial = intent.getStringExtra(EXTRA_STATION_SERIAL).orEmpty()
+        stationSerial = serial
         root.addView(TextView(this).apply { text = getString(R.string.install_title, serial); textSize = 22f })
         fun num(hint: Int, value: String) = EditText(this).apply {
             this.hint = getString(hint); setText(value)
@@ -63,11 +75,8 @@ class InstallationActivity : Activity() {
             sourceButton.text = getString(R.string.install_source, source.name)
         }
         root.addView(sourceButton)
-        val roleButton = Button(this).apply { text = getString(R.string.install_role, role.name) }
-        roleButton.setOnClickListener {
-            role = if (role == InstallationCommissioningRole.INSTALLER) InstallationCommissioningRole.SERVICE_ENGINEER else InstallationCommissioningRole.INSTALLER
-            roleButton.text = getString(R.string.install_role, role.name); controller?.setRole(role)
-        }
+        roleButton = Button(this).apply { text = getString(R.string.install_role, role.name) }
+        roleButton.setOnClickListener { showEngineerDialog() }
         root.addView(roleButton)
         val useLocation = Button(this).apply { text = getString(R.string.install_use_phone_location) }
         val read = Button(this).apply { text = getString(R.string.install_read) }
@@ -100,9 +109,67 @@ class InstallationActivity : Activity() {
                 }
             }
         }
-        read.setOnClickListener { executor.execute { controller?.readStored() } }
+        read.setOnClickListener { executor.execute { controller?.readStored(); refreshRole() } }
         apply.setOnClickListener { controller?.edit(readFields()); executor.execute { controller?.apply() } }
-        if (device != null) executor.execute { controller?.readStored() }
+        if (device != null) executor.execute { controller?.readStored(); refreshRole() }
+    }
+
+    // ---- B.9: the role comes from the station, not from a toggle --------------------------------
+
+    /** Reads session_role after a connection and mirrors it into the screen role. Worker thread. */
+    private fun refreshRole() {
+        val s = session ?: return
+        val stationRole = try { SessionRoleController(s).readRole() } catch (_: Exception) { return }
+        runOnUiThread { applyStationRole(stationRole) }
+    }
+
+    private fun applyStationRole(stationRole: Int) {
+        role = if (stationRole == GattContractV01.ROLE_ENGINEER) InstallationCommissioningRole.SERVICE_ENGINEER else InstallationCommissioningRole.INSTALLER
+        roleButton.text = getString(R.string.install_role, role.name)
+        controller?.setRole(role)
+    }
+
+    /** "Инженер": key on the phone? → import from the registry export, or run the challenge. */
+    private fun showEngineerDialog() {
+        val hasKey = stationSerial.isNotEmpty() && keyStore.has(stationSerial)
+        val b = AlertDialog.Builder(this)
+            .setTitle(R.string.role_dialog_title)
+            .setMessage(getString(if (hasKey) R.string.role_dialog_key_present else R.string.role_dialog_key_absent, stationSerial))
+            .setNeutralButton(R.string.role_dialog_import) { _, _ -> pickKeyFile() }
+            .setNegativeButton(android.R.string.cancel, null)
+        if (hasKey) b.setPositiveButton(R.string.role_dialog_elevate) { _, _ -> elevate() }
+        b.show()
+    }
+
+    private fun pickKeyFile() {
+        startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE); type = "*/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/json", "text/plain", "application/octet-stream"))
+        }, REQUEST_KEY_FILE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != REQUEST_KEY_FILE || resultCode != RESULT_OK) return
+        val uri = data?.data ?: return
+        val text = try { contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) } } catch (_: Exception) { null }
+        val key: EngineerKey? = text?.let { keyStore.importExport(it) }
+        status.text = if (key == null) getString(R.string.role_import_invalid)
+            else if (key.serial != stationSerial) getString(R.string.role_import_other_station, key.serial)
+            else getString(R.string.role_import_ok, key.serial)
+    }
+
+    private fun elevate() {
+        val s = session ?: return
+        val key = keyStore.get(stationSerial) ?: run { status.text = getString(R.string.role_key_unreadable); return }
+        status.text = getString(R.string.role_elevating)
+        executor.execute {
+            val r = SessionRoleController(s).elevate(key)
+            runOnUiThread {
+                status.text = getString(R.string.role_result, r.message)
+                if (r.outcome == SessionRoleController.Outcome.ENGINEER) applyStationRole(r.role)
+            }
+        }
     }
 
     private fun readFields() = InstallationScreenController.Fields(
@@ -159,5 +226,6 @@ class InstallationActivity : Activity() {
         const val EXTRA_DEVICE_ADDRESS = ServerActivity.EXTRA_DEVICE_ADDRESS
         const val EXTRA_STATION_SERIAL = ServerActivity.EXTRA_STATION_SERIAL
         private const val REQUEST_LOCATION = 45
+        private const val REQUEST_KEY_FILE = 46
     }
 }

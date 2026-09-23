@@ -35,7 +35,8 @@ object GattContractV01 {
     val CHAR_CONFIG_READ: UUID = uuid(0x0201)          // read/notify: station config read-back (CBOR, 14 keys)
     val CHAR_CONFIG_WRITE: UUID = uuid(0x0202)         // authenticated write: CBOR patch (11 keys), status by notify
     val CHAR_INSTALLATION_POSITION: UUID = uuid(0x0203)
-    val CHAR_POSITION_TRUST_POLICY: UUID = uuid(0x0204)
+    val CHAR_POSITION_TRUST_POLICY: UUID = uuid(0x0204)  // reserved in v0.2 (policy travels inside 0x0203)
+    val CHAR_SESSION_ROLE: UUID = uuid(0x0205)           // B.9: read [role]; write 01 (challenge) / 02‖tag16; notify 01‖nonce16 / 03‖role + status
     val CHAR_STATUS: UUID = uuid(0x0301)               // read/notify
     val CHAR_GNSS_INTEGRITY: UUID = uuid(0x0302)       // read/notify
     val CHAR_SELF_TEST: UUID = uuid(0x0303)            // write 0x01 = run all; notify: CBOR {id: [code, detail]}
@@ -61,9 +62,20 @@ object GattContractV01 {
 
     const val SELF_TEST_RUN_ALL: Byte = 0x01
 
+    /** session_role (B.9): roles and operations. */
+    const val ROLE_NONE = 0
+    const val ROLE_INSTALLER = 1
+    const val ROLE_ENGINEER = 2
+    const val ROLE_OP_CHALLENGE: Byte = 0x01
+    const val ROLE_OP_RESPONSE: Byte = 0x02
+    const val ROLE_OP_RESULT: Byte = 0x03
+    const val ROLE_NONCE_BYTES = 16
+    const val ROLE_TAG_BYTES = 16
+
     /** Operation timeouts (ms). */
     const val TIMEOUT_CONNECT_MS = 15_000L
     const val TIMEOUT_OPERATION_MS = 5_000L
     const val TIMEOUT_SELF_TEST_MS = 20_000L
     const val TIMEOUT_CONFIG_WRITE_MS = 10_000L
+    const val TIMEOUT_ROLE_MS = 5_000L
 }

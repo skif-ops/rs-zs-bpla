@@ -21,8 +21,9 @@ class BleSession(private val transport: BleTransport, private val opTimeoutMs: L
     @Volatile private var pending: Pending? = null
 
     private class Pending(val characteristic: UUID) {
-        val reassembler = LongValueFraming.Reassembler()
-        val done = ArrayBlockingQueue<Result<ByteArray>>(1)
+        var reassembler = LongValueFraming.Reassembler()
+        /** Every complete framed value notified while pending, in order (a request may answer with several). */
+        val done = ArrayBlockingQueue<Result<ByteArray>>(8)
     }
 
     init {
@@ -33,6 +34,7 @@ class BleSession(private val transport: BleTransport, private val opTimeoutMs: L
                 p.done.offer(Result.failure(BleException("framing error on $characteristic", BleError.FRAMING)))
             } else if (p.reassembler.complete) {
                 p.done.offer(Result.success(p.reassembler.value))
+                p.reassembler = LongValueFraming.Reassembler()
             }
         }
     }
@@ -81,15 +83,31 @@ class BleSession(private val transport: BleTransport, private val opTimeoutMs: L
      * Writes [payload] (framed) to [writeChar] and waits for the complete framed
      * response notified on [notifyChar].  Subscribes for the duration of the request.
      */
-    fun request(writeChar: UUID, notifyChar: UUID, payload: ByteArray, responseTimeoutMs: Long): ByteArray {
+    fun request(writeChar: UUID, notifyChar: UUID, payload: ByteArray, responseTimeoutMs: Long): ByteArray =
+        requestSequence(writeChar, notifyChar, payload, responseTimeoutMs) { true }.first()
+
+    /**
+     * Like [request] but collects every complete framed value notified on [notifyChar] until
+     * [last] accepts one; the timeout covers the whole sequence.  session_role (B.9) answers
+     * a write with a value (`01‖nonce16` or `03‖role`) followed by the one-byte status.
+     */
+    fun requestSequence(writeChar: UUID, notifyChar: UUID, payload: ByteArray, responseTimeoutMs: Long,
+                        last: (ByteArray) -> Boolean): List<ByteArray> {
         val p = Pending(notifyChar)
         pending = p
         try {
             transport.setNotifications(notifyChar, true, opTimeoutMs)
             writeLong(writeChar, payload)
-            val result = p.done.poll(responseTimeoutMs, TimeUnit.MILLISECONDS)
-                ?: throw BleException("no response from $notifyChar", BleError.TIMEOUT)
-            return result.getOrThrow()
+            val values = ArrayList<ByteArray>()
+            val deadline = System.nanoTime() + responseTimeoutMs * 1_000_000L
+            while (true) {
+                val left = (deadline - System.nanoTime()) / 1_000_000L
+                val result = (if (left > 0) p.done.poll(left, TimeUnit.MILLISECONDS) else null)
+                    ?: throw BleException("no response from $notifyChar", BleError.TIMEOUT)
+                val v = result.getOrThrow()
+                values.add(v)
+                if (last(v)) return values
+            }
         } finally {
             pending = null
             try { transport.setNotifications(notifyChar, false, opTimeoutMs) } catch (_: BleException) {}
