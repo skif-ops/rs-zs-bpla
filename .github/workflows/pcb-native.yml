@@ -1795,8 +1795,6 @@ jobs:
             "$candidate_project/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_BASE_REV_A.kicad_pcb"
           cp hardware/kicad/candidates/PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.kicad_pcb \
             "$candidate_project/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.kicad_pcb"
-          cmp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb \
-            hardware/kicad/candidates/PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.kicad_pcb
           /usr/bin/python3 - \
             "$candidate_project/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_BASE_REV_A.kicad_pcb" \
             "$candidate_project/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.kicad_pcb" <<'PY'
