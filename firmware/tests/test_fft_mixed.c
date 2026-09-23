@@ -92,6 +92,33 @@ static void test_real_32000(void) {
   }
 }
 
+/* In-place variant: identical magnitudes (same twiddle scheme) for the pipeline size and other 2^a 5^b sizes. */
+static void test_real_inplace(void) {
+  static const unsigned sizes[] = {8u, 20u, 400u, 4096u, 16000u, 32000u};
+  static float mag2[N / 2u + 1u];
+  for (unsigned s = 0u; s < sizeof(sizes) / sizeof(sizes[0]); s++) {
+    const unsigned n = sizes[s];
+    float m1 = 0.0f, m2 = 0.0f;
+    double maxe = 0.0, maxr = 0.0;
+    clock_t t0;
+    fill_signal(2u + s);
+    assert(zs_fft_mixed_real_magnitude(sample_cb, g_signal, n, g_work, g_mag, &m1));
+    t0 = clock();
+    assert(zs_fft_mixed_real_magnitude_inplace(sample_cb, g_signal, n, g_work, mag2, &m2));
+    if (n == N) printf("real 32000-point in-place FFT: %.1f ms on host\n", 1000.0 * (double)(clock() - t0) / CLOCKS_PER_SEC);
+    for (unsigned k = 0u; k <= n / 2u; k++) {
+      double e = fabs((double)mag2[k] - (double)g_mag[k]);
+      if (e > maxe) maxe = e;
+      if (g_mag[k] > maxr) maxr = g_mag[k];
+    }
+    printf("  in-place n=%u: max |mag diff| = %.2e of peak\n", n, maxe / maxr);
+    assert(maxe / maxr < 1e-6 * (1.0 + log2((double)n)));
+    assert(fabs((double)m1 - (double)m2) / maxr < 1e-6 * (1.0 + log2((double)n)));
+  }
+  assert(!zs_fft_mixed_real_magnitude_inplace(sample_cb, g_signal, 32001u, g_work, g_mag, NULL));
+  assert(!zs_fft_mixed_real_magnitude_inplace(sample_cb, g_signal, 24u, g_work, g_mag, NULL));   /* 12 = 2^2 * 3 */
+}
+
 static void test_complex_sizes(void) {
   static const unsigned sizes[] = {2u, 5u, 8u, 20u, 100u, 2048u, 8000u, 8192u};
   for (unsigned s = 0u; s < sizeof(sizes) / sizeof(sizes[0]); s++) {
@@ -118,6 +145,7 @@ static void test_complex_sizes(void) {
 int main(void) {
   test_complex_sizes();
   test_real_32000();
+  test_real_inplace();
   printf("fft_mixed tests passed\n");
   return 0;
 }
