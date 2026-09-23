@@ -15,6 +15,7 @@
 #include "bsp_gpio.h"
 #include "bsp_mdf.h"
 #include "bsp_nor.h"
+#include "bsp_rng.h"
 #include "bsp_tim2_pps.h"
 #include "bsp_uart.h"
 #include "evt_pre_20_clock_policy.h"
@@ -279,15 +280,19 @@ static bool ble_audit(void *ctx, const zs_commissioning_audit_event_t *e) {
 static bool ble_uart_send(void *ctx, const uint8_t *w, size_t n) { (void)ctx; return bsp_uart_write(BSP_UART_BLE, w, n) == (int)n; }
 static uint32_t ble_now_ms(void *ctx) { (void)ctx; return xTaskGetTickCount(); }
 static bool ble_service_mode(void *ctx, uint32_t *started) { (void)ctx; *started = service_started_ms; return modes.mode == ZS_MODE_S4_SERVICE; }
-static zs_commissioning_role_t ble_peer_role(void *ctx) { (void)ctx; return ZS_COMMISSIONING_ROLE_INSTALLER; }
+static zs_commissioning_role_t ble_peer_role(void *ctx) { (void)ctx; return ZS_COMMISSIONING_ROLE_INSTALLER; }   /* base role by pairing (B.7) */
 static bool ble_peer_secure(void *ctx) { (void)ctx; return ipc.link_state == 2u; }
+static bool ble_random(void *ctx, uint8_t *out, size_t n) { (void)ctx; return bsp_rng_fill(out, n); }
+/* B.9 engineer key: until provisioning (station.json) lands on the STM32, the bench loads it with "engkey <64 hex>";
+   ipc_port.engineer_key stays NULL (elevation refused) until then. */
+static uint8_t engineer_key[32];
 
 static zs_station_config_io_t cfg_io = {cfg_slots, ram_read, ram_erase, ram_write};
 static zs_installation_store_io_t pos_io = {pos_slots, ram_read, ram_erase, ram_write};
 static const zs_commissioning_audit_io_t audit_io = {NULL, ble_audit};
 static const zs_ipc_identity_t identity = {APP_STATION_SERIAL, APP_STATION_HW_REV, APP_STATION_FW_VERSION, APP_STATION_BL_VERSION, APP_STATION_ID, ZS_STATION_CONFIG_REGION_RU868};
-static const zs_ipc_service_port_t ipc_port = {NULL, ble_uart_send, ble_now_ms, ble_service_mode, ble_peer_role, ble_peer_secure,
-                                               &cfg_io, &pos_io, &audit_io, &selftests, &identity};
+static zs_ipc_service_port_t ipc_port = {NULL, ble_uart_send, ble_now_ms, ble_service_mode, ble_peer_role, ble_peer_secure,
+                                         &cfg_io, &pos_io, &audit_io, &selftests, &identity, NULL, ble_random};
 
 static void bind_record_stores(void) {
   memset(cfg_slots, 0xff, sizeof(cfg_slots));
@@ -327,6 +332,7 @@ static void ble_task_fn(void *arg) {
   (void)arg;
   bind_record_stores();
   (void)bsp_uart_init(BSP_UART_BLE, APP_UART_BLE_BAUD);
+  if (!bsp_rng_init()) console_printf("rng: init failed, engineer role elevation disabled\r\n");
   bsp_gpio_ble_enable(true);
   vTaskDelay(pdMS_TO_TICKS(200));                  /* nRF boot */
   (void)zs_ipc_service_init(&ipc, &ipc_port);
@@ -386,19 +392,33 @@ static void console_exec(const char *cmd) {
     for (uint8_t i = 0u; i < n; i++)
       console_printf("  %8lu %s -> %s (ev %u)\r\n", (unsigned long)j[i].at_ms, zs_mode_name((zs_mode_t)j[i].from), zs_mode_name((zs_mode_t)j[i].to), j[i].event);
   } else if (strcmp(cmd, "ble") == 0) {
-    console_printf("ble bridge %s (v%u, ping %lu/pong %lu) link %u window %s config v%lu%s (%s) writes ok %lu rejected %lu audits %lu uart overruns %lu\r\n",
+    console_printf("ble bridge %s (v%u, ping %lu/pong %lu) link %u role %d (elev %lu rej %lu) window %s config v%lu%s (%s) writes ok %lu rejected %lu audits %lu uart overruns %lu\r\n",
                    ipc.pongs_seen ? "alive" : "silent", ipc.peer_protocol_version, (unsigned long)ipc.pings_sent, (unsigned long)ipc.pongs_seen,
-                   ipc.link_state, modes.mode == ZS_MODE_S4_SERVICE ? "open" : "closed", (unsigned long)ipc.config.version,
+                   ipc.link_state, (int)zs_ipc_service_role(&ipc), (unsigned long)ipc.role_elevations, (unsigned long)ipc.role_rejections,
+                   modes.mode == ZS_MODE_S4_SERVICE ? "open" : "closed", (unsigned long)ipc.config.version,
                    ipc.config_loaded ? "" : " (none)", stores_on_nor ? "nor" : "ram", (unsigned long)ipc.writes_ok,
                    (unsigned long)ipc.writes_rejected, (unsigned long)ble_audit_events, (unsigned long)bsp_uart_rx_overruns(BSP_UART_BLE));
   } else if (strcmp(cmd, "ping") == 0) {
     (void)zs_ipc_service_ping(&ipc);
   } else if (strcmp(cmd, "bledfu") == 0) {
     ble_recovery_request = true;
+  } else if (strncmp(cmd, "engkey", 6u) == 0) {
+    const char *h = cmd + 6;
+    while (*h == ' ') h++;
+    if (strlen(h) != 64u) { console_printf("engkey <64 hex>: B.9 engineer key for this bench session (%s)\r\n", ipc_port.engineer_key ? "set" : "not set"); }
+    else {
+      bool ok = true;
+      for (unsigned i = 0u; i < 32u && ok; i++) {
+        unsigned v; char b[3] = {h[2u * i], h[2u * i + 1u], 0};
+        ok = sscanf(b, "%2x", &v) == 1;
+        engineer_key[i] = (uint8_t)v;
+      }
+      if (ok) { ipc_port.engineer_key = engineer_key; console_printf("engkey: set\r\n"); } else console_printf("engkey: bad hex\r\n");
+    }
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio svc modes ble ping bledfu nrfimg nrfupd heap\r\n");
+    console_printf("commands: st lag pps audio svc modes ble ping bledfu engkey nrfimg nrfupd heap\r\n");
   }
 }
 
