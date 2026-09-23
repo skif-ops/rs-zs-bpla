@@ -22,6 +22,7 @@
 #include "queue.h"
 #include "task.h"
 #include "zs_audio.h"
+#include "zs_dsp_mcu.h"
 #include "zs_ipc_service.h"
 #include "zs_nor_storage_layout.h"
 #include "zs_pdm_capture.h"
@@ -45,6 +46,8 @@ static zs_time_sync_t time_sync;
 static zs_pps_sync_t pps;
 static zs_mode_scheduler_t modes;
 static zs_selftest_registry_t selftests;
+static int16_t dsp_pcm[APP_AUDIO_SAMPLE_RATE_HZ] __attribute__((section(".bss"), aligned(4)));   /* 1 s mono window for the DSP bench command */
+static zs_dsp_ctx_t dsp_ctx;
 
 static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task, ble_task;
 
@@ -415,10 +418,30 @@ static void console_exec(const char *cmd) {
       }
       if (ok) { ipc_port.engineer_key = engineer_key; console_printf("engkey: set\r\n"); } else console_printf("engkey: bad hex\r\n");
     }
+  } else if (strcmp(cmd, "dsp") == 0) {
+    /* S2 dry run: last 1 s of channel 0 through the MCU feature extractor, timed with the DWT cycle counter */
+    float feat[ZS_FEATURE_COUNT];
+    uint64_t end = zs_pdm_capture_sample_counter(&capture);
+    if (end < APP_AUDIO_SAMPLE_RATE_HZ || !zs_audio_ring_copy_mono(&audio_ring, end, APP_AUDIO_SAMPLE_RATE_HZ, dsp_pcm, 0u)) {
+      console_printf("dsp: not enough audio yet\r\n");
+    } else {
+      uint32_t t0, cycles;
+      CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+      DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+      t0 = DWT->CYCCNT;
+      if (zs_dsp_mcu_extract_1s(&dsp_ctx, dsp_pcm, APP_AUDIO_SAMPLE_RATE_HZ, feat)) {
+        cycles = DWT->CYCCNT - t0;
+        console_printf("dsp: %lu ms  f0 %d Hz harmonics %d step %d Hz stab %d%% centroid %d Hz flat %d%% noise %d%% rough %d%%\r\n",
+                       (unsigned long)(cycles / (SystemCoreClock / 1000u)), (int)feat[0], (int)feat[1], (int)feat[2], (int)(feat[3] * 100.0f),
+                       (int)feat[7], (int)(feat[8] * 100.0f), (int)(feat[10] * 100.0f), (int)(feat[15] * 100.0f));
+      } else {
+        console_printf("dsp: extract failed\r\n");
+      }
+    }
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio svc modes ble ping bledfu engkey nrfimg nrfupd heap\r\n");
+    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey nrfimg nrfupd heap\r\n");
   }
 }
 
@@ -457,6 +480,7 @@ bool app_tasks_create(void) {
   if (!bsp_mdf_init(&capture, &pps)) return false;
   if (!bsp_tim2_pps_init(&pps)) return false;
 
+  zs_dsp_mcu_init(&dsp_ctx);
   zs_selftest_init(&selftests);
   (void)zs_selftest_register(&selftests, ZS_ST_ID_POWER_INA226, "power_good", st_power_good, NULL, true);
   (void)zs_selftest_register(&selftests, ZS_ST_ID_MIC_CAPTURE, "mic_capture", st_mic_capture, &capture, true);
