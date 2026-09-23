@@ -58,6 +58,16 @@ add_library(zs_core
   src/zs_fft_mixed.c
   src/zs_dsp_mcu.c
   src/zs_ina226.c
+  src/zs_cbor_read.c
+  src/zs_ble_framing.c
+  src/zs_ipc_link.c
+  src/zs_ble_bridge.c
+  src/zs_ipc_service.c
+  src/zs_nor_slot_store.c
+  src/zs_air_gate.c
+  src/zs_presence.c
+  src/zs_mcumgr_serial.c
+  src/zs_nor_image_store.c
 )
 target_include_directories(zs_core PUBLIC include generated)
 target_link_libraries(zs_core m)
@@ -141,6 +151,18 @@ add_executable(zs_dsp_mcu_tests tests/test_dsp_mcu.c)
 target_link_libraries(zs_dsp_mcu_tests zs_core m)
 add_executable(zs_ina226_tests tests/test_ina226.c)
 target_link_libraries(zs_ina226_tests zs_core m)
+add_executable(zs_ble_bridge_tests tests/test_ble_bridge.c)
+target_link_libraries(zs_ble_bridge_tests zs_core m)
+add_executable(zs_nor_slot_store_tests tests/test_nor_slot_store.c)
+target_link_libraries(zs_nor_slot_store_tests zs_core m)
+add_executable(zs_air_gate_tests tests/test_air_gate.c)
+target_link_libraries(zs_air_gate_tests zs_core m)
+add_executable(zs_presence_tests tests/test_presence.c)
+target_link_libraries(zs_presence_tests zs_core m)
+add_executable(zs_mcumgr_serial_tests tests/test_mcumgr_serial.c)
+target_link_libraries(zs_mcumgr_serial_tests zs_core m)
+add_executable(zs_nor_image_store_tests tests/test_nor_image_store.c)
+target_link_libraries(zs_nor_image_store_tests zs_core m)
 add_executable(evt_pre_20_target_contract_tests tests/test_evt_pre_20_target_contract.c)
 target_link_libraries(evt_pre_20_target_contract_tests PRIVATE evt_pre_20_target_contract)
 add_executable(evt_pre_20_dual_sim_gpio_tests tests/test_evt_pre_20_dual_sim_gpio.c)
@@ -187,6 +209,12 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_fft_mixed_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_dsp_mcu_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_ina226_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_ble_bridge_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_nor_slot_store_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_air_gate_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_presence_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_mcumgr_serial_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_nor_image_store_tests PRIVATE -UNDEBUG)
   target_compile_options(evt_pre_20_target_contract_tests PRIVATE -UNDEBUG)
   target_compile_options(evt_pre_20_dual_sim_gpio_tests PRIVATE -UNDEBUG)
 endif()
@@ -228,6 +256,12 @@ add_test(NAME platform COMMAND zs_platform_tests)
 add_test(NAME fft_mixed COMMAND zs_fft_mixed_tests)
 add_test(NAME dsp_mcu COMMAND zs_dsp_mcu_tests)
 add_test(NAME ina226 COMMAND zs_ina226_tests)
+add_test(NAME ble_bridge COMMAND zs_ble_bridge_tests)
+add_test(NAME nor_slot_store COMMAND zs_nor_slot_store_tests)
+add_test(NAME air_gate COMMAND zs_air_gate_tests)
+add_test(NAME presence COMMAND zs_presence_tests)
+add_test(NAME mcumgr_serial COMMAND zs_mcumgr_serial_tests)
+add_test(NAME nor_image_store COMMAND zs_nor_image_store_tests)
 add_test(NAME evt_pre_20_target_contract COMMAND evt_pre_20_target_contract_tests)
 add_test(NAME evt_pre_20_dual_sim_gpio COMMAND evt_pre_20_dual_sim_gpio_tests)
 
@@ -238,6 +272,10 @@ target_link_libraries(zs_emit_heartbeat PRIVATE zs_core m)
 
 add_executable(zs_eval_golden tools/eval_golden.c)
 target_link_libraries(zs_eval_golden PRIVATE zs_core m)
+add_executable(zs_air_gate_eval tools/air_gate_eval.c)
+target_link_libraries(zs_air_gate_eval PRIVATE zs_core m)
+add_executable(zs_presence_eval tools/presence_eval.c)
+target_link_libraries(zs_presence_eval PRIVATE zs_core m)
 add_executable(zs_eval_golden_mcu tools/eval_golden_mcu.c)
 target_link_libraries(zs_eval_golden_mcu PRIVATE zs_core m)
 add_executable(zs_dump_spectrum tools/dump_spectrum.c)
