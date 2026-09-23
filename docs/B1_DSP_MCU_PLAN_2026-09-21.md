@@ -25,7 +25,10 @@ Host results (test_fft_mixed):
   (the host's own float accumulation noise), 7x faster on x86; on the M33 the gain is larger
   because trig calls dominate there;
 - memory for the global spectrum: work (128 KB) + mag/packed input (128 KB) = 256 KB, host 320 KB.
-  An in-place iterative variant (128 KB total) is a follow-up.
+  2026-09-23: in-place iterative variant (`zs_fft_mixed_real_magnitude_inplace`, decimation in
+  frequency with the same radix schedule and twiddle scheme, digit-reversed read-out at the split):
+  work (128 KB) + magnitudes (64 KB) = 192 KB; magnitudes match the out-of-place transform to
+  4e-7 of the peak; the extractor scratch is 214 KB (was 278 KB), golden result unchanged.
 
 ## Step 2 (done): `zs_dsp_mcu` - the 43 features on the MCU
 
