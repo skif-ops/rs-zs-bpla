@@ -86,5 +86,15 @@ End-to-end level 1 on the recordings with the new table (in-sample for the datas
 | стрельба из бронетранспортера | 0 % / 0 / 14 % |
 | стрельба (14 s sample with the APC) | 17 % / 0 / 33 % |
 
-Still needed from the field: FP-1 raw audio (the 172 rows are the last ones not at the station rate), road traffic and
-a second tractor recording (their raw files are lost), and the six June Lyuty recordings if they still exist.
+## Tractor and street recordings (2026-09-23, evening)
+Three tractor MP3s (idling, pass-by, forward/back: 142 windows) and three street-ambience MP3s (240 windows) at 32 kHz
+replaced the lost 44.1 kHz rows of «трактор», «городской транспорт» and the two lost bird files (244 stale rows
+dropped). Dataset: 2136 rows, all at 32 kHz except FP-1 (172 rows: no raw audio yet). Table: 46 centroids;
+in-sample recall 0.970 / FPR 0.025, holdout recall 0.945 / FPR 0.028. With ground engines in the model the
+level-1 fusion now does what it was designed for on them: tractor **0 % confirmed / 50 % ENGINE_UNCONFIRMED**,
+street **0 % / 29 % ENGINE**; Lyuty 97 % confirmed, DJI Mini 93 %, Mavic 89 %, nature/cicadas 0 %.
+
+The June Lyuty recordings are not all confirmed by the owner (they stay `training_provisional`). Held-out check on
+the confirmed September files: training *with* the June rows gives 96 % UAV votes and 54 % strong votes on
+September; *without* them 97 % and 30 % — the June material is consistent with the confirmed one and improves the
+confidence, so it stays in training. FP-1 (weakly labeled, native-rate rows) remains the open item.
