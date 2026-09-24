@@ -30,10 +30,22 @@
     "evt_stackup_basis_sha256": "c417669cab385eb702c53a1912ad5973bda3ca0fec8cbc5c3e331a511178afad"
   },
   "machine_gate": {
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "candidate_source_commit_sha": "88121e99401c09ad37694cbfc7bee1473e4519a8",
+    "candidate_source_tree_sha": "56337e9cdf4ec7e4f36246c1a2ed68d998fcfc08",
+    "ci_run_number": 740,
+    "ci_run_id": 35979002894,
+    "pcb_pwr_schematic_run_number": 117,
+    "pcb_pwr_schematic_run_id": 35979002978,
+    "pcb_native_run_number": 379,
+    "pcb_native_run_id": 35979002864,
+    "pcb_native_job_id": 107566153325,
+    "artifact_id": 10799132722,
+    "artifact_digest": "sha256:5b8bb71eabfeb4503a89cd294beaa428318196368420609247dfa3a0d28cbcc8",
     "required_violations": [85, 85],
     "required_unconnected": [106, 105],
-    "required_drc_fingerprint_delta": 0
+    "required_drc_fingerprint_delta": 0,
+    "comparative_drc": "PASS_85_TO_85_VIOLATIONS_106_TO_105_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA"
   },
   "deferred_boundary": {
     "application_authorized": false,

@@ -74,7 +74,18 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     assert review["deferred_boundary"]["application_authorized"] is False
     assert review["routing_complete"] is review["review_b_complete"] is review["manufacturing_release"] is False
     gate = review["machine_gate"]
-    assert gate["status"] == "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"
+    assert gate["status"] in {"PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+                              "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"}
+    if gate["status"].startswith("PASS_"):
+        assert gate["candidate_source_commit_sha"] == "88121e99401c09ad37694cbfc7bee1473e4519a8"
+        assert gate["candidate_source_tree_sha"] == "56337e9cdf4ec7e4f36246c1a2ed68d998fcfc08"
+        assert gate["ci_run_number"] == 740 and gate["ci_run_id"] == 35979002894
+        assert gate["pcb_pwr_schematic_run_number"] == 117 and gate["pcb_pwr_schematic_run_id"] == 35979002978
+        assert gate["pcb_native_run_number"] == 379 and gate["pcb_native_run_id"] == 35979002864
+        assert gate["pcb_native_job_id"] == 107566153325
+        assert gate["artifact_id"] == 10799132722
+        assert gate["artifact_digest"] == "sha256:5b8bb71eabfeb4503a89cd294beaa428318196368420609247dfa3a0d28cbcc8"
+        assert gate["comparative_drc"] == "PASS_85_TO_85_VIOLATIONS_106_TO_105_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA"
     result = {"status": "PASS_STATIC_PCB_PWR_VBAT_SYS_C13_C11_ROUTING_009_CANDIDATE",
               "base_sha256": BASE_SHA256, "candidate_sha256": CANDIDATE_SHA256,
               "candidate_semantic_sha256": CANDIDATE_SEMANTIC_SHA256,
