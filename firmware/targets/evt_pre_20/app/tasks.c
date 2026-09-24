@@ -25,6 +25,7 @@
 #include "queue.h"
 #include "task.h"
 #include "zs_audio.h"
+#include "zs_boot_counter.h"
 #include "zs_dsp_mcu.h"
 #include "zs_ipc_service.h"
 #include "zs_nor_storage_layout.h"
@@ -152,7 +153,9 @@ static void audio_task_fn(void *arg) {
 static bool pl_extract(void *ctx, const int16_t *pcm, size_t n, float out[ZS_FEATURE_COUNT]) { (void)ctx; return zs_dsp_mcu_extract_1s(&dsp_ctx, pcm, n, out); }
 static int64_t pl_sample_time(void *ctx, uint64_t sample) { (void)ctx; return zs_time_for_sample(&time_sync, sample); }
 static bool pl_emit(void *ctx, const zs_detection_t *d);
-static const zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, APP_STATION_ID, APP_BOOT_ID, 0u, 0u};
+/* boot_id starts as APP_BOOT_ID and is replaced by the NOR boot counter once the stores are bound (the pipeline reads it per event) */
+static zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, APP_STATION_ID, APP_BOOT_ID, 0u, 0u};
+static uint32_t boot_id = APP_BOOT_ID;
 
 static void dsp_task_fn(void *arg) {
   (void)arg;
@@ -283,6 +286,7 @@ static zs_nor_storage_bindings_t nor_bindings;
 static zs_archive_storage_t nor_archive_storage;      /* handed to the prehistory archive with the rest of B3 */
 static zs_command_journal_io_t nor_command_io;
 static zs_event_outbox_io_t nor_outbox_io;
+static zs_boot_counter_t boot_counter;
 static bool stores_on_nor;
 
 static bool ram_read(void *ctx, uint8_t slot, uint32_t off, uint8_t *d, size_t n) {
@@ -327,9 +331,12 @@ static const zs_ipc_identity_t identity = {APP_STATION_SERIAL, APP_STATION_HW_RE
 static zs_ipc_service_port_t ipc_port = {NULL, ble_uart_send, ble_now_ms, ble_service_mode, ble_peer_role, ble_peer_secure,
                                          &cfg_io, &pos_io, &audit_io, &selftests, &identity, NULL, ble_random};
 
-/* Heartbeat (schema 1): identity, time, power/route placeholders of B1, self-test verdict, pipeline health in route hop_count. */
+/* Heartbeat (schema 2): identity, time, power/route placeholders of B1, self-test verdict, and the detector map
+   (key 13): boot_id, uptime, pipeline counters, level 1, longest window, events waiting in the NOR outbox. */
 static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
+  uint16_t pending = 0u;
   (void)ctx;
+  hb->schema_ver = 2u;
   hb->time_us = zs_time_for_sample(&time_sync, zs_pdm_capture_sample_counter(&capture));
   hb->power.battery_pct = 100u; hb->power.battery_mv = 12000u;           /* INA226 binding lands with the power task */
   hb->power.monitor_status = 1u;                                          /* nonzero: no live power monitor */
@@ -340,6 +347,19 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->self_test_ok = zs_selftest_required_ok(&selftests);
   hb->gnss.time_trust = (uint8_t)time_sync.trust;
   hb->gnss.expected_time_error_us = time_sync.expected_error_us;
+  hb->detector_present = true;
+  hb->detector.boot_id = boot_id;
+  hb->detector.uptime_s = xTaskGetTickCount() / 1000u;
+  hb->detector.windows = pipeline.windows;
+  hb->detector.windows_dropped = pipeline.windows_dropped;
+  hb->detector.confirmed_windows = pipeline.confirmed_windows;
+  hb->detector.suspect_windows = pipeline.suspect_windows;
+  hb->detector.engine_windows = pipeline.engine_windows;
+  hb->detector.events_emitted = pipeline.events_emitted;
+  hb->detector.events_refused = pipeline.events_refused;
+  if (stores_on_nor && zs_event_outbox_pending_count(&nor_outbox_io, &pending) == ZS_EVENT_OUTBOX_OK) hb->detector.outbox_pending = pending;
+  hb->detector.window_max_ms = (uint16_t)(pipeline_max_ms > 65535u ? 65535u : pipeline_max_ms);
+  hb->detector.presence_level = pipeline.presence.level;
   return true;
 }
 static const app_comms_hooks_t comms_hooks = {comms_fill_heartbeat, NULL, console_printf};
@@ -353,8 +373,15 @@ static void bind_record_stores(void) {
     stores_on_nor = true;
     app_nrf_update_bind(&nor, &nor_bindings.layout, console_printf);
     app_comms_bind(&nor_outbox_io, &nor_command_io, &comms_hooks);        /* comms needs the durable stores */
-    console_printf("nor: W25Q512JV bound, nrf image @0x%08lx config @0x%08lx installation @0x%08lx\r\n",
-                   (unsigned long)nor_bindings.layout.nrf_image_base_address, (unsigned long)nor_bindings.layout.config_base_address,
+    /* B3 boot counter: one erase block before the nRF image; every power cycle gets a new boot_id so event ids never repeat */
+    if (zs_boot_counter_open(&boot_counter, &nor, nor_bindings.layout.boot_counter_base_address, nor_bindings.layout.erase_block_bytes) &&
+        zs_boot_counter_increment(&boot_counter, &boot_id)) {
+      pipeline_port.boot_id = boot_id;
+    } else {
+      console_printf("nor: boot counter unavailable, boot_id stays %lu\r\n", (unsigned long)boot_id);
+    }
+    console_printf("nor: W25Q512JV bound, boot %lu, nrf image @0x%08lx config @0x%08lx installation @0x%08lx\r\n",
+                   (unsigned long)boot_id, (unsigned long)nor_bindings.layout.nrf_image_base_address, (unsigned long)nor_bindings.layout.config_base_address,
                    (unsigned long)nor_bindings.layout.installation_base_address);
   } else {
     cfg_io = (zs_station_config_io_t){cfg_slots, ram_read, ram_erase, ram_write};
@@ -396,12 +423,12 @@ static void ble_task_fn(void *arg) {
   vTaskDelay(pdMS_TO_TICKS(200));                  /* nRF boot */
   (void)zs_ipc_service_init(&ipc, &ipc_port);
   (void)zs_ipc_service_ping(&ipc);
-  if (ipc.config_loaded) app_comms_set_config(&ipc.config, APP_BOOT_ID);
+  if (ipc.config_loaded) app_comms_set_config(&ipc.config, boot_id);
   for (;;) {
     uint8_t buf[64];
     size_t n;
     (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(250));
-    { static uint32_t seen_version; if (ipc.config_loaded && ipc.config.version != seen_version) { seen_version = ipc.config.version; app_comms_set_config(&ipc.config, APP_BOOT_ID); } }
+    { static uint32_t seen_version; if (ipc.config_loaded && ipc.config.version != seen_version) { seen_version = ipc.config.version; app_comms_set_config(&ipc.config, boot_id); } }
     while ((n = bsp_uart_read(BSP_UART_BLE, buf, sizeof(buf))) > 0u) zs_ipc_service_on_uart_rx(&ipc, buf, n);
     if (ble_recovery_request) { ble_recovery_request = false; ble_enter_recovery(); (void)zs_ipc_service_init(&ipc, &ipc_port); }
     if (app_nrf_update_pending()) { app_nrf_update_run(); (void)zs_ipc_service_init(&ipc, &ipc_port); (void)zs_ipc_service_ping(&ipc); }
