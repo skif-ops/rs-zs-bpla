@@ -55,9 +55,13 @@ RF, первые образцы жгутов и корпусов) собираю
 | `evt_pcba_assembler_part_map` | каждая установленная электрическая позиция PCB-MAIN/PWR/MIC есть в `hardware/EVT_PRE_20_PCBA_ASSEMBLER_PART_MAP_REV_A.csv` с `Supply_mode=LCSC` и номером `C…` либо `Supply_mode=CONSIGNED` |
 | `evt_bom_paper_closure` | нет строк BOM в статусах, закрываемых расчётом или ревью: `SELECTED_PENDING_REVIEW_A`, `LOCKED_CANDIDATE_PENDING_DERATING`, `LOCKED_CANDIDATE` |
 | `evt_station_mechanical_bom` | `hardware/EVT_PRE_20_MECHANICAL_BOM_REV_A.csv` содержит категории `HOUSING_PART`, `CABLE_GLAND`, `ACOUSTIC_MEMBRANE`, `SEAL`, `FASTENER`, `THREADED_INSERT`, `INTER_MODULE_FUSE`, `POWER_CABLE`, `MOUNT` с MPN или номером чертежа |
+| `evt_ots_temperature_coverage` | паспортный рабочий диапазон каждой покупной системной позиции (`EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.json`) покрывает −40…+70 °C станции (`ENVIRONMENT_REV_A.md`, DEC-019, раздел 6 п. 1); диапазон заряда LiFePO4 проверяется отдельно по разделу 4 |
 | `evt_housing_manufacturing_package` | в `mechanics/vacuum_casting/` есть master STEP, чертёж PDF и `HOUSING_BOM*.csv` |
 
-Размеры `DIM-*` остаются блокирующими: без них нельзя выпустить корпус.
+Размеры `DIM-*` остаются блокирующими: без них нельзя выпустить корпус. Строки,
+закрытые для EVT по паспортам, ведутся в `mechanics/common/DIM_EVT_CLOSURE_REV_A.csv`
+(статус `CLOSED_*`): реестр `OPEN_DIMENSIONS.csv` не правится, потому что его SHA-256
+привязан к принятым пакетам DIM-003.
 
 Инженерный снапшот `hardware/manufacturing/engineering-snapshot/` остаётся
 рабочим срезом с пометкой `NOT FOR MANUFACTURE` и в этот гейт не засчитывается;

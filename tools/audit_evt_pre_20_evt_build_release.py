@@ -70,6 +70,10 @@ EVT_MECHANICAL_BOM_CATEGORIES = (
     "POWER_CABLE",
     "MOUNT",
 )
+DIM_EVT_CLOSURE = "mechanics/common/DIM_EVT_CLOSURE_REV_A.csv"
+OTS_IDENTITY = "hardware/reviews/EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.json"
+ENVIRONMENT_STATION_RANGE_C = (-40.0, 70.0)  # hardware/ENVIRONMENT_REV_A.md, DEC-019
+
 EVT_PAPER_CLOSABLE_BOM_STATUSES = frozenset(
     {
         "SELECTED_PENDING_REVIEW_A",
@@ -174,6 +178,20 @@ def audit() -> dict[str, object]:
         name = str(item["name"])
         if name in EVT_PHYSICAL_SCOPE:
             moved.append(name)
+            continue
+        if name == "mechanical_dimensions" and not item.get("pass"):
+            # DIM rows closed for EVT by datasheet live in an overlay: the
+            # OPEN_DIMENSIONS register is SHA-bound by accepted DIM-003 packets.
+            closed = {
+                row["ID"] for row in base.read_csv(DIM_EVT_CLOSURE)
+                if row["EVT_status"].startswith("CLOSED_")
+            } if (ROOT / DIM_EVT_CLOSURE).is_file() else set()
+            still_open = [
+                dim.strip() for dim in str(item["detail"]).removeprefix("open: ").split(",")
+                if dim.strip() and dim.strip() not in closed
+            ]
+            detail = "open: " + ", ".join(still_open) if still_open else "all hardware dimensions closed"
+            check(name, not still_open, detail, f"{name}: {detail}", "base-reevaluated")
             continue
         if name in PWR_TRACE_PINNED_CHECKS:
             passed, detail = reevaluate_pwr_trace_pinned(name, PWR_TRACE_PINNED_CHECKS[name])
@@ -295,6 +313,25 @@ def audit() -> dict[str, object]:
         not missing_categories,
         "all required categories present" if not missing_categories else "missing categories: " + ", ".join(missing_categories),
         "station mechanical/installation BOM is incomplete: " + ", ".join(missing_categories),
+        "evt-build",
+    )
+
+    # ENVIRONMENT_REV_A section 6 item 1: the BOM must not contain parts whose
+    # rated temperature range does not cover the station operating range.
+    ots = json.loads((ROOT / OTS_IDENTITY).read_text(encoding="utf-8"))["targets"]
+    uncovered = []
+    for item_id, target in ots.items():
+        facts = target.get("controlled_facts", {})
+        ranges = [facts[key] for key in facts if key.endswith("temperature_c") and key != "charge_temperature_c"]
+        low = max(r[0] for r in ranges) if ranges else None
+        high = min(r[1] for r in ranges) if ranges else None
+        if low is None or low > ENVIRONMENT_STATION_RANGE_C[0] or high < ENVIRONMENT_STATION_RANGE_C[1]:
+            uncovered.append(f"{item_id} {target['mpn']} rated {low}..{high} C")
+    check(
+        "evt_ots_temperature_coverage",
+        not uncovered,
+        "all system OTS items cover -40..+70 C" if not uncovered else "; ".join(uncovered),
+        "system OTS items do not cover the station -40..+70 C range: " + "; ".join(uncovered),
         "evt-build",
     )
 
