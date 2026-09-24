@@ -8,6 +8,7 @@
  *   dsp         - zs_station_pipeline: 1 s windows at a 0.5 s hop -> zs_dsp_mcu -> votes + AIR gate -> level 1 ->
  *                 detection events into the NOR outbox (fetch in the audio task, analysis here)
  *   comms       - app_comms: BG95 bring-up from the station configuration, MQTT session, outbox drain + heartbeat (B2)
+ *   power       - app_power: INA226 on I2C2 every second -> power snapshot for heartbeat, events and the self-test
  */
 #include "tasks.h"
 
@@ -15,6 +16,7 @@
 #include "app_config.h"
 #include "app_comms.h"
 #include "app_nrf_update.h"
+#include "app_power.h"
 #include "bsp_gpio.h"
 #include "bsp_mdf.h"
 #include "bsp_nor.h"
@@ -58,7 +60,7 @@ static zs_dsp_ctx_t dsp_ctx;
 static zs_station_pipeline_t pipeline;
 static uint32_t pipeline_last_ms, pipeline_max_ms, pipeline_events_ram;
 
-static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task, ble_task, dsp_task, comms_task;
+static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task, ble_task, dsp_task, comms_task, power_task;
 
 /* ---- ISR notifications ----------------------------------------------------- */
 void app_audio_block_notify_from_isr(void) {
@@ -123,9 +125,10 @@ static zs_selftest_code_t st_gnss_pps(void *ctx, uint32_t *detail) {
   return p->bound_count > 0u ? ZS_ST_PASS : ZS_ST_FAIL;
 }
 
+/* PWR_GOOD/PWR_FAULT from PCB-PWR decide; the INA226 bus voltage is the detail (0 until the first valid sample). */
 static zs_selftest_code_t st_power_good(void *ctx, uint32_t *detail) {
   (void)ctx;
-  *detail = bsp_gpio_power_fault() ? 1u : 0u;
+  *detail = app_power_battery_mv();
   return (bsp_gpio_power_good() && !bsp_gpio_power_fault()) ? ZS_ST_PASS : ZS_ST_FAIL;
 }
 
@@ -344,8 +347,7 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   (void)ctx;
   hb->schema_ver = 2u;
   hb->time_us = zs_time_for_sample(&time_sync, zs_pdm_capture_sample_counter(&capture));
-  hb->power.battery_pct = 100u; hb->power.battery_mv = 12000u;           /* INA226 binding lands with the power task */
-  hb->power.monitor_status = 1u;                                          /* nonzero: no live power monitor */
+  (void)app_power_snapshot(&hb->power);                                   /* INA226: last valid sample, status bits when stale */
   hb->route.transport = ZS_ROUTE_LTE;
   strncpy(hb->firmware_ver, APP_STATION_FW_VERSION, sizeof(hb->firmware_ver) - 1u);
   strncpy(hb->model_ver, "c46", sizeof(hb->model_ver) - 1u);
@@ -427,9 +429,13 @@ static void bind_record_stores(void) {
 /* Detection events go to the NOR outbox (B3 map) when it is bound; on the RAM fallback they are only counted. */
 static bool pl_emit(void *ctx, const zs_detection_t *d) {
   static uint8_t workspace[ZS_EVENT_OUTBOX_PAYLOAD_MAX_BYTES + 64u];
+  static zs_detection_t with_power;                                       /* dsp task only: the pipeline is not re-entrant */
   (void)ctx;
+  with_power = *d;
+  (void)app_power_snapshot(&with_power.power);                            /* battery bus/current/power of the moment */
+  with_power.route.transport = ZS_ROUTE_LTE;
   if (!stores_on_nor) { pipeline_events_ram++; return true; }
-  return zs_event_outbox_enqueue_detection(&nor_outbox_io, d, 2u, workspace, sizeof(workspace)) == ZS_EVENT_OUTBOX_OK;
+  return zs_event_outbox_enqueue_detection(&nor_outbox_io, &with_power, 2u, workspace, sizeof(workspace)) == ZS_EVENT_OUTBOX_OK;
 }
 
 static volatile bool ble_recovery_request;   /* console "bledfu": restart the nRF with BLE_DFU_REQ asserted */
@@ -573,10 +579,12 @@ static void console_exec(const char *cmd) {
     secrets_loaded = false;
     secrets_apply();
     console_printf((!secrets_on_nor || zs_station_secrets_clear(&secrets_io) == ZS_STATION_SECRETS_OK) ? "secrets: cleared (sim iccids apply after reboot)\r\n" : "secrets: nor clear failed\r\n");
+  } else if (strcmp(cmd, "power") == 0) {
+    app_power_status(console_printf);
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] heap\r\n");
+    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] power heap\r\n");
   }
 }
 
@@ -635,5 +643,6 @@ bool app_tasks_create(void) {
   if (xTaskCreate(ble_task_fn, "ble", APP_STACK_BLE, NULL, APP_PRIO_BLE, &ble_task) != pdPASS) return false;
   if (xTaskCreate(dsp_task_fn, "dsp", APP_STACK_DSP, NULL, APP_PRIO_DSP, &dsp_task) != pdPASS) return false;
   if (xTaskCreate(app_comms_task, "comms", APP_STACK_COMMS, NULL, APP_PRIO_COMMS, &comms_task) != pdPASS) return false;
+  if (xTaskCreate(app_power_task, "power", APP_STACK_POWER, NULL, APP_PRIO_POWER, &power_task) != pdPASS) return false;
   return true;
 }
