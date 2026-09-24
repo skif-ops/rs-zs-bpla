@@ -190,7 +190,8 @@ static bool secrets_available(const zs_ipc_service_t *s) {
   return s->port->secrets_io && s->port->secrets_io->read && s->port->secrets_io->erase && s->port->secrets_io->write;
 }
 
-static bool push_secrets(zs_ipc_service_t *s) {
+/* Presence map as READ_VALUE (bridge cache) and, when `notify`, as NOTIFY after a write (ICD v0.3 §3.2). */
+static bool push_secrets_map(zs_ipc_service_t *s, bool notify) {
   zs_station_secrets_t rec;
   zs_cbor_t c;
   uint8_t buf[24];
@@ -204,8 +205,12 @@ static bool push_secrets(zs_ipc_service_t *s) {
   zs_cbor_uint(&c, ZS_SECRETS_KEY_ICCID2); zs_cbor_bool(&c, present && rec.iccid[1][0] != '\0');
   zs_cbor_uint(&c, ZS_SECRETS_KEY_COMMAND); zs_cbor_bool(&c, present && rec.command_key_set);
   memset(&rec, 0, sizeof(rec));
-  return !c.error && push_value(s, ZS_IPC_READ_VALUE, ZS_CHAR_STATION_SECRETS, buf, c.len);
+  if (c.error) return false;
+  if (notify && !push_value(s, ZS_IPC_NOTIFY, ZS_CHAR_STATION_SECRETS, buf, c.len)) return false;
+  return push_value(s, ZS_IPC_READ_VALUE, ZS_CHAR_STATION_SECRETS, buf, c.len);
 }
+
+static bool push_secrets(zs_ipc_service_t *s) { return push_secrets_map(s, false); }
 
 static void secrets_audit(zs_ipc_service_t *s, zs_commissioning_audit_phase_t phase, zs_commissioning_operation_t op, zs_commissioning_result_t result, uint32_t version) {
   zs_commissioning_audit_event_t e;
@@ -292,7 +297,7 @@ static void handle_secrets_write(zs_ipc_service_t *s, const uint8_t *p, size_t l
   secrets_audit(s, ZS_COMMISSIONING_AUDIT_COMMITTED, op, ZS_COMMISSIONING_OK, rec.version);
   if (s->port->secrets_changed) s->port->secrets_changed(s->port->ctx, &rec);
   memset(&rec, 0, sizeof(rec));
-  (void)push_secrets(s);
+  (void)push_secrets_map(s, true);
   (void)send_status(s, ZS_CHAR_STATION_SECRETS, ZS_BLE_STATUS_OK);
 }
 
