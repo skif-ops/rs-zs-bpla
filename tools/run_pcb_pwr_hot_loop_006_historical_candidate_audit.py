@@ -16,6 +16,7 @@ from pcb_pwr_hot_loop_006_board import (
     C13_C11_009_SHA256,
     OUTPUT_BULK_010,
     OUTPUT_BULK_010_SHA256,
+    is_j2_placement_eco_003,
     CANDIDATE,
     SHUNT_BULK_007,
     SHUNT_BULK_007_SHA256,
@@ -31,6 +32,8 @@ def historical_candidate_audit(
 ) -> dict:
     payload = ACTIVE.read_bytes()
     active_sha = hashlib.sha256(payload).hexdigest()
+    if is_j2_placement_eco_003(payload):
+        payload, active_sha = OUTPUT_BULK_010.read_bytes(), OUTPUT_BULK_010_SHA256
     assert active_sha in {SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256}
     assert payload == (SHUNT_BULK_007 if active_sha == SHUNT_BULK_007_SHA256
                        else C13_C12_008 if active_sha == C13_C12_008_SHA256

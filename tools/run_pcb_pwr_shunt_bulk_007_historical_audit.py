@@ -19,6 +19,7 @@ SUCCESSOR = ROOT / "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C12-ROUTING-0
 SUCCESSOR_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
 ACTIVE_SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
 OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+J2_PLACEMENT_ECO_003_SHA = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
 
 
 def historical_candidate_audit(
@@ -26,7 +27,8 @@ def historical_candidate_audit(
 ) -> dict:
     payload = ACTIVE.read_bytes()
     active_sha = hashlib.sha256(payload).hexdigest()
-    assert active_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA, OUTPUT_BULK_010_SHA}
+    assert active_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA, OUTPUT_BULK_010_SHA,
+                          J2_PLACEMENT_ECO_003_SHA}
     assert hashlib.sha256(generator.CANDIDATE.read_bytes()).hexdigest() == CANDIDATE_SHA
     if active_sha == CANDIDATE_SHA:
         assert payload == generator.CANDIDATE.read_bytes()

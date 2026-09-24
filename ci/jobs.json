@@ -34,6 +34,13 @@
       "shell": "bash",
       "script": "ci/evt_build_release.sh",
       "artifacts": "artifacts/evt_pre_20_evt_build_release_audit.json"
+    },
+    {
+      "name": "pcb-pwr-j2-placement-eco-003-drc",
+      "runner": "ubuntu-24.04",
+      "shell": "bash",
+      "script": "ci/pcb_pwr_eco_003_drc.sh",
+      "artifacts": "artifacts/kicad-native/PCB-PWR/j2-placement-eco-003/*"
     }
   ]
 }

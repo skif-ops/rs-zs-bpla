@@ -24,13 +24,14 @@ STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 SEMANTIC_SHA = "1278dcdc1c752e34132af5ac6472525c5012774ff864aa2210bee40c8c2284e3"
 SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
 OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+J2_PLACEMENT_ECO_003_SHA = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
 
 
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict:
     board_sha = hashlib.sha256(BOARD.read_bytes()).hexdigest()
-    assert board_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA}
+    assert board_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA}
     assert hashlib.sha256(APPROVAL.read_bytes()).hexdigest() == APPROVAL_SHA
-    board = Board.from_file(str(CANDIDATE if board_sha in {SUCCESSOR_SHA, OUTPUT_BULK_010_SHA} else BOARD), encoding="utf-8")
+    board = Board.from_file(str(CANDIDATE if board_sha in {SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA} else BOARD), encoding="utf-8")
     assert semantic_board_sha256(board) == SEMANTIC_SHA
     assert len(board.traceItems) == 39 and len(board.zones) == 2
     proposal = historical_candidate_audit()
