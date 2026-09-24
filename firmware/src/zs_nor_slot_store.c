@@ -64,6 +64,26 @@ bool zs_nor_slot_store_installation_io(zs_nor_slot_store_t *store, zs_installati
   return true;
 }
 
+bool zs_nor_slot_store_secrets_io(zs_nor_slot_store_t *store, zs_station_secrets_io_t *out_io) {
+  if (!out_io) return false;
+  memset(out_io, 0, sizeof(*out_io));
+  if (!store_valid(store) || store->slot_count != ZS_STATION_SECRETS_SLOT_COUNT || store->record_bytes < ZS_STATION_SECRETS_SLOT_BYTES) return false;
+  out_io->ctx = store; out_io->read = slot_read; out_io->erase = slot_erase; out_io->write = slot_write;
+  return true;
+}
+
+bool zs_nor_storage_bind_secrets(zs_nor_storage_bindings_t *bindings, zs_nor_t *nor, zs_station_secrets_io_t *out_secrets_io) {
+  if (out_secrets_io) memset(out_secrets_io, 0, sizeof(*out_secrets_io));
+  if (!bindings || !nor || !out_secrets_io || bindings->layout.secrets_base_address == 0u) return false;
+  if (!zs_nor_slot_store_init(&bindings->secrets_store, nor, bindings->layout.secrets_base_address, ZS_STATION_SECRETS_SLOT_COUNT, ZS_STATION_SECRETS_SLOT_BYTES) ||
+      !zs_nor_slot_store_secrets_io(&bindings->secrets_store, out_secrets_io)) {
+    memset(&bindings->secrets_store, 0, sizeof(bindings->secrets_store));
+    memset(out_secrets_io, 0, sizeof(*out_secrets_io));
+    return false;
+  }
+  return true;
+}
+
 /* ---- B3 layout binding (declared in zs_nor_storage_layout.h) ----------------------------- */
 
 bool zs_nor_storage_bind_stores(zs_nor_storage_bindings_t *bindings,

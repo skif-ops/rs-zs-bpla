@@ -6,6 +6,7 @@
 #include "zs_nor_command_journal.h"
 #include "zs_nor_event_outbox.h"
 #include "zs_nor_slot_store.h"
+#include "zs_station_secrets.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -23,6 +24,7 @@ typedef struct {
   /* B3 record stores (zs_nor_storage_layout_make_stores only), after the outbox: the nRF52840 bridge image slot
      (ZS_NOR_STORAGE_NRF_IMAGE_BLOCKS erase blocks, addendum C.6), then two erase blocks each for the station
      configuration and the installation record. */
+  uint32_t secrets_base_address;        /* two erase blocks (zs_station_secrets) right before the boot counter */
   uint32_t boot_counter_base_address;   /* one erase block right before the nRF image (zs_boot_counter) */
   uint32_t nrf_image_base_address;
   uint32_t nrf_image_partition_bytes;
@@ -39,6 +41,7 @@ typedef struct {
   zs_nor_event_outbox_adapter_t outbox_adapter;
   zs_nor_slot_store_t config_store;
   zs_nor_slot_store_t installation_store;
+  zs_nor_slot_store_t secrets_store;
 } zs_nor_storage_bindings_t;
 
 /*
@@ -68,23 +71,29 @@ bool zs_nor_storage_bind(zs_nor_storage_bindings_t *bindings,
                          zs_event_outbox_io_t *out_outbox_io);
 
 /*
- * B3 layout: the v1 map above plus, at the very end of NOR, one erase block for the boot counter
- * (zs_boot_counter), the nRF52840 bridge image slot (128 erase blocks: MCUboot's 472 KiB secondary
- * slot plus one header block, addendum C.6) and four erase blocks for the station configuration
- * (2 slots) and the installation record (2 slots):
- *   archive | command journal | event outbox | boot counter | nrf image | config x2 | installation x2
+ * B3 layout: the v1 map above plus, at the very end of NOR, two erase blocks for the station secrets
+ * (zs_station_secrets), one for the boot counter (zs_boot_counter), the nRF52840 bridge image slot
+ * (128 erase blocks: MCUboot's 472 KiB secondary slot plus one header block, addendum C.6) and four
+ * erase blocks for the station configuration (2 slots) and the installation record (2 slots):
+ *   archive | command journal | event outbox | secrets x2 | boot counter | nrf image | config x2 | installation x2
  * The v1 function and its addresses are untouched; targets that carry the record
  * stores in NOR call this one and zs_nor_storage_bind_stores.
  */
 #define ZS_NOR_STORAGE_NRF_IMAGE_BLOCKS 128u
 #define ZS_NOR_STORAGE_BOOT_COUNTER_BLOCKS 1u
-#define ZS_NOR_STORAGE_STORE_BLOCKS (ZS_STATION_CONFIG_SLOT_COUNT + ZS_INSTALLATION_STORE_SLOT_COUNT + ZS_NOR_STORAGE_NRF_IMAGE_BLOCKS + ZS_NOR_STORAGE_BOOT_COUNTER_BLOCKS)
+#define ZS_NOR_STORAGE_SECRETS_BLOCKS ZS_STATION_SECRETS_SLOT_COUNT
+#define ZS_NOR_STORAGE_STORE_BLOCKS (ZS_STATION_CONFIG_SLOT_COUNT + ZS_INSTALLATION_STORE_SLOT_COUNT + ZS_NOR_STORAGE_NRF_IMAGE_BLOCKS + ZS_NOR_STORAGE_BOOT_COUNTER_BLOCKS + ZS_NOR_STORAGE_SECRETS_BLOCKS)
 
 bool zs_nor_storage_layout_make_stores(uint32_t capacity_bytes,
                                        uint32_t erase_block_bytes,
                                        uint16_t command_slot_count,
                                        uint16_t outbox_slot_count,
                                        zs_nor_storage_layout_t *out);
+
+/* Binds the secrets store on an already bound B3 layout (zs_nor_storage_bind_stores first). */
+bool zs_nor_storage_bind_secrets(zs_nor_storage_bindings_t *bindings,
+                                 zs_nor_t *nor,
+                                 zs_station_secrets_io_t *out_secrets_io);
 
 bool zs_nor_storage_bind_stores(zs_nor_storage_bindings_t *bindings,
                                 zs_nor_t *nor,
