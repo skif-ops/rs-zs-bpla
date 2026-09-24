@@ -1,0 +1,47 @@
+{
+  "schema": "dioneya-pcb-pwr-3v8-output-bulk-routing-010-candidate-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-3V8-OUTPUT-BULK-ROUTING-010",
+  "base": {
+    "sha256": "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf",
+    "trace_items": 43
+  },
+  "candidate": {
+    "sha256": "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469",
+    "semantic_sha256": "d6810b6ea293bfd931f09e73ff64698d18d0a64b465db7b71c712f64a36b2980",
+    "trace_items": 53
+  },
+  "scope": {
+    "net": "3V8_MODEM",
+    "connection": "L1.2-C3.1-C14.1-C15.1-C16.1",
+    "layer": "F.Cu",
+    "full_width_mm": 3.0,
+    "pad_entry_width_mm": 0.5,
+    "length_mm": 28.977510073245206,
+    "added_segments": 10,
+    "added_vias": 0,
+    "added_zones": 0,
+    "minimum_screened_edge_clearance_mm": 0.35,
+    "limiting_object": "C15.2"
+  },
+  "source_binding": {
+    "generator": "tools/generate_pcb_pwr_3v8_output_bulk_routing_010_candidate_rev_a.py",
+    "generator_sha256": "93ae29fbb66a0598148c8b0b8d60d6614717ab001f2df1d6bd2bd23f295a44da",
+    "routing_rules_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
+    "evt_stackup_basis_sha256": "c417669cab385eb702c53a1912ad5973bda3ca0fec8cbc5c3e331a511178afad"
+  },
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"
+  },
+  "deferred_boundary": {
+    "application_authorized": false,
+    "requires_owner_acceptance": "ACCEPT_PCB_PWR_3V8_OUTPUT_BULK_ROUTING_010_SUBGATE"
+  },
+  "invariants": {
+    "authoritative_board_modified": false,
+    "predecessor_objects_preserved": true
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}
