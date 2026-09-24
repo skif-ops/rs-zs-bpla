@@ -9,7 +9,7 @@ int main(void) {
   uint8_t encoded[1024];
   size_t size;
 
-  message.schema_ver = 1u;
+  message.schema_ver = 2u;   /* with the detector map (key 13); schema 1 = the same without it */
   message.station_id = 424242u;
   message.time_us = INT64_C(1780000000000000);
   message.station.lat_e7 = 557550800;
@@ -52,6 +52,19 @@ int main(void) {
   strcpy(message.model_ver, "model-test");
   strcpy(message.hardware_rev, "EVT-PRE-20-Rev.A");
   message.self_test_ok = true;
+  message.detector_present = true;
+  message.detector.boot_id = 7u;
+  message.detector.uptime_s = 3600u;
+  message.detector.windows = 7190u;
+  message.detector.windows_dropped = 2u;
+  message.detector.confirmed_windows = 120u;
+  message.detector.suspect_windows = 45u;
+  message.detector.engine_windows = 300u;
+  message.detector.events_emitted = 13u;
+  message.detector.events_refused = 0u;
+  message.detector.outbox_pending = 1u;
+  message.detector.window_max_ms = 187u;
+  message.detector.presence_level = 3u;
 
   size = zs_protocol_encode_heartbeat(&message, encoded, sizeof(encoded));
   if (size == 0u || fwrite(encoded, 1u, size, stdout) != size) return 1;
