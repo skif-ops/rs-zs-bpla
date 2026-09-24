@@ -1,0 +1,13 @@
+{
+  "board": "PCB-PWR",
+  "release": "BLOCKED_NOT_FOR_MANUFACTURE",
+  "drc_return_code": 0,
+  "erc_return_code": 0,
+  "gerber_return_code": 0,
+  "drill_return_code": 0,
+  "position_return_code": 0,
+  "ipc_d_356_return_code": 0,
+  "step_return_code": 0,
+  "schematic_pdf_return_code": 0,
+  "bom_return_code": 0
+}
