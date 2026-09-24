@@ -1,0 +1,28 @@
+{
+  "schema": "dioneya-pcb-pwr-3v8-output-bulk-routing-010-application-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-3V8-OUTPUT-BULK-ROUTING-010",
+  "decision": "ACCEPT_PCB_PWR_3V8_OUTPUT_BULK_ROUTING_010_SUBGATE",
+  "approval_commit_sha": "fd513d24baf18976ea640bcad875e529d4b73890",
+  "approval_sha256": "f7e0fb5f7bddc8fdca644cb125ff58900a187bfd36831c6ea9215e18687cad6b",
+  "predecessor_board_sha256": "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf",
+  "applied_board_sha256": "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469",
+  "applied_board_semantic_sha256": "d6810b6ea293bfd931f09e73ff64698d18d0a64b465db7b71c712f64a36b2980",
+  "exact_candidate_byte_identity": true,
+  "trace_items": 53,
+  "predecessor_trace_items": 43,
+  "added_segments": 10,
+  "added_vias": 0,
+  "added_zones": 0,
+  "routed_nets": ["3V8_MODEM"],
+  "connections": ["L1.2-C3.1-C14.1-C15.1-C16.1"],
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+    "required_violations": [85, 85],
+    "required_unconnected": [105, 101],
+    "required_drc_fingerprint_delta": 0
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}
