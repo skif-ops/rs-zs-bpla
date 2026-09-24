@@ -5,6 +5,7 @@
 #include <string.h>
 
 #define BG95_COMMAND_TIMEOUT_MS 120000u
+#define BG95_AT_SYNC_TIMEOUT_MS 30000u   /* PWRKEY release -> first "OK": the module boots for seconds and swallows early ATs */
 #define BG95_NO_PROFILE 0xffu
 
 static bool copy_checked(char *dst, size_t size, const char *src) {
@@ -621,9 +622,13 @@ void zs_bg95_tick(zs_bg95_t *m, uint32_t now_ms) {
     if (m->io.gpio_write) m->io.gpio_write(m->io.ctx, m->pwrkey_gpio, false);
     m->state = ZS_BG95_AT_SYNC;
     m->retry_at_ms = now_ms;
+    m->deadline_ms = now_ms + BG95_AT_SYNC_TIMEOUT_MS;   /* one deadline for the whole sync, not per probe */
   }
-  if (m->state == ZS_BG95_AT_SYNC && !m->command_pending && now_ms >= m->retry_at_ms) {
-    if (!send_timed_cmd(m, "AT", now_ms)) fail_transport(m);
+  /* AT sync probes every second whether or not the previous one was answered: the BG95 boots for several
+     seconds after PWRKEY and drops what arrives before its UART is up, so a "pending" first AT must not block
+     the retries (with the 120 s command timeout that used to cost a full power cycle per bring-up). */
+  if (m->state == ZS_BG95_AT_SYNC && now_ms >= m->retry_at_ms) {
+    if (!send_cmd(m, "AT")) fail_transport(m);
     m->retry_at_ms = now_ms + 1000u;
   }
   if (m->state == ZS_BG95_REGISTERING && !m->command_pending && now_ms >= m->retry_at_ms) {
