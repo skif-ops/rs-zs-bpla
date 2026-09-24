@@ -69,6 +69,9 @@ void evt_pre_20_sim_orchestrator_transport_closed(evt_pre_20_sim_orchestrator_t 
 /* A link failure on the active slot or during bring-up: retried on the same slot up to
    EVT_PRE_20_SIM_MAX_LINK_FAILURES times, then the controller is asked to switch (it may still hold). */
 void evt_pre_20_sim_orchestrator_fail(evt_pre_20_sim_orchestrator_t *o, zs_dual_sim_failure_t failure, uint32_t now_ms);
+/* Power policy: take the modem down (safe-off recovery) and stay in SAFE_OFF until start() is called again.
+   The caller should try a graceful `AT+QPOWD` first; the recovery pulses PWRKEY only while STATUS is still high. */
+void evt_pre_20_sim_orchestrator_shutdown(evt_pre_20_sim_orchestrator_t *o);
 /* Clears the bring-up failure counters (operator action or a long quiet period). */
 void evt_pre_20_sim_orchestrator_reset_failures(evt_pre_20_sim_orchestrator_t *o);
 

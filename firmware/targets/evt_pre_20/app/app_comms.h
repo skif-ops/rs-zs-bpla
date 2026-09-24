@@ -22,15 +22,20 @@ typedef struct {
   bool (*fill_heartbeat)(void *ctx, zs_heartbeat_t *hb);
   void *ctx;
   void (*log)(const char *fmt, ...);
+  /* The session did its work (outbox drained, heartbeat published): the mode scheduler may leave S3. May be NULL. */
+  void (*session_done)(void *ctx);
 } app_comms_hooks_t;
 
 /* Stores are the NOR bindings (B3 map) or their RAM fallback; config is the record the ble task loaded. */
 void app_comms_bind(const zs_event_outbox_io_t *outbox, const zs_command_journal_io_t *journal, const app_comms_hooks_t *hooks);
 /* Runs the comms state machine; call from its own task. Never returns. */
 void app_comms_task(void *arg);
-/* Console: one status line; "comms on|off" requests. */
+/* Console: one status line; "comms on|off" requests (operator enable). */
 void app_comms_status(void (*print)(const char *fmt, ...));
 void app_comms_request(bool on);
+/* Power policy from the mode scheduler (S3/S4 allow the modem): the comms task owns EN_MODEM and brings the modem
+   down gracefully (AT+QPOWD, then the rail) when the policy withdraws it; a later allow restarts it. */
+void app_comms_allow_modem(bool allowed);
 /* Latest station config for the endpoint (from the ble task's zs_ipc_service). */
 void app_comms_set_config(const zs_station_config_t *cfg, uint32_t boot_id);
 /* Expected ICCID of slot 1/2 (18..22 digits); the dual-SIM path engages once both are set. */
