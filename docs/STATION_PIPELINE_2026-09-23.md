@@ -48,6 +48,8 @@ classifier + fusion < 0.1 ms (x86); the M33 figure for the whole window is the a
 
 ## Open
 
-- boot_id from a NOR boot counter (B3) — the bench uses `APP_BOOT_ID = 1`;
+- ~~boot_id from a NOR boot counter (B3)~~ — done: `zs_boot_counter` (one erase block @0x03F7B000 before the nRF
+  image, one byte program per boot, erase only after 32640 boots); the RAM fallback keeps `APP_BOOT_ID = 1`;
 - ~~outbox drain to the BG95 uplink (B2)~~ — done in #48 (`zs_station_comms`, `app_comms`);
-- heartbeat with the pipeline counters (SUSPECT/ENGINE shares) for the server.
+- ~~heartbeat with the pipeline counters~~ — done: heartbeat schema 2, detector map key 13 (`MQTT_TLS_ICD_v0_1.md` §3.2),
+  server `DetectorHealth` stored with the station record.
