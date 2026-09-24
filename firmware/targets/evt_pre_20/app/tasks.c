@@ -406,6 +406,7 @@ static void secrets_apply(void) {
   if (secrets.engineer_key_set) { memcpy(engineer_key, secrets.engineer_key, sizeof(engineer_key)); ipc_port.engineer_key = engineer_key; }
   else ipc_port.engineer_key = NULL;
   for (unsigned i = 0u; i < 2u; i++) if (secrets.iccid[i][0]) (void)app_comms_set_sim_iccid(i + 1u, secrets.iccid[i]);
+  app_comms_set_command_key(secrets.command_key_set ? secrets.command_public_key : NULL);
 }
 
 static void ble_secrets_changed(void *ctx, const zs_station_secrets_t *rec) {

@@ -38,6 +38,9 @@ void app_comms_request(bool on);
 void app_comms_allow_modem(bool allowed);
 /* Latest station config for the endpoint (from the ble task's zs_ipc_service). */
 void app_comms_set_config(const zs_station_config_t *cfg, uint32_t boot_id);
+/* Ed25519 public key of the server's command signer (station secrets key 4); NULL clears it. Takes effect on the
+   next session: verified commands are acknowledged (execution lands with the command executor). */
+void app_comms_set_command_key(const uint8_t public_key[32]);
 /* Expected ICCID of slot 1/2 (18..22 digits); the dual-SIM path engages once both are set. */
 bool app_comms_set_sim_iccid(unsigned slot, const char *iccid);
 const zs_bg95_t *app_comms_modem(void);

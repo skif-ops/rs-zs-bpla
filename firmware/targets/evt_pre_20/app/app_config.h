@@ -47,7 +47,7 @@
 #define APP_PRIO_CONSOLE             1
 #define APP_STACK_AUDIO              1024
 #define APP_STACK_SUPERVISOR         768
-#define APP_STACK_COMMS              1536
+#define APP_STACK_COMMS              2048     /* Ed25519 verify of a command runs on this stack (~3 KB peak) */
 #define APP_STACK_SERVICE            768
 #define APP_STACK_CONSOLE            1024     /* nrfimg: NOR erase/verify and printf on the console stack */
 #define APP_PRIO_BLE                 3
