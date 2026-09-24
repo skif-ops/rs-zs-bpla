@@ -26,6 +26,8 @@ import ru.dioneya.commissioning.core.ble.GattContractV01
 import ru.dioneya.commissioning.core.position.InstallationScreenController
 import ru.dioneya.commissioning.core.role.EngineerKey
 import ru.dioneya.commissioning.core.role.SessionRoleController
+import ru.dioneya.commissioning.core.secrets.StationSecretsBundle
+import ru.dioneya.commissioning.core.secrets.StationSecretsController
 import ru.dioneya.commissioning.security.EngineerKeyStore
 import java.util.concurrent.Executors
 
@@ -78,6 +80,9 @@ class InstallationActivity : Activity() {
         roleButton = Button(this).apply { text = getString(R.string.install_role, role.name) }
         roleButton.setOnClickListener { showEngineerDialog() }
         root.addView(roleButton)
+        val secretsButton = Button(this).apply { text = getString(R.string.secrets_button) }
+        secretsButton.setOnClickListener { showSecretsDialog() }
+        root.addView(secretsButton)
         val useLocation = Button(this).apply { text = getString(R.string.install_use_phone_location) }
         val read = Button(this).apply { text = getString(R.string.install_read) }
         val apply = Button(this).apply { text = getString(R.string.install_apply) }
@@ -150,13 +155,90 @@ class InstallationActivity : Activity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode != REQUEST_KEY_FILE || resultCode != RESULT_OK) return
+        if (resultCode != RESULT_OK) return
         val uri = data?.data ?: return
         val text = try { contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) } } catch (_: Exception) { null }
-        val key: EngineerKey? = text?.let { keyStore.importExport(it) }
-        status.text = if (key == null) getString(R.string.role_import_invalid)
-            else if (key.serial != stationSerial) getString(R.string.role_import_other_station, key.serial)
-            else getString(R.string.role_import_ok, key.serial)
+        when (requestCode) {
+            REQUEST_KEY_FILE -> {
+                val key: EngineerKey? = text?.let { keyStore.importExport(it) }
+                status.text = if (key == null) getString(R.string.role_import_invalid)
+                    else if (key.serial != stationSerial) getString(R.string.role_import_other_station, key.serial)
+                    else getString(R.string.role_import_ok, key.serial)
+            }
+            REQUEST_SECRETS_FILE -> {
+                val bundle = text?.let { StationSecretsBundle.fromExportJson(it) }
+                when {
+                    bundle == null -> status.text = getString(R.string.secrets_file_invalid)
+                    bundle.serial != stationSerial -> status.text = getString(R.string.secrets_other_station, bundle.serial)
+                    bundle.isEmpty -> status.text = getString(R.string.secrets_file_empty)
+                    else -> confirmSecretsWrite(bundle)
+                }
+            }
+        }
+    }
+
+    // ---- v0.3: station secrets over BLE (0x0206) ------------------------------------------------
+
+    /** Presence on the station → write a bundle from the registry export, or clear (engineer). */
+    private fun showSecretsDialog() {
+        val s = session ?: run { status.text = getString(R.string.secrets_not_connected); return }
+        executor.execute {
+            val presence = try { StationSecretsController(s).readPresence() } catch (_: Exception) { null }
+            runOnUiThread {
+                val text = presence?.text() ?: getString(R.string.secrets_presence_unknown)
+                val b = AlertDialog.Builder(this)
+                    .setTitle(R.string.secrets_dialog_title)
+                    .setMessage(getString(R.string.secrets_dialog_message, stationSerial, text))
+                    .setPositiveButton(R.string.secrets_dialog_write) { _, _ -> pickSecretsFile() }
+                    .setNegativeButton(android.R.string.cancel, null)
+                if (presence != null && !presence.isBlank && role == InstallationCommissioningRole.SERVICE_ENGINEER)
+                    b.setNeutralButton(R.string.secrets_dialog_clear) { _, _ -> confirmSecretsClear() }
+                b.show()
+            }
+        }
+    }
+
+    private fun pickSecretsFile() {
+        startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE); type = "*/*"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/json", "text/plain", "application/octet-stream"))
+        }, REQUEST_SECRETS_FILE)
+    }
+
+    private fun confirmSecretsWrite(bundle: StationSecretsBundle) {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.secrets_dialog_title)
+            .setMessage(getString(R.string.secrets_confirm_write, bundle.serial, bundle.summary()))
+            .setPositiveButton(R.string.secrets_dialog_write) { _, _ -> writeSecrets(bundle) }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun confirmSecretsClear() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.secrets_dialog_title)
+            .setMessage(getString(R.string.secrets_confirm_clear, stationSerial))
+            .setPositiveButton(R.string.secrets_dialog_clear) { _, _ -> clearSecrets() }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun writeSecrets(bundle: StationSecretsBundle) {
+        val s = session ?: return
+        status.text = getString(R.string.secrets_writing)
+        executor.execute {
+            val r = StationSecretsController(s).write(bundle)
+            runOnUiThread { status.text = getString(R.string.secrets_result, r.message + (r.presence?.let { " (" + it.text() + ")" } ?: "")) }
+        }
+    }
+
+    private fun clearSecrets() {
+        val s = session ?: return
+        status.text = getString(R.string.secrets_writing)
+        executor.execute {
+            val r = StationSecretsController(s).clear()
+            runOnUiThread { status.text = getString(R.string.secrets_result, r.message) }
+        }
     }
 
     private fun elevate() {
@@ -227,5 +309,6 @@ class InstallationActivity : Activity() {
         const val EXTRA_STATION_SERIAL = ServerActivity.EXTRA_STATION_SERIAL
         private const val REQUEST_LOCATION = 45
         private const val REQUEST_KEY_FILE = 46
+        private const val REQUEST_SECRETS_FILE = 47
     }
 }
