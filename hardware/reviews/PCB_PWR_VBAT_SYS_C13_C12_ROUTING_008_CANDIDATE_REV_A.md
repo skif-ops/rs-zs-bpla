@@ -21,8 +21,12 @@ The candidate is byte-bound by
 `tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a.py` and
 independently checked by
 `tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a.py`.
-Commit-bound CI and KiCad 9 comparative DRC are pending. The authoritative
-board is unchanged, and application is not authorized.
+Commit-bound CI #731, PCB-PWR Schematic #112 and PCB Native #372 pass. KiCad 9
+reports 85 → 85 violations, 107 → 106 unconnected items and zero DRC
+fingerprint delta. PCB Native artifact `10789448583` has digest
+`sha256:d74ea3960dbd8596152d291ce4380e72406595fcfb1dfb433bf55258b8db90dc`.
+The authoritative board is unchanged, human review is pending, and application
+is not authorized.
 
 After the machine gate passes, the exact decision tokens are:
 

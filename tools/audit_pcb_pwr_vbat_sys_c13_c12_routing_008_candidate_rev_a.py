@@ -29,6 +29,7 @@ from generate_pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a import (
 )
 
 REVIEW = ROOT / "hardware/reviews/PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_CANDIDATE_REV_A.json"
+STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 ROUTE_RULES = ROOT / "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv"
 ROUTE_RULES_SHA256 = "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988"
 STACKUP = ROOT / "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json"
@@ -95,6 +96,7 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
                      / ((width * 0.001) * 35e-6) for start, end, width in ROUTES)
     assert resistance * 4 < 0.02
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
+    route = json.loads(STATUS.read_text(encoding="utf-8"))["native_layout"]["vbat_sys_c13_c12_routing_008"]
     assert review["base"]["sha256"] == BASE_SHA256
     assert review["candidate"]["sha256"] == generated["candidate_sha256"]
     assert review["candidate"]["semantic_sha256"] == CANDIDATE_SEMANTIC_SHA256
@@ -114,6 +116,35 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     assert gate["required_violations"] == [85, 85]
     assert gate["required_unconnected"] == [107, 106]
     assert gate["required_drc_fingerprint_delta"] == 0
+    assert route["machine_gate"] == gate["status"]
+    assert route["candidate_board_sha256"] == CANDIDATE_SHA256
+    assert route["candidate_board_semantic_sha256"] == CANDIDATE_SEMANTIC_SHA256
+    assert route["authoritative_board_modified"] is False
+    assert route["application_authorized"] is False
+    if gate["status"] == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC":
+        assert gate["candidate_source_commit_sha"] == "c9625333e0ac4982b17a17d06208879e5f008e5c"
+        assert gate["candidate_source_tree_sha"] == "78aa8fd4f34b4c8ed0572e09ab4c1b1535dfa30a"
+        assert gate["ci_run_number"] == 731 and gate["ci_run_id"] == 35953715966
+        assert gate["pcb_pwr_schematic_run_number"] == 112
+        assert gate["pcb_pwr_schematic_run_id"] == 35953715921
+        assert gate["pcb_native_run_number"] == 372
+        assert gate["pcb_native_run_id"] == 35953715973
+        assert gate["pcb_native_job_id"] == 107487478165
+        assert gate["artifact_id"] == 10789448583
+        assert gate["artifact_digest"] == (
+            "sha256:d74ea3960dbd8596152d291ce4380e72406595fcfb1dfb433bf55258b8db90dc"
+        )
+        assert gate["comparative_drc"] == (
+            "PASS_85_TO_85_VIOLATIONS_107_TO_106_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA"
+        )
+        assert route["status"] == (
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC_HUMAN_REVIEW_PENDING"
+        )
+        for key in ("candidate_source_commit_sha", "candidate_source_tree_sha",
+                    "ci_run_number", "pcb_pwr_schematic_run_number",
+                    "pcb_native_run_number", "artifact_id", "artifact_digest",
+                    "comparative_drc"):
+            assert route[key] == gate[key]
     result = {
         "status": "PASS_STATIC_PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_CANDIDATE",
         "base_sha256": BASE_SHA256,

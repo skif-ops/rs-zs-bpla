@@ -50,8 +50,10 @@ Native #370 with the same DRC comparison and zero fingerprint delta. Via-current
 qualification, physical
 +70 °C first-article validation and all other routing remain open. The
 isolated successor candidate 008 proposes only the lower 3.0 mm F.Cu branch
-from `C13.1` to `C12.1`; its commit-bound comparative DRC and human review are
-pending, and the authoritative board remains candidate 007. The U2-constrained
+from `C13.1` to `C12.1`; its commit-bound gate passes at CI #731, PCB-PWR
+Schematic #112 and PCB Native #372 (85 → 85 violations, 107 → 106 unconnected,
+zero DRC fingerprint delta). Human review is pending, and the authoritative
+board remains candidate 007. The U2-constrained
 upper branch to `C11.1` is explicitly deferred.
 
 The

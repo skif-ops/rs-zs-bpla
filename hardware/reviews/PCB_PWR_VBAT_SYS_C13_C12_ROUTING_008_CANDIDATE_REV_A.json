@@ -3,7 +3,7 @@
   "configuration": "EVT-PRE-20 Rev.A",
   "proposal_id": "PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008",
   "creation_authorization": "USER_CONTINUE_2026-09-24",
-  "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+  "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC_HUMAN_REVIEW_PENDING",
   "base": {
     "board": "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_BASE_REV_A.kicad_pcb",
     "sha256": "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b",
@@ -58,10 +58,22 @@
     "non_vbat_sys_copper_added": false
   },
   "machine_gate": {
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "candidate_source_commit_sha": "c9625333e0ac4982b17a17d06208879e5f008e5c",
+    "candidate_source_tree_sha": "78aa8fd4f34b4c8ed0572e09ab4c1b1535dfa30a",
+    "ci_run_number": 731,
+    "ci_run_id": 35953715966,
+    "pcb_pwr_schematic_run_number": 112,
+    "pcb_pwr_schematic_run_id": 35953715921,
+    "pcb_native_run_number": 372,
+    "pcb_native_run_id": 35953715973,
+    "pcb_native_job_id": 107487478165,
+    "artifact_id": 10789448583,
+    "artifact_digest": "sha256:d74ea3960dbd8596152d291ce4380e72406595fcfb1dfb433bf55258b8db90dc",
     "required_violations": [85, 85],
     "required_unconnected": [107, 106],
-    "required_drc_fingerprint_delta": 0
+    "required_drc_fingerprint_delta": 0,
+    "comparative_drc": "PASS_85_TO_85_VIOLATIONS_107_TO_106_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA"
   },
   "human_gate_after_machine_pass": {
     "accept_value": "ACCEPT_PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_SUBGATE",
