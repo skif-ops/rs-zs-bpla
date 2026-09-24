@@ -45,6 +45,7 @@ typedef struct {
   zs_bg95_event_uplink_outcome_t last_outcome;
   uint16_t message_id;
   uint32_t deadline_ms;
+  bool from_outbox;                 /* the publication in flight is an outbox event (not a heartbeat message) */
 } zs_bg95_event_uplink_t;
 
 bool zs_bg95_event_uplink_init(zs_bg95_event_uplink_t *uplink,
