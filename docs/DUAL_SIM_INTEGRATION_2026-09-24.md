@@ -38,5 +38,6 @@ driven. Target Release: FLASH 147 KB, RAM 83.7 %.
 
 - SIMx_DET polarity (`APP_SIM_DET_ACTIVE_HIGH`), CELL_STATUS level-shifter sense, U13_EN_N high-Z evidence
   (no MCU read-back in Rev.A: logical completion only, as in the GPIO binding).
-- The supervisor's mode power policy (`apply_power`) still drives EN_MODEM on mode changes; with dual SIM
-  engaged the rail belongs to the orchestrator — to be reconciled in the low-power work (S0/S1 modem off).
+- ~~The supervisor's mode power policy (`apply_power`) still drives EN_MODEM on mode changes~~ — resolved:
+  `apply_power` only tells the comms task whether the mode allows the modem (`app_comms_allow_modem`); the comms
+  task owns EN_MODEM and takes the modem down gracefully (`POWER_MODES_INTEGRATION_2026-09-24.md`).

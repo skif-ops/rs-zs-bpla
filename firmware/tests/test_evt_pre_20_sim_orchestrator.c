@@ -135,6 +135,26 @@ int main(void) {
     assert(zs_dual_sim_active_slot(&controller) == ZS_DUAL_SIM_SLOT_2 && m.level[EVT_PRE_20_PIN_SIM_MUX_SEL]);
   }
 
+  /* power policy: shutdown takes the modem down through the recovery and holds SAFE_OFF until start() */
+  {
+    unsigned spins = 0u;
+    evt_pre_20_sim_phase_t ph;
+    m.level[EVT_PRE_20_PIN_CELL_STATUS] = true;
+    evt_pre_20_sim_orchestrator_shutdown(&o);
+    do {
+      t += 10u;
+      /* the modem drops STATUS once PWRKEY has been held for the 1000 ms fallback pulse */
+      if (o.gpio->fallback_pulse_active && (uint32_t)(t - o.gpio->fallback_pulse_started_ms) >= 1000u) m.level[EVT_PRE_20_PIN_CELL_STATUS] = false;
+      ph = evt_pre_20_sim_orchestrator_step(&o, t);
+      assert(++spins < 400u);
+    } while (ph == EVT_PRE_20_SIM_PHASE_BUSY);
+    assert(ph == EVT_PRE_20_SIM_PHASE_SAFE_OFF && !m.level[EVT_PRE_20_PIN_EN_MODEM] && !m.level[EVT_PRE_20_PIN_SIM_MUX_EN]);
+    assert(evt_pre_20_sim_orchestrator_step(&o, t += 5000u) == EVT_PRE_20_SIM_PHASE_SAFE_OFF);   /* no restart on its own */
+    evt_pre_20_sim_orchestrator_start(&o);
+    t = bring_to_active(&o, &m, &modem, SLOT1_ICCID, t);                 /* a fresh start goes to the preferred slot again */
+    assert(zs_dual_sim_active_slot(&controller) == ZS_DUAL_SIM_SLOT_1 && o.starts == 5u);
+  }
+
   /* a wrong card on the pending slot counts as a bring-up failure; three of them exhaust the slot */
   {
     evt_pre_20_sim_orchestrator_t o2; zs_dual_sim_t c2; evt_pre_20_dual_sim_gpio_t g2; zs_bg95_t md2;

@@ -66,6 +66,7 @@
 #define APP_BATTERY_FULL_MV          14200u
 #define APP_PRIO_POWER               3
 #define APP_STACK_POWER              512
+#define APP_DSP_QUIET_WINDOWS        6u       /* S2 -> DSP_DONE_NOTHING after this many windows at level NONE (3 s at the 0.5 s hop) */
 
 /* NVIC priorities (0 = highest). FreeRTOS syscall ceiling is 5: ISRs at 5..15 may call FromISR APIs. */
 #define APP_IRQ_PRIO_TIM2_PPS        4   /* timestamp capture: above the RTOS ceiling, no RTOS calls inside */

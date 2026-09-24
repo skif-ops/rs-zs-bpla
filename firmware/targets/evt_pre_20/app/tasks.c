@@ -84,6 +84,9 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t pin) {
   }
 }
 
+/* Mode scheduler events raised by the tasks (the supervisor consumes them as notification bits). */
+static void mode_event(zs_mode_event_t ev) { if (supervisor_task) (void)xTaskNotify(supervisor_task, 1u << ev, eSetBits); }
+
 /* ---- console output -------------------------------------------------------- */
 static void console_printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 static void console_printf(const char *fmt, ...) {
@@ -146,9 +149,11 @@ static void audio_task_fn(void *arg) {
     while (zs_pdm_capture_process(&capture)) {}
     (void)zs_pps_sync_poll(&pps, bsp_tim2_pps_now());
     (void)zs_time_update(&time_sync, zs_pdm_capture_sample_counter(&capture));
-    /* detection duty (S2 and above): copy the next complete window out of the ring while it is still there,
-       hand it to the DSP task; a window that is still pending when the next one completes is skipped (dropped) */
-    if (modes.mode >= ZS_MODE_S2_DSP && modes.mode != ZS_MODE_SHUTDOWN && dsp_task && zs_station_pipeline_fetch(&pipeline, &audio_ring))
+    /* listen/detection duty (S1 and S2 keep the PDM clock): copy the next complete window out of the ring while it is
+       still there, hand it to the DSP task; a window that is still pending when the next one completes is skipped
+       (dropped). S1 runs the same pipeline as S2 for now - the gate IS the pipeline's AIR gate + level 1; a cheaper
+       listen-only gate is low-power work. */
+    if ((modes.mode == ZS_MODE_S1_LISTEN || modes.mode == ZS_MODE_S2_DSP) && dsp_task && zs_station_pipeline_fetch(&pipeline, &audio_ring))
       xTaskNotifyGive(dsp_task);
   }
 }
@@ -161,6 +166,24 @@ static bool pl_emit(void *ctx, const zs_detection_t *d);
 static zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, APP_STATION_ID, APP_BOOT_ID, 0u, 0u};
 static uint32_t boot_id = APP_BOOT_ID;
 
+/* Mode events from the pipeline: level 1 SUSPECT or above in S1 opens S2 (gate positive); in S2 an emitted event
+   moves to S3 (outbox has data) and APP_DSP_QUIET_WINDOWS windows of NONE end the DSP duty. */
+static void dsp_mode_events(void) {
+  static uint32_t seen_events;
+  static unsigned quiet_windows;
+  const uint8_t level = pipeline.presence.level;
+  if (modes.mode == ZS_MODE_S1_LISTEN) {
+    quiet_windows = 0u;
+    if (level >= ZS_PRESENCE_SUSPECT) mode_event(ZS_MODE_EV_GATE_POSITIVE);
+    if (pipeline.events_emitted != seen_events) { seen_events = pipeline.events_emitted; mode_event(ZS_MODE_EV_OUTBOX_PENDING); }
+    return;
+  }
+  if (modes.mode != ZS_MODE_S2_DSP) { quiet_windows = 0u; seen_events = pipeline.events_emitted; return; }
+  if (pipeline.events_emitted != seen_events) { seen_events = pipeline.events_emitted; quiet_windows = 0u; mode_event(ZS_MODE_EV_DSP_DONE_EVENT); return; }
+  if (level == ZS_PRESENCE_NONE) { if (++quiet_windows >= APP_DSP_QUIET_WINDOWS) { quiet_windows = 0u; mode_event(ZS_MODE_EV_DSP_DONE_NOTHING); } }
+  else quiet_windows = 0u;
+}
+
 static void dsp_task_fn(void *arg) {
   (void)arg;
   for (;;) {
@@ -170,6 +193,7 @@ static void dsp_task_fn(void *arg) {
       (void)zs_station_pipeline_run_pending(&pipeline);
       pipeline_last_ms = xTaskGetTickCount() - t0;
       if (pipeline_last_ms > pipeline_max_ms) pipeline_max_ms = pipeline_last_ms;
+      dsp_mode_events();
     }
   }
 }
@@ -177,7 +201,7 @@ static void dsp_task_fn(void *arg) {
 static void apply_power(zs_mode_t mode) {
   zs_mode_power_t p = zs_mode_power_for(mode);
   bsp_gpio_mic_rail(p.mic_1v8);
-  bsp_gpio_modem_power(p.modem);
+  app_comms_allow_modem(p.modem);                 /* EN_MODEM belongs to the comms task (graceful off, dual-SIM sequence) */
   if (p.mdf_clock) (void)bsp_mdf_start(); else bsp_mdf_stop();
   /* clock profile switching (S0 STOP2 etc.) lands with the low-power work; B1 keeps 160 MHz */
   (void)zs_mode_clock_profile(mode);
@@ -370,7 +394,8 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->detector.presence_level = pipeline.presence.level;
   return true;
 }
-static const app_comms_hooks_t comms_hooks = {comms_fill_heartbeat, NULL, console_printf};
+static void comms_session_done(void *ctx) { (void)ctx; mode_event(ZS_MODE_EV_COMMS_DONE); }
+static const app_comms_hooks_t comms_hooks = {comms_fill_heartbeat, NULL, console_printf, comms_session_done};
 
 static void secrets_apply(void);   /* defined after ipc_port */
 
@@ -398,6 +423,7 @@ static void bind_record_stores(void) {
     stores_on_nor = true;
     app_nrf_update_bind(&nor, &nor_bindings.layout, console_printf);
     app_comms_bind(&nor_outbox_io, &nor_command_io, &comms_hooks);        /* comms needs the durable stores */
+    { uint16_t pending = 0u; if (zs_event_outbox_pending_count(&nor_outbox_io, &pending) == ZS_EVENT_OUTBOX_OK && pending > 0u) { console_printf("outbox: %u events pending from before the reboot\r\n", pending); mode_event(ZS_MODE_EV_OUTBOX_PENDING); } }
     /* B3 boot counter: one erase block before the nRF image; every power cycle gets a new boot_id so event ids never repeat */
     if (zs_boot_counter_open(&boot_counter, &nor, nor_bindings.layout.boot_counter_base_address, nor_bindings.layout.erase_block_bytes) &&
         zs_boot_counter_increment(&boot_counter, &boot_id)) {
@@ -562,6 +588,7 @@ static void console_exec(const char *cmd) {
     app_comms_status(console_printf);
   } else if (strcmp(cmd, "comms on") == 0 || strcmp(cmd, "comms off") == 0) {
     app_comms_request(cmd[6] == 'o' && cmd[7] == 'n');
+    if (cmd[7] == 'n') mode_event(ZS_MODE_EV_OUTBOX_PENDING);           /* bench: pull the scheduler into S3 */
   } else if (strncmp(cmd, "simiccid ", 9u) == 0) {
     const unsigned slot = (unsigned)(cmd[9] - '0');
     const char *iccid = cmd[10] == ' ' ? cmd + 11 : "";
