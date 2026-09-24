@@ -1,5 +1,6 @@
 #include "bsp_gpio.h"
 
+#include "app_config.h"
 #include "evt_pre_20_board_pins.h"
 #include "stm32u5xx_hal.h"
 
@@ -24,6 +25,16 @@
 #define PIN_AAD_CFG         GPIO_PIN_15   /* AAD_CFG (PA15): shared T5838 THSEL one-wire */
 #define PIN_TAMPER_PORT     GPIOC
 #define PIN_TAMPER          GPIO_PIN_7    /* TAMPER_IN (PC7): enclosure switch, active low when open */
+#define PIN_SIM_MUX_SEL_PORT GPIOE
+#define PIN_SIM_MUX_SEL     GPIO_PIN_0    /* SIM_MUX_SEL (PE0, pin 97) */
+#define PIN_SIM_MUX_EN_PORT GPIOE
+#define PIN_SIM_MUX_EN      GPIO_PIN_2    /* SIM_MUX_EN (PE2, pin 1) */
+#define PIN_SIM1_DET_PORT   GPIOE
+#define PIN_SIM1_DET        GPIO_PIN_3    /* SIM1_DET (PE3, pin 2) */
+#define PIN_SIM2_DET_PORT   GPIOE
+#define PIN_SIM2_DET        GPIO_PIN_5    /* SIM2_DET (PE5, pin 4) */
+#define PIN_CELL_STATUS_PORT GPIOD
+#define PIN_CELL_STATUS     GPIO_PIN_13   /* CELL_STATUS (PD13, pin 60): BG95 STATUS through the level shifter */
 /* Decision 2026-09-21 (no board change): the Rev.A map has no service button, so the enclosure
    tamper switch doubles as the service trigger. Held active for the 5 s hold time = service mode
    request (the enclosure is open for a service visit anyway); shorter activations stay tamper events. */
@@ -80,6 +91,28 @@ void bsp_gpio_init(void) {
   g.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(PIN_TAMPER_PORT, &g);
 
+  /* Dual-SIM mux: both outputs low (slot 1 selected, mux disabled) until the SIM orchestrator drives them. */
+  HAL_GPIO_WritePin(PIN_SIM_MUX_SEL_PORT, PIN_SIM_MUX_SEL, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(PIN_SIM_MUX_EN_PORT, PIN_SIM_MUX_EN, GPIO_PIN_RESET);
+  g.Pin = PIN_SIM_MUX_SEL;
+  g.Mode = GPIO_MODE_OUTPUT_PP;
+  g.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(PIN_SIM_MUX_SEL_PORT, &g);
+  g.Pin = PIN_SIM_MUX_EN;
+  HAL_GPIO_Init(PIN_SIM_MUX_EN_PORT, &g);
+  /* SIM card detects: switch to GND on the holder, pull-up here (polarity: APP_SIM_DET_ACTIVE_HIGH, confirm on Rev.A). */
+  g.Pin = PIN_SIM1_DET;
+  g.Mode = GPIO_MODE_INPUT;
+  g.Pull = APP_SIM_DET_ACTIVE_HIGH ? GPIO_PULLDOWN : GPIO_PULLUP;
+  HAL_GPIO_Init(PIN_SIM1_DET_PORT, &g);
+  g.Pin = PIN_SIM2_DET;
+  HAL_GPIO_Init(PIN_SIM2_DET_PORT, &g);
+  /* CELL_STATUS: driven by the modem when it runs; pull-down reads "off" while the rail is down. */
+  g.Pin = PIN_CELL_STATUS;
+  g.Mode = GPIO_MODE_INPUT;
+  g.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(PIN_CELL_STATUS_PORT, &g);
+
   /* AAD_CFG idle low until the THSEL programming sequence (target_status AAD addendum) runs. */
   HAL_GPIO_WritePin(PIN_AAD_CFG_PORT, PIN_AAD_CFG, GPIO_PIN_RESET);
   g.Pin = PIN_AAD_CFG;
@@ -97,4 +130,14 @@ bool bsp_gpio_mic_wake(void) { return HAL_GPIO_ReadPin(PIN_MIC_WAKE_PORT, PIN_MI
 bool bsp_gpio_service_button(void) { return HAL_GPIO_ReadPin(PIN_TAMPER_PORT, PIN_TAMPER) == GPIO_PIN_RESET; }
 bool bsp_gpio_tamper_active(void) { return bsp_gpio_service_button(); }
 bool bsp_gpio_power_good(void) { return HAL_GPIO_ReadPin(PIN_PWR_GOOD_PORT, PIN_PWR_GOOD) == GPIO_PIN_SET; }
+void bsp_gpio_sim_mux_select(bool slot2) { HAL_GPIO_WritePin(PIN_SIM_MUX_SEL_PORT, PIN_SIM_MUX_SEL, slot2 ? GPIO_PIN_SET : GPIO_PIN_RESET); }
+void bsp_gpio_sim_mux_enable(bool on) { HAL_GPIO_WritePin(PIN_SIM_MUX_EN_PORT, PIN_SIM_MUX_EN, on ? GPIO_PIN_SET : GPIO_PIN_RESET); }
+bool bsp_gpio_sim_mux_select_level(void) { return HAL_GPIO_ReadPin(PIN_SIM_MUX_SEL_PORT, PIN_SIM_MUX_SEL) == GPIO_PIN_SET; }
+bool bsp_gpio_sim_mux_enable_level(void) { return HAL_GPIO_ReadPin(PIN_SIM_MUX_EN_PORT, PIN_SIM_MUX_EN) == GPIO_PIN_SET; }
+bool bsp_gpio_modem_power_level(void) { return HAL_GPIO_ReadPin(PIN_EN_MODEM_PORT, PIN_EN_MODEM) == GPIO_PIN_SET; }
+bool bsp_gpio_sim_present(unsigned slot) {
+  const bool high = HAL_GPIO_ReadPin(slot == 2u ? PIN_SIM2_DET_PORT : PIN_SIM1_DET_PORT, slot == 2u ? PIN_SIM2_DET : PIN_SIM1_DET) == GPIO_PIN_SET;
+  return APP_SIM_DET_ACTIVE_HIGH ? high : !high;
+}
+bool bsp_gpio_cell_status(void) { return HAL_GPIO_ReadPin(PIN_CELL_STATUS_PORT, PIN_CELL_STATUS) == GPIO_PIN_SET; }
 bool bsp_gpio_power_fault(void) { return HAL_GPIO_ReadPin(PIN_PWR_FAULT_PORT, PIN_PWR_FAULT) == GPIO_PIN_SET; }
