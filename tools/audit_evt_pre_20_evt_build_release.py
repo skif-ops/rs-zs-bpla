@@ -72,7 +72,10 @@ EVT_MECHANICAL_BOM_CATEGORIES = (
 )
 DIM_EVT_CLOSURE = "mechanics/common/DIM_EVT_CLOSURE_REV_A.csv"
 OTS_IDENTITY = "hardware/reviews/EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.json"
-ENVIRONMENT_STATION_RANGE_C = (-40.0, 70.0)  # hardware/ENVIRONMENT_REV_A.md, DEC-019
+# EVT operating range accepted by the customer on 2026-09-24 for EVT-PRE-20:
+# -20..+60 C. The serial target stays DEC-019 (-40..+70 C, ENVIRONMENT_REV_A.md)
+# and is revisited from EVT results.
+ENVIRONMENT_STATION_RANGE_C = (-20.0, 60.0)
 
 EVT_PAPER_CLOSABLE_BOM_STATUSES = frozenset(
     {
@@ -316,8 +319,8 @@ def audit() -> dict[str, object]:
         "evt-build",
     )
 
-    # ENVIRONMENT_REV_A section 6 item 1: the BOM must not contain parts whose
-    # rated temperature range does not cover the station operating range.
+    # ENVIRONMENT_REV_A section 6 item 1 applied to the accepted EVT range: the
+    # BOM must not contain parts whose rated range does not cover it.
     ots = json.loads((ROOT / OTS_IDENTITY).read_text(encoding="utf-8"))["targets"]
     uncovered = []
     for item_id, target in ots.items():
@@ -330,8 +333,10 @@ def audit() -> dict[str, object]:
     check(
         "evt_ots_temperature_coverage",
         not uncovered,
-        "all system OTS items cover -40..+70 C" if not uncovered else "; ".join(uncovered),
-        "system OTS items do not cover the station -40..+70 C range: " + "; ".join(uncovered),
+        "all system OTS items cover the EVT range {:g}..+{:g} C".format(*ENVIRONMENT_STATION_RANGE_C)
+        if not uncovered else "; ".join(uncovered),
+        "system OTS items do not cover the EVT range {:g}..+{:g} C: ".format(*ENVIRONMENT_STATION_RANGE_C)
+        + "; ".join(uncovered),
         "evt-build",
     )
 
