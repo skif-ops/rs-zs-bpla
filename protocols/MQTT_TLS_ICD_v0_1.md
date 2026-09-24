@@ -13,7 +13,7 @@ Detection schema: `4`
 | Topic | Направление | QoS | Retain | Payload | Статус реализации |
 |---|---|---:|---:|---|---|
 | `zs/v1/{tenant}/{station_id}/up` | station -> server | 1 | false | detection compact CBOR | PORTABLE_BG95_SESSION_FIXED_LENGTH_QMTPUB_QG_PASS; TARGET_USART_DMA_AND_HARDWARE_PENDING |
-| `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/status` | station -> server | 1 | false | compact heartbeat CBOR schema 1 / 2 (§3.2) | HOST_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/receipt` | server -> station | 1 | false | event application receipt | PORTABLE_BG95_SESSION_LENGTH_DELIMITED_QMTRECV_QG_PASS; TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
@@ -270,14 +270,16 @@ The INA226 extension is deliberately excluded from P0 summary so the LoRa worst-
 
 P0 summary должен оставаться не более 220 bytes до LoRa framing. Full packet size is monitored in CI and is not a LoRa payload contract.
 
-## 3.2 Compact heartbeat CBOR schema 1
+## 3.2 Compact heartbeat CBOR schema 1 / 2
 
 Heartbeat предназначен только для LTE/NB-IoT/2G транспорта и не включается в
-LoRa/P0. Верхний map использует message type `3` и следующие ключи:
+LoRa/P0. Верхний map использует message type `3` и следующие ключи (schema 2 =
+schema 1 плюс необязательный ключ 13; сервер принимает обе, ключ 13 в schema 1
+игнорируется):
 
 | Key | Назначение |
 |---:|---|
-| 0 | heartbeat schema, сейчас 1 |
+| 0 | heartbeat schema, 1 или 2 |
 | 1 | message type, heartbeat = 3 |
 | 2 | station_id |
 | 3 | time_us |
@@ -290,6 +292,24 @@ LoRa/P0. Верхний map использует message type `3` и следу�
 | 10 | hardware revision |
 | 11 | self-test result |
 | 12 | protected cellular telemetry |
+| 13 | detector health (schema 2, необязательный; прошивка `zs_detector_health_t`, сервер `DetectorHealth`) |
+
+Detector sub-map key 13 (schema 2, счётчики с момента загрузки; станция шлёт его с 2026‑09‑23):
+
+| Sub-key | Field | Назначение |
+|---:|---|---|
+| 0 | boot_id | NOR‑счётчик загрузок (`zs_boot_counter`); `event_id = (boot_id << 32) + seq_no` |
+| 1 | uptime_s | секунд с загрузки |
+| 2 | windows | окон 1 с проанализировано |
+| 3 | windows_dropped | пропущенных шагов (анализ отстал от кольца) |
+| 4 | confirmed_windows | окон уровня 1 CONFIRMED |
+| 5 | suspect_windows | окон уровня 1 SUSPECT |
+| 6 | engine_windows | окон уровня 1 ENGINE_UNCONFIRMED |
+| 7 | events_emitted | событий детекции положено в outbox |
+| 8 | events_refused | отказов outbox (переполнение/ошибка хранения) |
+| 9 | outbox_pending | событий, ещё не подтверждённых квитанцией сервера |
+| 10 | window_max_ms | самое долгое окно анализа |
+| 11 | presence_level | текущий уровень 1: 0 NONE, 1 SUSPECT, 2 ENGINE_UNCONFIRMED, 3 CONFIRMED |
 
 Cellular sub-map key 12:
 

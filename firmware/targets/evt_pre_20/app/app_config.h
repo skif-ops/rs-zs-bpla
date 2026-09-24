@@ -32,7 +32,7 @@
 #define APP_UART_CONSOLE_BAUD        115200u   /* LPUART1 PC0/PC1 diagnostic console */
 #define APP_UART_RX_RING             512u
 
-/* NOR map (zs_nor_storage_layout_make_stores): archive | command journal | event outbox | nrf image | config x2 | installation x2. */
+/* NOR map (zs_nor_storage_layout_make_stores): archive | command journal | event outbox | boot counter | nrf image | config x2 | installation x2. */
 #define APP_NOR_COMMAND_SLOTS        16u
 #define APP_NOR_OUTBOX_SLOTS         256u
 
@@ -53,7 +53,7 @@
 #define APP_PRIO_BLE                 3
 #define APP_PRIO_DSP                 2        /* station pipeline: below capture and the service tasks, above the console */
 #define APP_STACK_DSP                1536
-#define APP_BOOT_ID                  1u       /* B1 bench: a boot counter in NOR lands with B3 */
+#define APP_BOOT_ID                  1u       /* boot_id until the NOR boot counter is bound (RAM fallback keeps it) */
 #define APP_STACK_BLE                1024
 #define APP_COMMS_HEARTBEAT_MS       60000u   /* zs_station_comms heartbeat period */
 #define APP_COMMS_PUBLIC_APN         1        /* pilot policy: public APNs only (CELLULAR_CONNECTIVITY_BASELINE) */

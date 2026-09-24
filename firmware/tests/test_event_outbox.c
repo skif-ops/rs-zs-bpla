@@ -112,6 +112,7 @@ static void test_priority_fifo_attempt_and_reclaim(void) {
   value = event(3u, 3u, three, sizeof(three));
   assert(zs_event_outbox_enqueue(&io, &value) == ZS_EVENT_OUTBOX_OK);
 
+  { uint16_t pending = 0u; assert(zs_event_outbox_pending_count(&io, &pending) == ZS_EVENT_OUTBOX_OK && pending == 3u); }
   assert(zs_event_outbox_peek(&io, &item) == ZS_EVENT_OUTBOX_OK);
   assert(item.event_id == 2u && item.retry_count == 0u);
   assert(memcmp(item.payload, two, sizeof(two)) == 0);
@@ -123,6 +124,8 @@ static void test_priority_fifo_attempt_and_reclaim(void) {
          ZS_EVENT_OUTBOX_OK);
   assert(zs_event_outbox_mark_application_acked(&io, &item) ==
          ZS_EVENT_OUTBOX_ALREADY_ACKED);
+  { uint16_t pending = 0u; assert(zs_event_outbox_pending_count(&io, &pending) == ZS_EVENT_OUTBOX_OK && pending == 2u); }
+  assert(zs_event_outbox_pending_count(&io, NULL) == ZS_EVENT_OUTBOX_INVALID_ARGUMENT);
 
   assert(zs_event_outbox_peek(&io, &item) == ZS_EVENT_OUTBOX_OK);
   assert(item.event_id == 3u); /* same priority, older generation first */

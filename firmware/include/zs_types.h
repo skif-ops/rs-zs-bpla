@@ -178,8 +178,24 @@ typedef struct {
   bool settings_valid;
 } zs_cellular_telemetry_t;
 
+/* Heartbeat schema 2, key 13: health of the station detector (zs_station_pipeline) since boot. */
 typedef struct {
-  uint8_t schema_ver;
+  uint32_t boot_id;            /* NOR boot counter (zs_boot_counter); event_id = boot_id << 32 | seq_no */
+  uint32_t uptime_s;
+  uint32_t windows;            /* 1 s windows analysed */
+  uint32_t windows_dropped;    /* hops skipped: the analysis lagged the ring */
+  uint32_t confirmed_windows;  /* level 1 CONFIRMED */
+  uint32_t suspect_windows;    /* level 1 SUSPECT */
+  uint32_t engine_windows;     /* level 1 ENGINE_UNCONFIRMED */
+  uint32_t events_emitted;
+  uint32_t events_refused;     /* outbox full / storage error */
+  uint32_t outbox_pending;     /* detection events still waiting for the server receipt */
+  uint16_t window_max_ms;      /* longest analysis of one window since boot */
+  uint8_t presence_level;      /* current level 1 (zs_presence_level_t) */
+} zs_detector_health_t;
+
+typedef struct {
+  uint8_t schema_ver;          /* 1: without the detector map; 2: with it when detector_present */
   uint32_t station_id;
   int64_t time_us;
   zs_position_t station;
@@ -191,6 +207,8 @@ typedef struct {
   char model_ver[ZS_VERSION_CAPACITY];
   char hardware_rev[ZS_VERSION_CAPACITY];
   bool self_test_ok;
+  zs_detector_health_t detector;
+  bool detector_present;
 } zs_heartbeat_t;
 
 typedef struct {

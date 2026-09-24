@@ -78,6 +78,31 @@ int main(void) {
   message.cellular.settings_valid = false;
   assert(zs_protocol_encode_heartbeat(&message, encoded, sizeof(encoded)) == 0u);
 
+  /* schema 2: the detector map (key 13) follows the cellular map; schema 1 output is unchanged */
+  {
+    uint8_t v1[1024], v2[1024];
+    size_t n1, n2;
+    message = heartbeat();
+    n1 = zs_protocol_encode_heartbeat(&message, v1, sizeof(v1));
+    message.schema_ver = 2u;
+    message.detector_present = true;
+    message.detector.boot_id = 7u; message.detector.uptime_s = 3600u; message.detector.windows = 7190u; message.detector.windows_dropped = 2u;
+    message.detector.confirmed_windows = 120u; message.detector.suspect_windows = 45u; message.detector.engine_windows = 300u;
+    message.detector.events_emitted = 13u; message.detector.events_refused = 0u; message.detector.outbox_pending = 1u;
+    message.detector.window_max_ms = 187u; message.detector.presence_level = 3u;
+    n2 = zs_protocol_encode_heartbeat(&message, v2, sizeof(v2));
+    assert(n1 > 0u && n2 > n1);
+    assert(v1[0] == 0xadu && v2[0] == 0xaeu);                 /* map(13) vs map(14) */
+    assert(v1[2] == 0x01u && v2[2] == 0x02u);                 /* key 0: schema_ver */
+    assert(memcmp(v1 + 3, v2 + 3, n1 - 3u) == 0);             /* the 12 common keys are byte-identical */
+    assert(v2[n1] == 0x0du && v2[n1 + 1u] == 0xacu);           /* key 13, map(12) */
+    assert(v2[n2 - 2u] == 0x0bu && v2[n2 - 1u] == 0x03u);      /* last pair: presence_level 3 */
+    message.detector_present = false;                         /* schema 2 without the map degrades to 13 keys */
+    assert(zs_protocol_encode_heartbeat(&message, v2, sizeof(v2)) == n1 && v2[0] == 0xadu);
+    message.schema_ver = 3u;
+    assert(zs_protocol_encode_heartbeat(&message, v2, sizeof(v2)) == 0u);
+  }
+
   puts("zs_heartbeat_telemetry_tests: OK");
   return 0;
 }

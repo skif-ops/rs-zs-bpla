@@ -79,6 +79,9 @@ assert heartbeat.power.monitor_valid
 assert heartbeat.cellular is not None
 assert heartbeat.cellular.imsi == "250011234567890"
 assert heartbeat.cellular.iccid == "89701012345678901234"
+assert heartbeat.detector is not None, "schema 2 heartbeat must carry the detector map"
+assert heartbeat.detector.boot_id == 7 and heartbeat.detector.windows == 7190 and heartbeat.detector.outbox_pending == 1
+assert heartbeat.detector.presence_level == "CONFIRMED" and heartbeat.detector.window_max_ms == 187
 assert heartbeat.cellular.apn == "network.apn"
 assert heartbeat.cellular.apn_source == "NETWORK"
 assert heartbeat.cellular.settings_valid

@@ -347,6 +347,22 @@ class CellularTelemetry(BaseModel):
     settings_valid: Literal[True]
 
 
+class DetectorHealth(BaseModel):
+    """Compact heartbeat schema 2, key 13: the station detector since boot (firmware zs_detector_health_t)."""
+    boot_id: int = Field(default=0, ge=0, le=0xFFFFFFFF)
+    uptime_s: int = Field(default=0, ge=0)
+    windows: int = Field(default=0, ge=0)
+    windows_dropped: int = Field(default=0, ge=0)
+    confirmed_windows: int = Field(default=0, ge=0)
+    suspect_windows: int = Field(default=0, ge=0)
+    engine_windows: int = Field(default=0, ge=0)
+    events_emitted: int = Field(default=0, ge=0)
+    events_refused: int = Field(default=0, ge=0)
+    outbox_pending: int = Field(default=0, ge=0)
+    window_max_ms: int = Field(default=0, ge=0)
+    presence_level: Literal["NONE", "SUSPECT", "ENGINE_UNCONFIRMED", "CONFIRMED"] = "NONE"
+
+
 class HeartbeatMessage(BaseModel):
     station_id: int
     time_us: int
@@ -361,6 +377,7 @@ class HeartbeatMessage(BaseModel):
     self_test_ok: bool = True
     fault_flags: list[str] = Field(default_factory=list)
     cellular: CellularTelemetry | None = None
+    detector: DetectorHealth | None = None
 
 
 class SecurityEventMessage(BaseModel):
