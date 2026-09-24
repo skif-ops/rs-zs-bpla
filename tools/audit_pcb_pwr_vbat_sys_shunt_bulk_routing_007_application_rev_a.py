@@ -24,11 +24,12 @@ STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 SEMANTIC_SHA = "a3f4e65be713c3ed2518ffab78b1adad2fc0cf7814e0069b50b08fbe64d8d613"
 SUCCESSOR_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
 ACTIVE_SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
 
 
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict:
     active_sha = hashlib.sha256(BOARD.read_bytes()).hexdigest()
-    assert active_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA}
+    assert active_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA, OUTPUT_BULK_010_SHA}
     application_board = BOARD if active_sha == CANDIDATE_SHA else CANDIDATE
     assert hashlib.sha256(application_board.read_bytes()).hexdigest() == CANDIDATE_SHA
     assert application_board.read_bytes() == CANDIDATE.read_bytes()

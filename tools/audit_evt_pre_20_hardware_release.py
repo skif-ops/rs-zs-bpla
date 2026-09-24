@@ -503,7 +503,22 @@ def audit() -> dict[str, object]:
         "PCB-PWR C13-to-C12 008 application differs from the exact accepted board",
     )
     pwr_c13_c11 = run_json_audit(
-        "audit_pcb_pwr_vbat_sys_c13_c11_routing_009_application_rev_a.py"
+        "run_pcb_pwr_c13_c11_009_historical_application_audit.py"
+    )
+
+    pwr_output_bulk_010 = run_json_audit(
+        "audit_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py"
+    )
+    check(
+        "pcb_pwr_3v8_output_bulk_010_application",
+        pwr_output_bulk_010.get("status") ==
+        "PASS_EXACT_ACCEPTED_PCB_PWR_3V8_OUTPUT_BULK_ROUTING_010_APPLICATION"
+        and pwr_output_bulk_010.get("active_board_sha256") ==
+        "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+        and pwr_output_bulk_010.get("routing_complete") is False
+        and pwr_output_bulk_010.get("manufacturing_release") is False,
+        str(pwr_output_bulk_010.get("status", "MISSING")),
+        "PCB-PWR 3V8 output bulk 010 application differs from the exact accepted board",
     )
     check(
         "pcb_pwr_c13_c11_009_application",

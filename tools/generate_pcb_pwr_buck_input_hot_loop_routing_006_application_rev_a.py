@@ -20,6 +20,7 @@ CANDIDATE_SHA = "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd
 SHUNT_BULK_007_SHA = "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b"
 C13_C12_008_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
 C13_C11_009_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
 APPROVAL_SHA = "3738c1235f805acb01fccda413a379eac13b60d5d6f7ebaae12c72969c53ae1f"
 
 
@@ -52,7 +53,7 @@ def main() -> int:
     args = parser.parse_args()
     payload = accepted_payload()
     if args.check:
-        assert digest(BOARD) in {CANDIDATE_SHA, SHUNT_BULK_007_SHA, C13_C12_008_SHA, C13_C11_009_SHA}, \
+        assert digest(BOARD) in {CANDIDATE_SHA, SHUNT_BULK_007_SHA, C13_C12_008_SHA, C13_C11_009_SHA, OUTPUT_BULK_010_SHA}, \
             "authoritative board is not the approved candidate or controlled successor"
     else:
         assert BOARD.read_bytes() == BASE.read_bytes(), "authoritative predecessor differs"
