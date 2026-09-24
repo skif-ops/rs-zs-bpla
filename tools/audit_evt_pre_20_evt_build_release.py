@@ -76,6 +76,17 @@ OTS_IDENTITY = "hardware/reviews/EVT_SYSTEM_OTS_PROCUREMENT_IDENTITY_REV_A.json"
 # -20..+60 C. The serial target stays DEC-019 (-40..+70 C, ENVIRONMENT_REV_A.md)
 # and is revisited from EVT results.
 ENVIRONMENT_STATION_RANGE_C = (-20.0, 60.0)
+# Accepted EVT exceptions (customer decision 2026-09-24). PCB-PWR has no MPPT
+# control line (J1 carries only VBAT_RAW/GND_PWR, J2 only the MAIN interface), so
+# MCU-side charge inhibit is not available in Rev.A; the Smart Battery Sense stays
+# and its -20..-10 C gap is verified on the built lot.
+EVT_OTS_TEMPERATURE_EXCEPTIONS = {
+    "MPPT-TEMP": (
+        "ACCEPTED_FOR_EVT: SBS050150200 rated -10..+60 C; EVT test EVT-ENV-BATT-COLD must "
+        "show charge inhibit at battery temperature < 0 C and the MPPT fallback to its "
+        "internal sensor between -20 and -10 C"
+    ),
+}
 
 EVT_PAPER_CLOSABLE_BOM_STATUSES = frozenset(
     {
@@ -323,17 +334,22 @@ def audit() -> dict[str, object]:
     # BOM must not contain parts whose rated range does not cover it.
     ots = json.loads((ROOT / OTS_IDENTITY).read_text(encoding="utf-8"))["targets"]
     uncovered = []
+    accepted_exceptions: list[str] = []
     for item_id, target in ots.items():
         facts = target.get("controlled_facts", {})
         ranges = [facts[key] for key in facts if key.endswith("temperature_c") and key != "charge_temperature_c"]
         low = max(r[0] for r in ranges) if ranges else None
         high = min(r[1] for r in ranges) if ranges else None
         if low is None or low > ENVIRONMENT_STATION_RANGE_C[0] or high < ENVIRONMENT_STATION_RANGE_C[1]:
-            uncovered.append(f"{item_id} {target['mpn']} rated {low}..{high} C")
+            if item_id in EVT_OTS_TEMPERATURE_EXCEPTIONS:
+                accepted_exceptions.append(f"{item_id}: {EVT_OTS_TEMPERATURE_EXCEPTIONS[item_id]}")
+            else:
+                uncovered.append(f"{item_id} {target['mpn']} rated {low}..{high} C")
     check(
         "evt_ots_temperature_coverage",
         not uncovered,
-        "all system OTS items cover the EVT range {:g}..+{:g} C".format(*ENVIRONMENT_STATION_RANGE_C)
+        "system OTS items cover the EVT range {:g}..+{:g} C".format(*ENVIRONMENT_STATION_RANGE_C)
+        + (" or are accepted EVT exceptions; accepted: " + "; ".join(accepted_exceptions) if accepted_exceptions else "")
         if not uncovered else "; ".join(uncovered),
         "system OTS items do not cover the EVT range {:g}..+{:g} C: ".format(*ENVIRONMENT_STATION_RANGE_C)
         + "; ".join(uncovered),
