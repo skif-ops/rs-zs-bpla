@@ -22,13 +22,17 @@ APPROVAL = ROOT / "hardware/reviews/PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_APPR
 APPLICATION = ROOT / "hardware/reviews/PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_APPLICATION_REV_A.json"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 SEMANTIC_SHA = "a3f4e65be713c3ed2518ffab78b1adad2fc0cf7814e0069b50b08fbe64d8d613"
+SUCCESSOR_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
 
 
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict:
-    assert hashlib.sha256(BOARD.read_bytes()).hexdigest() == CANDIDATE_SHA
-    assert BOARD.read_bytes() == CANDIDATE.read_bytes()
+    active_sha = hashlib.sha256(BOARD.read_bytes()).hexdigest()
+    assert active_sha in {CANDIDATE_SHA, SUCCESSOR_SHA}
+    application_board = BOARD if active_sha == CANDIDATE_SHA else CANDIDATE
+    assert hashlib.sha256(application_board.read_bytes()).hexdigest() == CANDIDATE_SHA
+    assert application_board.read_bytes() == CANDIDATE.read_bytes()
     assert hashlib.sha256(APPROVAL.read_bytes()).hexdigest() == APPROVAL_SHA
-    board = Board.from_file(str(BOARD), encoding="utf-8")
+    board = Board.from_file(str(application_board), encoding="utf-8")
     assert semantic_board_sha256(board) == SEMANTIC_SHA
     assert len(board.traceItems) == 37 and len(board.zones) == 2
     proposal = historical_candidate_audit()

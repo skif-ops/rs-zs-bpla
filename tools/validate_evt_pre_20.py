@@ -1418,6 +1418,24 @@ def validate_hardware_baseline() -> None:
                 ("routing_complete", "review_b_complete", "manufacturing_release")),
         "PCB-PWR shunt-bulk 007 application or manufacturing boundary drifted",
     )
+    c13_c12 = pwr_status["native_layout"]["vbat_sys_c13_c12_routing_008"]
+    require(
+        c13_c12["status"] in {
+            "APPROVED_APPLIED_EXACT_VBAT_SYS_C13_C12_ROUTING_008_APPLICATION_GATE_PENDING",
+            "APPROVED_APPLIED_EXACT_VBAT_SYS_C13_C12_ROUTING_008_COMMIT_BOUND_KICAD9_GATE_PASS",
+        }
+        and c13_c12["active_board_sha256"] ==
+        "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
+        and c13_c12["exact_candidate_byte_identity"] is True
+        and c13_c12["authoritative_board_modified"] is True
+        and c13_c12["application_machine_gate"] in {
+            "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+            "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
+        }
+        and all(c13_c12[k] is False for k in
+                ("routing_complete", "review_b_complete", "manufacturing_release")),
+        "PCB-PWR C13-to-C12 008 application or manufacturing boundary drifted",
+    )
     pwr_hierarchy = pwr_status.get("human_readable_hierarchy", {})
     pwr_hierarchy_control = pwr_hierarchy.get("control", {})
     pwr_current_evidence = pwr_hierarchy.get("current_evidence", {})

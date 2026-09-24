@@ -18,6 +18,7 @@ APPROVAL = ROOT / "hardware/reviews/PCB_PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_APPR
 BASE_SHA = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e77c"
 CANDIDATE_SHA = "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
 SHUNT_BULK_007_SHA = "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b"
+C13_C12_008_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
 APPROVAL_SHA = "3738c1235f805acb01fccda413a379eac13b60d5d6f7ebaae12c72969c53ae1f"
 
 
@@ -50,8 +51,8 @@ def main() -> int:
     args = parser.parse_args()
     payload = accepted_payload()
     if args.check:
-        assert digest(BOARD) in {CANDIDATE_SHA, SHUNT_BULK_007_SHA}, \
-            "authoritative board is not the approved candidate or controlled 007 successor"
+        assert digest(BOARD) in {CANDIDATE_SHA, SHUNT_BULK_007_SHA, C13_C12_008_SHA}, \
+            "authoritative board is not the approved candidate or controlled successor"
     else:
         assert BOARD.read_bytes() == BASE.read_bytes(), "authoritative predecessor differs"
         BOARD.write_bytes(payload)

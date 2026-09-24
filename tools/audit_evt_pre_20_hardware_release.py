@@ -430,7 +430,7 @@ def audit() -> dict[str, object]:
         and pwr_clearance_summary.get("mounting_holes") == 4
         and pwr_clearance_summary.get("mounting_to_fitted_body_conflicts") == 0
         and pwr_clearance_summary.get("mounting_to_existing_pad_conflicts") == 0
-        and pwr_clearance.get("board", {}).get("trace_items") == 37
+        and pwr_clearance.get("board", {}).get("trace_items") == 39
         and pwr_clearance.get("board", {}).get("copper_zones") == 2
         and pwr_clearance.get("manufacturing_release") is False
     )
@@ -447,7 +447,7 @@ def audit() -> dict[str, object]:
         "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN"
         and pwr_routing_authority.get("authority", {}).get("row_count") == 31
         and pwr_routing_authority.get("board", {}).get("net_count") == 31
-        and pwr_routing_authority.get("board", {}).get("trace_items") == 37
+        and pwr_routing_authority.get("board", {}).get("trace_items") == 39
         and pwr_routing_authority.get("board", {}).get("copper_zones") == 2
         and pwr_routing_authority.get("dim_003") ==
         "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED"
@@ -487,6 +487,20 @@ def audit() -> dict[str, object]:
         and pwr_shunt_bulk.get("manufacturing_release") is False,
         str(pwr_shunt_bulk.get("status", "MISSING")),
         "PCB-PWR shunt-bulk 007 application differs from the exact accepted board",
+    )
+    pwr_c13_c12 = run_json_audit(
+        "audit_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py"
+    )
+    check(
+        "pcb_pwr_c13_c12_008_application",
+        pwr_c13_c12.get("status") ==
+        "PASS_EXACT_ACCEPTED_PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_APPLICATION"
+        and pwr_c13_c12.get("active_board_sha256") ==
+        "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
+        and pwr_c13_c12.get("routing_complete") is False
+        and pwr_c13_c12.get("manufacturing_release") is False,
+        str(pwr_c13_c12.get("status", "MISSING")),
+        "PCB-PWR C13-to-C12 008 application differs from the exact accepted board",
     )
 
     pwr_evt_routing_basis = run_json_audit(

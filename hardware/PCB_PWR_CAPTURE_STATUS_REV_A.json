@@ -284,7 +284,7 @@
       "record": "hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md",
       "control": {
         "state": "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED",
-        "board_semantic_sha256": "a3f4e65be713c3ed2518ffab78b1adad2fc0cf7814e0069b50b08fbe64d8d613",
+        "board_semantic_sha256": "1278dcdc1c752e34132af5ac6472525c5012774ff864aa2210bee40c8c2284e3",
         "placement_authority_sha256": "257fee5898b5d44970115220a485d40b01c4fefad14b5c3b1a4ffb43b7b5b2d6",
         "fitted_footprints": 44,
         "courtyard_footprints": 44,
@@ -857,16 +857,20 @@
       "application_comparative_drc": "PASS_85_TO_85_VIOLATIONS_108_TO_107_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA",
       "routing_complete": false,
       "review_b_complete": false,
-      "manufacturing_release": false
+      "manufacturing_release": false,
+      "active_controlled_successor": "PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008"
     },
     "vbat_sys_c13_c12_routing_008": {
       "proposal": "hardware/reviews/PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_CANDIDATE_REV_A.json",
       "record": "hardware/reviews/PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_CANDIDATE_REV_A.md",
       "mapping": "hardware/reviews/PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_REVIEW_COMMIT_MAPPING.json",
       "approval": "hardware/reviews/PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_APPROVAL_REV_A.json",
+      "application": "hardware/reviews/PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_APPLICATION_REV_A.json",
       "generator": "tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a.py",
       "audit": "tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a.py",
-      "status": "APPROVED_EXACT_VBAT_SYS_C13_C12_ROUTING_008_APPLICATION_PENDING",
+      "application_generator": "tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py",
+      "application_audit": "tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py",
+      "status": "APPROVED_APPLIED_EXACT_VBAT_SYS_C13_C12_ROUTING_008_APPLICATION_GATE_PENDING",
       "creation_authorization": "USER_CONTINUE_2026-09-24",
       "human_acceptance": "ACCEPT_PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_SUBGATE",
       "reviewer": "Скиф",
@@ -874,6 +878,9 @@
       "base_board_sha256": "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b",
       "candidate_board_sha256": "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e",
       "candidate_board_semantic_sha256": "1278dcdc1c752e34132af5ac6472525c5012774ff864aa2210bee40c8c2284e3",
+      "active_board_sha256": "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e",
+      "active_board_semantic_sha256": "1278dcdc1c752e34132af5ac6472525c5012774ff864aa2210bee40c8c2284e3",
+      "exact_candidate_byte_identity": true,
       "routed_nets": ["VBAT_SYS"],
       "connections": ["C13.1-C12.1"],
       "trace_items": 39,
@@ -881,8 +888,8 @@
       "added_vias": 0,
       "added_zones": 0,
       "minimum_screened_edge_clearance_mm": 0.875,
-      "authoritative_board_modified": false,
-      "application_authorized": false,
+      "authoritative_board_modified": true,
+      "application_authorized": true,
       "machine_gate": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
       "candidate_source_commit_sha": "c9625333e0ac4982b17a17d06208879e5f008e5c",
       "candidate_source_tree_sha": "78aa8fd4f34b4c8ed0572e09ab4c1b1535dfa30a",
@@ -892,6 +899,7 @@
       "artifact_id": 10789448583,
       "artifact_digest": "sha256:d74ea3960dbd8596152d291ce4380e72406595fcfb1dfb433bf55258b8db90dc",
       "comparative_drc": "PASS_85_TO_85_VIOLATIONS_107_TO_106_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA",
+      "application_machine_gate": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE",
       "routing_complete": false,
       "review_b_complete": false,
       "manufacturing_release": false
@@ -984,7 +992,7 @@
     "independent_audit": "tools/audit_pcb_pwr_routing_authority_rev_a.py",
     "control": {
       "state": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN",
-      "board_semantic_sha256": "a3f4e65be713c3ed2518ffab78b1adad2fc0cf7814e0069b50b08fbe64d8d613",
+      "board_semantic_sha256": "1278dcdc1c752e34132af5ac6472525c5012774ff864aa2210bee40c8c2284e3",
       "authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
       "net_count": 31,
       "class_counts": {
@@ -1015,7 +1023,7 @@
         "SELF_TO_GND_PWR_ONLY_AT_NT2": 1,
         "SELF_TO_GND_PWR_ONLY_AT_NT3": 1
       },
-      "trace_items": 37,
+      "trace_items": 39,
       "copper_zones": 2,
       "dim_003": "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED",
       "numeric_power_geometry": "EVT_PUBLIC_STACKUP_AND_CALCULATED_CURRENT_GEOMETRY_ACCEPTED_PHYSICAL_FAULT_THERMAL_VALIDATION_OPEN",

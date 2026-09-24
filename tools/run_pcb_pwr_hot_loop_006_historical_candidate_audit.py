@@ -9,7 +9,13 @@ import json
 from pathlib import Path
 
 import audit_pcb_pwr_buck_input_hot_loop_routing_006_candidate_rev_a as candidate_audit
-from pcb_pwr_hot_loop_006_board import CANDIDATE, SHUNT_BULK_007, SHUNT_BULK_007_SHA256
+from pcb_pwr_hot_loop_006_board import (
+    C13_C12_008,
+    C13_C12_008_SHA256,
+    CANDIDATE,
+    SHUNT_BULK_007,
+    SHUNT_BULK_007_SHA256,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,8 +26,10 @@ def historical_candidate_audit(
     drc_base: Path | None = None, drc_candidate: Path | None = None
 ) -> dict:
     payload = ACTIVE.read_bytes()
-    assert hashlib.sha256(payload).hexdigest() == SHUNT_BULK_007_SHA256
-    assert payload == SHUNT_BULK_007.read_bytes()
+    active_sha = hashlib.sha256(payload).hexdigest()
+    assert active_sha in {SHUNT_BULK_007_SHA256, C13_C12_008_SHA256}
+    assert payload == (SHUNT_BULK_007 if active_sha == SHUNT_BULK_007_SHA256
+                       else C13_C12_008).read_bytes()
     candidate_audit.ACTIVE = CANDIDATE
     return candidate_audit.audit(drc_base, drc_candidate)
 
