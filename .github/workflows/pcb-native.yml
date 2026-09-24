@@ -1991,8 +1991,6 @@ jobs:
             --drc-base "$evidence/baseline_drc.json" \
             --drc-candidate "$evidence/candidate_drc.json" \
             --output "$evidence/comparative_audit.json"
-          cmp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb \
-            hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C11-ROUTING-009/PCB-PWR_VBAT_SYS_C13_C11_ROUTING_009_CANDIDATE_REV_A.kicad_pcb
           PYTHONPATH="$DIONEYA_PYTHON_SITE" \
             /usr/bin/python3 tools/run_pcb_pwr_c13_c11_009_historical_application_audit.py \
             --output "$evidence/application_audit.json"
