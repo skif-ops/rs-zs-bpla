@@ -8,6 +8,7 @@
 #include "zs_bg95_provision.h"
 #include "zs_bg95_mqtt_session.h"
 #include "zs_command_trust.h"
+#include "zs_ed25519.h"
 #include "zs_mqtt_command_transport.h"
 #include <string.h>
 
@@ -85,12 +86,31 @@ static int hal_uart_write(void *ctx, unsigned ch, const uint8_t *d, size_t n) { 
 static void hal_gpio_write(void *ctx, unsigned id, bool level) { (void)ctx; (void)id; bsp_gpio_modem_pwrkey(level); }
 static const zs_hal_port_t hal = {NULL, hal_millis, hal_delay, hal_uart_write, NULL, NULL, NULL, hal_gpio_write, NULL};
 
-/* No provisioned command key on the station yet: nothing verifies. */
+/* Command trust (MQTT ICD §2.1): the Ed25519 public key of the server's command signer comes from the station
+   secrets record (ICD BLE v0.3, key 4).  Until it is provisioned the trust set holds a placeholder key whose
+   backend rejects everything, so the down channel subscribes but every command is refused as unverified
+   (zs_command_trust_init needs at least one enabled, non-zero key). */
+static uint8_t command_key[ZS_COMMAND_PUBLIC_KEY_BYTES];
+static bool command_key_set;
+static uint32_t commands_verified, commands_rejected;
 static bool verify_none(void *ctx, const uint8_t pk[ZS_COMMAND_PUBLIC_KEY_BYTES], const uint8_t *m, size_t n, const uint8_t sig[ZS_COMMAND_SIGNATURE_BYTES]) {
-  (void)ctx; (void)pk; (void)m; (void)n; (void)sig; return false;
+  (void)ctx; (void)pk; (void)m; (void)n; (void)sig; commands_rejected++; return false;
 }
+static bool verify_ed25519(void *ctx, const uint8_t pk[ZS_COMMAND_PUBLIC_KEY_BYTES], const uint8_t *m, size_t n, const uint8_t sig[ZS_COMMAND_SIGNATURE_BYTES]) {
+  (void)ctx;
+  const bool ok = zs_ed25519_verify(pk, m, n, sig);
+  if (ok) commands_verified++; else commands_rejected++;
+  return ok;
+}
+/* Verified commands are acknowledged but not executed yet: the command set (config push, service, reboot) lands
+   with the command executor; REJECTED/detail 1 = "not implemented on this station". */
 static bool execute_none(void *ctx, const zs_command_t *cmd, zs_command_ack_result_t *r, uint16_t *detail) {
   (void)ctx; (void)cmd; *r = ZS_COMMAND_ACK_REJECTED; *detail = 1u; return true;
+}
+
+void app_comms_set_command_key(const uint8_t public_key[ZS_COMMAND_PUBLIC_KEY_BYTES]) {
+  if (public_key) { memcpy(command_key, public_key, sizeof(command_key)); command_key_set = true; }
+  else { memset(command_key, 0, sizeof(command_key)); command_key_set = false; }
 }
 static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) { return hooks.fill_heartbeat ? hooks.fill_heartbeat(hooks.ctx ? hooks.ctx : ctx, hb) : false; }
 
@@ -107,8 +127,12 @@ const zs_station_comms_t *app_comms_state(void) { return &comms; }
 static void set_phase(comms_phase_t p) { phase = p; phase_since_ms = xTaskGetTickCount(); }
 
 static bool start_session(const char *tenant) {
-  zs_command_trust_key_t no_key; memset(&no_key, 0, sizeof(no_key));
-  if (!zs_command_trust_init(&trust, &no_key, 1u, verify_none, NULL)) return false;
+  zs_command_trust_key_t key;
+  memset(&key, 0, sizeof(key));
+  key.enabled = true;
+  if (command_key_set) memcpy(key.public_key, command_key, sizeof(key.public_key));
+  else memset(key.public_key, 0xff, sizeof(key.public_key));          /* placeholder: never matches a real key id, backend rejects anyway */
+  if (!zs_command_trust_init(&trust, &key, 1u, command_key_set ? verify_ed25519 : verify_none, NULL)) return false;
   channel = (zs_command_channel_t){config.station_id, &trust, journal_io, execute_none, NULL, verify_workspace, sizeof(verify_workspace)};
   if (!zs_mqtt_command_transport_init(&command_transport, &channel, (const uint8_t *)tenant, strlen(tenant))) return false;
   if (!zs_mqtt_event_transport_init(&event_transport, outbox_io, config.station_id, (const uint8_t *)tenant, strlen(tenant))) return false;
@@ -312,11 +336,12 @@ void app_comms_task(void *arg) {
 
 void app_comms_status(void (*print)(const char *fmt, ...)) {
   static const char *const names[] = {"off", "bringup", "endpoint", "session", "online", "fault", "sim", "stopping"};
-  print("comms %s (%s) policy %s%s faults %lu online %lu done %lu | events pub %lu fail %lu exhausted %lu | heartbeats %lu fail %lu\r\n",
+  print("comms %s (%s) policy %s%s faults %lu online %lu done %lu | events pub %lu fail %lu exhausted %lu | heartbeats %lu fail %lu | commands key %s verified %lu rejected %lu\r\n",
         names[phase], zs_bg95_state_name(modem.state), modem_allowed ? "modem-on" : "modem-off", want_on ? "" : " (operator off)",
         (unsigned long)faults, (unsigned long)online_count, (unsigned long)sessions_done,
         (unsigned long)comms.events_published, (unsigned long)comms.events_failed, (unsigned long)comms.events_exhausted,
-        (unsigned long)comms.heartbeats_published, (unsigned long)comms.heartbeats_failed);
+        (unsigned long)comms.heartbeats_published, (unsigned long)comms.heartbeats_failed,
+        command_key_set ? "set" : "none", (unsigned long)commands_verified, (unsigned long)commands_rejected);
   if (sim_enabled)
     print("  dual-sim %s slot %d (sim1 %s, sim2 %s, status %s) starts %lu switches %lu retries %lu recoveries %lu faults %lu bringup-fail %u/%u link-fail %u/%u\r\n",
           zs_dual_sim_state_name(zs_dual_sim_state(&sim_controller)), (int)zs_dual_sim_active_slot(&sim_controller),
