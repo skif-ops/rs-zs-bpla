@@ -70,6 +70,7 @@ add_library(zs_core
   src/zs_nor_image_store.c
   src/zs_station_pipeline.c
   src/zs_station_comms.c
+  src/zs_boot_counter.c
 )
 target_include_directories(zs_core PUBLIC include generated)
 target_link_libraries(zs_core m)
@@ -169,6 +170,8 @@ add_executable(zs_station_pipeline_tests tests/test_station_pipeline.c)
 target_link_libraries(zs_station_pipeline_tests zs_core m)
 add_executable(zs_station_comms_tests tests/test_station_comms.c)
 target_link_libraries(zs_station_comms_tests zs_core m)
+add_executable(zs_boot_counter_tests tests/test_boot_counter.c)
+target_link_libraries(zs_boot_counter_tests zs_core m)
 add_executable(evt_pre_20_target_contract_tests tests/test_evt_pre_20_target_contract.c)
 target_link_libraries(evt_pre_20_target_contract_tests PRIVATE evt_pre_20_target_contract)
 add_executable(evt_pre_20_dual_sim_gpio_tests tests/test_evt_pre_20_dual_sim_gpio.c)
@@ -223,6 +226,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_nor_image_store_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_station_pipeline_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_station_comms_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_boot_counter_tests PRIVATE -UNDEBUG)
   target_compile_options(evt_pre_20_target_contract_tests PRIVATE -UNDEBUG)
   target_compile_options(evt_pre_20_dual_sim_gpio_tests PRIVATE -UNDEBUG)
 endif()
@@ -272,6 +276,7 @@ add_test(NAME mcumgr_serial COMMAND zs_mcumgr_serial_tests)
 add_test(NAME nor_image_store COMMAND zs_nor_image_store_tests)
 add_test(NAME station_pipeline COMMAND zs_station_pipeline_tests)
 add_test(NAME station_comms COMMAND zs_station_comms_tests)
+add_test(NAME boot_counter COMMAND zs_boot_counter_tests)
 add_test(NAME evt_pre_20_target_contract COMMAND evt_pre_20_target_contract_tests)
 add_test(NAME evt_pre_20_dual_sim_gpio COMMAND evt_pre_20_dual_sim_gpio_tests)
 
