@@ -88,6 +88,22 @@ EVT_OTS_TEMPERATURE_EXCEPTIONS = {
     ),
 }
 
+# Housing technology packages accepted for EVT (mechanics/<technology>/DESIGN_RULES.md).
+EVT_HOUSING_PACKAGES = {
+    "3d_print": (
+        ("master STEP", ("*.step",)),
+        ("print files STL/3MF", ("*.stl", "*.3mf")),
+        ("drawing PDF", ("*.pdf",)),
+        ("housing BOM", ("HOUSING_BOM*.csv",)),
+        ("printer profile", ("*.ini", "*.json", "PRINT_PROFILE*")),
+    ),
+    "vacuum_casting": (
+        ("master STEP", ("*.step",)),
+        ("drawing PDF", ("*.pdf",)),
+        ("housing BOM", ("HOUSING_BOM*.csv",)),
+    ),
+}
+
 EVT_PAPER_CLOSABLE_BOM_STATUSES = frozenset(
     {
         "SELECTED_PENDING_REVIEW_A",
@@ -356,17 +372,23 @@ def audit() -> dict[str, object]:
         "evt-build",
     )
 
-    housing_dir = ROOT / "mechanics" / "vacuum_casting"
-    housing_missing = [
-        label
-        for label, pattern in (("master STEP", "*.step"), ("drawing PDF", "*.pdf"), ("housing BOM", "HOUSING_BOM*.csv"))
-        if not any(housing_dir.glob(pattern))
-    ]
+    # EVT housings may be vacuum-cast or 3D-printed (customer decision 2026-09-24);
+    # either complete technology package satisfies the EVT build release.
+    housing_status = {}
+    for technology, requirements in EVT_HOUSING_PACKAGES.items():
+        folder = ROOT / "mechanics" / technology
+        housing_status[technology] = [
+            label for label, patterns in requirements
+            if not any(any(folder.glob(pattern)) for pattern in patterns)
+        ]
+    complete = [technology for technology, missing in housing_status.items() if not missing]
     check(
         "evt_housing_manufacturing_package",
-        not housing_missing,
-        "vacuum-casting housing package present" if not housing_missing else "missing: " + ", ".join(housing_missing),
-        "vacuum-casting housing manufacturing package is incomplete: " + ", ".join(housing_missing),
+        bool(complete),
+        "complete housing package: " + ", ".join(complete) if complete
+        else "; ".join(f"{t} missing: {', '.join(m)}" for t, m in housing_status.items()),
+        "no complete housing manufacturing package (3D print or vacuum casting): "
+        + "; ".join(f"{t} missing: {', '.join(m)}" for t, m in housing_status.items()),
         "evt-build",
     )
 
