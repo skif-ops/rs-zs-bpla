@@ -90,6 +90,11 @@ zs_event_outbox_result_t zs_event_outbox_peek(
     const zs_event_outbox_io_t *io,
     zs_event_outbox_item_t *item);
 
+/* Number of stored events not yet acknowledged by the server (heartbeat detector map). */
+zs_event_outbox_result_t zs_event_outbox_pending_count(
+    const zs_event_outbox_io_t *io,
+    uint16_t *pending);
+
 /*
  * Find a committed event by station/event identity, including an already
  * delivered slot. This allows a queued QoS-1 application receipt to be applied
