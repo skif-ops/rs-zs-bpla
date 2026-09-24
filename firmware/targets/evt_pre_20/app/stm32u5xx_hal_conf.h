@@ -18,6 +18,7 @@ extern "C" {
 #define HAL_EXTI_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED
 #define HAL_GPIO_MODULE_ENABLED
+#define HAL_I2C_MODULE_ENABLED
 #define HAL_ICACHE_MODULE_ENABLED
 #define HAL_MDF_MODULE_ENABLED
 #define HAL_OSPI_MODULE_ENABLED
@@ -85,6 +86,10 @@ extern "C" {
 #endif
 #ifdef HAL_DMA_MODULE_ENABLED
 #include "stm32u5xx_hal_dma.h"
+#endif
+
+#ifdef HAL_I2C_MODULE_ENABLED
+#include "stm32u5xx_hal_i2c.h"
 #endif
 #ifdef HAL_CORTEX_MODULE_ENABLED
 #include "stm32u5xx_hal_cortex.h"

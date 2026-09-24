@@ -6,6 +6,30 @@ void HAL_MspInit(void) {
   HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 }
 
+/* I2C2 (INA226 power monitor): PB13 SCL / PB14 SDA AF4 open-drain, kernel clock HSI16 (timing in bsp_i2c.c). */
+void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c) {
+  GPIO_InitTypeDef g = {0};
+  RCC_PeriphCLKInitTypeDef pclk = {0};
+  if (hi2c->Instance != I2C2) return;
+  pclk.PeriphClockSelection = RCC_PERIPHCLK_I2C2;
+  pclk.I2c2ClockSelection = RCC_I2C2CLKSOURCE_HSI;
+  (void)HAL_RCCEx_PeriphCLKConfig(&pclk);
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  g.Pin = GPIO_PIN_13 | GPIO_PIN_14;
+  g.Mode = GPIO_MODE_AF_OD;
+  g.Pull = GPIO_NOPULL;                            /* external pull-ups on the power bus */
+  g.Speed = GPIO_SPEED_FREQ_LOW;
+  g.Alternate = GPIO_AF4_I2C2;
+  HAL_GPIO_Init(GPIOB, &g);
+  __HAL_RCC_I2C2_CLK_ENABLE();
+}
+
+void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c) {
+  if (hi2c->Instance != I2C2) return;
+  __HAL_RCC_I2C2_CLK_DISABLE();
+  HAL_GPIO_DeInit(GPIOB, GPIO_PIN_13 | GPIO_PIN_14);
+}
+
 void HAL_MDF_MspInit(MDF_HandleTypeDef *hmdf) {
   GPIO_InitTypeDef g = {0};
   (void)hmdf;
