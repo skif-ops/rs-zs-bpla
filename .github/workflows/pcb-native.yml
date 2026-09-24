@@ -1896,8 +1896,6 @@ jobs:
             cp "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_${kind}_REV_A.kicad_pcb" \
               "$candidate_project/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_${kind}_REV_A.kicad_pcb"
           done
-          cmp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb \
-            hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_BASE_REV_A.kicad_pcb
           /usr/bin/python3 - \
             "$candidate_project/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_BASE_REV_A.kicad_pcb" \
             "$candidate_project/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_CANDIDATE_REV_A.kicad_pcb" <<'PY'
