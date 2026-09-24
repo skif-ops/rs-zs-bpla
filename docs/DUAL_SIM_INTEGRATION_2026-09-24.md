@@ -20,9 +20,12 @@ CELL_STATUS PD13, EN_MODEM PD4, PWR_GOOD PD0, CELL_PWRKEY_CMD PD11) and the BG95
   A granted switch is graceful: the comms task drops the session (the outbox is durable NOR), `AT+QPOWD`,
   STATUS low, mux off, rail off, the other slot up.
 - A pulled card (presence debounce 20 ms) takes the modem down through the same recovery.
-- Console: `simiccid 1 <iccid>` / `simiccid 2 <iccid>` provision the expected ICCIDs on the bench (both
-  needed; provisioning through station.json lands them later); without them the single-SIM path of #48
-  is used unchanged. `comms` prints the dual-SIM line (state, slot, card presence, STATUS, counters).
+- Console: `simiccid 1 <iccid>` / `simiccid 2 <iccid>` provision the expected ICCIDs (both needed) and
+  commit them to the station secrets record in NOR (`zs_station_secrets`, two blocks @0x03F79000 before the
+  boot counter, together with the B.9 engineer key set by `engkey`); they are loaded and applied at every boot.
+  Without them the single-SIM path of #48 is used unchanged. `secrets` shows what is provisioned (presence
+  only), `secrets clear` wipes the record. `comms` prints the dual-SIM line (state, slot, card presence,
+  STATUS, counters).
 
 ## Evidence
 
