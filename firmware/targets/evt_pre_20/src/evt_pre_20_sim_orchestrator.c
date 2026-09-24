@@ -28,6 +28,12 @@ bool evt_pre_20_sim_orchestrator_init(evt_pre_20_sim_orchestrator_t *o, zs_dual_
 
 void evt_pre_20_sim_orchestrator_start(evt_pre_20_sim_orchestrator_t *o) { if (o) o->want_start = true; }
 void evt_pre_20_sim_orchestrator_transport_closed(evt_pre_20_sim_orchestrator_t *o) { if (o) o->transport_closed = true; }
+void evt_pre_20_sim_orchestrator_shutdown(evt_pre_20_sim_orchestrator_t *o) {
+  if (!o || !o->controller) return;
+  o->want_start = false;
+  if (zs_dual_sim_state(o->controller) != ZS_DUAL_SIM_STATE_SAFE_OFF) { zs_dual_sim_report_brownout(o->controller); o->recoveries++; }
+}
+
 void evt_pre_20_sim_orchestrator_reset_failures(evt_pre_20_sim_orchestrator_t *o) {
   if (!o) return;
   memset(o->bringup_failures, 0, sizeof(o->bringup_failures));
