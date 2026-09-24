@@ -1725,7 +1725,7 @@
 	(footprint "Capacitor_SMD:C_0603_1608Metric"
 		(layer "F.Cu")
 		(uuid "2e0c12e4-2d99-47f0-b21f-a40636c9df4b")
-		(at 76 50)
+		(at 74.4 50)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=AUX_1V8|placement=PROVISIONAL_NOISE_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C7"
@@ -3248,7 +3248,7 @@
 	(footprint "NetTie:NetTie-2_SMD_Pad0.5mm"
 		(layer "F.Cu")
 		(uuid "612c7b75-60b8-4291-8192-0ff7a121a763")
-		(at 79 38)
+		(at 75.6 40.12)
 		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=GROUND_JOIN|placement=PROVISIONAL_RETURN_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "NT1"
@@ -3903,7 +3903,7 @@
 	(footprint "NetTie:NetTie-2_SMD_Pad0.5mm"
 		(layer "F.Cu")
 		(uuid "779ac120-69ec-4d9e-836c-2d843c01d38c")
-		(at 79 41)
+		(at 75.6 48.52)
 		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=GROUND_JOIN|placement=PROVISIONAL_RETURN_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "NT2"
@@ -4242,7 +4242,7 @@
 	(footprint "Resistor_SMD:R_0402_1005Metric"
 		(layer "F.Cu")
 		(uuid "7e1b1de6-a763-4d61-99b4-9c5700fa9f7b")
-		(at 71 51)
+		(at 74.6 56.5)
 		(descr "DIONEA_PCB_PWR_REV_A|population=DNP|zone=CONTROL_INTERFACE|placement=PROVISIONAL_I2C_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "R13"
@@ -4896,7 +4896,7 @@
 	(footprint "Resistor_SMD:R_0402_1005Metric"
 		(layer "F.Cu")
 		(uuid "a302bc45-d7b7-4cab-91a6-4de269a209df")
-		(at 73.5 51)
+		(at 74.6 58)
 		(descr "DIONEA_PCB_PWR_REV_A|population=DNP|zone=CONTROL_INTERFACE|placement=PROVISIONAL_I2C_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "R14"
@@ -7336,7 +7336,7 @@
 	(footprint "DioneyaMain:Molex_43045-1202_MicroFit-12_RA"
 		(layer "F.Cu")
 		(uuid "db670c91-fe1f-476a-9652-f0a72fb11b44")
-		(at 90 56 -90)
+		(at 81.08 40 -90)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=CONTROL_INTERFACE|placement=PROVISIONAL_SERVICE_CLEARANCE_PENDING|authority=PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "J2"
@@ -7951,7 +7951,7 @@
 	(footprint "NetTie:NetTie-2_SMD_Pad0.5mm"
 		(layer "F.Cu")
 		(uuid "dd68637e-9b46-479b-b11f-38c7f1ebd288")
-		(at 79 44)
+		(at 75.6 52)
 		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=GROUND_JOIN|placement=PROVISIONAL_RETURN_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "NT3"
@@ -8036,7 +8036,7 @@
 	(footprint "Capacitor_SMD:C_0603_1608Metric"
 		(layer "F.Cu")
 		(uuid "e245b31a-e4be-4278-afec-0ccb4d9033e5")
-		(at 76 54)
+		(at 74.9 54)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=AUX_1V8|placement=PROVISIONAL_NOISE_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C8"
@@ -8548,7 +8548,7 @@
 	(footprint "DioneyaMain:TI_DBV0005A_SOT23-5"
 		(layer "F.Cu")
 		(uuid "fa11ca58-2f1a-421c-85da-0024c8b3351a")
-		(at 76 46)
+		(at 74.4 46)
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=AUX_1V8|placement=PROVISIONAL_NOISE_REVIEW_PENDING|authority=PCB_PWR_PIN_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "U5"

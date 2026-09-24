@@ -50,6 +50,20 @@ SHUNT_BULK_007_SHA256 = "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb
 C13_C12_008_SHA256 = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
 C13_C11_009_SHA256 = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
 OUTPUT_BULK_010_SHA256 = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+J2_PLACEMENT_ECO_003_SHA256 = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
+# Exact accepted ECO-003 poses; the placement authority CSV and the DIM-003
+# record stay byte-identical because historical packets bind their SHA-256.
+J2_PLACEMENT_ECO_003_POSES = {
+    "J2": (81.08, 40.0, 270.0),
+    "U5": (74.4, 46.0, 0.0),
+    "C7": (74.4, 50.0, 0.0),
+    "C8": (74.9, 54.0, 0.0),
+    "NT1": (75.6, 40.12, 0.0),
+    "NT2": (75.6, 48.52, 0.0),
+    "NT3": (75.6, 52.0, 0.0),
+    "R13": (74.6, 56.5, 0.0),
+    "R14": (74.6, 58.0, 0.0),
+}
 ECO_002_POSES = {
     "U3": (55.0, 14.0, 90.0),
     "U4": (55.0, 42.0, 90.0),
@@ -131,7 +145,10 @@ def rotate(point: tuple[float, float], angle_deg: float) -> tuple[float, float]:
     angle = math.radians(angle_deg)
     cosine, sine = math.cos(angle), math.sin(angle)
     x, y = point
-    return x * cosine - y * sine, x * sine + y * cosine
+    # KiCad boards are y-down: a footprint angle a maps local (x, y) to
+    # (x cos a + y sin a, -x sin a + y cos a).  ECO-003 corrected the former
+    # y-up sign, which mirrored +/-90 degree footprints such as J2.
+    return x * cosine + y * sine, -x * sine + y * cosine
 
 
 def courtyard_points(footprint: Any) -> list[tuple[float, float]]:
@@ -302,8 +319,10 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
     for ref, row in by_ref.items():
         footprint = footprints[ref]
         expected = (
-            ECO_002_POSES[ref]
-            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256} and ref in ECO_002_POSES
+            J2_PLACEMENT_ECO_003_POSES[ref]
+            if board_sha256 == J2_PLACEMENT_ECO_003_SHA256 and ref in J2_PLACEMENT_ECO_003_POSES
+            else ECO_002_POSES[ref]
+            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256, J2_PLACEMENT_ECO_003_SHA256} and ref in ECO_002_POSES
             else (float(row["X_mm"]), float(row["Y_mm"]),
                   float(row["Rotation_deg"]) % 360.0)
         )

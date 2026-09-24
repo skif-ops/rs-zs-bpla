@@ -284,7 +284,7 @@
       "record": "hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md",
       "control": {
         "state": "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED",
-        "board_semantic_sha256": "d6810b6ea293bfd931f09e73ff64698d18d0a64b465db7b71c712f64a36b2980",
+        "board_semantic_sha256": "55243176c6c9593ea8c6eff128bf23b452a592addd1299dde8d822f61dce19f8",
         "placement_authority_sha256": "257fee5898b5d44970115220a485d40b01c4fefad14b5c3b1a4ffb43b7b5b2d6",
         "fitted_footprints": 44,
         "courtyard_footprints": 44,
@@ -299,7 +299,7 @@
         "mounting_holes": 4,
         "mounting_pattern": "EVT_DIM_003_ACCEPTED_H1_H4_NPTH_3P4",
         "mounting_fitted_exclusion_diameter_mm": 10.0,
-        "minimum_mounting_to_fitted_body_margin_mm": 0.53,
+        "minimum_mounting_to_fitted_body_margin_mm": 0.426721,
         "mounting_to_fitted_body_conflicts": 0,
         "mounting_to_existing_pad_conflicts": 0,
         "connector_and_probe_service_clearance": "EVT_DIM_003_ACCEPTED_SERIAL_REVALIDATION_REQUIRED",
@@ -1113,7 +1113,7 @@
     "independent_audit": "tools/audit_pcb_pwr_routing_authority_rev_a.py",
     "control": {
       "state": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN",
-      "board_semantic_sha256": "d6810b6ea293bfd931f09e73ff64698d18d0a64b465db7b71c712f64a36b2980",
+      "board_semantic_sha256": "55243176c6c9593ea8c6eff128bf23b452a592addd1299dde8d822f61dce19f8",
       "authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
       "net_count": 31,
       "class_counts": {

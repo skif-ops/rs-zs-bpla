@@ -19,6 +19,13 @@ from generate_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a import (
 APPLICATION = ROOT / "hardware/reviews/PCB_PWR_3V8_OUTPUT_BULK_ROUTING_010_APPLICATION_REV_A.json"
 SEMANTIC_SHA = "d6810b6ea293bfd931f09e73ff64698d18d0a64b465db7b71c712f64a36b2980"
 
+# After the accepted J2 placement ECO-003 the authoritative board is the exact
+# placement-only successor; replay the 010 application on its committed candidate.
+from pcb_pwr_hot_loop_006_board import is_j2_placement_eco_003  # noqa: E402
+
+if is_j2_placement_eco_003(BOARD.read_bytes()):
+    BOARD = CANDIDATE
+
 
 def audit() -> dict:
     assert hashlib.sha256(BOARD.read_bytes()).hexdigest() == CANDIDATE_SHA

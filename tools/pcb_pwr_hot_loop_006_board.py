@@ -23,6 +23,16 @@ C13_C12_008_SHA256 = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489
 C13_C11_009_SHA256 = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
 OUTPUT_BULK_010_SHA256 = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
 SEMANTIC_SHA256 = "4da495603ca0c4ed2f7c4a3cb1197a133856408ac6f262ac976c1dab5667f687"
+J2_PLACEMENT_ECO_003_SHA256 = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
+
+
+def is_j2_placement_eco_003(payload: bytes) -> bool:
+    """Accepted ECO-003 successor of routing 010 (placement lines only)."""
+    if hashlib.sha256(payload).hexdigest() != J2_PLACEMENT_ECO_003_SHA256:
+        return False
+    import generate_pcb_pwr_j2_placement_eco_003_candidate_rev_a as eco_003
+
+    return payload == eco_003.candidate_bytes(OUTPUT_BULK_010.read_bytes())
 
 
 def is_exact_application(board: Path) -> bool:
@@ -41,7 +51,8 @@ def is_controlled_application_or_successor(board: Path) -> bool:
             or (hashlib.sha256(payload).hexdigest() == C13_C11_009_SHA256
                 and payload == C13_C11_009.read_bytes())
             or (hashlib.sha256(payload).hexdigest() == OUTPUT_BULK_010_SHA256
-                and payload == OUTPUT_BULK_010.read_bytes()))
+                and payload == OUTPUT_BULK_010.read_bytes())
+            or is_j2_placement_eco_003(payload))
 
 
 def historical_basis_board(active: Path) -> Path:
@@ -62,6 +73,7 @@ def hot_loop_application_board(active: Path) -> Path:
             or (hashlib.sha256(payload).hexdigest() == C13_C11_009_SHA256
                 and payload == C13_C11_009.read_bytes())
             or (hashlib.sha256(payload).hexdigest() == OUTPUT_BULK_010_SHA256
-                and payload == OUTPUT_BULK_010.read_bytes())):
+                and payload == OUTPUT_BULK_010.read_bytes())
+            or is_j2_placement_eco_003(payload)):
         return CANDIDATE
     return active
