@@ -342,6 +342,41 @@ def cmd_engineer_key(a):
         print(key)
 
 
+def cmd_station_secrets(a):
+    """v0.3 station_secrets bundle for the commissioning phone: the B.9 engineer key of the station (from the
+    registry), the expected ICCIDs of SIM slot 1/2 (arguments) and the Ed25519 command public key (from the
+    server's --command-signing-key PEM). Written once over BLE (0x0206); audited export."""
+    reg = _registry(Path(a.pki))
+    bundle = {"serial": a.serial, "context": "DIO-SECRETS-V1"}
+    fields = []
+    if not a.no_engineer_key:
+        bundle["engineer_key_hex"] = reg.ensure_engineer_key(a.serial)
+        fields.append("engineer_key")
+    for name, value in (("iccid1", a.iccid1), ("iccid2", a.iccid2)):
+        if value:
+            if not (18 <= len(value) <= 22 and value.isdigit()):
+                raise pki.PkiError(f"{name} must be 18..22 digits")
+            bundle[name] = value
+            fields.append(name)
+    if a.command_signing_key:
+        import sys as _sys
+        _sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        from station.command_codec import CommandSigner
+        from cryptography.hazmat.primitives import serialization
+        signer = CommandSigner.from_pem_file(a.command_signing_key)
+        bundle["command_public_key_hex"] = signer.public_key.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw).hex()
+        bundle["command_key_id_hex"] = signer.key_id.hex()
+        fields.append("command_public_key")
+    if not fields:
+        raise pki.PkiError("nothing to export: give --iccid1/--iccid2/--command-signing-key or drop --no-engineer-key")
+    reg.audit_station_secrets_export(a.serial, a.to, ",".join(fields))
+    out = Path(a.out)
+    out.mkdir(parents=True, exist_ok=True)
+    path = out / f"{a.serial}.station-secrets.json"
+    path.write_text(json.dumps(bundle, indent=2))
+    print(f"written {path} ({', '.join(fields)}); hand it to {a.to} out of band and delete after the write")
+
+
 def cmd_pairing_secret_rotate(a):
     reg = _registry(Path(a.pki))
     reg.rotate_pairing_secret(a.serial, a.reason)
@@ -408,6 +443,9 @@ def main(argv=None):
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--force", action="store_true"); s.add_argument("--show", action="store_true")
     s = add("engineer-key", cmd_engineer_key, help="B.9 engineer key of a station: print/export (audited) or --rotate <reason>")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--to", default="engineer"); s.add_argument("--out"); s.add_argument("--rotate")
+    s = add("station-secrets", cmd_station_secrets, help="v0.3 station_secrets bundle for the commissioning phone (engineer key, ICCIDs, command public key)")
+    s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--out", required=True); s.add_argument("--to", default="installer")
+    s.add_argument("--iccid1"); s.add_argument("--iccid2"); s.add_argument("--command-signing-key"); s.add_argument("--no-engineer-key", action="store_true")
     s = add("pairing-secret-rotate", cmd_pairing_secret_rotate, help="generate a new label secret for a station (reprint + reload)")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--reason", required=True)
     s = add("list", cmd_list, help="list stations");                                           s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--lot"); s.add_argument("--status")
