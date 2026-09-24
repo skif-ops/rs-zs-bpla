@@ -31,6 +31,9 @@ uint16_t zs_ipc_crc16(const uint8_t *data, size_t len);
 
 /* Encodes one frame (COBS + delimiter). Returns wire length or 0 if `cap` is too small. */
 size_t zs_ipc_encode(uint8_t type, uint8_t seq, const uint8_t *payload, size_t len, uint8_t *wire, size_t cap);
+/* Same frame with the payload given as head || payload (e.g. a 2-byte characteristic id before a value):
+   nothing is copied, the frame is COBS-encoded straight from the parts. */
+size_t zs_ipc_encode2(uint8_t type, uint8_t seq, const uint8_t *head, size_t head_len, const uint8_t *payload, size_t len, uint8_t *wire, size_t cap);
 
 /* Byte-stream decoder: feed received bytes one at a time. */
 typedef struct {
