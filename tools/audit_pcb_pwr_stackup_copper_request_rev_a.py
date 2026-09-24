@@ -229,8 +229,10 @@ def validate_board_and_bindings(contract: dict[str, Any]) -> dict[str, Any]:
             f"PCB-PWR footprint count is {len(board.footprints)}, expected 66")
     require(len(board_nets) == 31,
             f"PCB-PWR net count is {len(board_nets)}, expected 31")
-    require(len(board.traceItems) in {0, 2, 3, 4, 8, 14} and len(board.zones) == 0,
-            "stackup request does not cover copper beyond accepted buck power-stage ECO-002")
+    require((len(board.traceItems), len(board.zones)) in
+            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0),
+             (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)},
+            "stackup request does not cover copper beyond accepted 3V8 output bulk 010")
 
     expected_binding = {
         "native_board": relative(BOARD),
@@ -513,8 +515,9 @@ def audit_evt_accepted(contract: dict[str, Any]) -> dict[str, Any]:
     copper_layers = [str(layer.name) for layer in board.layers if str(layer.name).endswith(".Cu")]
     require(copper_layers == ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"]
             and float(board.general.thickness) == 1.6
-            and len(board.traceItems) in {0, 2, 3, 4, 8, 14}
-            and len(board.zones) == 0,
+            and (len(board.traceItems), len(board.zones)) in
+            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0),
+             (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)},
             "active PCB-PWR board exceeds the accepted bounded routing state")
     binding = contract.get("source_binding", {})
     require(binding.get("native_board") == relative(BOARD)

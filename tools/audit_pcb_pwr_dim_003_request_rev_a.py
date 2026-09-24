@@ -214,8 +214,10 @@ def validate_board_and_sources(contract: dict[str, Any]) -> dict[str, Any]:
             f"PCB-PWR thickness differs: {board.general.thickness}")
     require(len(board.footprints) == 66, f"PCB-PWR footprint count is {len(board.footprints)}, expected 66")
     require(len(board_nets) == 31, f"PCB-PWR net count is {len(board_nets)}, expected 31")
-    require(len(board.traceItems) in {0, 2, 3, 4, 8, 14} and len(board.zones) == 0,
-            "DIM-003 evidence does not cover copper beyond accepted buck power-stage ECO-002")
+    require((len(board.traceItems), len(board.zones)) in
+            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0),
+             (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)},
+            "DIM-003 evidence does not cover copper beyond accepted 3V8 output bulk 010")
 
     footprints = {ref_of(footprint): footprint for footprint in board.footprints}
     require(len(footprints) == 66 and set(EXPECTED_HOLES).issubset(footprints),
