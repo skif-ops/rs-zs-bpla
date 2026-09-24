@@ -53,7 +53,8 @@ accepted successor candidate 008 applies only the lower 3.0 mm F.Cu branch
 from `C13.1` to `C12.1`; its commit-bound gate passes at CI #731, PCB-PWR
 Schematic #112 and PCB Native #372 (85 → 85 violations, 107 → 106 unconnected,
 zero DRC fingerprint delta). It is now applied byte-for-byte for 39 total trace
-items; its separate application gate is pending. The U2-constrained
+items; its separate application gate passes at CI #736, PCB-PWR Schematic
+#115, and PCB Native #377. The U2-constrained
 upper branch to `C11.1` is explicitly deferred.
 
 The

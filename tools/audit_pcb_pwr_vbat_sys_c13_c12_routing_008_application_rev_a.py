@@ -68,6 +68,18 @@ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict:
     assert gate["required_violations"] == [85, 85]
     assert gate["required_unconnected"] == [107, 106]
     assert gate["required_drc_fingerprint_delta"] == 0
+    if gate["status"] == "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_APPLICATION_GATE":
+        assert gate["application_source_commit_sha"] == "dcf67e5057d13acc21d9dcf761433a6533c55a2a"
+        assert gate["application_source_tree_sha"] == "9367008d84ded02456f15a4b96fe456f0b721cf1"
+        assert gate["board_application_commit_sha"] == "055e1a04f6143930b0187be01354e959210396cc"
+        assert gate["ci_run_number"] == 736 and gate["ci_run_id"] == 35960317596
+        assert gate["pcb_pwr_schematic_run_number"] == 115
+        assert gate["pcb_pwr_schematic_run_id"] == 35959612219
+        assert gate["pcb_native_run_number"] == 377 and gate["pcb_native_run_id"] == 35960317609
+        assert gate["pcb_native_job_id"] == 107507288098
+        assert gate["artifact_id"] == 10791463571
+        assert gate["artifact_digest"] == "sha256:b121be95290b9912d179756292fa522ce7047388cd0aa6b8d0a743eae2e18333"
+        assert gate["comparative_drc"] == "PASS_85_TO_85_VIOLATIONS_107_TO_106_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA"
     assert (drc_base is None) == (drc_active is None)
     result = {
         "status": "PASS_EXACT_ACCEPTED_PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_APPLICATION",

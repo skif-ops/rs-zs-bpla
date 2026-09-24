@@ -236,7 +236,8 @@ Accepted candidate 008 adds only the lower 3.0 mm F.Cu `VBAT_SYS` branch from
 `C13.1` to `C12.1`; its machine gate passes at CI #731 and PCB Native #372
 (85 → 85 violations, 107 → 106 unconnected, zero fingerprint delta). It is
 applied byte-for-byte for 39 trace items and its separate application gate is
-pending. The U2-constrained upper branch
+passes at CI #736, PCB-PWR Schematic #115, and PCB Native #377. The
+U2-constrained upper branch
 to `C11.1` remains deferred.
 Remaining routing, physical via-sharing/current/thermal/fault evidence, DRC,
 CAM, checkout DFM, final serial mechanics and independent Review B are open.
