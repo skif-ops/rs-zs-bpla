@@ -59,6 +59,13 @@
 #define APP_COMMS_PUBLIC_APN         1        /* pilot policy: public APNs only (CELLULAR_CONNECTIVITY_BASELINE) */
 #define APP_SIM_DET_ACTIVE_HIGH      1        /* SIMx_DET level that means "card present" (confirm on Rev.A) */
 #define APP_SIM_SAFE_OFF_RETRY_MS    600000u  /* both slots exhausted / no SIM: reset the failure counters and try again */
+/* Power monitor (INA226 on I2C2): sampling period and the battery level map (bus voltage -> percent; the pack
+   chemistry / cell count of the pilot enclosure is not final: 4S LiFePO4 assumed, confirm before the field). */
+#define APP_POWER_PERIOD_MS          1000u
+#define APP_BATTERY_EMPTY_MV         11800u
+#define APP_BATTERY_FULL_MV          14200u
+#define APP_PRIO_POWER               3
+#define APP_STACK_POWER              512
 
 /* NVIC priorities (0 = highest). FreeRTOS syscall ceiling is 5: ISRs at 5..15 may call FromISR APIs. */
 #define APP_IRQ_PRIO_TIM2_PPS        4   /* timestamp capture: above the RTOS ceiling, no RTOS calls inside */
