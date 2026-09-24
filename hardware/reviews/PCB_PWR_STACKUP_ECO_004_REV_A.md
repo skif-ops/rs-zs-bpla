@@ -25,10 +25,12 @@ rejected.
 
 ## Electrical impact
 
-None on the accepted routing: the numeric power geometry
-(`PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv`, 4.0 mm at 5 A, 3.0 mm at 4 A,
-2.1 mm switch nodes) was already sized conservatively for 35 um copper and a
-10 °C rise. Thermal and current-density margin that 2 oz would have added is
+None on the accepted routing: the routed copper follows the conservative
+35 um numeric basis `hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json`
+(IPC-2221 external screen at 35 um finished copper and a 10 °C rise; selected
+widths 4.0 mm for the 5 A input/return classes, 3.0 mm for 4 A, 2.1 mm switch
+nodes). `PCB_PWR_CURRENT_GEOMETRY_BASIS_REV_A.csv` is the earlier 70 um
+calculation (2.0 mm at 5 A) and is not the basis of the routed widths. Thermal and current-density margin that 2 oz would have added is
 covered by the physical +70 °C / 5 A evidence on the EVT lot.
 
 ## Design rule
