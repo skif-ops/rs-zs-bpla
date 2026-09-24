@@ -858,6 +858,30 @@
       "routing_complete": false,
       "review_b_complete": false,
       "manufacturing_release": false
+    },
+    "vbat_sys_c13_c12_routing_008": {
+      "proposal": "hardware/reviews/PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_CANDIDATE_REV_A.json",
+      "record": "hardware/reviews/PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_CANDIDATE_REV_A.md",
+      "generator": "tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a.py",
+      "audit": "tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a.py",
+      "status": "CANDIDATE_GENERATED_MACHINE_GATE_PENDING_HUMAN_REVIEW_BLOCKED",
+      "creation_authorization": "USER_CONTINUE_2026-09-24",
+      "base_board_sha256": "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b",
+      "candidate_board_sha256": "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e",
+      "candidate_board_semantic_sha256": "1278dcdc1c752e34132af5ac6472525c5012774ff864aa2210bee40c8c2284e3",
+      "routed_nets": ["VBAT_SYS"],
+      "connections": ["C13.1-C12.1"],
+      "trace_items": 39,
+      "added_segments": 2,
+      "added_vias": 0,
+      "added_zones": 0,
+      "minimum_screened_edge_clearance_mm": 0.875,
+      "authoritative_board_modified": false,
+      "application_authorized": false,
+      "machine_gate": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+      "routing_complete": false,
+      "review_b_complete": false,
+      "manufacturing_release": false
     }
   },
   "mechanical_freeze_input": {

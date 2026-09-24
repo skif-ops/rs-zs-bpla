@@ -49,6 +49,12 @@ separate application gate passes at CI #725, PCB-PWR Schematic #110 and PCB
 Native #370 with the same DRC comparison and zero fingerprint delta. Via-current and via-under-pad fabrication
 qualification, physical
 +70 °C first-article validation and all other routing remain open. The
+isolated successor candidate 008 proposes only the lower 3.0 mm F.Cu branch
+from `C13.1` to `C12.1`; its commit-bound comparative DRC and human review are
+pending, and the authoritative board remains candidate 007. The U2-constrained
+upper branch to `C11.1` is explicitly deferred.
+
+The
 numeric overlay uses a deliberately conservative 35 µm / 10 °C-rise engineering
 screen: 4.0 mm for the 5 A input/primary return, 3.0 mm for 4 A rails/returns,
 2.1 mm for local 4 A switch nodes and 0.5 mm for the 0.3 A rail/return. It also

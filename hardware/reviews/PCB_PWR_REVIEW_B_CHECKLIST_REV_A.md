@@ -232,6 +232,9 @@ return zones. Accepted shunt-to-bulk candidate 007 is now applied byte-for-byte
 PCB-PWR Schematic #110 and PCB Native #370 (85 → 85 violations, 108 → 107
 unconnected, zero DRC fingerprint delta). These local
 zones do not complete the global return plane.
+Isolated candidate 008 adds only the lower 3.0 mm F.Cu `VBAT_SYS` branch from
+`C13.1` to `C12.1`; its machine gate and human review are pending, it is not
+applied, and the U2-constrained upper branch to `C11.1` remains deferred.
 Remaining routing, physical via-sharing/current/thermal/fault evidence, DRC,
 CAM, checkout DFM, final serial mechanics and independent Review B are open.
 Production outputs remain prohibited.

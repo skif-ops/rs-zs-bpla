@@ -1,0 +1,73 @@
+{
+  "schema": "dioneya-pcb-pwr-vbat-sys-c13-c12-routing-008-candidate-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008",
+  "creation_authorization": "USER_CONTINUE_2026-09-24",
+  "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+  "base": {
+    "board": "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_BASE_REV_A.kicad_pcb",
+    "sha256": "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b",
+    "semantic_sha256": "a3f4e65be713c3ed2518ffab78b1adad2fc0cf7814e0069b50b08fbe64d8d613",
+    "trace_items": 37,
+    "copper_zones": 2
+  },
+  "candidate": {
+    "board": "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_CANDIDATE_REV_A.kicad_pcb",
+    "sha256": "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e",
+    "semantic_sha256": "1278dcdc1c752e34132af5ac6472525c5012774ff864aa2210bee40c8c2284e3",
+    "trace_items": 39,
+    "copper_zones": 2,
+    "routed_nets": ["VBAT_SYS"],
+    "connections": ["C13.1-C12.1"],
+    "layer": "F.Cu",
+    "vias": 0,
+    "added_segments": 2,
+    "route_length_mm": 13.725,
+    "width_mm": 3.0,
+    "minimum_screened_edge_clearance_mm": 0.875
+  },
+  "selection_rationale": "ROUTE_THE_UNOBSTRUCTED_LOWER_4A_BUCK_INPUT_BRANCH_SEPARATELY_BEFORE_THE_U2_CONSTRAINED_UPPER_BRANCH",
+  "source_binding": {
+    "generator": "tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a.py",
+    "generator_sha256": "d35bf0bb2d951e977d8c3827299732a8da607478b77609d88e3525bba7a20eca",
+    "routing_rules": "hardware/PCB_PWR_EVT_ROUTE_RULES_REV_A.csv",
+    "routing_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
+    "evt_stackup_basis": "hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json",
+    "evt_stackup_basis_sha256": "c417669cab385eb702c53a1912ad5973bda3ca0fec8cbc5c3e331a511178afad"
+  },
+  "electrical_screen": {
+    "current_a": 4.0,
+    "copper_thickness_um": 35,
+    "copper_temperature_c": 70,
+    "one_way_drop_mv": 10.785319,
+    "thermal_current_density_qualification": false,
+    "assembled_temperature_validation_required": true
+  },
+  "deferred_boundary": {
+    "c13_to_c11_upper_branch": true,
+    "u2_vbat_sys_control_pin_branch": true,
+    "ground_return_and_global_planes": true,
+    "application_authorized": false
+  },
+  "invariants": {
+    "authoritative_board_modified": false,
+    "predecessor_copper_changed": false,
+    "component_poses_changed": false,
+    "pad_geometry_or_nets_changed": false,
+    "outline_or_layers_changed": false,
+    "non_vbat_sys_copper_added": false
+  },
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "required_violations": [85, 85],
+    "required_unconnected": [107, 106],
+    "required_drc_fingerprint_delta": 0
+  },
+  "human_gate_after_machine_pass": {
+    "accept_value": "ACCEPT_PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_SUBGATE",
+    "reject_value": "REJECT_PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_SUBGATE"
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}
