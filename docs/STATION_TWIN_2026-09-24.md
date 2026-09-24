@@ -29,9 +29,10 @@ remain the reference for the detector itself - the twin exercises the system aro
    back to listening and nobody raised OUTBOX_PENDING again; the event waited for the next detection or reboot.
    Fix: outbox retry in the supervisor (twin and tasks.c): 5 min after a failed S3, doubling to 1 h, reset by
    COMMS_DONE (`APP_OUTBOX_RETRY_MS`, `APP_OUTBOX_RETRY_MAX_MS`).
-3. **OUTBOX_PENDING in S1 did nothing** (it only set `comms_requested`, honoured on GATE_NEGATIVE, which no task
-   raises yet): the boot-time outbox flush of PR #55 and the retry above could never reach S3 from S1. Fix in
-   `zs_power_modes`: S0 and S1 enter S3 on OUTBOX_PENDING; S2 still finishes the detection first.
+3. **OUTBOX_PENDING in S1 was only honoured when listening ended** (it set `comms_requested`, consumed on
+   GATE_NEGATIVE, i.e. after the 3 s listen dwell with a negative gate). At a noisy site the station flaps
+   S1 <-> S2 on SUSPECT windows and the request (boot-time flush of PR #55, the retry above) starves. Fix in
+   `zs_power_modes`: S0 and S1 enter S3 on OUTBOX_PENDING at once; S2 still finishes the detection first.
 
 Verified end to end: drone -> event -> S3 -> publish -> receipt -> outbox empty -> COMMS_DONE -> S1 -> S0;
 with a 465 s outage: S3 times out, S0, retry at +300 s -> delivered, one server detection, no duplicates.

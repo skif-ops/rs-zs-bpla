@@ -99,6 +99,32 @@ static void clear_message(zs_mqtt_event_message_t *message) {
   if (message) memset(message, 0, sizeof(*message));
 }
 
+void zs_mqtt_event_transport_set_time(zs_mqtt_event_transport_t *transport, uint32_t now_ms) {
+  if (transport) transport->now_ms = now_ms;
+}
+
+void zs_mqtt_event_transport_note_published(zs_mqtt_event_transport_t *transport) {
+  size_t free_slot = ZS_MQTT_EVENT_RECEIPT_HOLD_SLOTS;
+  if (!transport || transport->publication_item.event_id == 0u) return;
+  for (size_t i = 0u; i < ZS_MQTT_EVENT_RECEIPT_HOLD_SLOTS; i++) {
+    if (transport->receipt_hold[i].used && transport->receipt_hold[i].event_id == transport->publication_item.event_id) { free_slot = i; break; }
+    if (!transport->receipt_hold[i].used || (int32_t)(transport->now_ms - transport->receipt_hold[i].until_ms) >= 0) free_slot = i;
+  }
+  if (free_slot == ZS_MQTT_EVENT_RECEIPT_HOLD_SLOTS) return;              /* table full of live holds: the event is offered again */
+  transport->receipt_hold[free_slot].used = true;
+  transport->receipt_hold[free_slot].event_id = transport->publication_item.event_id;
+  transport->receipt_hold[free_slot].until_ms = transport->now_ms + ZS_MQTT_EVENT_RECEIPT_WAIT_MS;
+}
+
+static bool held_for_receipt(void *ctx, const zs_event_outbox_item_t *candidate) {
+  const zs_mqtt_event_transport_t *transport = ctx;
+  for (size_t i = 0u; i < ZS_MQTT_EVENT_RECEIPT_HOLD_SLOTS; i++) {
+    if (transport->receipt_hold[i].used && transport->receipt_hold[i].event_id == candidate->event_id &&
+        (int32_t)(transport->now_ms - transport->receipt_hold[i].until_ms) < 0) return true;
+  }
+  return false;
+}
+
 zs_mqtt_event_prepare_result_t zs_mqtt_event_transport_prepare(
     zs_mqtt_event_transport_t *transport,
     zs_mqtt_event_message_t *publication) {
@@ -111,8 +137,7 @@ zs_mqtt_event_prepare_result_t zs_mqtt_event_transport_prepare(
 
   memset(&transport->publication_item, 0,
          sizeof(transport->publication_item));
-  result = zs_event_outbox_peek(transport->outbox,
-                                &transport->publication_item);
+  result = zs_event_outbox_peek_filtered(transport->outbox, &transport->publication_item, held_for_receipt, transport);
   if (result == ZS_EVENT_OUTBOX_EMPTY) return ZS_MQTT_EVENT_EMPTY;
   if (result == ZS_EVENT_OUTBOX_INVALID_ARGUMENT)
     return ZS_MQTT_EVENT_INVALID_ARGUMENT;
