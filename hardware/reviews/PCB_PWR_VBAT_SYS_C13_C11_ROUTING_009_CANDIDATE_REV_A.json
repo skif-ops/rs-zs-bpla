@@ -1,0 +1,49 @@
+{
+  "schema": "dioneya-pcb-pwr-vbat-sys-c13-c11-routing-009-candidate-v1",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "proposal_id": "PCB-PWR-VBAT-SYS-C13-C11-ROUTING-009",
+  "base": {
+    "sha256": "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e",
+    "trace_items": 39
+  },
+  "candidate": {
+    "sha256": "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf",
+    "semantic_sha256": "047dca85bb31d926bbd2228c985aa0a1c318b266fa8d68762613a9eec80f9550",
+    "trace_items": 43
+  },
+  "scope": {
+    "net": "VBAT_SYS",
+    "connection": "C13.1-C11.1",
+    "layer": "F.Cu",
+    "width_mm": 3.0,
+    "length_mm": 31.325,
+    "added_segments": 4,
+    "added_vias": 0,
+    "added_zones": 0,
+    "minimum_screened_edge_clearance_mm": 0.575,
+    "limiting_object": "U2.1"
+  },
+  "source_binding": {
+    "generator": "tools/generate_pcb_pwr_vbat_sys_c13_c11_routing_009_candidate_rev_a.py",
+    "generator_sha256": "3648d171b8bc2d0fb9f93b1c1e5eddf56752a98eac9741a0b28ba6d17b80a213",
+    "routing_rules_sha256": "551a9691d51fd9451bf60193d79b8ed244d6b61fd5ec9c844a15050710f48988",
+    "evt_stackup_basis_sha256": "c417669cab385eb702c53a1912ad5973bda3ca0fec8cbc5c3e331a511178afad"
+  },
+  "machine_gate": {
+    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "required_violations": [85, 85],
+    "required_unconnected": [106, 105],
+    "required_drc_fingerprint_delta": 0
+  },
+  "deferred_boundary": {
+    "application_authorized": false,
+    "requires_owner_acceptance": "ACCEPT_PCB_PWR_VBAT_SYS_C13_C11_ROUTING_009_SUBGATE"
+  },
+  "invariants": {
+    "authoritative_board_modified": false,
+    "predecessor_objects_preserved": true
+  },
+  "routing_complete": false,
+  "review_b_complete": false,
+  "manufacturing_release": false
+}

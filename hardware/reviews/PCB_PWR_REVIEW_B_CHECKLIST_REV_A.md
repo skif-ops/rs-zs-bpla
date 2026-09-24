@@ -237,8 +237,10 @@ Accepted candidate 008 adds only the lower 3.0 mm F.Cu `VBAT_SYS` branch from
 (85 → 85 violations, 107 → 106 unconnected, zero fingerprint delta). It is
 applied byte-for-byte for 39 trace items and its separate application gate is
 passes at CI #736, PCB-PWR Schematic #115, and PCB Native #377. The
-U2-constrained upper branch
-to `C11.1` remains deferred.
+U2-constrained upper branch to `C11.1` is now isolated candidate 009: four
+`3.0 mm` F.Cu segments, no vias or zones, and `0.575 mm` minimum screened
+foreign-copper clearance. It is not applied pending its commit-bound KiCad 9
+gate and explicit owner acceptance.
 Remaining routing, physical via-sharing/current/thermal/fault evidence, DRC,
 CAM, checkout DFM, final serial mechanics and independent Review B are open.
 Production outputs remain prohibited.

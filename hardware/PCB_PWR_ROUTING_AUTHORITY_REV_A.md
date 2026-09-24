@@ -54,8 +54,10 @@ from `C13.1` to `C12.1`; its commit-bound gate passes at CI #731, PCB-PWR
 Schematic #112 and PCB Native #372 (85 → 85 violations, 107 → 106 unconnected,
 zero DRC fingerprint delta). It is now applied byte-for-byte for 39 total trace
 items; its separate application gate passes at CI #736, PCB-PWR Schematic
-#115, and PCB Native #377. The U2-constrained
-upper branch to `C11.1` is explicitly deferred.
+#115, and PCB Native #377. Candidate 009 proposes the previously deferred
+U2-constrained upper branch from `C13.1` to `C11.1` as four `3.0 mm` F.Cu
+segments with `0.575 mm` minimum screened foreign-copper clearance. It is not
+applied and remains subject to commit-bound KiCad 9 DRC and owner acceptance.
 
 The
 numeric overlay uses a deliberately conservative 35 µm / 10 °C-rise engineering
