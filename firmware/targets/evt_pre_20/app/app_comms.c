@@ -31,7 +31,7 @@ static const zs_command_journal_io_t *journal_io;
 static app_comms_hooks_t hooks;
 static zs_station_config_t config;
 static bool config_valid, want_on = true, modem_allowed, bound, session_reported;
-static uint32_t boot_id, phase_since_ms, faults, online_count, sessions_done, last_outbox_check_ms;
+static uint32_t boot_id, phase_since_ms, faults, online_count, sessions_done, last_outbox_check_ms, stop_requested_ms;
 static comms_phase_t phase;
 static char line[256];
 static size_t line_len;
@@ -233,12 +233,10 @@ static void sim_phase(uint32_t now) {
   }
 }
 
-void app_comms_task(void *arg) {
-  (void)arg;
-  set_phase(COMMS_OFF);
-  for (;;) {
-    const uint32_t now = xTaskGetTickCount();
-    feed_uart(now);
+void app_comms_step(void) {
+  const uint32_t now = xTaskGetTickCount();
+  feed_uart(now);
+  {
     switch (phase) {
       case COMMS_OFF:
         if (wanted() && bound && config_valid && config.apn[0][0] != '\0') {
@@ -292,7 +290,14 @@ void app_comms_task(void *arg) {
         zs_station_comms_tick(&comms, now);
         if (phase == COMMS_SESSION && zs_bg95_mqtt_session_ready(&session)) { online_count++; set_phase(COMMS_ONLINE); }
         if (phase == COMMS_ONLINE) check_session_done(now);
-        if (!wanted()) { (void)zs_bg95_request_graceful_power_off(&modem, now); set_phase(COMMS_STOPPING); break; }
+        if (!wanted()) {
+          /* let a publish in flight finish (the modem would otherwise take the QPOWD text as payload bytes);
+             after 3 s the power-down goes ahead regardless */
+          if (stop_requested_ms == 0u) stop_requested_ms = now ? now : 1u;
+          if (session.owner != ZS_BG95_MQTT_OWNER_NONE && (uint32_t)(now - stop_requested_ms) < 3000u) break;
+          stop_requested_ms = 0u;
+          (void)zs_bg95_request_graceful_power_off(&modem, now); set_phase(COMMS_STOPPING); break;
+        }
         if (sim_enabled) {
           /* the orchestrator watches presence; a pulled card or a pending switch takes the modem down under us */
           const evt_pre_20_sim_phase_t ph = evt_pre_20_sim_orchestrator_step(&sim, now);
@@ -330,6 +335,14 @@ void app_comms_task(void *arg) {
         }
         break;
     }
+  }
+}
+
+void app_comms_task(void *arg) {
+  (void)arg;
+  set_phase(COMMS_OFF);
+  for (;;) {
+    app_comms_step();
     vTaskDelay(pdMS_TO_TICKS(20));
   }
 }

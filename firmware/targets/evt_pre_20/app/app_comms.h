@@ -30,6 +30,8 @@ typedef struct {
 void app_comms_bind(const zs_event_outbox_io_t *outbox, const zs_command_journal_io_t *journal, const app_comms_hooks_t *hooks);
 /* Runs the comms state machine; call from its own task. Never returns. */
 void app_comms_task(void *arg);
+/* One iteration of the state machine (the task calls it every 20 ms; the host simulation drives it directly). */
+void app_comms_step(void);
 /* Console: one status line; "comms on|off" requests (operator enable). */
 void app_comms_status(void (*print)(const char *fmt, ...));
 void app_comms_request(bool on);
