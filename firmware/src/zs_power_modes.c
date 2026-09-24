@@ -58,7 +58,9 @@ bool zs_mode_on_event(zs_mode_scheduler_t *s, zs_mode_event_t ev, uint32_t now_m
   if (ev == ZS_MODE_EV_OUTBOX_PENDING) {
     s->outbox_pending = true;
     s->comms_requested = true;
-    if (s->mode == ZS_MODE_S0_SLEEP) { enter(s, ZS_MODE_S3_COMMS, ev, now_ms); return true; }
+    /* S0 and S1 go to the session at once (boot-time flush, outbox retries); S2 finishes the detection first
+       (DSP_DONE_* honour comms_requested), S3/S4 are already busy */
+    if (s->mode == ZS_MODE_S0_SLEEP || s->mode == ZS_MODE_S1_LISTEN) { enter(s, ZS_MODE_S3_COMMS, ev, now_ms); return true; }
     return false;
   }
 

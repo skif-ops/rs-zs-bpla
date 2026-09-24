@@ -344,6 +344,14 @@ zs_event_outbox_result_t zs_event_outbox_enqueue_detection(
 zs_event_outbox_result_t zs_event_outbox_peek(
     const zs_event_outbox_io_t *io,
     zs_event_outbox_item_t *item) {
+  return zs_event_outbox_peek_filtered(io, item, NULL, NULL);
+}
+
+zs_event_outbox_result_t zs_event_outbox_peek_filtered(
+    const zs_event_outbox_io_t *io,
+    zs_event_outbox_item_t *item,
+    bool (*skip)(void *ctx, const zs_event_outbox_item_t *candidate),
+    void *ctx) {
   decoded_slot_t decoded;
   bool found = false;
   slot_state_t state;
@@ -354,6 +362,7 @@ zs_event_outbox_result_t zs_event_outbox_peek(
     if (state == SLOT_IO_ERROR || state == SLOT_CORRUPT)
       return slot_error(state);
     if (state != SLOT_VALID || decoded.delivered) continue;
+    if (skip && skip(ctx, &decoded.item)) continue;
     if (!found || decoded.item.priority > item->priority ||
         (decoded.item.priority == item->priority &&
          generation_newer(item->storage_generation,

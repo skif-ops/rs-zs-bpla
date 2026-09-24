@@ -210,6 +210,27 @@ static void apply_power(zs_mode_t mode) {
 
 static uint32_t tamper_events;
 
+/* Outbox retry: events left in the NOR outbox after an S3 that did not finish (no network, S3 watchdog) are
+   re-offered to the scheduler with a backoff (APP_OUTBOX_RETRY_MS, doubling up to APP_OUTBOX_RETRY_MAX_MS);
+   a completed session (COMMS_DONE) resets it.  Without this an event emitted during a GSM outage waited for the
+   next detection or reboot (found by the station twin). */
+static uint32_t outbox_retry_at_ms, outbox_retry_backoff_ms = APP_OUTBOX_RETRY_MS, outbox_retries;
+static bool outbox_has_pending(void);
+static void outbox_retry_tick(uint32_t now) {
+  static uint32_t last_check_ms;
+  if ((uint32_t)(now - last_check_ms) < 10000u) return;
+  last_check_ms = now;
+  if (modes.mode == ZS_MODE_S3_COMMS || modes.mode == ZS_MODE_S4_SERVICE) return;
+  if (!outbox_has_pending()) { outbox_retry_at_ms = 0u; return; }
+  if (outbox_retry_at_ms == 0u) { outbox_retry_at_ms = now + outbox_retry_backoff_ms; return; }
+  if ((int32_t)(now - outbox_retry_at_ms) < 0) return;
+  outbox_retries++;
+  console_printf("outbox: events still pending, retry S3 (backoff %lu s)\r\n", (unsigned long)(outbox_retry_backoff_ms / 1000u));
+  mode_event(ZS_MODE_EV_OUTBOX_PENDING);
+  if (outbox_retry_backoff_ms < APP_OUTBOX_RETRY_MAX_MS) outbox_retry_backoff_ms *= 2u;
+  outbox_retry_at_ms = now + outbox_retry_backoff_ms;
+}
+
 static void supervisor_task_fn(void *arg) {
   zs_mode_t last = ZS_MODE_SHUTDOWN;
   uint32_t tamper_since = 0u;
@@ -232,6 +253,7 @@ static void supervisor_task_fn(void *arg) {
     now = xTaskGetTickCount();
     for (unsigned ev = 1u; ev < 32u; ev++) if (bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, now);
     (void)zs_mode_tick(&modes, now);
+    outbox_retry_tick(now);
     if (bsp_gpio_power_fault()) (void)zs_mode_on_event(&modes, ZS_MODE_EV_FAULT, now);
     /* TAMPER_IN as service trigger: 5 s continuous activation requests service mode (once per activation);
        shorter activations are counted as tamper events for the security log. */
@@ -396,7 +418,8 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->detector.presence_level = pipeline.presence.level;
   return true;
 }
-static void comms_session_done(void *ctx) { (void)ctx; mode_event(ZS_MODE_EV_COMMS_DONE); }
+static void comms_session_done(void *ctx) { (void)ctx; outbox_retry_backoff_ms = APP_OUTBOX_RETRY_MS; outbox_retry_at_ms = 0u; mode_event(ZS_MODE_EV_COMMS_DONE); }
+static bool outbox_has_pending(void) { uint16_t pending = 0u; return stores_on_nor && zs_event_outbox_pending_count(&nor_outbox_io, &pending) == ZS_EVENT_OUTBOX_OK && pending > 0u; }
 static const app_comms_hooks_t comms_hooks = {comms_fill_heartbeat, NULL, console_printf, comms_session_done};
 
 static void secrets_apply(void);   /* defined after ipc_port */
@@ -555,7 +578,7 @@ static void console_exec(const char *cmd) {
   } else if (strcmp(cmd, "modes") == 0) {
     zs_mode_transition_t j[ZS_MODE_JOURNAL_DEPTH];
     uint8_t n = zs_mode_journal(&modes, j, ZS_MODE_JOURNAL_DEPTH);
-    console_printf("mode %s, tamper events %lu\r\n", zs_mode_name(modes.mode), (unsigned long)tamper_events);
+    console_printf("mode %s, tamper events %lu, outbox retries %lu (backoff %lu s)\r\n", zs_mode_name(modes.mode), (unsigned long)tamper_events, (unsigned long)outbox_retries, (unsigned long)(outbox_retry_backoff_ms / 1000u));
     for (uint8_t i = 0u; i < n; i++)
       console_printf("  %8lu %s -> %s (ev %u)\r\n", (unsigned long)j[i].at_ms, zs_mode_name((zs_mode_t)j[i].from), zs_mode_name((zs_mode_t)j[i].to), j[i].event);
   } else if (strcmp(cmd, "ble") == 0) {
