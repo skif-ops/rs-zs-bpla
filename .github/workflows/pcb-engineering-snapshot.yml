@@ -33,12 +33,12 @@ jobs:
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Export all PCB engineering deliverables
         run: |
-          python tools/export_pcb_engineering_snapshot_rev_a.py \
+          python3 tools/export_pcb_engineering_snapshot_rev_a.py \
             --snapshot 2026-09-24 \
             --output hardware/manufacturing/engineering-snapshot/EVT-PRE-20_2026-09-24
       - name: Verify manifest and file families
         run: |
-          python - <<'PY'
+          python3 - <<'PY'
           import hashlib, json
           from pathlib import Path
           root = Path("hardware/manufacturing/engineering-snapshot/EVT-PRE-20_2026-09-24")
