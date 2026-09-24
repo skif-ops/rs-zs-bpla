@@ -8,6 +8,7 @@ from station.schemas import (
     Classification,
     CellularTelemetry,
     DetectionMessage,
+    DetectorHealth,
     DoaEstimate,
     GnssStatus,
     HeartbeatMessage,
@@ -22,7 +23,7 @@ from station.schemas import (
 _MSG_DETECTION = 2
 _MSG_HEARTBEAT = 3
 _SUPPORTED_DETECTION_SCHEMAS = frozenset({1, 3, 4})
-_SUPPORTED_HEARTBEAT_SCHEMAS = frozenset({1})
+_SUPPORTED_HEARTBEAT_SCHEMAS = frozenset({1, 2})   # 2 adds the optional detector map (key 13)
 _ROUTE = {0: "LTE", 1: "NB_IOT", 2: "2G", 3: "LORA", 4: "BLE", 5: "TEST"}
 _PROFILE = {0: "generic", 1: "piston", 2: "reactive"}
 _CLASS_LABEL = {
@@ -61,6 +62,7 @@ _TIME_TRUST = {
 _ALTITUDE_SOURCE = {0: "gnss_msl", 1: "configured_msl", 2: "unknown"}
 _POSITION_SOURCE = {0: "gnss_live", 1: "configured_install"}
 _APN_SOURCE = {1: "EXPLICIT", 2: "NETWORK", 3: "CATALOG"}
+_PRESENCE_LEVEL = {0: "NONE", 1: "SUSPECT", 2: "ENGINE_UNCONFIRMED", 3: "CONFIRMED"}   # firmware zs_presence_level_t
 
 
 class _CborReader:
@@ -295,6 +297,7 @@ def decode_heartbeat_obj(obj: Any) -> HeartbeatMessage:
     power = _as_map(obj.get(6))
     route = _as_map(obj.get(7))
     cellular = _as_map(obj.get(12))
+    detector = _as_map(obj.get(13)) if schema_ver >= 2 and 13 in obj else None
     if not cellular:
         raise ValueError("compact heartbeat requires cellular telemetry")
     if cellular.get(11) is not True:
@@ -364,6 +367,20 @@ def decode_heartbeat_obj(obj: Any) -> HeartbeatMessage:
             access_technology=_integer_field(cellular, 9, "access technology"),
             apn_source=apn_source,
             settings_valid=True,
+        ),
+        detector=None if detector is None else DetectorHealth(
+            boot_id=_integer_field(detector, 0, "boot_id"),
+            uptime_s=int(detector.get(1, 0)),
+            windows=int(detector.get(2, 0)),
+            windows_dropped=int(detector.get(3, 0)),
+            confirmed_windows=int(detector.get(4, 0)),
+            suspect_windows=int(detector.get(5, 0)),
+            engine_windows=int(detector.get(6, 0)),
+            events_emitted=int(detector.get(7, 0)),
+            events_refused=int(detector.get(8, 0)),
+            outbox_pending=int(detector.get(9, 0)),
+            window_max_ms=int(detector.get(10, 0)),
+            presence_level=_PRESENCE_LEVEL.get(int(detector.get(11, 0)), "NONE"),
         ),
     )
 
