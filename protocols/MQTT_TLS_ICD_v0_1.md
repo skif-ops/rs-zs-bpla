@@ -298,7 +298,7 @@ Detector sub-map key 13 (schema 2, счётчики с момента загру
 
 | Sub-key | Field | Назначение |
 |---:|---|---|
-| 0 | boot_id | NOR‑счётчик загрузок (`zs_boot_counter`); `event_id = boot_id << 32 \\| seq_no` |
+| 0 | boot_id | NOR‑счётчик загрузок (`zs_boot_counter`); `event_id = (boot_id << 32) + seq_no` |
 | 1 | uptime_s | секунд с загрузки |
 | 2 | windows | окон 1 с проанализировано |
 | 3 | windows_dropped | пропущенных шагов (анализ отстал от кольца) |
