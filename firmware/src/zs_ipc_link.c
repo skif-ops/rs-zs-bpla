@@ -10,38 +10,63 @@ uint16_t zs_ipc_crc16(const uint8_t *data, size_t len) {
   return crc;
 }
 
-/* COBS encode of `in` into `out`; returns encoded length (without delimiter). */
-static size_t cobs_encode(const uint8_t *in, size_t len, uint8_t *out, size_t cap) {
-  size_t read = 0u, write = 1u, code_pos = 0u;
+/* COBS encoder over a virtual byte sequence made of up to four parts (header, payload halves, CRC): the frame is
+   never assembled in one buffer, so encoding costs no stack beyond the output (the STM32 BLE task and the nRF
+   bridge thread run with 4 KB stacks; a 4 KB frame copy on the stack overflowed both). */
+typedef struct { const uint8_t *p; size_t n; } part_t;
+
+static size_t cobs_encode_parts(const part_t *parts, size_t count, uint8_t *out, size_t cap) {
+  size_t write = 1u, code_pos = 0u;
   uint8_t code = 1u;
   if (cap < 1u) return 0u;
-  while (read < len) {
-    if (in[read] == 0u) {
-      out[code_pos] = code; code = 1u; code_pos = write++;
-      if (write > cap) return 0u;
-    } else {
-      if (write >= cap) return 0u;
-      out[write++] = in[read]; code++;
-      if (code == 0xFFu) { out[code_pos] = code; code = 1u; code_pos = write++; if (write > cap) return 0u; }
+  for (size_t k = 0u; k < count; k++) {
+    for (size_t i = 0u; i < parts[k].n; i++) {
+      const uint8_t v = parts[k].p[i];
+      if (v == 0u) {
+        out[code_pos] = code; code = 1u; code_pos = write++;
+        if (write > cap) return 0u;
+      } else {
+        if (write >= cap) return 0u;
+        out[write++] = v; code++;
+        if (code == 0xFFu) { out[code_pos] = code; code = 1u; code_pos = write++; if (write > cap) return 0u; }
+      }
     }
-    read++;
   }
   if (code_pos >= cap) return 0u;
   out[code_pos] = code;
   return write;
 }
 
-size_t zs_ipc_encode(uint8_t type, uint8_t seq, const uint8_t *payload, size_t len, uint8_t *wire, size_t cap) {
-  uint8_t raw[ZS_IPC_PAYLOAD_MAX + 4u];
-  if ((payload == NULL && len != 0u) || len > ZS_IPC_PAYLOAD_MAX || wire == NULL) return 0u;
-  raw[0] = type; raw[1] = seq;
-  if (len) memcpy(&raw[2], payload, len);
-  const uint16_t crc = zs_ipc_crc16(raw, len + 2u);
-  zs_ipc_put_u16(&raw[len + 2u], crc);
-  const size_t n = cobs_encode(raw, len + 4u, wire, cap > 0u ? cap - 1u : 0u);
+static uint16_t crc16_update(uint16_t crc, const uint8_t *data, size_t len) {
+  for (size_t i = 0u; i < len; i++) {
+    crc ^= (uint16_t)data[i] << 8;
+    for (int b = 0; b < 8; b++) crc = (crc & 0x8000u) ? (uint16_t)((crc << 1) ^ 0x1021u) : (uint16_t)(crc << 1);
+  }
+  return crc;
+}
+
+size_t zs_ipc_encode2(uint8_t type, uint8_t seq, const uint8_t *head, size_t head_len, const uint8_t *payload, size_t len, uint8_t *wire, size_t cap) {
+  uint8_t hdr[2], crcb[2];
+  part_t parts[4];
+  uint16_t crc;
+  if ((head == NULL && head_len != 0u) || (payload == NULL && len != 0u) || head_len + len > ZS_IPC_PAYLOAD_MAX || wire == NULL) return 0u;
+  hdr[0] = type; hdr[1] = seq;
+  crc = crc16_update(0xFFFFu, hdr, 2u);
+  crc = crc16_update(crc, head, head_len);
+  crc = crc16_update(crc, payload, len);
+  zs_ipc_put_u16(crcb, crc);
+  parts[0].p = hdr; parts[0].n = 2u;
+  parts[1].p = head; parts[1].n = head_len;
+  parts[2].p = payload; parts[2].n = len;
+  parts[3].p = crcb; parts[3].n = 2u;
+  const size_t n = cobs_encode_parts(parts, 4u, wire, cap > 0u ? cap - 1u : 0u);
   if (n == 0u) return 0u;
   wire[n] = 0u;
   return n + 1u;
+}
+
+size_t zs_ipc_encode(uint8_t type, uint8_t seq, const uint8_t *payload, size_t len, uint8_t *wire, size_t cap) {
+  return zs_ipc_encode2(type, seq, NULL, 0u, payload, len, wire, cap);
 }
 
 void zs_ipc_decoder_init(zs_ipc_decoder_t *d, uint8_t *buf, size_t cap) {

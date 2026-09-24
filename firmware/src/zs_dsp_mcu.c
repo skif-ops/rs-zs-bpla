@@ -206,11 +206,15 @@ static bool global_spectrum(const sig_t *s, float *max_mag) {
 }
 
 /* ---- YIN f0 track ------------------------------------------------------------- */
+/* YIN scratch: static like g_yin (6.4 KB on the stack overflowed the 6 KB DSP task on the target). */
+static float g_yin_energy[YIN_MAXP + 1u];
+static float g_yin_d[YIN_MAXP + 1u];
+
 static float f0_one_frame(const sig_t *s, int start) {
   zs_complex_t *x = g_work, *scratch = g_work + YIN_FFT;
-  float cumulative_energy[YIN_MAXP + 1u];
+  float *cumulative_energy = g_yin_energy;
   acc_t run = {0.0f, 0.0f, 0u};
-  float acf0, d[YIN_MAXP + 1u], cum = 0.0f, bestv, shift = 0.0f, period;
+  float acf0, *d = g_yin_d, cum = 0.0f, bestv, shift = 0.0f, period;
   unsigned best;
   bool found = false;
   for (unsigned i = 0u; i < 4096u; i++) {

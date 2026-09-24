@@ -38,13 +38,13 @@ bool zs_ble_bridge_on_gatt_write(zs_ble_bridge_t *b, uint16_t char_id, const uin
   if (b->write_char != char_id) { zs_ble_reassembler_reset(&b->write_rx); b->write_char = char_id; }
   if (!zs_ble_reassembler_feed(&b->write_rx, frame, len)) { b->write_char = 0u; return false; }
   if (!b->write_rx.complete) return true;
-  uint8_t payload[2u + ZS_BLE_BRIDGE_WRITE_BYTES];
-  zs_ipc_put_u16(payload, char_id);
-  memcpy(&payload[2], b->write_buf, b->write_rx.filled);
+  uint8_t id[2];
+  zs_ipc_put_u16(id, char_id);
   const size_t n = b->write_rx.filled;
+  const size_t w = zs_ipc_encode2(ZS_IPC_CHAR_WRITE, b->ipc_seq++, id, 2u, b->write_buf, n, b->wire, sizeof(b->wire));
   zs_ble_reassembler_reset(&b->write_rx);
   b->write_char = 0u;
-  return send_ipc(b, ZS_IPC_CHAR_WRITE, payload, 2u + n);
+  return w != 0u && b->port->uart_send(b->port->ctx, b->wire, w);
 }
 
 bool zs_ble_bridge_on_gatt_read(zs_ble_bridge_t *b, uint16_t char_id, uint8_t *frame, size_t cap, size_t *len) {
