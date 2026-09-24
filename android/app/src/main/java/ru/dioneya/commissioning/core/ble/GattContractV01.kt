@@ -37,6 +37,7 @@ object GattContractV01 {
     val CHAR_INSTALLATION_POSITION: UUID = uuid(0x0203)
     val CHAR_POSITION_TRUST_POLICY: UUID = uuid(0x0204)  // reserved in v0.2 (policy travels inside 0x0203)
     val CHAR_SESSION_ROLE: UUID = uuid(0x0205)           // B.9: read [role]; write 01 (challenge) / 02‖tag16; notify 01‖nonce16 / 03‖role + status
+    val CHAR_STATION_SECRETS: UUID = uuid(0x0206)        // v0.3: write CBOR patch {1 key32, 2 iccid1, 3 iccid2, 4 cmdkey32, 5 clear}; read/notify presence {0 ver, 1..4 bool}
     val CHAR_STATUS: UUID = uuid(0x0301)               // read/notify
     val CHAR_GNSS_INTEGRITY: UUID = uuid(0x0302)       // read/notify
     val CHAR_SELF_TEST: UUID = uuid(0x0303)            // write 0x01 = run all; notify: CBOR {id: [code, detail]}
@@ -78,4 +79,11 @@ object GattContractV01 {
     const val TIMEOUT_SELF_TEST_MS = 20_000L
     const val TIMEOUT_CONFIG_WRITE_MS = 10_000L
     const val TIMEOUT_ROLE_MS = 5_000L
+    const val TIMEOUT_SECRETS_MS = 8_000L               // NOR erase + program of the two-slot record
+    const val SECRETS_KEY_VERSION = 0L
+    const val SECRETS_KEY_ENGINEER = 1L
+    const val SECRETS_KEY_ICCID1 = 2L
+    const val SECRETS_KEY_ICCID2 = 3L
+    const val SECRETS_KEY_COMMAND = 4L
+    const val SECRETS_KEY_CLEAR = 5L
 }
