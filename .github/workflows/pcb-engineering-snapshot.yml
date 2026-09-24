@@ -1,0 +1,69 @@
+name: PCB Engineering Snapshot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [evt-pre-20]
+    paths:
+      - ".github/workflows/pcb-engineering-snapshot.yml"
+      - "tools/export_pcb_engineering_snapshot_rev_a.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pcb-engineering-snapshot-evt-pre-20
+  cancel-in-progress: false
+
+jobs:
+  export-and-commit:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
+      options: --user root
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: evt-pre-20
+      - name: Trust checkout
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Export all PCB engineering deliverables
+        run: |
+          python tools/export_pcb_engineering_snapshot_rev_a.py \
+            --snapshot 2026-09-24 \
+            --output hardware/manufacturing/engineering-snapshot/EVT-PRE-20_2026-09-24
+      - name: Verify manifest and file families
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root = Path("hardware/manufacturing/engineering-snapshot/EVT-PRE-20_2026-09-24")
+          records = json.loads((root / "SHA256SUMS.json").read_text())
+          assert len(records) >= 30, len(records)
+          for record in records:
+              path = root / record["path"]
+              assert path.stat().st_size == record["bytes"]
+              assert hashlib.sha256(path.read_bytes()).hexdigest() == record["sha256"]
+          for board in ("PCB-MAIN", "PCB-PWR", "PCB-MIC"):
+              assert list((root / board / "gerber").glob("*"))
+              assert list((root / board / "drill").glob("*"))
+              assert (root / board / f"{board}_pos.csv").is_file()
+          PY
+      - name: Commit snapshot to evt-pre-20
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add hardware/manufacturing/engineering-snapshot/EVT-PRE-20_2026-09-24
+          git commit -m "hardware: archive EVT-PRE-20 PCB engineering CAM snapshot [skip ci]"
+          git push origin HEAD:evt-pre-20
+      - name: Upload verified snapshot artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EVT-PRE-20-PCB-engineering-snapshot-2026-09-24
+          path: hardware/manufacturing/engineering-snapshot/EVT-PRE-20_2026-09-24
+          if-no-files-found: error
+          retention-days: 90
