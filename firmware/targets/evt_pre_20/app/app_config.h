@@ -54,7 +54,7 @@
 #define APP_PRIO_DSP                 2        /* station pipeline: below capture and the service tasks, above the console */
 #define APP_STACK_DSP                1536
 #define APP_BOOT_ID                  1u       /* boot_id until the NOR boot counter is bound (RAM fallback keeps it) */
-#define APP_STACK_BLE                1024
+#define APP_STACK_BLE                1280     /* config/installation/secrets commits + nRF image update on this stack */
 #define APP_COMMS_HEARTBEAT_MS       60000u   /* zs_station_comms heartbeat period */
 #define APP_COMMS_PUBLIC_APN         1        /* pilot policy: public APNs only (CELLULAR_CONNECTIVITY_BASELINE) */
 #define APP_SIM_DET_ACTIVE_HIGH      1        /* SIMx_DET level that means "card present" (confirm on Rev.A) */
