@@ -27,6 +27,13 @@
       "shell": "pwsh",
       "script": "ci/pki_windows.ps1",
       "artifacts": "server/dist/*"
+    },
+    {
+      "name": "evt-build-release-audit",
+      "runner": "ubuntu-24.04",
+      "shell": "bash",
+      "script": "ci/evt_build_release.sh",
+      "artifacts": "artifacts/evt_pre_20_evt_build_release_audit.json"
     }
   ]
 }

@@ -53,9 +53,13 @@
   трассировка, SI, DRC, CAM, checkout DFM и Review B открыты;
 - PCB-PWR: `DIM-003` принят `18/18` для EVT; `JLC04161H-3313A`, 70/35 µm
   copper, минимум 18 µm hole wall и расчётная силовая геометрия приняты;
-  точный power-stage ECO-002 применён, активны 14 trace items при zero
-  vias/zones; application gate ECO-002 прошёл CI #692, PCB-PWR Schematic #103
-  и PCB Native #357, физическая +70 °C проверка и оставшаяся трассировка открыты;
+  после точного power-stage ECO-002 были активны 14 trace items при zero
+  vias/zones, application gate ECO-002 прошёл CI #692, PCB-PWR Schematic #103
+  и PCB Native #357; после routing 010 активны 53 trace items (45 segments, 8 vias) и две зоны
+  `GND_PWR`; authoritative board SHA-256 `e46097f8…`; application gate routing
+  010 прошёл CI #761, PCB-PWR Schematic #125 и PCB Native #394 (DRC `85→85`,
+  unconnected `105→101`); медь есть у 10 из 31 цепей, оставшаяся трассировка
+  открыта;
 - PCB-MIC: стандартный двухслойный/PCBA процесс и все 9 инженерных строк
   приняты; first-panel bore inspection, CAM comparison, общий Review B и
   physical EVT открыты;
@@ -66,6 +70,11 @@
   выдаётся за ответы фабрик и не отменяет checkout DFM или first article;
 - BOM QG-1 и технический QG-2 проходят; per-lot таблицы 4/10/20 сохранены, а
   отдельная aggregate-таблица закупки покрывает 41 станцию;
+- критерий готовности ветки по железу — выпуск на сборку EVT
+  (`hardware/EVT_BUILD_RELEASE_GATE_REV_A.md`, аудит
+  `tools/audit_evt_pre_20_evt_build_release.py`): передача на фабрику плат и
+  монтажа, изготовление корпусов и сборка станций; физические EVT-проверки
+  выполняются на построенной партии и питают ревизию для серии;
 - hardware manufacturing release остаётся `BLOCKED` до завершения routing,
   DRC/CAM/Review B, механических входов и физических EVT-проверок;
 - firmware имеет статус `TARGET_PORT_REQUIRED`;
