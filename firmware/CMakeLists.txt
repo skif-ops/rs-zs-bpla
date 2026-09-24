@@ -192,6 +192,12 @@ add_executable(app_comms_sim_tests tests/test_app_comms_sim.c targets/evt_pre_20
 target_include_directories(app_comms_sim_tests PRIVATE tests/host_sim targets/evt_pre_20/app)
 target_link_libraries(app_comms_sim_tests PRIVATE evt_pre_20_dual_sim_gpio)
 
+# station digital twin: portable stack + real comms task on the host against a scene, a scripted BG95 and the server twin
+add_executable(zs_station_twin twin/station_twin.c twin/scene.c targets/evt_pre_20/app/app_comms.c)
+target_include_directories(zs_station_twin PRIVATE twin tests/host_sim targets/evt_pre_20/app)
+target_link_libraries(zs_station_twin PRIVATE evt_pre_20_dual_sim_gpio m)
+target_compile_options(zs_station_twin PRIVATE -UNDEBUG)
+
 # Release configuration defines NDEBUG globally. Tests must keep assert() active,
 # otherwise validation expressions disappear and can hide both test failures and warnings.
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
@@ -300,6 +306,9 @@ add_test(NAME evt_pre_20_target_contract COMMAND evt_pre_20_target_contract_test
 add_test(NAME evt_pre_20_dual_sim_gpio COMMAND evt_pre_20_dual_sim_gpio_tests)
 add_test(NAME evt_pre_20_sim_orchestrator COMMAND evt_pre_20_sim_orchestrator_tests)
 add_test(NAME app_comms_sim COMMAND app_comms_sim_tests)
+# station twin smoke: a drone fly-by must produce at least one detection event (no server: the comms side is
+# covered by app_comms_sim; the closed loop with server/twin/twin_server.py runs in the server CI job)
+add_test(NAME station_twin_smoke COMMAND zs_station_twin --scene drone --seconds 70 --seed 3 --expect-events 1)
 
 add_executable(zs_emit_detection tools/emit_detection.c)
 target_link_libraries(zs_emit_detection PRIVATE zs_core m)
