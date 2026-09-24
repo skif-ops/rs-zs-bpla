@@ -12,11 +12,11 @@ static bool send_ipc(zs_ipc_service_t *s, uint8_t type, const uint8_t *payload, 
 }
 
 static bool push_value(zs_ipc_service_t *s, uint8_t type, uint16_t char_id, const uint8_t *value, size_t len) {
-  uint8_t payload[2u + ZS_BLE_VALUE_MAX];
+  uint8_t id[2];
   if (len > ZS_BLE_VALUE_MAX) return false;
-  zs_ipc_put_u16(payload, char_id);
-  memcpy(&payload[2], value, len);
-  return send_ipc(s, type, payload, 2u + len);
+  zs_ipc_put_u16(id, char_id);
+  const size_t n = zs_ipc_encode2(type, s->ipc_seq++, id, 2u, value, len, s->wire, sizeof(s->wire));
+  return n != 0u && s->port->uart_send(s->port->ctx, s->wire, n);
 }
 
 static bool send_status(zs_ipc_service_t *s, uint16_t char_id, uint8_t status) {
