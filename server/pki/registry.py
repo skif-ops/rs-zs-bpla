@@ -193,6 +193,11 @@ class Registry:
         with self.lock, self._conn() as c:
             self._audit(c, serial, "engineer_key", f"exported to {who}")
 
+    def audit_station_secrets_export(self, serial: str, who: str, fields: str) -> None:
+        """v0.3 station_secrets bundle handed to the commissioning phone (never on the label)."""
+        with self.lock, self._conn() as c:
+            self._audit(c, serial, "station_secrets", f"exported to {who}: {fields}")
+
     def rotate_pairing_secret(self, serial: str, reason: str) -> str:
         from .label import new_pairing_secret
         secret = new_pairing_secret()

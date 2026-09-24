@@ -306,6 +306,7 @@ object CanonicalCbor {
         fun uint(v: Long) = head(0, v)
         fun bytes(b: ByteArray) { head(2, b.size.toLong()); out.write(b) }
         fun text(s: String) { val b = s.toByteArray(Charsets.UTF_8); head(3, b.size.toLong()); out.write(b) }
+        fun bool(v: Boolean) { out.write(if (v) 0xF5 else 0xF4) }
         fun toByteArray(): ByteArray = out.toByteArray()
         private fun head(major: Int, v: Long) {
             require(v >= 0)
@@ -326,6 +327,10 @@ object CanonicalCbor {
         fun uint(): Long = head(0)
         fun bytes(): ByteArray = take(head(2))
         fun text(): String = String(take(head(3)), Charsets.UTF_8)
+        fun bool(): Boolean {
+            if (pos >= data.size) throw IllegalArgumentException("truncated")
+            return when (data[pos++].toInt() and 0xFF) { 0xF4 -> false; 0xF5 -> true; else -> throw IllegalArgumentException("not a bool") }
+        }
         fun requireEnd() { if (pos != data.size) throw IllegalArgumentException("trailing bytes") }
         private fun take(n: Long): ByteArray {
             if (n < 0 || pos + n > data.size) throw IllegalArgumentException("truncated")

@@ -95,6 +95,13 @@ static bool pos_read(void *c, uint8_t s, uint32_t o, uint8_t *d, size_t n) { pos
 static bool pos_erase(void *c, uint8_t s) { pos_store_t *st = c; if (s >= 2u) return false; memset(st->slots[s], 0xff, ZS_INSTALLATION_STORE_SLOT_BYTES); return true; }
 static bool pos_write(void *c, uint8_t s, uint32_t o, const uint8_t *d, size_t n) { pos_store_t *st = c; if (s >= 2u || o + n > ZS_INSTALLATION_STORE_SLOT_BYTES) return false; for (size_t i = 0u; i < n; i++) { if ((st->slots[s][o + i] & d[i]) != d[i]) return false; st->slots[s][o + i] = d[i]; } return true; }
 static bool audit_append(void *c, const zs_commissioning_audit_event_t *e) { unsigned *count = c; (void)e; (*count)++; return true; }
+static zs_commissioning_audit_event_t last_audit;
+static bool audit_append_keep(void *c, const zs_commissioning_audit_event_t *e) { last_audit = *e; return audit_append(c, e); }
+
+typedef struct { uint8_t slots[2][ZS_STATION_SECRETS_SLOT_BYTES]; } sec_store_t;
+static bool sec_read(void *c, uint8_t s, uint32_t o, uint8_t *d, size_t n) { sec_store_t *st = c; if (s >= 2u || o + n > ZS_STATION_SECRETS_SLOT_BYTES) return false; memcpy(d, &st->slots[s][o], n); return true; }
+static bool sec_erase(void *c, uint8_t s) { sec_store_t *st = c; if (s >= 2u) return false; memset(st->slots[s], 0xff, ZS_STATION_SECRETS_SLOT_BYTES); return true; }
+static bool sec_write(void *c, uint8_t s, uint32_t o, const uint8_t *d, size_t n) { sec_store_t *st = c; if (s >= 2u || o + n > ZS_STATION_SECRETS_SLOT_BYTES) return false; for (size_t i = 0u; i < n; i++) { if ((st->slots[s][o + i] & d[i]) != d[i]) return false; st->slots[s][o + i] = d[i]; } return true; }
 
 typedef struct {
   zs_ble_bridge_t bridge;
@@ -115,6 +122,7 @@ typedef struct {
   /* service side */
   bool service_mode, secure; zs_commissioning_role_t role; uint32_t now;
   cfg_store_t cfg; pos_store_t pos; unsigned audits;
+  sec_store_t sec; zs_station_secrets_io_t sec_io; zs_station_secrets_t applied; unsigned applied_count;
   zs_selftest_registry_t selftest;
   zs_ipc_identity_t identity;
   zs_station_config_io_t cfg_io; zs_installation_store_io_t pos_io; zs_commissioning_audit_io_t audit_io;
@@ -145,6 +153,12 @@ static bool service_mode(void *ctx, uint32_t *started) { *started = 1000u; retur
 static zs_commissioning_role_t peer_role(void *ctx) { return ((world_t *)ctx)->role; }
 static bool peer_secure(void *ctx) { return ((world_t *)ctx)->secure; }
 static bool rnd(void *ctx, uint8_t *out, size_t n) { world_t *W = ctx; for (size_t i = 0u; i < n; i++) out[i] = (uint8_t)(0x5au + i + W->rnd_counter); W->rnd_counter += 17u; return true; }
+/* The station applies a new secrets record: the engineer key pointer of the port follows it (as tasks.c does). */
+static void secrets_changed(void *ctx, const zs_station_secrets_t *rec) {
+  world_t *W = ctx;
+  W->applied = *rec; W->applied_count++;
+  if (rec->engineer_key_set) memcpy(W->engineer_key, rec->engineer_key, 32u);
+}
 static zs_selftest_code_t st_pass(void *ctx, uint32_t *d) { (void)ctx; *d = 3900u; return ZS_ST_PASS; }
 static zs_selftest_code_t st_fail(void *ctx, uint32_t *d) { (void)ctx; *d = 7u; return ZS_ST_FAIL; }
 
@@ -164,7 +178,9 @@ static void world_init(world_t *W) {
   zs_selftest_register(&W->selftest, ZS_ST_ID_LORA_SPI, "lora_spi", st_fail, NULL, false);
   W->bport = (zs_ble_bridge_port_t){W, nrf_uart_send, gatt_notify, att_payload, advertise, set_name, set_secret};
   for (unsigned i = 0u; i < 32u; i++) W->engineer_key[i] = (uint8_t)(0xa0u + i);
-  W->sport = (zs_ipc_service_port_t){W, stm_uart_send, now_ms, service_mode, peer_role, peer_secure, &W->cfg_io, &W->pos_io, &W->audit_io, &W->selftest, &W->identity, W->engineer_key, rnd};
+  memset(W->sec.slots, 0xff, sizeof(W->sec.slots));
+  W->sec_io = (zs_station_secrets_io_t){&W->sec, sec_read, sec_erase, sec_write};
+  W->sport = (zs_ipc_service_port_t){W, stm_uart_send, now_ms, service_mode, peer_role, peer_secure, &W->cfg_io, &W->pos_io, &W->audit_io, &W->selftest, &W->identity, W->engineer_key, rnd, &W->sec_io, secrets_changed};
   zs_ble_bridge_init(&W->bridge, &W->bport);
   assert(zs_ipc_service_init(&W->service, &W->sport));
 }
@@ -296,14 +312,17 @@ static void test_end_to_end(void) {
   printf("end to end ok (writes ok=%u rejected=%u audits=%u)\n", W.service.writes_ok, W.service.writes_rejected, W.audits);
 }
 
-/* B.9: installer by pairing, engineer by HMAC challenge; the policy change needs the engineer. */
-static uint8_t role_write(world_t *W, const uint8_t *v, size_t n) {   /* like client_write_long but tolerates the extra notify */
+/* Like client_write_long but tolerates the value notify that precedes the status (role B.9, secrets v0.3). */
+static uint8_t write_with_notify(world_t *W, uint16_t id, const uint8_t *v, size_t n) {
   zs_ble_splitter_t s; uint8_t frame[244];
   assert(zs_ble_splitter_init(&s, v, n));
-  for (;;) { const size_t k = zs_ble_splitter_next(&s, W->att, frame, sizeof(frame)); if (!k) break; assert(zs_ble_bridge_on_gatt_write(&W->bridge, ZS_CHAR_SESSION_ROLE, frame, k)); }
-  assert(W->notify_char == ZS_CHAR_SESSION_ROLE && W->last_notify_len == 1u);
+  for (;;) { const size_t k = zs_ble_splitter_next(&s, W->att, frame, sizeof(frame)); if (!k) break; assert(zs_ble_bridge_on_gatt_write(&W->bridge, id, frame, k)); }
+  assert(W->notify_char == id && W->last_notify_len == 1u);
   return W->last_notify[0];
 }
+/* B.9: installer by pairing, engineer by HMAC challenge; the policy change needs the engineer. */
+static uint8_t role_write(world_t *W, const uint8_t *v, size_t n) { return write_with_notify(W, ZS_CHAR_SESSION_ROLE, v, n); }
+static uint8_t secrets_write(world_t *W, const uint8_t *v, size_t n) { return write_with_notify(W, ZS_CHAR_STATION_SECRETS, v, n); }
 
 static void test_session_role(void) {
   static world_t W;
@@ -356,11 +375,88 @@ static void test_session_role(void) {
   printf("\n");
 }
 
+/* v0.3 station_secrets: first record by the installer on a blank station, later changes only by the engineer
+   (with the key the record itself carried), presence read never exposes values, clear wipes the record. */
+static void test_station_secrets(void) {
+  static world_t W;
+  uint8_t out[64], patch[128], tag[ZS_ROLE_TAG_BYTES], resp[1u + ZS_ROLE_TAG_BYTES]; size_t n;
+  const uint8_t challenge = ZS_ROLE_OP_CHALLENGE;
+  zs_cbor_t c;
+  uint8_t newkey[32];
+  world_init(&W);
+  W.audit_io.append = audit_append_keep;
+  zs_ble_bridge_on_link(&W.bridge, 2u);
+  for (unsigned i = 0u; i < 32u; i++) newkey[i] = (uint8_t)(0x10u + i);
+
+  /* blank station: presence map all false, version 0 */
+  assert(client_read_long(&W, ZS_CHAR_STATION_SECRETS, out, sizeof(out), &n) && n == 11u);
+  assert(out[0] == 0xa5u && out[2] == 0x00u && out[4] == 0xf4u && out[6] == 0xf4u && out[8] == 0xf4u && out[10] == 0xf4u);
+
+  /* installer provisions the engineer key and slot-1 ICCID (the key on the station differs from the port's until applied) */
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 2u);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_ENGINEER); zs_cbor_bytes(&c, newkey, 32u);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_ICCID1); zs_cbor_text(&c, "89701012345678901234");
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_OK);
+  assert(W.applied_count == 1u && W.applied.engineer_key_set && strcmp(W.applied.iccid[0], "89701012345678901234") == 0 && W.applied.version == 1u);
+  /* the presence map was notified right before the status (the Android controller reads it from the notify) */
+  assert(W.prev_notify_len == 11u && W.prev_notify[0] == 0xa5u && W.prev_notify[2] == 0x01u && W.prev_notify[4] == 0xf5u && W.prev_notify[6] == 0xf5u && W.prev_notify[8] == 0xf4u);
+  assert(last_audit.phase == ZS_COMMISSIONING_AUDIT_COMMITTED && last_audit.operation == ZS_COMMISSIONING_OPERATION_SECRETS_WRITE && last_audit.role == ZS_COMMISSIONING_ROLE_INSTALLER && last_audit.version == 1u);
+  assert(client_read_long(&W, ZS_CHAR_STATION_SECRETS, out, sizeof(out), &n) && n == 11u && out[2] == 0x01u && out[4] == 0xf5u && out[6] == 0xf5u && out[8] == 0xf4u && out[10] == 0xf4u);
+  /* the value never travels back: the read-back holds no key bytes */
+  assert(memcmp(out, newkey, 8u) != 0);
+
+  /* a second write as installer is refused: the station is no longer blank */
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_ICCID2); zs_cbor_text(&c, "89702012345678901234");
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  assert(last_audit.phase == ZS_COMMISSIONING_AUDIT_REJECTED && last_audit.result == ZS_COMMISSIONING_POLICY_ROLE_REQUIRED && W.service.secrets_rejections == 1u);
+
+  /* elevate with the key just provisioned, then the change goes through and merges with what is stored */
+  assert(role_write(&W, &challenge, 1u) == ZS_BLE_STATUS_OK);
+  zs_ipc_role_tag(newkey, W.identity.serial, W.prev_notify + 1, tag);
+  resp[0] = ZS_ROLE_OP_RESPONSE; memcpy(resp + 1, tag, sizeof(tag));
+  assert(role_write(&W, resp, sizeof(resp)) == ZS_BLE_STATUS_OK && zs_ipc_service_role(&W.service) == ZS_COMMISSIONING_ROLE_ENGINEER);
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_OK);
+  assert(W.applied.version == 2u && W.applied.engineer_key_set && W.applied.iccid[0][0] && strcmp(W.applied.iccid[1], "89702012345678901234") == 0);
+  assert(last_audit.role == ZS_COMMISSIONING_ROLE_ENGINEER && last_audit.version == 2u);
+
+  /* malformed: unknown key, wrong key length, bad ICCID, not a map */
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, 9u); zs_cbor_uint(&c, 1u);
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_REJECTED_VALIDATION);
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, ZS_SECRETS_KEY_ENGINEER); zs_cbor_bytes(&c, newkey, 16u);
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_REJECTED_VALIDATION);
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, ZS_SECRETS_KEY_ICCID1); zs_cbor_text(&c, "12ab");
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_REJECTED_VALIDATION);
+  patch[0] = 0x01u;
+  assert(secrets_write(&W, patch, 1u) == ZS_BLE_STATUS_REJECTED_VALIDATION);
+  assert(W.applied.version == 2u);
+
+  /* clear as engineer: record gone, presence all false, the station drops the key */
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, ZS_SECRETS_KEY_CLEAR); zs_cbor_bool(&c, true);
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_OK);
+  assert(!W.applied.engineer_key_set && W.applied.iccid[0][0] == 0 && last_audit.operation == ZS_COMMISSIONING_OPERATION_SECRETS_CLEAR);
+  assert(client_read_long(&W, ZS_CHAR_STATION_SECRETS, out, sizeof(out), &n) && n == 11u && out[2] == 0x00u && out[4] == 0xf4u);
+
+  /* policy gates: not secure, not in service mode, no store */
+  zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, ZS_SECRETS_KEY_ICCID1); zs_cbor_text(&c, "89701012345678901234");
+  W.secure = false;
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_NOT_AUTHORIZED);
+  W.secure = true; W.service_mode = false;
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_NOT_IN_SERVICE_MODE);
+  W.service_mode = true; W.sport.secrets_io = NULL;
+  assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_STORAGE_ERROR);
+  assert(client_read_long(&W, ZS_CHAR_STATION_SECRETS, out, sizeof(out), &n) && n == 11u && out[4] == 0xf4u);
+  W.sport.secrets_io = &W.sec_io;
+  assert(W.service.secrets_writes == 3u);
+  printf("station secrets ok\n");
+}
+
 int main(void) {
   test_framing_vectors();
   test_ipc_link();
   test_end_to_end();
   test_session_role();
+  test_station_secrets();
   printf("ble bridge tests passed\n");
   return 0;
 }

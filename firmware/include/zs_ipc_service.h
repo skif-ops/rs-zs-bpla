@@ -10,6 +10,7 @@
 #include "zs_installation_commissioning.h"
 #include "zs_selftest.h"
 #include "zs_station_config.h"
+#include "zs_station_secrets.h"
 
 /* config_write / installation_position status byte (addendum B.3 + B.6). */
 enum {
@@ -48,6 +49,10 @@ typedef struct {
      elevation refused; random: nonce source (hardware RNG), NULL = elevation refused. Both optional for B1. */
   const uint8_t *engineer_key;
   bool (*random)(void *ctx, uint8_t *out, size_t len);
+  /* v0.3 station_secrets (0x0206): the NOR record store (NULL / zeroed io = provisioning refused) and the hook the
+     station uses to apply a new record (engineer key pointer, SIM ICCIDs). Both optional. */
+  const zs_station_secrets_io_t *secrets_io;
+  void (*secrets_changed)(void *ctx, const zs_station_secrets_t *secrets);
 } zs_ipc_service_port_t;
 
 /* B.9 session_role characteristic (0x0205): read = [role]; write [0x01] asks for a challenge, the station notifies
@@ -61,6 +66,19 @@ typedef struct {
 #define ZS_ROLE_TAG_BYTES 16u
 #define ZS_ROLE_MAX_FAILURES 3u
 #define ZS_ROLE_CONTEXT "DIO-ROLE-V1"
+
+/* v0.3 station_secrets characteristic (0x0206). Read: CBOR presence map {0: version, 1: engineer key set,
+   2: iccid1 set, 3: iccid2 set, 4: command key set} - never the values. Write: CBOR patch merged into the stored
+   record - {1: bstr32 engineer key, 2: tstr iccid1 ("" removes), 3: tstr iccid2, 4: bstr32 command public key,
+   5: true = clear everything}; one WRITE_STATUS, then the presence map by notify. Policy: service mode + secure
+   link; a blank station accepts the first record from the installer (commissioning), any later change needs the
+   engineer role (B.9 with the key already on the station). Every attempt is audited. */
+#define ZS_SECRETS_KEY_VERSION 0u
+#define ZS_SECRETS_KEY_ENGINEER 1u
+#define ZS_SECRETS_KEY_ICCID1 2u
+#define ZS_SECRETS_KEY_ICCID2 3u
+#define ZS_SECRETS_KEY_COMMAND 4u
+#define ZS_SECRETS_KEY_CLEAR 5u
 
 typedef struct {
   const zs_ipc_service_port_t *port;
@@ -78,6 +96,7 @@ typedef struct {
   uint8_t session_role;          /* zs_commissioning_role_t: NONE until secure, INSTALLER by pairing, ENGINEER by challenge */
   uint8_t role_nonce[ZS_ROLE_NONCE_BYTES];
   bool role_nonce_valid;
+  uint32_t secrets_writes, secrets_rejections;   /* v0.3 station_secrets */
   uint8_t role_failures;
   uint32_t role_elevations, role_rejections;
 } zs_ipc_service_t;

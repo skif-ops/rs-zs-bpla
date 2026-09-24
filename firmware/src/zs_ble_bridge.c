@@ -9,12 +9,14 @@ static bool send_ipc(zs_ble_bridge_t *b, uint8_t type, const uint8_t *payload, s
 
 static bool cacheable(uint16_t id) {
   return id == ZS_CHAR_IDENTITY || id == ZS_CHAR_CONFIG_READ || id == ZS_CHAR_INSTALLATION_POSITION ||
-         id == ZS_CHAR_POSITION_TRUST_POLICY || id == ZS_CHAR_SESSION_ROLE || id == ZS_CHAR_STATUS || id == ZS_CHAR_GNSS_INTEGRITY;
+         id == ZS_CHAR_POSITION_TRUST_POLICY || id == ZS_CHAR_SESSION_ROLE || id == ZS_CHAR_STATION_SECRETS ||
+         id == ZS_CHAR_STATUS || id == ZS_CHAR_GNSS_INTEGRITY;
 }
 
 static bool writable(uint16_t id) {
   return id == ZS_CHAR_CONFIG_WRITE || id == ZS_CHAR_INSTALLATION_POSITION || id == ZS_CHAR_POSITION_TRUST_POLICY ||
-         id == ZS_CHAR_SESSION_ROLE || id == ZS_CHAR_SELF_TEST || id == ZS_CHAR_OTA_MANIFEST || id == ZS_CHAR_OTA_IMAGE_CHUNK || id == ZS_CHAR_OTA_CONTROL;
+         id == ZS_CHAR_SESSION_ROLE || id == ZS_CHAR_STATION_SECRETS || id == ZS_CHAR_SELF_TEST || id == ZS_CHAR_OTA_MANIFEST ||
+         id == ZS_CHAR_OTA_IMAGE_CHUNK || id == ZS_CHAR_OTA_CONTROL;
 }
 
 static zs_ble_bridge_cache_t *cache_slot(zs_ble_bridge_t *b, uint16_t id, bool create) {

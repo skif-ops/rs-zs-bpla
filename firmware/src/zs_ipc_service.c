@@ -184,6 +184,123 @@ static void handle_role_write(zs_ipc_service_t *s, const uint8_t *p, size_t len)
   (void)send_status(s, ZS_CHAR_SESSION_ROLE, ZS_BLE_STATUS_REJECTED_VALIDATION);
 }
 
+/* ---- v0.3 station secrets ---------------------------------------------------------------- */
+
+static bool secrets_available(const zs_ipc_service_t *s) {
+  return s->port->secrets_io && s->port->secrets_io->read && s->port->secrets_io->erase && s->port->secrets_io->write;
+}
+
+/* Presence map as READ_VALUE (bridge cache) and, when `notify`, as NOTIFY after a write (ICD v0.3 §3.2). */
+static bool push_secrets_map(zs_ipc_service_t *s, bool notify) {
+  zs_station_secrets_t rec;
+  zs_cbor_t c;
+  uint8_t buf[24];
+  const bool present = secrets_available(s) && zs_station_secrets_load(s->port->secrets_io, &rec, NULL) == ZS_STATION_SECRETS_OK;
+  if (!present) memset(&rec, 0, sizeof(rec));
+  zs_cbor_init(&c, buf, sizeof(buf));
+  zs_cbor_map(&c, 5u);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_VERSION); zs_cbor_uint(&c, present ? rec.version : 0u);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_ENGINEER); zs_cbor_bool(&c, present && rec.engineer_key_set);
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_ICCID1); zs_cbor_bool(&c, present && rec.iccid[0][0] != '\0');
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_ICCID2); zs_cbor_bool(&c, present && rec.iccid[1][0] != '\0');
+  zs_cbor_uint(&c, ZS_SECRETS_KEY_COMMAND); zs_cbor_bool(&c, present && rec.command_key_set);
+  memset(&rec, 0, sizeof(rec));
+  if (c.error) return false;
+  if (notify && !push_value(s, ZS_IPC_NOTIFY, ZS_CHAR_STATION_SECRETS, buf, c.len)) return false;
+  return push_value(s, ZS_IPC_READ_VALUE, ZS_CHAR_STATION_SECRETS, buf, c.len);
+}
+
+static bool push_secrets(zs_ipc_service_t *s) { return push_secrets_map(s, false); }
+
+static void secrets_audit(zs_ipc_service_t *s, zs_commissioning_audit_phase_t phase, zs_commissioning_operation_t op, zs_commissioning_result_t result, uint32_t version) {
+  zs_commissioning_audit_event_t e;
+  if (!s->port->audit_io || !s->port->audit_io->append) return;
+  memset(&e, 0, sizeof(e));
+  e.phase = phase; e.operation = op; e.role = zs_ipc_service_role(s); e.result = result; e.version = version;
+  (void)s->port->audit_io->append(s->port->audit_io->ctx, &e);
+}
+
+/* Decodes the patch into `rec` (merged onto the stored record); false on malformed CBOR / bad values. */
+static bool secrets_decode_patch(const uint8_t *p, size_t len, zs_station_secrets_t *rec, bool *clear) {
+  zs_cbor_reader_t r;
+  uint32_t count;
+  *clear = false;
+  zs_cbor_reader_init(&r, p, len);
+  if (!zs_cbor_read_map(&r, &count) || count > 8u) return false;
+  for (uint32_t i = 0u; i < count; i++) {
+    uint64_t key;
+    const uint8_t *b; size_t n;
+    if (!zs_cbor_read_uint(&r, &key)) return false;
+    switch (key) {
+      case ZS_SECRETS_KEY_ENGINEER:
+        if (!zs_cbor_read_bytes(&r, &b, &n) || n != ZS_STATION_SECRETS_KEY_BYTES) return false;
+        memcpy(rec->engineer_key, b, n); rec->engineer_key_set = true; break;
+      case ZS_SECRETS_KEY_ICCID1:
+      case ZS_SECRETS_KEY_ICCID2: {
+        char *dst = rec->iccid[key == ZS_SECRETS_KEY_ICCID1 ? 0u : 1u];
+        if (!zs_cbor_read_text(&r, dst, ZS_STATION_SECRETS_ICCID_CAPACITY)) return false;
+        if (dst[0] != '\0' && !zs_station_secrets_iccid_valid(dst)) return false;
+        break;
+      }
+      case ZS_SECRETS_KEY_COMMAND:
+        if (!zs_cbor_read_bytes(&r, &b, &n) || n != ZS_STATION_SECRETS_KEY_BYTES) return false;
+        memcpy(rec->command_public_key, b, n); rec->command_key_set = true; break;
+      case ZS_SECRETS_KEY_CLEAR:
+        if (!zs_cbor_read_bool(&r, clear)) return false;
+        break;
+      default:
+        return false;                                                   /* unknown key: reject, the contract is explicit */
+    }
+  }
+  return zs_cbor_reader_at_end(&r);
+}
+
+static void handle_secrets_write(zs_ipc_service_t *s, const uint8_t *p, size_t len) {
+  zs_station_secrets_t rec;
+  uint32_t started = 0u;
+  bool clear = false, stored;
+  const zs_commissioning_role_t role = zs_ipc_service_role(s);
+  zs_commissioning_operation_t op;
+  zs_station_secrets_result_t r;
+  if (!s->port->service_mode(s->port->ctx, &started)) { s->secrets_rejections++; (void)send_status(s, ZS_CHAR_STATION_SECRETS, ZS_BLE_STATUS_NOT_IN_SERVICE_MODE); return; }
+  if (!s->port->peer_secure(s->port->ctx) || role == ZS_COMMISSIONING_ROLE_NONE) { s->secrets_rejections++; (void)send_status(s, ZS_CHAR_STATION_SECRETS, ZS_BLE_STATUS_NOT_AUTHORIZED); return; }
+  if (!secrets_available(s)) { s->secrets_rejections++; (void)send_status(s, ZS_CHAR_STATION_SECRETS, ZS_BLE_STATUS_STORAGE_ERROR); return; }
+  r = zs_station_secrets_load(s->port->secrets_io, &rec, NULL);
+  if (r == ZS_STATION_SECRETS_IO_ERROR) { s->secrets_rejections++; (void)send_status(s, ZS_CHAR_STATION_SECRETS, ZS_BLE_STATUS_STORAGE_ERROR); return; }
+  stored = r == ZS_STATION_SECRETS_OK;
+  if (!stored) memset(&rec, 0, sizeof(rec));
+  if (!secrets_decode_patch(p, len, &rec, &clear)) {
+    memset(&rec, 0, sizeof(rec)); s->secrets_rejections++;
+    secrets_audit(s, ZS_COMMISSIONING_AUDIT_REJECTED, ZS_COMMISSIONING_OPERATION_SECRETS_WRITE, ZS_COMMISSIONING_INVALID_RECORD, 0u);
+    (void)send_status(s, ZS_CHAR_STATION_SECRETS, ZS_BLE_STATUS_REJECTED_VALIDATION); return;
+  }
+  op = clear ? ZS_COMMISSIONING_OPERATION_SECRETS_CLEAR : ZS_COMMISSIONING_OPERATION_SECRETS_WRITE;
+  /* a blank station is provisioned by the installer; anything stored is changed only by the engineer */
+  if (stored && role != ZS_COMMISSIONING_ROLE_ENGINEER) {
+    memset(&rec, 0, sizeof(rec)); s->secrets_rejections++;
+    secrets_audit(s, ZS_COMMISSIONING_AUDIT_REJECTED, op, ZS_COMMISSIONING_POLICY_ROLE_REQUIRED, 0u);
+    (void)send_status(s, ZS_CHAR_STATION_SECRETS, ZS_BLE_STATUS_NOT_AUTHORIZED); return;
+  }
+  secrets_audit(s, ZS_COMMISSIONING_AUDIT_INTENT, op, ZS_COMMISSIONING_OK, 0u);
+  if (clear) {
+    r = zs_station_secrets_clear(s->port->secrets_io);
+    memset(&rec, 0, sizeof(rec));
+  } else {
+    r = zs_station_secrets_commit(s->port->secrets_io, &rec);
+  }
+  if (r != ZS_STATION_SECRETS_OK) {
+    memset(&rec, 0, sizeof(rec)); s->secrets_rejections++;
+    secrets_audit(s, ZS_COMMISSIONING_AUDIT_REJECTED, op, ZS_COMMISSIONING_STORAGE_IO_ERROR, 0u);
+    (void)send_status(s, ZS_CHAR_STATION_SECRETS, ZS_BLE_STATUS_STORAGE_ERROR); return;
+  }
+  s->secrets_writes++;
+  secrets_audit(s, ZS_COMMISSIONING_AUDIT_COMMITTED, op, ZS_COMMISSIONING_OK, rec.version);
+  if (s->port->secrets_changed) s->port->secrets_changed(s->port->ctx, &rec);
+  memset(&rec, 0, sizeof(rec));
+  (void)push_secrets_map(s, true);
+  (void)send_status(s, ZS_CHAR_STATION_SECRETS, ZS_BLE_STATUS_OK);
+}
+
 static zs_commissioning_context_t context(zs_ipc_service_t *s) {
   zs_commissioning_context_t c;
   uint32_t started = 0u;
@@ -287,7 +404,7 @@ static void on_ipc(zs_ipc_service_t *s, uint8_t type, const uint8_t *p, size_t l
       if (len >= 1u) {
         s->link_state = p[0];
         if (p[0] == 0u) role_reset(s);                              /* the role lives with the link (B.9) */
-        else { (void)push_identity(s); (void)push_config(s); (void)push_installation(s, true); (void)push_role(s); }
+        else { (void)push_identity(s); (void)push_config(s); (void)push_installation(s, true); (void)push_role(s); (void)push_secrets(s); }
       }
       break;
     case ZS_IPC_READ_REQUEST: {
@@ -297,6 +414,7 @@ static void on_ipc(zs_ipc_service_t *s, uint8_t type, const uint8_t *p, size_t l
       else if (id == ZS_CHAR_CONFIG_READ) (void)push_config(s);
       else if (id == ZS_CHAR_INSTALLATION_POSITION) (void)push_installation(s, true);
       else if (id == ZS_CHAR_SESSION_ROLE) (void)push_role(s);
+      else if (id == ZS_CHAR_STATION_SECRETS) (void)push_secrets(s);
       break;
     }
     case ZS_IPC_CHAR_WRITE: {
@@ -306,6 +424,7 @@ static void on_ipc(zs_ipc_service_t *s, uint8_t type, const uint8_t *p, size_t l
       else if (id == ZS_CHAR_INSTALLATION_POSITION) handle_installation_write(s, &p[2], len - 2u);
       else if (id == ZS_CHAR_SELF_TEST) handle_self_test(s, &p[2], len - 2u);
       else if (id == ZS_CHAR_SESSION_ROLE) handle_role_write(s, &p[2], len - 2u);
+      else if (id == ZS_CHAR_STATION_SECRETS) handle_secrets_write(s, &p[2], len - 2u);
       else (void)send_status(s, id, ZS_BLE_STATUS_REJECTED_VALIDATION);
       break;
     }

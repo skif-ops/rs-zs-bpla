@@ -361,8 +361,10 @@ static zs_station_config_io_t cfg_io = {cfg_slots, ram_read, ram_erase, ram_writ
 static zs_installation_store_io_t pos_io = {pos_slots, ram_read, ram_erase, ram_write};
 static const zs_commissioning_audit_io_t audit_io = {NULL, ble_audit};
 static const zs_ipc_identity_t identity = {APP_STATION_SERIAL, APP_STATION_HW_REV, APP_STATION_FW_VERSION, APP_STATION_BL_VERSION, APP_STATION_ID, ZS_STATION_CONFIG_REGION_RU868};
+/* v0.3 station_secrets over BLE: the service commits to the NOR record and hands the new record here to apply. */
+static void ble_secrets_changed(void *ctx, const zs_station_secrets_t *rec);
 static zs_ipc_service_port_t ipc_port = {NULL, ble_uart_send, ble_now_ms, ble_service_mode, ble_peer_role, ble_peer_secure,
-                                         &cfg_io, &pos_io, &audit_io, &selftests, &identity, NULL, ble_random};
+                                         &cfg_io, &pos_io, &audit_io, &selftests, &identity, NULL, ble_random, &secrets_io, ble_secrets_changed};
 
 /* Heartbeat (schema 2): identity, time, power/route placeholders of B1, self-test verdict, and the detector map
    (key 13): boot_id, uptime, pipeline counters, level 1, longest window, events waiting in the NOR outbox. */
@@ -404,6 +406,16 @@ static void secrets_apply(void) {
   if (secrets.engineer_key_set) { memcpy(engineer_key, secrets.engineer_key, sizeof(engineer_key)); ipc_port.engineer_key = engineer_key; }
   else ipc_port.engineer_key = NULL;
   for (unsigned i = 0u; i < 2u; i++) if (secrets.iccid[i][0]) (void)app_comms_set_sim_iccid(i + 1u, secrets.iccid[i]);
+}
+
+static void ble_secrets_changed(void *ctx, const zs_station_secrets_t *rec) {
+  (void)ctx;
+  secrets = *rec;
+  secrets_loaded = rec->engineer_key_set || rec->iccid[0][0] || rec->iccid[1][0] || rec->command_key_set;
+  if (!rec->engineer_key_set) memset(engineer_key, 0, sizeof(engineer_key));
+  secrets_apply();
+  console_printf("secrets: provisioned over ble (v%lu) engineer key %s, iccid1 %s, iccid2 %s, command key %s\r\n", (unsigned long)rec->version,
+                 rec->engineer_key_set ? "set" : "-", rec->iccid[0][0] ? "set" : "-", rec->iccid[1][0] ? "set" : "-", rec->command_key_set ? "set" : "-");
 }
 
 /* Commits the current secrets to NOR; false on the RAM fallback or a storage error (the RAM copy still applies). */
