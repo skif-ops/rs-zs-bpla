@@ -41,6 +41,13 @@
       "shell": "bash",
       "script": "ci/pcb_pwr_eco_003_drc.sh",
       "artifacts": "artifacts/kicad-native/PCB-PWR/j2-placement-eco-003/*"
+    },
+    {
+      "name": "pcb-pwr-eco-004-drc",
+      "runner": "ubuntu-24.04",
+      "shell": "bash",
+      "script": "ci/pcb_pwr_eco_004_drc.sh",
+      "artifacts": "artifacts/kicad-native/PCB-PWR/eco-004-u3-u4-land-rule/*"
     }
   ]
 }
