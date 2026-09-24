@@ -103,6 +103,7 @@ add_executable(dioneya_evt_pre_20.elf
   ${ZS_TARGET_ROOT}/vendor/cmsis_device_u5/startup_stm32u585xx.s
   ${ZS_TARGET_ROOT}/vendor/cmsis_device_u5/system_stm32u5xx.c
   ${ZS_TARGET_ROOT}/src/evt_pre_20_dual_sim_gpio.c
+  ${ZS_TARGET_ROOT}/src/evt_pre_20_sim_orchestrator.c
 )
 target_include_directories(dioneya_evt_pre_20.elf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${ZS_TARGET_ROOT}/include)
 target_link_libraries(dioneya_evt_pre_20.elf PRIVATE zs_core_target stm32u5_hal freertos_kernel m)
