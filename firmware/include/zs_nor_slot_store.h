@@ -10,6 +10,7 @@
 #include "zs_installation_store.h"
 #include "zs_nor.h"
 #include "zs_station_config.h"
+#include "zs_station_secrets.h"
 
 typedef struct {
   zs_nor_t *nor;
@@ -24,5 +25,6 @@ bool zs_nor_slot_store_init(zs_nor_slot_store_t *store, zs_nor_t *nor, uint32_t 
 /* Both bind the same adapter; the adapter must outlive the io. */
 bool zs_nor_slot_store_config_io(zs_nor_slot_store_t *store, zs_station_config_io_t *out_io);
 bool zs_nor_slot_store_installation_io(zs_nor_slot_store_t *store, zs_installation_store_io_t *out_io);
+bool zs_nor_slot_store_secrets_io(zs_nor_slot_store_t *store, zs_station_secrets_io_t *out_io);
 
 #endif
