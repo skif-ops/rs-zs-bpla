@@ -25,6 +25,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 NATIVE = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
+# Byte-identical committed copy of the routing-010 board; the candidate is always
+# materialised from it so candidate evidence replays after ECO-003 is applied.
+BASE_SOURCE = (
+    ROOT / "hardware/kicad/candidates/PCB-PWR-3V8-OUTPUT-BULK-ROUTING-010/"
+    "PCB-PWR_3V8_OUTPUT_BULK_ROUTING_010_CANDIDATE_REV_A.kicad_pcb"
+)
 CANDIDATE_NAME = "PCB-PWR_J2_PLACEMENT_ECO_003_CANDIDATE_REV_A.kicad_pcb"
 BASE_NAME = "PCB-PWR_J2_PLACEMENT_ECO_003_BASE_REV_A.kicad_pcb"
 
@@ -80,7 +86,7 @@ def candidate_bytes(base_payload: bytes) -> bytes:
 
 def materialize(directory: Path) -> tuple[Path, Path]:
     """Write BASE and CANDIDATE boards into directory; return their paths."""
-    base = NATIVE.read_bytes()
+    base = BASE_SOURCE.read_bytes()
     candidate = candidate_bytes(base)
     directory.mkdir(parents=True, exist_ok=True)
     base_path, candidate_path = directory / BASE_NAME, directory / CANDIDATE_NAME
@@ -93,7 +99,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", type=Path, help="materialise BASE and CANDIDATE boards here")
     args = parser.parse_args()
-    candidate = candidate_bytes(NATIVE.read_bytes())
+    candidate = candidate_bytes(BASE_SOURCE.read_bytes())
     if args.output_dir:
         base_path, candidate_path = materialize(args.output_dir)
         print(f"materialised {base_path} and {candidate_path}")
