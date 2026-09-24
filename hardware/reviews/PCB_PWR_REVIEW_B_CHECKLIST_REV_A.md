@@ -239,9 +239,10 @@ applied byte-for-byte for 39 trace items and its separate application gate is
 passes at CI #736, PCB-PWR Schematic #115, and PCB Native #377. The
 U2-constrained upper branch to `C11.1` is now isolated candidate 009: four
 `3.0 mm` F.Cu segments, no vias or zones, and `0.575 mm` minimum screened
-foreign-copper clearance. It is not applied; its gate passes at CI #740,
-PCB-PWR Schematic #117, and PCB Native #379, with explicit owner acceptance
-still required.
+foreign-copper clearance. It is applied byte-for-byte for 43 trace items after
+explicit owner acceptance; its candidate gate passes at CI #740, PCB-PWR
+Schematic #117 and PCB Native #379, while its separate application gate is
+pending.
 Remaining routing, physical via-sharing/current/thermal/fault evidence, DRC,
 CAM, checkout DFM, final serial mechanics and independent Review B are open.
 Production outputs remain prohibited.

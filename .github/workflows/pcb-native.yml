@@ -185,6 +185,9 @@ on:
       - "tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py"
       - "tools/generate_pcb_pwr_vbat_sys_c13_c11_routing_009_candidate_rev_a.py"
       - "tools/audit_pcb_pwr_vbat_sys_c13_c11_routing_009_candidate_rev_a.py"
+      - "tools/run_pcb_pwr_c13_c11_009_historical_audit.py"
+      - "tools/generate_pcb_pwr_vbat_sys_c13_c11_routing_009_application_rev_a.py"
+      - "tools/audit_pcb_pwr_vbat_sys_c13_c11_routing_009_application_rev_a.py"
       - "tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py"
       - "tools/audit_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py"
       - "tools/generate_pcb_pwr_buck_power_stage_eco_002_application_rev_a.py"
@@ -1397,8 +1400,11 @@ jobs:
           python tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/vbat_sys_shunt_bulk_routing_007_application_audit.json
           python tools/generate_pcb_pwr_vbat_sys_c13_c11_routing_009_candidate_rev_a.py --check
-          python tools/audit_pcb_pwr_vbat_sys_c13_c11_routing_009_candidate_rev_a.py \
+          python tools/run_pcb_pwr_c13_c11_009_historical_audit.py \
             --output artifacts/kicad-native/PCB-PWR/vbat_sys_c13_c11_routing_009_static_audit.json
+          python tools/generate_pcb_pwr_vbat_sys_c13_c11_routing_009_application_rev_a.py --check
+          python tools/audit_pcb_pwr_vbat_sys_c13_c11_routing_009_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-PWR/vbat_sys_c13_c11_routing_009_application_audit.json
           python tools/run_pcb_pwr_historical_generation_check.py tools/generate_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py --check
           python tools/audit_pcb_pwr_buck_power_stage_eco_002_candidate_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/buck_power_stage_eco_002_static_audit.json
@@ -1442,7 +1448,7 @@ jobs:
           assert board is not None, "KiCad failed to parse PCB-PWR placement candidate"
           assert len(board.GetFootprints()) == 66, "unexpected PCB-PWR electrical-plus-mounting footprint count"
           assert board.GetCopperLayerCount() == 4, "unexpected PCB-PWR layer count"
-          assert len(list(board.GetTracks())) == 39, "PCB-PWR exact C13-to-C12 008 application missing or out of scope"
+          assert len(list(board.GetTracks())) == 43, "PCB-PWR exact C13-to-C11 009 application missing or out of scope"
           assert len(list(board.Zones())) == 2, "PCB-PWR bounded local return zones missing or out of scope"
           print("PCB-PWR controlled footprints KiCad 9 native parse: PASS")
           PY
@@ -1974,10 +1980,16 @@ jobs:
             "$candidate_project/PCB-PWR_VBAT_SYS_C13_C11_ROUTING_009_CANDIDATE_REV_A.kicad_pcb"
           DIONEYA_PYTHON_SITE="$(python -c 'import site; print(site.getsitepackages()[0])')"
           PYTHONPATH="$DIONEYA_PYTHON_SITE" \
-            /usr/bin/python3 tools/audit_pcb_pwr_vbat_sys_c13_c11_routing_009_candidate_rev_a.py \
+            /usr/bin/python3 tools/run_pcb_pwr_c13_c11_009_historical_audit.py \
             --drc-base "$evidence/baseline_drc.json" \
             --drc-candidate "$evidence/candidate_drc.json" \
             --output "$evidence/comparative_audit.json"
+          cmp hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb \
+            hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C11-ROUTING-009/PCB-PWR_VBAT_SYS_C13_C11_ROUTING_009_CANDIDATE_REV_A.kicad_pcb
+          python tools/generate_pcb_pwr_vbat_sys_c13_c11_routing_009_application_rev_a.py --check
+          PYTHONPATH="$DIONEYA_PYTHON_SITE" \
+            /usr/bin/python3 tools/audit_pcb_pwr_vbat_sys_c13_c11_routing_009_application_rev_a.py \
+            --output "$evidence/application_audit.json"
       - name: KiCad 9 comparative DRC for PCB-PWR buck power-stage ECO-002
         shell: bash
         run: |

@@ -16,14 +16,15 @@ import generate_pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a as generato
 ROOT = Path(__file__).resolve().parents[1]
 ACTIVE = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 CANDIDATE_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
+ACTIVE_SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
 
 
 def historical_candidate_audit(
     drc_base: Path | None = None, drc_candidate: Path | None = None
 ) -> dict:
     payload = ACTIVE.read_bytes()
-    assert hashlib.sha256(payload).hexdigest() == CANDIDATE_SHA
-    assert payload == generator.CANDIDATE.read_bytes()
+    assert hashlib.sha256(payload).hexdigest() in {CANDIDATE_SHA, ACTIVE_SUCCESSOR_SHA}
+    assert hashlib.sha256(generator.CANDIDATE.read_bytes()).hexdigest() == CANDIDATE_SHA
     generator.SOURCE = generator.BASE
     candidate_audit.SOURCE = candidate_audit.BASE
     generator.generate(generator.BASE, generator.CANDIDATE, check=True)

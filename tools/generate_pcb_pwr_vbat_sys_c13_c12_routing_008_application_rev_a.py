@@ -17,6 +17,7 @@ BOARD = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 APPROVAL = ROOT / "hardware/reviews/PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_APPROVAL_REV_A.json"
 BASE_SHA = "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b"
 CANDIDATE_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
+SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
 APPROVAL_SHA = "f90d95781a140300856b290b9958f0f814c5ef13e44da332e0a1311993be40f2"
 
 
@@ -51,7 +52,8 @@ def main() -> int:
     args = parser.parse_args()
     payload = accepted_payload()
     if args.check:
-        assert BOARD.read_bytes() == payload, "authoritative PCB-PWR differs from accepted 008"
+        assert digest(BOARD) in {CANDIDATE_SHA, SUCCESSOR_SHA}, \
+            "authoritative PCB-PWR is not accepted 008 or controlled 009 successor"
     else:
         assert BOARD.read_bytes() == BASE.read_bytes(), "authoritative 007 predecessor differs"
         BOARD.write_bytes(payload)

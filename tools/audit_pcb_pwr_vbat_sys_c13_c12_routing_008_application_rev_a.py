@@ -22,13 +22,14 @@ APPROVAL = ROOT / "hardware/reviews/PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_APPROVA
 APPLICATION = ROOT / "hardware/reviews/PCB_PWR_VBAT_SYS_C13_C12_ROUTING_008_APPLICATION_REV_A.json"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 SEMANTIC_SHA = "1278dcdc1c752e34132af5ac6472525c5012774ff864aa2210bee40c8c2284e3"
+SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
 
 
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict:
-    assert hashlib.sha256(BOARD.read_bytes()).hexdigest() == CANDIDATE_SHA
-    assert BOARD.read_bytes() == CANDIDATE.read_bytes()
+    board_sha = hashlib.sha256(BOARD.read_bytes()).hexdigest()
+    assert board_sha in {CANDIDATE_SHA, SUCCESSOR_SHA}
     assert hashlib.sha256(APPROVAL.read_bytes()).hexdigest() == APPROVAL_SHA
-    board = Board.from_file(str(BOARD), encoding="utf-8")
+    board = Board.from_file(str(CANDIDATE if board_sha == SUCCESSOR_SHA else BOARD), encoding="utf-8")
     assert semantic_board_sha256(board) == SEMANTIC_SHA
     assert len(board.traceItems) == 39 and len(board.zones) == 2
     proposal = historical_candidate_audit()

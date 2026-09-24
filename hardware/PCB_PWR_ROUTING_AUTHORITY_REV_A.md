@@ -57,8 +57,9 @@ items; its separate application gate passes at CI #736, PCB-PWR Schematic
 #115, and PCB Native #377. Candidate 009 proposes the previously deferred
 U2-constrained upper branch from `C13.1` to `C11.1` as four `3.0 mm` F.Cu
 segments with `0.575 mm` minimum screened foreign-copper clearance. It is not
-applied. Its commit-bound gate passes at CI #740, PCB-PWR Schematic #117,
-and PCB Native #379; explicit owner acceptance remains required.
+applied byte-for-byte for 43 total trace items. Its candidate gate passes at
+CI #740, PCB-PWR Schematic #117 and PCB Native #379; its separate application
+gate is pending.
 
 The
 numeric overlay uses a deliberately conservative 35 µm / 10 °C-rise engineering

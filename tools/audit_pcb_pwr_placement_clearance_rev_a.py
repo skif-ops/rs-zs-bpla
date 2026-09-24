@@ -48,6 +48,7 @@ ECO_002_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e7
 HOT_LOOP_006_SHA256 = "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
 SHUNT_BULK_007_SHA256 = "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b"
 C13_C12_008_SHA256 = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
+C13_C11_009_SHA256 = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
 ECO_002_POSES = {
     "U3": (55.0, 14.0, 90.0),
     "U4": (55.0, 42.0, 90.0),
@@ -301,7 +302,7 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
         footprint = footprints[ref]
         expected = (
             ECO_002_POSES[ref]
-            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256} and ref in ECO_002_POSES
+            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256} and ref in ECO_002_POSES
             else (float(row["X_mm"]), float(row["Y_mm"]),
                   float(row["Rotation_deg"]) % 360.0)
         )
@@ -378,8 +379,8 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
                     })
 
     require((len(board.traceItems), len(board.zones)) in
-            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2)},
-            "PCB-PWR copper exceeds the accepted C13-to-C12 008 successor boundary")
+            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2), (43, 2)},
+            "PCB-PWR copper exceeds the accepted C13-to-C11 009 successor boundary")
 
     minimum = min(observed)
     passed = (not findings and not mounting_body_findings and

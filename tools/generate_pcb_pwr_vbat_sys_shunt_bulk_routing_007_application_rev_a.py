@@ -18,6 +18,7 @@ APPROVAL = ROOT / "hardware/reviews/PCB_PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_APPR
 BASE_SHA = "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
 CANDIDATE_SHA = "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b"
 SUCCESSOR_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
+ACTIVE_SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
 APPROVAL_SHA = "ad5a6f459cd80eebac05d622e361b8e8ea9e9b453176f2f4dc454abc982a87db"
 
 
@@ -51,7 +52,7 @@ def main() -> int:
     args = parser.parse_args()
     payload = accepted_payload()
     if args.check:
-        assert digest(BOARD) in {CANDIDATE_SHA, SUCCESSOR_SHA}, \
+        assert digest(BOARD) in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA}, \
             "authoritative PCB-PWR is not accepted 007 or controlled 008 successor"
     else:
         assert BOARD.read_bytes() == BASE.read_bytes(), "authoritative 006 predecessor differs"

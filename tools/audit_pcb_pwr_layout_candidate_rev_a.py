@@ -34,6 +34,7 @@ ECO_002_SHA256 = "44bbcd77bc3245f5f403361559167ed1fcf5cb5c130806bcc5db97613bb0e7
 HOT_LOOP_006_SHA256 = "9a836eeee73262ac26cf0ec18dae8fee0ecf443f3bafa9767c8f85910287dfd0"
 SHUNT_BULK_007_SHA256 = "bb17dbead2445bcf4464960a83e13302347ce90463928ab09563afb3f0a3876b"
 C13_C12_008_SHA256 = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71e"
+C13_C11_009_SHA256 = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
 ECO_002_POSES = {
     "U3": (55.0, 14.0, 90.0),
     "U4": (55.0, 42.0, 90.0),
@@ -146,7 +147,7 @@ def main() -> int:
         row = by_ref[ref]
         wanted_pose = (
             ECO_002_POSES[ref]
-            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256} and ref in ECO_002_POSES
+            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256} and ref in ECO_002_POSES
             else (float(row["X_mm"]), float(row["Y_mm"]),
                   float(row["Rotation_deg"]) % 360.0)
         )
@@ -208,8 +209,8 @@ def main() -> int:
     board_nets = {net.name for net in board.nets if net.number != 0}
     require(board_nets == expected_nets, "board net set differs from native schematic")
     require((len(board.traceItems), len(board.zones)) in
-            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2)},
-            "PCB-PWR contains copper beyond the accepted C13-to-C12 008 successor")
+            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2), (43, 2)},
+            "PCB-PWR contains copper beyond the accepted C13-to-C11 009 successor")
 
     edges = [item for item in board.graphicItems if getattr(item, "layer", None) == "Edge.Cuts"]
     require(len(edges) == 4, "provisional outline must contain four line segments")
@@ -249,7 +250,7 @@ def main() -> int:
             "PCB-PWR capture-status interlock drift")
 
     print("PCB-PWR EVT placement-candidate independent audit PASS")
-    print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; accepted C13-to-C12 008 successor")
+    print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; accepted C13-to-C11 009 successor")
     print("DIM-003 18/18 EVT accepted; DRC/CAM/Review B/manufacturing remain prohibited")
     return 0
 
