@@ -1399,7 +1399,6 @@ jobs:
           python tools/generate_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py --check
           python tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py \
             --output artifacts/kicad-native/PCB-PWR/vbat_sys_shunt_bulk_routing_007_application_audit.json
-          python tools/generate_pcb_pwr_vbat_sys_c13_c11_routing_009_candidate_rev_a.py --check
           python tools/run_pcb_pwr_c13_c11_009_historical_audit.py \
             --output artifacts/kicad-native/PCB-PWR/vbat_sys_c13_c11_routing_009_static_audit.json
           python tools/generate_pcb_pwr_vbat_sys_c13_c11_routing_009_application_rev_a.py --check
