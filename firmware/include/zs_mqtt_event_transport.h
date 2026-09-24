@@ -20,6 +20,9 @@ typedef struct {
   bool retained;
 } zs_mqtt_event_message_t;
 
+#define ZS_MQTT_EVENT_RECEIPT_HOLD_SLOTS 8u
+#define ZS_MQTT_EVENT_RECEIPT_WAIT_MS 30000u   /* at-least-once: republish only if no receipt within this window */
+
 typedef struct {
   const zs_event_outbox_io_t *outbox;
   uint32_t station_id;
@@ -29,7 +32,17 @@ typedef struct {
   size_t status_topic_size;
   zs_event_receipt_transport_t receipt;
   zs_event_outbox_item_t publication_item;
+  /* Published events wait for the server receipt before they are offered again: without this hold the outbox
+     drain re-sent every event as soon as the broker acknowledged it, until the receipt arrived (RAM only; a
+     reboot simply republishes). */
+  uint32_t now_ms;
+  struct { uint64_t event_id; uint32_t until_ms; bool used; } receipt_hold[ZS_MQTT_EVENT_RECEIPT_HOLD_SLOTS];
 } zs_mqtt_event_transport_t;
+
+/* Clock for the receipt hold (the uplink passes its now_ms before preparing a publication). */
+void zs_mqtt_event_transport_set_time(zs_mqtt_event_transport_t *transport, uint32_t now_ms);
+/* The broker acknowledged the publication prepared last: hold it for ZS_MQTT_EVENT_RECEIPT_WAIT_MS. */
+void zs_mqtt_event_transport_note_published(zs_mqtt_event_transport_t *transport);
 
 typedef enum {
   ZS_MQTT_EVENT_PUBLICATION_READY = 0,

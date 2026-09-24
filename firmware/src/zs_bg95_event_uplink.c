@@ -83,6 +83,7 @@ zs_bg95_event_uplink_start_result_t zs_bg95_event_uplink_start(
     return ZS_BG95_EVENT_UPLINK_OFFLINE;
   }
 
+  zs_mqtt_event_transport_set_time(uplink->transport, now_ms);
   prepared = zs_mqtt_event_transport_prepare(
       uplink->transport, &uplink->publication);
   if (prepared == ZS_MQTT_EVENT_EMPTY)
@@ -104,6 +105,7 @@ zs_bg95_event_uplink_start_result_t zs_bg95_event_uplink_start(
     return ZS_BG95_EVENT_UPLINK_INVALID_ARGUMENT;
   }
 
+  uplink->from_outbox = true;
   uplink->message_id = message_id;
   uplink->last_outcome = ZS_BG95_EVENT_UPLINK_OUTCOME_NONE;
   if (!send_publish_command(uplink)) {
@@ -134,6 +136,7 @@ zs_bg95_event_uplink_start_result_t zs_bg95_event_uplink_start_message(
       message->payload_size > BG95_QMTPUB_MAX_PAYLOAD_BYTES ||
       message->qos != 1u || message->retained)
     return ZS_BG95_EVENT_UPLINK_INVALID_ARGUMENT;
+  uplink->from_outbox = false;
   uplink->publication = *message;
   uplink->message_id = message_id;
   uplink->last_outcome = ZS_BG95_EVENT_UPLINK_OUTCOME_NONE;
@@ -204,6 +207,8 @@ bool zs_bg95_event_uplink_on_line(zs_bg95_event_uplink_t *uplink,
     finish(uplink, ZS_BG95_EVENT_UPLINK_OUTCOME_PROTOCOL_ERROR);
     return true;
   }
+  if (result == 0u && uplink->transport && uplink->from_outbox)
+    zs_mqtt_event_transport_note_published(uplink->transport);          /* wait for the receipt before re-offering it */
   finish(uplink, result == 0u
                      ? ZS_BG95_EVENT_UPLINK_OUTCOME_BROKER_ACK
                      : ZS_BG95_EVENT_UPLINK_OUTCOME_MODEM_REJECTED);

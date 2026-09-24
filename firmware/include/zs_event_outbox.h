@@ -90,6 +90,13 @@ zs_event_outbox_result_t zs_event_outbox_peek(
     const zs_event_outbox_io_t *io,
     zs_event_outbox_item_t *item);
 
+/* Same selection, skipping the items for which `skip` returns true (e.g. published and awaiting the receipt). */
+zs_event_outbox_result_t zs_event_outbox_peek_filtered(
+    const zs_event_outbox_io_t *io,
+    zs_event_outbox_item_t *item,
+    bool (*skip)(void *ctx, const zs_event_outbox_item_t *candidate),
+    void *ctx);
+
 /* Number of stored events not yet acknowledged by the server (heartbeat detector map). */
 zs_event_outbox_result_t zs_event_outbox_pending_count(
     const zs_event_outbox_io_t *io,
