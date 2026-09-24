@@ -21,6 +21,7 @@ enum {
   ZS_CHAR_INSTALLATION_POSITION = 0x0203,
   ZS_CHAR_POSITION_TRUST_POLICY = 0x0204,
   ZS_CHAR_SESSION_ROLE = 0x0205,           /* B.9: installer by pairing, engineer by HMAC challenge */
+  ZS_CHAR_STATION_SECRETS = 0x0206,        /* v0.3: provisioning of the station secrets (write patch / read presence) */
   ZS_CHAR_STATUS = 0x0301,
   ZS_CHAR_GNSS_INTEGRITY = 0x0302,
   ZS_CHAR_SELF_TEST = 0x0303,
@@ -30,7 +31,7 @@ enum {
   ZS_CHAR_OTA_CONTROL = 0x0503
 };
 
-#define ZS_BLE_BRIDGE_CACHE_SLOTS 7u   /* identity, config_read, installation_position, policy, session_role, status, gnss */
+#define ZS_BLE_BRIDGE_CACHE_SLOTS 8u   /* identity, config_read, installation_position, policy, session_role, station_secrets, status, gnss */
 #define ZS_BLE_BRIDGE_CACHE_BYTES 1024u
 #define ZS_BLE_BRIDGE_WRITE_BYTES ZS_BLE_VALUE_MAX
 #define ZS_BLE_BRIDGE_NOTIFY_BYTES ZS_BLE_VALUE_MAX
