@@ -11,7 +11,7 @@
 #include "zs_mqtt_command_transport.h"
 #include <string.h>
 
-typedef enum { COMMS_OFF = 0, COMMS_BRINGUP, COMMS_ENDPOINT, COMMS_SESSION, COMMS_ONLINE, COMMS_FAULT, COMMS_SIM } comms_phase_t;
+typedef enum { COMMS_OFF = 0, COMMS_BRINGUP, COMMS_ENDPOINT, COMMS_SESSION, COMMS_ONLINE, COMMS_FAULT, COMMS_SIM, COMMS_STOPPING } comms_phase_t;
 
 static zs_bg95_t modem;
 static zs_command_trust_t trust;
@@ -29,8 +29,8 @@ static const zs_event_outbox_io_t *outbox_io;
 static const zs_command_journal_io_t *journal_io;
 static app_comms_hooks_t hooks;
 static zs_station_config_t config;
-static bool config_valid, want_on = true, bound;
-static uint32_t boot_id, phase_since_ms, faults, online_count;
+static bool config_valid, want_on = true, modem_allowed, bound, session_reported;
+static uint32_t boot_id, phase_since_ms, faults, online_count, sessions_done, last_outbox_check_ms;
 static comms_phase_t phase;
 static char line[256];
 static size_t line_len;
@@ -99,6 +99,8 @@ void app_comms_bind(const zs_event_outbox_io_t *outbox, const zs_command_journal
 }
 void app_comms_set_config(const zs_station_config_t *cfg, uint32_t id) { if (cfg) { config = *cfg; config_valid = true; boot_id = id; } }
 void app_comms_request(bool on) { want_on = on; }
+void app_comms_allow_modem(bool allowed) { modem_allowed = allowed; }
+static bool wanted(void) { return want_on && modem_allowed; }
 const zs_bg95_t *app_comms_modem(void) { return &modem; }
 const zs_station_comms_t *app_comms_state(void) { return &comms; }
 
@@ -142,6 +144,20 @@ static bool modem_provision(uint32_t now) {
   if (hooks.log) hooks.log("comms: endpoint %s:%u tenant %s\r\n", config.server_host, config.mqtt_port, tenant);
   sim_provisioned = true;
   return true;
+}
+
+/* S3 exit criterion: the session is up, at least one heartbeat went out and nothing waits in the outbox
+   (checked at most every 5 s: it walks the NOR slots). */
+static void check_session_done(uint32_t now) {
+  uint16_t pending = 1u;
+  if (session_reported || !hooks.session_done || comms.heartbeats_published == 0u) return;
+  if ((uint32_t)(now - last_outbox_check_ms) < 5000u) return;
+  last_outbox_check_ms = now;
+  if (zs_event_outbox_pending_count(outbox_io, &pending) == ZS_EVENT_OUTBOX_OK && pending == 0u) {
+    session_reported = true;
+    sessions_done++;
+    hooks.session_done(hooks.ctx);
+  }
 }
 
 /* Bring-up lines go to the modem driver; once the session exists it owns the byte stream. */
@@ -201,7 +217,8 @@ void app_comms_task(void *arg) {
     feed_uart(now);
     switch (phase) {
       case COMMS_OFF:
-        if (want_on && bound && config_valid && config.apn[0][0] != '\0') {
+        if (wanted() && bound && config_valid && config.apn[0][0] != '\0') {
+          session_reported = false;
           modem_prepare();
           if (sim_enabled) {
             /* dual SIM: the orchestrator recovers the board to safe-off first, then brings the preferred slot up */
@@ -225,10 +242,12 @@ void app_comms_task(void *arg) {
         }
         break;
       case COMMS_SIM:
+        if (!wanted()) { if (modem.state >= ZS_BG95_AT_SYNC && modem.state < ZS_BG95_POWERING_OFF) (void)zs_bg95_request_graceful_power_off(&modem, now); set_phase(COMMS_STOPPING); break; }
         sim_phase(now);
         break;
       case COMMS_BRINGUP:
         zs_bg95_tick(&modem, now);
+        if (!wanted()) { (void)zs_bg95_request_graceful_power_off(&modem, now); set_phase(COMMS_STOPPING); break; }
         if (modem.state == ZS_BG95_READY) {
           if (modem_provision(now)) set_phase(COMMS_ENDPOINT);
           else { if (hooks.log) hooks.log("comms: endpoint rejected\r\n"); faults++; set_phase(COMMS_FAULT); }
@@ -236,6 +255,7 @@ void app_comms_task(void *arg) {
         break;
       case COMMS_ENDPOINT:
         zs_bg95_tick(&modem, now);
+        if (!wanted()) { (void)zs_bg95_request_graceful_power_off(&modem, now); set_phase(COMMS_STOPPING); break; }
         if (modem.state == ZS_BG95_ONLINE) {
           if (start_session(tenant)) { set_phase(COMMS_SESSION); if (hooks.log) hooks.log("comms: mqtt online, session starting\r\n"); }
           else { faults++; set_phase(COMMS_FAULT); }
@@ -247,17 +267,35 @@ void app_comms_task(void *arg) {
         zs_bg95_mqtt_session_tick(&session, now, (uint64_t)now * 1000u, false);
         zs_station_comms_tick(&comms, now);
         if (phase == COMMS_SESSION && zs_bg95_mqtt_session_ready(&session)) { online_count++; set_phase(COMMS_ONLINE); }
+        if (phase == COMMS_ONLINE) check_session_done(now);
+        if (!wanted()) { (void)zs_bg95_request_graceful_power_off(&modem, now); set_phase(COMMS_STOPPING); break; }
         if (sim_enabled) {
           /* the orchestrator watches presence; a pulled card or a pending switch takes the modem down under us */
           const evt_pre_20_sim_phase_t ph = evt_pre_20_sim_orchestrator_step(&sim, now);
           if (ph == EVT_PRE_20_SIM_PHASE_CLOSE_TRANSPORT) { evt_pre_20_sim_orchestrator_transport_closed(&sim); set_phase(COMMS_SIM); break; }
           if (ph != EVT_PRE_20_SIM_PHASE_ACTIVE) { set_phase(COMMS_SIM); break; }
           if (modem.state == ZS_BG95_ERROR || !zs_bg95_online(&modem)) { faults++; sim_faults++; evt_pre_20_sim_orchestrator_fail(&sim, ZS_DUAL_SIM_FAILURE_SUSTAINED_LINK_LOSS, now); set_phase(COMMS_SIM); break; }
-          if (!want_on) { (void)zs_bg95_request_graceful_power_off(&modem, now); set_phase(COMMS_FAULT); }
           break;
         }
         if (modem.state == ZS_BG95_ERROR || !zs_bg95_online(&modem)) { faults++; set_phase(COMMS_FAULT); }
-        if (!want_on) { (void)zs_bg95_request_graceful_power_off(&modem, now); set_phase(COMMS_FAULT); }
+        break;
+      case COMMS_STOPPING:
+        /* graceful power-down: QPOWD was requested; confirm on STATUS low (or give up after 5 s), then the rail */
+        zs_bg95_tick(&modem, now);
+        if (modem.state == ZS_BG95_POWERING_OFF) (void)zs_bg95_confirm_power_off(&modem, !bsp_gpio_cell_status());
+        if (sim_enabled) {
+          if (modem.state == ZS_BG95_OFF || (uint32_t)(now - phase_since_ms) > 5000u) {
+            evt_pre_20_sim_orchestrator_shutdown(&sim);                  /* safe-off recovery drops mux and rail */
+            if (evt_pre_20_sim_orchestrator_step(&sim, now) == EVT_PRE_20_SIM_PHASE_SAFE_OFF) { if (hooks.log) hooks.log("comms: modem off (policy)\r\n"); set_phase(COMMS_OFF); }
+          }
+          break;
+        }
+        if (modem.state == ZS_BG95_OFF || (uint32_t)(now - phase_since_ms) > 5000u) {
+          bsp_gpio_modem_power(false);
+          modem.state = ZS_BG95_OFF;
+          if (hooks.log) hooks.log("comms: modem off (policy)\r\n");
+          set_phase(COMMS_OFF);
+        }
         break;
       case COMMS_FAULT:
         zs_bg95_tick(&modem, now);
@@ -273,9 +311,10 @@ void app_comms_task(void *arg) {
 }
 
 void app_comms_status(void (*print)(const char *fmt, ...)) {
-  static const char *const names[] = {"off", "bringup", "endpoint", "session", "online", "fault", "sim"};
-  print("comms %s (%s) faults %lu online %lu | events pub %lu fail %lu exhausted %lu | heartbeats %lu fail %lu\r\n",
-        names[phase], zs_bg95_state_name(modem.state), (unsigned long)faults, (unsigned long)online_count,
+  static const char *const names[] = {"off", "bringup", "endpoint", "session", "online", "fault", "sim", "stopping"};
+  print("comms %s (%s) policy %s%s faults %lu online %lu done %lu | events pub %lu fail %lu exhausted %lu | heartbeats %lu fail %lu\r\n",
+        names[phase], zs_bg95_state_name(modem.state), modem_allowed ? "modem-on" : "modem-off", want_on ? "" : " (operator off)",
+        (unsigned long)faults, (unsigned long)online_count, (unsigned long)sessions_done,
         (unsigned long)comms.events_published, (unsigned long)comms.events_failed, (unsigned long)comms.events_exhausted,
         (unsigned long)comms.heartbeats_published, (unsigned long)comms.heartbeats_failed);
   if (sim_enabled)
