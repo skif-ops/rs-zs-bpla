@@ -84,7 +84,7 @@ file(GLOB ZS_CORE_SOURCES ${ZS_FW_ROOT}/src/zs_*.c)
 list(FILTER ZS_CORE_SOURCES EXCLUDE REGEX "zs_dsp\\.c$")   # double-precision host extractor stays on the host (zs_dsp_mcu on the target); zs_fft.c (float radix-2) serves the AIR gate
 add_library(zs_core_target STATIC ${ZS_CORE_SOURCES})
 target_include_directories(zs_core_target PUBLIC ${ZS_FW_ROOT}/include ${ZS_FW_ROOT}/generated ${ZS_TARGET_ROOT}/include)
-target_compile_options(zs_core_target PRIVATE -Os -Wall -Wextra -Wpedantic)
+target_compile_options(zs_core_target PRIVATE -Os -Wall -Wextra -Wpedantic -fstack-usage)   # .su files for tools/check_stack_usage.py
 
 # ---- application ----
 add_executable(dioneya_evt_pre_20.elf
@@ -111,7 +111,7 @@ add_executable(dioneya_evt_pre_20.elf
 )
 target_include_directories(dioneya_evt_pre_20.elf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${ZS_TARGET_ROOT}/include)
 target_link_libraries(dioneya_evt_pre_20.elf PRIVATE zs_core_target stm32u5_hal freertos_kernel m)
-target_compile_options(dioneya_evt_pre_20.elf PRIVATE -Os -Wall -Wextra -Wpedantic -Werror)
+target_compile_options(dioneya_evt_pre_20.elf PRIVATE -Os -Wall -Wextra -Wpedantic -Werror -fstack-usage)
 target_link_options(dioneya_evt_pre_20.elf PRIVATE
   -T${ZS_TARGET_ROOT}/ld/STM32U585VITXQ_ENGINEERING_FLASH.ld
   -Wl,-Map=${CMAKE_BINARY_DIR}/dioneya_evt_pre_20.map,--print-memory-usage)
