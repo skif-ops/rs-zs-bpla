@@ -11,3 +11,10 @@ PCB is unchanged. Application requires the exact owner decision
 `ACCEPT_PCB_PWR_3V8_OUTPUT_BULK_ROUTING_010_SUBGATE` after commit-bound KiCad 9
 comparative DRC. Review B, CAM/DFM, physical thermal validation and
 manufacturing release remain open.
+
+Commit-bound evidence for proposal commit `e203af7924dbd007a21a3f4cd0bc7fc901a740e2`
+and tree `83ebec4cdd38c95906b3e952a12f335ab46a41eb` passed: CI #751,
+PCB-PWR Schematic #121 and PCB Native #386. KiCad 9 comparative DRC retained
+85 violations, reduced unconnected items from 105 to 101, and introduced zero
+new DRC fingerprints. The evidence artifact is `10802971000`, digest
+`sha256:f84900812fa80350e4da4cbfeb9e5a017d72fc11d4fea4a7a09e1d8f020c1616`.

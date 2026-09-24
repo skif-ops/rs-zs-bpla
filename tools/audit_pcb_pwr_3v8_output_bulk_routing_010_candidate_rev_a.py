@@ -67,9 +67,24 @@ def audit(drc_base: Path | None = None, drc_candidate: Path | None = None) -> di
     clearance = copper_clearance_screen(base, candidate, added, [])
     assert math.isclose(clearance["minimum_edge_clearance_mm"], 0.35, abs_tol=1e-6)
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
+    assert review["base"]["sha256"] == BASE_SHA256
     assert review["candidate"]["sha256"] == CANDIDATE_SHA256
+    assert review["candidate"]["semantic_sha256"] == CANDIDATE_SEMANTIC_SHA256
     assert review["deferred_boundary"]["application_authorized"] is False
     assert review["routing_complete"] is review["review_b_complete"] is review["manufacturing_release"] is False
+    gate = review["machine_gate"]
+    assert gate["status"] in {"PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+                              "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"}
+    if gate["status"].startswith("PASS_"):
+        assert gate["candidate_source_commit_sha"] == "e203af7924dbd007a21a3f4cd0bc7fc901a740e2"
+        assert gate["candidate_source_tree_sha"] == "83ebec4cdd38c95906b3e952a12f335ab46a41eb"
+        assert gate["ci_run_number"] == 751 and gate["ci_run_id"] == 35986953239
+        assert gate["pcb_pwr_schematic_run_number"] == 121 and gate["pcb_pwr_schematic_run_id"] == 35986953246
+        assert gate["pcb_native_run_number"] == 386 and gate["pcb_native_run_id"] == 35986953171
+        assert gate["pcb_native_job_id"] == 107591764546
+        assert gate["artifact_id"] == 10802971000
+        assert gate["artifact_digest"] == "sha256:f84900812fa80350e4da4cbfeb9e5a017d72fc11d4fea4a7a09e1d8f020c1616"
+        assert gate["comparative_drc"] == "PASS_85_TO_85_VIOLATIONS_105_TO_101_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA"
     result = {"status": "PASS_STATIC_PCB_PWR_3V8_OUTPUT_BULK_ROUTING_010_CANDIDATE",
               "base_sha256": BASE_SHA256, "candidate_sha256": CANDIDATE_SHA256,
               "candidate_semantic_sha256": CANDIDATE_SEMANTIC_SHA256,

@@ -31,7 +31,19 @@
     "evt_stackup_basis_sha256": "c417669cab385eb702c53a1912ad5973bda3ca0fec8cbc5c3e331a511178afad"
   },
   "machine_gate": {
-    "status": "PENDING_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC"
+    "status": "PASS_COMMIT_BOUND_CI_AND_PCB_NATIVE_COMPARATIVE_DRC",
+    "candidate_source_commit_sha": "e203af7924dbd007a21a3f4cd0bc7fc901a740e2",
+    "candidate_source_tree_sha": "83ebec4cdd38c95906b3e952a12f335ab46a41eb",
+    "ci_run_number": 751,
+    "ci_run_id": 35986953239,
+    "pcb_pwr_schematic_run_number": 121,
+    "pcb_pwr_schematic_run_id": 35986953246,
+    "pcb_native_run_number": 386,
+    "pcb_native_run_id": 35986953171,
+    "pcb_native_job_id": 107591764546,
+    "artifact_id": 10802971000,
+    "artifact_digest": "sha256:f84900812fa80350e4da4cbfeb9e5a017d72fc11d4fea4a7a09e1d8f020c1616",
+    "comparative_drc": "PASS_85_TO_85_VIOLATIONS_105_TO_101_UNCONNECTED_ZERO_DRC_FINGERPRINT_DELTA"
   },
   "deferred_boundary": {
     "application_authorized": false,
