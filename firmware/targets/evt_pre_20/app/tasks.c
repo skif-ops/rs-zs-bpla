@@ -517,10 +517,13 @@ static void console_exec(const char *cmd) {
     app_comms_status(console_printf);
   } else if (strcmp(cmd, "comms on") == 0 || strcmp(cmd, "comms off") == 0) {
     app_comms_request(cmd[6] == 'o' && cmd[7] == 'n');
+  } else if (strncmp(cmd, "simiccid ", 9u) == 0) {
+    const unsigned slot = (unsigned)(cmd[9] - '0');
+    console_printf(app_comms_set_sim_iccid(slot, cmd[10] == ' ' ? cmd + 11 : "") ? "simiccid: slot %u set\r\n" : "simiccid <1|2> <18..22 digits>: slot %u not set\r\n", slot);
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey nrfimg nrfupd comms [on|off] heap\r\n");
+    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey nrfimg nrfupd comms [on|off] simiccid heap\r\n");
   }
 }
 
