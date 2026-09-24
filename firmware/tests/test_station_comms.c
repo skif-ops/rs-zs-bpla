@@ -165,13 +165,17 @@ int main(void) {
   ack_publish(&C, 202u);
   assert(C.session.owner == ZS_BG95_MQTT_OWNER_NONE);
 
-  /* accounted, then the heartbeat on the status topic (the item stays pending until the server receipt) */
+  /* accounted; the item stays pending until the server receipt but is NOT re-offered meanwhile (receipt hold,
+     ZS_MQTT_EVENT_RECEIPT_WAIT_MS): the heartbeat goes out instead of a duplicate publish */
   mark = C.fixture.uart_size;
   zs_station_comms_tick(&C.comms, 300u);
   assert(C.comms.events_published == 1u && C.comms.last_event_outcome == ZS_BG95_EVENT_UPLINK_OUTCOME_BROKER_ACK);
-  /* the outbox still holds the item (no receipt yet) -> it is retried before the heartbeat */
-  assert(C.comms.activity == ZS_STATION_COMMS_EVENT_IN_FLIGHT);
-  ack_publish(&C, 301u);
+  assert(C.comms.activity == ZS_STATION_COMMS_HEARTBEAT_IN_FLIGHT);
+  assert(strstr(last_command(&C, mark), ",1,0,\"zs/v1/evt/17/status\",") != NULL);
+  feed_prompt(&C, 301u);
+  { char line[32]; snprintf(line, sizeof(line), "+QMTPUB: 0,%u,0", C.uplink.message_id); feed_line(&C, "OK", 302u); feed_line(&C, line, 303u); }
+  zs_station_comms_tick(&C.comms, 303u);
+  assert(C.comms.heartbeats_published == 1u && C.comms.activity == ZS_STATION_COMMS_IDLE);
   /* deliver the server receipt: the slot is reclaimed */
   {
     uint8_t frame[256]; int n = snprintf((char *)frame, sizeof(frame), "+QMTRECV: 0,10,\"%.*s\",%zu,\"",
@@ -184,26 +188,21 @@ int main(void) {
     zs_event_outbox_item_t pending;
     assert(zs_event_outbox_peek(&C.event_outbox, &pending) == ZS_EVENT_OUTBOX_EMPTY);
   }
-  mark = C.fixture.uart_size;
+  /* the receipt arrived: nothing to publish, the next heartbeat is due one period after the first */
   zs_station_comms_tick(&C.comms, 400u);
-  assert(C.comms.events_published == 2u && C.comms.activity == ZS_STATION_COMMS_HEARTBEAT_IN_FLIGHT);
-  assert(strstr(last_command(&C, mark), ",1,0,\"zs/v1/evt/17/status\",") != NULL);
+  assert(C.comms.events_published == 1u && C.comms.activity == ZS_STATION_COMMS_IDLE);
   assert(C.fixture.heartbeats_filled == 1u && C.comms.heartbeat_message.payload_size > 100u && C.comms.heartbeat_payload[0] == 0xadu);   /* map(13) */
-  mark = C.fixture.uart_size;
-  feed_prompt(&C, 401u);
-  assert(C.fixture.uart_size == mark + C.comms.heartbeat_message.payload_size && memcmp(&C.fixture.uart[mark], C.comms.heartbeat_payload, C.comms.heartbeat_message.payload_size) == 0);
-  { char line[32]; snprintf(line, sizeof(line), "+QMTPUB: 0,%u,0", C.uplink.message_id); feed_line(&C, "OK", 402u); feed_line(&C, line, 403u); }
   zs_station_comms_tick(&C.comms, 500u);
-  assert(C.comms.heartbeats_published == 1u && C.comms.activity == ZS_STATION_COMMS_IDLE && C.comms.next_heartbeat_ms == 60400u);
+  assert(C.comms.heartbeats_published == 1u && C.comms.activity == ZS_STATION_COMMS_IDLE && C.comms.next_heartbeat_ms == 60300u);
   /* nothing due before the period */
   zs_station_comms_tick(&C.comms, 30000u);
   assert(C.comms.activity == ZS_STATION_COMMS_IDLE && C.fixture.heartbeats_filled == 1u);
 
   /* period elapsed: heartbeat; the modem rejects -> counted, retried after the backoff */
-  zs_station_comms_tick(&C.comms, 60400u);
+  zs_station_comms_tick(&C.comms, 60300u);
   assert(C.comms.activity == ZS_STATION_COMMS_HEARTBEAT_IN_FLIGHT && C.fixture.heartbeats_filled == 2u);
-  feed_line(&C, "ERROR", 60401u);
-  zs_station_comms_tick(&C.comms, 60402u);
+  feed_line(&C, "ERROR", 60301u);
+  zs_station_comms_tick(&C.comms, 60302u);
   assert(C.comms.heartbeats_failed == 1u && C.comms.last_heartbeat_outcome == ZS_BG95_EVENT_UPLINK_OUTCOME_MODEM_REJECTED && C.comms.activity == ZS_STATION_COMMS_IDLE);
   zs_station_comms_tick(&C.comms, 62000u);                                 /* inside the 5 s backoff */
   assert(C.comms.activity == ZS_STATION_COMMS_IDLE);
