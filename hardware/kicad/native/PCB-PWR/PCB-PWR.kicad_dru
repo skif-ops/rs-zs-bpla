@@ -1,0 +1,13 @@
+(version 1)
+
+# PCB-PWR ECO-004 (customer decision 2026-09-24: outer copper 1 oz).
+# The TI LMR60440 RAK0009A board pattern (SNAS877) places pins 6/7 0.125 mm from
+# the GND centre pad 2. This limit applies only between two items of the same
+# regulator footprint (U3 or U4); every route approaching U3/U4 keeps the board
+# default. Valid for 1 oz outer copper only (JLCPCB multilayer minimum 0.09 mm);
+# with 2 oz outer copper the fabricator minimum is about 0.2 mm and this rule
+# would be invalid. Review B and checkout DFM confirm before FOR_MANUFACTURE.
+(rule "LMR60440 TI land pattern (1 oz outer)"
+  (condition "(A.memberOfFootprint('U3') && B.memberOfFootprint('U3')) || (A.memberOfFootprint('U4') && B.memberOfFootprint('U4'))")
+  (constraint clearance (min 0.12mm))
+)
