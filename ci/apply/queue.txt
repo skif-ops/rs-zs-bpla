@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-25: evidence probe - historical PCB-PWR DRC with the pre-011 vs current project (no design change)
-tools/apply_pcb_pwr_netclass_historical_drc_probe_rev_a.py
