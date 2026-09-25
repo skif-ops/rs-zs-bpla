@@ -49,16 +49,17 @@ def main() -> int:
     assert "session done -> COMMS_DONE" in log
     print(f"scenario 1 (drone over GSM): detections {r['detections']}, heartbeats {r['heartbeats']}, duplicates {r['duplicates']}")
 
-    log, r = run(["--scene", "quiet", "--seconds", "1400", "--seed", "3", "--gsm-outage", "5", "1200", "--lora", "--lora-loss", "0.3",
+    # 1600 s: the boot session starts just before the outage and runs into the S3 watchdog, which shifts the whole
+    # degraded -> probe cycle by three minutes; the probe after the network returns lands at ~1450 s
+    log, r = run(["--scene", "quiet", "--seconds", "1600", "--seed", "3", "--gsm-outage", "5", "1200", "--lora", "--lora-loss", "0.3",
                   "--degraded-after", "2", "--gsm-probe-s", "300", "--inject-events", "12", "30", "--expect-delivered", "12"])
     assert r["lora_detections"] == 12 and r["unique_event_ids"] == 12 and r["decode_errors"] == 0, r
     assert r["duplicates"] == r["lora_frames"] - 12 or r["duplicates"] == 0, r   # a late duplicate frame is deduped, never double-counted
     assert "DEGRADED" in log and "link healthy again" in log, "degraded -> LoRa -> probe -> healthy cycle missing"
     print(f"scenario 2 (LoRa during a GSM outage): lora frames {r['lora_frames']}, delivered {r['lora_detections']}, duplicates {r['duplicates']}")
 
-    # one synthetic event opens the session (a quiet station otherwise first connects after its heartbeat period)
-    log, r = run(["--scene", "quiet", "--seconds", "90", "--seed", "3", "--inject-events", "1", "5", "--expect-delivered", "1",
-                  "--expect-commands", "2", "--expect-reboots", "1"],
+    # the boot session delivers the queue (no event needed); after the commanded reboot the station connects again
+    log, r = run(["--scene", "quiet", "--seconds", "90", "--seed", "3", "--expect-commands", "2", "--expect-reboots", "1"],
                  commands="set_params,reboot,reboot_again")
     sent, acks = r["commands_sent"], r["acks"]
     assert [c["command"] for c in sent] == ["CMD_SET_PARAMS", "CMD_REBOOT", "CMD_REBOOT"], sent
@@ -69,7 +70,11 @@ def main() -> int:
     assert log.count("command: REBOOT in 10 s") == 1 and "twin: REBOOT by command, params v1 reloaded" in log
     reboot_line = next(l for l in log.splitlines() if "twin: REBOOT by command" in l)
     assert log.index("command: REBOOT in 10 s") < log.index(reboot_line)
-    print(f"scenario 3 (remote commands): sent {len(sent)}, acks {[a['result'] for a in acks]}, one reboot, params survived it")
+    after_reboot = log[log.index(reboot_line):]
+    assert "session done -> COMMS_DONE" in after_reboot, "the station must connect right after the reboot (boot session)"
+    assert r["heartbeats"] >= 2, r["heartbeats"]                       # one per boot
+    print(f"scenario 3 (remote commands): sent {len(sent)}, acks {[a['result'] for a in acks]}, one reboot, params survived it, "
+          f"reconnected after the reboot ({r['heartbeats']} heartbeats)")
     return 0
 
 

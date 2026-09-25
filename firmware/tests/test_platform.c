@@ -15,6 +15,17 @@ static void test_power_modes(void) {
   zs_mode_transition_t j[ZS_MODE_JOURNAL_DEPTH];
   uint32_t t = 1000u;
   pol.listen_dwell_ms = 3000u; pol.min_sleep_ms = 2000u; pol.heartbeat_period_ms = 100000u;
+  assert(pol.boot_session);
+  /* boot session (default): self-check listen window, then a comms session, then the normal cycle */
+  zs_mode_init(&s, &pol, t);
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_BOOT_DONE, t) && s.mode == ZS_MODE_S1_LISTEN);
+  assert(!zs_mode_tick(&s, t + 2999u));
+  assert(zs_mode_tick(&s, t + 3000u) && s.mode == ZS_MODE_S3_COMMS);
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_COMMS_DONE, t + 8000u) && s.mode == ZS_MODE_S1_LISTEN);
+  assert(zs_mode_tick(&s, t + 11000u) && s.mode == ZS_MODE_S0_SLEEP);           /* once: no second session */
+  assert(!zs_mode_tick(&s, t + 12000u) && s.mode == ZS_MODE_S0_SLEEP);
+  /* the rest of the cycle without the boot session */
+  pol.boot_session = false;
   zs_mode_init(&s, &pol, t);
   assert(zs_mode_current(&s) == ZS_MODE_S0_SLEEP);
   /* boot -> listen -> nothing -> sleep */
