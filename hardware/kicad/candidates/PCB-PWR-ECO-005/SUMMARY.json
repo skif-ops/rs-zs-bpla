@@ -4,9 +4,104 @@
   "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
   "local_clearance_screen": "PASS",
   "manufacturing_release": false,
+  "text_removal": {
+    "segment": 38,
+    "via": 2,
+    "zone": 1
+  },
   "stage": {
-    "rc": 1,
-    "stdout": "swig/python detected a memory leak of type 'PCB_TRACK *', no destructor found.\n",
-    "stderr": "\n30ff91259e4e: Verifying Checksum\n30ff91259e4e: Download complete\n6fe7b24cfb8f: Verifying Checksum\n6fe7b24cfb8f: Download complete\nd0b76b7e8d80: Verifying Checksum\nd0b76b7e8d80: Download complete\nd0b76b7e8d80: Pull complete\ne64c2316cd50: Pull complete\n207ac5616789: Pull complete\n46f0bfc95fd9: Pull complete\nf8f12f6f970e: Pull complete\nf36d0dc2d7bb: Pull complete\naab27c973195: Pull complete\nfd5a0db17ede: Pull complete\n898e32f0e177: Pull complete\n591202fea89c: Pull complete\n30ff91259e4e: Pull complete\n6fe7b24cfb8f: Pull complete\nDigest: sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\nStatus: Downloaded newer image for ghcr.io/kicad/kicad@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\nTraceback (most recent call last):\n  File \"/w/tools/pcb_pwr_eco_005_stage_rev_a.py\", line 112, in <module>\n    apply(sys.argv[2], sys.argv[3], sys.argv[4])\n  File \"/w/tools/pcb_pwr_eco_005_stage_rev_a.py\", line 51, in apply\n    hits = [t for t in live_tracks() if t.GetClass() == \"PCB_TRACK\" and t.GetNetname() == item[\"net\"]\n                       ^^^^^^^^^^^^^\n  File \"/w/tools/pcb_pwr_eco_005_stage_rev_a.py\", line 47, in live_tracks\n    return list(board.GetTracks())\n                ^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3/dist-packages/pcbnew.py\", line 20412, in GetTracks\n    def GetTracks(self):              return list(self.Tracks())\n                                             ^^^^^^^^^^^^^^^^^^^\nTypeError: 'SwigPyObject' object is not iterable\n"
-  }
+    "rc": 0,
+    "stdout": "{\"rotated\": [\"NT2\"], \"removed_tracks\": 0, \"removed_vias\": 0, \"removed_zones\": 0, \"added_zones\": 1, \"added_items\": 13}\n",
+    "stderr": "c5616789: Waiting\n46f0bfc95fd9: Waiting\nf8f12f6f970e: Waiting\nf36d0dc2d7bb: Waiting\naab27c973195: Waiting\nfd5a0db17ede: Waiting\n898e32f0e177: Waiting\n591202fea89c: Waiting\n30ff91259e4e: Waiting\n6fe7b24cfb8f: Waiting\n26996d003dd4: Verifying Checksum\n26996d003dd4: Download complete\ne64c2316cd50: Verifying Checksum\ne64c2316cd50: Download complete\n46f0bfc95fd9: Download complete\n207ac5616789: Verifying Checksum\n207ac5616789: Download complete\nf36d0dc2d7bb: Verifying Checksum\nf36d0dc2d7bb: Download complete\naab27c973195: Download complete\nfd5a0db17ede: Verifying Checksum\nfd5a0db17ede: Download complete\n898e32f0e177: Verifying Checksum\n898e32f0e177: Download complete\n591202fea89c: Verifying Checksum\n591202fea89c: Download complete\nf8f12f6f970e: Download complete\n30ff91259e4e: Verifying Checksum\n30ff91259e4e: Download complete\n6fe7b24cfb8f: Download complete\nd0b76b7e8d80: Verifying Checksum\nd0b76b7e8d80: Download complete\n26996d003dd4: Pull complete\nd0b76b7e8d80: Pull complete\ne64c2316cd50: Pull complete\n207ac5616789: Pull complete\n46f0bfc95fd9: Pull complete\nf8f12f6f970e: Pull complete\nf36d0dc2d7bb: Pull complete\naab27c973195: Pull complete\nfd5a0db17ede: Pull complete\n898e32f0e177: Pull complete\n591202fea89c: Pull complete\n30ff91259e4e: Pull complete\n6fe7b24cfb8f: Pull complete\nDigest: sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\nStatus: Downloaded newer image for ghcr.io/kicad/kicad@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\n"
+  },
+  "drc_rc": 0,
+  "dump_rc": 0,
+  "drc": {
+    "error_total": 1,
+    "unconnected_total": 0,
+    "by_type": {
+      "error:hole_clearance": 1,
+      "warning:via_dangling": 1,
+      "warning:lib_footprint_issues": 66,
+      "warning:silk_over_copper": 41,
+      "warning:silk_overlap": 17
+    },
+    "errors": [
+      [
+        "hole_clearance",
+        "Polygon [<no net>] of NT2 on F.Cu",
+        "Via [GND_PWR] on F.Cu - B.Cu"
+      ]
+    ],
+    "unconnected": []
+  },
+  "return_cross_sections": [
+    {
+      "probe": "GND_MODEM J2.2->vias",
+      "layer": "B.Cu",
+      "net": "GND_MODEM",
+      "min_width_mm": 0.0,
+      "at_mm": [
+        77.2,
+        43.0
+      ],
+      "samples": 23
+    },
+    {
+      "probe": "GND_MODEM vias->NT1",
+      "layer": "F.Cu",
+      "net": "GND_MODEM",
+      "min_width_mm": 0.892,
+      "at_mm": [
+        74.0,
+        42.3
+      ],
+      "samples": 8
+    },
+    {
+      "probe": "GND_DIGITAL J2.4->NT2",
+      "layer": "F.Cu",
+      "net": "GND_DIGITAL",
+      "min_width_mm": 0.0,
+      "at_mm": [
+        77.45,
+        48.3
+      ],
+      "samples": 15
+    },
+    {
+      "probe": "GND_PWR NT1 east",
+      "layer": "F.Cu",
+      "net": "GND_PWR",
+      "min_width_mm": 0.0,
+      "at_mm": [
+        77.15,
+        40.12
+      ],
+      "samples": 4
+    },
+    {
+      "probe": "GND_PWR NT2 west",
+      "layer": "F.Cu",
+      "net": "GND_PWR",
+      "min_width_mm": 0.635,
+      "at_mm": [
+        73.8,
+        48.52
+      ],
+      "samples": 5
+    },
+    {
+      "probe": "GND_PWR NT3 east",
+      "layer": "F.Cu",
+      "net": "GND_PWR",
+      "min_width_mm": 1.651,
+      "at_mm": [
+        77.0,
+        51.55
+      ],
+      "samples": 4
+    }
+  ],
+  "candidate_sha256": "14df311b679881936ec8fb6f444dccaa12c85c2cc904e2b0aa5d45cdd6ac5895"
 }
