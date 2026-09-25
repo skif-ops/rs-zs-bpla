@@ -69,6 +69,9 @@
 #define APP_DSP_QUIET_WINDOWS        6u       /* S2 -> DSP_DONE_NOTHING after this many windows at level NONE (3 s at the 0.5 s hop) */
 #define APP_OUTBOX_RETRY_MS          300000u  /* pending events after a failed S3: first retry after 5 min, doubling */
 #define APP_OUTBOX_RETRY_MAX_MS      3600000u /* ... up to once an hour, until a session completes */
+#define APP_COMMS_DEGRADED_AFTER     3u       /* consecutive S3 sessions ended by the watchdog -> GSM degraded */
+#define APP_COMMS_MAX_DEGRADED_MS    60000u   /* S3 watchdog while degraded (default policy: 180 s) */
+#define APP_GSM_PROBE_MS             1800000u /* while degraded: try GSM again every 30 min (capped S3) */
 
 /* NVIC priorities (0 = highest). FreeRTOS syscall ceiling is 5: ISRs at 5..15 may call FromISR APIs. */
 #define APP_IRQ_PRIO_TIM2_PPS        4   /* timestamp capture: above the RTOS ceiling, no RTOS calls inside */
