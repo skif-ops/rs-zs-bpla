@@ -7,8 +7,9 @@ resistance; THT pads are equipotential on both layers. The source pad is held at
 pad at 0 V; R = 1 V / total source current.
 
 Assumptions (stated in every result): outer copper 35 um finished (1 oz, ECO-004 stack-up),
-rho = 1.724e-8 ohm*m at 20 C (x1.20 at 70 C), via barrel 1.75093 mOhm (0.6/0.3 mm, 20 um wall,
-Review B R1 finding 1 figure). Net-tie bridges are not part of the path (the sink is the domain pad).
+rho = 1.724e-8 ohm*m at 20 C (x1.197 at 70 C), via barrel 1.75093 mOhm AT 70 C (0.6/0.3 mm, 20 um
+wall, Review B R1 finding 1 figure; entered into the 20 C network as 1.75093/1.197 so that the
+x1.197 scaling of the result does not count it twice). Net-tie bridges are not part of the path.
 """
 
 from __future__ import annotations
@@ -43,7 +44,11 @@ def _reference(fp) -> str:
 
 
 def resistance(board_path: str, net: str, source: tuple[str, str], sink: tuple[str, str],
-               window: tuple[float, float, float, float]) -> dict:
+               window: tuple[float, float, float, float], probes: list | None = None,
+               drop: list | None = None, r_via_ohm: float | None = None) -> dict:
+    """probes: [(label, layer, [(x, y), (x, y)])] cut lines; the result gives the share of the
+    total current crossing each cut. drop: [(layer, (x0, y0), (x1, y1))] tracks left out.
+    source/sink: one (ref, pad) or a list of them. r_via_ohm: barrel resistance at 70 C."""
     import numpy as np
     import scipy.sparse as sp
     import scipy.sparse.linalg as spl
@@ -71,6 +76,10 @@ def resistance(board_path: str, net: str, source: tuple[str, str], sink: tuple[s
             if type(item).__name__ == "Via":
                 parts.append(Point(item.position.X, item.position.Y).buffer(item.size / 2))
             elif item.layer == layer:
+                if drop and any(d[0] == layer and {tuple(d[1]), tuple(d[2])} ==
+                                {(round(item.start.X, 4), round(item.start.Y, 4)),
+                                 (round(item.end.X, 4), round(item.end.Y, 4))} for d in drop):
+                    continue
                 parts.append(LineString([(item.start.X, item.start.Y), (item.end.X, item.end.Y)]).buffer(item.width / 2))
         for fp in board.footprints:
             for pad in fp.pads:
@@ -78,11 +87,18 @@ def resistance(board_path: str, net: str, source: tuple[str, str], sink: tuple[s
                     geometry = _pad_geometry(fp, pad)
                     parts.append(geometry)
                     pads[layer].append(((_reference(fp), str(pad.number)), geometry))
-        copper = prepared.prep(unary_union(parts))
-        for j in range(ny):
-            for i in range(nx):
-                if copper.contains(Point(x0 + (i + 0.5) * CELL_MM, y0 + (j + 0.5) * CELL_MM)):
-                    index[(li, j, i)] = len(index)
+        union = unary_union(parts)
+        xs = x0 + (np.arange(nx) + 0.5) * CELL_MM
+        ys = y0 + (np.arange(ny) + 0.5) * CELL_MM
+        gx, gy = np.meshgrid(xs, ys)
+        try:
+            from shapely import contains_xy
+            mask = contains_xy(union, gx, gy)
+        except ImportError:  # shapely < 2
+            copper = prepared.prep(union)
+            mask = np.array([[copper.contains(Point(x, y)) for x in xs] for y in ys])
+        for j, i in zip(*np.nonzero(mask)):
+            index[(li, int(j), int(i))] = len(index)
     n = len(index)
     rows, cols, vals = [], [], []
 
@@ -121,14 +137,16 @@ def resistance(board_path: str, net: str, source: tuple[str, str], sink: tuple[s
             for k in group[1:]:
                 link(group[0], k, 1e3)  # annular ring: equipotential
         if top and bottom:
-            link(top[0], bottom[0], 1 / R_VIA_OHM)
+            link(top[0], bottom[0], TEMP_FACTOR_70C / (r_via_ohm or R_VIA_OHM))  # 70 C value -> 20 C basis
             vias += 1
+    sources = source if isinstance(source, list) else [source]
+    sinks = sink if isinstance(sink, list) else [sink]
     src, snk = [], []
     for li, layer in enumerate(layers):
         for key, geometry in pads[layer]:
-            if key == source:
+            if key in sources:
                 src += cells(geometry, li)
-            if key == sink:
+            if key in sinks:
                 snk += cells(geometry, li)
     assert src and snk, f"{net}: source/sink pad has no copper cells"
     matrix = sp.csr_matrix((vals, (rows, cols)), shape=(n, n))
@@ -142,9 +160,32 @@ def resistance(board_path: str, net: str, source: tuple[str, str], sink: tuple[s
     volts[free] = spl.spsolve(matrix[free][:, free].tocsc(), rhs)
     current = float((matrix @ volts)[src].sum())
     r20 = 1.0 / current
-    return {"net": net, "from": f"{source[0]}.{source[1]}", "to": f"{sink[0]}.{sink[1]}",
+    shares = {}
+    for label, layer, line in probes or []:
+        li = layers.index(layer)
+        cut = LineString(line)
+        bx0, by0, bx1, by1 = cut.bounds
+        flow = 0.0
+        for j in range(max(0, int((by0 - y0) / CELL_MM) - 2), min(ny, int((by1 - y0) / CELL_MM) + 2)):
+            for i in range(max(0, int((bx0 - x0) / CELL_MM) - 2), min(nx, int((bx1 - x0) / CELL_MM) + 2)):
+                k = index.get((li, j, i))
+                if k is None:
+                    continue
+                for dj, di in ((0, 1), (1, 0)):
+                    other = index.get((li, j + dj, i + di))
+                    if other is None:
+                        continue
+                    a = (x0 + (i + 0.5) * CELL_MM, y0 + (j + 0.5) * CELL_MM)
+                    b = (x0 + (i + di + 0.5) * CELL_MM, y0 + (j + dj + 0.5) * CELL_MM)
+                    if LineString([a, b]).intersects(cut):
+                        side = ((line[1][0] - line[0][0]) * (a[1] - line[0][1])
+                                - (line[1][1] - line[0][1]) * (a[0] - line[0][0]))
+                        flow += (1 if side > 0 else -1) * g_sheet * (volts[k] - volts[other])
+        shares[label] = round(abs(float(flow)) / current, 4)
+    label = lambda ends: "+".join(f"{r}.{n}" for r, n in (ends if isinstance(ends, list) else [ends]))  # noqa: E731
+    return {"net": net, "from": label(source), "to": label(sink),
             "vias_in_path_region": vias, "r_mohm_20c": round(r20 * 1e3, 3),
-            "r_mohm_70c": round(r20 * TEMP_FACTOR_70C * 1e3, 3)}
+            "r_mohm_70c": round(r20 * TEMP_FACTOR_70C * 1e3, 3), **({"current_share": shares} if probes else {})}
 
 
 def load_case(result: dict, i_peak_a: float, i_cont_a: float | None = None) -> dict:
