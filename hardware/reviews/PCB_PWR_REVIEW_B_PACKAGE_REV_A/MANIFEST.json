@@ -1,0 +1,118 @@
+{
+  "schema": "dioneya-pcb-pwr-review-b-package-v1",
+  "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
+  "board_sha256": "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578",
+  "rules_sha256": "66bcf32aa0869eea2520d4feb053e25bd3f0ae14cef7d112b218868901fa9c26",
+  "project_sha256": "c2e65e384d09e7761100f7cfd68510a2ec63cd3c8500cb23774127b06beddfa8",
+  "steps": [
+    {
+      "step": "drc_report",
+      "command": "kicad-cli pcb drc --format report --severity-all -o hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_A/PCB-PWR_drc.rpt build/review_b_src/PCB-PWR/PCB-PWR.kicad_pcb",
+      "rc": 0,
+      "stderr_tail": "91259e4e: Waiting\n898e32f0e177: Waiting\n591202fea89c: Waiting\n207ac5616789: Waiting\ne64c2316cd50: Verifying Checksum\ne64c2316cd50: Download complete\n26996d003dd4: Verifying Checksum\n26996d003dd4: Download complete\n46f0bfc95fd9: Verifying Checksum\n46f0bfc95fd9: Download complete\n207ac5616789: Verifying Checksum\n207ac5616789: Download complete\nf36d0dc2d7bb: Verifying Checksum\nf36d0dc2d7bb: Download complete\nd0b76b7e8d80: Verifying Checksum\nd0b76b7e8d80: Download complete\nf8f12f6f970e: Verifying Checksum\nf8f12f6f970e: Download complete\naab27c973195: Verifying Checksum\naab27c973195: Download complete\nfd5a0db17ede: Verifying Checksum\nfd5a0db17ede: Download complete\n898e32f0e177: Verifying Checksum\n898e32f0e177: Download complete\n591202fea89c: Verifying Checksum\n591202fea89c: Download complete\n30ff91259e4e: Verifying Checksum\n30ff91259e4e: Download complete\n26996d003dd4: Pull complete\n6fe7b24cfb8f: Verifying Checksum\n6fe7b24cfb8f: Download complete\nd0b76b7e8d80: Pull complete\ne64c2316cd50: Pull complete\n207ac5616789: Pull complete\n46f0bfc95fd9: Pull complete\nf8f12f6f970e: Pull complete\nf36d0dc2d7bb: Pull complete\naab27c973195: Pull complete\nfd5a0db17ede: Pull complete\n898e32f0e177: Pull complete\n591202fea89c: Pull complete\n30ff91259e4e: Pull complete\n6fe7b24cfb8f: Pull complete\nDigest: sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\nStatus: Downloaded newer image for ghcr.io/kicad/kicad@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\n"
+    },
+    {
+      "step": "drc_json",
+      "command": "kicad-cli pcb drc --format json --severity-all -o hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_A/PCB-PWR_drc.json build/review_b_src/PCB-PWR/PCB-PWR.kicad_pcb",
+      "rc": 0,
+      "stderr_tail": ""
+    },
+    {
+      "step": "copper_pdf",
+      "command": "kicad-cli pcb export pdf -o hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_A/copper-pdf --layers F.Cu,In1.Cu,In2.Cu,B.Cu --common-layers Edge.Cuts --mode-multipage --include-border-title --drill-shape-opt 2 build/review_b_src/PCB-PWR/PCB-PWR.kicad_pcb",
+      "rc": 0,
+      "stderr_tail": ""
+    },
+    {
+      "step": "assembly_pdf",
+      "command": "kicad-cli pcb export pdf -o hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_A/assembly-pdf --layers F.Fab,F.Silkscreen,B.Fab,B.Silkscreen --common-layers Edge.Cuts --mode-multipage --sketch-pads-on-fab-layers --include-border-title --drill-shape-opt 2 build/review_b_src/PCB-PWR/PCB-PWR.kicad_pcb",
+      "rc": 0,
+      "stderr_tail": ""
+    },
+    {
+      "step": "render_top",
+      "command": "kicad-cli pcb render -o hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_A/PCB-PWR_top.png --side top --width 1800 --height 1300 --quality basic build/review_b_src/PCB-PWR/PCB-PWR.kicad_pcb",
+      "rc": 0,
+      "stderr_tail": ""
+    },
+    {
+      "step": "render_bottom",
+      "command": "kicad-cli pcb render -o hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_A/PCB-PWR_bottom.png --side bottom --width 1800 --height 1300 --quality basic build/review_b_src/PCB-PWR/PCB-PWR.kicad_pcb",
+      "rc": 0,
+      "stderr_tail": ""
+    },
+    {
+      "step": "schematic_pdf",
+      "command": "kicad-cli sch export pdf -o hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_A/PCB-PWR_schematic.pdf build/review_b_src/PCB-PWR/PCB-PWR.kicad_sch",
+      "rc": 0,
+      "stderr_tail": ""
+    },
+    {
+      "step": "gerbers",
+      "command": "kicad-cli pcb export gerbers -o hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_A/gerber/ build/review_b_src/PCB-PWR/PCB-PWR.kicad_pcb",
+      "rc": 0,
+      "stderr_tail": ""
+    },
+    {
+      "step": "drill",
+      "command": "kicad-cli pcb export drill -o hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_A/drill/ --format excellon --generate-map build/review_b_src/PCB-PWR/PCB-PWR.kicad_pcb",
+      "rc": 0,
+      "stderr_tail": ""
+    },
+    {
+      "step": "pos",
+      "command": "kicad-cli pcb export pos --format csv --units mm --side both -o hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_A/PCB-PWR_pos.csv build/review_b_src/PCB-PWR/PCB-PWR.kicad_pcb",
+      "rc": 0,
+      "stderr_tail": ""
+    },
+    {
+      "step": "ipcd356",
+      "command": "kicad-cli pcb export ipcd356 -o hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_A/PCB-PWR.d356 build/review_b_src/PCB-PWR/PCB-PWR.kicad_pcb",
+      "rc": 0,
+      "stderr_tail": ""
+    }
+  ],
+  "outputs": {
+    "PCB-PWR.d356": "c4a164504410f1912f9439c97cdb2804d1f4b59823129a38bebdeb9231cafae0",
+    "PCB-PWR_assembly.pdf": "a79bed4033d1f26c8807c9cb9615d9cb232f1e35bad10fe4b34924378b9a237b",
+    "PCB-PWR_bottom.png": "bfe8906caa79b558f5c67030f1713425c47011e63a9f847693ca9fa0c6df3b85",
+    "PCB-PWR_copper_layers.pdf": "f131e74e16a3ee59f02b8fa48bc89283599d560d793c7886c7b88b4c6813949b",
+    "PCB-PWR_drc.json": "148aa8133b8fcc298af259209b0c493123770a9c0f2d4c02b869118d31a4652a",
+    "PCB-PWR_drc.rpt": "345fef333ada1ee67575da0306d342bbe181c96c1d12b6ece1fa4aaef4156a5c",
+    "PCB-PWR_pos.csv": "7fb58f7e9af57dc6f8c8bb80ec2852a02ed42576e69f8d824c6cc963edf1f24a",
+    "PCB-PWR_schematic.pdf": "6e7dfe366fb3a4a3f518cbe19f20bb24ee5a6e7b0c20bb9a8de2dd7e5893fff6",
+    "PCB-PWR_top.png": "c967c6d473062a4fac0f13b8bcbf4a8e9cd9d583ec2e04ad9b715150f88d6d64",
+    "POWER_COPPER_WIDTH.json": "76dbb5f8f5397ebacdc060a42aa347006d86c1c1f7a78f028bb8a6eea8e5551f",
+    "REVIEW_B_CHECKLIST.md": "9afe0cd0053ee58031bfa4fd012dc443b507250b1a4261bf5d1340ffa60cdcec",
+    "drill/PCB-PWR-drl_map.pdf": "2981a1a50230bfce4b0ec7c833a7f3b3cdf8eb9d386122ef2cfd09d6fb756345",
+    "drill/PCB-PWR.drl": "8a16dfd80a17eef05d086f96002b7940b8da56fa9f05d188d8d36a722a6fb496",
+    "gerber/PCB-PWR-B_Adhesive.gba": "cc89af8db733a8989a881616acbeb526fedb1ad64235b9b44c45b8c91790c799",
+    "gerber/PCB-PWR-B_Courtyard.gbr": "854f7cd317b51753b6bf27b386cb212d26727af46c3d40bec1be47614d208270",
+    "gerber/PCB-PWR-B_Cu.gbl": "5260c731b641d319e9a6ecf31d013dfbfc1e1c84e11df8db795fe16a72e152a0",
+    "gerber/PCB-PWR-B_Fab.gbr": "f5a6ccd8807786a679543fc50c77ca0674ab490c1ec2d5ad6b6fa10036221d88",
+    "gerber/PCB-PWR-B_Mask.gbs": "8202b40cbb182c2141d410f525a06c0c3d1b6073f316c486abf15c3ba0459f86",
+    "gerber/PCB-PWR-B_Paste.gbp": "6cda221f4bfb4bea298696b838320fa7918e1817adcf6975f7dc20d9cd7c10c1",
+    "gerber/PCB-PWR-B_Silkscreen.gbo": "42886fccfad03cecbe69848d99ee6b4a48d0b25379049960312745f94fc729a6",
+    "gerber/PCB-PWR-Edge_Cuts.gm1": "115db6e4129336161d4d3bc4948ca131db47be76297daac3e231f20cbf48b633",
+    "gerber/PCB-PWR-F_Adhesive.gta": "06e877a4df89a7ebecd9d62367cb85cd87ef9e0260f6dd48693fe406399e63a0",
+    "gerber/PCB-PWR-F_Courtyard.gbr": "dd47b00611b48da2d1bd4397f1f0c28ef46b3c21688d4eae47e0c3d932c8ec6b",
+    "gerber/PCB-PWR-F_Cu.gtl": "5c96272373425acc8c6a6fb7210ab225764e7a7241f80344c9e1e5f83655f638",
+    "gerber/PCB-PWR-F_Fab.gbr": "75d409e8a79e42649cfc8f23d5b47142fa8b7a2ebddbd487a8204d6d356d82e1",
+    "gerber/PCB-PWR-F_Mask.gts": "aae18cf5524a83b2a3d06f7917e4e3116566e921767f81be000d4dc736df329a",
+    "gerber/PCB-PWR-F_Paste.gtp": "31632c3f9616b117ee77fd82ceb6a42d97a2ffbff0c72f2f83fd185548933333",
+    "gerber/PCB-PWR-F_Silkscreen.gto": "9d7d1b16f1659bb89315d3372a3cf7cc79f3988f2e5e7fc17f13abf3b30da9c0",
+    "gerber/PCB-PWR-In1_Cu.g1": "a67f404ab1ec469e6cbb0b2aabd8ed91f2b726166f30ec958500c374da64bb9d",
+    "gerber/PCB-PWR-In2_Cu.g2": "1553519eec7da6cec29d68ec0c0f3b1ec89dcfe26d8cbd5dc4bc75e3f8315363",
+    "gerber/PCB-PWR-Margin.gbr": "854f7cd317b51753b6bf27b386cb212d26727af46c3d40bec1be47614d208270",
+    "gerber/PCB-PWR-User_1.gbr": "854f7cd317b51753b6bf27b386cb212d26727af46c3d40bec1be47614d208270",
+    "gerber/PCB-PWR-User_2.gbr": "854f7cd317b51753b6bf27b386cb212d26727af46c3d40bec1be47614d208270",
+    "gerber/PCB-PWR-User_3.gbr": "854f7cd317b51753b6bf27b386cb212d26727af46c3d40bec1be47614d208270",
+    "gerber/PCB-PWR-User_4.gbr": "854f7cd317b51753b6bf27b386cb212d26727af46c3d40bec1be47614d208270",
+    "gerber/PCB-PWR-User_Comments.gbr": "cce792ecc3391e8e9ffe8170fc9170cbe40a39828c5e8fd5d97871ddced7e35f",
+    "gerber/PCB-PWR-User_Drawings.gbr": "7d3a94a734e85517129e9659cbd9592a1ca6a93734547c79adc76c4c10c89f4b",
+    "gerber/PCB-PWR-User_Eco1.gbr": "ee0f3c2bdd43f6b4ccb31e72bd113a619e2fce7ce75c2ecdf9de9bf6060aa36b",
+    "gerber/PCB-PWR-User_Eco2.gbr": "c1d1922ef86dec89d40e44505fbff7cbd1a392f5aeca672b543a8093f8c6473a",
+    "gerber/PCB-PWR-job.gbrjob": "0a17339d28263d7bb61173631f92b895c9e7ddfb236ced609b704c47ccb7ef78"
+  },
+  "manufacturing_release": false
+}
