@@ -1,0 +1,2 @@
+# Queued by Claude 2026-09-25: PCB-PWR autoroute candidate 011, run 13 (ground vias under U1/U2, NT3 ground link, gap-fill fixes)
+tools/apply_pcb_pwr_autoroute_candidate_rev_a.py
