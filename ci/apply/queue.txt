@@ -1,0 +1,3 @@
+# Queued by Claude 2026-09-25: PCB-PWR ECO-005 application (audit chain, then exact board + library, native DRC)
+tools/apply_pcb_pwr_eco_005_audit_chain_rev_a.py
+tools/apply_pcb_pwr_eco_005_rev_a.py
