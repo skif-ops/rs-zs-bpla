@@ -28,11 +28,24 @@ import hashlib
 import json
 import re
 import shutil
+import subprocess
 import sys
 import uuid
 from collections import Counter
 from pathlib import Path
 
+
+def _bootstrap() -> None:
+    """numpy / shapely / kiutils before the geometry modules are imported (a fresh ci-apply runner has none)."""
+    try:
+        import kiutils  # noqa: F401
+        import numpy  # noqa: F401
+        import shapely  # noqa: F401
+    except ImportError:
+        subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "numpy", "shapely>=2", "kiutils"], check=True)
+
+
+_bootstrap()
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import apply_pcb_main_ground_domain_routing_002_candidate_rev_a as g2  # noqa: E402
