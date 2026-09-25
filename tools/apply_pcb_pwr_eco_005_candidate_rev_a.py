@@ -13,8 +13,8 @@ Delta (nets, netlist and net-tie count unchanged; no new domain join):
     (NT1/NT3 keep their orientation: C17/C19 and C7/C8 GND_PWR pads bound them);
   - removed: the GND_MODEM 0.25 mm router track and single via, the GND_DIGITAL 0.4 mm track,
     the 0.3 mm GND_PWR stubs and via on NT2;
-  - GND_MODEM: B.Cu return band from J2.2 and F.Cu zone at NT1 re-created with solid pad
-    connection, joined by 3 same-net vias 0.6/0.3 (the 3V8 J2->TP4 test-point branch, no load
+  - GND_MODEM: existing B.Cu return band from J2.2 and F.Cu zone at NT1 (solid pad
+    connection), joined by 3 same-net vias 0.6/0.3 (the 3V8 J2->TP4 test-point branch, no load
     current, is narrowed 1.0 -> 0.3 mm next to J2 to free the via window);
   - GND_DIGITAL: F.Cu zone with solid pad connection from J2.4 straight to the rotated NT2;
   - GND_MIC (0.3 A class): second via 0.6/0.3 beside the existing one;
@@ -113,18 +113,12 @@ def build_spec() -> dict:
     shapely()
     board = Board.from_file(str(BOARD))
     names = {net.number: net.name for net in board.nets}
-    modem_f = zone_polygon(board, "GND_MODEM", "F.Cu", (74.0, 41.0))
-    modem_b = zone_polygon(board, "GND_MODEM", "B.Cu", (76.0, 43.0))
     spec = {"rotate": [{"ref": "NT2", "angle_deg": 180}],
             "remove_tracks": [], "remove_vias": [],
-            "remove_zones": [{"net": "GND_MODEM", "layer": "F.Cu", "contains": [74.0, 41.0]},
-                             {"net": "GND_MODEM", "layer": "B.Cu", "contains": [76.0, 43.0]},
-                             {"net": "GND_DIGITAL", "layer": "F.Cu", "contains": [78.0, 47.0]}],
-            "add_zones": [  # same outlines, solid pad connection (THT J2 pins and tie pads)
-                {"net": "GND_MODEM", "layer": "F.Cu", "priority": 16, "clearance_mm": 0.3, "polygon": modem_f},
-                {"net": "GND_MODEM", "layer": "B.Cu", "priority": 15, "clearance_mm": 0.3, "polygon": modem_b},
-                {"net": "GND_DIGITAL", "layer": "F.Cu", "priority": 14, "clearance_mm": 0.3,
-                 "polygon": GND_DIGITAL_ZONE}],
+            # the GND_MODEM zones already connect pads solidly (connect_pads yes) and stay as they are
+            "remove_zones": [{"net": "GND_DIGITAL", "layer": "F.Cu", "contains": [78.0, 47.0]}],
+            "add_zones": [{"net": "GND_DIGITAL", "layer": "F.Cu", "priority": 14, "clearance_mm": 0.3,
+                           "polygon": GND_DIGITAL_ZONE}],
             "add_items": []}
     for item in board.traceItems:
         net = names.get(item.net)
@@ -146,6 +140,66 @@ def build_spec() -> dict:
         + [("track", "B.Cu", "3V8_MODEM", 0.3, [a, b]) for a, b in TP4_BRANCH]
         + GND_MIC_SECOND_VIA)
     return spec
+
+
+def remove_text(text: str, spec: dict) -> tuple[str, dict]:
+    """Remove the exact (segment|via|zone) blocks of the spec from the board text; every other
+    byte is kept. Each requested removal must match exactly one block."""
+    import re
+
+    _, Point, Polygon, _ = shapely()
+    nets = {int(m.group(1)): m.group(2) for m in re.finditer(r'^\t\(net (\d+) "([^"]*)"\)$', text, re.M)}
+    lines = text.split("\n")
+    blocks = []  # (kind, first_line, last_line)
+    i = 0
+    while i < len(lines):
+        m = re.fullmatch(r"\t\((segment|via|zone)", lines[i])
+        if m:
+            j = i + 1
+            while lines[j] != "\t)":
+                j += 1
+            blocks.append((m.group(1), i, j))
+            i = j + 1
+        else:
+            i += 1
+
+    def field(body: str, name: str):
+        m = re.search(r"\(" + name + r" ([^()]*)\)", body)
+        return m.group(1) if m else None
+
+    def num_pair(value: str):
+        a, b = value.split()[:2]
+        return float(a), float(b)
+
+    doomed, counts = set(), {"segment": 0, "via": 0, "zone": 0}
+    for kind, a, b in blocks:
+        body = "\n".join(lines[a:b + 1])
+        net = nets.get(int(field(body, "net").split()[0]))
+        if kind == "segment":
+            start, end = num_pair(field(body, "start")), num_pair(field(body, "end"))
+            layer = field(body, "layer").strip('"')
+            hits = [r for r in spec["remove_tracks"] if r["net"] == net and r["layer"] == layer and (
+                (math.dist(start, r["start"]) < 0.01 and math.dist(end, r["end"]) < 0.01)
+                or (math.dist(start, r["end"]) < 0.01 and math.dist(end, r["start"]) < 0.01))]
+        elif kind == "via":
+            at = num_pair(field(body, "at"))
+            hits = [r for r in spec["remove_vias"] if r["net"] == net and math.dist(at, r["pos"]) < 0.01]
+        else:
+            layer = (field(body, "layer") or "").strip('"')
+            outline = body[body.index("(polygon"):] if "(polygon" in body else ""
+            outline = outline[:outline.index("(filled_polygon")] if "(filled_polygon" in outline else outline
+            pts = [(float(x), float(y)) for x, y in re.findall(r"\(xy ([-\d.]+) ([-\d.]+)\)", outline)]
+            hits = [r for r in spec["remove_zones"] if r["net"] == net and r["layer"] == layer and len(pts) >= 3
+                    and Polygon(pts).buffer(0).contains(Point(*r["contains"]))]
+        if hits:
+            assert len(hits) == 1
+            doomed.add((a, b))
+            counts[kind] += 1
+    expected = {"segment": len(spec["remove_tracks"]), "via": len(spec["remove_vias"]),
+                "zone": len(spec["remove_zones"])}
+    assert counts == expected, f"text removal matched {counts}, expected {expected}"
+    keep = [line for index, line in enumerate(lines) if not any(a <= index <= b for a, b in doomed)]
+    return "\n".join(keep), counts
 
 
 def check_additions(spec: dict) -> list[str]:
@@ -251,18 +305,21 @@ def generate() -> None:
                "manufacturing_release": False}
     if not problems:
         base = WORK / f"{STEM}.kicad_pcb"
-        shutil.copyfile(BOARD, base)
+        text, counts = remove_text(BOARD.read_text(encoding="utf-8"), spec)
+        base.write_text(text, encoding="utf-8")
+        summary["text_removal"] = counts
         shutil.copyfile(NATIVE / "PCB-PWR.kicad_pro", WORK / f"{STEM}.kicad_pro")
         shutil.copyfile(NATIVE / "PCB-PWR.kicad_dru", WORK / f"{STEM}.kicad_dru")
-        shutil.copyfile(OUT / "ECO_005_SPEC.json", WORK / "spec.json")
+        stage_spec = {k: v for k, v in spec.items() if not k.startswith("remove_")}
+        (WORK / "spec.json").write_text(json.dumps(stage_spec), encoding="utf-8")
         rel = WORK.relative_to(ROOT)
-        stage = docker("python3", "tools/pcb_pwr_eco_005_stage_rev_a.py", "apply", f"{rel}/{STEM}.kicad_pcb",
+        stage = docker("/usr/bin/python3", "tools/pcb_pwr_eco_005_stage_rev_a.py", "apply", f"{rel}/{STEM}.kicad_pcb",
                        f"{rel}/spec.json", f"{rel}/{STEM}.kicad_pcb")
         summary["stage"] = {"rc": stage.returncode, "stdout": stage.stdout[-800:], "stderr": stage.stderr[-1500:]}
         if stage.returncode == 0:
             drc = docker("kicad-cli", "pcb", "drc", "--format", "json", "--severity-all",
                          "-o", f"{rel}/drc.json", f"{rel}/{STEM}.kicad_pcb")
-            dump = docker("python3", "tools/pcb_pwr_eco_005_stage_rev_a.py", "dump", f"{rel}/{STEM}.kicad_pcb",
+            dump = docker("/usr/bin/python3", "tools/pcb_pwr_eco_005_stage_rev_a.py", "dump", f"{rel}/{STEM}.kicad_pcb",
                           f"{rel}/geometry.json")
             summary["drc_rc"], summary["dump_rc"] = drc.returncode, dump.returncode
             docker("chmod", "-R", "a+rwX", str(rel))
