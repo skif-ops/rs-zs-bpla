@@ -11,9 +11,11 @@ every further one in reply to the previous ACK.  Commands are signed with the re
 (tools/generate_command_set_vector.py), valid from one second before the station's wall clock for ten minutes.  Every line gets exactly one reply (a message or ``OK``) so the twin's simulated time stays deterministic
 regardless of wall-clock scheduling.  Audio (addendum B): with ``ZS_TWIN_AUDIO=<pre|post|both>`` the first detection
 over GSM is answered with its receipt and, on a second line, a signed ``CMD_REQUEST_AUDIO`` for that event (the
-auto-request policy for confirmed detections); the chunks on the audio topic are assembled and verified with the real
-``AudioAssembler`` (``ZS_TWIN_WAV_DIR`` also writes the WAV files; ``ZS_TWIN_AUDIO_REDELIVER=1`` answers the first
-chunk with the same request envelope again, as a QoS 1 redelivery would).  A final ``REPORT`` line summarises what arrived.
+auto-request policy of mqtt_bridge.request_event_audio); the request is a command of a real ``EventStore`` and the
+chunks on the audio topic go through the bridge's ``ingest_audio_chunk`` (authorisation against the request, parts in
+SQLite, SHA-256, WAV on disk; ``ZS_TWIN_WAV_DIR`` keeps the store and the WAV files, a temporary directory otherwise;
+``ZS_TWIN_AUDIO_REDELIVER=1`` answers the first chunk with the same request envelope again, as a QoS 1 redelivery
+would).  A final ``REPORT`` line summarises what arrived.
 Run by the twin: ``python3 -m twin.twin_server`` from the server/ directory.
 """
 from __future__ import annotations
@@ -22,14 +24,18 @@ import hashlib
 import json
 import os
 import sys
+import tempfile
 import uuid
+from pathlib import Path
 
-from station import audio_chunk_codec
 from station import cbor_codec
 from station import lora_codec
 from station.command_codec import CommandSigner, decode_command_ack, encode_signed_command
 from station.event_receipt_codec import EventReceipt, encode_event_receipt
+from station.audio_ingest import ingest_audio_chunk
+from station.mqtt_bridge import request_event_audio
 from station.schemas import StationCommand
+from station.store import EventStore
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 # The twin station's engineer key (the registry would hold it per station); the LoRa key derives from it.
@@ -77,20 +83,23 @@ def main() -> int:
     out = sys.stdout
     audio_segment = os.environ.get("ZS_TWIN_AUDIO", "")
     wav_dir = os.environ.get("ZS_TWIN_WAV_DIR", "")
-    assembler = audio_chunk_codec.AudioAssembler()
+    store_dir = Path(wav_dir) if wav_dir else Path(tempfile.mkdtemp(prefix="zs_twin_"))
+    event_store = EventStore(store_dir / "twin.sqlite3") if audio_segment else None
     audio_chunks = 0
+    audio_duplicates = 0
     audio_segments: list[dict] = []
     audio_requested: list[dict] = []
     audio_envelopes: dict[str, bytes] = {}
     redeliver = os.environ.get("ZS_TWIN_AUDIO_REDELIVER", "") == "1"
 
-    def request_audio(event_id: int) -> str:
+    def request_audio(detection) -> str:
         """A signed CMD_REQUEST_AUDIO for the event, sent right after its receipt (second reply line)."""
-        command_id = str(uuid.uuid4())
-        envelope = encode_signed_command(StationCommand(
-            command_id=command_id, station_id=int(down_topic.split("/")[3]), command="CMD_REQUEST_AUDIO",
-            payload={"event_id": event_id, "segment": audio_segment},
-            created_time_us=wall_us - 1_000_000, expires_time_us=wall_us + 600_000_000), signer)
+        cmd = request_event_audio(detection, segment=audio_segment, min_gap_us=120_000_000, now_us=wall_us, event_store=event_store)
+        if cmd is None:
+            return ""
+        command_id, event_id = cmd.command_id, detection.event_id
+        envelope = encode_signed_command(cmd.model_copy(update={
+            "created_time_us": wall_us - 1_000_000, "expires_time_us": wall_us + 600_000_000}), signer)
         commands_sent.append({"command_id": command_id, "command": "CMD_REQUEST_AUDIO"})
         audio_requested.append({"command_id": command_id, "event_id": event_id, "segment": audio_segment})
         audio_envelopes[command_id] = envelope
@@ -143,12 +152,19 @@ def main() -> int:
             out.flush()
             continue
         if parts[0] == "REPORT":
+            audio_store = None
+            if event_store is not None and audio_requested:
+                req = audio_requested[0]
+                record = event_store.command_record(req["command_id"])
+                audio_store = {"acked": record["acked"], "ack_result": record["ack_result"], "ack_detail": record["ack_detail"],
+                               "pending_parts": sum(n for n, _ in event_store.audio_upload_progress(int(down_topic.split("/")[3]), req["command_id"]).values())}
             report = {
+                "audio_store": audio_store,
                 "commands_sent": commands_sent, "acks": acks,
                 "detections": len(detections), "unique_event_ids": len(seen_event_ids), "duplicates": duplicates,
                 "heartbeats": len(heartbeats), "decode_errors": decode_errors,
                 "lora_frames": lora_frames, "lora_detections": lora_detections,
-                "audio_requested": audio_requested, "audio_chunks": audio_chunks, "audio_duplicates": assembler.duplicates,
+                "audio_requested": audio_requested, "audio_chunks": audio_chunks, "audio_duplicates": audio_duplicates,
                 "audio_segments": audio_segments,
                 "last_heartbeat": heartbeats[-1] if heartbeats else None,
                 "events": detections[:20],
@@ -177,24 +193,29 @@ def main() -> int:
                                        payload_sha256=hashlib.sha256(payload).digest())
                 reply = f"PUB {prefix}/{tenant}/{station}/receipt {encode_event_receipt(receipt).hex()}\n"
                 if audio_segment and down_topic and not audio_requested and not dup:
-                    reply += request_audio(d.event_id) + "\n"
+                    request = request_audio(d)
+                    if request:
+                        reply += request + "\n"
                 out.write(reply); out.flush()
             elif kind == "ack":
                 a = decode_command_ack(payload)
                 acks.append({"command_id": a.command_id, "result": a.result_code, "detail": a.detail_code,
                              "completed_time_us": a.completed_time_us})
+                if event_store is not None and event_store.command_record(a.command_id) is not None:
+                    event_store.ack_command(a.station_id, a.command_id, a.result_code, a.detail_code, a.completed_time_us)
                 out.write(next_command() + "\n"); out.flush()
             elif kind == "audio":
                 audio_chunks += 1
-                seg = assembler.add(audio_chunk_codec.decode_chunk(payload))
-                if seg is not None:
-                    audio_segments.append({"event_id": seg.event_id, "segment": seg.segment, "sample_rate": seg.sample_rate,
-                                           "start_time_us": seg.start_time_us, "seconds": len(seg.pcm) / seg.sample_rate,
-                                           "adpcm_bytes": len(seg.adpcm), "command_id": uuid.UUID(bytes=seg.command_id).hex})
-                    if wav_dir:
-                        path = os.path.join(wav_dir, f"event_{seg.event_id}_{seg.segment}.wav")
-                        with open(path, "wb") as f:
-                            f.write(audio_chunk_codec.pcm_to_wav(seg.pcm, seg.sample_rate))
+                status = ingest_audio_chunk(payload, int(station), event_store=event_store, now_us=wall_us)
+                audio_duplicates += status in ("duplicate", "already")
+                if status == "complete":
+                    event_id = audio_requested[0]["event_id"]
+                    done = {r["segment"] for r in audio_segments}
+                    for row in event_store.list_audio(int(station), event_id):
+                        if row["segment"] not in done:
+                            audio_segments.append({"event_id": event_id, "segment": row["segment"], "sample_rate": row["sample_rate"],
+                                                   "start_time_us": row["start_time_us"], "seconds": row["duration_ms"] / 1000,
+                                                   "path": row["path"], "command_id": row["command_id"]})
                 if redeliver and audio_chunks == 1 and audio_requested:
                     command_id = audio_requested[0]["command_id"]
                     commands_sent.append({"command_id": command_id, "command": "CMD_REQUEST_AUDIO"})
