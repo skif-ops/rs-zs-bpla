@@ -61,7 +61,7 @@ PASSES = 150
 #   on B.Cu to R1/R5/R10/R9, EN_MODEM corridor, NT2 net-tie exits, DNP I2C
 #   pull-ups R13/R14 and test point TP9 (TP10 is left to the routers), 3V3 links C7->R13/R14 and
 #   R15/U2->C5; GND_PWR of U1 pin 2 and U2 pins 1/2 to vias under the package
-#   bodies, NT3 GND_PWR pad to the NT2 ground via.
+#   bodies, NT3 GND_PWR pad to the NT2 ground via, R2 (FB divider) ground via.
 PREROUTE = [
     ('track', 'F.Cu', '3V3_DIGITAL', 0.2, [(46.2, 24.0), (47.7, 24.0)]),
     ('via', None, '3V3_DIGITAL', 0.6, [(47.7, 24.0)]),
@@ -158,6 +158,8 @@ PREROUTE = [
     ('track', 'F.Cu', 'GND_PWR', 0.3, [(42.3, 22.0), (42.8, 21.5), (44.4, 21.5)]),
     ('via', None, 'GND_PWR', 0.6, [(44.4, 21.5)]),
     ('track', 'F.Cu', 'GND_PWR', 0.3, [(76.6, 48.52), (76.6, 51.5), (76.1, 52.0)]),
+    ('track', 'F.Cu', 'GND_PWR', 0.3, [(59.01, 19.0), (59.01, 19.9)]),
+    ('via', None, 'GND_PWR', 0.6, [(59.01, 19.9)]),
 ]
 TIE_STRIPS = ["NT2"]
 # Mounting holes H1..H4 (native board) for the gap-fill router keepouts, and the
