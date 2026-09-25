@@ -93,7 +93,8 @@ def dump(src: str, dst: str) -> None:
             drill = pad.GetDrillSize()
             if drill.x > 0:
                 holes.append({"owner": f"{ref}.{pad.GetNumber()}", "at": row["at"], "d_mm": mm(min(drill.x, drill.y)),
-                              "plated": pad.GetAttribute() == pcbnew.PAD_ATTRIB_PTH, "kind": "pad"})
+                              "plated": pad.GetAttribute() == pcbnew.PAD_ATTRIB_PTH, "kind": "pad",
+                              "net": pad.GetNetname()})
             pads.append(row)
         items = list(fp.GraphicalItems()) + [fp.Reference(), fp.Value()]
         for item in items:
@@ -110,7 +111,8 @@ def dump(src: str, dst: str) -> None:
         if is_via:
             holes.append({"owner": f"via@{mm(track.GetPosition().x)},{mm(track.GetPosition().y)}",
                           "at": [mm(track.GetPosition().x), mm(track.GetPosition().y)],
-                          "d_mm": mm(track.GetDrillValue()), "plated": True, "kind": "via"})
+                          "d_mm": mm(track.GetDrillValue()), "plated": True, "kind": "via",
+                          "net": track.GetNetname()})
     for zone in board.Zones():
         if zone.GetIsRuleArea():
             continue

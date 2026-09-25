@@ -103,6 +103,18 @@ def measure(data: dict) -> dict:
             if side in p["paste"]:
                 paste_by_ref[p["ref"]].append(geom(p["paste"][side]))
         mask_by_pad = {name(p): g for p, g in masks}
+        mask_by_ref = defaultdict(list)
+        for p, g in masks:
+            mask_by_ref[p["ref"]].append(g)
+
+        def opening_of(pad, copper_geom):
+            """The pad's own opening, or the footprint openings (mask-only pads) exposing its copper."""
+            own = mask_by_pad.get(name(pad))
+            if own is not None and not own.is_empty:
+                return own, "OWN"
+            from shapely.ops import unary_union
+            parts = [g for g in mask_by_ref[pad["ref"]] if not g.is_empty and g.intersects(copper_geom)]
+            return (unary_union(parts), "FOOTPRINT_MASK_DEFINED") if parts else (None, "NONE")
 
         def paste_of(pad, copper_geom):
             parts = [g for g in paste_by_ref[pad["ref"]] if not g.is_empty and g.intersects(copper_geom)]
@@ -120,13 +132,16 @@ def measure(data: dict) -> dict:
                     continue
                 gap = ga.distance(gb)
                 if gap < REQ["smd_pad_to_pad_mm"][0]:
-                    ma, mb = mask_by_pad.get(name(pa)), mask_by_pad.get(name(pb))
+                    (ma, ka), (mb, kb) = opening_of(pa, ga), opening_of(pb, gb)
                     sa, sb = paste_of(pa, ga), paste_of(pb, gb)
                     rows["A_smd_pad_to_pad"].append({
                         "side": side, "a": name(pa), "b": name(pb), "net_a": pa["net"], "net_b": pb["net"],
                         "gap_mm": round(gap, 4),
                         "mask_expansion_mm": [pa["mask_expansion_mm"].get(side), pb["mask_expansion_mm"].get(side)],
+                        "mask_opening_kind": [ka, kb],
                         "mask_dam_mm": round(ma.distance(mb), 4) if ma is not None and mb is not None else None,
+                        "exposed_copper_gap_mm": round(ga.intersection(ma).distance(gb.intersection(mb)), 4)
+                        if ma is not None and mb is not None else None,
                         "paste_gap_mm": round(sa.distance(sb), 4) if sa is not None and sb is not None else None,
                         "paste_area_mm2": [round(sa.area, 4) if sa is not None else 0.0,
                                            round(sb.area, 4) if sb is not None else 0.0],
@@ -220,7 +235,8 @@ def measure(data: dict) -> dict:
             else:
                 limit, key = REQ["pad_hole_to_hole_mm"][0], "F_pad_hole_to_hole"
             if edge < limit:
-                rows[key].append({"a": a["owner"], "b": b["owner"], "edge_mm": round(edge, 4)})
+                rows[key].append({"a": a["owner"], "b": b["owner"], "net_a": a.get("net"), "net_b": b.get("net"),
+                                  "d_mm": [a["d_mm"], b["d_mm"]], "edge_mm": round(edge, 4)})
     return rows
 
 
