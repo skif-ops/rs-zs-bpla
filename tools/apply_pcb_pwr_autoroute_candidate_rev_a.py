@@ -300,7 +300,11 @@ def pour_spec(segments: list[dict]) -> dict:
     return {"thicken": thicken, "ground_net": GROUND["net"], "ground_pour_layers": GROUND["layers"],
             "pour_inset_mm": GROUND["inset_mm"], "pour_clearance_mm": GROUND["clearance_mm"],
             "stitch_pitch_mm": GROUND["stitch_pitch_mm"], "stitch_keep_mm": GROUND["stitch_keep_mm"],
-            "hole_refs": HOLE_KEEPOUTS["refs"], "hole_keep_mm": HOLE_KEEPOUTS["radius_mm"] + 0.3}
+            "hole_refs": HOLE_KEEPOUTS["refs"], "hole_keep_mm": HOLE_KEEPOUTS["radius_mm"] + 0.3,
+            "preroute_segments": [[layer, net, a[0], a[1], b[0], b[1]]
+                                  for kind, layer, net, _, points in PREROUTE if kind == "track"
+                                  for a, b in zip(points, points[1:])],
+            "preroute_vias": [[net, points[0][0], points[0][1]] for kind, _, net, _, points in PREROUTE if kind == "via"]}
 
 
 def gap_fill(board: Path, rel) -> dict:
