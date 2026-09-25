@@ -89,6 +89,10 @@
 /* Command validity (ICD §2.1): network time (NITZ) stands in for GNSS this long after it was read (tick drift is
    LSE-locked, ~0.2 s/h). */
 #define APP_COMMAND_NETWORK_TIME_MAX_MS 86400000u
+/* Remote commands (ICD addendum D): minimum delay between the reboot ACK and the reset; runtime parameter record in
+   the last APP_PARAMS_NOR_BLOCKS erase blocks of the nRF image partition (128 blocks, MCUboot needs 119). */
+#define APP_REBOOT_MIN_DELAY_S       5u
+#define APP_PARAMS_NOR_BLOCKS        2u
 
 /* NVIC priorities (0 = highest). FreeRTOS syscall ceiling is 5: ISRs at 5..15 may call FromISR APIs. */
 #define APP_IRQ_PRIO_TIM2_PPS        4   /* timestamp capture: above the RTOS ceiling, no RTOS calls inside */
