@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-25: PCB-MAIN supplier requests name the applied 003 board (controlled review recorded)
-tools/apply_pcb_main_requests_active_state_003_rev_a.py

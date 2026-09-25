@@ -39,11 +39,21 @@ Independent audit:
 | Footprint-review register | `e1fa9f08d8e055c57240b0cdef11a404f367926a5bbe29909ca13994a2c2f09b` |
 
 The bound SHA above is the historical pre-route request basis. The active native
-successor is SHA-256
-`2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273`
-with 1023 trace items and eight copper zones; routing remains incomplete. No
-Gerber, paste Gerber, centroid or assembly drawing is released by this packet.
-Any footprint or board-byte change requires a new controlled review.
+board is SHA-256
+`30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739`
+(PCB-MAIN inner reroute 003, accepted and applied 2026-09-25) with 1069 trace items
+and ten copper zones; routing remains incomplete. No Gerber, paste Gerber, centroid
+or assembly drawing is released by this packet; centroid and paste come from
+controlled CAM of the native board after DRC. Any footprint or board-byte change
+requires a new controlled review.
+
+Controlled review of 003 for this subgate: the `U2`, `U25`, `U26` and `U9`
+footprint blocks (position, rotation, lands, mask, paste, nets) are byte-identical
+in the 003 board and its predecessor
+`2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273`;
+003 moves only `R9`, `R10` and `R11` (0402, 22 ohm) and reroutes non-impedance-
+controlled OctoSPI/SDIO/EN_MODEM runs. The accepted process baseline and the
+closed response register are unaffected.
 
 ## Historical response identity rule
 
