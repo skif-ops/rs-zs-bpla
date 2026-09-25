@@ -24,6 +24,25 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c) {
   __HAL_RCC_I2C2_CLK_ENABLE();
 }
 
+void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi) {
+  GPIO_InitTypeDef g = {0};
+  if (hspi->Instance != SPI1) return;
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  g.Pin = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7;             /* SCK, MISO, MOSI; NSS (PA4) is a GPIO */
+  g.Mode = GPIO_MODE_AF_PP;
+  g.Pull = GPIO_NOPULL;
+  g.Speed = GPIO_SPEED_FREQ_HIGH;
+  g.Alternate = GPIO_AF5_SPI1;
+  HAL_GPIO_Init(GPIOA, &g);
+  __HAL_RCC_SPI1_CLK_ENABLE();
+}
+
+void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi) {
+  if (hspi->Instance != SPI1) return;
+  __HAL_RCC_SPI1_CLK_DISABLE();
+  HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7);
+}
+
 void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c) {
   if (hi2c->Instance != I2C2) return;
   __HAL_RCC_I2C2_CLK_DISABLE();
