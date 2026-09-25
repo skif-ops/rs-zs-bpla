@@ -24,11 +24,24 @@ ACK_MESSAGE_TYPE = 5
 MAX_COMMAND_BYTES = 2048
 MAX_ACK_BYTES = 128
 MAX_COMMAND_TTL_US = 15 * 60 * 1_000_000
-COMMAND_CODES = {"CMD_REQUEST_AUDIO": 1}
+COMMAND_CODES = {"CMD_REQUEST_AUDIO": 1, "CMD_REBOOT": 2, "CMD_SET_PARAMS": 3}   # 2, 3: ICD addendum D
 COMMAND_NAMES = {value: key for key, value in COMMAND_CODES.items()}
 ACK_RESULTS = {0: "OK", 1: "REJECTED", 2: "FAILED", 3: "EXPIRED"}
 AUDIO_SEGMENT_CODES = {"pre": 0, "post": 1, "both": 2, "range": 3}
 AUDIO_SEGMENT_NAMES = {value: key for key, value in AUDIO_SEGMENT_CODES.items()}
+REBOOT_MAX_DELAY_S = 600
+PARAMS_MAX = 8
+# Runtime parameter whitelist (MQTT_TLS_ICD_v0_1 addendum D, table 2): name -> (id, min, max, default).
+# The station re-validates against its own copy; an unknown id or a value out of range rejects the whole command.
+STATION_PARAMS = {
+    "heartbeat_period_s": (1, 900, 86400, 21600),
+    "mic_channel": (2, 0, 3, 0),
+    "event_update_windows": (3, 4, 40, 10),
+    "comms_degraded_after": (4, 1, 10, 3),
+    "gsm_probe_s": (5, 300, 14400, 1800),
+    "listen_dwell_s": (6, 1, 10, 3),
+}
+STATION_PARAM_NAMES = {spec[0]: name for name, spec in STATION_PARAMS.items()}
 
 
 @dataclass(frozen=True)
@@ -132,15 +145,77 @@ def _audio_payload_from_wire(payload: object) -> dict[str, object]:
     return normalized
 
 
+def _int(value: object) -> bool:
+    return type(value) is int
+
+
+def _reboot_payload_to_wire(payload: dict) -> dict[int, object]:
+    if set(payload) - {"delay_s"}:
+        raise ValueError("unsupported reboot payload field")
+    delay = payload.get("delay_s", 30)
+    if not _int(delay) or not 0 <= delay <= REBOOT_MAX_DELAY_S:
+        raise ValueError("reboot delay_s is outside 0..600")
+    return {0: delay}
+
+
+def _reboot_payload_from_wire(payload: object) -> dict[str, object]:
+    if not isinstance(payload, dict) or set(payload) != {0}:
+        raise ValueError("invalid reboot payload keys")
+    normalized = {"delay_s": payload[0]}
+    _reboot_payload_to_wire(normalized)
+    return normalized
+
+
+def _params_payload_to_wire(payload: dict) -> dict[int, object]:
+    if set(payload) - {"reset", "params"}:
+        raise ValueError("unsupported set-params payload field")
+    reset = payload.get("reset", False)
+    params = payload.get("params", {})
+    if type(reset) is not bool or not isinstance(params, dict):
+        raise ValueError("set-params needs reset: bool and params: map")
+    if len(params) > PARAMS_MAX or (not params and not reset):
+        raise ValueError("set-params carries 1..8 parameters (or none with reset)")
+    wire: dict[int, int] = {}
+    for name, value in params.items():
+        spec = STATION_PARAMS.get(name)
+        if spec is None:
+            raise ValueError(f"unknown station parameter: {name}")
+        if not _int(value) or not spec[1] <= value <= spec[2]:
+            raise ValueError(f"station parameter {name} outside {spec[1]}..{spec[2]}")
+        wire[spec[0]] = value
+    return {0: reset, 1: wire}
+
+
+def _params_payload_from_wire(payload: object) -> dict[str, object]:
+    if not isinstance(payload, dict) or set(payload) != {0, 1} or not isinstance(payload[1], dict):
+        raise ValueError("invalid set-params payload keys")
+    names = {}
+    for param_id, value in payload[1].items():
+        if param_id not in STATION_PARAM_NAMES:
+            raise ValueError(f"unknown station parameter id: {param_id}")
+        names[STATION_PARAM_NAMES[param_id]] = value
+    normalized = {"reset": payload[0], "params": names}
+    _params_payload_to_wire(normalized)
+    return normalized
+
+
 def _command_payload_to_wire(command_name: str, payload: dict) -> dict[int, object]:
     if command_name == "CMD_REQUEST_AUDIO":
         return _audio_payload_to_wire(payload)
+    if command_name == "CMD_REBOOT":
+        return _reboot_payload_to_wire(payload)
+    if command_name == "CMD_SET_PARAMS":
+        return _params_payload_to_wire(payload)
     raise ValueError(f"unsupported command: {command_name}")
 
 
 def _command_payload_from_wire(command_name: str, payload: object) -> dict[str, object]:
     if command_name == "CMD_REQUEST_AUDIO":
         return _audio_payload_from_wire(payload)
+    if command_name == "CMD_REBOOT":
+        return _reboot_payload_from_wire(payload)
+    if command_name == "CMD_SET_PARAMS":
+        return _params_payload_from_wire(payload)
     raise ValueError(f"unsupported command: {command_name}")
 
 

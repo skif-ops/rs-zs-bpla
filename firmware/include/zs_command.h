@@ -16,8 +16,13 @@
 #define ZS_COMMAND_MAX_TTL_US UINT64_C(900000000)
 
 typedef enum {
-  ZS_COMMAND_REQUEST_AUDIO = 1
+  ZS_COMMAND_REQUEST_AUDIO = 1,
+  ZS_COMMAND_REBOOT = 2,          /* MQTT_TLS_ICD_v0_1 addendum D */
+  ZS_COMMAND_SET_PARAMS = 3       /* addendum D: bounded whitelist of runtime parameters */
 } zs_command_code_t;
+
+#define ZS_COMMAND_REBOOT_MAX_DELAY_S 600u
+#define ZS_COMMAND_PARAMS_MAX 8u
 
 typedef enum {
   ZS_AUDIO_SEGMENT_PRE = 0,
@@ -34,6 +39,21 @@ typedef struct {
   bool has_range;
 } zs_audio_request_command_t;
 
+/* CMD_REBOOT payload {0: delay_s}: reset this many seconds after the ACK (the executor enforces a minimum). */
+typedef struct {
+  uint16_t delay_s;
+} zs_reboot_command_t;
+
+/* CMD_SET_PARAMS payload {0: reset_to_defaults, 1: {param_id: int32}} with strictly ascending ids.  The codec checks
+   the structure; ranges and the id whitelist belong to the executor (an unknown or out-of-range id rejects the whole
+   command, nothing is applied). */
+typedef struct {
+  bool reset_to_defaults;
+  uint8_t count;
+  uint16_t id[ZS_COMMAND_PARAMS_MAX];
+  int32_t value[ZS_COMMAND_PARAMS_MAX];
+} zs_set_params_command_t;
+
 typedef struct {
   uint32_t station_id;
   uint8_t command_id[ZS_COMMAND_UUID_BYTES];
@@ -41,6 +61,8 @@ typedef struct {
   uint64_t expires_time_us;
   zs_command_code_t code;
   zs_audio_request_command_t audio;
+  zs_reboot_command_t reboot;
+  zs_set_params_command_t params;
   uint8_t key_id[ZS_COMMAND_KEY_ID_BYTES];
 } zs_command_t;
 
