@@ -1,4 +1,5 @@
 #include "app_power.h"
+#include "app_watchdog.h"
 #include "app_config.h"
 #include "bsp_i2c.h"
 #include "FreeRTOS.h"
@@ -60,6 +61,7 @@ void app_power_task(void *arg) {
   if (!bsp_i2c_init()) last_status = ZS_INA226_STATUS_IO;
   for (;;) {
     zs_ina226_measurement_t m;
+    app_watchdog_checkin(APP_WD_POWER);
     if (!probed) {
       last_status = zs_ina226_probe_and_configure(&ina);
       probed = last_status == ZS_INA226_STATUS_OK;
