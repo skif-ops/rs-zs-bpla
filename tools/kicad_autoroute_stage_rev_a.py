@@ -191,7 +191,8 @@ def import_session(board_path: str, ses_path: str, out_path: str, tracks_json: s
     print(json.dumps({"track_items_before": before, "track_items_after": len(list(board.GetTracks()))}))
 
 
-def _zone(board, net_name: str, layer_name: str, points_mm, priority: int, clearance_mm: float):
+def _zone(board, net_name: str, layer_name: str, points_mm, priority: int, clearance_mm: float,
+          remove_islands: bool = False):
     zone = pcbnew.ZONE(board)
     zone.SetLayer(board.GetLayerID(layer_name))
     zone.SetNetCode(board.FindNet(net_name).GetNetCode())
@@ -199,10 +200,11 @@ def _zone(board, net_name: str, layer_name: str, points_mm, priority: int, clear
     zone.SetLocalClearance(mm(clearance_mm))
     zone.SetMinThickness(mm(0.25))
     zone.SetAssignedPriority(priority)
-    try:  # drop copper islands that the fill cannot connect
-        zone.SetIslandRemovalMode(pcbnew.ISLAND_REMOVAL_MODE_ALWAYS)
-    except AttributeError:
-        pass
+    if remove_islands:  # ground pours: drop islands the fill cannot connect
+        try:
+            zone.SetIslandRemovalMode(pcbnew.ISLAND_REMOVAL_MODE_ALWAYS)
+        except AttributeError:
+            pass
     outline = zone.Outline()
     outline.NewOutline()
     for x, y in points_mm:
@@ -231,7 +233,7 @@ def pours(board_path: str, spec_json: str) -> None:
             (pcbnew.ToMM(box.GetRight() - inset), pcbnew.ToMM(box.GetY() + inset)),
             (pcbnew.ToMM(box.GetRight() - inset), pcbnew.ToMM(box.GetBottom() - inset)),
             (pcbnew.ToMM(box.GetX() + inset), pcbnew.ToMM(box.GetBottom() - inset))]
-    ground_zones = [_zone(board, spec["ground_net"], layer, rect, 0, spec["pour_clearance_mm"])
+    ground_zones = [_zone(board, spec["ground_net"], layer, rect, 0, spec["pour_clearance_mm"], True)
                     for layer in spec["ground_pour_layers"]]
     filler = pcbnew.ZONE_FILLER(board)
     filler.Fill(board.Zones())

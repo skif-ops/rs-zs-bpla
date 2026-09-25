@@ -49,7 +49,9 @@ PASSES = 150
 # and R10/R9; U2 VSSOP-10 pins 6/7/8 with vias; EN_MODEM through the 0.75 mm
 # corridor between C20 and U3 pin 8; the NT2 net-tie exit to J2 pin 4 (0.4 mm,
 # the tie itself is the current limit) and its GND_PWR via; the DNP I2C
-# pull-ups R13/R14 tied to J2 pins 11/12.
+# pull-ups R13/R14 tied to J2 pins 11/12; U2 3V3 to C2 and on B.Cu to R15;
+# U2 VBAT_SYS on B.Cu into the accepted 3 mm VBAT_SYS track; I2C test points
+# TP9 (B.Cu) and TP10 (In2.Cu) around the H3 keepout to the J2 pull-up ties.
 PREROUTE = [
     ('track', 'F.Cu', '3V3_DIGITAL', 0.2, [(46.2, 24.0), (47.7, 24.0)]),
     ('via', None, '3V3_DIGITAL', 0.6, [(47.7, 24.0)]),
@@ -92,6 +94,19 @@ PREROUTE = [
     ('track', 'B.Cu', 'MODE_3V3', 0.2, [(54.415, 38.7), (54.2, 40.5), (54.2, 44.0), (54.49, 49.9)]),
     ('via', None, 'MODE_3V3', 0.6, [(54.49, 49.9)]),
     ('track', 'F.Cu', 'MODE_3V3', 0.2, [(54.49, 49.9), (54.49, 49.0)]),
+    ('track', 'F.Cu', '3V3_DIGITAL', 0.25, [(47.7, 24.0), (48.2, 23.5), (48.2, 22.2)]),
+    ('track', 'B.Cu', '3V3_DIGITAL', 0.25, [(47.7, 24.0), (61.51, 24.0), (61.51, 21.4)]),
+    ('via', None, '3V3_DIGITAL', 0.6, [(61.51, 21.4)]),
+    ('track', 'F.Cu', '3V3_DIGITAL', 0.25, [(61.51, 21.4), (61.51, 20.5)]),
+    ('track', 'B.Cu', 'VBAT_SYS', 0.25, [(47.3, 23.0), (44.0, 28.5)]),
+    ('via', None, 'VBAT_SYS', 0.6, [(44.0, 28.5)]),
+    ('via', None, 'I2C2_SCL', 0.6, [(45.32, 54.6)]),
+    ('track', 'F.Cu', 'I2C2_SCL', 0.25, [(45.32, 56.0), (45.32, 54.6)]),
+    ('track', 'B.Cu', 'I2C2_SCL', 0.25, [(45.32, 54.6), (62.0, 50.5), (73.5, 50.5), (76.9, 53.9)]),
+    ('via', None, 'I2C2_SCL', 0.6, [(76.9, 53.9)]),
+    ('via', None, 'I2C2_SDA', 0.6, [(47.86, 55.0)]),
+    ('track', 'In2.Cu', 'I2C2_SDA', 0.25, [(47.86, 55.0), (62.0, 50.5), (73.5, 50.5), (76.6, 57.4), (76.6, 58.0)]),
+    ('via', None, 'I2C2_SDA', 0.6, [(76.6, 58.0)]),
 ]
 TIE_STRIPS = ["NT2"]
 # Autoroute (connectivity) class parameters. Freerouting cannot neck a wide
