@@ -2,7 +2,7 @@
   "schema": "dioneya-pcb-pwr-autoroute-candidate-v1",
   "status": "CANDIDATE_FOR_REVIEW_NOT_APPLIED",
   "native_board_sha256": "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6",
-  "candidate_sha256": "588dbbfa666f51fa6bcfe2596825cf26816113811efcb61b7a81d0e8dce109aa",
+  "candidate_sha256": "ee3b0dd4e769de88fe058c1c8688d996294f3f050decb273d5a60ba5d8a78112",
   "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
   "freerouting": {
     "url": "https://github.com/freerouting/freerouting/releases/download/v2.4.1/freerouting-2.4.1-linux-x64.zip",
@@ -16,51 +16,72 @@
       "inset_mm": 0.5
     }
   ],
+  "hole_keepouts": {
+    "refs": [
+      "H1",
+      "H2",
+      "H3",
+      "H4"
+    ],
+    "radius_mm": 4.0
+  },
+  "autoroute_class_overrides": {
+    "PWR_RAIL_4A": {
+      "track_width": 2.1
+    },
+    "PWR_RETURN_5A": {
+      "track_width": 0.6,
+      "clearance": 0.2
+    },
+    "PWR_RAIL_0P3A": {
+      "clearance": 0.2
+    },
+    "PWR_LOCAL": {
+      "clearance": 0.2
+    },
+    "PWR_SENSE": {
+      "clearance": 0.2
+    }
+  },
   "stage": {
     "export": {
       "locked_track_items": 53,
-      "zones": 3
+      "zones": 7,
+      "hole_keepouts": 4
     },
     "import": {
       "track_items_before": 53,
-      "track_items_after": 341
+      "track_items_after": 442
     }
   },
   "drc": {
     "errors": {
-      "clearance": 5,
-      "hole_clearance": 8,
-      "zones_intersect": 2
+      "clearance": 3
     },
     "warnings": {
       "lib_footprint_issues": 66,
       "silk_over_copper": 41,
-      "silk_overlap": 16,
-      "via_dangling": 1
+      "silk_overlap": 16
     },
-    "error_total": 15,
-    "unconnected_total": 42,
+    "error_total": 3,
+    "unconnected_total": 37,
     "unconnected_by_net": {
       "3V3_DIGITAL": 6,
-      "3V8_MODEM": 3,
       "EN_MODEM": 1,
-      "FAULT": 1,
       "FB_3V8": 1,
       "GND_DIGITAL": 1,
       "GND_MODEM": 1,
       "GND_PWR": 17,
+      "I2C2_SCL": 1,
+      "I2C2_SDA": 1,
       "MODE_3V3": 1,
       "MODE_3V8": 1,
-      "PG_3V8": 1,
-      "RT_3V3": 1,
-      "RT_3V8": 1,
       "SHUNT_LOAD_SENSE": 1,
-      "SHUNT_SOURCE_SENSE": 1,
-      "VBAT_FUSED": 2,
+      "VBAT_FUSED": 3,
       "VBAT_PROTECTED": 1,
       "VBAT_SYS": 1
     }
   },
-  "freerouting_log_tail": "  Net 'PG_3V8' (2 unrouted connections):\n    - U3-5@1  ->  U3-5\n    - U3-5  ->  via\n  Net 'PWR_GOOD' (1 unrouted connection):\n    - U4-5  ->  U4-5@1\n  Net 'RT_3V3' (2 unrouted connections):\n    - U4-8@1  ->  U4-8\n    - U4-8  ->  R7-1\n  Net 'RT_3V8' (2 unrouted connections):\n    - U3-8@1  ->  U3-8\n    - U3-8  ->  R3-1\n  Net 'SHUNT_LOAD_SENSE' (1 unrouted connection):\n    - RSH1-4  ->  U2-9\n  Net 'SHUNT_SOURCE_SENSE' (1 unrouted connection):\n    - U2-10  ->  via\n  Net 'SW_3V3' (3 unrouted connections):\n    - U4-3@1  ->  U4-3\n    - U4-3@1  ->  C6-2\n    - L2-1  ->  C6-2\n  Net 'SW_3V8' (3 unrouted connections):\n    - U3-3  ->  U3-3@1\n    - U3-3@1  ->  C4-2\n    - L1-1  ->  C4-2\n  Net 'VBAT_FUSED' (2 unrouted connections):\n    - via  ->  D1-1\n    - U1-6  ->  Q1-3\n  Net 'VBAT_PROTECTED' (1 unrouted connection):\n    - C10-1  ->  RSH1-1\n  Net 'VBAT_SYS' (1 unrouted connection):\n    - U2-8  ->  C11-1\n2026-09-25 03:24:36.827 INFO   [890DC7\\E43E43] Auto-routing stage completed: started with 128 unrouted nets, completed in 293.60 seconds, final score: 544.05 (53 unrouted and 61 violations), using 285.53 total CPU seconds, 1209.70 GB total allocated, and 562.7 MB peak heap usage.\n2026-09-25 03:24:36.886 INFO   [890DC7\\E43E43] Optimization stage started on board '72480cfdd3ee5c4a4961629bf3129a3e' with score 537.06 (54 unrouted and 61 violations).\n2026-09-25 03:24:42.687 INFO   [890DC7\\E43E43] Stopping optimization pass #1 early after 50 consecutive items could not be improved.\n2026-09-25 03:24:42.750 INFO   [890DC7\\E43E43] Optimizer pass #1 on board '1b57bd2770cb5f80d129daa2ebd65887' was completed in 5.68 seconds with the score of 537.06 (54 unrouted and 61 violations).\n2026-09-25 03:24:42.806 INFO   [890DC7\\E43E43] Stopping optimizer because the improvement in this pass (0.0000%) is below the threshold (1.00%).\n2026-09-25 03:24:42.864 INFO   [890DC7\\E43E43] Optimization stage completed: started with score 537.06 (54 unrouted and 61 violations), completed in 5.92 seconds, final score: 537.06 (54 unrouted and 61 violations), using 5.80 total CPU seconds, 45.29 GB total allocated, and 556.6 MB peak heap usage.\n2026-09-25 03:24:42.872 INFO   [890DC7\\E43E43] Job '890DC7\\E43E43' finished with state: COMPLETED (elapsed: 4 minutes 59.79 seconds, finished at UTC: 2026-09-25T03:24:42.871836125Z).\n2026-09-25 03:24:43.305 INFO   Saving output file '/home/runner/work/rs-zs-bpla/rs-zs-bpla/build/autoroute/PCB-PWR/PCB-PWR_AUTOROUTE_011_CANDIDATE_REV_A.ses' (SES)...\n2026-09-25 03:24:43.307 INFO   Successfully saved output file '/home/runner/work/rs-zs-bpla/rs-zs-bpla/build/autoroute/PCB-PWR/PCB-PWR_AUTOROUTE_011_CANDIDATE_REV_A.ses' (27970 bytes).\nPicked up JAVA_TOOL_OPTIONS: -Xmx3g",
+  "freerouting_log_tail": "  Net 'GND_MODEM' (1 unrouted connection):\n    - J2-2  ->  NT1-1\n  Net 'I2C2_SCL' (1 unrouted connection):\n    - TP9-1  ->  R13-2\n  Net 'I2C2_SDA' (1 unrouted connection):\n    - TP10-1  ->  R14-2\n  Net 'MODE_3V3' (1 unrouted connection):\n    - U4-7  ->  R9-1\n  Net 'MODE_3V8' (1 unrouted connection):\n    - U3-7  ->  R5-1\n  Net 'PWR_GOOD' (1 unrouted connection):\n    - U4-5  ->  U4-5@1\n  Net 'SHUNT_LOAD_SENSE' (1 unrouted connection):\n    - U2-9  ->  RSH1-4\n  Net 'SW_3V3' (2 unrouted connections):\n    - U4-3  ->  U4-3@1\n    - U4-3@1  ->  C6-2\n  Net 'SW_3V8' (2 unrouted connections):\n    - U3-3  ->  U3-3@1\n    - U3-3@1  ->  C4-2\n  Net 'VBAT_FUSED' (3 unrouted connections):\n    - U1-6  ->  U1-3\n    - F1-2  ->  U1-3\n    - Q1-1  ->  U1-6\n  Net 'VBAT_PROTECTED' (1 unrouted connection):\n    - C10-1  ->  RSH1-1\n  Net 'VBAT_RAW' (1 unrouted connection):\n    - J1-1  ->  F1-1\n  Net 'VBAT_SYS' (1 unrouted connection):\n    - U2-8  ->  C11-1\n2026-09-25 03:32:38.341 INFO   [D7FE51\\B7E792] Auto-routing stage completed: started with 128 unrouted nets, completed in 246.74 seconds, final score: 611.18 (45 unrouted and 53 violations), using 240.01 total CPU seconds, 1113.58 GB total allocated, and 581.7 MB peak heap usage.\n2026-09-25 03:32:38.392 INFO   [D7FE51\\B7E792] Optimization stage started on board '63b4951dccd5e835e4df0131342fe933' with score 576.22 (50 unrouted and 53 violations).\n2026-09-25 03:32:42.808 INFO   [D7FE51\\B7E792] Stopping optimization pass #1 early after 50 consecutive items could not be improved.\n2026-09-25 03:32:42.859 INFO   [D7FE51\\B7E792] Optimizer pass #1 on board 'eda44d9c4a1b0ce270c6f79a36d3e01a' was completed in 4.32 seconds with the score of 576.22 (50 unrouted and 53 violations).\n2026-09-25 03:32:42.903 INFO   [D7FE51\\B7E792] Stopping optimizer because the improvement in this pass (0.0000%) is below the threshold (1.00%).\n2026-09-25 03:32:42.946 INFO   [D7FE51\\B7E792] Optimization stage completed: started with score 576.22 (50 unrouted and 53 violations), completed in 4.51 seconds, final score: 576.22 (50 unrouted and 53 violations), using 4.43 total CPU seconds, 35.49 GB total allocated, and 431.9 MB peak heap usage.\n2026-09-25 03:32:42.955 INFO   [D7FE51\\B7E792] Job 'D7FE51\\B7E792' finished with state: COMPLETED (elapsed: 4 minutes 11.52 seconds, finished at UTC: 2026-09-25T03:32:42.954577971Z).\n2026-09-25 03:32:43.167 INFO   Saving output file '/home/runner/work/rs-zs-bpla/rs-zs-bpla/build/autoroute/PCB-PWR/PCB-PWR_AUTOROUTE_011_CANDIDATE_REV_A.ses' (SES)...\n2026-09-25 03:32:43.169 INFO   Successfully saved output file '/home/runner/work/rs-zs-bpla/rs-zs-bpla/build/autoroute/PCB-PWR/PCB-PWR_AUTOROUTE_011_CANDIDATE_REV_A.ses' (36270 bytes).\nPicked up JAVA_TOOL_OPTIONS: -Xmx3g",
   "manufacturing_release": false
 }
