@@ -1,0 +1,51 @@
+{
+  "schema": "dioneya-pcb-routing-004-export-v1",
+  "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
+  "boards": {
+    "PCB-MAIN": {
+      "path": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+      "sha256": "30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739"
+    },
+    "PCB-PWR": {
+      "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
+      "sha256": "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610",
+      "drc": {
+        "errors": 0,
+        "warnings": 9,
+        "unconnected": 0
+      }
+    },
+    "PCB-MIC": {
+      "path": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
+      "sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
+      "drc": {
+        "errors": 0,
+        "warnings": 0,
+        "unconnected": 0
+      }
+    }
+  },
+  "steps": {
+    "dsn_main": {
+      "rc": 0,
+      "log": "e\n591202fea89c: Verifying Checksum\n591202fea89c: Download complete\n30ff91259e4e: Verifying Checksum\n30ff91259e4e: Download complete\n6fe7b24cfb8f: Verifying Checksum\n6fe7b24cfb8f: Download complete\nd0b76b7e8d80: Download complete\n26996d003dd4: Pull complete\nd0b76b7e8d80: Pull complete\ne64c2316cd50: Pull complete\n207ac5616789: Pull complete\n46f0bfc95fd9: Pull complete\nf8f12f6f970e: Pull complete\nf36d0dc2d7bb: Pull complete\naab27c973195: Pull complete\nfd5a0db17ede: Pull complete\n898e32f0e177: Pull complete\n591202fea89c: Pull complete\n30ff91259e4e: Pull complete\n6fe7b24cfb8f: Pull complete\nDigest: sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\nStatus: Downloaded newer image for ghcr.io/kicad/kicad@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\n"
+    },
+    "fill_PCB-PWR": {
+      "rc": 0,
+      "log": "{\"filled_zones\": 33}\n"
+    },
+    "drc_PCB-PWR": {
+      "rc": 0,
+      "log": "Found 9 violations\nFound 0 unconnected items\nSaved DRC Report to hardware/kicad/native/_r004_PCB-PWR/drc.json\n"
+    },
+    "fill_PCB-MIC": {
+      "rc": 0,
+      "log": "{\"filled_zones\": 0}\n"
+    },
+    "drc_PCB-MIC": {
+      "rc": 0,
+      "log": "Found 0 violations\nFound 0 unconnected items\nSaved DRC Report to hardware/kicad/native/_r004_PCB-MIC/drc.json\n"
+    }
+  },
+  "dsn_sha256": "a0efbfaa05a390c87e8a27284d41bf75c2433c279155c867cdbec0b1eded446d"
+}

@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-25: PCB routing 004 step 1 - PCB-MAIN DSN export, PCB-PWR/PCB-MIC DRC state
-tools/apply_pcb_routing_004_export_rev_a.py
