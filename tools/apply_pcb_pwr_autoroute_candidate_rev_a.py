@@ -52,7 +52,8 @@ PASSES = 150
 # pull-ups R13/R14 tied to J2 pins 11/12; U2 3V3 to C2 and on B.Cu to R15;
 # U2 VBAT_SYS on B.Cu into the accepted 3 mm VBAT_SYS track; I2C test points
 # TP9 (B.Cu) and TP10 (In2.Cu) around the H3 keepout to the J2 pull-up ties;
-# 3V3 from C7 to the R13/R14 pull-ups and from the R15/U2 cluster to C5.
+# 3V3 from C7 to the R13/R14 pull-ups and from the R15/U2 cluster to C5;
+# U2 left pin row 3..5 (FAULT, I2C) fanned out to staggered vias under the body.
 PREROUTE = [
     ('track', 'F.Cu', '3V3_DIGITAL', 0.2, [(46.2, 24.0), (47.7, 24.0)]),
     ('via', None, '3V3_DIGITAL', 0.6, [(47.7, 24.0)]),
@@ -112,6 +113,12 @@ PREROUTE = [
     ('track', 'B.Cu', '3V3_DIGITAL', 0.25, [(61.51, 24.0), (64.5, 27.0), (64.5, 35.0)]),
     ('via', None, '3V3_DIGITAL', 0.6, [(64.5, 35.0)]),
     ('track', 'F.Cu', '3V3_DIGITAL', 0.25, [(64.5, 35.0), (66.4, 36.9), (67.3, 36.9)]),
+    ('track', 'F.Cu', 'FAULT', 0.2, [(41.8, 23.0), (42.7, 23.0), (43.2, 22.2)]),
+    ('via', None, 'FAULT', 0.6, [(43.2, 22.2)]),
+    ('track', 'F.Cu', 'I2C2_SDA', 0.2, [(41.8, 23.5), (43.9, 23.5)]),
+    ('via', None, 'I2C2_SDA', 0.6, [(43.9, 23.5)]),
+    ('track', 'F.Cu', 'I2C2_SCL', 0.2, [(41.8, 24.0), (42.7, 24.0), (43.2, 24.8)]),
+    ('via', None, 'I2C2_SCL', 0.6, [(43.2, 24.8)]),
 ]
 TIE_STRIPS = ["NT2"]
 # Mounting holes H1..H4 (native board) for the gap-fill router keepouts, and the
@@ -274,10 +281,14 @@ def gap_fill(board: Path, rel) -> dict:
         if net in GAPFILL_SKIP_NETS or a["description"].startswith("Zone") or b["description"].startswith("Zone"):
             continue
         pairs.append((net, (a["pos"]["x"], a["pos"]["y"]), (b["pos"]["x"], b["pos"]["y"])))
+    settings = project_with_netclasses(NATIVE_DIR / f"{BOARD}.kicad_pro")["net_settings"]
+    class_clearance = {c["name"]: c["clearance"] for c in settings["classes"]}
+    net_clearance = {p["pattern"]: class_clearance[p["netclass"]] for p in settings["netclass_patterns"]}
     router, failed = gapfill_router.route_all(
         lambda: gapfill_router.GapFillRouter(geometry, ["F.Cu", "In2.Cu", "B.Cu"], width=0.25, clearance=0.2,
                                              via_size=0.6, via_drill=0.3, edge_keep=0.5,
-                                             hole_keep=HOLE_KEEPOUTS["radius_mm"] + 0.3),
+                                             hole_keep=HOLE_KEEPOUTS["radius_mm"] + 0.3,
+                                             net_clearance=net_clearance),
         pairs) if pairs else (None, [])
     routed = router.routed if router else []
     routes_path = WORK / "gapfill.json"

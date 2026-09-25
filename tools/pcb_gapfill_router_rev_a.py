@@ -24,7 +24,10 @@ GRID_MM = 0.1
 
 class GapFillRouter:
     def __init__(self, geometry: dict, layers: list[str], width: float, clearance: float,
-                 via_size: float, via_drill: float, edge_keep: float, hole_keep: float) -> None:
+                 via_size: float, via_drill: float, edge_keep: float, hole_keep: float,
+                 net_clearance: dict | None = None) -> None:
+        # clearance between two nets = max of both class clearances (KiCad rule)
+        self.net_clearance = net_clearance or {}
         self.geometry = geometry
         self.layers = layers
         self.width = width
@@ -77,17 +80,17 @@ class GapFillRouter:
 
     def _blocked(self, net: str) -> tuple[np.ndarray, np.ndarray]:
         """Per-layer track-centre blocking and via-centre blocking for one net."""
-        track_margin = self.clearance + self.width / 2
-        via_margin = self.clearance + self.via_size / 2
+        own = self.net_clearance.get(net, self.clearance)
         track_block = np.zeros((len(self.layers), self.nx, self.ny), dtype=bool)
         via_block = np.zeros((self.nx, self.ny), dtype=bool)
         foreign = [(n, ls, s) for n, ls, s in self.items if n != net]
         foreign += [(n, ls, s) for n, ls, s in self._routed_shapes() if n != net]
-        for _, item_layers, shape in foreign:
+        for item_net, item_layers, shape in foreign:
+            gap = max(own, self.net_clearance.get(item_net, self.clearance), self.clearance) + 0.005
             for index, layer in enumerate(self.layers):
                 if layer in item_layers:
-                    self._rasterize(track_block[index], shape, track_margin)
-            self._rasterize(via_block, shape, via_margin)
+                    self._rasterize(track_block[index], shape, gap + self.width / 2)
+            self._rasterize(via_block, shape, gap + self.via_size / 2)
         # no via in or next to any SMD pad, own net included (solder wicking)
         for pad in self.geometry["pads"]:
             if pad["net"] == net and pad["layers"] == ["F.Cu"] and len(pad["poly"]) >= 3:
