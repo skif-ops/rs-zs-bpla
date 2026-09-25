@@ -56,6 +56,7 @@
 #define APP_BOOT_ID                  1u       /* boot_id until the NOR boot counter is bound (RAM fallback keeps it) */
 #define APP_STACK_BLE                1280     /* config/installation/secrets commits + nRF image update on this stack */
 #define APP_COMMS_HEARTBEAT_MS       60000u   /* zs_station_comms heartbeat period */
+#define APP_COMMS_LINGER_MS          10000u   /* S3 stays this long after the last activity: queued/answering commands */
 #define APP_COMMS_PUBLIC_APN         1        /* pilot policy: public APNs only (CELLULAR_CONNECTIVITY_BASELINE) */
 #define APP_SIM_DET_ACTIVE_HIGH      1        /* SIMx_DET level that means "card present" (confirm on Rev.A) */
 #define APP_SIM_SAFE_OFF_RETRY_MS    600000u  /* both slots exhausted / no SIM: reset the failure counters and try again */
