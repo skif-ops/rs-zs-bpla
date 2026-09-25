@@ -67,6 +67,7 @@ int main(void) {
   message.detector.presence_level = 3u;
   message.detector.reset_cause = 4u;          /* IWDG: the previous boot ended by the hardware watchdog */
   message.detector.watchdog_missed = 0x0020u;  /* task 5 had stopped checking in */
+  message.detector.params_version = 3u;        /* runtime parameter set v3 (CMD_SET_PARAMS) */
 
   size = zs_protocol_encode_heartbeat(&message, encoded, sizeof(encoded));
   if (size == 0u || fwrite(encoded, 1u, size, stdout) != size) return 1;
