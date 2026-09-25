@@ -1,0 +1,2 @@
+# Queued by Claude 2026-09-25: R2.002 DFM register run 2 (mask dam / paste gap per pad pair, exposure detail)
+tools/apply_pcb_pwr_dfm_register_rev_a.py

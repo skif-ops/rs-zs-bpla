@@ -97,6 +97,18 @@ def measure(data: dict) -> dict:
         masks = [(p, geom(p["mask"][side])) for p in data["pads"] if side in p["mask"]]
         copper = [(c, geom(c["polys"])) for c in data["copper"] if c["side"] == side]
         name = lambda p: f"{p['ref']}.{p['pad'] or '-'}"  # noqa: E731
+        # paste apertures of every footprint (paste-only pads carry no number): assign to the copper pad they sit on
+        paste_by_ref = defaultdict(list)
+        for p in data["pads"]:
+            if side in p["paste"]:
+                paste_by_ref[p["ref"]].append(geom(p["paste"][side]))
+        mask_by_pad = {name(p): g for p, g in masks}
+
+        def paste_of(pad, copper_geom):
+            parts = [g for g in paste_by_ref[pad["ref"]] if not g.is_empty and g.intersects(copper_geom)]
+            from shapely.ops import unary_union
+            return unary_union(parts) if parts else None
+
         # A. SMD pad to pad, different nets (pads without a net count as their own net)
         tree = STRtree([g for _, g in pads])
         for i, (pa, ga) in enumerate(pads):
@@ -108,8 +120,17 @@ def measure(data: dict) -> dict:
                     continue
                 gap = ga.distance(gb)
                 if gap < REQ["smd_pad_to_pad_mm"][0]:
-                    rows["A_smd_pad_to_pad"].append({"side": side, "a": name(pa), "b": name(pb), "net_a": pa["net"],
-                                                     "net_b": pb["net"], "gap_mm": round(gap, 4)})
+                    ma, mb = mask_by_pad.get(name(pa)), mask_by_pad.get(name(pb))
+                    sa, sb = paste_of(pa, ga), paste_of(pb, gb)
+                    rows["A_smd_pad_to_pad"].append({
+                        "side": side, "a": name(pa), "b": name(pb), "net_a": pa["net"], "net_b": pb["net"],
+                        "gap_mm": round(gap, 4),
+                        "mask_expansion_mm": [pa["mask_expansion_mm"].get(side), pb["mask_expansion_mm"].get(side)],
+                        "mask_dam_mm": round(ma.distance(mb), 4) if ma is not None and mb is not None else None,
+                        "paste_gap_mm": round(sa.distance(sb), 4) if sa is not None and sb is not None else None,
+                        "paste_area_mm2": [round(sa.area, 4) if sa is not None else 0.0,
+                                           round(sb.area, 4) if sb is not None else 0.0],
+                        "pad_area_mm2": [round(ga.area, 4), round(gb.area, 4)]})
         # B. pad to track / zone copper of another net
         ctree = STRtree([g for _, g in copper])
         for pa, ga in pads:
@@ -121,6 +142,7 @@ def measure(data: dict) -> dict:
                 if gap < REQ["pad_to_track_mm"][0]:
                     rows["B_pad_to_copper"].append({"side": side, "pad": name(pa), "net": pa["net"], "other": c["kind"],
                                                     "other_net": c["net"], "gap_mm": round(gap, 4)})
+        pads_by_name = {name(p): g for p, g in pads}
         # C. mask dams between openings of different nets; opening to other-net copper
         mtree = STRtree([g for _, g in masks])
         for i, (pa, ga) in enumerate(masks):
@@ -141,7 +163,12 @@ def measure(data: dict) -> dict:
                 gap = ga.distance(gc)
                 if gap < REQ["mask_opening_to_trace_mm"][0]:
                     rows["C_mask_opening_to_copper"].append({"side": side, "opening": name(pa), "net": pa["net"],
+                                                             "mask_expansion_mm": pa["mask_expansion_mm"].get(side),
                                                              "other": c["kind"], "other_net": c["net"],
+                                                             "other_width_mm": c.get("width_mm"),
+                                                             "copper_gap_mm": round(pads_by_name[name(pa)].distance(gc), 4)
+                                                             if name(pa) in pads_by_name else None,
+                                                             "exposed_other_copper_mm2": round(ga.intersection(gc).area, 4),
                                                              "gap_mm": round(gap, 4)})
         # D. paste apertures and coverage of large pads
         for p in data["pads"]:
@@ -179,8 +206,10 @@ def measure(data: dict) -> dict:
             if not g.is_empty and not opening_union.is_empty:
                 gap = g.distance(opening_union)
                 if gap < REQ["legend_to_pad_mm"][0]:
+                    over = g.intersection(opening_union).area
                     rows["E_legend_to_opening"].append({"side": side, "item": label, "gap_mm": round(gap, 4),
-                                                        "over_opening_mm2": round(g.intersection(opening_union).area, 4)})
+                                                        "over_opening_mm2": round(over, 4),
+                                                        "kind": "ON_OPENING_CLIPPED" if over > 1e-6 else "NEAR_OPENING"})
     # F. holes
     holes = data["holes"]
     for i, a in enumerate(holes):
