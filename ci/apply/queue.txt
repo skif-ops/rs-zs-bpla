@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-25: R2.001 evidence run 2 (short segments included in delta-U / loss sums)
-tools/apply_pcb_pwr_current_evidence_rev_a.py
