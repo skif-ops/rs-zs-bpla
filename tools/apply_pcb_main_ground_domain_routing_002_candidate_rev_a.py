@@ -14,7 +14,9 @@ Output: hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-ROUTING-002/
                      preserved-geometry check, In4 island connectivity
 Delta: the In4.Cu GND_MODEM zone is replaced by GND_MODEM zones over the modem region (priority 1)
 plus one GND_DIGITAL In4.Cu zone over the In1.Cu digital outline (priority 0); GND_DIGITAL
-through vias 0.5/0.3 are added next to digital signal transitions. Every other byte of the
+through vias 0.5/0.3 are added next to digital signal transitions; a modem piece cut off from
+the main modem copper (TP_CELL_DBG ground under U1) is tied back by a 0.3 mm GND_MODEM track on
+In3.Cu (no plane on In3, a ground conductor, not a signal). Every other byte of the
 board is kept (checked). Rules: tools/pcb_main_ground_domain_002_rev_a.py.
 --check regenerates the candidate text and compares it byte for byte, and checks SUMMARY.json.
 """
@@ -86,6 +88,8 @@ def build(text: str) -> tuple[str, dict]:
     board, domains = geo.load(BOARD)
     split = geo.split_in4(board, domains)
     added, stitch_report = geo.stitching_vias(board, domains, split)
+    ties = geo.island_ties(board, split)
+    assert all("points" in t for t in ties), f"modem island without an In3 tie: {ties}"
     gnd_digital, gnd_modem = net_number(text, "GND_DIGITAL"), net_number(text, "GND_MODEM")
     lines = text.split("\n")
     start = next(i for i, line in enumerate(lines) if line.startswith(OLD_ZONE_HEAD))
@@ -100,12 +104,21 @@ def build(text: str) -> tuple[str, dict]:
         zones.append(zone_text(gnd_modem, "GND_MODEM", f"PCB_MAIN_GND_MODEM_In4_Cu_{index + 1}", pts, 1))
     via_lines = [f'  (via (at {x:.4f} {y:.4f}) (size {geo.VIA_SIZE}) (drill {geo.VIA_DRILL}) (layers "F.Cu" "B.Cu") '
                  f'(net {gnd_digital}) (tstamp {uuid.uuid5(NAMESPACE, f"via|{x:.4f}|{y:.4f}")}))' for x, y in added]
+    tie_lines = []
+    for tie in ties:
+        for (xa, ya), (xb, yb) in zip(tie["points"], tie["points"][1:]):
+            tie_lines.append(f'  (segment (start {xa:.4f} {ya:.4f}) (end {xb:.4f} {yb:.4f}) (width {tie["width"]}) '
+                             f'(layer "{tie["layer"]}") (net {gnd_modem}) '
+                             f'(tstamp {uuid.uuid5(NAMESPACE, f"tie|{xa:.4f}|{ya:.4f}|{xb:.4f}|{yb:.4f}")}))')
     last_via = max(i for i, line in enumerate(lines) if line.startswith("  (via "))
+    last_segment = max(i for i, line in enumerate(lines) if line.startswith("  (segment "))
+    assert last_segment < last_via < start, "unexpected board item order"
     new_lines = lines[:start] + "\n".join(zones).split("\n") + lines[end + 1:]
     new_lines = new_lines[:last_via + 1] + via_lines + new_lines[last_via + 1:]
+    new_lines = new_lines[:last_segment + 1] + tie_lines + new_lines[last_segment + 1:]
     candidate = "\n".join(new_lines)
     # preserved-geometry proof: removing exactly what was added and restoring the old block gives the base
-    restored = [line for line in new_lines if line not in via_lines]
+    restored = [line for line in new_lines if line not in via_lines and line not in tie_lines]
     z0 = restored.index(zones[0].split("\n")[0])
     z_len = sum(len(z.split("\n")) for z in zones)
     restored = restored[:z0] + old_block.split("\n") + restored[z0 + z_len:]
@@ -124,6 +137,7 @@ def build(text: str) -> tuple[str, dict]:
                         for p in sorted(split["modem_pieces"], key=lambda p: -p.area)],
         "previous_in4_modem_area_mm2": round(split["old_in4_modem"].area, 1),
         "stitching_vias": [list(v) for v in added],
+        "modem_island_ties": ties,
         "stitching_report": stitch_report,
     }
     return candidate, spec

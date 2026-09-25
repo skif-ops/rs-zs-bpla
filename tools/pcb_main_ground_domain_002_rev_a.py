@@ -291,3 +291,106 @@ def continuity_map(board, domains, references: dict) -> dict:
                     "share": round(v["over_own_reference_mm"] / v["length_mm"], 4) if v["length_mm"] else None}
                 for k, v in sorted(table.items())}
     return {"by_layer_domain": fmt(rows), "by_net_layer": fmt(per_net)}
+
+
+TIE_LAYER, TIE_WIDTH = "In3.Cu", 0.3
+
+
+def _astar(blocked, start, goal, box, step=0.05, snap=0.4):
+    """8-connected grid A*; blocked(x, y) -> bool. Cells within `snap` of start/goal are free."""
+    import heapq
+    x0, y0, x1, y1 = box
+    nx, ny = int((x1 - x0) / step), int((y1 - y0) / step)
+    s = (round((start[0] - x0) / step), round((start[1] - y0) / step))
+    g = (round((goal[0] - x0) / step), round((goal[1] - y0) / step))
+    cost, prev, heap, seen = {s: 0.0}, {}, [(0.0, s)], {}
+    while heap:
+        _, cur = heapq.heappop(heap)
+        if cur == g:
+            path = [cur]
+            while cur in prev:
+                cur = prev[cur]
+                path.append(cur)
+            return [(round(x0 + i * step, 4), round(y0 + j * step, 4)) for i, j in reversed(path)]
+        for di in (-1, 0, 1):
+            for dj in (-1, 0, 1):
+                if not di and not dj:
+                    continue
+                n = (cur[0] + di, cur[1] + dj)
+                if not (0 <= n[0] < nx and 0 <= n[1] < ny):
+                    continue
+                if n not in seen:
+                    px, py = x0 + n[0] * step, y0 + n[1] * step
+                    near = math.dist((px, py), start) < snap or math.dist((px, py), goal) < snap
+                    seen[n] = near or not blocked(px, py)
+                if not seen[n]:
+                    continue
+                c = cost[cur] + math.hypot(di, dj)
+                if c < cost.get(n, 1e9):
+                    cost[n], prev[n] = c, cur
+                    heapq.heappush(heap, (c + math.dist(n, g), n))
+    return None
+
+
+def _simplify(path, clear):
+    out, i = [path[0]], 0
+    LineString = _shapely()[0]
+    while i < len(path) - 1:
+        j = len(path) - 1
+        while j > i + 1 and not clear(LineString([path[i], path[j]])):
+            j -= 1
+        out.append(path[j])
+        i = j
+    return out
+
+
+def island_ties(board, split: dict) -> list:
+    """GND_MODEM In3.Cu ties from every modem piece other than the main one to the main piece:
+    from a GND_MODEM via inside the piece to the nearest GND_MODEM via inside the main piece,
+    0.3 mm track, 0.2 mm clearance to every other-net In3.Cu item (tracks, vias, *.Cu pads)."""
+    LineString, Point, Polygon, box, unary_union = _shapely()
+    from shapely import prepared
+    pieces = sorted(split["modem_pieces"], key=lambda p: -p.area)
+    if len(pieces) < 2:
+        return []
+    main = pieces[0]
+    modem_vias = [geom for net, kind, _, geom, _ in items(board) if kind == "via" and net == "GND_MODEM"]
+    obstacles_in3 = []
+    for fp in board.footprints:
+        for pad in fp.pads:
+            if TIE_LAYER in pad_layers(pad) and not (pad.net and pad.net.name == "GND_MODEM"):
+                obstacles_in3.append(pad_geometry(fp, pad))
+    for net, kind, layer, geom, raw in items(board):
+        if net == "GND_MODEM":
+            continue
+        if kind == "via":
+            obstacles_in3.append(geom.buffer(raw.size / 2))
+        elif layer == TIE_LAYER:
+            obstacles_in3.append(geom.buffer(raw.width / 2))
+    for zone in board.zones:
+        if zone.keepoutSettings:
+            obstacles_in3.append(Polygon([(c.X, c.Y) for c in zone.polygons[0].coordinates]).buffer(0))
+    grown = unary_union(obstacles_in3).buffer(CLEARANCE + TIE_WIDTH / 2)
+    blocked_prep = prepared.prep(grown)
+    edge = prepared.prep(split["digital_outline"].union(split["old_in4_modem"]).buffer(-0.3))
+    ties = []
+    for piece in pieces[1:]:
+        starts = [v for v in modem_vias if piece.buffer(0.3).contains(v)]
+        goals = sorted((v for v in modem_vias if main.contains(v)), key=lambda v: min(v.distance(s) for s in starts))
+        for start in starts[:1]:
+            for goal in goals[:8]:
+                lo = (min(start.x, goal.x) - 6, min(start.y, goal.y) - 6, max(start.x, goal.x) + 6, max(start.y, goal.y) + 6)
+                path = _astar(lambda x, y: blocked_prep.contains(Point(x, y)) or not edge.contains(Point(x, y)),
+                              (start.x, start.y), (goal.x, goal.y), lo)
+                if path:
+                    clear = lambda seg: not seg.buffer(TIE_WIDTH / 2).intersects(  # noqa: E731
+                        unary_union(obstacles_in3).buffer(CLEARANCE).difference(
+                            unary_union([start.buffer(0.45), goal.buffer(0.45)])))
+                    pts = _simplify([(start.x, start.y)] + path[1:-1] + [(goal.x, goal.y)], clear)
+                    ties.append({"layer": TIE_LAYER, "width": TIE_WIDTH, "net": "GND_MODEM",
+                                 "from_via": [start.x, start.y], "to_via": [goal.x, goal.y], "points": pts,
+                                 "length_mm": round(LineString(pts).length, 2)})
+                    break
+            else:
+                ties.append({"from_via": [start.x, start.y], "result": "NO_IN3_PATH_FOUND"})
+    return ties
