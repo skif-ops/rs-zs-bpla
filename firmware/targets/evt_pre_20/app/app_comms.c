@@ -5,6 +5,7 @@
 #include "evt_pre_20_sim_orchestrator.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "zs_audio_upload.h"
 #include "zs_bg95_provision.h"
 #include "zs_bg95_mqtt_session.h"
 #include "zs_command_trust.h"
@@ -129,7 +130,12 @@ static bool wanted(void) { return want_on && modem_allowed; }
 const zs_bg95_t *app_comms_modem(void) { return &modem; }
 const zs_station_comms_t *app_comms_state(void) { return &comms; }
 
-static void set_phase(comms_phase_t p) { phase = p; phase_since_ms = xTaskGetTickCount(); }
+static void audio_abort(const char *why);
+static bool build_audio_topic(void);
+static void set_phase(comms_phase_t p) {
+  if ((phase == COMMS_SESSION || phase == COMMS_ONLINE) && p != COMMS_SESSION && p != COMMS_ONLINE) audio_abort("session ended");
+  phase = p; phase_since_ms = xTaskGetTickCount();
+}
 
 static bool start_session(const char *tenant) {
   zs_command_trust_key_t key;
@@ -145,8 +151,115 @@ static bool start_session(const char *tenant) {
   if (!zs_bg95_event_receipt_init(&receipt_binding, &modem, &event_transport, true)) return false;
   if (!zs_bg95_event_uplink_init(&uplink_binding, &modem, &event_transport)) return false;
   if (!zs_bg95_mqtt_session_init(&session, &modem, &command_binding, &receipt_binding, &uplink_binding, (uint16_t)(1u + (xTaskGetTickCount() & 0x7fffu)))) return false;
+  if (!build_audio_topic()) return false;
+  audio_abort("new session");
   comms_port = (zs_station_comms_port_t){NULL, fill_heartbeat, APP_COMMS_HEARTBEAT_MS, 0u};
   return zs_station_comms_init(&comms, &comms_port, &session, &event_transport, xTaskGetTickCount());
+}
+
+/* ---- audio upload (addendum B): CMD_REQUEST_AUDIO answered chunk by chunk on the audio topic ----
+   The job (zs_audio_upload) shares the uplink with zs_station_comms: every step first collects the outcome of our
+   own chunk, then lets the outbox/heartbeat go (detections keep priority), then starts the next chunk when the
+   session is free.  The last chunk completes the command in the journal and the ACK is published from it. */
+static const app_comms_audio_source_t *audio_src;
+static zs_audio_upload_t upload;
+static bool chunk_in_flight, ack_pending;
+static unsigned chunk_failures;
+static uint8_t chunk_buf[ZS_AUDIO_CHUNK_MAX_BYTES], ack_buf[ZS_COMMAND_ACK_MAX_BYTES];
+static uint8_t audio_topic[ZS_MQTT_EVENT_TOPIC_MAX_BYTES];
+static size_t audio_topic_size;
+static zs_mqtt_event_message_t chunk_msg, ack_msg;
+static uint32_t audio_uploads, audio_chunks, audio_rejected, audio_failed, audio_aborted;
+void app_comms_set_audio_source(const app_comms_audio_source_t *src) { audio_src = src; }
+bool app_comms_audio_busy(void) { return zs_audio_upload_active(&upload) || upload.state == ZS_AUDIO_UPLOAD_FINISHED || ack_pending || chunk_in_flight; }
+
+bool app_comms_request_audio(const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail) {
+  int64_t event_us;
+  bool trusted;
+  const zs_prehistory_t *ring = audio_src && audio_src->ring ? audio_src->ring() : NULL;
+  *result = ZS_COMMAND_ACK_REJECTED;
+  if (!ring) { *detail = 1u; audio_rejected++; return true; }                       /* no recorder on this station */
+  if (app_comms_audio_busy()) {
+    if (memcmp(upload.command_id, cmd->command_id, ZS_COMMAND_UUID_BYTES) == 0) return false;   /* redelivery: still running */
+    *detail = ZS_AUDIO_UPLOAD_DETAIL_BUSY; audio_rejected++; return true;
+  }
+  if (!audio_src->event_time(cmd->audio.event_id, &event_us, &trusted)) { *detail = ZS_AUDIO_UPLOAD_DETAIL_NO_AUDIO; audio_rejected++; return true; }
+  if (!trusted) { *detail = ZS_AUDIO_UPLOAD_DETAIL_TIME; audio_rejected++; return true; }
+  if (!zs_audio_upload_start(&upload, ring, config.station_id, cmd->command_id, &cmd->audio, event_us, detail)) { audio_rejected++; return true; }
+  chunk_failures = 0u;
+  audio_uploads++;
+  if (hooks.log) hooks.log("audio: request for event %lu:%lu accepted (segment %u), upload follows\r\n",
+                           (unsigned long)(cmd->audio.event_id >> 32), (unsigned long)(cmd->audio.event_id & 0xffffffffu), (unsigned)cmd->audio.segment);
+  return false;                                                                    /* ACCEPTED stays; the ACK comes later */
+}
+
+/* audio topic = the ack topic with "audio" in place of "ack" (same tenant/station prefix) */
+static bool build_audio_topic(void) {
+  const size_t base = command_transport.ack_topic_size;
+  if (base < 3u || base - 3u + 5u > sizeof(audio_topic) || memcmp(command_transport.ack_topic + base - 3u, "ack", 3u) != 0) return false;
+  memcpy(audio_topic, command_transport.ack_topic, base - 3u);
+  memcpy(audio_topic + base - 3u, "audio", 5u);
+  audio_topic_size = base + 2u;                             /* "ack" (3) -> "audio" (5) */
+  return true;
+}
+
+static void audio_abort(const char *why) {
+  if (zs_audio_upload_active(&upload) || upload.state == ZS_AUDIO_UPLOAD_FINISHED) {
+    audio_aborted++;
+    if (hooks.log) hooks.log("audio: upload abandoned (%s), the command stays accepted\r\n", why);
+  }
+  zs_audio_upload_abort(&upload);
+  chunk_in_flight = false;
+  ack_pending = false;
+}
+
+static bool command_time(uint32_t now_ms, uint64_t *now_us);
+
+/* 1: the outcome of our chunk, read before anyone else starts a publication on the uplink */
+static void audio_collect(void) {
+  if (!chunk_in_flight || uplink_binding.state != ZS_BG95_EVENT_UPLINK_IDLE) return;
+  chunk_in_flight = false;
+  if (uplink_binding.last_outcome == ZS_BG95_EVENT_UPLINK_OUTCOME_BROKER_ACK) { zs_audio_upload_chunk_sent(&upload); audio_chunks++; chunk_failures = 0u; }
+  else if (++chunk_failures >= 5u) audio_abort("chunk refused 5 times");
+}
+
+/* 3: the next piece of work when the session is free */
+static void audio_drive(uint32_t now) {
+  uint64_t oldest = 0u, next = 0u;
+  if (chunk_in_flight || session.owner != ZS_BG95_MQTT_OWNER_NONE || !zs_bg95_mqtt_session_ready(&session)) return;
+  if (ack_pending) {
+    if (zs_bg95_mqtt_session_start_message(&session, &ack_msg, now) == ZS_BG95_EVENT_UPLINK_STARTED) ack_pending = false;
+    return;
+  }
+  if (!zs_audio_upload_active(&upload) && upload.state != ZS_AUDIO_UPLOAD_FINISHED) return;
+  for (unsigned i = 0u; i < 4u; i++) {                   /* a few bounded steps (header scan / one record hash) */
+    zs_audio_upload_step_t st;
+    audio_src->range(&oldest, &next);
+    st = zs_audio_upload_step(&upload, audio_src->now_us(), audio_src->recording(), oldest, next);
+    if (st == ZS_AUDIO_UPLOAD_STEP_BUSY) continue;
+    if (st == ZS_AUDIO_UPLOAD_STEP_CHUNK_READY) {
+      const size_t n = zs_audio_upload_chunk(&upload, chunk_buf, sizeof(chunk_buf));
+      if (n == 0u) continue;                               /* storage failure: the job finished FAILED */
+      chunk_msg = (zs_mqtt_event_message_t){audio_topic, audio_topic_size, chunk_buf, n, 1u, false};
+      if (zs_bg95_mqtt_session_start_message(&session, &chunk_msg, now) == ZS_BG95_EVENT_UPLINK_STARTED) chunk_in_flight = true;
+      return;
+    }
+    if (st == ZS_AUDIO_UPLOAD_STEP_FINISHED) {
+      uint64_t now_us;
+      size_t n;
+      (void)command_time(now, &now_us);
+      if (upload.result != ZS_COMMAND_ACK_OK) audio_failed++;
+      if (hooks.log) hooks.log("audio: upload finished, result %u detail %u (%lu chunks)\r\n", (unsigned)upload.result, (unsigned)upload.detail, (unsigned long)upload.chunks_sent);
+      if (zs_command_journal_complete(journal_io, upload.command_id, upload.result, upload.detail, now_us) == ZS_COMMAND_JOURNAL_OK &&
+          (n = zs_command_journal_encode_ack(journal_io, upload.command_id, ack_buf, sizeof(ack_buf))) > 0u) {
+        ack_msg = (zs_mqtt_event_message_t){command_transport.ack_topic, command_transport.ack_topic_size, ack_buf, n, 1u, false};
+        ack_pending = true;
+      }
+      upload.state = ZS_AUDIO_UPLOAD_IDLE;
+      return;
+    }
+    return;                                                /* IDLE: waiting for the window to be recorded */
+  }
 }
 
 /* zs_bg95 instance for the station configuration (APN profiles of the config, pilot APN policy). */
@@ -182,7 +295,7 @@ static bool modem_provision(uint32_t now) {
 static uint32_t activity_ms, activity_seen;
 static void note_session_activity(uint32_t now) {
   const uint32_t seen = comms.heartbeats_published + commands_verified + commands_rejected +
-                        session.queued_command_count + session.retry_required_count;
+                        session.queued_command_count + session.retry_required_count + audio_chunks + audio_uploads;
   if (seen != activity_seen) { activity_seen = seen; activity_ms = now; }
 }
 
@@ -190,7 +303,7 @@ static void note_session_activity(uint32_t now) {
    linger since the last activity has passed (the outbox is checked at most every 5 s: it walks the NOR slots). */
 static void check_session_done(uint32_t now) {
   uint16_t pending = 1u;
-  if (session_reported || !hooks.session_done || comms.heartbeats_published == 0u) return;
+  if (session_reported || !hooks.session_done || comms.heartbeats_published == 0u || app_comms_audio_busy()) return;
   if ((uint32_t)(now - activity_ms) < APP_COMMS_LINGER_MS || session.owner != ZS_BG95_MQTT_OWNER_NONE) return;
   if ((uint32_t)(now - last_outbox_check_ms) < 5000u) return;
   last_outbox_check_ms = now;
@@ -316,7 +429,9 @@ void app_comms_step(void) {
       case COMMS_ONLINE:
         zs_bg95_tick(&modem, now);
         { uint64_t now_us; const bool trusted = command_time(now, &now_us); zs_bg95_mqtt_session_tick(&session, now, now_us, trusted); }
+        audio_collect();                                   /* our chunk's outcome before anyone reuses the uplink */
         zs_station_comms_tick(&comms, now);
+        if (phase == COMMS_ONLINE) audio_drive(now);
         if (phase == COMMS_SESSION && zs_bg95_mqtt_session_ready(&session)) { online_count++; set_phase(COMMS_ONLINE); activity_ms = now; }
         if (phase == COMMS_ONLINE) { note_session_activity(now); check_session_done(now); }
         if (!wanted()) {
@@ -384,6 +499,8 @@ void app_comms_status(void (*print)(const char *fmt, ...)) {
         (unsigned long)comms.events_published, (unsigned long)comms.events_failed, (unsigned long)comms.events_exhausted,
         (unsigned long)comms.heartbeats_published, (unsigned long)comms.heartbeats_failed,
         command_key_set ? "set" : "none", (unsigned long)commands_verified, (unsigned long)commands_rejected);
+  print("  audio uploads %lu chunks %lu rejected %lu failed %lu abandoned %lu%s\r\n", (unsigned long)audio_uploads, (unsigned long)audio_chunks,
+        (unsigned long)audio_rejected, (unsigned long)audio_failed, (unsigned long)audio_aborted, app_comms_audio_busy() ? " (upload running)" : "");
   if (sim_enabled)
     print("  dual-sim %s slot %d (sim1 %s, sim2 %s, status %s) starts %lu switches %lu retries %lu recoveries %lu faults %lu bringup-fail %u/%u link-fail %u/%u\r\n",
           zs_dual_sim_state_name(zs_dual_sim_state(&sim_controller)), (int)zs_dual_sim_active_slot(&sim_controller),
