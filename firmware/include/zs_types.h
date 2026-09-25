@@ -194,6 +194,7 @@ typedef struct {
   uint8_t presence_level;      /* current level 1 (zs_presence_level_t) */
   uint8_t reset_cause;         /* key 12: why this boot started (zs_reset_cause_t: 1 power/BOR, 2 pin, 3 software, 4 IWDG, 5 WWDG, 6 low-power, 7 option bytes) */
   uint16_t watchdog_missed;    /* key 13: task-watch mask that let the IWDG fire before this boot (0 = none) */
+  uint32_t params_version;     /* key 14: version of the runtime parameter set in force (CMD_SET_PARAMS; 0 = defaults) */
 } zs_detector_health_t;
 
 typedef struct {

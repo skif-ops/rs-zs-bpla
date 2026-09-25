@@ -73,6 +73,7 @@ def main() -> int:
     after_reboot = log[log.index(reboot_line):]
     assert "session done -> COMMS_DONE" in after_reboot, "the station must connect right after the reboot (boot session)"
     assert r["heartbeats"] >= 2, r["heartbeats"]                       # one per boot
+    assert r["last_heartbeat"]["detector"]["params_version"] == 1, r["last_heartbeat"]   # the server sees the set in force
     print(f"scenario 3 (remote commands): sent {len(sent)}, acks {[a['result'] for a in acks]}, one reboot, params survived it, "
           f"reconnected after the reboot ({r['heartbeats']} heartbeats)")
     return 0

@@ -429,6 +429,7 @@ static void dsp_mode_events(void) {
   else quiet_windows = 0u;
 }
 
+static zs_station_params_t params;        /* the runtime parameter set in force (remote commands below) */
 static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   uint16_t pending = 0u; (void)ctx;
   hb->schema_ver = 2u; hb->time_us = pl_sample_time(NULL, ring.total_frames);
@@ -439,6 +440,7 @@ static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->detector.confirmed_windows = pipeline.confirmed_windows; hb->detector.suspect_windows = pipeline.suspect_windows;
   hb->detector.events_emitted = pipeline.events_emitted; hb->detector.presence_level = pipeline.presence.level;
   if (zs_event_outbox_pending_count(&outbox_io, &pending) == ZS_EVENT_OUTBOX_OK) hb->detector.outbox_pending = pending;
+  hb->detector.params_version = params.version;
   return true;
 }
 static uint32_t outbox_retry_at_ms, outbox_retry_backoff_ms = 300000u, outbox_retries;
@@ -499,7 +501,6 @@ static bool pm_read(void *c, uint8_t s, uint32_t o, uint8_t *d, size_t n) { (voi
 static bool pm_erase(void *c, uint8_t s) { (void)c; if (s > 1u) return false; memset(params_mem[s], 0xff, 64u); return true; }
 static bool pm_write(void *c, uint8_t s, uint32_t o, const uint8_t *d, size_t n) { (void)c; if (s > 1u || o + n > 64u) return false; for (size_t i = 0u; i < n; i++) { if ((params_mem[s][o + i] & d[i]) != d[i]) return false; params_mem[s][o + i] = d[i]; } return true; }
 static const zs_station_params_io_t params_io = {NULL, pm_read, pm_erase, pm_write};
-static zs_station_params_t params;
 static unsigned cmd_executed, cmd_rejected, cmd_reboots_scheduled, twin_reboots;
 static bool reboot_pending; static uint32_t reboot_at_ms;
 static void params_apply(const zs_station_params_t *p) {

@@ -83,6 +83,7 @@ assert heartbeat.detector is not None, "schema 2 heartbeat must carry the detect
 assert heartbeat.detector.boot_id == 7 and heartbeat.detector.windows == 7190 and heartbeat.detector.outbox_pending == 1
 assert heartbeat.detector.presence_level == "CONFIRMED" and heartbeat.detector.window_max_ms == 187
 assert heartbeat.detector.reset_cause == "IWDG" and heartbeat.detector.watchdog_missed_tasks == 0x20
+assert heartbeat.detector.params_version == 3
 assert heartbeat.cellular.apn == "network.apn"
 assert heartbeat.cellular.apn_source == "NETWORK"
 assert heartbeat.cellular.settings_valid
