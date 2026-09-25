@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-09-25T04:19:28+0000",
+    "date": "2026-09-25T04:25:34+0000",
     "included_severities": [
         "error",
         "warning",
@@ -15,6 +15,29 @@
             "description": "Missing connection between items",
             "items": [
                 {
+                    "description": "Zone [3V3_DIGITAL] on F.Cu, priority 11",
+                    "pos": {
+                        "x": 48.274,
+                        "y": 25.3858
+                    },
+                    "uuid": "4d53acb6-fd7a-4b89-8031-d90a39e3b446"
+                },
+                {
+                    "description": "Zone [3V3_DIGITAL] on B.Cu, priority 10",
+                    "pos": {
+                        "x": 56.1809,
+                        "y": 48.6324
+                    },
+                    "uuid": "89f9b668-b621-4b50-97ab-52fa9873e86c"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
                     "description": "Pad 1 [3V3_DIGITAL] of C2 on F.Cu",
                     "pos": {
                         "x": 48.02,
@@ -23,12 +46,12 @@
                     "uuid": "27599666-a8cc-4c43-ad02-f8bb5756534e"
                 },
                 {
-                    "description": "Zone [3V3_DIGITAL] on F.Cu, priority 10",
+                    "description": "Zone [3V3_DIGITAL] on F.Cu, priority 11",
                     "pos": {
-                        "x": 48.4071,
-                        "y": 25.3229
+                        "x": 48.274,
+                        "y": 25.3858
                     },
-                    "uuid": "044d7393-18c5-498a-bd92-1f2cd05260cb"
+                    "uuid": "4d53acb6-fd7a-4b89-8031-d90a39e3b446"
                 }
             ],
             "severity": "error",
@@ -38,12 +61,12 @@
             "description": "Missing connection between items",
             "items": [
                 {
-                    "description": "Zone [3V3_DIGITAL] on F.Cu, priority 10",
+                    "description": "Pad 2 [3V3_DIGITAL] of R15 on F.Cu",
                     "pos": {
-                        "x": 61.9454,
-                        "y": 19.0646
+                        "x": 61.51,
+                        "y": 20.5
                     },
-                    "uuid": "4553ada1-243c-4c21-833a-f2c82001d49d"
+                    "uuid": "72daec73-f82a-4f9e-a181-378266ac5f9b"
                 },
                 {
                     "description": "Pad 1 [3V3_DIGITAL] of C2 on F.Cu",
@@ -61,66 +84,20 @@
             "description": "Missing connection between items",
             "items": [
                 {
-                    "description": "Zone [3V3_DIGITAL] on F.Cu, priority 10",
+                    "description": "Zone [3V8_MODEM] on In2.Cu, priority 13",
                     "pos": {
-                        "x": 75.3372,
-                        "y": 55.6666
+                        "x": 55.1024,
+                        "y": 16.7174
                     },
-                    "uuid": "0b392b34-cbd0-4cc3-bd18-d2ffe436674f"
+                    "uuid": "e4e6373d-0d94-4a0d-aeb6-3a6d8c5c0138"
                 },
                 {
-                    "description": "Zone [3V3_DIGITAL] on F.Cu, priority 10",
+                    "description": "Zone [3V8_MODEM] on F.Cu, priority 12",
                     "pos": {
-                        "x": 56.9652,
-                        "y": 36.4898
+                        "x": 68.7449,
+                        "y": 10.8701
                     },
-                    "uuid": "f48e21ac-a348-4c3e-822a-049172887b09"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Track [FB_3V8] on F.Cu, length 1.2250 mm",
-                    "pos": {
-                        "x": 55.585,
-                        "y": 13.125
-                    },
-                    "uuid": "0bb63f03-6a42-42b9-a5e5-7d1083659580"
-                },
-                {
-                    "description": "Track [FB_3V8] on F.Cu, length 1.4800 mm",
-                    "pos": {
-                        "x": 56.51,
-                        "y": 19.0
-                    },
-                    "uuid": "7fd886ab-d653-4e22-b972-4779fb6b1e34"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Zone [GND_PWR] on In1.Cu, priority 0",
-                    "pos": {
-                        "x": 0.45,
-                        "y": 0.45
-                    },
-                    "uuid": "467b84d8-b401-4658-bda9-12796232ec69"
-                },
-                {
-                    "description": "Zone [GND_PWR] on F.Cu, priority 0",
-                    "pos": {
-                        "x": 0.45,
-                        "y": 0.45
-                    },
-                    "uuid": "418448bf-d4b2-448c-bf2e-ac11a6fe10c6"
+                    "uuid": "128dc693-7209-443e-a46f-1ab3cedd0aa4"
                 }
             ],
             "severity": "error",
@@ -135,7 +112,7 @@
                         "x": 0.45,
                         "y": 0.45
                     },
-                    "uuid": "418448bf-d4b2-448c-bf2e-ac11a6fe10c6"
+                    "uuid": "af092ef1-af71-42ca-b4eb-6c90c4f02a74"
                 },
                 {
                     "description": "Zone [GND_PWR] on F.Cu, priority 0",
@@ -143,7 +120,7 @@
                         "x": 0.45,
                         "y": 0.45
                     },
-                    "uuid": "418448bf-d4b2-448c-bf2e-ac11a6fe10c6"
+                    "uuid": "af092ef1-af71-42ca-b4eb-6c90c4f02a74"
                 }
             ],
             "severity": "error",
@@ -153,12 +130,35 @@
             "description": "Missing connection between items",
             "items": [
                 {
-                    "description": "Track [I2C2_SDA] on F.Cu, length 0.1143 mm",
+                    "description": "Pad 1 [I2C2_SCL] of TP9 on F.Cu",
+                    "pos": {
+                        "x": 45.32,
+                        "y": 56.0
+                    },
+                    "uuid": "80698f64-d3ff-4cf5-8d1d-8ccf8371062b"
+                },
+                {
+                    "description": "Track [I2C2_SCL] on F.Cu, length 1.0900 mm",
+                    "pos": {
+                        "x": 75.11,
+                        "y": 56.5
+                    },
+                    "uuid": "738f0937-c199-4e51-a0a8-33baec8bf9f1"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [I2C2_SDA] on F.Cu, length 0.1159 mm",
                     "pos": {
                         "x": 47.86,
-                        "y": 55.8857
+                        "y": 56.0
                     },
-                    "uuid": "d66b53d9-1d18-40ea-9043-41ceddf1944f"
+                    "uuid": "57021995-caf6-4f6d-8aca-21a46cb1f3cc"
                 },
                 {
                     "description": "Track [I2C2_SDA] on F.Cu, length 1.4900 mm",
@@ -166,7 +166,7 @@
                         "x": 75.11,
                         "y": 58.0
                     },
-                    "uuid": "09ef806f-2103-447a-8345-d95f6e90d644"
+                    "uuid": "e539ac4f-f77b-409b-95a4-02c0e926cb15"
                 }
             ],
             "severity": "error",
@@ -176,158 +176,20 @@
             "description": "Missing connection between items",
             "items": [
                 {
-                    "description": "Track [MODE_3V3] on F.Cu, length 1.0969 mm",
-                    "pos": {
-                        "x": 53.7144,
-                        "y": 49.7756
-                    },
-                    "uuid": "bb7c1e09-cf03-408e-82ed-aeefbe4682ed"
-                },
-                {
-                    "description": "Pad 7 [MODE_3V3] of U4 on F.Cu",
-                    "pos": {
-                        "x": 54.475,
-                        "y": 41.125
-                    },
-                    "uuid": "f39ce87d-433c-468c-b5a0-362bbd0d12d4"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Track [MODE_3V8] on F.Cu, length 1.2250 mm",
-                    "pos": {
-                        "x": 54.415,
-                        "y": 13.125
-                    },
-                    "uuid": "279208f9-9366-47b8-8895-eabc3c9ee3ec"
-                },
-                {
-                    "description": "Track [MODE_3V8] on F.Cu, length 1.0684 mm",
-                    "pos": {
-                        "x": 54.1964,
-                        "y": 20.2064
-                    },
-                    "uuid": "dfba53e6-a51e-4032-93d7-5bf73bfc15d5"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Pad 5 [PG_3V8] of U3 on F.Cu",
-                    "pos": {
-                        "x": 56.175,
-                        "y": 13.3
-                    },
-                    "uuid": "55acc4ab-aa52-4e79-96d2-effcd3ebf913"
-                },
-                {
-                    "description": "Track [PG_3V8] on F.Cu, length 9.9685 mm",
-                    "pos": {
-                        "x": 53.4412,
-                        "y": 27.5488
-                    },
-                    "uuid": "cda7ae01-bb2d-48a1-935f-b7b879faefe5"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Track [RT_3V3] on F.Cu, length 0.0529 mm",
-                    "pos": {
-                        "x": 53.8624,
-                        "y": 41.2626
-                    },
-                    "uuid": "22eb0dbb-718f-4f1f-b6e3-f87afd069875"
-                },
-                {
-                    "description": "Pad 1 [RT_3V3] of R7 on F.Cu",
-                    "pos": {
-                        "x": 49.49,
-                        "y": 47.0
-                    },
-                    "uuid": "e9496d3d-2ccb-49d9-8b53-8ce80a8b7707"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Pad 1 [RT_3V8] of R3 on F.Cu",
-                    "pos": {
-                        "x": 49.99,
-                        "y": 19.0
-                    },
-                    "uuid": "1d2e3c19-ee44-4eab-839a-4c4f5b4dd94e"
-                },
-                {
-                    "description": "Pad 2 [RT_3V8] of R5 on F.Cu",
-                    "pos": {
-                        "x": 56.01,
-                        "y": 21.0
-                    },
-                    "uuid": "19534324-6866-44c5-a530-e8e0b715fc09"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Track [RT_3V8] on F.Cu, length 0.1602 mm",
-                    "pos": {
-                        "x": 53.825,
-                        "y": 13.1398
-                    },
-                    "uuid": "73dfc549-56df-41d8-a6a5-2bf81772a3bd"
-                },
-                {
-                    "description": "Pad 1 [RT_3V8] of R3 on F.Cu",
-                    "pos": {
-                        "x": 49.99,
-                        "y": 19.0
-                    },
-                    "uuid": "1d2e3c19-ee44-4eab-839a-4c4f5b4dd94e"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Zone [VBAT_SYS] on F.Cu, priority 22",
+                    "description": "Zone [VBAT_SYS] on F.Cu, priority 21",
                     "pos": {
                         "x": 49.2888,
                         "y": 13.0572
                     },
-                    "uuid": "9ff69888-7fda-40f6-80b1-ffbc0888963e"
+                    "uuid": "7dbb973c-024c-4385-b128-c6efda4cbb09"
                 },
                 {
-                    "description": "Zone [VBAT_SYS] on F.Cu, priority 22",
+                    "description": "Zone [VBAT_SYS] on F.Cu, priority 21",
                     "pos": {
                         "x": 48.2428,
                         "y": 24.7638
                     },
-                    "uuid": "47cb8276-f027-46e6-ab17-58709863b06a"
+                    "uuid": "d0e9cc34-3231-4a5d-ae4a-c96c9d145dc3"
                 }
             ],
             "severity": "error",
@@ -344,52 +206,7 @@
                         "x": 47.7,
                         "y": 24.0
                     },
-                    "uuid": "7c2e8c04-3552-4cb3-846b-2b0b0db66194"
-                }
-            ],
-            "severity": "warning",
-            "type": "via_dangling"
-        },
-        {
-            "description": "Via is not connected or connected on only one layer",
-            "items": [
-                {
-                    "description": "Via [FB_3V8] on F.Cu - B.Cu",
-                    "pos": {
-                        "x": 55.585,
-                        "y": 11.9
-                    },
-                    "uuid": "5e2807c2-1f76-4cee-b268-353dc14b34de"
-                }
-            ],
-            "severity": "warning",
-            "type": "via_dangling"
-        },
-        {
-            "description": "Via is not connected or connected on only one layer",
-            "items": [
-                {
-                    "description": "Via [MODE_3V3] on F.Cu - B.Cu",
-                    "pos": {
-                        "x": 54.415,
-                        "y": 39.9
-                    },
-                    "uuid": "78775fdb-67e9-4502-a577-388332cde872"
-                }
-            ],
-            "severity": "warning",
-            "type": "via_dangling"
-        },
-        {
-            "description": "Via is not connected or connected on only one layer",
-            "items": [
-                {
-                    "description": "Via [MODE_3V8] on F.Cu - B.Cu",
-                    "pos": {
-                        "x": 54.415,
-                        "y": 11.9
-                    },
-                    "uuid": "7404ff6a-021d-45a7-ba74-23c7e28080ab"
+                    "uuid": "61ceb6ef-b878-483b-b73e-14137b0b421a"
                 }
             ],
             "severity": "warning",
@@ -404,7 +221,7 @@
                         "x": 47.3,
                         "y": 23.0
                     },
-                    "uuid": "35f24de1-98d2-48a0-93e2-53b64f721ea9"
+                    "uuid": "dca07095-ca67-4cc7-9122-c7a2e73a2a90"
                 }
             ],
             "severity": "warning",
