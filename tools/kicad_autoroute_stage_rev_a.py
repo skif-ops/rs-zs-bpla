@@ -227,10 +227,19 @@ def dump_geometry(board_path: str, out_json: str) -> None:
         w, h = pcbnew.ToMM(size.x) / 2, pcbnew.ToMM(size.y) / 2
         angle = math.radians(pad.GetOrientation().AsDegrees())
         cx, cy = pcbnew.ToMM(pad.GetPosition().x), pcbnew.ToMM(pad.GetPosition().y)
+        try:
+            shape = pad.GetShape()
+        except TypeError:
+            shape = pad.GetShape(pcbnew.F_Cu if pad.IsOnLayer(pcbnew.F_Cu) else pcbnew.B_Cu)
         poly = []
-        for dx, dy in ((-w, -h), (w, -h), (w, h), (-w, h)):
-            poly.append([round(cx + dx * math.cos(angle) + dy * math.sin(angle), 4),
-                         round(cy - dx * math.sin(angle) + dy * math.cos(angle), 4)])
+        if shape == pcbnew.PAD_SHAPE_CIRCLE:
+            for step in range(16):
+                a = 2 * math.pi * step / 16
+                poly.append([round(cx + w * math.cos(a), 4), round(cy + w * math.sin(a), 4)])
+        else:
+            for dx, dy in ((-w, -h), (w, -h), (w, h), (-w, h)):
+                poly.append([round(cx + dx * math.cos(angle) + dy * math.sin(angle), 4),
+                             round(cy - dx * math.sin(angle) + dy * math.cos(angle), 4)])
         geometry["pads"].append({"net": pad.GetNetname(), "layers": layers, "pos": [cx, cy], "poly": poly})
     box = board.GetBoardEdgesBoundingBox()
     geometry["outline"] = [pcbnew.ToMM(box.GetX()), pcbnew.ToMM(box.GetY()),
@@ -360,7 +369,8 @@ def pours(board_path: str, spec_json: str) -> None:
                 y = centre.y + int((half + mm(extra)) * math.sin(angle))
                 # 0.5 mm probe: the via (r 0.3) lies wholly inside the pour, which
                 # already keeps its clearance to foreign copper
-                if via_site_ok(x, y, f_fill, mm(0.5)):
+                if via_site_ok(x, y, f_fill, mm(0.5)) and not any(
+                        math.hypot(v.x - x, v.y - y) < mm(0.9) for v in ground_vias):
                     add_ground_via(x, y)
                     ground_vias.append(pcbnew.VECTOR2I(int(x), int(y)))
                     pad_vias += 1
