@@ -6,6 +6,11 @@
  *         -> zs_power_modes (the same event wiring as tasks.c) -> app_comms (real STM32 comms task, tests/host_sim)
  *         -> BG95 responder -> twin link: "PUB <topic> <hex>" lines to the server, receipts/commands back as +QMTRECV
  *
+ * Remote commands (ICD addendum D): the twin tells the server when the station subscribes to its down topic
+ * ("SUB <topic> <wall_us>", as a broker would deliver its QoS 1 queue); the server answers with a signed command
+ * and sends the next one in reply to each ACK.  The station side runs the real command channel with the
+ * repository test key, a trusted wall clock and an executor that mirrors app_commands.c over zs_station_params.
+ *
  * Nothing on the target changes: the twin reuses the modules and mirrors the task wiring of tasks.c.
  *   station_twin --scene drone|quiet|ground --seconds N --server "python3 -m twin.twin_server" [--seed S]
  */
@@ -16,11 +21,13 @@
 #include "task.h"
 #include "zs_audio.h"
 #include "zs_command_journal.h"
+#include "zs_command_set_vector.h"
 #include "zs_dsp_mcu.h"
 #include "zs_event_outbox.h"
 #include "zs_lora_uplink.h"
 #include "zs_power_modes.h"
 #include "zs_station_config.h"
+#include "zs_station_params.h"
 #include "zs_station_pipeline.h"
 
 #include <assert.h>
@@ -102,6 +109,17 @@ static void link_send(const char *topic, const uint8_t *payload, size_t n) {
   link_await_reply();
 }
 static void link_report(void) { const char *r = "REPORT\n"; if (write(link_out, r, 7) != 7) tlog("link: report write failed"); }
+/* Wall clock of the twin (station and server agree on UTC: GNSS on the station, NTP on the server). */
+static uint64_t twin_wall_us(void) { return UINT64_C(1800000000000000) + (uint64_t)sim_now * 1000u; }
+/* The station subscribed to its down topic: the broker delivers its queue now (the server twin answers with a
+   command or OK). */
+static void link_subscribed(const char *topic) {
+  char line[192];
+  const int k = snprintf(line, sizeof(line), "SUB %s %llu\n", topic, (unsigned long long)twin_wall_us());
+  if (link_out < 0 || k <= 0) return;
+  if (write(link_out, line, (size_t)k) != (ssize_t)k) tlog("link: write failed");
+  link_await_reply();
+}
 /* The server answers every line (a message or OK); waiting for that reply keeps the simulation deterministic. */
 static bool link_handle_line(char *line);
 static void link_await_reply(void) {
@@ -171,7 +189,14 @@ static void on_at_command(const char *c) {
   if (strcmp(c, "AT+QIACT=1") == 0) { reply(gsm_available ? "OK" : "ERROR"); return; }
   if (strncmp(c, "AT+QMTOPEN=", 11u) == 0) { reply("OK"); reply(gsm_available && !mqtt_refused() ? "+QMTOPEN: 0,0" : "+QMTOPEN: 0,-1"); return; }
   if (strncmp(c, "AT+QMTCONN=", 11u) == 0) { reply("OK"); reply("+QMTCONN: 0,0,0"); return; }
-  if (strncmp(c, "AT+QMTSUB=", 10u) == 0) { unsigned client, id; char r[64]; if (sscanf(c, "AT+QMTSUB=%u,%u", &client, &id) == 2) { reply("OK"); snprintf(r, sizeof(r), "+QMTSUB: %u,%u,0,1", client, id); reply(r); } return; }
+  if (strncmp(c, "AT+QMTSUB=", 10u) == 0) {
+    unsigned client, id; char r[64], topic[128];
+    if (sscanf(c, "AT+QMTSUB=%u,%u", &client, &id) == 2) {
+      reply("OK"); snprintf(r, sizeof(r), "+QMTSUB: %u,%u,0,1", client, id); reply(r);
+      if (sscanf(c, "AT+QMTSUB=%*u,%*u,\"%127[^\"]\"", topic) == 1) link_subscribed(topic);
+    }
+    return;
+  }
   if (strncmp(c, "AT+QMTPUB=", 10u) == 0) {
     unsigned client, id, qos, retain, len; char topic[128];
     if (sscanf(c, "AT+QMTPUB=%u,%u,%u,%u,\"%127[^\"]\",%u", &client, &id, &qos, &retain, topic, &len) == 6) {
@@ -468,8 +493,60 @@ static void gsm_probe_tick(void) {
   mode_event(ZS_MODE_EV_OUTBOX_PENDING);
 }
 
+/* ---- remote commands: executor mirroring app_commands.c over zs_station_params (RAM record = the NOR one) ---- */
+static uint8_t params_mem[2][64];
+static bool pm_read(void *c, uint8_t s, uint32_t o, uint8_t *d, size_t n) { (void)c; if (s > 1u || o + n > 64u) return false; memcpy(d, &params_mem[s][o], n); return true; }
+static bool pm_erase(void *c, uint8_t s) { (void)c; if (s > 1u) return false; memset(params_mem[s], 0xff, 64u); return true; }
+static bool pm_write(void *c, uint8_t s, uint32_t o, const uint8_t *d, size_t n) { (void)c; if (s > 1u || o + n > 64u) return false; for (size_t i = 0u; i < n; i++) { if ((params_mem[s][o + i] & d[i]) != d[i]) return false; params_mem[s][o + i] = d[i]; } return true; }
+static const zs_station_params_io_t params_io = {NULL, pm_read, pm_erase, pm_write};
+static zs_station_params_t params;
+static unsigned cmd_executed, cmd_rejected, cmd_reboots_scheduled, twin_reboots;
+static bool reboot_pending; static uint32_t reboot_at_ms;
+static void params_apply(const zs_station_params_t *p) {
+  modes.policy.heartbeat_period_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_HEARTBEAT_PERIOD_S) * 1000u;
+  modes.policy.listen_dwell_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_LISTEN_DWELL_S) * 1000u;
+  pipeline_port.channel = (uint8_t)zs_station_params_get(p, ZS_PARAM_MIC_CHANNEL);
+  pipeline_port.update_period_windows = (uint8_t)zs_station_params_get(p, ZS_PARAM_EVENT_UPDATE_WINDOWS);
+  degraded_after = (unsigned)zs_station_params_get(p, ZS_PARAM_COMMS_DEGRADED_AFTER);
+  gsm_probe_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_GSM_PROBE_S) * 1000u;
+}
+static bool twin_execute(void *ctx, const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail) {
+  (void)ctx;
+  *result = ZS_COMMAND_ACK_OK; *detail = 0u;
+  if (cmd->code == ZS_COMMAND_SET_PARAMS) {
+    zs_station_params_t next;
+    const uint16_t reject = zs_station_params_apply_command(&params, &cmd->params, &next);
+    if (reject) { *result = ZS_COMMAND_ACK_REJECTED; *detail = reject; }
+    else if (zs_station_params_commit(&params_io, &next) != ZS_STATION_PARAMS_OK) { *result = ZS_COMMAND_ACK_FAILED; *detail = 1u; }
+    else { params = next; params_apply(&params); tlog("command: SET_PARAMS applied, params v%lu (heartbeat %ld s, mic %ld, dwell %ld s)", (unsigned long)params.version, (long)params.value[0], (long)params.value[1], (long)params.value[5]); }
+  } else if (cmd->code == ZS_COMMAND_REBOOT) {
+    const uint32_t delay_s = cmd->reboot.delay_s > 5u ? cmd->reboot.delay_s : 5u;
+    reboot_pending = true; reboot_at_ms = sim_now + delay_s * 1000u; cmd_reboots_scheduled++;
+    tlog("command: REBOOT in %lu s", (unsigned long)delay_s);
+  } else { *result = ZS_COMMAND_ACK_REJECTED; *detail = 1u; }
+  if (*result == ZS_COMMAND_ACK_OK) cmd_executed++; else cmd_rejected++;
+  return true;
+}
+/* Trusted wall clock for the command validity window (the target: zs_command_clock over GNSS/NITZ). */
+static bool twin_clock(uint32_t now_ms, uint64_t *now_us) { (void)now_ms; *now_us = twin_wall_us(); return true; }
+/* The reboot the executor scheduled: the scheduler restarts and the parameters come back from the record (the
+   command journal and the outbox live in NOR and survive as they are). */
+static void reboot_tick(void) {
+  zs_station_params_t loaded;
+  if (!reboot_pending || (int32_t)(sim_now - reboot_at_ms) < 0) return;
+  reboot_pending = false; twin_reboots++;
+  if (zs_station_params_load(&params_io, &loaded) != ZS_STATION_PARAMS_OK || memcmp(&loaded, &params, sizeof(params)) != 0) {
+    tlog("twin: FAIL parameters did not survive the reboot"); exit(1);
+  }
+  zs_mode_init(&modes, NULL, sim_now);
+  params_apply(&loaded);
+  (void)zs_mode_on_event(&modes, ZS_MODE_EV_BOOT_DONE, sim_now);
+  tlog("twin: REBOOT by command, params v%lu reloaded from the record", (unsigned long)loaded.version);
+}
+
 static void supervisor_tick(void) {
   static zs_mode_t last = ZS_MODE_SHUTDOWN;
+  reboot_tick();
   outbox_retry_tick();
   gsm_probe_tick();
   for (unsigned ev = 1u; ev < 32u; ev++) if (mode_bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, sim_now);
@@ -507,7 +584,7 @@ static void audio_tick(void) {
 int main(int argc, char **argv) {
   const char *scene_name = "drone", *server_cmd = NULL;
   uint32_t seconds = 120u, seed = 1u, outage_start = 0u, outage_end = 0u;
-  int expect_events = -1, expect_delivered = -1;
+  int expect_events = -1, expect_delivered = -1, expect_commands = -1, expect_reboots = -1;
   zs_station_config_t cfg;
   static scene_segment_t segs[4]; size_t nseg = 0u;
   for (int i = 1; i < argc; i++) {
@@ -529,7 +606,9 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--degraded-after") && i + 1 < argc) degraded_after = (unsigned)atoi(argv[++i]);
     else if (!strcmp(argv[i], "--gsm-probe-s") && i + 1 < argc) gsm_probe_ms = (uint32_t)atoi(argv[++i]) * 1000u;
     else if (!strcmp(argv[i], "--inject-events") && i + 2 < argc) { inject_count = (unsigned)atoi(argv[++i]); inject_at_ms = (uint32_t)atoi(argv[++i]) * 1000u; }
-    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N]\n"); return 2; }
+    else if (!strcmp(argv[i], "--expect-commands") && i + 1 < argc) expect_commands = atoi(argv[++i]);
+    else if (!strcmp(argv[i], "--expect-reboots") && i + 1 < argc) expect_reboots = atoi(argv[++i]);
+    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N]\n"); return 2; }
   }
   if (!strcmp(scene_name, "drone")) { segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 20000u, 60000u, 185.0f, 1.0f}; if (seconds > 150u) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 100000u, 130000u, 210.0f, 0.8f}; }
   else if (!strcmp(scene_name, "ground")) segs[nseg++] = (scene_segment_t){SCENE_GROUND_VEHICLE, 20000u, 60000u, 0.0f, 1.0f};
@@ -547,6 +626,14 @@ int main(int argc, char **argv) {
   assert(zs_station_config_validate(&cfg) == 0u && zs_station_config_compute_hash(&cfg, cfg.config_hash));
   for (unsigned i = 0u; i < 32u; i++) twin_engineer_key[i] = (uint8_t)(0xa0u + i);
   assert(zs_lora_uplink_init(&lora, &lora_port, &outbox_io, 17u, 1u, twin_engineer_key, 9u, 125000u, sim_now));
+  /* remote commands: the repository test key (tools/generate_command_set_vector.py), the twin wall clock and the
+     executor; the parameter record starts empty (defaults, the CLI flags above stay in force until a command) */
+  (void)zs_command_set_vector_reboot; (void)zs_command_set_vector_params;
+  memset(params_mem, 0xff, sizeof(params_mem));
+  (void)zs_station_params_load(&params_io, &params);
+  app_comms_set_command_key(zs_command_set_vector_public_key);
+  app_comms_set_clock(twin_clock);
+  app_comms_set_executor(twin_execute, NULL);
   app_comms_bind(&outbox_io, &journal_io, &hooks);
   app_comms_set_config(&cfg, 5u);
   app_comms_request(true);
@@ -576,12 +663,15 @@ int main(int argc, char **argv) {
          events_emitted_total, (unsigned long)app_comms_state()->events_published, link_receipts, pending, sessions_done, qpowd_count);
     tlog("twin: outbox retries %u, channel: publishes lost %u, receipts lost %u, gsm %s (fail streak %u)", outbox_retries, ch_publishes_lost, ch_receipts_lost, gsm_degraded ? "DEGRADED" : "ok", comms_fail_streak);
     if (lora_enabled) tlog("twin: lora frames %u acks %u timeouts %u budget waits %u airtime %lu ms", lora.frames_sent, lora.acks, lora.ack_timeouts, lora.budget_waits, (unsigned long)lora.airtime_ms_total);
+    tlog("twin: commands executed %u rejected %u, reboots scheduled %u done %u, params v%lu", cmd_executed, cmd_rejected, cmd_reboots_scheduled, twin_reboots, (unsigned long)params.version);
   }
   {
     uint16_t pending = 0u;
     (void)zs_event_outbox_pending_count(&outbox_io, &pending);
     if (expect_events >= 0 && (int)events_emitted_total < expect_events) { tlog("twin: FAIL expected >= %d events, got %u", expect_events, events_emitted_total); return 1; }
     if (expect_delivered >= 0 && ((int)(link_receipts + lora.acks) < expect_delivered || pending != 0u)) { tlog("twin: FAIL expected %d delivered events with an empty outbox (mqtt receipts %u, lora acks %u, pending %u)", expect_delivered, link_receipts, lora.acks, pending); return 1; }
+    if (expect_commands >= 0 && (int)cmd_executed != expect_commands) { tlog("twin: FAIL expected %d executed commands, got %u", expect_commands, cmd_executed); return 1; }
+    if (expect_reboots >= 0 && ((int)twin_reboots != expect_reboots || (int)cmd_reboots_scheduled != expect_reboots)) { tlog("twin: FAIL expected %d reboots (scheduled %u, done %u)", expect_reboots, cmd_reboots_scheduled, twin_reboots); return 1; }
   }
   if (link_out >= 0) { link_report(); fcntl(link_in, F_SETFL, fcntl(link_in, F_GETFL) & ~O_NONBLOCK); close(link_out); for (;;) { ssize_t r = read(link_in, link_buf + link_len, sizeof(link_buf) - 1u - link_len); if (r <= 0) break; link_len += (size_t)r; } link_buf[link_len] = 0; { char *p = strstr(link_buf, "REPORT "); if (p) printf("SERVER %s", p + 7); } waitpid(server_pid, NULL, 0); }
   return 0;
