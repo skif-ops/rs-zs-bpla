@@ -1,12 +1,27 @@
 #include "bsp_nor.h"
 
 #include "FreeRTOS.h"
+#include "semphr.h"
 #include "task.h"
 #include "stm32u5xx_hal.h"
 
 #include <string.h>
 
 static OSPI_HandleTypeDef hospi;
+
+/* One NOR, many tasks (outbox, command journal, records, nRF image, audio prehistory): zs_nor takes this lock per
+   page program, erase block and read.  Static mutex with priority inheritance; before the scheduler runs there is
+   only one context, so the lock is a no-op then. */
+static StaticSemaphore_t nor_mutex_storage;
+static SemaphoreHandle_t nor_mutex;
+static void nor_lock(void *ctx) {
+  (void)ctx;
+  if (nor_mutex && xTaskGetSchedulerState() == taskSCHEDULER_RUNNING) (void)xSemaphoreTake(nor_mutex, portMAX_DELAY);
+}
+static void nor_unlock(void *ctx) {
+  (void)ctx;
+  if (nor_mutex && xTaskGetSchedulerState() == taskSCHEDULER_RUNNING) (void)xSemaphoreGive(nor_mutex);
+}
 
 /* zs_nor_port_t command executor: opcode, optional 3/4-byte address, then either tx or rx data on one line.
    tx followed by rx under the same nCS is only supported when tx is a dummy prefix (SFDP read 0x5A). */
@@ -80,7 +95,10 @@ bool bsp_nor_init(zs_nor_t *nor) {
   iom.NCSPort = 1u;
   iom.IOLowPort = HAL_OSPIM_IOPORT_1_LOW;
   if (HAL_OSPIM_Config(&hospi, &iom, HAL_OSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK) return false;
-  return zs_nor_init(nor, &port, &geometry);
+  if (!zs_nor_init(nor, &port, &geometry)) return false;
+  if (!nor_mutex) nor_mutex = xSemaphoreCreateMutexStatic(&nor_mutex_storage);
+  zs_nor_set_lock(nor, nor_lock, nor_unlock, NULL);
+  return true;
 }
 
 void HAL_OSPI_MspInit(OSPI_HandleTypeDef *h) {
