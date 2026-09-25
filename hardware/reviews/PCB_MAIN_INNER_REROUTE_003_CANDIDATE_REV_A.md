@@ -74,9 +74,9 @@ NOR_CLK_U1 reaches R8 from the right, so EN_MODEM keeps the only way out to the 
 | F.Cu over In1, GND_DIGITAL | 93.8 % | **96.1 %** |
 | In2.Cu / In3.Cu digital runs | 157.4 / 112.7 mm, 0 % | none |
 
-Per rerouted net and layer: 79–100 % (antipads of vias and pad clearances); lowest NOR_IO3_U2 F.Cu 64 %
-(2.5 mm of its unchanged stub at U2) and NCS F.Cu 79 % (the stub inside the U1 pad ring). Full table:
-`REFERENCE_MAP.json` → `rerouted_nets`.
+Per rerouted net and layer: 64–100 %, gaps at via antipads and pad clearances. Lowest: NOR_IO3_U2 F.Cu 64 %
+(2.5 mm of its unchanged stub at U2), NCS F.Cu 79 % (the stub inside the U1 pad ring), NOR_CLK_U1 B.Cu 82 %.
+Full table: `REFERENCE_MAP.json` → `rerouted_nets`.
 
 ## 4. Return vias
 Every F.Cu↔B.Cu transition of a rerouted net has a GND_DIGITAL via within 2.0 mm: 21 transitions, 17 served
