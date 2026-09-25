@@ -40,9 +40,11 @@ def test_worst_segment_not_longest_segment() -> None:
     assert summary["i_branch_a"] == 0.3, summary["i_branch_a"]
     assert summary["worst_segment"]["i_a"] == 0.3
     assert summary["cases"][0]["i_max_a"] == 0.3
-    # delta-U along the loaded segments only: 0.3 A through 1.5 + 2.5 mm of 0.5 mm x 35 um copper at 70 C
-    r_mohm = ev.RHO_70C * 4.0e-3 / (0.5e-3 * ev.T_CU_M) * 1e3
-    assert abs(summary["cases"][0]["du_mv_along_segments"] - 0.3 * r_mohm) < 0.01
+    # delta-U along every loaded segment: 0.3 A through 1.5 + 2.5 mm of 0.5 mm copper and, conservatively,
+    # through the 0.05 mm x 0.2 mm short neck; the 0 A dead end adds nothing (35 um, 70 C)
+    r_main = ev.RHO_70C * 4.0e-3 / (0.5e-3 * ev.T_CU_M) * 1e3
+    r_neck = ev.RHO_70C * 0.05e-3 / (0.2e-3 * ev.T_CU_M) * 1e3
+    assert abs(summary["cases"][0]["du_mv_along_segments"] - 0.3 * (r_main + r_neck)) < 0.002
 
 
 def test_short_segment_never_screened_at_zero() -> None:

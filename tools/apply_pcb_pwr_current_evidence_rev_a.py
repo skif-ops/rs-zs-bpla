@@ -14,9 +14,10 @@ CURRENT_EVIDENCE.json next to it. Everything is recomputed from the board file:
              longest segment was a dead-end branch - 1V8_MIC read 0 A). Per segment and case: current,
              resistance, delta-U, loss, the IPC-2221 external 10 C current for THAT segment's width
              (project screen: 2.03 mm -> 4.0 A) and the clamped-bar heating; the group reports the
-             worst segment and the sum of delta-U / loss along its segments. Groups no longer than
-             SHORT_MM are conduction-dominated (both ends in wider copper): heating is the clamped-bar
-             value dT = J^2 rho L^2 / (8 k) over the whole group length, accepted up to 1 C.
+             worst segment and the sum of delta-U / loss along ALL its segments (short ones included).
+             Groups no longer than SHORT_MM are conduction-dominated (both ends in wider copper):
+             heating is the clamped-bar value dT = J^2 rho L^2 / (8 k) over the whole group length,
+             accepted up to 1 C.
              Self-check: a group touching both the source and the sink pad of a case must carry
              current in that case (assert_loaded_paths);
   hot_loop   buck VIN stubs: DC share plus the full input RMS ripple Iout*sqrt(D(1-D)) assumed to
@@ -244,10 +245,15 @@ def summarise_group(group: dict, case_currents: dict, bound_a: float) -> dict:
                          "ipc2221_10c_a": round(ipc, 3), "bar_delta_t_c": None if bar is None else round(bar, 4),
                          "status": status})
     per_case = []
+    shorts = segments[len(probes):]
     for c, cur in case_currents.items():
+        # short segments carry the largest current measured in the group in this case (bound_a without cuts)
+        i_c = max(cur, default=0.0) if probes else bound_a
         du = sum(cur[k] * segments[k]["r_mohm_70c"] for k in range(len(probes)))
+        du += sum(i_c * s["r_mohm_70c"] for s in shorts)
         p = sum(cur[k] ** 2 * segments[k]["r_mohm_70c"] for k in range(len(probes)))
-        per_case.append({"case": c, "i_max_a": round(max(cur, default=0.0), 4),
+        p += sum(i_c ** 2 * s["r_mohm_70c"] for s in shorts)
+        per_case.append({"case": c, "i_max_a": round(i_c, 4),
                          "du_mv_along_segments": round(du, 3), "p_mw_along_segments": round(p, 3)})
     worst = max(segments, key=lambda s: (STATUS_ORDER[s["status"]], s["i_a"]), default=None)
     return {"segments_detail": segments, "cases": per_case,
