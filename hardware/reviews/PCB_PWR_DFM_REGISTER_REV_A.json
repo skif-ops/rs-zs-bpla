@@ -82,7 +82,12 @@
      null,
      0.05
     ],
-    "mask_dam_mm": null,
+    "mask_opening_kind": [
+     "FOOTPRINT_MASK_DEFINED",
+     "OWN"
+    ],
+    "mask_dam_mm": 0.2,
+    "exposed_copper_gap_mm": 0.25,
     "paste_gap_mm": 0.25,
     "paste_area_mm2": [
      0.7622,
@@ -104,7 +109,12 @@
      null,
      0.05
     ],
-    "mask_dam_mm": null,
+    "mask_opening_kind": [
+     "FOOTPRINT_MASK_DEFINED",
+     "OWN"
+    ],
+    "mask_dam_mm": 0.2,
+    "exposed_copper_gap_mm": 0.25,
     "paste_gap_mm": 0.25,
     "paste_area_mm2": [
      0.7622,
@@ -126,7 +136,12 @@
      null,
      0.05
     ],
-    "mask_dam_mm": null,
+    "mask_opening_kind": [
+     "FOOTPRINT_MASK_DEFINED",
+     "OWN"
+    ],
+    "mask_dam_mm": 0.2,
+    "exposed_copper_gap_mm": 0.25,
     "paste_gap_mm": 0.25,
     "paste_area_mm2": [
      0.7622,
@@ -148,7 +163,12 @@
      null,
      0.05
     ],
-    "mask_dam_mm": null,
+    "mask_opening_kind": [
+     "FOOTPRINT_MASK_DEFINED",
+     "OWN"
+    ],
+    "mask_dam_mm": 0.2,
+    "exposed_copper_gap_mm": 0.25,
     "paste_gap_mm": 0.25,
     "paste_area_mm2": [
      0.7622,
@@ -3931,6 +3951,12 @@
    {
     "a": "J1.2",
     "b": "via@6.95,27.95",
+    "net_a": "GND_PWR",
+    "net_b": "GND_PWR",
+    "d_mm": [
+     1.02,
+     0.3
+    ],
     "edge_mm": 0.2913
    }
   ]

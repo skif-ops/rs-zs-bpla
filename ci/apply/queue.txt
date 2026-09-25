@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-25: R2.002 DFM register run 3 (mask-defined openings of U3/U4 pad 2, hole nets)
-tools/apply_pcb_pwr_dfm_register_rev_a.py
