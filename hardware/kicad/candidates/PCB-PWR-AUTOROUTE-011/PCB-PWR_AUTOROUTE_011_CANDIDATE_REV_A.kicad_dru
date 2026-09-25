@@ -1,14 +1,5 @@
 (version 1)
 
-# PCB-PWR autoroute 011: net class PWR_SWITCH_4A clearance of the 35 um routing
-# basis (hardware/reviews/PCB_PWR_JLC04161H_3313_EVT_ROUTING_BASIS_REV_A.json) as a
-# rule, so the project keeps no net classes. First rule: the footprint land-pattern
-# rules below take precedence inside U3/U4/U2.
-(rule "PWR_SWITCH_4A clearance (SW nodes)"
-  (condition "A.NetName == 'SW_3V8' || A.NetName == 'SW_3V3'")
-  (constraint clearance (min 0.4mm))
-)
-
 # PCB-PWR ECO-004 (customer decision 2026-09-24: outer copper 1 oz).
 # The TI LMR60440 RAK0009A board pattern (SNAS877) places pins 6/7 0.125 mm from
 # the GND centre pad 2. This limit applies only between two items of the same

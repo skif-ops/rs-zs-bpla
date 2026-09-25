@@ -49,11 +49,11 @@ def main() -> int:
     args = parser.parse_args()
     payload = accepted_payload()
     if args.check:
-        from pcb_pwr_hot_loop_006_board import is_j2_placement_eco_003
+        from pcb_pwr_hot_loop_006_board import is_autoroute_011, is_j2_placement_eco_003
 
         active = BOARD.read_bytes()
-        assert active == payload or is_j2_placement_eco_003(active), \
-            "authoritative PCB-PWR is not exact accepted 010 or its ECO-003 successor"
+        assert active == payload or is_j2_placement_eco_003(active) or is_autoroute_011(active), \
+            "authoritative PCB-PWR is not exact accepted 010 or its ECO-003 / autoroute 011 successor"
     else:
         assert BOARD.read_bytes() == BASE.read_bytes(), "authoritative 009 predecessor differs"
         BOARD.write_bytes(payload)

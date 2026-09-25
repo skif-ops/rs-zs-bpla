@@ -1,0 +1,16 @@
+{
+  "schema": "dioneya-pcb-pwr-native-drc-v1",
+  "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
+  "board_sha256": "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578",
+  "project_sha256": "c2e65e384d09e7761100f7cfd68510a2ec63cd3c8500cb23774127b06beddfa8",
+  "rules_sha256": "66bcf32aa0869eea2520d4feb053e25bd3f0ae14cef7d112b218868901fa9c26",
+  "error_total": 0,
+  "errors": [],
+  "warnings": {
+    "lib_footprint_issues": 66,
+    "silk_over_copper": 41,
+    "silk_overlap": 16,
+    "via_dangling": 1
+  },
+  "unconnected_total": 0
+}

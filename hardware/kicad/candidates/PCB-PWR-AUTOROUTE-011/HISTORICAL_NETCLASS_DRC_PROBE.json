@@ -1,0 +1,222 @@
+{
+  "schema": "dioneya-pcb-pwr-netclass-historical-drc-probe-v1",
+  "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
+  "pre_011_project_commit": "3112a43b23fab117774865473580c64e5cf2e9e1",
+  "boards": 26,
+  "boards_with_difference": 10,
+  "rows": [
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-3V8-OUTPUT-BULK-ROUTING-010/PCB-PWR_3V8_OUTPUT_BULK_ROUTING_010_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 126,
+      "violations_current_project": 126,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-3V8-OUTPUT-BULK-ROUTING-010/PCB-PWR_3V8_OUTPUT_BULK_ROUTING_010_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 126,
+      "violations_current_project": 126,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 127,
+      "violations_current_project": 127,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-BUCK-BOOTSTRAP-ROUTING-001/PCB-PWR_BUCK_BOOTSTRAP_ROUTING_001_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 127,
+      "violations_current_project": 129,
+      "added": {
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V8] of U3 on F.Cu\", \"Track [BOOT_3V8] on F.Cu, length 1.2816 mm\"]]": 1,
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V3] of U4 on F.Cu\", \"Track [BOOT_3V3] on F.Cu, length 1.2816 mm\"]]": 1
+      },
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 126,
+      "violations_current_project": 126,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006/PCB-PWR_BUCK_INPUT_HOT_LOOP_ROUTING_006_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 126,
+      "violations_current_project": 126,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 128,
+      "violations_current_project": 128,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-BUCK-PLACEMENT-ECO-001/PCB-PWR_BUCK_PLACEMENT_ECO_001_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 129,
+      "violations_current_project": 129,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 127,
+      "violations_current_project": 129,
+      "added": {
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V3] of U4 on F.Cu\", \"Track [BOOT_3V3] on F.Cu, length 1.2816 mm\"]]": 1,
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V8] of U3 on F.Cu\", \"Track [BOOT_3V8] on F.Cu, length 1.2816 mm\"]]": 1
+      },
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 126,
+      "violations_current_project": 126,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 127,
+      "violations_current_project": 129,
+      "added": {
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V3] of U4 on F.Cu\", \"Track [BOOT_3V3] on F.Cu, length 1.2816 mm\"]]": 1,
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V8] of U3 on F.Cu\", \"Track [BOOT_3V8] on F.Cu, length 1.2816 mm\"]]": 1
+      },
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-BUCK-SWITCH-NODE-ROUTING-005/PCB-PWR_BUCK_SWITCH_NODE_ROUTING_005_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 127,
+      "violations_current_project": 129,
+      "added": {
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V3] of U4 on F.Cu\", \"Track [BOOT_3V3] on F.Cu, length 1.2816 mm\"]]": 1,
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V8] of U3 on F.Cu\", \"Track [BOOT_3V8] on F.Cu, length 1.2816 mm\"]]": 1
+      },
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 129,
+      "violations_current_project": 129,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-BUCK-WARNING-REMEDIATION-001/PCB-PWR_BUCK_WARNING_REMEDIATION_001_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 127,
+      "violations_current_project": 127,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 127,
+      "violations_current_project": 129,
+      "added": {
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V3] of U4 on F.Cu\", \"Track [BOOT_3V3] on F.Cu, length 1.2816 mm\"]]": 1,
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V8] of U3 on F.Cu\", \"Track [BOOT_3V8] on F.Cu, length 1.2816 mm\"]]": 1
+      },
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-LM74700-VCAP-ROUTING-002/PCB-PWR_LM74700_VCAP_ROUTING_002_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 127,
+      "violations_current_project": 129,
+      "added": {
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V3] of U4 on F.Cu\", \"Track [BOOT_3V3] on F.Cu, length 1.2816 mm\"]]": 1,
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V8] of U3 on F.Cu\", \"Track [BOOT_3V8] on F.Cu, length 1.2816 mm\"]]": 1
+      },
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 127,
+      "violations_current_project": 129,
+      "added": {
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V8] of U3 on F.Cu\", \"Track [BOOT_3V8] on F.Cu, length 1.2816 mm\"]]": 1,
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V3] of U4 on F.Cu\", \"Track [BOOT_3V3] on F.Cu, length 1.2816 mm\"]]": 1
+      },
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-REV-GATE-ROUTING-004/PCB-PWR_REV_GATE_ROUTING_004_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 127,
+      "violations_current_project": 129,
+      "added": {
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V3] of U4 on F.Cu\", \"Track [BOOT_3V3] on F.Cu, length 1.2816 mm\"]]": 1,
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V8] of U3 on F.Cu\", \"Track [BOOT_3V8] on F.Cu, length 1.2816 mm\"]]": 1
+      },
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 127,
+      "violations_current_project": 129,
+      "added": {
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V3] of U4 on F.Cu\", \"Track [BOOT_3V3] on F.Cu, length 1.2816 mm\"]]": 1,
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V8] of U3 on F.Cu\", \"Track [BOOT_3V8] on F.Cu, length 1.2816 mm\"]]": 1
+      },
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-VBAT-RAW-ROUTING-003/PCB-PWR_VBAT_RAW_ROUTING_003_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 127,
+      "violations_current_project": 129,
+      "added": {
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V3] of U4 on F.Cu\", \"Track [BOOT_3V3] on F.Cu, length 1.2816 mm\"]]": 1,
+        "[\"clearance\", \"error\", [\"Pad 3 [SW_3V8] of U3 on F.Cu\", \"Track [BOOT_3V8] on F.Cu, length 1.2816 mm\"]]": 1
+      },
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C11-ROUTING-009/PCB-PWR_VBAT_SYS_C13_C11_ROUTING_009_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 126,
+      "violations_current_project": 126,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C11-ROUTING-009/PCB-PWR_VBAT_SYS_C13_C11_ROUTING_009_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 126,
+      "violations_current_project": 126,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 126,
+      "violations_current_project": 126,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008/PCB-PWR_VBAT_SYS_C13_C12_ROUTING_008_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 126,
+      "violations_current_project": 126,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-SHUNT-BULK-ROUTING-007/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_BASE_REV_A.kicad_pcb",
+      "violations_pre011_project": 126,
+      "violations_current_project": 126,
+      "added": {},
+      "removed": {}
+    },
+    {
+      "board": "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-SHUNT-BULK-ROUTING-007/PCB-PWR_VBAT_SYS_SHUNT_BULK_ROUTING_007_CANDIDATE_REV_A.kicad_pcb",
+      "violations_pre011_project": 126,
+      "violations_current_project": 126,
+      "added": {},
+      "removed": {}
+    }
+  ],
+  "design_change": false
+}
