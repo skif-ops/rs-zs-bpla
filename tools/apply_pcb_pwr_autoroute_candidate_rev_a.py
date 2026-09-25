@@ -40,7 +40,23 @@ KICAD_IMAGE = "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3
 FREEROUTING_URL = "https://github.com/freerouting/freerouting/releases/download/v2.4.1/freerouting-2.4.1-linux-x64.zip"
 FREEROUTING_SHA256 = "3ad5a956ab474b12f331d24195feadac90e8344b8e013c6a4ab26e203ce51519"
 PLANES = [{"net": "GND_PWR", "layer": "In1.Cu", "inset_mm": 0.5}]
+HOLE_KEEPOUTS = {"refs": ["H1", "H2", "H3", "H4"], "radius_mm": 4.0}
 PASSES = 60
+# Autoroute-only class parameters (the basis stays the acceptance reference):
+# - PWR_RAIL_4A 2.1 mm: still >= the 2.03 mm 4 A / 35 um / 10 C screen of the basis
+#   and fits the 3.0 mm J2 pin pitch (1.2 mm to the neighbour pad);
+# - PWR_RETURN_5A 0.6 mm: GND_PWR pads are stubbed to vias into the In1.Cu plane,
+#   the 5 A return flows in the plane (basis layer policy CONTINUOUS_GND_PWR_PLANE);
+# - 0.2 mm clearance for return, sense, local and 0.3 A classes: fine-pitch pins
+#   (0.5 mm pitch, 0.2 mm gaps) cannot meet 0.3 mm; 0.2 mm is above the JLCPCB
+#   1 oz multilayer minimum.
+AUTOROUTE_OVERRIDES = {
+    "PWR_RAIL_4A": {"track_width": 2.1},
+    "PWR_RETURN_5A": {"track_width": 0.6, "clearance": 0.2},
+    "PWR_RAIL_0P3A": {"clearance": 0.2},
+    "PWR_LOCAL": {"clearance": 0.2},
+    "PWR_SENSE": {"clearance": 0.2},
+}
 
 
 def sha256(path: Path) -> str:
@@ -76,6 +92,7 @@ def project_with_netclasses(source: Path) -> dict:
             via_drill=numeric.get("via_drill_mm", 0.3),
             priority=index,
         ))
+        classes[-1].update(AUTOROUTE_OVERRIDES.get(numeric["name"], {}))
     patterns = [
         {"netclass": cls, "pattern": net}
         for cls, nets in basis["netclass_assignments"].items()
@@ -126,6 +143,8 @@ def summarize(drc_path: Path, candidate: Path, native_sha: str, log_tail: str, s
         "kicad_image": KICAD_IMAGE,
         "freerouting": {"url": FREEROUTING_URL, "sha256": FREEROUTING_SHA256, "passes": PASSES},
         "planes_added": PLANES,
+        "hole_keepouts": HOLE_KEEPOUTS,
+        "autoroute_class_overrides": AUTOROUTE_OVERRIDES,
         "stage": stage,
         "drc": {
             "errors": {t: n for (s, t), n in sorted(by_type.items()) if s == "error"},
@@ -154,7 +173,8 @@ def generate() -> None:
             shutil.copy2(NATIVE_DIR / extra, WORK / f"{STEM}.kicad_dru")
     rel = lambda path: str(path.relative_to(ROOT))  # noqa: E731
     dsn, ses = WORK / f"{STEM}.dsn", WORK / f"{STEM}.ses"
-    exported = docker("/usr/bin/python3", "tools/kicad_autoroute_stage_rev_a.py", "export", rel(board), rel(dsn), json.dumps(PLANES))
+    exported = docker("/usr/bin/python3", "tools/kicad_autoroute_stage_rev_a.py", "export", rel(board), rel(dsn),
+                      json.dumps({"planes": PLANES, "hole_keepouts": HOLE_KEEPOUTS}))
     binary = freerouting()
     env = dict(os.environ, JAVA_TOOL_OPTIONS="-Xmx3g")
     routed = subprocess.run(
