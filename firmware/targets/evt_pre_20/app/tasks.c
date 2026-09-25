@@ -31,6 +31,7 @@
 #include "task.h"
 #include "zs_audio.h"
 #include "zs_boot_counter.h"
+#include "zs_command_clock.h"
 #include "zs_dsp_mcu.h"
 #include "zs_ipc_service.h"
 #include "zs_nor_storage_layout.h"
@@ -470,6 +471,14 @@ static void comms_task_fn(void *arg) {
     vTaskDelay(pdMS_TO_TICKS(20));
   }
 }
+/* Command validity clock: PPS-disciplined time while GNSS is trusted or in holdover, otherwise the network time
+   (NITZ) for APP_COMMAND_NETWORK_TIME_MAX_MS; called from the comms task only. */
+static zs_command_clock_t command_clock;
+static bool command_clock_now(uint32_t now_ms, uint64_t *now_us) {
+  const bool gnss = time_sync.trust == ZS_TIME_TRUST_GNSS_TRUSTED || time_sync.trust == ZS_TIME_TRUST_HOLDOVER;
+  const int64_t gnss_us = gnss ? zs_time_for_sample(&time_sync, zs_pdm_capture_sample_counter(&capture)) : 0;
+  return zs_command_clock_now(&command_clock, gnss_us, gnss, now_ms, now_us);
+}
 static void comms_session_done(void *ctx) { (void)ctx; outbox_retry_backoff_ms = APP_OUTBOX_RETRY_MS; outbox_retry_at_ms = 0u; mode_event(ZS_MODE_EV_COMMS_DONE); }
 static bool outbox_has_pending(void) { uint16_t pending = 0u; return stores_on_nor && zs_event_outbox_pending_count(&nor_outbox_io, &pending) == ZS_EVENT_OUTBOX_OK && pending > 0u; }
 static const app_comms_hooks_t comms_hooks = {comms_fill_heartbeat, NULL, console_printf, comms_session_done};
@@ -700,6 +709,11 @@ static void console_exec(const char *cmd) {
     console_printf((!secrets_on_nor || zs_station_secrets_clear(&secrets_io) == ZS_STATION_SECRETS_OK) ? "secrets: cleared (sim iccids apply after reboot)\r\n" : "secrets: nor clear failed\r\n");
   } else if (strcmp(cmd, "power") == 0) {
     app_power_status(console_printf);
+  } else if (strcmp(cmd, "clock") == 0) {
+    static const char *const src[] = {"none", "gnss", "network"};
+    console_printf("command clock: last source %s | reads gnss %lu network %lu untrusted %lu | network sets %lu rejected %lu | time trust %d\r\n",
+                   src[command_clock.last_source % 3u], (unsigned long)command_clock.gnss_reads, (unsigned long)command_clock.network_reads,
+                   (unsigned long)command_clock.untrusted_reads, (unsigned long)command_clock.network_sets, (unsigned long)command_clock.network_rejected, (int)time_sync.trust);
   } else if (strcmp(cmd, "wd") == 0) {
     app_watchdog_status(console_printf);
   } else if (strncmp(cmd, "wdtest ", 7u) == 0) {
@@ -713,7 +727,7 @@ static void console_exec(const char *cmd) {
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] power lora [on|off] wd wdtest heap\r\n");
+    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] power lora [on|off] clock wd wdtest heap\r\n");
   }
 }
 
@@ -765,6 +779,8 @@ bool app_tasks_create(void) {
   (void)zs_selftest_register(&selftests, ZS_ST_ID_GNSS_PPS, "gnss_pps", st_gnss_pps, &pps, false);
   (void)zs_selftest_register(&selftests, ZS_ST_ID_RTC_LSE, "rtc_lse", st_rtc_lse, NULL, true);
 
+  zs_command_clock_init(&command_clock, APP_COMMAND_NETWORK_TIME_MAX_MS);
+  app_comms_set_clock(command_clock_now);
   app_watchdog_capture_reset_cause();
   for (unsigned t = APP_WD_AUDIO; t <= APP_WD_GNSS; t++) app_watchdog_register((app_wd_task_t)t);
   if (xTaskCreate(audio_task_fn, "audio", APP_STACK_AUDIO, NULL, APP_PRIO_AUDIO, &audio_task) != pdPASS) return false;
