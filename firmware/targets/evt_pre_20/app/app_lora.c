@@ -14,6 +14,7 @@ static const zs_event_outbox_io_t *outbox_io;
 static uint32_t station_id;
 static uint8_t engineer_key[32];
 static bool key_set, radio_ok, route_lora, bound;
+static volatile bool rebind;                     /* set by app_lora_bind (other tasks), consumed by the LoRa task */
 static void (*log_fn)(const char *fmt, ...);
 static uint32_t dry_frames, live_frames, acks, radio_errors;
 static bool rx_open; static uint32_t rx_close_ms;
@@ -60,10 +61,14 @@ static bool tx(void *ctx, const uint8_t *frame, size_t n) {
 }
 static const zs_lora_uplink_port_t port = {NULL, tx, summarize};
 
+/* Called at boot and whenever the station secrets change: a new or cleared engineer key re-creates the uplink
+   (the LoRa key derives from it), so frames are never tagged with a stale key. */
 void app_lora_bind(const zs_event_outbox_io_t *outbox, uint32_t id, const uint8_t key[32], void (*log)(const char *fmt, ...)) {
   outbox_io = outbox; station_id = id; log_fn = log;
   if (key) { memcpy(engineer_key, key, sizeof(engineer_key)); key_set = true; }
+  else { memset(engineer_key, 0, sizeof(engineer_key)); key_set = false; }
   bound = outbox && id;
+  rebind = true;
 }
 void app_lora_set_route_hint(bool lora_preferred) { route_lora = lora_preferred; }
 
@@ -100,6 +105,7 @@ void app_lora_task(void *arg) {
   if (radio_ok) (void)zs_sx1262_set_sleep(&radio);                 /* idle until the first frame */
   for (;;) {
     const uint32_t now = xTaskGetTickCount();
+    if (rebind) { rebind = false; uplink_ready = false; }
     if (!uplink_ready && bound && key_set) uplink_ready = zs_lora_uplink_init(&uplink, &port, outbox_io, station_id, APP_LORA_PROFILE_ID, engineer_key, APP_LORA_SF, APP_LORA_BW_HZ, now);
     if (uplink_ready) {
       const zs_lora_uplink_result_t r = zs_lora_uplink_tick(&uplink, now, route_lora);
@@ -111,8 +117,8 @@ void app_lora_task(void *arg) {
 }
 
 void app_lora_status(void (*print)(const char *fmt, ...)) {
-  print("lora radio %s %s | route %s | frames dry %lu live %lu acks %lu timeouts %lu budget %lu ms airtime %lu ms | radio errors %lu spi errors %lu\r\n",
-        radio_ok ? "up" : "down", APP_LORA_TX_ENABLED ? "LIVE" : "DRY", route_lora ? "lora" : "gsm",
+  print("lora radio %s %s | key %s | route %s | frames dry %lu live %lu acks %lu timeouts %lu budget %lu ms airtime %lu ms | radio errors %lu spi errors %lu\r\n",
+        radio_ok ? "up" : "down", APP_LORA_TX_ENABLED ? "LIVE" : "DRY", key_set ? "set" : "none (uplink inactive)", route_lora ? "lora" : "gsm",
         (unsigned long)dry_frames, (unsigned long)live_frames, (unsigned long)acks, (unsigned long)uplink.ack_timeouts,
         (unsigned long)uplink.budget_ms, (unsigned long)uplink.airtime_ms_total, (unsigned long)radio_errors, (unsigned long)bsp_spi_errors());
 }

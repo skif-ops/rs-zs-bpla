@@ -72,6 +72,16 @@
 #define APP_COMMS_DEGRADED_AFTER     3u       /* consecutive S3 sessions ended by the watchdog -> GSM degraded */
 #define APP_COMMS_MAX_DEGRADED_MS    60000u   /* S3 watchdog while degraded (default policy: 180 s) */
 #define APP_GSM_PROBE_MS             1800000u /* while degraded: try GSM again every 30 min (capped S3) */
+/* LoRa fallback (ICD addendum A). TX stays disabled until the signed RU868 profile and the RF gate are closed:
+   the task runs DRY (radio bring-up + frame log only). Carrier from config/lora/RU868.yaml, +14 dBm = 25 mW RU limit. */
+#define APP_LORA_TX_ENABLED          0
+#define APP_LORA_FREQUENCY_HZ        868900000u
+#define APP_LORA_SF                  9u
+#define APP_LORA_BW_HZ               125000u
+#define APP_LORA_TX_DBM              14
+#define APP_LORA_PROFILE_ID          1u
+#define APP_PRIO_LORA                3
+#define APP_STACK_LORA               768
 
 /* NVIC priorities (0 = highest). FreeRTOS syscall ceiling is 5: ISRs at 5..15 may call FromISR APIs. */
 #define APP_IRQ_PRIO_TIM2_PPS        4   /* timestamp capture: above the RTOS ceiling, no RTOS calls inside */
