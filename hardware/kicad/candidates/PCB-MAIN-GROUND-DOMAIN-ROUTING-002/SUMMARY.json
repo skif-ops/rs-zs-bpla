@@ -1,0 +1,140 @@
+{
+  "schema": "dioneya-pcb-main-ground-domain-routing-002-candidate-v1",
+  "proposal_id": "PCB-MAIN-GROUND-DOMAIN-ROUTING-002",
+  "base_board_sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273",
+  "candidate_sha256": "c168f5f2418776bf037598e856f4920d02c30c9702ab0a4c485146d93b17c536",
+  "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
+  "preserved_geometry_outside_delta": "PASS",
+  "stitching_vias_added": 15,
+  "manufacturing_release": false,
+  "applied_to_authoritative_board": false,
+  "steps": {
+    "fill_base": {
+      "rc": 0,
+      "stderr": ""
+    },
+    "drc_base": {
+      "rc": 0,
+      "stderr": ""
+    },
+    "dump_base": {
+      "rc": 0,
+      "stderr": ""
+    },
+    "fill_candidate": {
+      "rc": 0,
+      "stderr": ""
+    },
+    "drc_candidate": {
+      "rc": 0,
+      "stderr": ""
+    },
+    "dump_candidate": {
+      "rc": 0,
+      "stderr": ""
+    }
+  },
+  "drc": {
+    "base": {
+      "by_type": {
+        "warning:silk_over_copper": 166,
+        "warning:silk_overlap": 66
+      },
+      "unconnected": 421
+    },
+    "candidate": {
+      "by_type": {
+        "warning:silk_over_copper": 166,
+        "warning:silk_overlap": 66
+      },
+      "unconnected": 421
+    },
+    "new_fingerprints": [],
+    "new_fingerprint_count": 0,
+    "removed_fingerprints": [],
+    "removed_fingerprint_count": 0,
+    "new_errors": 0
+  },
+  "in4_islands": [
+    {
+      "net": "GND_MODEM",
+      "zone": "PCB_MAIN_GND_MODEM_In4_Cu_2",
+      "area_mm2": 5.21,
+      "same_net_vias": 1
+    },
+    {
+      "net": "GND_MODEM",
+      "zone": "PCB_MAIN_GND_MODEM_In4_Cu_1",
+      "area_mm2": 2382.25,
+      "same_net_vias": 94
+    },
+    {
+      "net": "GND_DIGITAL",
+      "zone": "PCB_MAIN_GND_DIGITAL_In4_Cu",
+      "area_mm2": 5184.89,
+      "same_net_vias": 144
+    },
+    {
+      "net": "GND_DIGITAL",
+      "zone": "PCB_MAIN_GND_DIGITAL_In4_Cu",
+      "area_mm2": 0.19,
+      "same_net_vias": 1
+    },
+    {
+      "net": "GND_DIGITAL",
+      "zone": "PCB_MAIN_GND_DIGITAL_In4_Cu",
+      "area_mm2": 0.19,
+      "same_net_vias": 1
+    },
+    {
+      "net": "GND_DIGITAL",
+      "zone": "PCB_MAIN_GND_DIGITAL_In4_Cu",
+      "area_mm2": 0.19,
+      "same_net_vias": 1
+    },
+    {
+      "net": "GND_DIGITAL",
+      "zone": "PCB_MAIN_GND_DIGITAL_In4_Cu",
+      "area_mm2": 0.21,
+      "same_net_vias": 1
+    },
+    {
+      "net": "GND_DIGITAL",
+      "zone": "PCB_MAIN_GND_DIGITAL_In4_Cu",
+      "area_mm2": 0.19,
+      "same_net_vias": 1
+    },
+    {
+      "net": "GND_DIGITAL",
+      "zone": "PCB_MAIN_GND_DIGITAL_In4_Cu",
+      "area_mm2": 0.19,
+      "same_net_vias": 1
+    },
+    {
+      "net": "GND_DIGITAL",
+      "zone": "PCB_MAIN_GND_DIGITAL_In4_Cu",
+      "area_mm2": 0.19,
+      "same_net_vias": 1
+    }
+  ],
+  "continuity_summary": {
+    "base": {
+      "B.Cu|GND_DIGITAL": 0.0,
+      "B.Cu|GND_MODEM": 0.9939,
+      "F.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
+      "F.Cu|GND_DIGITAL": 0.9377,
+      "F.Cu|GND_MODEM": 0.9145,
+      "In2.Cu|GND_DIGITAL": 0.0,
+      "In3.Cu|GND_DIGITAL": 0.0
+    },
+    "candidate": {
+      "B.Cu|GND_DIGITAL": 0.9458,
+      "B.Cu|GND_MODEM": 0.9939,
+      "F.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
+      "F.Cu|GND_DIGITAL": 0.9377,
+      "F.Cu|GND_MODEM": 0.9145,
+      "In2.Cu|GND_DIGITAL": 0.0,
+      "In3.Cu|GND_DIGITAL": 0.0
+    }
+  }
+}

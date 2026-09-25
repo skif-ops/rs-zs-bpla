@@ -7,13 +7,16 @@ import csv
 import hashlib
 import json
 import math
+import sys
 from pathlib import Path
 from typing import Any
 
 from kiutils.board import Board
 
 ROOT = Path(__file__).resolve().parents[1]
-BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
+BOARD = _lineage.historical_board()
 BASE = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-OCTOSPI-R8-ECO-002/"
     "PCB-MAIN_OCTOSPI_R8_ECO_BASE_REV_A.kicad_pcb"
@@ -34,7 +37,7 @@ RF_CANDIDATE = (
     "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
 )
 RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
-PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+PLACEMENT = _lineage.historical_placement()
 STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 
 BASE_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"

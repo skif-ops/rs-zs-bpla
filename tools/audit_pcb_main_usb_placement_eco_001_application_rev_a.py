@@ -8,6 +8,7 @@ import csv
 import hashlib
 import json
 from collections import Counter
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -18,14 +19,16 @@ import audit_pcb_main_usb_placement_eco_001_candidate_rev_a as candidate_audit
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
+BOARD = _lineage.historical_board()
 BASE = candidate_audit.BASE
 CANDIDATE = candidate_audit.CANDIDATE
 APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPROVAL_REV_A.json"
 MAPPING = ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_REVIEW_COMMIT_MAPPING.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_PLACEMENT_ECO_001_APPLICATION_REV_A.json"
 GENERATOR = ROOT / "tools/generate_pcb_main_usb_placement_eco_001_application_rev_a.py"
-PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+PLACEMENT = _lineage.historical_placement()
 AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 SOURCE_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPLICATION_REV_A.json"

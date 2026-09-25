@@ -13,19 +13,22 @@ import hashlib
 import io
 import json
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
 from kiutils.board import Board
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
 CANDIDATE = ROOT / "hardware/reviews/PCB_MAIN_MECH_ECO_002_CANDIDATE.md"
 APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPROVAL.json"
 MAPPING = ROOT / "hardware/reviews/PCB_MAIN_MECH_ECO_002_REVIEW_COMMIT_MAPPING.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPLICATION.json"
 AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
-BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
-PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+BOARD = _lineage.historical_board()
+PLACEMENT = _lineage.historical_placement()
 STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 ECO003_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPLICATION.json"
 ECO004_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_STTS22H_FOOTPRINT_ECO_004_APPLICATION.json"

@@ -7,15 +7,18 @@ import argparse
 import hashlib
 import json
 from collections import Counter
+import sys
 from pathlib import Path
 
 from kiutils.board import Board
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
 BASE = ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001/PCB-MAIN_USB_CELL_FIXTURE_BASE_REV_A.kicad_pcb"
 CANDIDATE = ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001/PCB-MAIN_USB_CELL_FIXTURE_CANDIDATE_REV_A.kicad_pcb"
-BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+BOARD = _lineage.historical_board()
 APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_FIXTURE_ROUTING_001_APPROVAL_REV_A.json"
 MAPPING = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_FIXTURE_ROUTING_001_REVIEW_COMMIT_MAPPING.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_CELL_FIXTURE_ROUTING_001_APPLICATION_REV_A.json"

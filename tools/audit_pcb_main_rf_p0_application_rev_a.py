@@ -8,6 +8,7 @@ import hashlib
 import json
 import math
 from collections import Counter, defaultdict
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -15,7 +16,9 @@ from kiutils.board import Board
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
+BOARD = _lineage.historical_board()
 BASE = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-P0-001/"
     "PCB-MAIN_RF_P0_BASE_REV_A.kicad_pcb"

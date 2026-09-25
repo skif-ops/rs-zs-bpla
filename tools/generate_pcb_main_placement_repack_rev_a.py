@@ -31,6 +31,8 @@ from kiutils.items.common import Position
 from kiutils.utils import sexpr
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
 sys.path.insert(0, str(ROOT / "tools"))
 from audit_pcb_main_native_schematic_rev_a import expected_components  # noqa: E402
 from audit_pcb_main_placement_clearance_rev_a import (  # noqa: E402
@@ -43,10 +45,10 @@ from audit_pcb_main_placement_clearance_rev_a import (  # noqa: E402
     rotate,
 )
 
-BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+BOARD = _lineage.historical_board()
 AUTHORITY = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
 PASSIVE_AUTHORITY = ROOT / "hardware/PCB_MAIN_PASSIVE_SUPPORT_AUTHORITY_REV_A.csv"
-PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+PLACEMENT = _lineage.historical_placement()
 ECO002_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_MECH_ECO_002_APPLICATION.json"
 ECO003_APPLICATION = (
     ROOT / "hardware/reviews/PCB_MAIN_RF_ROUTEABILITY_ECO_003_APPLICATION.json"

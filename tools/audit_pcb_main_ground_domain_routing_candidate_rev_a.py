@@ -15,6 +15,7 @@ import json
 import math
 import re
 from collections import Counter, defaultdict
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -22,12 +23,14 @@ from kiutils.board import Board
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
 BASE_BOARD = (
     ROOT
     / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001"
     / "PCB-MAIN_GROUND_DOMAIN_BASE_REV_A.kicad_pcb"
 )
-ACTIVE_BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+ACTIVE_BOARD = _lineage.historical_board()
 CANDIDATE_BOARD = (
     ROOT
     / "hardware/kicad/candidates/PCB-MAIN-GROUND-DOMAIN-001"

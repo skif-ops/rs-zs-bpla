@@ -8,6 +8,7 @@ import hashlib
 import json
 import math
 from collections import Counter
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,8 @@ from kiutils.board import Board
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
 BASE = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-SOURCE-ROUTING-001/"
     "PCB-MAIN_USB_SOURCE_BASE_REV_A.kicad_pcb"
@@ -23,7 +26,7 @@ CANDIDATE = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-USB-SOURCE-ROUTING-001/"
     "PCB-MAIN_USB_SOURCE_CANDIDATE_REV_A.kicad_pcb"
 )
-ACTIVE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+ACTIVE = _lineage.historical_board()
 REVIEW = ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_CANDIDATE_REV_A.json"
 APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPROVAL_REV_A.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_USB_SOURCE_ROUTING_001_APPLICATION_REV_A.json"
