@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-25: PCB-PWR autoroute candidate 011, run 8 (final 3V3 links, ground pad vias)
-tools/apply_pcb_pwr_autoroute_candidate_rev_a.py
