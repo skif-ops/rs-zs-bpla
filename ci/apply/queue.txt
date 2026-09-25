@@ -1,0 +1,2 @@
+# Queued by Claude 2026-09-25: PCB-MAIN routing-constraint control brought to the applied 003 board
+tools/apply_pcb_main_routing_authority_003_rev_a.py
