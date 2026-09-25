@@ -1989,10 +1989,11 @@
   "result": "PASS"
  },
  "reroute_delta": {
-  "removed_lines": 140,
+  "removed_lines": 144,
+  "removed_dangling_vias": 4,
   "added_segments": 146,
   "added_vias": 16,
   "added_gnd_return_vias": 4
  },
- "stage_sha256": "59c60b9c9cee75d34b775b29a8f93e5ea54ea49b9ffd3631d716fd92ca1b2518"
+ "stage_sha256": "b2d751b054c80ba0e10a6a8f192e5e45d4cb5f73759d1e4605bd810f89ade4c1"
 }

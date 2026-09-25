@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-09-25T18:09:21+0000",
+    "date": "2026-09-25T18:21:55+0000",
     "included_severities": [
         "error",
         "warning",
@@ -9430,12 +9430,12 @@
                     "uuid": "4ffe310e-85ce-4f76-9826-bbbc80fa5551"
                 },
                 {
-                    "description": "Pad B4 [USB_VBUS_CONN] of J11 on F.Cu",
+                    "description": "Pad A9 [USB_VBUS_CONN] of J11 on F.Cu",
                     "pos": {
                         "x": 39.6,
                         "y": 7.355
                     },
-                    "uuid": "900a0397-762a-471e-b500-dda19dfbd6e0"
+                    "uuid": "0530e032-d6b2-4233-b1e1-82828ddac106"
                 }
             ],
             "severity": "error",
@@ -9696,66 +9696,6 @@
         }
     ],
     "violations": [
-        {
-            "description": "Via is not connected or connected on only one layer",
-            "items": [
-                {
-                    "description": "Via [NOR_CLK_U1] on F.Cu - B.Cu",
-                    "pos": {
-                        "x": 52.975,
-                        "y": 17.975
-                    },
-                    "uuid": "4b5209bc-bfcd-4fb5-89ca-c14131175707"
-                }
-            ],
-            "severity": "warning",
-            "type": "via_dangling"
-        },
-        {
-            "description": "Via is not connected or connected on only one layer",
-            "items": [
-                {
-                    "description": "Via [NOR_IO3_U2] on F.Cu - B.Cu",
-                    "pos": {
-                        "x": 54.6,
-                        "y": 27.85
-                    },
-                    "uuid": "f2da93f2-6579-45ee-b056-959b40d72397"
-                }
-            ],
-            "severity": "warning",
-            "type": "via_dangling"
-        },
-        {
-            "description": "Via is not connected or connected on only one layer",
-            "items": [
-                {
-                    "description": "Via [SD_D2_U1] on F.Cu - B.Cu",
-                    "pos": {
-                        "x": 57.2,
-                        "y": 23.7
-                    },
-                    "uuid": "1a7e9337-6045-405e-b071-8c7914a558f9"
-                }
-            ],
-            "severity": "warning",
-            "type": "via_dangling"
-        },
-        {
-            "description": "Via is not connected or connected on only one layer",
-            "items": [
-                {
-                    "description": "Via [SD_D2_U1] on F.Cu - B.Cu",
-                    "pos": {
-                        "x": 89.2,
-                        "y": 21.7
-                    },
-                    "uuid": "3f56ac6e-eafb-403e-aebc-bbd3a2b43bfc"
-                }
-            ],
-            "severity": "warning",
-            "type": "via_dangling"
-        },
         {
             "description": "Silkscreen clipped by solder mask",
             "items": [
@@ -11592,8 +11532,8 @@
                 {
                     "description": "Reference field of R10",
                     "pos": {
-                        "x": 60.8,
-                        "y": 19.75
+                        "x": 62.0,
+                        "y": 18.45
                     },
                     "uuid": "6070f456-205b-43ae-b3d2-7daefc881d2a"
                 }
@@ -12012,8 +11952,8 @@
                 {
                     "description": "Reference field of R11",
                     "pos": {
-                        "x": 62.3,
-                        "y": 19.75
+                        "x": 63.5,
+                        "y": 18.45
                     },
                     "uuid": "06be4a19-af13-4e82-b5d4-3d972d4d582b"
                 }
@@ -12473,75 +12413,6 @@
             "description": "Silkscreen overlap",
             "items": [
                 {
-                    "description": "Reference field of C59",
-                    "pos": {
-                        "x": 65.0,
-                        "y": 15.3
-                    },
-                    "uuid": "1215f004-2bcc-4309-89a8-568a130f19a0"
-                },
-                {
-                    "description": "Reference field of R53",
-                    "pos": {
-                        "x": 66.75,
-                        "y": 15.3
-                    },
-                    "uuid": "d98239c4-602a-497d-a0d7-afeb24197802"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
-                    "description": "Reference field of C59",
-                    "pos": {
-                        "x": 65.0,
-                        "y": 15.3
-                    },
-                    "uuid": "1215f004-2bcc-4309-89a8-568a130f19a0"
-                },
-                {
-                    "description": "Reference field of C58",
-                    "pos": {
-                        "x": 63.25,
-                        "y": 15.3
-                    },
-                    "uuid": "3bd3cab8-9894-4c16-8380-b779f6539886"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
-                    "description": "Reference field of R54",
-                    "pos": {
-                        "x": 68.5,
-                        "y": 15.3
-                    },
-                    "uuid": "2e073402-86e4-437f-a003-5a50f4e2749e"
-                },
-                {
-                    "description": "Reference field of R53",
-                    "pos": {
-                        "x": 66.75,
-                        "y": 15.3
-                    },
-                    "uuid": "d98239c4-602a-497d-a0d7-afeb24197802"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
                     "description": "Reference field of R91",
                     "pos": {
                         "x": 64.0,
@@ -12611,75 +12482,6 @@
             "description": "Silkscreen overlap",
             "items": [
                 {
-                    "description": "Reference field of R2",
-                    "pos": {
-                        "x": 61.75,
-                        "y": 30.3
-                    },
-                    "uuid": "3c5f4b2b-c251-47ec-a856-37bd34f8f636"
-                },
-                {
-                    "description": "Segment of X1 on F.Silkscreen",
-                    "pos": {
-                        "x": 60.98,
-                        "y": 30.54
-                    },
-                    "uuid": "bd846356-6702-435b-9157-13ca0513a4ef"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
-                    "description": "Reference field of R75",
-                    "pos": {
-                        "x": 63.5,
-                        "y": 31.55
-                    },
-                    "uuid": "2a62d507-a535-4a8e-81fa-a2edefbe2963"
-                },
-                {
-                    "description": "Reference field of C16",
-                    "pos": {
-                        "x": 61.75,
-                        "y": 32.3
-                    },
-                    "uuid": "9574c233-19a1-4651-87de-56b42dc00058"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
-                    "description": "Reference field of R10",
-                    "pos": {
-                        "x": 60.8,
-                        "y": 19.75
-                    },
-                    "uuid": "6070f456-205b-43ae-b3d2-7daefc881d2a"
-                },
-                {
-                    "description": "Reference field of R9",
-                    "pos": {
-                        "x": 59.3,
-                        "y": 19.75
-                    },
-                    "uuid": "90703bee-c709-4a08-8138-4b17c65ddb01"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
                     "description": "Reference field of C51",
                     "pos": {
                         "x": 58.0,
@@ -12726,20 +12528,89 @@
             "description": "Silkscreen overlap",
             "items": [
                 {
-                    "description": "Reference field of R11",
+                    "description": "Reference field of R2",
                     "pos": {
-                        "x": 62.3,
-                        "y": 19.75
+                        "x": 61.75,
+                        "y": 30.3
                     },
-                    "uuid": "06be4a19-af13-4e82-b5d4-3d972d4d582b"
+                    "uuid": "3c5f4b2b-c251-47ec-a856-37bd34f8f636"
                 },
                 {
-                    "description": "Reference field of R10",
+                    "description": "Segment of X1 on F.Silkscreen",
                     "pos": {
-                        "x": 60.8,
-                        "y": 19.75
+                        "x": 60.98,
+                        "y": 30.54
                     },
-                    "uuid": "6070f456-205b-43ae-b3d2-7daefc881d2a"
+                    "uuid": "bd846356-6702-435b-9157-13ca0513a4ef"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_overlap"
+        },
+        {
+            "description": "Silkscreen overlap",
+            "items": [
+                {
+                    "description": "Reference field of R75",
+                    "pos": {
+                        "x": 63.5,
+                        "y": 31.55
+                    },
+                    "uuid": "2a62d507-a535-4a8e-81fa-a2edefbe2963"
+                },
+                {
+                    "description": "Reference field of C16",
+                    "pos": {
+                        "x": 61.75,
+                        "y": 32.3
+                    },
+                    "uuid": "9574c233-19a1-4651-87de-56b42dc00058"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_overlap"
+        },
+        {
+            "description": "Silkscreen overlap",
+            "items": [
+                {
+                    "description": "Reference field of C59",
+                    "pos": {
+                        "x": 65.0,
+                        "y": 15.3
+                    },
+                    "uuid": "1215f004-2bcc-4309-89a8-568a130f19a0"
+                },
+                {
+                    "description": "Reference field of R53",
+                    "pos": {
+                        "x": 66.75,
+                        "y": 15.3
+                    },
+                    "uuid": "d98239c4-602a-497d-a0d7-afeb24197802"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_overlap"
+        },
+        {
+            "description": "Silkscreen overlap",
+            "items": [
+                {
+                    "description": "Reference field of C59",
+                    "pos": {
+                        "x": 65.0,
+                        "y": 15.3
+                    },
+                    "uuid": "1215f004-2bcc-4309-89a8-568a130f19a0"
+                },
+                {
+                    "description": "Reference field of C58",
+                    "pos": {
+                        "x": 63.25,
+                        "y": 15.3
+                    },
+                    "uuid": "3bd3cab8-9894-4c16-8380-b779f6539886"
                 }
             ],
             "severity": "warning",
@@ -12772,20 +12643,66 @@
             "description": "Silkscreen overlap",
             "items": [
                 {
-                    "description": "Reference field of R102",
+                    "description": "Reference field of R54",
                     "pos": {
-                        "x": 38.5,
-                        "y": 31.8
+                        "x": 68.5,
+                        "y": 15.3
                     },
-                    "uuid": "887ae26d-11cc-478c-a5df-3eaebbb451ce"
+                    "uuid": "2e073402-86e4-437f-a003-5a50f4e2749e"
                 },
                 {
-                    "description": "Reference field of R71",
+                    "description": "Reference field of R53",
                     "pos": {
-                        "x": 40.5,
-                        "y": 31.55
+                        "x": 66.75,
+                        "y": 15.3
                     },
-                    "uuid": "9b35fcef-3ac0-48d6-a95c-adf4b7403a70"
+                    "uuid": "d98239c4-602a-497d-a0d7-afeb24197802"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_overlap"
+        },
+        {
+            "description": "Silkscreen overlap",
+            "items": [
+                {
+                    "description": "Polygon of U21 on F.Silkscreen",
+                    "pos": {
+                        "x": 91.32,
+                        "y": 64.15
+                    },
+                    "uuid": "cd47d9ca-0c9f-4f3f-8d5a-a370edd7c546"
+                },
+                {
+                    "description": "Reference field of U21",
+                    "pos": {
+                        "x": 92.0,
+                        "y": 64.05
+                    },
+                    "uuid": "d1609ec1-2f2d-4ea5-b078-7a6c1fba8112"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_overlap"
+        },
+        {
+            "description": "Silkscreen overlap",
+            "items": [
+                {
+                    "description": "Reference field of U22",
+                    "pos": {
+                        "x": 100.75,
+                        "y": 52.8
+                    },
+                    "uuid": "3ed290b0-2403-422e-baf7-370b9608fe66"
+                },
+                {
+                    "description": "Polygon of U22 on F.Silkscreen",
+                    "pos": {
+                        "x": 100.07,
+                        "y": 52.9
+                    },
+                    "uuid": "cb6f1c97-789f-40cf-a0e5-823fce5ddba4"
                 }
             ],
             "severity": "warning",
@@ -12801,6 +12718,29 @@
                         "y": 19.55
                     },
                     "uuid": "51734b53-ff9a-4eb4-b8cf-f5cdb4394405"
+                },
+                {
+                    "description": "Reference field of C5",
+                    "pos": {
+                        "x": 46.0,
+                        "y": 19.55
+                    },
+                    "uuid": "fc9066c2-c78c-41e6-8946-f084dfe3f3d4"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_overlap"
+        },
+        {
+            "description": "Silkscreen overlap",
+            "items": [
+                {
+                    "description": "Reference field of C15",
+                    "pos": {
+                        "x": 47.75,
+                        "y": 19.55
+                    },
+                    "uuid": "4ee28038-2d3e-43f8-99b3-6c8ff30bf782"
                 },
                 {
                     "description": "Reference field of C5",
@@ -12864,66 +12804,20 @@
             "description": "Silkscreen overlap",
             "items": [
                 {
-                    "description": "Reference field of C15",
+                    "description": "Reference field of R102",
                     "pos": {
-                        "x": 47.75,
-                        "y": 19.55
+                        "x": 38.5,
+                        "y": 31.8
                     },
-                    "uuid": "4ee28038-2d3e-43f8-99b3-6c8ff30bf782"
+                    "uuid": "887ae26d-11cc-478c-a5df-3eaebbb451ce"
                 },
                 {
-                    "description": "Reference field of C5",
+                    "description": "Reference field of R71",
                     "pos": {
-                        "x": 46.0,
-                        "y": 19.55
+                        "x": 40.5,
+                        "y": 31.55
                     },
-                    "uuid": "fc9066c2-c78c-41e6-8946-f084dfe3f3d4"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
-                    "description": "Polygon of U21 on F.Silkscreen",
-                    "pos": {
-                        "x": 91.32,
-                        "y": 64.15
-                    },
-                    "uuid": "cd47d9ca-0c9f-4f3f-8d5a-a370edd7c546"
-                },
-                {
-                    "description": "Reference field of U21",
-                    "pos": {
-                        "x": 92.0,
-                        "y": 64.05
-                    },
-                    "uuid": "d1609ec1-2f2d-4ea5-b078-7a6c1fba8112"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
-                    "description": "Reference field of U22",
-                    "pos": {
-                        "x": 100.75,
-                        "y": 52.8
-                    },
-                    "uuid": "3ed290b0-2403-422e-baf7-370b9608fe66"
-                },
-                {
-                    "description": "Polygon of U22 on F.Silkscreen",
-                    "pos": {
-                        "x": 100.07,
-                        "y": 52.9
-                    },
-                    "uuid": "cb6f1c97-789f-40cf-a0e5-823fce5ddba4"
+                    "uuid": "9b35fcef-3ac0-48d6-a95c-adf4b7403a70"
                 }
             ],
             "severity": "warning",
@@ -13301,6 +13195,121 @@
             "description": "Silkscreen overlap",
             "items": [
                 {
+                    "description": "Segment of U5 on F.Silkscreen",
+                    "pos": {
+                        "x": 61.65,
+                        "y": 58.62
+                    },
+                    "uuid": "1969130d-bd40-4ed9-b99a-3b8f1f7f0408"
+                },
+                {
+                    "description": "Reference field of R59",
+                    "pos": {
+                        "x": 61.0,
+                        "y": 58.55
+                    },
+                    "uuid": "e439efff-f378-409f-9787-66cad6796d32"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_overlap"
+        },
+        {
+            "description": "Silkscreen overlap",
+            "items": [
+                {
+                    "description": "Reference field of U18",
+                    "pos": {
+                        "x": 53.5,
+                        "y": 44.8
+                    },
+                    "uuid": "2f0b49c6-25fb-4d47-9188-275d6f2c2d77"
+                },
+                {
+                    "description": "Polygon of U18 on F.Silkscreen",
+                    "pos": {
+                        "x": 52.5,
+                        "y": 45.33
+                    },
+                    "uuid": "ada30b74-f221-41ec-ae89-c5aade39b1e4"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_overlap"
+        },
+        {
+            "description": "Silkscreen overlap",
+            "items": [
+                {
+                    "description": "Reference field of C32",
+                    "pos": {
+                        "x": 54.5,
+                        "y": 43.05
+                    },
+                    "uuid": "adb6ce9d-c7af-4dbf-8d8d-2017ee1f7558"
+                },
+                {
+                    "description": "Reference field of C31",
+                    "pos": {
+                        "x": 52.75,
+                        "y": 43.05
+                    },
+                    "uuid": "c8833ff5-698d-43e6-8114-44510a5c6b6a"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_overlap"
+        },
+        {
+            "description": "Silkscreen overlap",
+            "items": [
+                {
+                    "description": "Reference field of R41",
+                    "pos": {
+                        "x": 39.75,
+                        "y": 55.55
+                    },
+                    "uuid": "74ceb22f-4d6a-47aa-be66-330ef4751854"
+                },
+                {
+                    "description": "Reference field of C46",
+                    "pos": {
+                        "x": 38.0,
+                        "y": 55.55
+                    },
+                    "uuid": "c7163f71-08ca-4248-bb4a-030a69d6238d"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_overlap"
+        },
+        {
+            "description": "Silkscreen overlap",
+            "items": [
+                {
+                    "description": "Reference field of C42",
+                    "pos": {
+                        "x": 38.0,
+                        "y": 54.3
+                    },
+                    "uuid": "16edbb59-121d-42c1-8e77-9396be84ab73"
+                },
+                {
+                    "description": "Reference field of R37",
+                    "pos": {
+                        "x": 39.75,
+                        "y": 54.3
+                    },
+                    "uuid": "35a55ac1-4d04-419e-89bb-3158eaa35cb8"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_overlap"
+        },
+        {
+            "description": "Silkscreen overlap",
+            "items": [
+                {
                     "description": "Reference field of U27",
                     "pos": {
                         "x": 41.0,
@@ -13430,121 +13439,6 @@
                         "y": 66.8
                     },
                     "uuid": "fe4a21d7-b40c-406d-8570-601cc12c4956"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
-                    "description": "Segment of U5 on F.Silkscreen",
-                    "pos": {
-                        "x": 61.65,
-                        "y": 58.62
-                    },
-                    "uuid": "1969130d-bd40-4ed9-b99a-3b8f1f7f0408"
-                },
-                {
-                    "description": "Reference field of R59",
-                    "pos": {
-                        "x": 61.0,
-                        "y": 58.55
-                    },
-                    "uuid": "e439efff-f378-409f-9787-66cad6796d32"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
-                    "description": "Reference field of U18",
-                    "pos": {
-                        "x": 53.5,
-                        "y": 44.8
-                    },
-                    "uuid": "2f0b49c6-25fb-4d47-9188-275d6f2c2d77"
-                },
-                {
-                    "description": "Polygon of U18 on F.Silkscreen",
-                    "pos": {
-                        "x": 52.5,
-                        "y": 45.33
-                    },
-                    "uuid": "ada30b74-f221-41ec-ae89-c5aade39b1e4"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
-                    "description": "Reference field of C32",
-                    "pos": {
-                        "x": 54.5,
-                        "y": 43.05
-                    },
-                    "uuid": "adb6ce9d-c7af-4dbf-8d8d-2017ee1f7558"
-                },
-                {
-                    "description": "Reference field of C31",
-                    "pos": {
-                        "x": 52.75,
-                        "y": 43.05
-                    },
-                    "uuid": "c8833ff5-698d-43e6-8114-44510a5c6b6a"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
-                    "description": "Reference field of R41",
-                    "pos": {
-                        "x": 39.75,
-                        "y": 55.55
-                    },
-                    "uuid": "74ceb22f-4d6a-47aa-be66-330ef4751854"
-                },
-                {
-                    "description": "Reference field of C46",
-                    "pos": {
-                        "x": 38.0,
-                        "y": 55.55
-                    },
-                    "uuid": "c7163f71-08ca-4248-bb4a-030a69d6238d"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_overlap"
-        },
-        {
-            "description": "Silkscreen overlap",
-            "items": [
-                {
-                    "description": "Reference field of C42",
-                    "pos": {
-                        "x": 38.0,
-                        "y": 54.3
-                    },
-                    "uuid": "16edbb59-121d-42c1-8e77-9396be84ab73"
-                },
-                {
-                    "description": "Reference field of R37",
-                    "pos": {
-                        "x": 39.75,
-                        "y": 54.3
-                    },
-                    "uuid": "35a55ac1-4d04-419e-89bb-3158eaa35cb8"
                 }
             ],
             "severity": "warning",
