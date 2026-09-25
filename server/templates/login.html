@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Мухоед - вход{% endblock %}
+{% block content %}
+<section class="page-header compact">
+  <h1>Вход оператора</h1>
+  {% if not configured %}
+  <p>Учётные записи операторов ещё не созданы. На сервере выполните
+    <code>python -m station.operator_auth add-user &lt;имя&gt; --role operator</code>.</p>
+  {% endif %}
+</section>
+
+<form class="upload-panel" action="/login" method="post" autocomplete="on">
+  {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+  <input type="hidden" name="next" value="{{ next_url }}">
+  <label class="form-label" for="username">Имя</label>
+  <input class="form-control" id="username" name="username" type="text" autocomplete="username" required autofocus>
+  <label class="form-label mt-3" for="password">Пароль</label>
+  <input class="form-control" id="password" name="password" type="password" autocomplete="current-password" required>
+  <button class="btn btn-primary btn-lg mt-3" type="submit">Войти</button>
+</form>
+{% endblock %}
