@@ -10,6 +10,10 @@ import <board.kicad_pcb> <in.ses> <out.kicad_pcb> [tracks.json]
 pours <board.kicad_pcb> <spec.json>
     Add thickening zones along power routes (polygons computed by the host),
     ground pours on the outer layers and stitching vias into the plane.
+dump <board.kicad_pcb> <geometry.json>
+    Tracks, vias, pads and outline for the host-side gap-fill router.
+addroutes <board.kicad_pcb> <routes.json>
+    Add the gap-fill routes (PREROUTE tuple format) and save.
 
 The project file next to the board carries the net classes, so the DSN
 exports the per-class widths and clearances.
@@ -191,6 +195,60 @@ def import_session(board_path: str, ses_path: str, out_path: str, tracks_json: s
     print(json.dumps({"track_items_before": before, "track_items_after": len(list(board.GetTracks()))}))
 
 
+def dump_geometry(board_path: str, out_json: str) -> None:
+    """Tracks, vias, pads (as rotated rectangles) and outline for the gap-fill router."""
+    import math
+
+    board = pcbnew.LoadBoard(board_path)
+    copper = ["F.Cu", "In1.Cu", "In2.Cu", "B.Cu"]
+    geometry = {"tracks": [], "vias": [], "pads": []}
+    for track in board.GetTracks():
+        if track.GetClass() == "PCB_VIA":
+            try:
+                size = track.GetWidth()
+            except TypeError:
+                size = track.GetWidth(pcbnew.F_Cu)
+            geometry["vias"].append({"net": track.GetNetname(), "size": pcbnew.ToMM(size),
+                                     "pos": [pcbnew.ToMM(track.GetPosition().x), pcbnew.ToMM(track.GetPosition().y)]})
+        elif track.GetClass() == "PCB_TRACK":
+            geometry["tracks"].append({
+                "net": track.GetNetname(), "layer": board.GetLayerName(track.GetLayer()),
+                "start": [pcbnew.ToMM(track.GetStart().x), pcbnew.ToMM(track.GetStart().y)],
+                "end": [pcbnew.ToMM(track.GetEnd().x), pcbnew.ToMM(track.GetEnd().y)],
+                "width": pcbnew.ToMM(track.GetWidth())})
+    for pad in board.GetPads():
+        if pad.GetAttribute() == pcbnew.PAD_ATTRIB_NPTH:
+            continue
+        layers = [name for name in copper if pad.IsOnLayer(board.GetLayerID(name))]
+        try:
+            size = pad.GetSize()
+        except TypeError:
+            size = pad.GetSize(pcbnew.F_Cu if pad.IsOnLayer(pcbnew.F_Cu) else pcbnew.B_Cu)
+        w, h = pcbnew.ToMM(size.x) / 2, pcbnew.ToMM(size.y) / 2
+        angle = math.radians(pad.GetOrientation().AsDegrees())
+        cx, cy = pcbnew.ToMM(pad.GetPosition().x), pcbnew.ToMM(pad.GetPosition().y)
+        poly = []
+        for dx, dy in ((-w, -h), (w, -h), (w, h), (-w, h)):
+            poly.append([round(cx + dx * math.cos(angle) + dy * math.sin(angle), 4),
+                         round(cy - dx * math.sin(angle) + dy * math.cos(angle), 4)])
+        geometry["pads"].append({"net": pad.GetNetname(), "layers": layers, "pos": [cx, cy], "poly": poly})
+    box = board.GetBoardEdgesBoundingBox()
+    geometry["outline"] = [pcbnew.ToMM(box.GetX()), pcbnew.ToMM(box.GetY()),
+                           pcbnew.ToMM(box.GetRight()), pcbnew.ToMM(box.GetBottom())]
+    with open(out_json, "w", encoding="utf-8") as handle:
+        json.dump(geometry, handle)
+    print(json.dumps({"tracks": len(geometry["tracks"]), "vias": len(geometry["vias"]), "pads": len(geometry["pads"])}))
+
+
+def add_routes(board_path: str, routes_json: str) -> None:
+    board = pcbnew.LoadBoard(board_path)
+    items = json.load(open(routes_json, encoding="utf-8"))
+    count = add_preroute(board, items)
+    pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+    board.Save(board_path)
+    print(json.dumps({"gapfill_items": count}))
+
+
 def _zone(board, net_name: str, layer_name: str, points_mm, priority: int, clearance_mm: float,
           remove_islands: bool = False):
     zone = pcbnew.ZONE(board)
@@ -329,5 +387,9 @@ if __name__ == "__main__":
         import_session(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5] if len(sys.argv) > 5 else "")
     elif mode == "pours":
         pours(sys.argv[2], sys.argv[3])
+    elif mode == "dump":
+        dump_geometry(sys.argv[2], sys.argv[3])
+    elif mode == "addroutes":
+        add_routes(sys.argv[2], sys.argv[3])
     else:
         raise SystemExit(f"unknown mode {mode}")

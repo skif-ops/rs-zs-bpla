@@ -114,6 +114,10 @@ PREROUTE = [
     ('track', 'F.Cu', '3V3_DIGITAL', 0.25, [(64.5, 35.0), (66.4, 36.9), (67.3, 36.9)]),
 ]
 TIE_STRIPS = ["NT2"]
+# Mounting holes H1..H4 (native board) for the gap-fill router keepouts, and the
+# nets it leaves to the pours (GND_PWR reaches the plane through pour vias).
+HOLE_CENTRES_MM = [(5.0, 5.0), (82.0, 5.0), (68.0, 55.0), (5.0, 55.0)]
+GAPFILL_SKIP_NETS = {"GND_PWR"}
 # Autoroute (connectivity) class parameters. Freerouting cannot neck a wide
 # track down into a fine-pitch pin, so power nets are routed at 1.0 mm for
 # connectivity and then thickened to the basis width by zones along the route
@@ -244,6 +248,45 @@ def pour_spec(segments: list[dict]) -> dict:
             "hole_refs": HOLE_KEEPOUTS["refs"], "hole_keep_mm": HOLE_KEEPOUTS["radius_mm"] + 0.3}
 
 
+def gap_fill(board: Path, rel) -> dict:
+    """Route what Freerouting left open (KiCad DRC before pours) with the grid A*
+    router of tools/pcb_gapfill_router_rev_a.py on the actual copper of this run."""
+    try:
+        import shapely  # noqa: F401
+    except ImportError:
+        subprocess.run(["python", "-m", "pip", "install", "--quiet", "shapely", "numpy"], check=True)
+    import sys as _sys
+
+    _sys.path.insert(0, str(ROOT / "tools"))
+    import pcb_gapfill_router_rev_a as gapfill_router
+
+    pre_drc = WORK / "drc_pre_pour.json"
+    docker("kicad-cli", "pcb", "drc", "--format", "json", "--severity-all", "-o", rel(pre_drc), rel(board))
+    geometry_path = WORK / "geometry.json"
+    docker("/usr/bin/python3", "tools/kicad_autoroute_stage_rev_a.py", "dump", rel(board), rel(geometry_path))
+    geometry = json.loads(geometry_path.read_text(encoding="utf-8"))
+    geometry["holes"] = [list(p) for p in HOLE_CENTRES_MM]
+    pairs = []
+    for item in json.loads(pre_drc.read_text(encoding="utf-8")).get("unconnected_items", []):
+        a, b = item["items"][0], item["items"][1]
+        match = re.search(r"\[([^\]]+)\]", a.get("description", ""))
+        net = match.group(1) if match else ""
+        if net in GAPFILL_SKIP_NETS or a["description"].startswith("Zone") or b["description"].startswith("Zone"):
+            continue
+        pairs.append((net, (a["pos"]["x"], a["pos"]["y"]), (b["pos"]["x"], b["pos"]["y"])))
+    router, failed = gapfill_router.route_all(
+        lambda: gapfill_router.GapFillRouter(geometry, ["F.Cu", "In2.Cu", "B.Cu"], width=0.25, clearance=0.2,
+                                             via_size=0.6, via_drill=0.3, edge_keep=0.5,
+                                             hole_keep=HOLE_KEEPOUTS["radius_mm"] + 0.3),
+        pairs) if pairs else (None, [])
+    routed = router.routed if router else []
+    routes_path = WORK / "gapfill.json"
+    routes_path.write_text(json.dumps(routed), encoding="utf-8")
+    if routed:
+        docker("/usr/bin/python3", "tools/kicad_autoroute_stage_rev_a.py", "addroutes", rel(board), rel(routes_path))
+    return {"routed": routed, "pairs": [p[0] for p in pairs], "failed": [p[0] for p in failed]}
+
+
 def summarize(drc_path: Path, candidate: Path, native_sha: str, log_tail: str, stage: dict) -> dict:
     report = json.loads(drc_path.read_text(encoding="utf-8"))
     by_type = collections.Counter(
@@ -312,13 +355,21 @@ def generate() -> None:
     imported = docker("/usr/bin/python3", "tools/kicad_autoroute_stage_rev_a.py", "import", rel(board), rel(ses),
                       rel(candidate), rel(tracks))
     shutil.move(candidate, board)
+    gapfill = gap_fill(board, rel)
+    segments = json.loads(tracks.read_text(encoding="utf-8"))
+    for kind, layer, net, width, points in gapfill["routed"]:
+        if kind == "track":
+            segments += [{"net": net, "layer": layer, "start": list(a), "end": list(b), "width": width}
+                         for a, b in zip(points, points[1:])]
     spec = WORK / "pours.json"
-    spec.write_text(json.dumps(pour_spec(json.loads(tracks.read_text(encoding="utf-8")))), encoding="utf-8")
+    spec.write_text(json.dumps(pour_spec(segments)), encoding="utf-8")
     poured = docker("/usr/bin/python3", "tools/kicad_autoroute_stage_rev_a.py", "pours", rel(board), rel(spec))
     drc = WORK / "drc.json"
     docker("kicad-cli", "pcb", "drc", "--format", "json", "--severity-all", "-o", rel(drc), rel(board))
     stage = {"export": json.loads(exported.strip().splitlines()[-1]), "import": json.loads(imported.strip().splitlines()[-1]),
-             "pours": json.loads(poured.strip().splitlines()[-1])}
+             "pours": json.loads(poured.strip().splitlines()[-1]),
+             "gapfill": {"routed_items": len(gapfill["routed"]), "pairs": gapfill["pairs"],
+                         "failed": gapfill["failed"]}}
     if OUT_DIR.exists():
         shutil.rmtree(OUT_DIR)
     OUT_DIR.mkdir(parents=True)
