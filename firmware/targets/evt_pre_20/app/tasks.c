@@ -475,7 +475,15 @@ static void comms_task_fn(void *arg) {
    (NITZ) for APP_COMMAND_NETWORK_TIME_MAX_MS; called from the comms task only. */
 static zs_command_clock_t command_clock;
 static bool command_clock_now(uint32_t now_ms, uint64_t *now_us) {
+  static uint32_t network_seen_at_ms;
+  int64_t network_us;
+  uint32_t network_at_ms;
   const bool gnss = time_sync.trust == ZS_TIME_TRUST_GNSS_TRUSTED || time_sync.trust == ZS_TIME_TRUST_HOLDOVER;
+  /* NITZ read by the modem during this bring-up (AT+QLTS=1): hand each new reading to the clock once */
+  if (zs_bg95_network_time(app_comms_modem(), &network_us, &network_at_ms) && network_at_ms != network_seen_at_ms) {
+    network_seen_at_ms = network_at_ms;
+    (void)zs_command_clock_set_network(&command_clock, network_us, network_at_ms);
+  }
   const int64_t gnss_us = gnss ? zs_time_for_sample(&time_sync, zs_pdm_capture_sample_counter(&capture)) : 0;
   return zs_command_clock_now(&command_clock, gnss_us, gnss, now_ms, now_us);
 }
