@@ -5,6 +5,7 @@
  * prehistory ring (the archive region of the B3 NOR map), so CMD_REQUEST_AUDIO can be answered later.  The
  * supervisor tells it when the PDM capture starts and stops; the audio task wakes it after each block.
  */
+#include "app_comms.h"
 #include "zs_audio.h"
 #include "zs_audio_recorder.h"
 #include "zs_prehistory.h"
@@ -23,5 +24,10 @@ void app_audio_rec_task(void *arg);
 void app_audio_rec_status(void (*print)(const char *fmt, ...));
 /* The ring for readers (the audio upload); NULL until bound. */
 const zs_prehistory_t *app_audio_rec_ring(void);
+/* An emitted event (dsp task): its time and whether the station time was trusted then, for CMD_REQUEST_AUDIO. The
+   table keeps the last APP_AUDIO_EVENT_TABLE events of this boot (older requests answer REJECTED / no audio). */
+void app_audio_rec_note_event(uint64_t event_id, int64_t time_us, bool time_trusted);
+/* Port for app_comms (the upload in the comms task). */
+const app_comms_audio_source_t *app_audio_rec_source(void);
 
 #endif

@@ -16,6 +16,7 @@
 #include "zs_command_journal.h"
 #include "zs_station_config.h"
 #include "zs_station_comms.h"
+#include "zs_prehistory.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -51,6 +52,22 @@ void app_comms_set_config(const zs_station_config_t *cfg, uint32_t boot_id);
 void app_comms_set_command_key(const uint8_t public_key[32]);
 /* Expected ICCID of slot 1/2 (18..22 digits); the dual-SIM path engages once both are set. */
 bool app_comms_set_sim_iccid(unsigned slot, const char *iccid);
+/* Audio for CMD_REQUEST_AUDIO (MQTT ICD addendum B): the prehistory ring and the event times live with the
+   recorder; the comms task reads them through this port while it uploads. */
+typedef struct {
+  const zs_prehistory_t *(*ring)(void);                               /* NULL until the ring is bound */
+  void (*range)(uint64_t *oldest_seq, uint64_t *next_seq);            /* consistent snapshot of the records held */
+  bool (*event_time)(uint64_t event_id, int64_t *time_us, bool *trusted);
+  int64_t (*now_us)(void);                                            /* the station's current sample time */
+  bool (*recording)(void);                                            /* the capture still runs */
+} app_comms_audio_source_t;
+void app_comms_set_audio_source(const app_comms_audio_source_t *src);
+/* Executor part for CMD_REQUEST_AUDIO: true = answered now (*result, *detail); false = accepted: the upload runs in
+   the session and the ACK (OK, detail = chunks) follows its last chunk.  A redelivery of the running command
+   returns false again; a different request while one runs is REJECTED / detail 4 (busy). */
+bool app_comms_request_audio(const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail);
+/* An upload runs or its ACK waits: the session must stay (the scheduler extends S3). */
+bool app_comms_audio_busy(void);
 const zs_bg95_t *app_comms_modem(void);
 const zs_station_comms_t *app_comms_state(void);
 #endif

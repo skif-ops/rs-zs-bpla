@@ -157,6 +157,19 @@ bool zs_prehistory_read_record_info(const zs_prehistory_t *ring,
   return true;
 }
 
+bool zs_prehistory_read_payload(const zs_prehistory_t *ring,
+                                uint64_t sequence,
+                                uint32_t offset,
+                                uint8_t *data,
+                                size_t len) {
+  const uint32_t payload = expected_payload_bytes(ring);
+  if (!ring || !data || len == 0u || payload == 0u || offset > payload || len > (size_t)(payload - offset)) return false;
+  const uint32_t record_address = record_address_for_sequence(ring, sequence);
+  if (record_address == UINT32_MAX) return false;
+  const uint64_t address64 = (uint64_t)record_address + ZS_PREHISTORY_HEADER_BYTES + offset;
+  return address64 <= UINT32_MAX && ring->storage.read(ring->storage.ctx, (uint32_t)address64, data, len) == 0;
+}
+
 bool zs_prehistory_recover(zs_prehistory_t *ring) {
   if (!ring || ring->active || ring->record_count == 0u) return false;
   bool found = false;

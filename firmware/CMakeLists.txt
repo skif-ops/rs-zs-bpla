@@ -46,6 +46,7 @@ add_library(zs_core
   src/zs_adpcm.c
   src/zs_prehistory.c
   src/zs_audio_recorder.c
+  src/zs_audio_upload.c
   src/zs_spatial.c
   src/zs_position_trust.c
   src/zs_installation_store.c
@@ -144,6 +145,10 @@ add_executable(zs_prehistory_tests tests/test_prehistory.c)
 target_link_libraries(zs_prehistory_tests zs_core m)
 add_executable(zs_audio_recorder_tests tests/test_audio_recorder.c)
 target_link_libraries(zs_audio_recorder_tests zs_core m)
+add_executable(zs_audio_upload_tests tests/test_audio_upload.c)
+target_link_libraries(zs_audio_upload_tests zs_core m)
+add_executable(zs_time_gap_tests tests/test_time_gap.c)
+target_link_libraries(zs_time_gap_tests zs_core m)
 add_executable(zs_spatial_tests tests/test_spatial.c)
 target_link_libraries(zs_spatial_tests zs_core m)
 add_executable(zs_protocol_size_tests tests/test_protocol_size.c)
@@ -252,6 +257,8 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_nor_storage_layout_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_prehistory_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_audio_recorder_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_audio_upload_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_time_gap_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_spatial_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_protocol_size_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_position_trust_tests PRIVATE -UNDEBUG)
@@ -315,6 +322,8 @@ add_test(NAME nor_event_outbox COMMAND zs_nor_event_outbox_tests)
 add_test(NAME nor_storage_layout COMMAND zs_nor_storage_layout_tests)
 add_test(NAME prehistory COMMAND zs_prehistory_tests)
 add_test(NAME audio_recorder COMMAND zs_audio_recorder_tests)
+add_test(NAME audio_upload COMMAND zs_audio_upload_tests)
+add_test(NAME time_gap COMMAND zs_time_gap_tests)
 add_test(NAME spatial COMMAND zs_spatial_tests)
 add_test(NAME protocol_size COMMAND zs_protocol_size_tests)
 add_test(NAME position_trust COMMAND zs_position_trust_tests)

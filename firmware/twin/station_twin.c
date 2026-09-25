@@ -397,7 +397,9 @@ static int pre_erase(void *c, uint32_t a, size_t n) { (void)c; if (a % 4096u || 
 static const zs_archive_storage_t pre_storage = {NULL, sizeof(pre_flash), 4096u, pre_read, pre_write, pre_erase};
 static zs_prehistory_t prehistory;
 static zs_audio_recorder_t recorder;
-static bool capture_on;
+static bool capture_on, capture_was_stopped;
+static uint32_t capture_stopped_ms;
+static int64_t capture_gaps_us;           /* zs_time_on_capture_gap on the target: the time mapping keeps up with pauses */
 static uint32_t post_capture_until_ms;
 static int64_t first_event_time_us;
 static void post_capture_open(void) { post_capture_until_ms = sim_now + 30000u; }
@@ -405,10 +407,22 @@ static bool capture_wanted(zs_mode_t mode) { return zs_mode_power_for(mode).mdf_
 static void capture_set(bool on) {
   if (on == capture_on) return;
   capture_on = on;
+  if (on && capture_was_stopped) capture_gaps_us += (int64_t)(sim_now - capture_stopped_ms) * 1000;
+  if (!on) { capture_stopped_ms = sim_now; capture_was_stopped = true; }
   if (on) zs_audio_recorder_start(&recorder, ring.total_frames); else zs_audio_recorder_stop(&recorder);
 }
+/* events of this run for CMD_REQUEST_AUDIO (mirrors app_audio_rec's table; the twin's clock is always trusted) */
+typedef struct { uint64_t event_id; int64_t time_us; } twin_event_t;
+static twin_event_t twin_events[16]; static unsigned twin_events_next;
+static const zs_prehistory_t *src_ring(void) { return &prehistory; }
+static void src_range(uint64_t *oldest, uint64_t *next) { *next = prehistory.next_sequence; *oldest = prehistory.next_sequence - prehistory.available_records; }
+static bool src_event_time(uint64_t id, int64_t *t, bool *trusted) { for (unsigned i = 0u; i < 16u; i++) if (id && twin_events[i].event_id == id) { *t = twin_events[i].time_us; *trusted = true; return true; } return false; }
+static int64_t pl_sample_time(void *ctx, uint64_t sample);
+static int64_t src_now_us(void) { return pl_sample_time(NULL, ring.total_frames); }
+static bool src_recording(void) { return capture_on; }
+static const app_comms_audio_source_t audio_source = {src_ring, src_range, src_event_time, src_now_us, src_recording};
 static bool pl_extract(void *ctx, const int16_t *pcm, size_t n, float out[ZS_FEATURE_COUNT]) { (void)ctx; return zs_dsp_mcu_extract_1s(&dsp_ctx, pcm, n, out); }
-static int64_t pl_sample_time(void *ctx, uint64_t sample) { (void)ctx; return (int64_t)1800000000000000LL + (int64_t)sample * 1000000LL / 32000LL; }
+static int64_t pl_sample_time(void *ctx, uint64_t sample) { (void)ctx; return (int64_t)1800000000000000LL + (int64_t)sample * 1000000LL / 32000LL + capture_gaps_us; }
 static bool pl_emit(void *ctx, const zs_detection_t *d) {
   static uint8_t ws[ZS_EVENT_OUTBOX_PAYLOAD_MAX_BYTES + 64u];
   zs_detection_t e = *d; (void)ctx;
@@ -417,6 +431,7 @@ static bool pl_emit(void *ctx, const zs_detection_t *d) {
   events_emitted_total += ok;
   if (ok) remember_summary(d->event_id, d->classification.class_id, d->classification.confidence_u8, pipeline.presence.level, (uint16_t)pipeline.last_gate.f0_hz);
   if (ok && first_event_time_us == 0) first_event_time_us = d->event_time_us;
+  twin_events[twin_events_next] = (twin_event_t){d->event_id, d->event_time_us}; twin_events_next = (twin_events_next + 1u) % 16u;
   tlog("station: event %llu emitted (level %u conf %u) -> outbox %s", (unsigned long long)d->event_id, pipeline.presence.level, pipeline.presence.confidence_u8, ok ? "ok" : "REFUSED");
   return ok;
 }
@@ -493,6 +508,7 @@ static void outbox_retry_tick(void) {
    degraded after 3: the S3 watchdog drops from 180 s to 60 s so a dead network costs less modem time per retry,
    and the route hint switches to LoRa for the phase-2 transport; a completed session restores everything. */
 static unsigned comms_fail_streak, degraded_after = 3u; static bool gsm_degraded;
+static uint32_t comms_max_base_ms = 180000u;               /* + 300 s while an audio upload runs (mirrors tasks.c) */
 static uint32_t gsm_probe_ms = 1800000u, last_s3_exit_ms;   /* while degraded: probe GSM every 30 min (S3 capped at 60 s) */
 /* LoRa duty: while the route hint is LoRa the uplink drains the outbox regardless of the mode (the radio is cheap:
    no S3 needed); a delivered outbox resets the outbox retry so S3 is not re-entered for events LoRa has sent. */
@@ -506,9 +522,9 @@ static void lora_step(void) {
 }
 static void comms_health_on_s3_exit(bool done) {
   last_s3_exit_ms = sim_now;
-  if (done) { comms_fail_streak = 0u; if (gsm_degraded) { gsm_degraded = false; modes.policy.comms_max_ms = 180000u; tlog("comms: link healthy again, S3 watchdog 180 s"); } return; }
+  if (done) { comms_fail_streak = 0u; if (gsm_degraded) { gsm_degraded = false; comms_max_base_ms = 180000u; tlog("comms: link healthy again, S3 watchdog 180 s"); } return; }
   comms_fail_streak++;
-  if (!gsm_degraded && comms_fail_streak >= degraded_after) { gsm_degraded = true; modes.policy.comms_max_ms = 60000u; tlog("comms: DEGRADED after %u failed sessions -> S3 watchdog 60 s, route hint LoRa", comms_fail_streak); }
+  if (!gsm_degraded && comms_fail_streak >= degraded_after) { gsm_degraded = true; comms_max_base_ms = 60000u; tlog("comms: DEGRADED after %u failed sessions -> S3 watchdog 60 s, route hint LoRa", comms_fail_streak); }
 }
 
 static void gsm_probe_tick(void) {
@@ -549,6 +565,8 @@ static bool twin_execute(void *ctx, const zs_command_t *cmd, zs_command_ack_resu
     const uint32_t delay_s = cmd->reboot.delay_s > 5u ? cmd->reboot.delay_s : 5u;
     reboot_pending = true; reboot_at_ms = sim_now + delay_s * 1000u; cmd_reboots_scheduled++;
     tlog("command: REBOOT in %lu s", (unsigned long)delay_s);
+  } else if (cmd->code == ZS_COMMAND_REQUEST_AUDIO) {
+    if (!app_comms_request_audio(cmd, result, detail)) { tlog("command: REQUEST_AUDIO accepted, upload follows"); return false; }
   } else { *result = ZS_COMMAND_ACK_REJECTED; *detail = 1u; }
   if (*result == ZS_COMMAND_ACK_OK) cmd_executed++; else cmd_rejected++;
   return true;
@@ -577,6 +595,7 @@ static void supervisor_tick(void) {
   gsm_probe_tick();
   for (unsigned ev = 1u; ev < 32u; ev++) if (mode_bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, sim_now);
   mode_bits = 0u;
+  modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? 300000u : 0u);
   (void)zs_mode_tick(&modes, sim_now);
   if (capture_on && !capture_wanted(modes.mode)) capture_set(false);   /* the post-event window closed */
   if (modes.mode != last) {
@@ -666,6 +685,7 @@ int main(int argc, char **argv) {
   app_comms_set_command_key(zs_command_set_vector_public_key);
   app_comms_set_clock(twin_clock);
   app_comms_set_executor(twin_execute, NULL);
+  app_comms_set_audio_source(&audio_source);
   app_comms_bind(&outbox_io, &journal_io, &hooks);
   app_comms_set_config(&cfg, 5u);
   app_comms_request(true);

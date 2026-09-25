@@ -70,4 +70,8 @@ bool zs_pps_sync_poll(zs_pps_sync_t *p, uint32_t now_ticks);
 /* Expected sample-rate error from the last two bound PPS edges, in ppm (0 when unknown). */
 int32_t zs_pps_sync_rate_error_ppm(const zs_pps_sync_t *p);
 
+/* The capture stopped and restarts: the block marks from before the pause cannot bracket a PPS (the samples did
+   not advance while the timer did), so they and any edge seen meanwhile are dropped; rebinding starts afresh. */
+void zs_pps_sync_on_capture_gap(zs_pps_sync_t *p);
+
 #endif
