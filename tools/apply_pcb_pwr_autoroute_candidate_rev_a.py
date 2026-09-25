@@ -41,7 +41,23 @@ FREEROUTING_URL = "https://github.com/freerouting/freerouting/releases/download/
 FREEROUTING_SHA256 = "3ad5a956ab474b12f331d24195feadac90e8344b8e013c6a4ab26e203ce51519"
 PLANES = [{"net": "GND_PWR", "layer": "In1.Cu", "inset_mm": 0.5}]
 HOLE_KEEPOUTS = {"refs": ["H1", "H2", "H3", "H4"], "radius_mm": 4.0}
-PASSES = 100
+PASSES = 150
+# Locked escape stubs (checked >= 0.21 mm to all foreign copper against the
+# authoritative board): LMR60440 pins 6/7 of U3/U4 sit 0.125 mm from pad 2 under
+# the ECO-004 land rule the autorouter cannot see; U2 VSSOP-10 pins 6/7/8; the
+# NT2 net-tie exit to J2 pin 4 (0.4 mm, the tie itself is the current limit).
+PREROUTE = [
+    ('track', 'F.Cu', 'FB_3V8', 0.2, [(55.585, 13.125), (55.585, 12.15)]),
+    ('track', 'F.Cu', 'MODE_3V8', 0.2, [(54.415, 13.125), (54.415, 12.15)]),
+    ('track', 'F.Cu', '3V3_DIGITAL', 0.2, [(55.585, 41.125), (55.585, 40.15)]),
+    ('track', 'F.Cu', 'MODE_3V3', 0.2, [(54.415, 41.125), (54.415, 40.15)]),
+    ('track', 'F.Cu', '3V3_DIGITAL', 0.2, [(46.2, 24.0), (47.6, 24.0)]),
+    ('track', 'F.Cu', 'VBAT_SYS', 0.2, [(46.2, 23.0), (47.3, 23.0)]),
+    ('track', 'F.Cu', 'GND_PWR', 0.2, [(46.2, 23.5), (44.9, 23.5)]),
+    ('via', None, 'GND_PWR', 0.6, [(44.9, 23.5)]),
+    ('track', 'F.Cu', 'GND_DIGITAL', 0.4, [(75.1, 48.52), (75.1, 47.8), (79.5, 47.8), (81.08, 49.0)]),
+]
+TIE_STRIPS = ["NT2"]
 # Autoroute (connectivity) class parameters. Freerouting cannot neck a wide
 # track down into a fine-pitch pin, so power nets are routed at 1.0 mm for
 # connectivity and then thickened to the basis width by zones along the route
@@ -60,7 +76,7 @@ AUTOROUTE_OVERRIDES = {
 THICKEN_MM = {"PWR_INPUT_5A": 4.0, "PWR_RAIL_4A": 3.0}
 THICKEN_CLEARANCE_MM = 0.3
 GROUND = {"net": "GND_PWR", "layers": ["F.Cu", "B.Cu"], "inset_mm": 0.5, "clearance_mm": 0.3,
-          "stitch_pitch_mm": 2.5, "stitch_keep_mm": 0.75}
+          "stitch_pitch_mm": 3.5, "stitch_keep_mm": 0.75}
 # Same-footprint pad spacing of the fine-pitch shunt monitor U2 (VSSOP-10 0.5 mm
 # pitch, 0.2 mm gaps) is set by its land pattern, like U3/U4 in ECO-004.
 CANDIDATE_DRU_APPEND = """
@@ -191,6 +207,8 @@ def summarize(drc_path: Path, candidate: Path, native_sha: str, log_tail: str, s
         "hole_keepouts": HOLE_KEEPOUTS,
         "autoroute_class_overrides": AUTOROUTE_OVERRIDES,
         "thicken_mm": THICKEN_MM,
+        "preroute": PREROUTE,
+        "tie_strips": TIE_STRIPS,
         "ground": GROUND,
         "stage": stage,
         "drc": {
@@ -221,7 +239,8 @@ def generate() -> None:
     rel = lambda path: str(path.relative_to(ROOT))  # noqa: E731
     dsn, ses = WORK / f"{STEM}.dsn", WORK / f"{STEM}.ses"
     exported = docker("/usr/bin/python3", "tools/kicad_autoroute_stage_rev_a.py", "export", rel(board), rel(dsn),
-                      json.dumps({"planes": PLANES, "hole_keepouts": HOLE_KEEPOUTS}))
+                      json.dumps({"planes": PLANES, "hole_keepouts": HOLE_KEEPOUTS,
+                                  "preroute": PREROUTE, "tie_strips": TIE_STRIPS}))
     binary = freerouting()
     env = dict(os.environ, JAVA_TOOL_OPTIONS="-Xmx3g")
     routed = subprocess.run(

@@ -77,6 +77,70 @@ def add_hole_keepouts(board, references: list[str], radius_mm: float) -> int:
     return added
 
 
+def _via(board, net_name: str, x_mm: float, y_mm: float, size_mm: float = 0.6, drill_mm: float = 0.3):
+    via = pcbnew.PCB_VIA(board)
+    via.SetPosition(pcbnew.VECTOR2I(mm(x_mm), mm(y_mm)))
+    try:
+        via.SetWidth(mm(size_mm))
+    except TypeError:  # KiCad 9 padstack API
+        via.SetWidth(pcbnew.F_Cu, mm(size_mm))
+    via.SetDrill(mm(drill_mm))
+    via.SetNetCode(board.FindNet(net_name).GetNetCode())
+    board.Add(via)
+    return via
+
+
+def add_preroute(board, items) -> int:
+    """Deterministic, locked escape stubs for pins the autorouter cannot enter
+    (fine-pitch pins next to same-footprint land rules, net-tie exits)."""
+    count = 0
+    for kind, layer, net, width, points in items:
+        if kind == "via":
+            _via(board, net, points[0][0], points[0][1], width).SetLocked(True)
+            count += 1
+            continue
+        for (x0, y0), (x1, y1) in zip(points, points[1:]):
+            track = pcbnew.PCB_TRACK(board)
+            track.SetStart(pcbnew.VECTOR2I(mm(x0), mm(y0)))
+            track.SetEnd(pcbnew.VECTOR2I(mm(x1), mm(y1)))
+            track.SetWidth(mm(width))
+            track.SetLayer(board.GetLayerID(layer))
+            track.SetNetCode(board.FindNet(net).GetNetCode())
+            track.SetLocked(True)
+            board.Add(track)
+            count += 1
+    return count
+
+
+def add_tie_strips(board, references) -> int:
+    """Thin no-track strips beside net-tie bridges: the bridge polygon is not
+    exported to the DSN, so the autorouter would otherwise pass too close."""
+    added = 0
+    for footprint in board.GetFootprints():
+        if footprint.GetReference() not in references:
+            continue
+        pads = sorted(footprint.Pads(), key=lambda pad: pad.GetPosition().x)
+        x0, x1 = pads[0].GetPosition().x, pads[-1].GetPosition().x
+        yc = pads[0].GetPosition().y
+        for sign in (1,):  # below the bridge only: exits upward stay free
+            zone = pcbnew.ZONE(board)
+            zone.SetIsRuleArea(True)
+            zone.SetDoNotAllowTracks(True)
+            zone.SetDoNotAllowVias(True)
+            zone.SetDoNotAllowPads(False)
+            zone.SetDoNotAllowCopperPour(False)
+            zone.SetDoNotAllowFootprints(False)
+            zone.SetLayer(footprint.GetLayer())
+            ya, yb = yc + sign * mm(0.30), yc + sign * mm(0.70)
+            outline = zone.Outline()
+            outline.NewOutline()
+            for x, y in ((x0, ya), (x1, ya), (x1, yb), (x0, yb)):
+                outline.Append(x, y)
+            board.Add(zone)
+            added += 1
+    return added
+
+
 def export(board_path: str, dsn_path: str, plane_json: str) -> None:
     config = json.loads(plane_json)
     planes = config["planes"] if isinstance(config, dict) else config
@@ -93,13 +157,16 @@ def export(board_path: str, dsn_path: str, plane_json: str) -> None:
         board.SetLayerType(layer, pcbnew.LT_POWER)
     for plane in planes:
         add_plane(board, plane["net"], plane["layer"], plane.get("inset_mm", 0.5))
+    prerouted = add_preroute(board, config.get("preroute", []) if isinstance(config, dict) else [])
+    strips = add_tie_strips(board, config.get("tie_strips", []) if isinstance(config, dict) else [])
     keepouts = 0
     if isinstance(config, dict) and config.get("hole_keepouts"):
         keepouts = add_hole_keepouts(board, config["hole_keepouts"]["refs"], config["hole_keepouts"]["radius_mm"])
     pcbnew.ZONE_FILLER(board).Fill(board.Zones())
     board.Save(board_path)
     assert pcbnew.ExportSpecctraDSN(board, dsn_path), "DSN export failed"
-    print(json.dumps({"locked_track_items": locked, "zones": len(list(board.Zones())), "hole_keepouts": keepouts}))
+    print(json.dumps({"locked_track_items": locked, "zones": len(list(board.Zones())), "hole_keepouts": keepouts,
+                      "preroute_items": prerouted, "tie_strips": strips}))
 
 
 def import_session(board_path: str, ses_path: str, out_path: str, tracks_json: str = "") -> None:
