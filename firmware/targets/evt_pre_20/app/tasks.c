@@ -16,6 +16,7 @@
 #include "FreeRTOS.h"
 #include "app_config.h"
 #include "app_comms.h"
+#include "app_commands.h"
 #include "app_lora.h"
 #include "app_watchdog.h"
 #include "app_nrf_update.h"
@@ -34,6 +35,7 @@
 #include "zs_command_clock.h"
 #include "zs_dsp_mcu.h"
 #include "zs_ipc_service.h"
+#include "zs_nor_slot_store.h"
 #include "zs_nor_storage_layout.h"
 #include "zs_pdm_capture.h"
 #include "zs_power_modes.h"
@@ -243,12 +245,15 @@ static void outbox_retry_tick(uint32_t now) {
    session restores the defaults. */
 static unsigned comms_fail_streak;
 static bool gsm_degraded;
+/* runtime parameters (CMD_SET_PARAMS, zs_station_params); compile-time values until the record is applied */
+static unsigned comms_degraded_after = APP_COMMS_DEGRADED_AFTER;
+static uint32_t gsm_probe_ms = APP_GSM_PROBE_MS;
 static uint32_t last_s3_exit_ms;
 bool app_route_hint_lora(void) { return gsm_degraded; }
 /* While degraded, probe GSM every APP_GSM_PROBE_MS with a capped S3: a completed session restores the link. */
 static void gsm_probe_tick(uint32_t now) {
   if (!gsm_degraded || modes.mode == ZS_MODE_S3_COMMS || modes.mode == ZS_MODE_S4_SERVICE) return;
-  if ((uint32_t)(now - last_s3_exit_ms) < APP_GSM_PROBE_MS) return;
+  if ((uint32_t)(now - last_s3_exit_ms) < gsm_probe_ms) return;
   last_s3_exit_ms = now;
   console_printf("comms: gsm probe\r\n");
   mode_event(ZS_MODE_EV_OUTBOX_PENDING);
@@ -257,12 +262,24 @@ static void comms_health_on_s3_exit(bool done) {
   last_s3_exit_ms = xTaskGetTickCount();
   if (done) { comms_fail_streak = 0u; if (gsm_degraded) { gsm_degraded = false; modes.policy.comms_max_ms = zs_mode_policy_default().comms_max_ms; app_lora_set_route_hint(false); console_printf("comms: link healthy again\r\n"); } return; }
   comms_fail_streak++;
-  if (!gsm_degraded && comms_fail_streak >= APP_COMMS_DEGRADED_AFTER) {
+  if (!gsm_degraded && comms_fail_streak >= comms_degraded_after) {
     gsm_degraded = true;
     modes.policy.comms_max_ms = APP_COMMS_MAX_DEGRADED_MS;
     app_lora_set_route_hint(true);
     console_printf("comms: DEGRADED after %u failed sessions, S3 watchdog %lu s, route hint lora\r\n", comms_fail_streak, (unsigned long)(APP_COMMS_MAX_DEGRADED_MS / 1000u));
   }
+}
+
+/* CMD_SET_PARAMS (addendum D): the stored or commanded parameter set takes effect here.  Called from the ble task
+   at bind time, from the comms task by the executor and from the supervisor after the scheduler init; every target
+   is a single aligned word or byte. */
+static void params_apply(const zs_station_params_t *p) {
+  modes.policy.heartbeat_period_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_HEARTBEAT_PERIOD_S) * 1000u;
+  modes.policy.listen_dwell_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_LISTEN_DWELL_S) * 1000u;
+  pipeline_port.channel = (uint8_t)zs_station_params_get(p, ZS_PARAM_MIC_CHANNEL);
+  pipeline_port.update_period_windows = (uint8_t)zs_station_params_get(p, ZS_PARAM_EVENT_UPDATE_WINDOWS);
+  comms_degraded_after = (unsigned)zs_station_params_get(p, ZS_PARAM_COMMS_DEGRADED_AFTER);
+  gsm_probe_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_GSM_PROBE_S) * 1000u;
 }
 
 static void supervisor_task_fn(void *arg) {
@@ -271,6 +288,7 @@ static void supervisor_task_fn(void *arg) {
   bool tamper_fired = false;
   (void)arg;
   zs_mode_init(&modes, NULL, xTaskGetTickCount());
+  params_apply(app_commands_params());             /* the init reset the policy: re-apply the stored parameters */
   bsp_gpio_mic_rail(true);
   vTaskDelay(pdMS_TO_TICKS(50));                 /* 1V8_MIC settle before the PDM clock */
   (void)bsp_mdf_start();
@@ -291,6 +309,7 @@ static void supervisor_task_fn(void *arg) {
     for (unsigned ev = 1u; ev < 32u; ev++) if (bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, now);
     (void)zs_mode_tick(&modes, now);
     app_watchdog_service();
+    app_commands_tick(now);
     outbox_retry_tick(now);
     gsm_probe_tick(now);
     if (bsp_gpio_power_fault()) (void)zs_mode_on_event(&modes, ZS_MODE_EV_FAULT, now);
@@ -527,7 +546,24 @@ static void bind_record_stores(void) {
       zs_nor_storage_bind_stores(&nor_bindings, &nor, APP_NOR_COMMAND_SLOTS, APP_NOR_OUTBOX_SLOTS, &nor_archive_storage,
                                  &nor_command_io, &nor_outbox_io, &cfg_io, &pos_io)) {
     stores_on_nor = true;
-    app_nrf_update_bind(&nor, &nor_bindings.layout, console_printf);
+    {
+      /* runtime parameters: the last APP_PARAMS_NOR_BLOCKS blocks of the nRF image partition (addendum D) */
+      static zs_nor_storage_layout_t nrf_layout;
+      static zs_nor_slot_store_t params_slots;
+      static zs_station_params_io_t params_io;
+      zs_station_config_io_t slot_io;
+      const uint32_t params_bytes = APP_PARAMS_NOR_BLOCKS * nor_bindings.layout.erase_block_bytes;
+      nrf_layout = nor_bindings.layout;
+      nrf_layout.nrf_image_partition_bytes -= params_bytes;
+      app_nrf_update_bind(&nor, &nrf_layout, console_printf);
+      if (zs_nor_slot_store_init(&params_slots, &nor, nrf_layout.nrf_image_base_address + nrf_layout.nrf_image_partition_bytes, 2u, ZS_STATION_PARAMS_RECORD_BYTES) &&
+          zs_nor_slot_store_config_io(&params_slots, &slot_io)) {
+        params_io = (zs_station_params_io_t){slot_io.ctx, slot_io.read, slot_io.erase, slot_io.write};
+        app_commands_bind(&params_io, params_apply, console_printf);
+      } else {
+        app_commands_bind(NULL, params_apply, console_printf);
+      }
+    }
     app_comms_bind(&nor_outbox_io, &nor_command_io, &comms_hooks);        /* comms needs the durable stores */
     app_lora_bind(&nor_outbox_io, APP_STATION_ID, secrets.engineer_key_set ? secrets.engineer_key : NULL, console_printf);
     { uint16_t pending = 0u; if (zs_event_outbox_pending_count(&nor_outbox_io, &pending) == ZS_EVENT_OUTBOX_OK && pending > 0u) { console_printf("outbox: %u events pending from before the reboot\r\n", pending); mode_event(ZS_MODE_EV_OUTBOX_PENDING); } }
@@ -556,6 +592,7 @@ static void bind_record_stores(void) {
     cfg_io = (zs_station_config_io_t){cfg_slots, ram_read, ram_erase, ram_write};
     pos_io = (zs_installation_store_io_t){pos_slots, ram_read, ram_erase, ram_write};
     console_printf("nor: bind/probe failed, record stores in RAM for this session\r\n");
+    app_commands_bind(NULL, params_apply, console_printf);
   }
 }
 
@@ -717,6 +754,8 @@ static void console_exec(const char *cmd) {
     console_printf((!secrets_on_nor || zs_station_secrets_clear(&secrets_io) == ZS_STATION_SECRETS_OK) ? "secrets: cleared (sim iccids apply after reboot)\r\n" : "secrets: nor clear failed\r\n");
   } else if (strcmp(cmd, "power") == 0) {
     app_power_status(console_printf);
+  } else if (strcmp(cmd, "cmds") == 0) {
+    app_commands_status(console_printf);
   } else if (strcmp(cmd, "clock") == 0) {
     static const char *const src[] = {"none", "gnss", "network"};
     console_printf("command clock: last source %s | reads gnss %lu network %lu untrusted %lu | network sets %lu rejected %lu | time trust %d\r\n",
@@ -735,7 +774,7 @@ static void console_exec(const char *cmd) {
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] power lora [on|off] clock wd wdtest heap\r\n");
+    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] power lora [on|off] clock cmds wd wdtest heap\r\n");
   }
 }
 
@@ -789,6 +828,7 @@ bool app_tasks_create(void) {
 
   zs_command_clock_init(&command_clock, APP_COMMAND_NETWORK_TIME_MAX_MS);
   app_comms_set_clock(command_clock_now);
+  app_comms_set_executor(app_commands_execute, NULL);
   app_watchdog_capture_reset_cause();
   for (unsigned t = APP_WD_AUDIO; t <= APP_WD_GNSS; t++) app_watchdog_register((app_wd_task_t)t);
   if (xTaskCreate(audio_task_fn, "audio", APP_STACK_AUDIO, NULL, APP_PRIO_AUDIO, &audio_task) != pdPASS) return false;
