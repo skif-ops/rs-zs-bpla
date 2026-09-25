@@ -77,7 +77,21 @@
     "b": "U3.6",
     "net_a": "GND_PWR",
     "net_b": "FB_3V8",
-    "gap_mm": 0.125
+    "gap_mm": 0.125,
+    "mask_expansion_mm": [
+     null,
+     0.05
+    ],
+    "mask_dam_mm": null,
+    "paste_gap_mm": 0.25,
+    "paste_area_mm2": [
+     0.7622,
+     0.1531
+    ],
+    "pad_area_mm2": [
+     1.3392,
+     0.1531
+    ]
    },
    {
     "side": "F",
@@ -85,7 +99,21 @@
     "b": "U3.7",
     "net_a": "GND_PWR",
     "net_b": "MODE_3V8",
-    "gap_mm": 0.125
+    "gap_mm": 0.125,
+    "mask_expansion_mm": [
+     null,
+     0.05
+    ],
+    "mask_dam_mm": null,
+    "paste_gap_mm": 0.25,
+    "paste_area_mm2": [
+     0.7622,
+     0.1531
+    ],
+    "pad_area_mm2": [
+     1.3392,
+     0.1531
+    ]
    },
    {
     "side": "F",
@@ -93,7 +121,21 @@
     "b": "U4.7",
     "net_a": "GND_PWR",
     "net_b": "MODE_3V3",
-    "gap_mm": 0.125
+    "gap_mm": 0.125,
+    "mask_expansion_mm": [
+     null,
+     0.05
+    ],
+    "mask_dam_mm": null,
+    "paste_gap_mm": 0.25,
+    "paste_area_mm2": [
+     0.7622,
+     0.1531
+    ],
+    "pad_area_mm2": [
+     1.3392,
+     0.1531
+    ]
    },
    {
     "side": "F",
@@ -101,7 +143,21 @@
     "b": "U4.6",
     "net_a": "GND_PWR",
     "net_b": "3V3_DIGITAL",
-    "gap_mm": 0.125
+    "gap_mm": 0.125,
+    "mask_expansion_mm": [
+     null,
+     0.05
+    ],
+    "mask_dam_mm": null,
+    "paste_gap_mm": 0.25,
+    "paste_area_mm2": [
+     0.7622,
+     0.1531
+    ],
+    "pad_area_mm2": [
+     1.3392,
+     0.1531
+    ]
    }
   ],
   "C_mask_opening_to_copper": [
@@ -109,96 +165,144 @@
     "side": "F",
     "opening": "TP7.1",
     "net": "1V8_MIC",
+    "mask_expansion_mm": 0.2,
     "other": "track",
     "other_net": "3V8_MODEM",
+    "other_width_mm": 1.0,
+    "copper_gap_mm": 0.2039,
+    "exposed_other_copper_mm2": 0.0,
     "gap_mm": 0.0038
    },
    {
     "side": "F",
     "opening": "TP6.1",
     "net": "PWR_GOOD",
+    "mask_expansion_mm": 0.2,
     "other": "track",
     "other_net": "3V8_MODEM",
+    "other_width_mm": 1.0,
+    "copper_gap_mm": 0.2039,
+    "exposed_other_copper_mm2": 0.0,
     "gap_mm": 0.0038
    },
    {
     "side": "F",
     "opening": "TP9.1",
     "net": "I2C2_SCL",
+    "mask_expansion_mm": 0.2,
     "other": "track",
     "other_net": "3V8_MODEM",
+    "other_width_mm": 1.0,
+    "copper_gap_mm": 0.2039,
+    "exposed_other_copper_mm2": 0.0,
     "gap_mm": 0.0038
    },
    {
     "side": "F",
     "opening": "TP8.1",
     "net": "FAULT",
+    "mask_expansion_mm": 0.2,
     "other": "track",
     "other_net": "3V8_MODEM",
+    "other_width_mm": 1.0,
+    "copper_gap_mm": 0.2039,
+    "exposed_other_copper_mm2": 0.0,
     "gap_mm": 0.0038
    },
    {
     "side": "F",
     "opening": "U3.-",
     "net": "",
+    "mask_expansion_mm": 0.0,
     "other": "track",
     "other_net": "GND_PWR",
+    "other_width_mm": 0.6,
+    "copper_gap_mm": null,
+    "exposed_other_copper_mm2": 0.2295,
     "gap_mm": 0.0
    },
    {
     "side": "F",
     "opening": "U3.-",
     "net": "",
+    "mask_expansion_mm": 0.0,
     "other": "zone",
     "other_net": "GND_PWR",
+    "other_width_mm": null,
+    "copper_gap_mm": null,
+    "exposed_other_copper_mm2": 0.7109,
     "gap_mm": 0.0
    },
    {
     "side": "F",
     "opening": "TP10.1",
     "net": "I2C2_SDA",
+    "mask_expansion_mm": 0.2,
     "other": "track",
     "other_net": "3V8_MODEM",
+    "other_width_mm": 1.0,
+    "copper_gap_mm": 0.2039,
+    "exposed_other_copper_mm2": 0.0,
     "gap_mm": 0.0038
    },
    {
     "side": "F",
     "opening": "TP10.1",
     "net": "I2C2_SDA",
+    "mask_expansion_mm": 0.2,
     "other": "track",
     "other_net": "3V8_MODEM",
+    "other_width_mm": 1.0,
+    "copper_gap_mm": 0.2035,
+    "exposed_other_copper_mm2": 0.0,
     "gap_mm": 0.0034
    },
    {
     "side": "F",
     "opening": "TP10.1",
     "net": "I2C2_SDA",
+    "mask_expansion_mm": 0.2,
     "other": "track",
     "other_net": "3V8_MODEM",
+    "other_width_mm": 1.0,
+    "copper_gap_mm": 0.2135,
+    "exposed_other_copper_mm2": 0.0,
     "gap_mm": 0.0133
    },
    {
     "side": "F",
     "opening": "U4.-",
     "net": "",
+    "mask_expansion_mm": 0.0,
     "other": "zone",
     "other_net": "GND_PWR",
+    "other_width_mm": null,
+    "copper_gap_mm": null,
+    "exposed_other_copper_mm2": 0.698,
     "gap_mm": 0.0
    },
    {
     "side": "F",
     "opening": "U4.-",
     "net": "",
+    "mask_expansion_mm": 0.0,
     "other": "track",
     "other_net": "GND_PWR",
+    "other_width_mm": 0.6,
+    "copper_gap_mm": null,
+    "exposed_other_copper_mm2": 0.2295,
     "gap_mm": 0.0
    },
    {
     "side": "F",
     "opening": "TP5.1",
     "net": "PG_3V8",
+    "mask_expansion_mm": 0.2,
     "other": "track",
     "other_net": "3V8_MODEM",
+    "other_width_mm": 1.0,
+    "copper_gap_mm": 0.2039,
+    "exposed_other_copper_mm2": 0.0,
     "gap_mm": 0.0038
    }
   ],
@@ -3490,289 +3594,337 @@
     "side": "F",
     "item": "R6:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R6:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R7:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R7:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "C1:PCB_SHAPE",
     "gap_mm": 0.1016,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "C1:PCB_SHAPE",
     "gap_mm": 0.1016,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "C4:PCB_SHAPE",
     "gap_mm": 0.1016,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "C4:PCB_SHAPE",
     "gap_mm": 0.1016,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "C6:PCB_SHAPE",
     "gap_mm": 0.1016,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "C6:PCB_SHAPE",
     "gap_mm": 0.1016,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R10:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R10:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R3:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R3:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "U1:PCB_SHAPE",
     "gap_mm": 0.0,
-    "over_opening_mm2": 0.0997
+    "over_opening_mm2": 0.0997,
+    "kind": "ON_OPENING_CLIPPED"
    },
    {
     "side": "F",
     "item": "J1:PCB_SHAPE",
     "gap_mm": 0.14,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R2:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R2:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R11:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R11:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "Q1:PCB_SHAPE",
     "gap_mm": 0.0,
-    "over_opening_mm2": 0.0359
+    "over_opening_mm2": 0.0359,
+    "kind": "ON_OPENING_CLIPPED"
    },
    {
     "side": "F",
     "item": "RSH1:PCB_SHAPE",
     "gap_mm": 0.0,
-    "over_opening_mm2": 0.1545
+    "over_opening_mm2": 0.1545,
+    "kind": "ON_OPENING_CLIPPED"
    },
    {
     "side": "F",
     "item": "R13:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R13:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "U3:PCB_SHAPE",
     "gap_mm": 0.0,
-    "over_opening_mm2": 0.0136
+    "over_opening_mm2": 0.0136,
+    "kind": "ON_OPENING_CLIPPED"
    },
    {
     "side": "F",
     "item": "U3:PCB_SHAPE",
     "gap_mm": 0.0,
-    "over_opening_mm2": 0.0005
+    "over_opening_mm2": 0.0005,
+    "kind": "ON_OPENING_CLIPPED"
    },
    {
     "side": "F",
     "item": "R4:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R4:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R14:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R14:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R9:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R9:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "U2:PCB_SHAPE",
     "gap_mm": 0.0,
-    "over_opening_mm2": 0.0101
+    "over_opening_mm2": 0.0101,
+    "kind": "ON_OPENING_CLIPPED"
    },
    {
     "side": "F",
     "item": "C2:PCB_SHAPE",
     "gap_mm": 0.1016,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "C2:PCB_SHAPE",
     "gap_mm": 0.1016,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R15:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R15:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R1:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R1:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R8:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R8:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "U4:PCB_SHAPE",
     "gap_mm": 0.0,
-    "over_opening_mm2": 0.0136
+    "over_opening_mm2": 0.0136,
+    "kind": "ON_OPENING_CLIPPED"
    },
    {
     "side": "F",
     "item": "U4:PCB_SHAPE",
     "gap_mm": 0.0,
-    "over_opening_mm2": 0.0005
+    "over_opening_mm2": 0.0005,
+    "kind": "ON_OPENING_CLIPPED"
    },
    {
     "side": "F",
     "item": "R5:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R5:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R12:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "R12:PCB_SHAPE",
     "gap_mm": 0.1026,
-    "over_opening_mm2": 0.0
+    "over_opening_mm2": 0.0,
+    "kind": "NEAR_OPENING"
    },
    {
     "side": "F",
     "item": "U5:PCB_SHAPE",
     "gap_mm": 0.0,
-    "over_opening_mm2": 0.0997
+    "over_opening_mm2": 0.0997,
+    "kind": "ON_OPENING_CLIPPED"
    }
   ],
   "F_pad_hole_to_hole": [
