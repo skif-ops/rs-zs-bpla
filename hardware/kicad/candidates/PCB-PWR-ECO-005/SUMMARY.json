@@ -1,0 +1,12 @@
+{
+  "schema": "dioneya-pcb-pwr-eco-005-candidate-v1",
+  "base_board_sha256": "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578",
+  "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
+  "local_clearance_screen": "PASS",
+  "manufacturing_release": false,
+  "stage": {
+    "rc": 1,
+    "stdout": "swig/python detected a memory leak of type 'PCB_TRACK *', no destructor found.\n",
+    "stderr": "Download complete\nf8f12f6f970e: Verifying Checksum\nf8f12f6f970e: Download complete\nd0b76b7e8d80: Verifying Checksum\nd0b76b7e8d80: Download complete\nd0b76b7e8d80: Pull complete\ne64c2316cd50: Pull complete\n207ac5616789: Pull complete\n46f0bfc95fd9: Pull complete\nf8f12f6f970e: Pull complete\nf36d0dc2d7bb: Pull complete\naab27c973195: Pull complete\nfd5a0db17ede: Pull complete\n898e32f0e177: Pull complete\n591202fea89c: Pull complete\n30ff91259e4e: Pull complete\n6fe7b24cfb8f: Pull complete\nDigest: sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\nStatus: Downloaded newer image for ghcr.io/kicad/kicad@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\nTraceback (most recent call last):\n  File \"/w/tools/pcb_pwr_eco_005_stage_rev_a.py\", line 112, in <module>\n    apply(sys.argv[2], sys.argv[3], sys.argv[4])\n  File \"/w/tools/pcb_pwr_eco_005_stage_rev_a.py\", line 49, in apply\n    hits = [t for t in tracks if t.GetClass() == \"PCB_TRACK\" and t.GetNetname() == item[\"net\"]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/w/tools/pcb_pwr_eco_005_stage_rev_a.py\", line 51, in <listcomp>\n    and ((_near(t.GetStart(), x0, y0) and _near(t.GetEnd(), x1, y1))\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/w/tools/pcb_pwr_eco_005_stage_rev_a.py\", line 31, in _near\n    return abs(a.x - mm(x_mm)) <= TOL and abs(a.y - mm(y_mm)) <= TOL\n               ^^^\nAttributeError: 'SwigPyObject' object has no attribute 'x'\n"
+  }
+}
