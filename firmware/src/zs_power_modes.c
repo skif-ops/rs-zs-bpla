@@ -10,6 +10,7 @@ zs_mode_policy_t zs_mode_policy_default(void) {
   p.heartbeat_period_ms = 6u * 3600u * 1000u;
   p.service_window_ms = 10u * 60u * 1000u;
   p.min_sleep_ms = 2000u;
+  p.boot_session = true;
   return p;
 }
 
@@ -66,7 +67,11 @@ bool zs_mode_on_event(zs_mode_scheduler_t *s, zs_mode_event_t ev, uint32_t now_m
 
   switch (s->mode) {
     case ZS_MODE_S0_SLEEP:
-      if (ev == ZS_MODE_EV_BOOT_DONE) { enter(s, ZS_MODE_S1_LISTEN, ev, now_ms); return true; }
+      if (ev == ZS_MODE_EV_BOOT_DONE) {
+        enter(s, ZS_MODE_S1_LISTEN, ev, now_ms);
+        s->comms_requested = s->policy.boot_session;   /* S1 ends in S3 instead of S0 (GATE_NEGATIVE path) */
+        return true;
+      }
       if (ev == ZS_MODE_EV_MIC_WAKE) {
         if (elapsed(s, now_ms) < s->policy.min_sleep_ms) return false; /* hysteresis against wake storms */
         enter(s, ZS_MODE_S1_LISTEN, ev, now_ms);
