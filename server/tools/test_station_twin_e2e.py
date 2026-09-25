@@ -6,7 +6,8 @@ Runs zs_station_twin with the Python server twin on the pipe and checks the serv
   1. a drone fly-by is detected, published over GSM, acknowledged, no duplicates; the audio prehistory ring holds the
      seconds around the event, including the post-event window; the server asks for the event's audio
      (CMD_REQUEST_AUDIO, both segments) right after the receipt, the station waits for the post-event window, uploads
-     both segments chunk by chunk and acknowledges with the chunk count; the server assembles and verifies them;
+     both segments chunk by chunk and acknowledges with the chunk count; the server stores them through the bridge's
+     ingest (station.audio_ingest: parts in SQLite, SHA-256, WAV) and the ACK closes the request in the store;
   2. a burst of events during a GSM outage goes out over LoRa (30 % loss both ways) once the link is marked
      degraded, every event is delivered exactly once, and a GSM probe restores the link when the network returns.
   3. remote commands (ICD addendum D): the server signs CMD_SET_PARAMS and CMD_REBOOT, the station verifies them
@@ -65,6 +66,8 @@ def main() -> int:
     (ack,) = [a for a in r["acks"] if a["command_id"] == req["command_id"]]
     assert ack["result"] == 0 and ack["detail"] == r["audio_chunks"] and r["audio_duplicates"] == 0, (ack, r["audio_chunks"])
     assert log.count("audio: request for event") == 1, "a redelivery must not start a second upload"
+    # the server side ran the bridge's ingest: the request is closed in the store and no part is left over
+    assert r["audio_store"] == {"acked": True, "ack_result": 0, "ack_detail": r["audio_chunks"], "pending_parts": 0}, r["audio_store"]
     pre, post = segs["pre"], segs["post"]
     assert pre["seconds"] >= 10 and post["seconds"] >= 25, segs                        # continuous audio on both sides
     assert pre["start_time_us"] + pre["seconds"] * 1e6 > event["time_us"] - 1e6       # pre reaches the event

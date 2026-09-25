@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS mqtt_detection_ingress(event_key BLOB PRIMARY KEY, st
 CREATE TABLE IF NOT EXISTS commands(command_id TEXT PRIMARY KEY, station_id INTEGER NOT NULL, created_us INTEGER NOT NULL, expires_us INTEGER NOT NULL, command TEXT NOT NULL, payload TEXT NOT NULL, delivered INTEGER NOT NULL DEFAULT 0, acked INTEGER NOT NULL DEFAULT 0, last_publish_us INTEGER NOT NULL DEFAULT 0, publish_count INTEGER NOT NULL DEFAULT 0, ack_result INTEGER, ack_detail INTEGER, completed_us INTEGER);
 CREATE INDEX IF NOT EXISTS idx_cmd_station ON commands(station_id, delivered, acked);
 CREATE TABLE IF NOT EXISTS audio(event_id INTEGER NOT NULL, station_id INTEGER NOT NULL, segment TEXT NOT NULL, path TEXT NOT NULL, codec TEXT, sample_rate INTEGER, created_us INTEGER NOT NULL, PRIMARY KEY(event_id, station_id, segment));
+CREATE TABLE IF NOT EXISTS audio_parts(station_id INTEGER NOT NULL, command_id TEXT NOT NULL, segment INTEGER NOT NULL, chunk_index INTEGER NOT NULL, event_id INTEGER NOT NULL, chunk_count INTEGER NOT NULL, sample_rate INTEGER NOT NULL, start_time_us INTEGER NOT NULL, sha256 BLOB NOT NULL, data BLOB NOT NULL, received_us INTEGER NOT NULL, PRIMARY KEY(station_id, command_id, segment, chunk_index));
 """
 
 class EventStore:
@@ -27,6 +28,8 @@ class EventStore:
         with self._conn() as c:
             c.executescript(SCHEMA)
             self._migrate_commands(c)
+            self._migrate_audio(c)
+        self.audio_root=path.parent/'audio'     # assembled segments: {audio_root}/{station}/{event}/{segment}.wav
         try: os.chmod(path, 0o600)
         except OSError: pass
     def _conn(self):
@@ -53,6 +56,10 @@ class EventStore:
             if name not in columns: c.execute(f"ALTER TABLE commands ADD COLUMN {name} {definition}")
         c.execute("UPDATE commands SET expires_us=created_us+? WHERE expires_us=0",(COMMAND_TTL_US,))
         c.execute("CREATE INDEX IF NOT EXISTS idx_cmd_due ON commands(acked,expires_us,last_publish_us,created_us)")
+    def _migrate_audio(self,c):
+        columns={row['name'] for row in c.execute("PRAGMA table_info(audio)")}
+        for name,definition in {'start_time_us':'INTEGER','sha256':'BLOB','command_id':'TEXT','duration_ms':'INTEGER'}.items():
+            if name not in columns: c.execute(f"ALTER TABLE audio ADD COLUMN {name} {definition}")
     def get_station_heartbeat(self,station_id:int)->HeartbeatMessage|None:
         with self._conn() as c:
             row=c.execute("SELECT payload FROM stations WHERE station_id=?",(station_id,)).fetchone()
@@ -153,7 +160,60 @@ class EventStore:
             if row['acked']: return 'duplicate'
             c.execute("UPDATE commands SET acked=1,ack_result=?,ack_detail=?,completed_us=? WHERE command_id=? AND station_id=?",(result_code,detail_code,when,command_id,station_id))
         return 'acked'
+    # ---- audio upload over MQTT (ICD addendum B): chunks stay here until their segment is complete ----
+    def command_record(self,command_id:str)->dict[str,Any]|None:
+        with self._conn() as c:
+            row=c.execute("SELECT station_id,command,payload,acked,ack_result,ack_detail,created_us FROM commands WHERE command_id=?",(command_id,)).fetchone()
+        if row is None: return None
+        return {'station_id':row['station_id'],'command':row['command'],'payload':json.loads(row['payload']),'acked':bool(row['acked']),
+                'ack_result':row['ack_result'],'ack_detail':row['ack_detail'],'created_us':row['created_us']}
+    def last_command_us(self,station_id:int,command:str)->int|None:
+        with self._conn() as c:
+            row=c.execute("SELECT MAX(created_us) AS t FROM commands WHERE station_id=? AND command=?",(station_id,command)).fetchone()
+        return row['t'] if row and row['t'] is not None else None
+    def add_audio_part(self,*,station_id:int,command_id:str,segment:int,segment_name:str,chunk_index:int,chunk_count:int,event_id:int,
+                       sample_rate:int,start_time_us:int,sha256:bytes,data:bytes,now_us:int,max_pending_parts:int)->tuple[str,list[bytes]|None]:
+        """'already' (segment stored before), 'duplicate' (part seen), 'stored', or 'complete' with the parts in order.
+        Parts whose segment metadata changed (the station selected the segment again after a lost session) replace
+        the old ones."""
+        eid=self._sqlite_event_id(event_id)
+        meta=(eid,chunk_count,sample_rate,start_time_us,sha256)
+        with self.lock,self._conn() as c:
+            done=c.execute("SELECT sha256 FROM audio WHERE event_id=? AND station_id=? AND segment=?",(eid,station_id,segment_name)).fetchone()
+            if done is not None and done['sha256']==sha256: return 'already',None
+            key=(station_id,command_id,segment)
+            first=c.execute("SELECT event_id,chunk_count,sample_rate,start_time_us,sha256 FROM audio_parts WHERE station_id=? AND command_id=? AND segment=? LIMIT 1",key).fetchone()
+            if first is not None and tuple(first)!=meta:
+                c.execute("DELETE FROM audio_parts WHERE station_id=? AND command_id=? AND segment=?",key)
+            pending=c.execute("SELECT COUNT(*) FROM audio_parts WHERE station_id=?",(station_id,)).fetchone()[0]
+            if pending>=max_pending_parts: raise ValueError('too many pending audio parts for the station')
+            inserted=c.execute("INSERT OR IGNORE INTO audio_parts VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+                               (station_id,command_id,segment,chunk_index,eid,chunk_count,sample_rate,start_time_us,sha256,data,now_us)).rowcount
+            if not inserted: return 'duplicate',None
+            rows=c.execute("SELECT data FROM audio_parts WHERE station_id=? AND command_id=? AND segment=? ORDER BY chunk_index",key).fetchall()
+        if len(rows)<chunk_count: return 'stored',None
+        return 'complete',[bytes(r['data']) for r in rows]
+    def drop_audio_parts(self,station_id:int,command_id:str,segment:int):
+        with self.lock,self._conn() as c: c.execute("DELETE FROM audio_parts WHERE station_id=? AND command_id=? AND segment=?",(station_id,command_id,segment))
+    def complete_audio_segment(self,*,station_id:int,command_id:str,segment:int,segment_name:str,event_id:int,path:str,sample_rate:int,
+                               start_time_us:int,sha256:bytes,duration_ms:int,now_us:int):
+        """The WAV is on disk: record it and drop the parts in one transaction (a crash before this replays the last part)."""
+        with self.lock,self._conn() as c:
+            c.execute("INSERT OR REPLACE INTO audio(event_id,station_id,segment,path,codec,sample_rate,created_us,start_time_us,sha256,command_id,duration_ms) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+                      (self._sqlite_event_id(event_id),station_id,segment_name,path,'pcm16-wav',sample_rate,now_us,start_time_us,sha256,command_id,duration_ms))
+            c.execute("DELETE FROM audio_parts WHERE station_id=? AND command_id=? AND segment=?",(station_id,command_id,segment))
+    def list_audio(self,station_id:int,event_id:int)->list[dict[str,Any]]:
+        with self._conn() as c:
+            rows=c.execute("SELECT segment,path,codec,sample_rate,created_us,start_time_us,duration_ms,command_id FROM audio WHERE station_id=? AND event_id=? ORDER BY segment DESC",
+                           (station_id,self._sqlite_event_id(event_id))).fetchall()
+        return [dict(r) for r in rows]
+    def audio_upload_progress(self,station_id:int,command_id:str)->dict[int,tuple[int,int]]:
+        """segment -> (parts received, chunk_count) of an unfinished upload."""
+        with self._conn() as c:
+            rows=c.execute("SELECT segment,COUNT(*) AS n,MAX(chunk_count) AS total FROM audio_parts WHERE station_id=? AND command_id=? GROUP BY segment",(station_id,command_id)).fetchall()
+        return {r['segment']:(r['n'],r['total']) for r in rows}
     def cleanup(self,retention_days:int=365):
         cutoff=int((time.time()-retention_days*86400)*1e6)
         with self.lock,self._conn() as c:
+            c.execute("DELETE FROM audio_parts WHERE received_us<?",(int((time.time()-2*86400)*1e6),))   # abandoned uploads
             c.execute("DELETE FROM system_events WHERE created_us<?",(cutoff,)); c.execute("DELETE FROM detections WHERE event_time_us<?",(cutoff,)); c.execute("DELETE FROM security_events WHERE created_us<?",(cutoff,))

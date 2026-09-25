@@ -60,6 +60,9 @@ def main() -> int:
     require(
         unguarded_station_decorators == {
             "@router.post('/stations/{station_id}/audio-request')",
+            # operator reads of audio assembled from the MQTT upload (addendum B); no station ingress
+            "@router.get('/stations/{station_id}/events/{event_id}/audio')",
+            "@router.get('/stations/{station_id}/events/{event_id}/audio/{segment}.wav')",
         },
         f"station transport route bypasses guarded router: {unguarded_station_decorators}",
     )
