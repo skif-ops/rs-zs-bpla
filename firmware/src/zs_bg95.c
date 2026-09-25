@@ -1,5 +1,4 @@
 #include "zs_bg95.h"
-#include "zs_command_clock.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -8,6 +7,26 @@
 #define BG95_COMMAND_TIMEOUT_MS 120000u
 #define BG95_AT_SYNC_TIMEOUT_MS 30000u   /* PWRKEY release -> first "OK": the module boots for seconds and swallows early ATs */
 #define BG95_NO_PROFILE 0xffu
+
+#define BG95_MIN_NETWORK_EPOCH_US INT64_C(1735689600000000)   /* 2025-01-01: earlier = the modem's RTC default */
+
+static int64_t days_from_civil(int y, unsigned m, unsigned d) {   /* H. Hinnant's algorithm, proleptic Gregorian */
+  const int yy = y - (m <= 2u);
+  const int era = (yy >= 0 ? yy : yy - 399) / 400;
+  const unsigned yoe = (unsigned)(yy - era * 400);
+  const unsigned doy = (153u * (m + (m > 2u ? (unsigned)-3 : 9u)) + 2u) / 5u + d - 1u;
+  const unsigned doe = yoe * 365u + yoe / 4u - yoe / 100u + doy;
+  return (int64_t)era * 146097 + (int64_t)doe - 719468;
+}
+
+/* +QLTS: "yyyy/MM/dd,hh:mm:ss+-zz,dst" of AT+QLTS=1: the time is GMT, the zone field is informative. */
+static bool parse_qlts(const char *line, int64_t *epoch_us) {
+  int y, mo, d, h, mi, s;
+  if (strncmp(line, "+QLTS: \"", 8u) != 0 || sscanf(line + 8, "%4d/%2d/%2d,%2d:%2d:%2d", &y, &mo, &d, &h, &mi, &s) != 6) return false;
+  if (y < 2000 || mo < 1 || mo > 12 || d < 1 || d > 31 || h < 0 || h > 23 || mi < 0 || mi > 59 || s < 0 || s > 60) return false;
+  *epoch_us = (days_from_civil(y, (unsigned)mo, (unsigned)d) * 86400 + h * 3600 + mi * 60 + s) * INT64_C(1000000);
+  return true;
+}
 
 static bool copy_checked(char *dst, size_t size, const char *src) {
   size_t n;
@@ -510,7 +529,7 @@ void zs_bg95_on_line(zs_bg95_t *m, const char *line, uint32_t now_ms) {
   }
   if (m->state == ZS_BG95_TIME_QUERY && strncmp(line, "+QLTS:", 6u) == 0) {
     int64_t t;
-    if (zs_command_clock_parse_qlts(line, &t) && t >= ZS_COMMAND_CLOCK_MIN_EPOCH_US) {
+    if (parse_qlts(line, &t) && t >= BG95_MIN_NETWORK_EPOCH_US) {
       m->network_time_us = t;
       m->network_time_at_ms = now_ms;
       m->network_time_valid = true;
