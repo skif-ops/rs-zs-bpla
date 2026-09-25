@@ -88,7 +88,7 @@ def build(text: str) -> tuple[str, dict]:
     board, domains = geo.load(BOARD)
     split = geo.split_in4(board, domains)
     added, stitch_report = geo.stitching_vias(board, domains, split)
-    ties = geo.island_ties(board, split)
+    ties = geo.island_ties(board, split, added)
     assert all("points" in t for t in ties), f"modem island without an In3 tie: {ties}"
     gnd_digital, gnd_modem = net_number(text, "GND_DIGITAL"), net_number(text, "GND_MODEM")
     lines = text.split("\n")

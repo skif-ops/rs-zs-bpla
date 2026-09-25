@@ -344,7 +344,7 @@ def _simplify(path, clear):
     return out
 
 
-def island_ties(board, split: dict) -> list:
+def island_ties(board, split: dict, extra_vias: list = ()) -> list:
     """GND_MODEM In3.Cu ties from every modem piece other than the main one to the main piece:
     from a GND_MODEM via inside the piece to the nearest GND_MODEM via inside the main piece,
     0.3 mm track, 0.2 mm clearance to every other-net In3.Cu item (tracks, vias, *.Cu pads)."""
@@ -367,6 +367,8 @@ def island_ties(board, split: dict) -> list:
             obstacles_in3.append(geom.buffer(raw.size / 2))
         elif layer == TIE_LAYER:
             obstacles_in3.append(geom.buffer(raw.width / 2))
+    for x, y in extra_vias:  # stitching vias added by this candidate
+        obstacles_in3.append(Point(x, y).buffer(VIA_SIZE / 2))
     for zone in board.zones:
         if zone.keepoutSettings:
             obstacles_in3.append(Polygon([(c.X, c.Y) for c in zone.polygons[0].coordinates]).buffer(0))
