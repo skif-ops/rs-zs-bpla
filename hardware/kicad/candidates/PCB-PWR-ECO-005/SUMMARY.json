@@ -12,73 +12,66 @@
   "stage": {
     "rc": 0,
     "stdout": "{\"rotated\": [\"NT2\"], \"removed_tracks\": 0, \"removed_vias\": 0, \"removed_zones\": 0, \"added_zones\": 1, \"added_items\": 13}\n",
-    "stderr": "c5616789: Waiting\n46f0bfc95fd9: Waiting\nf8f12f6f970e: Waiting\nf36d0dc2d7bb: Waiting\naab27c973195: Waiting\nfd5a0db17ede: Waiting\n898e32f0e177: Waiting\n591202fea89c: Waiting\n30ff91259e4e: Waiting\n6fe7b24cfb8f: Waiting\n26996d003dd4: Verifying Checksum\n26996d003dd4: Download complete\ne64c2316cd50: Verifying Checksum\ne64c2316cd50: Download complete\n46f0bfc95fd9: Download complete\n207ac5616789: Verifying Checksum\n207ac5616789: Download complete\nf36d0dc2d7bb: Verifying Checksum\nf36d0dc2d7bb: Download complete\naab27c973195: Download complete\nfd5a0db17ede: Verifying Checksum\nfd5a0db17ede: Download complete\n898e32f0e177: Verifying Checksum\n898e32f0e177: Download complete\n591202fea89c: Verifying Checksum\n591202fea89c: Download complete\nf8f12f6f970e: Download complete\n30ff91259e4e: Verifying Checksum\n30ff91259e4e: Download complete\n6fe7b24cfb8f: Download complete\nd0b76b7e8d80: Verifying Checksum\nd0b76b7e8d80: Download complete\n26996d003dd4: Pull complete\nd0b76b7e8d80: Pull complete\ne64c2316cd50: Pull complete\n207ac5616789: Pull complete\n46f0bfc95fd9: Pull complete\nf8f12f6f970e: Pull complete\nf36d0dc2d7bb: Pull complete\naab27c973195: Pull complete\nfd5a0db17ede: Pull complete\n898e32f0e177: Pull complete\n591202fea89c: Pull complete\n30ff91259e4e: Pull complete\n6fe7b24cfb8f: Pull complete\nDigest: sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\nStatus: Downloaded newer image for ghcr.io/kicad/kicad@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\n"
+    "stderr": "aiting\nfd5a0db17ede: Waiting\n898e32f0e177: Waiting\n6fe7b24cfb8f: Waiting\n30ff91259e4e: Waiting\n591202fea89c: Waiting\n26996d003dd4: Verifying Checksum\n26996d003dd4: Download complete\ne64c2316cd50: Verifying Checksum\ne64c2316cd50: Download complete\n46f0bfc95fd9: Verifying Checksum\n46f0bfc95fd9: Download complete\n207ac5616789: Verifying Checksum\n207ac5616789: Download complete\nf36d0dc2d7bb: Verifying Checksum\nf36d0dc2d7bb: Download complete\naab27c973195: Verifying Checksum\naab27c973195: Download complete\nfd5a0db17ede: Verifying Checksum\nfd5a0db17ede: Download complete\n898e32f0e177: Verifying Checksum\n898e32f0e177: Download complete\nf8f12f6f970e: Verifying Checksum\nf8f12f6f970e: Download complete\n591202fea89c: Verifying Checksum\n591202fea89c: Download complete\n30ff91259e4e: Download complete\n6fe7b24cfb8f: Verifying Checksum\n6fe7b24cfb8f: Download complete\nd0b76b7e8d80: Verifying Checksum\nd0b76b7e8d80: Download complete\n26996d003dd4: Pull complete\nd0b76b7e8d80: Pull complete\ne64c2316cd50: Pull complete\n207ac5616789: Pull complete\n46f0bfc95fd9: Pull complete\nf8f12f6f970e: Pull complete\nf36d0dc2d7bb: Pull complete\naab27c973195: Pull complete\nfd5a0db17ede: Pull complete\n898e32f0e177: Pull complete\n591202fea89c: Pull complete\n30ff91259e4e: Pull complete\n6fe7b24cfb8f: Pull complete\nDigest: sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\nStatus: Downloaded newer image for ghcr.io/kicad/kicad@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\n"
   },
   "drc_rc": 0,
   "dump_rc": 0,
   "drc": {
-    "error_total": 1,
+    "error_total": 0,
     "unconnected_total": 0,
     "by_type": {
-      "error:hole_clearance": 1,
       "warning:via_dangling": 1,
       "warning:lib_footprint_issues": 66,
       "warning:silk_over_copper": 41,
       "warning:silk_overlap": 17
     },
-    "errors": [
-      [
-        "hole_clearance",
-        "Polygon [<no net>] of NT2 on F.Cu",
-        "Via [GND_PWR] on F.Cu - B.Cu"
-      ]
-    ],
+    "errors": [],
     "unconnected": []
   },
   "return_cross_sections": [
     {
-      "probe": "GND_MODEM J2.2->vias",
+      "probe": "GND_MODEM J2.2->vias, below J2.8",
       "layer": "B.Cu",
       "net": "GND_MODEM",
       "min_width_mm": 0.0,
       "at_mm": [
-        77.2,
-        43.0
+        75.55,
+        44.4
       ],
-      "samples": 23
+      "samples": 20
     },
     {
-      "probe": "GND_MODEM vias->NT1",
+      "probe": "GND_MODEM vias->NT1, between C17/C19 pads",
       "layer": "F.Cu",
       "net": "GND_MODEM",
-      "min_width_mm": 0.892,
+      "min_width_mm": 0.699,
       "at_mm": [
         74.0,
-        42.3
+        42.75
       ],
-      "samples": 8
+      "samples": 10
     },
     {
-      "probe": "GND_DIGITAL J2.4->NT2",
+      "probe": "GND_DIGITAL J2.4->NT2, above J2.10",
       "layer": "F.Cu",
       "net": "GND_DIGITAL",
-      "min_width_mm": 0.0,
+      "min_width_mm": 0.899,
       "at_mm": [
-        77.45,
-        48.3
+        78.05,
+        47.3
       ],
       "samples": 15
     },
     {
-      "probe": "GND_PWR NT1 east",
+      "probe": "GND_DIGITAL J2.4->NT2, below J2.10",
       "layer": "F.Cu",
-      "net": "GND_PWR",
+      "net": "GND_DIGITAL",
       "min_width_mm": 0.0,
       "at_mm": [
-        77.15,
-        40.12
+        77.3,
+        50.05
       ],
-      "samples": 4
+      "samples": 13
     },
     {
       "probe": "GND_PWR NT2 west",
@@ -90,18 +83,7 @@
         48.52
       ],
       "samples": 5
-    },
-    {
-      "probe": "GND_PWR NT3 east",
-      "layer": "F.Cu",
-      "net": "GND_PWR",
-      "min_width_mm": 1.651,
-      "at_mm": [
-        77.0,
-        51.55
-      ],
-      "samples": 4
     }
   ],
-  "candidate_sha256": "14df311b679881936ec8fb6f444dccaa12c85c2cc904e2b0aa5d45cdd6ac5895"
+  "candidate_sha256": "21ac79ffc9fa8223ea2d86c77b545e194a798a26a7da9d808ab87b5c43d8b656"
 }
