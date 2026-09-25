@@ -7,7 +7,7 @@
 | Key | Field | Encoding |
 |---:|---|---|
 | 12 | reset_cause | uint: причина текущей загрузки — 0 неизвестна, 1 питание/BOR, 2 NRST, 3 программный, 4 IWDG, 5 WWDG, 6 low-power, 7 option bytes |
-| 13 | watchdog_missed | uint16: маска задач, переставших отмечаться перед сбросом по IWDG (бит = задача: 1 audio, 2 dsp, 3 comms, 4 ble, 5 power, 6 lora, 7 gnss); 0 — нет |
+| 13 | watchdog_missed | uint16: маска задач, переставших отмечаться перед сбросом по IWDG (бит = задача: 1 audio, 2 dsp, 3 comms, 4 ble, 5 power, 6 lora, 7 gnss, 8 rec — запись предыстории, аддендум B); 0 — нет |
 | 14 | params_version | uint32: версия набора параметров, действующего на станции (аддендум D, `CMD_SET_PARAMS`; 0 — умолчания). Добавлен 2026-09-25; прошивки без ключа декодируются как 0 |
 
 Источник: аппаратный сторожевой таймер станции (`app_watchdog`, `zs_task_watch`) — супервизор кормит IWDG только

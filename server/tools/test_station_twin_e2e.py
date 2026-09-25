@@ -3,7 +3,8 @@
 `station_twin_e2e`, with ZS_STATION_TWIN pointing at the freshly built binary).
 
 Runs zs_station_twin with the Python server twin on the pipe and checks the server-side report:
-  1. a drone fly-by is detected, published over GSM, acknowledged, no duplicates;
+  1. a drone fly-by is detected, published over GSM, acknowledged, no duplicates; the audio prehistory ring holds the
+     seconds around the event, including the post-event window;
   2. a burst of events during a GSM outage goes out over LoRa (30 % loss both ways) once the link is marked
      degraded, every event is delivered exactly once, and a GSM probe restores the link when the network returns.
   3. remote commands (ICD addendum D): the server signs CMD_SET_PARAMS and CMD_REBOOT, the station verifies them
@@ -44,10 +45,16 @@ def main() -> int:
     if not TWIN.exists():
         print(f"SKIP: {TWIN} not built")
         return 77
-    log, r = run(["--scene", "drone", "--seconds", "140", "--seed", "3", "--receipt-latency", "2000", "--expect-events", "1", "--expect-delivered", "1"])
+    # --expect-post-audio: the prehistory ring holds >= 25 s recorded after the event although the station went to S3
+    # and S0 (the post-event capture window of addendum B)
+    log, r = run(["--scene", "drone", "--seconds", "140", "--seed", "3", "--receipt-latency", "2000", "--expect-events", "1", "--expect-delivered", "1",
+                  "--expect-post-audio", "25"])
     assert r["detections"] >= 1 and r["duplicates"] == 0 and r["decode_errors"] == 0, r
     assert "session done -> COMMS_DONE" in log
-    print(f"scenario 1 (drone over GSM): detections {r['detections']}, heartbeats {r['heartbeats']}, duplicates {r['duplicates']}")
+    rec_line = next(l for l in log.splitlines() if "twin: rec committed" in l)
+    assert "overruns 0 errors 0" in rec_line, rec_line
+    print(f"scenario 1 (drone over GSM): detections {r['detections']}, heartbeats {r['heartbeats']}, duplicates {r['duplicates']}; "
+          f"prehistory: {rec_line.split('around the first event: ')[1]}")
 
     # 1600 s: the boot session starts just before the outage and runs into the S3 watchdog, which shifts the whole
     # degraded -> probe cycle by three minutes; the probe after the network returns lands at ~1450 s

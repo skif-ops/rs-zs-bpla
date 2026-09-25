@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef enum { APP_WD_AUDIO = 1, APP_WD_DSP, APP_WD_COMMS, APP_WD_BLE, APP_WD_POWER, APP_WD_LORA, APP_WD_GNSS } app_wd_task_t;
+typedef enum { APP_WD_AUDIO = 1, APP_WD_DSP, APP_WD_COMMS, APP_WD_BLE, APP_WD_POWER, APP_WD_LORA, APP_WD_GNSS, APP_WD_REC } app_wd_task_t;
 
 /* Reads and clears the reset flags and the backup-register mask; call first thing at boot. */
 void app_watchdog_capture_reset_cause(void);
