@@ -1,0 +1,2 @@
+# Queued by Claude 2026-09-25: PCB-PWR ECO-005 candidate run 9 (XAL7030 reference field parity)
+tools/apply_pcb_pwr_eco_005_candidate_rev_a.py

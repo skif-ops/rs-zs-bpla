@@ -21,7 +21,7 @@ Delta (nets, netlist and net-tie count unchanged; no new domain join):
   - GND_PWR: 5 plane vias on the GND_PWR side of NT1/NT2/NT3;
   - RT_3V8: dangling via at (53.6, 11.5) and its stub from U3.8 removed (finding 9);
   - SHUNT_SOURCE_SENSE: redundant third via removed (3.3); reference designators re-placed (3.4);
-  - project library: MountingHole silk circle removed, XAL7030 re-saved (3.4; libs/ in OUT).
+  - project library: MountingHole silk circle removed, XAL7030 reference aligned + re-saved (3.4).
 Run 3: 0 unconnected, 1 hole_clearance (NT2 bridge vs a GND_PWR via) -> via moved, graphics screened.
 Run 4: DRC 0 errors / 0 unconnected.
 --check verifies the candidate matches SUMMARY.json.
@@ -78,7 +78,9 @@ SOURCE_SENSE_LINK = ("track", "B.Cu", "SHUNT_SOURCE_SENSE", 0.25, [(35.1803, 31.
 #     board copies (H1-H4) do not; pads, attributes and models are identical -> the circle is
 #     removed from the project library (no silkscreen under the M3 head).
 #   Coilcraft_XAL7030_472 - pads, graphics, attributes and models identical; the library file is
-#     the 2022 s-expression format -> re-saved by KiCad 9 without geometry edits.
+#     the 2022 s-expression format and its reference field sits at (0,-4.25) while every board copy
+#     uses the generator's normalised (0,-1.4) -> reference moved to (0,-1.4), re-saved by KiCad 9
+#     (run 8 showed the field position as the only remaining difference).
 LIB_PRETTY = "libs/DioneyaPWR.pretty"
 LIB_SYNC = ("MountingHole_M3_3.4_EVT", "Coilcraft_XAL7030_472")
 MOUNT_SILK_CIRCLE = """  (fp_circle
@@ -89,6 +91,8 @@ MOUNT_SILK_CIRCLE = """  (fp_circle
     (layer "F.SilkS")
   )
 """
+XAL_REF_OLD = '(fp_text reference "REF**" (at 0 -4.25) (layer "F.SilkS")'
+XAL_REF_NEW = '(fp_text reference "REF**" (at 0 -1.4) (layer "F.SilkS")'
 # return-path resistance cases: (net, J2 pin, tie, peak current A or None while the budget is open)
 RETURN_CASES = [("GND_MODEM", ("J2", "2"), ("NT1", "1"), 3.3),   # BG95 0.6 A BB + 2.7 A RF burst
                 ("GND_DIGITAL", ("J2", "4"), ("NT2", "1"), None),  # 3V3 budget: separate record
@@ -352,6 +356,10 @@ def _generate() -> None:
         mount_text = mount.read_text(encoding="utf-8")
         assert mount_text.count(MOUNT_SILK_CIRCLE) == 1, "mounting-hole silk circle not found exactly once"
         mount.write_text(mount_text.replace(MOUNT_SILK_CIRCLE, ""), encoding="utf-8")
+        xal = WORK / LIB_PRETTY / "Coilcraft_XAL7030_472.kicad_mod"
+        xal_text = xal.read_text(encoding="utf-8")
+        assert xal_text.count(XAL_REF_OLD) == 1, "XAL7030 reference field not found exactly once"
+        xal.write_text(xal_text.replace(XAL_REF_OLD, XAL_REF_NEW), encoding="utf-8")
         resave = docker("/usr/bin/python3", "tools/pcb_pwr_eco_005_stage_rev_a.py", "libresave",
                         str(WORK.relative_to(ROOT) / LIB_PRETTY), ",".join(LIB_SYNC))
         summary["library_sync"] = {"rc": resave.returncode, "stdout": resave.stdout[-400:],
