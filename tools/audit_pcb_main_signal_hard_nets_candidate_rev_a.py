@@ -9,6 +9,7 @@ import json
 import math
 import re
 from collections import Counter, defaultdict
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,8 @@ from kiutils.board import Board
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
 BASE = (
     ROOT
     / "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001"
@@ -26,7 +29,7 @@ CANDIDATE = (
     / "hardware/kicad/candidates/PCB-MAIN-SIGNAL-HARD-NETS-001"
     / "PCB-MAIN_SIGNAL_HARD_NETS_CANDIDATE_REV_A.kicad_pcb"
 )
-ACTIVE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+ACTIVE = _lineage.historical_board()
 APPROVAL = ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPROVAL_REV_A.json"
 APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_SIGNAL_HARD_NETS_ROUTING_APPLICATION_REV_A.json"
 OCTOSPI_CANDIDATE = (
