@@ -9,7 +9,11 @@ queue (``set_params``, ``reboot``, ``reboot_again`` = the same reboot UUID redel
 when the station subscribes to its down topic (``SUB <topic> <wall_us>``, as the broker delivers its QoS 1 queue),
 every further one in reply to the previous ACK.  Commands are signed with the repository test key
 (tools/generate_command_set_vector.py), valid from one second before the station's wall clock for ten minutes.  Every line gets exactly one reply (a message or ``OK``) so the twin's simulated time stays deterministic
-regardless of wall-clock scheduling.  A final ``REPORT`` line summarises what arrived.
+regardless of wall-clock scheduling.  Audio (addendum B): with ``ZS_TWIN_AUDIO=<pre|post|both>`` the first detection
+over GSM is answered with its receipt and, on a second line, a signed ``CMD_REQUEST_AUDIO`` for that event (the
+auto-request policy for confirmed detections); the chunks on the audio topic are assembled and verified with the real
+``AudioAssembler`` (``ZS_TWIN_WAV_DIR`` also writes the WAV files; ``ZS_TWIN_AUDIO_REDELIVER=1`` answers the first
+chunk with the same request envelope again, as a QoS 1 redelivery would).  A final ``REPORT`` line summarises what arrived.
 Run by the twin: ``python3 -m twin.twin_server`` from the server/ directory.
 """
 from __future__ import annotations
@@ -20,6 +24,7 @@ import os
 import sys
 import uuid
 
+from station import audio_chunk_codec
 from station import cbor_codec
 from station import lora_codec
 from station.command_codec import CommandSigner, decode_command_ack, encode_signed_command
@@ -70,6 +75,26 @@ def main() -> int:
     wall_us = 0
     down_topic = ""
     out = sys.stdout
+    audio_segment = os.environ.get("ZS_TWIN_AUDIO", "")
+    wav_dir = os.environ.get("ZS_TWIN_WAV_DIR", "")
+    assembler = audio_chunk_codec.AudioAssembler()
+    audio_chunks = 0
+    audio_segments: list[dict] = []
+    audio_requested: list[dict] = []
+    audio_envelopes: dict[str, bytes] = {}
+    redeliver = os.environ.get("ZS_TWIN_AUDIO_REDELIVER", "") == "1"
+
+    def request_audio(event_id: int) -> str:
+        """A signed CMD_REQUEST_AUDIO for the event, sent right after its receipt (second reply line)."""
+        command_id = str(uuid.uuid4())
+        envelope = encode_signed_command(StationCommand(
+            command_id=command_id, station_id=int(down_topic.split("/")[3]), command="CMD_REQUEST_AUDIO",
+            payload={"event_id": event_id, "segment": audio_segment},
+            created_time_us=wall_us - 1_000_000, expires_time_us=wall_us + 600_000_000), signer)
+        commands_sent.append({"command_id": command_id, "command": "CMD_REQUEST_AUDIO"})
+        audio_requested.append({"command_id": command_id, "event_id": event_id, "segment": audio_segment})
+        audio_envelopes[command_id] = envelope
+        return f"PUB {down_topic} {envelope.hex()}"
 
     def next_command() -> str:
         if not queue or not down_topic:
@@ -123,6 +148,8 @@ def main() -> int:
                 "detections": len(detections), "unique_event_ids": len(seen_event_ids), "duplicates": duplicates,
                 "heartbeats": len(heartbeats), "decode_errors": decode_errors,
                 "lora_frames": lora_frames, "lora_detections": lora_detections,
+                "audio_requested": audio_requested, "audio_chunks": audio_chunks, "audio_duplicates": assembler.duplicates,
+                "audio_segments": audio_segments,
                 "last_heartbeat": heartbeats[-1] if heartbeats else None,
                 "events": detections[:20],
             }
@@ -148,12 +175,32 @@ def main() -> int:
                                    "class_id": d.classification.class_id, "confidence": d.classification.confidence_u8, "duplicate": dup, "via": "gsm"})
                 receipt = EventReceipt(station_id=d.station_id, boot_id=d.boot_id, seq_no=d.seq_no, event_id=d.event_id,
                                        payload_sha256=hashlib.sha256(payload).digest())
-                out.write(f"PUB {prefix}/{tenant}/{station}/receipt {encode_event_receipt(receipt).hex()}\n"); out.flush()
+                reply = f"PUB {prefix}/{tenant}/{station}/receipt {encode_event_receipt(receipt).hex()}\n"
+                if audio_segment and down_topic and not audio_requested and not dup:
+                    reply += request_audio(d.event_id) + "\n"
+                out.write(reply); out.flush()
             elif kind == "ack":
                 a = decode_command_ack(payload)
                 acks.append({"command_id": a.command_id, "result": a.result_code, "detail": a.detail_code,
                              "completed_time_us": a.completed_time_us})
                 out.write(next_command() + "\n"); out.flush()
+            elif kind == "audio":
+                audio_chunks += 1
+                seg = assembler.add(audio_chunk_codec.decode_chunk(payload))
+                if seg is not None:
+                    audio_segments.append({"event_id": seg.event_id, "segment": seg.segment, "sample_rate": seg.sample_rate,
+                                           "start_time_us": seg.start_time_us, "seconds": len(seg.pcm) / seg.sample_rate,
+                                           "adpcm_bytes": len(seg.adpcm), "command_id": uuid.UUID(bytes=seg.command_id).hex})
+                    if wav_dir:
+                        path = os.path.join(wav_dir, f"event_{seg.event_id}_{seg.segment}.wav")
+                        with open(path, "wb") as f:
+                            f.write(audio_chunk_codec.pcm_to_wav(seg.pcm, seg.sample_rate))
+                if redeliver and audio_chunks == 1 and audio_requested:
+                    command_id = audio_requested[0]["command_id"]
+                    commands_sent.append({"command_id": command_id, "command": "CMD_REQUEST_AUDIO"})
+                    out.write(f"PUB {down_topic} {audio_envelopes[command_id].hex()}\n"); out.flush()
+                else:
+                    out.write("OK\n"); out.flush()
             elif kind == "status":
                 h = cbor_codec.decode_heartbeat_cbor(payload)
                 heartbeats.append({"time_us": h.time_us, "battery_pct": h.power.battery_pct, "battery_mv": h.power.battery_mv,
