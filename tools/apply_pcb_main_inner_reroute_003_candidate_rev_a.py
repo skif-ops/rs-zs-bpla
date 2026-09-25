@@ -88,6 +88,9 @@ def move_resistors(text: str) -> str:
                 break
         k = i + 1
         while not lines[k].startswith("  )"):
+            if rot and lines[k].lstrip().startswith(f'(fp_text reference "{ref}"'):
+                # local (1.3, 0) is 1.3 mm above the body after the 90 deg rotation; vertical text fits the 1.5 mm pitch
+                lines[k] = re.sub(r"\(at [-\d.]+ [-\d.]+( [-\d.]+)?\)", f"(at 1.3 0 {rot})", lines[k], count=1)
             if rot and lines[k].lstrip().startswith("(pad "):
                 lines[k] = re.sub(r"\(at ([-\d.]+) ([-\d.]+)\)", lambda mm: f"(at {mm.group(1)} {mm.group(2)} {rot})",
                                   lines[k], count=1)
@@ -135,6 +138,7 @@ def reroute(stage_text: str, plan: dict) -> tuple[str, dict]:
                 remove.add(_key_via(number[net], (g.x, g.y)))
             else:
                 remove.add(_key_seg(number[net], layer, g.coords[0], g.coords[-1]))
+    removed_keys = set(remove)
     lines = stage_text.split("\n")
     seg_re = re.compile(r'^  \(segment \(start ([-\d.]+) ([-\d.]+)\) \(end ([-\d.]+) ([-\d.]+)\) \(width [-\d.]+\) '
                         r'\(layer "([^"]+)"\) \(net (\d+)\)')
@@ -171,6 +175,28 @@ def reroute(stage_text: str, plan: dict) -> tuple[str, dict]:
     for x, y in plan["gnd_return_vias"]:
         via_lines.append(f'  (via (at {x:.4f} {y:.4f}) (size {rr.VIA_SIZE}) (drill {rr.VIA_DRILL}) '
                          f'(layers "F.Cu" "B.Cu") (net {gnd}) (tstamp {uuid.uuid5(NAMESPACE, f"gnd|{x:.4f}|{y:.4f}")}))')
+    # vias of the rerouted nets that now join copper of one layer only (the old inner layer change is gone):
+    # the tracks meet at the same point, the via is removed
+    dangling = []
+    LineString, Point = geo._shapely()[0], geo._shapely()[1]
+    for net, kind, layer, g, raw in geo.items(board):
+        if net not in rr.NETS or kind != "via" or _key_via(number[net], (g.x, g.y)) in removed_keys:
+            continue
+        touching = [lay for n2, k2, lay, g2, r2 in geo.items(board)
+                    if n2 == net and k2 == "track" and lay not in rr.INNER and g2.distance(g) < 1e-3
+                    and _key_seg(number[net], lay, g2.coords[0], g2.coords[-1]) not in removed_keys]
+        run = plan["routed"].get(net)
+        if run:
+            touching += [t["layer"] for t in run["tracks"] if LineString(t["points"]).distance(g) < 1e-3]
+        pads = [p for fp in board.footprints for p in fp.pads if p.net and p.net.name == net
+                and geo.pad_geometry(fp, p).distance(g) < 1e-3]
+        if len(set(touching)) == 1 and len(touching) >= 2 and not pads:
+            dangling.append(_key_via(number[net], (g.x, g.y)))
+    for key in dangling:
+        idx = next(i for i, line in enumerate(kept) if via_re.match(line) and
+                   _key_via(int(via_re.match(line).group(3)), (float(via_re.match(line).group(1)),
+                                                               float(via_re.match(line).group(2)))) == key)
+        removed_lines.append(kept.pop(idx))
     last_via = max(i for i, line in enumerate(kept) if line.startswith("  (via "))
     last_seg = max(i for i, line in enumerate(kept) if line.startswith("  (segment "))
     assert last_seg < last_via, "unexpected board item order"
@@ -180,7 +206,8 @@ def reroute(stage_text: str, plan: dict) -> tuple[str, dict]:
     # textual proof: without the added lines and with the removed ones restored (as a multiset) -> stage text
     back = [line for line in out if line not in set(seg_lines) | set(via_lines)]
     assert Counter(back) + Counter(removed_lines) == Counter(lines), "candidate differs from stage 2 outside the delta"
-    return candidate, {"removed_lines": len(removed_lines), "added_segments": len(seg_lines),
+    return candidate, {"removed_lines": len(removed_lines), "removed_dangling_vias": len(dangling),
+                       "added_segments": len(seg_lines),
                        "added_vias": len(via_lines) - len(plan["gnd_return_vias"]),
                        "added_gnd_return_vias": len(plan["gnd_return_vias"])}
 
