@@ -1,7 +1,7 @@
 #ifndef BSP_SPI_H
 #define BSP_SPI_H
 /* SPI1 to the SX1262 (PA4 NSS as GPIO, PA5 SCK, PA6 MISO, PA7 MOSI, AF5) and the LoRa control pins: DIO1 PC2 (in),
-   TXEN PB15 / RXEN PD8 (out), BUSY PD9 (in), RESET_N PD10 (out).  Mode 0, MSB first, 8 MHz from the 160 MHz bus
+   TXEN PB15 / RXEN PD8 (out), BUSY PD9 (in), RESET_N PD10 (out).  Mode 0, MSB first, 5 MHz from the 160 MHz bus
    (the SX1262 allows up to 16 MHz). */
 #include <stdbool.h>
 #include <stddef.h>
