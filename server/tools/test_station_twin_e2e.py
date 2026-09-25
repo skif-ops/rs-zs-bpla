@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Station twin end-to-end scenarios against the Muhoed twin server (CI: protocol-e2e job).
+"""Station twin end-to-end scenarios against the Muhoed twin server (CI: the firmware job runs it through CTest,
+`station_twin_e2e`, with ZS_STATION_TWIN pointing at the freshly built binary).
 
-Runs firmware/build/zs_station_twin with the Python server twin on the pipe and checks the server-side report:
+Runs zs_station_twin with the Python server twin on the pipe and checks the server-side report:
   1. a drone fly-by is detected, published over GSM, acknowledged, no duplicates;
   2. a burst of events during a GSM outage goes out over LoRa (30 % loss both ways) once the link is marked
      degraded, every event is delivered exactly once, and a GSM probe restores the link when the network returns.
@@ -9,13 +10,14 @@ Runs firmware/build/zs_station_twin with the Python server twin on the pipe and 
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
 
 SERVER_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = SERVER_ROOT.parent
-TWIN = REPO_ROOT / "firmware" / "build" / "zs_station_twin"
+TWIN = Path(os.environ.get("ZS_STATION_TWIN", REPO_ROOT / "firmware" / "build" / "zs_station_twin"))
 SERVER_CMD = f"{sys.executable} -m twin.twin_server"
 
 

@@ -4,7 +4,8 @@ Speaks the twin link on stdin/stdout, one line per message: ``PUB <topic> <hex-p
 ``LORA <hex-frame>`` for the LoRa gateway (LORA_BACKUP_ICD_v0_1 addendum A; an ACK frame goes back the same way). Uplink
 publishes from the station are decoded with the real server codecs (station.cbor_codec) and stored in memory;
 every accepted detection is answered with the real receipt encoding (station.event_receipt_codec) on the
-station's receipt topic, exactly as mqtt_bridge would.  A final ``REPORT`` line summarises what arrived.
+station's receipt topic, exactly as mqtt_bridge would.  Every line gets exactly one reply (a message or ``OK``) so the twin's simulated time stays deterministic
+regardless of wall-clock scheduling.  A final ``REPORT`` line summarises what arrived.
 Run by the twin: ``python3 -m twin.twin_server`` from the server/ directory.
 """
 from __future__ import annotations
@@ -44,6 +45,7 @@ def main() -> int:
             except ValueError as exc:
                 decode_errors += 1
                 sys.stderr.write(f"twin gateway: {exc}\n")
+                out.write("OK\n"); out.flush()
                 continue
             dup = e.event_id in seen_event_ids
             if dup:
@@ -67,10 +69,12 @@ def main() -> int:
             out.write("REPORT " + json.dumps(report) + "\n"); out.flush()
             continue
         if parts[0] != "PUB" or len(parts) != 3:
+            out.write("OK\n"); out.flush()
             continue
         topic, payload = parts[1], bytes.fromhex(parts[2])
         segs = topic.split("/")
         if len(segs) != 5:
+            out.write("OK\n"); out.flush()
             continue
         prefix, tenant, station, kind = "/".join(segs[:2]), segs[2], segs[3], segs[4]
         try:
@@ -89,9 +93,13 @@ def main() -> int:
                 h = cbor_codec.decode_heartbeat_cbor(payload)
                 heartbeats.append({"time_us": h.time_us, "battery_pct": h.power.battery_pct, "battery_mv": h.power.battery_mv,
                                    "detector": (h.detector.model_dump() if getattr(h, "detector", None) else None)})
+                out.write("OK\n"); out.flush()
+            else:
+                out.write("OK\n"); out.flush()
         except Exception as exc:  # noqa: BLE001 - the twin reports, it does not crash on a bad frame
             decode_errors += 1
             sys.stderr.write(f"twin server: {kind}: {exc}\n")
+            out.write("OK\n"); out.flush()
     return 0
 
 
