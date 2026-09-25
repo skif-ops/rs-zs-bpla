@@ -39,21 +39,28 @@ STEM = "PCB-PWR_AUTOROUTE_011_CANDIDATE_REV_A"
 KICAD_IMAGE = "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729"
 FREEROUTING_URL = "https://github.com/freerouting/freerouting/releases/download/v2.4.1/freerouting-2.4.1-linux-x64.zip"
 FREEROUTING_SHA256 = "3ad5a956ab474b12f331d24195feadac90e8344b8e013c6a4ab26e203ce51519"
-PLANES = [{"net": "GND_PWR", "layer": "In1.Cu", "inset_mm": 0.5}]
+# Layer authority PCB-PWR: F.Cu POWER_SIGNAL, In1.Cu REFERENCE, In2.Cu POWER_RETURN,
+# B.Cu POWER_SIGNAL -> both inner layers are GND_PWR planes, routing on outer layers
+# only (an inner 1 oz conductor would need ~2x the outer width for the same rise).
+PLANES = [{"net": "GND_PWR", "layer": "In1.Cu", "inset_mm": 0.5},
+          {"net": "GND_PWR", "layer": "In2.Cu", "inset_mm": 0.5}]
 HOLE_KEEPOUTS = {"refs": ["H1", "H2", "H3", "H4"], "radius_mm": 4.0}
 PASSES = 150
-# Locked escape stubs, all checked >= 0.205 mm to every foreign copper item of the
-# authoritative board and to each other: fan-out of the LMR60440 pin row 5..8 of
-# U3/U4 (pins 6/7 sit 0.125 mm from pad 2 under the ECO-004 land rule the
-# autorouter cannot see) with staggered vias, FB/MODE carried on B.Cu to R1/R5
-# and R10/R9; U2 VSSOP-10 pins 6/7/8 with vias; EN_MODEM through the 0.75 mm
-# corridor between C20 and U3 pin 8; the NT2 net-tie exit to J2 pin 4 (0.4 mm,
-# the tie itself is the current limit) and its GND_PWR via; the DNP I2C
-# pull-ups R13/R14 tied to J2 pins 11/12; U2 3V3 to C2 and on B.Cu to R15;
-# U2 VBAT_SYS on B.Cu into the accepted 3 mm VBAT_SYS track; I2C test points
-# TP9 (B.Cu) and TP10 (In2.Cu) around the H3 keepout to the J2 pull-up ties;
-# 3V3 from C7 to the R13/R14 pull-ups and from the R15/U2 cluster to C5;
-# U2 left pin row 3..5 (FAULT, I2C) fanned out to staggered vias under the body.
+# Locked pre-routes, all checked against every copper item of the authoritative
+# board and against each other (>= 0.2 mm, SW nodes 0.4 mm, NPTH 0.3 mm, mounting
+# hole keepouts, 0.5 mm edge); power items keep >= 0.3 mm (basis):
+# - input protection: VBAT_FUSED on F.Cu from F1 through the D1/U1 corridor
+#   (1.9 mm, the 1206 fuse is the narrower element) and under Q1 (3.0 mm) to the
+#   source pins, with the D1 cathode; VBAT_PROTECTED from the Q1 drain through
+#   7 vias, 3.0 mm on B.Cu, 7 vias at RSH1/C10 (no via-in-pad; the provisional
+#   12-via value of the basis is covered by the EVT +70 C / 5 A test);
+# - 3V8_MODEM from the accepted 3V8 copper to J2 pin 1 along the east corridor
+#   (3.0 mm); 3V3_DIGITAL from C17/C19 to J2 pin 3 on B.Cu (1.2 mm between the
+#   J2 pins and the locating peg: connector pitch limit, documented);
+# - fan-outs of the LMR60440 pin rows 5..8 (U3/U4) and of U2 with vias, FB/MODE
+#   on B.Cu to R1/R5/R10/R9, EN_MODEM corridor, NT2 net-tie exits, DNP I2C
+#   pull-ups R13/R14 and test point TP9 (TP10 is left to the routers), 3V3 links C7->R13/R14 and
+#   R15/U2->C5.
 PREROUTE = [
     ('track', 'F.Cu', '3V3_DIGITAL', 0.2, [(46.2, 24.0), (47.7, 24.0)]),
     ('via', None, '3V3_DIGITAL', 0.6, [(47.7, 24.0)]),
@@ -106,9 +113,6 @@ PREROUTE = [
     ('track', 'F.Cu', 'I2C2_SCL', 0.25, [(45.32, 56.0), (45.32, 54.6)]),
     ('track', 'B.Cu', 'I2C2_SCL', 0.25, [(45.32, 54.6), (62.0, 50.5), (73.5, 50.5), (76.9, 53.9)]),
     ('via', None, 'I2C2_SCL', 0.6, [(76.9, 53.9)]),
-    ('via', None, 'I2C2_SDA', 0.6, [(47.86, 55.0)]),
-    ('track', 'In2.Cu', 'I2C2_SDA', 0.25, [(47.86, 55.0), (62.0, 50.5), (73.5, 50.5), (76.6, 57.4), (76.6, 58.0)]),
-    ('via', None, 'I2C2_SDA', 0.6, [(76.6, 58.0)]),
     ('track', 'F.Cu', '3V3_DIGITAL', 0.25, [(73.625, 50.3), (73.2, 50.8), (73.2, 56.5), (74.09, 56.5), (74.09, 58.0)]),
     ('track', 'B.Cu', '3V3_DIGITAL', 0.25, [(61.51, 24.0), (64.5, 27.0), (64.5, 35.0)]),
     ('via', None, '3V3_DIGITAL', 0.6, [(64.5, 35.0)]),
@@ -119,6 +123,35 @@ PREROUTE = [
     ('via', None, 'I2C2_SDA', 0.6, [(43.9, 23.5)]),
     ('track', 'F.Cu', 'I2C2_SCL', 0.2, [(41.8, 24.0), (42.7, 24.0), (43.2, 24.8)]),
     ('via', None, 'I2C2_SCL', 0.6, [(43.2, 24.8)]),
+    ('track', 'F.Cu', 'VBAT_FUSED', 1.9, [(14.4, 29.0), (16.9, 29.0), (16.9, 35.5)]),
+    ('track', 'F.Cu', 'VBAT_FUSED', 3.0, [(14.5, 35.5), (29.77, 35.5)]),
+    ('track', 'F.Cu', 'VBAT_FUSED', 1.2, [(29.77, 35.5), (29.77, 29.365)]),
+    ('track', 'F.Cu', 'VBAT_PROTECTED', 1.0, [(22.9, 31.4), (22.9, 32.6), (27.9, 32.6)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(22.9, 31.4)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(22.9, 32.4)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(23.9, 33.3)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(24.9, 33.3)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(25.9, 33.3)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(26.9, 33.3)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(27.9, 33.3)]),
+    ('track', 'B.Cu', 'VBAT_PROTECTED', 3.0, [(22.9, 31.4), (22.9, 33.3), (31.35, 33.3), (31.35, 27.0), (33.9, 28.3)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(31.35, 27.0)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(31.35, 28.0)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(31.35, 29.0)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(31.35, 30.0)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(31.35, 31.0)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(33.0, 28.3)]),
+    ('via', None, 'VBAT_PROTECTED', 0.6, [(33.9, 28.3)]),
+    ('track', 'F.Cu', 'VBAT_PROTECTED', 1.0, [(31.35, 27.0), (31.35, 31.0)]),
+    ('track', 'F.Cu', 'VBAT_PROTECTED', 1.6, [(31.85, 30.4), (32.6, 30.4)]),
+    ('track', 'F.Cu', 'VBAT_PROTECTED', 1.0, [(31.35, 27.0), (32.525, 26.0)]),
+    ('track', 'F.Cu', 'VBAT_PROTECTED', 1.2, [(32.525, 26.0), (33.515, 30.365)]),
+    ('track', 'F.Cu', 'VBAT_PROTECTED', 0.8, [(33.0, 28.3), (33.9, 28.3)]),
+    ('track', 'F.Cu', '3V8_MODEM', 3.0, [(72.525, 20.2), (79.5, 20.2), (83.5, 24.2), (83.5, 37.0), (81.08, 39.42)]),
+    ('track', 'F.Cu', '3V3_DIGITAL', 1.0, [(72.525, 38.0), (72.525, 42.25)]),
+    ('via', None, '3V3_DIGITAL', 0.6, [(72.0, 40.1)]),
+    ('via', None, '3V3_DIGITAL', 0.6, [(73.0, 40.1)]),
+    ('track', 'B.Cu', '3V3_DIGITAL', 1.2, [(72.0, 40.1), (76.5, 38.0), (82.95, 38.0), (82.95, 44.5), (81.08, 46.0)]),
 ]
 TIE_STRIPS = ["NT2"]
 # Mounting holes H1..H4 (native board) for the gap-fill router keepouts, and the
@@ -236,7 +269,7 @@ def pour_spec(segments: list[dict]) -> dict:
     grouped: dict[tuple[str, str], list] = collections.defaultdict(list)
     for segment in segments:
         width = width_by_net.get(segment["net"])
-        if width is None or segment["layer"] not in {"F.Cu", "B.Cu", "In2.Cu"}:
+        if width is None or segment["layer"] not in {"F.Cu", "B.Cu"}:
             continue
         line = LineString([segment["start"], segment["end"]]) if segment["start"] != segment["end"] else None
         if line is not None:
@@ -285,7 +318,7 @@ def gap_fill(board: Path, rel) -> dict:
     class_clearance = {c["name"]: c["clearance"] for c in settings["classes"]}
     net_clearance = {p["pattern"]: class_clearance[p["netclass"]] for p in settings["netclass_patterns"]}
     router, failed = gapfill_router.route_all(
-        lambda: gapfill_router.GapFillRouter(geometry, ["F.Cu", "In2.Cu", "B.Cu"], width=0.25, clearance=0.2,
+        lambda: gapfill_router.GapFillRouter(geometry, ["F.Cu", "B.Cu"], width=0.25, clearance=0.2,
                                              via_size=0.6, via_drill=0.3, edge_keep=0.5,
                                              hole_keep=HOLE_KEEPOUTS["radius_mm"] + 0.3,
                                              net_clearance=net_clearance),
