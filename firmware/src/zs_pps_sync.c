@@ -96,3 +96,12 @@ bool zs_pps_sync_poll(zs_pps_sync_t *p, uint32_t now_ticks) {
 }
 
 int32_t zs_pps_sync_rate_error_ppm(const zs_pps_sync_t *p) { return p ? p->last_interval_ppm : 0; }
+
+void zs_pps_sync_on_capture_gap(zs_pps_sync_t *p) {
+  if (!p) return;
+  p->mark_count = 0u;
+  p->pps_armed = false;
+  p->pps_sample_valid = false;
+  p->label_pending = false;
+  p->prev_pps_valid = false;       /* no interval measurement across the pause */
+}
