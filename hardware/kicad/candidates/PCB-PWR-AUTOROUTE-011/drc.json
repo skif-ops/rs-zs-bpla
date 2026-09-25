@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-09-25T06:39:52+0000",
+    "date": "2026-09-25T06:49:22+0000",
     "included_severities": [
         "error",
         "warning",
@@ -15,58 +15,12 @@
             "description": "Missing connection between items",
             "items": [
                 {
-                    "description": "Track [BOOT_3V3] on F.Cu, length 0.3100 mm",
-                    "pos": {
-                        "x": 57.49,
-                        "y": 41.55
-                    },
-                    "uuid": "a3e3c177-5889-49a6-9f95-9c0574115deb"
-                },
-                {
-                    "description": "Pad 4 [BOOT_3V3] of U4 on F.Cu",
-                    "pos": {
-                        "x": 56.125,
-                        "y": 42.075
-                    },
-                    "uuid": "24b4f83e-3694-4f7b-b3b8-7d6be37ac5c9"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Track [BOOT_3V8] on F.Cu, length 0.3100 mm",
-                    "pos": {
-                        "x": 57.49,
-                        "y": 13.55
-                    },
-                    "uuid": "41699d57-3b92-4d72-9d70-57bacfd434f9"
-                },
-                {
-                    "description": "Pad 4 [BOOT_3V8] of U3 on F.Cu",
-                    "pos": {
-                        "x": 56.125,
-                        "y": 14.075
-                    },
-                    "uuid": "a6d9c252-a88d-4f26-887b-98b0019b0c97"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
                     "description": "Track [I2C2_SCL] on F.Cu, length 1.4000 mm",
                     "pos": {
                         "x": 45.32,
                         "y": 56.0
                     },
-                    "uuid": "7e363b66-7dc0-45f4-9ec1-a9334a46749d"
+                    "uuid": "683eaac0-8915-4e66-9670-4f23af4a19e9"
                 },
                 {
                     "description": "Track [I2C2_SCL] on F.Cu, length 1.0900 mm",
@@ -74,7 +28,7 @@
                         "x": 75.11,
                         "y": 56.5
                     },
-                    "uuid": "2ca3c4a0-65c7-4107-8cf8-a504cfdda091"
+                    "uuid": "0819c44e-ea8c-4c31-924b-19d214d90ae6"
                 }
             ],
             "severity": "error",
@@ -91,11 +45,26 @@
                         "x": 53.6,
                         "y": 11.5
                     },
-                    "uuid": "70f3d60e-6f7c-435a-8554-1af4ac146813"
+                    "uuid": "0ac46e8f-70bc-4e37-a626-cf2130824c14"
                 }
             ],
             "severity": "warning",
             "type": "via_dangling"
+        },
+        {
+            "description": "Track has unconnected end",
+            "items": [
+                {
+                    "description": "Track [RT_3V8] on B.Cu, length 0.1414 mm",
+                    "pos": {
+                        "x": 50.75,
+                        "y": 18.15
+                    },
+                    "uuid": "95099537-c894-4e40-b3f7-dd1ebd883a4d"
+                }
+            ],
+            "severity": "warning",
+            "type": "track_dangling"
         },
         {
             "description": "The current configuration does not include the footprint library 'Resistor_SMD'.",
