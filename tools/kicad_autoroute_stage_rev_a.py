@@ -242,35 +242,83 @@ def pours(board_path: str, spec_json: str) -> None:
     pitch = mm(spec["stitch_pitch_mm"])
     fills = [zone.GetFilledPolysList(zone.GetLayer()) for zone in ground_zones]
     blockers = [t for t in board.GetTracks() if t.GetNetCode() != ground.GetNetCode()]
+    holes = [fp.GetPosition() for fp in board.GetFootprints() if fp.GetReference() in spec.get("hole_refs", [])]
+    hole_keep = mm(spec.get("hole_keep_mm", 4.3))
+    foreign_tht = [pad for pad in board.GetPads()
+                   if pad.GetAttribute() == pcbnew.PAD_ATTRIB_PTH and pad.GetNetCode() != ground.GetNetCode()]
+
+    def via_site_ok(x: int, y: int, fill_list) -> bool:
+        probes = [(x + int(radius * math.cos(a)), y + int(radius * math.sin(a)))
+                  for a in [i * math.pi / 4 for i in range(8)]] + [(x, y)]
+        if not all(all(_inside(fill, px, py) for px, py in probes) for fill in fill_list):
+            return False
+        if any(math.hypot(x - h.x, y - h.y) < hole_keep for h in holes):
+            return False
+        point = pcbnew.VECTOR2I(int(x), int(y))
+        if any(track.HitTest(point, radius) for track in blockers):
+            return False
+        for pad in foreign_tht:
+            box_ = pad.GetBoundingBox()
+            if math.hypot(x - pad.GetPosition().x, y - pad.GetPosition().y) < max(box_.GetWidth(), box_.GetHeight()) / 2 + radius:
+                return False
+        return True
+
+    def add_ground_via(x: int, y: int) -> None:
+        via = pcbnew.PCB_VIA(board)
+        via.SetPosition(pcbnew.VECTOR2I(int(x), int(y)))
+        try:
+            via.SetWidth(mm(0.6))
+        except TypeError:  # KiCad 9 padstack API
+            via.SetWidth(pcbnew.F_Cu, mm(0.6))
+        via.SetDrill(mm(0.3))
+        via.SetNetCode(ground.GetNetCode())
+        board.Add(via)
+
+    # One via next to every SMD ground pad on F.Cu, so no pour region depends on
+    # the grid alone to reach the In1.Cu plane.
+    f_layer = board.GetLayerID("F.Cu")
+    f_fill = [zone.GetFilledPolysList(zone.GetLayer()) for zone in ground_zones if zone.GetLayer() == f_layer]
+    ground_vias = [t.GetPosition() for t in board.GetTracks()
+                   if t.GetClass() == "PCB_VIA" and t.GetNetCode() == ground.GetNetCode()]
+    pad_vias = 0
+    for pad in board.GetPads():
+        if (pad.GetNetCode() != ground.GetNetCode() or not pad.IsOnLayer(f_layer)
+                or pad.GetAttribute() != pcbnew.PAD_ATTRIB_SMD):
+            continue
+        centre = pad.GetPosition()
+        box_ = pad.GetBoundingBox()
+        half = max(box_.GetWidth(), box_.GetHeight()) / 2
+        if any(math.hypot(v.x - centre.x, v.y - centre.y) < half + mm(1.0) for v in ground_vias):
+            continue
+        done = False
+        for extra in (0.55, 0.9, 1.3, 1.8):
+            for step in range(16):
+                angle = step * math.pi / 8
+                x = centre.x + int((half + mm(extra)) * math.cos(angle))
+                y = centre.y + int((half + mm(extra)) * math.sin(angle))
+                if via_site_ok(x, y, f_fill):
+                    add_ground_via(x, y)
+                    ground_vias.append(pcbnew.VECTOR2I(int(x), int(y)))
+                    pad_vias += 1
+                    done = True
+                    break
+            if done:
+                break
     placed = 0
     y = box.GetY() + pitch
     while y < box.GetBottom():
         x = box.GetX() + pitch
         while x < box.GetRight():
-            probes = [(x + int(radius * math.cos(a)), y + int(radius * math.sin(a)))
-                      for a in [i * math.pi / 4 for i in range(8)]] + [(x, y)]
-            if all(all(_inside(fill, px, py) for px, py in probes) for fill in fills):
-                clear = True
-                for track in blockers:
-                    if track.HitTest(pcbnew.VECTOR2I(int(x), int(y)), radius):
-                        clear = False
-                        break
-                if clear:
-                    via = pcbnew.PCB_VIA(board)
-                    via.SetPosition(pcbnew.VECTOR2I(int(x), int(y)))
-                    try:
-                        via.SetWidth(mm(0.6))
-                    except TypeError:  # KiCad 9 padstack API
-                        via.SetWidth(pcbnew.F_Cu, mm(0.6))
-                    via.SetDrill(mm(0.3))
-                    via.SetNetCode(ground.GetNetCode())
-                    board.Add(via)
-                    placed += 1
+            if via_site_ok(x, y, fills) and not any(
+                    math.hypot(v.x - x, v.y - y) < mm(1.2) for v in ground_vias):
+                add_ground_via(x, y)
+                placed += 1
             x += pitch
         y += pitch
     filler.Fill(board.Zones())
     board.Save(board_path)
-    print(json.dumps({"thicken_zones": sum(len(i["polygons"]) for i in spec["thicken"]), "stitching_vias": placed}))
+    print(json.dumps({"thicken_zones": sum(len(i["polygons"]) for i in spec["thicken"]),
+                      "ground_pad_vias": pad_vias, "stitching_vias": placed}))
 
 
 if __name__ == "__main__":

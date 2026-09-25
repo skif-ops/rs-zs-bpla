@@ -51,7 +51,8 @@ PASSES = 150
 # the tie itself is the current limit) and its GND_PWR via; the DNP I2C
 # pull-ups R13/R14 tied to J2 pins 11/12; U2 3V3 to C2 and on B.Cu to R15;
 # U2 VBAT_SYS on B.Cu into the accepted 3 mm VBAT_SYS track; I2C test points
-# TP9 (B.Cu) and TP10 (In2.Cu) around the H3 keepout to the J2 pull-up ties.
+# TP9 (B.Cu) and TP10 (In2.Cu) around the H3 keepout to the J2 pull-up ties;
+# 3V3 from C7 to the R13/R14 pull-ups and from the R15/U2 cluster to C5.
 PREROUTE = [
     ('track', 'F.Cu', '3V3_DIGITAL', 0.2, [(46.2, 24.0), (47.7, 24.0)]),
     ('via', None, '3V3_DIGITAL', 0.6, [(47.7, 24.0)]),
@@ -107,6 +108,10 @@ PREROUTE = [
     ('via', None, 'I2C2_SDA', 0.6, [(47.86, 55.0)]),
     ('track', 'In2.Cu', 'I2C2_SDA', 0.25, [(47.86, 55.0), (62.0, 50.5), (73.5, 50.5), (76.6, 57.4), (76.6, 58.0)]),
     ('via', None, 'I2C2_SDA', 0.6, [(76.6, 58.0)]),
+    ('track', 'F.Cu', '3V3_DIGITAL', 0.25, [(73.625, 50.3), (73.2, 50.8), (73.2, 56.5), (74.09, 56.5), (74.09, 58.0)]),
+    ('track', 'B.Cu', '3V3_DIGITAL', 0.25, [(61.51, 24.0), (64.5, 27.0), (64.5, 35.0)]),
+    ('via', None, '3V3_DIGITAL', 0.6, [(64.5, 35.0)]),
+    ('track', 'F.Cu', '3V3_DIGITAL', 0.25, [(64.5, 35.0), (66.4, 36.9), (67.3, 36.9)]),
 ]
 TIE_STRIPS = ["NT2"]
 # Autoroute (connectivity) class parameters. Freerouting cannot neck a wide
@@ -235,7 +240,8 @@ def pour_spec(segments: list[dict]) -> dict:
         })
     return {"thicken": thicken, "ground_net": GROUND["net"], "ground_pour_layers": GROUND["layers"],
             "pour_inset_mm": GROUND["inset_mm"], "pour_clearance_mm": GROUND["clearance_mm"],
-            "stitch_pitch_mm": GROUND["stitch_pitch_mm"], "stitch_keep_mm": GROUND["stitch_keep_mm"]}
+            "stitch_pitch_mm": GROUND["stitch_pitch_mm"], "stitch_keep_mm": GROUND["stitch_keep_mm"],
+            "hole_refs": HOLE_KEEPOUTS["refs"], "hole_keep_mm": HOLE_KEEPOUTS["radius_mm"] + 0.3}
 
 
 def summarize(drc_path: Path, candidate: Path, native_sha: str, log_tail: str, stage: dict) -> dict:
