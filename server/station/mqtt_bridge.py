@@ -12,11 +12,12 @@ import time
 
 import paho.mqtt.client as mqtt
 
+from station.audio_ingest import AUDIO_COMMAND, ingest_audio_chunk
 from station.cbor_codec import decode_cbor, decode_detection_obj, decode_heartbeat_obj
 from station.command_codec import CommandSigner, decode_command_ack, encode_signed_command
 from station.event_receipt_codec import EventReceipt, encode_event_receipt
 from station.router import service, store
-from station.schemas import HeartbeatMessage
+from station.schemas import DetectionMessage, HeartbeatMessage, StationCommand
 
 
 TENANT_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,31}")
@@ -36,7 +37,7 @@ def station_id_from_topic(topic: str, tenant: str) -> tuple[int, str]:
         or parts[0] != "zs"
         or parts[1] != "v1"
         or parts[2] != tenant
-        or parts[4] not in {"up", "status", "ack"}
+        or parts[4] not in {"up", "status", "ack", "audio"}
     ):
         raise ValueError(f"unexpected topic: {topic}")
     try:
@@ -70,6 +71,18 @@ def build_parser() -> argparse.ArgumentParser:
         "--command-retry-seconds",
         type=float,
         default=float(os.getenv("ZS_COMMAND_RETRY_SECONDS", "30")),
+    )
+    parser.add_argument(
+        "--auto-audio",
+        choices=("off", "pre", "post", "both"),
+        default=os.getenv("ZS_AUTO_AUDIO", "both"),
+        help="Ask a station for the audio of a new detection (addendum B); off disables it.",
+    )
+    parser.add_argument(
+        "--auto-audio-gap-seconds",
+        type=float,
+        default=float(os.getenv("ZS_AUTO_AUDIO_GAP_SECONDS", "120")),
+        help="At most one automatic audio request per station in this interval (one per detection episode).",
     )
     parser.add_argument(
         "--insecure-bench",
@@ -127,6 +140,8 @@ def process_message(
     fusion_service=service,
 ) -> str:
     topic_station_id, kind = station_id_from_topic(topic, tenant)
+    if kind == "audio":
+        return ingest_audio_chunk(payload, topic_station_id, event_store=event_store)
     if kind == "ack":
         ack = decode_command_ack(payload)
         if ack.station_id != topic_station_id:
@@ -164,6 +179,32 @@ def process_message(
         if not event_store.complete_mqtt_detection(detection, wire_sha256):
             raise RuntimeError("detection ingress completion failed")
     return "duplicate" if ingress == "duplicate" else "stored"
+
+
+# Station time trust values that make an audio request pointless (the station answers REJECTED / detail 3).
+UNTRUSTED_EVENT_TIME = {"GNSS_TIME_SUSPECT", "UNSYNCED"}
+
+
+def request_event_audio(
+    detection: DetectionMessage,
+    *,
+    segment: str,
+    min_gap_us: int,
+    now_us: int,
+    event_store=store,
+) -> StationCommand | None:
+    """Auto-request (addendum B): the station emits a detection only at confirmed presence, first on the rising edge
+    and then as periodic updates, so one request per station per ``min_gap_us`` covers an episode.  The station holds
+    the audio in its NOR ring (~42 min of recorded sound) and knows the last 16 events of its boot."""
+
+    if segment == "off" or detection.gnss.time_trust in UNTRUSTED_EVENT_TIME:
+        return None
+    last = event_store.last_command_us(detection.station_id, AUDIO_COMMAND)
+    if last is not None and now_us - last < min_gap_us:
+        return None
+    return event_store.create_command(
+        detection.station_id, AUDIO_COMMAND, {"event_id": detection.event_id, "segment": segment}
+    )
 
 
 def build_event_receipt(topic: str, payload: bytes, tenant: str) -> tuple[str, bytes]:
@@ -234,13 +275,15 @@ def handle_message(
     *,
     event_store=store,
     fusion_service=service,
+    on_new_detection=None,
 ) -> bool:
-    """Process then MQTT-ACK; discard invalid input but retry transient failures."""
+    """Process then MQTT-ACK; discard invalid input but retry transient failures.  ``on_new_detection`` runs for a
+    newly stored detection after its receipt went out (the audio auto-request); its failure never blocks the ACK."""
 
     try:
         if type(message.qos) is not int or message.qos != 1 or getattr(message, "retain", False):
             raise ValueError("station MQTT delivery must be QoS 1 and non-retained")
-        process_message(
+        status = process_message(
             message.topic,
             message.payload,
             tenant,
@@ -261,6 +304,11 @@ def handle_message(
             )
             if info.rc != mqtt.MQTT_ERR_SUCCESS:
                 raise RuntimeError("event application receipt publish failed")
+            if status == "stored" and on_new_detection is not None:
+                try:
+                    on_new_detection(decode_detection_obj(decode_cbor(message.payload)))
+                except Exception as exc:  # noqa: BLE001 - optional follow-up, the event itself is stored
+                    print(f"MQTT follow-up error: {type(exc).__name__}", file=sys.stderr)
     except ValueError as exc:
         print(f"MQTT decode error: {exc}", file=sys.stderr)
         if message.qos:
@@ -280,6 +328,8 @@ def main(argv: list[str] | None = None) -> None:
     validate_tenant(args.tenant)
     if args.command_poll_seconds <= 0 or args.command_retry_seconds <= 0:
         raise ValueError("command poll and retry intervals must be positive")
+    if args.auto_audio_gap_seconds < 0:
+        raise ValueError("auto audio gap must not be negative")
     signer = (
         CommandSigner.from_pem_file(args.command_signing_key)
         if args.command_signing_key
@@ -304,10 +354,23 @@ def main(argv: list[str] | None = None) -> None:
         client_obj.subscribe(f"zs/v1/{args.tenant}/+/up", qos=1)
         client_obj.subscribe(f"zs/v1/{args.tenant}/+/status", qos=1)
         client_obj.subscribe(f"zs/v1/{args.tenant}/+/ack", qos=1)
+        client_obj.subscribe(f"zs/v1/{args.tenant}/+/audio", qos=1)
+
+    auto_audio = args.auto_audio if signer is not None else "off"      # a request needs the command downstream
+
+    def on_new_detection(detection: DetectionMessage) -> None:
+        command = request_event_audio(
+            detection,
+            segment=auto_audio,
+            min_gap_us=int(args.auto_audio_gap_seconds * 1_000_000),
+            now_us=int(time.time() * 1_000_000),
+        )
+        if command is not None:
+            print(f"MQTT audio request {command.command_id} for station {detection.station_id}", file=sys.stderr)
 
     def on_message(client_obj, userdata, message):
         del userdata
-        handle_message(client_obj, message, args.tenant, tls_enabled)
+        handle_message(client_obj, message, args.tenant, tls_enabled, on_new_detection=on_new_detection)
 
     client.on_connect = on_connect
     client.on_message = on_message

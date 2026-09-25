@@ -3,7 +3,7 @@ from __future__ import annotations
 import json, time
 from pathlib import Path
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage
 from station.store import EventStore
 from station.service import StationFusionService
@@ -74,6 +74,25 @@ async def request_audio(station_id:int,req:AudioRequest):
     except ValueError as exc: raise HTTPException(400,str(exc)) from None
     return command.model_dump()
 
+@router.get('/stations/{station_id}/events/{event_id}/audio')
+async def event_audio(station_id:int,event_id:int):
+    """Assembled audio segments of an event (MQTT upload, addendum B); the WAV is served by the route below."""
+    try: rows=store.list_audio(station_id,event_id)
+    except ValueError as exc: raise HTTPException(400,str(exc)) from None
+    return [{'segment':r['segment'],'codec':r['codec'],'sample_rate':r['sample_rate'],'start_time_us':r['start_time_us'],
+             'duration_ms':r['duration_ms'],'created_us':r['created_us'],'command_id':r['command_id'],
+             'url':f"/api/v1/stations/{station_id}/events/{event_id}/audio/{r['segment']}.wav"} for r in rows if r['codec']=='pcm16-wav']
+
+@router.get('/stations/{station_id}/events/{event_id}/audio/{segment}.wav')
+async def event_audio_file(station_id:int,event_id:int,segment:str):
+    if segment not in ('pre','post'): raise HTTPException(404,'no such segment')
+    try: rows=[r for r in store.list_audio(station_id,event_id) if r['segment']==segment and r['codec']=='pcm16-wav']
+    except ValueError as exc: raise HTTPException(400,str(exc)) from None
+    if not rows: raise HTTPException(404,'audio not uploaded')
+    path=Path(rows[0]['path']).resolve()
+    if not path.is_relative_to(store.audio_root.resolve()) or not path.is_file(): raise HTTPException(404,'audio file missing')
+    return FileResponse(path,media_type='audio/wav',filename=f'station{station_id}_event{event_id}_{segment}.wav')
+
 @station_http_router.get('/stations/{station_id}/commands/poll')
 async def poll_commands(station_id:int): return [x.model_dump() for x in store.poll_commands(station_id)]
 
@@ -91,7 +110,7 @@ async def upload_audio(station_id:int,event_id:int,segment:str='pre',sample_rate
     suffix=Path(audio.filename or 'audio.bin').suffix or '.bin'; path=root/f'{segment}{suffix}'
     path.write_bytes(await audio.read())
     with store.lock,store._conn() as c:
-        c.execute('INSERT OR REPLACE INTO audio VALUES(?,?,?,?,?,?,?)',(event_id,station_id,segment,str(path),codec,sample_rate,int(time.time()*1e6)))
+        c.execute('INSERT OR REPLACE INTO audio(event_id,station_id,segment,path,codec,sample_rate,created_us) VALUES(?,?,?,?,?,?,?)',(store._sqlite_event_id(event_id),station_id,segment,str(path),codec,sample_rate,int(time.time()*1e6)))
     return {'status':'ok','path':str(path),'bytes':path.stat().st_size}
 
 @router.websocket('/stream')
