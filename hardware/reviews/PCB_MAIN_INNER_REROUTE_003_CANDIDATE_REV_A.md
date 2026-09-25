@@ -1,7 +1,7 @@
 # PCB-MAIN 003 — OctoSPI / SDIO / EN_MODEM off In2/In3 (candidate record, Rev A)
 
-Status: **CANDIDATE — decision pending** (`ACCEPT_INNER_REROUTE_003` / `REJECT_INNER_REROUTE_003`).
-Not applied to the authoritative board; not a manufacturing release.
+Status: **ACCEPTED and APPLIED** (`ACCEPT_INNER_REROUTE_003`, project owner, 2026-09-25; ci-apply commit `33f20a1b`).
+Not a manufacturing release. Application: section 7.
 
 | Item | Value |
 |---|---|
@@ -104,6 +104,49 @@ select and is not matched; SD_D2_U1 and EN_MODEM are not in the OctoSPI group.
 3. The row R8–R11 sits over the corridor (In4 GND_DIGITAL); the GND_MODEM arm of In4 above it is not cut.
 4. The IO3 U1 side (R12) is unchanged; IO3 sets the matched length.
 
-Decision tokens: `ACCEPT_INNER_REROUTE_003` / `REJECT_INNER_REROUTE_003`.
-Application (after acceptance, separate commit through ci-apply): the candidate board as authoritative, the three
-placement rows, the audit chain values that follow the board.
+Decision: `ACCEPT_INNER_REROUTE_003`.
+
+## 7. Application
+
+Tool `tools/apply_pcb_main_inner_reroute_003_application_rev_a.py` (ci-apply, bot commit `33f20a1b`); record
+`hardware/reviews/PCB_MAIN_INNER_REROUTE_003_APPLICATION_REV_A.json`.
+
+| Item | Before | After |
+|---|---|---|
+| `hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb` | `2dd9bdf2…` (USB cell fixture 001 candidate) | `30c6c93e…` (byte copy of the 003 candidate) |
+| `hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv` | `df7cdbfc…` | `d97bdf31…` (rows R9, R10, R11 only) |
+| Pre-003 manifest snapshot | — | `hardware/kicad/candidates/PCB-MAIN-INNER-REROUTE-003/PCB_MAIN_PLACEMENT_REPACK_PRE_003_REV_A.csv` |
+
+### Audit chain
+About 30 audits and generators of the earlier sub-gates (RF P0/remediation/return, GNSS, OctoSPI R8, signal hard
+nets, ground domain 001, USB placement/source/cell modem/cell fixture, mechanical ECO-002, the stackup and
+assembler/stencil requests, the frozen placement repack) pinned the authoritative board and manifest hashes and
+compared the board with their own predecessors. Instead of teaching each of them the 003 delta:
+
+- `tools/pcb_main_lineage_rev_a.py`: `historical_board()` / `historical_placement()` return the exact 003
+  predecessor (the USB cell fixture 001 candidate and the pre-003 manifest snapshot) **only** when the authoritative
+  board is byte-identical to the accepted 003 candidate, the application record carries the decision, both
+  predecessors have their pinned hashes and the manifest differs from the snapshot in the R9–R11 rows only, set to
+  the accepted poses. Otherwise they return the authoritative files, so any other change keeps failing every
+  earlier audit. The path names itself by the authoritative path (`relative_to`), so path bindings and
+  `git show <commit>:<path>` in those audits keep their meaning.
+- 24 files read the predecessor board, 6 the predecessor manifest (edits of one line each).
+- Current-state audits: the layout audit accepts the applied 003 copper inventory (1069 track items, 10 zones);
+  the footprint materialization binds the 003 board hash; the new
+  `tools/audit_pcb_main_inner_reroute_003_application_rev_a.py` checks the 003 state (lineage predicate, record,
+  candidate DRC evidence, R9–R11 poses, 251 footprints equal to the predecessor set, no rerouted net on In2/In3,
+  strict placement clearance of the authoritative board: 227 assembly footprints, 0 collisions).
+- Unchanged: `PCB_MAIN_CAPTURE_STATUS_REV_A.json`, the capture manifest, schematic sources.
+
+The tool ran the whole Python part of the PCB-MAIN CI chain (55 commands,
+`hardware/kicad/candidates/PCB-MAIN-INNER-REROUTE-003/CI_CHAIN_COMMANDS.txt`) after the application and again in
+`--check`: PASS.
+
+### Open after the application
+1. `pcb-native.yml` should run `tools/audit_pcb_main_inner_reroute_003_application_rev_a.py` (workflow change,
+   owner only).
+2. The stackup/impedance and assembler DFM/stencil requests stay bound to the pre-003 manifest (valid as issued);
+   the assembly request must be re-issued with the new R9–R11 poses before a quote is used.
+3. `PCB_MAIN_ROUTING_AUTHORITY_REV_A` does not yet describe the OctoSPI/SDIO/EN_MODEM runs on the outer layers;
+   its audit checks the predecessor. Updating the routing authority is a separate step.
+4. PR #81 (candidate 002) closes without application.
