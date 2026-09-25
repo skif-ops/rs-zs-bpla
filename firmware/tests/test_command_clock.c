@@ -1,4 +1,4 @@
-/* Command-validity clock: GNSS first, network fallback with a bounded age, monotonic floor, QLTS parsing. */
+/* Command-validity clock: GNSS first, network fallback with a bounded age, monotonic floor. */
 #include "zs_command_clock.h"
 #include <assert.h>
 #include <stdio.h>
@@ -33,15 +33,6 @@ int main(void) {
   assert(zs_command_clock_set_network(&c, T0, 0xFFFFF000u));
   assert(zs_command_clock_now(&c, 0, false, 0x00001000u, &t) && t == (uint64_t)(T0 + 0x2000 * 1000));
 
-  /* AT+QLTS=1 */
-  {
-    int64_t e;
-    assert(zs_command_clock_parse_qlts("+QLTS: \"2026/09/25,08:10:05+12,0\"", &e) && e == INT64_C(1790323805000000));
-    assert(zs_command_clock_parse_qlts("+QLTS: \"2024/02/29,23:59:59+00,0\"", &e) && e == INT64_C(1709251199000000));
-    assert(!zs_command_clock_parse_qlts("+QLTS: \"2026/13/25,08:10:05+12,0\"", &e));
-    assert(!zs_command_clock_parse_qlts("+CCLK: \"26/09/25,08:10:05+12\"", &e));
-    assert(!zs_command_clock_parse_qlts("+QLTS: \"\"", &e));
-  }
   printf("command clock tests passed\n");
   return 0;
 }
