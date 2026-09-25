@@ -9,7 +9,7 @@
 		(at 0 -5.75 0)
 		(layer "F.SilkS")
 		(hide yes)
-		(uuid "27078b72-b73c-4a04-9e87-62354b7a7280")
+		(uuid "6f0c0fb1-2ee4-4803-ac1b-eff43cb1d58e")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -21,7 +21,7 @@
 		(at 0 5.75 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "af9fbb14-8f9d-4778-bda9-ac31661a25ef")
+		(uuid "13558bf6-08dd-4c28-ad20-15d3311ac3a9")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -33,7 +33,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "dd8d7d03-383c-49e4-98a5-eeb95c4aee00")
+		(uuid "6867cf4d-db5d-4cbc-8ed3-6c30c38831a8")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -45,7 +45,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "9f638205-7ce5-4717-9a45-ba30766c2b41")
+		(uuid "fc700015-fd84-435c-8984-0357a144a175")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -63,7 +63,7 @@
 		)
 		(fill no)
 		(layer "Dwgs.User")
-		(uuid "13222653-2144-408d-bc8e-1e9bb32451a1")
+		(uuid "54ab88fa-a2d7-4fbb-b21b-3a9d5a122d6d")
 	)
 	(fp_circle
 		(center 0 0)
@@ -74,7 +74,7 @@
 		)
 		(fill no)
 		(layer "F.CrtYd")
-		(uuid "684c8d5b-32ef-443f-bda8-44b9fa599f7f")
+		(uuid "1f681489-eadf-4656-86cc-198ee4c5252e")
 	)
 	(pad "" np_thru_hole circle
 		(at 0 0)
@@ -82,7 +82,7 @@
 		(drill 3.4)
 		(layers "*.Cu" "*.Mask")
 		(clearance 2.3)
-		(uuid "01756efc-3ea4-4928-b013-604c3b51b4c4")
+		(uuid "bba4e1a2-8d11-4570-af7f-31d78a641e24")
 	)
 	(embedded_fonts no)
 )
