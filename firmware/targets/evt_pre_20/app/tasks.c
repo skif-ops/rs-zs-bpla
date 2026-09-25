@@ -478,6 +478,7 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->detector.presence_level = pipeline.presence.level;
   hb->detector.reset_cause = app_watchdog_reset_cause();
   hb->detector.watchdog_missed = app_watchdog_previous_missed();
+  hb->detector.params_version = app_commands_params()->version;
   return true;
 }
 /* The comms duty loop (app_comms_task's body, as the host simulation and the twin drive it) plus the watchdog
