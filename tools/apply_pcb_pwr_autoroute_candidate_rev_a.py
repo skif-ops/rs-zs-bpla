@@ -41,22 +41,34 @@ FREEROUTING_URL = "https://github.com/freerouting/freerouting/releases/download/
 FREEROUTING_SHA256 = "3ad5a956ab474b12f331d24195feadac90e8344b8e013c6a4ab26e203ce51519"
 PLANES = [{"net": "GND_PWR", "layer": "In1.Cu", "inset_mm": 0.5}]
 HOLE_KEEPOUTS = {"refs": ["H1", "H2", "H3", "H4"], "radius_mm": 4.0}
-PASSES = 60
-# Autoroute-only class parameters (the basis stays the acceptance reference):
-# - PWR_RAIL_4A 2.1 mm: still >= the 2.03 mm 4 A / 35 um / 10 C screen of the basis
-#   and fits the 3.0 mm J2 pin pitch (1.2 mm to the neighbour pad);
-# - PWR_RETURN_5A 0.6 mm: GND_PWR pads are stubbed to vias into the In1.Cu plane,
-#   the 5 A return flows in the plane (basis layer policy CONTINUOUS_GND_PWR_PLANE);
-# - 0.2 mm clearance for return, sense, local and 0.3 A classes: fine-pitch pins
-#   (0.5 mm pitch, 0.2 mm gaps) cannot meet 0.3 mm; 0.2 mm is above the JLCPCB
-#   1 oz multilayer minimum.
+PASSES = 100
+# Autoroute (connectivity) class parameters. Freerouting cannot neck a wide
+# track down into a fine-pitch pin, so power nets are routed at 1.0 mm for
+# connectivity and then thickened to the basis width by zones along the route
+# (THICKEN_MM); zone fill necks down automatically where neighbours are closer.
+# 0.2 mm clearance for all non-switch classes: fine-pitch pins (0.5 mm pitch,
+# 0.2 mm gaps) cannot meet 0.3 mm; 0.2 mm is above the JLCPCB 1 oz minimum.
+# GND_PWR is stubbed to vias into the In1.Cu plane and poured on F.Cu/B.Cu.
 AUTOROUTE_OVERRIDES = {
-    "PWR_RAIL_4A": {"track_width": 2.1},
+    "PWR_INPUT_5A": {"track_width": 1.0, "clearance": 0.2},
+    "PWR_RAIL_4A": {"track_width": 1.0, "clearance": 0.2},
     "PWR_RETURN_5A": {"track_width": 0.6, "clearance": 0.2},
     "PWR_RAIL_0P3A": {"clearance": 0.2},
     "PWR_LOCAL": {"clearance": 0.2},
     "PWR_SENSE": {"clearance": 0.2},
 }
+THICKEN_MM = {"PWR_INPUT_5A": 4.0, "PWR_RAIL_4A": 3.0}
+THICKEN_CLEARANCE_MM = 0.3
+GROUND = {"net": "GND_PWR", "layers": ["F.Cu", "B.Cu"], "inset_mm": 0.5, "clearance_mm": 0.3,
+          "stitch_pitch_mm": 2.5, "stitch_keep_mm": 0.75}
+# Same-footprint pad spacing of the fine-pitch shunt monitor U2 (VSSOP-10 0.5 mm
+# pitch, 0.2 mm gaps) is set by its land pattern, like U3/U4 in ECO-004.
+CANDIDATE_DRU_APPEND = """
+(rule "U2 VSSOP-10 land pattern"
+  (condition "A.memberOfFootprint('U2') && B.memberOfFootprint('U2')")
+  (constraint clearance (min 0.19mm))
+)
+"""
 
 
 def sha256(path: Path) -> str:
@@ -126,6 +138,39 @@ def freerouting() -> Path:
     return binary
 
 
+def pour_spec(segments: list[dict]) -> dict:
+    """Host side: union of buffered power routes per net and layer -> zone polygons."""
+    try:
+        from shapely.geometry import LineString
+        from shapely.ops import unary_union
+    except ImportError:
+        subprocess.run(["python", "-m", "pip", "install", "--quiet", "shapely"], check=True)
+        from shapely.geometry import LineString
+        from shapely.ops import unary_union
+    basis = json.loads(BASIS.read_text(encoding="utf-8"))
+    width_by_net = {net: THICKEN_MM[cls] for cls, nets in basis["netclass_assignments"].items()
+                    if cls in THICKEN_MM for net in nets}
+    grouped: dict[tuple[str, str], list] = collections.defaultdict(list)
+    for segment in segments:
+        width = width_by_net.get(segment["net"])
+        if width is None or segment["layer"] not in {"F.Cu", "B.Cu", "In2.Cu"}:
+            continue
+        line = LineString([segment["start"], segment["end"]]) if segment["start"] != segment["end"] else None
+        if line is not None:
+            grouped[(segment["net"], segment["layer"])].append(line.buffer(width / 2.0, cap_style=1, join_style=1))
+    thicken = []
+    for priority, ((net, layer), shapes) in enumerate(sorted(grouped.items()), start=10):
+        merged = unary_union(shapes).simplify(0.02)
+        polygons = [merged] if merged.geom_type == "Polygon" else list(merged.geoms)
+        thicken.append({
+            "net": net, "layer": layer, "priority": priority, "clearance_mm": THICKEN_CLEARANCE_MM,
+            "polygons": [[[round(x, 4), round(y, 4)] for x, y in list(poly.exterior.coords)[:-1]] for poly in polygons],
+        })
+    return {"thicken": thicken, "ground_net": GROUND["net"], "ground_pour_layers": GROUND["layers"],
+            "pour_inset_mm": GROUND["inset_mm"], "pour_clearance_mm": GROUND["clearance_mm"],
+            "stitch_pitch_mm": GROUND["stitch_pitch_mm"], "stitch_keep_mm": GROUND["stitch_keep_mm"]}
+
+
 def summarize(drc_path: Path, candidate: Path, native_sha: str, log_tail: str, stage: dict) -> dict:
     report = json.loads(drc_path.read_text(encoding="utf-8"))
     by_type = collections.Counter(
@@ -145,6 +190,8 @@ def summarize(drc_path: Path, candidate: Path, native_sha: str, log_tail: str, s
         "planes_added": PLANES,
         "hole_keepouts": HOLE_KEEPOUTS,
         "autoroute_class_overrides": AUTOROUTE_OVERRIDES,
+        "thicken_mm": THICKEN_MM,
+        "ground": GROUND,
         "stage": stage,
         "drc": {
             "errors": {t: n for (s, t), n in sorted(by_type.items()) if s == "error"},
@@ -168,9 +215,9 @@ def generate() -> None:
     shutil.copy2(native_board, board)
     project.write_text(json.dumps(project_with_netclasses(NATIVE_DIR / f"{BOARD}.kicad_pro"), indent=2) + "\n",
                        encoding="utf-8")
-    for extra in (f"{BOARD}.kicad_dru",):
-        if (NATIVE_DIR / extra).is_file():
-            shutil.copy2(NATIVE_DIR / extra, WORK / f"{STEM}.kicad_dru")
+    native_dru = NATIVE_DIR / f"{BOARD}.kicad_dru"
+    dru_text = native_dru.read_text(encoding="utf-8") if native_dru.is_file() else "(version 1)\n"
+    (WORK / f"{STEM}.kicad_dru").write_text(dru_text + CANDIDATE_DRU_APPEND, encoding="utf-8")
     rel = lambda path: str(path.relative_to(ROOT))  # noqa: E731
     dsn, ses = WORK / f"{STEM}.dsn", WORK / f"{STEM}.ses"
     exported = docker("/usr/bin/python3", "tools/kicad_autoroute_stage_rev_a.py", "export", rel(board), rel(dsn),
@@ -185,15 +232,21 @@ def generate() -> None:
     log_tail = "\n".join((routed.stdout + routed.stderr).splitlines()[-40:])
     assert ses.is_file(), "Freerouting produced no session:\n" + log_tail
     candidate = WORK / f"{STEM}.routed.kicad_pcb"
-    imported = docker("/usr/bin/python3", "tools/kicad_autoroute_stage_rev_a.py", "import", rel(board), rel(ses), rel(candidate))
+    tracks = WORK / "tracks.json"
+    imported = docker("/usr/bin/python3", "tools/kicad_autoroute_stage_rev_a.py", "import", rel(board), rel(ses),
+                      rel(candidate), rel(tracks))
     shutil.move(candidate, board)
+    spec = WORK / "pours.json"
+    spec.write_text(json.dumps(pour_spec(json.loads(tracks.read_text(encoding="utf-8")))), encoding="utf-8")
+    poured = docker("/usr/bin/python3", "tools/kicad_autoroute_stage_rev_a.py", "pours", rel(board), rel(spec))
     drc = WORK / "drc.json"
     docker("kicad-cli", "pcb", "drc", "--format", "json", "--severity-all", "-o", rel(drc), rel(board))
-    stage = {"export": json.loads(exported.strip().splitlines()[-1]), "import": json.loads(imported.strip().splitlines()[-1])}
+    stage = {"export": json.loads(exported.strip().splitlines()[-1]), "import": json.loads(imported.strip().splitlines()[-1]),
+             "pours": json.loads(poured.strip().splitlines()[-1])}
     if OUT_DIR.exists():
         shutil.rmtree(OUT_DIR)
     OUT_DIR.mkdir(parents=True)
-    for source in (board, project, drc):
+    for source in (board, project, drc, WORK / f"{STEM}.kicad_dru"):
         shutil.copy2(source, OUT_DIR / source.name)
     summary = summarize(OUT_DIR / "drc.json", OUT_DIR / board.name, sha256(native_board), log_tail, stage)
     (OUT_DIR / "SUMMARY.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
