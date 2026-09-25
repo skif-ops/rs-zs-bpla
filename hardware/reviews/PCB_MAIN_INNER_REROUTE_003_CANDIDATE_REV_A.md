@@ -150,3 +150,6 @@ The tool ran the whole Python part of the PCB-MAIN CI chain (55 commands,
 3. `PCB_MAIN_ROUTING_AUTHORITY_REV_A` does not yet describe the OctoSPI/SDIO/EN_MODEM runs on the outer layers;
    its audit checks the predecessor. Updating the routing authority is a separate step.
 4. PR #81 (candidate 002) closes without application.
+5. Merge path: PR #84 → `evt-pre-20`. The 003 branch carries the 002 branch history (002 generator, candidate
+   and record are needed by the 003 generator); they enter `evt-pre-20` as unapplied history, the authoritative
+   board is the 003 board.
