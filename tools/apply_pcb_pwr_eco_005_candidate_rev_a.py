@@ -7,7 +7,7 @@ not changed. Output: hardware/kicad/candidates/PCB-PWR-ECO-005/
   PCB-PWR_ECO_005_CANDIDATE_REV_A.kicad_pcb  refilled candidate
   ECO_005_SPEC.json                          exact geometry delta applied by the KiCad stage
   drc.json                                   KiCad 9.0.9 DRC with the authoritative project + rules
-  SUMMARY.json                               DRC counts, return cross-sections, via groups
+  SUMMARY.json                               DRC counts, return-path resistance base 011 vs candidate
 Delta (nets, netlist and net-tie count unchanged; no new domain join):
   - NT2 rotated 180 deg: its GND_DIGITAL pad faces J2.4, its GND_PWR pad faces the GND_PWR pour
     (NT1/NT3 keep their orientation: C17/C19 and C7/C8 GND_PWR pads bound them);
@@ -18,8 +18,10 @@ Delta (nets, netlist and net-tie count unchanged; no new domain join):
     current, is narrowed 1.0 -> 0.3 mm next to J2 to free the via window);
   - GND_DIGITAL: F.Cu zone with solid pad connection from J2.4 straight to the rotated NT2;
   - GND_MIC (0.3 A class): second via 0.6/0.3 beside the existing one;
-  - GND_PWR: 5 plane vias on the GND_PWR side of NT1/NT2/NT3.
+  - GND_PWR: 5 plane vias on the GND_PWR side of NT1/NT2/NT3;
+  - RT_3V8: dangling via at (53.6, 11.5) and its stub from U3.8 removed (finding 9).
 Run 3: 0 unconnected, 1 hole_clearance (NT2 bridge vs a GND_PWR via) -> via moved, graphics screened.
+Run 4: DRC 0 errors / 0 unconnected.
 --check verifies the candidate matches SUMMARY.json.
 """
 
@@ -61,14 +63,14 @@ GND_MIC_SECOND_VIA = [
     ("track", "B.Cu", "GND_MIC", 0.5, [(73.85, 52.95), (74.55, 53.18)]),
 ]
 GND_DIGITAL_ZONE = [(75.8, 46.4), (82.6, 46.4), (82.6, 50.4), (75.8, 50.4)]
-# cross-section probes: (label, layer, net, polyline) - cuts every 0.25 mm perpendicular to the line
-PROBES = [  # lines chosen clear of other-net pads (J2 inner row, cap pads)
-    ("GND_MODEM J2.2->vias, below J2.8", "B.Cu", "GND_MODEM", [(80.3, 44.4), (75.5, 44.4)]),
-    ("GND_MODEM vias->NT1, between C17/C19 pads", "F.Cu", "GND_MODEM", [(74.0, 43.0), (74.0, 40.6)]),
-    ("GND_DIGITAL J2.4->NT2, above J2.10", "F.Cu", "GND_DIGITAL", [(80.3, 47.3), (76.6, 47.3)]),
-    ("GND_DIGITAL J2.4->NT2, below J2.10", "F.Cu", "GND_DIGITAL", [(80.3, 50.05), (77.2, 50.05)]),
-    ("GND_PWR NT2 west", "F.Cu", "GND_PWR", [(74.8, 48.52), (73.6, 48.52)]),
-]
+# Review B R1 finding 9: dangling RT_3V8 via and its stub from U3.8
+RT_3V8_STUB = [((54.0, 12.3), (53.6, 11.5)), ((54.0, 12.9), (54.0, 12.3)), ((54.0, 12.9), (54.0, 13.1))]
+RT_3V8_VIA = (53.6, 11.5)
+# return-path resistance cases: (net, J2 pin, tie, peak current A or None while the budget is open)
+RETURN_CASES = [("GND_MODEM", ("J2", "2"), ("NT1", "1"), 3.3),   # BG95 0.6 A BB + 2.7 A RF burst
+                ("GND_DIGITAL", ("J2", "4"), ("NT2", "1"), None),  # 3V3 budget: separate record
+                ("GND_MIC", ("J2", "6"), ("NT3", "1"), 0.3)]       # TPS7A20 rating
+RETURN_WINDOW = (70.0, 37.0, 84.0, 58.0)
 
 
 def sha256(path: Path) -> str:
@@ -82,9 +84,10 @@ def docker(*argv: str) -> subprocess.CompletedProcess:
 
 def shapely():
     try:
+        import scipy.sparse  # noqa: F401
         import shapely.geometry  # noqa: F401
     except ImportError:
-        subprocess.run(["python", "-m", "pip", "install", "--quiet", "shapely"], check=True)
+        subprocess.run(["python", "-m", "pip", "install", "--quiet", "shapely", "numpy", "scipy"], check=True)
     from shapely.geometry import LineString, Point, Polygon
     from shapely.ops import unary_union
     return LineString, Point, Polygon, unary_union
@@ -132,8 +135,11 @@ def build_spec() -> dict:
         spec["remove_tracks"].append({"net": "GND_PWR", "layer": "F.Cu", "start": list(a), "end": list(b)})
     for a, b in TP4_BRANCH:
         spec["remove_tracks"].append({"net": "3V8_MODEM", "layer": "B.Cu", "start": list(a), "end": list(b)})
+    for a, b in RT_3V8_STUB:
+        spec["remove_tracks"].append({"net": "RT_3V8", "layer": "F.Cu", "start": list(a), "end": list(b)})
     spec["remove_vias"] = [{"net": "GND_MODEM", "pos": list(OLD_GND_MODEM_VIA)},
-                           {"net": "GND_PWR", "pos": list(NT2_PWR_VIA)}]
+                           {"net": "GND_PWR", "pos": list(NT2_PWR_VIA)},
+                           {"net": "RT_3V8", "pos": list(RT_3V8_VIA)}]
     spec["add_items"] = (
         [("via", "", "GND_MODEM", 0.6, [v]) for v in GND_MODEM_VIAS]
         + [("via", "", "GND_PWR", 0.6, [v]) for v in GND_PWR_VIAS]
@@ -272,40 +278,21 @@ def check_additions(spec: dict) -> list[str]:
     return problems
 
 
-def cross_sections(geometry: dict) -> list[dict]:
-    LineString, Point, Polygon, unary_union = shapely()
+def return_resistance(candidate: Path) -> list[dict]:
+    """Finite-difference return resistance J2 pin -> tie domain pad, base 011 vs candidate."""
+    import sys
+
+    sys.path.insert(0, str(ROOT / "tools"))
+    from pcb_return_resistance_rev_a import load_case, resistance
+
     rows = []
-    for label, layer, net, line in PROBES:
-        parts = []
-        for fill in geometry["fills"]:
-            if fill["net"] == net and fill["layer"] == layer and len(fill["points"]) >= 3:
-                parts.append(Polygon(fill["points"], [h for h in fill["holes"] if len(h) >= 3]).buffer(0))
-        for track in geometry["tracks"]:
-            if track["net"] == net and track["layer"] == layer:
-                parts.append(LineString([track["start"], track["end"]]).buffer(track["width"] / 2))
-        for pad in geometry["pads"]:
-            if pad["net"] == net and layer in pad["layers"]:
-                parts.append(Polygon(pad["poly"]).buffer(0))
-        copper = unary_union(parts) if parts else None
-        (x0, y0), (x1, y1) = line
-        length = math.dist((x0, y0), (x1, y1))
-        ux, uy = (x1 - x0) / length, (y1 - y0) / length
-        widths = []
-        k = 0
-        while k * 0.25 <= length:
-            px, py = x0 + ux * k * 0.25, y0 + uy * k * 0.25
-            width = 0.0
-            if copper is not None:
-                cut = LineString([(px + uy * 5, py - ux * 5), (px - uy * 5, py + ux * 5)]).intersection(copper)
-                for piece in ([cut] if cut.geom_type == "LineString" else list(getattr(cut, "geoms", []))):
-                    if piece.distance(Point(px, py)) < 1e-6:
-                        width = piece.length
-                        break
-            widths.append((round(width, 3), [round(px, 2), round(py, 2)]))
-            k += 1
-        low = min(widths)
-        rows.append({"probe": label, "layer": layer, "net": net, "min_width_mm": low[0], "at_mm": low[1],
-                     "samples": len(widths)})
+    for net, source, sink, peak in RETURN_CASES:
+        entry = {"net": net, "path": f"{source[0]}.{source[1]} -> {sink[0]}.{sink[1]}"}
+        for label, board in (("base_011", BOARD), ("eco_005", candidate)):
+            result = resistance(str(board), net, source, sink, RETURN_WINDOW)
+            result["du_per_amp_mv_70c"] = result["r_mohm_70c"]
+            entry[label] = load_case(result, peak) if peak else result
+        rows.append(entry)
     return rows
 
 
@@ -336,9 +323,7 @@ def generate() -> None:
         if stage.returncode == 0:
             drc = docker("kicad-cli", "pcb", "drc", "--format", "json", "--severity-all",
                          "-o", f"{rel}/drc.json", f"{rel}/{STEM}.kicad_pcb")
-            dump = docker("/usr/bin/python3", "tools/pcb_pwr_eco_005_stage_rev_a.py", "dump", f"{rel}/{STEM}.kicad_pcb",
-                          f"{rel}/geometry.json")
-            summary["drc_rc"], summary["dump_rc"] = drc.returncode, dump.returncode
+            summary["drc_rc"] = drc.returncode
             docker("chmod", "-R", "a+rwX", str(rel))
             if not (WORK / "drc.json").exists():
                 summary["drc_stderr"] = drc.stderr[-1500:]
@@ -355,8 +340,8 @@ def generate() -> None:
                               "errors": [[v["type"]] + [i["description"] for i in v["items"]] for v in errors][:60],
                               "unconnected": [[i["description"] for i in u["items"]]
                                               for u in report["unconnected_items"]][:40]}
-            summary["return_cross_sections"] = cross_sections(json.loads((WORK / "geometry.json").read_text()))
             shutil.copyfile(WORK / f"{STEM}.kicad_pcb", OUT / f"{STEM}.kicad_pcb")
+            summary["return_resistance"] = return_resistance(OUT / f"{STEM}.kicad_pcb")
             shutil.copyfile(WORK / "drc.json", OUT / "drc.json")
             summary["candidate_sha256"] = sha256(OUT / f"{STEM}.kicad_pcb")
     (OUT / "SUMMARY.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
