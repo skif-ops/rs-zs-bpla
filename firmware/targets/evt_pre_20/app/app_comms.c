@@ -108,6 +108,11 @@ static bool execute_none(void *ctx, const zs_command_t *cmd, zs_command_ack_resu
   (void)ctx; (void)cmd; *r = ZS_COMMAND_ACK_REJECTED; *detail = 1u; return true;
 }
 
+/* The command executor (app_commands on the target) replaces execute_none from the next session on. */
+static zs_command_execute_fn executor = execute_none;
+static void *executor_ctx;
+void app_comms_set_executor(zs_command_execute_fn exec, void *ctx) { executor = exec ? exec : execute_none; executor_ctx = exec ? ctx : NULL; }
+
 void app_comms_set_command_key(const uint8_t public_key[ZS_COMMAND_PUBLIC_KEY_BYTES]) {
   if (public_key) { memcpy(command_key, public_key, sizeof(command_key)); command_key_set = true; }
   else { memset(command_key, 0, sizeof(command_key)); command_key_set = false; }
@@ -133,7 +138,7 @@ static bool start_session(const char *tenant) {
   if (command_key_set) memcpy(key.public_key, command_key, sizeof(key.public_key));
   else memset(key.public_key, 0xff, sizeof(key.public_key));          /* placeholder: never matches a real key id, backend rejects anyway */
   if (!zs_command_trust_init(&trust, &key, 1u, command_key_set ? verify_ed25519 : verify_none, NULL)) return false;
-  channel = (zs_command_channel_t){config.station_id, &trust, journal_io, execute_none, NULL, verify_workspace, sizeof(verify_workspace)};
+  channel = (zs_command_channel_t){config.station_id, &trust, journal_io, executor, executor_ctx, verify_workspace, sizeof(verify_workspace)};
   if (!zs_mqtt_command_transport_init(&command_transport, &channel, (const uint8_t *)tenant, strlen(tenant))) return false;
   if (!zs_mqtt_event_transport_init(&event_transport, outbox_io, config.station_id, (const uint8_t *)tenant, strlen(tenant))) return false;
   if (!zs_bg95_command_transport_init(&command_binding, &modem, &command_transport, true)) return false;
@@ -184,13 +189,25 @@ static void check_session_done(uint32_t now) {
   }
 }
 
+/* Wall time for the validity window of signed commands (zs_command_clock on the target).  Without a clock source
+   the uptime stands in and every command is rejected as TIME_UNTRUSTED, which is the safe default. */
+static bool (*clock_fn)(uint32_t now_ms, uint64_t *now_us);
+void app_comms_set_clock(bool (*now)(uint32_t now_ms, uint64_t *now_us)) { clock_fn = now; }
+static bool command_time(uint32_t now_ms, uint64_t *now_us) {
+  if (clock_fn && clock_fn(now_ms, now_us)) return true;
+  *now_us = (uint64_t)now_ms * 1000u;
+  return false;
+}
+
 /* Bring-up lines go to the modem driver; once the session exists it owns the byte stream. */
 static void feed_uart(uint32_t now_ms) {
   uint8_t buf[64];
   size_t n;
   while ((n = bsp_uart_read(BSP_UART_CELL, buf, sizeof(buf))) > 0u) {
     if (phase == COMMS_SESSION || phase == COMMS_ONLINE) {
-      (void)zs_bg95_mqtt_session_feed_uart(&session, buf, n, now_ms, (uint64_t)now_ms * 1000u, false);
+      uint64_t now_us;
+      const bool trusted = command_time(now_ms, &now_us);
+      (void)zs_bg95_mqtt_session_feed_uart(&session, buf, n, now_ms, now_us, trusted);
       continue;
     }
     for (size_t i = 0u; i < n; i++) {
@@ -286,7 +303,7 @@ void app_comms_step(void) {
       case COMMS_SESSION:
       case COMMS_ONLINE:
         zs_bg95_tick(&modem, now);
-        zs_bg95_mqtt_session_tick(&session, now, (uint64_t)now * 1000u, false);
+        { uint64_t now_us; const bool trusted = command_time(now, &now_us); zs_bg95_mqtt_session_tick(&session, now, now_us, trusted); }
         zs_station_comms_tick(&comms, now);
         if (phase == COMMS_SESSION && zs_bg95_mqtt_session_ready(&session)) { online_count++; set_phase(COMMS_ONLINE); }
         if (phase == COMMS_ONLINE) check_session_done(now);
