@@ -52,6 +52,9 @@ typedef struct {
   uint32_t heartbeat_period_ms;  /* S0 -> S3 for heartbeat when nothing else happens */
   uint32_t service_window_ms;    /* S4 auto-exit */
   uint32_t min_sleep_ms;         /* hysteresis: stay in S0 at least this long before MIC_WAKE is honoured */
+  bool boot_session;             /* BOOT_DONE requests a comms session after the self-check listen window: the reset
+                                    cause reaches the server and queued commands are delivered without waiting a
+                                    heartbeat period (default on) */
 } zs_mode_policy_t;
 
 typedef struct {
