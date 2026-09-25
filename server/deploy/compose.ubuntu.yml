@@ -20,6 +20,7 @@ services:
       ZS_MQTT_CA: /run/tls/ca-chain.pem
       ZS_MQTT_CERT: /run/tls/bridge.crt.pem
       ZS_MQTT_KEY: /run/tls/bridge.key.pem
+      ZS_OPERATOR_TRUSTED_PROXY: "1"          # 8000 is bound to 127.0.0.1: only the local HTTPS proxy / SSH tunnel reach it
     ports:
       - "127.0.0.1:8000:8000"
     volumes:

@@ -16,6 +16,12 @@
           <a class="nav-link" href="/localization">Локализация</a>
           <a class="nav-link" href="/dataset">Обучение</a>
         </div>
+        {% if request.state.operator %}
+        <form class="d-flex align-items-center" action="/logout" method="post">
+          <span class="navbar-text me-2">{{ request.state.operator.name }} ({{ request.state.operator.role }})</span>
+          <button class="btn btn-sm btn-outline-light" type="submit">Выйти</button>
+        </form>
+        {% endif %}
       </div>
     </nav>
     <main class="container py-4">

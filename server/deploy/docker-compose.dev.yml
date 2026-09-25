@@ -15,6 +15,7 @@ services:
       ZS_MQTT_PORT: "1883"
       ZS_TENANT: default
       ZS_STATION_HTTP_INSECURE_BENCH: "1"
+      ZS_OPERATOR_AUTH_INSECURE_BENCH: "1"          # isolated bench only: no operator login
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
