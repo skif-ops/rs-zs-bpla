@@ -318,7 +318,8 @@ def main() -> int:
     require(set(sections["bridge"]) == {
         f"topic {op} zs/v1/{tenant}/+/{suffix}"
         for tenant in tenants
-        for op, suffix in (("read", "up"), ("read", "status"), ("write", "down"), ("read", "ack"), ("write", "receipt"))
+        for op, suffix in (("read", "up"), ("read", "status"), ("write", "down"), ("read", "ack"), ("write", "receipt"),
+                               ("read", "audio"))                       # audio: addendum B
     }, "bridge MQTT ACL has missing or excessive rights")
     for serial, (tenant, station_id) in pilot_units.items():
         rights = sections[serial]
@@ -330,6 +331,7 @@ def main() -> int:
             f"topic read zs/v1/{tenant}/{station_id}/down",
             f"topic write zs/v1/{tenant}/{station_id}/ack",
             f"topic read zs/v1/{tenant}/{station_id}/receipt",
+            f"topic write zs/v1/{tenant}/{station_id}/audio",
         }, f"station {serial} MQTT ACL has missing or excessive rights")
 
     for token in (
