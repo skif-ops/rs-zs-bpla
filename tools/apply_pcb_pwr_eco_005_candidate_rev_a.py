@@ -359,6 +359,14 @@ def _generate() -> None:
                               "errors": [[v["type"]] + [i["description"] for i in v["items"]] for v in errors][:60],
                               "unconnected": [[i["description"] for i in u["items"]]
                                               for u in report["unconnected_items"]][:40]}
+            mismatched = sorted({i["description"].split()[1] for v in report["violations"]
+                                 if v["type"] == "lib_footprint_mismatch" for i in v["items"]})
+            if mismatched:
+                parity = docker("/usr/bin/python3", "tools/pcb_pwr_eco_005_stage_rev_a.py", "libdiff",
+                                f"{rel}/{STEM}.kicad_pcb", f"{rel}/libs", ",".join(mismatched))
+                lines = [line for line in parity.stdout.splitlines() if line.startswith("{")]
+                summary["library_parity"] = json.loads(lines[-1]) if lines else {"rc": parity.returncode,
+                                                                                  "stderr": parity.stderr[-1500:]}
             shutil.copyfile(WORK / f"{STEM}.kicad_pcb", OUT / f"{STEM}.kicad_pcb")
             summary["return_resistance"] = return_resistance(OUT / f"{STEM}.kicad_pcb")
             shutil.copyfile(WORK / "drc.json", OUT / "drc.json")

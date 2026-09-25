@@ -13,6 +13,9 @@ apply <in.kicad_pcb> <spec.json> <out.kicad_pcb>
                     board edge (keep if already clear, else nearest free spot at 0/90 deg,
                     else hide on silkscreen - the F.Fab reference stays)
     Every requested removal must match exactly one item, otherwise the stage fails.
+libdiff <board.kicad_pcb> <libs_dir> <refs,comma,separated>
+    Library-parity evidence: KiCad's own footprint comparison with its report (when the binding
+    exposes it) plus a pad/graphic comparison of the library copy placed at the instance pose.
 dump <board.kicad_pcb> <geometry.json>
     Same geometry dump as the autoroute stage, plus filled zone polygons per net/layer.
 """
@@ -192,6 +195,66 @@ def place_references(board) -> dict:
     return {"kept": sorted(kept), "moved": sorted(moved), "hidden": sorted(hidden)}
 
 
+def libdiff(board_path: str, libs_dir: str, refs: str) -> None:
+    import os
+
+    board = pcbnew.LoadBoard(board_path)
+    result = {}
+    for ref in refs.split(","):
+        try:
+            footprint = board.FindFootprintByReference(ref)
+            fpid = footprint.GetFPID()
+            lib, name = str(fpid.GetLibNickname()), str(fpid.GetLibItemName())
+            lib_fp = pcbnew.FootprintLoad(os.path.join(libs_dir, f"{lib}.pretty"), name)
+            entry = {"lib": f"{lib}:{name}"}
+            try:
+                reporter = pcbnew.WX_STRING_REPORTER()
+                entry["kicad_needs_update"] = bool(footprint.FootprintNeedsUpdate(lib_fp, 0, reporter))
+                entry["kicad_report"] = reporter.GetMessages()
+            except Exception as exc:  # binding differences between KiCad builds
+                entry["kicad_report_error"] = repr(exc)[:300]
+            lib_fp.SetPosition(footprint.GetPosition())
+            lib_fp.SetOrientation(footprint.GetOrientation())
+
+            def pads(fp):
+                out = []
+                for pad in fp.Pads():
+                    try:
+                        size = pad.GetSize()
+                    except TypeError:
+                        size = pad.GetSize(pcbnew.F_Cu)
+                    out.append((pad.GetNumber(), pcbnew.ToMM(pad.GetPosition().x), pcbnew.ToMM(pad.GetPosition().y),
+                                pcbnew.ToMM(size.x), pcbnew.ToMM(size.y), pcbnew.ToMM(pad.GetDrillSize().x),
+                                pad.GetLayerSet().FmtHex(), pad.GetAttribute()))
+                return sorted((tuple(round(v, 4) if isinstance(v, float) else v for v in row) for row in out), key=str)
+
+            def graphics(fp):
+                out = []
+                for item in fp.GraphicalItems():
+                    if item.GetClass() not in ("PCB_SHAPE", "FP_SHAPE"):
+                        out.append((item.GetClass(), board.GetLayerName(item.GetLayer())))
+                        continue
+                    box = item.GetBoundingBox()
+                    out.append((item.GetShapeStr(), board.GetLayerName(item.GetLayer()),
+                                round(pcbnew.ToMM(item.GetWidth()), 3),
+                                round(pcbnew.ToMM(box.GetX()), 3), round(pcbnew.ToMM(box.GetY()), 3),
+                                round(pcbnew.ToMM(box.GetRight()), 3), round(pcbnew.ToMM(box.GetBottom()), 3)))
+                return sorted(out, key=str)
+
+            pb, pl = pads(footprint), pads(lib_fp)
+            gb, gl = graphics(footprint), graphics(lib_fp)
+            entry["pads_only_on_board"] = [r for r in pb if r not in pl]
+            entry["pads_only_in_library"] = [r for r in pl if r not in pb]
+            entry["graphics_only_on_board"] = [r for r in gb if r not in gl]
+            entry["graphics_only_in_library"] = [r for r in gl if r not in gb]
+            entry["attributes"] = [footprint.GetAttributes(), lib_fp.GetAttributes()]
+            entry["models"] = [[m.m_Filename for m in footprint.Models()], [m.m_Filename for m in lib_fp.Models()]]
+            result[ref] = entry
+        except Exception as exc:
+            result[ref] = {"error": repr(exc)[:400]}
+    print(json.dumps(result))
+
+
 def dump(board_path: str, out_json: str) -> None:
     dump_geometry(board_path, out_json)
     board = pcbnew.LoadBoard(board_path)
@@ -222,5 +285,7 @@ if __name__ == "__main__":
         apply(sys.argv[2], sys.argv[3], sys.argv[4])
     elif sys.argv[1] == "dump":
         dump(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "libdiff":
+        libdiff(sys.argv[2], sys.argv[3], sys.argv[4])
     else:
         raise SystemExit(f"unknown mode {sys.argv[1]}")
