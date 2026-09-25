@@ -1,0 +1,2 @@
+# Queued by Claude 2026-09-25: PCB-MAIN 003 candidate run 1 (inner reroute, OCTOSPI length-matched)
+tools/apply_pcb_main_inner_reroute_003_candidate_rev_a.py
