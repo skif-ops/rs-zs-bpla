@@ -460,8 +460,9 @@ def remove_dangling(board, preroute_segments=(), preroute_vias=()) -> int:
             for layer in (pcbnew.F_Cu, pcbnew.In1_Cu, pcbnew.In2_Cu, pcbnew.B_Cu):
                 if zone_hit(net, layer, pos) or pad_hit(net, layer, pos):
                     links += 1
-            links += sum(1 for t in tracks if t.GetNetCode() == net and any(
-                math.hypot(end.x - pos.x, end.y - pos.y) <= radius for end in (t.GetStart(), t.GetEnd())))
+            # a track counts when it ends on the via or passes over its centre
+            links += sum(1 for t in tracks if t.GetNetCode() == net and (t.HitTest(pos, 0) or any(
+                math.hypot(end.x - pos.x, end.y - pos.y) <= radius for end in (t.GetStart(), t.GetEnd()))))
             if links < 2:
                 doomed.append(via)
         for track in tracks:
