@@ -75,6 +75,14 @@ bool zs_prehistory_read_record_info(const zs_prehistory_t *ring,
                                     uint64_t sequence,
                                     zs_prehistory_record_info_t *out);
 
+/* Reads `len` payload bytes at `offset` of the record at `sequence` (the caller checked the record with
+   zs_prehistory_read_record_info; the audio upload re-checks it after reading). */
+bool zs_prehistory_read_payload(const zs_prehistory_t *ring,
+                                uint64_t sequence,
+                                uint32_t offset,
+                                uint8_t *data,
+                                size_t len);
+
 /*
  * Verifies CRC for all selected records first, then copies chronological IMA
  * blocks into the active event archive using only the caller scratch buffer.
