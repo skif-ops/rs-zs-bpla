@@ -17,6 +17,7 @@
 #include "app_config.h"
 #include "app_comms.h"
 #include "app_lora.h"
+#include "app_watchdog.h"
 #include "app_nrf_update.h"
 #include "app_power.h"
 #include "bsp_gpio.h"
@@ -148,6 +149,7 @@ static void audio_task_fn(void *arg) {
   (void)arg;
   for (;;) {
     ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
+    app_watchdog_checkin(APP_WD_AUDIO);
     while (zs_pdm_capture_process(&capture)) {}
     (void)zs_pps_sync_poll(&pps, bsp_tim2_pps_now());
     (void)zs_time_update(&time_sync, zs_pdm_capture_sample_counter(&capture));
@@ -189,7 +191,8 @@ static void dsp_mode_events(void) {
 static void dsp_task_fn(void *arg) {
   (void)arg;
   for (;;) {
-    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(1000));          /* timed wait: the watchdog sees an idle DSP as alive */
+    app_watchdog_checkin(APP_WD_DSP);
     while (pipeline.pending) {
       const uint32_t t0 = xTaskGetTickCount();
       (void)zs_station_pipeline_run_pending(&pipeline);
@@ -276,6 +279,9 @@ static void supervisor_task_fn(void *arg) {
   } else {
     console_printf("selftest: required test failed, staying in S0\r\n");
   }
+  app_watchdog_start();
+  console_printf("boot: reset cause %s%s, watchdog running (%lu s)\r\n", app_watchdog_reset_cause_name(),
+                 app_watchdog_previous_missed() ? " - a supervised task had stopped" : "", (unsigned long)(APP_WATCHDOG_TIMEOUT_MS / 1000u));
   for (;;) {
     uint32_t bits = 0u;
     uint32_t now;
@@ -283,6 +289,7 @@ static void supervisor_task_fn(void *arg) {
     now = xTaskGetTickCount();
     for (unsigned ev = 1u; ev < 32u; ev++) if (bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, now);
     (void)zs_mode_tick(&modes, now);
+    app_watchdog_service();
     outbox_retry_tick(now);
     gsm_probe_tick(now);
     if (bsp_gpio_power_fault()) (void)zs_mode_on_event(&modes, ZS_MODE_EV_FAULT, now);
@@ -334,6 +341,7 @@ static void gnss_task_fn(void *arg) {
     uint8_t buf[32];
     size_t n;
     ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(500));
+    app_watchdog_checkin(APP_WD_GNSS);
     while ((n = bsp_uart_read(BSP_UART_GNSS, buf, sizeof(buf))) > 0u) {
       for (size_t i = 0u; i < n; i++) {
         char c = (char)buf[i];
@@ -448,7 +456,19 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   if (stores_on_nor && zs_event_outbox_pending_count(&nor_outbox_io, &pending) == ZS_EVENT_OUTBOX_OK) hb->detector.outbox_pending = pending;
   hb->detector.window_max_ms = (uint16_t)(pipeline_max_ms > 65535u ? 65535u : pipeline_max_ms);
   hb->detector.presence_level = pipeline.presence.level;
+  hb->detector.reset_cause = app_watchdog_reset_cause();
+  hb->detector.watchdog_missed = app_watchdog_previous_missed();
   return true;
+}
+/* The comms duty loop (app_comms_task's body, as the host simulation and the twin drive it) plus the watchdog
+   check-in; app_comms.c stays target/host neutral. */
+static void comms_task_fn(void *arg) {
+  (void)arg;
+  for (;;) {
+    app_comms_step();
+    app_watchdog_checkin(APP_WD_COMMS);
+    vTaskDelay(pdMS_TO_TICKS(20));
+  }
 }
 static void comms_session_done(void *ctx) { (void)ctx; outbox_retry_backoff_ms = APP_OUTBOX_RETRY_MS; outbox_retry_at_ms = 0u; mode_event(ZS_MODE_EV_COMMS_DONE); }
 static bool outbox_has_pending(void) { uint16_t pending = 0u; return stores_on_nor && zs_event_outbox_pending_count(&nor_outbox_io, &pending) == ZS_EVENT_OUTBOX_OK && pending > 0u; }
@@ -565,10 +585,11 @@ static void ble_task_fn(void *arg) {
     uint8_t buf[64];
     size_t n;
     (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(250));
+    app_watchdog_checkin(APP_WD_BLE);
     { static uint32_t seen_version; if (ipc.config_loaded && ipc.config.version != seen_version) { seen_version = ipc.config.version; app_comms_set_config(&ipc.config, boot_id); } }
     while ((n = bsp_uart_read(BSP_UART_BLE, buf, sizeof(buf))) > 0u) zs_ipc_service_on_uart_rx(&ipc, buf, n);
     if (ble_recovery_request) { ble_recovery_request = false; ble_enter_recovery(); (void)zs_ipc_service_init(&ipc, &ipc_port); }
-    if (app_nrf_update_pending()) { app_nrf_update_run(); (void)zs_ipc_service_init(&ipc, &ipc_port); (void)zs_ipc_service_ping(&ipc); }
+    if (app_nrf_update_pending()) { app_watchdog_hold(APP_WD_BLE, APP_NRF_UPDATE_HOLD_MS); app_nrf_update_run(); (void)zs_ipc_service_init(&ipc, &ipc_port); (void)zs_ipc_service_ping(&ipc); }
     /* until the bridge has answered once, repeat the link check every 2 s (nRF boot / re-flash on the bench) */
     if (ipc.pongs_seen == 0u && (uint32_t)(xTaskGetTickCount() - last_ping) >= 2000u) { last_ping = xTaskGetTickCount(); (void)zs_ipc_service_ping(&ipc); }
     const bool want = modes.mode == ZS_MODE_S4_SERVICE;
@@ -679,6 +700,12 @@ static void console_exec(const char *cmd) {
     console_printf((!secrets_on_nor || zs_station_secrets_clear(&secrets_io) == ZS_STATION_SECRETS_OK) ? "secrets: cleared (sim iccids apply after reboot)\r\n" : "secrets: nor clear failed\r\n");
   } else if (strcmp(cmd, "power") == 0) {
     app_power_status(console_printf);
+  } else if (strcmp(cmd, "wd") == 0) {
+    app_watchdog_status(console_printf);
+  } else if (strncmp(cmd, "wdtest ", 7u) == 0) {
+    const int t = atoi(cmd + 7);
+    if (t >= (int)APP_WD_AUDIO && t <= (int)APP_WD_GNSS) { app_watchdog_simulate_stall((app_wd_task_t)t); console_printf("wdtest: task %d stops checking in, reset expected within %lu s\r\n", t, (unsigned long)((APP_WATCHDOG_WINDOW_MS * 2u + APP_WATCHDOG_TIMEOUT_MS) / 1000u)); }
+    else console_printf("wdtest <1..7>: 1 audio 2 dsp 3 comms 4 ble 5 power 6 lora 7 gnss\r\n");
   } else if (strcmp(cmd, "lora") == 0) {
     app_lora_status(console_printf);
   } else if (strcmp(cmd, "lora on") == 0 || strcmp(cmd, "lora off") == 0) {
@@ -686,7 +713,7 @@ static void console_exec(const char *cmd) {
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] power lora [on|off] heap\r\n");
+    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] power lora [on|off] wd wdtest heap\r\n");
   }
 }
 
@@ -738,13 +765,15 @@ bool app_tasks_create(void) {
   (void)zs_selftest_register(&selftests, ZS_ST_ID_GNSS_PPS, "gnss_pps", st_gnss_pps, &pps, false);
   (void)zs_selftest_register(&selftests, ZS_ST_ID_RTC_LSE, "rtc_lse", st_rtc_lse, NULL, true);
 
+  app_watchdog_capture_reset_cause();
+  for (unsigned t = APP_WD_AUDIO; t <= APP_WD_GNSS; t++) app_watchdog_register((app_wd_task_t)t);
   if (xTaskCreate(audio_task_fn, "audio", APP_STACK_AUDIO, NULL, APP_PRIO_AUDIO, &audio_task) != pdPASS) return false;
   if (xTaskCreate(supervisor_task_fn, "superv", APP_STACK_SUPERVISOR, NULL, APP_PRIO_SUPERVISOR, &supervisor_task) != pdPASS) return false;
   if (xTaskCreate(gnss_task_fn, "gnss", APP_STACK_SERVICE, NULL, APP_PRIO_SERVICE, &gnss_task) != pdPASS) return false;
   if (xTaskCreate(console_task_fn, "console", APP_STACK_CONSOLE, NULL, APP_PRIO_CONSOLE, &console_task) != pdPASS) return false;
   if (xTaskCreate(ble_task_fn, "ble", APP_STACK_BLE, NULL, APP_PRIO_BLE, &ble_task) != pdPASS) return false;
   if (xTaskCreate(dsp_task_fn, "dsp", APP_STACK_DSP, NULL, APP_PRIO_DSP, &dsp_task) != pdPASS) return false;
-  if (xTaskCreate(app_comms_task, "comms", APP_STACK_COMMS, NULL, APP_PRIO_COMMS, &comms_task) != pdPASS) return false;
+  if (xTaskCreate(comms_task_fn, "comms", APP_STACK_COMMS, NULL, APP_PRIO_COMMS, &comms_task) != pdPASS) return false;
   if (xTaskCreate(app_power_task, "power", APP_STACK_POWER, NULL, APP_PRIO_POWER, &power_task) != pdPASS) return false;
   if (xTaskCreate(app_lora_task, "lora", APP_STACK_LORA, NULL, APP_PRIO_LORA, &lora_task) != pdPASS) return false;
   return true;

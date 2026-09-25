@@ -1,6 +1,7 @@
 #include "app_lora.h"
 #include "app_config.h"
 #include "app_power.h"
+#include "app_watchdog.h"
 #include "bsp_spi.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -105,6 +106,7 @@ void app_lora_task(void *arg) {
   if (radio_ok) (void)zs_sx1262_set_sleep(&radio);                 /* idle until the first frame */
   for (;;) {
     const uint32_t now = xTaskGetTickCount();
+    app_watchdog_checkin(APP_WD_LORA);
     if (rebind) { rebind = false; uplink_ready = false; }
     if (!uplink_ready && bound && key_set) uplink_ready = zs_lora_uplink_init(&uplink, &port, outbox_io, station_id, APP_LORA_PROFILE_ID, engineer_key, APP_LORA_SF, APP_LORA_BW_HZ, now);
     if (uplink_ready) {

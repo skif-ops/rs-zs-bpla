@@ -105,6 +105,7 @@ add_executable(dioneya_evt_pre_20.elf
   app_comms.c
   app_power.c
   app_lora.c
+  app_watchdog.c
   hal_msp.c
   stm32u5xx_it.c
   syscalls.c

@@ -263,7 +263,7 @@ size_t zs_protocol_encode_heartbeat(const zs_heartbeat_t *m, uint8_t *out, size_
   if (with_detector) {
     const zs_detector_health_t *d = &m->detector;
     zs_cbor_uint(&c, 13u);
-    zs_cbor_map(&c, 12u);
+    zs_cbor_map(&c, 14u);
     kvu(&c, 0u, d->boot_id);
     kvu(&c, 1u, d->uptime_s);
     kvu(&c, 2u, d->windows);
@@ -276,6 +276,8 @@ size_t zs_protocol_encode_heartbeat(const zs_heartbeat_t *m, uint8_t *out, size_
     kvu(&c, 9u, d->outbox_pending);
     kvu(&c, 10u, d->window_max_ms);
     kvu(&c, 11u, d->presence_level);
+    kvu(&c, 12u, d->reset_cause);
+    kvu(&c, 13u, d->watchdog_missed);
   }
 
   return c.error ? 0u : c.len;

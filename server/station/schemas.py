@@ -361,6 +361,9 @@ class DetectorHealth(BaseModel):
     outbox_pending: int = Field(default=0, ge=0)
     window_max_ms: int = Field(default=0, ge=0)
     presence_level: Literal["NONE", "SUSPECT", "ENGINE_UNCONFIRMED", "CONFIRMED"] = "NONE"
+    # key 12/13: why this boot started and which supervised tasks let the hardware watchdog fire before it
+    reset_cause: Literal["UNKNOWN", "POWER", "PIN", "SOFTWARE", "IWDG", "WWDG", "LOW_POWER", "OPTION_BYTES"] = "UNKNOWN"
+    watchdog_missed_tasks: int = 0
 
 
 class HeartbeatMessage(BaseModel):

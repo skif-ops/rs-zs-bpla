@@ -23,6 +23,7 @@ from station.schemas import (
 _MSG_DETECTION = 2
 _MSG_HEARTBEAT = 3
 _SUPPORTED_DETECTION_SCHEMAS = frozenset({1, 3, 4})
+_RESET_CAUSE = {1: "POWER", 2: "PIN", 3: "SOFTWARE", 4: "IWDG", 5: "WWDG", 6: "LOW_POWER", 7: "OPTION_BYTES"}
 _SUPPORTED_HEARTBEAT_SCHEMAS = frozenset({1, 2})   # 2 adds the optional detector map (key 13)
 _ROUTE = {0: "LTE", 1: "NB_IOT", 2: "2G", 3: "LORA", 4: "BLE", 5: "TEST"}
 _PROFILE = {0: "generic", 1: "piston", 2: "reactive"}
@@ -381,6 +382,8 @@ def decode_heartbeat_obj(obj: Any) -> HeartbeatMessage:
             outbox_pending=int(detector.get(9, 0)),
             window_max_ms=int(detector.get(10, 0)),
             presence_level=_PRESENCE_LEVEL.get(int(detector.get(11, 0)), "NONE"),
+            reset_cause=_RESET_CAUSE.get(int(detector.get(12, 0)), "UNKNOWN"),
+            watchdog_missed_tasks=int(detector.get(13, 0)),
         ),
     )
 
