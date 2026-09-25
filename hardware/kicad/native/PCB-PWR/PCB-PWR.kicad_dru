@@ -11,3 +11,8 @@
   (condition "(A.memberOfFootprint('U3') && B.memberOfFootprint('U3')) || (A.memberOfFootprint('U4') && B.memberOfFootprint('U4'))")
   (constraint clearance (min 0.12mm))
 )
+
+(rule "U2 VSSOP-10 land pattern"
+  (condition "A.memberOfFootprint('U2') && B.memberOfFootprint('U2')")
+  (constraint clearance (min 0.19mm))
+)
