@@ -24,7 +24,7 @@ def main() -> int:
     gitignore = read(".gitignore")
     readme = read("server/deploy/README.md")
     audit = read("server/EVT_PRE_20_RELEASE_AUDIT.md")
-    ci = read(".github/workflows/ci.yml")
+    gates = read("server/tests/test_operator_auth_gates.py")
     prod = {name: read(f"server/deploy/{name}") for name in ("compose.ubuntu.yml", "compose.windows.tls.yml")}
     bench = {name: read(f"server/deploy/{name}") for name in ("docker-compose.dev.yml", "compose.windows.yml")}
 
@@ -78,7 +78,8 @@ def main() -> int:
     require("proxy_set_header Host" in readme, "reverse proxy Host requirement undocumented")
     require("Пункт 1 остаётся открытым до\ndeployment-проверок" in audit and "station/operator_auth.py" in audit,
             "release audit does not state the operator auth scope")
-    require("validate_operator_auth.py" in ci and "audit_operator_auth_technical.py" in ci,
+    # bound to CI through the server job's `pytest tests` (a dedicated ci.yml step may be added as well)
+    require("validate_operator_auth.py" in gates and "audit_operator_auth_technical.py" in gates,
             "operator auth QG-1/QG-2 are not bound to CI")
 
     print("Operator authentication QG-1 completeness/traceability: PASS")
