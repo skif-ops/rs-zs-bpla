@@ -1,0 +1,75 @@
+{
+  "schema": "dioneya-pcb-pwr-eco-006-candidate-v1",
+  "eco": "PCB-PWR ECO-006",
+  "responds_to": "Review B R2.002 decisions: DFM-PWR-02 fix, DFM-PWR-03 fix (reference designators)",
+  "base_sha256": "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610",
+  "candidate_sha256": "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7",
+  "library_base_sha256": "0ee0d3c81dc5261cad7e2ce69e39f212b83609fc7d86265a440129b26d22d823",
+  "library_candidate_sha256": "86d8f611057d3e8d2e32f738a736707a6530c79ea15670a529ed51b37c1c8418",
+  "delta": {
+    "changed_reference_lines": 294,
+    "changed_mask_lines": 10,
+    "outside_delta": [],
+    "outside_delta_count": 0
+  },
+  "invariants": {
+    "semantic_sha256_base": "4c835eae78eaf1e43116642bc5d5ceafed0c156abfc1a7906293f94636e8d1e2",
+    "semantic_sha256_candidate": "4c835eae78eaf1e43116642bc5d5ceafed0c156abfc1a7906293f94636e8d1e2",
+    "trace_items": [
+      842,
+      842
+    ],
+    "zones": [
+      33,
+      33
+    ],
+    "trace_items_identical": true,
+    "zones_identical": true,
+    "tp_mask_margins": [
+      "0.1"
+    ]
+  },
+  "refs": {
+    "text_height_mm": 1.0,
+    "stroke_mm": 0.15,
+    "opening_gap_mm": 0.15,
+    "silk_gap_mm": 0.1,
+    "edge_gap_mm": 0.3,
+    "resized": 62,
+    "kept": 38,
+    "moved": 22,
+    "hidden": 2
+  },
+  "hidden_references": [
+    "NT3",
+    "U5"
+  ],
+  "drc": {
+    "error_total": 0,
+    "unconnected_total": 0,
+    "by_type": {
+      "warning:silk_over_copper": 9
+    }
+  },
+  "dfm_counts": {
+    "A_smd_pad_to_pad": 4,
+    "C_mask_opening_to_copper": 4,
+    "D_large_pad_paste_coverage": 67,
+    "D_paste_all": 149,
+    "E_legend_line": 97,
+    "E_legend_to_opening": 48,
+    "F_pad_hole_to_hole": 1
+  },
+  "steps": {
+    "refs": {
+      "rc": 0,
+      "stderr": ""
+    },
+    "drc": {
+      "rc": 0,
+      "stderr": ""
+    }
+  },
+  "manufacturing_release": false,
+  "applied_to_authoritative_board": false
+}

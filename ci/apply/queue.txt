@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-25: PCB-PWR ECO-006 candidate run 1 (DFM-PWR-02 TP mask 0.1 mm, DFM-PWR-03 legend 1.0/0.15 mm)
-tools/apply_pcb_pwr_eco_006_candidate_rev_a.py

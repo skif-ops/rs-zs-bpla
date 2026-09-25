@@ -1,0 +1,151 @@
+{
+    "$schema": "https://schemas.kicad.org/drc.v1.json",
+    "coordinate_units": "mm",
+    "date": "2026-09-25T13:59:53+0000",
+    "included_severities": [
+        "error",
+        "warning",
+        "exclusion"
+    ],
+    "kicad_version": "9.0.9",
+    "schematic_parity": [],
+    "source": "PCB-PWR.kicad_pcb",
+    "unconnected_items": [],
+    "violations": [
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Polygon of U1 on F.Silkscreen",
+                    "pos": {
+                        "x": 18.52,
+                        "y": 28.92
+                    },
+                    "uuid": "00022571-99ac-4c67-afa2-3332d20da20b"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Polygon of Q1 on F.Silkscreen",
+                    "pos": {
+                        "x": 29.62,
+                        "y": 32.62
+                    },
+                    "uuid": "b61229d5-5ac8-4d38-b1c4-6b7384244ccf"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Polygon of RSH1 on F.Silkscreen",
+                    "pos": {
+                        "x": 33.0,
+                        "y": 29.25
+                    },
+                    "uuid": "85cbe586-efc6-4128-8ce2-9fe5042efc5a"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Segment of U3 on F.Silkscreen",
+                    "pos": {
+                        "x": 53.52,
+                        "y": 14.9
+                    },
+                    "uuid": "d9c2280a-dc29-4789-87e6-05c555463c83"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Segment of U3 on F.Silkscreen",
+                    "pos": {
+                        "x": 53.62,
+                        "y": 15.0
+                    },
+                    "uuid": "69614ddc-2fcc-42f6-aa46-0f555a57ba4c"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Polygon of U2 on F.Silkscreen",
+                    "pos": {
+                        "x": 41.7,
+                        "y": 21.82
+                    },
+                    "uuid": "76e9aeaf-a669-4e04-9e1e-50d8acb3cdab"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Segment of U4 on F.Silkscreen",
+                    "pos": {
+                        "x": 53.52,
+                        "y": 42.9
+                    },
+                    "uuid": "afa89bfa-3d7c-4781-8869-0189476140c2"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Segment of U4 on F.Silkscreen",
+                    "pos": {
+                        "x": 53.62,
+                        "y": 43.0
+                    },
+                    "uuid": "603ef7ce-165b-47ba-bb48-4ad8b9675146"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Polygon of U5 on F.Silkscreen",
+                    "pos": {
+                        "x": 72.92,
+                        "y": 44.92
+                    },
+                    "uuid": "771a0eba-4602-43b4-ac93-d103311df001"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        }
+    ]
+}
