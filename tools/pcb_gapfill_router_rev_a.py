@@ -53,6 +53,8 @@ class GapFillRouter:
         for via in self.geometry["vias"]:
             items.append((via["net"], all_layers, Point(via["pos"]).buffer(via["size"] / 2)))
         for pad in self.geometry["pads"]:
+            if not pad["layers"]:
+                continue  # paste/mask-only apertures carry no copper
             items.append((pad["net"], set(pad["layers"]), Polygon(pad["poly"]) if len(pad["poly"]) >= 3
                           else Point(pad["pos"]).buffer(0.3)))
         return items
@@ -91,10 +93,16 @@ class GapFillRouter:
                 if layer in item_layers:
                     self._rasterize(track_block[index], shape, gap + self.width / 2)
             self._rasterize(via_block, shape, gap + self.via_size / 2)
-        # no via in or next to any SMD pad, own net included (solder wicking)
+        # no via in or next to any SMD pad, own net included (solder wicking); own
+        # vias and plated holes keep >= 0.25 mm hole-to-hole
         for pad in self.geometry["pads"]:
-            if pad["net"] == net and pad["layers"] == ["F.Cu"] and len(pad["poly"]) >= 3:
-                self._rasterize(via_block, Polygon(pad["poly"]), self.via_size / 2 + 0.05)
+            if pad["net"] != net or len(pad["poly"]) < 3 or not pad["layers"]:
+                continue
+            margin = self.via_size / 2 + (0.05 if pad["layers"] == ["F.Cu"] else 0.3)
+            self._rasterize(via_block, Polygon(pad["poly"]), margin)
+        for via in self.geometry["vias"]:
+            if via["net"] == net:
+                self._rasterize(via_block, Point(via["pos"]).buffer(via["size"] / 2), 0.55)
         x0, y0, x1, y1 = self.geometry["outline"]
         frame = box(x0, y0, x1, y1).exterior.buffer(0.001)
         for index in range(len(self.layers)):
@@ -123,6 +131,9 @@ class GapFillRouter:
         for item_net, item_layers, shape in self.items + self._routed_shapes():
             if item_net != net or shape.distance(point) > 0.05:
                 continue
+            # land strictly on copper: erode rounded/approximated outlines
+            eroded = shape.buffer(-0.12)
+            shape = eroded if not eroded.is_empty else shape.centroid.buffer(0.05)
             minx, miny, maxx, maxy = shape.bounds
             i0, j0 = self._cell(minx, miny)
             i1, j1 = self._cell(maxx, maxy)
@@ -198,6 +209,7 @@ class GapFillRouter:
         return True
 
     def _emit(self, net: str, path: list[tuple[int, int, int]]) -> None:
+        path = _merge_close_hops(path, int(round(0.6 / GRID_MM)))
         segment: list[tuple[float, float]] = []
         current_layer = path[0][0]
         for layer, i, j in path:
@@ -214,8 +226,27 @@ class GapFillRouter:
             self.routed.append(("track", self.layers[current_layer], net, self.width, _simplify(segment)))
 
 
+def _merge_close_hops(path: list[tuple[int, int, int]], min_cells: int) -> list[tuple[int, int, int]]:
+    """Two layer changes closer than min_cells (a short excursion to another layer
+    and back) are folded back onto the original layer."""
+    changed = True
+    while changed:
+        changed = False
+        changes = [k for k in range(1, len(path)) if path[k][0] != path[k - 1][0]]
+        for first, second in zip(changes, changes[1:]):
+            if path[first - 1][0] == path[second][0]:
+                a, b = path[first], path[second - 1]
+                if max(abs(a[1] - b[1]), abs(a[2] - b[2])) < min_cells:
+                    layer = path[first - 1][0]
+                    path = path[:first] + [(layer, i, j) for _, i, j in path[first:second]] + path[second:]
+                    changed = True
+                    break
+    return path
+
+
 def _simplify(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
-    """Drop collinear grid points so the track is a short polyline."""
+    """Drop repeated and collinear grid points so the track is a short polyline."""
+    points = [p for k, p in enumerate(points) if k == 0 or p != points[k - 1]]
     if len(points) <= 2:
         return points
     kept = [points[0]]
