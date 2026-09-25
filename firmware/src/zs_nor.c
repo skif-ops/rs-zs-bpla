@@ -210,12 +210,26 @@ zs_nor_probe_result_t zs_nor_probe_w25q512jv(
   return ZS_NOR_PROBE_OK;
 }
 
+void zs_nor_set_lock(zs_nor_t *nor, void (*lock)(void *ctx), void (*unlock)(void *ctx), void *ctx) {
+  if (!nor) return;
+  nor->lock = (lock && unlock) ? lock : NULL;
+  nor->unlock = (lock && unlock) ? unlock : NULL;
+  nor->lock_ctx = ctx;
+}
+
+static void bus_lock(zs_nor_t *nor) { if (nor->lock) nor->lock(nor->lock_ctx); }
+static void bus_unlock(zs_nor_t *nor) { if (nor->unlock) nor->unlock(nor->lock_ctx); }
+
 bool zs_nor_read(zs_nor_t *nor, uint32_t address, uint8_t *data, size_t len) {
+  bool ok;
   if (!nor || (!data && len != 0u) || !range_ok(nor, address, len)) return false;
   if (len == 0u) return true;
-  if (!zs_nor_wait_ready(nor, nor->program_timeout_ms)) return false;
-  return nor->port.command(nor->port.ctx, nor->geometry.read_opcode, address,
-                           nor->geometry.address_bytes, NULL, 0u, data, len) == 0;
+  bus_lock(nor);
+  ok = zs_nor_wait_ready(nor, nor->program_timeout_ms) &&
+       nor->port.command(nor->port.ctx, nor->geometry.read_opcode, address,
+                         nor->geometry.address_bytes, NULL, 0u, data, len) == 0;
+  bus_unlock(nor);
+  return ok;
 }
 
 bool zs_nor_program(zs_nor_t *nor, uint32_t address, const uint8_t *data, size_t len) {
@@ -227,11 +241,14 @@ bool zs_nor_program(zs_nor_t *nor, uint32_t address, const uint8_t *data, size_t
     const uint32_t page_off = a % nor->geometry.page_bytes;
     const uint32_t room = nor->geometry.page_bytes - page_off;
     const size_t chunk = remaining < room ? remaining : (size_t)room;
-    if (!zs_nor_wait_ready(nor, nor->program_timeout_ms)) return false;
-    if (!zs_nor_write_enable(nor)) return false;
-    if (nor->port.command(nor->port.ctx, nor->geometry.program_opcode, a,
-                          nor->geometry.address_bytes, p, chunk, NULL, 0u) != 0) return false;
-    if (!zs_nor_wait_ready(nor, nor->program_timeout_ms)) return false;
+    bool ok;
+    bus_lock(nor);
+    ok = zs_nor_wait_ready(nor, nor->program_timeout_ms) && zs_nor_write_enable(nor) &&
+         nor->port.command(nor->port.ctx, nor->geometry.program_opcode, a,
+                           nor->geometry.address_bytes, p, chunk, NULL, 0u) == 0 &&
+         zs_nor_wait_ready(nor, nor->program_timeout_ms);
+    bus_unlock(nor);
+    if (!ok) return false;
     a += (uint32_t)chunk;
     p += chunk;
     remaining -= chunk;
@@ -246,11 +263,14 @@ bool zs_nor_erase(zs_nor_t *nor, uint32_t address, size_t len) {
   uint32_t a = address;
   size_t remaining = len;
   while (remaining != 0u) {
-    if (!zs_nor_wait_ready(nor, nor->erase_timeout_ms)) return false;
-    if (!zs_nor_write_enable(nor)) return false;
-    if (nor->port.command(nor->port.ctx, nor->geometry.erase_opcode, a,
-                          nor->geometry.address_bytes, NULL, 0u, NULL, 0u) != 0) return false;
-    if (!zs_nor_wait_ready(nor, nor->erase_timeout_ms)) return false;
+    bool ok;
+    bus_lock(nor);
+    ok = zs_nor_wait_ready(nor, nor->erase_timeout_ms) && zs_nor_write_enable(nor) &&
+         nor->port.command(nor->port.ctx, nor->geometry.erase_opcode, a,
+                           nor->geometry.address_bytes, NULL, 0u, NULL, 0u) == 0 &&
+         zs_nor_wait_ready(nor, nor->erase_timeout_ms);
+    bus_unlock(nor);
+    if (!ok) return false;
     a += nor->geometry.erase_bytes;
     remaining -= nor->geometry.erase_bytes;
   }
