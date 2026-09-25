@@ -32,6 +32,14 @@ def run(args: list[str]) -> tuple[str, dict]:
 
 
 def main() -> int:
+    try:
+        import cbor2  # noqa: F401 - the server twin needs the protocol dependencies (server/requirements-protocol.lock.txt)
+    except ImportError:
+        print("SKIP: server protocol dependencies not installed (pip install -r server/requirements-protocol.lock.txt)")
+        return 77
+    if not TWIN.exists():
+        print(f"SKIP: {TWIN} not built")
+        return 77
     log, r = run(["--scene", "drone", "--seconds", "140", "--seed", "3", "--receipt-latency", "2000", "--expect-events", "1", "--expect-delivered", "1"])
     assert r["detections"] >= 1 and r["duplicates"] == 0 and r["decode_errors"] == 0, r
     assert "session done -> COMMS_DONE" in log
