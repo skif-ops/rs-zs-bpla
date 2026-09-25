@@ -384,6 +384,7 @@ def decode_heartbeat_obj(obj: Any) -> HeartbeatMessage:
             presence_level=_PRESENCE_LEVEL.get(int(detector.get(11, 0)), "NONE"),
             reset_cause=_RESET_CAUSE.get(int(detector.get(12, 0)), "UNKNOWN"),
             watchdog_missed_tasks=int(detector.get(13, 0)),
+            params_version=int(detector.get(14, 0)),
         ),
     )
 
