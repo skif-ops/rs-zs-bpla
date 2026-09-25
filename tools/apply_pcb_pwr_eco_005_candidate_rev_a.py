@@ -19,6 +19,7 @@ Delta (nets, netlist and net-tie count unchanged; no new domain join):
   - GND_DIGITAL: F.Cu zone with solid pad connection from J2.4 straight to the rotated NT2;
   - GND_MIC (0.3 A class): second via 0.6/0.3 beside the existing one;
   - GND_PWR: 5 plane vias on the GND_PWR side of NT1/NT2/NT3.
+Run 3: 0 unconnected, 1 hole_clearance (NT2 bridge vs a GND_PWR via) -> via moved, graphics screened.
 --check verifies the candidate matches SUMMARY.json.
 """
 
@@ -47,7 +48,7 @@ DOMAINS = ("GND_MODEM", "GND_DIGITAL")      # router tracks of these nets in REG
 # item on F.Cu and B.Cu, 0.8 mm pitch); see hardware/reviews/PCB_PWR_ECO_005_REV_A.md.
 GND_MODEM_VIAS = [(73.85, 42.15), (74.4, 42.75), (74.15, 43.55)]        # B.Cu band -> F.Cu at NT1
 GND_PWR_VIAS = [(76.65, 39.15),                                          # NT1 GND_PWR side
-                (74.35, 48.15), (73.75, 48.75), (74.75, 48.85),          # NT2 GND_PWR side (rotated)
+                (74.35, 48.15), (73.75, 48.75), (74.55, 49.05),          # NT2 GND_PWR side (rotated)
                 (76.95, 51.15)]                                          # NT3 GND_PWR side
 OLD_GND_MODEM_VIA = (74.35, 42.55)
 NT2_PWR_STUBS = [((76.1, 48.52), (76.6, 48.52)), ((76.6, 48.52), (76.6, 51.5)), ((76.6, 51.5), (76.1, 52.0))]
@@ -61,13 +62,12 @@ GND_MIC_SECOND_VIA = [
 ]
 GND_DIGITAL_ZONE = [(75.8, 46.4), (82.6, 46.4), (82.6, 50.4), (75.8, 50.4)]
 # cross-section probes: (label, layer, net, polyline) - cuts every 0.25 mm perpendicular to the line
-PROBES = [
-    ("GND_MODEM J2.2->vias", "B.Cu", "GND_MODEM", [(80.2, 43.0), (74.6, 43.0)]),
-    ("GND_MODEM vias->NT1", "F.Cu", "GND_MODEM", [(74.0, 42.3), (74.0, 40.4)]),
-    ("GND_DIGITAL J2.4->NT2", "F.Cu", "GND_DIGITAL", [(80.2, 48.3), (76.6, 48.3)]),
-    ("GND_PWR NT1 east", "F.Cu", "GND_PWR", [(76.4, 40.12), (77.2, 40.12)]),
+PROBES = [  # lines chosen clear of other-net pads (J2 inner row, cap pads)
+    ("GND_MODEM J2.2->vias, below J2.8", "B.Cu", "GND_MODEM", [(80.3, 44.4), (75.5, 44.4)]),
+    ("GND_MODEM vias->NT1, between C17/C19 pads", "F.Cu", "GND_MODEM", [(74.0, 43.0), (74.0, 40.6)]),
+    ("GND_DIGITAL J2.4->NT2, above J2.10", "F.Cu", "GND_DIGITAL", [(80.3, 47.3), (76.6, 47.3)]),
+    ("GND_DIGITAL J2.4->NT2, below J2.10", "F.Cu", "GND_DIGITAL", [(80.3, 50.05), (77.2, 50.05)]),
     ("GND_PWR NT2 west", "F.Cu", "GND_PWR", [(74.8, 48.52), (73.6, 48.52)]),
-    ("GND_PWR NT3 east", "F.Cu", "GND_PWR", [(76.4, 52.0), (77.2, 51.4)]),
 ]
 
 
@@ -239,8 +239,25 @@ def check_additions(spec: dict) -> list[str]:
             r = min(pad.size.X, pad.size.Y) / 2
             for layer in (("F.Cu", "B.Cu") if pad.type == "thru_hole" else (pad.layers[0],)):
                 shapes.append((net, layer, Point(x, y).buffer(r)))
+    graphics = []  # footprint copper graphics (net-tie bridges): copper 0.2 mm, hole 0.25 mm
+    for fp in board.footprints:
+        ref = next((p.value for p in (fp.properties if not isinstance(fp.properties, dict) else [])
+                    if getattr(p, "key", None) == "Reference"), None) or \
+            (fp.properties.get("Reference") if isinstance(fp.properties, dict) else None)
+        angle = math.radians((fp.position.angle or 0) + (180 if ref in rotated else 0))
+        for g in fp.graphicItems:
+            if getattr(g, "layer", None) not in ("F.Cu", "B.Cu") or not getattr(g, "coordinates", None):
+                continue
+            pts = [(fp.position.X + c.X * math.cos(angle) + c.Y * math.sin(angle),
+                    fp.position.Y - c.X * math.sin(angle) + c.Y * math.cos(angle)) for c in g.coordinates]
+            if len(pts) >= 3:
+                graphics.append((g.layer, Polygon(pts).buffer(0), ref))
     problems = []
     for kind, layer, net, width, points in spec["add_items"]:
+        if kind == "via":
+            for g_layer, poly, ref in graphics:
+                if Point(*points[0]).distance(poly) - 0.15 < 0.25 - 1e-6:
+                    problems.append(f"via {net} {points[0]}: hole within 0.25 mm of {ref} copper graphic")
         if kind == "via":
             geoms = [(lay, Point(*points[0]).buffer(width / 2)) for lay in ("F.Cu", "B.Cu")]
         else:
