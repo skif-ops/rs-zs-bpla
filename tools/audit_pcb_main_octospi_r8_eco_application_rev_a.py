@@ -38,7 +38,7 @@ RF_CANDIDATE = (
 )
 RF_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_RF_P0_ROUTING_APPLICATION_REV_A.json"
 PLACEMENT = _lineage.historical_placement()
-STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+STATUS = _lineage.historical_status()
 
 BASE_SHA256 = "7dea2fdce607dbf7df2205e74b188d45e2def07c5329bacb4f9503ddcf7ae6f3"
 CANDIDATE_SHA256 = "04a0c7e37068d00fbe53b48fd19063b015b6b5c04e9aaafb3b01bbced0d7a99f"
