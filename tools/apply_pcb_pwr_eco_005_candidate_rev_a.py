@@ -19,7 +19,8 @@ Delta (nets, netlist and net-tie count unchanged; no new domain join):
   - GND_DIGITAL: F.Cu zone with solid pad connection from J2.4 straight to the rotated NT2;
   - GND_MIC (0.3 A class): second via 0.6/0.3 beside the existing one;
   - GND_PWR: 5 plane vias on the GND_PWR side of NT1/NT2/NT3;
-  - RT_3V8: dangling via at (53.6, 11.5) and its stub from U3.8 removed (finding 9).
+  - RT_3V8: dangling via at (53.6, 11.5) and its stub from U3.8 removed (finding 9);
+  - SHUNT_SOURCE_SENSE: redundant third via removed (3.3); reference designators re-placed (3.4).
 Run 3: 0 unconnected, 1 hole_clearance (NT2 bridge vs a GND_PWR via) -> via moved, graphics screened.
 Run 4: DRC 0 errors / 0 unconnected.
 --check verifies the candidate matches SUMMARY.json.
@@ -42,7 +43,7 @@ BOARD = NATIVE / "PCB-PWR.kicad_pcb"
 BASE_SHA256 = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"  # autoroute 011
 OUT = ROOT / "hardware/kicad/candidates/PCB-PWR-ECO-005"
 STEM = "PCB-PWR_ECO_005_CANDIDATE_REV_A"
-WORK = ROOT / "build/eco005"
+WORK = ROOT / "hardware/kicad/native/_eco005_work"  # sibling of PCB-PWR: library paths resolve
 
 REGION = (72.0, 37.0, 83.0, 57.5)          # tie / J2 return region
 DOMAINS = ("GND_MODEM", "GND_DIGITAL")      # router tracks of these nets in REGION are replaced by zones
@@ -66,6 +67,11 @@ GND_DIGITAL_ZONE = [(75.8, 46.4), (82.6, 46.4), (82.6, 50.4), (75.8, 50.4)]
 # Review B R1 finding 9: dangling RT_3V8 via and its stub from U3.8
 RT_3V8_STUB = [((54.0, 12.3), (53.6, 11.5)), ((54.0, 12.9), (54.0, 12.3)), ((54.0, 12.9), (54.0, 13.1))]
 RT_3V8_VIA = (53.6, 11.5)
+# Review B R1 3.3: SHUNT_SOURCE_SENSE had a third via (F.Cu hop at the shunt). The TP2 branch now
+# leaves from the shunt-side via, so both Kelvin lines RSH1 -> U2 carry exactly 2 vias (the
+# VBAT_SYS 3 mm F.Cu bus encloses U2; the pair crosses it on B.Cu).
+SOURCE_SENSE_VIA = (34.5901, 32.27)
+SOURCE_SENSE_LINK = ("track", "B.Cu", "SHUNT_SOURCE_SENSE", 0.25, [(35.1803, 31.6798), (34.5901, 32.27)])
 # return-path resistance cases: (net, J2 pin, tie, peak current A or None while the budget is open)
 RETURN_CASES = [("GND_MODEM", ("J2", "2"), ("NT1", "1"), 3.3),   # BG95 0.6 A BB + 2.7 A RF burst
                 ("GND_DIGITAL", ("J2", "4"), ("NT2", "1"), None),  # 3V3 budget: separate record
@@ -122,7 +128,7 @@ def build_spec() -> dict:
             "remove_zones": [{"net": "GND_DIGITAL", "layer": "F.Cu", "contains": [78.0, 47.0]}],
             "add_zones": [{"net": "GND_DIGITAL", "layer": "F.Cu", "priority": 14, "clearance_mm": 0.3,
                            "polygon": GND_DIGITAL_ZONE}],
-            "add_items": []}
+            "add_items": [], "silk_refs": True}
     for item in board.traceItems:
         net = names.get(item.net)
         if type(item).__name__ == "Via":
@@ -139,12 +145,13 @@ def build_spec() -> dict:
         spec["remove_tracks"].append({"net": "RT_3V8", "layer": "F.Cu", "start": list(a), "end": list(b)})
     spec["remove_vias"] = [{"net": "GND_MODEM", "pos": list(OLD_GND_MODEM_VIA)},
                            {"net": "GND_PWR", "pos": list(NT2_PWR_VIA)},
-                           {"net": "RT_3V8", "pos": list(RT_3V8_VIA)}]
+                           {"net": "RT_3V8", "pos": list(RT_3V8_VIA)},
+                           {"net": "SHUNT_SOURCE_SENSE", "pos": list(SOURCE_SENSE_VIA)}]
     spec["add_items"] = (
         [("via", "", "GND_MODEM", 0.6, [v]) for v in GND_MODEM_VIAS]
         + [("via", "", "GND_PWR", 0.6, [v]) for v in GND_PWR_VIAS]
         + [("track", "B.Cu", "3V8_MODEM", 0.3, [a, b]) for a, b in TP4_BRANCH]
-        + GND_MIC_SECOND_VIA)
+        + GND_MIC_SECOND_VIA + [SOURCE_SENSE_LINK])
     return spec
 
 
@@ -301,6 +308,14 @@ def generate() -> None:
     shutil.rmtree(WORK, ignore_errors=True)
     WORK.mkdir(parents=True)
     OUT.mkdir(parents=True, exist_ok=True)
+    try:
+        _generate()
+    finally:
+        docker("rm", "-rf", str(WORK.relative_to(ROOT)))
+        shutil.rmtree(WORK, ignore_errors=True)
+
+
+def _generate() -> None:
     spec = build_spec()
     problems = check_additions(spec)
     (OUT / "ECO_005_SPEC.json").write_text(json.dumps(spec, indent=1) + "\n", encoding="utf-8")
@@ -314,12 +329,16 @@ def generate() -> None:
         summary["text_removal"] = counts
         shutil.copyfile(NATIVE / "PCB-PWR.kicad_pro", WORK / f"{STEM}.kicad_pro")
         shutil.copyfile(NATIVE / "PCB-PWR.kicad_dru", WORK / f"{STEM}.kicad_dru")
+        shutil.copyfile(NATIVE / "fp-lib-table", WORK / "fp-lib-table")
+        shutil.copytree(NATIVE / "libs", WORK / "libs")
         stage_spec = {k: v for k, v in spec.items() if not k.startswith("remove_")}
         (WORK / "spec.json").write_text(json.dumps(stage_spec), encoding="utf-8")
         rel = WORK.relative_to(ROOT)
         stage = docker("/usr/bin/python3", "tools/pcb_pwr_eco_005_stage_rev_a.py", "apply", f"{rel}/{STEM}.kicad_pcb",
                        f"{rel}/spec.json", f"{rel}/{STEM}.kicad_pcb")
-        summary["stage"] = {"rc": stage.returncode, "stdout": stage.stdout[-800:], "stderr": stage.stderr[-1500:]}
+        summary["stage"] = {"rc": stage.returncode, "stderr": stage.stderr[-1500:] if stage.returncode else ""}
+        lines = [line for line in stage.stdout.splitlines() if line.startswith("{")]
+        summary["stage"]["report"] = json.loads(lines[-1]) if lines else stage.stdout[-800:]
         if stage.returncode == 0:
             drc = docker("kicad-cli", "pcb", "drc", "--format", "json", "--severity-all",
                          "-o", f"{rel}/drc.json", f"{rel}/{STEM}.kicad_pcb")
@@ -345,7 +364,6 @@ def generate() -> None:
             shutil.copyfile(WORK / "drc.json", OUT / "drc.json")
             summary["candidate_sha256"] = sha256(OUT / f"{STEM}.kicad_pcb")
     (OUT / "SUMMARY.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    docker("rm", "-rf", str(WORK.relative_to(ROOT)))
     print(json.dumps({k: summary.get(k) for k in ("local_clearance_screen", "drc", "candidate_sha256")},
                      ensure_ascii=False)[:1500])
 

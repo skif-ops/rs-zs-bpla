@@ -9,6 +9,9 @@ apply <in.kicad_pcb> <spec.json> <out.kicad_pcb>
       remove_zones  [{"net", "layer", "contains"}]        zone of that net/layer whose outline contains the point
       add_zones     [{"net", "layer", "polygon", "priority", "clearance_mm"}]   solid pad connection
       add_items     PREROUTE tuples (kind, layer, net, width, points)          locked copper
+      silk_refs     true: re-place reference designators clear of pads, silkscreen and the
+                    board edge (keep if already clear, else nearest free spot at 0/90 deg,
+                    else hide on silkscreen - the F.Fab reference stays)
     Every requested removal must match exactly one item, otherwise the stage fails.
 dump <board.kicad_pcb> <geometry.json>
     Same geometry dump as the autoroute stage, plus filled zone polygons per net/layer.
@@ -77,9 +80,116 @@ def apply(in_path: str, spec_path: str, out_path: str) -> None:
         report["added_zones"] += 1
     report["added_items"] = add_preroute(board, spec.get("add_items", []), lock=True)
 
+    if spec.get("silk_refs"):
+        report["silk_refs"] = place_references(board)
     pcbnew.ZONE_FILLER(board).Fill(board.Zones())
     board.Save(out_path)
     print(json.dumps(report))
+
+
+def _box(item):
+    return item.GetBoundingBox()  # returned by value: a private copy
+
+
+def _fp_body_box(footprint):
+    try:
+        return footprint.GetBoundingBox(False, False)
+    except TypeError:
+        return footprint.GetBoundingBox(False)
+
+
+def place_references(board) -> dict:
+    """Reference designators clear of pad copper (+0.15 mm), all other silkscreen (+0.1 mm)
+    and the board edge (0.3 mm inside)."""
+    import math
+
+    pad_gap, silk_gap = mm(0.15), mm(0.1)
+    edge = board.GetBoardEdgesBoundingBox()
+    edge.Inflate(-mm(0.3))
+    pads = {pcbnew.F_SilkS: [], pcbnew.B_SilkS: []}
+    silk = {pcbnew.F_SilkS: [], pcbnew.B_SilkS: []}
+    for footprint in board.GetFootprints():
+        for pad in footprint.Pads():
+            box = _box(pad)
+            box.Inflate(pad_gap)
+            if pad.IsOnLayer(pcbnew.F_Cu):
+                pads[pcbnew.F_SilkS].append(box)
+            if pad.IsOnLayer(pcbnew.B_Cu):
+                pads[pcbnew.B_SilkS].append(box)
+        for item in footprint.GraphicalItems():
+            if item.GetLayer() in silk:
+                box = _box(item)
+                box.Inflate(silk_gap)
+                silk[item.GetLayer()].append(box)
+    for item in board.GetDrawings():
+        if item.GetLayer() in silk:
+            box = _box(item)
+            box.Inflate(silk_gap)
+            silk[item.GetLayer()].append(box)
+
+    def clear(box, layer, own) -> bool:
+        if not edge.Contains(box.GetOrigin()) or not edge.Contains(box.GetEnd()):
+            return False
+        return not any(box.Intersects(o) for o in pads[layer] + silk[layer] if o is not own)
+
+    footprints = sorted(board.GetFootprints(), key=lambda f: _fp_body_box(f).GetArea())
+    kept, moved, hidden = [], [], []
+    placed = {pcbnew.F_SilkS: [], pcbnew.B_SilkS: []}
+    todo = []
+    for footprint in footprints:  # pass 1: keep every reference that is already clear
+        field = footprint.Reference()
+        layer = field.GetLayer()
+        if layer not in silk or not field.IsVisible():
+            continue
+        box = _box(field)
+        if clear(box, layer, None) and not any(box.Intersects(o) for o in placed[layer]):
+            kept.append(footprint.GetReference())
+            placed[layer].append(box)
+        else:
+            todo.append(footprint)
+    for footprint in todo:  # pass 2: move the rest to the nearest free spot
+        field = footprint.Reference()
+        layer = field.GetLayer()
+        ref = footprint.GetReference()
+        start_pos, start_angle = field.GetPosition(), field.GetTextAngleDegrees()
+        body = _fp_body_box(footprint)
+        cx, cy = body.GetCenter().x, body.GetCenter().y
+        options = []
+        for angle in (0.0, 90.0):
+            field.SetTextAngleDegrees(angle)
+            field.SetPosition(pcbnew.VECTOR2I(cx, cy))
+            probe = _box(field)
+            tw, th = probe.GetWidth(), probe.GetHeight()
+            for gap in (mm(0.15), mm(0.4), mm(0.8), mm(1.3)):
+                ys = (body.GetY() - gap - th // 2, body.GetBottom() + gap + th // 2)
+                xs = (body.GetX() - gap - tw // 2, body.GetRight() + gap + tw // 2)
+                for y in ys:
+                    for dx in range(-8, 9):
+                        options.append((angle, cx + dx * mm(0.25), y))
+                for x in xs:
+                    for dy in range(-8, 9):
+                        options.append((angle, x, cy + dy * mm(0.25)))
+        options.sort(key=lambda o: (math.hypot(o[1] - start_pos.x, o[2] - start_pos.y), o[0]))
+        done = False
+        for angle, x, y in options:
+            field.SetTextAngleDegrees(angle)
+            field.SetPosition(pcbnew.VECTOR2I(int(x), int(y)))
+            box = _box(field)
+            # the text centre may be offset from its anchor: re-centre on the requested point
+            field.SetPosition(pcbnew.VECTOR2I(int(x) - (box.GetCenter().x - int(x)),
+                                              int(y) - (box.GetCenter().y - int(y))))
+            box = _box(field)
+            if clear(box, layer, None) and not any(box.Intersects(o) for o in placed[layer]):
+                placed[layer].append(box)
+                moved.append(ref)
+                done = True
+                break
+        if not done:
+            field.SetTextAngleDegrees(start_angle)
+            field.SetPosition(start_pos)
+            field.SetVisible(False)
+            hidden.append(ref)
+    return {"kept": sorted(kept), "moved": sorted(moved), "hidden": sorted(hidden)}
 
 
 def dump(board_path: str, out_json: str) -> None:
