@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-09-25T12:42:13+0000",
+    "date": "2026-09-25T12:50:12+0000",
     "included_severities": [
         "error",
         "warning",
@@ -4054,29 +4054,6 @@
                         "y": 22.5
                     },
                     "uuid": "9c0ea476-1a7f-4fc1-a342-0ae0dab678ca"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Zone 'PCB_MAIN_GND_MODEM_In4_Cu_1' [GND_MODEM] on In4.Cu, priority 1",
-                    "pos": {
-                        "x": 4.9268,
-                        "y": 50.9575
-                    },
-                    "uuid": "b2ce489d-99d8-5afb-b319-f0afd1c43a87"
-                },
-                {
-                    "description": "Zone 'PCB_MAIN_GND_MODEM_In4_Cu_2' [GND_MODEM] on In4.Cu, priority 1",
-                    "pos": {
-                        "x": 56.0094,
-                        "y": 29.6599
-                    },
-                    "uuid": "a11a962c-1d8b-5eb9-b1b7-1a9cc0cc215b"
                 }
             ],
             "severity": "error",
@@ -9719,6 +9696,29 @@
         }
     ],
     "violations": [
+        {
+            "description": "Clearance violation ( clearance 0.2000 mm; actual 0.0644 mm)",
+            "items": [
+                {
+                    "description": "Via [GND_DIGITAL] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 58.05,
+                        "y": 24.6
+                    },
+                    "uuid": "2f0c7ef5-eddd-5664-b6a1-763850fea410"
+                },
+                {
+                    "description": "Track [GND_MODEM] on In3.Cu, length 6.1301 mm",
+                    "pos": {
+                        "x": 56.225,
+                        "y": 29.1
+                    },
+                    "uuid": "c9b39b9a-9991-52aa-bc69-4941c4244f7c"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
         {
             "description": "Silkscreen clipped by solder mask",
             "items": [
