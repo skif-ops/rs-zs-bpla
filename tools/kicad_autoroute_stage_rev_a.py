@@ -94,13 +94,13 @@ def _via(board, net_name: str, x_mm: float, y_mm: float, size_mm: float = 0.6, d
     return via
 
 
-def add_preroute(board, items) -> int:
+def add_preroute(board, items, lock: bool = True) -> int:
     """Deterministic, locked escape stubs for pins the autorouter cannot enter
     (fine-pitch pins next to same-footprint land rules, net-tie exits)."""
     count = 0
     for kind, layer, net, width, points in items:
         if kind == "via":
-            _via(board, net, points[0][0], points[0][1], width).SetLocked(True)
+            _via(board, net, points[0][0], points[0][1], width).SetLocked(lock)
             count += 1
             continue
         for (x0, y0), (x1, y1) in zip(points, points[1:]):
@@ -110,7 +110,7 @@ def add_preroute(board, items) -> int:
             track.SetWidth(mm(width))
             track.SetLayer(board.GetLayerID(layer))
             track.SetNetCode(board.FindNet(net).GetNetCode())
-            track.SetLocked(True)
+            track.SetLocked(lock)
             board.Add(track)
             count += 1
     return count
@@ -252,7 +252,7 @@ def dump_geometry(board_path: str, out_json: str) -> None:
 def add_routes(board_path: str, routes_json: str) -> None:
     board = pcbnew.LoadBoard(board_path)
     items = json.load(open(routes_json, encoding="utf-8"))
-    count = add_preroute(board, items)
+    count = add_preroute(board, items, lock=False)  # router-made copper stays unlocked
     pcbnew.ZONE_FILLER(board).Fill(board.Zones())
     board.Save(board_path)
     print(json.dumps({"gapfill_items": count}))
@@ -390,7 +390,7 @@ def pours(board_path: str, spec_json: str) -> None:
             x += pitch
         y += pitch
     filler.Fill(board.Zones())
-    removed = remove_dangling(board)
+    removed = remove_dangling(board, spec.get("preroute_segments", []), spec.get("preroute_vias", []))
     if removed:
         filler.Fill(board.Zones())
     board.Save(board_path)
@@ -398,10 +398,11 @@ def pours(board_path: str, spec_json: str) -> None:
                       "ground_pad_vias": pad_vias, "stitching_vias": placed, "dangling_removed": removed}))
 
 
-def remove_dangling(board) -> int:
-    """Iteratively delete vias that join fewer than two copper items and tracks
-    with an open end (router leftovers: unused escape vias, stubs). An item is
-    connected when a same-net track, via, pad or zone fill touches it."""
+def remove_dangling(board, preroute_segments=(), preroute_vias=()) -> int:
+    """Iteratively delete vias that join fewer than two copper items and router-made
+    or pre-routed tracks with an open end: unused escape vias and stubs. Locked
+    accepted copper is kept. An item is connected when a same-net track, via,
+    pad (bounding box) or zone fill touches it."""
     import math
 
     def zone_hit(net: int, layer: int, point) -> bool:
@@ -413,8 +414,34 @@ def remove_dangling(board) -> int:
         return False
 
     def pad_hit(net: int, layer: int, point) -> bool:
-        return any(pad.GetNetCode() == net and pad.IsOnLayer(layer) and pad.HitTest(point)
-                   for pad in board.GetPads())
+        # bounding-box test: conservative (never calls a touching pad open)
+        for pad in board.GetPads():
+            if pad.GetNetCode() != net or not pad.IsOnLayer(layer):
+                continue
+            box_ = pad.GetBoundingBox()
+            box_.Inflate(mm(0.05))
+            if box_.Contains(point):
+                return True
+        return False
+
+    tol = mm(0.001)
+    prerouted = [(layer, net, mm(x0), mm(y0), mm(x1), mm(y1)) for layer, net, x0, y0, x1, y1 in preroute_segments]
+
+    def is_preroute(track) -> bool:
+        a, b = track.GetStart(), track.GetEnd()
+        name, layer = track.GetNetname(), board.GetLayerName(track.GetLayer())
+        for p_layer, p_net, x0, y0, x1, y1 in prerouted:
+            if p_layer == layer and p_net == name and (
+                    (abs(a.x - x0) <= tol and abs(a.y - y0) <= tol and abs(b.x - x1) <= tol and abs(b.y - y1) <= tol)
+                    or (abs(a.x - x1) <= tol and abs(a.y - y1) <= tol and abs(b.x - x0) <= tol and abs(b.y - y0) <= tol)):
+                return True
+        return False
+
+    via_sites = [(net, mm(x), mm(y)) for net, x, y in preroute_vias]
+
+    def is_preroute_via(via) -> bool:
+        pos, name = via.GetPosition(), via.GetNetname()
+        return any(net == name and abs(pos.x - x) <= tol and abs(pos.y - y) <= tol for net, x, y in via_sites)
 
     total = 0
     while True:
@@ -422,6 +449,8 @@ def remove_dangling(board) -> int:
         vias = [t for t in board.GetTracks() if t.GetClass() == "PCB_VIA"]
         doomed = []
         for via in vias:
+            if via.IsLocked() and not is_preroute_via(via):
+                continue  # accepted vias are never removed
             net, pos = via.GetNetCode(), via.GetPosition()
             try:
                 radius = via.GetWidth() / 2
@@ -436,12 +465,14 @@ def remove_dangling(board) -> int:
             if links < 2:
                 doomed.append(via)
         for track in tracks:
+            if track.IsLocked() and not is_preroute(track):
+                continue  # accepted copper is never removed
             net, layer = track.GetNetCode(), track.GetLayer()
             for end in (track.GetStart(), track.GetEnd()):
                 touched = (pad_hit(net, layer, end) or zone_hit(net, layer, end)
                            or any(v.GetNetCode() == net and v.HitTest(end) for v in vias)
                            or any(o is not track and o.GetNetCode() == net and o.GetLayer() == layer
-                                  and o.HitTest(end, 1) for o in tracks))
+                                  and o.HitTest(end, track.GetWidth() // 2) for o in tracks))
                 if not touched:
                     doomed.append(track)
                     break
