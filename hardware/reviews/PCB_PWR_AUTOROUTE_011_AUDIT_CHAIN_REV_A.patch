@@ -1,0 +1,419 @@
+diff --git a/hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json b/hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
+index 38824e49..12668536 100644
+--- a/hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
++++ b/hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json
+@@ -284,7 +284,7 @@
+       "record": "hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md",
+       "control": {
+         "state": "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED",
+-        "board_semantic_sha256": "55243176c6c9593ea8c6eff128bf23b452a592addd1299dde8d822f61dce19f8",
++        "board_semantic_sha256": "2694f7cfe20ab3b0f67d6dd00ea32ca83fd92db69137cddeaec58943a784de7e",
+         "placement_authority_sha256": "257fee5898b5d44970115220a485d40b01c4fefad14b5c3b1a4ffb43b7b5b2d6",
+         "fitted_footprints": 44,
+         "courtyard_footprints": 44,
+@@ -1113,7 +1113,7 @@
+     "independent_audit": "tools/audit_pcb_pwr_routing_authority_rev_a.py",
+     "control": {
+       "state": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN",
+-      "board_semantic_sha256": "55243176c6c9593ea8c6eff128bf23b452a592addd1299dde8d822f61dce19f8",
++      "board_semantic_sha256": "2694f7cfe20ab3b0f67d6dd00ea32ca83fd92db69137cddeaec58943a784de7e",
+       "authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
+       "net_count": 31,
+       "class_counts": {
+@@ -1144,8 +1144,8 @@
+         "SELF_TO_GND_PWR_ONLY_AT_NT2": 1,
+         "SELF_TO_GND_PWR_ONLY_AT_NT3": 1
+       },
+-      "trace_items": 53,
+-      "copper_zones": 2,
++      "trace_items": 873,
++      "copper_zones": 33,
+       "dim_003": "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED",
+       "numeric_power_geometry": "EVT_PUBLIC_STACKUP_AND_CALCULATED_CURRENT_GEOMETRY_ACCEPTED_PHYSICAL_FAULT_THERMAL_VALIDATION_OPEN",
+       "routing_complete": false,
+diff --git a/tools/audit_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py b/tools/audit_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py
+index 4b48ff4c..fa470eb5 100644
+--- a/tools/audit_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py
++++ b/tools/audit_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py
+@@ -21,9 +21,10 @@ SEMANTIC_SHA = "d6810b6ea293bfd931f09e73ff64698d18d0a64b465db7b71c712f64a36b2980
+ 
+ # After the accepted J2 placement ECO-003 the authoritative board is the exact
+ # placement-only successor; replay the 010 application on its committed candidate.
+-from pcb_pwr_hot_loop_006_board import is_j2_placement_eco_003  # noqa: E402
++from pcb_pwr_hot_loop_006_board import is_autoroute_011, is_j2_placement_eco_003  # noqa: E402
+ 
+-if is_j2_placement_eco_003(BOARD.read_bytes()):
++# ... and after the accepted autoroute 011 (successor of ECO-003) likewise.
++if is_j2_placement_eco_003(BOARD.read_bytes()) or is_autoroute_011(BOARD.read_bytes()):
+     BOARD = CANDIDATE
+ 
+ 
+diff --git a/tools/audit_pcb_pwr_eco_004_drc_rev_a.py b/tools/audit_pcb_pwr_eco_004_drc_rev_a.py
+index eb44f583..d1372bf4 100644
+--- a/tools/audit_pcb_pwr_eco_004_drc_rev_a.py
++++ b/tools/audit_pcb_pwr_eco_004_drc_rev_a.py
+@@ -4,7 +4,10 @@
+ Inputs are two KiCad 9 DRC JSON reports of the same authoritative board: one
+ without and one with hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_dru.
+ PASS requires: exactly the four U3/U4 pad-2 to pad-6/7 clearance errors removed,
+-no new error or warning fingerprint, unconnected items unchanged.
++no new error or warning fingerprint, unconnected items unchanged. Since the
++accepted autoroute 011 the same rule file also carries the U2 VSSOP-10 land
++pattern rule; clearance errors between two pads of U2 may additionally vanish,
++nothing else.
+ """
+ 
+ from __future__ import annotations
+@@ -22,6 +25,13 @@ EXPECTED_REMOVED = {
+ }
+ 
+ 
++def is_u2_land_pattern(key) -> bool:
++    """Clearance error between two pads of U2 (VSSOP-10 0.5 mm pitch)."""
++    kind, items = key
++    return (kind == "clearance" and len(items) == 2
++            and all(item.startswith("Pad ") and " of U2 on " in item for item in items))
++
++
+ def fingerprints(path: Path) -> tuple[Counter, int]:
+     report = json.loads(path.read_text(encoding="utf-8"))
+     prints: Counter = Counter()
+@@ -42,7 +52,8 @@ def main() -> int:
+     removed = {key for key in base if candidate[key] < base[key]}
+     added = sorted(str(key) for key in candidate if candidate[key] > base[key])
+     blockers = []
+-    if removed != EXPECTED_REMOVED:
++    extra = removed - EXPECTED_REMOVED
++    if not EXPECTED_REMOVED <= removed or not all(is_u2_land_pattern(key) for key in extra):
+         blockers.append(f"removed fingerprints differ: {sorted(map(str, removed))}")
+     if added:
+         blockers.append(f"new fingerprints: {added}")
+@@ -54,6 +65,7 @@ def main() -> int:
+         "violations": [sum(base.values()), sum(candidate.values())],
+         "unconnected": [base_unconnected, candidate_unconnected],
+         "removed": sorted(map(str, removed)),
++        "removed_u2_land_pattern": sorted(map(str, extra)),
+         "blockers": blockers,
+         "manufacturing_release": False,
+     }
+diff --git a/tools/audit_pcb_pwr_layout_candidate_rev_a.py b/tools/audit_pcb_pwr_layout_candidate_rev_a.py
+index ad9d9e58..78085666 100644
+--- a/tools/audit_pcb_pwr_layout_candidate_rev_a.py
++++ b/tools/audit_pcb_pwr_layout_candidate_rev_a.py
+@@ -37,6 +37,7 @@ C13_C12_008_SHA256 = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489
+ C13_C11_009_SHA256 = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+ OUTPUT_BULK_010_SHA256 = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+ J2_PLACEMENT_ECO_003_SHA256 = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
++AUTOROUTE_011_SHA256 = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ # Exact accepted ECO-003 poses; the placement authority CSV and the DIM-003
+ # record stay byte-identical because historical packets bind their SHA-256.
+ J2_PLACEMENT_ECO_003_POSES = {
+@@ -162,9 +163,9 @@ def main() -> int:
+         row = by_ref[ref]
+         wanted_pose = (
+             J2_PLACEMENT_ECO_003_POSES[ref]
+-            if board_sha256 == J2_PLACEMENT_ECO_003_SHA256 and ref in J2_PLACEMENT_ECO_003_POSES
++            if board_sha256 in {J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256} and ref in J2_PLACEMENT_ECO_003_POSES
+             else ECO_002_POSES[ref]
+-            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256, J2_PLACEMENT_ECO_003_SHA256} and ref in ECO_002_POSES
++            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256, J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256} and ref in ECO_002_POSES
+             else (float(row["X_mm"]), float(row["Y_mm"]),
+                   float(row["Rotation_deg"]) % 360.0)
+         )
+@@ -226,8 +227,9 @@ def main() -> int:
+     board_nets = {net.name for net in board.nets if net.number != 0}
+     require(board_nets == expected_nets, "board net set differs from native schematic")
+     require((len(board.traceItems), len(board.zones)) in
+-            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)},
+-            "PCB-PWR contains copper beyond the accepted 3V8 output bulk 010 successor")
++            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)}
++            or board_sha256 == AUTOROUTE_011_SHA256,  # exact committed autoroute 011 board
++            "PCB-PWR contains copper beyond the accepted autoroute 011 successor")
+ 
+     edges = [item for item in board.graphicItems if getattr(item, "layer", None) == "Edge.Cuts"]
+     require(len(edges) == 4, "provisional outline must contain four line segments")
+diff --git a/tools/audit_pcb_pwr_placement_clearance_rev_a.py b/tools/audit_pcb_pwr_placement_clearance_rev_a.py
+index 3c4aac5d..2f80c40e 100644
+--- a/tools/audit_pcb_pwr_placement_clearance_rev_a.py
++++ b/tools/audit_pcb_pwr_placement_clearance_rev_a.py
+@@ -51,6 +51,7 @@ C13_C12_008_SHA256 = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489
+ C13_C11_009_SHA256 = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+ OUTPUT_BULK_010_SHA256 = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+ J2_PLACEMENT_ECO_003_SHA256 = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
++AUTOROUTE_011_SHA256 = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ # Exact accepted ECO-003 poses; the placement authority CSV and the DIM-003
+ # record stay byte-identical because historical packets bind their SHA-256.
+ J2_PLACEMENT_ECO_003_POSES = {
+@@ -320,9 +321,9 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
+         footprint = footprints[ref]
+         expected = (
+             J2_PLACEMENT_ECO_003_POSES[ref]
+-            if board_sha256 == J2_PLACEMENT_ECO_003_SHA256 and ref in J2_PLACEMENT_ECO_003_POSES
++            if board_sha256 in {J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256} and ref in J2_PLACEMENT_ECO_003_POSES
+             else ECO_002_POSES[ref]
+-            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256, J2_PLACEMENT_ECO_003_SHA256} and ref in ECO_002_POSES
++            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256, J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256} and ref in ECO_002_POSES
+             else (float(row["X_mm"]), float(row["Y_mm"]),
+                   float(row["Rotation_deg"]) % 360.0)
+         )
+@@ -399,8 +400,9 @@ def audit(board_path: Path, placement_path: Path) -> dict[str, Any]:
+                     })
+ 
+     require((len(board.traceItems), len(board.zones)) in
+-            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)},
+-            "PCB-PWR copper exceeds the accepted 3V8 output bulk 010 successor boundary")
++            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)}
++            or board_sha256 == AUTOROUTE_011_SHA256,  # exact committed autoroute 011 board
++            "PCB-PWR copper exceeds the accepted autoroute 011 successor boundary")
+ 
+     minimum = min(observed)
+     passed = (not findings and not mounting_body_findings and
+diff --git a/tools/audit_pcb_pwr_routing_authority_rev_a.py b/tools/audit_pcb_pwr_routing_authority_rev_a.py
+index f1eb0555..49cd3cb4 100644
+--- a/tools/audit_pcb_pwr_routing_authority_rev_a.py
++++ b/tools/audit_pcb_pwr_routing_authority_rev_a.py
+@@ -420,9 +420,13 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
+             f"PCB-PWR layer-count drift: {copper_layers}")
+     trace_items = len(board.traceItems)
+     copper_zones = len(board.zones)
++    from pcb_pwr_hot_loop_006_board import is_autoroute_011  # local: avoids an import cycle
++
++    # the exact committed autoroute 011 board is the accepted successor of 010/ECO-003
+     require((trace_items, copper_zones) in
+-            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)},
+-            "routing authority does not cover copper beyond accepted 3V8 output bulk 010")
++            {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)}
++            or is_autoroute_011(board_path.read_bytes()),
++            "routing authority does not cover copper beyond accepted autoroute 011")
+ 
+     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
+     require(baseline["input"]["actual_battery_bms_limits_frozen"] is False and
+diff --git a/tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py b/tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py
+index 10f2e60d..e3643e48 100644
+--- a/tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py
++++ b/tools/audit_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py
+@@ -25,13 +25,14 @@ SEMANTIC_SHA = "1278dcdc1c752e34132af5ac6472525c5012774ff864aa2210bee40c8c2284e3
+ SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+ OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+ J2_PLACEMENT_ECO_003_SHA = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
++AUTOROUTE_011_SHA = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ 
+ 
+ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict:
+     board_sha = hashlib.sha256(BOARD.read_bytes()).hexdigest()
+-    assert board_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA}
++    assert board_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA}
+     assert hashlib.sha256(APPROVAL.read_bytes()).hexdigest() == APPROVAL_SHA
+-    board = Board.from_file(str(CANDIDATE if board_sha in {SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA} else BOARD), encoding="utf-8")
++    board = Board.from_file(str(CANDIDATE if board_sha in {SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA} else BOARD), encoding="utf-8")
+     assert semantic_board_sha256(board) == SEMANTIC_SHA
+     assert len(board.traceItems) == 39 and len(board.zones) == 2
+     proposal = historical_candidate_audit()
+diff --git a/tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py b/tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py
+index 9faf1899..500d8b13 100644
+--- a/tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py
++++ b/tools/audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py
+@@ -26,11 +26,12 @@ SUCCESSOR_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71
+ ACTIVE_SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+ OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+ J2_PLACEMENT_ECO_003_SHA = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
++AUTOROUTE_011_SHA = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ 
+ 
+ def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict:
+     active_sha = hashlib.sha256(BOARD.read_bytes()).hexdigest()
+-    assert active_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA}
++    assert active_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA}
+     application_board = BOARD if active_sha == CANDIDATE_SHA else CANDIDATE
+     assert hashlib.sha256(application_board.read_bytes()).hexdigest() == CANDIDATE_SHA
+     assert application_board.read_bytes() == CANDIDATE.read_bytes()
+diff --git a/tools/generate_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py b/tools/generate_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py
+index d67e4deb..0f64e415 100644
+--- a/tools/generate_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py
++++ b/tools/generate_pcb_pwr_3v8_output_bulk_routing_010_application_rev_a.py
+@@ -49,11 +49,11 @@ def main() -> int:
+     args = parser.parse_args()
+     payload = accepted_payload()
+     if args.check:
+-        from pcb_pwr_hot_loop_006_board import is_j2_placement_eco_003
++        from pcb_pwr_hot_loop_006_board import is_autoroute_011, is_j2_placement_eco_003
+ 
+         active = BOARD.read_bytes()
+-        assert active == payload or is_j2_placement_eco_003(active), \
+-            "authoritative PCB-PWR is not exact accepted 010 or its ECO-003 successor"
++        assert active == payload or is_j2_placement_eco_003(active) or is_autoroute_011(active), \
++            "authoritative PCB-PWR is not exact accepted 010 or its ECO-003 / autoroute 011 successor"
+     else:
+         assert BOARD.read_bytes() == BASE.read_bytes(), "authoritative 009 predecessor differs"
+         BOARD.write_bytes(payload)
+diff --git a/tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py b/tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py
+index dfcdf476..62fb4cc9 100644
+--- a/tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py
++++ b/tools/generate_pcb_pwr_buck_input_hot_loop_routing_006_application_rev_a.py
+@@ -22,6 +22,7 @@ C13_C12_008_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e
+ C13_C11_009_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+ OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+ J2_PLACEMENT_ECO_003_SHA = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
++AUTOROUTE_011_SHA = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ APPROVAL_SHA = "3738c1235f805acb01fccda413a379eac13b60d5d6f7ebaae12c72969c53ae1f"
+ 
+ 
+@@ -54,7 +55,7 @@ def main() -> int:
+     args = parser.parse_args()
+     payload = accepted_payload()
+     if args.check:
+-        assert digest(BOARD) in {CANDIDATE_SHA, SHUNT_BULK_007_SHA, C13_C12_008_SHA, C13_C11_009_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA}, \
++        assert digest(BOARD) in {CANDIDATE_SHA, SHUNT_BULK_007_SHA, C13_C12_008_SHA, C13_C11_009_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA}, \
+             "authoritative board is not the approved candidate or controlled successor"
+     else:
+         assert BOARD.read_bytes() == BASE.read_bytes(), "authoritative predecessor differs"
+diff --git a/tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py b/tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py
+index 490f8f78..d42af5ba 100644
+--- a/tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py
++++ b/tools/generate_pcb_pwr_vbat_sys_c13_c12_routing_008_application_rev_a.py
+@@ -20,6 +20,7 @@ CANDIDATE_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71
+ SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+ OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+ J2_PLACEMENT_ECO_003_SHA = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
++AUTOROUTE_011_SHA = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ APPROVAL_SHA = "f90d95781a140300856b290b9958f0f814c5ef13e44da332e0a1311993be40f2"
+ 
+ 
+@@ -54,7 +55,7 @@ def main() -> int:
+     args = parser.parse_args()
+     payload = accepted_payload()
+     if args.check:
+-        assert digest(BOARD) in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA}, \
++        assert digest(BOARD) in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA}, \
+             "authoritative PCB-PWR is not accepted 008 or controlled successor"
+     else:
+         assert BOARD.read_bytes() == BASE.read_bytes(), "authoritative 007 predecessor differs"
+diff --git a/tools/generate_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py b/tools/generate_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py
+index 870c9b84..c26422c8 100644
+--- a/tools/generate_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py
++++ b/tools/generate_pcb_pwr_vbat_sys_shunt_bulk_routing_007_application_rev_a.py
+@@ -21,6 +21,7 @@ SUCCESSOR_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71
+ ACTIVE_SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+ OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+ J2_PLACEMENT_ECO_003_SHA = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
++AUTOROUTE_011_SHA = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ APPROVAL_SHA = "ad5a6f459cd80eebac05d622e361b8e8ea9e9b453176f2f4dc454abc982a87db"
+ 
+ 
+@@ -54,7 +55,7 @@ def main() -> int:
+     args = parser.parse_args()
+     payload = accepted_payload()
+     if args.check:
+-        assert digest(BOARD) in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA}, \
++        assert digest(BOARD) in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA}, \
+             "authoritative PCB-PWR is not accepted 007 or controlled successor"
+     else:
+         assert BOARD.read_bytes() == BASE.read_bytes(), "authoritative 006 predecessor differs"
+diff --git a/tools/pcb_pwr_hot_loop_006_board.py b/tools/pcb_pwr_hot_loop_006_board.py
+index 4b38b6e3..fc6a2aa7 100644
+--- a/tools/pcb_pwr_hot_loop_006_board.py
++++ b/tools/pcb_pwr_hot_loop_006_board.py
+@@ -24,6 +24,8 @@ C13_C11_009_SHA256 = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a0
+ OUTPUT_BULK_010_SHA256 = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+ SEMANTIC_SHA256 = "4da495603ca0c4ed2f7c4a3cb1197a133856408ac6f262ac976c1dab5667f687"
+ J2_PLACEMENT_ECO_003_SHA256 = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
++AUTOROUTE_011 = ROOT / "hardware/kicad/candidates/PCB-PWR-AUTOROUTE-011/PCB-PWR_AUTOROUTE_011_CANDIDATE_REV_A.kicad_pcb"
++AUTOROUTE_011_SHA256 = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ 
+ 
+ def is_j2_placement_eco_003(payload: bytes) -> bool:
+@@ -35,6 +37,12 @@ def is_j2_placement_eco_003(payload: bytes) -> bool:
+     return payload == eco_003.candidate_bytes(OUTPUT_BULK_010.read_bytes())
+ 
+ 
++def is_autoroute_011(payload: bytes) -> bool:
++    """Accepted autoroute 011 successor of ECO-003: the committed CI candidate."""
++    return (hashlib.sha256(payload).hexdigest() == AUTOROUTE_011_SHA256
++            and payload == AUTOROUTE_011.read_bytes())
++
++
+ def is_exact_application(board: Path) -> bool:
+     payload = board.read_bytes()
+     return (hashlib.sha256(payload).hexdigest() == SHA256
+@@ -52,7 +60,8 @@ def is_controlled_application_or_successor(board: Path) -> bool:
+                 and payload == C13_C11_009.read_bytes())
+             or (hashlib.sha256(payload).hexdigest() == OUTPUT_BULK_010_SHA256
+                 and payload == OUTPUT_BULK_010.read_bytes())
+-            or is_j2_placement_eco_003(payload))
++            or is_j2_placement_eco_003(payload)
++            or is_autoroute_011(payload))
+ 
+ 
+ def historical_basis_board(active: Path) -> Path:
+@@ -74,6 +83,7 @@ def hot_loop_application_board(active: Path) -> Path:
+                 and payload == C13_C11_009.read_bytes())
+             or (hashlib.sha256(payload).hexdigest() == OUTPUT_BULK_010_SHA256
+                 and payload == OUTPUT_BULK_010.read_bytes())
+-            or is_j2_placement_eco_003(payload)):
++            or is_j2_placement_eco_003(payload)
++            or is_autoroute_011(payload)):
+         return CANDIDATE
+     return active
+diff --git a/tools/run_pcb_pwr_c13_c12_008_historical_audit.py b/tools/run_pcb_pwr_c13_c12_008_historical_audit.py
+index 86cd1a33..6d026782 100644
+--- a/tools/run_pcb_pwr_c13_c12_008_historical_audit.py
++++ b/tools/run_pcb_pwr_c13_c12_008_historical_audit.py
+@@ -19,6 +19,7 @@ CANDIDATE_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71
+ ACTIVE_SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+ OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+ J2_PLACEMENT_ECO_003_SHA = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
++AUTOROUTE_011_SHA = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ 
+ 
+ def historical_candidate_audit(
+@@ -26,7 +27,7 @@ def historical_candidate_audit(
+ ) -> dict:
+     payload = ACTIVE.read_bytes()
+     assert hashlib.sha256(payload).hexdigest() in {CANDIDATE_SHA, ACTIVE_SUCCESSOR_SHA, OUTPUT_BULK_010_SHA,
+-                                                     J2_PLACEMENT_ECO_003_SHA}
++                                                     J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA}
+     assert hashlib.sha256(generator.CANDIDATE.read_bytes()).hexdigest() == CANDIDATE_SHA
+     generator.SOURCE = generator.BASE
+     candidate_audit.SOURCE = candidate_audit.BASE
+diff --git a/tools/run_pcb_pwr_hot_loop_006_historical_candidate_audit.py b/tools/run_pcb_pwr_hot_loop_006_historical_candidate_audit.py
+index 512f9c83..331ff842 100644
+--- a/tools/run_pcb_pwr_hot_loop_006_historical_candidate_audit.py
++++ b/tools/run_pcb_pwr_hot_loop_006_historical_candidate_audit.py
+@@ -16,6 +16,7 @@ from pcb_pwr_hot_loop_006_board import (
+     C13_C11_009_SHA256,
+     OUTPUT_BULK_010,
+     OUTPUT_BULK_010_SHA256,
++    is_autoroute_011,
+     is_j2_placement_eco_003,
+     CANDIDATE,
+     SHUNT_BULK_007,
+@@ -32,7 +33,7 @@ def historical_candidate_audit(
+ ) -> dict:
+     payload = ACTIVE.read_bytes()
+     active_sha = hashlib.sha256(payload).hexdigest()
+-    if is_j2_placement_eco_003(payload):
++    if is_j2_placement_eco_003(payload) or is_autoroute_011(payload):
+         payload, active_sha = OUTPUT_BULK_010.read_bytes(), OUTPUT_BULK_010_SHA256
+     assert active_sha in {SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256}
+     assert payload == (SHUNT_BULK_007 if active_sha == SHUNT_BULK_007_SHA256
+diff --git a/tools/run_pcb_pwr_shunt_bulk_007_historical_audit.py b/tools/run_pcb_pwr_shunt_bulk_007_historical_audit.py
+index a4039ab2..33950e2c 100644
+--- a/tools/run_pcb_pwr_shunt_bulk_007_historical_audit.py
++++ b/tools/run_pcb_pwr_shunt_bulk_007_historical_audit.py
+@@ -20,6 +20,7 @@ SUCCESSOR_SHA = "bb4b5363c9d03daae5b0a81b9f048878aa6d0a38bcb541b24b681f1489b5e71
+ ACTIVE_SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846bf"
+ OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
+ J2_PLACEMENT_ECO_003_SHA = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
++AUTOROUTE_011_SHA = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ 
+ 
+ def historical_candidate_audit(
+@@ -28,7 +29,7 @@ def historical_candidate_audit(
+     payload = ACTIVE.read_bytes()
+     active_sha = hashlib.sha256(payload).hexdigest()
+     assert active_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA, OUTPUT_BULK_010_SHA,
+-                          J2_PLACEMENT_ECO_003_SHA}
++                          J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA}
+     assert hashlib.sha256(generator.CANDIDATE.read_bytes()).hexdigest() == CANDIDATE_SHA
+     if active_sha == CANDIDATE_SHA:
+         assert payload == generator.CANDIDATE.read_bytes()
