@@ -90,6 +90,7 @@ static bool link_start(const char *cmd) {
   fcntl(link_in, F_SETFL, fcntl(link_in, F_GETFL) | O_NONBLOCK);
   return true;
 }
+static void link_await_reply(void);
 static void link_send(const char *topic, const uint8_t *payload, size_t n) {
   char *line = malloc(strlen(topic) + 2u * n + 16u);
   size_t k = (size_t)sprintf(line, "PUB %s ", topic);
@@ -98,8 +99,26 @@ static void link_send(const char *topic, const uint8_t *payload, size_t n) {
   if (write(link_out, line, k) != (ssize_t)k) tlog("link: write failed");
   free(line);
   link_pubs++;
+  link_await_reply();
 }
 static void link_report(void) { const char *r = "REPORT\n"; if (write(link_out, r, 7) != 7) tlog("link: report write failed"); }
+/* The server answers every line (a message or OK); waiting for that reply keeps the simulation deterministic. */
+static bool link_handle_line(char *line);
+static void link_await_reply(void) {
+  for (unsigned tries = 0u; tries < 10000u; tries++) {
+    char *nl = memchr(link_buf, '\n', link_len);
+    if (nl) {
+      *nl = 0;
+      (void)link_handle_line(link_buf);
+      memmove(link_buf, nl + 1, link_len - (size_t)(nl + 1 - link_buf));
+      link_len -= (size_t)(nl + 1 - link_buf);
+      return;
+    }
+    const ssize_t r = read(link_in, link_buf + link_len, sizeof(link_buf) - 1u - link_len);
+    if (r > 0) link_len += (size_t)r; else usleep(1000);
+  }
+  tlog("link: no reply from the server");
+}
 
 /* ---- BG95 responder (as in test_app_comms_sim.c) + downlink injection ------------------------- */
 static uint8_t rx_fifo[65536]; static size_t rx_head, rx_tail;
@@ -210,6 +229,33 @@ static void inject_downlink(const char *topic, const uint8_t *payload, size_t n)
   if (powered_down || !gsm_available || k <= 0) return;
   rx_push(head, (size_t)k); rx_push(payload, n); rx_push("\"\r\n", 3u);
 }
+static bool link_handle_line(char *line) {
+  if (strncmp(line, "PUB ", 4u) == 0) {
+    char topic[128]; char *hex; size_t n = 0u;
+    static uint8_t payload[4096];
+    if (sscanf(line + 4, "%127s", topic) == 1 && (hex = strchr(line + 4, ' ')) != NULL) {
+      hex++;
+      for (; hex[0] && hex[1] && n < sizeof(payload); hex += 2) { unsigned v; if (sscanf(hex, "%2x", &v) != 1) break; payload[n++] = (uint8_t)v; }
+      if (strstr(topic, "/receipt")) link_receipts++; else link_commands++;
+      if (ch_rand() < ch_receipt_loss) { ch_receipts_lost++; tlog("link: <- %s (%zu B) LOST on air", topic, n); }
+      else {
+        unsigned slot = 32u;
+        for (unsigned i = 0u; i < 32u; i++) if (!delayed_msgs[i].used) { slot = i; break; }
+        if (slot < 32u && n <= sizeof(delayed_msgs[0].payload)) { delayed_msgs[slot].used = true; delayed_msgs[slot].at_ms = sim_now + ch_receipt_latency_ms; snprintf(delayed_msgs[slot].topic, sizeof(delayed_msgs[slot].topic), "%s", topic); memcpy(delayed_msgs[slot].payload, payload, n); delayed_msgs[slot].n = n; }
+        tlog("link: <- %s (%zu B), delivered in %lu ms", topic, n, (unsigned long)ch_receipt_latency_ms);
+      }
+    }
+    return true;
+  }
+  if (strncmp(line, "LORA ", 5u) == 0) {
+    static uint8_t frame[64]; size_t n = 0u; const char *hex = line + 5;
+    for (; hex[0] && hex[1] && n < sizeof(frame); hex += 2) { unsigned v; if (sscanf(hex, "%2x", &v) != 1) break; frame[n++] = (uint8_t)v; }
+    lora_downlink(frame, n);
+    return true;
+  }
+  if (strncmp(line, "REPORT ", 7u) == 0) { printf("SERVER %s\n", line + 7); return true; }
+  return strcmp(line, "OK") == 0;
+}
 static void link_poll(void) {
   ssize_t r;
   if (link_in < 0) return;
@@ -218,28 +264,7 @@ static void link_poll(void) {
     char *nl = memchr(link_buf, '\n', link_len);
     if (!nl) break;
     *nl = 0;
-    if (strncmp(link_buf, "PUB ", 4u) == 0) {
-      char topic[128]; char *hex; size_t n = 0u;
-      static uint8_t payload[4096];
-      if (sscanf(link_buf + 4, "%127s", topic) == 1 && (hex = strchr(link_buf + 4, ' ')) != NULL) {
-        hex++;
-        for (; hex[0] && hex[1] && n < sizeof(payload); hex += 2) { unsigned v; if (sscanf(hex, "%2x", &v) != 1) break; payload[n++] = (uint8_t)v; }
-        if (strstr(topic, "/receipt")) link_receipts++; else link_commands++;
-        if (ch_rand() < ch_receipt_loss) { ch_receipts_lost++; tlog("link: <- %s (%zu B) LOST on air", topic, n); }
-        else {
-          unsigned slot = 32u;
-          for (unsigned i = 0u; i < 32u; i++) if (!delayed_msgs[i].used) { slot = i; break; }
-          if (slot < 32u && n <= sizeof(delayed_msgs[0].payload)) { delayed_msgs[slot].used = true; delayed_msgs[slot].at_ms = sim_now + ch_receipt_latency_ms; snprintf(delayed_msgs[slot].topic, sizeof(delayed_msgs[slot].topic), "%s", topic); memcpy(delayed_msgs[slot].payload, payload, n); delayed_msgs[slot].n = n; }
-          tlog("link: <- %s (%zu B), delivered in %lu ms", topic, n, (unsigned long)ch_receipt_latency_ms);
-        }
-      }
-    } else if (strncmp(link_buf, "LORA ", 5u) == 0) {
-      static uint8_t frame[64]; size_t n = 0u; const char *hex = link_buf + 5;
-      for (; hex[0] && hex[1] && n < sizeof(frame); hex += 2) { unsigned v; if (sscanf(hex, "%2x", &v) != 1) break; frame[n++] = (uint8_t)v; }
-      lora_downlink(frame, n);
-    } else if (strncmp(link_buf, "REPORT ", 7u) == 0) {
-      printf("SERVER %s\n", link_buf + 7);
-    }
+    (void)link_handle_line(link_buf);
     memmove(link_buf, nl + 1, link_len - (size_t)(nl + 1 - link_buf));
     link_len -= (size_t)(nl + 1 - link_buf);
   }
@@ -282,6 +307,7 @@ static void lora_channel_tick(void) {
     line[k++] = '\n';
     if (link_out >= 0 && write(link_out, line, k) != (ssize_t)k) tlog("lora: link write failed");
     free(line); lora_to_gateway[i].used = false;
+    if (link_out >= 0) link_await_reply();
   }
   for (unsigned i = 0u; i < 8u; i++) if (lora_to_station[i].used && (int32_t)(sim_now - lora_to_station[i].at_ms) >= 0) {
     lora_to_station[i].used = false;
