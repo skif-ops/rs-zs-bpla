@@ -305,19 +305,19 @@ def pours(board_path: str, spec_json: str) -> None:
     foreign_tht = [pad for pad in board.GetPads()
                    if pad.GetAttribute() == pcbnew.PAD_ATTRIB_PTH and pad.GetNetCode() != ground.GetNetCode()]
 
-    def via_site_ok(x: int, y: int, fill_list) -> bool:
-        probes = [(x + int(radius * math.cos(a)), y + int(radius * math.sin(a)))
+    def via_site_ok(x: int, y: int, fill_list, keep: int = radius) -> bool:
+        probes = [(x + int(keep * math.cos(a)), y + int(keep * math.sin(a)))
                   for a in [i * math.pi / 4 for i in range(8)]] + [(x, y)]
         if not all(all(_inside(fill, px, py) for px, py in probes) for fill in fill_list):
             return False
         if any(math.hypot(x - h.x, y - h.y) < hole_keep for h in holes):
             return False
         point = pcbnew.VECTOR2I(int(x), int(y))
-        if any(track.HitTest(point, radius) for track in blockers):
+        if any(track.HitTest(point, keep) for track in blockers):
             return False
         for pad in foreign_tht:
             box_ = pad.GetBoundingBox()
-            if math.hypot(x - pad.GetPosition().x, y - pad.GetPosition().y) < max(box_.GetWidth(), box_.GetHeight()) / 2 + radius:
+            if math.hypot(x - pad.GetPosition().x, y - pad.GetPosition().y) < max(box_.GetWidth(), box_.GetHeight()) / 2 + keep:
                 return False
         return True
 
@@ -346,7 +346,11 @@ def pours(board_path: str, spec_json: str) -> None:
         centre = pad.GetPosition()
         box_ = pad.GetBoundingBox()
         half = max(box_.GetWidth(), box_.GetHeight()) / 2
-        if any(math.hypot(v.x - centre.x, v.y - centre.y) < half + mm(1.0) for v in ground_vias):
+        def same_piece(v) -> bool:  # the straight path pad -> via stays inside the pour
+            return all(any(_inside(fill, int(centre.x + (v.x - centre.x) * t), int(centre.y + (v.y - centre.y) * t))
+                           for fill in f_fill) for t in (0.5, 0.75, 1.0))
+
+        if any(math.hypot(v.x - centre.x, v.y - centre.y) < half + mm(1.0) and same_piece(v) for v in ground_vias):
             continue
         done = False
         for extra in (0.55, 0.9, 1.3, 1.8):
@@ -354,7 +358,9 @@ def pours(board_path: str, spec_json: str) -> None:
                 angle = step * math.pi / 8
                 x = centre.x + int((half + mm(extra)) * math.cos(angle))
                 y = centre.y + int((half + mm(extra)) * math.sin(angle))
-                if via_site_ok(x, y, f_fill):
+                # 0.5 mm probe: the via (r 0.3) lies wholly inside the pour, which
+                # already keeps its clearance to foreign copper
+                if via_site_ok(x, y, f_fill, mm(0.5)):
                     add_ground_via(x, y)
                     ground_vias.append(pcbnew.VECTOR2I(int(x), int(y)))
                     pad_vias += 1
