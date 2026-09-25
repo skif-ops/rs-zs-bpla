@@ -96,7 +96,35 @@ static void provide_pdp_settings(zs_bg95_t *modem, uint32_t now_ms, const char *
   assert(n > 0 && (size_t)n < sizeof(line));
   zs_bg95_on_line(modem, line, now_ms + 1u);
   zs_bg95_on_line(modem, "OK", now_ms + 2u);
+  /* network time for the command clock (NITZ), then TLS */
+  expect_last(modem, "AT+QLTS=1");
+  assert(modem->state == ZS_BG95_TIME_QUERY);
+  zs_bg95_on_line(modem, "+QLTS: \"2026/09/25,08:10:05+12,0\"", now_ms + 2u);
+  zs_bg95_on_line(modem, "OK", now_ms + 2u);
+  {
+    int64_t t; uint32_t at;
+    assert(zs_bg95_network_time(modem, &t, &at) && t == INT64_C(1790323805000000) && at == now_ms + 2u);
+  }
   expect_last(modem, "AT+QSSLCFG=\"sslversion\",1,4");
+}
+
+/* AT+QLTS=1 on a cell without NITZ: ERROR (or the modem's RTC default) must not stop the bring-up. */
+static void test_network_time_optional(void) {
+  mock_t mock = {0};
+  zs_bg95_t modem;
+  int64_t t; uint32_t at;
+  reach_registered(&modem, &mock, "internet");
+  assert(zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 443u, "dioneya-001-boot1", "UFS:pilot-ca.pem", true));
+  assert(zs_bg95_start_mqtt(&modem, 1000u));
+  zs_bg95_on_line(&modem, "OK", 1001u);
+  zs_bg95_on_line(&modem, "+CGCONTRDP: 1,5,\"internet\",\"10.10.0.2.255.255.255.0\",\"10.10.0.1\",\"1.1.1.1\",\"8.8.8.8\"", 1002u);
+  zs_bg95_on_line(&modem, "OK", 1003u);
+  expect_last(&modem, "AT+QLTS=1");
+  zs_bg95_on_line(&modem, "+QLTS: \"1980/01/06,00:00:03+00,0\"", 1004u);   /* RTC default: ignored */
+  zs_bg95_on_line(&modem, "+CME ERROR: 3", 1005u);
+  assert(modem.state == ZS_BG95_TLS_CONFIGURING && !zs_bg95_network_time(&modem, &t, &at));
+  expect_last(&modem, "AT+QSSLCFG=\"sslversion\",1,4");
+  assert(strcmp(zs_bg95_state_name(ZS_BG95_TIME_QUERY), "TIME_QUERY") == 0);
 }
 
 static void test_mqtt_tls_happy_path(void) {
@@ -464,6 +492,7 @@ static void test_timeout_and_negative_results(void) {
 
 int main(void) {
   test_mqtt_tls_happy_path();
+  test_network_time_optional();
   test_automatic_network_settings();
   test_catalog_fallback_and_unknown_sim();
   test_identity_query_fail_closed();
