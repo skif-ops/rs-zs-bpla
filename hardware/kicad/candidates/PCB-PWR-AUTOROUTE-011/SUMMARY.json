@@ -2,7 +2,7 @@
   "schema": "dioneya-pcb-pwr-autoroute-candidate-v1",
   "status": "CANDIDATE_FOR_REVIEW_NOT_APPLIED",
   "native_board_sha256": "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6",
-  "candidate_sha256": "0e0aa9707fbf1b73c364e8c1fef58f85b5c677c5ba7562896575c7cdb60b49fd",
+  "candidate_sha256": "09522e2a8c2c6016c7f02022a5e716e6d83d1f3b1f8882a5387a3ae5832f92d3",
   "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
   "freerouting": {
     "url": "https://github.com/freerouting/freerouting/releases/download/v2.4.1/freerouting-2.4.1-linux-x64.zip",
@@ -996,6 +996,98 @@
           36.9
         ]
       ]
+    ],
+    [
+      "track",
+      "F.Cu",
+      "FAULT",
+      0.2,
+      [
+        [
+          41.8,
+          23.0
+        ],
+        [
+          42.7,
+          23.0
+        ],
+        [
+          43.2,
+          22.2
+        ]
+      ]
+    ],
+    [
+      "via",
+      null,
+      "FAULT",
+      0.6,
+      [
+        [
+          43.2,
+          22.2
+        ]
+      ]
+    ],
+    [
+      "track",
+      "F.Cu",
+      "I2C2_SDA",
+      0.2,
+      [
+        [
+          41.8,
+          23.5
+        ],
+        [
+          43.9,
+          23.5
+        ]
+      ]
+    ],
+    [
+      "via",
+      null,
+      "I2C2_SDA",
+      0.6,
+      [
+        [
+          43.9,
+          23.5
+        ]
+      ]
+    ],
+    [
+      "track",
+      "F.Cu",
+      "I2C2_SCL",
+      0.2,
+      [
+        [
+          41.8,
+          24.0
+        ],
+        [
+          42.7,
+          24.0
+        ],
+        [
+          43.2,
+          24.8
+        ]
+      ]
+    ],
+    [
+      "via",
+      null,
+      "I2C2_SCL",
+      0.6,
+      [
+        [
+          43.2,
+          24.8
+        ]
+      ]
     ]
   ],
   "tie_strips": [
@@ -1017,47 +1109,43 @@
       "locked_track_items": 53,
       "zones": 8,
       "hole_keepouts": 4,
-      "preroute_items": 86,
+      "preroute_items": 94,
       "tie_strips": 1
     },
     "import": {
-      "track_items_before": 139,
-      "track_items_after": 580
+      "track_items_before": 147,
+      "track_items_after": 564
     },
     "pours": {
-      "thicken_zones": 21,
-      "ground_pad_vias": 19,
-      "stitching_vias": 196
+      "thicken_zones": 22,
+      "ground_pad_vias": 17,
+      "stitching_vias": 197
     },
     "gapfill": {
-      "routed_items": 5,
+      "routed_items": 9,
       "pairs": [
+        "1V8_MIC",
         "3V3_DIGITAL",
         "3V8_MODEM",
         "3V8_MODEM",
-        "I2C2_SDA"
+        "GND_MIC"
       ],
-      "failed": [
-        "I2C2_SDA"
-      ]
+      "failed": []
     }
   },
   "drc": {
-    "errors": {
-      "clearance": 4
-    },
+    "errors": {},
     "warnings": {
       "lib_footprint_issues": 66,
       "silk_over_copper": 41,
       "silk_overlap": 16
     },
-    "error_total": 4,
-    "unconnected_total": 2,
+    "error_total": 0,
+    "unconnected_total": 1,
     "unconnected_by_net": {
-      "GND_PWR": 1,
-      "I2C2_SDA": 1
+      "GND_PWR": 1
     }
   },
-  "freerouting_log_tail": "  Net '3V3_DIGITAL' (3 unrouted connections):\n    - via  ->  U4-6\n    - C2-1  ->  via\n    - L2-2  ->  R10-1\n  Net '3V8_MODEM' (2 unrouted connections):\n    - L1-2  ->  R1-1\n    - J2-1  ->  C16-1\n  Net 'BOOT_3V3' (1 unrouted connection):\n    - C6-1  ->  U4-4\n  Net 'BOOT_3V8' (1 unrouted connection):\n    - C4-1  ->  U3-4\n  Net 'FB_3V8' (1 unrouted connection):\n    - U3-6  ->  via\n  Net 'I2C2_SCL' (1 unrouted connection):\n    - TP9-1  ->  R13-2\n  Net 'I2C2_SDA' (1 unrouted connection):\n    - via  ->  U2-4\n  Net 'MODE_3V3' (1 unrouted connection):\n    - U4-7  ->  via\n  Net 'MODE_3V8' (1 unrouted connection):\n    - U3-7  ->  via\n  Net 'SW_3V3' (2 unrouted connections):\n    - U4-3  ->  U4-3@1\n    - U4-3@1  ->  C6-2\n  Net 'SW_3V8' (2 unrouted connections):\n    - U3-3  ->  U3-3@1\n    - U3-3@1  ->  C4-2\n  Net 'VBAT_SYS' (2 unrouted connections):\n    - U3-1@1  ->  C20-1\n    - via  ->  C11-1\n2026-09-25 05:12:24.858 INFO   [AE27EB\\081BA2] Auto-routing stage completed: started with 121 unrouted nets, completed in 145.15 seconds, final score: 700.69 (31 unrouted and 59 violations), using 141.45 total CPU seconds, 667.94 GB total allocated, and 628.4 MB peak heap usage.\n2026-09-25 05:12:24.940 INFO   [AE27EB\\081BA2] Optimization stage started on board 'a02743a5b3d05a1b4677950d03687668' with score 700.69 (31 unrouted and 59 violations).\n2026-09-25 05:12:32.742 INFO   [AE27EB\\081BA2] Stopping optimization pass #1 early after 50 consecutive items could not be improved.\n2026-09-25 05:12:32.824 INFO   [AE27EB\\081BA2] Optimizer pass #1 on board '13727f175b4354a475f67f02e09da5b0' was completed in 7.64 seconds with the score of 700.69 (31 unrouted and 59 violations).\n2026-09-25 05:12:32.898 INFO   [AE27EB\\081BA2] Stopping optimizer because the improvement in this pass (0.0000%) is below the threshold (1.00%).\n2026-09-25 05:12:32.974 INFO   [AE27EB\\081BA2] Optimization stage completed: started with score 700.69 (31 unrouted and 59 violations), completed in 7.96 seconds, final score: 700.69 (31 unrouted and 59 violations), using 7.84 total CPU seconds, 59.32 GB total allocated, and 454.7 MB peak heap usage.\n2026-09-25 05:12:32.983 INFO   [AE27EB\\081BA2] Job 'AE27EB\\081BA2' finished with state: COMPLETED (elapsed: 2 minutes 33.46 seconds, finished at UTC: 2026-09-25T05:12:32.982885597Z).\n2026-09-25 05:12:33.182 INFO   Saving output file '/home/runner/work/rs-zs-bpla/rs-zs-bpla/build/autoroute/PCB-PWR/PCB-PWR_AUTOROUTE_011_CANDIDATE_REV_A.ses' (SES)...\n2026-09-25 05:12:33.184 INFO   Successfully saved output file '/home/runner/work/rs-zs-bpla/rs-zs-bpla/build/autoroute/PCB-PWR/PCB-PWR_AUTOROUTE_011_CANDIDATE_REV_A.ses' (39043 bytes).\nPicked up JAVA_TOOL_OPTIONS: -Xmx3g",
+  "freerouting_log_tail": "  Net '3V3_DIGITAL' (3 unrouted connections):\n    - via  ->  U4-6\n    - C2-1  ->  via\n    - L2-2  ->  R10-1\n  Net '3V8_MODEM' (2 unrouted connections):\n    - L1-2  ->  R1-1\n    - C16-1  ->  J2-1\n  Net 'BOOT_3V3' (1 unrouted connection):\n    - C6-1  ->  U4-4\n  Net 'BOOT_3V8' (1 unrouted connection):\n    - U3-4  ->  C4-1\n  Net 'FB_3V8' (1 unrouted connection):\n    - U3-6  ->  via\n  Net 'GND_MIC' (1 unrouted connection):\n    - J2-6  ->  NT3-1\n  Net 'I2C2_SCL' (1 unrouted connection):\n    - R13-2  ->  TP9-1\n  Net 'MODE_3V3' (1 unrouted connection):\n    - U4-7  ->  via\n  Net 'MODE_3V8' (1 unrouted connection):\n    - U3-7  ->  via\n  Net 'SW_3V3' (2 unrouted connections):\n    - U4-3  ->  U4-3@1\n    - U4-3@1  ->  C6-2\n  Net 'SW_3V8' (2 unrouted connections):\n    - U3-3  ->  U3-3@1\n    - C4-2  ->  U3-3@1\n  Net 'VBAT_SYS' (2 unrouted connections):\n    - C20-1  ->  U3-1@1\n    - C11-1  ->  via\n2026-09-25 05:23:40.422 INFO   [AD4911\\372AA4] Auto-routing stage completed: started with 121 unrouted nets, completed in 164.12 seconds, final score: 693.70 (32 unrouted and 59 violations), using 160.17 total CPU seconds, 622.30 GB total allocated, and 554.2 MB peak heap usage.\n2026-09-25 05:23:40.534 INFO   [AD4911\\372AA4] Optimization stage started on board '46f00de5f01eeae6189be0911e3164a6' with score 693.70 (32 unrouted and 59 violations).\n2026-09-25 05:23:52.251 INFO   [AD4911\\372AA4] Stopping optimization pass #1 early after 50 consecutive items could not be improved.\n2026-09-25 05:23:52.368 INFO   [AD4911\\372AA4] Optimizer pass #1 on board '64d597ea617138f9c285b2472dc4c483' was completed in 11.49 seconds with the score of 693.70 (32 unrouted and 59 violations).\n2026-09-25 05:23:52.474 INFO   [AD4911\\372AA4] Stopping optimizer because the improvement in this pass (0.0000%) is below the threshold (1.00%).\n2026-09-25 05:23:52.582 INFO   [AD4911\\372AA4] Optimization stage completed: started with score 693.70 (32 unrouted and 59 violations), completed in 11.94 seconds, final score: 693.70 (32 unrouted and 59 violations), using 11.78 total CPU seconds, 59.91 GB total allocated, and 464.3 MB peak heap usage.\n2026-09-25 05:23:52.595 INFO   [AD4911\\372AA4] Job 'AD4911\\372AA4' finished with state: COMPLETED (elapsed: 2 minutes 56.49 seconds, finished at UTC: 2026-09-25T05:23:52.594186919Z).\n2026-09-25 05:23:52.799 INFO   Saving output file '/home/runner/work/rs-zs-bpla/rs-zs-bpla/build/autoroute/PCB-PWR/PCB-PWR_AUTOROUTE_011_CANDIDATE_REV_A.ses' (SES)...\n2026-09-25 05:23:52.801 INFO   Successfully saved output file '/home/runner/work/rs-zs-bpla/rs-zs-bpla/build/autoroute/PCB-PWR/PCB-PWR_AUTOROUTE_011_CANDIDATE_REV_A.ses' (38093 bytes).\nPicked up JAVA_TOOL_OPTIONS: -Xmx3g",
   "manufacturing_release": false
 }
