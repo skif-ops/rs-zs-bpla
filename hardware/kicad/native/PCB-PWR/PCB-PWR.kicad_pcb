@@ -123,8 +123,8 @@
 			(uuid "7a2f7b53-9413-4140-a400-9606c6967053")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -259,8 +259,8 @@
 			(uuid "a543ca13-6d9a-4f04-9c28-509d5038c830")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -395,8 +395,8 @@
 			(uuid "40cf144d-515d-4c12-941e-a9861290355a")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -526,13 +526,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C21"
-			(at 2.3336 0 0)
+			(at 2.50325 0 0)
 			(layer "F.SilkS")
 			(uuid "dc1ff745-be74-4fdf-9cc6-504508a34c2a")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -667,8 +667,8 @@
 			(uuid "a7f51633-26b4-4e37-acf1-cdeb59f4c9f0")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -803,8 +803,8 @@
 			(uuid "b91ff3bf-c408-4bc6-89c2-19bb311e13e6")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -939,8 +939,8 @@
 			(uuid "e1477abf-2079-4445-94a1-f01509296087")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -997,7 +997,7 @@
 			(size 1.7 1.7)
 			(layers "F.Cu" "F.Mask")
 			(net 1 "1V8_MIC")
-			(solder_mask_margin 0.2)
+			(solder_mask_margin 0.1)
 			(uuid "cd4baf4f-c825-4bf3-a07a-3498cd7228c7")
 		)
 		(embedded_fonts no)
@@ -1101,8 +1101,8 @@
 			(uuid "9ec3c5c5-50b8-41a3-930d-85263e1c193a")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -1237,8 +1237,8 @@
 			(uuid "caa1618d-0419-4f0e-a958-49f370fe226b")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -1373,8 +1373,8 @@
 			(uuid "fc4003f8-eef5-437c-9ba2-36483d0a8e38")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -1509,8 +1509,8 @@
 			(uuid "d0c562b7-6a17-4a09-b4ba-2477a35d175a")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -1645,8 +1645,8 @@
 			(uuid "0cdea500-6e42-41b6-b4d7-2a953eb1ccf5")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -1868,8 +1868,8 @@
 			(uuid "b98f9385-d62d-4f06-8c11-e2fa9aabcb82")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -2004,8 +2004,8 @@
 			(uuid "a7a07459-6906-4bcc-a102-28c7f668774c")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -2135,13 +2135,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=INPUT_PROTECTION|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PIN_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "U1"
-			(at 0 -2.6336 0)
+			(at 2 -3.08 90)
 			(layer "F.SilkS")
 			(uuid "e7d44ab0-8d3f-4062-9c10-8c5c95bb649d")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -2280,13 +2280,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V8|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C20"
-			(at 2.3336 0 0)
+			(at 2.50325 0 0)
 			(layer "F.SilkS")
 			(uuid "a29bdb37-7ae9-437c-8c14-8c62d1e2b9b8")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -2416,13 +2416,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "TP6"
-			(at 0 -2.0036 0)
+			(at 0 -2.807143 90)
 			(layer "F.SilkS")
 			(uuid "00fac1e8-edb5-4d51-84cf-38431aac8466")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -2479,7 +2479,7 @@
 			(size 1.7 1.7)
 			(layers "F.Cu" "F.Mask")
 			(net 20 "PWR_GOOD")
-			(solder_mask_margin 0.2)
+			(solder_mask_margin 0.1)
 			(uuid "457b5fc4-40a9-4393-a51e-4c21183f14c5")
 		)
 		(embedded_fonts no)
@@ -2496,8 +2496,8 @@
 			(uuid "bdbab254-f6e8-4882-b043-5945b01e5e92")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -2706,8 +2706,8 @@
 			(uuid "72aeb604-5ab3-4de7-9659-7b273f81b9db")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -2837,13 +2837,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=CURRENT_SENSE|placement=PROVISIONAL_PACKAGE_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C13"
-			(at 0 -4.4036 0)
+			(at 0 -4.57325 0)
 			(layer "F.SilkS")
 			(uuid "6c08c205-5c9b-45c2-a4a5-8de8017f4c48")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -3267,8 +3267,8 @@
 			(uuid "c00bd95b-4a6a-4d7c-b539-a25b3b905100")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -3325,7 +3325,7 @@
 			(size 1.7 1.7)
 			(layers "F.Cu" "F.Mask")
 			(net 14 "I2C2_SCL")
-			(solder_mask_margin 0.2)
+			(solder_mask_margin 0.1)
 			(uuid "80698f64-d3ff-4cf5-8d1d-8ccf8371062b")
 		)
 		(embedded_fonts no)
@@ -3337,13 +3337,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=GROUND_JOIN|placement=PROVISIONAL_RETURN_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "NT1"
-			(at 1.5 -2.254762 90)
+			(at 1.5 -2.555951 90)
 			(layer "F.SilkS")
 			(uuid "8de50199-a48c-40bf-a02b-04572bf5acb7")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -3422,13 +3422,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "TP8"
-			(at 0 -2.0036 0)
+			(at 0 -2.807143 90)
 			(layer "F.SilkS")
 			(uuid "9d889a66-96ed-4877-85e3-16517143ddca")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -3485,7 +3485,7 @@
 			(size 1.7 1.7)
 			(layers "F.Cu" "F.Mask")
 			(net 8 "FAULT")
-			(solder_mask_margin 0.2)
+			(solder_mask_margin 0.1)
 			(uuid "3482a7f1-0d52-4dbb-83f8-ed51c9c6237e")
 		)
 		(embedded_fonts no)
@@ -3502,8 +3502,8 @@
 			(uuid "04ce4191-5230-45d9-85f5-7d3375e671b0")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -3633,13 +3633,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=INPUT_PROTECTION|placement=PROVISIONAL_THERMAL_REVIEW_PENDING|authority=PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "Q1"
-			(at 0 -3.6036 0)
+			(at 0 -3.77325 0)
 			(layer "F.SilkS")
 			(uuid "2b194ba2-8720-4eab-84b6-5deb028c2dcc")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -3922,8 +3922,8 @@
 			(uuid "dff544ec-bc08-4e38-8f15-11317bdc6293")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -3980,7 +3980,7 @@
 			(size 1.7 1.7)
 			(layers "F.Cu" "F.Mask")
 			(net 25 "SHUNT_SOURCE_SENSE")
-			(solder_mask_margin 0.2)
+			(solder_mask_margin 0.1)
 			(uuid "57389900-769c-4e3e-bc68-80f6bb1d4432")
 		)
 		(embedded_fonts no)
@@ -3992,13 +3992,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=GROUND_JOIN|placement=PROVISIONAL_RETURN_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "NT2"
-			(at 2.354762 0 0)
+			(at 0.75 -3.09825 0)
 			(layer "F.SilkS")
 			(uuid "11d0dcd6-a1db-405b-8c5b-b1e9e51dcf4f")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -4077,13 +4077,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=CURRENT_SENSE|placement=PROVISIONAL_KELVIN_REVIEW_PENDING|authority=PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "RSH1"
-			(at 0 -1.4 0)
+			(at 2 -2.92325 0)
 			(layer "F.SilkS")
 			(uuid "7b21d9f0-044e-4989-a58f-4d20d006b8be")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -4200,8 +4200,8 @@
 			(uuid "f0334249-9817-4f8e-b0a0-6b0d8ac6c719")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -4331,13 +4331,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=DNP|zone=CONTROL_INTERFACE|placement=PROVISIONAL_I2C_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "R13"
-			(at -1.7836 -1.5 90)
+			(at -1.95325 -1.25 90)
 			(layer "F.SilkS")
 			(uuid "f9cab3f6-7654-44dc-a09b-fa0d2fe56aff")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -4472,8 +4472,8 @@
 			(uuid "9f221151-1036-4186-9038-c26a80ae81d3")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -4837,8 +4837,8 @@
 			(uuid "b2e71e05-cd61-4355-b145-5d95e2b37389")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -4973,8 +4973,8 @@
 			(uuid "e86cf4cf-602a-4d1d-b79e-b099e913812f")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -5072,13 +5072,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=DNP|zone=CONTROL_INTERFACE|placement=PROVISIONAL_I2C_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "R14"
-			(at 1.7836 -1.5 90)
+			(at 2.682381 -1.25 0)
 			(layer "F.SilkS")
 			(uuid "f5164eaa-3255-45ca-90cd-a7f7d2d0ed66")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -5213,8 +5213,8 @@
 			(uuid "60e25273-1237-470e-9d24-d02323ce3143")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -5349,8 +5349,8 @@
 			(uuid "e045a526-102d-4532-9131-3b47fa5542f4")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -5530,8 +5530,8 @@
 			(uuid "97b46b04-dd20-448e-b10d-0cc662150ac5")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -5666,8 +5666,8 @@
 			(uuid "4111c1d5-e467-4c00-9089-1387851707be")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -5802,8 +5802,8 @@
 			(uuid "3c5004fb-c661-4b8c-a809-e3517f4b76d1")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -5938,8 +5938,8 @@
 			(uuid "ee018cbb-56cd-425e-a2f3-70181c001356")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -6069,13 +6069,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=DNP|zone=BUCK_3V8|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "R15"
-			(at 0 -1.4 0)
+			(at 0.25 -1.49325 0)
 			(layer "F.SilkS")
 			(uuid "6a142b0d-3aa6-421e-acf0-4cd8c76db0e1")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -6205,13 +6205,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=INPUT_PROTECTION|placement=PROVISIONAL_TRANSIENT_REVIEW_PENDING|authority=POWER_COMPONENT_FREEZE_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "D1"
-			(at 1.477499 -3.1036 90)
+			(at 1.477499 -3.27325 90)
 			(layer "F.SilkS")
 			(uuid "6756906e-a923-4bb3-87ec-173db8809190")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -6471,13 +6471,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=BUCK_3V3|placement=PROVISIONAL_LOAD_STEP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C19"
-			(at -3.736905 -1.5 0)
+			(at -4.052381 -1.5 0)
 			(layer "F.SilkS")
 			(uuid "26cd85a5-a4e8-43ee-986b-8e7446a2a912")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -6612,8 +6612,8 @@
 			(uuid "c229bd59-26f1-45a7-94b3-a7fc2a7822c5")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -6743,13 +6743,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "TP1"
-			(at 0 -2.0036 0)
+			(at -0.5 -2.17325 0)
 			(layer "F.SilkS")
 			(uuid "bc373da5-f940-4297-8d74-2e3734ca7890")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -6806,7 +6806,7 @@
 			(size 1.7 1.7)
 			(layers "F.Cu" "F.Mask")
 			(net 29 "VBAT_PROTECTED")
-			(solder_mask_margin 0.2)
+			(solder_mask_margin 0.1)
 			(uuid "0f26b012-9dc9-4ded-b4a3-660f055234be")
 		)
 		(embedded_fonts no)
@@ -6823,8 +6823,8 @@
 			(uuid "108580ac-7aad-422e-9aa3-9931e19fabb9")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -6954,13 +6954,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "TP10"
-			(at 0.25 -2.0036 0)
+			(at 1 -2.17325 0)
 			(layer "F.SilkS")
 			(uuid "9f02f19c-11bb-4f8f-b323-5fe893b51530")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -7017,7 +7017,7 @@
 			(size 1.7 1.7)
 			(layers "F.Cu" "F.Mask")
 			(net 15 "I2C2_SDA")
-			(solder_mask_margin 0.2)
+			(solder_mask_margin 0.1)
 			(uuid "2f15a26a-6e21-492e-b1f8-1ffab16cf345")
 		)
 		(embedded_fonts no)
@@ -7034,8 +7034,8 @@
 			(uuid "6cd8e726-e254-4060-b765-ae4ab17b3d7b")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -7165,13 +7165,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=INPUT_PROTECTION|placement=PROVISIONAL_HOT_LOOP_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "C9"
-			(at 0 -1.4 0)
+			(at 0 -1.75325 0)
 			(layer "F.SilkS")
 			(uuid "27574d5b-a4b7-4d06-8ef1-e21741d0b394")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -7306,8 +7306,8 @@
 			(uuid "9aa5ed8d-d2c8-4e54-9100-33c181a9e191")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -7437,13 +7437,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "TP3"
-			(at 0 -2.0036 0)
+			(at 0.5 -2.17325 0)
 			(layer "F.SilkS")
 			(uuid "0aa3140c-1c56-4b76-9bd8-7db5d9150e62")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -7500,7 +7500,7 @@
 			(size 1.7 1.7)
 			(layers "F.Cu" "F.Mask")
 			(net 24 "SHUNT_LOAD_SENSE")
-			(solder_mask_margin 0.2)
+			(solder_mask_margin 0.1)
 			(uuid "bd743c30-26da-44c9-9f2f-cc3e682f138f")
 		)
 		(embedded_fonts no)
@@ -7517,8 +7517,8 @@
 			(uuid "1d0f5ace-3a22-4ff8-9df3-0f5cb0843e59")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -7718,8 +7718,8 @@
 			(uuid "bc9314e5-1b6f-43d8-adae-9a25d5b44a01")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -7991,13 +7991,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=DNP|zone=BUCK_3V8|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "R5"
-			(at 0 1.3236 0)
+			(at 0 1.49325 0)
 			(layer "F.SilkS")
 			(uuid "9b25d65c-7818-48ac-b314-e3ff7c07c5da")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -8129,11 +8129,12 @@
 		(property "Reference" "NT3"
 			(at -1.8286 0 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "d503139a-ffe0-4da3-9524-c0690a605ed9")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -8217,8 +8218,8 @@
 			(uuid "eadf0958-10ad-4825-b731-2cf4f450da47")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -8348,13 +8349,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=FITTED|zone=CONTROL_INTERFACE|placement=PROVISIONAL_CONTROL_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "R12"
-			(at 0.25 -1.3236 0)
+			(at 0.75 -1.49325 0)
 			(layer "F.SilkS")
 			(uuid "42e5b88a-ead7-4dea-9dd5-0098243a399a")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -8489,8 +8490,8 @@
 			(uuid "1c6052e0-453c-4dbf-b0db-ef4c448da4cd")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -8593,8 +8594,8 @@
 			(uuid "c1628b52-5265-4249-84ce-74d08ec6a706")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -8726,11 +8727,12 @@
 		(property "Reference" "U5"
 			(at -3.2036 1.5 90)
 			(layer "F.SilkS")
+			(hide yes)
 			(uuid "5bb33750-9193-43e7-939d-6023bbc8df1a")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -8864,8 +8866,8 @@
 			(uuid "a07ca322-dc00-45da-b0e2-e779a8d2f458")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -8922,7 +8924,7 @@
 			(size 1.7 1.7)
 			(layers "F.Cu" "F.Mask")
 			(net 19 "PG_3V8")
-			(solder_mask_margin 0.2)
+			(solder_mask_margin 0.1)
 			(uuid "8e83e556-a196-4624-876f-1384af99ece2")
 		)
 		(embedded_fonts no)
@@ -8934,13 +8936,13 @@
 		(descr "DIONEA_PCB_PWR_REV_A|population=PCB_FEATURE|zone=DFT_EDGE|placement=PROVISIONAL_DFT_ACCESS_REVIEW_PENDING|authority=PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv")
 		(tags "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE")
 		(property "Reference" "TP4"
-			(at 0 -2.0036 0)
+			(at 0 -4.02325 0)
 			(layer "F.SilkS")
 			(uuid "d7c31fc0-6243-4e4e-a2fb-34b1d4f20388")
 			(effects
 				(font
-					(size 0.8 0.8)
-					(thickness 0.12)
+					(size 1 1)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -8997,7 +8999,7 @@
 			(size 1.7 1.7)
 			(layers "F.Cu" "F.Mask")
 			(net 3 "3V8_MODEM")
-			(solder_mask_margin 0.2)
+			(solder_mask_margin 0.1)
 			(uuid "e283238f-09a1-41ad-a18e-862bd60f03b9")
 		)
 		(embedded_fonts no)

@@ -126,7 +126,7 @@ def audit_remaining_power_components(library: Path) -> None:
 
     testpoint = {
         ("1", "circle", 0.0, 0.0, 1.70, 1.70,
-         ("F.Cu", "F.Mask"), None, 0.20),
+         ("F.Cu", "F.Mask"), None, 0.10),  # ECO-006 (Review B R2 DFM-PWR-02): 0.20 -> 0.10 mm
     }
     audit_simple_ti_package(library / "TestPoint_DFT_1.7mm_NoPaste.kicad_mod",
                             "TestPoint_DFT_1.7mm_NoPaste", testpoint)
