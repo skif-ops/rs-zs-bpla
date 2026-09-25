@@ -6,6 +6,9 @@ Runs zs_station_twin with the Python server twin on the pipe and checks the serv
   1. a drone fly-by is detected, published over GSM, acknowledged, no duplicates;
   2. a burst of events during a GSM outage goes out over LoRa (30 % loss both ways) once the link is marked
      degraded, every event is delivered exactly once, and a GSM probe restores the link when the network returns.
+  3. remote commands (ICD addendum D): the server signs CMD_SET_PARAMS and CMD_REBOOT, the station verifies them
+     against its wall clock, executes, acknowledges; the reboot happens after its ACK, the parameters survive it,
+     and the same reboot redelivered is answered from the journal without a second reset.
 """
 from __future__ import annotations
 
@@ -21,8 +24,9 @@ TWIN = Path(os.environ.get("ZS_STATION_TWIN", REPO_ROOT / "firmware" / "build" /
 SERVER_CMD = f"{sys.executable} -m twin.twin_server"
 
 
-def run(args: list[str]) -> tuple[str, dict]:
-    out = subprocess.run([str(TWIN), *args, "--server", SERVER_CMD], cwd=SERVER_ROOT, capture_output=True, text=True, timeout=900)
+def run(args: list[str], commands: str = "") -> tuple[str, dict]:
+    env = dict(os.environ, ZS_TWIN_COMMANDS=commands)
+    out = subprocess.run([str(TWIN), *args, "--server", SERVER_CMD], cwd=SERVER_ROOT, capture_output=True, text=True, timeout=900, env=env)
     if out.returncode != 0:
         sys.stderr.write(out.stdout[-4000:] + out.stderr[-2000:])
         raise SystemExit(f"twin exited with {out.returncode}: {args}")
@@ -51,6 +55,21 @@ def main() -> int:
     assert r["duplicates"] == r["lora_frames"] - 12 or r["duplicates"] == 0, r   # a late duplicate frame is deduped, never double-counted
     assert "DEGRADED" in log and "link healthy again" in log, "degraded -> LoRa -> probe -> healthy cycle missing"
     print(f"scenario 2 (LoRa during a GSM outage): lora frames {r['lora_frames']}, delivered {r['lora_detections']}, duplicates {r['duplicates']}")
+
+    # one synthetic event opens the session (a quiet station otherwise first connects after its heartbeat period)
+    log, r = run(["--scene", "quiet", "--seconds", "90", "--seed", "3", "--inject-events", "1", "5", "--expect-delivered", "1",
+                  "--expect-commands", "2", "--expect-reboots", "1"],
+                 commands="set_params,reboot,reboot_again")
+    sent, acks = r["commands_sent"], r["acks"]
+    assert [c["command"] for c in sent] == ["CMD_SET_PARAMS", "CMD_REBOOT", "CMD_REBOOT"], sent
+    assert len(acks) == 3 and all(a["result"] == 0 for a in acks), acks                  # OK, OK, stored OK
+    assert [a["command_id"] for a in acks] == [c["command_id"] for c in sent], (acks, sent)
+    assert acks[2] == acks[1], "the redelivered reboot must be answered with the journal's ACK, unchanged"
+    assert "command: SET_PARAMS applied, params v1 (heartbeat 900 s, mic 1, dwell 5 s)" in log
+    assert log.count("command: REBOOT in 10 s") == 1 and "twin: REBOOT by command, params v1 reloaded" in log
+    reboot_line = next(l for l in log.splitlines() if "twin: REBOOT by command" in l)
+    assert log.index("command: REBOOT in 10 s") < log.index(reboot_line)
+    print(f"scenario 3 (remote commands): sent {len(sent)}, acks {[a['result'] for a in acks]}, one reboot, params survived it")
     return 0
 
 
