@@ -43,24 +43,24 @@ def apply(in_path: str, spec_path: str, out_path: str) -> None:
         footprint.SetOrientationDegrees(float(item["angle_deg"]))
         report["rotated"].append(item["ref"])
 
-    tracks = list(board.GetTracks())
+    def live_tracks():  # re-read after every removal: KiCad frees removed items
+        return list(board.GetTracks())
+
     for item in spec.get("remove_tracks", []):
         (x0, y0), (x1, y1) = item["start"], item["end"]
-        hits = [t for t in tracks if t.GetClass() == "PCB_TRACK" and t.GetNetname() == item["net"]
+        hits = [t for t in live_tracks() if t.GetClass() == "PCB_TRACK" and t.GetNetname() == item["net"]
                 and board.GetLayerName(t.GetLayer()) == item["layer"]
                 and ((_near(t.GetStart(), x0, y0) and _near(t.GetEnd(), x1, y1))
                      or (_near(t.GetStart(), x1, y1) and _near(t.GetEnd(), x0, y0)))]
         assert len(hits) == 1, f"track removal matched {len(hits)}: {item}"
         board.Remove(hits[0])
-        tracks.remove(hits[0])
         report["removed_tracks"] += 1
     for item in spec.get("remove_vias", []):
         x, y = item["pos"]
-        hits = [t for t in tracks if t.GetClass() == "PCB_VIA" and t.GetNetname() == item["net"]
+        hits = [t for t in live_tracks() if t.GetClass() == "PCB_VIA" and t.GetNetname() == item["net"]
                 and _near(t.GetPosition(), x, y)]
         assert len(hits) == 1, f"via removal matched {len(hits)}: {item}"
         board.Remove(hits[0])
-        tracks.remove(hits[0])
         report["removed_vias"] += 1
 
     for item in spec.get("remove_zones", []):
