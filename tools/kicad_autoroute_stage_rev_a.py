@@ -393,6 +393,10 @@ def pours(board_path: str, spec_json: str) -> None:
     removed = remove_dangling(board, spec.get("preroute_segments", []), spec.get("preroute_vias", []))
     if removed:
         filler.Fill(board.Zones())
+    # the plane layers were typed "power" only for the Specctra export; the layer
+    # authority keeps every copper layer "signal"
+    for name in spec.get("restore_signal_layers", []):
+        board.SetLayerType(board.GetLayerID(name), pcbnew.LT_SIGNAL)
     board.Save(board_path)
     print(json.dumps({"thicken_zones": sum(len(i["polygons"]) for i in spec["thicken"]),
                       "ground_pad_vias": pad_vias, "stitching_vias": placed, "dangling_removed": removed}))
