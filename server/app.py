@@ -26,6 +26,7 @@ from utils.logging_utils import logger
 from utils.media import extract_audio_to_wav, is_supported_video_filename
 from utils.validation import load_microphone_config
 from station.router import router as station_router
+from station.operator_auth import OperatorAuthMiddleware, build_router as build_auth_router
 
 
 ensure_runtime_directories()
@@ -39,6 +40,9 @@ app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 
 templates = Jinja2Templates(directory=settings.template_dir)
 app.include_router(station_router)
+# release audit item 1: every page, API route and the event stream need an operator (station/operator_auth.py)
+app.include_router(build_auth_router(templates))
+app.add_middleware(OperatorAuthMiddleware)
 
 
 def artifact_url(path: str) -> str:
