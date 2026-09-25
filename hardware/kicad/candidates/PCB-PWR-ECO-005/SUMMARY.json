@@ -9,6 +9,11 @@
     "via": 4,
     "zone": 1
   },
+  "library_sync": {
+    "rc": 0,
+    "stdout": "{\"resaved\": [\"MountingHole_M3_3.4_EVT\", \"Coilcraft_XAL7030_472\"]}\n",
+    "stderr": ""
+  },
   "stage": {
     "rc": 0,
     "stderr": "",
@@ -97,117 +102,13 @@
     "error_total": 0,
     "unconnected_total": 0,
     "by_type": {
-      "warning:lib_footprint_mismatch": 6,
+      "warning:lib_footprint_mismatch": 2,
       "warning:silk_over_copper": 9
     },
     "errors": [],
     "unconnected": []
   },
   "library_parity": {
-    "H1": {
-      "lib": "DioneyaPWR:MountingHole_M3_3.4_EVT",
-      "kicad_report_error": "AttributeError(\"module 'pcbnew' has no attribute 'WX_STRING_REPORTER'\")",
-      "pads_only_on_board": [],
-      "pads_only_in_library": [],
-      "graphics_only_on_board": [],
-      "graphics_only_in_library": [
-        [
-          "Circle",
-          "F.Silkscreen",
-          0.25,
-          2.625,
-          2.625,
-          7.375,
-          7.375
-        ]
-      ],
-      "attributes": [
-        28,
-        28
-      ],
-      "models": [
-        [],
-        []
-      ]
-    },
-    "H2": {
-      "lib": "DioneyaPWR:MountingHole_M3_3.4_EVT",
-      "kicad_report_error": "AttributeError(\"module 'pcbnew' has no attribute 'WX_STRING_REPORTER'\")",
-      "pads_only_on_board": [],
-      "pads_only_in_library": [],
-      "graphics_only_on_board": [],
-      "graphics_only_in_library": [
-        [
-          "Circle",
-          "F.Silkscreen",
-          0.25,
-          79.625,
-          2.625,
-          84.375,
-          7.375
-        ]
-      ],
-      "attributes": [
-        28,
-        28
-      ],
-      "models": [
-        [],
-        []
-      ]
-    },
-    "H3": {
-      "lib": "DioneyaPWR:MountingHole_M3_3.4_EVT",
-      "kicad_report_error": "AttributeError(\"module 'pcbnew' has no attribute 'WX_STRING_REPORTER'\")",
-      "pads_only_on_board": [],
-      "pads_only_in_library": [],
-      "graphics_only_on_board": [],
-      "graphics_only_in_library": [
-        [
-          "Circle",
-          "F.Silkscreen",
-          0.25,
-          65.625,
-          52.625,
-          70.375,
-          57.375
-        ]
-      ],
-      "attributes": [
-        28,
-        28
-      ],
-      "models": [
-        [],
-        []
-      ]
-    },
-    "H4": {
-      "lib": "DioneyaPWR:MountingHole_M3_3.4_EVT",
-      "kicad_report_error": "AttributeError(\"module 'pcbnew' has no attribute 'WX_STRING_REPORTER'\")",
-      "pads_only_on_board": [],
-      "pads_only_in_library": [],
-      "graphics_only_on_board": [],
-      "graphics_only_in_library": [
-        [
-          "Circle",
-          "F.Silkscreen",
-          0.25,
-          2.625,
-          52.625,
-          7.375,
-          57.375
-        ]
-      ],
-      "attributes": [
-        28,
-        28
-      ],
-      "models": [
-        [],
-        []
-      ]
-    },
     "L1": {
       "lib": "DioneyaPWR:Coilcraft_XAL7030_472",
       "kicad_report_error": "AttributeError(\"module 'pcbnew' has no attribute 'WX_STRING_REPORTER'\")",
@@ -321,5 +222,5 @@
       }
     }
   ],
-  "candidate_sha256": "546b16a5e6a9ec4227b3f912da465a4852e8ee47bb2037bf77e21863841d6df8"
+  "candidate_sha256": "cc805fbfb5df266de805988e54cefad642c6ad6acea02fa414269625a367043f"
 }

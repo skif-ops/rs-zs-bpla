@@ -1,0 +1,103 @@
+(footprint "Coilcraft_XAL7030_472"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "Coilcraft XAL7030-472 4.7 uH shielded inductor; Document 863-2 Rev 02/25/26 recommended land pattern")
+	(tags "Coilcraft XAL7030 472 shielded power inductor")
+	(property "Reference" "REF**"
+		(at 0 -4.25 0)
+		(layer "F.SilkS")
+		(uuid "953598bb-6326-43d5-8efc-02414007bb81")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Value" "Coilcraft_XAL7030_472"
+		(at 0 4.25 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "1b517236-eaad-45a1-a051-71f195070166")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "cc3775e7-e132-4c36-9e6b-bc6f2ded4921")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "a034fb7d-d4a8-4045-a540-9504d424d8ed")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_poly
+		(pts
+			(xy 3.3 -3.9) (xy 3.9 -3.9) (xy 3.9 -3.3)
+		)
+		(stroke
+			(width 0.15)
+			(type default)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "badf2154-540f-4314-a140-f772d7661e57")
+	)
+	(fp_rect
+		(start -4 -4)
+		(end 4 4)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "049675f5-d710-4374-a5fe-e8f5e48a15b1")
+	)
+	(fp_rect
+		(start -3.75 -3.75)
+		(end 3.75 3.75)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "b01a6786-a705-4b74-b483-97653387c94a")
+	)
+	(pad "1" smd rect
+		(at 2.26 0)
+		(size 1.58 6.5)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "9146d8f6-86da-42cd-a306-5946f446f66c")
+	)
+	(pad "2" smd rect
+		(at -2.26 0)
+		(size 1.58 6.5)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "f3951891-0cd8-4334-b2a0-4f9a64364c4b")
+	)
+	(embedded_fonts no)
+)
