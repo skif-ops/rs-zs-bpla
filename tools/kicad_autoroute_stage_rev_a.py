@@ -199,6 +199,10 @@ def _zone(board, net_name: str, layer_name: str, points_mm, priority: int, clear
     zone.SetLocalClearance(mm(clearance_mm))
     zone.SetMinThickness(mm(0.25))
     zone.SetAssignedPriority(priority)
+    try:  # drop copper islands that the fill cannot connect
+        zone.SetIslandRemovalMode(pcbnew.ISLAND_REMOVAL_MODE_ALWAYS)
+    except AttributeError:
+        pass
     outline = zone.Outline()
     outline.NewOutline()
     for x, y in points_mm:
