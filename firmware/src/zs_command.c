@@ -137,6 +137,50 @@ static bool read_audio_payload(command_reader_t *reader,
   return true;
 }
 
+static bool read_bool(command_reader_t *reader, bool *value) {
+  if (reader->offset >= reader->size) return false;
+  if (reader->data[reader->offset] == 0xf4u) *value = false;
+  else if (reader->data[reader->offset] == 0xf5u) *value = true;
+  else return false;
+  ++reader->offset;
+  return true;
+}
+
+static bool read_int32(command_reader_t *reader, int32_t *output) {
+  uint8_t major;
+  uint64_t value;
+  if (!read_argument(reader, &major, &value) || major > 1u || value > INT32_MAX) return false;
+  *output = major == 0u ? (int32_t)value : (int32_t)(-1 - (int64_t)value);
+  return true;
+}
+
+/* CMD_REBOOT: {0: delay_s <= ZS_COMMAND_REBOOT_MAX_DELAY_S} */
+static bool read_reboot_payload(command_reader_t *reader, zs_reboot_command_t *reboot) {
+  uint64_t delay;
+  if (!expect_map(reader, 1u) || !expect_uint(reader, 0u) || !read_uint(reader, &delay) ||
+      delay > ZS_COMMAND_REBOOT_MAX_DELAY_S) return false;
+  reboot->delay_s = (uint16_t)delay;
+  return true;
+}
+
+/* CMD_SET_PARAMS: {0: reset_to_defaults, 1: {id: int32, ...}} - ids 1..65535 strictly ascending (canonical order),
+   at most ZS_COMMAND_PARAMS_MAX, at least one unless the command resets to defaults. */
+static bool read_params_payload(command_reader_t *reader, zs_set_params_command_t *params) {
+  uint8_t major;
+  uint64_t count, id, previous = 0u;
+  if (!expect_map(reader, 2u) || !expect_uint(reader, 0u) || !read_bool(reader, &params->reset_to_defaults) ||
+      !expect_uint(reader, 1u) || !read_argument(reader, &major, &count) || major != 5u ||
+      count > ZS_COMMAND_PARAMS_MAX || (count == 0u && !params->reset_to_defaults)) return false;
+  for (uint64_t i = 0u; i < count; ++i) {
+    if (!read_uint(reader, &id) || id == 0u || id > UINT16_MAX || id <= previous ||
+        !read_int32(reader, &params->value[i])) return false;
+    params->id[i] = (uint16_t)id;
+    previous = id;
+  }
+  params->count = (uint8_t)count;
+  return true;
+}
+
 static zs_command_status_t decode_envelope(
     size_t payload_size, uint32_t expected_station_id,
     uint64_t now_us, bool time_trusted, command_reader_t *reader,
@@ -164,10 +208,15 @@ static zs_command_status_t decode_envelope(
   if (now_us < command->created_time_us) return ZS_COMMAND_STATUS_NOT_YET_VALID;
   if (now_us >= command->expires_time_us) return ZS_COMMAND_STATUS_EXPIRED;
   if (!expect_uint(reader, 6u) || !read_uint(reader, &value) ||
-      value != ZS_COMMAND_REQUEST_AUDIO) return ZS_COMMAND_STATUS_UNSUPPORTED;
+      (value != ZS_COMMAND_REQUEST_AUDIO && value != ZS_COMMAND_REBOOT && value != ZS_COMMAND_SET_PARAMS))
+    return ZS_COMMAND_STATUS_UNSUPPORTED;
   command->code = (zs_command_code_t)value;
-  if (!expect_uint(reader, 7u) || !read_audio_payload(reader, &command->audio) ||
-      !expect_uint(reader, 8u) ||
+  if (!expect_uint(reader, 7u)) return ZS_COMMAND_STATUS_INVALID_CBOR;
+  if ((command->code == ZS_COMMAND_REQUEST_AUDIO && !read_audio_payload(reader, &command->audio)) ||
+      (command->code == ZS_COMMAND_REBOOT && !read_reboot_payload(reader, &command->reboot)) ||
+      (command->code == ZS_COMMAND_SET_PARAMS && !read_params_payload(reader, &command->params)))
+    return ZS_COMMAND_STATUS_INVALID_CBOR;
+  if (!expect_uint(reader, 8u) ||
       !read_bytes(reader, command->key_id, ZS_COMMAND_KEY_ID_BYTES))
     return ZS_COMMAND_STATUS_INVALID_CBOR;
   *signed_size = reader->offset;
