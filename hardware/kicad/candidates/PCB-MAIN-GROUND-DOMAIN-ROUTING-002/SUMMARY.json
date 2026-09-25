@@ -2,7 +2,7 @@
   "schema": "dioneya-pcb-main-ground-domain-routing-002-candidate-v1",
   "proposal_id": "PCB-MAIN-GROUND-DOMAIN-ROUTING-002",
   "base_board_sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273",
-  "candidate_sha256": "e1259654694b2176ddd6c7b79371822447d9e3f57c4ae3217505d5a3f8154315",
+  "candidate_sha256": "c168f5f2418776bf037598e856f4920d02c30c9702ab0a4c485146d93b17c536",
   "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
   "preserved_geometry_outside_delta": "PASS",
   "stitching_vias_added": 15,
@@ -44,26 +44,16 @@
     },
     "candidate": {
       "by_type": {
-        "error:clearance": 1,
         "warning:silk_over_copper": 166,
         "warning:silk_overlap": 66
       },
       "unconnected": 421
     },
-    "new_fingerprints": [
-      [
-        "error",
-        "clearance",
-        [
-          "Track [GND_MODEM] on In3.Cu, length 6.1301 mm",
-          "Via [GND_DIGITAL] on F.Cu - B.Cu"
-        ]
-      ]
-    ],
-    "new_fingerprint_count": 1,
+    "new_fingerprints": [],
+    "new_fingerprint_count": 0,
     "removed_fingerprints": [],
     "removed_fingerprint_count": 0,
-    "new_errors": 1
+    "new_errors": 0
   },
   "in4_islands": [
     {

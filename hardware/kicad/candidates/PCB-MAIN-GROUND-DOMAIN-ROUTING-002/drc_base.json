@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-09-25T12:50:09+0000",
+    "date": "2026-09-25T12:56:07+0000",
     "included_severities": [
         "error",
         "warning",
@@ -9430,12 +9430,12 @@
                     "uuid": "d4aaf4e5-7dd3-4f56-9bc0-5aaec617233b"
                 },
                 {
-                    "description": "Pad A9 [USB_VBUS_CONN] of J11 on F.Cu",
+                    "description": "Pad B4 [USB_VBUS_CONN] of J11 on F.Cu",
                     "pos": {
                         "x": 39.6,
                         "y": 7.355
                     },
-                    "uuid": "0530e032-d6b2-4233-b1e1-82828ddac106"
+                    "uuid": "900a0397-762a-471e-b500-dda19dfbd6e0"
                 }
             ],
             "severity": "error",

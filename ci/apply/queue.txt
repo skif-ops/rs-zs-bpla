@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-25: PCB-MAIN-GROUND-DOMAIN-ROUTING-002 candidate run 3 (In3 tie clears the new stitching vias)
-tools/apply_pcb_main_ground_domain_routing_002_candidate_rev_a.py
