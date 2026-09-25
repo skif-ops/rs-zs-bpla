@@ -1,0 +1,2 @@
+# Queued by Claude 2026-09-25: PCB-MAIN inner reroute 003 application (ACCEPT_INNER_REROUTE_003)
+tools/apply_pcb_main_inner_reroute_003_application_rev_a.py
