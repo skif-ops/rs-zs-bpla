@@ -35,6 +35,4 @@ bool zs_command_clock_set_network(zs_command_clock_t *c, int64_t epoch_us, uint3
 /* Time for a command check at `now_ms`.  `gnss_us`/`gnss_trusted`: the PPS-disciplined time and whether its trust is
    GNSS_TRUSTED or HOLDOVER.  Returns false (time untrusted) when neither source is usable. */
 bool zs_command_clock_now(zs_command_clock_t *c, int64_t gnss_us, bool gnss_trusted, uint32_t now_ms, uint64_t *now_us);
-/* Parses the BG95 reply `+QLTS: "yyyy/MM/dd,hh:mm:ss±zz,dst"` of AT+QLTS=1 (time in GMT; the zone field is informative). */
-bool zs_command_clock_parse_qlts(const char *line, int64_t *epoch_us);
 #endif
