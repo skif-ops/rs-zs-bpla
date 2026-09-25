@@ -42,35 +42,56 @@ FREEROUTING_SHA256 = "3ad5a956ab474b12f331d24195feadac90e8344b8e013c6a4ab26e203c
 PLANES = [{"net": "GND_PWR", "layer": "In1.Cu", "inset_mm": 0.5}]
 HOLE_KEEPOUTS = {"refs": ["H1", "H2", "H3", "H4"], "radius_mm": 4.0}
 PASSES = 150
-# Locked escape stubs (checked >= 0.21 mm to all foreign copper against the
-# authoritative board): LMR60440 pins 6/7 of U3/U4 sit 0.125 mm from pad 2 under
-# the ECO-004 land rule the autorouter cannot see; U2 VSSOP-10 pins 6/7/8; the
-# NT2 net-tie exit to J2 pin 4 (0.4 mm, the tie itself is the current limit);
-# vias at stub ends so the autorouter can leave on another layer; the EN_MODEM
-# exit through the 0.75 mm corridor between C20 and U3 pin 8; the DNP I2C
-# pull-ups R13/R14 tied to J2 pins 11/12; the NT2 GND_PWR pad to a via.
+# Locked escape stubs, all checked >= 0.205 mm to every foreign copper item of the
+# authoritative board and to each other: fan-out of the LMR60440 pin row 5..8 of
+# U3/U4 (pins 6/7 sit 0.125 mm from pad 2 under the ECO-004 land rule the
+# autorouter cannot see) with staggered vias, FB/MODE carried on B.Cu to R1/R5
+# and R10/R9; U2 VSSOP-10 pins 6/7/8 with vias; EN_MODEM through the 0.75 mm
+# corridor between C20 and U3 pin 8; the NT2 net-tie exit to J2 pin 4 (0.4 mm,
+# the tie itself is the current limit) and its GND_PWR via; the DNP I2C
+# pull-ups R13/R14 tied to J2 pins 11/12.
 PREROUTE = [
-    ('track', 'F.Cu', 'FB_3V8', 0.2, [(55.585, 13.125), (55.585, 11.9)]),
-    ('track', 'F.Cu', 'MODE_3V8', 0.2, [(54.415, 13.125), (54.415, 11.9)]),
-    ('track', 'F.Cu', '3V3_DIGITAL', 0.2, [(55.585, 41.125), (55.585, 39.9)]),
-    ('track', 'F.Cu', 'MODE_3V3', 0.2, [(54.415, 41.125), (54.415, 39.9)]),
     ('track', 'F.Cu', '3V3_DIGITAL', 0.2, [(46.2, 24.0), (47.7, 24.0)]),
+    ('via', None, '3V3_DIGITAL', 0.6, [(47.7, 24.0)]),
     ('track', 'F.Cu', 'VBAT_SYS', 0.2, [(46.2, 23.0), (47.3, 23.0)]),
+    ('via', None, 'VBAT_SYS', 0.6, [(47.3, 23.0)]),
     ('track', 'F.Cu', 'GND_PWR', 0.2, [(46.2, 23.5), (44.9, 23.5)]),
     ('via', None, 'GND_PWR', 0.6, [(44.9, 23.5)]),
     ('track', 'F.Cu', 'GND_DIGITAL', 0.4, [(75.1, 48.52), (75.1, 47.8), (79.5, 47.8), (81.08, 49.0)]),
-    ('via', None, 'FB_3V8', 0.6, [(55.585, 11.9)]),
-    ('via', None, 'MODE_3V8', 0.6, [(54.415, 11.9)]),
-    ('via', None, '3V3_DIGITAL', 0.6, [(55.585, 39.9)]),
-    ('via', None, 'MODE_3V3', 0.6, [(54.415, 39.9)]),
-    ('via', None, '3V3_DIGITAL', 0.6, [(47.7, 24.0)]),
-    ('via', None, 'VBAT_SYS', 0.6, [(47.3, 23.0)]),
     ('track', 'F.Cu', 'EN_MODEM', 0.2, [(53.875, 14.075), (53.175, 14.075), (53.175, 12.2)]),
     ('via', None, 'EN_MODEM', 0.6, [(53.175, 12.2)]),
     ('track', 'F.Cu', 'I2C2_SCL', 0.25, [(75.11, 56.5), (76.2, 56.5), (76.9, 55.8), (76.9, 52.9), (78.08, 52.0)]),
     ('track', 'F.Cu', 'I2C2_SDA', 0.25, [(75.11, 58.0), (76.6, 58.0), (78.08, 56.5), (78.08, 55.0)]),
     ('track', 'F.Cu', 'GND_PWR', 0.3, [(76.1, 48.52), (76.6, 48.52)]),
     ('via', None, 'GND_PWR', 0.6, [(76.6, 48.52)]),
+    ('track', 'F.Cu', 'PG_3V8', 0.2, [(56.0, 12.9), (56.0, 12.4), (56.6, 11.8)]),
+    ('via', None, 'PG_3V8', 0.6, [(56.6, 11.8)]),
+    ('track', 'F.Cu', 'FB_3V8', 0.2, [(55.585, 13.125), (55.585, 11.2)]),
+    ('via', None, 'FB_3V8', 0.6, [(55.585, 11.2)]),
+    ('track', 'F.Cu', 'MODE_3V8', 0.2, [(54.415, 13.125), (54.415, 10.7)]),
+    ('via', None, 'MODE_3V8', 0.6, [(54.415, 10.7)]),
+    ('track', 'F.Cu', 'RT_3V8', 0.2, [(54.0, 12.9), (54.0, 12.3), (53.6, 11.5)]),
+    ('via', None, 'RT_3V8', 0.6, [(53.6, 11.5)]),
+    ('track', 'F.Cu', 'PWR_GOOD', 0.2, [(56.0, 40.9), (56.0, 40.4), (56.6, 39.8)]),
+    ('via', None, 'PWR_GOOD', 0.6, [(56.6, 39.8)]),
+    ('track', 'F.Cu', '3V3_DIGITAL', 0.2, [(55.585, 41.125), (55.585, 39.2)]),
+    ('via', None, '3V3_DIGITAL', 0.6, [(55.585, 39.2)]),
+    ('track', 'F.Cu', 'MODE_3V3', 0.2, [(54.415, 41.125), (54.415, 38.7)]),
+    ('via', None, 'MODE_3V3', 0.6, [(54.415, 38.7)]),
+    ('track', 'F.Cu', 'RT_3V3', 0.2, [(54.0, 40.9), (54.0, 40.3), (53.6, 39.5)]),
+    ('via', None, 'RT_3V3', 0.6, [(53.6, 39.5)]),
+    ('track', 'B.Cu', 'FB_3V8', 0.2, [(55.585, 11.2), (56.51, 19.9)]),
+    ('via', None, 'FB_3V8', 0.6, [(56.51, 19.9)]),
+    ('track', 'F.Cu', 'FB_3V8', 0.2, [(56.51, 19.9), (56.51, 19.0)]),
+    ('track', 'B.Cu', 'MODE_3V8', 0.2, [(54.415, 10.7), (54.2, 12.5), (54.2, 16.0), (54.99, 21.9)]),
+    ('via', None, 'MODE_3V8', 0.6, [(54.99, 21.9)]),
+    ('track', 'F.Cu', 'MODE_3V8', 0.2, [(54.99, 21.9), (54.99, 21.0)]),
+    ('track', 'B.Cu', '3V3_DIGITAL', 0.2, [(55.585, 39.2), (57.49, 47.9)]),
+    ('via', None, '3V3_DIGITAL', 0.6, [(57.49, 47.9)]),
+    ('track', 'F.Cu', '3V3_DIGITAL', 0.2, [(57.49, 47.9), (57.49, 47.0)]),
+    ('track', 'B.Cu', 'MODE_3V3', 0.2, [(54.415, 38.7), (54.2, 40.5), (54.2, 44.0), (54.49, 49.9)]),
+    ('via', None, 'MODE_3V3', 0.6, [(54.49, 49.9)]),
+    ('track', 'F.Cu', 'MODE_3V3', 0.2, [(54.49, 49.9), (54.49, 49.0)]),
 ]
 TIE_STRIPS = ["NT2"]
 # Autoroute (connectivity) class parameters. Freerouting cannot neck a wide
