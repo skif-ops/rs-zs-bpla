@@ -82,6 +82,10 @@
 #define APP_LORA_PROFILE_ID          1u
 #define APP_PRIO_LORA                3
 #define APP_STACK_LORA               768
+/* Hardware watchdog: IWDG timeout and the task-liveness window (longest normal block: INA226 re-probe 5 s). */
+#define APP_WATCHDOG_TIMEOUT_MS      25000u
+#define APP_WATCHDOG_WINDOW_MS       10000u
+#define APP_NRF_UPDATE_HOLD_MS       900000u /* nRF image update blocks the BLE task: exempt it for up to 15 min */
 
 /* NVIC priorities (0 = highest). FreeRTOS syscall ceiling is 5: ISRs at 5..15 may call FromISR APIs. */
 #define APP_IRQ_PRIO_TIM2_PPS        4   /* timestamp capture: above the RTOS ceiling, no RTOS calls inside */
