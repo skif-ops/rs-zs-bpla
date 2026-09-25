@@ -420,12 +420,12 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             f"PCB-PWR layer-count drift: {copper_layers}")
     trace_items = len(board.traceItems)
     copper_zones = len(board.zones)
-    from pcb_pwr_hot_loop_006_board import is_autoroute_011  # local: avoids an import cycle
+    from pcb_pwr_hot_loop_006_board import is_autoroute_011, is_eco_005  # local: avoids an import cycle
 
     # the exact committed autoroute 011 board is the accepted successor of 010/ECO-003
     require((trace_items, copper_zones) in
             {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)}
-            or is_autoroute_011(board_path.read_bytes()),
+            or (is_autoroute_011(board_path.read_bytes()) or is_eco_005(board_path.read_bytes())),
             "routing authority does not cover copper beyond accepted autoroute 011")
 
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))

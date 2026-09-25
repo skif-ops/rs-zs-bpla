@@ -38,6 +38,10 @@ C13_C11_009_SHA256 = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a0
 OUTPUT_BULK_010_SHA256 = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
 J2_PLACEMENT_ECO_003_SHA256 = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
 AUTOROUTE_011_SHA256 = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ECO_005_SHA256 = "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610"  # exact committed ECO-005 board (Review B R1 remediation)
+# ECO-005 (Review B R1 finding 6): NT2 turned 180 deg so its GND_DIGITAL pad faces J2.4;
+# only this pose changes (hardware/reviews/PCB_PWR_ECO_005_REV_A.md).
+ECO_005_POSES = {"NT2": (75.6, 48.52, 180.0)}
 # Exact accepted ECO-003 poses; the placement authority CSV and the DIM-003
 # record stay byte-identical because historical packets bind their SHA-256.
 J2_PLACEMENT_ECO_003_POSES = {
@@ -162,10 +166,12 @@ def main() -> int:
         footprint = footprints[ref]
         row = by_ref[ref]
         wanted_pose = (
-            J2_PLACEMENT_ECO_003_POSES[ref]
-            if board_sha256 in {J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256} and ref in J2_PLACEMENT_ECO_003_POSES
+            ECO_005_POSES[ref]
+            if board_sha256 == ECO_005_SHA256 and ref in ECO_005_POSES
+            else J2_PLACEMENT_ECO_003_POSES[ref]
+            if board_sha256 in {J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256, ECO_005_SHA256} and ref in J2_PLACEMENT_ECO_003_POSES
             else ECO_002_POSES[ref]
-            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256, J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256} and ref in ECO_002_POSES
+            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256, J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256, ECO_005_SHA256} and ref in ECO_002_POSES
             else (float(row["X_mm"]), float(row["Y_mm"]),
                   float(row["Rotation_deg"]) % 360.0)
         )
@@ -228,7 +234,7 @@ def main() -> int:
     require(board_nets == expected_nets, "board net set differs from native schematic")
     require((len(board.traceItems), len(board.zones)) in
             {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)}
-            or board_sha256 == AUTOROUTE_011_SHA256,  # exact committed autoroute 011 board
+            or board_sha256 in {AUTOROUTE_011_SHA256, ECO_005_SHA256},  # exact committed autoroute 011 board
             "PCB-PWR contains copper beyond the accepted autoroute 011 successor")
 
     edges = [item for item in board.graphicItems if getattr(item, "layer", None) == "Edge.Cuts"]

@@ -21,10 +21,10 @@ SEMANTIC_SHA = "d6810b6ea293bfd931f09e73ff64698d18d0a64b465db7b71c712f64a36b2980
 
 # After the accepted J2 placement ECO-003 the authoritative board is the exact
 # placement-only successor; replay the 010 application on its committed candidate.
-from pcb_pwr_hot_loop_006_board import is_autoroute_011, is_j2_placement_eco_003  # noqa: E402
+from pcb_pwr_hot_loop_006_board import is_autoroute_011, is_eco_005, is_j2_placement_eco_003  # noqa: E402
 
 # ... and after the accepted autoroute 011 (successor of ECO-003) likewise.
-if is_j2_placement_eco_003(BOARD.read_bytes()) or is_autoroute_011(BOARD.read_bytes()):
+if is_j2_placement_eco_003(BOARD.read_bytes()) or (is_autoroute_011(BOARD.read_bytes()) or is_eco_005(BOARD.read_bytes())):
     BOARD = CANDIDATE
 
 

@@ -284,7 +284,7 @@
       "record": "hardware/reviews/PCB_PWR_PLACEMENT_CLEARANCE_REV_A.md",
       "control": {
         "state": "PASS_FITTED_2D_AND_EVT_MOUNTING_CLEARANCE_DIM_003_ACCEPTED",
-        "board_semantic_sha256": "2694f7cfe20ab3b0f67d6dd00ea32ca83fd92db69137cddeaec58943a784de7e",
+        "board_semantic_sha256": "4c835eae78eaf1e43116642bc5d5ceafed0c156abfc1a7906293f94636e8d1e2",
         "placement_authority_sha256": "257fee5898b5d44970115220a485d40b01c4fefad14b5c3b1a4ffb43b7b5b2d6",
         "fitted_footprints": 44,
         "courtyard_footprints": 44,
@@ -1113,7 +1113,7 @@
     "independent_audit": "tools/audit_pcb_pwr_routing_authority_rev_a.py",
     "control": {
       "state": "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN",
-      "board_semantic_sha256": "2694f7cfe20ab3b0f67d6dd00ea32ca83fd92db69137cddeaec58943a784de7e",
+      "board_semantic_sha256": "4c835eae78eaf1e43116642bc5d5ceafed0c156abfc1a7906293f94636e8d1e2",
       "authority_sha256": "53b1a1ecfee6f38544b593e63fb25faf3521140c794d3490951e30d0d6df52b1",
       "net_count": 31,
       "class_counts": {
@@ -1144,7 +1144,7 @@
         "SELF_TO_GND_PWR_ONLY_AT_NT2": 1,
         "SELF_TO_GND_PWR_ONLY_AT_NT3": 1
       },
-      "trace_items": 873,
+      "trace_items": 842,
       "copper_zones": 33,
       "dim_003": "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED",
       "numeric_power_geometry": "EVT_PUBLIC_STACKUP_AND_CALCULATED_CURRENT_GEOMETRY_ACCEPTED_PHYSICAL_FAULT_THERMAL_VALIDATION_OPEN",

@@ -1457,7 +1457,7 @@ jobs:
           assert board is not None, "KiCad failed to parse PCB-PWR placement candidate"
           assert len(board.GetFootprints()) == 66, "unexpected PCB-PWR electrical-plus-mounting footprint count"
           assert board.GetCopperLayerCount() == 4, "unexpected PCB-PWR layer count"
-          assert len(list(board.GetTracks())) == 873, "PCB-PWR exact autoroute 011 application missing or out of scope"
+          assert len(list(board.GetTracks())) == 842, "PCB-PWR exact ECO-005 application (successor of autoroute 011) missing or out of scope"
           assert len(list(board.Zones())) == 33, "PCB-PWR autoroute 011 zones (planes, pours, thickening, keepouts) missing or out of scope"
           print("PCB-PWR controlled footprints KiCad 9 native parse: PASS")
           PY

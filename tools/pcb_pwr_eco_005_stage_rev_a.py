@@ -1,0 +1,304 @@
+#!/usr/bin/env python3
+"""KiCad 9 stage of PCB-PWR ECO-005 (runs inside the pinned KiCad image).
+
+apply <in.kicad_pcb> <spec.json> <out.kicad_pcb>
+    Apply a controlled geometry delta and save the refilled board:
+      rotate        [{"ref", "angle_deg"}]                footprint orientation (about its origin)
+      remove_tracks [{"net", "layer", "start", "end"}]    exact segment match (0.01 mm)
+      remove_vias   [{"net", "pos"}]                      exact via match (0.01 mm)
+      remove_zones  [{"net", "layer", "contains"}]        zone of that net/layer whose outline contains the point
+      add_zones     [{"net", "layer", "polygon", "priority", "clearance_mm"}]   solid pad connection
+      add_items     PREROUTE tuples (kind, layer, net, width, points)          locked copper
+      silk_refs     true: re-place reference designators clear of pads, silkscreen and the
+                    board edge (keep if already clear, else nearest free spot at 0/90 deg,
+                    else hide on silkscreen - the F.Fab reference stays)
+    Every requested removal must match exactly one item, otherwise the stage fails.
+libresave <pretty_dir> <names,comma,separated>
+    Load each project footprint with KiCad and save it back in the KiCad 9 format (no edit).
+libdiff <board.kicad_pcb> <libs_dir> <refs,comma,separated>
+    Library-parity evidence: KiCad's own footprint comparison with its report (when the binding
+    exposes it) plus a pad/graphic comparison of the library copy placed at the instance pose.
+dump <board.kicad_pcb> <geometry.json>
+    Same geometry dump as the autoroute stage, plus filled zone polygons per net/layer.
+"""
+
+from __future__ import annotations
+
+import json
+import sys
+
+import pcbnew
+
+sys.path.insert(0, sys.path[0])
+from kicad_autoroute_stage_rev_a import _zone, add_preroute, dump_geometry, mm  # noqa: E402
+
+TOL = mm(0.01)
+
+
+def _near(a, x_mm: float, y_mm: float) -> bool:
+    return abs(a.x - mm(x_mm)) <= TOL and abs(a.y - mm(y_mm)) <= TOL
+
+
+def apply(in_path: str, spec_path: str, out_path: str) -> None:
+    spec = json.load(open(spec_path, encoding="utf-8"))
+    board = pcbnew.LoadBoard(in_path)
+    report = {"rotated": [], "removed_tracks": 0, "removed_vias": 0, "removed_zones": 0,
+              "added_zones": 0, "added_items": 0}
+
+    for item in spec.get("rotate", []):
+        footprint = board.FindFootprintByReference(item["ref"])
+        assert footprint is not None, f"footprint {item['ref']} not found"
+        footprint.SetOrientationDegrees(float(item["angle_deg"]))
+        report["rotated"].append(item["ref"])
+
+    def live_tracks():  # re-read after every removal: KiCad frees removed items
+        return list(board.GetTracks())
+
+    for item in spec.get("remove_tracks", []):
+        (x0, y0), (x1, y1) = item["start"], item["end"]
+        hits = [t for t in live_tracks() if t.GetClass() == "PCB_TRACK" and t.GetNetname() == item["net"]
+                and board.GetLayerName(t.GetLayer()) == item["layer"]
+                and ((_near(t.GetStart(), x0, y0) and _near(t.GetEnd(), x1, y1))
+                     or (_near(t.GetStart(), x1, y1) and _near(t.GetEnd(), x0, y0)))]
+        assert len(hits) == 1, f"track removal matched {len(hits)}: {item}"
+        board.Remove(hits[0])
+        report["removed_tracks"] += 1
+    for item in spec.get("remove_vias", []):
+        x, y = item["pos"]
+        hits = [t for t in live_tracks() if t.GetClass() == "PCB_VIA" and t.GetNetname() == item["net"]
+                and _near(t.GetPosition(), x, y)]
+        assert len(hits) == 1, f"via removal matched {len(hits)}: {item}"
+        board.Remove(hits[0])
+        report["removed_vias"] += 1
+
+    for item in spec.get("remove_zones", []):
+        x, y = item["contains"]
+        hits = [z for z in board.Zones() if not z.GetIsRuleArea() and z.GetNetname() == item["net"]
+                and board.GetLayerName(z.GetLayer()) == item["layer"]
+                and z.Outline().Contains(pcbnew.VECTOR2I(mm(x), mm(y)))]
+        assert len(hits) == 1, f"zone removal matched {len(hits)}: {item}"
+        board.Remove(hits[0])
+        report["removed_zones"] += 1
+
+    for item in spec.get("add_zones", []):
+        _zone(board, item["net"], item["layer"], item["polygon"], item["priority"], item["clearance_mm"])
+        report["added_zones"] += 1
+    report["added_items"] = add_preroute(board, spec.get("add_items", []), lock=True)
+
+    if spec.get("silk_refs"):
+        report["silk_refs"] = place_references(board)
+    pcbnew.ZONE_FILLER(board).Fill(board.Zones())
+    board.Save(out_path)
+    print(json.dumps(report))
+
+
+def _box(item):
+    return item.GetBoundingBox()  # returned by value: a private copy
+
+
+def _fp_body_box(footprint):
+    try:
+        return footprint.GetBoundingBox(False, False)
+    except TypeError:
+        return footprint.GetBoundingBox(False)
+
+
+def place_references(board) -> dict:
+    """Reference designators clear of pad copper (+0.15 mm), all other silkscreen (+0.1 mm)
+    and the board edge (0.3 mm inside)."""
+    import math
+
+    pad_gap, silk_gap = mm(0.15), mm(0.1)
+    edge = board.GetBoardEdgesBoundingBox()
+    edge.Inflate(-mm(0.3))
+    pads = {pcbnew.F_SilkS: [], pcbnew.B_SilkS: []}
+    silk = {pcbnew.F_SilkS: [], pcbnew.B_SilkS: []}
+    for footprint in board.GetFootprints():
+        for pad in footprint.Pads():
+            box = _box(pad)
+            box.Inflate(pad_gap)
+            if pad.IsOnLayer(pcbnew.F_Cu):
+                pads[pcbnew.F_SilkS].append(box)
+            if pad.IsOnLayer(pcbnew.B_Cu):
+                pads[pcbnew.B_SilkS].append(box)
+        for item in footprint.GraphicalItems():
+            if item.GetLayer() in silk:
+                box = _box(item)
+                box.Inflate(silk_gap)
+                silk[item.GetLayer()].append(box)
+    for item in board.GetDrawings():
+        if item.GetLayer() in silk:
+            box = _box(item)
+            box.Inflate(silk_gap)
+            silk[item.GetLayer()].append(box)
+
+    def clear(box, layer, own) -> bool:
+        if not edge.Contains(box.GetOrigin()) or not edge.Contains(box.GetEnd()):
+            return False
+        return not any(box.Intersects(o) for o in pads[layer] + silk[layer] if o is not own)
+
+    footprints = sorted(board.GetFootprints(), key=lambda f: _fp_body_box(f).GetArea())
+    kept, moved, hidden = [], [], []
+    placed = {pcbnew.F_SilkS: [], pcbnew.B_SilkS: []}
+    todo = []
+    for footprint in footprints:  # pass 1: keep every reference that is already clear
+        field = footprint.Reference()
+        layer = field.GetLayer()
+        if layer not in silk or not field.IsVisible():
+            continue
+        box = _box(field)
+        if clear(box, layer, None) and not any(box.Intersects(o) for o in placed[layer]):
+            kept.append(footprint.GetReference())
+            placed[layer].append(box)
+        else:
+            todo.append(footprint)
+    for footprint in todo:  # pass 2: move the rest to the nearest free spot
+        field = footprint.Reference()
+        layer = field.GetLayer()
+        ref = footprint.GetReference()
+        start_pos, start_angle = field.GetPosition(), field.GetTextAngleDegrees()
+        body = _fp_body_box(footprint)
+        cx, cy = body.GetCenter().x, body.GetCenter().y
+        options = []
+        for angle in (0.0, 90.0):
+            field.SetTextAngleDegrees(angle)
+            field.SetPosition(pcbnew.VECTOR2I(cx, cy))
+            probe = _box(field)
+            tw, th = probe.GetWidth(), probe.GetHeight()
+            for gap in (mm(0.15), mm(0.4), mm(0.8), mm(1.3)):
+                ys = (body.GetY() - gap - th // 2, body.GetBottom() + gap + th // 2)
+                xs = (body.GetX() - gap - tw // 2, body.GetRight() + gap + tw // 2)
+                for y in ys:
+                    for dx in range(-8, 9):
+                        options.append((angle, cx + dx * mm(0.25), y))
+                for x in xs:
+                    for dy in range(-8, 9):
+                        options.append((angle, x, cy + dy * mm(0.25)))
+        options.sort(key=lambda o: (math.hypot(o[1] - start_pos.x, o[2] - start_pos.y), o[0]))
+        done = False
+        for angle, x, y in options:
+            field.SetTextAngleDegrees(angle)
+            field.SetPosition(pcbnew.VECTOR2I(int(x), int(y)))
+            box = _box(field)
+            # the text centre may be offset from its anchor: re-centre on the requested point
+            field.SetPosition(pcbnew.VECTOR2I(int(x) - (box.GetCenter().x - int(x)),
+                                              int(y) - (box.GetCenter().y - int(y))))
+            box = _box(field)
+            if clear(box, layer, None) and not any(box.Intersects(o) for o in placed[layer]):
+                placed[layer].append(box)
+                moved.append(ref)
+                done = True
+                break
+        if not done:
+            field.SetTextAngleDegrees(start_angle)
+            field.SetPosition(start_pos)
+            field.SetVisible(False)
+            hidden.append(ref)
+    return {"kept": sorted(kept), "moved": sorted(moved), "hidden": sorted(hidden)}
+
+
+def libresave(pretty_dir: str, names: str) -> None:
+    saved = []
+    for name in names.split(","):
+        footprint = pcbnew.FootprintLoad(pretty_dir, name)
+        pcbnew.FootprintSave(pretty_dir, footprint)
+        saved.append(name)
+    print(json.dumps({"resaved": saved}))
+
+
+def libdiff(board_path: str, libs_dir: str, refs: str) -> None:
+    import os
+
+    board = pcbnew.LoadBoard(board_path)
+    result = {}
+    for ref in refs.split(","):
+        try:
+            footprint = board.FindFootprintByReference(ref)
+            fpid = footprint.GetFPID()
+            lib, name = str(fpid.GetLibNickname()), str(fpid.GetLibItemName())
+            lib_fp = pcbnew.FootprintLoad(os.path.join(libs_dir, f"{lib}.pretty"), name)
+            entry = {"lib": f"{lib}:{name}"}
+            try:
+                reporter = pcbnew.WX_STRING_REPORTER()
+                entry["kicad_needs_update"] = bool(footprint.FootprintNeedsUpdate(lib_fp, 0, reporter))
+                entry["kicad_report"] = reporter.GetMessages()
+            except Exception as exc:  # binding differences between KiCad builds
+                entry["kicad_report_error"] = repr(exc)[:300]
+            lib_fp.SetPosition(footprint.GetPosition())
+            lib_fp.SetOrientation(footprint.GetOrientation())
+
+            def pads(fp):
+                out = []
+                for pad in fp.Pads():
+                    try:
+                        size = pad.GetSize()
+                    except TypeError:
+                        size = pad.GetSize(pcbnew.F_Cu)
+                    out.append((pad.GetNumber(), pcbnew.ToMM(pad.GetPosition().x), pcbnew.ToMM(pad.GetPosition().y),
+                                pcbnew.ToMM(size.x), pcbnew.ToMM(size.y), pcbnew.ToMM(pad.GetDrillSize().x),
+                                pad.GetLayerSet().FmtHex(), pad.GetAttribute()))
+                return sorted((tuple(round(v, 4) if isinstance(v, float) else v for v in row) for row in out), key=str)
+
+            def graphics(fp):
+                out = []
+                for item in fp.GraphicalItems():
+                    if item.GetClass() not in ("PCB_SHAPE", "FP_SHAPE"):
+                        out.append((item.GetClass(), board.GetLayerName(item.GetLayer())))
+                        continue
+                    box = item.GetBoundingBox()
+                    out.append((item.GetShapeStr(), board.GetLayerName(item.GetLayer()),
+                                round(pcbnew.ToMM(item.GetWidth()), 3),
+                                round(pcbnew.ToMM(box.GetX()), 3), round(pcbnew.ToMM(box.GetY()), 3),
+                                round(pcbnew.ToMM(box.GetRight()), 3), round(pcbnew.ToMM(box.GetBottom()), 3)))
+                return sorted(out, key=str)
+
+            pb, pl = pads(footprint), pads(lib_fp)
+            gb, gl = graphics(footprint), graphics(lib_fp)
+            entry["pads_only_on_board"] = [r for r in pb if r not in pl]
+            entry["pads_only_in_library"] = [r for r in pl if r not in pb]
+            entry["graphics_only_on_board"] = [r for r in gb if r not in gl]
+            entry["graphics_only_in_library"] = [r for r in gl if r not in gb]
+            entry["attributes"] = [footprint.GetAttributes(), lib_fp.GetAttributes()]
+            entry["models"] = [[m.m_Filename for m in footprint.Models()], [m.m_Filename for m in lib_fp.Models()]]
+            result[ref] = entry
+        except Exception as exc:
+            result[ref] = {"error": repr(exc)[:400]}
+    print(json.dumps(result))
+
+
+def dump(board_path: str, out_json: str) -> None:
+    dump_geometry(board_path, out_json)
+    board = pcbnew.LoadBoard(board_path)
+    geometry = json.load(open(out_json, encoding="utf-8"))
+    fills = []
+    for zone in board.Zones():
+        if zone.GetIsRuleArea():
+            continue
+        for layer in zone.GetLayerSet().Seq():
+            poly = zone.GetFilledPolysList(layer)
+            for index in range(poly.OutlineCount()):
+                outline = poly.Outline(index)
+                fills.append({"net": zone.GetNetname(), "layer": board.GetLayerName(layer),
+                              "points": [[pcbnew.ToMM(outline.CPoint(i).x), pcbnew.ToMM(outline.CPoint(i).y)]
+                                         for i in range(outline.PointCount())],
+                              "holes": [[[pcbnew.ToMM(poly.Hole(index, h).CPoint(i).x),
+                                          pcbnew.ToMM(poly.Hole(index, h).CPoint(i).y)]
+                                         for i in range(poly.Hole(index, h).PointCount())]
+                                        for h in range(poly.HoleCount(index))]})
+    geometry["fills"] = fills
+    with open(out_json, "w", encoding="utf-8") as handle:
+        json.dump(geometry, handle)
+    print(json.dumps({"fills": len(fills)}))
+
+
+if __name__ == "__main__":
+    if sys.argv[1] == "apply":
+        apply(sys.argv[2], sys.argv[3], sys.argv[4])
+    elif sys.argv[1] == "dump":
+        dump(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "libresave":
+        libresave(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "libdiff":
+        libdiff(sys.argv[2], sys.argv[3], sys.argv[4])
+    else:
+        raise SystemExit(f"unknown mode {sys.argv[1]}")

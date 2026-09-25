@@ -26,13 +26,14 @@ SUCCESSOR_SHA = "9ad58d135bedfccc2acc59dfe6480f76730aa10bf3f526e9c3807159a06846b
 OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bffbceb469"
 J2_PLACEMENT_ECO_003_SHA = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
 AUTOROUTE_011_SHA = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
+ECO_005_SHA = "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610"  # exact committed ECO-005 board (Review B R1 remediation)
 
 
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict:
     board_sha = hashlib.sha256(BOARD.read_bytes()).hexdigest()
-    assert board_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA}
+    assert board_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA}
     assert hashlib.sha256(APPROVAL.read_bytes()).hexdigest() == APPROVAL_SHA
-    board = Board.from_file(str(CANDIDATE if board_sha in {SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA} else BOARD), encoding="utf-8")
+    board = Board.from_file(str(CANDIDATE if board_sha in {SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA} else BOARD), encoding="utf-8")
     assert semantic_board_sha256(board) == SEMANTIC_SHA
     assert len(board.traceItems) == 39 and len(board.zones) == 2
     proposal = historical_candidate_audit()
