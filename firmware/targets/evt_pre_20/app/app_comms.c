@@ -175,11 +175,23 @@ static bool modem_provision(uint32_t now) {
   return true;
 }
 
-/* S3 exit criterion: the session is up, at least one heartbeat went out and nothing waits in the outbox
-   (checked at most every 5 s: it walks the NOR slots). */
+/* Linger (ICD addendum D): the broker delivers queued commands after the subscription and the server may answer
+   the heartbeat with one, so the session stays up APP_COMMS_LINGER_MS after the last activity (online, heartbeat,
+   any command in or out) and never ends with a publish in flight.  Without it the second command of a queue, or a
+   command sent in reply to the heartbeat, landed in a closing session (found by the station twin). */
+static uint32_t activity_ms, activity_seen;
+static void note_session_activity(uint32_t now) {
+  const uint32_t seen = comms.heartbeats_published + commands_verified + commands_rejected +
+                        session.queued_command_count + session.retry_required_count;
+  if (seen != activity_seen) { activity_seen = seen; activity_ms = now; }
+}
+
+/* S3 exit criterion: the session is up, at least one heartbeat went out, nothing waits in the outbox and the
+   linger since the last activity has passed (the outbox is checked at most every 5 s: it walks the NOR slots). */
 static void check_session_done(uint32_t now) {
   uint16_t pending = 1u;
   if (session_reported || !hooks.session_done || comms.heartbeats_published == 0u) return;
+  if ((uint32_t)(now - activity_ms) < APP_COMMS_LINGER_MS || session.owner != ZS_BG95_MQTT_OWNER_NONE) return;
   if ((uint32_t)(now - last_outbox_check_ms) < 5000u) return;
   last_outbox_check_ms = now;
   if (zs_event_outbox_pending_count(outbox_io, &pending) == ZS_EVENT_OUTBOX_OK && pending == 0u) {
@@ -305,8 +317,8 @@ void app_comms_step(void) {
         zs_bg95_tick(&modem, now);
         { uint64_t now_us; const bool trusted = command_time(now, &now_us); zs_bg95_mqtt_session_tick(&session, now, now_us, trusted); }
         zs_station_comms_tick(&comms, now);
-        if (phase == COMMS_SESSION && zs_bg95_mqtt_session_ready(&session)) { online_count++; set_phase(COMMS_ONLINE); }
-        if (phase == COMMS_ONLINE) check_session_done(now);
+        if (phase == COMMS_SESSION && zs_bg95_mqtt_session_ready(&session)) { online_count++; set_phase(COMMS_ONLINE); activity_ms = now; }
+        if (phase == COMMS_ONLINE) { note_session_activity(now); check_session_done(now); }
         if (!wanted()) {
           /* let a publish in flight finish (the modem would otherwise take the QPOWD text as payload bytes);
              after 3 s the power-down goes ahead regardless */
