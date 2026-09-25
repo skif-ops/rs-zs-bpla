@@ -664,6 +664,11 @@ static bool pl_emit(void *ctx, const zs_detection_t *d) {
   with_power = *d;
   (void)app_power_snapshot(&with_power.power);                            /* battery bus/current/power of the moment */
   with_power.route.transport = ZS_ROUTE_LTE;
+  /* the quality of the event time (fusion weights it; the server skips audio requests it knows would be refused) */
+  with_power.gnss.time_trust = (uint8_t)time_sync.trust;
+  with_power.gnss.expected_time_error_us = time_sync.expected_error_us;
+  with_power.gnss.pps_ok = time_sync.pps_ok;
+  with_power.gnss.time_holdover = time_sync.trust == ZS_TIME_TRUST_HOLDOVER;
   app_audio_rec_note_event(d->event_id, d->event_time_us,                 /* CMD_REQUEST_AUDIO finds its audio by this */
                            time_sync.trust == ZS_TIME_TRUST_GNSS_TRUSTED || time_sync.trust == ZS_TIME_TRUST_HOLDOVER);
   if (!stores_on_nor) { pipeline_events_ram++; return true; }
