@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-25: PCB-PWR Review B package Rev D (ECO-006 evidence + exports)
-tools/apply_pcb_pwr_review_b_package_rev_d.py
