@@ -125,6 +125,28 @@ static void test_network_time_optional(void) {
   assert(modem.state == ZS_BG95_TLS_CONFIGURING && !zs_bg95_network_time(&modem, &t, &at));
   expect_last(&modem, "AT+QSSLCFG=\"sslversion\",1,4");
   assert(strcmp(zs_bg95_state_name(ZS_BG95_TIME_QUERY), "TIME_QUERY") == 0);
+  /* reply formats: a leap day is parsed, malformed replies leave the time unset */
+  {
+    static const struct { const char *line; bool ok; int64_t us; } cases[] = {
+      {"+QLTS: \"2028/02/29,23:59:59+00,0\"", true, INT64_C(1835481599000000)},
+      {"+QLTS: \"2026/13/25,08:10:05+12,0\"", false, 0},
+      {"+QLTS: \"\"", false, 0},
+      {"+QLTS: 2026/09/25,08:10:05", false, 0},
+    };
+    for (unsigned i = 0u; i < sizeof(cases) / sizeof(cases[0]); i++) {
+      memset(&mock, 0, sizeof(mock));
+      reach_registered(&modem, &mock, "internet");
+      assert(zs_bg95_configure_mqtt_tls(&modem, "pilot.example", 443u, "dioneya-001-boot1", "UFS:pilot-ca.pem", true));
+      assert(zs_bg95_start_mqtt(&modem, 2000u));
+      zs_bg95_on_line(&modem, "OK", 2001u);
+      zs_bg95_on_line(&modem, "+CGCONTRDP: 1,5,\"internet\",\"10.10.0.2.255.255.255.0\",\"10.10.0.1\",\"1.1.1.1\",\"8.8.8.8\"", 2002u);
+      zs_bg95_on_line(&modem, "OK", 2003u);
+      zs_bg95_on_line(&modem, cases[i].line, 2004u);
+      zs_bg95_on_line(&modem, "OK", 2005u);
+      assert(zs_bg95_network_time(&modem, &t, &at) == cases[i].ok && (!cases[i].ok || t == cases[i].us));
+      expect_last(&modem, "AT+QSSLCFG=\"sslversion\",1,4");
+    }
+  }
 }
 
 static void test_mqtt_tls_happy_path(void) {
