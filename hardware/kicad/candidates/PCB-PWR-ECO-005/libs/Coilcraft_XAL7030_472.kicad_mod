@@ -6,9 +6,9 @@
 	(descr "Coilcraft XAL7030-472 4.7 uH shielded inductor; Document 863-2 Rev 02/25/26 recommended land pattern")
 	(tags "Coilcraft XAL7030 472 shielded power inductor")
 	(property "Reference" "REF**"
-		(at 0 -4.25 0)
+		(at 0 -1.4 0)
 		(layer "F.SilkS")
-		(uuid "953598bb-6326-43d5-8efc-02414007bb81")
+		(uuid "3dcc1276-3204-4add-9be5-fdf3b3ad42b6")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -20,7 +20,7 @@
 		(at 0 4.25 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "1b517236-eaad-45a1-a051-71f195070166")
+		(uuid "0b69e59f-14e9-460a-8379-db20670c40a8")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -32,7 +32,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "cc3775e7-e132-4c36-9e6b-bc6f2ded4921")
+		(uuid "2854c9cf-af8e-47d0-838f-581977d11434")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -44,7 +44,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "a034fb7d-d4a8-4045-a540-9504d424d8ed")
+		(uuid "a3bb1012-7feb-40c2-87a6-9b76df390c7b")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -63,7 +63,7 @@
 		)
 		(fill no)
 		(layer "F.SilkS")
-		(uuid "badf2154-540f-4314-a140-f772d7661e57")
+		(uuid "55c7df66-8c8c-4cba-9497-15f465183fb8")
 	)
 	(fp_rect
 		(start -4 -4)
@@ -74,7 +74,7 @@
 		)
 		(fill no)
 		(layer "F.CrtYd")
-		(uuid "049675f5-d710-4374-a5fe-e8f5e48a15b1")
+		(uuid "19c1468f-4ad1-4441-a0a5-9fa528364e1f")
 	)
 	(fp_rect
 		(start -3.75 -3.75)
@@ -85,19 +85,19 @@
 		)
 		(fill no)
 		(layer "F.Fab")
-		(uuid "b01a6786-a705-4b74-b483-97653387c94a")
+		(uuid "3bc93905-7044-4785-9ee8-f8f35488f692")
 	)
 	(pad "1" smd rect
 		(at 2.26 0)
 		(size 1.58 6.5)
 		(layers "F.Cu" "F.Mask" "F.Paste")
-		(uuid "9146d8f6-86da-42cd-a306-5946f446f66c")
+		(uuid "d607ae64-895e-4ec6-a95f-d873fdf54340")
 	)
 	(pad "2" smd rect
 		(at -2.26 0)
 		(size 1.58 6.5)
 		(layers "F.Cu" "F.Mask" "F.Paste")
-		(uuid "f3951891-0cd8-4334-b2a0-4f9a64364c4b")
+		(uuid "d9b814ec-4d8a-47dd-a852-2c2a2d7a5f55")
 	)
 	(embedded_fonts no)
 )
