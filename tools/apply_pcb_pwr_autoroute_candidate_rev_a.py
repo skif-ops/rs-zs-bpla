@@ -304,7 +304,8 @@ def pour_spec(segments: list[dict]) -> dict:
             "preroute_segments": [[layer, net, a[0], a[1], b[0], b[1]]
                                   for kind, layer, net, _, points in PREROUTE if kind == "track"
                                   for a, b in zip(points, points[1:])],
-            "preroute_vias": [[net, points[0][0], points[0][1]] for kind, _, net, _, points in PREROUTE if kind == "via"]}
+            "preroute_vias": [[net, points[0][0], points[0][1]] for kind, _, net, _, points in PREROUTE if kind == "via"],
+            "restore_signal_layers": [plane["layer"] for plane in PLANES]}
 
 
 def gap_fill(board: Path, rel) -> dict:
