@@ -2,6 +2,7 @@
 # Host test suite + STM32U585 target build. Run by .github/workflows/ci-dispatch.yml (ubuntu).
 set -euo pipefail
 sudo apt-get update -qq && sudo apt-get install -y -qq gcc-arm-none-eabi cmake >/dev/null
+python3 -m pip install --break-system-packages --require-hashes -r server/requirements-protocol.lock.txt   # the station twin end-to-end test talks to the Python server twin
 cmake -S firmware -B build-host -DCMAKE_BUILD_TYPE=Release
 cmake --build build-host --parallel
 ctest --test-dir build-host --output-on-failure
