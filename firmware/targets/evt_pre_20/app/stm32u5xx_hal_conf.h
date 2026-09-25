@@ -22,6 +22,7 @@ extern "C" {
 #define HAL_ICACHE_MODULE_ENABLED
 #define HAL_MDF_MODULE_ENABLED
 #define HAL_OSPI_MODULE_ENABLED
+#define HAL_SPI_MODULE_ENABLED
 #define HAL_PWR_MODULE_ENABLED
 #define HAL_RCC_MODULE_ENABLED
 #define HAL_RNG_MODULE_ENABLED
@@ -90,6 +91,9 @@ extern "C" {
 
 #ifdef HAL_I2C_MODULE_ENABLED
 #include "stm32u5xx_hal_i2c.h"
+#endif
+#ifdef HAL_SPI_MODULE_ENABLED
+#include "stm32u5xx_hal_spi.h"
 #endif
 #ifdef HAL_CORTEX_MODULE_ENABLED
 #include "stm32u5xx_hal_cortex.h"

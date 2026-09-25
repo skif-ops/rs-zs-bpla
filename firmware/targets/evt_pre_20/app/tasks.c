@@ -9,12 +9,14 @@
  *                 detection events into the NOR outbox (fetch in the audio task, analysis here)
  *   comms       - app_comms: BG95 bring-up from the station configuration, MQTT session, outbox drain + heartbeat (B2)
  *   power       - app_power: INA226 on I2C2 every second -> power snapshot for heartbeat, events and the self-test
+ *   lora        - app_lora: SX1262 fallback uplink of the outbox while the GSM link is degraded (DRY until the RF gate)
  */
 #include "tasks.h"
 
 #include "FreeRTOS.h"
 #include "app_config.h"
 #include "app_comms.h"
+#include "app_lora.h"
 #include "app_nrf_update.h"
 #include "app_power.h"
 #include "bsp_gpio.h"
@@ -60,7 +62,7 @@ static zs_dsp_ctx_t dsp_ctx;
 static zs_station_pipeline_t pipeline;
 static uint32_t pipeline_last_ms, pipeline_max_ms, pipeline_events_ram;
 
-static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task, ble_task, dsp_task, comms_task, power_task;
+static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task, ble_task, dsp_task, comms_task, power_task, lora_task;
 
 /* ---- ISR notifications ----------------------------------------------------- */
 void app_audio_block_notify_from_isr(void) {
@@ -249,11 +251,12 @@ static void gsm_probe_tick(uint32_t now) {
 }
 static void comms_health_on_s3_exit(bool done) {
   last_s3_exit_ms = xTaskGetTickCount();
-  if (done) { comms_fail_streak = 0u; if (gsm_degraded) { gsm_degraded = false; modes.policy.comms_max_ms = zs_mode_policy_default().comms_max_ms; console_printf("comms: link healthy again\r\n"); } return; }
+  if (done) { comms_fail_streak = 0u; if (gsm_degraded) { gsm_degraded = false; modes.policy.comms_max_ms = zs_mode_policy_default().comms_max_ms; app_lora_set_route_hint(false); console_printf("comms: link healthy again\r\n"); } return; }
   comms_fail_streak++;
   if (!gsm_degraded && comms_fail_streak >= APP_COMMS_DEGRADED_AFTER) {
     gsm_degraded = true;
     modes.policy.comms_max_ms = APP_COMMS_MAX_DEGRADED_MS;
+    app_lora_set_route_hint(true);
     console_printf("comms: DEGRADED after %u failed sessions, S3 watchdog %lu s, route hint lora\r\n", comms_fail_streak, (unsigned long)(APP_COMMS_MAX_DEGRADED_MS / 1000u));
   }
 }
@@ -459,6 +462,7 @@ static void secrets_apply(void) {
   else ipc_port.engineer_key = NULL;
   for (unsigned i = 0u; i < 2u; i++) if (secrets.iccid[i][0]) (void)app_comms_set_sim_iccid(i + 1u, secrets.iccid[i]);
   app_comms_set_command_key(secrets.command_key_set ? secrets.command_public_key : NULL);
+  if (stores_on_nor) app_lora_bind(&nor_outbox_io, APP_STATION_ID, secrets.engineer_key_set ? secrets.engineer_key : NULL, console_printf);
 }
 
 static void ble_secrets_changed(void *ctx, const zs_station_secrets_t *rec) {
@@ -488,6 +492,7 @@ static void bind_record_stores(void) {
     stores_on_nor = true;
     app_nrf_update_bind(&nor, &nor_bindings.layout, console_printf);
     app_comms_bind(&nor_outbox_io, &nor_command_io, &comms_hooks);        /* comms needs the durable stores */
+    app_lora_bind(&nor_outbox_io, APP_STATION_ID, secrets.engineer_key_set ? secrets.engineer_key : NULL, console_printf);
     { uint16_t pending = 0u; if (zs_event_outbox_pending_count(&nor_outbox_io, &pending) == ZS_EVENT_OUTBOX_OK && pending > 0u) { console_printf("outbox: %u events pending from before the reboot\r\n", pending); mode_event(ZS_MODE_EV_OUTBOX_PENDING); } }
     /* B3 boot counter: one erase block before the nRF image; every power cycle gets a new boot_id so event ids never repeat */
     if (zs_boot_counter_open(&boot_counter, &nor, nor_bindings.layout.boot_counter_base_address, nor_bindings.layout.erase_block_bytes) &&
@@ -526,6 +531,7 @@ static bool pl_emit(void *ctx, const zs_detection_t *d) {
   (void)app_power_snapshot(&with_power.power);                            /* battery bus/current/power of the moment */
   with_power.route.transport = ZS_ROUTE_LTE;
   if (!stores_on_nor) { pipeline_events_ram++; return true; }
+  app_lora_remember_event(d->event_id, d->classification.class_id, d->classification.confidence_u8, pipeline.presence.level, (uint16_t)pipeline.last_gate.f0_hz);
   return zs_event_outbox_enqueue_detection(&nor_outbox_io, &with_power, 2u, workspace, sizeof(workspace)) == ZS_EVENT_OUTBOX_OK;
 }
 
@@ -673,10 +679,14 @@ static void console_exec(const char *cmd) {
     console_printf((!secrets_on_nor || zs_station_secrets_clear(&secrets_io) == ZS_STATION_SECRETS_OK) ? "secrets: cleared (sim iccids apply after reboot)\r\n" : "secrets: nor clear failed\r\n");
   } else if (strcmp(cmd, "power") == 0) {
     app_power_status(console_printf);
+  } else if (strcmp(cmd, "lora") == 0) {
+    app_lora_status(console_printf);
+  } else if (strcmp(cmd, "lora on") == 0 || strcmp(cmd, "lora off") == 0) {
+    app_lora_set_route_hint(cmd[5] == 'o' && cmd[6] == 'n');            /* bench: force the route hint */
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] power heap\r\n");
+    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] power lora [on|off] heap\r\n");
   }
 }
 
@@ -736,5 +746,6 @@ bool app_tasks_create(void) {
   if (xTaskCreate(dsp_task_fn, "dsp", APP_STACK_DSP, NULL, APP_PRIO_DSP, &dsp_task) != pdPASS) return false;
   if (xTaskCreate(app_comms_task, "comms", APP_STACK_COMMS, NULL, APP_PRIO_COMMS, &comms_task) != pdPASS) return false;
   if (xTaskCreate(app_power_task, "power", APP_STACK_POWER, NULL, APP_PRIO_POWER, &power_task) != pdPASS) return false;
+  if (xTaskCreate(app_lora_task, "lora", APP_STACK_LORA, NULL, APP_PRIO_LORA, &lora_task) != pdPASS) return false;
   return true;
 }

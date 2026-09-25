@@ -63,6 +63,8 @@ add_library(stm32u5_hal STATIC
   ${HAL_SRC}/stm32u5xx_hal_flash_ex.c
   ${HAL_SRC}/stm32u5xx_hal_i2c.c
   ${HAL_SRC}/stm32u5xx_hal_i2c_ex.c
+  ${HAL_SRC}/stm32u5xx_hal_spi.c
+  ${HAL_SRC}/stm32u5xx_hal_spi_ex.c
   ${HAL_SRC}/stm32u5xx_hal_icache.c
   ${HAL_SRC}/stm32u5xx_hal_exti.c
   ${HAL_SRC}/stm32u5xx_hal_ospi.c
@@ -97,10 +99,12 @@ add_executable(dioneya_evt_pre_20.elf
   bsp_nor.c
   bsp_rng.c
   bsp_i2c.c
+  bsp_spi.c
   tasks.c
   app_nrf_update.c
   app_comms.c
   app_power.c
+  app_lora.c
   hal_msp.c
   stm32u5xx_it.c
   syscalls.c
