@@ -231,6 +231,33 @@ static void outbox_retry_tick(uint32_t now) {
   outbox_retry_at_ms = now + outbox_retry_backoff_ms;
 }
 
+/* GSM health: consecutive S3 sessions that end without COMMS_DONE (watchdog) mark the link degraded after
+   APP_COMMS_DEGRADED_AFTER: the S3 watchdog drops to APP_COMMS_MAX_DEGRADED_MS so a dead network costs less
+   modem time per retry, and the route hint (app_route_hint_lora) is set for the LoRa transport; a completed
+   session restores the defaults. */
+static unsigned comms_fail_streak;
+static bool gsm_degraded;
+static uint32_t last_s3_exit_ms;
+bool app_route_hint_lora(void) { return gsm_degraded; }
+/* While degraded, probe GSM every APP_GSM_PROBE_MS with a capped S3: a completed session restores the link. */
+static void gsm_probe_tick(uint32_t now) {
+  if (!gsm_degraded || modes.mode == ZS_MODE_S3_COMMS || modes.mode == ZS_MODE_S4_SERVICE) return;
+  if ((uint32_t)(now - last_s3_exit_ms) < APP_GSM_PROBE_MS) return;
+  last_s3_exit_ms = now;
+  console_printf("comms: gsm probe\r\n");
+  mode_event(ZS_MODE_EV_OUTBOX_PENDING);
+}
+static void comms_health_on_s3_exit(bool done) {
+  last_s3_exit_ms = xTaskGetTickCount();
+  if (done) { comms_fail_streak = 0u; if (gsm_degraded) { gsm_degraded = false; modes.policy.comms_max_ms = zs_mode_policy_default().comms_max_ms; console_printf("comms: link healthy again\r\n"); } return; }
+  comms_fail_streak++;
+  if (!gsm_degraded && comms_fail_streak >= APP_COMMS_DEGRADED_AFTER) {
+    gsm_degraded = true;
+    modes.policy.comms_max_ms = APP_COMMS_MAX_DEGRADED_MS;
+    console_printf("comms: DEGRADED after %u failed sessions, S3 watchdog %lu s, route hint lora\r\n", comms_fail_streak, (unsigned long)(APP_COMMS_MAX_DEGRADED_MS / 1000u));
+  }
+}
+
 static void supervisor_task_fn(void *arg) {
   zs_mode_t last = ZS_MODE_SHUTDOWN;
   uint32_t tamper_since = 0u;
@@ -254,6 +281,7 @@ static void supervisor_task_fn(void *arg) {
     for (unsigned ev = 1u; ev < 32u; ev++) if (bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, now);
     (void)zs_mode_tick(&modes, now);
     outbox_retry_tick(now);
+    gsm_probe_tick(now);
     if (bsp_gpio_power_fault()) (void)zs_mode_on_event(&modes, ZS_MODE_EV_FAULT, now);
     /* TAMPER_IN as service trigger: 5 s continuous activation requests service mode (once per activation);
        shorter activations are counted as tamper events for the security log. */
@@ -270,6 +298,7 @@ static void supervisor_task_fn(void *arg) {
     }
     if (modes.mode != last) {
       console_printf("mode %s -> %s\r\n", zs_mode_name(last), zs_mode_name(modes.mode));
+      if (last == ZS_MODE_S3_COMMS) comms_health_on_s3_exit(modes.journal[(modes.journal_head + ZS_MODE_JOURNAL_DEPTH - 1u) % ZS_MODE_JOURNAL_DEPTH].event == ZS_MODE_EV_COMMS_DONE);
       apply_power(modes.mode);
       last = modes.mode;
     }
@@ -578,7 +607,7 @@ static void console_exec(const char *cmd) {
   } else if (strcmp(cmd, "modes") == 0) {
     zs_mode_transition_t j[ZS_MODE_JOURNAL_DEPTH];
     uint8_t n = zs_mode_journal(&modes, j, ZS_MODE_JOURNAL_DEPTH);
-    console_printf("mode %s, tamper events %lu, outbox retries %lu (backoff %lu s)\r\n", zs_mode_name(modes.mode), (unsigned long)tamper_events, (unsigned long)outbox_retries, (unsigned long)(outbox_retry_backoff_ms / 1000u));
+    console_printf("mode %s, tamper events %lu, outbox retries %lu (backoff %lu s), gsm %s (fail streak %u)\r\n", zs_mode_name(modes.mode), (unsigned long)tamper_events, (unsigned long)outbox_retries, (unsigned long)(outbox_retry_backoff_ms / 1000u), gsm_degraded ? "degraded" : "ok", comms_fail_streak);
     for (uint8_t i = 0u; i < n; i++)
       console_printf("  %8lu %s -> %s (ev %u)\r\n", (unsigned long)j[i].at_ms, zs_mode_name((zs_mode_t)j[i].from), zs_mode_name((zs_mode_t)j[i].to), j[i].event);
   } else if (strcmp(cmd, "ble") == 0) {
