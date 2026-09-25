@@ -1,5 +1,5 @@
 {
- "schema": "dioneya-pcb-pwr-current-evidence-v1",
+ "schema": "dioneya-pcb-pwr-current-evidence-v2",
  "board": "hardware/kicad/candidates/PCB-PWR-ECO-005/PCB-PWR_ECO_005_CANDIDATE_REV_A.kicad_pcb",
  "board_sha256": "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610",
  "basis": {
@@ -184,30 +184,173 @@
     "U1.3",
     "U1.6"
    ],
-   "probe": {
-    "layer": "B.Cu",
-    "at_mm": [
-     19.35,
-     30.1
-    ],
-    "segment_width_mm": 0.25,
-    "segment_length_mm": 0.7
-   },
+   "short_segments": [],
+   "net": "VBAT_FUSED",
+   "probed_segments": 9,
    "cases": [
     {
      "case": "input_fused",
-     "share": 0.0,
-     "current_a": 0.0
+     "i_max_a": 0.0045,
+     "du_mv_along_segments": 0.006,
+     "p_mw_along_segments": 0.0
     }
    ],
-   "net": "VBAT_FUSED",
+   "segments_detail": [
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      19.35,
+      30.1
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.7,
+     "worst_case": "input_fused",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.651,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      19.5,
+      30.6
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.424,
+     "worst_case": "input_fused",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.0,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      19.55,
+      29.55
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.566,
+     "worst_case": "input_fused",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.335,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      20.0,
+      29.35
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.5,
+     "worst_case": "input_fused",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.179,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      20.3,
+      29.3
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.141,
+     "worst_case": "input_fused",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.333,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      19.1,
+      30.8
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.141,
+     "worst_case": "input_fused",
+     "i_a": 0.0035,
+     "r_mohm_70c": 0.333,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      19.4,
+      30.75
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.5,
+     "worst_case": "input_fused",
+     "i_a": 0.0045,
+     "r_mohm_70c": 1.179,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      20.6,
+      29.25
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.5,
+     "worst_case": "input_fused",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.179,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      20.9,
+      29.2
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.141,
+     "worst_case": "input_fused",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.333,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
    "worst_case": "input_fused",
-   "i_branch_a": 0.0,
+   "worst_segment": {
+    "layer": "F.Cu",
+    "at_mm": [
+     19.4,
+     30.75
+    ],
+    "width_mm": 0.25,
+    "length_mm": 0.5,
+    "i_a": 0.0045,
+    "ipc2221_10c_a": 0.875,
+    "bar_delta_t_c": null,
+    "status": "PASS"
+   },
+   "i_branch_a": 0.0045,
    "r_branch_mohm_70c": 8.523,
-   "du_mv": 0.0,
+   "du_mv": 0.006,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 0.875,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 0.875,
    "status": "PASS"
   },
   {
@@ -220,30 +363,158 @@
    "pads": [
     "U1.3"
    ],
-   "probe": {
-    "layer": "F.Cu",
-    "at_mm": [
-     17.5,
-     30.0
-    ],
-    "segment_width_mm": 0.25,
-    "segment_length_mm": 0.707
-   },
+   "short_segments": [],
+   "net": "VBAT_FUSED",
+   "probed_segments": 8,
    "cases": [
     {
      "case": "input_fused",
-     "share": 0.1001,
-     "current_a": 0.5005
+     "i_max_a": 0.734,
+     "du_mv_along_segments": 2.168,
+     "p_mw_along_segments": 1.235
     }
    ],
-   "net": "VBAT_FUSED",
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      17.5,
+      30.0
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.707,
+     "worst_case": "input_fused",
+     "i_a": 0.5005,
+     "r_mohm_70c": 1.667,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": 0.0606,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      17.75,
+      30.3
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.1,
+     "worst_case": "input_fused",
+     "i_a": 0.71,
+     "r_mohm_70c": 0.236,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": 0.1219,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      17.8,
+      30.4
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.141,
+     "worst_case": "input_fused",
+     "i_a": 0.676,
+     "r_mohm_70c": 0.333,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": 0.1105,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      17.85,
+      30.5
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.1,
+     "worst_case": "input_fused",
+     "i_a": 0.676,
+     "r_mohm_70c": 0.236,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": 0.1105,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      17.9,
+      30.6
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.141,
+     "worst_case": "input_fused",
+     "i_a": 0.734,
+     "r_mohm_70c": 0.333,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": 0.1303,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      18.0,
+      30.65
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.1,
+     "worst_case": "input_fused",
+     "i_a": 0.562,
+     "r_mohm_70c": 0.236,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": 0.0764,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      18.15,
+      30.75
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.283,
+     "worst_case": "input_fused",
+     "i_a": 0.4835,
+     "r_mohm_70c": 0.667,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": 0.0565,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      18.3,
+      30.85
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.1,
+     "worst_case": "input_fused",
+     "i_a": 0.3475,
+     "r_mohm_70c": 0.236,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": 0.0292,
+     "status": "PASS"
+    }
+   ],
    "worst_case": "input_fused",
-   "i_branch_a": 0.5005,
+   "worst_segment": {
+    "layer": "F.Cu",
+    "at_mm": [
+     17.9,
+     30.6
+    ],
+    "width_mm": 0.25,
+    "length_mm": 0.141,
+    "i_a": 0.734,
+    "ipc2221_10c_a": 0.875,
+    "bar_delta_t_c": 0.1303,
+    "status": "PASS"
+   },
+   "i_branch_a": 0.734,
    "r_branch_mohm_70c": 3.946,
-   "du_mv": 1.975,
-   "p_mw": 0.988,
-   "ipc2221_10c_a": 0.875,
-   "bar_delta_t_c": 0.0606,
+   "du_mv": 2.168,
+   "p_mw": 1.235,
+   "ipc2221_10c_a_min_width": 0.875,
    "status": "PASS"
   },
   {
@@ -256,30 +527,72 @@
    "pads": [
     "C1.2"
    ],
-   "probe": {
+   "short_segments": [
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.5608,
+     "length_mm": 0.0001
+    }
+   ],
+   "net": "VBAT_FUSED",
+   "probed_segments": 1,
+   "cases": [
+    {
+     "case": "input_fused",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      20.615,
+      26.135
+     ],
+     "width_mm": 0.5608,
+     "length_mm": 0.381,
+     "worst_case": "input_fused",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.401,
+     "ipc2221_10c_a": 1.572,
+     "bar_delta_t_c": 0.0,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.5608,
+     "length_mm": 0.0001,
+     "worst_case": null,
+     "i_a": 0.0,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0001,
+     "ipc2221_10c_a": 1.572,
+     "bar_delta_t_c": 0.0,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "input_fused",
+   "worst_segment": {
     "layer": "F.Cu",
     "at_mm": [
      20.615,
      26.135
     ],
-    "segment_width_mm": 0.5608,
-    "segment_length_mm": 0.381
+    "width_mm": 0.5608,
+    "length_mm": 0.381,
+    "i_a": 0.0,
+    "ipc2221_10c_a": 1.572,
+    "bar_delta_t_c": 0.0,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "input_fused",
-     "share": 0.0,
-     "current_a": 0.0
-    }
-   ],
-   "net": "VBAT_FUSED",
-   "worst_case": "input_fused",
    "i_branch_a": 0.0,
    "r_branch_mohm_70c": 0.401,
    "du_mv": 0.0,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 1.572,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 1.572,
    "status": "PASS"
   },
   {
@@ -292,23 +605,55 @@
    "pads": [
     "U1.6"
    ],
-   "note": "longest segment < 0.1 mm: pad neck/zero-length joint inside wider copper",
-   "cases": [
+   "short_segments": [
     {
-     "case": "input_fused",
-     "share": 0.0,
-     "current_a": 0.0
+     "layer": "F.Cu",
+     "width_mm": 0.6006,
+     "length_mm": 0.0523
     }
    ],
    "net": "VBAT_FUSED",
-   "worst_case": "input_fused",
-   "i_branch_a": 0.0,
+   "probed_segments": 0,
+   "cases": [
+    {
+     "case": "input_fused",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0,
+     "p_mw_along_segments": 0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.6006,
+     "length_mm": 0.0523,
+     "worst_case": null,
+     "i_a": 5.0,
+     "current_basis": "NET_CASE_BOUND_NO_CUT",
+     "r_mohm_70c": 0.0513,
+     "ipc2221_10c_a": 1.653,
+     "bar_delta_t_c": 0.001,
+     "status": "PASS_SHORT_CONDUCTION"
+    }
+   ],
+   "worst_case": null,
+   "worst_segment": {
+    "layer": "F.Cu",
+    "at_mm": null,
+    "width_mm": 0.6006,
+    "length_mm": 0.0523,
+    "i_a": 5.0,
+    "ipc2221_10c_a": 1.653,
+    "bar_delta_t_c": 0.001,
+    "status": "PASS_SHORT_CONDUCTION"
+   },
+   "i_branch_a": 5.0,
    "r_branch_mohm_70c": 0.051,
-   "du_mv": 0.0,
-   "p_mw": 0.0,
-   "ipc2221_10c_a": 1.653,
-   "bar_delta_t_c": 0.0,
-   "status": "PASS"
+   "du_mv": 0,
+   "p_mw": 0,
+   "ipc2221_10c_a_min_width": 1.653,
+   "status": "PASS_SHORT_CONDUCTION"
   },
   {
    "layers": [
@@ -318,30 +663,53 @@
    "length_mm": 0.9,
    "min_width_mm": 0.8,
    "pads": [],
-   "probe": {
+   "short_segments": [],
+   "net": "VBAT_PROTECTED",
+   "probed_segments": 1,
+   "cases": [
+    {
+     "case": "input_protected",
+     "i_max_a": 0.1595,
+     "du_mv_along_segments": 0.106,
+     "p_mw_along_segments": 0.017
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      33.45,
+      28.3
+     ],
+     "width_mm": 0.8,
+     "length_mm": 0.9,
+     "worst_case": "input_protected",
+     "i_a": 0.1595,
+     "r_mohm_70c": 0.663,
+     "ipc2221_10c_a": 2.034,
+     "bar_delta_t_c": 0.0002,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "input_protected",
+   "worst_segment": {
     "layer": "F.Cu",
     "at_mm": [
      33.45,
      28.3
     ],
-    "segment_width_mm": 0.8,
-    "segment_length_mm": 0.9
+    "width_mm": 0.8,
+    "length_mm": 0.9,
+    "i_a": 0.1595,
+    "ipc2221_10c_a": 2.034,
+    "bar_delta_t_c": 0.0002,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "input_protected",
-     "share": 0.0319,
-     "current_a": 0.1595
-    }
-   ],
-   "net": "VBAT_PROTECTED",
-   "worst_case": "input_protected",
    "i_branch_a": 0.1595,
    "r_branch_mohm_70c": 0.663,
    "du_mv": 0.106,
    "p_mw": 0.017,
-   "ipc2221_10c_a": 2.034,
-   "bar_delta_t_c": 0.0002,
+   "ipc2221_10c_a_min_width": 2.034,
    "status": "PASS"
   },
   {
@@ -354,30 +722,53 @@
    "pads": [
     "U1.4"
    ],
-   "probe": {
+   "short_segments": [],
+   "net": "VBAT_PROTECTED",
+   "probed_segments": 1,
+   "cases": [
+    {
+     "case": "input_protected",
+     "i_max_a": 0.0035,
+     "du_mv_along_segments": 0.001,
+     "p_mw_along_segments": 0.0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      21.386,
+      31.036
+     ],
+     "width_mm": 0.6006,
+     "length_mm": 0.242,
+     "worst_case": "input_protected",
+     "i_a": 0.0035,
+     "r_mohm_70c": 0.238,
+     "ipc2221_10c_a": 1.653,
+     "bar_delta_t_c": 0.0,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "input_protected",
+   "worst_segment": {
     "layer": "F.Cu",
     "at_mm": [
      21.386,
      31.036
     ],
-    "segment_width_mm": 0.6006,
-    "segment_length_mm": 0.242
+    "width_mm": 0.6006,
+    "length_mm": 0.242,
+    "i_a": 0.0035,
+    "ipc2221_10c_a": 1.653,
+    "bar_delta_t_c": 0.0,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "input_protected",
-     "share": 0.0007,
-     "current_a": 0.0035
-    }
-   ],
-   "net": "VBAT_PROTECTED",
-   "worst_case": "input_protected",
    "i_branch_a": 0.0035,
    "r_branch_mohm_70c": 0.238,
    "du_mv": 0.001,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 1.653,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 1.653,
    "status": "PASS"
   },
   {
@@ -390,30 +781,53 @@
    "pads": [
     "U1.4"
    ],
-   "probe": {
+   "short_segments": [],
+   "net": "VBAT_PROTECTED",
+   "probed_segments": 1,
+   "cases": [
+    {
+     "case": "input_protected",
+     "i_max_a": 0.0155,
+     "du_mv_along_segments": 0.003,
+     "p_mw_along_segments": 0.0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      21.643,
+      31.207
+     ],
+     "width_mm": 0.6006,
+     "length_mm": 0.171,
+     "worst_case": "input_protected",
+     "i_a": 0.0155,
+     "r_mohm_70c": 0.168,
+     "ipc2221_10c_a": 1.653,
+     "bar_delta_t_c": 0.0,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "input_protected",
+   "worst_segment": {
     "layer": "F.Cu",
     "at_mm": [
      21.643,
      31.207
     ],
-    "segment_width_mm": 0.6006,
-    "segment_length_mm": 0.171
+    "width_mm": 0.6006,
+    "length_mm": 0.171,
+    "i_a": 0.0155,
+    "ipc2221_10c_a": 1.653,
+    "bar_delta_t_c": 0.0,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "input_protected",
-     "share": 0.0031,
-     "current_a": 0.0155
-    }
-   ],
-   "net": "VBAT_PROTECTED",
-   "worst_case": "input_protected",
    "i_branch_a": 0.0155,
    "r_branch_mohm_70c": 0.168,
    "du_mv": 0.003,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 1.653,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 1.653,
    "status": "PASS"
   },
   {
@@ -427,35 +841,74 @@
    "pads": [
     "U2.8"
    ],
-   "probe": {
+   "short_segments": [],
+   "net": "VBAT_SYS",
+   "probed_segments": 2,
+   "cases": [
+    {
+     "case": "vin_3v8",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    },
+    {
+     "case": "vin_3v3",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      45.65,
+      25.75
+     ],
+     "width_mm": 0.25,
+     "length_mm": 6.414,
+     "worst_case": "vin_3v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 15.127,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      46.75,
+      23.0
+     ],
+     "width_mm": 0.2,
+     "length_mm": 1.1,
+     "worst_case": "vin_3v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 3.243,
+     "ipc2221_10c_a": 0.745,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "vin_3v8",
+   "worst_segment": {
     "layer": "B.Cu",
     "at_mm": [
      45.65,
      25.75
     ],
-    "segment_width_mm": 0.25,
-    "segment_length_mm": 6.414
+    "width_mm": 0.25,
+    "length_mm": 6.414,
+    "i_a": 0.0,
+    "ipc2221_10c_a": 0.875,
+    "bar_delta_t_c": null,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "vin_3v8",
-     "share": 0.0,
-     "current_a": 0.0
-    },
-    {
-     "case": "vin_3v3",
-     "share": 0.0,
-     "current_a": 0.0
-    }
-   ],
-   "net": "VBAT_SYS",
-   "worst_case": "vin_3v8",
    "i_branch_a": 0.0,
    "r_branch_mohm_70c": 22.152,
    "du_mv": 0.0,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 0.745,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 0.745,
    "status": "PASS"
   },
   {
@@ -470,35 +923,74 @@
     "U4.1",
     "U4.9"
    ],
-   "probe": {
+   "short_segments": [],
+   "net": "VBAT_SYS",
+   "probed_segments": 2,
+   "cases": [
+    {
+     "case": "vin_3v8",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    },
+    {
+     "case": "vin_3v3",
+     "i_max_a": 0.3222,
+     "du_mv_along_segments": 0.699,
+     "p_mw_along_segments": 0.197
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      53.125,
+      42.763
+     ],
+     "width_mm": 0.5,
+     "length_mm": 1.55,
+     "worst_case": "vin_3v3",
+     "i_a": 0.3222,
+     "r_mohm_70c": 1.828,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      53.888,
+      42.413
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.675,
+     "worst_case": "vin_3v3",
+     "i_a": 0.069,
+     "r_mohm_70c": 1.592,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "vin_3v3",
+   "worst_segment": {
     "layer": "F.Cu",
     "at_mm": [
      53.125,
      42.763
     ],
-    "segment_width_mm": 0.5,
-    "segment_length_mm": 1.55
+    "width_mm": 0.5,
+    "length_mm": 1.55,
+    "i_a": 0.3222,
+    "ipc2221_10c_a": 1.447,
+    "bar_delta_t_c": null,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "vin_3v8",
-     "share": 0.0,
-     "current_a": 0.0
-    },
-    {
-     "case": "vin_3v3",
-     "share": 0.2075,
-     "current_a": 0.3222
-    }
-   ],
-   "net": "VBAT_SYS",
-   "worst_case": "vin_3v3",
    "i_branch_a": 0.3222,
    "r_branch_mohm_70c": 5.25,
-   "du_mv": 1.692,
-   "p_mw": 0.545,
-   "ipc2221_10c_a": 0.875,
-   "bar_delta_t_c": 0.0444,
+   "du_mv": 0.699,
+   "p_mw": 0.197,
+   "ipc2221_10c_a_min_width": 0.875,
    "status": "PASS"
   },
   {
@@ -512,35 +1004,59 @@
     "C20.1",
     "U3.1"
    ],
-   "probe": {
+   "short_segments": [],
+   "net": "VBAT_SYS",
+   "probed_segments": 1,
+   "cases": [
+    {
+     "case": "vin_3v8",
+     "i_max_a": 0.5402,
+     "du_mv_along_segments": 0.988,
+     "p_mw_along_segments": 0.533
+    },
+    {
+     "case": "vin_3v3",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      53.125,
+      14.762
+     ],
+     "width_mm": 0.5,
+     "length_mm": 1.55,
+     "worst_case": "vin_3v8",
+     "i_a": 0.5402,
+     "r_mohm_70c": 1.828,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": 0.0151,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "vin_3v8",
+   "worst_segment": {
     "layer": "F.Cu",
     "at_mm": [
      53.125,
      14.762
     ],
-    "segment_width_mm": 0.5,
-    "segment_length_mm": 1.55
+    "width_mm": 0.5,
+    "length_mm": 1.55,
+    "i_a": 0.5402,
+    "ipc2221_10c_a": 1.447,
+    "bar_delta_t_c": 0.0151,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "vin_3v8",
-     "share": 0.3021,
-     "current_a": 0.5402
-    },
-    {
-     "case": "vin_3v3",
-     "share": 0.0,
-     "current_a": 0.0
-    }
-   ],
-   "net": "VBAT_SYS",
-   "worst_case": "vin_3v8",
    "i_branch_a": 0.5402,
    "r_branch_mohm_70c": 1.828,
-   "du_mv": 0.987,
+   "du_mv": 0.988,
    "p_mw": 0.533,
-   "ipc2221_10c_a": 1.447,
-   "bar_delta_t_c": 0.0151,
+   "ipc2221_10c_a_min_width": 1.447,
    "status": "PASS"
   },
   {
@@ -553,35 +1069,59 @@
    "pads": [
     "U3.1"
    ],
-   "probe": {
+   "short_segments": [],
+   "net": "VBAT_SYS",
+   "probed_segments": 1,
+   "cases": [
+    {
+     "case": "vin_3v8",
+     "i_max_a": 0.0089,
+     "du_mv_along_segments": 0.005,
+     "p_mw_along_segments": 0.0
+    },
+    {
+     "case": "vin_3v3",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      53.985,
+      14.812
+     ],
+     "width_mm": 0.2506,
+     "length_mm": 0.247,
+     "worst_case": "vin_3v8",
+     "i_a": 0.0089,
+     "r_mohm_70c": 0.581,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.0,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "vin_3v8",
+   "worst_segment": {
     "layer": "F.Cu",
     "at_mm": [
      53.985,
      14.812
     ],
-    "segment_width_mm": 0.2506,
-    "segment_length_mm": 0.247
+    "width_mm": 0.2506,
+    "length_mm": 0.247,
+    "i_a": 0.0089,
+    "ipc2221_10c_a": 0.877,
+    "bar_delta_t_c": 0.0,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "vin_3v8",
-     "share": 0.005,
-     "current_a": 0.0089
-    },
-    {
-     "case": "vin_3v3",
-     "share": 0.0,
-     "current_a": 0.0
-    }
-   ],
-   "net": "VBAT_SYS",
-   "worst_case": "vin_3v8",
    "i_branch_a": 0.0089,
    "r_branch_mohm_70c": 0.581,
    "du_mv": 0.005,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 0.877,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 0.877,
    "status": "PASS"
   },
   {
@@ -594,28 +1134,61 @@
    "pads": [
     "U4.1"
    ],
-   "note": "longest segment < 0.1 mm: pad neck/zero-length joint inside wider copper",
-   "cases": [
+   "short_segments": [
     {
-     "case": "vin_3v8",
-     "share": 0.0,
-     "current_a": 0.0
-    },
-    {
-     "case": "vin_3v3",
-     "share": 0.0,
-     "current_a": 0.0
+     "layer": "F.Cu",
+     "width_mm": 0.3456,
+     "length_mm": 0.0744
     }
    ],
    "net": "VBAT_SYS",
-   "worst_case": "vin_3v8",
-   "i_branch_a": 0.0,
+   "probed_segments": 0,
+   "cases": [
+    {
+     "case": "vin_3v8",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0,
+     "p_mw_along_segments": 0
+    },
+    {
+     "case": "vin_3v3",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0,
+     "p_mw_along_segments": 0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.3456,
+     "length_mm": 0.0744,
+     "worst_case": null,
+     "i_a": 1.7882,
+     "current_basis": "NET_CASE_BOUND_NO_CUT",
+     "r_mohm_70c": 0.1269,
+     "ipc2221_10c_a": 1.107,
+     "bar_delta_t_c": 0.0008,
+     "status": "PASS_SHORT_CONDUCTION"
+    }
+   ],
+   "worst_case": null,
+   "worst_segment": {
+    "layer": "F.Cu",
+    "at_mm": null,
+    "width_mm": 0.3456,
+    "length_mm": 0.0744,
+    "i_a": 1.7882,
+    "ipc2221_10c_a": 1.107,
+    "bar_delta_t_c": 0.0008,
+    "status": "PASS_SHORT_CONDUCTION"
+   },
+   "i_branch_a": 1.7882,
    "r_branch_mohm_70c": 0.126,
-   "du_mv": 0.0,
-   "p_mw": 0.0,
-   "ipc2221_10c_a": 1.107,
-   "bar_delta_t_c": 0.0,
-   "status": "PASS"
+   "du_mv": 0,
+   "p_mw": 0,
+   "ipc2221_10c_a_min_width": 1.107,
+   "status": "PASS_SHORT_CONDUCTION"
   },
   {
    "layers": [
@@ -627,30 +1200,555 @@
    "pads": [
     "U3.3"
    ],
-   "probe": {
+   "short_segments": [
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.3456,
+     "length_mm": 0.0721
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.5608,
+     "length_mm": 0.0704
+    }
+   ],
+   "net": "SW_3V8",
+   "probed_segments": 2,
+   "cases": [
+    {
+     "case": "sw_3v8",
+     "i_max_a": 1.13,
+     "du_mv_along_segments": 2.51,
+     "p_mw_along_segments": 2.822
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      56.043,
+      14.943
+     ],
+     "width_mm": 0.3456,
+     "length_mm": 0.123,
+     "worst_case": "sw_3v8",
+     "i_a": 0.0655,
+     "r_mohm_70c": 0.21,
+     "ipc2221_10c_a": 1.107,
+     "bar_delta_t_c": 0.0003,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      56.418,
+      15.319
+     ],
+     "width_mm": 0.2506,
+     "length_mm": 0.939,
+     "worst_case": "sw_3v8",
+     "i_a": 1.13,
+     "r_mohm_70c": 2.209,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.3456,
+     "length_mm": 0.0721,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.123,
+     "ipc2221_10c_a": 1.107,
+     "bar_delta_t_c": 0.0847,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.161,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.5608,
+     "length_mm": 0.0704,
+     "worst_case": null,
+     "i_a": 1.13,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.074,
+     "ipc2221_10c_a": 1.572,
+     "bar_delta_t_c": 0.0321,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "sw_3v8",
+   "worst_segment": {
     "layer": "F.Cu",
     "at_mm": [
      56.418,
      15.319
     ],
-    "segment_width_mm": 0.2506,
-    "segment_length_mm": 0.939
+    "width_mm": 0.2506,
+    "length_mm": 0.939,
+    "i_a": 1.13,
+    "ipc2221_10c_a": 0.877,
+    "bar_delta_t_c": 0.161,
+    "status": "PASS_SHORT_CONDUCTION"
    },
-   "cases": [
-    {
-     "case": "sw_3v8",
-     "share": 0.2379,
-     "current_a": 1.13
-    }
-   ],
-   "net": "SW_3V8",
-   "worst_case": "sw_3v8",
    "i_branch_a": 1.13,
    "r_branch_mohm_70c": 2.849,
-   "du_mv": 3.22,
-   "p_mw": 3.638,
-   "ipc2221_10c_a": 0.877,
-   "bar_delta_t_c": 0.161,
+   "du_mv": 2.51,
+   "p_mw": 2.822,
+   "ipc2221_10c_a_min_width": 0.877,
    "status": "PASS_SHORT_CONDUCTION"
   },
   {
@@ -663,30 +1761,501 @@
    "pads": [
     "U4.3"
    ],
-   "probe": {
+   "short_segments": [
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.3456,
+     "length_mm": 0.0721
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.2506,
+     "length_mm": 0.0003
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.5608,
+     "length_mm": 0.0704
+    }
+   ],
+   "net": "SW_3V3",
+   "probed_segments": 2,
+   "cases": [
+    {
+     "case": "sw_3v3",
+     "i_max_a": 1.1134,
+     "du_mv_along_segments": 2.473,
+     "p_mw_along_segments": 2.739
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      56.043,
+      42.943
+     ],
+     "width_mm": 0.3456,
+     "length_mm": 0.123,
+     "worst_case": "sw_3v3",
+     "i_a": 0.0646,
+     "r_mohm_70c": 0.21,
+     "ipc2221_10c_a": 1.107,
+     "bar_delta_t_c": 0.0003,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      56.418,
+      43.319
+     ],
+     "width_mm": 0.2506,
+     "length_mm": 0.939,
+     "worst_case": "sw_3v3",
+     "i_a": 1.1134,
+     "r_mohm_70c": 2.209,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.3456,
+     "length_mm": 0.0721,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.123,
+     "ipc2221_10c_a": 1.107,
+     "bar_delta_t_c": 0.082,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.2506,
+     "length_mm": 0.0003,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0007,
+     "ipc2221_10c_a": 0.877,
+     "bar_delta_t_c": 0.156,
+     "status": "PASS_SHORT_CONDUCTION"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.5608,
+     "length_mm": 0.0704,
+     "worst_case": null,
+     "i_a": 1.1134,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.074,
+     "ipc2221_10c_a": 1.572,
+     "bar_delta_t_c": 0.0312,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "sw_3v3",
+   "worst_segment": {
     "layer": "F.Cu",
     "at_mm": [
      56.418,
      43.319
     ],
-    "segment_width_mm": 0.2506,
-    "segment_length_mm": 0.939
+    "width_mm": 0.2506,
+    "length_mm": 0.939,
+    "i_a": 1.1134,
+    "ipc2221_10c_a": 0.877,
+    "bar_delta_t_c": 0.156,
+    "status": "PASS_SHORT_CONDUCTION"
    },
-   "cases": [
-    {
-     "case": "sw_3v3",
-     "share": 0.2379,
-     "current_a": 1.1134
-    }
-   ],
-   "net": "SW_3V3",
-   "worst_case": "sw_3v3",
    "i_branch_a": 1.1134,
    "r_branch_mohm_70c": 2.847,
-   "du_mv": 3.17,
-   "p_mw": 3.529,
-   "ipc2221_10c_a": 0.877,
-   "bar_delta_t_c": 0.156,
+   "du_mv": 2.473,
+   "p_mw": 2.739,
+   "ipc2221_10c_a_min_width": 0.877,
    "status": "PASS_SHORT_CONDUCTION"
   },
   {
@@ -699,30 +2268,68 @@
    "pads": [
     "J2.1"
    ],
-   "probe": {
+   "short_segments": [],
+   "net": "3V8_MODEM",
+   "probed_segments": 2,
+   "cases": [
+    {
+     "case": "out_3v8",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      75.232,
+      41.474
+     ],
+     "width_mm": 0.3,
+     "length_mm": 8.749,
+     "worst_case": "out_3v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 17.195,
+     "ipc2221_10c_a": 0.999,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      80.343,
+      40.737
+     ],
+     "width_mm": 0.3,
+     "length_mm": 2.084,
+     "worst_case": "out_3v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 4.096,
+     "ipc2221_10c_a": 0.999,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "out_3v8",
+   "worst_segment": {
     "layer": "B.Cu",
     "at_mm": [
      75.232,
      41.474
     ],
-    "segment_width_mm": 0.3,
-    "segment_length_mm": 8.749
+    "width_mm": 0.3,
+    "length_mm": 8.749,
+    "i_a": 0.0,
+    "ipc2221_10c_a": 0.999,
+    "bar_delta_t_c": null,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "out_3v8",
-     "share": 0.0,
-     "current_a": 0.0
-    }
-   ],
-   "net": "3V8_MODEM",
-   "worst_case": "out_3v8",
    "i_branch_a": 0.0,
    "r_branch_mohm_70c": 21.291,
    "du_mv": 0.0,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 0.999,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 0.999,
    "status": "PASS"
   },
   {
@@ -735,30 +2342,158 @@
    "pads": [
     "R1.1"
    ],
-   "probe": {
-    "layer": "F.Cu",
-    "at_mm": [
-     58.85,
-     17.95
-    ],
-    "segment_width_mm": 0.25,
-    "segment_length_mm": 3.0
-   },
+   "short_segments": [],
+   "net": "3V8_MODEM",
+   "probed_segments": 8,
    "cases": [
     {
      "case": "out_3v8",
-     "share": 0.0,
-     "current_a": 0.0
+     "i_max_a": 0.0043,
+     "du_mv_along_segments": 0.01,
+     "p_mw_along_segments": 0.0
     }
    ],
-   "net": "3V8_MODEM",
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      55.8,
+      18.6
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.707,
+     "worst_case": "out_3v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.667,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      56.5,
+      18.35
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.9,
+     "worst_case": "out_3v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 2.123,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      57.15,
+      18.15
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.566,
+     "worst_case": "out_3v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.335,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      58.85,
+      17.95
+     ],
+     "width_mm": 0.25,
+     "length_mm": 3.0,
+     "worst_case": "out_3v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 7.075,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      60.4,
+      17.9
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.141,
+     "worst_case": "out_3v8",
+     "i_a": 0.0003,
+     "r_mohm_70c": 0.333,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      61.2,
+      17.85
+     ],
+     "width_mm": 0.25,
+     "length_mm": 1.5,
+     "worst_case": "out_3v8",
+     "i_a": 0.0016,
+     "r_mohm_70c": 3.538,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      62.05,
+      17.75
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.283,
+     "worst_case": "out_3v8",
+     "i_a": 0.0043,
+     "r_mohm_70c": 0.667,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      62.85,
+      17.65
+     ],
+     "width_mm": 0.25,
+     "length_mm": 1.4,
+     "worst_case": "out_3v8",
+     "i_a": 0.0003,
+     "r_mohm_70c": 3.302,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
    "worst_case": "out_3v8",
-   "i_branch_a": 0.0,
+   "worst_segment": {
+    "layer": "F.Cu",
+    "at_mm": [
+     62.05,
+     17.75
+    ],
+    "width_mm": 0.25,
+    "length_mm": 0.283,
+    "i_a": 0.0043,
+    "ipc2221_10c_a": 0.875,
+    "bar_delta_t_c": null,
+    "status": "PASS"
+   },
+   "i_branch_a": 0.0043,
    "r_branch_mohm_70c": 20.04,
-   "du_mv": 0.0,
+   "du_mv": 0.01,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 0.875,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 0.875,
    "status": "PASS"
   },
   {
@@ -771,30 +2506,53 @@
    "pads": [
     "C16.1"
    ],
-   "probe": {
+   "short_segments": [],
+   "net": "3V8_MODEM",
+   "probed_segments": 1,
+   "cases": [
+    {
+     "case": "out_3v8",
+     "i_max_a": 0.0244,
+     "du_mv_along_segments": 0.075,
+     "p_mw_along_segments": 0.002
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      72.525,
+      18.3
+     ],
+     "width_mm": 0.5,
+     "length_mm": 2.6,
+     "worst_case": "out_3v8",
+     "i_a": 0.0244,
+     "r_mohm_70c": 3.066,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "out_3v8",
+   "worst_segment": {
     "layer": "F.Cu",
     "at_mm": [
      72.525,
      18.3
     ],
-    "segment_width_mm": 0.5,
-    "segment_length_mm": 2.6
+    "width_mm": 0.5,
+    "length_mm": 2.6,
+    "i_a": 0.0244,
+    "ipc2221_10c_a": 1.447,
+    "bar_delta_t_c": null,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "out_3v8",
-     "share": 0.0074,
-     "current_a": 0.0244
-    }
-   ],
-   "net": "3V8_MODEM",
-   "worst_case": "out_3v8",
    "i_branch_a": 0.0244,
    "r_branch_mohm_70c": 3.066,
    "du_mv": 0.075,
    "p_mw": 0.002,
-   "ipc2221_10c_a": 1.447,
-   "bar_delta_t_c": 0.0001,
+   "ipc2221_10c_a_min_width": 1.447,
    "status": "PASS"
   },
   {
@@ -807,30 +2565,53 @@
    "pads": [
     "C14.1"
    ],
-   "probe": {
+   "short_segments": [],
+   "net": "3V8_MODEM",
+   "probed_segments": 1,
+   "cases": [
+    {
+     "case": "out_3v8",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      72.525,
+      8.7
+     ],
+     "width_mm": 0.5,
+     "length_mm": 2.6,
+     "worst_case": "out_3v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 3.066,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "out_3v8",
+   "worst_segment": {
     "layer": "F.Cu",
     "at_mm": [
      72.525,
      8.7
     ],
-    "segment_width_mm": 0.5,
-    "segment_length_mm": 2.6
+    "width_mm": 0.5,
+    "length_mm": 2.6,
+    "i_a": 0.0,
+    "ipc2221_10c_a": 1.447,
+    "bar_delta_t_c": null,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "out_3v8",
-     "share": 0.0,
-     "current_a": 0.0
-    }
-   ],
-   "net": "3V8_MODEM",
-   "worst_case": "out_3v8",
    "i_branch_a": 0.0,
    "r_branch_mohm_70c": 3.066,
    "du_mv": 0.0,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 1.447,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 1.447,
    "status": "PASS"
   },
   {
@@ -847,35 +2628,194 @@
     "R15.2",
     "U2.6"
    ],
-   "probe": {
-    "layer": "B.Cu",
-    "at_mm": [
-     54.605,
-     24.0
-    ],
-    "segment_width_mm": 0.25,
-    "segment_length_mm": 13.81
-   },
+   "short_segments": [],
+   "net": "3V3_DIGITAL",
+   "probed_segments": 10,
    "cases": [
     {
      "case": "out_3v3",
-     "share": 0.0,
-     "current_a": 0.0
+     "i_max_a": 0.0047,
+     "du_mv_along_segments": 0.035,
+     "p_mw_along_segments": 0.0
     },
     {
      "case": "ldo_in",
-     "share": 0.0,
-     "current_a": 0.0
+     "i_max_a": 0.0014,
+     "du_mv_along_segments": 0.01,
+     "p_mw_along_segments": 0.0
     }
    ],
-   "net": "3V3_DIGITAL",
+   "segments_detail": [
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      54.605,
+      24.0
+     ],
+     "width_mm": 0.25,
+     "length_mm": 13.81,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 32.57,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      61.51,
+      22.7
+     ],
+     "width_mm": 0.25,
+     "length_mm": 2.6,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 6.132,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      63.005,
+      25.5
+     ],
+     "width_mm": 0.25,
+     "length_mm": 4.236,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 9.99,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      64.5,
+      31.0
+     ],
+     "width_mm": 0.25,
+     "length_mm": 8.0,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 18.867,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      46.95,
+      24.0
+     ],
+     "width_mm": 0.2,
+     "length_mm": 1.5,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 4.422,
+     "ipc2221_10c_a": 0.745,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      47.95,
+      23.75
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.707,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.667,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      48.2,
+      22.85
+     ],
+     "width_mm": 0.25,
+     "length_mm": 1.3,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 3.066,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      61.51,
+      20.95
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.9,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 2.123,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      65.45,
+      35.95
+     ],
+     "width_mm": 0.25,
+     "length_mm": 2.687,
+     "worst_case": "out_3v3",
+     "i_a": 0.0039,
+     "r_mohm_70c": 6.337,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      66.85,
+      36.9
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.9,
+     "worst_case": "out_3v3",
+     "i_a": 0.0047,
+     "r_mohm_70c": 2.123,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
    "worst_case": "out_3v3",
-   "i_branch_a": 0.0,
+   "worst_segment": {
+    "layer": "F.Cu",
+    "at_mm": [
+     66.85,
+     36.9
+    ],
+    "width_mm": 0.25,
+    "length_mm": 0.9,
+    "i_a": 0.0047,
+    "ipc2221_10c_a": 0.875,
+    "bar_delta_t_c": null,
+    "status": "PASS"
+   },
+   "i_branch_a": 0.0047,
    "r_branch_mohm_70c": 108.016,
-   "du_mv": 0.0,
+   "du_mv": 0.035,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 0.745,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 0.745,
    "status": "PASS"
   },
   {
@@ -890,35 +2830,89 @@
     "R10.1",
     "U4.6"
    ],
-   "probe": {
+   "short_segments": [],
+   "net": "3V3_DIGITAL",
+   "probed_segments": 3,
+   "cases": [
+    {
+     "case": "out_3v3",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    },
+    {
+     "case": "ldo_in",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      56.538,
+      43.55
+     ],
+     "width_mm": 0.2,
+     "length_mm": 8.906,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 26.255,
+     "ipc2221_10c_a": 0.745,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      55.585,
+      40.163
+     ],
+     "width_mm": 0.2,
+     "length_mm": 1.925,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 5.675,
+     "ipc2221_10c_a": 0.745,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      57.49,
+      47.45
+     ],
+     "width_mm": 0.2,
+     "length_mm": 0.9,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 2.653,
+     "ipc2221_10c_a": 0.745,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "out_3v3",
+   "worst_segment": {
     "layer": "B.Cu",
     "at_mm": [
      56.538,
      43.55
     ],
-    "segment_width_mm": 0.2,
-    "segment_length_mm": 8.906
+    "width_mm": 0.2,
+    "length_mm": 8.906,
+    "i_a": 0.0,
+    "ipc2221_10c_a": 0.745,
+    "bar_delta_t_c": null,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "out_3v3",
-     "share": 0.0,
-     "current_a": 0.0
-    },
-    {
-     "case": "ldo_in",
-     "share": 0.0,
-     "current_a": 0.0
-    }
-   ],
-   "net": "3V3_DIGITAL",
-   "worst_case": "out_3v3",
    "i_branch_a": 0.0,
    "r_branch_mohm_70c": 34.583,
    "du_mv": 0.0,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 0.745,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 0.745,
    "status": "PASS"
   },
   {
@@ -933,35 +2927,104 @@
     "R13.1",
     "R14.1"
    ],
-   "probe": {
+   "short_segments": [],
+   "net": "3V3_DIGITAL",
+   "probed_segments": 4,
+   "cases": [
+    {
+     "case": "out_3v3",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    },
+    {
+     "case": "ldo_in",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      73.2,
+      53.65
+     ],
+     "width_mm": 0.25,
+     "length_mm": 5.7,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 13.443,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      73.645,
+      56.5
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.89,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 2.099,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      73.412,
+      50.55
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.656,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.547,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      74.09,
+      57.25
+     ],
+     "width_mm": 0.25,
+     "length_mm": 1.5,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 3.538,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "out_3v3",
+   "worst_segment": {
     "layer": "F.Cu",
     "at_mm": [
      73.2,
      53.65
     ],
-    "segment_width_mm": 0.25,
-    "segment_length_mm": 5.7
+    "width_mm": 0.25,
+    "length_mm": 5.7,
+    "i_a": 0.0,
+    "ipc2221_10c_a": 0.875,
+    "bar_delta_t_c": null,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "out_3v3",
-     "share": 0.0,
-     "current_a": 0.0
-    },
-    {
-     "case": "ldo_in",
-     "share": 0.0,
-     "current_a": 0.0
-    }
-   ],
-   "net": "3V3_DIGITAL",
-   "worst_case": "out_3v3",
    "i_branch_a": 0.0,
    "r_branch_mohm_70c": 20.627,
    "du_mv": 0.0,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 0.875,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 0.875,
    "status": "PASS"
   },
   {
@@ -972,35 +3035,348 @@
    "length_mm": 8.37,
    "min_width_mm": 0.25,
    "pads": [],
-   "probe": {
-    "layer": "F.Cu",
-    "at_mm": [
-     64.85,
-     48.6
-    ],
-    "segment_width_mm": 0.25,
-    "segment_length_mm": 1.7
-   },
-   "cases": [
+   "short_segments": [
     {
-     "case": "out_3v3",
-     "share": 0.0,
-     "current_a": 0.0
-    },
-    {
-     "case": "ldo_in",
-     "share": 0.0,
-     "current_a": 0.0
+     "layer": "F.Cu",
+     "width_mm": 0.25,
+     "length_mm": 0.1
     }
    ],
    "net": "3V3_DIGITAL",
+   "probed_segments": 19,
+   "cases": [
+    {
+     "case": "out_3v3",
+     "i_max_a": 0.0003,
+     "du_mv_along_segments": 0.001,
+     "p_mw_along_segments": 0.0
+    },
+    {
+     "case": "ldo_in",
+     "i_max_a": 0.0001,
+     "du_mv_along_segments": 0.0,
+     "p_mw_along_segments": 0.0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      64.9,
+      47.7
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.141,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.333,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      64.85,
+      48.6
+     ],
+     "width_mm": 0.25,
+     "length_mm": 1.7,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 4.009,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      65.0,
+      47.5
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.141,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.333,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      64.95,
+      47.6
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.1,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.236,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      65.1,
+      47.3
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.141,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.333,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      65.05,
+      47.4
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.1,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.236,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      64.95,
+      49.55
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.283,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.667,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      65.2,
+      47.0
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.141,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.333,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      65.15,
+      47.15
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.2,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.472,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      65.3,
+      46.8
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.141,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.333,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      65.25,
+      46.9
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.1,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.236,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      65.8,
+      45.2
+     ],
+     "width_mm": 0.25,
+     "length_mm": 1.273,
+     "worst_case": "out_3v3",
+     "i_a": 0.0002,
+     "r_mohm_70c": 3.002,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      65.35,
+      46.2
+     ],
+     "width_mm": 0.25,
+     "length_mm": 1.1,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 2.594,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      66.3,
+      44.6
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.141,
+     "worst_case": "out_3v3",
+     "i_a": 0.0003,
+     "r_mohm_70c": 0.333,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      66.25,
+      44.7
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.1,
+     "worst_case": "out_3v3",
+     "i_a": 0.0001,
+     "r_mohm_70c": 0.236,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      65.65,
+      49.65
+     ],
+     "width_mm": 0.25,
+     "length_mm": 1.2,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 2.83,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      66.45,
+      44.35
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.283,
+     "worst_case": "out_3v3",
+     "i_a": 0.0003,
+     "r_mohm_70c": 0.667,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      66.35,
+      49.75
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.283,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 0.667,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      66.8,
+      49.85
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.7,
+     "worst_case": "out_3v3",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.651,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.25,
+     "length_mm": 0.1,
+     "worst_case": null,
+     "i_a": 0.0003,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.2358,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
    "worst_case": "out_3v3",
-   "i_branch_a": 0.0,
+   "worst_segment": {
+    "layer": "F.Cu",
+    "at_mm": [
+     66.3,
+     44.6
+    ],
+    "width_mm": 0.25,
+    "length_mm": 0.141,
+    "i_a": 0.0003,
+    "ipc2221_10c_a": 0.875,
+    "bar_delta_t_c": null,
+    "status": "PASS"
+   },
+   "i_branch_a": 0.0003,
    "r_branch_mohm_70c": 19.74,
-   "du_mv": 0.0,
+   "du_mv": 0.001,
    "p_mw": 0.0,
-   "ipc2221_10c_a": 0.875,
-   "bar_delta_t_c": 0.0,
+   "ipc2221_10c_a_min_width": 0.875,
    "status": "PASS"
   },
   {
@@ -1014,35 +3390,104 @@
     "C17.1",
     "C5.1"
    ],
-   "probe": {
-    "layer": "F.Cu",
-    "at_mm": [
-     71.85,
-     36.95
-    ],
-    "segment_width_mm": 0.25,
-    "segment_length_mm": 1.98
-   },
+   "short_segments": [],
+   "net": "3V3_DIGITAL",
+   "probed_segments": 4,
    "cases": [
     {
      "case": "out_3v3",
-     "share": 0.1415,
-     "current_a": 0.1415
+     "i_max_a": 0.2291,
+     "du_mv_along_segments": 2.02,
+     "p_mw_along_segments": 0.361
     },
     {
      "case": "ldo_in",
-     "share": 0.1416,
-     "current_a": 0.0425
+     "i_max_a": 0.0687,
+     "du_mv_along_segments": 0.606,
+     "p_mw_along_segments": 0.033
     }
    ],
-   "net": "3V3_DIGITAL",
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      68.35,
+      36.85
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.8,
+     "worst_case": "out_3v3",
+     "i_a": 0.0582,
+     "r_mohm_70c": 1.887,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      69.05,
+      36.55
+     ],
+     "width_mm": 0.25,
+     "length_mm": 0.849,
+     "worst_case": "out_3v3",
+     "i_a": 0.1385,
+     "r_mohm_70c": 2.002,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      70.25,
+      36.25
+     ],
+     "width_mm": 0.25,
+     "length_mm": 1.8,
+     "worst_case": "out_3v3",
+     "i_a": 0.2291,
+     "r_mohm_70c": 4.245,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      71.85,
+      36.95
+     ],
+     "width_mm": 0.25,
+     "length_mm": 1.98,
+     "worst_case": "out_3v3",
+     "i_a": 0.1415,
+     "r_mohm_70c": 4.67,
+     "ipc2221_10c_a": 0.875,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
    "worst_case": "out_3v3",
-   "i_branch_a": 0.1415,
+   "worst_segment": {
+    "layer": "F.Cu",
+    "at_mm": [
+     70.25,
+     36.25
+    ],
+    "width_mm": 0.25,
+    "length_mm": 1.8,
+    "i_a": 0.2291,
+    "ipc2221_10c_a": 0.875,
+    "bar_delta_t_c": null,
+    "status": "PASS"
+   },
+   "i_branch_a": 0.2291,
    "r_branch_mohm_70c": 12.802,
-   "du_mv": 1.811,
-   "p_mw": 0.256,
-   "ipc2221_10c_a": 0.875,
-   "bar_delta_t_c": 0.051,
+   "du_mv": 2.02,
+   "p_mw": 0.361,
+   "ipc2221_10c_a_min_width": 0.875,
    "status": "PASS"
   },
   {
@@ -1055,27 +3500,60 @@
    "pads": [
     "U5.1"
    ],
-   "note": "longest segment < 0.1 mm: pad neck/zero-length joint inside wider copper",
-   "cases": [
+   "short_segments": [
     {
-     "case": "out_3v3",
-     "share": 0.0,
-     "current_a": 0.0
-    },
-    {
-     "case": "ldo_in",
-     "share": 0.0,
-     "current_a": 0.0
+     "layer": "F.Cu",
+     "width_mm": 0.6006,
+     "length_mm": 0.0523
     }
    ],
    "net": "3V3_DIGITAL",
-   "worst_case": "out_3v3",
-   "i_branch_a": 0.0,
+   "probed_segments": 0,
+   "cases": [
+    {
+     "case": "out_3v3",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0,
+     "p_mw_along_segments": 0
+    },
+    {
+     "case": "ldo_in",
+     "i_max_a": 0.0,
+     "du_mv_along_segments": 0,
+     "p_mw_along_segments": 0
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.6006,
+     "length_mm": 0.0523,
+     "worst_case": null,
+     "i_a": 1.0,
+     "current_basis": "NET_CASE_BOUND_NO_CUT",
+     "r_mohm_70c": 0.0513,
+     "ipc2221_10c_a": 1.653,
+     "bar_delta_t_c": 0.0,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": null,
+   "worst_segment": {
+    "layer": "F.Cu",
+    "at_mm": null,
+    "width_mm": 0.6006,
+    "length_mm": 0.0523,
+    "i_a": 1.0,
+    "ipc2221_10c_a": 1.653,
+    "bar_delta_t_c": 0.0,
+    "status": "PASS"
+   },
+   "i_branch_a": 1.0,
    "r_branch_mohm_70c": 0.051,
-   "du_mv": 0.0,
-   "p_mw": 0.0,
-   "ipc2221_10c_a": 1.653,
-   "bar_delta_t_c": 0.0,
+   "du_mv": 0,
+   "p_mw": 0,
+   "ipc2221_10c_a_min_width": 1.653,
    "status": "PASS"
   },
   {
@@ -1092,30 +3570,420 @@
     "TP7.1",
     "U5.5"
    ],
-   "probe": {
-    "layer": "B.Cu",
-    "at_mm": [
-     48.633,
-     40.975
-    ],
-    "segment_width_mm": 0.5,
-    "segment_length_mm": 12.485
-   },
-   "cases": [
+   "short_segments": [
     {
-     "case": "out_1v8",
-     "share": 0.0,
-     "current_a": 0.0
+     "layer": "F.Cu",
+     "width_mm": 0.5,
+     "length_mm": 0.0533
+    },
+    {
+     "layer": "F.Cu",
+     "width_mm": 0.5,
+     "length_mm": 0.081
     }
    ],
    "net": "1V8_MIC",
+   "probed_segments": 23,
+   "cases": [
+    {
+     "case": "out_1v8",
+     "i_max_a": 0.3,
+     "du_mv_along_segments": 3.857,
+     "p_mw_along_segments": 1.127
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      43.786,
+      51.506
+     ],
+     "width_mm": 0.5,
+     "length_mm": 1.225,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.445,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      48.633,
+      40.975
+     ],
+     "width_mm": 0.5,
+     "length_mm": 12.485,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 14.723,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      44.219,
+      48.231
+     ],
+     "width_mm": 0.5,
+     "length_mm": 5.683,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 6.701,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      56.772,
+      36.561
+     ],
+     "width_mm": 0.5,
+     "length_mm": 7.448,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 8.783,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      69.282,
+      41.315
+     ],
+     "width_mm": 0.5,
+     "length_mm": 8.486,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 10.007,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      73.583,
+      44.315
+     ],
+     "width_mm": 0.5,
+     "length_mm": 2.602,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 3.068,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      74.884,
+      44.433
+     ],
+     "width_mm": 0.5,
+     "length_mm": 0.237,
+     "worst_case": "out_1v8",
+     "i_a": 0.037,
+     "r_mohm_70c": 0.279,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      76.358,
+      46.026
+     ],
+     "width_mm": 0.5,
+     "length_mm": 4.17,
+     "worst_case": "out_1v8",
+     "i_a": 0.3,
+     "r_mohm_70c": 4.917,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      75.978,
+      55.906
+     ],
+     "width_mm": 0.5,
+     "length_mm": 2.976,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 3.509,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      78.962,
+      56.959
+     ],
+     "width_mm": 0.5,
+     "length_mm": 3.864,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 4.556,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      78.079,
+      47.5
+     ],
+     "width_mm": 0.5,
+     "length_mm": 0.492,
+     "worst_case": "out_1v8",
+     "i_a": 0.3,
+     "r_mohm_70c": 0.58,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      78.952,
+      48.128
+     ],
+     "width_mm": 0.5,
+     "length_mm": 1.775,
+     "worst_case": "out_1v8",
+     "i_a": 0.3,
+     "r_mohm_70c": 2.093,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      79.58,
+      49.628
+     ],
+     "width_mm": 0.5,
+     "length_mm": 1.745,
+     "worst_case": "out_1v8",
+     "i_a": 0.3,
+     "r_mohm_70c": 2.058,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      80.33,
+      51.25
+     ],
+     "width_mm": 0.5,
+     "length_mm": 2.121,
+     "worst_case": "out_1v8",
+     "i_a": 0.3,
+     "r_mohm_70c": 2.501,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      81.591,
+      56.263
+     ],
+     "width_mm": 0.5,
+     "length_mm": 1.969,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 2.322,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      81.683,
+      52.603
+     ],
+     "width_mm": 0.5,
+     "length_mm": 1.706,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 2.012,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      82.287,
+      54.387
+     ],
+     "width_mm": 0.5,
+     "length_mm": 2.36,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 2.783,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      41.796,
+      54.444
+     ],
+     "width_mm": 0.5,
+     "length_mm": 4.402,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 5.191,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      43.353,
+      52.413
+     ],
+     "width_mm": 0.5,
+     "length_mm": 0.948,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.118,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      62.512,
+      36.561
+     ],
+     "width_mm": 0.5,
+     "length_mm": 4.032,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 4.755,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      65.405,
+      37.438
+     ],
+     "width_mm": 0.5,
+     "length_mm": 2.48,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 2.924,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      74.525,
+      54.454
+     ],
+     "width_mm": 0.5,
+     "length_mm": 1.132,
+     "worst_case": "out_1v8",
+     "i_a": 0.0,
+     "r_mohm_70c": 1.335,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      75.333,
+      44.683
+     ],
+     "width_mm": 0.5,
+     "length_mm": 1.039,
+     "worst_case": "out_1v8",
+     "i_a": 0.1651,
+     "r_mohm_70c": 1.225,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.5,
+     "length_mm": 0.0533,
+     "worst_case": null,
+     "i_a": 0.3,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0629,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": null,
+     "width_mm": 0.5,
+     "length_mm": 0.081,
+     "worst_case": null,
+     "i_a": 0.3,
+     "current_basis": "GROUP_MAX_MEASURED",
+     "r_mohm_70c": 0.0955,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
    "worst_case": "out_1v8",
-   "i_branch_a": 0.0,
+   "worst_segment": {
+    "layer": "B.Cu",
+    "at_mm": [
+     76.358,
+     46.026
+    ],
+    "width_mm": 0.5,
+    "length_mm": 4.17,
+    "i_a": 0.3,
+    "ipc2221_10c_a": 1.447,
+    "bar_delta_t_c": null,
+    "status": "PASS"
+   },
+   "i_branch_a": 0.3,
    "r_branch_mohm_70c": 89.046,
-   "du_mv": 0.0,
-   "p_mw": 0.0,
-   "ipc2221_10c_a": 1.447,
-   "bar_delta_t_c": 0.0,
+   "du_mv": 3.857,
+   "p_mw": 1.127,
+   "ipc2221_10c_a_min_width": 1.447,
    "status": "PASS"
   },
   {
@@ -1130,30 +3998,143 @@
     "J2.6",
     "NT3.1"
    ],
-   "probe": {
+   "short_segments": [],
+   "net": "GND_MIC",
+   "probed_segments": 7,
+   "cases": [
+    {
+     "case": "ret_mic",
+     "i_max_a": 0.3,
+     "du_mv_along_segments": 3.573,
+     "p_mw_along_segments": 1.015
+    }
+   ],
+   "segments_detail": [
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      74.2,
+      53.065
+     ],
+     "width_mm": 0.5,
+     "length_mm": 0.737,
+     "worst_case": "ret_mic",
+     "i_a": 0.1286,
+     "r_mohm_70c": 0.869,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      74.547,
+      52.868
+     ],
+     "width_mm": 0.5,
+     "length_mm": 0.63,
+     "worst_case": "ret_mic",
+     "i_a": 0.1714,
+     "r_mohm_70c": 0.743,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      76.066,
+      54.702
+     ],
+     "width_mm": 0.5,
+     "length_mm": 4.296,
+     "worst_case": "ret_mic",
+     "i_a": 0.3,
+     "r_mohm_70c": 5.066,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      78.722,
+      56.221
+     ],
+     "width_mm": 0.5,
+     "length_mm": 2.274,
+     "worst_case": "ret_mic",
+     "i_a": 0.3,
+     "r_mohm_70c": 2.682,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "B.Cu",
+     "at_mm": [
+      80.47,
+      55.61
+     ],
+     "width_mm": 0.5,
+     "length_mm": 1.727,
+     "worst_case": "ret_mic",
+     "i_a": 0.3,
+     "r_mohm_70c": 2.037,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      74.199,
+      52.751
+     ],
+     "width_mm": 0.5,
+     "length_mm": 0.803,
+     "worst_case": "ret_mic",
+     "i_a": 0.1286,
+     "r_mohm_70c": 0.947,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    },
+    {
+     "layer": "F.Cu",
+     "at_mm": [
+      74.824,
+      52.276
+     ],
+     "width_mm": 0.5,
+     "length_mm": 0.781,
+     "worst_case": "ret_mic",
+     "i_a": 0.3,
+     "r_mohm_70c": 0.921,
+     "ipc2221_10c_a": 1.447,
+     "bar_delta_t_c": null,
+     "status": "PASS"
+    }
+   ],
+   "worst_case": "ret_mic",
+   "worst_segment": {
     "layer": "B.Cu",
     "at_mm": [
      76.066,
      54.702
     ],
-    "segment_width_mm": 0.5,
-    "segment_length_mm": 4.296
+    "width_mm": 0.5,
+    "length_mm": 4.296,
+    "i_a": 0.3,
+    "ipc2221_10c_a": 1.447,
+    "bar_delta_t_c": null,
+    "status": "PASS"
    },
-   "cases": [
-    {
-     "case": "ret_mic",
-     "share": 1.0,
-     "current_a": 0.3
-    }
-   ],
-   "net": "GND_MIC",
-   "worst_case": "ret_mic",
    "i_branch_a": 0.3,
    "r_branch_mohm_70c": 13.264,
-   "du_mv": 3.979,
-   "p_mw": 1.194,
-   "ipc2221_10c_a": 1.447,
-   "bar_delta_t_c": 0.2459,
+   "du_mv": 3.573,
+   "p_mw": 1.015,
+   "ipc2221_10c_a_min_width": 1.447,
    "status": "PASS"
   }
  ],
@@ -1355,22 +4336,29 @@
   "du_cont_mv": 4.29,
   "note": "regulation point is U4 (fixed 3.3 V, FB at the output); the J2 drop is uncompensated"
  },
- "returns_base_011": [
+ "narrow_review": [],
+ "loaded_path_check": [
   {
-   "id": "ret_modem",
-   "r_mohm_70c": 5.948,
-   "du_mv_70c": 19.63
+   "case": "out_1v8",
+   "net": "1V8_MIC",
+   "group_pads": [
+    "C8.1",
+    "J2.5",
+    "TP7.1",
+    "U5.5"
+   ],
+   "case_current_a": 0.3,
+   "group_i_max_a": 0.3
   },
   {
-   "id": "ret_digital",
-   "r_mohm_70c": 3.659,
-   "du_mv_70c": 3.66
-  },
-  {
-   "id": "ret_mic",
-   "r_mohm_70c": 12.006,
-   "du_mv_70c": 3.6
+   "case": "ret_mic",
+   "net": "GND_MIC",
+   "group_pads": [
+    "J2.6",
+    "NT3.1"
+   ],
+   "case_current_a": 0.3,
+   "group_i_max_a": 0.3
   }
- ],
- "narrow_review": []
+ ]
 }
