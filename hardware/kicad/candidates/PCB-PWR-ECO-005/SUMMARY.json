@@ -5,22 +5,20 @@
   "local_clearance_screen": "PASS",
   "manufacturing_release": false,
   "text_removal": {
-    "segment": 38,
-    "via": 2,
+    "segment": 41,
+    "via": 3,
     "zone": 1
   },
   "stage": {
     "rc": 0,
     "stdout": "{\"rotated\": [\"NT2\"], \"removed_tracks\": 0, \"removed_vias\": 0, \"removed_zones\": 0, \"added_zones\": 1, \"added_items\": 13}\n",
-    "stderr": "aiting\nfd5a0db17ede: Waiting\n898e32f0e177: Waiting\n6fe7b24cfb8f: Waiting\n30ff91259e4e: Waiting\n591202fea89c: Waiting\n26996d003dd4: Verifying Checksum\n26996d003dd4: Download complete\ne64c2316cd50: Verifying Checksum\ne64c2316cd50: Download complete\n46f0bfc95fd9: Verifying Checksum\n46f0bfc95fd9: Download complete\n207ac5616789: Verifying Checksum\n207ac5616789: Download complete\nf36d0dc2d7bb: Verifying Checksum\nf36d0dc2d7bb: Download complete\naab27c973195: Verifying Checksum\naab27c973195: Download complete\nfd5a0db17ede: Verifying Checksum\nfd5a0db17ede: Download complete\n898e32f0e177: Verifying Checksum\n898e32f0e177: Download complete\nf8f12f6f970e: Verifying Checksum\nf8f12f6f970e: Download complete\n591202fea89c: Verifying Checksum\n591202fea89c: Download complete\n30ff91259e4e: Download complete\n6fe7b24cfb8f: Verifying Checksum\n6fe7b24cfb8f: Download complete\nd0b76b7e8d80: Verifying Checksum\nd0b76b7e8d80: Download complete\n26996d003dd4: Pull complete\nd0b76b7e8d80: Pull complete\ne64c2316cd50: Pull complete\n207ac5616789: Pull complete\n46f0bfc95fd9: Pull complete\nf8f12f6f970e: Pull complete\nf36d0dc2d7bb: Pull complete\naab27c973195: Pull complete\nfd5a0db17ede: Pull complete\n898e32f0e177: Pull complete\n591202fea89c: Pull complete\n30ff91259e4e: Pull complete\n6fe7b24cfb8f: Pull complete\nDigest: sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\nStatus: Downloaded newer image for ghcr.io/kicad/kicad@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\n"
+    "stderr": "c5616789: Waiting\nfd5a0db17ede: Waiting\n46f0bfc95fd9: Waiting\naab27c973195: Waiting\n898e32f0e177: Waiting\nf8f12f6f970e: Waiting\nf36d0dc2d7bb: Waiting\n591202fea89c: Waiting\n6fe7b24cfb8f: Waiting\n30ff91259e4e: Waiting\n26996d003dd4: Verifying Checksum\n26996d003dd4: Download complete\ne64c2316cd50: Verifying Checksum\ne64c2316cd50: Download complete\n46f0bfc95fd9: Verifying Checksum\n46f0bfc95fd9: Download complete\nd0b76b7e8d80: Verifying Checksum\nd0b76b7e8d80: Download complete\nf36d0dc2d7bb: Download complete\nf8f12f6f970e: Verifying Checksum\nf8f12f6f970e: Download complete\naab27c973195: Download complete\nfd5a0db17ede: Download complete\n26996d003dd4: Pull complete\n898e32f0e177: Download complete\n591202fea89c: Verifying Checksum\n591202fea89c: Download complete\n6fe7b24cfb8f: Verifying Checksum\n6fe7b24cfb8f: Download complete\n30ff91259e4e: Verifying Checksum\n30ff91259e4e: Download complete\n207ac5616789: Verifying Checksum\n207ac5616789: Download complete\nd0b76b7e8d80: Pull complete\ne64c2316cd50: Pull complete\n207ac5616789: Pull complete\n46f0bfc95fd9: Pull complete\nf8f12f6f970e: Pull complete\nf36d0dc2d7bb: Pull complete\naab27c973195: Pull complete\nfd5a0db17ede: Pull complete\n898e32f0e177: Pull complete\n591202fea89c: Pull complete\n30ff91259e4e: Pull complete\n6fe7b24cfb8f: Pull complete\nDigest: sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\nStatus: Downloaded newer image for ghcr.io/kicad/kicad@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\n"
   },
   "drc_rc": 0,
-  "dump_rc": 0,
   "drc": {
     "error_total": 0,
     "unconnected_total": 0,
     "by_type": {
-      "warning:via_dangling": 1,
       "warning:lib_footprint_issues": 66,
       "warning:silk_over_copper": 41,
       "warning:silk_overlap": 17
@@ -28,62 +26,85 @@
     "errors": [],
     "unconnected": []
   },
-  "return_cross_sections": [
+  "return_resistance": [
     {
-      "probe": "GND_MODEM J2.2->vias, below J2.8",
-      "layer": "B.Cu",
       "net": "GND_MODEM",
-      "min_width_mm": 0.0,
-      "at_mm": [
-        75.55,
-        44.4
-      ],
-      "samples": 20
+      "path": "J2.2 -> NT1.1",
+      "base_011": {
+        "net": "GND_MODEM",
+        "from": "J2.2",
+        "to": "NT1.1",
+        "vias_in_path_region": 1,
+        "r_mohm_20c": 5.257,
+        "r_mohm_70c": 6.293,
+        "du_per_amp_mv_70c": 6.293,
+        "i_peak_a": 3.3,
+        "du_peak_mv_70c": 20.77,
+        "p_peak_mw_70c": 68.53
+      },
+      "eco_005": {
+        "net": "GND_MODEM",
+        "from": "J2.2",
+        "to": "NT1.1",
+        "vias_in_path_region": 3,
+        "r_mohm_20c": 3.935,
+        "r_mohm_70c": 4.711,
+        "du_per_amp_mv_70c": 4.711,
+        "i_peak_a": 3.3,
+        "du_peak_mv_70c": 15.55,
+        "p_peak_mw_70c": 51.3
+      }
     },
     {
-      "probe": "GND_MODEM vias->NT1, between C17/C19 pads",
-      "layer": "F.Cu",
-      "net": "GND_MODEM",
-      "min_width_mm": 0.699,
-      "at_mm": [
-        74.0,
-        42.75
-      ],
-      "samples": 10
-    },
-    {
-      "probe": "GND_DIGITAL J2.4->NT2, above J2.10",
-      "layer": "F.Cu",
       "net": "GND_DIGITAL",
-      "min_width_mm": 0.899,
-      "at_mm": [
-        78.05,
-        47.3
-      ],
-      "samples": 15
+      "path": "J2.4 -> NT2.1",
+      "base_011": {
+        "net": "GND_DIGITAL",
+        "from": "J2.4",
+        "to": "NT2.1",
+        "vias_in_path_region": 0,
+        "r_mohm_20c": 3.062,
+        "r_mohm_70c": 3.665,
+        "du_per_amp_mv_70c": 3.665
+      },
+      "eco_005": {
+        "net": "GND_DIGITAL",
+        "from": "J2.4",
+        "to": "NT2.1",
+        "vias_in_path_region": 0,
+        "r_mohm_20c": 1.769,
+        "r_mohm_70c": 2.118,
+        "du_per_amp_mv_70c": 2.118
+      }
     },
     {
-      "probe": "GND_DIGITAL J2.4->NT2, below J2.10",
-      "layer": "F.Cu",
-      "net": "GND_DIGITAL",
-      "min_width_mm": 0.0,
-      "at_mm": [
-        77.3,
-        50.05
-      ],
-      "samples": 13
-    },
-    {
-      "probe": "GND_PWR NT2 west",
-      "layer": "F.Cu",
-      "net": "GND_PWR",
-      "min_width_mm": 0.635,
-      "at_mm": [
-        73.8,
-        48.52
-      ],
-      "samples": 5
+      "net": "GND_MIC",
+      "path": "J2.6 -> NT3.1",
+      "base_011": {
+        "net": "GND_MIC",
+        "from": "J2.6",
+        "to": "NT3.1",
+        "vias_in_path_region": 1,
+        "r_mohm_20c": 10.313,
+        "r_mohm_70c": 12.345,
+        "du_per_amp_mv_70c": 12.345,
+        "i_peak_a": 0.3,
+        "du_peak_mv_70c": 3.7,
+        "p_peak_mw_70c": 1.11
+      },
+      "eco_005": {
+        "net": "GND_MIC",
+        "from": "J2.6",
+        "to": "NT3.1",
+        "vias_in_path_region": 2,
+        "r_mohm_20c": 9.403,
+        "r_mohm_70c": 11.255,
+        "du_per_amp_mv_70c": 11.255,
+        "i_peak_a": 0.3,
+        "du_peak_mv_70c": 3.38,
+        "p_peak_mw_70c": 1.01
+      }
     }
   ],
-  "candidate_sha256": "21ac79ffc9fa8223ea2d86c77b545e194a798a26a7da9d808ab87b5c43d8b656"
+  "candidate_sha256": "b2a3cb91b8150ce8a5cdc4078faaa58bbfb527fe608aa0408974aaed1023f78e"
 }
