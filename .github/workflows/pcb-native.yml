@@ -1457,8 +1457,8 @@ jobs:
           assert board is not None, "KiCad failed to parse PCB-PWR placement candidate"
           assert len(board.GetFootprints()) == 66, "unexpected PCB-PWR electrical-plus-mounting footprint count"
           assert board.GetCopperLayerCount() == 4, "unexpected PCB-PWR layer count"
-          assert len(list(board.GetTracks())) == 53, "PCB-PWR exact 3V8 output bulk 010 application missing or out of scope"
-          assert len(list(board.Zones())) == 2, "PCB-PWR bounded local return zones missing or out of scope"
+          assert len(list(board.GetTracks())) == 873, "PCB-PWR exact autoroute 011 application missing or out of scope"
+          assert len(list(board.Zones())) == 33, "PCB-PWR autoroute 011 zones (planes, pours, thickening, keepouts) missing or out of scope"
           print("PCB-PWR controlled footprints KiCad 9 native parse: PASS")
           PY
       - name: KiCad 9 comparative DRC for PCB-PWR buck placement ECO-001
