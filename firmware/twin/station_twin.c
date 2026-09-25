@@ -427,6 +427,7 @@ static bool pl_emit(void *ctx, const zs_detection_t *d) {
   static uint8_t ws[ZS_EVENT_OUTBOX_PAYLOAD_MAX_BYTES + 64u];
   zs_detection_t e = *d; (void)ctx;
   e.route.transport = ZS_ROUTE_LTE; e.power.battery_pct = 80u; e.power.battery_mv = 13200u;
+  e.gnss.time_trust = ZS_TIME_TRUST_GNSS_TRUSTED; e.gnss.pps_ok = true; e.gnss.expected_time_error_us = 100u;   /* as tasks.c: the twin's clock is trusted */
   const bool ok = zs_event_outbox_enqueue_detection(&outbox_io, &e, 2u, ws, sizeof(ws)) == ZS_EVENT_OUTBOX_OK;
   events_emitted_total += ok;
   if (ok) remember_summary(d->event_id, d->classification.class_id, d->classification.confidence_u8, pipeline.presence.level, (uint16_t)pipeline.last_gate.f0_hz);
