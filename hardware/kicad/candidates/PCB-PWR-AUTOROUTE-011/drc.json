@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-09-25T05:02:04+0000",
+    "date": "2026-09-25T05:14:11+0000",
     "included_severities": [
         "error",
         "warning",
@@ -15,20 +15,20 @@
             "description": "Missing connection between items",
             "items": [
                 {
-                    "description": "Track [1V8_MIC] on In2.Cu, length 5.3145 mm",
+                    "description": "Zone [GND_PWR] on F.Cu, priority 0",
                     "pos": {
-                        "x": 73.0515,
-                        "y": 46.0914
+                        "x": 0.45,
+                        "y": 0.45
                     },
-                    "uuid": "ea549e82-d9dc-4c14-93d0-bd2698678804"
+                    "uuid": "728f19c4-d314-4da6-b0c7-90f94bde5e0a"
                 },
                 {
-                    "description": "Pad 1 [1V8_MIC] of C8 on F.Cu",
+                    "description": "Zone [GND_PWR] on F.Cu, priority 0",
                     "pos": {
-                        "x": 74.125,
-                        "y": 54.0
+                        "x": 0.45,
+                        "y": 0.45
                     },
-                    "uuid": "bb5e49b6-c563-444b-b855-bda3482878d0"
+                    "uuid": "728f19c4-d314-4da6-b0c7-90f94bde5e0a"
                 }
             ],
             "severity": "error",
@@ -38,112 +38,20 @@
             "description": "Missing connection between items",
             "items": [
                 {
-                    "description": "Zone [3V3_DIGITAL] on F.Cu, priority 11",
+                    "description": "Track [I2C2_SDA] on In2.Cu, length 14.8388 mm",
                     "pos": {
-                        "x": 58.8129,
-                        "y": 46.2929
-                    },
-                    "uuid": "7b78905b-7020-49ad-ace3-306b6b23cd52"
-                },
-                {
-                    "description": "Zone [3V3_DIGITAL] on F.Cu, priority 11",
-                    "pos": {
-                        "x": 66.025,
-                        "y": 40.5
-                    },
-                    "uuid": "29a6202d-1163-44ad-8878-24541bc4629d"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Zone [3V8_MODEM] on F.Cu, priority 12",
-                    "pos": {
-                        "x": 68.6538,
-                        "y": 10.9855
-                    },
-                    "uuid": "1d72f9a4-f1f1-42c9-a200-9e5b0b11d7a5"
-                },
-                {
-                    "description": "Pad 1 [3V8_MODEM] of R1 on F.Cu",
-                    "pos": {
-                        "x": 55.49,
-                        "y": 19.0
-                    },
-                    "uuid": "7dcf1036-1dbf-476a-87ce-63bf69ad3059"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Zone [3V8_MODEM] on F.Cu, priority 12",
-                    "pos": {
-                        "x": 68.6538,
-                        "y": 10.9855
-                    },
-                    "uuid": "1d72f9a4-f1f1-42c9-a200-9e5b0b11d7a5"
-                },
-                {
-                    "description": "Zone [3V8_MODEM] on In2.Cu, priority 13",
-                    "pos": {
-                        "x": 80.5079,
-                        "y": 37.3168
-                    },
-                    "uuid": "09bf2366-ed28-4bec-8c53-64bd2abf0657"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Pad 1 [GND_MIC] of NT3 on F.Cu",
-                    "pos": {
-                        "x": 75.1,
-                        "y": 52.0
-                    },
-                    "uuid": "7d944e34-6c8b-4e86-8fe9-73ece4a82da2"
-                },
-                {
-                    "description": "PTH pad 6 [GND_MIC] of J2",
-                    "pos": {
-                        "x": 81.08,
+                        "x": 47.86,
                         "y": 55.0
                     },
-                    "uuid": "88daa285-21c6-41e8-ac39-bd60695130d3"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Zone [GND_PWR] on F.Cu, priority 0",
-                    "pos": {
-                        "x": 0.45,
-                        "y": 0.45
-                    },
-                    "uuid": "4374167c-89cd-44a8-bc92-ce6d811fe478"
+                    "uuid": "d5d1a42f-060d-4c21-9769-be185ccb7b1c"
                 },
                 {
-                    "description": "Zone [GND_PWR] on F.Cu, priority 0",
+                    "description": "Pad 4 [I2C2_SDA] of U2 on F.Cu",
                     "pos": {
-                        "x": 0.45,
-                        "y": 0.45
+                        "x": 41.8,
+                        "y": 23.5
                     },
-                    "uuid": "4374167c-89cd-44a8-bc92-ce6d811fe478"
+                    "uuid": "8e327695-e934-43e2-ba6d-d692a2860a90"
                 }
             ],
             "severity": "error",
@@ -151,6 +59,98 @@
         }
     ],
     "violations": [
+        {
+            "description": "Clearance violation (netclass 'PWR_SWITCH_4A' clearance 0.4000 mm; actual 0.3750 mm)",
+            "items": [
+                {
+                    "description": "Track [3V3_DIGITAL] on F.Cu, length 4.0000 mm",
+                    "pos": {
+                        "x": 62.65,
+                        "y": 45.75
+                    },
+                    "uuid": "78cefb21-21c4-46d8-bc90-e83943652740"
+                },
+                {
+                    "description": "Pad 1 [SW_3V3] of L2 on F.Cu",
+                    "pos": {
+                        "x": 60.24,
+                        "y": 42.0
+                    },
+                    "uuid": "e54b3038-2972-4b7c-ade8-9540d5529d88"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation (netclass 'PWR_SWITCH_4A' clearance 0.4000 mm; actual 0.2750 mm)",
+            "items": [
+                {
+                    "description": "Track [3V8_MODEM] on F.Cu, length 0.1414 mm",
+                    "pos": {
+                        "x": 60.25,
+                        "y": 17.65
+                    },
+                    "uuid": "0abde0e4-1fee-47f6-9a9f-73d8e43cd186"
+                },
+                {
+                    "description": "Pad 1 [SW_3V8] of L1 on F.Cu",
+                    "pos": {
+                        "x": 60.24,
+                        "y": 14.0
+                    },
+                    "uuid": "c58eb890-75cb-4999-8f0b-6ade6bf1dc41"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation (netclass 'PWR_SWITCH_4A' clearance 0.4000 mm; actual 0.2750 mm)",
+            "items": [
+                {
+                    "description": "Track [3V8_MODEM] on F.Cu, length 1.5000 mm",
+                    "pos": {
+                        "x": 61.75,
+                        "y": 17.65
+                    },
+                    "uuid": "8822837a-cb3b-4acd-ac7a-25ae4fe81760"
+                },
+                {
+                    "description": "Pad 1 [SW_3V8] of L1 on F.Cu",
+                    "pos": {
+                        "x": 60.24,
+                        "y": 14.0
+                    },
+                    "uuid": "c58eb890-75cb-4999-8f0b-6ade6bf1dc41"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation (netclass 'PWR_SWITCH_4A' clearance 0.4000 mm; actual 0.3750 mm)",
+            "items": [
+                {
+                    "description": "Pad 1 [SW_3V8] of L1 on F.Cu",
+                    "pos": {
+                        "x": 60.24,
+                        "y": 14.0
+                    },
+                    "uuid": "c58eb890-75cb-4999-8f0b-6ade6bf1dc41"
+                },
+                {
+                    "description": "Track [3V8_MODEM] on F.Cu, length 3.0000 mm",
+                    "pos": {
+                        "x": 60.15,
+                        "y": 17.75
+                    },
+                    "uuid": "f6d859ea-d331-41d7-b149-e8c0b4a7cf0d"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
         {
             "description": "The current configuration does not include the footprint library 'Resistor_SMD'.",
             "items": [
