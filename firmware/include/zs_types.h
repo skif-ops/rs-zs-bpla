@@ -192,6 +192,8 @@ typedef struct {
   uint32_t outbox_pending;     /* detection events still waiting for the server receipt */
   uint16_t window_max_ms;      /* longest analysis of one window since boot */
   uint8_t presence_level;      /* current level 1 (zs_presence_level_t) */
+  uint8_t reset_cause;         /* key 12: why this boot started (zs_reset_cause_t: 1 power/BOR, 2 pin, 3 software, 4 IWDG, 5 WWDG, 6 low-power, 7 option bytes) */
+  uint16_t watchdog_missed;    /* key 13: task-watch mask that let the IWDG fire before this boot (0 = none) */
 } zs_detector_health_t;
 
 typedef struct {
