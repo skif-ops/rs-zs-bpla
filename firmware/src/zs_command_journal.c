@@ -83,14 +83,23 @@ static bool all_value(const uint8_t *data, size_t size, uint8_t value) {
   return true;
 }
 
+static bool params_valid(const zs_set_params_command_t *p) {
+  if (p->count > ZS_COMMAND_PARAMS_MAX || (p->count == 0u && !p->reset_to_defaults)) return false;
+  for (uint8_t i = 0u; i < p->count; ++i)
+    if (p->id[i] == 0u || (i > 0u && p->id[i] <= p->id[i - 1u])) return false;
+  return true;
+}
+
 static bool command_valid(const zs_command_t *command, uint64_t now_us) {
   if (!command || command->station_id == 0u ||
       command->created_time_us >= command->expires_time_us ||
       command->expires_time_us - command->created_time_us > ZS_COMMAND_MAX_TTL_US ||
       now_us < command->created_time_us || now_us >= command->expires_time_us ||
-      command->code != ZS_COMMAND_REQUEST_AUDIO || command->audio.event_id == 0u ||
-      (unsigned)command->audio.segment > (unsigned)ZS_AUDIO_SEGMENT_RANGE ||
       all_value(command->command_id, ZS_COMMAND_UUID_BYTES, 0u)) return false;
+  if (command->code == ZS_COMMAND_REBOOT) return command->reboot.delay_s <= ZS_COMMAND_REBOOT_MAX_DELAY_S;
+  if (command->code == ZS_COMMAND_SET_PARAMS) return params_valid(&command->params);
+  if (command->code != ZS_COMMAND_REQUEST_AUDIO || command->audio.event_id == 0u ||
+      (unsigned)command->audio.segment > (unsigned)ZS_AUDIO_SEGMENT_RANGE) return false;
   if (command->audio.segment == ZS_AUDIO_SEGMENT_RANGE) {
     return command->audio.has_range && command->audio.duration_ms > 0u;
   }
@@ -112,11 +121,29 @@ static bool command_fingerprint(
   put_be64(&input[29], command->created_time_us);
   put_be64(&input[37], command->expires_time_us);
   input[45] = (uint8_t)command->code;
-  put_be64(&input[46], command->audio.event_id);
-  input[54] = (uint8_t)command->audio.segment;
-  put_be32(&input[55], (uint32_t)command->audio.start_offset_ms);
-  put_be32(&input[59], command->audio.duration_ms);
-  input[63] = command->audio.has_range ? 1u : 0u;
+  if (command->code == ZS_COMMAND_REQUEST_AUDIO) {        /* layout unchanged: journals on NOR stay valid */
+    put_be64(&input[46], command->audio.event_id);
+    input[54] = (uint8_t)command->audio.segment;
+    put_be32(&input[55], (uint32_t)command->audio.start_offset_ms);
+    put_be32(&input[59], command->audio.duration_ms);
+    input[63] = command->audio.has_range ? 1u : 0u;
+  } else if (command->code == ZS_COMMAND_REBOOT) {
+    input[46] = (uint8_t)(command->reboot.delay_s >> 8);
+    input[47] = (uint8_t)command->reboot.delay_s;
+  } else {                                                /* SET_PARAMS: digest of reset flag and the id/value list */
+    uint8_t list[2u + ZS_COMMAND_PARAMS_MAX * 6u];
+    size_t n = 0u;
+    list[n++] = command->params.reset_to_defaults ? 1u : 0u;
+    list[n++] = command->params.count;
+    for (uint8_t i = 0u; i < command->params.count && i < ZS_COMMAND_PARAMS_MAX; ++i) {
+      list[n++] = (uint8_t)(command->params.id[i] >> 8);
+      list[n++] = (uint8_t)command->params.id[i];
+      put_be32(&list[n], (uint32_t)command->params.value[i]);
+      n += 4u;
+    }
+    zs_sha256_digest(list, n, digest);
+    memcpy(&input[46], digest, 18u);
+  }
   zs_sha256_digest(input, sizeof(input), digest);
   memcpy(output, digest, ZS_COMMAND_JOURNAL_FINGERPRINT_BYTES);
   memset(input, 0, sizeof(input));
