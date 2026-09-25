@@ -35,10 +35,13 @@ PRE_003_PLACEMENT = CANDIDATES / "PCB-MAIN-INNER-REROUTE-003" / "PCB_MAIN_PLACEM
 INNER_003_CANDIDATE = (CANDIDATES / "PCB-MAIN-INNER-REROUTE-003"
                        / "PCB-MAIN_INNER_REROUTE_003_CANDIDATE_REV_A.kicad_pcb")
 INNER_003_APPLICATION = ROOT / "hardware/reviews/PCB_MAIN_INNER_REROUTE_003_APPLICATION_REV_A.json"
+CAPTURE_STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
+PRE_003_STATUS = CANDIDATES / "PCB-MAIN-INNER-REROUTE-003" / "PCB_MAIN_CAPTURE_STATUS_PRE_003_ROUTING_REV_A.json"
 
 PRE_003_BOARD_SHA256 = "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273"
 PRE_003_PLACEMENT_SHA256 = "df7cdbfc2ac023d43ac040b14eb99440fc392d402793d5a3b03f2fd560af6a6f"
 INNER_003_BOARD_SHA256 = "30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739"
+PRE_003_STATUS_SHA256 = "1d8f81d09a93a9e1910faa7ee24130e634e46600c4033daef9ca3bdea2fd30ab"
 INNER_003_POSES = {"R9": ("60.5", "19.75", "90"), "R10": ("62", "19.75", "90"), "R11": ("63.5", "19.75", "90")}
 
 
@@ -102,3 +105,12 @@ def historical_board() -> Path:
 
 def historical_placement() -> Path:
     return _aliased(PRE_003_PLACEMENT, PLACEMENT) if inner_reroute_003_applied() else PLACEMENT
+
+
+def historical_status() -> Path:
+    """The capture status as the earlier sub-gates left it (before the 003 routing-constraint control update)
+    once 003 is applied; the current routing-constraint control is audited by
+    tools/audit_pcb_main_routing_authority_rev_a.py."""
+    if inner_reroute_003_applied() and PRE_003_STATUS.is_file() and sha256(PRE_003_STATUS) == PRE_003_STATUS_SHA256:
+        return _aliased(PRE_003_STATUS, CAPTURE_STATUS)
+    return CAPTURE_STATUS

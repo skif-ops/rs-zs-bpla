@@ -25,8 +25,9 @@ import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier 
 sys.path.insert(0, str(ROOT / "tools"))
 from audit_pcb_main_native_schematic_rev_a import expected_components  # noqa: E402
 
-DEFAULT_BOARD = _lineage.historical_board()
+DEFAULT_BOARD = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"  # current board (003 checked below)
 DEFAULT_AUTHORITY = ROOT / "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv"
+INNER_003 = _lineage.inner_reroute_003_applied()
 DEFAULT_STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"
 GROUND_CANDIDATE = (
     ROOT
@@ -479,7 +480,7 @@ def expected_status_control(
     board_sha256: str,
     authority_sha256: str,
 ) -> dict[str, Any]:
-    return {
+    control = {
         "state": STATE,
         "board_sha256": board_sha256,
         "authority_sha256": authority_sha256,
@@ -489,8 +490,8 @@ def expected_status_control(
         "rf_50ohm_net_count": 7,
         "usb_90ohm_pair_count": 4,
         "cross_domain_review_net_count": 18,
-        "trace_items": 1023,
-        "copper_zones": 8,
+        "trace_items": 1069 if INNER_003 else 1023,
+        "copper_zones": 10 if INNER_003 else 8,
         "ground_domain_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "signal_hard_nets_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "octospi_r8_eco_002_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
@@ -510,6 +511,10 @@ def expected_status_control(
         "routing_complete": False,
         "manufacturing_release": False,
     }
+    if INNER_003:
+        # accepted inner reroute 003: OCTOSPI/SDIO/EN_MODEM on F.Cu/B.Cu over GND_DIGITAL, In4 split, R9-R11 row
+        control["inner_reroute_003_subgate"] = "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS"
+    return control
 
 
 def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> dict[str, Any]:
@@ -607,11 +612,20 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
 
     trace_items = len(board.traceItems)
     copper_zones = len(board.zones)
-    require(trace_items == 1023 and copper_zones == 8,
-            "authoritative board does not contain the accepted RF remediations")
     board_digest = sha256(board_path)
-    require(board_digest == ACTIVE_BOARD_SHA256,
-            "authoritative board SHA-256 differs from the accepted USB placement successor")
+    if INNER_003:
+        # the 003 application audit proves the 003 delta; the earlier sub-gates below are checked on its predecessor
+        inner = json.loads(_lineage.INNER_003_APPLICATION.read_text(encoding="utf-8"))
+        require(trace_items == 1069 and copper_zones == 10
+                and board_digest == _lineage.INNER_003_BOARD_SHA256
+                and inner.get("applied", {}).get("predecessor_board_sha256") == ACTIVE_BOARD_SHA256
+                and inner.get("routing_complete") is False and inner.get("manufacturing_release") is False,
+                "authoritative board is not the accepted inner reroute 003 successor")
+    else:
+        require(trace_items == 1023 and copper_zones == 8,
+                "authoritative board does not contain the accepted RF remediations")
+        require(board_digest == ACTIVE_BOARD_SHA256,
+                "authoritative board SHA-256 differs from the accepted USB placement successor")
     require(sha256(GROUND_CANDIDATE) == GROUND_CANDIDATE_SHA256,
             "accepted ground-domain candidate hash drift")
     require(sha256(SIGNAL_CANDIDATE) == SIGNAL_CANDIDATE_SHA256 and
