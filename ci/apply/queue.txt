@@ -1,0 +1,2 @@
+# Queued by Claude 2026-09-25: PCB-PWR autoroute candidate 011, run 17 (dangling via/track cleanup)
+tools/apply_pcb_pwr_autoroute_candidate_rev_a.py

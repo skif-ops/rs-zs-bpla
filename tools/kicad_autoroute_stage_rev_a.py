@@ -390,9 +390,66 @@ def pours(board_path: str, spec_json: str) -> None:
             x += pitch
         y += pitch
     filler.Fill(board.Zones())
+    removed = remove_dangling(board)
+    if removed:
+        filler.Fill(board.Zones())
     board.Save(board_path)
     print(json.dumps({"thicken_zones": sum(len(i["polygons"]) for i in spec["thicken"]),
-                      "ground_pad_vias": pad_vias, "stitching_vias": placed}))
+                      "ground_pad_vias": pad_vias, "stitching_vias": placed, "dangling_removed": removed}))
+
+
+def remove_dangling(board) -> int:
+    """Iteratively delete vias that join fewer than two copper items and tracks
+    with an open end (router leftovers: unused escape vias, stubs). An item is
+    connected when a same-net track, via, pad or zone fill touches it."""
+    import math
+
+    def zone_hit(net: int, layer: int, point) -> bool:
+        for zone in board.Zones():
+            if zone.GetIsRuleArea() or zone.GetNetCode() != net or not zone.IsOnLayer(layer):
+                continue
+            if zone.GetFilledPolysList(layer).Contains(point):
+                return True
+        return False
+
+    def pad_hit(net: int, layer: int, point) -> bool:
+        return any(pad.GetNetCode() == net and pad.IsOnLayer(layer) and pad.HitTest(point)
+                   for pad in board.GetPads())
+
+    total = 0
+    while True:
+        tracks = [t for t in board.GetTracks() if t.GetClass() == "PCB_TRACK"]
+        vias = [t for t in board.GetTracks() if t.GetClass() == "PCB_VIA"]
+        doomed = []
+        for via in vias:
+            net, pos = via.GetNetCode(), via.GetPosition()
+            try:
+                radius = via.GetWidth() / 2
+            except TypeError:
+                radius = via.GetWidth(pcbnew.F_Cu) / 2
+            links = 0
+            for layer in (pcbnew.F_Cu, pcbnew.In1_Cu, pcbnew.In2_Cu, pcbnew.B_Cu):
+                if zone_hit(net, layer, pos) or pad_hit(net, layer, pos):
+                    links += 1
+            links += sum(1 for t in tracks if t.GetNetCode() == net and any(
+                math.hypot(end.x - pos.x, end.y - pos.y) <= radius for end in (t.GetStart(), t.GetEnd())))
+            if links < 2:
+                doomed.append(via)
+        for track in tracks:
+            net, layer = track.GetNetCode(), track.GetLayer()
+            for end in (track.GetStart(), track.GetEnd()):
+                touched = (pad_hit(net, layer, end) or zone_hit(net, layer, end)
+                           or any(v.GetNetCode() == net and v.HitTest(end) for v in vias)
+                           or any(o is not track and o.GetNetCode() == net and o.GetLayer() == layer
+                                  and o.HitTest(end, 1) for o in tracks))
+                if not touched:
+                    doomed.append(track)
+                    break
+        if not doomed:
+            return total
+        for item in doomed:
+            board.Remove(item)
+        total += len(doomed)
 
 
 if __name__ == "__main__":
