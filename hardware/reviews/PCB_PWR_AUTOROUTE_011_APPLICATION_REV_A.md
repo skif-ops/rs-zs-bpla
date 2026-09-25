@@ -14,8 +14,9 @@ Status: **APPLIED_EXACT_AUTOROUTE_011_EVT_ROUTING — Review B open, no manufact
 | Application | `tools/apply_pcb_pwr_autoroute_011_rev_a.py` (ci-apply, `--check` byte-exact) |
 | Tools | KiCad 9.0.9 image `e638b79b…`, Freerouting 2.4.1 linux-x64 `3ad5a956…`, 150 passes |
 
-Placement, footprints, nets and outline are unchanged relative to ECO-003; only copper,
-the project net classes and the rule file change.
+Placement, footprints, nets and outline are unchanged relative to ECO-003; only copper
+and the rule file change. The project `PCB-PWR.kicad_pro` stays byte-identical to the
+pre-011 project (see "Project and rules" below).
 
 ## What the pipeline does
 
@@ -37,9 +38,24 @@ B.Cu 3 mm → 7 vias at RSH1/C10), 3V8 to J2 pin 1 (3 mm east corridor), 3V3 to 
 LMR60440 and U2 fan-outs, net-tie exits, I2C test-point links, ground vias under U1/U2.
 Each preroute was checked against every copper item of the board before use.
 
-## KiCad 9 DRC of the applied board (with project and rules)
+## Project and rules
 
-0 errors, 0 unconnected items. Warnings: 66 `lib_footprint_issues` (library sync open),
+The candidate project carries the 35 µm basis net classes (used by the pipeline). The
+authoritative project does not: the historical comparative DRC steps of routing 001–010 and
+ECO-001/002 copy it next to their archived boards, and a KiCad 9 probe over all 26 archived
+PCB-PWR boards showed that the classes add two SW-node errors (pre-ECO-002 BOOT tracks) on 10
+of them, which would change accepted historical evidence
+(`hardware/kicad/candidates/PCB-PWR-AUTOROUTE-011/HISTORICAL_NETCLASS_DRC_PROBE.json`).
+Only one class differs from the 0.2 mm default: PWR_SWITCH_4A (SW_3V8, SW_3V3) 0.4 mm. It is
+carried as the first rule of `PCB-PWR.kicad_dru`, so the later ECO-004 U3/U4 and U2
+land-pattern rules keep precedence inside those footprints. Track widths of the classes are
+routing defaults only and are not DRC constraints.
+
+## KiCad 9 DRC of the applied board
+
+Authoritative board + authoritative project + rule file
+(`hardware/kicad/candidates/PCB-PWR-AUTOROUTE-011/NATIVE_DRC_REV_A.json`) and the candidate
+with its net-class project (`drc.json`): 0 errors, 0 unconnected items in both. Warnings: 66 `lib_footprint_issues` (library sync open),
 41 `silk_over_copper` + 16 `silk_overlap` (silk pass before CAM), 1 `via_dangling`
 (unused RT_3V8 escape via at 53.6/11.5; timing-resistor node, negligible).
 
@@ -67,8 +83,8 @@ Sense and escape stubs < 1 mm (U2, U3/U4 pins) carry no load current and are exc
 3. 3V3_DIGITAL 1.2 mm between the J2 pins and the locating peg (connector pitch limit).
 4. VBAT_FUSED 1.2 mm inside the Q1 source pin row (package access).
 5. Power tracks routed at 1.0 mm and thickened by zones to the basis width.
-6. Rule file adds `U2 VSSOP-10 land pattern` (min 0.19 mm between pads of U2), like ECO-004
-   for U3/U4. The ECO-004 comparative DRC audit now allows U2 pad-to-pad errors to vanish
+6. Rule file adds `PWR_SWITCH_4A clearance (SW nodes)` (0.4 mm, from the basis) and
+   `U2 VSSOP-10 land pattern` (min 0.19 mm between pads of U2), like ECO-004 for U3/U4. The ECO-004 comparative DRC audit now allows U2 pad-to-pad errors to vanish
    in addition to the four U3/U4 ones, nothing else.
 
 ## Audit chain
