@@ -13,6 +13,8 @@ apply <in.kicad_pcb> <spec.json> <out.kicad_pcb>
                     board edge (keep if already clear, else nearest free spot at 0/90 deg,
                     else hide on silkscreen - the F.Fab reference stays)
     Every requested removal must match exactly one item, otherwise the stage fails.
+libresave <pretty_dir> <names,comma,separated>
+    Load each project footprint with KiCad and save it back in the KiCad 9 format (no edit).
 libdiff <board.kicad_pcb> <libs_dir> <refs,comma,separated>
     Library-parity evidence: KiCad's own footprint comparison with its report (when the binding
     exposes it) plus a pad/graphic comparison of the library copy placed at the instance pose.
@@ -195,6 +197,15 @@ def place_references(board) -> dict:
     return {"kept": sorted(kept), "moved": sorted(moved), "hidden": sorted(hidden)}
 
 
+def libresave(pretty_dir: str, names: str) -> None:
+    saved = []
+    for name in names.split(","):
+        footprint = pcbnew.FootprintLoad(pretty_dir, name)
+        pcbnew.FootprintSave(pretty_dir, footprint)
+        saved.append(name)
+    print(json.dumps({"resaved": saved}))
+
+
 def libdiff(board_path: str, libs_dir: str, refs: str) -> None:
     import os
 
@@ -285,6 +296,8 @@ if __name__ == "__main__":
         apply(sys.argv[2], sys.argv[3], sys.argv[4])
     elif sys.argv[1] == "dump":
         dump(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "libresave":
+        libresave(sys.argv[2], sys.argv[3])
     elif sys.argv[1] == "libdiff":
         libdiff(sys.argv[2], sys.argv[3], sys.argv[4])
     else:
