@@ -321,7 +321,7 @@ add_test(NAME app_comms_sim COMMAND app_comms_sim_tests)
 add_test(NAME station_twin_smoke COMMAND zs_station_twin --scene drone --seconds 70 --seed 3 --expect-events 1)
 # closed loop with the Python server twin (needs server/requirements-protocol.lock.txt installed, as ci/firmware.sh does)
 add_test(NAME station_twin_e2e COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/../server/tools/test_station_twin_e2e.py)
-set_tests_properties(station_twin_e2e PROPERTIES ENVIRONMENT "ZS_STATION_TWIN=$<TARGET_FILE:zs_station_twin>")
+set_tests_properties(station_twin_e2e PROPERTIES ENVIRONMENT "ZS_STATION_TWIN=$<TARGET_FILE:zs_station_twin>" SKIP_RETURN_CODE 77)
 
 add_executable(zs_emit_detection tools/emit_detection.c)
 target_link_libraries(zs_emit_detection PRIVATE zs_core m)
