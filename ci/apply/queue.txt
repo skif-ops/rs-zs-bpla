@@ -1,0 +1,3 @@
+# Queued by Claude 2026-09-25: Review B R2 - R2.001 per-segment current evidence, R2.002 DFM register
+tools/apply_pcb_pwr_current_evidence_rev_a.py
+tools/apply_pcb_pwr_dfm_register_rev_a.py

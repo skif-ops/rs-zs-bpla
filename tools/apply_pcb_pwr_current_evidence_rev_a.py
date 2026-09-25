@@ -8,20 +8,25 @@ CURRENT_EVIDENCE.json next to it. Everything is recomputed from the board file:
              basis; finite-difference path resistance on F.Cu + B.Cu with vias
              (tools/pcb_return_resistance_rev_a.py), delta-U and loss at +70 C;
   narrow     EVERY track group narrower than 1.0 mm on a power or return net (same-net tracks
-             joined through each other or through vias). A cut through the middle of its longest
-             segment gives the share of the case current it carries; for that current: resistance
-             (length / minimum width), delta-U, loss and the IPC-2221 external 10 C current for its
-             width (the project screen: 2.03 mm -> 4.0 A). Signal branches come out at ~0 %.
-             Groups no longer than SHORT_MM are conduction-dominated (both ends in wider copper):
-             their heating is the clamped-bar value dT = J^2 rho L^2 / (8 k) over the whole group
-             length, accepted up to 1 C;
+             joined through each other or through vias). EVERY segment of the group (>= 0.1 mm) gets
+             a cut through its middle; the solver gives the share of the case current crossing each
+             cut (Review B R2.001: one cut in the longest segment missed the loaded path when the
+             longest segment was a dead-end branch - 1V8_MIC read 0 A). Per segment and case: current,
+             resistance, delta-U, loss, the IPC-2221 external 10 C current for THAT segment's width
+             (project screen: 2.03 mm -> 4.0 A) and the clamped-bar heating; the group reports the
+             worst segment and the sum of delta-U / loss along its segments. Groups no longer than
+             SHORT_MM are conduction-dominated (both ends in wider copper): heating is the clamped-bar
+             value dT = J^2 rho L^2 / (8 k) over the whole group length, accepted up to 1 C.
+             Self-check: a group touching both the source and the sink pad of a case must carry
+             current in that case (assert_loaded_paths);
   hot_loop   buck VIN stubs: DC share plus the full input RMS ripple Iout*sqrt(D(1-D)) assumed to
              flow through the stub (upper bound: the bulk C12/C20-side capacitors carry most of it);
   via_group  finding 1 wall basis: 20 um nominal / 18 um project minimum average, 1.6 mm +10 %;
   nt_bridge  NetTie-2_SMD_Pad0.5mm bridge 1.0 x 0.5 mm: resistance bounds and bar-model heating;
   budget_3v3 3V3_DIGITAL load budget (PCB-MAIN parts) -> the J2.3/J2.4 current class.
 
---check verifies that the JSON belongs to the board it names.
+--check verifies that the JSON belongs to the board it names, that every narrow segment was screened,
+the loaded-path guard, and runs tools/test_pcb_pwr_current_evidence_rev_a.py (R2.001 regression).
 """
 
 from __future__ import annotations
@@ -173,22 +178,100 @@ def narrow_groups(board, net: str) -> list[dict]:
     for members in groups.values():
         length = sum(g.length for _, _, g in members)
         width = min(w for _, w, _ in members)
-        layer, w_long, longest = max(members, key=lambda m: m[2].length)
         entry = {"layers": sorted({m[0] for m in members}), "segments": len(members),
                  "length_mm": round(length, 3), "min_width_mm": round(width, 4),
-                 "pads": sorted({name for name, geom in pads if any(geom.distance(g) < 1e-3 for _, _, g in members)})}
-        if longest.length < 0.1:
-            entry["probe"] = None
-            entry["note"] = "longest segment < 0.1 mm: pad neck/zero-length joint inside wider copper"
-        else:
-            (ax, ay), (bx, by) = longest.coords[0], longest.coords[-1]
-            mx, my, d = (ax + bx) / 2, (ay + by) / 2, longest.length
-            nx, ny, half = -(by - ay) / d, (bx - ax) / d, w_long / 2 + 0.03
-            entry["probe"] = {"layer": layer, "at_mm": [round(mx, 3), round(my, 3)],
-                              "segment_width_mm": round(w_long, 4), "segment_length_mm": round(d, 3),
-                              "line": [[mx - nx * half, my - ny * half], [mx + nx * half, my + ny * half]]}
+                 "pads": sorted({name for name, geom in pads if any(geom.distance(g) < 1e-3 for _, _, g in members)}),
+                 "probes": [], "short_segments": []}
+        for layer, w_seg, seg in sorted(members, key=lambda m: (m[0], m[2].coords[0], m[2].coords[-1])):
+            if seg.length < 0.1:  # pad neck / joint: too short for a cut, screened with the group bound
+                entry["short_segments"].append({"layer": layer, "width_mm": round(w_seg, 4),
+                                                "length_mm": round(seg.length, 4)})
+                continue
+            (ax, ay), (bx, by) = seg.coords[0], seg.coords[-1]
+            mx, my, d = (ax + bx) / 2, (ay + by) / 2, seg.length
+            nx, ny, half = -(by - ay) / d, (bx - ax) / d, w_seg / 2 + 0.03
+            entry["probes"].append({"layer": layer, "at_mm": [round(mx, 3), round(my, 3)],
+                                    "segment_width_mm": round(w_seg, 4), "segment_length_mm": round(d, 3),
+                                    "line": [[mx - nx * half, my - ny * half], [mx + nx * half, my + ny * half]]})
         out.append(entry)
     return sorted(out, key=lambda e: (-e["length_mm"]))
+
+
+def segment_status(i_seg: float, width_mm: float, group_length_mm: float) -> tuple[str, float, float | None]:
+    """Screen one segment: (status, IPC-2221 10 C current for its width, bar heating over the group).
+    The clamped-bar model holds only for groups no longer than SHORT_MM (both ends in wider copper);
+    for longer groups it is not applicable (None) and the IPC screen alone decides."""
+    ipc = ipc2221_external_a(width_mm)
+    bar = None
+    if group_length_mm <= SHORT_MM:
+        j = i_seg / (width_mm * 1e-3 * T_CU_M)
+        bar = j ** 2 * RHO_70C * (group_length_mm * 1e-3) ** 2 / (8 * K_CU)
+    if i_seg <= ipc:
+        return "PASS", ipc, bar
+    if bar is not None and bar <= BAR_LIMIT_C:
+        return "PASS_SHORT_CONDUCTION", ipc, bar
+    return "REVIEW", ipc, bar
+
+
+STATUS_ORDER = {"PASS": 0, "PASS_SHORT_CONDUCTION": 1, "REVIEW": 2}
+
+
+def summarise_group(group: dict, case_currents: dict, bound_a: float) -> dict:
+    """case_currents: {case: [current of probe k, ...]} -> worst segment, per-case sums, status.
+    Segments shorter than 0.1 mm carry no cut: each is screened at its own width with the largest
+    current measured in the group, or with bound_a (largest case current of the net) when the
+    group has no cut at all - never with zero. Pure function (no board), covered by
+    tools/test_pcb_pwr_current_evidence_rev_a.py."""
+    probes = group["probes"]
+    segments = []
+    for k, probe in enumerate(probes):
+        w, l = probe["segment_width_mm"], probe["segment_length_mm"]
+        r = RHO_70C * l * 1e-3 / (w * 1e-3 * T_CU_M)
+        case, i_seg = max(((c, cur[k]) for c, cur in case_currents.items()), key=lambda t: t[1], default=(None, 0.0))
+        status, ipc, bar = segment_status(i_seg, w, group["length_mm"])
+        segments.append({"layer": probe["layer"], "at_mm": probe["at_mm"], "width_mm": w, "length_mm": l,
+                         "worst_case": case, "i_a": round(i_seg, 4), "r_mohm_70c": round(r * 1e3, 3),
+                         "ipc2221_10c_a": round(ipc, 3), "bar_delta_t_c": None if bar is None else round(bar, 4),
+                         "status": status})
+    measured = max((s["i_a"] for s in segments), default=None)
+    i_short, basis = (measured, "GROUP_MAX_MEASURED") if segments else (bound_a, "NET_CASE_BOUND_NO_CUT")
+    for short in group["short_segments"]:
+        status, ipc, bar = segment_status(i_short, short["width_mm"], group["length_mm"])
+        r = RHO_70C * short["length_mm"] * 1e-3 / (short["width_mm"] * 1e-3 * T_CU_M)
+        segments.append({"layer": short["layer"], "at_mm": None, "width_mm": short["width_mm"],
+                         "length_mm": short["length_mm"], "worst_case": None, "i_a": round(i_short, 4),
+                         "current_basis": basis, "r_mohm_70c": round(r * 1e3, 4),
+                         "ipc2221_10c_a": round(ipc, 3), "bar_delta_t_c": None if bar is None else round(bar, 4),
+                         "status": status})
+    per_case = []
+    for c, cur in case_currents.items():
+        du = sum(cur[k] * segments[k]["r_mohm_70c"] for k in range(len(probes)))
+        p = sum(cur[k] ** 2 * segments[k]["r_mohm_70c"] for k in range(len(probes)))
+        per_case.append({"case": c, "i_max_a": round(max(cur, default=0.0), 4),
+                         "du_mv_along_segments": round(du, 3), "p_mw_along_segments": round(p, 3)})
+    worst = max(segments, key=lambda s: (STATUS_ORDER[s["status"]], s["i_a"]), default=None)
+    return {"segments_detail": segments, "cases": per_case,
+            "worst_segment": worst, "i_branch_a": max((s["i_a"] for s in segments), default=0.0),
+            "status": worst["status"] if worst else "PASS",
+            "du_mv": max((c["du_mv_along_segments"] for c in per_case), default=0.0),
+            "p_mw": max((c["p_mw_along_segments"] for c in per_case), default=0.0)}
+
+
+def assert_loaded_paths(result: dict) -> list:
+    """R2.001 regression guard: a narrow group that touches both the source and the sink pad of a
+    case lies on that case's path and must carry current in it. Returns the checked rows."""
+    rows = []
+    for case in result["cases"]:
+        ends_src, ends_snk = set(case["from"].split("+")), set(case["to"].split("+"))
+        for g in result["narrow"]:
+            if g["net"] != case["net"] or not (ends_src & set(g["pads"]) and ends_snk & set(g["pads"])):
+                continue
+            i_max = next(c["i_max_a"] for c in g["cases"] if c["case"] == case["id"])
+            rows.append({"case": case["id"], "net": case["net"], "group_pads": g["pads"],
+                         "case_current_a": case["current_a"], "group_i_max_a": i_max})
+            assert i_max >= 0.01 * case["current_a"], (
+                f"{case['id']}: narrow group {g['pads']} joins source and sink but reads {i_max} A")
+    return rows
 
 
 def evaluate(board_path: Path) -> dict:
@@ -198,7 +281,7 @@ def evaluate(board_path: Path) -> dict:
     from pcb_return_resistance_rev_a import resistance
 
     board = Board.from_file(str(board_path))
-    result = {"schema": "dioneya-pcb-pwr-current-evidence-v1", "board": str(board_path.relative_to(ROOT)),
+    result = {"schema": "dioneya-pcb-pwr-current-evidence-v2", "board": str(board_path.relative_to(ROOT)),
               "board_sha256": sha256(board_path),
               "basis": {"outer_copper_um": 35, "rho_20c": RHO_20C, "temperature_factor_70c": TEMP_70C,
                         "via_70c_mohm_in_network": 1.75093, "cell_mm": 0.05,
@@ -211,7 +294,8 @@ def evaluate(board_path: Path) -> dict:
     for net, cases in by_net.items():
         window = net_window(board, net)
         groups = narrow_groups(board, net)
-        probes = [(f"g{i}", g["probe"]["layer"], g["probe"]["line"]) for i, g in enumerate(groups) if g["probe"]]
+        probes = [(f"g{i}s{k}", p["layer"], p["line"]) for i, g in enumerate(groups) for k, p in enumerate(g["probes"])]
+        case_currents = [dict() for _ in groups]
         for case_id, source, sink, amps, basis in cases:
             solved = resistance(str(board_path), net, source, sink, window, probes=probes)
             r = solved["r_mohm_70c"] / 1e3
@@ -224,34 +308,33 @@ def evaluate(board_path: Path) -> dict:
                 row["r_mohm_70c_min_wall_thick_board"] = worst["r_mohm_70c"]
                 row["du_mv_70c_min_wall_thick_board"] = round(amps * worst["r_mohm_70c"], 2)
             result["cases"].append(row)
+            shares = solved.get("current_share", {})
             for i, g in enumerate(groups):
-                share = solved.get("current_share", {}).get(f"g{i}", 0.0) if g["probe"] else 0.0
-                g.setdefault("cases", []).append({"case": case_id, "share": share, "current_a": round(share * amps, 4)})
-        for g in groups:
-            worst = max(g.get("cases", [{"current_a": 0.0}]), key=lambda c: c["current_a"])
-            i_branch = worst["current_a"]
+                case_currents[i][case_id] = [shares.get(f"g{i}s{k}", 0.0) * amps for k in range(len(g["probes"]))]
+        for i, g in enumerate(groups):
+            summary = summarise_group(g, case_currents[i], max(c[3] for c in cases))
+            worst = summary["worst_segment"]
             r_branch = RHO_70C * g["length_mm"] * 1e-3 / (g["min_width_mm"] * 1e-3 * T_CU_M)
-            g.update({"net": net, "worst_case": worst.get("case"), "i_branch_a": i_branch,
-                      "r_branch_mohm_70c": round(r_branch * 1e3, 3),
-                      "du_mv": round(i_branch * r_branch * 1e3, 3), "p_mw": round(i_branch ** 2 * r_branch * 1e3, 3),
-                      "ipc2221_10c_a": round(ipc2221_external_a(g["min_width_mm"]), 3)})
-            j = i_branch / (g["min_width_mm"] * 1e-3 * T_CU_M)
-            g["bar_delta_t_c"] = round(j ** 2 * RHO_70C * (g["length_mm"] * 1e-3) ** 2 / (8 * K_CU), 4)
-            if i_branch <= g["ipc2221_10c_a"]:
-                g["status"] = "PASS"
-            elif g["length_mm"] <= SHORT_MM and g["bar_delta_t_c"] <= BAR_LIMIT_C:
-                g["status"] = "PASS_SHORT_CONDUCTION"
-            else:
-                g["status"] = "REVIEW"
-            g.pop("probe", None) if g["probe"] is None else g["probe"].pop("line")
+            g.update({"net": net, "probed_segments": len(g["probes"]), "cases": summary["cases"],
+                      "segments_detail": summary["segments_detail"],
+                      "worst_case": worst["worst_case"] if worst else None,
+                      "worst_segment": {k: worst[k] for k in ("layer", "at_mm", "width_mm", "length_mm", "i_a",
+                                                              "ipc2221_10c_a", "bar_delta_t_c", "status")} if worst else None,
+                      "i_branch_a": summary["i_branch_a"], "r_branch_mohm_70c": round(r_branch * 1e3, 3),
+                      "du_mv": summary["du_mv"], "p_mw": summary["p_mw"],
+                      "ipc2221_10c_a_min_width": round(ipc2221_external_a(g["min_width_mm"]), 3),
+                      "status": summary["status"]})
+            stub_probes = g.pop("probes")
             result["narrow"].append(g)
             for reg, (vout, iout) in HOT_LOOP.items():
                 if net == "VBAT_SYS" and f"{reg}.1" in g["pads"] and g["length_mm"] > 1.0:
                     duty = vout / VIN_MIN_V
                     i_ac = iout * math.sqrt(duty * (1 - duty))
-                    i_dc = next(c["current_a"] for c in g["cases"] if c["case"] == f"vin_{'3v8' if reg == 'U3' else '3v3'}")
+                    case_id = f"vin_{'3v8' if reg == 'U3' else '3v3'}"
+                    k_dc = max(range(len(stub_probes)), key=lambda k: case_currents[i][case_id][k])
+                    i_dc = round(case_currents[i][case_id][k_dc], 4)
                     i_rms = math.hypot(i_dc, i_ac)
-                    w_seg, l_seg = g["probe"]["segment_width_mm"], g["probe"]["segment_length_mm"]
+                    w_seg, l_seg = stub_probes[k_dc]["segment_width_mm"], stub_probes[k_dc]["segment_length_mm"]
                     r_seg = RHO_70C * l_seg * 1e-3 / (w_seg * 1e-3 * T_CU_M)
                     j_seg = i_rms / (w_seg * 1e-3 * T_CU_M)
                     bar = j_seg ** 2 * RHO_70C * (l_seg * 1e-3) ** 2 / (8 * K_CU)
@@ -299,6 +382,7 @@ def evaluate(board_path: Path) -> dict:
                 result["returns_base_011"].append({"id": case_id, "r_mohm_70c": solved["r_mohm_70c"],
                                                    "du_mv_70c": round(amps * solved["r_mohm_70c"], 2)})
     result["narrow_review"] = [g for g in result["narrow"] if g["status"] == "REVIEW"]
+    result["loaded_path_check"] = assert_loaded_paths(result)
     return result
 
 
@@ -312,6 +396,13 @@ def main() -> int:
     if args.check:
         data = json.loads(out.read_text(encoding="utf-8"))
         assert data["board_sha256"] == sha256(board), "CURRENT_EVIDENCE.json does not belong to the board"
+        assert data["schema"] == "dioneya-pcb-pwr-current-evidence-v2", "evidence predates the R2.001 per-segment fix"
+        assert all(g["probed_segments"] + len(g["short_segments"]) == g["segments"] for g in data["narrow"]), \
+            "a narrow segment was neither probed nor screened as short"
+        assert all(len(g["segments_detail"]) == g["segments"] for g in data["narrow"]), "segment screen incomplete"
+        assert_loaded_paths(data)
+        import test_pcb_pwr_current_evidence_rev_a as regression  # R2.001 regression tests
+        regression.main()
         print(f"current evidence: {len(data['cases'])} cases, {len(data['narrow'])} narrow groups, "
               f"{len(data['narrow_review'])} for review")
         return 0
