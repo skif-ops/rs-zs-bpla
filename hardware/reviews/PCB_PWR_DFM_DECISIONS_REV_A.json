@@ -42,7 +42,26 @@
    "executed_by": "ECO-006"
   },
   "DFM-PWR-04": {
-   "decision": "OPEN"
+   "decision": "DEVIATION_ACCEPTED_FOR_EVT",
+   "decided": "2026-09-26",
+   "fact": {
+    "a": "J1.2",
+    "b": "via@6.95,27.95",
+    "net": "GND_PWR",
+    "drill_mm": [
+     1.02,
+     0.3
+    ],
+    "hole_edge_mm": 0.2913,
+    "rule_pad_hole_to_hole_mm": 0.45,
+    "rule_via_hole_to_hole_mm": 0.2
+   },
+   "conditions": {
+    "C1_order_note": "PCB-PWR J1.2 (GND_PWR, 1.02 mm drill) and GND_PWR via at (6.95, 27.95) (0.30 mm drill): hole edge-to-edge 0.29 mm, same net; drill as designed, do not move or merge the holes",
+    "C2_first_article": "first articles: web between the two holes intact (no breakout into the J1.2 barrel); J1.2 to GND_PWR continuity"
+   },
+   "rationale": "same net: no short possible; risk limited to drilling (thin web between holes)",
+   "scope": "EVT lot; move the via by a copper change for later lots if C2 shows breakout"
   }
  },
  "manufacturing_release": false
