@@ -21,7 +21,10 @@ Not a candidate for application yet; nothing here changes the authoritative boar
 | 013 + C5/U1.100 014 (`008b133f…`) | 138 | 0 under the same candidate rules |
 | 014 + seven 3V3 local links 015 (`00b01ae3…`) | 131 | 0 under the same candidate rules |
 | 015 + two power-island links 016 (`9574bdca…`) | 129 | 0 under the same candidate rules |
-| 016 + I2C/GNSS control links 017 (`bedd7cba…`) | **127** | **0 under the same candidate rules** |
+| 016 + I2C/GNSS control links 017 (`bedd7cba…`) | 127 | 0 under the same candidate rules |
+| 017 + local AAD_CFG legs 018 (`0860bf13…`) | 124 | 0 under the same candidate rules |
+| 018 + SIM_MUX_SEL links 019 (`b07416af…`) | 122 | 0 under the same candidate rules |
+| 019 + SIM2_VDD_CONN link 020 (`7d45ad45…`) | **121** | **0 under the same candidate rules** |
 
 At the end of the autorouting experiments P2 was the best clean result (156 open, 0 new errors, 22 dangling fan-out
 vias to clean); it is built from
@@ -89,13 +92,13 @@ Conclusion: seven autorouting variants converge to 155–160 open connections. T
 (KiCad push-and-shove by a layout engineer, or a generalised version of the 003 router in net groups).
 Tools: `tools/apply_pcb_routing_relief_p1_rev_a.py`, `tools/apply_pcb_routing_fanout_p2_rev_a.py`.
 
-## 7. Bounded local routes 007–017 and current stop (2026-09-26)
+## 7. Bounded local routes 007–020 and current stop (2026-09-26)
 
-The cumulative 017 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
+The cumulative 020 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
 authoritative board. The unchanged general PCB-MAIN project rejects the 0.25/0.15 mm vias introduced in 009 and 010 (five each of
 `annular_width`, `drill_out_of_range`, `via_diameter`). Under an explicit *candidate-only* JLCPCB six-layer process
 overlay (`min_via_diameter=0.25`, `min_through_hole_diameter=0.15`, `min_via_annular_width=0.05`), KiCad 9 comparative
-DRC is 146→142→141→140→139→138→131→129→127 open with zero new violations at each accepted step. Candidate projects,
+DRC is 146→142→141→140→139→138→131→129→127→124→122→121 open with zero new violations at each accepted step. Candidate projects,
 comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` directories. The published six-layer process basis is `https://jlcpcb.com/6-layer-pcb` (minimum
 0.15/0.25 mm and via-in-pad option); a job-specific acceptance is still required.
 
@@ -124,10 +127,17 @@ comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` dire
   tie at U18; 6.87 mm total, DRC 131→129. Power/return review remains open.
 - 017: 0.20 mm F.Cu links on I2C2_SCL_BUS (U3.1→R15.2) and GNSS_ANT_GATE
   (R61.2→existing track), 6.294 mm total; DRC 129→127. GNSS_ANT_GATE is a control signal, not RF.
+- 018: three local 0.20 mm F.Cu `AAD_CFG_1V8_FANOUT` legs from U20/U21/U22
+  to J_MIC2/J_MIC3/J_MIC4, 25.655 mm total; DRC 127→124. The shared fanout and the microphone-domain
+  return path remain open.
+- 019: two 0.20 mm F.Cu links join U13.24→R45.1 and U13.14→U13.24 on `SIM_MUX_SEL`,
+  12.99 mm total; DRC 124→122. U1.97 still needs its connection.
+- 020: one 0.25 mm F.Cu `SIM2_VDD_CONN` tie from U15.1 to an existing supply run,
+  10.794 mm; DRC 122→121. SIM supply/return review is open.
 
-Remaining 127 open connections span 70 nets: `3V3_DIGITAL` 23, `1V8_MIC` 8, `AAD_CFG_1V8_FANOUT` 8,
-`I2C2_SCL_BUS` 3, and 85 others. Of 35 U1 pads now appearing in the open-connection report, the earlier 009
+Remaining 121 open connections span 69 nets: `3V3_DIGITAL` 23, `1V8_MIC` 8, `AAD_CFG_1V8_FANOUT` 5,
+`I2C2_SCL_BUS` 3, and 82 others. Of 36 U1 pads now appearing in the open-connection report, the earlier 009
 first-pass 0.25/0.15 mm via-in-pad clearance scan admitted only 13 of 40; most others hit existing B.Cu/In3 copper. A clean
 route requires placement/rip-up and local power/return design, followed by native DRC and SI/PI review.
 
-Do not copy 017 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
+Do not copy 020 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
