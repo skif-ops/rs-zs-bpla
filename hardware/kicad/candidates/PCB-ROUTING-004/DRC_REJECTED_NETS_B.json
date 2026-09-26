@@ -1,0 +1,1 @@
+{"source": "KiCad 9.0.9 DRC of candidate 3b14eff3 (ci-apply 76f60404)", "nets": {"3V8_MODEM": ["hole_clearance", "shorting_items", "solder_mask_bridge"], "EN_AUX": ["shorting_items", "solder_mask_bridge"], "SD_DET": ["shorting_items", "solder_mask_bridge"]}}
