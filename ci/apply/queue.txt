@@ -1,1 +1,0 @@
-tools/apply_pcb_main_swd_3v3_back_028_rev_a.py
