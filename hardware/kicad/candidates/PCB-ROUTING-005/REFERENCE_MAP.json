@@ -11,9 +11,9 @@
    "share": 0.0
   },
   "B.Cu|GND_DIGITAL": {
-   "length_mm": 685.22,
-   "over_own_reference_mm": 599.62,
-   "share": 0.8751
+   "length_mm": 679.26,
+   "over_own_reference_mm": 594.56,
+   "share": 0.8753
   },
   "B.Cu|GND_MIC": {
    "length_mm": 68.87,
@@ -46,9 +46,9 @@
    "share": 0.0
   },
   "F.Cu|GND_DIGITAL": {
-   "length_mm": 920.97,
-   "over_own_reference_mm": 863.86,
-   "share": 0.938
+   "length_mm": 892.2,
+   "over_own_reference_mm": 836.96,
+   "share": 0.9381
   },
   "F.Cu|GND_MIC": {
    "length_mm": 118.03,
@@ -71,7 +71,7 @@
    "share": 0.0
   },
   "In3.Cu|GND_DIGITAL": {
-   "length_mm": 33.74,
+   "length_mm": 26.03,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
@@ -416,16 +416,6 @@
    "length_mm": 34.49,
    "over_own_reference_mm": 34.49,
    "share": 1.0
-  },
-  "GNSS_ANT_OFF_N|B.Cu": {
-   "length_mm": 5.96,
-   "over_own_reference_mm": 5.06,
-   "share": 0.8488
-  },
-  "GNSS_ANT_OFF_N|F.Cu": {
-   "length_mm": 20.14,
-   "over_own_reference_mm": 19.23,
-   "share": 0.9553
   },
   "GNSS_ANT_SHORT_N|B.Cu": {
    "length_mm": 15.17,
@@ -1294,16 +1284,6 @@
   },
   "USB_VBUS_CONN|In3.Cu": {
    "length_mm": 8.39,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
-  "VCORE_1V1|F.Cu": {
-   "length_mm": 8.63,
-   "over_own_reference_mm": 7.67,
-   "share": 0.8883
-  },
-  "VCORE_1V1|In3.Cu": {
-   "length_mm": 7.71,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
