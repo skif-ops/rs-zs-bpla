@@ -22,6 +22,7 @@ OUTPUT_BULK_010_SHA = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840bff
 J2_PLACEMENT_ECO_003_SHA = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
 AUTOROUTE_011_SHA = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
 ECO_005_SHA = "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610"  # exact committed ECO-005 board (Review B R1 remediation)
+ECO_006_SHA = "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7"  # exact committed ECO-006 board (Review B R2 DFM: TP mask 0.1 mm, legend 1.0/0.15 mm; copper unchanged)
 APPROVAL_SHA = "f90d95781a140300856b290b9958f0f814c5ef13e44da332e0a1311993be40f2"
 
 
@@ -56,7 +57,7 @@ def main() -> int:
     args = parser.parse_args()
     payload = accepted_payload()
     if args.check:
-        assert digest(BOARD) in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA}, \
+        assert digest(BOARD) in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA}, \
             "authoritative PCB-PWR is not accepted 008 or controlled successor"
     else:
         assert BOARD.read_bytes() == BASE.read_bytes(), "authoritative 007 predecessor differs"

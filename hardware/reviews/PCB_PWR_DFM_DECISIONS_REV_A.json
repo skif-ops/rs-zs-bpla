@@ -1,0 +1,49 @@
+{
+ "schema": "dioneya-pcb-pwr-dfm-decisions-v1",
+ "board_sha256": "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7",
+ "date": "2026-09-25",
+ "record": "hardware/reviews/PCB_PWR_DFM_DECISIONS_REV_A.md",
+ "decisions": {
+  "DFM-PWR-01": {
+   "decision": "DEVIATION_ACCEPTED_FOR_EVT",
+   "conditions": {
+    "C1_order_note": "U3/U4: SMD pad gap 0.125 mm between pad 2 and pins 6/7 per TI RAK0009A land pattern; do not clip or shrink pads; solder mask dam 0.20 mm must be kept",
+    "C2_inspection": "AOI and X-ray of U3 and U4 on 100 % of boards; no solder between pad 2 and pins 6/7",
+    "C3_pre_power": [
+     {
+      "points": "FB_3V8 (R2.1) - GND_PWR",
+      "expected": "approx 35.7 kOhm",
+      "reject_below_ohm": 1000
+     },
+     {
+      "points": "3V3_DIGITAL (J2.3) - GND_PWR",
+      "expected": "high, rising while capacitors charge",
+      "reject_below_ohm": 1000
+     }
+    ],
+    "C4_first_power": "current-limited bench supply; check 3V8_MODEM = 3.8 V before connecting PCB-MAIN"
+   },
+   "significant_pairs": [
+    "U3.6 FB_3V8 - U3.2 GND_PWR",
+    "U4.6 3V3_DIGITAL - U4.2 GND_PWR"
+   ],
+   "insignificant_pairs": {
+    "U3.7 MODE_3V8": "tied to GND_PWR by fitted R4 0 ohm",
+    "U4.7 MODE_3V3": "tied to GND_PWR by fitted R8 0 ohm"
+   },
+   "scope": "EVT lot; review for later lots from C2-C3 results"
+  },
+  "DFM-PWR-02": {
+   "decision": "FIX",
+   "executed_by": "ECO-006"
+  },
+  "DFM-PWR-03": {
+   "decision": "FIX_REFERENCES_ACCEPT_FOOTPRINT_GRAPHICS",
+   "executed_by": "ECO-006"
+  },
+  "DFM-PWR-04": {
+   "decision": "OPEN"
+  }
+ },
+ "manufacturing_release": false
+}

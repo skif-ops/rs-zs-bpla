@@ -28,6 +28,8 @@ AUTOROUTE_011 = ROOT / "hardware/kicad/candidates/PCB-PWR-AUTOROUTE-011/PCB-PWR_
 AUTOROUTE_011_SHA256 = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
 ECO_005 = ROOT / "hardware/kicad/candidates/PCB-PWR-ECO-005/PCB-PWR_ECO_005_CANDIDATE_REV_A.kicad_pcb"
 ECO_005_SHA256 = "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610"
+ECO_006 = ROOT / "hardware/kicad/candidates/PCB-PWR-ECO-006/PCB-PWR_ECO_006_CANDIDATE_REV_A.kicad_pcb"
+ECO_006_SHA256 = "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7"
 
 
 def is_j2_placement_eco_003(payload: bytes) -> bool:
@@ -51,6 +53,13 @@ def is_eco_005(payload: bytes) -> bool:
             and payload == ECO_005.read_bytes())
 
 
+def is_eco_006(payload: bytes) -> bool:
+    """Accepted ECO-006 successor of ECO-005 (Review B R2 DFM: test-point mask 0.1 mm, legend 1.0/0.15 mm;
+    copper, placement and nets unchanged): the committed candidate."""
+    return (hashlib.sha256(payload).hexdigest() == ECO_006_SHA256
+            and payload == ECO_006.read_bytes())
+
+
 def is_exact_application(board: Path) -> bool:
     payload = board.read_bytes()
     return (hashlib.sha256(payload).hexdigest() == SHA256
@@ -70,7 +79,7 @@ def is_controlled_application_or_successor(board: Path) -> bool:
                 and payload == OUTPUT_BULK_010.read_bytes())
             or is_j2_placement_eco_003(payload)
             or is_autoroute_011(payload)
-            or is_eco_005(payload))
+            or is_eco_005(payload) or is_eco_006(payload))
 
 
 def historical_basis_board(active: Path) -> Path:
@@ -94,6 +103,6 @@ def hot_loop_application_board(active: Path) -> Path:
                 and payload == OUTPUT_BULK_010.read_bytes())
             or is_j2_placement_eco_003(payload)
             or is_autoroute_011(payload)
-            or is_eco_005(payload)):
+            or is_eco_005(payload) or is_eco_006(payload)):
         return CANDIDATE
     return active
