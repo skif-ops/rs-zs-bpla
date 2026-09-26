@@ -31,12 +31,17 @@ typedef enum {
   ZS_AUDIO_SEGMENT_RANGE = 3
 } zs_audio_segment_t;
 
+/* CMD_REQUEST_AUDIO payload {0: event_id, 1: segment, 2: start_offset_ms|null, 3: duration_ms|null
+   [, 4: event_time_us]}: the optional key 4 is the event time the server knows from the detection (MQTT ICD
+   addendum B), so the station can serve events its own table no longer holds (an earlier boot). */
 typedef struct {
   uint64_t event_id;
   zs_audio_segment_t segment;
   int32_t start_offset_ms;
   uint32_t duration_ms;
   bool has_range;
+  bool has_event_time;
+  int64_t event_time_us;
 } zs_audio_request_command_t;
 
 /* CMD_REBOOT payload {0: delay_s}: reset this many seconds after the ACK (the executor enforces a minimum). */
