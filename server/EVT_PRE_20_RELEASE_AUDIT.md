@@ -78,9 +78,22 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
 Частично закрыто после baseline: station HTTP ingress, command polling/ACK и
 audio upload теперь fail-closed и доступны только при точном стендовом opt-in
 `ZS_STATION_HTTP_INSECURE_BENCH=1`. Production telemetry должна поступать через
-MQTT mTLS. Пункт 1 остаётся открытым до завершения auth/authz операторского
-REST/WebSocket UI и deployment-проверок; это изменение не разрешает публикацию
-FastAPI напрямую в интернет.
+MQTT mTLS.
+
+Auth/authz операторского REST/WebSocket UI реализованы (`station/operator_auth.py`):
+всё приложение, кроме `/static`, `/login`, `/api/v1/health` и станционных стендовых
+маршрутов, требует оператора; без учётных записей сервер отказывает во всём
+(fail-closed); роли `viewer`/`operator`, аудио событий только для `operator`;
+scrypt-пароли, API-токены хранятся как SHA-256; HMAC-сессия (HttpOnly, SameSite=Strict,
+Secure, 12 ч) с проверкой учётной записи и версии пароля на каждом запросе; same-origin
+проверка изменяющих запросов по cookie; блокировка входа (5 неудач на имя с одного адреса,
+20 с адреса, 15 мин; адрес клиента из `X-Forwarded-For` только за доверенным прокси). Отключение —
+только точным стендовым `ZS_OPERATOR_AUTH_INSECURE_BENCH=1` в dev/Windows-bench compose.
+Проверки: `server/tests/test_operator_auth.py`, `tools/validate_operator_auth.py` (QG-1),
+`tools/audit_operator_auth_technical.py` (QG-2). Пункт 1 остаётся открытым до
+deployment-проверок на целевом сервере (HTTPS reverse proxy с передачей `Host`,
+созданные учётные записи, отсутствие bench-флагов); это изменение не разрешает
+публикацию FastAPI напрямую в интернет.
 
 Частично закрыт пункт 2: production bridge публикует только подписанные команды,
 не считает broker QoS ACK прикладным подтверждением и безопасно отключает

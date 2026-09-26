@@ -35,9 +35,11 @@ Independent audit:
 | Routing authority SHA-256 | `36da48a6614de40bed1b52cb53b0b6a1367fabf0e0504e8c0f4297c5b962f6f0` |
 
 The request basis is the historical controlled 110 x 75 x 1.6 mm six-layer
-pre-route candidate. The active native successor is SHA-256
-`2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273`
-with 1023 trace items and eight copper zones; routing remains incomplete. No
+pre-route candidate. The active native board is SHA-256
+`30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739`
+(PCB-MAIN inner reroute 003, accepted and applied 2026-09-25) with 1069 trace items
+and ten copper zones; routing remains incomplete. 003 changes neither the stackup
+nor the layer count, and none of its rerouted nets is impedance-controlled. No
 vendor may treat this historical packet or the active board as released
 fabrication data.
 

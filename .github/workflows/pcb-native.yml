@@ -134,6 +134,8 @@ on:
       - "tools/audit_pcb_main_usb_cell_fixture_routing_candidate_rev_a.py"
       - "tools/generate_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py"
       - "tools/audit_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py"
+      - "tools/pcb_main_lineage_rev_a.py"
+      - "tools/audit_pcb_main_inner_reroute_003_application_rev_a.py"
       - "tools/generate_pcb_main_rf_remediation_application_rev_a.py"
       - "tools/audit_pcb_main_rf_remediation_application_rev_a.py"
       - "tools/route_pcb_release_candidate_rev_a.py"
@@ -534,6 +536,8 @@ jobs:
           python tools/generate_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py --check
           python tools/audit_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/usb_cell_fixture_routing_001_application_audit.json
+          python tools/audit_pcb_main_inner_reroute_003_application_rev_a.py \
+            --output artifacts/kicad-native/PCB-MAIN/inner_reroute_003_application_audit.json
           python tools/generate_pcb_main_rf_remediation_application_rev_a.py --check
           python tools/audit_pcb_main_rf_remediation_application_rev_a.py \
             --output artifacts/kicad-native/PCB-MAIN/rf_remediation_application_audit.json

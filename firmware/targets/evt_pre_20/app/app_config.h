@@ -94,6 +94,13 @@
    the last APP_PARAMS_NOR_BLOCKS erase blocks of the nRF image partition (128 blocks, MCUboot needs 119). */
 #define APP_REBOOT_MIN_DELAY_S       5u
 #define APP_PARAMS_NOR_BLOCKS        2u
+/* Audio prehistory (addendum B): the recorder task, and the capture kept on (any mode but SHUTDOWN) this long after
+   an event so the post-event segment exists (S3 and S0 otherwise stop the PDM clock). */
+#define APP_PRIO_REC                 3
+#define APP_STACK_REC                768
+#define APP_AUDIO_POST_EVENT_MS      30000u
+#define APP_AUDIO_EVENT_TABLE        16u      /* events of this boot whose audio CMD_REQUEST_AUDIO can find */
+#define APP_AUDIO_UPLOAD_MAX_MS      300000u  /* S3 watchdog extension while an audio upload runs (~314 chunks both) */
 
 /* NVIC priorities (0 = highest). FreeRTOS syscall ceiling is 5: ISRs at 5..15 may call FromISR APIs. */
 #define APP_IRQ_PRIO_TIM2_PPS        4   /* timestamp capture: above the RTOS ceiling, no RTOS calls inside */

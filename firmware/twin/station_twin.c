@@ -20,12 +20,14 @@
 #include "scene.h"
 #include "task.h"
 #include "zs_audio.h"
+#include "zs_audio_recorder.h"
 #include "zs_command_journal.h"
 #include "zs_command_set_vector.h"
 #include "zs_dsp_mcu.h"
 #include "zs_event_outbox.h"
 #include "zs_lora_uplink.h"
 #include "zs_power_modes.h"
+#include "zs_prehistory.h"
 #include "zs_station_config.h"
 #include "zs_station_params.h"
 #include "zs_station_pipeline.h"
@@ -384,15 +386,53 @@ static float scene_level;                 /* recent RMS of the scene, for the AA
 static FILE *dump_pcm;                    /* --dump-pcm: the mono scene as PCM16LE 32 kHz (for tools/presence_eval) */
 
 static void mode_event(zs_mode_event_t ev) { mode_bits |= 1u << ev; }
+
+/* ---- audio prehistory (mirrors app_audio_rec + the capture policy of tasks.c): RAM ring of 128 one-second records
+   (the station has ~2500; the twin needs more than one event's before + after) ---- */
+#define PRE_RECORDS 128u
+static uint8_t pre_flash[PRE_RECORDS * 16384u];
+static int pre_read(void *c, uint32_t a, uint8_t *d, size_t n) { (void)c; if ((uint64_t)a + n > sizeof(pre_flash)) return -1; memcpy(d, pre_flash + a, n); return 0; }
+static int pre_write(void *c, uint32_t a, const uint8_t *d, size_t n) { (void)c; if ((uint64_t)a + n > sizeof(pre_flash)) return -1; for (size_t i = 0u; i < n; i++) { if ((pre_flash[a + i] & d[i]) != d[i]) return -2; pre_flash[a + i] &= d[i]; } return 0; }
+static int pre_erase(void *c, uint32_t a, size_t n) { (void)c; if (a % 4096u || n % 4096u || (uint64_t)a + n > sizeof(pre_flash)) return -1; memset(pre_flash + a, 0xff, n); return 0; }
+static const zs_archive_storage_t pre_storage = {NULL, sizeof(pre_flash), 4096u, pre_read, pre_write, pre_erase};
+static zs_prehistory_t prehistory;
+static zs_audio_recorder_t recorder;
+static bool capture_on, capture_was_stopped;
+static uint32_t capture_stopped_ms;
+static int64_t capture_gaps_us;           /* zs_time_on_capture_gap on the target: the time mapping keeps up with pauses */
+static uint32_t post_capture_until_ms;
+static int64_t first_event_time_us;
+static void post_capture_open(void) { post_capture_until_ms = sim_now + 30000u; }
+static bool capture_wanted(zs_mode_t mode) { return zs_mode_power_for(mode).mdf_clock || (mode != ZS_MODE_SHUTDOWN && (int32_t)(sim_now - post_capture_until_ms) < 0); }
+static void capture_set(bool on) {
+  if (on == capture_on) return;
+  capture_on = on;
+  if (on && capture_was_stopped) capture_gaps_us += (int64_t)(sim_now - capture_stopped_ms) * 1000;
+  if (!on) { capture_stopped_ms = sim_now; capture_was_stopped = true; }
+  if (on) zs_audio_recorder_start(&recorder, ring.total_frames); else zs_audio_recorder_stop(&recorder);
+}
+/* events of this run for CMD_REQUEST_AUDIO (mirrors app_audio_rec's table; the twin's clock is always trusted) */
+typedef struct { uint64_t event_id; int64_t time_us; } twin_event_t;
+static twin_event_t twin_events[16]; static unsigned twin_events_next;
+static const zs_prehistory_t *src_ring(void) { return &prehistory; }
+static void src_range(uint64_t *oldest, uint64_t *next) { *next = prehistory.next_sequence; *oldest = prehistory.next_sequence - prehistory.available_records; }
+static bool src_event_time(uint64_t id, int64_t *t, bool *trusted) { for (unsigned i = 0u; i < 16u; i++) if (id && twin_events[i].event_id == id) { *t = twin_events[i].time_us; *trusted = true; return true; } return false; }
+static int64_t pl_sample_time(void *ctx, uint64_t sample);
+static int64_t src_now_us(void) { return pl_sample_time(NULL, ring.total_frames); }
+static bool src_recording(void) { return capture_on; }
+static const app_comms_audio_source_t audio_source = {src_ring, src_range, src_event_time, src_now_us, src_recording};
 static bool pl_extract(void *ctx, const int16_t *pcm, size_t n, float out[ZS_FEATURE_COUNT]) { (void)ctx; return zs_dsp_mcu_extract_1s(&dsp_ctx, pcm, n, out); }
-static int64_t pl_sample_time(void *ctx, uint64_t sample) { (void)ctx; return (int64_t)1800000000000000LL + (int64_t)sample * 1000000LL / 32000LL; }
+static int64_t pl_sample_time(void *ctx, uint64_t sample) { (void)ctx; return (int64_t)1800000000000000LL + (int64_t)sample * 1000000LL / 32000LL + capture_gaps_us; }
 static bool pl_emit(void *ctx, const zs_detection_t *d) {
   static uint8_t ws[ZS_EVENT_OUTBOX_PAYLOAD_MAX_BYTES + 64u];
   zs_detection_t e = *d; (void)ctx;
   e.route.transport = ZS_ROUTE_LTE; e.power.battery_pct = 80u; e.power.battery_mv = 13200u;
+  e.gnss.time_trust = ZS_TIME_TRUST_GNSS_TRUSTED; e.gnss.pps_ok = true; e.gnss.expected_time_error_us = 100u;   /* as tasks.c: the twin's clock is trusted */
   const bool ok = zs_event_outbox_enqueue_detection(&outbox_io, &e, 2u, ws, sizeof(ws)) == ZS_EVENT_OUTBOX_OK;
   events_emitted_total += ok;
   if (ok) remember_summary(d->event_id, d->classification.class_id, d->classification.confidence_u8, pipeline.presence.level, (uint16_t)pipeline.last_gate.f0_hz);
+  if (ok && first_event_time_us == 0) first_event_time_us = d->event_time_us;
+  twin_events[twin_events_next] = (twin_event_t){d->event_id, d->event_time_us}; twin_events_next = (twin_events_next + 1u) % 16u;
   tlog("station: event %llu emitted (level %u conf %u) -> outbox %s", (unsigned long long)d->event_id, pipeline.presence.level, pipeline.presence.confidence_u8, ok ? "ok" : "REFUSED");
   return ok;
 }
@@ -420,11 +460,11 @@ static void dsp_mode_events(void) {
   if (modes.mode == ZS_MODE_S1_LISTEN) {
     quiet_windows = 0u;
     if (level >= ZS_PRESENCE_SUSPECT) mode_event(ZS_MODE_EV_GATE_POSITIVE);
-    if (pipeline.events_emitted != seen_events) { seen_events = pipeline.events_emitted; mode_event(ZS_MODE_EV_OUTBOX_PENDING); }
+    if (pipeline.events_emitted != seen_events) { seen_events = pipeline.events_emitted; post_capture_open(); mode_event(ZS_MODE_EV_OUTBOX_PENDING); }
     return;
   }
   if (modes.mode != ZS_MODE_S2_DSP) { quiet_windows = 0u; seen_events = pipeline.events_emitted; return; }
-  if (pipeline.events_emitted != seen_events) { seen_events = pipeline.events_emitted; quiet_windows = 0u; mode_event(ZS_MODE_EV_DSP_DONE_EVENT); return; }
+  if (pipeline.events_emitted != seen_events) { seen_events = pipeline.events_emitted; quiet_windows = 0u; post_capture_open(); mode_event(ZS_MODE_EV_DSP_DONE_EVENT); return; }
   if (level == ZS_PRESENCE_NONE) { if (++quiet_windows >= 6u) { quiet_windows = 0u; mode_event(ZS_MODE_EV_DSP_DONE_NOTHING); } }
   else quiet_windows = 0u;
 }
@@ -469,6 +509,7 @@ static void outbox_retry_tick(void) {
    degraded after 3: the S3 watchdog drops from 180 s to 60 s so a dead network costs less modem time per retry,
    and the route hint switches to LoRa for the phase-2 transport; a completed session restores everything. */
 static unsigned comms_fail_streak, degraded_after = 3u; static bool gsm_degraded;
+static uint32_t comms_max_base_ms = 180000u;               /* + 300 s while an audio upload runs (mirrors tasks.c) */
 static uint32_t gsm_probe_ms = 1800000u, last_s3_exit_ms;   /* while degraded: probe GSM every 30 min (S3 capped at 60 s) */
 /* LoRa duty: while the route hint is LoRa the uplink drains the outbox regardless of the mode (the radio is cheap:
    no S3 needed); a delivered outbox resets the outbox retry so S3 is not re-entered for events LoRa has sent. */
@@ -482,9 +523,9 @@ static void lora_step(void) {
 }
 static void comms_health_on_s3_exit(bool done) {
   last_s3_exit_ms = sim_now;
-  if (done) { comms_fail_streak = 0u; if (gsm_degraded) { gsm_degraded = false; modes.policy.comms_max_ms = 180000u; tlog("comms: link healthy again, S3 watchdog 180 s"); } return; }
+  if (done) { comms_fail_streak = 0u; if (gsm_degraded) { gsm_degraded = false; comms_max_base_ms = 180000u; tlog("comms: link healthy again, S3 watchdog 180 s"); } return; }
   comms_fail_streak++;
-  if (!gsm_degraded && comms_fail_streak >= degraded_after) { gsm_degraded = true; modes.policy.comms_max_ms = 60000u; tlog("comms: DEGRADED after %u failed sessions -> S3 watchdog 60 s, route hint LoRa", comms_fail_streak); }
+  if (!gsm_degraded && comms_fail_streak >= degraded_after) { gsm_degraded = true; comms_max_base_ms = 60000u; tlog("comms: DEGRADED after %u failed sessions -> S3 watchdog 60 s, route hint LoRa", comms_fail_streak); }
 }
 
 static void gsm_probe_tick(void) {
@@ -507,6 +548,7 @@ static void params_apply(const zs_station_params_t *p) {
   modes.policy.heartbeat_period_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_HEARTBEAT_PERIOD_S) * 1000u;
   modes.policy.listen_dwell_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_LISTEN_DWELL_S) * 1000u;
   pipeline_port.channel = (uint8_t)zs_station_params_get(p, ZS_PARAM_MIC_CHANNEL);
+  if (recorder.channel != pipeline_port.channel) { const bool on = capture_on; capture_set(false); recorder.channel = pipeline_port.channel; capture_set(on); }
   pipeline_port.update_period_windows = (uint8_t)zs_station_params_get(p, ZS_PARAM_EVENT_UPDATE_WINDOWS);
   degraded_after = (unsigned)zs_station_params_get(p, ZS_PARAM_COMMS_DEGRADED_AFTER);
   gsm_probe_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_GSM_PROBE_S) * 1000u;
@@ -524,6 +566,8 @@ static bool twin_execute(void *ctx, const zs_command_t *cmd, zs_command_ack_resu
     const uint32_t delay_s = cmd->reboot.delay_s > 5u ? cmd->reboot.delay_s : 5u;
     reboot_pending = true; reboot_at_ms = sim_now + delay_s * 1000u; cmd_reboots_scheduled++;
     tlog("command: REBOOT in %lu s", (unsigned long)delay_s);
+  } else if (cmd->code == ZS_COMMAND_REQUEST_AUDIO) {
+    if (!app_comms_request_audio(cmd, result, detail)) { tlog("command: REQUEST_AUDIO accepted, upload follows"); return false; }
   } else { *result = ZS_COMMAND_ACK_REJECTED; *detail = 1u; }
   if (*result == ZS_COMMAND_ACK_OK) cmd_executed++; else cmd_rejected++;
   return true;
@@ -552,19 +596,22 @@ static void supervisor_tick(void) {
   gsm_probe_tick();
   for (unsigned ev = 1u; ev < 32u; ev++) if (mode_bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, sim_now);
   mode_bits = 0u;
+  modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? 300000u : 0u);
   (void)zs_mode_tick(&modes, sim_now);
+  if (capture_on && !capture_wanted(modes.mode)) capture_set(false);   /* the post-event window closed */
   if (modes.mode != last) {
     const zs_mode_power_t p = zs_mode_power_for(modes.mode);
     tlog("mode %s -> %s", zs_mode_name(last), zs_mode_name(modes.mode));
     if (last == ZS_MODE_S3_COMMS) comms_health_on_s3_exit(modes.journal[(modes.journal_head + ZS_MODE_JOURNAL_DEPTH - 1u) % ZS_MODE_JOURNAL_DEPTH].event == ZS_MODE_EV_COMMS_DONE);
     bsp_gpio_mic_rail(p.mic_1v8);
     app_comms_allow_modem(p.modem);
+    capture_set(capture_wanted(modes.mode));
     last = modes.mode;
   }
 }
 
 static void audio_tick(void) {
-  const bool mdf_on = zs_mode_power_for(modes.mode).mdf_clock;
+  const bool mdf_on = capture_on;
   float acc = 0.0f;
   for (unsigned i = 0u; i < TICK_FRAMES; i++) {
     const float v = scene_next(&scene);
@@ -580,12 +627,13 @@ static void audio_tick(void) {
   if ((modes.mode == ZS_MODE_S1_LISTEN || modes.mode == ZS_MODE_S2_DSP) && zs_station_pipeline_fetch(&pipeline, &ring)) {
     while (pipeline.pending) { (void)zs_station_pipeline_run_pending(&pipeline); dsp_mode_events(); }
   }
+  (void)zs_audio_recorder_step(&recorder, &ring, ring.total_frames, 32000u);
 }
 
 int main(int argc, char **argv) {
   const char *scene_name = "drone", *server_cmd = NULL;
   uint32_t seconds = 120u, seed = 1u, outage_start = 0u, outage_end = 0u;
-  int expect_events = -1, expect_delivered = -1, expect_commands = -1, expect_reboots = -1;
+  int expect_events = -1, expect_delivered = -1, expect_commands = -1, expect_reboots = -1, expect_post_audio = -1;
   zs_station_config_t cfg;
   static scene_segment_t segs[4]; size_t nseg = 0u;
   for (int i = 1; i < argc; i++) {
@@ -609,7 +657,8 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--inject-events") && i + 2 < argc) { inject_count = (unsigned)atoi(argv[++i]); inject_at_ms = (uint32_t)atoi(argv[++i]) * 1000u; }
     else if (!strcmp(argv[i], "--expect-commands") && i + 1 < argc) expect_commands = atoi(argv[++i]);
     else if (!strcmp(argv[i], "--expect-reboots") && i + 1 < argc) expect_reboots = atoi(argv[++i]);
-    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N]\n"); return 2; }
+    else if (!strcmp(argv[i], "--expect-post-audio") && i + 1 < argc) expect_post_audio = atoi(argv[++i]);
+    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S]\n"); return 2; }
   }
   if (!strcmp(scene_name, "drone")) { segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 20000u, 60000u, 185.0f, 1.0f}; if (seconds > 150u) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 100000u, 130000u, 210.0f, 0.8f}; }
   else if (!strcmp(scene_name, "ground")) segs[nseg++] = (scene_segment_t){SCENE_GROUND_VEHICLE, 20000u, 60000u, 0.0f, 1.0f};
@@ -619,6 +668,8 @@ int main(int argc, char **argv) {
   if (server_cmd && !link_start(server_cmd)) { fprintf(stderr, "cannot start the server twin\n"); return 3; }
   memset(outbox_mem, 0xff, sizeof(outbox_mem)); memset(journal_mem, 0xff, sizeof(journal_mem));
   zs_audio_ring_init(&ring, ring_storage, RING_FRAMES, 32000u);
+  memset(pre_flash, 0xff, sizeof(pre_flash));
+  assert(zs_prehistory_init(&prehistory, &pre_storage, 0u, sizeof(pre_flash), 32000u) && zs_audio_recorder_init(&recorder, &prehistory, pl_sample_time, NULL));
   zs_dsp_mcu_init(&dsp_ctx);
   { size_t work; zs_complex_t *scratch = zs_dsp_mcu_borrow_work(&work); assert(work >= ZS_AIR_SCRATCH_COMPLEX); assert(zs_station_pipeline_init(&pipeline, &pipeline_port, scratch, window_pcm)); }
   zs_station_config_defaults(&cfg, 17u, ZS_STATION_CONFIG_REGION_RU868);
@@ -635,6 +686,7 @@ int main(int argc, char **argv) {
   app_comms_set_command_key(zs_command_set_vector_public_key);
   app_comms_set_clock(twin_clock);
   app_comms_set_executor(twin_execute, NULL);
+  app_comms_set_audio_source(&audio_source);
   app_comms_bind(&outbox_io, &journal_io, &hooks);
   app_comms_set_config(&cfg, 5u);
   app_comms_request(true);
@@ -666,12 +718,22 @@ int main(int argc, char **argv) {
     if (lora_enabled) tlog("twin: lora frames %u acks %u timeouts %u budget waits %u airtime %lu ms", lora.frames_sent, lora.acks, lora.ack_timeouts, lora.budget_waits, (unsigned long)lora.airtime_ms_total);
     tlog("twin: commands executed %u rejected %u, reboots scheduled %u done %u, params v%lu", cmd_executed, cmd_rejected, cmd_reboots_scheduled, twin_reboots, (unsigned long)params.version);
   }
+  /* prehistory around the first event: complete seconds recorded before it and after it (the post-event window) */
+  unsigned audio_before = 0u, audio_after = 0u;
+  {
+    zs_prehistory_record_info_t info;
+    for (uint64_t s = prehistory.next_sequence - prehistory.available_records; s < prehistory.next_sequence; s++)
+      if (first_event_time_us && zs_prehistory_read_record_info(&prehistory, s, &info)) { if (info.start_time_us >= first_event_time_us) audio_after++; else audio_before++; }
+    tlog("twin: rec committed %u aborted %u overruns %u errors %u, ring holds %u s; around the first event: %u s before, %u s after",
+         recorder.frames_committed, recorder.frames_aborted, recorder.overruns, recorder.storage_errors, (unsigned)prehistory.available_records, audio_before, audio_after);
+  }
   {
     uint16_t pending = 0u;
     (void)zs_event_outbox_pending_count(&outbox_io, &pending);
     if (expect_events >= 0 && (int)events_emitted_total < expect_events) { tlog("twin: FAIL expected >= %d events, got %u", expect_events, events_emitted_total); return 1; }
     if (expect_delivered >= 0 && ((int)(link_receipts + lora.acks) < expect_delivered || pending != 0u)) { tlog("twin: FAIL expected %d delivered events with an empty outbox (mqtt receipts %u, lora acks %u, pending %u)", expect_delivered, link_receipts, lora.acks, pending); return 1; }
     if (expect_commands >= 0 && (int)cmd_executed != expect_commands) { tlog("twin: FAIL expected %d executed commands, got %u", expect_commands, cmd_executed); return 1; }
+    if (expect_post_audio >= 0 && (int)audio_after < expect_post_audio) { tlog("twin: FAIL expected >= %d s of audio after the event, got %u", expect_post_audio, audio_after); return 1; }
     if (expect_reboots >= 0 && ((int)twin_reboots != expect_reboots || (int)cmd_reboots_scheduled != expect_reboots)) { tlog("twin: FAIL expected %d reboots (scheduled %u, done %u)", expect_reboots, cmd_reboots_scheduled, twin_reboots); return 1; }
   }
   if (link_out >= 0) { link_report(); fcntl(link_in, F_SETFL, fcntl(link_in, F_GETFL) & ~O_NONBLOCK); close(link_out); for (;;) { ssize_t r = read(link_in, link_buf + link_len, sizeof(link_buf) - 1u - link_len); if (r <= 0) break; link_len += (size_t)r; } link_buf[link_len] = 0; { char *p = strstr(link_buf, "REPORT "); if (p) printf("SERVER %s", p + 7); } waitpid(server_pid, NULL, 0); }

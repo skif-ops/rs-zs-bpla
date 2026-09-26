@@ -2,7 +2,7 @@
 
 Certificate CN (= station serial) is the mosquitto username
 (``use_identity_as_username true``).  Topics follow MQTT_TLS_ICD v0.1:
-``zs/v1/{tenant}/{station_id}/{up|status|down|ack|receipt}``.
+``zs/v1/{tenant}/{station_id}/{up|status|down|ack|receipt|audio}`` (audio: addendum B).
 """
 
 from __future__ import annotations
@@ -20,6 +20,7 @@ def station_topics(row: StationRow) -> list[tuple[str, str]]:
         ("read", f"{base}/down"),
         ("write", f"{base}/ack"),
         ("read", f"{base}/receipt"),
+        ("write", f"{base}/audio"),
     ]
 
 
@@ -39,6 +40,7 @@ def render_acl(registry: Registry, bridge_user: str = BRIDGE_USER) -> str:
             f"topic write zs/v1/{tenant}/+/down",
             f"topic read zs/v1/{tenant}/+/ack",
             f"topic write zs/v1/{tenant}/+/receipt",
+            f"topic read zs/v1/{tenant}/+/audio",
         ]
     lines.append("")
     for row in registry.active():

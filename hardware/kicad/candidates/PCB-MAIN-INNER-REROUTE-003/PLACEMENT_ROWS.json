@@ -1,0 +1,23 @@
+[
+ {
+  "RefDes": "R9",
+  "X_mm": 60.5,
+  "Y_mm": 19.75,
+  "Rotation_deg": 90,
+  "reason": "PCB-MAIN 003: OCTOSPI resistor row in U1 pin order (IO0, IO1, IO2 right of R8)"
+ },
+ {
+  "RefDes": "R10",
+  "X_mm": 62.0,
+  "Y_mm": 19.75,
+  "Rotation_deg": 90,
+  "reason": "PCB-MAIN 003: OCTOSPI resistor row in U1 pin order (IO0, IO1, IO2 right of R8)"
+ },
+ {
+  "RefDes": "R11",
+  "X_mm": 63.5,
+  "Y_mm": 19.75,
+  "Rotation_deg": 90,
+  "reason": "PCB-MAIN 003: OCTOSPI resistor row in U1 pin order (IO0, IO1, IO2 right of R8)"
+ }
+]

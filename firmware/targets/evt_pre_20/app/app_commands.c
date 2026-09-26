@@ -1,4 +1,5 @@
 #include "app_commands.h"
+#include "app_comms.h"
 #include "app_config.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -49,6 +50,9 @@ bool app_commands_execute(void *ctx, const zs_command_t *cmd, zs_command_ack_res
       break;
     }
     case ZS_COMMAND_REQUEST_AUDIO:
+      /* addendum B: answered now (refusal) or accepted: the upload runs in the session, the ACK follows it */
+      if (!app_comms_request_audio(cmd, result, detail)) return false;
+      break;
     default:
       *result = ZS_COMMAND_ACK_REJECTED;
       *detail = 1u;                                   /* not implemented on this station yet */

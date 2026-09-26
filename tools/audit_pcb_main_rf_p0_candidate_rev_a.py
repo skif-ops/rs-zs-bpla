@@ -8,12 +8,15 @@ import hashlib
 import json
 import math
 from collections import Counter, defaultdict
+import sys
 from pathlib import Path
 
 from kiutils.board import Board
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
 BASE = (
     ROOT
     / "hardware/kicad/candidates/PCB-MAIN-RF-P0-001"
@@ -24,7 +27,7 @@ CANDIDATE = (
     / "hardware/kicad/candidates/PCB-MAIN-RF-P0-001"
     / "PCB-MAIN_RF_P0_CANDIDATE_REV_A.kicad_pcb"
 )
-ACTIVE = ROOT / "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
+ACTIVE = _lineage.historical_board()
 ACTIVE_COMPOSED = (
     ROOT / "hardware/kicad/candidates/PCB-MAIN-RF-REMEDIATION-APPLICATION-001/"
     "PCB-MAIN_RF_REMEDIATION_COMPOSED_REV_A.kicad_pcb"

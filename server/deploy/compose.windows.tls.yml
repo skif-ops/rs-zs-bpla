@@ -14,6 +14,8 @@ services:
     build:
       context: ..
     restart: unless-stopped
+    environment:
+      ZS_OPERATOR_TRUSTED_PROXY: "1"          # 8000 is bound to 127.0.0.1: only the local HTTPS proxy / SSH tunnel reach it
     ports:
       - "127.0.0.1:8000:8000"
     volumes:

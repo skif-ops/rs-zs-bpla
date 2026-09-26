@@ -599,7 +599,7 @@
       "routing_constraint_status": "PASS_ALL_186_NETS_CLASSIFIED_EVT_STACKUP_ACCEPTED_RF_REMEDIATION_REPEAT_REVIEW_PASS_REMAINING_ROUTING_PENDING",
       "routing_constraint_control": {
         "state": "PASS_CONSTRAINT_COVERAGE_ACCEPTED_RF_REMEDIATIONS_USB_MCU_SOURCE_CELL_MODEM_AND_CELL_FIXTURE_APPLIED",
-        "board_sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273",
+        "board_sha256": "30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739",
         "authority_sha256": "36da48a6614de40bed1b52cb53b0b6a1367fabf0e0504e8c0f4297c5b962f6f0",
         "net_count": 186,
         "class_counts": {
@@ -632,8 +632,8 @@
         "rf_50ohm_net_count": 7,
         "usb_90ohm_pair_count": 4,
         "cross_domain_review_net_count": 18,
-        "trace_items": 1023,
-        "copper_zones": 8,
+        "trace_items": 1069,
+        "copper_zones": 10,
         "ground_domain_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "signal_hard_nets_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
         "octospi_r8_eco_002_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE",
@@ -645,6 +645,7 @@
         "usb_mcu_source_routing_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
         "usb_cell_modem_routing_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
         "usb_cell_fixture_routing_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
+        "inner_reroute_003_subgate": "APPLIED_EXACT_ACCEPTED_CANDIDATE_COMMIT_BOUND_GATE_PASS",
         "factory_stackup": "EVT_JLC06161H_3313_ACCEPTED_CHECKOUT_DFM_REQUIRED",
         "routing_complete": false,
         "manufacturing_release": false

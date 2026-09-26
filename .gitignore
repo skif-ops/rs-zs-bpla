@@ -12,6 +12,11 @@ firmware/build*/
 
 # Runtime data
 server/data/*.sqlite3
+server/data/*.sqlite3-*
+# operator accounts, session key and uploaded event audio: secrets and recordings, never in Git
+server/data/operators.json
+server/data/operator_session.key
+server/data/audio/
 server/output/
 server/uploads/
 .env

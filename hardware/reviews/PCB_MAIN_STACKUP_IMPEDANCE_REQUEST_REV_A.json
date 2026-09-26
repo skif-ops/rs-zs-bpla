@@ -139,9 +139,9 @@
   },
   "active_native_routing_state": {
     "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
-    "board_sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273",
-    "trace_items": 1023,
-    "copper_zones": 8,
+    "board_sha256": "30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739",
+    "trace_items": 1069,
+    "copper_zones": 10,
     "routing_complete": false,
     "manufacturing_release": false
   }

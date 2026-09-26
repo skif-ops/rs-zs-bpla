@@ -13,6 +13,7 @@ import hashlib
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +21,8 @@ from kiutils.board import Board
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
 NATIVE_BOARD_BINDING = "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb"
 ACTIVE_BOARD = ROOT / NATIVE_BOARD_BINDING
 BOARD = (
@@ -33,7 +36,7 @@ GROUND_APPLICATION = (
 RULES = ROOT / "hardware/kicad/PCB_RULES.md"
 LAYER_AUTHORITY = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
 MECHANICAL = ROOT / "hardware/PCB_MAIN_MECHANICAL_PLACEMENT_AUTHORITY_REV_A.csv"
-PLACEMENT = ROOT / "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv"
+PLACEMENT = _lineage.historical_placement()
 ROUTING = ROOT / "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv"
 ROUTING_RECORD = ROOT / "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.md"
 STATUS = ROOT / "hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json"

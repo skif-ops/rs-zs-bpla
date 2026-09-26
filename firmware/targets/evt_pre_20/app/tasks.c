@@ -10,12 +10,14 @@
  *   comms       - app_comms: BG95 bring-up from the station configuration, MQTT session, outbox drain + heartbeat (B2)
  *   power       - app_power: INA226 on I2C2 every second -> power snapshot for heartbeat, events and the self-test
  *   lora        - app_lora: SX1262 fallback uplink of the outbox while the GSM link is degraded (DRY until the RF gate)
+ *   rec         - app_audio_rec: mono audio from the capture ring into the NOR prehistory ring (addendum B)
  */
 #include "tasks.h"
 
 #include "FreeRTOS.h"
 #include "app_config.h"
 #include "app_comms.h"
+#include "app_audio_rec.h"
 #include "app_commands.h"
 #include "app_lora.h"
 #include "app_watchdog.h"
@@ -66,7 +68,7 @@ static zs_dsp_ctx_t dsp_ctx;
 static zs_station_pipeline_t pipeline;
 static uint32_t pipeline_last_ms, pipeline_max_ms, pipeline_events_ram;
 
-static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task, ble_task, dsp_task, comms_task, power_task, lora_task;
+static TaskHandle_t audio_task, supervisor_task, console_task, gnss_task, ble_task, dsp_task, comms_task, power_task, lora_task, rec_task;
 
 /* ---- ISR notifications ----------------------------------------------------- */
 void app_audio_block_notify_from_isr(void) {
@@ -147,13 +149,28 @@ static zs_selftest_code_t st_rtc_lse(void *ctx, uint32_t *detail) {
   return (RCC->BDCR & RCC_BDCR_LSERDY) ? ZS_ST_PASS : ZS_ST_FAIL;
 }
 
+/* Capture pauses: the sample counter stops with the PDM clock while time goes on.  The supervisor measures each
+   pause (capture_set) and the audio task applies it to the time mapping and the PPS binder before it touches the
+   first block after the restart (zs_time_on_capture_gap / zs_pps_sync_on_capture_gap). */
+static volatile uint32_t capture_gap_pending_ms;
+static void apply_capture_gap(void) {
+  uint32_t gap;
+  taskENTER_CRITICAL();                              /* the MDF block ISR also writes the PPS marks */
+  gap = capture_gap_pending_ms;
+  capture_gap_pending_ms = 0u;
+  if (gap) { zs_time_on_capture_gap(&time_sync, (int64_t)gap * 1000); zs_pps_sync_on_capture_gap(&pps); }
+  taskEXIT_CRITICAL();
+}
+
 /* ---- tasks ------------------------------------------------------------------ */
 static void audio_task_fn(void *arg) {
   (void)arg;
   for (;;) {
     ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
     app_watchdog_checkin(APP_WD_AUDIO);
+    apply_capture_gap();
     while (zs_pdm_capture_process(&capture)) {}
+    app_audio_rec_notify();                        /* the recorder follows the capture ring */
     (void)zs_pps_sync_poll(&pps, bsp_tim2_pps_now());
     (void)zs_time_update(&time_sync, zs_pdm_capture_sample_counter(&capture));
     /* listen/detection duty (S1 and S2 keep the PDM clock): copy the next complete window out of the ring while it is
@@ -173,6 +190,11 @@ static bool pl_emit(void *ctx, const zs_detection_t *d);
 static zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, APP_STATION_ID, APP_BOOT_ID, 0u, 0u};
 static uint32_t boot_id = APP_BOOT_ID;
 
+/* Capture after an event: S3 and S0 stop the PDM clock, so without this the 30 s after a detection (the post-event
+   audio segment of addendum B) would never be recorded.  Set by the DSP task, read by the supervisor. */
+static volatile uint32_t post_capture_until_ms;
+static void post_capture_open(void) { post_capture_until_ms = xTaskGetTickCount() + APP_AUDIO_POST_EVENT_MS; }
+
 /* Mode events from the pipeline: level 1 SUSPECT or above in S1 opens S2 (gate positive); in S2 an emitted event
    moves to S3 (outbox has data) and APP_DSP_QUIET_WINDOWS windows of NONE end the DSP duty. */
 static void dsp_mode_events(void) {
@@ -182,11 +204,11 @@ static void dsp_mode_events(void) {
   if (modes.mode == ZS_MODE_S1_LISTEN) {
     quiet_windows = 0u;
     if (level >= ZS_PRESENCE_SUSPECT) mode_event(ZS_MODE_EV_GATE_POSITIVE);
-    if (pipeline.events_emitted != seen_events) { seen_events = pipeline.events_emitted; mode_event(ZS_MODE_EV_OUTBOX_PENDING); }
+    if (pipeline.events_emitted != seen_events) { seen_events = pipeline.events_emitted; post_capture_open(); mode_event(ZS_MODE_EV_OUTBOX_PENDING); }
     return;
   }
   if (modes.mode != ZS_MODE_S2_DSP) { quiet_windows = 0u; seen_events = pipeline.events_emitted; return; }
-  if (pipeline.events_emitted != seen_events) { seen_events = pipeline.events_emitted; quiet_windows = 0u; mode_event(ZS_MODE_EV_DSP_DONE_EVENT); return; }
+  if (pipeline.events_emitted != seen_events) { seen_events = pipeline.events_emitted; quiet_windows = 0u; post_capture_open(); mode_event(ZS_MODE_EV_DSP_DONE_EVENT); return; }
   if (level == ZS_PRESENCE_NONE) { if (++quiet_windows >= APP_DSP_QUIET_WINDOWS) { quiet_windows = 0u; mode_event(ZS_MODE_EV_DSP_DONE_NOTHING); } }
   else quiet_windows = 0u;
 }
@@ -206,11 +228,37 @@ static void dsp_task_fn(void *arg) {
   }
 }
 
+/* The PDM capture: on where the mode table says so, and in any mode but SHUTDOWN during the post-event window (S3,
+   and the S0 that may follow it, would otherwise cut the post-event segment short; the window costs 30 s without
+   deep sleep per event).  Every start/stop is told to the recorder, which keeps only complete, continuous seconds. */
+static bool capture_on, capture_was_stopped;
+static uint32_t capture_stopped_ms;
+static bool capture_wanted(zs_mode_t mode) {
+  return zs_mode_power_for(mode).mdf_clock || (mode != ZS_MODE_SHUTDOWN && (int32_t)(xTaskGetTickCount() - post_capture_until_ms) < 0);
+}
+static void capture_set(bool on) {
+  if (on == capture_on) return;
+  capture_on = on;
+  if (on) {
+    if (capture_was_stopped) {                       /* the pause, before the first block after the restart */
+      taskENTER_CRITICAL();
+      capture_gap_pending_ms += xTaskGetTickCount() - capture_stopped_ms;
+      taskEXIT_CRITICAL();
+    }
+    (void)bsp_mdf_start();
+  } else {
+    bsp_mdf_stop();
+    capture_stopped_ms = xTaskGetTickCount();
+    capture_was_stopped = true;
+  }
+  app_audio_rec_capture(on);
+}
+
 static void apply_power(zs_mode_t mode) {
   zs_mode_power_t p = zs_mode_power_for(mode);
   bsp_gpio_mic_rail(p.mic_1v8);
   app_comms_allow_modem(p.modem);                 /* EN_MODEM belongs to the comms task (graceful off, dual-SIM sequence) */
-  if (p.mdf_clock) (void)bsp_mdf_start(); else bsp_mdf_stop();
+  capture_set(capture_wanted(mode));
   /* clock profile switching (S0 STOP2 etc.) lands with the low-power work; B1 keeps 160 MHz */
   (void)zs_mode_clock_profile(mode);
 }
@@ -245,6 +293,9 @@ static void outbox_retry_tick(uint32_t now) {
    session restores the defaults. */
 static unsigned comms_fail_streak;
 static bool gsm_degraded;
+/* S3 watchdog = this base (default, or APP_COMMS_MAX_DEGRADED_MS while degraded) + APP_AUDIO_UPLOAD_MAX_MS while an
+   audio upload runs (the supervisor applies it every tick). */
+static uint32_t comms_max_base_ms;
 /* runtime parameters (CMD_SET_PARAMS, zs_station_params); compile-time values until the record is applied */
 static unsigned comms_degraded_after = APP_COMMS_DEGRADED_AFTER;
 static uint32_t gsm_probe_ms = APP_GSM_PROBE_MS;
@@ -260,11 +311,11 @@ static void gsm_probe_tick(uint32_t now) {
 }
 static void comms_health_on_s3_exit(bool done) {
   last_s3_exit_ms = xTaskGetTickCount();
-  if (done) { comms_fail_streak = 0u; if (gsm_degraded) { gsm_degraded = false; modes.policy.comms_max_ms = zs_mode_policy_default().comms_max_ms; app_lora_set_route_hint(false); console_printf("comms: link healthy again\r\n"); } return; }
+  if (done) { comms_fail_streak = 0u; if (gsm_degraded) { gsm_degraded = false; comms_max_base_ms = zs_mode_policy_default().comms_max_ms; app_lora_set_route_hint(false); console_printf("comms: link healthy again\r\n"); } return; }
   comms_fail_streak++;
   if (!gsm_degraded && comms_fail_streak >= comms_degraded_after) {
     gsm_degraded = true;
-    modes.policy.comms_max_ms = APP_COMMS_MAX_DEGRADED_MS;
+    comms_max_base_ms = APP_COMMS_MAX_DEGRADED_MS;
     app_lora_set_route_hint(true);
     console_printf("comms: DEGRADED after %u failed sessions, S3 watchdog %lu s, route hint lora\r\n", comms_fail_streak, (unsigned long)(APP_COMMS_MAX_DEGRADED_MS / 1000u));
   }
@@ -277,6 +328,7 @@ static void params_apply(const zs_station_params_t *p) {
   modes.policy.heartbeat_period_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_HEARTBEAT_PERIOD_S) * 1000u;
   modes.policy.listen_dwell_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_LISTEN_DWELL_S) * 1000u;
   pipeline_port.channel = (uint8_t)zs_station_params_get(p, ZS_PARAM_MIC_CHANNEL);
+  app_audio_rec_set_channel(pipeline_port.channel);                       /* the prehistory records the analysed channel */
   pipeline_port.update_period_windows = (uint8_t)zs_station_params_get(p, ZS_PARAM_EVENT_UPDATE_WINDOWS);
   comms_degraded_after = (unsigned)zs_station_params_get(p, ZS_PARAM_COMMS_DEGRADED_AFTER);
   gsm_probe_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_GSM_PROBE_S) * 1000u;
@@ -288,10 +340,11 @@ static void supervisor_task_fn(void *arg) {
   bool tamper_fired = false;
   (void)arg;
   zs_mode_init(&modes, NULL, xTaskGetTickCount());
+  comms_max_base_ms = modes.policy.comms_max_ms;
   params_apply(app_commands_params());             /* the init reset the policy: re-apply the stored parameters */
   bsp_gpio_mic_rail(true);
   vTaskDelay(pdMS_TO_TICKS(50));                 /* 1V8_MIC settle before the PDM clock */
-  (void)bsp_mdf_start();
+  capture_set(true);
   vTaskDelay(pdMS_TO_TICKS(300));                /* let the capture stabilise for the self-tests */
   if (zs_selftest_run_all(&selftests, xTaskGetTickCount())) {
     (void)zs_mode_on_event(&modes, ZS_MODE_EV_BOOT_DONE, xTaskGetTickCount());
@@ -307,9 +360,11 @@ static void supervisor_task_fn(void *arg) {
     (void)xTaskNotifyWait(0u, UINT32_MAX, &bits, pdMS_TO_TICKS(100));
     now = xTaskGetTickCount();
     for (unsigned ev = 1u; ev < 32u; ev++) if (bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, now);
+    modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? APP_AUDIO_UPLOAD_MAX_MS : 0u);
     (void)zs_mode_tick(&modes, now);
     app_watchdog_service();
     app_commands_tick(now);
+    if (capture_on && !capture_wanted(modes.mode)) capture_set(false);   /* the post-event window closed */
     outbox_retry_tick(now);
     gsm_probe_tick(now);
     if (bsp_gpio_power_fault()) (void)zs_mode_on_event(&modes, ZS_MODE_EV_FAULT, now);
@@ -393,7 +448,7 @@ static uint8_t pos_slots[ZS_INSTALLATION_STORE_SLOT_COUNT][ZS_INSTALLATION_STORE
 static uint32_t service_started_ms, ble_audit_events;
 static zs_nor_t nor;
 static zs_nor_storage_bindings_t nor_bindings;
-static zs_archive_storage_t nor_archive_storage;      /* handed to the prehistory archive with the rest of B3 */
+static zs_archive_storage_t nor_archive_storage;      /* the audio prehistory ring (app_audio_rec) */
 static zs_command_journal_io_t nor_command_io;
 static zs_event_outbox_io_t nor_outbox_io;
 static zs_boot_counter_t boot_counter;
@@ -566,6 +621,10 @@ static void bind_record_stores(void) {
       }
     }
     app_comms_bind(&nor_outbox_io, &nor_command_io, &comms_hooks);        /* comms needs the durable stores */
+    /* audio prehistory: the archive region at the start of the NOR map (event slots after it stay unused for now) */
+    if (app_audio_rec_bind(&nor_archive_storage, nor_bindings.layout.archive.base_address, nor_bindings.layout.archive.prehistory_ring_bytes,
+                           &audio_ring, pl_sample_time, console_printf))
+      app_comms_set_audio_source(app_audio_rec_source());                 /* CMD_REQUEST_AUDIO can now be served */
     app_lora_bind(&nor_outbox_io, APP_STATION_ID, secrets.engineer_key_set ? secrets.engineer_key : NULL, console_printf);
     { uint16_t pending = 0u; if (zs_event_outbox_pending_count(&nor_outbox_io, &pending) == ZS_EVENT_OUTBOX_OK && pending > 0u) { console_printf("outbox: %u events pending from before the reboot\r\n", pending); mode_event(ZS_MODE_EV_OUTBOX_PENDING); } }
     /* B3 boot counter: one erase block before the nRF image; every power cycle gets a new boot_id so event ids never repeat */
@@ -605,6 +664,13 @@ static bool pl_emit(void *ctx, const zs_detection_t *d) {
   with_power = *d;
   (void)app_power_snapshot(&with_power.power);                            /* battery bus/current/power of the moment */
   with_power.route.transport = ZS_ROUTE_LTE;
+  /* the quality of the event time (fusion weights it; the server skips audio requests it knows would be refused) */
+  with_power.gnss.time_trust = (uint8_t)time_sync.trust;
+  with_power.gnss.expected_time_error_us = time_sync.expected_error_us;
+  with_power.gnss.pps_ok = time_sync.pps_ok;
+  with_power.gnss.time_holdover = time_sync.trust == ZS_TIME_TRUST_HOLDOVER;
+  app_audio_rec_note_event(d->event_id, d->event_time_us,                 /* CMD_REQUEST_AUDIO finds its audio by this */
+                           time_sync.trust == ZS_TIME_TRUST_GNSS_TRUSTED || time_sync.trust == ZS_TIME_TRUST_HOLDOVER);
   if (!stores_on_nor) { pipeline_events_ram++; return true; }
   app_lora_remember_event(d->event_id, d->classification.class_id, d->classification.confidence_u8, pipeline.presence.level, (uint16_t)pipeline.last_gate.f0_hz);
   return zs_event_outbox_enqueue_detection(&nor_outbox_io, &with_power, 2u, workspace, sizeof(workspace)) == ZS_EVENT_OUTBOX_OK;
@@ -755,6 +821,8 @@ static void console_exec(const char *cmd) {
     console_printf((!secrets_on_nor || zs_station_secrets_clear(&secrets_io) == ZS_STATION_SECRETS_OK) ? "secrets: cleared (sim iccids apply after reboot)\r\n" : "secrets: nor clear failed\r\n");
   } else if (strcmp(cmd, "power") == 0) {
     app_power_status(console_printf);
+  } else if (strcmp(cmd, "rec") == 0) {
+    app_audio_rec_status(console_printf);
   } else if (strcmp(cmd, "cmds") == 0) {
     app_commands_status(console_printf);
   } else if (strcmp(cmd, "clock") == 0) {
@@ -766,8 +834,8 @@ static void console_exec(const char *cmd) {
     app_watchdog_status(console_printf);
   } else if (strncmp(cmd, "wdtest ", 7u) == 0) {
     const int t = atoi(cmd + 7);
-    if (t >= (int)APP_WD_AUDIO && t <= (int)APP_WD_GNSS) { app_watchdog_simulate_stall((app_wd_task_t)t); console_printf("wdtest: task %d stops checking in, reset expected within %lu s\r\n", t, (unsigned long)((APP_WATCHDOG_WINDOW_MS * 2u + APP_WATCHDOG_TIMEOUT_MS) / 1000u)); }
-    else console_printf("wdtest <1..7>: 1 audio 2 dsp 3 comms 4 ble 5 power 6 lora 7 gnss\r\n");
+    if (t >= (int)APP_WD_AUDIO && t <= (int)APP_WD_REC) { app_watchdog_simulate_stall((app_wd_task_t)t); console_printf("wdtest: task %d stops checking in, reset expected within %lu s\r\n", t, (unsigned long)((APP_WATCHDOG_WINDOW_MS * 2u + APP_WATCHDOG_TIMEOUT_MS) / 1000u)); }
+    else console_printf("wdtest <1..8>: 1 audio 2 dsp 3 comms 4 ble 5 power 6 lora 7 gnss 8 rec\r\n");
   } else if (strcmp(cmd, "lora") == 0) {
     app_lora_status(console_printf);
   } else if (strcmp(cmd, "lora on") == 0 || strcmp(cmd, "lora off") == 0) {
@@ -775,7 +843,7 @@ static void console_exec(const char *cmd) {
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] power lora [on|off] clock cmds wd wdtest heap\r\n");
+    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] power lora [on|off] clock cmds rec wd wdtest heap\r\n");
   }
 }
 
@@ -804,6 +872,12 @@ static void console_task_fn(void *arg) {
   }
 }
 
+/* Every task stack comes from the FreeRTOS heap (nothing else allocates): a new task that does not fit must fail
+   the build, not xTaskCreate at boot.  128 B per task covers the TCB and the heap_4 block header. */
+#define APP_TASK_STACK_WORDS (APP_STACK_AUDIO + APP_STACK_SUPERVISOR + APP_STACK_SERVICE + APP_STACK_CONSOLE + APP_STACK_BLE + APP_STACK_DSP + \
+                              APP_STACK_COMMS + APP_STACK_POWER + APP_STACK_LORA + APP_STACK_REC)
+_Static_assert(APP_TASK_STACK_WORDS * 4u + 10u * 128u + 2048u <= configTOTAL_HEAP_SIZE, "task stacks exceed the FreeRTOS heap (keep 2 KB spare)");
+
 bool app_tasks_create(void) {
   zs_pdm_config_t cfg = zs_pdm_config_default();
   cfg.block_samples = APP_AUDIO_BLOCK_SAMPLES;
@@ -831,7 +905,7 @@ bool app_tasks_create(void) {
   app_comms_set_clock(command_clock_now);
   app_comms_set_executor(app_commands_execute, NULL);
   app_watchdog_capture_reset_cause();
-  for (unsigned t = APP_WD_AUDIO; t <= APP_WD_GNSS; t++) app_watchdog_register((app_wd_task_t)t);
+  for (unsigned t = APP_WD_AUDIO; t <= APP_WD_REC; t++) app_watchdog_register((app_wd_task_t)t);
   if (xTaskCreate(audio_task_fn, "audio", APP_STACK_AUDIO, NULL, APP_PRIO_AUDIO, &audio_task) != pdPASS) return false;
   if (xTaskCreate(supervisor_task_fn, "superv", APP_STACK_SUPERVISOR, NULL, APP_PRIO_SUPERVISOR, &supervisor_task) != pdPASS) return false;
   if (xTaskCreate(gnss_task_fn, "gnss", APP_STACK_SERVICE, NULL, APP_PRIO_SERVICE, &gnss_task) != pdPASS) return false;
@@ -841,5 +915,6 @@ bool app_tasks_create(void) {
   if (xTaskCreate(comms_task_fn, "comms", APP_STACK_COMMS, NULL, APP_PRIO_COMMS, &comms_task) != pdPASS) return false;
   if (xTaskCreate(app_power_task, "power", APP_STACK_POWER, NULL, APP_PRIO_POWER, &power_task) != pdPASS) return false;
   if (xTaskCreate(app_lora_task, "lora", APP_STACK_LORA, NULL, APP_PRIO_LORA, &lora_task) != pdPASS) return false;
+  if (xTaskCreate(app_audio_rec_task, "rec", APP_STACK_REC, NULL, APP_PRIO_REC, &rec_task) != pdPASS) return false;
   return true;
 }

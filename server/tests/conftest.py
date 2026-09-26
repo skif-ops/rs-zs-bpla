@@ -40,3 +40,11 @@ def insecure_station_http_bench(monkeypatch):
     """Enable the legacy station HTTP transport for an isolated test only."""
 
     monkeypatch.setenv("ZS_STATION_HTTP_INSECURE_BENCH", "1")
+
+
+@pytest.fixture(autouse=True)
+def operator_auth_bench(monkeypatch):
+    """Most API tests exercise routes, not operator login: switch the operator check off for them (the exact bench
+    opt-in).  test_operator_auth.py removes it and runs with real accounts."""
+
+    monkeypatch.setenv("ZS_OPERATOR_AUTH_INSECURE_BENCH", "1")

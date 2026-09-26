@@ -1,0 +1,56 @@
+# Python part of the PCB-MAIN CI chain (KiCad-free), run by tools/apply_pcb_main_inner_reroute_003_application_rev_a.py
+tools/audit_pcb_main_capture_authority_rev_a.py
+tools/audit_pcb_main_gnss_rf_eco_001_candidate_rev_a.py --output /tmp/o/1.json
+tools/audit_pcb_main_ground_domain_routing_candidate_rev_a.py --output /tmp/o/2.json
+tools/audit_pcb_main_hierarchy_rev_a.py --output /tmp/o/3.json
+tools/audit_pcb_main_jlc06161h_3313_routing_basis_rev_a.py --output /tmp/o/4.json
+tools/audit_pcb_main_layout_candidate_rev_a.py
+tools/audit_pcb_main_mech_eco_002_rev_a.py --output /tmp/o/5.json
+tools/audit_pcb_main_mechanical_eco_candidate_rev_a.py --output /tmp/o/6.json
+tools/audit_pcb_main_native_schematic_rev_a.py --output /tmp/o/7.json
+tools/audit_pcb_main_octospi_r8_eco_application_rev_a.py --output /tmp/o/8.json
+tools/audit_pcb_main_octospi_r8_eco_candidate_rev_a.py --output /tmp/o/9.json
+tools/audit_pcb_main_placement_clearance_rev_a.py --output /tmp/o/10.json --strict
+tools/audit_pcb_main_rf_p0_application_rev_a.py --output /tmp/o/11.json
+tools/audit_pcb_main_rf_p0_candidate_rev_a.py --output /tmp/o/12.json
+tools/audit_pcb_main_rf_remediation_application_rev_a.py --output /tmp/o/13.json
+tools/audit_pcb_main_rf_return_001_candidate_rev_a.py --output /tmp/o/14.json
+tools/audit_pcb_main_rf_routeability_eco_003_rev_a.py --output /tmp/o/15.json
+tools/audit_pcb_main_routing_authority_rev_a.py --output /tmp/o/16.json
+tools/audit_pcb_main_signal_hard_nets_candidate_rev_a.py --output /tmp/o/17.json
+tools/audit_pcb_main_stackup_impedance_request_rev_a.py --output /tmp/o/18.json
+tools/audit_pcb_main_stts22h_footprint_eco_004_rev_a.py --output /tmp/o/19.json
+tools/audit_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py --output /tmp/o/20.json
+tools/audit_pcb_main_usb_cell_fixture_routing_candidate_rev_a.py --output /tmp/o/21.json
+tools/audit_pcb_main_usb_cell_modem_routing_001_application_rev_a.py --output /tmp/o/22.json
+tools/audit_pcb_main_usb_cell_modem_routing_candidate_rev_a.py --output /tmp/o/23.json
+tools/audit_pcb_main_usb_placement_eco_001_application_rev_a.py --output /tmp/o/24.json
+tools/audit_pcb_main_usb_placement_eco_001_candidate_rev_a.py --output /tmp/o/25.json
+tools/audit_pcb_main_usb_source_routing_001_application_rev_a.py --output /tmp/o/26.json
+tools/audit_pcb_main_usb_source_routing_candidate_rev_a.py --output /tmp/o/27.json
+tools/audit_pcb_main_assembler_dfm_stencil_request_rev_a.py --output /tmp/o/28.json
+tools/generate_pcb_main_manufacturer_footprints_rev_a.py --check
+tools/generate_pcb_main_placement_repack_rev_a.py --check
+tools/generate_pcb_main_rf_remediation_application_rev_a.py --check
+tools/generate_pcb_main_routing_authority_rev_a.py --check
+tools/generate_pcb_main_schematic_rev_a.py --check
+tools/generate_pcb_main_usb_cell_fixture_routing_001_application_rev_a.py --check
+tools/generate_pcb_main_usb_cell_fixture_routing_candidate_rev_a.py --check
+tools/generate_pcb_main_usb_cell_modem_routing_001_application_rev_a.py --check
+tools/generate_pcb_main_usb_cell_modem_routing_candidate_rev_a.py --check
+tools/generate_pcb_main_usb_placement_eco_001_candidate_rev_a.py --check
+tools/generate_pcb_main_usb_source_routing_candidate_rev_a.py --check
+tools/materialize_pcb_main_manufacturer_footprints_rev_a.py --check
+tools/materialize_pcb_main_verified_library_footprints_rev_a.py --check
+tools/verify_pcb_main_audio_logic_authority_rev_a.py
+tools/verify_pcb_main_ble_authority_rev_a.py
+tools/verify_pcb_main_cellular_authority_rev_a.py
+tools/verify_pcb_main_connector_fixture_authority_rev_a.py
+tools/verify_pcb_main_dual_sim_authority_rev_a.py
+tools/verify_pcb_main_gnss_authority_rev_a.py
+tools/verify_pcb_main_lora_authority_rev_a.py
+tools/verify_pcb_main_mcu_pin_authority_rev_a.py
+tools/verify_pcb_main_mechanical_placement_authority_rev_a.py
+tools/verify_pcb_main_passive_support_authority_rev_a.py
+tools/verify_pcb_main_storage_sensor_authority_rev_a.py
+tools/audit_pcb_main_inner_reroute_003_application_rev_a.py --output /tmp/o/a003.json

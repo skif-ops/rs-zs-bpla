@@ -1,0 +1,24 @@
+{
+ "schema": "dioneya-pcb-main-application-v1",
+ "proposal_id": "PCB-MAIN-INNER-REROUTE-003",
+ "decision": "ACCEPT_INNER_REROUTE_003",
+ "decided_by": "project owner, chat 2026-09-25",
+ "record": "hardware/reviews/PCB_MAIN_INNER_REROUTE_003_CANDIDATE_REV_A.md",
+ "supersedes_unapplied": "PCB-MAIN-GROUND-DOMAIN-ROUTING-002 (PR #81): 003 contains its construction",
+ "applied": {
+  "board": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
+  "board_sha256": "30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739",
+  "exact_candidate_byte_identity": true,
+  "predecessor_board": "hardware/kicad/candidates/PCB-MAIN-USB-CELL-FIXTURE-ROUTING-001/PCB-MAIN_USB_CELL_FIXTURE_CANDIDATE_REV_A.kicad_pcb",
+  "predecessor_board_sha256": "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273",
+  "placement_manifest": "hardware/PCB_MAIN_PLACEMENT_REPACK_REV_A.csv",
+  "placement_manifest_sha256": "d97bdf31eb3c3092a4c4d10ec1751d43ddb396cdd5b368f6c7f9d71108231307",
+  "predecessor_placement_manifest": "hardware/kicad/candidates/PCB-MAIN-INNER-REROUTE-003/PCB_MAIN_PLACEMENT_REPACK_PRE_003_REV_A.csv",
+  "predecessor_placement_manifest_sha256": "df7cdbfc2ac023d43ac040b14eb99440fc392d402793d5a3b03f2fd560af6a6f",
+  "placement_rows_changed": {"R9": [60.5, 19.75, 90], "R10": [62.0, 19.75, 90], "R11": [63.5, 19.75, 90]},
+  "audit_chain": "earlier sub-gate audits read the predecessor through tools/pcb_main_lineage_rev_a.py; the 003 state is audited by tools/audit_pcb_main_inner_reroute_003_application_rev_a.py"
+ },
+ "routing_complete": false,
+ "review_b_complete": false,
+ "manufacturing_release": false
+}

@@ -3,7 +3,11 @@
 `station_twin_e2e`, with ZS_STATION_TWIN pointing at the freshly built binary).
 
 Runs zs_station_twin with the Python server twin on the pipe and checks the server-side report:
-  1. a drone fly-by is detected, published over GSM, acknowledged, no duplicates;
+  1. a drone fly-by is detected, published over GSM, acknowledged, no duplicates; the audio prehistory ring holds the
+     seconds around the event, including the post-event window; the server asks for the event's audio
+     (CMD_REQUEST_AUDIO, both segments) right after the receipt, the station waits for the post-event window, uploads
+     both segments chunk by chunk and acknowledges with the chunk count; the server stores them through the bridge's
+     ingest (station.audio_ingest: parts in SQLite, SHA-256, WAV) and the ACK closes the request in the store;
   2. a burst of events during a GSM outage goes out over LoRa (30 % loss both ways) once the link is marked
      degraded, every event is delivered exactly once, and a GSM probe restores the link when the network returns.
   3. remote commands (ICD addendum D): the server signs CMD_SET_PARAMS and CMD_REBOOT, the station verifies them
@@ -24,8 +28,8 @@ TWIN = Path(os.environ.get("ZS_STATION_TWIN", REPO_ROOT / "firmware" / "build" /
 SERVER_CMD = f"{sys.executable} -m twin.twin_server"
 
 
-def run(args: list[str], commands: str = "") -> tuple[str, dict]:
-    env = dict(os.environ, ZS_TWIN_COMMANDS=commands)
+def run(args: list[str], commands: str = "", audio: str = "", redeliver: bool = False) -> tuple[str, dict]:
+    env = dict(os.environ, ZS_TWIN_COMMANDS=commands, ZS_TWIN_AUDIO=audio, ZS_TWIN_AUDIO_REDELIVER="1" if redeliver else "")
     out = subprocess.run([str(TWIN), *args, "--server", SERVER_CMD], cwd=SERVER_ROOT, capture_output=True, text=True, timeout=900, env=env)
     if out.returncode != 0:
         sys.stderr.write(out.stdout[-4000:] + out.stderr[-2000:])
@@ -44,10 +48,33 @@ def main() -> int:
     if not TWIN.exists():
         print(f"SKIP: {TWIN} not built")
         return 77
-    log, r = run(["--scene", "drone", "--seconds", "140", "--seed", "3", "--receipt-latency", "2000", "--expect-events", "1", "--expect-delivered", "1"])
+    # --expect-post-audio: the prehistory ring holds >= 25 s recorded after the event although the station went to S3
+    # and S0 (the post-event capture window of addendum B)
+    log, r = run(["--scene", "drone", "--seconds", "140", "--seed", "3", "--receipt-latency", "2000", "--expect-events", "1", "--expect-delivered", "1",
+                  "--expect-post-audio", "25"], audio="both", redeliver=True)
     assert r["detections"] >= 1 and r["duplicates"] == 0 and r["decode_errors"] == 0, r
     assert "session done -> COMMS_DONE" in log
-    print(f"scenario 1 (drone over GSM): detections {r['detections']}, heartbeats {r['heartbeats']}, duplicates {r['duplicates']}")
+    rec_line = next(l for l in log.splitlines() if "twin: rec committed" in l)
+    assert "overruns 0 errors 0" in rec_line, rec_line
+    # audio: one request, both segments assembled (SHA-256 checked by the AudioAssembler), ACK OK = chunk count
+    (req,) = r["audio_requested"]
+    event = next(e for e in r["events"] if e["event_id"] == req["event_id"])
+    segs = {s["segment"]: s for s in r["audio_segments"]}
+    assert set(segs) == {"pre", "post"} and all(s["event_id"] == event["event_id"] for s in segs.values()), r["audio_segments"]
+    # the request was redelivered after the first chunk (QoS 1): the running upload is neither restarted nor doubled
+    assert [c["command_id"] for c in r["commands_sent"]].count(req["command_id"]) == 2, r["commands_sent"]
+    (ack,) = [a for a in r["acks"] if a["command_id"] == req["command_id"]]
+    assert ack["result"] == 0 and ack["detail"] == r["audio_chunks"] and r["audio_duplicates"] == 0, (ack, r["audio_chunks"])
+    assert log.count("audio: request for event") == 1, "a redelivery must not start a second upload"
+    # the server side ran the bridge's ingest: the request is closed in the store and no part is left over
+    assert r["audio_store"] == {"acked": True, "ack_result": 0, "ack_detail": r["audio_chunks"], "pending_parts": 0}, r["audio_store"]
+    pre, post = segs["pre"], segs["post"]
+    assert pre["seconds"] >= 10 and post["seconds"] >= 25, segs                        # continuous audio on both sides
+    assert pre["start_time_us"] + pre["seconds"] * 1e6 > event["time_us"] - 1e6       # pre reaches the event
+    assert post["start_time_us"] <= event["time_us"] < post["start_time_us"] + 1e6     # post starts at the event
+    print(f"scenario 1 (drone over GSM): detections {r['detections']}, heartbeats {r['heartbeats']}, duplicates {r['duplicates']}; "
+          f"prehistory: {rec_line.split('around the first event: ')[1]}; audio upload: {r['audio_chunks']} chunks, "
+          f"pre {pre['seconds']:.0f} s + post {post['seconds']:.0f} s assembled, ACK OK")
 
     # 1600 s: the boot session starts just before the outage and runs into the S3 watchdog, which shifts the whole
     # degraded -> probe cycle by three minutes; the probe after the network returns lands at ~1450 s

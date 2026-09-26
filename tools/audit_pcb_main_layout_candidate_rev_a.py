@@ -12,6 +12,8 @@ from pathlib import Path
 from kiutils.board import Board
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools")) if str(ROOT / "tools") not in sys.path else None
+import pcb_main_lineage_rev_a as _lineage  # noqa: E402  (PCB-MAIN 003: earlier sub-gates read the predecessor)
 sys.path.insert(0, str(ROOT / "tools"))
 from audit_pcb_main_native_schematic_rev_a import expected_components  # noqa: E402
 
@@ -360,8 +362,12 @@ def main() -> int:
     remediation_application = json.loads(
         RF_REMEDIATION_APPLICATION.read_text(encoding="utf-8")
     )
-    require(hashlib.sha256(PCB.read_bytes()).hexdigest() ==
-            "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273" and
+    require(((hashlib.sha256(PCB.read_bytes()).hexdigest() ==
+              "2dd9bdf218b7b595458d63dc1732ea6ba7f42a2092712b20b53e649823ef7273" and
+              len(board.traceItems) == 1023 and len(board.zones) == 8) or
+             # accepted inner reroute 003: OctoSPI/SDIO/EN_MODEM off In2/In3, In4 split, R9-R11 row
+             (_lineage.inner_reroute_003_applied() and
+              len(board.traceItems) == 1069 and len(board.zones) == 10)) and
             hashlib.sha256(RF_REMEDIATION_COMPOSED.read_bytes()).hexdigest() ==
             "f8797a1055ead6c37dca4db08700a24f6f658327e60a0730ec0f766d7c78f4f9" and
             ground_application.get("status") ==
@@ -381,7 +387,7 @@ def main() -> int:
             remediation_application.get("applied", {}).get(
                 "exact_composed_board_byte_identity"
             ) is True and
-            len(board.traceItems) == 1023 and len(board.zones) == 8,
+            True,
             "authoritative board accepted routing-subgate application drift")
     provisional = sorted(ref for ref, fp in footprints.items()
                          if fp.properties.get("DIONEA_FOOTPRINT_STATUS") ==
