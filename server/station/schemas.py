@@ -415,6 +415,8 @@ class AudioRequest(BaseModel):
         default=None, strict=True, ge=-0x80000000, le=0x7FFFFFFF
     )
     duration_ms: int | None = Field(default=None, strict=True, ge=1, le=0xFFFFFFFF)
+    # the event time (station clock, us); the audio-request route fills it from the stored detection when omitted
+    event_time_us: int | None = Field(default=None, strict=True, ge=1, le=0x7FFFFFFFFFFFFFFF)
 
     @model_validator(mode="after")
     def validate_range_fields(self):
