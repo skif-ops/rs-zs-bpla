@@ -1,0 +1,18 @@
+{
+  "schema": "dioneya-pcb-main-x1-feed-025-v1",
+  "base_sha256": "b02929037204ab6e1422a890b34cdb3cf2a92059fee29f82432e8e01bfa48b9a",
+  "candidate_sha256": "f1b2e2b43fe02e7aed5b1b9cc10932920a3a59526f4e970bf7622ed216dacd0a",
+  "track_segments": 3,
+  "width_mm": 0.25,
+  "length_mm": 2.18,
+  "drc": {
+    "base_unconnected": 117,
+    "candidate_unconnected": 116,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "oscillator_power_integrity_review": "OPEN: 0.15 mm downstream supply branch to X1",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
