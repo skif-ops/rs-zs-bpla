@@ -26,7 +26,8 @@ NAMESPACE = uuid.UUID("306a0886-91ce-4792-9e22-7c29176a126e")
 
 # Net, width (mm), pad centre, legal bends, pad or existing track endpoint.
 ROUTES = (
-    ("USB_SHIELD", .25, ((37.68,6.78),(46.32,6.78))),
+    ("USB_SHIELD", .25, ((37.68,6.78),(38.38,6.08),(38.38,5.55),
+                          (45.62,5.55),(45.62,6.08),(46.32,6.78))),
 )
 
 
@@ -40,19 +41,23 @@ def copper_clearance_check() -> None:
 
     board, _ = geo.load(BASE)
     inner_reference = geo.zone_outline(board, "GND_MIC", "In2.Cu")
-    obstacles, owners = [], []
+    obstacles, owners, holes = [], [], []
     endpoints = set()
     for fp in board.footprints:
         for pad in fp.pads:
-            if "In3.Cu" not in geo.pad_layers(pad):
-                continue
             geom = geo.pad_geometry(fp, pad)
             net = pad.net.name if pad.net else None
+            if pad.drill is not None and getattr(pad.drill, "diameter", 0):
+                holes.append((geom.centroid, pad.drill.diameter / 2, net))
+            if "In3.Cu" not in geo.pad_layers(pad):
+                continue
             obstacles.append(geom)
             owners.append(net)
             if net:
                 endpoints.add((net, round(geom.centroid.x, 4), round(geom.centroid.y, 4)))
     for net, kind, layer, geom, raw in geo.items(board):
+        if kind == "via":
+            holes.append((geom, raw.drill / 2, net))
         if kind == "via" or layer == "In3.Cu":
             obstacles.append(geom.buffer(raw.size / 2 if kind == "via" else raw.width / 2, 8))
             owners.append(net)
@@ -70,6 +75,10 @@ def copper_clearance_check() -> None:
         conflicts = [(owners[int(i)], int(i)) for i in index.query(clearance)
                      if owners[int(i)] != net and obstacles[int(i)].intersects(clearance)]
         assert not conflicts, (net, points, conflicts[:8])
+        drill_conflicts = [(other_net, round(path.distance(center) - radius - width / 2, 4))
+                           for center, radius, other_net in holes
+                           if other_net != net and path.distance(center) - radius - width / 2 < .25 - 1e-6]
+        assert not drill_conflicts, (net, "hole clearance", drill_conflicts[:8])
 
 
 def build() -> str:

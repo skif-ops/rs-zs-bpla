@@ -1,1 +1,2 @@
+# rev B hole-clearance correction
 tools/apply_pcb_main_usb_shield_027_rev_a.py
