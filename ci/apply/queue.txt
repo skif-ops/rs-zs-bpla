@@ -1,2 +1,0 @@
-# rerun USB 009 with the six-layer via-in-pad candidate rules
-tools/apply_pcb_main_usb_connector_009_rev_a.py
