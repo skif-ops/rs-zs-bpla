@@ -1,0 +1,21 @@
+{
+  "schema": "dioneya-pcb-main-sim2-vdd-020-v1",
+  "base_sha256": "b07416af6bf3fd4d100e5b38496a061d5a33f1325a53aeb383c1dbcc1bb0ae30",
+  "candidate_sha256": "7d45ad459ac597d2b993e58bc3be758f77f29d72f4b14c024e6c3b4316b1ae6e",
+  "routes": 1,
+  "track_segments": 3,
+  "width_mm": [
+    0.25
+  ],
+  "total_length_mm": 10.794,
+  "drc": {
+    "base_unconnected": 122,
+    "candidate_unconnected": 121,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "sim_supply_return_review": "OPEN",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

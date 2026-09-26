@@ -1,1 +1,0 @@
-tools/apply_pcb_main_sim2_vdd_020_rev_a.py
