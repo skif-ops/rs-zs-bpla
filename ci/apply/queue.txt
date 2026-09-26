@@ -1,0 +1,2 @@
+# Queued by Claude 2026-09-26: PCB routing 004b - second Freerouting run (back-side parts as pre-mirrored front parts)
+tools/apply_pcb_routing_004b_autoroute_rev_a.py
