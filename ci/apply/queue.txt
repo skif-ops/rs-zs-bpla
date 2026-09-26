@@ -1,0 +1,1 @@
+tools/apply_pcb_main_pwr_good_tp_043_rev_a.py
