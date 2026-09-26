@@ -1,0 +1,33 @@
+{
+  "board": {
+    "design_settings": {
+      "rules": {
+        "min_through_hole_diameter": 0.15,
+        "min_via_annular_width": 0.05,
+        "min_via_diameter": 0.25
+      }
+    }
+  },
+  "boards": [],
+  "cvpcb": {},
+  "erc": {},
+  "libraries": {},
+  "meta": {
+    "filename": "PCB-MAIN.kicad_pro",
+    "version": 1
+  },
+  "net_settings": {
+    "classes": [],
+    "meta": {
+      "version": 3
+    }
+  },
+  "pcbnew": {},
+  "schematic": {},
+  "text_variables": {
+    "BOARD": "PCB-MAIN",
+    "PROJECT": "Dioneya EVT-PRE-20",
+    "REV": "A",
+    "STATUS": "LAYOUT_ENGINEERING_CANDIDATE_NOT_FOR_MANUFACTURE"
+  }
+}
