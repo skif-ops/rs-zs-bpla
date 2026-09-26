@@ -1,1 +1,2 @@
+# C7 relief rev B: clearance and silkscreen correction
 tools/apply_pcb_main_u1_c7_relief_013_rev_a.py

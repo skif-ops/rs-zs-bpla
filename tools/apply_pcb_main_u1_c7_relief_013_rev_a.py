@@ -20,8 +20,8 @@ BASE_SHA='ad6cbb021f9ba8fa3a3b4c18b0820e49c864ea8113a55b0645e37f63928fe0d1'
 NAMESPACE=uuid.UUID('40ec670d-4db6-4c3b-a1db-02a2187513fd')
 RIP_GND={'48dd2539-6322-4978-88ef-5db8b6dbf405','c7413a3a-4af0-45fb-b97f-bf7537c203f1'}
 ROUTES=(
-    ('3V3_DIGITAL',.25,((42.875,26.5),(44.25,26.5))),
-    ('GND_DIGITAL',.25,((42.225,26.5),(42.225,26.9),(42.425,27.1),(43.1,27.1))),
+    ('3V3_DIGITAL',.25,((42.425,26.5),(44.25,26.5))),
+    ('GND_DIGITAL',.25,((41.775,26.5),(41.775,25.85),(43.1,25.85))),
 )
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def check_geometry(source):
@@ -49,6 +49,17 @@ def check_geometry(source):
         assert not bad,(net,bad[:8])
         ref=geo.zone_outline(b,'GND_DIGITAL','In1.Cu')
         assert line.difference(ref).length<1e-6,(net,'reference gap')
+    # Pad-to-through-hole clearance also matters after the footprint moves.
+    for fp in b.footprints:
+        if geo.reference(fp)!='C7':
+            continue
+        for pad in fp.pads:
+            geom=geo.pad_geometry(fp,pad)
+            for n,k,l,g,raw in geo.items(b):
+                if k!='via' or n==pad.net.name:
+                    continue
+                assert geom.distance(g)>=raw.size/2+.2,(pad.number,n,'via copper')
+                assert geom.distance(g)>=raw.drill/2+.25,(pad.number,n,'via hole')
 
 def build():
     assert sha(BASE)==BASE_SHA
@@ -57,7 +68,12 @@ def build():
     start=source.rfind('\n  (footprint ',0,ref);end=source.index('\n  (footprint ',ref)
     fp=source[start:end]
     assert fp.count('(at 42.25 26.5)')==1
-    source=source[:start]+fp.replace('(at 42.25 26.5)','(at 42.55 26.5 180)')+source[end:]
+    fp=fp.replace('(at 42.25 26.5)','(at 42.1 26.5 180)')
+    # The rotated reference would land on C1's silkscreen. Keep it on F.Fab.
+    ref_start=fp.index('(fp_text reference "C7"')
+    ref_end=fp.index('(tstamp ',ref_start)
+    fp=fp[:ref_start]+fp[ref_start:ref_end].replace('(layer "F.SilkS")','(layer "F.Fab")')+fp[ref_end:]
+    source=source[:start]+fp+source[end:]
     lines=source.splitlines()
     kept=[line for line in lines if not
           (line.startswith('  (segment ') and any(f'(tstamp {t})' in line for t in RIP_GND))]
@@ -119,7 +135,7 @@ def main():
     CANDIDATE.write_text(build())
     drc=run_drc()
     summary={'schema':'dioneya-pcb-main-u1-c7-relief-013-v1','base_sha256':BASE_SHA,
-             'candidate_sha256':sha(CANDIDATE),'moved_c7_mm':[.3,0],'rotated_c7_deg':180,
+             'candidate_sha256':sha(CANDIDATE),'moved_c7_mm':[-.15,0],'rotated_c7_deg':180,
              'ripped_ground_tracks':len(RIP_GND),'new_short_tracks':sum(len(r[2])-1 for r in ROUTES),
              'drc':drc,'candidate_only_usb_u1_via_rules':True,'c7_power_return_review':'OPEN',
              'applied_to_authoritative_board':False,'manufacturing_release':False}
