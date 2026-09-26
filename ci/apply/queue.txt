@@ -1,0 +1,1 @@
+tools/apply_pcb_main_p2_u1_power_010_rev_a.py
