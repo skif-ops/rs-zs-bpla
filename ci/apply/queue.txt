@@ -1,1 +1,0 @@
-tools/apply_pcb_main_p2_local_007_rev_a.py
