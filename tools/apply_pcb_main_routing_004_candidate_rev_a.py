@@ -45,6 +45,10 @@ DEFERRED = {"VCORE_1V1"}
 # the back-side test connectors (TP_EOL, TP_BLE_SWD, TP_MCU_SWD, TP_CELL_USB, TP_CELL_DBG) and of R62/FB1/L1; their
 # new copper is left out whole and the connections stay open for the next routing step
 REJECTED = OUT / "DRC_REJECTED_NETS.json"
+# second session (004b): the connections left open by the first; its own DRC rejections, if any
+SES_B = OUT / "PCB-MAIN_ROUTED_B.ses"
+AUTOROUTE_B = OUT / "AUTOROUTE_B.json"
+REJECTED_B = OUT / "DRC_REJECTED_NETS_B.json"
 
 
 def sha256(path: Path) -> str:
@@ -108,6 +112,18 @@ def build(base_text: str) -> tuple[str, dict]:
     rejected = set(json.loads(REJECTED.read_text(encoding="utf-8"))["nets"])
     skip = set(info["prep"]["not_autorouted"]) | DEFERRED | rejected
     copper = session_copy(SES.read_text(encoding="utf-8"), skip)
+    second = {}
+    if AUTOROUTE_B.is_file():
+        info_b = json.loads(AUTOROUTE_B.read_text(encoding="utf-8"))
+        assert info_b["session_sha256"] == sha256(SES_B), "second session differs from AUTOROUTE_B.json"
+        assert info_b["first_session_sha256"] == info["session_sha256"], "second session built on another first session"
+        rejected_b = set(json.loads(REJECTED_B.read_text(encoding="utf-8"))["nets"]) if REJECTED_B.is_file() else set()
+        skip_b = set(info_b["prep"]["not_autorouted"]) | DEFERRED | rejected_b
+        second = session_copy(SES_B.read_text(encoding="utf-8"), skip_b)
+        for net, entry in second.items():
+            merged = copper.setdefault(net, {"wires": [], "vias": []})
+            merged["wires"] += entry["wires"]
+            merged["vias"] += entry["vias"]
     number = {name: int(num) for num, name in re.findall(r'^  \(net (\d+) "([^"]*)"\)', base_text, re.M)}
     seg_lines, via_lines = [], []
     for net in sorted(copper):
@@ -134,7 +150,10 @@ def build(base_text: str) -> tuple[str, dict]:
             "by_layer": dict(Counter(layer for c in copper.values() for layer, _, pts in c["wires"]
                                      for _ in range(len(pts) - 1))),
             "session_sha256": info["session_sha256"], "not_autorouted": sorted(set(info["prep"]["not_autorouted"])),
-            "deferred_to_005": sorted(DEFERRED), "drc_rejected": sorted(rejected)}
+            "deferred_to_005": sorted(DEFERRED), "drc_rejected": sorted(rejected),
+            "second_session_nets": sorted(second),
+            "second_session_rejected": sorted(json.loads(REJECTED_B.read_text(encoding="utf-8"))["nets"])
+            if REJECTED_B.is_file() else []}
     return "\n".join(out), spec
 
 
