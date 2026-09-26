@@ -1,0 +1,1321 @@
+{
+ "by_layer_domain": {
+  "B.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": {
+   "length_mm": 280.45,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "B.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": {
+   "length_mm": 88.61,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "B.Cu|GND_DIGITAL": {
+   "length_mm": 685.22,
+   "over_own_reference_mm": 599.62,
+   "share": 0.8751
+  },
+  "B.Cu|GND_MIC": {
+   "length_mm": 68.87,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "B.Cu|GND_MODEM": {
+   "length_mm": 536.69,
+   "over_own_reference_mm": 475.32,
+   "share": 0.8856
+  },
+  "B.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": {
+   "length_mm": 28.66,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "B.Cu|SHIELD_COUPLING_NETWORK_REVIEW_B": {
+   "length_mm": 8.36,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "F.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": {
+   "length_mm": 218.61,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "F.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": {
+   "length_mm": 96.76,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "F.Cu|GND_DIGITAL": {
+   "length_mm": 920.97,
+   "over_own_reference_mm": 863.86,
+   "share": 0.938
+  },
+  "F.Cu|GND_MIC": {
+   "length_mm": 118.03,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "F.Cu|GND_MODEM": {
+   "length_mm": 470.92,
+   "over_own_reference_mm": 175.83,
+   "share": 0.3734
+  },
+  "F.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": {
+   "length_mm": 261.34,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "F.Cu|SHIELD_COUPLING_NETWORK_REVIEW_B": {
+   "length_mm": 11.87,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "In3.Cu|GND_DIGITAL": {
+   "length_mm": 33.74,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "In3.Cu|GND_MODEM": {
+   "length_mm": 208.73,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "In3.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": {
+   "length_mm": 248.71,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  }
+ },
+ "by_net_layer": {
+  "1V8_MIC|F.Cu": {
+   "length_mm": 69.28,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "1V8_MIC|In3.Cu": {
+   "length_mm": 129.22,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "3V3_DIGITAL|B.Cu": {
+   "length_mm": 28.66,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "3V3_DIGITAL|F.Cu": {
+   "length_mm": 192.06,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "3V3_DIGITAL|In3.Cu": {
+   "length_mm": 119.49,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "3V8_MODEM_BB|B.Cu": {
+   "length_mm": 5.4,
+   "over_own_reference_mm": 2.14,
+   "share": 0.3967
+  },
+  "3V8_MODEM_BB|F.Cu": {
+   "length_mm": 22.03,
+   "over_own_reference_mm": 1.83,
+   "share": 0.0829
+  },
+  "3V8_MODEM_BB|In3.Cu": {
+   "length_mm": 13.49,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "3V8_MODEM_RF|F.Cu": {
+   "length_mm": 13.52,
+   "over_own_reference_mm": 9.25,
+   "share": 0.6846
+  },
+  "3V8_MODEM_RF|In3.Cu": {
+   "length_mm": 25.71,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "AAD_CFG_1V8_FANOUT|B.Cu": {
+   "length_mm": 93.11,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "AAD_CFG_1V8_FANOUT|F.Cu": {
+   "length_mm": 94.35,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "AAD_CFG_1V8_U7|B.Cu": {
+   "length_mm": 3.59,
+   "over_own_reference_mm": 2.65,
+   "share": 0.7394
+  },
+  "AAD_CFG_1V8_U7|F.Cu": {
+   "length_mm": 4.57,
+   "over_own_reference_mm": 3.65,
+   "share": 0.7996
+  },
+  "BLE_DFU_REQ|B.Cu": {
+   "length_mm": 14.88,
+   "over_own_reference_mm": 13.98,
+   "share": 0.9394
+  },
+  "BLE_DFU_REQ|F.Cu": {
+   "length_mm": 3.93,
+   "over_own_reference_mm": 2.99,
+   "share": 0.762
+  },
+  "BLE_EN|F.Cu": {
+   "length_mm": 4.85,
+   "over_own_reference_mm": 4.85,
+   "share": 1.0
+  },
+  "BLE_RX_U11|B.Cu": {
+   "length_mm": 11.34,
+   "over_own_reference_mm": 10.44,
+   "share": 0.9205
+  },
+  "BLE_RX_U11|F.Cu": {
+   "length_mm": 4.49,
+   "over_own_reference_mm": 3.58,
+   "share": 0.7976
+  },
+  "BLE_RX_U1|F.Cu": {
+   "length_mm": 50.79,
+   "over_own_reference_mm": 50.79,
+   "share": 1.0
+  },
+  "BLE_TX_U11|B.Cu": {
+   "length_mm": 15.41,
+   "over_own_reference_mm": 13.61,
+   "share": 0.883
+  },
+  "BLE_TX_U11|F.Cu": {
+   "length_mm": 19.77,
+   "over_own_reference_mm": 17.91,
+   "share": 0.9056
+  },
+  "BLE_TX_U1|B.Cu": {
+   "length_mm": 9.74,
+   "over_own_reference_mm": 8.8,
+   "share": 0.9036
+  },
+  "BLE_TX_U1|F.Cu": {
+   "length_mm": 4.91,
+   "over_own_reference_mm": 4.01,
+   "share": 0.8166
+  },
+  "BOOT0|B.Cu": {
+   "length_mm": 16.79,
+   "over_own_reference_mm": 15.85,
+   "share": 0.9439
+  },
+  "BOOT0|F.Cu": {
+   "length_mm": 2.38,
+   "over_own_reference_mm": 1.13,
+   "share": 0.4743
+  },
+  "CELL_DBG_RXD_TP|B.Cu": {
+   "length_mm": 6.29,
+   "over_own_reference_mm": 5.36,
+   "share": 0.8522
+  },
+  "CELL_DBG_RXD_TP|F.Cu": {
+   "length_mm": 8.21,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "CELL_DBG_RXD_U8|B.Cu": {
+   "length_mm": 22.27,
+   "over_own_reference_mm": 20.47,
+   "share": 0.9191
+  },
+  "CELL_DBG_RXD_U8|F.Cu": {
+   "length_mm": 4.07,
+   "over_own_reference_mm": 1.89,
+   "share": 0.4645
+  },
+  "CELL_DBG_TXD_TP|B.Cu": {
+   "length_mm": 20.8,
+   "over_own_reference_mm": 18.97,
+   "share": 0.9124
+  },
+  "CELL_DBG_TXD_TP|F.Cu": {
+   "length_mm": 20.87,
+   "over_own_reference_mm": 14.78,
+   "share": 0.7084
+  },
+  "CELL_DBG_TXD_U8|B.Cu": {
+   "length_mm": 10.29,
+   "over_own_reference_mm": 9.39,
+   "share": 0.9124
+  },
+  "CELL_DBG_TXD_U8|F.Cu": {
+   "length_mm": 12.33,
+   "over_own_reference_mm": 10.75,
+   "share": 0.872
+  },
+  "CELL_DTR_U16|B.Cu": {
+   "length_mm": 46.69,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "CELL_DTR_U16|F.Cu": {
+   "length_mm": 13.33,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "CELL_RF_ANT|F.Cu": {
+   "length_mm": 18.44,
+   "over_own_reference_mm": 18.44,
+   "share": 1.0
+  },
+  "CELL_RF|F.Cu": {
+   "length_mm": 33.07,
+   "over_own_reference_mm": 33.07,
+   "share": 1.0
+  },
+  "CELL_RI_U16|B.Cu": {
+   "length_mm": 7.84,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "CELL_RI_U16|F.Cu": {
+   "length_mm": 4.51,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "CELL_RX_U16|F.Cu": {
+   "length_mm": 41.1,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "CELL_STATUS_U16|B.Cu": {
+   "length_mm": 6.62,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "CELL_STATUS_U16|F.Cu": {
+   "length_mm": 10.0,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "CELL_USB_BOOT_1V8|B.Cu": {
+   "length_mm": 7.44,
+   "over_own_reference_mm": 6.54,
+   "share": 0.8789
+  },
+  "CELL_USB_BOOT_1V8|F.Cu": {
+   "length_mm": 3.96,
+   "over_own_reference_mm": 1.16,
+   "share": 0.2918
+  },
+  "CELL_USB_BOOT_TP|B.Cu": {
+   "length_mm": 5.53,
+   "over_own_reference_mm": 3.76,
+   "share": 0.6789
+  },
+  "CELL_USB_BOOT_TP|F.Cu": {
+   "length_mm": 4.47,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "CELL_USB_DM_TP|B.Cu": {
+   "length_mm": 74.68,
+   "over_own_reference_mm": 74.23,
+   "share": 0.994
+  },
+  "CELL_USB_DM_TP|F.Cu": {
+   "length_mm": 2.62,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "CELL_USB_DM_U8|F.Cu": {
+   "length_mm": 4.77,
+   "over_own_reference_mm": 4.77,
+   "share": 1.0
+  },
+  "CELL_USB_DP_TP|B.Cu": {
+   "length_mm": 74.22,
+   "over_own_reference_mm": 73.77,
+   "share": 0.9939
+  },
+  "CELL_USB_DP_TP|F.Cu": {
+   "length_mm": 3.08,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "CELL_USB_DP_U8|F.Cu": {
+   "length_mm": 4.77,
+   "over_own_reference_mm": 4.77,
+   "share": 1.0
+  },
+  "CELL_USB_VBUS|B.Cu": {
+   "length_mm": 1.52,
+   "over_own_reference_mm": 1.07,
+   "share": 0.7045
+  },
+  "CELL_USB_VBUS|F.Cu": {
+   "length_mm": 3.46,
+   "over_own_reference_mm": 1.14,
+   "share": 0.3286
+  },
+  "CELL_USB_VBUS|In3.Cu": {
+   "length_mm": 47.15,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "CELL_USIM_VDD_1V8|F.Cu": {
+   "length_mm": 8.15,
+   "over_own_reference_mm": 0.56,
+   "share": 0.0693
+  },
+  "CELL_USIM_VDD_1V8|In3.Cu": {
+   "length_mm": 32.36,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "EN_MODEM|B.Cu": {
+   "length_mm": 8.32,
+   "over_own_reference_mm": 7.42,
+   "share": 0.8913
+  },
+  "EN_MODEM|F.Cu": {
+   "length_mm": 36.19,
+   "over_own_reference_mm": 34.34,
+   "share": 0.9488
+  },
+  "GNSS_ANT_BIAS_RAW|F.Cu": {
+   "length_mm": 13.4,
+   "over_own_reference_mm": 13.4,
+   "share": 1.0
+  },
+  "GNSS_ANT_DETECT|B.Cu": {
+   "length_mm": 8.28,
+   "over_own_reference_mm": 7.31,
+   "share": 0.8825
+  },
+  "GNSS_ANT_DETECT|F.Cu": {
+   "length_mm": 4.91,
+   "over_own_reference_mm": 3.97,
+   "share": 0.8097
+  },
+  "GNSS_ANT_DIV|B.Cu": {
+   "length_mm": 10.34,
+   "over_own_reference_mm": 9.44,
+   "share": 0.9129
+  },
+  "GNSS_ANT_DIV|F.Cu": {
+   "length_mm": 8.59,
+   "over_own_reference_mm": 7.66,
+   "share": 0.8917
+  },
+  "GNSS_ANT_GATE|F.Cu": {
+   "length_mm": 34.49,
+   "over_own_reference_mm": 34.49,
+   "share": 1.0
+  },
+  "GNSS_ANT_OFF_N|B.Cu": {
+   "length_mm": 5.96,
+   "over_own_reference_mm": 5.06,
+   "share": 0.8488
+  },
+  "GNSS_ANT_OFF_N|F.Cu": {
+   "length_mm": 20.14,
+   "over_own_reference_mm": 19.23,
+   "share": 0.9553
+  },
+  "GNSS_ANT_SHORT_N|B.Cu": {
+   "length_mm": 15.17,
+   "over_own_reference_mm": 13.37,
+   "share": 0.8812
+  },
+  "GNSS_ANT_SHORT_N|F.Cu": {
+   "length_mm": 18.8,
+   "over_own_reference_mm": 17.45,
+   "share": 0.9281
+  },
+  "GNSS_ANT_SWITCHED|B.Cu": {
+   "length_mm": 4.61,
+   "over_own_reference_mm": 4.16,
+   "share": 0.9022
+  },
+  "GNSS_ANT_SWITCHED|F.Cu": {
+   "length_mm": 1.45,
+   "over_own_reference_mm": 1.0,
+   "share": 0.6885
+  },
+  "GNSS_ANT_SWITCHED|In3.Cu": {
+   "length_mm": 5.99,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "GNSS_PPS_U9|B.Cu": {
+   "length_mm": 2.62,
+   "over_own_reference_mm": 1.72,
+   "share": 0.6559
+  },
+  "GNSS_PPS_U9|F.Cu": {
+   "length_mm": 5.18,
+   "over_own_reference_mm": 4.28,
+   "share": 0.8262
+  },
+  "GNSS_RF_ANT_BIASED|F.Cu": {
+   "length_mm": 34.11,
+   "over_own_reference_mm": 34.11,
+   "share": 1.0
+  },
+  "GNSS_RF_DC_BLOCK|F.Cu": {
+   "length_mm": 1.39,
+   "over_own_reference_mm": 1.39,
+   "share": 1.0
+  },
+  "GNSS_RF_FILTERED|F.Cu": {
+   "length_mm": 1.33,
+   "over_own_reference_mm": 1.33,
+   "share": 1.0
+  },
+  "GNSS_RX_U1|B.Cu": {
+   "length_mm": 21.28,
+   "over_own_reference_mm": 20.37,
+   "share": 0.9576
+  },
+  "GNSS_RX_U1|F.Cu": {
+   "length_mm": 3.34,
+   "over_own_reference_mm": 2.4,
+   "share": 0.7179
+  },
+  "GNSS_RX_U9|F.Cu": {
+   "length_mm": 7.34,
+   "over_own_reference_mm": 7.34,
+   "share": 1.0
+  },
+  "I2C2_SCL_BUS|F.Cu": {
+   "length_mm": 2.19,
+   "over_own_reference_mm": 2.19,
+   "share": 1.0
+  },
+  "I2C2_SDA_BUS|B.Cu": {
+   "length_mm": 29.54,
+   "over_own_reference_mm": 3.28,
+   "share": 0.1111
+  },
+  "I2C2_SDA_BUS|F.Cu": {
+   "length_mm": 20.34,
+   "over_own_reference_mm": 18.02,
+   "share": 0.8858
+  },
+  "LORA_BUSY|B.Cu": {
+   "length_mm": 4.3,
+   "over_own_reference_mm": 3.4,
+   "share": 0.7906
+  },
+  "LORA_BUSY|F.Cu": {
+   "length_mm": 15.35,
+   "over_own_reference_mm": 14.45,
+   "share": 0.9413
+  },
+  "LORA_DIO1|B.Cu": {
+   "length_mm": 29.91,
+   "over_own_reference_mm": 28.53,
+   "share": 0.954
+  },
+  "LORA_DIO1|F.Cu": {
+   "length_mm": 9.03,
+   "over_own_reference_mm": 7.64,
+   "share": 0.847
+  },
+  "LORA_MISO_U10|F.Cu": {
+   "length_mm": 1.25,
+   "over_own_reference_mm": 1.25,
+   "share": 1.0
+  },
+  "LORA_MISO_U1|B.Cu": {
+   "length_mm": 21.24,
+   "over_own_reference_mm": 20.31,
+   "share": 0.9565
+  },
+  "LORA_MISO_U1|F.Cu": {
+   "length_mm": 4.31,
+   "over_own_reference_mm": 3.38,
+   "share": 0.7841
+  },
+  "LORA_MOSI_U1|F.Cu": {
+   "length_mm": 17.29,
+   "over_own_reference_mm": 17.29,
+   "share": 1.0
+  },
+  "LORA_NSS_U10|F.Cu": {
+   "length_mm": 16.68,
+   "over_own_reference_mm": 16.68,
+   "share": 1.0
+  },
+  "LORA_NSS_U1|B.Cu": {
+   "length_mm": 6.61,
+   "over_own_reference_mm": 5.71,
+   "share": 0.8637
+  },
+  "LORA_NSS_U1|F.Cu": {
+   "length_mm": 14.41,
+   "over_own_reference_mm": 13.49,
+   "share": 0.9356
+  },
+  "LORA_RESET_N|B.Cu": {
+   "length_mm": 7.39,
+   "over_own_reference_mm": 6.45,
+   "share": 0.873
+  },
+  "LORA_RESET_N|F.Cu": {
+   "length_mm": 5.59,
+   "over_own_reference_mm": 4.69,
+   "share": 0.8389
+  },
+  "LORA_RF_ANT|F.Cu": {
+   "length_mm": 14.54,
+   "over_own_reference_mm": 14.54,
+   "share": 1.0
+  },
+  "LORA_RF_MODULE|F.Cu": {
+   "length_mm": 9.04,
+   "over_own_reference_mm": 9.04,
+   "share": 1.0
+  },
+  "LORA_RXEN|B.Cu": {
+   "length_mm": 3.95,
+   "over_own_reference_mm": 3.05,
+   "share": 0.7719
+  },
+  "LORA_RXEN|F.Cu": {
+   "length_mm": 3.43,
+   "over_own_reference_mm": 2.49,
+   "share": 0.7253
+  },
+  "LORA_SCK_U10|B.Cu": {
+   "length_mm": 23.83,
+   "over_own_reference_mm": 21.09,
+   "share": 0.8854
+  },
+  "LORA_SCK_U10|F.Cu": {
+   "length_mm": 24.66,
+   "over_own_reference_mm": 21.96,
+   "share": 0.8904
+  },
+  "LORA_TXEN|B.Cu": {
+   "length_mm": 25.4,
+   "over_own_reference_mm": 23.6,
+   "share": 0.9291
+  },
+  "LORA_TXEN|F.Cu": {
+   "length_mm": 24.76,
+   "over_own_reference_mm": 22.9,
+   "share": 0.9248
+  },
+  "MIC_WAKE12_OR_1V8|F.Cu": {
+   "length_mm": 6.61,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "MIC_WAKE1|F.Cu": {
+   "length_mm": 2.92,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "MIC_WAKE2|B.Cu": {
+   "length_mm": 17.33,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "MIC_WAKE2|F.Cu": {
+   "length_mm": 14.13,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "MIC_WAKE34_OR_1V8|B.Cu": {
+   "length_mm": 2.65,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "MIC_WAKE34_OR_1V8|F.Cu": {
+   "length_mm": 3.6,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "MIC_WAKE3|B.Cu": {
+   "length_mm": 48.89,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "MIC_WAKE3|F.Cu": {
+   "length_mm": 20.72,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "MIC_WAKE4|F.Cu": {
+   "length_mm": 70.05,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "MIC_WAKE_OR_1V8|F.Cu": {
+   "length_mm": 3.46,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "MIC_WAKE|F.Cu": {
+   "length_mm": 1.42,
+   "over_own_reference_mm": 1.42,
+   "share": 1.0
+  },
+  "NOR_CLK_U1|B.Cu": {
+   "length_mm": 4.97,
+   "over_own_reference_mm": 4.07,
+   "share": 0.8186
+  },
+  "NOR_CLK_U1|F.Cu": {
+   "length_mm": 19.29,
+   "over_own_reference_mm": 18.39,
+   "share": 0.9532
+  },
+  "NOR_CLK_U2|B.Cu": {
+   "length_mm": 24.29,
+   "over_own_reference_mm": 23.38,
+   "share": 0.9627
+  },
+  "NOR_CLK_U2|F.Cu": {
+   "length_mm": 6.19,
+   "over_own_reference_mm": 5.28,
+   "share": 0.8543
+  },
+  "NOR_IO0_U1|B.Cu": {
+   "length_mm": 8.15,
+   "over_own_reference_mm": 7.25,
+   "share": 0.889
+  },
+  "NOR_IO0_U1|F.Cu": {
+   "length_mm": 22.67,
+   "over_own_reference_mm": 21.77,
+   "share": 0.9603
+  },
+  "NOR_IO0_U2|B.Cu": {
+   "length_mm": 15.55,
+   "over_own_reference_mm": 14.65,
+   "share": 0.942
+  },
+  "NOR_IO0_U2|F.Cu": {
+   "length_mm": 8.29,
+   "over_own_reference_mm": 7.39,
+   "share": 0.8914
+  },
+  "NOR_IO1_U1|B.Cu": {
+   "length_mm": 7.58,
+   "over_own_reference_mm": 6.68,
+   "share": 0.8807
+  },
+  "NOR_IO1_U1|F.Cu": {
+   "length_mm": 14.11,
+   "over_own_reference_mm": 13.21,
+   "share": 0.936
+  },
+  "NOR_IO1_U2|B.Cu": {
+   "length_mm": 27.17,
+   "over_own_reference_mm": 26.27,
+   "share": 0.9666
+  },
+  "NOR_IO1_U2|F.Cu": {
+   "length_mm": 5.74,
+   "over_own_reference_mm": 5.14,
+   "share": 0.8962
+  },
+  "NOR_IO2_U1|B.Cu": {
+   "length_mm": 10.46,
+   "over_own_reference_mm": 9.55,
+   "share": 0.9136
+  },
+  "NOR_IO2_U1|F.Cu": {
+   "length_mm": 13.12,
+   "over_own_reference_mm": 12.21,
+   "share": 0.9311
+  },
+  "NOR_IO2_U2|B.Cu": {
+   "length_mm": 18.99,
+   "over_own_reference_mm": 18.09,
+   "share": 0.9525
+  },
+  "NOR_IO2_U2|F.Cu": {
+   "length_mm": 12.11,
+   "over_own_reference_mm": 11.21,
+   "share": 0.9256
+  },
+  "NOR_IO3_U1|B.Cu": {
+   "length_mm": 19.1,
+   "over_own_reference_mm": 18.17,
+   "share": 0.9513
+  },
+  "NOR_IO3_U1|F.Cu": {
+   "length_mm": 2.01,
+   "over_own_reference_mm": 1.08,
+   "share": 0.5383
+  },
+  "NOR_IO3_U2|B.Cu": {
+   "length_mm": 31.02,
+   "over_own_reference_mm": 30.11,
+   "share": 0.9709
+  },
+  "NOR_IO3_U2|F.Cu": {
+   "length_mm": 2.6,
+   "over_own_reference_mm": 1.7,
+   "share": 0.6532
+  },
+  "NOR_NCS_U2|B.Cu": {
+   "length_mm": 17.44,
+   "over_own_reference_mm": 16.54,
+   "share": 0.9482
+  },
+  "NOR_NCS_U2|F.Cu": {
+   "length_mm": 6.82,
+   "over_own_reference_mm": 5.38,
+   "share": 0.7882
+  },
+  "NRF_RESET_N|B.Cu": {
+   "length_mm": 5.1,
+   "over_own_reference_mm": 4.2,
+   "share": 0.8234
+  },
+  "NRF_RESET_N|F.Cu": {
+   "length_mm": 5.18,
+   "over_own_reference_mm": 4.28,
+   "share": 0.8262
+  },
+  "NRF_SWCLK|B.Cu": {
+   "length_mm": 25.99,
+   "over_own_reference_mm": 25.54,
+   "share": 0.9827
+  },
+  "NRF_SWCLK|F.Cu": {
+   "length_mm": 0.94,
+   "over_own_reference_mm": 0.46,
+   "share": 0.4874
+  },
+  "NRF_SWDIO|B.Cu": {
+   "length_mm": 26.1,
+   "over_own_reference_mm": 25.65,
+   "share": 0.9827
+  },
+  "NRF_SWDIO|F.Cu": {
+   "length_mm": 1.22,
+   "over_own_reference_mm": 0.77,
+   "share": 0.6318
+  },
+  "PDM_CLK_1V8_FANOUT|B.Cu": {
+   "length_mm": 80.25,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "PDM_CLK_1V8_FANOUT|F.Cu": {
+   "length_mm": 66.89,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "PDM_CLK_1V8_U7|F.Cu": {
+   "length_mm": 7.01,
+   "over_own_reference_mm": 7.01,
+   "share": 1.0
+  },
+  "PDM_DATA1|B.Cu": {
+   "length_mm": 12.23,
+   "over_own_reference_mm": 11.3,
+   "share": 0.924
+  },
+  "PDM_DATA1|F.Cu": {
+   "length_mm": 4.13,
+   "over_own_reference_mm": 3.23,
+   "share": 0.7818
+  },
+  "PDM_DATA2_1V8|B.Cu": {
+   "length_mm": 26.8,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "PDM_DATA2_1V8|F.Cu": {
+   "length_mm": 31.97,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "PDM_DATA3_1V8|B.Cu": {
+   "length_mm": 45.18,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "PDM_DATA3_1V8|F.Cu": {
+   "length_mm": 5.08,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "PDM_DATA3|B.Cu": {
+   "length_mm": 15.67,
+   "over_own_reference_mm": 14.75,
+   "share": 0.941
+  },
+  "PDM_DATA3|F.Cu": {
+   "length_mm": 4.59,
+   "over_own_reference_mm": 3.66,
+   "share": 0.7965
+  },
+  "PDM_DATA4_1V8|B.Cu": {
+   "length_mm": 35.11,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "PDM_DATA4_1V8|F.Cu": {
+   "length_mm": 16.86,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "PDM_DATA4|B.Cu": {
+   "length_mm": 20.84,
+   "over_own_reference_mm": 19.93,
+   "share": 0.9568
+  },
+  "PDM_DATA4|F.Cu": {
+   "length_mm": 12.42,
+   "over_own_reference_mm": 11.52,
+   "share": 0.9274
+  },
+  "Q1_BASE|F.Cu": {
+   "length_mm": 5.79,
+   "over_own_reference_mm": 0.3,
+   "share": 0.0522
+  },
+  "Q2_BASE|B.Cu": {
+   "length_mm": 3.67,
+   "over_own_reference_mm": 2.76,
+   "share": 0.7532
+  },
+  "Q2_BASE|F.Cu": {
+   "length_mm": 5.05,
+   "over_own_reference_mm": 1.35,
+   "share": 0.2672
+  },
+  "Q3_BASE|F.Cu": {
+   "length_mm": 5.63,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SD_CK_CARD|B.Cu": {
+   "length_mm": 18.07,
+   "over_own_reference_mm": 12.62,
+   "share": 0.6984
+  },
+  "SD_CK_CARD|F.Cu": {
+   "length_mm": 52.84,
+   "over_own_reference_mm": 50.57,
+   "share": 0.9569
+  },
+  "SD_CK_U1|B.Cu": {
+   "length_mm": 6.55,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SD_CK_U1|F.Cu": {
+   "length_mm": 7.59,
+   "over_own_reference_mm": 6.69,
+   "share": 0.8814
+  },
+  "SD_CMD_CARD|B.Cu": {
+   "length_mm": 23.01,
+   "over_own_reference_mm": 21.17,
+   "share": 0.9201
+  },
+  "SD_CMD_CARD|F.Cu": {
+   "length_mm": 13.48,
+   "over_own_reference_mm": 12.13,
+   "share": 0.8997
+  },
+  "SD_CMD_U1|F.Cu": {
+   "length_mm": 30.99,
+   "over_own_reference_mm": 30.99,
+   "share": 1.0
+  },
+  "SD_D0_CARD|B.Cu": {
+   "length_mm": 11.63,
+   "over_own_reference_mm": 9.82,
+   "share": 0.845
+  },
+  "SD_D0_CARD|F.Cu": {
+   "length_mm": 13.89,
+   "over_own_reference_mm": 11.84,
+   "share": 0.8527
+  },
+  "SD_D1_CARD|F.Cu": {
+   "length_mm": 23.61,
+   "over_own_reference_mm": 23.61,
+   "share": 1.0
+  },
+  "SD_D2_CARD|B.Cu": {
+   "length_mm": 9.41,
+   "over_own_reference_mm": 8.51,
+   "share": 0.9042
+  },
+  "SD_D2_CARD|F.Cu": {
+   "length_mm": 16.68,
+   "over_own_reference_mm": 15.28,
+   "share": 0.9161
+  },
+  "SD_D2_U1|F.Cu": {
+   "length_mm": 35.77,
+   "over_own_reference_mm": 35.77,
+   "share": 1.0
+  },
+  "SD_D3_CARD|B.Cu": {
+   "length_mm": 2.73,
+   "over_own_reference_mm": 1.83,
+   "share": 0.6701
+  },
+  "SD_D3_CARD|F.Cu": {
+   "length_mm": 5.27,
+   "over_own_reference_mm": 4.37,
+   "share": 0.8292
+  },
+  "SD_DET|B.Cu": {
+   "length_mm": 9.24,
+   "over_own_reference_mm": 8.34,
+   "share": 0.9025
+  },
+  "SD_DET|F.Cu": {
+   "length_mm": 4.63,
+   "over_own_reference_mm": 3.69,
+   "share": 0.7981
+  },
+  "SIM1_CLK_CONN|B.Cu": {
+   "length_mm": 9.88,
+   "over_own_reference_mm": 8.08,
+   "share": 0.8176
+  },
+  "SIM1_CLK_CONN|F.Cu": {
+   "length_mm": 6.0,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM1_CLK_MUX|B.Cu": {
+   "length_mm": 8.23,
+   "over_own_reference_mm": 7.3,
+   "share": 0.887
+  },
+  "SIM1_CLK_MUX|F.Cu": {
+   "length_mm": 9.62,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM1_DATA_CONN|F.Cu": {
+   "length_mm": 8.22,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM1_DATA_MUX|B.Cu": {
+   "length_mm": 12.27,
+   "over_own_reference_mm": 11.33,
+   "share": 0.9233
+  },
+  "SIM1_DATA_MUX|F.Cu": {
+   "length_mm": 2.44,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM1_DET|F.Cu": {
+   "length_mm": 6.18,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM1_RST_CONN|B.Cu": {
+   "length_mm": 3.15,
+   "over_own_reference_mm": 2.25,
+   "share": 0.7142
+  },
+  "SIM1_RST_CONN|F.Cu": {
+   "length_mm": 13.5,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM1_RST_MUX|B.Cu": {
+   "length_mm": 12.51,
+   "over_own_reference_mm": 11.61,
+   "share": 0.928
+  },
+  "SIM1_RST_MUX|F.Cu": {
+   "length_mm": 2.05,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM1_VDD_CONN|F.Cu": {
+   "length_mm": 27.28,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM1_VDD_CONN|In3.Cu": {
+   "length_mm": 5.41,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM2_CLK_CONN|B.Cu": {
+   "length_mm": 5.8,
+   "over_own_reference_mm": 4.87,
+   "share": 0.8392
+  },
+  "SIM2_CLK_CONN|F.Cu": {
+   "length_mm": 12.33,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM2_CLK_MUX|B.Cu": {
+   "length_mm": 27.28,
+   "over_own_reference_mm": 11.34,
+   "share": 0.4155
+  },
+  "SIM2_CLK_MUX|F.Cu": {
+   "length_mm": 6.78,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM2_DATA_CONN|F.Cu": {
+   "length_mm": 18.53,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM2_DATA_MUX|B.Cu": {
+   "length_mm": 25.68,
+   "over_own_reference_mm": 23.08,
+   "share": 0.8987
+  },
+  "SIM2_DATA_MUX|F.Cu": {
+   "length_mm": 12.35,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM2_DET|F.Cu": {
+   "length_mm": 7.23,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM2_RST_CONN|B.Cu": {
+   "length_mm": 3.19,
+   "over_own_reference_mm": 2.28,
+   "share": 0.7172
+  },
+  "SIM2_RST_CONN|F.Cu": {
+   "length_mm": 15.34,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM2_RST_MUX|B.Cu": {
+   "length_mm": 21.53,
+   "over_own_reference_mm": 10.65,
+   "share": 0.4945
+  },
+  "SIM2_RST_MUX|F.Cu": {
+   "length_mm": 10.12,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM2_VDD_CONN|F.Cu": {
+   "length_mm": 30.72,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM2_VDD_CONN|In3.Cu": {
+   "length_mm": 3.78,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM_MUX_EN|B.Cu": {
+   "length_mm": 22.78,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM_MUX_EN|F.Cu": {
+   "length_mm": 5.66,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM_MUX_SEL|B.Cu": {
+   "length_mm": 4.68,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "SIM_MUX_SEL|F.Cu": {
+   "length_mm": 8.74,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "TAMPER_IN_CONN|F.Cu": {
+   "length_mm": 16.43,
+   "over_own_reference_mm": 16.43,
+   "share": 1.0
+  },
+  "TAMPER_IN_U1|B.Cu": {
+   "length_mm": 13.44,
+   "over_own_reference_mm": 11.6,
+   "share": 0.863
+  },
+  "TAMPER_IN_U1|F.Cu": {
+   "length_mm": 39.53,
+   "over_own_reference_mm": 37.68,
+   "share": 0.953
+  },
+  "U13_EN_N|B.Cu": {
+   "length_mm": 8.85,
+   "over_own_reference_mm": 7.92,
+   "share": 0.8944
+  },
+  "U13_EN_N|F.Cu": {
+   "length_mm": 8.87,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "U8_MAIN_DTR_1V8|B.Cu": {
+   "length_mm": 27.49,
+   "over_own_reference_mm": 26.56,
+   "share": 0.9663
+  },
+  "U8_MAIN_DTR_1V8|F.Cu": {
+   "length_mm": 7.1,
+   "over_own_reference_mm": 5.09,
+   "share": 0.7176
+  },
+  "U8_MAIN_RI_1V8|B.Cu": {
+   "length_mm": 23.65,
+   "over_own_reference_mm": 21.76,
+   "share": 0.92
+  },
+  "U8_MAIN_RI_1V8|F.Cu": {
+   "length_mm": 4.96,
+   "over_own_reference_mm": 1.85,
+   "share": 0.3723
+  },
+  "U8_MAIN_RXD_1V8|B.Cu": {
+   "length_mm": 21.09,
+   "over_own_reference_mm": 20.19,
+   "share": 0.9573
+  },
+  "U8_MAIN_RXD_1V8|F.Cu": {
+   "length_mm": 11.9,
+   "over_own_reference_mm": 8.45,
+   "share": 0.7104
+  },
+  "U8_MAIN_TXD_1V8|B.Cu": {
+   "length_mm": 7.98,
+   "over_own_reference_mm": 7.08,
+   "share": 0.8871
+  },
+  "U8_MAIN_TXD_1V8|F.Cu": {
+   "length_mm": 37.66,
+   "over_own_reference_mm": 31.83,
+   "share": 0.8452
+  },
+  "U8_PWRKEY_N|B.Cu": {
+   "length_mm": 29.36,
+   "over_own_reference_mm": 26.58,
+   "share": 0.9055
+  },
+  "U8_PWRKEY_N|F.Cu": {
+   "length_mm": 14.35,
+   "over_own_reference_mm": 10.71,
+   "share": 0.7468
+  },
+  "U8_RESET_N|B.Cu": {
+   "length_mm": 23.69,
+   "over_own_reference_mm": 22.78,
+   "share": 0.962
+  },
+  "U8_RESET_N|F.Cu": {
+   "length_mm": 10.71,
+   "over_own_reference_mm": 9.3,
+   "share": 0.8684
+  },
+  "U8_STATUS_1V8|B.Cu": {
+   "length_mm": 32.11,
+   "over_own_reference_mm": 31.21,
+   "share": 0.9719
+  },
+  "U8_STATUS_1V8|F.Cu": {
+   "length_mm": 4.49,
+   "over_own_reference_mm": 0.74,
+   "share": 0.1642
+  },
+  "U8_VDD_EXT_1V8|B.Cu": {
+   "length_mm": 0.85,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "U8_VDD_EXT_1V8|F.Cu": {
+   "length_mm": 11.31,
+   "over_own_reference_mm": 3.81,
+   "share": 0.3366
+  },
+  "U8_VDD_EXT_1V8|In3.Cu": {
+   "length_mm": 80.84,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "USB_CC1|F.Cu": {
+   "length_mm": 4.96,
+   "over_own_reference_mm": 4.96,
+   "share": 1.0
+  },
+  "USB_CC2|F.Cu": {
+   "length_mm": 5.0,
+   "over_own_reference_mm": 5.0,
+   "share": 1.0
+  },
+  "USB_DM_U1|F.Cu": {
+   "length_mm": 4.18,
+   "over_own_reference_mm": 4.18,
+   "share": 1.0
+  },
+  "USB_DP_U1|F.Cu": {
+   "length_mm": 4.18,
+   "over_own_reference_mm": 4.18,
+   "share": 1.0
+  },
+  "USB_SHIELD|B.Cu": {
+   "length_mm": 8.36,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "USB_SHIELD|F.Cu": {
+   "length_mm": 11.87,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "USB_VBUS_CONN|F.Cu": {
+   "length_mm": 12.16,
+   "over_own_reference_mm": 11.26,
+   "share": 0.9259
+  },
+  "USB_VBUS_CONN|In3.Cu": {
+   "length_mm": 8.39,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "VCORE_1V1|F.Cu": {
+   "length_mm": 8.63,
+   "over_own_reference_mm": 7.67,
+   "share": 0.8883
+  },
+  "VCORE_1V1|In3.Cu": {
+   "length_mm": 7.71,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  },
+  "VREF+|F.Cu": {
+   "length_mm": 2.04,
+   "over_own_reference_mm": 1.14,
+   "share": 0.5567
+  },
+  "VREF+|In3.Cu": {
+   "length_mm": 11.66,
+   "over_own_reference_mm": 0.0,
+   "share": 0.0
+  }
+ }
+}

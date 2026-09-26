@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-26: PCB-MAIN candidate 005 (candidate 004 + L1 moved + session C)
-tools/apply_pcb_main_routing_005_candidate_rev_a.py
