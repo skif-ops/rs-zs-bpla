@@ -1,0 +1,1 @@
+tools/apply_pcb_main_tp_3v3_039_rev_a.py
