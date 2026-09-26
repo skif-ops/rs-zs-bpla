@@ -1,1 +1,0 @@
-tools/apply_pcb_main_lora_dio1_local_045_rev_a.py
