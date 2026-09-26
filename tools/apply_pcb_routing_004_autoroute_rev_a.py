@@ -39,8 +39,8 @@ LOG = OUT / "AUTOROUTE.json"
 AUTHORITY = ROOT / "hardware/PCB_MAIN_ROUTING_AUTHORITY_REV_A.csv"
 JAR_URL = "https://github.com/freerouting/freerouting/releases/download/v2.4.1/freerouting-2.4.1.jar"
 JAR_SHA256 = "251101c3eeac22d7e7dfcf6796603279e5d1000283eb82d8f093780f7afc6aa9"
-PASSES = 25
-TIME_LIMIT_S = 60 * 60
+PASSES = 8  # run 1: 423 -> 127 unrouted after 7 passes, 123 after 11 (5-6 min per pass); the session is written at the end
+TIME_LIMIT_S = 110 * 60
 CLASSES = [("signal", None, ["F.Cu", "B.Cu"], 150), ("power", "POWER_RAIL", ["F.Cu", "In3.Cu", "B.Cu"], 300),
            ("burst", "MODEM_BURST_POWER", ["F.Cu", "In3.Cu", "B.Cu"], 800)]
 NOT_AUTOROUTED = ("RETURN_PLANE", "RF_50OHM", "USB_90OHM_DIFF", "SWITCH_NODE")

@@ -1,0 +1,2 @@
+# Queued by Claude 2026-09-26: PCB routing 004 step 2, run 2 - 8 passes so the session is written
+tools/apply_pcb_routing_004_autoroute_rev_a.py
