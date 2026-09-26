@@ -42,6 +42,7 @@ Not a candidate for application yet; nothing here changes the authoritative boar
 | 034 + I2C2_SCL_BUS bridge 035 (`bcf0ba9b…`) | **106** | **0 under the same candidate rules; I2C rise-time/return review open** |
 | 035 + SIM1_RST_CONN bridge 036 (`844e3f7f…`) | **105** | **0 under the same candidate rules; mixed-domain return review open** |
 | 036 + R90 pull-up 3V3 branch 037 (`75558caa…`) | **104** | **0 under the same candidate rules; pull-up power/DFM review open** |
+| 037 + CELL_DBG_RXD_TP bridge 038 (`2b3d8b12…`) | **103** | **0 under the same candidate rules; mixed return/PDM coupling review open** |
 
 At the end of the autorouting experiments P2 was the best clean result (156 open, 0 new errors, 22 dangling fan-out
 vias to clean); it is built from
@@ -109,13 +110,13 @@ Conclusion: seven autorouting variants converge to 155–160 open connections. T
 (KiCad push-and-shove by a layout engineer, or a generalised version of the 003 router in net groups).
 Tools: `tools/apply_pcb_routing_relief_p1_rev_a.py`, `tools/apply_pcb_routing_fanout_p2_rev_a.py`.
 
-## 7. Bounded local routes 007–037 and current stop (2026-09-26)
+## 7. Bounded local routes 007–038 and current stop (2026-09-26)
 
-The cumulative 037 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
+The cumulative 038 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
 authoritative board. The unchanged general PCB-MAIN project rejects the 0.25/0.15 mm vias introduced in 009 and 010 (five each of
 `annular_width`, `drill_out_of_range`, `via_diameter`). Under an explicit *candidate-only* JLCPCB six-layer process
 overlay (`min_via_diameter=0.25`, `min_through_hole_diameter=0.15`, `min_via_annular_width=0.05`), KiCad 9 comparative
-DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110→109→108→107→106→105→104 open with zero new violations at each accepted step. Candidate projects,
+DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110→109→108→107→106→105→104→103 open with zero new violations at each accepted step. Candidate projects,
 comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` directories. The published six-layer process basis is `https://jlcpcb.com/6-layer-pcb` (minimum
 0.15/0.25 mm and via-in-pad option); a job-specific acceptance is still required.
 
@@ -211,13 +212,19 @@ comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` dire
   track at (80.01, 20.5) via two 0.25/0.15 mm through vias, a 0.15 mm B.Cu
   link and a short F.Cu exit, 3.198 mm total; DRC 105→104. Pull-up supply
   and small-via DFM review remain open.
+- 038: connect U27.2 `CELL_DBG_RXD_TP` to the existing via at (40.3804,
+  57.475) with one 0.25/0.15 mm near-pad via, a short F.Cu stub and 0.15 mm
+  In3.Cu detour, 7.327 mm total; DRC 104→103. The F.Cu stub references
+  In1.Cu GND_DIGITAL, while the In3.Cu path is screened against In4.Cu
+  GND_MODEM. Mixed-domain return, nearby PDM coupling and filled/capped
+  near-pad via DFM remain unresolved Review B items.
 
-Remaining 104 open connections span 65 nets: `3V3_DIGITAL` 13, `1V8_MIC` 8, `AAD_CFG_1V8_FANOUT` 5,
-`SIM2_DET` 3, and 75 others. Of 34 distinct U1 pads now appearing in the open-connection report, the earlier 009
+Remaining 103 open connections span 65 nets: `3V3_DIGITAL` 13, `1V8_MIC` 8, `AAD_CFG_1V8_FANOUT` 5,
+`SIM2_DET` 3, and 74 others. Of 34 distinct U1 pads now appearing in the open-connection report, the earlier 009
 first-pass 0.25/0.15 mm via-in-pad clearance scan admitted only 13 of 40; most others hit existing B.Cu/In3 copper. A clean
 route requires placement/rip-up and local power/return design, followed by native DRC and SI/PI review.
 
-Do not copy 037 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
+Do not copy 038 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
 
 ## 8. Locality scan and relief targets after 033
 
