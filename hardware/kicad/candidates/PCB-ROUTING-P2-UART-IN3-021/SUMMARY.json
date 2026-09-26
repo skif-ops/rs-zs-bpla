@@ -1,0 +1,20 @@
+{
+  "schema": "dioneya-pcb-main-uart-in3-021-v1",
+  "base_sha256": "7d45ad459ac597d2b993e58bc3be758f77f29d72f4b14c024e6c3b4316b1ae6e",
+  "candidate_sha256": "5b6290ccbeac173310ef66d600282e702da821538107385cda6325096e157e5c",
+  "net": "TEST_UART_RX_U1",
+  "vias": 2,
+  "track_segments": 7,
+  "width_mm": 0.15,
+  "inner_length_mm": 11.912,
+  "drc": {
+    "base_unconnected": 121,
+    "candidate_unconnected": 120,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "inner_reference_review_b": "OPEN: digital UART return over In2.Cu GND_MIC",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
