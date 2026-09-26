@@ -44,6 +44,7 @@ Not a candidate for application yet; nothing here changes the authoritative boar
 | 036 + R90 pull-up 3V3 branch 037 (`75558caa…`) | **104** | **0 under the same candidate rules; pull-up power/DFM review open** |
 | 037 + CELL_DBG_RXD_TP bridge 038 (`2b3d8b12…`) | **103** | **0 under the same candidate rules; mixed return/PDM coupling review open** |
 | 038 + TP_EOL 3V3 supply bridge 039 (`039c9f4e…`) | **102** | **0 under the same candidate rules; test-pad supply/return and via DFM review open** |
+| 039 + FB1 input 3V8_MODEM bridge 040 (`0b1b7a44…`) | **101** | **0 under the same candidate rules; modem burst current/PI and via-in-pad DFM review open** |
 
 At the end of the autorouting experiments P2 was the best clean result (156 open, 0 new errors, 22 dangling fan-out
 vias to clean); it is built from
@@ -111,13 +112,13 @@ Conclusion: seven autorouting variants converge to 155–160 open connections. T
 (KiCad push-and-shove by a layout engineer, or a generalised version of the 003 router in net groups).
 Tools: `tools/apply_pcb_routing_relief_p1_rev_a.py`, `tools/apply_pcb_routing_fanout_p2_rev_a.py`.
 
-## 7. Bounded local routes 007–039 and current stop (2026-09-26)
+## 7. Bounded local routes 007–040 and current stop (2026-09-26)
 
-The cumulative 039 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
+The cumulative 040 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
 authoritative board. The unchanged general PCB-MAIN project rejects the 0.25/0.15 mm vias introduced in 009 and 010 (five each of
 `annular_width`, `drill_out_of_range`, `via_diameter`). Under an explicit *candidate-only* JLCPCB six-layer process
 overlay (`min_via_diameter=0.25`, `min_through_hole_diameter=0.15`, `min_via_annular_width=0.05`), KiCad 9 comparative
-DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110→109→108→107→106→105→104→103→102 open with zero new violations at each accepted step. Candidate projects,
+DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110→109→108→107→106→105→104→103→102→101 open with zero new violations at each accepted step. Candidate projects,
 comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` directories. The published six-layer process basis is `https://jlcpcb.com/6-layer-pcb` (minimum
 0.15/0.25 mm and via-in-pad option); a job-specific acceptance is still required.
 
@@ -223,13 +224,18 @@ comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` dire
   to the existing B.Cu branch at (44.34, 23.5) with one 0.25/0.15 mm
   through via and a 0.15 mm B.Cu route, 3.400 mm total; DRC 103→102.
   Test-pad supply/return and small-via DFM review remain open.
+- 040: join FB1.1 `3V8_MODEM` to the existing 0.8 mm B.Cu supply run
+  at (39, 52) with a 0.50/0.30 mm via inside the bead's SMD pad at
+  (38.5, 52) and a 0.8 mm, 0.5 mm long B.Cu tie; DRC 102→101.
+  The modem burst current, power integrity and filled/capped via-in-pad
+  manufacturing process require Review B; DRC alone cannot release this feed.
 
-Remaining 102 open connections span 65 nets: `3V3_DIGITAL` 12, `1V8_MIC` 8, `AAD_CFG_1V8_FANOUT` 5,
-`SIM2_DET` 3, and 74 others. Of 37 distinct U1 pads now appearing in the open-connection report, the earlier 009
+Remaining 101 open connections span 64 nets: `3V3_DIGITAL` 12, `1V8_MIC` 8, `AAD_CFG_1V8_FANOUT` 5,
+`SIM2_DET` 3, and 73 others. Of 36 distinct U1 pads now appearing in the open-connection report, the earlier 009
 first-pass 0.25/0.15 mm via-in-pad clearance scan admitted only 13 of 40; most others hit existing B.Cu/In3 copper. A clean
 route requires placement/rip-up and local power/return design, followed by native DRC and SI/PI review.
 
-Do not copy 039 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
+Do not copy 040 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
 
 ## 8. Locality scan and relief targets after 033
 
