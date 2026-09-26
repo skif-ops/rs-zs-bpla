@@ -70,7 +70,12 @@ async def event(event_id:str):
 
 @router.post('/stations/{station_id}/audio-request')
 async def request_audio(station_id:int,req:AudioRequest):
-    try: command=store.create_command(station_id,'CMD_REQUEST_AUDIO',req.model_dump())
+    payload=req.model_dump()
+    if payload['event_time_us'] is None:              # the station may have lost its own record (a reboot): send the time
+        try: payload['event_time_us']=store.detection_time_us(station_id,req.event_id)
+        except ValueError: payload['event_time_us']=None
+    if payload['event_time_us'] is None: payload.pop('event_time_us')
+    try: command=store.create_command(station_id,'CMD_REQUEST_AUDIO',payload)
     except ValueError as exc: raise HTTPException(400,str(exc)) from None
     return command.model_dump()
 
