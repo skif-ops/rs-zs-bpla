@@ -171,11 +171,27 @@
     "90ohm_main_segment_matched_length": "PASS",
     "main_pair_minimum_gap_0p2032mm": "PASS",
     "F_over_In1_and_B_over_In4_digital_reference_outline": "PASS",
-    "native_kicad_9_drc": "PENDING",
+    "native_kicad_9_drc": "RERUN_PENDING_WITH_CANDIDATE_ONLY_RULES",
     "via_in_pad_finished_drill_annular_ring_and_fill": "OPEN",
     "return_path_and_usb_si": "OPEN"
   },
   "six_layer_fabricator_public_basis": "https://jlcpcb.com/6-layer-pcb",
   "applied_to_authoritative_board": false,
-  "manufacturing_release": false
+  "manufacturing_release": false,
+  "first_native_drc": {
+    "base_unconnected": 146,
+    "candidate_unconnected": 142,
+    "new_errors": {
+      "annular_width": 4,
+      "drill_out_of_range": 4,
+      "via_diameter": 4
+    },
+    "result": "FAILED_GENERAL_0P50_0P30_VIA_MINIMUM"
+  },
+  "candidate_only_rules": {
+    "min_via_diameter_mm": 0.25,
+    "min_drill_mm": 0.15,
+    "min_annular_width_mm": 0.05,
+    "authoritative_project_unchanged": true
+  }
 }

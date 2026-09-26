@@ -143,19 +143,33 @@ def run_drc() -> dict:
     shutil.copytree(ROOT / "hardware/kicad/native/PCB-MAIN", work)
     try:
         rel = work.relative_to(ROOT)
+        shutil.copyfile(BASE, work / "base.kicad_pcb")
         shutil.copyfile(CANDIDATE, work / "candidate.kicad_pcb")
-        shutil.copyfile(work / "PCB-MAIN.kicad_pro", work / "candidate.kicad_pro")
+        # This is a candidate-only manufacturing-process overlay. The native
+        # project's general 0.50/0.30 mm via rule is never changed. JLCPCB's
+        # public 6-layer via-in-pad capability is 0.25/0.15 mm; the nominal
+        # annular width is 0.05 mm. Compare both boards under this exact rule.
+        project = json.loads((work / "PCB-MAIN.kicad_pro").read_text(encoding="utf-8"))
+        rules = project.setdefault("board", {}).setdefault("design_settings", {}).setdefault("rules", {})
+        rules.update({"min_via_diameter": .25, "min_through_hole_diameter": .15,
+                      "min_via_annular_width": .05})
+        project_text = json.dumps(project, indent=2, sort_keys=True) + "\n"
+        for name in ("base", "candidate"):
+            (work / f"{name}.kicad_pro").write_text(project_text, encoding="utf-8")
+        (OUT / "PCB-MAIN_P2_USB_009_CANDIDATE_REV_A.kicad_pro").write_text(project_text, encoding="utf-8")
         stage = "tools/pcb_main_ground_domain_002_stage_rev_a.py"
-        for command in (("/usr/bin/python3", stage, "fill", f"{rel}/candidate.kicad_pcb", f"{rel}/candidate.kicad_pcb"),
-                        ("kicad-cli", "pcb", "drc", "--format", "json", "--severity-all", "-o",
-                         f"{rel}/drc_candidate.json", f"{rel}/candidate.kicad_pcb")):
-            result = gate.docker(*command)
-            assert result.returncode == 0, (command, result.stdout[-1000:], result.stderr[-1000:])
+        for name in ("base", "candidate"):
+            for command in (("/usr/bin/python3", stage, "fill", f"{rel}/{name}.kicad_pcb", f"{rel}/{name}.kicad_pcb"),
+                            ("kicad-cli", "pcb", "drc", "--format", "json", "--severity-all", "-o",
+                             f"{rel}/drc_{name}.json", f"{rel}/{name}.kicad_pcb")):
+                result = gate.docker(*command)
+                assert result.returncode == 0, (command, result.stdout[-1000:], result.stderr[-1000:])
         gate.docker("chmod", "-R", "a+rwX", str(rel))
         report = json.loads((work / "drc_candidate.json").read_text(encoding="utf-8"))
+        baseline = json.loads((work / "drc_base.json").read_text(encoding="utf-8"))
         shutil.copyfile(work / "drc_candidate.json", OUT / "drc_candidate.json")
-        before = json.loads(BASE_DRC.read_text(encoding="utf-8"))
-        (bfp, bunc), (cfp, cunc) = gate.drc_fingerprints(before), gate.drc_fingerprints(report)
+        shutil.copyfile(work / "drc_base.json", OUT / "drc_base_candidate_rules.json")
+        (bfp, bunc), (cfp, cunc) = gate.drc_fingerprints(baseline), gate.drc_fingerprints(report)
         novel = [(key, count - bfp.get(key, 0)) for key, count in cfp.items() if count > bfp.get(key, 0)]
         by_type = Counter()
         for key, count in novel:
@@ -184,6 +198,8 @@ def main() -> None:
     summary = {"schema": "dioneya-pcb-main-usb-connector-009-v1", "base_sha256": BASE_SHA,
                "candidate_sha256": sha(CANDIDATE), "routes": len(ROUTES), "vias": len(VIAS),
                "ripped_cc1_tracks": len(REMOVE_CC1), "drc": drc,
+               "candidate_only_rules": {"min_via_diameter_mm": .25, "min_drill_mm": .15,
+                                        "min_annular_width_mm": .05},
                "via_in_pad_filled_capped_process_review": "OPEN",
                "usb_90ohm_si_return_review": "OPEN",
                "applied_to_authoritative_board": False, "manufacturing_release": False}
