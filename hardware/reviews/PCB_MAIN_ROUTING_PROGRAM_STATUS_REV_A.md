@@ -35,6 +35,7 @@ Not a candidate for application yet; nothing here changes the authoritative boar
 | 027 + SWD 3V3 B.Cu branch 028 (`f0e1243e…`) | **113** | **0 under the same candidate rules; test-pad power/return review open** |
 | 028 + SD_D2 In3 crossing 029 (`cbbc51ed…`) | **112** | **0 under the same candidate rules; SD return/DFM review open** |
 | 029 + C6→R14 3V3 branch 030 (`2cddda58…`) | **111** | **0 under the same candidate rules; pull-up power/DFM review open** |
+| 030 + SD_D1 B.Cu crossing 031 (`c27f9873…`) | **110** | **0 under the same candidate rules; SD return/DFM review open** |
 
 At the end of the autorouting experiments P2 was the best clean result (156 open, 0 new errors, 22 dangling fan-out
 vias to clean); it is built from
@@ -102,13 +103,13 @@ Conclusion: seven autorouting variants converge to 155–160 open connections. T
 (KiCad push-and-shove by a layout engineer, or a generalised version of the 003 router in net groups).
 Tools: `tools/apply_pcb_routing_relief_p1_rev_a.py`, `tools/apply_pcb_routing_fanout_p2_rev_a.py`.
 
-## 7. Bounded local routes 007–030 and current stop (2026-09-26)
+## 7. Bounded local routes 007–031 and current stop (2026-09-26)
 
-The cumulative 030 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
+The cumulative 031 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
 authoritative board. The unchanged general PCB-MAIN project rejects the 0.25/0.15 mm vias introduced in 009 and 010 (five each of
 `annular_width`, `drill_out_of_range`, `via_diameter`). Under an explicit *candidate-only* JLCPCB six-layer process
 overlay (`min_via_diameter=0.25`, `min_through_hole_diameter=0.15`, `min_via_annular_width=0.05`), KiCad 9 comparative
-DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111 open with zero new violations at each accepted step. Candidate projects,
+DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110 open with zero new violations at each accepted step. Candidate projects,
 comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` directories. The published six-layer process basis is `https://jlcpcb.com/6-layer-pcb` (minimum
 0.15/0.25 mm and via-in-pad option); a job-specific acceptance is still required.
 
@@ -176,10 +177,14 @@ comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` dire
   capacitor island with two 0.25/0.15 mm through vias and a 0.15 mm
   In3.Cu link plus two short F.Cu exits, 2.689 mm total; DRC 112→111.
   Pull-up supply/return and via-in-pad DFM review remain open.
+- 031: connect `SD_D1_CARD` from the existing F.Cu run near R82 to R87.2
+  with a 0.15 mm B.Cu detour and two 0.25/0.15 mm through vias, one at
+  R87.2; 2.655 mm total over In4.Cu GND_DIGITAL. DRC 111→110 and the net
+  leaves the open-connection report. SD return and via-in-pad DFM review remain open.
 
-Remaining 111 open connections span 66 nets: `3V3_DIGITAL` 17, `1V8_MIC` 8, `AAD_CFG_1V8_FANOUT` 5,
-`I2C2_SCL_BUS` 3, and 78 others. Of 34 U1 pads now appearing in the open-connection report, the earlier 009
+Remaining 110 open connections span 65 nets: `3V3_DIGITAL` 17, `1V8_MIC` 8, `AAD_CFG_1V8_FANOUT` 5,
+`I2C2_SCL_BUS` 3, and 77 others. Of 34 U1 pads now appearing in the open-connection report, the earlier 009
 first-pass 0.25/0.15 mm via-in-pad clearance scan admitted only 13 of 40; most others hit existing B.Cu/In3 copper. A clean
 route requires placement/rip-up and local power/return design, followed by native DRC and SI/PI review.
 
-Do not copy 030 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
+Do not copy 031 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
