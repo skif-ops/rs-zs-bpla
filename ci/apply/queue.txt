@@ -1,1 +1,0 @@
-tools/apply_pcb_main_vcore_u1_49_041_rev_a.py
