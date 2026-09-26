@@ -1,1 +1,0 @@
-tools/apply_pcb_main_gnss_switched_r62_048_rev_a.py
