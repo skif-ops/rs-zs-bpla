@@ -1,0 +1,22 @@
+{
+  "schema": "dioneya-pcb-main-u1-c7-relief-013-v1",
+  "base_sha256": "ad6cbb021f9ba8fa3a3b4c18b0820e49c864ea8113a55b0645e37f63928fe0d1",
+  "candidate_sha256": "d18f20d2c18b9f35d2b8006a396c8d127fa2d0936c3601bd03cc94639dc7909b",
+  "moved_c7_mm": [
+    -0.15,
+    0
+  ],
+  "rotated_c7_deg": 180,
+  "ripped_ground_tracks": 2,
+  "new_short_tracks": 3,
+  "drc": {
+    "base_unconnected": 140,
+    "candidate_unconnected": 139,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "c7_power_return_review": "OPEN",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
