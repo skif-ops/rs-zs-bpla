@@ -1,0 +1,19 @@
+{
+  "schema": "dioneya-pcb-main-u1-power-010-v1",
+  "base_sha256": "c42e099cd366556055db0947ec5e99a0b774bc9a9019723c78ceadd9ca38122b",
+  "candidate_sha256": "6cc9d30c5c2326f1b0ea2eeaa91f2240e5e3b83c335c080e2fb4537f9460da16",
+  "3v3_route_length_mm": 13.97,
+  "width_mm": 0.25,
+  "vias_0_25_0_15": 1,
+  "drc": {
+    "base_unconnected": 142,
+    "candidate_unconnected": 141,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_via_rules": true,
+  "power_integrity_review": "OPEN",
+  "via_in_pad_dfm_review": "OPEN",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
