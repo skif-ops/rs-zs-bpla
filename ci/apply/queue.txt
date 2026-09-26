@@ -1,1 +1,0 @@
-tools/apply_pcb_main_p2_gnss_008_rev_a.py
