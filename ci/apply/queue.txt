@@ -1,1 +1,0 @@
-tools/apply_pcb_main_u1_c5_power_014_rev_a.py
