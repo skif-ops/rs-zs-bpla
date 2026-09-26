@@ -12,8 +12,12 @@ Not a candidate for application yet; nothing here changes the authoritative boar
 | Global session G, candidate G (`aec71de7…`) | 161 | 0 |
 | Experiment P1: G + pogo rows TP_EOL/TP_CELL_DBG moved off U1 (`3a021176…`, not filtered) | 136 before filter (G: 131) | 30 |
 | **Experiment P2: G + Freerouting fan-out, flagged pieces removed (`6da31a8c…`)** | **156** | **0** |
+| P2 + eight local F.Cu links 007 (`d45b5b1d…`) | 148 | 0 |
+| 007 + GNSS antenna-short sense 008 (`63de9049…`) | 146 | 0 |
+| 008 + USB connector escape 009 (`c42e099c…`) | **142** | **0 under candidate-only 6-layer via rules** |
 
-Candidate P2 is now the best clean result (156 open, 0 new errors, 22 dangling fan-out vias to clean); it is built from
+At the end of the autorouting experiments P2 was the best clean result (156 open, 0 new errors, 22 dangling fan-out
+vias to clean); it is built from
 the same router input as G with fan-out enabled, and only the connected pieces of new copper flagged by KiCad DRC are
 left out (199 items). Candidate G below is kept as the fan-out-free reference: one reproducible session from the 003 board, clean after the DRC filter, not
 dependent on the chain A–D. It adds 123 nets, 2014 segments and 275 vias (F.Cu / In3.Cu / B.Cu) and moves L1 to the
@@ -58,9 +62,9 @@ work is layout work:
    bulk capacitors of 3V8_MODEM_BB/RF (C37–C47, D1, D2, R42 at x 6–10 mm) are 20–25 mm from the U8 supply pins; the
    1V8_MIC and 3V3_DIGITAL decoupling around U1/U7. Then one more global session from the relieved placement.
 2. **Manual routing** of what remains (the 003 router, net groups, rip-up of blocking autorouted copper, KiCad DRC).
-3. **USB connector pair:** blocked by the recorded DFM hold (`PCB_MAIN_USB_ROUTEABILITY_REVIEW_REV_A.md`): the
-   alternating J11 contacts need a via smaller than 0.50/0.30 mm; only after the fabricator confirms finished drill and
-   annular ring for this job.
+3. **USB connector pair:** the recorded DFM hold (`PCB_MAIN_USB_ROUTEABILITY_REVIEW_REV_A.md`) requires a via smaller
+   than 0.50/0.30 mm. Section 7 records a candidate-only 0.25/0.15 mm via-in-pad route under the published six-layer
+   process limits; finished drill, annular ring, filling/capping and SI/DFM acceptance remain open.
 4. **Modem-domain reference:** F.Cu/GND_MODEM 32.7 % — modem-domain nets on F.Cu leave the In1 GND_MODEM zone;
    to be constrained by region in the next session or rerouted on B.Cu.
 
@@ -77,3 +81,29 @@ branch); sessions A–E and candidates 004–006 on `feature/pcb-routing-004`.
 Conclusion: seven autorouting variants converge to 155–160 open connections. The remainder needs interactive routing
 (KiCad push-and-shove by a layout engineer, or a generalised version of the 003 router in net groups).
 Tools: `tools/apply_pcb_routing_relief_p1_rev_a.py`, `tools/apply_pcb_routing_fanout_p2_rev_a.py`.
+
+## 7. Bounded local routes 007–009 and current stop (2026-09-26)
+
+The cumulative 009 is the lowest native-DRC-clean routing experiment on this branch. It is **not applied** to the
+authoritative board. The unchanged general PCB-MAIN project rejects its four 0.25/0.15 mm vias (four each of
+`annular_width`, `drill_out_of_range`, `via_diameter`). Under an explicit *candidate-only* JLCPCB six-layer process
+overlay (`min_via_diameter=0.25`, `min_through_hole_diameter=0.15`, `min_via_annular_width=0.05`), KiCad 9 comparative
+DRC is 146→142 open with zero new violations. The candidate project, base/candidate DRC and generator are in
+`PCB-ROUTING-P2-USB-009/`. The published six-layer process basis is `https://jlcpcb.com/6-layer-pcb` (minimum
+0.15/0.25 mm and via-in-pad option); a job-specific acceptance is still required.
+
+- 007: eight short F.Cu links in 3V3_DIGITAL and 1V8_MIC; native DRC 156→148, no new violation.
+- 008: two F.Cu branches of `GNSS_ANT_SHORT_N` (MAX-M10S antenna-short status, not RF) from U9 to R62/C63;
+  native DRC 148→146, no new violation.
+- 009: connector-side USB-C duplicated D+/D− contacts and symmetric connector-to-U25 F.Cu paths. Five P2 CC1
+  segments are replaced with a B.Cu CC1 route. Four 0.25/0.15 mm vias, three in SMD pads, require filled/capped
+  via-in-pad and finished-drill/annular-ring review. Main paired F.Cu segments are each 1.5669 mm; this does not
+  establish end-to-end skew through the duplicated contact branches. The nearest existing GND_DIGITAL via to the
+  B6 D+ transition is 2.37 mm. USB pair/return SI review is open.
+
+Remaining 142 open connections span 72 nets: `3V3_DIGITAL` 34, `1V8_MIC` 9, `AAD_CFG_1V8_FANOUT` 8,
+`I2C2_SCL_BUS` 4, and 87 others. Of 40 U1 pads appearing in the open-connection report, a first-pass
+0.25/0.15 mm via-in-pad clearance scan admits only 13; most others hit existing B.Cu/In3 copper. A clean
+route requires placement/rip-up and local power/return design, followed by native DRC and SI/PI review.
+
+Do not copy 009 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
