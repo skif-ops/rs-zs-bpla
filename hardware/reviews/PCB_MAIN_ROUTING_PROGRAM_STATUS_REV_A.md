@@ -1,0 +1,64 @@
+# PCB-MAIN routing program — status after the autorouting sessions (Rev A, 2026-09-26)
+
+Not a candidate for application yet; nothing here changes the authoritative board (`30c6c93e…`, applied 003).
+
+## 1. Result
+
+| Path | Open connections (KiCad DRC, after fill) | New DRC errors |
+|---|---|---|
+| Authoritative board (003) | 421 | — |
+| Stacked sessions A–C, candidate 005 (`231707ed…`) | 156 | 0 |
+| Stacked + session D, candidate 006 (`18cd3efa…`) | 143 | 27 (not yet filtered) |
+| **Global session G, candidate G (`aec71de7…`)** | **161** | **0** |
+
+Candidate G is the proposed base: one reproducible session from the 003 board, clean after the DRC filter, not
+dependent on the chain A–D. It adds 123 nets, 2014 segments and 275 vias (F.Cu / In3.Cu / B.Cu) and moves L1 to the
+SMPS pins of U1 (53.75, 40.75, 180): SMPS_SW ≈ 2.5 mm instead of ≈ 18 mm. Reference (share of length over its own
+ground domain): F.Cu/GND_DIGITAL 92.5 %, B.Cu/GND_DIGITAL 84.8 %, B.Cu/GND_MODEM 88.6 %, **F.Cu/GND_MODEM 32.7 %**.
+
+## 2. Owner decisions (2026-09-26)
+1. Power by pours — accepted; the 3V3_DIGITAL In3 pour was then dropped (option A: traces): In2 carries the GND_MIC
+   plane under almost the whole board (5677 mm², 0.11 mm from In3). The earlier statement that GND_MIC covers only a
+   small area was wrong.
+2. In3 for slow classes (LOW_SPEED_CONTROL, FIXTURE_DEBUG, ANALOG_SENSE_BIAS, MIC_WAKE_SIGNAL, I2C_OPEN_DRAIN,
+   UART_SIGNAL) — accepted; used in sessions D, E, G.
+3. USB connector pair as two loose lines — rejected: it stays a 90 Ω pair (0.1537 / 0.2032 mm, F.Cu over In1).
+
+## 3. Freerouting findings (handled in the router input)
+- Back-side parts (TP_EOL, TP_BLE_SWD, TP_MCU_SWD, TP_CELL_USB, TP_CELL_DBG): their mirrored pads were misplaced;
+  they are described as front parts with pre-mirrored images and B.Cu pads.
+- RoundRect polygon pads (L1, R62, FB1): routed through; replaced by their bounding rectangles.
+- A net with an emptied pin list makes its pads permeable; nets not to be routed are locked to a plane layer instead
+  (grounds stay emptied — no front-side ground pad was crossed).
+- Every candidate is filtered by KiCad 9.0.9 DRC: nets whose new copper has an error are left out whole.
+
+## 4. Open connections of candidate G (161 in 68 nets; list: `OPEN_CONNECTIONS_G.json`)
+
+| Class | Open |
+|---|---|
+| POWER_RAIL (3V3_DIGITAL 27, 1V8_MIC 14, VCORE_1V1 5, …) | 53 |
+| EDGE_DATA / EDGE_CLOCK (SD, SPI, PDM, AAD fan-out) | 30 |
+| MODEM_BURST_POWER (3V8_MODEM_BB 9, 3V8_MODEM_RF 4, 3V8_MODEM 2) | 15 |
+| LOW_SPEED_CONTROL, MODEM_SIM_CONTROL, ANALOG_SENSE_BIAS, I2C, UART, FIXTURE_DEBUG, MIC_WAKE | 56 |
+| USB_90OHM_DIFF (connector pair) | 6 |
+| SWITCH_NODE (SMPS_SW) | 1 |
+
+## 5. Why it stops here, and what is needed
+Five autorouting sessions converge to 140–160 open connections whatever the order: on F.Cu, B.Cu and In3 the present
+placement leaves no channel. More router passes do not help. The main choke is the escape of U1 (STM32U585, LQFP100):
+42 of the 161 open connections (32 nets) end at an isolated U1 pin, ten of them 3V3_DIGITAL supply pins. The remaining
+work is layout work:
+
+1. **U1 escape and placement relief (owner decision needed):** open the U1 fan-out first (decoupling and series parts
+   around the LQFP ring, escape vias outside the pad ring); move/rotate local passive groups to open channels, e.g. the modem
+   bulk capacitors of 3V8_MODEM_BB/RF (C37–C47, D1, D2, R42 at x 6–10 mm) are 20–25 mm from the U8 supply pins; the
+   1V8_MIC and 3V3_DIGITAL decoupling around U1/U7. Then one more global session from the relieved placement.
+2. **Manual routing** of what remains (the 003 router, net groups, rip-up of blocking autorouted copper, KiCad DRC).
+3. **USB connector pair:** blocked by the recorded DFM hold (`PCB_MAIN_USB_ROUTEABILITY_REVIEW_REV_A.md`): the
+   alternating J11 contacts need a via smaller than 0.50/0.30 mm; only after the fabricator confirms finished drill and
+   annular ring for this job.
+4. **Modem-domain reference:** F.Cu/GND_MODEM 32.7 % — modem-domain nets on F.Cu leave the In1 GND_MODEM zone;
+   to be constrained by region in the next session or rerouted on B.Cu.
+
+Tools: `tools/apply_pcb_routing_global_g_rev_a.py`, `tools/apply_pcb_main_routing_g_candidate_rev_a.py` (this
+branch); sessions A–E and candidates 004–006 on `feature/pcb-routing-004`.
