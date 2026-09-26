@@ -1,1 +1,0 @@
-tools/apply_pcb_main_power_islands_016_rev_a.py
