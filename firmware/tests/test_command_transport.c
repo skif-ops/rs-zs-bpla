@@ -46,11 +46,15 @@ static void put_null(zs_cbor_t *cbor) {
   cbor->buf[cbor->len++] = 0xf6u;
 }
 
+/* optional key 4 of the audio request (event time from the server, addendum B) */
+static bool g_with_event_time;
+static uint64_t g_event_time;
+
 static size_t encode_audio_payload(zs_cbor_t *cbor, uint64_t event_id,
                                    zs_audio_segment_t segment,
                                    int32_t start_ms, uint32_t duration_ms) {
   const size_t before = cbor->len;
-  zs_cbor_map(cbor, 4u);
+  zs_cbor_map(cbor, g_with_event_time ? 5u : 4u);
   zs_cbor_uint(cbor, 0u); zs_cbor_uint(cbor, event_id);
   zs_cbor_uint(cbor, 1u); zs_cbor_uint(cbor, segment);
   zs_cbor_uint(cbor, 2u);
@@ -59,6 +63,7 @@ static size_t encode_audio_payload(zs_cbor_t *cbor, uint64_t event_id,
   zs_cbor_uint(cbor, 3u);
   if (segment == ZS_AUDIO_SEGMENT_RANGE) zs_cbor_uint(cbor, duration_ms);
   else put_null(cbor);
+  if (g_with_event_time) { zs_cbor_uint(cbor, 4u); zs_cbor_uint(cbor, g_event_time); }
   return cbor->len - before;
 }
 
@@ -263,8 +268,42 @@ static void test_ttl_limit(void) {
                 &dedup, sizeof(payload), &command) == ZS_COMMAND_STATUS_INVALID_TTL);
 }
 
+/* the optional event time: carried when present (any segment), absent in the four-key form, zero or beyond int64
+   refused as malformed */
+static void test_audio_event_time(void) {
+  const uint8_t command_id[ZS_COMMAND_UUID_BYTES] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88,
+                                                     0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xf0, 0x01};
+  uint8_t payload[512];
+  size_t size;
+  verifier_t verifier = {.accept = true};
+  dedup_t dedup = {.state = ZS_COMMAND_DEDUP_NOT_SEEN};
+  zs_command_t command;
+  memcpy(dedup.expected_id, command_id, sizeof(command_id));
+
+  g_with_event_time = true;
+  g_event_time = UINT64_C(1800000000123456);
+  for (unsigned s = ZS_AUDIO_SEGMENT_PRE; s <= ZS_AUDIO_SEGMENT_RANGE; s++) {
+    size = build_command(payload, sizeof(payload), &verifier, command_id, 17u, UINT64_C(1000000), UINT64_C(2000000), (zs_audio_segment_t)s);
+    assert(decode(payload, size, 17u, UINT64_C(1500000), true, &verifier, &dedup, sizeof(payload), &command) == ZS_COMMAND_STATUS_OK);
+    assert(command.audio.has_event_time && command.audio.event_time_us == INT64_C(1800000000123456) &&
+           command.audio.event_id == UINT64_C(42) && command.audio.segment == (zs_audio_segment_t)s);
+  }
+  g_event_time = 0u;
+  size = build_command(payload, sizeof(payload), &verifier, command_id, 17u, UINT64_C(1000000), UINT64_C(2000000), ZS_AUDIO_SEGMENT_BOTH);
+  assert(decode(payload, size, 17u, UINT64_C(1500000), true, &verifier, &dedup, sizeof(payload), &command) == ZS_COMMAND_STATUS_INVALID_CBOR);
+  g_event_time = (uint64_t)INT64_MAX + 1u;
+  size = build_command(payload, sizeof(payload), &verifier, command_id, 17u, UINT64_C(1000000), UINT64_C(2000000), ZS_AUDIO_SEGMENT_BOTH);
+  assert(decode(payload, size, 17u, UINT64_C(1500000), true, &verifier, &dedup, sizeof(payload), &command) == ZS_COMMAND_STATUS_INVALID_CBOR);
+
+  g_with_event_time = false;
+  size = build_command(payload, sizeof(payload), &verifier, command_id, 17u, UINT64_C(1000000), UINT64_C(2000000), ZS_AUDIO_SEGMENT_BOTH);
+  assert(decode(payload, size, 17u, UINT64_C(1500000), true, &verifier, &dedup, sizeof(payload), &command) == ZS_COMMAND_STATUS_OK);
+  assert(!command.audio.has_event_time);
+}
+
 int main(void) {
   test_server_generated_ed25519_vector();
+  test_audio_event_time();
   test_valid_audio_commands_and_ack();
   test_fail_closed_guards();
   test_ttl_limit();
