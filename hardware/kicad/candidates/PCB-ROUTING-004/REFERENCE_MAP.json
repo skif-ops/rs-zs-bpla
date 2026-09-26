@@ -11,9 +11,9 @@
    "share": 0.0
   },
   "B.Cu|GND_DIGITAL": {
-   "length_mm": 785.05,
-   "over_own_reference_mm": 642.12,
-   "share": 0.8179
+   "length_mm": 679.66,
+   "over_own_reference_mm": 600.57,
+   "share": 0.8836
   },
   "B.Cu|GND_MIC": {
    "length_mm": 68.87,
@@ -21,9 +21,9 @@
    "share": 0.0
   },
   "B.Cu|GND_MODEM": {
-   "length_mm": 572.56,
-   "over_own_reference_mm": 508.67,
-   "share": 0.8884
+   "length_mm": 536.69,
+   "over_own_reference_mm": 475.32,
+   "share": 0.8856
   },
   "B.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": {
    "length_mm": 28.66,
@@ -46,9 +46,9 @@
    "share": 0.0
   },
   "F.Cu|GND_DIGITAL": {
-   "length_mm": 915.28,
-   "over_own_reference_mm": 858.17,
-   "share": 0.9376
+   "length_mm": 888.2,
+   "over_own_reference_mm": 832.96,
+   "share": 0.9378
   },
   "F.Cu|GND_MIC": {
    "length_mm": 118.03,
@@ -56,9 +56,9 @@
    "share": 0.0
   },
   "F.Cu|GND_MODEM": {
-   "length_mm": 473.82,
+   "length_mm": 470.92,
    "over_own_reference_mm": 175.83,
-   "share": 0.3711
+   "share": 0.3734
   },
   "F.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": {
    "length_mm": 257.75,
@@ -76,7 +76,7 @@
    "share": 0.0
   },
   "In3.Cu|GND_MODEM": {
-   "length_mm": 234.87,
+   "length_mm": 208.73,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
@@ -134,21 +134,6 @@
   },
   "3V8_MODEM_RF|In3.Cu": {
    "length_mm": 25.71,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
-  "3V8_MODEM|B.Cu": {
-   "length_mm": 35.87,
-   "over_own_reference_mm": 33.35,
-   "share": 0.93
-  },
-  "3V8_MODEM|F.Cu": {
-   "length_mm": 2.9,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
-  "3V8_MODEM|In3.Cu": {
-   "length_mm": 26.14,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
@@ -391,16 +376,6 @@
    "length_mm": 32.36,
    "over_own_reference_mm": 0.0,
    "share": 0.0
-  },
-  "EN_AUX|B.Cu": {
-   "length_mm": 32.0,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
-  "EN_AUX|F.Cu": {
-   "length_mm": 13.98,
-   "over_own_reference_mm": 13.53,
-   "share": 0.9678
   },
   "EN_MODEM|B.Cu": {
    "length_mm": 8.32,
@@ -996,16 +971,6 @@
    "length_mm": 5.27,
    "over_own_reference_mm": 4.37,
    "share": 0.8292
-  },
-  "SD_DET|B.Cu": {
-   "length_mm": 73.39,
-   "over_own_reference_mm": 41.55,
-   "share": 0.5661
-  },
-  "SD_DET|F.Cu": {
-   "length_mm": 13.1,
-   "over_own_reference_mm": 11.69,
-   "share": 0.892
   },
   "SIM1_CLK_CONN|B.Cu": {
    "length_mm": 9.88,
