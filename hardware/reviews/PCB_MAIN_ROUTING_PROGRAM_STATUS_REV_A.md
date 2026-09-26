@@ -188,3 +188,27 @@ first-pass 0.25/0.15 mm via-in-pad clearance scan admitted only 13 of 40; most o
 route requires placement/rip-up and local power/return design, followed by native DRC and SI/PI review.
 
 Do not copy 031 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
+
+## 8. Locality scan after 031
+
+A geometry scan of the remaining F.Cu pad-to-pad DRC pairs within 15 mm
+(0.15 mm trial width, 0.20 mm copper clearance, 0.25 mm hole clearance,
+0.25/0.15 mm candidate-process through vias, In4.Cu GND_DIGITAL reference)
+found no further unobstructed straight two-via route. The successful C6→R14
+case was consumed by 030. This is a screening result, not proof that all
+push-and-shove routes fail.
+
+Near-term layout relief targets from the same scan:
+
+| Open pair | Obstacle / required action |
+|---|---|
+| R14.1→C9.1, 3V3_DIGITAL, 2.15 mm | I2C2_SDA_BUS separates the F.Cu islands; no clear short via pair at the present placement. Repack the capacitor/pull-up group or selectively reroute SDA. |
+| U3.2→U3.9, 3V3_DIGITAL, 1.53 mm | Package pads block F.Cu; a through via at U3.2 meets GNSS_TX_U9 on In3.Cu and NOR_IO3_U2 on B.Cu. Requires local escape/placement or rip-up. |
+| R49.2→C53.1, SIM2_DET, 2.15 mm | F.Cu 3V3_DIGITAL blocks the direct path; the sampled pad-neighbourhood via positions are occupied on In3/B.Cu. Requires local rip-up. |
+| R86.2→R81.2, SD_D0_CARD, 3.50 mm | A 3V3_DIGITAL branch occupies both inner/back-side escape space near R86; sampled short via positions fail. Requires local channel relief with SD return-path review. |
+
+The B.Cu test-pad search likewise found no further clean direct pad-to-existing-via
+join; the short CELL_DBG_TXD_TP candidate from TP_CELL_DBG.2 to the existing
+via at (46.474, 31.7499) is blocked by NOR_IO3_U1 and has no unobstructed
+local B.Cu detour in the sampled corridor. Manual push-and-shove, selective
+rip-up and U1 breakout remain the critical path to zero open connections.
