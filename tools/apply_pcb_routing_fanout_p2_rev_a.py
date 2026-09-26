@@ -49,6 +49,43 @@ NAMESPACE = uuid.UUID("2a3b4c5d-6e7f-5081-9a2b-3c4d5e6f7a8b")
 PASSES, TIME_LIMIT_S = 10, 200 * 60
 MOVES = {}
 RIP_NETS = set()
+# KiCad DRC points of the first candidate run (39d343f1): only the connected pieces of new copper that contain a
+# flagged track/via are left out; the rest of the same net stays
+REJECTED_ITEMS = OUT / "DRC_REJECTED_ITEMS_P2.json"
+
+
+def drop_flagged(copper: dict) -> tuple[dict, int]:
+    from shapely.geometry import LineString, Point
+    if not REJECTED_ITEMS.is_file():
+        return copper, 0
+    flags = json.loads(REJECTED_ITEMS.read_text(encoding="utf-8"))["items"]
+    dropped = 0
+    for net, entry in copper.items():
+        pts = [Point(f["x"], f["y"]) for f in flags if f["net"] == net]
+        if not pts:
+            continue
+        parts = [("w", w) for w in entry["wires"]] + [("v", v) for v in entry["vias"]]
+        geom = [LineString(w[2]).buffer(w[1] / 2) if k == "w" and len(set(w[2])) > 1 else
+                (Point(w[2][0]).buffer(w[1] / 2) if k == "w" else Point(w).buffer(c4.VIA_SIZE / 2)) for k, w in parts]
+        layer = [w[0] if k == "w" else None for k, w in parts]
+        parent = list(range(len(parts)))
+
+        def find(i):
+            while parent[i] != i:
+                parent[i] = parent[parent[i]]
+                i = parent[i]
+            return i
+
+        for i in range(len(parts)):
+            for j in range(i + 1, len(parts)):
+                if (layer[i] is None or layer[j] is None or layer[i] == layer[j]) and geom[i].intersects(geom[j]):
+                    parent[find(i)] = find(j)
+        bad = {find(i) for i in range(len(parts)) if any(geom[i].distance(p) < 0.02 for p in pts)}
+        keep_w = [w for i, (k, w) in enumerate(parts) if k == "w" and find(i) not in bad]
+        keep_v = [w for i, (k, w) in enumerate(parts) if k == "v" and find(i) not in bad]
+        dropped += len(parts) - len(keep_w) - len(keep_v)
+        entry["wires"], entry["vias"] = keep_w, keep_v
+    return {n: e for n, e in copper.items() if e["wires"] or e["vias"]}, dropped
 
 
 def sha256(path: Path) -> str:
@@ -151,6 +188,8 @@ def build(base_text: str) -> tuple[str, dict]:
     assert info["session_sha256"] == sha256(SES)
     stage, stage_spec = board_stage(base_text)
     copper = c4.session_copy(SES.read_text(encoding="utf-8"), set(info["prep"]["not_autorouted"]))
+    copper, dropped = drop_flagged(copper)
+    stage_spec = dict(stage_spec, drc_dropped_items=dropped)
     number = {name: int(num) for num, name in re.findall(r'^  \(net (\d+) "([^"]*)"\)', stage, re.M)}
     seg_lines, via_lines = [], []
     for net in sorted(copper):
@@ -184,7 +223,7 @@ def main() -> int:
     g2.deps()
     assert sha256(BOARD) == BASE_SHA256
     OUT.mkdir(parents=True, exist_ok=True)
-    info = route()
+    info = json.loads(LOG.read_text(encoding="utf-8")) if (REJECTED_ITEMS.is_file() and SES.is_file()) else route()
     summary = {"schema": "dioneya-pcb-main-fanout-p2-v1", "measurement_only": True, "autoroute": info}
     if info["session_sha256"]:
         candidate, spec = build(BOARD.read_text(encoding="utf-8"))
