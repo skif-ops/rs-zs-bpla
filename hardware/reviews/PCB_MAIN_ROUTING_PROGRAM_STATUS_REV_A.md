@@ -111,8 +111,8 @@ DRC is 146→142→141→140 open with zero new violations at each step. Candida
 - 012 trial: a 0.25/0.15 mm via at `TP_BLE_SWD` had comparative DRC 140→140 and was removed from the branch.
 
 Remaining 140 open connections span 71 nets: `3V3_DIGITAL` 33, `1V8_MIC` 9, `AAD_CFG_1V8_FANOUT` 8,
-`I2C2_SCL_BUS` 4, and 87 others. Of 40 U1 pads appearing in the open-connection report, a first-pass
-0.25/0.15 mm via-in-pad clearance scan admits only 13; most others hit existing B.Cu/In3 copper. A clean
+`I2C2_SCL_BUS` 4, and 86 others. Of 37 U1 pads now appearing in the open-connection report, the earlier 009
+first-pass 0.25/0.15 mm via-in-pad clearance scan admitted only 13 of 40; most others hit existing B.Cu/In3 copper. A clean
 route requires placement/rip-up and local power/return design, followed by native DRC and SI/PI review.
 
 Do not copy 011 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
