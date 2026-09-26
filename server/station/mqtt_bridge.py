@@ -202,8 +202,10 @@ def request_event_audio(
     last = event_store.last_command_us(detection.station_id, AUDIO_COMMAND)
     if last is not None and now_us - last < min_gap_us:
         return None
+    # the event time goes along: the station serves it even after a reboot has emptied its own event table
     return event_store.create_command(
-        detection.station_id, AUDIO_COMMAND, {"event_id": detection.event_id, "segment": segment}
+        detection.station_id, AUDIO_COMMAND,
+        {"event_id": detection.event_id, "segment": segment, "event_time_us": detection.event_time_us},
     )
 
 
