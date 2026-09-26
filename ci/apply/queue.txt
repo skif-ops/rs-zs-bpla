@@ -1,0 +1,1 @@
+tools/apply_pcb_main_hw_rev0_back_026_rev_a.py
