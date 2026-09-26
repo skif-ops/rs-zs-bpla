@@ -268,3 +268,12 @@ join; the short CELL_DBG_TXD_TP candidate from TP_CELL_DBG.2 to the existing
 via at (46.474, 31.7499) is blocked by NOR_IO3_U1 and has no unobstructed
 local B.Cu detour in the sampled corridor. Manual push-and-shove, selective
 rip-up and U1 breakout remain the critical path to zero open connections.
+
+After 041, a 0.15 mm grid search of the F.Cu-only open pairs within 12 mm
+(0.20 mm copper clearance, 2.5 mm bounding-box margin) found no other
+local path among the sampled digital/control and power pairs. It found a
+~9.6 mm path from the 0.8 mm `3V8_MODEM_RF` feed to C47 only at 0.4 mm
+width; the 0.6 and 0.8 mm trials had no corridor. The narrow and long
+RF-supply capacitor branch over In1.Cu GND_DIGITAL was not accepted.
+Move/repack the modem bulk/decoupling group and review its supply and return
+instead. This grid scan is a screening result, not a proof of unroutability.
