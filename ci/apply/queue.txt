@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-26: PCB-MAIN candidate G (003 board + L1 moved + global session G)
-tools/apply_pcb_main_routing_g_candidate_rev_a.py
