@@ -67,39 +67,36 @@
       "2026-09-26 12:20:05.795 INFO   [B511A9\\D786ED] Auto-routing stage completed: started with 452 unrouted nets, completed in 3404.01 seconds, final score: 355.78 (120 unrouted and 872 violations), using 3318.78 total CPU se"
     ]
   },
-  "candidate_sha256": "39d343f179a6c95eb66ac4c31b938cb3fe595a5f4b279de3d9e76bcc5b9e66d6",
+  "candidate_sha256": "6da31a8cdb8522a2d807fd940f8e76e6bb6638647d7b9dd45a287f5789a577c6",
   "delta": {
     "moves": {},
     "ripped_items": 0,
     "ripped_nets": [],
-    "nets": 142,
-    "segments": 2358,
-    "vias": 313
+    "drc_dropped_items": 199,
+    "nets": 136,
+    "segments": 2023,
+    "vias": 276
   },
   "drc": {
     "base_unconnected": 421,
-    "candidate_unconnected": 107,
-    "new_fingerprint_count": 54,
-    "new_errors": 24,
+    "candidate_unconnected": 156,
+    "new_fingerprint_count": 28,
+    "new_errors": 0,
     "new_by_type": {
-      "error:clearance": 3,
-      "error:hole_clearance": 5,
-      "error:shorting_items": 8,
-      "error:solder_mask_bridge": 8,
-      "warning:track_dangling": 8,
+      "warning:track_dangling": 6,
       "warning:via_dangling": 22
     }
   },
   "continuity_summary": {
     "B.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": 0.0,
     "B.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
-    "B.Cu|GND_DIGITAL": 0.8884,
+    "B.Cu|GND_DIGITAL": 0.8887,
     "B.Cu|GND_MIC": 0.0,
     "B.Cu|GND_MODEM": 0.8998,
     "B.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0,
     "F.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": 0.0,
     "F.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
-    "F.Cu|GND_DIGITAL": 0.932,
+    "F.Cu|GND_DIGITAL": 0.9338,
     "F.Cu|GND_MIC": 0.0,
     "F.Cu|GND_MODEM": 0.3411,
     "F.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0,

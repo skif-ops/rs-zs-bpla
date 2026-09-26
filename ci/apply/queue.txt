@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-26: P2 candidate rebuild from the recorded session, DRC-flagged pieces left out
-tools/apply_pcb_routing_fanout_p2_rev_a.py
