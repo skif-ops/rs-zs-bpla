@@ -9,9 +9,13 @@ Not a candidate for application yet; nothing here changes the authoritative boar
 | Authoritative board (003) | 421 | — |
 | Stacked sessions A–C, candidate 005 (`231707ed…`) | 156 | 0 |
 | Stacked + session D, candidate 006 (`18cd3efa…`) | 143 | 27 (not yet filtered) |
-| **Global session G, candidate G (`aec71de7…`)** | **161** | **0** |
+| Global session G, candidate G (`aec71de7…`) | 161 | 0 |
+| Experiment P1: G + pogo rows TP_EOL/TP_CELL_DBG moved off U1 (`3a021176…`, not filtered) | 136 before filter (G: 131) | 30 |
+| **Experiment P2: G + Freerouting fan-out, flagged pieces removed (`6da31a8c…`)** | **156** | **0** |
 
-Candidate G is the proposed base: one reproducible session from the 003 board, clean after the DRC filter, not
+Candidate P2 is now the best clean result (156 open, 0 new errors, 22 dangling fan-out vias to clean); it is built from
+the same router input as G with fan-out enabled, and only the connected pieces of new copper flagged by KiCad DRC are
+left out (199 items). Candidate G below is kept as the fan-out-free reference: one reproducible session from the 003 board, clean after the DRC filter, not
 dependent on the chain A–D. It adds 123 nets, 2014 segments and 275 vias (F.Cu / In3.Cu / B.Cu) and moves L1 to the
 SMPS pins of U1 (53.75, 40.75, 180): SMPS_SW ≈ 2.5 mm instead of ≈ 18 mm. Reference (share of length over its own
 ground domain): F.Cu/GND_DIGITAL 92.5 %, B.Cu/GND_DIGITAL 84.8 %, B.Cu/GND_MODEM 88.6 %, **F.Cu/GND_MODEM 32.7 %**.
@@ -62,3 +66,14 @@ work is layout work:
 
 Tools: `tools/apply_pcb_routing_global_g_rev_a.py`, `tools/apply_pcb_main_routing_g_candidate_rev_a.py` (this
 branch); sessions A–E and candidates 004–006 on `feature/pcb-routing-004`.
+
+## 6. Experiments after candidate G (2026-09-26)
+- **P1 — pogo rows off U1** (TP_EOL to (47.5, 9.0), TP_CELL_DBG to (22.5, 28.0); BOOT0 copper removed). Router:
+  148 unrouted (G: 144); before the DRC filter 136 open (G: 131). No gain: the bottom pogo pads are not what limits the
+  U1 escape. MAIN-AUTH-011 (pogo coordinates) stays closed.
+- **P2 — fan-out enabled** (same input as G). Router: 120 unrouted (G: 144); before the DRC filter 107 open. The 24 DRC
+  errors fell into large connected pieces of 3V3_DIGITAL and 1V8_MIC; removing only the flagged pieces leaves 156 open.
+
+Conclusion: seven autorouting variants converge to 155–160 open connections. The remainder needs interactive routing
+(KiCad push-and-shove by a layout engineer, or a generalised version of the 003 router in net groups).
+Tools: `tools/apply_pcb_routing_relief_p1_rev_a.py`, `tools/apply_pcb_routing_fanout_p2_rev_a.py`.
