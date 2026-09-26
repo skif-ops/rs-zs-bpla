@@ -1,1 +1,0 @@
-tools/apply_pcb_main_c7_3v3_033_rev_a.py
