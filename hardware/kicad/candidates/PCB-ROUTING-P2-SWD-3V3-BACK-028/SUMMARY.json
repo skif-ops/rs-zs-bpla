@@ -1,0 +1,21 @@
+{
+  "schema": "dioneya-pcb-main-swd-3v3-back-028-v1",
+  "base_sha256": "79e3d98ecca114b094d06b9d462d12f78a096930f66248c7bfeb8bb5ecd4b6f5",
+  "candidate_sha256": "f0e1243eb99f239ea77058ad9e5b62e1e045d696a0474ca938b593c96021cf2e",
+  "routes": 1,
+  "test_pad_power_return_review_b": "OPEN",
+  "track_segments": 1,
+  "width_mm": [
+    0.3
+  ],
+  "total_length_mm": 6.697,
+  "drc": {
+    "base_unconnected": 114,
+    "candidate_unconnected": 113,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

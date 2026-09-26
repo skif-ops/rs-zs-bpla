@@ -1,0 +1,19 @@
+{
+  "schema": "dioneya-pcb-main-aad-local-018-v1",
+  "base_sha256": "bedd7cba396f4ed67fb79517b2cd07ef322373d295d432255444619c3c51d922",
+  "candidate_sha256": "0860bf139270c963d6790a4a4ddb19a7b461f0c2cfe42ef0d79a462fa2dd7363",
+  "routes": 3,
+  "track_segments": 16,
+  "width_mm": 0.2,
+  "total_length_mm": 25.655,
+  "drc": {
+    "base_unconnected": 127,
+    "candidate_unconnected": 124,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "mic_domain_return_review": "OPEN",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

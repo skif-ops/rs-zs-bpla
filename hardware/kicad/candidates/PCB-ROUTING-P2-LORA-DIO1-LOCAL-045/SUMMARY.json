@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-lora-dio1-local-045-v1",
+  "base_sha256": "d3df48a62b6657b8fc7b569ae14bf251b0b09dea0922603b9528f2e86be20e86",
+  "candidate_sha256": "da04ba895d9d92f4d2ede5ec8583acc28aa2f8808b52c7bc317a2d6f071ee3c3",
+  "routes": 2,
+  "track_segments": 9,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 7.877,
+  "lora_dio1_signal_return_review_b": "OPEN",
+  "small_via_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 97,
+    "candidate_unconnected": 96,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "dioneya-pcb-main-control-links-017-v1",
+  "base_sha256": "9574bdcaa0b030d74059673ac887cefa7827a68723d77907c70acac6717f09d4",
+  "candidate_sha256": "bedd7cba396f4ed67fb79517b2cd07ef322373d295d432255444619c3c51d922",
+  "routes": 2,
+  "track_segments": 9,
+  "width_mm": [
+    0.2,
+    0.2
+  ],
+  "total_length_mm": 6.294,
+  "drc": {
+    "base_unconnected": 129,
+    "candidate_unconnected": 127,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-tp-3v3-039-v1",
+  "base_sha256": "2b3d8b12b1ff0cc4e774d99f16a011c8725c8e0ce20216d97d33de38bdc680dc",
+  "candidate_sha256": "039c9f4e34e4be60cf89d4482f5c45d71374a247f83e16e2f17c41c79dd4fa41",
+  "routes": 1,
+  "track_segments": 3,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 3.4,
+  "test_pad_supply_return_review_b": "OPEN",
+  "small_via_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 103,
+    "candidate_unconnected": 102,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

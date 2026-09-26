@@ -1,0 +1,120 @@
+{
+  "schema": "dioneya-pcb-main-p2-local-007-precheck-v1",
+  "base_sha256": "6da31a8cdb8522a2d807fd940f8e76e6bb6638647d7b9dd45a287f5789a577c6",
+  "candidate_sha256": "d45b5b1de5b8d29b78b90e67949db0c7193629f7e2af608e24883f5ac3906743",
+  "routes": [
+    {
+      "net": "3V3_DIGITAL",
+      "width_mm": 0.25,
+      "layer": "F.Cu",
+      "start_mm": [
+        44.25,
+        34.0
+      ],
+      "end_mm": [
+        44.25,
+        33.5
+      ]
+    },
+    {
+      "net": "1V8_MIC",
+      "width_mm": 0.25,
+      "layer": "F.Cu",
+      "start_mm": [
+        56.85,
+        42.325
+      ],
+      "end_mm": [
+        56.85,
+        41.675
+      ]
+    },
+    {
+      "net": "3V3_DIGITAL",
+      "width_mm": 0.25,
+      "layer": "F.Cu",
+      "start_mm": [
+        26.9,
+        29.175
+      ],
+      "end_mm": [
+        26.9,
+        29.825
+      ]
+    },
+    {
+      "net": "1V8_MIC",
+      "width_mm": 0.25,
+      "layer": "F.Cu",
+      "start_mm": [
+        52.76,
+        45.5
+      ],
+      "end_mm": [
+        52.425,
+        44.25
+      ]
+    },
+    {
+      "net": "1V8_MIC",
+      "width_mm": 0.25,
+      "layer": "F.Cu",
+      "start_mm": [
+        56.85,
+        41.675
+      ],
+      "end_mm": [
+        56.425,
+        40.25
+      ]
+    },
+    {
+      "net": "3V3_DIGITAL",
+      "width_mm": 0.25,
+      "layer": "F.Cu",
+      "start_mm": [
+        41.925,
+        28.5
+      ],
+      "end_mm": [
+        41.55,
+        30.0
+      ]
+    },
+    {
+      "net": "1V8_MIC",
+      "width_mm": 0.25,
+      "layer": "F.Cu",
+      "start_mm": [
+        49.9,
+        44.05
+      ],
+      "end_mm": [
+        49.675,
+        42.5
+      ]
+    },
+    {
+      "net": "1V8_MIC",
+      "width_mm": 0.25,
+      "layer": "F.Cu",
+      "start_mm": [
+        49.9,
+        44.05
+      ],
+      "end_mm": [
+        52.425,
+        44.25
+      ]
+    }
+  ],
+  "checks": {
+    "endpoint_pad_net": "PASS",
+    "other_net_copper_clearance_0p20mm": "PASS",
+    "continuous_in1_gnd_digital_outline": "PASS",
+    "native_kicad_9_drc": "PENDING"
+  },
+  "expected_unconnected_upper_bound": 156,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

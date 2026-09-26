@@ -1,0 +1,19 @@
+{
+  "schema": "dioneya-pcb-main-c7-3v3-033-v1",
+  "base_sha256": "205da6e000c30460cd9e587b95d48170170306a205051d9a76a2acffa0df7e39",
+  "candidate_sha256": "d28f9952617e0ce7e03db99e01ac304fe896b9b9603205d3e700129621543f24",
+  "routes": 1,
+  "track_segments": 3,
+  "added_vias": 0,
+  "total_length_mm": 4.66,
+  "capacitor_supply_return_review_b": "OPEN",
+  "drc": {
+    "base_unconnected": 109,
+    "candidate_unconnected": 108,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

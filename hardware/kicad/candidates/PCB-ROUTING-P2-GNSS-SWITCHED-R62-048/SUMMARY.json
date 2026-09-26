@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-gnss-switched-r62-048-v1",
+  "base_sha256": "6658aedbf02d79bfaa29777459f0da5b21cde580fa01407d7519dd88f1ab6f21",
+  "candidate_sha256": "2dee54ef4544e5c8c59f48935df1ae1cdc840faa1a3861d2eb46eda1562abe02",
+  "routes": 1,
+  "track_segments": 1,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 0.7,
+  "gnss_bias_and_rf_coupling_review_b": "OPEN",
+  "via_in_pad_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 94,
+    "candidate_unconnected": 93,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

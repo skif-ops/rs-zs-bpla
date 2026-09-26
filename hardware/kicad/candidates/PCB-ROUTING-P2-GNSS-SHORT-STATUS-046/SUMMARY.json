@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-gnss-short-status-046-v1",
+  "base_sha256": "da04ba895d9d92f4d2ede5ec8583acc28aa2f8808b52c7bc317a2d6f071ee3c3",
+  "candidate_sha256": "59d2b0f07f032ff3ec67b3c6a920b49491c427a5edd96d6a36ede60fe0d92dbc",
+  "routes": 1,
+  "track_segments": 2,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 11.808,
+  "gnss_status_return_and_coupling_review_b": "OPEN",
+  "via_in_pad_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 96,
+    "candidate_unconnected": 95,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

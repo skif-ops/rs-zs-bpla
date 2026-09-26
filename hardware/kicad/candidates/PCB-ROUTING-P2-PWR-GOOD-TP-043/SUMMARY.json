@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-pwr-good-tp-043-v1",
+  "base_sha256": "483f78aed9594b13663db172bd7067258a186558d962562a4e81b705973f3fc4",
+  "candidate_sha256": "f6560764d8dc97ab049d4ddcb4eb5427265ccd1bda7cae32ab6acd5bcb266578",
+  "routes": 2,
+  "track_segments": 3,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 8.676,
+  "pwr_good_mixed_domain_return_review_b": "OPEN",
+  "small_via_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 99,
+    "candidate_unconnected": 98,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
