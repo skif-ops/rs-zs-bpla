@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-26: PCB routing 004 step 2, run 3 (run 2 cannot push: the branch moved during the job)
-tools/apply_pcb_routing_004_autoroute_rev_a.py
