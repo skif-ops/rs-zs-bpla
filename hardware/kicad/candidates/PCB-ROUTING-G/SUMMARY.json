@@ -1,23 +1,34 @@
 {
   "schema": "dioneya-pcb-main-routing-g-candidate-v1",
   "base_board_sha256": "30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739",
-  "candidate_sha256": "b79b0e234c93ae8d93203253cd64e9643a0d199510eca1cae303420a99f944a2",
+  "candidate_sha256": "aec71de78a32ec09cfe446adf71a0862a211c05072c8336b158e6172aa242da4",
   "delta": {
     "base": "003 board, L1 moved",
     "l1": [
       "(at 52 19.75 180)",
       "(at 53.75 40.75 180)"
     ],
-    "nets": 133,
-    "segments": 2303,
-    "vias": 314,
+    "nets": 123,
+    "segments": 2014,
+    "vias": 275,
     "by_layer": {
-      "B.Cu": 456,
-      "F.Cu": 1408,
-      "In3.Cu": 439
+      "In3.Cu": 408,
+      "F.Cu": 1225,
+      "B.Cu": 381
     },
     "session_sha256": "cb8c1bf16b8d23f846292d757cf04fd844000443cfb5aabc2833a82be036f3e6",
-    "drc_rejected": []
+    "drc_rejected": [
+      "1V8_MIC",
+      "AAD_CFG",
+      "AAD_CFG_1V8_FANOUT",
+      "CELL_RI_U16",
+      "CELL_USB_BOOT_1V8",
+      "GNSS_ANT_GATE",
+      "GNSS_ANT_SHORT_N",
+      "LORA_NSS_U1",
+      "PDM_DATA1_1V8",
+      "SIM_MUX_EN"
+    ]
   },
   "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
   "manufacturing_release": false,
@@ -58,355 +69,15 @@
     },
     "candidate": {
       "by_type": {
-        "error:clearance": 7,
-        "error:hole_clearance": 5,
-        "error:shorting_items": 12,
-        "error:solder_mask_bridge": 18,
         "warning:silk_over_copper": 164,
         "warning:silk_overlap": 66,
-        "warning:track_dangling": 8
+        "warning:track_dangling": 5
       },
-      "unconnected": 131
+      "unconnected": 161
     },
-    "new_fingerprint_count": 50,
-    "new_errors": 42,
+    "new_fingerprint_count": 5,
+    "new_errors": 0,
     "new_fingerprints": [
-      [
-        "error",
-        "clearance",
-        [
-          "Pad 1 [SMPS_SW] of L1 on F.Cu",
-          "Track [1V8_MIC] on F.Cu, length 1.7232 mm"
-        ]
-      ],
-      [
-        "error",
-        "clearance",
-        [
-          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
-          "Track [AAD_CFG_1V8_FANOUT] on F.Cu, length 1.2615 mm"
-        ]
-      ],
-      [
-        "error",
-        "clearance",
-        [
-          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
-          "Track [AAD_CFG_1V8_FANOUT] on F.Cu, length 7.3153 mm"
-        ]
-      ],
-      [
-        "error",
-        "clearance",
-        [
-          "Pad 2 [VCORE_1V1] of L1 on F.Cu",
-          "Via [PDM_DATA1_1V8] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "clearance",
-        [
-          "Pad 5 [GND_DIGITAL] of TP_MCU_SWD on B.Cu",
-          "Track [AAD_CFG] on B.Cu, length 4.4849 mm"
-        ]
-      ],
-      [
-        "error",
-        "clearance",
-        [
-          "Track [CELL_RI_U16] on B.Cu, length 0.1193 mm",
-          "Via [LORA_NSS_U1] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "clearance",
-        [
-          "Track [CELL_RI_U16] on B.Cu, length 0.4363 mm",
-          "Via [LORA_NSS_U1] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "hole_clearance",
-        [
-          "Pad 1 [GNSS_ANT_SWITCHED] of R62 on F.Cu",
-          "Via [GNSS_ANT_SHORT_N] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "hole_clearance",
-        [
-          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
-          "Via [GNSS_ANT_GATE] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "hole_clearance",
-        [
-          "Pad 2 [VCORE_1V1] of L1 on F.Cu",
-          "Via [PDM_DATA1_1V8] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "hole_clearance",
-        [
-          "Pad 4 [NRST] of TP_MCU_SWD on B.Cu",
-          "Via [AAD_CFG] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "hole_clearance",
-        [
-          "Pad 6 [TEST_UART_RX_TP] of TP_EOL on B.Cu",
-          "Via [SIM_MUX_EN] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "shorting_items",
-        [
-          "Pad 1 [3V8_MODEM] of FB1 on F.Cu",
-          "Track [CELL_USB_BOOT_1V8] on F.Cu, length 0.1341 mm"
-        ]
-      ],
-      [
-        "error",
-        "shorting_items",
-        [
-          "Pad 1 [3V8_MODEM] of FB1 on F.Cu",
-          "Track [CELL_USB_BOOT_1V8] on F.Cu, length 8.4755 mm"
-        ]
-      ],
-      [
-        "error",
-        "shorting_items",
-        [
-          "Pad 1 [GNSS_ANT_SWITCHED] of R62 on F.Cu",
-          "Track [GNSS_ANT_GATE] on F.Cu, length 3.4009 mm"
-        ]
-      ],
-      [
-        "error",
-        "shorting_items",
-        [
-          "Pad 1 [GNSS_ANT_SWITCHED] of R62 on F.Cu",
-          "Via [GNSS_ANT_SHORT_N] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "shorting_items",
-        [
-          "Pad 1 [SMPS_SW] of L1 on F.Cu",
-          "Track [1V8_MIC] on F.Cu, length 2.1046 mm"
-        ]
-      ],
-      [
-        "error",
-        "shorting_items",
-        [
-          "Pad 2 [3V8_MODEM_BB] of FB1 on F.Cu",
-          "Track [CELL_USB_BOOT_1V8] on F.Cu, length 0.8629 mm"
-        ]
-      ],
-      [
-        "error",
-        "shorting_items",
-        [
-          "Pad 2 [3V8_MODEM_BB] of FB1 on F.Cu",
-          "Track [CELL_USB_BOOT_1V8] on F.Cu, length 4.5149 mm"
-        ]
-      ],
-      [
-        "error",
-        "shorting_items",
-        [
-          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
-          "Via [GNSS_ANT_GATE] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "shorting_items",
-        [
-          "Pad 4 [NRST] of TP_MCU_SWD on B.Cu",
-          "Via [AAD_CFG] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "shorting_items",
-        [
-          "Pad 6 [TEST_UART_RX_TP] of TP_EOL on B.Cu",
-          "Track [SIM_MUX_EN] on B.Cu, length 0.7294 mm"
-        ]
-      ],
-      [
-        "error",
-        "shorting_items",
-        [
-          "Pad 6 [TEST_UART_RX_TP] of TP_EOL on B.Cu",
-          "Track [SIM_MUX_EN] on B.Cu, length 5.3815 mm"
-        ]
-      ],
-      [
-        "error",
-        "shorting_items",
-        [
-          "Pad 6 [TEST_UART_RX_TP] of TP_EOL on B.Cu",
-          "Via [SIM_MUX_EN] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 1 [3V8_MODEM] of FB1 on F.Cu",
-          "Track [CELL_USB_BOOT_1V8] on F.Cu, length 0.1341 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 1 [3V8_MODEM] of FB1 on F.Cu",
-          "Track [CELL_USB_BOOT_1V8] on F.Cu, length 0.8629 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 1 [3V8_MODEM] of FB1 on F.Cu",
-          "Track [CELL_USB_BOOT_1V8] on F.Cu, length 8.4755 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 1 [GNSS_ANT_SWITCHED] of R62 on F.Cu",
-          "Track [GNSS_ANT_GATE] on F.Cu, length 3.4009 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 1 [GNSS_ANT_SWITCHED] of R62 on F.Cu",
-          "Via [GNSS_ANT_SHORT_N] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 1 [SMPS_SW] of L1 on F.Cu",
-          "Track [1V8_MIC] on F.Cu, length 2.1046 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 2 [3V8_MODEM_BB] of FB1 on F.Cu",
-          "Track [CELL_USB_BOOT_1V8] on F.Cu, length 0.8629 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 2 [3V8_MODEM_BB] of FB1 on F.Cu",
-          "Track [CELL_USB_BOOT_1V8] on F.Cu, length 4.5149 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
-          "Track [GNSS_ANT_GATE] on F.Cu, length 3.4009 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
-          "Via [GNSS_ANT_GATE] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 2 [VCORE_1V1] of L1 on F.Cu",
-          "Track [1V8_MIC] on F.Cu, length 1.7232 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 2 [VCORE_1V1] of L1 on F.Cu",
-          "Track [1V8_MIC] on F.Cu, length 2.1046 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 4 [NRST] of TP_MCU_SWD on B.Cu",
-          "Track [AAD_CFG] on B.Cu, length 4.4849 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 4 [NRST] of TP_MCU_SWD on B.Cu",
-          "Via [AAD_CFG] on F.Cu - B.Cu"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 5 [GND_DIGITAL] of TP_MCU_SWD on B.Cu",
-          "Track [AAD_CFG] on B.Cu, length 4.4849 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 6 [TEST_UART_RX_TP] of TP_EOL on B.Cu",
-          "Track [SIM_MUX_EN] on B.Cu, length 0.7294 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 6 [TEST_UART_RX_TP] of TP_EOL on B.Cu",
-          "Track [SIM_MUX_EN] on B.Cu, length 5.3815 mm"
-        ]
-      ],
-      [
-        "error",
-        "solder_mask_bridge",
-        [
-          "Pad 6 [TEST_UART_RX_TP] of TP_EOL on B.Cu",
-          "Via [SIM_MUX_EN] on F.Cu - B.Cu"
-        ]
-      ],
       [
         "warning",
         "track_dangling",
@@ -432,27 +103,6 @@
         "warning",
         "track_dangling",
         [
-          "Track [GNSS_ANT_GATE] on F.Cu, length 1.4778 mm"
-        ]
-      ],
-      [
-        "warning",
-        "track_dangling",
-        [
-          "Track [GNSS_ANT_SHORT_N] on B.Cu, length 1.2799 mm"
-        ]
-      ],
-      [
-        "warning",
-        "track_dangling",
-        [
-          "Track [GNSS_ANT_SHORT_N] on F.Cu, length 0.4400 mm"
-        ]
-      ],
-      [
-        "warning",
-        "track_dangling",
-        [
           "Track [GNSS_ANT_SWITCHED] on B.Cu, length 2.5734 mm"
         ]
       ],
@@ -468,14 +118,14 @@
   "continuity_summary": {
     "B.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": 0.0,
     "B.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
-    "B.Cu|GND_DIGITAL": 0.8156,
+    "B.Cu|GND_DIGITAL": 0.8484,
     "B.Cu|GND_MODEM": 0.8859,
     "B.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0,
     "F.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": 0.0,
     "F.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
-    "F.Cu|GND_DIGITAL": 0.921,
+    "F.Cu|GND_DIGITAL": 0.925,
     "F.Cu|GND_MIC": 0.0,
-    "F.Cu|GND_MODEM": 0.3249,
+    "F.Cu|GND_MODEM": 0.3268,
     "F.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0,
     "F.Cu|SHIELD_COUPLING_NETWORK_REVIEW_B": 0.0,
     "In3.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,

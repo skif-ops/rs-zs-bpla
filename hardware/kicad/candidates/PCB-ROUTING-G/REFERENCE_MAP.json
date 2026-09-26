@@ -1,19 +1,19 @@
 {
  "by_layer_domain": {
   "B.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": {
-   "length_mm": 259.82,
+   "length_mm": 212.94,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
   "B.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": {
-   "length_mm": 131.59,
+   "length_mm": 66.4,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
   "B.Cu|GND_DIGITAL": {
-   "length_mm": 630.56,
-   "over_own_reference_mm": 514.29,
-   "share": 0.8156
+   "length_mm": 561.16,
+   "over_own_reference_mm": 476.11,
+   "share": 0.8484
   },
   "B.Cu|GND_MODEM": {
    "length_mm": 535.0,
@@ -21,24 +21,24 @@
    "share": 0.8859
   },
   "B.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": {
-   "length_mm": 63.11,
+   "length_mm": 20.17,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
   "F.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": {
-   "length_mm": 289.22,
+   "length_mm": 104.52,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
   "F.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": {
-   "length_mm": 131.96,
+   "length_mm": 116.74,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
   "F.Cu|GND_DIGITAL": {
-   "length_mm": 876.22,
-   "over_own_reference_mm": 806.96,
-   "share": 0.921
+   "length_mm": 803.17,
+   "over_own_reference_mm": 742.94,
+   "share": 0.925
   },
   "F.Cu|GND_MIC": {
    "length_mm": 102.4,
@@ -46,12 +46,12 @@
    "share": 0.0
   },
   "F.Cu|GND_MODEM": {
-   "length_mm": 534.6,
-   "over_own_reference_mm": 173.7,
-   "share": 0.3249
+   "length_mm": 513.06,
+   "over_own_reference_mm": 167.65,
+   "share": 0.3268
   },
   "F.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": {
-   "length_mm": 358.19,
+   "length_mm": 262.57,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
@@ -66,7 +66,7 @@
    "share": 0.0
   },
   "In3.Cu|GND_DIGITAL": {
-   "length_mm": 515.92,
+   "length_mm": 475.37,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
@@ -81,7 +81,7 @@
    "share": 0.0
   },
   "In3.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": {
-   "length_mm": 198.49,
+   "length_mm": 124.29,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
@@ -92,21 +92,6 @@
   }
  },
  "by_net_layer": {
-  "1V8_MIC|B.Cu": {
-   "length_mm": 42.94,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
-  "1V8_MIC|F.Cu": {
-   "length_mm": 95.62,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
-  "1V8_MIC|In3.Cu": {
-   "length_mm": 74.2,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
   "3V3_DIGITAL|B.Cu": {
    "length_mm": 20.17,
    "over_own_reference_mm": 0.0,
@@ -157,16 +142,6 @@
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
-  "AAD_CFG_1V8_FANOUT|B.Cu": {
-   "length_mm": 40.78,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
-  "AAD_CFG_1V8_FANOUT|F.Cu": {
-   "length_mm": 132.32,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
   "AAD_CFG_1V8_U7|B.Cu": {
    "length_mm": 8.86,
    "over_own_reference_mm": 7.96,
@@ -176,16 +151,6 @@
    "length_mm": 2.57,
    "over_own_reference_mm": 1.6,
    "share": 0.6215
-  },
-  "AAD_CFG|B.Cu": {
-   "length_mm": 55.56,
-   "over_own_reference_mm": 33.85,
-   "share": 0.6093
-  },
-  "AAD_CFG|F.Cu": {
-   "length_mm": 23.86,
-   "over_own_reference_mm": 19.35,
-   "share": 0.811
   },
   "BLE_EN|F.Cu": {
    "length_mm": 24.3,
@@ -312,16 +277,6 @@
    "over_own_reference_mm": 33.07,
    "share": 1.0
   },
-  "CELL_RI_U16|B.Cu": {
-   "length_mm": 36.97,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
-  "CELL_RI_U16|F.Cu": {
-   "length_mm": 12.26,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
   "CELL_RX_U16|F.Cu": {
    "length_mm": 41.1,
    "over_own_reference_mm": 0.0,
@@ -346,11 +301,6 @@
    "length_mm": 20.18,
    "over_own_reference_mm": 0.0,
    "share": 0.0
-  },
-  "CELL_USB_BOOT_1V8|F.Cu": {
-   "length_mm": 21.54,
-   "over_own_reference_mm": 6.05,
-   "share": 0.2809
   },
   "CELL_USB_BOOT_TP|B.Cu": {
    "length_mm": 5.27,
@@ -492,16 +442,6 @@
    "over_own_reference_mm": 21.03,
    "share": 1.0
   },
-  "GNSS_ANT_GATE|F.Cu": {
-   "length_mm": 8.07,
-   "over_own_reference_mm": 6.74,
-   "share": 0.8346
-  },
-  "GNSS_ANT_GATE|In3.Cu": {
-   "length_mm": 16.82,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
   "GNSS_ANT_OFF_N|F.Cu": {
    "length_mm": 3.61,
    "over_own_reference_mm": 2.71,
@@ -509,21 +449,6 @@
   },
   "GNSS_ANT_OFF_N|In3.Cu": {
    "length_mm": 11.4,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
-  "GNSS_ANT_SHORT_N|B.Cu": {
-   "length_mm": 1.31,
-   "over_own_reference_mm": 0.85,
-   "share": 0.6496
-  },
-  "GNSS_ANT_SHORT_N|F.Cu": {
-   "length_mm": 23.12,
-   "over_own_reference_mm": 21.76,
-   "share": 0.9415
-  },
-  "GNSS_ANT_SHORT_N|In3.Cu": {
-   "length_mm": 23.73,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
@@ -686,16 +611,6 @@
    "length_mm": 35.29,
    "over_own_reference_mm": 34.35,
    "share": 0.9735
-  },
-  "LORA_NSS_U1|B.Cu": {
-   "length_mm": 12.53,
-   "over_own_reference_mm": 3.47,
-   "share": 0.2772
-  },
-  "LORA_NSS_U1|F.Cu": {
-   "length_mm": 18.0,
-   "over_own_reference_mm": 16.17,
-   "share": 0.8983
   },
   "LORA_RESET_N|F.Cu": {
    "length_mm": 3.9,
@@ -971,16 +886,6 @@
    "length_mm": 6.99,
    "over_own_reference_mm": 6.99,
    "share": 1.0
-  },
-  "PDM_DATA1_1V8|B.Cu": {
-   "length_mm": 6.1,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
-  "PDM_DATA1_1V8|F.Cu": {
-   "length_mm": 52.39,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
   },
   "PDM_DATA1|B.Cu": {
    "length_mm": 16.05,
@@ -1274,16 +1179,6 @@
   },
   "SIM2_VDD_CONN|In3.Cu": {
    "length_mm": 7.95,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
-  "SIM_MUX_EN|B.Cu": {
-   "length_mm": 28.21,
-   "over_own_reference_mm": 0.0,
-   "share": 0.0
-  },
-  "SIM_MUX_EN|F.Cu": {
-   "length_mm": 2.97,
    "over_own_reference_mm": 0.0,
    "share": 0.0
   },
