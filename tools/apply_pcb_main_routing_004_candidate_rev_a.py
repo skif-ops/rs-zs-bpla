@@ -39,6 +39,8 @@ STEM = "PCB-MAIN_ROUTING_004_CANDIDATE_REV_A"
 NAMESPACE = uuid.UUID("7d1e2c3b-4a5f-5e6d-8c9b-004a1b2c3d4e")
 VIA_SIZE, VIA_DRILL = 0.5, 0.3
 LAYERS = {"F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "B.Cu"}
+# VCORE_1V1 is routed from L1, which 005 moves to the SMPS pins (46/49) of U1: its autorouted copper is left out
+DEFERRED = {"VCORE_1V1"}
 
 
 def sha256(path: Path) -> str:
@@ -99,7 +101,7 @@ def session_copy(text: str, skip: set) -> dict:
 def build(base_text: str) -> tuple[str, dict]:
     info = json.loads(AUTOROUTE.read_text(encoding="utf-8"))
     assert info["session_sha256"] == sha256(SES), "session differs from the one recorded by step 2"
-    skip = set(info["prep"]["not_autorouted"])
+    skip = set(info["prep"]["not_autorouted"]) | DEFERRED
     copper = session_copy(SES.read_text(encoding="utf-8"), skip)
     number = {name: int(num) for num, name in re.findall(r'^  \(net (\d+) "([^"]*)"\)', base_text, re.M)}
     seg_lines, via_lines = [], []
@@ -126,7 +128,8 @@ def build(base_text: str) -> tuple[str, dict]:
     spec = {"nets": len(copper), "segments": len(seg_lines), "vias": len(via_lines),
             "by_layer": dict(Counter(layer for c in copper.values() for layer, _, pts in c["wires"]
                                      for _ in range(len(pts) - 1))),
-            "session_sha256": info["session_sha256"], "not_autorouted": sorted(skip)}
+            "session_sha256": info["session_sha256"], "not_autorouted": sorted(set(info["prep"]["not_autorouted"])),
+            "deferred_to_005": sorted(DEFERRED)}
     return "\n".join(out), spec
 
 
