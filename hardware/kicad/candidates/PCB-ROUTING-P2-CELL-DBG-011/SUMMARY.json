@@ -1,0 +1,16 @@
+{
+  "schema": "dioneya-pcb-main-cell-dbg-power-011-v1",
+  "base_sha256": "6cc9d30c5c2326f1b0ea2eeaa91f2240e5e3b83c335c080e2fb4537f9460da16",
+  "candidate_sha256": "ad6cbb021f9ba8fa3a3b4c18b0820e49c864ea8113a55b0645e37f63928fe0d1",
+  "standard_vias_0_5_0_3": 1,
+  "drc": {
+    "base_unconnected": 141,
+    "candidate_unconnected": 140,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "test_pad_via_in_pad_dfm_review": "OPEN",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

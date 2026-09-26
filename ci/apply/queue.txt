@@ -1,1 +1,0 @@
-tools/apply_pcb_main_p2_cell_dbg_power_011_rev_a.py
