@@ -237,7 +237,7 @@ route requires placement/rip-up and local power/return design, followed by nativ
 
 Do not copy 040 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
 
-## 8. Locality scan and relief targets after 033
+## 8. Locality scan and relief targets through 040
 
 A geometry scan of the remaining F.Cu pad-to-pad DRC pairs within 15 mm
 (0.15 mm trial width, 0.20 mm copper clearance, 0.25 mm hole clearance,
@@ -254,6 +254,8 @@ Near-term layout relief targets from the same scan:
 | U3.2→U3.9, 3V3_DIGITAL, 1.53 mm | Package pads block F.Cu; a through via at U3.2 meets GNSS_TX_U9 on In3.Cu and NOR_IO3_U2 on B.Cu. Requires local escape/placement or rip-up. |
 | R49.2→C53.1, SIM2_DET, 2.15 mm | F.Cu 3V3_DIGITAL blocks the direct path; the sampled pad-neighbourhood via positions are occupied on In3/B.Cu. Requires local rip-up. |
 | R86.2→R81.2, SD_D0_CARD, 3.50 mm | A 3V3_DIGITAL branch occupies both inner/back-side escape space near R86; sampled short via positions fail. Requires local channel relief with SD return-path review. |
+| U23.4→SD_CMD_CARD run, 2.85 mm | The 0.50 mm U23 pad pitch leaves no 0.25/0.15 mm through-via site at the pad; a leftward F.Cu escape hits GND_DIGITAL copper and B.Cu is crossed by SD_D1_CARD/SD_DET. Requires local ground/SD push-and-shove and return-path review. |
+| FB1.2→3V8_MODEM_BB, 3.68 mm | The now-connected 3V8_MODEM B.Cu feed lies between FB1.2 and the existing BB run. On In3.Cu the long CELL_USB_VBUS trace at x≈37.57 blocks a short direct power branch. Needs power-channel relief with burst-current and PI assessment. |
 
 The B.Cu test-pad search likewise found no further clean direct pad-to-existing-via
 join; the short CELL_DBG_TXD_TP candidate from TP_CELL_DBG.2 to the existing
