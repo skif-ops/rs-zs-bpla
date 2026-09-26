@@ -51,6 +51,7 @@ Not a candidate for application yet; nothing here changes the authoritative boar
 | 043 + I2C2_SDA_BUS test-pad branch 044 (`d3df48a6…`) | **97** | **0 under the same candidate rules; I2C rise-time/return review open** |
 | 044 + local LORA_DIO1 U10/R65 link 045 (`da04ba89…`) | **96** | **0 under the same candidate rules; signal return and via DFM review open** |
 | 045 + GNSS_ANT_SHORT_N U5 branch 046 (`59d2b0f0…`) | **95** | **0 under the same candidate rules; GNSS bias/RF coupling and via DFM review open** |
+| 046 + GNSS_ANT_BIAS_RAW R61 branch 047 (`6658aedb…`) | **94** | **0 under the same candidate rules; bias-current/RF isolation and via DFM review open** |
 
 At the end of the autorouting experiments P2 was the best clean result (156 open, 0 new errors, 22 dangling fan-out
 vias to clean); it is built from
@@ -118,13 +119,13 @@ Conclusion: seven autorouting variants converge to 155–160 open connections. T
 (KiCad push-and-shove by a layout engineer, or a generalised version of the 003 router in net groups).
 Tools: `tools/apply_pcb_routing_relief_p1_rev_a.py`, `tools/apply_pcb_routing_fanout_p2_rev_a.py`.
 
-## 7. Bounded local routes 007–046 and current stop (2026-09-26)
+## 7. Bounded local routes 007–047 and current stop (2026-09-26)
 
-The cumulative 046 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
+The cumulative 047 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
 authoritative board. The unchanged general PCB-MAIN project rejects the 0.25/0.15 mm vias introduced in 009 and 010 (five each of
 `annular_width`, `drill_out_of_range`, `via_diameter`). Under an explicit *candidate-only* JLCPCB six-layer process
 overlay (`min_via_diameter=0.25`, `min_through_hole_diameter=0.15`, `min_via_annular_width=0.05`), KiCad 9 comparative
-DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110→109→108→107→106→105→104→103→102→101→100→99→98→97→96→95 open with zero new violations at each accepted step. Candidate projects,
+DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110→109→108→107→106→105→104→103→102→101→100→99→98→97→96→95→94 open with zero new violations at each accepted step. Candidate projects,
 comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` directories. The published six-layer process basis is `https://jlcpcb.com/6-layer-pcb` (minimum
 0.15/0.25 mm and via-in-pad option); a job-specific acceptance is still required.
 
@@ -265,13 +266,18 @@ comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` dire
   0.15 mm B.Cu route over In4.Cu GND_DIGITAL; DRC 96→95. L2.1 on
   the same net remains disconnected. The L2 link to GNSS_RF_ANT_BIASED
   makes bias/RF coupling, return and via-in-pad DFM open Review B items.
+- 047: join R61.1 to the existing `GNSS_ANT_BIAS_RAW` F.Cu run at
+  (54.0168, 55.183) using two 0.25/0.15 mm vias and a 0.3 mm,
+  6.049 mm In3.Cu route over In4.Cu GND_DIGITAL; DRC 95→94.
+  GNSS active-antenna bias current, RF isolation and filled/capped
+  via-in-pad DFM remain open. The Q4.4 branch is still disconnected.
 
-Remaining 95 open connections span 62 nets: `3V3_DIGITAL` 11, `1V8_MIC` 8, `AAD_CFG_1V8_FANOUT` 5,
-`SIM2_DET` 3, and 68 others. Of 34 distinct U1 pads now appearing in the open-connection report, the earlier 009
+Remaining 94 open connections span 62 nets: `3V3_DIGITAL` 11, `1V8_MIC` 8, `AAD_CFG_1V8_FANOUT` 5,
+`SIM2_DET` 3, and 67 others. Of 35 distinct U1 pads now appearing in the open-connection report, the earlier 009
 first-pass 0.25/0.15 mm via-in-pad clearance scan admitted only 13 of 40; most others hit existing B.Cu/In3 copper. A clean
 route requires placement/rip-up and local power/return design, followed by native DRC and SI/PI review.
 
-Do not copy 046 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
+Do not copy 047 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
 
 ## 8. Locality scan and relief targets through 040
 
@@ -307,3 +313,10 @@ width; the 0.6 and 0.8 mm trials had no corridor. The narrow and long
 RF-supply capacitor branch over In1.Cu GND_DIGITAL was not accepted.
 Move/repack the modem bulk/decoupling group and review its supply and return
 instead. This grid scan is a screening result, not a proof of unroutability.
+
+Later inner/back-layer probes found a narrow 3V3 route of about 8.4 mm
+from the supply run to C34 (100 nF); it was not accepted because the
+long narrow decoupling loop and GND_MODEM reference need placement/power
+review. The `GNSS_ANT_BIAS_RAW` Q4.4 branch likewise admits only a
+roughly 16 mm back-side detour in the sampled corridor; it was left open
+for local placement/channel relief and GNSS bias/RF review.
