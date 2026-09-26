@@ -1,2 +1,0 @@
-# Queued by Claude 2026-09-26: PCB-MAIN candidate 004 from the Freerouting session (VCORE_1V1 deferred to 005)
-tools/apply_pcb_main_routing_004_candidate_rev_a.py

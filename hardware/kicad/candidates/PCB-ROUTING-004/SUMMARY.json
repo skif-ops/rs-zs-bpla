@@ -1,51 +1,821 @@
 {
-  "schema": "dioneya-pcb-routing-004-export-v1",
+  "schema": "dioneya-pcb-main-routing-004-candidate-v1",
+  "base_board_sha256": "30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739",
+  "candidate_sha256": "e22680dc52c178e2cd5703fa62e82301b673f63ece8f4b4f82d53fdccab5958e",
+  "delta": {
+    "nets": 125,
+    "segments": 1857,
+    "vias": 286,
+    "by_layer": {
+      "In3.Cu": 176,
+      "F.Cu": 1231,
+      "B.Cu": 450
+    },
+    "session_sha256": "aa768a7db6a198e7bef773753866e594685e5ec82a4e34b27a51e9ddb62fffca",
+    "not_autorouted": [
+      "CELL_RF",
+      "CELL_RF_ANT",
+      "CELL_USB_DM_TP",
+      "CELL_USB_DM_U8",
+      "CELL_USB_DP_TP",
+      "CELL_USB_DP_U8",
+      "GND_DIGITAL",
+      "GND_MIC",
+      "GND_MODEM",
+      "GNSS_RF_ANT_BIASED",
+      "GNSS_RF_DC_BLOCK",
+      "GNSS_RF_FILTERED",
+      "LORA_RF_ANT",
+      "LORA_RF_MODULE",
+      "SMPS_SW",
+      "USB_DM_CONN",
+      "USB_DM_U1",
+      "USB_DP_CONN",
+      "USB_DP_U1"
+    ],
+    "deferred_to_005": [
+      "VCORE_1V1"
+    ]
+  },
   "kicad_image": "ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729",
-  "boards": {
-    "PCB-MAIN": {
-      "path": "hardware/kicad/native/PCB-MAIN/PCB-MAIN.kicad_pcb",
-      "sha256": "30c6c93e5afbbc0888ed7c7e8693af6c6f0c7df8f5c4525e02c6d5a4c47b8739"
-    },
-    "PCB-PWR": {
-      "path": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
-      "sha256": "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610",
-      "drc": {
-        "errors": 0,
-        "warnings": 9,
-        "unconnected": 0
-      }
-    },
-    "PCB-MIC": {
-      "path": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
-      "sha256": "a292a6ec2be555519a4fcc44f3d6cfdf0bc38a7f214caff6e71786942e3e4031",
-      "drc": {
-        "errors": 0,
-        "warnings": 0,
-        "unconnected": 0
-      }
-    }
-  },
+  "manufacturing_release": false,
+  "applied_to_authoritative_board": false,
   "steps": {
-    "dsn_main": {
+    "fill_base": {
       "rc": 0,
-      "log": "e\n591202fea89c: Verifying Checksum\n591202fea89c: Download complete\n30ff91259e4e: Verifying Checksum\n30ff91259e4e: Download complete\n6fe7b24cfb8f: Verifying Checksum\n6fe7b24cfb8f: Download complete\nd0b76b7e8d80: Download complete\n26996d003dd4: Pull complete\nd0b76b7e8d80: Pull complete\ne64c2316cd50: Pull complete\n207ac5616789: Pull complete\n46f0bfc95fd9: Pull complete\nf8f12f6f970e: Pull complete\nf36d0dc2d7bb: Pull complete\naab27c973195: Pull complete\nfd5a0db17ede: Pull complete\n898e32f0e177: Pull complete\n591202fea89c: Pull complete\n30ff91259e4e: Pull complete\n6fe7b24cfb8f: Pull complete\nDigest: sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\nStatus: Downloaded newer image for ghcr.io/kicad/kicad@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729\n"
+      "stderr": ""
     },
-    "fill_PCB-PWR": {
+    "drc_base": {
       "rc": 0,
-      "log": "{\"filled_zones\": 33}\n"
+      "stderr": ""
     },
-    "drc_PCB-PWR": {
+    "dump_base": {
       "rc": 0,
-      "log": "Found 9 violations\nFound 0 unconnected items\nSaved DRC Report to hardware/kicad/native/_r004_PCB-PWR/drc.json\n"
+      "stderr": ""
     },
-    "fill_PCB-MIC": {
+    "fill_candidate": {
       "rc": 0,
-      "log": "{\"filled_zones\": 0}\n"
+      "stderr": ""
     },
-    "drc_PCB-MIC": {
+    "drc_candidate": {
       "rc": 0,
-      "log": "Found 0 violations\nFound 0 unconnected items\nSaved DRC Report to hardware/kicad/native/_r004_PCB-MIC/drc.json\n"
+      "stderr": ""
+    },
+    "dump_candidate": {
+      "rc": 0,
+      "stderr": ""
     }
   },
-  "dsn_sha256": "a0efbfaa05a390c87e8a27284d41bf75c2433c279155c867cdbec0b1eded446d"
+  "drc": {
+    "base": {
+      "by_type": {
+        "warning:silk_over_copper": 164,
+        "warning:silk_overlap": 66
+      },
+      "unconnected": 421
+    },
+    "candidate": {
+      "by_type": {
+        "error:clearance": 7,
+        "error:hole_clearance": 8,
+        "error:shorting_items": 31,
+        "error:solder_mask_bridge": 39,
+        "warning:silk_over_copper": 164,
+        "warning:silk_overlap": 66,
+        "warning:track_dangling": 4
+      },
+      "unconnected": 143
+    },
+    "new_fingerprint_count": 89,
+    "new_errors": 85,
+    "new_fingerprints": [
+      [
+        "error",
+        "clearance",
+        [
+          "Pad 2 [3V3_DIGITAL] of TP_EOL on B.Cu",
+          "Track [SIM1_DET] on B.Cu, length 5.5569 mm"
+        ]
+      ],
+      [
+        "error",
+        "clearance",
+        [
+          "Pad 2 [CELL_USB_DP_TP] of TP_CELL_USB on B.Cu",
+          "Track [CELL_USIM_CLK_1V8] on B.Cu, length 1.7831 mm"
+        ]
+      ],
+      [
+        "error",
+        "clearance",
+        [
+          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
+          "Track [GNSS_ANT_SWITCHED] on F.Cu, length 1.3019 mm"
+        ]
+      ],
+      [
+        "error",
+        "clearance",
+        [
+          "Pad 4 [GND_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D3_CARD] on B.Cu, length 1.2078 mm"
+        ]
+      ],
+      [
+        "error",
+        "clearance",
+        [
+          "Pad 4 [GND_MODEM] of TP_CELL_USB on B.Cu",
+          "Track [TEST_UART_TX_U1] on B.Cu, length 1.3067 mm"
+        ]
+      ],
+      [
+        "error",
+        "clearance",
+        [
+          "Pad 5 [GND_DIGITAL] of TP_MCU_SWD on B.Cu",
+          "Track [SD_DET] on B.Cu, length 1.5364 mm"
+        ]
+      ],
+      [
+        "error",
+        "clearance",
+        [
+          "Pad 5 [GND_DIGITAL] of TP_MCU_SWD on B.Cu",
+          "Track [SD_DET] on B.Cu, length 1.7945 mm"
+        ]
+      ],
+      [
+        "error",
+        "hole_clearance",
+        [
+          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
+          "Via [GNSS_ANT_OFF_N] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "hole_clearance",
+        [
+          "Pad 2 [NRF_SWDIO] of TP_BLE_SWD on B.Cu",
+          "Via [3V3_DIGITAL] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "hole_clearance",
+        [
+          "Pad 3 [NRF_SWCLK] of TP_BLE_SWD on B.Cu",
+          "Via [SD_D0_CARD] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "hole_clearance",
+        [
+          "Pad 4 [1V8_MIC] of TP_EOL on B.Cu",
+          "Via [USB_VBUS_SENSE] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "hole_clearance",
+        [
+          "Pad 4 [GND_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Via [SD_D3_CARD] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "hole_clearance",
+        [
+          "Pad 4 [GND_MODEM] of TP_CELL_USB on B.Cu",
+          "Via [3V3_DIGITAL] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "hole_clearance",
+        [
+          "Pad 4 [GND_MODEM] of TP_CELL_USB on B.Cu",
+          "Via [TEST_UART_TX_U1] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "hole_clearance",
+        [
+          "Pad 6 [TEST_UART_RX_TP] of TP_EOL on B.Cu",
+          "Via [HW_REV1] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 1 [3V3_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Track [NRF_SWDIO] on B.Cu, length 19.8643 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 1 [GND_DIGITAL] of TP_EOL on B.Cu",
+          "Track [CELL_USIM_CLK_1V8] on B.Cu, length 1.1994 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 1 [GND_DIGITAL] of TP_EOL on B.Cu",
+          "Track [CELL_USIM_CLK_1V8] on B.Cu, length 2.1357 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 1 [GND_DIGITAL] of TP_EOL on B.Cu",
+          "Track [CELL_USIM_DATA_1V8] on B.Cu, length 1.1554 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 1 [GND_DIGITAL] of TP_EOL on B.Cu",
+          "Track [CELL_USIM_DATA_1V8] on B.Cu, length 1.4268 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 1 [SMPS_SW] of L1 on F.Cu",
+          "Track [EN_AUX] on F.Cu, length 1.9188 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 1 [SMPS_SW] of L1 on F.Cu",
+          "Track [EN_AUX] on F.Cu, length 2.9966 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 1 [U8_VDD_EXT_1V8] of TP_CELL_DBG on B.Cu",
+          "Track [CELL_DBG_TXD_TP] on B.Cu, length 2.2896 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 2 [3V8_MODEM_BB] of FB1 on F.Cu",
+          "Track [3V8_MODEM] on F.Cu, length 4.6978 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 2 [CELL_USB_DP_TP] of TP_CELL_USB on B.Cu",
+          "Track [CELL_TX_U16] on B.Cu, length 4.7833 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
+          "Track [GNSS_ANT_OFF_N] on F.Cu, length 0.1546 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
+          "Track [GNSS_ANT_OFF_N] on F.Cu, length 1.1767 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
+          "Track [GNSS_ANT_OFF_N] on F.Cu, length 1.3614 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
+          "Via [GNSS_ANT_OFF_N] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 2 [NRF_SWDIO] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D1_CARD] on B.Cu, length 3.5399 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 2 [NRF_SWDIO] of TP_BLE_SWD on B.Cu",
+          "Via [3V3_DIGITAL] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 3 [3V8_MODEM] of TP_EOL on B.Cu",
+          "Track [CELL_USIM_RST_1V8] on B.Cu, length 3.6675 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 3 [CELL_DBG_RXD_TP] of TP_CELL_DBG on B.Cu",
+          "Track [USB_VBUS_SENSE] on B.Cu, length 8.5981 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 3 [NRF_SWCLK] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D0_CARD] on B.Cu, length 1.8474 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 3 [NRF_SWCLK] of TP_BLE_SWD on B.Cu",
+          "Via [SD_D0_CARD] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 4 [1V8_MIC] of TP_EOL on B.Cu",
+          "Track [USB_VBUS_SENSE] on B.Cu, length 0.8880 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 4 [1V8_MIC] of TP_EOL on B.Cu",
+          "Track [USB_VBUS_SENSE] on B.Cu, length 3.6146 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 4 [1V8_MIC] of TP_EOL on B.Cu",
+          "Via [USB_VBUS_SENSE] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 4 [GND_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D3_CARD] on B.Cu, length 0.3579 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 4 [GND_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D3_CARD] on B.Cu, length 0.3771 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 4 [GND_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D3_CARD] on B.Cu, length 3.5412 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 4 [GND_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Via [SD_D3_CARD] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 4 [GND_MODEM] of TP_CELL_USB on B.Cu",
+          "Via [3V3_DIGITAL] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 4 [GND_MODEM] of TP_CELL_USB on B.Cu",
+          "Via [TEST_UART_TX_U1] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 6 [TEST_UART_RX_TP] of TP_EOL on B.Cu",
+          "Track [HW_REV1] on B.Cu, length 1.3770 mm"
+        ]
+      ],
+      [
+        "error",
+        "shorting_items",
+        [
+          "Pad 6 [TEST_UART_RX_TP] of TP_EOL on B.Cu",
+          "Via [HW_REV1] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 1 [3V3_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Track [NRF_SWDIO] on B.Cu, length 19.8643 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 1 [GND_DIGITAL] of TP_EOL on B.Cu",
+          "Track [CELL_USIM_CLK_1V8] on B.Cu, length 1.1994 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 1 [GND_DIGITAL] of TP_EOL on B.Cu",
+          "Track [CELL_USIM_CLK_1V8] on B.Cu, length 2.1357 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 1 [GND_DIGITAL] of TP_EOL on B.Cu",
+          "Track [CELL_USIM_DATA_1V8] on B.Cu, length 1.1554 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 1 [GND_DIGITAL] of TP_EOL on B.Cu",
+          "Track [CELL_USIM_DATA_1V8] on B.Cu, length 1.4268 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 1 [SMPS_SW] of L1 on F.Cu",
+          "Track [EN_AUX] on F.Cu, length 1.9188 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 1 [SMPS_SW] of L1 on F.Cu",
+          "Track [EN_AUX] on F.Cu, length 2.9966 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 1 [U8_VDD_EXT_1V8] of TP_CELL_DBG on B.Cu",
+          "Track [CELL_DBG_TXD_TP] on B.Cu, length 2.2896 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 2 [3V3_DIGITAL] of TP_EOL on B.Cu",
+          "Track [SIM1_DET] on B.Cu, length 5.5569 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 2 [3V8_MODEM_BB] of FB1 on F.Cu",
+          "Track [3V8_MODEM] on F.Cu, length 4.6978 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 2 [CELL_USB_DP_TP] of TP_CELL_USB on B.Cu",
+          "Track [CELL_TX_U16] on B.Cu, length 4.7833 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 2 [CELL_USB_DP_TP] of TP_CELL_USB on B.Cu",
+          "Track [CELL_USIM_CLK_1V8] on B.Cu, length 1.7831 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
+          "Track [GNSS_ANT_OFF_N] on F.Cu, length 0.1546 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
+          "Track [GNSS_ANT_OFF_N] on F.Cu, length 1.1767 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
+          "Track [GNSS_ANT_OFF_N] on F.Cu, length 1.3614 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 2 [GNSS_ANT_SHORT_N] of R62 on F.Cu",
+          "Via [GNSS_ANT_OFF_N] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 2 [NRF_SWDIO] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D1_CARD] on B.Cu, length 3.5399 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 2 [NRF_SWDIO] of TP_BLE_SWD on B.Cu",
+          "Via [3V3_DIGITAL] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 3 [3V8_MODEM] of TP_EOL on B.Cu",
+          "Track [CELL_USIM_RST_1V8] on B.Cu, length 3.6675 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 3 [3V8_MODEM] of TP_EOL on B.Cu",
+          "Track [SIM1_DET] on B.Cu, length 5.5569 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 3 [CELL_DBG_RXD_TP] of TP_CELL_DBG on B.Cu",
+          "Track [USB_VBUS_SENSE] on B.Cu, length 8.5981 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 3 [NRF_SWCLK] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D0_CARD] on B.Cu, length 1.8474 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 3 [NRF_SWCLK] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D3_CARD] on B.Cu, length 3.5412 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 3 [NRF_SWCLK] of TP_BLE_SWD on B.Cu",
+          "Via [SD_D0_CARD] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 4 [1V8_MIC] of TP_EOL on B.Cu",
+          "Track [USB_VBUS_SENSE] on B.Cu, length 0.8880 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 4 [1V8_MIC] of TP_EOL on B.Cu",
+          "Track [USB_VBUS_SENSE] on B.Cu, length 3.6146 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 4 [1V8_MIC] of TP_EOL on B.Cu",
+          "Via [USB_VBUS_SENSE] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 4 [GND_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D3_CARD] on B.Cu, length 0.3579 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 4 [GND_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D3_CARD] on B.Cu, length 0.3771 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 4 [GND_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D3_CARD] on B.Cu, length 1.2078 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 4 [GND_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Track [SD_D3_CARD] on B.Cu, length 3.5412 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 4 [GND_DIGITAL] of TP_BLE_SWD on B.Cu",
+          "Via [SD_D3_CARD] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 4 [GND_MODEM] of TP_CELL_USB on B.Cu",
+          "Track [TEST_UART_TX_U1] on B.Cu, length 1.3067 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 4 [GND_MODEM] of TP_CELL_USB on B.Cu",
+          "Via [3V3_DIGITAL] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 4 [GND_MODEM] of TP_CELL_USB on B.Cu",
+          "Via [TEST_UART_TX_U1] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 5 [GND_DIGITAL] of TP_MCU_SWD on B.Cu",
+          "Track [SD_DET] on B.Cu, length 1.5364 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 5 [GND_DIGITAL] of TP_MCU_SWD on B.Cu",
+          "Track [SD_DET] on B.Cu, length 1.7945 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 6 [TEST_UART_RX_TP] of TP_EOL on B.Cu",
+          "Track [HW_REV1] on B.Cu, length 1.3770 mm"
+        ]
+      ],
+      [
+        "error",
+        "solder_mask_bridge",
+        [
+          "Pad 6 [TEST_UART_RX_TP] of TP_EOL on B.Cu",
+          "Via [HW_REV1] on F.Cu - B.Cu"
+        ]
+      ],
+      [
+        "warning",
+        "track_dangling",
+        [
+          "Track [3V8_MODEM_BB] on F.Cu, length 1.1389 mm"
+        ]
+      ],
+      [
+        "warning",
+        "track_dangling",
+        [
+          "Track [GNSS_ANT_GATE] on F.Cu, length 2.6348 mm"
+        ]
+      ],
+      [
+        "warning",
+        "track_dangling",
+        [
+          "Track [GNSS_ANT_SHORT_N] on F.Cu, length 0.4090 mm"
+        ]
+      ],
+      [
+        "warning",
+        "track_dangling",
+        [
+          "Track [GNSS_ANT_SWITCHED] on F.Cu, length 1.3019 mm"
+        ]
+      ]
+    ]
+  },
+  "continuity_summary": {
+    "B.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": 0.0,
+    "B.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
+    "B.Cu|GND_DIGITAL": 0.8331,
+    "B.Cu|GND_MIC": 0.0,
+    "B.Cu|GND_MODEM": 0.8386,
+    "B.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0,
+    "B.Cu|SHIELD_COUPLING_NETWORK_REVIEW_B": 0.0,
+    "F.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": 0.0,
+    "F.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
+    "F.Cu|GND_DIGITAL": 0.9311,
+    "F.Cu|GND_MIC": 0.0,
+    "F.Cu|GND_MODEM": 0.3698,
+    "F.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0,
+    "F.Cu|SHIELD_COUPLING_NETWORK_REVIEW_B": 0.0,
+    "In3.Cu|GND_DIGITAL": 0.0,
+    "In3.Cu|GND_MODEM": 0.0,
+    "In3.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0
+  }
 }
