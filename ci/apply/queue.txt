@@ -1,0 +1,2 @@
+# Queued by Claude 2026-09-26: experiment P2 - session-G input with Freerouting fan-out enabled (measurement only)
+tools/apply_pcb_routing_fanout_p2_rev_a.py
