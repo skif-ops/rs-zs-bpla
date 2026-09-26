@@ -1,1 +1,0 @@
-tools/apply_pcb_main_c6_r14_030_rev_a.py
