@@ -1,0 +1,63 @@
+{
+ "schema": "dioneya-pcb-routing-007-autoroute-v1",
+ "freerouting": "2.4.1",
+ "passes": 8,
+ "rc": 0,
+ "seconds": 2472,
+ "input_dsn_sha256": "0c066420c518f52a2478f09e213fcd14b8549fcbcc229969c5fdd32e14b0664a",
+ "prep": {
+  "base": "session-D input",
+  "fixed_d_items": 90,
+  "fixed_d_nets": [
+   "3V8_MODEM",
+   "CELL_TX_U16",
+   "GNSS_ANT_OFF_N",
+   "I2C2_SDA_U1",
+   "LORA_BUSY",
+   "LORA_RESET_N",
+   "LORA_RXEN",
+   "NRST",
+   "PDM_DATA1_1V8",
+   "SIM1_DET",
+   "VCORE_1V1"
+  ],
+  "unlocked": "3V3_DIGITAL",
+  "not_autorouted": [
+   "CELL_RF",
+   "CELL_RF_ANT",
+   "CELL_USB_DM_TP",
+   "CELL_USB_DM_U8",
+   "CELL_USB_DP_TP",
+   "CELL_USB_DP_U8",
+   "GND_DIGITAL",
+   "GND_MIC",
+   "GND_MODEM",
+   "GNSS_RF_ANT_BIASED",
+   "GNSS_RF_DC_BLOCK",
+   "GNSS_RF_FILTERED",
+   "LORA_RF_ANT",
+   "LORA_RF_MODULE",
+   "USB_DM_CONN",
+   "USB_DM_U1",
+   "USB_DP_CONN",
+   "USB_DP_U1"
+  ]
+ },
+ "session_d_sha256": "ccb12b2d98c7e388ee2cac54d470cd155421dac6c748409762bdc802d08638f2",
+ "session_sha256": "1f6c9fff3137fc70a3d7970dbb1156f0a6ece78aac16fbd9f66624f08ad95ea8",
+ "log_tail": [
+  "2026-09-26 09:18:10.995 WARN   Power-plane validation failed:",
+  "   - Vias and Anti-Pads: Plated holes passing through the board, surrounded by circular voids (anti-pads) to prevent shorting.",
+  "2026-09-26 09:18:11.583 INFO   [9B03BB\\72699A] Auto-routing stage started on board '72ac5d5b6323b8f88d02a823e47b117b' for 159 unrouted items.",
+  "2026-09-26 09:23:27.096 INFO   [9B03BB\\72699A] Auto-routing pass #1 on board '72ac5d5b6323b8f88d02a823e47b117b' was completed in 314.15 seconds with score 244.62 (154 unrouted and 956 violations), using 306.68 CPU second",
+  "2026-09-26 09:28:31.759 INFO   [9B03BB\\72699A] Auto-routing pass #2 on board '437bf5f2f5de2654c80a5bff9a4831bd' was completed in 303.72 seconds with score 242.43 (155 unrouted and 956 violations), using 604.16 CPU second",
+  "2026-09-26 09:33:44.714 INFO   [9B03BB\\72699A] Auto-routing pass #3 on board '678bd4c5555908e9d01f3bdcd7481362' was completed in 311.97 seconds with score 244.62 (154 unrouted and 956 violations), using 909.53 CPU second",
+  "2026-09-26 09:38:48.030 INFO   [9B03BB\\72699A] Auto-routing pass #4 on board '59c74fa2686b8f0ec4e9535f55abd2c0' was completed in 302.39 seconds with score 242.43 (155 unrouted and 956 violations), using 1205.10 CPU secon",
+  "2026-09-26 09:44:00.713 INFO   [9B03BB\\72699A] Auto-routing pass #5 on board '4d822d917c4abe5d99aaba8bab8eaca2' was completed in 311.74 seconds with score 244.62 (154 unrouted and 956 violations), using 1509.37 CPU secon",
+  "2026-09-26 09:49:04.116 INFO   [9B03BB\\72699A] Auto-routing pass #6 on board '264247e46b0d17a9fb70d63d494139b0' was completed in 302.48 seconds with score 242.43 (155 unrouted and 956 violations), using 1805.76 CPU secon",
+  "2026-09-26 09:54:14.458 INFO   [9B03BB\\72699A] Auto-routing pass #7 on board '908d937bf5bf2846fd4a5bffd42d4a24' was completed in 309.41 seconds with score 244.62 (154 unrouted and 956 violations), using 2108.06 CPU secon",
+  "2026-09-26 09:59:18.677 INFO   [9B03BB\\72699A] Auto-routing pass #8 on board '16ffc82a0a762400d31c3a3f683a2508' was completed in 303.30 seconds with score 244.62 (154 unrouted and 956 violations), using 2404.52 CPU secon",
+  "2026-09-26 09:59:19.618 INFO   [9B03BB\\72699A] Auto-routing stage completed: started with 159 unrouted nets, completed in 2468.05 seconds, final score: 244.62 (154 unrouted and 956 violations), using 2405.50 total CPU se",
+  "2026-09-26 09:59:19.662 INFO   [9B03BB\\72699A] Job '9B03BB\\72699A' finished with state: COMPLETED (elapsed: 41 minutes 8.63 seconds, finished at UTC: 2026-09-26T09:59:19.661384127Z)."
+ ]
+}
