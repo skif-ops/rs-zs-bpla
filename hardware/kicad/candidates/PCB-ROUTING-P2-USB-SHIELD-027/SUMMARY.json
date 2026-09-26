@@ -1,0 +1,21 @@
+{
+  "schema": "dioneya-pcb-main-usb-shield-027-v1",
+  "base_sha256": "c6da5dc72bb0e2d4bc743057cdc79f18fe3c74d460da53c35e84241e0a20c467",
+  "candidate_sha256": "79e3d98ecca114b094d06b9d462d12f78a096930f66248c7bfeb8bb5ecd4b6f5",
+  "routes": 1,
+  "shield_coupling_review_b": "OPEN",
+  "track_segments": 5,
+  "width_mm": [
+    0.25
+  ],
+  "total_length_mm": 10.28,
+  "drc": {
+    "base_unconnected": 115,
+    "candidate_unconnected": 114,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
