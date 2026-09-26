@@ -1,0 +1,2 @@
+# Queued by Claude 2026-09-26: placement-relief experiment P1 (pogo rows off U1) - measurement only
+tools/apply_pcb_routing_relief_p1_rev_a.py
