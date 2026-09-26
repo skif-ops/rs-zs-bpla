@@ -1,0 +1,84 @@
+{
+ "rc": 0,
+ "seconds": 2630,
+ "input_dsn_sha256": "a8dc0b887f52b7a6287bb65a2a76e5f468bc26ba560215200e78015edf95e257",
+ "prep": {
+  "base": "003 board (step-1 DSN), no autorouted copper fixed",
+  "polygon_pads_as_rect": 32,
+  "classes": {
+   "signal": 87,
+   "slow": 68,
+   "power": 13,
+   "burst": 3,
+   "locked": 15
+  },
+  "back_parts_as_front": [
+   "TP_CELL_USB",
+   "TP_BLE_SWD",
+   "TP_EOL",
+   "TP_MCU_SWD",
+   "TP_CELL_DBG"
+  ],
+  "l1": [
+   "(place L1 52000.000000 -19750.000000 front 180.000000",
+   "(place L1 53750.000000 -40750.000000 front 180.000000"
+  ],
+  "not_autorouted": [
+   "CELL_RF",
+   "CELL_RF_ANT",
+   "CELL_USB_DM_TP",
+   "CELL_USB_DM_U8",
+   "CELL_USB_DP_TP",
+   "CELL_USB_DP_U8",
+   "GND_DIGITAL",
+   "GND_MIC",
+   "GND_MODEM",
+   "GNSS_RF_ANT_BIASED",
+   "GNSS_RF_DC_BLOCK",
+   "GNSS_RF_FILTERED",
+   "LORA_RF_ANT",
+   "LORA_RF_MODULE",
+   "USB_DM_CONN",
+   "USB_DM_U1",
+   "USB_DP_CONN",
+   "USB_DP_U1"
+  ],
+  "moves": {
+   "TP_EOL": [
+    [
+     33.0,
+     23.0
+    ],
+    [
+     47.5,
+     9.0
+    ]
+   ],
+   "TP_CELL_DBG": [
+    [
+     47.0,
+     30.0
+    ],
+    [
+     22.5,
+     28.0
+    ]
+   ]
+  },
+  "removed_wiring": 14
+ },
+ "session_sha256": "68c4dd4c240052dffe38211537569e37af29268fc17929b620434f3670b6e32d",
+ "log_tail": [
+  "2026-09-26 10:31:18.363 INFO   [FECE01\\5E77AB] Auto-routing pass #1 on board 'fd3cbbe86f7b693ef57ba02c2c99373e' was completed in 199.01 seconds with score 87.08 (245 unrouted and 861 violations), using 194.69 CPU seconds",
+  "2026-09-26 10:34:54.090 INFO   [FECE01\\5E77AB] Auto-routing pass #2 on board '7e2789a81c76de981f6aee20b83daa57' was completed in 215.24 seconds with score 135.21 (223 unrouted and 861 violations), using 405.83 CPU second",
+  "2026-09-26 10:39:05.242 INFO   [FECE01\\5E77AB] Auto-routing pass #3 on board '125aac6bb8cf85a8bc7ebaeb3cab4e68' was completed in 250.64 seconds with score 198.67 (194 unrouted and 861 violations), using 650.49 CPU second",
+  "2026-09-26 10:43:29.014 INFO   [FECE01\\5E77AB] Auto-routing pass #4 on board '8e93692090230ec654d430f9a85bfb61' was completed in 263.21 seconds with score 240.24 (175 unrouted and 861 violations), using 906.79 CPU second",
+  "2026-09-26 10:48:00.062 INFO   [FECE01\\5E77AB] Auto-routing pass #5 on board 'a9acf6f20697ad14d74bd894b8f71be7' was completed in 270.44 seconds with score 242.43 (174 unrouted and 861 violations), using 1170.01 CPU secon",
+  "2026-09-26 10:52:30.806 INFO   [FECE01\\5E77AB] Auto-routing pass #6 on board '504805296c4069deb9de61b313367b19' was completed in 270.14 seconds with score 253.37 (169 unrouted and 861 violations), using 1433.43 CPU secon",
+  "2026-09-26 10:57:23.690 INFO   [FECE01\\5E77AB] Auto-routing pass #7 on board '545f5b7c87faf9a4254234575f3bbdaa' was completed in 292.23 seconds with score 273.07 (160 unrouted and 861 violations), using 1718.59 CPU secon",
+  "2026-09-26 11:02:01.204 INFO   [FECE01\\5E77AB] Auto-routing pass #8 on board 'd21251e31e6b5f957ea590aae159c381' was completed in 276.86 seconds with score 288.38 (153 unrouted and 861 violations), using 1987.43 CPU secon",
+  "2026-09-26 11:06:29.457 INFO   [FECE01\\5E77AB] Auto-routing pass #9 on board '2ccf80894505bbe5f6c998d2ec69b875' was completed in 267.57 seconds with score 292.76 (151 unrouted and 861 violations), using 2247.67 CPU secon",
+  "2026-09-26 11:11:27.429 INFO   [FECE01\\5E77AB] Auto-routing pass #10 on board '027eb6ac3eac4f44959ba828218f8f7e' was completed in 297.30 seconds with score 299.32 (148 unrouted and 861 violations), using 2536.13 CPU seco",
+  "2026-09-26 11:11:28.132 INFO   [FECE01\\5E77AB] Auto-routing stage completed: started with 451 unrouted nets, completed in 2609.05 seconds, final score: 299.32 (148 unrouted and 861 violations), using 2537.08 total CPU se"
+ ]
+}

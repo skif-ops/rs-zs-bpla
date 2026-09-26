@@ -1,0 +1,111 @@
+{
+  "schema": "dioneya-pcb-main-fanout-p2-v1",
+  "measurement_only": true,
+  "autoroute": {
+    "rc": 0,
+    "seconds": 3420,
+    "input_dsn_sha256": "a0e755a3ca5f5c0f5803b6e2ca9144cd88b03a2e8b16c48d294d95fc0a1c5453",
+    "prep": {
+      "base": "003 board (step-1 DSN), no autorouted copper fixed",
+      "polygon_pads_as_rect": 32,
+      "classes": {
+        "signal": 87,
+        "slow": 68,
+        "power": 13,
+        "burst": 3,
+        "locked": 15
+      },
+      "back_parts_as_front": [
+        "TP_CELL_USB",
+        "TP_BLE_SWD",
+        "TP_EOL",
+        "TP_MCU_SWD",
+        "TP_CELL_DBG"
+      ],
+      "l1": [
+        "(place L1 52000.000000 -19750.000000 front 180.000000",
+        "(place L1 53750.000000 -40750.000000 front 180.000000"
+      ],
+      "not_autorouted": [
+        "CELL_RF",
+        "CELL_RF_ANT",
+        "CELL_USB_DM_TP",
+        "CELL_USB_DM_U8",
+        "CELL_USB_DP_TP",
+        "CELL_USB_DP_U8",
+        "GND_DIGITAL",
+        "GND_MIC",
+        "GND_MODEM",
+        "GNSS_RF_ANT_BIASED",
+        "GNSS_RF_DC_BLOCK",
+        "GNSS_RF_FILTERED",
+        "LORA_RF_ANT",
+        "LORA_RF_MODULE",
+        "USB_DM_CONN",
+        "USB_DM_U1",
+        "USB_DP_CONN",
+        "USB_DP_U1"
+      ],
+      "moves": {},
+      "removed_wiring": 0
+    },
+    "session_sha256": "31fee07b13cac414fe727baa798198ef7e819314e590a20c2f2c55eb8b34fadc",
+    "log_tail": [
+      "2026-09-26 11:24:15.008 INFO   [B511A9\\D786ED] Fanout pass #7 on board 'a42b78f58ac7d76d6fed9fe420ed6fd2' completed in 6.83 seconds with 21 SMD pins fanouted, 497 not routed, 0 insert errors, +0 extra vias (0 SMD pins st",
+      "2026-09-26 11:24:21.884 INFO   [B511A9\\D786ED] Fanout pass #8 on board '0186d6f347c48c2ee85eed7a36eb8a7f' completed in 6.83 seconds with 21 SMD pins fanouted, 497 not routed, 0 insert errors, +0 extra vias (0 SMD pins st",
+      "2026-09-26 11:24:22.018 INFO   [B511A9\\D786ED] Fanout stage completed: started with 624 total SMD pins, completed in 60.24 seconds, escaped pins: 242/624 (38.8%), using 59.69 total CPU seconds, 174.55 GB total allocated,",
+      "2026-09-26 11:30:12.365 INFO   [B511A9\\D786ED] Auto-routing pass #1 on board '0186d6f347c48c2ee85eed7a36eb8a7f' was completed in 349.75 seconds with score 158.85 (210 unrouted and 872 violations), using 401.16 CPU second",
+      "2026-09-26 11:36:57.873 INFO   [B511A9\\D786ED] Auto-routing pass #2 on board '590537eb66f57e7090a6f0b852559134' was completed in 404.79 seconds with score 248.56 (169 unrouted and 872 violations), using 796.01 CPU second",
+      "2026-09-26 11:42:22.689 INFO   [B511A9\\D786ED] Auto-routing pass #3 on board '720afaaa7d75ddd694604fa8e1471406' was completed in 324.00 seconds with score 285.76 (152 unrouted and 872 violations), using 1112.05 CPU secon",
+      "2026-09-26 11:47:51.887 INFO   [B511A9\\D786ED] Auto-routing pass #4 on board '76bc85039d518983bc354591c32e2157' was completed in 328.31 seconds with score 303.26 (144 unrouted and 872 violations), using 1434.07 CPU secon",
+      "2026-09-26 11:52:55.274 INFO   [B511A9\\D786ED] Auto-routing pass #5 on board 'ad2bcd79741f9379a2422baa35940f51' was completed in 302.42 seconds with score 309.83 (141 unrouted and 872 violations), using 1729.52 CPU secon",
+      "2026-09-26 11:58:02.387 INFO   [B511A9\\D786ED] Auto-routing pass #6 on board 'a0ebb5655d27a1e4bcfa821fa378b42c' was completed in 306.19 seconds with score 349.21 (123 unrouted and 872 violations), using 2028.82 CPU secon",
+      "2026-09-26 12:03:12.885 INFO   [B511A9\\D786ED] Auto-routing pass #7 on board '8b279edcd23fd145af3a7c70719fc166' was completed in 309.51 seconds with score 331.71 (131 unrouted and 872 violations), using 2330.52 CPU secon",
+      "2026-09-26 12:08:55.799 INFO   [B511A9\\D786ED] Auto-routing pass #8 on board '8b279edcd23fd145af3a7c70719fc166' was completed in 0.00 seconds with score 349.21 (123 unrouted and 872 violations), using 2664.55 CPU seconds",
+      "2026-09-26 12:13:46.827 INFO   [B511A9\\D786ED] Auto-routing pass #9 on board '8b279edcd23fd145af3a7c70719fc166' was completed in 290.53 seconds with score 349.21 (123 unrouted and 872 violations), using 2948.83 CPU secon",
+      "2026-09-26 12:20:04.842 INFO   [B511A9\\D786ED] Auto-routing pass #10 on board 'e6898bc3cc2e91cf9a6170d37b5aa0cf' was completed in 377.07 seconds with score 355.78 (120 unrouted and 872 violations), using 3317.80 CPU seco",
+      "2026-09-26 12:20:05.795 INFO   [B511A9\\D786ED] Auto-routing stage completed: started with 452 unrouted nets, completed in 3404.01 seconds, final score: 355.78 (120 unrouted and 872 violations), using 3318.78 total CPU se"
+    ]
+  },
+  "candidate_sha256": "6da31a8cdb8522a2d807fd940f8e76e6bb6638647d7b9dd45a287f5789a577c6",
+  "delta": {
+    "moves": {},
+    "ripped_items": 0,
+    "ripped_nets": [],
+    "drc_dropped_items": 199,
+    "nets": 136,
+    "segments": 2023,
+    "vias": 276
+  },
+  "drc": {
+    "base_unconnected": 421,
+    "candidate_unconnected": 156,
+    "new_fingerprint_count": 28,
+    "new_errors": 0,
+    "new_by_type": {
+      "warning:track_dangling": 6,
+      "warning:via_dangling": 22
+    }
+  },
+  "continuity_summary": {
+    "B.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": 0.0,
+    "B.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
+    "B.Cu|GND_DIGITAL": 0.8887,
+    "B.Cu|GND_MIC": 0.0,
+    "B.Cu|GND_MODEM": 0.8998,
+    "B.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0,
+    "F.Cu|CROSS_GND_DIGITAL_GND_MIC_REVIEW_B": 0.0,
+    "F.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
+    "F.Cu|GND_DIGITAL": 0.9338,
+    "F.Cu|GND_MIC": 0.0,
+    "F.Cu|GND_MODEM": 0.3411,
+    "F.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0,
+    "F.Cu|SHIELD_COUPLING_NETWORK_REVIEW_B": 0.0,
+    "In3.Cu|CROSS_GND_DIGITAL_GND_MODEM_REVIEW_B": 0.0,
+    "In3.Cu|GND_DIGITAL": 0.0,
+    "In3.Cu|GND_MIC": 0.0,
+    "In3.Cu|GND_MODEM": 0.0,
+    "In3.Cu|RETURN_AT_LOAD_PER_GROUND_AUTHORITY": 0.0,
+    "In3.Cu|SHIELD_COUPLING_NETWORK_REVIEW_B": 0.0
+  }
+}
