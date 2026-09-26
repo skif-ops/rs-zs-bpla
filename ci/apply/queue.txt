@@ -1,1 +1,0 @@
-tools/apply_pcb_main_p2_ble_swd_power_012_rev_a.py
