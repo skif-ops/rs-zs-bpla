@@ -1,0 +1,2 @@
+# Queued by Claude 2026-09-26: PCB-MAIN candidate 004, run 2 (nets failing KiCad DRC in run 1 left out)
+tools/apply_pcb_main_routing_004_candidate_rev_a.py

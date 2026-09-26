@@ -41,6 +41,10 @@ VIA_SIZE, VIA_DRILL = 0.5, 0.3
 LAYERS = {"F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "B.Cu"}
 # VCORE_1V1 is routed from L1, which 005 moves to the SMPS pins (46/49) of U1: its autorouted copper is left out
 DEFERRED = {"VCORE_1V1"}
+# nets whose autorouted copper failed KiCad DRC in the first candidate (e22680dc): the router misplaced the pads of
+# the back-side test connectors (TP_EOL, TP_BLE_SWD, TP_MCU_SWD, TP_CELL_USB, TP_CELL_DBG) and of R62/FB1/L1; their
+# new copper is left out whole and the connections stay open for the next routing step
+REJECTED = OUT / "DRC_REJECTED_NETS.json"
 
 
 def sha256(path: Path) -> str:
@@ -101,7 +105,8 @@ def session_copy(text: str, skip: set) -> dict:
 def build(base_text: str) -> tuple[str, dict]:
     info = json.loads(AUTOROUTE.read_text(encoding="utf-8"))
     assert info["session_sha256"] == sha256(SES), "session differs from the one recorded by step 2"
-    skip = set(info["prep"]["not_autorouted"]) | DEFERRED
+    rejected = set(json.loads(REJECTED.read_text(encoding="utf-8"))["nets"])
+    skip = set(info["prep"]["not_autorouted"]) | DEFERRED | rejected
     copper = session_copy(SES.read_text(encoding="utf-8"), skip)
     number = {name: int(num) for num, name in re.findall(r'^  \(net (\d+) "([^"]*)"\)', base_text, re.M)}
     seg_lines, via_lines = [], []
@@ -129,7 +134,7 @@ def build(base_text: str) -> tuple[str, dict]:
             "by_layer": dict(Counter(layer for c in copper.values() for layer, _, pts in c["wires"]
                                      for _ in range(len(pts) - 1))),
             "session_sha256": info["session_sha256"], "not_autorouted": sorted(set(info["prep"]["not_autorouted"])),
-            "deferred_to_005": sorted(DEFERRED)}
+            "deferred_to_005": sorted(DEFERRED), "drc_rejected": sorted(rejected)}
     return "\n".join(out), spec
 
 
