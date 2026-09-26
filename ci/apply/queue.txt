@@ -1,1 +1,0 @@
-tools/apply_pcb_main_cell_dbg_rx_038_rev_a.py
