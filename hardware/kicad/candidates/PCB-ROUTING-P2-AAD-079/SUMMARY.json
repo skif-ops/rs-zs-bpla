@@ -1,0 +1,25 @@
+{
+  "schema": "dioneya-pcb-main-aad-079-v1",
+  "base_sha256": "44fd9e8b36f47511cc48b3450807337c61af1cc5d99a67373a56b5e7e6b29526",
+  "candidate_sha256": "d98ee2e91c9faa48d73e3133683d99814764d3be76b1179f714d1bb922654054",
+  "route": {
+    "net": "AAD_CFG_1V8_FANOUT",
+    "track_length_mm": 52.332,
+    "segments": 9,
+    "vias": 2,
+    "B_Cu_over_In4_GND_DIGITAL_mm": 49.922
+  },
+  "source_session_sha256": "5f0da7e0378294be89e7982b51cca200def301edd1bdfd86b420eb2a79e147e1",
+  "review_b": "OPEN: cross-domain return, edge timing and small-via DFM",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 37,
+    "candidate_unconnected": 36,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}
