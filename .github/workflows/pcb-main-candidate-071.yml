@@ -1,0 +1,38 @@
+name: PCB-MAIN candidate 071 route batch ERC and DRC
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/pcb-main-completion]
+    paths:
+      - 'tools/apply_pcb_main_batch_071_rev_a.py'
+      - '.github/workflows/pcb-main-candidate-071.yml'
+      - 'hardware/kicad/candidates/PCB-ROUTING-P2-BATCH-071/ROUTES.json'
+
+jobs:
+  candidate-erc-drc:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
+      options: --user root
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install candidate geometry dependencies
+        run: |
+          apt-get -o APT::Update::Error-Mode=any update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3-pip
+          /usr/bin/python3 -m pip install --break-system-packages --disable-pip-version-check \
+            'kiutils==1.4.8' 'shapely>=2,<3' 'numpy==2.0.2'
+      - name: Generate candidate and run native KiCad 9 ERC and DRC
+        env:
+          DIONEYA_KICAD_DIRECT: '1'
+        run: /usr/bin/python3 tools/apply_pcb_main_batch_071_rev_a.py
+      - name: Upload candidate and ERC/DRC evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-071
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-BATCH-071/
