@@ -132,6 +132,7 @@ jobs:
             /usr/bin/python3 tools/apply_pcb_main_sd_d3_top_088_rev_a.py
           fi
           /usr/bin/python3 tools/probe_pcb_main_089_rev_a.py
+          /usr/bin/python3 tools/probe_pcb_main_r89_089_rev_a.py
       - name: Upload candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
