@@ -131,7 +131,6 @@ jobs:
           else
             /usr/bin/python3 tools/apply_pcb_main_sd_d3_top_088_rev_a.py
           fi
-          /usr/bin/python3 tools/probe_pcb_main_lora_089_rev_a.py
       - name: Upload candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -216,6 +215,16 @@ jobs:
         with:
           name: pcb-main-candidate-088
           path: hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-TOP-088/
+      - name: Upload routing workspace snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-routing-workspace
+          path: |
+            tools/
+            hardware/kicad/native/PCB-MAIN/
+            hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-TOP-088/
+            hardware/kicad/candidates/PCB-ROUTING-P2-VREF-3V3-062/
       - name: Commit verified candidate evidence to feature branch
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
