@@ -11,6 +11,7 @@ on:
 jobs:
   export:
     runs-on: ubuntu-latest
+    timeout-minutes: 55
     container:
       image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
       options: --user root
@@ -21,6 +22,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: feature/pcb-main-completion
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
       - name: Export locked candidate 096 copper as DSN
         run: |
           mkdir -p hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE
@@ -28,8 +33,30 @@ jobs:
           cp hardware/kicad/candidates/PCB-ROUTING-P2-3V3-NORTH-096/PCB-MAIN_P2_3V3_NORTH_096_CANDIDATE_REV_A.kicad_pro hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.kicad_pro
           /usr/bin/python3 tools/kicad_autoroute_stage_rev_a.py export hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.kicad_pcb hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.dsn '{"planes":[]}'
           sha256sum hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.dsn
+      - name: Route the remaining signal nets
+        run: |
+          java -version
+          /usr/bin/python3 tools/probe_pcb_main_freerouting_097_rev_a.py
+      - name: Import and measure the session with native KiCad 9
+        if: always()
+        run: |
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.ses; then
+            /usr/bin/python3 tools/kicad_autoroute_stage_rev_a.py import hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.kicad_pcb hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.ses hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/ROUTED.kicad_pcb
+            cp hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.kicad_pro hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/ROUTED.kicad_pro
+            kicad-cli pcb drc --format json --severity-all -o hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/drc_probe.json hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/ROUTED.kicad_pcb
+            /usr/bin/python3 - <<'PY'
+          import collections,json
+          from pathlib import Path
+          p=Path('hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE')
+          d=json.loads((p/'drc_probe.json').read_text())
+          counts=collections.Counter((v['severity'],v['type']) for v in d['violations'])
+          result={'measurement_only':True,'base_candidate':96,'base_open':19,'router_open':len(d['unconnected_items']),'violations':{f'{s}:{t}':n for (s,t),n in sorted(counts.items())},'manufacturing_release':False}
+          (p/'SUMMARY.json').write_text(json.dumps(result,indent=2)+'\\n')
+          print(json.dumps(result,indent=2))
+          PY
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: pcb-main-autoroute-097-dsn
+          name: pcb-main-autoroute-097-probe
           path: hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/
