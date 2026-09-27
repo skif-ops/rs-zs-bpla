@@ -1,0 +1,31 @@
+{
+  "schema": "dioneya-pcb-main-sd-d3-relief-087-v1",
+  "base_sha256": "f529508ae13d3715c245b0dfce5165aafe21ad0c1e45ba88b6cb2caa9e30d30b",
+  "candidate_sha256": "a41ce5bd9d71d81d3abde9c57116debbc205bf88f97fafa834fc6e9c1076dbfe",
+  "route": {
+    "D11_translation_mm": [
+      -0.4,
+      0
+    ],
+    "new_vias": 3,
+    "new_segments": 40,
+    "removed_ground_segments": 1,
+    "new_track_length_by_net_mm": {
+      "3V3_DIGITAL": 0.4,
+      "GND_DIGITAL": 0.555,
+      "SD_D3_CARD": 21.096
+    }
+  },
+  "drc": {
+    "base_unconnected": 29,
+    "candidate_unconnected": 28,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: SDIO timing/skew and return, ESD D11 placement, small vias/DFM",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
