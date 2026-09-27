@@ -2,18 +2,22 @@
 
 #include <string.h>
 
-static const uint8_t MAGIC[8] = {'Z', 'S', 'S', 'E', 'C', 'R', '0', '1'};
+static const uint8_t MAGIC_V1[8] = {'Z', 'S', 'S', 'E', 'C', 'R', '0', '1'};
+static const uint8_t MAGIC[8] = {'Z', 'S', 'S', 'E', 'C', 'R', '0', '2'};
 #define OFF_VERSION 8u
 #define OFF_FLAGS 12u
 #define OFF_ENGINEER 16u
 #define OFF_ICCID1 48u
 #define OFF_ICCID2 71u
 #define OFF_COMMAND 94u
-#define OFF_CRC 128u
+#define OFF_NEXT 126u
+#define OFF_CRC_V1 128u
+#define OFF_CRC 160u
 #define FLAG_ENGINEER 1u
 #define FLAG_ICCID1 2u
 #define FLAG_ICCID2 4u
 #define FLAG_COMMAND 8u
+#define FLAG_NEXT 16u
 
 static uint32_t crc32(const uint8_t *d, size_t n) {
   uint32_t c = 0xffffffffu;
@@ -40,6 +44,8 @@ static bool same(const zs_station_secrets_t *a, const zs_station_secrets_t *b) {
   if (a->version != b->version || a->engineer_key_set != b->engineer_key_set || a->command_key_set != b->command_key_set) return false;
   if (a->engineer_key_set && memcmp(a->engineer_key, b->engineer_key, ZS_STATION_SECRETS_KEY_BYTES) != 0) return false;
   if (a->command_key_set && memcmp(a->command_public_key, b->command_public_key, ZS_STATION_SECRETS_KEY_BYTES) != 0) return false;
+  if (a->command_next_key_set != b->command_next_key_set ||
+      (a->command_next_key_set && memcmp(a->command_next_key, b->command_next_key, ZS_STATION_SECRETS_KEY_BYTES) != 0)) return false;
   return strcmp(a->iccid[0], b->iccid[0]) == 0 && strcmp(a->iccid[1], b->iccid[1]) == 0;
 }
 
@@ -48,7 +54,9 @@ static bool read_slot(const zs_station_secrets_io_t *io, uint8_t slot, zs_statio
   uint8_t raw[ZS_STATION_SECRETS_RECORD_BYTES];
   uint32_t flags;
   if (!io->read(io->ctx, slot, 0u, raw, sizeof(raw))) { *io_error = true; return false; }
-  if (memcmp(raw, MAGIC, sizeof(MAGIC)) != 0 || crc32(raw, OFF_CRC) != le32(raw + OFF_CRC)) return false;
+  const bool v2 = memcmp(raw, MAGIC, sizeof(MAGIC)) == 0;
+  if (!v2 && memcmp(raw, MAGIC_V1, sizeof(MAGIC_V1)) != 0) return false;
+  if (v2 ? crc32(raw, OFF_CRC) != le32(raw + OFF_CRC) : crc32(raw, OFF_CRC_V1) != le32(raw + OFF_CRC_V1)) return false;
   memset(out, 0, sizeof(*out));
   out->version = le32(raw + OFF_VERSION);
   flags = le32(raw + OFF_FLAGS);
@@ -56,6 +64,7 @@ static bool read_slot(const zs_station_secrets_io_t *io, uint8_t slot, zs_statio
   out->command_key_set = (flags & FLAG_COMMAND) != 0u;
   memcpy(out->engineer_key, raw + OFF_ENGINEER, ZS_STATION_SECRETS_KEY_BYTES);
   memcpy(out->command_public_key, raw + OFF_COMMAND, ZS_STATION_SECRETS_KEY_BYTES);
+  if (v2 && (flags & FLAG_NEXT)) { out->command_next_key_set = true; memcpy(out->command_next_key, raw + OFF_NEXT, ZS_STATION_SECRETS_KEY_BYTES); }
   if (flags & FLAG_ICCID1) { memcpy(out->iccid[0], raw + OFF_ICCID1, ZS_STATION_SECRETS_ICCID_CAPACITY - 1u); out->iccid[0][ZS_STATION_SECRETS_ICCID_CAPACITY - 1u] = 0; }
   if (flags & FLAG_ICCID2) { memcpy(out->iccid[1], raw + OFF_ICCID2, ZS_STATION_SECRETS_ICCID_CAPACITY - 1u); out->iccid[1][ZS_STATION_SECRETS_ICCID_CAPACITY - 1u] = 0; }
   if ((flags & FLAG_ICCID1) && !zs_station_secrets_iccid_valid(out->iccid[0])) return false;
@@ -100,6 +109,7 @@ zs_station_secrets_result_t zs_station_secrets_commit(const zs_station_secrets_i
   if (in->iccid[0][0]) { flags |= FLAG_ICCID1; memset(raw + OFF_ICCID1, 0, ZS_STATION_SECRETS_ICCID_CAPACITY); memcpy(raw + OFF_ICCID1, in->iccid[0], strlen(in->iccid[0])); }
   if (in->iccid[1][0]) { flags |= FLAG_ICCID2; memset(raw + OFF_ICCID2, 0, ZS_STATION_SECRETS_ICCID_CAPACITY); memcpy(raw + OFF_ICCID2, in->iccid[1], strlen(in->iccid[1])); }
   if (in->command_key_set) { flags |= FLAG_COMMAND; memcpy(raw + OFF_COMMAND, in->command_public_key, ZS_STATION_SECRETS_KEY_BYTES); }
+  if (in->command_next_key_set) { flags |= FLAG_NEXT; memcpy(raw + OFF_NEXT, in->command_next_key, ZS_STATION_SECRETS_KEY_BYTES); }
   put_le32(raw + OFF_FLAGS, flags);
   put_le32(raw + OFF_CRC, crc32(raw, OFF_CRC));
 
