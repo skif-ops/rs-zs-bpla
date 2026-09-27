@@ -1,0 +1,28 @@
+{
+  "schema": "dioneya-pcb-main-cell-dbg-081-v1",
+  "base_sha256": "af268566ff4bc1c704bcf8f1b39d2f2931f29d8b802994e60ece3489b56d089b",
+  "candidate_sha256": "7e883cc37c0d522e700dd69d3a9a0006e0b0c4de4310ea16e664200792c5b331",
+  "route": {
+    "net": "CELL_DBG_RXD_TP",
+    "track_length_mm": 30.661,
+    "segments": 23,
+    "vias": 4,
+    "length_by_layer_mm": {
+      "B.Cu": 2.397,
+      "In3.Cu": 17.847,
+      "F.Cu": 10.417
+    }
+  },
+  "review_b": "OPEN: modem debug return through MIC/digital reference and fixture timing",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 35,
+    "candidate_unconnected": 34,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}
