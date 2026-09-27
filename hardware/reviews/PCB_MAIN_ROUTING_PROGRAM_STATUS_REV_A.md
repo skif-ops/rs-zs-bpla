@@ -522,7 +522,7 @@ The `GNSS_ANT_SWITCHED` Q4.3 leg has only a roughly 14.7 mm In3.Cu
 or 23.6 mm B.Cu detour to the existing through via in the sampled
 channel. It remains open pending shorter RF-bias-network layout relief.
 
-## 9. Native KiCad 9 continuation through candidate 093 (2026-09-27)
+## 9. Native KiCad 9 continuation through candidate 094 (2026-09-27)
 
 Draft PR #93, branch `feature/pcb-main-completion`, retains PCB-MAIN 003 as the
 authoritative board. Comparative filled-board KiCad 9.0.9 checks under the
@@ -553,6 +553,7 @@ candidate-only 0.25/0.15 mm via rules gave:
 | 091, USB_DM_CONN U25.2 to R92.2 | **24** | **0** | **0** |
 | 092, SD_D0_CARD lower branch plus SD_D2_U1 repack | **23** | **0** | **0** |
 | 093, SD_D0_CARD U24 upper branch | **22** | **0** | **0** |
+| 094, R18 AAD_CFG_1V8_FANOUT placement relief | **21** | **0** | **0** |
 
 076 moves the existing GND_DIGITAL via next to U3.6 from
 (66.099999, 30.600) to (66.099999, 30.650) mm and changes it from
@@ -638,6 +639,8 @@ combined 087–088 SDIO length, skew and return require Review B.
 
 092 removes nine F.Cu segments of SD_D2_U1 blocking the R86→R81 SD_D0_CARD corridor. A 3.931 mm F.Cu link closes that branch; SD_D2_U1 is rerouted using 37.546 mm of new 0.15 mm copper and four 0.25/0.15 mm vias. A first trial produced two dangling-track warnings and was rejected. The corrected version trims the old F.Cu tail, then passed native filled-board DRC 24→23 with no new violations and ERC zero. 093 joins U24.1 to the R86 SD_D0_CARD branch with 6.256 mm of 0.15 mm F.Cu and no vias, passing native DRC 23→22 with no new violations and ERC zero. SDIO data timing/skew, returns, ESD coupling and candidate via DFM remain Review B holds.
 
+094 shifts R18 from (64.75,45.25) to (65.0,44.0) mm outside U10's courtyard, removes two dangling pieces of the former R18.1 branch and restores AAD_CFG_1V8_U7 with 0.7 mm of F.Cu. AAD_CFG_1V8_FANOUT gains 30.189 mm of F.Cu/In3.Cu/B.Cu and four candidate-process vias. The first placements/routes failed on U10 courtyard overlap or dangling ends; the corrected version passes filled-board native DRC 22→21 without new violations and ERC zero. AAD function, audio/LoRa return and DFM remain Review B holds.
+
 Post-088 probes examined all 27 remaining airwires: the unmodified
 0.15/0.25 mm grid router found **zero** directly routeable gaps.
 Six R89 placement experiments for the adjacent SD_D0_CARD channel
@@ -650,7 +653,7 @@ LORA_SCK_U1 51–64 mm with 5–8 vias). The PDM_DATA2 virtual
 U1 via at (52.5, 22.1) mm conflicts with NRST and BOOT0 copper
 and was rejected before native DRC. The next routing work needs
 coordinated placement relief and rerouting in the U1, SDIO and
-power corridors; the accepted candidate is now 093 with 22 open.
+power corridors; the accepted candidate is now 094 with 21 open.
 
 The 075 routes total 107.8935 mm and 15 new vias, including a 45.1553 mm
 1V8_MIC branch; they are routing experiments. Power integrity, microphone
