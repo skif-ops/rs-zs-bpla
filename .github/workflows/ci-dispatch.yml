@@ -141,6 +141,11 @@ jobs:
           else
             /usr/bin/python3 tools/apply_pcb_main_usb_dp_090_rev_a.py
           fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-USB-DM-091/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_usb_dm_091_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_usb_dm_091_rev_a.py
+          fi
       - name: Upload candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -237,6 +242,12 @@ jobs:
         with:
           name: pcb-main-candidate-090
           path: hardware/kicad/candidates/PCB-ROUTING-P2-USB-DP-090/
+      - name: Upload USB DM candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-091
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-USB-DM-091/
       - name: Upload routing workspace snapshot
         if: always()
         uses: actions/upload-artifact@v4
@@ -267,7 +278,8 @@ jobs:
                   hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-RELIEF-087/ \
                   hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-TOP-088/ \
                   hardware/kicad/candidates/PCB-ROUTING-P2-NRST-089/ \
-                  hardware/kicad/candidates/PCB-ROUTING-P2-USB-DP-090/
+                  hardware/kicad/candidates/PCB-ROUTING-P2-USB-DP-090/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-USB-DM-091/
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' \
                 -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
