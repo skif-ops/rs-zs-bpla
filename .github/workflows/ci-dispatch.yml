@@ -121,6 +121,11 @@ jobs:
           else
             /usr/bin/python3 tools/apply_pcb_main_r4_relief_086_rev_a.py
           fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-RELIEF-087/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_sd_d3_relief_087_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_sd_d3_relief_087_rev_a.py
+          fi
       - name: Upload candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -193,6 +198,12 @@ jobs:
         with:
           name: pcb-main-candidate-086
           path: hardware/kicad/candidates/PCB-ROUTING-P2-R4-RELIEF-086/
+      - name: Upload SD D3 placement relief candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-087
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-RELIEF-087/
       - name: Commit verified candidate evidence to feature branch
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -209,10 +220,11 @@ jobs:
                   hardware/kicad/candidates/PCB-ROUTING-P2-USIM-CLK-083/ \
                   hardware/kicad/candidates/PCB-ROUTING-P2-C46-084/ \
                   hardware/kicad/candidates/PCB-ROUTING-P2-PDM-RELIEF-085/ \
-                  hardware/kicad/candidates/PCB-ROUTING-P2-R4-RELIEF-086/
+                  hardware/kicad/candidates/PCB-ROUTING-P2-R4-RELIEF-086/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-RELIEF-087/
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' \
                 -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
-                commit -m 'PCB-MAIN: record native KiCad 9 candidate 086 (29 open, ERC 0)'
+                commit -m 'PCB-MAIN: record native KiCad 9 candidate 087 (28 open, ERC 0)'
             git push origin HEAD:feature/pcb-main-completion
           fi
