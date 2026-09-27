@@ -522,7 +522,7 @@ The `GNSS_ANT_SWITCHED` Q4.3 leg has only a roughly 14.7 mm In3.Cu
 or 23.6 mm B.Cu detour to the existing through via in the sampled
 channel. It remains open pending shorter RF-bias-network layout relief.
 
-## 9. Native KiCad 9 continuation through candidate 085 (2026-09-27)
+## 9. Native KiCad 9 continuation through candidate 086 (2026-09-27)
 
 Draft PR #93, branch `feature/pcb-main-completion`, retains PCB-MAIN 003 as the
 authoritative board. Comparative filled-board KiCad 9.0.9 checks under the
@@ -545,6 +545,7 @@ candidate-only 0.25/0.15 mm via rules gave:
 | 083, CELL_USIM_CLK_1V8 branch | **32** | **0** | **0** |
 | 084, 3V8_MODEM_RF C46 branch | **31** | **0** | **0** |
 | 085, U19 PDM_DATA1 relief | **30** | **0** | **0** |
+| 086, R4 3V3 relief | **29** | **0** | **0** |
 
 076 moves the existing GND_DIGITAL via next to U3.6 from
 (66.099999, 30.600) to (66.099999, 30.650) mm and changes it from
@@ -604,6 +605,13 @@ U19.2. The nearby GND_MIC via is moved and resized to 0.25/0.15 mm,
 with a 0.348 mm F.Cu link to preserve ground continuity. Filled-board
 DRC went 31→30 without new violations; ERC stays zero. U19 via-in-pad,
 microphone return, modem supply and finished-drill DFM need Review B.
+
+086 removes a redundant GND_DIGITAL stitching via at (56.9, 20.0) mm
+that blocked the R4.1 escape, then joins R4.1 to its upper 3V3_DIGITAL
+source with 4.028 mm of 0.25 mm copper on F.Cu/In3.Cu and two
+0.25/0.15 mm vias. Filled-board DRC went 30→29 with no new violations;
+ERC remains zero. The loss of this ground stitch, local return path and
+finished-drill DFM need Review B before any release.
 
 The 075 routes total 107.8935 mm and 15 new vias, including a 45.1553 mm
 1V8_MIC branch; they are routing experiments. Power integrity, microphone
