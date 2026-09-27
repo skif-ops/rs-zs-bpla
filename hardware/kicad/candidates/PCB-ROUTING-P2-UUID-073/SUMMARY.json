@@ -1,0 +1,18 @@
+{
+  "schema": "dioneya-pcb-main-uuid-073-v1",
+  "base_sha256": "42e70280275169e6fe2b06343f09683153a45a228666eb9e4c31f7c437851dee",
+  "candidate_sha256": "60ba342df46f68de3cb472dbf554677427a29f367ae6fbab3e6f1cec82c4f9df",
+  "fixed_duplicate_copper_uuids": 53,
+  "removed_redundant_segment": "5384ef96-6d84-5825-a572-6cf5d5b9f187",
+  "review_b": "OPEN",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 45,
+    "candidate_unconnected": 45,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}
