@@ -522,7 +522,7 @@ The `GNSS_ANT_SWITCHED` Q4.3 leg has only a roughly 14.7 mm In3.Cu
 or 23.6 mm B.Cu detour to the existing through via in the sampled
 channel. It remains open pending shorter RF-bias-network layout relief.
 
-## 9. Native KiCad 9 continuation through candidate 076 (2026-09-27)
+## 9. Native KiCad 9 continuation through candidate 077 (2026-09-27)
 
 Draft PR #93, branch `feature/pcb-main-completion`, retains PCB-MAIN 003 as the
 authoritative board. Comparative filled-board KiCad 9.0.9 checks under the
@@ -535,7 +535,8 @@ candidate-only 0.25/0.15 mm via rules gave:
 | 073, UUID repair | 45 | 0 | 0 |
 | 074, GNSS bias branches | 43 | 0 | 0 |
 | 075, microphone rail branches and LORA_TXEN | 40 | 0 | 0 |
-| 076, U3 local 3V3 relief | **39** | **0** | **0** |
+| 076, U3 local 3V3 relief | 39 | 0 | 0 |
+| 077, 3V3_DIGITAL In3 bridge | **38** | **0** | **0** |
 
 076 moves the existing GND_DIGITAL via next to U3.6 from
 (66.099999, 30.600) to (66.099999, 30.650) mm and changes it from
@@ -544,6 +545,15 @@ U3.2 and U3.9 on 3V3_DIGITAL. This preserves the ground connection and
 clears the tight local channel. Its generator, candidate board, filled-board
 DRC and ERC evidence are under `PCB-ROUTING-P2-U3-POWER-076/`.
 
+077 bridges the 3V3_DIGITAL gap between the (16.975, 34.600) and
+(17.175, 28.850) mm copper clusters. It adds 8.027 mm of 0.25 mm tracks
+on F.Cu and In3.Cu and two 0.25/0.15 mm through vias. The route was screened
+against the existing copper and ground reference; filled-board native KiCad
+9.0.9 DRC went from 39 to 38 without new violations, and the nine-sheet
+ERC remained at zero. The generator, route coordinates, candidate board,
+and reports are under `PCB-ROUTING-P2-ASTAR-077/`. Power and DFM Review B
+remain open.
+
 The 075 routes total 107.8935 mm and 15 new vias, including a 45.1553 mm
 1V8_MIC branch; they are routing experiments. Power integrity, microphone
 noise, LoRa return path, and via-in-pad/finished-drill DFM require Review B.
@@ -551,6 +561,15 @@ A reference-aware GNSS_TX_U1 A* probe after 075 needed roughly 82 mm and
 seven vias to join points only 19.95 mm apart; it was rejected rather than
 added to the candidate. The SD_D0_CARD local F.Cu trial after 076 reduced
 one open connection but shorted SD_D2_U1; it was rejected as well.
+After 077, additional grid routes for LSE_IN, GNSS_TX_U1 and the USB
+connector pair required about 91/83/50 mm and 11/7/3 transitions respectively;
+the LSE placement and USB 90-ohm pair constraints rule out accepting them.
+At U1.27, a 3V3 escape via is obstructed by the B.Cu CELL_RESET_N_CMD
+track and the In3.Cu TEST_UART_RX_U1 track; local rip-up/placement relief is
+needed. Freerouting experiments on the 076 DSN did not improve the KiCad
+DRC count beyond these local routes. Automatic approval review blocked a
+further Freerouting run when it contacted api.github.com with private
+PCB-derived input; that run was not used for candidate copper.
 
 The target of ten or fewer open connections has **not** been met. Further
 placement relief and selective rip-up around U1, SDIO, and the modem power
