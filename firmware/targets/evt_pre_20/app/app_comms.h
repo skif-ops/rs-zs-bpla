@@ -14,6 +14,7 @@
 #include "zs_event_outbox.h"
 #include "zs_command_channel.h"
 #include "zs_command_journal.h"
+#include "zs_command_trust.h"
 #include "zs_station_config.h"
 #include "zs_station_comms.h"
 #include "zs_prehistory.h"
@@ -47,9 +48,13 @@ void app_comms_request(bool on);
 void app_comms_allow_modem(bool allowed);
 /* Latest station config for the endpoint (from the ble task's zs_ipc_service). */
 void app_comms_set_config(const zs_station_config_t *cfg, uint32_t boot_id);
-/* Ed25519 public key of the server's command signer (station secrets key 4); NULL clears it. Takes effect on the
-   next session: verified commands are acknowledged (execution lands with the command executor). */
+/* Ed25519 public keys of the server's command signer (station secrets key 4): the current key and, while a
+   rotation is in flight, the next one (MQTT ICD addendum E, zs_command_keys_trust_set); count 0 clears them.
+   Called from the executor inside a session, the running channel uses the new set from the next command on. */
+void app_comms_set_command_keys(const zs_command_trust_key_t *keys, size_t count);
+/* One key (NULL clears): app_comms_set_command_keys with a single entry. */
 void app_comms_set_command_key(const uint8_t public_key[32]);
+size_t app_comms_command_key_count(void);
 /* Expected ICCID of slot 1/2 (18..22 digits); the dual-SIM path engages once both are set. */
 bool app_comms_set_sim_iccid(unsigned slot, const char *iccid);
 /* Audio for CMD_REQUEST_AUDIO (MQTT ICD addendum B): the prehistory ring and the event times live with the

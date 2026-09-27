@@ -369,6 +369,10 @@ class DetectorHealth(BaseModel):
     # key 15: self-tests whose last run failed, bit = self-test id (firmware zs_selftest_id_t: 1 power/INA226,
     # 4 microphone capture, 5 microphone alignment, 7 GNSS PPS, 12 RTC LSE, ...); 0 = none
     selftest_failed_tests: int = Field(default=0, ge=0, le=0xFFFF)
+    # key 16/17 (ICD addendum E): ids of the command keys the station trusts (hex of the 8-byte §2.1 key id), the next
+    # one only while a rotation is in flight; None = not provisioned / firmware without the keys
+    command_key_id: str | None = None
+    command_next_key_id: str | None = None
 
 
 class HeartbeatMessage(BaseModel):
@@ -409,6 +413,11 @@ class SecurityEventMessage(BaseModel):
     ]
     power: PowerStatus = Field(default_factory=PowerStatus)
     route: RouteStatus = Field(default_factory=RouteStatus)
+
+
+class CommandKeyRotationRequest(BaseModel):
+    """ICD addendum E: the next command public key (raw Ed25519, 64 hex characters)."""
+    public_key: str = Field(min_length=64, max_length=64, pattern=r"^[0-9a-fA-F]{64}$")
 
 
 class AudioRequest(BaseModel):

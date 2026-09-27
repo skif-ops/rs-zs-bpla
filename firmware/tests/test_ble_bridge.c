@@ -420,6 +420,18 @@ static void test_station_secrets(void) {
   assert(W.applied.version == 2u && W.applied.engineer_key_set && W.applied.iccid[0][0] && strcmp(W.applied.iccid[1], "89702012345678901234") == 0);
   assert(last_audit.role == ZS_COMMISSIONING_ROLE_ENGINEER && last_audit.version == 2u);
 
+  /* a remote rotation is in flight (MQTT ICD addendum E): the engineer's command key ends it (the recovery path) */
+  { zs_station_secrets_t rec; uint8_t k[32];
+    assert(zs_station_secrets_load(&W.sec_io, &rec, NULL) == ZS_STATION_SECRETS_OK);
+    rec.command_key_set = true; memset(rec.command_public_key, 0x31, 32u);
+    rec.command_next_key_set = true; memset(rec.command_next_key, 0x32, 32u);
+    assert(zs_station_secrets_commit(&W.sec_io, &rec) == ZS_STATION_SECRETS_OK && rec.version == 3u);
+    memset(k, 0x33, 32u);
+    zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, ZS_SECRETS_KEY_COMMAND); zs_cbor_bytes(&c, k, 32u);
+    assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_OK);
+    assert(W.applied.command_key_set && W.applied.command_public_key[0] == 0x33u && !W.applied.command_next_key_set && W.applied.version == 4u);
+    assert(zs_station_secrets_load(&W.sec_io, &rec, NULL) == ZS_STATION_SECRETS_OK && !rec.command_next_key_set && strcmp(rec.iccid[1], "89702012345678901234") == 0); }
+
   /* malformed: unknown key, wrong key length, bad ICCID, not a map */
   zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, 9u); zs_cbor_uint(&c, 1u);
   assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_REJECTED_VALIDATION);
@@ -429,7 +441,7 @@ static void test_station_secrets(void) {
   assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_REJECTED_VALIDATION);
   patch[0] = 0x01u;
   assert(secrets_write(&W, patch, 1u) == ZS_BLE_STATUS_REJECTED_VALIDATION);
-  assert(W.applied.version == 2u);
+  assert(W.applied.version == 4u);
 
   /* clear as engineer: record gone, presence all false, the station drops the key */
   zs_cbor_init(&c, patch, sizeof(patch)); zs_cbor_map(&c, 1u); zs_cbor_uint(&c, ZS_SECRETS_KEY_CLEAR); zs_cbor_bool(&c, true);
@@ -447,7 +459,7 @@ static void test_station_secrets(void) {
   assert(secrets_write(&W, patch, c.len) == ZS_BLE_STATUS_STORAGE_ERROR);
   assert(client_read_long(&W, ZS_CHAR_STATION_SECRETS, out, sizeof(out), &n) && n == 11u && out[4] == 0xf4u);
   W.sport.secrets_io = &W.sec_io;
-  assert(W.service.secrets_writes == 3u);
+  assert(W.service.secrets_writes == 4u);
   printf("station secrets ok\n");
 }
 

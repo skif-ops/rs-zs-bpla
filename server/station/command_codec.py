@@ -24,7 +24,8 @@ ACK_MESSAGE_TYPE = 5
 MAX_COMMAND_BYTES = 2048
 MAX_ACK_BYTES = 128
 MAX_COMMAND_TTL_US = 15 * 60 * 1_000_000
-COMMAND_CODES = {"CMD_REQUEST_AUDIO": 1, "CMD_REBOOT": 2, "CMD_SET_PARAMS": 3}   # 2, 3: ICD addendum D
+COMMAND_CODES = {"CMD_REQUEST_AUDIO": 1, "CMD_REBOOT": 2, "CMD_SET_PARAMS": 3,   # 2, 3: ICD addendum D
+                 "CMD_ROTATE_COMMAND_KEY": 4}                                   # 4: ICD addendum E
 COMMAND_NAMES = {value: key for key, value in COMMAND_CODES.items()}
 ACK_RESULTS = {0: "OK", 1: "REJECTED", 2: "FAILED", 3: "EXPIRED"}
 AUDIO_SEGMENT_CODES = {"pre": 0, "post": 1, "both": 2, "range": 3}
@@ -86,6 +87,51 @@ class CommandSigner:
 
     def sign(self, payload: bytes) -> bytes:
         return self._private_key.sign(payload)
+
+    @property
+    def public_key_hex(self) -> str:
+        return self.public_key.public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw).hex()
+
+
+def key_id_hex(public_key_hex: str) -> str:
+    """MQTT ICD §2.1 key id (first 8 bytes of SHA-256 over the raw public key) as the heartbeat reports it."""
+    return hashlib.sha256(bytes.fromhex(public_key_hex)).digest()[:8].hex()
+
+
+class CommandKeyring:
+    """The bridge's command signers during a key rotation (ICD addendum E): the primary key every station trusts
+    and the next key that CMD_ROTATE_COMMAND_KEY installs.  A station is signed for with the next key once it trusts
+    it - its heartbeat lists the key (detector keys 16/17), or it acknowledged the rotation after its last heartbeat
+    - and with the primary key otherwise.  The first command it verifies with the next key promotes that key on the
+    station and drops the old one."""
+
+    def __init__(self, primary: CommandSigner, next_signer: CommandSigner | None = None):
+        if next_signer is not None and next_signer.key_id == primary.key_id:
+            raise ValueError("the next command signing key must differ from the current one")
+        self.primary = primary
+        self.next = next_signer
+
+    @property
+    def key_id(self) -> bytes:
+        return self.primary.key_id
+
+    def signer_for(self, station_id: int, event_store) -> CommandSigner:
+        if self.next is None:
+            return self.primary
+        wanted = self.next.key_id.hex()
+        heartbeat = event_store.get_station_heartbeat(station_id)
+        detector = heartbeat.detector if heartbeat is not None else None
+        if detector is not None and wanted in (detector.command_key_id, detector.command_next_key_id):
+            return self.next
+        acked = event_store.acked_key_rotation(station_id)
+        if acked is not None and key_id_hex(acked[0]) == wanted and (heartbeat is None or acked[1] > heartbeat.time_us):
+            return self.next                    # acknowledged after the last heartbeat: the station trusts both keys now
+        return self.primary
+
+
+def validate_command_payload(command_name: str, payload: dict) -> None:
+    """Raises ValueError when the payload would not encode (the operator routes check before queueing)."""
+    _command_payload_to_wire(command_name, payload)
 
 
 def _canonical(obj: object) -> bytes:
@@ -208,6 +254,29 @@ def _params_payload_from_wire(payload: object) -> dict[str, object]:
     return normalized
 
 
+def _rotate_payload_to_wire(payload: dict) -> dict[int, object]:
+    if set(payload) != {"public_key"}:
+        raise ValueError("rotate payload carries exactly public_key")
+    raw = payload["public_key"]
+    if not isinstance(raw, str):
+        raise ValueError("rotate public_key must be 64 hex characters")
+    try:
+        key = bytes.fromhex(raw)
+    except ValueError:
+        raise ValueError("rotate public_key must be 64 hex characters") from None
+    if len(key) != 32 or not any(key):
+        raise ValueError("rotate public_key must be a non-zero 32-byte Ed25519 key")
+    return {0: key}
+
+
+def _rotate_payload_from_wire(payload: object) -> dict[str, object]:
+    if not isinstance(payload, dict) or set(payload) != {0} or not isinstance(payload[0], bytes):
+        raise ValueError("invalid rotate payload keys")
+    normalized = {"public_key": payload[0].hex()}
+    _rotate_payload_to_wire(normalized)
+    return normalized
+
+
 def _command_payload_to_wire(command_name: str, payload: dict) -> dict[int, object]:
     if command_name == "CMD_REQUEST_AUDIO":
         return _audio_payload_to_wire(payload)
@@ -215,6 +284,8 @@ def _command_payload_to_wire(command_name: str, payload: dict) -> dict[int, obje
         return _reboot_payload_to_wire(payload)
     if command_name == "CMD_SET_PARAMS":
         return _params_payload_to_wire(payload)
+    if command_name == "CMD_ROTATE_COMMAND_KEY":
+        return _rotate_payload_to_wire(payload)
     raise ValueError(f"unsupported command: {command_name}")
 
 
@@ -225,6 +296,8 @@ def _command_payload_from_wire(command_name: str, payload: object) -> dict[str, 
         return _reboot_payload_from_wire(payload)
     if command_name == "CMD_SET_PARAMS":
         return _params_payload_from_wire(payload)
+    if command_name == "CMD_ROTATE_COMMAND_KEY":
+        return _rotate_payload_from_wire(payload)
     raise ValueError(f"unsupported command: {command_name}")
 
 

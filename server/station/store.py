@@ -171,6 +171,11 @@ class EventStore:
         if row is None: return None
         return {'station_id':row['station_id'],'command':row['command'],'payload':json.loads(row['payload']),'acked':bool(row['acked']),
                 'ack_result':row['ack_result'],'ack_detail':row['ack_detail'],'created_us':row['created_us']}
+    def acked_key_rotation(self,station_id:int)->tuple[str,int]|None:
+        """The newest CMD_ROTATE_COMMAND_KEY the station acknowledged OK: (public key hex, completed time, station clock)."""
+        with self._conn() as c:
+            row=c.execute("SELECT payload,completed_us FROM commands WHERE station_id=? AND command='CMD_ROTATE_COMMAND_KEY' AND acked=1 AND ack_result=0 ORDER BY completed_us DESC LIMIT 1",(station_id,)).fetchone()
+        return (json.loads(row['payload'])['public_key'],row['completed_us']) if row else None
     def last_command_us(self,station_id:int,command:str)->int|None:
         with self._conn() as c:
             row=c.execute("SELECT MAX(created_us) AS t FROM commands WHERE station_id=? AND command=?",(station_id,command)).fetchone()

@@ -133,6 +133,13 @@ def _as_map(value: Any) -> dict:
     return value if isinstance(value, dict) else {}
 
 
+def _key_id_hex(value: object) -> str | None:
+    """Heartbeat detector keys 16/17 (ICD addendum E): a command key id as uint64, 0 = none."""
+    if type(value) is not int or not 0 <= value <= 0xFFFFFFFFFFFFFFFF:
+        raise ValueError("command key id must be a uint64")
+    return None if value == 0 else value.to_bytes(8, "big").hex()
+
+
 def _text_field(values: dict, key: int, name: str) -> str:
     value = values.get(key, "")
     if not isinstance(value, str):
@@ -386,6 +393,8 @@ def decode_heartbeat_obj(obj: Any) -> HeartbeatMessage:
             watchdog_missed_tasks=int(detector.get(13, 0)),
             params_version=int(detector.get(14, 0)),
             selftest_failed_tests=int(detector.get(15, 0)),
+            command_key_id=_key_id_hex(detector.get(16, 0)),
+            command_next_key_id=_key_id_hex(detector.get(17, 0)),
         ),
     )
 

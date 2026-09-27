@@ -69,6 +69,8 @@ int main(void) {
   message.detector.watchdog_missed = 0x0020u;  /* task 5 had stopped checking in */
   message.detector.params_version = 3u;        /* runtime parameter set v3 (CMD_SET_PARAMS) */
   message.detector.selftest_failed = 0x0010u;  /* mic_capture (id 4) failed */
+  message.detector.command_key_id = UINT64_C(0xa1b2c3d4e5f60718);       /* addendum E: rotation in flight */
+  message.detector.command_next_key_id = UINT64_C(0x0102030405060708);
 
   size = zs_protocol_encode_heartbeat(&message, encoded, sizeof(encoded));
   if (size == 0u || fwrite(encoded, 1u, size, stdout) != size) return 1;

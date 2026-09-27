@@ -98,6 +98,7 @@ static bool command_valid(const zs_command_t *command, uint64_t now_us) {
       all_value(command->command_id, ZS_COMMAND_UUID_BYTES, 0u)) return false;
   if (command->code == ZS_COMMAND_REBOOT) return command->reboot.delay_s <= ZS_COMMAND_REBOOT_MAX_DELAY_S;
   if (command->code == ZS_COMMAND_SET_PARAMS) return params_valid(&command->params);
+  if (command->code == ZS_COMMAND_ROTATE_KEY) return true;   /* any 32 bytes are structurally valid; the executor judges */
   if (command->code != ZS_COMMAND_REQUEST_AUDIO || command->audio.event_id == 0u ||
       (unsigned)command->audio.segment > (unsigned)ZS_AUDIO_SEGMENT_RANGE) return false;
   if (command->audio.segment == ZS_AUDIO_SEGMENT_RANGE) {
@@ -130,6 +131,9 @@ static bool command_fingerprint(
   } else if (command->code == ZS_COMMAND_REBOOT) {
     input[46] = (uint8_t)(command->reboot.delay_s >> 8);
     input[47] = (uint8_t)command->reboot.delay_s;
+  } else if (command->code == ZS_COMMAND_ROTATE_KEY) {   /* ROTATE: digest of the new public key */
+    zs_sha256_digest(command->rotate.public_key, sizeof(command->rotate.public_key), digest);
+    memcpy(&input[46], digest, 18u);
   } else {                                                /* SET_PARAMS: digest of reset flag and the id/value list */
     uint8_t list[2u + ZS_COMMAND_PARAMS_MAX * 6u];
     size_t n = 0u;

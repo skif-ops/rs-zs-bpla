@@ -14,7 +14,7 @@ import paho.mqtt.client as mqtt
 
 from station.audio_ingest import AUDIO_COMMAND, ingest_audio_chunk
 from station.cbor_codec import decode_cbor, decode_detection_obj, decode_heartbeat_obj
-from station.command_codec import CommandSigner, decode_command_ack, encode_signed_command
+from station.command_codec import CommandKeyring, CommandSigner, decode_command_ack, encode_signed_command
 from station.event_receipt_codec import EventReceipt, encode_event_receipt
 from station.router import service, store
 from station.schemas import DetectionMessage, HeartbeatMessage, StationCommand
@@ -61,6 +61,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--command-signing-key",
         default=os.getenv("ZS_COMMAND_SIGNING_KEY"),
         help="Unencrypted PKCS#8 Ed25519 PEM; downstream is disabled when omitted.",
+    )
+    parser.add_argument(
+        "--command-next-signing-key",
+        default=os.getenv("ZS_COMMAND_NEXT_SIGNING_KEY"),
+        help="Key rotation (ICD addendum E): the next Ed25519 PEM; stations that trust it (heartbeat or an "
+             "acknowledged CMD_ROTATE_COMMAND_KEY) are signed for with it, the others with --command-signing-key.",
     )
     parser.add_argument(
         "--command-poll-seconds",
@@ -231,7 +237,7 @@ def build_event_receipt(topic: str, payload: bytes, tenant: str) -> tuple[str, b
 def publish_due_commands(
     client,
     tenant: str,
-    signer: CommandSigner | None,
+    signer: CommandSigner | CommandKeyring | None,
     *,
     now_us: int,
     retry_after_us: int,
@@ -246,7 +252,8 @@ def publish_due_commands(
     published = failed = 0
     for command in event_store.due_commands(now_us, retry_after_us, limit):
         try:
-            payload = encode_signed_command(command, signer)
+            chosen = signer.signer_for(command.station_id, event_store) if isinstance(signer, CommandKeyring) else signer
+            payload = encode_signed_command(command, chosen)
             info = client.publish(
                 f"zs/v1/{tenant}/{command.station_id}/down",
                 payload,
@@ -337,6 +344,12 @@ def main(argv: list[str] | None = None) -> None:
         if args.command_signing_key
         else None
     )
+    if args.command_next_signing_key:
+        if signer is None:
+            raise ValueError("--command-next-signing-key needs --command-signing-key")
+        signer = CommandKeyring(signer, CommandSigner.from_pem_file(args.command_next_signing_key))
+        print(f"command key rotation: current {signer.primary.key_id.hex()}, next {signer.next.key_id.hex()} "
+              f"(public key {signer.next.public_key_hex})", file=sys.stderr)
     if signer is None:
         print(
             "MQTT command downstream disabled: signing key not configured",

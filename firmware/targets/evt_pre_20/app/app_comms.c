@@ -87,12 +87,16 @@ static int hal_uart_write(void *ctx, unsigned ch, const uint8_t *d, size_t n) { 
 static void hal_gpio_write(void *ctx, unsigned id, bool level) { (void)ctx; (void)id; bsp_gpio_modem_pwrkey(level); }
 static const zs_hal_port_t hal = {NULL, hal_millis, hal_delay, hal_uart_write, NULL, NULL, NULL, hal_gpio_write, NULL};
 
-/* Command trust (MQTT ICD §2.1): the Ed25519 public key of the server's command signer comes from the station
-   secrets record (ICD BLE v0.3, key 4).  Until it is provisioned the trust set holds a placeholder key whose
-   backend rejects everything, so the down channel subscribes but every command is refused as unverified
-   (zs_command_trust_init needs at least one enabled, non-zero key). */
-static uint8_t command_key[ZS_COMMAND_PUBLIC_KEY_BYTES];
-static bool command_key_set;
+/* Command trust (MQTT ICD §2.1): the Ed25519 public keys of the server's command signer come from the station
+   secrets record (ICD BLE v0.3, key 4): the current key and, while a rotation is in flight, the next one (addendum
+   E).  Until a key is provisioned the trust set holds a placeholder key whose backend rejects everything, so the
+   down channel subscribes but every command is refused as unverified (zs_command_trust_init needs at least one
+   enabled, non-zero key). */
+static zs_command_trust_key_t command_keys[2];
+static size_t command_key_count;
+static volatile bool trust_dirty;          /* a new set waits for the comms task (never swapped under a verification) */
+static bool trust_ready;
+static bool trust_load(void);
 static uint32_t commands_verified, commands_rejected;
 static bool verify_none(void *ctx, const uint8_t pk[ZS_COMMAND_PUBLIC_KEY_BYTES], const uint8_t *m, size_t n, const uint8_t sig[ZS_COMMAND_SIGNATURE_BYTES]) {
   (void)ctx; (void)pk; (void)m; (void)n; (void)sig; commands_rejected++; return false;
@@ -114,10 +118,41 @@ static zs_command_execute_fn executor = execute_none;
 static void *executor_ctx;
 void app_comms_set_executor(zs_command_execute_fn exec, void *ctx) { executor = exec ? exec : execute_none; executor_ctx = exec ? ctx : NULL; }
 
-void app_comms_set_command_key(const uint8_t public_key[ZS_COMMAND_PUBLIC_KEY_BYTES]) {
-  if (public_key) { memcpy(command_key, public_key, sizeof(command_key)); command_key_set = true; }
-  else { memset(command_key, 0, sizeof(command_key)); command_key_set = false; }
+void app_comms_set_command_keys(const zs_command_trust_key_t *keys, size_t count) {
+  /* callers: the ble task (secrets over BLE), the comms task (the executor: rotation, promotion) and boot; the comms
+     task swaps the running trust set between two commands (trust_refresh), so a verification never sees half a set */
+  taskENTER_CRITICAL();
+  memset(command_keys, 0, sizeof(command_keys));
+  command_key_count = keys && count ? (count > 2u ? 2u : count) : 0u;
+  if (command_key_count) memcpy(command_keys, keys, command_key_count * sizeof(keys[0]));
+  trust_dirty = true;
+  taskEXIT_CRITICAL();
 }
+void app_comms_set_command_key(const uint8_t public_key[ZS_COMMAND_PUBLIC_KEY_BYTES]) {
+  zs_command_trust_key_t key;
+  memset(&key, 0, sizeof(key));
+  if (!public_key) { app_comms_set_command_keys(NULL, 0u); return; }
+  memcpy(key.public_key, public_key, sizeof(key.public_key)); key.enabled = true;
+  app_comms_set_command_keys(&key, 1u);
+}
+size_t app_comms_command_key_count(void) { return command_key_count; }
+static bool trust_load(void) {
+  zs_command_trust_key_t keys[2];
+  size_t count;
+  taskENTER_CRITICAL();
+  count = command_key_count;
+  memcpy(keys, command_keys, sizeof(keys));
+  trust_dirty = false;
+  taskEXIT_CRITICAL();
+  if (count) { trust_ready = zs_command_trust_init(&trust, keys, count, verify_ed25519, NULL); memset(keys, 0, sizeof(keys)); return trust_ready; }
+  memset(&keys[0], 0, sizeof(keys[0]));
+  keys[0].enabled = true;
+  memset(keys[0].public_key, 0xff, sizeof(keys[0].public_key));          /* placeholder: never matches a real key id, backend rejects anyway */
+  return trust_ready = zs_command_trust_init(&trust, keys, 1u, verify_none, NULL);
+}
+/* comms task, between commands: a rotation or promotion by the executor verifies the next command with the new set
+   in the same session; a set from the ble task takes effect the same way */
+static void trust_refresh(void) { if (trust_ready && trust_dirty) (void)trust_load(); }
 static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) { return hooks.fill_heartbeat ? hooks.fill_heartbeat(hooks.ctx ? hooks.ctx : ctx, hb) : false; }
 
 void app_comms_bind(const zs_event_outbox_io_t *outbox, const zs_command_journal_io_t *journal, const app_comms_hooks_t *h) {
@@ -138,12 +173,7 @@ static void set_phase(comms_phase_t p) {
 }
 
 static bool start_session(const char *tenant) {
-  zs_command_trust_key_t key;
-  memset(&key, 0, sizeof(key));
-  key.enabled = true;
-  if (command_key_set) memcpy(key.public_key, command_key, sizeof(key.public_key));
-  else memset(key.public_key, 0xff, sizeof(key.public_key));          /* placeholder: never matches a real key id, backend rejects anyway */
-  if (!zs_command_trust_init(&trust, &key, 1u, command_key_set ? verify_ed25519 : verify_none, NULL)) return false;
+  if (!trust_load()) return false;
   channel = (zs_command_channel_t){config.station_id, &trust, journal_io, executor, executor_ctx, verify_workspace, sizeof(verify_workspace)};
   if (!zs_mqtt_command_transport_init(&command_transport, &channel, (const uint8_t *)tenant, strlen(tenant))) return false;
   if (!zs_mqtt_event_transport_init(&event_transport, outbox_io, config.station_id, (const uint8_t *)tenant, strlen(tenant))) return false;
@@ -340,6 +370,7 @@ static void feed_uart(uint32_t now_ms) {
     if (phase == COMMS_SESSION || phase == COMMS_ONLINE) {
       uint64_t now_us;
       const bool trusted = command_time(now_ms, &now_us);
+      trust_refresh();
       (void)zs_bg95_mqtt_session_feed_uart(&session, buf, n, now_ms, now_us, trusted);
       continue;
     }
@@ -436,7 +467,7 @@ void app_comms_step(void) {
       case COMMS_SESSION:
       case COMMS_ONLINE:
         zs_bg95_tick(&modem, now);
-        { uint64_t now_us; const bool trusted = command_time(now, &now_us); zs_bg95_mqtt_session_tick(&session, now, now_us, trusted); }
+        { uint64_t now_us; const bool trusted = command_time(now, &now_us); trust_refresh(); zs_bg95_mqtt_session_tick(&session, now, now_us, trusted); }
         audio_collect();                                   /* our chunk's outcome before anyone reuses the uplink */
         zs_station_comms_tick(&comms, now);
         if (phase == COMMS_ONLINE) audio_drive(now);
@@ -506,7 +537,7 @@ void app_comms_status(void (*print)(const char *fmt, ...)) {
         (unsigned long)faults, (unsigned long)online_count, (unsigned long)sessions_done,
         (unsigned long)comms.events_published, (unsigned long)comms.events_failed, (unsigned long)comms.events_exhausted,
         (unsigned long)comms.heartbeats_published, (unsigned long)comms.heartbeats_failed,
-        command_key_set ? "set" : "none", (unsigned long)commands_verified, (unsigned long)commands_rejected);
+        command_key_count == 2u ? "set+next" : command_key_count ? "set" : "none", (unsigned long)commands_verified, (unsigned long)commands_rejected);
   print("  audio uploads %lu (by server time %lu) chunks %lu rejected %lu failed %lu abandoned %lu%s\r\n", (unsigned long)audio_uploads,
         (unsigned long)audio_by_server_time, (unsigned long)audio_chunks, (unsigned long)audio_rejected, (unsigned long)audio_failed,
         (unsigned long)audio_aborted, app_comms_audio_busy() ? " (upload running)" : "");

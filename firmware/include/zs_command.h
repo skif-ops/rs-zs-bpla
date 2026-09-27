@@ -18,7 +18,8 @@
 typedef enum {
   ZS_COMMAND_REQUEST_AUDIO = 1,
   ZS_COMMAND_REBOOT = 2,          /* MQTT_TLS_ICD_v0_1 addendum D */
-  ZS_COMMAND_SET_PARAMS = 3       /* addendum D: bounded whitelist of runtime parameters */
+  ZS_COMMAND_SET_PARAMS = 3,      /* addendum D: bounded whitelist of runtime parameters */
+  ZS_COMMAND_ROTATE_KEY = 4       /* addendum E: install the next command public key (trusted with the current one) */
 } zs_command_code_t;
 
 #define ZS_COMMAND_REBOOT_MAX_DELAY_S 600u
@@ -59,6 +60,12 @@ typedef struct {
   int32_t value[ZS_COMMAND_PARAMS_MAX];
 } zs_set_params_command_t;
 
+/* CMD_ROTATE_COMMAND_KEY payload {0: bstr(32)}: the raw Ed25519 public key the server will sign with next.  The
+   codec checks the structure; zero or already-trusted keys belong to the executor (zs_command_keys). */
+typedef struct {
+  uint8_t public_key[32];
+} zs_rotate_key_command_t;
+
 typedef struct {
   uint32_t station_id;
   uint8_t command_id[ZS_COMMAND_UUID_BYTES];
@@ -68,6 +75,7 @@ typedef struct {
   zs_audio_request_command_t audio;
   zs_reboot_command_t reboot;
   zs_set_params_command_t params;
+  zs_rotate_key_command_t rotate;
   uint8_t key_id[ZS_COMMAND_KEY_ID_BYTES];
 } zs_command_t;
 

@@ -19,6 +19,9 @@ Runs zs_station_twin with the Python server twin on the pipe and checks the serv
      test in the detector map), takes commands, and keeps the detector off although a drone flies by;
   4b. the failure is transient: the test repeated after the boot session passes, detection resumes and the drone
      is delivered; the server sees the verdict go from false to true.
+  5. command key rotation (ICD addendum E): CMD_ROTATE_COMMAND_KEY signed by the current key installs the next one;
+     the bridge's keyring signs the following command with the next key, which promotes it on the station in the
+     same session; a command signed by the old key is refused afterwards; the next heartbeat reports the new key.
 """
 from __future__ import annotations
 
@@ -140,6 +143,20 @@ def main() -> int:
     assert oks[0] is False and oks[-1] is True, oks
     assert r["last_heartbeat"]["detector"]["selftest_failed_tests"] == 0 and r["detections"] >= 1, r["last_heartbeat"]
     print(f"scenario 4b (transient self-test failure): recovered after the boot session, heartbeats {oks}, detections {r['detections']}")
+
+    # rotation in the boot session; an injected event at 60 s brings a second session whose heartbeat shows the result
+    log, r = run(["--scene", "quiet", "--seconds", "120", "--seed", "3", "--inject-events", "1", "60", "--expect-delivered", "1",
+                  "--expect-commands", "2"], commands="rotate_key,set_params,reboot_by_old_key")
+    ids, sent, acks = r["key_ids"], r["commands_sent"], r["acks"]
+    assert [(c["command"], c["key_id"]) for c in sent] == [("CMD_ROTATE_COMMAND_KEY", ids["current"]), ("CMD_SET_PARAMS", ids["next"]),
+                                                           ("CMD_REBOOT", ids["current"])], sent
+    assert [(a["command_id"], a["result"]) for a in acks] == [(sent[0]["command_id"], 0), (sent[1]["command_id"], 0)], acks   # no ACK for the old key
+    assert "next key installed, both trusted" in log and "next key promoted, old key dropped" in log
+    assert "command: REBOOT" not in log and "command keys 1 (rotations 1 promotions 1)" in log
+    assert r["heartbeats"] >= 2 and r["last_heartbeat"]["detector"]["command_key_id"] == ids["next"], r["last_heartbeat"]
+    assert r["last_heartbeat"]["detector"]["command_next_key_id"] is None
+    print(f"scenario 5 (command key rotation): {ids['current']} -> {ids['next']} in one session, old key refused after it, "
+          f"heartbeat reports {r['last_heartbeat']['detector']['command_key_id']}")
     return 0
 
 

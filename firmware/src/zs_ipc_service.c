@@ -244,7 +244,9 @@ static bool secrets_decode_patch(const uint8_t *p, size_t len, zs_station_secret
       }
       case ZS_SECRETS_KEY_COMMAND:
         if (!zs_cbor_read_bytes(&r, &b, &n) || n != ZS_STATION_SECRETS_KEY_BYTES) return false;
-        memcpy(rec->command_public_key, b, n); rec->command_key_set = true; break;
+        memcpy(rec->command_public_key, b, n); rec->command_key_set = true;
+        rec->command_next_key_set = false;                              /* the engineer's key ends a remote rotation */
+        memset(rec->command_next_key, 0, sizeof(rec->command_next_key)); break;
       case ZS_SECRETS_KEY_CLEAR:
         if (!zs_cbor_read_bool(&r, clear)) return false;
         break;

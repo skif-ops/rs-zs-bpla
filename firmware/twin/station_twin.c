@@ -22,6 +22,7 @@
 #include "zs_audio.h"
 #include "zs_audio_recorder.h"
 #include "zs_command_journal.h"
+#include "zs_command_keys.h"
 #include "zs_command_set_vector.h"
 #include "zs_dsp_mcu.h"
 #include "zs_event_outbox.h"
@@ -484,6 +485,20 @@ static void dsp_mode_events(void) {
   else quiet_windows = 0u;
 }
 
+/* station secrets (the NOR record of tasks.c): the command key and, during a rotation, the next one (addendum E) */
+static uint8_t secrets_mem[2][ZS_STATION_SECRETS_SLOT_BYTES];
+static bool sm_read(void *c, uint8_t s, uint32_t o, uint8_t *d, size_t n) { (void)c; if (s > 1u || o + n > ZS_STATION_SECRETS_SLOT_BYTES) return false; memcpy(d, &secrets_mem[s][o], n); return true; }
+static bool sm_erase(void *c, uint8_t s) { (void)c; if (s > 1u) return false; memset(secrets_mem[s], 0xff, ZS_STATION_SECRETS_SLOT_BYTES); return true; }
+static bool sm_write(void *c, uint8_t s, uint32_t o, const uint8_t *d, size_t n) { (void)c; if (s > 1u || o + n > ZS_STATION_SECRETS_SLOT_BYTES) return false; for (size_t i = 0u; i < n; i++) { if ((secrets_mem[s][o + i] & d[i]) != d[i]) return false; secrets_mem[s][o + i] = d[i]; } return true; }
+static const zs_station_secrets_io_t secrets_io = {NULL, sm_read, sm_erase, sm_write};
+static zs_station_secrets_t secrets;        /* the RAM copy tasks.c keeps (heartbeat key ids) */
+static unsigned key_rotations, key_promotions;
+static void command_keys_reload(const char *what) {
+  zs_command_trust_key_t keys[2];
+  if (zs_station_secrets_load(&secrets_io, &secrets, NULL) != ZS_STATION_SECRETS_OK) return;
+  app_comms_set_command_keys(keys, zs_command_keys_trust_set(&secrets, keys));
+  if (what) tlog("command key: %s (secrets v%lu)", what, (unsigned long)secrets.version);
+}
 static zs_station_params_t params;        /* the runtime parameter set in force (remote commands below) */
 static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   uint16_t pending = 0u; (void)ctx;
@@ -497,6 +512,8 @@ static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   if (zs_event_outbox_pending_count(&outbox_io, &pending) == ZS_EVENT_OUTBOX_OK) hb->detector.outbox_pending = pending;
   hb->detector.params_version = params.version;
   hb->detector.selftest_failed = selftest_failed_mask;
+  hb->detector.command_key_id = secrets.command_key_set ? zs_command_key_id_u64(secrets.command_public_key) : 0u;
+  hb->detector.command_next_key_id = secrets.command_next_key_set ? zs_command_key_id_u64(secrets.command_next_key) : 0u;
   return true;
 }
 static uint32_t outbox_retry_at_ms, outbox_retry_backoff_ms = 300000u, outbox_retries;
@@ -572,7 +589,12 @@ static void params_apply(const zs_station_params_t *p) {
 static bool twin_execute(void *ctx, const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail) {
   (void)ctx;
   *result = ZS_COMMAND_ACK_OK; *detail = 0u;
-  if (cmd->code == ZS_COMMAND_SET_PARAMS) {
+  /* addendum E, as app_commands.c: a command signed by the next key promotes it first */
+  if (zs_command_keys_on_verified(&secrets_io, cmd->key_id)) { key_promotions++; command_keys_reload("next key promoted, old key dropped"); }
+  if (cmd->code == ZS_COMMAND_ROTATE_KEY) {
+    zs_command_keys_rotate(&secrets_io, cmd->rotate.public_key, result, detail);
+    if (*result == ZS_COMMAND_ACK_OK) { key_rotations++; command_keys_reload("next key installed, both trusted"); }
+  } else if (cmd->code == ZS_COMMAND_SET_PARAMS) {
     zs_station_params_t next;
     const uint16_t reject = zs_station_params_apply_command(&params, &cmd->params, &next);
     if (reject) { *result = ZS_COMMAND_ACK_REJECTED; *detail = reject; }
@@ -707,7 +729,12 @@ int main(int argc, char **argv) {
   (void)zs_command_set_vector_reboot; (void)zs_command_set_vector_params;
   memset(params_mem, 0xff, sizeof(params_mem));
   (void)zs_station_params_load(&params_io, &params);
-  app_comms_set_command_key(zs_command_set_vector_public_key);
+  /* provisioned over BLE: the repository test key is the command key (the secrets record survives the reboots) */
+  memset(secrets_mem, 0xff, sizeof(secrets_mem));
+  memset(&secrets, 0, sizeof(secrets));
+  secrets.command_key_set = true; memcpy(secrets.command_public_key, zs_command_set_vector_public_key, sizeof(secrets.command_public_key));
+  assert(zs_station_secrets_commit(&secrets_io, &secrets) == ZS_STATION_SECRETS_OK);
+  command_keys_reload(NULL);
   app_comms_set_clock(twin_clock);
   app_comms_set_executor(twin_execute, NULL);
   app_comms_set_audio_source(&audio_source);
@@ -742,6 +769,7 @@ int main(int argc, char **argv) {
     if (lora_enabled) tlog("twin: lora frames %u acks %u timeouts %u budget waits %u airtime %lu ms", lora.frames_sent, lora.acks, lora.ack_timeouts, lora.budget_waits, (unsigned long)lora.airtime_ms_total);
     tlog("twin: commands executed %u rejected %u, reboots scheduled %u done %u, params v%lu", cmd_executed, cmd_rejected, cmd_reboots_scheduled, twin_reboots, (unsigned long)params.version);
     tlog("twin: selftest runs %u recoveries %u, failed mask 0x%04x", selftest_runs, selftest_recoveries, (unsigned)selftest_failed_mask);
+    tlog("twin: command keys %u (rotations %u promotions %u)", (unsigned)app_comms_command_key_count(), key_rotations, key_promotions);
   }
   /* prehistory around the first event: complete seconds recorded before it and after it (the post-event window) */
   unsigned audio_before = 0u, audio_after = 0u;

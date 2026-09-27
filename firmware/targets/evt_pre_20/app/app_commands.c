@@ -1,6 +1,8 @@
 #include "app_commands.h"
 #include "app_comms.h"
 #include "app_config.h"
+#include "zs_command_keys.h"
+#include <string.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "stm32u5xx_hal.h"
@@ -14,6 +16,9 @@ static volatile bool reboot_pending;
 static volatile uint32_t reboot_at_ms;
 static uint32_t executed, rejected, failed, last_detail;
 static uint8_t last_code;
+static const zs_station_secrets_io_t *keys_io;
+static void (*keys_changed_fn)(const zs_station_secrets_t *rec);
+static uint32_t key_rotations, key_promotions;
 
 void app_commands_bind(const zs_station_params_io_t *io, void (*apply)(const zs_station_params_t *p), void (*log)(const char *fmt, ...)) {
   zs_station_params_result_t r;
@@ -26,11 +31,27 @@ void app_commands_bind(const zs_station_params_io_t *io, void (*apply)(const zs_
   if (apply_fn) apply_fn(&params);
 }
 
+void app_commands_bind_keys(const zs_station_secrets_io_t *io, void (*changed)(const zs_station_secrets_t *rec)) {
+  keys_io = io; keys_changed_fn = changed;
+}
+
+/* the record changed on NOR: its owner reloads the trust set and its RAM copy */
+static void keys_reload(const char *what) {
+  zs_station_secrets_t rec;
+  if (keys_io && zs_station_secrets_load(keys_io, &rec, NULL) == ZS_STATION_SECRETS_OK) {
+    if (keys_changed_fn) keys_changed_fn(&rec);
+    if (log_fn) log_fn("command key: %s (secrets v%lu)\r\n", what, (unsigned long)rec.version);
+  }
+  memset(&rec, 0, sizeof(rec));
+}
+
 bool app_commands_execute(void *ctx, const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail) {
   (void)ctx;
   *result = ZS_COMMAND_ACK_OK;
   *detail = 0u;
   last_code = (uint8_t)cmd->code;
+  /* addendum E: the first command signed by the next key proves the server has it - it becomes the current key */
+  if (keys_io && zs_command_keys_on_verified(keys_io, cmd->key_id)) { key_promotions++; keys_reload("next key promoted, old key dropped"); }
   switch (cmd->code) {
     case ZS_COMMAND_SET_PARAMS: {
       zs_station_params_t next;
@@ -52,6 +73,11 @@ bool app_commands_execute(void *ctx, const zs_command_t *cmd, zs_command_ack_res
     case ZS_COMMAND_REQUEST_AUDIO:
       /* addendum B: answered now (refusal) or accepted: the upload runs in the session, the ACK follows it */
       if (!app_comms_request_audio(cmd, result, detail)) return false;
+      break;
+    case ZS_COMMAND_ROTATE_KEY:
+      if (!keys_io) { *result = ZS_COMMAND_ACK_REJECTED; *detail = ZS_COMMAND_KEYS_REJECT_NO_RECORD; break; }
+      zs_command_keys_rotate(keys_io, cmd->rotate.public_key, result, detail);
+      if (*result == ZS_COMMAND_ACK_OK) { key_rotations++; keys_reload("next key installed, both trusted"); }
       break;
     default:
       *result = ZS_COMMAND_ACK_REJECTED;
@@ -78,9 +104,9 @@ const zs_station_params_t *app_commands_params(void) {
 }
 
 void app_commands_status(void (*print)(const char *fmt, ...)) {
-  print("commands executed %lu rejected %lu failed %lu (last code %u detail 0x%04lx)%s | params v%lu: heartbeat %ld s mic %ld update %ld win degraded-after %ld gsm-probe %ld s dwell %ld s (%s)\r\n",
+  print("commands executed %lu rejected %lu failed %lu (last code %u detail 0x%04lx)%s | key rotations %lu promotions %lu | params v%lu: heartbeat %ld s mic %ld update %ld win degraded-after %ld gsm-probe %ld s dwell %ld s (%s)\r\n",
         (unsigned long)executed, (unsigned long)rejected, (unsigned long)failed, last_code, (unsigned long)last_detail,
-        reboot_pending ? " | REBOOT PENDING" : "", (unsigned long)params.version,
+        reboot_pending ? " | REBOOT PENDING" : "", (unsigned long)key_rotations, (unsigned long)key_promotions, (unsigned long)params.version,
         (long)params.value[0], (long)params.value[1], (long)params.value[2], (long)params.value[3], (long)params.value[4], (long)params.value[5],
         params_io ? "nor" : "ram");
 }
