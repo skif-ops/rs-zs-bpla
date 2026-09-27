@@ -1,0 +1,30 @@
+{
+  "schema": "dioneya-pcb-main-aad-r18-094-v1",
+  "base_sha256": "277ffd2e92bd3096e1607fdc832b21aeb019047e9df7dfb359d63d2bd350cfc2",
+  "candidate_sha256": "23ac8f527d669e5c8e7887695f80b5b0cb975a04625917baaef4e8c229939a6f",
+  "route": {
+    "moved_R18_mm": [
+      65.0,
+      44.0
+    ],
+    "removed_old_R18_tail_segments": 2,
+    "added_length_mm": {
+      "AAD_CFG_1V8_U7": 0.7,
+      "AAD_CFG_1V8_FANOUT": 30.189
+    },
+    "new_vias": 4,
+    "new_segments": 42
+  },
+  "drc": {
+    "base_unconnected": 22,
+    "candidate_unconnected": 21,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: AAD configuration, audio/LoRa return and R18 placement/DFM",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
