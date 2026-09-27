@@ -159,6 +159,11 @@ jobs:
           else
             /usr/bin/python3 tools/apply_pcb_main_sd_d0_upper_093_rev_a.py
           fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-AAD-R18-094/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_aad_r18_094_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_aad_r18_094_rev_a.py
+          fi
       - name: Upload candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -273,6 +278,12 @@ jobs:
         with:
           name: pcb-main-candidate-093
           path: hardware/kicad/candidates/PCB-ROUTING-P2-SD-D0-UPPER-093/
+      - name: Upload R18 AAD fanout candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-094
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-AAD-R18-094/
       - name: Upload routing workspace snapshot
         if: always()
         uses: actions/upload-artifact@v4
@@ -306,7 +317,8 @@ jobs:
                   hardware/kicad/candidates/PCB-ROUTING-P2-USB-DP-090/ \
                   hardware/kicad/candidates/PCB-ROUTING-P2-USB-DM-091/ \
                   hardware/kicad/candidates/PCB-ROUTING-P2-SD-D0-REPACK-092/ \
-                  hardware/kicad/candidates/PCB-ROUTING-P2-SD-D0-UPPER-093/
+                  hardware/kicad/candidates/PCB-ROUTING-P2-SD-D0-UPPER-093/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-AAD-R18-094/
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' \
                 -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
