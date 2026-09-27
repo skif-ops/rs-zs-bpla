@@ -45,6 +45,7 @@
 #include "zs_selftest.h"
 #include "zs_station_pipeline.h"
 #include "zs_station_secrets.h"
+#include "zs_command_keys.h"
 #include "zs_time.h"
 #include "zs_event_outbox.h"
 
@@ -476,7 +477,6 @@ static zs_command_journal_io_t nor_command_io;
 static zs_event_outbox_io_t nor_outbox_io;
 static zs_boot_counter_t boot_counter;
 static bool stores_on_nor;
-
 static bool ram_read(void *ctx, uint8_t slot, uint32_t off, uint8_t *d, size_t n) {
   const size_t bytes = ctx == cfg_slots ? ZS_STATION_CONFIG_SLOT_BYTES : ZS_INSTALLATION_STORE_SLOT_BYTES;
   if (slot >= 2u || off + n > bytes) return false;
@@ -558,6 +558,8 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->detector.watchdog_missed = app_watchdog_previous_missed();
   hb->detector.params_version = app_commands_params()->version;
   hb->detector.selftest_failed = zs_selftest_failed_mask(&selftests);
+  hb->detector.command_key_id = secrets.command_key_set ? zs_command_key_id_u64(secrets.command_public_key) : 0u;
+  hb->detector.command_next_key_id = secrets.command_next_key_set ? zs_command_key_id_u64(secrets.command_next_key) : 0u;
   return true;
 }
 /* The comms duty loop (app_comms_task's body, as the host simulation and the twin drive it) plus the watchdog
@@ -597,7 +599,7 @@ static void secrets_apply(void) {
   if (secrets.engineer_key_set) { memcpy(engineer_key, secrets.engineer_key, sizeof(engineer_key)); ipc_port.engineer_key = engineer_key; }
   else ipc_port.engineer_key = NULL;
   for (unsigned i = 0u; i < 2u; i++) if (secrets.iccid[i][0]) (void)app_comms_set_sim_iccid(i + 1u, secrets.iccid[i]);
-  app_comms_set_command_key(secrets.command_key_set ? secrets.command_public_key : NULL);
+  { zs_command_trust_key_t keys[2]; const size_t n = zs_command_keys_trust_set(&secrets, keys); app_comms_set_command_keys(keys, n); }
   if (stores_on_nor) app_lora_bind(&nor_outbox_io, APP_STATION_ID, secrets.engineer_key_set ? secrets.engineer_key : NULL, console_printf);
 }
 
@@ -609,6 +611,14 @@ static void ble_secrets_changed(void *ctx, const zs_station_secrets_t *rec) {
   secrets_apply();
   console_printf("secrets: provisioned over ble (v%lu) engineer key %s, iccid1 %s, iccid2 %s, command key %s\r\n", (unsigned long)rec->version,
                  rec->engineer_key_set ? "set" : "-", rec->iccid[0][0] ? "set" : "-", rec->iccid[1][0] ? "set" : "-", rec->command_key_set ? "set" : "-");
+}
+
+/* Command key rotation (addendum E, app_commands in the comms task): the NOR record changed, keep the RAM copy in
+   step (the console commits it) and reload the trust set. */
+static void command_keys_changed(const zs_station_secrets_t *rec) {
+  secrets = *rec;
+  secrets_loaded = true;
+  secrets_apply();
 }
 
 /* Commits the current secrets to NOR; false on the RAM fallback or a storage error (the RAM copy still applies). */
@@ -665,6 +675,7 @@ static void bind_record_stores(void) {
     if (zs_nor_storage_bind_secrets(&nor_bindings, &nor, &secrets_io)) {
       const zs_station_secrets_result_t r = zs_station_secrets_load(&secrets_io, &secrets, NULL);
       secrets_on_nor = true;
+      app_commands_bind_keys(&secrets_io, command_keys_changed);
       if (r == ZS_STATION_SECRETS_OK) { secrets_loaded = true; secrets_apply(); }
       else if (r != ZS_STATION_SECRETS_NOT_FOUND) console_printf("secrets: read error %d\r\n", (int)r);
       console_printf("secrets: %s (v%lu) engineer key %s, iccid1 %s, iccid2 %s\r\n", secrets_loaded ? "loaded" : "none",
@@ -834,9 +845,10 @@ static void console_exec(const char *cmd) {
       console_printf(secrets_persist() ? "simiccid: slot %u set, stored in nor (v%lu)\r\n" : "simiccid: slot %u set for this session only (nor v%lu)\r\n", slot, (unsigned long)secrets.version);
     } else console_printf("simiccid <1|2> <18..22 digits>: slot %u not set\r\n", slot);
   } else if (strcmp(cmd, "secrets") == 0) {
-    console_printf("secrets %s (%s, v%lu): engineer key %s, iccid1 %s, iccid2 %s, command key %s\r\n", secrets_loaded ? "loaded" : "none",
+    console_printf("secrets %s (%s, v%lu): engineer key %s, iccid1 %s, iccid2 %s, command key %s%s\r\n", secrets_loaded ? "loaded" : "none",
                    secrets_on_nor ? "nor" : "ram", (unsigned long)secrets.version, secrets.engineer_key_set ? "set" : "-",
-                   secrets.iccid[0][0] ? "set" : "-", secrets.iccid[1][0] ? "set" : "-", secrets.command_key_set ? "set" : "-");
+                   secrets.iccid[0][0] ? "set" : "-", secrets.iccid[1][0] ? "set" : "-", secrets.command_key_set ? "set" : "-",
+                   secrets.command_next_key_set ? " + next (rotation in flight)" : "");
   } else if (strcmp(cmd, "secrets clear") == 0) {
     memset(&secrets, 0, sizeof(secrets));
     memset(engineer_key, 0, sizeof(engineer_key));
