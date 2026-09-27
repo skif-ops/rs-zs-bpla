@@ -60,22 +60,31 @@ jobs:
       - name: Run native KiCad 9 candidate ERC and DRC
         env:
           DIONEYA_KICAD_DIRECT: '1'
-        run: /usr/bin/python3 tools/apply_pcb_main_batch_075_rev_a.py
+        run: |
+          /usr/bin/python3 tools/apply_pcb_main_batch_075_rev_a.py
+          /usr/bin/python3 tools/apply_pcb_main_u3_power_076_rev_a.py
       - name: Upload candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pcb-main-candidate-075
           path: hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/
+      - name: Upload U3 power relief candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-076
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-U3-POWER-076/
       - name: Commit verified candidate evidence to feature branch
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git add hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/PCB-MAIN_P2_ASTAR_075_CANDIDATE_REV_A.kicad_pcb \
                   hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/PCB-MAIN_P2_ASTAR_075_CANDIDATE_REV_A.kicad_pro \
-                  hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/{SUMMARY,drc_candidate,erc_candidate}.json
+                  hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/{SUMMARY,drc_candidate,erc_candidate}.json \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-U3-POWER-076/
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' \
                 -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
-                commit -m 'PCB-MAIN: record native KiCad 9 candidate 075 (40 open, ERC 0)'
+                commit -m 'PCB-MAIN: record native KiCad 9 candidates 075-076 (39 open, ERC 0)'
             git push origin HEAD:feature/pcb-main-completion
           fi
