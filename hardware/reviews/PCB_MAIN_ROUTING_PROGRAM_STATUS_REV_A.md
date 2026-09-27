@@ -521,3 +521,38 @@ for local placement/channel relief and GNSS bias/RF review.
 The `GNSS_ANT_SWITCHED` Q4.3 leg has only a roughly 14.7 mm In3.Cu
 or 23.6 mm B.Cu detour to the existing through via in the sampled
 channel. It remains open pending shorter RF-bias-network layout relief.
+
+## 9. Native KiCad 9 continuation through candidate 076 (2026-09-27)
+
+Draft PR #93, branch `feature/pcb-main-completion`, retains PCB-MAIN 003 as the
+authoritative board. Comparative filled-board KiCad 9.0.9 checks under the
+candidate-only 0.25/0.15 mm via rules gave:
+
+| Candidate | Open connections | New DRC violations | ERC violations |
+|---|---:|---:|---:|
+| 071 | 48 | 0 | 0 |
+| 072 | 45 | 0 | 0 |
+| 073, UUID repair | 45 | 0 | 0 |
+| 074, GNSS bias branches | 43 | 0 | 0 |
+| 075, microphone rail branches and LORA_TXEN | 40 | 0 | 0 |
+| 076, U3 local 3V3 relief | **39** | **0** | **0** |
+
+076 moves the existing GND_DIGITAL via next to U3.6 from
+(66.099999, 30.600) to (66.099999, 30.650) mm and changes it from
+0.50/0.30 to 0.25/0.15 mm. A 1.525 mm, 0.15 mm F.Cu segment then joins
+U3.2 and U3.9 on 3V3_DIGITAL. This preserves the ground connection and
+clears the tight local channel. Its generator, candidate board, filled-board
+DRC and ERC evidence are under `PCB-ROUTING-P2-U3-POWER-076/`.
+
+The 075 routes total 107.8935 mm and 15 new vias, including a 45.1553 mm
+1V8_MIC branch; they are routing experiments. Power integrity, microphone
+noise, LoRa return path, and via-in-pad/finished-drill DFM require Review B.
+A reference-aware GNSS_TX_U1 A* probe after 075 needed roughly 82 mm and
+seven vias to join points only 19.95 mm apart; it was rejected rather than
+added to the candidate. The SD_D0_CARD local F.Cu trial after 076 reduced
+one open connection but shorted SD_D2_U1; it was rejected as well.
+
+The target of ten or fewer open connections has **not** been met. Further
+placement relief and selective rip-up around U1, SDIO, and the modem power
+group are needed. No candidate in this section is applied to PCB-MAIN 003 or
+released for manufacture.
