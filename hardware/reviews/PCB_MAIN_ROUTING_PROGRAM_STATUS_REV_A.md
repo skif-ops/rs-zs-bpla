@@ -128,13 +128,13 @@ Conclusion: seven autorouting variants converge to 155–160 open connections. T
 (KiCad push-and-shove by a layout engineer, or a generalised version of the 003 router in net groups).
 Tools: `tools/apply_pcb_routing_relief_p1_rev_a.py`, `tools/apply_pcb_routing_fanout_p2_rev_a.py`.
 
-## 7. Bounded local routes 007–059 and current stop (2026-09-27)
+## 7. Bounded local routes 007–060 and current stop (2026-09-27)
 
-The cumulative 059 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
+The cumulative 060 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
 authoritative board. The unchanged general PCB-MAIN project rejects the 0.25/0.15 mm vias introduced in 009 and 010 (five each of
 `annular_width`, `drill_out_of_range`, `via_diameter`). Under an explicit *candidate-only* JLCPCB six-layer process
 overlay (`min_via_diameter=0.25`, `min_through_hole_diameter=0.15`, `min_via_annular_width=0.05`), KiCad 9 comparative
-DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110→109→108→107→106→105→104→103→102→101→100→99→98→97→96→95→94→93→92→91→90→89→88→87→86→85→84→83→82 open with zero new violations at each accepted step. Candidate projects,
+DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110→109→108→107→106→105→104→103→102→101→100→99→98→97→96→95→94→93→92→91→90→89→88→87→86→85→84→83→82→81 open with zero new violations at each accepted step. Candidate projects,
 comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` directories. The published six-layer process basis is `https://jlcpcb.com/6-layer-pcb` (minimum
 0.15/0.25 mm and via-in-pad option); a job-specific acceptance is still required.
 
@@ -366,13 +366,20 @@ comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` dire
   outlines. Native KiCad 9 comparative DRC 83→82 with no new
   violations (Actions run 36302625651). C34 supply current, return
   transition and filled/capped via-in-pad DFM remain Review B items.
+- 060: extend the C34 `3V3_DIGITAL` branch from the existing through via
+  at (26.9, 29.175) to the existing through via at (32.675, 18.9) with
+  nine 0.30 mm In3.Cu segments, 15.2072 mm total, without new vias.
+  The route lies within the In1.Cu GND_DIGITAL, In2.Cu GND_MIC and
+  In4.Cu GND_DIGITAL zone outlines. Native KiCad 9 comparative DRC
+  82→81 with no new violations (Actions run 36303052402). The longer
+  3V3 supply path, current budget and mixed-domain return need Review B.
 
-Remaining 82 open connections span 60 nets: `3V3_DIGITAL` 7, `1V8_MIC` 6, `AAD_CFG_1V8_FANOUT` 4,
+Remaining 81 open connections span 60 nets: `3V3_DIGITAL` 6, `1V8_MIC` 6, `AAD_CFG_1V8_FANOUT` 4,
 `SIM2_DET` 1, and 64 others. The earlier 009
 first-pass 0.25/0.15 mm via-in-pad clearance scan admitted only 13 of 40; most others hit existing B.Cu/In3 copper. A clean
 route requires placement/rip-up and local power/return design, followed by native DRC and SI/PI review.
 
-Do not copy 059 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
+Do not copy 060 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
 
 ## 8. Locality scan and relief targets through 040
 
