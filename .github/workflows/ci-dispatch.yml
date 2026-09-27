@@ -209,6 +209,11 @@ jobs:
           else
             /usr/bin/python3 tools/apply_pcb_main_pad_stubs_103_rev_a.py
           fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-TRACK-ENDS-104/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_track_ends_104_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_track_ends_104_rev_a.py
+          fi
       - name: Upload candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -383,6 +388,12 @@ jobs:
         with:
           name: pcb-main-candidate-103
           path: hardware/kicad/candidates/PCB-ROUTING-P2-PAD-STUBS-103/
+      - name: Upload track-end candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-104
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-TRACK-ENDS-104/
       - name: Upload routing workspace snapshot
         if: always()
         uses: actions/upload-artifact@v4
@@ -426,7 +437,8 @@ jobs:
                   hardware/kicad/candidates/PCB-ROUTING-P2-PDM-DATA2-100/ \
                   hardware/kicad/candidates/PCB-ROUTING-P2-VIA-CLEANUP-101/ \
                   hardware/kicad/candidates/PCB-ROUTING-P2-TAIL-CLEANUP-102/ \
-                  hardware/kicad/candidates/PCB-ROUTING-P2-PAD-STUBS-103/
+                  hardware/kicad/candidates/PCB-ROUTING-P2-PAD-STUBS-103/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-TRACK-ENDS-104/
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' \
                 -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
