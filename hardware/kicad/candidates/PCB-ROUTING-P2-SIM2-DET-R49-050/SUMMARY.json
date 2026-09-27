@@ -1,0 +1,27 @@
+{
+  "schema": "dioneya-pcb-main-sim2-det-r49-050-v1",
+  "base_sha256": "ca3381d980b8deaeae5d040fbb65d7da6c1930a92d4dbd05aab82931425de5c0",
+  "candidate_sha256": "07904a6f469e1820218323e56d1cf13f992098f4098ba109bb3201fcb5594beb",
+  "rotation": {
+    "reference": "R49",
+    "from_deg": 180,
+    "to_deg": 0
+  },
+  "removed_tracks": [
+    "d0a3c8e7-e500-5ab2-be62-dfc69d7fc83c",
+    "00ace013-b42a-5726-86d2-5d6c004e233c"
+  ],
+  "routes": 2,
+  "track_segments": 2,
+  "sim2_return_review_b": "OPEN",
+  "power_return_review_b": "OPEN",
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 92,
+    "candidate_unconnected": 91,
+    "new_by_type": {},
+    "new_errors": 0
+  }
+}
