@@ -86,6 +86,11 @@ jobs:
           else
             /usr/bin/python3 tools/apply_pcb_main_aad_079_rev_a.py
           fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-C47-080/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_c47_080_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_c47_080_rev_a.py
+          fi
       - name: Upload candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -116,6 +121,12 @@ jobs:
         with:
           name: pcb-main-candidate-079
           path: hardware/kicad/candidates/PCB-ROUTING-P2-AAD-079/
+      - name: Upload C47 route candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-080
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-C47-080/
       - name: Commit verified candidate evidence to feature branch
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -125,10 +136,11 @@ jobs:
                   hardware/kicad/candidates/PCB-ROUTING-P2-U3-POWER-076/ \
                   hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-077/ \
                   hardware/kicad/candidates/PCB-ROUTING-P2-U1-RELIEF-078/ \
-                  hardware/kicad/candidates/PCB-ROUTING-P2-AAD-079/
+                  hardware/kicad/candidates/PCB-ROUTING-P2-AAD-079/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-C47-080/
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' \
                 -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
-                commit -m 'PCB-MAIN: record native KiCad 9 candidate 079 (36 open, ERC 0)'
+                commit -m 'PCB-MAIN: record native KiCad 9 candidate 080 (35 open, ERC 0)'
             git push origin HEAD:feature/pcb-main-completion
           fi
