@@ -1,0 +1,98 @@
+{
+  "schema": "dioneya-pcb-main-fault-jpwr-064-v1",
+  "base_sha256": "02147cb8e1af7ef426a69e54dd47da0538160ac2944df346d8e704f97de8a121",
+  "candidate_sha256": "393f131f58c8285026b01f99770362970ad631ede069004e0f6735d02accb827",
+  "net": "FAULT",
+  "routes": [
+    {
+      "layer": "B.Cu",
+      "points": [
+        [
+          11.92,
+          26.5
+        ],
+        [
+          14.2,
+          28.2
+        ]
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "points": [
+        [
+          14.2,
+          28.2
+        ],
+        [
+          14.6,
+          28.2
+        ]
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "points": [
+        [
+          14.6,
+          28.2
+        ],
+        [
+          17.3,
+          26.3
+        ]
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "points": [
+        [
+          17.3,
+          26.3
+        ],
+        [
+          25.1,
+          22.7
+        ]
+      ]
+    },
+    {
+      "layer": "F.Cu",
+      "points": [
+        [
+          25.1,
+          22.7
+        ],
+        [
+          26.675,
+          22.5
+        ]
+      ]
+    }
+  ],
+  "track_width_mm": 0.15,
+  "new_vias": 1,
+  "via_position_mm": [
+    25.1,
+    22.7
+  ],
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "route_length_mm": 16.7239,
+  "reference_outline_fraction": 1.0,
+  "fault_return_review_b": "OPEN",
+  "small_via_dfm": "OPEN",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 78,
+    "candidate_unconnected": 77,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}
