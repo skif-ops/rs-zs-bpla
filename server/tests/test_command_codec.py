@@ -141,6 +141,15 @@ def test_audio_payload_is_compact_numeric_and_range_is_unambiguous():
             command(payload={"event_id": 42, "segment": "range"}),
             key,
         )
+    # optional key 4: the event time for a station that no longer knows the event (addendum B)
+    timed = command(payload={"event_id": 42, "segment": "both", "event_time_us": 1_800_000_000_123_456})
+    encoded = encode_signed_command(timed, key)
+    assert cbor2.loads(encoded)[7] == {0: 42, 1: 2, 2: None, 3: None, 4: 1_800_000_000_123_456}
+    decoded = decode_signed_command(encoded, {key.key_id: key.public_key}, now_us=1_500_000)
+    assert decoded.payload["event_time_us"] == 1_800_000_000_123_456
+    for bad in (0, -1, 2 ** 63, True):
+        with pytest.raises(ValueError, match="event_time_us"):
+            encode_signed_command(command(payload={"event_id": 42, "segment": "both", "event_time_us": bad}), key)
 
 
 def test_signer_loads_only_ed25519_pem(tmp_path: Path):

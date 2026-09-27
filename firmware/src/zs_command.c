@@ -115,9 +115,11 @@ static bool read_nullable_uint32(command_reader_t *reader, uint32_t *output,
 
 static bool read_audio_payload(command_reader_t *reader,
                                zs_audio_request_command_t *audio) {
-  uint64_t event_id, segment;
+  uint64_t event_id, segment, event_time = 0u;
   bool start_present, duration_present;
-  if (!expect_map(reader, 4u) ||
+  /* four keys, or five with the optional event time (key 4, positive int64) */
+  const bool with_time = reader->offset < reader->size && reader->data[reader->offset] == 0xa5u;
+  if (!expect_map(reader, with_time ? 5u : 4u) ||
       !expect_uint(reader, 0u) || !read_uint(reader, &event_id) || event_id == 0u ||
       !expect_uint(reader, 1u) || !read_uint(reader, &segment) ||
       segment > ZS_AUDIO_SEGMENT_RANGE ||
@@ -125,6 +127,10 @@ static bool read_audio_payload(command_reader_t *reader,
       !read_nullable_int32(reader, &audio->start_offset_ms, &start_present) ||
       !expect_uint(reader, 3u) ||
       !read_nullable_uint32(reader, &audio->duration_ms, &duration_present)) return false;
+  if (with_time && (!expect_uint(reader, 4u) || !read_uint(reader, &event_time) ||
+                    event_time == 0u || event_time > (uint64_t)INT64_MAX)) return false;
+  audio->has_event_time = with_time;
+  audio->event_time_us = (int64_t)event_time;
   if (segment == ZS_AUDIO_SEGMENT_RANGE) {
     if (!start_present || !duration_present) return false;
     audio->has_range = true;

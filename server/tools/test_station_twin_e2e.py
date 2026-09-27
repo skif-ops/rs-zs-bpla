@@ -8,6 +8,8 @@ Runs zs_station_twin with the Python server twin on the pipe and checks the serv
      (CMD_REQUEST_AUDIO, both segments) right after the receipt, the station waits for the post-event window, uploads
      both segments chunk by chunk and acknowledges with the chunk count; the server stores them through the bridge's
      ingest (station.audio_ingest: parts in SQLite, SHA-256, WAV) and the ACK closes the request in the store;
+  1b. the same with a station that no longer knows its events (as after a reboot): the request carries the event
+     time the server has from the detection, and the station uploads by it;
   2. a burst of events during a GSM outage goes out over LoRa (30 % loss both ways) once the link is marked
      degraded, every event is delivered exactly once, and a GSM probe restores the link when the network returns.
   3. remote commands (ICD addendum D): the server signs CMD_SET_PARAMS and CMD_REBOOT, the station verifies them
@@ -66,6 +68,7 @@ def main() -> int:
     (ack,) = [a for a in r["acks"] if a["command_id"] == req["command_id"]]
     assert ack["result"] == 0 and ack["detail"] == r["audio_chunks"] and r["audio_duplicates"] == 0, (ack, r["audio_chunks"])
     assert log.count("audio: request for event") == 1, "a redelivery must not start a second upload"
+    assert "accepted (segment 2, station time)" in log                 # the station's own table serves its events
     # the server side ran the bridge's ingest: the request is closed in the store and no part is left over
     assert r["audio_store"] == {"acked": True, "ack_result": 0, "ack_detail": r["audio_chunks"], "pending_parts": 0}, r["audio_store"]
     pre, post = segs["pre"], segs["post"]
@@ -75,6 +78,16 @@ def main() -> int:
     print(f"scenario 1 (drone over GSM): detections {r['detections']}, heartbeats {r['heartbeats']}, duplicates {r['duplicates']}; "
           f"prehistory: {rec_line.split('around the first event: ')[1]}; audio upload: {r['audio_chunks']} chunks, "
           f"pre {pre['seconds']:.0f} s + post {post['seconds']:.0f} s assembled, ACK OK")
+
+    log, r = run(["--scene", "drone", "--seconds", "140", "--seed", "3", "--receipt-latency", "2000", "--expect-events", "1",
+                  "--expect-delivered", "1", "--forget-events"], audio="both")
+    segs = {s["segment"]: s for s in r["audio_segments"]}
+    assert set(segs) == {"pre", "post"} and r["audio_store"]["ack_result"] == 0, (r["audio_segments"], r["audio_store"])
+    assert "accepted (segment 2, server time)" in log, "the upload did not run on the server's event time"
+    event = next(e for e in r["events"] if e["event_id"] == r["audio_requested"][0]["event_id"])
+    assert segs["post"]["start_time_us"] <= event["time_us"] < segs["post"]["start_time_us"] + 1e6
+    print(f"scenario 1b (event table lost): served by the server's event time, pre {segs['pre']['seconds']:.0f} s + "
+          f"post {segs['post']['seconds']:.0f} s")
 
     # 1600 s: the boot session starts just before the outage and runs into the S3 watchdog, which shifts the whole
     # degraded -> probe cycle by three minutes; the probe after the network returns lands at ~1450 s

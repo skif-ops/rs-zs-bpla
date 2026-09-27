@@ -104,6 +104,10 @@ class EventStore:
         with self._conn() as c:
             rows=c.execute("SELECT payload FROM detections WHERE event_time_us BETWEEN ? AND ? ORDER BY event_time_us",(center_us-window_us,center_us+window_us)).fetchall()
         return [DetectionMessage.model_validate_json(r['payload']) for r in rows]
+    def detection_time_us(self,station_id:int,event_id:int)->int|None:
+        with self._conn() as c:
+            row=c.execute("SELECT event_time_us FROM detections WHERE event_id=? AND station_id=?",(self._sqlite_event_id(event_id),station_id)).fetchone()
+        return row['event_time_us'] if row else None
     def link_detections(self,event_ids:list[int],system_event_id:str):
         with self.lock,self._conn() as c: c.executemany("UPDATE detections SET system_event_id=? WHERE event_id=?",[(system_event_id,self._sqlite_event_id(e)) for e in event_ids])
     def save_system_event(self,e:SystemEvent):

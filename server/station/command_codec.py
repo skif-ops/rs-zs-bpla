@@ -103,7 +103,7 @@ def _uuid_bytes(value: str) -> bytes:
 
 
 def _audio_payload_to_wire(payload: dict) -> dict[int, object]:
-    allowed = {"event_id", "segment", "start_offset_ms", "duration_ms"}
+    allowed = {"event_id", "segment", "start_offset_ms", "duration_ms", "event_time_us"}
     if set(payload) - allowed:
         raise ValueError("unsupported audio request payload field")
     event_id = payload.get("event_id")
@@ -127,11 +127,18 @@ def _audio_payload_to_wire(payload: dict) -> dict[int, object]:
             raise ValueError("range audio request requires offset and duration")
     elif start is not None or duration is not None:
         raise ValueError("offset and duration are allowed only for range audio request")
-    return {0: event_id, 1: AUDIO_SEGMENT_CODES[segment], 2: start, 3: duration}
+    wire = {0: event_id, 1: AUDIO_SEGMENT_CODES[segment], 2: start, 3: duration}
+    # optional key 4 (addendum B): the event time the server knows, for events the station's own table has lost
+    event_time = payload.get("event_time_us")
+    if event_time is not None:
+        if type(event_time) is not int or not 0 < event_time <= 0x7FFFFFFFFFFFFFFF:
+            raise ValueError("audio request event_time_us is outside positive int64 range")
+        wire[4] = event_time
+    return wire
 
 
 def _audio_payload_from_wire(payload: object) -> dict[str, object]:
-    if not isinstance(payload, dict) or set(payload) != set(range(4)):
+    if not isinstance(payload, dict) or set(payload) not in (set(range(4)), set(range(5))):
         raise ValueError("invalid audio request payload keys")
     if type(payload[1]) is not int or payload[1] not in AUDIO_SEGMENT_NAMES:
         raise ValueError("unsupported audio request segment code")
@@ -141,6 +148,8 @@ def _audio_payload_from_wire(payload: object) -> dict[str, object]:
         "start_offset_ms": payload[2],
         "duration_ms": payload[3],
     }
+    if 4 in payload:
+        normalized["event_time_us"] = payload[4]
     _audio_payload_to_wire(normalized)
     return normalized
 

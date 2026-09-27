@@ -169,13 +169,13 @@ static uint8_t chunk_buf[ZS_AUDIO_CHUNK_MAX_BYTES], ack_buf[ZS_COMMAND_ACK_MAX_B
 static uint8_t audio_topic[ZS_MQTT_EVENT_TOPIC_MAX_BYTES];
 static size_t audio_topic_size;
 static zs_mqtt_event_message_t chunk_msg, ack_msg;
-static uint32_t audio_uploads, audio_chunks, audio_rejected, audio_failed, audio_aborted;
+static uint32_t audio_uploads, audio_chunks, audio_rejected, audio_failed, audio_aborted, audio_by_server_time;
 void app_comms_set_audio_source(const app_comms_audio_source_t *src) { audio_src = src; }
 bool app_comms_audio_busy(void) { return zs_audio_upload_active(&upload) || upload.state == ZS_AUDIO_UPLOAD_FINISHED || ack_pending || chunk_in_flight; }
 
 bool app_comms_request_audio(const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail) {
   int64_t event_us;
-  bool trusted;
+  bool trusted, by_server = false;
   const zs_prehistory_t *ring = audio_src && audio_src->ring ? audio_src->ring() : NULL;
   *result = ZS_COMMAND_ACK_REJECTED;
   if (!ring) { *detail = 1u; audio_rejected++; return true; }                       /* no recorder on this station */
@@ -183,13 +183,21 @@ bool app_comms_request_audio(const zs_command_t *cmd, zs_command_ack_result_t *r
     if (memcmp(upload.command_id, cmd->command_id, ZS_COMMAND_UUID_BYTES) == 0) return false;   /* redelivery: still running */
     *detail = ZS_AUDIO_UPLOAD_DETAIL_BUSY; audio_rejected++; return true;
   }
-  if (!audio_src->event_time(cmd->audio.event_id, &event_us, &trusted)) { *detail = ZS_AUDIO_UPLOAD_DETAIL_NO_AUDIO; audio_rejected++; return true; }
+  /* the station's own table of this boot first; for older events the time the server signed into the request */
+  if (!audio_src->event_time(cmd->audio.event_id, &event_us, &trusted)) {
+    if (!cmd->audio.has_event_time) { *detail = ZS_AUDIO_UPLOAD_DETAIL_NO_AUDIO; audio_rejected++; return true; }
+    event_us = cmd->audio.event_time_us;
+    trusted = true;                                      /* the server requests only events whose time it trusts */
+    by_server = true;
+  }
   if (!trusted) { *detail = ZS_AUDIO_UPLOAD_DETAIL_TIME; audio_rejected++; return true; }
   if (!zs_audio_upload_start(&upload, ring, config.station_id, cmd->command_id, &cmd->audio, event_us, detail)) { audio_rejected++; return true; }
   chunk_failures = 0u;
   audio_uploads++;
-  if (hooks.log) hooks.log("audio: request for event %lu:%lu accepted (segment %u), upload follows\r\n",
-                           (unsigned long)(cmd->audio.event_id >> 32), (unsigned long)(cmd->audio.event_id & 0xffffffffu), (unsigned)cmd->audio.segment);
+  audio_by_server_time += by_server;
+  if (hooks.log) hooks.log("audio: request for event %lu:%lu accepted (segment %u, %s time), upload follows\r\n",
+                           (unsigned long)(cmd->audio.event_id >> 32), (unsigned long)(cmd->audio.event_id & 0xffffffffu), (unsigned)cmd->audio.segment,
+                           by_server ? "server" : "station");
   return false;                                                                    /* ACCEPTED stays; the ACK comes later */
 }
 
@@ -499,8 +507,9 @@ void app_comms_status(void (*print)(const char *fmt, ...)) {
         (unsigned long)comms.events_published, (unsigned long)comms.events_failed, (unsigned long)comms.events_exhausted,
         (unsigned long)comms.heartbeats_published, (unsigned long)comms.heartbeats_failed,
         command_key_set ? "set" : "none", (unsigned long)commands_verified, (unsigned long)commands_rejected);
-  print("  audio uploads %lu chunks %lu rejected %lu failed %lu abandoned %lu%s\r\n", (unsigned long)audio_uploads, (unsigned long)audio_chunks,
-        (unsigned long)audio_rejected, (unsigned long)audio_failed, (unsigned long)audio_aborted, app_comms_audio_busy() ? " (upload running)" : "");
+  print("  audio uploads %lu (by server time %lu) chunks %lu rejected %lu failed %lu abandoned %lu%s\r\n", (unsigned long)audio_uploads,
+        (unsigned long)audio_by_server_time, (unsigned long)audio_chunks, (unsigned long)audio_rejected, (unsigned long)audio_failed,
+        (unsigned long)audio_aborted, app_comms_audio_busy() ? " (upload running)" : "");
   if (sim_enabled)
     print("  dual-sim %s slot %d (sim1 %s, sim2 %s, status %s) starts %lu switches %lu retries %lu recoveries %lu faults %lu bringup-fail %u/%u link-fail %u/%u\r\n",
           zs_dual_sim_state_name(zs_dual_sim_state(&sim_controller)), (int)zs_dual_sim_active_slot(&sim_controller),

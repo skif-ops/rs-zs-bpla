@@ -175,7 +175,7 @@ def test_auto_request_once_per_episode_and_only_for_new_trusted_detections(tmp_p
     up = "zs/v1/evt/17/up"
     first = detection(100)
     assert handle_message(client, msg(first, 1, up), "evt", True, event_store=store, fusion_service=fusion, on_new_detection=on_new)
-    assert requested == [{"event_id": 100, "segment": "both"}]
+    assert requested == [{"event_id": 100, "segment": "both", "event_time_us": 1_700_000}]   # the time goes along
     # the same detection redelivered: stored already, no second request
     assert handle_message(client, msg(first, 2, up), "evt", True, event_store=store, fusion_service=fusion, on_new_detection=on_new)
     assert len(requested) == 1
@@ -185,7 +185,7 @@ def test_auto_request_once_per_episode_and_only_for_new_trusted_detections(tmp_p
     # after the gap the next episode is asked for again
     later = request_event_audio(decode_detection_obj(decode_cbor(detection(104))), segment="both", min_gap_us=120_000_000,
                                 now_us=int(time.time() * 1e6) + 121_000_000, event_store=store)
-    assert later is not None and later.payload == {"event_id": 104, "segment": "both"}
+    assert later is not None and later.payload == {"event_id": 104, "segment": "both", "event_time_us": 1_700_000}
     assert client.published.count("zs/v1/evt/17/receipt") == 3            # every delivery still gets its receipt
     # the station said its time was not synchronised: it would refuse (REJECTED 3)
     unsynced = decode_detection_obj(decode_cbor(detection(102, time_trust=4)))
@@ -229,3 +229,20 @@ def test_operator_endpoints_list_and_serve_the_wav(tmp_path: Path, monkeypatch):
     assert wav.status_code == 200 and wav.headers["content-type"] == "audio/wav" and wav.content[:4] == b"RIFF"
     assert client.get("/api/v1/stations/17/events/42/audio/post.wav").status_code == 404
     assert client.get("/api/v1/stations/17/events/42/audio/..%2Fx.wav").status_code == 404
+
+
+def test_operator_audio_request_carries_the_stored_event_time(tmp_path: Path, monkeypatch):
+    """A station that rebooted no longer knows its earlier events: the request carries the detection's time."""
+    from app import app
+    import station.router as router
+
+    store = EventStore(tmp_path / "events.sqlite3")
+    monkeypatch.setattr(router, "store", store)
+    store.save_detection(decode_detection_obj(decode_cbor(detection(300))))
+    client = TestClient(app)
+    known = client.post("/api/v1/stations/17/audio-request", json={"event_id": 300, "segment": "post"}).json()
+    assert known["payload"] == {"event_id": 300, "segment": "post", "start_offset_ms": None, "duration_ms": None, "event_time_us": 1_700_000}
+    unknown = client.post("/api/v1/stations/17/audio-request", json={"event_id": 301}).json()
+    assert "event_time_us" not in unknown["payload"]                     # nothing to add: the station decides
+    explicit = client.post("/api/v1/stations/17/audio-request", json={"event_id": 301, "event_time_us": 5}).json()
+    assert explicit["payload"]["event_time_us"] == 5
