@@ -1,0 +1,48 @@
+name: PCB-MAIN candidate 102 tail cleanup
+on:
+  push:
+    branches: [feature/pcb-main-completion]
+    paths:
+      - .github/workflows/pcb-main-tail-cleanup-102.yml
+      - tools/apply_pcb_main_dead_end_102_rev_a.py
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  native-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container:
+      image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
+      options: --user root
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/pcb-main-completion
+      - name: Generate and gate candidate 102
+        env:
+          DIONEYA_KICAD_DIRECT: '1'
+        run: /usr/bin/python3 tools/apply_pcb_main_dead_end_102_rev_a.py
+      - name: Upload candidate and DRC evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-102
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-TAIL-CLEANUP-102/
+      - name: Commit candidate after successful native gate
+        if: success() && github.event_name == 'push'
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git add hardware/kicad/candidates/PCB-ROUTING-P2-TAIL-CLEANUP-102/
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'PCB-MAIN: record native KiCad 9 candidate 102'
+            for attempt in 1 2 3 4 5; do
+              if git push origin HEAD:feature/pcb-main-completion; then exit 0; fi
+              git fetch origin feature/pcb-main-completion
+              git rebase origin/feature/pcb-main-completion
+            done
+            exit 1
+          fi
