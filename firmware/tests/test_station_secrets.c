@@ -115,13 +115,52 @@ static void test_nor(void) {
   assert(zs_station_secrets_commit(&io, &s) == ZS_STATION_SECRETS_OK);
   assert(zs_station_secrets_commit(&io, &s) == ZS_STATION_SECRETS_OK && s.version == 2u);
   assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && slot == 1u && strcmp(back.iccid[1], ICCID2) == 0);
-  assert(memcmp(&m.memory[2u * MOCK_ERASE_BYTES], "ZSSECR01", 8) == 0 && memcmp(&m.memory[3u * MOCK_ERASE_BYTES], "ZSSECR01", 8) == 0);
+  assert(memcmp(&m.memory[2u * MOCK_ERASE_BYTES], "ZSSECR02", 8) == 0 && memcmp(&m.memory[3u * MOCK_ERASE_BYTES], "ZSSECR02", 8) == 0);
   for (uint32_t a = 0u; a < 2u * MOCK_ERASE_BYTES; a++) assert(m.memory[a] == 0xffu);     /* nothing outside the partition */
   printf("secrets nor ok\n");
 }
 
+/* Addendum E: the next command key round-trips; a v1 record written before it (132 bytes, CRC at 128) still loads,
+   and the next commit upgrades it to v2 in the other slot. */
+static uint32_t t_crc32(const uint8_t *d, size_t n) {
+  uint32_t c = 0xffffffffu;
+  for (size_t i = 0u; i < n; i++) { c ^= d[i]; for (unsigned b = 0u; b < 8u; b++) c = (c >> 1) ^ (0xedb88320u & (uint32_t)-(int32_t)(c & 1u)); }
+  return ~c;
+}
+static void test_next_key_and_v1(void) {
+  static ram_t m;
+  const zs_station_secrets_io_t io = {&m, r_read, r_erase, r_write};
+  zs_station_secrets_t s, back;
+  uint8_t slot = 9u, *r;
+  uint32_t crc;
+  memset(&m, 0xff, sizeof(m)); m.writes = 0u; m.fail_write = 0u; m.erases = 0u;
+  /* a v1 record in slot 0: version 7, command key 0x11.. */
+  r = m.slots[0];
+  memcpy(r, "ZSSECR01", 8); r[8] = 7u; r[9] = r[10] = r[11] = 0u; r[12] = 8u; r[13] = r[14] = r[15] = 0u;
+  memset(r + 94, 0x11, 32u);
+  crc = t_crc32(r, 128u); r[128] = (uint8_t)crc; r[129] = (uint8_t)(crc >> 8); r[130] = (uint8_t)(crc >> 16); r[131] = (uint8_t)(crc >> 24);
+  assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && slot == 0u && back.version == 7u);
+  assert(back.command_key_set && back.command_public_key[31] == 0x11u && !back.command_next_key_set && !back.engineer_key_set);
+  /* install a next key: v2 in slot 1, both keys back */
+  s = back;
+  s.command_next_key_set = true; memset(s.command_next_key, 0x22, 32u);
+  assert(zs_station_secrets_commit(&io, &s) == ZS_STATION_SECRETS_OK && s.version == 8u);
+  assert(memcmp(m.slots[1], "ZSSECR02", 8) == 0);
+  assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && slot == 1u && back.version == 8u);
+  assert(back.command_key_set && back.command_public_key[0] == 0x11u && back.command_next_key_set && back.command_next_key[0] == 0x22u);
+  /* promote: next becomes current, next cleared */
+  memcpy(s.command_public_key, s.command_next_key, 32u); s.command_next_key_set = false;
+  assert(zs_station_secrets_commit(&io, &s) == ZS_STATION_SECRETS_OK && s.version == 9u);
+  assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && slot == 0u && back.command_public_key[0] == 0x22u && !back.command_next_key_set);
+  /* a v2 record with a flipped next-key byte fails its CRC: the previous record wins */
+  m.slots[0][140] ^= 0x01u;
+  assert(zs_station_secrets_load(&io, &back, &slot) == ZS_STATION_SECRETS_OK && slot == 1u && back.version == 8u);
+  printf("secrets next key / v1 ok\n");
+}
+
 int main(void) {
   test_ram();
+  test_next_key_and_v1();
   test_nor();
   printf("station secrets tests passed\n");
   return 0;

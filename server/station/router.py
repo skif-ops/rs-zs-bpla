@@ -4,7 +4,8 @@ import json, time
 from pathlib import Path
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
-from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage
+from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage, CommandKeyRotationRequest
+from station.command_codec import validate_command_payload
 from station.store import EventStore
 from station.service import StationFusionService
 from station.cbor_codec import decode_detection_cbor
@@ -76,6 +77,18 @@ async def request_audio(station_id:int,req:AudioRequest):
         except ValueError: payload['event_time_us']=None
     if payload['event_time_us'] is None: payload.pop('event_time_us')
     try: command=store.create_command(station_id,'CMD_REQUEST_AUDIO',payload)
+    except ValueError as exc: raise HTTPException(400,str(exc)) from None
+    return command.model_dump()
+
+@router.post('/stations/{station_id}/command-key-rotation')
+async def rotate_command_key(station_id:int,req:CommandKeyRotationRequest):
+    """ICD addendum E: queue CMD_ROTATE_COMMAND_KEY with the bridge's next public key (--command-next-signing-key,
+    printed at its start).  The station trusts both keys after its OK; the first command signed by the next key
+    promotes it there."""
+    payload={'public_key':req.public_key.lower()}
+    try:
+        validate_command_payload('CMD_ROTATE_COMMAND_KEY',payload)
+        command=store.create_command(station_id,'CMD_ROTATE_COMMAND_KEY',payload)
     except ValueError as exc: raise HTTPException(400,str(exc)) from None
     return command.model_dump()
 

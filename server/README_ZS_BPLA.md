@@ -93,7 +93,11 @@ python -m station.mqtt_bridge --host mqtt.example --port 8883 --tenant pilot \
 
 The command signing key is an owner-only (`0600`) Ed25519 PKCS#8 PEM. Without
 it the bridge remains telemetry-only and will not downgrade to unsigned
-commands. Command delivery uses QoS 1, retain false and durable retries until a
+commands. To rotate it without a site visit (MQTT ICD addendum E), start the
+bridge with `--command-next-signing-key <new pem>` as well, queue
+`POST /api/v1/stations/{id}/command-key-rotation` with the new public key it
+prints, and switch `--command-signing-key` to the new key once every station
+reports it as current (`detector.command_key_id` in `/api/v1/stations`). Command delivery uses QoS 1, retain false and durable retries until a
 station-bound application ACK or the 15-minute TTL. The checked-in ACL contains
 separate topic rights for station credentials 01 through 20.
 
