@@ -81,6 +81,11 @@ def main():
         BOARD = BASE / 'PCB-MAIN_P2_ASTAR_074_CANDIDATE_REV_A.kicad_pcb'
         DRC = BASE / 'drc_candidate.json'
         OUT = ROOT / 'hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075'
+    if '--base=075' in sys.argv:
+        BASE = ROOT / 'hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075'
+        BOARD = BASE / 'PCB-MAIN_P2_ASTAR_075_CANDIDATE_REV_A.kicad_pcb'
+        DRC = BASE / 'drc_candidate.json'
+        OUT = ROOT / 'hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-076'
     board, domains = geo.load(BOARD)
     g = geometry(board)
     gaps = json.loads(DRC.read_text())['unconnected_items']
