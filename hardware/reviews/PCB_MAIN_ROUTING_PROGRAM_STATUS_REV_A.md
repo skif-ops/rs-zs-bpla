@@ -522,7 +522,7 @@ The `GNSS_ANT_SWITCHED` Q4.3 leg has only a roughly 14.7 mm In3.Cu
 or 23.6 mm B.Cu detour to the existing through via in the sampled
 channel. It remains open pending shorter RF-bias-network layout relief.
 
-## 9. Native KiCad 9 continuation through candidate 096 (2026-09-27)
+## 9. Native KiCad 9 continuation through candidate 097 (2026-09-27)
 
 Draft PR #93, branch `feature/pcb-main-completion`, retains PCB-MAIN 003 as the
 authoritative board. Comparative filled-board KiCad 9.0.9 checks under the
@@ -555,7 +555,7 @@ candidate-only 0.25/0.15 mm via rules gave:
 | 093, SD_D0_CARD U24 upper branch | **22** | **0** | **0** |
 | 094, R18 AAD_CFG_1V8_FANOUT placement relief | **21** | **0** | **0** |
 | 095, PDM_DATA1_1V8 to U19.2 | **20** | **0** | **0** |
-| 096, north F.Cu 3V3_DIGITAL bridge | **19** | **0** | **0** |
+| 096, north F.Cu 3V3_DIGITAL bridge | **19** | **0** | **0** |\n| 097, AAD_CFG with REV_STRAP0 relocation | **18** | **0** | **0** |
 
 076 moves the existing GND_DIGITAL via next to U3.6 from
 (66.099999, 30.600) to (66.099999, 30.650) mm and changes it from
@@ -647,6 +647,16 @@ combined 087–088 SDIO length, skew and return require Review B.
 
 095 joins PDM_DATA1_1V8 from the U7-side F.Cu branch to the existing U19.2-side via with 66.262 mm of 0.15 mm F.Cu/In3.Cu/B.Cu and seven 0.25/0.15 mm candidate-process vias. Its endpoints are placed exactly on existing track/via centres. Native filled-board DRC went 21→20 without new violations and ERC zero. PDM audio-domain return, skew/coupling and DFM remain Review B holds.
 
+097 removes ten B.Cu segments of REV_STRAP0 crossing the AAD_CFG MCU pin,
+places a candidate-process 0.25/0.15 mm via at (57.5,22.1) mm, and
+restores REV_STRAP0 around it. The new AAD_CFG path has 53.183 mm of
+0.15 mm copper across F.Cu/In3.Cu/B.Cu and nine vias including the MCU
+pad transition. Filled-board KiCad 9 DRC fell 19→18 with no new violations
+and ERC zero. Via-in-pad assembly, length, return current, and coupling
+remain Review B/DFM holds. A locked-copper Freerouting 2.4.1 measurement
+before 097 solved only three of 52 internal airwires and its session
+failed KiCad import, so none of its generated copper was adopted.
+
 Post-088 probes examined all 27 remaining airwires: the unmodified
 0.15/0.25 mm grid router found **zero** directly routeable gaps.
 Six R89 placement experiments for the adjacent SD_D0_CARD channel
@@ -659,7 +669,7 @@ LORA_SCK_U1 51–64 mm with 5–8 vias). The PDM_DATA2 virtual
 U1 via at (52.5, 22.1) mm conflicts with NRST and BOOT0 copper
 and was rejected before native DRC. The next routing work needs
 coordinated placement relief and rerouting in the U1, SDIO and
-power corridors; the accepted candidate is now 096 with 19 open.
+power corridors; the accepted candidate is now 097 with 18 open.
 
 The 075 routes total 107.8935 mm and 15 new vias, including a 45.1553 mm
 1V8_MIC branch; they are routing experiments. Power integrity, microphone
