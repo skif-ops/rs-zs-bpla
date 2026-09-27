@@ -1,0 +1,24 @@
+{
+  "schema": "dioneya-pcb-main-nrst-089-v1",
+  "base_sha256": "6a2b1353fa3e0e71c98f4547f667a496f5aee2cad61bc080075cd64472f69e80",
+  "candidate_sha256": "d252a2876cdf24408865685dd076ae2c301c29b41ae08a243541b9388d13ddef",
+  "route": {
+    "net": "NRST",
+    "length_mm": 17.285,
+    "new_vias": 3,
+    "new_segments": 25,
+    "via_in_R1_pad": true
+  },
+  "drc": {
+    "base_unconnected": 27,
+    "candidate_unconnected": 26,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: reset-net integrity, R1.2 via-in-pad, DFM and return",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
