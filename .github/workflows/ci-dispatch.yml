@@ -189,6 +189,11 @@ jobs:
           else
             /usr/bin/python3 tools/apply_pcb_main_cell_pwrkey_099_rev_a.py
           fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-PDM-DATA2-100/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_pdm_data2_100_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_pdm_data2_100_rev_a.py
+          fi
       - name: Upload candidate evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -339,6 +344,12 @@ jobs:
         with:
           name: pcb-main-candidate-099
           path: hardware/kicad/candidates/PCB-ROUTING-P2-CELL-PWRKEY-099/
+      - name: Upload PDM_DATA2 candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-100
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-PDM-DATA2-100/
       - name: Upload routing workspace snapshot
         if: always()
         uses: actions/upload-artifact@v4
@@ -378,7 +389,8 @@ jobs:
                   hardware/kicad/candidates/PCB-ROUTING-P2-3V3-NORTH-096/ \
                   hardware/kicad/candidates/PCB-ROUTING-P2-AAD-REROUTE-097/ \
                   hardware/kicad/candidates/PCB-ROUTING-P2-PWR-FAULT-098/ \
-                  hardware/kicad/candidates/PCB-ROUTING-P2-CELL-PWRKEY-099/
+                  hardware/kicad/candidates/PCB-ROUTING-P2-CELL-PWRKEY-099/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-PDM-DATA2-100/
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' \
                 -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
