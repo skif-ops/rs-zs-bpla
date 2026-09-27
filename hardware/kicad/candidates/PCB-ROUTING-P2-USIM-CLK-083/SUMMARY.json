@@ -1,0 +1,27 @@
+{
+  "schema": "dioneya-pcb-main-usim-clk-083-v1",
+  "base_sha256": "a3ac2ff52b39ecac8a8785c8df4743ce125a30cd2daf7880c2fbbcbc1d5745ac",
+  "candidate_sha256": "f90e00b8f01da340bb8927dc9cdf04388efd7c0f5f07e04995397425a05d945b",
+  "route": {
+    "net": "CELL_USIM_CLK_1V8",
+    "track_length_mm": 36.252,
+    "segments": 95,
+    "vias": 3,
+    "length_by_layer_mm": {
+      "F.Cu": 9.297,
+      "In3.Cu": 26.955
+    }
+  },
+  "review_b": "OPEN: USIM clock timing/return through MIC reference and via DFM",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 33,
+    "candidate_unconnected": 32,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}
