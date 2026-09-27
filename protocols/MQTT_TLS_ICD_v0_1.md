@@ -40,7 +40,7 @@ an explicit signing key is loaded.
 | 3 | command_id | UUID as 16 bytes |
 | 4 | created_time_us | uint64 |
 | 5 | expires_time_us | uint64; maximum and default server TTL is 15 minutes |
-| 6 | command code | uint; `CMD_REQUEST_AUDIO` = 1 |
+| 6 | command code | uint; `CMD_REQUEST_AUDIO` = 1, `CMD_REBOOT` = 2, `CMD_SET_PARAMS` = 3 (addendum D), `CMD_ROTATE_COMMAND_KEY` = 4 (addendum E) |
 | 7 | command payload | CBOR map |
 | 8 | signing key ID | first 8 bytes of SHA-256 over the raw Ed25519 public key |
 | 9 | signature | 64-byte Ed25519 signature over canonical keys 0..8 |
@@ -356,7 +356,8 @@ CA, клиентского сертификата и ключа. Явный `--i
 Его отсутствие безопасно отключает публикацию команд, не понижая transport до
 unsigned режима. Файл не хранится в Git; raw 32-byte public key provisioned на
 станции отдельным контролируемым процессом. Ротация использует новый key ID и
-период явного доверия к старому и новому public key.
+период явного доверия к старому и новому public key: `CMD_ROTATE_COMMAND_KEY`, подписанная текущим ключом,
+ставит следующий ключ, первая команда с ним делает его текущим (аддендум E).
 
 ## 5. HTTPS fallback
 
