@@ -1,0 +1,53 @@
+{
+  "schema": "dioneya-pcb-main-batch-068-v1",
+  "base_sha256": "22391d5e5fda68ec30438406a4497ff96b1b26d6acb75a4cd9738beb8024d16d",
+  "candidate_sha256": "d78d34cf477825f4b15ac1e68294b1cb22be83184ed53c899022f95bcd5025d8",
+  "routes": [
+    {
+      "net": "HW_REV1",
+      "track_length_mm": 27.5664,
+      "vias": 2
+    },
+    {
+      "net": "I2C2_SCL_BUS",
+      "track_length_mm": 13.0083,
+      "vias": 3
+    },
+    {
+      "net": "LORA_NSS_U1",
+      "track_length_mm": 24.3054,
+      "vias": 4
+    },
+    {
+      "net": "PDM_DATA3",
+      "track_length_mm": 18.8368,
+      "vias": 3
+    },
+    {
+      "net": "SD_D2_CARD",
+      "track_length_mm": 11.3194,
+      "vias": 2
+    },
+    {
+      "net": "TAMPER_IN_U1",
+      "track_length_mm": 45.6279,
+      "vias": 5
+    }
+  ],
+  "route_count": 6,
+  "new_vias": 19,
+  "new_track_length_mm": 140.6642,
+  "reference_outline_fraction": 1.0,
+  "review_b": "OPEN",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 66,
+    "candidate_unconnected": 60,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}
