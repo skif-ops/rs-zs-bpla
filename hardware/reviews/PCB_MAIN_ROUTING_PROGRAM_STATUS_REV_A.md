@@ -522,7 +522,7 @@ The `GNSS_ANT_SWITCHED` Q4.3 leg has only a roughly 14.7 mm In3.Cu
 or 23.6 mm B.Cu detour to the existing through via in the sampled
 channel. It remains open pending shorter RF-bias-network layout relief.
 
-## 9. Native KiCad 9 continuation through candidate 079 (2026-09-27)
+## 9. Native KiCad 9 continuation through candidate 081 (2026-09-27)
 
 Draft PR #93, branch `feature/pcb-main-completion`, retains PCB-MAIN 003 as the
 authoritative board. Comparative filled-board KiCad 9.0.9 checks under the
@@ -539,6 +539,8 @@ candidate-only 0.25/0.15 mm via rules gave:
 | 077, 3V3_DIGITAL In3 bridge | **38** | **0** | **0** |
 | 078, U1 3V3 escape relief | **37** | **0** | **0** |
 | 079, AAD_CFG_1V8_FANOUT branch | **36** | **0** | **0** |
+| 080, 3V8_MODEM_RF C47 branch | **35** | **0** | **0** |
+| 081, CELL_DBG_RXD_TP debug branch | **34** | **0** | **0** |
 
 076 moves the existing GND_DIGITAL via next to U3.6 from
 (66.099999, 30.600) to (66.099999, 30.650) mm and changes it from
@@ -565,6 +567,20 @@ and two candidate-process vias. Its right via was moved onto an existing
 same-net F.Cu track to clear a copper sliver. The filled-board native DRC
 went from 37 to 36 without new violations; ERC remains zero. Return path
 across ground domains, timing, and small-via DFM remain open for Review B.
+
+080 joins the C47 10 pF RF supply pad with a 4.324 mm, 0.40 mm F.Cu
+branch and no vias. Native filled-board DRC went 36→35 with no new
+violations. All of this branch lies over In1.Cu GND_DIGITAL, whereas
+the net is assigned to GND_MODEM. RF decoupling current, return path and
+the narrower branch require PI/Review B before any application.
+
+081 joins the CELL_DBG_RXD_TP test pad to its resistor branch with
+30.661 mm of copper and four candidate-process vias. Native filled-board
+DRC went 35→34 with no new violations, ERC zero. Its 17.847 mm In3.Cu
+section lies over GND_MIC and the outer sections over GND_DIGITAL for a
+modem-domain debug signal. Cross-domain return and fixture timing need
+Review B. An independent CELL_USB_BOOT_TP grid proposal shares this
+channel and shorts to 081, so it was rejected.
 
 The 075 routes total 107.8935 mm and 15 new vias, including a 45.1553 mm
 1V8_MIC branch; they are routing experiments. Power integrity, microphone
