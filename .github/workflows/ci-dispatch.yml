@@ -38,6 +38,9 @@ jobs:
           retention-days: 30
   pcb-main-candidate-075:
     if: github.ref == 'refs/heads/feature/pcb-main-completion' || github.head_ref == 'feature/pcb-main-completion'
+    concurrency:
+      group: pcb-main-candidate-feature-p2
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -283,7 +286,7 @@ jobs:
           if ! git diff --cached --quiet; then
             git -c user.name='github-actions[bot]' \
                 -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
-                commit -m 'PCB-MAIN: record native KiCad 9 candidate 089 (26 open, ERC 0)'
+                commit -m 'PCB-MAIN: record native KiCad 9 latest P2 candidate'
             for attempt in 1 2 3 4 5; do
               if git push origin HEAD:feature/pcb-main-completion; then
                 exit 0
