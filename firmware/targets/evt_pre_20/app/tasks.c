@@ -477,6 +477,7 @@ static zs_command_journal_io_t nor_command_io;
 static zs_event_outbox_io_t nor_outbox_io;
 static zs_boot_counter_t boot_counter;
 static bool stores_on_nor;
+
 static bool ram_read(void *ctx, uint8_t slot, uint32_t off, uint8_t *d, size_t n) {
   const size_t bytes = ctx == cfg_slots ? ZS_STATION_CONFIG_SLOT_BYTES : ZS_INSTALLATION_STORE_SLOT_BYTES;
   if (slot >= 2u || off + n > bytes) return false;
