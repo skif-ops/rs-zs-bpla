@@ -1,0 +1,18 @@
+{
+  "schema": "dioneya-pcb-main-u3-power-076-v1",
+  "base_sha256": "749c67134365db87fd4cbf85cd32fab94bb88f07c7aaa6b50065f1b6a518b9d5",
+  "candidate_sha256": "df2aaafb3e9195c3cc8ac3b03e60f099b527eb0f7fc0447fa3216ab6fa44e64f",
+  "change": "U3.6 ground via moved 0.05 mm and reduced to 0.25/0.15 mm; U3.2 to U3.9 local 3V3 F.Cu 0.15 mm, 1.525 mm",
+  "candidate_only_via_rules": true,
+  "review_b": "OPEN",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 40,
+    "candidate_unconnected": 39,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}
