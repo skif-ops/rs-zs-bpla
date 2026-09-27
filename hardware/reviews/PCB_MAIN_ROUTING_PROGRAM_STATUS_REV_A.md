@@ -1,4 +1,4 @@
-# PCB-MAIN routing program — status after the autorouting sessions (Rev A, 2026-09-26)
+# PCB-MAIN routing program — status after the autorouting sessions (Rev A, 2026-09-27)
 
 Not a candidate for application yet; nothing here changes the authoritative board (`30c6c93e…`, applied 003).
 
@@ -53,6 +53,7 @@ Not a candidate for application yet; nothing here changes the authoritative boar
 | 045 + GNSS_ANT_SHORT_N U5 branch 046 (`59d2b0f0…`) | **95** | **0 under the same candidate rules; GNSS bias/RF coupling and via DFM review open** |
 | 046 + GNSS_ANT_BIAS_RAW R61 branch 047 (`6658aedb…`) | **94** | **0 under the same candidate rules; bias-current/RF isolation and via DFM review open** |
 | 047 + GNSS_ANT_SWITCHED R62 branch 048 (`2dee54ef…`) | **93** | **0 under the same candidate rules; GNSS bias/RF coupling and via-in-pad DFM review open** |
+| 048 + local 3V3_DIGITAL In3 bridge 049 (`ca3381d9…`) | **92** | **0 under the same candidate rules; power/return and small-via DFM review open** |
 
 At the end of the autorouting experiments P2 was the best clean result (156 open, 0 new errors, 22 dangling fan-out
 vias to clean); it is built from
@@ -120,13 +121,13 @@ Conclusion: seven autorouting variants converge to 155–160 open connections. T
 (KiCad push-and-shove by a layout engineer, or a generalised version of the 003 router in net groups).
 Tools: `tools/apply_pcb_routing_relief_p1_rev_a.py`, `tools/apply_pcb_routing_fanout_p2_rev_a.py`.
 
-## 7. Bounded local routes 007–048 and current stop (2026-09-26)
+## 7. Bounded local routes 007–049 and current stop (2026-09-27)
 
-The cumulative 048 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
+The cumulative 049 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
 authoritative board. The unchanged general PCB-MAIN project rejects the 0.25/0.15 mm vias introduced in 009 and 010 (five each of
 `annular_width`, `drill_out_of_range`, `via_diameter`). Under an explicit *candidate-only* JLCPCB six-layer process
 overlay (`min_via_diameter=0.25`, `min_through_hole_diameter=0.15`, `min_via_annular_width=0.05`), KiCad 9 comparative
-DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110→109→108→107→106→105→104→103→102→101→100→99→98→97→96→95→94→93 open with zero new violations at each accepted step. Candidate projects,
+DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110→109→108→107→106→105→104→103→102→101→100→99→98→97→96→95→94→93→92 open with zero new violations at each accepted step. Candidate projects,
 comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` directories. The published six-layer process basis is `https://jlcpcb.com/6-layer-pcb` (minimum
 0.15/0.25 mm and via-in-pad option); a job-specific acceptance is still required.
 
@@ -277,13 +278,19 @@ comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` dire
   at (52.8, 51.25) and a 0.7 mm B.Cu link; DRC 94→93. The Q4.3
   branch remains open. GNSS bias/RF coupling and filled/capped
   via-in-pad DFM require Review B.
+- 049: join two `3V3_DIGITAL` F.Cu islands near U1 with a 2.569 mm,
+  0.15 mm In3.Cu segment, two 0.25/0.15 mm through vias and a 0.125 mm,
+  0.25 mm F.Cu exit. The nearest In4.Cu reference is GND_DIGITAL along
+  the entire inner segment. Native KiCad 9 comparative DRC 93→92 with no
+  new violations (Actions run 36289895793). The narrow power segment,
+  return/current budget and small-via DFM remain open for Review B.
 
-Remaining 93 open connections span 62 nets: `3V3_DIGITAL` 11, `1V8_MIC` 8, `AAD_CFG_1V8_FANOUT` 5,
+Remaining 92 open connections span 62 nets: `3V3_DIGITAL` 10, `1V8_MIC` 8, `AAD_CFG_1V8_FANOUT` 5,
 `SIM2_DET` 3, and 66 others. Of 34 distinct U1 pads now appearing in the open-connection report, the earlier 009
 first-pass 0.25/0.15 mm via-in-pad clearance scan admitted only 13 of 40; most others hit existing B.Cu/In3 copper. A clean
 route requires placement/rip-up and local power/return design, followed by native DRC and SI/PI review.
 
-Do not copy 048 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
+Do not copy 049 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
 
 ## 8. Locality scan and relief targets through 040
 
