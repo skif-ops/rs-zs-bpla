@@ -1,0 +1,21 @@
+{
+  "schema": "dioneya-pcb-main-pad-stubs-103-v1",
+  "base_sha256": "e3239975dbb043d15ce43d7e3fae415957cc423b7a553a0bdab8af631b400799",
+  "candidate_sha256": "a347c8dd632b18c26bbca7710cd673009f31918f15b141a3c8b637d48e068087",
+  "removed_redundant_vias": 3,
+  "removed_segments": 2,
+  "trimmed_segments": 1,
+  "via_dangling_before": 10,
+  "via_dangling_after": 7,
+  "drc": {
+    "base_unconnected": 15,
+    "candidate_unconnected": 15,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
