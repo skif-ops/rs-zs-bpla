@@ -1,0 +1,43 @@
+{
+  "schema": "dioneya-pcb-main-1v8-mic-jpwr-c20-055-v1",
+  "base_sha256": "86ea2df63d68972957a503ee1e6717ce4e8a30a605e61d42078c38d0fc8f029e",
+  "candidate_sha256": "b8dcaef544942542264b4165df0748a6f6a50920406141d90fbbd1ec761d3847",
+  "route_points": [
+    [
+      8.92,
+      17.5
+    ],
+    [
+      10.7,
+      21.7
+    ],
+    [
+      10.7,
+      23.7
+    ],
+    [
+      11.1,
+      24.4
+    ],
+    [
+      14.05,
+      26.0
+    ]
+  ],
+  "track_segments": 4,
+  "track_width_mm": 0.3,
+  "route_length_mm": 10.7238,
+  "new_vias": 0,
+  "in1_gnd_digital_reference_fraction": 1.0,
+  "in2_gnd_mic_reference_fraction": 1.0,
+  "mic_supply_current_and_return_review_b": "OPEN",
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 87,
+    "candidate_unconnected": 86,
+    "new_by_type": {},
+    "new_errors": 0
+  }
+}
