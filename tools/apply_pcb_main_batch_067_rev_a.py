@@ -231,6 +231,7 @@ def main() -> None:
         record = json.loads((OUT / 'SUMMARY.json').read_text())
         assert CANDIDATE.read_text() == build()
         assert record['candidate_sha256'] == sha(CANDIDATE)
+        assert not record['drc']['new_by_type']
         assert record['drc']['new_errors'] == record['drc']['erc_errors'] == record['drc']['erc_violations'] == 0
         assert record['drc']['candidate_unconnected'] < record['drc']['base_unconnected']
         print('PCB-MAIN batch 067: PASS', record['drc'])
@@ -253,6 +254,7 @@ def main() -> None:
                'applied_to_authoritative_board': False, 'manufacturing_release': False,
                'drc': drc}
     (OUT / 'SUMMARY.json').write_text(json.dumps(summary, indent=2) + '\n')
+    assert not drc['new_by_type'], drc
     assert drc['new_errors'] == drc['erc_errors'] == drc['erc_violations'] == 0
     assert drc['candidate_unconnected'] < drc['base_unconnected'], drc
     print(summary)
