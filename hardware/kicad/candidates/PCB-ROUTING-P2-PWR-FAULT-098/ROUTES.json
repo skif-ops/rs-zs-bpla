@@ -1,0 +1,440 @@
+{
+  "schema": "dioneya-pcb-main-route-098-v1",
+  "base_candidate": 97,
+  "removed_tracks": [
+    {
+      "net": "NOR_CLK_U1",
+      "layer": "B.Cu",
+      "width": 0.15,
+      "start": [
+        55.5,
+        24.5
+      ],
+      "end": [
+        54.8,
+        23.45
+      ]
+    },
+    {
+      "net": "NOR_CLK_U1",
+      "layer": "B.Cu",
+      "width": 0.15,
+      "start": [
+        54.8,
+        23.45
+      ],
+      "end": [
+        54.7,
+        22.95
+      ]
+    },
+    {
+      "net": "NOR_CLK_U1",
+      "layer": "B.Cu",
+      "width": 0.15,
+      "start": [
+        54.7,
+        22.95
+      ],
+      "end": [
+        54.8,
+        19.75
+      ]
+    }
+  ],
+  "items": [
+    {
+      "kind": "via",
+      "layer": null,
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.25,
+      "points_mm": [
+        [
+          55,
+          22.1
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "layer": null,
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.25,
+      "points_mm": [
+        [
+          27.3,
+          22.6
+        ]
+      ]
+    },
+    {
+      "kind": "track",
+      "layer": "B.Cu",
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.15,
+      "points_mm": [
+        [
+          55.0,
+          22.1
+        ],
+        [
+          54.2,
+          22.1
+        ],
+        [
+          53.6,
+          21.5
+        ],
+        [
+          53.0,
+          21.5
+        ],
+        [
+          52.5,
+          21.0
+        ],
+        [
+          52.5,
+          20.8
+        ],
+        [
+          52.6,
+          20.7
+        ],
+        [
+          52.6,
+          19.4
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "layer": null,
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.25,
+      "points_mm": [
+        [
+          52.6,
+          19.4
+        ]
+      ]
+    },
+    {
+      "kind": "track",
+      "layer": "In3.Cu",
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.15,
+      "points_mm": [
+        [
+          52.6,
+          19.4
+        ],
+        [
+          48.6,
+          15.4
+        ],
+        [
+          48.6,
+          15.3
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "layer": null,
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.25,
+      "points_mm": [
+        [
+          48.6,
+          15.3
+        ]
+      ]
+    },
+    {
+      "kind": "track",
+      "layer": "F.Cu",
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.15,
+      "points_mm": [
+        [
+          48.6,
+          15.3
+        ],
+        [
+          45.8,
+          18.1
+        ],
+        [
+          45.8,
+          18.5
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "layer": null,
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.25,
+      "points_mm": [
+        [
+          45.8,
+          18.5
+        ]
+      ]
+    },
+    {
+      "kind": "track",
+      "layer": "In3.Cu",
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.15,
+      "points_mm": [
+        [
+          45.8,
+          18.5
+        ],
+        [
+          45.7,
+          18.4
+        ],
+        [
+          45.7,
+          18.3
+        ],
+        [
+          45.5,
+          18.1
+        ],
+        [
+          45.4,
+          18.1
+        ],
+        [
+          45.3,
+          18.0
+        ],
+        [
+          38.3,
+          18.0
+        ],
+        [
+          38.2,
+          18.1
+        ],
+        [
+          37.6,
+          18.1
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "layer": null,
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.25,
+      "points_mm": [
+        [
+          37.6,
+          18.1
+        ]
+      ]
+    },
+    {
+      "kind": "track",
+      "layer": "B.Cu",
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.15,
+      "points_mm": [
+        [
+          37.6,
+          18.1
+        ],
+        [
+          37.2,
+          18.1
+        ],
+        [
+          36.9,
+          17.8
+        ],
+        [
+          36.7,
+          17.8
+        ],
+        [
+          36.6,
+          17.7
+        ],
+        [
+          36.5,
+          17.8
+        ],
+        [
+          36.4,
+          17.8
+        ],
+        [
+          35.8,
+          18.4
+        ],
+        [
+          32.6,
+          18.4
+        ],
+        [
+          32.5,
+          18.5
+        ],
+        [
+          32.4,
+          18.5
+        ],
+        [
+          31.8,
+          19.1
+        ],
+        [
+          31.7,
+          19.1
+        ],
+        [
+          31.6,
+          19.2
+        ],
+        [
+          31.5,
+          19.2
+        ],
+        [
+          31.1,
+          19.6
+        ],
+        [
+          30.7,
+          19.6
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "layer": null,
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.25,
+      "points_mm": [
+        [
+          30.7,
+          19.6
+        ]
+      ]
+    },
+    {
+      "kind": "track",
+      "layer": "F.Cu",
+      "net": "PWR_FAULT",
+      "width_or_size_mm": 0.15,
+      "points_mm": [
+        [
+          30.7,
+          19.6
+        ],
+        [
+          30.4,
+          19.9
+        ],
+        [
+          30.1,
+          19.9
+        ],
+        [
+          30.0,
+          20.0
+        ],
+        [
+          29.8,
+          20.0
+        ],
+        [
+          27.4,
+          22.4
+        ]
+      ]
+    },
+    {
+      "kind": "track",
+      "layer": "In3.Cu",
+      "net": "NOR_CLK_U1",
+      "width_or_size_mm": 0.15,
+      "points_mm": [
+        [
+          55.5,
+          24.4
+        ],
+        [
+          55.5,
+          21.5
+        ],
+        [
+          55.4,
+          21.4
+        ],
+        [
+          55.4,
+          21.3
+        ],
+        [
+          55.3,
+          21.2
+        ],
+        [
+          55.3,
+          21.0
+        ],
+        [
+          55.2,
+          20.9
+        ],
+        [
+          55.2,
+          20.8
+        ],
+        [
+          55.1,
+          20.7
+        ],
+        [
+          55.1,
+          20.6
+        ],
+        [
+          55.0,
+          20.5
+        ],
+        [
+          55.0,
+          20.4
+        ],
+        [
+          54.9,
+          20.3
+        ],
+        [
+          54.9,
+          20.2
+        ],
+        [
+          54.8,
+          20.1
+        ],
+        [
+          54.8,
+          19.9
+        ],
+        [
+          54.7,
+          19.8
+        ]
+      ]
+    }
+  ],
+  "intent": "Connect PWR_FAULT while restoring NOR_CLK_U1 on In3.Cu; candidate only."
+}
