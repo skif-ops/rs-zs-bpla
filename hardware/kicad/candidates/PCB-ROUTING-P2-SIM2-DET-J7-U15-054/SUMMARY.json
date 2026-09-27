@@ -1,0 +1,54 @@
+{
+  "schema": "dioneya-pcb-main-sim2-det-j7-u15-054-v1",
+  "base_sha256": "7ca19333121d06c5c35b15cf8d4ca4039336f503bf7e5752f4ba9f2b5c81467a",
+  "candidate_sha256": "86ea2df63d68972957a503ee1e6717ce4e8a30a605e61d42078c38d0fc8f029e",
+  "route_points": [
+    [
+      59.875,
+      12.905
+    ],
+    [
+      60.7,
+      12.3
+    ],
+    [
+      62.0,
+      11.9
+    ],
+    [
+      63.3,
+      10.3
+    ],
+    [
+      63.7,
+      10.0
+    ],
+    [
+      70.1,
+      10.0
+    ],
+    [
+      73.5,
+      11.1
+    ],
+    [
+      74.305,
+      11.5
+    ]
+  ],
+  "track_segments": 7,
+  "track_width_mm": 0.15,
+  "route_length_mm": 15.8172,
+  "new_vias": 0,
+  "in1_gnd_digital_reference_fraction": 1.0,
+  "sim_detect_return_review_b": "OPEN",
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 88,
+    "candidate_unconnected": 87,
+    "new_by_type": {},
+    "new_errors": 0
+  }
+}
