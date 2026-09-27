@@ -39,6 +39,8 @@ jobs:
   pcb-main-candidate-075:
     if: github.ref == 'refs/heads/feature/pcb-main-completion' || github.head_ref == 'feature/pcb-main-completion'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     container:
       image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
       options: --user root
@@ -47,6 +49,8 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: feature/pcb-main-completion
       - name: Install candidate geometry dependencies
         run: |
           apt-get -o APT::Update::Error-Mode=any update
@@ -63,3 +67,15 @@ jobs:
         with:
           name: pcb-main-candidate-075
           path: hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/
+      - name: Commit verified candidate evidence to feature branch
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git add hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/PCB-MAIN_P2_ASTAR_075_CANDIDATE_REV_A.kicad_pcb \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/PCB-MAIN_P2_ASTAR_075_CANDIDATE_REV_A.kicad_pro \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/{SUMMARY,drc_candidate,erc_candidate}.json
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' \
+                -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+                commit -m 'PCB-MAIN: record native KiCad 9 candidate 075 (40 open, ERC 0)'
+            git push origin HEAD:feature/pcb-main-completion
+          fi
