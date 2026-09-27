@@ -1,0 +1,24 @@
+{
+  "schema": "dioneya-pcb-main-r4-relief-086-v1",
+  "base_sha256": "620aabcbffe095401edae7084f1fd026ca266a2411281e05f2dea495175eeeb9",
+  "candidate_sha256": "f529508ae13d3715c245b0dfce5165aafe21ad0c1e45ba88b6cb2caa9e30d30b",
+  "route": {
+    "net": "3V3_DIGITAL",
+    "track_length_mm": 4.028,
+    "new_segments": 8,
+    "new_vias": 2,
+    "removed_redundant_gnd_digital_stitch_vias": 1
+  },
+  "drc": {
+    "base_unconnected": 30,
+    "candidate_unconnected": 29,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: removed GND_DIGITAL stitch near R4, power return, two small vias/DFM",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
