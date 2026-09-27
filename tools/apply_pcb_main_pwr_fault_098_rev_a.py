@@ -30,7 +30,7 @@ def build() -> tuple[str, dict]:
     assert spec['schema'] == 'dioneya-pcb-main-route-098-v1' and spec['base_candidate'] == 97
     text = BOARD.read_text()
     nets = {name: int(code) for code, name in re.findall(r'^  \(net (\d+) "([^"]*)"\)', text, re.M)}
-    assert len(spec['removed_tracks']) == 3 and len(spec['items']) == 14
+    assert len(spec['removed_tracks']) == 3 and len(spec['items']) == 13
     removals = {(q['net'], q['layer'], q['width'], tuple(q['start']), tuple(q['end']))
                 for q in spec['removed_tracks']}
     assert len(removals) == 3 and all(n == 'NOR_CLK_U1' and l == 'B.Cu' for n, l, *_ in removals)
@@ -70,7 +70,7 @@ def build() -> tuple[str, dict]:
                              f'(width 0.15) (layer "{layer}") (net {nets[net]}) '
                              f'(tstamp {uuid.uuid5(uuid.NAMESPACE_URL, f"098|{index}|{n}|{a}|{b}")}))')
                 counts['new_segments'] += 1
-    assert counts['new_segments'] == 56 and counts['new_vias'] == 7
+    assert counts['new_segments'] == 56 and counts['new_vias'] == 6
     at = text.index('\n', text.rfind('  (segment ')) + 1
     return text[:at] + '\n'.join(lines) + '\n' + text[at:], {**counts, 'length_mm': round(length, 3)}
 
