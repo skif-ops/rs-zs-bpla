@@ -627,6 +627,20 @@ timing/skew, return, ESD placement and via DFM need Review B.
 Filled-board DRC went 28→27 without new violations, ERC zero. The
 combined 087–088 SDIO length, skew and return require Review B.
 
+Post-088 probes examined all 27 remaining airwires: the unmodified
+0.15/0.25 mm grid router found **zero** directly routeable gaps.
+Six R89 placement experiments for the adjacent SD_D0_CARD channel
+created two open connections at R89 and 4–16 new DRC errors apiece,
+so none was adopted. Removing eleven local LORA_DIO1 In3 segments
+did not yield an alternate path around a prospective U1.27 3V3 via.
+A single-neighbor rip-up screen found only obstructed or long
+routes (for example GNSS_TX_U1 69–79 mm with 9–10 vias and
+LORA_SCK_U1 51–64 mm with 5–8 vias). The PDM_DATA2 virtual
+U1 via at (52.5, 22.1) mm conflicts with NRST and BOOT0 copper
+and was rejected before native DRC. The next routing work needs
+coordinated placement relief and rerouting in the U1, SDIO and
+power corridors; the accepted candidate remains 088 with 27 open.
+
 The 075 routes total 107.8935 mm and 15 new vias, including a 45.1553 mm
 1V8_MIC branch; they are routing experiments. Power integrity, microphone
 noise, LoRa return path, and via-in-pad/finished-drill DFM require Review B.
