@@ -1,0 +1,59 @@
+{
+  "schema": "dioneya-pcb-main-cell-dbg-txd-tp-063-v1",
+  "base_sha256": "ae099f301e6dff1d93cb67141d0b28c416d8cad86b6f46eb120c9e2d0553be43",
+  "candidate_sha256": "02147cb8e1af7ef426a69e54dd47da0538160ac2944df346d8e704f97de8a121",
+  "net": "CELL_DBG_TXD_TP",
+  "routes": [
+    {
+      "layer": "In3.Cu",
+      "points": [
+        [
+          46.474,
+          31.7499
+        ],
+        [
+          47.9,
+          31.4
+        ]
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "points": [
+        [
+          47.9,
+          31.4
+        ],
+        [
+          49.54,
+          30.0
+        ]
+      ]
+    }
+  ],
+  "track_width_mm": 0.15,
+  "new_vias": 1,
+  "via_position_mm": [
+    47.9,
+    31.4
+  ],
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "route_length_mm": 3.6246,
+  "reference_outline_fraction": 1.0,
+  "testpoint_access_review_b": "OPEN",
+  "small_via_dfm": "OPEN",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 79,
+    "candidate_unconnected": 78,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}

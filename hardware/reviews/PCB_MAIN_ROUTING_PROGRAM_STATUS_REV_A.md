@@ -63,6 +63,7 @@ Not a candidate for application yet; nothing here changes the authoritative boar
 | 055 + U22→U21/J_MIC3 AAD_CFG bridge 056 (`eb40e9a6…`) | **85** | **0 under the same candidate rules; AAD return/audio coupling Review B open** |
 | 060 + C54/J6→R50 SIM1_RST_CONN In3.Cu bridge 061 (`b733b350…`) | **80** | **0 under the same candidate rules; SIM return and small-via DFM Review B open** |
 | 061 + C10/C11 VREF bypass net correction and two local 3V3 F.Cu links 062 (`ae099f30…`) | **79** | **0; nine-sheet ERC 0; analog-reference decoupling Review B open** |
+| 062 + CELL_DBG_TXD_TP test-pad branch 063 (`02147cb8…`) | **78** | **0; nine-sheet ERC 0; test-pad return/DFM Review B open** |
 
 At the end of the autorouting experiments P2 was the best clean result (156 open, 0 new errors, 22 dangling fan-out
 vias to clean); it is built from
@@ -130,13 +131,13 @@ Conclusion: seven autorouting variants converge to 155–160 open connections. T
 (KiCad push-and-shove by a layout engineer, or a generalised version of the 003 router in net groups).
 Tools: `tools/apply_pcb_routing_relief_p1_rev_a.py`, `tools/apply_pcb_routing_fanout_p2_rev_a.py`.
 
-## 7. Bounded local routes 007–062 and current stop (2026-09-27)
+## 7. Bounded local routes 007–063 and current stop (2026-09-27)
 
-The cumulative 062 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
+The cumulative 063 is the lowest comparative-DRC-clean routing experiment on this branch. It is **not applied** to the
 authoritative board. The unchanged general PCB-MAIN project rejects the 0.25/0.15 mm vias introduced in 009 and 010 (five each of
 `annular_width`, `drill_out_of_range`, `via_diameter`). Under an explicit *candidate-only* JLCPCB six-layer process
 overlay (`min_via_diameter=0.25`, `min_through_hole_diameter=0.15`, `min_via_annular_width=0.05`), KiCad 9 comparative
-DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110→109→108→107→106→105→104→103→102→101→100→99→98→97→96→95→94→93→92→91→90→89→88→87→86→85→84→83→82→81→80→79 open with zero new violations at each accepted step. Candidate projects,
+DRC is 146→142→141→140→139→138→131→129→127→124→122→121→120→119→118→117→116→115→114→113→112→111→110→109→108→107→106→105→104→103→102→101→100→99→98→97→96→95→94→93→92→91→90→89→88→87→86→85→84→83→82→81→80→79→78 open with zero new violations at each accepted step. Candidate projects,
 comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` directories. The published six-layer process basis is `https://jlcpcb.com/6-layer-pcb` (minimum
 0.15/0.25 mm and via-in-pad option); a job-specific acceptance is still required.
 
@@ -390,13 +391,23 @@ comparative DRC and generators are in the corresponding `PCB-ROUTING-P2-*/` dire
   with no new errors (Actions run 36305521530). The exact passive-support
   and routing-authority delta is staged but unapplied. Analog-reference
   decoupling and the remaining 3V3 connections need Review B.
+- 063: connect the `CELL_DBG_TXD_TP` run's existing through via at
+  (46.474, 31.7499) to a new 0.25/0.15 mm through via at (47.9, 31.4)
+  with 1.4683 mm of 0.15 mm In3.Cu trace, then 2.1563 mm of B.Cu trace
+  to TP_CELL_DBG.2. The route is within the In1.Cu GND_DIGITAL,
+  In2.Cu GND_MIC and In4.Cu GND_DIGITAL zone outlines. Native KiCad 9
+  full-hierarchy ERC is 0; filled-board comparative DRC is 79→78 with
+  no new errors or schematic-parity differences (Actions run 36306717954).
+  The nearest GND_DIGITAL stitching via to the new transition is about
+  3.0 mm; test-pad access, mixed-domain return and small-via DFM remain
+  Review B items.
 
-Remaining 79 open connections span 58 nets: `3V3_DIGITAL` 6, `1V8_MIC` 6, `AAD_CFG_1V8_FANOUT` 4,
-`SIM2_DET` 1, and 62 others. The earlier 009
+Remaining 78 open connections span 57 nets: `3V3_DIGITAL` 6, `1V8_MIC` 6, `AAD_CFG_1V8_FANOUT` 4,
+`SIM2_DET` 1, and 61 others. The earlier 009
 first-pass 0.25/0.15 mm via-in-pad clearance scan admitted only 13 of 40; most others hit existing B.Cu/In3 copper. A clean
 route requires placement/rip-up and local power/return design, followed by native DRC and SI/PI review.
 
-Do not copy 062 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
+Do not copy 063 to `hardware/kicad/native/PCB-MAIN`: Review B, complete connectivity, SI/PI/DFM and CAM are open.
 
 ## 8. Locality scan and relief targets through 040
 
@@ -418,10 +429,10 @@ Near-term layout relief targets from the same scan:
 | U23.4→SD_CMD_CARD run, 2.85 mm | Addressed by local ground relocation and In3.Cu route in candidate 051; return-path and via-in-pad DFM Review B remain open. |
 | FB1.2→3V8_MODEM_BB, 3.68 mm | The now-connected 3V8_MODEM B.Cu feed lies between FB1.2 and the existing BB run. On In3.Cu the long CELL_USB_VBUS trace at x≈37.57 blocks a short direct power branch. Needs power-channel relief with burst-current and PI assessment. |
 
-The B.Cu test-pad search likewise found no further clean direct pad-to-existing-via
-join; the short CELL_DBG_TXD_TP candidate from TP_CELL_DBG.2 to the existing
-via at (46.474, 31.7499) is blocked by NOR_IO3_U1 and has no unobstructed
-local B.Cu detour in the sampled corridor. Manual push-and-shove, selective
+The B.Cu test-pad search found no clean direct pad-to-existing-via
+join; the direct CELL_DBG_TXD_TP run from TP_CELL_DBG.2 to the existing
+via at (46.474, 31.7499) was blocked by NOR_IO3_U1. Candidate 063
+uses a new via and a short In3.Cu link to close this branch. Manual push-and-shove, selective
 rip-up and U1 breakout remain the critical path to zero open connections.
 
 After 041, a 0.15 mm grid search of the F.Cu-only open pairs within 12 mm
