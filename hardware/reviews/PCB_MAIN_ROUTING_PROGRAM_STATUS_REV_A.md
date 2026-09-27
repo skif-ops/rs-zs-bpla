@@ -522,7 +522,7 @@ The `GNSS_ANT_SWITCHED` Q4.3 leg has only a roughly 14.7 mm In3.Cu
 or 23.6 mm B.Cu detour to the existing through via in the sampled
 channel. It remains open pending shorter RF-bias-network layout relief.
 
-## 9. Native KiCad 9 continuation through candidate 100 (2026-09-27)
+## 9. Native KiCad 9 continuation through candidate 101 (2026-09-27)
 
 Draft PR #93, branch `feature/pcb-main-completion`, retains PCB-MAIN 003 as the
 authoritative board. Comparative filled-board KiCad 9.0.9 checks under the
@@ -560,6 +560,7 @@ candidate-only 0.25/0.15 mm via rules gave:
 | 098, PWR_FAULT with NOR_CLK_U1 relocation | **17** | **0** | **0** |
 | 099, CELL_PWRKEY_CMD with LORA_BUSY relocation | **16** | **0** | **0** |
 | 100, PDM_DATA2_1V8 with NRST relocation | **15** | **0** | **0** |
+| 101, remove six one-layer via barrels | **15** | **0** | **0** |
 
 076 moves the existing GND_DIGITAL via next to U3.6 from
 (66.099999, 30.600) to (66.099999, 30.650) mm and changes it from
@@ -684,6 +685,13 @@ uses 66.890 mm of 0.15 mm copper and eight 0.25/0.15 mm vias.
 Native filled-board KiCad 9.0.9 DRC went 16→15 without new violations;
 ERC remains zero. Audio skew/return, reset integrity and via-in-pad
 assembly remain Review B/DFM holds.
+
+101 removes six redundant vias connected on F.Cu alone. Native KiCad
+filled-board DRC keeps 15 opens, reduces `via_dangling` 18→12, adds no
+new violation, and leaves ERC at zero. The removed barrels were at
+F.Cu junctions or through-running track sections; the copper traces
+remain. This is candidate-only cleanup; the other 12 one-layer tails,
+three track-dangling warnings, and silkscreen warnings remain.
 
 Post-088 probes examined all 27 remaining airwires: the unmodified
 0.15/0.25 mm grid router found **zero** directly routeable gaps.
