@@ -366,6 +366,9 @@ class DetectorHealth(BaseModel):
     watchdog_missed_tasks: int = 0
     # key 14: version of the runtime parameter set in force (ICD addendum D, CMD_SET_PARAMS; 0 = defaults)
     params_version: int = Field(default=0, ge=0, le=0xFFFFFFFF)
+    # key 15: self-tests whose last run failed, bit = self-test id (firmware zs_selftest_id_t: 1 power/INA226,
+    # 4 microphone capture, 5 microphone alignment, 7 GNSS PPS, 12 RTC LSE, ...); 0 = none
+    selftest_failed_tests: int = Field(default=0, ge=0, le=0xFFFF)
 
 
 class HeartbeatMessage(BaseModel):

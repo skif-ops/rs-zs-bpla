@@ -42,7 +42,8 @@ typedef enum {
   ZS_MODE_EV_SERVICE_BUTTON,   /* button held for the service hold time */
   ZS_MODE_EV_SERVICE_EXIT,     /* service session closed by the phone or engineer */
   ZS_MODE_EV_BATTERY_CRITICAL, /* below shutdown threshold */
-  ZS_MODE_EV_FAULT             /* unrecoverable fault reported by a task */
+  ZS_MODE_EV_FAULT,            /* unrecoverable fault reported by a task */
+  ZS_MODE_EV_BOOT_FAILED       /* a required self-test failed: report and take commands, no detection (see below) */
 } zs_mode_event_t;
 
 typedef struct {
@@ -82,11 +83,18 @@ typedef struct {
   uint32_t last_comms_at_ms;
   bool outbox_pending;
   bool comms_requested;
+  bool selftest_failed;          /* BOOT_FAILED seen and no BOOT_DONE since: S1/S2 are closed, S3/S4 return to S0 */
   uint32_t fault_code;
   zs_mode_transition_t journal[ZS_MODE_JOURNAL_DEPTH];
   uint8_t journal_head;
   uint8_t journal_count;
 } zs_mode_scheduler_t;
+
+/* Failed self-test (BOOT_FAILED): the station stays reachable but does not detect.  The first BOOT_FAILED requests a
+ * session at once (with boot_session, the default) so the verdict and the reset cause reach the server and queued
+ * commands (REBOOT, SET_PARAMS) are delivered; after that the station cycles S0 -> S3 (heartbeat, outbox, commands)
+ * -> S0 and S4 on the service button.  MIC_WAKE is ignored, so a broken microphone path cannot wake the detector.
+ * A later BOOT_DONE (a repeated self-test passed) clears the state and starts the normal boot path. */
 
 /* Default policy for the pilot: listen 3 s, DSP 20 s, comms 180 s, heartbeat 6 h, service 10 min, min sleep 2 s. */
 zs_mode_policy_t zs_mode_policy_default(void);

@@ -71,6 +71,10 @@ zs_selftest_code_t zs_selftest_run_one(zs_selftest_registry_t *r, uint8_t id, ui
 
 bool zs_selftest_required_ok(const zs_selftest_registry_t *r);
 
+/* Bit `id` set for every registered test whose last result is FAIL or TIMEOUT, required or not (the heartbeat's
+   detector map, key 15): the operator sees which interface failed, not only the verdict. */
+uint16_t zs_selftest_failed_mask(const zs_selftest_registry_t *r);
+
 /* CBOR map {id: [code, detail]} over registered tests, keys ascending; returns bytes or 0 if cap too small. */
 size_t zs_selftest_encode(const zs_selftest_registry_t *r, uint8_t *buf, size_t cap);
 

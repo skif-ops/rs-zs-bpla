@@ -167,6 +167,7 @@ def main() -> int:
                 "audio_requested": audio_requested, "audio_chunks": audio_chunks, "audio_duplicates": audio_duplicates,
                 "audio_segments": audio_segments,
                 "last_heartbeat": heartbeats[-1] if heartbeats else None,
+                "heartbeat_self_test_ok": [h["self_test_ok"] for h in heartbeats],
                 "events": detections[:20],
             }
             out.write("REPORT " + json.dumps(report) + "\n"); out.flush()
@@ -224,7 +225,7 @@ def main() -> int:
                     out.write("OK\n"); out.flush()
             elif kind == "status":
                 h = cbor_codec.decode_heartbeat_cbor(payload)
-                heartbeats.append({"time_us": h.time_us, "battery_pct": h.power.battery_pct, "battery_mv": h.power.battery_mv,
+                heartbeats.append({"time_us": h.time_us, "battery_pct": h.power.battery_pct, "battery_mv": h.power.battery_mv, "self_test_ok": h.self_test_ok,
                                    "detector": (h.detector.model_dump() if getattr(h, "detector", None) else None)})
                 out.write("OK\n"); out.flush()
             else:

@@ -108,13 +108,16 @@ static void console_printf(const char *fmt, ...) {
 }
 
 /* ---- self-tests bound to the B1 hardware ----------------------------------- */
+/* The capture counters grow for the whole boot; a self-test judges the window it ran in (selftest_window below),
+   so one DMA overrun at boot does not fail every later retest. */
+static uint32_t st_blocks_base, st_overruns_base;
 static zs_selftest_code_t st_mic_capture(void *ctx, uint32_t *detail) {
   const zs_pdm_capture_t *c = ctx;
   int16_t min_peak = 32767;
-  if (c->blocks_processed < 10u) return ZS_ST_SKIPPED;
+  if (c->blocks_processed - st_blocks_base < 10u) return ZS_ST_SKIPPED;
   for (unsigned i = 0u; i < ZS_PDM_CHANNELS; i++) if (c->peak[i] < min_peak) min_peak = c->peak[i];
   *detail = (uint32_t)min_peak;
-  return (min_peak > 8 && c->overruns == 0u) ? ZS_ST_PASS : ZS_ST_FAIL;   /* dead channel or DMA overrun */
+  return (min_peak > 8 && c->overruns == st_overruns_base) ? ZS_ST_PASS : ZS_ST_FAIL;   /* dead channel or DMA overrun */
 }
 
 static zs_selftest_code_t st_mic_alignment(void *ctx, uint32_t *detail) {
@@ -334,6 +337,27 @@ static void params_apply(const zs_station_params_t *p) {
   gsm_probe_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_GSM_PROBE_S) * 1000u;
 }
 
+/* The self-test window: capture on for 300 ms (the microphone tests need blocks), every registered test, capture
+   back to what the mode wants.  At boot and, while a required test is failed, after every session: a transient
+   failure (a slow LSE start, a DMA overrun at boot) recovers without a site visit or a remote reboot.  At boot the
+   capture stays on (the first mode change applies the mode's power); a retest hands it back to the mode. */
+static bool selftest_window(bool restore) {
+  bool ok;
+  st_blocks_base = capture.blocks_processed;
+  st_overruns_base = capture.overruns;
+  bsp_gpio_mic_rail(true);
+  vTaskDelay(pdMS_TO_TICKS(50));                 /* 1V8_MIC settle before the PDM clock */
+  capture_set(true);
+  vTaskDelay(pdMS_TO_TICKS(300));                /* let the capture stabilise for the self-tests */
+  ok = zs_selftest_run_all(&selftests, xTaskGetTickCount());
+  console_printf("selftest: %s (failed mask 0x%04x)\r\n", ok ? "PASS" : "required test FAILED", (unsigned)zs_selftest_failed_mask(&selftests));
+  if (restore) {
+    bsp_gpio_mic_rail(zs_mode_power_for(modes.mode).mic_1v8);
+    capture_set(capture_wanted(modes.mode));
+  }
+  return ok;
+}
+
 static void supervisor_task_fn(void *arg) {
   zs_mode_t last = ZS_MODE_SHUTDOWN;
   uint32_t tamper_since = 0u;
@@ -342,15 +366,9 @@ static void supervisor_task_fn(void *arg) {
   zs_mode_init(&modes, NULL, xTaskGetTickCount());
   comms_max_base_ms = modes.policy.comms_max_ms;
   params_apply(app_commands_params());             /* the init reset the policy: re-apply the stored parameters */
-  bsp_gpio_mic_rail(true);
-  vTaskDelay(pdMS_TO_TICKS(50));                 /* 1V8_MIC settle before the PDM clock */
-  capture_set(true);
-  vTaskDelay(pdMS_TO_TICKS(300));                /* let the capture stabilise for the self-tests */
-  if (zs_selftest_run_all(&selftests, xTaskGetTickCount())) {
-    (void)zs_mode_on_event(&modes, ZS_MODE_EV_BOOT_DONE, xTaskGetTickCount());
-  } else {
-    console_printf("selftest: required test failed, staying in S0\r\n");
-  }
+  /* a failed required test does not silence the station: BOOT_FAILED reports it in a session at once and keeps it
+     reachable (heartbeat, commands, service) with the detector off; the test is repeated after every session */
+  (void)zs_mode_on_event(&modes, selftest_window(false) ? ZS_MODE_EV_BOOT_DONE : ZS_MODE_EV_BOOT_FAILED, xTaskGetTickCount());
   app_watchdog_start();
   console_printf("boot: reset cause %s%s, watchdog running (%lu s)\r\n", app_watchdog_reset_cause_name(),
                  app_watchdog_previous_missed() ? " - a supervised task had stopped" : "", (unsigned long)(APP_WATCHDOG_TIMEOUT_MS / 1000u));
@@ -386,6 +404,11 @@ static void supervisor_task_fn(void *arg) {
       if (last == ZS_MODE_S3_COMMS) comms_health_on_s3_exit(modes.journal[(modes.journal_head + ZS_MODE_JOURNAL_DEPTH - 1u) % ZS_MODE_JOURNAL_DEPTH].event == ZS_MODE_EV_COMMS_DONE);
       apply_power(modes.mode);
       last = modes.mode;
+      /* retest after a session while failed: a pass resumes the normal boot path (detection, a session saying so) */
+      if (modes.selftest_failed && modes.mode == ZS_MODE_S0_SLEEP && selftest_window(true)) {
+        console_printf("selftest: recovered, detection resumes\r\n");
+        (void)zs_mode_on_event(&modes, ZS_MODE_EV_BOOT_DONE, xTaskGetTickCount());
+      }
     }
   }
 }
@@ -534,6 +557,7 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->detector.reset_cause = app_watchdog_reset_cause();
   hb->detector.watchdog_missed = app_watchdog_previous_missed();
   hb->detector.params_version = app_commands_params()->version;
+  hb->detector.selftest_failed = zs_selftest_failed_mask(&selftests);
   return true;
 }
 /* The comms duty loop (app_comms_task's body, as the host simulation and the twin drive it) plus the watchdog

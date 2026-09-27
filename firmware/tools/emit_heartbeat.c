@@ -51,7 +51,7 @@ int main(void) {
   strcpy(message.firmware_ver, "evt-pre-20-test");
   strcpy(message.model_ver, "model-test");
   strcpy(message.hardware_rev, "EVT-PRE-20-Rev.A");
-  message.self_test_ok = true;
+  message.self_test_ok = false;               /* a required self-test failed: see detector key 15 */
   message.detector_present = true;
   message.detector.boot_id = 7u;
   message.detector.uptime_s = 3600u;
@@ -68,6 +68,7 @@ int main(void) {
   message.detector.reset_cause = 4u;          /* IWDG: the previous boot ended by the hardware watchdog */
   message.detector.watchdog_missed = 0x0020u;  /* task 5 had stopped checking in */
   message.detector.params_version = 3u;        /* runtime parameter set v3 (CMD_SET_PARAMS) */
+  message.detector.selftest_failed = 0x0010u;  /* mic_capture (id 4) failed */
 
   size = zs_protocol_encode_heartbeat(&message, encoded, sizeof(encoded));
   if (size == 0u || fwrite(encoded, 1u, size, stdout) != size) return 1;

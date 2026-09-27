@@ -15,6 +15,10 @@ Runs zs_station_twin with the Python server twin on the pipe and checks the serv
   3. remote commands (ICD addendum D): the server signs CMD_SET_PARAMS and CMD_REBOOT, the station verifies them
      against its wall clock, executes, acknowledges; the reboot happens after its ACK, the parameters survive it,
      and the same reboot redelivered is answered from the journal without a second reset.
+  4. a required self-test fails at boot: the station reports it in a session at once (self_test_ok false, the failed
+     test in the detector map), takes commands, and keeps the detector off although a drone flies by;
+  4b. the failure is transient: the test repeated after the boot session passes, detection resumes and the drone
+     is delivered; the server sees the verdict go from false to true.
 """
 from __future__ import annotations
 
@@ -116,6 +120,26 @@ def main() -> int:
     assert r["last_heartbeat"]["detector"]["params_version"] == 1, r["last_heartbeat"]   # the server sees the set in force
     print(f"scenario 3 (remote commands): sent {len(sent)}, acks {[a['result'] for a in acks]}, one reboot, params survived it, "
           f"reconnected after the reboot ({r['heartbeats']} heartbeats)")
+
+    # the microphone test fails for the whole run: reachable, commandable, but no detection despite the fly-by
+    log, r = run(["--scene", "drone", "--seconds", "140", "--seed", "3", "--selftest-fail-until", "100000", "--expect-commands", "1"],
+                 commands="set_params")
+    assert r["heartbeats"] >= 1 and r["heartbeat_self_test_ok"][0] is False, r["heartbeat_self_test_ok"]
+    assert r["last_heartbeat"]["detector"]["selftest_failed_tests"] == 1 << 4, r["last_heartbeat"]   # mic_capture (id 4)
+    assert [a["result"] for a in r["acks"]] == [0], r["acks"]                                         # SET_PARAMS OK
+    assert r["detections"] == 0 and "events emitted 0" in log and "-> S1_LISTEN" not in log and "-> S2_DSP" not in log
+    assert "selftest runs 2 recoveries 0" in log, "the test must be repeated after the session, once"
+    print(f"scenario 4 (failed self-test): reported at boot (mask 0x{r['last_heartbeat']['detector']['selftest_failed_tests']:04x}), "
+          f"command acked, detector off: {r['detections']} detections")
+
+    # a transient failure: the retest after the boot session passes and the fly-by is detected and delivered
+    log, r = run(["--scene", "drone", "--seconds", "140", "--seed", "3", "--selftest-fail-until", "5", "--receipt-latency", "2000",
+                  "--expect-events", "1", "--expect-delivered", "1"])
+    assert "selftest: recovered, detection resumes" in log and "recoveries 1" in log
+    oks = r["heartbeat_self_test_ok"]
+    assert oks[0] is False and oks[-1] is True, oks
+    assert r["last_heartbeat"]["detector"]["selftest_failed_tests"] == 0 and r["detections"] >= 1, r["last_heartbeat"]
+    print(f"scenario 4b (transient self-test failure): recovered after the boot session, heartbeats {oks}, detections {r['detections']}")
     return 0
 
 

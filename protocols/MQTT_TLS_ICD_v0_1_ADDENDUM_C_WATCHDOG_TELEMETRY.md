@@ -1,17 +1,37 @@
 # ICD GSM/LTE MQTT/TLS v0.1 — Addendum C: watchdog telemetry in the heartbeat (2026-09-25)
 
-Статус: DRAFT. Дополняет §3.2 (heartbeat schema 2, ключ 13 — карта детектора) ключами 12–14. Карта остаётся
+Статус: DRAFT. Дополняет §3.2 (heartbeat schema 2, ключ 13 — карта детектора) ключами 12–15. Карта остаётся
 необязательной; сервер читает её с умолчаниями, поэтому прошивки без новых ключей декодируются как
-`reset_cause = UNKNOWN`, `watchdog_missed = 0`.
+`reset_cause = UNKNOWN`, `watchdog_missed = 0`, `selftest_failed = 0`.
 
 | Key | Field | Encoding |
 |---:|---|---|
 | 12 | reset_cause | uint: причина текущей загрузки — 0 неизвестна, 1 питание/BOR, 2 NRST, 3 программный, 4 IWDG, 5 WWDG, 6 low-power, 7 option bytes |
 | 13 | watchdog_missed | uint16: маска задач, переставших отмечаться перед сбросом по IWDG (бит = задача: 1 audio, 2 dsp, 3 comms, 4 ble, 5 power, 6 lora, 7 gnss, 8 rec — запись предыстории, аддендум B); 0 — нет |
 | 14 | params_version | uint32: версия набора параметров, действующего на станции (аддендум D, `CMD_SET_PARAMS`; 0 — умолчания). Добавлен 2026-09-25; прошивки без ключа декодируются как 0 |
+| 15 | selftest_failed | uint16: самотесты, проваленные при последнем прогоне, обязательные и нет (бит = `zs_selftest_id_t`: 1 питание/INA226, 4 захват микрофонов, 5 выравнивание каналов, 7 GNSS PPS, 12 RTC LSE, …); 0 — нет. Добавлен 2026-09-27; прошивки без ключа декодируются как 0 |
 
 Источник: аппаратный сторожевой таймер станции (`app_watchdog`, `zs_task_watch`) — супервизор кормит IWDG только
 пока все задачи отмечаются в окне 10 с; при зависании маска пишется в backup-регистр TAMP и попадает в первый
 heartbeat после сброса. Прошивка: `zs_detector_health_t.reset_cause/watchdog_missed`; сервер:
 `DetectorHealth.reset_cause/watchdog_missed_tasks`. Проверка: `firmware/tests/test_heartbeat_telemetry.c`,
 `server/tools/test_firmware_packet.py`.
+
+## Проваленный самотест (2026-09-27)
+
+Раньше станция с проваленным обязательным самотестом «оставалась в S0»: загрузочной сессии не было, оператор до
+heartbeat через `heartbeat_period_s` (6 ч) видел только тишину, а пробуждение от микрофона (AAD) всё равно
+запускало детектор на неисправном тракте. Теперь (`zs_power_modes`, событие `BOOT_FAILED`):
+- первый `BOOT_FAILED` сразу открывает сессию S3 (при `boot_session`, по умолчанию): heartbeat с
+  `self_test_ok = false` и маской ключа 15, причина сброса, очередь команд (`CMD_REBOOT`, `CMD_SET_PARAMS`);
+- дальше станция ходит только S0 → S3 → S0 (heartbeat, outbox, команды) и S4 по сервисной кнопке; `MIC_WAKE`
+  игнорируется, S1/S2 закрыты — событий с неисправного тракта нет;
+- после каждой сессии супервизор повторяет самотест (окно захвата 300 мс; счётчики захвата оцениваются только в
+  этом окне, поэтому одно переполнение DMA при загрузке не проваливает все повторы); прошёл — `BOOT_DONE`, обычный
+  путь загрузки с сессией, детектор снова работает. Повторный провал сессию не запрашивает (нет петли).
+
+Сервер: `DetectorHealth.selftest_failed_tests`, `HeartbeatMessage.self_test_ok`. Проверка:
+`firmware/tests/test_platform.c` (`test_power_modes_selftest_failed`, `zs_selftest_failed_mask`),
+`firmware/tests/test_heartbeat_telemetry.c` (ключ 15), `server/tools/test_firmware_packet.py`, двойник — сценарии 4
+(самотест провален весь прогон: сессия при загрузке, команда исполнена, пролёт дрона не детектирован) и 4b
+(провал проходит после загрузочной сессии: восстановление, пролёт доставлен) `server/tools/test_station_twin_e2e.py`.

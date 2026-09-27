@@ -58,6 +58,16 @@ bool zs_selftest_required_ok(const zs_selftest_registry_t *r) {
   return true;
 }
 
+uint16_t zs_selftest_failed_mask(const zs_selftest_registry_t *r) {
+  uint16_t mask = 0u;
+  if (!r) return 0u;
+  for (uint8_t i = 0u; i < r->count; i++) {
+    const uint8_t id = r->entries[i].id;
+    if (id < 16u && (r->result[id] == ZS_ST_FAIL || r->result[id] == ZS_ST_TIMEOUT)) mask |= (uint16_t)(1u << id);
+  }
+  return mask;
+}
+
 /* zs_cbor has no array encoder; a two-element definite array is a single head byte. */
 static void cbor_array2(zs_cbor_t *c) {
   if (c->len < c->cap) c->buf[c->len++] = 0x82u;

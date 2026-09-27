@@ -385,6 +385,7 @@ def decode_heartbeat_obj(obj: Any) -> HeartbeatMessage:
             reset_cause=_RESET_CAUSE.get(int(detector.get(12, 0)), "UNKNOWN"),
             watchdog_missed_tasks=int(detector.get(13, 0)),
             params_version=int(detector.get(14, 0)),
+            selftest_failed_tests=int(detector.get(15, 0)),
         ),
     )
 

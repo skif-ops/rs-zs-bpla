@@ -28,6 +28,7 @@
 #include "zs_lora_uplink.h"
 #include "zs_power_modes.h"
 #include "zs_prehistory.h"
+#include "zs_selftest.h"
 #include "zs_station_config.h"
 #include "zs_station_params.h"
 #include "zs_station_pipeline.h"
@@ -387,6 +388,19 @@ static FILE *dump_pcm;                    /* --dump-pcm: the mono scene as PCM16
 
 static void mode_event(zs_mode_event_t ev) { mode_bits |= 1u << ev; }
 
+/* ---- self-test (mirrors the supervisor of tasks.c): --selftest-fail-until S makes the microphone test fail until
+   S seconds; the station boots with BOOT_FAILED, reports in a session, keeps the detector off and repeats the test
+   after every session ---- */
+static uint32_t selftest_fail_until_ms;
+static uint16_t selftest_failed_mask;
+static unsigned selftest_runs, selftest_recoveries;
+static bool twin_selftest(void) {
+  selftest_runs++;
+  selftest_failed_mask = sim_now < selftest_fail_until_ms ? (uint16_t)(1u << ZS_ST_ID_MIC_CAPTURE) : 0u;
+  tlog("selftest: %s (failed mask 0x%04x)", selftest_failed_mask ? "required test FAILED" : "PASS", (unsigned)selftest_failed_mask);
+  return selftest_failed_mask == 0u;
+}
+
 /* ---- audio prehistory (mirrors app_audio_rec + the capture policy of tasks.c): RAM ring of 128 one-second records
    (the station has ~2500; the twin needs more than one event's before + after) ---- */
 #define PRE_RECORDS 128u
@@ -475,13 +489,14 @@ static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   uint16_t pending = 0u; (void)ctx;
   hb->schema_ver = 2u; hb->time_us = pl_sample_time(NULL, ring.total_frames);
   hb->power.battery_pct = 80u; hb->power.battery_mv = 13200u; hb->route.transport = ZS_ROUTE_LTE;
-  strcpy(hb->firmware_ver, "twin"); strcpy(hb->model_ver, "c46"); strcpy(hb->hardware_rev, "Rev.A"); hb->self_test_ok = true;
+  strcpy(hb->firmware_ver, "twin"); strcpy(hb->model_ver, "c46"); strcpy(hb->hardware_rev, "Rev.A"); hb->self_test_ok = selftest_failed_mask == 0u;
   hb->detector_present = true; hb->detector.boot_id = 5u; hb->detector.uptime_s = sim_now / 1000u;
   hb->detector.windows = pipeline.windows; hb->detector.windows_dropped = pipeline.windows_dropped;
   hb->detector.confirmed_windows = pipeline.confirmed_windows; hb->detector.suspect_windows = pipeline.suspect_windows;
   hb->detector.events_emitted = pipeline.events_emitted; hb->detector.presence_level = pipeline.presence.level;
   if (zs_event_outbox_pending_count(&outbox_io, &pending) == ZS_EVENT_OUTBOX_OK) hb->detector.outbox_pending = pending;
   hb->detector.params_version = params.version;
+  hb->detector.selftest_failed = selftest_failed_mask;
   return true;
 }
 static uint32_t outbox_retry_at_ms, outbox_retry_backoff_ms = 300000u, outbox_retries;
@@ -586,7 +601,7 @@ static void reboot_tick(void) {
   }
   zs_mode_init(&modes, NULL, sim_now);
   params_apply(&loaded);
-  (void)zs_mode_on_event(&modes, ZS_MODE_EV_BOOT_DONE, sim_now);
+  (void)zs_mode_on_event(&modes, twin_selftest() ? ZS_MODE_EV_BOOT_DONE : ZS_MODE_EV_BOOT_FAILED, sim_now);
   tlog("twin: REBOOT by command, params v%lu reloaded from the record", (unsigned long)loaded.version);
 }
 
@@ -608,6 +623,12 @@ static void supervisor_tick(void) {
     app_comms_allow_modem(p.modem);
     capture_set(capture_wanted(modes.mode));
     last = modes.mode;
+    /* retest after a session while failed (tasks.c): a pass resumes the normal boot path */
+    if (modes.selftest_failed && modes.mode == ZS_MODE_S0_SLEEP && twin_selftest()) {
+      selftest_recoveries++;
+      tlog("selftest: recovered, detection resumes");
+      (void)zs_mode_on_event(&modes, ZS_MODE_EV_BOOT_DONE, sim_now);
+    }
   }
 }
 
@@ -660,7 +681,8 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--expect-reboots") && i + 1 < argc) expect_reboots = atoi(argv[++i]);
     else if (!strcmp(argv[i], "--expect-post-audio") && i + 1 < argc) expect_post_audio = atoi(argv[++i]);
     else if (!strcmp(argv[i], "--forget-events")) forget_events = true;
-    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events]\n"); return 2; }
+    else if (!strcmp(argv[i], "--selftest-fail-until") && i + 1 < argc) selftest_fail_until_ms = sim_now + (uint32_t)atoi(argv[++i]) * 1000u;
+    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S]\n"); return 2; }
   }
   if (!strcmp(scene_name, "drone")) { segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 20000u, 60000u, 185.0f, 1.0f}; if (seconds > 150u) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 100000u, 130000u, 210.0f, 0.8f}; }
   else if (!strcmp(scene_name, "ground")) segs[nseg++] = (scene_segment_t){SCENE_GROUND_VEHICLE, 20000u, 60000u, 0.0f, 1.0f};
@@ -693,7 +715,7 @@ int main(int argc, char **argv) {
   app_comms_set_config(&cfg, 5u);
   app_comms_request(true);
   zs_mode_init(&modes, NULL, sim_now);
-  (void)zs_mode_on_event(&modes, ZS_MODE_EV_BOOT_DONE, sim_now);
+  (void)zs_mode_on_event(&modes, twin_selftest() ? ZS_MODE_EV_BOOT_DONE : ZS_MODE_EV_BOOT_FAILED, sim_now);
   tlog("twin: scene %s, %u s, seed %u, server %s", scene_name, seconds, seed, server_cmd ? "pipe" : "none");
 
   const uint32_t end = sim_now + seconds * 1000u;
@@ -719,6 +741,7 @@ int main(int argc, char **argv) {
     tlog("twin: outbox retries %u, channel: publishes lost %u, receipts lost %u, gsm %s (fail streak %u)", outbox_retries, ch_publishes_lost, ch_receipts_lost, gsm_degraded ? "DEGRADED" : "ok", comms_fail_streak);
     if (lora_enabled) tlog("twin: lora frames %u acks %u timeouts %u budget waits %u airtime %lu ms", lora.frames_sent, lora.acks, lora.ack_timeouts, lora.budget_waits, (unsigned long)lora.airtime_ms_total);
     tlog("twin: commands executed %u rejected %u, reboots scheduled %u done %u, params v%lu", cmd_executed, cmd_rejected, cmd_reboots_scheduled, twin_reboots, (unsigned long)params.version);
+    tlog("twin: selftest runs %u recoveries %u, failed mask 0x%04x", selftest_runs, selftest_recoveries, (unsigned)selftest_failed_mask);
   }
   /* prehistory around the first event: complete seconds recorded before it and after it (the post-event window) */
   unsigned audio_before = 0u, audio_after = 0u;
