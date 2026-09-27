@@ -238,5 +238,12 @@ jobs:
             git -c user.name='github-actions[bot]' \
                 -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
                 commit -m 'PCB-MAIN: record native KiCad 9 candidate 088 (27 open, ERC 0)'
-            git push origin HEAD:feature/pcb-main-completion
+            for attempt in 1 2 3 4 5; do
+              if git push origin HEAD:feature/pcb-main-completion; then
+                exit 0
+              fi
+              git fetch origin feature/pcb-main-completion
+              git rebase origin/feature/pcb-main-completion
+            done
+            exit 1
           fi
