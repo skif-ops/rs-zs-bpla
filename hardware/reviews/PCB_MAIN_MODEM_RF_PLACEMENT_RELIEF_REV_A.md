@@ -26,7 +26,7 @@ The U16–C36 courtyard gap is **0.29 mm**. C47's courtyard is 1.60 × 1.00 mm,
 so it cannot occupy that gap in the present placement. The U8 courtyard also
 prevents placing it immediately below the supply pads.
 
-## Bounded placement trial for candidate 051
+## Bounded placement trial — rejected at copper preflight
 
 An X-only move of C36 by +2.00 mm changes its courtyard to
 (30.19–39.31, 31.95–37.05) mm and opens a 2.29 mm U16–C36 channel.
@@ -46,9 +46,26 @@ placement. This trial preserves those two narrow courtyard gaps; it does
 not establish assembly clearance there. The 0.20 mm search separation
 applies to the proposed R102 location and C47's new side clearances.
 
-Next operation: create an isolated 051 placement candidate with those three
-coordinates; reroute C36's `3V8_MODEM_BB`/ground and R102's UART legs, then
-connect both C47 pads with a short RF-supply and local `GND_MODEM` return.
-Run KiCad 9 zone fill and comparative DRC, followed by modem burst PI,
-return-path, courtyard, assembly and via-process review. Keep candidate 050
-and authoritative board 003 unchanged until the trial passes.
+Moving all three footprints in a temporary in-memory board and checking the
+new pad shapes against existing F.Cu copper (0.20 mm clearance) found:
+
+| Moved pad | Intersecting / clearance-blocking nets |
+|---|---|
+| C36.1, `3V8_MODEM_BB` | `TEST_UART_RX_U1`, `LORA_MOSI_U10`, `LORA_NSS_U10` |
+| C36.2, `GND_MODEM` | `CELL_STATUS_U16`, `CELL_USIM_DATA_1V8` |
+| C47.1, `3V8_MODEM_RF` | `CELL_DTR_U16` at 0.198 mm, below the 0.20 mm screening clearance |
+
+The two C47 pads have a nominal 0.20 mm mutual gap in the existing 0402
+footprint; their mutual contact with a 0.20 mm screening buffer is not a new
+external-net conflict. C47.2 showed no additional external-net conflict in
+this scan. R102's moved pads likewise only meet the footprint's nominal
+mutual 0.20 mm clearance.
+
+Thus the three-coordinate move is **rejected as a direct candidate 051**.
+Courtyard clearance alone concealed multiple signal/power conflicts; the
+existing C36 power and ground branches and R102 UART copper would also need
+replacement. A larger placement/rip-up proposal must explicitly preserve
+those nets and the modem/digital return boundaries before generating a PCB
+candidate. KiCad 9 DRC, modem burst PI, assembly and via-process review would
+follow that proposal. Candidate 050 and authoritative board 003 remain
+unchanged.
