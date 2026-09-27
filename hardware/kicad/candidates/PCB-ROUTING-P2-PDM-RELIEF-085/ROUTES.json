@@ -1,0 +1,137 @@
+{
+  "schema": "dioneya-pcb-main-route-085-v1",
+  "source": "local selective rip-up and native filled-board KiCad DRC screen on candidate 084",
+  "review_b": "PDM_DATA1 via in U19 pad, relocated GND_MIC 0.25/0.15 via, modem supply and MIC reference/DFM",
+  "delete": [
+    "  (segment (start 7.5857 37.5907) (end 8.1664 38.1714) (width 0.15) (layer \"B.Cu\") (net 110) (tstamp b4de765e-f613-5007-804f-54d27caf314f))",
+    "  (segment (start 8.1664 38.1714) (end 8.1664 40.4437) (width 0.15) (layer \"B.Cu\") (net 110) (tstamp e4c50fd7-904b-5fe8-bf1f-c569a9bf27a9))",
+    "  (segment (start 8.6625 38.5514) (end 8.6625 31.1103) (width 0.8) (layer \"In3.Cu\") (net 3) (tstamp b406d163-93ed-53c8-a6e1-bdb0847deaf6))",
+    "  (via (at 9.725 38.475) (size 0.5) (drill 0.3) (layers \"F.Cu\" \"B.Cu\") (net 46) (tstamp 9a5931a7-d7eb-4fdb-8ff7-c9f0e1e66cfd))"
+  ],
+  "routes": [
+    {
+      "kind": "track",
+      "net": "PDM_CLK_1V8_FANOUT",
+      "layer": "B.Cu",
+      "points": [
+        [
+          7.5857,
+          37.5907
+        ],
+        [
+          7.6,
+          37.0
+        ],
+        [
+          9.0,
+          37.0
+        ],
+        [
+          9.0,
+          40.0
+        ],
+        [
+          8.5563,
+          40.4437
+        ],
+        [
+          8.1664,
+          40.4437
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "net": "PDM_DATA1_1V8",
+      "at": [
+        8.2,
+        37.95
+      ]
+    },
+    {
+      "kind": "track",
+      "net": "PDM_DATA1_1V8",
+      "layer": "In3.Cu",
+      "points": [
+        [
+          8.2,
+          37.95
+        ],
+        [
+          8.2,
+          37.0
+        ],
+        [
+          6.5,
+          37.0
+        ],
+        [
+          6.5,
+          39.2
+        ],
+        [
+          5.1,
+          39.2
+        ],
+        [
+          5.1,
+          40.7106
+        ],
+        [
+          5.6196,
+          40.7106
+        ]
+      ]
+    },
+    {
+      "kind": "track",
+      "net": "3V8_MODEM",
+      "layer": "In3.Cu",
+      "width": 0.8,
+      "points": [
+        [
+          8.6625,
+          31.1103
+        ],
+        [
+          9.5,
+          31.1103
+        ],
+        [
+          9.5,
+          37.7
+        ],
+        [
+          8.6625,
+          38.5514
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "net": "GND_MIC",
+      "at": [
+        9.85,
+        38.8
+      ],
+      "size": 0.25,
+      "drill": 0.15
+    },
+    {
+      "kind": "track",
+      "net": "GND_MIC",
+      "layer": "F.Cu",
+      "width": 0.15,
+      "points": [
+        [
+          9.725,
+          38.475
+        ],
+        [
+          9.85,
+          38.8
+        ]
+      ]
+    }
+  ]
+}
