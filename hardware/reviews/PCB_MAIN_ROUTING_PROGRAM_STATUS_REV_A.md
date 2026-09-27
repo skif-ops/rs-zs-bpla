@@ -522,7 +522,7 @@ The `GNSS_ANT_SWITCHED` Q4.3 leg has only a roughly 14.7 mm In3.Cu
 or 23.6 mm B.Cu detour to the existing through via in the sampled
 channel. It remains open pending shorter RF-bias-network layout relief.
 
-## 9. Native KiCad 9 continuation through candidate 103 (2026-09-27)
+## 9. Native KiCad 9 continuation through candidate 104 (2026-09-27)
 
 Draft PR #93, branch `feature/pcb-main-completion`, retains PCB-MAIN 003 as the
 authoritative board. Comparative filled-board KiCad 9.0.9 checks under the
@@ -563,6 +563,7 @@ candidate-only 0.25/0.15 mm via rules gave:
 | 101, remove six one-layer via barrels | **15** | **0** | **0** |
 | 102, remove two screened dead-end branches | **15** | **0** | **0** |
 | 103, trim three pad-side via tails | **15** | **0** | **0** |
+| 104, repair three dangling track ends | **15** | **0** | **0** |
 
 076 moves the existing GND_DIGITAL via next to U3.6 from
 (66.099999, 30.600) to (66.099999, 30.650) mm and changes it from
@@ -708,6 +709,14 @@ and SD_D3_CARD pad stubs and their redundant vias. Native DRC keeps
 ERC remains zero. The initial AAD endpoint text substitution failed
 and produced one `track_dangling` warning; it was corrected before
 acceptance.
+
+104 removes the unconnected B.Cu 3V8_MODEM_BB tail and the F.Cu
+CELL_DBG_TXD_TP stub with its now-redundant via, and starts the
+U8_VDD_EXT_1V8 F.Cu segment at an existing through via instead of
+inside an unrelated B.Cu pad. Native DRC keeps 15 opens, reduces
+`track_dangling` 3→0 without new violations; ERC remains zero.
+Full DRC still reports seven `via_dangling`, 163 `silk_over_copper`,
+66 `silk_overlap`, and 15 unconnected items.
 
 Post-088 probes examined all 27 remaining airwires: the unmodified
 0.15/0.25 mm grid router found **zero** directly routeable gaps.
