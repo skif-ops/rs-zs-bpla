@@ -8,7 +8,11 @@ station's receipt topic, exactly as mqtt_bridge would.  Remote commands (ICD add
 queue (``set_params``, ``reboot``, ``reboot_again`` = the same reboot UUID redelivered); the first command goes out
 when the station subscribes to its down topic (``SUB <topic> <wall_us>``, as the broker delivers its QoS 1 queue),
 every further one in reply to the previous ACK.  Commands are signed with the repository test key
-(tools/generate_command_set_vector.py), valid from one second before the station's wall clock for ten minutes.  Every line gets exactly one reply (a message or ``OK``) so the twin's simulated time stays deterministic
+(tools/generate_command_set_vector.py), valid from one second before the station's wall clock for ten minutes.
+Key rotation (addendum E): ``rotate_key`` installs the next test key (tools/generate_command_rotate_vector.py); every
+command is signed by the bridge's ``CommandKeyring`` against a real ``EventStore`` (heartbeats and the rotation's ACK),
+so after the OK the next command goes out under the next key; ``reboot_by_old_key`` is a CMD_REBOOT signed with the
+old key on purpose (the station must refuse it once the next key is promoted).  Every line gets exactly one reply (a message or ``OK``) so the twin's simulated time stays deterministic
 regardless of wall-clock scheduling.  Audio (addendum B): with ``ZS_TWIN_AUDIO=<pre|post|both>`` the first detection
 over GSM is answered with its receipt and, on a second line, a signed ``CMD_REQUEST_AUDIO`` for that event (the
 auto-request policy of mqtt_bridge.request_event_audio); the request is a command of a real ``EventStore`` and the
@@ -30,7 +34,7 @@ from pathlib import Path
 
 from station import cbor_codec
 from station import lora_codec
-from station.command_codec import CommandSigner, decode_command_ack, encode_signed_command
+from station.command_codec import CommandKeyring, CommandSigner, decode_command_ack, encode_signed_command
 from station.event_receipt_codec import EventReceipt, encode_event_receipt
 from station.audio_ingest import ingest_audio_chunk
 from station.mqtt_bridge import request_event_audio
@@ -44,6 +48,7 @@ TWIN_ENGINEER_KEY = bytes(range(0xA0, 0xA0 + 32))
 
 # Repository test key of the command vectors (public data, never a production key).
 TWIN_COMMAND_SEED = bytes(range(1, 33))
+TWIN_NEXT_COMMAND_SEED = bytes(range(33, 65))    # the next key of tools/generate_command_rotate_vector.py
 TWIN_SET_PARAMS = {"reset": False, "params": {"heartbeat_period_s": 900, "mic_channel": 1, "listen_dwell_s": 5}}
 
 
@@ -59,6 +64,11 @@ def command_queue(spec: str) -> list[tuple[str, str, dict]]:
             queue.append((reboot_id, "CMD_REBOOT", {"delay_s": 10}))
         elif item == "reboot_again" and reboot_id:
             queue.append((reboot_id, "CMD_REBOOT", {"delay_s": 10}))
+        elif item == "rotate_key":
+            nxt = CommandSigner(Ed25519PrivateKey.from_private_bytes(TWIN_NEXT_COMMAND_SEED))
+            queue.append((str(uuid.uuid4()), "CMD_ROTATE_COMMAND_KEY", {"public_key": nxt.public_key_hex}))
+        elif item == "reboot_by_old_key":
+            queue.append((str(uuid.uuid4()), "CMD_REBOOT@old", {"delay_s": 10}))
         else:
             raise SystemExit(f"twin server: unknown command {item!r}")
     return queue
@@ -74,8 +84,10 @@ def main() -> int:
     lora_detections = 0
     lora_key = lora_codec.derive_key(TWIN_ENGINEER_KEY)
     signer = CommandSigner(Ed25519PrivateKey.from_private_bytes(TWIN_COMMAND_SEED))
+    keyring = CommandKeyring(signer, CommandSigner(Ed25519PrivateKey.from_private_bytes(TWIN_NEXT_COMMAND_SEED)))
     queue = command_queue(os.environ.get("ZS_TWIN_COMMANDS", ""))
     signed: dict[str, bytes] = {}          # a redelivered command is the identical envelope, as a broker would resend it
+    key_ids: dict[str, str] = {}
     commands_sent: list[dict] = []
     acks: list[dict] = []
     wall_us = 0
@@ -85,6 +97,7 @@ def main() -> int:
     wav_dir = os.environ.get("ZS_TWIN_WAV_DIR", "")
     store_dir = Path(wav_dir) if wav_dir else Path(tempfile.mkdtemp(prefix="zs_twin_"))
     event_store = EventStore(store_dir / "twin.sqlite3") if audio_segment else None
+    key_store = EventStore(store_dir / "twin_keys.sqlite3")        # heartbeats and commands for the keyring
     audio_chunks = 0
     audio_duplicates = 0
     audio_segments: list[dict] = []
@@ -109,11 +122,18 @@ def main() -> int:
         if not queue or not down_topic:
             return "OK"
         command_id, name, payload = queue.pop(0)
+        station_id = int(down_topic.split("/")[3])
+        by_old_key = name.endswith("@old")
+        name = name.removesuffix("@old")
         if command_id not in signed:
+            if name == "CMD_ROTATE_COMMAND_KEY":        # the keyring learns the rotation from its ACK in the store
+                command_id = key_store.create_command(station_id, name, payload).command_id
+            chosen = keyring.primary if by_old_key else keyring.signer_for(station_id, key_store)
             signed[command_id] = encode_signed_command(StationCommand(
-                command_id=command_id, station_id=int(down_topic.split("/")[3]), command=name, payload=payload,
-                created_time_us=wall_us - 1_000_000, expires_time_us=wall_us + 600_000_000), signer)
-        commands_sent.append({"command_id": command_id, "command": name})
+                command_id=command_id, station_id=station_id, command=name, payload=payload,
+                created_time_us=wall_us - 1_000_000, expires_time_us=wall_us + 600_000_000), chosen)
+            key_ids[command_id] = chosen.key_id.hex()
+        commands_sent.append({"command_id": command_id, "command": name, "key_id": key_ids[command_id]})
         return f"PUB {down_topic} {signed[command_id].hex()}"
 
     for line in sys.stdin:
@@ -168,6 +188,7 @@ def main() -> int:
                 "audio_segments": audio_segments,
                 "last_heartbeat": heartbeats[-1] if heartbeats else None,
                 "heartbeat_self_test_ok": [h["self_test_ok"] for h in heartbeats],
+                "key_ids": {"current": keyring.primary.key_id.hex(), "next": keyring.next.key_id.hex()},
                 "events": detections[:20],
             }
             out.write("REPORT " + json.dumps(report) + "\n"); out.flush()
@@ -204,6 +225,8 @@ def main() -> int:
                              "completed_time_us": a.completed_time_us})
                 if event_store is not None and event_store.command_record(a.command_id) is not None:
                     event_store.ack_command(a.station_id, a.command_id, a.result_code, a.detail_code, a.completed_time_us)
+                if key_store.command_record(a.command_id) is not None:
+                    key_store.ack_command(a.station_id, a.command_id, a.result_code, a.detail_code, a.completed_time_us)
                 out.write(next_command() + "\n"); out.flush()
             elif kind == "audio":
                 audio_chunks += 1
@@ -225,6 +248,7 @@ def main() -> int:
                     out.write("OK\n"); out.flush()
             elif kind == "status":
                 h = cbor_codec.decode_heartbeat_cbor(payload)
+                key_store.upsert_station(h)
                 heartbeats.append({"time_us": h.time_us, "battery_pct": h.power.battery_pct, "battery_mv": h.power.battery_mv, "self_test_ok": h.self_test_ok,
                                    "detector": (h.detector.model_dump() if getattr(h, "detector", None) else None)})
                 out.write("OK\n"); out.flush()
