@@ -41,6 +41,8 @@ void zs_mode_init(zs_mode_scheduler_t *s, const zs_mode_policy_t *policy, uint32
 }
 
 static uint32_t elapsed(const zs_mode_scheduler_t *s, uint32_t now_ms) { return now_ms - s->entered_at_ms; }
+/* where S3 and S4 return: a listen window normally, straight to sleep while the self-test is failed */
+static zs_mode_t after_session(const zs_mode_scheduler_t *s) { return s->selftest_failed ? ZS_MODE_S0_SLEEP : ZS_MODE_S1_LISTEN; }
 
 bool zs_mode_on_event(zs_mode_scheduler_t *s, zs_mode_event_t ev, uint32_t now_ms) {
   if (!s || s->mode == ZS_MODE_SHUTDOWN) return false;
@@ -56,6 +58,16 @@ bool zs_mode_on_event(zs_mode_scheduler_t *s, zs_mode_event_t ev, uint32_t now_m
     enter(s, ZS_MODE_S4_SERVICE, ev, now_ms);
     return true;
   }
+  if (ev == ZS_MODE_EV_BOOT_FAILED) {
+    const bool first = !s->selftest_failed;
+    s->selftest_failed = true;
+    /* the first failure reports at once; a repeated failed self-test changes nothing (no session loop) */
+    if (!first || s->mode == ZS_MODE_S3_COMMS || s->mode == ZS_MODE_S4_SERVICE) return false;
+    if (s->policy.boot_session) { s->comms_requested = true; enter(s, ZS_MODE_S3_COMMS, ev, now_ms); return true; }
+    if (s->mode == ZS_MODE_S0_SLEEP) return false;
+    enter(s, ZS_MODE_S0_SLEEP, ev, now_ms);
+    return true;
+  }
   if (ev == ZS_MODE_EV_OUTBOX_PENDING) {
     s->outbox_pending = true;
     s->comms_requested = true;
@@ -68,11 +80,13 @@ bool zs_mode_on_event(zs_mode_scheduler_t *s, zs_mode_event_t ev, uint32_t now_m
   switch (s->mode) {
     case ZS_MODE_S0_SLEEP:
       if (ev == ZS_MODE_EV_BOOT_DONE) {
+        s->selftest_failed = false;
         enter(s, ZS_MODE_S1_LISTEN, ev, now_ms);
         s->comms_requested = s->policy.boot_session;   /* S1 ends in S3 instead of S0 (GATE_NEGATIVE path) */
         return true;
       }
       if (ev == ZS_MODE_EV_MIC_WAKE) {
+        if (s->selftest_failed) return false;                          /* no detection on a failed self-test */
         if (elapsed(s, now_ms) < s->policy.min_sleep_ms) return false; /* hysteresis against wake storms */
         enter(s, ZS_MODE_S1_LISTEN, ev, now_ms);
         return true;
@@ -101,13 +115,13 @@ bool zs_mode_on_event(zs_mode_scheduler_t *s, zs_mode_event_t ev, uint32_t now_m
       if (ev == ZS_MODE_EV_COMMS_DONE) {
         s->outbox_pending = false;
         s->last_comms_at_ms = now_ms;
-        enter(s, ZS_MODE_S1_LISTEN, ev, now_ms); /* one listen window before sleeping again */
+        enter(s, after_session(s), ev, now_ms); /* one listen window before sleeping again (none on a failed self-test) */
         return true;
       }
       return false;
     case ZS_MODE_S4_SERVICE:
       if (ev == ZS_MODE_EV_SERVICE_EXIT) {
-        enter(s, s->outbox_pending ? ZS_MODE_S3_COMMS : ZS_MODE_S1_LISTEN, ev, now_ms);
+        enter(s, s->outbox_pending ? ZS_MODE_S3_COMMS : after_session(s), ev, now_ms);
         return true;
       }
       return false;
@@ -142,7 +156,7 @@ bool zs_mode_tick(zs_mode_scheduler_t *s, uint32_t now_ms) {
       if (dt >= s->policy.comms_max_ms) {
         /* give up this session, keep outbox_pending so the next wake retries */
         s->last_comms_at_ms = now_ms;
-        enter(s, ZS_MODE_S1_LISTEN, ZS_MODE_EV_NONE, now_ms);
+        enter(s, after_session(s), ZS_MODE_EV_NONE, now_ms);
         return true;
       }
       return false;
