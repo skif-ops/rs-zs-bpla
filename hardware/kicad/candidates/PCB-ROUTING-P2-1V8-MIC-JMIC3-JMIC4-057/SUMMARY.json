@@ -1,0 +1,48 @@
+{
+  "schema": "dioneya-pcb-main-1v8-mic-jmic3-jmic4-057-v1",
+  "base_sha256": "eb40e9a6eab76255658339c07cad56af668bbacc55979c2cdb50872672741117",
+  "candidate_sha256": "1ae3dd8186881bf6f252c3f87ac2a0f0ab8ae469ed2934f37cf626d1cfcd390d",
+  "route_points": [
+    [
+      88.25,
+      68.41
+    ],
+    [
+      89.4,
+      69.4
+    ],
+    [
+      92.6,
+      69.7
+    ],
+    [
+      94.4,
+      69.7
+    ],
+    [
+      96.3,
+      69.3
+    ],
+    [
+      103.41,
+      57.75
+    ]
+  ],
+  "track_segments": 5,
+  "track_width_mm": 0.3,
+  "route_length_mm": 22.0361,
+  "new_vias": 0,
+  "in1_gnd_digital_reference_fraction": 1.0,
+  "in2_gnd_mic_reference_fraction": 1.0,
+  "in4_gnd_digital_reference_fraction": 1.0,
+  "mic_supply_current_and_return_review_b": "OPEN",
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 85,
+    "candidate_unconnected": 84,
+    "new_by_type": {},
+    "new_errors": 0
+  }
+}
