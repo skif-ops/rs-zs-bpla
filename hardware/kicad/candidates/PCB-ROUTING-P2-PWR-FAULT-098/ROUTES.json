@@ -56,18 +56,6 @@
       ]
     },
     {
-      "kind": "via",
-      "layer": null,
-      "net": "PWR_FAULT",
-      "width_or_size_mm": 0.25,
-      "points_mm": [
-        [
-          27.3,
-          22.6
-        ]
-      ]
-    },
-    {
       "kind": "track",
       "layer": "B.Cu",
       "net": "PWR_FAULT",
