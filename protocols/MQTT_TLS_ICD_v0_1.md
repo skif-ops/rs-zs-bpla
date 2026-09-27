@@ -45,7 +45,8 @@ an explicit signing key is loaded.
 | 8 | signing key ID | first 8 bytes of SHA-256 over the raw Ed25519 public key |
 | 9 | signature | 64-byte Ed25519 signature over canonical keys 0..8 |
 
-`CMD_REQUEST_AUDIO` key 7 is a four-entry numeric map:
+`CMD_REQUEST_AUDIO` key 7 is a four-entry numeric map, or five entries with the
+optional event time (sub-key 4, addendum B):
 
 | Sub-key | Field | Encoding |
 |---:|---|---|
@@ -53,6 +54,7 @@ an explicit signing key is loaded.
 | 1 | segment | 0 pre, 1 post, 2 both, 3 range |
 | 2 | start_offset_ms | signed int32 for range, otherwise null |
 | 3 | duration_ms | positive uint32 for range, otherwise null |
+| 4 | event_time_us | optional; positive int64, the detection's event time as the server stored it; the station uses it only when its own event table no longer holds the event (after a reboot) |
 
 The portable station codec rejects an unknown/rejected key ID, invalid
 signature callback result, non-canonical encoding, wrong `station_id`, duplicate
