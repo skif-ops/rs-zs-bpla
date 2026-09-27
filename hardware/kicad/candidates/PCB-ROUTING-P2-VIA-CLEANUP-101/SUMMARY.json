@@ -1,0 +1,19 @@
+{
+  "schema": "dioneya-pcb-main-via-cleanup-101-v1",
+  "base_sha256": "bf864d3f869ec033ed529a035d1028d63988805c28b057a22845ea0e32038df0",
+  "candidate_sha256": "3225c39d1fd58195111de8019cfb9bfba70a69fda486c8e594ec139a29671001",
+  "removed_one_layer_vias": 6,
+  "via_dangling_before": 18,
+  "via_dangling_after": 12,
+  "drc": {
+    "base_unconnected": 15,
+    "candidate_unconnected": 15,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
