@@ -1,0 +1,24 @@
+{
+  "schema": "dioneya-pcb-main-usb-dp-090-v1",
+  "base_sha256": "d252a2876cdf24408865685dd076ae2c301c29b41ae08a243541b9388d13ddef",
+  "candidate_sha256": "8123c954bcf16415cb51b6e923d1234f827c77dde0f59c11714f472aa5a12fce",
+  "route": {
+    "net": "USB_DP_CONN",
+    "length_mm": 49.602,
+    "new_vias": 3,
+    "new_segments": 24,
+    "via_in_U25_pad": true
+  },
+  "drc": {
+    "base_unconnected": 26,
+    "candidate_unconnected": 25,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: USB pair timing/impedance, U25.1 via-in-pad, return and DFM",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
