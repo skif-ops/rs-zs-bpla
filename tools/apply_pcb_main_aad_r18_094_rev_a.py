@@ -13,6 +13,10 @@ CANDIDATE=OUT/'PCB-MAIN_P2_AAD_R18_094_CANDIDATE_REV_A.kicad_pcb'
 PROJECT=OUT/'PCB-MAIN_P2_AAD_R18_094_CANDIDATE_REV_A.kicad_pro'
 BASE_SHA='277ffd2e92bd3096e1607fdc832b21aeb019047e9df7dfb359d63d2bd350cfc2'
 OLD='    (tstamp 18974097-31b3-45bb-a0a9-850cf0445e30)\n    (at 64.75 45.25)'
+RIPPED=(
+    '  (segment (start 64.7 44.7) (end 64.5 44.9) (width 0.15) (layer "F.Cu") (net 8) (tstamp fd452e9e-5019-50f7-bedd-976f08104216))',
+    '  (segment (start 64.5 44.9) (end 64.5 45.2) (width 0.15) (layer "F.Cu") (net 8) (tstamp 2e6609f8-744c-567b-8023-7569da886bb8))',
+)
 
 def build():
     assert native.sha(BOARD)==BASE_SHA
@@ -22,6 +26,9 @@ def build():
     board=BOARD.read_text()
     assert board.count(OLD)==1
     board=board.replace(OLD,OLD.split('\n')[0]+'\n    (at 65 44)')
+    for old in RIPPED:
+        assert board.count(old+'\n')==1
+        board=board.replace(old+'\n','')
     nets={name:int(code) for code,name in re.findall(r'^  \(net (\d+) "([^"]*)"\)',board,re.M)}
     lines=[];lengths={'AAD_CFG_1V8_U7':0.,'AAD_CFG_1V8_FANOUT':0.};vias=0
     for j,route in enumerate(spec['routes']):
@@ -36,7 +43,7 @@ def build():
                 lines.append(f'  (segment (start {a[0]} {a[1]}) (end {b[0]} {b[1]}) (width 0.15) (layer "{route["layer"]}") (net {nets[net]}) (tstamp {uuid.uuid5(uuid.NAMESPACE_URL,f"094|{j}|{i}|{a}|{b}")}))')
     assert vias==4
     at=board.index('\n',board.rfind('  (segment '))+1
-    return board[:at]+'\n'.join(lines)+'\n'+board[at:],{'moved_R18_mm':[65.0,44.0],'added_length_mm':{k:round(v,3) for k,v in lengths.items()},'new_vias':vias,'new_segments':len(lines)-vias}
+    return board[:at]+'\n'.join(lines)+'\n'+board[at:],{'moved_R18_mm':[65.0,44.0],'removed_old_R18_tail_segments':2,'added_length_mm':{k:round(v,3) for k,v in lengths.items()},'new_vias':vias,'new_segments':len(lines)-vias}
 
 def main():
     board,route=build()
