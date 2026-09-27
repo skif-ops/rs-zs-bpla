@@ -1,12 +1,5 @@
 name: PCB-MAIN candidate 097 autorouter probe
 on:
-  push:
-    branches: [feature/pcb-main-completion]
-    paths:
-      - .github/workflows/pcb-main-autoroute-probe.yml
-  pull_request:
-    paths:
-      - .github/workflows/pcb-main-autoroute-probe.yml
   workflow_dispatch:
 jobs:
   export:
