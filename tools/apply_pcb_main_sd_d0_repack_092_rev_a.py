@@ -17,11 +17,11 @@ SEG=re.compile(r'^  \(segment \(start ([\d.]+) ([\d.]+)\) \(end ([\d.]+) ([\d.]+
 def build():
     assert native.sha(BOARD)==BASE_SHA
     spec=json.loads((OUT/'ROUTES.json').read_text())
-    assert spec['schema']=='dioneya-pcb-main-route-092-v1' and len(spec['removed_segments'])==8
+    assert spec['schema']=='dioneya-pcb-main-route-092-v1' and len(spec['removed_segments'])==9
     board=BOARD.read_text()
     nets={name:int(code) for code,name in re.findall(r'^  \(net (\d+) "([^"]*)"\)',board,re.M)}
     pending={(r['net'],r['layer'],tuple(r['start']),tuple(r['end'])) for r in spec['removed_segments']}
-    assert len(pending)==8
+    assert len(pending)==9
     kept=[]
     for line in board.splitlines(keepends=True):
         m=SEG.match(line.rstrip('\n'))
@@ -48,7 +48,7 @@ def build():
                 lines.append(f'  (segment (start {a[0]} {a[1]}) (end {b[0]} {b[1]}) (width 0.15) (layer "{route["layer"]}") (net {nets[net]}) (tstamp {uuid.uuid5(uuid.NAMESPACE_URL,f"092|{j}|{i}|{a}|{b}")}))')
     assert vias==4
     at=board.index('\n',board.rfind('  (segment '))+1
-    return board[:at]+'\n'.join(lines)+'\n'+board[at:],{'removed_sd_d2_segments':8,'added_length_mm':{k:round(v,3) for k,v in lengths.items()},'new_vias':vias,'new_segments':len(lines)-vias}
+    return board[:at]+'\n'.join(lines)+'\n'+board[at:],{'removed_sd_d2_segments':9,'added_length_mm':{k:round(v,3) for k,v in lengths.items()},'new_vias':vias,'new_segments':len(lines)-vias}
 
 def main():
     board,route=build()
