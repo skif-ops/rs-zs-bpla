@@ -1,0 +1,28 @@
+{
+  "schema": "dioneya-pcb-main-c46-084-v1",
+  "base_sha256": "f90e00b8f01da340bb8927dc9cdf04388efd7c0f5f07e04995397425a05d945b",
+  "candidate_sha256": "2a8111d236f1f84cbb009fd62a1f800e0b67e906d0e90f151b411157a2f38428",
+  "route": {
+    "net": "3V8_MODEM_RF",
+    "track_length_mm": 22.062,
+    "segments": 60,
+    "vias": 3,
+    "length_by_layer_mm": {
+      "B.Cu": 17.265,
+      "In3.Cu": 2.566,
+      "F.Cu": 2.231
+    }
+  },
+  "review_b": "OPEN: RF supply decoupling branch impedance/return, cross-domain edges and via DFM",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 32,
+    "candidate_unconnected": 31,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}
