@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-pwr-fault-098-v1",
+  "base_sha256": "d009b62229fc4665d205146d6e704881f7a88483ee3c83b4134236ede1b28590",
+  "candidate_sha256": "e8d8e315a810b9b90f91c467625b5459525f5e3310a41cc14649cc9d87d7e4f8",
+  "route": {
+    "new_segments": 56,
+    "new_vias": 6,
+    "removed_segments": 3,
+    "length_mm": 40.465
+  },
+  "drc": {
+    "base_unconnected": 18,
+    "candidate_unconnected": 17,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: PWR_FAULT length, via-in-pad and NOR_CLK return-current review",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
