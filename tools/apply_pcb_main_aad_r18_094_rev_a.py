@@ -17,11 +17,11 @@ OLD='    (tstamp 18974097-31b3-45bb-a0a9-850cf0445e30)\n    (at 64.75 45.25)'
 def build():
     assert native.sha(BOARD)==BASE_SHA
     spec=json.loads((OUT/'ROUTES.json').read_text())
-    assert spec['schema']=='dioneya-pcb-main-route-094-v1' and spec['move']=={'reference':'R18','from':[64.75,45.25],'to':[65.8,45.0]}
+    assert spec['schema']=='dioneya-pcb-main-route-094-v1' and spec['move']=={'reference':'R18','from':[64.75,45.25],'to':[65.0,44.0]}
     assert len(spec['routes'])==10 and spec['routes'][0]['net']=='AAD_CFG_1V8_U7'
     board=BOARD.read_text()
     assert board.count(OLD)==1
-    board=board.replace(OLD,OLD.split('\n')[0]+'\n    (at 65.8 45.0)')
+    board=board.replace(OLD,OLD.split('\n')[0]+'\n    (at 65 44)')
     nets={name:int(code) for code,name in re.findall(r'^  \(net (\d+) "([^"]*)"\)',board,re.M)}
     lines=[];lengths={'AAD_CFG_1V8_U7':0.,'AAD_CFG_1V8_FANOUT':0.};vias=0
     for j,route in enumerate(spec['routes']):
@@ -36,7 +36,7 @@ def build():
                 lines.append(f'  (segment (start {a[0]} {a[1]}) (end {b[0]} {b[1]}) (width 0.15) (layer "{route["layer"]}") (net {nets[net]}) (tstamp {uuid.uuid5(uuid.NAMESPACE_URL,f"094|{j}|{i}|{a}|{b}")}))')
     assert vias==4
     at=board.index('\n',board.rfind('  (segment '))+1
-    return board[:at]+'\n'.join(lines)+'\n'+board[at:],{'moved_R18_mm':[65.8,45.0],'added_length_mm':{k:round(v,3) for k,v in lengths.items()},'new_vias':vias,'new_segments':len(lines)-vias}
+    return board[:at]+'\n'.join(lines)+'\n'+board[at:],{'moved_R18_mm':[65.0,44.0],'added_length_mm':{k:round(v,3) for k,v in lengths.items()},'new_vias':vias,'new_segments':len(lines)-vias}
 
 def main():
     board,route=build()
