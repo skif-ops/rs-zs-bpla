@@ -4,188 +4,188 @@
     "net": "3V3_DIGITAL",
     "gap_mm": 4.811,
     "routed": false,
-    "seconds": 1.43
+    "seconds": 1.75
   },
   {
     "index": 1,
     "net": "3V3_DIGITAL",
     "gap_mm": 4.14,
     "routed": false,
-    "seconds": 10.13
+    "seconds": 10.89
   },
   {
     "index": 2,
     "net": "AAD_CFG",
     "gap_mm": 25.448,
     "routed": false,
-    "seconds": 11.01
+    "seconds": 12.57
   },
   {
     "index": 3,
     "net": "AAD_CFG_1V8_FANOUT",
     "gap_mm": 30.517,
     "routed": false,
-    "seconds": 10.58
+    "seconds": 11.45
   },
   {
     "index": 4,
     "net": "ACCEL_INT",
     "gap_mm": 6.006,
     "routed": false,
-    "seconds": 1.54
+    "seconds": 1.82
   },
   {
     "index": 5,
     "net": "CELL_PWRKEY_CMD",
     "gap_mm": 45.121,
     "routed": false,
-    "seconds": 11.07
+    "seconds": 12.11
   },
   {
     "index": 6,
     "net": "CELL_RI_U16",
     "gap_mm": 30.69,
     "routed": false,
-    "seconds": 1.46
+    "seconds": 1.81
   },
   {
     "index": 7,
     "net": "CELL_STATUS_U16",
     "gap_mm": 27.657,
     "routed": false,
-    "seconds": 1.45
+    "seconds": 1.81
   },
   {
     "index": 8,
     "net": "GNSS_TX_U1",
     "gap_mm": 19.948,
     "routed": false,
-    "seconds": 1.56
+    "seconds": 1.81
   },
   {
     "index": 9,
     "net": "LORA_SCK_U1",
     "gap_mm": 18.867,
     "routed": false,
-    "seconds": 11.66
+    "seconds": 12.47
   },
   {
     "index": 10,
     "net": "LSE_IN",
     "gap_mm": 18.202,
     "routed": false,
-    "seconds": 1.51
+    "seconds": 1.81
   },
   {
     "index": 11,
     "net": "NRST",
     "gap_mm": 15.55,
     "routed": false,
-    "seconds": 11.04
+    "seconds": 11.44
   },
   {
     "index": 12,
     "net": "PDM_DATA1_1V8",
     "gap_mm": 47.53,
     "routed": false,
-    "seconds": 10.98
+    "seconds": 11.77
   },
   {
     "index": 13,
     "net": "PDM_DATA2",
     "gap_mm": 24.077,
     "routed": false,
-    "seconds": 11.21
+    "seconds": 11.79
   },
   {
     "index": 14,
     "net": "PWR_FAULT",
     "gap_mm": 27.676,
     "routed": false,
-    "seconds": 10.71
+    "seconds": 11.53
   },
   {
     "index": 15,
     "net": "REV_STRAP1",
     "gap_mm": 10.427,
     "routed": false,
-    "seconds": 1.53
+    "seconds": 1.83
   },
   {
     "index": 16,
     "net": "SD_CK_U1",
     "gap_mm": 11.523,
     "routed": false,
-    "seconds": 10.83
+    "seconds": 11.98
   },
   {
     "index": 17,
     "net": "SD_D0_CARD",
     "gap_mm": 3.5,
     "routed": false,
-    "seconds": 1.47
+    "seconds": 1.82
   },
   {
     "index": 18,
     "net": "SD_D0_CARD",
     "gap_mm": 3.16,
     "routed": false,
-    "seconds": 10.33
+    "seconds": 11.06
   },
   {
     "index": 19,
     "net": "SD_D0_U1",
     "gap_mm": 28.807,
     "routed": false,
-    "seconds": 1.48
+    "seconds": 1.82
   },
   {
     "index": 20,
     "net": "SD_D1_U1",
     "gap_mm": 25.038,
     "routed": false,
-    "seconds": 1.48
+    "seconds": 1.81
   },
   {
     "index": 21,
     "net": "SIM2_DET",
     "gap_mm": 16.068,
     "routed": false,
-    "seconds": 1.52
+    "seconds": 1.8
   },
   {
     "index": 22,
     "net": "TEST_UART_RX_TP",
     "gap_mm": 12.135,
     "routed": false,
-    "seconds": 1.48
+    "seconds": 1.83
   },
   {
     "index": 23,
     "net": "USB_DM_CONN",
     "gap_mm": 28.597,
     "routed": false,
-    "seconds": 1.49
+    "seconds": 1.8
   },
   {
     "index": 24,
     "net": "USB_DP_CONN",
     "gap_mm": 27.435,
     "routed": false,
-    "seconds": 1.51
+    "seconds": 1.8
   },
   {
     "index": 25,
     "net": "USB_VBUS_SENSE",
     "gap_mm": 17.024,
     "routed": false,
-    "seconds": 1.47
+    "seconds": 1.8
   },
   {
     "index": 26,
     "net": "VCORE_1V1",
     "gap_mm": 17.091,
     "routed": false,
-    "seconds": 11.01
+    "seconds": 11.5
   }
 ]
