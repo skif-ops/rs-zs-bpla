@@ -74,6 +74,7 @@ add_library(zs_core
   src/zs_station_comms.c
   src/zs_boot_counter.c
   src/zs_station_secrets.c
+  src/zs_command_keys.c
   src/zs_ed25519.c
   src/zs_lora_frame.c
   src/zs_lora_uplink.c
@@ -191,6 +192,8 @@ add_executable(zs_boot_counter_tests tests/test_boot_counter.c)
 target_link_libraries(zs_boot_counter_tests zs_core m)
 add_executable(zs_station_secrets_tests tests/test_station_secrets.c)
 target_link_libraries(zs_station_secrets_tests zs_core m)
+add_executable(zs_command_keys_tests tests/test_command_keys.c)
+target_link_libraries(zs_command_keys_tests zs_core m)
 add_executable(zs_ed25519_tests tests/test_ed25519.c)
 target_link_libraries(zs_ed25519_tests zs_core m)
 add_executable(zs_lora_frame_tests tests/test_lora_frame.c)
@@ -280,6 +283,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_station_comms_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_boot_counter_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_station_secrets_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_command_keys_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_ed25519_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_lora_frame_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_lora_uplink_tests PRIVATE -UNDEBUG)
@@ -345,6 +349,7 @@ add_test(NAME station_pipeline COMMAND zs_station_pipeline_tests)
 add_test(NAME station_comms COMMAND zs_station_comms_tests)
 add_test(NAME boot_counter COMMAND zs_boot_counter_tests)
 add_test(NAME station_secrets COMMAND zs_station_secrets_tests)
+add_test(NAME command_keys COMMAND zs_command_keys_tests)
 add_test(NAME ed25519 COMMAND zs_ed25519_tests)
 add_test(NAME lora_frame COMMAND zs_lora_frame_tests)
 add_test(NAME lora_uplink COMMAND zs_lora_uplink_tests)
