@@ -522,7 +522,7 @@ The `GNSS_ANT_SWITCHED` Q4.3 leg has only a roughly 14.7 mm In3.Cu
 or 23.6 mm B.Cu detour to the existing through via in the sampled
 channel. It remains open pending shorter RF-bias-network layout relief.
 
-## 9. Native KiCad 9 continuation through candidate 087 (2026-09-27)
+## 9. Native KiCad 9 continuation through candidate 088 (2026-09-27)
 
 Draft PR #93, branch `feature/pcb-main-completion`, retains PCB-MAIN 003 as the
 authoritative board. Comparative filled-board KiCad 9.0.9 checks under the
@@ -547,6 +547,7 @@ candidate-only 0.25/0.15 mm via rules gave:
 | 085, U19 PDM_DATA1 relief | **30** | **0** | **0** |
 | 086, R4 3V3 relief | **29** | **0** | **0** |
 | 087, SD_D3_CARD U23/D11 relief | **28** | **0** | **0** |
+| 088, SD_D3_CARD upper branch | **27** | **0** | **0** |
 
 076 moves the existing GND_DIGITAL via next to U3.6 from
 (66.099999, 30.600) to (66.099999, 30.650) mm and changes it from
@@ -620,6 +621,11 @@ the existing card-side trace. The signal route is 21.096 mm of 0.15 mm
 copper on F.Cu/B.Cu/In3.Cu with three 0.25/0.15 mm vias. Filled-board
 DRC went 29→28 without new violations and ERC stayed zero. Card-bus
 timing/skew, return, ESD placement and via DFM need Review B.
+
+088 joins the upper SD_D3_CARD source to the U23/card-side branch with
+14.740 mm of 0.15 mm F.Cu/B.Cu copper and two 0.25/0.15 mm vias.
+Filled-board DRC went 28→27 without new violations, ERC zero. The
+combined 087–088 SDIO length, skew and return require Review B.
 
 The 075 routes total 107.8935 mm and 15 new vias, including a 45.1553 mm
 1V8_MIC branch; they are routing experiments. Power integrity, microphone
