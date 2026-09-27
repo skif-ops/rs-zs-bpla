@@ -1,0 +1,48 @@
+{
+  "schema": "dioneya-pcb-main-batch-069-v1",
+  "base_sha256": "d78d34cf477825f4b15ac1e68294b1cb22be83184ed53c899022f95bcd5025d8",
+  "candidate_sha256": "1c358e1ef89165c05f9c6987bcfaf34c9848464400fc9f20c9ebe4846339b78d",
+  "routes": [
+    {
+      "net": "AAD_CFG_1V8_U7",
+      "track_length_mm": 14.4823,
+      "vias": 0
+    },
+    {
+      "net": "LORA_RESET_N",
+      "track_length_mm": 37.4919,
+      "vias": 2
+    },
+    {
+      "net": "LORA_SCK_U10",
+      "track_length_mm": 25.6368,
+      "vias": 4
+    },
+    {
+      "net": "SIM1_DET",
+      "track_length_mm": 23.3752,
+      "vias": 4
+    },
+    {
+      "net": "SWCLK",
+      "track_length_mm": 16.9083,
+      "vias": 2
+    }
+  ],
+  "route_count": 5,
+  "new_vias": 12,
+  "new_track_length_mm": 117.8945,
+  "reference_outline_fraction": 1.0,
+  "review_b": "OPEN",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 60,
+    "candidate_unconnected": 55,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}
