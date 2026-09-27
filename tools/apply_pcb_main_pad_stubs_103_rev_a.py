@@ -57,7 +57,8 @@ def build() -> str:
                 if key == AAD:
                     assert aad_pending
                     aad_pending = False
-                    line = line.replace('(end 59.189 46.225)', '(end 58 46.2)')
+                    line = (f'  (segment (start {a}) (end 58 46.2) (width {width}) '
+                            f'(layer "{layer}") (net {code}) (tstamp {stamp}))\n')
         kept.append(line)
     assert not via_pending and not track_pending and not aad_pending, (via_pending, track_pending, aad_pending)
     return ''.join(kept)
