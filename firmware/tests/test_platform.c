@@ -82,6 +82,48 @@ static void test_power_modes(void) {
   assert(strcmp(zs_mode_name(ZS_MODE_S2_DSP), "S2_DSP") == 0);
 }
 
+/* A required self-test failed: the station reports at once and stays reachable (heartbeat, outbox, commands,
+   service), but never listens or classifies until a repeated self-test passes. */
+static void test_power_modes_selftest_failed(void) {
+  zs_mode_scheduler_t s;
+  zs_mode_policy_t pol = zs_mode_policy_default();
+  uint32_t t = 1000u;
+  pol.heartbeat_period_ms = 100000u;
+  zs_mode_init(&s, &pol, t);
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_BOOT_FAILED, t) && s.mode == ZS_MODE_S3_COMMS && s.selftest_failed);
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_COMMS_DONE, t + 8000u) && s.mode == ZS_MODE_S0_SLEEP);   /* no listen window */
+  t += 8000u;
+  assert(!zs_mode_on_event(&s, ZS_MODE_EV_BOOT_FAILED, t + 100u) && s.mode == ZS_MODE_S0_SLEEP);   /* retest failed: no session loop */
+  assert(!zs_mode_on_event(&s, ZS_MODE_EV_MIC_WAKE, t + 5000u) && s.mode == ZS_MODE_S0_SLEEP);     /* the detector stays off */
+  /* the heartbeat keeps coming; the S3 watchdog also returns to sleep */
+  assert(zs_mode_tick(&s, t + pol.heartbeat_period_ms) && s.mode == ZS_MODE_S3_COMMS);
+  t += pol.heartbeat_period_ms;
+  assert(zs_mode_tick(&s, t + pol.comms_max_ms) && s.mode == ZS_MODE_S0_SLEEP);
+  t += pol.comms_max_ms;
+  /* queued events still go out, the service window still opens and closes to sleep */
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_OUTBOX_PENDING, t) && s.mode == ZS_MODE_S3_COMMS);
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_COMMS_DONE, t + 1000u) && s.mode == ZS_MODE_S0_SLEEP);
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_SERVICE_BUTTON, t + 2000u) && s.mode == ZS_MODE_S4_SERVICE);
+  assert(!zs_mode_on_event(&s, ZS_MODE_EV_BOOT_FAILED, t + 2500u) && s.mode == ZS_MODE_S4_SERVICE);
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_SERVICE_EXIT, t + 3000u) && s.mode == ZS_MODE_S0_SLEEP);
+  t += 3000u;
+  /* a repeated self-test passed: the normal boot path (listen window, boot session) and detection again */
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_BOOT_DONE, t) && s.mode == ZS_MODE_S1_LISTEN && !s.selftest_failed);
+  assert(zs_mode_tick(&s, t + pol.listen_dwell_ms) && s.mode == ZS_MODE_S3_COMMS);
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_COMMS_DONE, t + 10000u) && s.mode == ZS_MODE_S1_LISTEN);
+  /* without the boot session the failure only closes the detector */
+  pol.boot_session = false;
+  zs_mode_init(&s, &pol, t);
+  assert(!zs_mode_on_event(&s, ZS_MODE_EV_BOOT_FAILED, t) && s.mode == ZS_MODE_S0_SLEEP && s.selftest_failed);
+  assert(!zs_mode_on_event(&s, ZS_MODE_EV_MIC_WAKE, t + 5000u));
+  /* a failure reported while listening stops the detector */
+  zs_mode_init(&s, &pol, t);
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_BOOT_DONE, t) && s.mode == ZS_MODE_S1_LISTEN);
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_BOOT_FAILED, t + 100u) && s.mode == ZS_MODE_S0_SLEEP);
+  /* critical battery still wins */
+  assert(zs_mode_on_event(&s, ZS_MODE_EV_BATTERY_CRITICAL, t + 200u) && s.mode == ZS_MODE_SHUTDOWN);
+}
+
 /* ------------------------------------------------------------- pdm capture */
 #define BLK 64u
 static int32_t dma_buf[ZS_PDM_CHANNELS][2u * BLK];
@@ -263,6 +305,7 @@ static void test_selftest(void) {
   assert(zs_selftest_run_all(&r, 10u));  /* required test passes, optional failure tolerated */
   assert(r.result[ZS_ST_ID_POWER_INA226] == ZS_ST_PASS && r.detail[ZS_ST_ID_POWER_INA226] == 3900u);
   assert(r.result[ZS_ST_ID_LORA_SPI] == ZS_ST_FAIL && r.detail[ZS_ST_ID_LORA_SPI] == 7u);
+  assert(zs_selftest_failed_mask(&r) == (1u << ZS_ST_ID_LORA_SPI));   /* optional failures are reported too */
   n = zs_selftest_encode(&r, buf, sizeof(buf));
   /* map(3){1:[1,3900], 8:[2,7], 9:[3,0]} */
   {
@@ -274,6 +317,8 @@ static void test_selftest(void) {
   assert(zs_selftest_register(&r, ZS_ST_ID_NOR_SFDP, "nor", st_broken, NULL, true));
   assert(!zs_selftest_run_all(&r, 20u));
   assert(r.result[ZS_ST_ID_NOR_SFDP] == ZS_ST_FAIL); /* NOT_RUN from a test is reported as FAIL */
+  assert(zs_selftest_failed_mask(&r) == ((1u << ZS_ST_ID_LORA_SPI) | (1u << ZS_ST_ID_NOR_SFDP)));
+  assert(zs_selftest_failed_mask(NULL) == 0u);
   assert(zs_selftest_run_one(&r, ZS_ST_ID_POWER_INA226, 30u) == ZS_ST_PASS && r.last_run_ms == 30u);
   assert(zs_selftest_run_one(&r, ZS_ST_ID_SD_CARD, 30u) == ZS_ST_NOT_RUN);
   assert(strcmp(zs_selftest_code_name(ZS_ST_SKIPPED), "SKIPPED") == 0);
@@ -281,6 +326,7 @@ static void test_selftest(void) {
 
 int main(void) {
   test_power_modes();
+  test_power_modes_selftest_failed();
   test_pdm_capture();
   test_pps_sync();
   test_selftest();
