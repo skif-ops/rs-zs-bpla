@@ -5,6 +5,8 @@ import math
 import sys
 from pathlib import Path
 
+import numpy as np
+import shapely
 from shapely.geometry import Polygon
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,6 +18,38 @@ BASE = ROOT / 'hardware/kicad/candidates/PCB-ROUTING-P2-UUID-073'
 BOARD = BASE / 'PCB-MAIN_P2_UUID_073_CANDIDATE_REV_A.kicad_pcb'
 DRC = BASE / 'drc_candidate.json'
 OUT = ROOT / 'hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-074'
+
+
+class GroundAwareRouter(GapFillRouter):
+    def __init__(self, *args, reference_masks, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.reference_masks = reference_masks
+
+    def _blocked(self, net):
+        track, via = super()._blocked(net)
+        for k, layer in enumerate(self.layers):
+            track[k] |= ~self.reference_masks[layer]
+        via |= ~(self.reference_masks['F.Cu'] & self.reference_masks['B.Cu'])
+        return track, via
+
+
+def masks(board, domain, layers):
+    x = np.arange(1101) * .1
+    y = np.arange(751) * .1
+    gx, gy = np.meshgrid(x, y, indexing='ij')
+    result = {}
+    for layer in layers:
+        ground_layer = {'F.Cu':'In1.Cu','In3.Cu':'In2.Cu','B.Cu':'In4.Cu'}[layer]
+        if ground_layer == 'In2.Cu':
+            shape = geo.zone_outline(board, 'GND_MIC', ground_layer)
+        elif domain.startswith(('CROSS_', 'RETURN_AT_LOAD_')):
+            shapes = [geo.zone_outline(board, name, ground_layer) for name in ('GND_DIGITAL','GND_MODEM')
+                      if any(z.netName == name and z.layers == [ground_layer] for z in board.zones)]
+            shape = shapes[0].union(*shapes[1:])
+        else:
+            shape = geo.zone_outline(board, domain, ground_layer)
+        result[layer] = shapely.intersects_xy(shape, gx, gy)
+    return result
 
 
 def geometry(board):
@@ -41,7 +75,13 @@ def geometry(board):
 
 
 def main():
-    board, _ = geo.load(BOARD)
+    global BASE, BOARD, DRC, OUT
+    if '--base=074' in sys.argv:
+        BASE = ROOT / 'hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-074'
+        BOARD = BASE / 'PCB-MAIN_P2_ASTAR_074_CANDIDATE_REV_A.kicad_pcb'
+        DRC = BASE / 'drc_candidate.json'
+        OUT = ROOT / 'hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075'
+    board, domains = geo.load(BOARD)
     g = geometry(board)
     gaps = json.loads(DRC.read_text())['unconnected_items']
     pairs = []
@@ -54,17 +94,26 @@ def main():
     if '--list' in sys.argv:
         for pair in sorted(pairs): print(pair)
         return
-    selected = [int(s) for s in sys.argv[1:] if s.isdigit()] or [i for d,i,*_ in sorted(pairs)[:10]]
+    selected = ([i for _,i,*_ in pairs] if '--all' in sys.argv else
+                [int(s) for s in sys.argv[1:] if s.isdigit()] or [i for d,i,*_ in sorted(pairs)[:10]])
     results=[]
     shared = None
+    mask_cache = {}
     for distance,i,net,a,b in sorted(pairs):
         if i not in selected: continue
         print('TRY',i,net,round(distance,2),flush=True)
+        layers=['F.Cu','B.Cu'] if '--fb' in sys.argv else ['F.Cu','In3.Cu','B.Cu']
         if shared is None or '--sequential' not in sys.argv:
-            router=GapFillRouter(g,['F.Cu','B.Cu'] if '--fb' in sys.argv else ['F.Cu','In3.Cu','B.Cu'],
+            Router = GroundAwareRouter if '--ref' in sys.argv else GapFillRouter
+            extra = {}
+            if '--ref' in sys.argv:
+                key=(domains[net],tuple(layers))
+                if key not in mask_cache: mask_cache[key]=masks(board,*key)
+                extra['reference_masks']=mask_cache[key]
+            router=Router(g,layers,
                                  width=.25 if net in ('3V3_DIGITAL','1V8_MIC','VCORE_1V1') else .15,
                                  clearance=.20,via_size=.25,via_drill=.15,edge_keep=.60,hole_keep=.25,
-                                 allow_via_in_own_pad=True)
+                                 allow_via_in_own_pad=True,**extra)
             if '--sequential' in sys.argv: shared = router
         else: router = shared
         before = len(router.routed)
