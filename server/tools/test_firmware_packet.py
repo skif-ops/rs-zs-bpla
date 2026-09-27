@@ -85,6 +85,7 @@ assert heartbeat.detector.presence_level == "CONFIRMED" and heartbeat.detector.w
 assert heartbeat.detector.reset_cause == "IWDG" and heartbeat.detector.watchdog_missed_tasks == 0x20
 assert heartbeat.detector.params_version == 3
 assert not heartbeat.self_test_ok and heartbeat.detector.selftest_failed_tests == 0x10   # mic_capture (id 4)
+assert heartbeat.detector.command_key_id == "a1b2c3d4e5f60718" and heartbeat.detector.command_next_key_id == "0102030405060708"
 assert heartbeat.cellular.apn == "network.apn"
 assert heartbeat.cellular.apn_source == "NETWORK"
 assert heartbeat.cellular.settings_valid

@@ -196,6 +196,8 @@ typedef struct {
   uint16_t watchdog_missed;    /* key 13: task-watch mask that let the IWDG fire before this boot (0 = none) */
   uint32_t params_version;     /* key 14: version of the runtime parameter set in force (CMD_SET_PARAMS; 0 = defaults) */
   uint16_t selftest_failed;    /* key 15: self-tests whose last run failed (bit = zs_selftest_id_t, zs_selftest_failed_mask; 0 = none) */
+  uint64_t command_key_id;     /* key 16: id of the current command key (zs_command_key_id_u64; 0 = none provisioned) */
+  uint64_t command_next_key_id; /* key 17: id of the next key while a rotation is in flight (addendum E; 0 = none) */
 } zs_detector_health_t;
 
 typedef struct {
