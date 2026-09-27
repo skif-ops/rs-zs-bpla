@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Candidate 102: trim nine F.Cu dead-end stubs and their unused vias."""
+"""Candidate 102: trim two screened F.Cu dead-end stubs and unused vias."""
 from __future__ import annotations
 
 import json
@@ -23,15 +23,8 @@ VIA = re.compile(r'^  \(via \(at ([^)]*)\) \(size ([^)]*)\) \(drill ([^)]*)\) '
 SEGMENT = re.compile(r'^  \(segment \(start ([^)]*)\) \(end ([^)]*)\) \(width ([^)]*)\) '
                      r'\(layer "([^"]*)"\) \(net (\d+)\) \(tstamp [^)]*\)\)\n$')
 REMOVE = {
-    ('CELL_DTR_U16', 29.124, 37.0148),
-    ('CELL_USIM_CLK_1V8', 34.1524, 45.4019),
-    ('HW_REV1', 50.016, 19.224),
-    ('I2C2_SDA_U1', 44.0768, 37.6641),
-    ('LORA_TXEN', 57.2258, 34.4489),
-    ('PDM_DATA1_1V8', 54.2917, 42.7736),
     ('SIM2_DET', 58.9437, 12.9666),
     ('SIM_MUX_EN', 28.4433, 15.223),
-    ('USB_VBUS_SENSE', 48.0268, 14.8002),
 }
 
 
@@ -86,7 +79,7 @@ def main() -> None:
     before = json.loads((BASE / 'drc_candidate.json').read_text())
     after = json.loads((OUT / 'drc_candidate.json').read_text())
     count = lambda document: sum(v['type'] == 'via_dangling' for v in document['violations'])
-    assert count(before) == 12 and count(after) == 3, (count(before), count(after))
+    assert count(before) == 12 and count(after) == 10, (count(before), count(after))
     summary = {'schema': 'dioneya-pcb-main-tail-cleanup-102-v1', 'base_sha256': BASE_SHA,
                'candidate_sha256': native.sha(CANDIDATE), 'removed_dead_end_vias': len(REMOVE),
                'removed_dead_end_segments': len(REMOVE), 'via_dangling_before': count(before),
