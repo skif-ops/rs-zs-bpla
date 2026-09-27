@@ -522,7 +522,7 @@ The `GNSS_ANT_SWITCHED` Q4.3 leg has only a roughly 14.7 mm In3.Cu
 or 23.6 mm B.Cu detour to the existing through via in the sampled
 channel. It remains open pending shorter RF-bias-network layout relief.
 
-## 9. Native KiCad 9 continuation through candidate 081 (2026-09-27)
+## 9. Native KiCad 9 continuation through candidate 085 (2026-09-27)
 
 Draft PR #93, branch `feature/pcb-main-completion`, retains PCB-MAIN 003 as the
 authoritative board. Comparative filled-board KiCad 9.0.9 checks under the
@@ -541,6 +541,10 @@ candidate-only 0.25/0.15 mm via rules gave:
 | 079, AAD_CFG_1V8_FANOUT branch | **36** | **0** | **0** |
 | 080, 3V8_MODEM_RF C47 branch | **35** | **0** | **0** |
 | 081, CELL_DBG_RXD_TP debug branch | **34** | **0** | **0** |
+| 082, CELL_USB_BOOT_TP test branch | **33** | **0** | **0** |
+| 083, CELL_USIM_CLK_1V8 branch | **32** | **0** | **0** |
+| 084, 3V8_MODEM_RF C46 branch | **31** | **0** | **0** |
+| 085, U19 PDM_DATA1 relief | **30** | **0** | **0** |
 
 076 moves the existing GND_DIGITAL via next to U3.6 from
 (66.099999, 30.600) to (66.099999, 30.650) mm and changes it from
@@ -581,6 +585,25 @@ section lies over GND_MIC and the outer sections over GND_DIGITAL for a
 modem-domain debug signal. Cross-domain return and fixture timing need
 Review B. An independent CELL_USB_BOOT_TP grid proposal shares this
 channel and shorts to 081, so it was rejected.
+
+Re-running the grid search after 081 found a separate CELL_USB_BOOT_TP
+path, accepted as 082. It is 54.058 mm with six candidate-process vias;
+its filled-board DRC went 34→33 with no new violations. The route is
+long and crosses the MIC/digital reference areas. 083 adds a 36.252 mm
+USIM clock branch with three vias, including 26.955 mm on In3.Cu over
+GND_MIC. DRC went 33→32 with no new violations. Signal timing, return
+and DFM are Review B holds.
+
+084 joins the C46 33 pF RF supply capacitor with 22.062 mm of 0.40 mm
+copper and three vias, 17.265 mm of it on B.Cu above GND_MODEM. DRC
+went 32→31 without new violations. The RF decoupling loop and brief
+MIC/digital ground crossings need PI and return-path Review B. 085
+reroutes PDM_CLK on B.Cu and the existing 0.80 mm 3V8_MODEM In3.Cu
+feed near U19, then connects PDM_DATA1 through a 0.25/0.15 mm via in
+U19.2. The nearby GND_MIC via is moved and resized to 0.25/0.15 mm,
+with a 0.348 mm F.Cu link to preserve ground continuity. Filled-board
+DRC went 31→30 without new violations; ERC stays zero. U19 via-in-pad,
+microphone return, modem supply and finished-drill DFM need Review B.
 
 The 075 routes total 107.8935 mm and 15 new vias, including a 45.1553 mm
 1V8_MIC branch; they are routing experiments. Power integrity, microphone
