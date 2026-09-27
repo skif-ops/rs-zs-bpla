@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-sd-d3-top-088-v1",
+  "base_sha256": "a41ce5bd9d71d81d3abde9c57116debbc205bf88f97fafa834fc6e9c1076dbfe",
+  "candidate_sha256": "6a2b1353fa3e0e71c98f4547f667a496f5aee2cad61bc080075cd64472f69e80",
+  "route": {
+    "net": "SD_D3_CARD",
+    "track_length_mm": 14.74,
+    "new_segments": 25,
+    "new_vias": 2
+  },
+  "drc": {
+    "base_unconnected": 28,
+    "candidate_unconnected": 27,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: end-to-end SDIO timing/skew and return, two small vias/DFM",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
