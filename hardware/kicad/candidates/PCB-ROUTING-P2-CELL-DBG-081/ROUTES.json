@@ -1,0 +1,199 @@
+{
+  "schema": "dioneya-pcb-main-route-081-v1",
+  "source": "reference-unrestricted 0.1 mm A* on candidate 080; native filled-board KiCad DRC screen",
+  "net": "CELL_DBG_RXD_TP",
+  "items": [
+    {
+      "kind": "track",
+      "layer": "B.Cu",
+      "width_or_size_mm": 0.15,
+      "points_mm": [
+        [
+          51.9,
+          30.7
+        ],
+        [
+          51.6,
+          31.0
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "layer": null,
+      "width_or_size_mm": 0.25,
+      "points_mm": [
+        [
+          51.6,
+          31.0
+        ]
+      ]
+    },
+    {
+      "kind": "track",
+      "layer": "In3.Cu",
+      "width_or_size_mm": 0.15,
+      "points_mm": [
+        [
+          51.6,
+          31.0
+        ],
+        [
+          49.7,
+          32.9
+        ],
+        [
+          49.7,
+          33.1
+        ],
+        [
+          47.4,
+          35.4
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "layer": null,
+      "width_or_size_mm": 0.25,
+      "points_mm": [
+        [
+          47.4,
+          35.4
+        ]
+      ]
+    },
+    {
+      "kind": "track",
+      "layer": "B.Cu",
+      "width_or_size_mm": 0.15,
+      "points_mm": [
+        [
+          47.4,
+          35.4
+        ],
+        [
+          46.6,
+          36.2
+        ],
+        [
+          46.4,
+          36.2
+        ],
+        [
+          46.3,
+          36.3
+        ],
+        [
+          45.8,
+          36.3
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "layer": null,
+      "width_or_size_mm": 0.25,
+      "points_mm": [
+        [
+          45.8,
+          36.3
+        ]
+      ]
+    },
+    {
+      "kind": "track",
+      "layer": "In3.Cu",
+      "width_or_size_mm": 0.15,
+      "points_mm": [
+        [
+          45.8,
+          36.3
+        ],
+        [
+          45.8,
+          37.4
+        ],
+        [
+          45.9,
+          37.5
+        ],
+        [
+          45.9,
+          38.3
+        ],
+        [
+          46.0,
+          38.4
+        ],
+        [
+          46.0,
+          46.1
+        ],
+        [
+          46.3,
+          46.4
+        ],
+        [
+          46.3,
+          47.8
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "layer": null,
+      "width_or_size_mm": 0.25,
+      "points_mm": [
+        [
+          46.3,
+          47.8
+        ]
+      ]
+    },
+    {
+      "kind": "track",
+      "layer": "F.Cu",
+      "width_or_size_mm": 0.15,
+      "points_mm": [
+        [
+          46.3,
+          47.8
+        ],
+        [
+          40.1,
+          54.0
+        ],
+        [
+          40.1,
+          54.2
+        ],
+        [
+          39.8,
+          54.5
+        ],
+        [
+          39.8,
+          54.7
+        ],
+        [
+          39.7,
+          54.8
+        ],
+        [
+          39.7,
+          55.0
+        ],
+        [
+          39.5,
+          55.2
+        ],
+        [
+          39.5,
+          55.4
+        ]
+      ]
+    }
+  ],
+  "review_b": "MODEM debug/test signal over In2.Cu GND_MIC and digital ground instead of GND_MODEM; cross-domain return and fixture timing open"
+}
