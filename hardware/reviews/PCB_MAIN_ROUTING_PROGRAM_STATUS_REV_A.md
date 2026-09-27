@@ -522,7 +522,7 @@ The `GNSS_ANT_SWITCHED` Q4.3 leg has only a roughly 14.7 mm In3.Cu
 or 23.6 mm B.Cu detour to the existing through via in the sampled
 channel. It remains open pending shorter RF-bias-network layout relief.
 
-## 9. Native KiCad 9 continuation through candidate 099 (2026-09-27)
+## 9. Native KiCad 9 continuation through candidate 100 (2026-09-27)
 
 Draft PR #93, branch `feature/pcb-main-completion`, retains PCB-MAIN 003 as the
 authoritative board. Comparative filled-board KiCad 9.0.9 checks under the
@@ -555,7 +555,11 @@ candidate-only 0.25/0.15 mm via rules gave:
 | 093, SD_D0_CARD U24 upper branch | **22** | **0** | **0** |
 | 094, R18 AAD_CFG_1V8_FANOUT placement relief | **21** | **0** | **0** |
 | 095, PDM_DATA1_1V8 to U19.2 | **20** | **0** | **0** |
-| 096, north F.Cu 3V3_DIGITAL bridge | **19** | **0** | **0** |\n| 097, AAD_CFG with REV_STRAP0 relocation | **18** | **0** | **0** |\n| 098, PWR_FAULT with NOR_CLK_U1 relocation | **17** | **0** | **0** |\n| 099, CELL_PWRKEY_CMD with LORA_BUSY relocation | **16** | **0** | **0** |
+| 096, north F.Cu 3V3_DIGITAL bridge | **19** | **0** | **0** |
+| 097, AAD_CFG with REV_STRAP0 relocation | **18** | **0** | **0** |
+| 098, PWR_FAULT with NOR_CLK_U1 relocation | **17** | **0** | **0** |
+| 099, CELL_PWRKEY_CMD with LORA_BUSY relocation | **16** | **0** | **0** |
+| 100, PDM_DATA2_1V8 with NRST relocation | **15** | **0** | **0** |
 
 076 moves the existing GND_DIGITAL via next to U3.6 from
 (66.099999, 30.600) to (66.099999, 30.650) mm and changes it from
@@ -673,6 +677,14 @@ KiCad DRC went 17→16 without new violations; ERC remains zero.
 The long detour, modem control latency/noise, return and via-in-pad
 assembly remain Review B/DFM holds; it is not a manufacturing route.
 
+100 removes one NRST In3.Cu segment at the U1 edge, adds the
+PDM_DATA2_1V8 pad transition at (52.5, 21.9) mm and connects it to
+the existing U19-side via. It restores NRST on In3.Cu. The replacement
+uses 66.890 mm of 0.15 mm copper and eight 0.25/0.15 mm vias.
+Native filled-board KiCad 9.0.9 DRC went 16→15 without new violations;
+ERC remains zero. Audio skew/return, reset integrity and via-in-pad
+assembly remain Review B/DFM holds.
+
 Post-088 probes examined all 27 remaining airwires: the unmodified
 0.15/0.25 mm grid router found **zero** directly routeable gaps.
 Six R89 placement experiments for the adjacent SD_D0_CARD channel
@@ -681,11 +693,11 @@ so none was adopted. Removing eleven local LORA_DIO1 In3 segments
 did not yield an alternate path around a prospective U1.27 3V3 via.
 A single-neighbor rip-up screen found only obstructed or long
 routes (for example GNSS_TX_U1 69–79 mm with 9–10 vias and
-LORA_SCK_U1 51–64 mm with 5–8 vias). The PDM_DATA2 virtual
-U1 via at (52.5, 22.1) mm conflicts with NRST and BOOT0 copper
-and was rejected before native DRC. The next routing work needs
+LORA_SCK_U1 51–64 mm with 5–8 vias). The earlier PDM_DATA2 virtual
+U1 via at (52.5, 22.1) mm conflicts with NRST and BOOT0 copper;
+a different transition at (52.5, 21.9) mm is accepted in 100. The next routing work needs
 coordinated placement relief and rerouting in the U1, SDIO and
-power corridors; the accepted candidate is now 099 with 16 open.
+power corridors; the accepted candidate is now 100 with 15 open.
 
 The 075 routes total 107.8935 mm and 15 new vias, including a 45.1553 mm
 1V8_MIC branch; they are routing experiments. Power integrity, microphone
