@@ -135,16 +135,22 @@ class GapFillRouter:
                 continue
             # land strictly on copper: erode rounded/approximated outlines
             eroded = shape.buffer(-0.12)
-            shape = eroded if not eroded.is_empty else shape.centroid.buffer(0.05)
-            minx, miny, maxx, maxy = shape.bounds
-            i0, j0 = self._cell(minx, miny)
-            i1, j1 = self._cell(maxx, maxy)
-            for i in range(max(i0, 0), min(i1, self.nx - 1) + 1):
-                for j in range(max(j0, 0), min(j1, self.ny - 1) + 1):
-                    if shape.contains(Point(self._xy(i, j))):
-                        for index, layer in enumerate(self.layers):
-                            if layer in item_layers:
-                                cells.append((index, i, j))
+            # Small pads and vias can survive erosion as a sub-grid sliver.
+            # In that case sample their original copper, not an empty goal set.
+            candidates = []
+            for landing in ([eroded, shape] if not eroded.is_empty else [shape]):
+                minx, miny, maxx, maxy = landing.bounds
+                i0, j0 = self._cell(minx, miny)
+                i1, j1 = self._cell(maxx, maxy)
+                for i in range(max(i0, 0), min(i1, self.nx - 1) + 1):
+                    for j in range(max(j0, 0), min(j1, self.ny - 1) + 1):
+                        if landing.contains(Point(self._xy(i, j))):
+                            for index, layer in enumerate(self.layers):
+                                if layer in item_layers:
+                                    candidates.append((index, i, j))
+                if candidates:
+                    break
+            cells.extend(candidates)
         return cells
 
     # --- search -------------------------------------------------------------------
