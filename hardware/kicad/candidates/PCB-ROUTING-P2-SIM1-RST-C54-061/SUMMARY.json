@@ -1,0 +1,35 @@
+{
+  "schema": "dioneya-pcb-main-sim1-rst-c54-061-v1",
+  "base_sha256": "397917294ca238fa72fd17548a77518b56887b77af361606bb4062fbf96afacd",
+  "candidate_sha256": "b733b350b14dcbad0c62e91f7b58a715a891b418bdeac28d17f88277e724b4d0",
+  "net": "SIM1_RST_CONN",
+  "route_points": [
+    [
+      18.175,
+      16.0
+    ],
+    [
+      24.075,
+      16.7
+    ]
+  ],
+  "track_width_mm": 0.15,
+  "route_length_mm": 5.9414,
+  "new_vias": 1,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "in4_gnd_modem_reference_fraction": 1.0,
+  "sim_reset_return_review_b": "OPEN",
+  "small_via_dfm": "OPEN",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 81,
+    "candidate_unconnected": 80,
+    "new_by_type": {},
+    "new_errors": 0
+  }
+}
