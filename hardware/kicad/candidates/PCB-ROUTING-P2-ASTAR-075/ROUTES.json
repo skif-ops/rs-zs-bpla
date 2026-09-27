@@ -892,5 +892,6 @@
         }
       ]
     }
-  ]
+  ],
+  "screening_status": "experimental; native KiCad ERC/DRC and PI/return-path review pending"
 }
