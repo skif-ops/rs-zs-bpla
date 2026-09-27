@@ -414,6 +414,7 @@ static void capture_set(bool on) {
 /* events of this run for CMD_REQUEST_AUDIO (mirrors app_audio_rec's table; the twin's clock is always trusted) */
 typedef struct { uint64_t event_id; int64_t time_us; } twin_event_t;
 static twin_event_t twin_events[16]; static unsigned twin_events_next;
+static bool forget_events;   /* --forget-events: the station lost its table (as after a reboot); requests rely on the server's time */
 static const zs_prehistory_t *src_ring(void) { return &prehistory; }
 static void src_range(uint64_t *oldest, uint64_t *next) { *next = prehistory.next_sequence; *oldest = prehistory.next_sequence - prehistory.available_records; }
 static bool src_event_time(uint64_t id, int64_t *t, bool *trusted) { for (unsigned i = 0u; i < 16u; i++) if (id && twin_events[i].event_id == id) { *t = twin_events[i].time_us; *trusted = true; return true; } return false; }
@@ -432,7 +433,7 @@ static bool pl_emit(void *ctx, const zs_detection_t *d) {
   events_emitted_total += ok;
   if (ok) remember_summary(d->event_id, d->classification.class_id, d->classification.confidence_u8, pipeline.presence.level, (uint16_t)pipeline.last_gate.f0_hz);
   if (ok && first_event_time_us == 0) first_event_time_us = d->event_time_us;
-  twin_events[twin_events_next] = (twin_event_t){d->event_id, d->event_time_us}; twin_events_next = (twin_events_next + 1u) % 16u;
+  if (!forget_events) { twin_events[twin_events_next] = (twin_event_t){d->event_id, d->event_time_us}; twin_events_next = (twin_events_next + 1u) % 16u; }
   tlog("station: event %llu emitted (level %u conf %u) -> outbox %s", (unsigned long long)d->event_id, pipeline.presence.level, pipeline.presence.confidence_u8, ok ? "ok" : "REFUSED");
   return ok;
 }
@@ -658,7 +659,8 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--expect-commands") && i + 1 < argc) expect_commands = atoi(argv[++i]);
     else if (!strcmp(argv[i], "--expect-reboots") && i + 1 < argc) expect_reboots = atoi(argv[++i]);
     else if (!strcmp(argv[i], "--expect-post-audio") && i + 1 < argc) expect_post_audio = atoi(argv[++i]);
-    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S]\n"); return 2; }
+    else if (!strcmp(argv[i], "--forget-events")) forget_events = true;
+    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events]\n"); return 2; }
   }
   if (!strcmp(scene_name, "drone")) { segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 20000u, 60000u, 185.0f, 1.0f}; if (seconds > 150u) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 100000u, 130000u, 210.0f, 0.8f}; }
   else if (!strcmp(scene_name, "ground")) segs[nseg++] = (scene_segment_t){SCENE_GROUND_VEHICLE, 20000u, 60000u, 0.0f, 1.0f};
