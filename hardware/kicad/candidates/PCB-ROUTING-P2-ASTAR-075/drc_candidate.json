@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-09-27T12:54:10+0000",
+    "date": "2026-09-27T12:59:52+0000",
     "included_severities": [
         "error",
         "warning",
@@ -222,12 +222,12 @@
             "description": "Missing connection between items",
             "items": [
                 {
-                    "description": "Track [AAD_CFG_1V8_FANOUT] on F.Cu, length 3.7886 mm",
+                    "description": "Track [AAD_CFG_1V8_FANOUT] on F.Cu, length 1.5556 mm",
                     "pos": {
-                        "x": 42.9825,
-                        "y": 64.7
+                        "x": 41.8825,
+                        "y": 63.6
                     },
-                    "uuid": "111d9282-0079-5a8e-8306-07ecc1f5ce1c"
+                    "uuid": "43cbc069-2e4f-5cb9-a230-3601608a9f30"
                 },
                 {
                     "description": "Pad 2 [AAD_CFG_1V8_FANOUT] of R18 on F.Cu",
@@ -345,12 +345,12 @@
                     "uuid": "59c47db9-be67-4418-9cb6-167a7d5e78c2"
                 },
                 {
-                    "description": "Via [CELL_RI_U16] on F.Cu - B.Cu",
+                    "description": "Track [CELL_RI_U16] on B.Cu, length 4.6878 mm",
                     "pos": {
                         "x": 29.1194,
                         "y": 32.4026
                     },
-                    "uuid": "aad2c200-91be-5b33-824d-1068d6880e29"
+                    "uuid": "6cef923a-545b-5d04-a9c2-04cae0384f44"
                 }
             ],
             "severity": "error",
@@ -391,12 +391,12 @@
                     "uuid": "66b51a96-ab5f-4315-bcff-d2ad84956c45"
                 },
                 {
-                    "description": "Pad 1 [CELL_USB_BOOT_TP] of R38 on F.Cu",
+                    "description": "Track [CELL_USB_BOOT_TP] on F.Cu, length 0.6789 mm",
                     "pos": {
                         "x": 37.675,
                         "y": 59.25
                     },
-                    "uuid": "e14fcc69-d28f-444a-939c-aece1635b876"
+                    "uuid": "f4efe046-ca39-5ff1-b759-ee285bdc36c4"
                 }
             ],
             "severity": "error",
@@ -414,12 +414,12 @@
                     "uuid": "5132f010-4915-53b0-95e1-2ce204ec4596"
                 },
                 {
-                    "description": "Via [CELL_USIM_CLK_1V8] on F.Cu - B.Cu",
+                    "description": "Track [CELL_USIM_CLK_1V8] on F.Cu, length 0.0230 mm",
                     "pos": {
                         "x": 35.9097,
-                        "y": 19.8958
+                        "y": 19.8728
                     },
-                    "uuid": "b0016547-7d22-51d3-95da-ae33bbc0a9e5"
+                    "uuid": "7108ef10-ff8f-541a-8589-1a8a4222c420"
                 }
             ],
             "severity": "error",
