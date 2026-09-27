@@ -522,7 +522,7 @@ The `GNSS_ANT_SWITCHED` Q4.3 leg has only a roughly 14.7 mm In3.Cu
 or 23.6 mm B.Cu detour to the existing through via in the sampled
 channel. It remains open pending shorter RF-bias-network layout relief.
 
-## 9. Native KiCad 9 continuation through candidate 077 (2026-09-27)
+## 9. Native KiCad 9 continuation through candidate 079 (2026-09-27)
 
 Draft PR #93, branch `feature/pcb-main-completion`, retains PCB-MAIN 003 as the
 authoritative board. Comparative filled-board KiCad 9.0.9 checks under the
@@ -537,6 +537,8 @@ candidate-only 0.25/0.15 mm via rules gave:
 | 075, microphone rail branches and LORA_TXEN | 40 | 0 | 0 |
 | 076, U3 local 3V3 relief | 39 | 0 | 0 |
 | 077, 3V3_DIGITAL In3 bridge | **38** | **0** | **0** |
+| 078, U1 3V3 escape relief | **37** | **0** | **0** |
+| 079, AAD_CFG_1V8_FANOUT branch | **36** | **0** | **0** |
 
 076 moves the existing GND_DIGITAL via next to U3.6 from
 (66.099999, 30.600) to (66.099999, 30.650) mm and changes it from
@@ -554,6 +556,16 @@ ERC remained at zero. The generator, route coordinates, candidate board,
 and reports are under `PCB-ROUTING-P2-ASTAR-077/`. Power and DFM Review B
 remain open.
 
+078 moves the B.Cu CELL_RESET_N_CMD and In3.Cu TEST_UART_RX_U1
+segments beside U1.27, then joins its 3V3_DIGITAL pad to an In3.Cu
+branch with two candidate-process vias. The filled-board native DRC went
+from 38 to 37 without new violations. 079 adds 52.332 mm of AAD_CFG_1V8_FANOUT
+copper, including 49.922 mm on B.Cu above the In4.Cu GND_DIGITAL outline,
+and two candidate-process vias. Its right via was moved onto an existing
+same-net F.Cu track to clear a copper sliver. The filled-board native DRC
+went from 37 to 36 without new violations; ERC remains zero. Return path
+across ground domains, timing, and small-via DFM remain open for Review B.
+
 The 075 routes total 107.8935 mm and 15 new vias, including a 45.1553 mm
 1V8_MIC branch; they are routing experiments. Power integrity, microphone
 noise, LoRa return path, and via-in-pad/finished-drill DFM require Review B.
@@ -564,14 +576,15 @@ one open connection but shorted SD_D2_U1; it was rejected as well.
 After 077, additional grid routes for LSE_IN, GNSS_TX_U1 and the USB
 connector pair required about 91/83/50 mm and 11/7/3 transitions respectively;
 the LSE placement and USB 90-ohm pair constraints rule out accepting them.
-At U1.27, a 3V3 escape via is obstructed by the B.Cu CELL_RESET_N_CMD
-track and the In3.Cu TEST_UART_RX_U1 track; local rip-up/placement relief is
-needed. Freerouting experiments on the 076 DSN did not improve the KiCad
-DRC count beyond these local routes. Automatic approval review blocked a
-further Freerouting run when it contacted api.github.com with private
-PCB-derived input; that run was not used for candidate copper.
+The U1.27 3V3 escape obstruction was relieved in 078. A subsequent
+Freerouting 2.4.1 session supplied the AAD branch in 079; its other
+session copper did not yield another clean connection. The 079 short-gap
+reference-aware grid probe found no unobstructed path for its ten closest
+pairs. Trial PDM_DATA1_1V8 and R4 power routes reduced the open count
+by one but caused new copper short/clearance violations, so neither
+was incorporated.
 
-The target of ten or fewer open connections has **not** been met. Further
+The current target of zero open connections has **not** been met. Further
 placement relief and selective rip-up around U1, SDIO, and the modem power
 group are needed. No candidate in this section is applied to PCB-MAIN 003 or
 released for manufacture.
