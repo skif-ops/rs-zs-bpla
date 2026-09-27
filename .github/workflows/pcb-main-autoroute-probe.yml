@@ -1,0 +1,32 @@
+name: PCB-MAIN candidate 097 autorouter probe
+on:
+  push:
+    branches: [feature/pcb-main-completion]
+    paths:
+      - .github/workflows/pcb-main-autoroute-probe.yml
+  workflow_dispatch:
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
+      options: --user root
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/pcb-main-completion
+      - name: Export locked candidate 096 copper as DSN
+        run: |
+          mkdir -p hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE
+          cp hardware/kicad/candidates/PCB-ROUTING-P2-3V3-NORTH-096/PCB-MAIN_P2_3V3_NORTH_096_CANDIDATE_REV_A.kicad_pcb hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.kicad_pcb
+          cp hardware/kicad/candidates/PCB-ROUTING-P2-3V3-NORTH-096/PCB-MAIN_P2_3V3_NORTH_096_CANDIDATE_REV_A.kicad_pro hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.kicad_pro
+          /usr/bin/python3 tools/kicad_autoroute_stage_rev_a.py export hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.kicad_pcb hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.dsn '{"planes":[]}'
+          sha256sum hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/PROBE.dsn
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pcb-main-autoroute-097-dsn
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-AUTOROUTE-097-PROBE/
