@@ -216,8 +216,8 @@ def main() -> int:
             require(actual == {net}, f"{ref}.{number}: board net {sorted(actual)} != {net}")
 
     dim003 = json.loads(DIM003_REV_B.read_text(encoding="utf-8"))
-    require(board_sha256 == ECO_006_SHA256 == dim003["source_board_sha256"],
-            "DIM-003 Rev B is bound to the exact ECO-006 board")
+    require(dim003["source_board_sha256"] == ECO_006_SHA256,
+            "DIM-003 Rev B source binding differs from the exact ECO-006 board")
     require(dim003["coordinate_system"]["origin"] == "LOWER_LEFT_EDGE_CUT_INTERSECTION" and
             dim003["coordinate_system"]["y_axis"] == "NORTH_ALONG_60_MM_EDGE" and
             dim003["outline"]["size_mm"] == [90, 60],
@@ -300,10 +300,16 @@ def main() -> int:
     require(dim003["release_boundary"]["dim_003_accepted_for_evt"] is False and
             dim003["release_boundary"]["manufacturing_release"] is False,
             "DIM-003 Rev B candidate release boundary drift")
-    audit_dim003_rev_b()
+    # This historical audit also runs after regenerating earlier placement
+    # candidates. Only the committed ECO-006 board is source-bound to Rev B.
+    if board_sha256 == ECO_006_SHA256:
+        audit_dim003_rev_b()
     print("PCB-PWR EVT placement-candidate independent audit PASS")
     print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; accepted 3V8 output bulk 010 successor")
-    print("DIM-003 Rev B candidate verified against ECO-006 board; independent mechanical acceptance and manufacturing release remain blocked")
+    if board_sha256 == ECO_006_SHA256:
+        print("DIM-003 Rev B candidate verified against ECO-006 board; independent mechanical acceptance and manufacturing release remain blocked")
+    else:
+        print("Historical placement geometry checked; DIM-003 Rev B source binding applies only to ECO-006")
     return 0
 
 
