@@ -1,0 +1,28 @@
+{
+  "schema": "dioneya-pcb-pwr-dim-003-board-pose-evidence-v1",
+  "source_board": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
+  "source_ref": "evt-pre-20@02647713c228e3beb338053f37d06f83cd4bb94f",
+  "source_board_sha256": "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7",
+  "source_frame": "KiCad: upper-left Edge.Cuts origin, +X east, +Y south, mm",
+  "authority_frame": "DIM-003: lower-left Edge.Cuts origin, +X east, +Y north, mm",
+  "transform": "x_dim = x_kicad; y_dim = 60 - y_kicad",
+  "board_height_mm": 60,
+  "footprints": {
+    "H1": {"at_kicad_mm": [5, 5], "at_dim_mm": [5, 55]},
+    "H2": {"at_kicad_mm": [82, 5], "at_dim_mm": [82, 55]},
+    "H3": {"at_kicad_mm": [68, 55], "at_dim_mm": [68, 5]},
+    "H4": {"at_kicad_mm": [5, 55], "at_dim_mm": [5, 5]},
+    "J1": {"at_kicad_mm": [6, 28], "at_dim_mm": [6, 32]},
+    "J2": {"at_kicad_mm": [81.08, 40], "rotation_kicad_deg": -90, "at_dim_mm": [81.08, 20]}
+  },
+  "j2_front_courtyard_local_mm": {
+    "start": [-4.08, -9.42],
+    "end": [19.08, 4.25]
+  },
+  "j2_front_courtyard_dim_bounds_mm": {
+    "x": [76.83, 90.5],
+    "y": [0.92, 24.08]
+  },
+  "j2_service_y_mm": [0, 25],
+  "evidence_limit": "Courtyard is a footprint clearance outline, not a connector-plug sweep or a verified harness mating datum. Check supplier CAD and fixture/enclosure overlay before EVT acceptance."
+}
