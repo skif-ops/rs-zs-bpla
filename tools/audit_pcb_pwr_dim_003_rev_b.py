@@ -61,7 +61,7 @@ def bracket_block(text: str, start: int) -> str:
 def read_board_poses(board: Path) -> tuple[dict, dict]:
     text = board.read_text(encoding="utf-8")
     poses = {}
-    j2_courtyard = None
+    courtyards = {}
     for match in re.finditer(r"(?m)^\s*\(footprint\s+", text):
         block = bracket_block(text, match.start() + len(match.group()) - len(match.group().lstrip()))
         ref = re.search(r'\(property\s+"Reference"\s+"([^"]+)"', block)
@@ -73,7 +73,7 @@ def read_board_poses(board: Path) -> tuple[dict, dict]:
             raise AssertionError(f"Missing at for {name}")
         poses[name] = {"at_kicad_mm": [float(at.group(1)), float(at.group(2))],
                        "rotation_kicad_deg": float(at.group(3) or 0)}
-        if name == "J2":
+        if name in ("J1", "J2"):
             for rect_match in re.finditer(r"\(fp_rect\s+", block):
                 rect = bracket_block(block, rect_match.start())
                 if '(layer "F.CrtYd")' not in rect:
@@ -81,11 +81,11 @@ def read_board_poses(board: Path) -> tuple[dict, dict]:
                 start = re.search(r"\(start\s+(-?[\d.]+)\s+(-?[\d.]+)\)", rect)
                 end = re.search(r"\(end\s+(-?[\d.]+)\s+(-?[\d.]+)\)", rect)
                 if start and end:
-                    j2_courtyard = {"start": [float(start.group(1)), float(start.group(2))],
-                                    "end": [float(end.group(1)), float(end.group(2))]}
-    if set(poses) != set(REFS) or j2_courtyard is None:
-        raise AssertionError(f"Board pose coverage: {sorted(poses)}; J2 courtyard={j2_courtyard}")
-    return poses, j2_courtyard
+                    courtyards[name] = {"start": [float(start.group(1)), float(start.group(2))],
+                                        "end": [float(end.group(1)), float(end.group(2))]}
+    if set(poses) != set(REFS) or set(courtyards) != {"J1", "J2"}:
+        raise AssertionError(f"Board pose coverage: {sorted(poses)}; courtyards={sorted(courtyards)}")
+    return poses, courtyards
 
 
 def transform_courtyard(pose: dict, rect: dict, board_height: float) -> dict:
@@ -152,12 +152,13 @@ def main() -> int:
     poses = {name: {"at_kicad_mm": entry["at_kicad_mm"],
                     "rotation_kicad_deg": entry.get("rotation_kicad_deg", 0)}
              for name, entry in evidence["footprints"].items()}
-    courtyard = evidence["j2_front_courtyard_local_mm"]
+    courtyards = {name: evidence[f"{name.lower()}_front_courtyard_local_mm"]
+                  for name in ("J1", "J2")}
     if args.board.exists():
         digest = hashlib.sha256(args.board.read_bytes()).hexdigest()
         if digest != authority["source_board_sha256"]:
             raise AssertionError(f"Board SHA-256 mismatch: {digest}")
-        poses, courtyard = read_board_poses(args.board)
+        poses, courtyards = read_board_poses(args.board)
         board_status = "SOURCE_BOARD_SHA_AND_POSES_VERIFIED"
     holes = {item["reference"]: item["xy_mm"] for item in authority["mounting"]["holes"]}
     for name in REFS:
@@ -175,26 +176,32 @@ def main() -> int:
     if all(poses[name]["at_kicad_mm"] == holes[name] for name in holes):
         raise AssertionError("Mirror guard did not detect the Rev A coordinate error")
     mirror_guard = "PASS_DIRECT_MAPPING_REJECTED"
-    xy_close(courtyard["start"], evidence["j2_front_courtyard_local_mm"]["start"], "J2 courtyard start")
-    xy_close(courtyard["end"], evidence["j2_front_courtyard_local_mm"]["end"], "J2 courtyard end")
-    bounds = transform_courtyard(poses["J2"], courtyard, board_height)
-    for axis in ("x", "y"):
-        for index in (0, 1):
-            close(bounds[axis][index], evidence["j2_front_courtyard_dim_bounds_mm"][axis][index],
-                  f"J2 courtyard {axis}{index}")
+    bounds = {}
+    for name in ("J1", "J2"):
+        rect = courtyards[name]
+        reference_rect = evidence[f"{name.lower()}_front_courtyard_local_mm"]
+        for endpoint in ("start", "end"):
+            xy_close(rect[endpoint], reference_rect[endpoint], f"{name} courtyard {endpoint}")
+        bounds[name] = transform_courtyard(poses[name], rect, board_height)
+        for axis in ("x", "y"):
+            for index in (0, 1):
+                close(bounds[name][axis][index],
+                      evidence[f"{name.lower()}_front_courtyard_dim_bounds_mm"][axis][index],
+                      f"{name} courtyard {axis}{index}")
     j2 = authority["connector_service_volumes"]["J2"]
-    if bounds["y"][0] < j2["mating_box_xyz_min_mm"][1] or bounds["y"][1] > j2["mating_box_xyz_max_mm"][1]:
+    if bounds["J2"]["y"][0] < j2["mating_box_xyz_min_mm"][1] or bounds["J2"]["y"][1] > j2["mating_box_xyz_max_mm"][1]:
         raise AssertionError("J2 service box does not span footprint courtyard Y")
     j1 = authority["connector_service_volumes"]["J1"]
-    j1_xy = evidence["footprints"]["J1"]["at_dim_mm"]
-    if not all(j1["mating_box_xyz_min_mm"][i] <= j1_xy[i] <= j1["mating_box_xyz_max_mm"][i]
-               for i in (0, 1)):
-        raise AssertionError("J1 footprint origin outside service box")
+    if not all(j1["mating_box_xyz_min_mm"][i] <= bounds["J1"][axis][0] and
+               bounds["J1"][axis][1] <= j1["mating_box_xyz_max_mm"][i]
+               for i, axis in enumerate(("x", "y"))):
+        raise AssertionError("J1 footprint courtyard outside service box")
     step_hash = hashlib.sha256(STEP.read_bytes()).hexdigest()
     if step_hash != authority["frozen_step"]["sha256"] or step_hash != report["step_sha256"]:
         raise AssertionError("STEP SHA-256 differs between file, authority and report")
     result = {"board_source": board_status, "mirror_guard": mirror_guard,
-              "j2_courtyard_dim_bounds_mm": bounds, "step_sha256": step_hash,
+              "j1_courtyard_dim_bounds_mm": bounds["J1"],
+              "j2_courtyard_dim_bounds_mm": bounds["J2"], "step_sha256": step_hash,
               "step_geometry": audit_step(STEP, authority) if args.step_geometry else "HASH_VERIFIED"}
     print(json.dumps(result, indent=2))
     return 0

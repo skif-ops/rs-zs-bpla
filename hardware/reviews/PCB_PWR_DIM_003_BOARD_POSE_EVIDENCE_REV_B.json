@@ -15,6 +15,14 @@
     "J1": {"at_kicad_mm": [6, 28], "at_dim_mm": [6, 32]},
     "J2": {"at_kicad_mm": [81.08, 40], "rotation_kicad_deg": -90, "at_dim_mm": [81.08, 20]}
   },
+  "j1_front_courtyard_local_mm": {
+    "start": [-3.83, -3.8],
+    "end": [3.83, 7.3]
+  },
+  "j1_front_courtyard_dim_bounds_mm": {
+    "x": [2.17, 9.83],
+    "y": [24.7, 35.8]
+  },
   "j2_front_courtyard_local_mm": {
     "start": [-4.08, -9.42],
     "end": [19.08, 4.25]
