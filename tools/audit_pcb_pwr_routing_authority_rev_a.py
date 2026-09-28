@@ -25,6 +25,7 @@ CAPTURE_NETS = ROOT / "hardware/PCB_PWR_CAPTURE_NETS_REV_A.csv"
 BASELINE = ROOT / "hardware/POWER_DESIGN_BASELINE_REV_A.json"
 LAYERS = ROOT / "hardware/PCB_LAYER_COUNT_AUTHORITY_REV_A.csv"
 OPEN_DIMENSIONS = ROOT / "mechanics/common/OPEN_DIMENSIONS.csv"
+DIM003_REV_B = ROOT / "hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_B.json"
 REVIEW_B = ROOT / "hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md"
 
 STATE = "PASS_PRE_ROUTE_CONSTRAINT_COVERAGE_ROUTING_OPEN"
@@ -462,9 +463,13 @@ def audit(board_path: Path, authority_path: Path, status_path: Path | None) -> d
             "PCB-PWR layer/stackup release boundary drift")
     dimensions = {row["ID"]: row for row in read_csv(OPEN_DIMENSIONS)}
     require(dimensions["DIM-003"]["Status"] ==
-            "CLOSED_EVT_ENGINEERING_18_OF_18_ACCEPTED_SERIAL_REVALIDATION_REQUIRED"
+            "REOPENED_REV_B_CANDIDATE_INDEPENDENT_ME_REVIEW_REQUIRED"
             and dimensions["DIM-003"]["Owner"] == "EE_ME",
-            "DIM-003 EVT acceptance or serial-revalidation boundary differs")
+            "DIM-003 Rev B mechanical hold differs")
+    dim003 = json.loads(DIM003_REV_B.read_text(encoding="utf-8"))
+    require(dim003["release_boundary"]["dim_003_accepted_for_evt"] is False and
+            dim003["release_boundary"]["manufacturing_release"] is False,
+            "DIM-003 Rev B mechanical hold was released without review")
 
     review_text = REVIEW_B.read_text(encoding="utf-8")
     for marker in (
@@ -563,3 +568,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
