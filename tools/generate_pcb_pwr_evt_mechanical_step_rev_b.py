@@ -70,7 +70,8 @@ def main() -> int:
     step_text = re.sub(r"('Open CASCADE Shape Model',)'[^']+'",
                        r"\g<1>'2026-09-28T00:00:00'", step_text, count=1)
     step_text = "\n".join(line.rstrip() for line in step_text.splitlines()) + "\n"
-    args.output.write_text(step_text, encoding="utf-8")
+    # STEP bytes are fixed across Windows and Linux; the authority hashes the bytes.
+    args.output.write_bytes(step_text.replace("\n", "\r\n").encode("utf-8"))
 
     report = {
         "schema": "dioneya-pcb-pwr-dim-003-rev-b-step-evidence-v1",
