@@ -60,9 +60,19 @@ def generate(cli: str) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "gerber").mkdir(exist_ok=True)
     (OUT / "drill").mkdir(exist_ok=True)
-    # KiCad 9 PDF export refuses an existing PDF path in the checked-out package.
-    for name in ("PCB-PWR_copper_layers.pdf", "PCB-PWR_schematic.pdf"):
-        (OUT / name).unlink(missing_ok=True)
+    # KiCad 9 creates a directory for multipage PCB PDF even when the -o path
+    # ends in .pdf. Retire that controlled legacy directory and move the new
+    # generated PDF into a real file at the package's stable path.
+    copper_pdf = OUT / "PCB-PWR_copper_layers.pdf"
+    if copper_pdf.is_dir():
+        previous = list(copper_pdf.iterdir())
+        if len(previous) != 1 or previous[0].name != "PCB-PWR.pdf" or not previous[0].is_file():
+            raise AssertionError("Unexpected legacy copper PDF directory contents")
+        previous[0].unlink()
+        copper_pdf.rmdir()
+    else:
+        copper_pdf.unlink(missing_ok=True)
+    (OUT / "PCB-PWR_schematic.pdf").unlink(missing_ok=True)
     steps = []
     version = subprocess.run([cli, "version"], capture_output=True, text=True, errors="replace", check=True).stdout.strip()
     if not re.match(r"^9\.0\.9(?:\b|$)", version):
@@ -77,9 +87,19 @@ def generate(cli: str) -> None:
                                            "--schematic-parity", "-o", str(OUT / "PCB-PWR_parity_drc.json"), str(BOARD)]))
     steps.append(run("parity_disposition", [sys.executable,
                                             str(ROOT / "tools/generate_pcb_pwr_parity_disposition_rev_e.py")]))
+    copper_export_dir = OUT / "_copper_export"
+    if copper_export_dir.exists():
+        raise AssertionError("Unexpected stale copper export directory")
     steps.append(run("copper_pdf", [cli, "pcb", "export", "pdf", "--layers", "F.Cu,In1.Cu,In2.Cu,B.Cu",
                                     "--common-layers", "Edge.Cuts", "--mode-multipage", "--black-and-white",
-                                    "-o", str(OUT / "PCB-PWR_copper_layers.pdf"), str(BOARD)]))
+                                    "-o", str(copper_export_dir) + os.sep, str(BOARD)]))
+    generated_copper_pdfs = list(copper_export_dir.glob("*.pdf"))
+    if len(generated_copper_pdfs) != 1:
+        raise AssertionError(f"Expected one KiCad 9 copper PDF: {generated_copper_pdfs}")
+    generated_copper_pdfs[0].replace(copper_pdf)
+    copper_export_dir.rmdir()
+    steps.append({"step": "copper_pdf_relocate", "source": generated_copper_pdfs[0].name,
+                  "destination": rel(copper_pdf), "rc": 0})
     steps.append(run("assembly_pdf", [sys.executable, str(ROOT / "tools/generate_pcb_pwr_assembly_rev_e.py"),
                                       "--kicad-cli", cli]))
     for side in ("top", "bottom"):
