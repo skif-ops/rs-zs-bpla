@@ -15,7 +15,7 @@ on:
       - "tools/pcb_pwr_board_identity.py"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   reproduce:
@@ -39,21 +39,14 @@ jobs:
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3-pip python-is-python3
           python3 -m pip install --break-system-packages --disable-pip-version-check \
             'kiutils==1.4.8' 'reportlab==4.4.9' 'pypdf==6.10.0'
+      - name: Verify committed Rev E package inputs and output hashes
+        run: python tools/apply_pcb_pwr_review_b_package_rev_e.py --check
       - name: Reproduce Rev E in pinned KiCad image
         run: python tools/apply_pcb_pwr_review_b_package_rev_e.py --kicad-cli kicad-cli
       - name: Verify Rev E manifest and native source
         run: |
           python tools/apply_pcb_pwr_review_b_package_rev_e.py --check
           git diff --exit-code -- hardware/kicad/native/PCB-PWR/
-      - name: Publish pinned KiCad 9 package to Review B branch
-        run: |
-          git add -- hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_E/
-          if ! git diff --cached --quiet; then
-            git -c user.name='github-actions[bot]' \
-                -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
-                commit -m 'build(pcb-pwr): publish pinned KiCad 9 Review B Rev E outputs'
-            git push origin HEAD:docs/pcb-pwr-review-b-rev-e
-          fi
       - name: Upload reproducible Rev E package
         if: always()
         uses: actions/upload-artifact@v4
