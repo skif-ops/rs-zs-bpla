@@ -8,6 +8,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from pcb_pwr_board_identity import is_rev_e_metadata_only
+
 import audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_candidate_rev_a as candidate_audit
 import generate_pcb_pwr_vbat_sys_shunt_bulk_routing_007_candidate_rev_a as generator
 
@@ -31,7 +33,7 @@ def historical_candidate_audit(
     payload = ACTIVE.read_bytes()
     active_sha = hashlib.sha256(payload).hexdigest()
     assert active_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA, OUTPUT_BULK_010_SHA,
-                          J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA}
+                          J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA} or is_rev_e_metadata_only(payload)
     assert hashlib.sha256(generator.CANDIDATE.read_bytes()).hexdigest() == CANDIDATE_SHA
     if active_sha == CANDIDATE_SHA:
         assert payload == generator.CANDIDATE.read_bytes()

@@ -8,6 +8,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from pcb_pwr_board_identity import is_rev_e_metadata_only
+
 from kiutils.board import Board
 
 import audit_pcb_pwr_vbat_sys_c13_c12_routing_008_candidate_rev_a as candidate_audit
@@ -32,9 +34,9 @@ ECO_006_SHA = "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7"
 
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict:
     board_sha = hashlib.sha256(BOARD.read_bytes()).hexdigest()
-    assert board_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA}
+    assert board_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA} or is_rev_e_metadata_only(BOARD.read_bytes())
     assert hashlib.sha256(APPROVAL.read_bytes()).hexdigest() == APPROVAL_SHA
-    board = Board.from_file(str(CANDIDATE if board_sha in {SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA} else BOARD), encoding="utf-8")
+    board = Board.from_file(str(CANDIDATE if board_sha in {SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA} or is_rev_e_metadata_only(BOARD.read_bytes()) else BOARD), encoding="utf-8")
     assert semantic_board_sha256(board) == SEMANTIC_SHA
     assert len(board.traceItems) == 39 and len(board.zones) == 2
     proposal = historical_candidate_audit()

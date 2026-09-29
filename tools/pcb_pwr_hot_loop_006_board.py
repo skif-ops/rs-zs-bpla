@@ -7,8 +7,9 @@ read that archived board when the authoritative board is the exact 006 successor
 from __future__ import annotations
 
 import hashlib
-import re
 from pathlib import Path
+
+from pcb_pwr_board_identity import is_rev_e_metadata_only
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,7 +32,6 @@ ECO_005 = ROOT / "hardware/kicad/candidates/PCB-PWR-ECO-005/PCB-PWR_ECO_005_CAND
 ECO_005_SHA256 = "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610"
 ECO_006 = ROOT / "hardware/kicad/candidates/PCB-PWR-ECO-006/PCB-PWR_ECO_006_CANDIDATE_REV_A.kicad_pcb"
 ECO_006_SHA256 = "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7"
-REV_E_SHA256 = "de2a723bbbc0d37b9f4fc5f55e24bfa287f892a081925daf4a24b8a7fa6c901d"
 
 
 def is_j2_placement_eco_003(payload: bytes) -> bool:
@@ -60,15 +60,6 @@ def is_eco_006(payload: bytes) -> bool:
     copper, placement and nets unchanged): the committed candidate."""
     return (hashlib.sha256(payload).hexdigest() == ECO_006_SHA256
             and payload == ECO_006.read_bytes())
-
-
-def is_rev_e_metadata_only(payload: bytes) -> bool:
-    """Rev E board with only title block and nominal stackup added to ECO-006."""
-    if hashlib.sha256(payload).hexdigest() != REV_E_SHA256:
-        return False
-    stripped, title_count = re.subn(rb'\t\(title_block\n(?:\t.*\n)*?\t\)\n', b'', payload, count=1)
-    stripped, stack_count = re.subn(rb'\t\t\(stackup\n(?:\t\t\t.*\n)*?\t\t\)\n', b'', stripped, count=1)
-    return title_count == stack_count == 1 and is_eco_006(stripped)
 
 
 def is_exact_application(board: Path) -> bool:
