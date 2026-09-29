@@ -171,6 +171,19 @@
         "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B.kicad_pcb"
       ],
       "return_code": 0
+    },
+    {
+      "step": "bilingual_schematic_pdf",
+      "argv": [
+        "kicad-cli 10.0.6",
+        "sch",
+        "export",
+        "pdf",
+        "-o",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\fab\\assembly\\PCB-MAIN_SCHEMATIC_RU_EN.pdf",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\native_bundle\\PCB-MAIN.kicad_sch"
+      ],
+      "return_code": 0
     }
   ]
 }

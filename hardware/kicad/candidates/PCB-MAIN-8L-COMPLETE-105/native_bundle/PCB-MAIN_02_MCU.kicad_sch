@@ -1778,7 +1778,7 @@
     (uuid 04ea6f3e-a6e9-5efa-845e-9aa940aaaca5)
   )
 
-  (text "Every connected symbol pin has one explicit wire stub. Only hierarchical labels cross functional-sheet boundaries."
+  (text "RU: Каждый подключённый вывод имеет провод; листы связаны иерархическими метками.\nEN: Each connected pin has a wire; hierarchical labels link sheets."
     (at 297.0 12.7 0)
     (effects (font (size 1.1 1.1)))
     (uuid 571eddc3-36de-5d8c-b974-b1652ef2d273)
