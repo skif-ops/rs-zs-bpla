@@ -1,0 +1,62 @@
+{
+  "schema": "dioneya-pcb-main-fab-stackup-request-v1",
+  "revision": "B",
+  "board": "PCB-MAIN",
+  "layers": 8,
+  "finished_thickness_mm": 1.6,
+  "surface_finish": "ENIG",
+  "outer_copper_finished_oz": 1.0,
+  "inner_copper_finished_oz": 0.5,
+  "preferred_fabricator_stack_candidate": "JLC08161H-3313",
+  "preferred_stack_status": "PROPOSED_NOT_FACTORY_APPROVED",
+  "dielectric_thicknesses": "TO_BE_CONFIRMED_BY_FABRICATOR",
+  "impedance_control": "REQUIRES_FABRICATOR_DFM_REVIEW",
+  "layer_functions_top_to_bottom": [
+    [
+      "F.Cu",
+      "signal_components"
+    ],
+    [
+      "In1.Cu",
+      "GND_DIGITAL_GND_MODEM_split_plane"
+    ],
+    [
+      "In2.Cu",
+      "GND_MIC_plane"
+    ],
+    [
+      "In3.Cu",
+      "signal"
+    ],
+    [
+      "In4.Cu",
+      "GND_DIGITAL_GND_MODEM_split_plane"
+    ],
+    [
+      "In5.Cu",
+      "signal"
+    ],
+    [
+      "In6.Cu",
+      "GND_DIGITAL_reference_plane"
+    ],
+    [
+      "B.Cu",
+      "signal_test_pads"
+    ]
+  ],
+  "fabrication_notes": [
+    "All 57 SMD via-in-pad locations are marked filled and capped in KiCad; quote epoxy filled and copper capped process.",
+    "Minimum 0.15 mm drilled through vias and 0.25 mm finished via diameter are present.",
+    "Board design DRC rules: 0.10 mm trace/space, 0.20 mm hole-to-copper, 0.20 mm hole-to-hole and edge-to-copper.",
+    "Do not infer dielectric spacing or inner copper weight from a default KiCad stackup; use this request and approved fab stack ID.",
+    "Return DFM review with stack ID, layer thicknesses, via-in-pad process, copper weights, impedance and drill capability before panel release."
+  ],
+  "supplier_sources": [
+    "https://jlcpcb.com/capabilities/Capab",
+    "https://jlcpcb.com/help/article/multi-layer-pcb-standard-laminated-structures",
+    "https://jlcpcb.com/blog/multilayer-pcb-design-guidelines"
+  ],
+  "generated_job_sha256_before_control": "87a5bef4bd9c57c410507fc3fb0a412dda1ed104a7a1c2626ebd0a1e991f3953",
+  "controlled_job_sha256": "afe379e3ee84e9bcc2060b5eb4bef91f9ac20f31e6894b48bed817d5ea453720"
+}

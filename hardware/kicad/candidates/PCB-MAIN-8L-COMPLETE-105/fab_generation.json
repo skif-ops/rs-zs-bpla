@@ -1,0 +1,176 @@
+{
+  "kicad_version": "10.0.6",
+  "host": "Windows",
+  "results": [
+    {
+      "step": "gerber",
+      "argv": [
+        "kicad-cli 10.0.6",
+        "pcb",
+        "export",
+        "gerbers",
+        "-o",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\fab\\gerber",
+        "-l",
+        "F.Cu,In1.Cu,In2.Cu,In3.Cu,In4.Cu,In5.Cu,In6.Cu,B.Cu,F.Mask,B.Mask,F.Paste,B.Paste,F.Silkscreen,B.Silkscreen,Edge.Cuts",
+        "--subtract-soldermask",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B.kicad_pcb"
+      ],
+      "return_code": 0
+    },
+    {
+      "step": "drill",
+      "argv": [
+        "kicad-cli 10.0.6",
+        "pcb",
+        "export",
+        "drill",
+        "-o",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\fab\\drill",
+        "--format",
+        "excellon",
+        "--excellon-units",
+        "mm",
+        "--excellon-separate-th",
+        "--generate-map",
+        "--map-format",
+        "pdf",
+        "--generate-report",
+        "--report-path",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\fab\\drill\\drill_report.txt",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B.kicad_pcb"
+      ],
+      "return_code": 0
+    },
+    {
+      "step": "position_top_all",
+      "argv": [
+        "kicad-cli 10.0.6",
+        "pcb",
+        "export",
+        "pos",
+        "-o",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\fab\\assembly\\PCB-MAIN_POS_TOP_ALL.csv",
+        "--side",
+        "front",
+        "--format",
+        "csv",
+        "--units",
+        "mm",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B.kicad_pcb"
+      ],
+      "return_code": 0
+    },
+    {
+      "step": "position_bottom_all",
+      "argv": [
+        "kicad-cli 10.0.6",
+        "pcb",
+        "export",
+        "pos",
+        "-o",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\fab\\assembly\\PCB-MAIN_POS_BOTTOM_ALL.csv",
+        "--side",
+        "back",
+        "--format",
+        "csv",
+        "--units",
+        "mm",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B.kicad_pcb"
+      ],
+      "return_code": 0
+    },
+    {
+      "step": "position_top_smd",
+      "argv": [
+        "kicad-cli 10.0.6",
+        "pcb",
+        "export",
+        "pos",
+        "-o",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\fab\\assembly\\PCB-MAIN_POS_TOP_SMD.csv",
+        "--side",
+        "front",
+        "--format",
+        "csv",
+        "--units",
+        "mm",
+        "--smd-only",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B.kicad_pcb"
+      ],
+      "return_code": 0
+    },
+    {
+      "step": "ipc_netlist",
+      "argv": [
+        "kicad-cli 10.0.6",
+        "pcb",
+        "export",
+        "ipcd356",
+        "-o",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\fab\\PCB-MAIN_netlist.ipc",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B.kicad_pcb"
+      ],
+      "return_code": 0
+    },
+    {
+      "step": "assembly_top",
+      "argv": [
+        "kicad-cli 10.0.6",
+        "pcb",
+        "export",
+        "pdf",
+        "-o",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\fab\\assembly\\PCB-MAIN_ASSEMBLY_TOP.pdf",
+        "--mode-single",
+        "-l",
+        "F.Fab,F.Silkscreen,Edge.Cuts",
+        "--scale",
+        "1.8",
+        "--no-property-popups",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B.kicad_pcb"
+      ],
+      "return_code": 0
+    },
+    {
+      "step": "assembly_bottom",
+      "argv": [
+        "kicad-cli 10.0.6",
+        "pcb",
+        "export",
+        "pdf",
+        "-o",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\fab\\assembly\\PCB-MAIN_ASSEMBLY_BOTTOM.pdf",
+        "--mode-single",
+        "-l",
+        "B.Fab,B.Silkscreen,Edge.Cuts",
+        "--scale",
+        "1.8",
+        "--mirror",
+        "--no-property-popups",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B.kicad_pcb"
+      ],
+      "return_code": 0
+    },
+    {
+      "step": "bottom_copper",
+      "argv": [
+        "kicad-cli 10.0.6",
+        "pcb",
+        "export",
+        "pdf",
+        "-o",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\fab\\assembly\\PCB-MAIN_BOTTOM_COPPER.pdf",
+        "--mode-single",
+        "-l",
+        "B.Cu,B.Fab,Edge.Cuts",
+        "--scale",
+        "1.8",
+        "--mirror",
+        "--no-property-popups",
+        "{REPO}\\hardware\\kicad\\candidates\\PCB-MAIN-8L-COMPLETE-105\\PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B.kicad_pcb"
+      ],
+      "return_code": 0
+    }
+  ]
+}

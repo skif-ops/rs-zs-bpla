@@ -63,6 +63,8 @@ jobs:
             --require-clean-source
       - name: Independent PCB-MAIN capture-authority audit
         run: python tools/audit_pcb_main_capture_authority_rev_a.py
+      - name: PCB-MAIN Rev B candidate 105 handoff integrity
+        run: python tools/audit_pcb_main_rev_b_105_package.py
       - name: Second independent PCB-MAIN U1 electrical control
         run: python tools/verify_pcb_main_mcu_pin_authority_rev_a.py
       - name: Second independent PCB-MAIN storage and sensor control
