@@ -7,6 +7,7 @@ actual KiCad CLI version used; the earlier Rev D package remains immutable.
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import os
@@ -49,6 +50,13 @@ def run(name: str, argv: list[str]) -> dict:
 
 def generate(cli: str) -> None:
     assert_metadata_only()
+    archived_parity = json.loads((ROOT / "hardware/reviews/PCB_PWR_REVIEW_B_R4_PARITY_KICAD10.json").read_text(encoding="utf-8"))["schematic_parity"]
+    with (ROOT / "hardware/reviews/PCB_PWR_REVIEW_B_R4_PARITY_KICAD10_DISPOSITION.csv").open(encoding="utf-8", newline="") as handle:
+        archived_rows = list(csv.DictReader(handle))
+    assert len(archived_parity) == len(archived_rows) == 251
+    assert all(row["Type"] == item["type"] and row["Item_UUID"] == item["items"][0].get("uuid", "")
+               and row["Description"] == item["description"]
+               for row, item in zip(archived_rows, archived_parity))
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "gerber").mkdir(exist_ok=True)
     (OUT / "drill").mkdir(exist_ok=True)
@@ -106,6 +114,8 @@ def generate(cli: str) -> None:
     inputs[rel(PREV)] = sha(PREV)
     for path in (ROOT / "hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_B.json",
                  ROOT / "hardware/reviews/PCB_PWR_DIM_003_BOARD_POSE_EVIDENCE_REV_B.json",
+                 ROOT / "hardware/reviews/PCB_PWR_REVIEW_B_R4_PARITY_KICAD10.json",
+                 ROOT / "hardware/reviews/PCB_PWR_REVIEW_B_R4_PARITY_KICAD10_DISPOSITION.csv",
                  ROOT / "mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_B.step",
                  ROOT / "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
                  ROOT / "tools/audit_pcb_pwr_dim_003_rev_b.py",
@@ -132,7 +142,8 @@ def generate(cli: str) -> None:
             "count": len(parity.get("schematic_parity", [])),
             "types": {typ: sum(x.get("type") == typ for x in parity.get("schematic_parity", []))
                       for typ in sorted({x.get("type") for x in parity.get("schematic_parity", [])})}},
-        "parity_disposition": "251_CLASSIFIED_ZERO_UNEXPLAINED_17_VALUE_OR_BOM_METADATA_PENDING_SYNC",
+        "parity_disposition": f"{len(parity.get('schematic_parity', []))}_CLASSIFIED_ZERO_UNEXPLAINED_17_VALUE_OR_BOM_METADATA_PENDING_SYNC",
+        "kicad10_parity_archive": "251_CLASSIFIED_IN_SEPARATE_R4_JSON_AND_CSV",
         "drc_ignored_checks": {
             "keys": sorted(item["key"] for item in drc.get("ignored_checks", [])),
             "basis": "No project rule_severities; KiCad 9 JSON may omit default ignored_checks. Copper-only NT1-NT3 have no courtyard.",
@@ -150,6 +161,7 @@ def check() -> None:
     assert_metadata_only()
     m = json.loads((OUT / "MANIFEST.json").read_text(encoding="utf-8"))
     assert m["revision"] == "REV_E" and m["board_sha256"] == sha(BOARD)
+    assert m["kicad_container_image"] == PINNED_IMAGE and m["kicad_cli_version"].startswith("9.0.9")
     assert m["previous_package_manifest_sha256"] == sha(PREV)
     for rel, digest in m["inputs"].items():
         assert sha(ROOT / rel) == digest, f"input drift: {rel}"

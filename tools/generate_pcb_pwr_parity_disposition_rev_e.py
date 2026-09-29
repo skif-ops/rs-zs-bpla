@@ -14,10 +14,9 @@ OUT = ROOT / "hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_E"
 INPUT = OUT / "PCB-PWR_parity_drc.json"
 CSV = OUT / "PCB-PWR_parity_disposition.csv"
 NOTE = OUT / "PCB-PWR_parity_disposition.md"
-EXPECTED = {
+EXPECTED_BASE = {
     "HIERARCHICAL_NET_NAME_ONLY": 171,
     "INTENTIONALLY_UNCONNECTED_U5_NC": 1,
-    "DATASHEET_FIELD_METADATA": 62,
     "VALUE_FIELD_METADATA_PENDING_SYNC": 9,
     "BOM_ATTRIBUTE_PENDING_SYNC": 8,
 }
@@ -70,7 +69,8 @@ def main() -> None:
             "Description": entry["description"],
         })
     counts = Counter(row["Disposition"] for row in rows)
-    assert len(rows) == 251 and dict(counts) == EXPECTED, counts
+    expected = EXPECTED_BASE | ({"DATASHEET_FIELD_METADATA": 62} if len(rows) == 251 else {})
+    assert len(rows) in {189, 251} and dict(counts) == expected, counts
     with CSV.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
         writer.writeheader()
@@ -82,11 +82,13 @@ def main() -> None:
         "| Class | Count | Disposition |\n|---|---:|---|\n"
         "| Hierarchical net name prefix | 171 | Equivalent final net name; primary connectivity audit PASS |\n"
         "| U5 NC pad 4 | 1 | Intentionally unconnected |\n"
-        "| Datasheet field | 62 | Board field blank; schematic metadata retained |\n"
+        f"| Datasheet field | {counts['DATASHEET_FIELD_METADATA']} | Board field blank; schematic metadata retained |\n"
         "| Value field | 9 | Metadata sync against controlled BOM remains open |\n"
         "| Exclude-from-BOM attribute | 8 | Five DNP resistors and NT1–NT3; schematic flag sync remains open |\n\n"
         "There is no observed physical net mismatch. The KiCad parity command remains a "
         "diagnostic and is **not marked PASS** while the 17 Value/BOM attribute items are open. "
+        "KiCad 9 reports 189 entries; KiCad 10 additionally reports 62 blank Datasheet fields. "
+        "The Rev E R4 archive retains the 251-entry KiCad 10 disposition separately. "
         "This disposition does not replace the independent human Review B signature.\n",
         encoding="utf-8",
     )
