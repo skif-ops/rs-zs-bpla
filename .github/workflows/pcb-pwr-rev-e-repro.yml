@@ -1,7 +1,6 @@
 name: PCB-PWR Rev E reproducible package
 
 on:
-  workflow_dispatch:
   pull_request:
     branches: [evt-pre-20]
     paths:
@@ -15,14 +14,25 @@ on:
       - "tools/generate_pcb_pwr_parity_disposition_rev_e.py"
       - "tools/pcb_pwr_board_identity.py"
 
+permissions:
+  contents: write
+
 jobs:
   reproduce:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'docs/pcb-pwr-review-b-rev-e'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
       options: --user root
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Trust checkout for exact source check
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Install pinned Python dependencies
         run: |
           apt-get -o APT::Update::Error-Mode=any update
@@ -35,6 +45,15 @@ jobs:
         run: |
           python tools/apply_pcb_pwr_review_b_package_rev_e.py --check
           git diff --exit-code -- hardware/kicad/native/PCB-PWR/
+      - name: Publish pinned KiCad 9 package to Review B branch
+        run: |
+          git add -- hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_E/
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' \
+                -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+                commit -m 'build(pcb-pwr): publish pinned KiCad 9 Review B Rev E outputs'
+            git push origin HEAD:docs/pcb-pwr-review-b-rev-e
+          fi
       - name: Upload reproducible Rev E package
         if: always()
         uses: actions/upload-artifact@v4
