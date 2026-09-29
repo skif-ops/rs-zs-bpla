@@ -1,56 +1,19 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-09-29T08:20:47",
-    "ignored_checks": [
-        {
-            "description": "Footprint has no courtyard defined",
-            "key": "missing_courtyard"
-        },
-        {
-            "description": "Track endpoint not centered on via",
-            "key": "track_not_centered_on_via"
-        },
-        {
-            "description": "Tuning profile track geometries",
-            "key": "tuning_profile_track_geometries"
-        },
-        {
-            "description": "Footprint doesn't match symbol's footprint filters",
-            "key": "footprint_filters_mismatch"
-        },
-        {
-            "description": "Footprint component type doesn't match footprint pads",
-            "key": "footprint_type_mismatch"
-        }
-    ],
+    "date": "2026-09-29T09:12:56+0000",
     "included_severities": [
         "error",
         "warning",
         "exclusion"
     ],
-    "kicad_version": "10.0.6",
+    "kicad_version": "9.0.9",
     "schematic_parity": [
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK CGA exact product data')",
+            "description": "Pad net (LM74700_VCAP) doesn't match net given by schematic (/Input protection and monitor/LM74700_VCAP).",
             "items": [
                 {
-                    "description": "Посад. место C1",
-                    "pos": {
-                        "x": 20.0,
-                        "y": 26.0
-                    },
-                    "uuid": "11fba8b4-3586-42d8-bef9-a706df43e217"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (LM74700_VCAP) не соответствует цепи, заданной схемой (/Input protection and monitor/LM74700_VCAP)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [LM74700_VCAP] от C1 на F.Cu",
+                    "description": "Pad 1 [LM74700_VCAP] of C1 on F.Cu",
                     "pos": {
                         "x": 19.52,
                         "y": 26.0
@@ -62,10 +25,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_FUSED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_FUSED)",
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [VBAT_FUSED] от C1 на F.Cu",
+                    "description": "Pad 2 [VBAT_FUSED] of C1 on F.Cu",
                     "pos": {
                         "x": 20.48,
                         "y": 26.0
@@ -77,25 +40,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK CGA exact product data')",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Посад. место C2",
-                    "pos": {
-                        "x": 48.5,
-                        "y": 22.0
-                    },
-                    "uuid": "be28dc7f-6c4c-4d4a-8ec4-b742aa7a3e6b"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V3_DIGITAL] от C2 на F.Cu",
+                    "description": "Pad 1 [3V3_DIGITAL] of C2 on F.Cu",
                     "pos": {
                         "x": 48.02,
                         "y": 22.0
@@ -107,10 +55,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C2 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C2 on F.Cu",
                     "pos": {
                         "x": 48.98,
                         "y": 22.0
@@ -122,25 +70,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA3E2X7R1H104K080AA')",
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
             "items": [
                 {
-                    "description": "Посад. место C9",
-                    "pos": {
-                        "x": 16.0,
-                        "y": 26.75
-                    },
-                    "uuid": "d53beafb-13ca-41f1-9617-594f8afe1fcc"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_FUSED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_FUSED)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_FUSED] от C9 на F.Cu",
+                    "description": "Pad 1 [VBAT_FUSED] of C9 on F.Cu",
                     "pos": {
                         "x": 15.225,
                         "y": 26.75
@@ -152,10 +85,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C9 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C9 on F.Cu",
                     "pos": {
                         "x": 16.775,
                         "y": 26.75
@@ -167,25 +100,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA6P3X7R1H475K250AB')",
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
             "items": [
                 {
-                    "description": "Посад. место C10",
-                    "pos": {
-                        "x": 34.0,
-                        "y": 26.0
-                    },
-                    "uuid": "303c7b33-1dc7-455b-83dd-b8014fbf51e7"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_PROTECTED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_PROTECTED)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_PROTECTED] от C10 на F.Cu",
+                    "description": "Pad 1 [VBAT_PROTECTED] of C10 on F.Cu",
                     "pos": {
                         "x": 32.525,
                         "y": 26.0
@@ -197,10 +115,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C10 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C10 on F.Cu",
                     "pos": {
                         "x": 35.475,
                         "y": 26.0
@@ -212,25 +130,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic EEH-ZK1V101XP exact product page')",
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
             "items": [
                 {
-                    "description": "Посад. место C13",
-                    "pos": {
-                        "x": 47.0,
-                        "y": 32.0
-                    },
-                    "uuid": "5bf17283-cf63-4787-bd0a-f1593c0e6952"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_SYS) не соответствует цепи, заданной схемой (/VBAT_SYS)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_SYS] от C13 на F.Cu",
+                    "description": "Pad 1 [VBAT_SYS] of C13 on F.Cu",
                     "pos": {
                         "x": 44.3,
                         "y": 32.0
@@ -242,10 +145,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C13 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C13 on F.Cu",
                     "pos": {
                         "x": 49.7,
                         "y": 32.0
@@ -257,10 +160,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Значение (D1) не соответствует значению символа (SMBJ18A CANDIDATE)",
+            "description": "Value (D1) doesn't match symbol value (SMBJ18A CANDIDATE).",
             "items": [
                 {
-                    "description": "Посад. место D1",
+                    "description": "Footprint D1",
                     "pos": {
                         "x": 14.5,
                         "y": 34.0
@@ -272,25 +175,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Littelfuse SMBJ series')",
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
             "items": [
                 {
-                    "description": "Посад. место D1",
-                    "pos": {
-                        "x": 14.5,
-                        "y": 34.0
-                    },
-                    "uuid": "c41ed018-0a4a-4830-b1f2-54bfc384205d"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_FUSED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_FUSED)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_FUSED] от D1 на F.Cu",
+                    "description": "Pad 1 [VBAT_FUSED] of D1 on F.Cu",
                     "pos": {
                         "x": 14.5,
                         "y": 36.15
@@ -302,10 +190,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от D1 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of D1 on F.Cu",
                     "pos": {
                         "x": 14.5,
                         "y": 31.85
@@ -317,25 +205,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Littelfuse 0451')",
+            "description": "Pad net (VBAT_RAW) doesn't match net given by schematic (/Input protection and monitor/VBAT_RAW).",
             "items": [
                 {
-                    "description": "Посад. место F1",
-                    "pos": {
-                        "x": 13.0,
-                        "y": 29.0
-                    },
-                    "uuid": "b2352f23-2459-42ef-a8e7-237f98683cbc"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_RAW) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_RAW)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_RAW] от F1 на F.Cu",
+                    "description": "Pad 1 [VBAT_RAW] of F1 on F.Cu",
                     "pos": {
                         "x": 11.6,
                         "y": 29.0
@@ -347,10 +220,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_FUSED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_FUSED)",
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [VBAT_FUSED] от F1 на F.Cu",
+                    "description": "Pad 2 [VBAT_FUSED] of F1 on F.Cu",
                     "pos": {
                         "x": 14.4,
                         "y": 29.0
@@ -362,10 +235,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Значение (J1) не соответствует значению символа (43045-0213)",
+            "description": "Value (J1) doesn't match symbol value (43045-0213).",
             "items": [
                 {
-                    "description": "Посад. место J1",
+                    "description": "Footprint J1",
                     "pos": {
                         "x": 6.0,
                         "y": 28.0
@@ -377,25 +250,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Molex SD-43045-005 Rev.G1')",
+            "description": "Pad net (VBAT_RAW) doesn't match net given by schematic (/Input protection and monitor/VBAT_RAW).",
             "items": [
                 {
-                    "description": "Посад. место J1",
-                    "pos": {
-                        "x": 6.0,
-                        "y": 28.0
-                    },
-                    "uuid": "595f6fca-c8b1-418d-b4c0-2a4b526dc6a2"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_RAW) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_RAW)",
-            "items": [
-                {
-                    "description": "PTH конт. пл. 1 [VBAT_RAW] у J1",
+                    "description": "PTH pad 1 [VBAT_RAW] of J1",
                     "pos": {
                         "x": 6.0,
                         "y": 31.0
@@ -407,10 +265,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "PTH конт. пл. 2 [GND_PWR] у J1",
+                    "description": "PTH pad 2 [GND_PWR] of J1",
                     "pos": {
                         "x": 6.0,
                         "y": 28.0
@@ -422,25 +280,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TI CSD18540Q5B Rev.B')",
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
             "items": [
                 {
-                    "description": "Посад. место Q1",
-                    "pos": {
-                        "x": 27.0,
-                        "y": 30.0
-                    },
-                    "uuid": "76789d20-d5c5-4cc6-8b63-8ce233d66dca"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_FUSED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_FUSED)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_FUSED] от Q1 на F.Cu",
+                    "description": "Pad 1 [VBAT_FUSED] of Q1 on F.Cu",
                     "pos": {
                         "x": 29.77,
                         "y": 31.905
@@ -452,10 +295,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_FUSED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_FUSED)",
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [VBAT_FUSED] от Q1 на F.Cu",
+                    "description": "Pad 2 [VBAT_FUSED] of Q1 on F.Cu",
                     "pos": {
                         "x": 29.77,
                         "y": 30.635
@@ -467,10 +310,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_FUSED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_FUSED)",
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
             "items": [
                 {
-                    "description": "Конт. пл. 3 [VBAT_FUSED] от Q1 на F.Cu",
+                    "description": "Pad 3 [VBAT_FUSED] of Q1 on F.Cu",
                     "pos": {
                         "x": 29.77,
                         "y": 29.365
@@ -482,10 +325,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (REV_GATE) не соответствует цепи, заданной схемой (/Input protection and monitor/REV_GATE)",
+            "description": "Pad net (REV_GATE) doesn't match net given by schematic (/Input protection and monitor/REV_GATE).",
             "items": [
                 {
-                    "description": "Конт. пл. 4 [REV_GATE] от Q1 на F.Cu",
+                    "description": "Pad 4 [REV_GATE] of Q1 on F.Cu",
                     "pos": {
                         "x": 29.77,
                         "y": 28.095
@@ -497,10 +340,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_PROTECTED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_PROTECTED)",
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
             "items": [
                 {
-                    "description": "Конт. пл. 5 [VBAT_PROTECTED] от Q1 на F.Cu",
+                    "description": "Pad 5 [VBAT_PROTECTED] of Q1 on F.Cu",
                     "pos": {
                         "x": 25.764,
                         "y": 28.095
@@ -512,10 +355,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_PROTECTED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_PROTECTED)",
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
             "items": [
                 {
-                    "description": "Конт. пл. 5 [VBAT_PROTECTED] от Q1 на F.Cu",
+                    "description": "Pad 5 [VBAT_PROTECTED] of Q1 on F.Cu",
                     "pos": {
                         "x": 26.059,
                         "y": 28.73
@@ -527,10 +370,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_PROTECTED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_PROTECTED)",
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
             "items": [
                 {
-                    "description": "Конт. пл. 5 [VBAT_PROTECTED] от Q1 на F.Cu",
+                    "description": "Pad 5 [VBAT_PROTECTED] of Q1 on F.Cu",
                     "pos": {
                         "x": 26.059,
                         "y": 30.0
@@ -542,10 +385,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_PROTECTED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_PROTECTED)",
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
             "items": [
                 {
-                    "description": "Конт. пл. 5 [VBAT_PROTECTED] от Q1 на F.Cu",
+                    "description": "Pad 5 [VBAT_PROTECTED] of Q1 on F.Cu",
                     "pos": {
                         "x": 26.059,
                         "y": 31.27
@@ -557,10 +400,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_PROTECTED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_PROTECTED)",
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
             "items": [
                 {
-                    "description": "Конт. пл. 6 [VBAT_PROTECTED] от Q1 на F.Cu",
+                    "description": "Pad 6 [VBAT_PROTECTED] of Q1 on F.Cu",
                     "pos": {
                         "x": 25.764,
                         "y": 29.365
@@ -572,10 +415,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_PROTECTED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_PROTECTED)",
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
             "items": [
                 {
-                    "description": "Конт. пл. 7 [VBAT_PROTECTED] от Q1 на F.Cu",
+                    "description": "Pad 7 [VBAT_PROTECTED] of Q1 on F.Cu",
                     "pos": {
                         "x": 25.764,
                         "y": 30.635
@@ -587,10 +430,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_PROTECTED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_PROTECTED)",
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
             "items": [
                 {
-                    "description": "Конт. пл. 8 [VBAT_PROTECTED] от Q1 на F.Cu",
+                    "description": "Pad 8 [VBAT_PROTECTED] of Q1 on F.Cu",
                     "pos": {
                         "x": 25.764,
                         "y": 31.905
@@ -602,10 +445,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Значение (RSH1) не соответствует значению символа (WSK2512R0100FEA)",
+            "description": "Value (RSH1) doesn't match symbol value (WSK2512R0100FEA).",
             "items": [
                 {
-                    "description": "Посад. место RSH1",
+                    "description": "Footprint RSH1",
                     "pos": {
                         "x": 36.5,
                         "y": 31.0
@@ -617,25 +460,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Vishay WSK2512 document 30108')",
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
             "items": [
                 {
-                    "description": "Посад. место RSH1",
-                    "pos": {
-                        "x": 36.5,
-                        "y": 31.0
-                    },
-                    "uuid": "7ccbcef5-ad08-44d6-aa03-7260ae68fd3f"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_PROTECTED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_PROTECTED)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_PROTECTED] от RSH1 на F.Cu",
+                    "description": "Pad 1 [VBAT_PROTECTED] of RSH1 on F.Cu",
                     "pos": {
                         "x": 33.515,
                         "y": 30.365
@@ -647,10 +475,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_SYS) не соответствует цепи, заданной схемой (/VBAT_SYS)",
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [VBAT_SYS] от RSH1 на F.Cu",
+                    "description": "Pad 2 [VBAT_SYS] of RSH1 on F.Cu",
                     "pos": {
                         "x": 39.485,
                         "y": 31.635
@@ -662,10 +490,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (SHUNT_SOURCE_SENSE) не соответствует цепи, заданной схемой (/Input protection and monitor/SHUNT_SOURCE_SENSE)",
+            "description": "Pad net (SHUNT_SOURCE_SENSE) doesn't match net given by schematic (/Input protection and monitor/SHUNT_SOURCE_SENSE).",
             "items": [
                 {
-                    "description": "Конт. пл. 3 [SHUNT_SOURCE_SENSE] от RSH1 на F.Cu",
+                    "description": "Pad 3 [SHUNT_SOURCE_SENSE] of RSH1 on F.Cu",
                     "pos": {
                         "x": 33.22,
                         "y": 32.27
@@ -677,10 +505,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (SHUNT_LOAD_SENSE) не соответствует цепи, заданной схемой (/Input protection and monitor/SHUNT_LOAD_SENSE)",
+            "description": "Pad net (SHUNT_LOAD_SENSE) doesn't match net given by schematic (/Input protection and monitor/SHUNT_LOAD_SENSE).",
             "items": [
                 {
-                    "description": "Конт. пл. 4 [SHUNT_LOAD_SENSE] от RSH1 на F.Cu",
+                    "description": "Pad 4 [SHUNT_LOAD_SENSE] of RSH1 on F.Cu",
                     "pos": {
                         "x": 39.78,
                         "y": 29.73
@@ -692,25 +520,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project PCB-PWR DFT authority')",
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
             "items": [
                 {
-                    "description": "Посад. место TP1",
-                    "pos": {
-                        "x": 25.0,
-                        "y": 56.0
-                    },
-                    "uuid": "cc80e382-865d-4f77-b5d6-1e2f497c21a4"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_PROTECTED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_PROTECTED)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_PROTECTED] от TP1 на F.Cu",
+                    "description": "Pad 1 [VBAT_PROTECTED] of TP1 on F.Cu",
                     "pos": {
                         "x": 25.0,
                         "y": 56.0
@@ -722,25 +535,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project PCB-PWR DFT authority')",
+            "description": "Pad net (SHUNT_SOURCE_SENSE) doesn't match net given by schematic (/Input protection and monitor/SHUNT_SOURCE_SENSE).",
             "items": [
                 {
-                    "description": "Посад. место TP2",
-                    "pos": {
-                        "x": 27.54,
-                        "y": 56.0
-                    },
-                    "uuid": "76e14a08-4b71-41b0-9fbc-0ef9c020dd3d"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (SHUNT_SOURCE_SENSE) не соответствует цепи, заданной схемой (/Input protection and monitor/SHUNT_SOURCE_SENSE)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [SHUNT_SOURCE_SENSE] от TP2 на F.Cu",
+                    "description": "Pad 1 [SHUNT_SOURCE_SENSE] of TP2 on F.Cu",
                     "pos": {
                         "x": 27.54,
                         "y": 56.0
@@ -752,25 +550,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project PCB-PWR DFT authority')",
+            "description": "Pad net (SHUNT_LOAD_SENSE) doesn't match net given by schematic (/Input protection and monitor/SHUNT_LOAD_SENSE).",
             "items": [
                 {
-                    "description": "Посад. место TP3",
-                    "pos": {
-                        "x": 30.08,
-                        "y": 56.0
-                    },
-                    "uuid": "d8bd4a1e-40be-4e3a-9a2b-dcebbfcf25d1"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (SHUNT_LOAD_SENSE) не соответствует цепи, заданной схемой (/Input protection and monitor/SHUNT_LOAD_SENSE)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [SHUNT_LOAD_SENSE] от TP3 на F.Cu",
+                    "description": "Pad 1 [SHUNT_LOAD_SENSE] of TP3 on F.Cu",
                     "pos": {
                         "x": 30.08,
                         "y": 56.0
@@ -782,25 +565,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project PCB-PWR DFT authority')",
+            "description": "Pad net (FAULT) doesn't match net given by schematic (/FAULT).",
             "items": [
                 {
-                    "description": "Посад. место TP8",
-                    "pos": {
-                        "x": 42.78,
-                        "y": 56.0
-                    },
-                    "uuid": "68ee0ce7-a9a5-436f-9d06-efe02c4d447b"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (FAULT) не соответствует цепи, заданной схемой (/FAULT)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [FAULT] от TP8 на F.Cu",
+                    "description": "Pad 1 [FAULT] of TP8 on F.Cu",
                     "pos": {
                         "x": 42.78,
                         "y": 56.0
@@ -812,25 +580,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project PCB-PWR DFT authority')",
+            "description": "Pad net (I2C2_SCL) doesn't match net given by schematic (/I2C2_SCL).",
             "items": [
                 {
-                    "description": "Посад. место TP9",
-                    "pos": {
-                        "x": 45.32,
-                        "y": 56.0
-                    },
-                    "uuid": "5f046fae-abb7-4686-9b25-bc65fde71e34"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (I2C2_SCL) не соответствует цепи, заданной схемой (/I2C2_SCL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [I2C2_SCL] от TP9 на F.Cu",
+                    "description": "Pad 1 [I2C2_SCL] of TP9 on F.Cu",
                     "pos": {
                         "x": 45.32,
                         "y": 56.0
@@ -842,25 +595,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project PCB-PWR DFT authority')",
+            "description": "Pad net (I2C2_SDA) doesn't match net given by schematic (/I2C2_SDA).",
             "items": [
                 {
-                    "description": "Посад. место TP10",
-                    "pos": {
-                        "x": 47.86,
-                        "y": 56.0
-                    },
-                    "uuid": "d0f7664e-4c12-4119-9624-df24a6d6a471"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (I2C2_SDA) не соответствует цепи, заданной схемой (/I2C2_SDA)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [I2C2_SDA] от TP10 на F.Cu",
+                    "description": "Pad 1 [I2C2_SDA] of TP10 on F.Cu",
                     "pos": {
                         "x": 47.86,
                         "y": 56.0
@@ -872,25 +610,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TI LM74700-Q1 Rev.G')",
+            "description": "Pad net (LM74700_VCAP) doesn't match net given by schematic (/Input protection and monitor/LM74700_VCAP).",
             "items": [
                 {
-                    "description": "Посад. место U1",
-                    "pos": {
-                        "x": 20.0,
-                        "y": 30.0
-                    },
-                    "uuid": "461c5536-f483-47a0-99cc-cf2025b624fc"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (LM74700_VCAP) не соответствует цепи, заданной схемой (/Input protection and monitor/LM74700_VCAP)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [LM74700_VCAP] от U1 на F.Cu",
+                    "description": "Pad 1 [LM74700_VCAP] of U1 on F.Cu",
                     "pos": {
                         "x": 18.7,
                         "y": 29.05
@@ -902,10 +625,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от U1 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of U1 on F.Cu",
                     "pos": {
                         "x": 18.7,
                         "y": 30.0
@@ -917,10 +640,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_FUSED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_FUSED)",
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
             "items": [
                 {
-                    "description": "Конт. пл. 3 [VBAT_FUSED] от U1 на F.Cu",
+                    "description": "Pad 3 [VBAT_FUSED] of U1 on F.Cu",
                     "pos": {
                         "x": 18.7,
                         "y": 30.95
@@ -932,10 +655,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_PROTECTED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_PROTECTED)",
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
             "items": [
                 {
-                    "description": "Конт. пл. 4 [VBAT_PROTECTED] от U1 на F.Cu",
+                    "description": "Pad 4 [VBAT_PROTECTED] of U1 on F.Cu",
                     "pos": {
                         "x": 21.3,
                         "y": 30.95
@@ -947,10 +670,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (REV_GATE) не соответствует цепи, заданной схемой (/Input protection and monitor/REV_GATE)",
+            "description": "Pad net (REV_GATE) doesn't match net given by schematic (/Input protection and monitor/REV_GATE).",
             "items": [
                 {
-                    "description": "Конт. пл. 5 [REV_GATE] от U1 на F.Cu",
+                    "description": "Pad 5 [REV_GATE] of U1 on F.Cu",
                     "pos": {
                         "x": 21.3,
                         "y": 30.0
@@ -962,10 +685,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_FUSED) не соответствует цепи, заданной схемой (/Input protection and monitor/VBAT_FUSED)",
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
             "items": [
                 {
-                    "description": "Конт. пл. 6 [VBAT_FUSED] от U1 на F.Cu",
+                    "description": "Pad 6 [VBAT_FUSED] of U1 on F.Cu",
                     "pos": {
                         "x": 21.3,
                         "y": 29.05
@@ -977,25 +700,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TI INA226 Rev.C')",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Посад. место U2",
-                    "pos": {
-                        "x": 44.0,
-                        "y": 23.0
-                    },
-                    "uuid": "ab62f7bb-e30d-40ed-8b16-93207183f363"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [GND_PWR] от U2 на F.Cu",
+                    "description": "Pad 1 [GND_PWR] of U2 on F.Cu",
                     "pos": {
                         "x": 41.8,
                         "y": 22.0
@@ -1007,10 +715,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от U2 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of U2 on F.Cu",
                     "pos": {
                         "x": 41.8,
                         "y": 22.5
@@ -1022,10 +730,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (FAULT) не соответствует цепи, заданной схемой (/FAULT)",
+            "description": "Pad net (FAULT) doesn't match net given by schematic (/FAULT).",
             "items": [
                 {
-                    "description": "Конт. пл. 3 [FAULT] от U2 на F.Cu",
+                    "description": "Pad 3 [FAULT] of U2 on F.Cu",
                     "pos": {
                         "x": 41.8,
                         "y": 23.0
@@ -1037,10 +745,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (I2C2_SDA) не соответствует цепи, заданной схемой (/I2C2_SDA)",
+            "description": "Pad net (I2C2_SDA) doesn't match net given by schematic (/I2C2_SDA).",
             "items": [
                 {
-                    "description": "Конт. пл. 4 [I2C2_SDA] от U2 на F.Cu",
+                    "description": "Pad 4 [I2C2_SDA] of U2 on F.Cu",
                     "pos": {
                         "x": 41.8,
                         "y": 23.5
@@ -1052,10 +760,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (I2C2_SCL) не соответствует цепи, заданной схемой (/I2C2_SCL)",
+            "description": "Pad net (I2C2_SCL) doesn't match net given by schematic (/I2C2_SCL).",
             "items": [
                 {
-                    "description": "Конт. пл. 5 [I2C2_SCL] от U2 на F.Cu",
+                    "description": "Pad 5 [I2C2_SCL] of U2 on F.Cu",
                     "pos": {
                         "x": 41.8,
                         "y": 24.0
@@ -1067,10 +775,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Конт. пл. 6 [3V3_DIGITAL] от U2 на F.Cu",
+                    "description": "Pad 6 [3V3_DIGITAL] of U2 on F.Cu",
                     "pos": {
                         "x": 46.2,
                         "y": 24.0
@@ -1082,10 +790,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 7 [GND_PWR] от U2 на F.Cu",
+                    "description": "Pad 7 [GND_PWR] of U2 on F.Cu",
                     "pos": {
                         "x": 46.2,
                         "y": 23.5
@@ -1097,10 +805,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_SYS) не соответствует цепи, заданной схемой (/VBAT_SYS)",
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
             "items": [
                 {
-                    "description": "Конт. пл. 8 [VBAT_SYS] от U2 на F.Cu",
+                    "description": "Pad 8 [VBAT_SYS] of U2 on F.Cu",
                     "pos": {
                         "x": 46.2,
                         "y": 23.0
@@ -1112,10 +820,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (SHUNT_LOAD_SENSE) не соответствует цепи, заданной схемой (/Input protection and monitor/SHUNT_LOAD_SENSE)",
+            "description": "Pad net (SHUNT_LOAD_SENSE) doesn't match net given by schematic (/Input protection and monitor/SHUNT_LOAD_SENSE).",
             "items": [
                 {
-                    "description": "Конт. пл. 9 [SHUNT_LOAD_SENSE] от U2 на F.Cu",
+                    "description": "Pad 9 [SHUNT_LOAD_SENSE] of U2 on F.Cu",
                     "pos": {
                         "x": 46.2,
                         "y": 22.5
@@ -1127,10 +835,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (SHUNT_SOURCE_SENSE) не соответствует цепи, заданной схемой (/Input protection and monitor/SHUNT_SOURCE_SENSE)",
+            "description": "Pad net (SHUNT_SOURCE_SENSE) doesn't match net given by schematic (/Input protection and monitor/SHUNT_SOURCE_SENSE).",
             "items": [
                 {
-                    "description": "Конт. пл. 10 [SHUNT_SOURCE_SENSE] от U2 на F.Cu",
+                    "description": "Pad 10 [SHUNT_SOURCE_SENSE] of U2 on F.Cu",
                     "pos": {
                         "x": 46.2,
                         "y": 22.0
@@ -1142,25 +850,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA6P3X7R1E226M250AB')",
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
             "items": [
                 {
-                    "description": "Посад. место C3",
-                    "pos": {
-                        "x": 69.0,
-                        "y": 10.0
-                    },
-                    "uuid": "b5e717b9-9453-427b-b8e6-d78304f33115"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V8_MODEM) не соответствует цепи, заданной схемой (/3V8_MODEM)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V8_MODEM] от C3 на F.Cu",
+                    "description": "Pad 1 [3V8_MODEM] of C3 on F.Cu",
                     "pos": {
                         "x": 67.525,
                         "y": 10.0
@@ -1172,10 +865,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C3 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C3 on F.Cu",
                     "pos": {
                         "x": 70.475,
                         "y": 10.0
@@ -1187,25 +880,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK CGA exact product data')",
+            "description": "Pad net (BOOT_3V8) doesn't match net given by schematic (/3V8 modem rail/BOOT_3V8).",
             "items": [
                 {
-                    "description": "Посад. место C4",
-                    "pos": {
-                        "x": 57.8,
-                        "y": 14.03
-                    },
-                    "uuid": "13bb7723-9626-432d-a033-4a468ca183b5"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (BOOT_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/BOOT_3V8)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [BOOT_3V8] от C4 на F.Cu",
+                    "description": "Pad 1 [BOOT_3V8] of C4 on F.Cu",
                     "pos": {
                         "x": 57.8,
                         "y": 13.55
@@ -1217,10 +895,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (SW_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/SW_3V8)",
+            "description": "Pad net (SW_3V8) doesn't match net given by schematic (/3V8 modem rail/SW_3V8).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [SW_3V8] от C4 на F.Cu",
+                    "description": "Pad 2 [SW_3V8] of C4 on F.Cu",
                     "pos": {
                         "x": 57.8,
                         "y": 14.51
@@ -1232,25 +910,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA6P3X7R1H475K250AB')",
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
             "items": [
                 {
-                    "description": "Посад. место C11",
-                    "pos": {
-                        "x": 49.0,
-                        "y": 14.0
-                    },
-                    "uuid": "ca871ed9-66af-4ea8-8ae5-4f3f394ba7e3"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_SYS) не соответствует цепи, заданной схемой (/VBAT_SYS)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_SYS] от C11 на F.Cu",
+                    "description": "Pad 1 [VBAT_SYS] of C11 on F.Cu",
                     "pos": {
                         "x": 47.525,
                         "y": 14.0
@@ -1262,10 +925,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C11 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C11 on F.Cu",
                     "pos": {
                         "x": 50.475,
                         "y": 14.0
@@ -1277,25 +940,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA6P3X7R1E226M250AB')",
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
             "items": [
                 {
-                    "description": "Посад. место C14",
-                    "pos": {
-                        "x": 74.0,
-                        "y": 10.0
-                    },
-                    "uuid": "f158a3db-d157-4eb1-ad0a-88f743262425"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V8_MODEM) не соответствует цепи, заданной схемой (/3V8_MODEM)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V8_MODEM] от C14 на F.Cu",
+                    "description": "Pad 1 [3V8_MODEM] of C14 on F.Cu",
                     "pos": {
                         "x": 72.525,
                         "y": 10.0
@@ -1307,10 +955,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C14 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C14 on F.Cu",
                     "pos": {
                         "x": 75.475,
                         "y": 10.0
@@ -1322,25 +970,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA6P3X7R1E226M250AB')",
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
             "items": [
                 {
-                    "description": "Посад. место C15",
-                    "pos": {
-                        "x": 69.0,
-                        "y": 17.0
-                    },
-                    "uuid": "d7226da8-48a9-4b65-8d85-b800b037a732"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V8_MODEM) не соответствует цепи, заданной схемой (/3V8_MODEM)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V8_MODEM] от C15 на F.Cu",
+                    "description": "Pad 1 [3V8_MODEM] of C15 on F.Cu",
                     "pos": {
                         "x": 67.525,
                         "y": 17.0
@@ -1352,10 +985,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C15 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C15 on F.Cu",
                     "pos": {
                         "x": 70.475,
                         "y": 17.0
@@ -1367,25 +1000,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA6P3X7R1E226M250AB')",
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
             "items": [
                 {
-                    "description": "Посад. место C16",
-                    "pos": {
-                        "x": 74.0,
-                        "y": 17.0
-                    },
-                    "uuid": "28057b3a-ccf4-41b7-8f4e-592a6fb41d93"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V8_MODEM) не соответствует цепи, заданной схемой (/3V8_MODEM)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V8_MODEM] от C16 на F.Cu",
+                    "description": "Pad 1 [3V8_MODEM] of C16 on F.Cu",
                     "pos": {
                         "x": 72.525,
                         "y": 17.0
@@ -1397,10 +1015,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C16 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C16 on F.Cu",
                     "pos": {
                         "x": 75.475,
                         "y": 17.0
@@ -1412,25 +1030,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA3E2X7R1H104K080AA')",
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
             "items": [
                 {
-                    "description": "Посад. место C20",
-                    "pos": {
-                        "x": 52.35,
-                        "y": 14.0
-                    },
-                    "uuid": "4df3e011-1027-4027-9741-0122566b2b6b"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_SYS) не соответствует цепи, заданной схемой (/VBAT_SYS)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_SYS] от C20 на F.Cu",
+                    "description": "Pad 1 [VBAT_SYS] of C20 on F.Cu",
                     "pos": {
                         "x": 52.35,
                         "y": 14.775
@@ -1442,10 +1045,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C20 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C20 on F.Cu",
                     "pos": {
                         "x": 52.35,
                         "y": 13.225
@@ -1457,10 +1060,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Значение (L1) не соответствует значению символа (XAL7030-472MEC)",
+            "description": "Value (L1) doesn't match symbol value (XAL7030-472MEC).",
             "items": [
                 {
-                    "description": "Посад. место L1",
+                    "description": "Footprint L1",
                     "pos": {
                         "x": 62.5,
                         "y": 14.0
@@ -1472,25 +1075,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Coilcraft XAL7030 document 863')",
+            "description": "Pad net (SW_3V8) doesn't match net given by schematic (/3V8 modem rail/SW_3V8).",
             "items": [
                 {
-                    "description": "Посад. место L1",
-                    "pos": {
-                        "x": 62.5,
-                        "y": 14.0
-                    },
-                    "uuid": "e721b151-6673-4d74-872b-8c9bd0080d80"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (SW_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/SW_3V8)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [SW_3V8] от L1 на F.Cu",
+                    "description": "Pad 1 [SW_3V8] of L1 on F.Cu",
                     "pos": {
                         "x": 60.24,
                         "y": 14.0
@@ -1502,10 +1090,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (3V8_MODEM) не соответствует цепи, заданной схемой (/3V8_MODEM)",
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [3V8_MODEM] от L1 на F.Cu",
+                    "description": "Pad 2 [3V8_MODEM] of L1 on F.Cu",
                     "pos": {
                         "x": 64.76,
                         "y": 14.0
@@ -1517,25 +1105,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERA-2A series data')",
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
             "items": [
                 {
-                    "description": "Посад. место R1",
-                    "pos": {
-                        "x": 56.0,
-                        "y": 19.0
-                    },
-                    "uuid": "ce2e5522-ed6d-4228-91ff-aec755dc3dd3"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V8_MODEM) не соответствует цепи, заданной схемой (/3V8_MODEM)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V8_MODEM] от R1 на F.Cu",
+                    "description": "Pad 1 [3V8_MODEM] of R1 on F.Cu",
                     "pos": {
                         "x": 55.49,
                         "y": 19.0
@@ -1547,10 +1120,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (FB_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/FB_3V8)",
+            "description": "Pad net (FB_3V8) doesn't match net given by schematic (/3V8 modem rail/FB_3V8).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [FB_3V8] от R1 на F.Cu",
+                    "description": "Pad 2 [FB_3V8] of R1 on F.Cu",
                     "pos": {
                         "x": 56.51,
                         "y": 19.0
@@ -1562,25 +1135,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERA-2A series data')",
+            "description": "Pad net (FB_3V8) doesn't match net given by schematic (/3V8 modem rail/FB_3V8).",
             "items": [
                 {
-                    "description": "Посад. место R2",
-                    "pos": {
-                        "x": 58.5,
-                        "y": 19.0
-                    },
-                    "uuid": "5a4b3965-6c2f-42c2-9140-0299dd3fc7f6"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (FB_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/FB_3V8)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [FB_3V8] от R2 на F.Cu",
+                    "description": "Pad 1 [FB_3V8] of R2 on F.Cu",
                     "pos": {
                         "x": 57.99,
                         "y": 19.0
@@ -1592,10 +1150,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от R2 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of R2 on F.Cu",
                     "pos": {
                         "x": 59.01,
                         "y": 19.0
@@ -1607,25 +1165,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERA-2A series data')",
+            "description": "Pad net (RT_3V8) doesn't match net given by schematic (/3V8 modem rail/RT_3V8).",
             "items": [
                 {
-                    "description": "Посад. место R3",
-                    "pos": {
-                        "x": 50.5,
-                        "y": 19.0
-                    },
-                    "uuid": "42be065e-2ccb-4d6a-8337-727d6e6f0aca"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (RT_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/RT_3V8)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [RT_3V8] от R3 на F.Cu",
+                    "description": "Pad 1 [RT_3V8] of R3 on F.Cu",
                     "pos": {
                         "x": 49.99,
                         "y": 19.0
@@ -1637,10 +1180,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от R3 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of R3 on F.Cu",
                     "pos": {
                         "x": 51.01,
                         "y": 19.0
@@ -1652,25 +1195,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERJ-2G series data')",
+            "description": "Pad net (MODE_3V8) doesn't match net given by schematic (/3V8 modem rail/MODE_3V8).",
             "items": [
                 {
-                    "description": "Посад. место R4",
-                    "pos": {
-                        "x": 53.0,
-                        "y": 21.0
-                    },
-                    "uuid": "9a4fb099-7c90-4fe9-9d5b-88500d76db21"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (MODE_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/MODE_3V8)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [MODE_3V8] от R4 на F.Cu",
+                    "description": "Pad 1 [MODE_3V8] of R4 on F.Cu",
                     "pos": {
                         "x": 52.49,
                         "y": 21.0
@@ -1682,10 +1210,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от R4 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of R4 on F.Cu",
                     "pos": {
                         "x": 53.51,
                         "y": 21.0
@@ -1697,10 +1225,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Атрибуты посад. места не совпадают с символом: Настройки Исключить из перечня элементов отличаются",
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
             "items": [
                 {
-                    "description": "Посад. место R5",
+                    "description": "Footprint R5",
                     "pos": {
                         "x": 55.5,
                         "y": 21.0
@@ -1712,25 +1240,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERJ-2G series data')",
+            "description": "Pad net (MODE_3V8) doesn't match net given by schematic (/3V8 modem rail/MODE_3V8).",
             "items": [
                 {
-                    "description": "Посад. место R5",
-                    "pos": {
-                        "x": 55.5,
-                        "y": 21.0
-                    },
-                    "uuid": "dd1b4d5b-7b1f-46f1-b1a6-eccc98d790e3"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (MODE_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/MODE_3V8)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [MODE_3V8] от R5 на F.Cu",
+                    "description": "Pad 1 [MODE_3V8] of R5 on F.Cu",
                     "pos": {
                         "x": 54.99,
                         "y": 21.0
@@ -1742,10 +1255,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (RT_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/RT_3V8)",
+            "description": "Pad net (RT_3V8) doesn't match net given by schematic (/3V8 modem rail/RT_3V8).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [RT_3V8] от R5 на F.Cu",
+                    "description": "Pad 2 [RT_3V8] of R5 on F.Cu",
                     "pos": {
                         "x": 56.01,
                         "y": 21.0
@@ -1757,25 +1270,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERJ-2R series data')",
+            "description": "Pad net (EN_MODEM) doesn't match net given by schematic (/EN_MODEM).",
             "items": [
                 {
-                    "description": "Посад. место R6",
-                    "pos": {
-                        "x": 48.0,
-                        "y": 18.5
-                    },
-                    "uuid": "023b421b-3ad9-465a-8fd3-78cdbd04a265"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (EN_MODEM) не соответствует цепи, заданной схемой (/EN_MODEM)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [EN_MODEM] от R6 на F.Cu",
+                    "description": "Pad 1 [EN_MODEM] of R6 on F.Cu",
                     "pos": {
                         "x": 47.49,
                         "y": 18.5
@@ -1787,10 +1285,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от R6 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of R6 on F.Cu",
                     "pos": {
                         "x": 48.51,
                         "y": 18.5
@@ -1802,10 +1300,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Атрибуты посад. места не совпадают с символом: Настройки Исключить из перечня элементов отличаются",
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
             "items": [
                 {
-                    "description": "Посад. место R15",
+                    "description": "Footprint R15",
                     "pos": {
                         "x": 61.0,
                         "y": 20.5
@@ -1817,25 +1315,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERJ-2R series data')",
+            "description": "Pad net (PG_3V8) doesn't match net given by schematic (/3V8 modem rail/PG_3V8).",
             "items": [
                 {
-                    "description": "Посад. место R15",
-                    "pos": {
-                        "x": 61.0,
-                        "y": 20.5
-                    },
-                    "uuid": "bef662b3-c2c9-460a-bf1b-d14e8df16b09"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (PG_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/PG_3V8)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [PG_3V8] от R15 на F.Cu",
+                    "description": "Pad 1 [PG_3V8] of R15 on F.Cu",
                     "pos": {
                         "x": 60.49,
                         "y": 20.5
@@ -1847,10 +1330,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [3V3_DIGITAL] от R15 на F.Cu",
+                    "description": "Pad 2 [3V3_DIGITAL] of R15 on F.Cu",
                     "pos": {
                         "x": 61.51,
                         "y": 20.5
@@ -1862,25 +1345,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project PCB-PWR DFT authority')",
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
             "items": [
                 {
-                    "description": "Посад. место TP4",
-                    "pos": {
-                        "x": 32.62,
-                        "y": 56.0
-                    },
-                    "uuid": "feab9c5b-b898-42c0-bb08-5993bc266550"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V8_MODEM) не соответствует цепи, заданной схемой (/3V8_MODEM)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V8_MODEM] от TP4 на F.Cu",
+                    "description": "Pad 1 [3V8_MODEM] of TP4 on F.Cu",
                     "pos": {
                         "x": 32.62,
                         "y": 56.0
@@ -1892,25 +1360,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project PCB-PWR DFT authority')",
+            "description": "Pad net (PG_3V8) doesn't match net given by schematic (/3V8 modem rail/PG_3V8).",
             "items": [
                 {
-                    "description": "Посад. место TP5",
-                    "pos": {
-                        "x": 35.16,
-                        "y": 56.0
-                    },
-                    "uuid": "fa2f61a0-fcd1-4180-a528-1f21076b53fa"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (PG_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/PG_3V8)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [PG_3V8] от TP5 на F.Cu",
+                    "description": "Pad 1 [PG_3V8] of TP5 on F.Cu",
                     "pos": {
                         "x": 35.16,
                         "y": 56.0
@@ -1922,10 +1375,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Значение (U3) не соответствует значению символа (LMR604403SRAKR)",
+            "description": "Value (U3) doesn't match symbol value (LMR604403SRAKR).",
             "items": [
                 {
-                    "description": "Посад. место U3",
+                    "description": "Footprint U3",
                     "pos": {
                         "x": 55.0,
                         "y": 14.0
@@ -1937,25 +1390,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TI LMR60440 SNAS877')",
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
             "items": [
                 {
-                    "description": "Посад. место U3",
-                    "pos": {
-                        "x": 55.0,
-                        "y": 14.0
-                    },
-                    "uuid": "9653d464-afad-4ea9-99e6-4b474376ac18"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_SYS) не соответствует цепи, заданной схемой (/VBAT_SYS)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_SYS] от U3 на F.Cu",
+                    "description": "Pad 1 [VBAT_SYS] of U3 on F.Cu",
                     "pos": {
                         "x": 54.0725,
                         "y": 14.9
@@ -1967,10 +1405,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_SYS) не соответствует цепи, заданной схемой (/VBAT_SYS)",
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
             "items": [
                 {
-                    "description": "Конт. пл. 1 [VBAT_SYS] от U3 на F.Cu",
+                    "description": "Pad 1 [VBAT_SYS] of U3 on F.Cu",
                     "pos": {
                         "x": 53.8975,
                         "y": 14.725
@@ -1982,10 +1420,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от U3 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of U3 on F.Cu",
                     "pos": {
                         "x": 55.0,
                         "y": 14.0
@@ -1997,10 +1435,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (SW_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/SW_3V8)",
+            "description": "Pad net (SW_3V8) doesn't match net given by schematic (/3V8 modem rail/SW_3V8).",
             "items": [
                 {
-                    "description": "Конт. пл. 3 [SW_3V8] от U3 на F.Cu",
+                    "description": "Pad 3 [SW_3V8] of U3 on F.Cu",
                     "pos": {
                         "x": 55.9275,
                         "y": 14.9
@@ -2012,10 +1450,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (SW_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/SW_3V8)",
+            "description": "Pad net (SW_3V8) doesn't match net given by schematic (/3V8 modem rail/SW_3V8).",
             "items": [
                 {
-                    "description": "Конт. пл. 3 [SW_3V8] от U3 на F.Cu",
+                    "description": "Pad 3 [SW_3V8] of U3 on F.Cu",
                     "pos": {
                         "x": 56.1025,
                         "y": 14.725
@@ -2027,10 +1465,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (BOOT_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/BOOT_3V8)",
+            "description": "Pad net (BOOT_3V8) doesn't match net given by schematic (/3V8 modem rail/BOOT_3V8).",
             "items": [
                 {
-                    "description": "Конт. пл. 4 [BOOT_3V8] от U3 на F.Cu",
+                    "description": "Pad 4 [BOOT_3V8] of U3 on F.Cu",
                     "pos": {
                         "x": 56.125,
                         "y": 14.075
@@ -2042,10 +1480,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (PG_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/PG_3V8)",
+            "description": "Pad net (PG_3V8) doesn't match net given by schematic (/3V8 modem rail/PG_3V8).",
             "items": [
                 {
-                    "description": "Конт. пл. 5 [PG_3V8] от U3 на F.Cu",
+                    "description": "Pad 5 [PG_3V8] of U3 on F.Cu",
                     "pos": {
                         "x": 56.175,
                         "y": 13.3
@@ -2057,10 +1495,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (PG_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/PG_3V8)",
+            "description": "Pad net (PG_3V8) doesn't match net given by schematic (/3V8 modem rail/PG_3V8).",
             "items": [
                 {
-                    "description": "Конт. пл. 5 [PG_3V8] от U3 на F.Cu",
+                    "description": "Pad 5 [PG_3V8] of U3 on F.Cu",
                     "pos": {
                         "x": 56.0,
                         "y": 13.1
@@ -2072,10 +1510,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (FB_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/FB_3V8)",
+            "description": "Pad net (FB_3V8) doesn't match net given by schematic (/3V8 modem rail/FB_3V8).",
             "items": [
                 {
-                    "description": "Конт. пл. 6 [FB_3V8] от U3 на F.Cu",
+                    "description": "Pad 6 [FB_3V8] of U3 on F.Cu",
                     "pos": {
                         "x": 55.525,
                         "y": 13.125
@@ -2087,10 +1525,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (MODE_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/MODE_3V8)",
+            "description": "Pad net (MODE_3V8) doesn't match net given by schematic (/3V8 modem rail/MODE_3V8).",
             "items": [
                 {
-                    "description": "Конт. пл. 7 [MODE_3V8] от U3 на F.Cu",
+                    "description": "Pad 7 [MODE_3V8] of U3 on F.Cu",
                     "pos": {
                         "x": 54.475,
                         "y": 13.125
@@ -2102,10 +1540,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (RT_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/RT_3V8)",
+            "description": "Pad net (RT_3V8) doesn't match net given by schematic (/3V8 modem rail/RT_3V8).",
             "items": [
                 {
-                    "description": "Конт. пл. 8 [RT_3V8] от U3 на F.Cu",
+                    "description": "Pad 8 [RT_3V8] of U3 on F.Cu",
                     "pos": {
                         "x": 53.825,
                         "y": 13.3
@@ -2117,10 +1555,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (RT_3V8) не соответствует цепи, заданной схемой (/3V8 modem rail/RT_3V8)",
+            "description": "Pad net (RT_3V8) doesn't match net given by schematic (/3V8 modem rail/RT_3V8).",
             "items": [
                 {
-                    "description": "Конт. пл. 8 [RT_3V8] от U3 на F.Cu",
+                    "description": "Pad 8 [RT_3V8] of U3 on F.Cu",
                     "pos": {
                         "x": 54.0,
                         "y": 13.1
@@ -2132,10 +1570,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (EN_MODEM) не соответствует цепи, заданной схемой (/EN_MODEM)",
+            "description": "Pad net (EN_MODEM) doesn't match net given by schematic (/EN_MODEM).",
             "items": [
                 {
-                    "description": "Конт. пл. 9 [EN_MODEM] от U3 на F.Cu",
+                    "description": "Pad 9 [EN_MODEM] of U3 on F.Cu",
                     "pos": {
                         "x": 53.875,
                         "y": 14.075
@@ -2147,25 +1585,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA6P3X7R1E226M250AB')",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Посад. место C5",
-                    "pos": {
-                        "x": 69.0,
-                        "y": 38.0
-                    },
-                    "uuid": "afadcc2d-5d75-4231-b4f2-0e81dfc9141b"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V3_DIGITAL] от C5 на F.Cu",
+                    "description": "Pad 1 [3V3_DIGITAL] of C5 on F.Cu",
                     "pos": {
                         "x": 67.525,
                         "y": 38.0
@@ -2177,10 +1600,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C5 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C5 on F.Cu",
                     "pos": {
                         "x": 70.475,
                         "y": 38.0
@@ -2192,25 +1615,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK CGA exact product data')",
+            "description": "Pad net (BOOT_3V3) doesn't match net given by schematic (/3V3 digital rail/BOOT_3V3).",
             "items": [
                 {
-                    "description": "Посад. место C6",
-                    "pos": {
-                        "x": 57.8,
-                        "y": 42.03
-                    },
-                    "uuid": "295360c4-fe8a-42a3-846a-bac95ca509c2"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (BOOT_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/BOOT_3V3)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [BOOT_3V3] от C6 на F.Cu",
+                    "description": "Pad 1 [BOOT_3V3] of C6 on F.Cu",
                     "pos": {
                         "x": 57.8,
                         "y": 41.55
@@ -2222,10 +1630,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (SW_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/SW_3V3)",
+            "description": "Pad net (SW_3V3) doesn't match net given by schematic (/3V3 digital rail/SW_3V3).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [SW_3V3] от C6 на F.Cu",
+                    "description": "Pad 2 [SW_3V3] of C6 on F.Cu",
                     "pos": {
                         "x": 57.8,
                         "y": 42.51
@@ -2237,25 +1645,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA6P3X7R1H475K250AB')",
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
             "items": [
                 {
-                    "description": "Посад. место C12",
-                    "pos": {
-                        "x": 49.0,
-                        "y": 42.0
-                    },
-                    "uuid": "06fd5a22-1f6f-48fe-9566-760b27b0901e"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_SYS) не соответствует цепи, заданной схемой (/VBAT_SYS)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_SYS] от C12 на F.Cu",
+                    "description": "Pad 1 [VBAT_SYS] of C12 on F.Cu",
                     "pos": {
                         "x": 47.525,
                         "y": 42.0
@@ -2267,10 +1660,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C12 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C12 on F.Cu",
                     "pos": {
                         "x": 50.475,
                         "y": 42.0
@@ -2282,25 +1675,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA6P3X7R1E226M250AB')",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Посад. место C17",
-                    "pos": {
-                        "x": 74.0,
-                        "y": 38.0
-                    },
-                    "uuid": "443c29b3-896b-4a31-8f41-39a6c6f6cb08"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V3_DIGITAL] от C17 на F.Cu",
+                    "description": "Pad 1 [3V3_DIGITAL] of C17 on F.Cu",
                     "pos": {
                         "x": 72.525,
                         "y": 38.0
@@ -2312,10 +1690,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C17 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C17 on F.Cu",
                     "pos": {
                         "x": 75.475,
                         "y": 38.0
@@ -2327,25 +1705,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA6P3X7R1E226M250AB')",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Посад. место C18",
-                    "pos": {
-                        "x": 69.0,
-                        "y": 45.0
-                    },
-                    "uuid": "7d890dde-36c1-41ff-95fd-f9eaf693e371"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V3_DIGITAL] от C18 на F.Cu",
+                    "description": "Pad 1 [3V3_DIGITAL] of C18 on F.Cu",
                     "pos": {
                         "x": 67.525,
                         "y": 45.0
@@ -2357,10 +1720,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C18 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C18 on F.Cu",
                     "pos": {
                         "x": 70.475,
                         "y": 45.0
@@ -2372,25 +1735,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA6P3X7R1E226M250AB')",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Посад. место C19",
-                    "pos": {
-                        "x": 74.0,
-                        "y": 42.25
-                    },
-                    "uuid": "c9c990dd-a045-4d29-8f37-5e158c18dafb"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V3_DIGITAL] от C19 на F.Cu",
+                    "description": "Pad 1 [3V3_DIGITAL] of C19 on F.Cu",
                     "pos": {
                         "x": 72.525,
                         "y": 42.25
@@ -2402,10 +1750,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C19 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C19 on F.Cu",
                     "pos": {
                         "x": 75.475,
                         "y": 42.25
@@ -2417,25 +1765,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK exact product data for CGA3E2X7R1H104K080AA')",
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
             "items": [
                 {
-                    "description": "Посад. место C21",
-                    "pos": {
-                        "x": 52.35,
-                        "y": 42.0
-                    },
-                    "uuid": "0f7f20f5-191a-4fdc-8fbf-25ed14618a46"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_SYS) не соответствует цепи, заданной схемой (/VBAT_SYS)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_SYS] от C21 на F.Cu",
+                    "description": "Pad 1 [VBAT_SYS] of C21 on F.Cu",
                     "pos": {
                         "x": 52.35,
                         "y": 42.775
@@ -2447,10 +1780,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C21 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C21 on F.Cu",
                     "pos": {
                         "x": 52.35,
                         "y": 41.225
@@ -2462,10 +1795,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Значение (L2) не соответствует значению символа (XAL7030-472MEC)",
+            "description": "Value (L2) doesn't match symbol value (XAL7030-472MEC).",
             "items": [
                 {
-                    "description": "Посад. место L2",
+                    "description": "Footprint L2",
                     "pos": {
                         "x": 62.5,
                         "y": 42.0
@@ -2477,25 +1810,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Coilcraft XAL7030 document 863')",
+            "description": "Pad net (SW_3V3) doesn't match net given by schematic (/3V3 digital rail/SW_3V3).",
             "items": [
                 {
-                    "description": "Посад. место L2",
-                    "pos": {
-                        "x": 62.5,
-                        "y": 42.0
-                    },
-                    "uuid": "9dfb95c2-e64e-4d3e-a05d-d46c0f740220"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (SW_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/SW_3V3)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [SW_3V3] от L2 на F.Cu",
+                    "description": "Pad 1 [SW_3V3] of L2 on F.Cu",
                     "pos": {
                         "x": 60.24,
                         "y": 42.0
@@ -2507,10 +1825,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [3V3_DIGITAL] от L2 на F.Cu",
+                    "description": "Pad 2 [3V3_DIGITAL] of L2 on F.Cu",
                     "pos": {
                         "x": 64.76,
                         "y": 42.0
@@ -2522,25 +1840,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERA-2A series data')",
+            "description": "Pad net (RT_3V3) doesn't match net given by schematic (/3V3 digital rail/RT_3V3).",
             "items": [
                 {
-                    "description": "Посад. место R7",
-                    "pos": {
-                        "x": 50.0,
-                        "y": 47.0
-                    },
-                    "uuid": "0ec0c0e8-4383-406d-890b-b9b3d4b09421"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (RT_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/RT_3V3)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [RT_3V3] от R7 на F.Cu",
+                    "description": "Pad 1 [RT_3V3] of R7 on F.Cu",
                     "pos": {
                         "x": 49.49,
                         "y": 47.0
@@ -2552,10 +1855,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от R7 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of R7 on F.Cu",
                     "pos": {
                         "x": 50.51,
                         "y": 47.0
@@ -2567,25 +1870,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERJ-2G series data')",
+            "description": "Pad net (MODE_3V3) doesn't match net given by schematic (/3V3 digital rail/MODE_3V3).",
             "items": [
                 {
-                    "description": "Посад. место R8",
-                    "pos": {
-                        "x": 52.5,
-                        "y": 49.0
-                    },
-                    "uuid": "d125f36b-4f2a-4d69-b857-6f2e90fd077b"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (MODE_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/MODE_3V3)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [MODE_3V3] от R8 на F.Cu",
+                    "description": "Pad 1 [MODE_3V3] of R8 on F.Cu",
                     "pos": {
                         "x": 51.99,
                         "y": 49.0
@@ -2597,10 +1885,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от R8 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of R8 on F.Cu",
                     "pos": {
                         "x": 53.01,
                         "y": 49.0
@@ -2612,10 +1900,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Атрибуты посад. места не совпадают с символом: Настройки Исключить из перечня элементов отличаются",
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
             "items": [
                 {
-                    "description": "Посад. место R9",
+                    "description": "Footprint R9",
                     "pos": {
                         "x": 55.0,
                         "y": 49.0
@@ -2627,25 +1915,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERJ-2G series data')",
+            "description": "Pad net (MODE_3V3) doesn't match net given by schematic (/3V3 digital rail/MODE_3V3).",
             "items": [
                 {
-                    "description": "Посад. место R9",
-                    "pos": {
-                        "x": 55.0,
-                        "y": 49.0
-                    },
-                    "uuid": "a6918d6a-ed2c-45b1-b14f-664ea484cd2d"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (MODE_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/MODE_3V3)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [MODE_3V3] от R9 на F.Cu",
+                    "description": "Pad 1 [MODE_3V3] of R9 on F.Cu",
                     "pos": {
                         "x": 54.49,
                         "y": 49.0
@@ -2657,10 +1930,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (RT_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/RT_3V3)",
+            "description": "Pad net (RT_3V3) doesn't match net given by schematic (/3V3 digital rail/RT_3V3).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [RT_3V3] от R9 на F.Cu",
+                    "description": "Pad 2 [RT_3V3] of R9 on F.Cu",
                     "pos": {
                         "x": 55.51,
                         "y": 49.0
@@ -2672,25 +1945,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERJ-2R series data')",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Посад. место R10",
-                    "pos": {
-                        "x": 58.0,
-                        "y": 47.0
-                    },
-                    "uuid": "295600b5-cda2-44a1-8728-7557d22123b3"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V3_DIGITAL] от R10 на F.Cu",
+                    "description": "Pad 1 [3V3_DIGITAL] of R10 on F.Cu",
                     "pos": {
                         "x": 57.49,
                         "y": 47.0
@@ -2702,10 +1960,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (PWR_GOOD) не соответствует цепи, заданной схемой (/PWR_GOOD)",
+            "description": "Pad net (PWR_GOOD) doesn't match net given by schematic (/PWR_GOOD).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [PWR_GOOD] от R10 на F.Cu",
+                    "description": "Pad 2 [PWR_GOOD] of R10 on F.Cu",
                     "pos": {
                         "x": 58.51,
                         "y": 47.0
@@ -2717,25 +1975,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERJ-2R series data')",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Посад. место R12",
-                    "pos": {
-                        "x": 68.5,
-                        "y": 49.0
-                    },
-                    "uuid": "e60ae725-1c85-49e5-ab45-ea00b07222f0"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V3_DIGITAL] от R12 на F.Cu",
+                    "description": "Pad 1 [3V3_DIGITAL] of R12 on F.Cu",
                     "pos": {
                         "x": 67.99,
                         "y": 49.0
@@ -2747,10 +1990,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (FAULT) не соответствует цепи, заданной схемой (/FAULT)",
+            "description": "Pad net (FAULT) doesn't match net given by schematic (/FAULT).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [FAULT] от R12 на F.Cu",
+                    "description": "Pad 2 [FAULT] of R12 on F.Cu",
                     "pos": {
                         "x": 69.01,
                         "y": 49.0
@@ -2762,10 +2005,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Атрибуты посад. места не совпадают с символом: Настройки Исключить из перечня элементов отличаются",
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
             "items": [
                 {
-                    "description": "Посад. место R13",
+                    "description": "Footprint R13",
                     "pos": {
                         "x": 74.6,
                         "y": 56.5
@@ -2777,25 +2020,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERJ-2R series data')",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Посад. место R13",
-                    "pos": {
-                        "x": 74.6,
-                        "y": 56.5
-                    },
-                    "uuid": "7e1b1de6-a763-4d61-99b4-9c5700fa9f7b"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V3_DIGITAL] от R13 на F.Cu",
+                    "description": "Pad 1 [3V3_DIGITAL] of R13 on F.Cu",
                     "pos": {
                         "x": 74.09,
                         "y": 56.5
@@ -2807,10 +2035,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (I2C2_SCL) не соответствует цепи, заданной схемой (/I2C2_SCL)",
+            "description": "Pad net (I2C2_SCL) doesn't match net given by schematic (/I2C2_SCL).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [I2C2_SCL] от R13 на F.Cu",
+                    "description": "Pad 2 [I2C2_SCL] of R13 on F.Cu",
                     "pos": {
                         "x": 75.11,
                         "y": 56.5
@@ -2822,10 +2050,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Атрибуты посад. места не совпадают с символом: Настройки Исключить из перечня элементов отличаются",
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
             "items": [
                 {
-                    "description": "Посад. место R14",
+                    "description": "Footprint R14",
                     "pos": {
                         "x": 74.6,
                         "y": 58.0
@@ -2837,25 +2065,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERJ-2R series data')",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Посад. место R14",
-                    "pos": {
-                        "x": 74.6,
-                        "y": 58.0
-                    },
-                    "uuid": "a302bc45-d7b7-4cab-91a6-4de269a209df"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V3_DIGITAL] от R14 на F.Cu",
+                    "description": "Pad 1 [3V3_DIGITAL] of R14 on F.Cu",
                     "pos": {
                         "x": 74.09,
                         "y": 58.0
@@ -2867,10 +2080,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (I2C2_SDA) не соответствует цепи, заданной схемой (/I2C2_SDA)",
+            "description": "Pad net (I2C2_SDA) doesn't match net given by schematic (/I2C2_SDA).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [I2C2_SDA] от R14 на F.Cu",
+                    "description": "Pad 2 [I2C2_SDA] of R14 on F.Cu",
                     "pos": {
                         "x": 75.11,
                         "y": 58.0
@@ -2882,25 +2095,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project PCB-PWR DFT authority')",
+            "description": "Pad net (PWR_GOOD) doesn't match net given by schematic (/PWR_GOOD).",
             "items": [
                 {
-                    "description": "Посад. место TP6",
-                    "pos": {
-                        "x": 37.7,
-                        "y": 56.0
-                    },
-                    "uuid": "4ebbc11e-daa0-4735-9079-9c9f64f1351f"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (PWR_GOOD) не соответствует цепи, заданной схемой (/PWR_GOOD)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [PWR_GOOD] от TP6 на F.Cu",
+                    "description": "Pad 1 [PWR_GOOD] of TP6 on F.Cu",
                     "pos": {
                         "x": 37.7,
                         "y": 56.0
@@ -2912,10 +2110,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Значение (U4) не соответствует значению символа (LMR604403SRAKR)",
+            "description": "Value (U4) doesn't match symbol value (LMR604403SRAKR).",
             "items": [
                 {
-                    "description": "Посад. место U4",
+                    "description": "Footprint U4",
                     "pos": {
                         "x": 55.0,
                         "y": 42.0
@@ -2927,25 +2125,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TI LMR60440 SNAS877')",
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
             "items": [
                 {
-                    "description": "Посад. место U4",
-                    "pos": {
-                        "x": 55.0,
-                        "y": 42.0
-                    },
-                    "uuid": "dbe4a6d0-1689-4791-8559-b9258a62c949"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (VBAT_SYS) не соответствует цепи, заданной схемой (/VBAT_SYS)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [VBAT_SYS] от U4 на F.Cu",
+                    "description": "Pad 1 [VBAT_SYS] of U4 on F.Cu",
                     "pos": {
                         "x": 54.0725,
                         "y": 42.9
@@ -2957,10 +2140,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_SYS) не соответствует цепи, заданной схемой (/VBAT_SYS)",
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
             "items": [
                 {
-                    "description": "Конт. пл. 1 [VBAT_SYS] от U4 на F.Cu",
+                    "description": "Pad 1 [VBAT_SYS] of U4 on F.Cu",
                     "pos": {
                         "x": 53.8975,
                         "y": 42.725
@@ -2972,10 +2155,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от U4 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of U4 on F.Cu",
                     "pos": {
                         "x": 55.0,
                         "y": 42.0
@@ -2987,10 +2170,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (SW_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/SW_3V3)",
+            "description": "Pad net (SW_3V3) doesn't match net given by schematic (/3V3 digital rail/SW_3V3).",
             "items": [
                 {
-                    "description": "Конт. пл. 3 [SW_3V3] от U4 на F.Cu",
+                    "description": "Pad 3 [SW_3V3] of U4 on F.Cu",
                     "pos": {
                         "x": 55.9275,
                         "y": 42.9
@@ -3002,10 +2185,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (SW_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/SW_3V3)",
+            "description": "Pad net (SW_3V3) doesn't match net given by schematic (/3V3 digital rail/SW_3V3).",
             "items": [
                 {
-                    "description": "Конт. пл. 3 [SW_3V3] от U4 на F.Cu",
+                    "description": "Pad 3 [SW_3V3] of U4 on F.Cu",
                     "pos": {
                         "x": 56.1025,
                         "y": 42.725
@@ -3017,10 +2200,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (BOOT_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/BOOT_3V3)",
+            "description": "Pad net (BOOT_3V3) doesn't match net given by schematic (/3V3 digital rail/BOOT_3V3).",
             "items": [
                 {
-                    "description": "Конт. пл. 4 [BOOT_3V3] от U4 на F.Cu",
+                    "description": "Pad 4 [BOOT_3V3] of U4 on F.Cu",
                     "pos": {
                         "x": 56.125,
                         "y": 42.075
@@ -3032,10 +2215,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (PWR_GOOD) не соответствует цепи, заданной схемой (/PWR_GOOD)",
+            "description": "Pad net (PWR_GOOD) doesn't match net given by schematic (/PWR_GOOD).",
             "items": [
                 {
-                    "description": "Конт. пл. 5 [PWR_GOOD] от U4 на F.Cu",
+                    "description": "Pad 5 [PWR_GOOD] of U4 on F.Cu",
                     "pos": {
                         "x": 56.175,
                         "y": 41.3
@@ -3047,10 +2230,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (PWR_GOOD) не соответствует цепи, заданной схемой (/PWR_GOOD)",
+            "description": "Pad net (PWR_GOOD) doesn't match net given by schematic (/PWR_GOOD).",
             "items": [
                 {
-                    "description": "Конт. пл. 5 [PWR_GOOD] от U4 на F.Cu",
+                    "description": "Pad 5 [PWR_GOOD] of U4 on F.Cu",
                     "pos": {
                         "x": 56.0,
                         "y": 41.1
@@ -3062,10 +2245,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Конт. пл. 6 [3V3_DIGITAL] от U4 на F.Cu",
+                    "description": "Pad 6 [3V3_DIGITAL] of U4 on F.Cu",
                     "pos": {
                         "x": 55.525,
                         "y": 41.125
@@ -3077,10 +2260,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (MODE_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/MODE_3V3)",
+            "description": "Pad net (MODE_3V3) doesn't match net given by schematic (/3V3 digital rail/MODE_3V3).",
             "items": [
                 {
-                    "description": "Конт. пл. 7 [MODE_3V3] от U4 на F.Cu",
+                    "description": "Pad 7 [MODE_3V3] of U4 on F.Cu",
                     "pos": {
                         "x": 54.475,
                         "y": 41.125
@@ -3092,10 +2275,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (RT_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/RT_3V3)",
+            "description": "Pad net (RT_3V3) doesn't match net given by schematic (/3V3 digital rail/RT_3V3).",
             "items": [
                 {
-                    "description": "Конт. пл. 8 [RT_3V3] от U4 на F.Cu",
+                    "description": "Pad 8 [RT_3V3] of U4 on F.Cu",
                     "pos": {
                         "x": 53.825,
                         "y": 41.3
@@ -3107,10 +2290,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (RT_3V3) не соответствует цепи, заданной схемой (/3V3 digital rail/RT_3V3)",
+            "description": "Pad net (RT_3V3) doesn't match net given by schematic (/3V3 digital rail/RT_3V3).",
             "items": [
                 {
-                    "description": "Конт. пл. 8 [RT_3V3] от U4 на F.Cu",
+                    "description": "Pad 8 [RT_3V3] of U4 on F.Cu",
                     "pos": {
                         "x": 54.0,
                         "y": 41.1
@@ -3122,10 +2305,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (VBAT_SYS) не соответствует цепи, заданной схемой (/VBAT_SYS)",
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
             "items": [
                 {
-                    "description": "Конт. пл. 9 [VBAT_SYS] от U4 на F.Cu",
+                    "description": "Pad 9 [VBAT_SYS] of U4 on F.Cu",
                     "pos": {
                         "x": 53.875,
                         "y": 42.075
@@ -3137,25 +2320,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK CGA exact product data')",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Посад. место C7",
-                    "pos": {
-                        "x": 74.4,
-                        "y": 50.0
-                    },
-                    "uuid": "2e0c12e4-2d99-47f0-b21f-a40636c9df4b"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V3_DIGITAL] от C7 на F.Cu",
+                    "description": "Pad 1 [3V3_DIGITAL] of C7 on F.Cu",
                     "pos": {
                         "x": 73.625,
                         "y": 50.0
@@ -3167,10 +2335,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C7 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C7 on F.Cu",
                     "pos": {
                         "x": 75.175,
                         "y": 50.0
@@ -3182,25 +2350,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TDK CGA exact product data')",
+            "description": "Pad net (1V8_MIC) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/1V8_MIC).",
             "items": [
                 {
-                    "description": "Посад. место C8",
-                    "pos": {
-                        "x": 74.9,
-                        "y": 54.0
-                    },
-                    "uuid": "e245b31a-e4be-4278-afec-0ccb4d9033e5"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (1V8_MIC) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/1V8_MIC)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [1V8_MIC] от C8 на F.Cu",
+                    "description": "Pad 1 [1V8_MIC] of C8 on F.Cu",
                     "pos": {
                         "x": 74.125,
                         "y": 54.0
@@ -3212,10 +2365,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от C8 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of C8 on F.Cu",
                     "pos": {
                         "x": 75.675,
                         "y": 54.0
@@ -3227,10 +2380,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Значение (J2) не соответствует значению символа (43045-1202)",
+            "description": "Value (J2) doesn't match symbol value (43045-1202).",
             "items": [
                 {
-                    "description": "Посад. место J2",
+                    "description": "Footprint J2",
                     "pos": {
                         "x": 81.08,
                         "y": 40.0
@@ -3242,25 +2395,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Molex 43045-1202')",
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
             "items": [
                 {
-                    "description": "Посад. место J2",
-                    "pos": {
-                        "x": 81.08,
-                        "y": 40.0
-                    },
-                    "uuid": "db670c91-fe1f-476a-9652-f0a72fb11b44"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V8_MODEM) не соответствует цепи, заданной схемой (/3V8_MODEM)",
-            "items": [
-                {
-                    "description": "PTH конт. пл. 1 [3V8_MODEM] у J2",
+                    "description": "PTH pad 1 [3V8_MODEM] of J2",
                     "pos": {
                         "x": 81.08,
                         "y": 40.0
@@ -3272,10 +2410,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_MODEM) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/GND_MODEM)",
+            "description": "Pad net (GND_MODEM) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/GND_MODEM).",
             "items": [
                 {
-                    "description": "PTH конт. пл. 2 [GND_MODEM] у J2",
+                    "description": "PTH pad 2 [GND_MODEM] of J2",
                     "pos": {
                         "x": 81.08,
                         "y": 43.0
@@ -3287,10 +2425,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "PTH конт. пл. 3 [3V3_DIGITAL] у J2",
+                    "description": "PTH pad 3 [3V3_DIGITAL] of J2",
                     "pos": {
                         "x": 81.08,
                         "y": 46.0
@@ -3302,10 +2440,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_DIGITAL) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/GND_DIGITAL)",
+            "description": "Pad net (GND_DIGITAL) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/GND_DIGITAL).",
             "items": [
                 {
-                    "description": "PTH конт. пл. 4 [GND_DIGITAL] у J2",
+                    "description": "PTH pad 4 [GND_DIGITAL] of J2",
                     "pos": {
                         "x": 81.08,
                         "y": 49.0
@@ -3317,10 +2455,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (1V8_MIC) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/1V8_MIC)",
+            "description": "Pad net (1V8_MIC) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/1V8_MIC).",
             "items": [
                 {
-                    "description": "PTH конт. пл. 5 [1V8_MIC] у J2",
+                    "description": "PTH pad 5 [1V8_MIC] of J2",
                     "pos": {
                         "x": 81.08,
                         "y": 52.0
@@ -3332,10 +2470,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_MIC) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/GND_MIC)",
+            "description": "Pad net (GND_MIC) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/GND_MIC).",
             "items": [
                 {
-                    "description": "PTH конт. пл. 6 [GND_MIC] у J2",
+                    "description": "PTH pad 6 [GND_MIC] of J2",
                     "pos": {
                         "x": 81.08,
                         "y": 55.0
@@ -3347,10 +2485,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (PWR_GOOD) не соответствует цепи, заданной схемой (/PWR_GOOD)",
+            "description": "Pad net (PWR_GOOD) doesn't match net given by schematic (/PWR_GOOD).",
             "items": [
                 {
-                    "description": "PTH конт. пл. 7 [PWR_GOOD] у J2",
+                    "description": "PTH pad 7 [PWR_GOOD] of J2",
                     "pos": {
                         "x": 78.08,
                         "y": 40.0
@@ -3362,10 +2500,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (FAULT) не соответствует цепи, заданной схемой (/FAULT)",
+            "description": "Pad net (FAULT) doesn't match net given by schematic (/FAULT).",
             "items": [
                 {
-                    "description": "PTH конт. пл. 8 [FAULT] у J2",
+                    "description": "PTH pad 8 [FAULT] of J2",
                     "pos": {
                         "x": 78.08,
                         "y": 43.0
@@ -3377,10 +2515,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (EN_MODEM) не соответствует цепи, заданной схемой (/EN_MODEM)",
+            "description": "Pad net (EN_MODEM) doesn't match net given by schematic (/EN_MODEM).",
             "items": [
                 {
-                    "description": "PTH конт. пл. 9 [EN_MODEM] у J2",
+                    "description": "PTH pad 9 [EN_MODEM] of J2",
                     "pos": {
                         "x": 78.08,
                         "y": 46.0
@@ -3392,10 +2530,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (EN_AUX) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/EN_AUX)",
+            "description": "Pad net (EN_AUX) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/EN_AUX).",
             "items": [
                 {
-                    "description": "PTH конт. пл. 10 [EN_AUX] у J2",
+                    "description": "PTH pad 10 [EN_AUX] of J2",
                     "pos": {
                         "x": 78.08,
                         "y": 49.0
@@ -3407,10 +2545,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (I2C2_SCL) не соответствует цепи, заданной схемой (/I2C2_SCL)",
+            "description": "Pad net (I2C2_SCL) doesn't match net given by schematic (/I2C2_SCL).",
             "items": [
                 {
-                    "description": "PTH конт. пл. 11 [I2C2_SCL] у J2",
+                    "description": "PTH pad 11 [I2C2_SCL] of J2",
                     "pos": {
                         "x": 78.08,
                         "y": 52.0
@@ -3422,10 +2560,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (I2C2_SDA) не соответствует цепи, заданной схемой (/I2C2_SDA)",
+            "description": "Pad net (I2C2_SDA) doesn't match net given by schematic (/I2C2_SDA).",
             "items": [
                 {
-                    "description": "PTH конт. пл. 12 [I2C2_SDA] у J2",
+                    "description": "PTH pad 12 [I2C2_SDA] of J2",
                     "pos": {
                         "x": 78.08,
                         "y": 55.0
@@ -3437,10 +2575,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Атрибуты посад. места не совпадают с символом: Настройки Исключить из перечня элементов отличаются",
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
             "items": [
                 {
-                    "description": "Посад. место NT1",
+                    "description": "Footprint NT1",
                     "pos": {
                         "x": 75.6,
                         "y": 40.12
@@ -3452,25 +2590,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project ground-return authority')",
+            "description": "Pad net (GND_MODEM) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/GND_MODEM).",
             "items": [
                 {
-                    "description": "Посад. место NT1",
-                    "pos": {
-                        "x": 75.6,
-                        "y": 40.12
-                    },
-                    "uuid": "612c7b75-60b8-4291-8192-0ff7a121a763"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (GND_MODEM) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/GND_MODEM)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [GND_MODEM] от NT1 на F.Cu",
+                    "description": "Pad 1 [GND_MODEM] of NT1 on F.Cu",
                     "pos": {
                         "x": 75.1,
                         "y": 40.12
@@ -3482,10 +2605,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от NT1 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of NT1 on F.Cu",
                     "pos": {
                         "x": 76.1,
                         "y": 40.12
@@ -3497,10 +2620,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Атрибуты посад. места не совпадают с символом: Настройки Исключить из перечня элементов отличаются",
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
             "items": [
                 {
-                    "description": "Посад. место NT2",
+                    "description": "Footprint NT2",
                     "pos": {
                         "x": 75.6,
                         "y": 48.52
@@ -3512,25 +2635,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project ground-return authority')",
+            "description": "Pad net (GND_DIGITAL) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/GND_DIGITAL).",
             "items": [
                 {
-                    "description": "Посад. место NT2",
-                    "pos": {
-                        "x": 75.6,
-                        "y": 48.52
-                    },
-                    "uuid": "779ac120-69ec-4d9e-836c-2d843c01d38c"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (GND_DIGITAL) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/GND_DIGITAL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [GND_DIGITAL] от NT2 на F.Cu",
+                    "description": "Pad 1 [GND_DIGITAL] of NT2 on F.Cu",
                     "pos": {
                         "x": 76.1,
                         "y": 48.52
@@ -3542,10 +2650,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от NT2 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of NT2 on F.Cu",
                     "pos": {
                         "x": 75.1,
                         "y": 48.52
@@ -3557,10 +2665,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Атрибуты посад. места не совпадают с символом: Настройки Исключить из перечня элементов отличаются",
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
             "items": [
                 {
-                    "description": "Посад. место NT3",
+                    "description": "Footprint NT3",
                     "pos": {
                         "x": 75.6,
                         "y": 52.0
@@ -3572,25 +2680,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project ground-return authority')",
+            "description": "Pad net (GND_MIC) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/GND_MIC).",
             "items": [
                 {
-                    "description": "Посад. место NT3",
-                    "pos": {
-                        "x": 75.6,
-                        "y": 52.0
-                    },
-                    "uuid": "dd68637e-9b46-479b-b11f-38c7f1ebd288"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (GND_MIC) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/GND_MIC)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [GND_MIC] от NT3 на F.Cu",
+                    "description": "Pad 1 [GND_MIC] of NT3 on F.Cu",
                     "pos": {
                         "x": 75.1,
                         "y": 52.0
@@ -3602,10 +2695,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от NT3 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of NT3 on F.Cu",
                     "pos": {
                         "x": 76.1,
                         "y": 52.0
@@ -3617,25 +2710,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Panasonic ERJ-2R series data')",
+            "description": "Pad net (EN_AUX) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/EN_AUX).",
             "items": [
                 {
-                    "description": "Посад. место R11",
-                    "pos": {
-                        "x": 66.0,
-                        "y": 49.0
-                    },
-                    "uuid": "73d079b9-0925-4565-a088-98d6709af50a"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (EN_AUX) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/EN_AUX)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [EN_AUX] от R11 на F.Cu",
+                    "description": "Pad 1 [EN_AUX] of R11 on F.Cu",
                     "pos": {
                         "x": 65.49,
                         "y": 49.0
@@ -3647,10 +2725,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от R11 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of R11 on F.Cu",
                     "pos": {
                         "x": 66.51,
                         "y": 49.0
@@ -3662,25 +2740,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'Project PCB-PWR DFT authority')",
+            "description": "Pad net (1V8_MIC) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/1V8_MIC).",
             "items": [
                 {
-                    "description": "Посад. место TP7",
-                    "pos": {
-                        "x": 40.24,
-                        "y": 56.0
-                    },
-                    "uuid": "1f98715d-a70f-4968-9c93-b00269906a96"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (1V8_MIC) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/1V8_MIC)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [1V8_MIC] от TP7 на F.Cu",
+                    "description": "Pad 1 [1V8_MIC] of TP7 on F.Cu",
                     "pos": {
                         "x": 40.24,
                         "y": 56.0
@@ -3692,10 +2755,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Значение (U5) не соответствует значению символа (TPS7A2018PDBVR)",
+            "description": "Value (U5) doesn't match symbol value (TPS7A2018PDBVR).",
             "items": [
                 {
-                    "description": "Посад. место U5",
+                    "description": "Footprint U5",
                     "pos": {
                         "x": 74.4,
                         "y": 46.0
@@ -3707,25 +2770,10 @@
             "type": "footprint_symbol_mismatch"
         },
         {
-            "description": "Поле 'Datasheet' отличается (Плата: '', Схема: 'TI TPS7A20 Rev.H')",
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
             "items": [
                 {
-                    "description": "Посад. место U5",
-                    "pos": {
-                        "x": 74.4,
-                        "y": 46.0
-                    },
-                    "uuid": "fa11ca58-2f1a-421c-85da-0024c8b3351a"
-                }
-            ],
-            "severity": "warning",
-            "type": "footprint_symbol_field_mismatch"
-        },
-        {
-            "description": "Цепь конт. пл. (3V3_DIGITAL) не соответствует цепи, заданной схемой (/3V3_DIGITAL)",
-            "items": [
-                {
-                    "description": "Конт. пл. 1 [3V3_DIGITAL] от U5 на F.Cu",
+                    "description": "Pad 1 [3V3_DIGITAL] of U5 on F.Cu",
                     "pos": {
                         "x": 73.1,
                         "y": 45.05
@@ -3737,10 +2785,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (GND_PWR) не соответствует цепи, заданной схемой (/GND_PWR)",
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
             "items": [
                 {
-                    "description": "Конт. пл. 2 [GND_PWR] от U5 на F.Cu",
+                    "description": "Pad 2 [GND_PWR] of U5 on F.Cu",
                     "pos": {
                         "x": 73.1,
                         "y": 46.0
@@ -3752,10 +2800,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (EN_AUX) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/EN_AUX)",
+            "description": "Pad net (EN_AUX) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/EN_AUX).",
             "items": [
                 {
-                    "description": "Конт. пл. 3 [EN_AUX] от U5 на F.Cu",
+                    "description": "Pad 3 [EN_AUX] of U5 on F.Cu",
                     "pos": {
                         "x": 73.1,
                         "y": 46.95
@@ -3767,10 +2815,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "У конт. пл. отсутствует цепь, заданная схемой (unconnected-(U5-NC-Pad4))",
+            "description": "Pad missing net given by schematic (unconnected-(U5-NC-Pad4)).",
             "items": [
                 {
-                    "description": "Конт. пл. 4 [<no net>] от U5 на F.Cu",
+                    "description": "Pad 4 [<no net>] of U5 on F.Cu",
                     "pos": {
                         "x": 75.7,
                         "y": 46.95
@@ -3782,10 +2830,10 @@
             "type": "net_conflict"
         },
         {
-            "description": "Цепь конт. пл. (1V8_MIC) не соответствует цепи, заданной схемой (/1V8 auxiliary and MAIN harness/1V8_MIC)",
+            "description": "Pad net (1V8_MIC) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/1V8_MIC).",
             "items": [
                 {
-                    "description": "Конт. пл. 5 [1V8_MIC] от U5 на F.Cu",
+                    "description": "Pad 5 [1V8_MIC] of U5 on F.Cu",
                     "pos": {
                         "x": 75.7,
                         "y": 45.05
@@ -3804,112 +2852,12 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "Сегмент от U3 на F.Silkscreen",
-                    "pos": {
-                        "x": 53.52,
-                        "y": 14.9
-                    },
-                    "uuid": "d9c2280a-dc29-4789-87e6-05c555463c83"
-                },
-                {
-                    "description": "Конт. пл. 1 [VBAT_SYS] от U3 на F.Cu",
-                    "pos": {
-                        "x": 53.8975,
-                        "y": 14.725
-                    },
-                    "uuid": "641dafa3-6db4-4b93-bfb3-cce129b6da73"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_over_copper"
-        },
-        {
-            "description": "Silkscreen clipped by solder mask",
-            "items": [
-                {
-                    "description": "Сегмент от U4 на F.Silkscreen",
-                    "pos": {
-                        "x": 53.52,
-                        "y": 42.9
-                    },
-                    "uuid": "afa89bfa-3d7c-4781-8869-0189476140c2"
-                },
-                {
-                    "description": "Конт. пл. 1 [VBAT_SYS] от U4 на F.Cu",
-                    "pos": {
-                        "x": 53.8975,
-                        "y": 42.725
-                    },
-                    "uuid": "66050095-dd2a-420f-b9a6-9ec12152b2a1"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_over_copper"
-        },
-        {
-            "description": "Silkscreen clipped by solder mask",
-            "items": [
-                {
-                    "description": "Полигон от U5 на F.Silkscreen",
-                    "pos": {
-                        "x": 72.92,
-                        "y": 44.92
-                    },
-                    "uuid": "771a0eba-4602-43b4-ac93-d103311df001"
-                },
-                {
-                    "description": "Конт. пл. 1 [3V3_DIGITAL] от U5 на F.Cu",
-                    "pos": {
-                        "x": 73.1,
-                        "y": 45.05
-                    },
-                    "uuid": "ccec6917-e7b4-41b5-8a77-a7f1d9050e07"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_over_copper"
-        },
-        {
-            "description": "Silkscreen clipped by solder mask",
-            "items": [
-                {
-                    "description": "Полигон от U2 на F.Silkscreen",
-                    "pos": {
-                        "x": 41.7,
-                        "y": 21.82
-                    },
-                    "uuid": "76e9aeaf-a669-4e04-9e1e-50d8acb3cdab"
-                },
-                {
-                    "description": "Конт. пл. 1 [GND_PWR] от U2 на F.Cu",
-                    "pos": {
-                        "x": 41.8,
-                        "y": 22.0
-                    },
-                    "uuid": "ecee993b-f763-450b-8ebb-dcde5c69826c"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_over_copper"
-        },
-        {
-            "description": "Silkscreen clipped by solder mask",
-            "items": [
-                {
-                    "description": "Полигон от U1 на F.Silkscreen",
+                    "description": "Polygon of U1 on F.Silkscreen",
                     "pos": {
                         "x": 18.52,
                         "y": 28.92
                     },
                     "uuid": "00022571-99ac-4c67-afa2-3332d20da20b"
-                },
-                {
-                    "description": "Конт. пл. 1 [LM74700_VCAP] от U1 на F.Cu",
-                    "pos": {
-                        "x": 18.7,
-                        "y": 29.05
-                    },
-                    "uuid": "2f2fa89e-92ee-4109-9c26-10a5505c0e14"
                 }
             ],
             "severity": "warning",
@@ -3919,43 +2867,117 @@
             "description": "Silkscreen clipped by solder mask",
             "items": [
                 {
-                    "description": "Полигон от RSH1 на F.Silkscreen",
-                    "pos": {
-                        "x": 33.0,
-                        "y": 29.25
-                    },
-                    "uuid": "85cbe586-efc6-4128-8ce2-9fe5042efc5a"
-                },
-                {
-                    "description": "Конт. пл. 1 [VBAT_PROTECTED] от RSH1 на F.Cu",
-                    "pos": {
-                        "x": 33.515,
-                        "y": 30.365
-                    },
-                    "uuid": "0118ca51-ae57-49c8-925f-253f173c6063"
-                }
-            ],
-            "severity": "warning",
-            "type": "silk_over_copper"
-        },
-        {
-            "description": "Silkscreen clipped by solder mask",
-            "items": [
-                {
-                    "description": "Полигон от Q1 на F.Silkscreen",
+                    "description": "Polygon of Q1 on F.Silkscreen",
                     "pos": {
                         "x": 29.62,
                         "y": 32.62
                     },
                     "uuid": "b61229d5-5ac8-4d38-b1c4-6b7384244ccf"
-                },
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
                 {
-                    "description": "Конт. пл. 1 [VBAT_FUSED] от Q1 на F.Cu",
+                    "description": "Polygon of RSH1 on F.Silkscreen",
                     "pos": {
-                        "x": 29.77,
-                        "y": 31.905
+                        "x": 33.0,
+                        "y": 29.25
                     },
-                    "uuid": "fc17ffb3-dbd9-4d4e-acb2-78688c2eac9d"
+                    "uuid": "85cbe586-efc6-4128-8ce2-9fe5042efc5a"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Segment of U3 on F.Silkscreen",
+                    "pos": {
+                        "x": 53.52,
+                        "y": 14.9
+                    },
+                    "uuid": "d9c2280a-dc29-4789-87e6-05c555463c83"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Segment of U3 on F.Silkscreen",
+                    "pos": {
+                        "x": 53.62,
+                        "y": 15.0
+                    },
+                    "uuid": "69614ddc-2fcc-42f6-aa46-0f555a57ba4c"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Polygon of U2 on F.Silkscreen",
+                    "pos": {
+                        "x": 41.7,
+                        "y": 21.82
+                    },
+                    "uuid": "76e9aeaf-a669-4e04-9e1e-50d8acb3cdab"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Segment of U4 on F.Silkscreen",
+                    "pos": {
+                        "x": 53.52,
+                        "y": 42.9
+                    },
+                    "uuid": "afa89bfa-3d7c-4781-8869-0189476140c2"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Segment of U4 on F.Silkscreen",
+                    "pos": {
+                        "x": 53.62,
+                        "y": 43.0
+                    },
+                    "uuid": "603ef7ce-165b-47ba-bb48-4ad8b9675146"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Polygon of U5 on F.Silkscreen",
+                    "pos": {
+                        "x": 72.92,
+                        "y": 44.92
+                    },
+                    "uuid": "771a0eba-4602-43b4-ac93-d103311df001"
                 }
             ],
             "severity": "warning",
