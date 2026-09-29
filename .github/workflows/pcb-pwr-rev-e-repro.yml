@@ -13,6 +13,7 @@ on:
       - "tools/generate_pcb_pwr_assembly_rev_e.py"
       - "tools/generate_pcb_pwr_parity_disposition_rev_e.py"
       - "tools/pcb_pwr_board_identity.py"
+      - "tools/audit_pcb_pwr_rev_e_cam_equivalence.py"
 
 permissions:
   contents: read
@@ -47,6 +48,8 @@ jobs:
         run: |
           python tools/apply_pcb_pwr_review_b_package_rev_e.py --check
           git diff --exit-code -- hardware/kicad/native/PCB-PWR/
+      - name: Compare manufacturing CAM records with Rev D
+        run: python tools/audit_pcb_pwr_rev_e_cam_equivalence.py
       - name: Upload reproducible Rev E package
         if: always()
         uses: actions/upload-artifact@v4
