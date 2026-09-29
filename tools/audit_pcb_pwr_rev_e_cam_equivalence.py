@@ -31,13 +31,25 @@ FILES = (
 def controlled_lines(path: Path) -> list[str]:
     lines = path.read_text(encoding="utf-8").splitlines()
     if path.suffix in {".drl"}:
-        return [line for line in lines
-                if not re.match(r"^; DRILL file \{KiCad 9\.0\.9\} date ", line)
-                and not line.startswith("; #@! TF.CreationDate,")]
+        result = []
+        for line in lines:
+            if line.startswith("; #@! TF.CreationDate,"):
+                continue
+            if re.match(r"^; DRILL file \{KiCad 9\.0\.9\} date ", line):
+                line = "; DRILL file {KiCad 9.0.9} date <timestamp>"
+            result.append(line)
+        return result
     if path.parent.name == "gerber":
-        return [line for line in lines
-                if not line.startswith(("%TF.CreationDate,", "%TF.ProjectId,",
-                                        "G04 Created by KiCad"))]
+        result = []
+        for line in lines:
+            if line.startswith(("%TF.CreationDate,", "G04 Created by KiCad")):
+                continue
+            if line.startswith("%TF.ProjectId,"):
+                match = re.fullmatch(r"(%TF\.ProjectId,[^,]+,[^,]+,)[^,]*\*%", line)
+                assert match, f"Unexpected Gerber project ID: {line}"
+                line = match.group(1) + "<revision>*%"
+            result.append(line)
+        return result
     return lines
 
 
