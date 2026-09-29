@@ -43,6 +43,21 @@ def overlap(a, b, gap: float = 1.7) -> bool:
 def label_layout(fps) -> dict[str, tuple[float, float]]:
     placed = []
     labels = {}
+    # The two buck clusters are too dense for labels on their fab outlines.
+    # Reserve a clear row above each cluster and draw leaders to the parts.
+    dense_refs = {"C20", "U3", "C21", "U4"}
+    for fp in fps:
+        ref = str(fp.properties["Reference"])
+        if ref not in dense_refs:
+            continue
+        cx, cy = to_sheet(float(fp.position.X), float(fp.position.Y))
+        width = stringWidth(ref, "Helvetica-Bold", 7.5)
+        x, y = cx - width / 2, cy + 28
+        rect = (x, y - 1.5, x + width, y + 8)
+        if any(overlap(rect, other) for other in placed):
+            raise RuntimeError(f"Overlapping dense-area callout: {ref}")
+        labels[ref] = (x, y)
+        placed.append(rect)
     # DFT pads form a 2.54 mm row. Put their callouts below the board in two
     # staggered rows, with leaders, instead of printing on top of the pads.
     for fp in fps:
