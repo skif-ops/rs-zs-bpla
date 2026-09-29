@@ -43,10 +43,27 @@ def overlap(a, b, gap: float = 1.7) -> bool:
 def label_layout(fps) -> dict[str, tuple[float, float]]:
     placed = []
     labels = {}
+    # DFT pads form a 2.54 mm row. Put their callouts below the board in two
+    # staggered rows, with leaders, instead of printing on top of the pads.
+    for fp in fps:
+        ref = str(fp.properties["Reference"])
+        if not ref.startswith("TP"):
+            continue
+        cx, _ = to_sheet(float(fp.position.X), float(fp.position.Y))
+        y = (62 if int(ref[2:]) % 2 else 55) * MM
+        width = stringWidth(ref, "Helvetica-Bold", 7.5)
+        x = cx - width / 2
+        rect = (x, y - 1.5, x + width, y + 8)
+        if any(overlap(rect, other) for other in placed):
+            raise RuntimeError(f"Overlapping DFT callout: {ref}")
+        labels[ref] = (x, y)
+        placed.append(rect)
     # Dense component clusters are placed first, then larger footprints.
     for fp in sorted(fps, key=lambda f: (f.properties.get("Reference", "").startswith("TP"),
                                         float(f.position.X), float(f.position.Y))):
         ref = str(fp.properties["Reference"])
+        if ref in labels:
+            continue
         cx, cy = to_sheet(float(fp.position.X), float(fp.position.Y))
         width = stringWidth(ref, "Helvetica-Bold", 7.5)
         choices = [(3, 3), (3, -5), (-3, 3), (-3, -5), (6, 0), (-6, 0)]
@@ -100,8 +117,9 @@ def make_overlay(fps, labels, board_sha: str) -> bytes:
     for fp in fps:
         ref = str(fp.properties["Reference"])
         x, y = labels[ref]
-        is_dnp = bool(fp.attributes.excludeFromBom) and not (ref.startswith("H") or ref.startswith("TP"))
-        c.setFillColor(colors.HexColor("#A43B36") if is_dnp else colors.HexColor("#0A4380"))
+        is_dnp = ref in {"R5", "R9", "R13", "R14", "R15"}
+        is_tie = ref in {"NT1", "NT2", "NT3"}
+        c.setFillColor(colors.HexColor("#227464") if is_tie else colors.HexColor("#A43B36") if is_dnp else colors.HexColor("#0A4380"))
         c.setFont("Helvetica-Bold", 7.5)
         c.drawString(x, y, ref)
         if is_dnp:
@@ -125,12 +143,13 @@ def make_overlay(fps, labels, board_sha: str) -> bytes:
     c.setFont("Helvetica", 8.5)
     notes = [
         "Blue: all board reference designators",
-        "Red strike: do not populate (DNP)",
+        "Red strike: DNP resistor; fit no part",
+        "Green NT1-NT3: copper-only net tie, no part",
         "Orange ring: actual pad 1 location",
         "J1 mating direction: +Z",
         "J2 mating direction: +X (east edge)",
-        "D1 polarity: follow footprint bar / pad 1",
-        "C13 polarity: verify pad 1 against BOM",
+        "D1 cathode: pad 1 (VBAT_FUSED)",
+        "C13 + : pad 1 (VBAT_SYS)",
         "All components and test points: top side",
     ]
     for index, note in enumerate(notes):
@@ -147,6 +166,12 @@ def make_overlay(fps, labels, board_sha: str) -> bytes:
     c.drawString(rx + 8 * MM, 136 * MM, "Factory stack ID: pending checkout")
     c.drawString(rx + 8 * MM, 129 * MM, "Mechanical DIM-003 Rev B: review open")
     c.drawString(rx + 8 * MM, 122 * MM, "Connector plug/fixture CAD: unavailable")
+    c.setFont("Helvetica-Bold", 9)
+    c.drawString(rx + 8 * MM, 110 * MM, "DENSE-AREA CALLOUTS")
+    c.setFont("Helvetica", 8)
+    c.drawString(rx + 8 * MM, 103 * MM, "C20 is west of U3 at board y = 14 mm")
+    c.drawString(rx + 8 * MM, 97 * MM, "C21 is west of U4 at board y = 42 mm")
+    c.drawString(rx + 8 * MM, 91 * MM, "TP1-TP10: staggered callouts below board")
     c.setFont("Helvetica-Bold", 9)
     c.drawString(rx + 8 * MM, 80 * MM, "REVIEW STATUS: HOLD")
     c.setFont("Helvetica", 8)
@@ -165,8 +190,9 @@ def main() -> None:
     board = Board.from_file(str(BOARD), encoding="utf-8")
     fps = [fp for fp in board.footprints if fp.properties.get("Reference")]
     assert len(fps) == 66 and len({fp.properties["Reference"] for fp in fps}) == 66
-    dnp = {fp.properties["Reference"] for fp in fps if fp.attributes.excludeFromBom}
-    assert {"R5", "R9", "R13", "R14", "R15"} <= dnp
+    dnp = {fp.properties["Reference"] for fp in fps if fp.attributes.excludeFromBom
+           and not fp.properties["Reference"].startswith(("H", "TP"))}
+    assert dnp == {"R5", "R9", "R13", "R14", "R15", "NT1", "NT2", "NT3"}
     labels = label_layout(fps)
     import hashlib
     digest = hashlib.sha256(BOARD.read_bytes()).hexdigest()

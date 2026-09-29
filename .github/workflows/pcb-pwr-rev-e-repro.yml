@@ -1,0 +1,44 @@
+name: PCB-PWR Rev E reproducible package
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [evt-pre-20]
+    paths:
+      - ".github/workflows/pcb-pwr-rev-e-repro.yml"
+      - "hardware/kicad/native/PCB-PWR/**"
+      - "hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_E/**"
+      - "hardware/reviews/PCB_PWR_DIM_003_*REV_B.*"
+      - "mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_B.step"
+      - "tools/apply_pcb_pwr_review_b_package_rev_e.py"
+      - "tools/generate_pcb_pwr_assembly_rev_e.py"
+      - "tools/generate_pcb_pwr_parity_disposition_rev_e.py"
+      - "tools/pcb_pwr_board_identity.py"
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
+      options: --user root
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Python dependencies
+        run: |
+          apt-get -o APT::Update::Error-Mode=any update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3-pip python-is-python3
+          python3 -m pip install --break-system-packages --disable-pip-version-check \
+            'kiutils==1.4.8' 'reportlab==4.4.9' 'pypdf==6.10.0'
+      - name: Reproduce Rev E in pinned KiCad image
+        run: python tools/apply_pcb_pwr_review_b_package_rev_e.py --kicad-cli kicad-cli
+      - name: Verify Rev E manifest and native source
+        run: |
+          python tools/apply_pcb_pwr_review_b_package_rev_e.py --check
+          git diff --exit-code -- hardware/kicad/native/PCB-PWR/
+      - name: Upload reproducible Rev E package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-pwr-review-b-rev-e-kicad-9-0-9
+          path: hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_E/
+          if-no-files-found: error

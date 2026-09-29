@@ -11,10 +11,11 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+from pcb_pwr_board_identity import assert_rev_e_metadata_only
 
 ROOT = Path(__file__).resolve().parents[1]
 NATIVE = ROOT / "hardware/kicad/native/PCB-PWR"
@@ -23,7 +24,8 @@ SCH = NATIVE / "PCB-PWR.kicad_sch"
 OUT = ROOT / "hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_E"
 PREV = ROOT / "hardware/reviews/PCB_PWR_REVIEW_B_PACKAGE_REV_D/MANIFEST.json"
 OLD_SHA = "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7"
-NEW_SHA = "de2a723bbbc0d37b9f4fc5f55e24bfa287f892a081925daf4a24b8a7fa6c901d"
+PINNED_IMAGE = ("ghcr.io/kicad/kicad:9.0.9@sha256:"
+                "e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729")
 
 
 def sha(path: Path) -> str:
@@ -35,19 +37,14 @@ def rel(path: Path) -> str:
 
 
 def assert_metadata_only() -> None:
-    text = BOARD.read_text(encoding="utf-8")
-    assert sha(BOARD) == NEW_SHA
-    text, n_title = re.subn(r'\t\(title_block\n(?:\t.*\n)*?\t\)\n', '', text, count=1)
-    text, n_stack = re.subn(r'\t\t\(stackup\n(?:\t\t\t.*\n)*?\t\t\)\n', '', text, count=1)
-    assert (n_title, n_stack) == (1, 1)
-    assert hashlib.sha256(text.encode("utf-8")).hexdigest() == OLD_SHA, "PCB geometry changed"
+    assert_rev_e_metadata_only(BOARD)
 
 
 def run(name: str, argv: list[str]) -> dict:
     result = subprocess.run(argv, cwd=ROOT, capture_output=True, text=True, errors="replace")
     if result.returncode != 0:
         raise RuntimeError(f"{name}: rc={result.returncode}\n{result.stdout[-1200:]}\n{result.stderr[-1200:]}")
-    return {"step": name, "tool": Path(argv[0]).name, "rc": result.returncode}
+    return {"step": name, "argv": argv, "rc": result.returncode}
 
 
 def generate(cli: str) -> None:
@@ -57,6 +54,8 @@ def generate(cli: str) -> None:
     (OUT / "drill").mkdir(exist_ok=True)
     steps = []
     version = subprocess.run([cli, "version"], capture_output=True, text=True, errors="replace", check=True).stdout.strip()
+    if not re.match(r"^9\.0\.9(?:\b|$)", version):
+        raise RuntimeError(f"Review B Rev E exports require pinned KiCad 9.0.9, got {version!r}")
     steps.append(run("drc_json", [cli, "pcb", "drc", "--format", "json", "--severity-all",
                                   "-o", str(OUT / "PCB-PWR_drc.json"), str(BOARD)]))
     steps.append(run("drc_report", [cli, "pcb", "drc", "--format", "report", "--severity-all",
@@ -65,6 +64,8 @@ def generate(cli: str) -> None:
                              "--exit-code-violations", "-o", str(OUT / "PCB-PWR_erc.json"), str(SCH)]))
     steps.append(run("parity_diagnostic", [cli, "pcb", "drc", "--format", "json", "--severity-all",
                                            "--schematic-parity", "-o", str(OUT / "PCB-PWR_parity_drc.json"), str(BOARD)]))
+    steps.append(run("parity_disposition", [sys.executable,
+                                            str(ROOT / "tools/generate_pcb_pwr_parity_disposition_rev_e.py")]))
     steps.append(run("copper_pdf", [cli, "pcb", "export", "pdf", "--layers", "F.Cu,In1.Cu,In2.Cu,B.Cu",
                                     "--common-layers", "Edge.Cuts", "--mode-multipage", "--black-and-white",
                                     "-o", str(OUT / "PCB-PWR_copper_layers.pdf"), str(BOARD)]))
@@ -89,7 +90,7 @@ def generate(cli: str) -> None:
     if audit.returncode != 0 or "independent audit PASS" not in audit.stdout:
         raise AssertionError(f"Primary layout/schematic audit failed: {audit.stdout}\n{audit.stderr}")
     (OUT / "PCB-PWR_layout_schematic_audit.log").write_text(audit.stdout, encoding="utf-8")
-    steps.append({"step": "primary_schematic_board_audit", "command": [sys.executable,
+    steps.append({"step": "primary_schematic_board_audit", "argv": [sys.executable,
                   "tools/audit_pcb_pwr_layout_candidate_rev_a.py"], "rc": 0})
     drc = json.loads((OUT / "PCB-PWR_drc.json").read_text(encoding="utf-8"))
     erc = json.loads((OUT / "PCB-PWR_erc.json").read_text(encoding="utf-8"))
@@ -109,7 +110,9 @@ def generate(cli: str) -> None:
                  ROOT / "tools/audit_pcb_pwr_layout_candidate_rev_a.py",
                  ROOT / "tools/audit_pcb_pwr_dim_003_rev_b.py",
                  ROOT / "tools/generate_pcb_pwr_assembly_rev_e.py",
-                 ROOT / "tools/apply_pcb_pwr_review_b_package_rev_e.py"):
+                 ROOT / "tools/generate_pcb_pwr_parity_disposition_rev_e.py",
+                 ROOT / "tools/apply_pcb_pwr_review_b_package_rev_e.py",
+                 ROOT / "tools/pcb_pwr_board_identity.py"):
         inputs[rel(path)] = sha(path)
     outputs = {path.relative_to(OUT).as_posix(): sha(path) for path in sorted(OUT.rglob("*"))
                if path.is_file() and path.name != "MANIFEST.json"}
@@ -117,6 +120,7 @@ def generate(cli: str) -> None:
         "schema": "dioneya-pcb-pwr-review-b-package-v4", "revision": "REV_E",
         "responds_to": "Review B R3.1 F1-F4",
         "kicad_cli_version": version,
+        "kicad_container_image": PINNED_IMAGE,
         "board_sha256": sha(BOARD), "geometry_equivalent_rev_d_board_sha256": OLD_SHA,
         "geometry_equivalence_method": "remove only title_block and stackup; remaining UTF-8 bytes SHA-256 equal Rev D board",
         "source_commit_eco006": "02647713c228e3beb338053f37d06f83cd4bb94f",
@@ -128,6 +132,12 @@ def generate(cli: str) -> None:
             "count": len(parity.get("schematic_parity", [])),
             "types": {typ: sum(x.get("type") == typ for x in parity.get("schematic_parity", []))
                       for typ in sorted({x.get("type") for x in parity.get("schematic_parity", [])})}},
+        "parity_disposition": "251_CLASSIFIED_ZERO_UNEXPLAINED_17_VALUE_OR_BOM_METADATA_PENDING_SYNC",
+        "drc_ignored_checks": {
+            "keys": sorted(item["key"] for item in drc.get("ignored_checks", [])),
+            "basis": "No project rule_severities; KiCad 9 JSON may omit default ignored_checks. Copper-only NT1-NT3 have no courtyard.",
+        },
+        "nominal_stackup_use": "NOT_FOR_IMPEDANCE_CAPACITANCE_OR_THERMAL_ANALYSIS_PENDING_FAB_STACK_ID",
         "factory_stack_id": None, "manufacturer_checkout": "PENDING",
         "dim_003_independent_mechanical_review": "PENDING_CAD_AND_HUMAN_SIGNOFF",
         "manufacturing_release": False,
