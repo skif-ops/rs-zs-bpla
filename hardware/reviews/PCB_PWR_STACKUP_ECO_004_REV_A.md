@@ -1,6 +1,6 @@
 # PCB-PWR ECO-004 — outer copper 1 oz and LMR60440 land rule, Rev.A
 
-Status: `CANDIDATE / NOT FOR MANUFACTURE`
+Status: `APPLIED TO PCB-PWR RULES AND EVT ROUTING BASIS / FAB STACK CHECKOUT PENDING / NOT FOR MANUFACTURE`
 
 ## Decision
 
@@ -8,6 +8,13 @@ Customer decision 2026-09-24: PCB-PWR outer layers **1 oz (35 um finished)**
 instead of 2 oz. Inner layers stay 1 oz (35 um), 4 layers, 1.6 mm ±10 %, ENIG,
 minimum average hole-wall plating 18 um. The fabricator stackup identifier is
 selected at checkout to match these values.
+
+The 1 oz outer-copper decision and the local U3/U4 design rule are applied to
+the authoritative ECO-006 PCB-PWR review source. The selected fabricator's
+stack ID and order acceptance have not been recorded; this status does not
+authorize a purchase or manufacturing release. Review B Rev E records the
+design target in the Gerber job as ENIG and 4 × 35 um copper, while explicitly
+identifying the generic dielectric dimensions as pending fabricator checkout.
 
 This record supersedes the 2 oz outer value of `JLC04161H-3313A` for the EVT
 order. The historical request/response packets (`PCB_PWR_STACKUP_COPPER_REQUEST_REV_A.*`,

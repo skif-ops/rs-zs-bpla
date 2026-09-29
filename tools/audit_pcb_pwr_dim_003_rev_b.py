@@ -22,6 +22,16 @@ BOARD = ROOT / "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb"
 STEP = ROOT / "mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_B.step"
 REPORT = ROOT / "mechanics/pcb_pwr/PCB_PWR_EVT_MECHANICAL_ENVELOPE_REV_B.json"
 REFS = ("H1", "H2", "H3", "H4", "J1", "J2")
+REV_E_METADATA_BOARD_SHA256 = "de2a723bbbc0d37b9f4fc5f55e24bfa287f892a081925daf4a24b8a7fa6c901d"
+
+
+def strip_rev_e_metadata(board_text: str) -> str:
+    """Remove only Rev E title and stackup blocks to prove ECO-006 geometry identity."""
+    text, title_count = re.subn(r'\t\(title_block\n(?:\t.*\n)*?\t\)\n', '', board_text, count=1)
+    text, stack_count = re.subn(r'\t\t\(stackup\n(?:\t\t\t.*\n)*?\t\t\)\n', '', text, count=1)
+    if (title_count, stack_count) != (1, 1):
+        raise AssertionError("Rev E metadata blocks missing or altered")
+    return text
 
 
 def close(actual: float, expected: float, label: str, tolerance: float = 0.001) -> None:
@@ -157,9 +167,15 @@ def main() -> int:
     if args.board.exists():
         digest = hashlib.sha256(args.board.read_bytes()).hexdigest()
         if digest != authority["source_board_sha256"]:
-            raise AssertionError(f"Board SHA-256 mismatch: {digest}")
+            if digest != REV_E_METADATA_BOARD_SHA256:
+                raise AssertionError(f"Board SHA-256 mismatch: {digest}")
+            stripped = strip_rev_e_metadata(args.board.read_text(encoding="utf-8"))
+            if hashlib.sha256(stripped.encode("utf-8")).hexdigest() != authority["source_board_sha256"]:
+                raise AssertionError("Rev E board differs from ECO-006 beyond title and stackup")
+            board_status = "REV_E_METADATA_ONLY_EQUIVALENCE_AND_POSES_VERIFIED"
+        else:
+            board_status = "SOURCE_BOARD_SHA_AND_POSES_VERIFIED"
         poses, courtyards = read_board_poses(args.board)
-        board_status = "SOURCE_BOARD_SHA_AND_POSES_VERIFIED"
     holes = {item["reference"]: item["xy_mm"] for item in authority["mounting"]["holes"]}
     for name in REFS:
         expected = evidence["footprints"][name]

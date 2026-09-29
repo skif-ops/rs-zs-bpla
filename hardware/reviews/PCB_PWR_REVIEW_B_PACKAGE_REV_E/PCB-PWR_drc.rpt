@@ -1,0 +1,46 @@
+** Drc report for PCB-PWR.kicad_pcb **
+** Created on 2026-09-29T08:20:44 **
+** Report includes: Errors, Warnings, Exclusions **
+
+** Found 7 DRC violations **
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(53.5200 mm, 14.9000 mm): Segment of U3 on F.Silkscreen
+    @(53.8975 mm, 14.7250 mm): Pad 1 [VBAT_SYS] of U3 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(53.5200 mm, 42.9000 mm): Segment of U4 on F.Silkscreen
+    @(53.8975 mm, 42.7250 mm): Pad 1 [VBAT_SYS] of U4 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(72.9200 mm, 44.9200 mm): Polygon of U5 on F.Silkscreen
+    @(73.1000 mm, 45.0500 mm): Pad 1 [3V3_DIGITAL] of U5 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(41.7000 mm, 21.8200 mm): Polygon of U2 on F.Silkscreen
+    @(41.8000 mm, 22.0000 mm): Pad 1 [GND_PWR] of U2 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(18.5200 mm, 28.9200 mm): Polygon of U1 on F.Silkscreen
+    @(18.7000 mm, 29.0500 mm): Pad 1 [LM74700_VCAP] of U1 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(33.0000 mm, 29.2500 mm): Polygon of RSH1 on F.Silkscreen
+    @(33.5150 mm, 30.3650 mm): Pad 1 [VBAT_PROTECTED] of RSH1 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(29.6200 mm, 32.6200 mm): Polygon of Q1 on F.Silkscreen
+    @(29.7700 mm, 31.9050 mm): Pad 1 [VBAT_FUSED] of Q1 on F.Cu
+
+** Found 0 unconnected pads **
+
+** Found 0 Footprint errors **
+
+** Ignored checks **
+    - Footprint has no courtyard defined
+    - Track endpoint not centered on via
+    - Tuning profile track geometries
+    - Footprint doesn't match symbol's footprint filters
+    - Footprint component type doesn't match footprint pads
+
+** End of Report **
