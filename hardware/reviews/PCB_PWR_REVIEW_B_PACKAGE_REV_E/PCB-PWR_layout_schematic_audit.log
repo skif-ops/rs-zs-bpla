@@ -1,6 +1,6 @@
 {
   "board_source": "REV_E_METADATA_ONLY_EQUIVALENCE_AND_POSES_VERIFIED",
-  "mirror_guard": "PASS_DIRECT_MAPPING_REJECTED",
+  "mirror_guard": "PASS_REFLECTED_INPUT_REJECTED",
   "j1_courtyard_dim_bounds_mm": {
     "x": [
       2.17,
