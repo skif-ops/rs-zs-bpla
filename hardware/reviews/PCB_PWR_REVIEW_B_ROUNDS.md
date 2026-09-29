@@ -9,7 +9,7 @@
 | `PCB_PWR_REVIEW_B_PACKAGE_REV_B` | ECO-005, `81f44a70…` | R1 (REQUEST_CHANGES) | `PCB_PWR_ECO_005_REV_A.md` |
 | `PCB_PWR_REVIEW_B_PACKAGE_REV_C` | ECO-005, `81f44a70…` | R2 (REQUEST_CHANGES_R2): R2.001, R2.002 | `PCB_PWR_REVIEW_B_R2_RESPONSE_REV_A.md` |
 | `PCB_PWR_REVIEW_B_PACKAGE_REV_D` | ECO-006, `b8c1da6c…` | решения по R2: исправлены DFM-PWR-02 и DFM-PWR-03 | `PCB_PWR_ECO_006_REV_A.md` |
-| `PCB_PWR_REVIEW_B_PACKAGE_REV_E` | геометрия ECO-006 без изменений, `de2a723b…` после метаданных | R3.1 F1–F4: DIM-003 Rev B, сборка, хешированная сверка, статус документации | `PCB_PWR_REVIEW_B_R3_RESPONSE_REV_E.md` |
+| `PCB_PWR_REVIEW_B_PACKAGE_REV_E` | геометрия ECO-006 без изменений, `de2a723b…` после метаданных | R3.1 F1–F4 и R4 E1–E7: DIM-003 Rev B, сборка, хешированная сверка, воспроизводимый экспорт KiCad 9.0.9 | `PCB_PWR_REVIEW_B_R3_RESPONSE_REV_E.md`, `PCB_PWR_REVIEW_B_R4_RESPONSE_REV_E.md` |
 
 По проверке R3.1 от 28.09.2026 пакет **Rev D получил `REQUEST_CHANGES_R3`**. Пакет Rev E —
 кандидат на повторную проверку, но **остаётся на HOLD** из-за F1 и фабричного стека F2.
@@ -19,8 +19,15 @@
 `PCB_PWR_REVIEW_B_R3_RESPONSE_REV_E.md`.
 
 По F1 выбран перевыпуск DIM-003 под фактическую плату. Кандидат Rev B со STEP и проверкой
-преобразования координат представлен в черновом PR #98; механический overlay, ответные части J1/J2
+преобразования координат включён в черновой PR #100 вместе с пакетом Rev E; PR #98 входит в его
+историю и подлежит закрытию как поглощённый. Механический overlay, ответные части J1/J2
 и подпись человека ещё ожидаются. Пока F1 открыт.
+
+R4 от 29.09.2026 вернул `REQUEST_CHANGES_R4`: исторические аудиты исправлены общей проверкой
+метаданных платы, пакет повторно экспортирован в закреплённом KiCad 9.0.9, диагностические
+записи KiCad 10 сохранены с поэлементной диспозицией. Статус **HOLD** сохраняется по F1 и
+фабричному стеку F2; синхронизация 17 атрибутов Value/BOM и исправление тега DIM-003 на плате
+запланированы отдельным ECO. Подробности — `PCB_PWR_REVIEW_B_R4_RESPONSE_REV_E.md`.
 
 Решения по реестру DFM — `PCB_PWR_DFM_DECISIONS_REV_A.md`:
 DFM-PWR-01 принято для EVT с условиями (примечание в заказе, AOI и рентген U3/U4 на 100 %, проверка

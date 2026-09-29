@@ -44,6 +44,15 @@ def xy_close(actual: list[float], expected: list[float], label: str) -> None:
         close(a, e, f"{label}.{axis}")
 
 
+def assert_dim_coordinates(poses: dict, footprint_evidence: dict, board_height: float) -> None:
+    """Check the KiCad-to-DIM transform for every controlled footprint."""
+    for name in REFS:
+        expected = footprint_evidence[name]
+        xy_close(poses[name]["at_kicad_mm"], expected["at_kicad_mm"], f"{name} KiCad")
+        x_kicad, y_kicad = poses[name]["at_kicad_mm"]
+        xy_close([x_kicad, board_height - y_kicad], expected["at_dim_mm"], f"{name} DIM")
+
+
 def bracket_block(text: str, start: int) -> str:
     depth = 0
     quoted = False
@@ -177,12 +186,20 @@ def main() -> int:
             board_status = "SOURCE_BOARD_SHA_AND_POSES_VERIFIED"
         poses, courtyards = read_board_poses(args.board)
     holes = {item["reference"]: item["xy_mm"] for item in authority["mounting"]["holes"]}
+    assert_dim_coordinates(poses, evidence["footprints"], board_height)
+    reflected_evidence = {
+        name: {"at_kicad_mm": pose["at_kicad_mm"], "at_dim_mm": pose["at_kicad_mm"]}
+        for name, pose in poses.items()
+    }
+    try:
+        assert_dim_coordinates(poses, reflected_evidence, board_height)
+    except AssertionError:
+        mirror_guard = "PASS_REFLECTED_INPUT_REJECTED"
+    else:
+        raise AssertionError("Deliberately reflected DIM input was accepted")
     for name in REFS:
-        expected = evidence["footprints"][name]
-        xy_close(poses[name]["at_kicad_mm"], expected["at_kicad_mm"], f"{name} KiCad")
         x_kicad, y_kicad = poses[name]["at_kicad_mm"]
         transformed = [x_kicad, board_height - y_kicad]
-        xy_close(transformed, expected["at_dim_mm"], f"{name} DIM")
         if name.startswith("H"):
             xy_close(transformed, holes[name], f"{name} authority")
         else:
@@ -191,7 +208,6 @@ def main() -> int:
     # Deliberately perform the wrong direct mapping as a negative mirror test.
     if all(poses[name]["at_kicad_mm"] == holes[name] for name in holes):
         raise AssertionError("Mirror guard did not detect the Rev A coordinate error")
-    mirror_guard = "PASS_DIRECT_MAPPING_REJECTED"
     bounds = {}
     for name in ("J1", "J2"):
         rect = courtyards[name]
