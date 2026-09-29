@@ -60,6 +60,9 @@ def generate(cli: str) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "gerber").mkdir(exist_ok=True)
     (OUT / "drill").mkdir(exist_ok=True)
+    # KiCad 9 PDF export refuses an existing PDF path in the checked-out package.
+    for name in ("PCB-PWR_copper_layers.pdf", "PCB-PWR_schematic.pdf"):
+        (OUT / name).unlink(missing_ok=True)
     steps = []
     version = subprocess.run([cli, "version"], capture_output=True, text=True, errors="replace", check=True).stdout.strip()
     if not re.match(r"^9\.0\.9(?:\b|$)", version):
