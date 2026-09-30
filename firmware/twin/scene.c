@@ -11,9 +11,43 @@ void scene_init(scene_t *s, const scene_segment_t *segments, size_t count, float
   s->segments = segments; s->count = count; s->noise = noise; s->rng = seed ? seed : 0x9e3779b9u;
   for (i = 0u; i < 24u; i++) s->phase[i] = 0.0;
   s->pink = 0.0; s->sample = 0u;
+  for (i = 0u; i < 3u; i++) { s->bg_rng[i] = (s->rng ^ (0x85ebca6bu * (uint32_t)(i + 1u))) | 1u; s->bg_pink[i] = 0.0; }
+}
+
+static float rnd_state(uint32_t *r) { *r ^= *r << 13; *r ^= *r >> 17; *r ^= *r << 5; return ((float)(*r & 0xffffffu) / 8388608.0f) - 1.0f; }
+
+float scene_background(scene_t *s, unsigned ch) {
+  uint32_t *r;
+  float g1, g2;
+  if (ch < 1u || ch > 3u) return 0.0f;
+  r = &s->bg_rng[ch - 1u];
+  g1 = 0.866f * (rnd_state(r) + rnd_state(r) + rnd_state(r));
+  g2 = 0.866f * (rnd_state(r) + rnd_state(r) + rnd_state(r));
+  s->bg_pink[ch - 1u] = 0.995 * s->bg_pink[ch - 1u] + g1 * 0.02;
+  return s->noise * (float)(0.6 * g2 + s->bg_pink[ch - 1u]);
+}
+
+bool scene_direction(const scene_t *s, float *azimuth_deg, float *elevation_deg) {
+  const uint32_t ms = (uint32_t)((double)s->sample / SR * 1000.0);
+  for (size_t i = 0u; i < s->count; i++) {
+    const scene_segment_t *g = &s->segments[i];
+    if (ms < g->start_ms || ms >= g->end_ms) continue;
+    const float f = (float)(ms - g->start_ms) / (float)(g->end_ms - g->start_ms);
+    *azimuth_deg = g->az_start_deg + f * (g->az_end_deg - g->az_start_deg);
+    *elevation_deg = g->el_deg;
+    return true;
+  }
+  return false;
 }
 
 float scene_next(scene_t *s) {
+  float src, bg, out;
+  scene_next_parts(s, &src, &bg);
+  out = src + bg;
+  return out > 1.0f ? 1.0f : (out < -1.0f ? -1.0f : out);
+}
+
+void scene_next_parts(scene_t *s, float *source, float *background) {
   const double t = (double)s->sample / SR;
   const uint32_t ms = (uint32_t)(t * 1000.0);
   float out = 0.0f;
@@ -40,7 +74,7 @@ float scene_next(scene_t *s) {
   }
   /* background: broadband ambient (white + a slow low-frequency wander), no harmonic structure */
   s->pink = 0.995 * s->pink + gauss(s) * 0.02;
-  out += s->noise * (float)(0.6 * gauss(s) + s->pink);
+  *source = out;
+  *background = s->noise * (float)(0.6 * gauss(s) + s->pink);
   s->sample++;
-  return out > 1.0f ? 1.0f : (out < -1.0f ? -1.0f : out);
 }

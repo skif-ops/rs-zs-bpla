@@ -48,7 +48,7 @@ int main(void) {
   m.route.snr_db10 = INT16_MAX;
   m.route.gateway_id = UINT32_MAX;
 
-  m.doa.azimuth_cdeg = INT16_MAX;
+  m.doa.azimuth_cdeg = UINT16_MAX;
   m.doa.elevation_cdeg = INT16_MIN;
   m.doa.sigma_cdeg = UINT16_MAX;
   m.doa.valid = true;
