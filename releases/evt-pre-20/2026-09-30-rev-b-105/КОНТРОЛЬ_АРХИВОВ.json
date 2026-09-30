@@ -1,0 +1,25 @@
+{
+  "schema": "dioneya-evt-pre-20-archive-control-v2",
+  "date": "2026-09-30",
+  "board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "archives": [
+    {
+      "name": "EVT_PRE_20_ПОЛНЫЙ_ПАКЕТ_ДЛЯ_ПЕРЕДАЧИ_REV_B_105.zip",
+      "bytes": 7086582,
+      "sha256": "e73d9e4aa5a6767bfa9288aff3b13330c843f5aefeb17f9c02f25b07cea8cb7c",
+      "entries": 67
+    },
+    {
+      "name": "EVT_PRE_20_ПЛАТЫ_ЗАКАЗ_И_МОНТАЖ_REV_B_105.zip",
+      "bytes": 4862268,
+      "sha256": "1ae3f46c7eb8ddcf94e8e6c39b8939d319f8c09f5918f7c6eb4371a7dc03edef",
+      "entries": 201
+    },
+    {
+      "name": "EVT_PRE_20_ПРОГРАММА_И_МУХОЕД_REV_B_105.zip",
+      "bytes": 80680,
+      "sha256": "241b761be54156008367a31c80e4a75d1076021aba95ac8e215099f4d2601cbd",
+      "entries": 13
+    }
+  ]
+}
