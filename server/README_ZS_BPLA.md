@@ -97,7 +97,19 @@ commands. To rotate it without a site visit (MQTT ICD addendum E), start the
 bridge with `--command-next-signing-key <new pem>` as well, queue
 `POST /api/v1/stations/{id}/command-key-rotation` with the new public key it
 prints, and switch `--command-signing-key` to the new key once every station
-reports it as current (`detector.command_key_id` in `/api/v1/stations`). Command delivery uses QoS 1, retain false and durable retries until a
+reports it as current (`detector.command_key_id` in `/api/v1/stations`).
+
+Station firmware goes over MQTT as well (ICD addendum F). Offline, create the
+release key once (`python -m pki.cli fw-release-key --out release.pem`, its
+public key is built into the firmware with `-DZS_FW_RELEASE_PUBLIC_KEYS=`) and
+sign every application image into the release repository
+(`python -m pki.cli fw-sign --key release.pem --image dioneya_evt_pre_20.bin
+--out data/firmware`; target and version come from the image's `.fw_info`).
+The bridge serves the chunks from that directory (`--firmware-dir`,
+`ZS_FIRMWARE_DIR`, default `data/firmware`); `GET /api/v1/firmware/releases`
+lists it and `POST /api/v1/stations/{id}/firmware-update {"version": N}`
+queues CMD_UPDATE_FIRMWARE. Progress is in the heartbeat
+(`detector.fw_version / fw_state / fw_other_version`). Command delivery uses QoS 1, retain false and durable retries until a
 station-bound application ACK or the 15-minute TTL. The checked-in ACL contains
 separate topic rights for station credentials 01 through 20.
 
