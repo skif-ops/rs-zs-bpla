@@ -6,30 +6,38 @@
   "pcb_mic_board_sha256": "c57cebbb3886247166551fd242fa51350bc9be7fee6299e63e7eaac60518d518",
   "pcb_mic_review_b": "ACCEPT_CONTROLLED_FIRST_ARTICLE",
   "pcb_mic_first_lot_pcba": 80,
+  "harness_order_sets": 22,
+  "harness_schedule_conductors_per_set": 38,
   "archives": [
     {
       "name": "EVT_PRE_20_ПОЛНЫЙ_ПАКЕТ_20260930_REV_D.zip",
-      "bytes": 7594725,
-      "sha256": "0741a41b52d38a7d8d1be6fc6d7540d3425352567dab7a91d127bf1aec9778c3",
-      "entries": 80
+      "bytes": 7964935,
+      "sha256": "63ad62ce4546d6dae20deb8b2344be55cbd58e07543c2f99dee9be09707e66ad",
+      "entries": 89
     },
     {
       "name": "EVT_PRE_20_ПЛАТЫ_ЗАКАЗ_И_МОНТАЖ_20260930_REV_D.zip",
-      "bytes": 5024755,
-      "sha256": "f2000e8766a44006e7859462ba6fde6a82d7f4c85413dc94c14819729cfd97b1",
-      "entries": 203
+      "bytes": 4976653,
+      "sha256": "bd1112485185396b2fc4a0ad341513a6e9c6a4b6cc7313b0bda376bf03179721",
+      "entries": 204
     },
     {
       "name": "EVT_PRE_20_ПРОГРАММА_И_МУХОЕД_20260930_REV_D.zip",
-      "bytes": 80680,
-      "sha256": "878abb2384cf627996b89c58393e4a84d714c4877ea343cf9e4d3ef42e73c7bd",
+      "bytes": 80858,
+      "sha256": "e2bbe75de123a3beef4b96493261eddf2f70d5797a9afa701924a0aa6b344873",
       "entries": 13
     },
     {
       "name": "EVT_PRE_20_PCB_MIC_REVIEW_B_20260930_REV_D.zip",
       "bytes": 698578,
-      "sha256": "cfd355c9c4a99557bde9ca2d2562e8650b3df3c1245d3ec3e477a594d6e139dd",
+      "sha256": "ea745ee6e3d0070693ed20f4d888fbfaaffb1738de57bb5d6092a22deda17d73",
       "entries": 40
+    },
+    {
+      "name": "EVT_PRE_20_ЖГУТЫ_И_КАБЕЛИ_20260930_REV_D.zip",
+      "bytes": 208728,
+      "sha256": "0ea5afceca7004fe042d00582af635876ae045bae0b191b2d7d99ee9400833ed",
+      "entries": 9
     }
   ]
 }

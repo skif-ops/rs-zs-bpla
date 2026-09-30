@@ -21,5 +21,13 @@
   "program_bom_basis": 41,
   "price_basis": "historical_v02_estimate_not_current_quote",
   "release_limit_ru": "Комплект разрешает заказ плат с обязательной DFM-проверкой. Для PCB-MIC действует порядок: одна плата/панель, контроль, затем остаток 79 PCBA. Подтверждение фабричного стека PCB-MAIN/PCB-PWR и примерка корпусов выполняются в производственном цикле.",
-  "release_limit_en": "Boards may be ordered subject to mandatory fabricator DFM review. PCB-MIC sequence: one board/panel, inspection, then the remaining 79 PCBAs. PCB-MAIN/PCB-PWR stack confirmation and housing fit are completed during the production cycle."
+  "release_limit_en": "Boards may be ordered subject to mandatory fabricator DFM review. PCB-MIC sequence: one board/panel, inspection, then the remaining 79 PCBAs. PCB-MAIN/PCB-PWR stack confirmation and housing fit are completed during the production cycle.",
+  "harness_order": "RELEASED_CONTROLLED_FIRST_ARTICLE",
+  "harness_order_sets": 22,
+  "harness_schedule_conductors_per_set": 38,
+  "harness_lengths_mm": {
+    "H-MIC1..4": "275+/-5",
+    "H-MAIN-PWR": "440+/-5",
+    "H-BAT-PWR": "330+/-5"
+  }
 }
