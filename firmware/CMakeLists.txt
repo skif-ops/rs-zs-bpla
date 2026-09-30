@@ -48,6 +48,7 @@ add_library(zs_core
   src/zs_audio_recorder.c
   src/zs_audio_upload.c
   src/zs_spatial.c
+  src/zs_bearing.c
   src/zs_position_trust.c
   src/zs_installation_store.c
   src/zs_installation_commissioning.c
@@ -204,6 +205,9 @@ add_executable(zs_fw_boot_tests tests/test_fw_boot.c)
 target_link_libraries(zs_fw_boot_tests zs_core m)
 add_executable(zs_net_trial_tests tests/test_net_trial.c)
 target_link_libraries(zs_net_trial_tests zs_core m)
+add_executable(zs_bearing_tests tests/test_bearing.c twin/array_render.c)
+target_include_directories(zs_bearing_tests PRIVATE twin)
+target_link_libraries(zs_bearing_tests zs_core m)
 add_executable(zs_ed25519_tests tests/test_ed25519.c)
 target_link_libraries(zs_ed25519_tests zs_core m)
 add_executable(zs_lora_frame_tests tests/test_lora_frame.c)
@@ -236,7 +240,7 @@ target_include_directories(app_comms_sim_tests PRIVATE tests/host_sim targets/ev
 target_link_libraries(app_comms_sim_tests PRIVATE evt_pre_20_dual_sim_gpio)
 
 # station digital twin: portable stack + real comms task on the host against a scene, a scripted BG95 and the server twin
-add_executable(zs_station_twin twin/station_twin.c twin/scene.c targets/evt_pre_20/app/app_comms.c)
+add_executable(zs_station_twin twin/station_twin.c twin/scene.c twin/array_render.c targets/evt_pre_20/app/app_comms.c)
 target_include_directories(zs_station_twin PRIVATE twin tests/host_sim targets/evt_pre_20/app)
 target_link_libraries(zs_station_twin PRIVATE evt_pre_20_dual_sim_gpio m)
 target_compile_options(zs_station_twin PRIVATE -UNDEBUG)
@@ -297,6 +301,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_fw_update_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_fw_boot_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_net_trial_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_bearing_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_ed25519_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_lora_frame_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_lora_uplink_tests PRIVATE -UNDEBUG)
@@ -366,6 +371,7 @@ add_test(NAME command_keys COMMAND zs_command_keys_tests)
 add_test(NAME fw_update COMMAND zs_fw_update_tests)
 add_test(NAME fw_boot COMMAND zs_fw_boot_tests)
 add_test(NAME net_trial COMMAND zs_net_trial_tests)
+add_test(NAME bearing COMMAND zs_bearing_tests)
 add_test(NAME ed25519 COMMAND zs_ed25519_tests)
 add_test(NAME lora_frame COMMAND zs_lora_frame_tests)
 add_test(NAME lora_uplink COMMAND zs_lora_uplink_tests)
