@@ -24,6 +24,7 @@
  *   station_twin --scene drone|quiet|ground --seconds N --server "python3 -m twin.twin_server" [--seed S]
  */
 #include "app_comms.h"
+#include "array_render.h"
 #include "bsp_gpio.h"
 #include "bsp_uart.h"
 #include "scene.h"
@@ -49,6 +50,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -408,6 +410,9 @@ static uint32_t mode_bits;
 static unsigned events_emitted_total, sessions_done, quiet_windows;
 static uint32_t seen_events;
 static scene_t scene;
+static array_render_t array_render;       /* the source as a plane wave on the 3+1 array (bearings) */
+static unsigned bearings_total;
+static float bearing_err_sum, bearing_err_max;
 static float scene_level;                 /* recent RMS of the scene, for the AAD wake emulation */
 static FILE *dump_pcm;                    /* --dump-pcm: the mono scene as PCM16LE 32 kHz (for tools/presence_eval) */
 
@@ -473,10 +478,21 @@ static bool pl_emit(void *ctx, const zs_detection_t *d) {
   if (ok) remember_summary(d->event_id, d->classification.class_id, d->classification.confidence_u8, pipeline.presence.level, (uint16_t)pipeline.last_gate.f0_hz);
   if (ok && first_event_time_us == 0) first_event_time_us = d->event_time_us;
   if (!forget_events) { twin_events[twin_events_next] = (twin_event_t){d->event_id, d->event_time_us}; twin_events_next = (twin_events_next + 1u) % 16u; }
-  tlog("station: event %llu emitted (level %u conf %u) -> outbox %s", (unsigned long long)d->event_id, pipeline.presence.level, pipeline.presence.confidence_u8, ok ? "ok" : "REFUSED");
+  tlog("station: event %llu emitted (level %u conf %u) -> outbox %s; doa %s az %.1f el %.1f sigma %.1f (truth az %.1f el %.1f)",
+       (unsigned long long)d->event_id, pipeline.presence.level, pipeline.presence.confidence_u8, ok ? "ok" : "REFUSED",
+       d->doa.valid ? "valid" : "none", d->doa.azimuth_cdeg / 100.0, d->doa.elevation_cdeg / 100.0, d->doa.sigma_cdeg / 100.0,
+       array_render.azimuth_deg, array_render.elevation_deg);
   return ok;
 }
-static zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, 17u, 5u, 0u, 0u};
+/* every bearing of a CONFIRMED window, against the rendered truth */
+static void pl_bearing(void *ctx, const zs_bearing_t *b, uint64_t end_sample, uint64_t track_event_id) {
+  const float e = fabsf(fmodf(b->azimuth_deg - array_render.azimuth_deg + 540.0f, 360.0f) - 180.0f);
+  (void)ctx; (void)end_sample; (void)track_event_id;
+  bearings_total++;
+  bearing_err_sum += e;
+  if (e > bearing_err_max) bearing_err_max = e;
+}
+static zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, 17u, 5u, 0u, 0u, NULL, pl_bearing};
 
 /* --inject-events N AT_S: N synthetic detections straight into the outbox (burst scenarios without the classifier) */
 static unsigned inject_count; static uint32_t inject_at_ms; static bool injected;
@@ -814,11 +830,22 @@ static void supervisor_tick(void) {
 static void audio_tick(void) {
   const bool mdf_on = capture_on;
   float acc = 0.0f;
+  {
+    float az, el;          /* the source moves along its segment: re-aim the plane wave every tick (20 ms) */
+    if (scene_direction(&scene, &az, &el) && (az != array_render.azimuth_deg || el != array_render.elevation_deg))
+      array_render_set_direction(&array_render, az, el, 15.0f);
+  }
   for (unsigned i = 0u; i < TICK_FRAMES; i++) {
-    const float v = scene_next(&scene);
+    float src, bg, out[ZS_AUDIO_CHANNELS], v;
+    scene_next_parts(&scene, &src, &bg);
+    array_render_push(&array_render, src, out);
+    out[0] += bg;
+    for (unsigned c = 1u; c < ZS_AUDIO_CHANNELS; c++) out[c] += scene_background(&scene, c);
+    for (unsigned c = 0u; c < ZS_AUDIO_CHANNELS; c++) out[c] = out[c] > 1.0f ? 1.0f : (out[c] < -1.0f ? -1.0f : out[c]);
+    v = out[0];
     int16_t frame[ZS_AUDIO_CHANNELS];
     acc += v * v;
-    for (unsigned c = 0u; c < ZS_AUDIO_CHANNELS; c++) frame[c] = (int16_t)(v * 30000.0f);
+    for (unsigned c = 0u; c < ZS_AUDIO_CHANNELS; c++) frame[c] = (int16_t)(out[c] * 30000.0f);
     if (dump_pcm) fwrite(&frame[0], sizeof(int16_t), 1u, dump_pcm);
     if (mdf_on) zs_audio_ring_push(&ring, frame);
   }
@@ -836,6 +863,7 @@ int main(int argc, char **argv) {
   uint32_t seconds = 120u, seed = 1u, outage_start = 0u, outage_end = 0u;
   int expect_events = -1, expect_delivered = -1, expect_commands = -1, expect_reboots = -1, expect_post_audio = -1;
   int expect_fw_version = -1, expect_fw_state = -1, expect_net_version = -1, expect_net_state = -1;
+  float expect_bearing_error = -1.0f;
   uint32_t factory_version = 1u;
   zs_station_config_t cfg;
   static scene_segment_t segs[4]; size_t nseg = 0u;
@@ -869,11 +897,13 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--expect-fw-state") && i + 1 < argc) expect_fw_state = atoi(argv[++i]);
     else if (!strcmp(argv[i], "--expect-net-version") && i + 1 < argc) expect_net_version = atoi(argv[++i]);
     else if (!strcmp(argv[i], "--expect-net-state") && i + 1 < argc) expect_net_state = atoi(argv[++i]);
-    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S] [--expect-net-version N] [--expect-net-state S]\n"); return 2; }
+    else if (!strcmp(argv[i], "--expect-bearing-error") && i + 1 < argc) expect_bearing_error = (float)atof(argv[++i]);
+    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S] [--expect-net-version N] [--expect-net-state S] [--expect-bearing-error DEG]\n"); return 2; }
   }
-  if (!strcmp(scene_name, "drone")) { segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 20000u, 60000u, 185.0f, 1.0f}; if (seconds > 150u) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 100000u, 130000u, 210.0f, 0.8f}; }
-  else if (!strcmp(scene_name, "ground")) segs[nseg++] = (scene_segment_t){SCENE_GROUND_VEHICLE, 20000u, 60000u, 0.0f, 1.0f};
+  if (!strcmp(scene_name, "drone")) { segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 20000u, 60000u, 185.0f, 1.0f, 60.0f, 140.0f, 20.0f}; if (seconds > 150u) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 100000u, 130000u, 210.0f, 0.8f, 300.0f, 250.0f, 35.0f}; }
+  else if (!strcmp(scene_name, "ground")) segs[nseg++] = (scene_segment_t){SCENE_GROUND_VEHICLE, 20000u, 60000u, 0.0f, 1.0f, 200.0f, 200.0f, 0.0f};
   scene_init(&scene, segs, nseg, 0.02f, seed);
+  array_render_init(&array_render, NULL, 32000.0f);
   ch_rng ^= seed * 2654435761u;
 
   if (server_cmd && !link_start(server_cmd)) { fprintf(stderr, "cannot start the server twin\n"); return 3; }
@@ -964,6 +994,10 @@ int main(int argc, char **argv) {
     zs_prehistory_record_info_t info;
     for (uint64_t s = prehistory.next_sequence - prehistory.available_records; s < prehistory.next_sequence; s++)
       if (first_event_time_us && zs_prehistory_read_record_info(&prehistory, s, &info)) { if (info.start_time_us >= first_event_time_us) audio_after++; else audio_before++; }
+    tlog("twin: bearings %u (computed %lu of %lu asked, no audio %lu, weak %lu, unsolved %lu), azimuth error mean %.2f max %.2f deg",
+         bearings_total, (unsigned long)pipeline.bearing_ctx.computed, (unsigned long)pipeline.bearing_ctx.attempts,
+         (unsigned long)pipeline.bearing_ctx.no_audio, (unsigned long)pipeline.bearing_ctx.weak, (unsigned long)pipeline.bearing_ctx.unsolved,
+         bearings_total ? bearing_err_sum / (float)bearings_total : 0.0f, bearing_err_max);
     tlog("twin: rec committed %u aborted %u overruns %u errors %u, ring holds %u s; around the first event: %u s before, %u s after",
          recorder.frames_committed, recorder.frames_aborted, recorder.overruns, recorder.storage_errors, (unsigned)prehistory.available_records, audio_before, audio_after);
   }
@@ -980,6 +1014,11 @@ int main(int argc, char **argv) {
       zs_detector_health_t d; memset(&d, 0, sizeof(d)); app_comms_net_heartbeat(&d);
       if (expect_net_version >= 0 && d.net_config_version != (uint32_t)expect_net_version) { tlog("twin: FAIL expected network config v%d, got v%lu", expect_net_version, (unsigned long)d.net_config_version); return 1; }
       if (expect_net_state >= 0 && d.net_state != (uint8_t)expect_net_state) { tlog("twin: FAIL expected network state %d, got %u", expect_net_state, (unsigned)d.net_state); return 1; }
+    }
+    if (expect_bearing_error >= 0.0f && (bearings_total == 0u || bearing_err_sum / (float)bearings_total > expect_bearing_error)) {
+      tlog("twin: FAIL expected bearings with a mean azimuth error <= %.1f deg (%u bearings, mean %.2f)", expect_bearing_error, bearings_total,
+           bearings_total ? bearing_err_sum / (float)bearings_total : 0.0f);
+      return 1;
     }
     if (expect_reboots >= 0 && ((int)twin_reboots != expect_reboots || (int)cmd_reboots_scheduled != expect_reboots)) { tlog("twin: FAIL expected %d reboots (scheduled %u, done %u)", expect_reboots, cmd_reboots_scheduled, twin_reboots); return 1; }
   }
