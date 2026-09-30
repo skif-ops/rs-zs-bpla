@@ -58,7 +58,7 @@
 #define APP_COMMS_HEARTBEAT_MS       60000u   /* zs_station_comms heartbeat period */
 #define APP_COMMS_LINGER_MS          10000u   /* S3 stays this long after the last activity: queued/answering commands */
 #define APP_COMMS_PUBLIC_APN         1        /* pilot policy: public APNs only (CELLULAR_CONNECTIVITY_BASELINE) */
-#define APP_SIM_DET_ACTIVE_HIGH      1        /* SIMx_DET level that means \"card present\" (confirm on Rev.A) */
+#define APP_SIM_DET_ACTIVE_HIGH      1        /* SIMx_DET level that means "card present" (confirm on Rev.A) */
 #define APP_SIM_SAFE_OFF_RETRY_MS    600000u  /* both slots exhausted / no SIM: reset the failure counters and try again */
 /* Power monitor (INA226 on I2C2): sampling period and the battery level map (bus voltage -> percent; the pack
    chemistry / cell count of the pilot enclosure is not final: 4S LiFePO4 assumed, confirm before the field). */
