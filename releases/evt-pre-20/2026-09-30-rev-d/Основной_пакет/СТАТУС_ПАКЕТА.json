@@ -8,14 +8,14 @@
   "pcb_main_offboard": [
     "U12_microSD"
   ],
-  "pcb_mic": "REVIEW_B_ACCEPT_CONTROLLED_FIRST_ARTICLE_ORDER",
+  "pcb_mic": "REVIEW_B_DESIGN_ACCEPTED_CUSTOMER_FULL_LOT_NO_PAUSE",
   "pcb_pwr": "CUSTOMER_AUTHORIZED_FAB_CHECKOUT_ORDER_REVIEW_B_OPEN",
   "housing": "PRELIMINARY_PRINT_AND_CAST_MODELS_FIT_AND_STRENGTH_PENDING",
   "first_housing_lot": 20,
   "program_bom_basis": 41,
   "price_basis": "historical_v02_estimate_not_current_quote",
-  "release_limit_ru": "Комплект разрешает заказ плат с обязательной DFM-проверкой. Для PCB-MIC действует порядок: одна плата/панель, контроль, затем остаток 79 PCBA. Подтверждение фабричного стека PCB-MAIN/PCB-PWR и примерка корпусов выполняются в производственном цикле.",
-  "release_limit_en": "Boards may be ordered subject to mandatory fabricator DFM review. PCB-MIC sequence: one board/panel, inspection, then the remaining 79 PCBAs. PCB-MAIN/PCB-PWR stack confirmation and housing fit are completed during the production cycle.",
+  "release_limit_ru": "Весь объём плат заказывается и изготавливается без паузы: 22 PCB-MAIN, 22 PCB-PWR, 80 PCB-MIC. Для PCB-MAIN контроль импеданса не заказан; до панели фабрика подтверждает стек, DFM и 76 POFV. После изготовления выполняется углублённый контроль образцов из партии. Корпуса требуют примерки.",
+  "release_limit_en": "Order and manufacture complete lots without a first-article pause: 22 PCB-MAIN, 22 PCB-PWR and 80 PCB-MIC. MAIN controlled impedance is not ordered; the fabricator confirms stack, DFM and 76 POFV before panel release. Sample completed lots for enhanced inspection. Housing fit remains pending.",
   "pcb_mic_kicad10_drc_errors": 0,
   "pcb_mic_board_sha256": "c57cebbb3886247166551fd242fa51350bc9be7fee6299e63e7eaac60518d518",
   "pcb_mic_design_commit": "8d2e6229e453b186b10f2978e29c6df458c87b32",
@@ -34,13 +34,16 @@
   "pcb_mic_first_lot_reserve_pcba": 0,
   "pcb_mic_program_41_procure_qty": 168,
   "pcb_mic_review_b_archive": "EVT_PRE_20_PCB_MIC_REVIEW_B_20260930_REV_D.zip",
-  "pcb_pwr_first_article_pcba": 2,
   "pcb_main_pofv_order_count": 76,
   "pcb_main_native_pofv_flags": 74,
   "pcb_main_cam_added_pofv": [
     "C6.1",
     "D11.1"
   ],
-  "pcb_main_impedance_control": "PENDING_CUSTOMER_DECISION",
-  "pcb_main_impedance_inventory": "PCB-MAIN_ИМПЕДАНС_ТРАССЫ_REV_D.csv"
+  "pcb_main_impedance_control": "EVT_AS_ROUTED_NO_CONTROLLED_IMPEDANCE",
+  "pcb_main_impedance_inventory": "PCB-MAIN_ИМПЕДАНС_ТРАССЫ_REV_D.csv",
+  "pcb_main_post_lot_sample_pcba": 2,
+  "pcb_order_sequence": "FULL_LOTS_NO_FIRST_ARTICLE_PAUSE",
+  "pcb_pwr_post_lot_sample_pcba": 2,
+  "pcb_mic_post_lot_sample": "ONE_BOARD_OR_PANEL"
 }

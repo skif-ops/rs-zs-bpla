@@ -32,16 +32,16 @@
   "fill_and_cap_via_count": 74,
   "official_supplier_screen": "fab/JLCPCB_OFFICIAL_CAPABILITY_SCREEN_REV_B_105.json",
   "dfm_open_ru": [
-    "Выбрать фактический стек и записать межслойные диэлектрики; решение по импедансу задаётся отдельно",
+    "Выбрать фактический стек и записать межслойные диэлектрики; EVT без заказа контролируемого импеданса по решению заказчика",
     "Подтвердить 76/76 заполненных эпоксидом и закрытых медью переходов по заказному CSV; 74 признака в плате и два CAM-дополнения",
     "Проверить зазоры, отверстия и уменьшенные контактные площадки J6/J7/J11",
-    "Сверить BOM, DNP, полярность, ориентацию и монтаж первых двух изделий"
+    "Сверить BOM, DNP, полярность и ориентацию; после полной партии проверить два выбранных изделия"
   ],
   "dfm_open_en": [
-    "Select the actual stack and record dielectrics; the impedance decision is documented separately",
+    "Select actual stack and record dielectrics; EVT controlled impedance is not ordered by customer decision",
     "Confirm 76/76 epoxy-filled copper-capped vias from the order CSV; 74 native flags and two CAM overrides",
     "Check clearances, drills and reduced J6/J7/J11 pads",
-    "Review BOM, DNP, polarity, orientation and first two assembled boards"
+    "Review BOM, DNP, polarity and orientation; inspect two sampled units after the full lot is built"
   ],
   "controlled_fab_job": "fab/gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-job.gbrjob",
   "fabrication_stack_request": "fab/STACKUP_REQUEST.json",
@@ -52,5 +52,7 @@
     "C6.1",
     "D11.1"
   ],
-  "manufacturing_order_pofv_map": "VIA_FILL_CAP_76_MAP_RU_EN.pdf"
+  "manufacturing_order_pofv_map": "VIA_FILL_CAP_76_MAP_RU_EN.pdf",
+  "impedance_disposition": "EVT_AS_ROUTED_NO_CONTROLLED_IMPEDANCE_BY_CUSTOMER",
+  "order_sequence": "FULL_LOT_22_NO_FIRST_ARTICLE_PAUSE"
 }

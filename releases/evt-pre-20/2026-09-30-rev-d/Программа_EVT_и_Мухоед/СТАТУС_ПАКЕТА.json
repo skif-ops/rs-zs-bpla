@@ -4,7 +4,7 @@
   "source_repository": "skif-ops/rs-zs-bpla",
   "manufacturing_release": false,
   "pcb_main": "ROUTED_REV_B_8L_DRC_0_ERRORS_0_UNCONNECTED_FAB_DFM_PENDING",
-  "pcb_mic": "REVIEW_B_ACCEPT_CONTROLLED_FIRST_ARTICLE_ORDER",
+  "pcb_mic": "REVIEW_B_DESIGN_ACCEPTED_CUSTOMER_FULL_LOT_NO_PAUSE",
   "pcb_pwr": "CUSTOMER_AUTHORIZED_FAB_CHECKOUT_ORDER_REVIEW_B_OPEN",
   "first_housing_lot": "20_3D_PRINT_PRELIMINARY_CAD",
   "housing_authority_note": "First lot uses 20 preliminary 3D-printed housing sets; the second 20 may also be printed. Casting CAD remains preliminary and requires tooling DFM.",
@@ -15,5 +15,8 @@
   "pcb_mic_program_41_procure_qty": 168,
   "pcb_pwr_copper": "FOUR_LAYERS_ALL_1OZ_35UM",
   "baseline_source_commit": "d34cb97",
-  "source_release_note": "Archive SHA256 manifest and КОНТРОЛЬ_АРХИВОВ.json identify this revised delivery."
+  "source_release_note": "Archive SHA256 manifest and КОНТРОЛЬ_АРХИВОВ.json identify this revised delivery.",
+  "pcb_main_impedance_disposition": "EVT_AS_ROUTED_NO_CONTROLLED_IMPEDANCE",
+  "pcb_order_sequence": "FULL_LOTS_NO_FIRST_ARTICLE_PAUSE",
+  "pcb_mic_post_lot_sample": "ONE_BOARD_OR_PANEL"
 }
