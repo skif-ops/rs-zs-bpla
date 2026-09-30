@@ -38,6 +38,8 @@
 - после применения запись проверяется целиком (`zs_station_config_validate`) и хэшируется станцией;
 - запись во Flash только в физическом сервисном режиме и аутентифицированной ролью; пишется неактивный слот, commit-маркер последним, затем read-back и сравнение хэша.
 
+Удалённый путь (`MQTT_TLS_ICD_v0_1_ADDENDUM_G_NETWORK_CONFIG.md`, 2026-09-30): тот же патч приходит в подписанной команде `CMD_SET_NETWORK_CONFIG` (код 6) без сервисного режима, но только с сетевыми полями (ключи 2–4, 6–11; `ca_reference`, `region`, `station_id` удалённо не меняются, MQTT-порт — 8883 или 443). Станция сначала выходит с новой записью на связь и лишь затем пишет её во Flash (`zs_station_config_store_commit_remote`); не вышла — остаётся прежняя запись. Локальная запись по BLE отменяет незавершённую удалённую смену.
+
 ## 4. Канонический хэш
 
 SHA-256 над 281 байтом: домен `ZS-STATION-CONFIG-V1` (20), schema (1), version BE32, station_id BE32, region, preferred_sim, mqtt_port BE16, https_port BE16, затем поля `len(1) + data(max, дополнено нулями)`: host 64, ca_reference 32, fingerprint 32 (без длины), tenant 16, topic_prefix 32, apn1 32, apn2 32. Метаданные хранения (generation) в хэш не входят.
