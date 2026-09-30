@@ -1,5 +1,6 @@
-/* MQTT ICD addendum I, model package: the server-built shared vector (tools/generate_model_update_vector.py) through
-   the package parser (every refusal), the classifier parity with the built-in table, the active model and its
+/* MQTT ICD addendum I, model package: the built-in table written as package m5 here must be the package the server
+   signed (its SHA-256 is in the manifest of the shared vector, tools/generate_model_update_vector.py); then the
+   package parser (every refusal), the classifier parity with the built-in table, the active model and its
    seqlock, the release check for target 3, and the two-slot model store filled by the addendum F download engine on
    a RAM flash with NOR semantics (erase to 0xFF, program only clears bits):
      envelope -> zs_fw_model_check -> begin (header erased) -> fwreq bytes equal the server's -> chunks -> SHA-256 +
@@ -19,14 +20,33 @@
 #include <stdio.h>
 #include <string.h>
 
-#define PKG zs_model_update_vector_package
-#define PKG_BYTES ((uint32_t)sizeof(zs_model_update_vector_package))
+static uint8_t pkg[ZS_MODEL_PACKAGE_MAX_BYTES];
+#define PKG pkg
+#define PKG_BYTES ZS_MODEL_UPDATE_VECTOR_PACKAGE_BYTES
 
 static zs_model_storage_t storage;
 
 static uint32_t le32(const uint8_t *p) { return (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24); }
 static void put_le32(uint8_t *p, uint32_t v) { p[0] = (uint8_t)v; p[1] = (uint8_t)(v >> 8); p[2] = (uint8_t)(v >> 16); p[3] = (uint8_t)(v >> 24); }
 static void put_f32(uint8_t *p, float f) { uint32_t b; memcpy(&b, &f, 4u); put_le32(p, b); }
+
+/* The package layout of zs_model.h written from a model: the C side of the server's model_codec.encode_model. */
+static size_t build_package(const zs_model_t *m, uint32_t version, uint8_t *out) {
+  size_t o = ZS_MODEL_HEADER_BYTES;
+  const unsigned n = m->class_count, padded = (n + 3u) & ~3u;
+  memset(out, 0, ZS_MODEL_BYTES(n));
+  put_le32(&out[0], ZS_MODEL_MAGIC);
+  out[4] = (uint8_t)ZS_MODEL_FORMAT; out[6] = (uint8_t)ZS_FEATURE_COUNT; out[8] = (uint8_t)n; out[9] = (uint8_t)(n >> 8);
+  put_le32(&out[12], version);
+  put_le32(&out[16], m->feature_set);
+  for (unsigned i = 0u; i < ZS_FEATURE_COUNT; i++, o += 4u) put_f32(&out[o], m->mean[i]);
+  for (unsigned i = 0u; i < ZS_FEATURE_COUNT; i++, o += 4u) put_f32(&out[o], m->std[i]);
+  memcpy(&out[o], m->class_id, n); o += padded;
+  for (unsigned c = 0u; c < n; c++, o += 4u) put_f32(&out[o], m->radius[c]);
+  for (unsigned c = 0u; c < n; c++)
+    for (unsigned i = 0u; i < ZS_FEATURE_COUNT; i++, o += 4u) put_f32(&out[o], m->centroid[c][i]);
+  return o;
+}
 
 static uint8_t pkg_copy[ZS_MODEL_PACKAGE_MAX_BYTES];
 static const uint8_t *mutated(size_t offset, uint8_t value) {
@@ -309,6 +329,15 @@ int main(void) {
   zs_fw_chunk_t chunk;
   uint8_t buf[64];
 
+  /* the package the server signed is the built-in table in the package layout, byte for byte */
+  assert(build_package(zs_model_builtin(), ZS_MODEL_UPDATE_VECTOR_VERSION, pkg) == PKG_BYTES);
+  {
+    zs_fw_manifest_t signed_manifest;
+    uint8_t d[ZS_SHA256_DIGEST_BYTES];
+    assert(zs_fw_manifest_decode(zs_model_update_vector_manifest, sizeof(zs_model_update_vector_manifest), &signed_manifest));
+    zs_sha256_digest(pkg, PKG_BYTES, d);
+    assert(signed_manifest.size == PKG_BYTES && memcmp(d, signed_manifest.sha256, sizeof(d)) == 0);
+  }
   test_parse();
   test_predict();
   test_active();
@@ -344,7 +373,7 @@ int main(void) {
     f.manifest_size = 0u; assert(zs_fw_update_target(&f) == 0u);
   }
 
-  /* ---- the first request and chunk are the server's bytes ---- */
+  /* ---- the first request is the server's bytes ---- */
   {
     zs_fw_download_t dl;
     zs_model_store_t s;
@@ -354,9 +383,9 @@ int main(void) {
     while (zs_fw_download_step(&dl, 65536u) == ZS_FW_STEP_BUSY) {}
     assert(zs_fw_download_request(&dl, buf, sizeof(buf)) == sizeof(zs_model_update_vector_request0) &&
            memcmp(buf, zs_model_update_vector_request0, sizeof(zs_model_update_vector_request0)) == 0);
-    assert(zs_fw_chunk_decode(zs_model_update_vector_chunk0, sizeof(zs_model_update_vector_chunk0), &chunk));
-    assert(chunk.offset == 0u && chunk.data_len == ZS_FW_CHUNK_BYTES && memcmp(chunk.data, PKG, ZS_FW_CHUNK_BYTES) == 0);
-    assert(zs_fw_download_on_chunk(&dl, &chunk) == ZS_FW_CHUNK_ACCEPTED);
+    chunk = (zs_fw_chunk_t){ZS_MODEL_UPDATE_VECTOR_STATION_ID, {0}, 0u, PKG, ZS_FW_CHUNK_BYTES};
+    memcpy(chunk.command_id, cid, sizeof(cid));
+    assert(zs_fw_download_on_chunk(&dl, &chunk) == ZS_FW_CHUNK_ACCEPTED && dl.offset == ZS_FW_CHUNK_BYTES);
   }
 
   test_store(&manifest);
