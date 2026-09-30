@@ -20,6 +20,9 @@
  * (the same server twin behind two names), any other host fails its DNS lookup; CMD_SET_NETWORK_CONFIG goes through
  * the real app_comms trial and the RAM configuration record stands in for the NOR one.
  *
+ * Bearing stream (ICD addendum H): the source is rendered as a plane wave on the 3+1 array; after an event of a new
+ * track the tracking window keeps the detector running in S3 and the bearings go out in batches on the bearing topic.
+ *
  * Nothing on the target changes: the twin reuses the modules and mirrors the task wiring of tasks.c.
  *   station_twin --scene drone|quiet|ground --seconds N --server "python3 -m twin.twin_server" [--seed S]
  */
@@ -46,6 +49,7 @@
 #include "zs_station_config.h"
 #include "zs_station_params.h"
 #include "zs_station_pipeline.h"
+#include "zs_track_window.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -411,8 +415,12 @@ static unsigned events_emitted_total, sessions_done, quiet_windows;
 static uint32_t seen_events;
 static scene_t scene;
 static array_render_t array_render;       /* the source as a plane wave on the 3+1 array (bearings) */
-static unsigned bearings_total;
+static unsigned bearings_total, bearings_streamed;
 static float bearing_err_sum, bearing_err_max;
+/* tracking window (mirrors tasks.c) */
+static zs_track_window_t track;
+static bool track_open, track_close_request, track_s3_extension, gsm_degraded;
+static uint32_t track_max_ms = 120000u;
 static float scene_level;                 /* recent RMS of the scene, for the AAD wake emulation */
 static FILE *dump_pcm;                    /* --dump-pcm: the mono scene as PCM16LE 32 kHz (for tools/presence_eval) */
 
@@ -447,7 +455,7 @@ static int64_t capture_gaps_us;           /* zs_time_on_capture_gap on the targe
 static uint32_t post_capture_until_ms;
 static int64_t first_event_time_us;
 static void post_capture_open(void) { post_capture_until_ms = sim_now + 30000u; }
-static bool capture_wanted(zs_mode_t mode) { return zs_mode_power_for(mode).mdf_clock || (mode != ZS_MODE_SHUTDOWN && (int32_t)(sim_now - post_capture_until_ms) < 0); }
+static bool capture_wanted(zs_mode_t mode) { return zs_mode_power_for(mode).mdf_clock || (mode != ZS_MODE_SHUTDOWN && ((int32_t)(sim_now - post_capture_until_ms) < 0 || track_open)); }
 static void capture_set(bool on) {
   if (on == capture_on) return;
   capture_on = on;
@@ -487,10 +495,17 @@ static bool pl_emit(void *ctx, const zs_detection_t *d) {
 /* every bearing of a CONFIRMED window, against the rendered truth */
 static void pl_bearing(void *ctx, const zs_bearing_t *b, uint64_t end_sample, uint64_t track_event_id) {
   const float e = fabsf(fmodf(b->azimuth_deg - array_render.azimuth_deg + 540.0f, 360.0f) - 180.0f);
-  (void)ctx; (void)end_sample; (void)track_event_id;
+  zs_bearing_record_t r;
+  (void)ctx;
   bearings_total++;
   bearing_err_sum += e;
   if (e > bearing_err_max) bearing_err_max = e;
+  /* the open window's bearings go to the live stream under the window's track (tasks.c: pl_bearing) */
+  (void)track_event_id;
+  if (track_open && zs_bearing_record_from(&r, track.track_event_id, pl_sample_time(NULL, end_sample), ZS_TIME_TRUST_GNSS_TRUSTED, b)) {
+    app_comms_bearing_push(&r);
+    bearings_streamed++;
+  }
 }
 static zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, 17u, 5u, 0u, 0u, NULL, pl_bearing};
 
@@ -511,8 +526,27 @@ static void inject_tick(void) {
   mode_event(ZS_MODE_EV_OUTBOX_PENDING);
 }
 
+/* the tracking window after every analysed window (tasks.c: track_step) */
+static void track_step(bool new_event) {
+  zs_track_end_t end = ZS_TRACK_END_NONE;
+  if (new_event && zs_track_window_on_event(&track, pipeline.track_event_id, !gsm_degraded, sim_now)) {
+    track_open = true; track_s3_extension = true; track_close_request = false;
+    app_comms_set_tracking(true);
+    tlog("track: window open for event %llu (max %lu s)", (unsigned long long)track.track_event_id, (unsigned long)(track_max_ms / 1000u));
+    return;
+  }
+  if (!track_open) return;
+  if (track_close_request) { zs_track_window_end(&track); end = ZS_TRACK_END_MODE; }
+  else end = zs_track_window_on_window(&track, pipeline.presence.level == ZS_PRESENCE_CONFIRMED, sim_now);
+  if (end == ZS_TRACK_END_NONE) return;
+  track_open = false; track_close_request = false;
+  app_comms_set_tracking(false);
+  tlog("track: window closed (%s) after %lu windows", zs_track_end_name(end), (unsigned long)track.windows);
+}
+
 static void dsp_mode_events(void) {
   const uint8_t level = pipeline.presence.level;
+  track_step(pipeline.events_emitted != seen_events && (modes.mode == ZS_MODE_S1_LISTEN || modes.mode == ZS_MODE_S2_DSP));
   if (modes.mode == ZS_MODE_S1_LISTEN) {
     quiet_windows = 0u;
     if (level >= ZS_PRESENCE_SUSPECT) mode_event(ZS_MODE_EV_GATE_POSITIVE);
@@ -590,7 +624,7 @@ static void outbox_retry_tick(void) {
 /* GSM health (mirrors tasks.c): consecutive S3 sessions that end without COMMS_DONE (watchdog) mark the link
    degraded after 3: the S3 watchdog drops from 180 s to 60 s so a dead network costs less modem time per retry,
    and the route hint switches to LoRa for the phase-2 transport; a completed session restores everything. */
-static unsigned comms_fail_streak, degraded_after = 3u; static bool gsm_degraded;
+static unsigned comms_fail_streak, degraded_after = 3u;
 static uint32_t comms_max_base_ms = 180000u;               /* + 300 s while an audio upload runs (mirrors tasks.c) */
 static uint32_t gsm_probe_ms = 1800000u, last_s3_exit_ms;   /* while degraded: probe GSM every 30 min (S3 capped at 60 s) */
 /* LoRa duty: while the route hint is LoRa the uplink drains the outbox regardless of the mode (the radio is cheap:
@@ -807,13 +841,16 @@ static void supervisor_tick(void) {
   for (unsigned ev = 1u; ev < 32u; ev++) if (mode_bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, sim_now);
   mode_bits = 0u;
   modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? 300000u : 0u) + (app_comms_fw_busy() ? 900000u : 0u) +
-                              (app_comms_net_busy() ? 300000u : 0u);
+                              (app_comms_net_busy() ? 300000u : 0u) + (track_s3_extension ? track_max_ms : 0u);
   (void)zs_mode_tick(&modes, sim_now);
   if (capture_on && !capture_wanted(modes.mode)) capture_set(false);   /* the post-event window closed */
   if (modes.mode != last) {
     const zs_mode_power_t p = zs_mode_power_for(modes.mode);
     tlog("mode %s -> %s", zs_mode_name(last), zs_mode_name(modes.mode));
     if (last == ZS_MODE_S3_COMMS) comms_health_on_s3_exit(modes.journal[(modes.journal_head + ZS_MODE_JOURNAL_DEPTH - 1u) % ZS_MODE_JOURNAL_DEPTH].event == ZS_MODE_EV_COMMS_DONE);
+    if (last == ZS_MODE_S3_COMMS) track_s3_extension = false;
+    if (track_open && (last == ZS_MODE_S3_COMMS || modes.mode == ZS_MODE_S0_SLEEP || modes.mode == ZS_MODE_S4_SERVICE || modes.mode == ZS_MODE_SHUTDOWN))
+      track_close_request = true;
     bsp_gpio_mic_rail(p.mic_1v8);
     app_comms_allow_modem(p.modem);
     capture_set(capture_wanted(modes.mode));
@@ -852,7 +889,7 @@ static void audio_tick(void) {
   scene_level = 0.9f * scene_level + 0.1f * acc / (float)TICK_FRAMES;
   /* the T5838 AAD: a loud enough scene wakes the station from S0 */
   if (modes.mode == ZS_MODE_S0_SLEEP && scene_level > 0.002f) mode_event(ZS_MODE_EV_MIC_WAKE);
-  if ((modes.mode == ZS_MODE_S1_LISTEN || modes.mode == ZS_MODE_S2_DSP) && zs_station_pipeline_fetch(&pipeline, &ring)) {
+  if ((modes.mode == ZS_MODE_S1_LISTEN || modes.mode == ZS_MODE_S2_DSP || track_open) && zs_station_pipeline_fetch(&pipeline, &ring)) {
     while (pipeline.pending) { (void)zs_station_pipeline_run_pending(&pipeline); dsp_mode_events(); }
   }
   (void)zs_audio_recorder_step(&recorder, &ring, ring.total_frames, 32000u);
@@ -864,6 +901,7 @@ int main(int argc, char **argv) {
   int expect_events = -1, expect_delivered = -1, expect_commands = -1, expect_reboots = -1, expect_post_audio = -1;
   int expect_fw_version = -1, expect_fw_state = -1, expect_net_version = -1, expect_net_state = -1;
   float expect_bearing_error = -1.0f;
+  int expect_streamed = -1;
   uint32_t factory_version = 1u;
   zs_station_config_t cfg;
   static scene_segment_t segs[4]; size_t nseg = 0u;
@@ -898,12 +936,15 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--expect-net-version") && i + 1 < argc) expect_net_version = atoi(argv[++i]);
     else if (!strcmp(argv[i], "--expect-net-state") && i + 1 < argc) expect_net_state = atoi(argv[++i]);
     else if (!strcmp(argv[i], "--expect-bearing-error") && i + 1 < argc) expect_bearing_error = (float)atof(argv[++i]);
-    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S] [--expect-net-version N] [--expect-net-state S] [--expect-bearing-error DEG]\n"); return 2; }
+    else if (!strcmp(argv[i], "--track-max-s") && i + 1 < argc) track_max_ms = (uint32_t)atoi(argv[++i]) * 1000u;
+    else if (!strcmp(argv[i], "--expect-streamed") && i + 1 < argc) expect_streamed = atoi(argv[++i]);
+    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S] [--expect-net-version N] [--expect-net-state S] [--expect-bearing-error DEG] [--track-max-s S] [--expect-streamed N]\n"); return 2; }
   }
   if (!strcmp(scene_name, "drone")) { segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 20000u, 60000u, 185.0f, 1.0f, 60.0f, 140.0f, 20.0f}; if (seconds > 150u) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 100000u, 130000u, 210.0f, 0.8f, 300.0f, 250.0f, 35.0f}; }
   else if (!strcmp(scene_name, "ground")) segs[nseg++] = (scene_segment_t){SCENE_GROUND_VEHICLE, 20000u, 60000u, 0.0f, 1.0f, 200.0f, 200.0f, 0.0f};
   scene_init(&scene, segs, nseg, 0.02f, seed);
   array_render_init(&array_render, NULL, 32000.0f);
+  zs_track_window_init(&track, track_max_ms, 6u);
   ch_rng ^= seed * 2654435761u;
 
   if (server_cmd && !link_start(server_cmd)) { fprintf(stderr, "cannot start the server twin\n"); return 3; }
@@ -998,6 +1039,9 @@ int main(int argc, char **argv) {
          bearings_total, (unsigned long)pipeline.bearing_ctx.computed, (unsigned long)pipeline.bearing_ctx.attempts,
          (unsigned long)pipeline.bearing_ctx.no_audio, (unsigned long)pipeline.bearing_ctx.weak, (unsigned long)pipeline.bearing_ctx.unsolved,
          bearings_total ? bearing_err_sum / (float)bearings_total : 0.0f, bearing_err_max);
+    tlog("twin: tracks %lu (target lost %lu, time limit %lu, mode %lu, refused on link %lu), bearings streamed %u",
+         (unsigned long)track.tracks, (unsigned long)track.ended_lost, (unsigned long)track.ended_max, (unsigned long)track.ended_mode,
+         (unsigned long)track.refused_link, bearings_streamed);
     tlog("twin: rec committed %u aborted %u overruns %u errors %u, ring holds %u s; around the first event: %u s before, %u s after",
          recorder.frames_committed, recorder.frames_aborted, recorder.overruns, recorder.storage_errors, (unsigned)prehistory.available_records, audio_before, audio_after);
   }
@@ -1020,6 +1064,7 @@ int main(int argc, char **argv) {
            bearings_total ? bearing_err_sum / (float)bearings_total : 0.0f);
       return 1;
     }
+    if (expect_streamed >= 0 && (int)bearings_streamed < expect_streamed) { tlog("twin: FAIL expected >= %d streamed bearings, got %u", expect_streamed, bearings_streamed); return 1; }
     if (expect_reboots >= 0 && ((int)twin_reboots != expect_reboots || (int)cmd_reboots_scheduled != expect_reboots)) { tlog("twin: FAIL expected %d reboots (scheduled %u, done %u)", expect_reboots, cmd_reboots_scheduled, twin_reboots); return 1; }
   }
   if (link_out >= 0) { link_report(); fcntl(link_in, F_SETFL, fcntl(link_in, F_GETFL) & ~O_NONBLOCK); close(link_out); for (;;) { ssize_t r = read(link_in, link_buf + link_len, sizeof(link_buf) - 1u - link_len); if (r <= 0) break; link_len += (size_t)r; } link_buf[link_len] = 0; { char *p = strstr(link_buf, "REPORT "); if (p) printf("SERVER %s", p + 7); } waitpid(server_pid, NULL, 0); }
