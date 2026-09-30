@@ -88,6 +88,13 @@ async def index(request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "index.html")
 
 
+@app.get("/replay", response_class=HTMLResponse)
+async def replay_page(request: Request) -> HTMLResponse:
+    """Replay of a target's movement without a map: stations, bearing rays and the fused track on a metric plane."""
+
+    return templates.TemplateResponse(request, "replay.html")
+
+
 @app.get("/single", response_class=HTMLResponse)
 async def single_upload_page(request: Request) -> HTMLResponse:
     """Render single-file analysis upload page."""
