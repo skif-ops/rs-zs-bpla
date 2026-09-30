@@ -12,6 +12,7 @@
 #include "zs_ed25519.h"
 #include "zs_mqtt_command_transport.h"
 #include "zs_bg95_topic_subscription.h"
+#include "zs_net_trial.h"
 #include <string.h>
 
 typedef enum { COMMS_OFF = 0, COMMS_BRINGUP, COMMS_ENDPOINT, COMMS_SESSION, COMMS_ONLINE, COMMS_FAULT, COMMS_SIM, COMMS_STOPPING } comms_phase_t;
@@ -31,7 +32,8 @@ static uint8_t verify_workspace[256];
 static const zs_event_outbox_io_t *outbox_io;
 static const zs_command_journal_io_t *journal_io;
 static app_comms_hooks_t hooks;
-static zs_station_config_t config;
+static zs_station_config_t config;          /* the record this bring-up/session uses (the trial candidate while on trial) */
+static zs_station_config_t stable_config;   /* the stored record (ble task); a trial is built on it and falls back to it */
 static bool config_valid, want_on = true, modem_allowed, bound, session_reported;
 static uint32_t boot_id, phase_since_ms, faults, online_count, sessions_done, last_outbox_check_ms, stop_requested_ms;
 static comms_phase_t phase;
@@ -159,7 +161,61 @@ static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) { return hooks.fill_he
 void app_comms_bind(const zs_event_outbox_io_t *outbox, const zs_command_journal_io_t *journal, const app_comms_hooks_t *h) {
   outbox_io = outbox; journal_io = journal; if (h) hooks = *h; bound = outbox && journal;
 }
-void app_comms_set_config(const zs_station_config_t *cfg, uint32_t id) { if (cfg) { config = *cfg; config_valid = true; boot_id = id; } }
+/* ---- remote network configuration (MQTT ICD addendum G): CMD_SET_NETWORK_CONFIG is accepted in RAM, the next
+   bring-up tries it, the first session online commits it; 3 failed bring-ups or 30 min roll back ---- */
+static zs_net_trial_t net;
+static const zs_station_config_io_t *net_io;
+static void (*net_committed)(const zs_station_config_t *cfg);
+static bool net_switch;                     /* the accepting session ended: restart the modem with the candidate */
+void app_comms_bind_config_store(const zs_station_config_io_t *io, void (*committed)(const zs_station_config_t *cfg)) {
+  net_io = io; net_committed = committed;
+}
+bool app_comms_set_network(const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail) {
+  if (!net_io || !config_valid) { *result = ZS_COMMAND_ACK_REJECTED; *detail = ZS_NET_REJECT_UNSUPPORTED; return true; }
+  zs_net_trial_accept(&net, &stable_config, &cmd->network, result, detail);
+  if (hooks.log) {
+    if (*result == ZS_COMMAND_ACK_OK)
+      hooks.log("net: configuration v%lu accepted (%s:%u tenant %s apn %s), tried after this session\r\n", (unsigned long)net.candidate.version,
+                net.candidate.server_host, net.candidate.mqtt_port, net.candidate.tenant, net.candidate.apn[0]);
+    else hooks.log("net: configuration refused, detail %u\r\n", (unsigned)*detail);
+  }
+  return true;
+}
+bool app_comms_net_busy(void) { return zs_net_trial_busy(&net); }
+void app_comms_net_heartbeat(zs_detector_health_t *d) {
+  zs_net_trial_heartbeat(&net, config_valid ? &stable_config : NULL, &d->net_config_version, &d->net_state, &d->net_failed_version);
+}
+static void net_failed(uint32_t now) {
+  if (net.state != ZS_NET_STATE_TRIAL) return;
+  if (zs_net_trial_on_failure(&net, now)) { if (hooks.log) hooks.log("net: v%lu failed %u bring-ups, ROLLED BACK to v%lu\r\n", (unsigned long)net.failed_version, ZS_NET_TRIAL_ATTEMPTS, (unsigned long)stable_config.version); }
+  else if (hooks.log) hooks.log("net: bring-up %u of %u with v%lu failed\r\n", net.failures, ZS_NET_TRIAL_ATTEMPTS, (unsigned long)net.candidate.version);
+}
+static void net_online(void) {
+  bool committed;
+  if (!zs_net_trial_on_online(&net)) return;
+  committed = net_io && zs_station_config_store_commit_remote(net_io, &net.candidate, &net.stable) == ZS_STATION_CONFIG_OK &&
+              zs_station_config_store_load(net_io, &stable_config, NULL) == ZS_STATION_CONFIG_OK &&
+              stable_config.version == net.candidate.version;
+  zs_net_trial_finish(&net, committed);
+  if (committed) {
+    config = stable_config;
+    if (hooks.log) hooks.log("net: v%lu CONFIRMED (online with %s:%u), stored\r\n", (unsigned long)stable_config.version, stable_config.server_host, stable_config.mqtt_port);
+    if (net_committed) net_committed(&stable_config);
+  } else if (hooks.log) {
+    hooks.log("net: v%lu online but not stored, rolled back for the next session\r\n", (unsigned long)net.failed_version);
+  }
+}
+
+void app_comms_set_config(const zs_station_config_t *cfg, uint32_t id) {
+  if (!cfg) return;
+  boot_id = id;
+  if (config_valid && memcmp(cfg->config_hash, stable_config.config_hash, sizeof(cfg->config_hash)) == 0) return;   /* our own commit */
+  if (zs_net_trial_busy(&net) && hooks.log) hooks.log("net: local configuration v%lu replaces the pending v%lu\r\n", (unsigned long)cfg->version, (unsigned long)net.candidate.version);
+  zs_net_trial_cancel(&net);                                   /* a local write (BLE) wins over a remote trial */
+  stable_config = *cfg;
+  if (phase == COMMS_OFF || !config_valid) config = *cfg;      /* a running session keeps its record until it ends */
+  config_valid = true;
+}
 void app_comms_request(bool on) { want_on = on; }
 void app_comms_allow_modem(bool allowed) { modem_allowed = allowed; }
 static bool wanted(void) { return want_on && modem_allowed; }
@@ -171,6 +227,7 @@ static bool build_audio_topic(void);
 static bool fw_session_start(void);
 static void set_phase(comms_phase_t p) {
   if ((phase == COMMS_SESSION || phase == COMMS_ONLINE) && p != COMMS_SESSION && p != COMMS_ONLINE) audio_abort("session ended");
+  if (p == COMMS_FAULT && phase != COMMS_FAULT) net_failed(xTaskGetTickCount());   /* a bring-up on trial failed */
   phase = p; phase_since_ms = xTaskGetTickCount();
 }
 
@@ -495,6 +552,9 @@ static void fw_drive(uint32_t now) {
 
 void app_comms_reset(void) {
   audio_abort("reset");
+  zs_net_trial_init(&net);                                     /* the candidate lived in RAM: a reset is a rollback */
+  net_switch = false;
+  if (config_valid) config = stable_config;
   zs_fw_download_abort(&fw_dl);
   fw_phase = FW_IDLE;
   fw_req_in_flight = fw_waiting = fw_paused = fw_ack_in_flight = false;
@@ -551,6 +611,15 @@ static void check_session_done(uint32_t now) {
   if ((uint32_t)(now - last_outbox_check_ms) < 5000u) return;
   last_outbox_check_ms = now;
   if (zs_event_outbox_pending_count(outbox_io, &pending) == ZS_EVENT_OUTBOX_OK && pending == 0u) {
+    if (net.state == ZS_NET_STATE_ACCEPTED) {
+      /* the session that accepted a network configuration did its work (its ACK is out): the same S3 goes on with a
+         fresh bring-up under the candidate instead of ending */
+      net_switch = true;
+      if (hooks.log) hooks.log("net: switching to configuration v%lu\r\n", (unsigned long)net.candidate.version);
+      (void)zs_bg95_request_graceful_power_off(&modem, now);
+      set_phase(COMMS_STOPPING);
+      return;
+    }
     session_reported = true;
     sessions_done++;
     hooks.session_done(hooks.ctx);
@@ -588,6 +657,12 @@ static void feed_uart(uint32_t now_ms) {
   }
 }
 
+/* A failed bring-up on the dual-SIM path: the orchestrator decides the slot, the trial counts it (addendum G). */
+static void sim_fail(zs_dual_sim_failure_t reason, uint32_t now) {
+  net_failed(now);
+  evt_pre_20_sim_orchestrator_fail(&sim, reason, now);
+}
+
 /* Dual-SIM phase: the orchestrator owns rail/mux/PWRKEY; this task feeds it the modem side. */
 static void sim_phase(uint32_t now) {
   evt_pre_20_sim_phase_t ph;
@@ -596,14 +671,14 @@ static void sim_phase(uint32_t now) {
   switch (ph) {
     case EVT_PRE_20_SIM_PHASE_MODEM_BOOT:
     case EVT_PRE_20_SIM_PHASE_NEED_LINK:
-      if (modem.state == ZS_BG95_READY && !sim_provisioned) { if (!modem_provision(now)) { sim_faults++; evt_pre_20_sim_orchestrator_fail(&sim, ZS_DUAL_SIM_FAILURE_PDP, now); } }
-      else if (modem.state == ZS_BG95_ERROR) { sim_faults++; evt_pre_20_sim_orchestrator_fail(&sim, ZS_DUAL_SIM_FAILURE_ATTACH_TIMEOUT, now); }
-      else if ((uint32_t)(now - phase_since_ms) > 180000u) { sim_faults++; evt_pre_20_sim_orchestrator_fail(&sim, ZS_DUAL_SIM_FAILURE_ATTACH_TIMEOUT, now); phase_since_ms = now; }
+      if (modem.state == ZS_BG95_READY && !sim_provisioned) { if (!modem_provision(now)) { sim_faults++; sim_fail(ZS_DUAL_SIM_FAILURE_PDP, now); } }
+      else if (modem.state == ZS_BG95_ERROR) { sim_faults++; sim_fail(ZS_DUAL_SIM_FAILURE_ATTACH_TIMEOUT, now); }
+      else if ((uint32_t)(now - phase_since_ms) > 180000u) { sim_faults++; sim_fail(ZS_DUAL_SIM_FAILURE_ATTACH_TIMEOUT, now); phase_since_ms = now; }
       safe_off_logged = false;
       break;
     case EVT_PRE_20_SIM_PHASE_ACTIVE:
       if (start_session(tenant)) { set_phase(COMMS_SESSION); if (hooks.log) hooks.log("comms: sim slot %d active, mqtt online, session starting\r\n", (int)zs_dual_sim_active_slot(&sim_controller)); }
-      else { faults++; sim_faults++; evt_pre_20_sim_orchestrator_fail(&sim, ZS_DUAL_SIM_FAILURE_TLS, now); }
+      else { faults++; sim_faults++; sim_fail(ZS_DUAL_SIM_FAILURE_TLS, now); }
       safe_off_logged = false;
       break;
     case EVT_PRE_20_SIM_PHASE_CLOSE_TRANSPORT:
@@ -625,7 +700,19 @@ void app_comms_step(void) {
   {
     switch (phase) {
       case COMMS_OFF:
+        if (zs_net_trial_tick(&net, now) && hooks.log)
+          hooks.log("net: v%lu not online within %lu min, ROLLED BACK to v%lu\r\n", (unsigned long)net.failed_version,
+                    (unsigned long)(ZS_NET_TRIAL_TIMEOUT_MS / 60000u), (unsigned long)stable_config.version);
+        if (wanted() && bound && config_valid) {
+          config = *zs_net_trial_config(&net, &stable_config);     /* the candidate while accepted / on trial */
+          net_switch = false;
+        }
         if (wanted() && bound && config_valid && config.apn[0][0] != '\0') {
+          if (zs_net_trial_busy(&net)) {
+            zs_net_trial_on_bringup(&net, now);
+            if (hooks.log) hooks.log("net: bring-up with configuration v%lu on trial (%s:%u, %u failed so far)\r\n", (unsigned long)config.version,
+                                     config.server_host, config.mqtt_port, net.failures);
+          }
           session_reported = false;
           modem_prepare();
           if (sim_enabled) {
@@ -673,12 +760,13 @@ void app_comms_step(void) {
       case COMMS_ONLINE:
         zs_bg95_tick(&modem, now);
         { uint64_t now_us; const bool trusted = command_time(now, &now_us); trust_refresh(); zs_bg95_mqtt_session_tick(&session, now, now_us, trusted); }
+        if (zs_bg95_mqtt_session_ready(&session)) net_online();   /* a configuration on trial proved itself (before the heartbeat) */
         audio_collect();                                   /* our chunk's outcome before anyone reuses the uplink */
         fw_collect(now);
         zs_station_comms_tick(&comms, now);
         if (phase == COMMS_ONLINE) { audio_drive(now); fw_drive(now); }
         if (phase == COMMS_SESSION && zs_bg95_mqtt_session_ready(&session)) { online_count++; set_phase(COMMS_ONLINE); activity_ms = now; }
-        if (phase == COMMS_ONLINE) { note_session_activity(now); check_session_done(now); }
+        if (phase == COMMS_ONLINE) { note_session_activity(now); check_session_done(now); if (phase != COMMS_ONLINE) break; }   /* net switch */
         if (!wanted()) {
           /* let a publish in flight finish (the modem would otherwise take the QPOWD text as payload bytes);
              after 3 s the power-down goes ahead regardless */
@@ -717,6 +805,9 @@ void app_comms_step(void) {
         break;
       case COMMS_FAULT:
         zs_bg95_tick(&modem, now);
+        if (zs_net_trial_tick(&net, now) && hooks.log)
+          hooks.log("net: v%lu not online within %lu min, ROLLED BACK to v%lu\r\n", (unsigned long)net.failed_version,
+                    (unsigned long)(ZS_NET_TRIAL_TIMEOUT_MS / 60000u), (unsigned long)stable_config.version);
         if ((uint32_t)(now - phase_since_ms) > 30000u) {           /* back off, then a clean restart of the modem */
           bsp_gpio_modem_power(false);
           vTaskDelay(pdMS_TO_TICKS(2000));
@@ -751,6 +842,13 @@ void app_comms_status(void (*print)(const char *fmt, ...)) {
         (unsigned long)fw_rejected, (unsigned long)fw_failed, (unsigned long)fw_installs, (unsigned long)fw_chunks, (unsigned long)fw_chunks_ignored,
         (unsigned long)fw_timeouts_total, fw_phase == FW_DOWNLOADING ? " (downloading)" : fw_phase != FW_IDLE ? " (finishing)" : "",
         fw_paused ? " (paused)" : "");
+  {
+    static const char *const net_names[] = {"stable", "accepted", "trial", "rolled back"};
+    print("  network config v%lu (%s:%u tenant %s) %s%s | remote accepted %lu confirmed %lu rolled back %lu (last failed v%lu)\r\n",
+          (unsigned long)config.version, config.server_host, config.mqtt_port, config.tenant, net_names[net.state],
+          net.state == ZS_NET_STATE_TRIAL ? (net.failures ? " (failed bring-ups so far)" : "") : "",
+          (unsigned long)net.accepted, (unsigned long)net.confirmed, (unsigned long)net.rolled_back, (unsigned long)net.failed_version);
+  }
   if (sim_enabled)
     print("  dual-sim %s slot %d (sim1 %s, sim2 %s, status %s) starts %lu switches %lu retries %lu recoveries %lu faults %lu bringup-fail %u/%u link-fail %u/%u\r\n",
           zs_dual_sim_state_name(zs_dual_sim_state(&sim_controller)), (int)zs_dual_sim_active_slot(&sim_controller),
