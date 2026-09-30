@@ -1,0 +1,31 @@
+{
+  "board": "PCB-MAIN",
+  "outer_mm": [
+    200.0,
+    145.0,
+    59.0
+  ],
+  "board_origin_mm": [
+    42.0,
+    29.0,
+    9.0
+  ],
+  "edge_clearance_mm": {
+    "west": 38.8,
+    "east": 44.80000000000001,
+    "south": 25.8,
+    "north": 37.80000000000001,
+    "below_board": 5.0,
+    "above_board": 44.4
+  },
+  "pcb_housing_overlap_mm3": 0.0,
+  "body_volume_mm3": 231714.555,
+  "lid_volume_mm3": 117352.904,
+  "service_pull_clearance_mm": {
+    "J_PWR_west_35": 3.799999999999997,
+    "J_MIC_north_20": 17.80000000000001,
+    "J_MIC_east_20": 24.80000000000001,
+    "J_SIM_USB_SD_south_20": 5.800000000000001
+  },
+  "pass_candidate_fit": true
+}
