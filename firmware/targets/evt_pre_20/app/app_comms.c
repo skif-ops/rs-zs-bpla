@@ -225,8 +225,10 @@ const zs_station_comms_t *app_comms_state(void) { return &comms; }
 static void audio_abort(const char *why);
 static bool build_audio_topic(void);
 static bool fw_session_start(void);
+static bool bearing_session_start(void);
+static void bearing_drop(void);
 static void set_phase(comms_phase_t p) {
-  if ((phase == COMMS_SESSION || phase == COMMS_ONLINE) && p != COMMS_SESSION && p != COMMS_ONLINE) audio_abort("session ended");
+  if ((phase == COMMS_SESSION || phase == COMMS_ONLINE) && p != COMMS_SESSION && p != COMMS_ONLINE) { audio_abort("session ended"); bearing_drop(); }
   if (p == COMMS_FAULT && phase != COMMS_FAULT) net_failed(xTaskGetTickCount());   /* a bring-up on trial failed */
   phase = p; phase_since_ms = xTaskGetTickCount();
 }
@@ -243,6 +245,7 @@ static bool start_session(const char *tenant) {
   if (!build_audio_topic()) return false;
   audio_abort("new session");
   if (!fw_session_start()) return false;
+  if (!bearing_session_start()) return false;
   comms_port = (zs_station_comms_port_t){NULL, fill_heartbeat, APP_COMMS_HEARTBEAT_MS, 0u};
   return zs_station_comms_init(&comms, &comms_port, &session, &event_transport, xTaskGetTickCount());
 }
@@ -550,8 +553,70 @@ static void fw_drive(uint32_t now) {
   }
 }
 
+/* ---- bearing stream while tracking (addendum H): batches of the RAM queue on the bearing topic, best effort ----
+   Detection events and the heartbeat go first (zs_station_comms_tick runs before); a batch goes when the session is
+   free and a second has passed since the last one (or the queue holds a full batch, or the window has closed and
+   the rest is flushed).  A refused batch is not retried: the next one carries newer bearings. */
+static zs_bearing_queue_t bearings;
+static volatile bool tracking;
+static bool bearing_in_flight;
+static zs_bearing_batch_t bearing_batch;
+static uint8_t bearing_buf[ZS_BEARING_BATCH_MAX_BYTES];
+static uint8_t bearing_topic[ZS_MQTT_EVENT_TOPIC_MAX_BYTES];
+static size_t bearing_topic_size;
+static zs_mqtt_event_message_t bearing_msg;
+static uint32_t bearing_last_ms, bearing_batches, bearing_samples, bearing_failed, bearing_dropped;
+void app_comms_bearing_push(const zs_bearing_record_t *r) {
+  taskENTER_CRITICAL();
+  zs_bearing_queue_push(&bearings, r);
+  taskEXIT_CRITICAL();
+}
+void app_comms_set_tracking(bool active) { tracking = active; }
+static uint8_t bearing_queued(void) { uint8_t n; taskENTER_CRITICAL(); n = zs_bearing_queue_count(&bearings); taskEXIT_CRITICAL(); return n; }
+bool app_comms_track_busy(void) { return tracking || bearing_in_flight || bearing_queued() > 0u; }
+static bool bearing_session_start(void) {
+  bearing_in_flight = false;
+  return derive_topic("bearing", bearing_topic, sizeof(bearing_topic), &bearing_topic_size);
+}
+static void bearing_drop(void) {
+  uint8_t n;
+  taskENTER_CRITICAL();
+  n = zs_bearing_queue_count(&bearings);
+  zs_bearing_queue_clear(&bearings);
+  taskEXIT_CRITICAL();
+  bearing_dropped += n;
+  bearing_in_flight = false;
+}
+/* 1: the outcome of our batch, read before anyone else starts a publication on the uplink */
+static void bearing_collect(void) {
+  if (!bearing_in_flight || uplink_binding.state != ZS_BG95_EVENT_UPLINK_IDLE) return;
+  bearing_in_flight = false;
+  if (uplink_binding.last_outcome == ZS_BG95_EVENT_UPLINK_OUTCOME_BROKER_ACK) bearing_batches++;
+  else bearing_failed++;
+}
+/* 3: the next batch when the session is free */
+static void bearing_drive(uint32_t now) {
+  uint8_t queued, n;
+  size_t len;
+  if (bearing_in_flight || session.owner != ZS_BG95_MQTT_OWNER_NONE || !zs_bg95_mqtt_session_ready(&session)) return;
+  queued = bearing_queued();
+  if (queued == 0u) return;
+  if (tracking && queued < ZS_BEARING_BATCH_MAX_SAMPLES && (uint32_t)(now - bearing_last_ms) < APP_BEARING_BATCH_MS) return;
+  taskENTER_CRITICAL();
+  n = zs_bearing_queue_take(&bearings, config.station_id, boot_id, 1u, ZS_BEARING_BATCH_MAX_SAMPLES, &bearing_batch);
+  taskEXIT_CRITICAL();
+  if (n == 0u) return;
+  bearing_last_ms = now;
+  len = zs_bearing_batch_encode(&bearing_batch, bearing_buf, sizeof(bearing_buf));
+  bearing_msg = (zs_mqtt_event_message_t){bearing_topic, bearing_topic_size, bearing_buf, len, 1u, false};
+  if (len && zs_bg95_mqtt_session_start_message(&session, &bearing_msg, now) == ZS_BG95_EVENT_UPLINK_STARTED) { bearing_in_flight = true; bearing_samples += n; }
+  else { bearing_failed++; bearing_dropped += n; }
+}
+
 void app_comms_reset(void) {
   audio_abort("reset");
+  bearing_drop();
+  tracking = false;
   zs_net_trial_init(&net);                                     /* the candidate lived in RAM: a reset is a rollback */
   net_switch = false;
   if (config_valid) config = stable_config;
@@ -598,7 +663,7 @@ static uint32_t activity_ms, activity_seen;
 static void note_session_activity(uint32_t now) {
   const uint32_t seen = comms.heartbeats_published + commands_verified + commands_rejected +
                         session.queued_command_count + session.retry_required_count + audio_chunks + audio_uploads +
-                        fw_chunks + fw_updates + fw_timeouts_total;
+                        fw_chunks + fw_updates + fw_timeouts_total + bearing_batches + bearing_failed;
   if (seen != activity_seen) { activity_seen = seen; activity_ms = now; }
 }
 
@@ -606,7 +671,8 @@ static void note_session_activity(uint32_t now) {
    linger since the last activity has passed (the outbox is checked at most every 5 s: it walks the NOR slots). */
 static void check_session_done(uint32_t now) {
   uint16_t pending = 1u;
-  if (session_reported || !hooks.session_done || comms.heartbeats_published == 0u || app_comms_audio_busy() || app_comms_fw_busy()) return;
+  if (session_reported || !hooks.session_done || comms.heartbeats_published == 0u || app_comms_audio_busy() || app_comms_fw_busy() ||
+      app_comms_track_busy()) return;
   if ((uint32_t)(now - activity_ms) < APP_COMMS_LINGER_MS || session.owner != ZS_BG95_MQTT_OWNER_NONE) return;
   if ((uint32_t)(now - last_outbox_check_ms) < 5000u) return;
   last_outbox_check_ms = now;
@@ -763,8 +829,9 @@ void app_comms_step(void) {
         if (zs_bg95_mqtt_session_ready(&session)) net_online();   /* a configuration on trial proved itself (before the heartbeat) */
         audio_collect();                                   /* our chunk's outcome before anyone reuses the uplink */
         fw_collect(now);
+        bearing_collect();
         zs_station_comms_tick(&comms, now);
-        if (phase == COMMS_ONLINE) { audio_drive(now); fw_drive(now); }
+        if (phase == COMMS_ONLINE) { bearing_drive(now); audio_drive(now); fw_drive(now); }
         if (phase == COMMS_SESSION && zs_bg95_mqtt_session_ready(&session)) { online_count++; set_phase(COMMS_ONLINE); activity_ms = now; }
         if (phase == COMMS_ONLINE) { note_session_activity(now); check_session_done(now); if (phase != COMMS_ONLINE) break; }   /* net switch */
         if (!wanted()) {
@@ -842,6 +909,9 @@ void app_comms_status(void (*print)(const char *fmt, ...)) {
         (unsigned long)fw_rejected, (unsigned long)fw_failed, (unsigned long)fw_installs, (unsigned long)fw_chunks, (unsigned long)fw_chunks_ignored,
         (unsigned long)fw_timeouts_total, fw_phase == FW_DOWNLOADING ? " (downloading)" : fw_phase != FW_IDLE ? " (finishing)" : "",
         fw_paused ? " (paused)" : "");
+  print("  bearings %s: batches %lu (samples %lu) failed %lu dropped %lu, queued %u (pushed %lu, overflow %lu)\r\n",
+        tracking ? "tracking" : "idle", (unsigned long)bearing_batches, (unsigned long)bearing_samples, (unsigned long)bearing_failed,
+        (unsigned long)bearing_dropped, (unsigned)bearing_queued(), (unsigned long)bearings.pushed, (unsigned long)bearings.dropped);
   {
     static const char *const net_names[] = {"stable", "accepted", "trial", "rolled back"};
     print("  network config v%lu (%s:%u tenant %s) %s%s | remote accepted %lu confirmed %lu rolled back %lu (last failed v%lu)\r\n",
