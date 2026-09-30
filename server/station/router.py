@@ -71,6 +71,16 @@ async def event(event_id:str):
     if result is None: raise HTTPException(404,'event not found')
     return result
 
+@router.get('/events/{event_id}/bearings')
+async def event_bearings(event_id:str,limit:int=5000):
+    """Live bearings (ICD addendum H) of every station whose track belongs to this system event."""
+    if store.get_event(event_id) is None: raise HTTPException(404,'event not found')
+    return store.list_bearings(system_event_id=event_id,limit=limit)
+
+@router.get('/bearings')
+async def bearings(station_id:int|None=None,track_event_id:int|None=None,since_us:int|None=None,until_us:int|None=None,limit:int=5000):
+    return store.list_bearings(station_id=station_id,track_event_id=track_event_id,since_us=since_us,until_us=until_us,limit=limit)
+
 @router.post('/stations/{station_id}/audio-request')
 async def request_audio(station_id:int,req:AudioRequest):
     payload=req.model_dump()

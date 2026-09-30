@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS mqtt_detection_ingress(event_key BLOB PRIMARY KEY, st
 CREATE TABLE IF NOT EXISTS commands(command_id TEXT PRIMARY KEY, station_id INTEGER NOT NULL, created_us INTEGER NOT NULL, expires_us INTEGER NOT NULL, command TEXT NOT NULL, payload TEXT NOT NULL, delivered INTEGER NOT NULL DEFAULT 0, acked INTEGER NOT NULL DEFAULT 0, last_publish_us INTEGER NOT NULL DEFAULT 0, publish_count INTEGER NOT NULL DEFAULT 0, ack_result INTEGER, ack_detail INTEGER, completed_us INTEGER);
 CREATE INDEX IF NOT EXISTS idx_cmd_station ON commands(station_id, delivered, acked);
 CREATE TABLE IF NOT EXISTS audio(event_id INTEGER NOT NULL, station_id INTEGER NOT NULL, segment TEXT NOT NULL, path TEXT NOT NULL, codec TEXT, sample_rate INTEGER, created_us INTEGER NOT NULL, PRIMARY KEY(event_id, station_id, segment));
+CREATE TABLE IF NOT EXISTS bearings(station_id INTEGER NOT NULL, track_event_id INTEGER NOT NULL, time_us INTEGER NOT NULL, azimuth_cdeg INTEGER NOT NULL, elevation_cdeg INTEGER NOT NULL, sigma_cdeg INTEGER NOT NULL, confidence REAL NOT NULL, frames INTEGER NOT NULL, time_trust TEXT NOT NULL, received_us INTEGER NOT NULL, PRIMARY KEY(station_id, track_event_id, time_us));
+CREATE INDEX IF NOT EXISTS idx_bearing_time ON bearings(time_us);
 CREATE TABLE IF NOT EXISTS audio_parts(station_id INTEGER NOT NULL, command_id TEXT NOT NULL, segment INTEGER NOT NULL, chunk_index INTEGER NOT NULL, event_id INTEGER NOT NULL, chunk_count INTEGER NOT NULL, sample_rate INTEGER NOT NULL, start_time_us INTEGER NOT NULL, sha256 BLOB NOT NULL, data BLOB NOT NULL, received_us INTEGER NOT NULL, PRIMARY KEY(station_id, command_id, segment, chunk_index));
 """
 
@@ -164,6 +166,36 @@ class EventStore:
             if row['acked']: return 'duplicate'
             c.execute("UPDATE commands SET acked=1,ack_result=?,ack_detail=?,completed_us=? WHERE command_id=? AND station_id=?",(result_code,detail_code,when,command_id,station_id))
         return 'acked'
+    # ---- bearing stream while tracking (ICD addendum H): live samples, idempotent on broker redelivery ----
+    def save_bearings(self,batch,now_us:int|None=None)->int:
+        """Stores the samples of a decoded BearingBatch; returns how many were new (a redelivered batch adds none)."""
+        when=int(time.time()*1e6) if now_us is None else now_us
+        track=self._sqlite_event_id(batch.track_event_id)
+        rows=[(batch.station_id,track,s.time_us,round(s.azimuth_deg*100),round(s.elevation_deg*100),round(s.sigma_deg*100),s.confidence,s.frames,batch.time_trust,when)
+              for s in batch.samples]
+        with self.lock,self._conn() as c:
+            before=c.total_changes
+            c.executemany("INSERT OR IGNORE INTO bearings VALUES(?,?,?,?,?,?,?,?,?,?)",rows)
+            return c.total_changes-before
+    def list_bearings(self,*,station_id:int|None=None,track_event_id:int|None=None,system_event_id:str|None=None,
+                      since_us:int|None=None,until_us:int|None=None,limit:int=5000)->list[dict[str,Any]]:
+        """Samples in time order with the system event their track's detection belongs to (None until correlated)."""
+        where,args=[],[]
+        if station_id is not None: where.append("b.station_id=?"); args.append(station_id)
+        if track_event_id is not None: where.append("b.track_event_id=?"); args.append(self._sqlite_event_id(track_event_id))
+        if system_event_id is not None: where.append("d.system_event_id=?"); args.append(system_event_id)
+        if since_us is not None: where.append("b.time_us>=?"); args.append(since_us)
+        if until_us is not None: where.append("b.time_us<=?"); args.append(until_us)
+        sql=("SELECT b.*,d.system_event_id FROM bearings b LEFT JOIN detections d ON d.event_id=b.track_event_id AND d.station_id=b.station_id"
+             +(" WHERE "+" AND ".join(where) if where else "")+" ORDER BY b.time_us,b.station_id LIMIT ?")
+        with self._conn() as c: rows=c.execute(sql,(*args,max(1,min(limit,50000)))).fetchall()
+        return [{'station_id':r['station_id'],'track_event_id':r['track_event_id']&0xFFFFFFFFFFFFFFFF,'system_event_id':r['system_event_id'],
+                 'time_us':r['time_us'],'azimuth_deg':r['azimuth_cdeg']/100,'elevation_deg':r['elevation_cdeg']/100,'sigma_deg':r['sigma_cdeg']/100,
+                 'confidence':r['confidence'],'frames':r['frames'],'time_trust':r['time_trust']} for r in rows]
+    def system_event_of_detection(self,station_id:int,event_id:int)->str|None:
+        with self._conn() as c:
+            row=c.execute("SELECT system_event_id FROM detections WHERE event_id=? AND station_id=?",(self._sqlite_event_id(event_id),station_id)).fetchone()
+        return row['system_event_id'] if row else None
     # ---- audio upload over MQTT (ICD addendum B): chunks stay here until their segment is complete ----
     def command_record(self,command_id:str)->dict[str,Any]|None:
         with self._conn() as c:
@@ -225,4 +257,5 @@ class EventStore:
         cutoff=int((time.time()-retention_days*86400)*1e6)
         with self.lock,self._conn() as c:
             c.execute("DELETE FROM audio_parts WHERE received_us<?",(int((time.time()-2*86400)*1e6),))   # abandoned uploads
+            c.execute("DELETE FROM bearings WHERE time_us<?",(cutoff,))
             c.execute("DELETE FROM system_events WHERE created_us<?",(cutoff,)); c.execute("DELETE FROM detections WHERE event_time_us<?",(cutoff,)); c.execute("DELETE FROM security_events WHERE created_us<?",(cutoff,))
