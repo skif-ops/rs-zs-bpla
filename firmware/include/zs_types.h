@@ -198,6 +198,9 @@ typedef struct {
   uint16_t selftest_failed;    /* key 15: self-tests whose last run failed (bit = zs_selftest_id_t, zs_selftest_failed_mask; 0 = none) */
   uint64_t command_key_id;     /* key 16: id of the current command key (zs_command_key_id_u64; 0 = none provisioned) */
   uint64_t command_next_key_id; /* key 17: id of the next key while a rotation is in flight (addendum E; 0 = none) */
+  uint32_t fw_version;         /* key 18: .fw_info version of the running image (addendum F; 0 = unknown) */
+  uint8_t fw_state;            /* key 19: 0 idle, 1 downloading, 2 install pending, 3 trial, 4 rolled back */
+  uint32_t fw_other_version;   /* key 20: version of the image in the other bank (0 = none) */
 } zs_detector_health_t;
 
 typedef struct {

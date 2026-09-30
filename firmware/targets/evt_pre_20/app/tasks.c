@@ -19,6 +19,7 @@
 #include "app_comms.h"
 #include "app_audio_rec.h"
 #include "app_commands.h"
+#include "app_fw.h"
 #include "app_lora.h"
 #include "app_watchdog.h"
 #include "app_nrf_update.h"
@@ -379,10 +380,12 @@ static void supervisor_task_fn(void *arg) {
     (void)xTaskNotifyWait(0u, UINT32_MAX, &bits, pdMS_TO_TICKS(100));
     now = xTaskGetTickCount();
     for (unsigned ev = 1u; ev < 32u; ev++) if (bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, now);
-    modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? APP_AUDIO_UPLOAD_MAX_MS : 0u);
+    modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? APP_AUDIO_UPLOAD_MAX_MS : 0u) +
+                                (app_comms_fw_busy() ? APP_FW_UPDATE_MAX_MS : 0u);
     (void)zs_mode_tick(&modes, now);
     app_watchdog_service();
     app_commands_tick(now);
+    app_fw_tick(now);
     if (capture_on && !capture_wanted(modes.mode)) capture_set(false);   /* the post-event window closed */
     outbox_retry_tick(now);
     gsm_probe_tick(now);
@@ -561,6 +564,7 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->detector.selftest_failed = zs_selftest_failed_mask(&selftests);
   hb->detector.command_key_id = secrets.command_key_set ? zs_command_key_id_u64(secrets.command_public_key) : 0u;
   hb->detector.command_next_key_id = secrets.command_next_key_set ? zs_command_key_id_u64(secrets.command_next_key) : 0u;
+  app_fw_fill_heartbeat(&hb->detector);                                  /* addendum F: keys 18..20 */
   return true;
 }
 /* The comms duty loop (app_comms_task's body, as the host simulation and the twin drive it) plus the watchdog
@@ -589,7 +593,10 @@ static bool command_clock_now(uint32_t now_ms, uint64_t *now_us) {
   const int64_t gnss_us = gnss ? zs_time_for_sample(&time_sync, zs_pdm_capture_sample_counter(&capture)) : 0;
   return zs_command_clock_now(&command_clock, gnss_us, gnss, now_ms, now_us);
 }
-static void comms_session_done(void *ctx) { (void)ctx; outbox_retry_backoff_ms = APP_OUTBOX_RETRY_MS; outbox_retry_at_ms = 0u; mode_event(ZS_MODE_EV_COMMS_DONE); }
+static void comms_session_done(void *ctx) {
+  (void)ctx; outbox_retry_backoff_ms = APP_OUTBOX_RETRY_MS; outbox_retry_at_ms = 0u; mode_event(ZS_MODE_EV_COMMS_DONE);
+  app_fw_confirm(zs_selftest_required_ok(&selftests));                   /* addendum F: a trial image proved itself */
+}
 static bool outbox_has_pending(void) { uint16_t pending = 0u; return stores_on_nor && zs_event_outbox_pending_count(&nor_outbox_io, &pending) == ZS_EVENT_OUTBOX_OK && pending > 0u; }
 static const app_comms_hooks_t comms_hooks = {comms_fill_heartbeat, NULL, console_printf, comms_session_done};
 
@@ -835,6 +842,7 @@ static void console_exec(const char *cmd) {
                    (int)pipeline.features[7], (int)(pipeline.features[8] * 100.0f), (int)(pipeline.features[10] * 100.0f), (int)(pipeline.features[15] * 100.0f));
   } else if (strcmp(cmd, "comms") == 0) {
     app_comms_status(console_printf);
+    app_fw_status(console_printf);
   } else if (strcmp(cmd, "comms on") == 0 || strcmp(cmd, "comms off") == 0) {
     app_comms_request(cmd[6] == 'o' && cmd[7] == 'n');
     if (cmd[7] == 'n') mode_event(ZS_MODE_EV_OUTBOX_PENDING);           /* bench: pull the scheduler into S3 */
@@ -941,6 +949,7 @@ bool app_tasks_create(void) {
   zs_command_clock_init(&command_clock, APP_COMMAND_NETWORK_TIME_MAX_MS);
   app_comms_set_clock(command_clock_now);
   app_comms_set_executor(app_commands_execute, NULL);
+  app_comms_set_fw_port(app_fw_port());                                  /* CMD_UPDATE_FIRMWARE (addendum F) */
   app_watchdog_capture_reset_cause();
   for (unsigned t = APP_WD_AUDIO; t <= APP_WD_REC; t++) app_watchdog_register((app_wd_task_t)t);
   if (xTaskCreate(audio_task_fn, "audio", APP_STACK_AUDIO, NULL, APP_PRIO_AUDIO, &audio_task) != pdPASS) return false;

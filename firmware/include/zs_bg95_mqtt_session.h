@@ -4,6 +4,7 @@
 #include "zs_bg95_command_transport.h"
 #include "zs_bg95_event_receipt.h"
 #include "zs_bg95_event_uplink.h"
+#include "zs_bg95_topic_subscription.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -16,7 +17,8 @@ typedef enum {
   ZS_BG95_MQTT_OWNER_COMMAND_SUBSCRIBE,
   ZS_BG95_MQTT_OWNER_RECEIPT_SUBSCRIBE,
   ZS_BG95_MQTT_OWNER_EVENT_UPLINK,
-  ZS_BG95_MQTT_OWNER_COMMAND_ACK
+  ZS_BG95_MQTT_OWNER_COMMAND_ACK,
+  ZS_BG95_MQTT_OWNER_TOPIC_SUBSCRIBE
 } zs_bg95_mqtt_owner_t;
 
 typedef enum {
@@ -27,7 +29,8 @@ typedef enum {
   ZS_BG95_MQTT_INPUT_COMMAND_QUEUED,
   ZS_BG95_MQTT_INPUT_COMMAND_RETRY_REQUIRED,
   ZS_BG95_MQTT_INPUT_RECEIPT,
-  ZS_BG95_MQTT_INPUT_PROTOCOL_ERROR
+  ZS_BG95_MQTT_INPUT_PROTOCOL_ERROR,
+  ZS_BG95_MQTT_INPUT_TOPIC_MESSAGE
 } zs_bg95_mqtt_input_outcome_t;
 
 typedef struct {
@@ -35,6 +38,7 @@ typedef struct {
   zs_bg95_command_transport_t *command;
   zs_bg95_event_receipt_t *receipt;
   zs_bg95_event_uplink_t *uplink;
+  zs_bg95_topic_subscription_t *extra;   /* optional extra downlink topic (addendum F firmware chunks) */
   zs_bg95_mqtt_owner_t owner;
   zs_bg95_mqtt_input_outcome_t last_input_outcome;
   zs_bg95_command_receive_result_t last_command_result;
@@ -63,6 +67,10 @@ bool zs_bg95_mqtt_session_init(
     zs_bg95_event_receipt_t *receipt,
     zs_bg95_event_uplink_t *uplink,
     uint16_t first_message_id);
+
+/* Attach an extra downlink topic (after init): always routed, subscribed after command and receipt while the
+   owner wants it. */
+bool zs_bg95_mqtt_session_attach(zs_bg95_mqtt_session_t *session, zs_bg95_topic_subscription_t *extra);
 
 /*
  * Drive timeouts, subscribe command then receipt without overlap, and service

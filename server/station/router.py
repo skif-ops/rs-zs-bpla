@@ -1,11 +1,12 @@
 """FastAPI router for live ZS-BPLA station integration."""
 from __future__ import annotations
-import json, time
+import json, os, time
 from pathlib import Path
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
-from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage, CommandKeyRotationRequest
+from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage, CommandKeyRotationRequest, FirmwareUpdateRequest
 from station.command_codec import validate_command_payload
+from station.firmware_codec import ReleaseRepository, UPDATE_COMMAND
 from station.store import EventStore
 from station.service import StationFusionService
 from station.cbor_codec import decode_detection_cbor
@@ -91,6 +92,33 @@ async def rotate_command_key(station_id:int,req:CommandKeyRotationRequest):
         command=store.create_command(station_id,'CMD_ROTATE_COMMAND_KEY',payload)
     except ValueError as exc: raise HTTPException(400,str(exc)) from None
     return command.model_dump()
+
+def firmware_repository()->ReleaseRepository:
+    """The same release repository the MQTT bridge serves from (ZS_FIRMWARE_DIR, default server/data/firmware)."""
+    return ReleaseRepository(os.environ.get('ZS_FIRMWARE_DIR') or BASE/'data'/'firmware')
+
+@router.post('/stations/{station_id}/firmware-update')
+async def update_firmware(station_id:int,req:FirmwareUpdateRequest):
+    """ICD addendum F: queue CMD_UPDATE_FIRMWARE with the manifest and the offline release signature of a release in
+    the repository (python -m pki.cli fw-sign).  The station fetches the image over fwreq/fw from the bridge."""
+    try: release=firmware_repository().get(req.version)
+    except ValueError as exc: raise HTTPException(409,str(exc)) from None
+    if release is None: raise HTTPException(404,f'release {req.version} is not in the firmware repository')
+    try:
+        payload=release.command_payload()
+        validate_command_payload(UPDATE_COMMAND,payload)
+        command=store.create_command(station_id,UPDATE_COMMAND,payload)
+    except ValueError as exc: raise HTTPException(400,str(exc)) from None
+    return {**command.model_dump(),'release':{'version':release.manifest.version,'size':release.manifest.size,'sha256':release.manifest.sha256.hex()}}
+
+@router.get('/firmware/releases')
+async def firmware_releases():
+    repo=firmware_repository(); out=[]
+    for v in repo.versions():
+        try: r=repo.get(v)
+        except ValueError: out.append({'version':v,'error':'inconsistent'}); continue
+        if r is not None: out.append({'version':v,'target':r.manifest.target,'size':r.manifest.size,'sha256':r.manifest.sha256.hex(),'release_key_id':r.key_id.hex()})
+    return out
 
 @router.get('/stations/{station_id}/events/{event_id}/audio')
 async def event_audio(station_id:int,event_id:int):

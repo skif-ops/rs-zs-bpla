@@ -1,9 +1,10 @@
 /*
  * Dioneya EVT-PRE-20 station firmware, milestone B1 bring-up entry point.
- * HAL init -> Rev.A clock tree -> GPIO -> UARTs -> FreeRTOS tasks (audio/supervisor/gnss/console).
+ * HAL init -> Rev.A clock tree -> A/B boot guard -> GPIO -> UARTs -> FreeRTOS tasks (audio/supervisor/gnss/console).
  */
 #include "FreeRTOS.h"
 #include "app_config.h"
+#include "app_fw.h"
 #include "bsp_clock.h"
 #include "bsp_gpio.h"
 #include "bsp_uart.h"
@@ -20,6 +21,7 @@ int main(void) {
   HAL_Init();
   if (!bsp_clock_init_160mhz()) fatal();
   HAL_ICACHE_Enable();
+  app_fw_boot_guard();              /* A/B trial: count the attempt, early IWDG, or swap back (addendum F) */
   bsp_gpio_init();
   if (!bsp_uart_init(BSP_UART_CONSOLE, APP_UART_CONSOLE_BAUD)) fatal();
   if (!bsp_uart_init(BSP_UART_GNSS, APP_UART_GNSS_BAUD)) fatal();

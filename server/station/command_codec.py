@@ -15,6 +15,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PublicKey,
 )
 
+from station import firmware_codec
 from station.schemas import StationCommand
 
 
@@ -25,7 +26,8 @@ MAX_COMMAND_BYTES = 2048
 MAX_ACK_BYTES = 128
 MAX_COMMAND_TTL_US = 15 * 60 * 1_000_000
 COMMAND_CODES = {"CMD_REQUEST_AUDIO": 1, "CMD_REBOOT": 2, "CMD_SET_PARAMS": 3,   # 2, 3: ICD addendum D
-                 "CMD_ROTATE_COMMAND_KEY": 4}                                   # 4: ICD addendum E
+                 "CMD_ROTATE_COMMAND_KEY": 4,                                   # 4: ICD addendum E
+                 "CMD_UPDATE_FIRMWARE": 5}                                      # 5: ICD addendum F
 COMMAND_NAMES = {value: key for key, value in COMMAND_CODES.items()}
 ACK_RESULTS = {0: "OK", 1: "REJECTED", 2: "FAILED", 3: "EXPIRED"}
 AUDIO_SEGMENT_CODES = {"pre": 0, "post": 1, "both": 2, "range": 3}
@@ -286,6 +288,8 @@ def _command_payload_to_wire(command_name: str, payload: dict) -> dict[int, obje
         return _params_payload_to_wire(payload)
     if command_name == "CMD_ROTATE_COMMAND_KEY":
         return _rotate_payload_to_wire(payload)
+    if command_name == "CMD_UPDATE_FIRMWARE":
+        return firmware_codec.payload_to_wire(payload)
     raise ValueError(f"unsupported command: {command_name}")
 
 
@@ -298,6 +302,8 @@ def _command_payload_from_wire(command_name: str, payload: object) -> dict[str, 
         return _params_payload_from_wire(payload)
     if command_name == "CMD_ROTATE_COMMAND_KEY":
         return _rotate_payload_from_wire(payload)
+    if command_name == "CMD_UPDATE_FIRMWARE":
+        return firmware_codec.payload_from_wire(payload)
     raise ValueError(f"unsupported command: {command_name}")
 
 

@@ -72,6 +72,15 @@ supply mode and peripheral runtime parameters are deliberately not released by
 the pinout generator. HAL/LL integration, measured clocks, secure boot, A/B OTA,
 production target build and hardware evidence remain blockers.
 
+The FreeRTOS application (`app/`) links with `ld/STM32U585VITXQ_APP_BANK.ld`
+(MQTT ICD addendum F): the image lives in the 1 MiB bank mapped at 0x08000000,
+ends before that bank's last 8 KiB page (the A/B boot record) and carries a
+32-byte `.fw_info` block at offset 0x400 (version `-DZS_FW_VERSION_CODE`).
+A signed release (`-DZS_FW_RELEASE_PUBLIC_KEYS`) is fetched over MQTT into the
+other bank, installed by SWAP_BANK and confirmed or rolled back by the early
+boot guard (`app/app_fw.c`). The engineering full-flash script above remains the
+scaffold contract; secure boot and hardware evidence of the bank swap remain open.
+
 The portable installation-position store now provides a two-slot atomic record,
 CRC, last-write commit marker, monotonic recommission version and read-back. Its
 QG-1/QG-2 host result does not define STM32 Flash page addresses or close target

@@ -17,6 +17,8 @@ Detection schema: `4`
 | `zs/v1/{tenant}/{station_id}/down` | server -> station | 1 | false | signed command envelope | PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/ack` | station -> server | 1 | false | command result | PORTABLE_BG95_SESSION_FRAMED_SERIALIZED_QG_PASS; TARGET_CRYPTO_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/receipt` | server -> station | 1 | false | event application receipt | PORTABLE_BG95_SESSION_LENGTH_DELIMITED_QMTRECV_QG_PASS; TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/fwreq` | station -> server | 1 | false | firmware chunk request (addendum F) | HOST_TWIN_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/fw` | server -> station | 0 | false | firmware chunk (addendum F); subscribed only while a download runs | HOST_TWIN_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
 
 Client ID: `dioneya-{station_id}-{boot_id}`. Clean start запрещён после provisioning; session expiry и keepalive замораживаются после 24-часового теста сети. Повторная доставка QoS 1 ожидаема, дедупликация выполняется по `event_id`, а для команд по `command_id`.
 
@@ -40,7 +42,7 @@ an explicit signing key is loaded.
 | 3 | command_id | UUID as 16 bytes |
 | 4 | created_time_us | uint64 |
 | 5 | expires_time_us | uint64; maximum and default server TTL is 15 minutes |
-| 6 | command code | uint; `CMD_REQUEST_AUDIO` = 1, `CMD_REBOOT` = 2, `CMD_SET_PARAMS` = 3 (addendum D), `CMD_ROTATE_COMMAND_KEY` = 4 (addendum E) |
+| 6 | command code | uint; `CMD_REQUEST_AUDIO` = 1, `CMD_REBOOT` = 2, `CMD_SET_PARAMS` = 3 (addendum D), `CMD_ROTATE_COMMAND_KEY` = 4 (addendum E), `CMD_UPDATE_FIRMWARE` = 5 (addendum F) |
 | 7 | command payload | CBOR map |
 | 8 | signing key ID | first 8 bytes of SHA-256 over the raw Ed25519 public key |
 | 9 | signature | 64-byte Ed25519 signature over canonical keys 0..8 |

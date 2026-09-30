@@ -11,6 +11,8 @@
  *   CMD_ROTATE_COMMAND_KEY  next key into the NOR secrets record, both keys trusted -> OK; REJECTED 2 invalid key,
  *                     3 no record; FAILED 1 (NOR) (addendum E).  Every verified command signed by the next key
  *                     promotes it first (the old key is dropped).
+ *   CMD_UPDATE_FIRMWARE refused (REJECTED 1..7) or accepted: the image is fetched into the other bank in the
+ *                     sessions, OK (detail = chunks) / FAILED 1..4 follows its check; install and trial: app_fw (addendum F).
  */
 #include "zs_command.h"
 #include "zs_station_params.h"

@@ -19,7 +19,8 @@ typedef enum {
   ZS_COMMAND_REQUEST_AUDIO = 1,
   ZS_COMMAND_REBOOT = 2,          /* MQTT_TLS_ICD_v0_1 addendum D */
   ZS_COMMAND_SET_PARAMS = 3,      /* addendum D: bounded whitelist of runtime parameters */
-  ZS_COMMAND_ROTATE_KEY = 4       /* addendum E: install the next command public key (trusted with the current one) */
+  ZS_COMMAND_ROTATE_KEY = 4,      /* addendum E: install the next command public key (trusted with the current one) */
+  ZS_COMMAND_UPDATE_FIRMWARE = 5  /* addendum F: fetch, verify and install a signed release in the other flash bank */
 } zs_command_code_t;
 
 #define ZS_COMMAND_REBOOT_MAX_DELAY_S 600u
@@ -66,6 +67,16 @@ typedef struct {
   uint8_t public_key[32];
 } zs_rotate_key_command_t;
 
+/* CMD_UPDATE_FIRMWARE payload {0: manifest bstr(1..96), 1: release key id bstr(8), 2: release signature bstr(64)}:
+   the codec checks the structure; the release signature, target, version and size belong to zs_fw_update_check. */
+#define ZS_COMMAND_FW_MANIFEST_MAX 96u
+typedef struct {
+  uint8_t manifest[ZS_COMMAND_FW_MANIFEST_MAX];
+  uint8_t manifest_size;
+  uint8_t key_id[8];
+  uint8_t signature[64];
+} zs_update_firmware_command_t;
+
 typedef struct {
   uint32_t station_id;
   uint8_t command_id[ZS_COMMAND_UUID_BYTES];
@@ -76,6 +87,7 @@ typedef struct {
   zs_reboot_command_t reboot;
   zs_set_params_command_t params;
   zs_rotate_key_command_t rotate;
+  zs_update_firmware_command_t firmware;
   uint8_t key_id[ZS_COMMAND_KEY_ID_BYTES];
 } zs_command_t;
 

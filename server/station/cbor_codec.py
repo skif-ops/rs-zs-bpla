@@ -23,6 +23,7 @@ from station.schemas import (
 _MSG_DETECTION = 2
 _MSG_HEARTBEAT = 3
 _SUPPORTED_DETECTION_SCHEMAS = frozenset({1, 3, 4})
+_FW_STATE = {0: "IDLE", 1: "DOWNLOADING", 2: "INSTALL_PENDING", 3: "TRIAL", 4: "ROLLED_BACK"}   # addendum F, key 19
 _RESET_CAUSE = {1: "POWER", 2: "PIN", 3: "SOFTWARE", 4: "IWDG", 5: "WWDG", 6: "LOW_POWER", 7: "OPTION_BYTES"}
 _SUPPORTED_HEARTBEAT_SCHEMAS = frozenset({1, 2})   # 2 adds the optional detector map (key 13)
 _ROUTE = {0: "LTE", 1: "NB_IOT", 2: "2G", 3: "LORA", 4: "BLE", 5: "TEST"}
@@ -395,6 +396,9 @@ def decode_heartbeat_obj(obj: Any) -> HeartbeatMessage:
             selftest_failed_tests=int(detector.get(15, 0)),
             command_key_id=_key_id_hex(detector.get(16, 0)),
             command_next_key_id=_key_id_hex(detector.get(17, 0)),
+            fw_version=int(detector.get(18, 0)),
+            fw_state=_FW_STATE.get(int(detector.get(19, 0)), "IDLE"),
+            fw_other_version=int(detector.get(20, 0)),
         ),
     )
 

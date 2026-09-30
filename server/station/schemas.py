@@ -373,6 +373,11 @@ class DetectorHealth(BaseModel):
     # one only while a rotation is in flight; None = not provisioned / firmware without the keys
     command_key_id: str | None = None
     command_next_key_id: str | None = None
+    # key 18..20 (ICD addendum F): version of the running image (.fw_info), the update state and the version held by
+    # the other flash bank (0 = none / firmware without the update)
+    fw_version: int = Field(default=0, ge=0, le=0xFFFFFFFF)
+    fw_state: Literal["IDLE", "DOWNLOADING", "INSTALL_PENDING", "TRIAL", "ROLLED_BACK"] = "IDLE"
+    fw_other_version: int = Field(default=0, ge=0, le=0xFFFFFFFF)
 
 
 class HeartbeatMessage(BaseModel):
@@ -413,6 +418,11 @@ class SecurityEventMessage(BaseModel):
     ]
     power: PowerStatus = Field(default_factory=PowerStatus)
     route: RouteStatus = Field(default_factory=RouteStatus)
+
+
+class FirmwareUpdateRequest(BaseModel):
+    """ICD addendum F: the release (its version in the server's firmware repository) to install."""
+    version: int = Field(strict=True, ge=1, le=0xFFFFFFFF)
 
 
 class CommandKeyRotationRequest(BaseModel):

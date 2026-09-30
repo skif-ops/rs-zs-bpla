@@ -83,7 +83,8 @@ version | flags | engineer_key | iccid1 | iccid2 | command_key | next_command_ke
 - новые операции аудита `SECRETS_WRITE`, `SECRETS_CLEAR` (`zs_commissioning_operation_t`);
 - реестр «Мухоеда»: `station-secrets` экспорт; Android: `StationSecretsBundle`/`StationSecretsController`, диалог
   «Секреты станции»;
-- всё остальное — без изменений; status/gnss_integrity/log/OTA STM32 остаются зарезервированными (v0.4+).
+- всё остальное — без изменений; status/gnss_integrity/log остаются зарезервированными (v0.4+); OTA STM32 по BLE
+  не нужна: образ приходит по MQTT (`MQTT_TLS_ICD_v0_1_ADDENDUM_F_FIRMWARE_UPDATE.md`, 2026-09-30).
 
 Ссылки: `BLE_GATT_OTA_ICD_v0_2.md`, аддендумы B/C, `STATION_CONFIG_CBOR_v0_1.md`, `MQTT_TLS_ICD_v0_1.md`,
 `PROTOCOL_VERSIONING.md`, `docs/DUAL_SIM_INTEGRATION_2026-09-24.md`.

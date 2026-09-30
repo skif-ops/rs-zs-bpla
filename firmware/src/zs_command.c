@@ -192,6 +192,19 @@ static bool read_rotate_payload(command_reader_t *reader, zs_rotate_key_command_
   return expect_map(reader, 1u) && expect_uint(reader, 0u) && read_bytes(reader, rotate->public_key, sizeof(rotate->public_key));
 }
 
+/* CMD_UPDATE_FIRMWARE: {0: bstr(1..96), 1: bstr(8), 2: bstr(64)} */
+static bool read_firmware_payload(command_reader_t *reader, zs_update_firmware_command_t *fw) {
+  uint8_t major;
+  uint64_t size;
+  if (!expect_map(reader, 3u) || !expect_uint(reader, 0u) || !read_argument(reader, &major, &size) || major != 2u ||
+      size == 0u || size > ZS_COMMAND_FW_MANIFEST_MAX || reader->offset + size > reader->size) return false;
+  memcpy(fw->manifest, &reader->data[reader->offset], (size_t)size);
+  fw->manifest_size = (uint8_t)size;
+  reader->offset += (size_t)size;
+  return expect_uint(reader, 1u) && read_bytes(reader, fw->key_id, sizeof(fw->key_id)) &&
+         expect_uint(reader, 2u) && read_bytes(reader, fw->signature, sizeof(fw->signature));
+}
+
 static zs_command_status_t decode_envelope(
     size_t payload_size, uint32_t expected_station_id,
     uint64_t now_us, bool time_trusted, command_reader_t *reader,
@@ -220,14 +233,15 @@ static zs_command_status_t decode_envelope(
   if (now_us >= command->expires_time_us) return ZS_COMMAND_STATUS_EXPIRED;
   if (!expect_uint(reader, 6u) || !read_uint(reader, &value) ||
       (value != ZS_COMMAND_REQUEST_AUDIO && value != ZS_COMMAND_REBOOT && value != ZS_COMMAND_SET_PARAMS &&
-       value != ZS_COMMAND_ROTATE_KEY))
+       value != ZS_COMMAND_ROTATE_KEY && value != ZS_COMMAND_UPDATE_FIRMWARE))
     return ZS_COMMAND_STATUS_UNSUPPORTED;
   command->code = (zs_command_code_t)value;
   if (!expect_uint(reader, 7u)) return ZS_COMMAND_STATUS_INVALID_CBOR;
   if ((command->code == ZS_COMMAND_REQUEST_AUDIO && !read_audio_payload(reader, &command->audio)) ||
       (command->code == ZS_COMMAND_REBOOT && !read_reboot_payload(reader, &command->reboot)) ||
       (command->code == ZS_COMMAND_SET_PARAMS && !read_params_payload(reader, &command->params)) ||
-      (command->code == ZS_COMMAND_ROTATE_KEY && !read_rotate_payload(reader, &command->rotate)))
+      (command->code == ZS_COMMAND_ROTATE_KEY && !read_rotate_payload(reader, &command->rotate)) ||
+      (command->code == ZS_COMMAND_UPDATE_FIRMWARE && !read_firmware_payload(reader, &command->firmware)))
     return ZS_COMMAND_STATUS_INVALID_CBOR;
   if (!expect_uint(reader, 8u) ||
       !read_bytes(reader, command->key_id, ZS_COMMAND_KEY_ID_BYTES))

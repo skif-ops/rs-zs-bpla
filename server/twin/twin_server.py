@@ -19,7 +19,12 @@ auto-request policy of mqtt_bridge.request_event_audio); the request is a comman
 chunks on the audio topic go through the bridge's ``ingest_audio_chunk`` (authorisation against the request, parts in
 SQLite, SHA-256, WAV on disk; ``ZS_TWIN_WAV_DIR`` keeps the store and the WAV files, a temporary directory otherwise;
 ``ZS_TWIN_AUDIO_REDELIVER=1`` answers the first chunk with the same request envelope again, as a QoS 1 redelivery
-would).  A final ``REPORT`` line summarises what arrived.
+would).  Firmware update (addendum F): ``update_firmware`` queues CMD_UPDATE_FIRMWARE for a release of the repository
+test image (tools/generate_fw_update_vector.py, version ``ZS_TWIN_FW_VERSION``, default 2) signed by the test release
+key into a real ``ReleaseRepository``; every ``fwreq`` is answered by the bridge's ``serve_request`` against the
+store (``ZS_TWIN_FW_DROP=n`` drops the n-th request, as a lost chunk would; ``ZS_TWIN_FW_REDELIVER=1`` sends the command
+envelope again after the second chunk, as a QoS 1 redelivery during the download would).  A final ``REPORT`` line summarises what
+arrived.
 Run by the twin: ``python3 -m twin.twin_server`` from the server/ directory.
 """
 from __future__ import annotations
@@ -29,10 +34,14 @@ import json
 import os
 import sys
 import tempfile
+import time
 import uuid
 from pathlib import Path
 
+import importlib.util
+
 from station import cbor_codec
+from station import firmware_codec
 from station import lora_codec
 from station.command_codec import CommandKeyring, CommandSigner, decode_command_ack, encode_signed_command
 from station.event_receipt_codec import EventReceipt, encode_event_receipt
@@ -50,6 +59,16 @@ TWIN_ENGINEER_KEY = bytes(range(0xA0, 0xA0 + 32))
 TWIN_COMMAND_SEED = bytes(range(1, 33))
 TWIN_NEXT_COMMAND_SEED = bytes(range(33, 65))    # the next key of tools/generate_command_rotate_vector.py
 TWIN_SET_PARAMS = {"reset": False, "params": {"heartbeat_period_s": 900, "mic_channel": 1, "listen_dwell_s": 5}}
+TWIN_RELEASE_SEED = bytes(range(65, 97))          # the test release key of tools/generate_fw_update_vector.py
+TWIN_FW_IMAGE_BYTES = 40_000                      # 40 chunks; the twin's simulated bank holds 120 KiB
+
+
+def twin_release(repository: firmware_codec.ReleaseRepository, version: int) -> firmware_codec.Release:
+    spec = importlib.util.spec_from_file_location("gen_fw_update", Path(__file__).resolve().parents[2] / "tools" / "generate_fw_update_vector.py")
+    gen = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gen)
+    signer = firmware_codec.ReleaseSigner(Ed25519PrivateKey.from_private_bytes(TWIN_RELEASE_SEED))
+    return repository.add(gen.test_image(version=version, size=TWIN_FW_IMAGE_BYTES), signer)
 
 
 def command_queue(spec: str) -> list[tuple[str, str, dict]]:
@@ -69,6 +88,8 @@ def command_queue(spec: str) -> list[tuple[str, str, dict]]:
             queue.append((str(uuid.uuid4()), "CMD_ROTATE_COMMAND_KEY", {"public_key": nxt.public_key_hex}))
         elif item == "reboot_by_old_key":
             queue.append((str(uuid.uuid4()), "CMD_REBOOT@old", {"delay_s": 10}))
+        elif item == "update_firmware":
+            queue.append((str(uuid.uuid4()), "CMD_UPDATE_FIRMWARE", {}))      # the payload comes from the release
         else:
             raise SystemExit(f"twin server: unknown command {item!r}")
     return queue
@@ -104,6 +125,14 @@ def main() -> int:
     audio_requested: list[dict] = []
     audio_envelopes: dict[str, bytes] = {}
     redeliver = os.environ.get("ZS_TWIN_AUDIO_REDELIVER", "") == "1"
+    repository = firmware_codec.ReleaseRepository(store_dir / "firmware")
+    release = twin_release(repository, int(os.environ.get("ZS_TWIN_FW_VERSION", "2"))) if any(c[1] == "CMD_UPDATE_FIRMWARE" for c in queue) else None
+    fw_drop = int(os.environ.get("ZS_TWIN_FW_DROP", "0") or 0)
+    fw_redeliver = os.environ.get("ZS_TWIN_FW_REDELIVER", "") == "1"
+    fw_command: list[str] = []
+    fw_requests = 0
+    fw_served = 0
+    fw_dropped = 0
 
     def request_audio(detection) -> str:
         """A signed CMD_REQUEST_AUDIO for the event, sent right after its receipt (second reply line)."""
@@ -126,13 +155,18 @@ def main() -> int:
         by_old_key = name.endswith("@old")
         name = name.removesuffix("@old")
         if command_id not in signed:
-            if name == "CMD_ROTATE_COMMAND_KEY":        # the keyring learns the rotation from its ACK in the store
+            if name == "CMD_UPDATE_FIRMWARE":           # the bridge serves the chunks against this store record
+                payload = release.command_payload()
+                fw_command.append("")
+            if name in ("CMD_ROTATE_COMMAND_KEY", "CMD_UPDATE_FIRMWARE"):   # the keyring / fw server read the store
                 command_id = key_store.create_command(station_id, name, payload).command_id
             chosen = keyring.primary if by_old_key else keyring.signer_for(station_id, key_store)
             signed[command_id] = encode_signed_command(StationCommand(
                 command_id=command_id, station_id=station_id, command=name, payload=payload,
                 created_time_us=wall_us - 1_000_000, expires_time_us=wall_us + 600_000_000), chosen)
             key_ids[command_id] = chosen.key_id.hex()
+            if fw_command and fw_command[-1] == "":
+                fw_command[-1] = command_id
         commands_sent.append({"command_id": command_id, "command": name, "key_id": key_ids[command_id]})
         return f"PUB {down_topic} {signed[command_id].hex()}"
 
@@ -189,6 +223,9 @@ def main() -> int:
                 "last_heartbeat": heartbeats[-1] if heartbeats else None,
                 "heartbeat_self_test_ok": [h["self_test_ok"] for h in heartbeats],
                 "key_ids": {"current": keyring.primary.key_id.hex(), "next": keyring.next.key_id.hex()},
+                "firmware": {"release_version": release.manifest.version if release else None, "requests": fw_requests,
+                             "served": fw_served, "dropped": fw_dropped,
+                             "chunks": (release.manifest.size + firmware_codec.CHUNK_BYTES - 1) // firmware_codec.CHUNK_BYTES if release else 0},
                 "events": detections[:20],
             }
             out.write("REPORT " + json.dumps(report) + "\n"); out.flush()
@@ -246,6 +283,20 @@ def main() -> int:
                     out.write(f"PUB {down_topic} {audio_envelopes[command_id].hex()}\n"); out.flush()
                 else:
                     out.write("OK\n"); out.flush()
+            elif kind == "fwreq":
+                fw_requests += 1
+                answer = firmware_codec.serve_request(payload, int(station), event_store=key_store, repository=repository,
+                                                      now_us=int(time.time() * 1_000_000))
+                if answer is None or fw_requests == fw_drop:
+                    fw_dropped += answer is not None
+                    out.write("OK\n"); out.flush()
+                else:
+                    fw_served += 1
+                    reply = f"PUB {prefix}/{tenant}/{station}/fw {answer[1].hex()}\n"
+                    if fw_redeliver and fw_served == 2 and fw_command:          # the broker delivers the command again
+                        commands_sent.append({"command_id": fw_command[0], "command": "CMD_UPDATE_FIRMWARE", "key_id": key_ids[fw_command[0]]})
+                        reply += f"PUB {down_topic} {signed[fw_command[0]].hex()}\n"
+                    out.write(reply); out.flush()
             elif kind == "status":
                 h = cbor_codec.decode_heartbeat_cbor(payload)
                 key_store.upsert_station(h)

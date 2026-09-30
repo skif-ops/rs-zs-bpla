@@ -11,6 +11,7 @@
 #include "zs_command_trust.h"
 #include "zs_ed25519.h"
 #include "zs_mqtt_command_transport.h"
+#include "zs_bg95_topic_subscription.h"
 #include <string.h>
 
 typedef enum { COMMS_OFF = 0, COMMS_BRINGUP, COMMS_ENDPOINT, COMMS_SESSION, COMMS_ONLINE, COMMS_FAULT, COMMS_SIM, COMMS_STOPPING } comms_phase_t;
@@ -167,6 +168,7 @@ const zs_station_comms_t *app_comms_state(void) { return &comms; }
 
 static void audio_abort(const char *why);
 static bool build_audio_topic(void);
+static bool fw_session_start(void);
 static void set_phase(comms_phase_t p) {
   if ((phase == COMMS_SESSION || phase == COMMS_ONLINE) && p != COMMS_SESSION && p != COMMS_ONLINE) audio_abort("session ended");
   phase = p; phase_since_ms = xTaskGetTickCount();
@@ -183,6 +185,7 @@ static bool start_session(const char *tenant) {
   if (!zs_bg95_mqtt_session_init(&session, &modem, &command_binding, &receipt_binding, &uplink_binding, (uint16_t)(1u + (xTaskGetTickCount() & 0x7fffu)))) return false;
   if (!build_audio_topic()) return false;
   audio_abort("new session");
+  if (!fw_session_start()) return false;
   comms_port = (zs_station_comms_port_t){NULL, fill_heartbeat, APP_COMMS_HEARTBEAT_MS, 0u};
   return zs_station_comms_init(&comms, &comms_port, &session, &event_transport, xTaskGetTickCount());
 }
@@ -300,6 +303,207 @@ static void audio_drive(uint32_t now) {
   }
 }
 
+/* ---- firmware update (addendum F): CMD_UPDATE_FIRMWARE fetched chunk by chunk (fwreq -> fw), stop-and-wait ----
+   The image goes into the other flash bank through the port; the download lives in RAM for this boot and survives
+   the end of a session (it pauses and resumes in the next one).  Verified -> journal COMPLETED -> ACK OK at the
+   broker -> the new bank is armed for trial -> port install (swap + reset). */
+#define FW_REQUEST_TIMEOUT_MS 15000u
+#define FW_TIMEOUTS_PAUSE 8u
+#define FW_STALLED_SESSIONS_FAIL 3u
+typedef enum { FW_IDLE = 0, FW_DOWNLOADING, FW_ACK, FW_INSTALLING } fw_phase_t;
+static const app_comms_fw_port_t *fw_port;
+static fw_phase_t fw_phase;
+static zs_fw_download_t fw_dl;
+static zs_bg95_topic_subscription_t fw_sub;
+static uint8_t fw_topic[ZS_MQTT_EVENT_TOPIC_MAX_BYTES], fwreq_topic[ZS_MQTT_EVENT_TOPIC_MAX_BYTES];
+static size_t fw_topic_size, fwreq_topic_size;
+static uint8_t fw_req_buf[ZS_FW_REQUEST_MAX_BYTES], fw_ack_buf[ZS_COMMAND_ACK_MAX_BYTES];
+static zs_mqtt_event_message_t fw_req_msg, fw_ack_msg;
+static bool fw_req_in_flight, fw_waiting, fw_paused, fw_ack_in_flight;
+static uint32_t fw_req_offset, fw_req_sent_ms, fw_session_chunks;
+static unsigned fw_timeouts, fw_stalled_sessions;
+static uint32_t fw_updates, fw_rejected, fw_failed, fw_chunks, fw_chunks_ignored, fw_timeouts_total, fw_installs;
+void app_comms_set_fw_port(const app_comms_fw_port_t *port) { fw_port = port; }
+bool app_comms_fw_busy(void) { return (fw_phase == FW_DOWNLOADING && !fw_paused) || fw_phase == FW_ACK || fw_phase == FW_INSTALLING; }
+uint8_t app_comms_fw_state(void) {
+  if (fw_phase == FW_DOWNLOADING) return 1u;
+  if ((fw_phase == FW_ACK && fw_dl.result == ZS_COMMAND_ACK_OK) || fw_phase == FW_INSTALLING) return 2u;
+  return 0u;
+}
+
+/* the topic next to the ack topic: ".../ack" -> ".../<suffix>" (same tenant/station prefix) */
+static bool derive_topic(const char *suffix, uint8_t *out, size_t cap, size_t *size) {
+  const size_t base = command_transport.ack_topic_size, n = strlen(suffix);
+  if (base < 3u || base - 3u + n > cap || memcmp(command_transport.ack_topic + base - 3u, "ack", 3u) != 0) return false;
+  memcpy(out, command_transport.ack_topic, base - 3u);
+  memcpy(out + base - 3u, suffix, n);
+  *size = base - 3u + n;
+  return true;
+}
+
+static void fw_on_message(void *ctx, const uint8_t *payload, size_t size) {
+  zs_fw_chunk_t chunk;
+  zs_fw_chunk_result_t r;
+  (void)ctx;
+  if (fw_phase != FW_DOWNLOADING || !zs_fw_chunk_decode(payload, size, &chunk)) { fw_chunks_ignored++; return; }
+  r = zs_fw_download_on_chunk(&fw_dl, &chunk);
+  if (r == ZS_FW_CHUNK_IGNORED) { fw_chunks_ignored++; return; }
+  fw_waiting = false;
+  fw_timeouts = 0u;
+  if (r == ZS_FW_CHUNK_ACCEPTED) { fw_chunks++; fw_session_chunks++; }
+}
+
+static bool fw_session_start(void) {
+  if (!derive_topic("fw", fw_topic, sizeof(fw_topic), &fw_topic_size) ||
+      !derive_topic("fwreq", fwreq_topic, sizeof(fwreq_topic), &fwreq_topic_size) ||
+      !zs_bg95_topic_subscription_init(&fw_sub, &modem, fw_topic, fw_topic_size, fw_on_message, NULL) ||
+      !zs_bg95_mqtt_session_attach(&session, &fw_sub))
+    return false;
+  fw_req_in_flight = fw_waiting = fw_paused = fw_ack_in_flight = false;
+  fw_timeouts = 0u;
+  if (fw_phase == FW_DOWNLOADING) {
+    /* a session that ended without a single chunk counts; three in a row end the download (addendum F §2) */
+    if (fw_session_chunks == 0u && ++fw_stalled_sessions >= FW_STALLED_SESSIONS_FAIL) {
+      zs_fw_download_fail(&fw_dl, ZS_FW_FAIL_STALLED);
+      if (hooks.log) hooks.log("fw: no progress in %u sessions, download failed\r\n", fw_stalled_sessions);
+    } else if (fw_session_chunks) {
+      fw_stalled_sessions = 0u;
+    }
+    if (fw_dl.state != ZS_FW_DOWNLOAD_FINISHED) zs_bg95_topic_subscription_want(&fw_sub, true);
+  }
+  fw_session_chunks = 0u;
+  return true;
+}
+
+bool app_comms_update_firmware(const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail) {
+  zs_fw_manifest_t manifest;
+  zs_fw_station_t station;
+  *result = ZS_COMMAND_ACK_REJECTED;
+  if (!fw_port || !fw_port->io || !fw_port->other_record || !fw_port->install) { *detail = ZS_FW_REJECT_UNSUPPORTED; fw_rejected++; return true; }
+  if (fw_phase != FW_IDLE) {
+    if (fw_phase == FW_DOWNLOADING && memcmp(fw_dl.command_id, cmd->command_id, ZS_COMMAND_UUID_BYTES) == 0) return false;   /* redelivery */
+    *detail = ZS_FW_REJECT_BUSY; fw_rejected++; return true;
+  }
+  station = (zs_fw_station_t){fw_port->keys, fw_port->key_count, fw_port->target,
+                              fw_port->running_version ? fw_port->running_version() : 0u, fw_port->io->capacity,
+                              fw_port->trial ? fw_port->trial() : false};
+  *detail = zs_fw_update_check(&cmd->firmware, &station, &manifest);
+  if (*detail) {
+    fw_rejected++;
+    if (hooks.log) hooks.log("fw: update refused, detail %u (running v%lu)\r\n", (unsigned)*detail, (unsigned long)station.running_version);
+    return true;
+  }
+  if (!zs_fw_download_start(&fw_dl, fw_port->io, config.station_id, cmd->command_id, &manifest)) { *detail = ZS_FW_REJECT_UNSUPPORTED; fw_rejected++; return true; }
+  fw_phase = FW_DOWNLOADING;
+  fw_updates++;
+  fw_req_in_flight = fw_waiting = fw_paused = false;
+  fw_timeouts = fw_stalled_sessions = 0u;
+  fw_session_chunks = 0u;
+  zs_bg95_topic_subscription_want(&fw_sub, true);
+  if (hooks.log) hooks.log("fw: update to v%lu accepted (%lu bytes, running v%lu), download follows\r\n",
+                           (unsigned long)manifest.version, (unsigned long)manifest.size, (unsigned long)station.running_version);
+  return false;
+}
+
+/* 1: the outcome of our request or ACK, read before anyone else starts a publication on the uplink */
+static void fw_collect(uint32_t now) {
+  if ((!fw_req_in_flight && !fw_ack_in_flight) || uplink_binding.state != ZS_BG95_EVENT_UPLINK_IDLE) return;
+  if (fw_req_in_flight) {
+    fw_req_in_flight = false;
+    if (uplink_binding.last_outcome == ZS_BG95_EVENT_UPLINK_OUTCOME_BROKER_ACK) {
+      /* the chunk may already be here (it can overtake the +QMTPUB line) */
+      fw_waiting = fw_phase == FW_DOWNLOADING && fw_dl.offset == fw_req_offset && zs_fw_download_want(&fw_dl) != 0u;
+      fw_req_sent_ms = now;
+    } else if (++fw_timeouts >= FW_TIMEOUTS_PAUSE) {
+      fw_paused = true;
+    }
+    return;
+  }
+  fw_ack_in_flight = false;
+  if (uplink_binding.last_outcome != ZS_BG95_EVENT_UPLINK_OUTCOME_BROKER_ACK) return;   /* published again next time */
+  if (fw_dl.result != ZS_COMMAND_ACK_OK) { fw_phase = FW_IDLE; return; }
+  fw_phase = FW_INSTALLING;
+}
+
+static void fw_finish(uint32_t now) {
+  uint64_t now_us;
+  size_t n;
+  (void)command_time(now, &now_us);
+  zs_bg95_topic_subscription_want(&fw_sub, false);
+  if (fw_dl.result != ZS_COMMAND_ACK_OK) fw_failed++;
+  if (hooks.log) hooks.log("fw: download finished, result %u detail %u (%lu chunks)\r\n", (unsigned)fw_dl.result, (unsigned)fw_dl.detail, (unsigned long)fw_dl.chunks);
+  if (zs_command_journal_complete(journal_io, fw_dl.command_id, fw_dl.result, fw_dl.detail, now_us) == ZS_COMMAND_JOURNAL_OK &&
+      (n = zs_command_journal_encode_ack(journal_io, fw_dl.command_id, fw_ack_buf, sizeof(fw_ack_buf))) > 0u) {
+    fw_ack_msg = (zs_mqtt_event_message_t){command_transport.ack_topic, command_transport.ack_topic_size, fw_ack_buf, n, 1u, false};
+    fw_phase = FW_ACK;
+  } else {
+    if (hooks.log) hooks.log("fw: journal completion failed, the command stays accepted\r\n");
+    fw_phase = FW_IDLE;
+  }
+}
+
+/* 3: local work (erase / verify) and the next publication when the session is free */
+static void fw_drive(uint32_t now) {
+  if (!fw_port || fw_phase == FW_IDLE) return;
+  if (fw_phase == FW_INSTALLING) {
+    fw_phase = FW_IDLE;
+    if (!zs_fw_boot_arm(fw_port->other_record, fw_dl.manifest.version, fw_port->running_version ? fw_port->running_version() : 0u)) {
+      fw_failed++;
+      if (hooks.log) hooks.log("fw: arming the new bank failed, staying on the running image\r\n");
+      return;
+    }
+    fw_installs++;
+    if (hooks.log) hooks.log("fw: v%lu armed for trial, installing\r\n", (unsigned long)fw_dl.manifest.version);
+    fw_port->install(fw_dl.manifest.version);
+    return;
+  }
+  if (fw_phase == FW_DOWNLOADING) {
+    const zs_fw_step_t st = zs_fw_download_step(&fw_dl, 16384u);
+    if (st == ZS_FW_STEP_FINISHED) { fw_finish(now); return; }
+    if (st != ZS_FW_STEP_NEED_CHUNK || fw_paused) return;
+    if (!zs_bg95_topic_subscription_ready(&fw_sub)) {
+      zs_bg95_topic_subscription_want(&fw_sub, true);
+      if (fw_sub.failed) { fw_paused = true; if (hooks.log) hooks.log("fw: chunk topic refused, download paused\r\n"); }
+      return;
+    }
+    if (fw_waiting) {
+      if ((uint32_t)(now - fw_req_sent_ms) < FW_REQUEST_TIMEOUT_MS) return;
+      fw_waiting = false;
+      fw_timeouts_total++;
+      if (++fw_timeouts >= FW_TIMEOUTS_PAUSE) {
+        fw_paused = true;
+        if (hooks.log) hooks.log("fw: %u requests unanswered at offset %lu, download paused until the next session\r\n", fw_timeouts, (unsigned long)fw_dl.offset);
+        return;
+      }
+    }
+  }
+  if (fw_req_in_flight || fw_ack_in_flight || session.owner != ZS_BG95_MQTT_OWNER_NONE || !zs_bg95_mqtt_session_ready(&session)) return;
+  if (fw_phase == FW_ACK) {
+    if (zs_bg95_mqtt_session_start_message(&session, &fw_ack_msg, now) == ZS_BG95_EVENT_UPLINK_STARTED) fw_ack_in_flight = true;
+    return;
+  }
+  if (fw_phase == FW_DOWNLOADING && !fw_waiting) {
+    const size_t n = zs_fw_download_request(&fw_dl, fw_req_buf, sizeof(fw_req_buf));
+    if (n == 0u) return;
+    fw_req_msg = (zs_mqtt_event_message_t){fwreq_topic, fwreq_topic_size, fw_req_buf, n, 1u, false};
+    if (zs_bg95_mqtt_session_start_message(&session, &fw_req_msg, now) == ZS_BG95_EVENT_UPLINK_STARTED) {
+      fw_req_in_flight = true;
+      fw_req_offset = fw_dl.offset;
+    }
+  }
+}
+
+void app_comms_reset(void) {
+  audio_abort("reset");
+  zs_fw_download_abort(&fw_dl);
+  fw_phase = FW_IDLE;
+  fw_req_in_flight = fw_waiting = fw_paused = fw_ack_in_flight = false;
+  if (phase != COMMS_OFF) { bsp_gpio_modem_power(false); modem.state = ZS_BG95_OFF; }
+  session_reported = false;
+  stop_requested_ms = 0u;
+  set_phase(COMMS_OFF);
+}
+
 /* zs_bg95 instance for the station configuration (APN profiles of the config, pilot APN policy). */
 static void modem_prepare(void) {
   zs_bg95_apn_profile_t profiles[2];
@@ -333,7 +537,8 @@ static bool modem_provision(uint32_t now) {
 static uint32_t activity_ms, activity_seen;
 static void note_session_activity(uint32_t now) {
   const uint32_t seen = comms.heartbeats_published + commands_verified + commands_rejected +
-                        session.queued_command_count + session.retry_required_count + audio_chunks + audio_uploads;
+                        session.queued_command_count + session.retry_required_count + audio_chunks + audio_uploads +
+                        fw_chunks + fw_updates + fw_timeouts_total;
   if (seen != activity_seen) { activity_seen = seen; activity_ms = now; }
 }
 
@@ -341,7 +546,7 @@ static void note_session_activity(uint32_t now) {
    linger since the last activity has passed (the outbox is checked at most every 5 s: it walks the NOR slots). */
 static void check_session_done(uint32_t now) {
   uint16_t pending = 1u;
-  if (session_reported || !hooks.session_done || comms.heartbeats_published == 0u || app_comms_audio_busy()) return;
+  if (session_reported || !hooks.session_done || comms.heartbeats_published == 0u || app_comms_audio_busy() || app_comms_fw_busy()) return;
   if ((uint32_t)(now - activity_ms) < APP_COMMS_LINGER_MS || session.owner != ZS_BG95_MQTT_OWNER_NONE) return;
   if ((uint32_t)(now - last_outbox_check_ms) < 5000u) return;
   last_outbox_check_ms = now;
@@ -469,8 +674,9 @@ void app_comms_step(void) {
         zs_bg95_tick(&modem, now);
         { uint64_t now_us; const bool trusted = command_time(now, &now_us); trust_refresh(); zs_bg95_mqtt_session_tick(&session, now, now_us, trusted); }
         audio_collect();                                   /* our chunk's outcome before anyone reuses the uplink */
+        fw_collect(now);
         zs_station_comms_tick(&comms, now);
-        if (phase == COMMS_ONLINE) audio_drive(now);
+        if (phase == COMMS_ONLINE) { audio_drive(now); fw_drive(now); }
         if (phase == COMMS_SESSION && zs_bg95_mqtt_session_ready(&session)) { online_count++; set_phase(COMMS_ONLINE); activity_ms = now; }
         if (phase == COMMS_ONLINE) { note_session_activity(now); check_session_done(now); }
         if (!wanted()) {
@@ -541,6 +747,10 @@ void app_comms_status(void (*print)(const char *fmt, ...)) {
   print("  audio uploads %lu (by server time %lu) chunks %lu rejected %lu failed %lu abandoned %lu%s\r\n", (unsigned long)audio_uploads,
         (unsigned long)audio_by_server_time, (unsigned long)audio_chunks, (unsigned long)audio_rejected, (unsigned long)audio_failed,
         (unsigned long)audio_aborted, app_comms_audio_busy() ? " (upload running)" : "");
+  print("  firmware updates %lu rejected %lu failed %lu installs %lu | chunks %lu ignored %lu timeouts %lu%s%s\r\n", (unsigned long)fw_updates,
+        (unsigned long)fw_rejected, (unsigned long)fw_failed, (unsigned long)fw_installs, (unsigned long)fw_chunks, (unsigned long)fw_chunks_ignored,
+        (unsigned long)fw_timeouts_total, fw_phase == FW_DOWNLOADING ? " (downloading)" : fw_phase != FW_IDLE ? " (finishing)" : "",
+        fw_paused ? " (paused)" : "");
   if (sim_enabled)
     print("  dual-sim %s slot %d (sim1 %s, sim2 %s, status %s) starts %lu switches %lu retries %lu recoveries %lu faults %lu bringup-fail %u/%u link-fail %u/%u\r\n",
           zs_dual_sim_state_name(zs_dual_sim_state(&sim_controller)), (int)zs_dual_sim_active_slot(&sim_controller),

@@ -11,6 +11,11 @@
  * and sends the next one in reply to each ACK.  The station side runs the real command channel with the
  * repository test key, a trusted wall clock and an executor that mirrors app_commands.c over zs_station_params.
  *
+ * Firmware update (ICD addendum F): two simulated flash banks with a boot record page each; CMD_UPDATE_FIRMWARE is
+ * downloaded by the real app_comms driver (fwreq/fw through the BG95 responder and the server twin), installed by a
+ * simulated bank swap and reset, run on trial through the real boot guard (zs_fw_boot) and confirmed by a session;
+ * --ota-hang-version makes that image hang at start so the early IWDG resets it until the guard swaps back.
+ *
  * Nothing on the target changes: the twin reuses the modules and mirrors the task wiring of tasks.c.
  *   station_twin --scene drone|quiet|ground --seconds N --server "python3 -m twin.twin_server" [--seed S]
  */
@@ -25,6 +30,9 @@
 #include "zs_command_keys.h"
 #include "zs_command_set_vector.h"
 #include "zs_dsp_mcu.h"
+#include "zs_fw_boot.h"
+#include "zs_fw_update.h"
+#include "zs_fw_update_vector.h"
 #include "zs_event_outbox.h"
 #include "zs_lora_uplink.h"
 #include "zs_power_modes.h"
@@ -161,7 +169,7 @@ static bool mqtt_refused(void) { return ch_mqtt_refuse_end && sim_now >= ch_mqtt
 /* delayed modem lines (the BG95 reports a failed publish only after its own retries, ~15 s) and delayed downlink */
 typedef struct { uint32_t at_ms; char line[64]; } delayed_line_t;
 static delayed_line_t delayed_lines[16];
-typedef struct { uint32_t at_ms; bool used; char topic[128]; uint8_t payload[512]; size_t n; } delayed_msg_t;
+typedef struct { uint32_t at_ms; bool used; char topic[128]; uint8_t payload[2304]; size_t n; } delayed_msg_t;
 static delayed_msg_t delayed_msgs[32];
 static void reply(const char *line);
 static void reply_later(const char *line, uint32_t delay_ms) {
@@ -500,6 +508,11 @@ static void command_keys_reload(const char *what) {
   if (what) tlog("command key: %s (secrets v%lu)", what, (unsigned long)secrets.version);
 }
 static zs_station_params_t params;        /* the runtime parameter set in force (remote commands below) */
+static uint32_t fw_running_version(void);
+static uint8_t fw_state_now(void);
+static uint32_t fw_bank_version(const uint8_t *bank);
+static uint8_t *fw_other(void);
+static void fw_session_done(void);
 static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   uint16_t pending = 0u; (void)ctx;
   hb->schema_ver = 2u; hb->time_us = pl_sample_time(NULL, ring.total_frames);
@@ -514,10 +527,13 @@ static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->detector.selftest_failed = selftest_failed_mask;
   hb->detector.command_key_id = secrets.command_key_set ? zs_command_key_id_u64(secrets.command_public_key) : 0u;
   hb->detector.command_next_key_id = secrets.command_next_key_set ? zs_command_key_id_u64(secrets.command_next_key) : 0u;
+  hb->detector.fw_version = fw_running_version();                    /* addendum F: keys 18..20 */
+  hb->detector.fw_state = fw_state_now();
+  hb->detector.fw_other_version = fw_bank_version(fw_other());
   return true;
 }
 static uint32_t outbox_retry_at_ms, outbox_retry_backoff_ms = 300000u, outbox_retries;
-static void session_done(void *ctx) { (void)ctx; sessions_done++; outbox_retry_backoff_ms = 300000u; outbox_retry_at_ms = 0u; mode_event(ZS_MODE_EV_COMMS_DONE); tlog("comms: session done -> COMMS_DONE"); }
+static void session_done(void *ctx) { (void)ctx; sessions_done++; outbox_retry_backoff_ms = 300000u; outbox_retry_at_ms = 0u; mode_event(ZS_MODE_EV_COMMS_DONE); tlog("comms: session done -> COMMS_DONE"); fw_session_done(); }
 static const app_comms_hooks_t hooks = {fill_heartbeat, NULL, comms_log, session_done};
 
 /* Outbox retry (mirrors tasks.c): events left in the outbox after an S3 that did not finish (no network, S3
@@ -606,6 +622,8 @@ static bool twin_execute(void *ctx, const zs_command_t *cmd, zs_command_ack_resu
     tlog("command: REBOOT in %lu s", (unsigned long)delay_s);
   } else if (cmd->code == ZS_COMMAND_REQUEST_AUDIO) {
     if (!app_comms_request_audio(cmd, result, detail)) { tlog("command: REQUEST_AUDIO accepted, upload follows"); return false; }
+  } else if (cmd->code == ZS_COMMAND_UPDATE_FIRMWARE) {
+    if (!app_comms_update_firmware(cmd, result, detail)) { tlog("command: UPDATE_FIRMWARE accepted, download follows"); return false; }
   } else { *result = ZS_COMMAND_ACK_REJECTED; *detail = 1u; }
   if (*result == ZS_COMMAND_ACK_OK) cmd_executed++; else cmd_rejected++;
   return true;
@@ -627,6 +645,114 @@ static void reboot_tick(void) {
   tlog("twin: REBOOT by command, params v%lu reloaded from the record", (unsigned long)loaded.version);
 }
 
+
+/* ---- firmware update (addendum F): two flash banks with their boot record pages, install, trial, hang ------------
+   The bank mapped at "0x08000000" is fw_bank[fw_active]; the download (app_comms, through fw_io) fills the other one.
+   An install swaps them and resets; every reset runs the real boot guard on the running bank's record first. */
+#define FW_BANK_BYTES (128u * 1024u)
+#define FW_PAGE 8192u
+#define FW_IMAGE_BYTES (FW_BANK_BYTES - FW_PAGE)
+static uint8_t fw_bank[2][FW_BANK_BYTES];
+static unsigned fw_active;
+static uint32_t fw_hang_version;               /* --ota-hang-version: this image hangs right after the boot guard */
+static zs_fw_boot_record_t fw_own;
+static zs_fw_boot_action_t fw_action;
+static bool fw_install_pending, fw_hung, fw_iwdg_early;
+static uint32_t fw_install_at_ms, fw_hung_since_ms, fw_boot_ms;
+static unsigned fw_installs, fw_trial_boots, fw_rollbacks, fw_confirms, fw_iwdg_resets;
+static uint8_t *fw_other(void) { return fw_bank[fw_active ^ 1u]; }
+static bool fwb_erase(void *c, uint32_t o, uint32_t n) { (void)c; if (o % FW_PAGE || n % FW_PAGE || o + n > FW_BANK_BYTES) return false; memset(fw_other() + o, 0xff, n); return true; }
+static bool fwb_program(void *c, uint32_t o, const uint8_t *d, size_t n) {
+  (void)c;
+  if (o % 16u || n % 16u || o + n > FW_IMAGE_BYTES) return false;
+  for (size_t i = 0u; i < n; i++) if (fw_other()[o + i] != 0xffu) return false;       /* a quad-word is programmed once */
+  memcpy(fw_other() + o, d, n);
+  return true;
+}
+static bool fwb_read(void *c, uint32_t o, uint8_t *d, size_t n) { (void)c; if (o + n > FW_BANK_BYTES) return false; memcpy(d, fw_other() + o, n); return true; }
+static const zs_fw_image_io_t fw_io = {NULL, FW_IMAGE_BYTES, FW_PAGE, FW_IMAGE_BYTES, fwb_erase, fwb_program, fwb_read};
+/* record pages: ctx 0 = the running bank, 1 = the other bank */
+static uint8_t *fw_record(void *c) { return fw_bank[fw_active ^ (unsigned)(uintptr_t)c] + FW_IMAGE_BYTES; }
+static bool fwr_read(void *c, uint32_t o, uint8_t *d, size_t n) { if (o + n > FW_PAGE) return false; memcpy(d, fw_record(c) + o, n); return true; }
+static bool fwr_program(void *c, uint32_t o, const uint8_t slot[ZS_FW_BOOT_SLOT_BYTES]) {
+  uint8_t *page = fw_record(c);
+  if (o % ZS_FW_BOOT_SLOT_BYTES || o + ZS_FW_BOOT_SLOT_BYTES > FW_PAGE) return false;
+  for (unsigned i = 0u; i < ZS_FW_BOOT_SLOT_BYTES; i++) if (page[o + i] != 0xffu) return false;
+  memcpy(page + o, slot, ZS_FW_BOOT_SLOT_BYTES);
+  return true;
+}
+static const zs_fw_boot_port_t fw_own_port = {(void *)(uintptr_t)0u, fwr_read, fwr_program};
+static const zs_fw_boot_port_t fw_other_port = {(void *)(uintptr_t)1u, fwr_read, fwr_program};
+static uint32_t fw_bank_version(const uint8_t *bank) { zs_fw_info_t info; return zs_fw_info_parse(bank + ZS_FW_INFO_OFFSET, &info) ? info.version : 0u; }
+static uint32_t fw_running_version(void) { return fw_bank_version(fw_bank[fw_active]); }
+static bool fw_on_trial(void) { return fw_own.armed && !fw_own.confirmed; }
+static void fw_install(uint32_t version) { fw_install_pending = true; fw_install_at_ms = sim_now + 3000u; tlog("fw: install of v%lu in 3 s (bank swap + reset)", (unsigned long)version); }
+static zs_fw_release_key_t fw_release_key;       /* the repository test release key (tools/generate_fw_update_vector.py) */
+static const app_comms_fw_port_t fw_port = {&fw_io, &fw_other_port, &fw_release_key, 1u, ZS_FW_TARGET_STM32_APP, fw_running_version, fw_on_trial, fw_install};
+/* heartbeat key 19 as tasks.c/app_fw computes it */
+static uint8_t fw_state_now(void) {
+  zs_fw_boot_record_t other;
+  uint8_t state = app_comms_fw_state();
+  if (state == 0u && fw_on_trial()) state = 3u;
+  if (state == 0u && zs_fw_boot_read(&fw_other_port, &other) && other.armed && !other.confirmed && other.rolled_back) state = 4u;
+  return state;
+}
+/* the factory image: 16 KiB with its .fw_info, programmed by SWD into bank 1 (not swapped), records erased */
+static void fw_factory(uint32_t version) {
+  memset(fw_bank, 0xff, sizeof(fw_bank));
+  for (unsigned i = 0u; i < 16384u; i++) fw_bank[0][i] = (uint8_t)(i * 13u + 5u);
+  zs_fw_info_encode(ZS_FW_TARGET_STM32_APP, version, fw_bank[0] + ZS_FW_INFO_OFFSET);
+  fw_active = 0u;
+  memcpy(fw_release_key.public_key, zs_fw_update_vector_release_public_key, sizeof(fw_release_key.public_key));
+}
+static void fw_boot_guard(void) {
+  for (unsigned n = 0u; n < 4u; n++) {
+    fw_action = zs_fw_boot_guard(&fw_own_port, &fw_own);
+    if (fw_action != ZS_FW_BOOT_ROLLBACK) break;
+    fw_rollbacks++;
+    tlog("fw: boot guard: v%lu not confirmed after %u attempts -> ROLLBACK (bank swap + reset)", (unsigned long)fw_own.version, fw_own.attempts);
+    fw_active ^= 1u;
+  }
+  fw_iwdg_early = fw_action == ZS_FW_BOOT_TRIAL;         /* app_fw starts the IWDG right away while on trial */
+  fw_trial_boots += fw_iwdg_early;
+  fw_boot_ms = sim_now;
+  fw_hung = fw_hang_version != 0u && fw_running_version() == fw_hang_version;
+  fw_hung_since_ms = sim_now;
+}
+/* A simulated reset (install, IWDG, trial timeout): RAM is gone, the stores (journal, outbox, params) stay. */
+static void station_reset(const char *why) {
+  zs_station_params_t loaded;
+  fw_boot_guard();
+  app_comms_reset();
+  capture_set(false);
+  zs_mode_init(&modes, NULL, sim_now);
+  if (zs_station_params_load(&params_io, &loaded) == ZS_STATION_PARAMS_OK) { params = loaded; params_apply(&params); }
+  tlog("twin: RESET (%s): running v%lu from bank %u, boot %s (attempt %u)%s", why, (unsigned long)fw_running_version(), fw_active + 1u,
+       zs_fw_boot_action_name(fw_action), fw_own.attempts, fw_hung ? " - the image HANGS at start" : "");
+  if (!fw_hung) (void)zs_mode_on_event(&modes, twin_selftest() ? ZS_MODE_EV_BOOT_DONE : ZS_MODE_EV_BOOT_FAILED, sim_now);
+}
+static void fw_tick(void) {
+  if (fw_install_pending && (int32_t)(sim_now - fw_install_at_ms) >= 0) {
+    fw_install_pending = false;
+    fw_installs++;
+    fw_active ^= 1u;                                                 /* SWAP_BANK toggled, option bytes reloaded */
+    station_reset("install");
+    return;
+  }
+  if (fw_hung) {
+    if (fw_iwdg_early && (uint32_t)(sim_now - fw_hung_since_ms) >= 32000u) { fw_iwdg_resets++; station_reset("IWDG"); }
+    return;
+  }
+  if (fw_on_trial() && (uint32_t)(sim_now - fw_boot_ms) >= ZS_FW_BOOT_TRIAL_TIMEOUT_MS) station_reset("trial timeout");
+}
+/* the session completed with the self-test passed: a trial image proved itself (tasks.c: comms_session_done) */
+static void fw_session_done(void) {
+  if (fw_on_trial() && selftest_failed_mask == 0u && zs_fw_boot_confirm(&fw_own_port, &fw_own)) {
+    fw_confirms++;
+    tlog("fw: v%lu confirmed (self-test passed, session completed)", (unsigned long)fw_running_version());
+  }
+}
+
 static void supervisor_tick(void) {
   static zs_mode_t last = ZS_MODE_SHUTDOWN;
   reboot_tick();
@@ -634,7 +760,7 @@ static void supervisor_tick(void) {
   gsm_probe_tick();
   for (unsigned ev = 1u; ev < 32u; ev++) if (mode_bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, sim_now);
   mode_bits = 0u;
-  modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? 300000u : 0u);
+  modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? 300000u : 0u) + (app_comms_fw_busy() ? 900000u : 0u);
   (void)zs_mode_tick(&modes, sim_now);
   if (capture_on && !capture_wanted(modes.mode)) capture_set(false);   /* the post-event window closed */
   if (modes.mode != last) {
@@ -678,6 +804,8 @@ int main(int argc, char **argv) {
   const char *scene_name = "drone", *server_cmd = NULL;
   uint32_t seconds = 120u, seed = 1u, outage_start = 0u, outage_end = 0u;
   int expect_events = -1, expect_delivered = -1, expect_commands = -1, expect_reboots = -1, expect_post_audio = -1;
+  int expect_fw_version = -1, expect_fw_state = -1;
+  uint32_t factory_version = 1u;
   zs_station_config_t cfg;
   static scene_segment_t segs[4]; size_t nseg = 0u;
   for (int i = 1; i < argc; i++) {
@@ -704,7 +832,11 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--expect-post-audio") && i + 1 < argc) expect_post_audio = atoi(argv[++i]);
     else if (!strcmp(argv[i], "--forget-events")) forget_events = true;
     else if (!strcmp(argv[i], "--selftest-fail-until") && i + 1 < argc) selftest_fail_until_ms = sim_now + (uint32_t)atoi(argv[++i]) * 1000u;
-    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S]\n"); return 2; }
+    else if (!strcmp(argv[i], "--fw-version") && i + 1 < argc) factory_version = (uint32_t)atoi(argv[++i]);
+    else if (!strcmp(argv[i], "--ota-hang-version") && i + 1 < argc) fw_hang_version = (uint32_t)atoi(argv[++i]);
+    else if (!strcmp(argv[i], "--expect-fw-version") && i + 1 < argc) expect_fw_version = atoi(argv[++i]);
+    else if (!strcmp(argv[i], "--expect-fw-state") && i + 1 < argc) expect_fw_state = atoi(argv[++i]);
+    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S]\n"); return 2; }
   }
   if (!strcmp(scene_name, "drone")) { segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 20000u, 60000u, 185.0f, 1.0f}; if (seconds > 150u) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 100000u, 130000u, 210.0f, 0.8f}; }
   else if (!strcmp(scene_name, "ground")) segs[nseg++] = (scene_segment_t){SCENE_GROUND_VEHICLE, 20000u, 60000u, 0.0f, 1.0f};
@@ -738,6 +870,11 @@ int main(int argc, char **argv) {
   app_comms_set_clock(twin_clock);
   app_comms_set_executor(twin_execute, NULL);
   app_comms_set_audio_source(&audio_source);
+  fw_factory(factory_version);
+  fw_boot_guard();
+  app_comms_set_fw_port(&fw_port);
+  (void)zs_fw_update_vector_image; (void)zs_fw_update_vector_manifest; (void)zs_fw_update_vector_signature; (void)zs_fw_update_vector_command;
+  (void)zs_fw_update_vector_request0; (void)zs_fw_update_vector_chunk0; (void)zs_fw_update_vector_chunk1; (void)zs_fw_update_vector_chunk2;
   app_comms_bind(&outbox_io, &journal_io, &hooks);
   app_comms_set_config(&cfg, 5u);
   app_comms_request(true);
@@ -749,13 +886,16 @@ int main(int argc, char **argv) {
   while (sim_now < end) {
     if (outage_end && sim_now >= outage_start && sim_now < outage_end) { if (gsm_available) { gsm_available = false; tlog("radio: GSM outage begins"); } }
     else if (!gsm_available) { gsm_available = true; tlog("radio: GSM back"); }
-    audio_tick();
-    inject_tick();
-    supervisor_tick();
+    fw_tick();
+    if (!fw_hung) {                               /* a hung image does nothing until the IWDG resets it */
+      audio_tick();
+      inject_tick();
+      supervisor_tick();
+    }
     modem_physics();
     channel_tick();
-    app_comms_step();
-    if (lora_enabled) { lora_channel_tick(); lora_step(); }
+    if (!fw_hung) app_comms_step();
+    if (lora_enabled && !fw_hung) { lora_channel_tick(); lora_step(); }
     link_poll();
     sim_now += TICK_MS;
   }
@@ -770,6 +910,9 @@ int main(int argc, char **argv) {
     tlog("twin: commands executed %u rejected %u, reboots scheduled %u done %u, params v%lu", cmd_executed, cmd_rejected, cmd_reboots_scheduled, twin_reboots, (unsigned long)params.version);
     tlog("twin: selftest runs %u recoveries %u, failed mask 0x%04x", selftest_runs, selftest_recoveries, (unsigned)selftest_failed_mask);
     tlog("twin: command keys %u (rotations %u promotions %u)", (unsigned)app_comms_command_key_count(), key_rotations, key_promotions);
+    tlog("twin: firmware v%lu (bank %u, state %u), other bank v%lu; installs %u trial boots %u iwdg resets %u rollbacks %u confirms %u",
+         (unsigned long)fw_running_version(), fw_active + 1u, (unsigned)fw_state_now(), (unsigned long)fw_bank_version(fw_other()),
+         fw_installs, fw_trial_boots, fw_iwdg_resets, fw_rollbacks, fw_confirms);
   }
   /* prehistory around the first event: complete seconds recorded before it and after it (the post-event window) */
   unsigned audio_before = 0u, audio_after = 0u;
@@ -787,6 +930,8 @@ int main(int argc, char **argv) {
     if (expect_delivered >= 0 && ((int)(link_receipts + lora.acks) < expect_delivered || pending != 0u)) { tlog("twin: FAIL expected %d delivered events with an empty outbox (mqtt receipts %u, lora acks %u, pending %u)", expect_delivered, link_receipts, lora.acks, pending); return 1; }
     if (expect_commands >= 0 && (int)cmd_executed != expect_commands) { tlog("twin: FAIL expected %d executed commands, got %u", expect_commands, cmd_executed); return 1; }
     if (expect_post_audio >= 0 && (int)audio_after < expect_post_audio) { tlog("twin: FAIL expected >= %d s of audio after the event, got %u", expect_post_audio, audio_after); return 1; }
+    if (expect_fw_version >= 0 && fw_running_version() != (uint32_t)expect_fw_version) { tlog("twin: FAIL expected firmware v%d, running v%lu", expect_fw_version, (unsigned long)fw_running_version()); return 1; }
+    if (expect_fw_state >= 0 && fw_state_now() != (uint8_t)expect_fw_state) { tlog("twin: FAIL expected firmware state %d, got %u", expect_fw_state, (unsigned)fw_state_now()); return 1; }
     if (expect_reboots >= 0 && ((int)twin_reboots != expect_reboots || (int)cmd_reboots_scheduled != expect_reboots)) { tlog("twin: FAIL expected %d reboots (scheduled %u, done %u)", expect_reboots, cmd_reboots_scheduled, twin_reboots); return 1; }
   }
   if (link_out >= 0) { link_report(); fcntl(link_in, F_SETFL, fcntl(link_in, F_GETFL) & ~O_NONBLOCK); close(link_out); for (;;) { ssize_t r = read(link_in, link_buf + link_len, sizeof(link_buf) - 1u - link_len); if (r <= 0) break; link_len += (size_t)r; } link_buf[link_len] = 0; { char *p = strstr(link_buf, "REPORT "); if (p) printf("SERVER %s", p + 7); } waitpid(server_pid, NULL, 0); }

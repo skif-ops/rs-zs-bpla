@@ -22,6 +22,14 @@ Runs zs_station_twin with the Python server twin on the pipe and checks the serv
   5. command key rotation (ICD addendum E): CMD_ROTATE_COMMAND_KEY signed by the current key installs the next one;
      the bridge's keyring signs the following command with the next key, which promotes it on the station in the
      same session; a command signed by the old key is refused afterwards; the next heartbeat reports the new key.
+  6. firmware update over MQTT (ICD addendum F): CMD_UPDATE_FIRMWARE with a release signed by the test release key;
+     the station fetches the image chunk by chunk (fwreq -> the bridge's serve_request -> fw; one request lost on the
+     way is asked again after its timeout), checks it, acknowledges OK with the chunk count, installs it by a bank
+     swap, boots it on trial through the real boot guard and confirms it after the session; the heartbeat reports
+     the new version on trial and the old one in the other bank; the command redelivered during the download does not
+     restart it.  A station already running that version refuses it.
+  6b. the new image hangs at start: the early IWDG resets it three times, the boot guard swaps back, the old image
+     runs again and the heartbeat reports the rollback.
 """
 from __future__ import annotations
 
@@ -37,8 +45,8 @@ TWIN = Path(os.environ.get("ZS_STATION_TWIN", REPO_ROOT / "firmware" / "build" /
 SERVER_CMD = f"{sys.executable} -m twin.twin_server"
 
 
-def run(args: list[str], commands: str = "", audio: str = "", redeliver: bool = False) -> tuple[str, dict]:
-    env = dict(os.environ, ZS_TWIN_COMMANDS=commands, ZS_TWIN_AUDIO=audio, ZS_TWIN_AUDIO_REDELIVER="1" if redeliver else "")
+def run(args: list[str], commands: str = "", audio: str = "", redeliver: bool = False, **extra: str) -> tuple[str, dict]:
+    env = dict(os.environ, ZS_TWIN_COMMANDS=commands, ZS_TWIN_AUDIO=audio, ZS_TWIN_AUDIO_REDELIVER="1" if redeliver else "", **extra)
     out = subprocess.run([str(TWIN), *args, "--server", SERVER_CMD], cwd=SERVER_ROOT, capture_output=True, text=True, timeout=900, env=env)
     if out.returncode != 0:
         sys.stderr.write(out.stdout[-4000:] + out.stderr[-2000:])
@@ -157,6 +165,41 @@ def main() -> int:
     assert r["last_heartbeat"]["detector"]["command_next_key_id"] is None
     print(f"scenario 5 (command key rotation): {ids['current']} -> {ids['next']} in one session, old key refused after it, "
           f"heartbeat reports {r['last_heartbeat']['detector']['command_key_id']}")
+
+    # firmware update: v1 -> v2 (40 chunks), the third request lost on the way
+    log, r = run(["--scene", "quiet", "--seconds", "150", "--seed", "3", "--fw-version", "1", "--expect-fw-version", "2",
+                  "--expect-fw-state", "0"], commands="update_firmware", ZS_TWIN_FW_DROP="3", ZS_TWIN_FW_REDELIVER="1")
+    f, (ack,) = r["firmware"], r["acks"]
+    # the command redelivered during the download (QoS 1): the running download is neither restarted nor doubled
+    assert [c["command_id"] for c in r["commands_sent"]] == [ack["command_id"]] * 2, r["commands_sent"]
+    assert log.count("fw: update to v2 accepted") == 1, "a redelivery must not start a second download"
+    assert f["release_version"] == 2 and f["chunks"] == 40 and f["served"] == 40 and f["dropped"] == 1 and f["requests"] == 41, f
+    assert ack["result"] == 0 and ack["detail"] == 40, ack
+    assert "fw: update to v2 accepted (40000 bytes, running v1)" in log and "fw: v2 armed for trial, installing" in log
+    assert "twin: RESET (install): running v2 from bank 2, boot trial (attempt 1)" in log and "fw: v2 confirmed" in log
+    assert log.index("fw: v2 armed for trial") > log.index("fw: download finished, result 0 detail 40")
+    det = r["last_heartbeat"]["detector"]
+    assert (det["fw_version"], det["fw_state"], det["fw_other_version"]) == (2, "TRIAL", 1), det   # the boot session of v2
+    assert "installs 1 trial boots 1 iwdg resets 0 rollbacks 0 confirms 1" in log
+    print(f"scenario 6 (firmware update): v1 -> v2, {f['chunks']} chunks ({f['requests']} requests, {f['dropped']} lost and asked again), "
+          f"ACK OK, bank swap, trial, confirmed; heartbeat v{det['fw_version']} {det['fw_state']} (other bank v{det['fw_other_version']})")
+    log, r = run(["--scene", "quiet", "--seconds", "60", "--seed", "3", "--fw-version", "2", "--expect-fw-version", "2"],
+                 commands="update_firmware")
+    assert [(a["result"], a["detail"]) for a in r["acks"]] == [(1, 4)] and r["firmware"]["requests"] == 0, (r["acks"], r["firmware"])
+    print("scenario 6 (same version): REJECTED 4 (version not newer), nothing fetched")
+
+    # the new image hangs at start: three IWDG resets on trial, then the guard swaps back to v1
+    log, r = run(["--scene", "quiet", "--seconds", "240", "--seed", "3", "--fw-version", "1", "--ota-hang-version", "2",
+                  "--expect-fw-version", "1", "--expect-fw-state", "4"], commands="update_firmware")
+    assert [(a["result"], a["detail"]) for a in r["acks"]] == [(0, 40)], r["acks"]
+    assert log.count("twin: RESET (IWDG)") == 3 and "not confirmed after 3 attempts -> ROLLBACK" in log
+    assert "running v1 from bank 1, boot normal" in log and "fw: v2 confirmed" not in log
+    rollback_at = log.index("-> ROLLBACK")
+    assert "session done -> COMMS_DONE" in log[rollback_at:], "the old image must connect again after the rollback"
+    det = r["last_heartbeat"]["detector"]
+    assert (det["fw_version"], det["fw_state"], det["fw_other_version"]) == (1, "ROLLED_BACK", 2), det
+    print(f"scenario 6b (image hangs at start): 3 IWDG resets on trial, rollback to v{det['fw_version']}, "
+          f"heartbeat {det['fw_state']} (other bank v{det['fw_other_version']})")
     return 0
 
 

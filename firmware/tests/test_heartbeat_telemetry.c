@@ -94,14 +94,18 @@ int main(void) {
     message.detector.params_version = 3u;                                             /* CMD_SET_PARAMS set v3 */
     message.detector.selftest_failed = 0x1010u;                                       /* mic_capture (4) and rtc_lse (12) failed */
     message.detector.command_key_id = UINT64_C(0x0102030405060708);                   /* addendum E: current key, no rotation */
+    message.detector.fw_version = 7u; message.detector.fw_state = 3u;               /* addendum F: v7 on trial, */
+    message.detector.fw_other_version = 6u;                                           /* v6 in the other bank */
     n2 = zs_protocol_encode_heartbeat(&message, v2, sizeof(v2));
     assert(n1 > 0u && n2 > n1);
     assert(v1[0] == 0xadu && v2[0] == 0xaeu);                 /* map(13) vs map(14) */
     assert(v1[2] == 0x01u && v2[2] == 0x02u);                 /* key 0: schema_ver */
     assert(memcmp(v1 + 3, v2 + 3, n1 - 3u) == 0);             /* the 12 common keys are byte-identical */
-    assert(v2[n1] == 0x0du && v2[n1 + 1u] == 0xb2u);           /* key 13, map(18) */
+    assert(v2[n1] == 0x0du && v2[n1 + 1u] == 0xb5u);           /* key 13, map(21) */
     {
-      const size_t t = n2 - 12u;                                /* keys 16/17 take the last 12 bytes */
+      static const uint8_t fw_tail[6] = {0x12u, 0x07u, 0x13u, 0x03u, 0x14u, 0x06u};
+      const size_t t = n2 - 18u;                                /* keys 16/17 take 12 bytes, keys 18..20 the last 6 */
+      assert(memcmp(v2 + n2 - 6u, fw_tail, sizeof(fw_tail)) == 0);   /* fw_version 7, fw_state 3 (trial), other 6 */
       static const uint8_t keys_tail[12] = {0x10u, 0x1bu, 1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 0x11u, 0x00u};
       assert(v2[t - 13u] == 0x0bu && v2[t - 12u] == 0x03u);    /* key 11 presence_level 3 */
       assert(v2[t - 11u] == 0x0cu && v2[t - 10u] == 0x04u);    /* key 12 reset_cause: IWDG */
