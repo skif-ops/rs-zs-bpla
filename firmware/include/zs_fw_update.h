@@ -30,6 +30,8 @@
 #define ZS_FW_MANIFEST_SCHEMA 1u
 #define ZS_FW_TARGET_STM32_APP 1u      /* EVT-PRE-20 STM32U585 application */
 #define ZS_FW_TARGET_NRF52 2u          /* reserved (nRF52840 image, addendum C.6 path today) */
+#define ZS_FW_TARGET_MODEL 3u          /* station classifier model package (addendum I, zs_model.h) */
+#define ZS_FW_MODEL_MIN_BYTES 556u     /* ZS_MODEL_BYTES(1): a package with one class */
 
 #define ZS_FW_INFO_OFFSET 0x400u
 #define ZS_FW_INFO_BYTES 32u
@@ -98,6 +100,13 @@ void zs_fw_release_key_id(const uint8_t public_key[ZS_FW_RELEASE_PUBLIC_KEY_BYTE
 /* Checks a CMD_UPDATE_FIRMWARE payload against the station: 0 = acceptable (*manifest set), otherwise the
    REJECTED detail (ZS_FW_REJECT_*; BUSY is the caller's). */
 uint16_t zs_fw_update_check(const zs_update_firmware_command_t *cmd, const zs_fw_station_t *station, zs_fw_manifest_t *manifest);
+/* Target of a CMD_UPDATE_FIRMWARE manifest without any check (0 when it does not decode): picks the image or the
+   model path before the full check. */
+uint32_t zs_fw_update_target(const zs_update_firmware_command_t *cmd);
+/* The model package variant (addendum I): same keys and signature, target ZS_FW_TARGET_MODEL, any version other than
+   the running model's (a rollback is a re-release of an older package), size within capacity and at least one class.
+   station->target/trial are not used; running_version is the active model version (0 = built-in). */
+uint16_t zs_fw_model_check(const zs_update_firmware_command_t *cmd, const zs_fw_station_t *station, zs_fw_manifest_t *manifest);
 
 /* fwreq / fw messages */
 size_t zs_fw_request_encode(uint32_t station_id, const uint8_t command_id[ZS_COMMAND_UUID_BYTES], uint32_t offset,
@@ -122,6 +131,8 @@ typedef struct {
   bool (*erase)(void *ctx, uint32_t offset, uint32_t size);                        /* page-aligned */
   bool (*program)(void *ctx, uint32_t offset, const uint8_t *data, size_t size);  /* ZS_FW_PROGRAM_ALIGN-aligned */
   bool (*read)(void *ctx, uint32_t offset, uint8_t *data, size_t size);
+  /* Content check after the SHA-256 matched; NULL = the application image .fw_info check.  false = FAILED 3. */
+  bool (*validate)(void *ctx, const zs_fw_manifest_t *manifest);
 } zs_fw_image_io_t;
 
 typedef enum {
