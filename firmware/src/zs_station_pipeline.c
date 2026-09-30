@@ -1,4 +1,5 @@
 #include "zs_station_pipeline.h"
+#include <math.h>
 #include <string.h>
 
 /* Most frequent UAV class among the weak-or-better votes: what the event names before the 5/8 type consensus. */
@@ -25,6 +26,7 @@ bool zs_station_pipeline_init(zs_station_pipeline_t *p, const zs_station_pipelin
   p->window = window;
   zs_classifier_consensus_init(&p->votes);
   zs_air_gate_init(&p->gate);
+  zs_bearing_init(&p->bearing_ctx, NULL);
   p->classification.unknown = true;
   p->next_window_end = ZS_PIPELINE_WINDOW_SAMPLES;
   return true;
@@ -47,8 +49,38 @@ void zs_station_pipeline_fill_detection(const zs_station_pipeline_t *p, uint64_t
     if (d->hierarchy.family_status == ZS_DECISION_UNKNOWN) d->hierarchy.family_status = ZS_DECISION_CANDIDATE;
   }
   memcpy(d->features, p->features, sizeof(d->features));
+  if (p->last_bearing.valid && p->last_bearing_end == end_sample) {
+    const zs_bearing_t *b = &p->last_bearing;
+    long az = lroundf(b->azimuth_deg * 100.0f) % 36000L;
+    const long sigma = lroundf(b->sigma_deg * 100.0f);
+    if (az < 0) az += 36000L;
+    d->doa.azimuth_cdeg = (uint16_t)az;
+    d->doa.elevation_cdeg = (int16_t)lroundf(b->elevation_deg * 100.0f);
+    d->doa.sigma_cdeg = (uint16_t)(sigma > 65535L ? 65535L : sigma);
+    d->doa.valid = true;
+    d->spatial.tdoa12_us = (int16_t)lroundf(b->tdoa_us[0]);
+    d->spatial.tdoa13_us = (int16_t)lroundf(b->tdoa_us[1]);
+    d->spatial.tdoa14_us = (int16_t)lroundf(b->tdoa_us[2]);
+    d->spatial.residual_us = (uint16_t)lroundf(b->residual_us);
+    d->spatial.confidence_u8 = (uint8_t)lroundf(b->confidence * 255.0f);
+    d->spatial.geometry_id = p->bearing_ctx.geometry.geometry_id;
+    d->spatial.valid_flags = 0x03u;                                   /* TDOAs and direction valid */
+  }
   d->sample_rate_hz = ZS_AIR_SAMPLE_RATE;
   d->detector_profile = detector_profile_for(p->hierarchy.family_id);
+}
+
+_Static_assert(ZS_PIPELINE_WINDOW_SAMPLES >= ZS_BEARING_FRAME_MEMORY, "the 1 s window lends the bearing frames");
+_Static_assert(ZS_AIR_SCRATCH_COMPLEX * sizeof(zs_complex_t) >= sizeof(zs_spatial_gcc_workspace_t), "the gate scratch lends the GCC workspace");
+
+/* Bearing of a CONFIRMED window from the 4-channel ring; the window and the gate scratch are idle by now. */
+static void update_bearing(zs_station_pipeline_t *p, uint64_t end_sample) {
+  const float t = p->port->temperature_c ? p->port->temperature_c(p->port->ctx) : 15.0f;
+  p->last_bearing.valid = false;
+  if (!p->ring) return;
+  if (zs_bearing_from_ring(&p->bearing_ctx, p->ring, end_sample, ZS_PIPELINE_BEARING_SPAN, t, p->window,
+                           (zs_spatial_gcc_workspace_t *)(void *)p->scratch, &p->last_bearing))
+    p->last_bearing_end = end_sample;
 }
 
 static void emit(zs_station_pipeline_t *p, uint64_t end_sample) {
@@ -75,8 +107,13 @@ bool zs_station_pipeline_push_window(zs_station_pipeline_t *p, const int16_t *pc
     default: break;
   }
   if (p->presence.level == ZS_PRESENCE_CONFIRMED) {
-    if (!p->confirmed) { p->confirmed = true; emit(p, end_sample); }               /* rising edge */
-    else if (++p->windows_since_event >= period) emit(p, end_sample);              /* keep-alive update */
+    update_bearing(p, end_sample);
+    if (!p->confirmed) {                                                            /* rising edge */
+      p->confirmed = true;
+      emit(p, end_sample);
+      p->track_event_id = ((uint64_t)p->port->boot_id << 32) | p->seq_no;
+    } else if (++p->windows_since_event >= period) emit(p, end_sample);            /* keep-alive update */
+    if (p->last_bearing.valid && p->port->bearing) p->port->bearing(p->port->ctx, &p->last_bearing, end_sample, p->track_event_id);
   } else {
     p->confirmed = false;
     p->windows_since_event = 0u;
@@ -93,6 +130,7 @@ bool zs_station_pipeline_fetch(zs_station_pipeline_t *p, const zs_audio_ring_t *
   }
   if (p->next_window_end > ring->total_frames) return false;
   if (!zs_audio_ring_copy_mono(ring, p->next_window_end, ZS_PIPELINE_WINDOW_SAMPLES, p->window, p->port->channel)) return false;
+  p->ring = ring;
   p->pending_end = p->next_window_end;
   p->pending = true;
   p->next_window_end += ZS_PIPELINE_HOP_SAMPLES;

@@ -255,7 +255,10 @@ def main() -> int:
                     duplicates += 1
                 seen_event_ids.add(d.event_id)
                 detections.append({"event_id": d.event_id, "seq_no": d.seq_no, "boot_id": d.boot_id, "time_us": d.event_time_us,
-                                   "class_id": d.classification.class_id, "confidence": d.classification.confidence_u8, "duplicate": dup, "via": "gsm"})
+                                   "class_id": d.classification.class_id, "confidence": d.classification.confidence_u8, "duplicate": dup, "via": "gsm",
+                                   "doa": {"valid": d.doa.valid, "azimuth_deg": d.doa.azimuth_deg, "elevation_deg": d.doa.elevation_deg,
+                                           "sigma_deg": d.doa.sigma_deg} if d.doa.valid else None,
+                                   "tdoa_valid": d.spatial.tdoa_valid})
                 receipt = EventReceipt(station_id=d.station_id, boot_id=d.boot_id, seq_no=d.seq_no, event_id=d.event_id,
                                        payload_sha256=hashlib.sha256(payload).digest())
                 reply = f"PUB {prefix}/{tenant}/{station}/receipt {encode_event_receipt(receipt).hex()}\n"

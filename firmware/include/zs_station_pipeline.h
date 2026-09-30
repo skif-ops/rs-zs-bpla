@@ -9,12 +9,16 @@
  *     `update_period_windows` while it stays CONFIRMED (the server keeps the track alive on updates);
  *   - SUSPECT / ENGINE_UNCONFIRMED are counted and exposed for diagnostics, never sent as detections;
  *   - the event carries the last window's 43 features, the consensus classification/hierarchy, the
- *     level-1 confidence and the detector profile (piston / reactive / generic) of the consensus family.
+ *     level-1 confidence and the detector profile (piston / reactive / generic) of the consensus family;
+ *   - while CONFIRMED every window also gets a bearing of the 3+1 array (zs_bearing, the last 0.5 s of the window
+ *     from the 4-channel ring): the event carries it as DOA (key 11) and the reference TDOAs (key 14), and the
+ *     bearing port, when set, receives each one (the bearing stream while tracking).
  * The module is portable: the extractor, the clock, the identity and the event sink are ports, the
  * 1 s mono window and the 64 KB gate scratch are caller-provided (the target overlays them on DSP memory).
  */
 #include "zs_air_gate.h"
 #include "zs_audio.h"
+#include "zs_bearing.h"
 #include "zs_classifier_consensus.h"
 #include "zs_dsp.h"
 #include "zs_presence.h"
@@ -23,6 +27,7 @@
 #define ZS_PIPELINE_WINDOW_SAMPLES 32000u
 #define ZS_PIPELINE_HOP_SAMPLES 16000u
 #define ZS_PIPELINE_DEFAULT_UPDATE_WINDOWS 10u   /* 5 s at the 0.5 s hop */
+#define ZS_PIPELINE_BEARING_SPAN ZS_PIPELINE_HOP_SAMPLES   /* the newest 0.5 s of a window, still in a 1.125 s ring */
 
 typedef struct {
   void *ctx;
@@ -36,6 +41,10 @@ typedef struct {
   uint32_t boot_id;
   uint8_t channel;                 /* ring channel analysed (0..ZS_AUDIO_CHANNELS-1) */
   uint8_t update_period_windows;   /* 0 = ZS_PIPELINE_DEFAULT_UPDATE_WINDOWS */
+  /* Optional: air temperature for the speed of sound (NULL = 15 C; azimuth barely depends on it). */
+  float (*temperature_c)(void *ctx);
+  /* Optional: every valid bearing of a CONFIRMED window (end_sample = the window's last sample). */
+  void (*bearing)(void *ctx, const zs_bearing_t *bearing, uint64_t end_sample, uint64_t track_event_id);
 } zs_station_pipeline_port_t;
 
 typedef struct {
@@ -60,6 +69,11 @@ typedef struct {
   uint32_t seq_no;
   uint16_t windows_since_event;    /* while CONFIRMED */
   bool confirmed;                  /* current level-1 state */
+  const zs_audio_ring_t *ring;     /* set by fetch: the 4-channel source of the bearings */
+  zs_bearing_ctx_t bearing_ctx;
+  zs_bearing_t last_bearing;       /* of the window ending at last_bearing_end */
+  uint64_t last_bearing_end;
+  uint64_t track_event_id;         /* event id of the rising edge of the current CONFIRMED run */
 } zs_station_pipeline_t;
 
 bool zs_station_pipeline_init(zs_station_pipeline_t *p, const zs_station_pipeline_port_t *port,

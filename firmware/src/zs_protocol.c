@@ -121,7 +121,7 @@ static size_t encode_detection_impl(const zs_detection_t *m, uint8_t *out, size_
   if (full) {
     zs_cbor_uint(&c, 11);
     zs_cbor_map(&c, 4);
-    kvi(&c, 0, m->doa.azimuth_cdeg);
+    kvu(&c, 0, m->doa.azimuth_cdeg);
     kvi(&c, 1, m->doa.elevation_cdeg);
     kvu(&c, 2, m->doa.sigma_cdeg);
     kvb(&c, 3, m->doa.valid);

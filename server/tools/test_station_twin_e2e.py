@@ -3,7 +3,8 @@
 `station_twin_e2e`, with ZS_STATION_TWIN pointing at the freshly built binary).
 
 Runs zs_station_twin with the Python server twin on the pipe and checks the server-side report:
-  1. a drone fly-by is detected, published over GSM, acknowledged, no duplicates; the audio prehistory ring holds the
+  1. a drone fly-by is detected, published over GSM, acknowledged, no duplicates; the event carries the on-board
+     bearing of the 3+1 array (DOA within 5 deg of the rendered plane wave); the audio prehistory ring holds the
      seconds around the event, including the post-event window; the server asks for the event's audio
      (CMD_REQUEST_AUDIO, both segments) right after the receipt, the station waits for the post-event window, uploads
      both segments chunk by chunk and acknowledges with the chunk count; the server stores them through the bridge's
@@ -92,13 +93,19 @@ def main() -> int:
     assert "accepted (segment 2, station time)" in log                 # the station's own table serves its events
     # the server side ran the bridge's ingest: the request is closed in the store and no part is left over
     assert r["audio_store"] == {"acked": True, "ack_result": 0, "ack_detail": r["audio_chunks"], "pending_parts": 0}, r["audio_store"]
+    # the on-board bearing (3+1 array, zs_bearing) reaches the server as the event's DOA, next to the rendered truth
+    truth = next(l for l in log.splitlines() if "station: event" in l and "doa valid" in l)
+    truth_az = float(truth.split("truth az ")[1].split()[0])
+    first = next(e for e in r["events"] if e["doa"])
+    assert first["tdoa_valid"] and abs((first["doa"]["azimuth_deg"] - truth_az + 180) % 360 - 180) < 5.0, (first, truth)
     pre, post = segs["pre"], segs["post"]
     assert pre["seconds"] >= 10 and post["seconds"] >= 25, segs                        # continuous audio on both sides
     assert pre["start_time_us"] + pre["seconds"] * 1e6 > event["time_us"] - 1e6       # pre reaches the event
     assert post["start_time_us"] <= event["time_us"] < post["start_time_us"] + 1e6     # post starts at the event
     print(f"scenario 1 (drone over GSM): detections {r['detections']}, heartbeats {r['heartbeats']}, duplicates {r['duplicates']}; "
           f"prehistory: {rec_line.split('around the first event: ')[1]}; audio upload: {r['audio_chunks']} chunks, "
-          f"pre {pre['seconds']:.0f} s + post {post['seconds']:.0f} s assembled, ACK OK")
+          f"pre {pre['seconds']:.0f} s + post {post['seconds']:.0f} s assembled, ACK OK; DOA az {first['doa']['azimuth_deg']:.1f} "
+          f"(truth {truth_az:.1f}) sigma {first['doa']['sigma_deg']:.1f} deg")
 
     log, r = run(["--scene", "drone", "--seconds", "140", "--seed", "3", "--receipt-latency", "2000", "--expect-events", "1",
                   "--expect-delivered", "1", "--forget-events"], audio="both")

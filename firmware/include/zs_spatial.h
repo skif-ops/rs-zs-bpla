@@ -56,4 +56,18 @@ bool zs_spatial_gcc_phat_delay_us(const int16_t *reference,
                                   float *delay_us,
                                   float *quality);
 
+/* The three reference delays of one frame (t_j - t_1, j = 2..4, microseconds) with a single transform of the
+   reference channel: 4 FFT + 3 IFFT instead of 6 + 3.  Same results as three zs_spatial_gcc_phat_delay_us() calls
+   against channels[0]; coherence[j] is the PHAT peak relative to a fully coherent pair (0..1: ~0.1 for independent
+   noise, ~0.3-0.9 for a source above the noise), a better gate than the peak-to-mean ratio of the short lag range. */
+bool zs_spatial_gcc_phat_reference_delays(const int16_t *const channels[ZS_SPATIAL_MIC_COUNT],
+                                          size_t sample_count,
+                                          uint32_t sample_rate_hz,
+                                          float max_delay_us,
+                                          float fmin_hz,
+                                          float fmax_hz,
+                                          zs_spatial_gcc_workspace_t *workspace,
+                                          float delay_us[ZS_SPATIAL_REF_TDOA_COUNT],
+                                          float coherence[ZS_SPATIAL_REF_TDOA_COUNT]);
+
 #endif

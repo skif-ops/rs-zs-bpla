@@ -245,10 +245,10 @@ assembled-station evidence.
 | 8 | position, GNSS, classification, detector profile, sample rate |
 | 9 | 43 float16 features, только full packet |
 | 10 | power and route status; INA226 extension described below |
-| 11 | DOA block, только full packet |
+| 11 | DOA block, только full packet: 0 azimuth, uint сотые градуса 0..35999 по часовой от севера; 1 elevation, int сотые градуса; 2 sigma, uint сотые градуса; 3 valid. С 2026-09-30 станция заполняет его пеленгом решётки 3+1 для окон CONFIRMED (`zs_bearing`) |
 | 12 | hierarchical classification |
 | 13 | single-station estimate |
-| 14 | 3+1 spatial block, `geometry_id=1` |
+| 14 | 3+1 spatial block, `geometry_id=1`: медианные t_j − t_1 (мкс) того же пеленга, остаток решателя, уверенность |
 
 ### 3.1 Key 10 power/route sub-map
 
