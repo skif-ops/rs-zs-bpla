@@ -77,7 +77,8 @@ def close(actual: float, expected: float, tolerance: float, label: str) -> None:
 
 
 def rel(path: Path) -> str:
-    return str(path.resolve().relative_to(ROOT))
+    # Git object names always use forward slashes, including on Windows.
+    return path.resolve().relative_to(ROOT).as_posix()
 
 
 def sha256(path: Path) -> str:
@@ -574,12 +575,48 @@ def main() -> int:
     mechanical = audit_mechanical(board)
     status_record = json.loads(STATUS.read_text(encoding="utf-8"))
     review_a = status_record["review_a"]
-    require(status_record["review_b"]["complete"] is False and
-            status_record["manufacturing_release"] is False,
-            "PCB-MIC review state silently promoted manufacturing release")
-
     release_state = status_record["release_state"]
-    if release_state == "REVIEW_A_PASS":
+    if release_state == "REVIEW_B_PASS_CONTROLLED_FIRST_ARTICLE":
+        review_b = status_record["review_b"]
+        require(review_a["complete"] is True and review_a["status"] == "PASS",
+                "PCB-MIC historical Review A record is incomplete")
+        require(review_b.get("complete") is True
+                and review_b.get("decision") == "ACCEPT_CONTROLLED_FIRST_ARTICLE",
+                "PCB-MIC Review B controlled release is incomplete")
+        require(status_record.get("manufacturing_release") is True,
+                "PCB-MIC controlled manufacturing release flag is false")
+        reviewed_commit = str(review_b.get("reviewed_design_commit_sha", ""))
+        require(re.fullmatch(r"[0-9a-f]{40}", reviewed_commit) is not None,
+                "PCB-MIC Review B design commit is invalid")
+        require(commit_available(reviewed_commit),
+                "PCB-MIC Review B design commit is unavailable")
+        require(source_path_matches_commit(reviewed_commit, board_path),
+                "current PCB-MIC board differs from the Review B design commit")
+        require(review_b.get("approved_native_board_sha256") == sha256(board_path),
+                "PCB-MIC Review B board SHA mismatch")
+        reviewed_source_commit_match = source_matches_commit(
+            reviewed_commit,
+            [board_path, DEFAULT_SCHEMATIC, T5838_LIBRARY, MOLEX_LIBRARY,
+             FABRICATION_METADATA],
+        )
+        report_status = "PASS_GEOMETRY_EVIDENCE_REVIEW_B_CONTROLLED_FIRST_ARTICLE"
+        review_a_signature = {
+            "reviewer": review_a["reviewer"],
+            "date": review_a["date"],
+            "reviewed_commit_sha": review_a["commit_sha"],
+            "role": "HISTORICAL_BASELINE",
+        }
+        superseded_signature = None
+        remaining_review_a_evidence = []
+        review_summary = (
+            f"Review B signed by {review_b['reviewer']} on {review_b['date']} "
+            f"for design commit {reviewed_commit}; controlled first-article release"
+        )
+        release_effect = "CONTROLLED_FIRST_ARTICLE_FABRICATION_AND_PCBA"
+    elif release_state == "REVIEW_A_PASS":
+        require(status_record["review_b"]["complete"] is False and
+                status_record["manufacturing_release"] is False,
+                "PCB-MIC Review-A state silently promoted manufacturing release")
         require(review_a["complete"] is True and review_a["status"] == "PASS",
                 "PCB-MIC Review A is not a signed PASS")
         require(all(review_a.get(field) for field in ("reviewer", "date", "commit_sha")),
@@ -618,7 +655,11 @@ def main() -> int:
             f"Review A signed PASS by {review_a['reviewer']} on {review_a['date']} "
             f"for {review_a['commit_sha']}; Review B and manufacturing release remain open"
         )
+        release_effect = "NONE_NOT_FOR_MANUFACTURE"
     else:
+        require(status_record["review_b"]["complete"] is False and
+                status_record["manufacturing_release"] is False,
+                "PCB-MIC post-ECO state silently promoted manufacturing release")
         require(release_state == "REVIEW_A_REQUIRED_AFTER_COPPER_ECO",
                 f"unexpected PCB-MIC release state: {release_state}")
         require(review_a["complete"] is False
@@ -687,6 +728,7 @@ def main() -> int:
             f"ECO candidate geometry PASS for {commit_sha}; prior Review A at "
             f"{prior_commit} is superseded and repeat Review A remains required"
         )
+        release_effect = "NONE_NOT_FOR_MANUFACTURE"
 
     report = {
         "status": report_status,
@@ -721,7 +763,7 @@ def main() -> int:
             "panelization and acoustic membrane/cavity stack",
             "physical calibration and acoustic EVT",
         ],
-        "release_effect": "NONE_NOT_FOR_MANUFACTURE",
+        "release_effect": release_effect,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

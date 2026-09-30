@@ -45,12 +45,15 @@ PCB_PWR_STACKUP_COPPER_AUDIT = ROOT / "tools" / "audit_pcb_pwr_stackup_copper_re
 PCB_MIC_STATUS = ROOT / "hardware" / "PCB_MIC_CAPTURE_STATUS_REV_A.json"
 PCB_PWR_STATUS = ROOT / "hardware" / "PCB_PWR_CAPTURE_STATUS_REV_A.json"
 PRODUCTION_BOM = ROOT / "hardware" / "EVT_PRE_20_BOM_REV_A.csv"
-PCB_MIC_REVIEW_B_AUDIT = ROOT / "tools" / "audit_pcb_mic_review_b_preflight_rev_a.py"
+PCB_MIC_REVIEW_B_AUDIT = ROOT / "tools" / "audit_pcb_mic_review_b_release_rev_b.py"
 PCB_MIC_COPPER_RETURN_AUDIT = ROOT / "tools" / "audit_pcb_mic_copper_return_rev_a.py"
 PCB_MIC_HANDOFF_AUDIT = ROOT / "tools" / "audit_pcb_mic_manufacturing_handoff_rev_a.py"
 PCB_MIC_HANDOFF_SOURCES = [
-    ROOT / "hardware" / "reviews" / "PCB_MIC_MANUFACTURING_HANDOFF_REV_A.md",
-    ROOT / "hardware" / "reviews" / "PCB_MIC_MANUFACTURING_HANDOFF_REV_A.json",
+    ROOT / "hardware" / "reviews" / "PCB_MIC_MANUFACTURING_HANDOFF_REV_B.md",
+    ROOT / "hardware" / "reviews" / "PCB_MIC_MANUFACTURING_HANDOFF_REV_B.json",
+    ROOT / "hardware" / "reviews" / "PCB_MIC_REVIEW_B_CHECKLIST_REV_B.md",
+    ROOT / "hardware" / "reviews" / "PCB_MIC_REVIEW_B_APPROVAL_REV_B.json",
+    ROOT / "hardware" / "reviews" / "PCB_MIC_PARITY_DISPOSITION_REV_B.csv",
     ROOT / "hardware" / "reviews" / "PCB_MIC_DFM_RESPONSE_REV_A.csv",
 ]
 
@@ -865,26 +868,34 @@ def main() -> int:
         mic_pcb_ok = str(mic["pcb_state"]).startswith("CLI_DRC_FAB_EXPORT_METADATA_PASS")
         mic_sch_ok = str(mic["sch_state"]).startswith("CLI_ERC_PDF_BOM_PASS")
         if mic_pcb_ok and mic_sch_ok:
-            copper_audit_output = ART / "PCB-MIC" / "copper_return_review_audit.json"
-            copper_audit_rc = run(
-                [
-                    sys.executable,
-                    str(PCB_MIC_COPPER_RETURN_AUDIT.relative_to(ROOT)),
-                    "--artifact-root", str(ART / "PCB-MIC"),
-                    "--output", str(copper_audit_output),
-                    "--commit-sha", git_head(),
-                    "--require-clean-source",
-                ],
-                check=False,
-            )
-            if copper_audit_rc == 0:
-                copper_report = json.loads(copper_audit_output.read_text(encoding="utf-8"))
-                mic["copper_return_review_state"] = copper_report["review_b_disposition"]
-            else:
-                mic["copper_return_review_state"] = f"FAIL_rc{copper_audit_rc}"
-                cli_failures.append(
-                    f"PCB-MIC: COPPER_RETURN_AUDIT_FAIL_rc{copper_audit_rc}"
+            mic_status = json.loads(PCB_MIC_STATUS.read_text(encoding="utf-8"))
+            signed_review_b = mic_status.get("review_b", {}).get("complete") is True
+            if signed_review_b:
+                copper_audit_rc = 0
+                mic["copper_return_review_state"] = (
+                    "PASS_HISTORICAL_SUBGATE_CARRIED_IN_SIGNED_REVIEW_B"
                 )
+            else:
+                copper_audit_output = ART / "PCB-MIC" / "copper_return_review_audit.json"
+                copper_audit_rc = run(
+                    [
+                        sys.executable,
+                        str(PCB_MIC_COPPER_RETURN_AUDIT.relative_to(ROOT)),
+                        "--artifact-root", str(ART / "PCB-MIC"),
+                        "--output", str(copper_audit_output),
+                        "--commit-sha", git_head(),
+                        "--require-clean-source",
+                    ],
+                    check=False,
+                )
+                if copper_audit_rc == 0:
+                    copper_report = json.loads(copper_audit_output.read_text(encoding="utf-8"))
+                    mic["copper_return_review_state"] = copper_report["review_b_disposition"]
+                else:
+                    mic["copper_return_review_state"] = f"FAIL_rc{copper_audit_rc}"
+                    cli_failures.append(
+                        f"PCB-MIC: COPPER_RETURN_AUDIT_FAIL_rc{copper_audit_rc}"
+                    )
 
             if copper_audit_rc == 0:
                 audit_output = ART / "PCB-MIC" / "review_b_preflight_audit.json"
