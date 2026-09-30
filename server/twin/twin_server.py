@@ -25,8 +25,8 @@ key into a real ``ReleaseRepository``; every ``fwreq`` is answered by the bridge
 store (``ZS_TWIN_FW_DROP=n`` drops the n-th request, as a lost chunk would; ``ZS_TWIN_FW_REDELIVER=1`` sends the command
 envelope again after the second chunk, as a QoS 1 redelivery during the download would).  Network configuration (addendum G): ``set_network`` queues CMD_SET_NETWORK_CONFIG moving the station to
 ``muhoed2.twin:443`` (the same twin behind a second name, which the twin modem reaches), ``set_network_bad`` one to a
-host no DNS knows (the station must roll back).  A final ``REPORT`` line summarises what
-arrived.
+host no DNS knows (the station must roll back).  Bearing stream (addendum H): batches on the bearing topic are
+decoded with the server codec and listed in the report.  A final ``REPORT`` line summarises what arrived.
 Run by the twin: ``python3 -m twin.twin_server`` from the server/ directory.
 """
 from __future__ import annotations
@@ -45,6 +45,7 @@ import importlib.util
 from station import cbor_codec
 from station import firmware_codec
 from station import lora_codec
+from station.bearing_codec import decode_bearing_batch
 from station.command_codec import CommandKeyring, CommandSigner, decode_command_ack, encode_signed_command
 from station.event_receipt_codec import EventReceipt, encode_event_receipt
 from station.audio_ingest import ingest_audio_chunk
@@ -141,6 +142,7 @@ def main() -> int:
     fw_requests = 0
     fw_served = 0
     fw_dropped = 0
+    bearing_batches: list[dict] = []
 
     def request_audio(detection) -> str:
         """A signed CMD_REQUEST_AUDIO for the event, sent right after its receipt (second reply line)."""
@@ -235,6 +237,8 @@ def main() -> int:
                              "served": fw_served, "dropped": fw_dropped,
                              "chunks": (release.manifest.size + firmware_codec.CHUNK_BYTES - 1) // firmware_codec.CHUNK_BYTES if release else 0},
                 "events": detections[:20],
+                "bearing_batches": len(bearing_batches),
+                "bearings": [dict(s, track_event_id=b["track_event_id"]) for b in bearing_batches for s in b["samples"]],
             }
             out.write("REPORT " + json.dumps(report) + "\n"); out.flush()
             continue
@@ -308,6 +312,14 @@ def main() -> int:
                         commands_sent.append({"command_id": fw_command[0], "command": "CMD_UPDATE_FIRMWARE", "key_id": key_ids[fw_command[0]]})
                         reply += f"PUB {down_topic} {signed[fw_command[0]].hex()}\n"
                     out.write(reply); out.flush()
+            elif kind == "bearing":
+                batch = decode_bearing_batch(payload)
+                if batch.station_id != int(station):
+                    raise ValueError("station_id mismatch between topic and bearing batch")
+                bearing_batches.append({"track_event_id": batch.track_event_id, "time_trust": batch.time_trust,
+                                        "samples": [{"time_us": x.time_us, "azimuth_deg": x.azimuth_deg,
+                                                     "elevation_deg": x.elevation_deg, "sigma_deg": x.sigma_deg} for x in batch.samples]})
+                out.write("OK\n"); out.flush()
             elif kind == "status":
                 h = cbor_codec.decode_heartbeat_cbor(payload)
                 key_store.upsert_station(h)
