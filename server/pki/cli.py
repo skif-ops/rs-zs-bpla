@@ -324,6 +324,46 @@ def cmd_nrf_boot_key(a):
     print(f'build: west build -b evt_pre_20_ble firmware/targets/nrf52840_ble -- -DSB_CONFIG_BOOT_SIGNATURE_KEY_FILE=\\"{k.key_path.as_posix()}\\"')
 
 
+def cmd_fw_release_key(a):
+    """[offline] Ed25519 release key for the station firmware (MQTT ICD addendum F); its public key is compiled into
+    the firmware (-DZS_FW_RELEASE_PUBLIC_KEYS=<hex>).  Never on the server: the server only forwards signed releases."""
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    from station.firmware_codec import ReleaseSigner
+    path = Path(a.out)
+    if path.exists() and not a.show:
+        raise pki.PkiError(f"{path} exists (use --show to print its public key)")
+    if not a.show:
+        key = Ed25519PrivateKey.generate()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(key.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()))
+        os.chmod(path, 0o600)
+    signer = ReleaseSigner.from_pem_file(path)
+    print(f"release key: {path}")
+    print(f"release key id: {signer.key_id.hex()}")
+    print(f"public key: {signer.public_key_hex}")
+    print(f"build: cmake ... -DZS_FW_RELEASE_PUBLIC_KEYS={signer.public_key_hex} -DZS_FW_VERSION_CODE=<n>")
+
+
+def cmd_fw_sign(a):
+    """[offline] Sign a station application image into a release repository (manifest + signature next to the
+    image); target and version come from the image's .fw_info block."""
+    from station.firmware_codec import STM32_IMAGE_CAPACITY, TARGET_STM32_APP, ReleaseRepository, ReleaseSigner, parse_fw_info
+    image = Path(a.image).read_bytes()
+    try:
+        info = parse_fw_info(image)
+    except ValueError as exc:
+        raise pki.PkiError(str(exc)) from None
+    if info.target == TARGET_STM32_APP and len(image) > STM32_IMAGE_CAPACITY:
+        raise pki.PkiError(f"image of {len(image)} bytes exceeds the bank's {STM32_IMAGE_CAPACITY}")
+    repo = ReleaseRepository(a.out)
+    if repo.get(info.version) is not None and not a.force:
+        raise pki.PkiError(f"release {info.version} already exists in {a.out} (--force replaces it)")
+    release = repo.add(image, ReleaseSigner.from_pem_file(a.key))
+    print(f"release v{release.manifest.version} target {release.manifest.target}: {release.manifest.size} bytes, "
+          f"sha256 {release.manifest.sha256.hex()}, release key id {release.key_id.hex()} -> {a.out}")
+
+
 def cmd_engineer_key(a):
     """B.9 engineer key of one station for the engineer's app (audited export) or a rotation."""
     reg = _registry(Path(a.pki))
@@ -441,6 +481,10 @@ def main(argv=None):
     s.add_argument("--topic-prefix", default="zs/v1"); s.add_argument("--png", action="store_true")
     s = add("nrf-boot-key", cmd_nrf_boot_key, help="create (or --show) the MCUboot signing key for the nRF52840 bridge images")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--force", action="store_true"); s.add_argument("--show", action="store_true")
+    s = add("fw-release-key", cmd_fw_release_key, help="[offline] create (or --show) the Ed25519 firmware release key (addendum F)")
+    s.add_argument("--out", required=True); s.add_argument("--show", action="store_true")
+    s = add("fw-sign", cmd_fw_sign, help="[offline] sign an application image into a release repository (addendum F)")
+    s.add_argument("--key", required=True); s.add_argument("--image", required=True); s.add_argument("--out", required=True); s.add_argument("--force", action="store_true")
     s = add("engineer-key", cmd_engineer_key, help="B.9 engineer key of a station: print/export (audited) or --rotate <reason>")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--to", default="engineer"); s.add_argument("--out"); s.add_argument("--rotate")
     s = add("station-secrets", cmd_station_secrets, help="v0.3 station_secrets bundle for the commissioning phone (engineer key, ICCIDs, command public key)")
