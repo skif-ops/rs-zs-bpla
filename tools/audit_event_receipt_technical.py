@@ -214,6 +214,7 @@ def audit_firmware_runtime() -> None:
             (
                 "firmware/tests/test_bg95_mqtt_session.c",
                 "firmware/src/zs_bg95_mqtt_session.c",
+                "firmware/src/zs_bg95_topic_subscription.c",
                 "firmware/src/zs_bg95_command_transport.c",
                 "firmware/src/zs_bg95_event_receipt.c",
                 "firmware/src/zs_bg95_event_uplink.c",

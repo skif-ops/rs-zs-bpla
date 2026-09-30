@@ -65,6 +65,8 @@ def main() -> int:
             "@router.get('/stations/{station_id}/events/{event_id}/audio/{segment}.wav')",
             # operator queues a command key rotation (addendum E); goes to the station over MQTT only
             "@router.post('/stations/{station_id}/command-key-rotation')",
+            # operator queues a firmware update (addendum F); the image goes to the station over MQTT only
+            "@router.post('/stations/{station_id}/firmware-update')",
         },
         f"station transport route bypasses guarded router: {unguarded_station_decorators}",
     )
