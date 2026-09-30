@@ -23,7 +23,8 @@ MANIFEST_SCHEMA = 1
 MANIFEST_MAX_BYTES = 96
 TARGET_STM32_APP = 1
 TARGET_NRF52 = 2
-TARGETS = {TARGET_STM32_APP: "stm32-app", TARGET_NRF52: "nrf52"}
+TARGET_MODEL = 3                     # station classifier model package (addendum I, station/model_codec.py)
+TARGETS = {TARGET_STM32_APP: "stm32-app", TARGET_NRF52: "nrf52", TARGET_MODEL: "model"}
 FW_INFO_OFFSET = 0x400
 FW_INFO_BYTES = 32
 FW_INFO_MAGIC = 0x464F4944          # "DIOF" little-endian
@@ -36,9 +37,10 @@ CHUNK_BYTES = 1024
 REQUEST_MAX_BYTES = 48
 SERVE_WINDOW_US = 24 * 3600 * 1_000_000
 UPDATE_COMMAND = "CMD_UPDATE_FIRMWARE"
-REJECT_DETAILS = {1: "not supported (no release key)", 2: "manifest or signature", 3: "wrong target", 4: "version not newer",
-                  5: "image too large", 6: "another update running", 7: "running image still on trial"}
-FAIL_DETAILS = {1: "flash error", 2: "SHA-256 mismatch", 3: ".fw_info mismatch", 4: "download stalled"}
+REJECT_DETAILS = {1: "not supported (no release key)", 2: "manifest or signature", 3: "wrong target",
+                  4: "version not newer (model: already active)", 5: "image too large", 6: "another update running",
+                  7: "running image still on trial"}
+FAIL_DETAILS = {1: "flash error", 2: "SHA-256 mismatch", 3: ".fw_info mismatch (model: package check)", 4: "download stalled"}
 
 
 def _canonical(obj: object) -> bytes:
@@ -258,12 +260,13 @@ class ReleaseRepository:
     release; every load re-checks size and SHA-256 of the image against the manifest."""
 
     NAME = re.compile(r"^([1-9][0-9]*)\.manifest\.cbor$")
+    manifest_for = staticmethod(manifest_for_image)   # the model repository (station/model_codec.py) swaps it
 
     def __init__(self, root: str | Path):
         self.root = Path(root)
 
     def add(self, image: bytes, signer: ReleaseSigner) -> Release:
-        manifest = manifest_for_image(image)
+        manifest = self.manifest_for(image)
         manifest_bytes = manifest.encode()
         signature = signer.sign(manifest_bytes)
         self.root.mkdir(parents=True, exist_ok=True)
@@ -292,21 +295,25 @@ class ReleaseRepository:
 
 
 def serve_request(payload: bytes, topic_station_id: int, *, event_store, repository: ReleaseRepository | None,
-                  now_us: int) -> tuple[FirmwareRequest, bytes] | None:
+                  now_us: int, model_repository: ReleaseRepository | None = None) -> tuple[FirmwareRequest, bytes] | None:
     """The bridge's answer to a fwreq (addendum F §2): the chunk, or None (dropped silently) when the command is not
     an unacknowledged CMD_UPDATE_FIRMWARE of this station from the last 24 h, the release is unknown or the range
-    leaves the image.  A malformed request raises ValueError."""
+    leaves the image.  A manifest of target 3 is served from the model repository (addendum I).  A malformed request
+    raises ValueError."""
     request = decode_request(payload)
     if request.station_id != topic_station_id:
         raise ValueError("station_id mismatch between topic and firmware request")
-    if repository is None:
+    if repository is None and model_repository is None:
         return None
     record = event_store.command_record(str(uuid.UUID(bytes=request.command_id)))
     if (record is None or record["command"] != UPDATE_COMMAND or record["station_id"] != request.station_id or
             record["acked"] or now_us - record["created_us"] > SERVE_WINDOW_US):
         return None
     wanted = decode_manifest(bytes.fromhex(record["payload"]["manifest"]))
-    release = repository.get(wanted.version)
+    source = model_repository if wanted.target == TARGET_MODEL else repository
+    if source is None:
+        return None
+    release = source.get(wanted.version)
     if release is None or release.manifest != wanted:
         return None
     if request.offset + request.length > wanted.size:
