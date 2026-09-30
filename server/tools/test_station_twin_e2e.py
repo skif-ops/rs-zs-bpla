@@ -39,6 +39,9 @@ Runs zs_station_twin with the Python server twin on the pipe and checks the serv
      endpoint.
   7b. a configuration whose host does not resolve: three failed bring-ups, rollback to the stored configuration, the
      station comes back over the old endpoint and its heartbeat reports the failed version.
+  8. model package (ICD addendum I): the same command with a manifest of target 3 for package m5 of the built-in
+     model; nine chunks from the model repository into the free slot, ACK OK, the package is active without a reset,
+     and after a CMD_REBOOT it is loaded from the store again: the heartbeat model text goes from c46 to m5.
 """
 from __future__ import annotations
 
@@ -248,6 +251,19 @@ def main() -> int:
     assert (det["net_config_version"], det["net_state"], det["net_failed_version"]) == (1, "ROLLED_BACK", 2), det
     print(f"scenario 7b (unreachable configuration): 3 failed bring-ups, rollback to v{det['net_config_version']}, "
           f"heartbeat {det['net_state']} (failed v{det['net_failed_version']})")
+
+    # model package m5 (addendum I), then a reboot: the store brings it back
+    log, r = run(["--scene", "quiet", "--seconds", "90", "--seed", "3", "--expect-reboots", "1"], commands="update_model,reboot")
+    m, acks = r["model"], r["acks"]
+    assert m["release_version"] == 5 and m["chunks"] == 9 and m["requests"] == 9, m
+    assert [(a["result"], a["detail"]) for a in acks] == [(0, 9), (0, 0)], acks
+    assert "model: update to m5 accepted (8520 bytes, active m0)" in log and "model: m5 active" in log
+    assert log.index("model: m5 active") > log.index("fw: download finished, result 0 detail 9"), "active only after the OK ACK"
+    assert "twin: model m5 loaded from the store" in log and "twin: RESET" not in log
+    assert r["heartbeat_model_ver"] == ["c46", "m5"], r["heartbeat_model_ver"]
+    assert r["last_heartbeat"]["detector"]["fw_state"] == "IDLE", "a model download is not a firmware state"
+    print(f"scenario 8 (model package): m5 in {m['chunks']} chunks, ACK OK, active without a reset, reloaded after the reboot; "
+          f"heartbeat model {' -> '.join(r['heartbeat_model_ver'])}")
     return 0
 
 

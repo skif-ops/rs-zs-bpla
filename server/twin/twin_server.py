@@ -25,8 +25,11 @@ key into a real ``ReleaseRepository``; every ``fwreq`` is answered by the bridge
 store (``ZS_TWIN_FW_DROP=n`` drops the n-th request, as a lost chunk would; ``ZS_TWIN_FW_REDELIVER=1`` sends the command
 envelope again after the second chunk, as a QoS 1 redelivery during the download would).  Network configuration (addendum G): ``set_network`` queues CMD_SET_NETWORK_CONFIG moving the station to
 ``muhoed2.twin:443`` (the same twin behind a second name, which the twin modem reaches), ``set_network_bad`` one to a
-host no DNS knows (the station must roll back).  Bearing stream (addendum H): batches on the bearing topic are
-decoded with the server codec and listed in the report.  A final ``REPORT`` line summarises what arrived.
+host no DNS knows (the station must roll back).  Model package (addendum I): ``update_model`` queues the same command
+for package m<``ZS_TWIN_MODEL_VERSION``, default 5> of the built-in model (tools/generate_model_update_vector.py) signed
+into a real ``ModelRepository``; its fwreq are served from it and the heartbeat model text turns into ``m5``.
+Bearing stream (addendum H): batches on the bearing topic are decoded with the server codec and listed in the report.
+A final ``REPORT`` line summarises what arrived.
 Run by the twin: ``python3 -m twin.twin_server`` from the server/ directory.
 """
 from __future__ import annotations
@@ -44,6 +47,7 @@ import importlib.util
 
 from station import cbor_codec
 from station import firmware_codec
+from station import model_codec
 from station import lora_codec
 from station.bearing_codec import decode_bearing_batch
 from station.command_codec import CommandKeyring, CommandSigner, decode_command_ack, encode_signed_command
@@ -76,6 +80,14 @@ def twin_release(repository: firmware_codec.ReleaseRepository, version: int) -> 
     return repository.add(gen.test_image(version=version, size=TWIN_FW_IMAGE_BYTES), signer)
 
 
+def twin_model(repository: model_codec.ModelRepository, version: int) -> firmware_codec.Release:
+    spec = importlib.util.spec_from_file_location("gen_model_update", Path(__file__).resolve().parents[2] / "tools" / "generate_model_update_vector.py")
+    gen = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gen)
+    signer = firmware_codec.ReleaseSigner(Ed25519PrivateKey.from_private_bytes(TWIN_RELEASE_SEED))
+    return repository.add(model_codec.encode_model(gen.builtin_model(), version), signer)
+
+
 def command_queue(spec: str) -> list[tuple[str, str, dict]]:
     """(command_id, command, payload) in delivery order; ``reboot_again`` reuses the reboot UUID."""
     queue: list[tuple[str, str, dict]] = []
@@ -95,6 +107,8 @@ def command_queue(spec: str) -> list[tuple[str, str, dict]]:
             queue.append((str(uuid.uuid4()), "CMD_REBOOT@old", {"delay_s": 10}))
         elif item == "update_firmware":
             queue.append((str(uuid.uuid4()), "CMD_UPDATE_FIRMWARE", {}))      # the payload comes from the release
+        elif item == "update_model":                  # addendum I: the same command, manifest target 3
+            queue.append((str(uuid.uuid4()), "CMD_UPDATE_FIRMWARE#model", {}))
         elif item == "set_network":                   # addendum G: the twin broker under its second name and port
             queue.append((str(uuid.uuid4()), NETWORK_COMMAND, dict(TWIN_NETWORK)))
         elif item == "set_network_bad":               # a host no DNS knows: the station must roll back
@@ -136,6 +150,10 @@ def main() -> int:
     redeliver = os.environ.get("ZS_TWIN_AUDIO_REDELIVER", "") == "1"
     repository = firmware_codec.ReleaseRepository(store_dir / "firmware")
     release = twin_release(repository, int(os.environ.get("ZS_TWIN_FW_VERSION", "2"))) if any(c[1] == "CMD_UPDATE_FIRMWARE" for c in queue) else None
+    models = model_codec.ModelRepository(store_dir / "models")
+    model_release = (twin_model(models, int(os.environ.get("ZS_TWIN_MODEL_VERSION", "5")))
+                     if any(c[1] == "CMD_UPDATE_FIRMWARE#model" for c in queue) else None)
+    model_requests = 0
     fw_drop = int(os.environ.get("ZS_TWIN_FW_DROP", "0") or 0)
     fw_redeliver = os.environ.get("ZS_TWIN_FW_REDELIVER", "") == "1"
     fw_command: list[str] = []
@@ -164,8 +182,12 @@ def main() -> int:
         station_id = int(down_topic.split("/")[3])
         by_old_key = name.endswith("@old")
         name = name.removesuffix("@old")
+        is_model = name.endswith("#model")
+        name = name.removesuffix("#model")
         if command_id not in signed:
-            if name == "CMD_UPDATE_FIRMWARE":           # the bridge serves the chunks against this store record
+            if is_model:
+                payload = model_release.command_payload()
+            elif name == "CMD_UPDATE_FIRMWARE":           # the bridge serves the chunks against this store record
                 payload = release.command_payload()
                 fw_command.append("")
             if name in ("CMD_ROTATE_COMMAND_KEY", "CMD_UPDATE_FIRMWARE"):   # the keyring / fw server read the store
@@ -236,6 +258,9 @@ def main() -> int:
                 "firmware": {"release_version": release.manifest.version if release else None, "requests": fw_requests,
                              "served": fw_served, "dropped": fw_dropped,
                              "chunks": (release.manifest.size + firmware_codec.CHUNK_BYTES - 1) // firmware_codec.CHUNK_BYTES if release else 0},
+                "model": {"release_version": model_release.manifest.version if model_release else None, "requests": model_requests,
+                          "chunks": (model_release.manifest.size + firmware_codec.CHUNK_BYTES - 1) // firmware_codec.CHUNK_BYTES if model_release else 0},
+                "heartbeat_model_ver": [h["model_ver"] for h in heartbeats],
                 "events": detections[:20],
                 "bearing_batches": len(bearing_batches),
                 "bearings": [dict(s, track_event_id=b["track_event_id"]) for b in bearing_batches for s in b["samples"]],
@@ -301,7 +326,9 @@ def main() -> int:
             elif kind == "fwreq":
                 fw_requests += 1
                 answer = firmware_codec.serve_request(payload, int(station), event_store=key_store, repository=repository,
-                                                      now_us=int(time.time() * 1_000_000))
+                                                      now_us=int(time.time() * 1_000_000), model_repository=models)
+                if answer is not None and model_release is not None and fw_command == []:
+                    model_requests += 1
                 if answer is None or fw_requests == fw_drop:
                     fw_dropped += answer is not None
                     out.write("OK\n"); out.flush()
@@ -324,6 +351,7 @@ def main() -> int:
                 h = cbor_codec.decode_heartbeat_cbor(payload)
                 key_store.upsert_station(h)
                 heartbeats.append({"time_us": h.time_us, "battery_pct": h.power.battery_pct, "battery_mv": h.power.battery_mv, "self_test_ok": h.self_test_ok,
+                                   "model_ver": h.model_ver,
                                    "detector": (h.detector.model_dump() if getattr(h, "detector", None) else None)})
                 out.write("OK\n"); out.flush()
             else:
