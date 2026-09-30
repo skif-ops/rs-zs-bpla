@@ -6,7 +6,8 @@
  *   gnss        - NMEA RMC parser stub: extracts UTC seconds for PPS labelling
  *   ble         - zs_ipc_service over USART3 to the nRF52840 bridge (ICD addendum C), window with S4 SERVICE
  *   dsp         - zs_station_pipeline: 1 s windows at a 0.5 s hop -> zs_dsp_mcu -> votes + AIR gate -> level 1 ->
- *                 detection events into the NOR outbox (fetch in the audio task, analysis here)
+ *                 detection events into the NOR outbox (fetch in the audio task, analysis here); after an event of a
+ *                 new track the tracking window keeps it running in S3 and streams the bearings (addendum H)
  *   comms       - app_comms: BG95 bring-up from the station configuration, MQTT session, outbox drain + heartbeat (B2)
  *   power       - app_power: INA226 on I2C2 every second -> power snapshot for heartbeat, events and the self-test
  *   lora        - app_lora: SX1262 fallback uplink of the outbox while the GSM link is degraded (DRY until the RF gate)
@@ -48,6 +49,7 @@
 #include "zs_station_secrets.h"
 #include "zs_command_keys.h"
 #include "zs_time.h"
+#include "zs_track_window.h"
 #include "zs_event_outbox.h"
 
 #include <stdarg.h>
@@ -167,6 +169,15 @@ static void apply_capture_gap(void) {
   taskEXIT_CRITICAL();
 }
 
+/* Tracking window (addendum H): opened by the DSP task on an event of a new track, it keeps the capture and the
+   detector running through S3 and the bearings flowing to the comms task; closed after APP_TRACK_LOST_WINDOWS windows
+   without CONFIRMED, after APP_TRACK_MAX_MS, or when the supervisor asks (the mode left S3, sleep, service). */
+static zs_track_window_t track;
+static volatile bool track_open;             /* DSP task writes; audio task and supervisor read */
+static volatile bool track_close_request;    /* supervisor -> DSP task */
+static volatile bool track_s3_extension;     /* a window opened in this S3 episode: its watchdog is extended until S3 ends */
+static bool gsm_degraded;                    /* defined with the GSM health below */
+
 /* ---- tasks ------------------------------------------------------------------ */
 static void audio_task_fn(void *arg) {
   (void)arg;
@@ -182,7 +193,7 @@ static void audio_task_fn(void *arg) {
        still there, hand it to the DSP task; a window that is still pending when the next one completes is skipped
        (dropped). S1 runs the same pipeline as S2 for now - the gate IS the pipeline's AIR gate + level 1; a cheaper
        listen-only gate is low-power work. */
-    if ((modes.mode == ZS_MODE_S1_LISTEN || modes.mode == ZS_MODE_S2_DSP) && dsp_task && zs_station_pipeline_fetch(&pipeline, &audio_ring))
+    if ((modes.mode == ZS_MODE_S1_LISTEN || modes.mode == ZS_MODE_S2_DSP || track_open) && dsp_task && zs_station_pipeline_fetch(&pipeline, &audio_ring))
       xTaskNotifyGive(dsp_task);
   }
 }
@@ -191,8 +202,16 @@ static void audio_task_fn(void *arg) {
 static bool pl_extract(void *ctx, const int16_t *pcm, size_t n, float out[ZS_FEATURE_COUNT]) { (void)ctx; return zs_dsp_mcu_extract_1s(&dsp_ctx, pcm, n, out); }
 static int64_t pl_sample_time(void *ctx, uint64_t sample) { (void)ctx; return zs_time_for_sample(&time_sync, sample); }
 static bool pl_emit(void *ctx, const zs_detection_t *d);
+/* every bearing of a CONFIRMED window while the tracking window is open goes to the live stream (addendum H), under
+   the window's track: a level-1 flicker inside the window (a new rising edge, a new event id) stays one track */
+static void pl_bearing(void *ctx, const zs_bearing_t *b, uint64_t end_sample, uint64_t track_event_id) {
+  zs_bearing_record_t r;
+  (void)ctx; (void)track_event_id;
+  if (!track_open) return;
+  if (zs_bearing_record_from(&r, track.track_event_id, zs_time_for_sample(&time_sync, end_sample), (uint8_t)time_sync.trust, b)) app_comms_bearing_push(&r);
+}
 /* boot_id starts as APP_BOOT_ID and is replaced by the NOR boot counter once the stores are bound (the pipeline reads it per event) */
-static zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, APP_STATION_ID, APP_BOOT_ID, 0u, 0u, NULL, NULL};
+static zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, APP_STATION_ID, APP_BOOT_ID, 0u, 0u, NULL, pl_bearing};
 static uint32_t boot_id = APP_BOOT_ID;
 
 /* Capture after an event: S3 and S0 stop the PDM clock, so without this the 30 s after a detection (the post-event
@@ -200,12 +219,37 @@ static uint32_t boot_id = APP_BOOT_ID;
 static volatile uint32_t post_capture_until_ms;
 static void post_capture_open(void) { post_capture_until_ms = xTaskGetTickCount() + APP_AUDIO_POST_EVENT_MS; }
 
+/* The tracking window after every analysed window: an event of a new track opens it (LTE link healthy), the level
+   of the window or the supervisor's request closes it. */
+static void track_step(bool new_event) {
+  const uint32_t now = xTaskGetTickCount();
+  zs_track_end_t end = ZS_TRACK_END_NONE;
+  if (new_event && zs_track_window_on_event(&track, pipeline.track_event_id, !gsm_degraded, now)) {
+    track_open = true;
+    track_s3_extension = true;
+    track_close_request = false;
+    app_comms_set_tracking(true);
+    console_printf("track: window open for event %lu:%lu (max %lu s)\r\n", (unsigned long)(track.track_event_id >> 32),
+                   (unsigned long)(track.track_event_id & 0xffffffffu), (unsigned long)(APP_TRACK_MAX_MS / 1000u));
+    return;
+  }
+  if (!track_open) return;
+  if (track_close_request) { zs_track_window_end(&track); end = ZS_TRACK_END_MODE; }
+  else end = zs_track_window_on_window(&track, pipeline.presence.level == ZS_PRESENCE_CONFIRMED, now);
+  if (end == ZS_TRACK_END_NONE) return;
+  track_open = false;
+  track_close_request = false;
+  app_comms_set_tracking(false);
+  console_printf("track: window closed (%s) after %lu windows\r\n", zs_track_end_name(end), (unsigned long)track.windows);
+}
+
 /* Mode events from the pipeline: level 1 SUSPECT or above in S1 opens S2 (gate positive); in S2 an emitted event
    moves to S3 (outbox has data) and APP_DSP_QUIET_WINDOWS windows of NONE end the DSP duty. */
 static void dsp_mode_events(void) {
   static uint32_t seen_events;
   static unsigned quiet_windows;
   const uint8_t level = pipeline.presence.level;
+  track_step(pipeline.events_emitted != seen_events && (modes.mode == ZS_MODE_S1_LISTEN || modes.mode == ZS_MODE_S2_DSP));
   if (modes.mode == ZS_MODE_S1_LISTEN) {
     quiet_windows = 0u;
     if (level >= ZS_PRESENCE_SUSPECT) mode_event(ZS_MODE_EV_GATE_POSITIVE);
@@ -239,7 +283,8 @@ static void dsp_task_fn(void *arg) {
 static bool capture_on, capture_was_stopped;
 static uint32_t capture_stopped_ms;
 static bool capture_wanted(zs_mode_t mode) {
-  return zs_mode_power_for(mode).mdf_clock || (mode != ZS_MODE_SHUTDOWN && (int32_t)(xTaskGetTickCount() - post_capture_until_ms) < 0);
+  return zs_mode_power_for(mode).mdf_clock ||
+         (mode != ZS_MODE_SHUTDOWN && ((int32_t)(xTaskGetTickCount() - post_capture_until_ms) < 0 || track_open));
 }
 static void capture_set(bool on) {
   if (on == capture_on) return;
@@ -297,7 +342,6 @@ static void outbox_retry_tick(uint32_t now) {
    modem time per retry, and the route hint (app_route_hint_lora) is set for the LoRa transport; a completed
    session restores the defaults. */
 static unsigned comms_fail_streak;
-static bool gsm_degraded;
 /* S3 watchdog = this base (default, or APP_COMMS_MAX_DEGRADED_MS while degraded) + APP_AUDIO_UPLOAD_MAX_MS while an
    audio upload runs (the supervisor applies it every tick). */
 static uint32_t comms_max_base_ms;
@@ -381,7 +425,8 @@ static void supervisor_task_fn(void *arg) {
     now = xTaskGetTickCount();
     for (unsigned ev = 1u; ev < 32u; ev++) if (bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, now);
     modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? APP_AUDIO_UPLOAD_MAX_MS : 0u) +
-                                (app_comms_fw_busy() ? APP_FW_UPDATE_MAX_MS : 0u) + (app_comms_net_busy() ? APP_NET_TRIAL_MAX_MS : 0u);
+                                (app_comms_fw_busy() ? APP_FW_UPDATE_MAX_MS : 0u) + (app_comms_net_busy() ? APP_NET_TRIAL_MAX_MS : 0u) +
+                                (track_s3_extension ? APP_TRACK_MAX_MS : 0u);
     (void)zs_mode_tick(&modes, now);
     app_watchdog_service();
     app_commands_tick(now);
@@ -406,6 +451,10 @@ static void supervisor_task_fn(void *arg) {
     if (modes.mode != last) {
       console_printf("mode %s -> %s\r\n", zs_mode_name(last), zs_mode_name(modes.mode));
       if (last == ZS_MODE_S3_COMMS) comms_health_on_s3_exit(modes.journal[(modes.journal_head + ZS_MODE_JOURNAL_DEPTH - 1u) % ZS_MODE_JOURNAL_DEPTH].event == ZS_MODE_EV_COMMS_DONE);
+      /* the tracking window lives in S2/S3 only: the session is gone, or sleep / service / shutdown */
+      if (last == ZS_MODE_S3_COMMS) track_s3_extension = false;
+      if (track_open && (last == ZS_MODE_S3_COMMS || modes.mode == ZS_MODE_S0_SLEEP || modes.mode == ZS_MODE_S4_SERVICE || modes.mode == ZS_MODE_SHUTDOWN))
+        track_close_request = true;
       apply_power(modes.mode);
       last = modes.mode;
       /* retest after a session while failed: a pass resumes the normal boot path (detection, a session saying so) */
@@ -851,6 +900,10 @@ static void console_exec(const char *cmd) {
                    pr->level, pr->confidence_u8, pr->uav_votes, pr->windows, pr->uav_weak_votes, pr->ground_votes, pr->comb, (int)pipeline.last_gate.f0_hz,
                    pipeline.last_window.class_id, pipeline.last_window.confidence_u8, (unsigned long)pipeline.events_emitted, (unsigned long)pipeline.events_refused,
                    (unsigned long)pipeline_events_ram);
+    console_printf("  track %s (event %lu:%lu, %lu windows) | tracks %lu ended lost %lu max %lu mode %lu, refused (link) %lu\r\n",
+                   track_open ? "OPEN" : "closed", (unsigned long)(track.track_event_id >> 32), (unsigned long)(track.track_event_id & 0xffffffffu),
+                   (unsigned long)track.windows, (unsigned long)track.tracks, (unsigned long)track.ended_lost, (unsigned long)track.ended_max,
+                   (unsigned long)track.ended_mode, (unsigned long)track.refused_link);
     console_printf("  features f0 %d Hz harmonics %d step %d Hz stab %d%% centroid %d Hz flat %d%% noise %d%% rough %d%%\r\n",
                    (int)pipeline.features[0], (int)pipeline.features[1], (int)pipeline.features[2], (int)(pipeline.features[3] * 100.0f),
                    (int)pipeline.features[7], (int)(pipeline.features[8] * 100.0f), (int)(pipeline.features[10] * 100.0f), (int)(pipeline.features[15] * 100.0f));
@@ -948,6 +1001,7 @@ bool app_tasks_create(void) {
   if (!bsp_tim2_pps_init(&pps)) return false;
 
   zs_dsp_mcu_init(&dsp_ctx);
+  zs_track_window_init(&track, APP_TRACK_MAX_MS, APP_TRACK_LOST_WINDOWS);
   {
     size_t work;
     zs_complex_t *scratch = zs_dsp_mcu_borrow_work(&work);        /* the AIR gate scratch overlays the DSP work buffer */
