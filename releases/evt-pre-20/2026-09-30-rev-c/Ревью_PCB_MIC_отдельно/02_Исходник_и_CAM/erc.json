@@ -1,0 +1,19 @@
+{
+    "$schema": "https://schemas.kicad.org/erc.v1.json",
+    "coordinate_units": "mm",
+    "date": "2026-09-24T12:47:44+0000",
+    "included_severities": [
+        "error",
+        "warning",
+        "exclusion"
+    ],
+    "kicad_version": "9.0.9",
+    "sheets": [
+        {
+            "path": "/",
+            "uuid_path": "/9ddeb6d6-243f-4a21-b1c7-1e6f9e354e2e",
+            "violations": []
+        }
+    ],
+    "source": "PCB-MIC.kicad_sch"
+}

@@ -1,0 +1,2 @@
+# Manufacturing manifests bind to byte-exact files, including STEP and CSV line endings.
+2026-09-30-rev-c/** -text -whitespace

@@ -1,0 +1,33 @@
+{
+  "schema": "dioneya-evt-pre-20-archive-control-v3",
+  "date": "2026-09-30",
+  "release": "CONTROLLED_HANDOFF_WITH_REVIEW_AND_FIRST_ARTICLE_GATES",
+  "pcb_main_board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "pcb_mic_board_sha256": "f558e030fa561a472d76360f714226a4e1ed3e6d95521591bea8ee4ca41504cb",
+  "archives": [
+    {
+      "name": "EVT_PRE_20_ПОЛНЫЙ_ПАКЕТ_20260930_REV_C.zip",
+      "bytes": 7440656,
+      "sha256": "d75af48c819f5492a7e51b9046bf2ee9f69ff33caae2561e9a379c16f1148702",
+      "entries": 80
+    },
+    {
+      "name": "EVT_PRE_20_ПЛАТЫ_ЗАКАЗ_И_МОНТАЖ_20260930_REV_C.zip",
+      "bytes": 4862681,
+      "sha256": "d68b2f17feb7324285ca49274a50bc4a7a28353bb2c24f9da01ff1b45c95493e",
+      "entries": 201
+    },
+    {
+      "name": "EVT_PRE_20_ПРОГРАММА_И_МУХОЕД_20260930_REV_C.zip",
+      "bytes": 80680,
+      "sha256": "cf2a9ba638745c9c1f9c472310840f761e75ce797c0300b4dba64cb642640e41",
+      "entries": 13
+    },
+    {
+      "name": "EVT_PRE_20_PCB_MIC_REVIEW_B_20260930_REV_C.zip",
+      "bytes": 229283,
+      "sha256": "011a2c383c530de4640590be9df99b954c8d40b5c3204c204d03d1287da6537d",
+      "entries": 49
+    }
+  ]
+}
