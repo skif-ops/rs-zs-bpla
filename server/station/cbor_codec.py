@@ -24,6 +24,7 @@ _MSG_DETECTION = 2
 _MSG_HEARTBEAT = 3
 _SUPPORTED_DETECTION_SCHEMAS = frozenset({1, 3, 4})
 _FW_STATE = {0: "IDLE", 1: "DOWNLOADING", 2: "INSTALL_PENDING", 3: "TRIAL", 4: "ROLLED_BACK"}   # addendum F, key 19
+_NET_STATE = {0: "STABLE", 1: "ACCEPTED", 2: "TRIAL", 3: "ROLLED_BACK"}                        # addendum G, key 22
 _RESET_CAUSE = {1: "POWER", 2: "PIN", 3: "SOFTWARE", 4: "IWDG", 5: "WWDG", 6: "LOW_POWER", 7: "OPTION_BYTES"}
 _SUPPORTED_HEARTBEAT_SCHEMAS = frozenset({1, 2})   # 2 adds the optional detector map (key 13)
 _ROUTE = {0: "LTE", 1: "NB_IOT", 2: "2G", 3: "LORA", 4: "BLE", 5: "TEST"}
@@ -399,6 +400,9 @@ def decode_heartbeat_obj(obj: Any) -> HeartbeatMessage:
             fw_version=int(detector.get(18, 0)),
             fw_state=_FW_STATE.get(int(detector.get(19, 0)), "IDLE"),
             fw_other_version=int(detector.get(20, 0)),
+            net_config_version=int(detector.get(21, 0)),
+            net_state=_NET_STATE.get(int(detector.get(22, 0)), "STABLE"),
+            net_failed_version=int(detector.get(23, 0)),
         ),
     )
 
