@@ -381,7 +381,7 @@ static void supervisor_task_fn(void *arg) {
     now = xTaskGetTickCount();
     for (unsigned ev = 1u; ev < 32u; ev++) if (bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, now);
     modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? APP_AUDIO_UPLOAD_MAX_MS : 0u) +
-                                (app_comms_fw_busy() ? APP_FW_UPDATE_MAX_MS : 0u);
+                                (app_comms_fw_busy() ? APP_FW_UPDATE_MAX_MS : 0u) + (app_comms_net_busy() ? APP_NET_TRIAL_MAX_MS : 0u);
     (void)zs_mode_tick(&modes, now);
     app_watchdog_service();
     app_commands_tick(now);
@@ -565,6 +565,7 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->detector.command_key_id = secrets.command_key_set ? zs_command_key_id_u64(secrets.command_public_key) : 0u;
   hb->detector.command_next_key_id = secrets.command_next_key_set ? zs_command_key_id_u64(secrets.command_next_key) : 0u;
   app_fw_fill_heartbeat(&hb->detector);                                  /* addendum F: keys 18..20 */
+  app_comms_net_heartbeat(&hb->detector);                                /* addendum G: keys 21..23 */
   return true;
 }
 /* The comms duty loop (app_comms_task's body, as the host simulation and the twin drive it) plus the watchdog
@@ -637,6 +638,14 @@ static bool secrets_persist(void) {
   return true;
 }
 
+/* Remote network configuration (addendum G): the comms task committed a confirmed record to the config store; the ble
+   task reloads its service copy (config_read, the base of the next BLE patch) on its next turn. */
+static volatile bool config_reload_pending;
+static void net_config_committed(const zs_station_config_t *cfg) {
+  (void)cfg;
+  config_reload_pending = true;
+}
+
 static void bind_record_stores(void) {
   memset(cfg_slots, 0xff, sizeof(cfg_slots));
   memset(pos_slots, 0xff, sizeof(pos_slots));
@@ -663,6 +672,7 @@ static void bind_record_stores(void) {
       }
     }
     app_comms_bind(&nor_outbox_io, &nor_command_io, &comms_hooks);        /* comms needs the durable stores */
+    app_comms_bind_config_store(&cfg_io, net_config_committed);           /* CMD_SET_NETWORK_CONFIG (addendum G) */
     /* audio prehistory: the archive region at the start of the NOR map (event slots after it stay unused for now) */
     if (app_audio_rec_bind(&nor_archive_storage, nor_bindings.layout.archive.base_address, nor_bindings.layout.archive.prehistory_ring_bytes,
                            &audio_ring, pl_sample_time, console_printf))
@@ -750,6 +760,10 @@ static void ble_task_fn(void *arg) {
     size_t n;
     (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(250));
     app_watchdog_checkin(APP_WD_BLE);
+    if (config_reload_pending) {                                          /* a remote configuration was confirmed (addendum G) */
+      config_reload_pending = false;
+      if (zs_station_config_store_load(&cfg_io, &ipc.config, NULL) == ZS_STATION_CONFIG_OK) ipc.config_loaded = true;
+    }
     { static uint32_t seen_version; if (ipc.config_loaded && ipc.config.version != seen_version) { seen_version = ipc.config.version; app_comms_set_config(&ipc.config, boot_id); } }
     while ((n = bsp_uart_read(BSP_UART_BLE, buf, sizeof(buf))) > 0u) zs_ipc_service_on_uart_rx(&ipc, buf, n);
     if (ble_recovery_request) { ble_recovery_request = false; ble_enter_recovery(); (void)zs_ipc_service_init(&ipc, &ipc_port); }
