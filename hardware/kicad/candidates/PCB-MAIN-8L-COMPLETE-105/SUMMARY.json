@@ -2,9 +2,9 @@
   "schema": "dioneya-pcb-main-candidate-release-v1",
   "board": "PCB-MAIN",
   "revision": "B",
-  "date": "2026-09-29",
-  "status_ru": "Трассировка завершена; перед запуском панели требуется ответ фабрики по стеку, металлизированным переходам в контактных площадках и DFM.",
-  "status_en": "Routing complete; fabricator stack, capped via-in-pad process and DFM response required before panel release.",
+  "date": "2026-09-30",
+  "status_ru": "Трассировка завершена. Официальные возможности JLCPCB покрывают базис заказа; при заказе выбрать стек и POFV, сверить производственные файлы и оформить отклонения через ECO.",
+  "status_en": "Routing complete. Published JLCPCB capabilities cover the order baseline; select stack and POFV at order, verify production files and process deviations through ECO.",
   "board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
   "kicad_version": "10.0.6",
   "copper_layers": 8,
@@ -29,15 +29,17 @@
     "TP_MCU_SWD": "TP_MCU_SWD1"
   },
   "via_in_pad_count": 57,
+  "fill_and_cap_via_count": 74,
+  "official_supplier_screen": "fab/JLCPCB_OFFICIAL_CAPABILITY_SCREEN_REV_B_105.json",
   "dfm_open_ru": [
-    "Утверждение фабричного стека и диэлектриков",
-    "Подтверждение заполнения и металлизации 57 переходов в площадках",
+    "Выбор стека при заказе и фиксация межслойных диэлектриков и импедансов",
+    "Сверка 74 заполненных и закрытых медью переходов по координатам, включая 57 в SMD-площадках",
     "Проверка импеданса, отверстий и уменьшенных контактных площадок J6/J7/J11",
     "Проверка BOM, DNP, полярности, ориентации и образца монтажа"
   ],
   "dfm_open_en": [
-    "Approve fabricator stack and dielectrics",
-    "Confirm fill and cap for 57 via-in-pad locations",
+    "Select order stack and record dielectrics and impedance targets",
+    "Verify all 74 fill/cap via coordinates, including 57 in SMD pads",
     "Check impedance, drills and adjusted J6/J7/J11 pads",
     "Review BOM, DNP, polarity, orientation and first article assembly"
   ],

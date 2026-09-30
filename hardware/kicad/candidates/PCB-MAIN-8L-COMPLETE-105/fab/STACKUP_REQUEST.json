@@ -8,9 +8,9 @@
   "outer_copper_finished_oz": 1.0,
   "inner_copper_finished_oz": 0.5,
   "preferred_fabricator_stack_candidate": "JLC08161H-3313",
-  "preferred_stack_status": "PROPOSED_NOT_FACTORY_APPROVED",
-  "dielectric_thicknesses": "TO_BE_CONFIRMED_BY_FABRICATOR",
-  "impedance_control": "REQUIRES_FABRICATOR_DFM_REVIEW",
+  "preferred_stack_status": "PUBLISHED_STANDARD_EXAMPLE_ORDER_SELECTION_PENDING",
+  "dielectric_thicknesses": "READ_FROM_SELECTED_ORDER_STACKUP",
+  "impedance_control": "SET_TARGETS_AND_OPTION_IN_ORDER",
   "layer_functions_top_to_bottom": [
     [
       "F.Cu",
@@ -46,17 +46,20 @@
     ]
   ],
   "fabrication_notes": [
-    "All 57 SMD via-in-pad locations are marked filled and capped in KiCad; quote epoxy filled and copper capped process.",
+    "Select epoxy-filled and copper-capped POFV and use the 74-coordinate CSV/map; 57 locations overlap SMD pads, while 17 additional vias also carry fill/cap flags.",
     "Minimum 0.15 mm drilled through vias and 0.25 mm finished via diameter are present.",
     "Board design DRC rules: 0.10 mm trace/space, 0.20 mm hole-to-copper, 0.20 mm hole-to-hole and edge-to-copper.",
-    "Do not infer dielectric spacing or inner copper weight from a default KiCad stackup; use this request and approved fab stack ID.",
-    "Return DFM review with stack ID, layer thicknesses, via-in-pad process, copper weights, impedance and drill capability before panel release."
+    "Published JLCPCB options support 8 layers, 1.6 mm, ENIG, 1 oz outer/0.5 oz inner copper, 0.15/0.25 mm minimum via and POFV; see official capability screen.",
+    "Do not infer dielectric spacing from the default KiCad stackup or the illustrative JLC08161H-3313 blog table; record the selected order stack and dielectric values.",
+    "Choose minimum via and POFV options, then verify the fabricator's production files against the coordinate map before panel release; resolve deviations through ECO."
   ],
   "supplier_sources": [
     "https://jlcpcb.com/capabilities/Capab",
     "https://jlcpcb.com/help/article/multi-layer-pcb-standard-laminated-structures",
-    "https://jlcpcb.com/blog/multilayer-pcb-design-guidelines"
+    "https://jlcpcb.com/blog/multilayer-pcb-design-guidelines",
+    "https://jlcpcb.com/help/article/pcb-via-covering"
   ],
+  "official_capability_screen": "JLCPCB_OFFICIAL_CAPABILITY_SCREEN_REV_B_105.json",
   "generated_job_sha256_before_control": "87a5bef4bd9c57c410507fc3fb0a412dda1ed104a7a1c2626ebd0a1e991f3953",
   "controlled_job_sha256": "afe379e3ee84e9bcc2060b5eb4bef91f9ac20f31e6894b48bed817d5ea453720"
 }
