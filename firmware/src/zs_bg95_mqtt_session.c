@@ -79,6 +79,10 @@ static void sync_owner(zs_bg95_mqtt_session_t *session) {
               ZS_BG95_COMMAND_TRANSPORT_WAIT_ACK_RESULT)
         session->owner = ZS_BG95_MQTT_OWNER_NONE;
       break;
+    case ZS_BG95_MQTT_OWNER_TOPIC_SUBSCRIBE:
+      if (!session->extra || session->extra->state != ZS_BG95_TOPIC_WAIT_SUBSCRIBE_RESULT)
+        session->owner = ZS_BG95_MQTT_OWNER_NONE;
+      break;
     case ZS_BG95_MQTT_OWNER_NONE:
     default:
       break;
@@ -101,6 +105,9 @@ static void route_line(zs_bg95_mqtt_session_t *session, const char *line,
       break;
     case ZS_BG95_MQTT_OWNER_EVENT_UPLINK:
       handled = zs_bg95_event_uplink_on_line(session->uplink, line);
+      break;
+    case ZS_BG95_MQTT_OWNER_TOPIC_SUBSCRIBE:
+      handled = zs_bg95_topic_subscription_on_line(session->extra, line, now_ms);
       break;
     case ZS_BG95_MQTT_OWNER_NONE:
     default:
@@ -180,6 +187,15 @@ static bool route_frame(zs_bg95_mqtt_session_t *session,
     session->last_receipt_result = zs_bg95_event_receipt_on_frame(
         session->receipt, frame, frame_size, &session->last_receipt_status);
     session->last_input_outcome = ZS_BG95_MQTT_INPUT_RECEIPT;
+    return true;
+  }
+  if (session->extra &&
+      zs_bg95_topic_subscription_matches(session->extra, received.topic, received.topic_size)) {
+    if (!zs_bg95_topic_subscription_on_frame(session->extra, frame, frame_size)) {
+      protocol_error(session);
+      return false;
+    }
+    session->last_input_outcome = ZS_BG95_MQTT_INPUT_TOPIC_MESSAGE;
     return true;
   }
   protocol_error(session);
@@ -349,6 +365,15 @@ bool zs_bg95_mqtt_session_init(
   return true;
 }
 
+bool zs_bg95_mqtt_session_attach(zs_bg95_mqtt_session_t *session,
+                                 zs_bg95_topic_subscription_t *extra) {
+  if (!session || !session->modem || !extra || extra->modem != session->modem ||
+      session->extra)
+    return false;
+  session->extra = extra;
+  return true;
+}
+
 bool zs_bg95_mqtt_session_ready(const zs_bg95_mqtt_session_t *session) {
   return session && session->modem && zs_bg95_online(session->modem) &&
          command_subscription_active(session->command) &&
@@ -368,6 +393,7 @@ void zs_bg95_mqtt_session_tick(zs_bg95_mqtt_session_t *session,
   zs_bg95_command_transport_tick(session->command, now_ms);
   zs_bg95_event_receipt_tick(session->receipt, now_ms);
   zs_bg95_event_uplink_tick(session->uplink, now_ms);
+  if (session->extra) zs_bg95_topic_subscription_tick(session->extra, now_ms);
   sync_owner(session);
   if (!zs_bg95_online(session->modem)) {
     session->owner = ZS_BG95_MQTT_OWNER_NONE;
@@ -400,6 +426,15 @@ void zs_bg95_mqtt_session_tick(zs_bg95_mqtt_session_t *session,
     session->pending_command_size = 0u;
     run_command(session, session->pending_command, pending_size,
                 now_ms, now_us, time_trusted);
+    return;
+  }
+  if (session->extra && session->extra->wanted && !session->extra->failed &&
+      session->extra->state == ZS_BG95_TOPIC_IDLE) {
+    if (zs_bg95_topic_subscription_start(session->extra,
+                                         take_message_id(session), now_ms))
+      session->owner = ZS_BG95_MQTT_OWNER_TOPIC_SUBSCRIBE;
+    else
+      session->extra->failed = true;
   }
 }
 
