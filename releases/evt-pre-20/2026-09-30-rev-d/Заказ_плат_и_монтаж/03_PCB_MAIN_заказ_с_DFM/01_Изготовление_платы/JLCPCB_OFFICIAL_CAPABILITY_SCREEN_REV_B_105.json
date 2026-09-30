@@ -1,0 +1,55 @@
+{
+  "schema": "dioneya-pcb-main-official-jlcpcb-screen-v1",
+  "date": "2026-09-30",
+  "board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "supplier": "JLCPCB",
+  "screen_result": "PUBLISHED_CAPABILITIES_MATCH_ORDER_BASELINE",
+  "order_baseline": {
+    "layers": 8,
+    "finished_thickness_mm": 1.6,
+    "surface_finish": "ENIG",
+    "outer_finished_copper_oz": 1.0,
+    "inner_finished_copper_oz": 0.5,
+    "min_via_drill_mm": 0.15,
+    "min_via_diameter_mm": 0.25,
+    "preferred_standard_stack_example": "JLC08161H-3313",
+    "via_in_pad_process": "epoxy filled and copper capped / POFV"
+  },
+  "board_vias": {
+    "all_vias": 853,
+    "small_0p15_0p25": 274,
+    "flagged_fill_and_cap": 74,
+    "flagged_in_SMD_pad": 57,
+    "flagged_elsewhere": 17,
+    "flagged_sizes": {
+      "0.15_drill_0.25_diameter": 69,
+      "0.30_drill_0.50_diameter": 5
+    },
+    "coordinate_file": "VIA_FILL_CAP_74_REV_B_105.csv"
+  },
+  "official_evidence": [
+    "8 layers, 1.6 mm FR-4, 1 oz outer/0.5 oz inner copper and ENIG are published options.",
+    "0.15 mm drilled / 0.25 mm via diameter is the published multilayer minimum, with a cost/option note.",
+    "Epoxy-filled and copper-capped via-in-pad is published as the default process for 6-layer and above; published via diameter range is 0.15 to 0.55 mm.",
+    "JLC08161H-3313 is a published 1.6 mm 8-layer example, not an approved dielectric drawing for this board."
+  ],
+  "order_instructions_ru": [
+    "Выбрать 8 слоёв, 1,6 мм, ENIG, наружная медь 1 oz, внутренняя 0,5 oz.",
+    "Выбрать опцию минимального перехода 0,15/0,25 мм и процесс POFV: эпоксидное заполнение с медной крышкой.",
+    "Передать CSV и карту 74 переходов; 57 находятся в SMD-площадках, 17 вне площадок. Не выбирать отверстия только по диаметру: на плате есть другие переходы того же диаметра.",
+    "Выбрать стек JLC08161H-3313, если он доступен в заказе, и проверить его действующие толщины/параметры в карточке заказа; при замене стека фиксировать ECO.",
+    "Запросить подтверждение производственных файлов до запуска панели и оформить замечания DFM через ECO."
+  ],
+  "limits": [
+    "Published capability is not a job-specific acceptance, yield guarantee or completed impedance calculation.",
+    "The public example does not supply a controlled dielectric table for this exact order; chosen stack and impedance targets must be captured in the order record.",
+    "The published example's suggested signal/power/ground layer functions differ from this board's copper assignment; calculate impedance and review return paths using the actual layers.",
+    "Selective treatment of 74 vias must be checked in the production-file confirmation; it cannot be inferred from via diameter alone."
+  ],
+  "sources": {
+    "capabilities": "https://jlcpcb.com/capabilities/pcb-capabilities/",
+    "laminate_structures": "https://jlcpcb.com/help/article/multi-layer-pcb-standard-laminated-structures",
+    "via_covering": "https://jlcpcb.com/help/article/pcb-via-covering",
+    "eight_layer_example": "https://jlcpcb.com/blog/multilayer-pcb-design-guidelines"
+  }
+}
