@@ -11,6 +11,7 @@
  * graceful switch after repeated link failures); otherwise the single-SIM path powers the modem directly.
  */
 #include "zs_bg95.h"
+#include "zs_bearing_batch.h"
 #include "zs_event_outbox.h"
 #include "zs_command_channel.h"
 #include "zs_command_journal.h"
@@ -108,6 +109,14 @@ bool app_comms_set_network(const zs_command_t *cmd, zs_command_ack_result_t *res
 bool app_comms_net_busy(void);
 /* Heartbeat keys 21..23 (version in use, state, last failed version). */
 void app_comms_net_heartbeat(zs_detector_health_t *d);
+/* Bearing stream while tracking (MQTT ICD addendum H): the DSP task pushes the bearing of every CONFIRMED window of
+   an open tracking window (any task; the oldest record goes when the RAM queue is full); the comms task publishes
+   them about once a second as one batch on the bearing topic, after the detection events.  While the window is
+   open, or bearings are still queued or in flight, the session stays (the scheduler extends S3); a session that
+   ends drops what is left (the stream is live data, the detection events are the durable record). */
+void app_comms_bearing_push(const zs_bearing_record_t *r);
+void app_comms_set_tracking(bool active);
+bool app_comms_track_busy(void);
 /* The twin's simulated reset: drop the session and every RAM job (audio upload, firmware download) as a real reset
    would; the stores (journal, outbox) stay. */
 void app_comms_reset(void);
