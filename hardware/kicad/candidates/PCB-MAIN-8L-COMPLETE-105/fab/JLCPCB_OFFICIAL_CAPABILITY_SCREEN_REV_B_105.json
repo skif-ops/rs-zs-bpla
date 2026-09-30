@@ -43,6 +43,7 @@
   "limits": [
     "Published capability is not a job-specific acceptance, yield guarantee or completed impedance calculation.",
     "The public example does not supply a controlled dielectric table for this exact order; chosen stack and impedance targets must be captured in the order record.",
+    "The published example's suggested signal/power/ground layer functions differ from this board's copper assignment; calculate impedance and review return paths using the actual layers.",
     "Selective treatment of 74 vias must be checked in the production-file confirmation; it cannot be inferred from via diameter alone."
   ],
   "sources": {
