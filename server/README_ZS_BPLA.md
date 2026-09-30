@@ -111,6 +111,13 @@ lists it and `POST /api/v1/stations/{id}/firmware-update {"version": N}`
 queues CMD_UPDATE_FIRMWARE. Progress is in the heartbeat
 (`detector.fw_version / fw_state / fw_other_version`).
 
+A retrained station model goes out the same way without a firmware release (MQTT ICD addendum I): export it as a
+package (`python tools/export_station_model.py --package m7.diom --version 7`), sign it offline with the same release
+key (`python -m pki.cli model-sign --key release.pem --model m7.diom --out data/models`), and queue it with
+`POST /api/v1/stations/{id}/model-update {"version": 7}` (`GET /api/v1/models/releases` lists the packages; the bridge
+serves them from `--model-dir` / `ZS_MODEL_DIR`, default `data/models`). The station loads it after the OK ACK without
+a reset; the heartbeat model text changes from `c46` (built-in) to `m7`.
+
 The network part of a station's configuration (server host, MQTT/HTTPS port, certificate pin, tenant, topic prefix,
 SIM, APNs; ICD addendum G) changes remotely as well: `POST /api/v1/stations/{id}/network-config` with the fields to
 change queues CMD_SET_NETWORK_CONFIG (the version defaults to the one the station reports + 1). The station tries the
