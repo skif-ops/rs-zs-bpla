@@ -131,7 +131,8 @@ typedef struct {
 } zs_single_station_estimate_t;
 
 typedef struct {
-  int16_t azimuth_cdeg, elevation_cdeg;
+  uint16_t azimuth_cdeg;      /* 0..35999, clockwise from north */
+  int16_t elevation_cdeg;
   uint16_t sigma_cdeg;
   bool valid;
 } zs_doa_t;
