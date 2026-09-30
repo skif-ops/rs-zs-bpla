@@ -71,6 +71,8 @@ int main(void) {
   message.detector.selftest_failed = 0x0010u;  /* mic_capture (id 4) failed */
   message.detector.command_key_id = UINT64_C(0xa1b2c3d4e5f60718);       /* addendum E: rotation in flight */
   message.detector.command_next_key_id = UINT64_C(0x0102030405060708);
+  message.detector.fw_version = 7u; message.detector.fw_state = 3u;       /* addendum F: v7 on trial, */
+  message.detector.fw_other_version = 6u;                                 /* v6 in the other bank */
 
   size = zs_protocol_encode_heartbeat(&message, encoded, sizeof(encoded));
   if (size == 0u || fwrite(encoded, 1u, size, stdout) != size) return 1;
