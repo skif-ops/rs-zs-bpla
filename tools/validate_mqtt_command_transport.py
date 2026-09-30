@@ -153,7 +153,8 @@ def main() -> int:
         for tenant in tenants
         for op, suffix in (("read", "up"), ("read", "status"), ("write", "down"), ("read", "ack"), ("write", "receipt"),
                                ("read", "audio"),                       # audio: addendum B
-                               ("read", "fwreq"), ("write", "fw"))      # firmware update: addendum F
+                               ("read", "fwreq"), ("write", "fw"),      # firmware update: addendum F
+                               ("read", "bearing"))                     # bearing stream: addendum H
     }, "bridge ACL has missing or excessive rights")
     for serial, (tenant, station_id) in pilot_units.items():
         require(sections.get(serial) == {
@@ -165,6 +166,7 @@ def main() -> int:
             f"topic write zs/v1/{tenant}/{station_id}/audio",
             f"topic write zs/v1/{tenant}/{station_id}/fwreq",     # addendum F: chunk requests up,
             f"topic read zs/v1/{tenant}/{station_id}/fw",         # firmware chunks down
+            f"topic write zs/v1/{tenant}/{station_id}/bearing",   # addendum H: bearing stream up
         }, f"station {serial} ACL has missing or excessive rights")
     require(set(sections) == {"bridge"} | set(pilot_units), "unexpected MQTT ACL identity")
 
