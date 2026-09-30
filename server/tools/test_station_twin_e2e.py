@@ -4,7 +4,9 @@
 
 Runs zs_station_twin with the Python server twin on the pipe and checks the server-side report:
   1. a drone fly-by is detected, published over GSM, acknowledged, no duplicates; the event carries the on-board
-     bearing of the 3+1 array (DOA within 5 deg of the rendered plane wave); the audio prehistory ring holds the
+     bearing of the 3+1 array (DOA within 5 deg of the rendered plane wave); the tracking window keeps the detector
+     running in the session and the bearings of the track reach the server as batches on the bearing topic (ICD
+     addendum H: one track, time order, following the target); the audio prehistory ring holds the
      seconds around the event, including the post-event window; the server asks for the event's audio
      (CMD_REQUEST_AUDIO, both segments) right after the receipt, the station waits for the post-event window, uploads
      both segments chunk by chunk and acknowledges with the chunk count; the server stores them through the bridge's
@@ -75,7 +77,7 @@ def main() -> int:
     # --expect-post-audio: the prehistory ring holds >= 25 s recorded after the event although the station went to S3
     # and S0 (the post-event capture window of addendum B)
     log, r = run(["--scene", "drone", "--seconds", "140", "--seed", "3", "--receipt-latency", "2000", "--expect-events", "1", "--expect-delivered", "1",
-                  "--expect-post-audio", "25"], audio="both", redeliver=True)
+                  "--expect-post-audio", "25", "--expect-bearing-error", "5", "--expect-streamed", "4"], audio="both", redeliver=True)
     assert r["detections"] >= 1 and r["duplicates"] == 0 and r["decode_errors"] == 0, r
     assert "session done -> COMMS_DONE" in log
     rec_line = next(l for l in log.splitlines() if "twin: rec committed" in l)
@@ -98,6 +100,13 @@ def main() -> int:
     truth_az = float(truth.split("truth az ")[1].split()[0])
     first = next(e for e in r["events"] if e["doa"])
     assert first["tdoa_valid"] and abs((first["doa"]["azimuth_deg"] - truth_az + 180) % 360 - 180) < 5.0, (first, truth)
+    # the bearing stream of the tracking window: one track (the first event), in time order, the target moving east
+    stream = r["bearings"]
+    streamed = int(next(l for l in log.splitlines() if "bearings streamed" in l).split("bearings streamed ")[1].split()[0])
+    assert r["bearing_batches"] >= 2 and len(stream) == streamed >= 4, (r["bearing_batches"], len(stream), streamed)
+    assert {b["track_event_id"] for b in stream} == {first["event_id"]}, stream
+    assert [b["time_us"] for b in stream] == sorted(b["time_us"] for b in stream)
+    assert stream[-1]["azimuth_deg"] > stream[0]["azimuth_deg"] and "track: window closed (target lost)" in log, stream
     pre, post = segs["pre"], segs["post"]
     assert pre["seconds"] >= 10 and post["seconds"] >= 25, segs                        # continuous audio on both sides
     assert pre["start_time_us"] + pre["seconds"] * 1e6 > event["time_us"] - 1e6       # pre reaches the event
@@ -105,7 +114,8 @@ def main() -> int:
     print(f"scenario 1 (drone over GSM): detections {r['detections']}, heartbeats {r['heartbeats']}, duplicates {r['duplicates']}; "
           f"prehistory: {rec_line.split('around the first event: ')[1]}; audio upload: {r['audio_chunks']} chunks, "
           f"pre {pre['seconds']:.0f} s + post {post['seconds']:.0f} s assembled, ACK OK; DOA az {first['doa']['azimuth_deg']:.1f} "
-          f"(truth {truth_az:.1f}) sigma {first['doa']['sigma_deg']:.1f} deg")
+          f"(truth {truth_az:.1f}) sigma {first['doa']['sigma_deg']:.1f} deg; bearing stream {len(stream)} samples in "
+          f"{r['bearing_batches']} batches, az {stream[0]['azimuth_deg']:.1f} -> {stream[-1]['azimuth_deg']:.1f}")
 
     log, r = run(["--scene", "drone", "--seconds", "140", "--seed", "3", "--receipt-latency", "2000", "--expect-events", "1",
                   "--expect-delivered", "1", "--forget-events"], audio="both")
