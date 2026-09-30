@@ -9,6 +9,7 @@ from station.command_codec import validate_command_payload
 from station.firmware_codec import ReleaseRepository, UPDATE_COMMAND
 from station.network_config import NETWORK_COMMAND, next_version
 from station.store import EventStore
+from station.replay import ReplayError, build_replay, replay_sources
 from station.service import StationFusionService
 from station.cbor_codec import decode_detection_cbor
 from station.http_transport import require_insecure_station_http_bench
@@ -97,6 +98,17 @@ async def track(track_id:str):
     result=store.get_track(track_id)
     if result is None: raise HTTPException(404,'track not found')
     return result
+
+@router.get('/replay')
+async def replay(track_id:str|None=None,system_event_id:str|None=None,since_us:int|None=None,until_us:int|None=None):
+    """Everything the replay page draws for a time window (decision 3): stations, fused tracks, bearings, in metres
+    east/north/up around the stations."""
+    try: return build_replay(store,track_id=track_id,system_event_id=system_event_id,since_us=since_us,until_us=until_us)
+    except ReplayError as exc: raise HTTPException(404 if 'not found' in str(exc) else 400,str(exc)) from None
+
+@router.get('/replay/sources')
+async def replay_sources_list(limit:int=50):
+    return replay_sources(store,min(max(limit,1),200))
 
 @router.post('/stations/{station_id}/audio-request')
 async def request_audio(station_id:int,req:AudioRequest):

@@ -305,3 +305,31 @@
 @media (prefers-reduced-motion: reduce) {
   .t-input { animation: none !important; transform: none !important; }
 }
+
+/* ---- replay (decision 3): target movement on a metric plane without a map ---- */
+.replay { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+@media (min-width: 992px) { .replay { grid-template-columns: minmax(0, 1fr) 320px; } }
+.replay-stage { position: relative; border: 1px solid #d0d7de; border-radius: 8px; background: #f8fafc; overflow: hidden; }
+.replay-stage canvas { display: block; width: 100%; height: clamp(320px, 62vh, 640px); cursor: grab; touch-action: none; }
+.replay-stage canvas:active { cursor: grabbing; }
+.replay-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #64748b; pointer-events: none; }
+.replay-empty[hidden] { display: none; }
+.replay-controls { display: flex; align-items: center; gap: .5rem; margin-top: .6rem; flex-wrap: wrap; }
+.replay-slider { flex: 1 1 200px; min-width: 160px; }
+.replay-speed { width: auto; }
+.replay-btn { padding: .35rem .75rem; font-size: .9rem; }
+.replay-btn:disabled, .replay-slider:disabled { opacity: .5; cursor: default; }
+.replay-select { padding: .35rem .5rem; font-size: .88rem; }
+.replay-check { display: flex; align-items: center; gap: .4rem; margin-top: .6rem; font-size: .9rem; }
+.replay-hint { color: #64748b; font-size: .8rem; margin-top: .3rem; }
+.replay-panel { border: 1px solid #d0d7de; border-radius: 8px; padding: .9rem; background: #fff; }
+.replay-panel .form-label { font-size: .9rem; }
+.replay-subtitle { font-size: .95rem; font-weight: 600; margin: .9rem 0 .4rem; }
+.replay-readout { display: grid; grid-template-columns: auto 1fr; gap: .15rem .6rem; margin: .8rem 0 0; font-size: .88rem; }
+.replay-readout dt { font-weight: 400; color: #64748b; }
+.replay-readout dd { margin: 0; font-variant-numeric: tabular-nums; }
+.replay-bearings { list-style: none; padding: 0; margin: 0; font-size: .85rem; }
+.replay-bearings .text-muted { color: #64748b; }
+.replay-bearings li { margin: .15rem 0; }
+.replay-dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; vertical-align: -1px; }
+.replay-note { color: #64748b; font-size: .8rem; margin: .9rem 0 0; }
