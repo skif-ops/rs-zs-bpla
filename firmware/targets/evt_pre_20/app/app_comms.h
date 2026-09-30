@@ -18,6 +18,8 @@
 #include "zs_station_config.h"
 #include "zs_station_comms.h"
 #include "zs_prehistory.h"
+#include "zs_fw_boot.h"
+#include "zs_fw_update.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -73,6 +75,31 @@ void app_comms_set_audio_source(const app_comms_audio_source_t *src);
 bool app_comms_request_audio(const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail);
 /* An upload runs or its ACK waits: the session must stay (the scheduler extends S3). */
 bool app_comms_audio_busy(void);
+/* Firmware update (MQTT ICD addendum F): the other flash bank, its boot record and the running image as the station
+   knows them; install() is called once the OK ACK of a verified image is at the broker and the new bank is armed
+   (the target swaps the banks and resets, the twin simulates it).  No port (or no release key) = REJECTED 1. */
+typedef struct {
+  const zs_fw_image_io_t *io;                 /* image area of the other bank */
+  const zs_fw_boot_port_t *other_record;      /* boot record page of the other bank */
+  const zs_fw_release_key_t *keys;            /* compiled-in release keys */
+  size_t key_count;
+  uint32_t target;                            /* ZS_FW_TARGET_STM32_APP */
+  uint32_t (*running_version)(void);
+  bool (*trial)(void);                        /* the running image is not confirmed yet */
+  void (*install)(uint32_t version);
+} app_comms_fw_port_t;
+void app_comms_set_fw_port(const app_comms_fw_port_t *port);
+/* Executor part for CMD_UPDATE_FIRMWARE: true = answered now (REJECTED detail, addendum F §3); false = accepted:
+   the download runs in the sessions, the ACK (OK, detail = chunks; FAILED detail) follows the image check.  A
+   redelivery of the running command returns false again; another one while a download runs is REJECTED 6. */
+bool app_comms_update_firmware(const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail);
+/* A download runs (not paused) or its ACK / the install waits: the session must stay (the scheduler extends S3). */
+bool app_comms_fw_busy(void);
+/* 0 idle, 1 downloading, 2 install pending (heartbeat key 19 before the boot-record states 3/4 are added). */
+uint8_t app_comms_fw_state(void);
+/* The twin's simulated reset: drop the session and every RAM job (audio upload, firmware download) as a real reset
+   would; the stores (journal, outbox) stay. */
+void app_comms_reset(void);
 const zs_bg95_t *app_comms_modem(void);
 const zs_station_comms_t *app_comms_state(void);
 #endif
