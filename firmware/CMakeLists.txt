@@ -88,6 +88,8 @@ add_library(zs_core
   src/zs_bg95_topic_subscription.c
   src/zs_fw_update.c
   src/zs_fw_boot.c
+  src/zs_model.c
+  src/zs_model_store.c
   src/zs_net_trial.c
 )
 target_include_directories(zs_core PUBLIC include generated)
@@ -203,6 +205,8 @@ add_executable(zs_command_keys_tests tests/test_command_keys.c)
 target_link_libraries(zs_command_keys_tests zs_core m)
 add_executable(zs_fw_update_tests tests/test_fw_update.c)
 target_link_libraries(zs_fw_update_tests zs_core m)
+add_executable(zs_model_tests tests/test_model.c)
+target_link_libraries(zs_model_tests zs_core m)
 add_executable(zs_fw_boot_tests tests/test_fw_boot.c)
 target_link_libraries(zs_fw_boot_tests zs_core m)
 add_executable(zs_net_trial_tests tests/test_net_trial.c)
@@ -303,6 +307,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_station_secrets_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_command_keys_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_fw_update_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_model_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_fw_boot_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_net_trial_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_bearing_tests PRIVATE -UNDEBUG)
@@ -374,6 +379,7 @@ add_test(NAME boot_counter COMMAND zs_boot_counter_tests)
 add_test(NAME station_secrets COMMAND zs_station_secrets_tests)
 add_test(NAME command_keys COMMAND zs_command_keys_tests)
 add_test(NAME fw_update COMMAND zs_fw_update_tests)
+add_test(NAME model COMMAND zs_model_tests)
 add_test(NAME fw_boot COMMAND zs_fw_boot_tests)
 add_test(NAME net_trial COMMAND zs_net_trial_tests)
 add_test(NAME bearing COMMAND zs_bearing_tests)
