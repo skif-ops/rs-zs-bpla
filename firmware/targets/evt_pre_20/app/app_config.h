@@ -101,6 +101,7 @@
 #define APP_AUDIO_POST_EVENT_MS      30000u
 #define APP_AUDIO_EVENT_TABLE        16u      /* events of this boot whose audio CMD_REQUEST_AUDIO can find */
 #define APP_FW_UPDATE_MAX_MS         900000u  /* S3 watchdog extension while a firmware download runs (addendum F, ~1016 chunks max) */
+#define APP_NET_TRIAL_MAX_MS         300000u  /* S3 watchdog extension while a network configuration is accepted / on trial (addendum G: switch + 3 bring-ups) */
 #define APP_AUDIO_UPLOAD_MAX_MS      300000u  /* S3 watchdog extension while an audio upload runs (~314 chunks both) */
 
 /* NVIC priorities (0 = highest). FreeRTOS syscall ceiling is 5: ISRs at 5..15 may call FromISR APIs. */
