@@ -192,7 +192,7 @@ static bool pl_extract(void *ctx, const int16_t *pcm, size_t n, float out[ZS_FEA
 static int64_t pl_sample_time(void *ctx, uint64_t sample) { (void)ctx; return zs_time_for_sample(&time_sync, sample); }
 static bool pl_emit(void *ctx, const zs_detection_t *d);
 /* boot_id starts as APP_BOOT_ID and is replaced by the NOR boot counter once the stores are bound (the pipeline reads it per event) */
-static zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, APP_STATION_ID, APP_BOOT_ID, 0u, 0u};
+static zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, APP_STATION_ID, APP_BOOT_ID, 0u, 0u, NULL, NULL};
 static uint32_t boot_id = APP_BOOT_ID;
 
 /* Capture after an event: S3 and S0 stop the PDM clock, so without this the 30 s after a detection (the post-event
