@@ -78,6 +78,10 @@ bool app_commands_execute(void *ctx, const zs_command_t *cmd, zs_command_ack_res
       /* addendum F: refused now, or accepted: the download runs in the sessions, the ACK follows the image check */
       if (!app_comms_update_firmware(cmd, result, detail)) return false;
       break;
+    case ZS_COMMAND_SET_NETWORK:
+      /* addendum G: accepted for trial (the next bring-up uses it, the first session online stores it) or refused */
+      (void)app_comms_set_network(cmd, result, detail);
+      break;
     case ZS_COMMAND_ROTATE_KEY:
       if (!keys_io) { *result = ZS_COMMAND_ACK_REJECTED; *detail = ZS_COMMAND_KEYS_REJECT_NO_RECORD; break; }
       zs_command_keys_rotate(keys_io, cmd->rotate.public_key, result, detail);
