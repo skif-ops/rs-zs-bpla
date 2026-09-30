@@ -201,6 +201,9 @@ typedef struct {
   uint32_t fw_version;         /* key 18: .fw_info version of the running image (addendum F; 0 = unknown) */
   uint8_t fw_state;            /* key 19: 0 idle, 1 downloading, 2 install pending, 3 trial, 4 rolled back */
   uint32_t fw_other_version;   /* key 20: version of the image in the other bank (0 = none) */
+  uint32_t net_config_version; /* key 21: version of the network configuration in use (addendum G; the trial's while on trial) */
+  uint8_t net_state;           /* key 22: 0 stable, 1 accepted (switch after this session), 2 trial, 3 rolled back */
+  uint32_t net_failed_version; /* key 23: version of the last configuration that failed its trial (0 = none) */
 } zs_detector_health_t;
 
 typedef struct {
@@ -209,6 +212,30 @@ typedef struct {
   int64_t time_us;
   zs_position_t station;
   zs_gnss_t gnss;
+  zs_power_t power;
+  zs_route_status_t route;
+  zs_cellular_telemetry_t cellular;
+  char firmware_ver[ZS_VERSION_CAPACITY];
+  char model_ver[ZS_VERSION_CAPACITY];
+  char hardware_rev[ZS_VERSION_CAPACITY];
+  bool self_test_ok;
+  zs_detector_health_t detector;
+  bool detector_present;
+} zs_heartbeat_t;
+
+typedef struct {
+  uint8_t schema_ver;
+  uint32_t station_id, seq_no, boot_id;
+  uint64_t event_id;
+  int64_t event_time_us;
+  zs_position_t station;
+  zs_gnss_t gnss;
+  zs_classification_t classification;
+  zs_hier_classification_t hierarchy;
+  zs_single_station_estimate_t single_station;
+  float features[ZS_FEATURE_COUNT];
+  zs_doa_t doa;
+  zs_spatial_info_t spatial;
   zs_power_t power;
   zs_route_status_t route;
   zs_cellular_telemetry_t cellular;

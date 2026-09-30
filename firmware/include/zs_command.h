@@ -20,7 +20,8 @@ typedef enum {
   ZS_COMMAND_REBOOT = 2,          /* MQTT_TLS_ICD_v0_1 addendum D */
   ZS_COMMAND_SET_PARAMS = 3,      /* addendum D: bounded whitelist of runtime parameters */
   ZS_COMMAND_ROTATE_KEY = 4,      /* addendum E: install the next command public key (trusted with the current one) */
-  ZS_COMMAND_UPDATE_FIRMWARE = 5  /* addendum F: fetch, verify and install a signed release in the other flash bank */
+  ZS_COMMAND_UPDATE_FIRMWARE = 5, /* addendum F: fetch, verify and install a signed release in the other flash bank */
+  ZS_COMMAND_SET_NETWORK = 6      /* addendum G: network configuration patch, tried and rolled back automatically */
 } zs_command_code_t;
 
 #define ZS_COMMAND_REBOOT_MAX_DELAY_S 600u
@@ -77,6 +78,14 @@ typedef struct {
   uint8_t signature[64];
 } zs_update_firmware_command_t;
 
+/* CMD_SET_NETWORK_CONFIG payload {0: bstr(1..240)}: a station configuration patch in the BLE config_write format
+   (STATION_CONFIG_CBOR_v0_1 §2-3).  The codec checks the structure; the patch itself belongs to zs_net_trial. */
+#define ZS_COMMAND_NET_PATCH_MAX 240u
+typedef struct {
+  uint8_t patch[ZS_COMMAND_NET_PATCH_MAX];
+  uint8_t patch_size;
+} zs_set_network_command_t;
+
 typedef struct {
   uint32_t station_id;
   uint8_t command_id[ZS_COMMAND_UUID_BYTES];
@@ -88,6 +97,7 @@ typedef struct {
   zs_set_params_command_t params;
   zs_rotate_key_command_t rotate;
   zs_update_firmware_command_t firmware;
+  zs_set_network_command_t network;
   uint8_t key_id[ZS_COMMAND_KEY_ID_BYTES];
 } zs_command_t;
 
