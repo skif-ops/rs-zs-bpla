@@ -364,6 +364,24 @@ def cmd_fw_sign(a):
           f"sha256 {release.manifest.sha256.hex()}, release key id {release.key_id.hex()} -> {a.out}")
 
 
+def cmd_model_sign(a):
+    """[offline] Sign a station model package (addendum I, tools/export_station_model.py --package) into a model
+    repository with the firmware release key; the version comes from the package header."""
+    from station.firmware_codec import ReleaseSigner
+    from station.model_codec import ModelRepository, manifest_for_model
+    package = Path(a.model).read_bytes()
+    try:
+        manifest = manifest_for_model(package)
+    except ValueError as exc:
+        raise pki.PkiError(str(exc)) from None
+    repo = ModelRepository(a.out)
+    if repo.get(manifest.version) is not None and not a.force:
+        raise pki.PkiError(f"model {manifest.version} already exists in {a.out} (--force replaces it)")
+    release = repo.add(package, ReleaseSigner.from_pem_file(a.key))
+    print(f"model m{release.manifest.version}: {release.manifest.size} bytes, sha256 {release.manifest.sha256.hex()}, "
+          f"release key id {release.key_id.hex()} -> {a.out}")
+
+
 def cmd_engineer_key(a):
     """B.9 engineer key of one station for the engineer's app (audited export) or a rotation."""
     reg = _registry(Path(a.pki))
@@ -485,6 +503,8 @@ def main(argv=None):
     s.add_argument("--out", required=True); s.add_argument("--show", action="store_true")
     s = add("fw-sign", cmd_fw_sign, help="[offline] sign an application image into a release repository (addendum F)")
     s.add_argument("--key", required=True); s.add_argument("--image", required=True); s.add_argument("--out", required=True); s.add_argument("--force", action="store_true")
+    s = add("model-sign", cmd_model_sign, help="[offline] sign a station model package into a model repository (addendum I)")
+    s.add_argument("--key", required=True); s.add_argument("--model", required=True); s.add_argument("--out", required=True); s.add_argument("--force", action="store_true")
     s = add("engineer-key", cmd_engineer_key, help="B.9 engineer key of a station: print/export (audited) or --rotate <reason>")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--to", default="engineer"); s.add_argument("--out"); s.add_argument("--rotate")
     s = add("station-secrets", cmd_station_secrets, help="v0.3 station_secrets bundle for the commissioning phone (engineer key, ICCIDs, command public key)")
