@@ -8,6 +8,7 @@ from station.store import EventStore
 from fusion.solver import solve_target
 from fusion.geodesy import EnuFrame
 from fusion.kalman import ConstantVelocityKalman3D
+from station.track_fusion import BearingTrackFusion
 
 class EventBus:
     def __init__(self): self._queues:set[asyncio.Queue]=set()
@@ -24,6 +25,7 @@ class EventBus:
 class StationFusionService:
     def __init__(self,store:EventStore,correlation_window_s:float=3.0):
         self.store=store; self.window_us=int(correlation_window_s*1e6); self.bus=EventBus(); self.track_filters={}; self.track_frames={}
+        self.tracks=BearingTrackFusion(store)
     @staticmethod
     def _compatible(a:DetectionMessage,b:DetectionMessage)->bool:
         if a.classification.unknown or b.classification.unknown: return True
@@ -66,12 +68,15 @@ class StationFusionService:
         return e
     def ingest_bearings(self,batch)->int:
         """A bearing batch of a tracking window (ICD addendum H): stored, then published live with the system event its
-        track belongs to; the multi-station fusion of bearings into track points builds on these rows."""
+        track belongs to; bearings of two or more stations are fused into the points of one target track."""
         inserted=self.store.save_bearings(batch)
         if inserted:
             self.bus.publish_nowait({'type':'bearings','station_id':batch.station_id,'track_event_id':batch.track_event_id,
                                      'system_event_id':self.store.system_event_of_detection(batch.station_id,batch.track_event_id),
                                      'time_trust':batch.time_trust,'samples':[s.as_dict() for s in batch.samples]})
+            track=self.tracks.on_batch(batch)          # two or more stations: the fused track, recomputed
+            if track is not None and track['last'] is not None:
+                self.bus.publish_nowait({'type':'track',**track})
         return inserted
     @staticmethod
     def _label(dets):
