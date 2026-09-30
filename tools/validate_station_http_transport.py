@@ -67,6 +67,8 @@ def main() -> int:
             "@router.post('/stations/{station_id}/command-key-rotation')",
             # operator queues a firmware update (addendum F); the image goes to the station over MQTT only
             "@router.post('/stations/{station_id}/firmware-update')",
+            # operator queues a network configuration change (addendum G); goes to the station over MQTT only
+            "@router.post('/stations/{station_id}/network-config')",
         },
         f"station transport route bypasses guarded router: {unguarded_station_decorators}",
     )
