@@ -238,30 +238,6 @@ typedef struct {
   zs_spatial_info_t spatial;
   zs_power_t power;
   zs_route_status_t route;
-  zs_cellular_telemetry_t cellular;
-  char firmware_ver[ZS_VERSION_CAPACITY];
-  char model_ver[ZS_VERSION_CAPACITY];
-  char hardware_rev[ZS_VERSION_CAPACITY];
-  bool self_test_ok;
-  zs_detector_health_t detector;
-  bool detector_present;
-} zs_heartbeat_t;
-
-typedef struct {
-  uint8_t schema_ver;
-  uint32_t station_id, seq_no, boot_id;
-  uint64_t event_id;
-  int64_t event_time_us;
-  zs_position_t station;
-  zs_gnss_t gnss;
-  zs_classification_t classification;
-  zs_hier_classification_t hierarchy;
-  zs_single_station_estimate_t single_station;
-  float features[ZS_FEATURE_COUNT];
-  zs_doa_t doa;
-  zs_spatial_info_t spatial;
-  zs_power_t power;
-  zs_route_status_t route;
   uint16_t sample_rate_hz;
   uint8_t detector_profile;
 } zs_detection_t;
