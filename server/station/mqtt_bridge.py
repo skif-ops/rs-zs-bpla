@@ -400,6 +400,8 @@ def main(argv: list[str] | None = None) -> None:
             file=sys.stderr,
         )
 
+    service.alerts.tenant = args.tenant          # dioneya.alert/1 messages of this bridge belong to its tenant
+
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     client.manual_ack_set(True)
     if tls_enabled:
@@ -456,6 +458,10 @@ def main(argv: list[str] | None = None) -> None:
                         f"MQTT command publish batch: {published} queued, {failed} failed",
                         file=sys.stderr,
                     )
+            try:
+                service.alerts.sweep()           # dioneya.alert/1: tracks and the alert that went quiet end
+            except Exception as exc:              # the output API never stops the bridge
+                print(f"dioneya.alert/1 sweep failed: {exc}", file=sys.stderr)
             time.sleep(args.command_poll_seconds)
     except KeyboardInterrupt:
         pass

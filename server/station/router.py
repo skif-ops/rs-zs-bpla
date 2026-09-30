@@ -1,6 +1,6 @@
 """FastAPI router for live ZS-BPLA station integration."""
 from __future__ import annotations
-import json, os, time
+import asyncio, json, os, time
 from pathlib import Path
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
@@ -10,6 +10,7 @@ from station.firmware_codec import ReleaseRepository, UPDATE_COMMAND
 from station.network_config import NETWORK_COMMAND, next_version
 from station.store import EventStore
 from station.replay import ReplayError, build_replay, replay_sources
+from integration import dioneya_alert
 from station.service import StationFusionService
 from station.cbor_codec import decode_detection_cbor
 from station.http_transport import require_insecure_station_http_bench
@@ -109,6 +110,37 @@ async def replay(track_id:str|None=None,system_event_id:str|None=None,since_us:i
 @router.get('/replay/sources')
 async def replay_sources_list(limit:int=50):
     return replay_sources(store,min(max(limit,1),200))
+
+@router.get('/alerts')
+async def alerts(after_seq:int=0,tenant:str|None=None,limit:int=500):
+    """Output API dioneya.alert/1 (protocols/DIONEYA_ALERT_API_v1.md): messages after a seq, oldest first; continue
+    with next_after_seq."""
+    messages,next_after=await asyncio.to_thread(store.read_alerts,max(after_seq,0),tenant=tenant,limit=min(max(limit,1),2000))
+    return {'schema':dioneya_alert.SCHEMA,'messages':messages,'next_after_seq':next_after}
+
+@router.websocket('/alerts/stream')
+async def alert_stream(ws:WebSocket,after_seq:int|None=None,tenant:str|None=None,heartbeat_s:float=15.0):
+    """dioneya.alert/1 live: the messages after after_seq (default: only new ones), then each new one; a heartbeat
+    when the stream has been idle for heartbeat_s."""
+    await ws.accept()
+    closed=asyncio.create_task(_until_disconnect(ws))
+    cursor=await asyncio.to_thread(store.last_alert_seq) if after_seq is None else max(after_seq,0)
+    heartbeat_us=int(max(heartbeat_s,1.0)*1e6); last_sent=int(time.time()*1e6)
+    try:
+        while not closed.done():
+            messages,cursor_next=await asyncio.to_thread(store.read_alerts,cursor,tenant=tenant,limit=500)
+            for m in messages: await ws.send_json(m)
+            cursor=cursor_next; now=int(time.time()*1e6)
+            if messages: last_sent=now
+            elif now-last_sent>=heartbeat_us:
+                await ws.send_json(dioneya_alert.heartbeat(cursor,now,tenant)); last_sent=now
+            if len(messages)<500: await asyncio.wait({closed},timeout=0.5)
+    except (WebSocketDisconnect,RuntimeError): pass
+    finally: closed.cancel()
+
+async def _until_disconnect(ws:WebSocket):
+    while True:
+        if (await ws.receive())['type']=='websocket.disconnect': return
 
 @router.post('/stations/{station_id}/audio-request')
 async def request_audio(station_id:int,req:AudioRequest):
