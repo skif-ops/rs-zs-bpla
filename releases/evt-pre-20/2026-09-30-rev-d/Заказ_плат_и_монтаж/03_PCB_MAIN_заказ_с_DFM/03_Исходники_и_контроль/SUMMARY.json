@@ -32,17 +32,25 @@
   "fill_and_cap_via_count": 74,
   "official_supplier_screen": "fab/JLCPCB_OFFICIAL_CAPABILITY_SCREEN_REV_B_105.json",
   "dfm_open_ru": [
-    "Выбор стека при заказе и фиксация межслойных диэлектриков и импедансов",
-    "Сверка 74 заполненных и закрытых медью переходов по координатам, включая 57 в SMD-площадках",
-    "Проверка импеданса, отверстий и уменьшенных контактных площадок J6/J7/J11",
-    "Проверка BOM, DNP, полярности, ориентации и образца монтажа"
+    "Выбрать фактический стек и записать межслойные диэлектрики; решение по импедансу задаётся отдельно",
+    "Подтвердить 76/76 заполненных эпоксидом и закрытых медью переходов по заказному CSV; 74 признака в плате и два CAM-дополнения",
+    "Проверить зазоры, отверстия и уменьшенные контактные площадки J6/J7/J11",
+    "Сверить BOM, DNP, полярность, ориентацию и монтаж первых двух изделий"
   ],
   "dfm_open_en": [
-    "Select order stack and record dielectrics and impedance targets",
-    "Verify all 74 fill/cap via coordinates, including 57 in SMD pads",
-    "Check impedance, drills and adjusted J6/J7/J11 pads",
-    "Review BOM, DNP, polarity, orientation and first article assembly"
+    "Select the actual stack and record dielectrics; the impedance decision is documented separately",
+    "Confirm 76/76 epoxy-filled copper-capped vias from the order CSV; 74 native flags and two CAM overrides",
+    "Check clearances, drills and reduced J6/J7/J11 pads",
+    "Review BOM, DNP, polarity, orientation and first two assembled boards"
   ],
   "controlled_fab_job": "fab/gerber/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-job.gbrjob",
-  "fabrication_stack_request": "fab/STACKUP_REQUEST.json"
+  "fabrication_stack_request": "fab/STACKUP_REQUEST.json",
+  "manufacturing_order_pofv_count": 76,
+  "native_board_flagged_pofv_count": 74,
+  "manufacturing_order_pofv_csv": "VIA_FILL_CAP_76_ORDER_REV_D.csv",
+  "manufacturing_order_cam_overrides": [
+    "C6.1",
+    "D11.1"
+  ],
+  "manufacturing_order_pofv_map": "VIA_FILL_CAP_76_MAP_RU_EN.pdf"
 }

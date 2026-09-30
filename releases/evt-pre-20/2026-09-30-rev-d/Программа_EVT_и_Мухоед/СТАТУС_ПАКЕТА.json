@@ -1,14 +1,19 @@
 {
   "name": "EVT programme and Muhoed additional training; tests not run",
-  "date": "2026-09-29",
+  "date": "2026-09-30",
   "source_repository": "skif-ops/rs-zs-bpla",
-  "source_commit": "2f94a3ad6e7a43fa6b35bc3c44d9d8ca4843301c",
   "manufacturing_release": false,
   "pcb_main": "ROUTED_REV_B_8L_DRC_0_ERRORS_0_UNCONNECTED_FAB_DFM_PENDING",
-  "pcb_mic": "REVIEW_B_OPEN_DFM_ONLY",
+  "pcb_mic": "REVIEW_B_ACCEPT_CONTROLLED_FIRST_ARTICLE_ORDER",
   "pcb_pwr": "CUSTOMER_AUTHORIZED_FAB_CHECKOUT_ORDER_REVIEW_B_OPEN",
   "first_housing_lot": "20_3D_PRINT_PRELIMINARY_CAD",
   "housing_authority_note": "First lot uses 20 preliminary 3D-printed housing sets; the second 20 may also be printed. Casting CAD remains preliminary and requires tooling DFM.",
   "price_basis": "historical_v02_estimate_not_current_quote",
-  "pcb_main_board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f"
+  "pcb_main_board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "pcb_mic_board_sha256": "c57cebbb3886247166551fd242fa51350bc9be7fee6299e63e7eaac60518d518",
+  "pcb_mic_first_lot_pcba": 80,
+  "pcb_mic_program_41_procure_qty": 168,
+  "pcb_pwr_copper": "FOUR_LAYERS_ALL_1OZ_35UM",
+  "baseline_source_commit": "d34cb97",
+  "source_release_note": "Archive SHA256 manifest and КОНТРОЛЬ_АРХИВОВ.json identify this revised delivery."
 }

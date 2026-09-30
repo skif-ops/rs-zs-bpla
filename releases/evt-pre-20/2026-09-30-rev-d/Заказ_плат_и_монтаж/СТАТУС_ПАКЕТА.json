@@ -29,5 +29,15 @@
     "H-MIC1..4": "275+/-5",
     "H-MAIN-PWR": "440+/-5",
     "H-BAT-PWR": "330+/-5"
-  }
+  },
+  "pcb_main_pofv_order_count": 76,
+  "pcb_main_native_pofv_flags": 74,
+  "pcb_main_cam_added_pofv": [
+    "C6.1",
+    "D11.1"
+  ],
+  "pcb_pwr_copper": "FOUR_LAYERS_ALL_1OZ_35UM",
+  "pcb_pwr_first_article_pcba": 2,
+  "pcb_main_impedance_control": "PENDING_CUSTOMER_DECISION",
+  "pcb_main_impedance_inventory": "PCB-MAIN_ИМПЕДАНС_ТРАССЫ_REV_D.csv"
 }

@@ -10,7 +10,7 @@
   "preferred_fabricator_stack_candidate": "JLC08161H-3313",
   "preferred_stack_status": "PUBLISHED_STANDARD_EXAMPLE_ORDER_SELECTION_PENDING",
   "dielectric_thicknesses": "READ_FROM_SELECTED_ORDER_STACKUP",
-  "impedance_control": "SET_TARGETS_AND_OPTION_IN_ORDER",
+  "impedance_control": "PENDING_CUSTOMER_DECISION_NO_NUMERIC_TARGET",
   "layer_functions_top_to_bottom": [
     [
       "F.Cu",
@@ -46,7 +46,7 @@
     ]
   ],
   "fabrication_notes": [
-    "Select epoxy-filled and copper-capped POFV and use the 74-coordinate CSV/map; 57 locations overlap SMD pads, while 17 additional vias also carry fill/cap flags.",
+    "Select epoxy-filled and copper-capped POFV and use the 76-coordinate order CSV/map; 74 are source-flagged and two are CAM overrides at C6.1/D11.1.",
     "Minimum 0.15 mm drilled through vias and 0.25 mm finished via diameter are present.",
     "Board design DRC rules: 0.10 mm trace/space, 0.20 mm hole-to-copper, 0.20 mm hole-to-hole and edge-to-copper.",
     "Published JLCPCB options support 8 layers, 1.6 mm, ENIG, 1 oz outer/0.5 oz inner copper, 0.15/0.25 mm minimum via and POFV; see official capability screen.",
@@ -61,5 +61,19 @@
   ],
   "official_capability_screen": "JLCPCB_OFFICIAL_CAPABILITY_SCREEN_REV_B_105.json",
   "generated_job_sha256_before_control": "87a5bef4bd9c57c410507fc3fb0a412dda1ed104a7a1c2626ebd0a1e991f3953",
-  "controlled_job_sha256": "afe379e3ee84e9bcc2060b5eb4bef91f9ac20f31e6894b48bed817d5ea453720"
+  "controlled_job_sha256": "afe379e3ee84e9bcc2060b5eb4bef91f9ac20f31e6894b48bed817d5ea453720",
+  "pofv_order_csv": "VIA_FILL_CAP_76_ORDER_REV_D.csv",
+  "pofv_order_count": 76,
+  "native_board_flagged_count": 74,
+  "pofv_cam_override": [
+    "C6.1 X41.75 Y30.40",
+    "D11.1 X80.01 Y20.50"
+  ],
+  "as_routed_impedance_inventory": [
+    "PCB-MAIN_ИМПЕДАНС_ТРАССЫ_REV_D.csv",
+    "PCB-MAIN_ИМПЕДАНС_ТРАССЫ_REV_D.xlsx"
+  ],
+  "impedance_note_ru": "Ширины и слои извлечены из нативной платы. Опорные слои являются кандидатами; непрерывность земли под каждой трассой и импеданс на выбранном стеке не подтверждены. Численные цели фабрике не заданы.",
+  "impedance_note_en": "Widths and layers were extracted from the native PCB. Reference layers are candidates; ground continuity and impedance on the selected stack are unverified. No numerical target is specified to the fabricator.",
+  "panel_release_gate": "CUSTOMER_IMPEDANCE_DISPOSITION_AND_SELECTED_STACK_DFM"
 }

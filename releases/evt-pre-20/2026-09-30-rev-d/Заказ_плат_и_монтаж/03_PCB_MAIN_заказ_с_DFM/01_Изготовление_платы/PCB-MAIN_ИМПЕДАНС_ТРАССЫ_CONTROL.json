@@ -1,0 +1,9 @@
+{
+  "schema": "dioneya-pcb-main-as-routed-impedance-inventory-v1",
+  "board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "rf_net_count": 7,
+  "row_count": 23,
+  "decision": "PENDING_CUSTOMER_DECISION",
+  "note_ru": "Ширины и слои извлечены из нативной платы. Опорные слои являются кандидатами; непрерывность земли под каждой трассой и импеданс на выбранном стеке не подтверждены. Численные цели фабрике не заданы.",
+  "note_en": "Widths and layers were extracted from the native PCB. Reference layers are candidates; ground continuity and impedance on the selected stack are unverified. No numerical target is specified to the fabricator."
+}
