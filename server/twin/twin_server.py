@@ -23,7 +23,9 @@ would).  Firmware update (addendum F): ``update_firmware`` queues CMD_UPDATE_FIR
 test image (tools/generate_fw_update_vector.py, version ``ZS_TWIN_FW_VERSION``, default 2) signed by the test release
 key into a real ``ReleaseRepository``; every ``fwreq`` is answered by the bridge's ``serve_request`` against the
 store (``ZS_TWIN_FW_DROP=n`` drops the n-th request, as a lost chunk would; ``ZS_TWIN_FW_REDELIVER=1`` sends the command
-envelope again after the second chunk, as a QoS 1 redelivery during the download would).  A final ``REPORT`` line summarises what
+envelope again after the second chunk, as a QoS 1 redelivery during the download would).  Network configuration (addendum G): ``set_network`` queues CMD_SET_NETWORK_CONFIG moving the station to
+``muhoed2.twin:443`` (the same twin behind a second name, which the twin modem reaches), ``set_network_bad`` one to a
+host no DNS knows (the station must roll back).  A final ``REPORT`` line summarises what
 arrived.
 Run by the twin: ``python3 -m twin.twin_server`` from the server/ directory.
 """
@@ -47,6 +49,7 @@ from station.command_codec import CommandKeyring, CommandSigner, decode_command_
 from station.event_receipt_codec import EventReceipt, encode_event_receipt
 from station.audio_ingest import ingest_audio_chunk
 from station.mqtt_bridge import request_event_audio
+from station.network_config import NETWORK_COMMAND
 from station.schemas import StationCommand
 from station.store import EventStore
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -61,6 +64,7 @@ TWIN_NEXT_COMMAND_SEED = bytes(range(33, 65))    # the next key of tools/generat
 TWIN_SET_PARAMS = {"reset": False, "params": {"heartbeat_period_s": 900, "mic_channel": 1, "listen_dwell_s": 5}}
 TWIN_RELEASE_SEED = bytes(range(65, 97))          # the test release key of tools/generate_fw_update_vector.py
 TWIN_FW_IMAGE_BYTES = 40_000                      # 40 chunks; the twin's simulated bank holds 120 KiB
+TWIN_NETWORK = {"version": 2, "server_host": "muhoed2.twin", "mqtt_port": 443}   # the second endpoint the twin modem reaches
 
 
 def twin_release(repository: firmware_codec.ReleaseRepository, version: int) -> firmware_codec.Release:
@@ -90,6 +94,10 @@ def command_queue(spec: str) -> list[tuple[str, str, dict]]:
             queue.append((str(uuid.uuid4()), "CMD_REBOOT@old", {"delay_s": 10}))
         elif item == "update_firmware":
             queue.append((str(uuid.uuid4()), "CMD_UPDATE_FIRMWARE", {}))      # the payload comes from the release
+        elif item == "set_network":                   # addendum G: the twin broker under its second name and port
+            queue.append((str(uuid.uuid4()), NETWORK_COMMAND, dict(TWIN_NETWORK)))
+        elif item == "set_network_bad":               # a host no DNS knows: the station must roll back
+            queue.append((str(uuid.uuid4()), NETWORK_COMMAND, {"version": 2, "server_host": "dead.twin"}))
         else:
             raise SystemExit(f"twin server: unknown command {item!r}")
     return queue

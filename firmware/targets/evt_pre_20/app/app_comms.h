@@ -48,7 +48,8 @@ void app_comms_request(bool on);
 /* Power policy from the mode scheduler (S3/S4 allow the modem): the comms task owns EN_MODEM and brings the modem
    down gracefully (AT+QPOWD, then the rail) when the policy withdraws it; a later allow restarts it. */
 void app_comms_allow_modem(bool allowed);
-/* Latest station config for the endpoint (from the ble task's zs_ipc_service). */
+/* Latest station config for the endpoint (from the ble task's zs_ipc_service).  A record other than the stable one
+   (a local BLE write) replaces a remote configuration that is accepted or on trial (addendum G). */
 void app_comms_set_config(const zs_station_config_t *cfg, uint32_t boot_id);
 /* Ed25519 public keys of the server's command signer (station secrets key 4): the current key and, while a
    rotation is in flight, the next one (MQTT ICD addendum E, zs_command_keys_trust_set); count 0 clears them.
@@ -97,6 +98,16 @@ bool app_comms_update_firmware(const zs_command_t *cmd, zs_command_ack_result_t 
 bool app_comms_fw_busy(void);
 /* 0 idle, 1 downloading, 2 install pending (heartbeat key 19 before the boot-record states 3/4 are added). */
 uint8_t app_comms_fw_state(void);
+/* Remote network configuration (MQTT ICD addendum G): the store the ble task loads the record from (the confirmed
+   candidate is committed to it) and a callback after that commit (the owner of the BLE service reloads its copy). */
+void app_comms_bind_config_store(const zs_station_config_io_t *io, void (*committed)(const zs_station_config_t *cfg));
+/* Executor part for CMD_SET_NETWORK_CONFIG: always answered now - REJECTED detail (zs_net_trial.h) or OK = accepted
+   for trial (the next bring-up uses it, the first session online commits it, 3 failed bring-ups / 30 min roll back). */
+bool app_comms_set_network(const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail);
+/* Accepted or on trial: the scheduler extends S3 so the switch and its attempts fit in the session. */
+bool app_comms_net_busy(void);
+/* Heartbeat keys 21..23 (version in use, state, last failed version). */
+void app_comms_net_heartbeat(zs_detector_health_t *d);
 /* The twin's simulated reset: drop the session and every RAM job (audio upload, firmware download) as a real reset
    would; the stores (journal, outbox) stay. */
 void app_comms_reset(void);

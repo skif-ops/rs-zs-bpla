@@ -13,6 +13,8 @@
  *                     promotes it first (the old key is dropped).
  *   CMD_UPDATE_FIRMWARE refused (REJECTED 1..7) or accepted: the image is fetched into the other bank in the
  *                     sessions, OK (detail = chunks) / FAILED 1..4 follows its check; install and trial: app_fw (addendum F).
+ *   CMD_SET_NETWORK_CONFIG  refused (REJECTED 1..7) or accepted for trial: the next bring-up uses the new record,
+ *                     the first session online stores it, 3 failed bring-ups / 30 min roll back (app_comms, addendum G).
  */
 #include "zs_command.h"
 #include "zs_station_params.h"

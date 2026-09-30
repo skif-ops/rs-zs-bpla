@@ -201,6 +201,9 @@ typedef struct {
   uint32_t fw_version;         /* key 18: .fw_info version of the running image (addendum F; 0 = unknown) */
   uint8_t fw_state;            /* key 19: 0 idle, 1 downloading, 2 install pending, 3 trial, 4 rolled back */
   uint32_t fw_other_version;   /* key 20: version of the image in the other bank (0 = none) */
+  uint32_t net_config_version; /* key 21: version of the network configuration in use (addendum G; the trial's while on trial) */
+  uint8_t net_state;           /* key 22: 0 stable, 1 accepted (switch after this session), 2 trial, 3 rolled back */
+  uint32_t net_failed_version; /* key 23: version of the last configuration that failed its trial (0 = none) */
 } zs_detector_health_t;
 
 typedef struct {

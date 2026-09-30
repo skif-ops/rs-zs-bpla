@@ -484,16 +484,12 @@ zs_station_config_result_t zs_station_config_store_load(
   return ZS_STATION_CONFIG_OK;
 }
 
-zs_station_config_result_t zs_station_config_store_commit(
-    const zs_station_config_io_t *io, const zs_station_config_t *cfg,
-    bool physical_service_mode, bool authenticated_role) {
+static zs_station_config_result_t store_commit(const zs_station_config_io_t *io, const zs_station_config_t *cfg) {
   zs_station_config_t current, verify;
   uint8_t bytes[ZS_STATION_CONFIG_SLOT_BYTES], readback[ZS_STATION_CONFIG_SLOT_BYTES];
   uint8_t active = 0u, target;
   uint32_t generation = 1u;
   zs_station_config_result_t load;
-  if (!io_valid(io) || cfg == NULL) return ZS_STATION_CONFIG_INVALID_ARGUMENT;
-  if (!physical_service_mode || !authenticated_role) return ZS_STATION_CONFIG_AUTH_REQUIRED;
   if (zs_station_config_validate(cfg) != 0u || !zs_station_config_hash_valid(cfg)) return ZS_STATION_CONFIG_INVALID_RECORD;
   load = zs_station_config_store_load(io, &current, &active);
   if (load == ZS_STATION_CONFIG_OK) {
@@ -518,4 +514,27 @@ zs_station_config_result_t zs_station_config_store_commit(
     return ZS_STATION_CONFIG_VERIFY_FAILED;
   }
   return ZS_STATION_CONFIG_OK;
+}
+
+zs_station_config_result_t zs_station_config_store_commit(
+    const zs_station_config_io_t *io, const zs_station_config_t *cfg,
+    bool physical_service_mode, bool authenticated_role) {
+  if (!io_valid(io) || cfg == NULL) return ZS_STATION_CONFIG_INVALID_ARGUMENT;
+  if (!physical_service_mode || !authenticated_role) return ZS_STATION_CONFIG_AUTH_REQUIRED;
+  return store_commit(io, cfg);
+}
+
+zs_station_config_result_t zs_station_config_store_commit_remote(
+    const zs_station_config_io_t *io, const zs_station_config_t *cfg, const zs_station_config_t *stable) {
+  zs_station_config_t current;
+  zs_station_config_result_t load;
+  if (!io_valid(io) || cfg == NULL || stable == NULL) return ZS_STATION_CONFIG_INVALID_ARGUMENT;
+  /* the trust anchor stays a service-mode field: the record may differ from the stable one in its network fields only */
+  if (strcmp(cfg->ca_reference, stable->ca_reference) != 0 || cfg->station_id != stable->station_id ||
+      cfg->region != stable->region) return ZS_STATION_CONFIG_PATCH_IMMUTABLE_FIELD;
+  load = zs_station_config_store_load(io, &current, NULL);
+  if (load == ZS_STATION_CONFIG_OK && memcmp(current.config_hash, stable->config_hash, ZS_STATION_CONFIG_HASH_BYTES) != 0)
+    return ZS_STATION_CONFIG_VERSION_REJECTED;       /* the stored record changed under the trial (BLE write) */
+  if (load != ZS_STATION_CONFIG_OK && load != ZS_STATION_CONFIG_NOT_FOUND) return load;
+  return store_commit(io, cfg);
 }

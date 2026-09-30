@@ -80,6 +80,9 @@ A signed release (`-DZS_FW_RELEASE_PUBLIC_KEYS`) is fetched over MQTT into the
 other bank, installed by SWAP_BANK and confirmed or rolled back by the early
 boot guard (`app/app_fw.c`). The engineering full-flash script above remains the
 scaffold contract; secure boot and hardware evidence of the bank swap remain open.
+A signed CMD_SET_NETWORK_CONFIG (addendum G) is tried by the comms task on the next
+bring-up and committed to the configuration record only once a session is online
+with it; three failed bring-ups or 30 minutes roll back to the stored record.
 
 The portable installation-position store now provides a two-slot atomic record,
 CRC, last-write commit marker, monotonic recommission version and read-back. Its

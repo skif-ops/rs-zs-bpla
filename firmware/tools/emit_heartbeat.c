@@ -73,6 +73,8 @@ int main(void) {
   message.detector.command_next_key_id = UINT64_C(0x0102030405060708);
   message.detector.fw_version = 7u; message.detector.fw_state = 3u;       /* addendum F: v7 on trial, */
   message.detector.fw_other_version = 6u;                                 /* v6 in the other bank */
+  message.detector.net_config_version = 4u; message.detector.net_state = 3u;   /* addendum G: v4 in use, */
+  message.detector.net_failed_version = 5u;                               /* v5 failed its trial and was rolled back */
 
   size = zs_protocol_encode_heartbeat(&message, encoded, sizeof(encoded));
   if (size == 0u || fwrite(encoded, 1u, size, stdout) != size) return 1;

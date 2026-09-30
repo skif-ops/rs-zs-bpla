@@ -166,4 +166,16 @@ zs_station_config_result_t zs_station_config_store_commit(
     bool physical_service_mode,
     bool authenticated_role);
 
+/*
+ * MQTT ICD addendum G: commits a network configuration that proved itself on trial (a session came online with it)
+ * after a signed CMD_SET_NETWORK_CONFIG.  No service-mode requirement - the command signature is the authority - but
+ * the record may differ from `stable` (the record the trial started from, which must still be the stored one) only
+ * in the network fields: ca_reference, station_id and region are refused as PATCH_IMMUTABLE_FIELD.  Version,
+ * validation, inactive-slot write and read-back as zs_station_config_store_commit.
+ */
+zs_station_config_result_t zs_station_config_store_commit_remote(
+    const zs_station_config_io_t *io,
+    const zs_station_config_t *cfg,
+    const zs_station_config_t *stable);
+
 #endif

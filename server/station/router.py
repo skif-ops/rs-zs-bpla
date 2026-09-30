@@ -4,9 +4,10 @@ import json, os, time
 from pathlib import Path
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
-from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage, CommandKeyRotationRequest, FirmwareUpdateRequest
+from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage, CommandKeyRotationRequest, FirmwareUpdateRequest, NetworkConfigRequest
 from station.command_codec import validate_command_payload
 from station.firmware_codec import ReleaseRepository, UPDATE_COMMAND
+from station.network_config import NETWORK_COMMAND, next_version
 from station.store import EventStore
 from station.service import StationFusionService
 from station.cbor_codec import decode_detection_cbor
@@ -90,6 +91,22 @@ async def rotate_command_key(station_id:int,req:CommandKeyRotationRequest):
     try:
         validate_command_payload('CMD_ROTATE_COMMAND_KEY',payload)
         command=store.create_command(station_id,'CMD_ROTATE_COMMAND_KEY',payload)
+    except ValueError as exc: raise HTTPException(400,str(exc)) from None
+    return command.model_dump()
+
+@router.post('/stations/{station_id}/network-config')
+async def set_network_config(station_id:int,req:NetworkConfigRequest):
+    """ICD addendum G: queue CMD_SET_NETWORK_CONFIG (server host, ports, pin, tenant, topic prefix, SIM, APNs).  The
+    station tries it on its next bring-up and keeps it only when a session comes online with it; the outcome is in its
+    heartbeat (detector.net_config_version / net_state / net_failed_version).  The version defaults to the one the
+    station reported + 1."""
+    payload={k:v for k,v in req.model_dump().items() if v is not None}
+    try:
+        if 'version' not in payload: payload['version']=next_version(store.get_station_heartbeat(station_id))
+    except ValueError as exc: raise HTTPException(409,str(exc)) from None
+    try:
+        validate_command_payload(NETWORK_COMMAND,payload)
+        command=store.create_command(station_id,NETWORK_COMMAND,payload)
     except ValueError as exc: raise HTTPException(400,str(exc)) from None
     return command.model_dump()
 

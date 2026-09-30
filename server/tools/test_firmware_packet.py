@@ -87,6 +87,7 @@ assert heartbeat.detector.params_version == 3
 assert not heartbeat.self_test_ok and heartbeat.detector.selftest_failed_tests == 0x10   # mic_capture (id 4)
 assert heartbeat.detector.command_key_id == "a1b2c3d4e5f60718" and heartbeat.detector.command_next_key_id == "0102030405060708"
 assert (heartbeat.detector.fw_version, heartbeat.detector.fw_state, heartbeat.detector.fw_other_version) == (7, "TRIAL", 6)   # addendum F
+assert (heartbeat.detector.net_config_version, heartbeat.detector.net_state, heartbeat.detector.net_failed_version) == (4, "ROLLED_BACK", 5)   # addendum G
 assert heartbeat.cellular.apn == "network.apn"
 assert heartbeat.cellular.apn_source == "NETWORK"
 assert heartbeat.cellular.settings_valid

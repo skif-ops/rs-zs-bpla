@@ -16,6 +16,10 @@
  * simulated bank swap and reset, run on trial through the real boot guard (zs_fw_boot) and confirmed by a session;
  * --ota-hang-version makes that image hang at start so the early IWDG resets it until the guard swaps back.
  *
+ * Network configuration (ICD addendum G): the BG95 responder opens MQTT only to muhoed.twin:8883 and muhoed2.twin:443
+ * (the same server twin behind two names), any other host fails its DNS lookup; CMD_SET_NETWORK_CONFIG goes through
+ * the real app_comms trial and the RAM configuration record stands in for the NOR one.
+ *
  * Nothing on the target changes: the twin reuses the modules and mirrors the task wiring of tasks.c.
  *   station_twin --scene drone|quiet|ground --seconds N --server "python3 -m twin.twin_server" [--seed S]
  */
@@ -157,6 +161,7 @@ static size_t binary_expected; static uint8_t binary_buf[4096]; static size_t bi
 static unsigned pending_pub_id; static char pending_pub_topic[128];
 static bool powered_down = true, gsm_available = true;   /* gsm_available=false: the network is gone (outage scenario) */
 static unsigned qmtpub_count, qpowd_count, recv_msgid = 100u;
+static unsigned endpoint1_opens, endpoint2_opens, endpoint_failures;   /* QMTOPEN to muhoed.twin:8883 / muhoed2.twin:443 / elsewhere */
 
 /* ---- channel model: publish loss, receipt latency/loss, an MQTT broker that refuses while the network is fine ---- */
 static float ch_publish_loss, ch_receipt_loss;          /* probabilities 0..1 */
@@ -199,7 +204,18 @@ static void on_at_command(const char *c) {
   if (strcmp(c, "AT+CGCONTRDP=1") == 0) { reply("+CGCONTRDP: 1,5,\"internet\",\"10.10.0.2.255.255.255.0\",\"10.10.0.1\",\"1.1.1.1\",\"8.8.8.8\""); reply("OK"); return; }
   if (strncmp(c, "AT+QSSLCFG=", 11u) == 0 || strncmp(c, "AT+QMTCFG=", 10u) == 0) { reply("OK"); return; }
   if (strcmp(c, "AT+QIACT=1") == 0) { reply(gsm_available ? "OK" : "ERROR"); return; }
-  if (strncmp(c, "AT+QMTOPEN=", 11u) == 0) { reply("OK"); reply(gsm_available && !mqtt_refused() ? "+QMTOPEN: 0,0" : "+QMTOPEN: 0,-1"); return; }
+  if (strncmp(c, "AT+QMTOPEN=", 11u) == 0) {
+    /* the brokers this twin can reach (the Muhoed twin behind both names); any other host fails its DNS lookup (4) */
+    char host[80] = ""; unsigned port = 0u;
+    const bool known = sscanf(c, "AT+QMTOPEN=%*u,\"%79[^\"]\",%u", host, &port) == 2 &&
+                       ((strcmp(host, "muhoed.twin") == 0 && port == 8883u) || (strcmp(host, "muhoed2.twin") == 0 && port == 443u));
+    reply("OK");
+    if (!gsm_available || mqtt_refused()) { reply("+QMTOPEN: 0,-1"); return; }
+    if (!known) { endpoint_failures++; tlog("modem: QMTOPEN %s:%u -> DNS failure", host, port); reply("+QMTOPEN: 0,4"); return; }
+    if (strcmp(host, "muhoed2.twin") == 0) endpoint2_opens++; else endpoint1_opens++;
+    reply("+QMTOPEN: 0,0");
+    return;
+  }
   if (strncmp(c, "AT+QMTCONN=", 11u) == 0) { reply("OK"); reply("+QMTCONN: 0,0,0"); return; }
   if (strncmp(c, "AT+QMTSUB=", 10u) == 0) {
     unsigned client, id; char r[64], topic[128];
@@ -530,6 +546,7 @@ static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->detector.fw_version = fw_running_version();                    /* addendum F: keys 18..20 */
   hb->detector.fw_state = fw_state_now();
   hb->detector.fw_other_version = fw_bank_version(fw_other());
+  app_comms_net_heartbeat(&hb->detector);                            /* addendum G: keys 21..23 */
   return true;
 }
 static uint32_t outbox_retry_at_ms, outbox_retry_backoff_ms = 300000u, outbox_retries;
@@ -585,6 +602,15 @@ static void gsm_probe_tick(void) {
   mode_event(ZS_MODE_EV_OUTBOX_PENDING);
 }
 
+/* ---- station configuration record (the NOR record the ble task loads in tasks.c): a remote network configuration
+   that proved itself is committed here (addendum G) ---- */
+static uint8_t cfg_mem[2][ZS_STATION_CONFIG_SLOT_BYTES];
+static bool cf_read(void *c, uint8_t s, uint32_t o, uint8_t *d, size_t n) { (void)c; if (s > 1u || o + n > ZS_STATION_CONFIG_SLOT_BYTES) return false; memcpy(d, &cfg_mem[s][o], n); return true; }
+static bool cf_erase(void *c, uint8_t s) { (void)c; if (s > 1u) return false; memset(cfg_mem[s], 0xff, ZS_STATION_CONFIG_SLOT_BYTES); return true; }
+static bool cf_write(void *c, uint8_t s, uint32_t o, const uint8_t *d, size_t n) { (void)c; if (s > 1u || o + n > ZS_STATION_CONFIG_SLOT_BYTES) return false; for (size_t i = 0u; i < n; i++) { if ((cfg_mem[s][o + i] & d[i]) != d[i]) return false; cfg_mem[s][o + i] = d[i]; } return true; }
+static const zs_station_config_io_t cfg_io = {NULL, cf_read, cf_erase, cf_write};
+static void net_committed(const zs_station_config_t *cfg) { tlog("twin: configuration v%lu stored (%s:%u)", (unsigned long)cfg->version, cfg->server_host, cfg->mqtt_port); }
+
 /* ---- remote commands: executor mirroring app_commands.c over zs_station_params (RAM record = the NOR one) ---- */
 static uint8_t params_mem[2][64];
 static bool pm_read(void *c, uint8_t s, uint32_t o, uint8_t *d, size_t n) { (void)c; if (s > 1u || o + n > 64u) return false; memcpy(d, &params_mem[s][o], n); return true; }
@@ -624,6 +650,9 @@ static bool twin_execute(void *ctx, const zs_command_t *cmd, zs_command_ack_resu
     if (!app_comms_request_audio(cmd, result, detail)) { tlog("command: REQUEST_AUDIO accepted, upload follows"); return false; }
   } else if (cmd->code == ZS_COMMAND_UPDATE_FIRMWARE) {
     if (!app_comms_update_firmware(cmd, result, detail)) { tlog("command: UPDATE_FIRMWARE accepted, download follows"); return false; }
+  } else if (cmd->code == ZS_COMMAND_SET_NETWORK) {
+    (void)app_comms_set_network(cmd, result, detail);                  /* addendum G, as app_commands.c */
+    tlog("command: SET_NETWORK_CONFIG -> result %u detail %u", (unsigned)*result, (unsigned)*detail);
   } else { *result = ZS_COMMAND_ACK_REJECTED; *detail = 1u; }
   if (*result == ZS_COMMAND_ACK_OK) cmd_executed++; else cmd_rejected++;
   return true;
@@ -724,6 +753,7 @@ static void station_reset(const char *why) {
   zs_station_params_t loaded;
   fw_boot_guard();
   app_comms_reset();
+  { zs_station_config_t stored; if (zs_station_config_store_load(&cfg_io, &stored, NULL) == ZS_STATION_CONFIG_OK) app_comms_set_config(&stored, 5u); }
   capture_set(false);
   zs_mode_init(&modes, NULL, sim_now);
   if (zs_station_params_load(&params_io, &loaded) == ZS_STATION_PARAMS_OK) { params = loaded; params_apply(&params); }
@@ -760,7 +790,8 @@ static void supervisor_tick(void) {
   gsm_probe_tick();
   for (unsigned ev = 1u; ev < 32u; ev++) if (mode_bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, sim_now);
   mode_bits = 0u;
-  modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? 300000u : 0u) + (app_comms_fw_busy() ? 900000u : 0u);
+  modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? 300000u : 0u) + (app_comms_fw_busy() ? 900000u : 0u) +
+                              (app_comms_net_busy() ? 300000u : 0u);
   (void)zs_mode_tick(&modes, sim_now);
   if (capture_on && !capture_wanted(modes.mode)) capture_set(false);   /* the post-event window closed */
   if (modes.mode != last) {
@@ -804,7 +835,7 @@ int main(int argc, char **argv) {
   const char *scene_name = "drone", *server_cmd = NULL;
   uint32_t seconds = 120u, seed = 1u, outage_start = 0u, outage_end = 0u;
   int expect_events = -1, expect_delivered = -1, expect_commands = -1, expect_reboots = -1, expect_post_audio = -1;
-  int expect_fw_version = -1, expect_fw_state = -1;
+  int expect_fw_version = -1, expect_fw_state = -1, expect_net_version = -1, expect_net_state = -1;
   uint32_t factory_version = 1u;
   zs_station_config_t cfg;
   static scene_segment_t segs[4]; size_t nseg = 0u;
@@ -836,7 +867,9 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--ota-hang-version") && i + 1 < argc) fw_hang_version = (uint32_t)atoi(argv[++i]);
     else if (!strcmp(argv[i], "--expect-fw-version") && i + 1 < argc) expect_fw_version = atoi(argv[++i]);
     else if (!strcmp(argv[i], "--expect-fw-state") && i + 1 < argc) expect_fw_state = atoi(argv[++i]);
-    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S]\n"); return 2; }
+    else if (!strcmp(argv[i], "--expect-net-version") && i + 1 < argc) expect_net_version = atoi(argv[++i]);
+    else if (!strcmp(argv[i], "--expect-net-state") && i + 1 < argc) expect_net_state = atoi(argv[++i]);
+    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S] [--expect-net-version N] [--expect-net-state S]\n"); return 2; }
   }
   if (!strcmp(scene_name, "drone")) { segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 20000u, 60000u, 185.0f, 1.0f}; if (seconds > 150u) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 100000u, 130000u, 210.0f, 0.8f}; }
   else if (!strcmp(scene_name, "ground")) segs[nseg++] = (scene_segment_t){SCENE_GROUND_VEHICLE, 20000u, 60000u, 0.0f, 1.0f};
@@ -854,6 +887,8 @@ int main(int argc, char **argv) {
   cfg.version = 1u; strcpy(cfg.server_host, "muhoed.twin"); cfg.mqtt_port = 8883u; strcpy(cfg.ca_reference, "dioneya-root");
   strcpy(cfg.tenant, "pilot1"); strcpy(cfg.topic_prefix, "zs/v1"); cfg.preferred_sim = 1u; strcpy(cfg.apn[0], "internet");
   assert(zs_station_config_validate(&cfg) == 0u && zs_station_config_compute_hash(&cfg, cfg.config_hash));
+  memset(cfg_mem, 0xff, sizeof(cfg_mem));                       /* commissioned over BLE: the record is stored */
+  assert(zs_station_config_store_commit(&cfg_io, &cfg, true, true) == ZS_STATION_CONFIG_OK && zs_station_config_store_load(&cfg_io, &cfg, NULL) == ZS_STATION_CONFIG_OK);
   for (unsigned i = 0u; i < 32u; i++) twin_engineer_key[i] = (uint8_t)(0xa0u + i);
   assert(zs_lora_uplink_init(&lora, &lora_port, &outbox_io, 17u, 1u, twin_engineer_key, 9u, 125000u, sim_now));
   /* remote commands: the repository test key (tools/generate_command_set_vector.py), the twin wall clock and the
@@ -876,6 +911,7 @@ int main(int argc, char **argv) {
   (void)zs_fw_update_vector_image; (void)zs_fw_update_vector_manifest; (void)zs_fw_update_vector_signature; (void)zs_fw_update_vector_command;
   (void)zs_fw_update_vector_request0; (void)zs_fw_update_vector_chunk0; (void)zs_fw_update_vector_chunk1; (void)zs_fw_update_vector_chunk2;
   app_comms_bind(&outbox_io, &journal_io, &hooks);
+  app_comms_bind_config_store(&cfg_io, net_committed);
   app_comms_set_config(&cfg, 5u);
   app_comms_request(true);
   zs_mode_init(&modes, NULL, sim_now);
@@ -913,6 +949,14 @@ int main(int argc, char **argv) {
     tlog("twin: firmware v%lu (bank %u, state %u), other bank v%lu; installs %u trial boots %u iwdg resets %u rollbacks %u confirms %u",
          (unsigned long)fw_running_version(), fw_active + 1u, (unsigned)fw_state_now(), (unsigned long)fw_bank_version(fw_other()),
          fw_installs, fw_trial_boots, fw_iwdg_resets, fw_rollbacks, fw_confirms);
+    {
+      zs_detector_health_t d; zs_station_config_t stored;
+      memset(&d, 0, sizeof(d)); app_comms_net_heartbeat(&d);
+      tlog("twin: network config v%lu state %u (last failed v%lu), stored v%lu; broker opens muhoed.twin %u muhoed2.twin %u, failed endpoints %u",
+           (unsigned long)d.net_config_version, (unsigned)d.net_state, (unsigned long)d.net_failed_version,
+           zs_station_config_store_load(&cfg_io, &stored, NULL) == ZS_STATION_CONFIG_OK ? (unsigned long)stored.version : 0ul,
+           endpoint1_opens, endpoint2_opens, endpoint_failures);
+    }
   }
   /* prehistory around the first event: complete seconds recorded before it and after it (the post-event window) */
   unsigned audio_before = 0u, audio_after = 0u;
@@ -932,6 +976,11 @@ int main(int argc, char **argv) {
     if (expect_post_audio >= 0 && (int)audio_after < expect_post_audio) { tlog("twin: FAIL expected >= %d s of audio after the event, got %u", expect_post_audio, audio_after); return 1; }
     if (expect_fw_version >= 0 && fw_running_version() != (uint32_t)expect_fw_version) { tlog("twin: FAIL expected firmware v%d, running v%lu", expect_fw_version, (unsigned long)fw_running_version()); return 1; }
     if (expect_fw_state >= 0 && fw_state_now() != (uint8_t)expect_fw_state) { tlog("twin: FAIL expected firmware state %d, got %u", expect_fw_state, (unsigned)fw_state_now()); return 1; }
+    if (expect_net_version >= 0 || expect_net_state >= 0) {
+      zs_detector_health_t d; memset(&d, 0, sizeof(d)); app_comms_net_heartbeat(&d);
+      if (expect_net_version >= 0 && d.net_config_version != (uint32_t)expect_net_version) { tlog("twin: FAIL expected network config v%d, got v%lu", expect_net_version, (unsigned long)d.net_config_version); return 1; }
+      if (expect_net_state >= 0 && d.net_state != (uint8_t)expect_net_state) { tlog("twin: FAIL expected network state %d, got %u", expect_net_state, (unsigned)d.net_state); return 1; }
+    }
     if (expect_reboots >= 0 && ((int)twin_reboots != expect_reboots || (int)cmd_reboots_scheduled != expect_reboots)) { tlog("twin: FAIL expected %d reboots (scheduled %u, done %u)", expect_reboots, cmd_reboots_scheduled, twin_reboots); return 1; }
   }
   if (link_out >= 0) { link_report(); fcntl(link_in, F_SETFL, fcntl(link_in, F_GETFL) & ~O_NONBLOCK); close(link_out); for (;;) { ssize_t r = read(link_in, link_buf + link_len, sizeof(link_buf) - 1u - link_len); if (r <= 0) break; link_len += (size_t)r; } link_buf[link_len] = 0; { char *p = strstr(link_buf, "REPORT "); if (p) printf("SERVER %s", p + 7); } waitpid(server_pid, NULL, 0); }

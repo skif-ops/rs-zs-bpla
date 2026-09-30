@@ -109,7 +109,14 @@ The bridge serves the chunks from that directory (`--firmware-dir`,
 `ZS_FIRMWARE_DIR`, default `data/firmware`); `GET /api/v1/firmware/releases`
 lists it and `POST /api/v1/stations/{id}/firmware-update {"version": N}`
 queues CMD_UPDATE_FIRMWARE. Progress is in the heartbeat
-(`detector.fw_version / fw_state / fw_other_version`). Command delivery uses QoS 1, retain false and durable retries until a
+(`detector.fw_version / fw_state / fw_other_version`).
+
+The network part of a station's configuration (server host, MQTT/HTTPS port, certificate pin, tenant, topic prefix,
+SIM, APNs; ICD addendum G) changes remotely as well: `POST /api/v1/stations/{id}/network-config` with the fields to
+change queues CMD_SET_NETWORK_CONFIG (the version defaults to the one the station reports + 1). The station tries the
+new record on its next bring-up and stores it only when a session comes online with it; otherwise it rolls back after
+three failed bring-ups or 30 minutes. The outcome is in the heartbeat (`detector.net_config_version / net_state /
+net_failed_version`); the CA reference stays a service-mode field. Command delivery uses QoS 1, retain false and durable retries until a
 station-bound application ACK or the 15-minute TTL. The checked-in ACL contains
 separate topic rights for station credentials 01 through 20.
 
