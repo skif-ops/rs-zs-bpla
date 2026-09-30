@@ -65,7 +65,7 @@ int main(void) {
   unsigned seed = 7u;
   const unsigned uav_centroid = 0u, background_centroid = 43u;  /* FP-1 (class 1) / природный фон (class 18) */
   assert(zs_model_class_id[uav_centroid] == ZS_CLASS_PISTON_UAV && zs_model_class_id[background_centroid] == ZS_CLASS_WIND);
-  const zs_station_pipeline_port_t port = {&W, extract, sample_time, emit, 12u, 0x5a5au, 0u, 6u};
+  const zs_station_pipeline_port_t port = {&W, extract, sample_time, emit, 12u, 0x5a5au, 0u, 6u, NULL, NULL};
   zs_audio_ring_init(&ring, ring_storage, RING_FRAMES, 32000u);
   assert(zs_station_pipeline_init(&P, &port, scratch, window));
   assert(zs_station_pipeline_poll(&P, &ring) == 0u && P.windows == 0u);     /* nothing captured yet */
