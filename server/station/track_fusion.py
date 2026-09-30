@@ -15,9 +15,9 @@ After every accepted batch the whole fused track is recomputed from all member b
 so batches of different stations may arrive in any order and a redelivered batch changes nothing.  Only bearings
 with trusted station time (GNSS or holdover) are fused.
 
-Known limit: two targets at once in the same area can form ghost intersections before either track exists; the
-association then follows whichever pair formed first.  Resolving that needs class/f0 matching across stations
-(next revision, together with the output API dioneya.alert/1).
+Two targets at once: rays of stations hearing different targets intersect in ghost points.  Station tracks whose
+known classes differ or whose fundamentals are further apart than the Doppler shift allows (station/target_match.py)
+are therefore never paired or joined.  Two targets of the same class and engine note can still form a ghost pair.
 """
 from __future__ import annotations
 
@@ -27,6 +27,7 @@ import numpy as np
 
 from fusion.bearing_fusion import MAX_RANGE_M, SPEED_OF_SOUND_MPS, StationBearings, fuse
 from fusion.geodesy import EnuFrame
+from station import target_match
 
 TRUSTED_TIME = ("GNSS_TIME_TRUSTED", "HOLDOVER")
 JOIN_WINDOW_US = 15_000_000     # station tracks this far apart in time may still belong together
@@ -84,11 +85,18 @@ class BearingTrackFusion:
         median = float(np.median(residuals))
         return median if median <= float(np.median(limits)) else None
 
+    def _signature(self, station_id: int, track_event_id: int) -> target_match.Signature:
+        return target_match.station_track_signature(self.store, station_id, track_event_id)
+
     def _associate(self, station_id: int, track_event_id: int, first_us: int, last_us: int) -> str | None:
         nearby = [t for t in self.store.bearing_tracks(first_us - JOIN_WINDOW_US, last_us + JOIN_WINDOW_US)
                   if (t["station_id"], t["track_event_id"]) != (station_id, track_event_id)]
+        own = self._signature(station_id, track_event_id)
         best = None
         for track_id in sorted({t["track_id"] for t in nearby if t["track_id"]}):
+            members = self.store.track_members(track_id)
+            if not target_match.compatible(own, target_match.merge([self._signature(s, t) for s, t in members])):
+                continue                                         # the fused track is another target
             track = self.store.get_track(track_id)
             residual = self._residual_deg(station_id, track_event_id, track) if track else None
             if residual is not None and (best is None or residual < best[0]):
@@ -100,6 +108,8 @@ class BearingTrackFusion:
         for other in nearby:
             if other["track_id"] or other["station_id"] == station_id:
                 continue
+            if not target_match.compatible(own, self._signature(other["station_id"], other["track_event_id"])):
+                continue                                         # the other station hears another target
             members = [(station_id, track_event_id), (other["station_id"], other["track_event_id"])]
             points = fuse(self._station_bearings(members))
             if len(points) >= MIN_FIXES and (pair is None or len(points) > pair[0]):

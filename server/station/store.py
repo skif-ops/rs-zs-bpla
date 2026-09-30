@@ -6,12 +6,14 @@ from typing import Any
 from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, StationCommand, SystemEvent
 
 COMMAND_TTL_US = 15 * 60 * 1_000_000
+ALERT_OUTBOX_DAYS = 30             # consumers catch up from the outbox within this time (dioneya.alert/1)
 
 SCHEMA = """
 PRAGMA journal_mode=WAL;
 CREATE TABLE IF NOT EXISTS stations(station_id INTEGER PRIMARY KEY, updated_us INTEGER NOT NULL, payload TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS detections(event_id INTEGER PRIMARY KEY, station_id INTEGER NOT NULL, event_time_us INTEGER NOT NULL, class_label TEXT NOT NULL, payload TEXT NOT NULL, system_event_id TEXT);
 CREATE INDEX IF NOT EXISTS idx_det_time ON detections(event_time_us);
+CREATE INDEX IF NOT EXISTS idx_det_station ON detections(station_id, event_time_us);
 CREATE TABLE IF NOT EXISTS system_events(system_event_id TEXT PRIMARY KEY, created_us INTEGER NOT NULL, event_type TEXT NOT NULL, payload TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS idx_evt_time ON system_events(created_us);
 CREATE TABLE IF NOT EXISTS security_events(event_id INTEGER PRIMARY KEY, station_id INTEGER NOT NULL, created_us INTEGER NOT NULL, payload TEXT NOT NULL);
@@ -26,6 +28,11 @@ CREATE INDEX IF NOT EXISTS idx_track_last ON fused_tracks(last_time_us);
 CREATE TABLE IF NOT EXISTS track_members(station_id INTEGER NOT NULL, track_event_id INTEGER NOT NULL, track_id TEXT NOT NULL, PRIMARY KEY(station_id, track_event_id));
 CREATE INDEX IF NOT EXISTS idx_member_track ON track_members(track_id);
 CREATE TABLE IF NOT EXISTS track_points(track_id TEXT NOT NULL, time_us INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(track_id, time_us));
+CREATE TABLE IF NOT EXISTS alert_outbox(seq INTEGER PRIMARY KEY AUTOINCREMENT, msg_id TEXT NOT NULL UNIQUE, tenant TEXT NOT NULL, type TEXT NOT NULL, created_us INTEGER NOT NULL, message TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS alert_episodes(alert_id TEXT PRIMARY KEY, tenant TEXT NOT NULL, started_us INTEGER NOT NULL, last_activity_us INTEGER NOT NULL, level TEXT NOT NULL, stations TEXT NOT NULL, class TEXT NOT NULL, ended_us INTEGER);
+CREATE INDEX IF NOT EXISTS idx_episode_open ON alert_episodes(tenant, ended_us);
+CREATE TABLE IF NOT EXISTS alert_tracks(track_id TEXT PRIMARY KEY, alert_id TEXT NOT NULL, last_point_us INTEGER NOT NULL, ended_us INTEGER);
+CREATE TABLE IF NOT EXISTS alert_cursors(consumer TEXT PRIMARY KEY, seq INTEGER NOT NULL, updated_us INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS audio_parts(station_id INTEGER NOT NULL, command_id TEXT NOT NULL, segment INTEGER NOT NULL, chunk_index INTEGER NOT NULL, event_id INTEGER NOT NULL, chunk_count INTEGER NOT NULL, sample_rate INTEGER NOT NULL, start_time_us INTEGER NOT NULL, sha256 BLOB NOT NULL, data BLOB NOT NULL, received_us INTEGER NOT NULL, PRIMARY KEY(station_id, command_id, segment, chunk_index));
 """
 
@@ -197,6 +204,18 @@ class EventStore:
         return [{'station_id':r['station_id'],'track_event_id':r['track_event_id']&0xFFFFFFFFFFFFFFFF,'system_event_id':r['system_event_id'],
                  'time_us':r['time_us'],'azimuth_deg':r['azimuth_cdeg']/100,'elevation_deg':r['elevation_cdeg']/100,'sigma_deg':r['sigma_cdeg']/100,
                  'confidence':r['confidence'],'frames':r['frames'],'time_trust':r['time_trust']} for r in rows]
+    def get_detection(self,station_id:int,event_id:int)->DetectionMessage|None:
+        with self._conn() as c:
+            row=c.execute("SELECT payload FROM detections WHERE event_id=? AND station_id=?",(self._sqlite_event_id(event_id),station_id)).fetchone()
+        return DetectionMessage.model_validate_json(row['payload']) if row else None
+    def station_detections(self,station_id:int,since_us:int,until_us:int)->list[DetectionMessage]:
+        with self._conn() as c:
+            rows=c.execute("SELECT payload FROM detections WHERE station_id=? AND event_time_us BETWEEN ? AND ? ORDER BY event_time_us",(station_id,since_us,until_us)).fetchall()
+        return [DetectionMessage.model_validate_json(r['payload']) for r in rows]
+    def bearing_span(self,station_id:int,track_event_id:int)->tuple[int,int]|None:
+        with self._conn() as c:
+            row=c.execute("SELECT MIN(time_us) AS a,MAX(time_us) AS b FROM bearings WHERE station_id=? AND track_event_id=? AND time_us>0",(station_id,self._sqlite_event_id(track_event_id))).fetchone()
+        return (row['a'],row['b']) if row and row['a'] is not None else None
     def system_event_of_detection(self,station_id:int,event_id:int)->str|None:
         with self._conn() as c:
             row=c.execute("SELECT system_event_id FROM detections WHERE event_id=? AND station_id=?",(self._sqlite_event_id(event_id),station_id)).fetchone()
@@ -212,7 +231,8 @@ class EventStore:
         return [{'station_id':r['station_id'],'track_event_id':r['track_event_id']&0xFFFFFFFFFFFFFFFF,'first_us':r['first_us'],'last_us':r['last_us'],
                  'samples':r['samples'],'track_id':r['track_id']} for r in rows]
     def station_position(self,station_id:int,event_id:int|None=None)->tuple[float,float,float]|None:
-        """(lat, lon, alt MSL) of a station: the (position-guarded) detection of the track, else its last heartbeat."""
+        """(lat, lon, alt MSL) of a station: the (position-guarded) detection of the track, else its last heartbeat, else
+        its latest detection."""
         if event_id is not None:
             with self._conn() as c:
                 row=c.execute("SELECT payload FROM detections WHERE event_id=? AND station_id=?",(self._sqlite_event_id(event_id),station_id)).fetchone()
@@ -221,6 +241,11 @@ class EventStore:
                 if st.lat_e7 or st.lon_e7: return st.lat,st.lon,st.alt_m
         hb=self.get_station_heartbeat(station_id)
         if hb is not None and (hb.station.lat_e7 or hb.station.lon_e7): return hb.station.lat,hb.station.lon,hb.station.alt_m
+        with self._conn() as c:        # no heartbeat yet: the station's latest detection
+            row=c.execute("SELECT payload FROM detections WHERE station_id=? ORDER BY event_time_us DESC LIMIT 1",(station_id,)).fetchone()
+        if row is not None:
+            st=DetectionMessage.model_validate_json(row['payload']).station
+            if st.lat_e7 or st.lon_e7: return st.lat,st.lon,st.alt_m
         return None
     # ---- fused tracks (bearing fusion of several stations, fusion/bearing_fusion.py) ----
     def track_of_member(self,station_id:int,track_event_id:int)->str|None:
@@ -264,6 +289,65 @@ class EventStore:
         out['members']=[{'station_id':s,'track_event_id':t} for s,t in self.track_members(track_id)]
         out['track_points']=[json.loads(p['payload']) for p in pts]
         return out
+    # ---- output API dioneya.alert/1 (integration/): the outbox every consumer reads by seq, alert episodes, tracks ----
+    def append_alert(self,msg_id:str,tenant:str,msg_type:str,created_us:int,message:dict)->int|None:
+        """Append a message once (msg_id is unique): its seq, or None when it was appended before."""
+        with self.lock,self._conn() as c:
+            cur=c.execute("INSERT OR IGNORE INTO alert_outbox(msg_id,tenant,type,created_us,message) VALUES(?,?,?,?,?)",
+                          (msg_id,tenant,msg_type,created_us,json.dumps(message,ensure_ascii=False,separators=(',',':'))))
+            return cur.lastrowid if cur.rowcount else None
+    def list_alerts(self,after_seq:int=0,*,tenant:str|None=None,limit:int=500,until_seq:int|None=None)->list[dict[str,Any]]:
+        """Messages after a seq (up to until_seq), oldest first, with their seq."""
+        where,args=["seq>?"],[after_seq]
+        if until_seq is not None: where.append("seq<=?"); args.append(until_seq)
+        if tenant: where.append("tenant=?"); args.append(tenant)
+        with self._conn() as c:
+            rows=c.execute("SELECT seq,message FROM alert_outbox WHERE "+" AND ".join(where)+" ORDER BY seq LIMIT ?",(*args,limit)).fetchall()
+        return [{**json.loads(r['message']),'seq':r['seq']} for r in rows]
+    def read_alerts(self,after_seq:int,*,tenant:str|None=None,limit:int=500)->tuple[list[dict[str,Any]],int]:
+        """A page of messages and the seq to continue after: past every message this read could see, also those of
+        other tenants (the outbox's last seq is read first, so nothing appended meanwhile is skipped)."""
+        upto=self.last_alert_seq()
+        messages=self.list_alerts(after_seq,tenant=tenant,limit=limit,until_seq=upto)
+        return messages,(messages[-1]['seq'] if len(messages)>=limit else max(upto,after_seq))
+    def last_alert_seq(self)->int:
+        with self._conn() as c: row=c.execute("SELECT MAX(seq) FROM alert_outbox").fetchone()
+        return row[0] or 0
+    def open_episode(self,tenant:str)->dict[str,Any]|None:
+        with self._conn() as c:
+            row=c.execute("SELECT * FROM alert_episodes WHERE tenant=? AND ended_us IS NULL ORDER BY started_us DESC LIMIT 1",(tenant,)).fetchone()
+        return self._episode(row) if row else None
+    def get_episode(self,alert_id:str)->dict[str,Any]|None:
+        with self._conn() as c: row=c.execute("SELECT * FROM alert_episodes WHERE alert_id=?",(alert_id,)).fetchone()
+        return self._episode(row) if row else None
+    @staticmethod
+    def _episode(r)->dict[str,Any]:
+        return {'alert_id':r['alert_id'],'tenant':r['tenant'],'started_us':r['started_us'],'last_activity_us':r['last_activity_us'],
+                'level':r['level'],'stations':json.loads(r['stations']),'class':json.loads(r['class']),'ended_us':r['ended_us']}
+    def save_episode(self,e:dict[str,Any]):
+        with self.lock,self._conn() as c:
+            c.execute("INSERT OR REPLACE INTO alert_episodes VALUES(?,?,?,?,?,?,?,?)",(e['alert_id'],e['tenant'],e['started_us'],e['last_activity_us'],
+                      e['level'],json.dumps(e['stations']),json.dumps(e['class']),e['ended_us']))
+    def alert_track(self,track_id:str)->dict[str,Any]|None:
+        with self._conn() as c: row=c.execute("SELECT * FROM alert_tracks WHERE track_id=?",(track_id,)).fetchone()
+        return dict(row) if row else None
+    def save_alert_track(self,track_id:str,alert_id:str,last_point_us:int,ended_us:int|None=None):
+        with self.lock,self._conn() as c: c.execute("INSERT OR REPLACE INTO alert_tracks VALUES(?,?,?,?)",(track_id,alert_id,last_point_us,ended_us))
+    def open_alert_tracks(self,alert_id:str)->list[dict[str,Any]]:
+        """Tracks of an alert not ended yet, with the wall time their fusion was last updated."""
+        with self._conn() as c:
+            rows=c.execute("SELECT a.track_id,a.alert_id,a.last_point_us,a.ended_us,t.updated_us FROM alert_tracks a JOIN fused_tracks t ON t.track_id=a.track_id "
+                           "WHERE a.alert_id=? AND a.ended_us IS NULL",(alert_id,)).fetchall()
+        return [dict(r) for r in rows]
+    def alert_tracks_of(self,alert_id:str)->list[str]:
+        with self._conn() as c: rows=c.execute("SELECT track_id FROM alert_tracks WHERE alert_id=? ORDER BY track_id",(alert_id,)).fetchall()
+        return [r['track_id'] for r in rows]
+    def alert_cursor(self,consumer:str)->int|None:
+        with self._conn() as c: row=c.execute("SELECT seq FROM alert_cursors WHERE consumer=?",(consumer,)).fetchone()
+        return row['seq'] if row else None
+    def set_alert_cursor(self,consumer:str,seq:int,now_us:int|None=None):
+        with self.lock,self._conn() as c:
+            c.execute("INSERT OR REPLACE INTO alert_cursors VALUES(?,?,?)",(consumer,seq,int(time.time()*1e6) if now_us is None else now_us))
     # ---- audio upload over MQTT (ICD addendum B): chunks stay here until their segment is complete ----
     def command_record(self,command_id:str)->dict[str,Any]|None:
         with self._conn() as c:
@@ -328,4 +412,7 @@ class EventStore:
             c.execute("DELETE FROM bearings WHERE time_us<?",(cutoff,))
             c.execute("DELETE FROM track_points WHERE time_us<?",(cutoff,)); c.execute("DELETE FROM fused_tracks WHERE last_time_us<?",(cutoff,))
             c.execute("DELETE FROM track_members WHERE track_id NOT IN (SELECT track_id FROM fused_tracks)")
+            c.execute("DELETE FROM alert_outbox WHERE created_us<?",(int((time.time()-ALERT_OUTBOX_DAYS*86400)*1e6),))
+            c.execute("DELETE FROM alert_tracks WHERE track_id NOT IN (SELECT track_id FROM fused_tracks)")
+            c.execute("DELETE FROM alert_episodes WHERE ended_us<?",(cutoff,))
             c.execute("DELETE FROM system_events WHERE created_us<?",(cutoff,)); c.execute("DELETE FROM detections WHERE event_time_us<?",(cutoff,)); c.execute("DELETE FROM security_events WHERE created_us<?",(cutoff,))
