@@ -30,6 +30,12 @@ Runs zs_station_twin with the Python server twin on the pipe and checks the serv
      restart it.  A station already running that version refuses it.
   6b. the new image hangs at start: the early IWDG resets it three times, the boot guard swaps back, the old image
      runs again and the heartbeat reports the rollback.
+  7. remote network configuration (ICD addendum G): CMD_SET_NETWORK_CONFIG moves the station to the broker's second
+     name and port; the station acknowledges under the old configuration, ends that session, brings the modem up with
+     the new one in the same S3, commits it once the session is online and reports it in the heartbeat over the new
+     endpoint.
+  7b. a configuration whose host does not resolve: three failed bring-ups, rollback to the stored configuration, the
+     station comes back over the old endpoint and its heartbeat reports the failed version.
 """
 from __future__ import annotations
 
@@ -200,6 +206,31 @@ def main() -> int:
     assert (det["fw_version"], det["fw_state"], det["fw_other_version"]) == (1, "ROLLED_BACK", 2), det
     print(f"scenario 6b (image hangs at start): 3 IWDG resets on trial, rollback to v{det['fw_version']}, "
           f"heartbeat {det['fw_state']} (other bank v{det['fw_other_version']})")
+
+    # remote network configuration: muhoed.twin:8883 -> muhoed2.twin:443 (the same twin behind its second name)
+    log, r = run(["--scene", "quiet", "--seconds", "120", "--seed", "3", "--expect-net-version", "2", "--expect-net-state", "0"],
+                 commands="set_network")
+    (sent,), (ack,) = r["commands_sent"], r["acks"]
+    assert sent["command"] == "CMD_SET_NETWORK_CONFIG" and (ack["command_id"], ack["result"], ack["detail"]) == (sent["command_id"], 0, 0), (sent, ack)
+    assert log.index("net: switching to configuration v2") > log.index("command: SET_NETWORK_CONFIG -> result 0")
+    assert log.index("net: v2 CONFIRMED (online with muhoed2.twin:443)") < log.index("session done -> COMMS_DONE")
+    assert "stored v2; broker opens muhoed.twin 1 muhoed2.twin 1, failed endpoints 0" in log
+    det = r["last_heartbeat"]["detector"]
+    assert (det["net_config_version"], det["net_state"], det["net_failed_version"]) == (2, "STABLE", 0), det
+    print(f"scenario 7 (network configuration): ACK under v1, switch in the same S3, online over muhoed2.twin:443, stored; "
+          f"heartbeat v{det['net_config_version']} {det['net_state']}")
+
+    # a host no DNS knows: three failed bring-ups, rollback, back over the old endpoint
+    log, r = run(["--scene", "quiet", "--seconds", "200", "--seed", "3", "--expect-net-version", "1", "--expect-net-state", "3"],
+                 commands="set_network_bad")
+    assert [(a["result"], a["detail"]) for a in r["acks"]] == [(0, 0)], r["acks"]
+    assert log.count("DNS failure") == 3 and "net: v2 failed 3 bring-ups, ROLLED BACK to v1" in log and "CONFIRMED" not in log
+    assert "session done -> COMMS_DONE" in log[log.index("ROLLED BACK"):], "the old configuration must connect again"
+    assert "stored v1; broker opens muhoed.twin 2 muhoed2.twin 0, failed endpoints 3" in log
+    det = r["last_heartbeat"]["detector"]
+    assert (det["net_config_version"], det["net_state"], det["net_failed_version"]) == (1, "ROLLED_BACK", 2), det
+    print(f"scenario 7b (unreachable configuration): 3 failed bring-ups, rollback to v{det['net_config_version']}, "
+          f"heartbeat {det['net_state']} (failed v{det['net_failed_version']})")
     return 0
 
 
