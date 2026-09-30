@@ -19,6 +19,7 @@ Detection schema: `4`
 | `zs/v1/{tenant}/{station_id}/receipt` | server -> station | 1 | false | event application receipt | PORTABLE_BG95_SESSION_LENGTH_DELIMITED_QMTRECV_QG_PASS; TARGET_USART_DMA_RETAIN_POLICY_AND_HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/fwreq` | station -> server | 1 | false | firmware chunk request (addendum F) | HOST_TWIN_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
 | `zs/v1/{tenant}/{station_id}/fw` | server -> station | 0 | false | firmware chunk (addendum F); subscribed only while a download runs | HOST_TWIN_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
+| `zs/v1/{tenant}/{station_id}/bearing` | station -> server | 1 | false | bearing batch while tracking (addendum H), message type 7; live data, never stored in NOR | HOST_TWIN_END_TO_END_IMPLEMENTED; HARDWARE_PENDING |
 
 Client ID: `dioneya-{station_id}-{boot_id}`. Clean start запрещён после provisioning; session expiry и keepalive замораживаются после 24-часового теста сети. Повторная доставка QoS 1 ожидаема, дедупликация выполняется по `event_id`, а для команд по `command_id`.
 
