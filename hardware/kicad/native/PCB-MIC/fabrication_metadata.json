@@ -1,12 +1,12 @@
 {
   "schema": "dioneya-fabrication-metadata-v1",
   "board": "PCB-MIC",
-  "revision": "A",
+  "revision": "B",
   "material": "FR-4",
   "surface_finish": "ENIG",
   "board_thickness_mm": 1.0,
   "copper_layers": 2,
-  "status": "NOT_FOR_MANUFACTURE",
+  "status": "CONTROLLED_FIRST_ARTICLE",
   "authority": "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
   "release_notes": [
     "Review A and Review B remain mandatory",

@@ -176,70 +176,44 @@ def paths(name: str) -> dict[str, Path]:
 
 
 def prepare_cam_source(name: str, pcb: Path, out: Path) -> Path:
-    """Archive a controlled CAM-only copy with drill guide flashes disabled.
+    """Archive the exact PCB-MIC source used for CAM generation.
 
-    PCB-MIC review evidence is bound against the committed native PCB. KiCad's saved
-    ``drillshape 1`` plot preference adds 0.35 mm guide flashes to every plotted
-    technical layer, including paste and mask. The controlled native source itself must
-    remain byte-for-byte unchanged, so only an archived CAM-input copy is changed and
-    the exact one-field transform is recorded beside it.
+    ECO-007 stores ``drillshape 0`` in the authoritative board, so no derived
+    transform is permitted or needed.  The archived CAM input must be byte-identical.
     """
     if name != "PCB-MIC":
         return pcb
 
     source_text = pcb.read_text(encoding="utf-8")
     source_values = re.findall(r"\(drillshape\s+(\d+)\)", source_text)
-    if source_values != ["1"]:
+    if source_values != ["0"]:
         raise RuntimeError(
-            f"PCB-MIC: expected only pcbplotparams drillshape 1, got {source_values}"
+            f"PCB-MIC: expected only pcbplotparams drillshape 0, got {source_values}"
         )
-    pattern = re.compile(
-        r"(?m)^(?P<prefix>[ \t]*\(drillshape[ \t]+)1(?P<suffix>\)[ \t]*)$"
-    )
-    derived_text, replacements = pattern.subn(r"\g<prefix>0\g<suffix>", source_text)
-    if replacements != 1:
-        raise RuntimeError(
-            f"PCB-MIC: expected one pcbplotparams drillshape 1 field, found {replacements}"
-        )
-    if re.findall(r"\(drillshape\s+(\d+)\)", derived_text) != ["0"]:
-        raise RuntimeError("PCB-MIC: CAM drillshape 0 verification failed")
 
     cam_dir = out / "cam-source"
     cam_dir.mkdir(parents=True, exist_ok=True)
     derived = cam_dir / pcb.name
-    derived.write_text(derived_text, encoding="utf-8")
+    derived.write_bytes(pcb.read_bytes())
 
     transform = {
-        "schema": "dioneya-controlled-cam-source-transform-v1",
+        "schema": "dioneya-controlled-cam-source-identity-v2",
         "board": name,
-        "status": "CONTROLLED_CAM_PLOT_SETTINGS_TRANSFORM_NOT_A_DESIGN_CHANGE",
+        "status": "BYTE_IDENTICAL_CONTROLLED_CAM_SOURCE",
         "source_commit_sha": git_head(),
         "source_path": str(pcb.relative_to(ROOT)),
         "source_sha256": sha256(pcb),
         "derived_path": str(derived.relative_to(ART)),
         "derived_sha256": sha256(derived),
-        "transformations": [
-            {
-                "field": "pcbplotparams.drillshape",
-                "before": 1,
-                "after": 0,
-                "count": 1,
-                "reason": (
-                    "suppress non-design drill guide flashes in Gerber paste, mask, "
-                    "silkscreen and profile layers"
-                ),
-            }
-        ],
+        "transformations": [],
         "design_geometry_modified": False,
-        "review_b_complete": False,
-        "manufacturing_release": False,
+        "drill_guide_flashes": "DISABLED_IN_AUTHORITATIVE_SOURCE",
     }
     (out / "cam_source_transform.json").write_text(
         json.dumps(transform, indent=2) + "\n", encoding="utf-8"
     )
     print(
-        "PCB-MIC: controlled CAM source PASS: drillshape 1 -> 0; "
-        "committed native source unchanged"
+        "PCB-MIC: controlled CAM source PASS: byte-identical drillshape 0 source"
     )
     return derived
 
@@ -628,7 +602,9 @@ def validate_pcb(cli: str, name: str, pcb: Path) -> tuple[bool, str]:
     # mechanical fit/tolerance work without pretending secondary reference CAD is released.
     export_commands = [
         [cli, "pcb", "export", "gerbers", "-o", str(gerber), "--board-plot-params", str(cam_pcb)],
-        [cli, "pcb", "export", "drill", "-o", str(drill), "--format", "excellon", "--generate-map", str(pcb)],
+        [cli, "pcb", "export", "drill", "-o", str(drill), "--format", "excellon",
+         "--excellon-separate-th", "--generate-map", "--generate-report",
+         "--report-path", str(drill / f"{name}-drill_report.rpt"), str(pcb)],
         [cli, "pcb", "export", "pos", "--format", "csv", "--units", "mm", "--side", "both",
          "-o", str(pos_path), str(pcb)],
         [cli, "pcb", "export", "ipcd356", "-o", str(out / f"{name}.d356"), str(pcb)],

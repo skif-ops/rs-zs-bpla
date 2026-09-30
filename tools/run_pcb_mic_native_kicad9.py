@@ -39,19 +39,35 @@ def _build_segmented_annulus(mic, pin_number: str, center_x_mm: float, center_y_
         # Local X tangential, local Y radial.
         p.SetSize(base.v(tangential, radial))
         base.set_rel(p, center_x_mm + r_mid * math.cos(a), center_y_mm + r_mid * math.sin(a))
-        p.SetOrientationDegrees(angle + 90.0)
+        # KiCad board coordinates use +Y downward.  The physical radial angle is
+        # therefore -angle; local Y must follow the physical radial direction.
+        p.SetOrientationDegrees(90.0 - angle)
         mic.Add(p)
 
 
-def _add_paste_ring_graphic(mic, center_x_mm: float, center_y_mm: float,
-                            center_radius_mm: float, width_mm: float) -> None:
-    ring = pcbnew.PCB_SHAPE(mic)
-    ring.SetShape(pcbnew.SHAPE_T_CIRCLE)
-    ring.SetStart(base.v(center_x_mm, center_y_mm))
-    ring.SetEnd(base.v(center_x_mm + center_radius_mm, center_y_mm))
-    ring.SetWidth(base.mm(width_mm))
-    ring.SetLayer(pcbnew.F_Paste)
-    mic.Add(ring)
+def _add_paste_ring_graphics(mic, center_x_mm: float, center_y_mm: float,
+                             center_radius_mm: float, width_mm: float,
+                             gap_mm: float = 0.1) -> None:
+    """Add the four separated paste arcs from TDK DS-000383 Figure 33."""
+    half_gap_angle = math.degrees(math.asin((gap_mm / 2.0) / center_radius_mm))
+    for quadrant in range(4):
+        start_angle = quadrant * 90.0 + half_gap_angle
+        end_angle = (quadrant + 1) * 90.0 - half_gap_angle
+        mid_angle = (start_angle + end_angle) / 2.0
+
+        def point(angle: float):
+            radians = math.radians(angle)
+            return base.v(
+                center_x_mm + center_radius_mm * math.cos(radians),
+                center_y_mm + center_radius_mm * math.sin(radians),
+            )
+
+        arc = pcbnew.PCB_SHAPE(mic)
+        arc.SetShape(pcbnew.SHAPE_T_ARC)
+        arc.SetArcGeometry(point(start_angle), point(mid_angle), point(end_angle))
+        arc.SetWidth(base.mm(width_mm))
+        arc.SetLayer(pcbnew.F_Paste)
+        mic.Add(arc)
 
 
 def rebuild_t5838_manufacturer_land_kicad9(mic) -> None:
@@ -73,10 +89,11 @@ def rebuild_t5838_manufacturer_land_kicad9(mic) -> None:
         segments=32,
     )
 
-    # Figure 37 stencil: outer phi1.625, inner phi1.125.
-    paste_inner = 1.125 / 2.0
-    paste_outer = 1.625 / 2.0
-    _add_paste_ring_graphic(
+    # DS-000383 Rev 1.1 Figure 33 stencil: outer phi1.525, inner phi1.025,
+    # split into four arcs by 0.1 mm gaps at the cardinal axes.
+    paste_inner = 1.025 / 2.0
+    paste_outer = 1.525 / 2.0
+    _add_paste_ring_graphics(
         mic,
         center_x_mm=-0.65,
         center_y_mm=0.0,
@@ -104,7 +121,7 @@ def rebuild_t5838_manufacturer_land_kicad9(mic) -> None:
     # Exact radial dimensions are construction inputs, not inferred after the fact.
     if abs(2.0 * r_outer - 1.625) > 1e-9 or abs(2.0 * r_inner - 1.025) > 1e-9:
         raise RuntimeError("T5838 copper annulus dimension mismatch")
-    if abs(2.0 * paste_outer - 1.625) > 1e-9 or abs(2.0 * paste_inner - 1.125) > 1e-9:
+    if abs(2.0 * paste_outer - 1.525) > 1e-9 or abs(2.0 * paste_inner - 1.025) > 1e-9:
         raise RuntimeError("T5838 paste annulus dimension mismatch")
 
 

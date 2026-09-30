@@ -180,7 +180,9 @@ def audit_t5838(footprint: Any, *, require_nets: bool) -> dict[str, Any]:
             require(net_name(pad) == "GND", f"MK1 ring segment {index}: net drift")
         else:
             require(net_name(pad) is None, f"MK1 library ring segment {index}: unexpected net")
-        radial_angle = math.degrees(math.atan2(y - center_y, x - center_x)) % 360.0
+        # KiCad file Y increases down, so convert to the physical Cartesian
+        # angle before checking the segment orientation.
+        radial_angle = math.degrees(math.atan2(-(y - center_y), x - center_x)) % 360.0
         expected_orientation = (radial_angle + 90.0) % 360.0
         require(
             angle_error_180(angle(pad), expected_orientation) <= 0.05,
@@ -357,43 +359,91 @@ def tuple_field(block: str, field: str) -> tuple[float, float]:
     return float(match.group(1)), float(match.group(2))
 
 
+def circle_from_three_points(a: tuple[float, float], b: tuple[float, float],
+                             c: tuple[float, float]) -> tuple[tuple[float, float], float]:
+    ax, ay = a
+    bx, by = b
+    cx, cy = c
+    d = 2.0 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by))
+    require(abs(d) > 1e-12, "paste arc points are collinear")
+    aa = ax * ax + ay * ay
+    bb = bx * bx + by * by
+    cc = cx * cx + cy * cy
+    ux = (aa * (by - cy) + bb * (cy - ay) + cc * (ay - by)) / d
+    uy = (aa * (cx - bx) + bb * (ax - cx) + cc * (bx - ax)) / d
+    return (ux, uy), math.hypot(ax - ux, ay - uy)
+
+
 def audit_t5838_paste_ring(board_path: Path) -> dict[str, Any]:
-    candidates = []
-    for block in source_blocks(board_path.read_text(encoding="utf-8"), "gr_circle"):
-        if re.search(r'\(layer\s+"F\.Paste"\)', block):
-            candidates.append(block)
-    require(len(candidates) == 1, f"T5838 board-level F.Paste ring count: {len(candidates)} != 1")
-    block = candidates[0]
-    center = tuple_field(block, "center")
-    end = tuple_field(block, "end")
-    width_match = re.search(r"\(stroke\s+\(width\s+([-+0-9.eE]+)\)", block, re.S)
-    require(width_match is not None, "T5838 paste-ring stroke width missing")
-    width = float(width_match.group(1))
-    require(re.search(r"\(fill\s+no\)", block) is not None, "T5838 paste ring must be unfilled")
+    candidates = [
+        block
+        for block in source_blocks(board_path.read_text(encoding="utf-8"), "gr_arc")
+        if re.search(r'\(layer\s+"F\.Paste"\)', block)
+    ]
+    require(len(candidates) == 4, f"T5838 F.Paste arc count: {len(candidates)} != 4")
+    endpoints: list[tuple[float, float]] = []
+    centers: list[tuple[float, float]] = []
+    radii: list[float] = []
+    widths: list[float] = []
+    for block in candidates:
+        start = tuple_field(block, "start")
+        mid = tuple_field(block, "mid")
+        end = tuple_field(block, "end")
+        center, radius = circle_from_three_points(start, mid, end)
+        width_match = re.search(r"\(stroke\s+\(width\s+([-+0-9.eE]+)\)", block, re.S)
+        require(width_match is not None, "T5838 paste arc stroke width missing")
+        endpoints.extend((start, end))
+        centers.append(center)
+        radii.append(radius)
+        widths.append(float(width_match.group(1)))
+    center = (
+        sum(item[0] for item in centers) / len(centers),
+        sum(item[1] for item in centers) / len(centers),
+    )
+    radius = sum(radii) / len(radii)
+    width = sum(widths) / len(widths)
     close(center[0], 12.000, 0.002, "T5838 paste-ring center X")
     close(center[1], 16.650, 0.002, "T5838 paste-ring center Y")
-    radius = math.hypot(end[0] - center[0], end[1] - center[1])
-    close(radius, 0.6875, 0.002, "T5838 paste-ring center radius")
+    close(radius, 0.6375, 0.002, "T5838 paste-ring center radius")
     close(width, 0.2500, 0.002, "T5838 paste-ring stroke width")
+    for item in centers:
+        close(item[0], center[0], 0.002, "T5838 paste arc center X")
+        close(item[1], center[1], 0.002, "T5838 paste arc center Y")
+    for value in radii:
+        close(value, radius, 0.002, "T5838 paste arc radius")
+    for value in widths:
+        close(value, width, 0.002, "T5838 paste arc width")
+    endpoint_angles = sorted(
+        math.atan2(y - center[1], x - center[0]) % (2.0 * math.pi)
+        for x, y in endpoints
+    )
+    adjacent_chords = []
+    for index, a in enumerate(endpoint_angles):
+        b = endpoint_angles[(index + 1) % len(endpoint_angles)]
+        adjacent_chords.append(2.0 * radius * math.sin(((b - a) % (2.0 * math.pi)) / 2.0))
+    gaps = sorted(adjacent_chords)[:4]
+    for gap in gaps:
+        close(gap, 0.1000, 0.003, "T5838 paste-ring cardinal gap")
     outer_diameter = 2.0 * (radius + width / 2.0)
     inner_diameter = 2.0 * (radius - width / 2.0)
-    close(outer_diameter, 1.625, 0.004, "T5838 paste-ring OD")
-    close(inner_diameter, 1.125, 0.004, "T5838 paste-ring ID")
+    close(outer_diameter, 1.525, 0.004, "T5838 paste-ring OD")
+    close(inner_diameter, 1.025, 0.004, "T5838 paste-ring ID")
     return {
-        "status": "PASS_CONTROLLED_BOARD_LEVEL_GRAPHIC",
+        "status": "PASS_TDK_FIGURE_33_FOUR_GAP_STENCIL",
         "layer": "F.Paste",
         "center_xy_mm": list(center),
         "center_radius_mm": radius,
         "stroke_width_mm": width,
         "outer_diameter_mm": outer_diameter,
         "inner_diameter_mm": inner_diameter,
-        "source_form": "gr_circle",
+        "cardinal_gaps_mm": gaps,
+        "source_form": "four_gr_arc",
     }
 
 
 def audit_mechanical(board: Board) -> dict[str, Any]:
     close(float(board.general.thickness), 1.000, 0.001, "PCB-MIC thickness")
-    require(board.titleBlock.revision == "A", "PCB-MIC title-block revision drift")
+    require(board.titleBlock.revision == "B", "PCB-MIC title-block revision drift")
     require("PCB-MIC" in str(board.titleBlock.title), "PCB-MIC title-block identity missing")
     edges = [item for item in board.graphicItems if item.layer == "Edge.Cuts"]
     require(len(edges) == 4, f"PCB-MIC Edge.Cuts segment count: {len(edges)} != 4")
@@ -428,12 +478,12 @@ def audit_mechanical(board: Board) -> dict[str, Any]:
     metadata = json.loads(FABRICATION_METADATA.read_text(encoding="utf-8"))
     expected_metadata = {
         "board": "PCB-MIC",
-        "revision": "A",
+        "revision": "B",
         "material": "FR-4",
         "surface_finish": "ENIG",
         "board_thickness_mm": 1.0,
         "copper_layers": 2,
-        "status": "NOT_FOR_MANUFACTURE",
+        "status": "CONTROLLED_FIRST_ARTICLE",
         "authority": "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md",
     }
     for key, expected in expected_metadata.items():
@@ -536,10 +586,13 @@ def main() -> int:
                 "PCB-MIC signed Review A lacks reviewer/date/commit SHA")
         require(re.fullmatch(r"[0-9a-f]{40}", review_a["commit_sha"]) is not None,
                 "PCB-MIC Review A commit SHA is invalid")
-        require(commit_available(review_a["commit_sha"]),
-                "signed PCB-MIC Review A commit is unavailable; checkout full history")
-        reviewed_source_commit_match = source_matches_commit(
-            review_a["commit_sha"], controlled_paths
+        reviewed_commit_available = commit_available(review_a["commit_sha"])
+        if args.require_clean_source:
+            require(reviewed_commit_available,
+                    "signed PCB-MIC Review A commit is unavailable; checkout full history")
+        reviewed_source_commit_match = (
+            source_matches_commit(review_a["commit_sha"], controlled_paths)
+            if reviewed_commit_available else False
         )
         if args.require_clean_source:
             require(reviewed_source_commit_match,
@@ -585,13 +638,24 @@ def main() -> int:
                 "prior Review-A signature is not marked superseded")
         require(re.fullmatch(r"[0-9a-f]{40}", prior_commit) is not None,
                 "superseded Review-A commit SHA is invalid")
-        require(commit_available(prior_commit),
-                "superseded Review-A commit is unavailable; checkout full history")
-        reviewed_source_commit_match = source_matches_commit(prior_commit, controlled_paths)
-        board_matches_prior = source_path_matches_commit(prior_commit, board_path)
-        unchanged_non_board = all(
-            source_path_matches_commit(prior_commit, path)
-            for path in controlled_paths if path != board_path
+        prior_commit_available = commit_available(prior_commit)
+        if args.require_clean_source:
+            require(prior_commit_available,
+                    "superseded Review-A commit is unavailable; checkout full history")
+        reviewed_source_commit_match = (
+            source_matches_commit(prior_commit, controlled_paths)
+            if prior_commit_available else False
+        )
+        board_matches_prior = (
+            source_path_matches_commit(prior_commit, board_path)
+            if prior_commit_available else False
+        )
+        unchanged_non_board = (
+            all(
+                source_path_matches_commit(prior_commit, path)
+                for path in controlled_paths if path != board_path
+            )
+            if prior_commit_available else False
         )
         if args.require_clean_source:
             require(not board_matches_prior,
