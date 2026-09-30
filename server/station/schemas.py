@@ -378,6 +378,11 @@ class DetectorHealth(BaseModel):
     fw_version: int = Field(default=0, ge=0, le=0xFFFFFFFF)
     fw_state: Literal["IDLE", "DOWNLOADING", "INSTALL_PENDING", "TRIAL", "ROLLED_BACK"] = "IDLE"
     fw_other_version: int = Field(default=0, ge=0, le=0xFFFFFFFF)
+    # key 21..23 (ICD addendum G): version of the network configuration in use (the candidate's while on trial), the
+    # remote-change state and the version of the last configuration that failed its trial (0 = none / older firmware)
+    net_config_version: int = Field(default=0, ge=0, le=0xFFFFFFFF)
+    net_state: Literal["STABLE", "ACCEPTED", "TRIAL", "ROLLED_BACK"] = "STABLE"
+    net_failed_version: int = Field(default=0, ge=0, le=0xFFFFFFFF)
 
 
 class HeartbeatMessage(BaseModel):
@@ -423,6 +428,20 @@ class SecurityEventMessage(BaseModel):
 class FirmwareUpdateRequest(BaseModel):
     """ICD addendum F: the release (its version in the server's firmware repository) to install."""
     version: int = Field(strict=True, ge=1, le=0xFFFFFFFF)
+
+
+class NetworkConfigRequest(BaseModel):
+    """ICD addendum G: the network fields to change (at least one); version defaults to the reported one + 1."""
+    version: int | None = Field(default=None, strict=True, ge=1, le=0xFFFFFFFF)
+    server_host: str | None = None
+    mqtt_port: int | None = Field(default=None, strict=True)
+    https_port: int | None = Field(default=None, strict=True)
+    server_fingerprint: str | None = None
+    tenant: str | None = None
+    topic_prefix: str | None = None
+    preferred_sim: int | None = Field(default=None, strict=True)
+    apn1: str | None = None
+    apn2: str | None = None
 
 
 class CommandKeyRotationRequest(BaseModel):
