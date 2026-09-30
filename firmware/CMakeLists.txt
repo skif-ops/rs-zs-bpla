@@ -49,6 +49,8 @@ add_library(zs_core
   src/zs_audio_upload.c
   src/zs_spatial.c
   src/zs_bearing.c
+  src/zs_bearing_batch.c
+  src/zs_track_window.c
   src/zs_position_trust.c
   src/zs_installation_store.c
   src/zs_installation_commissioning.c
@@ -208,6 +210,8 @@ target_link_libraries(zs_net_trial_tests zs_core m)
 add_executable(zs_bearing_tests tests/test_bearing.c twin/array_render.c)
 target_include_directories(zs_bearing_tests PRIVATE twin)
 target_link_libraries(zs_bearing_tests zs_core m)
+add_executable(zs_bearing_stream_tests tests/test_bearing_stream.c)
+target_link_libraries(zs_bearing_stream_tests zs_core m)
 add_executable(zs_ed25519_tests tests/test_ed25519.c)
 target_link_libraries(zs_ed25519_tests zs_core m)
 add_executable(zs_lora_frame_tests tests/test_lora_frame.c)
@@ -302,6 +306,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_fw_boot_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_net_trial_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_bearing_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_bearing_stream_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_ed25519_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_lora_frame_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_lora_uplink_tests PRIVATE -UNDEBUG)
@@ -372,6 +377,7 @@ add_test(NAME fw_update COMMAND zs_fw_update_tests)
 add_test(NAME fw_boot COMMAND zs_fw_boot_tests)
 add_test(NAME net_trial COMMAND zs_net_trial_tests)
 add_test(NAME bearing COMMAND zs_bearing_tests)
+add_test(NAME bearing_stream COMMAND zs_bearing_stream_tests)
 add_test(NAME ed25519 COMMAND zs_ed25519_tests)
 add_test(NAME lora_frame COMMAND zs_lora_frame_tests)
 add_test(NAME lora_uplink COMMAND zs_lora_uplink_tests)

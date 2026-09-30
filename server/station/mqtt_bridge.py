@@ -13,6 +13,7 @@ import time
 import paho.mqtt.client as mqtt
 
 from station.audio_ingest import AUDIO_COMMAND, ingest_audio_chunk
+from station.bearing_codec import decode_bearing_batch
 from station.cbor_codec import decode_cbor, decode_detection_obj, decode_heartbeat_obj
 from station.command_codec import CommandKeyring, CommandSigner, decode_command_ack, encode_signed_command
 from station.event_receipt_codec import EventReceipt, encode_event_receipt
@@ -38,7 +39,7 @@ def station_id_from_topic(topic: str, tenant: str) -> tuple[int, str]:
         or parts[0] != "zs"
         or parts[1] != "v1"
         or parts[2] != tenant
-        or parts[4] not in {"up", "status", "ack", "audio", "fwreq"}
+        or parts[4] not in {"up", "status", "ack", "audio", "fwreq", "bearing"}
     ):
         raise ValueError(f"unexpected topic: {topic}")
     try:
@@ -155,6 +156,11 @@ def process_message(
     topic_station_id, kind = station_id_from_topic(topic, tenant)
     if kind == "audio":
         return ingest_audio_chunk(payload, topic_station_id, event_store=event_store)
+    if kind == "bearing":                       # addendum H: the live bearings of a tracking window
+        batch = decode_bearing_batch(payload)
+        if batch.station_id != topic_station_id:
+            raise ValueError("station_id mismatch between topic and bearing batch")
+        return "stored" if fusion_service.ingest_bearings(batch) else "duplicate"
     if kind == "ack":
         ack = decode_command_ack(payload)
         if ack.station_id != topic_station_id:
@@ -409,6 +415,7 @@ def main(argv: list[str] | None = None) -> None:
         client_obj.subscribe(f"zs/v1/{args.tenant}/+/ack", qos=1)
         client_obj.subscribe(f"zs/v1/{args.tenant}/+/audio", qos=1)
         client_obj.subscribe(f"zs/v1/{args.tenant}/+/fwreq", qos=1)
+        client_obj.subscribe(f"zs/v1/{args.tenant}/+/bearing", qos=1)
 
     auto_audio = args.auto_audio if signer is not None else "off"      # a request needs the command downstream
     firmware_repository = ReleaseRepository(args.firmware_dir) if args.firmware_dir else None

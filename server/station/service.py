@@ -64,6 +64,15 @@ class StationFusionService:
         e=SystemEvent(system_event_id=sid,event_type=event_type,created_time_us=max(x.event_time_us for x in grouped),source_event_ids=[x.event_id for x in grouped],source_station_ids=[x.station_id for x in grouped],classification_label=self._label(grouped),confidence=conf,stations_used=len(grouped),target=target,route_summary=[f"{x.station_id}:{x.route.transport}:{x.route.hop_count}" for x in grouped])
         self.store.save_system_event(e); self.store.link_detections(e.source_event_ids,sid); self.bus.publish_nowait(e.model_dump())
         return e
+    def ingest_bearings(self,batch)->int:
+        """A bearing batch of a tracking window (ICD addendum H): stored, then published live with the system event its
+        track belongs to; the multi-station fusion of bearings into track points builds on these rows."""
+        inserted=self.store.save_bearings(batch)
+        if inserted:
+            self.bus.publish_nowait({'type':'bearings','station_id':batch.station_id,'track_event_id':batch.track_event_id,
+                                     'system_event_id':self.store.system_event_of_detection(batch.station_id,batch.track_event_id),
+                                     'time_trust':batch.time_trust,'samples':[s.as_dict() for s in batch.samples]})
+        return inserted
     @staticmethod
     def _label(dets):
         if not dets:return 'UNKNOWN'
