@@ -21,6 +21,11 @@ CREATE INDEX IF NOT EXISTS idx_cmd_station ON commands(station_id, delivered, ac
 CREATE TABLE IF NOT EXISTS audio(event_id INTEGER NOT NULL, station_id INTEGER NOT NULL, segment TEXT NOT NULL, path TEXT NOT NULL, codec TEXT, sample_rate INTEGER, created_us INTEGER NOT NULL, PRIMARY KEY(event_id, station_id, segment));
 CREATE TABLE IF NOT EXISTS bearings(station_id INTEGER NOT NULL, track_event_id INTEGER NOT NULL, time_us INTEGER NOT NULL, azimuth_cdeg INTEGER NOT NULL, elevation_cdeg INTEGER NOT NULL, sigma_cdeg INTEGER NOT NULL, confidence REAL NOT NULL, frames INTEGER NOT NULL, time_trust TEXT NOT NULL, received_us INTEGER NOT NULL, PRIMARY KEY(station_id, track_event_id, time_us));
 CREATE INDEX IF NOT EXISTS idx_bearing_time ON bearings(time_us);
+CREATE TABLE IF NOT EXISTS fused_tracks(track_id TEXT PRIMARY KEY, system_event_id TEXT, first_time_us INTEGER, last_time_us INTEGER, stations TEXT NOT NULL, points INTEGER NOT NULL, updated_us INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS idx_track_last ON fused_tracks(last_time_us);
+CREATE TABLE IF NOT EXISTS track_members(station_id INTEGER NOT NULL, track_event_id INTEGER NOT NULL, track_id TEXT NOT NULL, PRIMARY KEY(station_id, track_event_id));
+CREATE INDEX IF NOT EXISTS idx_member_track ON track_members(track_id);
+CREATE TABLE IF NOT EXISTS track_points(track_id TEXT NOT NULL, time_us INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(track_id, time_us));
 CREATE TABLE IF NOT EXISTS audio_parts(station_id INTEGER NOT NULL, command_id TEXT NOT NULL, segment INTEGER NOT NULL, chunk_index INTEGER NOT NULL, event_id INTEGER NOT NULL, chunk_count INTEGER NOT NULL, sample_rate INTEGER NOT NULL, start_time_us INTEGER NOT NULL, sha256 BLOB NOT NULL, data BLOB NOT NULL, received_us INTEGER NOT NULL, PRIMARY KEY(station_id, command_id, segment, chunk_index));
 """
 
@@ -196,6 +201,69 @@ class EventStore:
         with self._conn() as c:
             row=c.execute("SELECT system_event_id FROM detections WHERE event_id=? AND station_id=?",(self._sqlite_event_id(event_id),station_id)).fetchone()
         return row['system_event_id'] if row else None
+    def bearing_tracks(self,since_us:int,until_us:int,trusted:tuple[str,...]=('GNSS_TIME_TRUSTED','HOLDOVER'))->list[dict[str,Any]]:
+        """Station tracks with trusted-time bearings overlapping [since_us, until_us], with their fused track (or None)."""
+        marks=','.join('?'*len(trusted))
+        with self._conn() as c:
+            rows=c.execute(f"SELECT b.station_id,b.track_event_id,MIN(b.time_us) AS first_us,MAX(b.time_us) AS last_us,COUNT(*) AS samples,m.track_id "
+                           f"FROM bearings b LEFT JOIN track_members m ON m.station_id=b.station_id AND m.track_event_id=b.track_event_id "
+                           f"WHERE b.time_trust IN ({marks}) GROUP BY b.station_id,b.track_event_id HAVING MAX(b.time_us)>=? AND MIN(b.time_us)<=? "
+                           f"ORDER BY first_us",(*trusted,since_us,until_us)).fetchall()
+        return [{'station_id':r['station_id'],'track_event_id':r['track_event_id']&0xFFFFFFFFFFFFFFFF,'first_us':r['first_us'],'last_us':r['last_us'],
+                 'samples':r['samples'],'track_id':r['track_id']} for r in rows]
+    def station_position(self,station_id:int,event_id:int|None=None)->tuple[float,float,float]|None:
+        """(lat, lon, alt MSL) of a station: the (position-guarded) detection of the track, else its last heartbeat."""
+        if event_id is not None:
+            with self._conn() as c:
+                row=c.execute("SELECT payload FROM detections WHERE event_id=? AND station_id=?",(self._sqlite_event_id(event_id),station_id)).fetchone()
+            if row is not None:
+                st=DetectionMessage.model_validate_json(row['payload']).station
+                if st.lat_e7 or st.lon_e7: return st.lat,st.lon,st.alt_m
+        hb=self.get_station_heartbeat(station_id)
+        if hb is not None and (hb.station.lat_e7 or hb.station.lon_e7): return hb.station.lat,hb.station.lon,hb.station.alt_m
+        return None
+    # ---- fused tracks (bearing fusion of several stations, fusion/bearing_fusion.py) ----
+    def track_of_member(self,station_id:int,track_event_id:int)->str|None:
+        with self._conn() as c:
+            row=c.execute("SELECT track_id FROM track_members WHERE station_id=? AND track_event_id=?",(station_id,self._sqlite_event_id(track_event_id))).fetchone()
+        return row['track_id'] if row else None
+    def track_members(self,track_id:str)->list[tuple[int,int]]:
+        with self._conn() as c:
+            rows=c.execute("SELECT station_id,track_event_id FROM track_members WHERE track_id=? ORDER BY station_id,track_event_id",(track_id,)).fetchall()
+        return [(r['station_id'],r['track_event_id']&0xFFFFFFFFFFFFFFFF) for r in rows]
+    def add_track_member(self,track_id:str,station_id:int,track_event_id:int):
+        with self.lock,self._conn() as c:
+            c.execute("INSERT OR IGNORE INTO track_members VALUES(?,?,?)",(station_id,self._sqlite_event_id(track_event_id),track_id))
+    def replace_track(self,track_id:str,members:list[tuple[int,int]],system_event_id:str|None,points:list[dict],now_us:int|None=None):
+        """Members are added (never moved); the points of the track are replaced by the fresh fusion result."""
+        when=int(time.time()*1e6) if now_us is None else now_us
+        stations=sorted({s for s,_ in members})
+        with self.lock,self._conn() as c:
+            c.executemany("INSERT OR IGNORE INTO track_members VALUES(?,?,?)",[(s,self._sqlite_event_id(t),track_id) for s,t in members])
+            c.execute("DELETE FROM track_points WHERE track_id=?",(track_id,))
+            c.executemany("INSERT INTO track_points VALUES(?,?,?)",[(track_id,p['time_us'],json.dumps(p)) for p in points])
+            c.execute("INSERT OR REPLACE INTO fused_tracks VALUES(?,?,?,?,?,?,?)",(track_id,system_event_id,points[0]['time_us'] if points else None,
+                      points[-1]['time_us'] if points else None,json.dumps(stations),len(points),when))
+    def _track_summary(self,r)->dict[str,Any]:
+        return {'track_id':r['track_id'],'system_event_id':r['system_event_id'],'first_time_us':r['first_time_us'],'last_time_us':r['last_time_us'],
+                'stations':json.loads(r['stations']),'points':r['points'],'updated_us':r['updated_us']}
+    def list_tracks(self,*,since_us:int|None=None,until_us:int|None=None,system_event_id:str|None=None,limit:int=200)->list[dict[str,Any]]:
+        where,args=[],[]
+        if since_us is not None: where.append("last_time_us>=?"); args.append(since_us)
+        if until_us is not None: where.append("first_time_us<=?"); args.append(until_us)
+        if system_event_id is not None: where.append("system_event_id=?"); args.append(system_event_id)
+        sql="SELECT * FROM fused_tracks"+(" WHERE "+" AND ".join(where) if where else "")+" ORDER BY first_time_us DESC LIMIT ?"
+        with self._conn() as c: rows=c.execute(sql,(*args,max(1,min(limit,2000)))).fetchall()
+        return [self._track_summary(r) for r in rows]
+    def get_track(self,track_id:str)->dict[str,Any]|None:
+        with self._conn() as c:
+            row=c.execute("SELECT * FROM fused_tracks WHERE track_id=?",(track_id,)).fetchone()
+            if row is None: return None
+            pts=c.execute("SELECT payload FROM track_points WHERE track_id=? ORDER BY time_us",(track_id,)).fetchall()
+        out=self._track_summary(row)
+        out['members']=[{'station_id':s,'track_event_id':t} for s,t in self.track_members(track_id)]
+        out['track_points']=[json.loads(p['payload']) for p in pts]
+        return out
     # ---- audio upload over MQTT (ICD addendum B): chunks stay here until their segment is complete ----
     def command_record(self,command_id:str)->dict[str,Any]|None:
         with self._conn() as c:
@@ -258,4 +326,6 @@ class EventStore:
         with self.lock,self._conn() as c:
             c.execute("DELETE FROM audio_parts WHERE received_us<?",(int((time.time()-2*86400)*1e6),))   # abandoned uploads
             c.execute("DELETE FROM bearings WHERE time_us<?",(cutoff,))
+            c.execute("DELETE FROM track_points WHERE time_us<?",(cutoff,)); c.execute("DELETE FROM fused_tracks WHERE last_time_us<?",(cutoff,))
+            c.execute("DELETE FROM track_members WHERE track_id NOT IN (SELECT track_id FROM fused_tracks)")
             c.execute("DELETE FROM system_events WHERE created_us<?",(cutoff,)); c.execute("DELETE FROM detections WHERE event_time_us<?",(cutoff,)); c.execute("DELETE FROM security_events WHERE created_us<?",(cutoff,))

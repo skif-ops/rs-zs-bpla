@@ -81,6 +81,23 @@ async def event_bearings(event_id:str,limit:int=5000):
 async def bearings(station_id:int|None=None,track_event_id:int|None=None,since_us:int|None=None,until_us:int|None=None,limit:int=5000):
     return store.list_bearings(station_id=station_id,track_event_id=track_event_id,since_us=since_us,until_us=until_us,limit=limit)
 
+@router.get('/events/{event_id}/tracks')
+async def event_tracks(event_id:str):
+    """Fused tracks (bearings of two or more stations) that belong to this system event, with their points."""
+    if store.get_event(event_id) is None: raise HTTPException(404,'event not found')
+    return [store.get_track(t['track_id']) for t in store.list_tracks(system_event_id=event_id)]
+
+@router.get('/tracks')
+async def tracks(since_us:int|None=None,until_us:int|None=None,limit:int=200):
+    """Fused target tracks overlapping the time range, newest first (summaries; points by /tracks/{track_id})."""
+    return store.list_tracks(since_us=since_us,until_us=until_us,limit=limit)
+
+@router.get('/tracks/{track_id}')
+async def track(track_id:str):
+    result=store.get_track(track_id)
+    if result is None: raise HTTPException(404,'track not found')
+    return result
+
 @router.post('/stations/{station_id}/audio-request')
 async def request_audio(station_id:int,req:AudioRequest):
     payload=req.model_dump()
