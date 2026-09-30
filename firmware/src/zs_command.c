@@ -205,6 +205,18 @@ static bool read_firmware_payload(command_reader_t *reader, zs_update_firmware_c
          expect_uint(reader, 2u) && read_bytes(reader, fw->signature, sizeof(fw->signature));
 }
 
+/* CMD_SET_NETWORK_CONFIG: {0: bstr(1..240)} */
+static bool read_network_payload(command_reader_t *reader, zs_set_network_command_t *net) {
+  uint8_t major;
+  uint64_t size;
+  if (!expect_map(reader, 1u) || !expect_uint(reader, 0u) || !read_argument(reader, &major, &size) || major != 2u ||
+      size == 0u || size > ZS_COMMAND_NET_PATCH_MAX || reader->offset + size > reader->size) return false;
+  memcpy(net->patch, &reader->data[reader->offset], (size_t)size);
+  net->patch_size = (uint8_t)size;
+  reader->offset += (size_t)size;
+  return true;
+}
+
 static zs_command_status_t decode_envelope(
     size_t payload_size, uint32_t expected_station_id,
     uint64_t now_us, bool time_trusted, command_reader_t *reader,
@@ -233,7 +245,7 @@ static zs_command_status_t decode_envelope(
   if (now_us >= command->expires_time_us) return ZS_COMMAND_STATUS_EXPIRED;
   if (!expect_uint(reader, 6u) || !read_uint(reader, &value) ||
       (value != ZS_COMMAND_REQUEST_AUDIO && value != ZS_COMMAND_REBOOT && value != ZS_COMMAND_SET_PARAMS &&
-       value != ZS_COMMAND_ROTATE_KEY && value != ZS_COMMAND_UPDATE_FIRMWARE))
+       value != ZS_COMMAND_ROTATE_KEY && value != ZS_COMMAND_UPDATE_FIRMWARE && value != ZS_COMMAND_SET_NETWORK))
     return ZS_COMMAND_STATUS_UNSUPPORTED;
   command->code = (zs_command_code_t)value;
   if (!expect_uint(reader, 7u)) return ZS_COMMAND_STATUS_INVALID_CBOR;
@@ -241,7 +253,8 @@ static zs_command_status_t decode_envelope(
       (command->code == ZS_COMMAND_REBOOT && !read_reboot_payload(reader, &command->reboot)) ||
       (command->code == ZS_COMMAND_SET_PARAMS && !read_params_payload(reader, &command->params)) ||
       (command->code == ZS_COMMAND_ROTATE_KEY && !read_rotate_payload(reader, &command->rotate)) ||
-      (command->code == ZS_COMMAND_UPDATE_FIRMWARE && !read_firmware_payload(reader, &command->firmware)))
+      (command->code == ZS_COMMAND_UPDATE_FIRMWARE && !read_firmware_payload(reader, &command->firmware)) ||
+      (command->code == ZS_COMMAND_SET_NETWORK && !read_network_payload(reader, &command->network)))
     return ZS_COMMAND_STATUS_INVALID_CBOR;
   if (!expect_uint(reader, 8u) ||
       !read_bytes(reader, command->key_id, ZS_COMMAND_KEY_ID_BYTES))

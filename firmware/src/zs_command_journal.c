@@ -101,6 +101,8 @@ static bool command_valid(const zs_command_t *command, uint64_t now_us) {
   if (command->code == ZS_COMMAND_ROTATE_KEY) return true;   /* any 32 bytes are structurally valid; the executor judges */
   if (command->code == ZS_COMMAND_UPDATE_FIRMWARE)           /* the release signature is the executor's (zs_fw_update) */
     return command->firmware.manifest_size > 0u && command->firmware.manifest_size <= ZS_COMMAND_FW_MANIFEST_MAX;
+  if (command->code == ZS_COMMAND_SET_NETWORK)               /* the patch rules are the executor's (zs_net_trial) */
+    return command->network.patch_size > 0u && command->network.patch_size <= ZS_COMMAND_NET_PATCH_MAX;
   if (command->code != ZS_COMMAND_REQUEST_AUDIO || command->audio.event_id == 0u ||
       (unsigned)command->audio.segment > (unsigned)ZS_AUDIO_SEGMENT_RANGE) return false;
   if (command->audio.segment == ZS_AUDIO_SEGMENT_RANGE) {
@@ -140,6 +142,13 @@ static bool command_fingerprint(
     zs_sha256_update(&sha, command->firmware.manifest, command->firmware.manifest_size);
     zs_sha256_update(&sha, command->firmware.key_id, sizeof(command->firmware.key_id));
     zs_sha256_update(&sha, command->firmware.signature, sizeof(command->firmware.signature));
+    zs_sha256_final(&sha, digest);
+    memcpy(&input[46], digest, 18u);
+  } else if (command->code == ZS_COMMAND_SET_NETWORK) {       /* SET_NETWORK: digest of the patch */
+    zs_sha256_t sha;
+    zs_sha256_init(&sha);
+    zs_sha256_update(&sha, &command->network.patch_size, 1u);
+    zs_sha256_update(&sha, command->network.patch, command->network.patch_size);
     zs_sha256_final(&sha, digest);
     memcpy(&input[46], digest, 18u);
   } else if (command->code == ZS_COMMAND_ROTATE_KEY) {   /* ROTATE: digest of the new public key */
