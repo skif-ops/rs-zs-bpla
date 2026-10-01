@@ -1,0 +1,12 @@
+{
+  "schema": "dioneya-pcb-main-as-routed-impedance-inventory-v1",
+  "board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "rf_net_count": 7,
+  "row_count": 23,
+  "decision": "EVT_AS_ROUTED_WITHOUT_CONTROLLED_IMPEDANCE",
+  "customer_decision_date": "2026-09-30",
+  "order_sequence": "FULL_LOT_22_NO_FIRST_ARTICLE_PAUSE",
+  "post_lot_rf_sample_pcba": 2,
+  "note_ru": "По решению заказчика EVT-плата остаётся без переразводки. Ширины и слои извлечены из нативной платы. Опорные слои являются кандидатами; непрерывность земли под каждой трассой и импеданс на выбранном стеке не подтверждены. Контроль импеданса и численные цели фабрике не заказываются. Вся партия 22 PCBA изготавливается без паузы; два изделия выбираются после изготовления для ВЧ-испытаний EVT. При отклонениях выполняется контроль партии и ECO.",
+  "note_en": "By customer decision the EVT PCB remains as routed. Widths and layers were extracted from the native board. Reference layers are candidates; ground continuity and impedance on the selected stack are unverified. Controlled impedance and numerical targets are not ordered. The full lot of 22 PCBAs is made without a pause; two units are sampled afterward for EVT RF tests. Deviations require lot disposition and an ECO."
+}

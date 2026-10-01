@@ -1,0 +1,48 @@
+{
+  "schema": "dioneya-evt-pre-20-archive-control-v6",
+  "revision": "REV_D3_CUSTOMER_HEAD_GEOMETRY",
+  "date": "2026-10-02",
+  "pcb_mic_order": "ALREADY_PLACED_NO_CHANGE_NO_CANCELLATION",
+  "pcb_mic_sha256": "c57cebbb3886247166551fd242fa51350bc9be7fee6299e63e7eaac60518d518",
+  "mechanical_status": "PRELIMINARY_PRINT_AND_CAST; FIT_WIND_WATER_STRENGTH_TEST_OPEN",
+  "approved_appearance_image_sha256": "6f681404e224ac36c9609303d089d067493fbb823788bc2707699e6b4080a9c2",
+  "review_b_archive_separate_from_full_production_zip": true,
+  "archives": [
+    {
+      "name": "EVT_PRE_20_ПОЛНЫЙ_ПАКЕТ_20261002_REV_D3.zip",
+      "sha256": "084bcffd5175a08bca2eb3bfbebf70bba5b5308cc3fb72968aac37e317cc0df0",
+      "bytes": 13004914,
+      "entries": 127
+    },
+    {
+      "name": "EVT_PRE_20_ПЛАТЫ_ЗАКАЗ_И_МОНТАЖ_20261002_REV_D3.zip",
+      "sha256": "f4c37f3800c56ce17fd9ccc600460b6d05d71f939b0ec3b3db642f873c57ad84",
+      "bytes": 5999706,
+      "entries": 215
+    },
+    {
+      "name": "EVT_PRE_20_ПРОГРАММА_И_МУХОЕД_20261002_REV_D3.zip",
+      "sha256": "0042c829fdec7b7f9338fb61eca9be4d2f6689faa54e464c857636907ee5e65f",
+      "bytes": 130768,
+      "entries": 15
+    },
+    {
+      "name": "EVT_PRE_20_ЖГУТЫ_И_КАБЕЛИ_20261002_REV_D3.zip",
+      "sha256": "0007f434159e96e0640c97578a256ca2d04ac67aeb1ace9a9a64f9aeb23623d1",
+      "bytes": 211666,
+      "entries": 9
+    },
+    {
+      "name": "EVT_PRE_20_СБОРКА_И_КОРПУСА_20261002_REV_D3.zip",
+      "sha256": "7f58d5ad79bae827ad915aff3c4f281eff9bc020a596c95d5bc2f5bb3e1301f6",
+      "bytes": 5873701,
+      "entries": 105
+    },
+    {
+      "name": "EVT_PRE_20_PCB_MIC_REVIEW_B_20261002_REV_D3.zip",
+      "sha256": "742919f6ca0a95e207020b6c90b8e985d7f88ee1ebeff36e198dcc210073dce4",
+      "bytes": 1217196,
+      "entries": 43
+    }
+  ]
+}
