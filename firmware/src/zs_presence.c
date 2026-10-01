@@ -13,6 +13,7 @@ zs_presence_t zs_presence_evaluate(const zs_classifier_consensus_t *votes, const
     p.windows = votes->count;
     for (uint8_t i = 0u; i < votes->count; i++) {
       if (uav_class(votes->class_id[i]) && votes->confidence_u8[i] >= ZS_PRESENCE_WEAK_CONFIDENCE_U8) p.uav_weak_votes++;
+      if (ground_engine_class(votes->class_id[i]) && votes->confidence_u8[i] >= ZS_PRESENCE_WEAK_CONFIDENCE_U8) p.ground_weak_votes++;
       if (votes->confidence_u8[i] < ZS_CLASSIFICATION_MIN_CONFIDENCE_U8) continue;
       if (uav_class(votes->class_id[i])) { p.uav_votes++; uav_conf = (uint16_t)(uav_conf + votes->confidence_u8[i]); }
       else if (ground_engine_class(votes->class_id[i])) p.ground_votes++;
