@@ -344,6 +344,7 @@ static void link_poll(void) {
 /* ---- LoRa: the radio channel (airtime, loss, gateway round trip) and the station uplink --------------- */
 static zs_lora_uplink_t lora;
 static bool lora_enabled;                       /* --lora: a gateway is in range (the regional gate is assumed closed) */
+static bool no_doa;                             /* --no-doa: no stash, the targets by direction are off (comparison) */
 static float ch_lora_loss;                      /* frame loss probability, each direction */
 static uint32_t ch_lora_gateway_ms = 800u;      /* gateway -> server -> ACK round trip */
 static unsigned lora_tx_frames, lora_acks_rx;
@@ -527,22 +528,29 @@ static void target_step(const double p0[3], const double vel[3], double ta, floa
   *te_rate = 1.0 / (1.0 + radial / FIELD_C);   /* receding: the recording plays slower (lower pitch) */
 }
 static void world_step(double ta, float *az, float *el) { target_step(tg_p0, tg_v, ta, az, el, &world_gain, &world_te, &world_te_rate); }
-/* the target a bearing follows: the one whose fundamental is nearest (log ratio) when the bearing has one (several
-   sources, zs_comb_bearing), else the nearest true direction; *err = the azimuth error against it */
+/* the target a bearing points at: the nearest true direction (a bearing is judged by where it points; its label only
+   names the source for the server); *err = the azimuth error against it */
 static unsigned truth_target(float az_deg, float f0_hz, float *err) {
   unsigned best = 0u;
   float e = fabsf(fmodf(az_deg - array_render.azimuth_deg + 540.0f, 360.0f) - 180.0f);
-  float d = f0_hz > 0.0f ? fabsf(logf(f0_hz / tg_f0)) : 0.0f;
+  (void)f0_hz;
   for (unsigned t = 1u; t < world_targets; t++) {
     const float f = fabsf(fmodf(az_deg - xt_render[t].azimuth_deg + 540.0f, 360.0f) - 180.0f);
-    const float dt = f0_hz > 0.0f ? fabsf(logf(f0_hz / xt_f0[t])) : 0.0f;
-    if (f0_hz > 0.0f ? dt < d : f < e) { best = t; e = f; d = dt; }
+    if (f < e) { best = t; e = f; }
   }
   *err = e;
   return best;
 }
 static unsigned bearings_of_target[WORLD_MAX_TARGETS];
 static float bearing_err_of_target[WORLD_MAX_TARGETS];
+static float label_min_of_target[WORLD_MAX_TARGETS], label_max_of_target[WORLD_MAX_TARGETS];
+static unsigned bearings_stray;                  /* pointing more than 10 degrees from every target */
+/* ZS_TWIN_DOA_LOG=1: the direction targets of every window and every bearing delivered (diagnostics) */
+static bool doa_log_on(void) {
+  static int on = -1;
+  if (on < 0) { const char *e = getenv("ZS_TWIN_DOA_LOG"); on = e && *e == '1'; }
+  return on != 0;
+}
 /* the recording at emission time te (seconds, looped), linear interpolation */
 static float world_wav_at(const world_wav_t *w, double te) {
   double pos = fmod(te * w->rate, (double)w->n);
@@ -669,8 +677,14 @@ static void pl_bearing(void *ctx, const zs_bearing_t *b, uint64_t end_sample, ui
   bearings_total++;
   bearings_of_target[t]++;
   bearing_err_of_target[t] += e;
+  if (e > 10.0f) bearings_stray++;
+  if (b->f0_hz > 0.0f) {
+    if (label_min_of_target[t] <= 0.0f || b->f0_hz < label_min_of_target[t]) label_min_of_target[t] = b->f0_hz;
+    if (b->f0_hz > label_max_of_target[t]) label_max_of_target[t] = b->f0_hz;
+  }
   bearing_err_sum += e;
   if (e > bearing_err_max) bearing_err_max = e;
+  if (doa_log_on()) tlog("bearing az %.1f label %.1f -> target %u (%.1f deg off)", b->azimuth_deg, b->f0_hz, t + 1u, e);
   /* the open window's bearings go to the live stream under the window's track (tasks.c: pl_bearing) */
   (void)track_event_id;
   if (track_open && zs_bearing_record_from(&r, track.track_event_id, pl_sample_time(NULL, end_sample), ZS_TIME_TRUST_GNSS_TRUSTED, b)) {
@@ -679,6 +693,30 @@ static void pl_bearing(void *ctx, const zs_bearing_t *b, uint64_t end_sample, ui
   }
 }
 static zs_station_pipeline_port_t pipeline_port = {NULL, pl_extract, pl_sample_time, pl_emit, 17u, 5u, 0u, 0u, NULL, pl_bearing};
+
+/* ZS_TWIN_DOA_LOG=1: every window's direction targets against the truth (diagnostics) */
+static void doa_log(void) {
+  if (!doa_log_on()) return;
+  char line[512];
+  static uint32_t classified;
+  int n = snprintf(line, sizeof(line), "doa w%lu lvl %u truth", (unsigned long)pipeline.windows, pipeline.presence.level);
+  n += snprintf(line + n, sizeof(line) - (size_t)n, " %.0f", array_render.azimuth_deg);
+  for (unsigned t = 1u; t < world_targets; t++) n += snprintf(line + n, sizeof(line) - (size_t)n, " %.0f", xt_render[t].azimuth_deg);
+  n += snprintf(line + n, sizeof(line) - (size_t)n, " |");
+  for (unsigned k = 0u; k < ZS_DOA_MAX_TRACKS; k++) {
+    const zs_pipeline_target_t *t = &pipeline.doa_targets[k];
+    if (!t->id) continue;
+    if (t->absent) { n += snprintf(line + n, sizeof(line) - (size_t)n, " #%u gone %u", t->id, t->absent); continue; }
+    n += snprintf(line + n, sizeof(line) - (size_t)n, " #%u az %.0f %s%s f %.0f p%u c%u/%u", t->id, t->bearing.azimuth_deg,
+                  t->confirmed_direction ? "C" : "-", t->bearing.valid ? "b" : "-", t->bearing.f0_hz, t->presence.level,
+                  t->presence.uav_votes, t->presence.windows);
+  }
+  if (pipeline.doa_classified_windows != classified) {
+    classified = pipeline.doa_classified_windows;
+    n += snprintf(line + n, sizeof(line) - (size_t)n, " | own window: class %u conf %u", pipeline.last_window.class_id, pipeline.last_window.confidence_u8);
+  }
+  tlog("%s", line);
+}
 
 /* --inject-events N AT_S: N synthetic detections straight into the outbox (burst scenarios without the classifier) */
 static unsigned inject_count; static uint32_t inject_at_ms; static bool injected;
@@ -1113,7 +1151,7 @@ static void audio_tick(void) {
   /* the T5838 AAD: a loud enough scene wakes the station from S0 */
   if (modes.mode == ZS_MODE_S0_SLEEP && scene_level > 0.002f) mode_event(ZS_MODE_EV_MIC_WAKE);
   if ((modes.mode == ZS_MODE_S1_LISTEN || modes.mode == ZS_MODE_S2_DSP || track_open) && zs_station_pipeline_fetch(&pipeline, &ring)) {
-    while (pipeline.pending) { (void)zs_station_pipeline_run_pending(&pipeline); dsp_mode_events(); }
+    while (pipeline.pending) { (void)zs_station_pipeline_run_pending(&pipeline); dsp_mode_events(); doa_log(); }
   }
   (void)zs_audio_recorder_step(&recorder, &ring, ring.total_frames, 32000u);
 }
@@ -1143,6 +1181,7 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--receipt-latency") && i + 1 < argc) ch_receipt_latency_ms = (uint32_t)atoi(argv[++i]);
     else if (!strcmp(argv[i], "--mqtt-refuse") && i + 2 < argc) { ch_mqtt_refuse_start = (uint32_t)atoi(argv[++i]) * 1000u; ch_mqtt_refuse_end = (uint32_t)atoi(argv[++i]) * 1000u; }
     else if (!strcmp(argv[i], "--lora")) lora_enabled = true;
+    else if (!strcmp(argv[i], "--no-doa")) no_doa = true;
     else if (!strcmp(argv[i], "--lora-loss") && i + 1 < argc) ch_lora_loss = (float)atof(argv[++i]);
     else if (!strcmp(argv[i], "--lora-gateway-ms") && i + 1 < argc) ch_lora_gateway_ms = (uint32_t)atoi(argv[++i]);
     else if (!strcmp(argv[i], "--degraded-after") && i + 1 < argc) degraded_after = (unsigned)atoi(argv[++i]);
@@ -1179,7 +1218,7 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--world-sound") && i + 1 < argc && world_sounds < WORLD_MAX_TARGETS) world_sound[world_sounds++] = argv[++i];
     else if (!strcmp(argv[i], "--installed")) world_installed = true;
     else if (!strcmp(argv[i], "--log-uplink") && i + 1 < argc) uplink_log = fopen(argv[++i], "w");
-    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S] [--expect-net-version N] [--expect-net-state S] [--expect-bearing-error DEG] [--track-max-s S] [--expect-streamed N] [--station-id N] [--pos E,N[,U]] [--installed] [--world X,Y,Z,VX,VY,VZ[,F0] ...] [--world-ref-m M] [--world-absorption-db-km A] [--world-level L] [--world-sound FILE.wav ...] [--log-uplink FILE]\n"); return 2; }
+    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--no-doa] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S] [--expect-net-version N] [--expect-net-state S] [--expect-bearing-error DEG] [--track-max-s S] [--expect-streamed N] [--station-id N] [--pos E,N[,U]] [--installed] [--world X,Y,Z,VX,VY,VZ[,F0] ...] [--world-ref-m M] [--world-absorption-db-km A] [--world-level L] [--world-sound FILE.wav ...] [--log-uplink FILE]\n"); return 2; }
   }
   for (unsigned k = 0u; k < world_sounds; k++)          /* the k-th recording is the k-th target's sound */
     if (!world_wav_load(world_sound[k], &world_wav[k])) { fprintf(stderr, "--world-sound: %s is not a PCM16 WAV\n", world_sound[k]); return 2; }
@@ -1206,7 +1245,8 @@ int main(int argc, char **argv) {
   zs_station_position_init(&station_pos);
   zs_gnss_nmea_init(&gnss_nmea);
   if (world_installed) field_install();
-  { size_t work; zs_complex_t *scratch = zs_dsp_mcu_borrow_work(&work); assert(work >= ZS_AIR_SCRATCH_COMPLEX); assert(zs_station_pipeline_init(&pipeline, &pipeline_port, scratch, window_pcm)); }
+  { size_t work; zs_complex_t *scratch = zs_dsp_mcu_borrow_work(&work); assert(work >= ZS_AIR_SCRATCH_COMPLEX); assert(zs_station_pipeline_init(&pipeline, &pipeline_port, scratch, window_pcm));
+    if (!no_doa) { size_t ns; int16_t *stash = zs_dsp_mcu_borrow_stash(&ns); assert(ns >= ZS_PIPELINE_HOP_SAMPLES); zs_station_pipeline_set_stash(&pipeline, stash); } }
   zs_station_config_defaults(&cfg, twin_station_id, ZS_STATION_CONFIG_REGION_RU868);
   cfg.version = 1u; strcpy(cfg.server_host, "muhoed.twin"); cfg.mqtt_port = 8883u; strcpy(cfg.ca_reference, "dioneya-root");
   strcpy(cfg.tenant, "pilot1"); strcpy(cfg.topic_prefix, "zs/v1"); cfg.preferred_sim = 1u; strcpy(cfg.apn[0], "internet");
@@ -1303,11 +1343,15 @@ int main(int argc, char **argv) {
          bearings_total ? bearing_err_sum / (float)bearings_total : 0.0f, bearing_err_max);
     if (world_targets > 1u) {
       for (unsigned t = 0u; t < world_targets; t++)
-        tlog("twin: target %u (%.0f Hz): %u bearings, azimuth error mean %.2f deg", t + 1u, t ? xt_f0[t] : tg_f0, bearings_of_target[t],
-             bearings_of_target[t] ? bearing_err_of_target[t] / (float)bearings_of_target[t] : 0.0f);
+        tlog("twin: target %u (%.0f Hz): %u bearings, azimuth error mean %.2f deg, labels %.1f..%.1f Hz", t + 1u, t ? xt_f0[t] : tg_f0, bearings_of_target[t],
+             bearings_of_target[t] ? bearing_err_of_target[t] / (float)bearings_of_target[t] : 0.0f, label_min_of_target[t], label_max_of_target[t]);
+      tlog("twin: bearings pointing at no target (more than 10 degrees off): %u", bearings_stray);
       tlog("twin: comb bearings in %lu windows (asked %lu, computed %lu, few bins %lu, weak %lu, unsolved %lu)",
            (unsigned long)pipeline.comb_windows, (unsigned long)pipeline.comb_stats.attempts, (unsigned long)pipeline.comb_stats.computed,
            (unsigned long)pipeline.comb_stats.few_bins, (unsigned long)pipeline.comb_stats.weak, (unsigned long)pipeline.comb_stats.unsolved);
+      tlog("twin: directions in %lu windows (several %lu, classified %lu, confirmed by one %lu, bearings %lu, mask failed %lu)",
+           (unsigned long)pipeline.doa_windows, (unsigned long)pipeline.doa_mixture_windows, (unsigned long)pipeline.doa_classified_windows,
+           (unsigned long)pipeline.doa_confirmed_windows, (unsigned long)pipeline.doa_bearings, (unsigned long)pipeline.doa_mask_failed);
     }
     tlog("twin: tracks %lu (target lost %lu, time limit %lu, mode %lu, refused on link %lu), bearings streamed %u",
          (unsigned long)track.tracks, (unsigned long)track.ended_lost, (unsigned long)track.ended_max, (unsigned long)track.ended_mode,
