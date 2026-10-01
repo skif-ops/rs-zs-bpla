@@ -1,4 +1,4 @@
-/* Station AIR gate: synthetic sources (comb, noise, chirp, impulses, mains) and the 100 «Лютый» golden windows. */
+/* Station AIR gate: synthetic sources (comb, noise, chirp, impulses, mains, two combs at once) and the 100 «Лютый» golden windows. */
 #include "zs_air_gate.h"
 #include <assert.h>
 #include <math.h>
@@ -28,6 +28,26 @@ static void synth_comb(float f0, unsigned harm, float noise_level, float drift, 
   }
 }
 
+/* Two combs at once (two targets): f0a and f0b with 8 harmonics each (1/k), the second `gain_b` as loud, slow
+   Doppler drifts of 0.2 and 0.1 %/s, plus white noise. */
+static void synth_two(float f0a, float f0b, float gain_b, unsigned second) {
+  static double pa[9], pb[9];
+  if (second == 0u) { memset(pa, 0, sizeof(pa)); memset(pb, 0, sizeof(pb)); }
+  for (unsigned i = 0u; i < ZS_AIR_WINDOW_SAMPLES; i++) {
+    const double t = (double)second + (double)i / ZS_AIR_SAMPLE_RATE;
+    const double fa = f0a * (1.0 + 0.002 * t), fb = f0b * (1.0 + 0.001 * t);
+    float s = 0.0f;
+    for (unsigned k = 1u; k <= 8u; k++) {
+      pa[k] += 2.0 * M_PI * fa * k / ZS_AIR_SAMPLE_RATE; pb[k] += 2.0 * M_PI * fb * k / ZS_AIR_SAMPLE_RATE;
+      s += (float)(sin(pa[k]) + gain_b * sin(pb[k])) / (float)k;
+    }
+    s = s * 0.2f + 0.05f * noise();
+    if (s > 0.99f) s = 0.99f;
+    if (s < -0.99f) s = -0.99f;
+    pcm[i] = (int16_t)(s * 32767.0f);
+  }
+}
+
 static void synth_noise(float level) { for (unsigned i = 0u; i < ZS_AIR_WINDOW_SAMPLES; i++) pcm[i] = (int16_t)(level * noise() * 32767.0f); }
 static void synth_chirp(void) { /* bird-like sweep 2..4 kHz plus noise: tonal but out of band / unsteady */
   for (unsigned i = 0u; i < ZS_AIR_WINDOW_SAMPLES; i++) { float t = (float)i / ZS_AIR_SAMPLE_RATE; float f = 2000.0f + 2000.0f * t; pcm[i] = (int16_t)((0.4f * sinf(2.0f * (float)M_PI * f * t) + 0.05f * noise()) * 32767.0f); }
@@ -50,6 +70,57 @@ static void gen_chirp(unsigned s) { (void)s; synth_chirp(); }
 static void gen_impulses(unsigned s) { (void)s; synth_impulses(); }
 static void gen_mains(unsigned s) { synth_comb(50.0f, 8u, 0.05f, 0.0f, s); }           /* rock-steady 50 Hz comb = hum */
 static void gen_unsteady(unsigned s) { synth_comb(60.0f, 8u, 0.05f, 0.15f, s); }   /* siren-like glide, +15 %/s: 60 -> 114 Hz over 6 s */
+
+static void gen_two(unsigned s) { synth_two(120.0f, 183.0f, 0.7f, s); }   /* 120 + 183 Hz: both near multiples of 61 Hz */
+
+/* Two sources at once (zs_air_gate.h): the single-comb fit takes their common sub-harmonic, 61 Hz, which the gate
+   would reject as mains; the gate finds both combs instead, tracks the stronger one and reports the other for
+   suppression.  A single source never gets a secondary comb. */
+static void test_two_sources(void) {
+  zs_air_gate_result_t r;
+  unsigned separated = 0u, present = 0u;
+  zs_air_gate_init(&gate);
+  for (unsigned s = 0u; s < 20u; s++) {
+    gen_two(s);
+    assert(zs_air_gate_push(&gate, pcm, ZS_AIR_WINDOW_SAMPLES, scratch, &r));
+    if (s < 6u) continue;
+    if (r.present) present++;
+    if (r.secondary_count == 1u) {
+      separated++;
+      /* the stronger comb is the gate's line, the other one the secondary */
+      const float lo = fminf(gate.f0_hz, r.secondary_f0_hz[0]), hi = fmaxf(gate.f0_hz, r.secondary_f0_hz[0]);
+      assert(fabsf(lo - 120.0f) < 8.0f && fabsf(hi - 183.0f) < 8.0f && !r.mains);
+    }
+  }
+  printf("air gate two sources: present %u/14, separated %u/14 (main %.1f Hz, other %.1f Hz)\n", present, separated, r.f0_hz, r.secondary_f0_hz[0]);
+  assert(present >= 12u && separated >= 12u);
+  run_sequence(gen_drone, 20u, &r);    assert(r.present && r.secondary_count == 0u);
+  run_sequence(gen_quad, 20u, &r);     assert(r.present && r.secondary_count == 0u);
+  /* the suppression removes the other comb's lines and leaves the tracked one */
+  {
+    float before_b = 0.0f, after_b = 0.0f, before_a = 0.0f, after_a = 0.0f;
+    static int16_t copy[ZS_AIR_WINDOW_SAMPLES];
+    run_sequence(gen_two, 20u, &r);
+    gen_two(20u);
+    memcpy(copy, pcm, sizeof(copy));
+    zs_air_gate_suppress_secondary(copy, ZS_AIR_WINDOW_SAMPLES, &r);
+    for (unsigned k = 1u; k <= 3u; k++) {   /* Goertzel-like power at the first teeth of each comb */
+      const bool a_main = fabsf(gate.f0_hz - 120.0f) < fabsf(gate.f0_hz - 183.0f);
+      const float f120 = 120.0f * (1.0f + 0.002f * 20.5f) * (float)k, f183 = 183.0f * (1.0f + 0.001f * 20.5f) * (float)k;
+      const float fa = a_main ? f120 : f183, fb = a_main ? f183 : f120;   /* a: the tracked comb, b: the other */
+      float ar = 0, ai = 0, br = 0, bi = 0, ar2 = 0, ai2 = 0, br2 = 0, bi2 = 0;
+      for (unsigned i = 0u; i < ZS_AIR_WINDOW_SAMPLES; i++) {
+        const float t = (float)i / ZS_AIR_SAMPLE_RATE, ca = cosf(2.0f * (float)M_PI * fa * t), sa = sinf(2.0f * (float)M_PI * fa * t);
+        const float cb = cosf(2.0f * (float)M_PI * fb * t), sb = sinf(2.0f * (float)M_PI * fb * t);
+        ar += pcm[i] * ca; ai += pcm[i] * sa; br += pcm[i] * cb; bi += pcm[i] * sb;
+        ar2 += copy[i] * ca; ai2 += copy[i] * sa; br2 += copy[i] * cb; bi2 += copy[i] * sb;
+      }
+      before_a += ar * ar + ai * ai; after_a += ar2 * ar2 + ai2 * ai2; before_b += br * br + bi * bi; after_b += br2 * br2 + bi2 * bi2;
+    }
+    printf("  suppression: tracked comb %.1f dB, other comb %.1f dB\n", 10.0f * log10f(after_a / before_a), 10.0f * log10f(after_b / before_b));
+    assert(after_b < 0.25f * before_b && after_a > 0.5f * before_a);   /* at least 6 dB off the other comb, the tracked one kept */
+  }
+}
 
 static void test_synthetic(void) {
   zs_air_gate_result_t r;
@@ -96,6 +167,7 @@ static void test_lyuty(const char *dir) {
 
 int main(int argc, char **argv) {
   test_synthetic();
+  test_two_sources();
   test_lyuty(argc > 1 ? argv[1] : "../server/tools/golden_lyuty");
   printf("air gate tests passed\n");
   return 0;

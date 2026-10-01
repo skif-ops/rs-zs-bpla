@@ -65,6 +65,7 @@ typedef struct {
   uint32_t windows;                /* windows processed */
   uint32_t windows_dropped;        /* ring overran the analysis (hops skipped) */
   uint32_t confirmed_windows, suspect_windows, engine_windows;
+  uint32_t separated_windows;      /* windows classified with other sources suppressed (zs_air_gate.h) */
   uint32_t events_emitted, events_refused;
   uint32_t seq_no;
   uint16_t windows_since_event;    /* while CONFIRMED */

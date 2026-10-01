@@ -94,10 +94,19 @@ static void emit(zs_station_pipeline_t *p, uint64_t end_sample) {
 bool zs_station_pipeline_push_window(zs_station_pipeline_t *p, const int16_t *pcm, uint64_t end_sample) {
   const uint8_t period = p->port->update_period_windows ? p->port->update_period_windows : ZS_PIPELINE_DEFAULT_UPDATE_WINDOWS;
   if (!p || !pcm) return false;
+  /* the gate first: with several sources it finds the strongest comb and the others (zs_air_gate.h), and the
+     classifier gets the window with the others suppressed, so it classifies the source the station tracks; a
+     window with one source reaches the classifier unchanged */
+  if (!zs_air_gate_push(&p->gate, pcm, ZS_PIPELINE_WINDOW_SAMPLES, p->scratch, &p->last_gate)) return false;
+  if (p->last_gate.secondary_count) {
+    if (pcm != p->window) memcpy(p->window, pcm, ZS_PIPELINE_WINDOW_SAMPLES * sizeof(int16_t));
+    zs_air_gate_suppress_secondary(p->window, ZS_PIPELINE_WINDOW_SAMPLES, &p->last_gate);
+    pcm = p->window;
+    p->separated_windows++;
+  }
   if (!p->port->extract(p->port->ctx, pcm, ZS_PIPELINE_WINDOW_SAMPLES, p->features)) return false;
   p->last_window = zs_classifier_predict_centroid(p->features);
   (void)zs_classifier_consensus_push(&p->votes, p->last_window, &p->classification, &p->hierarchy);
-  if (!zs_air_gate_push(&p->gate, pcm, ZS_PIPELINE_WINDOW_SAMPLES, p->scratch, &p->last_gate)) return false;
   p->presence = zs_presence_evaluate(&p->votes, &p->last_gate);
   p->windows++;
   switch (p->presence.level) {
