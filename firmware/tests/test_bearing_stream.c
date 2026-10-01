@@ -15,7 +15,7 @@ static const char *const GOLDEN =
 static void hex(const uint8_t *b, size_t n, char *out) { for (size_t i = 0u; i < n; i++) sprintf(out + 2u * i, "%02x", b[i]); }
 
 static zs_bearing_record_t rec(uint64_t track, int64_t t, uint16_t az, int16_t el, uint16_t sigma, uint8_t conf, uint8_t frames, uint8_t trust) {
-  zs_bearing_record_t r = {track, t, az, el, sigma, conf, frames, trust};
+  zs_bearing_record_t r = {track, t, az, el, sigma, conf, frames, trust, 0u};
   return r;
 }
 
@@ -29,9 +29,9 @@ static void test_golden_batch(void) {
   const uint64_t track = ((uint64_t)5u << 32) | 1u;
   size_t n;
   zs_bearing_queue_init(&q);
-  zs_bearing_queue_push(&q, &(zs_bearing_record_t){track, 1800000012500000LL, 12630u, 2000, 180u, 230u, 8u, 1u});
-  zs_bearing_queue_push(&q, &(zs_bearing_record_t){track, 1800000013000000LL, 12702u, 1985, 175u, 229u, 8u, 1u});
-  zs_bearing_queue_push(&q, &(zs_bearing_record_t){track, 1800000013500000LL, 12751u, -150, 900u, 128u, 5u, 1u});
+  zs_bearing_queue_push(&q, &(zs_bearing_record_t){track, 1800000012500000LL, 12630u, 2000, 180u, 230u, 8u, 1u, 0u});
+  zs_bearing_queue_push(&q, &(zs_bearing_record_t){track, 1800000013000000LL, 12702u, 1985, 175u, 229u, 8u, 1u, 0u});
+  zs_bearing_queue_push(&q, &(zs_bearing_record_t){track, 1800000013500000LL, 12751u, -150, 900u, 128u, 5u, 1u, 0u});
   assert(zs_bearing_queue_take(&q, 17u, 5u, 1u, 16u, &b) == 3u && zs_bearing_queue_count(&q) == 0u);
   assert(b.base_time_us == 1800000012500000LL && b.sample[2].dt_ms == 1000u && b.track_event_id == track);
   n = zs_bearing_batch_encode(&b, buf, sizeof(buf));
@@ -47,9 +47,39 @@ static void test_worst_case_size(void) {
   memset(&b, 0, sizeof(b));
   b.station_id = UINT32_MAX; b.boot_id = UINT32_MAX; b.track_event_id = UINT64_MAX; b.base_time_us = INT64_MIN;
   b.time_trust = 255u; b.geometry_id = 255u; b.count = ZS_BEARING_BATCH_MAX_SAMPLES;
-  for (unsigned i = 0u; i < ZS_BEARING_BATCH_MAX_SAMPLES; i++) b.sample[i] = (zs_bearing_sample_t){UINT32_MAX, 35999u, INT16_MIN, UINT16_MAX, 255u, 255u};
-  printf("bearing batch worst case %zu bytes\n", zs_bearing_batch_encode(&b, buf, sizeof(buf)));
+  for (unsigned i = 0u; i < ZS_BEARING_BATCH_MAX_SAMPLES; i++) b.sample[i] = (zs_bearing_sample_t){UINT32_MAX, 35999u, INT16_MIN, UINT16_MAX, 255u, 255u, 0u};
+  printf("bearing batch worst case %zu bytes (schema 1)\n", zs_bearing_batch_encode(&b, buf, sizeof(buf)));
   assert(zs_bearing_batch_encode(&b, buf, sizeof(buf)) > 0u);
+  for (unsigned i = 0u; i < ZS_BEARING_BATCH_MAX_SAMPLES; i++) b.sample[i].f0_dhz = UINT16_MAX;
+  printf("bearing batch worst case %zu bytes (schema 2)\n", zs_bearing_batch_encode(&b, buf, sizeof(buf)));
+  assert(zs_bearing_batch_encode(&b, buf, sizeof(buf)) > 0u && zs_bearing_batch_encode(&b, buf, sizeof(buf)) <= 512u);   /* the server's limit */
+}
+
+/* several sources (schema 2): server/tests/test_bearing_stream.py decodes the same bytes */
+static const char *const GOLDEN_SOURCES =
+    "a90002010702110305041b0000000500000001051b0006651729573c2006010701088387001931561907d018b418e60719073a87001975c6190352"
+    "19010418b3071904b0871901f41931561907d018b418e607190740";
+
+static void test_golden_batch_with_sources(void) {
+  zs_bearing_queue_t q;
+  zs_bearing_batch_t b;
+  uint8_t buf[ZS_BEARING_BATCH_MAX_BYTES];
+  char text[2u * ZS_BEARING_BATCH_MAX_BYTES + 1u];
+  const uint64_t track = ((uint64_t)5u << 32) | 1u;
+  zs_bearing_record_t r;
+  zs_bearing_t a = {.azimuth_deg = 126.3f, .elevation_deg = 20.0f, .sigma_deg = 1.8f, .confidence = 0.9f, .f0_hz = 185.04f, .frames_used = 7u, .valid = true};
+  zs_bearing_t c = {.azimuth_deg = 301.5f, .elevation_deg = 8.5f, .sigma_deg = 2.6f, .confidence = 0.7f, .f0_hz = 119.96f, .frames_used = 7u, .valid = true};
+  size_t n;
+  zs_bearing_queue_init(&q);
+  assert(zs_bearing_record_from(&r, track, 1800000012500000LL, 1u, &a) && r.f0_dhz == 1850u); zs_bearing_queue_push(&q, &r);
+  assert(zs_bearing_record_from(&r, track, 1800000012500000LL, 1u, &c) && r.f0_dhz == 1200u); zs_bearing_queue_push(&q, &r);
+  a.f0_hz = 185.6f;
+  assert(zs_bearing_record_from(&r, track, 1800000013000000LL, 1u, &a)); zs_bearing_queue_push(&q, &r);
+  assert(zs_bearing_queue_take(&q, 17u, 5u, 1u, 16u, &b) == 3u && b.sample[1].dt_ms == 0u && b.sample[2].f0_dhz == 1856u);
+  n = zs_bearing_batch_encode(&b, buf, sizeof(buf));
+  hex(buf, n, text);
+  printf("schema 2 golden: %s\n", text);
+  assert(n > 0u && buf[2] == 0x02u && strcmp(text, GOLDEN_SOURCES) == 0);
 }
 
 static void test_queue_boundaries_and_overflow(void) {
@@ -81,6 +111,9 @@ static void test_record_from_bearing(void) {
   assert(r.azimuth_cdeg == 0u && r.elevation_cdeg == 9000 && r.sigma_cdeg == 65535u && r.confidence_u8 == 255u && r.frames == 7u && r.time_trust == 1u);
   b.azimuth_deg = -0.5f; b.elevation_deg = -12.34f; b.sigma_deg = 2.25f; b.confidence = 0.5f;
   assert(zs_bearing_record_from(&r, 11u, 123456, 1u, &b) && r.azimuth_cdeg == 35950u && r.elevation_cdeg == -1234 && r.sigma_cdeg == 225u && r.confidence_u8 == 128u);
+  assert(r.f0_dhz == 0u);                                                             /* full band: not known */
+  b.f0_hz = 7000.0f;
+  assert(zs_bearing_record_from(&r, 11u, 123456, 1u, &b) && r.f0_dhz == 65535u);       /* saturated */
   b.valid = false;
   assert(!zs_bearing_record_from(&r, 11u, 123456, 1u, &b));
 }
@@ -113,6 +146,7 @@ static void test_track_window(void) {
 int main(void) {
   test_golden_batch();
   test_worst_case_size();
+  test_golden_batch_with_sources();
   test_queue_boundaries_and_overflow();
   test_record_from_bearing();
   test_track_window();

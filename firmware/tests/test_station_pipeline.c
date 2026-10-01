@@ -11,7 +11,7 @@
 #define RING_FRAMES 64000u   /* 2 s x 4 channels, as APP_AUDIO_RING_FRAMES_B1 */
 static int16_t ring_storage[RING_FRAMES * ZS_AUDIO_CHANNELS];
 static zs_complex_t scratch[ZS_AIR_SCRATCH_COMPLEX];
-static int16_t window[ZS_PIPELINE_WINDOW_SAMPLES];
+static int16_t window[ZS_PIPELINE_WINDOW_SAMPLES] __attribute__((aligned(4)));   /* the pipeline lends it as floats */
 
 typedef struct {
   unsigned feature_centroid;       /* which centroid the stub extractor returns (de-normalized) */
