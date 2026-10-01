@@ -34,6 +34,17 @@
       <label class="form-label" for="replay-source">Что воспроизвести</label>
       <select class="form-control replay-select" id="replay-source"><option value="">загрузка…</option></select>
       <label class="replay-check"><input type="checkbox" id="replay-follow"> Следить за целью</label>
+      <label class="replay-check"><input type="checkbox" id="replay-geometry"> Слепые зоны расстановки</label>
+      <div id="replay-geometry-opts" hidden>
+        <label class="form-label" for="replay-geo-range">Дальность слышимости, м</label>
+        <input class="form-control replay-select" id="replay-geo-range" type="number" min="100" max="5000" step="100" value="1500">
+        <label class="form-label" for="replay-geo-height">Высота цели над станциями, м</label>
+        <input class="form-control replay-select" id="replay-geo-height" type="number" min="0" max="5000" step="50" value="150">
+        <p class="replay-note" id="replay-geo-legend">Зелёный — общий трек даёт точку (чем ярче, тем меньше ошибка), красный —
+          слепая геометрия: станции слышат, но лучи почти параллельны (вдоль линии между станциями), серый — слышит одна
+          станция, только линия пеленга. Сигма пеленга — медиана пеленгов окна (3° без них).</p>
+        <p class="replay-note" id="replay-geo-share"></p>
+      </div>
 
       <dl class="replay-readout" id="replay-time">
         <dt>Время (UTC)</dt><dd id="ro-utc">—</dd>
