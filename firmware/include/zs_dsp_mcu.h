@@ -22,5 +22,8 @@ size_t zs_dsp_mcu_scratch_bytes(void);
    gate scratch (ZS_AIR_SCRATCH_COMPLEX, FFT + per-window areas) on it so the target pays no extra RAM.
    Not re-entrant with the extractor. */
 zs_complex_t *zs_dsp_mcu_borrow_work(size_t *complex_count);
+/* The magnitude buffer (64 KB) is written and read inside one zs_dsp_mcu_extract_1s call only: between two calls it is
+   lent as int16 storage (the station pipeline's stash of a direction's 0.5 s, zs_station_pipeline_set_stash). */
+int16_t *zs_dsp_mcu_borrow_stash(size_t *samples);
 
 #endif

@@ -49,13 +49,14 @@ static void decimate(sample_fn get, const void *src, float *memory) {
   }
 }
 
-/* Hann frame f of every channel -> ws->spectrum */
-static bool frame_spectra(const float *memory, unsigned f, zs_comb_bearing_workspace_t *ws) {
+/* Hann frame f of every channel -> spectrum */
+bool zs_comb_bearing_frame_spectra(const float *memory, unsigned f, zs_complex_t spectrum[ZS_SPATIAL_MIC_COUNT][ZS_COMB_BEARING_N]) {
+  if (!memory || !spectrum || f >= ZS_COMB_BEARING_FRAMES) return false;
   const float a = 2.0f * (float)M_PI / (float)(ZS_COMB_BEARING_N - 1u);
   const float cr = cosf(a), si = sinf(a);
   for (unsigned c = 0u; c < ZS_SPATIAL_MIC_COUNT; c++) {
     const float *x = memory + (size_t)c * ZS_COMB_BEARING_SPAN_DECIMATED + (size_t)f * ZS_COMB_BEARING_HOP;
-    zs_complex_t *X = ws->spectrum[c];
+    zs_complex_t *X = spectrum[c];
     float wr = 1.0f, wi = 0.0f;                        /* e^{i a n}, the window's cosine by rotation */
     for (unsigned n = 0u; n < ZS_COMB_BEARING_N; n++) {
       X[n].re = x[n] * (0.5f - 0.5f * wr);
@@ -159,7 +160,7 @@ static unsigned comb_core(const zs_bearing_ctx_t *ctx, zs_comb_bearing_stats_t *
 
   /* pass 1: PHAT cross spectra of each source's bins summed over the frames */
   for (unsigned f = 0u; f < ZS_COMB_BEARING_FRAMES; f++) {
-    if (!frame_spectra(memory, f, ws)) return 0u;
+    if (!zs_comb_bearing_frame_spectra(memory, f, ws->spectrum)) return 0u;
     for (unsigned s = 0u; s < count; s++) {
       if (!live[s]) continue;
       for (unsigned j = 0u; j < ZS_SPATIAL_REF_TDOA_COUNT; j++) {
@@ -191,7 +192,7 @@ static unsigned comb_core(const zs_bearing_ctx_t *ctx, zs_comb_bearing_stats_t *
     bool any = false;
     for (unsigned s = 0u; s < count; s++) any = any || live[s];
     if (!any) break;
-    if (!frame_spectra(memory, f, ws)) return 0u;
+    if (!zs_comb_bearing_frame_spectra(memory, f, ws->spectrum)) return 0u;
     for (unsigned s = 0u; s < count; s++) {
       if (!live[s]) continue;
       for (unsigned j = 0u; j < ZS_SPATIAL_REF_TDOA_COUNT; j++) {
@@ -266,19 +267,15 @@ static int16_t ring_sample(const void *p, unsigned ch, uint32_t i) {
   return zs_audio_ring_at(r->ring, r->end, r->count, i, ch);
 }
 
-unsigned zs_comb_bearings_from_ring(const zs_bearing_ctx_t *ctx, zs_comb_bearing_stats_t *stats, const zs_audio_ring_t *ring,
-                                    uint64_t end_sample, const float *f0_hz, unsigned count, float temperature_c, float *memory,
-                                    zs_comb_bearing_workspace_t *ws, zs_bearing_t *out) {
+bool zs_comb_bearing_decimate_ring(const zs_audio_ring_t *ring, uint64_t end_sample, float *memory) {
   ring_src_t src;
-  if (!args_ok(ctx, f0_hz, count, memory, ws, out) || !ring) return 0u;
-  reset_out(f0_hz, count, out);
-  if (stats) stats->attempts += count;
+  if (!ring || !memory) return false;
   src.ring = ring;
   src.end = end_sample;
   src.count = ZS_COMB_BEARING_SPAN + ZS_COMB_BEARING_TAPS - 1u;
-  if (end_sample < src.count || !zs_audio_ring_range_ok(ring, end_sample, src.count)) { if (stats) stats->no_audio += count; return 0u; }
+  if (end_sample < src.count || !zs_audio_ring_range_ok(ring, end_sample, src.count)) return false;
   decimate(ring_sample, &src, memory);
-  return comb_core(ctx, stats, f0_hz, count, temperature_c, memory, ws, out);
+  return true;
 }
 
 typedef struct {
@@ -291,18 +288,43 @@ static int16_t chan_sample(const void *p, unsigned ch, uint32_t i) {
   return s->channels[ch][s->offset + i];
 }
 
+bool zs_comb_bearing_decimate_channels(const int16_t *const channels[ZS_SPATIAL_MIC_COUNT], uint32_t count_samples, float *memory) {
+  chan_src_t src;
+  const uint32_t need = ZS_COMB_BEARING_SPAN + ZS_COMB_BEARING_TAPS - 1u;
+  if (!channels || !memory || count_samples < need) return false;
+  for (unsigned c = 0u; c < ZS_SPATIAL_MIC_COUNT; c++) if (!channels[c]) return false;
+  src.channels = channels;
+  src.offset = count_samples - need;
+  decimate(chan_sample, &src, memory);
+  return true;
+}
+
+unsigned zs_comb_bearings_from_memory(const zs_bearing_ctx_t *ctx, zs_comb_bearing_stats_t *stats, const float *memory,
+                                      const float *f0_hz, unsigned count, float temperature_c, zs_comb_bearing_workspace_t *ws,
+                                      zs_bearing_t *out) {
+  if (!args_ok(ctx, f0_hz, count, memory, ws, out)) return 0u;
+  reset_out(f0_hz, count, out);
+  if (stats) stats->attempts += count;
+  return comb_core(ctx, stats, f0_hz, count, temperature_c, memory, ws, out);
+}
+
+unsigned zs_comb_bearings_from_ring(const zs_bearing_ctx_t *ctx, zs_comb_bearing_stats_t *stats, const zs_audio_ring_t *ring,
+                                    uint64_t end_sample, const float *f0_hz, unsigned count, float temperature_c, float *memory,
+                                    zs_comb_bearing_workspace_t *ws, zs_bearing_t *out) {
+  if (!args_ok(ctx, f0_hz, count, memory, ws, out) || !ring) return 0u;
+  reset_out(f0_hz, count, out);
+  if (stats) stats->attempts += count;
+  if (!zs_comb_bearing_decimate_ring(ring, end_sample, memory)) { if (stats) stats->no_audio += count; return 0u; }
+  return comb_core(ctx, stats, f0_hz, count, temperature_c, memory, ws, out);
+}
+
 unsigned zs_comb_bearings_from_channels(const zs_bearing_ctx_t *ctx, zs_comb_bearing_stats_t *stats,
                                         const int16_t *const channels[ZS_SPATIAL_MIC_COUNT], uint32_t count_samples,
                                         const float *f0_hz, unsigned count, float temperature_c, float *memory,
                                         zs_comb_bearing_workspace_t *ws, zs_bearing_t *out) {
-  chan_src_t src;
-  const uint32_t need = ZS_COMB_BEARING_SPAN + ZS_COMB_BEARING_TAPS - 1u;
-  if (!args_ok(ctx, f0_hz, count, memory, ws, out) || !channels || count_samples < need) return 0u;
-  for (unsigned c = 0u; c < ZS_SPATIAL_MIC_COUNT; c++) if (!channels[c]) return 0u;
+  if (!args_ok(ctx, f0_hz, count, memory, ws, out)) return 0u;
+  if (!zs_comb_bearing_decimate_channels(channels, count_samples, memory)) return 0u;
   reset_out(f0_hz, count, out);
   if (stats) stats->attempts += count;
-  src.channels = channels;
-  src.offset = count_samples - need;
-  decimate(chan_sample, &src, memory);
   return comb_core(ctx, stats, f0_hz, count, temperature_c, memory, ws, out);
 }
