@@ -8,6 +8,13 @@
       "artifacts": "build-target/dioneya_evt_pre_20.*"
     },
     {
+      "name": "station-twin-field",
+      "runner": "ubuntu-24.04",
+      "shell": "bash",
+      "script": "ci/twin_field.sh",
+      "artifacts": ""
+    },
+    {
       "name": "server-pki",
       "runner": "ubuntu-24.04",
       "shell": "bash",
