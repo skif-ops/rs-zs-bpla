@@ -16,6 +16,24 @@
  * fundamental (folded by integer ratios so an octave slip of the fit does not count as motion; all teeth
  * of a comb move with f0, so this is the server's line steadiness), decision as in
  * DroneSeparator._build_findings.
+ * Several targets at once: the sum of two propulsion combs whose fundamentals are not in a small integer ratio
+ * fits a common sub-harmonic comb (185 Hz + 120 Hz -> 61 Hz: both are near multiples of it), which the gate would
+ * then take for 60 Hz mains and the classifier for a ground engine.  When the fit lands on a sub-harmonic of the
+ * strongest line below that line's own comb (the lowest fundamental of it with five of six teeth real), the own comb
+ * is removed from the spectrum (4 % of every harmonic: the Doppler smear on the average) and the rest searched line
+ * by line: a comb with three real teeth among its first six known positions (teeth in removed bands count neither
+ * way), a twentieth of the main comb's power, heard in the current window too and in no integer ratio to a known
+ * comb (within 6 %: a leftover of a smeared line) is another source.  Up to ZS_AIR_MAX_SECONDARY others are
+ * reported with their fundamental on the current window - only beside a present source - so the station can
+ * suppress them before the classifier (zs_air_gate_suppress_secondary) and classify the target it tracks.  A comb
+ * starts a source only in a fit that shows such a mixture and counts once it has been found again and again: +1
+ * for every fit that finds it within 4 % of the fit before, -1 for every fit that misses it, counted from 3 (a
+ * Doppler pass moves a line by 1-3 % per 0.5 s hop; a single source gliding in pitch, which smears the average into
+ * what looks like two combs, by more, so it never scores); the common sub-harmonic of two counting sources is not
+ * one.  The stronger comb is the gate's line; another one takes over only when it is 1 dB stronger, so two
+ * sources of about the same level do not swap from fit to fit.  A single source - also one whose fit is a true
+ * sub-harmonic of its strongest line, or an engine with further combs of its own - has no secondary comb and is
+ * analysed exactly as before.
  * Scratch is caller-provided (ZS_AIR_SCRATCH_COMPLEX: the 8192-point FFT plus the per-window work areas
  * including the window's own power spectrum, ~118 KB) so the target can overlay it on the DSP work buffer;
  * the gate itself keeps one band spectrum (the 12 KB running log-average) and the window history.
@@ -31,6 +49,8 @@
 #define ZS_AIR_FFT 8192u
 #define ZS_AIR_BINS 3074u        /* bins up to 2400 Hz at 0.78125 Hz */
 #define ZS_AIR_HISTORY 8u
+#define ZS_AIR_MAX_SECONDARY 2u
+#define ZS_AIR_SOURCE_TRACKS 6u
 /* scratch for zs_air_gate_push: the FFT plus four band-sized float work areas (window spectrum, p, lp, noise)
    and a byte mask (~118 KB) */
 #define ZS_AIR_SCRATCH_COMPLEX (ZS_AIR_FFT + (4u * ZS_AIR_BINS * 4u + ZS_AIR_BINS + 7u) / 8u)
@@ -52,6 +72,13 @@ typedef struct {
   uint8_t next, count;
   float f0_hz;                     /* comb fundamental fitted on avg_log, 0 = no line */
   float anchor_hz;                 /* strongest tooth of that comb on avg_log */
+  float secondary_f0_hz[ZS_AIR_MAX_SECONDARY];   /* other sources' combs on avg_log (0 = none) */
+  float secondary_window_hz[ZS_AIR_MAX_SECONDARY]; /* the same refined on the last window */
+  uint8_t secondary_count;
+  float source_hz[ZS_AIR_SOURCE_TRACKS];          /* combs found on the recent fits... */
+  uint8_t source_score[ZS_AIR_SOURCE_TRACKS];      /* ...+1 for every fit that finds one again (within 4 %), -1 otherwise */
+  uint8_t source_count;
+  float main_hz;                                   /* the main comb of the last fit with several sources (0: none) */
 } zs_air_gate_t;
 
 typedef struct {
@@ -64,6 +91,8 @@ typedef struct {
   float f0_hz;          /* folded median fundamental of the comb windows (fit value when none) */
   uint8_t harmonic_count;
   uint8_t confidence_u8; /* server _confidence blend without the separation-gain term */
+  uint8_t secondary_count;               /* other sources heard at once (their combs on the last window); 0 unless present */
+  float secondary_f0_hz[ZS_AIR_MAX_SECONDARY];
 } zs_air_gate_result_t;
 
 void zs_air_gate_init(zs_air_gate_t *g);
@@ -74,5 +103,8 @@ bool zs_air_gate_push(zs_air_gate_t *g, const int16_t *pcm, size_t n, zs_complex
 zs_air_gate_result_t zs_air_gate_evaluate(const zs_air_gate_t *g);
 /* The last window's measurement (diagnostics). */
 const zs_air_window_t *zs_air_gate_last(const zs_air_gate_t *g);
+/* Suppresses the secondary sources of a gate result in a window (32 kHz mono, in place): a narrow comb notch at
+   every harmonic of each secondary fundamental, flat between them.  Nothing changes without secondary sources. */
+void zs_air_gate_suppress_secondary(int16_t *pcm, size_t n, const zs_air_gate_result_t *r);
 
 #endif

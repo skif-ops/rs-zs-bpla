@@ -56,3 +56,42 @@ replacing it.
 
 Next: combine with the centroid classifier in `zs_classifier_consensus` (gate-confirmed comb raises presence,
 background-class + no comb lowers it; a comb with a ground-vehicle class stays "engine, not confirmed airborne").
+
+## Several sources at once (2026-10-01)
+
+Two targets heard at once broke the single-comb fit: 185 Hz + 120 Hz are both near multiples of 61 Hz, the fit took
+that common sub-harmonic, the gate rejected it as mains and the classifier saw a ground engine.  The gate now
+separates sources (`zs_air_gate.h`, `separate_sources` in `zs_air_gate.c`):
+
+- a mixture is suspected only when the fit lands on a sub-harmonic of the strongest line *below* that line's own
+  comb (the lowest dominant/k with five of six real teeth): a single source whose fit is its true fundamental (the
+  APC at 104 Hz with its 5th harmonic strongest) is never split;
+- the own comb is notched out (a fixed notch of 4 % of each harmonic: the Doppler smear on the 4 s average) and
+  the rest searched line by line: a comb with at least three real teeth among its first six known positions (teeth
+  inside notched bands count neither way), at least a twentieth (`SECONDARY_MIN_POWER` 0.05) of the main comb's
+  power, present in the current window too, and in no integer ratio (within 6 %) to a known comb - a leftover of a
+  smeared line is the known comb's harmonic - is another source; after the own comb is known, 3:2 is another source;
+- a comb starts a source track only in a fit that shows a mixture and counts once it is found in three fits more
+  than missed (+1 found, -1 missed, max 6, 4 % drift); the common sub-harmonic of two counting sources is not one;
+- the stronger comb is the gate's line (the other must be 1 dB stronger to take over, so two sources of about the
+  same level do not swap from fit to fit); up to two others are reported, only beside a present source, and the
+  pipeline notches them out of the window before the classifier (`zs_air_gate_suppress_secondary`, IIR comb with
+  fractional delay, about 10 dB on the other comb's teeth, under 1 dB on the tracked one).
+
+Twin recordings of station 17 (`presence_eval`, 358 windows, the same synthetic sources as the field run):
+
+| Sound at the station | confirmed before | confirmed now | gate present now | separated windows |
+|---|---|---|---|---|
+| one target, 185 Hz | 314 | 314 | 356 | 0 |
+| 120 Hz alone / 290 Hz alone | 218 / 261 | 218 / 261 | 356 / 356 | 0 |
+| two targets, 185 + 120 Hz | 64 (gate 100) | 153 | 318 | 315 |
+| three targets, 185 + 120 + 290 Hz | 18 (gate 98) | 66 | 287 | 284 |
+
+The remaining loss is the classifier: the synthetic 120 Hz source alone is called agricultural (class 14) in 27 %
+of its windows, and the three-target windows keep one of the other sources partly (184 of 287 windows class 14).
+
+Real recordings (38 files, `presence_eval` before/after): confirmed windows unchanged on every non-UAV file
+(birds 3, gunfire 2, tractors 0, city 0); suspect windows birds 230 -> 231, tractors 44 -> 37, city traffic 16 -> 9;
+DJI Mavic 3 Pro 296 -> 296 confirmed; DJI Mini 3 Pro 150 -> 149.  Test: `firmware/tests/test_air_gate.c`
+(`test_two_sources`: 120 + 183 Hz separated in 14 of 14 windows, single sources get no secondary comb, the
+suppression takes about 10 dB off the other comb).

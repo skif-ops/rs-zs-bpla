@@ -80,6 +80,7 @@ class Fix:
     vertical_error_m: float
     crossing_deg: float
     stations: tuple[int, ...]
+    height_spread: float = 0.0      # disagreement of the stations' heights (from their elevations), in sigmas
 
 
 @dataclass(frozen=True)
@@ -97,6 +98,7 @@ class TrackPoint:
     course_deg: float
     crossing_deg: float
     stations: tuple[int, ...] = field(default_factory=tuple)
+    height_spread: float = 0.0      # not stored: used to tell ghost intersections (station/track_fusion.py)
 
     def as_dict(self) -> dict:
         return {"time_us": self.time_us, "lat": self.lat, "lon": self.lon, "alt_msl_m": self.alt_msl_m,
@@ -112,10 +114,11 @@ def _direction(az_deg: float) -> np.ndarray:
 
 
 def intersect(origins: np.ndarray, azimuth_deg: list[float], elevation_deg: list[float], sigma_deg: list[float],
-              ranges_m: list[float] | None) -> tuple[np.ndarray, np.ndarray, float] | None:
+              ranges_m: list[float] | None, spread: list | None = None) -> tuple[np.ndarray, np.ndarray, float] | None:
     """Weighted intersection of horizontal rays from ``origins`` (ENU, n x 3).  ``ranges_m`` from the previous
     iteration weight each ray by its lateral error (None: equal ranges).  Returns (xyz, 2x2 covariance, vertical
-    sigma) or None for parallel rays."""
+    sigma) or None for parallel rays.  ``spread`` (a list) receives the height disagreement of the rays in sigmas:
+    rays of one target agree on its height, rays of two targets that only cross in a ghost point mostly do not."""
     n = len(azimuth_deg)
     a = np.zeros((n, 2))
     b = np.zeros(n)
@@ -144,6 +147,8 @@ def intersect(origins: np.ndarray, azimuth_deg: list[float], elevation_deg: list
     if zs:
         z = float(np.average(zs, weights=zw))
         z_sigma = math.sqrt(1.0 / sum(zw))
+        if spread is not None and len(zs) >= 2:
+            spread.append(math.sqrt(sum(w * (h - z) ** 2 for h, w in zip(zs, zw)) / (len(zs) - 1)))
     else:
         z = float(np.mean(origins[:, 2]))
         z_sigma = MAX_ERROR_M
@@ -173,10 +178,12 @@ def fix_at(t: float, stations: list[StationBearings], origins: np.ndarray, *, c:
                 az.append(s[0]); el.append(s[1]); sg.append(s[2]); idx.append(k)
         if len(idx) < 2:
             return None
-        solved = intersect(origins[idx], az, el, sg, [ranges[k] for k in idx] if ranges else None)
+        spread: list[float] = []
+        solved = intersect(origins[idx], az, el, sg, [ranges[k] for k in idx] if ranges else None, spread)
         if solved is None:
             return None
         xyz, cov, z_sigma = solved
+        height_spread = spread[0] if spread else 0.0
         new_ranges = [float(np.linalg.norm(xyz[:2] - origins[k, :2])) for k in range(len(stations))]
         converged = ranges is not None and max(abs(x - y) for x, y in zip(new_ranges, ranges)) < 2.0
         result, used = (xyz, cov, z_sigma, az), idx
@@ -192,7 +199,7 @@ def fix_at(t: float, stations: list[StationBearings], origins: np.ndarray, *, c:
     h_err = math.sqrt(max(float(np.trace(cov)), 0.0))
     if crossing < MIN_CROSSING_DEG or h_err > MAX_ERROR_M:
         return None
-    return Fix(t, xyz, h_err, max(z_sigma, 10.0), crossing, tuple(stations[k].station_id for k in used))
+    return Fix(t, xyz, h_err, max(z_sigma, 10.0), crossing, tuple(stations[k].station_id for k in used), height_spread)
 
 
 def fuse(stations: list[StationBearings], *, bin_s: float = BIN_S, c: float = SPEED_OF_SOUND_MPS,
@@ -231,5 +238,5 @@ def fuse(stations: list[StationBearings], *, bin_s: float = BIN_S, c: float = SP
         course = (math.degrees(math.atan2(vel[0], vel[1])) + 360.0) % 360.0 if speed > 0.5 else 0.0
         points.append(TrackPoint(int(round(f.time_s * 1e6)), lat, lon, alt, round(h_err, 1), round(f.vertical_error_m, 1),
                                  float(vel[0]), float(vel[1]), float(vel[2]), speed, course, round(f.crossing_deg, 1),
-                                 f.stations))
+                                 f.stations, f.height_spread))
     return points

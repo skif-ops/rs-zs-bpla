@@ -453,6 +453,16 @@ static bool world_mode, world_installed;
 static unsigned twin_station_id = 17u;
 static double st_enu[3];                        /* this station, m east/north/up of the field origin */
 static double tg_p0[3], tg_v[3];                /* the target at scene time 0 and its velocity */
+static float tg_f0 = 185.0f;                    /* blade-pass fundamental of the synthetic source */
+/* more targets at once (--world repeated): each its own synthetic source (own f0), own plane wave on the array; the
+   microphones hear the sum.  Target 0 keeps the globals above (and --world-sound), targets 1.. live here. */
+#define WORLD_MAX_TARGETS 3u
+static unsigned world_targets;
+static double xt_p0[WORLD_MAX_TARGETS][3], xt_v[WORLD_MAX_TARGETS][3];
+static float xt_f0[WORLD_MAX_TARGETS], xt_gain[WORLD_MAX_TARGETS];
+static scene_segment_t xt_seg[WORLD_MAX_TARGETS];
+static scene_t xt_scene[WORLD_MAX_TARGETS];
+static array_render_t xt_render[WORLD_MAX_TARGETS];
 static double world_ref_m = 800.0;              /* full source level at this range and closer */
 static double world_absorption_db_km = 2.0;     /* air absorption around 500 Hz (ISO 9613-1, 10..20 C, 70 % RH) */
 static float world_level = 0.5f;                /* source level at --world-ref-m (the drone scene's scale) */
@@ -500,19 +510,29 @@ static void field_install(void) {
   zs_station_position_set_installation(&station_pos, &c);
 }
 /* direction and gain of the sound arriving now (scene time ta): emitted at te = ta - range(te) / c */
-static void world_step(double ta, float *az, float *el) {
+static void target_step(const double p0[3], const double vel[3], double ta, float *az, float *el, float *gain, double *te_out, double *te_rate) {
   double te = ta, v[3], r = 0.0, radial = 0.0;
   for (unsigned it = 0u; it < 8u; it++) {
-    for (unsigned k = 0u; k < 3u; k++) v[k] = tg_p0[k] + tg_v[k] * te - st_enu[k];
+    for (unsigned k = 0u; k < 3u; k++) v[k] = p0[k] + vel[k] * te - st_enu[k];
     r = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     te = ta - r / FIELD_C;
   }
-  for (unsigned k = 0u; k < 3u; k++) radial += r > 0.0 ? tg_v[k] * v[k] / r : 0.0;
+  for (unsigned k = 0u; k < 3u; k++) radial += r > 0.0 ? vel[k] * v[k] / r : 0.0;
   *az = (float)fmod(atan2(v[0], v[1]) * 180.0 / M_PI + 360.0, 360.0);
   *el = (float)(atan2(v[2], hypot(v[0], v[1])) * 180.0 / M_PI);
-  world_gain = (float)(r <= world_ref_m ? 1.0 : world_ref_m / r * pow(10.0, -world_absorption_db_km * (r - world_ref_m) / 1000.0 / 20.0));
-  world_te = te;
-  world_te_rate = 1.0 / (1.0 + radial / FIELD_C);   /* receding: the recording plays slower (lower pitch) */
+  *gain = (float)(r <= world_ref_m ? 1.0 : world_ref_m / r * pow(10.0, -world_absorption_db_km * (r - world_ref_m) / 1000.0 / 20.0));
+  *te_out = te;
+  *te_rate = 1.0 / (1.0 + radial / FIELD_C);   /* receding: the recording plays slower (lower pitch) */
+}
+static void world_step(double ta, float *az, float *el) { target_step(tg_p0, tg_v, ta, az, el, &world_gain, &world_te, &world_te_rate); }
+/* azimuth error of a bearing against the nearest true direction of any target */
+static float truth_error(float az_deg) {
+  float e = fabsf(fmodf(az_deg - array_render.azimuth_deg + 540.0f, 360.0f) - 180.0f);
+  for (unsigned t = 1u; t < world_targets; t++) {
+    const float f = fabsf(fmodf(az_deg - xt_render[t].azimuth_deg + 540.0f, 360.0f) - 180.0f);
+    if (f < e) e = f;
+  }
+  return e;
 }
 /* the recording at emission time te (seconds, looped), linear interpolation */
 static float world_wav_at(double te) {
@@ -633,7 +653,7 @@ static bool pl_emit(void *ctx, const zs_detection_t *d) {
 }
 /* every bearing of a CONFIRMED window, against the rendered truth */
 static void pl_bearing(void *ctx, const zs_bearing_t *b, uint64_t end_sample, uint64_t track_event_id) {
-  const float e = fabsf(fmodf(b->azimuth_deg - array_render.azimuth_deg + 540.0f, 360.0f) - 180.0f);
+  const float e = truth_error(b->azimuth_deg);
   zs_bearing_record_t r;
   (void)ctx;
   bearings_total++;
@@ -1044,7 +1064,14 @@ static void audio_tick(void) {
   float acc = 0.0f;
   {
     float az, el;          /* the source moves along its segment: re-aim the plane wave every tick (20 ms) */
-    if (world_mode) { world_step((double)scene.sample / 32000.0, &az, &el); array_render_set_direction(&array_render, az, el, 15.0f); }
+    if (world_mode) {
+      world_step((double)scene.sample / 32000.0, &az, &el); array_render_set_direction(&array_render, az, el, 15.0f);
+      for (unsigned t = 1u; t < world_targets; t++) {
+        double te, rate;
+        target_step(xt_p0[t], xt_v[t], (double)scene.sample / 32000.0, &az, &el, &xt_gain[t], &te, &rate);
+        array_render_set_direction(&xt_render[t], az, el, 15.0f);
+      }
+    }
     else if (scene_direction(&scene, &az, &el) && (az != array_render.azimuth_deg || el != array_render.elevation_deg))
       array_render_set_direction(&array_render, az, el, 15.0f);
   }
@@ -1054,6 +1081,12 @@ static void audio_tick(void) {
     if (world_wav) src = world_wav_at(world_te + (double)i / 32000.0 * world_te_rate);
     if (world_mode) src *= world_gain;
     array_render_push(&array_render, src, out);
+    for (unsigned t = 1u; t < world_targets; t++) {
+      float xs, xb, xo[ZS_AUDIO_CHANNELS];
+      scene_next_parts(&xt_scene[t], &xs, &xb);
+      array_render_push(&xt_render[t], xs * xt_gain[t], xo);
+      for (unsigned c = 0u; c < ZS_AUDIO_CHANNELS; c++) out[c] += xo[c];
+    }
     out[0] += bg;
     for (unsigned c = 1u; c < ZS_AUDIO_CHANNELS; c++) out[c] += scene_background(&scene, c);
     for (unsigned c = 0u; c < ZS_AUDIO_CHANNELS; c++) out[c] = out[c] > 1.0f ? 1.0f : (out[c] < -1.0f ? -1.0f : out[c]);
@@ -1119,9 +1152,12 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--station-id") && i + 1 < argc) twin_station_id = (unsigned)atoi(argv[++i]);
     else if (!strcmp(argv[i], "--pos") && i + 1 < argc && parse3(argv[++i], st_enu, 2)) {}
     else if (!strcmp(argv[i], "--world") && i + 1 < argc) {
-      double p[6] = {0};
-      if (sscanf(argv[++i], "%lf,%lf,%lf,%lf,%lf,%lf", &p[0], &p[1], &p[2], &p[3], &p[4], &p[5]) != 6) { fprintf(stderr, "--world x0,y0,z0,vx,vy,vz\n"); return 2; }
-      for (unsigned k = 0u; k < 3u; k++) { tg_p0[k] = p[k]; tg_v[k] = p[3 + k]; }
+      double p[7] = {0, 0, 0, 0, 0, 0, 185.0};
+      const int got = sscanf(argv[++i], "%lf,%lf,%lf,%lf,%lf,%lf,%lf", &p[0], &p[1], &p[2], &p[3], &p[4], &p[5], &p[6]);
+      if ((got != 6 && got != 7) || world_targets >= WORLD_MAX_TARGETS || p[6] < 40.0 || p[6] > 1000.0) { fprintf(stderr, "--world x0,y0,z0,vx,vy,vz[,f0_hz] (up to %u targets)\n", WORLD_MAX_TARGETS); return 2; }
+      if (world_targets == 0u) { for (unsigned k = 0u; k < 3u; k++) { tg_p0[k] = p[k]; tg_v[k] = p[3 + k]; } tg_f0 = (float)p[6]; }
+      else { for (unsigned k = 0u; k < 3u; k++) { xt_p0[world_targets][k] = p[k]; xt_v[world_targets][k] = p[3 + k]; } xt_f0[world_targets] = (float)p[6]; }
+      world_targets++;
       world_mode = true;
     }
     else if (!strcmp(argv[i], "--world-ref-m") && i + 1 < argc) world_ref_m = atof(argv[++i]);
@@ -1130,13 +1166,18 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--world-sound") && i + 1 < argc) world_sound = argv[++i];
     else if (!strcmp(argv[i], "--installed")) world_installed = true;
     else if (!strcmp(argv[i], "--log-uplink") && i + 1 < argc) uplink_log = fopen(argv[++i], "w");
-    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S] [--expect-net-version N] [--expect-net-state S] [--expect-bearing-error DEG] [--track-max-s S] [--expect-streamed N] [--station-id N] [--pos E,N[,U]] [--installed] [--world X,Y,Z,VX,VY,VZ] [--world-ref-m M] [--world-absorption-db-km A] [--world-level L] [--world-sound FILE.wav] [--log-uplink FILE]\n"); return 2; }
+    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S] [--expect-net-version N] [--expect-net-state S] [--expect-bearing-error DEG] [--track-max-s S] [--expect-streamed N] [--station-id N] [--pos E,N[,U]] [--installed] [--world X,Y,Z,VX,VY,VZ[,F0] ...] [--world-ref-m M] [--world-absorption-db-km A] [--world-level L] [--world-sound FILE.wav] [--log-uplink FILE]\n"); return 2; }
   }
   if (world_sound && !world_wav_load(world_sound)) { fprintf(stderr, "--world-sound: %s is not a PCM16 WAV\n", world_sound); return 2; }
-  if (world_mode && !world_wav) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 0u, seconds * 1000u, 185.0f, world_level, 0.0f, 0.0f, 0.0f, true};
+  if (world_mode && !world_wav) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 0u, seconds * 1000u, tg_f0, world_level, 0.0f, 0.0f, 0.0f, true};
   else if (!strcmp(scene_name, "drone")) { segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 20000u, 60000u, 185.0f, 1.0f, 60.0f, 140.0f, 20.0f, false}; if (seconds > 150u) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 100000u, 130000u, 210.0f, 0.8f, 300.0f, 250.0f, 35.0f, false}; }
   else if (!strcmp(scene_name, "ground")) segs[nseg++] = (scene_segment_t){SCENE_GROUND_VEHICLE, 20000u, 60000u, 0.0f, 1.0f, 200.0f, 200.0f, 0.0f, false};
   scene_init(&scene, segs, nseg, 0.02f, seed);
+  for (unsigned t = 1u; t < world_targets; t++) {           /* the other targets: source only (the background is scene's) */
+    xt_seg[t] = (scene_segment_t){SCENE_DRONE_FLYBY, 0u, seconds * 1000u, xt_f0[t], world_level, 0.0f, 0.0f, 0.0f, true};
+    scene_init(&xt_scene[t], &xt_seg[t], 1u, 0.0f, seed * 7919u + t);
+    array_render_init(&xt_render[t], NULL, 32000.0f);
+  }
   array_render_init(&array_render, NULL, 32000.0f);
   zs_track_window_init(&track, track_max_ms, 6u);
   ch_rng ^= seed * 2654435761u;
@@ -1190,7 +1231,10 @@ int main(int argc, char **argv) {
   if (world_mode)
     tlog("field: station %u at E %.0f N %.0f U %.0f m (%s); target from E %.0f N %.0f U %.0f m at %.1f/%.1f/%.1f m/s, %s, full level within %.0f m, air %.1f dB/km",
          twin_station_id, st_enu[0], st_enu[1], st_enu[2], world_installed ? "installation record" : "GNSS position", tg_p0[0], tg_p0[1], tg_p0[2],
-         tg_v[0], tg_v[1], tg_v[2], world_wav ? world_sound : "synthetic electric multirotor (185 Hz)", world_ref_m, world_absorption_db_km);
+         tg_v[0], tg_v[1], tg_v[2], world_wav ? world_sound : "synthetic electric multirotor", world_ref_m, world_absorption_db_km);
+  for (unsigned t = 1u; t < world_targets; t++)
+    tlog("field: target %u from E %.0f N %.0f U %.0f m at %.1f/%.1f/%.1f m/s, synthetic %.0f Hz", t + 1u, xt_p0[t][0], xt_p0[t][1], xt_p0[t][2],
+         xt_v[t][0], xt_v[t][1], xt_v[t][2], xt_f0[t]);
 
   const uint32_t end = sim_now + seconds * 1000u;
   while (sim_now < end) {

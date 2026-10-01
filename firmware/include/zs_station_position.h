@@ -13,6 +13,11 @@
  *     satellites and HDOP of the GNSS block are those of a fix younger than ZS_STATION_POSITION_FIX_FRESH_MS only;
  *   - neither: nothing is filled (the server then has no position for the station).
  *
+ * While the GNSS is suspect (zs_station_position_set_gnss_suspect: the station time saw a GNSS time jump, or the
+ * receiver reports spoofing, zs_time.h) a fix is not believed: a commissioned station reports the fix as suspect
+ * (receiver_spoof of zs_position_trust) and an uncommissioned one keeps the last fix from before (unless it has
+ * none: then the fix is all it has).
+ *
  * Portable state, no locking: the target serialises the GNSS task (writer) against the DSP and comms tasks (readers).
  */
 #include "zs_gnss.h"
@@ -36,12 +41,16 @@ typedef struct {
   uint8_t fix_quality, satellites;
   uint16_t hdop_x100;
   uint32_t seen_gga;
+  bool gnss_suspect;                            /* the GNSS is suspect now (time jump, receiver spoofing report) */
   uint32_t fixes;                               /* counters for the console */
+  uint32_t held_fixes;                          /* fixes not taken while the GNSS was suspect */
 } zs_station_position_t;
 
 void zs_station_position_init(zs_station_position_t *sp);
 /* The installation record's position and trust thresholds (NULL or not configured: not commissioned). */
 void zs_station_position_set_installation(zs_station_position_t *sp, const zs_position_trust_config_t *installation);
+/* The GNSS is suspect (true) or no longer (false); see above. */
+void zs_station_position_set_gnss_suspect(zs_station_position_t *sp, bool suspect);
 /* After zs_gnss_parse_line: takes a GGA parsed since the last call; true when it carried a fix. */
 bool zs_station_position_on_gnss(zs_station_position_t *sp, const zs_gnss_nmea_t *nmea, uint32_t now_ms);
 /* Fills the station position and the position part of the GNSS block (fix type, satellites, HDOP, position trust,

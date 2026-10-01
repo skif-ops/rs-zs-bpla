@@ -542,6 +542,7 @@ static void gnss_task_fn(void *arg) {
           line[len] = '\0';
           if (rmc_epoch_us(line, &epoch)) zs_pps_sync_on_utc(&pps, epoch);   /* the RMC follows the PPS edge it labels */
           /* the GGA fixes: the station position of uncommissioned stations, a check of the installation otherwise */
+          zs_station_position_set_gnss_suspect(&station_pos, zs_time_suspect(&time_sync));   /* a GNSS time jump: its fixes neither */
           if (zs_gnss_parse_line(&nmea, line) && zs_station_position_on_gnss(&station_pos, &nmea, xTaskGetTickCount())) station_pos_publish();
           len = 0u;
         } else if (c != '\r' && len + 1u < sizeof(line)) {
@@ -660,6 +661,7 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->gnss.time_trust = (uint8_t)time_sync.trust;
   hb->gnss.expected_time_error_us = time_sync.expected_error_us;
   (void)station_pos_fill(&hb->station, &hb->gnss);                       /* installation record or GNSS fix (zeros: unknown) */
+  hb->gnss.time_suspect = zs_time_suspect(&time_sync);                    /* a GNSS time jump or an unverified timeline (zs_time.h) */
   hb->detector_present = true;
   hb->detector.boot_id = boot_id;
   hb->detector.uptime_s = xTaskGetTickCount() / 1000u;
@@ -866,6 +868,7 @@ static bool pl_emit(void *ctx, const zs_detection_t *d) {
   with_power.gnss.pps_ok = time_sync.pps_ok;
   with_power.gnss.time_holdover = time_sync.trust == ZS_TIME_TRUST_HOLDOVER;
   (void)station_pos_fill(&with_power.station, &with_power.gnss);          /* the server fuses bearings by it (zeros: unknown) */
+  with_power.gnss.time_suspect = zs_time_suspect(&time_sync);
   app_audio_rec_note_event(d->event_id, d->event_time_us,                 /* CMD_REQUEST_AUDIO finds its audio by this */
                            time_sync.trust == ZS_TIME_TRUST_GNSS_TRUSTED || time_sync.trust == ZS_TIME_TRUST_HOLDOVER);
   if (!stores_on_nor) { pipeline_events_ram++; return true; }
@@ -960,6 +963,8 @@ static void console_exec(const char *cmd) {
                    (unsigned long)bsp_tim2_pps_edges(), (unsigned long)pps.bound_count, (unsigned long)pps.dropped_no_label,
                    (unsigned long)pps.dropped_no_pps, (unsigned long)pps.dropped_no_bracket, (long)zs_pps_sync_rate_error_ppm(&pps),
                    (int)time_sync.trust, (unsigned long)time_sync.expected_error_us);
+    console_printf("time suspect %d verified %d jumps %lu last_jump_ms %ld reanchors %lu\r\n", (int)zs_time_suspect(&time_sync),   /* ms: long is 32 bit */
+                   (int)time_sync.verified, (unsigned long)time_sync.jumps, (long)(time_sync.last_jump_us / 1000), (unsigned long)time_sync.reanchors);
   } else if (strcmp(cmd, "audio") == 0) {
     console_printf("blocks %lu samples %lu overruns %lu seq %lu dma_err %lu peaks %d %d %d %d\r\n",
                    (unsigned long)capture.blocks_processed, (unsigned long)zs_pdm_capture_sample_counter(&capture),

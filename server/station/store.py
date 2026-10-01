@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS bearings(station_id INTEGER NOT NULL, track_event_id 
 CREATE INDEX IF NOT EXISTS idx_bearing_time ON bearings(time_us);
 CREATE TABLE IF NOT EXISTS fused_tracks(track_id TEXT PRIMARY KEY, system_event_id TEXT, first_time_us INTEGER, last_time_us INTEGER, stations TEXT NOT NULL, points INTEGER NOT NULL, updated_us INTEGER NOT NULL);
 CREATE INDEX IF NOT EXISTS idx_track_last ON fused_tracks(last_time_us);
-CREATE TABLE IF NOT EXISTS track_members(station_id INTEGER NOT NULL, track_event_id INTEGER NOT NULL, track_id TEXT NOT NULL, PRIMARY KEY(station_id, track_event_id));
+CREATE TABLE IF NOT EXISTS track_members(station_id INTEGER NOT NULL, track_event_id INTEGER NOT NULL, track_id TEXT NOT NULL, segment_us INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(station_id, track_event_id, segment_us));
 CREATE INDEX IF NOT EXISTS idx_member_track ON track_members(track_id);
 CREATE TABLE IF NOT EXISTS track_points(track_id TEXT NOT NULL, time_us INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(track_id, time_us));
 CREATE TABLE IF NOT EXISTS alert_outbox(seq INTEGER PRIMARY KEY AUTOINCREMENT, msg_id TEXT NOT NULL UNIQUE, tenant TEXT NOT NULL, type TEXT NOT NULL, created_us INTEGER NOT NULL, message TEXT NOT NULL);
@@ -41,6 +41,7 @@ class EventStore:
         self.path=path; path.parent.mkdir(parents=True,exist_ok=True); self.lock=threading.RLock()
         with self._conn() as c:
             self._migrate_station_event_keys(c)
+            self._migrate_track_segments(c)
             c.executescript(SCHEMA)
             self._migrate_commands(c)
             self._migrate_audio(c)
@@ -88,6 +89,33 @@ class EventStore:
                 c.execute(f"INSERT INTO {table}({columns}) SELECT {columns} FROM {table}_before_station_key")
                 c.execute(f"DROP TABLE {table}_before_station_key")
                 for index in indexes: c.execute(index)
+            c.execute("COMMIT")
+        except BaseException:
+            if c.in_transaction: c.execute("ROLLBACK")
+            raise
+        finally:
+            c.isolation_level=level
+    def _migrate_track_segments(self,c):
+        """Fused tracks made before station tracks were split into segments (station/track_segments.py) had whole
+        station tracks as members; such a member is the first segment of its track (segment_us 0), so its rows move as
+        they are, in one transaction as above."""
+        def pending():
+            names={r['name'] for r in c.execute("PRAGMA table_info(track_members)")}
+            return bool(names) and 'segment_us' not in names
+        if not pending(): return
+        level=c.isolation_level
+        c.isolation_level=None
+        try:
+            c.execute("BEGIN IMMEDIATE")
+            if pending():
+                definition=next(line for line in SCHEMA.splitlines() if line.startswith("CREATE TABLE IF NOT EXISTS track_members("))
+                c.execute("ALTER TABLE track_members RENAME TO track_members_before_segments")
+                c.execute("DROP INDEX IF EXISTS idx_member_track")
+                c.execute(definition.rstrip(';'))
+                c.execute("INSERT INTO track_members(station_id,track_event_id,track_id,segment_us) "
+                          "SELECT station_id,track_event_id,track_id,0 FROM track_members_before_segments")
+                c.execute("DROP TABLE track_members_before_segments")
+                c.execute("CREATE INDEX IF NOT EXISTS idx_member_track ON track_members(track_id)")
             c.execute("COMMIT")
         except BaseException:
             if c.in_transaction: c.execute("ROLLBACK")
@@ -260,15 +288,15 @@ class EventStore:
             row=c.execute("SELECT system_event_id FROM detections WHERE event_id=? AND station_id=?",(self._sqlite_event_id(event_id),station_id)).fetchone()
         return row['system_event_id'] if row else None
     def bearing_tracks(self,since_us:int,until_us:int,trusted:tuple[str,...]=('GNSS_TIME_TRUSTED','HOLDOVER'))->list[dict[str,Any]]:
-        """Station tracks with trusted-time bearings overlapping [since_us, until_us], with their fused track (or None)."""
+        """Station tracks with trusted-time bearings overlapping [since_us, until_us] (their segments and the fused
+        tracks of the segments: station/track_fusion.py)."""
         marks=','.join('?'*len(trusted))
         with self._conn() as c:
-            rows=c.execute(f"SELECT b.station_id,b.track_event_id,MIN(b.time_us) AS first_us,MAX(b.time_us) AS last_us,COUNT(*) AS samples,m.track_id "
-                           f"FROM bearings b LEFT JOIN track_members m ON m.station_id=b.station_id AND m.track_event_id=b.track_event_id "
-                           f"WHERE b.time_trust IN ({marks}) GROUP BY b.station_id,b.track_event_id HAVING MAX(b.time_us)>=? AND MIN(b.time_us)<=? "
-                           f"ORDER BY first_us",(*trusted,since_us,until_us)).fetchall()
+            rows=c.execute(f"SELECT b.station_id,b.track_event_id,MIN(b.time_us) AS first_us,MAX(b.time_us) AS last_us,COUNT(*) AS samples "
+                           f"FROM bearings b WHERE b.time_trust IN ({marks}) GROUP BY b.station_id,b.track_event_id "
+                           f"HAVING MAX(b.time_us)>=? AND MIN(b.time_us)<=? ORDER BY first_us",(*trusted,since_us,until_us)).fetchall()
         return [{'station_id':r['station_id'],'track_event_id':r['track_event_id']&0xFFFFFFFFFFFFFFFF,'first_us':r['first_us'],'last_us':r['last_us'],
-                 'samples':r['samples'],'track_id':r['track_id']} for r in rows]
+                 'samples':r['samples']} for r in rows]
     def station_position(self,station_id:int,event_id:int|None=None)->tuple[float,float,float]|None:
         """(lat, lon, alt MSL) of a station: the (position-guarded) detection of the track, else its last heartbeat, else
         its latest detection."""
@@ -287,23 +315,38 @@ class EventStore:
             if st.lat_e7 or st.lon_e7: return st.lat,st.lon,st.alt_m
         return None
     # ---- fused tracks (bearing fusion of several stations, fusion/bearing_fusion.py) ----
-    def track_of_member(self,station_id:int,track_event_id:int)->str|None:
+    # A member of a fused track is a segment of a station track (station/track_segments.py): station, track event id
+    # and the segment's key (0 for the first segment, else the time of its first bearing).
+    def track_of_member(self,station_id:int,track_event_id:int,segment_us:int=0)->str|None:
         with self._conn() as c:
-            row=c.execute("SELECT track_id FROM track_members WHERE station_id=? AND track_event_id=?",(station_id,self._sqlite_event_id(track_event_id))).fetchone()
+            row=c.execute("SELECT track_id FROM track_members WHERE station_id=? AND track_event_id=? AND segment_us=?",
+                          (station_id,self._sqlite_event_id(track_event_id),segment_us)).fetchone()
         return row['track_id'] if row else None
-    def track_members(self,track_id:str)->list[tuple[int,int]]:
+    def segment_tracks(self,station_id:int,track_event_id:int)->dict[int,str]:
+        """The fused track of every associated segment of a station track: {segment_us: track_id}."""
         with self._conn() as c:
-            rows=c.execute("SELECT station_id,track_event_id FROM track_members WHERE track_id=? ORDER BY station_id,track_event_id",(track_id,)).fetchall()
-        return [(r['station_id'],r['track_event_id']&0xFFFFFFFFFFFFFFFF) for r in rows]
-    def add_track_member(self,track_id:str,station_id:int,track_event_id:int):
+            rows=c.execute("SELECT segment_us,track_id FROM track_members WHERE station_id=? AND track_event_id=?",
+                           (station_id,self._sqlite_event_id(track_event_id))).fetchall()
+        return {r['segment_us']:r['track_id'] for r in rows}
+    def track_members(self,track_id:str)->list[tuple[int,int,int]]:
+        with self._conn() as c:
+            rows=c.execute("SELECT station_id,track_event_id,segment_us FROM track_members WHERE track_id=? ORDER BY station_id,track_event_id,segment_us",(track_id,)).fetchall()
+        return [(r['station_id'],r['track_event_id']&0xFFFFFFFFFFFFFFFF,r['segment_us']) for r in rows]
+    def add_track_member(self,track_id:str,station_id:int,track_event_id:int,segment_us:int=0):
         with self.lock,self._conn() as c:
-            c.execute("INSERT OR IGNORE INTO track_members VALUES(?,?,?)",(station_id,self._sqlite_event_id(track_event_id),track_id))
-    def replace_track(self,track_id:str,members:list[tuple[int,int]],system_event_id:str|None,points:list[dict],now_us:int|None=None):
+            c.execute("INSERT OR IGNORE INTO track_members(station_id,track_event_id,track_id,segment_us) VALUES(?,?,?,?)",
+                      (station_id,self._sqlite_event_id(track_event_id),track_id,segment_us))
+    def remove_track_member(self,track_id:str,station_id:int,track_event_id:int,segment_us:int):
+        with self.lock,self._conn() as c:
+            c.execute("DELETE FROM track_members WHERE track_id=? AND station_id=? AND track_event_id=? AND segment_us=?",
+                      (track_id,station_id,self._sqlite_event_id(track_event_id),segment_us))
+    def replace_track(self,track_id:str,members:list[tuple[int,int,int]],system_event_id:str|None,points:list[dict],now_us:int|None=None):
         """Members are added (never moved); the points of the track are replaced by the fresh fusion result."""
         when=int(time.time()*1e6) if now_us is None else now_us
-        stations=sorted({s for s,_ in members})
+        stations=sorted({m[0] for m in members})
         with self.lock,self._conn() as c:
-            c.executemany("INSERT OR IGNORE INTO track_members VALUES(?,?,?)",[(s,self._sqlite_event_id(t),track_id) for s,t in members])
+            c.executemany("INSERT OR IGNORE INTO track_members(station_id,track_event_id,track_id,segment_us) VALUES(?,?,?,?)",
+                          [(s,self._sqlite_event_id(t),track_id,g) for s,t,g in members])
             c.execute("DELETE FROM track_points WHERE track_id=?",(track_id,))
             c.executemany("INSERT INTO track_points VALUES(?,?,?)",[(track_id,p['time_us'],json.dumps(p)) for p in points])
             c.execute("INSERT OR REPLACE INTO fused_tracks VALUES(?,?,?,?,?,?,?)",(track_id,system_event_id,points[0]['time_us'] if points else None,
@@ -325,7 +368,7 @@ class EventStore:
             if row is None: return None
             pts=c.execute("SELECT payload FROM track_points WHERE track_id=? ORDER BY time_us",(track_id,)).fetchall()
         out=self._track_summary(row)
-        out['members']=[{'station_id':s,'track_event_id':t} for s,t in self.track_members(track_id)]
+        out['members']=[{'station_id':s,'track_event_id':t,'segment_us':g} for s,t,g in self.track_members(track_id)]
         out['track_points']=[json.loads(p['payload']) for p in pts]
         return out
     # ---- output API dioneya.alert/1 (integration/): the outbox every consumer reads by seq, alert episodes, tracks ----

@@ -20,7 +20,8 @@ from __future__ import annotations
 import time
 
 from integration import dioneya_alert as msg
-from station import target_match
+from station import target_match, track_segments
+from station.track_fusion import station_segments
 
 TRUSTED_TIME = ("GNSS_TIME_TRUSTED", "HOLDOVER")
 BEARING_PERIOD_US = 1_000_000
@@ -117,10 +118,13 @@ class AlertProducer:
         self.sweep(now)
         key = (batch.station_id, batch.track_event_id)
         sample = batch.samples[-1]
-        if self.store.track_of_member(*key) is not None:          # the fused track carries this station now
+        # the segment of the station track this bearing belongs to (station/track_segments.py); an outlier or a
+        # bearing still waiting for its segment draws no line
+        segment = track_segments.segment_at(station_segments(self.store, *key), sample.time_us)
+        if segment is None or self.store.track_of_member(*key, segment.key) is not None:   # a fused track carries it
             self._touch(now, sample.time_us, stations=[batch.station_id], level="warning", klass=None)
             return
-        signature = target_match.station_track_signature(self.store, *key).as_class()
+        signature = target_match.station_track_signature(self.store, *key, segment).as_class()
         episode = self._touch(now, sample.time_us, stations=[batch.station_id], level="warning", klass=signature)
         last = self._last_bearing.get(key)
         if last is not None and sample.time_us < last + BEARING_PERIOD_US:
@@ -160,7 +164,11 @@ class AlertProducer:
 
     def _track_class(self, track_id: str) -> dict:
         members = self.store.track_members(track_id)
-        return target_match.merge([target_match.station_track_signature(self.store, s, t) for s, t in members]).as_class()
+        signatures = []
+        for station_id, track_event_id, segment_us in members:
+            segment = track_segments.by_key(station_segments(self.store, station_id, track_event_id), segment_us)
+            signatures.append(target_match.station_track_signature(self.store, station_id, track_event_id, segment))
+        return target_match.merge(signatures).as_class()
 
     # ---- ends -----------------------------------------------------------------------------------------------------
     def _end_track(self, track_id: str, alert_id: str, now: int, reason: str) -> None:

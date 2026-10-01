@@ -20,6 +20,10 @@ void zs_station_position_set_installation(zs_station_position_t *sp, const zs_po
   sp->checked = false;
 }
 
+void zs_station_position_set_gnss_suspect(zs_station_position_t *sp, bool suspect) {
+  if (sp) sp->gnss_suspect = suspect;
+}
+
 static uint16_t accuracy_m(uint16_t hdop_x100) {
   uint32_t m;
   if (hdop_x100 == 0u) return 20u;            /* the receiver gave no HDOP: the ICD default */
@@ -34,6 +38,7 @@ bool zs_station_position_on_gnss(zs_station_position_t *sp, const zs_gnss_nmea_t
   sp->satellites = nmea->satellites;
   sp->hdop_x100 = nmea->hdop_x100;
   if (!nmea->valid_fix || nmea->gga_quality == 0u) return false;
+  if (sp->gnss_suspect && !sp->installation.configured && sp->have_fix) { sp->held_fixes++; return false; }
   sp->fix = nmea->position;
   sp->fix.pos_accuracy_m = accuracy_m(nmea->hdop_x100);
   sp->fix.altitude_source = 0u;               /* GNSS MSL */
@@ -42,7 +47,7 @@ bool zs_station_position_on_gnss(zs_station_position_t *sp, const zs_gnss_nmea_t
   sp->fix_ms = now_ms;
   sp->fixes++;
   if (sp->installation.configured) {
-    sp->last = zs_position_trust_update(&sp->installation, &sp->trust, &sp->fix, sp->fix.pos_accuracy_m, false, false);
+    sp->last = zs_position_trust_update(&sp->installation, &sp->trust, &sp->fix, sp->fix.pos_accuracy_m, sp->gnss_suspect, false);
     sp->checked = true;
   }
   return true;

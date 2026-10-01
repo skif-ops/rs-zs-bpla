@@ -63,6 +63,11 @@ def geodetic(e: float, n: float, u: float) -> tuple[float, float, float]:
     return LAT0 + n / M_PER_DEG, LON0 + e / (M_PER_DEG * math.cos(math.radians(LAT0))), ALT0 + u
 
 
+def as_targets(target) -> list[tuple[float, ...]]:
+    """One target (x0,y0,z0,vx,vy,vz[,f0]) or a list of them (up to three fly at once)."""
+    return [tuple(target)] if target and not isinstance(target[0], (tuple, list)) else [tuple(t) for t in target]
+
+
 def target_at(target: tuple[float, ...], t: float) -> tuple[float, float, float]:
     return tuple(target[k] + target[3 + k] * t for k in range(3))
 
@@ -73,7 +78,8 @@ def run_twins(stations: list[FieldStation], target: tuple[float, ...], seconds: 
     procs = {}
     for st in stations:
         args = [str(TWIN), "--seconds", str(seconds), "--seed", str(seed + st.station_id), "--station-id", str(st.station_id),
-                "--pos", ",".join(f"{v:g}" for v in st.enu), "--world", ",".join(f"{v:g}" for v in target),
+                "--pos", ",".join(f"{v:g}" for v in st.enu),
+                *[a for t in as_targets(target) for a in ("--world", ",".join(f"{v:g}" for v in t))],
                 "--log-uplink", str(out / f"uplink_{st.station_id}.log"), "--server", SERVER_CMD, *(extra or [])]
         if st.installed:
             args.append("--installed")
@@ -118,20 +124,27 @@ def write_trial(stations: list[FieldStation], target: tuple[float, ...], seconds
                 with_positions: bool = False) -> Path:
     """The truth: the target every second, the stations (positions only on request: the database has them).  The
     track starts a minute before scene time 0: the sound heard at the start left the target up to ~15 s earlier."""
-    track = []
-    for t in range(-60, seconds + 1):
-        lat, lon, alt = geodetic(*target_at(target, t))
-        track.append({"time": WALL0_US + t * 1_000_000, "lat": lat, "lon": lon, "alt_msl_m": alt})
+    targets = as_targets(target)
+    passes = []
+    for i, tg in enumerate(targets, 1):
+        track = []
+        for t in range(-60, seconds + 1):
+            lat, lon, alt = geodetic(*target_at(tg, t))
+            track.append({"time": WALL0_US + t * 1_000_000, "lat": lat, "lon": lon, "alt_msl_m": alt})
+        passes.append({"pass_id": f"P{i}", "class": target_class, "track": track})
     st_rows = []
     for st in stations:
         row = {"station_id": st.station_id}
         if with_positions:
             row["lat"], row["lon"], row["alt_msl_m"] = geodetic(*st.enu)
         st_rows.append(row)
-    speed = math.hypot(*target[3:6])
-    doc = {"format": "dioneya.trial/1", "name": f"Поле двойников: {len(stations)} станции, цель {speed:.0f} м/с на {target[2]:.0f} м",
+    if len(targets) == 1:
+        name = f"Поле двойников: {len(stations)} станции, цель {math.hypot(*targets[0][3:6]):.0f} м/с на {targets[0][2]:.0f} м"
+    else:
+        name = f"Поле двойников: {len(stations)} станции, {len(targets)} цели одновременно"
+    doc = {"format": "dioneya.trial/1", "name": name,
            "window": {"since": WALL0_US, "until": WALL0_US + (seconds + 20) * 1_000_000},
-           "stations": st_rows, "passes": [{"pass_id": "P1", "class": target_class, "track": track}]}
+           "stations": st_rows, "passes": passes}
     path = out / "trial.json"
     path.write_text(json.dumps(doc, ensure_ascii=False))
     return path
@@ -151,7 +164,9 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--station", type=parse_station, action="append", required=True, help="ID:E,N[,U][:installed]")
-    ap.add_argument("--target", required=True, help="x0,y0,z0,vx,vy,vz: metres and m/s in the field frame at scene time 0")
+    ap.add_argument("--target", required=True, action="append",
+                    help="x0,y0,z0,vx,vy,vz[,f0]: metres and m/s in the field frame at scene time 0, the synthetic source's "
+                         "fundamental in Hz (default 185); repeat for up to three targets at once")
     ap.add_argument("--seconds", type=int, default=180)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--class", dest="target_class", default="ELECTRIC_UAV",
@@ -160,9 +175,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--max-range", type=float, default=5000.0)
     ap.add_argument("--assoc-range", type=float, default=6000.0)
     args = ap.parse_args(argv)
-    target = tuple(float(v) for v in args.target.split(","))
-    if len(target) != 6:
-        ap.error("--target needs six numbers")
+    target = [tuple(float(v) for v in t.split(",")) for t in args.target]
+    if len(target) > 3 or any(len(t) not in (6, 7) for t in target):
+        ap.error("--target needs six numbers (seven with f0), at most three targets")
     if not TWIN.exists():
         ap.error(f"{TWIN} not built (cmake --build firmware/build --target zs_station_twin, or set ZS_STATION_TWIN)")
     args.out.mkdir(parents=True, exist_ok=True)

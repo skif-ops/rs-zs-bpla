@@ -2,7 +2,8 @@
 docs/ZVOOK_COMPARISON_DECISIONS_2026-09-30.md, dioneya.alert/1).
 
 A station track (station + the event id of its rising edge) has the rising-edge detection and, every few seconds,
-keep-alive detections of the same window.  Their classification and fundamental frequency (feature 0 of the 43,
+keep-alive detections of the same window; a segment of it (station/track_segments.py) has the keep-alive detections
+of its time span.  Their classification and fundamental frequency (feature 0 of the 43,
 ``fundamental_hz``) describe the target the station tracks.  Two station tracks whose known classes differ, or whose
 fundamentals are further apart than the Doppler shift between two stations allows, hear different targets: their
 rays are not intersected (station/track_fusion.py), and the output API reports the class of a track from them.
@@ -74,13 +75,15 @@ def from_detections(detections: list[DetectionMessage]) -> Signature:
                      best.classification.confidence, type_label, f0)
 
 
-def station_track_signature(store, station_id: int, track_event_id: int) -> Signature:
-    """Signature of a station track: its rising-edge detection and the keep-alive detections of the window."""
+def station_track_signature(store, station_id: int, track_event_id: int, segment=None) -> Signature:
+    """Signature of a station track: its rising-edge detection and the keep-alive detections of the window.  For a
+    segment of the track (station/track_segments.py) the keep-alive detections within the segment's bearings; the
+    rising edge only for the first segment (a later segment hears another target than the edge did)."""
     detections = []
-    rising = store.get_detection(station_id, track_event_id)
+    rising = store.get_detection(station_id, track_event_id) if segment is None or segment.key == 0 else None
     if rising is not None:
         detections.append(rising)
-    span = store.bearing_span(station_id, track_event_id)
+    span = store.bearing_span(station_id, track_event_id) if segment is None else (segment.first_us, segment.last_us)
     if span is not None:
         seen = {d.event_id for d in detections}
         for d in store.station_detections(station_id, span[0] - KEEPALIVE_MARGIN_US, span[1] + KEEPALIVE_MARGIN_US):

@@ -122,6 +122,20 @@ int main(void) {
   assert(st.position_source == ZS_POSITION_SOURCE_GNSS_LIVE && fabs((double)(st.lat_e7 - 550000000) - 400.0 / 111320.0 * 1e7) < 2.0);
   assert(g.position_trust == ZS_POSITION_TRUST_UNCONFIGURED);
 
+  /* the GNSS is suspect (a GNSS time jump, zs_time.h): an uncommissioned station keeps the fix from before */
+  zs_station_position_set_gnss_suspect(&sp, true);
+  assert(!feed(&sp, &nmea, 0.0, 1, 9000u) && sp.held_fixes == 1u);
+  assert(zs_station_position_fill(&sp, 9000u, &st, &g) && fabs((double)(st.lat_e7 - 550000000) - 400.0 / 111320.0 * 1e7) < 2.0);
+  zs_station_position_set_gnss_suspect(&sp, false);
+  assert(feed(&sp, &nmea, 0.0, 1, 10000u));
+  assert(zs_station_position_fill(&sp, 10000u, &st, &g) && st.lat_e7 == 550000000);
+  /* ...and a commissioned one reports even a fix at its place as suspect */
+  zs_station_position_set_installation(&sp, &inst);
+  zs_station_position_set_gnss_suspect(&sp, true);
+  assert(feed(&sp, &nmea, 3.0, 1, 11000u));
+  assert(zs_station_position_fill(&sp, 11000u, &st, &g) && g.position_trust == ZS_POSITION_TRUST_CONFIGURED_SUSPECT && g.position_suspect);
+  assert(st.lat_e7 == 550000000 && st.position_source == ZS_POSITION_SOURCE_CONFIGURED_INSTALL);
+
   puts("station_position: ok");
   return 0;
 }
