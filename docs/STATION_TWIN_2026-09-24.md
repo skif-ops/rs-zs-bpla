@@ -43,3 +43,5 @@ Dual SIM in the twin (own host test exists), commands from the server, LoRa (no 
 yet - phase 2 designs it here), multi-station / TDOA (phase 3), battery model, real recordings as scenes.
 CTest runs a smoke (`station_twin_smoke`: a drone fly-by must yield an event); the closed loop with the Python
 server twin runs from the server CI job.
+
+Multi-station: the field mode of 2026-10-01 (`docs/STATION_TWIN_FIELD_2026-10-01.md`).
