@@ -97,7 +97,10 @@ GNSS observed position передаётся только как diagnostic/integ
 - Вход для собственного флага подмены приёмника: `zs_time_set_receiver_spoof`. Источника у него пока нет: сообщение
   UBX-SEC-SIG (состояние обнаружения подмены и глушения) появилось в прошивке u-blox M10 SPG 5.30, а MAX-M10S
   (BOM, U9) работает на ПЗУ-прошивке SPG 5.10 без обновления; прошивку SPG 5.30 с флеш-обновлением имеет MAX-M10N.
-  Решение (заменить приёмник или проверить на образце флаг `spoofDetState` в UBX-NAV-STATUS) — до заморозки BOM.
+  Решение заказчика (2026-10-01): BOM ушёл в закупку, MAX-M10S остаётся; на образце проверить, выставляет ли он
+  признак подмены `spoofDetState` в UBX-NAV-STATUS (если да — он и станет источником `zs_time_set_receiver_spoof`);
+  замена приёмника на MAX-M10N — вопрос промышленной партии. До тех пор подмену выдают скачок PPS и, у станции с
+  координатами монтажника, расхождение фикса с ними.
 - Консоль: `pps` печатает `time suspect/verified/jumps/last_jump_ms/reanchors`. Тест: `firmware/tests/test_time_spoof.c`.
 
 ## 6. Android commissioning workflow
