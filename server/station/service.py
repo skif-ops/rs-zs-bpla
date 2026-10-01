@@ -85,11 +85,11 @@ class StationFusionService:
             self.bus.publish_nowait({'type':'bearings','station_id':batch.station_id,'track_event_id':batch.track_event_id,
                                      'system_event_id':self.store.system_event_of_detection(batch.station_id,batch.track_event_id),
                                      'time_trust':batch.time_trust,'samples':[s.as_dict() for s in batch.samples]})
-            track=self.tracks.on_batch(batch)          # two or more stations: the fused track, recomputed
-            if track is not None and track['last'] is not None:
-                self.bus.publish_nowait({'type':'track',**track})
+            tracks=self.tracks.on_batch(batch)         # two or more stations: the fused tracks of its segments, recomputed
+            for track in tracks:
+                if track['last'] is not None: self.bus.publish_nowait({'type':'track',**track})
             self._alert(self.alerts.on_bearings,batch)   # a line from the station while no fused track carries it
-            if track is not None: self._alert(self.alerts.on_track,track)
+            for track in tracks: self._alert(self.alerts.on_track,track)
         return inserted
     @staticmethod
     def _label(dets):
