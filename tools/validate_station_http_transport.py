@@ -69,6 +69,8 @@ def main() -> int:
             "@router.post('/stations/{station_id}/firmware-update')",
             # operator queues a network configuration change (addendum G); goes to the station over MQTT only
             "@router.post('/stations/{station_id}/network-config')",
+            # operator queues a classifier model package (addendum I); the package goes to the station over MQTT only
+            "@router.post('/stations/{station_id}/model-update')",
         },
         f"station transport route bypasses guarded router: {unguarded_station_decorators}",
     )
