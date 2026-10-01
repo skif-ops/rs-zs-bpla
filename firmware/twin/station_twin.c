@@ -23,8 +23,13 @@
  * Bearing stream (ICD addendum H): the source is rendered as a plane wave on the 3+1 array; after an event of a new
  * track the tracking window keeps the detector running in S3 and the bearings go out in batches on the bearing topic.
  *
+ * Field (--world, docs/STATION_TWIN_FIELD_2026-10-01.md): one process per station of a shared field, the same target
+ * over all of them; the station finds its position by a simulated GNSS receiver (GGA) or its installation record
+ * (zs_station_position, as tasks.c) and the publishes go to --log-uplink for server/tools/twin_field.py.
+ *
  * Nothing on the target changes: the twin reuses the modules and mirrors the task wiring of tasks.c.
  *   station_twin --scene drone|quiet|ground --seconds N --server "python3 -m twin.twin_server" [--seed S]
+ *   station_twin --world X,Y,Z,VX,VY,VZ --station-id N --pos E,N [--installed] --seconds N --server ... --log-uplink F
  */
 #include "app_comms.h"
 #include "array_render.h"
@@ -50,6 +55,8 @@
 #include "zs_station_config.h"
 #include "zs_station_params.h"
 #include "zs_station_pipeline.h"
+#include "zs_station_position.h"
+#include "zs_gnss.h"
 #include "zs_track_window.h"
 
 #include <assert.h>
@@ -121,7 +128,10 @@ static bool link_start(const char *cmd) {
   return true;
 }
 static void link_await_reply(void);
+static FILE *uplink_log;                         /* --log-uplink: every publish that reached the broker, with wall time */
+static uint64_t twin_wall_us(void);
 static void link_send(const char *topic, const uint8_t *payload, size_t n) {
+  if (uplink_log) { fprintf(uplink_log, "%llu %s ", (unsigned long long)twin_wall_us(), topic); for (size_t i = 0u; i < n; i++) fprintf(uplink_log, "%02x", payload[i]); fputc('\n', uplink_log); }
   char *line = malloc(strlen(topic) + 2u * n + 16u);
   size_t k = (size_t)sprintf(line, "PUB %s ", topic);
   for (size_t i = 0u; i < n; i++) k += (size_t)sprintf(line + k, "%02x", payload[i]);
@@ -421,11 +431,137 @@ static float bearing_err_sum, bearing_err_max;
 /* tracking window (mirrors tasks.c) */
 static zs_track_window_t track;
 static bool track_open, track_close_request, track_s3_extension, gsm_degraded;
-static uint32_t track_max_ms = 120000u;
+static uint32_t track_max_ms = (uint32_t)ZS_PARAM_TRACK_MAX_S_DEFAULT * 1000u;   /* track_max_s (addendum D id 7) */
 static float scene_level;                 /* recent RMS of the scene, for the AAD wake emulation */
 static FILE *dump_pcm;                    /* --dump-pcm: the mono scene as PCM16LE 32 kHz (for tools/presence_eval) */
 
 static void mode_event(zs_mode_event_t ev) { mode_bits |= 1u << ev; }
+
+/* ---- field (--world): one target flies a straight line in a shared ENU frame around 55 N 37 E, 150 m MSL; every
+   twin process is one station of the same field (--station-id, --pos).  The station hears the target where it was
+   range / c earlier: direction of that point, level by spherical spreading (full level at --world-ref-m and closer)
+   and air absorption (--world-absorption-db-km).  The sound is the synthetic electric multirotor of the drone scene,
+   or a recording (--world-sound FILE.wav: PCM16, any rate, the first channel, looped; read at the emission time, so it
+   carries the Doppler shift of the pass).  The station knows where it stands from a simulated GNSS receiver (a GGA
+   of its position every second, as the target's GNSS task parses them) or, with --installed, from the installation
+   record of a commissioned station; the receiver's fixes then check that record. ---- */
+#define FIELD_LAT0 55.0
+#define FIELD_LON0 37.0
+#define FIELD_ALT0 150.0
+#define FIELD_C 343.0
+static bool world_mode, world_installed;
+static unsigned twin_station_id = 17u;
+static double st_enu[3];                        /* this station, m east/north/up of the field origin */
+static double tg_p0[3], tg_v[3];                /* the target at scene time 0 and its velocity */
+static double world_ref_m = 800.0;              /* full source level at this range and closer */
+static double world_absorption_db_km = 2.0;     /* air absorption around 500 Hz (ISO 9613-1, 10..20 C, 70 % RH) */
+static float world_level = 0.5f;                /* source level at --world-ref-m (the drone scene's scale) */
+static float world_gain = 1.0f;
+static double world_te, world_te_rate = 1.0;    /* emission time of the sound arriving now, d(te)/d(ta) */
+static float *world_wav;                        /* --world-sound: the recording's first channel, scaled */
+static size_t world_wav_n;
+static double world_wav_rate;
+static zs_station_position_t station_pos;       /* as tasks.c: GNSS fixes and the installation record */
+static zs_gnss_nmea_t gnss_nmea;
+static uint32_t gnss_next_ms;
+
+static void field_geodetic(const double enu[3], double *lat, double *lon, double *alt) {
+  *lat = FIELD_LAT0 + enu[1] / 111320.0;
+  *lon = FIELD_LON0 + enu[0] / (111320.0 * cos(FIELD_LAT0 * M_PI / 180.0));
+  *alt = FIELD_ALT0 + enu[2];
+}
+/* the receiver: a GGA of the station's position once a second (8 satellites, HDOP 0.9) */
+static void gnss_tick(void) {
+  char body[112], line[128];
+  double lat, lon, alt;
+  unsigned sum = 0u;
+  uint32_t t;
+  if ((int32_t)(sim_now - gnss_next_ms) < 0) return;
+  gnss_next_ms = sim_now + 1000u;
+  field_geodetic(st_enu, &lat, &lon, &alt);
+  t = (uint32_t)(twin_wall_us() / 1000000u % 86400u);
+  snprintf(body, sizeof(body), "GNGGA,%02u%02u%02u.00,%02d%07.4f,N,%03d%07.4f,E,1,08,0.90,%.1f,M,14.0,M,,", t / 3600u, t / 60u % 60u, t % 60u,
+           (int)lat, (lat - floor(lat)) * 60.0, (int)lon, (lon - floor(lon)) * 60.0, alt);
+  for (const char *c = body; *c; c++) sum ^= (unsigned char)*c;
+  snprintf(line, sizeof(line), "$%s*%02X", body, sum & 0xffu);
+  if (zs_gnss_parse_line(&gnss_nmea, line)) (void)zs_station_position_on_gnss(&station_pos, &gnss_nmea, sim_now);
+}
+/* --installed: the record a BLE commissioning stores (the surveyed position, the default trust thresholds) */
+static void field_install(void) {
+  zs_position_trust_config_t c;
+  double lat, lon, alt;
+  memset(&c, 0, sizeof(c));
+  field_geodetic(st_enu, &lat, &lon, &alt);
+  c.configured = true; c.locked = true;
+  c.installation.lat_e7 = (int32_t)llround(lat * 1e7); c.installation.lon_e7 = (int32_t)llround(lon * 1e7);
+  c.installation.alt_dm = (int32_t)llround(alt * 10.0); c.installation.pos_accuracy_m = 1u; c.installation.altitude_source = 1u;
+  c.warning_distance_m = 25u; c.suspect_distance_m = 75u; c.gross_jump_distance_m = 250u;
+  c.warning_consecutive_fixes = 3u; c.suspect_consecutive_fixes = 10u;
+  zs_station_position_set_installation(&station_pos, &c);
+}
+/* direction and gain of the sound arriving now (scene time ta): emitted at te = ta - range(te) / c */
+static void world_step(double ta, float *az, float *el) {
+  double te = ta, v[3], r = 0.0, radial = 0.0;
+  for (unsigned it = 0u; it < 8u; it++) {
+    for (unsigned k = 0u; k < 3u; k++) v[k] = tg_p0[k] + tg_v[k] * te - st_enu[k];
+    r = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    te = ta - r / FIELD_C;
+  }
+  for (unsigned k = 0u; k < 3u; k++) radial += r > 0.0 ? tg_v[k] * v[k] / r : 0.0;
+  *az = (float)fmod(atan2(v[0], v[1]) * 180.0 / M_PI + 360.0, 360.0);
+  *el = (float)(atan2(v[2], hypot(v[0], v[1])) * 180.0 / M_PI);
+  world_gain = (float)(r <= world_ref_m ? 1.0 : world_ref_m / r * pow(10.0, -world_absorption_db_km * (r - world_ref_m) / 1000.0 / 20.0));
+  world_te = te;
+  world_te_rate = 1.0 / (1.0 + radial / FIELD_C);   /* receding: the recording plays slower (lower pitch) */
+}
+/* the recording at emission time te (seconds, looped), linear interpolation */
+static float world_wav_at(double te) {
+  double pos = fmod(te * world_wav_rate, (double)world_wav_n);
+  size_t i;
+  float f;
+  if (pos < 0.0) pos += (double)world_wav_n;
+  i = (size_t)pos; f = (float)(pos - (double)i);
+  return world_wav[i] * (1.0f - f) + world_wav[(i + 1u) % world_wav_n] * f;
+}
+static uint32_t le32(const uint8_t *p) { return (uint32_t)p[0] | (uint32_t)p[1] << 8 | (uint32_t)p[2] << 16 | (uint32_t)p[3] << 24; }
+/* WAV PCM16: the first channel, scaled so its RMS is that of the synthetic source at the same level */
+static bool world_wav_load(const char *path) {
+  FILE *f = fopen(path, "rb");
+  uint8_t h[12], ch[8];
+  unsigned channels = 0u, bits = 0u, format = 0u;
+  double sum = 0.0;
+  if (!f || fread(h, 1u, 12u, f) != 12u || memcmp(h, "RIFF", 4u) || memcmp(h + 8, "WAVE", 4u)) { if (f) fclose(f); return false; }
+  while (fread(ch, 1u, 8u, f) == 8u) {
+    const uint32_t n = le32(ch + 4);
+    if (!memcmp(ch, "fmt ", 4u) && n >= 16u) {
+      uint8_t fmt[16];
+      if (fread(fmt, 1u, 16u, f) != 16u) break;
+      format = fmt[0] | fmt[1] << 8; channels = fmt[2] | fmt[3] << 8; world_wav_rate = le32(fmt + 4); bits = fmt[14] | fmt[15] << 8;
+      if (fseek(f, (long)(n - 16u + (n & 1u)), SEEK_CUR) != 0) break;
+    } else if (!memcmp(ch, "data", 4u) && format == 1u && bits == 16u && channels > 0u && world_wav_rate > 0.0) {
+      const size_t frames = n / (2u * channels);
+      int16_t *pcm = malloc(n);
+      if (!pcm || frames < 2u || fread(pcm, 1u, n, f) != n) { free(pcm); break; }
+      world_wav = malloc(frames * sizeof(float));
+      if (!world_wav) { free(pcm); break; }
+      for (size_t i = 0u; i < frames; i++) { world_wav[i] = pcm[i * channels] / 32768.0f; sum += (double)world_wav[i] * world_wav[i]; }
+      free(pcm);
+      world_wav_n = frames;
+      fclose(f);
+      if (sum <= 0.0) return false;
+      {
+        const float scale = (float)(0.243 * world_level / sqrt(sum / (double)frames));   /* the drone scene: RMS 0.243 x level */
+        for (size_t i = 0u; i < frames; i++) world_wav[i] *= scale;
+      }
+      return true;
+    } else if (fseek(f, (long)(n + (n & 1u)), SEEK_CUR) != 0) break;
+  }
+  fclose(f);
+  return false;
+}
+static bool parse3(const char *s, double out[3], unsigned need) {
+  return sscanf(s, "%lf,%lf,%lf", &out[0], &out[1], &out[2]) >= (int)need;
+}
 
 /* ---- self-test (mirrors the supervisor of tasks.c): --selftest-fail-until S makes the microphone test fail until
    S seconds; the station boots with BOOT_FAILED, reports in a session, keeps the detector off and repeats the test
@@ -482,13 +618,15 @@ static bool pl_emit(void *ctx, const zs_detection_t *d) {
   zs_detection_t e = *d; (void)ctx;
   e.route.transport = ZS_ROUTE_LTE; e.power.battery_pct = 80u; e.power.battery_mv = 13200u;
   e.gnss.time_trust = ZS_TIME_TRUST_GNSS_TRUSTED; e.gnss.pps_ok = true; e.gnss.expected_time_error_us = 100u;   /* as tasks.c: the twin's clock is trusted */
+  (void)zs_station_position_fill(&station_pos, sim_now, &e.station, &e.gnss);   /* as tasks.c: installation or GNSS fix */
   const bool ok = zs_event_outbox_enqueue_detection(&outbox_io, &e, 2u, ws, sizeof(ws)) == ZS_EVENT_OUTBOX_OK;
   events_emitted_total += ok;
   if (ok) remember_summary(d->event_id, d->classification.class_id, d->classification.confidence_u8, pipeline.presence.level, (uint16_t)pipeline.last_gate.f0_hz);
   if (ok && first_event_time_us == 0) first_event_time_us = d->event_time_us;
   if (!forget_events) { twin_events[twin_events_next] = (twin_event_t){d->event_id, d->event_time_us}; twin_events_next = (twin_events_next + 1u) % 16u; }
-  tlog("station: event %llu emitted (level %u conf %u) -> outbox %s; doa %s az %.1f el %.1f sigma %.1f (truth az %.1f el %.1f)",
-       (unsigned long long)d->event_id, pipeline.presence.level, pipeline.presence.confidence_u8, ok ? "ok" : "REFUSED",
+  tlog("station: event %llu emitted (level %u conf %u class %u f0 %u) -> outbox %s; doa %s az %.1f el %.1f sigma %.1f (truth az %.1f el %.1f)",
+       (unsigned long long)d->event_id, pipeline.presence.level, pipeline.presence.confidence_u8, d->classification.class_id,
+       (unsigned)pipeline.last_gate.f0_hz, ok ? "ok" : "REFUSED",
        d->doa.valid ? "valid" : "none", d->doa.azimuth_cdeg / 100.0, d->doa.elevation_cdeg / 100.0, d->doa.sigma_cdeg / 100.0,
        array_render.azimuth_deg, array_render.elevation_deg);
   return ok;
@@ -518,7 +656,7 @@ static void inject_tick(void) {
   for (unsigned i = 0u; i < inject_count; i++) {
     static uint8_t ws[ZS_EVENT_OUTBOX_PAYLOAD_MAX_BYTES + 64u];
     zs_detection_t d; memset(&d, 0, sizeof(d));
-    d.schema_ver = 4u; d.station_id = 17u; d.boot_id = 5u; d.seq_no = 1000u + i; d.event_id = ((uint64_t)5u << 32) | (1000u + i);
+    d.schema_ver = 4u; d.station_id = twin_station_id; d.boot_id = 5u; d.seq_no = 1000u + i; d.event_id = ((uint64_t)5u << 32) | (1000u + i);
     d.event_time_us = pl_sample_time(NULL, ring.total_frames) + (int64_t)i * 1000000LL; d.classification.class_id = 3u; d.classification.confidence_u8 = 200u;
     d.route.transport = ZS_ROUTE_LTE; d.power.battery_mv = 13200u; d.power.battery_pct = 80u;
     if (zs_event_outbox_enqueue_detection(&outbox_io, &d, 2u, ws, sizeof(ws)) == ZS_EVENT_OUTBOX_OK) { events_emitted_total++; remember_summary(d.event_id, 3u, 200u, 3u, 190u); }
@@ -585,7 +723,8 @@ static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->schema_ver = 2u; hb->time_us = pl_sample_time(NULL, ring.total_frames);
   hb->power.battery_pct = 80u; hb->power.battery_mv = 13200u; hb->route.transport = ZS_ROUTE_LTE;
   strcpy(hb->firmware_ver, "twin"); (void)zs_model_active_describe(hb->model_ver, sizeof(hb->model_ver)); strcpy(hb->hardware_rev, "Rev.A"); hb->self_test_ok = selftest_failed_mask == 0u;
-  hb->detector_present = true; hb->detector.boot_id = 5u; hb->detector.uptime_s = sim_now / 1000u;
+  (void)zs_station_position_fill(&station_pos, sim_now, &hb->station, &hb->gnss);
+  hb->detector_present = true; hb->detector.boot_id = pipeline_port.boot_id; hb->detector.uptime_s = sim_now / 1000u;
   hb->detector.windows = pipeline.windows; hb->detector.windows_dropped = pipeline.windows_dropped;
   hb->detector.confirmed_windows = pipeline.confirmed_windows; hb->detector.suspect_windows = pipeline.suspect_windows;
   hb->detector.events_emitted = pipeline.events_emitted; hb->detector.presence_level = pipeline.presence.level;
@@ -678,6 +817,8 @@ static void params_apply(const zs_station_params_t *p) {
   pipeline_port.update_period_windows = (uint8_t)zs_station_params_get(p, ZS_PARAM_EVENT_UPDATE_WINDOWS);
   degraded_after = (unsigned)zs_station_params_get(p, ZS_PARAM_COMMS_DEGRADED_AFTER);
   gsm_probe_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_GSM_PROBE_S) * 1000u;
+  track_max_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_TRACK_MAX_S) * 1000u;
+  track.max_ms = track_max_ms;
 }
 static bool twin_execute(void *ctx, const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail) {
   (void)ctx;
@@ -903,12 +1044,15 @@ static void audio_tick(void) {
   float acc = 0.0f;
   {
     float az, el;          /* the source moves along its segment: re-aim the plane wave every tick (20 ms) */
-    if (scene_direction(&scene, &az, &el) && (az != array_render.azimuth_deg || el != array_render.elevation_deg))
+    if (world_mode) { world_step((double)scene.sample / 32000.0, &az, &el); array_render_set_direction(&array_render, az, el, 15.0f); }
+    else if (scene_direction(&scene, &az, &el) && (az != array_render.azimuth_deg || el != array_render.elevation_deg))
       array_render_set_direction(&array_render, az, el, 15.0f);
   }
   for (unsigned i = 0u; i < TICK_FRAMES; i++) {
     float src, bg, out[ZS_AUDIO_CHANNELS], v;
     scene_next_parts(&scene, &src, &bg);
+    if (world_wav) src = world_wav_at(world_te + (double)i / 32000.0 * world_te_rate);
+    if (world_mode) src *= world_gain;
     array_render_push(&array_render, src, out);
     out[0] += bg;
     for (unsigned c = 1u; c < ZS_AUDIO_CHANNELS; c++) out[c] += scene_background(&scene, c);
@@ -930,7 +1074,7 @@ static void audio_tick(void) {
 }
 
 int main(int argc, char **argv) {
-  const char *scene_name = "drone", *server_cmd = NULL;
+  const char *scene_name = "drone", *server_cmd = NULL, *world_sound = NULL;
   uint32_t seconds = 120u, seed = 1u, outage_start = 0u, outage_end = 0u;
   int expect_events = -1, expect_delivered = -1, expect_commands = -1, expect_reboots = -1, expect_post_audio = -1;
   int expect_fw_version = -1, expect_fw_state = -1, expect_net_version = -1, expect_net_state = -1;
@@ -972,10 +1116,26 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "--expect-bearing-error") && i + 1 < argc) expect_bearing_error = (float)atof(argv[++i]);
     else if (!strcmp(argv[i], "--track-max-s") && i + 1 < argc) track_max_ms = (uint32_t)atoi(argv[++i]) * 1000u;
     else if (!strcmp(argv[i], "--expect-streamed") && i + 1 < argc) expect_streamed = atoi(argv[++i]);
-    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S] [--expect-net-version N] [--expect-net-state S] [--expect-bearing-error DEG] [--track-max-s S] [--expect-streamed N]\n"); return 2; }
+    else if (!strcmp(argv[i], "--station-id") && i + 1 < argc) twin_station_id = (unsigned)atoi(argv[++i]);
+    else if (!strcmp(argv[i], "--pos") && i + 1 < argc && parse3(argv[++i], st_enu, 2)) {}
+    else if (!strcmp(argv[i], "--world") && i + 1 < argc) {
+      double p[6] = {0};
+      if (sscanf(argv[++i], "%lf,%lf,%lf,%lf,%lf,%lf", &p[0], &p[1], &p[2], &p[3], &p[4], &p[5]) != 6) { fprintf(stderr, "--world x0,y0,z0,vx,vy,vz\n"); return 2; }
+      for (unsigned k = 0u; k < 3u; k++) { tg_p0[k] = p[k]; tg_v[k] = p[3 + k]; }
+      world_mode = true;
+    }
+    else if (!strcmp(argv[i], "--world-ref-m") && i + 1 < argc) world_ref_m = atof(argv[++i]);
+    else if (!strcmp(argv[i], "--world-absorption-db-km") && i + 1 < argc) world_absorption_db_km = atof(argv[++i]);
+    else if (!strcmp(argv[i], "--world-level") && i + 1 < argc) world_level = (float)atof(argv[++i]);
+    else if (!strcmp(argv[i], "--world-sound") && i + 1 < argc) world_sound = argv[++i];
+    else if (!strcmp(argv[i], "--installed")) world_installed = true;
+    else if (!strcmp(argv[i], "--log-uplink") && i + 1 < argc) uplink_log = fopen(argv[++i], "w");
+    else { fprintf(stderr, "usage: station_twin --scene drone|quiet|ground [--seconds N] [--seed S] [--server CMD] [--gsm-outage FROM_S TO_S] [--publish-loss P] [--receipt-loss P] [--receipt-latency MS] [--mqtt-refuse FROM_S TO_S] [--lora] [--lora-loss P] [--lora-gateway-ms MS] [--degraded-after N] [--gsm-probe-s S] [--inject-events N AT_S] [--dump-pcm FILE] [--expect-events N] [--expect-delivered N] [--expect-commands N] [--expect-reboots N] [--expect-post-audio S] [--forget-events] [--selftest-fail-until S] [--fw-version N] [--ota-hang-version N] [--expect-fw-version N] [--expect-fw-state S] [--expect-net-version N] [--expect-net-state S] [--expect-bearing-error DEG] [--track-max-s S] [--expect-streamed N] [--station-id N] [--pos E,N[,U]] [--installed] [--world X,Y,Z,VX,VY,VZ] [--world-ref-m M] [--world-absorption-db-km A] [--world-level L] [--world-sound FILE.wav] [--log-uplink FILE]\n"); return 2; }
   }
-  if (!strcmp(scene_name, "drone")) { segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 20000u, 60000u, 185.0f, 1.0f, 60.0f, 140.0f, 20.0f}; if (seconds > 150u) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 100000u, 130000u, 210.0f, 0.8f, 300.0f, 250.0f, 35.0f}; }
-  else if (!strcmp(scene_name, "ground")) segs[nseg++] = (scene_segment_t){SCENE_GROUND_VEHICLE, 20000u, 60000u, 0.0f, 1.0f, 200.0f, 200.0f, 0.0f};
+  if (world_sound && !world_wav_load(world_sound)) { fprintf(stderr, "--world-sound: %s is not a PCM16 WAV\n", world_sound); return 2; }
+  if (world_mode && !world_wav) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 0u, seconds * 1000u, 185.0f, world_level, 0.0f, 0.0f, 0.0f, true};
+  else if (!strcmp(scene_name, "drone")) { segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 20000u, 60000u, 185.0f, 1.0f, 60.0f, 140.0f, 20.0f, false}; if (seconds > 150u) segs[nseg++] = (scene_segment_t){SCENE_DRONE_FLYBY, 100000u, 130000u, 210.0f, 0.8f, 300.0f, 250.0f, 35.0f, false}; }
+  else if (!strcmp(scene_name, "ground")) segs[nseg++] = (scene_segment_t){SCENE_GROUND_VEHICLE, 20000u, 60000u, 0.0f, 1.0f, 200.0f, 200.0f, 0.0f, false};
   scene_init(&scene, segs, nseg, 0.02f, seed);
   array_render_init(&array_render, NULL, 32000.0f);
   zs_track_window_init(&track, track_max_ms, 6u);
@@ -987,15 +1147,19 @@ int main(int argc, char **argv) {
   memset(pre_flash, 0xff, sizeof(pre_flash));
   assert(zs_prehistory_init(&prehistory, &pre_storage, 0u, sizeof(pre_flash), 32000u) && zs_audio_recorder_init(&recorder, &prehistory, pl_sample_time, NULL));
   zs_dsp_mcu_init(&dsp_ctx);
+  pipeline_port.station_id = twin_station_id;
+  zs_station_position_init(&station_pos);
+  zs_gnss_nmea_init(&gnss_nmea);
+  if (world_installed) field_install();
   { size_t work; zs_complex_t *scratch = zs_dsp_mcu_borrow_work(&work); assert(work >= ZS_AIR_SCRATCH_COMPLEX); assert(zs_station_pipeline_init(&pipeline, &pipeline_port, scratch, window_pcm)); }
-  zs_station_config_defaults(&cfg, 17u, ZS_STATION_CONFIG_REGION_RU868);
+  zs_station_config_defaults(&cfg, twin_station_id, ZS_STATION_CONFIG_REGION_RU868);
   cfg.version = 1u; strcpy(cfg.server_host, "muhoed.twin"); cfg.mqtt_port = 8883u; strcpy(cfg.ca_reference, "dioneya-root");
   strcpy(cfg.tenant, "pilot1"); strcpy(cfg.topic_prefix, "zs/v1"); cfg.preferred_sim = 1u; strcpy(cfg.apn[0], "internet");
   assert(zs_station_config_validate(&cfg) == 0u && zs_station_config_compute_hash(&cfg, cfg.config_hash));
   memset(cfg_mem, 0xff, sizeof(cfg_mem));                       /* commissioned over BLE: the record is stored */
   assert(zs_station_config_store_commit(&cfg_io, &cfg, true, true) == ZS_STATION_CONFIG_OK && zs_station_config_store_load(&cfg_io, &cfg, NULL) == ZS_STATION_CONFIG_OK);
   for (unsigned i = 0u; i < 32u; i++) twin_engineer_key[i] = (uint8_t)(0xa0u + i);
-  assert(zs_lora_uplink_init(&lora, &lora_port, &outbox_io, 17u, 1u, twin_engineer_key, 9u, 125000u, sim_now));
+  assert(zs_lora_uplink_init(&lora, &lora_port, &outbox_io, twin_station_id, 1u, twin_engineer_key, 9u, 125000u, sim_now));
   /* remote commands: the repository test key (tools/generate_command_set_vector.py), the twin wall clock and the
      executor; the parameter record starts empty (defaults, the CLI flags above stay in force until a command) */
   (void)zs_command_set_vector_reboot; (void)zs_command_set_vector_params;
@@ -1023,6 +1187,10 @@ int main(int argc, char **argv) {
   zs_mode_init(&modes, NULL, sim_now);
   (void)zs_mode_on_event(&modes, twin_selftest() ? ZS_MODE_EV_BOOT_DONE : ZS_MODE_EV_BOOT_FAILED, sim_now);
   tlog("twin: scene %s, %u s, seed %u, server %s", scene_name, seconds, seed, server_cmd ? "pipe" : "none");
+  if (world_mode)
+    tlog("field: station %u at E %.0f N %.0f U %.0f m (%s); target from E %.0f N %.0f U %.0f m at %.1f/%.1f/%.1f m/s, %s, full level within %.0f m, air %.1f dB/km",
+         twin_station_id, st_enu[0], st_enu[1], st_enu[2], world_installed ? "installation record" : "GNSS position", tg_p0[0], tg_p0[1], tg_p0[2],
+         tg_v[0], tg_v[1], tg_v[2], world_wav ? world_sound : "synthetic electric multirotor (185 Hz)", world_ref_m, world_absorption_db_km);
 
   const uint32_t end = sim_now + seconds * 1000u;
   while (sim_now < end) {
@@ -1030,6 +1198,7 @@ int main(int argc, char **argv) {
     else if (!gsm_available) { gsm_available = true; tlog("radio: GSM back"); }
     fw_tick();
     if (!fw_hung) {                               /* a hung image does nothing until the IWDG resets it */
+      gnss_tick();
       audio_tick();
       inject_tick();
       supervisor_tick();
