@@ -1,0 +1,8 @@
+﻿Part_ID,Qty_per_station,Qty_20,Qty_40,Qty_41,Description_RU_EN,Status
+DIO-3DP-MC-001B_body,4,80,160,164,Печатный корпус микрофона / printed microphone body,TRIAL_PRINT_FIT_AND_ACOUSTIC_TEST_REQUIRED
+DIO-3DP-MC-001B_lid,4,80,160,164,Печатная крышка / printed lid,TRIAL_PRINT_FIT_AND_ACOUSTIC_TEST_REQUIRED
+DIO-3DP-AH-001A_base_carrier,1,20,40,41,Нижнее кольцо и траверса / lower carrier,TRIAL_PRINT_FIT_AND_ACOUSTIC_TEST_REQUIRED
+DIO-3DP-AH-001A_central_mast,1,20,40,41,Центральная стойка / central mast,TRIAL_PRINT_FIT_AND_ACOUSTIC_TEST_REQUIRED
+DIO-3DP-AH-001A_upper_carrier,1,20,40,41,Верхняя траверса / upper carrier,TRIAL_PRINT_FIT_AND_ACOUSTIC_TEST_REQUIRED
+DIO-3DP-AH-001A_vertical_rib,6,120,240,246,Вертикальная стойка / upright,TRIAL_PRINT_FIT_AND_ACOUSTIC_TEST_REQUIRED
+DIO-3DP-AH-001A_dome,1,20,40,41,Купол / dome,TRIAL_PRINT_FIT_AND_ACOUSTIC_TEST_REQUIRED
