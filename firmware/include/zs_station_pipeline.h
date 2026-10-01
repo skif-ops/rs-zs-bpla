@@ -37,7 +37,12 @@
  *     newest 0.5 s of a window for the DSP task, one mask per window keeps the load).  A direction is a target when
  *     its own votes alone have a UAV majority of at least ZS_CLASSIFICATION_MIN_WINDOWS windows, or a majority of weak
  *     UAV votes with its own comb (its label) and almost no ground votes (no votes of the main stream, no comb of the
- *     gate: a tractor heard beside a UAV is a direction, never a target); the station is
+ *     gate: a tractor heard beside a UAV is a direction, never a target).  A target once confirmed stays so while its
+ *     direction track lives (confirmed, labelled) and none of its own windows is a ground engine even at the weak
+ *     threshold: its own window weakens as the targets close in (the mask leaves more of the others, twin 2026-10-01:
+ *     an electric UAV's own windows fell from 72..134 to 0..38) and its bearings must not stop for it; with one direction
+ *     left (the others gone, or come into its direction) a held target keeps its own bearing until a ground vote of
+ *     the main stream lets it go; the station is
  *     CONFIRMED when the main stream or a target is.  The confirmed targets then replace the comb bearings: one
  *     bearing each with its label as f0_hz (the gate's fundamental when the label is an integer multiple of exactly
  *     one of the gate's combs, so the detections and the bearings name the same source).  While two directions or
@@ -94,6 +99,7 @@ typedef struct {
   uint8_t bearing_age;             /* windows since that bearing (0: this window) */
   float strength;                  /* the direction memory's peak */
   bool confirmed_direction;
+  bool held;                       /* its own votes confirmed it once: it stays CONFIRMED while its track lives (see doa_evaluate) */
   uint8_t absent;                  /* windows its track has been gone (it may come back, zs_doa_sep recall) */
 } zs_pipeline_target_t;
 
