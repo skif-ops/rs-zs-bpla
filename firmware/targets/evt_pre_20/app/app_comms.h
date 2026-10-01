@@ -21,6 +21,7 @@
 #include "zs_prehistory.h"
 #include "zs_fw_boot.h"
 #include "zs_fw_update.h"
+#include "zs_model_store.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -95,9 +96,19 @@ void app_comms_set_fw_port(const app_comms_fw_port_t *port);
    the download runs in the sessions, the ACK (OK, detail = chunks; FAILED detail) follows the image check.  A
    redelivery of the running command returns false again; another one while a download runs is REJECTED 6. */
 bool app_comms_update_firmware(const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail);
+/* Model package (MQTT ICD addendum I): the same command with a manifest of target 3 downloads into the free slot of
+   the model store; after the OK ACK the slot header is committed and the package becomes the active model (no
+   reset).  No model port = REJECTED 1 for target 3. */
+typedef struct {
+  zs_model_store_t *store;
+  const zs_fw_release_key_t *keys;            /* the release keys of the firmware (same signer, domain DIO-FW-V1) */
+  size_t key_count;
+} app_comms_model_port_t;
+void app_comms_set_model_port(const app_comms_model_port_t *port);
 /* A download runs (not paused) or its ACK / the install waits: the session must stay (the scheduler extends S3). */
 bool app_comms_fw_busy(void);
-/* 0 idle, 1 downloading, 2 install pending (heartbeat key 19 before the boot-record states 3/4 are added). */
+/* 0 idle, 1 downloading, 2 install pending (heartbeat key 19 before the boot-record states 3/4 are added); a model
+   package download is not a firmware state and reads 0 (the heartbeat model text shows its result). */
 uint8_t app_comms_fw_state(void);
 /* Remote network configuration (MQTT ICD addendum G): the store the ble task loads the record from (the confirmed
    candidate is committed to it) and a callback after that commit (the owner of the BLE service reloads its copy). */

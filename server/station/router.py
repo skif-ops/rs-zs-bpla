@@ -7,6 +7,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage, CommandKeyRotationRequest, FirmwareUpdateRequest, NetworkConfigRequest
 from station.command_codec import validate_command_payload
 from station.firmware_codec import ReleaseRepository, UPDATE_COMMAND
+from station.model_codec import ModelRepository, parse_model
 from station.network_config import NETWORK_COMMAND, next_version
 from station.store import EventStore
 from station.replay import ReplayError, build_replay, replay_sources
@@ -206,6 +207,37 @@ async def firmware_releases():
         try: r=repo.get(v)
         except ValueError: out.append({'version':v,'error':'inconsistent'}); continue
         if r is not None: out.append({'version':v,'target':r.manifest.target,'size':r.manifest.size,'sha256':r.manifest.sha256.hex(),'release_key_id':r.key_id.hex()})
+    return out
+
+def model_repository()->ModelRepository:
+    """The model package repository the MQTT bridge serves from (ZS_MODEL_DIR, default server/data/models)."""
+    return ModelRepository(os.environ.get('ZS_MODEL_DIR') or BASE/'data'/'models')
+
+@router.post('/stations/{station_id}/model-update')
+async def update_model(station_id:int,req:FirmwareUpdateRequest):
+    """ICD addendum I: queue CMD_UPDATE_FIRMWARE with the manifest (target 3) and release signature of a model package
+    in the repository (python -m pki.cli model-sign).  The station loads it after the download, without a reset;
+    its heartbeat model text becomes m<version>."""
+    try: release=model_repository().get(req.version)
+    except ValueError as exc: raise HTTPException(409,str(exc)) from None
+    if release is None: raise HTTPException(404,f'model {req.version} is not in the model repository')
+    try:
+        payload=release.command_payload()
+        validate_command_payload(UPDATE_COMMAND,payload)
+        command=store.create_command(station_id,UPDATE_COMMAND,payload)
+    except ValueError as exc: raise HTTPException(400,str(exc)) from None
+    return {**command.model_dump(),'model':{'version':release.manifest.version,'size':release.manifest.size,'sha256':release.manifest.sha256.hex()}}
+
+@router.get('/models/releases')
+async def model_releases():
+    repo=model_repository(); out=[]
+    for v in repo.versions():
+        try: r=repo.get(v)
+        except ValueError: out.append({'version':v,'error':'inconsistent'}); continue
+        if r is None: continue
+        try: classes=parse_model(r.image).class_count
+        except ValueError: out.append({'version':v,'error':'inconsistent'}); continue
+        out.append({'version':v,'target':r.manifest.target,'size':r.manifest.size,'classes':classes,'sha256':r.manifest.sha256.hex(),'release_key_id':r.key_id.hex()})
     return out
 
 @router.get('/stations/{station_id}/events/{event_id}/audio')

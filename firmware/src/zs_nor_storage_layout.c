@@ -121,7 +121,9 @@ bool zs_nor_storage_layout_make_stores(uint32_t capacity_bytes,
                                   command_slot_count, outbox_slot_count, out))
     return false;
   out->capacity_bytes = capacity_bytes;
-  out->secrets_base_address = out->outbox_base_address + out->outbox_partition_bytes;
+  out->model_base_address = out->outbox_base_address + out->outbox_partition_bytes;
+  out->model_slot_bytes = ZS_NOR_STORAGE_MODEL_SLOT_BLOCKS * erase_block_bytes;
+  out->secrets_base_address = out->model_base_address + ZS_NOR_STORAGE_MODEL_SLOTS * out->model_slot_bytes;
   out->boot_counter_base_address = out->secrets_base_address + ZS_NOR_STORAGE_SECRETS_BLOCKS * erase_block_bytes;
   out->nrf_image_base_address = out->boot_counter_base_address + ZS_NOR_STORAGE_BOOT_COUNTER_BLOCKS * erase_block_bytes;
   out->nrf_image_partition_bytes = ZS_NOR_STORAGE_NRF_IMAGE_BLOCKS * erase_block_bytes;

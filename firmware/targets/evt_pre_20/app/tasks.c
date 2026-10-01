@@ -51,6 +51,7 @@
 #include "zs_time.h"
 #include "zs_track_window.h"
 #include "zs_event_outbox.h"
+#include "zs_model_store.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -589,7 +590,7 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   (void)app_power_snapshot(&hb->power);                                   /* INA226: last valid sample, status bits when stale */
   hb->route.transport = ZS_ROUTE_LTE;
   strncpy(hb->firmware_ver, APP_STATION_FW_VERSION, sizeof(hb->firmware_ver) - 1u);
-  strncpy(hb->model_ver, "c46", sizeof(hb->model_ver) - 1u);
+  (void)zs_model_active_describe(hb->model_ver, sizeof(hb->model_ver));  /* "c46" built-in, "m<version>" package */
   strncpy(hb->hardware_rev, APP_STATION_HW_REV, sizeof(hb->hardware_rev) - 1u);
   hb->self_test_ok = zs_selftest_required_ok(&selftests);
   hb->gnss.time_trust = (uint8_t)time_sync.trust;
@@ -695,6 +696,33 @@ static void net_config_committed(const zs_station_config_t *cfg) {
   config_reload_pending = true;
 }
 
+/* Model packages (MQTT ICD addendum I): two slots in the NOR model region; the active one is loaded at boot. */
+static zs_model_store_t model_store;
+static app_comms_model_port_t model_port;
+static bool model_nor_erase(void *ctx, uint32_t address, uint32_t size) { return zs_nor_erase((zs_nor_t *)ctx, address, size); }
+static bool model_nor_program(void *ctx, uint32_t address, const uint8_t *data, size_t size) { return zs_nor_program((zs_nor_t *)ctx, address, data, size); }
+static bool model_nor_read(void *ctx, uint32_t address, uint8_t *data, size_t size) { return zs_nor_read((zs_nor_t *)ctx, address, data, size); }
+static const zs_model_flash_t model_flash = {&nor, model_nor_erase, model_nor_program, model_nor_read};
+
+static void bind_model_store(void) {
+  const app_comms_fw_port_t *fw = app_fw_port();
+  uint32_t size = 0u, version = 0u;
+  char text[ZS_MODEL_DESCRIBE_MAX];
+  if (!zs_model_store_init(&model_store, &model_flash, nor_bindings.layout.model_base_address, nor_bindings.layout.model_slot_bytes,
+                           nor_bindings.layout.erase_block_bytes)) {
+    console_printf("model: store not bound, built-in model\r\n");
+    return;
+  }
+  model_port = (app_comms_model_port_t){&model_store, fw ? fw->keys : NULL, fw ? fw->key_count : 0u};
+  app_comms_set_model_port(&model_port);                                 /* CMD_UPDATE_FIRMWARE target 3 (addendum I) */
+  if (zs_model_store_active(&model_store, &size, &version)) {
+    const zs_model_status_t st = zs_model_activate(zs_model_store_read_active, &model_store, size, version);
+    if (st != ZS_MODEL_OK) console_printf("model: stored m%lu not loaded (status %d)\r\n", (unsigned long)version, (int)st);
+  }
+  (void)zs_model_active_describe(text, sizeof(text));
+  console_printf("model: %s active (store @0x%08lx)\r\n", text, (unsigned long)nor_bindings.layout.model_base_address);
+}
+
 static void bind_record_stores(void) {
   memset(cfg_slots, 0xff, sizeof(cfg_slots));
   memset(pos_slots, 0xff, sizeof(pos_slots));
@@ -738,6 +766,7 @@ static void bind_record_stores(void) {
     console_printf("nor: W25Q512JV bound, boot %lu, nrf image @0x%08lx config @0x%08lx installation @0x%08lx\r\n",
                    (unsigned long)boot_id, (unsigned long)nor_bindings.layout.nrf_image_base_address, (unsigned long)nor_bindings.layout.config_base_address,
                    (unsigned long)nor_bindings.layout.installation_base_address);
+    bind_model_store();
     /* station secrets: two blocks before the boot counter */
     if (zs_nor_storage_bind_secrets(&nor_bindings, &nor, &secrets_io)) {
       const zs_station_secrets_result_t r = zs_station_secrets_load(&secrets_io, &secrets, NULL);

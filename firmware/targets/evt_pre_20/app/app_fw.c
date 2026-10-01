@@ -75,7 +75,7 @@ static bool img_read(void *ctx, uint32_t offset, uint8_t *data, size_t size) {
   memcpy(data, (const void *)(OTHER_BASE + offset), size);
   return true;
 }
-static const zs_fw_image_io_t image_io = {NULL, IMAGE_BYTES, PAGE_BYTES, RECORD_OFFSET, img_erase, img_program, img_read};
+static const zs_fw_image_io_t image_io = {NULL, IMAGE_BYTES, PAGE_BYTES, RECORD_OFFSET, img_erase, img_program, img_read, NULL};
 
 /* ---- boot record pages ---- */
 static bool rec_read(void *ctx, uint32_t offset, uint8_t *data, size_t size) {

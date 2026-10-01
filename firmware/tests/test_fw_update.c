@@ -154,7 +154,7 @@ int main(void) {
   /* ---- the download engine ---- */
   {
     static bank_t bank;
-    const zs_fw_image_io_t io = {&bank, BANK_BYTES - PAGE, PAGE, BANK_BYTES - PAGE, b_erase, b_program, b_read};
+    const zs_fw_image_io_t io = {&bank, BANK_BYTES - PAGE, PAGE, BANK_BYTES - PAGE, b_erase, b_program, b_read, NULL};
     zs_fw_download_t dl;
     zs_fw_chunk_t foreign;
     uint8_t foreign_msg[sizeof(zs_fw_update_vector_chunk0)];

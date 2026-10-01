@@ -18,6 +18,7 @@ from station.cbor_codec import decode_cbor, decode_detection_obj, decode_heartbe
 from station.command_codec import CommandKeyring, CommandSigner, decode_command_ack, encode_signed_command
 from station.event_receipt_codec import EventReceipt, encode_event_receipt
 from station.firmware_codec import ReleaseRepository, serve_request
+from station.model_codec import ModelRepository
 from station.router import service, store
 from station.schemas import DetectionMessage, HeartbeatMessage, StationCommand
 
@@ -97,6 +98,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=os.getenv("ZS_FIRMWARE_DIR", str(Path(__file__).resolve().parents[1] / "data" / "firmware")),
         help="Release repository of signed station firmware (addendum F, python -m pki.cli fw-sign), shared with "
              "the operator API; the bridge answers fwreq from it.",
+    )
+    parser.add_argument(
+        "--model-dir",
+        default=os.getenv("ZS_MODEL_DIR", str(Path(__file__).resolve().parents[1] / "data" / "models")),
+        help="Repository of signed station model packages (addendum I, python -m pki.cli model-sign), shared with "
+             "the operator API; fwreq of a model update (manifest target 3) are answered from it.",
     )
     parser.add_argument(
         "--insecure-bench",
@@ -298,6 +305,7 @@ def answer_firmware_request(
     event_store=store,
     firmware_repository: ReleaseRepository | None = None,
     now_us: int | None = None,
+    model_repository: ReleaseRepository | None = None,
 ) -> str:
     """Addendum F: one chunk for a fwreq, published at QoS 0 on the station's fw topic (a lost chunk is requested
     again by the station); a request the store or the repository does not cover is dropped silently."""
@@ -306,7 +314,8 @@ def answer_firmware_request(
     if kind != "fwreq":
         raise ValueError("firmware answers only fwreq")
     answer = serve_request(payload, topic_station_id, event_store=event_store, repository=firmware_repository,
-                           now_us=int(time.time() * 1_000_000) if now_us is None else now_us)
+                           now_us=int(time.time() * 1_000_000) if now_us is None else now_us,
+                           model_repository=model_repository)
     if answer is None:
         return "fw_ignored"
     info = client.publish(f"zs/v1/{tenant}/{topic_station_id}/fw", answer[1], qos=0, retain=False)
@@ -325,6 +334,7 @@ def handle_message(
     fusion_service=service,
     on_new_detection=None,
     firmware_repository: ReleaseRepository | None = None,
+    model_repository: ReleaseRepository | None = None,
 ) -> bool:
     """Process then MQTT-ACK; discard invalid input but retry transient failures.  ``on_new_detection`` runs for a
     newly stored detection after its receipt went out (the audio auto-request); its failure never blocks the ACK."""
@@ -335,7 +345,7 @@ def handle_message(
         _, kind = station_id_from_topic(message.topic, tenant)
         if kind == "fwreq":                     # addendum F: answered with a chunk (or dropped), then acknowledged
             status = answer_firmware_request(client, message.topic, message.payload, tenant, event_store=event_store,
-                                             firmware_repository=firmware_repository)
+                                             firmware_repository=firmware_repository, model_repository=model_repository)
         else:
             status = process_message(
                 message.topic,
@@ -423,6 +433,9 @@ def main(argv: list[str] | None = None) -> None:
     firmware_repository = ReleaseRepository(args.firmware_dir) if args.firmware_dir else None
     if firmware_repository is not None:
         print(f"firmware releases: {firmware_repository.versions() or 'none yet'} in {args.firmware_dir}", file=sys.stderr)
+    model_repository = ModelRepository(args.model_dir) if args.model_dir else None
+    if model_repository is not None:
+        print(f"model packages: {model_repository.versions() or 'none yet'} in {args.model_dir}", file=sys.stderr)
 
     def on_new_detection(detection: DetectionMessage) -> None:
         command = request_event_audio(
@@ -437,7 +450,7 @@ def main(argv: list[str] | None = None) -> None:
     def on_message(client_obj, userdata, message):
         del userdata
         handle_message(client_obj, message, args.tenant, tls_enabled, on_new_detection=on_new_detection,
-                       firmware_repository=firmware_repository)
+                       firmware_repository=firmware_repository, model_repository=model_repository)
 
     client.on_connect = on_connect
     client.on_message = on_message

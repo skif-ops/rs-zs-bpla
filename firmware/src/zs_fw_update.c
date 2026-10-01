@@ -69,7 +69,8 @@ void zs_fw_release_key_id(const uint8_t public_key[ZS_FW_RELEASE_PUBLIC_KEY_BYTE
   memcpy(key_id, digest, ZS_FW_RELEASE_KEY_ID_BYTES);
 }
 
-uint16_t zs_fw_update_check(const zs_update_firmware_command_t *cmd, const zs_fw_station_t *station, zs_fw_manifest_t *manifest) {
+/* Manifest decode, key lookup and the Ed25519 check shared by the image and the model path. */
+static uint16_t check_signed(const zs_update_firmware_command_t *cmd, const zs_fw_station_t *station, zs_fw_manifest_t *manifest) {
   uint8_t signed_msg[ZS_FW_SIGN_DOMAIN_BYTES + ZS_FW_MANIFEST_MAX_BYTES];
   const zs_fw_release_key_t *key = NULL;
   if (!cmd || !station || !manifest) return ZS_FW_REJECT_UNSUPPORTED;
@@ -87,10 +88,33 @@ uint16_t zs_fw_update_check(const zs_update_firmware_command_t *cmd, const zs_fw
   memcpy(&signed_msg[ZS_FW_SIGN_DOMAIN_BYTES], cmd->manifest, cmd->manifest_size);
   if (!zs_ed25519_verify(key->public_key, signed_msg, ZS_FW_SIGN_DOMAIN_BYTES + cmd->manifest_size, cmd->signature))
     return ZS_FW_REJECT_MANIFEST;
+  return 0u;
+}
+
+uint16_t zs_fw_update_check(const zs_update_firmware_command_t *cmd, const zs_fw_station_t *station, zs_fw_manifest_t *manifest) {
+  const uint16_t reject = check_signed(cmd, station, manifest);
+  if (reject) return reject;
   if (manifest->target != station->target) return ZS_FW_REJECT_TARGET;
   if (manifest->version <= station->running_version) return ZS_FW_REJECT_VERSION;
   if (manifest->size > station->capacity || manifest->size <= ZS_FW_INFO_OFFSET + ZS_FW_INFO_BYTES) return ZS_FW_REJECT_SIZE;
   if (station->trial) return ZS_FW_REJECT_TRIAL;
+  return 0u;
+}
+
+uint32_t zs_fw_update_target(const zs_update_firmware_command_t *cmd) {
+  zs_fw_manifest_t manifest;
+  if (!cmd || cmd->manifest_size == 0u || cmd->manifest_size > ZS_FW_MANIFEST_MAX_BYTES ||
+      !zs_fw_manifest_decode(cmd->manifest, cmd->manifest_size, &manifest))
+    return 0u;
+  return manifest.target;
+}
+
+uint16_t zs_fw_model_check(const zs_update_firmware_command_t *cmd, const zs_fw_station_t *station, zs_fw_manifest_t *manifest) {
+  const uint16_t reject = check_signed(cmd, station, manifest);
+  if (reject) return reject;
+  if (manifest->target != ZS_FW_TARGET_MODEL) return ZS_FW_REJECT_TARGET;
+  if (manifest->version == station->running_version) return ZS_FW_REJECT_VERSION;
+  if (manifest->size > station->capacity || manifest->size < ZS_FW_MODEL_MIN_BYTES) return ZS_FW_REJECT_SIZE;
   return 0u;
 }
 
@@ -201,6 +225,11 @@ static zs_fw_step_t verify_step(zs_fw_download_t *dl, uint32_t budget) {
     zs_fw_info_t info;
     zs_sha256_final(&dl->sha, digest);
     if (!zs_sha256_equal(digest, dl->manifest.sha256, sizeof(digest))) { finish(dl, ZS_COMMAND_ACK_FAILED, ZS_FW_FAIL_SHA256); return ZS_FW_STEP_FINISHED; }
+    if (dl->io->validate) {
+      if (!dl->io->validate(dl->io->ctx, &dl->manifest)) { finish(dl, ZS_COMMAND_ACK_FAILED, ZS_FW_FAIL_INFO); return ZS_FW_STEP_FINISHED; }
+      finish(dl, ZS_COMMAND_ACK_OK, dl->chunks > 0xFFFFu ? 0xFFFFu : (uint16_t)dl->chunks);
+      return ZS_FW_STEP_FINISHED;
+    }
     if (!dl->io->read(dl->io->ctx, ZS_FW_INFO_OFFSET, info_bytes, sizeof(info_bytes))) { finish(dl, ZS_COMMAND_ACK_FAILED, ZS_FW_FAIL_FLASH); return ZS_FW_STEP_FINISHED; }
     if (!zs_fw_info_parse(info_bytes, &info) || info.target != dl->manifest.target || info.version != dl->manifest.version) {
       finish(dl, ZS_COMMAND_ACK_FAILED, ZS_FW_FAIL_INFO);

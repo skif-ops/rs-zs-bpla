@@ -41,6 +41,7 @@
 #include "zs_fw_boot.h"
 #include "zs_fw_update.h"
 #include "zs_fw_update_vector.h"
+#include "zs_model_store.h"
 #include "zs_event_outbox.h"
 #include "zs_lora_uplink.h"
 #include "zs_power_modes.h"
@@ -583,7 +584,7 @@ static bool fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   uint16_t pending = 0u; (void)ctx;
   hb->schema_ver = 2u; hb->time_us = pl_sample_time(NULL, ring.total_frames);
   hb->power.battery_pct = 80u; hb->power.battery_mv = 13200u; hb->route.transport = ZS_ROUTE_LTE;
-  strcpy(hb->firmware_ver, "twin"); strcpy(hb->model_ver, "c46"); strcpy(hb->hardware_rev, "Rev.A"); hb->self_test_ok = selftest_failed_mask == 0u;
+  strcpy(hb->firmware_ver, "twin"); (void)zs_model_active_describe(hb->model_ver, sizeof(hb->model_ver)); strcpy(hb->hardware_rev, "Rev.A"); hb->self_test_ok = selftest_failed_mask == 0u;
   hb->detector_present = true; hb->detector.boot_id = 5u; hb->detector.uptime_s = sim_now / 1000u;
   hb->detector.windows = pipeline.windows; hb->detector.windows_dropped = pipeline.windows_dropped;
   hb->detector.confirmed_windows = pipeline.confirmed_windows; hb->detector.suspect_windows = pipeline.suspect_windows;
@@ -709,17 +710,21 @@ static bool twin_execute(void *ctx, const zs_command_t *cmd, zs_command_ack_resu
 }
 /* Trusted wall clock for the command validity window (the target: zs_command_clock over GNSS/NITZ). */
 static bool twin_clock(uint32_t now_ms, uint64_t *now_us) { (void)now_ms; *now_us = twin_wall_us(); return true; }
+static void model_boot(void);
 /* The reboot the executor scheduled: the scheduler restarts and the parameters come back from the record (the
    command journal and the outbox live in NOR and survive as they are). */
 static void reboot_tick(void) {
   zs_station_params_t loaded;
+  zs_station_params_result_t r;
   if (!reboot_pending || (int32_t)(sim_now - reboot_at_ms) < 0) return;
   reboot_pending = false; twin_reboots++;
-  if (zs_station_params_load(&params_io, &loaded) != ZS_STATION_PARAMS_OK || memcmp(&loaded, &params, sizeof(params)) != 0) {
+  r = zs_station_params_load(&params_io, &loaded);                  /* never set: the defaults come back */
+  if ((r != ZS_STATION_PARAMS_OK && !(r == ZS_STATION_PARAMS_NOT_FOUND && params.version == 0u)) || memcmp(&loaded, &params, sizeof(params)) != 0) {
     tlog("twin: FAIL parameters did not survive the reboot"); exit(1);
   }
   zs_mode_init(&modes, NULL, sim_now);
   params_apply(&loaded);
+  model_boot();
   (void)zs_mode_on_event(&modes, twin_selftest() ? ZS_MODE_EV_BOOT_DONE : ZS_MODE_EV_BOOT_FAILED, sim_now);
   tlog("twin: REBOOT by command, params v%lu reloaded from the record", (unsigned long)loaded.version);
 }
@@ -749,7 +754,7 @@ static bool fwb_program(void *c, uint32_t o, const uint8_t *d, size_t n) {
   return true;
 }
 static bool fwb_read(void *c, uint32_t o, uint8_t *d, size_t n) { (void)c; if (o + n > FW_BANK_BYTES) return false; memcpy(d, fw_other() + o, n); return true; }
-static const zs_fw_image_io_t fw_io = {NULL, FW_IMAGE_BYTES, FW_PAGE, FW_IMAGE_BYTES, fwb_erase, fwb_program, fwb_read};
+static const zs_fw_image_io_t fw_io = {NULL, FW_IMAGE_BYTES, FW_PAGE, FW_IMAGE_BYTES, fwb_erase, fwb_program, fwb_read, NULL};
 /* record pages: ctx 0 = the running bank, 1 = the other bank */
 static uint8_t *fw_record(void *c) { return fw_bank[fw_active ^ (unsigned)(uintptr_t)c] + FW_IMAGE_BYTES; }
 static bool fwr_read(void *c, uint32_t o, uint8_t *d, size_t n) { if (o + n > FW_PAGE) return false; memcpy(d, fw_record(c) + o, n); return true; }
@@ -768,6 +773,34 @@ static bool fw_on_trial(void) { return fw_own.armed && !fw_own.confirmed; }
 static void fw_install(uint32_t version) { fw_install_pending = true; fw_install_at_ms = sim_now + 3000u; tlog("fw: install of v%lu in 3 s (bank swap + reset)", (unsigned long)version); }
 static zs_fw_release_key_t fw_release_key;       /* the repository test release key (tools/generate_fw_update_vector.py) */
 static const app_comms_fw_port_t fw_port = {&fw_io, &fw_other_port, &fw_release_key, 1u, ZS_FW_TARGET_STM32_APP, fw_running_version, fw_on_trial, fw_install};
+/* model packages (addendum I): the NOR model region of tasks.c as two RAM slots of 64 KiB, the same release key */
+#define MODEL_BLOCK 4096u
+#define MODEL_SLOT_BYTES (16u * MODEL_BLOCK)
+static uint8_t model_mem[2u * MODEL_SLOT_BYTES];
+static bool mf_erase(void *c, uint32_t a, uint32_t n) { (void)c; if (a % MODEL_BLOCK || n % MODEL_BLOCK || a + n > sizeof(model_mem)) return false; memset(model_mem + a, 0xff, n); return true; }
+static bool mf_program(void *c, uint32_t a, const uint8_t *d, size_t n) {
+  (void)c;
+  if (a + n > sizeof(model_mem)) return false;
+  for (size_t i = 0u; i < n; i++) model_mem[a + i] &= d[i];                        /* NOR: bits only go 1 -> 0 */
+  return true;
+}
+static bool mf_read(void *c, uint32_t a, uint8_t *d, size_t n) { (void)c; if (a + n > sizeof(model_mem)) return false; memcpy(d, model_mem + a, n); return true; }
+static const zs_model_flash_t model_flash = {NULL, mf_erase, mf_program, mf_read};
+static zs_model_store_t model_store;
+static app_comms_model_port_t model_port;
+/* every boot, as tasks.c bind_model_store: RAM holds the built-in model until the stored package is loaded */
+static void model_boot(void) {
+  uint32_t size, version;
+  char text[ZS_MODEL_DESCRIBE_MAX];
+  zs_model_activate_builtin();
+  assert(zs_model_store_init(&model_store, &model_flash, 0u, MODEL_SLOT_BYTES, MODEL_BLOCK));
+  if (zs_model_store_active(&model_store, &size, &version)) (void)zs_model_activate(zs_model_store_read_active, &model_store, size, version);
+  model_port = (app_comms_model_port_t){&model_store, &fw_release_key, 1u};
+  app_comms_set_model_port(&model_port);
+  (void)zs_model_active_describe(text, sizeof(text));
+  if (zs_model_active_version()) tlog("twin: model %s loaded from the store", text);
+}
+static void model_factory(void) { memset(model_mem, 0xff, sizeof(model_mem)); model_boot(); }
 /* heartbeat key 19 as tasks.c/app_fw computes it */
 static uint8_t fw_state_now(void) {
   zs_fw_boot_record_t other;
@@ -803,6 +836,7 @@ static void station_reset(const char *why) {
   zs_station_params_t loaded;
   fw_boot_guard();
   app_comms_reset();
+  model_boot();
   { zs_station_config_t stored; if (zs_station_config_store_load(&cfg_io, &stored, NULL) == ZS_STATION_CONFIG_OK) app_comms_set_config(&stored, 5u); }
   capture_set(false);
   zs_mode_init(&modes, NULL, sim_now);
@@ -979,6 +1013,7 @@ int main(int argc, char **argv) {
   fw_factory(factory_version);
   fw_boot_guard();
   app_comms_set_fw_port(&fw_port);
+  model_factory();
   (void)zs_fw_update_vector_image; (void)zs_fw_update_vector_manifest; (void)zs_fw_update_vector_signature; (void)zs_fw_update_vector_command;
   (void)zs_fw_update_vector_request0; (void)zs_fw_update_vector_chunk0; (void)zs_fw_update_vector_chunk1; (void)zs_fw_update_vector_chunk2;
   app_comms_bind(&outbox_io, &journal_io, &hooks);

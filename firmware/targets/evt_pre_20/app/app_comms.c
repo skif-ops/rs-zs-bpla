@@ -383,9 +383,14 @@ static bool fw_req_in_flight, fw_waiting, fw_paused, fw_ack_in_flight;
 static uint32_t fw_req_offset, fw_req_sent_ms, fw_session_chunks;
 static unsigned fw_timeouts, fw_stalled_sessions;
 static uint32_t fw_updates, fw_rejected, fw_failed, fw_chunks, fw_chunks_ignored, fw_timeouts_total, fw_installs;
+static const app_comms_model_port_t *model_port;
+static bool fw_model;                                /* the download in fw_dl is a model package (addendum I) */
+static uint32_t model_updates, model_installs;
 void app_comms_set_fw_port(const app_comms_fw_port_t *port) { fw_port = port; }
+void app_comms_set_model_port(const app_comms_model_port_t *port) { model_port = port; }
 bool app_comms_fw_busy(void) { return (fw_phase == FW_DOWNLOADING && !fw_paused) || fw_phase == FW_ACK || fw_phase == FW_INSTALLING; }
 uint8_t app_comms_fw_state(void) {
+  if (fw_model) return 0u;
   if (fw_phase == FW_DOWNLOADING) return 1u;
   if ((fw_phase == FW_ACK && fw_dl.result == ZS_COMMAND_ACK_OK) || fw_phase == FW_INSTALLING) return 2u;
   return 0u;
@@ -435,15 +440,46 @@ static bool fw_session_start(void) {
   return true;
 }
 
+/* The model package path of CMD_UPDATE_FIRMWARE (manifest target 3, addendum I); the caller checked busy. */
+static bool update_model(const zs_command_t *cmd, uint16_t *detail) {
+  zs_fw_manifest_t manifest;
+  zs_fw_station_t station;
+  const zs_fw_image_io_t *io;
+  if (!model_port || !model_port->store) { *detail = ZS_FW_REJECT_UNSUPPORTED; fw_rejected++; return true; }
+  station = (zs_fw_station_t){model_port->keys, model_port->key_count, ZS_FW_TARGET_MODEL, zs_model_active_version(),
+                              zs_model_store_capacity(model_port->store), false};
+  *detail = zs_fw_model_check(&cmd->firmware, &station, &manifest);
+  if (*detail) {
+    fw_rejected++;
+    if (hooks.log) hooks.log("model: update refused, detail %u (active m%lu)\r\n", (unsigned)*detail, (unsigned long)station.running_version);
+    return true;
+  }
+  /* only now the free slot is touched: its header goes first, so a torn download can never become active */
+  if (!(io = zs_model_store_begin(model_port->store)) || !zs_fw_download_start(&fw_dl, io, config.station_id, cmd->command_id, &manifest)) {
+    *detail = ZS_FW_REJECT_UNSUPPORTED; fw_rejected++; return true;
+  }
+  fw_model = true;
+  fw_phase = FW_DOWNLOADING;
+  model_updates++;
+  fw_req_in_flight = fw_waiting = fw_paused = false;
+  fw_timeouts = fw_stalled_sessions = 0u;
+  fw_session_chunks = 0u;
+  zs_bg95_topic_subscription_want(&fw_sub, true);
+  if (hooks.log) hooks.log("model: update to m%lu accepted (%lu bytes, active m%lu), download follows\r\n",
+                           (unsigned long)manifest.version, (unsigned long)manifest.size, (unsigned long)station.running_version);
+  return false;
+}
+
 bool app_comms_update_firmware(const zs_command_t *cmd, zs_command_ack_result_t *result, uint16_t *detail) {
   zs_fw_manifest_t manifest;
   zs_fw_station_t station;
   *result = ZS_COMMAND_ACK_REJECTED;
-  if (!fw_port || !fw_port->io || !fw_port->other_record || !fw_port->install) { *detail = ZS_FW_REJECT_UNSUPPORTED; fw_rejected++; return true; }
   if (fw_phase != FW_IDLE) {
     if (fw_phase == FW_DOWNLOADING && memcmp(fw_dl.command_id, cmd->command_id, ZS_COMMAND_UUID_BYTES) == 0) return false;   /* redelivery */
     *detail = ZS_FW_REJECT_BUSY; fw_rejected++; return true;
   }
+  if (zs_fw_update_target(&cmd->firmware) == ZS_FW_TARGET_MODEL) return update_model(cmd, detail);
+  if (!fw_port || !fw_port->io || !fw_port->other_record || !fw_port->install) { *detail = ZS_FW_REJECT_UNSUPPORTED; fw_rejected++; return true; }
   station = (zs_fw_station_t){fw_port->keys, fw_port->key_count, fw_port->target,
                               fw_port->running_version ? fw_port->running_version() : 0u, fw_port->io->capacity,
                               fw_port->trial ? fw_port->trial() : false};
@@ -454,6 +490,7 @@ bool app_comms_update_firmware(const zs_command_t *cmd, zs_command_ack_result_t 
     return true;
   }
   if (!zs_fw_download_start(&fw_dl, fw_port->io, config.station_id, cmd->command_id, &manifest)) { *detail = ZS_FW_REJECT_UNSUPPORTED; fw_rejected++; return true; }
+  fw_model = false;
   fw_phase = FW_DOWNLOADING;
   fw_updates++;
   fw_req_in_flight = fw_waiting = fw_paused = false;
@@ -481,7 +518,7 @@ static void fw_collect(uint32_t now) {
   }
   fw_ack_in_flight = false;
   if (uplink_binding.last_outcome != ZS_BG95_EVENT_UPLINK_OUTCOME_BROKER_ACK) return;   /* published again next time */
-  if (fw_dl.result != ZS_COMMAND_ACK_OK) { fw_phase = FW_IDLE; return; }
+  if (fw_dl.result != ZS_COMMAND_ACK_OK) { fw_phase = FW_IDLE; fw_model = false; return; }
   fw_phase = FW_INSTALLING;
 }
 
@@ -499,12 +536,34 @@ static void fw_finish(uint32_t now) {
   } else {
     if (hooks.log) hooks.log("fw: journal completion failed, the command stays accepted\r\n");
     fw_phase = FW_IDLE;
+    fw_model = false;
   }
+}
+
+/* The OK ACK of a model package is at the broker: its slot header makes it the stored model, then it is loaded. */
+static void model_install(void) {
+  uint32_t size = 0u, version = 0u;
+  zs_model_status_t st = ZS_MODEL_ERR_READ;
+  fw_model = false;
+  if (!zs_model_store_commit(model_port->store, &fw_dl.manifest) || !zs_model_store_active(model_port->store, &size, &version) ||
+      (st = zs_model_activate(zs_model_store_read_active, model_port->store, size, fw_dl.manifest.version)) != ZS_MODEL_OK) {
+    fw_failed++;
+    if (hooks.log) hooks.log("model: m%lu not activated (status %d), active m%lu\r\n", (unsigned long)fw_dl.manifest.version, (int)st,
+                             (unsigned long)zs_model_active_version());
+    return;
+  }
+  model_installs++;
+  if (hooks.log) hooks.log("model: m%lu active\r\n", (unsigned long)version);
 }
 
 /* 3: local work (erase / verify) and the next publication when the session is free */
 static void fw_drive(uint32_t now) {
-  if (!fw_port || fw_phase == FW_IDLE) return;
+  if (fw_phase == FW_IDLE || (!fw_port && !fw_model)) return;
+  if (fw_phase == FW_INSTALLING && fw_model) {
+    fw_phase = FW_IDLE;
+    model_install();
+    return;
+  }
   if (fw_phase == FW_INSTALLING) {
     fw_phase = FW_IDLE;
     if (!zs_fw_boot_arm(fw_port->other_record, fw_dl.manifest.version, fw_port->running_version ? fw_port->running_version() : 0u)) {
@@ -622,6 +681,7 @@ void app_comms_reset(void) {
   if (config_valid) config = stable_config;
   zs_fw_download_abort(&fw_dl);
   fw_phase = FW_IDLE;
+  fw_model = false;
   fw_req_in_flight = fw_waiting = fw_paused = fw_ack_in_flight = false;
   if (phase != COMMS_OFF) { bsp_gpio_modem_power(false); modem.state = ZS_BG95_OFF; }
   session_reported = false;
@@ -663,7 +723,7 @@ static uint32_t activity_ms, activity_seen;
 static void note_session_activity(uint32_t now) {
   const uint32_t seen = comms.heartbeats_published + commands_verified + commands_rejected +
                         session.queued_command_count + session.retry_required_count + audio_chunks + audio_uploads +
-                        fw_chunks + fw_updates + fw_timeouts_total + bearing_batches + bearing_failed;
+                        fw_chunks + fw_updates + model_updates + fw_timeouts_total + bearing_batches + bearing_failed;
   if (seen != activity_seen) { activity_seen = seen; activity_ms = now; }
 }
 
@@ -909,6 +969,12 @@ void app_comms_status(void (*print)(const char *fmt, ...)) {
         (unsigned long)fw_rejected, (unsigned long)fw_failed, (unsigned long)fw_installs, (unsigned long)fw_chunks, (unsigned long)fw_chunks_ignored,
         (unsigned long)fw_timeouts_total, fw_phase == FW_DOWNLOADING ? " (downloading)" : fw_phase != FW_IDLE ? " (finishing)" : "",
         fw_paused ? " (paused)" : "");
+  {
+    char model_text[ZS_MODEL_DESCRIBE_MAX];
+    (void)zs_model_active_describe(model_text, sizeof(model_text));
+    print("  model %s: updates %lu installs %lu%s\r\n", model_text, (unsigned long)model_updates, (unsigned long)model_installs,
+          fw_model ? " (downloading)" : model_port ? "" : " (no store)");
+  }
   print("  bearings %s: batches %lu (samples %lu) failed %lu dropped %lu, queued %u (pushed %lu, overflow %lu)\r\n",
         tracking ? "tracking" : "idle", (unsigned long)bearing_batches, (unsigned long)bearing_samples, (unsigned long)bearing_failed,
         (unsigned long)bearing_dropped, (unsigned)bearing_queued(), (unsigned long)bearings.pushed, (unsigned long)bearings.dropped);

@@ -162,12 +162,23 @@ def main() -> int:
     ap.add_argument("--k", type=int, default=DEFAULT_K, help="max centroids per label")
     ap.add_argument("--check", action="store_true", help="fail if the header differs from what the dataset produces")
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--package", type=Path, help="also write the model as a package (MQTT ICD addendum I) for pki.cli model-sign")
+    ap.add_argument("--version", type=int, help="package version (>= 1, required with --package)")
     a = ap.parse_args()
+    if a.package is not None and (a.version is None or a.version < 1):
+        ap.error("--package needs --version N (N >= 1)")
     order, X, labels, files, starts = load_dataset(a.dataset)
     model = fit(X, labels, a.k)
     text = render_header(model, order)
     if a.report:
         report(model, X, labels, files, starts, a.k)
+    if a.package is not None:
+        if str(ROOT / "server") not in sys.path:
+            sys.path.insert(0, str(ROOT / "server"))
+        from station.model_codec import encode_model
+        raw = encode_model(model, a.version)
+        a.package.write_bytes(raw)
+        print(f"{a.package} written: package m{a.version}, {len(model['centroids'])} classes, {len(raw)} bytes")
     if a.check:
         if a.out.read_text(encoding="utf-8") != text:
             print(f"{a.out} is stale: regenerate with export_station_model.py", file=sys.stderr)
