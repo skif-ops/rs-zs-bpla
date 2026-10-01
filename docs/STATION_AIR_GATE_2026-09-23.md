@@ -95,3 +95,50 @@ Real recordings (38 files, `presence_eval` before/after): confirmed windows unch
 DJI Mavic 3 Pro 296 -> 296 confirmed; DJI Mini 3 Pro 150 -> 149.  Test: `firmware/tests/test_air_gate.c`
 (`test_two_sources`: 120 + 183 Hz separated in 14 of 14 windows, single sources get no secondary comb, the
 suppression takes about 10 dB off the other comb).
+
+## Each source its own target (2026-10-01)
+
+The gate finds the sources; the station pipeline (`zs_station_pipeline.h`) now follows each of them as a target of
+its own instead of classifying the strongest one only:
+
+- source tracks (`ZS_PIPELINE_SOURCES` 3): the gate's main comb and its secondary combs are matched to tracks by
+  fundamental (at most 6 % per window; `window_f0_hz`, the main comb on the last window, folded like `f0_hz`); a track
+  missed by the gate is kept for 8 windows if it was heard together with another source and is not of the same
+  harmonic family as one heard now (a single engine's further combs never become remembered sources);
+- one classification per window as before (the feature extraction is the costly part, 37 ms on the host): a window
+  of a mixture classifies one target in turn, with the combs of all the others suppressed (`zs_air_gate_suppress_combs`,
+  the main one included when it is not the turn's); each track keeps its own consensus votes and presence; the station
+  is CONFIRMED when the main stream or any source is;
+- bearings of every source of a mixture in every window (`zs_comb_bearing.h`): the bins within max(1 bin, 1.2 %) of
+  the source's harmonics (80-3100 Hz, minus a twice wider guard around the other sources' harmonics), decimated to
+  8 kHz, 7 Hann frames of 1024, PHAT cross-spectra summed over the frames, the delay from the correlation maximum
+  (5 us then 0.5 us steps and a parabola), a coherence gate, per-frame delays for sigma; 3.1 ms on the host for three
+  sources;
+- combs whose bearings agree (within max(6 deg, 2 sigma)) for 3 windows are one target (an agreeing window counts
+  +1 up to 6, a disagreeing one -2; apart again at 0, after 2-3 windows of disagreement): a multirotor's rotors at
+  different speeds and an engine's further combs are classified and reported as one, without rotation (the window is
+  classified as one sound, the other combs not suppressed); a new comb starts merged with the known ones until its
+  bearings disagree;
+- each bearing carries its source's fundamental (bearing batch schema 2, ICD addendum H §1.1, §3); the server splits
+  a station track into segments by fundamental as well as by direction.
+
+The gate itself is unchanged.  Changes to the gate's own search for three sources at once (the highest real
+sub-fundamental instead of the most powerful, a two-tooth "complete" own comb, a looser per-window check when two
+other sources crowd the window, wider removal of a no-comb line) gave about 20 % more bearings of the third target in
+the twin field but split a tracked tractor's 34 Hz comb into "sources" (suspect windows 24 -> 34, city traffic 4 -> 11)
+and were dropped.
+
+Real recordings (38 files, 5312 windows, `presence_eval`, which now runs the pipeline through the capture ring with
+the recording on channel 1 and the other channels delayed as a plane wave from one direction): confirmed windows
+unchanged on every file; the level changed in 5 windows (tractor moving: suspect 4 -> 6, street noise: suspect
+5 -> 2) and the class in 4, all at or just after windows where the gate reports a second comb from the same direction,
+which is no longer suppressed (the votes carry it over a few windows); the sum of UAV votes over the DJI Mini 3 Pro
+windows 916 -> 972.  Tests: `firmware/tests/test_comb_bearing.c`,
+`firmware/tests/test_pipeline_sources.c` (two directions: both sources confirmed, bearings with mean error about
+1 deg; one direction: one target, no rotation).  Field results with two and three targets:
+`docs/STATION_TWIN_FIELD_2026-10-01.md` §5.
+
+Limits: the gate separates combs by pitch only.  Two sources with fundamentals in a small integer ratio (DJI Mavic 3
+Pro 174 Hz and Mini 3 Pro 261 Hz are 2:3) look like one comb of 87 Hz, and two of the same type within 4 % are not
+separated at all.  Next: separation by direction before pitch (the direction of every spectral line from the
+inter-channel phase, lines grouped by azimuth into targets, the fundamental of each group).
