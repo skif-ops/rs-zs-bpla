@@ -29,6 +29,7 @@ bool zs_station_pipeline_init(zs_station_pipeline_t *p, const zs_station_pipelin
   zs_classifier_consensus_init(&p->votes);
   zs_air_gate_init(&p->gate);
   zs_bearing_init(&p->bearing_ctx, NULL);
+  zs_doa_sep_init(&p->doa);
   p->classification.unknown = true;
   p->next_window_end = ZS_PIPELINE_WINDOW_SAMPLES;
   return true;
@@ -78,27 +79,44 @@ _Static_assert(ZS_AIR_SCRATCH_COMPLEX * sizeof(zs_complex_t) >= sizeof(zs_spatia
 _Static_assert(ZS_PIPELINE_WINDOW_SAMPLES * sizeof(int16_t) >= ZS_COMB_BEARING_MEMORY * sizeof(float), "the 1 s window lends the decimated span");
 _Static_assert(ZS_AIR_SCRATCH_COMPLEX * sizeof(zs_complex_t) >= sizeof(zs_comb_bearing_workspace_t), "the gate scratch lends the comb workspace");
 _Static_assert(ZS_COMB_BEARING_SPAN == ZS_PIPELINE_BEARING_SPAN, "both bearings cover the newest 0.5 s of the window");
+_Static_assert(ZS_AIR_SCRATCH_COMPLEX * sizeof(zs_complex_t) >= sizeof(zs_doa_workspace_t), "the gate scratch lends the direction workspace");
+_Static_assert(ZS_AIR_SCRATCH_COMPLEX * sizeof(zs_complex_t) >= sizeof(zs_doa_mask_workspace_t), "the gate scratch lends the mask workspace");
+_Static_assert(ZS_PIPELINE_WINDOW_SAMPLES == 2u * ZS_PIPELINE_HOP_SAMPLES, "a direction's window is two halves");
 
-/* Bearings of a CONFIRMED window from the 4-channel ring; the window and the gate scratch are idle by now.  One source:
-   the full-band bearing.  A mixture: one bearing per source from the bins of its own harmonics (all sources take
-   part, each excludes the others' bins), the main one first; `wanted` marks the sources whose bearing is delivered.
-   Returns how many of out[] were filled (valid or not). */
-static unsigned update_bearings(zs_station_pipeline_t *p, uint64_t end_sample, zs_bearing_t out[ZS_COMB_BEARING_MAX_SOURCES]) {
-  const float t = p->port->temperature_c ? p->port->temperature_c(p->port->ctx) : 15.0f;
-  unsigned n = 1u;
-  p->last_bearing.valid = false;
-  if (!p->ring) return 0u;
-  if (p->source_count >= 2u) {
-    n = p->source_count;
-    (void)zs_comb_bearings_from_ring(&p->bearing_ctx, &p->comb_stats, p->ring, end_sample, p->source_f0, n, t, (float *)(void *)p->window,
-                                     (zs_comb_bearing_workspace_t *)(void *)p->scratch, out);
-    p->comb_windows++;
-  } else {
-    (void)zs_bearing_from_ring(&p->bearing_ctx, p->ring, end_sample, ZS_PIPELINE_BEARING_SPAN, t, p->window,
-                               (zs_spatial_gcc_workspace_t *)(void *)p->scratch, &out[0]);
-    if (p->last_gate.present) out[0].f0_hz = p->last_gate.window_f0_hz;      /* the source it follows, for the server */
+void zs_station_pipeline_set_stash(zs_station_pipeline_t *p, int16_t *stash) {
+  if (!p) return;
+  p->stash = stash;
+  p->stash_target = 0u;
+}
+
+static float temperature_of(const zs_station_pipeline_t *p) {
+  return p->port->temperature_c ? p->port->temperature_c(p->port->ctx) : 15.0f;
+}
+
+/* Bearings of the sources of a mixture from the window's decimated newest 0.5 s (memory_ok: in the window buffer): one
+   per source from the bins of its own harmonics (all sources take part, each excludes the others' bins), the main one
+   first.  Returns how many of out[] were filled (valid or not). */
+static unsigned comb_bearings(zs_station_pipeline_t *p, bool memory_ok, zs_bearing_t out[ZS_COMB_BEARING_MAX_SOURCES]) {
+  const unsigned n = p->source_count;
+  if (!memory_ok) {
+    for (unsigned i = 0u; i < n; i++) { memset(&out[i], 0, sizeof(out[i])); out[i].f0_hz = p->source_f0[i]; }
+    p->comb_stats.attempts += n;
+    p->comb_stats.no_audio += n;
+    return n;
   }
+  (void)zs_comb_bearings_from_memory(&p->bearing_ctx, &p->comb_stats, (const float *)(const void *)p->window, p->source_f0, n,
+                                     temperature_of(p), (zs_comb_bearing_workspace_t *)(void *)p->scratch, out);
+  p->comb_windows++;
   return n;
+}
+
+/* The full-band bearing of a single source (the window buffer and the gate scratch are idle by now). */
+static void single_bearing(zs_station_pipeline_t *p, uint64_t end_sample, zs_bearing_t *out) {
+  memset(out, 0, sizeof(*out));
+  if (!p->ring) return;
+  (void)zs_bearing_from_ring(&p->bearing_ctx, p->ring, end_sample, ZS_PIPELINE_BEARING_SPAN, temperature_of(p), p->window,
+                             (zs_spatial_gcc_workspace_t *)(void *)p->scratch, out);
+  if (p->last_gate.present) out->f0_hz = p->last_gate.window_f0_hz;           /* the source it follows, for the server */
 }
 
 /* ---- source tracks of a mixture ---------------------------------------------------------------------------------- */
@@ -198,6 +216,119 @@ static void update_together(zs_station_pipeline_t *p, const zs_bearing_t *b, uns
     }
 }
 
+/* ---- targets by direction ----------------------------------------------------------------------------------- */
+static void doa_clear(zs_station_pipeline_t *p) {
+  zs_doa_sep_reset(&p->doa);
+  memset(p->doa_targets, 0, sizeof(p->doa_targets));
+  p->stash_target = 0u;
+}
+
+/* The directions a window can classify: present, confirmed, labelled, with a bearing at most
+   ZS_PIPELINE_DOA_BEARING_AGE windows old (the mask aims at it). */
+static unsigned doa_ready(const zs_station_pipeline_t *p, unsigned list[ZS_DOA_MAX_TRACKS]) {
+  unsigned n = 0u;
+  for (unsigned k = 0u; k < ZS_DOA_MAX_TRACKS; k++) {
+    const zs_pipeline_target_t *t = &p->doa_targets[k];
+    if (t->id && !t->absent && t->confirmed_direction && t->bearing.valid && t->bearing_age <= ZS_PIPELINE_DOA_BEARING_AGE &&
+        t->bearing.f0_hz > 0.0f)
+      list[n++] = k;
+  }
+  return n;
+}
+
+/* The window's direction tracks onto the targets: the same track keeps its votes (also after a few windows gone: the
+   track comes back under its id); a new one starts with no votes (the main stream's votes are the mixture's, not this
+   direction's). */
+static void doa_update_targets(zs_station_pipeline_t *p, const zs_doa_target_t *out, unsigned n) {
+  bool seen[ZS_DOA_MAX_TRACKS] = {false, false, false};
+  for (unsigned i = 0u; i < n; i++) {
+    int slot = -1;
+    for (unsigned k = 0u; k < ZS_DOA_MAX_TRACKS && slot < 0; k++) if (p->doa_targets[k].id == out[i].id) slot = (int)k;
+    if (slot < 0) {
+      /* a free slot, else the target gone longest */
+      for (unsigned k = 0u; k < ZS_DOA_MAX_TRACKS; k++) {
+        const zs_pipeline_target_t *t = &p->doa_targets[k];
+        if (seen[k]) continue;
+        if (!t->id) { slot = (int)k; break; }
+        if (t->absent && (slot < 0 || t->absent > p->doa_targets[slot].absent)) slot = (int)k;
+      }
+      if (slot < 0) continue;
+      zs_pipeline_target_t *t = &p->doa_targets[slot];
+      memset(t, 0, sizeof(*t));
+      t->id = out[i].id;
+      zs_classifier_consensus_init(&t->votes);
+      t->classification.unknown = true;
+    }
+    zs_pipeline_target_t *t = &p->doa_targets[slot];
+    seen[slot] = true;
+    t->absent = 0u;
+    t->confirmed_direction = out[i].confirmed;
+    t->strength = out[i].strength;
+    if (out[i].has_bearing) { t->bearing = out[i].bearing; t->bearing_age = 0u; }
+    else { t->bearing.f0_hz = out[i].bearing.f0_hz; if (t->bearing_age < 255u) t->bearing_age++; }
+  }
+  for (unsigned k = 0u; k < ZS_DOA_MAX_TRACKS; k++) {
+    zs_pipeline_target_t *t = &p->doa_targets[k];
+    if (seen[k] || !t->id) continue;
+    t->confirmed_direction = false;
+    if (t->bearing_age < 255u) t->bearing_age++;
+    if (++t->absent > ZS_DOA_RECALL_WINDOWS + ZS_DOA_MISS_MAX + 2u) memset(t, 0, sizeof(*t));
+  }
+}
+
+/* level 1 of a direction target: its own votes alone (the gate's comb belongs to the station, not to this direction:
+   a tractor heard beside a UAV would borrow it).  A UAV majority of at least ZS_CLASSIFICATION_MIN_WINDOWS of its own
+   windows; or, as the station does with a comb, a majority of weak UAV votes, the direction's own comb being its label
+   (a harmonic series of its own bins) and ground votes at most an eighth: the own window of a UAV (the other targets'
+   lines removed) is a UAV, often less certainly than the whole sound. */
+static void doa_evaluate(zs_station_pipeline_t *p, unsigned k) {
+  zs_pipeline_target_t *t = &p->doa_targets[k];
+  t->presence = zs_presence_evaluate(&t->votes, NULL);
+  const unsigned n = t->presence.windows, majority = (n * 5u + 7u) / 8u;
+  if (t->presence.level != ZS_PRESENCE_CONFIRMED && n >= ZS_CLASSIFICATION_MIN_WINDOWS && t->bearing.f0_hz > 0.0f &&
+      t->presence.uav_weak_votes >= majority && 8u * t->presence.ground_votes <= n) {
+    t->presence.level = ZS_PRESENCE_CONFIRMED;
+    t->presence.confidence_u8 = ZS_PRESENCE_WEAK_CONFIDENCE_U8;
+  }
+}
+
+/* the gate comb a label names: k x f0 (k 1..6) within ZS_PIPELINE_LABEL_RATIO; 0 when none or more than one */
+static float gate_comb_of(const zs_air_gate_result_t *g, float label) {
+  float combs[1u + ZS_AIR_MAX_SECONDARY], found = 0.0f;
+  unsigned n = 0u, hits = 0u;
+  if (!g->present || label <= 0.0f) return 0.0f;
+  if (g->window_f0_hz > 0.0f) combs[n++] = g->window_f0_hz;
+  for (unsigned s = 0u; s < g->secondary_count && s < ZS_AIR_MAX_SECONDARY; s++) if (g->secondary_f0_hz[s] > 0.0f) combs[n++] = g->secondary_f0_hz[s];
+  for (unsigned i = 0u; i < n; i++) {
+    const float k = roundf(label / combs[i]);
+    if (k >= 1.0f && k <= 6.0f && fabsf(label - k * combs[i]) <= ZS_PIPELINE_LABEL_RATIO * label) { found = combs[i]; hits++; }
+  }
+  return hits == 1u ? found : 0.0f;
+}
+
+/* The bearings of the CONFIRMED direction targets (a window with at least two classifiable directions); the label goes
+   out as the gate's fundamental when it names exactly one gate comb and no other delivered target names the same one.
+   Returns how many of out[] were filled. */
+static unsigned doa_deliveries(zs_station_pipeline_t *p, zs_bearing_t out[ZS_DOA_MAX_TRACKS]) {
+  unsigned list[ZS_DOA_MAX_TRACKS], n = 0u;
+  const unsigned nd = doa_ready(p, list);
+  if (!p->stash || nd < 2u) return 0u;
+  float comb[ZS_DOA_MAX_TRACKS];
+  for (unsigned i = 0u; i < nd; i++) {
+    const zs_pipeline_target_t *t = &p->doa_targets[list[i]];
+    if (t->presence.level != ZS_PRESENCE_CONFIRMED || t->bearing_age != 0u) continue;    /* this window's own bearing */
+    out[n] = t->bearing;
+    comb[n] = gate_comb_of(&p->last_gate, t->bearing.f0_hz);
+    n++;
+  }
+  for (unsigned i = 0u; i < n; i++) {
+    bool shared = false;
+    for (unsigned j = 0u; j < n; j++) if (j != i && comb[j] > 0.0f && comb[j] == comb[i]) shared = true;
+    if (comb[i] > 0.0f && !shared) out[i].f0_hz = comb[i];
+  }
+  return n;
+}
+
 static void emit(zs_station_pipeline_t *p, uint64_t end_sample) {
   zs_detection_t d;
   p->seq_no++;
@@ -222,11 +353,38 @@ bool zs_station_pipeline_push_window(zs_station_pipeline_t *p, const int16_t *pc
     p->source_count = (uint8_t)match_sources(p, reported);
     if (p->source_count < 2u) p->source_count = 0u;           /* one source: the window as it is, the main stream */
   }
+  /* targets by direction (the last window's tracks): at least two classifiable ones replace the comb mixture; when the
+     stash holds the last window's newest 0.5 s of one of them, this window completes and classifies its own 1 s */
+  unsigned dl[ZS_DOA_MAX_TRACKS];
+  const unsigned nd = doa_ready(p, dl);
+  const bool by_direction = p->stash && p->ring && nd >= 2u;
+  bool dir_window = false;
+  unsigned dir_slot = 0u;
+  if (by_direction && p->stash_target && p->stash_end + ZS_PIPELINE_HOP_SAMPLES == end_sample) {
+    zs_bearing_t dirs[ZS_DOA_MAX_TRACKS];
+    int which = -1;
+    for (unsigned i = 0u; i < nd; i++) {
+      dirs[i] = p->doa_targets[dl[i]].bearing;
+      if (p->doa_targets[dl[i]].id == p->stash_target) which = (int)i;
+    }
+    if (which >= 0) {
+      int16_t *buf = (int16_t *)p->window;
+      if (zs_doa_sep_mask_window(&p->bearing_ctx, p->ring, end_sample, ZS_PIPELINE_HOP_SAMPLES, dirs, nd, (unsigned)which,
+                                 temperature_of(p), (zs_doa_mask_workspace_t *)(void *)p->scratch, buf + ZS_PIPELINE_HOP_SAMPLES)) {
+        memcpy(buf, p->stash, ZS_PIPELINE_HOP_SAMPLES * sizeof(int16_t));
+        pcm = buf;
+        dir_window = true;
+        dir_slot = dl[which];
+      } else p->doa_mask_failed++;
+    }
+  }
+  p->stash_target = 0u;
+  if (by_direction) p->doa_mixture_windows++;
   /* the targets of the mixture: sources heard from one direction are one target (its first listed source) */
   unsigned targets[ZS_PIPELINE_SOURCES], n_targets = 0u;
   for (unsigned i = 0u; i < p->source_count; i++) if (target_of(p, i) == i) targets[n_targets++] = i;
-  const bool mixture = n_targets >= 2u;
-  if (p->source_count && !mixture) p->merged_windows++;
+  const bool mixture = !by_direction && n_targets >= 2u;
+  if (p->source_count && !mixture && !by_direction) p->merged_windows++;
   if (mixture) {
     float others[ZS_PIPELINE_SOURCES];
     unsigned n_others = 0u;
@@ -239,7 +397,11 @@ bool zs_station_pipeline_push_window(zs_station_pipeline_t *p, const int16_t *pc
   }
   if (!p->port->extract(p->port->ctx, pcm, ZS_PIPELINE_WINDOW_SAMPLES, p->features)) return false;
   p->last_window = zs_classifier_predict_centroid(p->features);
-  if (mixture) {
+  if (dir_window) {
+    zs_pipeline_target_t *t = &p->doa_targets[dir_slot];
+    (void)zs_classifier_consensus_push(&t->votes, p->last_window, &t->classification, &t->hierarchy);
+    p->doa_classified_windows++;
+  } else if (mixture) {
     zs_pipeline_source_t *t = &p->sources[p->source_of[chosen]];
     (void)zs_classifier_consensus_push(&t->votes, p->last_window, &t->classification, &t->hierarchy);
     if (chosen == 0u) (void)zs_classifier_consensus_push(&p->votes, p->last_window, &p->classification, &p->hierarchy);
@@ -248,6 +410,7 @@ bool zs_station_pipeline_push_window(zs_station_pipeline_t *p, const int16_t *pc
     (void)zs_classifier_consensus_push(&p->votes, p->last_window, &p->classification, &p->hierarchy);
   }
   p->presence = zs_presence_evaluate(&p->votes, &p->last_gate);
+  if (by_direction) for (unsigned i = 0u; i < nd; i++) doa_evaluate(p, dl[i]);
   /* a mixture: the station is CONFIRMED when any of its sources is; the event names the confirming source */
   if (p->presence.level != ZS_PRESENCE_CONFIRMED && mixture) {
     for (unsigned k = 0u; k < n_targets; k++) {
@@ -260,6 +423,17 @@ bool zs_station_pipeline_push_window(zs_station_pipeline_t *p, const int16_t *pc
       break;
     }
   }
+  if (p->presence.level != ZS_PRESENCE_CONFIRMED && by_direction) {
+    for (unsigned i = 0u; i < nd; i++) {
+      const zs_pipeline_target_t *t = &p->doa_targets[dl[i]];
+      if (t->presence.level != ZS_PRESENCE_CONFIRMED) continue;
+      p->presence = t->presence;
+      p->classification = t->classification;
+      p->hierarchy = t->hierarchy;
+      p->doa_confirmed_windows++;
+      break;
+    }
+  }
   p->windows++;
   switch (p->presence.level) {
     case ZS_PRESENCE_CONFIRMED: p->confirmed_windows++; break;
@@ -267,33 +441,79 @@ bool zs_station_pipeline_push_window(zs_station_pipeline_t *p, const int16_t *pc
     case ZS_PRESENCE_ENGINE_UNCONFIRMED: p->engine_windows++; break;
     default: break;
   }
-  /* several sources: their bearings every window (whether they are one target is told by the directions) */
+  /* the window's newest 0.5 s decimated once (into the window buffer, done with by now): the comb bearings of a gate
+     mixture every window (whether its sources are one target is told by the directions), and the direction tracks
+     from the first sign of a target on (the gate's comb, any level above none, or tracks still alive), so they are
+     confirmed by the time the station is */
+  bool live = false;
+  for (unsigned k = 0u; k < ZS_DOA_MAX_TRACKS; k++) live = live || (p->doa_targets[k].id != 0u && !p->doa_targets[k].absent);
+  const bool doa_run = p->stash && p->ring && (p->last_gate.present || p->presence.level != ZS_PRESENCE_NONE || live);
+  const bool comb_run = p->source_count >= 2u && !by_direction;
+  bool memory_ok = false;
+  if (p->ring && (doa_run || comb_run))
+    memory_ok = zs_comb_bearing_decimate_ring(p->ring, end_sample, (float *)(void *)p->window);
   zs_bearing_t bearings[ZS_COMB_BEARING_MAX_SOURCES];
   unsigned nb = 0u;
-  if (p->source_count >= 2u) {
-    nb = update_bearings(p, end_sample, bearings);
+  if (comb_run) {
+    nb = comb_bearings(p, memory_ok, bearings);
     update_together(p, bearings, nb);
   }
-  if (p->presence.level == ZS_PRESENCE_CONFIRMED) {
-    bool wanted[ZS_COMB_BEARING_MAX_SOURCES] = {true, true, true};
-    if (p->source_count < 2u) nb = update_bearings(p, end_sample, bearings);
-    else {
-      /* a mixture: the bearings of the CONFIRMED targets (the main one also when the main stream confirms it); the
-         other combs of a target are not reported */
-      const bool main_stream = zs_presence_evaluate(&p->votes, &p->last_gate).level == ZS_PRESENCE_CONFIRMED;
-      for (unsigned i = 0u; i < nb; i++)
-        wanted[i] = target_of(p, i) == i &&
-                    ((mixture && p->sources[p->source_of[i]].presence.level == ZS_PRESENCE_CONFIRMED) || (i == 0u && main_stream));
+  if (doa_run && memory_ok) {
+    zs_doa_target_t out[ZS_DOA_MAX_TRACKS];
+    const unsigned n = zs_doa_sep_push(&p->doa, &p->bearing_ctx, (const float *)(const void *)p->window, temperature_of(p),
+                                       (zs_doa_workspace_t *)(void *)p->scratch, out);
+    doa_update_targets(p, out, n);
+    p->doa_windows++;
+  } else if (!doa_run) {
+    doa_clear(p);
+  }
+  /* a window classified as it is takes the next direction's newest 0.5 s into the stash (one mask per window) */
+  if (p->stash && p->ring && !dir_window) {
+    unsigned list[ZS_DOA_MAX_TRACKS];
+    const unsigned n = doa_ready(p, list);
+    if (n >= 2u) {
+      zs_bearing_t dirs[ZS_DOA_MAX_TRACKS];
+      for (unsigned i = 0u; i < n; i++) dirs[i] = p->doa_targets[list[i]].bearing;
+      const unsigned which = p->doa_turn++ % n;
+      if (zs_doa_sep_mask_window(&p->bearing_ctx, p->ring, end_sample, ZS_PIPELINE_HOP_SAMPLES, dirs, n, which, temperature_of(p),
+                                 (zs_doa_mask_workspace_t *)(void *)p->scratch, p->stash)) {
+        p->stash_target = p->doa_targets[list[which]].id;
+        p->stash_end = end_sample;
+      } else p->doa_mask_failed++;
     }
-    for (unsigned i = 0u; i < nb; i++)                         /* the event carries the first delivered bearing */
-      if (bearings[i].valid && wanted[i]) { p->last_bearing = bearings[i]; p->last_bearing_end = end_sample; break; }
+  }
+  if (p->presence.level == ZS_PRESENCE_CONFIRMED) {
+    zs_bearing_t send[ZS_COMB_BEARING_MAX_SOURCES > ZS_DOA_MAX_TRACKS ? ZS_COMB_BEARING_MAX_SOURCES : ZS_DOA_MAX_TRACKS];
+    unsigned ns = doa_deliveries(p, send);
+    p->doa_bearings += ns;
+    /* several directions heard (confirmed, labelled or not yet): only their own bearings; the full band mixes them, and
+       the gate's main comb may be the one that is no UAV (a tractor's beside a UAV the main stream confirms) */
+    unsigned several = 0u;
+    for (unsigned k = 0u; k < ZS_DOA_MAX_TRACKS; k++)
+      several += p->doa_targets[k].id && !p->doa_targets[k].absent && p->doa_targets[k].confirmed_direction;
+    if (ns == 0u && !by_direction && several < 2u) {
+      if (p->source_count < 2u) {
+        single_bearing(p, end_sample, &bearings[0]);
+        if (bearings[0].valid) send[ns++] = bearings[0];
+      } else {
+        /* a mixture: the bearings of the CONFIRMED targets (the main one also when the main stream confirms it); the
+           other combs of a target are not reported */
+        const bool main_stream = zs_presence_evaluate(&p->votes, &p->last_gate).level == ZS_PRESENCE_CONFIRMED;
+        for (unsigned i = 0u; i < nb; i++) {
+          const bool wanted = target_of(p, i) == i &&
+                              ((mixture && p->sources[p->source_of[i]].presence.level == ZS_PRESENCE_CONFIRMED) || (i == 0u && main_stream));
+          if (bearings[i].valid && wanted) send[ns++] = bearings[i];
+        }
+      }
+    }
+    if (ns) { p->last_bearing = send[0]; p->last_bearing_end = end_sample; }     /* the event carries the first one */
+    else p->last_bearing.valid = false;
     if (!p->confirmed) {                                                            /* rising edge */
       p->confirmed = true;
       emit(p, end_sample);
       p->track_event_id = ((uint64_t)p->port->boot_id << 32) | p->seq_no;
     } else if (++p->windows_since_event >= period) emit(p, end_sample);            /* keep-alive update */
-    for (unsigned i = 0u; i < nb && p->port->bearing; i++)
-      if (bearings[i].valid && wanted[i]) p->port->bearing(p->port->ctx, &bearings[i], end_sample, p->track_event_id);
+    for (unsigned i = 0u; i < ns && p->port->bearing; i++) p->port->bearing(p->port->ctx, &send[i], end_sample, p->track_event_id);
   } else {
     p->confirmed = false;
     p->windows_since_event = 0u;

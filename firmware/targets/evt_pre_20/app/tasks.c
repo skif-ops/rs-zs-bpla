@@ -1018,6 +1018,9 @@ static void console_exec(const char *cmd) {
                    (unsigned long)pipeline.separated_windows, (unsigned long)pipeline.merged_windows, (unsigned long)pipeline.source_confirmed_windows,
                    (unsigned long)pipeline.comb_stats.computed, (unsigned long)pipeline.comb_stats.attempts, (unsigned long)pipeline.comb_stats.few_bins,
                    (unsigned long)pipeline.comb_stats.weak);
+    console_printf("  directions: windows %lu, several %lu, classified %lu, confirmed by one %lu, bearings %lu, mask failed %lu\r\n",
+                   (unsigned long)pipeline.doa_windows, (unsigned long)pipeline.doa_mixture_windows, (unsigned long)pipeline.doa_classified_windows,
+                   (unsigned long)pipeline.doa_confirmed_windows, (unsigned long)pipeline.doa_bearings, (unsigned long)pipeline.doa_mask_failed);
     console_printf("  track %s (event %lu:%lu, %lu windows) | tracks %lu ended lost %lu max %lu mode %lu, refused (link) %lu\r\n",
                    track_open ? "OPEN" : "closed", (unsigned long)(track.track_event_id >> 32), (unsigned long)(track.track_event_id & 0xffffffffu),
                    (unsigned long)track.windows, (unsigned long)track.tracks, (unsigned long)track.ended_lost, (unsigned long)track.ended_max,
@@ -1125,6 +1128,12 @@ bool app_tasks_create(void) {
     size_t work;
     zs_complex_t *scratch = zs_dsp_mcu_borrow_work(&work);        /* the AIR gate scratch overlays the DSP work buffer */
     if (work < ZS_AIR_SCRATCH_COMPLEX || !zs_station_pipeline_init(&pipeline, &pipeline_port, scratch, dsp_pcm)) return false;
+    {
+      size_t stash_samples;
+      int16_t *stash = zs_dsp_mcu_borrow_stash(&stash_samples);   /* idle between two feature extractions */
+      if (stash_samples < ZS_PIPELINE_HOP_SAMPLES) return false;
+      zs_station_pipeline_set_stash(&pipeline, stash);
+    }
   }
   zs_selftest_init(&selftests);
   (void)zs_selftest_register(&selftests, ZS_ST_ID_POWER_INA226, "power_good", st_power_good, NULL, true);

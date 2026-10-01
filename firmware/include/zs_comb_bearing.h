@@ -68,6 +68,19 @@ unsigned zs_comb_bearings_from_ring(const zs_bearing_ctx_t *ctx, zs_comb_bearing
                                     uint64_t end_sample, const float *f0_hz, unsigned count, float temperature_c, float *memory,
                                     zs_comb_bearing_workspace_t *ws, zs_bearing_t *out);
 
+/* Same on a span already decimated into `memory` (zs_comb_bearing_decimate_ring / _channels). */
+unsigned zs_comb_bearings_from_memory(const zs_bearing_ctx_t *ctx, zs_comb_bearing_stats_t *stats, const float *memory,
+                                      const float *f0_hz, unsigned count, float temperature_c, zs_comb_bearing_workspace_t *ws,
+                                      zs_bearing_t *out);
+
+/* The decimated 8 kHz span (ZS_COMB_BEARING_MEMORY floats, channel after channel) of the ring span [end_sample - 16000,
+   end_sample) or of the last ZS_COMB_BEARING_SPAN samples of four channel buffers; false when the audio is not there.
+   Shared with the direction separation (zs_doa_sep.h). */
+bool zs_comb_bearing_decimate_ring(const zs_audio_ring_t *ring, uint64_t end_sample, float *memory);
+bool zs_comb_bearing_decimate_channels(const int16_t *const channels[ZS_SPATIAL_MIC_COUNT], uint32_t count_samples, float *memory);
+/* Hann frame `frame` (0 .. ZS_COMB_BEARING_FRAMES - 1) of every channel of the decimated span -> its spectrum. */
+bool zs_comb_bearing_frame_spectra(const float *memory, unsigned frame, zs_complex_t spectrum[ZS_SPATIAL_MIC_COUNT][ZS_COMB_BEARING_N]);
+
 /* Same from four caller-provided channel buffers at 32 kHz of at least ZS_COMB_BEARING_SPAN + ZS_COMB_BEARING_TAPS - 1
    samples each (the span is the last ZS_COMB_BEARING_SPAN samples; the filter reads the taps before it). */
 unsigned zs_comb_bearings_from_channels(const zs_bearing_ctx_t *ctx, zs_comb_bearing_stats_t *stats,

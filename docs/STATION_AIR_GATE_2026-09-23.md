@@ -140,5 +140,5 @@ windows 916 -> 972.  Tests: `firmware/tests/test_comb_bearing.c`,
 
 Limits: the gate separates combs by pitch only.  Two sources with fundamentals in a small integer ratio (DJI Mavic 3
 Pro 174 Hz and Mini 3 Pro 261 Hz are 2:3) look like one comb of 87 Hz, and two of the same type within 4 % are not
-separated at all.  Next: separation by direction before pitch (the direction of every spectral line from the
-inter-channel phase, lines grouped by azimuth into targets, the fundamental of each group).
+separated at all.  Done next (2026-10-01): separation by direction before pitch, each direction classified on its own
+window (`docs/STATION_DIRECTION_SEPARATION_2026-10-01.md`, `firmware/include/zs_doa_sep.h`).

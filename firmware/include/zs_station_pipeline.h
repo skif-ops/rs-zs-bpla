@@ -25,6 +25,26 @@
  *     multirotor's rotors at different speeds), classified and reported as one, the main one; a new comb starts as
  *     one target with those heard already, and becomes a target of its own once its bearings disagree with theirs
  *     (two windows).
+ *   - several targets by direction first (zs_doa_sep.h): from the first sign of a target (the gate's comb or any level
+ *     above none) the newest 0.5 s of every window
+ *     gives every spectral bin its own direction, the directions are counted over windows, and up to three direction
+ *     tracks follow where many bins point (the comb cannot split two targets whose fundamentals are in a small integer
+ *     ratio, nor hear one masked by a louder one).  When at least two direction tracks are confirmed and have their
+ *     label (fundamental), and the caller lent a stash (zs_station_pipeline_set_stash), each one is classified on its
+ *     own window: a window spends its newest 0.5 s on the next direction (the bins its plane wave fits best, soft mask)
+ *     into the stash and is classified as it is (the main stream); the next window completes that direction's 1 s
+ *     from the stash and its own newest 0.5 s and is classified as that direction (the 4-channel ring keeps only the
+ *     newest 0.5 s of a window for the DSP task, one mask per window keeps the load).  A direction is a target when
+ *     its own votes alone have a UAV majority of at least ZS_CLASSIFICATION_MIN_WINDOWS windows, or a majority of weak
+ *     UAV votes with its own comb (its label) and almost no ground votes (no votes of the main stream, no comb of the
+ *     gate: a tractor heard beside a UAV is a direction, never a target); the station is
+ *     CONFIRMED when the main stream or a target is.  The confirmed targets then replace the comb bearings: one
+ *     bearing each with its label as f0_hz (the gate's fundamental when the label is an integer multiple of exactly
+ *     one of the gate's combs, so the detections and the bearings name the same source).  While two directions or
+ *     more are confirmed (also before they are labelled and classified) nothing else is delivered: the full-band
+ *     bearing follows the louder of them, and the gate's main comb may be the one that is no UAV (a tractor's beside a
+ *     UAV the main stream confirms).  Without a stash, or with fewer than two confirmed
+ *     directions, everything is as above.
  * The module is portable: the extractor, the clock, the identity and the event sink are ports, the
  * 1 s mono window (4-byte aligned: the comb bearings borrow it as floats) and the gate scratch are caller-provided
  * (the target overlays them on DSP memory).
@@ -34,6 +54,7 @@
 #include "zs_bearing.h"
 #include "zs_comb_bearing.h"
 #include "zs_classifier_consensus.h"
+#include "zs_doa_sep.h"
 #include "zs_dsp.h"
 #include "zs_presence.h"
 #include "zs_types.h"
@@ -47,6 +68,8 @@
 #define ZS_PIPELINE_SOURCE_HOLD_WINDOWS 8u                /* a source track not heard this long is free again */
 #define ZS_PIPELINE_TOGETHER_DEG 6.0f                     /* two combs from one direction (or 2 sigma) ...          */
 #define ZS_PIPELINE_TOGETHER_WINDOWS 3u                   /* ... for this many windows are one target (its rotors) */
+#define ZS_PIPELINE_LABEL_RATIO 0.04f                     /* a direction's label within 4 % of k x a gate comb (k 1..6) */
+#define ZS_PIPELINE_DOA_BEARING_AGE 4u                    /* a direction's own window is masked by a bearing this recent */
 
 /* One source of a mixture followed from window to window. */
 typedef struct {
@@ -59,6 +82,20 @@ typedef struct {
   bool heard;                      /* in the current window */
   bool with_others;                /* the gate reported it beside another source at least once (a mixture) */
 } zs_pipeline_source_t;
+
+/* A target found by direction (zs_doa_sep) with votes of its own (classified on its own window). */
+typedef struct {
+  uint16_t id;                     /* the direction track; 0 = free slot */
+  zs_classifier_consensus_t votes;
+  zs_classification_t classification;
+  zs_hier_classification_t hierarchy;
+  zs_presence_t presence;
+  zs_bearing_t bearing;            /* its last bearing (valid once it had one); f0_hz = its label */
+  uint8_t bearing_age;             /* windows since that bearing (0: this window) */
+  float strength;                  /* the direction memory's peak */
+  bool confirmed_direction;
+  uint8_t absent;                  /* windows its track has been gone (it may come back, zs_doa_sep recall) */
+} zs_pipeline_target_t;
 
 typedef struct {
   void *ctx;
@@ -119,10 +156,26 @@ typedef struct {
   uint32_t merged_windows;         /* mixture windows whose combs all came from one target */
   uint64_t last_bearing_end;
   uint64_t track_event_id;         /* event id of the rising edge of the current CONFIRMED run */
+  zs_doa_sep_t doa;                /* direction tracks (zs_doa_sep.h) */
+  zs_pipeline_target_t doa_targets[ZS_DOA_MAX_TRACKS];
+  int16_t *stash;                  /* ZS_PIPELINE_HOP_SAMPLES: a direction's masked 0.5 s between two windows (NULL: none) */
+  uint16_t stash_target;           /* whose 0.5 s the stash holds (0: none) */
+  uint64_t stash_end;              /* the window it was taken from */
+  uint8_t doa_turn;                /* which direction the next stash takes */
+  uint32_t doa_windows;            /* windows with the direction tracks running */
+  uint32_t doa_mixture_windows;    /* windows with two or more confirmed directions (labelled) */
+  uint32_t doa_classified_windows; /* windows classified as one direction's own window */
+  uint32_t doa_confirmed_windows;  /* windows CONFIRMED by a direction target while the main stream was not */
+  uint32_t doa_bearings;           /* bearings delivered from direction targets */
+  uint32_t doa_mask_failed;        /* masks not made: the ring no longer held the span */
 } zs_station_pipeline_t;
 
 bool zs_station_pipeline_init(zs_station_pipeline_t *p, const zs_station_pipeline_port_t *port,
                               zs_complex_t *scratch, int16_t *window);
+/* Lends a buffer of ZS_PIPELINE_HOP_SAMPLES int16 that nothing else touches between two windows (the target: the DSP
+   magnitude buffer, idle between two feature extractions).  Without it the directions are tracked but not classified
+   and their bearings never delivered. */
+void zs_station_pipeline_set_stash(zs_station_pipeline_t *p, int16_t *stash);
 /* Copies the next complete window out of the ring into `window` (a few ms) and marks it pending; false when
    no new window is complete or one is still pending. Windows the ring has already overwritten are skipped
    and counted as dropped. On the target the capture task calls this so the copy happens while the samples

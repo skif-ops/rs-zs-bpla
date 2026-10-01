@@ -451,6 +451,11 @@ zs_complex_t *zs_dsp_mcu_borrow_work(size_t *complex_count) {
   return g_work;
 }
 
+int16_t *zs_dsp_mcu_borrow_stash(size_t *samples) {
+  if (samples) *samples = sizeof(g_magbuf) / (sizeof(int16_t));
+  return (int16_t *)(void *)g_magbuf;
+}
+
 size_t zs_dsp_mcu_scratch_bytes(void) {
   return sizeof(g_work) + sizeof(g_magbuf) + sizeof(g_yin) + sizeof(g_f0) + sizeof(g_harmonics) + sizeof(g_cos_q) + sizeof(g_mel_edges);
 }
