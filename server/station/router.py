@@ -2,7 +2,7 @@
 from __future__ import annotations
 import asyncio, json, os, time
 from pathlib import Path
-from fastapi import APIRouter, Body, Depends, File, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
 from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage, CommandKeyRotationRequest, FirmwareUpdateRequest, NetworkConfigRequest
 from station.command_codec import validate_command_payload
@@ -11,6 +11,9 @@ from station.model_codec import ModelRepository, parse_model
 from station.network_config import NETWORK_COMMAND, next_version
 from station.store import EventStore
 from station.replay import ReplayError, build_replay, replay_sources
+from station.geometry_coverage import coverage_grid
+from fusion.bearing_fusion import MAX_RANGE_M
+from fusion.geodesy import EnuFrame
 from integration import dioneya_alert
 from station.service import StationFusionService
 from station.cbor_codec import decode_detection_cbor
@@ -111,6 +114,29 @@ async def replay(track_id:str|None=None,system_event_id:str|None=None,since_us:i
 @router.get('/replay/sources')
 async def replay_sources_list(limit:int=50):
     return replay_sources(store,min(max(limit,1),200))
+
+@router.get('/geometry/coverage')
+async def geometry_coverage(station_ids:str,range_m:float=Query(gt=0,le=MAX_RANGE_M),sigma_deg:float=Query(3.0,gt=0,le=45),
+                            height_m:float=Query(150.0,ge=0,le=5000),origin_lat:float|None=None,origin_lon:float|None=None,
+                            origin_alt:float|None=None):
+    """Blind zones of the station geometry (decision 5): per grid cell around the stations whether a target at height_m
+    gets a fused point and with which error; in metres east/north of the origin (default: the stations' mean), so the
+    replay page lays it under its own frame."""
+    try: ids=sorted({int(x) for x in station_ids.split(',') if x.strip()})
+    except ValueError: raise HTTPException(422,'station_ids: comma-separated integers') from None
+    if not ids or len(ids)>64: raise HTTPException(422,'station_ids: 1..64 stations')
+    positions={s:store.station_position(s) for s in ids}
+    missing=[s for s,p in positions.items() if p is None]
+    if missing: raise HTTPException(404,f'no position for station(s) {missing}')
+    if origin_lat is None or origin_lon is None:
+        origin_lat=sum(p[0] for p in positions.values())/len(ids); origin_lon=sum(p[1] for p in positions.values())/len(ids)
+        origin_alt=sum(p[2] for p in positions.values())/len(ids)
+    frame=EnuFrame(origin_lat,origin_lon,origin_alt or 0.0)
+    enu={s:[float(v) for v in frame.to_enu(*p)] for s,p in positions.items()}
+    grid=coverage_grid([enu[s] for s in ids],range_m=range_m,sigma_deg=sigma_deg,height_m=height_m+sum(e[2] for e in enu.values())/len(ids))
+    grid['height_m']=height_m
+    return {**grid,'origin':{'lat':origin_lat,'lon':origin_lon,'alt_msl_m':origin_alt or 0.0},
+            'stations':[{'station_id':s,'e':round(enu[s][0],1),'n':round(enu[s][1],1),'u':round(enu[s][2],1)} for s in ids]}
 
 @router.get('/alerts')
 async def alerts(after_seq:int=0,tenant:str|None=None,limit:int=500):
