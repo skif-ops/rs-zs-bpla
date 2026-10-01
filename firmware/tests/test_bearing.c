@@ -129,7 +129,7 @@ static bool fake_emit(void *c, const zs_detection_t *d) { (void)c; (void)d; retu
 /* The event carries the window's bearing as DOA (key 11) and reference TDOAs (key 14); azimuth wraps into 0..35999. */
 static void test_detection_carries_bearing(void) {
   static zs_complex_t scratch[ZS_AIR_SCRATCH_COMPLEX];
-  static int16_t window[ZS_PIPELINE_WINDOW_SAMPLES];
+  static int16_t window[ZS_PIPELINE_WINDOW_SAMPLES] __attribute__((aligned(4)));   /* the pipeline lends it as floats */
   static zs_station_pipeline_t p;
   const zs_station_pipeline_port_t port = {NULL, fake_extract, NULL, fake_emit, 17u, 5u, 0u, 0u, NULL, NULL};
   zs_detection_t d;

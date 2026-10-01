@@ -21,6 +21,7 @@ KEEPALIVE_MARGIN_US = 2_000_000     # keep-alive detections of the window: withi
 # a ghost fusion would report a target where there is none.
 F0_RATIO_MAX = 1.45
 F0_MIN_HZ = 20.0
+OTHER_SOURCE_RATIO = 1.12   # a segment's fundamental this far from its detections' follows another source
 
 EXTERNAL_CLASS = {
     int(TargetClass.PISTON_UAV): "uav_piston",
@@ -78,7 +79,9 @@ def from_detections(detections: list[DetectionMessage]) -> Signature:
 def station_track_signature(store, station_id: int, track_event_id: int, segment=None) -> Signature:
     """Signature of a station track: its rising-edge detection and the keep-alive detections of the window.  For a
     segment of the track (station/track_segments.py) the keep-alive detections within the segment's bearings; the
-    rising edge only for the first segment (a later segment hears another target than the edge did)."""
+    rising edge only for the first segment (a later segment hears another target than the edge did).  When the
+    segment's bearings name their source's fundamental (several sources at once), that is the segment's fundamental,
+    and a segment of another source than the detections describe has no known class."""
     detections = []
     rising = store.get_detection(station_id, track_event_id) if segment is None or segment.key == 0 else None
     if rising is not None:
@@ -89,7 +92,16 @@ def station_track_signature(store, station_id: int, track_event_id: int, segment
         for d in store.station_detections(station_id, span[0] - KEEPALIVE_MARGIN_US, span[1] + KEEPALIVE_MARGIN_US):
             if d.event_id not in seen:
                 detections.append(d)
-    return from_detections(detections)
+    signature = from_detections(detections)
+    own = segment.f0_hz if segment is not None else None
+    if own is None:
+        return signature
+    # the segment's bearings name their source (bearing batch schema 2): its fundamental is the bearings', and when it
+    # is not the source the detections describe (the station classified its main source, this segment follows another
+    # one it hears at the same time) the class is not known
+    if signature.f0_hz is not None and max(own, signature.f0_hz) / min(own, signature.f0_hz) > OTHER_SOURCE_RATIO:
+        return Signature(UNKNOWN.class_id, UNKNOWN.label, True, 0.0, None, own)
+    return Signature(signature.class_id, signature.label, signature.unknown, signature.confidence, signature.type_label, own)
 
 
 def compatible(a: Signature, b: Signature) -> bool:

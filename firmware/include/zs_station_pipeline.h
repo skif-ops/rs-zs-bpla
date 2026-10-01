@@ -12,13 +12,27 @@
  *     level-1 confidence and the detector profile (piston / reactive / generic) of the consensus family;
  *   - while CONFIRMED every window also gets a bearing of the 3+1 array (zs_bearing, the last 0.5 s of the window
  *     from the 4-channel ring): the event carries it as DOA (key 11) and the reference TDOAs (key 14), and the
- *     bearing port, when set, receives each one (the bearing stream while tracking).
+ *     bearing port, when set, receives each one (the bearing stream while tracking);
+ *   - when the AIR gate hears other sources beside the main one (a mixture, up to three), every source is followed
+ *     as a source track (its fundamental from window to window, within ZS_PIPELINE_SOURCE_F0_STEP) with votes of its
+ *     own: each mixture window classifies one source in turn with all the others suppressed, the main one included
+ *     (one feature extraction per window, as before), and the source's presence is level 1 over its own votes with
+ *     the gate's comb evidence.  The station is CONFIRMED when the main stream or any source track is; the event then
+ *     names the confirming source's class.  Every CONFIRMED source gets its own bearing from the bins of its
+ *     harmonics (zs_comb_bearing): the port receives each one with its fundamental (f0_hz), so the server follows
+ *     several targets heard by one station; the event carries the first one.  The bearings of a mixture are taken in
+ *     every window: two combs heard from one direction for ZS_PIPELINE_TOGETHER_WINDOWS windows are one target (a
+ *     multirotor's rotors at different speeds), classified and reported as one, the main one; a new comb starts as
+ *     one target with those heard already, and becomes a target of its own once its bearings disagree with theirs
+ *     (two windows).
  * The module is portable: the extractor, the clock, the identity and the event sink are ports, the
- * 1 s mono window and the 64 KB gate scratch are caller-provided (the target overlays them on DSP memory).
+ * 1 s mono window (4-byte aligned: the comb bearings borrow it as floats) and the gate scratch are caller-provided
+ * (the target overlays them on DSP memory).
  */
 #include "zs_air_gate.h"
 #include "zs_audio.h"
 #include "zs_bearing.h"
+#include "zs_comb_bearing.h"
 #include "zs_classifier_consensus.h"
 #include "zs_dsp.h"
 #include "zs_presence.h"
@@ -28,6 +42,23 @@
 #define ZS_PIPELINE_HOP_SAMPLES 16000u
 #define ZS_PIPELINE_DEFAULT_UPDATE_WINDOWS 10u   /* 5 s at the 0.5 s hop */
 #define ZS_PIPELINE_BEARING_SPAN ZS_PIPELINE_HOP_SAMPLES   /* the newest 0.5 s of a window, still in a 1.125 s ring */
+#define ZS_PIPELINE_SOURCES (1u + ZS_AIR_MAX_SECONDARY)     /* source tracks of a mixture */
+#define ZS_PIPELINE_SOURCE_F0_STEP 0.06f                  /* a source's fundamental moves less than this per window */
+#define ZS_PIPELINE_SOURCE_HOLD_WINDOWS 8u                /* a source track not heard this long is free again */
+#define ZS_PIPELINE_TOGETHER_DEG 6.0f                     /* two combs from one direction (or 2 sigma) ...          */
+#define ZS_PIPELINE_TOGETHER_WINDOWS 3u                   /* ... for this many windows are one target (its rotors) */
+
+/* One source of a mixture followed from window to window. */
+typedef struct {
+  float f0_hz;                     /* last fundamental; 0 = free */
+  uint32_t last_window;            /* the window it was last heard in */
+  zs_classifier_consensus_t votes; /* its own windows, classified with the other sources suppressed */
+  zs_classification_t classification;
+  zs_hier_classification_t hierarchy;
+  zs_presence_t presence;
+  bool heard;                      /* in the current window */
+  bool with_others;                /* the gate reported it beside another source at least once (a mixture) */
+} zs_pipeline_source_t;
 
 typedef struct {
   void *ctx;
@@ -43,7 +74,8 @@ typedef struct {
   uint8_t update_period_windows;   /* 0 = ZS_PIPELINE_DEFAULT_UPDATE_WINDOWS */
   /* Optional: air temperature for the speed of sound (NULL = 15 C; azimuth barely depends on it). */
   float (*temperature_c)(void *ctx);
-  /* Optional: every valid bearing of a CONFIRMED window (end_sample = the window's last sample). */
+  /* Optional: every valid bearing of a CONFIRMED window (end_sample = the window's last sample); with several
+     sources one call per source, bearing->f0_hz telling which (0 for the full-band bearing of a single source). */
   void (*bearing)(void *ctx, const zs_bearing_t *bearing, uint64_t end_sample, uint64_t track_event_id);
 } zs_station_pipeline_port_t;
 
@@ -72,7 +104,19 @@ typedef struct {
   bool confirmed;                  /* current level-1 state */
   const zs_audio_ring_t *ring;     /* set by fetch: the 4-channel source of the bearings */
   zs_bearing_ctx_t bearing_ctx;
-  zs_bearing_t last_bearing;       /* of the window ending at last_bearing_end */
+  zs_bearing_t last_bearing;       /* of the window ending at last_bearing_end (the main source's) */
+  zs_comb_bearing_stats_t comb_stats;   /* bearings of several sources (zs_comb_bearing) */
+  uint32_t comb_windows;           /* windows whose bearings came from the sources' combs */
+  zs_pipeline_source_t sources[ZS_PIPELINE_SOURCES];
+  uint8_t source_of[ZS_PIPELINE_SOURCES];   /* this window's sources (main first) -> source track, 0xff = none */
+  float source_f0[ZS_PIPELINE_SOURCES];     /* this window's fundamentals, main first */
+  uint8_t source_count;            /* this window's sources (0 = not a mixture) */
+  uint8_t mixture_turn;            /* which source of a mixture the next window classifies */
+  uint32_t source_confirmed_windows; /* windows CONFIRMED by a source track while the main stream was not */
+  uint8_t together[ZS_PIPELINE_SOURCES][ZS_PIPELINE_SOURCES];   /* source tracks heard from one direction: windows */
+  bool same_target[ZS_PIPELINE_SOURCES][ZS_PIPELINE_SOURCES];   /* ... and the decision (one target, e.g. a quadcopter
+                                                                   whose rotors run at different speeds) */
+  uint32_t merged_windows;         /* mixture windows whose combs all came from one target */
   uint64_t last_bearing_end;
   uint64_t track_event_id;         /* event id of the rising edge of the current CONFIRMED run */
 } zs_station_pipeline_t;

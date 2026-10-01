@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS mqtt_detection_ingress(event_key BLOB NOT NULL, stati
 CREATE TABLE IF NOT EXISTS commands(command_id TEXT PRIMARY KEY, station_id INTEGER NOT NULL, created_us INTEGER NOT NULL, expires_us INTEGER NOT NULL, command TEXT NOT NULL, payload TEXT NOT NULL, delivered INTEGER NOT NULL DEFAULT 0, acked INTEGER NOT NULL DEFAULT 0, last_publish_us INTEGER NOT NULL DEFAULT 0, publish_count INTEGER NOT NULL DEFAULT 0, ack_result INTEGER, ack_detail INTEGER, completed_us INTEGER);
 CREATE INDEX IF NOT EXISTS idx_cmd_station ON commands(station_id, delivered, acked);
 CREATE TABLE IF NOT EXISTS audio(event_id INTEGER NOT NULL, station_id INTEGER NOT NULL, segment TEXT NOT NULL, path TEXT NOT NULL, codec TEXT, sample_rate INTEGER, created_us INTEGER NOT NULL, PRIMARY KEY(event_id, station_id, segment));
-CREATE TABLE IF NOT EXISTS bearings(station_id INTEGER NOT NULL, track_event_id INTEGER NOT NULL, time_us INTEGER NOT NULL, azimuth_cdeg INTEGER NOT NULL, elevation_cdeg INTEGER NOT NULL, sigma_cdeg INTEGER NOT NULL, confidence REAL NOT NULL, frames INTEGER NOT NULL, time_trust TEXT NOT NULL, received_us INTEGER NOT NULL, PRIMARY KEY(station_id, track_event_id, time_us));
+CREATE TABLE IF NOT EXISTS bearings(station_id INTEGER NOT NULL, track_event_id INTEGER NOT NULL, time_us INTEGER NOT NULL, azimuth_cdeg INTEGER NOT NULL, elevation_cdeg INTEGER NOT NULL, sigma_cdeg INTEGER NOT NULL, confidence REAL NOT NULL, frames INTEGER NOT NULL, time_trust TEXT NOT NULL, received_us INTEGER NOT NULL, f0_dhz INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(station_id, track_event_id, time_us, f0_dhz));
 CREATE INDEX IF NOT EXISTS idx_bearing_time ON bearings(time_us);
 CREATE TABLE IF NOT EXISTS fused_tracks(track_id TEXT PRIMARY KEY, system_event_id TEXT, first_time_us INTEGER, last_time_us INTEGER, stations TEXT NOT NULL, points INTEGER NOT NULL, updated_us INTEGER NOT NULL);
 CREATE INDEX IF NOT EXISTS idx_track_last ON fused_tracks(last_time_us);
@@ -42,6 +42,7 @@ class EventStore:
         with self._conn() as c:
             self._migrate_station_event_keys(c)
             self._migrate_track_segments(c)
+            self._migrate_bearing_sources(c)
             c.executescript(SCHEMA)
             self._migrate_commands(c)
             self._migrate_audio(c)
@@ -116,6 +117,33 @@ class EventStore:
                           "SELECT station_id,track_event_id,track_id,0 FROM track_members_before_segments")
                 c.execute("DROP TABLE track_members_before_segments")
                 c.execute("CREATE INDEX IF NOT EXISTS idx_member_track ON track_members(track_id)")
+            c.execute("COMMIT")
+        except BaseException:
+            if c.in_transaction: c.execute("ROLLBACK")
+            raise
+        finally:
+            c.isolation_level=level
+    def _migrate_bearing_sources(self,c):
+        """Bearings stored before a station could follow several sources at once (bearing batch schema 2) had one bearing
+        per station track and time; the source's fundamental (f0_dhz, 0 = not known) joins the key, so the rows move as
+        they are with f0_dhz 0, in one transaction as above."""
+        def pending():
+            names={r['name'] for r in c.execute("PRAGMA table_info(bearings)")}
+            return bool(names) and 'f0_dhz' not in names
+        if not pending(): return
+        level=c.isolation_level
+        c.isolation_level=None
+        try:
+            c.execute("BEGIN IMMEDIATE")
+            if pending():
+                definition=next(line for line in SCHEMA.splitlines() if line.startswith("CREATE TABLE IF NOT EXISTS bearings("))
+                c.execute("ALTER TABLE bearings RENAME TO bearings_before_sources")
+                c.execute("DROP INDEX IF EXISTS idx_bearing_time")
+                c.execute(definition.rstrip(';'))
+                cols="station_id,track_event_id,time_us,azimuth_cdeg,elevation_cdeg,sigma_cdeg,confidence,frames,time_trust,received_us"
+                c.execute(f"INSERT INTO bearings({cols},f0_dhz) SELECT {cols},0 FROM bearings_before_sources")
+                c.execute("DROP TABLE bearings_before_sources")
+                c.execute("CREATE INDEX IF NOT EXISTS idx_bearing_time ON bearings(time_us)")
             c.execute("COMMIT")
         except BaseException:
             if c.in_transaction: c.execute("ROLLBACK")
@@ -250,11 +278,13 @@ class EventStore:
         """Stores the samples of a decoded BearingBatch; returns how many were new (a redelivered batch adds none)."""
         when=int(time.time()*1e6) if now_us is None else now_us
         track=self._sqlite_event_id(batch.track_event_id)
-        rows=[(batch.station_id,track,s.time_us,round(s.azimuth_deg*100),round(s.elevation_deg*100),round(s.sigma_deg*100),s.confidence,s.frames,batch.time_trust,when)
+        rows=[(batch.station_id,track,s.time_us,round(s.azimuth_deg*100),round(s.elevation_deg*100),round(s.sigma_deg*100),s.confidence,s.frames,batch.time_trust,when,
+               round(s.f0_hz*10) if s.f0_hz else 0)
               for s in batch.samples]
         with self.lock,self._conn() as c:
             before=c.total_changes
-            c.executemany("INSERT OR IGNORE INTO bearings VALUES(?,?,?,?,?,?,?,?,?,?)",rows)
+            c.executemany("INSERT OR IGNORE INTO bearings(station_id,track_event_id,time_us,azimuth_cdeg,elevation_cdeg,sigma_cdeg,confidence,frames,"
+                          "time_trust,received_us,f0_dhz) VALUES(?,?,?,?,?,?,?,?,?,?,?)",rows)
             return c.total_changes-before
     def list_bearings(self,*,station_id:int|None=None,track_event_id:int|None=None,system_event_id:str|None=None,
                       since_us:int|None=None,until_us:int|None=None,limit:int=5000)->list[dict[str,Any]]:
@@ -266,11 +296,12 @@ class EventStore:
         if since_us is not None: where.append("b.time_us>=?"); args.append(since_us)
         if until_us is not None: where.append("b.time_us<=?"); args.append(until_us)
         sql=("SELECT b.*,d.system_event_id FROM bearings b LEFT JOIN detections d ON d.event_id=b.track_event_id AND d.station_id=b.station_id"
-             +(" WHERE "+" AND ".join(where) if where else "")+" ORDER BY b.time_us,b.station_id LIMIT ?")
+             +(" WHERE "+" AND ".join(where) if where else "")+" ORDER BY b.time_us,b.station_id,b.f0_dhz LIMIT ?")
         with self._conn() as c: rows=c.execute(sql,(*args,max(1,min(limit,50000)))).fetchall()
         return [{'station_id':r['station_id'],'track_event_id':r['track_event_id']&0xFFFFFFFFFFFFFFFF,'system_event_id':r['system_event_id'],
                  'time_us':r['time_us'],'azimuth_deg':r['azimuth_cdeg']/100,'elevation_deg':r['elevation_cdeg']/100,'sigma_deg':r['sigma_cdeg']/100,
-                 'confidence':r['confidence'],'frames':r['frames'],'time_trust':r['time_trust']} for r in rows]
+                 'confidence':r['confidence'],'frames':r['frames'],'time_trust':r['time_trust'],
+                 'f0_hz':r['f0_dhz']/10 if r['f0_dhz'] else None} for r in rows]
     def get_detection(self,station_id:int,event_id:int)->DetectionMessage|None:
         with self._conn() as c:
             row=c.execute("SELECT payload FROM detections WHERE event_id=? AND station_id=?",(self._sqlite_event_id(event_id),station_id)).fetchone()

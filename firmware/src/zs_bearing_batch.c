@@ -20,15 +20,21 @@ bool zs_bearing_record_from(zs_bearing_record_t *r, uint64_t track_event_id, int
   r->confidence_u8 = (uint8_t)lroundf((b->confidence < 0.0f ? 0.0f : (b->confidence > 1.0f ? 1.0f : b->confidence)) * 255.0f);
   r->frames = b->frames_used;
   r->time_trust = time_trust;
+  {
+    const long f0 = b->f0_hz > 0.0f ? lroundf(b->f0_hz * 10.0f) : 0L;
+    r->f0_dhz = (uint16_t)(f0 > 65535L ? 65535L : f0);
+  }
   return true;
 }
 
 size_t zs_bearing_batch_encode(const zs_bearing_batch_t *b, uint8_t *out, size_t cap) {
   zs_cbor_t c;
+  bool sources = false;
   if (!b || !out || b->count == 0u || b->count > ZS_BEARING_BATCH_MAX_SAMPLES || b->station_id == 0u) return 0u;
+  for (unsigned i = 0u; i < b->count; i++) sources = sources || b->sample[i].f0_dhz != 0u;
   zs_cbor_init(&c, out, cap);
   zs_cbor_map(&c, 9u);
-  zs_cbor_uint(&c, 0u); zs_cbor_uint(&c, ZS_BEARING_BATCH_SCHEMA);
+  zs_cbor_uint(&c, 0u); zs_cbor_uint(&c, sources ? ZS_BEARING_BATCH_SCHEMA_SOURCES : ZS_BEARING_BATCH_SCHEMA);
   zs_cbor_uint(&c, 1u); zs_cbor_uint(&c, ZS_BEARING_BATCH_MESSAGE_TYPE);
   zs_cbor_uint(&c, 2u); zs_cbor_uint(&c, b->station_id);
   zs_cbor_uint(&c, 3u); zs_cbor_uint(&c, b->boot_id);
@@ -39,13 +45,14 @@ size_t zs_bearing_batch_encode(const zs_bearing_batch_t *b, uint8_t *out, size_t
   zs_cbor_uint(&c, 8u); zs_cbor_array(&c, b->count);
   for (unsigned i = 0u; i < b->count; i++) {
     const zs_bearing_sample_t *s = &b->sample[i];
-    zs_cbor_array(&c, 6u);
+    zs_cbor_array(&c, sources ? 7u : 6u);
     zs_cbor_uint(&c, s->dt_ms);
     zs_cbor_uint(&c, s->azimuth_cdeg);
     zs_cbor_int(&c, s->elevation_cdeg);
     zs_cbor_uint(&c, s->sigma_cdeg);
     zs_cbor_uint(&c, s->confidence_u8);
     zs_cbor_uint(&c, s->frames);
+    if (sources) zs_cbor_uint(&c, s->f0_dhz);
   }
   return c.error ? 0u : c.len;
 }
@@ -86,7 +93,7 @@ uint8_t zs_bearing_queue_take(zs_bearing_queue_t *q, uint32_t station_id, uint32
     if (r->track_event_id != batch->track_event_id || r->time_trust != batch->time_trust) break;
     dt = (r->time_us - batch->base_time_us) / 1000;
     if (dt < 0 || dt > (int64_t)UINT32_MAX) break;         /* time went back or jumped: next batch */
-    batch->sample[n] = (zs_bearing_sample_t){(uint32_t)dt, r->azimuth_cdeg, r->elevation_cdeg, r->sigma_cdeg, r->confidence_u8, r->frames};
+    batch->sample[n] = (zs_bearing_sample_t){(uint32_t)dt, r->azimuth_cdeg, r->elevation_cdeg, r->sigma_cdeg, r->confidence_u8, r->frames, r->f0_dhz};
     n++;
     q->head = (uint8_t)((q->head + 1u) % ZS_BEARING_QUEUE_DEPTH);
     q->count--;

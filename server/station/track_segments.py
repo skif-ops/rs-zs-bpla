@@ -18,12 +18,19 @@ The split follows the bearings in time order:
 - waiting bearings that never form a segment (single outliers, reflections) belong to no segment and are not fused;
 - a bearing the station itself gives a sigma above MAX_SIGMA_DEG (its array heard no single clear direction, e.g.
   two targets at once) takes no part: with its wide tolerance it would join any segment and tilt the prediction,
-  and the fusion would give it next to no weight anyway.
+  and the fusion would give it next to no weight anyway;
+- a bearing that names the fundamental of its source (bearing batch schema 2: a station hearing several targets at
+  once sends one bearing per source, zs_comb_bearing.h) continues only a segment whose last named fundamental is
+  within F0_STEP of it (more after a gap: Doppler moves the pitch of a pass by a few per cent a second), and waiting
+  bearings form a new segment only with waiting bearings of the same fundamental.  So the bearings of two or three
+  targets a station hears at the same time make two or three segments, also where their directions cross.  Bearings
+  without a fundamental (schema 1) follow the direction alone, as before.
 
 A target passing close to the station turns the bearing fast but smoothly: the straight-line prediction follows it.
 The decisions depend on earlier bearings only, so segments found once stay as they are when later batches arrive.
-A segment is named by the time of its first bearing; the first segment of a track by 0 (FIRST_SEGMENT), so a fused
-track stored before segments existed keeps its members.
+A segment is named by the time of its first bearing (plus 1 us for each earlier segment starting at the same time:
+several sources start together); the first segment of a track by 0 (FIRST_SEGMENT), so a fused track stored before
+segments existed keeps its members.
 """
 from __future__ import annotations
 
@@ -44,6 +51,8 @@ WAIT_S = 6.0                    # a bearing waits this long for others to agree 
 ACTIVE_S = 6.0                  # a segment without a bearing for 6 s takes no more (the station window: 3 s)
 MAX_RATE_DEG_S = 30.0           # the prediction never turns faster (a target 100 m away at 50 m/s: 29 deg/s)
 MAX_SIGMA_DEG = 10.0            # bearings less certain than this belong to no segment
+F0_STEP = 0.05                  # a bearing's fundamental within 5 % of the segment's last one...
+F0_STEP_PER_S = 0.05            # ...plus 5 % per second of gap (Doppler of a close pass: up to ~7 %/s)
 
 
 def wrap(deg: float) -> float:
@@ -62,6 +71,19 @@ class Segment:
     @property
     def last_us(self) -> int:
         return self.rows[-1]["time_us"]
+
+    @property
+    def f0_hz(self) -> float | None:
+        """Median fundamental of the bearings that name one (None: none does)."""
+        f0s = [r["f0_hz"] for r in self.rows if r.get("f0_hz")]
+        return float(np.median(f0s)) if f0s else None
+
+    def last_f0(self) -> tuple[float, int] | None:
+        """(fundamental, time) of the last bearing that names one."""
+        for r in reversed(self.rows):
+            if r.get("f0_hz"):
+                return r["f0_hz"], r["time_us"]
+        return None
 
 
 def _line(rows: list[dict]) -> tuple[float, float, float]:
@@ -95,6 +117,19 @@ def _tolerance(row: dict, gap_s: float) -> float:
     return max(JUMP_MIN_DEG, JUMP_SIGMA * row["sigma_deg"]) + GAP_SLACK_DEG_PER_S * max(0.0, gap_s - 1.0)
 
 
+def _f0_close(a: float | None, b: float | None, gap_s: float) -> bool:
+    if not a or not b:
+        return True
+    return abs(a - b) <= (F0_STEP + F0_STEP_PER_S * max(0.0, gap_s)) * min(a, b)
+
+
+def _same_source(segment: Segment, row: dict) -> bool:
+    last = segment.last_f0()
+    if last is None or not row.get("f0_hz"):
+        return True
+    return _f0_close(last[0], row["f0_hz"], (row["time_us"] - last[1]) * 1e-6)
+
+
 def _agree(rows: list[dict]) -> bool:
     if len(rows) < 2:
         return True
@@ -107,7 +142,7 @@ def split(rows: list[dict]) -> list[Segment]:
     """The segments of one station track's bearings (any order; sorted by time here).  Up to MAX_ACTIVE segments
     run at once (a station whose bearing alternates between two targets): a bearing joins the active segment that
     predicts it best."""
-    rows = sorted((r for r in rows if r["sigma_deg"] <= MAX_SIGMA_DEG), key=lambda r: r["time_us"])
+    rows = sorted((r for r in rows if r["sigma_deg"] <= MAX_SIGMA_DEG), key=lambda r: (r["time_us"], r.get("f0_hz") or 0.0))
     if not rows:
         return []
     segments = [Segment(FIRST_SEGMENT, [rows[0]])]
@@ -116,29 +151,35 @@ def split(rows: list[dict]) -> list[Segment]:
         best = None
         for seg in segments:
             gap_s = (row["time_us"] - seg.last_us) * 1e-6
-            if gap_s > ACTIVE_S:
-                continue
+            if gap_s > ACTIVE_S or seg.last_us == row["time_us"] or not _same_source(seg, row):
+                continue                                         # one bearing per segment and window
             residual = abs(wrap(row["azimuth_deg"] - _predict(seg.rows, row["time_us"])))
             if residual <= _tolerance(row, gap_s) and (best is None or residual < best[0]):
                 best = (residual, seg)
+        waiting = [w for w in waiting if row["time_us"] - w["time_us"] <= WAIT_S * 1e6]
         if best is not None:
             best[1].rows.append(row)
-            waiting = [w for w in waiting if row["time_us"] - w["time_us"] <= WAIT_S * 1e6]
             continue
         waiting.append(row)
-        waiting = [w for w in waiting if row["time_us"] - w["time_us"] <= WAIT_S * 1e6]
-        while not _agree(waiting):
-            waiting.pop(0)
-        if len(waiting) >= NEW_SEGMENT_BEARINGS and (waiting[-1]["time_us"] - waiting[0]["time_us"]) * 1e-6 >= NEW_SEGMENT_MIN_S:
-            segments.append(Segment(waiting[0]["time_us"], waiting))
-            waiting = []
+        # the waiting bearings of this bearing's source (all of them when the bearings name none)
+        group = [w for w in waiting if _f0_close(w.get("f0_hz"), row.get("f0_hz"), (row["time_us"] - w["time_us"]) * 1e-6)
+                 and (w is row or w["time_us"] != row["time_us"])]
+        while not _agree(group):
+            waiting.remove(group.pop(0))
+        if len(group) >= NEW_SEGMENT_BEARINGS and (group[-1]["time_us"] - group[0]["time_us"]) * 1e-6 >= NEW_SEGMENT_MIN_S:
+            key = group[0]["time_us"]
+            while any(s.key == key for s in segments):
+                key += 1                                         # several sources start at the same time
+            segments.append(Segment(key, group))
+            waiting = [w for w in waiting if not any(w is g for g in group)]
     return segments
 
 
-def segment_at(segments: list[Segment], time_us: int) -> Segment | None:
-    """The segment holding the bearing of this time (None: an outlier or a bearing still waiting)."""
+def segment_at(segments: list[Segment], time_us: int, f0_hz: float | None = None) -> Segment | None:
+    """The segment holding the bearing of this time (and source, when several share the time; None: an outlier or a
+    bearing still waiting)."""
     for s in segments:
-        if any(r["time_us"] == time_us for r in s.rows):
+        if any(r["time_us"] == time_us and (f0_hz is None or (r.get("f0_hz") or None) == f0_hz) for r in s.rows):
             return s
     return None
 
