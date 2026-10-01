@@ -378,6 +378,9 @@ def _reports(store, trial: Trial, crit: Criteria) -> list[dict]:
 
 
 def _associate(trial: Trial, report: dict, crit: Criteria) -> tuple[TruthPass, float, np.ndarray] | None:
+    """The pass a report belongs to: of the passes within the association range, the one its direction points at when
+    it has one (several targets at once: a station's bearings of each source belong to that source), else the
+    nearest."""
     st = trial.stations[report["station_id"]]
     best = None
     for p in trial.passes:
@@ -385,8 +388,13 @@ def _associate(trial: Trial, report: dict, crit: Criteria) -> tuple[TruthPass, f
         if hit is None:
             continue
         rng = float(np.linalg.norm(hit[1] - st))
-        if rng <= crit.assoc_range_m and (best is None or rng < best[0]):
-            best = (rng, p, hit[0], hit[1])
+        if rng > crit.assoc_range_m:
+            continue
+        key = rng
+        if report.get("az") is not None:
+            key = abs((report["az"] - direction(st, hit[1])[0] + 180.0) % 360.0 - 180.0)
+        if best is None or key < best[0]:
+            best = (key, p, hit[0], hit[1])
     return (best[1], best[2], best[3]) if best else None
 
 
