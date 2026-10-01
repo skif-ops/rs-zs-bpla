@@ -105,7 +105,8 @@
 #define APP_AUDIO_UPLOAD_MAX_MS      300000u  /* S3 watchdog extension while an audio upload runs (~314 chunks both) */
 /* Tracking window and bearing stream (addendum H): the detector keeps running in S3 after an event of a new track
    (DSP + modem at once: the energy cap is the window), a bearing per CONFIRMED window, one batch a second. */
-#define APP_TRACK_MAX_MS             120000u  /* longest tracking window (also the S3 watchdog extension while it is open) */
+/* the longest tracking window is the runtime parameter track_max_s (CMD_SET_PARAMS id 7, default 300 s); it also
+   extends the S3 watchdog while a window is open */
 #define APP_TRACK_LOST_WINDOWS       6u       /* the window closes after this many windows without CONFIRMED (3 s) */
 #define APP_BEARING_BATCH_MS         1000u    /* a batch at most this often while tracking */
 

@@ -16,6 +16,7 @@ typedef struct {
   float level;                   /* 0..1 */
   float az_start_deg, az_end_deg; /* direction of arrival, linear over the segment (0/0 = north on the horizon) */
   float el_deg;
+  bool steady;                   /* world mode: constant level and pitch (the twin scales the level by range) */
 } scene_segment_t;
 
 typedef struct {
