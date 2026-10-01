@@ -10,8 +10,8 @@
   "archives": [
     {
       "name": "EVT_PRE_20_ПОЛНЫЙ_ПАКЕТ_20261001_REV_D2.zip",
-      "sha256": "78e4b6c20f74c9fc92c6f1454bebcf5f6a44808107b10826013c1f5e25aa3edf",
-      "bytes": 12348343,
+      "sha256": "282fec91abf50683a00ee89e2212dc625cef792034b0f32852453b3298ad6e53",
+      "bytes": 12348190,
       "entries": 120
     },
     {
@@ -34,8 +34,8 @@
     },
     {
       "name": "EVT_PRE_20_СБОРКА_И_КОРПУСА_20261001_REV_D2.zip",
-      "sha256": "f69d7f8827e9e648d49c2db5683fc92e9ba15b777a63aec2814e2ab12e938b0c",
-      "bytes": 5217177,
+      "sha256": "610693deb54686bfb51bba9907d55e78320339aa54e94dd391305eea3bb06a15",
+      "bytes": 5217024,
       "entries": 98
     },
     {
