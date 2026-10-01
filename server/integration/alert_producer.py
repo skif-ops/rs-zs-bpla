@@ -36,7 +36,7 @@ class AlertProducer:
         self.store = store
         self.tenant = tenant
         self.clock = clock
-        self._last_bearing: dict[tuple[int, int], int] = {}
+        self._last_bearing: dict[tuple[int, int, int], int] = {}   # (station, track, segment) -> time of the last line
         self._last_sweep = 0
 
     def now_us(self) -> int:
@@ -117,23 +117,30 @@ class AlertProducer:
         now = self.now_us()
         self.sweep(now)
         key = (batch.station_id, batch.track_event_id)
-        sample = batch.samples[-1]
-        # the segment of the station track this bearing belongs to (station/track_segments.py); an outlier or a
-        # bearing still waiting for its segment draws no line
-        segment = track_segments.segment_at(station_segments(self.store, *key), sample.time_us)
-        if segment is None or self.store.track_of_member(*key, segment.key) is not None:   # a fused track carries it
-            self._touch(now, sample.time_us, stations=[batch.station_id], level="warning", klass=None)
-            return
-        signature = target_match.station_track_signature(self.store, *key, segment).as_class()
-        episode = self._touch(now, sample.time_us, stations=[batch.station_id], level="warning", klass=signature)
-        last = self._last_bearing.get(key)
-        if last is not None and sample.time_us < last + BEARING_PERIOD_US:
-            return
-        self._last_bearing[key] = sample.time_us
-        position = self.store.station_position(batch.station_id, batch.track_event_id)
-        body = msg.bearing_object(msg.station(batch.station_id, position), batch.track_event_id, sample.as_dict(), signature)
-        self._emit("bearing", f"bearing:{batch.station_id}:{batch.track_event_id:016x}:{sample.time_us}",
-                   episode["alert_id"], sample.time_us, now, bearing=body)
+        # the newest bearing of every source in the batch (one when the station hears one target; with several at
+        # once a bearing per source, bearing batch schema 2), each a line of its own segment
+        newest: dict[float | None, object] = {}
+        for sample in batch.samples:
+            newest[sample.f0_hz] = sample
+        segments = station_segments(self.store, *key)
+        for sample in sorted(newest.values(), key=lambda x: (x.time_us, x.f0_hz or 0.0)):
+            # the segment of the station track this bearing belongs to (station/track_segments.py); an outlier or a
+            # bearing still waiting for its segment draws no line
+            segment = track_segments.segment_at(segments, sample.time_us, sample.f0_hz)
+            if segment is None or self.store.track_of_member(*key, segment.key) is not None:   # a fused track carries it
+                self._touch(now, sample.time_us, stations=[batch.station_id], level="warning", klass=None)
+                continue
+            signature = target_match.station_track_signature(self.store, *key, segment).as_class()
+            episode = self._touch(now, sample.time_us, stations=[batch.station_id], level="warning", klass=signature)
+            last = self._last_bearing.get((*key, segment.key))
+            if last is not None and sample.time_us < last + BEARING_PERIOD_US:
+                continue
+            self._last_bearing[(*key, segment.key)] = sample.time_us
+            position = self.store.station_position(batch.station_id, batch.track_event_id)
+            body = msg.bearing_object(msg.station(batch.station_id, position), batch.track_event_id, sample.as_dict(), signature)
+            source = f":{round(sample.f0_hz * 10)}" if sample.f0_hz else ""
+            self._emit("bearing", f"bearing:{batch.station_id}:{batch.track_event_id:016x}:{sample.time_us}{source}",
+                       episode["alert_id"], sample.time_us, now, bearing=body)
 
     def on_track(self, track: dict) -> None:
         """A recomputed fused track (station/track_fusion.py): its newest point, once."""

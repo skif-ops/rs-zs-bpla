@@ -73,7 +73,7 @@ def target_at(target: tuple[float, ...], t: float) -> tuple[float, float, float]
 
 
 def run_twins(stations: list[FieldStation], target: tuple[float, ...], seconds: int, out: Path, *, seed: int = 1,
-              sound: str | None = None, extra: list[str] | None = None) -> dict[int, str]:
+              sound: str | list[str] | None = None, extra: list[str] | None = None) -> dict[int, str]:
     """All stations at once, each with its own server twin on the pipe; returns the twin logs."""
     procs = {}
     for st in stations:
@@ -83,8 +83,8 @@ def run_twins(stations: list[FieldStation], target: tuple[float, ...], seconds: 
                 "--log-uplink", str(out / f"uplink_{st.station_id}.log"), "--server", SERVER_CMD, *(extra or [])]
         if st.installed:
             args.append("--installed")
-        if sound:
-            args += ["--world-sound", sound]
+        for path in ([sound] if isinstance(sound, str) else (sound or [])):
+            args += ["--world-sound", path]
         log = open(out / f"twin_{st.station_id}.log", "w")
         procs[st.station_id] = (subprocess.Popen(args, cwd=SERVER_ROOT, stdout=log, stderr=subprocess.STDOUT, text=True), log)
     logs = {}
@@ -171,7 +171,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--class", dest="target_class", default="ELECTRIC_UAV",
                     help="the truth class of the sound (the synthetic source is an electric multirotor)")
-    ap.add_argument("--sound", help="WAV recording of the target (PCM16) instead of the synthetic source")
+    ap.add_argument("--sound", action="append",
+                    help="WAV recording (PCM16) instead of the synthetic source: the first for the first target, the "
+                         "second for the second, ...")
     ap.add_argument("--max-range", type=float, default=5000.0)
     ap.add_argument("--assoc-range", type=float, default=6000.0)
     args = ap.parse_args(argv)
