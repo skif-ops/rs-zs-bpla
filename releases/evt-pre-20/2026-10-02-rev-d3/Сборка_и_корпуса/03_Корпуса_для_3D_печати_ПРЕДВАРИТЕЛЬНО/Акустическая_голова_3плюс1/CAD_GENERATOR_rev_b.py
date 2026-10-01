@@ -79,16 +79,9 @@ def make():
     for old in OUT.glob("DIO-3DP-AH-001A_*"):
         old.unlink()
 
-    # Ring OD 216. The lower sumps sit between the structural plate pairs;
-    # their bores exit radially OUTSIDE, never toward PCB/central mast.
+    # Ring OD 216. The lower sumps sit between both plate pairs and the
+    # lower microphone support posts. Their bores exit radially OUTSIDE.
     base = cyl(0,0,0,108,14).cut(cyl(0,0,-0.1,93,14.2))
-    for angle in (0,90,180,270):
-        theta=math.radians(angle)
-        x,y=101*math.cos(theta),101*math.sin(theta)
-        base=base.cut(cyl(x,y,8.5,4.5,5.6))
-        bore=cq.Solid.makeCylinder(1.1,10,cq.Vector(x,y,9.5),
-                                   cq.Vector(math.cos(theta),math.sin(theta),0))
-        base=base.cut(bore)
     for angle in (45,135,225,315):
         for r0,r1 in ((95.1,96.1),(106.5,107.5)):
             base=base.cut(rotated_box(r0-0.15,r1+0.15,10,4.1,angle,width=14.4))
@@ -102,6 +95,17 @@ def make():
         for dx in (-10,10):
             carrier=carrier.cut(cyl(x+dx,y-9,29.9,1.4,6.2))
     base=base.union(carrier).cut(cyl(0,0,29.9,8.1,6.2))
+    drain_angles=(10,100,190,280)
+    anchors=[(100*mic[n][0]/math.hypot(*mic[n][:2]),
+              100*mic[n][1]/math.hypot(*mic[n][:2])) for n in ("MIC1","MIC2","MIC3")]
+    for angle in drain_angles:
+        theta=math.radians(angle)
+        x,y=101*math.cos(theta),101*math.sin(theta)
+        assert min(math.dist((x,y),a) for a in anchors)>10.0,angle
+        base=base.cut(cyl(x,y,8.5,4.5,5.6))
+        bore=cq.Solid.makeCylinder(1.1,10,cq.Vector(x,y,9.5),
+                                   cq.Vector(math.cos(theta),math.sin(theta),0))
+        base=base.cut(bore)
     mast=cyl(0,0,0,8,150).cut(cyl(0,0,-0.1,4,150.2))
     upper=cyl(0,0,0,18,6).cut(cyl(0,0,-0.1,8.1,6.2))
     for dx in (-10,10):
@@ -182,7 +186,8 @@ def make():
         "foam_radial_slot_mm":10.4,"foam_envelope_outer_diameter_mm":212.6,
         "foam_envelope_height_mm":206,"foam_lower_post_notch_count":3,
         "plate_pair_count":4,
-        "condensate_pocket_count":4,"pocket_diameter_mm":9,"pocket_depth_mm":5.5,
+        "condensate_pocket_count":4,"condensate_pocket_angles_deg":drain_angles,
+        "pocket_diameter_mm":9,"pocket_depth_mm":5.5,
         "outward_drain_diameter_mm":2.2,"acoustic_centres_world_mm":positions,
         "print_parts_per_station":{"base_carrier":1,"central_mast":1,"upper_carrier":1,
           "vertical_plate_inner":4,"vertical_plate_outer":4,"dome_mount_ring":1,"dome":1,
@@ -195,7 +200,7 @@ def make():
           "fit with actual PCBA and J1", "print-bed margin and shrinkage",
           "ring/plate joint strength, dome screw inserts and torque", "mast mount and cable routes"],
         "files":{p.name:sha(p) for p in sorted(OUT.glob(f"{HEAD}*"))
-                 if p.is_file() and p.name!=f"{HEAD}_fit_report.json"},
+                 if p.is_file() and p.suffix.lower() in (".step",".stl")},
     }
     (OUT/f"{HEAD}_fit_report.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps({"head":HEAD,"size_mm":sizes,"acoustic_centres":positions},ensure_ascii=False))
