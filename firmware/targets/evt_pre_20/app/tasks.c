@@ -3,7 +3,7 @@
  *   audio       - converts MDF blocks, drives PPS binding, computes block peaks
  *   supervisor  - zs_power_modes scheduler, self-tests, rail enables, console status line
  *   console     - LPUART1 line commands for the bench: "st" (self-test), "lag", "svc", "modes", "pps"
- *   gnss        - NMEA RMC parser stub: extracts UTC seconds for PPS labelling
+ *   gnss        - NMEA: RMC labels the PPS seconds, GGA fixes give the station position (zs_station_position)
  *   ble         - zs_ipc_service over USART3 to the nRF52840 bridge (ICD addendum C), window with S4 SERVICE
  *   dsp         - zs_station_pipeline: 1 s windows at a 0.5 s hop -> zs_dsp_mcu -> votes + AIR gate -> level 1 ->
  *                 detection events into the NOR outbox (fetch in the audio task, analysis here); after an event of a
@@ -46,6 +46,9 @@
 #include "zs_pps_sync.h"
 #include "zs_selftest.h"
 #include "zs_station_pipeline.h"
+#include "zs_station_position.h"
+#include "zs_gnss.h"
+#include "zs_installation_store.h"
 #include "zs_station_secrets.h"
 #include "zs_command_keys.h"
 #include "zs_time.h"
@@ -172,8 +175,10 @@ static void apply_capture_gap(void) {
 
 /* Tracking window (addendum H): opened by the DSP task on an event of a new track, it keeps the capture and the
    detector running through S3 and the bearings flowing to the comms task; closed after APP_TRACK_LOST_WINDOWS windows
-   without CONFIRMED, after APP_TRACK_MAX_MS, or when the supervisor asks (the mode left S3, sleep, service). */
+   without CONFIRMED, after track_max_s (CMD_SET_PARAMS id 7), or when the supervisor asks (the mode left S3, sleep,
+   service). */
 static zs_track_window_t track;
+static volatile uint32_t track_max_ms = (uint32_t)ZS_PARAM_TRACK_MAX_S_DEFAULT * 1000u;   /* params_apply writes it */
 static volatile bool track_open;             /* DSP task writes; audio task and supervisor read */
 static volatile bool track_close_request;    /* supervisor -> DSP task */
 static volatile bool track_s3_extension;     /* a window opened in this S3 episode: its watchdog is extended until S3 ends */
@@ -225,13 +230,14 @@ static void post_capture_open(void) { post_capture_until_ms = xTaskGetTickCount(
 static void track_step(bool new_event) {
   const uint32_t now = xTaskGetTickCount();
   zs_track_end_t end = ZS_TRACK_END_NONE;
+  track.max_ms = track_max_ms;                                            /* a CMD_SET_PARAMS also reaches an open window */
   if (new_event && zs_track_window_on_event(&track, pipeline.track_event_id, !gsm_degraded, now)) {
     track_open = true;
     track_s3_extension = true;
     track_close_request = false;
     app_comms_set_tracking(true);
     console_printf("track: window open for event %lu:%lu (max %lu s)\r\n", (unsigned long)(track.track_event_id >> 32),
-                   (unsigned long)(track.track_event_id & 0xffffffffu), (unsigned long)(APP_TRACK_MAX_MS / 1000u));
+                   (unsigned long)(track.track_event_id & 0xffffffffu), (unsigned long)(track.max_ms / 1000u));
     return;
   }
   if (!track_open) return;
@@ -382,6 +388,7 @@ static void params_apply(const zs_station_params_t *p) {
   pipeline_port.update_period_windows = (uint8_t)zs_station_params_get(p, ZS_PARAM_EVENT_UPDATE_WINDOWS);
   comms_degraded_after = (unsigned)zs_station_params_get(p, ZS_PARAM_COMMS_DEGRADED_AFTER);
   gsm_probe_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_GSM_PROBE_S) * 1000u;
+  track_max_ms = (uint32_t)zs_station_params_get(p, ZS_PARAM_TRACK_MAX_S) * 1000u;
 }
 
 /* The self-test window: capture on for 300 ms (the microphone tests need blocks), every registered test, capture
@@ -427,7 +434,7 @@ static void supervisor_task_fn(void *arg) {
     for (unsigned ev = 1u; ev < 32u; ev++) if (bits & (1u << ev)) (void)zs_mode_on_event(&modes, (zs_mode_event_t)ev, now);
     modes.policy.comms_max_ms = comms_max_base_ms + (app_comms_audio_busy() ? APP_AUDIO_UPLOAD_MAX_MS : 0u) +
                                 (app_comms_fw_busy() ? APP_FW_UPDATE_MAX_MS : 0u) + (app_comms_net_busy() ? APP_NET_TRIAL_MAX_MS : 0u) +
-                                (track_s3_extension ? APP_TRACK_MAX_MS : 0u);
+                                (track_s3_extension ? track_max_ms : 0u);
     (void)zs_mode_tick(&modes, now);
     app_watchdog_service();
     app_commands_tick(now);
@@ -485,15 +492,48 @@ static bool rmc_epoch_us(const char *line, int64_t *epoch_us) {
   return true;
 }
 
+/* ---- station position (zs_station_position): the GNSS task owns `station_pos` (its GGA fixes, the installation
+   record) and publishes a copy after every change; pl_emit (DSP task) and the heartbeat (comms task) fill the station
+   map from that copy.  The BLE task loads the installation record at boot and after every commissioning attempt
+   and hands it over through `installation_pending`. ---- */
+static zs_station_position_t station_pos, station_pos_shared;
+static zs_position_trust_config_t installation_pending;
+static volatile bool installation_pending_set;
+static volatile bool installation_reload_pending;             /* ble_audit -> BLE task: a commissioning attempt ended */
+
+static void station_pos_publish(void) {
+  taskENTER_CRITICAL();
+  station_pos_shared = station_pos;
+  taskEXIT_CRITICAL();
+}
+static bool station_pos_fill(zs_position_t *station, zs_gnss_t *gnss) {
+  zs_station_position_t snap;
+  taskENTER_CRITICAL();
+  snap = station_pos_shared;
+  taskEXIT_CRITICAL();
+  return zs_station_position_fill(&snap, xTaskGetTickCount(), station, gnss);
+}
 static void gnss_task_fn(void *arg) {
   static char line[96];
+  static zs_gnss_nmea_t nmea;
   size_t len = 0u;
   (void)arg;
+  zs_gnss_nmea_init(&nmea);
+  zs_station_position_init(&station_pos);
   for (;;) {
     uint8_t buf[32];
     size_t n;
     ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(500));
     app_watchdog_checkin(APP_WD_GNSS);
+    if (installation_pending_set) {
+      zs_position_trust_config_t cfg;
+      taskENTER_CRITICAL();
+      cfg = installation_pending;
+      installation_pending_set = false;
+      taskEXIT_CRITICAL();
+      zs_station_position_set_installation(&station_pos, &cfg);
+      station_pos_publish();
+    }
     while ((n = bsp_uart_read(BSP_UART_GNSS, buf, sizeof(buf))) > 0u) {
       for (size_t i = 0u; i < n; i++) {
         char c = (char)buf[i];
@@ -501,6 +541,8 @@ static void gnss_task_fn(void *arg) {
           int64_t epoch;
           line[len] = '\0';
           if (rmc_epoch_us(line, &epoch)) zs_pps_sync_on_utc(&pps, epoch);   /* the RMC follows the PPS edge it labels */
+          /* the GGA fixes: the station position of uncommissioned stations, a check of the installation otherwise */
+          if (zs_gnss_parse_line(&nmea, line) && zs_station_position_on_gnss(&station_pos, &nmea, xTaskGetTickCount())) station_pos_publish();
           len = 0u;
         } else if (c != '\r' && len + 1u < sizeof(line)) {
           line[len++] = c;
@@ -553,6 +595,10 @@ static bool ram_write(void *ctx, uint8_t slot, uint32_t off, const uint8_t *d, s
 static bool ble_audit(void *ctx, const zs_commissioning_audit_event_t *e) {
   (void)ctx;
   ble_audit_events++;
+  /* after every commissioning attempt the BLE task re-reads the record: it can be stored even when the final audit
+     entry fails (AUDIT_FINALIZE_FAILED, READBACK_FAILED), and re-reading an unchanged record changes nothing */
+  if (e->operation == ZS_COMMISSIONING_OPERATION_INITIAL || e->operation == ZS_COMMISSIONING_OPERATION_RECOMMISSION)
+    installation_reload_pending = true;
   console_printf("install audit phase %u op %u role %u result %u v%lu\r\n", e->phase, e->operation, e->role, e->result, (unsigned long)e->version);
   return true;
 }
@@ -580,6 +626,24 @@ static void ble_secrets_changed(void *ctx, const zs_station_secrets_t *rec);
 static zs_ipc_service_port_t ipc_port = {NULL, ble_uart_send, ble_now_ms, ble_service_mode, ble_peer_role, ble_peer_secure,
                                          &cfg_io, &pos_io, &audit_io, &selftests, &identity, NULL, ble_random, &secrets_io, ble_secrets_changed};
 
+/* BLE task: the installation record from its store (none: GNSS position only); a read error keeps the current one. */
+static void installation_reload(void) {
+  static zs_installation_record_t rec;
+  zs_position_trust_config_t cfg;
+  const zs_installation_store_result_t r = zs_installation_store_load(&pos_io, &rec, NULL);
+  memset(&cfg, 0, sizeof(cfg));
+  if (r == ZS_INSTALLATION_STORE_OK) cfg = rec.trust;
+  else if (r != ZS_INSTALLATION_STORE_NOT_FOUND) { console_printf("position: installation record unreadable (%d), kept\r\n", (int)r); return; }
+  taskENTER_CRITICAL();
+  installation_pending = cfg;
+  installation_pending_set = true;
+  taskEXIT_CRITICAL();
+  if (cfg.configured) console_printf("position: installation v%lu %ld.%07ld %ld.%07ld alt %ld dm\r\n", (unsigned long)rec.version,
+                                     (long)(cfg.installation.lat_e7 / 10000000), (long)labs(cfg.installation.lat_e7 % 10000000),
+                                     (long)(cfg.installation.lon_e7 / 10000000), (long)labs(cfg.installation.lon_e7 % 10000000), (long)cfg.installation.alt_dm);
+  else console_printf("position: not commissioned, GNSS position\r\n");
+}
+
 /* Heartbeat (schema 2): identity, time, power/route placeholders of B1, self-test verdict, and the detector map
    (key 13): boot_id, uptime, pipeline counters, level 1, longest window, events waiting in the NOR outbox. */
 static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
@@ -595,6 +659,7 @@ static bool comms_fill_heartbeat(void *ctx, zs_heartbeat_t *hb) {
   hb->self_test_ok = zs_selftest_required_ok(&selftests);
   hb->gnss.time_trust = (uint8_t)time_sync.trust;
   hb->gnss.expected_time_error_us = time_sync.expected_error_us;
+  (void)station_pos_fill(&hb->station, &hb->gnss);                       /* installation record or GNSS fix (zeros: unknown) */
   hb->detector_present = true;
   hb->detector.boot_id = boot_id;
   hb->detector.uptime_s = xTaskGetTickCount() / 1000u;
@@ -800,6 +865,7 @@ static bool pl_emit(void *ctx, const zs_detection_t *d) {
   with_power.gnss.expected_time_error_us = time_sync.expected_error_us;
   with_power.gnss.pps_ok = time_sync.pps_ok;
   with_power.gnss.time_holdover = time_sync.trust == ZS_TIME_TRUST_HOLDOVER;
+  (void)station_pos_fill(&with_power.station, &with_power.gnss);          /* the server fuses bearings by it (zeros: unknown) */
   app_audio_rec_note_event(d->event_id, d->event_time_us,                 /* CMD_REQUEST_AUDIO finds its audio by this */
                            time_sync.trust == ZS_TIME_TRUST_GNSS_TRUSTED || time_sync.trust == ZS_TIME_TRUST_HOLDOVER);
   if (!stores_on_nor) { pipeline_events_ram++; return true; }
@@ -826,6 +892,7 @@ static void ble_task_fn(void *arg) {
   uint32_t last_ping = 0u;
   (void)arg;
   bind_record_stores();
+  installation_reload();                                                  /* the station position of a commissioned station */
   (void)bsp_uart_init(BSP_UART_BLE, APP_UART_BLE_BAUD);
   if (!bsp_rng_init()) console_printf("rng: init failed, engineer role elevation disabled\r\n");
   bsp_gpio_ble_enable(true);
@@ -838,6 +905,7 @@ static void ble_task_fn(void *arg) {
     size_t n;
     (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(250));
     app_watchdog_checkin(APP_WD_BLE);
+    if (installation_reload_pending) { installation_reload_pending = false; installation_reload(); }
     if (config_reload_pending) {                                          /* a remote configuration was confirmed (addendum G) */
       config_reload_pending = false;
       if (zs_station_config_store_load(&cfg_io, &ipc.config, NULL) == ZS_STATION_CONFIG_OK) ipc.config_loaded = true;
@@ -875,6 +943,18 @@ static void console_exec(const char *cmd) {
       bool ok = zs_pdm_capture_channel_lag(&capture, ch, 2048u, 8, &lag);
       console_printf("ch%u lag %s %d\r\n", ch, ok ? "=" : "n/a", ok ? lag : 0);
     }
+  } else if (strcmp(cmd, "pos") == 0) {
+    zs_position_t st;
+    zs_gnss_t g;
+    memset(&st, 0, sizeof(st));
+    memset(&g, 0, sizeof(g));
+    if (!station_pos_fill(&st, &g)) console_printf("position: unknown (no installation record, no GNSS fix yet)\r\n");
+    else console_printf("position: %s %ld.%07ld %ld.%07ld alt %ld dm acc %u m | fix %u sats %u hdop %u.%02u | trust %u delta %u m | fixes %lu\r\n",
+                        st.position_source == ZS_POSITION_SOURCE_CONFIGURED_INSTALL ? "installation" : "gnss",
+                        (long)(st.lat_e7 / 10000000), (long)labs(st.lat_e7 % 10000000), (long)(st.lon_e7 / 10000000), (long)labs(st.lon_e7 % 10000000),
+                        (long)st.alt_dm, (unsigned)st.pos_accuracy_m, (unsigned)g.fix_type, (unsigned)g.satellites,
+                        (unsigned)(g.hdop_x100 / 100u), (unsigned)(g.hdop_x100 % 100u), (unsigned)g.position_trust, (unsigned)g.position_delta_m,
+                        (unsigned long)station_pos_shared.fixes);
   } else if (strcmp(cmd, "pps") == 0) {
     console_printf("pps edges %lu bound %lu drop(label %lu pps %lu bracket %lu) ppm %ld trust %d err_us %lu\r\n",
                    (unsigned long)bsp_tim2_pps_edges(), (unsigned long)pps.bound_count, (unsigned long)pps.dropped_no_label,
@@ -984,7 +1064,8 @@ static void console_exec(const char *cmd) {
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear] nrfimg nrfupd comms [on|off] power lora [on|off] clock cmds rec wd wdtest heap\r\n");
+    console_printf("commands: st lag pos pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear]\r\n");   /* one line: 160 B */
+    console_printf("          nrfimg nrfupd comms [on|off] power lora [on|off] clock cmds rec wd wdtest heap\r\n");
   }
 }
 
@@ -1030,7 +1111,7 @@ bool app_tasks_create(void) {
   if (!bsp_tim2_pps_init(&pps)) return false;
 
   zs_dsp_mcu_init(&dsp_ctx);
-  zs_track_window_init(&track, APP_TRACK_MAX_MS, APP_TRACK_LOST_WINDOWS);
+  zs_track_window_init(&track, track_max_ms, APP_TRACK_LOST_WINDOWS);
   {
     size_t work;
     zs_complex_t *scratch = zs_dsp_mcu_borrow_work(&work);        /* the AIR gate scratch overlays the DSP work buffer */
