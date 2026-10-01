@@ -26,8 +26,20 @@
  *     ZS_DOA_CONFIRM_M of the last ZS_DOA_CONFIRM_N windows, and stays confirmed until none of them did (a target
  *     whose bins drop out for a window or two): the memory alone keeps a one-window burst (a horn, a bird) for several
  *     windows, its own support does not;
- *   - each track's bearing of the window is the weighted circular mean of the bins within ZS_DOA_ASSIGN_DEG of it
- *     (at least ZS_DOA_MIN_BINS of them, otherwise no bearing this window); sigma from their spread;
+ *   - each track's bearing of the window is the weighted circular mean of its bins: those within ZS_DOA_ASSIGN_DEG of
+ *     it and nearer to it than to any other track (at least ZS_DOA_MIN_BINS of them, otherwise no bearing this
+ *     window); sigma from their spread.  The memory peaks and the window's support go to the tracks the same way
+ *     (nearest pair first, each on its own side), so a louder target nearing a quiet one does not pull the quiet one's
+ *     track onto itself (twin, 2026-10-01: three targets, the group's track of 121 Hz followed the 186 Hz one and its
+ *     own target was lost);
+ *   - a crossing: two tracks closer than ZS_DOA_CROSS_DEG see one blob of bins.  With both labels known and not in an
+ *     integer ratio, frequency tells them apart: each takes the blob's bins on its own harmonics and on none of the
+ *     other's and goes on as usual (two targets in one direction are two harmonic series, also when they stay
+ *     together).  Otherwise both report the blob's bearing but coast on their own last bearing and rate of turn (no
+ *     turn, no label from the blob), so each comes out where its own turn puts it and finds its own bins again.  A
+ *     pair that cannot part is one target: a track that coasted ZS_DOA_COAST_MAX windows, or (no frequency) rates of
+ *     turn that do not part it within that; the track whose label the blob's lines name stays (else the one with bins
+ *     of its own, else the older), the other ends;
  *   - each track's label: the fundamental (100..400 Hz) of a harmonic sieve over its bins' local maxima; fixed by
  *     the median of its first estimates, then followed slowly (an estimate in an integer ratio to the label within
  *     6 % is folded onto it; others are ignored), so the label does not slip from window to window.
@@ -68,6 +80,8 @@
 #define ZS_DOA_MISS_MAX 2u                /* a track not continued for more windows than this ends */
 #define ZS_DOA_ASSIGN_DEG 10.0f
 #define ZS_DOA_RECALL_WINDOWS 10u         /* a track lost this recently comes back under its id where it went */
+#define ZS_DOA_CROSS_DEG 6.0f             /* two tracks closer than this are crossing (one blob of bins) */
+#define ZS_DOA_COAST_MAX 24u              /* windows a crossing may last; longer, the two are one target: one track ends */
 #define ZS_DOA_MIN_BINS 3u
 #define ZS_DOA_LABEL_MIN_HZ 100.0f
 #define ZS_DOA_LABEL_MAX_HZ 400.0f
@@ -109,6 +123,7 @@ typedef struct {
   uint8_t support;         /* own window support, newest in bit 0 */
   uint8_t misses;
   uint8_t age;             /* windows since it started (saturates) */
+  uint8_t crossing;        /* windows it has coasted through a crossing (0: not crossing) */
   uint16_t id;             /* never 0 for a live track */
   bool live;
   bool confirmed;          /* ZS_DOA_CONFIRM_M of the last ZS_DOA_CONFIRM_N windows supported it; stays until none of them do */

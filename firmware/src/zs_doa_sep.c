@@ -289,6 +289,96 @@ static void update_label(zs_doa_track_t *t, float estimate) {
   if (folded > 0.0f) t->label_hz += LABEL_FOLLOW * (folded - t->label_hz);
 }
 
+/* az is on track t's side of every other live track (nearer to t than to it), unless the two are crossing (closer than
+   ZS_DOA_CROSS_DEG: their bins are one blob) */
+static bool owns(const float *at, const bool *live, unsigned t, float az) {
+  const float d = ang_dist(az, at[t]);
+  for (unsigned u = 0u; u < ZS_DOA_MAX_TRACKS; u++) {
+    if (u == t || !live[u] || ang_dist(at[t], at[u]) < ZS_DOA_CROSS_DEG) continue;
+    if (ang_dist(az, at[u]) < d) return false;
+  }
+  return true;
+}
+
+/* f is on a harmonic of label (as the sieve counts a line) */
+static bool harmonic_of(float f, float label) {
+  if (label <= 0.0f) return false;
+  const float h = roundf(f / label);
+  return h >= 1.0f && fabsf(f - h * label) <= fmaxf(BIN_HZ, 0.012f * h * label);
+}
+
+/* how the window's bins go to the tracks: where each track is; in a crossing told apart by frequency (by_freq: its label
+   and its partners' are known and not in an integer ratio) a track takes only the bins on its own harmonics and on none
+   of its partners' (two targets in one direction are two harmonic series) */
+typedef struct {
+  float at[ZS_DOA_MAX_TRACKS];
+  float label[ZS_DOA_MAX_TRACKS];
+  bool live[ZS_DOA_MAX_TRACKS];
+  bool by_freq[ZS_DOA_MAX_TRACKS];
+} layout_t;
+
+/* a bin of track t: within ZS_DOA_ASSIGN_DEG of it, on its side, and in a crossing told apart by frequency on its
+   harmonics only */
+static bool member(const zs_doa_bin_t *b, const layout_t *L, unsigned t) {
+  if (ang_dist(b->az_deg, L->at[t]) > ZS_DOA_ASSIGN_DEG || !owns(L->at, L->live, t, b->az_deg)) return false;
+  if (!L->by_freq[t]) return true;
+  const float f = (float)b->k * BIN_HZ;
+  if (!harmonic_of(f, L->label[t])) return false;
+  for (unsigned u = 0u; u < ZS_DOA_MAX_TRACKS; u++)
+    if (u != t && L->live[u] && ang_dist(L->at[t], L->at[u]) < ZS_DOA_CROSS_DEG && harmonic_of(f, L->label[u])) return false;
+  return true;
+}
+
+/* the crossings of the layout and which of them frequency tells apart */
+static void layout_crossings(layout_t *L, bool crossing[ZS_DOA_MAX_TRACKS]) {
+  for (unsigned t = 0u; t < ZS_DOA_MAX_TRACKS; t++) {
+    crossing[t] = false;
+    L->by_freq[t] = L->live[t] && L->label[t] > 0.0f;
+    for (unsigned u = 0u; u < ZS_DOA_MAX_TRACKS; u++) {
+      if (u == t || !L->live[t] || !L->live[u] || ang_dist(L->at[t], L->at[u]) >= ZS_DOA_CROSS_DEG) continue;
+      crossing[t] = true;
+      if (L->label[u] <= 0.0f || fold_onto(L->label[u], L->label[t]) > 0.0f) L->by_freq[t] = false;
+    }
+    if (!crossing[t]) L->by_freq[t] = false;
+  }
+}
+
+typedef struct { float sx, sy, sw, sel, sw2; unsigned members, lines; } bins_sum_t;
+
+/* track t's bins: the sums of their weighted circular mean and elevation; their local maxima (lines for the label)
+   into ws->line_hz / line_w */
+static bins_sum_t track_bins(zs_doa_workspace_t *ws, unsigned nb, const layout_t *L, unsigned t) {
+  bins_sum_t m;
+  memset(&m, 0, sizeof(m));
+  for (unsigned i = 0u; i < nb; i++) {
+    const zs_doa_bin_t *b = &ws->bins[i];
+    if (!member(b, L, t)) continue;
+    const float w = bin_weight(b) + 1e-3f;
+    m.sx += w * sinf(b->az_deg * (float)M_PI / 180.0f);
+    m.sy += w * cosf(b->az_deg * (float)M_PI / 180.0f);
+    m.sel += w * b->el_deg;
+    m.sw += w;
+    m.sw2 += w * w;
+    m.members++;
+    /* a local maximum among the track's own bins: a line for the label */
+    bool peak = true;
+    for (unsigned j = 0u; j < nb && peak; j++) {
+      const zs_doa_bin_t *q = &ws->bins[j];
+      if ((q->k + 1u == b->k || q->k == b->k + 1u) && member(q, L, t) && q->power > b->power) peak = false;
+    }
+    if (peak) { ws->line_hz[m.lines] = (float)b->k * BIN_HZ; ws->line_w[m.lines++] = b->power; }
+  }
+  return m;
+}
+
+/* the fundamental the lines name: the sieve over their powers on a log scale */
+static float lines_label(zs_doa_workspace_t *ws, unsigned n) {
+  float wmin = 1e30f;
+  for (unsigned i = 0u; i < n; i++) if (ws->line_w[i] < wmin) wmin = ws->line_w[i];
+  for (unsigned i = 0u; i < n; i++) ws->line_w[i] = 1.0f + log10f(ws->line_w[i] / wmin);
+  return sieve(ws->line_hz, ws->line_w, n);
+}
+
 unsigned zs_doa_sep_push(zs_doa_sep_t *s, const zs_bearing_ctx_t *ctx, const float *memory, float temperature_c,
                          zs_doa_workspace_t *ws, zs_doa_target_t out[ZS_DOA_MAX_TRACKS]) {
   if (!s || !ctx || !memory || !ws || !out) return 0u;
@@ -304,36 +394,60 @@ unsigned zs_doa_sep_push(zs_doa_sep_t *s, const zs_bearing_ctx_t *ctx, const flo
   const unsigned np = memory_peaks(s->memory, peaks);
   bool used[ZS_DOA_MAX_TRACKS] = {false, false, false};
 
-  /* continue the tracks: where the last bearing and the rate of turn put it (the memory lags behind a fast pass), the
-     nearest free memory peak within the gate (wider by the turn), or the window's own support there */
+  /* where each live track is now: its last bearing plus its rate of turn (the memory lags behind a fast pass); a track
+     coasting through a crossing stays where its turn puts it for the crossing */
+  float pred[ZS_DOA_MAX_TRACKS], gate[ZS_DOA_MAX_TRACKS];
+  bool fresh[ZS_DOA_MAX_TRACKS], live[ZS_DOA_MAX_TRACKS];
+  for (unsigned t = 0u; t < ZS_DOA_MAX_TRACKS; t++) {
+    zs_doa_track_t *tr = &s->track[t];
+    live[t] = tr->live;
+    pred[t] = gate[t] = 0.0f;
+    fresh[t] = false;
+    if (!tr->live) continue;
+    if (tr->since_bearing < 255u) tr->since_bearing++;
+    fresh[t] = tr->since_bearing <= ZS_DOA_MISS_MAX + 1u ||
+               (tr->crossing && tr->since_bearing <= ZS_DOA_COAST_MAX + ZS_DOA_MISS_MAX + 1u);
+    pred[t] = fresh[t] ? wrap360(tr->last_az_deg + tr->rate_deg * (float)tr->since_bearing) : tr->az_deg;
+    gate[t] = ZS_DOA_GATE_DEG + (fresh[t] ? fminf(2.0f * fabsf(tr->rate_deg) * (float)tr->since_bearing, 12.0f) : 0.0f);
+  }
+  /* the memory peaks to the tracks, nearest pair first: a peak within a track's gate and on its side of every other
+     track (a louder target nearing a quiet one is not the quiet one's peak) */
+  int best_of[ZS_DOA_MAX_TRACKS] = {-1, -1, -1};
+  for (;;) {
+    int bt = -1, bp = -1;
+    float bd = 1e9f;
+    for (unsigned t = 0u; t < ZS_DOA_MAX_TRACKS; t++) {
+      if (!live[t] || best_of[t] >= 0) continue;
+      for (unsigned p = 0u; p < np; p++) {
+        if (used[p]) continue;
+        const float paz = peak_az(s->memory, peaks[p]), d = ang_dist(paz, pred[t]);
+        if (d <= gate[t] && d < bd && owns(pred, live, t, paz)) { bd = d; bt = (int)t; bp = (int)p; }
+      }
+    }
+    if (bt < 0) break;
+    best_of[bt] = bp;
+    used[bp] = true;
+  }
+
+  /* continue the tracks: a peak, or the window's own support near where the track is (its side only) */
   for (unsigned t = 0u; t < ZS_DOA_MAX_TRACKS; t++) {
     zs_doa_track_t *tr = &s->track[t];
     if (!tr->live) continue;
-    if (tr->since_bearing < 255u) tr->since_bearing++;
-    const bool fresh = tr->since_bearing <= ZS_DOA_MISS_MAX + 1u;
-    const float pred = fresh ? wrap360(tr->last_az_deg + tr->rate_deg * (float)tr->since_bearing) : tr->az_deg;
-    const float gate = ZS_DOA_GATE_DEG + (fresh ? fminf(2.0f * fabsf(tr->rate_deg) * (float)tr->since_bearing, 12.0f) : 0.0f);
-    int best = -1;
-    float best_d = gate;
-    for (unsigned p = 0u; p < np; p++) {
-      if (used[p]) continue;
-      const float d = ang_dist(peak_az(s->memory, peaks[p]), pred);
-      if (d <= best_d) { best_d = d; best = (int)p; }
-    }
+    const int best = best_of[t];
     float support = 0.0f;
     for (unsigned c = 0u; c < ZS_DOA_CELLS; c++)
-      if (ang_dist((float)c * CELL_DEG, pred) <= gate && ws->window_hist[c] > support) support = ws->window_hist[c];
+      if (ang_dist((float)c * CELL_DEG, pred[t]) <= gate[t] && ws->window_hist[c] > support && owns(pred, live, t, (float)c * CELL_DEG))
+        support = ws->window_hist[c];
     const bool own = support >= ZS_DOA_SUPPORT;
     tr->support = (uint8_t)(((tr->support << 1) | (own ? 1u : 0u)) & ((1u << ZS_DOA_CONFIRM_N) - 1u));
-    if (best >= 0) used[best] = true;
-    if (best >= 0 || (fresh && own)) {
-      tr->az_deg = fresh ? pred : peak_az(s->memory, peaks[best]);
+    if (best >= 0 || (fresh[t] && own)) {
+      tr->az_deg = fresh[t] ? pred[t] : peak_az(s->memory, peaks[best]);
       tr->misses = 0u;
     } else if (++tr->misses > ZS_DOA_MISS_MAX) {
       remember_lost(s, tr);
       memset(tr, 0, sizeof(*tr));
       continue;
-    } else tr->az_deg = pred;
+    } else tr->az_deg = pred[t];
     if (tr->age < 255u) tr->age++;
   }
   /* new tracks for the remaining peaks, in free slots (not the lagging memory of a live track) */
@@ -374,7 +488,48 @@ unsigned zs_doa_sep_push(zs_doa_sep_t *s, const zs_bearing_ctx_t *ctx, const flo
     }
   }
 
-  /* each track's bins of the window: bearing, label */
+  /* the tracks as they stand: two closer than ZS_DOA_CROSS_DEG are crossing.  With their labels known and unrelated,
+     frequency tells them apart: each takes the bins on its own harmonics (two targets in one direction are two
+     harmonic series) and goes on as usual.  Otherwise the bins are one blob: both coast through it on their own turn
+     and come out where it puts them.  A crossing is one target when the pair cannot part: a track that has coasted
+     ZS_DOA_COAST_MAX windows, or (not told apart by frequency) a pair whose turns do not part it within that; the track
+     whose label the blob's lines name stays (else the one that had its own bins, else the older), the other ends (and
+     may be recalled) */
+  layout_t L;
+  bool crossing[ZS_DOA_MAX_TRACKS];
+  for (unsigned t = 0u; t < ZS_DOA_MAX_TRACKS; t++) {
+    L.live[t] = s->track[t].live;
+    L.at[t] = s->track[t].az_deg;
+    L.label[t] = s->track[t].live ? s->track[t].label_hz : 0.0f;
+  }
+  layout_crossings(&L, crossing);
+  for (unsigned t = 0u; t < ZS_DOA_MAX_TRACKS; t++)
+    for (unsigned u = t + 1u; u < ZS_DOA_MAX_TRACKS; u++) {
+      zs_doa_track_t *a = &s->track[t], *b = &s->track[u];
+      if (!L.live[t] || !L.live[u] || ang_dist(L.at[t], L.at[u]) >= ZS_DOA_CROSS_DEG) continue;
+      const bool stale_a = a->crossing >= ZS_DOA_COAST_MAX, stale_b = b->crossing >= ZS_DOA_COAST_MAX;
+      const bool freq = L.by_freq[t] && L.by_freq[u];
+      /* their turns part them within the coast: a crossing still under way */
+      const bool parting = fabsf(a->rate_deg - b->rate_deg) * (float)ZS_DOA_COAST_MAX >= 2.0f * ZS_DOA_CROSS_DEG;
+      if (!stale_a && !stale_b && (freq || parting)) continue;
+      bool keep_a;
+      if (stale_a != stale_b) keep_a = stale_b;
+      else {
+        layout_t blob = L;
+        for (unsigned v = 0u; v < ZS_DOA_MAX_TRACKS; v++) blob.by_freq[v] = false;
+        const bins_sum_t m = track_bins(ws, nb, &blob, t);
+        const float est = lines_label(ws, m.lines);
+        const bool ma = fold_onto(est, a->label_hz) > 0.0f, mb = fold_onto(est, b->label_hz) > 0.0f;
+        keep_a = ma != mb ? ma : a->age >= b->age;
+      }
+      zs_doa_track_t *gone = keep_a ? b : a;
+      L.live[keep_a ? u : t] = false;
+      remember_lost(s, gone);
+      memset(gone, 0, sizeof(*gone));
+    }
+  layout_crossings(&L, crossing);
+
+  /* each track's bins of the window (its side of the other tracks): bearing, label */
   unsigned n = 0u;
   for (unsigned t = 0u; t < ZS_DOA_MAX_TRACKS; t++) {
     zs_doa_track_t *tr = &s->track[t];
@@ -389,61 +544,43 @@ unsigned zs_doa_sep_push(zs_doa_sep_t *s, const zs_bearing_ctx_t *ctx, const flo
       const int cell = (int)lroundf(tr->az_deg / CELL_DEG) % (int)ZS_DOA_CELLS;
       o->strength = s->memory[cell];
     }
-    float sx = 0.0f, sy = 0.0f, sw = 0.0f, sel = 0.0f, sw2 = 0.0f;
-    float *fpk = ws->line_hz, *wpk = ws->line_w;
-    unsigned members = 0u, npk = 0u;
-    for (unsigned i = 0u; i < nb; i++) {
-      const zs_doa_bin_t *b = &ws->bins[i];
-      if (ang_dist(b->az_deg, tr->az_deg) > ZS_DOA_ASSIGN_DEG) continue;
-      const float w = bin_weight(b) + 1e-3f;
-      sx += w * sinf(b->az_deg * (float)M_PI / 180.0f);
-      sy += w * cosf(b->az_deg * (float)M_PI / 180.0f);
-      sel += w * b->el_deg;
-      sw += w;
-      sw2 += w * w;
-      members++;
-      /* a local maximum among the track's own bins: a line for the label */
-      bool peak = true;
-      for (unsigned j = 0u; j < nb && peak; j++) {
-        const zs_doa_bin_t *q = &ws->bins[j];
-        if ((q->k + 1u == b->k || q->k == b->k + 1u) && ang_dist(q->az_deg, tr->az_deg) <= ZS_DOA_ASSIGN_DEG && q->power > b->power) peak = false;
-      }
-      if (peak) { fpk[npk] = (float)b->k * BIN_HZ; wpk[npk++] = b->power; }
-    }
-    o->bins = (uint8_t)(members > 255u ? 255u : members);
-    if (members >= ZS_DOA_MIN_BINS && sw > 0.0f) {
-      const float az = wrap360(atan2f(sx, sy) * 180.0f / (float)M_PI);
+    const bins_sum_t m = track_bins(ws, nb, &L, t);
+    /* a crossing coasts unless frequency gives the track bins of its own */
+    const bool coast = crossing[t] && tr->since_bearing < 255u && !(L.by_freq[t] && m.members >= ZS_DOA_MIN_BINS);
+    if (coast && tr->crossing < 255u) tr->crossing++;
+    o->bins = (uint8_t)(m.members > 255u ? 255u : m.members);
+    if (m.members >= ZS_DOA_MIN_BINS && m.sw > 0.0f) {
+      const float az = wrap360(atan2f(m.sx, m.sy) * 180.0f / (float)M_PI);
       float var = 0.0f;
       for (unsigned i = 0u; i < nb; i++) {
         const zs_doa_bin_t *b = &ws->bins[i];
-        if (ang_dist(b->az_deg, tr->az_deg) > ZS_DOA_ASSIGN_DEG) continue;
+        if (!member(b, &L, t)) continue;
         const float d = ang_dist(b->az_deg, az);
         var += (bin_weight(b) + 1e-3f) * d * d;
       }
-      var /= sw;
-      const float n_eff = sw * sw / sw2;
+      var /= m.sw;
+      const float n_eff = m.sw * m.sw / m.sw2;
       float sigma = sqrtf(var / fmaxf(n_eff, 1.0f)) + 0.5f;
       if (sigma > 45.0f) sigma = 45.0f;
       o->has_bearing = true;
       o->bearing.valid = true;
       o->bearing.azimuth_deg = az;
-      if (tr->since_bearing < 255u && tr->since_bearing > 0u) {
-        const float turn = (fmodf(az - tr->last_az_deg + 540.0f, 360.0f) - 180.0f) / (float)tr->since_bearing;
-        tr->rate_deg = tr->rate_deg == 0.0f ? turn : 0.6f * tr->rate_deg + 0.4f * turn;
-      }
-      tr->last_az_deg = az;
-      tr->since_bearing = 0u;
-      tr->az_deg = az;
-      o->bearing.elevation_deg = sel / sw;
+      o->bearing.elevation_deg = m.sel / m.sw;
       o->bearing.sigma_deg = sigma;
       o->bearing.confidence = fminf(1.0f, n_eff / 10.0f);
       o->bearing.frames_used = (uint8_t)ZS_COMB_BEARING_FRAMES;
-      if (o->confirmed) {
-        /* the label from the lines' powers on a log scale (the sieve's weights) */
-        float wmin = 1e30f;
-        for (unsigned i = 0u; i < npk; i++) if (wpk[i] < wmin) wmin = wpk[i];
-        for (unsigned i = 0u; i < npk; i++) wpk[i] = 1.0f + log10f(wpk[i] / wmin);
-        update_label(tr, sieve(fpk, wpk, npk));
+      /* coasting through a crossing: the blob is both targets' bearing, not this track's own: its turn, its last bearing
+         and its label wait for the crossing to end (told apart by frequency, the bins are its own: it goes on) */
+      if (!coast) {
+        if (tr->since_bearing < 255u && tr->since_bearing > 0u) {
+          const float turn = (fmodf(az - tr->last_az_deg + 540.0f, 360.0f) - 180.0f) / (float)tr->since_bearing;
+          tr->rate_deg = tr->rate_deg == 0.0f ? turn : 0.6f * tr->rate_deg + 0.4f * turn;
+        }
+        tr->last_az_deg = az;
+        tr->since_bearing = 0u;
+        tr->az_deg = az;
+        tr->crossing = 0u;
+        if (o->confirmed) update_label(tr, lines_label(ws, m.lines));
       }
     }
     o->bearing.f0_hz = tr->label_hz;
