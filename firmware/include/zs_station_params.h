@@ -17,10 +17,12 @@ typedef enum {
   ZS_PARAM_EVENT_UPDATE_WINDOWS = 3,
   ZS_PARAM_COMMS_DEGRADED_AFTER = 4,
   ZS_PARAM_GSM_PROBE_S = 5,
-  ZS_PARAM_LISTEN_DWELL_S = 6
+  ZS_PARAM_LISTEN_DWELL_S = 6,
+  ZS_PARAM_TRACK_MAX_S = 7          /* longest tracking window (addendum H): DSP and modem at once */
 } zs_param_id_t;
 
-#define ZS_PARAM_COUNT 6u
+#define ZS_PARAM_COUNT 7u
+#define ZS_PARAM_TRACK_MAX_S_DEFAULT 300   /* a 28 m/s target crosses an 8 km audible chord; also before the record loads */
 #define ZS_STATION_PARAMS_RECORD_BYTES 48u
 #define ZS_STATION_PARAMS_REJECT_BASE 0x0100u   /* ACK detail: REJECTED 0x0100 | param_id */
 

@@ -62,7 +62,7 @@ async def feature_update(station_id:int,event_id:int,msg:FeatureUpdateMessage):
 async def security(station_id:int,msg:SecurityEventMessage):
     if station_id!=msg.station_id: raise HTTPException(400,'station_id mismatch')
     store.save_security(msg)
-    event={'system_event_id':f'SECURITY-{msg.event_id:016x}','event_type':'SECURITY_EVENT','created_time_us':msg.event_time_us,'source_event_ids':[msg.event_id],'source_station_ids':[msg.station_id],'classification_label':msg.reason,'confidence':1.0,'stations_used':1,'target':{},'route_summary':[f'{msg.route.transport}:{msg.route.hop_count}'],'status':'active'}
+    event={'system_event_id':f'SECURITY-{msg.event_id:016x}-{msg.station_id}','event_type':'SECURITY_EVENT','created_time_us':msg.event_time_us,'source_event_ids':[msg.event_id],'source_station_ids':[msg.station_id],'classification_label':msg.reason,'confidence':1.0,'stations_used':1,'target':{},'route_summary':[f'{msg.route.transport}:{msg.route.hop_count}'],'status':'active'}
     service.bus.publish_nowait(event); return event
 
 @router.get('/stations')

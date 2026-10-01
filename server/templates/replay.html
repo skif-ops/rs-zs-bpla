@@ -1,15 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Мухоед - воспроизведение{% endblock %}
+{% block title %}Мухоед - сопровождение{% endblock %}
 {% block content %}
 <section class="page-header compact">
-  <h1>Воспроизведение</h1>
-  <p>Движение цели без карты: станции, лучи их пеленгов и точки общего трека на плоскости в метрах вокруг станций.</p>
+  <h1>Сопровождение</h1>
+  <p>Сопровождение цели без карты: станции, лучи их пеленгов и точки общего трека на плоскости в метрах вокруг станций;
+    движение можно просмотреть по времени.</p>
 </section>
 
 <div class="replay">
   <div class="replay-main">
     <div class="replay-stage">
-      <canvas id="replay-canvas" aria-label="Плоскость воспроизведения: восток вправо, север вверх"></canvas>
+      <canvas id="replay-canvas" aria-label="Плоскость сопровождения: восток вправо, север вверх"></canvas>
       <div class="replay-empty" id="replay-empty">Выберите трек или событие справа.</div>
     </div>
     <div class="replay-controls">
@@ -17,7 +18,7 @@
       <button class="btn btn-outline-primary replay-btn" id="replay-back" type="button" title="Назад 1 с" disabled>−1 с</button>
       <button class="btn btn-outline-primary replay-btn" id="replay-fwd" type="button" title="Вперёд 1 с" disabled>+1 с</button>
       <input class="replay-slider" id="replay-slider" type="range" min="0" max="1" step="100" value="0" disabled
-             aria-label="Время воспроизведения">
+             aria-label="Время на шкале сопровождения">
       <select class="form-control replay-select replay-speed" id="replay-speed" aria-label="Скорость">
         <option value="1">×1</option>
         <option value="2">×2</option>
@@ -31,7 +32,7 @@
 
   <div class="replay-side">
     <div class="replay-panel">
-      <label class="form-label" for="replay-source">Что воспроизвести</label>
+      <label class="form-label" for="replay-source">Трек или событие</label>
       <select class="form-control replay-select" id="replay-source"><option value="">загрузка…</option></select>
       <label class="replay-check"><input type="checkbox" id="replay-follow"> Следить за целью</label>
       <label class="replay-check"><input type="checkbox" id="replay-geometry"> Слепые зоны расстановки</label>

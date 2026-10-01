@@ -14,6 +14,13 @@ static bool r_write(void *c, uint8_t s, uint32_t o, const uint8_t *d, size_t n) 
   return true;
 }
 
+static uint32_t crc32_ref(const uint8_t *d, size_t n) {
+  uint32_t c = UINT32_MAX;
+  for (size_t i = 0u; i < n; i++) { c ^= d[i]; for (unsigned k = 0u; k < 8u; k++) c = (c >> 1) ^ (UINT32_C(0xedb88320) & (uint32_t)-(int32_t)(c & 1u)); }
+  return ~c;
+}
+static uint32_t le32(const uint8_t *p) { return (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24); }
+
 static zs_set_params_command_t cmd(bool reset, unsigned n, const uint16_t *id, const int32_t *v) {
   zs_set_params_command_t c;
   memset(&c, 0, sizeof(c));
@@ -32,6 +39,7 @@ int main(void) {
   assert(zs_station_params_load(&io, &p) == ZS_STATION_PARAMS_NOT_FOUND && p.version == 0u);
   assert(zs_station_params_get(&p, ZS_PARAM_HEARTBEAT_PERIOD_S) == 21600 && zs_station_params_get(&p, ZS_PARAM_MIC_CHANNEL) == 0);
   assert(zs_station_params_get(&p, ZS_PARAM_LISTEN_DWELL_S) == 3 && zs_station_params_get(&p, ZS_PARAM_GSM_PROBE_S) == 1800);
+  assert(zs_station_params_get(&p, ZS_PARAM_TRACK_MAX_S) == 300 && ZS_PARAM_TRACK_MAX_S_DEFAULT == 300);
 
   /* the shared-vector command: heartbeat 3600, mic 2, dwell 5 */
   {
@@ -82,6 +90,53 @@ int main(void) {
     bad.value[ZS_PARAM_MIC_CHANNEL - 1u] = 7;            /* bypass the command validation */
     assert(zs_station_params_commit(&io, &bad) == ZS_STATION_PARAMS_OK);
     assert(zs_station_params_load(&io, &loaded) == ZS_STATION_PARAMS_OK && loaded.version == 2u);   /* falls back to the valid slot */
+  }
+  /* track_max_s (id 7, addendum H): 30..900 s */
+  {
+    const uint16_t id[] = {7u}; const int32_t v[] = {600};
+    zs_set_params_command_t c = cmd(false, 1u, id, v);
+    assert(zs_station_params_apply_command(&loaded, &c, &p) == 0u && zs_station_params_get(&p, ZS_PARAM_TRACK_MAX_S) == 600);
+    const int32_t low[] = {29}, high[] = {901};
+    c = cmd(false, 1u, id, low);
+    assert(zs_station_params_apply_command(&loaded, &c, &q) == (0x0100u | 7u));
+    c = cmd(false, 1u, id, high);
+    assert(zs_station_params_apply_command(&loaded, &c, &q) == (0x0100u | 7u));
+    assert(zs_station_params_commit(&io, &p) == ZS_STATION_PARAMS_OK);
+    assert(zs_station_params_load(&io, &loaded) == ZS_STATION_PARAMS_OK && zs_station_params_get(&loaded, ZS_PARAM_TRACK_MAX_S) == 600);
+  }
+
+  /* a record of the older firmware (base only: six values, CRC at 36, the rest erased) stays valid and track_max_s
+     takes its default; the record this firmware writes is still a valid base record for the older firmware (a
+     rollback keeps the operator's parameters) and carries track_max_s in the extension */
+  {
+    static const uint32_t v6[6] = {3600u, 1u, 12u, 4u, 900u, 5u};
+    uint8_t *b;
+    memset(ram.slot, 0xff, sizeof(ram.slot));
+    b = ram.slot[1];
+    b[0] = 0x5a; b[1] = 0x53; b[2] = 0x50; b[3] = 0x4d;   /* "ZSPM" little endian */
+    b[4] = 1u; b[5] = 0u; b[6] = 6u; b[7] = 0u;
+    b[8] = 9u; b[9] = 0u; b[10] = 0u; b[11] = 0u;          /* version 9 */
+    for (unsigned i = 0u; i < 6u; i++) for (unsigned k = 0u; k < 4u; k++) b[12u + 4u * i + k] = (uint8_t)(v6[i] >> (8u * k));
+    { const uint32_t c = crc32_ref(b, 36u); for (unsigned k = 0u; k < 4u; k++) b[36u + k] = (uint8_t)(c >> (8u * k)); }
+    assert(zs_station_params_load(&io, &loaded) == ZS_STATION_PARAMS_OK && loaded.version == 9u);
+    assert(zs_station_params_get(&loaded, ZS_PARAM_HEARTBEAT_PERIOD_S) == 3600 && zs_station_params_get(&loaded, ZS_PARAM_LISTEN_DWELL_S) == 5);
+    assert(zs_station_params_get(&loaded, ZS_PARAM_TRACK_MAX_S) == 300);
+    p = loaded; p.value[ZS_PARAM_TRACK_MAX_S - 1u] = 450;
+    assert(zs_station_params_commit(&io, &p) == ZS_STATION_PARAMS_OK && p.version == 10u);
+    b = ram.slot[0];
+    /* what the older decoder checks: magic, format 1, count 6, CRC of bytes 0..35, the six values */
+    assert(b[4] == 1u && b[6] == 6u && le32(&b[36]) == crc32_ref(b, 36u) && le32(&b[12]) == 3600u && le32(&b[32]) == 5u);
+    assert(le32(&b[40]) == 450u && le32(&b[44]) == crc32_ref(b, 44u));
+    assert(zs_station_params_load(&io, &loaded) == ZS_STATION_PARAMS_OK && loaded.version == 10u);
+    assert(zs_station_params_get(&loaded, ZS_PARAM_TRACK_MAX_S) == 450 && zs_station_params_get(&loaded, ZS_PARAM_HEARTBEAT_PERIOD_S) == 3600);
+    /* a torn extension is ignored (default), the base stays in force */
+    b[41] ^= 0x01u;
+    assert(zs_station_params_load(&io, &loaded) == ZS_STATION_PARAMS_OK && loaded.version == 10u);
+    assert(zs_station_params_get(&loaded, ZS_PARAM_TRACK_MAX_S) == 300 && zs_station_params_get(&loaded, ZS_PARAM_HEARTBEAT_PERIOD_S) == 3600);
+    /* an extension with a valid CRC but a value outside the table makes the record invalid */
+    { const uint32_t bad = 5u; uint32_t c; for (unsigned k = 0u; k < 4u; k++) b[40u + k] = (uint8_t)(bad >> (8u * k));
+      c = crc32_ref(b, 44u); for (unsigned k = 0u; k < 4u; k++) b[44u + k] = (uint8_t)(c >> (8u * k)); }
+    assert(zs_station_params_load(&io, &loaded) == ZS_STATION_PARAMS_OK && loaded.version == 9u);
   }
   printf("station params tests passed\n");
   return 0;

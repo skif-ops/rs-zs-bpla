@@ -11,13 +11,13 @@ ALERT_OUTBOX_DAYS = 30             # consumers catch up from the outbox within t
 SCHEMA = """
 PRAGMA journal_mode=WAL;
 CREATE TABLE IF NOT EXISTS stations(station_id INTEGER PRIMARY KEY, updated_us INTEGER NOT NULL, payload TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS detections(event_id INTEGER PRIMARY KEY, station_id INTEGER NOT NULL, event_time_us INTEGER NOT NULL, class_label TEXT NOT NULL, payload TEXT NOT NULL, system_event_id TEXT);
+CREATE TABLE IF NOT EXISTS detections(event_id INTEGER NOT NULL, station_id INTEGER NOT NULL, event_time_us INTEGER NOT NULL, class_label TEXT NOT NULL, payload TEXT NOT NULL, system_event_id TEXT, PRIMARY KEY(station_id, event_id));
 CREATE INDEX IF NOT EXISTS idx_det_time ON detections(event_time_us);
 CREATE INDEX IF NOT EXISTS idx_det_station ON detections(station_id, event_time_us);
 CREATE TABLE IF NOT EXISTS system_events(system_event_id TEXT PRIMARY KEY, created_us INTEGER NOT NULL, event_type TEXT NOT NULL, payload TEXT NOT NULL);
 CREATE INDEX IF NOT EXISTS idx_evt_time ON system_events(created_us);
-CREATE TABLE IF NOT EXISTS security_events(event_id INTEGER PRIMARY KEY, station_id INTEGER NOT NULL, created_us INTEGER NOT NULL, payload TEXT NOT NULL);
-CREATE TABLE IF NOT EXISTS mqtt_detection_ingress(event_key BLOB PRIMARY KEY, station_id INTEGER NOT NULL, boot_id INTEGER NOT NULL, seq_no INTEGER NOT NULL, event_time_us INTEGER NOT NULL, wire_sha256 BLOB NOT NULL, processed INTEGER NOT NULL DEFAULT 0 CHECK(processed IN (0,1)));
+CREATE TABLE IF NOT EXISTS security_events(event_id INTEGER NOT NULL, station_id INTEGER NOT NULL, created_us INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(station_id, event_id));
+CREATE TABLE IF NOT EXISTS mqtt_detection_ingress(event_key BLOB NOT NULL, station_id INTEGER NOT NULL, boot_id INTEGER NOT NULL, seq_no INTEGER NOT NULL, event_time_us INTEGER NOT NULL, wire_sha256 BLOB NOT NULL, processed INTEGER NOT NULL DEFAULT 0 CHECK(processed IN (0,1)), PRIMARY KEY(station_id, event_key));
 CREATE TABLE IF NOT EXISTS commands(command_id TEXT PRIMARY KEY, station_id INTEGER NOT NULL, created_us INTEGER NOT NULL, expires_us INTEGER NOT NULL, command TEXT NOT NULL, payload TEXT NOT NULL, delivered INTEGER NOT NULL DEFAULT 0, acked INTEGER NOT NULL DEFAULT 0, last_publish_us INTEGER NOT NULL DEFAULT 0, publish_count INTEGER NOT NULL DEFAULT 0, ack_result INTEGER, ack_detail INTEGER, completed_us INTEGER);
 CREATE INDEX IF NOT EXISTS idx_cmd_station ON commands(station_id, delivered, acked);
 CREATE TABLE IF NOT EXISTS audio(event_id INTEGER NOT NULL, station_id INTEGER NOT NULL, segment TEXT NOT NULL, path TEXT NOT NULL, codec TEXT, sample_rate INTEGER, created_us INTEGER NOT NULL, PRIMARY KEY(event_id, station_id, segment));
@@ -40,6 +40,7 @@ class EventStore:
     def __init__(self, path: Path):
         self.path=path; path.parent.mkdir(parents=True,exist_ok=True); self.lock=threading.RLock()
         with self._conn() as c:
+            self._migrate_station_event_keys(c)
             c.executescript(SCHEMA)
             self._migrate_commands(c)
             self._migrate_audio(c)
@@ -56,6 +57,43 @@ class EventStore:
     def _sqlite_event_id(event_id:int)->int:
         EventStore._event_key(event_id)
         return event_id if event_id<=0x7FFFFFFFFFFFFFFF else event_id-0x10000000000000000
+    # event_id = boot_id<<32 | seq_no is unique within one station only (ICD): two stations with the same boot counter
+    # and sequence number send equal event_id, so every table of station events is keyed by (station_id, event_id).
+    _STATION_EVENT_TABLES={
+        'detections':('event_id, station_id, event_time_us, class_label, payload, system_event_id',
+                      ['CREATE INDEX IF NOT EXISTS idx_det_time ON detections(event_time_us)',
+                       'CREATE INDEX IF NOT EXISTS idx_det_station ON detections(station_id, event_time_us)']),
+        'security_events':('event_id, station_id, created_us, payload',[]),
+        'mqtt_detection_ingress':('event_key, station_id, boot_id, seq_no, event_time_us, wire_sha256, processed',[]),
+    }
+    def _migrate_station_event_keys(self,c):
+        """A database made before the per-station key had event_id (event_key) alone as the primary key; its rows are
+        unique by event_id and therefore by (station_id, event_id) too, so they move into the new table as they are.
+        All three tables move in one transaction (SQLite DDL is transactional): an interrupted migration leaves the old
+        database as it was, and BEGIN IMMEDIATE keeps a second process from migrating at the same time."""
+        def pending(table):
+            info=c.execute(f"PRAGMA table_info({table})").fetchall()
+            key='event_key' if table=='mqtt_detection_ingress' else 'event_id'
+            return bool(info) and sorted(r['name'] for r in info if r['pk'])==[key]
+        if not any(pending(t) for t in self._STATION_EVENT_TABLES): return
+        level=c.isolation_level
+        c.isolation_level=None                               # explicit transaction control
+        try:
+            c.execute("BEGIN IMMEDIATE")
+            for table,(columns,indexes) in self._STATION_EVENT_TABLES.items():
+                if not pending(table): continue              # re-checked inside the transaction
+                definition=next(line for line in SCHEMA.splitlines() if line.startswith(f"CREATE TABLE IF NOT EXISTS {table}("))
+                c.execute(f"ALTER TABLE {table} RENAME TO {table}_before_station_key")
+                c.execute(definition.rstrip(';'))
+                c.execute(f"INSERT INTO {table}({columns}) SELECT {columns} FROM {table}_before_station_key")
+                c.execute(f"DROP TABLE {table}_before_station_key")
+                for index in indexes: c.execute(index)
+            c.execute("COMMIT")
+        except BaseException:
+            if c.in_transaction: c.execute("ROLLBACK")
+            raise
+        finally:
+            c.isolation_level=level
     def _migrate_commands(self,c):
         columns={row['name'] for row in c.execute("PRAGMA table_info(commands)")}
         additions={
@@ -100,19 +138,19 @@ class EventStore:
         if not isinstance(wire_sha256,bytes) or len(wire_sha256)!=32: raise ValueError('wire SHA-256 must contain 32 bytes')
         event_key=self._event_key(d.event_id)
         with self.lock,self._conn() as c:
-            row=c.execute("SELECT station_id,boot_id,seq_no,event_time_us,wire_sha256,processed FROM mqtt_detection_ingress WHERE event_key=?",(event_key,)).fetchone()
+            row=c.execute("SELECT station_id,boot_id,seq_no,event_time_us,wire_sha256,processed FROM mqtt_detection_ingress WHERE station_id=? AND event_key=?",(d.station_id,event_key)).fetchone()
             if row is not None:
                 exact=(row['station_id']==d.station_id and row['boot_id']==d.boot_id and row['seq_no']==d.seq_no and row['event_time_us']==d.event_time_us and bytes(row['wire_sha256'])==wire_sha256)
                 if not exact: return 'conflict'
                 return 'duplicate' if row['processed'] else 'resume'
-            existing=c.execute("SELECT 1 FROM detections WHERE event_id=?",(self._sqlite_event_id(d.event_id),)).fetchone()
+            existing=c.execute("SELECT 1 FROM detections WHERE station_id=? AND event_id=?",(d.station_id,self._sqlite_event_id(d.event_id))).fetchone()
             if existing is not None: return 'conflict'
             c.execute("INSERT INTO mqtt_detection_ingress(event_key,station_id,boot_id,seq_no,event_time_us,wire_sha256) VALUES(?,?,?,?,?,?)",(event_key,d.station_id,d.boot_id,d.seq_no,d.event_time_us,wire_sha256))
         return 'new'
     def complete_mqtt_detection(self,d:DetectionMessage,wire_sha256:bytes)->bool:
         event_key=self._event_key(d.event_id)
         with self.lock,self._conn() as c:
-            result=c.execute("UPDATE mqtt_detection_ingress SET processed=1 WHERE event_key=? AND station_id=? AND boot_id=? AND seq_no=? AND event_time_us=? AND wire_sha256=?",(event_key,d.station_id,d.boot_id,d.seq_no,d.event_time_us,wire_sha256))
+            result=c.execute("UPDATE mqtt_detection_ingress SET processed=1 WHERE station_id=? AND event_key=? AND boot_id=? AND seq_no=? AND event_time_us=? AND wire_sha256=?",(d.station_id,event_key,d.boot_id,d.seq_no,d.event_time_us,wire_sha256))
         return result.rowcount==1
     def recent_detections(self,center_us:int,window_us:int=3_000_000)->list[DetectionMessage]:
         with self._conn() as c:
@@ -122,8 +160,9 @@ class EventStore:
         with self._conn() as c:
             row=c.execute("SELECT event_time_us FROM detections WHERE event_id=? AND station_id=?",(self._sqlite_event_id(event_id),station_id)).fetchone()
         return row['event_time_us'] if row else None
-    def link_detections(self,event_ids:list[int],system_event_id:str):
-        with self.lock,self._conn() as c: c.executemany("UPDATE detections SET system_event_id=? WHERE event_id=?",[(system_event_id,self._sqlite_event_id(e)) for e in event_ids])
+    def link_detections(self,members:list[tuple[int,int]],system_event_id:str):
+        """Link detections, given as (station_id, event_id) pairs, to a system event."""
+        with self.lock,self._conn() as c: c.executemany("UPDATE detections SET system_event_id=? WHERE station_id=? AND event_id=?",[(system_event_id,s,self._sqlite_event_id(e)) for s,e in members])
     def save_system_event(self,e:SystemEvent):
         with self.lock,self._conn() as c: c.execute("INSERT OR REPLACE INTO system_events VALUES(?,?,?,?)",(e.system_event_id,e.created_time_us,e.event_type,e.model_dump_json()))
     def save_security(self,e:SecurityEventMessage):

@@ -59,8 +59,8 @@ void scene_next_parts(scene_t *s, float *source, float *background) {
     if (g->kind == SCENE_DRONE_FLYBY) {
       /* approach - closest - recede: Gaussian level profile, slight Doppler-like f0 drift and rotor wobble */
       const double x = (t - mid) / (dur / 4.0);
-      env = 0.05 + 0.95 * exp(-x * x);
-      f = g->f0_hz * (1.0 + 0.03 * tanh(-(t - mid) / (dur / 6.0)) + 0.015 * sin(2.0 * M_PI * 0.7 * t) + 0.004 * sin(2.0 * M_PI * 7.3 * t));
+      env = g->steady ? 1.0 : 0.05 + 0.95 * exp(-x * x);
+      f = g->f0_hz * (1.0 + (g->steady ? 0.0 : 0.03 * tanh(-(t - mid) / (dur / 6.0))) + 0.015 * sin(2.0 * M_PI * 0.7 * t) + 0.004 * sin(2.0 * M_PI * 7.3 * t));
       for (unsigned k = 1u; k <= 18u; k++) {
         const double amp = (1.0 / pow((double)k, 0.9)) * (1.0 + 0.3 * sin(2.0 * M_PI * 0.3 * k * t));
         s->phase[k - 1u] += 2.0 * M_PI * f * k / SR;

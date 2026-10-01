@@ -45,6 +45,7 @@ STATION_PARAMS = {
     "comms_degraded_after": (4, 1, 10, 3),
     "gsm_probe_s": (5, 300, 14400, 1800),
     "listen_dwell_s": (6, 1, 10, 3),
+    "track_max_s": (7, 30, 900, 300),     # longest tracking window, addendum H
 }
 STATION_PARAM_NAMES = {spec[0]: name for name, spec in STATION_PARAMS.items()}
 

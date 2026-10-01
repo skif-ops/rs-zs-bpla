@@ -52,6 +52,7 @@ add_library(zs_core
   src/zs_bearing_batch.c
   src/zs_track_window.c
   src/zs_position_trust.c
+  src/zs_station_position.c
   src/zs_installation_store.c
   src/zs_installation_commissioning.c
   src/zs_station_config.c
@@ -165,6 +166,8 @@ add_executable(zs_protocol_size_tests tests/test_protocol_size.c)
 target_link_libraries(zs_protocol_size_tests zs_core m)
 add_executable(zs_position_trust_tests tests/test_position_trust.c)
 target_link_libraries(zs_position_trust_tests zs_core m)
+add_executable(zs_station_position_tests tests/test_station_position.c)
+target_link_libraries(zs_station_position_tests zs_core m)
 add_executable(zs_installation_store_tests tests/test_installation_store.c)
 target_link_libraries(zs_installation_store_tests zs_core m)
 add_executable(zs_installation_commissioning_tests tests/test_installation_commissioning.c)
@@ -287,6 +290,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(zs_spatial_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_protocol_size_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_position_trust_tests PRIVATE -UNDEBUG)
+  target_compile_options(zs_station_position_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_installation_store_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_installation_commissioning_tests PRIVATE -UNDEBUG)
   target_compile_options(zs_station_config_tests PRIVATE -UNDEBUG)
@@ -359,6 +363,7 @@ add_test(NAME time_gap COMMAND zs_time_gap_tests)
 add_test(NAME spatial COMMAND zs_spatial_tests)
 add_test(NAME protocol_size COMMAND zs_protocol_size_tests)
 add_test(NAME position_trust COMMAND zs_position_trust_tests)
+add_test(NAME station_position COMMAND zs_station_position_tests)
 add_test(NAME installation_store COMMAND zs_installation_store_tests)
 add_test(NAME installation_commissioning COMMAND zs_installation_commissioning_tests)
 add_test(NAME station_config COMMAND zs_station_config_tests)
@@ -403,6 +408,9 @@ add_test(NAME station_twin_smoke COMMAND zs_station_twin --scene drone --seconds
 # closed loop with the Python server twin (needs server/requirements-protocol.lock.txt installed, as ci/firmware.sh does)
 add_test(NAME station_twin_e2e COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/../server/tools/test_station_twin_e2e.py)
 set_tests_properties(station_twin_e2e PROPERTIES ENVIRONMENT "ZS_STATION_TWIN=$<TARGET_FILE:zs_station_twin>" SKIP_RETURN_CODE 77)
+# three twins in one field through the real server path (needs server/requirements.lock.txt, as ci/twin_field.sh does)
+add_test(NAME station_twin_field COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/../server/tools/test_twin_field_e2e.py)
+set_tests_properties(station_twin_field PROPERTIES ENVIRONMENT "ZS_STATION_TWIN=$<TARGET_FILE:zs_station_twin>" SKIP_RETURN_CODE 77)
 
 add_executable(zs_emit_detection tools/emit_detection.c)
 target_link_libraries(zs_emit_detection PRIVATE zs_core m)

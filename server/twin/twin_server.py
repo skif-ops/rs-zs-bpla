@@ -121,7 +121,7 @@ def command_queue(spec: str) -> list[tuple[str, str, dict]]:
 def main() -> int:
     detections: list[dict] = []
     heartbeats: list[dict] = []
-    seen_event_ids: set[int] = set()
+    seen_event_ids: set[tuple[int, int]] = set()   # (station_id, event_id): event_id is unique per station
     duplicates = 0
     decode_errors = 0
     lora_frames = 0
@@ -217,12 +217,12 @@ def main() -> int:
                 sys.stderr.write(f"twin gateway: {exc}\n")
                 out.write("OK\n"); out.flush()
                 continue
-            dup = e.event_id in seen_event_ids
+            dup = (e.station_id, e.event_id) in seen_event_ids
             if dup:
                 duplicates += 1
             else:
                 lora_detections += 1
-            seen_event_ids.add(e.event_id)
+            seen_event_ids.add((e.station_id, e.event_id))
             detections.append({"event_id": e.event_id, "seq_no": e.seq_no, "boot_id": e.boot_id, "time_us": e.event_time_us,
                                "class_id": e.class_id, "confidence": e.confidence_u8, "duplicate": dup, "via": "lora",
                                "retry": bool(e.flags & lora_codec.FLAG_RETRY)})
@@ -279,10 +279,10 @@ def main() -> int:
         try:
             if kind == "up":
                 d = cbor_codec.decode_detection_cbor(payload)
-                dup = d.event_id in seen_event_ids
+                dup = (d.station_id, d.event_id) in seen_event_ids
                 if dup:
                     duplicates += 1
-                seen_event_ids.add(d.event_id)
+                seen_event_ids.add((d.station_id, d.event_id))
                 detections.append({"event_id": d.event_id, "seq_no": d.seq_no, "boot_id": d.boot_id, "time_us": d.event_time_us,
                                    "class_id": d.classification.class_id, "confidence": d.classification.confidence_u8, "duplicate": dup, "via": "gsm",
                                    "doa": {"valid": d.doa.valid, "azimuth_deg": d.doa.azimuth_deg, "elevation_deg": d.doa.elevation_deg,

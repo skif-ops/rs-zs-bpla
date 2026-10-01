@@ -117,7 +117,9 @@ class BearingTrackFusion:
         if pair is None:
             return None
         members = pair[1]
-        track_id = f"TRK-{min(t for _, t in members):016x}-{min(s for s, _ in members)}"
+        # the earliest (track event_id, station) pair: event_id is unique within a station only (ICD)
+        first_event, first_station = min((t, s) for s, t in members)
+        track_id = f"TRK-{first_event:016x}-{first_station}"
         self.store.replace_track(track_id, members, None, [])
         return track_id
 

@@ -3,6 +3,7 @@
 
 #define PARAMS_MAGIC UINT32_C(0x4d50535a)   /* "ZSPM" */
 #define PARAMS_FORMAT 1u
+#define PARAMS_BASE_COUNT 6u                /* the values of the format-1 base record (ids 1..6) */
 
 static const struct { int32_t min, max, def; } table[ZS_PARAM_COUNT] = {
   {900, 86400, 21600},   /* heartbeat_period_s */
@@ -11,6 +12,7 @@ static const struct { int32_t min, max, def; } table[ZS_PARAM_COUNT] = {
   {1, 10, 3},            /* comms_degraded_after */
   {300, 14400, 1800},    /* gsm_probe_s */
   {1, 10, 3},            /* listen_dwell_s */
+  {30, 900, ZS_PARAM_TRACK_MAX_S_DEFAULT},   /* track_max_s */
 };
 
 void zs_station_params_defaults(zs_station_params_t *p) {
@@ -55,21 +57,36 @@ static uint32_t crc32(const uint8_t *d, size_t n) {
 static void put32(uint8_t *p, uint32_t v) { for (unsigned i = 0u; i < 4u; i++) p[i] = (uint8_t)(v >> (8u * i)); }
 static uint32_t get32(const uint8_t *p) { return (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24); }
 
-/* magic u32 | format u16 | count u16 | version u32 | value i32 x 6 | crc32 (all little endian) = 40 bytes */
+/* Base record (format 1, as written since addendum D): magic u32 | format u8 | 0 | count u8 = 6 | 0 | version u32 |
+   value i32 x 6 | crc32 of bytes 0..35, little endian, 40 bytes.  Extension (track_max_s, id 7): value i32 at 40 and
+   crc32 of bytes 0..43 at 44, filling the 48-byte slot.  A firmware that knows only the base reads the record as before
+   and ignores the extension, so a rollback keeps the operator's parameters; a base record without a valid extension
+   (written by that firmware) gives track_max_s its default. */
+#define EXT_OFFSET 40u
+#define EXT_CRC_OFFSET 44u
+typedef char params_record_fits[(EXT_CRC_OFFSET + 4u == ZS_STATION_PARAMS_RECORD_BYTES && ZS_PARAM_COUNT == PARAMS_BASE_COUNT + 1u) ? 1 : -1];
 static void encode(const zs_station_params_t *p, uint8_t b[ZS_STATION_PARAMS_RECORD_BYTES]) {
   memset(b, 0xff, ZS_STATION_PARAMS_RECORD_BYTES);
   put32(&b[0], PARAMS_MAGIC);
-  b[4] = PARAMS_FORMAT; b[5] = 0u; b[6] = ZS_PARAM_COUNT; b[7] = 0u;
+  b[4] = PARAMS_FORMAT; b[5] = 0u; b[6] = PARAMS_BASE_COUNT; b[7] = 0u;
   put32(&b[8], p->version);
-  for (unsigned i = 0u; i < ZS_PARAM_COUNT; i++) put32(&b[12u + 4u * i], (uint32_t)p->value[i]);
+  for (unsigned i = 0u; i < PARAMS_BASE_COUNT; i++) put32(&b[12u + 4u * i], (uint32_t)p->value[i]);
   put32(&b[36], crc32(b, 36u));
+  put32(&b[EXT_OFFSET], (uint32_t)p->value[ZS_PARAM_TRACK_MAX_S - 1u]);
+  put32(&b[EXT_CRC_OFFSET], crc32(b, EXT_CRC_OFFSET));
 }
 static bool decode(const uint8_t b[ZS_STATION_PARAMS_RECORD_BYTES], zs_station_params_t *p) {
-  if (get32(&b[0]) != PARAMS_MAGIC || b[4] != PARAMS_FORMAT || b[6] != ZS_PARAM_COUNT || get32(&b[36]) != crc32(b, 36u)) return false;
+  if (get32(&b[0]) != PARAMS_MAGIC || b[4] != PARAMS_FORMAT || b[6] != PARAMS_BASE_COUNT || get32(&b[36]) != crc32(b, 36u)) return false;
+  zs_station_params_defaults(p);
   p->version = get32(&b[8]);
-  for (unsigned i = 0u; i < ZS_PARAM_COUNT; i++) {
+  for (unsigned i = 0u; i < PARAMS_BASE_COUNT; i++) {
     p->value[i] = (int32_t)get32(&b[12u + 4u * i]);
     if (p->value[i] < table[i].min || p->value[i] > table[i].max) return false;   /* never trust a stored value blindly */
+  }
+  if (get32(&b[EXT_CRC_OFFSET]) == crc32(b, EXT_CRC_OFFSET)) {
+    const unsigned i = ZS_PARAM_TRACK_MAX_S - 1u;
+    p->value[i] = (int32_t)get32(&b[EXT_OFFSET]);
+    if (p->value[i] < table[i].min || p->value[i] > table[i].max) return false;
   }
   return p->version != 0u;
 }

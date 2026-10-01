@@ -63,3 +63,18 @@ def test_whitelist_ids_are_unique_and_defaults_in_range():
     for lo_hi_default in STATION_PARAMS.values():
         _, lo, hi, default = lo_hi_default
         assert lo <= default <= hi
+
+
+def test_whitelist_matches_the_station_table():
+    """The station checks the same table (firmware/src/zs_station_params.c, rows in id order)."""
+    import re
+    from pathlib import Path
+    source = (Path(__file__).resolve().parents[2] / "firmware" / "src" / "zs_station_params.c").read_text()
+    header = (Path(__file__).resolve().parents[2] / "firmware" / "include" / "zs_station_params.h").read_text()
+    table = source[source.index("table[ZS_PARAM_COUNT] = {"):source.index("};")]
+    rows = [tuple(int(v) if v.strip().lstrip("-").isdigit() else v.strip() for v in m.groups())
+            for m in re.finditer(r"\{([^,{}]+),\s*([^,{}]+),\s*([^,{}]+)\}", table)]
+    defines = {k: int(v) for k, v in re.findall(r"#define (ZS_PARAM_\w+_DEFAULT) (\d+)", header)}
+    rows = [tuple(defines.get(v, v) for v in r) for r in rows]
+    expected = [spec[1:] for spec in sorted(STATION_PARAMS.values())]
+    assert rows == expected, (rows, expected)

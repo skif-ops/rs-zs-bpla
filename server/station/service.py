@@ -68,11 +68,13 @@ class StationFusionService:
         target=solve_target(grouped) if is_alert else TargetEstimate()
         conf=float(np.mean([x.classification.confidence for x in grouped])) if grouped else d.classification.confidence
         event_type='AIR_ALERT' if is_alert else 'AIR_WARNING'
-        sid=f"{event_type}-{min(x.event_id for x in grouped):016x}" if grouped else f"{event_type}-{d.event_id:016x}"
+        # event_id is unique within a station only: the id names the earliest (event_id, station) pair of the group
+        first=min(((x.event_id,x.station_id) for x in grouped),default=(d.event_id,d.station_id))
+        sid=f"{event_type}-{first[0]:016x}-{first[1]}"
         if is_alert and target.lat is not None:
             target=self._track(sid,target,grouped)
         e=SystemEvent(system_event_id=sid,event_type=event_type,created_time_us=max(x.event_time_us for x in grouped),source_event_ids=[x.event_id for x in grouped],source_station_ids=[x.station_id for x in grouped],classification_label=self._label(grouped),confidence=conf,stations_used=len(grouped),target=target,route_summary=[f"{x.station_id}:{x.route.transport}:{x.route.hop_count}" for x in grouped])
-        self.store.save_system_event(e); self.store.link_detections(e.source_event_ids,sid); self.bus.publish_nowait(e.model_dump())
+        self.store.save_system_event(e); self.store.link_detections(list(zip(e.source_station_ids,e.source_event_ids)),sid); self.bus.publish_nowait(e.model_dump())
         self._alert(self.alerts.on_event,e,grouped)
         return e
     def ingest_bearings(self,batch)->int:
