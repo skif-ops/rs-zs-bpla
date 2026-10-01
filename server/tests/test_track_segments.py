@@ -68,6 +68,27 @@ def test_a_stream_alternating_between_two_targets_keeps_two_segments():
     assert len(segments) == 2 and sorted(len(s.rows) for s in segments) == [60, 60]   # the waiting ones of B start its segment
 
 
+def test_three_sources_heard_at_once_make_three_segments_also_where_they_cross():
+    # bearing batch schema 2: one bearing per source and window; sources 1 and 2 cross each other's direction
+    rng = np.random.default_rng(5)
+    rows = []
+    for k in range(120):
+        t = int(T0 * 1e6 + k * 0.5e6)
+        glide = 1.0 + 0.002 * k                                        # Doppler: +12 % over the minute
+        for src, f0, az in ((1, 185.0 * glide, 40.0 + 1.0 * k), (2, 120.0 / glide, 160.0 - 1.0 * k), (3, 290.0, 300.0 + 0.1 * k)):
+            rows.append({"time_us": t, "azimuth_deg": (az + rng.normal(0.0, 1.5)) % 360.0, "sigma_deg": 1.5, "f0_hz": round(f0, 1),
+                         "src": src})
+    segments = track_segments.split(rows)
+    assert len(segments) == 3 and all(len(s.rows) >= 115 for s in segments), [(s.key, len(s.rows)) for s in segments]
+    for seg in segments:
+        assert len({r["src"] for r in seg.rows}) == 1                       # one source each
+        assert len({r["time_us"] for r in seg.rows}) == len(seg.rows)      # one bearing per window
+    assert len({s.key for s in segments}) == 3                              # distinct names also when they start together
+    late = rows[-30]
+    seg = track_segments.segment_at(segments, late["time_us"], late["f0_hz"])
+    assert seg is not None and any(r is late for r in seg.rows)
+
+
 def test_the_split_does_not_change_when_more_bearings_arrive():
     az = [300.0 + 0.2 * k for k in range(60)] + [130.0 + 0.3 * k for k in range(60)]
     rows = rows_of(az)

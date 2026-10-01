@@ -38,6 +38,46 @@ def test_golden_vector_matches_the_firmware():
     assert b.samples[0].confidence == pytest.approx(230 / 255, abs=1e-4)
 
 
+# firmware/tests/test_bearing_stream.c: two sources at the same time, then the first again (schema 2)
+GOLDEN_SOURCES = bytes.fromhex(
+    "a90002010702110305041b0000000500000001051b0006651729573c2006010701088387001931561907d018b418e60719073a87001975c6190352"
+    "19010418b3071904b0871901f41931561907d018b418e607190740"
+)
+
+
+def test_golden_vector_with_sources_matches_the_firmware():
+    b = decode_bearing_batch(GOLDEN_SOURCES)
+    assert [(s.time_us, s.azimuth_deg, s.f0_hz) for s in b.samples] == [
+        (1_800_000_012_500_000, 126.3, 185.0), (1_800_000_012_500_000, 301.5, 120.0), (1_800_000_013_000_000, 126.3, 185.6)]
+    assert decode_bearing_batch(GOLDEN).samples[0].f0_hz is None            # schema 1: not known
+
+
+def test_two_sources_at_the_same_time_are_both_stored(tmp_path):
+    store = EventStore(tmp_path / "t.sqlite3")
+    b = decode_bearing_batch(GOLDEN_SOURCES)
+    assert store.save_bearings(b) == 3 and store.save_bearings(b) == 0
+    rows = store.list_bearings(track_event_id=TRACK)
+    assert [(r["time_us"], r["f0_hz"]) for r in rows] == [(1_800_000_012_500_000, 120.0), (1_800_000_012_500_000, 185.0),
+                                                           (1_800_000_013_000_000, 185.6)]
+
+
+def test_bearings_stored_before_sources_keep_their_rows(tmp_path):
+    import sqlite3
+    path = tmp_path / "old.sqlite3"
+    c = sqlite3.connect(path)
+    c.execute("CREATE TABLE bearings(station_id INTEGER NOT NULL, track_event_id INTEGER NOT NULL, time_us INTEGER NOT NULL, "
+              "azimuth_cdeg INTEGER NOT NULL, elevation_cdeg INTEGER NOT NULL, sigma_cdeg INTEGER NOT NULL, confidence REAL NOT NULL, "
+              "frames INTEGER NOT NULL, time_trust TEXT NOT NULL, received_us INTEGER NOT NULL, PRIMARY KEY(station_id, track_event_id, time_us))")
+    c.execute("CREATE INDEX idx_bearing_time ON bearings(time_us)")
+    c.execute("INSERT INTO bearings VALUES(17, ?, 1800000012500000, 12630, 2000, 180, 0.9, 8, 'GNSS_TIME_TRUSTED', 1)", (TRACK,))
+    c.commit()
+    c.close()
+    store = EventStore(path)
+    rows = store.list_bearings(track_event_id=TRACK)
+    assert len(rows) == 1 and rows[0]["azimuth_deg"] == 126.3 and rows[0]["f0_hz"] is None
+    assert store.save_bearings(decode_bearing_batch(GOLDEN_SOURCES)) == 3      # the same time, now of named sources
+
+
 @pytest.mark.parametrize("obj,reason", [
     (batch({1: 6}), "type"),
     (batch({2: 0}), "station_id"),
@@ -46,7 +86,11 @@ def test_golden_vector_matches_the_firmware():
     (batch({8: [[0, 36000, 0, 1, 1, 1]]}), "azimuth"),
     (batch({8: [[0, 100, 9001, 1, 1, 1]]}), "elevation"),
     (batch({8: [[500, 100, 0, 1, 1, 1], [0, 100, 0, 1, 1, 1]]}), "time order"),
-    (batch({8: [[0, 100, 0, 1, 1]]}), "six fields"),
+    (batch({8: [[0, 100, 0, 1, 1]]}), "6 fields"),
+    (batch({8: [[0, 100, 0, 1, 1, 1, 1200]]}), "6 fields"),                    # schema 1 has no source field
+    (batch({0: 2}), "7 fields"),                                               # schema 2 needs it
+    (batch({0: 2, 8: [[0, 100, 0, 1, 1, 1, 70000]]}), "f0"),
+    (batch({0: 3}), "version"),
     (batch({8: [[0, 100, 0, 1, 1, 1]] * 17}), "1..16 samples"),
 ])
 def test_invalid_batches_are_refused(obj, reason):
