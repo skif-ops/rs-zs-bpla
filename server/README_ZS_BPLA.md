@@ -124,7 +124,12 @@ Acceptance metrics of a trial (decision 5, `docs/ACCEPTANCE_METRICS.md`): with t
 gives Pd per class with its 95 % interval, detection ranges, classification, false alarms per station-hour, the
 elevation sector, bearing and track point accuracy, received levels and the geometry of the layout. Blind zones of
 the station geometry: `GET /api/v1/geometry/coverage?station_ids=…&range_m=…`, and the «Слепые зоны расстановки»
-layer of the replay page.
+layer of the «Сопровождение» page (`/replay`).
+
+A field of station twins (`docs/STATION_TWIN_FIELD_2026-10-01.md`): `python tools/twin_field.py --out /tmp/field
+--station 17:0,0 --station 18:1200,0 --station 19:600,1000:installed --target=-2500,2200,200,45,-10,0` runs one
+firmware twin per station against the same target, feeds their publishes through the bridge into a fresh database
+and ends with the acceptance report; `tools/test_twin_field_e2e.py` is the CI check of it.
 
 The network part of a station's configuration (server host, MQTT/HTTPS port, certificate pin, tenant, topic prefix,
 SIM, APNs; ICD addendum G) changes remotely as well: `POST /api/v1/stations/{id}/network-config` with the fields to

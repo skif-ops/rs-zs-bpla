@@ -67,7 +67,7 @@
 
 | Поле | Смысл |
 |---|---|
-| `track_id` | `TRK-{наименьший track event_id}-{станция}`, неизменен |
+| `track_id` | `TRK-{наименьший track event_id}-{станция этого event_id}`, неизменен (event_id уникален только в пределах станции) |
 | `position` | `lat`, `lon`, `alt_msl_m` точки |
 | `error` | `horizontal_m` — радиальная ошибка 1σ (корень из суммы дисперсий по осям), `vertical_m` — 1σ по высоте |
 | `velocity` | `speed_mps`, `course_deg`, `east_mps`, `north_mps`, `up_mps` |
