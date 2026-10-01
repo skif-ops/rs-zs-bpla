@@ -33,6 +33,7 @@ typedef struct {
   float residual_us;         /* solver residual */
   float tdoa_us[ZS_SPATIAL_REF_TDOA_COUNT];   /* median t_j - t_1, j = 2..4 */
   float confidence;          /* 0..1 */
+  float f0_hz;               /* fundamental of the source this bearing follows (zs_comb_bearing); 0 = full band */
   uint8_t frames_used;
   bool valid;
 } zs_bearing_t;
