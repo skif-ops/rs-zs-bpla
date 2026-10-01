@@ -1014,6 +1014,10 @@ static void console_exec(const char *cmd) {
                    pr->level, pr->confidence_u8, pr->uav_votes, pr->windows, pr->uav_weak_votes, pr->ground_votes, pr->comb, (int)pipeline.last_gate.f0_hz,
                    pipeline.last_window.class_id, pipeline.last_window.confidence_u8, (unsigned long)pipeline.events_emitted, (unsigned long)pipeline.events_refused,
                    (unsigned long)pipeline_events_ram);
+    console_printf("  sources: mixture windows %lu, one target %lu, confirmed by a source %lu | comb bearings %lu of %lu (few bins %lu weak %lu)\r\n",
+                   (unsigned long)pipeline.separated_windows, (unsigned long)pipeline.merged_windows, (unsigned long)pipeline.source_confirmed_windows,
+                   (unsigned long)pipeline.comb_stats.computed, (unsigned long)pipeline.comb_stats.attempts, (unsigned long)pipeline.comb_stats.few_bins,
+                   (unsigned long)pipeline.comb_stats.weak);
     console_printf("  track %s (event %lu:%lu, %lu windows) | tracks %lu ended lost %lu max %lu mode %lu, refused (link) %lu\r\n",
                    track_open ? "OPEN" : "closed", (unsigned long)(track.track_event_id >> 32), (unsigned long)(track.track_event_id & 0xffffffffu),
                    (unsigned long)track.windows, (unsigned long)track.tracks, (unsigned long)track.ended_lost, (unsigned long)track.ended_max,
