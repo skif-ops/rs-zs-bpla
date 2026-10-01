@@ -534,6 +534,14 @@ zs_air_gate_result_t zs_air_gate_evaluate(const zs_air_gate_t *g) {
                 0.20f * (1.0f - fminf(r.steadiness_cv / 0.1f, 1.0f)) + 0.10f * fminf((float)hmax / 8.0f, 1.0f);
   if (!r.present) score *= 0.5f;
   r.confidence_u8 = (uint8_t)(fminf(fmaxf(score, 0.0f), 1.0f) * 255.0f + 0.5f);
+  /* the last window's fundamental, folded onto the history's like the comb windows above */
+  r.window_f0_hz = r.f0_hz;
+  if (last->comb && last->f0_hz > 0.0f && r.f0_hz > 0.0f) {
+    for (unsigned k = 1u; k <= 3u; k++) {
+      const float up = last->f0_hz * (float)k;
+      if (fabsf(up - r.f0_hz) <= 0.10f * r.f0_hz) { r.window_f0_hz = up; break; }
+    }
+  }
   /* other sources only beside a present source: without one the classifier gets the window as it is */
   r.secondary_count = r.present ? g->secondary_count : 0u;
   for (unsigned i = 0u; i < ZS_AIR_MAX_SECONDARY; i++) r.secondary_f0_hz[i] = i < r.secondary_count ? g->secondary_window_hz[i] : 0.0f;
@@ -588,5 +596,10 @@ static void comb_notch(int16_t *pcm, size_t n, float f0) {
 
 void zs_air_gate_suppress_secondary(int16_t *pcm, size_t n, const zs_air_gate_result_t *r) {
   if (!pcm || !r) return;
-  for (unsigned s = 0u; s < r->secondary_count && s < ZS_AIR_MAX_SECONDARY; s++) comb_notch(pcm, n, r->secondary_f0_hz[s]);
+  zs_air_gate_suppress_combs(pcm, n, r->secondary_f0_hz, r->secondary_count < ZS_AIR_MAX_SECONDARY ? r->secondary_count : ZS_AIR_MAX_SECONDARY);
+}
+
+void zs_air_gate_suppress_combs(int16_t *pcm, size_t n, const float *f0_hz, unsigned count) {
+  if (!pcm || !f0_hz) return;
+  for (unsigned s = 0u; s < count; s++) comb_notch(pcm, n, f0_hz[s]);
 }

@@ -91,6 +91,8 @@ typedef struct {
   float f0_hz;          /* folded median fundamental of the comb windows (fit value when none) */
   uint8_t harmonic_count;
   uint8_t confidence_u8; /* server _confidence blend without the separation-gain term */
+  float window_f0_hz;   /* the main comb's fundamental on the last window (folded like f0_hz; f0_hz when that window
+                           has no comb): what the bearing of the main source follows (zs_comb_bearing) */
   uint8_t secondary_count;               /* other sources heard at once (their combs on the last window); 0 unless present */
   float secondary_f0_hz[ZS_AIR_MAX_SECONDARY];
 } zs_air_gate_result_t;
@@ -106,5 +108,8 @@ const zs_air_window_t *zs_air_gate_last(const zs_air_gate_t *g);
 /* Suppresses the secondary sources of a gate result in a window (32 kHz mono, in place): a narrow comb notch at
    every harmonic of each secondary fundamental, flat between them.  Nothing changes without secondary sources. */
 void zs_air_gate_suppress_secondary(int16_t *pcm, size_t n, const zs_air_gate_result_t *r);
+/* The same comb notch for any list of fundamentals (the station pipeline classifies one source of a mixture at a
+   time with all the others suppressed, the main one included). */
+void zs_air_gate_suppress_combs(int16_t *pcm, size_t n, const float *f0_hz, unsigned count);
 
 #endif
