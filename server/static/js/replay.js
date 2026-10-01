@@ -18,6 +18,7 @@
   let lastFrame = 0;
   let lastWidth = 0;
   const view = { cx: 0, cy: 0, s: 0.1 };   // centre (m) and scale (px per m)
+  let coverage = null;             // blind zones of the station geometry (/api/v1/geometry/coverage), pre-rendered
 
   const colorOf = (sid) => {
     const i = data ? data.stations.findIndex((s) => s.station_id === sid) : 0;
@@ -103,6 +104,61 @@
     enableControls(!empty);
     fit();
     draw();
+    loadCoverage();
+  }
+
+  // ---- blind zones of the station geometry (decision 5) --------------------------------------------------------
+  async function loadCoverage() {
+    const on = $("replay-geometry").checked;
+    $("replay-geometry-opts").hidden = !on;
+    coverage = null;
+    if (!on || !data || !data.origin || !data.stations.length) { $("replay-geo-share").textContent = ""; draw(); return; }
+    const sig = data.bearings.map((b) => b.sigma_deg).filter((v) => v > 0).sort((a, b) => a - b);
+    const q = new URLSearchParams({
+      station_ids: data.stations.map((s) => s.station_id).join(","),
+      range_m: Math.min(Math.max(Number($("replay-geo-range").value) || 1500, 100), 5000),
+      height_m: Math.min(Math.max(Number($("replay-geo-height").value) || 0, 0), 5000),
+      sigma_deg: sig.length ? sig[sig.length >> 1] : 3,
+      origin_lat: data.origin.lat, origin_lon: data.origin.lon, origin_alt: data.origin.alt_msl_m,
+    });
+    const res = await fetch("/api/v1/geometry/coverage?" + q);
+    if (!res.ok) { $("replay-geo-share").textContent = "Не удалось рассчитать зоны."; draw(); return; }
+    const g = await res.json();
+    const off = document.createElement("canvas");
+    off.width = g.nx; off.height = g.ny;
+    const octx = off.getContext("2d");
+    const img = octx.createImageData(g.nx, g.ny);
+    for (let i = 0; i < g.ny; i++) {
+      for (let j = 0; j < g.nx; j++) {
+        const k = i * g.nx + j, o = ((g.ny - 1 - i) * g.nx + j) * 4;      // row 0 is the southmost
+        const c = g.codes.charCodeAt(k) - 48;
+        let rgba = [0, 0, 0, 0];
+        if (c === 1) rgba = [100, 116, 139, 40];
+        else if (c === 2) rgba = [220, 38, 38, 60];
+        else if (c === 3) {
+          const err = g.h_err_m[k] == null ? g.max_error_m : g.h_err_m[k];
+          rgba = [5, 150, 105, Math.round(25 + 55 * (1 - Math.min(err / g.max_error_m, 1)))];
+        }
+        img.data.set(rgba, o);
+      }
+    }
+    octx.putImageData(img, 0, 0);
+    coverage = { g, off };
+    const pc = (v) => Math.round(v * 100) + " %";
+    $("replay-geo-share").textContent = `Доля площади: точка ${pc(g.share.position)}, слепая геометрия ` +
+      `${pc(g.share.blind_geometry)}, одна станция ${pc(g.share.single_station)}, не слышно ${pc(g.share.out_of_range)} ` +
+      `(сигма ${Number(g.sigma_deg).toFixed(1)}°).`;
+    draw();
+  }
+
+  function drawCoverage() {
+    if (!coverage) return;
+    const { g, off } = coverage;
+    const left = sx(g.e0 - g.step_m / 2), top = sy(g.n0 - g.step_m / 2 + g.ny * g.step_m);
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(off, left, top, g.nx * g.step_m * view.s, g.ny * g.step_m * view.s);
+    ctx.restore();
   }
 
   function enableControls(on) {
@@ -167,6 +223,7 @@
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = "#f8fafc";
     ctx.fillRect(0, 0, w, h);
+    if (data) drawCoverage();
     drawGrid(w, h);
     if (!data) return;
     drawBearings();
@@ -349,6 +406,9 @@
   $("replay-fwd").addEventListener("click", () => setTime(t + 1e6));
   $("replay-slider").addEventListener("input", (e) => { stop(); setTime(Number(e.target.value)); });
   $("replay-follow").addEventListener("change", draw);
+  $("replay-geometry").addEventListener("change", loadCoverage);
+  $("replay-geo-range").addEventListener("change", loadCoverage);
+  $("replay-geo-height").addEventListener("change", loadCoverage);
   document.addEventListener("keydown", (e) => {
     const tag = document.activeElement ? document.activeElement.tagName : "";
     if (!data || ["INPUT", "SELECT", "TEXTAREA", "BUTTON"].includes(tag)) return;   // their own keys stay theirs

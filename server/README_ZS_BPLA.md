@@ -118,6 +118,14 @@ key (`python -m pki.cli model-sign --key release.pem --model m7.diom --out data/
 serves them from `--model-dir` / `ZS_MODEL_DIR`, default `data/models`). The station loads it after the OK ACK without
 a reset; the heartbeat model text changes from `c46` (built-in) to `m7`.
 
+Acceptance metrics of a trial (decision 5, `docs/ACCEPTANCE_METRICS.md`): with the ground truth of what flew
+(`dioneya.trial/1`: stations, passes with the target's GNSS log, quiet periods, exclusions, reference SPL),
+`python tools/acceptance_metrics.py report --db data/zs_bpla.sqlite3 --trial trial.json --json r.json --md r.md`
+gives Pd per class with its 95 % interval, detection ranges, classification, false alarms per station-hour, the
+elevation sector, bearing and track point accuracy, received levels and the geometry of the layout. Blind zones of
+the station geometry: `GET /api/v1/geometry/coverage?station_ids=…&range_m=…`, and the «Слепые зоны расстановки»
+layer of the replay page.
+
 The network part of a station's configuration (server host, MQTT/HTTPS port, certificate pin, tenant, topic prefix,
 SIM, APNs; ICD addendum G) changes remotely as well: `POST /api/v1/stations/{id}/network-config` with the fields to
 change queues CMD_SET_NETWORK_CONFIG (the version defaults to the one the station reports + 1). The station tries the
