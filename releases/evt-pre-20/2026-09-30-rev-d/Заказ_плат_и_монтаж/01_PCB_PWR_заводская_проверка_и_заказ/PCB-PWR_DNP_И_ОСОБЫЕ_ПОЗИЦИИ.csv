@@ -1,5 +1,0 @@
-﻿References,Type,Population,Procurement,Instruction_RU,Instruction_EN
-"R5,R9,R13,R14,R15",Resistor footprints,DNP,DO_NOT_BUY,Не устанавливать,Do not fit
-"NT1,NT2,NT3",Copper net tie PCB feature,PCB_FEATURE,DO_NOT_BUY,Только медь платы; отдельной детали нет,PCB copper only; no separate component
-TP1-TP10,Test points,PCB_FEATURE,DO_NOT_BUY,Контактные площадки контроля,Bare PCB test pads
-H1-H4,Mounting holes,PCB_FEATURE,DO_NOT_BUY,Отверстия платы,Bare PCB holes

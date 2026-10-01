@@ -1,5 +1,0 @@
-Reference,Quantity_per_board,Native_Value,Native_Footprint,Manufacturer,MPN,Package,Procurement_Value,Qty_per_station,Population,Source_Item_ID,Source_BOM
-C1,1,100nF X7R,Capacitor_SMD:C_0402_1005Metric,TDK,CGA2B3X7R1E104K050BB,0402 1005 metric,100 nF 25 V X7R,4,FITTED,C-MIC,hardware\EVT_PRE_20_BOM_REV_A.csv
-J1,1,5040500691,Dioneya:Molex_5040500691,Molex,5040500691,Pico-Lock 1.50 mm 6-circuit right-angle SMT,,4,FITTED,J-MIC,hardware\EVT_PRE_20_BOM_REV_A.csv
-MK1,1,MMICT5838-00-012,Dioneya:T5838_RevA,TDK InvenSense,MMICT5838-00-012,LGA-CAV-5 3.5x2.65x0.98 mm,,4,FITTED,MK1,hardware\EVT_PRE_20_BOM_REV_A.csv
-R1,1,0R EVT_SI_TUNE,Resistor_SMD:R_0402_1005Metric,Panasonic Industry,ERJ-2GE0R00X,0402 1005 metric,0 ohm,4,FITTED,R-MIC,hardware\EVT_PRE_20_BOM_REV_A.csv
