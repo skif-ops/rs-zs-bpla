@@ -19,6 +19,10 @@ The split follows the bearings in time order:
 - a bearing the station itself gives a sigma above MAX_SIGMA_DEG (its array heard no single clear direction, e.g.
   two targets at once) takes no part: with its wide tolerance it would join any segment and tilt the prediction,
   and the fusion would give it next to no weight anyway;
+- nor does a bearing the station gives a confidence below MIN_CONFIDENCE (a direction bearing of fewer than two bins
+  of its own, zs_doa_sep.h; a comb bearing whose pairs barely agree): two targets of one engine note heard at once
+  give such bearings between them, steady enough to form a segment whose rays cross the others' in ghost points
+  (twin field, three targets of 185 Hz 100..300 m apart: 24..47 ghost points of 180 s, 0..4 without them);
 - a bearing that names the fundamental of its source (bearing batch schema 2: a station hearing several targets at
   once sends one bearing per source, zs_comb_bearing.h) continues only a segment whose last named fundamental is
   within F0_STEP of it (more after a gap: Doppler moves the pitch of a pass by a few per cent a second), and waiting
@@ -51,6 +55,7 @@ WAIT_S = 6.0                    # a bearing waits this long for others to agree 
 ACTIVE_S = 6.0                  # a segment without a bearing for 6 s takes no more (the station window: 3 s)
 MAX_RATE_DEG_S = 30.0           # the prediction never turns faster (a target 100 m away at 50 m/s: 29 deg/s)
 MAX_SIGMA_DEG = 10.0            # bearings less certain than this belong to no segment
+MIN_CONFIDENCE = 0.2            # nor bearings the station gives so little confidence (its bins do not agree)
 F0_STEP = 0.05                  # a bearing's fundamental within 5 % of the segment's last one...
 F0_STEP_PER_S = 0.05            # ...plus 5 % per second of gap (Doppler of a close pass: up to ~7 %/s)
 
@@ -142,7 +147,8 @@ def split(rows: list[dict]) -> list[Segment]:
     """The segments of one station track's bearings (any order; sorted by time here).  Up to MAX_ACTIVE segments
     run at once (a station whose bearing alternates between two targets): a bearing joins the active segment that
     predicts it best."""
-    rows = sorted((r for r in rows if r["sigma_deg"] <= MAX_SIGMA_DEG), key=lambda r: (r["time_us"], r.get("f0_hz") or 0.0))
+    rows = sorted((r for r in rows if r["sigma_deg"] <= MAX_SIGMA_DEG and r.get("confidence", 1.0) >= MIN_CONFIDENCE),
+                  key=lambda r: (r["time_us"], r.get("f0_hz") or 0.0))
     if not rows:
         return []
     segments = [Segment(FIRST_SEGMENT, [rows[0]])]

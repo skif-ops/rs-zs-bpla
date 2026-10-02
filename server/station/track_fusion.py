@@ -25,8 +25,10 @@ stations, so association is geometric:
    STEAL_MARGIN_SIGMA (median); the track left behind keeps its points.
 
 After every accepted batch the whole fused track is recomputed from all member bearings (fusion/bearing_fusion.py),
-so batches of different stations may arrive in any order and a redelivered batch changes nothing.  Only bearings
-with trusted station time (GNSS or holdover) are fused.
+so batches of different stations may arrive in any order and a redelivered batch changes nothing; where its members
+give no points any more (a member left), the points shown before stay.  A point is marked ``ambiguous`` when a station
+of it hears another target of the same class and engine note at the same time: only geometry tells such targets'
+crossings from ghosts.  Only bearings with trusted station time (GNSS or holdover) are fused.
 
 Two targets at once: rays of stations hearing different targets intersect in ghost points.  Segments whose known
 classes differ or whose fundamentals are further apart than the Doppler shift allows (station/target_match.py) are
@@ -53,6 +55,9 @@ RELEASE_S = 10.0                 # a fused track without a point for this long o
 HEIGHT_AGREE_SIGMA = 3.0         # a point counts for a pair when its rays agree on the height within 3 sigma
 STEAL_MIN_POINTS = 8             # a pair may take a segment from another two-station track with this many points...
 STEAL_MARGIN_SIGMA = 0.5         # ...when its rays agree on the height better by this much (median, in sigmas)
+AMBIGUITY_TIME_US = 1_000_000    # a station hears another like target within 1 s of a point's arrival...
+AMBIGUITY_APART_DEG = 10.0       # ...in a direction at least this far from the point's
+AMBIGUITY_SLACK_US = 20_000_000  # station tracks heard this far around the points (range / c and more)
 
 Member = tuple[int, int, int]    # station_id, track event id, segment key
 
@@ -249,17 +254,64 @@ class BearingTrackFusion:
                 found.append((event["event_type"] == "AIR_ALERT", event["created_time_us"], sid))
         return max(found)[2] if found else None
 
+    def _mark_ambiguous(self, members: list[Member], points: list[dict]) -> None:
+        """Mark the points a ghost could explain as well (``ambiguous``): a station of the point hears, at the same
+        time, another target it cannot tell from this one (a segment of another direction, its class and fundamental
+        compatible with the track's: target_match).  Rays of such stations cross the other target's rays too, and only
+        geometry tells which crossings are targets (same-type targets in formation: most points of a ghost and of a
+        target alike).  Targets told apart by class or fundamental, and a single target, leave the points unmarked."""
+        if not points:
+            return
+        own = set(members)
+        signature = target_match.merge([self._signature(m) for m in members])
+        heard: dict[int, list[tuple[int, float]]] = {}           # station -> (time, azimuth) of like targets' bearings
+        for t in self.store.bearing_tracks(points[0]["time_us"] - AMBIGUITY_SLACK_US, points[-1]["time_us"] + AMBIGUITY_SLACK_US):
+            for seg in self._segments(t["station_id"], t["track_event_id"]):
+                member = (t["station_id"], t["track_event_id"], seg.key)
+                if member not in own and target_match.compatible(signature, self._signature(member)):
+                    heard.setdefault(t["station_id"], []).extend((r["time_us"], r["azimuth_deg"]) for r in seg.rows)
+        lookup = {}
+        for station_id, rows in heard.items():
+            pos = next((self.store.station_position(m[0], m[1]) for m in members if m[0] == station_id), None)
+            if pos:
+                rows.sort()
+                lookup[station_id] = (EnuFrame(*pos), np.array([r[0] for r in rows], dtype=np.int64), np.array([r[1] for r in rows]))
+        for p in points:
+            p["ambiguous"] = False
+            for station_id in p["stations"]:
+                if station_id not in lookup:
+                    continue
+                frame, times, azimuths = lookup[station_id]
+                enu = frame.to_enu(p["lat"], p["lon"], p["alt_msl_m"])
+                heard_us = p["time_us"] + float(np.linalg.norm(enu[:2])) / SPEED_OF_SOUND_MPS * 1e6
+                lo, hi = np.searchsorted(times, [heard_us - AMBIGUITY_TIME_US, heard_us + AMBIGUITY_TIME_US])
+                if hi > lo:
+                    toward = math.degrees(math.atan2(enu[0], enu[1]))
+                    if np.any(np.abs((azimuths[lo:hi] - toward + 180.0) % 360.0 - 180.0) > AMBIGUITY_APART_DEG):
+                        p["ambiguous"] = True
+                        break
+
     def recompute(self, track_id: str) -> dict:
+        """The track's points from all its member bearings.  Where its members cannot give points any more (a member
+        left the track: it heard another target, or the target went on without the track), the points shown before
+        stay as they were: a member leaving never erases a track's history, a ghost's included.  Where two or more
+        member stations have bearings, the fresh points are the track (so the order of the batches does not matter)."""
         members = self.store.track_members(track_id)
-        points = [p.as_dict() for p in fuse(self._station_bearings(members))]
-        if not points and len({m[0] for m in members}) < 2:          # a stale track left by its members: kept as it was
-            old = self.store.get_track(track_id)
-            if old and old["track_points"]:
-                points = old["track_points"]
+        stations = self._station_bearings(members)
+        fresh = [p.as_dict() for p in fuse(stations)]
+        self._mark_ambiguous(members, fresh)
+        old = self.store.get_track(track_id)
+        spans = [(float(s.time_s[0]) - MAX_RANGE_M / SPEED_OF_SOUND_MPS, float(s.time_s[-1])) for s in stations if s.time_s.size]
+
+        def covered(time_us: int) -> bool:                   # two member stations heard the emission time
+            return sum(1 for a, b in spans if a <= time_us * 1e-6 <= b) >= 2
+
+        kept = [p for p in (old["track_points"] if old else []) if not covered(p["time_us"])]
+        points = sorted(kept + fresh, key=lambda p: p["time_us"])
         system_event_id = self._system_event(members)
         self.store.replace_track(track_id, members, system_event_id, points)
         return {"track_id": track_id, "system_event_id": system_event_id, "stations": sorted({m[0] for m in members}),
-                "points": len(points), "last": points[-1] if points else None}
+                "points": len(points), "last": fresh[-1] if fresh else None}
 
     def on_batch(self, batch) -> list[dict]:
         """A stored bearing batch: the fused tracks of the segments it fed, recomputed (none while single-station)."""

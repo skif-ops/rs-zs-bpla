@@ -64,6 +64,7 @@ def track_object(track_id: str, point: dict, *, first_us: int, points: int, stat
         "class": klass,
         "stations": stations,
         "crossing_deg": round(point["crossing_deg"], 1),
+        "ambiguous": bool(point.get("ambiguous", False)),
         "first": iso(first_us),
         "points": points,
         "ended": iso(ended_us) if ended_us else None,

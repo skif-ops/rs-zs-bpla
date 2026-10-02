@@ -53,6 +53,19 @@ def test_uncertain_bearings_take_no_part():
     assert [len(s.rows) for s in segments] == [127]
 
 
+def test_bearings_of_little_confidence_take_no_part():
+    # two targets of one engine note in a formation: the array's bins at the shared lines hear both at once and point
+    # between them; the station gives such a bearing a confidence below 0.2 (fewer than two bins of its own).  Taken,
+    # they formed a segment of their own between the targets and its rays crossed others in ghost points.
+    rng = np.random.default_rng(6)
+    rows = rows_of([120.0 + 0.3 * k + rng.normal(0.0, 1.0) for k in range(120)])
+    rows = [dict(r, confidence=0.9) for r in rows]
+    for k in range(0, 120, 2):
+        rows[k] = dict(rows[k], azimuth_deg=150.0 + 0.3 * k + rng.normal(0.0, 1.0), confidence=0.1)
+    segments = track_segments.split(rows)
+    assert [len(s.rows) for s in segments] == [60] and all(r["confidence"] >= track_segments.MIN_CONFIDENCE for r in segments[0].rows)
+
+
 def test_a_switch_to_another_target_starts_a_segment_at_the_switch():
     az = [300.0 + 0.2 * k for k in range(60)] + [130.0 + 0.3 * k for k in range(60)]
     rows = rows_of(az)
