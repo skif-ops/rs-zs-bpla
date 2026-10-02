@@ -102,6 +102,7 @@
         "class": {"$ref": "#/$defs/class"},
         "stations": {"type": "array", "items": {"type": "integer"}, "minItems": 2},
         "crossing_deg": {"type": "number", "minimum": 0, "maximum": 90},
+        "ambiguous": {"enum": [true, false], "description": "a station of the point hears another target it cannot tell from this one at the same time: the point may be a ghost crossing (2026-10-02, optional)"},
         "first": {"$ref": "#/$defs/time"},
         "points": {"type": "integer", "minimum": 1},
         "ended": {"oneOf": [{"$ref": "#/$defs/time"}, {"type": "null"}]},
