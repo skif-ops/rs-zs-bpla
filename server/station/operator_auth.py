@@ -142,6 +142,11 @@ PERMISSION_RULES: list[tuple[set[str], re.Pattern, str]] = [
     ({"GET", "HEAD", "PUT"}, re.compile(r"^/api/v1/access/accounts(?:/[^/]+/scope)?$"), SCOPES_MANAGE),
     ({"GET", "HEAD"}, re.compile(r"^/api/v1/admin/audit-logging$"), AUDIT_READ),
     ({"PUT"}, re.compile(r"^/api/v1/admin/audit-logging$"), AUDIT_CONTROL),
+    ({"GET", "HEAD"}, re.compile(r"^/api/v1/admin/audit$"), AUDIT_READ),
+    ({"GET", "HEAD", "POST"}, re.compile(r"^/api/v1/admin/accounts$"), USERS_MANAGE),
+    ({"PUT", "DELETE"}, re.compile(r"^/api/v1/admin/accounts/[^/]+$"), USERS_MANAGE),
+    ({"POST"}, re.compile(r"^/api/v1/admin/accounts/[^/]+/(?:password|totp-reset|logout|tokens)$"), USERS_MANAGE),
+    ({"DELETE"}, re.compile(r"^/api/v1/admin/tokens/[^/]+$"), USERS_MANAGE),
 ]
 # the login steps before a session exists: a new password, the second-factor enrolment (each needs the signed step
 # token the password step gave)
@@ -415,8 +420,9 @@ class AccountStore:
         entry["stations"] = sorted(set(stations))
         self._save(data)
 
-    def set_totp(self, name: str, secret: str | None) -> None:
-        """The second-factor secret (None: removed; the superuser then enrols a new one at its next login)."""
+    def set_totp(self, name: str, secret: str | None, enrol_at_login: bool = False) -> None:
+        """The second-factor secret (None: removed; the superuser, or with ``enrol_at_login`` any account, then enrols a
+        new one at its next login)."""
         data = self._copy()
         entry = self._entry(data, name)
         if secret:
@@ -424,8 +430,18 @@ class AccountStore:
             entry.pop("totp_at_login", None)
         else:
             entry.pop("totp", None)
-            if name == SUPERUSER_NAME:
+            if name == SUPERUSER_NAME or enrol_at_login:
                 entry["totp_at_login"] = True
+        self._save(data)
+
+    def require_first_login(self, name: str) -> None:
+        """The next login changes the (temporary) password; an account that needs the second factor and has none enrols
+        it there too (accounts made or reset by an administrator)."""
+        data = self._copy()
+        entry = self._entry(data, name)
+        entry["must_change"] = True
+        if SECOND_FACTOR_ROLES & set(roles_of(entry)) and not entry.get("totp"):
+            entry["totp_at_login"] = True
         self._save(data)
 
     def remove_user(self, name: str) -> None:
@@ -946,6 +962,15 @@ def safe_next(target: str | None) -> str:
 
 def needs_second_factor(user: dict[str, Any]) -> bool:
     return second_factor_required() and bool(SECOND_FACTOR_ROLES & set(user["roles"]))
+
+
+def confirm_second_factor(user: dict[str, Any], code: str | None, now: float | None = None) -> bool:
+    """A dangerous action of a session repeats the code of its account's second factor (the current 30-s step or a
+    neighbour; not consumed, so several actions in one step need one code).  True without a second factor to ask."""
+    if not needs_second_factor(user):
+        return True
+    secret = user.get("totp")
+    return bool(secret) and totp_counter(code or "", secret, time.time() if now is None else now) is not None
 
 
 def build_router(templates) -> APIRouter:

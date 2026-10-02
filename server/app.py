@@ -43,7 +43,7 @@ app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 templates = Jinja2Templates(directory=settings.template_dir)
 app.include_router(station_router)
 app.include_router(access_router)      # who sees which stations: set by the security admin and engineers
-app.include_router(admin_router)       # administration: the audit log switch of the superuser
+app.include_router(admin_router)       # administration: accounts, the audit log and its switch (/admin)
 # release audit item 1: every page, API route and the event stream need an operator (station/operator_auth.py)
 app.include_router(build_auth_router(templates))
 app.add_middleware(OperatorAuthMiddleware)
@@ -97,6 +97,13 @@ async def replay_page(request: Request) -> HTMLResponse:
     """Replay of a target's movement without a map: stations, bearing rays and the fused track on a metric plane."""
 
     return templates.TemplateResponse(request, "replay.html")
+
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_page(request: Request) -> HTMLResponse:
+    """Administration: accounts, station visibility, the audit log (each part for the permissions it needs)."""
+
+    return templates.TemplateResponse(request, "admin.html")
 
 
 @app.get("/single", response_class=HTMLResponse)

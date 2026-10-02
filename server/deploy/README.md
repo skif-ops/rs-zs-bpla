@@ -72,6 +72,12 @@ isolated-bench configurations and must not be used for production.
   removed, disabled, limited or given other roles; `$OA passwd skif_root` and
   `$OA totp-reset skif_root` recover it on the server.
 
+  The `/admin` page does the same from the browser for the security admin and
+  `skif_root` (accounts, roles, resets, tokens, sessions, the audit log) and for
+  engineers (station visibility); every change there repeats the current
+  second-factor code. An account made or reset there sets its own password at
+  its next login, and an engineer or admin enrols its second factor there too.
+
   Scripts send `Authorization: Bearer <token>`; a token may use only its scopes
   (default `read`), never more than its account. The session cookie is `Secure`:
   serve the UI over HTTPS (an SSH tunnel to `localhost` also works). Sessions

@@ -1,4 +1,4 @@
-"""The superuser skif_root (docs/SERVER_ACCESS_CONTROL_2026-10-02.md, §8): one account, created by the server with the
+"""The superuser skif_root (docs/SERVER_ACCESS_CONTROL_2026-10-02.md, §7 and §8): one account, created by the server with the
 default password, which the first login must change and then enrol the second factor; every permission and every
 station; the switch of the audit log of actions, whose switching is always recorded."""
 import io
@@ -126,7 +126,8 @@ def test_superuser_may_do_everything_and_sees_every_station(auth):
 
 def test_the_audit_log_of_actions_can_be_switched_off_and_the_switching_shows(auth):
     store, app = auth
-    _, done = first_login(root := client(app))
+    root_secret, done = first_login(root := client(app))
+    step_up = {**ORIGIN, "x-second-factor": oa.totp_code(root_secret, int(time.time() // oa.TOTP_STEP_S))}
     store.add_user("anna", "operator", PASSWORD)
     adm_secret = oa.new_totp_secret()
     store.add_user("ada", "admin", PASSWORD)
@@ -135,9 +136,10 @@ def test_the_audit_log_of_actions_can_be_switched_off_and_the_switching_shows(au
     assert login(ada, "ada", code=oa.totp_code(adm_secret, int(time.time() // oa.TOTP_STEP_S))).status_code == 303
     assert ada.get("/api/v1/admin/audit-logging").json()["enabled"] is True
     assert ada.put("/api/v1/admin/audit-logging", json={"enabled": False}, headers=ORIGIN).status_code == 403
+    assert root.put("/api/v1/admin/audit-logging", json={"enabled": False}, headers=ORIGIN).status_code == 403   # no code
     state = oa.current_state()
     before = len(state.audit_records(1000))
-    off = root.put("/api/v1/admin/audit-logging", json={"enabled": False}, headers=ORIGIN)
+    off = root.put("/api/v1/admin/audit-logging", json={"enabled": False}, headers=step_up)
     assert off.status_code == 200 and off.json()["enabled"] is False and off.json()["changed_by"] == ROOT
     anna = client(app)
     login(anna, "anna")                                                 # not recorded: a login...
@@ -146,7 +148,8 @@ def test_the_audit_log_of_actions_can_be_switched_off_and_the_switching_shows(au
     client(app).post("/api/v1/stations/17/audio-request", json={"event_id": 5},
                      headers={**ORIGIN, "authorization": "Bearer " + store.issue_token("anna", "x")[1]})   # ...a refusal
     assert ada.get("/api/v1/admin/audit-logging").json()["enabled"] is False
-    on = root.put("/api/v1/admin/audit-logging", json={"enabled": True}, headers=ORIGIN)
+    on = root.put("/api/v1/admin/audit-logging", json={"enabled": True},
+                  headers={**ORIGIN, "x-second-factor": oa.totp_code(root_secret, int(time.time() // oa.TOTP_STEP_S))})
     assert on.status_code == 200 and on.json()["enabled"] is True
     rows = [(r["actor"], r["action"], r["target"], r["result"]) for r in state.audit_records(1000)][before:]
     assert rows[0] == (ROOT, "audit-logging", "off", "ok")

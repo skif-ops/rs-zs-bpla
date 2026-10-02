@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Мухоед - администрирование{% endblock %}
+{% block content %}
+{% set perms = request.state.operator.permissions if request.state.operator else [] %}
+<section class="page-header compact">
+  <h1>Администрирование</h1>
+  <p>Учётные записи, видимость станций и журнал аудита. Изменения подтверждаются кодом второго фактора и записываются
+    в журнал.</p>
+</section>
+
+<div class="admin" id="admin" data-permissions="{{ perms | join(',') }}" data-me="{{ request.state.operator.name if request.state.operator else '' }}">
+  <div class="alert alert-warning" id="admin-audit-off" hidden>Журнал действий выключен: входы и изменения не
+    записываются.</div>
+  <div class="alert alert-danger" id="admin-error" role="alert" hidden></div>
+
+  {% if "users.manage" in perms %}
+  <section class="admin-panel" id="panel-accounts">
+    <h2>Учётные записи</h2>
+    <div class="table-responsive">
+      <table class="table table-sm admin-table">
+        <thead><tr><th>Имя</th><th>Роли</th><th>Состояние</th><th>Участки, станции</th><th>Сессии</th><th>Действия</th></tr></thead>
+        <tbody id="accounts-body"><tr><td colspan="6" class="text-muted">загрузка…</td></tr></tbody>
+      </table>
+    </div>
+    <form class="admin-form" id="account-new">
+      <h3>Новая учётная запись</h3>
+      <div class="admin-row">
+        <label>Имя <input class="form-control" name="name" pattern="[a-z][a-z0-9._-]{1,31}" required></label>
+        <label>Временный пароль <input class="form-control" name="password" type="password" minlength="12" required
+               autocomplete="new-password"></label>
+      </div>
+      <div class="admin-roles" id="new-roles"></div>
+      <p class="admin-note">При первом входе пользователь сменит пароль; инженер и администратор там же получат второй фактор.</p>
+      <button class="btn btn-primary" type="submit">Создать</button>
+    </form>
+  </section>
+  {% endif %}
+
+  {% if "scopes.manage" in perms %}
+  <section class="admin-panel" id="panel-scopes">
+    <h2>Видимость станций</h2>
+    <p class="admin-note">Пусто: без ограничения. Участки и станции через запятую; действуют вместе.</p>
+    <div class="table-responsive">
+      <table class="table table-sm admin-table">
+        <thead><tr><th>Имя</th><th>Роли</th><th>Участки</th><th>Станции</th><th></th></tr></thead>
+        <tbody id="scopes-body"><tr><td colspan="5" class="text-muted">загрузка…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if "audit.read" in perms %}
+  <section class="admin-panel" id="panel-audit">
+    <h2>Журнал аудита</h2>
+    <div class="admin-row">
+      <span id="audit-chain" class="admin-chain"></span>
+      {% if "audit.control" in perms %}
+      <label class="admin-switch"><input type="checkbox" id="audit-logging"> Журнал действий включён</label>
+      {% else %}
+      <span id="audit-logging-state" class="admin-note"></span>
+      {% endif %}
+    </div>
+    <div class="admin-row">
+      <label>Кто <input class="form-control" id="audit-actor" placeholder="все"></label>
+      <label>Записей <select class="form-control" id="audit-limit"><option>100</option><option selected>200</option><option>1000</option></select></label>
+      <button class="btn btn-outline-primary" id="audit-refresh" type="button">Показать</button>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm admin-table admin-audit">
+        <thead><tr><th>Время (UTC)</th><th>Кто</th><th>Откуда</th><th>Действие</th><th>Объект</th><th>Итог</th><th>Подробности</th></tr></thead>
+        <tbody id="audit-body"></tbody>
+      </table>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if not ("users.manage" in perms or "scopes.manage" in perms or "audit.read" in perms) %}
+  <p>У этой учётной записи нет прав администрирования.</p>
+  {% endif %}
+</div>
+
+<dialog class="admin-dialog" id="confirm-dialog">
+  <form method="dialog" id="confirm-form">
+    <p id="confirm-text"></p>
+    <div id="confirm-extra"></div>
+    <label class="form-label" for="confirm-code">Код второго фактора</label>
+    <input class="form-control" id="confirm-code" inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" autocomplete="one-time-code">
+    <div class="admin-row mt-3">
+      <button class="btn btn-primary" value="ok">Подтвердить</button>
+      <button class="btn btn-outline-secondary" value="cancel" formnovalidate>Отмена</button>
+    </div>
+  </form>
+</dialog>
+<script src="/static/js/admin.js"></script>
+{% endblock %}
