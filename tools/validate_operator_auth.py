@@ -44,19 +44,33 @@ def main() -> int:
         '"websocket.close"',
         "has_users()",
         "0o600",
+        # roles and permissions, server-side sessions, second factor, audit chain (2026-10-02)
+        "ROLE_PERMISSIONS = {",
+        "def required_permission(",
+        "UNMAPPED",
+        'SECOND_FACTOR_ROLES = {"engineer", "admin"}',
+        "SESSION_IDLE_S = 30 * 60",
+        "close_sessions(",
+        "use_totp_step(",
+        "hashlib.sha1",
+        "def audit_verify(",
+        'user["permissions"] & set(entry["scopes"])',
     ):
         require(token in module, f"operator auth contract missing: {token}")
+    require('"viewer": {READ}' in module and '"service": {READ}' in module, "viewer or service role may change things")
+    require("STATION_COMMAND" not in module.split('"admin": {', 1)[1].split("}", 1)[0],
+            "the security admin must not command stations")
     require("TOKEN_PREFIX + secrets.token_urlsafe(32)" in module and "hashlib.sha256(token.encode())" in module,
             "API tokens are not random or not stored as hashes")
     require("app.add_middleware(OperatorAuthMiddleware)" in app and "build_auth_router(templates)" in app,
             "operator auth is not mounted on the application")
 
     for name, text in prod.items():
-        require(ENV not in text and "ZS_OPERATOR_COOKIE_SECURE" not in text,
+        require(ENV not in text and "ZS_OPERATOR_COOKIE_SECURE" not in text and "ZS_OPERATOR_TOTP" not in text,
                 f"production compose {name} weakens operator auth")
     for name, text in bench.items():
         require(f'{ENV}: "1"' in text, f"bench compose {name} does not opt out explicitly")
-    for entry in ("server/data/operators.json", "server/data/operator_session.key", "server/data/audio/"):
+    for entry in ("server/data/operators.json", "server/data/operator_session.key", "server/data/audio/", "server/data/*.sqlite3"):
         require(entry in gitignore, f"secret or recording not excluded from Git: {entry}")
 
     for token in (
@@ -70,9 +84,17 @@ def main() -> int:
         "test_event_stream_needs_a_viewer",
         "test_station_bench_routes_keep_their_own_guard",
         "test_bench_switch_is_exact",
+        "test_sessions_end_when_idle_and_on_demand",
+        "test_second_factor_for_engineers_and_admins",
+        "test_totp_matches_rfc_6238",
+        "test_roles_and_permissions",
+        "test_every_changing_route_is_declared",
+        "test_legacy_account_file_keeps_working",
+        "test_audit_log_is_chained",
     ):
         require(token in tests, f"operator auth QG-2 case missing: {token}")
     require(ENV in conftest, "API tests do not opt out explicitly")
+    require("totp-enroll" in readme and "audit-verify" in readme, "deployment guide does not cover the second factor and the audit log")
     require("python -m station.operator_auth add-user" in readme and f"Never set `{ENV}`" in readme,
             "deployment guide does not cover operator accounts")
     require("proxy_set_header Host" in readme, "reverse proxy Host requirement undocumented")
@@ -83,7 +105,8 @@ def main() -> int:
             "operator auth QG-1/QG-2 are not bound to CI")
 
     print("Operator authentication QG-1 completeness/traceability: PASS")
-    print("fail-closed login/roles/tokens mounted on the whole app; bench opt-out explicit; deployment checks remain open")
+    print("fail-closed login/roles/permissions/second factor/tokens/audit mounted on the whole app; bench opt-out explicit; "
+          "deployment checks remain open")
     return 0
 
 

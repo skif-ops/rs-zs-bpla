@@ -31,23 +31,49 @@ isolated-bench configurations and must not be used for production.
   `/api/v1/stream` WebSocket need an operator; only `/static`, `/login`,
   `/api/v1/health` and the (disabled) station bench routes are open. Without
   accounts the server refuses everything (fail-closed). Create accounts on the
-  server, outside Git (`data/operators.json`, mode 0600):
+  server, outside Git (`data/operators.json` and `data/operator_state.sqlite3`,
+  both mode 0600):
 
   ```bash
-  docker compose -f compose.ubuntu.yml exec server python -m station.operator_auth add-user anna --role operator
+  OA="docker compose -f compose.ubuntu.yml exec server python -m station.operator_auth"
   docker compose -f compose.ubuntu.yml exec server python -m station.operator_auth add-user duty --role viewer
-  docker compose -f compose.ubuntu.yml exec server python -m station.operator_auth issue-token anna --label reports
+  $OA add-user anna --role operator
+  $OA add-user ivan --roles operator,engineer
+  $OA totp-enroll ivan                       # secret shown once: add it to an authenticator app
+  $OA add-user sec --role admin
+  $OA totp-enroll sec
+  $OA set-scope anna --tenants north --stations 17,18   # what she sees (empty: all)
+  $OA issue-token anna --label reports --scopes read --expires-days 90
   ```
 
-  `viewer` reads events and stations; `operator` also requests audio, manages the
-  dataset and runs analyses, and is the only role that may fetch event audio (it
-  can contain speech). Scripts send `Authorization: Bearer <token>`. The session
-  cookie is `Secure`: serve the UI over HTTPS (an SSH tunnel to `localhost` also
-  works). Failed logins lock one name from one address after 5 tries and a whole
-  address after 20 (15 min); behind the proxy set `ZS_OPERATOR_TRUSTED_PROXY=1`
-  and have the proxy append `X-Forwarded-For`, otherwise all logins share the
-  proxy address. Never set `ZS_OPERATOR_AUTH_INSECURE_BENCH` or
-  `ZS_OPERATOR_COOKIE_SECURE=0` in production.
+  Roles (an account may have several): `viewer` reads events, stations and the
+  map; `operator` also listens to event audio (it can contain speech), requests
+  audio and runs analyses; `engineer` also edits the dataset and commands
+  stations (network configuration, firmware and model updates); `admin` (security
+  administrator) manages accounts and their visibility, rotates the command
+  signing key and reads the audit log, but does not command stations; `service`
+  is for integrations (read only). Engineers and admins log in with a TOTP code
+  of an authenticator app (`totp-enroll`; `totp-reset` when a phone is lost).
+  An account file from before roles keeps working: `"role": "operator"` becomes
+  the operator role, and engineer rights are given with `set-roles`.
+
+  Scripts send `Authorization: Bearer <token>`; a token may use only its scopes
+  (default `read`), never more than its account. The session cookie is `Secure`:
+  serve the UI over HTTPS (an SSH tunnel to `localhost` also works). Sessions
+  are kept on the server: logout ends one, 30 min without a request or 12 h end
+  it, `passwd`, `disable`, `remove-user` and `logout-all` end all of an
+  account's at once (`sessions` lists them). Failed logins lock one name from
+  one address after 5 tries and a whole address after 20 (15 min); behind the
+  proxy set `ZS_OPERATOR_TRUSTED_PROXY=1` and have the proxy append
+  `X-Forwarded-For`, otherwise all logins share the proxy address.
+
+  The audit log records logins and failed logins, logouts, every changing
+  request (who, from where, what, the answer) and every account change; each
+  record carries the hash of the one before. `$OA audit --limit 100` shows it,
+  `$OA audit-verify` checks that no record was changed or removed; back up
+  `operator_state.sqlite3` with the database.
+  Never set `ZS_OPERATOR_AUTH_INSECURE_BENCH`, `ZS_OPERATOR_COOKIE_SECURE=0` or
+  `ZS_OPERATOR_TOTP=0` in production.
 - Station HTTP ingress disabled by default; production telemetry enters through
   the mutual-TLS MQTT bridge. Do not set `ZS_STATION_HTTP_INSECURE_BENCH`.
 - Telegram/mobile notification credentials injected as secrets, not committed.
