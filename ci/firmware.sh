@@ -11,4 +11,5 @@ if [ -d firmware/targets/evt_pre_20/app ]; then
     -DCMAKE_TOOLCHAIN_FILE="$PWD/firmware/targets/evt_pre_20/app/cmake/arm-none-eabi.cmake" -DCMAKE_BUILD_TYPE=Release
   cmake --build build-target --parallel
   python3 firmware/tools/check_stack_usage.py build-target
+  python3 firmware/tools/check_memory_budget.py build-target/dioneya_evt_pre_20.elf firmware/targets/evt_pre_20/memory_budget.json
 fi
