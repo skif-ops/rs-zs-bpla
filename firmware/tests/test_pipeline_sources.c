@@ -3,7 +3,10 @@
    direction (one multirotor's rotors) are one target: no rotation, one bearing.  With a stash (targets by direction,
    zs_doa_sep.h): the two directions are classified on their own windows and each gets its own bearing with its label;
    a UAV beside a tractor (the extractor stub tells them by whose lines dominate the window it is given) gets bearings,
-   the tractor's direction none. */
+   the tractor's direction none; two targets whose own windows weaken below the weak threshold as they close in keep
+   their bearings (the hold of a confirmed target), and a held target whose own windows turn into a ground engine,
+   even far from its centroid, lets go; a held target keeps its own direction bearing and label when the other target
+   comes into its direction and loses its track. */
 #include "array_render.h"
 #include "zs_model_centroids.h"
 #include "zs_station_pipeline.h"
@@ -27,6 +30,11 @@ typedef struct {
   float az_sum[2], az_err_max[2];
   float truth_az[2], truth_f0[2];
   float other_f0;                  /* bearings whose fundamental matches neither source */
+  unsigned weak_from;              /* windows from this one on are a UAV far from its centroid (confidence 35 < 48) */
+  unsigned ground_from;            /* windows source 1 dominates from this one on are a ground engine at confidence 69 */
+  unsigned late_from, late[2];     /* bearings of each source from this window on */
+  unsigned late_f0[2];             /* ... that also name its fundamental */
+  unsigned late_doa;               /* direction bearings delivered from window late_from on */
 } world_t;
 
 /* power of the first four harmonics of f0 in the window (Goertzel) */
@@ -44,9 +52,12 @@ static double comb_power(const int16_t *pcm, size_t n, float f0) {
 static bool extract(void *ctx, const int16_t *pcm, size_t n, float out[ZS_FEATURE_COUNT]) {
   world_t *W = ctx;
   /* FP-1 (centroid 0), or a tractor (centroid 24, class 14) when the tractor's lines dominate the window given */
-  const bool ground = W->tractor && comb_power(pcm, n, W->truth_f0[1]) > comb_power(pcm, n, W->truth_f0[0]);
+  const bool second = comb_power(pcm, n, W->truth_f0[1]) > comb_power(pcm, n, W->truth_f0[0]);
+  const bool ground = second && (W->tractor || (W->ground_from && W->extracted >= W->ground_from));
   const unsigned c = ground ? 24u : 0u;
-  for (unsigned i = 0u; i < ZS_FEATURE_COUNT; i++) out[i] = zs_model_mean[i] + zs_model_std[i] * zs_model_centroid[c][i];
+  /* away from the centroid along it: FP-1 x 2.25 is FP-1 at 35, the tractor x 3 the tractor at 69 */
+  const float k = ground ? (W->tractor ? 1.0f : 3.0f) : (W->weak_from && W->extracted >= W->weak_from ? 2.25f : 1.0f);
+  for (unsigned i = 0u; i < ZS_FEATURE_COUNT; i++) out[i] = zs_model_mean[i] + zs_model_std[i] * zs_model_centroid[c][i] * k;
   W->extracted++;
   return true;
 }
@@ -55,11 +66,15 @@ static void bearing(void *ctx, const zs_bearing_t *b, uint64_t end_sample, uint6
   world_t *W = ctx;
   (void)end_sample; (void)track;
   for (unsigned s = 0u; s < 2u; s++)
-    if (fabsf(fmodf(b->azimuth_deg - W->truth_az[s] + 540.0f, 360.0f) - 180.0f) <= 10.0f) W->toward[s]++;
+    if (fabsf(fmodf(b->azimuth_deg - W->truth_az[s] + 540.0f, 360.0f) - 180.0f) <= 10.0f) {
+      W->toward[s]++;
+      if (W->late_from && W->extracted >= W->late_from) W->late[s]++;
+    }
   for (unsigned s = 0u; s < 2u; s++) {
     if (fabsf(b->f0_hz - W->truth_f0[s]) > 0.08f * W->truth_f0[s]) continue;
     const float e = fabsf(fmodf(b->azimuth_deg - W->truth_az[s] + 540.0f, 360.0f) - 180.0f);
     W->bearings[s]++;
+    if (W->late_from && W->extracted >= W->late_from && e <= 10.0f) W->late_f0[s]++;
     W->az_sum[s] += e;
     if (e > W->az_err_max[s]) W->az_err_max[s] = e;
     return;
@@ -76,14 +91,19 @@ static float comb_next(source_t *s) {
   return 0.1f * v;
 }
 
-/* `seconds` of the two sources (az a0 and a1, elevation 10 deg) and a little noise into the ring, polled every 0.5 s */
+/* `seconds` of the two sources (az a0 and a1, elevation 10 deg) and a little noise into the ring, polled every 0.5 s;
+   from hop `join_from` on (0: never) source 1 comes from source 0's direction, 3 dB louder than it */
+static unsigned join_from;
+static float join_az;
 static void run(zs_audio_ring_t *ring, zs_station_pipeline_t *p, source_t src[2], double seconds) {
   static uint32_t rng = 1u;
   for (unsigned hop = 0u; hop < (unsigned)(seconds * 2.0); hop++) {
     for (unsigned i = 0u; i < FS / 2u; i++) {
       float sum[4] = {0}, o[4];
       for (unsigned s = 0u; s < 2u; s++) {
-        array_render_push(&src[s].r, src[s].gain * comb_next(&src[s]), o);
+        const bool joined = s == 1u && join_from && hop >= join_from;
+        if (joined && i == 0u && hop == join_from) array_render_set_direction(&src[s].r, join_az, 10.0f, 15.0f);
+        array_render_push(&src[s].r, (joined ? 1.4f : src[s].gain) * comb_next(&src[s]), o);
         for (unsigned c = 0u; c < 4u; c++) sum[c] += o[c];
       }
       int16_t frame[4];
@@ -94,17 +114,28 @@ static void run(zs_audio_ring_t *ring, zs_station_pipeline_t *p, source_t src[2]
       }
       zs_audio_ring_push(ring, frame);
     }
+    world_t *W = p->port->ctx;
+    const uint32_t before = p->doa_bearings;
     (void)zs_station_pipeline_poll(p, ring);
+    if (W->late_from && W->extracted >= W->late_from) W->late_doa += p->doa_bearings - before;
   }
 }
 
 static int16_t stash[ZS_PIPELINE_HOP_SAMPLES];
 
-static void scenario(float az0, float az1, bool with_stash, bool tractor, world_t *W, zs_station_pipeline_t *P) {
+/* the windows (extractor calls) at which the own windows weaken, source 1's turn ground, and late bearings count from */
+typedef struct { unsigned weak_from, ground_from, late_from, join_from; } turns_t;
+
+static void scenario_t(float az0, float az1, bool with_stash, bool tractor, turns_t turns, world_t *W, zs_station_pipeline_t *P) {
   static source_t src[2];
   zs_audio_ring_t ring;
   const zs_station_pipeline_port_t port = {W, extract, NULL, emit, 21u, 3u, 0u, 0u, NULL, bearing};
   memset(W, 0, sizeof(*W));
+  W->weak_from = turns.weak_from;
+  W->ground_from = turns.ground_from;
+  W->late_from = turns.late_from;
+  join_from = turns.join_from;
+  join_az = az0;
   memset(src, 0, sizeof(src));
   W->tractor = tractor;
   src[0].f0 = 183.0f; src[1].f0 = 120.0f;
@@ -125,6 +156,13 @@ static void scenario(float az0, float az1, bool with_stash, bool tractor, world_
          W->bearings[0], W->bearings[0] ? W->az_sum[0] / W->bearings[0] : 0.0f, W->az_err_max[0],
          W->bearings[1], W->bearings[1] ? W->az_sum[1] / W->bearings[1] : 0.0f, W->az_err_max[1], P->comb_stats.attempts, P->comb_stats.computed,
          P->doa_windows, P->doa_mixture_windows, P->doa_classified_windows, P->doa_bearings, W->toward[0], W->toward[1]);
+  if (turns.late_from) printf("  late bearings (windows >= %u): %u / %u, naming their source %u / %u, by direction %u\n", turns.late_from,
+                              W->late[0], W->late[1], W->late_f0[0], W->late_f0[1], W->late_doa);
+}
+
+static void scenario(float az0, float az1, bool with_stash, bool tractor, world_t *W, zs_station_pipeline_t *P) {
+  const turns_t none = {0u, 0u, 0u, 0u};
+  scenario_t(az0, az1, with_stash, tractor, none, W, P);
 }
 
 int main(void) {
@@ -145,6 +183,28 @@ int main(void) {
   /* a UAV beside a tractor: the tractor's direction is never a target */
   scenario(40.0f, 230.0f, true, true, &W, &P);
   assert(P.doa_mixture_windows >= 30u && W.toward[0] >= 8u && W.toward[1] == 0u);
+  /* two targets confirmed, then their own windows weaken (UAV at 35 < 48: no weak votes) from window 24 on: their votes
+     alone lapse within a few windows, the hold keeps both targets and their bearings to the end */
+  {
+    const turns_t weak = {24u, 0u, 40u, 0u};
+    scenario_t(40.0f, 230.0f, true, false, weak, &W, &P);
+    assert(W.late[0] >= 15u && W.late[1] >= 15u && W.other_f0 == 0.0f);
+  }
+  /* ... and when source 1's own windows turn into a ground engine (69: not a ground vote, a weak one) from window 30 on,
+     its hold lets go: no bearings toward it from window 40 on, source 0 keeps its own */
+  {
+    const turns_t ground = {24u, 30u, 40u, 0u};
+    scenario_t(40.0f, 230.0f, true, false, ground, &W, &P);
+    assert(W.late[0] >= 15u && W.late[1] == 0u);
+  }
+  /* two targets confirmed, then source 1 comes into source 0's direction, louder (hop 36): its track is lost, one
+     direction is left; the held target keeps its own direction bearing with its label every window (before: the
+     pipeline fell back to the comb bearing of the mixture) */
+  {
+    const turns_t join = {0u, 0u, 44u, 36u};
+    scenario_t(40.0f, 230.0f, true, false, join, &W, &P);
+    assert(W.late_f0[0] >= 15u && W.late_doa >= 15u);
+  }
   /* the same two combs from one direction: one target (a multirotor's rotors), classified as one, one bearing */
   scenario(75.0f, 75.0f, false, false, &W, &P);
   assert(P.merged_windows >= 15u && P.separated_windows == 0u && P.confirmed_windows >= 30u);

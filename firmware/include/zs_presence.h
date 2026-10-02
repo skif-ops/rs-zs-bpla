@@ -36,6 +36,7 @@ typedef struct {
   uint8_t uav_votes;      /* windows with a UAV class at >= ZS_CLASSIFICATION_MIN_CONFIDENCE_U8 (distance <= 0.75 radius) */
   uint8_t uav_weak_votes; /* windows with a UAV class at >= ZS_PRESENCE_WEAK_CONFIDENCE_U8 (distance <= 1.2 radius) */
   uint8_t ground_votes;   /* windows with a ground-engine class (road traffic, agricultural, generator) */
+  uint8_t ground_weak_votes; /* windows with a ground-engine class at >= ZS_PRESENCE_WEAK_CONFIDENCE_U8 */
   bool comb;              /* gate present */
 } zs_presence_t;
 

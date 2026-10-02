@@ -263,6 +263,7 @@ static void doa_update_targets(zs_station_pipeline_t *p, const zs_doa_target_t *
     seen[slot] = true;
     t->absent = 0u;
     t->confirmed_direction = out[i].confirmed;
+    if (!out[i].confirmed) t->held = false;
     t->strength = out[i].strength;
     if (out[i].has_bearing) { t->bearing = out[i].bearing; t->bearing_age = 0u; }
     else { t->bearing.f0_hz = out[i].bearing.f0_hz; if (t->bearing_age < 255u) t->bearing_age++; }
@@ -271,6 +272,7 @@ static void doa_update_targets(zs_station_pipeline_t *p, const zs_doa_target_t *
     zs_pipeline_target_t *t = &p->doa_targets[k];
     if (seen[k] || !t->id) continue;
     t->confirmed_direction = false;
+    t->held = false;
     if (t->bearing_age < 255u) t->bearing_age++;
     if (++t->absent > ZS_DOA_RECALL_WINDOWS + ZS_DOA_MISS_MAX + 2u) memset(t, 0, sizeof(*t));
   }
@@ -290,6 +292,14 @@ static void doa_evaluate(zs_station_pipeline_t *p, unsigned k) {
     t->presence.level = ZS_PRESENCE_CONFIRMED;
     t->presence.confidence_u8 = ZS_PRESENCE_WEAK_CONFIDENCE_U8;
   }
+  /* once confirmed, a target holds while its direction track lives (it is here: present, a confirmed direction,
+     labelled; doa_update_targets drops the hold when the track is gone or its direction lapses) and none of its own
+     windows is a ground engine even at the weak threshold (a track that drifted onto a tractor lets go) */
+  if (t->presence.level == ZS_PRESENCE_CONFIRMED) t->held = true;
+  else if (t->held && t->presence.ground_weak_votes == 0u) {
+    t->presence.level = ZS_PRESENCE_CONFIRMED;
+    t->presence.confidence_u8 = ZS_PRESENCE_WEAK_CONFIDENCE_U8;
+  } else t->held = false;
 }
 
 /* the gate comb a label names: k x f0 (k 1..6) within ZS_PIPELINE_LABEL_RATIO; 0 when none or more than one */
@@ -308,11 +318,18 @@ static float gate_comb_of(const zs_air_gate_result_t *g, float label) {
 
 /* The bearings of the CONFIRMED direction targets (a window with at least two classifiable directions); the label goes
    out as the gate's fundamental when it names exactly one gate comb and no other delivered target names the same one.
-   Returns how many of out[] were filled. */
+   One direction left (the others faded, or came into its direction and lost their tracks): a target its own votes
+   confirmed keeps its bearing while it holds (doa_evaluate); with no window of its own any more, a ground vote of the
+   main stream lets it go.  Returns how many of out[] were filled. */
 static unsigned doa_deliveries(zs_station_pipeline_t *p, zs_bearing_t out[ZS_DOA_MAX_TRACKS]) {
   unsigned list[ZS_DOA_MAX_TRACKS], n = 0u;
   const unsigned nd = doa_ready(p, list);
-  if (!p->stash || nd < 2u) return 0u;
+  if (!p->stash || nd == 0u) return 0u;
+  if (nd == 1u) {
+    zs_pipeline_target_t *t = &p->doa_targets[list[0]];
+    if (t->held && zs_presence_evaluate(&p->votes, NULL).ground_weak_votes > 0u) t->held = false;
+    if (!t->held) return 0u;
+  }
   float comb[ZS_DOA_MAX_TRACKS];
   for (unsigned i = 0u; i < nd; i++) {
     const zs_pipeline_target_t *t = &p->doa_targets[list[i]];

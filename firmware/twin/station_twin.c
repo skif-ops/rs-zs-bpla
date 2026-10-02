@@ -1381,6 +1381,24 @@ int main(int argc, char **argv) {
     if (expect_streamed >= 0 && (int)bearings_streamed < expect_streamed) { tlog("twin: FAIL expected >= %d streamed bearings, got %u", expect_streamed, bearings_streamed); return 1; }
     if (expect_reboots >= 0 && ((int)twin_reboots != expect_reboots || (int)cmd_reboots_scheduled != expect_reboots)) { tlog("twin: FAIL expected %d reboots (scheduled %u, done %u)", expect_reboots, cmd_reboots_scheduled, twin_reboots); return 1; }
   }
-  if (link_out >= 0) { link_report(); fcntl(link_in, F_SETFL, fcntl(link_in, F_GETFL) & ~O_NONBLOCK); close(link_out); for (;;) { ssize_t r = read(link_in, link_buf + link_len, sizeof(link_buf) - 1u - link_len); if (r <= 0) break; link_len += (size_t)r; } link_buf[link_len] = 0; { char *p = strstr(link_buf, "REPORT "); if (p) printf("SERVER %s", p + 7); } waitpid(server_pid, NULL, 0); }
+  if (link_out >= 0) {
+    /* the server's last word: its REPORT line (it lists every bearing: a long run of several targets is well over the
+       link buffer), read to the end on the heap so the server never blocks on a full pipe while we wait for it */
+    size_t cap = link_len + 65536u, len = link_len;
+    char *all = malloc(cap + 1u);
+    link_report();
+    fcntl(link_in, F_SETFL, fcntl(link_in, F_GETFL) & ~O_NONBLOCK);
+    close(link_out);
+    if (all) memcpy(all, link_buf, link_len);
+    for (;;) {
+      if (all && len == cap) { char *more = realloc(all, 2u * cap + 1u); if (!more) { free(all); all = NULL; } else { all = more; cap *= 2u; } }
+      char sink[4096];
+      const ssize_t r = all ? read(link_in, all + len, cap - len) : read(link_in, sink, sizeof(sink));
+      if (r <= 0) break;
+      if (all) len += (size_t)r;
+    }
+    if (all) { all[len] = 0; const char *p = strstr(all, "REPORT "); if (p) printf("SERVER %s", p + 7); free(all); }
+    waitpid(server_pid, NULL, 0);
+  }
   return 0;
 }

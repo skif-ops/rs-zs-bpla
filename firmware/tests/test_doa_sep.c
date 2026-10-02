@@ -2,7 +2,9 @@
    2:3 (one comb to the gate), each found as its own confirmed direction track with its own label; a source 6 dB below
    two louder ones adds up over windows; a high source (vertical pair wraps); a fast pass across north keeps one track;
    a target fading for five windows comes back under its id; spatially white noise and a one-window burst confirm
-   nothing; the target's own window keeps its source and drops the other; one track resynthesises the input. */
+   nothing; the target's own window keeps its source and drops the other; one track resynthesises the input; a loud
+   target overtaking a quieter one keeps its own track and the quieter one keeps its own (no merge, no swap); two targets
+   that come into one direction and stay there keep their own tracks by their harmonics. */
 #include "array_render.h"
 #include "zs_audio.h"
 #include "zs_bearing.h"
@@ -18,7 +20,8 @@
 #define FS 32000u
 #define HOP 16000u                                   /* the pipeline's 0.5 s hop = the span */
 #define WINDOWS 12u
-#define LEN (WINDOWS * HOP + ZS_COMB_BEARING_TAPS)
+#define LONG_WINDOWS 40u                             /* the crossing: 20 s */
+#define LEN (LONG_WINDOWS * HOP + ZS_COMB_BEARING_TAPS)
 
 static uint32_t rng = 0x2545f491u;
 static float urand(void) { rng ^= rng << 13; rng ^= rng >> 17; rng ^= rng << 5; return (float)(rng & 0xffffffu) / 16777216.0f; }
@@ -28,6 +31,7 @@ static float angle_error(float a, float b) { return fabsf(fmodf(a - b + 540.0f, 
 typedef struct {
   float f0, az, el, gain;
   float rate;                                        /* azimuth change, degrees per second (a pass) */
+  float rate_after, turn_at;                         /* from turn_at seconds on the rate is rate_after (turn_at 0: never) */
   unsigned on_from, on_to;                           /* active samples [on_from, on_to); 0, 0 = always */
   unsigned gap_from, gap_to;                         /* silent samples [gap_from, gap_to) (a fade) */
   double phase[48];
@@ -52,6 +56,13 @@ static float source_next(source_t *s, unsigned n) {
   return s->gain * 0.10f * v;
 }
 
+static unsigned render_len = WINDOWS * HOP + ZS_COMB_BEARING_TAPS;   /* samples render() fills */
+
+static float az_at(const source_t *s, float t) {
+  const float a = s->turn_at > 0.0f && t > s->turn_at ? s->rate * s->turn_at + s->rate_after * (t - s->turn_at) : s->rate * t;
+  return fmodf(s->az + a + 720.0f, 360.0f);
+}
+
 static void render(source_t *src, unsigned n_src, float noise_rms) {
   for (unsigned s = 0u; s < n_src; s++) {
     memset(src[s].phase, 0, sizeof(src[s].phase));
@@ -59,12 +70,12 @@ static void render(source_t *src, unsigned n_src, float noise_rms) {
     array_render_init(&src[s].r, NULL, (float)FS);
     array_render_set_direction(&src[s].r, src[s].az, src[s].el, 15.0f);
   }
-  for (unsigned n = 0u; n < LEN + ARRAY_RENDER_HISTORY; n++) {
+  for (unsigned n = 0u; n < render_len + ARRAY_RENDER_HISTORY; n++) {
     float sum[4] = {0};
     for (unsigned s = 0u; s < n_src; s++) {
       float out[4];
-      if (src[s].rate != 0.0f && n % 320u == 0u)          /* a pass: re-aim every 10 ms */
-        array_render_set_direction(&src[s].r, fmodf(src[s].az + src[s].rate * (float)n / (float)FS + 360.0f, 360.0f), src[s].el, 15.0f);
+      if ((src[s].rate != 0.0f || src[s].turn_at > 0.0f) && n % 320u == 0u)   /* a pass: re-aim every 10 ms */
+        array_render_set_direction(&src[s].r, az_at(&src[s], (float)n / (float)FS), src[s].el, 15.0f);
       array_render_push(&src[s].r, source_next(&src[s], n), out);
       for (unsigned c = 0u; c < 4u; c++) sum[c] += out[c];
     }
@@ -219,6 +230,109 @@ static void test_noise_and_burst_confirm_nothing(void) {
   assert(r.confirmed[0] == 0u && r.ghosts == 0u);
 }
 
+/* a crossing (the twin's three-target group, station 17): a loud target turning 6 degrees per second overtakes a quieter
+   one turning 0.5 per second 50 degrees ahead of it; a third target elsewhere.  Each target keeps one track all along,
+   under one id with its own label: the quieter one's track is not pulled onto the louder one as it nears, the two do
+   not swap at the crossing, and neither is lost after it. */
+static void test_crossing_keeps_both_tracks(void) {
+  source_t src[3] = {{.f0 = 186.0f, .az = 300.0f, .el = 8.0f, .gain = 1.0f, .rate = 6.0f},
+                     {.f0 = 121.0f, .az = 350.0f, .el = 6.0f, .gain = 0.4f, .rate = 0.5f},
+                     {.f0 = 292.0f, .az = 230.0f, .el = 5.0f, .gain = 0.6f, .rate = -1.0f}};
+  zs_doa_sep_t s;
+  zs_bearing_ctx_t ctx;
+  uint16_t id[3] = {0u, 0u, 0u};
+  unsigned hits[3] = {0u, 0u, 0u}, switches[3] = {0u, 0u, 0u}, after[3] = {0u, 0u, 0u}, wrong_label = 0u, ghosts = 0u;
+  render_len = LEN;
+  render(src, 3u, 0.01f);
+  render_len = WINDOWS * HOP + ZS_COMB_BEARING_TAPS;
+  zs_doa_sep_init(&s);
+  zs_bearing_init(&ctx, NULL);
+  for (unsigned w = 0u; w < LONG_WINDOWS; w++) {
+    const int16_t *p[4] = {ch[0] + w * HOP, ch[1] + w * HOP, ch[2] + w * HOP, ch[3] + w * HOP};
+    zs_doa_target_t out[ZS_DOA_MAX_TRACKS];
+    float truth[3];
+    assert(zs_comb_bearing_decimate_channels(p, HOP + ZS_COMB_BEARING_TAPS - 1u, memory));
+    const unsigned n = zs_doa_sep_push(&s, &ctx, memory, 15.0f, &ws, out);
+    for (unsigned t = 0u; t < 3u; t++) truth[t] = az_at(&src[t], (float)w * 0.5f + 0.25f);
+    const bool apart = angle_error(truth[0], truth[1]) > 8.0f;     /* outside the crossing itself */
+    if (getenv("DOA_TRACE")) {
+      printf("w%2u truth %5.1f %5.1f %5.1f |", w, truth[0], truth[1], truth[2]);
+      for (unsigned i = 0u; i < n; i++)
+        printf(" #%u %s%s az %5.1f f %3.0f n%u |", out[i].id, out[i].confirmed ? "C" : "-", out[i].has_bearing ? "b" : "-",
+               out[i].bearing.azimuth_deg, out[i].bearing.f0_hz, out[i].bins);
+      printf("\n");
+    }
+    for (unsigned i = 0u; i < n; i++) {
+      if (!out[i].confirmed || !out[i].has_bearing || w < 4u) continue;
+      int hit = -1;
+      for (unsigned t = 0u; t < 3u; t++) if (angle_error(out[i].bearing.azimuth_deg, truth[t]) <= 4.0f) hit = (int)t;
+      if (!apart && hit != 2) {                                       /* the pair together: either track is right */
+        if (out[i].id != id[0] && out[i].id != id[1]) ghosts++;
+        continue;
+      }
+      if (hit < 0) { ghosts++; continue; }
+      if (id[hit] && out[i].id != id[hit]) switches[hit]++;
+      if (!id[hit]) id[hit] = out[i].id;
+      hits[hit]++;
+      if (w >= 30u) after[hit]++;
+      if (out[i].bearing.f0_hz > 0.0f && !near_ratio(out[i].bearing.f0_hz, src[hit].f0)) wrong_label++;
+    }
+  }
+  printf("doa crossing: hits %u %u %u, switches %u %u %u, after the crossing %u %u %u /10, wrong labels %u, ghosts %u\n",
+         hits[0], hits[1], hits[2], switches[0], switches[1], switches[2], after[0], after[1], after[2], wrong_label, ghosts);
+  assert(switches[0] == 0u && switches[1] == 0u && switches[2] == 0u);
+  assert(after[0] >= 8u && after[1] >= 8u && after[2] >= 8u);
+  assert(hits[0] >= 25u && hits[1] >= 20u && hits[2] >= 30u);
+  assert(wrong_label == 0u && ghosts == 0u);
+}
+
+/* two targets that come into one direction and stay in it (the twin's recordings, station 18: a Mini 3 Pro overtakes a
+   Mavic 3 Pro and the two stay within 1..4 degrees for 35 s): direction cannot tell them apart, their harmonics can.
+   Both tracks go on under their ids and labels, each with a bearing of its own lines. */
+static void test_one_direction_two_tracks(void) {
+  source_t src[2] = {{.f0 = 174.0f, .az = 20.0f, .el = 8.0f, .gain = 1.0f, .rate = 3.0f, .rate_after = 0.5f, .turn_at = 10.0f},
+                     {.f0 = 261.0f, .az = 45.0f, .el = 8.0f, .gain = 0.6f, .rate = 0.5f}};
+  zs_doa_sep_t s;
+  zs_bearing_ctx_t ctx;
+  uint16_t id[2] = {0u, 0u};
+  unsigned together[2] = {0u, 0u}, wrong = 0u;
+  float worst = 0.0f;
+  render_len = LEN;
+  render(src, 2u, 0.01f);
+  render_len = WINDOWS * HOP + ZS_COMB_BEARING_TAPS;
+  zs_doa_sep_init(&s);
+  zs_bearing_init(&ctx, NULL);
+  for (unsigned w = 0u; w < LONG_WINDOWS; w++) {
+    const int16_t *p[4] = {ch[0] + w * HOP, ch[1] + w * HOP, ch[2] + w * HOP, ch[3] + w * HOP};
+    zs_doa_target_t out[ZS_DOA_MAX_TRACKS];
+    assert(zs_comb_bearing_decimate_channels(p, HOP + ZS_COMB_BEARING_TAPS - 1u, memory));
+    const unsigned n = zs_doa_sep_push(&s, &ctx, memory, 15.0f, &ws, out);
+    const float t = (float)w * 0.5f + 0.25f, truth[2] = {az_at(&src[0], t), az_at(&src[1], t)};
+    if (getenv("DOA_TRACE")) {
+      printf("w%2u truth %5.1f %5.1f |", w, truth[0], truth[1]);
+      for (unsigned i = 0u; i < n; i++)
+        printf(" #%u %s%s az %5.1f f %3.0f n%u |", out[i].id, out[i].confirmed ? "C" : "-", out[i].has_bearing ? "b" : "-",
+               out[i].bearing.azimuth_deg, out[i].bearing.f0_hz, out[i].bins);
+      printf("\n");
+    }
+    for (unsigned i = 0u; i < n; i++) {
+      if (!out[i].confirmed || !out[i].has_bearing || out[i].bearing.f0_hz <= 0.0f) continue;
+      const int k = near_ratio(out[i].bearing.f0_hz, src[0].f0) ? 0 : (near_ratio(out[i].bearing.f0_hz, src[1].f0) ? 1 : -1);
+      if (k < 0) { wrong++; continue; }
+      if (w == 12u) id[k] = out[i].id;                           /* still apart: 9 degrees */
+      if (w < 24u) continue;                                      /* together from 10 s on */
+      if (out[i].id != id[k]) wrong++;
+      together[k]++;
+      const float e = angle_error(out[i].bearing.azimuth_deg, truth[k]);
+      if (e > worst) worst = e;
+    }
+  }
+  printf("doa one direction: ids %u %u, windows together %u %u /16, worst %.2f deg, wrong %u\n", id[0], id[1], together[0],
+         together[1], worst, wrong);
+  assert(id[0] && id[1] && id[0] != id[1]);
+  assert(together[0] >= 14u && together[1] >= 14u && wrong == 0u && worst <= 3.0f);
+}
+
 /* the power of a tone near f in x (single-bin DFT with a Hann window) */
 static double tone_power(const int16_t *x, unsigned n, float f) {
   double re = 0.0, im = 0.0;
@@ -279,6 +393,8 @@ int main(void) {
   test_fade_keeps_its_id();
   test_noise_and_burst_confirm_nothing();
   test_mask_window();
+  test_crossing_keeps_both_tracks();
+  test_one_direction_two_tracks();
   puts("doa_sep: ok");
   return 0;
 }

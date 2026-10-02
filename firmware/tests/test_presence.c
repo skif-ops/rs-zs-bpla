@@ -22,7 +22,11 @@ int main(void) {
   v = votes_of(uav8, 8u, 200u); g = gate_of(false, 0u); p = zs_presence_evaluate(&v, &g);            /* distant: classifier alone */
   assert(p.level == ZS_PRESENCE_CONFIRMED && p.confidence_u8 == 200u && !p.comb);
   v = votes_of(ground8, 8u, 220u); g = gate_of(true, 230u); p = zs_presence_evaluate(&v, &g);       /* APC / tractor engine line */
-  assert(p.level == ZS_PRESENCE_ENGINE_UNCONFIRMED && p.ground_votes == 8u && p.confidence_u8 == 230u);
+  assert(p.level == ZS_PRESENCE_ENGINE_UNCONFIRMED && p.ground_votes == 8u && p.ground_weak_votes == 8u && p.confidence_u8 == 230u);
+  v = votes_of(ground8, 8u, 60u); p = zs_presence_evaluate(&v, NULL);                               /* far from the ground centroids */
+  assert(p.ground_votes == 0u && p.ground_weak_votes == 8u);
+  v = votes_of(ground8, 8u, 0u); p = zs_presence_evaluate(&v, NULL);                                /* nearest centroid only */
+  assert(p.ground_votes == 0u && p.ground_weak_votes == 0u);
   v = votes_of(ground8, 8u, 220u); g = gate_of(false, 0u); p = zs_presence_evaluate(&v, &g);
   assert(p.level == ZS_PRESENCE_NONE);
   v = votes_of(birds8, 8u, 220u); g = gate_of(true, 180u); p = zs_presence_evaluate(&v, &g);        /* comb under a bird recording */
