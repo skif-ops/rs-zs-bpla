@@ -48,8 +48,11 @@
  *     one of the gate's combs, so the detections and the bearings name the same source).  While two directions or
  *     more are confirmed (also before they are labelled and classified) nothing else is delivered: the full-band
  *     bearing follows the louder of them, and the gate's main comb may be the one that is no UAV (a tractor's beside a
- *     UAV the main stream confirms).  Without a stash, or with fewer than two confirmed
- *     directions, everything is as above.
+ *     UAV the main stream confirms).  Nor are the full-band bearing and the main comb's while a direction heard (live,
+ *     or gone at most ZS_DOA_RECALL_WINDOWS) is a ground engine by its own windows (at least
+ *     ZS_CLASSIFICATION_MIN_WINDOWS of them, more ground votes than UAV ones at the weak threshold): the main stream
+ *     may confirm a UAV it hears in the mixture while the louder engine owns the full band and the main comb.  Without
+ *     a stash, or with fewer than two confirmed directions and none known as a ground engine, everything is as above.
  * The module is portable: the extractor, the clock, the identity and the event sink are ports, the
  * 1 s mono window (4-byte aligned: the comb bearings borrow it as floats) and the gate scratch are caller-provided
  * (the target overlays them on DSP memory).
