@@ -107,6 +107,18 @@ def main() -> int:
     admin_api = read("server/station/admin_api.py")
     require("operator_auth.AUDIT_CONTROL" in admin_api and "app.include_router(admin_router)" in app,
             "the audit log switch is not mounted or not bound to audit.control")
+    admin_tests = read("server/tests/test_admin_page.py")
+    for token in ('raise HTTPException(403, "administration changes are made from a browser session, not with an API token")',
+                  "operator_auth.confirm_second_factor(", "def _target(", "a token may not carry what you may not do yourself"):
+        require(token in admin_api, f"administration contract missing: {token}")
+    require('@app.get("/admin"' in app, "the administration page is not mounted")
+    for token in (
+        "test_the_page_shows_the_parts_the_account_may_use",
+        "test_accounts_are_managed_from_a_session_confirmed_by_the_second_factor",
+        "test_tokens_and_other_roles_cannot_administer",
+        "test_the_audit_log_and_its_chain",
+    ):
+        require(token in admin_tests, f"administration case missing: {token}")
     for token in (
         "test_one_superuser_created_by_the_server_and_protected",
         "test_first_login_changes_the_password_and_enrols_the_second_factor",
