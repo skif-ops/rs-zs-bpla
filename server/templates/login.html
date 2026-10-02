@@ -16,6 +16,9 @@
   <input class="form-control" id="username" name="username" type="text" autocomplete="username" required autofocus>
   <label class="form-label mt-3" for="password">Пароль</label>
   <input class="form-control" id="password" name="password" type="password" autocomplete="current-password" required>
+  <label class="form-label mt-3" for="code">Код второго фактора <span class="text-muted">(инженер, администратор)</span></label>
+  <input class="form-control" id="code" name="code" type="text" inputmode="numeric" pattern="[0-9 ]{6,7}"
+         autocomplete="one-time-code" maxlength="7">
   <button class="btn btn-primary btn-lg mt-3" type="submit">Войти</button>
 </form>
 {% endblock %}

@@ -47,6 +47,8 @@ def main() -> int:
         os.environ.pop(name, None)
     os.environ["ZS_OPERATOR_ACCOUNTS"] = str(tmp / "operators.json")
     os.environ["ZS_OPERATOR_SESSION_KEY_FILE"] = str(tmp / "session.key")
+    os.environ["ZS_OPERATOR_STATE"] = str(tmp / "state.sqlite3")
+    os.environ.pop("ZS_OPERATOR_TOTP", None)
 
     from fastapi.routing import APIRoute
     from fastapi.testclient import TestClient
@@ -88,6 +90,11 @@ def main() -> int:
     store.add_user("audit", "viewer", "audit password 1")
     require(sweep(401) == closed, "route set changed between sweeps")   # accounts exist, no login: 401 everywhere
     require(client.get("/api/v1/health").status_code == 200, "health probe is not public")
+    for kind, methods, path in routes:                          # every changing route names its permission
+        for method in methods - operator_auth.SAFE_METHODS:
+            if kind == "http" and (method, path) not in PUBLIC and (method, path) not in station:
+                require(operator_auth.required_permission(method, concrete(path)) not in (None, operator_auth.UNMAPPED),
+                        f"{method} {path} has no permission rule")
     require(client.post("/api/v1/stations/1/heartbeat", json={}).status_code == 403, "station bench guard bypassed")
 
     ok = client.post("/login", data={"username": "audit", "password": "audit password 1"}, headers={"origin": "https://testserver"})
@@ -97,13 +104,35 @@ def main() -> int:
     require(client.post("/api/v1/stations/1/audio-request", json={"event_id": 1},
                         headers={"origin": "https://testserver"}).status_code == 403, "viewer can change things")
 
+    changing = [(m, p) for kind, ms, p in routes if kind == "http" for m in ms - operator_auth.SAFE_METHODS
+                if (m, p) not in PUBLIC and (m, p) not in station]
+    for method, path in changing:                               # a viewer changes nothing
+        status = client.request(method, concrete(path), headers={"origin": "https://testserver"}).status_code
+        require(status == 403, f"viewer {method} {path} answered {status}")
+    store.add_user("auditop", "operator", "audit password 1")
+    op = TestClient(app, base_url="https://testserver", follow_redirects=False)
+    require(op.post("/login", data={"username": "auditop", "password": "audit password 1"},
+                    headers={"origin": "https://testserver"}).status_code == 303, "operator login failed")
+    for method, path in changing:                               # an operator neither edits the dataset nor commands stations
+        need = operator_auth.required_permission(method, concrete(path))
+        if need not in operator_auth.ROLE_PERMISSIONS["operator"]:
+            status = op.request(method, concrete(path), headers={"origin": "https://testserver"}).status_code
+            require(status == 403, f"operator {method} {path} answered {status}")
+    store.add_user("auditeng", "engineer", "audit password 1")
+    eng = TestClient(app, base_url="https://testserver", follow_redirects=False)
+    require(eng.post("/login", data={"username": "auditeng", "password": "audit password 1"},
+                     headers={"origin": "https://testserver"}).status_code == 403, "engineer logged in without a second factor")
+    ok_chain, records = operator_auth.current_state().audit_verify()
+    require(ok_chain and records >= len(changing), "audit log incomplete or broken")
+
     os.environ["ZS_OPERATOR_AUTH_INSECURE_BENCH"] = "yes"
     require(TestClient(app).get("/api/v1/events").status_code == 401, "ambiguous bench opt-out accepted")
     os.environ.pop("ZS_OPERATOR_AUTH_INSECURE_BENCH")
 
     print("Operator authentication QG-2 independent runtime audit: PASS")
     print(f"{closed} route/method pairs closed without an operator (503 without accounts, 401 without login); "
-          "viewer read-only, event audio operator-only")
+          "viewer read-only, event audio operator-only, every changing route declared, operators do not command stations, "
+          "engineers need the second factor, audit chain intact")
     return 0
 
 
