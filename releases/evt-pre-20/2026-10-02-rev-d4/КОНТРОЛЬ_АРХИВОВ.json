@@ -10,37 +10,37 @@
   "archives": [
     {
       "name": "EVT_PRE_20_ПОЛНЫЙ_ПАКЕТ_20261002_REV_D4.zip",
-      "sha256": "077d87a92ea78273262247345dfe9a60f770c52744b265b381dbdc5edabe907e",
-      "bytes": 13753488,
-      "entries": 128
+      "sha256": "276de26738b24eb2ae46627bee8f7f13778f25cdd723e8b9e6b8ac582bce6a1f",
+      "bytes": 13847381,
+      "entries": 129
     },
     {
       "name": "EVT_PRE_20_ПЛАТЫ_ЗАКАЗ_И_МОНТАЖ_20261002_REV_D4.zip",
-      "sha256": "989b3a9054cb7b0d93f2128ba5c8ff26c5f6e97c9ccbf45fd510939346db5fbf",
+      "sha256": "76d4c15dea90957536330003c6362e7e61475e2ae5dce0ec1668ae60af8f1654",
       "bytes": 5999706,
       "entries": 215
     },
     {
       "name": "EVT_PRE_20_ПРОГРАММА_И_МУХОЕД_20261002_REV_D4.zip",
-      "sha256": "dd2bc505dfca2970f2196549e66c1a31e4b6d7bc4a5ce2a6ae2acf3cb8381d80",
+      "sha256": "d01adeaad57cb1e8e52087e107de4243c0ea8c22813f48db6e01e285b1ce5ae7",
       "bytes": 130768,
       "entries": 15
     },
     {
       "name": "EVT_PRE_20_ЖГУТЫ_И_КАБЕЛИ_20261002_REV_D4.zip",
-      "sha256": "5a73500cf8748a02a86e40da3548f8f2391dd623ee30e7ddce86ea76527d8f8a",
+      "sha256": "0ca1453970a0a5a9259afca24635fa6f8a20f24670525f55b5fe03d680f4a134",
       "bytes": 211666,
       "entries": 9
     },
     {
       "name": "EVT_PRE_20_СБОРКА_И_КОРПУСА_20261002_REV_D4.zip",
-      "sha256": "a200a586dacb610da82037163a1f6b4e3427b66909bf80de4b789f9ba34d6cfa",
-      "bytes": 6622267,
-      "entries": 106
+      "sha256": "2d69388786bf66618f05d0bdec93aba72a7ff5de21873d5f97202e09004cccbd",
+      "bytes": 6716167,
+      "entries": 107
     },
     {
       "name": "EVT_PRE_20_PCB_MIC_REVIEW_B_20261002_REV_D4.zip",
-      "sha256": "39270156d925f1f6aa5447c6d732c5fdc6ce0529208f1d9ab285cf7b64d3f06e",
+      "sha256": "2987ba49a17d7cb3cdc9f0800bc9aa5633627137396817162990ae52bd6ea40f",
       "bytes": 1217196,
       "entries": 43
     }
