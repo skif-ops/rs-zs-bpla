@@ -116,7 +116,7 @@
     const sig = data.bearings.map((b) => b.sigma_deg).filter((v) => v > 0).sort((a, b) => a - b);
     const q = new URLSearchParams({
       station_ids: data.stations.map((s) => s.station_id).join(","),
-      range_m: Math.min(Math.max(Number($("replay-geo-range").value) || 1500, 100), 5000),
+      range_m: Math.min(Math.max(Number($("replay-geo-range").value) || 2000, 100), 5000),
       height_m: Math.min(Math.max(Number($("replay-geo-height").value) || 0, 0), 5000),
       sigma_deg: sig.length ? sig[sig.length >> 1] : 3,
       origin_lat: data.origin.lat, origin_lon: data.origin.lon, origin_alt: data.origin.alt_msl_m,
@@ -158,6 +158,20 @@
     ctx.save();
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(off, left, top, g.nx * g.step_m * view.s, g.ny * g.step_m * view.s);
+    // the hearing zone of every station: a circle of the range at the target's height (2 km by the specification)
+    const r = Math.sqrt(Math.max(g.range_m * g.range_m - g.height_m * g.height_m, 0)) * view.s;
+    ctx.setLineDash([6, 5]);
+    ctx.lineWidth = 1.2;
+    ctx.font = "11px system-ui, sans-serif";
+    for (const s of data.stations) {
+      const x = sx(s.e), y = sy(s.n);
+      ctx.strokeStyle = colorOf(s.station_id);
+      ctx.globalAlpha = 0.8;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = colorOf(s.station_id);
+      ctx.fillText(label(g.range_m), x + 4, y - r - 4);
+    }
     ctx.restore();
   }
 
@@ -180,14 +194,16 @@
   function fit() {
     if (!data) return;
     const xs = [], ys = [];
-    for (const s of data.stations) { xs.push(s.e); ys.push(s.n); }
+    // with the station zones shown, the whole circles are fitted in
+    const zr = $("replay-geometry").checked ? Math.min(Math.max(Number($("replay-geo-range").value) || 2000, 100), 5000) : 0;
+    for (const s of data.stations) { xs.push(s.e - zr, s.e + zr); ys.push(s.n - zr, s.n + zr); }
     for (const tr of data.tracks) for (const p of tr.points) { xs.push(p.e); ys.push(p.n); }
     if (!xs.length) { xs.push(0); ys.push(0); }
     const minx = Math.min(...xs), maxx = Math.max(...xs), miny = Math.min(...ys), maxy = Math.max(...ys);
     const spanx = Math.max(maxx - minx, 400), spany = Math.max(maxy - miny, 400);
     view.cx = (minx + maxx) / 2;
     view.cy = (miny + maxy) / 2;
-    view.s = 0.8 * Math.min(canvas.clientWidth / spanx, canvas.clientHeight / spany);
+    view.s = (zr ? 0.92 : 0.8) * Math.min(canvas.clientWidth / spanx, canvas.clientHeight / spany);
   }
 
   const sx = (e) => canvas.clientWidth / 2 + (e - view.cx) * view.s;
