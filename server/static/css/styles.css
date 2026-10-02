@@ -333,3 +333,33 @@
 .replay-bearings li { margin: .15rem 0; }
 .replay-dot { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; vertical-align: -1px; }
 .replay-note { color: #64748b; font-size: .8rem; margin: .9rem 0 0; }
+
+/* administration (/admin) */
+.admin-panel { border: 1px solid #d0d7de; border-radius: 8px; background: #fff; padding: 1rem 1.1rem; margin-bottom: 1.25rem; }
+.admin-panel h2 { font-size: 1.35rem; margin: 0 0 .75rem; }
+.admin-panel h3 { font-size: 1.05rem; margin: 1rem 0 .5rem; }
+.admin-table { font-size: .9rem; }
+.admin-table td { vertical-align: top; }
+.admin-actions { display: flex; flex-wrap: wrap; gap: .3rem; }
+.admin-actions .btn { padding: .15rem .45rem; font-size: .8rem; }
+.admin-token { flex-basis: 100%; font-size: .8rem; color: #475467; }
+.admin-actions .admin-danger { color: #b42318; border-color: #b42318; }
+.admin-actions .admin-danger:hover { color: #fff; background: #b42318; }
+.admin-link { padding: 0 .2rem !important; font-size: .8rem; text-decoration: underline; background: none; border: 0; color: #175cd3; }
+.app-navbar .navbar-text { color: #cbd5e1; }
+.admin-disabled td { color: #98a2b3; }
+.admin-row { display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-end; margin-bottom: .6rem; }
+.admin-row label { display: flex; flex-direction: column; font-size: .88rem; gap: .2rem; }
+.admin-roles { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin: .4rem 0; }
+.admin-check { font-size: .88rem; display: inline-flex; align-items: center; gap: .3rem; }
+.admin-note { color: #667085; font-size: .85rem; }
+.admin-chain { font-size: .9rem; color: #067647; }
+.admin-chain.admin-broken { color: #b42318; font-weight: 700; }
+.admin-switch { flex-direction: row !important; align-items: center; gap: .4rem !important; font-weight: 600; }
+.admin-audit td { white-space: nowrap; }
+.admin-audit .admin-detail { white-space: normal; font-family: ui-monospace, monospace; font-size: .78rem; color: #475467; }
+.admin-dialog { border: 1px solid #d0d7de; border-radius: 8px; padding: 1.1rem; max-width: 30rem; width: calc(100% - 2rem); }
+.admin-dialog::backdrop { background: rgba(16,24,40,.45); }
+.admin-dialog input:not([type=checkbox]) { margin-bottom: .5rem; }
+.totp-secret { font-size: 1.25rem; letter-spacing: .08em; user-select: all; }
+.totp-uri { word-break: break-all; font-size: .8rem; }
