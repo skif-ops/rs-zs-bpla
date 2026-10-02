@@ -1,0 +1,12 @@
+﻿Part_ID,Qty_per_station,Qty_20,Qty_40,Qty_41,Description_RU_EN,Status
+DIO-3DP-MC-001B_body,4,80,160,164,Печатный корпус микрофона / microphone body,TRIAL_PRINT_FIT_AND_TEST_REQUIRED
+DIO-3DP-MC-001B_lid,4,80,160,164,Печатная крышка / printed lid,TRIAL_PRINT_FIT_AND_TEST_REQUIRED
+DIO-3DP-AH-001C_sealed_floor_carrier,1,20,40,41,Закрытое основание с четырьмя стоками / closed drained floor,TRIAL_PRINT_FIT_AND_TEST_REQUIRED
+DIO-3DP-AH-001C_cable_hatch_north,1,20,40,41,"Разъёмный кабельный лючок, половина А / cable hatch half A",TRIAL_PRINT_FIT_AND_TEST_REQUIRED
+DIO-3DP-AH-001C_cable_hatch_south,1,20,40,41,"Разъёмный кабельный лючок, половина Б / cable hatch half B",TRIAL_PRINT_FIT_AND_TEST_REQUIRED
+DIO-3DP-AH-001C_central_mast,1,20,40,41,Центральная стойка / central mast,TRIAL_PRINT_FIT_AND_TEST_REQUIRED
+DIO-3DP-AH-001C_upper_carrier,1,20,40,41,Верхняя траверса / upper carrier,TRIAL_PRINT_FIT_AND_TEST_REQUIRED
+DIO-3DP-AH-001C_integral_upper_cage,1,20,40,41,Цельный верхний каркас с 8 пластинами / one-piece cage,TRIAL_PRINT_FIT_AND_TEST_REQUIRED
+DIO-3DP-AH-001C_dome,1,20,40,41,Высокий купол / taller dome,TRIAL_PRINT_FIT_AND_TEST_REQUIRED
+FOAM-OPEN-CELL-10MM-TRIAL,1,20,40,41,Опытный раскрой поролона 10 мм / trial foam cut,TRIAL_MATERIAL_SELECTION_AND_TEST_REQUIRED
+ELASTOMER-HATCH-SEAL-TRIAL,1,20,40,41,Уплотнение лючка и четырёх жгутов / hatch seal,TRIAL_MATERIAL_SELECTION_AND_TEST_REQUIRED
