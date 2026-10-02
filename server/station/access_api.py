@@ -1,9 +1,10 @@
 """Who sees which stations, set by the security admin and engineers (docs/SERVER_ACCESS_CONTROL_2026-10-02.md, §6).
 
 Both need the ``scopes.manage`` permission (operator_auth.ROLE_PERMISSIONS).  An engineer sets the scope of viewers,
-operators and service accounts only; the admin (``users.manage``) of any account.  Nobody sets their own scope, and a
-manager limited to stations or tenants gives only what it sees itself (never "all").  Every change goes to the audit
-log with what was set.  The CLI (``python -m station.operator_auth set-scope``) stays for the server's shell.
+operators and service accounts only; the admin (``users.manage``) of any account but the superuser skif_root, which
+sees everything.  Nobody sets their own scope, and a manager limited to stations or tenants gives only what it sees
+itself (never "all").  Every change goes to the audit log with what was set.  The CLI (``python -m
+station.operator_auth set-scope``) stays for the server's shell.
 """
 from __future__ import annotations
 
@@ -31,6 +32,8 @@ def _manager(request: Request) -> dict:
 
 
 def _manages(manager: dict, roles: list[str]) -> bool:
+    if operator_auth.SUPERUSER_ROLE in roles:      # the superuser sees everything: nobody limits it
+        return False
     return operator_auth.USERS_MANAGE in manager["permissions"] or set(roles) <= ENGINEER_MANAGES
 
 

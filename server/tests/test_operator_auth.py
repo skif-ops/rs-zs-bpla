@@ -52,13 +52,13 @@ def enrolled(store, name: str, roles: str) -> str:
 
 
 def test_fail_closed_without_accounts(auth):
-    _, app = auth
+    store, app = auth
     c = client(app)
     r = c.get("/api/v1/events")
-    assert r.status_code == 503 and "add-user" in r.json()["detail"]
+    assert r.status_code == 401                                          # only the superuser exists: a login is needed
+    assert store.listing()["users"].keys() == {oa.SUPERUSER_NAME} and store.user(oa.SUPERUSER_NAME)["must_change"]
     page = c.get("/", headers={"accept": "text/html"})
     assert page.status_code == 303 and page.headers["location"] == "/login?next=/"
-    assert "add-user" in c.get("/login").text                            # the login page says how to create one
     assert c.get("/api/v1/health").status_code == 200                    # public probe
     assert c.get("/static/js/app.js").status_code == 200
 
@@ -149,7 +149,7 @@ def test_password_change_and_removal_end_sessions_at_once(auth):
     assert login(c, "anna", PASSWORD + " new").status_code == 401
     store.set_disabled("anna", False)
     login(c, "anna", PASSWORD + " new")
-    store.add_user("boris", "operator", PASSWORD)                        # (without any account the server answers 503)
+    store.add_user("boris", "operator", PASSWORD)
     store.remove_user("anna")
     assert c.get("/api/v1/events").status_code == 401
 
@@ -356,12 +356,13 @@ def test_audit_log_is_chained(auth):
     c.post("/logout", headers=ORIGIN)
     state = oa.current_state()
     rows = [(r["actor"], r["action"], r["result"]) for r in state.audit_records()]
-    assert rows == [("anna", "login", "failed"), ("anna", "login", "ok"), ("anna", f"POST {AUDIO_REQUEST}", "200"),
+    assert rows == [("system", "superuser-created", "ok"),
+                    ("anna", "login", "failed"), ("anna", "login", "ok"), ("anna", f"POST {AUDIO_REQUEST}", "200"),
                     ("vic", "login", "ok"), ("vic", f"POST {AUDIO_REQUEST}", "403"), ("anna", "logout", "ok")]
-    assert state.audit_verify() == (True, 6)
+    assert state.audit_verify() == (True, 7)
     with sqlite3.connect(oa.state_path()) as db:                         # a record changed afterwards shows
         db.execute("UPDATE audit SET result='200' WHERE actor='vic' AND result='403'")
-    assert state.audit_verify() == (False, 4)
+    assert state.audit_verify() == (False, 5)
 
 
 def test_event_stream_needs_a_viewer(auth):
@@ -397,7 +398,7 @@ def test_station_bench_routes_keep_their_own_guard(auth, monkeypatch):
 def test_bench_switch_is_exact(auth, monkeypatch, value):
     _, app = auth
     monkeypatch.setenv(oa.INSECURE_BENCH_ENV, value)
-    assert client(app).get("/api/v1/events").status_code == 503
+    assert client(app).get("/api/v1/events").status_code == 401
 
 
 def test_policy_and_redirect_targets():
@@ -448,4 +449,4 @@ def test_passwords_and_cli(tmp_path: Path, monkeypatch, capsys):
     capsys.readouterr()
     assert oa.main([*cli, "audit"]) == 0
     actions = [line.split()[5] for line in capsys.readouterr().out.splitlines()]   # date time actor (via, address) action
-    assert actions == ["add-user", "issue-token", "set-roles", "set-scope", "totp-enroll"]
+    assert actions == ["superuser-created", "add-user", "issue-token", "set-roles", "set-scope", "totp-enroll"]

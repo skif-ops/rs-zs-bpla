@@ -1,6 +1,46 @@
 {% extends "base.html" %}
 {% block title %}Мухоед - вход{% endblock %}
 {% block content %}
+{% if mode == "password" %}
+<section class="page-header compact">
+  <h1>Смена пароля</h1>
+  <p>Учётная запись {{ name }} входит в первый раз: задайте свой пароль вместо выданного.</p>
+</section>
+
+<form class="upload-panel" action="/login/password" method="post" autocomplete="off">
+  {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+  <input type="hidden" name="next" value="{{ next_url }}">
+  <input type="hidden" name="step" value="{{ step }}">
+  <input type="hidden" name="username" value="{{ name }}" autocomplete="username">
+  <label class="form-label" for="new_password">Новый пароль <span class="text-muted">(не короче {{ min_password }} символов)</span></label>
+  <input class="form-control" id="new_password" name="new_password" type="password" autocomplete="new-password"
+         minlength="{{ min_password }}" required autofocus>
+  <label class="form-label mt-3" for="repeat">Повторите пароль</label>
+  <input class="form-control" id="repeat" name="repeat" type="password" autocomplete="new-password"
+         minlength="{{ min_password }}" required>
+  <button class="btn btn-primary btn-lg mt-3" type="submit">Сменить пароль</button>
+</form>
+{% elif mode == "totp" %}
+<section class="page-header compact">
+  <h1>Второй фактор</h1>
+  <p>Добавьте учётную запись {{ name }} в приложение-аутентификатор (Google Authenticator, Яндекс Ключ, FreeOTP и
+    подобные): выберите ввод ключа вручную и введите ключ ниже. Ключ показывается один раз.</p>
+</section>
+
+<form class="upload-panel" action="/login/totp" method="post" autocomplete="off">
+  {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+  <input type="hidden" name="next" value="{{ next_url }}">
+  <input type="hidden" name="step" value="{{ step }}">
+  <p class="form-label">Ключ (по времени, 6 цифр, 30 с)</p>
+  <p><code class="totp-secret" id="totp-secret">{{ secret }}</code></p>
+  <details class="mb-3"><summary>Ссылка otpauth для приложений, которые её принимают</summary>
+    <p><code class="totp-uri">{{ uri }}</code></p></details>
+  <label class="form-label" for="code">Код из приложения</label>
+  <input class="form-control" id="code" name="code" type="text" inputmode="numeric" pattern="[0-9 ]{6,7}"
+         autocomplete="one-time-code" maxlength="7" required autofocus>
+  <button class="btn btn-primary btn-lg mt-3" type="submit">Подтвердить и войти</button>
+</form>
+{% else %}
 <section class="page-header compact">
   <h1>Вход оператора</h1>
   {% if not configured %}
@@ -21,4 +61,5 @@
          autocomplete="one-time-code" maxlength="7">
   <button class="btn btn-primary btn-lg mt-3" type="submit">Войти</button>
 </form>
+{% endif %}
 {% endblock %}
