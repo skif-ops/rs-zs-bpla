@@ -91,6 +91,8 @@ class Scope:
             out["track_points"] = [self.point(p) for p in t["track_points"]]
         if isinstance(t.get("last"), dict):
             out["last"] = self.point(t["last"])
+        if "new_points" in t:
+            out["new_points"] = [self.point(p) for p in t["new_points"]]
         return out
 
     def alert(self, m: dict[str, Any]) -> dict[str, Any] | None:

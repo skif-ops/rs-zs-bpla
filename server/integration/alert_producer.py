@@ -10,7 +10,7 @@ Entities:
 * alert episode, per tenant: starts with the first air event, bearing or track while none is open; its level is
   ``warning`` (one station) or ``alert`` (two or more stations or a fused track); it ends ``ALERT_END_US`` after the
   last activity.  Messages ``alert.start``, ``alert.update`` (level, stations or class changed), ``alert.end``.
-* fused track (station/track_fusion.py): ``track.update`` with its newest point (the fusion grid gives at most one a
+* fused track (station/track_hypotheses.py): ``track.update`` with each new point (the fusion grid gives at most one a
   second), ``track.end`` when its fusion has not been updated for ``TRACK_END_US`` or the alert ends.
 * single-station bearing: while a station track is not part of a fused track, its newest bearing at most once a second
   as ``bearing`` (a line from the station), then nothing: the track carries the target.
@@ -21,11 +21,12 @@ import time
 
 from integration import dioneya_alert as msg
 from station import target_match, track_segments
-from station.track_fusion import station_segments
+from station.track_hypotheses import station_segments
 
 TRUSTED_TIME = ("GNSS_TIME_TRUSTED", "HOLDOVER")
 BEARING_PERIOD_US = 1_000_000
-TRACK_END_US = 20_000_000          # longer than the join window of station tracks (15 s): an ended track does not resume
+TRACK_END_US = 25_000_000          # longer than the fusion's idle time (track_hypotheses.TRACK_IDLE_S, 20 s of bearing time)
+                                   # plus the arrival jitter of the batches: an ended track does not resume
 ALERT_END_US = 120_000_000
 SWEEP_PERIOD_US = 1_000_000
 LEVEL_RANK = {"warning": 1, "alert": 2}
@@ -143,10 +144,11 @@ class AlertProducer:
                        episode["alert_id"], sample.time_us, now, bearing=body)
 
     def on_track(self, track: dict) -> None:
-        """A recomputed fused track (station/track_fusion.py): its newest point, once."""
-        point = track.get("last")
-        if not point:
-            return
+        """A fused track that got points (station/track_hypotheses.py): each new point, once, in time order."""
+        for point in track.get("new_points") or ([track["last"]] if track.get("last") else []):
+            self._track_point(track, point)
+
+    def _track_point(self, track: dict, point: dict) -> None:
         now = self.now_us()
         self.sweep(now)
         track_id = track["track_id"]
