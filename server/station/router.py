@@ -19,6 +19,7 @@ from station.service import StationFusionService
 from station.cbor_codec import decode_detection_cbor
 from station.http_transport import require_insecure_station_http_bench
 from station.online_type_service import OnlineTypeSessionService
+from station.access_scope import LIVE_RECHECK_S, LiveScope, close_revoked, scope_of
 
 BASE=Path(__file__).resolve().parents[1]
 store=EventStore(BASE/'data'/'zs_bpla.sqlite3')
@@ -34,11 +35,13 @@ async def health(): return {'status':'ok','protocol':'1.5','service':'zs-bpla'}
 async def heartbeat(station_id:int,msg:HeartbeatMessage):
     if station_id!=msg.station_id: raise HTTPException(400,'station_id mismatch')
     if msg.cellular is not None: raise HTTPException(400,'cellular identity is accepted only through mutual-TLS MQTT status')
+    store.note_station_tenant(station_id,service.alerts.tenant)
     store.upsert_station(msg); service.bus.publish_nowait({'type':'station','data':msg.model_dump()}); return {'status':'ok'}
 
 @station_http_router.post('/stations/{station_id}/detection')
 async def detection(station_id:int,msg:DetectionMessage):
     if station_id!=msg.station_id: raise HTTPException(400,'station_id mismatch')
+    store.note_station_tenant(station_id,service.alerts.tenant)
     return service.ingest(msg).model_dump()
 
 @station_http_router.post('/stations/{station_id}/detection.cbor')
@@ -47,6 +50,7 @@ async def detection_cbor(station_id:int,request:Request):
     try: msg=decode_detection_cbor(raw)
     except Exception as exc: raise HTTPException(400,f'invalid CBOR: {exc}') from exc
     if station_id!=msg.station_id: raise HTTPException(400,'station_id mismatch')
+    store.note_station_tenant(station_id,service.alerts.tenant)
     event=service.ingest(msg)
     return JSONResponse(event.model_dump())
 
@@ -61,62 +65,79 @@ async def feature_update(station_id:int,event_id:int,msg:FeatureUpdateMessage):
 @station_http_router.post('/stations/{station_id}/security')
 async def security(station_id:int,msg:SecurityEventMessage):
     if station_id!=msg.station_id: raise HTTPException(400,'station_id mismatch')
+    store.note_station_tenant(station_id,service.alerts.tenant)
     store.save_security(msg)
     event={'system_event_id':f'SECURITY-{msg.event_id:016x}-{msg.station_id}','event_type':'SECURITY_EVENT','created_time_us':msg.event_time_us,'source_event_ids':[msg.event_id],'source_station_ids':[msg.station_id],'classification_label':msg.reason,'confidence':1.0,'stations_used':1,'target':{},'route_summary':[f'{msg.route.transport}:{msg.route.hop_count}'],'status':'active'}
     service.bus.publish_nowait(event); return event
 
-@router.get('/stations')
-async def stations(): return store.list_stations()
+# What an operator account sees (station/access_scope.py): its stations and tenants; anything else answers 404.
+def _visible_station(request:Request,station_id:int):
+    if not scope_of(request,store).station(station_id): raise HTTPException(404,'station not found')
 
-@router.get('/events')
-async def events(limit:int=200): return store.list_events(min(max(limit,1),2000))
-
-@router.get('/events/{event_id}')
-async def event(event_id:str):
-    result=store.get_event(event_id)
+def _visible_event(request:Request,event_id:str)->dict:
+    found=store.get_event(event_id)
+    result=None if found is None else scope_of(request,store).event(found)
     if result is None: raise HTTPException(404,'event not found')
     return result
 
+@router.get('/stations')
+async def stations(request:Request):
+    scope=scope_of(request,store)
+    return [s for s in store.list_stations() if scope.station(s.get('station_id'))]
+
+@router.get('/events')
+async def events(request:Request,limit:int=200):
+    scope=scope_of(request,store)
+    return [scope.event(e) for e in store.list_events(min(max(limit,1),2000),stations=scope.station_list)]
+
+@router.get('/events/{event_id}')
+async def event(request:Request,event_id:str):
+    return _visible_event(request,event_id)
+
 @router.get('/events/{event_id}/bearings')
-async def event_bearings(event_id:str,limit:int=5000):
+async def event_bearings(request:Request,event_id:str,limit:int=5000):
     """Live bearings (ICD addendum H) of every station whose track belongs to this system event."""
-    if store.get_event(event_id) is None: raise HTTPException(404,'event not found')
-    return store.list_bearings(system_event_id=event_id,limit=limit)
+    _visible_event(request,event_id)
+    return store.list_bearings(system_event_id=event_id,limit=limit,stations=scope_of(request,store).station_list)
 
 @router.get('/bearings')
-async def bearings(station_id:int|None=None,track_event_id:int|None=None,since_us:int|None=None,until_us:int|None=None,limit:int=5000):
-    return store.list_bearings(station_id=station_id,track_event_id=track_event_id,since_us=since_us,until_us=until_us,limit=limit)
+async def bearings(request:Request,station_id:int|None=None,track_event_id:int|None=None,since_us:int|None=None,until_us:int|None=None,limit:int=5000):
+    return store.list_bearings(station_id=station_id,track_event_id=track_event_id,since_us=since_us,until_us=until_us,limit=limit,
+                               stations=scope_of(request,store).station_list)
 
 @router.get('/events/{event_id}/tracks')
-async def event_tracks(event_id:str):
+async def event_tracks(request:Request,event_id:str):
     """Fused tracks (bearings of two or more stations) that belong to this system event, with their points."""
-    if store.get_event(event_id) is None: raise HTTPException(404,'event not found')
-    return [store.get_track(t['track_id']) for t in store.list_tracks(system_event_id=event_id)]
+    _visible_event(request,event_id)
+    scope=scope_of(request,store)
+    return [scope.track(store.get_track(t['track_id'])) for t in store.list_tracks(system_event_id=event_id,stations=scope.station_list)]
 
 @router.get('/tracks')
-async def tracks(since_us:int|None=None,until_us:int|None=None,limit:int=200):
+async def tracks(request:Request,since_us:int|None=None,until_us:int|None=None,limit:int=200):
     """Fused target tracks overlapping the time range, newest first (summaries; points by /tracks/{track_id})."""
-    return store.list_tracks(since_us=since_us,until_us=until_us,limit=limit)
+    scope=scope_of(request,store)
+    return [scope.track(t) for t in store.list_tracks(since_us=since_us,until_us=until_us,limit=limit,stations=scope.station_list)]
 
 @router.get('/tracks/{track_id}')
-async def track(track_id:str):
-    result=store.get_track(track_id)
+async def track(request:Request,track_id:str):
+    result=scope_of(request,store).track(store.get_track(track_id))
     if result is None: raise HTTPException(404,'track not found')
     return result
 
 @router.get('/replay')
-async def replay(track_id:str|None=None,system_event_id:str|None=None,since_us:int|None=None,until_us:int|None=None):
+async def replay(request:Request,track_id:str|None=None,system_event_id:str|None=None,since_us:int|None=None,until_us:int|None=None):
     """Everything the replay page draws for a time window (decision 3): stations, fused tracks, bearings, in metres
     east/north/up around the stations."""
-    try: return build_replay(store,track_id=track_id,system_event_id=system_event_id,since_us=since_us,until_us=until_us)
+    try: return build_replay(store,track_id=track_id,system_event_id=system_event_id,since_us=since_us,until_us=until_us,
+                             scope=scope_of(request,store))
     except ReplayError as exc: raise HTTPException(404 if 'not found' in str(exc) else 400,str(exc)) from None
 
 @router.get('/replay/sources')
-async def replay_sources_list(limit:int=50):
-    return replay_sources(store,min(max(limit,1),200))
+async def replay_sources_list(request:Request,limit:int=50):
+    return replay_sources(store,min(max(limit,1),200),scope=scope_of(request,store))
 
 @router.get('/geometry/coverage')
-async def geometry_coverage(station_ids:str,range_m:float=Query(gt=0,le=MAX_RANGE_M),sigma_deg:float=Query(3.0,gt=0,le=45),
+async def geometry_coverage(request:Request,station_ids:str,range_m:float=Query(gt=0,le=MAX_RANGE_M),sigma_deg:float=Query(3.0,gt=0,le=45),
                             height_m:float=Query(150.0,ge=0,le=5000),origin_lat:float|None=None,origin_lon:float|None=None,
                             origin_alt:float|None=None):
     """Blind zones of the station geometry (decision 5): per grid cell around the stations whether a target at height_m
@@ -125,7 +146,8 @@ async def geometry_coverage(station_ids:str,range_m:float=Query(gt=0,le=MAX_RANG
     try: ids=sorted({int(x) for x in station_ids.split(',') if x.strip()})
     except ValueError: raise HTTPException(422,'station_ids: comma-separated integers') from None
     if not ids or len(ids)>64: raise HTTPException(422,'station_ids: 1..64 stations')
-    positions={s:store.station_position(s) for s in ids}
+    scope=scope_of(request,store)
+    positions={s:(store.station_position(s) if scope.station(s) else None) for s in ids}
     missing=[s for s,p in positions.items() if p is None]
     if missing: raise HTTPException(404,f'no position for station(s) {missing}')
     if origin_lat is None or origin_lon is None:
@@ -138,24 +160,37 @@ async def geometry_coverage(station_ids:str,range_m:float=Query(gt=0,le=MAX_RANG
     return {**grid,'origin':{'lat':origin_lat,'lon':origin_lon,'alt_msl_m':origin_alt or 0.0},
             'stations':[{'station_id':s,'e':round(enu[s][0],1),'n':round(enu[s][1],1),'u':round(enu[s][2],1)} for s in ids]}
 
+def _alert_reader(scope,tenant:str|None):
+    """read_alerts arguments for an account: its tenants, and what it may see of each message."""
+    if scope.tenants and tenant is not None and tenant not in scope.tenants: return None
+    return {'tenant':tenant,'tenants':sorted(scope.tenants) or None,'keep':None if scope.unrestricted else scope.alert}
+
 @router.get('/alerts')
-async def alerts(after_seq:int=0,tenant:str|None=None,limit:int=500):
+async def alerts(request:Request,after_seq:int=0,tenant:str|None=None,limit:int=500):
     """Output API dioneya.alert/1 (protocols/DIONEYA_ALERT_API_v1.md): messages after a seq, oldest first; continue
-    with next_after_seq."""
-    messages,next_after=await asyncio.to_thread(store.read_alerts,max(after_seq,0),tenant=tenant,limit=min(max(limit,1),2000))
+    with next_after_seq.  An operator account limited to tenants or stations gets only what they took part in."""
+    reader=_alert_reader(scope_of(request,store),tenant)
+    if reader is None: raise HTTPException(403,'tenant outside this account')
+    messages,next_after=await asyncio.to_thread(store.read_alerts,max(after_seq,0),limit=min(max(limit,1),2000),**reader)
     return {'schema':dioneya_alert.SCHEMA,'messages':messages,'next_after_seq':next_after}
 
 @router.websocket('/alerts/stream')
 async def alert_stream(ws:WebSocket,after_seq:int|None=None,tenant:str|None=None,heartbeat_s:float=15.0):
     """dioneya.alert/1 live: the messages after after_seq (default: only new ones), then each new one; a heartbeat
     when the stream has been idle for heartbeat_s."""
+    live=LiveScope(ws,store)
+    if _alert_reader(live.scope,tenant) is None:
+        await ws.close(code=4403); return
     await ws.accept()
     closed=asyncio.create_task(_until_disconnect(ws))
     cursor=await asyncio.to_thread(store.last_alert_seq) if after_seq is None else max(after_seq,0)
     heartbeat_us=int(max(heartbeat_s,1.0)*1e6); last_sent=int(time.time()*1e6)
     try:
         while not closed.done():
-            messages,cursor_next=await asyncio.to_thread(store.read_alerts,cursor,tenant=tenant,limit=500)
+            scope=live.current()
+            reader=None if scope is None else _alert_reader(scope,tenant)
+            if reader is None: await close_revoked(ws); return
+            messages,cursor_next=await asyncio.to_thread(store.read_alerts,cursor,limit=500,**reader)
             for m in messages: await ws.send_json(m)
             cursor=cursor_next; now=int(time.time()*1e6)
             if messages: last_sent=now
@@ -170,7 +205,8 @@ async def _until_disconnect(ws:WebSocket):
         if (await ws.receive())['type']=='websocket.disconnect': return
 
 @router.post('/stations/{station_id}/audio-request')
-async def request_audio(station_id:int,req:AudioRequest):
+async def request_audio(request:Request,station_id:int,req:AudioRequest):
+    _visible_station(request,station_id)
     payload=req.model_dump()
     if payload['event_time_us'] is None:              # the station may have lost its own record (a reboot): send the time
         try: payload['event_time_us']=store.detection_time_us(station_id,req.event_id)
@@ -181,10 +217,11 @@ async def request_audio(station_id:int,req:AudioRequest):
     return command.model_dump()
 
 @router.post('/stations/{station_id}/command-key-rotation')
-async def rotate_command_key(station_id:int,req:CommandKeyRotationRequest):
+async def rotate_command_key(request:Request,station_id:int,req:CommandKeyRotationRequest):
     """ICD addendum E: queue CMD_ROTATE_COMMAND_KEY with the bridge's next public key (--command-next-signing-key,
     printed at its start).  The station trusts both keys after its OK; the first command signed by the next key
     promotes it there."""
+    _visible_station(request,station_id)
     payload={'public_key':req.public_key.lower()}
     try:
         validate_command_payload('CMD_ROTATE_COMMAND_KEY',payload)
@@ -193,11 +230,12 @@ async def rotate_command_key(station_id:int,req:CommandKeyRotationRequest):
     return command.model_dump()
 
 @router.post('/stations/{station_id}/network-config')
-async def set_network_config(station_id:int,req:NetworkConfigRequest):
+async def set_network_config(request:Request,station_id:int,req:NetworkConfigRequest):
     """ICD addendum G: queue CMD_SET_NETWORK_CONFIG (server host, ports, pin, tenant, topic prefix, SIM, APNs).  The
     station tries it on its next bring-up and keeps it only when a session comes online with it; the outcome is in its
     heartbeat (detector.net_config_version / net_state / net_failed_version).  The version defaults to the one the
     station reported + 1."""
+    _visible_station(request,station_id)
     payload={k:v for k,v in req.model_dump().items() if v is not None}
     try:
         if 'version' not in payload: payload['version']=next_version(store.get_station_heartbeat(station_id))
@@ -213,9 +251,10 @@ def firmware_repository()->ReleaseRepository:
     return ReleaseRepository(os.environ.get('ZS_FIRMWARE_DIR') or BASE/'data'/'firmware')
 
 @router.post('/stations/{station_id}/firmware-update')
-async def update_firmware(station_id:int,req:FirmwareUpdateRequest):
+async def update_firmware(request:Request,station_id:int,req:FirmwareUpdateRequest):
     """ICD addendum F: queue CMD_UPDATE_FIRMWARE with the manifest and the offline release signature of a release in
     the repository (python -m pki.cli fw-sign).  The station fetches the image over fwreq/fw from the bridge."""
+    _visible_station(request,station_id)
     try: release=firmware_repository().get(req.version)
     except ValueError as exc: raise HTTPException(409,str(exc)) from None
     if release is None: raise HTTPException(404,f'release {req.version} is not in the firmware repository')
@@ -240,10 +279,11 @@ def model_repository()->ModelRepository:
     return ModelRepository(os.environ.get('ZS_MODEL_DIR') or BASE/'data'/'models')
 
 @router.post('/stations/{station_id}/model-update')
-async def update_model(station_id:int,req:FirmwareUpdateRequest):
+async def update_model(request:Request,station_id:int,req:FirmwareUpdateRequest):
     """ICD addendum I: queue CMD_UPDATE_FIRMWARE with the manifest (target 3) and release signature of a model package
     in the repository (python -m pki.cli model-sign).  The station loads it after the download, without a reset;
     its heartbeat model text becomes m<version>."""
+    _visible_station(request,station_id)
     try: release=model_repository().get(req.version)
     except ValueError as exc: raise HTTPException(409,str(exc)) from None
     if release is None: raise HTTPException(404,f'model {req.version} is not in the model repository')
@@ -267,8 +307,9 @@ async def model_releases():
     return out
 
 @router.get('/stations/{station_id}/events/{event_id}/audio')
-async def event_audio(station_id:int,event_id:int):
+async def event_audio(request:Request,station_id:int,event_id:int):
     """Assembled audio segments of an event (MQTT upload, addendum B); the WAV is served by the route below."""
+    _visible_station(request,station_id)
     try: rows=store.list_audio(station_id,event_id)
     except ValueError as exc: raise HTTPException(400,str(exc)) from None
     return [{'segment':r['segment'],'codec':r['codec'],'sample_rate':r['sample_rate'],'start_time_us':r['start_time_us'],
@@ -276,7 +317,8 @@ async def event_audio(station_id:int,event_id:int):
              'url':f"/api/v1/stations/{station_id}/events/{event_id}/audio/{r['segment']}.wav"} for r in rows if r['codec']=='pcm16-wav']
 
 @router.get('/stations/{station_id}/events/{event_id}/audio/{segment}.wav')
-async def event_audio_file(station_id:int,event_id:int,segment:str):
+async def event_audio_file(request:Request,station_id:int,event_id:int,segment:str):
+    _visible_station(request,station_id)
     if segment not in ('pre','post'): raise HTTPException(404,'no such segment')
     try: rows=[r for r in store.list_audio(station_id,event_id) if r['segment']==segment and r['codec']=='pcm16-wav']
     except ValueError as exc: raise HTTPException(400,str(exc)) from None
@@ -307,11 +349,21 @@ async def upload_audio(station_id:int,event_id:int,segment:str='pre',sample_rate
 
 @router.websocket('/stream')
 async def stream(ws:WebSocket):
+    """The live bus (events, stations, bearings, tracks); an operator account limited to tenants or stations gets
+    what they took part in, re-checked every few seconds (station/access_scope.py)."""
+    live=LiveScope(ws,store)
     await ws.accept(); q=service.bus.subscribe()
+    closed=asyncio.create_task(_until_disconnect(ws))
     try:
-        while True: await ws.send_json(await q.get())
-    except WebSocketDisconnect: pass
-    finally: service.bus.unsubscribe(q)
+        while not closed.done():
+            try: item=await asyncio.wait_for(q.get(),timeout=LIVE_RECHECK_S)
+            except asyncio.TimeoutError: item=None
+            scope=live.current()
+            if scope is None: await close_revoked(ws); return
+            item=None if item is None else scope.live(item)
+            if item is not None: await ws.send_json(item)
+    except (WebSocketDisconnect,RuntimeError): pass
+    finally: closed.cancel(); service.bus.unsubscribe(q)
 
 
 router.include_router(station_http_router)
