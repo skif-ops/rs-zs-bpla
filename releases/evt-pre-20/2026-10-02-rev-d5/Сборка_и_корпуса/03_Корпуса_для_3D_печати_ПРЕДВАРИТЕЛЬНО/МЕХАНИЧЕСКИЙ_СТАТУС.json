@@ -1,0 +1,22 @@
+{
+  "schema": "dioneya-head-release-appearance-v1",
+  "status": "APPROVED_APPEARANCE_ALIGNED_TRIAL_HARDWARE_NOT_PHYSICALLY_QUALIFIED",
+  "pcb_mic_status": "ORDERED_NO_CHANGE_NO_CANCELLATION",
+  "pcb_mic_sha256": "c57cebbb3886247166551fd242fa51350bc9be7fee6299e63e7eaac60518d518",
+  "approved_appearance_image_sha256": "6f681404e224ac36c9609303d089d067493fbb823788bc2707699e6b4080a9c2",
+  "approved_configuration": "3+1 closed-floor foam head with raised dome; separate chamfered PCB-MAIN enclosure Rev B with approved Dioneya relief logo",
+  "obsolete_square_mic_pod": "REMOVED_FROM_CURRENT_RELEASE",
+  "cast_models": "CONCEPT ENVELOPES; NOT TOOLING READY",
+  "open_checks": [
+    "actual foam/membrane and four-channel acoustic response",
+    "assembled cable routing and strain relief",
+    "water and drainage",
+    "wind and structural joints",
+    "first printed fit on actual PCB-MIC Rev B",
+    "physical PCB-MAIN and connector fit in faceted upper enclosure",
+    "upper enclosure gasket, antenna exits, mast bracket and water/IP trial"
+  ],
+  "upper_electronics_case": "DIO-3DP-UP-001B_PRINT_TRIAL; VACUUM_AND_INJECTION_STEP_APPEARANCE_CONCEPT_ONLY",
+  "upper_electronics_case_board_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "upper_electronics_case_logo_sha256": "62ac484ed28325afb5d534464f1d833b48974dcfd998072db4ca76b7bce45733"
+}
