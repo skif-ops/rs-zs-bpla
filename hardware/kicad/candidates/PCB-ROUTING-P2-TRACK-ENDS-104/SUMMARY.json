@@ -1,0 +1,21 @@
+{
+  "schema": "dioneya-pcb-main-track-ends-104-v1",
+  "base_sha256": "a347c8dd632b18c26bbca7710cd673009f31918f15b141a3c8b637d48e068087",
+  "candidate_sha256": "5d38d57d5a82ff69f0f2079ae8d1dd1a495e91156fd762a5c41e2b67522d76d0",
+  "removed_segments": 3,
+  "trimmed_segments": 1,
+  "removed_vias": 1,
+  "track_dangling_before": 3,
+  "track_dangling_after": 0,
+  "drc": {
+    "base_unconnected": 15,
+    "candidate_unconnected": 15,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

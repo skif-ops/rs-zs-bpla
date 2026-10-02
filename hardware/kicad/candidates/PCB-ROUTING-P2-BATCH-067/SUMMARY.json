@@ -1,0 +1,73 @@
+{
+  "schema": "dioneya-pcb-main-batch-067-v1",
+  "base_sha256": "f0d62adb45d766521c1af48bff1e0cb4555f703694d34cc9b668f3a7608d8362",
+  "candidate_sha256": "22391d5e5fda68ec30438406a4497ff96b1b26d6acb75a4cd9738beb8024d16d",
+  "routes": [
+    {
+      "net": "AAD_CFG_1V8_FANOUT",
+      "track_length_mm": 7.5113,
+      "vias": 2
+    },
+    {
+      "net": "CELL_DTR_U16",
+      "track_length_mm": 33.0368,
+      "vias": 3
+    },
+    {
+      "net": "FAULT",
+      "track_length_mm": 31.4936,
+      "vias": 4
+    },
+    {
+      "net": "I2C2_SCL_U1",
+      "track_length_mm": 5.2184,
+      "vias": 2
+    },
+    {
+      "net": "I2C2_SDA_U1",
+      "track_length_mm": 17.274,
+      "vias": 3
+    },
+    {
+      "net": "NRST",
+      "track_length_mm": 15.9095,
+      "vias": 3
+    },
+    {
+      "net": "REV_STRAP0",
+      "track_length_mm": 20.0681,
+      "vias": 3
+    },
+    {
+      "net": "SIM_MUX_EN",
+      "track_length_mm": 22.7017,
+      "vias": 2
+    },
+    {
+      "net": "SWDIO",
+      "track_length_mm": 14.5983,
+      "vias": 2
+    },
+    {
+      "net": "USB_VBUS_SENSE",
+      "track_length_mm": 10.0953,
+      "vias": 2
+    }
+  ],
+  "route_count": 10,
+  "new_vias": 26,
+  "new_track_length_mm": 177.907,
+  "reference_outline_fraction": 1.0,
+  "review_b": "OPEN",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 76,
+    "candidate_unconnected": 66,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}

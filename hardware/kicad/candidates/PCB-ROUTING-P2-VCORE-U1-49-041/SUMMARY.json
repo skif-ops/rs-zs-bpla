@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-vcore-u1-49-041-v1",
+  "base_sha256": "0b1b7a449271a79290c6fdd51b845e29678e73d87c2ac7d8320ab00823bc5422",
+  "candidate_sha256": "53d46280a79067be6e05a6fb10640cb76e63c1168e04b8e65730aaccdf6629d3",
+  "routes": 1,
+  "track_segments": 1,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 3.241,
+  "vcore_supply_pi_and_return_review_b": "OPEN",
+  "filled_capped_via_in_pad_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 101,
+    "candidate_unconnected": 100,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

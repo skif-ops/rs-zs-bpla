@@ -1,0 +1,18 @@
+{
+  "schema": "dioneya-pcb-main-sim-mux-019-v1",
+  "base_sha256": "0860bf139270c963d6790a4a4ddb19a7b461f0c2cfe42ef0d79a462fa2dd7363",
+  "candidate_sha256": "b07416af6bf3fd4d100e5b38496a061d5a33f1325a53aeb383c1dbcc1bb0ae30",
+  "routes": 2,
+  "track_segments": 7,
+  "width_mm": 0.2,
+  "total_length_mm": 12.99,
+  "drc": {
+    "base_unconnected": 124,
+    "candidate_unconnected": 122,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

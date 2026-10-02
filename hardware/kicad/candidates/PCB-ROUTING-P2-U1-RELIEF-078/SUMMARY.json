@@ -1,0 +1,19 @@
+{
+  "schema": "dioneya-pcb-main-u1-relief-078-v1",
+  "base_sha256": "e9ea548204565cbe81fd5fac91519c3f238b1cb152650bfe86aa5dec47f62f40",
+  "candidate_sha256": "44fd9e8b36f47511cc48b3450807337c61af1cc5d99a67373a56b5e7e6b29526",
+  "change": "CELL_RESET_N_CMD B.Cu and TEST_UART_RX_U1 In3.Cu local rip-up; 3V3_DIGITAL F.Cu/In3.Cu U1.27 bridge with two 0.25/0.15 mm vias",
+  "candidate_only_via_rules": true,
+  "via_in_pad_dfm": "OPEN",
+  "review_b": "OPEN",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 38,
+    "candidate_unconnected": 37,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}

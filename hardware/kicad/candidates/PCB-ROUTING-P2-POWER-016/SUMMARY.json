@@ -1,0 +1,22 @@
+{
+  "schema": "dioneya-pcb-main-power-islands-016-v1",
+  "base_sha256": "00b01ae33b8d6a457c084c163403520855c56c84efdd24869c5145dfae1d3dfc",
+  "candidate_sha256": "9574bdcaa0b030d74059673ac887cefa7827a68723d77907c70acac6717f09d4",
+  "routes": 2,
+  "track_segments": 9,
+  "width_mm": [
+    0.3,
+    0.25
+  ],
+  "total_length_mm": 6.87,
+  "drc": {
+    "base_unconnected": 131,
+    "candidate_unconnected": 129,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "power_return_review": "OPEN",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

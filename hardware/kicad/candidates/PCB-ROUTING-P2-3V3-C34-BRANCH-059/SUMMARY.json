@@ -1,0 +1,40 @@
+{
+  "schema": "dioneya-pcb-main-3v3-c34-branch-059-v1",
+  "base_sha256": "85ee10535aa7109cdb1fed2716864f420ef89329d355bf1afd5e2971fbc2ce82",
+  "candidate_sha256": "41f0652a9115add385006cf82531597033e5c82de51a10c842f94f401033c527",
+  "back_points": [
+    [
+      18.675,
+      28.0
+    ],
+    [
+      20.0,
+      28.6
+    ],
+    [
+      26.9,
+      29.175
+    ]
+  ],
+  "track_segments": 2,
+  "track_width_mm": 0.25,
+  "route_length_mm": 8.3784,
+  "new_vias": 2,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "in1_gnd_digital_reference_fraction": 1.0,
+  "in2_gnd_mic_reference_fraction": 1.0,
+  "in4_gnd_digital_reference_fraction": 1.0,
+  "c34_supply_current_and_return_review_b": "OPEN",
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 83,
+    "candidate_unconnected": 82,
+    "new_by_type": {},
+    "new_errors": 0
+  }
+}

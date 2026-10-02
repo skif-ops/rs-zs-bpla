@@ -1,0 +1,70 @@
+{
+  "schema": "dioneya-pcb-main-3v3-u1-47-058-v1",
+  "base_sha256": "1ae3dd8186881bf6f252c3f87ac2a0f0ab8ae469ed2934f37cf626d1cfcd390d",
+  "candidate_sha256": "85ee10535aa7109cdb1fed2716864f420ef89329d355bf1afd5e2971fbc2ce82",
+  "front_points": [
+    [
+      59.75,
+      36.0
+    ],
+    [
+      59.35,
+      36.3
+    ]
+  ],
+  "inner_points": [
+    [
+      59.35,
+      36.3
+    ],
+    [
+      58.3,
+      37.3
+    ],
+    [
+      58.0,
+      37.65
+    ],
+    [
+      58.0,
+      37.95
+    ],
+    [
+      57.85,
+      38.15
+    ],
+    [
+      57.6,
+      38.25
+    ],
+    [
+      57.0,
+      38.25
+    ],
+    [
+      56.5,
+      38.05
+    ]
+  ],
+  "track_segments": 8,
+  "track_width_mm": 0.25,
+  "route_length_mm": 4.3688,
+  "new_vias": 2,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "in1_gnd_digital_reference_fraction": 1.0,
+  "in2_gnd_mic_reference_fraction": 1.0,
+  "in4_gnd_digital_reference_fraction": 1.0,
+  "u1_supply_current_and_return_review_b": "OPEN",
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 84,
+    "candidate_unconnected": 83,
+    "new_by_type": {},
+    "new_errors": 0
+  }
+}

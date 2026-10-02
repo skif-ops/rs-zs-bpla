@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-aad-reroute-097-v1",
+  "base_sha256": "8b3a7d772f393c01bfafe5812e848bfbf91294e9d59d574829a2180ee12bbf25",
+  "candidate_sha256": "d009b62229fc4665d205146d6e704881f7a88483ee3c83b4134236ede1b28590",
+  "route": {
+    "new_segments": 119,
+    "new_vias": 9,
+    "removed_segments": 10,
+    "length_mm": 53.183
+  },
+  "drc": {
+    "base_unconnected": 19,
+    "candidate_unconnected": 18,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: AAD_CFG length, via-in-pad and return-current review",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

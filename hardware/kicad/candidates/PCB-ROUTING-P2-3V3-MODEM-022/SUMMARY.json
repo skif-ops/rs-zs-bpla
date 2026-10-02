@@ -1,0 +1,18 @@
+{
+  "schema": "dioneya-pcb-main-3v3-modem-022-v1",
+  "base_sha256": "5b6290ccbeac173310ef66d600282e702da821538107385cda6325096e157e5c",
+  "candidate_sha256": "a47c8a875108ea392cc59cdef1fe51ffecbabfc9cf2ede00695ac2d622f2b2ca",
+  "track_segments": 1,
+  "width_mm": 0.25,
+  "length_mm": 1.25,
+  "drc": {
+    "base_unconnected": 120,
+    "candidate_unconnected": 119,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "power_return_review_b": "OPEN: R28/R33 3V3 over GND_MODEM",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

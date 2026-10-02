@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-fb1-input-040-v1",
+  "base_sha256": "039c9f4e34e4be60cf89d4482f5c45d71374a247f83e16e2f17c41c79dd4fa41",
+  "candidate_sha256": "0b1b7a449271a79290c6fdd51b845e29678e73d87c2ac7d8320ab00823bc5422",
+  "routes": 1,
+  "track_segments": 1,
+  "via_size_drill_mm": [
+    0.5,
+    0.3
+  ],
+  "total_length_mm": 0.5,
+  "modem_burst_current_and_pi_review_b": "OPEN",
+  "filled_capped_via_in_pad_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 102,
+    "candidate_unconnected": 101,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

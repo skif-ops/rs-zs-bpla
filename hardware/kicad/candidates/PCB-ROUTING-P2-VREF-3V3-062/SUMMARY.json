@@ -1,0 +1,44 @@
+{
+  "schema": "dioneya-pcb-main-vref-3v3-062-v1",
+  "base_sha256": "b733b350b14dcbad0c62e91f7b58a715a891b418bdeac28d17f88277e724b4d0",
+  "candidate_sha256": "ae099f301e6dff1d93cb67141d0b28c416d8cad86b6f46eb120c9e2d0553be43",
+  "schematic_mcu_sha256": "298b13ba7d3573f8df1bd69936b2ea20744f53128083ffd0e713a29fb9f0e43d",
+  "routes": [
+    [
+      [
+        41.925,
+        31.5
+      ],
+      [
+        41.925,
+        32.75
+      ]
+    ],
+    [
+      [
+        41.925,
+        34.0
+      ],
+      [
+        41.925,
+        35.25
+      ]
+    ]
+  ],
+  "minimum_other_net_copper_clearance_mm": 0.3,
+  "new_vias": 0,
+  "track_width_mm": 0.25,
+  "route_length_mm": 2.5,
+  "analog_reference_decoupling_review_b": "OPEN",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 80,
+    "candidate_unconnected": 79,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}

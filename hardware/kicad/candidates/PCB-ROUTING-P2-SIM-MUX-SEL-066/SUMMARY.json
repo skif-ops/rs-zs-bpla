@@ -1,0 +1,108 @@
+{
+  "schema": "dioneya-pcb-main-sim-mux-sel-066-v1",
+  "base_sha256": "12130d529609fc1c907f3b6a28508f8ad3e8933c1cc0b2ff380904e06dd4d9cb",
+  "candidate_sha256": "f0d62adb45d766521c1af48bff1e0cb4555f703694d34cc9b668f3a7608d8362",
+  "net": "SIM_MUX_SEL",
+  "routes": [
+    {
+      "layer": "F.Cu",
+      "points": [
+        [
+          47.5,
+          22.25
+        ],
+        [
+          47.5,
+          21.4
+        ]
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "points": [
+        [
+          47.5,
+          21.4
+        ],
+        [
+          46.5,
+          19.6
+        ]
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "points": [
+        [
+          46.5,
+          19.6
+        ],
+        [
+          46.2,
+          19.4
+        ]
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "points": [
+        [
+          46.2,
+          19.4
+        ],
+        [
+          41.6,
+          20.7
+        ]
+      ]
+    },
+    {
+      "layer": "F.Cu",
+      "points": [
+        [
+          41.6,
+          20.7
+        ],
+        [
+          40.9,
+          20.825
+        ]
+      ]
+    }
+  ],
+  "track_width_mm": 0.15,
+  "new_vias": 2,
+  "via_positions_mm": [
+    [
+      47.5,
+      21.4
+    ],
+    [
+      41.6,
+      20.7
+    ]
+  ],
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "route_length_mm": 8.7609,
+  "reference_outline_fraction": 1.0,
+  "signal_to_nearest_digital_ground_vias_mm": [
+    1.2134,
+    1.4792
+  ],
+  "review_b": "OPEN",
+  "small_via_dfm": "OPEN",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 77,
+    "candidate_unconnected": 76,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}

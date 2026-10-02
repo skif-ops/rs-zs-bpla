@@ -1,0 +1,34 @@
+{
+  "schema": "dioneya-pcb-main-fault-return-stitch-065-v1",
+  "base_sha256": "393f131f58c8285026b01f99770362970ad631ede069004e0f6735d02accb827",
+  "candidate_sha256": "12130d529609fc1c907f3b6a28508f8ad3e8933c1cc0b2ff380904e06dd4d9cb",
+  "net": "GND_DIGITAL",
+  "via_position_mm": [
+    25.1,
+    23.9
+  ],
+  "via_size_drill_mm": [
+    0.5,
+    0.3
+  ],
+  "new_vias": 1,
+  "nearest_other_net_copper_mm": 0.3671,
+  "nearest_other_drill_mm": 0.975,
+  "signal_to_ground_stitch_mm": 1.2,
+  "digital_reference_zones": [
+    "In1.Cu",
+    "In4.Cu"
+  ],
+  "fault_return_review_b": "OPEN",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 77,
+    "candidate_unconnected": 77,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}

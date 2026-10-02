@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-r90-3v3-037-v1",
+  "base_sha256": "844e3f7f34eda15c56eefc46bfe661bb78d5e142208a8c769076f37d509fed42",
+  "candidate_sha256": "75558caa18c0d3fc3d8c3c9ff0c3e1700bb56b50821d9bcc29582a1bde5c80f9",
+  "routes": 2,
+  "track_segments": 2,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 3.198,
+  "sd_detect_pullup_power_review_b": "OPEN",
+  "small_via_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 105,
+    "candidate_unconnected": 104,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

@@ -1,0 +1,4 @@
+﻿Circuit_ID,PCB_MAIN_Connector,Function,Pigtail_Manufacturer,Pigtail_MPN,Pigtail_Spec,Pigtail_Order_Qty,Antenna_Manufacturer,Antenna_MPN,Antenna_Spec,Antenna_Order_Qty
+RF-CELL,J8,CELL/LTE,Taoglas,CAB.0243,150 mm; MHF I/U.FL-compatible R/A to waterproof SMA(F) bulkhead,66,Taoglas,G30.B.108111,SMA(M); IP67 dome; 1 m cable,22
+RF-GNSS,J9,GNSS L1 active,Taoglas,CAB.0243,150 mm; MHF I/U.FL-compatible R/A to waterproof SMA(F) bulkhead,66,Taoglas,AA.166.A.301111,SMA(M); IP67 magnetic; 3 m RG174,22
+RF-RU868,J10,LoRa RU868,Taoglas,CAB.0243,150 mm; MHF I/U.FL-compatible R/A to waterproof SMA(F) bulkhead,66,Taoglas,TI.89.B.2111W,SMA(M); IP67; 860–930 MHz,22

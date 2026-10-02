@@ -1,0 +1,40 @@
+{
+  "schema": "dioneya-pcb-main-sd-cmd-u23-051-v1",
+  "base_sha256": "07904a6f469e1820218323e56d1cf13f992098f4098ba109bb3201fcb5594beb",
+  "candidate_sha256": "3bf028120368ca5adf9f13d809cb32d89b0c9206f7794f99b7d31f17560395a2",
+  "removed_ground_items": [
+    "a6fa2aa3-9651-42c1-b845-626cd433333d",
+    "ab80d164-0c5f-4dee-83f6-f2eeaf96aa98",
+    "8b687512-09e7-4501-a8f4-40a509deeb89"
+  ],
+  "ground_via": [
+    82.5825,
+    21.0
+  ],
+  "sd_cmd_vias": [
+    [
+      81.8,
+      21.5
+    ],
+    [
+      83.325,
+      24.25
+    ]
+  ],
+  "track_segments": 2,
+  "small_via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "sd_return_review_b": "OPEN",
+  "via_in_pad_dfm_review": "OPEN",
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 91,
+    "candidate_unconnected": 90,
+    "new_by_type": {},
+    "new_errors": 0
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-usb-connector-009-v1",
+  "base_sha256": "63de90493a7e8ab5f82ced9c171dc258b6209d2aed68e63e00ff6ac3d54360a1",
+  "candidate_sha256": "c42e099cd366556055db0947ec5e99a0b774bc9a9019723c78ceadd9ca38122b",
+  "routes": 5,
+  "vias": 4,
+  "ripped_cc1_tracks": 5,
+  "drc": {
+    "base_unconnected": 146,
+    "candidate_unconnected": 142,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_rules": {
+    "min_via_diameter_mm": 0.25,
+    "min_drill_mm": 0.15,
+    "min_annular_width_mm": 0.05
+  },
+  "via_in_pad_filled_capped_process_review": "OPEN",
+  "usb_90ohm_si_return_review": "OPEN",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

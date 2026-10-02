@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-pdm-data2-100-v1",
+  "base_sha256": "09fd1ad0eb71f3bcb94dbff8709ccfa25ec9287d437a0467ef3645a98f9b602b",
+  "candidate_sha256": "bf864d3f869ec033ed529a035d1028d63988805c28b057a22845ea0e32038df0",
+  "route": {
+    "new_segments": 110,
+    "new_vias": 8,
+    "removed_segments": 1,
+    "length_mm": 66.89
+  },
+  "drc": {
+    "base_unconnected": 16,
+    "candidate_unconnected": 15,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: PDM_DATA2 length, audio skew/return, NRST integrity and via-in-pad DFM review",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

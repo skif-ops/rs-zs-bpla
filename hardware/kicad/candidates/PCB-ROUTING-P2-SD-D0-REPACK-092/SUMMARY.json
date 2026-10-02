@@ -1,0 +1,26 @@
+{
+  "schema": "dioneya-pcb-main-sd-d0-repack-092-v1",
+  "base_sha256": "ba9a0869e472b9ce5a9040024981d60b3dd573f644270b74f9023c240fcaf28d",
+  "candidate_sha256": "8af90eebff37cea2cb566ec14311163544f03d0cb3b4af5946dcb9befd67897e",
+  "route": {
+    "removed_sd_d2_segments": 9,
+    "added_length_mm": {
+      "SD_D0_CARD": 3.931,
+      "SD_D2_U1": 37.546
+    },
+    "new_vias": 4,
+    "new_segments": 48
+  },
+  "drc": {
+    "base_unconnected": 24,
+    "candidate_unconnected": 23,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: SD_D0/SD_D2 timing, skew, return and via DFM",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

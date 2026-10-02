@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-c6-r14-030-v1",
+  "base_sha256": "cbbc51ed5504c6158925a480e19db11a62735bc61e119fbb1d29be3a8758c21d",
+  "candidate_sha256": "2cddda588a3ad265fdf36331f40809c6dde9ec46fea99636874d87850652b529",
+  "routes": 3,
+  "track_segments": 3,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 2.689,
+  "i2c_pullup_power_review_b": "OPEN",
+  "via_in_pad_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 112,
+    "candidate_unconnected": 111,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

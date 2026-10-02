@@ -1,0 +1,33 @@
+{
+  "schema": "dioneya-pcb-main-batch-074-v1",
+  "base_sha256": "60ba342df46f68de3cb472dbf554677427a29f367ae6fbab3e6f1cec82c4f9df",
+  "candidate_sha256": "cf46bafbb10ffe6c9cea7f4a82439fdd0668b82979ee7b78d90b56c867157269",
+  "routes": [
+    {
+      "net": "GNSS_ANT_SWITCHED",
+      "track_length_mm": 17.5995,
+      "vias": 2
+    },
+    {
+      "net": "GNSS_ANT_BIAS_RAW",
+      "track_length_mm": 16.3894,
+      "vias": 2
+    }
+  ],
+  "route_count": 2,
+  "new_vias": 4,
+  "new_track_length_mm": 33.9889,
+  "reference_outline_fraction": 1.0,
+  "review_b": "OPEN",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 45,
+    "candidate_unconnected": 43,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}

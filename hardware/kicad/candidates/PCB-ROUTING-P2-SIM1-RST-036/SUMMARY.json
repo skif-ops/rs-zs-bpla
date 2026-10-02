@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-sim1-rst-036-v1",
+  "base_sha256": "bcf0ba9b0fab954d8cb96db3bf7521ccfbac9210cbfe29ca7c3e1c7971d4e904",
+  "candidate_sha256": "844e3f7f34eda15c56eefc46bfe661bb78d5e142208a8c769076f37d509fed42",
+  "routes": 2,
+  "track_segments": 3,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 4.605,
+  "sim_reset_mixed_domain_return_review_b": "OPEN",
+  "via_in_pad_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 106,
+    "candidate_unconnected": 105,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

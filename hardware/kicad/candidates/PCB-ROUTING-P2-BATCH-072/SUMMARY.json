@@ -1,0 +1,43 @@
+{
+  "schema": "dioneya-pcb-main-batch-072-v1",
+  "base_sha256": "84f4e18d8b8d3d685bd0256c6f67fb6d2926be77fe00618c1dbc2ae07afc0379",
+  "candidate_sha256": "42e70280275169e6fe2b06343f09683153a45a228666eb9e4c31f7c437851dee",
+  "routes": [
+    {
+      "net": "LORA_DIO1",
+      "track_length_mm": 32.1505,
+      "vias": 6
+    },
+    {
+      "net": "AAD_CFG_1V8_FANOUT",
+      "track_length_mm": 41.096,
+      "vias": 5
+    },
+    {
+      "net": "I2C2_SCL_BUS",
+      "track_length_mm": 58.6593,
+      "vias": 3
+    },
+    {
+      "net": "1V8_MIC",
+      "track_length_mm": 0.2236,
+      "vias": 0
+    }
+  ],
+  "route_count": 4,
+  "new_vias": 14,
+  "new_track_length_mm": 132.1294,
+  "reference_outline_fraction": 1.0,
+  "review_b": "OPEN",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 48,
+    "candidate_unconnected": 45,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}

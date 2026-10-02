@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-gnss-bias-r61-047-v1",
+  "base_sha256": "59d2b0f07f032ff3ec67b3c6a920b49491c427a5edd96d6a36ede60fe0d92dbc",
+  "candidate_sha256": "6658aedbf02d79bfaa29777459f0da5b21cde580fa01407d7519dd88f1ab6f21",
+  "routes": 1,
+  "track_segments": 2,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 6.049,
+  "gnss_bias_current_and_rf_isolation_review_b": "OPEN",
+  "via_in_pad_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 95,
+    "candidate_unconnected": 94,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

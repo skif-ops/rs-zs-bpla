@@ -1,0 +1,9 @@
+{
+  "schema": "dioneya-pcb-main-route-080-v1",
+  "net": "3V8_MODEM_RF",
+  "layer": "F.Cu",
+  "width_mm": 0.4,
+  "points_mm": [[5.4, 47.1], [8.1, 47.1], [8.2, 47.0], [8.3, 47.0], [8.4, 46.9], [9.5, 46.9], [9.6, 47.0]],
+  "source": "0.1 mm F.Cu grid search on candidate 079; native filled-board DRC screen",
+  "review_b": "C47 10 pF modem RF supply branch over In1.Cu GND_DIGITAL, rather than GND_MODEM; PI and return path open"
+}

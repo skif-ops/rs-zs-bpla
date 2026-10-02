@@ -1,0 +1,126 @@
+{
+  "schema": "dioneya-pcb-main-route-079-v1",
+  "source_session_sha256": "5f0da7e0378294be89e7982b51cca200def301edd1bdfd86b420eb2a79e147e1",
+  "net": "AAD_CFG_1V8_FANOUT",
+  "segments": [
+    {
+      "layer": "F.Cu",
+      "width_mm": 0.15,
+      "start_mm": [
+        43.75,
+        68.41
+      ],
+      "end_mm": [
+        43.75,
+        67.6327
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "width_mm": 0.15,
+      "start_mm": [
+        45.098,
+        68.3196
+      ],
+      "end_mm": [
+        65.0502,
+        68.3196
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "width_mm": 0.15,
+      "start_mm": [
+        65.0502,
+        68.3196
+      ],
+      "end_mm": [
+        65.2343,
+        68.5037
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "width_mm": 0.15,
+      "start_mm": [
+        65.2343,
+        68.5037
+      ],
+      "end_mm": [
+        73.0913,
+        68.5037
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "width_mm": 0.15,
+      "start_mm": [
+        73.0913,
+        68.5037
+      ],
+      "end_mm": [
+        73.3267,
+        68.2683
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "width_mm": 0.15,
+      "start_mm": [
+        73.3267,
+        68.2683
+      ],
+      "end_mm": [
+        92.8313,
+        68.2683
+      ]
+    },
+    {
+      "layer": "B.Cu",
+      "width_mm": 0.15,
+      "start_mm": [
+        92.8313,
+        68.2683
+      ],
+      "end_mm": [
+        94.7325,
+        67.6
+      ]
+    },
+    {
+      "layer": "F.Cu",
+      "width_mm": 0.15,
+      "start_mm": [
+        43.75,
+        67.6327
+      ],
+      "end_mm": [
+        44.4111,
+        67.6327
+      ]
+    },
+    {
+      "layer": "F.Cu",
+      "width_mm": 0.15,
+      "start_mm": [
+        44.4111,
+        67.6327
+      ],
+      "end_mm": [
+        45.098,
+        68.3196
+      ]
+    }
+  ],
+  "vias_mm": [
+    [
+      94.7325,
+      67.6
+    ],
+    [
+      45.098,
+      68.3196
+    ]
+  ],
+  "source": "Freerouting 2.4.1 fanout on candidate 077, screened and placed on 078; right via moved onto existing same-net F.Cu track near J_MIC3 to remove F.Cu sliver"
+}

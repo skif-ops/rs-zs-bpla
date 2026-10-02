@@ -1,0 +1,14 @@
+{
+  "schema": "dioneya-pcb-main-p2-gnss-008-v1",
+  "base_sha256": "d45b5b1de5b8d29b78b90e67949db0c7193629f7e2af608e24883f5ac3906743",
+  "candidate_sha256": "63de90493a7e8ab5f82ced9c171dc258b6209d2aed68e63e00ff6ac3d54360a1",
+  "routes": 2,
+  "drc": {
+    "base_unconnected": 148,
+    "candidate_unconnected": 146,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

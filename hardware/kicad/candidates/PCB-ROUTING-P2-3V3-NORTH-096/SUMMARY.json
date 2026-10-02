@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-3v3-north-096-v1",
+  "base_sha256": "3c5941069ec5bcc63bbb81f0c7f2fbdfdf8433ea78acfdd760ecd6c8197637e9",
+  "candidate_sha256": "8b3a7d772f393c01bfafe5812e848bfbf91294e9d59d574829a2180ee12bbf25",
+  "route": {
+    "net": "3V3_DIGITAL",
+    "length_mm": 35.617,
+    "new_vias": 0,
+    "new_segments": 64
+  },
+  "drc": {
+    "base_unconnected": 20,
+    "candidate_unconnected": 19,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: 3V3 rail top-edge length, supply impedance and return-current review",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

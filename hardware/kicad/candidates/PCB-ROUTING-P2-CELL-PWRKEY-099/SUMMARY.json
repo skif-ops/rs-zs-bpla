@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-cell-pwrkey-099-v1",
+  "base_sha256": "e8d8e315a810b9b90f91c467625b5459525f5e3310a41cc14649cc9d87d7e4f8",
+  "candidate_sha256": "09fd1ad0eb71f3bcb94dbff8709ccfa25ec9287d437a0467ef3645a98f9b602b",
+  "route": {
+    "new_segments": 95,
+    "new_vias": 11,
+    "removed_segments": 1,
+    "length_mm": 104.193
+  },
+  "drc": {
+    "base_unconnected": 17,
+    "candidate_unconnected": 16,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: CELL_PWRKEY_CMD 101 mm detour, latency, return-current and via-in-pad DFM review",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

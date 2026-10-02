@@ -1,0 +1,29 @@
+{
+  "schema": "dioneya-pcb-main-pdm-relief-085-v1",
+  "base_sha256": "2a8111d236f1f84cbb009fd62a1f800e0b67e906d0e90f151b411157a2f38428",
+  "candidate_sha256": "620aabcbffe095401edae7084f1fd026ca266a2411281e05f2dea495175eeeb9",
+  "route": {
+    "new_segments": 15,
+    "new_vias": 2,
+    "removed_segments": 3,
+    "relocated_ground_via": 1,
+    "new_track_length_by_net_mm": {
+      "PDM_CLK_1V8_FANOUT": 6.008,
+      "PDM_DATA1_1V8": 8.28,
+      "3V8_MODEM": 8.621,
+      "GND_MIC": 0.348
+    }
+  },
+  "review_b": "OPEN: U19 via-in-pad, MIC return, modem supply and small-via DFM",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 31,
+    "candidate_unconnected": 30,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}

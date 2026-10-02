@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-cell-dbg-rx-038-v1",
+  "base_sha256": "75558caa18c0d3fc3d8c3c9ff0c3e1700bb56b50821d9bcc29582a1bde5c80f9",
+  "candidate_sha256": "2b3d8b12b1ff0cc4e774d99f16a011c8725c8e0ce20216d97d33de38bdc680dc",
+  "routes": 2,
+  "track_segments": 5,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 7.327,
+  "debug_pdm_coupling_mixed_return_review_b": "OPEN",
+  "via_in_pad_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 104,
+    "candidate_unconnected": 103,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

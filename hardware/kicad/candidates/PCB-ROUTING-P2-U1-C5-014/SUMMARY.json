@@ -1,0 +1,17 @@
+{
+  "schema": "dioneya-pcb-main-u1-c5-power-014-v1",
+  "base_sha256": "d18f20d2c18b9f35d2b8006a396c8d127fa2d0936c3601bd03cc94639dc7909b",
+  "candidate_sha256": "008b133f27f2218c7f62d3c03e0c1f8c60c844cf46b2577151f20b4558cfa9f5",
+  "track_segments": 2,
+  "width_mm": 0.25,
+  "length_mm": 1.56,
+  "drc": {
+    "base_unconnected": 139,
+    "candidate_unconnected": 138,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

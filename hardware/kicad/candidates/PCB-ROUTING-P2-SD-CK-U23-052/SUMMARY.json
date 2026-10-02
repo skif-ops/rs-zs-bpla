@@ -1,0 +1,31 @@
+{
+  "schema": "dioneya-pcb-main-sd-ck-u23-052-v1",
+  "base_sha256": "3bf028120368ca5adf9f13d809cb32d89b0c9206f7794f99b7d31f17560395a2",
+  "candidate_sha256": "77c3ebb6098947b7bac7c46183c97cdf66566b4a1eb9cdfa88f2f431f94edbfa",
+  "sd_ck_vias": [
+    [
+      81.5,
+      22.0
+    ],
+    [
+      79.5,
+      18.0272
+    ]
+  ],
+  "track_segments": 2,
+  "small_via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "sd_return_review_b": "OPEN",
+  "via_in_pad_dfm_review": "OPEN",
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 90,
+    "candidate_unconnected": 89,
+    "new_by_type": {},
+    "new_errors": 0
+  }
+}

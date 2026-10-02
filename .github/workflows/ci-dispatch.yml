@@ -36,3 +36,419 @@ jobs:
           path: ${{ matrix.artifacts }}
           if-no-files-found: warn
           retention-days: 30
+  pcb-main-candidate-075:
+    if: github.ref == 'refs/heads/feature/pcb-main-completion' || github.head_ref == 'feature/pcb-main-completion'
+    concurrency:
+      group: pcb-main-candidate-feature-p2
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    container:
+      image: ghcr.io/kicad/kicad:9.0.9@sha256:e638b79b0321f29395a5b783e94bb9f3c73303e8da15da27b8f5cb4b67a37729
+      options: --user root
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/pcb-main-completion
+      - name: Install candidate geometry dependencies
+        run: |
+          apt-get -o APT::Update::Error-Mode=any update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3-pip
+          /usr/bin/python3 -m pip install --break-system-packages --disable-pip-version-check \
+            'kiutils==1.4.8' 'shapely>=2,<3' 'numpy==2.0.2'
+      - name: Run native KiCad 9 candidate ERC and DRC
+        env:
+          DIONEYA_KICAD_DIRECT: '1'
+        run: |
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_batch_075_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_batch_075_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-U3-POWER-076/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_u3_power_076_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_u3_power_076_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-077/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_astar_077_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_astar_077_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-U1-RELIEF-078/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_u1_relief_078_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_u1_relief_078_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-AAD-079/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_aad_079_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_aad_079_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-C47-080/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_c47_080_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_c47_080_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-CELL-DBG-081/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_cell_dbg_081_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_cell_dbg_081_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-CELL-BOOT-082/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_cell_boot_082_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_cell_boot_082_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-USIM-CLK-083/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_usim_clk_083_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_usim_clk_083_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-C46-084/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_c46_084_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_c46_084_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-PDM-RELIEF-085/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_pdm_relief_085_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_pdm_relief_085_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-R4-RELIEF-086/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_r4_relief_086_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_r4_relief_086_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-RELIEF-087/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_sd_d3_relief_087_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_sd_d3_relief_087_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-TOP-088/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_sd_d3_top_088_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_sd_d3_top_088_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-NRST-089/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_nrst_089_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_nrst_089_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-USB-DP-090/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_usb_dp_090_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_usb_dp_090_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-USB-DM-091/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_usb_dm_091_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_usb_dm_091_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-SD-D0-REPACK-092/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_sd_d0_repack_092_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_sd_d0_repack_092_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-SD-D0-UPPER-093/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_sd_d0_upper_093_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_sd_d0_upper_093_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-AAD-R18-094/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_aad_r18_094_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_aad_r18_094_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-PDM-DATA1-095/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_pdm_data1_095_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_pdm_data1_095_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-3V3-NORTH-096/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_3v3_north_096_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_3v3_north_096_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-AAD-REROUTE-097/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_aad_reroute_097_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_aad_reroute_097_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-PWR-FAULT-098/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_pwr_fault_098_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_pwr_fault_098_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-CELL-PWRKEY-099/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_cell_pwrkey_099_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_cell_pwrkey_099_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-PDM-DATA2-100/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_pdm_data2_100_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_pdm_data2_100_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-VIA-CLEANUP-101/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_dangling_vias_101_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_dangling_vias_101_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-TAIL-CLEANUP-102/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_dead_end_102_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_dead_end_102_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-PAD-STUBS-103/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_pad_stubs_103_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_pad_stubs_103_rev_a.py
+          fi
+          if test -f hardware/kicad/candidates/PCB-ROUTING-P2-TRACK-ENDS-104/SUMMARY.json; then
+            /usr/bin/python3 tools/apply_pcb_main_track_ends_104_rev_a.py --check
+          else
+            /usr/bin/python3 tools/apply_pcb_main_track_ends_104_rev_a.py
+          fi
+      - name: Upload candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-075
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/
+      - name: Upload U3 power relief candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-076
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-U3-POWER-076/
+      - name: Upload 3V3 bridge candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-077
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-077/
+      - name: Upload U1 relief candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-078
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-U1-RELIEF-078/
+      - name: Upload AAD route candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-079
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-AAD-079/
+      - name: Upload C47 route candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-080
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-C47-080/
+      - name: Upload cellular debug candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-081
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-CELL-DBG-081/
+      - name: Upload cellular boot candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-082
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-CELL-BOOT-082/
+      - name: Upload USIM clock candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-083
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-USIM-CLK-083/
+      - name: Upload C46 RF branch candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-084
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-C46-084/
+      - name: Upload U19 PDM relief candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-085
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-PDM-RELIEF-085/
+      - name: Upload R4 3V3 relief candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-086
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-R4-RELIEF-086/
+      - name: Upload SD D3 placement relief candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-087
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-RELIEF-087/
+      - name: Upload upper SD D3 branch candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-088
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-TOP-088/
+      - name: Upload NRST candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-089
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-NRST-089/
+      - name: Upload USB DP candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-090
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-USB-DP-090/
+      - name: Upload USB DM candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-091
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-USB-DM-091/
+      - name: Upload SD D0 repack candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-092
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-SD-D0-REPACK-092/
+      - name: Upload upper SD D0 candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-093
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-SD-D0-UPPER-093/
+      - name: Upload R18 AAD fanout candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-094
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-AAD-R18-094/
+      - name: Upload PDM DATA1 candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-095
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-PDM-DATA1-095/
+      - name: Upload 3V3 north bridge candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-096
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-3V3-NORTH-096/
+      - name: Upload AAD reroute candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-097
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-AAD-REROUTE-097/
+      - name: Upload PWR_FAULT candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-098
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-PWR-FAULT-098/
+      - name: Upload CELL_PWRKEY candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-099
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-CELL-PWRKEY-099/
+      - name: Upload PDM_DATA2 candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-100
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-PDM-DATA2-100/
+      - name: Upload via cleanup candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-101
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-VIA-CLEANUP-101/
+      - name: Upload tail cleanup candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-102
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-TAIL-CLEANUP-102/
+      - name: Upload pad stub candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-103
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-PAD-STUBS-103/
+      - name: Upload track-end candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-candidate-104
+          path: hardware/kicad/candidates/PCB-ROUTING-P2-TRACK-ENDS-104/
+      - name: Upload routing workspace snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pcb-main-routing-workspace
+          path: |
+            tools/
+            hardware/kicad/native/PCB-MAIN/
+            hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-TOP-088/
+            hardware/kicad/candidates/PCB-ROUTING-P2-VREF-3V3-062/
+      - name: Commit verified candidate evidence to feature branch
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git add hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/PCB-MAIN_P2_ASTAR_075_CANDIDATE_REV_A.kicad_pcb \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/PCB-MAIN_P2_ASTAR_075_CANDIDATE_REV_A.kicad_pro \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-075/{SUMMARY,drc_candidate,erc_candidate}.json \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-U3-POWER-076/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-ASTAR-077/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-U1-RELIEF-078/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-AAD-079/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-C47-080/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-CELL-DBG-081/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-CELL-BOOT-082/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-USIM-CLK-083/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-C46-084/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-PDM-RELIEF-085/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-R4-RELIEF-086/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-RELIEF-087/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-SD-D3-TOP-088/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-NRST-089/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-USB-DP-090/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-USB-DM-091/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-SD-D0-REPACK-092/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-SD-D0-UPPER-093/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-AAD-R18-094/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-PDM-DATA1-095/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-3V3-NORTH-096/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-AAD-REROUTE-097/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-PWR-FAULT-098/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-CELL-PWRKEY-099/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-PDM-DATA2-100/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-VIA-CLEANUP-101/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-TAIL-CLEANUP-102/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-PAD-STUBS-103/ \
+                  hardware/kicad/candidates/PCB-ROUTING-P2-TRACK-ENDS-104/
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' \
+                -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+                commit -m 'PCB-MAIN: record native KiCad 9 latest P2 candidate'
+            for attempt in 1 2 3 4 5; do
+              if git push origin HEAD:feature/pcb-main-completion; then
+                exit 0
+              fi
+              git fetch origin feature/pcb-main-completion
+              git rebase origin/feature/pcb-main-completion
+            done
+            exit 1
+          fi

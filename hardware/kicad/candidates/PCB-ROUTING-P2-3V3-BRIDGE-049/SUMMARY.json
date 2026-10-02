@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-3v3-bridge-049-v1",
+  "base_sha256": "2dee54ef4544e5c8c59f48935df1ae1cdc840faa1a3861d2eb46eda1562abe02",
+  "candidate_sha256": "ca3381d980b8deaeae5d040fbb65d7da6c1930a92d4dbd05aab82931425de5c0",
+  "routes": 2,
+  "track_segments": 2,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 2.69,
+  "power_integrity_and_return_review_b": "OPEN",
+  "small_via_dfm_review": "OPEN",
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 93,
+    "candidate_unconnected": 92,
+    "new_by_type": {},
+    "new_errors": 0
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-i2c-sda-tp-044-v1",
+  "base_sha256": "f6560764d8dc97ab049d4ddcb4eb5427265ccd1bda7cae32ab6acd5bcb266578",
+  "candidate_sha256": "d3df48a62b6657b8fc7b569ae14bf251b0b09dea0922603b9528f2e86be20e86",
+  "routes": 2,
+  "track_segments": 3,
+  "via_size_drill_mm": [
+    0.25,
+    0.15
+  ],
+  "total_length_mm": 7.098,
+  "i2c_rise_time_and_return_review_b": "OPEN",
+  "small_via_dfm_review": "OPEN",
+  "drc": {
+    "base_unconnected": 98,
+    "candidate_unconnected": 97,
+    "new_by_type": {},
+    "new_errors": 0
+  },
+  "candidate_only_usb_u1_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "dioneya-pcb-main-p2-gnss-008-precheck-v1",
+  "base_sha256": "d45b5b1de5b8d29b78b90e67949db0c7193629f7e2af608e24883f5ac3906743",
+  "candidate_sha256": "63de90493a7e8ab5f82ced9c171dc258b6209d2aed68e63e00ff6ac3d54360a1",
+  "routes": [
+    {
+      "net": "GNSS_ANT_SHORT_N",
+      "width_mm": 0.2,
+      "layer": "F.Cu",
+      "points_mm": [
+        [
+          54.4,
+          51.25
+        ],
+        [
+          53.4,
+          50.05
+        ],
+        [
+          51.6,
+          50.15
+        ],
+        [
+          50.5,
+          52.25
+        ],
+        [
+          50.2,
+          53.25
+        ]
+      ]
+    },
+    {
+      "net": "GNSS_ANT_SHORT_N",
+      "width_mm": 0.2,
+      "layer": "F.Cu",
+      "points_mm": [
+        [
+          50.2,
+          53.25
+        ],
+        [
+          49.125,
+          57.25
+        ],
+        [
+          47.025,
+          57.45
+        ],
+        [
+          46.925,
+          58.0
+        ]
+      ]
+    }
+  ],
+  "checks": {
+    "endpoint_pad_net": "PASS",
+    "other_net_copper_clearance_0p20mm": "PASS",
+    "continuous_in1_gnd_digital_outline": "PASS",
+    "native_kicad_9_drc": "PENDING"
+  },
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

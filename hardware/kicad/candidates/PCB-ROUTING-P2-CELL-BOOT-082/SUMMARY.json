@@ -1,0 +1,28 @@
+{
+  "schema": "dioneya-pcb-main-cell-boot-082-v1",
+  "base_sha256": "7e883cc37c0d522e700dd69d3a9a0006e0b0c4de4310ea16e664200792c5b331",
+  "candidate_sha256": "a3ac2ff52b39ecac8a8785c8df4743ce125a30cd2daf7880c2fbbcbc1d5745ac",
+  "route": {
+    "net": "CELL_USB_BOOT_TP",
+    "track_length_mm": 54.058,
+    "segments": 45,
+    "vias": 6,
+    "length_by_layer_mm": {
+      "B.Cu": 27.999,
+      "In3.Cu": 24.734,
+      "F.Cu": 1.324
+    }
+  },
+  "review_b": "OPEN: cellular boot test return through MIC/digital reference and fixture timing",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 34,
+    "candidate_unconnected": 33,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}

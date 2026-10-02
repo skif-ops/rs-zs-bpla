@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-sd-d0-upper-093-v1",
+  "base_sha256": "8af90eebff37cea2cb566ec14311163544f03d0cb3b4af5946dcb9befd67897e",
+  "candidate_sha256": "277ffd2e92bd3096e1607fdc832b21aeb019047e9df7dfb359d63d2bd350cfc2",
+  "route": {
+    "net": "SD_D0_CARD",
+    "length_mm": 6.256,
+    "new_vias": 0,
+    "new_segments": 15
+  },
+  "drc": {
+    "base_unconnected": 23,
+    "candidate_unconnected": 22,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: SD D0 timing, return and ESD coupling",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

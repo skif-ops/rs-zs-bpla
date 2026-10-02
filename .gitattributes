@@ -1,2 +1,4 @@
 # Preserve byte-exact upstream CMSIS snapshots, including upstream whitespace.
 /firmware/targets/evt_pre_20/vendor/cmsis_device_u5/** -whitespace
+# Candidate 105 has a byte-exact SHA-256 manufacturing manifest.
+/hardware/kicad/candidates/PCB-MAIN-8L-COMPLETE-105/** -text -whitespace

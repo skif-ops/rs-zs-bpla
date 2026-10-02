@@ -1,0 +1,94 @@
+{
+  "schema": "dioneya-pcb-main-route-086-v1",
+  "source": "local selective GND via relief and native filled-board KiCad DRC on candidate 085",
+  "review_b": "Removed GND_DIGITAL stitching via near R4; power return and small-via DFM",
+  "delete": [
+    "  (via (at 56.9000 20.0000) (size 0.5) (drill 0.3) (layers \"F.Cu\" \"B.Cu\") (net 45) (tstamp 90ba900a-f162-5458-a9f1-7f1488308a4f))"
+  ],
+  "routes": [
+    {
+      "kind": "track",
+      "net": "3V3_DIGITAL",
+      "layer": "F.Cu",
+      "width": 0.25,
+      "points": [
+        [
+          56.5,
+          20.7
+        ],
+        [
+          56.5,
+          20.3
+        ],
+        [
+          57.3,
+          19.5
+        ],
+        [
+          57.3,
+          19.2
+        ],
+        [
+          57.4,
+          19.1
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "net": "3V3_DIGITAL",
+      "at": [
+        57.4,
+        19.1
+      ]
+    },
+    {
+      "kind": "track",
+      "net": "3V3_DIGITAL",
+      "layer": "In3.Cu",
+      "width": 0.25,
+      "points": [
+        [
+          57.4,
+          19.1
+        ],
+        [
+          58.0,
+          18.5
+        ],
+        [
+          58.1,
+          18.5
+        ]
+      ]
+    },
+    {
+      "kind": "via",
+      "net": "3V3_DIGITAL",
+      "at": [
+        58.1,
+        18.5
+      ]
+    },
+    {
+      "kind": "track",
+      "net": "3V3_DIGITAL",
+      "layer": "F.Cu",
+      "width": 0.25,
+      "points": [
+        [
+          58.1,
+          18.5
+        ],
+        [
+          57.6,
+          18.0
+        ],
+        [
+          57.6,
+          17.6
+        ]
+      ]
+    }
+  ]
+}

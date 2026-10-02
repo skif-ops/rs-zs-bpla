@@ -1,0 +1,27 @@
+{
+  "schema": "dioneya-pcb-main-astar-077-v1",
+  "base_sha256": "df2aaafb3e9195c3cc8ac3b03e60f099b527eb0f7fc0447fa3216ab6fa44e64f",
+  "candidate_sha256": "e9ea548204565cbe81fd5fac91519c3f238b1cb152650bfe86aa5dec47f62f40",
+  "route": {
+    "net": "3V3_DIGITAL",
+    "track_length_mm": 8.027,
+    "segments": 20,
+    "vias": 2,
+    "via_size_drill_mm": [
+      0.25,
+      0.15
+    ]
+  },
+  "drc": {
+    "base_unconnected": 39,
+    "candidate_unconnected": 38,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "candidate_only_via_rules": true,
+  "review_b": "OPEN",
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}

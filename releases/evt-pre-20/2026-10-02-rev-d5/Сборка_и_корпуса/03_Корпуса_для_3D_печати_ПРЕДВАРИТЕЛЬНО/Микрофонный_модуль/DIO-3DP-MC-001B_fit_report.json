@@ -1,0 +1,65 @@
+{
+  "schema": "dioneya-mic-pod-3dprint-trial-v2",
+  "part_base": "DIO-3DP-MC-001B",
+  "status": "PRELIMINARY_TRIAL_PRINT_NOT_IP_OR_ACOUSTIC_RELEASE",
+  "approved_appearance_basis": "Рисунок1.png; round cans within cylindrical head covered in acoustic foam",
+  "source_board_sha256": "c57cebbb3886247166551fd242fa51350bc9be7fee6299e63e7eaac60518d518",
+  "outer_mm": [
+    52,
+    52,
+    24
+  ],
+  "board_outline_mm": [
+    24,
+    22,
+    1
+  ],
+  "board_origin_mm": [
+    -12.0,
+    -5.35,
+    14.4
+  ],
+  "mechanical_transform": "x=x_KiCad-12; y=(22-y_KiCad)-5.35",
+  "acoustic_axis_local_xyz_mm": [
+    0,
+    0,
+    20
+  ],
+  "mounting_holes_local_xy_mm": [
+    [
+      -8,
+      0
+    ],
+    [
+      8,
+      0
+    ]
+  ],
+  "acoustic_bore_mm": 1.2,
+  "membrane_seat_diameter_mm": 5.2,
+  "membrane_seat_depth_mm": 0.25,
+  "nominal_gap_to_pcb_mm": 0.6,
+  "cable_exit": {
+    "side": "+Y toward J1",
+    "width_mm": 14,
+    "height_mm": 9,
+    "sealed": false
+  },
+  "pcb_housing_overlap_mm3": 0.0,
+  "acoustic_channel_open": true,
+  "open_physical_checks": [
+    "selected acoustic membrane/foam and four-channel frequency response",
+    "membrane compression, water ingress and drainage",
+    "selected cable gland/grommet and sealed strain relief",
+    "cover/PCB/support fastener pull-out and torque",
+    "actual PCBA height and Molex 5040510601 mating sweep",
+    "first-printed fit and installed 3+1 acoustic-centre survey"
+  ],
+  "files": {
+    "DIO-3DP-MC-001B_body.step": "60911cd41076703b5487e3300009e5aea96df7dabbc4bbd59ce9f007b20b1ea3",
+    "DIO-3DP-MC-001B_body.stl": "a2596be0037b7b43c6e870201202abf9a4331e53b5874109d126321f09d661a2",
+    "DIO-3DP-MC-001B_fit_assembly.step": "8c16cca6264a875916ee86e10d8eff9fd93d2915b003888c5688f5cb2e856e69",
+    "DIO-3DP-MC-001B_lid.step": "673659e52cd8dd87c5fc18e15c630d8bf79a155b20c5c437c59631551f10aad2",
+    "DIO-3DP-MC-001B_lid.stl": "d601cd9dffa180c18f2a61e5bb7542de8a4a325b6b9d3d6b857a2c2b81ba854e"
+  }
+}

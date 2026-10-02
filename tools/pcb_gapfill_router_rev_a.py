@@ -25,7 +25,7 @@ GRID_MM = 0.1
 class GapFillRouter:
     def __init__(self, geometry: dict, layers: list[str], width: float, clearance: float,
                  via_size: float, via_drill: float, edge_keep: float, hole_keep: float,
-                 net_clearance: dict | None = None) -> None:
+                 net_clearance: dict | None = None, allow_via_in_own_pad: bool = False) -> None:
         # clearance between two nets = max of both class clearances (KiCad rule)
         self.net_clearance = net_clearance or {}
         self.geometry = geometry
@@ -40,6 +40,7 @@ class GapFillRouter:
         self.ny = int(round((y1 - y0) / GRID_MM)) + 1
         self.edge_keep = edge_keep
         self.hole_keep = hole_keep
+        self.allow_via_in_own_pad = allow_via_in_own_pad
         self.items = self._items()
         self.routed: list[tuple] = []
 
@@ -95,11 +96,12 @@ class GapFillRouter:
             self._rasterize(via_block, shape, gap + self.via_size / 2)
         # no via in or next to any SMD pad, own net included (solder wicking); own
         # vias and plated holes keep >= 0.25 mm hole-to-hole
-        for pad in self.geometry["pads"]:
-            if pad["net"] != net or len(pad["poly"]) < 3 or not pad["layers"]:
-                continue
-            margin = self.via_size / 2 + (0.05 if pad["layers"] == ["F.Cu"] else 0.3)
-            self._rasterize(via_block, Polygon(pad["poly"]), margin)
+        if not self.allow_via_in_own_pad:
+            for pad in self.geometry["pads"]:
+                if pad["net"] != net or len(pad["poly"]) < 3 or not pad["layers"]:
+                    continue
+                margin = self.via_size / 2 + (0.05 if pad["layers"] == ["F.Cu"] else 0.3)
+                self._rasterize(via_block, Polygon(pad["poly"]), margin)
         for via in self.geometry["vias"]:
             if via["net"] == net:
                 self._rasterize(via_block, Point(via["pos"]).buffer(via["size"] / 2), 0.55)
@@ -133,16 +135,22 @@ class GapFillRouter:
                 continue
             # land strictly on copper: erode rounded/approximated outlines
             eroded = shape.buffer(-0.12)
-            shape = eroded if not eroded.is_empty else shape.centroid.buffer(0.05)
-            minx, miny, maxx, maxy = shape.bounds
-            i0, j0 = self._cell(minx, miny)
-            i1, j1 = self._cell(maxx, maxy)
-            for i in range(max(i0, 0), min(i1, self.nx - 1) + 1):
-                for j in range(max(j0, 0), min(j1, self.ny - 1) + 1):
-                    if shape.contains(Point(self._xy(i, j))):
-                        for index, layer in enumerate(self.layers):
-                            if layer in item_layers:
-                                cells.append((index, i, j))
+            # Small pads and vias can survive erosion as a sub-grid sliver.
+            # In that case sample their original copper, not an empty goal set.
+            candidates = []
+            for landing in ([eroded, shape] if not eroded.is_empty else [shape]):
+                minx, miny, maxx, maxy = landing.bounds
+                i0, j0 = self._cell(minx, miny)
+                i1, j1 = self._cell(maxx, maxy)
+                for i in range(max(i0, 0), min(i1, self.nx - 1) + 1):
+                    for j in range(max(j0, 0), min(j1, self.ny - 1) + 1):
+                        if landing.contains(Point(self._xy(i, j))):
+                            for index, layer in enumerate(self.layers):
+                                if layer in item_layers:
+                                    candidates.append((index, i, j))
+                if candidates:
+                    break
+            cells.extend(candidates)
         return cells
 
     # --- search -------------------------------------------------------------------

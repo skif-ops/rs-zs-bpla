@@ -1,0 +1,48 @@
+{
+  "schema": "dioneya-pcb-main-power-070-v1",
+  "base_sha256": "1c358e1ef89165c05f9c6987bcfaf34c9848464400fc9f20c9ebe4846339b78d",
+  "candidate_sha256": "0d96887854926d95f486313d23655898dbeb34269577d1494d95413578e36546",
+  "routes": [
+    {
+      "net": "1V8_MIC",
+      "track_length_mm": 15.9953,
+      "vias": 2
+    },
+    {
+      "net": "1V8_MIC",
+      "track_length_mm": 18.5255,
+      "vias": 2
+    },
+    {
+      "net": "1V8_MIC",
+      "track_length_mm": 33.7723,
+      "vias": 2
+    },
+    {
+      "net": "1V8_MIC",
+      "track_length_mm": 28.8296,
+      "vias": 3
+    },
+    {
+      "net": "3V8_MODEM_BB",
+      "track_length_mm": 3.6142,
+      "vias": 0
+    }
+  ],
+  "route_count": 5,
+  "new_vias": 9,
+  "new_track_length_mm": 100.7369,
+  "reference_outline_fraction": 1.0,
+  "review_b": "OPEN",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false,
+  "drc": {
+    "base_unconnected": 55,
+    "candidate_unconnected": 50,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "dioneya-pcb-main-pdm-data1-095-v1",
+  "base_sha256": "23ac8f527d669e5c8e7887695f80b5b0cb975a04625917baaef4e8c229939a6f",
+  "candidate_sha256": "3c5941069ec5bcc63bbb81f0c7f2fbdfdf8433ea78acfdd760ecd6c8197637e9",
+  "route": {
+    "net": "PDM_DATA1_1V8",
+    "length_mm": 66.262,
+    "new_vias": 7,
+    "new_segments": 50
+  },
+  "drc": {
+    "base_unconnected": 21,
+    "candidate_unconnected": 20,
+    "new_by_type": {},
+    "new_errors": 0,
+    "erc_errors": 0,
+    "erc_violations": 0
+  },
+  "review_b": "OPEN: PDM audio-domain return, skew/coupling and small-via DFM",
+  "candidate_only_via_rules": true,
+  "applied_to_authoritative_board": false,
+  "manufacturing_release": false
+}
