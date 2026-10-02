@@ -102,7 +102,7 @@
         "class": {"$ref": "#/$defs/class"},
         "stations": {"type": "array", "items": {"type": "integer"}, "minItems": 2},
         "crossing_deg": {"type": "number", "minimum": 0, "maximum": 90},
-        "ambiguous": {"enum": [true, false], "description": "a station of the point hears another target it cannot tell from this one at the same time: the point may be a ghost crossing (2026-10-02, optional)"},
+        "ambiguous": {"enum": [true, false], "description": "the point comes from a pair of stations that also hear another target they cannot tell from this one, the other pairing of their rays not refuted; only the continuity of a track three stations confirmed tells which crossing is the target (2026-10-02, optional)"},
         "first": {"$ref": "#/$defs/time"},
         "points": {"type": "integer", "minimum": 1},
         "ended": {"oneOf": [{"$ref": "#/$defs/time"}, {"type": "null"}]},
