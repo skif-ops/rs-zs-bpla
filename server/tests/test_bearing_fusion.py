@@ -178,6 +178,29 @@ def test_a_third_station_joins_the_existing_track(bridge):
     assert any(p["stations"] == [1, 2, 3] for p in points)
 
 
+def test_a_member_leaving_keeps_the_points_shown(bridge):
+    """A member that leaves a fused track (a better pair takes it, or it moves on after the track went quiet) does
+    not erase the points the track had: where the members left give no points, the points shown stay; where they
+    do, their fresh points replace the earlier ones."""
+    store, service = bridge
+    feed(store, service, (1, 2, 3))
+    (summary,) = store.list_tracks()
+    track_id = summary["track_id"]
+    shown = store.get_track(track_id)["track_points"]
+    assert len(shown) >= 45 and all(p["stations"] == [1, 2, 3] for p in shown[5:-5])
+    store.remove_track_member(track_id, 1, event_id(1), 0)
+    store.remove_track_member(track_id, 2, event_id(2), 0)
+    store.add_track_member(track_id, 1, event_id(1), 12345)                # a segment of station 1 without bearings
+    result = service.tracks.recompute(track_id)                            # two stations, no fresh points
+    assert result["last"] is None and store.get_track(track_id)["track_points"] == shown
+    store.add_track_member(track_id, 2, event_id(2), 0)
+    result = service.tracks.recompute(track_id)                            # stations 2 and 3: fresh points
+    points = store.get_track(track_id)["track_points"]
+    fresh = [p for p in points if p["stations"] == [2, 3]]
+    assert len(fresh) >= 40 and len({p["time_us"] for p in points}) == len(points)
+    assert all(p["stations"] == [2, 3] for p in points if fresh[0]["time_us"] <= p["time_us"] <= fresh[-1]["time_us"])
+
+
 def test_a_station_looking_elsewhere_does_not_join(bridge):
     store, service = bridge
     feed(store, service, (1, 2))
