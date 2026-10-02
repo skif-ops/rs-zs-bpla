@@ -93,6 +93,23 @@ def main() -> int:
         "test_audit_log_is_chained",
     ):
         require(token in tests, f"operator auth QG-2 case missing: {token}")
+    scope_module = read("server/station/access_scope.py")
+    scope_tests = read("server/tests/test_access_scope.py")
+    router = read("server/station/router.py")
+    for token in ("def scope_for(", "class LiveScope", "return None                                  # an item nobody declared"):
+        require(token in scope_module, f"station visibility contract missing: {token}")
+    require(router.count("scope_of(request,store)") >= 10 and "LiveScope(ws,store)" in router,
+            "data APIs do not apply the account's stations and tenants")
+    for token in (
+        "test_stations_follow_tenants_and_stations",
+        "test_events_tracks_and_bearings_are_cut_to_the_account",
+        "test_replay_and_coverage_show_only_own_stations",
+        "test_audio_and_commands_of_other_stations_do_not_exist",
+        "test_output_api_follows_the_account",
+        "test_live_stream_follows_scope_and_logout",
+        "test_admin_and_engineers_set_who_sees_what",
+    ):
+        require(token in scope_tests, f"station visibility case missing: {token}")
     require(ENV in conftest, "API tests do not opt out explicitly")
     require("totp-enroll" in readme and "audit-verify" in readme, "deployment guide does not cover the second factor and the audit log")
     require("python -m station.operator_auth add-user" in readme and f"Never set `{ENV}`" in readme,

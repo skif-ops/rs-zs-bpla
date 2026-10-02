@@ -12,6 +12,7 @@ from __future__ import annotations
 import numpy as np
 
 from fusion.geodesy import EnuFrame
+from station.access_scope import UNRESTRICTED
 
 MAX_WINDOW_US = 30 * 60 * 1_000_000        # one replay covers at most half an hour
 TRACK_MARGIN_US = 15_000_000               # bearings heard up to ~15 s (5 km of sound) around the track's points
@@ -22,9 +23,11 @@ class ReplayError(ValueError):
     pass
 
 
-def _window(store, track_id: str | None, system_event_id: str | None, since_us: int | None, until_us: int | None):
+def _window(store, track_id: str | None, system_event_id: str | None, since_us: int | None, until_us: int | None,
+            scope=UNRESTRICTED):
+    stations = scope.station_list
     if track_id:
-        track = store.get_track(track_id)
+        track = scope.track(store.get_track(track_id))
         if track is None:
             raise ReplayError("track not found")
         if track["first_time_us"] is None:
@@ -32,10 +35,10 @@ def _window(store, track_id: str | None, system_event_id: str | None, since_us: 
         return track["first_time_us"] - TRACK_MARGIN_US, track["last_time_us"] + TRACK_MARGIN_US
     if system_event_id:
         event = store.get_event(system_event_id)
-        if event is None:
+        if event is None or scope.event(event) is None:
             raise ReplayError("event not found")
-        tracks = [t for t in store.list_tracks(system_event_id=system_event_id) if t["first_time_us"] is not None]
-        bearings = store.list_bearings(system_event_id=system_event_id, limit=50000)
+        tracks = [t for t in store.list_tracks(system_event_id=system_event_id, stations=stations) if t["first_time_us"] is not None]
+        bearings = store.list_bearings(system_event_id=system_event_id, limit=50000, stations=stations)
         times = [t["first_time_us"] for t in tracks] + [t["last_time_us"] for t in tracks] + [b["time_us"] for b in bearings]
         if times:
             return min(times) - TRACK_MARGIN_US, max(times) + TRACK_MARGIN_US
@@ -47,14 +50,17 @@ def _window(store, track_id: str | None, system_event_id: str | None, since_us: 
 
 
 def build_replay(store, *, track_id: str | None = None, system_event_id: str | None = None,
-                 since_us: int | None = None, until_us: int | None = None) -> dict:
-    t0, t1 = _window(store, track_id, system_event_id, since_us, until_us)
+                 since_us: int | None = None, until_us: int | None = None, scope=UNRESTRICTED) -> dict:
+    """``scope`` (station/access_scope.py): an operator account limited to stations sees their bearings and the tracks
+    they took part in, and only their positions."""
+    t0, t1 = _window(store, track_id, system_event_id, since_us, until_us, scope)
     if t1 <= t0:
         raise ReplayError("empty time window")
     if t1 - t0 > MAX_WINDOW_US:
         raise ReplayError("time window longer than 30 minutes")
-    bearings = store.list_bearings(since_us=t0, until_us=t1, limit=50000)
-    tracks = [store.get_track(t["track_id"]) for t in store.list_tracks(since_us=t0, until_us=t1, limit=50)]
+    bearings = store.list_bearings(since_us=t0, until_us=t1, limit=50000, stations=scope.station_list)
+    tracks = [scope.track(store.get_track(t["track_id"]))
+              for t in store.list_tracks(since_us=t0, until_us=t1, limit=50, stations=scope.station_list)]
     tracks = [t for t in tracks if t and t["track_points"]]
     # station positions: from the detection of one of the station's tracks, else the heartbeat
     station_tracks: dict[int, int | None] = {}
@@ -111,10 +117,11 @@ def build_replay(store, *, track_id: str | None = None, system_event_id: str | N
     }
 
 
-def replay_sources(store, limit: int = 50) -> dict:
-    """What can be replayed: recent fused tracks and recent system events."""
-    events = [e for e in store.list_events(limit) if e.get("event_type") in ("AIR_ALERT", "AIR_WARNING")]
-    return {"tracks": store.list_tracks(limit=limit),
+def replay_sources(store, limit: int = 50, scope=UNRESTRICTED) -> dict:
+    """What can be replayed: recent fused tracks and recent system events (of the account's stations)."""
+    events = [scope.event(e) for e in store.list_events(limit, stations=scope.station_list)
+              if e.get("event_type") in ("AIR_ALERT", "AIR_WARNING")]
+    return {"tracks": [scope.track(t) for t in store.list_tracks(limit=limit, stations=scope.station_list)],
             "events": [{"system_event_id": e["system_event_id"], "event_type": e["event_type"],
                         "created_time_us": e["created_time_us"], "classification_label": e.get("classification_label"),
                         "stations": e.get("source_station_ids", [])} for e in events]}

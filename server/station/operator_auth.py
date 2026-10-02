@@ -33,8 +33,9 @@ guard, ``ZS_STATION_HTTP_INSECURE_BENCH``).
 * The audit log records logins, failed logins, logouts, every changing request (who, from where, what, the answer)
   and every account change of the CLI; each record carries the hash of the one before, so a changed or removed record
   shows (``audit-verify``).
-* An account may be limited to tenants and stations (``set-scope``); every request carries them
-  (``request.state.operator``), and the data APIs are to show it only those (the next stage).
+* An account may be limited to tenants and stations (``set-scope``, or ``/api/v1/access`` by the admin and engineers);
+  every request carries them (``request.state.operator``) and the data APIs show it only those
+  (station/access_scope.py).
 * Fail-closed: without accounts every protected route is refused.  ``ZS_OPERATOR_AUTH_INSECURE_BENCH=1`` (exactly)
   switches the check off for an isolated bench, like the station HTTP bench switch.
 """
@@ -124,6 +125,7 @@ PERMISSION_RULES: list[tuple[set[str], re.Pattern, str]] = [
     ({"POST"}, re.compile(r"^/api/v1/stations/\d+/(?:firmware|model)-update$"), STATION_FIRMWARE),
     ({"POST"}, re.compile(r"^/(?:dataset/(?:add|train|delete)|api/dataset/train)$"), DATASET_EDIT),
     ({"POST"}, re.compile(r"^/(?:single/analyze|api/analyze-single|localization/analyze|api/localize)$"), ANALYSIS_RUN),
+    ({"GET", "HEAD", "PUT"}, re.compile(r"^/api/v1/access/accounts(?:/[^/]+/scope)?$"), SCOPES_MANAGE),
 ]
 PUBLIC_ROUTES = {("GET", "/login"), ("HEAD", "/login"), ("POST", "/login"), ("POST", "/logout"),
                  ("GET", "/api/v1/health"), ("HEAD", "/api/v1/health")}
