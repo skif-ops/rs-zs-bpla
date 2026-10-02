@@ -346,6 +346,19 @@ static unsigned doa_deliveries(zs_station_pipeline_t *p, zs_bearing_t out[ZS_DOA
   return n;
 }
 
+/* A direction heard (live, or gone at most ZS_DOA_RECALL_WINDOWS) whose own windows call it a ground engine (at least
+   ZS_CLASSIFICATION_MIN_WINDOWS of them, more ground votes than UAV ones, at the weak threshold): the station knows a
+   ground engine is in the sound. */
+static bool doa_ground_heard(const zs_station_pipeline_t *p) {
+  for (unsigned k = 0u; k < ZS_DOA_MAX_TRACKS; k++) {
+    const zs_pipeline_target_t *t = &p->doa_targets[k];
+    if (t->id && t->absent <= ZS_DOA_RECALL_WINDOWS && t->presence.windows >= ZS_CLASSIFICATION_MIN_WINDOWS &&
+        t->presence.ground_weak_votes > t->presence.uav_weak_votes)
+      return true;
+  }
+  return false;
+}
+
 static void emit(zs_station_pipeline_t *p, uint64_t end_sample) {
   zs_detection_t d;
   p->seq_no++;
@@ -509,13 +522,20 @@ bool zs_station_pipeline_push_window(zs_station_pipeline_t *p, const int16_t *pc
     for (unsigned k = 0u; k < ZS_DOA_MAX_TRACKS; k++)
       several += p->doa_targets[k].id && !p->doa_targets[k].absent && p->doa_targets[k].confirmed_direction;
     if (ns == 0u && !by_direction && several < 2u) {
+      /* a direction its own windows call a ground engine is heard: the full band and the main comb are the louder
+         engine's, not the UAV the main stream confirms in the mixture (twin 2026-10-02: a tractor 0.7 km from the
+         station, a Mavic 1.5..3 km off, the full-band bearing and the main comb on the tractor); only the targets
+         confirmed by their own votes keep their bearings */
+      const bool ground = doa_ground_heard(p);
       if (p->source_count < 2u) {
-        single_bearing(p, end_sample, &bearings[0]);
-        if (bearings[0].valid) send[ns++] = bearings[0];
+        if (!ground) {
+          single_bearing(p, end_sample, &bearings[0]);
+          if (bearings[0].valid) send[ns++] = bearings[0];
+        }
       } else {
         /* a mixture: the bearings of the CONFIRMED targets (the main one also when the main stream confirms it); the
            other combs of a target are not reported */
-        const bool main_stream = zs_presence_evaluate(&p->votes, &p->last_gate).level == ZS_PRESENCE_CONFIRMED;
+        const bool main_stream = !ground && zs_presence_evaluate(&p->votes, &p->last_gate).level == ZS_PRESENCE_CONFIRMED;
         for (unsigned i = 0u; i < nb; i++) {
           const bool wanted = target_of(p, i) == i &&
                               ((mixture && p->sources[p->source_of[i]].presence.level == ZS_PRESENCE_CONFIRMED) || (i == 0u && main_stream));
