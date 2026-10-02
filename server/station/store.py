@@ -33,12 +33,13 @@ CREATE TABLE IF NOT EXISTS alert_episodes(alert_id TEXT PRIMARY KEY, tenant TEXT
 CREATE INDEX IF NOT EXISTS idx_episode_open ON alert_episodes(tenant, ended_us);
 CREATE TABLE IF NOT EXISTS alert_tracks(track_id TEXT PRIMARY KEY, alert_id TEXT NOT NULL, last_point_us INTEGER NOT NULL, ended_us INTEGER);
 CREATE TABLE IF NOT EXISTS alert_cursors(consumer TEXT PRIMARY KEY, seq INTEGER NOT NULL, updated_us INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS station_tenants(station_id INTEGER PRIMARY KEY, tenant TEXT NOT NULL, updated_us INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS audio_parts(station_id INTEGER NOT NULL, command_id TEXT NOT NULL, segment INTEGER NOT NULL, chunk_index INTEGER NOT NULL, event_id INTEGER NOT NULL, chunk_count INTEGER NOT NULL, sample_rate INTEGER NOT NULL, start_time_us INTEGER NOT NULL, sha256 BLOB NOT NULL, data BLOB NOT NULL, received_us INTEGER NOT NULL, PRIMARY KEY(station_id, command_id, segment, chunk_index));
 """
 
 class EventStore:
     def __init__(self, path: Path):
-        self.path=path; path.parent.mkdir(parents=True,exist_ok=True); self.lock=threading.RLock()
+        self.path=path; path.parent.mkdir(parents=True,exist_ok=True); self.lock=threading.RLock(); self._tenant_seen={}
         with self._conn() as c:
             self._migrate_station_event_keys(c)
             self._migrate_track_segments(c)
@@ -182,6 +183,16 @@ class EventStore:
             hb=hb.model_copy(update={'gnss_observed':hb.station,'station':existing.station})
         payload=hb.model_dump_json()
         with self.lock,self._conn() as c: c.execute("INSERT OR REPLACE INTO stations VALUES(?,?,?)",(hb.station_id,hb.time_us,payload))
+    def note_station_tenant(self,station_id:int,tenant:str):
+        """The tenant a station's messages came through (its MQTT bridge, or the HTTP bench): what a tenant-limited
+        operator account may see (station/access_scope.py).  Written when it changes, not with every message."""
+        if self._tenant_seen.get(station_id)==tenant: return
+        with self.lock,self._conn() as c:
+            c.execute("INSERT INTO station_tenants VALUES(?,?,?) ON CONFLICT(station_id) DO UPDATE SET tenant=excluded.tenant,"
+                      "updated_us=excluded.updated_us WHERE tenant<>excluded.tenant",(station_id,tenant,int(time.time()*1e6)))
+        self._tenant_seen[station_id]=tenant
+    def station_tenants(self)->dict[int,str]:
+        with self._conn() as c: return {r['station_id']:r['tenant'] for r in c.execute("SELECT station_id,tenant FROM station_tenants")}
     def save_detection(self,d:DetectionMessage):
         database_event_id=self._sqlite_event_id(d.event_id)
         with self.lock,self._conn() as c:
@@ -223,8 +234,14 @@ class EventStore:
         with self.lock,self._conn() as c: c.execute("INSERT OR REPLACE INTO system_events VALUES(?,?,?,?)",(e.system_event_id,e.created_time_us,e.event_type,e.model_dump_json()))
     def save_security(self,e:SecurityEventMessage):
         with self.lock,self._conn() as c: c.execute("INSERT OR REPLACE INTO security_events VALUES(?,?,?,?)",(e.event_id,e.station_id,e.event_time_us,e.model_dump_json()))
-    def list_events(self,limit:int=200)->list[dict[str,Any]]:
-        with self._conn() as c: rows=c.execute("SELECT payload FROM system_events ORDER BY created_us DESC LIMIT ?",(limit,)).fetchall()
+    # ``stations`` (a list, or None for all) limits a listing to what these stations took part in (access_scope.py)
+    _IN_STATIONS="(SELECT value FROM json_each(?))"
+    def list_events(self,limit:int=200,*,stations:list[int]|None=None)->list[dict[str,Any]]:
+        where,args="",[]
+        if stations is not None:
+            where=f" WHERE EXISTS(SELECT 1 FROM json_each(payload,'$.source_station_ids') j WHERE j.value IN {self._IN_STATIONS})"
+            args.append(json.dumps(stations))
+        with self._conn() as c: rows=c.execute("SELECT payload FROM system_events"+where+" ORDER BY created_us DESC LIMIT ?",(*args,limit)).fetchall()
         return [json.loads(r['payload']) for r in rows]
     def get_event(self,event_id:str)->dict[str,Any]|None:
         with self._conn() as c: r=c.execute("SELECT payload FROM system_events WHERE system_event_id=?",(event_id,)).fetchone()
@@ -287,9 +304,10 @@ class EventStore:
                           "time_trust,received_us,f0_dhz) VALUES(?,?,?,?,?,?,?,?,?,?,?)",rows)
             return c.total_changes-before
     def list_bearings(self,*,station_id:int|None=None,track_event_id:int|None=None,system_event_id:str|None=None,
-                      since_us:int|None=None,until_us:int|None=None,limit:int=5000)->list[dict[str,Any]]:
+                      since_us:int|None=None,until_us:int|None=None,limit:int=5000,stations:list[int]|None=None)->list[dict[str,Any]]:
         """Samples in time order with the system event their track's detection belongs to (None until correlated)."""
         where,args=[],[]
+        if stations is not None: where.append(f"b.station_id IN {self._IN_STATIONS}"); args.append(json.dumps(stations))
         if station_id is not None: where.append("b.station_id=?"); args.append(station_id)
         if track_event_id is not None: where.append("b.track_event_id=?"); args.append(self._sqlite_event_id(track_event_id))
         if system_event_id is not None: where.append("d.system_event_id=?"); args.append(system_event_id)
@@ -385,8 +403,11 @@ class EventStore:
     def _track_summary(self,r)->dict[str,Any]:
         return {'track_id':r['track_id'],'system_event_id':r['system_event_id'],'first_time_us':r['first_time_us'],'last_time_us':r['last_time_us'],
                 'stations':json.loads(r['stations']),'points':r['points'],'updated_us':r['updated_us']}
-    def list_tracks(self,*,since_us:int|None=None,until_us:int|None=None,system_event_id:str|None=None,limit:int=200)->list[dict[str,Any]]:
+    def list_tracks(self,*,since_us:int|None=None,until_us:int|None=None,system_event_id:str|None=None,limit:int=200,
+                    stations:list[int]|None=None)->list[dict[str,Any]]:
         where,args=[],[]
+        if stations is not None:
+            where.append(f"EXISTS(SELECT 1 FROM json_each(fused_tracks.stations) j WHERE j.value IN {self._IN_STATIONS})"); args.append(json.dumps(stations))
         if since_us is not None: where.append("last_time_us>=?"); args.append(since_us)
         if until_us is not None: where.append("first_time_us<=?"); args.append(until_us)
         if system_event_id is not None: where.append("system_event_id=?"); args.append(system_event_id)
@@ -409,20 +430,35 @@ class EventStore:
             cur=c.execute("INSERT OR IGNORE INTO alert_outbox(msg_id,tenant,type,created_us,message) VALUES(?,?,?,?,?)",
                           (msg_id,tenant,msg_type,created_us,json.dumps(message,ensure_ascii=False,separators=(',',':'))))
             return cur.lastrowid if cur.rowcount else None
-    def list_alerts(self,after_seq:int=0,*,tenant:str|None=None,limit:int=500,until_seq:int|None=None)->list[dict[str,Any]]:
-        """Messages after a seq (up to until_seq), oldest first, with their seq."""
+    def list_alerts(self,after_seq:int=0,*,tenant:str|None=None,limit:int=500,until_seq:int|None=None,
+                    tenants:list[str]|None=None)->list[dict[str,Any]]:
+        """Messages after a seq (up to until_seq), oldest first, with their seq (``tenants``: only of these)."""
         where,args=["seq>?"],[after_seq]
         if until_seq is not None: where.append("seq<=?"); args.append(until_seq)
         if tenant: where.append("tenant=?"); args.append(tenant)
+        if tenants is not None: where.append("tenant IN (SELECT value FROM json_each(?))"); args.append(json.dumps(tenants))
         with self._conn() as c:
             rows=c.execute("SELECT seq,message FROM alert_outbox WHERE "+" AND ".join(where)+" ORDER BY seq LIMIT ?",(*args,limit)).fetchall()
         return [{**json.loads(r['message']),'seq':r['seq']} for r in rows]
-    def read_alerts(self,after_seq:int,*,tenant:str|None=None,limit:int=500)->tuple[list[dict[str,Any]],int]:
+    def read_alerts(self,after_seq:int,*,tenant:str|None=None,limit:int=500,tenants:list[str]|None=None,
+                    keep=None)->tuple[list[dict[str,Any]],int]:
         """A page of messages and the seq to continue after: past every message this read could see, also those of
-        other tenants (the outbox's last seq is read first, so nothing appended meanwhile is skipped)."""
+        other tenants (the outbox's last seq is read first, so nothing appended meanwhile is skipped).  ``keep`` (a
+        message -> message or None) is what an operator account may see of each (access_scope.py): the page is
+        filled up from later messages, and the cursor still passes the ones it dropped."""
         upto=self.last_alert_seq()
-        messages=self.list_alerts(after_seq,tenant=tenant,limit=limit,until_seq=upto)
-        return messages,(messages[-1]['seq'] if len(messages)>=limit else max(upto,after_seq))
+        out,cursor=[],max(after_seq,0)
+        while len(out)<limit and cursor<upto:
+            page=self.list_alerts(cursor,tenant=tenant,limit=limit,until_seq=upto,tenants=tenants)
+            if not page: cursor=upto; break
+            for m in page:
+                cursor=m['seq']
+                kept=m if keep is None else keep(m)
+                if kept is not None:
+                    out.append(kept)
+                    if len(out)>=limit: break
+            if len(page)<limit and len(out)<limit: cursor=upto
+        return out,(cursor if len(out)>=limit else max(upto,after_seq))
     def last_alert_seq(self)->int:
         with self._conn() as c: row=c.execute("SELECT MAX(seq) FROM alert_outbox").fetchone()
         return row[0] or 0

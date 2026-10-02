@@ -160,6 +160,22 @@ def process_message(
     event_store=store,
     fusion_service=service,
 ) -> str:
+    status = _process_message(topic, payload, tenant, tls_enabled, event_store=event_store, fusion_service=fusion_service)
+    # the station's tenant (what a tenant-limited operator account may see, station/access_scope.py): the topic's,
+    # which the broker ACL lets only this station's credential publish on
+    event_store.note_station_tenant(station_id_from_topic(topic, tenant)[0], tenant)
+    return status
+
+
+def _process_message(
+    topic: str,
+    payload: bytes,
+    tenant: str,
+    tls_enabled: bool,
+    *,
+    event_store,
+    fusion_service,
+) -> str:
     topic_station_id, kind = station_id_from_topic(topic, tenant)
     if kind == "audio":
         return ingest_audio_chunk(payload, topic_station_id, event_store=event_store)
