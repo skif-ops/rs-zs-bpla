@@ -57,6 +57,12 @@ isolated-bench configurations and must not be used for production.
   An account file from before roles keeps working: `"role": "operator"` becomes
   the operator role, and engineer rights are given with `set-roles`.
 
+  `set-scope` limits an account to tenants and stations: it then sees only
+  those stations and what they took part in, in every API, stream and the
+  `dioneya.alert/1` output. The security admin and engineers set it from the
+  web too (`PUT /api/v1/access/accounts/<name>/scope`); a station's tenant is
+  the tenant of the MQTT bridge its messages come through.
+
   Scripts send `Authorization: Bearer <token>`; a token may use only its scopes
   (default `read`), never more than its account. The session cookie is `Secure`:
   serve the UI over HTTPS (an SSH tunnel to `localhost` also works). Sessions
