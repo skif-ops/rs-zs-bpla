@@ -30,7 +30,7 @@ isolated-bench configurations and must not be used for production.
 - Operator login (`station/operator_auth.py`): every page, `/api/v1` route and the
   `/api/v1/stream` WebSocket need an operator; only `/static`, `/login`,
   `/api/v1/health` and the (disabled) station bench routes are open. Without
-  accounts the server refuses everything (fail-closed). Create accounts on the
+  a login the server refuses everything (fail-closed). Create accounts on the
   server, outside Git (`data/operators.json` and `data/operator_state.sqlite3`,
   both mode 0600):
 
@@ -63,6 +63,15 @@ isolated-bench configurations and must not be used for production.
   web too (`PUT /api/v1/access/accounts/<name>/scope`); a station's tenant is
   the tenant of the MQTT bridge its messages come through.
 
+  The superuser `skif_root` (role `superuser`, every permission, every station,
+  the switch of the audit log of actions) is created by the server itself with
+  the default password `12345678`. Log in as `skif_root` right after the first
+  start, before the server is reachable from the network: the first login asks
+  for a new password (12+ characters) and then shows the second-factor secret
+  once and takes a code; only then a session opens. `skif_root` cannot be
+  removed, disabled, limited or given other roles; `$OA passwd skif_root` and
+  `$OA totp-reset skif_root` recover it on the server.
+
   Scripts send `Authorization: Bearer <token>`; a token may use only its scopes
   (default `read`), never more than its account. The session cookie is `Secure`:
   serve the UI over HTTPS (an SSH tunnel to `localhost` also works). Sessions
@@ -77,7 +86,9 @@ isolated-bench configurations and must not be used for production.
   request (who, from where, what, the answer) and every account change; each
   record carries the hash of the one before. `$OA audit --limit 100` shows it,
   `$OA audit-verify` checks that no record was changed or removed; back up
-  `operator_state.sqlite3` with the database.
+  `operator_state.sqlite3` with the database. `skif_root` may switch the log of
+  actions off and on (`PUT /api/v1/admin/audit-logging`, or `$OA audit-logging
+  off|on`); the switching, failed logins and refusals are recorded even then.
   Never set `ZS_OPERATOR_AUTH_INSECURE_BENCH`, `ZS_OPERATOR_COOKIE_SECURE=0` or
   `ZS_OPERATOR_TOTP=0` in production.
 - Station HTTP ingress disabled by default; production telemetry enters through
