@@ -4,7 +4,7 @@ A station tracks whatever it hears loudest.  With two targets in the air its tra
 stays CONFIRMED) while the bearing jumps from the first target to the second; the window's track event id does not
 change.  Fused as one station track, such a stream would pull a fused track from one target to the other and leave
 the second target without a track.  The server therefore splits every station track into segments at sustained
-bearing jumps and associates segments, not whole tracks (station/track_fusion.py).
+bearing jumps and associates segments, not whole tracks (station/track_hypotheses.py).
 
 The split follows the bearings in time order:
 
@@ -68,6 +68,12 @@ def wrap(deg: float) -> float:
 class Segment:
     key: int                                    # FIRST_SEGMENT or the time of the first bearing, us
     rows: list[dict] = field(default_factory=list)
+    formed_us: int | None = None                # the bearing whose arrival made it a segment (None: the first one)
+
+    @property
+    def known_since_us(self) -> int:
+        """Time of the bearing from which the segment exists: the bearings before it were still waiting."""
+        return self.rows[0]["time_us"] if self.formed_us is None else self.formed_us
 
     @property
     def first_us(self) -> int:
@@ -176,7 +182,7 @@ def split(rows: list[dict]) -> list[Segment]:
             key = group[0]["time_us"]
             while any(s.key == key for s in segments):
                 key += 1                                         # several sources start at the same time
-            segments.append(Segment(key, group))
+            segments.append(Segment(key, group, formed_us=row["time_us"]))
             waiting = [w for w in waiting if not any(w is g for g in group)]
     return segments
 
