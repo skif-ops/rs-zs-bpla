@@ -12,7 +12,8 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 SERVER = ROOT / "server"
-PUBLIC = {("GET", "/login"), ("POST", "/login"), ("POST", "/logout"), ("GET", "/api/v1/health")}
+PUBLIC = {("GET", "/login"), ("POST", "/login"), ("POST", "/logout"), ("POST", "/login/password"), ("POST", "/login/totp"),
+          ("GET", "/api/v1/health")}
 
 
 def require(condition: bool, message: str) -> None:
@@ -85,8 +86,15 @@ def main() -> int:
                 checked += 1
         return checked
 
-    closed = sweep(503)                                         # no accounts: fail-closed
+    closed = sweep(401)                                         # no accounts but the superuser the server made: closed
     store = operator_auth.current_store()
+    root = store.user(operator_auth.SUPERUSER_NAME)
+    require(root is not None and root["roles"] == [operator_auth.SUPERUSER_ROLE] and root["must_change"],
+            "the superuser is missing or its default password is not to be changed")
+    first = client.post("/login", data={"username": operator_auth.SUPERUSER_NAME, "password": operator_auth.SUPERUSER_DEFAULT_PASSWORD},
+                        headers={"origin": "https://testserver"})
+    require(first.status_code == 200 and operator_auth.COOKIE_NAME not in first.cookies and "/login/password" in first.text,
+            "the default superuser password opened a session")
     store.add_user("audit", "viewer", "audit password 1")
     require(sweep(401) == closed, "route set changed between sweeps")   # accounts exist, no login: 401 everywhere
     require(client.get("/api/v1/health").status_code == 200, "health probe is not public")
@@ -130,7 +138,8 @@ def main() -> int:
     os.environ.pop("ZS_OPERATOR_AUTH_INSECURE_BENCH")
 
     print("Operator authentication QG-2 independent runtime audit: PASS")
-    print(f"{closed} route/method pairs closed without an operator (503 without accounts, 401 without login); "
+    print(f"{closed} route/method pairs closed without an operator (401; only the superuser exists at first and its default "
+          "password opens no session until changed); "
           "viewer read-only, event audio operator-only, every changing route declared, operators do not command stations, "
           "engineers need the second factor, audit chain intact")
     return 0

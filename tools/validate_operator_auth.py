@@ -48,7 +48,17 @@ def main() -> int:
         "ROLE_PERMISSIONS = {",
         "def required_permission(",
         "UNMAPPED",
-        'SECOND_FACTOR_ROLES = {"engineer", "admin"}',
+        'SECOND_FACTOR_ROLES = {"engineer", "admin", SUPERUSER_ROLE}',
+        # the superuser skif_root and the switch of the audit log of actions (2026-10-02)
+        'SUPERUSER_NAME = "skif_root"',
+        'SUPERUSER_ROLE: set(PERMISSIONS) | {AUDIT_CONTROL}',
+        "def ensure_superuser(",
+        "_not_superuser(name,",
+        '"must_change": True, "totp_at_login": True',
+        'user["permissions"] - {AUDIT_CONTROL}',
+        "force=True",
+        "def set_audit_logging(",
+        "verify_step(",
         "SESSION_IDLE_S = 30 * 60",
         "close_sessions(",
         "use_totp_step(",
@@ -93,6 +103,18 @@ def main() -> int:
         "test_audit_log_is_chained",
     ):
         require(token in tests, f"operator auth QG-2 case missing: {token}")
+    superuser_tests = read("server/tests/test_superuser.py")
+    admin_api = read("server/station/admin_api.py")
+    require("operator_auth.AUDIT_CONTROL" in admin_api and "app.include_router(admin_router)" in app,
+            "the audit log switch is not mounted or not bound to audit.control")
+    for token in (
+        "test_one_superuser_created_by_the_server_and_protected",
+        "test_first_login_changes_the_password_and_enrols_the_second_factor",
+        "test_superuser_may_do_everything_and_sees_every_station",
+        "test_the_audit_log_of_actions_can_be_switched_off_and_the_switching_shows",
+        "test_cli_keeps_the_superuser_and_switches_the_audit_log",
+    ):
+        require(token in superuser_tests, f"superuser case missing: {token}")
     scope_module = read("server/station/access_scope.py")
     scope_tests = read("server/tests/test_access_scope.py")
     router = read("server/station/router.py")
