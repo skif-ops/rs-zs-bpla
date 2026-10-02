@@ -42,7 +42,7 @@ import math
 
 import numpy as np
 
-from fusion.bearing_fusion import MAX_RANGE_M, SPEED_OF_SOUND_MPS, StationBearings, fuse
+from fusion.bearing_fusion import MAX_NEAREST_S, MAX_RANGE_M, SPEED_OF_SOUND_MPS, StationBearings, fuse
 from fusion.geodesy import EnuFrame
 from station import target_match, track_segments
 
@@ -298,15 +298,19 @@ class BearingTrackFusion:
         member stations have bearings, the fresh points are the track (so the order of the batches does not matter)."""
         members = self.store.track_members(track_id)
         stations = self._station_bearings(members)
-        fresh = [p.as_dict() for p in fuse(stations)]
+        fresh = list({p.time_us: p.as_dict() for p in fuse(stations)}.values())    # one point per time
         self._mark_ambiguous(members, fresh)
         old = self.store.get_track(track_id)
-        spans = [(float(s.time_s[0]) - MAX_RANGE_M / SPEED_OF_SOUND_MPS, float(s.time_s[-1])) for s in stations if s.time_s.size]
+        # the emission times a station's bearings serve: fuse() samples them at emission + range / c and takes the
+        # nearest bearing up to MAX_NEAREST_S beyond the first and the last one (a target close to the station)
+        spans = [(float(s.time_s[0]) - MAX_NEAREST_S - MAX_RANGE_M / SPEED_OF_SOUND_MPS, float(s.time_s[-1]) + MAX_NEAREST_S)
+                 for s in stations if s.time_s.size]
 
         def covered(time_us: int) -> bool:                   # two member stations heard the emission time
             return sum(1 for a, b in spans if a <= time_us * 1e-6 <= b) >= 2
 
-        kept = [p for p in (old["track_points"] if old else []) if not covered(p["time_us"])]
+        renewed = {p["time_us"] for p in fresh}              # fresh points win, whatever the spans say
+        kept = [p for p in (old["track_points"] if old else []) if not covered(p["time_us"]) and p["time_us"] not in renewed]
         points = sorted(kept + fresh, key=lambda p: p["time_us"])
         system_event_id = self._system_event(members)
         self.store.replace_track(track_id, members, system_event_id, points)
