@@ -30,7 +30,17 @@ isolated-bench configurations and must not be used for production.
   10 000 queued messages and the session for 7 days for a consumer that is away
   (`max_queued_messages`, `persistent_client_expiration`); older backlog is caught
   up over `/api/v1/alerts?after_seq=`.
-- Persistent database volume and backup policy.
+- Persistent database volume, retention and backups (docs/SERVER_RETENTION_2026-10-03.md):
+  the server removes events, bearings, tracks, commands and ingress records older
+  than `ZS_RETENTION_DAYS` (90), the `dioneya.alert/1` outbox older than
+  `ZS_ALERT_OUTBOX_DAYS` (30) and the audio of events, WAV files included, older
+  than `ZS_AUDIO_RETENTION_DAYS` (30), at startup and then once a day
+  (`ZS_RETENTION_INTERVAL_S`, 86400). `/api/v1/health` reports the database and
+  audio sizes, the free disk space and the last cleanup, so monitoring sees a
+  filling disk. Back up with `deploy/scripts/backup_ubuntu.sh [archive]`
+  (Windows: `backup_windows.ps1 [-Destination]`): the databases are copied with
+  the SQLite backup API inside the server container, so the archive is consistent
+  while the server runs; never archive the live `*.sqlite3` with its `-wal`.
 - Reverse proxy for the REST/WebSocket UI with HTTPS. The proxy must pass the
   original `Host` header (`proxy_set_header Host $host;` and the WebSocket
   `Upgrade`/`Connection` headers): changing requests made with the session cookie
@@ -115,8 +125,8 @@ isolated-bench configurations and must not be used for production.
   initial keypair outside Git, from the repository root:
 
   ```bash
-  python tools/generate_command_signing_key.py \
-    --private server/deploy/tls/command-signing.key \
+  python tools/generate_command_signing_key.py \\
+    --private server/deploy/tls/command-signing.key \\
     --public server/deploy/tls/command-signing.pub
   ```
 

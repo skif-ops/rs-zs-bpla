@@ -42,7 +42,8 @@
 - known UAV families retain an explicit unknown-type branch:
   `UNKNOWN_PROP_PISTON_UAV`, `UNKNOWN_TURBINE_JET_UAV` or
   `UNKNOWN_ROTOR_ELECTRIC_UAV`;
-- 365-day retention cleanup hook.
+- retention: 90 days for events, bearings and tracks, 30 for the alert outbox and the
+  audio of events, cleaned daily by the server (docs/SERVER_RETENTION_2026-10-03.md).
 
 ## Run
 

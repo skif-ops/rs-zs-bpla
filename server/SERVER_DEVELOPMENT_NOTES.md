@@ -9,7 +9,7 @@ This branch preserves the original Мухоед single-file and file-based local
 - `/api/v1/stations`, `/api/v1/events`, `/api/v1/events/{id}`
 - audio request/command polling and audio upload
 - `/api/v1/stream` WebSocket
-- SQLite WAL persistence with 365-day retention hook
+- SQLite WAL persistence; retention 90 days for events, 30 for the alert outbox and the audio, cleaned daily (docs/SERVER_RETENTION_2026-10-03.md)
 - DOA intersection and 4+ station arrival-time TDOA solver on WGS84/ENU
 - 3D constant-velocity Kalman tracking
 - optional MQTT/TLS bridge
