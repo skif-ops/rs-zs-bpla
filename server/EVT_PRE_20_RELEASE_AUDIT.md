@@ -143,4 +143,6 @@ pending events, а server/portable-firmware application receipt подтверж
 - 20-station soak не менее 24 часов (на хосте: сутки поля из 41 синтетической
   станции пройдены, `tools/load_field.py --hours 24 --check`; с реальными станциями —
   после партии EVT);
-- backup/restore и журнал отката OTA.
+- backup/restore (сценарии `deploy/scripts/backup_*` и `restore_*` с согласованной
+  копией, проверкой целостности и сохранением заменённого есть и проверены тестами;
+  прогон на целевых Windows 11 и Ubuntu 24.04 — открыт) и журнал отката OTA.
