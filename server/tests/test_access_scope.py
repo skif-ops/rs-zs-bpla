@@ -266,6 +266,41 @@ def test_admin_and_engineers_set_who_sees_what(field):
     assert oa.current_state().audit_verify()[0]
 
 
+def test_catalog_offers_what_the_manager_sees(field, tmp_path, monkeypatch):
+    """The drop-downs of the admin page: every unit of the PKI registry (serial, lot, tenant) plus the stations that
+    reported, the tenant of the bridge a station came through winning over its lot; a limited manager gets only what
+    it sees itself; nobody without scopes.manage gets the catalog."""
+    from pki.registry import Registry
+    from station import access_api
+
+    accounts, store, app = field
+    monkeypatch.setenv(access_api.PKI_DIR_ENV, str(tmp_path / "pki"))
+    registry = Registry(tmp_path / "pki" / "registry.sqlite3")
+    registry.add("DIO-EVT-017")                    # reported through the north bridge: north, not its lot's pilot1
+    registry.add("DIO-EVT-021")                    # registered, never reported
+    accounts.add_user("vic", "viewer", PASSWORD)
+    secrets = {}
+    for name, roles in (("eng", "engineer"), ("sec", "admin")):
+        accounts.add_user(name, roles, PASSWORD)
+        secrets[name] = oa.new_totp_secret()
+        accounts.set_totp(name, secrets[name])
+    eng = logged_in(app, "eng", code_now(secrets["eng"]))
+    catalog = eng.get("/api/v1/access/catalog").json()
+    assert catalog["tenants"] == ["bench", "north", "pilot1", "pilot2", "south"]
+    by_id = {s["station_id"]: s for s in catalog["stations"]}
+    assert sorted(by_id) == [17, 18, 19, 21]
+    assert by_id[17] == {"station_id": 17, "serial": "DIO-EVT-017", "tenant": "north", "lot": "EVT-LOT-1", "status": "created", "seen": True}
+    assert by_id[21] == {"station_id": 21, "serial": "DIO-EVT-021", "tenant": "pilot2", "lot": "EVT-LOT-2", "status": "created", "seen": False}
+    assert by_id[19] == {"station_id": 19, "serial": None, "tenant": "south", "lot": None, "status": "seen", "seen": True}
+    accounts.set_scope("sec", ["north"], [])      # a manager limited to a tenant chooses only inside it
+    sec = logged_in(app, "sec", code_now(secrets["sec"]))
+    limited = sec.get("/api/v1/access/catalog").json()
+    assert limited["tenants"] == ["north"] and ids(limited["stations"]) == [17, 18]
+    assert logged_in(app, "vic").get("/api/v1/access/catalog").status_code == 403
+    monkeypatch.setenv(access_api.PKI_DIR_ENV, str(tmp_path / "nowhere"))   # no registry: only what reported
+    assert ids(eng.get("/api/v1/access/catalog").json()["stations"]) == [17, 18, 19]
+
+
 def test_bridge_records_the_tenant_of_a_station(tmp_path: Path):
     store = EventStore(tmp_path / "zs.sqlite3")
     command = store.create_command(17, "CMD_REQUEST_AUDIO", {"event_id": 17001})

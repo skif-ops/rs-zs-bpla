@@ -180,21 +180,57 @@
   }
 
   // ---- visibility ----------------------------------------------------------------------------------------------
+  // A drop-down of checkboxes (tenants, stations grouped by tenant) whose summary shows what is chosen; a search box
+  // narrows a long list; the free field below takes values the catalog does not know (a station of another lot).
+  function picker(options, chosen, extraHint) {
+    const known = new Set(options.map((o) => o.value));
+    const inputs = options.map((o) => el("input", { type: "checkbox", value: o.value, checked: chosen.includes(o.value) }));
+    const extra = el("input", { class: "form-control form-control-sm admin-pick-extra", placeholder: extraHint,
+                                value: chosen.filter((c) => !known.has(c)).join(", ") });
+    const list = el("div", { class: "admin-pick-list" });
+    let group;
+    options.forEach((o, i) => {
+      if (o.group !== group) { group = o.group; if (group) list.append(el("div", { class: "admin-pick-group" }, group)); }
+      list.append(el("label", { class: "admin-check admin-pick-item", "data-text": `${o.value} ${o.label}`.toLowerCase() }, inputs[i], ` ${o.label}`));
+    });
+    const search = el("input", { class: "form-control form-control-sm", placeholder: "поиск", oninput: () => {
+      const q = search.value.trim().toLowerCase();
+      for (const item of list.querySelectorAll(".admin-pick-item")) item.hidden = !!q && !item.dataset.text.includes(q);
+    } });
+    const values = () => [...inputs.filter((i) => i.checked).map((i) => i.value),
+                          ...extra.value.split(",").map((s) => s.trim()).filter(Boolean)];
+    const summary = el("summary", {});
+    const show = () => { summary.textContent = values().length ? values().join(", ") : "все"; };
+    const panel = el("div", { class: "admin-pick-panel" }, options.length > 8 ? search : "", list,
+                     options.length ? "" : el("div", { class: "admin-note" }, "справочник пуст"), extra);
+    const details = el("details", { class: "admin-pick", onchange: show, oninput: show }, summary, panel);
+    details.addEventListener("toggle", () => { if (details.open) (options.length > 8 ? search : extra).focus(); });
+    show();
+    return { element: details, values };
+  }
+  document.addEventListener("click", (e) => {            // a click outside closes the open pickers
+    for (const d of document.querySelectorAll("details.admin-pick[open]")) if (!d.contains(e.target)) d.open = false;
+  });
+
   async function loadScopes() {
     if (!perms.has("scopes.manage")) return;
-    let list;
+    let list, catalog;
     try {
-      list = await api("GET", "/api/v1/access/accounts");
+      [list, catalog] = await Promise.all([api("GET", "/api/v1/access/accounts"), api("GET", "/api/v1/access/catalog")]);
     } catch (e) {
       fail(e.message);
       return;
     }
+    const tenantOptions = catalog.tenants.map((t) => ({ value: t, label: t }));
+    const stationOptions = [...catalog.stations]
+      .sort((a, b) => (a.tenant || "￿").localeCompare(b.tenant || "￿") || a.station_id - b.station_id)
+      .map((s) => ({ value: String(s.station_id), group: s.tenant || "участок не известен",
+                     label: `${s.station_id}${s.serial ? ` · ${s.serial}` : ""}${s.seen ? "" : " · не выходила на связь"}` }));
     $("scopes-body").replaceChildren(...list.map((a) => {
-      const tenants = el("input", { class: "form-control form-control-sm", value: a.tenants.join(", ") });
-      const stations = el("input", { class: "form-control form-control-sm", value: a.stations.join(", ") });
+      const tenants = picker(tenantOptions, a.tenants, "другой участок");
+      const stations = picker(stationOptions, a.stations.map(String), "другие номера через запятую");
       const save = el("button", { class: "btn btn-sm btn-outline-primary", type: "button", onclick: async () => {
-        const body = { tenants: tenants.value.split(",").map((s) => s.trim()).filter(Boolean),
-                       stations: stations.value.split(",").map((s) => s.trim()).filter(Boolean).map(Number) };
+        const body = { tenants: tenants.values(), stations: stations.values().map(Number) };
         if (body.stations.some((n) => !Number.isInteger(n) || n <= 0)) { fail("Станции: номера через запятую."); return; }
         try {
           fail("");
@@ -202,7 +238,7 @@
           refresh();
         } catch (e) { fail(e.message); }
       } }, "Сохранить");
-      return el("tr", {}, el("td", {}, a.name), el("td", {}, roleText(a.roles)), el("td", {}, tenants), el("td", {}, stations), el("td", {}, save));
+      return el("tr", {}, el("td", {}, a.name), el("td", {}, roleText(a.roles)), el("td", {}, tenants.element), el("td", {}, stations.element), el("td", {}, save));
     }));
     if (!list.length) $("scopes-body").replaceChildren(el("tr", {}, el("td", { colspan: 5, class: "text-muted" }, "нет учётных записей для настройки")));
   }
