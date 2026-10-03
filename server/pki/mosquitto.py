@@ -3,7 +3,9 @@
 Certificate CN (= station serial) is the mosquitto username
 (``use_identity_as_username true``).  Topics follow MQTT_TLS_ICD v0.1:
 ``zs/v1/{tenant}/{station_id}/{up|status|down|ack|receipt|audio|fwreq|fw|bearing}`` (audio: addendum B, fwreq/fw:
-addendum F, bearing: addendum H).
+addendum F, bearing: addendum H).  The output API dioneya.alert/1 (protocols/DIONEYA_ALERT_API_v1.md, 4.4) is
+published by the bridge user to ``dioneya/alert/v1/{tenant}``; a registered consumer (CN = its name) reads the
+topics of its tenants.
 """
 
 from __future__ import annotations
@@ -11,6 +13,11 @@ from __future__ import annotations
 from .registry import Registry, StationRow
 
 BRIDGE_USER = "bridge"
+ALERT_TOPIC_PREFIX = "dioneya/alert/v1"          # integration/mqtt_alerts.TOPIC_PREFIX
+
+
+def alert_topic(tenant: str) -> str:
+    return f"{ALERT_TOPIC_PREFIX}/{tenant}"
 
 
 def station_topics(row: StationRow) -> list[tuple[str, str]]:
@@ -36,7 +43,8 @@ def render_acl(registry: Registry, bridge_user: str = BRIDGE_USER) -> str:
         "",
         f"user {bridge_user}",
     ]
-    tenants = sorted({r.tenant for r in registry.active()})
+    consumers = registry.consumers(status="active")
+    tenants = sorted({r.tenant for r in registry.active()} | {t for c in consumers for t in c.tenants})
     for tenant in tenants:
         lines += [
             f"topic read zs/v1/{tenant}/+/up",
@@ -48,12 +56,18 @@ def render_acl(registry: Registry, bridge_user: str = BRIDGE_USER) -> str:
             f"topic read zs/v1/{tenant}/+/fwreq",
             f"topic write zs/v1/{tenant}/+/fw",
             f"topic read zs/v1/{tenant}/+/bearing",
+            f"topic write {alert_topic(tenant)}",
         ]
     lines.append("")
     for row in registry.active():
         lines.append(f"user {row.serial}")
         for access, topic in station_topics(row):
             lines.append(f"topic {access} {topic}")
+        lines.append("")
+    for consumer in consumers:                   # the output API: a consumer reads the alert topics of its tenants
+        lines.append(f"user {consumer.name}")
+        for tenant in consumer.tenants:
+            lines.append(f"topic read {alert_topic(tenant)}")
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 
@@ -75,5 +89,8 @@ def render_listener_conf(cert_dir: str = "/mosquitto/certs", crl: bool = True) -
     ]
     if crl:
         conf.append(f"crlfile {cert_dir}/crl.pem")
-    conf += ["", "acl_file /mosquitto/config/station_acl.conf"]
+    conf += ["", "acl_file /mosquitto/config/station_acl.conf",
+             "", "# consumers of the output API (dioneya.alert/1) with a persistent session get what was published while",
+             "# they were away: this many QoS 1 messages are kept per client, the session for a week",
+             "max_queued_messages 10000", "persistent_client_expiration 7d"]
     return "\n".join(conf) + "\n"
