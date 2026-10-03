@@ -1,4 +1,8 @@
-# tls/: ca-chain.pem, server.crt.pem, server.key.pem, crl.pem, bridge.crt.pem, bridge.key.pem (from server/pki)
+# tls/: ca-chain.pem, server.crt.pem, server.key.pem, crl.pem, bridge.crt.pem, bridge.key.pem (from server/pki).
+# The server certificate must carry the DNS name `mqtt` besides the public name: the bridges and mqtt_alerts connect to
+# the broker by this service name and verify it (`python -m pki.cli server-cert --dns <public> --dns mqtt --ip <ip>`).
+# Mosquitto reads server.key.pem after dropping privileges to uid 1883: chown 1883 and mode 0400, the directory 0755.
+# crl.pem is valid 30 days: rewrite it (`python -m pki.cli crl`) and restart mqtt at least monthly (a weekly cron).
 services:
   mqtt:
     image: eclipse-mosquitto:2.0

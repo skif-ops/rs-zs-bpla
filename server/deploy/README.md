@@ -17,7 +17,14 @@ isolated-bench configurations and must not be used for production.
 ## Production requirements
 
 - Public APN/CGNAT is the EVT-PRE-20 baseline; the station opens outbound connections only.
-- MQTT over TLS 1.2+ on port 8883.
+- MQTT over TLS 1.2+ on port 8883. The server certificate carries the compose
+  service name `mqtt` besides the public name and address (`python -m pki.cli
+  server-cert --dns <public> --dns mqtt --ip <ip>`): the bridges and `mqtt_alerts`
+  connect to the broker as `mqtt` and verify that name. Mosquitto reads
+  `tls/server.key.pem` after dropping privileges to uid 1883 (chown 1883, mode
+  0400, the `tls` directory 0755). The CRL `tls/crl.pem` is valid 30 days and
+  an expired one makes the broker refuse every client: rewrite it with
+  `python -m pki.cli crl` and restart `mqtt` at least monthly (a weekly cron).
 - Per-station credentials or client certificates.
 - Server-side `station_id` authorization, rate limiting and replay protection.
 - Broker ACL permits the bridge to publish event application receipts and each

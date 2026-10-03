@@ -19,7 +19,7 @@ Server:
 ```
 python -m pki.cli issuing-request
 python -m pki.cli issuing-install --cert issuing.crt.pem --root-cert root.crt.pem
-python -m pki.cli server-cert --dns muhoed.example.ru --ip 203.0.113.10
+python -m pki.cli server-cert --dns muhoed.example.ru --dns mqtt --ip 203.0.113.10   # `mqtt`: the compose service name the bridges verify
 python -m pki.cli bridge-cert
 python -m pki.cli station-add --all-lots
 python -m pki.cli station-sign DIO-EVT-012 --csr DIO-EVT-012.csr.pem
