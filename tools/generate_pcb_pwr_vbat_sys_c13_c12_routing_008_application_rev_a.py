@@ -8,6 +8,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from pcb_pwr_board_identity import is_rev_e_metadata_only
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DIRECTORY = ROOT / "hardware/kicad/candidates/PCB-PWR-VBAT-SYS-C13-C12-ROUTING-008"
@@ -57,7 +59,7 @@ def main() -> int:
     args = parser.parse_args()
     payload = accepted_payload()
     if args.check:
-        assert digest(BOARD) in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA}, \
+        assert digest(BOARD) in {CANDIDATE_SHA, SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA} or is_rev_e_metadata_only(BOARD.read_bytes()), \
             "authoritative PCB-PWR is not accepted 008 or controlled successor"
     else:
         assert BOARD.read_bytes() == BASE.read_bytes(), "authoritative 007 predecessor differs"

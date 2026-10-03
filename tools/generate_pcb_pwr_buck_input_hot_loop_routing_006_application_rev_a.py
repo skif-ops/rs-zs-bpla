@@ -8,6 +8,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from pcb_pwr_hot_loop_006_board import is_rev_e_metadata_only
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DIR = ROOT / "hardware/kicad/candidates/PCB-PWR-BUCK-INPUT-HOT-LOOP-ROUTING-006"
@@ -57,7 +59,8 @@ def main() -> int:
     args = parser.parse_args()
     payload = accepted_payload()
     if args.check:
-        assert digest(BOARD) in {CANDIDATE_SHA, SHUNT_BULK_007_SHA, C13_C12_008_SHA, C13_C11_009_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA}, \
+        assert (digest(BOARD) in {CANDIDATE_SHA, SHUNT_BULK_007_SHA, C13_C12_008_SHA, C13_C11_009_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA}
+                or is_rev_e_metadata_only(BOARD.read_bytes())), \
             "authoritative board is not the approved candidate or controlled successor"
     else:
         assert BOARD.read_bytes() == BASE.read_bytes(), "authoritative predecessor differs"

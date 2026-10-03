@@ -9,6 +9,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 from kiutils.board import Board
+from audit_pcb_pwr_dim_003_rev_b import main as audit_dim003_rev_b
 from pcb_pwr_schematic_hierarchy import HierarchicalSchematic
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,12 +19,14 @@ PLACEMENT = ROOT / "hardware/PCB_PWR_PLACEMENT_CANDIDATE_REV_A.csv"
 PASSIVE_AUTHORITY = ROOT / "hardware/PCB_PWR_PASSIVE_AUTHORITY_REV_A.csv"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 OPEN_DIMENSIONS = ROOT / "mechanics/common/OPEN_DIMENSIONS.csv"
+DIM003_REV_B = ROOT / "hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_B.json"
 
 EXPECTED_ZONE_COUNTS = Counter({
     "INPUT_PROTECTION": 7, "CURRENT_SENSE": 5, "BUCK_3V8": 16,
     "BUCK_3V3": 13, "AUX_1V8": 4, "CONTROL_INTERFACE": 4,
     "GROUND_JOIN": 3, "DFT_EDGE": 10,
 })
+# Native KiCad board positions, with origin upper-left and +Y down.
 EXPECTED_MOUNTS = {
     "H1": (5.0, 5.0),
     "H2": (82.0, 5.0),
@@ -39,7 +42,8 @@ OUTPUT_BULK_010_SHA256 = "e46097f868a04bea0145c9cb10dac3d94ce2a81cee063224eb7840
 J2_PLACEMENT_ECO_003_SHA256 = "b12f445dd87799745635c289b271dda1781a85245dcfee2b61f1c989c893a7e6"
 AUTOROUTE_011_SHA256 = "cc2c3c9faf9fd4c40108f0313a562ca0e66d0f8c6e837613958f098ac2373578"
 ECO_005_SHA256 = "81f44a7068de6c8d7b3ae1a6951bc9d7a4bc6c2646cdbc4eccea4d9c79e35610"  # exact committed ECO-005 board (Review B R1 remediation)
-ECO_006_SHA256 = "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7"  # exact committed ECO-006 board (Review B R2 DFM: TP mask 0.1 mm, legend 1.0/0.15 mm; copper unchanged)
+ECO_006_SHA256 = "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7"  # Review B Rev D
+REV_E_SHA256 = "de2a723bbbc0d37b9f4fc5f55e24bfa287f892a081925daf4a24b8a7fa6c901d"  # title/stackup only
 # ECO-005 (Review B R1 finding 6): NT2 turned 180 deg so its GND_DIGITAL pad faces J2.4;
 # only this pose changes (hardware/reviews/PCB_PWR_ECO_005_REV_A.md).
 ECO_005_POSES = {"NT2": (75.6, 48.52, 180.0)}
@@ -168,11 +172,11 @@ def main() -> int:
         row = by_ref[ref]
         wanted_pose = (
             ECO_005_POSES[ref]
-            if board_sha256 in {ECO_005_SHA256, ECO_006_SHA256} and ref in ECO_005_POSES
+            if board_sha256 in {ECO_005_SHA256, ECO_006_SHA256, REV_E_SHA256} and ref in ECO_005_POSES
             else J2_PLACEMENT_ECO_003_POSES[ref]
-            if board_sha256 in {J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256, ECO_005_SHA256, ECO_006_SHA256} and ref in J2_PLACEMENT_ECO_003_POSES
+            if board_sha256 in {J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256, ECO_005_SHA256, ECO_006_SHA256, REV_E_SHA256} and ref in J2_PLACEMENT_ECO_003_POSES
             else ECO_002_POSES[ref]
-            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256, J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256, ECO_005_SHA256, ECO_006_SHA256} and ref in ECO_002_POSES
+            if board_sha256 in {ECO_002_SHA256, HOT_LOOP_006_SHA256, SHUNT_BULK_007_SHA256, C13_C12_008_SHA256, C13_C11_009_SHA256, OUTPUT_BULK_010_SHA256, J2_PLACEMENT_ECO_003_SHA256, AUTOROUTE_011_SHA256, ECO_005_SHA256, ECO_006_SHA256, REV_E_SHA256} and ref in ECO_002_POSES
             else (float(row["X_mm"]), float(row["Y_mm"]),
                   float(row["Rotation_deg"]) % 360.0)
         )
@@ -194,8 +198,10 @@ def main() -> int:
             f"authority={row['Source_Authority']}",
         ))
         require(footprint.description == description, f"{ref}: placement metadata drift")
+        # The tag is historical board metadata bound to the ECO-006 source hash.
+        # Current mechanical acceptance is read from DIM-003 Rev B below.
         require(footprint.tags == "DIONEA PCB-PWR EVT DIM-003 ACCEPTED NOT FOR MANUFACTURE",
-                f"{ref}: EVT mechanical/release tags drift")
+                f"{ref}: historical board tag drift")
         excluded = population in {"DNP", "PCB_FEATURE"}
         require(footprint.attributes.excludeFromPosFiles is excluded and
                 footprint.attributes.excludeFromBom is excluded,
@@ -210,10 +216,25 @@ def main() -> int:
             actual = {pad.net.name if pad.net is not None else "NC" for pad in pads[number]}
             require(actual == {net}, f"{ref}.{number}: board net {sorted(actual)} != {net}")
 
+    dim003 = json.loads(DIM003_REV_B.read_text(encoding="utf-8"))
+    require(dim003["source_board_sha256"] == ECO_006_SHA256,
+            "DIM-003 Rev B source binding differs from the exact ECO-006 board")
+    require(dim003["coordinate_system"]["origin"] == "LOWER_LEFT_EDGE_CUT_INTERSECTION" and
+            dim003["coordinate_system"]["y_axis"] == "NORTH_ALONG_60_MM_EDGE" and
+            dim003["outline"]["size_mm"] == [90, 60],
+            "DIM-003 Rev B mechanical frame drift")
+    dim_holes = {item["reference"]: item["xy_mm"] for item in dim003["mounting"]["holes"]}
+    require(set(dim_holes) == set(EXPECTED_MOUNTS), "DIM-003 Rev B mounting set drift")
+    direct_kicad_matches_dim = []
     for ref, expected_xy in EXPECTED_MOUNTS.items():
         footprint = footprints[ref]
         close(float(footprint.position.X), expected_xy[0], f"{ref} X")
         close(float(footprint.position.Y), expected_xy[1], f"{ref} Y")
+        # Explicit KiCad Y-down -> DIM-003 Y-up conversion; copying Y is a mirror error.
+        dim_xy = (float(footprint.position.X), 60.0 - float(footprint.position.Y))
+        close(dim_xy[0], float(dim_holes[ref][0]), f"{ref} DIM X")
+        close(dim_xy[1], float(dim_holes[ref][1]), f"{ref} DIM Y")
+        direct_kicad_matches_dim.append(expected_xy == tuple(dim_holes[ref]))
         require(footprint.libId == "DioneyaPWR:MountingHole_M3_3.4_EVT",
                 f"{ref}: mounting footprint binding differs")
         require(footprint.attributes.boardOnly and
@@ -229,13 +250,15 @@ def main() -> int:
                 abs(float(pad.drill.diameter) - 3.4) <= 0.001 and
                 abs(float(pad.clearance) - 2.3) <= 0.001,
                 f"{ref}: NPTH drill or D8 copper exclusion differs")
+    require(not all(direct_kicad_matches_dim),
+            "DIM-003 mirror guard failed: direct KiCad coordinates passed as mechanical datum")
 
     expected_nets = {net for item in expected.values() for net in item["pins"].values() if net != "NC"}
     board_nets = {net.name for net in board.nets if net.number != 0}
     require(board_nets == expected_nets, "board net set differs from native schematic")
     require((len(board.traceItems), len(board.zones)) in
             {(0, 0), (2, 0), (3, 0), (4, 0), (8, 0), (14, 0), (35, 2), (37, 2), (39, 2), (43, 2), (53, 2)}
-            or board_sha256 in {AUTOROUTE_011_SHA256, ECO_005_SHA256, ECO_006_SHA256},  # exact committed autoroute 011 board
+            or board_sha256 in {AUTOROUTE_011_SHA256, ECO_005_SHA256, ECO_006_SHA256, REV_E_SHA256},  # exact committed autoroute 011 board
             "PCB-PWR contains copper beyond the accepted autoroute 011 successor")
 
     edges = [item for item in board.graphicItems if getattr(item, "layer", None) == "Edge.Cuts"]
@@ -261,9 +284,9 @@ def main() -> int:
 
     dim_rows = {row["ID"]: row for row in read_csv(OPEN_DIMENSIONS)}
     require(dim_rows["DIM-003"]["Status"] ==
-            "CLOSED_EVT_ENGINEERING_18_OF_18_ACCEPTED_SERIAL_REVALIDATION_REQUIRED"
+            "REOPENED_REV_B_CANDIDATE_INDEPENDENT_ME_REVIEW_REQUIRED"
             and dim_rows["DIM-003"]["Owner"] == "EE_ME",
-            "DIM-003 EVT acceptance state differs")
+            "DIM-003 Rev B review state differs")
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     layout = status["native_layout"]
     require(status["manufacturing_release"] is False and
@@ -275,11 +298,22 @@ def main() -> int:
             layout["mounting_status"] == "EVT_DIM_003_ACCEPTED_H1_H4_NPTH_3P4",
             "PCB-PWR capture-status interlock drift")
 
+    require(dim003["release_boundary"]["dim_003_accepted_for_evt"] is False and
+            dim003["release_boundary"]["manufacturing_release"] is False,
+            "DIM-003 Rev B candidate release boundary drift")
+    # This historical audit also runs after regenerating earlier placement
+    # candidates. Only the committed ECO-006 board is source-bound to Rev B.
+    if board_sha256 in {ECO_006_SHA256, REV_E_SHA256}:
+        audit_dim003_rev_b()
     print("PCB-PWR EVT placement-candidate independent audit PASS")
     print("62 electrical footprints + H1-H4; exact schematic nets; 90x60 four-layer canvas; accepted 3V8 output bulk 010 successor")
-    print("DIM-003 18/18 EVT accepted; DRC/CAM/Review B/manufacturing remain prohibited")
+    if board_sha256 in {ECO_006_SHA256, REV_E_SHA256}:
+        print("DIM-003 Rev B candidate verified against ECO-006 board geometry; independent mechanical acceptance and manufacturing release remain blocked")
+    else:
+        print("Historical placement geometry checked; DIM-003 Rev B source binding applies only to ECO-006")
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

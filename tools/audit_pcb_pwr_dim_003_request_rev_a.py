@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit the accepted PCB-PWR DIM-003 EVT mechanical authority.
+"""Audit the historical accepted PCB-PWR DIM-003 Rev A packet.
 
 This proves that all 18 mechanical responses are attributable, the native board
 implements the accepted H1-H4 pattern, the frozen STEP is hash-bound, and the
@@ -35,6 +35,7 @@ FOOTPRINTS = ROOT / "hardware/PCB_PWR_FOOTPRINT_AUTHORITY_REV_A.md"
 HARNESS_PINOUT = ROOT / "hardware/HARNESS_LOGICAL_PINOUT_REV_A.csv"
 HARNESS_SCHEDULE = ROOT / "hardware/HARNESS_MANUFACTURING_SCHEDULE_REV_A.csv"
 OPEN_DIMENSIONS = ROOT / "mechanics/common/OPEN_DIMENSIONS.csv"
+CURRENT_DIM003 = ROOT / "hardware/reviews/PCB_PWR_DIM_003_EVT_AUTHORITY_REV_B.json"
 STATUS = ROOT / "hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json"
 REVIEW_B = ROOT / "hardware/reviews/PCB_PWR_REVIEW_B_CHECKLIST_REV_A.md"
 CONTRACT = ROOT / "hardware/reviews/PCB_PWR_DIM_003_REQUEST_REV_A.json"
@@ -59,6 +60,9 @@ BASELINE_VALIDATOR = ROOT / "tools/validate_evt_pre_20.py"
 KICAD_NATIVE_GATE = ROOT / "tools/kicad_native_gate.py"
 
 STATE = "PASS_DIM_003_EVT_ENGINEERING_ACCEPTED_SERIAL_REVALIDATION_REQUIRED"
+# Hash recorded in the Rev A request contract. The live register was later
+# reopened for the corrected Rev B geometry and must not be substituted here.
+HISTORICAL_OPEN_DIMENSIONS_SHA256 = "44e3f597f65981c35f5d0657172bc1ba9ce87ee680e7fe25d3eea15c9cda8f10"
 CONTRACT_STATUS = (
     "EVT_ENGINEERING_ACCEPTED_18_OF_18_SERIAL_REVALIDATION_REQUIRED_"
     "NOT_FOR_MANUFACTURE"
@@ -188,7 +192,7 @@ def expected_source_binding(board: Board) -> dict[str, str]:
         "harness_manufacturing_schedule": relative(HARNESS_SCHEDULE),
         "harness_manufacturing_schedule_sha256": sha256(HARNESS_SCHEDULE),
         "open_dimensions": relative(OPEN_DIMENSIONS),
-        "open_dimensions_sha256": sha256(OPEN_DIMENSIONS),
+        "open_dimensions_sha256": HISTORICAL_OPEN_DIMENSIONS_SHA256,
         "accepted_evt_authority": relative(EVT_AUTHORITY),
         "accepted_evt_authority_sha256": sha256(EVT_AUTHORITY),
         "accepted_evt_authority_record": relative(EVT_AUTHORITY_RECORD),
@@ -419,9 +423,14 @@ def validate_integrations() -> None:
     require(len(dim_rows) == 1, "DIM-003 open-dimensions row missing or duplicated")
     dim = dim_rows[0]
     require(dim.get("Owner") == "EE_ME" and dim.get("Status") ==
-            "CLOSED_EVT_ENGINEERING_18_OF_18_ACCEPTED_SERIAL_REVALIDATION_REQUIRED" and
-            "serial" in dim.get("Blocks", "").lower(),
-            "DIM-003 open-dimensions acceptance state differs")
+            "REOPENED_REV_B_CANDIDATE_INDEPENDENT_ME_REVIEW_REQUIRED" and
+            "Review B" in dim.get("Blocks", ""),
+            "DIM-003 current mechanical hold differs")
+    current = json.loads(CURRENT_DIM003.read_text(encoding="utf-8"))
+    require(current["revision"] == "B" and
+            current["release_boundary"]["dim_003_accepted_for_evt"] is False and
+            current["release_boundary"]["manufacturing_release"] is False,
+            "DIM-003 Rev B must remain pending independent mechanical review")
 
     status = json.loads(STATUS.read_text(encoding="utf-8"))
     mechanical = status.get("mechanical_freeze_input", {})
@@ -495,9 +504,12 @@ def audit() -> dict[str, Any]:
         "response_register": relative(RESPONSE), "accepted_authority": relative(EVT_AUTHORITY),
         "frozen_step": relative(FROZEN_STEP), "frozen_step_sha256": sha256(FROZEN_STEP),
         "required_response_rows": len(GATES), "accepted_response_rows": len(rows),
-        "pending_response_rows": 0, "dim_003_accepted": True,
+        "pending_response_rows": 0, "historical_rev_a_accepted": True,
+        "dim_003_accepted": False,
+        "current_authority": relative(CURRENT_DIM003),
+        "current_mechanical_status": "REOPENED_REV_B_CANDIDATE_INDEPENDENT_ME_REVIEW_REQUIRED",
         "serial_revalidation_required": True, "board": board,
-        "routing_authorized": True, "harness_board_datum_authorized": True,
+        "routing_authorized": False, "harness_board_datum_authorized": False,
         "final_harness_cut_lengths_authorized": False,
         "review_b_complete": False, "manufacturing_release": False,
     }
@@ -518,10 +530,11 @@ def main() -> int:
         output = args.output if args.output.is_absolute() else ROOT / args.output
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print("PCB-PWR DIM-003 EVT acceptance audit PASS")
-    print("18/18 accepted; H1-H4/STEP bound; serial revalidation required; manufacture remains prohibited")
+    print("PCB-PWR DIM-003 historical Rev A packet audit PASS")
+    print("Rev A 18/18 historical; current Rev B mechanical acceptance and manufacturing release remain blocked")
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
