@@ -9,8 +9,8 @@ static float gauss(scene_t *s) { return 0.866f * (rnd(s) + rnd(s) + rnd(s)); }  
 void scene_init(scene_t *s, const scene_segment_t *segments, size_t count, float noise, uint32_t seed) {
   size_t i;
   s->segments = segments; s->count = count; s->noise = noise; s->rng = seed ? seed : 0x9e3779b9u;
-  for (i = 0u; i < 24u; i++) s->phase[i] = 0.0;
-  s->pink = 0.0; s->sample = 0u;
+  for (i = 0u; i < 48u; i++) s->phase[i] = 0.0;
+  s->pink = 0.0; s->hiss_lp = 0.0; s->hiss_hp = 0.0; s->rpm = 0.0; s->sample = 0u;
   for (i = 0u; i < 3u; i++) { s->bg_rng[i] = (s->rng ^ (0x85ebca6bu * (uint32_t)(i + 1u))) | 1u; s->bg_pink[i] = 0.0; }
 }
 
@@ -57,18 +57,36 @@ void scene_next_parts(scene_t *s, float *source, float *background) {
     if (ms < g->start_ms || ms >= g->end_ms) continue;
     dur = (double)(g->end_ms - g->start_ms) / 1000.0; mid = (double)g->start_ms / 1000.0 + dur / 2.0;
     if (g->kind == SCENE_DRONE_FLYBY) {
-      /* approach - closest - recede: Gaussian level profile, slight Doppler-like f0 drift and rotor wobble */
+      /* an electric multirotor: four rotors at slightly different speeds (hover trim), so their blade-pass combs beat
+         against each other; harmonics that fall off like a propeller's (about ten of them stand out); and the
+         broadband hiss of the blades (about 1..5 kHz, modulated at the blade-pass rate) that the comb sits in.  A
+         bare comb of 18 steady harmonics without the hiss reads like an engine: the station's centroid classifier put
+         the earlier source into the agricultural class whenever it stood out of the scene background
+         (docs/STATION_TWIN_SOURCE_2026-10-03.md).  Approach - closest - recede: Gaussian level profile, slight
+         Doppler-like f0 drift and rotor wobble. */
+      static const double rotor_ratio[4] = {1.0, 1.013, 0.989, 1.022};
       const double x = (t - mid) / (dur / 4.0);
+      double comb = 0.0, hiss, g1;
       env = g->steady ? 1.0 : 0.05 + 0.95 * exp(-x * x);
-      f = g->f0_hz * (1.0 + (g->steady ? 0.0 : 0.03 * tanh(-(t - mid) / (dur / 6.0))) + 0.015 * sin(2.0 * M_PI * 0.7 * t) + 0.004 * sin(2.0 * M_PI * 7.3 * t));
-      for (unsigned k = 1u; k <= 18u; k++) {
-        const double amp = (1.0 / pow((double)k, 0.9)) * (1.0 + 0.3 * sin(2.0 * M_PI * 0.3 * k * t));
-        s->phase[k - 1u] += 2.0 * M_PI * f * k / SR;
-        out += (float)(amp * sin(s->phase[k - 1u]));
+      s->rpm += 0.001 * (0.6 * gauss(s) - s->rpm);       /* the speed controller hunting: a slow random walk, ~1 % */
+      f = g->f0_hz * (1.0 + s->rpm + (g->steady ? 0.0 : 0.03 * tanh(-(t - mid) / (dur / 6.0))) + 0.015 * sin(2.0 * M_PI * 0.7 * t) + 0.004 * sin(2.0 * M_PI * 7.3 * t));
+      for (unsigned r = 0u; r < 4u; r++) {
+        const double fr = f * rotor_ratio[r];
+        for (unsigned k = 1u; k <= 10u; k++) {
+          const double amp = (1.0 / pow((double)k, 1.4)) * (1.0 + 0.25 * sin(2.0 * M_PI * (0.3 * k + 0.11 * r) * t));
+          s->phase[r * 10u + k - 1u] += 2.0 * M_PI * fr * k / SR;
+          comb += amp * sin(s->phase[r * 10u + k - 1u]);
+        }
       }
-      out *= (float)(env * 0.25 * g->level);
+      /* blade hiss: white noise, a one-pole high-pass near 1 kHz and a one-pole low-pass near 5 kHz, modulated by
+         the blade passes of the first rotor */
+      g1 = gauss(s);
+      s->hiss_hp += 0.18 * (g1 - s->hiss_hp);
+      s->hiss_lp += 0.62 * ((g1 - s->hiss_hp) - s->hiss_lp);
+      hiss = s->hiss_lp * (0.75 + 0.25 * cos(s->phase[0]));
+      out += (float)((0.52 * comb + 1.25 * hiss) * env * 0.25 * g->level);   /* the RMS of the earlier comb */
     } else if (g->kind == SCENE_GROUND_VEHICLE) {
-      for (unsigned k = 1u; k <= 6u; k++) { s->phase[18u + k - 1u] += 2.0 * M_PI * 32.0 * k / SR; out += (float)(sin(s->phase[18u + k - 1u]) / k); }
+      for (unsigned k = 1u; k <= 6u; k++) { s->phase[40u + k - 1u] += 2.0 * M_PI * 32.0 * k / SR; out += (float)(sin(s->phase[40u + k - 1u]) / k); }
       out = out * 0.25f * g->level + 0.6f * g->level * gauss(s) * 0.15f;
     }
   }

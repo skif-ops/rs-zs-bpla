@@ -111,7 +111,12 @@ def main() -> int:
     assert [b["time_us"] for b in stream] == sorted(b["time_us"] for b in stream)
     assert stream[-1]["azimuth_deg"] > stream[0]["azimuth_deg"] and "track: window closed (target lost)" in log, stream
     pre, post = segs["pre"], segs["post"]
-    assert pre["seconds"] >= 10 and post["seconds"] >= 25, segs                        # continuous audio on both sides
+    # continuous audio on both sides: the pre segment is everything the station heard since it woke for this target
+    # (the ring holds nothing of S0_SLEEP, and a run of records ends at that gap), the post segment the window after
+    wake_s = max(float(l[1:l.index("]")]) for l in log.splitlines()
+                 if "-> S1_LISTEN" in l and float(l[1:l.index("]")]) * 1e6 + 1.8e15 <= event["time_us"])
+    assert pre["seconds"] >= 2 and post["seconds"] >= 25, segs
+    assert pre["start_time_us"] <= 1.8e15 + (wake_s + 1.0) * 1e6, (pre, wake_s)       # pre starts at the wake
     assert pre["start_time_us"] + pre["seconds"] * 1e6 > event["time_us"] - 1e6       # pre reaches the event
     assert post["start_time_us"] <= event["time_us"] < post["start_time_us"] + 1e6     # post starts at the event
     print(f"scenario 1 (drone over GSM): detections {r['detections']}, heartbeats {r['heartbeats']}, duplicates {r['duplicates']}; "
