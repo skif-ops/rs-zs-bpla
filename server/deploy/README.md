@@ -125,8 +125,8 @@ isolated-bench configurations and must not be used for production.
   initial keypair outside Git, from the repository root:
 
   ```bash
-  python tools/generate_command_signing_key.py \\
-    --private server/deploy/tls/command-signing.key \\
+  python tools/generate_command_signing_key.py \
+    --private server/deploy/tls/command-signing.key \
     --public server/deploy/tls/command-signing.pub
   ```
 
