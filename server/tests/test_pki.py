@@ -168,8 +168,21 @@ def test_acl_only_lists_active_stations_and_isolates_tenants(tmp_path):
     assert "user DIO-EVT-007" not in acl            # revoked
     assert "user DIO-EVT-004" not in acl            # never provisioned
     assert "topic read zs/v1/pilot1/+/up" in acl and "topic write zs/v1/pilot2/+/down" in acl
+    assert "topic write dioneya/alert/v1/pilot1" in acl and "user platform" not in acl   # no consumer registered yet
+    reg.add_consumer("platform", ["pilot1", "pilot1", " pilot2 "], 200, "11" * 32, "2028-01-01T00:00:00+00:00")
+    with pytest.raises(pki.PkiError):
+        reg.add_consumer("platform", ["pilot1"], 201, "22" * 32, "2028-01-01T00:00:00+00:00")
+    with pytest.raises(pki.PkiError):
+        reg.add_consumer("other", [], 202, "33" * 32, "2028-01-01T00:00:00+00:00")
+    acl = render_acl(reg)
+    assert acl.endswith("user platform\ntopic read dioneya/alert/v1/pilot1\ntopic read dioneya/alert/v1/pilot2\n")
+    assert reg.get_consumer("platform").tenants == ("pilot1", "pilot2")
+    reg.revoke_consumer("platform", "key leaked")
+    assert (200, ) == tuple(serial for serial, _ in reg.revoked_cert_serials() if serial == 200)
+    assert "user platform" not in render_acl(reg)
     conf = render_listener_conf()
     assert "allow_anonymous false" in conf and "require_certificate true" in conf and "crlfile" in conf
+    assert "max_queued_messages 10000" in conf and "persistent_client_expiration 7d" in conf
 
 
 # ------------------------------------------------------------ full CLI workflow
@@ -231,3 +244,33 @@ def test_cli_end_to_end(tmp_path, monkeypatch):
     assert "user DIO-EVT-012" in acl and "user DIO-EVT-B01" not in acl
     assert cli(["list", "--pki", str(server), "--status", "commissioned"]) == 0
     assert cli(["audit", "--pki", str(server)]) == 0
+
+    # a consumer of the output API over MQTT (dioneya.alert/1): its own client certificate, the alert topics of its
+    # tenants in the ACL, revocation through the CRL
+    assert cli(["consumer-cert", "--pki", str(server), "platform", "--tenants", "pilot1,pilot2"]) == 0
+    cdir = server / "consumers" / "platform"
+    consumer_cert = pki.cert_from_pem((cdir / "platform.crt.pem").read_bytes())
+    assert consumer_cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value == "platform"
+    assert ExtendedKeyUsageOID.CLIENT_AUTH in consumer_cert.extensions.get_extension_for_class(x509.ExtendedKeyUsage).value
+    pki.verify_chain(consumer_cert, chain[0], chain[1])
+    assert (cdir / "platform.key.pem").exists() and (cdir / "ca-chain.pem").read_bytes() == (server / "issuing" / "ca-chain.pem").read_bytes()
+    assert cli(["consumer-cert", "--pki", str(server), "platform", "--tenants", "pilot1"]) == 2       # already active
+    assert cli(["consumer-cert", "--pki", str(server), "bridge", "--tenants", "pilot1"]) == 2         # reserved name
+    assert cli(["consumer-cert", "--pki", str(server), "DIO-EVT-013", "--tenants", "pilot1"]) == 2    # a station serial
+    assert cli(["mosquitto-acl", "--pki", str(server), "--out", str(tmp_path / "acl.conf")]) == 0
+    acl = (tmp_path / "acl.conf").read_text()
+    assert "user platform\ntopic read dioneya/alert/v1/pilot1\ntopic read dioneya/alert/v1/pilot2\n" in acl
+    assert "topic write dioneya/alert/v1/pilot1" in acl.split("user DIO-EVT-012")[0]     # the bridge publishes
+    assert cli(["consumer-revoke", "--pki", str(server), "platform", "--reason", "contract ended"]) == 0
+    crl = x509.load_pem_x509_crl((server / "issuing" / "crl.pem").read_bytes())
+    assert {r.serial_number for r in crl} == {consumer_cert.serial_number, pki.cert_from_pem(
+        (server / "stations" / "DIO-EVT-B01" / "DIO-EVT-B01.crt.pem").read_bytes()).serial_number}
+    assert cli(["mosquitto-acl", "--pki", str(server), "--out", str(tmp_path / "acl.conf")]) == 0
+    assert "user platform" not in (tmp_path / "acl.conf").read_text()
+    assert cli(["consumer-cert", "--pki", str(server), "platform", "--tenants", "pilot2"]) == 0       # issued again
+    assert cli(["list", "--pki", str(server)]) == 0
+    # the revoked certificates stay on the CRL after their subjects got new ones
+    assert cli(["station-keygen", "--pki", str(server), "DIO-EVT-B01", "--allow-server-side-key"]) == 0
+    assert cli(["crl", "--pki", str(server)]) == 0
+    crl = x509.load_pem_x509_crl((server / "issuing" / "crl.pem").read_bytes())
+    assert consumer_cert.serial_number in {r.serial_number for r in crl} and len(list(crl)) == 2

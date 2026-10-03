@@ -12,7 +12,8 @@ Directory layout (``--pki DIR``, default ``server/data/pki``)::
     server/server.key.pem        mosquitto/HTTPS key, 0600
     server/server.crt.pem        mosquitto/HTTPS certificate
     stations/<SERIAL>/           csr.pem, <SERIAL>.crt.pem (and key only for bench/fixture keygen)
-    registry.sqlite3             station registry + audit
+    consumers/<NAME>/            <NAME>.key.pem, <NAME>.crt.pem, ca-chain.pem (output API over MQTT, 0600 key)
+    registry.sqlite3             station and consumer registry + audit
     bundle/                      ca-chain.pem, server-fingerprint.txt, bundle.json (for app/QR/EOL)
 
 Passphrases come from ``ZS_PKI_ROOT_PASSPHRASE`` / ``ZS_PKI_ISSUING_PASSPHRASE``
@@ -182,6 +183,33 @@ def cmd_station_revoke(a):
     r = reg.revoke(a.serial, a.reason)
     out = _write_crl(d, issuing, reg)
     print(f"{r.serial} revoked; CRL updated at {out} -- reload mosquitto and regenerate the ACL")
+
+
+def cmd_consumer_cert(a):
+    """A consumer of the output API over MQTT (dioneya.alert/1, 4.4): key + certificate (CN = name) and its
+    tenants in the registry, so `mosquitto-acl` gives it the alert topics."""
+    d = Path(a.pki)
+    issuing, reg = _issuing(d), _registry(d)
+    name = pki.consumer_name(a.name)
+    tenants = [t.strip() for t in a.tenants.split(",") if t.strip()]
+    key_pem, cert_pem = issuing.issue_consumer(name)
+    cert = pki.cert_from_pem(cert_pem)
+    reg.add_consumer(name, tenants, cert.serial_number, pki.fingerprint_sha256(cert).hex(),
+                     cert.not_valid_after_utc.isoformat())
+    cdir = d / "consumers" / name
+    pki._write_private(cdir / f"{name}.key.pem", key_pem)
+    pki._write_public(cdir / f"{name}.crt.pem", cert_pem)
+    pki._write_public(cdir / "ca-chain.pem", issuing.chain_pem())
+    print(f"consumer {name} ({', '.join(tenants)}): key, certificate and ca-chain.pem in {cdir} -- hand them to the "
+          "consumer over a protected channel, then regenerate the ACL (mosquitto-acl) and reload mosquitto")
+
+
+def cmd_consumer_revoke(a):
+    d = Path(a.pki)
+    issuing, reg = _issuing(d), _registry(d)
+    r = reg.revoke_consumer(pki.consumer_name(a.name), a.reason)
+    out = _write_crl(d, issuing, reg)
+    print(f"consumer {r.name} revoked; CRL updated at {out} -- reload mosquitto and regenerate the ACL")
 
 
 def cmd_crl(a):
@@ -446,6 +474,8 @@ def cmd_list(a):
     for r in reg.list(lot=a.lot, status=a.status):
         print(f"{r.serial:12s} id={r.station_id:<4d} {r.lot:10s} {r.tenant:8s} {r.status:12s} "
               f"cert_until={r.cert_not_after or '-'}")
+    for c in reg.consumers(status=a.status):
+        print(f"{c.name:12s} consumer  {','.join(c.tenants):19s} {c.status:12s} cert_until={c.cert_not_after or '-'}")
 
 
 def cmd_audit(a):
@@ -481,6 +511,10 @@ def main(argv=None):
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--detail")
     s = add("station-revoke", cmd_station_revoke, help="revoke a station certificate and refresh the CRL")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--reason", required=True)
+    s = add("consumer-cert", cmd_consumer_cert, help="[server] issue a client certificate to a consumer of the output API over MQTT (dioneya.alert/1)")
+    s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("name"); s.add_argument("--tenants", required=True, help="comma-separated tenants it may read")
+    s = add("consumer-revoke", cmd_consumer_revoke, help="revoke a consumer certificate and refresh the CRL")
+    s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("name"); s.add_argument("--reason", required=True)
     s = add("crl", cmd_crl, help="rewrite issuing/crl.pem");                                  s.add_argument("--pki", default=str(DEFAULT_DIR))
     s = add("mosquitto-acl", cmd_mosquitto_acl, help="render station_acl.conf from the registry")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--out")
@@ -512,7 +546,7 @@ def main(argv=None):
     s.add_argument("--iccid1"); s.add_argument("--iccid2"); s.add_argument("--command-signing-key"); s.add_argument("--no-engineer-key", action="store_true")
     s = add("pairing-secret-rotate", cmd_pairing_secret_rotate, help="generate a new label secret for a station (reprint + reload)")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--reason", required=True)
-    s = add("list", cmd_list, help="list stations");                                           s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--lot"); s.add_argument("--status")
+    s = add("list", cmd_list, help="list stations and consumers");                             s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--lot"); s.add_argument("--status")
     s = add("audit", cmd_audit, help="print the audit log");                                    s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--limit", type=int, default=200)
 
     a = p.parse_args(argv)

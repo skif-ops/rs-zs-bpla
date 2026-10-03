@@ -35,3 +35,13 @@ services:
     depends_on:
       - mqtt
       - server
+  mqtt_alerts:                                  # the output API dioneya.alert/1 over MQTT (DIONEYA_ALERT_API_v1.md, 4.4)
+    build:
+      context: ..
+    restart: unless-stopped
+    command: ["python", "-m", "integration.mqtt_alerts", "--host", "mqtt", "--port", "1883", "--insecure-bench"]
+    volumes:
+      - ../data:/app/data
+    depends_on:
+      - mqtt
+      - server

@@ -495,6 +495,9 @@ class EventStore:
     def last_alert_seq(self)->int:
         with self._conn() as c: row=c.execute("SELECT MAX(seq) FROM alert_outbox").fetchone()
         return row[0] or 0
+    def alert_tenants(self)->list[str]:
+        """The tenants with messages in the outbox."""
+        with self._conn() as c: return [r[0] for r in c.execute("SELECT DISTINCT tenant FROM alert_outbox ORDER BY tenant")]
     def open_episode(self,tenant:str)->dict[str,Any]|None:
         with self._conn() as c:
             row=c.execute("SELECT * FROM alert_episodes WHERE tenant=? AND ended_us IS NULL ORDER BY started_us DESC LIMIT 1",(tenant,)).fetchone()

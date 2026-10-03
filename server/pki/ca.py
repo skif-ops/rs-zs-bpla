@@ -16,6 +16,10 @@ Trust structure
   station or on the EOL fixture; the server only signs a CSR.  A server-side
   station key is allowed only for the bench unit and must be requested
   explicitly.
+* consumer    -- client certificate of a consumer of the output API over MQTT
+  (dioneya.alert/1), CN = consumer name, OU = Consumers; the registry keeps its
+  tenants for the ACL.  Like the bridge certificate, key and certificate are
+  made on the server and handed over.
 
 Algorithms: ECDSA P-256 / SHA-256 everywhere (BG95 mbedTLS handshake stays
 small); root validity 15 years, issuing 5, server 2, station 3.
@@ -312,9 +316,17 @@ class IssuingCa:
         """Client certificate for the server-side MQTT bridge (mosquitto user = CN)."""
         if cn != "bridge":
             raise PkiError("bridge certificate CN must be 'bridge' (ACL user)")
+        return self._issue_client(cn, "Muhoed")
+
+    def issue_consumer(self, name: str) -> tuple[bytes, bytes]:
+        """Client certificate for a consumer of the output API over MQTT (dioneya.alert/1, mosquitto user = CN =
+        consumer name; the ACL gives it the alert topics of its tenants)."""
+        return self._issue_client(consumer_name(name), "Consumers")
+
+    def _issue_client(self, cn: str, ou: str) -> tuple[bytes, bytes]:
         key = new_key()
         cert = (
-            _builder(_name(cn, "Muhoed"), self.cert.subject, key.public_key(), SERVER_DAYS)
+            _builder(_name(cn, ou), self.cert.subject, key.public_key(), SERVER_DAYS)
             .add_extension(x509.BasicConstraints(ca=False, path_length=None), critical=True)
             .add_extension(
                 x509.KeyUsage(digital_signature=True, content_commitment=False, key_encipherment=False,
@@ -327,6 +339,19 @@ class IssuingCa:
             .sign(self.key, hashes.SHA256())
         )
         return key_to_pem(key, None), cert_to_pem(cert)
+
+
+CONSUMER_NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,31}$")
+
+
+def consumer_name(name: str) -> str:
+    """A consumer of the output API is named like a tenant (letters, digits, '-', '_', '.'); the name is the CN of
+    its certificate and its mosquitto user, so it can be neither a station serial nor the bridge."""
+    if CONSUMER_NAME_RE.match(name) is None:
+        raise PkiError("consumer name: 1..32 letters, digits, '-', '_' or '.'")
+    if name == "bridge" or SERIAL_RE.match(name):
+        raise PkiError(f"consumer name {name!r} is reserved")
+    return name
 
 
 def make_station_csr(serial: str) -> tuple[bytes, bytes]:

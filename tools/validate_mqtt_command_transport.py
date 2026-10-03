@@ -148,6 +148,9 @@ def main() -> int:
     pilot_units = {f"DIO-EVT-{i:03d}": ("pilot1" if i <= 20 else "pilot2", i) for i in range(1, 41)}
     pilot_units["DIO-EVT-B01"] = ("bench", 901)
     tenants = ("bench", "pilot1", "pilot2")
+    # The bridge also publishes the output API dioneya.alert/1 over MQTT (protocols/DIONEYA_ALERT_API_v1.md, 4.4);
+    # a registered consumer of it (`pki.cli consumer-cert`) reads nothing but the alert topics of pilot tenants.
+    alert_topics = {f"dioneya/alert/v1/{tenant}" for tenant in tenants}
     require(sections.get("bridge") == {
         f"topic {op} zs/v1/{tenant}/+/{suffix}"
         for tenant in tenants
@@ -155,7 +158,8 @@ def main() -> int:
                                ("read", "audio"),                       # audio: addendum B
                                ("read", "fwreq"), ("write", "fw"),      # firmware update: addendum F
                                ("read", "bearing"))                     # bearing stream: addendum H
-    }, "bridge ACL has missing or excessive rights")
+    } | {f"topic write {topic}" for topic in alert_topics},             # output API dioneya.alert/1 (4.4)
+    "bridge ACL has missing or excessive rights")
     for serial, (tenant, station_id) in pilot_units.items():
         require(sections.get(serial) == {
             f"topic write zs/v1/{tenant}/{station_id}/up",
@@ -168,7 +172,11 @@ def main() -> int:
             f"topic read zs/v1/{tenant}/{station_id}/fw",         # firmware chunks down
             f"topic write zs/v1/{tenant}/{station_id}/bearing",   # addendum H: bearing stream up
         }, f"station {serial} ACL has missing or excessive rights")
-    require(set(sections) == {"bridge"} | set(pilot_units), "unexpected MQTT ACL identity")
+    for consumer in set(sections) - {"bridge"} - set(pilot_units):
+        require(not consumer.startswith("DIO-EVT-") and sections[consumer] and
+                all(rule.startswith("topic read ") and rule.removeprefix("topic read ") in alert_topics
+                    for rule in sections[consumer]),
+                f"unexpected MQTT ACL identity or rights: {consumer}")
 
     for token in (
         "ZS_COMMAND_MAX_BYTES 2048u",

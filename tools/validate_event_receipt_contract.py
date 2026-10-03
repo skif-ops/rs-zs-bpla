@@ -312,7 +312,18 @@ def main() -> int:
     pilot_units = {f"DIO-EVT-{i:03d}": ("pilot1" if i <= 20 else "pilot2", i) for i in range(1, 41)}
     pilot_units["DIO-EVT-B01"] = ("bench", 901)
     tenants = ("bench", "pilot1", "pilot2")
-    require(set(sections) == {"bridge"} | set(pilot_units), "unexpected MQTT ACL identity")
+    # Besides the bridge and the stations, only a consumer of the output API dioneya.alert/1 over MQTT
+    # (protocols/DIONEYA_ALERT_API_v1.md, 4.4; registered by `pki.cli consumer-cert`) may appear, and it reads
+    # nothing but the alert topics of pilot tenants.
+    alert_topics = {f"dioneya/alert/v1/{tenant}" for tenant in tenants}
+    consumers = set(sections) - {"bridge"} - set(pilot_units)
+    require(set(pilot_units) <= set(sections) and "bridge" in sections, "unexpected MQTT ACL identity")
+    for consumer in consumers:
+        require(consumer != "bridge" and not consumer.startswith("DIO-EVT-") and sections[consumer] and
+                len(sections[consumer]) == len(set(sections[consumer])) and
+                all(rule.startswith("topic read ") and rule.removeprefix("topic read ") in alert_topics
+                    for rule in sections[consumer]),
+                f"unexpected MQTT ACL identity or rights: {consumer}")
     require(len(sections["bridge"]) == len(set(sections["bridge"])),
             "bridge MQTT ACL contains duplicate rights")
     require(set(sections["bridge"]) == {
@@ -322,7 +333,8 @@ def main() -> int:
                                ("read", "audio"),                       # audio: addendum B
                                ("read", "fwreq"), ("write", "fw"),      # firmware update: addendum F
                                ("read", "bearing"))                     # bearing stream: addendum H
-    }, "bridge MQTT ACL has missing or excessive rights")
+    } | {f"topic write {topic}" for topic in alert_topics},             # output API dioneya.alert/1 (4.4)
+    "bridge MQTT ACL has missing or excessive rights")
     for serial, (tenant, station_id) in pilot_units.items():
         rights = sections[serial]
         require(len(rights) == len(set(rights)),
