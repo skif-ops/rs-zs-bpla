@@ -49,7 +49,14 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    `--require-hashes`, а `sbom/server.cdx.json` воспроизводимо генерируется из
    byte-exact lock и проходит отдельные QG-1/QG-2.
 4. Нет подтверждённого clean deployment и backup/restore на Windows 11 и Ubuntu 24.04.
-5. Нет load/reconnect/dedup теста для 20 реальных станций.
+5. ЧАСТИЧНО: load/reconnect/dedup проверен на хосте с 41 синтетической станцией по пути
+   реального моста (`tools/load_field.py`, `tests/test_load_field.py`,
+   docs/SERVER_LOAD_FIELD_2026-10-03.md): сутки пилота со всеми сбоями связи
+   (154 634 сообщения, 305 сообщений/с, 170× реального времени) — всё сохранено ровно
+   один раз, повторы с тем же receipt, ни одного неподтверждённого сообщения,
+   читатели без блокировок; найдено и закрыто зависание моста после 20 ошибок
+   обработки (`StallGuard`). Открыто: тот же прогон с реальными станциями через
+   Mosquitto с TLS на целевом сервере.
 6. Нет OTA repository, canary rollout, pause и rollback audit.
 7. ЧАСТИЧНО: portable event outbox атомарно сохраняет schema-4 CBOR, metadata,
    SHA-256, приоритет и retry bitmap и проходит fault-injection. Серверная схема
@@ -133,5 +140,7 @@ pending events, а server/portable-firmware application receipt подтверж
 - secret scan;
 - clean deploy Windows 11 и Ubuntu 24.04;
 - broker mTLS/ACL и API auth tests;
-- 20-station soak не менее 24 часов;
+- 20-station soak не менее 24 часов (на хосте: сутки поля из 41 синтетической
+  станции пройдены, `tools/load_field.py --hours 24 --check`; с реальными станциями —
+  после партии EVT);
 - backup/restore и журнал отката OTA.
