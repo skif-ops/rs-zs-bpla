@@ -4,7 +4,7 @@ import asyncio, json, os, time
 from pathlib import Path
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse
-from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage, CommandKeyRotationRequest, FirmwareUpdateRequest, NetworkConfigRequest
+from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, AudioRequest, FeatureUpdateMessage, CommandKeyRotationRequest, FirmwareUpdateRequest, NetworkConfigRequest, RolloutRequest, RolloutReason, RevertRequest
 from station.command_codec import validate_command_payload
 from station.firmware_codec import ReleaseRepository, UPDATE_COMMAND
 from station.model_codec import ModelRepository, parse_model
@@ -20,7 +20,8 @@ from station.cbor_codec import decode_detection_cbor
 from station.http_transport import require_insecure_station_http_bench
 from station.online_type_service import OnlineTypeSessionService
 from station.access_scope import LIVE_RECHECK_S, LiveScope, close_revoked, scope_of
-from station import retention
+from station import retention, rollout
+from station.analysis_access import operator_of
 
 BASE=Path(__file__).resolve().parents[1]
 store=EventStore(BASE/'data'/'zs_bpla.sqlite3')
@@ -34,7 +35,7 @@ async def health():
     """Liveness, plus what fills the disk: the database and the audio files, free space, and the retention's last
     run (station/retention.py), so monitoring sees a full disk or a stuck cleanup without the logs."""
     return {'status':'ok','protocol':'1.5','service':'zs-bpla','storage':await asyncio.to_thread(store.storage_usage),
-            'retention':retention.RUNNER.status() if retention.RUNNER else None}
+            'retention':retention.RUNNER.status() if retention.RUNNER else None,'rollouts':rollout_runner.status()}
 
 @station_http_router.post('/stations/{station_id}/heartbeat')
 async def heartbeat(station_id:int,msg:HeartbeatMessage):
@@ -278,6 +279,69 @@ async def firmware_releases():
         except ValueError: out.append({'version':v,'error':'inconsistent'}); continue
         if r is not None: out.append({'version':v,'target':r.manifest.target,'size':r.manifest.size,'sha256':r.manifest.sha256.hex(),'release_key_id':r.key_id.hex()})
     return out
+
+# ---- firmware rollouts (station/rollout.py, docs/SERVER_OTA_ROLLOUT_2026-10-03.md): canary, waves, pause, revert ----
+rollout_runner=rollout.RolloutRunner(rollout.RolloutSettings.from_env())   # ticked by the app lifespan (app.py)
+
+def _actor(request:Request)->str:
+    op=operator_of(request); return str(op.get('name') or '') if op else ''
+
+def _rollout_call(fn,*args,**kwargs):
+    try: return fn(*args,**kwargs)
+    except rollout.RolloutError as exc:
+        raise HTTPException(404 if str(exc)=='rollout not found' else 409,str(exc)) from None
+
+def _visible_rollout(request:Request,rollout_id:str)->dict:
+    """A limited account sees a rollout only when it touches one of its stations."""
+    found=_rollout_call(rollout_runner.get,store,rollout_id)
+    if not scope_of(request,store).any_station(s['station_id'] for s in found['stations']): raise HTTPException(404,'rollout not found')
+    return found
+
+@router.get('/firmware/rollouts')
+async def firmware_rollouts(request:Request):
+    return rollout_runner.list(store,scope_of(request,store).station_list)
+
+@router.post('/firmware/rollouts')
+async def create_rollout(request:Request,req:RolloutRequest):
+    """A rollout of a repository release to stations: the canary stations first, the rest after they confirmed it;
+    at most max_in_flight stations commanded at a time; max_failures failures pause it.  The runner commands the
+    stations on its next tick (ZS_ROLLOUT_TICK_S)."""
+    scope=scope_of(request,store)
+    for s in req.stations:
+        if not scope.station(s): raise HTTPException(404,f'station {s} not found')
+    return _rollout_call(rollout_runner.create,store,firmware_repository(),version=req.version,stations=req.stations,canary=req.canary,
+                         canary_count=req.canary_count,max_failures=req.max_failures,max_in_flight=req.max_in_flight,actor=_actor(request))
+
+@router.get('/firmware/rollouts/{rollout_id}')
+async def get_rollout(request:Request,rollout_id:str):
+    return _visible_rollout(request,rollout_id)
+
+@router.post('/firmware/rollouts/{rollout_id}/pause')
+async def pause_rollout(request:Request,rollout_id:str,req:RolloutReason=Body(default=None)):
+    _visible_rollout(request,rollout_id)
+    return _rollout_call(rollout_runner.pause,store,rollout_id,actor=_actor(request),reason=req.reason if req else '')
+
+@router.post('/firmware/rollouts/{rollout_id}/resume')
+async def resume_rollout(request:Request,rollout_id:str):
+    _visible_rollout(request,rollout_id)
+    return _rollout_call(rollout_runner.resume,store,rollout_id,actor=_actor(request))
+
+@router.post('/firmware/rollouts/{rollout_id}/cancel')
+async def cancel_rollout(request:Request,rollout_id:str,req:RolloutReason=Body(default=None)):
+    _visible_rollout(request,rollout_id)
+    return _rollout_call(rollout_runner.cancel,store,rollout_id,actor=_actor(request),reason=req.reason if req else '')
+
+@router.post('/firmware/rollouts/{rollout_id}/revert')
+async def revert_rollout(request:Request,rollout_id:str,req:RevertRequest):
+    """Cancels the rollout and commands the revert release (a version above the reverted one: a station refuses a
+    version that is not newer) to every station the rollout commanded; answers the new rollout."""
+    _visible_rollout(request,rollout_id)
+    return _rollout_call(rollout_runner.revert,store,rollout_id,firmware_repository(),revert_version=req.version,actor=_actor(request),reason=req.reason)
+
+@router.post('/firmware/rollouts/{rollout_id}/stations/{station_id}/skip')
+async def skip_rollout_station(request:Request,rollout_id:str,station_id:int,req:RolloutReason=Body(default=None)):
+    _visible_rollout(request,rollout_id); _visible_station(request,station_id)
+    return _rollout_call(rollout_runner.skip,store,rollout_id,station_id,actor=_actor(request),reason=req.reason if req else '')
 
 def model_repository()->ModelRepository:
     """The model package repository the MQTT bridge serves from (ZS_MODEL_DIR, default server/data/models)."""

@@ -430,6 +430,27 @@ class FirmwareUpdateRequest(BaseModel):
     version: int = Field(strict=True, ge=1, le=0xFFFFFFFF)
 
 
+class RolloutRequest(BaseModel):
+    """A firmware rollout (station/rollout.py): the release, the stations, the canary stations (``canary`` or the first
+    ``canary_count`` of the list, default 1), and the limits that pause it or hold it back."""
+    version: int = Field(strict=True, ge=1, le=0xFFFFFFFF)
+    stations: list[int] = Field(min_length=1, max_length=10_000)
+    canary: list[int] | None = None
+    canary_count: int | None = Field(default=None, strict=True, ge=0)
+    max_failures: int | None = Field(default=None, strict=True, ge=1)
+    max_in_flight: int | None = Field(default=None, strict=True, ge=1)
+
+
+class RolloutReason(BaseModel):
+    reason: str = Field(default="", max_length=500)
+
+
+class RevertRequest(BaseModel):
+    """The revert release: a version above the reverted one (a station refuses a version that is not newer)."""
+    version: int = Field(strict=True, ge=1, le=0xFFFFFFFF)
+    reason: str = Field(default="", max_length=500)
+
+
 class NetworkConfigRequest(BaseModel):
     """ICD addendum G: the network fields to change (at least one); version defaults to the reported one + 1."""
     version: int | None = Field(default=None, strict=True, ge=1, le=0xFFFFFFFF)
