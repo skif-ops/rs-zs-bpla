@@ -41,6 +41,11 @@ isolated-bench configurations and must not be used for production.
   (Windows: `backup_windows.ps1 [-Destination]`): the databases are copied with
   the SQLite backup API inside the server container, so the archive is consistent
   while the server runs; never archive the live `*.sqlite3` with its `-wal`.
+  Restore with `deploy/scripts/restore_ubuntu.sh <archive>` (Windows:
+  `restore_windows.ps1 -Archive <archive>`): the services are stopped, the
+  archive is checked (a server backup, databases pass `integrity_check`), what
+  it replaces is kept in `output/backups/before_restore_<stamp>.tar.gz`, and the
+  services are started again.
 - Reverse proxy for the REST/WebSocket UI with HTTPS. The proxy must pass the
   original `Host` header (`proxy_set_header Host $host;` and the WebSocket
   `Upgrade`/`Connection` headers): changing requests made with the session cookie
