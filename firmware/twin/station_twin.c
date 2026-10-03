@@ -133,6 +133,7 @@ static FILE *uplink_log;                         /* --log-uplink: every publish 
 static uint64_t twin_wall_us(void);
 static void link_send(const char *topic, const uint8_t *payload, size_t n) {
   if (uplink_log) { fprintf(uplink_log, "%llu %s ", (unsigned long long)twin_wall_us(), topic); for (size_t i = 0u; i < n; i++) fprintf(uplink_log, "%02x", payload[i]); fputc('\n', uplink_log); }
+  if (link_out < 0) return;                      /* no server twin (--scene runs): the broker accepts, nobody answers, nothing to wait for */
   char *line = malloc(strlen(topic) + 2u * n + 16u);
   size_t k = (size_t)sprintf(line, "PUB %s ", topic);
   for (size_t i = 0u; i < n; i++) k += (size_t)sprintf(line + k, "%02x", payload[i]);
