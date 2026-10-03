@@ -8,7 +8,7 @@ from station.store import EventStore
 from fusion.solver import solve_target
 from fusion.geodesy import EnuFrame
 from fusion.kalman import ConstantVelocityKalman3D
-from station.track_fusion import BearingTrackFusion
+from station.track_hypotheses import HypothesisTrackFusion
 from integration.alert_producer import AlertProducer
 
 log=logging.getLogger(__name__)
@@ -28,7 +28,7 @@ class EventBus:
 class StationFusionService:
     def __init__(self,store:EventStore,correlation_window_s:float=3.0):
         self.store=store; self.window_us=int(correlation_window_s*1e6); self.bus=EventBus(); self.track_filters={}; self.track_frames={}
-        self.tracks=BearingTrackFusion(store)
+        self.tracks=HypothesisTrackFusion(store)
         self.alerts=AlertProducer(store)            # output API dioneya.alert/1 (the bridge sets its tenant)
     def _alert(self,handler,*args):
         """The output API never stops ingestion: a failure is logged and the station data stay stored."""

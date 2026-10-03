@@ -1,6 +1,6 @@
 """Bearing fusion (ICD addendum H, decision 2): bearings of two or more stations become the points of one target
-track.  Synthetic stations watch a target flying past; the batches go through the real bridge route
-(process_message) as the stations would publish them."""
+track (fusion/bearing_fusion.py; the association: station/track_hypotheses.py).  Synthetic stations watch a target
+flying past; the batches go through the real bridge route (process_message) as the stations would publish them."""
 
 import math
 
@@ -164,41 +164,69 @@ def test_arrival_order_and_redelivery_do_not_change_the_track(bridge, tmp_path):
     assert other.get_track(summary["track_id"])["track_points"] == before   # same id, same points in either order
 
 
+def in_time(streams: dict[int, list[bytes]]) -> list[tuple[int, bytes]]:
+    """The stations' batches in the order of their first bearing, as they reach the server live."""
+    return sorted(((s, b) for s, v in streams.items() for b in v), key=lambda sb: (cbor2.loads(sb[1])[5], sb[0]))
+
+
 def test_a_third_station_joins_the_existing_track(bridge):
     store, service = bridge
-    feed(store, service, (1, 2))
-    (before,) = store.list_tracks()
     late = [t for t in ARRIVALS if t > T0 + 30]                        # station 3 starts tracking later
-    assert publish(store, service, 3, detection(3, int(late[0] * 1e6)), "up") == "stored"
-    for b in batches(3, observe(3, late)):
-        assert publish(store, service, 3, b) == "stored"
+    streams = {1: batches(1, observe(1, ARRIVALS)), 2: batches(2, observe(2, ARRIVALS)), 3: batches(3, observe(3, late))}
+    for s, first in ((1, ARRIVALS[0]), (2, ARRIVALS[0]), (3, late[0])):
+        assert publish(store, service, s, detection(s, int(first * 1e6)), "up") == "stored"
+    before = None
+    for s, b in in_time(streams):
+        assert publish(store, service, s, b) == "stored"
+        if before is None and store.list_tracks():
+            before = store.list_tracks()[0]
     (after,) = store.list_tracks()
-    assert after["track_id"] == before["track_id"] and after["stations"] == [1, 2, 3]
+    assert before["stations"] == [1, 2]                                # the track of stations 1 and 2...
+    assert after["track_id"] == before["track_id"] and after["stations"] == [1, 2, 3]   # ...is the one station 3 joins
     points = store.get_track(after["track_id"])["track_points"]
-    assert any(p["stations"] == [1, 2, 3] for p in points)
+    assert sum(p["stations"] == [1, 2, 3] for p in points) >= 15
 
 
-def test_a_member_leaving_keeps_the_points_shown(bridge):
-    """A member that leaves a fused track (a better pair takes it, or it moves on after the track went quiet) does
-    not erase the points the track had: where the members left give no points, the points shown stay; where they
-    do, their fresh points replace the earlier ones."""
+def test_points_once_shown_are_never_rewritten(bridge):
+    """A track's points are final when stored: later batches add points, a member taken by another hypothesis or a
+    gap in a station's bearings never changes or removes the points shown (a ghost stays in the history as shown)."""
     store, service = bridge
-    feed(store, service, (1, 2, 3))
+    streams = {s: batches(s, observe(s, ARRIVALS)) for s in (1, 2, 3)}
+    for s in streams:
+        assert publish(store, service, s, detection(s, int(ARRIVALS[0] * 1e6)), "up") == "stored"
+    order = in_time(streams)
+    half = len(order) // 2
+    for s, b in order[:half]:
+        assert publish(store, service, s, b) == "stored"
     (summary,) = store.list_tracks()
-    track_id = summary["track_id"]
-    shown = store.get_track(track_id)["track_points"]
-    assert len(shown) >= 45 and all(p["stations"] == [1, 2, 3] for p in shown[5:-5])
-    store.remove_track_member(track_id, 1, event_id(1), 0)
-    store.remove_track_member(track_id, 2, event_id(2), 0)
-    store.add_track_member(track_id, 1, event_id(1), 12345)                # a segment of station 1 without bearings
-    result = service.tracks.recompute(track_id)                            # two stations, no fresh points
-    assert result["last"] is None and store.get_track(track_id)["track_points"] == shown
-    store.add_track_member(track_id, 2, event_id(2), 0)
-    result = service.tracks.recompute(track_id)                            # stations 2 and 3: fresh points
-    points = store.get_track(track_id)["track_points"]
-    fresh = [p for p in points if p["stations"] == [2, 3]]
-    assert len(fresh) >= 40 and len({p["time_us"] for p in points}) == len(points)
-    assert all(p["stations"] == [2, 3] for p in points if fresh[0]["time_us"] <= p["time_us"] <= fresh[-1]["time_us"])
+    shown = store.get_track(summary["track_id"])["track_points"]
+    assert len(shown) >= 15
+    for s, b in order[half:]:
+        assert publish(store, service, s, b) == "stored"
+    points = store.get_track(summary["track_id"])["track_points"]
+    assert points[:len(shown)] == shown and len(points) >= len(shown) + 25
+    times = [p["time_us"] for p in points]
+    assert times == sorted(set(times))
+    errs = [np.linalg.norm(FRAME.to_enu(p["lat"], p["lon"], p["alt_msl_m"])[:2] - truth(p["time_us"] * 1e-6)[:2]) for p in points]
+    assert np.median(errs) < 60.0 and all(p["stations"] == [1, 2, 3] for p in points[5:-5])
+
+
+def test_the_decision_survives_a_restart(bridge):
+    """The state of the decision (tracks' segments and filters, hypotheses waiting) is in the database: a server
+    restarted in the middle of a pass goes on with the same track."""
+    store, service = bridge
+    streams = {s: batches(s, observe(s, ARRIVALS)) for s in (1, 2)}
+    for s in streams:
+        assert publish(store, service, s, detection(s, int(ARRIVALS[0] * 1e6)), "up") == "stored"
+    order = in_time(streams)
+    for s, b in order[:len(order) // 2]:
+        assert publish(store, service, s, b) == "stored"
+    (before,) = store.list_tracks()
+    restarted = StationFusionService(store)
+    for s, b in order[len(order) // 2:]:
+        assert publish(store, restarted, s, b) == "stored"
+    (after,) = store.list_tracks()
+    assert after["track_id"] == before["track_id"] and after["points"] >= before["points"] + 20
 
 
 def test_a_station_looking_elsewhere_does_not_join(bridge):

@@ -34,6 +34,7 @@ CREATE INDEX IF NOT EXISTS idx_episode_open ON alert_episodes(tenant, ended_us);
 CREATE TABLE IF NOT EXISTS alert_tracks(track_id TEXT PRIMARY KEY, alert_id TEXT NOT NULL, last_point_us INTEGER NOT NULL, ended_us INTEGER);
 CREATE TABLE IF NOT EXISTS alert_cursors(consumer TEXT PRIMARY KEY, seq INTEGER NOT NULL, updated_us INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS station_tenants(station_id INTEGER PRIMARY KEY, tenant TEXT NOT NULL, updated_us INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS fusion_state(name TEXT PRIMARY KEY, value TEXT NOT NULL, updated_us INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS audio_parts(station_id INTEGER NOT NULL, command_id TEXT NOT NULL, segment INTEGER NOT NULL, chunk_index INTEGER NOT NULL, event_id INTEGER NOT NULL, chunk_count INTEGER NOT NULL, sample_rate INTEGER NOT NULL, start_time_us INTEGER NOT NULL, sha256 BLOB NOT NULL, data BLOB NOT NULL, received_us INTEGER NOT NULL, PRIMARY KEY(station_id, command_id, segment, chunk_index));
 """
 
@@ -338,7 +339,7 @@ class EventStore:
         return row['system_event_id'] if row else None
     def bearing_tracks(self,since_us:int,until_us:int,trusted:tuple[str,...]=('GNSS_TIME_TRUSTED','HOLDOVER'))->list[dict[str,Any]]:
         """Station tracks with trusted-time bearings overlapping [since_us, until_us] (their segments and the fused
-        tracks of the segments: station/track_fusion.py)."""
+        tracks of the segments: station/track_hypotheses.py)."""
         marks=','.join('?'*len(trusted))
         with self._conn() as c:
             rows=c.execute(f"SELECT b.station_id,b.track_event_id,MIN(b.time_us) AS first_us,MAX(b.time_us) AS last_us,COUNT(*) AS samples "
@@ -346,6 +347,13 @@ class EventStore:
                            f"HAVING MAX(b.time_us)>=? AND MIN(b.time_us)<=? ORDER BY first_us",(*trusted,since_us,until_us)).fetchall()
         return [{'station_id':r['station_id'],'track_event_id':r['track_event_id']&0xFFFFFFFFFFFFFFFF,'first_us':r['first_us'],'last_us':r['last_us'],
                  'samples':r['samples']} for r in rows]
+    def latest_bearing_times(self,since_us:int,trusted:tuple[str,...]=('GNSS_TIME_TRUSTED','HOLDOVER'))->dict[int,int]:
+        """The latest trusted bearing time of every station with bearings since since_us: {station_id: time_us}."""
+        q=",".join("?"*len(trusted))
+        with self._conn() as c:
+            rows=c.execute(f"SELECT station_id,MAX(time_us) t FROM bearings WHERE time_us>=? AND time_trust IN ({q}) GROUP BY station_id",
+                           (since_us,*trusted)).fetchall()
+        return {r['station_id']:r['t'] for r in rows}
     def station_position(self,station_id:int,event_id:int|None=None)->tuple[float,float,float]|None:
         """(lat, lon, alt MSL) of a station: the (position-guarded) detection of the track, else its last heartbeat, else
         its latest detection."""
@@ -400,6 +408,31 @@ class EventStore:
             c.executemany("INSERT INTO track_points VALUES(?,?,?)",[(track_id,p['time_us'],json.dumps(p)) for p in points])
             c.execute("INSERT OR REPLACE INTO fused_tracks VALUES(?,?,?,?,?,?,?)",(track_id,system_event_id,points[0]['time_us'] if points else None,
                       points[-1]['time_us'] if points else None,json.dumps(stations),len(points),when))
+    def set_track_members(self,track_id:str,members:list[tuple[int,int,int]]):
+        """The track's members are these segments now: each is taken from any other track (a segment is in one track
+        at a time); members it had before and not listed leave it."""
+        with self.lock,self._conn() as c:
+            c.execute("DELETE FROM track_members WHERE track_id=?",(track_id,))
+            c.executemany("INSERT OR REPLACE INTO track_members(station_id,track_event_id,track_id,segment_us) VALUES(?,?,?,?)",
+                          [(s,self._sqlite_event_id(t),track_id,g) for s,t,g in members])
+    def append_track_points(self,track_id:str,system_event_id:str|None,points:list[dict],now_us:int|None=None):
+        """New points of a track (a point of the same time replaces the stored one); the summary follows all points."""
+        when=int(time.time()*1e6) if now_us is None else now_us
+        with self.lock,self._conn() as c:
+            c.executemany("INSERT OR REPLACE INTO track_points VALUES(?,?,?)",[(track_id,p['time_us'],json.dumps(p)) for p in points])
+            row=c.execute("SELECT MIN(time_us) a,MAX(time_us) b,COUNT(*) n FROM track_points WHERE track_id=?",(track_id,)).fetchone()
+            stations=sorted({s for (pl,) in c.execute("SELECT payload FROM track_points WHERE track_id=?",(track_id,))
+                             for s in json.loads(pl).get('stations',[])})
+            old=c.execute("SELECT system_event_id FROM fused_tracks WHERE track_id=?",(track_id,)).fetchone()
+            sid=system_event_id or (old['system_event_id'] if old else None)
+            c.execute("INSERT OR REPLACE INTO fused_tracks VALUES(?,?,?,?,?,?,?)",(track_id,sid,row['a'],row['b'],json.dumps(stations),row['n'],when))
+    def fusion_state(self,name:str)->dict[str,Any]|None:
+        with self._conn() as c:
+            row=c.execute("SELECT value FROM fusion_state WHERE name=?",(name,)).fetchone()
+        return json.loads(row['value']) if row else None
+    def save_fusion_state(self,name:str,value:dict[str,Any]):
+        with self.lock,self._conn() as c:
+            c.execute("INSERT OR REPLACE INTO fusion_state VALUES(?,?,?)",(name,json.dumps(value),int(time.time()*1e6)))
     def _track_summary(self,r)->dict[str,Any]:
         return {'track_id':r['track_id'],'system_event_id':r['system_event_id'],'first_time_us':r['first_time_us'],'last_time_us':r['last_time_us'],
                 'stations':json.loads(r['stations']),'points':r['points'],'updated_us':r['updated_us']}

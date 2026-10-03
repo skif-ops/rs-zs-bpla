@@ -8,7 +8,7 @@ weighted by its lateral error (range x bearing sigma), so the error follows the 
 between two stations (the blind zone of triangulation) and such points are refused.  The height comes from the
 elevations.  A constant-velocity Kalman filter smooths the points and gives speed and course.
 
-Pure functions only: no storage, no association (station/track_fusion.py does both).
+Pure functions only: no storage, no association (station/track_hypotheses.py does both).
 """
 from __future__ import annotations
 
@@ -98,7 +98,7 @@ class TrackPoint:
     course_deg: float
     crossing_deg: float
     stations: tuple[int, ...] = field(default_factory=tuple)
-    height_spread: float = 0.0      # not stored: used to tell ghost intersections (station/track_fusion.py)
+    height_spread: float = 0.0      # not stored: used to tell ghost intersections (station/track_hypotheses.py)
 
     def as_dict(self) -> dict:
         return {"time_us": self.time_us, "lat": self.lat, "lon": self.lon, "alt_msl_m": self.alt_msl_m,

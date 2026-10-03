@@ -233,10 +233,13 @@ def detection2(station: int, time_us: int, class_id: int, f0_hz: float, boot: in
                         9: features, 10: {}, 12: {}, 13: {}, 14: {}}, canonical=True)
 
 
-def feed_station(store, service, station: int, target, class_id: int, f0_hz: float):
-    from tests.test_bearing_fusion import batches
-    assert publish(store, service, station, detection2(station, int(ARRIVALS[0] * 1e6), class_id, f0_hz), "up") == "stored"
-    for b in batches(station, observe2(station, target)):
+def feed_stations(store, service, *stations: tuple[int, object, int, float]):
+    """Stations (id, target, class, fundamental) heard at once: their detections, then their batches as they reach
+    the server live (in the order of their first bearing)."""
+    from tests.test_bearing_fusion import batches, in_time
+    for station, _, class_id, f0_hz in stations:
+        assert publish(store, service, station, detection2(station, int(ARRIVALS[0] * 1e6), class_id, f0_hz), "up") == "stored"
+    for station, b in in_time({station: batches(station, observe2(station, target)) for station, target, _, _ in stations}):
         assert publish(store, service, station, b) == "stored"
 
 
@@ -244,23 +247,24 @@ def members(store) -> list[set[int]]:
     return sorted(({m["station_id"] for m in store.get_track(t["track_id"])["members"]} for t in store.list_tracks()), key=min)
 
 
-def test_two_targets_same_class_form_a_ghost_pair(bridge):
-    """The control: stations 1 and 3 hear different targets whose rays still cross; without a difference in class
-    or fundamental the first two station tracks pair into a ghost."""
+def test_two_targets_same_class_crossing_with_heights_apart_form_no_ghost(bridge):
+    """Stations 1 and 3 hear different targets of one class whose rays cross ahead of both: class and fundamental do
+    not tell them apart, but the heights the two stations' elevations give at the crossing disagree (more than 3
+    sigma), so the crossing explains no bearing and no track is formed (station/track_hypotheses.py)."""
     store, service = bridge
-    feed_station(store, service, 1, truth, 1, 110.0)
-    feed_station(store, service, 3, target_b, 1, 115.0)
-    assert members(store) == [{1, 3}]
+    feed_stations(store, service, (1, truth, 1, 110.0), (3, target_b, 1, 115.0))
+    assert store.list_tracks() == []
+    assert not [m for m in store.list_alerts(0, limit=10000) if m["type"] == "track.update"]
 
 
 @pytest.mark.parametrize("class_b,f0_b", [(3, 115.0), (1, 240.0)])     # another class, or the same class another note
-def test_two_targets_are_kept_apart_by_class_or_fundamental(bridge, class_b, f0_b):
+def test_two_targets_are_kept_apart_by_class_or_fundamental(bridge, tmp_path, class_b, f0_b):
     store, service = bridge
-    feed_station(store, service, 1, truth, 1, 110.0)
-    feed_station(store, service, 3, target_b, class_b, f0_b)
+    feed_stations(store, service, (1, truth, 1, 110.0), (3, target_b, class_b, f0_b))
     assert store.list_tracks() == []                                  # no ghost from 1 x 3
-    feed_station(store, service, 2, truth, 1, 104.0)                  # Doppler-shifted note of the same engine
-    feed_station(store, service, 4, target_b, class_b, f0_b * 1.05)
+    store = EventStore(tmp_path / "four.sqlite3")
+    feed_stations(store, StationFusionService(store), (1, truth, 1, 110.0), (3, target_b, class_b, f0_b),
+                  (2, truth, 1, 104.0), (4, target_b, class_b, f0_b * 1.05))   # 2: a Doppler-shifted note of 1's engine
     assert members(store) == [{1, 2}, {3, 4}]
     for summary in store.list_tracks():
         track = store.get_track(summary["track_id"])

@@ -6,7 +6,7 @@ keep-alive detections of the same window; a segment of it (station/track_segment
 of its time span.  Their classification and fundamental frequency (feature 0 of the 43,
 ``fundamental_hz``) describe the target the station tracks.  Two station tracks whose known classes differ, or whose
 fundamentals are further apart than the Doppler shift between two stations allows, hear different targets: their
-rays are not intersected (station/track_fusion.py), and the output API reports the class of a track from them.
+rays are not intersected (station/track_hypotheses.py), and the output API reports the class of a track from them.
 """
 from __future__ import annotations
 

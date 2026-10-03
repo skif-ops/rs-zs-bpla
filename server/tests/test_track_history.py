@@ -1,15 +1,12 @@
-"""History of a fused track (station/track_fusion.py, ``recompute``): the points shown before stay where the members
-cannot give points any more, and fresh points replace them where they can.  A station's last bearings serve emission
-times up to MAX_NEAREST_S after them less the sound's travel time, so a target passing close to a station whose
-bearings end gives a fresh point at an emission time later than the station's last bearing; that point must replace
-the one shown before, not be stored next to it (one point per time: a UNIQUE key of the store)."""
+"""History of a fused track (station/track_hypotheses.py): points are added once a second of emission time and never
+rewritten.  A target passing close to a station whose bearings end is the case where a station's last bearings
+serve emission times after them (fusion/bearing_fusion.py, MAX_NEAREST_S): still one point per time, in time order,
+and a redelivered batch changes nothing."""
 
 import numpy as np
 
-from fusion.bearing_fusion import MAX_NEAREST_S, TrackPoint
-from station import track_fusion
 from station.store import EventStore
-from tests.test_bearing_fusion import T0, batches, bridge, detection, observe, publish  # noqa: F401
+from tests.test_bearing_fusion import T0, batches, bridge, detection, in_time, observe, publish  # noqa: F401
 
 
 def road(te: float) -> np.ndarray:
@@ -21,36 +18,35 @@ STATION1 = [T0 + 0.5 * k for k in range(1, 38)]       # its bearings end 1.5 s b
 STATION2 = [T0 + 0.5 * k for k in range(1, 81)]
 
 
-def test_a_point_after_a_stations_last_bearing_replaces_the_one_shown_before(bridge):  # noqa: F811
+def test_a_close_pass_gives_one_point_per_time_and_redelivery_changes_nothing(bridge):  # noqa: F811
     store, service = bridge
     streams = {1: batches(1, observe(1, STATION1, target=road)), 2: batches(2, observe(2, STATION2, target=road))}
     for s in streams:
         assert publish(store, service, s, detection(s, int(T0 * 1e6)), "up") == "stored"
-    order = [(s, v[k]) for k in range(max(len(v) for v in streams.values())) for s, v in streams.items() if k < len(v)]
-    for s, b in order:
+    for s, b in in_time(streams):
         assert publish(store, service, s, b) == "stored"
     (summary,) = store.list_tracks()
-    track_id = summary["track_id"]
-    last_us = int(round(STATION1[-1] * 1e6))
-    times = [p["time_us"] for p in store.get_track(track_id)["track_points"]]
-    late = [t for t in times if last_us < t <= last_us + MAX_NEAREST_S * 1e6]
-    assert late, times                                   # the case at hand: a point after station 1's last bearing
-    assert len(times) == len(set(times)) and times == sorted(times)
-    service.tracks.recompute(track_id)                   # a redelivered batch changes nothing
-    assert [p["time_us"] for p in store.get_track(track_id)["track_points"]] == times
+    points = store.get_track(summary["track_id"])["track_points"]
+    times = [p["time_us"] for p in points]
+    assert len(times) >= 10 and times == sorted(set(times))
+    assert summary["points"] == len(points) and summary["first_time_us"] == times[0] and summary["last_time_us"] == times[-1]
+    for s, v in streams.items():
+        assert publish(store, service, s, v[3]) == "duplicate"           # QoS 1 redelivery
+    assert store.get_track(summary["track_id"])["track_points"] == points
 
 
-def test_fresh_points_win_over_old_ones_of_the_same_time_whatever_the_spans(tmp_path, monkeypatch):
-    """No two points of a track share a time even where the member spans do not cover a fresh point's time (here: no
-    member bearings at all) and the fusion returned one time twice."""
+def test_appended_points_keep_one_point_per_time_and_the_summary(tmp_path):
     store = EventStore(tmp_path / "h.sqlite3")
     t0 = int(T0 * 1e6)
 
-    def point(dt_s: int, alt: float) -> TrackPoint:
-        return TrackPoint(t0 + dt_s * 1_000_000, 55.0, 37.0, alt, 50.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 30.0, (1, 2))
+    def point(dt_s: int, alt: float, stations: list[int]) -> dict:
+        return {"time_us": t0 + dt_s * 1_000_000, "lat": 55.0, "lon": 37.0, "alt_msl_m": alt, "stations": stations}
 
-    store.replace_track("TRK-h", [], None, [point(10, 100.0).as_dict(), point(11, 100.0).as_dict()])
-    monkeypatch.setattr(track_fusion, "fuse", lambda stations: [point(11, 200.0), point(11, 200.0), point(12, 200.0)])
-    track_fusion.BearingTrackFusion(store).recompute("TRK-h")
-    points = store.get_track("TRK-h")["track_points"]
-    assert [(p["time_us"] - t0, p["alt_msl_m"]) for p in points] == [(10_000_000, 100.0), (11_000_000, 200.0), (12_000_000, 200.0)]
+    store.append_track_points("TRK-h", None, [point(10, 100.0, [1, 2]), point(11, 100.0, [1, 2])])
+    store.append_track_points("TRK-h", "AIR_ALERT-x", [point(11, 200.0, [1, 3]), point(12, 200.0, [1, 3])])
+    track = store.get_track("TRK-h")
+    assert [(p["time_us"] - t0, p["alt_msl_m"]) for p in track["track_points"]] == [(10_000_000, 100.0), (11_000_000, 200.0), (12_000_000, 200.0)]
+    assert track["points"] == 3 and track["stations"] == [1, 2, 3] and track["system_event_id"] == "AIR_ALERT-x"
+    assert (track["first_time_us"], track["last_time_us"]) == (t0 + 10_000_000, t0 + 12_000_000)
+    store.append_track_points("TRK-h", None, [point(13, 200.0, [1, 3])])
+    assert store.get_track("TRK-h")["system_event_id"] == "AIR_ALERT-x"   # kept when the new points name none

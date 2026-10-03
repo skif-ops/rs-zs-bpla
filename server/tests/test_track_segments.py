@@ -123,26 +123,26 @@ def test_a_station_switching_targets_feeds_both_tracks(bridge):  # noqa: F811
     for s in streams:
         assert publish(store, service, s, detection(s, int(ARRIVALS[0] * 1e6)), "up") == "stored"
     order = [(s, b) for k in range(len(ARRIVALS)) for s, rows in streams.items() for b in batches(s, rows)[k:k + 1]]
+    members_seen: dict[str, set] = {}
     for s, b in order:
         assert publish(store, service, s, b) == "stored"
-    every = {t["track_id"]: store.get_track(t["track_id"]) for t in store.list_tracks()}
-    tracks = {k: t for k, t in every.items() if t["members"]}
-    assert len(tracks) == 2, list(every)
-    # a ghost (rays of stations hearing different targets cross near the stations) may have been shown for a few
-    # seconds before the better pair took its segment: it stays in the history, short and without members
-    ghosts = [t for k, t in every.items() if not t["members"]]
-    assert len(ghosts) <= 1 and all(t["last_time_us"] - t["first_time_us"] <= 15_000_000 for t in ghosts), ghosts
+        for t in store.list_tracks():                            # the members of each track while it is tracked
+            members_seen.setdefault(t["track_id"], set()).update((m["station_id"], m["segment_us"]) for m in store.get_track(t["track_id"])["members"])
+    tracks = {t["track_id"]: store.get_track(t["track_id"]) for t in store.list_tracks()}
+    assert len(tracks) == 2, list(tracks)
 
     def error(track, target):
         return float(np.median([np.linalg.norm(FRAME.to_enu(p["lat"], p["lon"], p["alt_msl_m"])[:2] - target(p["time_us"] * 1e-6)[:2])
                                 for p in track["track_points"]]))
 
-    north = next(t for t in tracks.values() if {m["station_id"] for m in t["members"]} == {1, 2})
-    southern = next(t for t in tracks.values() if {m["station_id"] for m in t["members"]} == {1, 3})
+    north = next(t for t in tracks.values() if t["stations"] == [1, 2])
+    southern = next(t for t in tracks.values() if t["stations"] == [1, 3])
     switch_us = streams[1][half]["time_us"]
-    assert [m["segment_us"] for m in north["members"] if m["station_id"] == 1] == [track_segments.FIRST_SEGMENT]
-    assert [m["segment_us"] for m in southern["members"] if m["station_id"] == 1] == [switch_us]
+    assert members_seen[north["track_id"]] == {(1, track_segments.FIRST_SEGMENT), (2, track_segments.FIRST_SEGMENT)}
+    assert members_seen[southern["track_id"]] == {(1, switch_us), (3, track_segments.FIRST_SEGMENT)}
     assert southern["track_id"] == f"TRK-{event_id(1):016x}-1-{switch_us:x}"            # the later segment's time
+    assert not north["members"]                     # over (no point for 20 s after station 1 left): its segments are free
+    assert [m["segment_us"] for m in southern["members"] if m["station_id"] == 1] == [switch_us]
     assert error(north, truth) < 80.0 and error(southern, south) < 80.0, (error(north, truth), error(southern, south))
     assert len(southern["track_points"]) >= 20 and len(north["track_points"]) >= 20      # 30 s of two stations each
 
