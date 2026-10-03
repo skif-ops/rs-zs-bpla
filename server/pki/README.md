@@ -1,8 +1,8 @@
 # server/pki - Muhoed internal PKI
 
 Root CA offline, issuing CA on the server, station certificates by CSR (CN = serial),
-registry for the 41-unit pilot (2 lots x 20 + bench), generated mosquitto ACL,
-enclosure label QR with the per-unit pairing secret.
+registry for the 41-unit pilot (2 lots x 20 + bench) and for the consumers of the output API,
+generated mosquitto ACL, enclosure label QR with the per-unit pairing secret.
 
 ```
 pip install -r requirements-pki.txt
@@ -26,6 +26,13 @@ python -m pki.cli station-sign DIO-EVT-012 --csr DIO-EVT-012.csr.pem
 python -m pki.cli bundle --mqtt-host muhoed.example.ru
 python -m pki.cli station-package DIO-EVT-012 --out /media/eol
 python -m pki.cli mosquitto-acl --out deploy/mosquitto/station_acl.conf
+```
+
+Consumers of the output API over MQTT (dioneya.alert/1, protocols/DIONEYA_ALERT_API_v1.md 4.4):
+```
+python -m pki.cli consumer-cert platform --tenants pilot1,pilot2   # key + cert (CN=platform) + ca-chain in consumers/platform
+python -m pki.cli mosquitto-acl --out deploy/mosquitto/station_acl.conf   # read dioneya/alert/v1/{tenant} for it
+python -m pki.cli consumer-revoke platform --reason "contract ended"      # CRL, then the ACL again
 ```
 
 Labels (protocols/STATION_LABEL_QR_v0_1.md):

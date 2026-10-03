@@ -208,7 +208,7 @@ def test_follow_up_failure_does_not_block_the_ack(tmp_path: Path):
 def test_acl_lets_the_station_write_and_the_bridge_read_the_audio_topic():
     row = SimpleNamespace(serial="DIO-1", station_id=3, tenant="pilot1")
     assert ("write", "zs/v1/pilot1/3/audio") in station_topics(row)
-    acl = render_acl(SimpleNamespace(active=lambda: [row]))
+    acl = render_acl(SimpleNamespace(active=lambda: [row], consumers=lambda status=None: []))
     bridge, station = acl.split("user DIO-1")
     assert "topic read zs/v1/pilot1/+/audio" in bridge and "topic write zs/v1/pilot1/3/audio" in station
 
