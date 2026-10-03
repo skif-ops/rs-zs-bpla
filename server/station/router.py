@@ -20,6 +20,7 @@ from station.cbor_codec import decode_detection_cbor
 from station.http_transport import require_insecure_station_http_bench
 from station.online_type_service import OnlineTypeSessionService
 from station.access_scope import LIVE_RECHECK_S, LiveScope, close_revoked, scope_of
+from station import retention
 
 BASE=Path(__file__).resolve().parents[1]
 store=EventStore(BASE/'data'/'zs_bpla.sqlite3')
@@ -29,7 +30,11 @@ router=APIRouter(prefix='/api/v1',tags=['ZS-BPLA stations'])
 station_http_router=APIRouter(dependencies=[Depends(require_insecure_station_http_bench)])
 
 @router.get('/health')
-async def health(): return {'status':'ok','protocol':'1.5','service':'zs-bpla'}
+async def health():
+    """Liveness, plus what fills the disk: the database and the audio files, free space, and the retention's last
+    run (station/retention.py), so monitoring sees a full disk or a stuck cleanup without the logs."""
+    return {'status':'ok','protocol':'1.5','service':'zs-bpla','storage':await asyncio.to_thread(store.storage_usage),
+            'retention':retention.RUNNER.status() if retention.RUNNER else None}
 
 @station_http_router.post('/stations/{station_id}/heartbeat')
 async def heartbeat(station_id:int,msg:HeartbeatMessage):
