@@ -24,8 +24,10 @@ typedef struct {
   size_t count;
   float noise;                   /* background level 0..1 */
   uint32_t rng;
-  double phase[24];
+  double phase[48];              /* 0..39: the four rotors' harmonics of a multirotor; 40..45: the ground vehicle */
   double pink;
+  double hiss_lp, hiss_hp;       /* the blade hiss shaping filters of the multirotor */
+  double rpm;                    /* the multirotor's slow speed wander, a fraction of f0 */
   uint64_t sample;
   uint32_t bg_rng[3];            /* independent backgrounds of microphones 2..4 */
   double bg_pink[3];
