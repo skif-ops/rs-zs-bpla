@@ -11,7 +11,7 @@ from station.event_receipt_codec import (
     decode_event_receipt,
     encode_event_receipt,
 )
-from station.mqtt_bridge import build_event_receipt, handle_message, process_message
+from station.mqtt_bridge import StallGuard, build_event_receipt, handle_message, process_message
 from station.service import StationFusionService
 from station.store import EventStore
 
@@ -268,3 +268,28 @@ def test_receipt_supports_full_uint64_event_id(tmp_path: Path):
     assert decode_event_receipt(receipt_payload).event_id == event_id
     with store._conn() as connection:
         assert connection.execute("SELECT COUNT(*) FROM detections").fetchone()[0] == 1
+
+
+class AlwaysFailingFusion(CountingFusion):
+    def ingest(self, detection):
+        self.calls += 1
+        raise RuntimeError("the database is gone")
+
+
+def test_stall_guard_counts_messages_left_unacknowledged(tmp_path: Path):
+    """A processing error leaves the QoS 1 message in flight; Mosquitto stops delivering after 20 of them, so the
+    bridge counts them and exits at the limit (docs/SERVER_LOAD_FIELD_2026-10-03.md, §4)."""
+    store = EventStore(tmp_path / "events.sqlite3")
+    fusion = AlwaysFailingFusion(StationFusionService(store))
+    guard = StallGuard(limit=3)
+    client = ReceiptClient()
+    for i in range(3):
+        assert not guard.stalled()
+        assert handle_message(client, mqtt_message(detection_payload(event_id=80 + i), mid=50 + i), "evt", True,
+                              event_store=store, fusion_service=fusion, guard=guard) is False
+    assert client.actions == [] and guard.unacked == 3 and guard.stalled()
+    # a malformed message is discarded with an acknowledgement and does not count
+    assert handle_message(client, mqtt_message(b"\xff", mid=60), "evt", True, event_store=store, fusion_service=fusion,
+                          guard=StallGuard(limit=1)) is False
+    assert client.actions == [("mqtt_ack", 60, 1)]
+    assert StallGuard().limit == 10 < 20                     # below Mosquitto's default max_inflight_messages

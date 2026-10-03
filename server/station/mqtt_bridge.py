@@ -340,6 +340,24 @@ def answer_firmware_request(
     return "fw_served"
 
 
+# A message handle_message could not process stays in flight unacknowledged (the broker redelivers it to the next
+# session only), and Mosquitto delivers at most max_inflight_messages (20 by default) QoS 1 messages to a client ahead
+# of its acknowledgements: after that many processing errors the bridge would receive nothing more and still look
+# alive.  StallGuard counts them; at the limit the bridge exits (code 3) and the container restarts it (compose:
+# restart unless-stopped) with a fresh session, while the stations repeat their detections until the application
+# receipt (docs/SERVER_LOAD_FIELD_2026-10-03.md, §4).
+UNACKED_LIMIT = 10
+
+
+class StallGuard:
+    def __init__(self, limit: int = UNACKED_LIMIT):
+        self.limit = limit
+        self.unacked = 0
+
+    def stalled(self) -> bool:
+        return self.unacked >= self.limit
+
+
 def handle_message(
     client,
     message,
@@ -351,9 +369,11 @@ def handle_message(
     on_new_detection=None,
     firmware_repository: ReleaseRepository | None = None,
     model_repository: ReleaseRepository | None = None,
+    guard: StallGuard | None = None,
 ) -> bool:
     """Process then MQTT-ACK; discard invalid input but retry transient failures.  ``on_new_detection`` runs for a
-    newly stored detection after its receipt went out (the audio auto-request); its failure never blocks the ACK."""
+    newly stored detection after its receipt went out (the audio auto-request); its failure never blocks the ACK.
+    ``guard`` counts the messages left unacknowledged by processing errors."""
 
     try:
         if type(message.qos) is not int or message.qos != 1 or getattr(message, "retain", False):
@@ -395,6 +415,8 @@ def handle_message(
         return False
     except Exception as exc:
         print(f"MQTT processing error: {type(exc).__name__}", file=sys.stderr)
+        if guard is not None:
+            guard.unacked += 1
         return False
     if message.qos:
         client.ack(message.mid, message.qos)
@@ -463,10 +485,12 @@ def main(argv: list[str] | None = None) -> None:
         if command is not None:
             print(f"MQTT audio request {command.command_id} for station {detection.station_id}", file=sys.stderr)
 
+    guard = StallGuard()
+
     def on_message(client_obj, userdata, message):
         del userdata
         handle_message(client_obj, message, args.tenant, tls_enabled, on_new_detection=on_new_detection,
-                       firmware_repository=firmware_repository, model_repository=model_repository)
+                       firmware_repository=firmware_repository, model_repository=model_repository, guard=guard)
 
     client.on_connect = on_connect
     client.on_message = on_message
@@ -474,6 +498,10 @@ def main(argv: list[str] | None = None) -> None:
     client.loop_start()
     try:
         while True:
+            if guard.stalled():
+                print(f"MQTT bridge: {guard.unacked} messages left unacknowledged after processing errors; "
+                      "exiting for a restart with a fresh session", file=sys.stderr)
+                raise SystemExit(3)
             if client.is_connected():
                 published, failed = publish_due_commands(
                     client,
