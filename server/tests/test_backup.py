@@ -55,8 +55,16 @@ def test_zip_archive_and_command_line(tmp_path, capsys):
         assert "data/zs_bpla.sqlite3" in names and "output/report.txt" in names and not any(n.endswith("-wal") for n in names)
         z.extract("data/zs_bpla.sqlite3", tmp_path / "restore")
     assert sqlite3.connect(tmp_path / "restore" / "data" / "zs_bpla.sqlite3").execute("PRAGMA integrity_check").fetchone()[0] == "ok"
-    # the default destination: output/backups/backup_<stamp>.tar.gz under the server directory
+    # the default destination: backups/backup_<stamp>.tar.gz beside data and output, outside both
     assert backup.main(["--server-dir", str(tmp_path)]) == 0
-    (default,) = list((tmp_path / "output" / "backups").glob("backup_*.tar.gz"))
+    (default,) = list((tmp_path / "backups").glob("backup_*.tar.gz"))
     with tarfile.open(default) as t:
         assert "data/zs_bpla.sqlite3" in t.getnames()
+
+
+def test_earlier_archives_in_output_backups_are_not_archived_again(tmp_path):
+    make_server(tmp_path)
+    inside = tmp_path / "output" / "backups" / "backup_20261003_110000.tar.gz"      # where the deployment scripts write
+    assert backup.main(["--server-dir", str(tmp_path), "--out", str(inside)]) == 0
+    names = backup.write_archive(tmp_path, tmp_path / "second.tar.gz")
+    assert "output/report.txt" in names and not any(n.startswith("output/backups/") for n in names)

@@ -79,7 +79,11 @@ isolated-bench configurations and must not be used for production.
   those stations and what they took part in, in every API, stream and the
   `dioneya.alert/1` output. The security admin and engineers set it from the
   web too (`PUT /api/v1/access/accounts/<name>/scope`); a station's tenant is
-  the tenant of the MQTT bridge its messages come through.
+  the tenant of the MQTT bridge its messages come through. A file analysis
+  (`/single`, `/localization`) belongs to the account that ran it: its plots,
+  reports and separated audio are seen by that account, by accounts without
+  limits and by accounts whose tenants cover the maker's
+  (docs/SERVER_ACCESS_CONTROL_2026-10-02.md, §10).
 
   The superuser `skif_root` (role `superuser`, every permission, every station,
   the switch of the audit log of actions) is created by the server itself with
