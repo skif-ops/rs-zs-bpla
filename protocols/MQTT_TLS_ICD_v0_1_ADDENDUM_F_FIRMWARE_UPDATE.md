@@ -94,7 +94,9 @@ fw_other_version`.
   `.fw_info` образа, SHA-256 и размер считаются); ключ выпуска — `python -m pki.cli fw-release-key --out <release.pem>` (PKCS#8 PEM,
   `0600`, публичный ключ печатается для `-DZS_FW_RELEASE_PUBLIC_KEYS`).
 - Оператор: `POST /api/v1/stations/{id}/firmware-update` `{"version": N}` (роль `operator`) ставит команду 5 с манифестом
-  и подписью выпуска N; `GET /api/v1/firmware/releases` — список выпусков хранилища.
+  и подписью выпуска N; `GET /api/v1/firmware/releases` — список выпусков хранилища. Группе станций выпуск ставит
+  раскатка `POST /api/v1/firmware/rollouts` (canary-волна, предел станций в полёте, автопауза по отказам, возврат
+  возвратным выпуском, журнал; `docs/SERVER_OTA_ROLLOUT_2026-10-03.md`).
 - Bridge подписывается на `+/fwreq` и отвечает кусками по правилам §2; ACL брокера: станция пишет в свой `fwreq`,
   читает свой `fw`; сервер наоборот.
 
