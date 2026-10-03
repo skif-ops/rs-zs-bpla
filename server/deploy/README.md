@@ -22,6 +22,14 @@ isolated-bench configurations and must not be used for production.
 - Server-side `station_id` authorization, rate limiting and replay protection.
 - Broker ACL permits the bridge to publish event application receipts and each
   station credential to read only its own `receipt` topic.
+- The output API `dioneya.alert/1` over MQTT (`mqtt_alerts` service, the bridge
+  certificate): topic `dioneya/alert/v1/{tenant}`, QoS 1. A consumer gets its own
+  client certificate and its tenants from the PKI (`python -m pki.cli consumer-cert
+  <name> --tenants ...`), the regenerated ACL gives it read access to those topics
+  only; revoke with `consumer-revoke` (CRL + ACL again). The broker keeps up to
+  10 000 queued messages and the session for 7 days for a consumer that is away
+  (`max_queued_messages`, `persistent_client_expiration`); older backlog is caught
+  up over `/api/v1/alerts?after_seq=`.
 - Persistent database volume and backup policy.
 - Reverse proxy for the REST/WebSocket UI with HTTPS. The proxy must pass the
   original `Host` header (`proxy_set_header Host $host;` and the WebSocket
