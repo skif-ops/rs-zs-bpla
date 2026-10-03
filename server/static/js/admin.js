@@ -223,7 +223,7 @@
     }
     const tenantOptions = catalog.tenants.map((t) => ({ value: t, label: t }));
     const stationOptions = [...catalog.stations]
-      .sort((a, b) => (a.tenant || "￿").localeCompare(b.tenant || "￿") || a.station_id - b.station_id)
+      .sort((a, b) => (a.tenant ? 0 : 1) - (b.tenant ? 0 : 1) || (a.tenant || "").localeCompare(b.tenant || "") || a.station_id - b.station_id)
       .map((s) => ({ value: String(s.station_id), group: s.tenant || "участок не известен",
                      label: `${s.station_id}${s.serial ? ` · ${s.serial}` : ""}${s.seen ? "" : " · не выходила на связь"}` }));
     $("scopes-body").replaceChildren(...list.map((a) => {
