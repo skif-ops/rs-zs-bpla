@@ -1,12 +1,19 @@
 """SQLite persistence for stations, detections, events and commands."""
 from __future__ import annotations
-import json, os, sqlite3, threading, time, uuid
+import json, os, shutil, sqlite3, threading, time, uuid
 from pathlib import Path
 from typing import Any
 from station.schemas import DetectionMessage, HeartbeatMessage, SecurityEventMessage, StationCommand, SystemEvent
 
 COMMAND_TTL_US = 15 * 60 * 1_000_000
+DAY_US = 86_400 * 1_000_000
+# Retention (docs/SERVER_RETENTION_2026-10-03.md): events, bearings and tracks about three months, the audio of the
+# events a month, the outbox of dioneya.alert/1 the time its consumers may need to catch up.  station/retention.py
+# runs cleanup() with the configured values once a day.
+RETENTION_DAYS = 90
+AUDIO_RETENTION_DAYS = 30
 ALERT_OUTBOX_DAYS = 30             # consumers catch up from the outbox within this time (dioneya.alert/1)
+TRACK_SPAN_MAX_US = 2 * 900 * 1_000_000   # twice the longest station track (track_max_s <= 900 s): the fusion's look-back
 
 SCHEMA = """
 PRAGMA journal_mode=WAL;
@@ -18,6 +25,7 @@ CREATE TABLE IF NOT EXISTS system_events(system_event_id TEXT PRIMARY KEY, creat
 CREATE INDEX IF NOT EXISTS idx_evt_time ON system_events(created_us);
 CREATE TABLE IF NOT EXISTS security_events(event_id INTEGER NOT NULL, station_id INTEGER NOT NULL, created_us INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(station_id, event_id));
 CREATE TABLE IF NOT EXISTS mqtt_detection_ingress(event_key BLOB NOT NULL, station_id INTEGER NOT NULL, boot_id INTEGER NOT NULL, seq_no INTEGER NOT NULL, event_time_us INTEGER NOT NULL, wire_sha256 BLOB NOT NULL, processed INTEGER NOT NULL DEFAULT 0 CHECK(processed IN (0,1)), PRIMARY KEY(station_id, event_key));
+CREATE INDEX IF NOT EXISTS idx_ingress_time ON mqtt_detection_ingress(event_time_us);
 CREATE TABLE IF NOT EXISTS commands(command_id TEXT PRIMARY KEY, station_id INTEGER NOT NULL, created_us INTEGER NOT NULL, expires_us INTEGER NOT NULL, command TEXT NOT NULL, payload TEXT NOT NULL, delivered INTEGER NOT NULL DEFAULT 0, acked INTEGER NOT NULL DEFAULT 0, last_publish_us INTEGER NOT NULL DEFAULT 0, publish_count INTEGER NOT NULL DEFAULT 0, ack_result INTEGER, ack_detail INTEGER, completed_us INTEGER);
 CREATE INDEX IF NOT EXISTS idx_cmd_station ON commands(station_id, delivered, acked);
 CREATE TABLE IF NOT EXISTS audio(event_id INTEGER NOT NULL, station_id INTEGER NOT NULL, segment TEXT NOT NULL, path TEXT NOT NULL, codec TEXT, sample_rate INTEGER, created_us INTEGER NOT NULL, PRIMARY KEY(event_id, station_id, segment));
@@ -28,7 +36,9 @@ CREATE INDEX IF NOT EXISTS idx_track_last ON fused_tracks(last_time_us);
 CREATE TABLE IF NOT EXISTS track_members(station_id INTEGER NOT NULL, track_event_id INTEGER NOT NULL, track_id TEXT NOT NULL, segment_us INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(station_id, track_event_id, segment_us));
 CREATE INDEX IF NOT EXISTS idx_member_track ON track_members(track_id);
 CREATE TABLE IF NOT EXISTS track_points(track_id TEXT NOT NULL, time_us INTEGER NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(track_id, time_us));
+CREATE INDEX IF NOT EXISTS idx_point_time ON track_points(time_us);
 CREATE TABLE IF NOT EXISTS alert_outbox(seq INTEGER PRIMARY KEY AUTOINCREMENT, msg_id TEXT NOT NULL UNIQUE, tenant TEXT NOT NULL, type TEXT NOT NULL, created_us INTEGER NOT NULL, message TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS idx_outbox_time ON alert_outbox(created_us);
 CREATE TABLE IF NOT EXISTS alert_episodes(alert_id TEXT PRIMARY KEY, tenant TEXT NOT NULL, started_us INTEGER NOT NULL, last_activity_us INTEGER NOT NULL, level TEXT NOT NULL, stations TEXT NOT NULL, class TEXT NOT NULL, ended_us INTEGER);
 CREATE INDEX IF NOT EXISTS idx_episode_open ON alert_episodes(tenant, ended_us);
 CREATE TABLE IF NOT EXISTS alert_tracks(track_id TEXT PRIMARY KEY, alert_id TEXT NOT NULL, last_point_us INTEGER NOT NULL, ended_us INTEGER);
@@ -337,22 +347,28 @@ class EventStore:
         with self._conn() as c:
             row=c.execute("SELECT system_event_id FROM detections WHERE event_id=? AND station_id=?",(self._sqlite_event_id(event_id),station_id)).fetchone()
         return row['system_event_id'] if row else None
+    # Both queries below run on every bearing batch (station/track_hypotheses.py).  Without a time bound (and without
+    # ANALYZE) SQLite groups them by a full pass over the primary key, so their cost grows with everything kept in
+    # the table: 0.4 s per batch at 2 million bearings (docs/SERVER_RETENTION_2026-10-03.md).  Bound to the time index
+    # they read only the recent rows and take well under a millisecond, whatever the retention.
     def bearing_tracks(self,since_us:int,until_us:int,trusted:tuple[str,...]=('GNSS_TIME_TRUSTED','HOLDOVER'))->list[dict[str,Any]]:
         """Station tracks with trusted-time bearings overlapping [since_us, until_us] (their segments and the fused
-        tracks of the segments: station/track_hypotheses.py)."""
+        tracks of the segments: station/track_hypotheses.py).  A station track lasts at most track_max_s (900 s, ICD
+        addendum D), so every bearing of a track that overlaps the window lies after since_us-TRACK_SPAN_MAX_US."""
         marks=','.join('?'*len(trusted))
         with self._conn() as c:
             rows=c.execute(f"SELECT b.station_id,b.track_event_id,MIN(b.time_us) AS first_us,MAX(b.time_us) AS last_us,COUNT(*) AS samples "
-                           f"FROM bearings b WHERE b.time_trust IN ({marks}) GROUP BY b.station_id,b.track_event_id "
-                           f"HAVING MAX(b.time_us)>=? AND MIN(b.time_us)<=? ORDER BY first_us",(*trusted,since_us,until_us)).fetchall()
+                           f"FROM bearings b INDEXED BY idx_bearing_time WHERE b.time_us>=? AND b.time_trust IN ({marks}) "
+                           f"GROUP BY b.station_id,b.track_event_id HAVING MAX(b.time_us)>=? AND MIN(b.time_us)<=? ORDER BY first_us",
+                           (since_us-TRACK_SPAN_MAX_US,*trusted,since_us,until_us)).fetchall()
         return [{'station_id':r['station_id'],'track_event_id':r['track_event_id']&0xFFFFFFFFFFFFFFFF,'first_us':r['first_us'],'last_us':r['last_us'],
                  'samples':r['samples']} for r in rows]
     def latest_bearing_times(self,since_us:int,trusted:tuple[str,...]=('GNSS_TIME_TRUSTED','HOLDOVER'))->dict[int,int]:
         """The latest trusted bearing time of every station with bearings since since_us: {station_id: time_us}."""
         q=",".join("?"*len(trusted))
         with self._conn() as c:
-            rows=c.execute(f"SELECT station_id,MAX(time_us) t FROM bearings WHERE time_us>=? AND time_trust IN ({q}) GROUP BY station_id",
-                           (since_us,*trusted)).fetchall()
+            rows=c.execute(f"SELECT station_id,MAX(time_us) t FROM bearings INDEXED BY idx_bearing_time WHERE time_us>=? AND time_trust IN ({q}) "
+                           f"GROUP BY station_id",(since_us,*trusted)).fetchall()
         return {r['station_id']:r['t'] for r in rows}
     def station_position(self,station_id:int,event_id:int|None=None)->tuple[float,float,float]|None:
         """(lat, lon, alt MSL) of a station: the (position-guarded) detection of the track, else its last heartbeat, else
@@ -590,14 +606,59 @@ class EventStore:
         with self._conn() as c:
             rows=c.execute("SELECT segment,COUNT(*) AS n,MAX(chunk_count) AS total FROM audio_parts WHERE station_id=? AND command_id=? GROUP BY segment",(station_id,command_id)).fetchall()
         return {r['segment']:(r['n'],r['total']) for r in rows}
-    def cleanup(self,retention_days:int=365):
-        cutoff=int((time.time()-retention_days*86400)*1e6)
+    # ---- retention (docs/SERVER_RETENTION_2026-10-03.md): what is older than its term goes, a day per transaction ----
+    _RETAINED=(                                  # table, its time column, which term applies
+        ('bearings','time_us','events'),('track_points','time_us','events'),('fused_tracks','last_time_us','events'),
+        ('alert_episodes','ended_us','events'),('system_events','created_us','events'),('detections','event_time_us','events'),
+        ('security_events','created_us','events'),('mqtt_detection_ingress','event_time_us','events'),('commands','created_us','events'),
+        ('alert_outbox','created_us','outbox'),('audio','created_us','audio'))
+    def cleanup(self,retention_days:int=RETENTION_DAYS,*,audio_retention_days:int=AUDIO_RETENTION_DAYS,outbox_days:int=ALERT_OUTBOX_DAYS,
+                now_us:int|None=None,step_us:int=DAY_US)->dict[str,int]:
+        """Removes what is older than its term: events, bearings, tracks, commands and ingress records after
+        ``retention_days``, the outbox of dioneya.alert/1 after ``outbox_days``, the audio of events (rows and WAV
+        files) after ``audio_retention_days``; open alert episodes, the stations and the cursors stay.  Old rows go a
+        ``step_us`` (a day) per transaction, so a first run on a long backlog never holds the writers for long.
+        Returns what was removed per table (``audio_files``: WAV files unlinked)."""
+        now=int(time.time()*1e6) if now_us is None else now_us
+        cutoff={'events':now-retention_days*DAY_US,'outbox':now-outbox_days*DAY_US,'audio':now-audio_retention_days*DAY_US}
+        removed={table:0 for table,_,_ in self._RETAINED}; removed.update(audio_files=0,track_members=0,alert_tracks=0,audio_parts=0)
+        files:list[str]=[]
+        with self.lock,self._conn() as c:                         # the lock is taken per transaction, not for the whole run
+            removed['audio_parts']=c.execute("DELETE FROM audio_parts WHERE received_us<?",(now-2*DAY_US,)).rowcount   # abandoned uploads
+        for table,column,term in self._RETAINED:
+            with self._conn() as c: edge=c.execute(f"SELECT MIN({column}) FROM {table}").fetchone()[0]
+            while edge is not None and edge<cutoff[term]:
+                edge=min(edge+step_us,cutoff[term])
+                with self.lock,self._conn() as c:
+                    if table=='audio': files+=[r[0] for r in c.execute("SELECT path FROM audio WHERE created_us<?",(edge,))]
+                    removed[table]+=c.execute(f"DELETE FROM {table} WHERE {column}<?",(edge,)).rowcount
         with self.lock,self._conn() as c:
-            c.execute("DELETE FROM audio_parts WHERE received_us<?",(int((time.time()-2*86400)*1e6),))   # abandoned uploads
-            c.execute("DELETE FROM bearings WHERE time_us<?",(cutoff,))
-            c.execute("DELETE FROM track_points WHERE time_us<?",(cutoff,)); c.execute("DELETE FROM fused_tracks WHERE last_time_us<?",(cutoff,))
-            c.execute("DELETE FROM track_members WHERE track_id NOT IN (SELECT track_id FROM fused_tracks)")
-            c.execute("DELETE FROM alert_outbox WHERE created_us<?",(int((time.time()-ALERT_OUTBOX_DAYS*86400)*1e6),))
-            c.execute("DELETE FROM alert_tracks WHERE track_id NOT IN (SELECT track_id FROM fused_tracks)")
-            c.execute("DELETE FROM alert_episodes WHERE ended_us<?",(cutoff,))
-            c.execute("DELETE FROM system_events WHERE created_us<?",(cutoff,)); c.execute("DELETE FROM detections WHERE event_time_us<?",(cutoff,)); c.execute("DELETE FROM security_events WHERE created_us<?",(cutoff,))
+            removed['track_members']=c.execute("DELETE FROM track_members WHERE track_id NOT IN (SELECT track_id FROM fused_tracks)").rowcount
+            removed['alert_tracks']=c.execute("DELETE FROM alert_tracks WHERE track_id NOT IN (SELECT track_id FROM fused_tracks)").rowcount
+        removed['audio_files']=self._remove_audio_files(files)
+        return removed
+    def _remove_audio_files(self,paths:list[str])->int:
+        """Unlinks the WAV files of removed audio rows (only under audio_root) and the folders they leave empty."""
+        root=self.audio_root.resolve(); removed=0
+        for text in paths:
+            path=Path(text).resolve()
+            if not path.is_relative_to(root) or path==root: continue
+            try: path.unlink(); removed+=1
+            except FileNotFoundError: pass
+            for folder in (path.parent,path.parent.parent):          # {audio_root}/{station}/{event}
+                if folder!=root and folder.is_relative_to(root):
+                    try: folder.rmdir()
+                    except OSError: break
+        return removed
+    def storage_usage(self,max_age_s:float=60.0)->dict[str,int]:
+        """Bytes of the database (with its WAL) and of the audio files, and free bytes on their disk, for
+        /api/v1/health; the walk over the audio files is repeated at most every ``max_age_s``."""
+        now=time.time(); cached=getattr(self,'_usage',None)
+        if cached and now-cached[0]<max_age_s: return dict(cached[1])
+        database=sum(p.stat().st_size for p in (self.path,self.path.with_name(self.path.name+'-wal')) if p.exists())
+        audio_bytes=audio_files=0
+        if self.audio_root.is_dir():
+            for p in self.audio_root.rglob('*.wav'): audio_bytes+=p.stat().st_size; audio_files+=1
+        usage={'database_bytes':database,'audio_bytes':audio_bytes,'audio_files':audio_files,'disk_free_bytes':shutil.disk_usage(self.path.parent).free}
+        self._usage=(now,usage)
+        return dict(usage)
