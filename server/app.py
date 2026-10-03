@@ -18,14 +18,13 @@ from utils.file_utils import (
     ensure_runtime_directories,
     is_supported_audio_filename,
     new_analysis_id,
-    resolve_artifact,
-    resolve_dataset_file,
+    resolve_dataset_image,
     save_upload,
 )
 from utils.logging_utils import logger
 from utils.media import extract_audio_to_wav, is_supported_video_filename
 from utils.validation import load_microphone_config
-from station import retention, router as station_router_module
+from station import analysis_access, retention, router as station_router_module
 from station.router import router as station_router
 from station.access_api import router as access_router
 from station.admin_api import router as admin_router
@@ -349,9 +348,12 @@ async def delete_dataset_entry(
 
 @app.get("/dataset/image", name="dataset_image")
 async def dataset_image(path: str) -> FileResponse:
-    """Serve a class reference image stored inside the dataset directory."""
+    """Serve a class reference image stored inside the dataset directory (an image, never a recording)."""
 
-    return FileResponse(resolve_dataset_file(path))
+    try:
+        return FileResponse(resolve_dataset_image(path))
+    except (ValueError, OSError) as exc:
+        raise HTTPException(status_code=404, detail="image not found") from exc
 
 
 @app.post("/single/analyze", response_class=HTMLResponse)
@@ -359,7 +361,7 @@ async def analyze_single(request: Request, wav_file: UploadFile = File(...)) -> 
     """Handle single audio upload and render analysis result."""
 
     try:
-        report = await _run_single_analysis(wav_file)
+        report = await _run_single_analysis(wav_file, analysis_access.operator_of(request))
     except Exception as exc:
         logger.exception("Single-file analysis failed")
         return _error_response(request, exc)
@@ -371,11 +373,11 @@ async def analyze_single(request: Request, wav_file: UploadFile = File(...)) -> 
 
 
 @app.post("/api/analyze-single")
-async def analyze_single_api(wav_file: UploadFile = File(...)) -> JSONResponse:
+async def analyze_single_api(request: Request, wav_file: UploadFile = File(...)) -> JSONResponse:
     """REST endpoint for single audio analysis."""
 
     try:
-        report = await _run_single_analysis(wav_file)
+        report = await _run_single_analysis(wav_file, analysis_access.operator_of(request))
     except Exception as exc:
         logger.exception("Single-file API analysis failed")
         raise HTTPException(status_code=400, detail=str(exc)) from exc
@@ -415,7 +417,7 @@ async def analyze_localization(
     """Handle multi-microphone upload and render localization result."""
 
     try:
-        report = await _run_localization_analysis(wav_files, mics_json)
+        report = await _run_localization_analysis(wav_files, mics_json, analysis_access.operator_of(request))
     except Exception as exc:
         logger.exception("Localization analysis failed")
         return _error_response(request, exc)
@@ -428,32 +430,41 @@ async def analyze_localization(
 
 @app.post("/api/localize")
 async def analyze_localization_api(
+    request: Request,
     wav_files: list[UploadFile] = File(...),
     mics_json: UploadFile = File(...),
 ) -> JSONResponse:
     """REST endpoint for multi-microphone localization."""
 
     try:
-        report = await _run_localization_analysis(wav_files, mics_json)
+        report = await _run_localization_analysis(wav_files, mics_json, analysis_access.operator_of(request))
     except Exception as exc:
         logger.exception("Localization API analysis failed")
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return JSONResponse(report.model_dump())
 
 
+def _visible_artifact(request: Request, path: str) -> Path:
+    """An artifact of an analysis this account may see (station/analysis_access.py); anything else: 404."""
+
+    artifact_path = analysis_access.resolve_analysis_file(path, analysis_access.operator_of(request))
+    if artifact_path is None:
+        raise HTTPException(status_code=404, detail="artifact not found")
+    return artifact_path
+
+
 @app.get("/artifact", name="artifact")
-async def artifact(path: str) -> FileResponse:
+async def artifact(request: Request, path: str) -> FileResponse:
     """Return a generated artifact for inline display."""
 
-    artifact_path = resolve_artifact(path)
-    return FileResponse(artifact_path)
+    return FileResponse(_visible_artifact(request, path))
 
 
 @app.get("/download", name="download")
-async def download(path: str) -> FileResponse:
+async def download(request: Request, path: str) -> FileResponse:
     """Return a generated artifact as a download."""
 
-    artifact_path = resolve_artifact(path)
+    artifact_path = _visible_artifact(request, path)
     return FileResponse(
         artifact_path,
         media_type="application/octet-stream",
@@ -461,8 +472,8 @@ async def download(path: str) -> FileResponse:
     )
 
 
-async def _run_single_analysis(wav_file: UploadFile):
-    """Save a single audio upload and run the analysis service."""
+async def _run_single_analysis(wav_file: UploadFile, operator: dict | None = None):
+    """Save a single audio upload and run the analysis service for the account ``operator``."""
 
     global single_service
 
@@ -477,6 +488,7 @@ async def _run_single_analysis(wav_file: UploadFile):
     analysis_id = new_analysis_id()
     upload_dir = analysis_upload_dir(analysis_id)
     output_dir = analysis_output_dir(analysis_id)
+    analysis_access.record_owner(output_dir, operator)
     saved = await save_upload(wav_file, upload_dir)
     return single_service.analyze(analysis_id, saved, output_dir)
 
@@ -484,8 +496,9 @@ async def _run_single_analysis(wav_file: UploadFile):
 async def _run_localization_analysis(
     wav_files: list[UploadFile],
     mics_json: UploadFile,
+    operator: dict | None = None,
 ):
-    """Save localization uploads and run the localization service."""
+    """Save localization uploads and run the localization service for the account ``operator``."""
 
     global localization_service
 
@@ -502,6 +515,7 @@ async def _run_localization_analysis(
     analysis_id = new_analysis_id()
     upload_dir = analysis_upload_dir(analysis_id)
     output_dir = analysis_output_dir(analysis_id)
+    analysis_access.record_owner(output_dir, operator)
 
     saved_wavs = []
     for upload in wav_files:

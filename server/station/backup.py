@@ -4,7 +4,10 @@
 inside the server container) archives ``data`` and ``output`` of the server directory the way a restore wants them:
 every SQLite database is copied with the SQLite backup API first, so the archive holds a transactionally consistent
 snapshot even while the server and the bridges write; the live files and their ``-wal``/``-shm`` companions are left
-out.  Everything else (the audio files, operators.json, the PKI material under data/pki) is archived as it is.
+out.  Everything else (the audio files, operators.json, the PKI material under data/pki) is archived as it is,
+except earlier archives in ``output/backups`` (an archive of archives would grow with every run; that directory is
+where the deployment scripts have the container write, as it is on the mounted volume; the web routes never serve
+it).  Without ``--out`` the archive goes to ``backups/`` beside ``data`` and ``output``, outside both.
 A ``.zip`` destination gives a zip archive, anything else a gzip-compressed tar.
 """
 from __future__ import annotations
@@ -20,6 +23,7 @@ import zipfile
 from pathlib import Path
 
 ARCHIVED = ("data", "output")
+SKIPPED = (Path("output") / "backups",)                  # earlier archives (relative to the server directory)
 DATABASE_SUFFIXES = (".sqlite3", ".sqlite3-wal", ".sqlite3-shm")
 
 
@@ -45,15 +49,16 @@ def snapshot_databases(data: Path, out: Path) -> list[Path]:
 
 
 def members(server_dir: Path, snapshot: Path) -> list[tuple[Path, str]]:
-    """(file on disk, name in the archive): data and output without the live databases, the snapshot copies in
-    their place."""
+    """(file on disk, name in the archive): data and output without the live databases (the snapshot copies in
+    their place) and without earlier archives."""
     out = []
+    skipped = tuple(server_dir / s for s in SKIPPED)
     for top in ARCHIVED:
         root = server_dir / top
         if not root.is_dir():
             continue
         for path in sorted(p for p in root.rglob("*") if p.is_file()):
-            if path.name.endswith(DATABASE_SUFFIXES):
+            if path.name.endswith(DATABASE_SUFFIXES) or any(s == path or s in path.parents for s in skipped):
                 continue
             out.append((path, path.relative_to(server_dir).as_posix()))
     for path in sorted(p for p in snapshot.rglob("*.sqlite3") if p.is_file()):
@@ -87,10 +92,10 @@ def write_archive(server_dir: Path, archive: Path) -> list[str]:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="python -m station.backup", description="consistent backup of the server data and output")
     parser.add_argument("--server-dir", default=str(Path(__file__).resolve().parents[1]), help="directory with data/ and output/ (default: the server)")
-    parser.add_argument("--out", help="archive to write (.zip or .tar.gz); default output/backups/backup_<UTC stamp>.tar.gz")
+    parser.add_argument("--out", help="archive to write (.zip or .tar.gz); default backups/backup_<UTC stamp>.tar.gz beside data and output")
     args = parser.parse_args(argv)
     server_dir = Path(args.server_dir)
-    archive = Path(args.out) if args.out else server_dir / "output" / "backups" / f"backup_{time.strftime('%Y%m%d_%H%M%S', time.gmtime())}.tar.gz"
+    archive = Path(args.out) if args.out else server_dir / "backups" / f"backup_{time.strftime('%Y%m%d_%H%M%S', time.gmtime())}.tar.gz"
     names = write_archive(server_dir, archive)
     databases = [n for n in names if n.endswith(".sqlite3")]
     print(f"backup saved: {archive} ({len(names)} files, {archive.stat().st_size / 1e6:.1f} MB; databases: {', '.join(databases) or 'none'})")

@@ -13,6 +13,8 @@ from models.schemas import UploadedFileInfo
 
 SUPPORTED_AUDIO_EXTENSIONS = {".wav", ".mp3", ".m4a", ".aac"}
 SUPPORTED_AUDIO_EXTENSIONS_TEXT = "WAV, MP3, M4A or AAC"
+# what /dataset/image serves: class reference pictures, never a recording of the dataset
+IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"}
 
 
 def ensure_runtime_directories() -> None:
@@ -102,7 +104,8 @@ def assert_wav_path(path: Path) -> None:
 
 
 def resolve_artifact(path: str) -> Path:
-    """Resolve a generated artifact path and keep it inside output_dir."""
+    """Resolve a generated artifact path and keep it inside output_dir (the web routes use
+    station/analysis_access.py, which also asks who may see the analysis)."""
 
     artifact = Path(path).resolve()
     output_root = settings.output_dir.resolve()
@@ -122,4 +125,13 @@ def resolve_dataset_file(path: str) -> Path:
         raise ValueError("Path is outside the dataset directory.")
     if not target.exists():
         raise FileNotFoundError(path)
+    return target
+
+
+def resolve_dataset_image(path: str) -> Path:
+    """Resolve a class reference image of the dataset: inside dataset_dir and an image file, nothing else."""
+
+    target = resolve_dataset_file(path)
+    if target.suffix.lower() not in IMAGE_EXTENSIONS or not target.is_file():
+        raise ValueError("Not a dataset image.")
     return target
