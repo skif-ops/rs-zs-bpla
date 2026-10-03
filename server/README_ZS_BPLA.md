@@ -127,6 +127,14 @@ elevation sector, bearing and track point accuracy, received levels and the geom
 the station geometry: `GET /api/v1/geometry/coverage?station_ids=…&range_m=…`, and the «Слепые зоны расстановки»
 layer of the «Сопровождение» page (`/replay`).
 
+The load of the pilot field (`docs/SERVER_LOAD_FIELD_2026-10-03.md`): `python tools/load_field.py --out /tmp/load
+--hours 24 --check` drives 41 synthetic stations (heartbeats, detections, bearings, audio) with the faults of a real
+link (QoS 1 redeliveries, reconnects, outages with a burst of backlog, bridge restarts) through the bridge path from
+one process per tenant into one database and checks that everything is stored once, nothing stays unacknowledged
+and the readers never block; `tests/test_load_field.py` runs half an hour of it. A bridge that could not process
+ten messages (they stay in flight unacknowledged; Mosquitto stops at twenty) exits with code 3 so that the container
+restarts it with a fresh session.
+
 A field of station twins (`docs/STATION_TWIN_FIELD_2026-10-01.md`): `python tools/twin_field.py --out /tmp/field
 --station 17:0,0 --station 18:1200,0 --station 19:600,1000:installed --target=-2500,2200,200,45,-10,0` runs one
 firmware twin per station against the same target, feeds their publishes through the bridge into a fresh database
