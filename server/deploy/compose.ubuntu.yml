@@ -1,3 +1,8 @@
+# tls/: ca-chain.pem, server.crt.pem, server.key.pem, crl.pem, bridge.crt.pem, bridge.key.pem (from server/pki).
+# The server certificate must carry the DNS name `mqtt` besides the public name: the bridges and mqtt_alerts connect to
+# the broker by this service name and verify it (`python -m pki.cli server-cert --dns <public> --dns mqtt --ip <ip>`).
+# Mosquitto reads server.key.pem after dropping privileges to uid 1883: chown 1883 and mode 0400, the directory 0755.
+# crl.pem is valid 30 days: rewrite it (`python -m pki.cli crl`) and restart mqtt at least monthly (a weekly cron).
 services:
   mqtt:
     image: eclipse-mosquitto:2.0
@@ -16,10 +21,10 @@ services:
     environment:
       ZS_MQTT_HOST: mqtt
       ZS_MQTT_PORT: "8883"
-      ZS_MQTT_CA: /run/tls/ca.crt
-      ZS_MQTT_CERT: /run/tls/bridge.crt
-      ZS_MQTT_KEY: /run/tls/bridge.key
-      ZS_TENANT: ${ZS_TENANT:-evt}
+      ZS_MQTT_CA: /run/tls/ca-chain.pem
+      ZS_MQTT_CERT: /run/tls/bridge.crt.pem
+      ZS_MQTT_KEY: /run/tls/bridge.key.pem
+      ZS_OPERATOR_TRUSTED_PROXY: "1"          # 8000 is bound to 127.0.0.1: only the local HTTPS proxy / SSH tunnel reach it
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
@@ -28,14 +33,53 @@ services:
       - ./tls:/run/tls:ro
     depends_on:
       - mqtt
-  mqtt_bridge:
+  mqtt_bridge_pilot1:
     build:
       context: ..
     restart: unless-stopped
-    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--ca", "/run/tls/ca.crt", "--cert", "/run/tls/bridge.crt", "--key", "/run/tls/bridge.key"]
+    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "pilot1", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem"]
     environment:
-      ZS_TENANT: ${ZS_TENANT:-evt}
+      ZS_TENANT: pilot1
       ZS_COMMAND_SIGNING_KEY: /run/tls/command-signing.key
+    volumes:
+      - ../data:/app/data
+      - ./tls:/run/tls:ro
+    depends_on:
+      - mqtt
+      - server
+  mqtt_bridge_pilot2:
+    build:
+      context: ..
+    restart: unless-stopped
+    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "pilot2", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem"]
+    environment:
+      ZS_TENANT: pilot2
+      ZS_COMMAND_SIGNING_KEY: /run/tls/command-signing.key
+    volumes:
+      - ../data:/app/data
+      - ./tls:/run/tls:ro
+    depends_on:
+      - mqtt
+      - server
+  mqtt_bridge_bench:
+    build:
+      context: ..
+    restart: unless-stopped
+    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "bench", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem"]
+    environment:
+      ZS_TENANT: bench
+      ZS_COMMAND_SIGNING_KEY: /run/tls/command-signing.key
+    volumes:
+      - ../data:/app/data
+      - ./tls:/run/tls:ro
+    depends_on:
+      - mqtt
+      - server
+  mqtt_alerts:                                  # the output API dioneya.alert/1 over MQTT (DIONEYA_ALERT_API_v1.md, 4.4)
+    build:
+      context: ..
+    restart: unless-stopped
+    command: ["python", "-m", "integration.mqtt_alerts", "--host", "mqtt", "--port", "8883", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem"]
     volumes:
       - ../data:/app/data
       - ./tls:/run/tls:ro
