@@ -137,6 +137,7 @@ PERMISSION_RULES: list[tuple[set[str], re.Pattern, str]] = [
     ({"POST"}, re.compile(r"^/api/v1/stations/\d+/command-key-rotation$"), KEYS_ROTATE),
     ({"POST"}, re.compile(r"^/api/v1/stations/\d+/network-config$"), STATION_COMMAND),
     ({"POST"}, re.compile(r"^/api/v1/stations/\d+/(?:firmware|model)-update$"), STATION_FIRMWARE),
+    ({"POST"}, re.compile(r"^/api/v1/firmware/rollouts(?:/[^/]+(?:/(?:pause|resume|cancel|revert)|/stations/\d+/skip))?$"), STATION_FIRMWARE),
     ({"POST"}, re.compile(r"^/(?:dataset/(?:add|train|delete)|api/dataset/train)$"), DATASET_EDIT),
     ({"POST"}, re.compile(r"^/(?:single/analyze|api/analyze-single|localization/analyze|api/localize)$"), ANALYSIS_RUN),
     ({"GET", "HEAD", "PUT"}, re.compile(r"^/api/v1/access/accounts(?:/[^/]+/scope)?$"), SCOPES_MANAGE),

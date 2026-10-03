@@ -57,7 +57,12 @@ runtime-маркировка `evt-mb` в этой ветке не допуска
    читатели без блокировок; найдено и закрыто зависание моста после 20 ошибок
    обработки (`StallGuard`). Открыто: тот же прогон с реальными станциями через
    Mosquitto с TLS на целевом сервере.
-6. Нет OTA repository, canary rollout, pause и rollback audit.
+6. ЧАСТИЧНО: хранилище выпусков и обновление станции по команде (аддендум F); раскатка
+   выпуска на группу станций — canary-волна, не больше N станций в полёте, автопауза по
+   отказу или откату станции, resume/cancel/skip, возврат возвратным выпуском (станция не
+   принимает версию не новее), журнал каждого шага и журнал действий учётных записей
+   (`station/rollout.py`, `docs/SERVER_OTA_ROLLOUT_2026-10-03.md`, `tests/test_rollout.py`).
+   Открыто: раскатка на двойниках поля с настоящими сессиями и страница в веб-интерфейсе.
 7. ЧАСТИЧНО: portable event outbox атомарно сохраняет schema-4 CBOR, metadata,
    SHA-256, приоритет и retry bitmap и проходит fault-injection. Серверная схема
    application receipt и portable firmware parser проверяют точный payload hash,
@@ -145,4 +150,5 @@ pending events, а server/portable-firmware application receipt подтверж
   после партии EVT);
 - backup/restore (сценарии `deploy/scripts/backup_*` и `restore_*` с согласованной
   копией, проверкой целостности и сохранением заменённого есть и проверены тестами;
-  прогон на целевых Windows 11 и Ubuntu 24.04 — открыт) и журнал отката OTA.
+  прогон на целевых Windows 11 и Ubuntu 24.04 — открыт) и журнал отката OTA (журнал
+  раскаток `rollout_journal` с откатами станций и возвратами, `docs/SERVER_OTA_ROLLOUT_2026-10-03.md`).

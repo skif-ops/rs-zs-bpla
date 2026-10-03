@@ -71,6 +71,8 @@ def main() -> int:
             "@router.post('/stations/{station_id}/network-config')",
             # operator queues a classifier model package (addendum I); the package goes to the station over MQTT only
             "@router.post('/stations/{station_id}/model-update')",
+            # operator takes a station out of a firmware rollout (docs/SERVER_OTA_ROLLOUT_2026-10-03.md); no station ingress
+            "@router.post('/firmware/rollouts/{rollout_id}/stations/{station_id}/skip')",
         },
         f"station transport route bypasses guarded router: {unguarded_station_decorators}",
     )

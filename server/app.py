@@ -24,7 +24,7 @@ from utils.file_utils import (
 from utils.logging_utils import logger
 from utils.media import extract_audio_to_wav, is_supported_video_filename
 from utils.validation import load_microphone_config
-from station import analysis_access, retention, router as station_router_module
+from station import analysis_access, retention, rollout, router as station_router_module
 from station.router import router as station_router
 from station.access_api import router as access_router
 from station.admin_api import router as admin_router
@@ -33,13 +33,16 @@ from station.operator_auth import OperatorAuthMiddleware, build_router as build_
 
 ensure_runtime_directories()
 
-# retention of the event store (docs/SERVER_RETENTION_2026-10-03.md): the cleanup runs with the application
+# retention of the event store (docs/SERVER_RETENTION_2026-10-03.md) and the firmware rollouts
+# (docs/SERVER_OTA_ROLLOUT_2026-10-03.md) run with the application
 retention_runner = retention.RetentionRunner(retention.RetentionSettings.from_env())
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
     description="Offline WAV/MP3/M4A drone acoustic analysis, classification and TDOA localization.",
-    lifespan=retention.lifespan(retention_runner, lambda: station_router_module.store),
+    lifespan=rollout.combine(retention.lifespan(retention_runner, lambda: station_router_module.store),
+                             rollout.lifespan(station_router_module.rollout_runner, lambda: station_router_module.store,
+                                              station_router_module.firmware_repository)),
 )
 app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 

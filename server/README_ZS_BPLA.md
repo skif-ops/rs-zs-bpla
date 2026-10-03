@@ -110,7 +110,15 @@ The bridge serves the chunks from that directory (`--firmware-dir`,
 `ZS_FIRMWARE_DIR`, default `data/firmware`); `GET /api/v1/firmware/releases`
 lists it and `POST /api/v1/stations/{id}/firmware-update {"version": N}`
 queues CMD_UPDATE_FIRMWARE. Progress is in the heartbeat
-(`detector.fw_version / fw_state / fw_other_version`).
+(`detector.fw_version / fw_state / fw_other_version`). A release goes to a
+group of stations as a rollout (`docs/SERVER_OTA_ROLLOUT_2026-10-03.md`):
+`POST /api/v1/firmware/rollouts {"version": N, "stations": [...], "canary": [...]}`
+commands the canary stations first and the rest only after they confirmed the
+release, at most `max_in_flight` at a time; a failed ACK or a station's own
+rollback pauses it after `max_failures`; `pause`, `resume`, `cancel`, `skip` a
+station, and `revert` (a station refuses a version that is not newer, so the
+revert is the earlier image signed as a higher version); every step is in the
+rollout's journal, the requests in the audit log of accounts.
 
 A retrained station model goes out the same way without a firmware release (MQTT ICD addendum I): export it as a
 package (`python tools/export_station_model.py --package m7.diom --version 7`), sign it offline with the same release
