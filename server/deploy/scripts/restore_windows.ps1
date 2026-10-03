@@ -13,7 +13,7 @@ $Ext = if ($Archive.ToLower().EndsWith(".zip")) { ".zip" } else { ".tar.gz" }
 $Inside = "restore_$Stamp$Ext"
 Set-Location $DeployDir
 $Compose = @("compose", "--env-file", ".env", "-f", "compose.windows.yml")
-$Backups = Join-Path $ServerRoot "output\\backups"
+$Backups = Join-Path $ServerRoot "output\backups"
 New-Item -ItemType Directory -Force -Path $Backups | Out-Null
 Copy-Item -LiteralPath $Archive -Destination (Join-Path $Backups $Inside)
 try {
