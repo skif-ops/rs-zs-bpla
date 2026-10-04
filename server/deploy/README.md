@@ -17,6 +17,15 @@ isolated-bench configurations and must not be used for production.
 ## Production requirements
 
 - Public APN/CGNAT is the EVT-PRE-20 baseline; the station opens outbound connections only.
+- Build identity: package the server with `git archive` (`git archive
+  --format=tar.gz --prefix=muhoed/ -o muhoed-server.tar.gz <commit> server
+  tools/generate_command_signing_key.py`). It writes the commit and its date into
+  `server/BUILD` (`.gitattributes`, `export-subst`), and the server shows the
+  release version with that build in the footer of every page and in
+  `/api/v1/health` (`version`, `build`), so an operator and monitoring see which
+  build runs without reading the host. A working copy keeps the placeholder and
+  asks git; `ZS_BUILD="<commit> <YYYY-MM-DD>"` overrides both on a bench
+  (utils/build_info.py).
 - MQTT over TLS 1.2+ on port 8883. The server certificate carries the compose
   service name `mqtt` besides the public name and address (`python -m pki.cli
   server-cert --dns <public> --dns mqtt --ip <ip>`): the bridges and `mqtt_alerts`
@@ -141,8 +150,8 @@ isolated-bench configurations and must not be used for production.
   initial keypair outside Git, from the repository root:
 
   ```bash
-  python tools/generate_command_signing_key.py \
-    --private server/deploy/tls/command-signing.key \
+  python tools/generate_command_signing_key.py \\
+    --private server/deploy/tls/command-signing.key \\
     --public server/deploy/tls/command-signing.pub
   ```
 

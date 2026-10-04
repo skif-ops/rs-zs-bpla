@@ -22,9 +22,12 @@ from station.online_type_service import OnlineTypeSessionService
 from station.access_scope import LIVE_RECHECK_S, LiveScope, close_revoked, scope_of
 from station import retention, rollout
 from station.analysis_access import operator_of
+from config import settings
+from utils.build_info import current as current_build
 
 BASE=Path(__file__).resolve().parents[1]
 store=EventStore(BASE/'data'/'zs_bpla.sqlite3')
+build=current_build(settings.app_version)     # shown by /api/v1/health next to the liveness
 service=StationFusionService(store)
 type_service=OnlineTypeSessionService()
 router=APIRouter(prefix='/api/v1',tags=['ZS-BPLA stations'])
@@ -34,7 +37,8 @@ station_http_router=APIRouter(dependencies=[Depends(require_insecure_station_htt
 async def health():
     """Liveness, plus what fills the disk: the database and the audio files, free space, and the retention's last
     run (station/retention.py), so monitoring sees a full disk or a stuck cleanup without the logs."""
-    return {'status':'ok','protocol':'1.5','service':'zs-bpla','storage':await asyncio.to_thread(store.storage_usage),
+    return {'status':'ok','protocol':'1.5','service':'zs-bpla','version':build.version,'build':build.as_dict(),
+            'storage':await asyncio.to_thread(store.storage_usage),
             'retention':retention.RUNNER.status() if retention.RUNNER else None,'rollouts':rollout_runner.status()}
 
 @station_http_router.post('/stations/{station_id}/heartbeat')
