@@ -19,6 +19,14 @@
   let lastWidth = 0;
   const view = { cx: 0, cy: 0, s: 0.1 };   // centre (m) and scale (px per m)
   let coverage = null;             // blind zones of the station geometry (/api/v1/geometry/coverage), pre-rendered
+  const pageQuery = new URLSearchParams(location.search);
+  const liveAlertId = pageQuery.get("live") === "1" ? pageQuery.get("alert") : null;
+  let liveActive = !!liveAlertId;
+  let liveFollowing = liveActive;
+  let liveLoading = false;
+  let liveSince = Number(pageQuery.get("since")) || Date.now() * 1000 - 5 * 60 * 1e6;
+  let liveStations = pageQuery.get("stations") || "";
+  let liveTenant = pageQuery.get("tenant") || "";
 
   const colorOf = (sid) => {
     const i = data ? data.stations.findIndex((s) => s.station_id === sid) : 0;
@@ -26,7 +34,15 @@
   };
 
   // ---- sources -------------------------------------------------------------------------------------------------
-  const fmtUtc = (us) => new Date(us / 1000).toISOString().replace("T", " ").slice(0, 21);
+  const fmtUtc = (us) => Number.isFinite(Number(us)) ? new Date(Number(us) / 1000).toISOString().replace("T", " ").slice(0, 21) : "—";
+
+  function liveQuery() {
+    const until = Date.now() * 1000;
+    const since = Math.max(Math.min(liveSince - 15e6, until - 1e6), until - 29 * 60 * 1e6);
+    const q = new URLSearchParams({ since_us: String(Math.round(since)), until_us: String(Math.round(until)) });
+    if (liveStations) q.set("station_ids", liveStations);
+    return q.toString();
+  }
 
   async function loadSources() {
     const sel = $("replay-source");
@@ -59,9 +75,20 @@
     } catch (e) {
       sel.innerHTML = '<option value="">не удалось загрузить список</option>';
     }
-    const q = new URLSearchParams(location.search);
-    const pre = q.get("track") ? "track_id=" + encodeURIComponent(q.get("track"))
-      : q.get("event") ? "system_event_id=" + encodeURIComponent(q.get("event")) : "";
+    if (liveActive) {
+      const o = document.createElement("option");
+      o.value = "live"; o.textContent = "Текущая тревога" + (liveTenant ? " · " + liveTenant : "");
+      sel.prepend(o); sel.value = "live";
+      $("replay-live-state").hidden = false;
+      $("replay-context").textContent = "Тревога на участке " + (liveTenant || "—") + ". Данные обновляются автоматически; север вверху, восток справа.";
+      $("replay-source-help").textContent = "Поступающие пеленги и точки показываются автоматически. Для просмотра истории выберите другую запись.";
+      $("replay-now").hidden = false;
+      load(liveQuery());
+      setInterval(refreshLive, 4000);
+      return;
+    }
+    const pre = pageQuery.get("track") ? "track_id=" + encodeURIComponent(pageQuery.get("track"))
+      : pageQuery.get("event") ? "system_event_id=" + encodeURIComponent(pageQuery.get("event")) : "";
     if (pre) {
       if (![...sel.options].some((o) => o.value === pre)) {
         const o = document.createElement("option");
@@ -73,38 +100,59 @@
     }
   }
 
-  async function load(query) {
-    stop();
+  async function load(query, updating = false) {
+    if (!updating) stop();
     if (!query) return;
-    $("replay-empty").textContent = "Загрузка…";
-    $("replay-empty").hidden = false;
-    const res = await fetch("/api/v1/replay?" + query);
-    if (!res.ok) {
-      const msg = await res.json().catch(() => ({}));
-      $("replay-empty").textContent = "Не удалось загрузить: " + (msg.detail || res.status);
-      data = null; enableControls(false); draw();
+    if (!updating) { $("replay-empty").textContent = "Загрузка…"; $("replay-empty").hidden = false; }
+    let res;
+    try { res = await fetch("/api/v1/replay?" + query, { cache: "no-store" }); }
+    catch { res = null; }
+    if (!res) {
+      if (!updating) { $("replay-empty").textContent = "Не удалось связаться с сервером."; data = null; enableControls(false); draw(); }
+      else $("replay-live-state").textContent = "● Связь с сервером потеряна";
       return;
     }
+    if (!res.ok) {
+      const msg = await res.json().catch(() => ({}));
+      if (!updating) { $("replay-empty").textContent = "Не удалось загрузить: " + (msg.detail || res.status); data = null; enableControls(false); draw(); }
+      else $("replay-live-state").textContent = "● Не удалось обновить сопровождение";
+      return;
+    }
+    const hadPositions = !!(data && (data.stations.length || data.tracks.length));
     data = await res.json();
+    if (liveActive) $("replay-live-state").textContent = "● Тревога · обновляется";
     byStation = new Map();
     for (const b of data.bearings) {
       if (!byStation.has(b.station_id)) byStation.set(b.station_id, []);
       byStation.get(b.station_id).push(b);
     }
     for (const list of byStation.values()) list.sort((a, b) => a.t_us - b.t_us);
-    const empty = !data.stations.length && !data.tracks.length;
-    $("replay-empty").textContent = empty ? "В этом окне нет станций с координатами и точек." : "";
+    const empty = !data.stations.length && !data.tracks.length && !data.bearings.length;
+    $("replay-empty").textContent = empty ? (liveActive ? "Ожидаем пеленги и точки трека по этой тревоге." : "В этой записи пока нет пеленгов и точек с координатами.") : "";
     $("replay-empty").hidden = !empty;
     const slider = $("replay-slider");
-    slider.min = data.window.first_us;
-    slider.max = data.window.last_us;
+    const first = data.window.first_us ?? data.window.since_us;
+    const last = data.window.last_us ?? data.window.until_us;
+    data.window.first_us = first; data.window.last_us = last;
+    slider.min = first;
+    slider.max = last;
     slider.step = 100000;
-    t = data.window.first_us;
+    t = liveActive && liveFollowing ? last : updating ? Math.min(Math.max(t, first), last) : first;
     slider.value = t;
+    $("replay-time-start").textContent = fmtUtc(first).slice(11, 19);
+    $("replay-time-end").textContent = fmtUtc(last).slice(11, 19);
+    $("replay-selection-title").textContent = liveActive ? "Тревога · " + (liveTenant || "участок") :
+      $("replay-source").selectedOptions[0]?.textContent || "Сопровождение";
     enableControls(!empty);
-    fit();
+    if (!updating || !hadPositions) fit();
     draw();
-    loadCoverage();
+    if (!updating) loadCoverage();
+  }
+
+  async function refreshLive() {
+    if (!liveActive || liveLoading) return;
+    liveLoading = true;
+    try { await load(liveQuery(), true); } finally { liveLoading = false; }
   }
 
   // ---- blind zones of the station geometry (decision 5) --------------------------------------------------------
@@ -357,6 +405,7 @@
   // ---- panel ---------------------------------------------------------------------------------------------------
   function updatePanel(p) {
     $("ro-utc").textContent = fmtUtc(t);
+    $("replay-current-time").textContent = fmtUtc(t) + " UTC";
     $("ro-rel").textContent = ((t - data.window.first_us) / 1e6).toFixed(1) + " с";
     const set = (id, v) => { $(id).textContent = v; };
     if (p) {
@@ -393,6 +442,11 @@
     draw();
   }
 
+  function userSetTime(v) {
+    if (liveActive) liveFollowing = false;
+    stop(); setTime(v);
+  }
+
   function frame(now) {
     if (!playing) return;
     const dt = lastFrame ? now - lastFrame : 0;
@@ -416,11 +470,16 @@
   }
 
   // ---- input ---------------------------------------------------------------------------------------------------
-  $("replay-source").addEventListener("change", (e) => load(e.target.value));
-  $("replay-play").addEventListener("click", () => (playing ? stop() : play()));
-  $("replay-back").addEventListener("click", () => setTime(t - 1e6));
-  $("replay-fwd").addEventListener("click", () => setTime(t + 1e6));
-  $("replay-slider").addEventListener("input", (e) => { stop(); setTime(Number(e.target.value)); });
+  $("replay-source").addEventListener("change", (e) => {
+    liveActive = e.target.value === "live";
+    if (liveActive) { liveFollowing = true; $("replay-live-state").hidden = false; $("replay-now").hidden = false; load(liveQuery()); }
+    else { $("replay-live-state").hidden = true; $("replay-now").hidden = true; load(e.target.value); }
+  });
+  $("replay-play").addEventListener("click", () => { if (liveActive) liveFollowing = false; playing ? stop() : play(); });
+  $("replay-back").addEventListener("click", () => userSetTime(t - 1e6));
+  $("replay-fwd").addEventListener("click", () => userSetTime(t + 1e6));
+  $("replay-slider").addEventListener("input", (e) => userSetTime(Number(e.target.value)));
+  $("replay-now").addEventListener("click", () => { liveFollowing = true; stop(); if (data) setTime(data.window.last_us); refreshLive(); });
   $("replay-follow").addEventListener("change", draw);
   $("replay-geometry").addEventListener("change", loadCoverage);
   $("replay-geo-range").addEventListener("change", loadCoverage);
@@ -428,9 +487,9 @@
   document.addEventListener("keydown", (e) => {
     const tag = document.activeElement ? document.activeElement.tagName : "";
     if (!data || ["INPUT", "SELECT", "TEXTAREA", "BUTTON"].includes(tag)) return;   // their own keys stay theirs
-    if (e.key === " ") { e.preventDefault(); playing ? stop() : play(); }
-    else if (e.key === "ArrowLeft") setTime(t - 1e6);
-    else if (e.key === "ArrowRight") setTime(t + 1e6);
+    if (e.key === " ") { e.preventDefault(); if (liveActive) liveFollowing = false; playing ? stop() : play(); }
+    else if (e.key === "ArrowLeft") userSetTime(t - 1e6);
+    else if (e.key === "ArrowRight") userSetTime(t + 1e6);
   });
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
@@ -453,6 +512,19 @@
   canvas.addEventListener("pointerup", () => { drag = null; });
   canvas.addEventListener("dblclick", () => { fit(); draw(); });
   new ResizeObserver(resize).observe(canvas);
+
+  window.addEventListener("muhoed:alert-message", (event) => {
+    const msg = event.detail;
+    if (!liveActive || msg.alert_id !== liveAlertId) return;
+    if (msg.type === "alert.end") {
+      liveActive = false;
+      $("replay-live-state").textContent = "● Тревога завершилась";
+      $("replay-now").hidden = true;
+      return;
+    }
+    if (msg.alert?.stations?.length) liveStations = msg.alert.stations.map((s) => s.station_id).join(",");
+    if (msg.type === "alert.update" || msg.type === "track.update" || msg.type === "bearing") refreshLive();
+  });
 
   loadSources();
 })();
