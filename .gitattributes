@@ -4,3 +4,6 @@
 # server/BUILD_ID: git archive writes the commit and its date of the archived tree here (utils/build_info.py shows
 # them in the footer of every page and in /api/v1/health); a working copy keeps the placeholder and asks git.
 server/BUILD_ID export-subst
+
+# The installed backup helper is invoked directly by backup-daily.sh on Linux.
+server/deploy/scripts/backup_ubuntu.sh text eol=lf
