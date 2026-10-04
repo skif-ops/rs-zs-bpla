@@ -1,6 +1,25 @@
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body > main {
+  flex: 1 0 auto;
+}
+
 .app-navbar {
   background: #101828;
   border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+/* the build the server runs (utils/build_info.py), at the foot of every page */
+.app-footer {
+  margin-top: 1.5rem;
+  padding: .6rem 0 .9rem;
+  border-top: 1px solid #e4e7ec;
+  color: #98a2b3;
+  font-size: .8rem;
 }
 
 .page-header {

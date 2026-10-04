@@ -1,2 +1,6 @@
 # Preserve byte-exact upstream CMSIS snapshots, including upstream whitespace.
 /firmware/targets/evt_pre_20/vendor/cmsis_device_u5/** -whitespace
+
+# server/BUILD_ID: git archive writes the commit and its date of the archived tree here (utils/build_info.py shows
+# them in the footer of every page and in /api/v1/health); a working copy keeps the placeholder and asks git.
+server/BUILD_ID export-subst

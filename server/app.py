@@ -12,6 +12,7 @@ from fastapi.templating import Jinja2Templates
 
 from config import settings
 from models.schemas import RecordingMetadata, UploadedFileInfo
+from utils.build_info import current as current_build
 from utils.file_utils import (
     analysis_output_dir,
     analysis_upload_dir,
@@ -32,6 +33,7 @@ from station.operator_auth import OperatorAuthMiddleware, build_router as build_
 
 
 ensure_runtime_directories()
+build = current_build(settings.app_version)      # the release version and the packaged commit: page footers, /api/v1/health
 
 # retention of the event store (docs/SERVER_RETENTION_2026-10-03.md) and the firmware rollouts
 # (docs/SERVER_OTA_ROLLOUT_2026-10-03.md) run with the application
@@ -85,6 +87,7 @@ def _attach_image_urls(summary):
 templates.env.globals["artifact_url"] = artifact_url
 templates.env.globals["download_url"] = download_url
 templates.env.globals["dataset_image_url"] = dataset_image_url
+templates.env.globals["build"] = build
 
 single_service = None
 localization_service = None
