@@ -49,7 +49,7 @@ services:
       ZS_MQTT_KEY: /run/tls/bridge-bench.key.pem
       ZS_PKI_TENANTS: bench
       ZS_PKI_INCLUDE_TWINS: "1"
-      ZS_OPERATOR_TRUSTED_PROXY: "1"
+      ZS_OPERATOR_TRUSTED_PROXY: "0"
     ports:
       - "127.0.0.1:8001:8000"
     volumes:
