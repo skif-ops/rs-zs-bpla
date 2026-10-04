@@ -33,6 +33,27 @@ services:
       - ./tls:/run/tls:ro
     depends_on:
       - mqtt
+  bench_server:
+    build:
+      context: ..
+    restart: unless-stopped
+    cpus: 0.50
+    mem_limit: 512m
+    environment:
+      ZS_MQTT_HOST: mqtt
+      ZS_MQTT_PORT: "8883"
+      ZS_MQTT_CA: /run/tls/ca-chain.pem
+      ZS_MQTT_CERT: /run/tls/bridge.crt.pem
+      ZS_MQTT_KEY: /run/tls/bridge.key.pem
+      ZS_OPERATOR_TRUSTED_PROXY: "1"
+    ports:
+      - "127.0.0.1:8001:8000"
+    volumes:
+      - ../bench-data:/app/data
+      - ../bench-output:/app/output
+      - ./tls:/run/tls:ro
+    depends_on:
+      - mqtt
   mqtt_bridge_pilot1:
     build:
       context: ..
@@ -65,16 +86,18 @@ services:
     build:
       context: ..
     restart: unless-stopped
+    cpus: 0.50
+    mem_limit: 512m
     command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "bench", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem"]
     environment:
       ZS_TENANT: bench
       ZS_COMMAND_SIGNING_KEY: /run/tls/command-signing.key
     volumes:
-      - ../data:/app/data
+      - ../bench-data:/app/data
       - ./tls:/run/tls:ro
     depends_on:
       - mqtt
-      - server
+      - bench_server
   mqtt_alerts:                                  # the output API dioneya.alert/1 over MQTT (DIONEYA_ALERT_API_v1.md, 4.4)
     build:
       context: ..
@@ -86,5 +109,18 @@ services:
     depends_on:
       - mqtt
       - server
+  mqtt_alerts_bench:
+    build:
+      context: ..
+    restart: unless-stopped
+    cpus: 0.25
+    mem_limit: 256m
+    command: ["python", "-m", "integration.mqtt_alerts", "--host", "mqtt", "--port", "8883", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem", "--tenants", "bench", "--client-id", "dioneya-alerts-bench"]
+    volumes:
+      - ../bench-data:/app/data
+      - ./tls:/run/tls:ro
+    depends_on:
+      - mqtt
+      - bench_server
 volumes:
   mqtt_data:

@@ -154,6 +154,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--key", default=os.getenv("ZS_MQTT_KEY"))
     parser.add_argument("--tenants", default=os.getenv("ZS_ALERT_TENANTS", ""),
                         help="comma-separated tenants to publish (default: every tenant of the outbox)")
+    parser.add_argument("--client-id", default="dioneya-alerts",
+                        help="unique MQTT client ID (use a separate one for each publisher)")
     parser.add_argument("--start", default="latest", choices=("latest", "earliest"),
                         help="where a new publisher starts: only new messages, or the whole outbox")
     parser.add_argument("--heartbeat-s", type=float, default=60.0)
@@ -200,7 +202,7 @@ def main(argv: list[str] | None = None) -> None:
     tenants = parse_tenants(args.tenants)
     logging.basicConfig(level=logging.INFO, stream=sys.stderr, format="%(asctime)s %(name)s %(levelname)s %(message)s")
 
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="dioneya-alerts", clean_session=True)
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=args.client_id, clean_session=True)
     if secure:
         client.tls_set(ca_certs=args.ca, certfile=args.cert, keyfile=args.key)
         client.tls_insecure_set(False)

@@ -37,6 +37,7 @@ import json
 import math
 import multiprocessing as mp
 import random
+import re
 import statistics
 import struct
 import sys
@@ -101,6 +102,20 @@ def make_field() -> list[Station]:
         stations.append(Station(i + 21, "pilot2", (i * STATION_SPACING_M + 600.0, 6000.0 + (250.0 if i % 2 else -250.0), 0.0)))
     stations.append(Station(41, "bench", (11400.0, 3000.0, 0.0)))
     return stations
+
+
+def scenario_stations(count: int, tenant: str = "", station_id_base: int = 1000) -> list[Station]:
+    """Keep the field geometry while giving an isolated bench its own tenant and virtual IDs."""
+    if not 1 <= count <= 41:
+        raise ValueError("station count must be between 1 and 41")
+    stations = make_field()[:count]
+    if not tenant:
+        return stations
+    if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,31}", tenant) is None:
+        raise ValueError("invalid tenant")
+    if station_id_base < 0 or station_id_base + count > 0xFFFFFFFF:
+        raise ValueError("virtual station IDs outside uint32 range")
+    return [Station(station_id_base + i + 1, tenant, s.enu) for i, s in enumerate(stations)]
 
 
 def plan_passes(rng: random.Random, stations: list[Station], hours: float, episodes_per_station_day: float) -> list[Pass]:
@@ -512,12 +527,14 @@ def database_facts(db: Path) -> dict:
 
 def run(args) -> dict:
     out = Path(args.out)
+    if out.resolve().is_relative_to((SERVER_ROOT / "data").resolve()):
+        raise ValueError("load-test output must be outside the server data directory")
     out.mkdir(parents=True, exist_ok=True)
     db = out / "zs_bpla.sqlite3"
     for f in out.glob("zs_bpla.sqlite3*"):
         f.unlink()
     audio_root = out / "audio"                       # EventStore keeps the assembled segments beside its database
-    stations = make_field()[: args.stations]
+    stations = scenario_stations(args.stations, args.tenant, args.station_id_base)
     rng = random.Random(args.seed)
     passes = plan_passes(rng, stations, args.hours, args.episodes)
     faults = None if args.no_faults else Faults(dup_p=args.dup, reconnect_s=args.reconnect, restart_s=args.restart,
@@ -614,6 +631,9 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--hours", type=float, default=2.0, help="simulated duration")
     ap.add_argument("--episodes", type=float, default=5.0, help="episodes per station and day")
     ap.add_argument("--stations", type=int, default=41)
+    ap.add_argument("--tenant", default="", help="place every virtual station in one tenant, e.g. bench")
+    ap.add_argument("--station-id-base", type=int, default=1000,
+                    help="first ID is base + 1 when --tenant is set; keep clear of physical station IDs")
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--dup", type=float, default=Faults.dup_p, help="probability of a QoS 1 redelivery per message")
     ap.add_argument("--reconnect", type=float, default=Faults.reconnect_s, help="seconds between reconnects of a station (0: none)")

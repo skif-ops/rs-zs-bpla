@@ -5,9 +5,25 @@ nothing left unacknowledged, no locked database for the readers (docs/SERVER_LOA
 import json
 import sys
 from pathlib import Path
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 import load_field  # noqa: E402
+
+
+@pytest.mark.parametrize("count", [3, 20, 40])
+def test_bench_scenario_uses_only_virtual_ids_and_one_tenant(count: int):
+    stations = load_field.scenario_stations(count, "bench", 1000)
+    assert [s.station_id for s in stations] == list(range(1001, 1001 + count))
+    assert {s.tenant for s in stations} == {"bench"}
+    assert len({s.enu for s in stations}) == count
+
+
+def test_bench_scenario_rejects_invalid_ids_and_tenant():
+    with pytest.raises(ValueError):
+        load_field.scenario_stations(40, "pilot1/other", 1000)
+    with pytest.raises(ValueError):
+        load_field.scenario_stations(40, "bench", 0xFFFFFFFF)
 
 
 def test_half_an_hour_of_the_field_with_faults(tmp_path: Path):
