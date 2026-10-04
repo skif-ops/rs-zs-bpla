@@ -13,6 +13,7 @@ from __future__ import annotations
 from .registry import Registry, StationRow
 
 BRIDGE_USER = "bridge"
+BENCH_BRIDGE_USER = "bridge-bench"
 ALERT_TOPIC_PREFIX = "dioneya/alert/v1"          # integration/mqtt_alerts.TOPIC_PREFIX
 
 
@@ -58,6 +59,20 @@ def render_acl(registry: Registry, bridge_user: str = BRIDGE_USER) -> str:
             f"topic read zs/v1/{tenant}/+/bearing",
             f"topic write {alert_topic(tenant)}",
         ]
+    lines.extend(["", f"user {BENCH_BRIDGE_USER}"])
+    for access, topic in (
+        ("read", "zs/v1/bench/+/up"),
+        ("read", "zs/v1/bench/+/status"),
+        ("write", "zs/v1/bench/+/down"),
+        ("read", "zs/v1/bench/+/ack"),
+        ("write", "zs/v1/bench/+/receipt"),
+        ("read", "zs/v1/bench/+/audio"),
+        ("read", "zs/v1/bench/+/fwreq"),
+        ("write", "zs/v1/bench/+/fw"),
+        ("read", "zs/v1/bench/+/bearing"),
+        ("write", alert_topic("bench")),
+    ):
+        lines.append(f"topic {access} {topic}")
     lines.append("")
     for row in registry.active():
         lines.append(f"user {row.serial}")

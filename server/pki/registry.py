@@ -23,9 +23,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
-from .ca import BENCH_LOT, BENCH_SERIAL, LOT_BY_SERIAL, PkiError, lot_for_serial, station_id_for_serial
+from .ca import BENCH_LOT, BENCH_SERIAL, LOT_BY_SERIAL, TWIN_LOT, PkiError, lot_for_serial, station_id_for_serial
 
-DEFAULT_TENANT_BY_LOT = {"EVT-LOT-1": "pilot1", "EVT-LOT-2": "pilot2", BENCH_LOT: "bench"}
+DEFAULT_TENANT_BY_LOT = {"EVT-LOT-1": "pilot1", "EVT-LOT-2": "pilot2", BENCH_LOT: "bench", TWIN_LOT: "bench"}
 STATUSES = ("created", "provisioned", "commissioned", "revoked")
 
 _SCHEMA = """

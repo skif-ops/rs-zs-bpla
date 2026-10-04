@@ -18,6 +18,8 @@ server/data/operators.json
 server/data/operator_session.key
 server/data/audio/
 server/output/
+server/bench-data/
+server/bench-output/
 server/uploads/
 .env
 server/deploy/tls/

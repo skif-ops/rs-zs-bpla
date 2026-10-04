@@ -53,18 +53,20 @@ class MqttPublisher:
     """Publishes the outbox to the broker through a connected paho client (or anything with ``publish`` and
     ``is_connected``)."""
 
-    def __init__(self, store, client, *, tenants: tuple[str, ...] = (), start: str = "latest",
+    def __init__(self, store, client, *, tenants: tuple[str, ...] = (), exclude_tenants: tuple[str, ...] = (),
+                 start: str = "latest",
                  heartbeat_s: float = 60.0, cursor_name: str = CURSOR, clock=time.time,
                  publish_timeout_s: float = PUBLISH_TIMEOUT_S):
         if start not in ("latest", "earliest"):
             raise ValueError("start must be 'latest' or 'earliest'")
         self.store, self.client = store, client
         self.tenants = tuple(tenants)
+        self.exclude_tenants = frozenset(exclude_tenants)
         self.start, self.heartbeat_s, self.cursor_name, self.clock = start, heartbeat_s, cursor_name, clock
         self.publish_timeout_s = publish_timeout_s
         self.failures = 0
         self.last_publish_us: dict[str, int] = {}          # tenant -> wall time of its last message or heartbeat
-        self.seen: set[str] = set(self.tenants) or set(store.alert_tenants())   # tenants that get heartbeats
+        self.seen: set[str] = (set(self.tenants) or set(store.alert_tenants())) - self.exclude_tenants
 
     def cursor(self) -> int:
         seq = self.store.alert_cursor(self.cursor_name)
@@ -100,7 +102,7 @@ class MqttPublisher:
         delivered = 0
         for m in messages:
             tenant = m["tenant"]
-            if self.tenants and tenant not in self.tenants:
+            if tenant in self.exclude_tenants or (self.tenants and tenant not in self.tenants):
                 self.store.set_alert_cursor(self.cursor_name, m["seq"])
                 continue
             if not self._publish(tenant, m):
@@ -154,6 +156,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--key", default=os.getenv("ZS_MQTT_KEY"))
     parser.add_argument("--tenants", default=os.getenv("ZS_ALERT_TENANTS", ""),
                         help="comma-separated tenants to publish (default: every tenant of the outbox)")
+    parser.add_argument("--exclude-tenants", default=os.getenv("ZS_ALERT_EXCLUDE_TENANTS", ""),
+                        help="comma-separated tenants to skip, including retained heartbeats")
+    parser.add_argument("--client-id", default="dioneya-alerts",
+                        help="unique MQTT client ID (use a separate one for each publisher)")
     parser.add_argument("--start", default="latest", choices=("latest", "earliest"),
                         help="where a new publisher starts: only new messages, or the whole outbox")
     parser.add_argument("--heartbeat-s", type=float, default=60.0)
@@ -198,9 +204,10 @@ def main(argv: list[str] | None = None) -> None:
     args = build_parser().parse_args(argv)
     secure = tls_enabled(args)
     tenants = parse_tenants(args.tenants)
+    exclude_tenants = parse_tenants(args.exclude_tenants)
     logging.basicConfig(level=logging.INFO, stream=sys.stderr, format="%(asctime)s %(name)s %(levelname)s %(message)s")
 
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="dioneya-alerts", clean_session=True)
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=args.client_id, clean_session=True)
     if secure:
         client.tls_set(ca_certs=args.ca, certfile=args.cert, keyfile=args.key)
         client.tls_insecure_set(False)
@@ -223,8 +230,10 @@ def main(argv: list[str] | None = None) -> None:
             break
         time.sleep(0.1)
     store = EventStore(Path(args.db))
-    publisher = MqttPublisher(store, client, tenants=tenants, start=args.start, heartbeat_s=args.heartbeat_s)
-    log.info("publishing dioneya.alert/1 to %s/{%s}", TOPIC_PREFIX, ",".join(tenants) or "tenant")
+    publisher = MqttPublisher(store, client, tenants=tenants, exclude_tenants=exclude_tenants,
+                              start=args.start, heartbeat_s=args.heartbeat_s)
+    log.info("publishing dioneya.alert/1 to %s/{%s}; excluding {%s}", TOPIC_PREFIX,
+             ",".join(tenants) or "tenant", ",".join(exclude_tenants))
     try:
         publisher.run_forever()
     except KeyboardInterrupt:

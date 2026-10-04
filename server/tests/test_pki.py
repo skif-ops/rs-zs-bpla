@@ -104,6 +104,9 @@ def test_serial_scheme_two_lots_plus_bench():
     assert pki.lot_for_serial("DIO-EVT-040") == "EVT-LOT-2"
     assert pki.lot_for_serial("DIO-EVT-B01") == "BENCH"
     assert pki.station_id_for_serial("DIO-EVT-B01") == 901
+    assert pki.station_id_for_serial("DIO-TWIN-001") == 9001
+    assert pki.station_id_for_serial("DIO-TWIN-040") == 9040
+    assert pki.lot_for_serial("DIO-TWIN-020") == "TWIN-BENCH"
     assert pki.station_id_for_serial("DIO-EVT-037") == 37
     for bad in ("DIO-EVT-041", "DIO-EVT-000", "DIO-EVT-1", "station01", "DIO-EVT-B02"):
         with pytest.raises(pki.PkiError):
@@ -140,6 +143,9 @@ def test_registry_registers_41_units_with_tenants(tmp_path):
     rows = reg.add_all_lots()
     assert len(rows) == 41
     assert len(reg.add_all_lots()) == 41  # idempotent
+    virtual = reg.add("DIO-TWIN-001")
+    assert virtual.station_id == 9001 and virtual.tenant == "bench"
+    assert len(reg.add_all_lots()) == 41  # twins are explicit, never part of the pilot batch
     lots = {r.lot for r in rows}
     assert lots == {"EVT-LOT-1", "EVT-LOT-2", "BENCH"}
     assert {r.tenant for r in rows} == set(DEFAULT_TENANT_BY_LOT.values())
@@ -161,6 +167,10 @@ def test_acl_only_lists_active_stations_and_isolates_tenants(tmp_path):
     reg.mark_provisioned("DIO-EVT-007", 126, "aa" * 32, "2029-01-01T00:00:00+00:00")
     reg.revoke("DIO-EVT-007", "returned")
     acl = render_acl(reg)
+    bench_bridge = acl.split("user bridge-bench\n", 1)[1].split("\nuser ", 1)[0]
+    assert "topic read zs/v1/bench/+/up" in bench_bridge
+    assert "topic write dioneya/alert/v1/bench" in bench_bridge
+    assert "pilot1" not in bench_bridge and "pilot2" not in bench_bridge
     assert "user DIO-EVT-003\ntopic write zs/v1/pilot1/3/up" in acl
     assert "user DIO-EVT-025\ntopic write zs/v1/pilot2/25/up" in acl
     assert "user DIO-EVT-B01\ntopic write zs/v1/bench/901/up" in acl
@@ -210,6 +220,9 @@ def test_cli_end_to_end(tmp_path, monkeypatch):
     assert cli(["bridge-cert", "--pki", str(server)]) == 0
     bridge = pki.cert_from_pem((server / "server" / "bridge.crt.pem").read_bytes())
     assert bridge.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value == "bridge"
+    assert cli(["bridge-cert", "--pki", str(server), "--cn", "bridge-bench"]) == 0
+    bench_bridge = pki.cert_from_pem((server / "server" / "bridge-bench.crt.pem").read_bytes())
+    assert bench_bridge.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value == "bridge-bench"
     assert cli(["station-add", "--pki", str(server), "--all-lots"]) == 0
     assert cli(["station-keygen", "--pki", str(server), "DIO-EVT-B01"]) == 2      # needs explicit flag
     assert cli(["station-keygen", "--pki", str(server), "DIO-EVT-B01", "--allow-server-side-key"]) == 0

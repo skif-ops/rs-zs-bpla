@@ -1,4 +1,5 @@
-# tls/: ca-chain.pem, server.crt.pem, server.key.pem, crl.pem, bridge.crt.pem, bridge.key.pem (from server/pki).
+# tls/: ca-chain.pem, server.crt.pem, server.key.pem, crl.pem, bridge.crt.pem, bridge.key.pem;
+# optional bench profile uses its own bridge-bench.crt.pem/key.pem and command-signing-bench.key.
 # The server certificate must carry the DNS name `mqtt` besides the public name: the bridges and mqtt_alerts connect to
 # the broker by this service name and verify it (`python -m pki.cli server-cert --dns <public> --dns mqtt --ip <ip>`).
 # Mosquitto reads server.key.pem after dropping privileges to uid 1883: chown 1883 and mode 0400, the directory 0755.
@@ -33,6 +34,32 @@ services:
       - ./tls:/run/tls:ro
     depends_on:
       - mqtt
+  bench_server:
+    profiles: ["bench"]
+    build:
+      context: ..
+    restart: unless-stopped
+    cpus: 0.50
+    mem_limit: 256m
+    environment:
+      ZS_MQTT_HOST: mqtt
+      ZS_MQTT_PORT: "8883"
+      ZS_MQTT_CA: /run/tls/ca-chain.pem
+      ZS_MQTT_CERT: /run/tls/bridge-bench.crt.pem
+      ZS_MQTT_KEY: /run/tls/bridge-bench.key.pem
+      ZS_PKI_TENANTS: bench
+      ZS_PKI_INCLUDE_TWINS: "1"
+      ZS_OPERATOR_TRUSTED_PROXY: "0"
+    ports:
+      - "127.0.0.1:8001:8000"
+    volumes:
+      - ../bench-data:/app/data
+      - ../bench-output:/app/output
+      - ./tls/ca-chain.pem:/run/tls/ca-chain.pem:ro
+      - ./tls/bridge-bench.crt.pem:/run/tls/bridge-bench.crt.pem:ro
+      - ./tls/bridge-bench.key.pem:/run/tls/bridge-bench.key.pem:ro
+    depends_on:
+      - mqtt
   mqtt_bridge_pilot1:
     build:
       context: ..
@@ -62,29 +89,51 @@ services:
       - mqtt
       - server
   mqtt_bridge_bench:
+    profiles: ["bench"]
     build:
       context: ..
     restart: unless-stopped
-    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "bench", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem"]
+    cpus: 0.50
+    mem_limit: 256m
+    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "bench", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge-bench.crt.pem", "--key", "/run/tls/bridge-bench.key.pem"]
     environment:
       ZS_TENANT: bench
-      ZS_COMMAND_SIGNING_KEY: /run/tls/command-signing.key
+      ZS_COMMAND_SIGNING_KEY: /run/tls/command-signing-bench.key
     volumes:
-      - ../data:/app/data
-      - ./tls:/run/tls:ro
+      - ../bench-data:/app/data
+      - ./tls/ca-chain.pem:/run/tls/ca-chain.pem:ro
+      - ./tls/bridge-bench.crt.pem:/run/tls/bridge-bench.crt.pem:ro
+      - ./tls/bridge-bench.key.pem:/run/tls/bridge-bench.key.pem:ro
+      - ./tls/command-signing-bench.key:/run/tls/command-signing-bench.key:ro
     depends_on:
       - mqtt
-      - server
+      - bench_server
   mqtt_alerts:                                  # the output API dioneya.alert/1 over MQTT (DIONEYA_ALERT_API_v1.md, 4.4)
     build:
       context: ..
     restart: unless-stopped
-    command: ["python", "-m", "integration.mqtt_alerts", "--host", "mqtt", "--port", "8883", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem"]
+    command: ["python", "-m", "integration.mqtt_alerts", "--host", "mqtt", "--port", "8883", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem", "--exclude-tenants", "bench"]
     volumes:
       - ../data:/app/data
       - ./tls:/run/tls:ro
     depends_on:
       - mqtt
       - server
+  mqtt_alerts_bench:
+    profiles: ["bench"]
+    build:
+      context: ..
+    restart: unless-stopped
+    cpus: 0.25
+    mem_limit: 128m
+    command: ["python", "-m", "integration.mqtt_alerts", "--host", "mqtt", "--port", "8883", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge-bench.crt.pem", "--key", "/run/tls/bridge-bench.key.pem", "--tenants", "bench", "--client-id", "dioneya-alerts-bench"]
+    volumes:
+      - ../bench-data:/app/data
+      - ./tls/ca-chain.pem:/run/tls/ca-chain.pem:ro
+      - ./tls/bridge-bench.crt.pem:/run/tls/bridge-bench.crt.pem:ro
+      - ./tls/bridge-bench.key.pem:/run/tls/bridge-bench.key.pem:ro
+    depends_on:
+      - mqtt
+      - bench_server
 volumes:
   mqtt_data:

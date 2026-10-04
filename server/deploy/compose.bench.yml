@@ -1,0 +1,89 @@
+# Standalone local-only bench stack. Run from its own source tree at /opt/muhoed-bench/server.
+# Never attach these services to the production Compose project or network.
+name: dioneya-bench
+services:
+  mqtt:
+    image: eclipse-mosquitto:2.0
+    restart: unless-stopped
+    cpus: 0.25
+    mem_limit: 96m
+    ports:
+      - "127.0.0.1:8884:8883"
+    volumes:
+      - ../../config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ../../config/station_acl.conf:/mosquitto/config/station_acl.conf:ro
+      - ../../config/tls:/mosquitto/certs:ro
+      - mqtt_data:/mosquitto/data
+
+  server:
+    build:
+      context: ..
+    image: dioneya-bench-server:local
+    restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 256m
+    environment:
+      ZS_MQTT_HOST: mqtt
+      ZS_MQTT_PORT: "8883"
+      ZS_MQTT_CA: /run/tls/ca-chain.pem
+      ZS_MQTT_CERT: /run/tls/bridge-bench.crt.pem
+      ZS_MQTT_KEY: /run/tls/bridge-bench.key.pem
+      ZS_PKI_TENANTS: bench
+      ZS_PKI_INCLUDE_TWINS: "1"
+      ZS_OPERATOR_TRUSTED_PROXY: "0"
+      ZS_OPERATOR_COOKIE_SECURE: "0"
+      ZS_OPERATOR_TOTP: "0"
+    ports:
+      - "127.0.0.1:8001:8000"
+    volumes:
+      - ../data:/app/data
+      - ../output:/app/output
+      - ../../config/tls:/run/tls:ro
+    depends_on:
+      - mqtt
+
+  mqtt_bridge_bench:
+    image: dioneya-bench-server:local
+    restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 256m
+    command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "bench", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge-bench.crt.pem", "--key", "/run/tls/bridge-bench.key.pem"]
+    environment:
+      ZS_TENANT: bench
+      ZS_COMMAND_SIGNING_KEY: /run/tls/command-signing-bench.key
+    volumes:
+      - ../data:/app/data
+      - ../../config/tls:/run/tls:ro
+    depends_on:
+      - mqtt
+      - server
+
+  twin_sender:
+    image: dioneya-bench-server:local
+    restart: unless-stopped
+    cpus: 0.25
+    mem_limit: 128m
+    command: ["python", "tools/bench_heartbeat_daemon.py", "--credentials", "/run/stations", "--ca", "/run/tls/ca-chain.pem", "--host", "mqtt", "--port", "8883", "--cycle-seconds", "1800"]
+    volumes:
+      - ../data/pki/stations:/run/stations:ro
+      - ../../config/tls/ca-chain.pem:/run/tls/ca-chain.pem:ro
+    depends_on:
+      - mqtt
+      - mqtt_bridge_bench
+
+  mqtt_alerts_bench:
+    profiles: ["alerts"]
+    image: dioneya-bench-server:local
+    restart: unless-stopped
+    cpus: 0.25
+    mem_limit: 128m
+    command: ["python", "-m", "integration.mqtt_alerts", "--host", "mqtt", "--port", "8883", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge-bench.crt.pem", "--key", "/run/tls/bridge-bench.key.pem", "--tenants", "bench", "--client-id", "dioneya-alerts-bench"]
+    volumes:
+      - ../data:/app/data
+      - ../../config/tls:/run/tls:ro
+    depends_on:
+      - mqtt
+      - server
+
+volumes:
+  mqtt_data:
