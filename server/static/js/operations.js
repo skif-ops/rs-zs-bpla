@@ -74,11 +74,11 @@
     const points = located.map((r) => ({ r, x: Number(r.position.lon) * cos, y: Number(r.position.lat) }));
     const xs = points.map((p) => p.x), ys = points.map((p) => p.y);
     const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-    const span = Math.max(maxX - minX, maxY - minY, 0.00005);
+    const scale = Math.min(650 / Math.max(maxX - minX, 0.00005), 335 / Math.max(maxY - minY, 0.00005));
     const labels = points.length <= 12;
     for (const p of points) {
-      const x = 400 + (p.x - (minX + maxX) / 2) * 650 / span;
-      const y = 210 - (p.y - (minY + maxY) / 2) * 335 / span;
+      const x = 400 + (p.x - (minX + maxX) / 2) * scale;
+      const y = 210 - (p.y - (minY + maxY) / 2) * scale;
       const g = svg("g", { class: "ops-map-point ops-map-" + status(p.r), tabindex: 0, role: "link",
         "aria-label": nameOf(p.r) + ", " + (stateText[p.r.state] || p.r.state) + ". Открыть список станций" });
       const title = svg("title"); title.textContent = nameOf(p.r) + " · " + (stateText[p.r.state] || p.r.state); g.appendChild(title);
