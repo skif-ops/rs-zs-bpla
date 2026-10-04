@@ -78,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--stations", type=int, choices=(3, 20, 40), required=True)
     parser.add_argument("--credentials", type=Path, required=True, help="directory with DIO-TWIN-001/... certificates")
     parser.add_argument("--ca", type=Path, required=True)
-    parser.add_argument("--host", default="localhost")
+    parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8884)
     parser.add_argument("--timeout", type=float, default=10.0)
     parser.add_argument("--gap", type=float, default=1.0, help="minimum seconds between stations")

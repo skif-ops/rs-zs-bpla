@@ -58,6 +58,19 @@ services:
       - mqtt
       - server
 
+  twin_sender:
+    image: dioneya-bench-server:local
+    restart: unless-stopped
+    cpus: 0.25
+    mem_limit: 128m
+    command: ["python", "tools/bench_heartbeat_daemon.py", "--credentials", "/run/stations", "--ca", "/run/tls/ca-chain.pem", "--host", "mqtt", "--port", "8883", "--cycle-seconds", "1800"]
+    volumes:
+      - ../data/pki/stations:/run/stations:ro
+      - ../../config/tls/ca-chain.pem:/run/tls/ca-chain.pem:ro
+    depends_on:
+      - mqtt
+      - mqtt_bridge_bench
+
   mqtt_alerts_bench:
     profiles: ["alerts"]
     image: dioneya-bench-server:local
