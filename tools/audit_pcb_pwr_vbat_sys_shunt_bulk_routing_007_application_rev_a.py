@@ -8,6 +8,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from pcb_pwr_board_identity import is_rev_e_metadata_only
+
 from kiutils.board import Board
 
 import audit_pcb_pwr_vbat_sys_shunt_bulk_routing_007_candidate_rev_a as candidate_audit
@@ -33,7 +35,7 @@ ECO_006_SHA = "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7"
 
 def audit(drc_base: Path | None = None, drc_active: Path | None = None) -> dict:
     active_sha = hashlib.sha256(BOARD.read_bytes()).hexdigest()
-    assert active_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA}
+    assert active_sha in {CANDIDATE_SHA, SUCCESSOR_SHA, ACTIVE_SUCCESSOR_SHA, OUTPUT_BULK_010_SHA, J2_PLACEMENT_ECO_003_SHA, AUTOROUTE_011_SHA, ECO_005_SHA, ECO_006_SHA} or is_rev_e_metadata_only(BOARD.read_bytes())
     application_board = BOARD if active_sha == CANDIDATE_SHA else CANDIDATE
     assert hashlib.sha256(application_board.read_bytes()).hexdigest() == CANDIDATE_SHA
     assert application_board.read_bytes() == CANDIDATE.read_bytes()

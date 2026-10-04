@@ -51,15 +51,14 @@
 - PCB-MAIN: 186-сетевой authority PASS, `JLC06161H-3313` и геометрия 50/90 Ом
   приняты для EVT, активны 1023 trace items и восемь copper zones; оставшаяся
   трассировка, SI, DRC, CAM, checkout DFM и Review B открыты;
-- PCB-PWR: `DIM-003` принят `18/18` для EVT; `JLC04161H-3313A`, 70/35 µm
-  copper, минимум 18 µm hole wall и расчётная силовая геометрия приняты;
-  после точного power-stage ECO-002 были активны 14 trace items при zero
-  vias/zones, application gate ECO-002 прошёл CI #692, PCB-PWR Schematic #103
-  и PCB Native #357; после routing 010 активны 53 trace items (45 segments, 8 vias) и две зоны
-  `GND_PWR`; authoritative board SHA-256 `e46097f8…`; application gate routing
-  010 прошёл CI #761, PCB-PWR Schematic #125 и PCB Native #394 (DRC `85→85`,
-  unconnected `105→101`); медь есть у 10 из 31 цепей, оставшаяся трассировка
-  открыта;
+- PCB-PWR: действующая геометрия ECO-006 подтверждена пакетом Review B Rev E; DIM-003 Rev A
+  возвращён на доработку после обнаружения зеркала по Y, Rev B перевыпущен по
+  фактической плате как кандидат независимой механической проверки. ECO-004
+  применён: 4 слоя, наружная и внутренняя медь 1 oz / 35 мкм, ENIG,
+  минимальная стенка отверстия 18 мкм; исторический `JLC04161H-3313A` с
+  наружной медью 70 мкм не служит заданием на заказ. Идентификатор стека
+  выбранной фабрики, CAD корпуса/оснастки и независимая подпись Review B остаются открытыми;
+  на архивном этапе ECO-002 были активны 14 trace items, application gate ECO-002 пройден;
 - PCB-MIC: стандартный двухслойный/PCBA процесс и все 9 инженерных строк
   приняты; first-panel bore inspection, CAM comparison, общий Review B и
   physical EVT открыты;

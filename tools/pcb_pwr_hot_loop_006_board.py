@@ -9,6 +9,8 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
+from pcb_pwr_board_identity import is_rev_e_metadata_only
+
 
 ROOT = Path(__file__).resolve().parents[1]
 PREDECESSOR = ROOT / "hardware/kicad/candidates/PCB-PWR-BUCK-POWER-STAGE-ECO-002/PCB-PWR_BUCK_POWER_STAGE_ECO_002_CANDIDATE_REV_A.kicad_pcb"
@@ -79,7 +81,7 @@ def is_controlled_application_or_successor(board: Path) -> bool:
                 and payload == OUTPUT_BULK_010.read_bytes())
             or is_j2_placement_eco_003(payload)
             or is_autoroute_011(payload)
-            or is_eco_005(payload) or is_eco_006(payload))
+            or is_eco_005(payload) or is_eco_006(payload) or is_rev_e_metadata_only(payload))
 
 
 def historical_basis_board(active: Path) -> Path:
@@ -103,6 +105,6 @@ def hot_loop_application_board(active: Path) -> Path:
                 and payload == OUTPUT_BULK_010.read_bytes())
             or is_j2_placement_eco_003(payload)
             or is_autoroute_011(payload)
-            or is_eco_005(payload) or is_eco_006(payload)):
+            or is_eco_005(payload) or is_eco_006(payload) or is_rev_e_metadata_only(payload)):
         return CANDIDATE
     return active

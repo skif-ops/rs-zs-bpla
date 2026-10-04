@@ -1,0 +1,55 @@
+{
+  "schema": "dioneya-pcb-pwr-dim-003-rev-b-step-evidence-v1",
+  "authority": "PCB_PWR_DIM_003_EVT_AUTHORITY_REV_B.json",
+  "source_board_sha256": "b8c1da6ca80b9e5d2795c4fee5b6926e4ab6169086795295e8e517a18def6ca7",
+  "coordinate_transform": "x_authority = x_kicad; y_authority = 60 - y_kicad",
+  "outline_size_mm": [
+    90,
+    60
+  ],
+  "holes_lower_left_y_up_mm": {
+    "H1": [
+      5,
+      55
+    ],
+    "H2": [
+      82,
+      55
+    ],
+    "H3": [
+      68,
+      5
+    ],
+    "H4": [
+      5,
+      5
+    ]
+  },
+  "j1_service_box_mm": [
+    [
+      0,
+      20,
+      1.6
+    ],
+    [
+      12,
+      40,
+      40
+    ]
+  ],
+  "j2_service_box_mm": [
+    [
+      80,
+      0,
+      1.6
+    ],
+    [
+      130,
+      25,
+      22
+    ]
+  ],
+  "step_sha256": "45920e1d17f9079933c7955e6fef82f0489efc00076bbe95269f07806b43b13f",
+  "independent_fit_review": "PENDING",
+  "manufacturing_release": false
+}
