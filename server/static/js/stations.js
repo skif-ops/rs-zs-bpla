@@ -74,6 +74,8 @@
   let sortKey = "state", sortDesc = true;
   let filters = {};                      // column key -> lower-case text
   let quick = "";                        // the summary card filter: state:x, level:x, problem:x
+  let selectedTenant = "";
+  let viewMode = "cards";
   const open = new Set();                // station ids with the details row open
 
   function quickMatch(r) {
@@ -94,7 +96,7 @@
     const rows = data.stations.map((r) => r.silence_s === null ? r : Object.assign({}, r, { silence_s: r.silence_s + elapsed }));
     const col = columns.find((c) => c.key === sortKey) || columns[0];
     const keyOf = col.sort || col.value;
-    const out = rows.filter((r) => quickMatch(r) && columns.every((c) => {
+    const out = rows.filter((r) => (!selectedTenant || r.tenant === selectedTenant) && quickMatch(r) && columns.every((c) => {
       const f = filters[c.key];
       return !f || String(c.value(r) ?? "").toLowerCase().includes(f);
     }));
@@ -169,9 +171,54 @@
     return tr;
   }
 
+  function renderOverview(rows) {
+    const overview = $("st-overview");
+    overview.replaceChildren();
+    rows.forEach((r) => {
+      const card = el("button", "st-station-card st-level-" + r.level);
+      card.type = "button";
+      card.setAttribute("aria-label", "Станция " + r.station_id + ", " + (STATE_TEXT[r.state] || r.state) + ". Открыть подробности");
+      const top = el("span", "st-station-top");
+      top.appendChild(el("strong", "", "№ " + r.station_id));
+      top.appendChild(el("span", "st-badge st-" + r.state, STATE_TEXT[r.state] || r.state));
+      card.appendChild(top);
+      card.appendChild(el("span", "st-station-tenant", r.tenant || "Без участка"));
+      card.appendChild(el("span", "st-station-seen", r.silence_s === null ? "Heartbeat: никогда" : "Heartbeat: " + fmt.ago(r.silence_s)));
+      const metrics = el("span", "st-station-metrics");
+      metrics.appendChild(el("span", "", "Батарея: " + (r.power.battery_pct === null ? "нет данных" : r.power.battery_pct + " %")));
+      metrics.appendChild(el("span", "", "GNSS: " + (r.gnss.fix_type === null ? "нет данных" : r.gnss.fix_type ? "fix " + r.gnss.fix_type : "нет fix")));
+      metrics.appendChild(el("span", "", "Самотест: " + (r.self_test_ok === null ? "нет данных" : r.self_test_ok ? "пройден" : "ошибка")));
+      card.appendChild(metrics);
+      const problem = r.problems.length ? r.problems[0].text + (r.problems.length > 1 ? " · ещё " + (r.problems.length - 1) : "") :
+        r.state === "online" ? "По последнему heartbeat замечаний нет" : "Требуется проверить связь";
+      card.appendChild(el("span", "st-station-problem", problem));
+      card.addEventListener("click", () => {
+        open.add(r.station_id);
+        setView("table");
+        const row = [...$("st-body").querySelectorAll(".st-row")].find((node) => Number(node.dataset.id) === r.station_id);
+        if (row) row.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      overview.appendChild(card);
+    });
+  }
+
+  function setView(mode) {
+    viewMode = mode;
+    $("st-overview").hidden = mode !== "cards";
+    $("st-table-wrap").hidden = mode !== "table";
+    for (const choice of ["cards", "table"]) {
+      const button = $("st-view-" + choice);
+      const active = mode === choice;
+      button.classList.toggle("st-view-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+    renderBody();
+  }
+
   function renderBody() {
     const body = $("st-body"); body.replaceChildren();
     const rows = visible();
+    renderOverview(rows);
     rows.forEach((r) => {
       const tr = el("tr", "st-row st-level-" + r.level);
       tr.dataset.id = r.station_id;
@@ -186,11 +233,23 @@
       if (open.has(r.station_id)) body.appendChild(detailRow(r));
     });
     $("st-empty").hidden = rows.length > 0;
-    $("st-shown").textContent = rows.length === data.stations.length ? "" : "показано " + rows.length + " из " + data.stations.length;
+    $("st-shown").textContent = "показано " + rows.length + " из " + data.stations.length;
   }
 
   function renderSummary() {
-    const s = data.summary || {};
+    const pool = selectedTenant ? data.stations.filter((r) => r.tenant === selectedTenant) : data.stations;
+    const s = selectedTenant ? {
+      total: pool.length,
+      online: pool.filter((r) => r.state === "online").length,
+      late: pool.filter((r) => r.state === "late").length,
+      lost: pool.filter((r) => r.state === "lost").length,
+      never: pool.filter((r) => r.state === "never").length,
+      alarm: pool.filter((r) => r.level === "alarm").length,
+      warn: pool.filter((r) => r.level === "warn").length,
+      battery_low: pool.filter((r) => r.problems.some((p) => p.code === "battery_low")).length,
+      gnss: pool.filter((r) => r.problems.some((p) => /^(gnss_|position_|time_)/.test(p.code))).length,
+      updating: pool.filter((r) => r.problems.some((p) => p.code === "fw_update" || p.code === "net_trial")).length,
+    } : (data.summary || {});
     document.querySelectorAll("#st-summary .st-num").forEach((n) => { n.textContent = s[n.dataset.key] ?? "–"; });
     document.querySelectorAll("#st-summary .st-card").forEach((b) => b.classList.toggle("st-active", b.dataset.filter === quick));
     const hours = (v) => v ? (v / 3600).toLocaleString("ru-RU", { maximumFractionDigits: 1 }) + " ч" : "";
@@ -204,9 +263,17 @@
       const res = await fetch("/api/v1/stations/health", { headers: { accept: "application/json" }, cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       data = await res.json(); receivedAt = Date.now();
+      const tenantSelect = $("st-tenant");
+      const tenants = [...new Set(data.stations.map((r) => r.tenant).filter(Boolean))].sort();
+      tenantSelect.replaceChildren(new Option("Все доступные", ""));
+      tenants.forEach((tenant) => tenantSelect.add(new Option(tenant === "bench" ? "bench · испытания" : tenant, tenant)));
+      if (selectedTenant && !tenants.includes(selectedTenant)) selectedTenant = "";
+      tenantSelect.value = selectedTenant;
       $("st-status").textContent = "Данные на " + new Date(data.now_us / 1000).toLocaleTimeString("ru-RU");
+      $("st-status").classList.remove("st-error");
     } catch (err) {
       $("st-status").textContent = "Не удалось обновить: " + err.message;
+      $("st-status").classList.add("st-error");
     }
     renderSummary(); renderBody();
   }
@@ -215,10 +282,14 @@
     quick = quick === b.dataset.filter ? "" : b.dataset.filter; renderSummary(); renderBody();
   }));
   $("st-reset").addEventListener("click", () => { filters = {}; quick = ""; renderHead(); renderSummary(); renderBody(); });
+  $("st-tenant").addEventListener("change", (event) => { selectedTenant = event.target.value; renderSummary(); renderBody(); });
+  $("st-view-cards").addEventListener("click", () => setView("cards"));
+  $("st-view-table").addEventListener("click", () => setView("table"));
   $("st-refresh").addEventListener("click", load);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
 
   renderHead();
+  setView("cards");
   load();
   setInterval(() => { if (!document.hidden) load(); else renderBody(); }, REFRESH_MS);
 })();
