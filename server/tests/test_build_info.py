@@ -1,5 +1,5 @@
 """The build shown in the footer of every page and in /api/v1/health (utils/build_info.py): the commit git archive wrote
-into server/BUILD, git in a working copy, ZS_BUILD on a bench, and only the release version when nothing is known."""
+into server/BUILD_ID, git in a working copy, ZS_BUILD on a bench, and only the release version when nothing is known."""
 from pathlib import Path
 
 from config import settings
@@ -16,7 +16,7 @@ def test_parse_takes_the_commit_and_date_and_refuses_the_placeholder():
 
 
 def test_build_label_and_sources(tmp_path: Path):
-    archived = tmp_path / "BUILD"
+    archived = tmp_path / "BUILD_ID"
     archived.write_text("696d9c801b68409655a2de598a942682b2a26513 2026-10-03\n", encoding="utf-8")
     b = build_info.read_build("1.2.0-x", archived, env={})
     assert (b.commit, b.date, b.date_ru) == ("696d9c80", "2026-10-03", "03.10.2026")
@@ -27,7 +27,7 @@ def test_build_label_and_sources(tmp_path: Path):
     assert (b.commit, b.date) == ("01234567", None) and b.label == "1.2.0-x, сборка 01234567"
     # a placeholder outside a git repository, or no file at all: only the version
     (tmp_path / "git-free").mkdir()
-    placeholder = tmp_path / "git-free" / "BUILD"
+    placeholder = tmp_path / "git-free" / "BUILD_ID"
     placeholder.write_text("$Format:%H %cs$\n", encoding="utf-8")
     assert build_info.read_build("1.2.0-x", placeholder, env={}).label == "1.2.0-x"
     assert build_info.read_build("1.2.0-x", tmp_path / "git-free" / "missing", env={}).label == "1.2.0-x"

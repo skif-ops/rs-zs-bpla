@@ -1,6 +1,6 @@
 """Which build the server runs: the release version (config.settings.app_version) and the commit it was packaged from.
 
-``server/BUILD`` holds the placeholder ``$Format:%H %cs$``; ``git archive`` replaces it with the commit hash and date of
+``server/BUILD_ID`` holds the placeholder ``$Format:%H %cs$``; ``git archive`` replaces it with the commit hash and date of
 the archived tree (``.gitattributes``: ``export-subst``), so the package installed on a server carries its own identity
 without anyone editing a version by hand.  A working copy still has the placeholder and asks git instead; where neither
 is available (no file, no git) only the release version is known.  ``ZS_BUILD`` ("<commit> <YYYY-MM-DD>") overrides
@@ -17,7 +17,7 @@ from functools import lru_cache
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parents[1]
-BUILD_FILE = BASE / "BUILD"
+BUILD_FILE = BASE / "BUILD_ID"   # not "BUILD": PyInstaller makes a build/ directory next to it on Windows
 BUILD_ENV = "ZS_BUILD"
 SHORT = 8                                   # the length the deploy scripts use in VERSION.txt
 PLACEHOLDER = "$Format"
