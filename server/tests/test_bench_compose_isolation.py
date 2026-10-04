@@ -24,4 +24,5 @@ def test_bench_has_its_own_data_and_local_only_web_port():
     assert '127.0.0.1:8001:8000' in service("bench_server")
     assert "- ../bench-output:/app/output" in service("bench_server")
     assert '"--tenants", "bench"' in service("mqtt_alerts_bench")
+    assert '"--tenants", "pilot1,pilot2"' in service("mqtt_alerts")
     assert '"--client-id", "dioneya-alerts-bench"' in service("mqtt_alerts_bench")
