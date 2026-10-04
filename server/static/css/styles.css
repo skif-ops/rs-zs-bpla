@@ -133,6 +133,7 @@ body > main {
   .app-brand { grid-column: 1; grid-row: 1; }
   .app-header-actions { display: contents; }
   .app-nav-menu { grid-column: 2; grid-row: 1; justify-self: end; }
+  .app-nav-panel { top: calc(100% + 2.75rem); }
   .alert-channel-status { grid-column: 1 / -1; grid-row: 2; justify-self: start; }
 }
 .index-group { font-size: 1.05rem; font-weight: 600; color: #475467; margin: 1.5rem 0 .75rem; }
