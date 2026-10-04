@@ -26,7 +26,18 @@ python tools/load_field.py --stations 20 --tenant bench --station-id-base 1000 -
 python tools/load_field.py --stations 40 --tenant bench --station-id-base 1000 --hours 24 --out <results>/40 --check
 ```
 
-В показанных командах используются ID 1001…1040, которые не пересекаются с 1…40 физических станций и действующим образцом 901. Перед выдачей сертификатов повторно проверить живой реестр: при обнаружении совпадения выбрать другой непрерывный диапазон. Результат нагрузочной ступени находится в `report.json` рядом с отдельной базой. Успех означает `ok: true`, отсутствие сообщений без подтверждения и ошибок обработки, полное сохранение уникальных событий, пеленгов и аудио.
+В показанных командах используются ID 1001…1040, которые не пересекаются с 1…40 физических станций и действующим образцом 901. Перед выдачей сертификатов повторно проверить живой реестр; при совпадении ID остановить подготовку и изменить карту ID в коде и документации. Результат нагрузочной ступени находится в `report.json` рядом с отдельной базой. Успех означает `ok: true`, отсутствие сообщений без подтверждения и ошибок обработки, полное сохранение уникальных событий, пеленгов и аудио.
+
+После выполнения защитных шагов ниже проверить настоящий TLS-брокер, мост и хранилище стенда. `tools/bench_mqtt_twins.py` проверяет все сертификаты до отправки, допускает только 3, 20 или 40 ID в tenant `bench`, требует явный флаг `--execute` и отправляет не чаще одного heartbeat в секунду. Без флага трафик не отправляется:
+
+```text
+python tools/bench_mqtt_twins.py --stations 3 --credentials <bench-credentials> --ca <ca-chain.pem> --out <results>/mqtt-3.json
+python tools/bench_mqtt_twins.py --stations 3 --credentials <bench-credentials> --ca <ca-chain.pem> --out <results>/mqtt-3.json --execute
+python tools/bench_mqtt_twins.py --stations 20 --credentials <bench-credentials> --ca <ca-chain.pem> --out <results>/mqtt-20.json --execute
+python tools/bench_mqtt_twins.py --stations 40 --credentials <bench-credentials> --ca <ca-chain.pem> --out <results>/mqtt-40.json --execute
+```
+
+Сетевая ступень подтверждает MQTT PUBACK каждой станции; после неё отдельно сверить 3/20/40 актуальных heartbeat в изолированной базе и отсутствие новых ID в рабочей базе. Пеленги, звук и алгоритмы дополнительно проверяет локальный `load_field.py`, который не посылает данные в рабочий брокер.
 
 ## Как изолируется bench на сервере
 
