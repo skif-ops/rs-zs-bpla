@@ -8,18 +8,14 @@ station.operator_auth set-scope``) stays for the server's shell.
 """
 from __future__ import annotations
 
-import os
-from pathlib import Path
-
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from station import operator_auth
+from station import operator_auth, pki_registry
 from station.access_scope import scope_for
+from station.pki_registry import PKI_DIR_ENV  # noqa: F401 - the PKI directory (default data/pki): its registry feeds the catalog
 
 ENGINEER_MANAGES = {"viewer", "operator", "service"}
-BASE = Path(__file__).resolve().parents[1]
-PKI_DIR_ENV = "ZS_PKI_DIR"          # the PKI directory of python -m pki.cli (default data/pki): its registry feeds the catalog
 
 router = APIRouter(prefix="/api/v1/access", tags=["access"])
 
@@ -61,24 +57,6 @@ async def accounts(request: Request):
     return [_entry(name, e) for name, e in sorted(users.items()) if name != manager["name"] and _manages(manager, e["roles"])]
 
 
-def _registry() -> tuple[list[dict], set[str]]:
-    """The stations of the PKI registry (server/pki, ``registry.sqlite3`` in the PKI directory) and the tenants of its
-    lots, when the server keeps the registry: every unit of the pilot with its serial, lot and tenant, before it ever
-    connects.  Without a registry the catalog has only the stations that reported."""
-    path = Path(os.environ.get(PKI_DIR_ENV) or BASE / "data" / "pki") / "registry.sqlite3"
-    if not path.exists():
-        return [], set()
-    try:
-        from pki.registry import Registry
-
-        registry = Registry(path)
-        rows = [{"station_id": r.station_id, "serial": r.serial, "tenant": r.tenant, "lot": r.lot, "status": r.status}
-                for r in registry.list()]
-        return rows, set(registry.tenant_by_lot.values())
-    except Exception:          # noqa: BLE001 - a registry this server cannot read: the catalog still lists what reported
-        return [], set()
-
-
 @router.get("/catalog")
 async def catalog(request: Request):
     """What a manager may choose from: the tenants and stations it sees itself (everything for an unlimited one), from
@@ -89,7 +67,7 @@ async def catalog(request: Request):
     own = scope_for(manager, store)
     seen_tenants = store.station_tenants()
     seen = {int(s["station_id"]) for s in store.list_stations() if s.get("station_id") is not None} | set(seen_tenants)
-    registry_rows, registry_tenants = _registry()
+    registry_rows, registry_tenants = pki_registry.registry_rows()
     rows = {r["station_id"]: dict(r, seen=r["station_id"] in seen) for r in registry_rows}
     for sid in sorted(seen):
         if sid not in rows:
