@@ -1,24 +1,30 @@
 {% extends "base.html" %}
 {% block title %}Мухоед - сопровождение{% endblock %}
+{% block main_class %} container-wide{% endblock %}
 {% block content %}
-<section class="page-header compact">
-  <h1>Сопровождение</h1>
-  <p>Сопровождение цели без карты: станции, лучи их пеленгов и точки общего трека на плоскости в метрах вокруг станций;
-    движение можно просмотреть по времени.</p>
+<section class="replay-heading">
+  <div>
+    <p class="ops-eyebrow">Работа с целью</p>
+    <h1>Сопровождение</h1>
+    <p id="replay-context">Станции, пеленги и общий трек на плоскости. Север вверху, восток справа.</p>
+  </div>
+  <div class="replay-heading-actions"><span id="replay-live-state" class="replay-live-state" hidden>● Тревога · обновляется</span><a class="btn btn-outline-secondary" href="/">Обзор</a></div>
 </section>
 
 <div class="replay">
   <div class="replay-main">
+    <div class="replay-stage-header"><strong id="replay-selection-title">Выберите событие или трек</strong><span id="replay-current-time">—</span></div>
     <div class="replay-stage">
       <canvas id="replay-canvas" aria-label="Плоскость сопровождения: восток вправо, север вверх"></canvas>
-      <div class="replay-empty" id="replay-empty">Выберите трек или событие справа.</div>
+      <div class="replay-empty" id="replay-empty">Выберите событие или трек в панели справа.</div>
     </div>
+    <div class="replay-visible-legend"><span><i class="replay-legend-line"></i> Пройденный путь</span><span><i class="replay-legend-target"></i> Положение цели</span><span><i class="replay-legend-ray"></i> Пеленг станции</span><span><i class="replay-legend-error"></i> Погрешность</span></div>
     <div class="replay-controls">
       <button class="btn btn-primary replay-btn" id="replay-play" type="button" disabled>▶ Пуск</button>
       <button class="btn btn-outline-primary replay-btn" id="replay-back" type="button" title="Назад 1 с" disabled>−1 с</button>
       <button class="btn btn-outline-primary replay-btn" id="replay-fwd" type="button" title="Вперёд 1 с" disabled>+1 с</button>
-      <input class="replay-slider" id="replay-slider" type="range" min="0" max="1" step="100" value="0" disabled
-             aria-label="Время на шкале сопровождения">
+      <button class="btn btn-outline-primary replay-btn" id="replay-now" type="button" hidden>К текущему</button>
+      <label for="replay-speed" class="replay-speed-label">Скорость</label>
       <select class="form-control replay-select replay-speed" id="replay-speed" aria-label="Скорость">
         <option value="1">×1</option>
         <option value="2">×2</option>
@@ -26,17 +32,41 @@
         <option value="10">×10</option>
       </select>
     </div>
-    <div class="replay-hint">Колесо — масштаб, перетаскивание — сдвиг, двойной щелчок — вписать всё, пробел — пуск/пауза,
-      стрелки — шаг 1 с.</div>
+    <div class="replay-timeline"><span id="replay-time-start">—</span><input class="replay-slider" id="replay-slider" type="range" min="0" max="1" step="100" value="0" disabled aria-label="Время на шкале сопровождения"><span id="replay-time-end">—</span></div>
+    <p class="replay-hint">Колесо мыши — масштаб; перетаскивание — сдвиг; двойной щелчок — показать всё; пробел — пуск/пауза; стрелки — шаг 1 с.</p>
   </div>
 
   <div class="replay-side">
     <div class="replay-panel">
-      <label class="form-label" for="replay-source">Трек или событие</label>
+      <h2 class="replay-panel-title">Источник сопровождения</h2>
+      <label class="form-label" for="replay-source">Событие или трек</label>
       <select class="form-control replay-select" id="replay-source"><option value="">загрузка…</option></select>
-      <label class="replay-check"><input type="checkbox" id="replay-follow"> Следить за целью</label>
-      <label class="replay-check"><input type="checkbox" id="replay-geometry" checked> Зоны станций и слепые зоны</label>
-      <div id="replay-geometry-opts">
+      <p class="replay-source-help" id="replay-source-help">Выберите запись. При новой тревоге этот экран откроется автоматически.</p>
+      <label class="replay-check"><input type="checkbox" id="replay-follow" checked> Держать цель в центре</label>
+
+      <h2 class="replay-subtitle">Время</h2>
+      <dl class="replay-readout" id="replay-time">
+        <dt>UTC</dt><dd id="ro-utc">—</dd>
+        <dt>От начала</dt><dd id="ro-rel">—</dd>
+      </dl>
+
+      <h2 class="replay-subtitle">Цель</h2>
+      <dl class="replay-readout" id="replay-target">
+        <dt>Высота</dt><dd id="ro-alt">—</dd>
+        <dt>Скорость</dt><dd id="ro-speed">—</dd>
+        <dt>Курс</dt><dd id="ro-course">—</dd>
+        <dt>Погрешность</dt><dd id="ro-err">—</dd>
+        <dt>Станции</dt><dd id="ro-stations">—</dd>
+        <dt>Угол лучей</dt><dd id="ro-crossing">—</dd>
+      </dl>
+
+      <h2 class="replay-subtitle">Пеленги станций</h2>
+      <ul class="replay-bearings" id="ro-bearings"><li class="text-muted">—</li></ul>
+      <p class="replay-note">Лучи показывают, откуда станции слышали звук. Точка общего трека учитывает время распространения звука. Круг вокруг точки показывает погрешность.</p>
+
+      <details class="replay-advanced"><summary>Зоны слышимости и настройки</summary>
+        <label class="replay-check"><input type="checkbox" id="replay-geometry"> Показать зоны и слепые направления</label>
+        <div id="replay-geometry-opts" hidden>
         <label class="form-label" for="replay-geo-range">Дальность слышимости, м</label>
         <input class="form-control replay-select" id="replay-geo-range" type="number" min="100" max="5000" step="100" value="2000">
         <label class="form-label" for="replay-geo-height">Высота цели над станциями, м</label>
@@ -46,28 +76,8 @@
           станция, только линия пеленга. Пунктирный круг — зона слышимости станции (по ТЗ 2 км) на высоте цели. Сигма
           пеленга — медиана пеленгов окна (3° без них).</p>
         <p class="replay-note" id="replay-geo-share"></p>
-      </div>
-
-      <dl class="replay-readout" id="replay-time">
-        <dt>Время (UTC)</dt><dd id="ro-utc">—</dd>
-        <dt>От начала</dt><dd id="ro-rel">—</dd>
-      </dl>
-
-      <h2 class="replay-subtitle">Цель</h2>
-      <dl class="replay-readout" id="replay-target">
-        <dt>Высота</dt><dd id="ro-alt">—</dd>
-        <dt>Скорость</dt><dd id="ro-speed">—</dd>
-        <dt>Курс</dt><dd id="ro-course">—</dd>
-        <dt>Ошибка</dt><dd id="ro-err">—</dd>
-        <dt>Станции</dt><dd id="ro-stations">—</dd>
-        <dt>Угол лучей</dt><dd id="ro-crossing">—</dd>
-      </dl>
-
-      <h2 class="replay-subtitle">Пеленги станций</h2>
-      <ul class="replay-bearings" id="ro-bearings"><li class="text-muted">—</li></ul>
-
-      <p class="replay-note">Луч — направление, которое станция слышит в этот момент: звук идёт до неё несколько секунд,
-        поэтому луч указывает туда, где цель была раньше. Точка трека уже учитывает это время. Круг — ошибка точки.</p>
+        </div>
+      </details>
     </div>
   </div>
 </div>

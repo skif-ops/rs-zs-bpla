@@ -50,7 +50,8 @@ def _window(store, track_id: str | None, system_event_id: str | None, since_us: 
 
 
 def build_replay(store, *, track_id: str | None = None, system_event_id: str | None = None,
-                 since_us: int | None = None, until_us: int | None = None, scope=UNRESTRICTED) -> dict:
+                 since_us: int | None = None, until_us: int | None = None, scope=UNRESTRICTED,
+                 include_scoped_stations: bool = False) -> dict:
     """``scope`` (station/access_scope.py): an operator account limited to stations sees their bearings and the tracks
     they took part in, and only their positions."""
     t0, t1 = _window(store, track_id, system_event_id, since_us, until_us, scope)
@@ -69,6 +70,9 @@ def build_replay(store, *, track_id: str | None = None, system_event_id: str | N
     for t in tracks:
         for m in t["members"]:
             station_tracks.setdefault(m["station_id"], m["track_event_id"])
+    if include_scoped_stations:
+        for station_id in scope.station_list or []:
+            station_tracks.setdefault(station_id, None)
     positions = {s: store.station_position(s, e) for s, e in sorted(station_tracks.items())}
     positions = {s: p for s, p in positions.items() if p}
     if positions:

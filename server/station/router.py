@@ -19,7 +19,7 @@ from station.service import StationFusionService
 from station.cbor_codec import decode_detection_cbor
 from station.http_transport import require_insecure_station_http_bench
 from station.online_type_service import OnlineTypeSessionService
-from station.access_scope import LIVE_RECHECK_S, LiveScope, close_revoked, scope_of
+from station.access_scope import LIVE_RECHECK_S, LiveScope, Scope, close_revoked, scope_of
 from station import retention, rollout
 from station.analysis_access import operator_of
 from config import settings
@@ -135,11 +135,20 @@ async def track(request:Request,track_id:str):
     return result
 
 @router.get('/replay')
-async def replay(request:Request,track_id:str|None=None,system_event_id:str|None=None,since_us:int|None=None,until_us:int|None=None):
+async def replay(request:Request,track_id:str|None=None,system_event_id:str|None=None,since_us:int|None=None,until_us:int|None=None,
+                 station_ids:str|None=None):
     """Everything the replay page draws for a time window (decision 3): stations, fused tracks, bearings, in metres
     east/north/up around the stations."""
+    scope=scope_of(request,store)
+    if station_ids is not None:
+        try: ids=sorted({int(x.strip()) for x in station_ids.split(',') if x.strip()})
+        except ValueError: raise HTTPException(422,'station_ids: comma-separated integers') from None
+        if not ids or len(ids)>64: raise HTTPException(422,'station_ids: 1..64 stations')
+        if any(not scope.station(s) for s in ids): raise HTTPException(404,'station not found')
+        # Narrow the already-authorized station set; retain its tenant restriction.
+        scope=Scope(scope.tenants, allowed=ids)
     try: return build_replay(store,track_id=track_id,system_event_id=system_event_id,since_us=since_us,until_us=until_us,
-                             scope=scope_of(request,store))
+                             scope=scope,include_scoped_stations=station_ids is not None)
     except ReplayError as exc: raise HTTPException(404 if 'not found' in str(exc) else 400,str(exc)) from None
 
 @router.get('/replay/sources')
@@ -183,6 +192,12 @@ async def alerts(request:Request,after_seq:int=0,tenant:str|None=None,limit:int=
     if reader is None: raise HTTPException(403,'tenant outside this account')
     messages,next_after=await asyncio.to_thread(store.read_alerts,max(after_seq,0),limit=min(max(limit,1),2000),**reader)
     return {'schema':dioneya_alert.SCHEMA,'messages':messages,'next_after_seq':next_after}
+
+@router.get('/alerts/head')
+async def alerts_head(request:Request):
+    """Outbox cursor at page entry; the browser subscribes after it and cannot miss an alert during connection setup."""
+    scope_of(request,store)
+    return {'seq':await asyncio.to_thread(store.last_alert_seq)}
 
 @router.websocket('/alerts/stream')
 async def alert_stream(ws:WebSocket,after_seq:int|None=None,tenant:str|None=None,heartbeat_s:float=15.0):

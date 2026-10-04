@@ -1,47 +1,56 @@
 {% extends "base.html" %}
-{% block title %}Мухоед - главная{% endblock %}
+{% block title %}Мухоед - обзор{% endblock %}
+{% block main_class %} container-wide{% endblock %}
 {% block content %}
-<section class="page-header">
-  <h1>Мухоед</h1>
-  <p>Сервер сети звукоуловительных станций: состояние станций, сопровождение целей, анализ записей, классификация и
-    TDOA-локализация.</p>
+<section class="ops-heading">
+  <div>
+    <p class="ops-eyebrow">Оперативный обзор</p>
+    <h1>Обстановка по станциям</h1>
+    <p>Связь, замечания и события сети в одном месте. Тревога автоматически открывает сопровождение.</p>
+  </div>
+  <div class="ops-heading-actions">
+    <span id="ops-updated" role="status">Загрузка данных…</span>
+    <button class="btn btn-outline-primary" id="ops-refresh" type="button">Обновить</button>
+  </div>
 </section>
 
-<h2 class="index-group">Работа с сетью станций</h2>
-<div class="row g-4 action-grid">
-  <div class="col-md-6 col-xl-4">
-    <a class="action-card" href="/stations">
-      <span class="action-title">Станции</span>
-      <span class="action-text">Состояние каждой станции: связь, питание, GNSS, версии, что требует внимания.</span>
-    </a>
-  </div>
-  <div class="col-md-6 col-xl-4">
-    <a class="action-card" href="/replay">
-      <span class="action-title">Сопровождение</span>
-      <span class="action-text">Движение цели по пеленгам станций, треки, зоны неуверенного обнаружения.</span>
-    </a>
-  </div>
+<div class="ops-error" id="ops-error" role="alert" hidden></div>
+<section class="ops-summary" aria-label="Сводка состояния">
+  <a href="/stations" class="ops-stat"><span>Всего станций</span><strong id="ops-total">—</strong><small>в доступных участках</small></a>
+  <a href="/stations" class="ops-stat ops-stat-ok"><span>На связи</span><strong id="ops-online">—</strong><small>по последнему heartbeat</small></a>
+  <a href="/stations" class="ops-stat ops-stat-attention"><span>Требуют внимания</span><strong id="ops-attention">—</strong><small>связь или неисправность</small></a>
+  <a href="/replay" class="ops-stat ops-stat-events"><span>Недавние события</span><strong id="ops-events-count">—</strong><small>тревоги и предупреждения</small></a>
+</section>
+
+<div class="ops-layout">
+  <section class="ops-panel ops-map-panel" aria-labelledby="ops-map-title">
+    <div class="ops-panel-head">
+      <div><h2 id="ops-map-title">Схема размещения</h2><p>Север вверху. Положение по последним данным станций.</p></div>
+      <label class="ops-tenant-label" for="ops-tenant">Участок
+        <select id="ops-tenant" class="form-control"><option value="">Все доступные</option></select>
+      </label>
+    </div>
+    <div class="ops-map-wrap">
+      <svg id="ops-map" class="ops-map" role="img" aria-label="Схема размещения станций" viewBox="0 0 800 420" preserveAspectRatio="xMidYMid meet"></svg>
+      <div id="ops-map-empty" class="ops-map-empty">Загрузка положений…</div>
+    </div>
+    <div class="ops-map-legend" aria-hidden="true"><span><i class="ops-dot ops-dot-ok"></i>На связи</span><span><i class="ops-dot ops-dot-warn"></i>Замечание</span><span><i class="ops-dot ops-dot-alarm"></i>Нет связи / тревога</span><span><i class="ops-dot ops-dot-unknown"></i>Нет данных</span></div>
+    <p class="ops-map-caption">Схема показывает относительное расположение, без картографической подложки. Точное состояние каждой станции — на экране «Станции».</p>
+  </section>
+
+  <section class="ops-panel ops-attention-panel" aria-labelledby="ops-attention-title">
+    <div class="ops-panel-head"><div><h2 id="ops-attention-title">Требуют внимания</h2><p>Сначала потеря связи и критичные замечания.</p></div><a href="/stations">Все станции →</a></div>
+    <div id="ops-attention-list" class="ops-list" aria-live="polite"><p class="ops-list-empty">Загрузка…</p></div>
+  </section>
 </div>
 
-<h2 class="index-group">Анализ записей</h2>
-<div class="row g-4 action-grid">
-  <div class="col-md-6 col-xl-4">
-    <a class="action-card" href="/single">
-      <span class="action-title">Анализ одного файла</span>
-      <span class="action-text">WAV/MP3/M4A, FFT, спектрограмма, гармоники, акустический паспорт и JSON.</span>
-    </a>
-  </div>
-  <div class="col-md-6 col-xl-4">
-    <a class="action-card" href="/localization">
-      <span class="action-title">Локализация по нескольким микрофонам</span>
-      <span class="action-text">GCC-PHAT, TDOA, координаты источника, траектория, CSV и PNG.</span>
-    </a>
-  </div>
-  <div class="col-md-6 col-xl-4">
-    <a class="action-card" href="/dataset">
-      <span class="action-title">База звуков</span>
-      <span class="action-text">Размеченные записи, оконные признаки, обучение локальной модели классов.</span>
-    </a>
-  </div>
-</div>
+<section class="ops-panel ops-events-panel" aria-labelledby="ops-events-title">
+  <div class="ops-panel-head"><div><h2 id="ops-events-title">Последние события и треки</h2><p>Выберите событие, чтобы открыть его на экране сопровождения.</p></div><a href="/replay">Открыть сопровождение →</a></div>
+  <div id="ops-events-list" class="ops-events" aria-live="polite"><p class="ops-list-empty">Загрузка…</p></div>
+</section>
+
+<details class="ops-tools"><summary>Анализ записей и обучение</summary>
+  <nav aria-label="Инструменты анализа"><a href="/single">Один файл</a><a href="/localization">Локализация</a><a href="/dataset">База звуков и обучение</a></nav>
+</details>
+<script src="/static/js/operations.js"></script>
 {% endblock %}

@@ -142,6 +142,15 @@ def test_replay_and_coverage_show_only_own_stations(field):
     assert sorted(t["track_id"] for t in replay["tracks"]) == ["TRK-17-19", "TRK-18-19"]
     assert all(set(p["stations"]) <= {17, 18} for t in replay["tracks"] for p in t["points"])
     assert c.get("/api/v1/replay", params={"system_event_id": "E-19"}).status_code == 404
+    one = c.get("/api/v1/replay", params={"since_us": T0 - 1, "until_us": T0 + 5_000_000,
+                                           "station_ids": "17"}).json()
+    assert ids(one["stations"]) == [17]
+    assert {b["station_id"] for b in one["bearings"]} == {17}
+    assert all(set(p["stations"]) <= {17} for t in one["tracks"] for p in t["points"])
+    assert c.get("/api/v1/replay", params={"since_us": T0 - 1, "until_us": T0 + 5_000_000,
+                                            "station_ids": "17,19"}).status_code == 404
+    assert c.get("/api/v1/replay", params={"since_us": T0 - 1, "until_us": T0 + 5_000_000,
+                                            "station_ids": "bogus"}).status_code == 422
     sources = c.get("/api/v1/replay/sources").json()
     assert sorted(e["system_event_id"] for e in sources["events"]) == ["E-17-19", "E-18"]
     assert all(set(e["stations"]) <= {17, 18} for e in sources["events"])
@@ -174,6 +183,7 @@ def test_output_api_follows_the_account(field):
     accounts.add_user("svc", "service", PASSWORD)
     accounts.set_scope("svc", ["north"], [17])
     c = logged_in(app, "svc")
+    assert c.get("/api/v1/alerts/head").json() == {"seq": store.last_alert_seq()}
     page = c.get("/api/v1/alerts").json()
     assert [m["msg_id"] for m in page["messages"]] == ["m0", "m4"]          # north, with station 17
     assert page["messages"][0]["alert"]["stations"] == [{"station_id": 17, "lat": 55.0, "lon": 37.0, "alt_msl_m": 150.0}]
