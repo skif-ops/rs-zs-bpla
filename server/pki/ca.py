@@ -54,10 +54,13 @@ STATION_DAYS = 3 * 365
 CRL_DAYS = 30
 
 SERIAL_RE = re.compile(r"^DIO-EVT-(0[0-3][0-9]|040|B01)$")
+TWIN_SERIAL_RE = re.compile(r"^DIO-TWIN-(0[0-3][0-9]|040)$")
 LOT_BY_SERIAL = (("EVT-LOT-1", range(1, 21)), ("EVT-LOT-2", range(21, 41)))
 BENCH_SERIAL = "DIO-EVT-B01"
 BENCH_LOT = "BENCH"
 BENCH_STATION_ID = 901
+TWIN_LOT = "TWIN-BENCH"
+TWIN_STATION_ID_BASE = 1000
 
 
 class PkiError(RuntimeError):
@@ -110,6 +113,12 @@ def fingerprint_sha256(cert: x509.Certificate) -> bytes:
 def station_id_for_serial(serial: str) -> int:
     if serial == BENCH_SERIAL:
         return BENCH_STATION_ID
+    twin = TWIN_SERIAL_RE.fullmatch(serial)
+    if twin:
+        number = int(twin.group(1))
+        if number == 0:
+            raise PkiError("virtual station serial 000 is reserved")
+        return TWIN_STATION_ID_BASE + number
     m = SERIAL_RE.match(serial)
     if not m or not m.group(1).isdigit():
         raise PkiError(f"invalid station serial {serial!r}")
@@ -122,6 +131,9 @@ def station_id_for_serial(serial: str) -> int:
 def lot_for_serial(serial: str) -> str:
     if serial == BENCH_SERIAL:
         return BENCH_LOT
+    if TWIN_SERIAL_RE.fullmatch(serial):
+        station_id_for_serial(serial)
+        return TWIN_LOT
     n = station_id_for_serial(serial)
     for lot, numbers in LOT_BY_SERIAL:
         if n in numbers:
@@ -314,8 +326,8 @@ class IssuingCa:
 
     def issue_bridge(self, cn: str = "bridge") -> tuple[bytes, bytes]:
         """Client certificate for the server-side MQTT bridge (mosquitto user = CN)."""
-        if cn != "bridge":
-            raise PkiError("bridge certificate CN must be 'bridge' (ACL user)")
+        if cn not in ("bridge", "bridge-bench"):
+            raise PkiError("bridge certificate CN must be 'bridge' or 'bridge-bench' (ACL users)")
         return self._issue_client(cn, "Muhoed")
 
     def issue_consumer(self, name: str) -> tuple[bytes, bytes]:
@@ -349,7 +361,7 @@ def consumer_name(name: str) -> str:
     its certificate and its mosquitto user, so it can be neither a station serial nor the bridge."""
     if CONSUMER_NAME_RE.match(name) is None:
         raise PkiError("consumer name: 1..32 letters, digits, '-', '_' or '.'")
-    if name == "bridge" or SERIAL_RE.match(name):
+    if name in ("bridge", "bridge-bench") or SERIAL_RE.match(name) or TWIN_SERIAL_RE.match(name):
         raise PkiError(f"consumer name {name!r} is reserved")
     return name
 

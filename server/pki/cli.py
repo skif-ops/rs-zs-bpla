@@ -129,10 +129,10 @@ def cmd_server_cert(a):
 
 def cmd_bridge_cert(a):
     d = Path(a.pki)
-    key_pem, cert_pem = _issuing(d).issue_bridge()
-    pki._write_private(d / "server" / "bridge.key.pem", key_pem)
-    pki._write_public(d / "server" / "bridge.crt.pem", cert_pem)
-    print("bridge client certificate written to server/bridge.*.pem (ZS_MQTT_CERT / ZS_MQTT_KEY)")
+    key_pem, cert_pem = _issuing(d).issue_bridge(a.cn)
+    pki._write_private(d / "server" / f"{a.cn}.key.pem", key_pem)
+    pki._write_public(d / "server" / f"{a.cn}.crt.pem", cert_pem)
+    print(f"bridge client certificate written to server/{a.cn}.*.pem (ZS_MQTT_CERT / ZS_MQTT_KEY)")
 
 
 def cmd_station_add(a):
@@ -500,7 +500,8 @@ def main(argv=None):
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--cert", required=True); s.add_argument("--root-cert", required=True)
     s = add("server-cert", cmd_server_cert, help="[server] issue the mosquitto/HTTPS certificate")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--dns", action="append"); s.add_argument("--ip", action="append")
-    s = add("bridge-cert", cmd_bridge_cert, help="[server] issue the MQTT bridge client certificate (CN=bridge)"); s.add_argument("--pki", default=str(DEFAULT_DIR))
+    s = add("bridge-cert", cmd_bridge_cert, help="[server] issue the MQTT bridge client certificate")
+    s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--cn", choices=("bridge", "bridge-bench"), default="bridge")
     s = add("station-add", cmd_station_add, help="register a serial or all 41 units")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial", nargs="?"); s.add_argument("--all-lots", action="store_true"); s.add_argument("--note")
     s = add("station-sign", cmd_station_sign, help="sign a station CSR (key stays on the station/fixture)")

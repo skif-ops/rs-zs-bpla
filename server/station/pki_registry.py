@@ -9,6 +9,8 @@ from pathlib import Path
 
 BASE = Path(__file__).resolve().parents[1]
 PKI_DIR_ENV = "ZS_PKI_DIR"
+PKI_TENANTS_ENV = "ZS_PKI_TENANTS"
+PKI_INCLUDE_TWINS_ENV = "ZS_PKI_INCLUDE_TWINS"
 
 
 def registry_path() -> Path:
@@ -25,8 +27,12 @@ def registry_rows() -> tuple[list[dict], set[str]]:
         from pki.registry import Registry
 
         registry = Registry(path)
+        selected = {t.strip() for t in os.environ.get(PKI_TENANTS_ENV, "").split(",") if t.strip()}
+        include_twins = os.environ.get(PKI_INCLUDE_TWINS_ENV) == "1"
         rows = [{"station_id": r.station_id, "serial": r.serial, "tenant": r.tenant, "lot": r.lot, "status": r.status}
-                for r in registry.list()]
-        return rows, set(registry.tenant_by_lot.values())
+                for r in registry.list()
+                if (not selected or r.tenant in selected) and (include_twins or r.lot != "TWIN-BENCH")]
+        tenants = ({r["tenant"] for r in rows} if selected else set(registry.tenant_by_lot.values()))
+        return rows, tenants
     except Exception:          # noqa: BLE001 - a registry this server cannot read: the callers list what reported
         return [], set()

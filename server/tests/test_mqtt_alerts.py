@@ -141,7 +141,8 @@ def test_tenant_filter_start_latest_and_restart(scene):
 def test_excluding_old_bench_outbox_does_not_hide_working_tenants(scene):
     store, service = scene
     pilot_count = len(store.list_alerts(0, limit=10000))
-    store.append_alert("old-bench-message", "bench", "alert.start", 1, {"type": "alert.start"})
+    store.append_alert("old-bench-message", "bench", "alert.start", 1,
+                       {"type": "alert.start", "tenant": "bench"})
     client = FakeClient()
     publisher = MqttPublisher(store, client, exclude_tenants=("bench",), start="earliest",
                               cursor_name="mqtt:no-bench", clock=service.alerts.clock)

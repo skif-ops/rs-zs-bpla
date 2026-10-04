@@ -38,8 +38,11 @@ isolated-bench configurations and must not be used for production.
   `mqtt_alerts_bench` services use `bench-data` outside the production
   `data` directory; the pilot services use `data`. Bench outputs likewise use
   `bench-output` and stay outside production backups.
-  The bench UI binds only to `127.0.0.1:8001` and requires its own operator
-  account. See `docs/MUHOED_BENCH_DIGITAL_TWINS.md` before sending virtual station traffic.
+  The bench services are disabled by default (`--profile bench` activates them).
+  They use a separate `bridge-bench` certificate and signing key; their TLS mounts
+  contain no production private keys. The bench UI binds only to `127.0.0.1:8001`
+  and requires its own operator account. See `docs/MUHOED_BENCH_DIGITAL_TWINS.md`
+  before sending virtual station traffic.
 - MQTT over TLS 1.2+ on port 8883. The server certificate carries the compose
   service name `mqtt` besides the public name and address (`python -m pki.cli
   server-cert --dns <public> --dns mqtt --ip <ip>`): the bridges and `mqtt_alerts`
