@@ -104,8 +104,8 @@ def test_serial_scheme_two_lots_plus_bench():
     assert pki.lot_for_serial("DIO-EVT-040") == "EVT-LOT-2"
     assert pki.lot_for_serial("DIO-EVT-B01") == "BENCH"
     assert pki.station_id_for_serial("DIO-EVT-B01") == 901
-    assert pki.station_id_for_serial("DIO-TWIN-001") == 1001
-    assert pki.station_id_for_serial("DIO-TWIN-040") == 1040
+    assert pki.station_id_for_serial("DIO-TWIN-001") == 9001
+    assert pki.station_id_for_serial("DIO-TWIN-040") == 9040
     assert pki.lot_for_serial("DIO-TWIN-020") == "TWIN-BENCH"
     assert pki.station_id_for_serial("DIO-EVT-037") == 37
     for bad in ("DIO-EVT-041", "DIO-EVT-000", "DIO-EVT-1", "station01", "DIO-EVT-B02"):
@@ -144,7 +144,7 @@ def test_registry_registers_41_units_with_tenants(tmp_path):
     assert len(rows) == 41
     assert len(reg.add_all_lots()) == 41  # idempotent
     virtual = reg.add("DIO-TWIN-001")
-    assert virtual.station_id == 1001 and virtual.tenant == "bench"
+    assert virtual.station_id == 9001 and virtual.tenant == "bench"
     assert len(reg.add_all_lots()) == 41  # twins are explicit, never part of the pilot batch
     lots = {r.lot for r in rows}
     assert lots == {"EVT-LOT-1", "EVT-LOT-2", "BENCH"}

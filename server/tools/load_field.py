@@ -104,7 +104,7 @@ def make_field() -> list[Station]:
     return stations
 
 
-def scenario_stations(count: int, tenant: str = "", station_id_base: int = 1000) -> list[Station]:
+def scenario_stations(count: int, tenant: str = "", station_id_base: int = 9000) -> list[Station]:
     """Keep the field geometry while giving an isolated bench its own tenant and virtual IDs."""
     if not 1 <= count <= 41:
         raise ValueError("station count must be between 1 and 41")
@@ -632,7 +632,7 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--episodes", type=float, default=5.0, help="episodes per station and day")
     ap.add_argument("--stations", type=int, default=41)
     ap.add_argument("--tenant", default="", help="place every virtual station in one tenant, e.g. bench")
-    ap.add_argument("--station-id-base", type=int, default=1000,
+    ap.add_argument("--station-id-base", type=int, default=9000,
                     help="first ID is base + 1 when --tenant is set; keep clear of physical station IDs")
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--dup", type=float, default=Faults.dup_p, help="probability of a QoS 1 redelivery per message")

@@ -18,6 +18,6 @@ def test_export_does_not_copy_pilot_records_or_secrets(tmp_path: Path):
         connection.execute("UPDATE stations SET engineer_key='bench-secret' WHERE serial='DIO-TWIN-001'")
     assert export(source, target) == 2
     exported = Registry(target)
-    assert [r.station_id for r in exported.list()] == [901, 1001]
+    assert [r.station_id for r in exported.list()] == [901, 9001]
     assert all(r.pairing_secret is None and r.engineer_key is None for r in exported.list())
     assert b"pilot-secret" not in target.read_bytes() and b"bench-secret" not in target.read_bytes()

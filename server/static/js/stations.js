@@ -14,6 +14,15 @@
   const FW_TEXT = { IDLE: "", DOWNLOADING: "загрузка", INSTALL_PENDING: "установка", TRIAL: "проверка", ROLLED_BACK: "откат" };
   const $ = (id) => document.getElementById(id);
 
+  function stationName(r) {
+    const twin = /^DIO-TWIN-(\d{3})$/.exec(r.serial || "");
+    if (r.tenant === "bench" && twin && Number(twin[1]) >= 1 && Number(twin[1]) <= 40 &&
+        r.station_id === 9000 + Number(twin[1])) {
+      return "Двойник " + String(Number(twin[1])).padStart(2, "0");
+    }
+    return "№ " + r.station_id;
+  }
+
   const fmt = {
     num: (v, digits) => (v === null || v === undefined || Number.isNaN(v)) ? "" : Number(v).toFixed(digits || 0),
     ago: (s) => {
@@ -177,12 +186,13 @@
     rows.forEach((r) => {
       const card = el("button", "st-station-card st-level-" + r.level);
       card.type = "button";
-      card.setAttribute("aria-label", "Станция " + r.station_id + ", " + (STATE_TEXT[r.state] || r.state) + ". Открыть подробности");
+      card.setAttribute("aria-label", stationName(r) + ", ID " + r.station_id + ", " + (STATE_TEXT[r.state] || r.state) + ". Открыть подробности");
       const top = el("span", "st-station-top");
-      top.appendChild(el("strong", "", "№ " + r.station_id));
+      top.appendChild(el("strong", "", stationName(r)));
       top.appendChild(el("span", "st-badge st-" + r.state, STATE_TEXT[r.state] || r.state));
       card.appendChild(top);
-      card.appendChild(el("span", "st-station-tenant", r.tenant || "Без участка"));
+      card.appendChild(el("span", "st-station-tenant", r.tenant === "bench" && r.serial ?
+        "ID " + r.station_id + " · " + r.serial : r.tenant || "Без участка"));
       card.appendChild(el("span", "st-station-seen", r.silence_s === null ? "Heartbeat: никогда" : "Heartbeat: " + fmt.ago(r.silence_s)));
       const metrics = el("span", "st-station-metrics");
       metrics.appendChild(el("span", "", "Батарея: " + (r.power.battery_pct === null ? "нет данных" : r.power.battery_pct + " %")));

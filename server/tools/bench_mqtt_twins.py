@@ -35,7 +35,7 @@ def identities(count: int, credentials: Path) -> list[tuple[int, str, Path, Path
         cn = subject.get_attributes_for_oid(NameOID.COMMON_NAME)
         if len(cn) != 1 or cn[0].value != serial:
             raise ValueError(f"certificate CN does not match {serial}")
-        out.append((1000 + i, serial, cert, key))
+        out.append((9000 + i, serial, cert, key))
     return out
 
 
@@ -78,8 +78,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--stations", type=int, choices=(3, 20, 40), required=True)
     parser.add_argument("--credentials", type=Path, required=True, help="directory with DIO-TWIN-001/... certificates")
     parser.add_argument("--ca", type=Path, required=True)
-    parser.add_argument("--host", default="dioneya.ru")
-    parser.add_argument("--port", type=int, default=8883)
+    parser.add_argument("--host", default="localhost")
+    parser.add_argument("--port", type=int, default=8884)
     parser.add_argument("--timeout", type=float, default=10.0)
     parser.add_argument("--gap", type=float, default=1.0, help="minimum seconds between stations")
     parser.add_argument("--out", type=Path, help="write a result JSON without credentials or payloads")
@@ -88,7 +88,7 @@ def main(argv: list[str] | None = None) -> int:
     if not args.ca.is_file() or not 1 <= args.port <= 65535 or args.timeout <= 0 or args.gap < 1:
         parser.error("CA, port, timeout and gap (at least 1 s) must be valid")
     identities_list = identities(args.stations, args.credentials)
-    stations = scenario_stations(args.stations, "bench", 1000)
+    stations = scenario_stations(args.stations, "bench", 9000)
     outcome = {"stage": args.stations, "tenant": "bench", "planned": len(identities_list),
                "published": 0, "status": "validated" if not args.execute else "running", "station_ids": []}
     if args.execute:

@@ -125,11 +125,11 @@ def test_the_page_data_follows_the_account(field, tmp_path, monkeypatch):
     registry.add("DIO-EVT-021")                                               # registered, never reported
     registry.add("DIO-TWIN-001")
     visible, _ = pki_registry.registry_rows()
-    assert 1001 not in {r["station_id"] for r in visible}
+    assert 9001 not in {r["station_id"] for r in visible}
     monkeypatch.setenv(pki_registry.PKI_TENANTS_ENV, "bench")
     monkeypatch.setenv(pki_registry.PKI_INCLUDE_TWINS_ENV, "1")
     bench_visible, _ = pki_registry.registry_rows()
-    assert [r["station_id"] for r in bench_visible] == [1001]
+    assert [r["station_id"] for r in bench_visible] == [9001]
     monkeypatch.delenv(pki_registry.PKI_TENANTS_ENV)
     monkeypatch.delenv(pki_registry.PKI_INCLUDE_TWINS_ENV)
     for name, tenants in (("all", []), ("north", ["north"])):

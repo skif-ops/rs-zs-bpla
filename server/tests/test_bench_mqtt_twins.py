@@ -63,6 +63,6 @@ def test_sender_publishes_only_its_bench_status_topic(monkeypatch, tmp_path: Pat
             pass
 
     monkeypatch.setattr(bench_mqtt_twins.mqtt, "Client", Client)
-    bench_mqtt_twins.send_one("dioneya.ru", 8883, tmp_path / "ca", tmp_path / "cert", tmp_path / "key",
-                             1001, b"heartbeat", 1)
-    assert published == [("zs/v1/bench/1001/status", b"heartbeat", 1, False)]
+    bench_mqtt_twins.send_one("localhost", 8884, tmp_path / "ca", tmp_path / "cert", tmp_path / "key",
+                             9001, b"heartbeat", 1)
+    assert published == [("zs/v1/bench/9001/status", b"heartbeat", 1, False)]
