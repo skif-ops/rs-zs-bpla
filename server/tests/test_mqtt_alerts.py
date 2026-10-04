@@ -138,6 +138,21 @@ def test_tenant_filter_start_latest_and_restart(scene):
     assert resumed.step() == 0 and [m["type"] for m in messages_of(again)] == ["heartbeat"]
 
 
+def test_excluding_old_bench_outbox_does_not_hide_working_tenants(scene):
+    store, service = scene
+    pilot_count = len(store.list_alerts(0, limit=10000))
+    store.append_alert("old-bench-message", "bench", "alert.start", 1, {"type": "alert.start"})
+    client = FakeClient()
+    publisher = MqttPublisher(store, client, exclude_tenants=("bench",), start="earliest",
+                              cursor_name="mqtt:no-bench", clock=service.alerts.clock)
+    assert publisher.seen == {"pilot1"}
+    assert publisher.step() == pilot_count
+    assert store.alert_cursor("mqtt:no-bench") == store.last_alert_seq()
+    service.alerts.clock.offset = 1000.0
+    assert publisher.step() == 0
+    assert client.published and all(topic == "dioneya/alert/v1/pilot1" for topic, _, _, _ in client.published)
+
+
 def test_arguments_tls_and_tenants():
     parser = mqtt_alerts.build_parser()
     args = parser.parse_args(["--ca", "a", "--cert", "b", "--key", "c"])

@@ -102,7 +102,7 @@ services:
     build:
       context: ..
     restart: unless-stopped
-    command: ["python", "-m", "integration.mqtt_alerts", "--host", "mqtt", "--port", "8883", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem", "--tenants", "pilot1,pilot2"]
+    command: ["python", "-m", "integration.mqtt_alerts", "--host", "mqtt", "--port", "8883", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge.crt.pem", "--key", "/run/tls/bridge.key.pem", "--exclude-tenants", "bench"]
     volumes:
       - ../data:/app/data
       - ./tls:/run/tls:ro
