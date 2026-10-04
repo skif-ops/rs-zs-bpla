@@ -4,11 +4,12 @@
 {% block content %}
 <section class="page-header compact">
   <h1>Станции</h1>
-  <p>Состояние каждой станции по её последнему heartbeat: связь, питание, GNSS, версии, неисправности.
-    Станция «на связи», пока молчит меньше <span id="st-late">7 ч</span>, «опаздывает» до
-    <span id="st-lost">13 ч</span>, дальше «потеряна»; станция реестра, которая ни разу не вышла на связь,
-    показана отдельно. Нажмите на строку, чтобы раскрыть полный heartbeat; заголовок столбца сортирует,
-    поле под ним фильтрует.</p>
+  <p>Связь, питание и неисправности по последнему heartbeat. Выберите карточку для подробностей.</p>
+  <details class="st-help"><summary>Как определяется состояние</summary>
+    <p>Станция «на связи», пока молчит меньше <span id="st-late">7 ч</span>, «опаздывает» до
+      <span id="st-lost">13 ч</span>, затем считается потерянной. Станция реестра без heartbeat
+      показана как «не выходила». В таблице заголовки сортируют, поля под ними фильтруют.</p>
+  </details>
 </section>
 
 <div class="st-summary" id="st-summary" aria-live="polite">
@@ -27,11 +28,21 @@
 <div class="st-toolbar">
   <span class="st-status" id="st-status">Загрузка…</span>
   <span class="st-shown" id="st-shown"></span>
+  <label class="st-tenant-label" for="st-tenant">Участок</label>
+  <select class="form-select form-select-sm" id="st-tenant" aria-label="Показать участок">
+    <option value="">Все доступные</option>
+  </select>
+  <div class="st-view-switch" role="group" aria-label="Представление станций">
+    <button class="btn btn-sm st-view-active" id="st-view-cards" type="button" aria-pressed="true">Обзор</button>
+    <button class="btn btn-sm" id="st-view-table" type="button" aria-pressed="false">Таблица</button>
+  </div>
   <button class="btn btn-sm btn-outline-secondary" id="st-reset" type="button">Сбросить фильтры</button>
   <button class="btn btn-sm btn-outline-primary" id="st-refresh" type="button">Обновить</button>
 </div>
 
-<div class="table-responsive st-wrap">
+<div class="st-overview" id="st-overview" aria-live="polite"></div>
+
+<div class="table-responsive st-wrap" id="st-table-wrap" hidden>
   <table class="table table-sm st-table" id="st-table">
     <thead>
       <tr id="st-head"></tr>
