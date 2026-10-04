@@ -40,7 +40,7 @@ services:
       context: ..
     restart: unless-stopped
     cpus: 0.50
-    mem_limit: 512m
+    mem_limit: 256m
     environment:
       ZS_MQTT_HOST: mqtt
       ZS_MQTT_PORT: "8883"
@@ -94,7 +94,7 @@ services:
       context: ..
     restart: unless-stopped
     cpus: 0.50
-    mem_limit: 512m
+    mem_limit: 256m
     command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "bench", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge-bench.crt.pem", "--key", "/run/tls/bridge-bench.key.pem"]
     environment:
       ZS_TENANT: bench
@@ -125,7 +125,7 @@ services:
       context: ..
     restart: unless-stopped
     cpus: 0.25
-    mem_limit: 256m
+    mem_limit: 128m
     command: ["python", "-m", "integration.mqtt_alerts", "--host", "mqtt", "--port", "8883", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge-bench.crt.pem", "--key", "/run/tls/bridge-bench.key.pem", "--tenants", "bench", "--client-id", "dioneya-alerts-bench"]
     volumes:
       - ../bench-data:/app/data
