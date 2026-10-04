@@ -8,38 +8,58 @@
     <link rel="stylesheet" href="/static/css/styles.css">
   </head>
   <body{% if request.state.operator %} data-operator-name="{{ request.state.operator.name }}"{% endif %}>
-    <nav class="navbar navbar-expand-lg navbar-dark app-navbar">
-      <div class="container">
-        <a class="navbar-brand" href="/">Мухоед</a>
-        {# the menu: field operation first (stations, tracking), then the analysis tools, then administration #}
-        {% set path = request.url.path %}
-        {% macro item(href, text) -%}
-          <a class="nav-link{% if path == href or path.startswith(href + '/') %} active{% endif %}" href="{{ href }}"
-             {% if path == href or path.startswith(href + '/') %}aria-current="page"{% endif %}>{{ text }}</a>
-        {%- endmacro %}
-        <div class="navbar-nav">
+    {% set path = request.url.path %}
+    {% set p = request.state.operator.permissions if request.state.operator else [] %}
+    {% macro item(href, label) -%}
+      <a class="app-nav-link{% if path == href or path.startswith(href + '/') %} active{% endif %}" href="{{ href }}"
+         {% if path == href or path.startswith(href + '/') %}aria-current="page"{% endif %}>{{ label }}</a>
+    {%- endmacro %}
+    <header class="app-header">
+      <div class="container app-header-inner">
+        <a class="app-brand" href="/">Мухоед</a>
+        <nav class="app-primary" aria-label="Оперативные экраны">
           {{ item("/", "Обзор") }}
           {{ item("/stations", "Станции") }}
           {{ item("/replay", "Сопровождение") }}
-          <span class="nav-sep" aria-hidden="true"></span>
-          {{ item("/single", "Один файл") }}
-          {{ item("/localization", "Локализация") }}
-          {{ item("/dataset", "Обучение") }}
-          {% set p = request.state.operator.permissions if request.state.operator else [] %}
-          {% if "users.manage" in p or "scopes.manage" in p or "audit.read" in p %}
-          <span class="nav-sep" aria-hidden="true"></span>
-          {{ item("/admin", "Администрирование") }}
-          {% endif %}
-        </div>
-        {% if request.state.operator %}
-        <form class="d-flex align-items-center" action="/logout" method="post">
+        </nav>
+        <div class="app-header-actions">
+          {% if request.state.operator %}
           <span id="alert-channel-status" class="alert-channel-status" role="status">Оповещения: подключение…</span>
-          <span class="navbar-text me-2">{{ request.state.operator.name }} ({{ request.state.operator.role }})</span>
-          <button class="btn btn-sm btn-outline-light" type="submit">Выйти</button>
-        </form>
-        {% endif %}
+          {% endif %}
+          <details class="app-nav-menu">
+            <summary>Меню <span aria-hidden="true">▾</span></summary>
+            <div class="app-nav-panel">
+              <div class="app-menu-primary">
+                <div class="app-menu-heading">Оперативная работа</div>
+                <nav aria-label="Оперативные экраны в меню">
+                  {{ item("/", "Обзор") }}
+                  {{ item("/stations", "Станции") }}
+                  {{ item("/replay", "Сопровождение") }}
+                </nav>
+              </div>
+              <div class="app-menu-heading">Анализ и обучение</div>
+              <nav aria-label="Анализ и обучение">
+                {{ item("/single", "Один файл") }}
+                {{ item("/localization", "Локализация") }}
+                {{ item("/dataset", "Обучение") }}
+              </nav>
+              {% if "users.manage" in p or "scopes.manage" in p or "audit.read" in p %}
+              <div class="app-menu-heading">Управление</div>
+              <nav aria-label="Управление">{{ item("/admin", "Администрирование") }}</nav>
+              {% endif %}
+              {% if request.state.operator %}
+              <div class="app-menu-account">
+                <strong>{{ request.state.operator.name }} ({{ request.state.operator.role }})</strong>
+              </div>
+              <form action="/logout" method="post">
+                <button class="app-menu-logout" type="submit">Выйти</button>
+              </form>
+              {% endif %}
+            </div>
+          </details>
+        </div>
       </div>
-    </nav>
+    </header>
     <main class="container py-4{% block main_class %}{% endblock %}">
       {% block content %}{% endblock %}
     </main>
