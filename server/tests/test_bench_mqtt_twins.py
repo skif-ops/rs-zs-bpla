@@ -22,3 +22,47 @@ def test_plan_requires_per_station_certificate_and_exact_cn(tmp_path: Path):
         bench_mqtt_twins.identities(3, tmp_path)
     with pytest.raises(ValueError, match="3, 20 or 40"):
         bench_mqtt_twins.identities(4, tmp_path)
+
+
+def test_sender_publishes_only_its_bench_status_topic(monkeypatch, tmp_path: Path):
+    published = []
+
+    class Receipt:
+        rc = bench_mqtt_twins.mqtt.MQTT_ERR_SUCCESS
+
+        def wait_for_publish(self, timeout=None):
+            pass
+
+        def is_published(self):
+            return True
+
+    class Client:
+        def __init__(self, *args, **kwargs):
+            self.on_connect = None
+
+        def tls_set(self, **kwargs):
+            pass
+
+        def tls_insecure_set(self, value):
+            assert value is False
+
+        def connect(self, *args, **kwargs):
+            self.on_connect(self, None, None, 0, None)
+
+        def loop_start(self):
+            pass
+
+        def publish(self, topic, payload, qos, retain):
+            published.append((topic, payload, qos, retain))
+            return Receipt()
+
+        def disconnect(self):
+            pass
+
+        def loop_stop(self):
+            pass
+
+    monkeypatch.setattr(bench_mqtt_twins.mqtt, "Client", Client)
+    bench_mqtt_twins.send_one("dioneya.ru", 8883, tmp_path / "ca", tmp_path / "cert", tmp_path / "key",
+                             1001, b"heartbeat", 1)
+    assert published == [("zs/v1/bench/1001/status", b"heartbeat", 1, False)]
