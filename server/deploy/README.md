@@ -20,7 +20,7 @@ isolated-bench configurations and must not be used for production.
 - Build identity: package the server with `git archive` (`git archive
   --format=tar.gz --prefix=muhoed/ -o muhoed-server.tar.gz <commit> server
   tools/generate_command_signing_key.py`). It writes the commit and its date into
-  `server/BUILD` (`.gitattributes`, `export-subst`), and the server shows the
+  `server/BUILD_ID` (`.gitattributes`, `export-subst`), and the server shows the
   release version with that build in the footer of every page and in
   `/api/v1/health` (`version`, `build`), so an operator and monitoring see which
   build runs without reading the host. A working copy keeps the placeholder and
