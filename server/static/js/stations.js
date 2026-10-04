@@ -185,10 +185,12 @@
       card.appendChild(el("span", "st-station-tenant", r.tenant || "Без участка"));
       card.appendChild(el("span", "st-station-seen", r.silence_s === null ? "Heartbeat: никогда" : "Heartbeat: " + fmt.ago(r.silence_s)));
       const metrics = el("span", "st-station-metrics");
-      metrics.appendChild(el("span", "", "Батарея: " + (r.power.battery_pct === null ? "—" : r.power.battery_pct + " %")));
-      metrics.appendChild(el("span", "", "GNSS: " + (r.gnss.fix_type ? "fix " + r.gnss.fix_type : "нет fix")));
+      metrics.appendChild(el("span", "", "Батарея: " + (r.power.battery_pct === null ? "нет данных" : r.power.battery_pct + " %")));
+      metrics.appendChild(el("span", "", "GNSS: " + (r.gnss.fix_type === null ? "нет данных" : r.gnss.fix_type ? "fix " + r.gnss.fix_type : "нет fix")));
+      metrics.appendChild(el("span", "", "Самотест: " + (r.self_test_ok === null ? "нет данных" : r.self_test_ok ? "пройден" : "ошибка")));
       card.appendChild(metrics);
-      const problem = r.problems.length ? r.problems[0].text + (r.problems.length > 1 ? " · ещё " + (r.problems.length - 1) : "") : "Замечаний нет";
+      const problem = r.problems.length ? r.problems[0].text + (r.problems.length > 1 ? " · ещё " + (r.problems.length - 1) : "") :
+        r.state === "online" ? "По последнему heartbeat замечаний нет" : "Требуется проверить связь";
       card.appendChild(el("span", "st-station-problem", problem));
       card.addEventListener("click", () => {
         open.add(r.station_id);
