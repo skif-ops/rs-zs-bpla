@@ -29,6 +29,7 @@ from station import analysis_access, retention, rollout, router as station_route
 from station.router import router as station_router
 from station.access_api import router as access_router
 from station.admin_api import router as admin_router
+from station.health_api import router as health_router
 from station.operator_auth import OperatorAuthMiddleware, build_router as build_auth_router
 
 
@@ -52,6 +53,7 @@ templates = Jinja2Templates(directory=settings.template_dir)
 app.include_router(station_router)
 app.include_router(access_router)      # who sees which stations: set by the security admin and engineers
 app.include_router(admin_router)       # administration: accounts, the audit log and its switch (/admin)
+app.include_router(health_router)      # the monitoring page's data: every station's state (/stations)
 # release audit item 1: every page, API route and the event stream need an operator (station/operator_auth.py)
 app.include_router(build_auth_router(templates))
 app.add_middleware(OperatorAuthMiddleware)
@@ -99,6 +101,13 @@ async def index(request: Request) -> HTMLResponse:
     """Render the main page."""
 
     return templates.TemplateResponse(request, "index.html")
+
+
+@app.get("/stations", response_class=HTMLResponse)
+async def stations_page(request: Request) -> HTMLResponse:
+    """Monitoring: every station's state from its last heartbeat (station/health.py), sortable and filterable."""
+
+    return templates.TemplateResponse(request, "stations.html")
 
 
 @app.get("/replay", response_class=HTMLResponse)

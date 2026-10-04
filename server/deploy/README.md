@@ -26,6 +26,14 @@ isolated-bench configurations and must not be used for production.
   build runs without reading the host. A working copy keeps the placeholder and
   asks git; `ZS_BUILD="<commit> <YYYY-MM-DD>"` overrides both on a bench
   (utils/build_info.py).
+- Station monitoring: the `/stations` page and `GET /api/v1/stations/health`
+  judge every station by its last heartbeat (docs/SERVER_STATION_MONITORING_2026-10-04.md):
+  silent longer than `ZS_STATION_LATE_S` (25200, 7 h: a 6 h duty-cycle period plus
+  margin) is late, longer than `ZS_STATION_LOST_S` (46800, 13 h) is lost, battery
+  below `ZS_STATION_BATTERY_LOW_PCT` (20) is low; all three are read from the
+  environment, so compose changes them without a rebuild. The PKI registry
+  (`ZS_PKI_DIR`, default `data/pki`) adds the serial, lot and the units that never
+  reported.
 - MQTT over TLS 1.2+ on port 8883. The server certificate carries the compose
   service name `mqtt` besides the public name and address (`python -m pki.cli
   server-cert --dns <public> --dns mqtt --ip <ip>`): the bridges and `mqtt_alerts`

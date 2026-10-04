@@ -11,14 +11,23 @@
     <nav class="navbar navbar-expand-lg navbar-dark app-navbar">
       <div class="container">
         <a class="navbar-brand" href="/">Мухоед</a>
+        {# the menu: field operation first (stations, tracking), then the analysis tools, then administration #}
+        {% set path = request.url.path %}
+        {% macro item(href, text) -%}
+          <a class="nav-link{% if path == href or path.startswith(href + '/') %} active{% endif %}" href="{{ href }}"
+             {% if path == href or path.startswith(href + '/') %}aria-current="page"{% endif %}>{{ text }}</a>
+        {%- endmacro %}
         <div class="navbar-nav">
-          <a class="nav-link" href="/single">Один файл</a>
-          <a class="nav-link" href="/localization">Локализация</a>
-          <a class="nav-link" href="/dataset">Обучение</a>
-          <a class="nav-link" href="/replay">Сопровождение</a>
+          {{ item("/stations", "Станции") }}
+          {{ item("/replay", "Сопровождение") }}
+          <span class="nav-sep" aria-hidden="true"></span>
+          {{ item("/single", "Один файл") }}
+          {{ item("/localization", "Локализация") }}
+          {{ item("/dataset", "Обучение") }}
           {% set p = request.state.operator.permissions if request.state.operator else [] %}
           {% if "users.manage" in p or "scopes.manage" in p or "audit.read" in p %}
-          <a class="nav-link" href="/admin">Администрирование</a>
+          <span class="nav-sep" aria-hidden="true"></span>
+          {{ item("/admin", "Администрирование") }}
           {% endif %}
         </div>
         {% if request.state.operator %}
@@ -29,7 +38,7 @@
         {% endif %}
       </div>
     </nav>
-    <main class="container py-4">
+    <main class="container py-4{% block main_class %}{% endblock %}">
       {% block content %}{% endblock %}
     </main>
     <footer class="app-footer">

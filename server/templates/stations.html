@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Мухоед - станции{% endblock %}
+{% block main_class %} container-wide{% endblock %}
+{% block content %}
+<section class="page-header compact">
+  <h1>Станции</h1>
+  <p>Состояние каждой станции по её последнему heartbeat: связь, питание, GNSS, версии, неисправности.
+    Станция «на связи», пока молчит меньше <span id="st-late">7 ч</span>, «опаздывает» до
+    <span id="st-lost">13 ч</span>, дальше «потеряна»; станция реестра, которая ни разу не вышла на связь,
+    показана отдельно. Нажмите на строку, чтобы раскрыть полный heartbeat; заголовок столбца сортирует,
+    поле под ним фильтрует.</p>
+</section>
+
+<div class="st-summary" id="st-summary" aria-live="polite">
+  <button class="st-card st-card-total" data-filter="" type="button"><span class="st-num" data-key="total">–</span><span class="st-label">всего</span></button>
+  <button class="st-card st-online" data-filter="state:online" type="button"><span class="st-num" data-key="online">–</span><span class="st-label">на связи</span></button>
+  <button class="st-card st-late" data-filter="state:late" type="button"><span class="st-num" data-key="late">–</span><span class="st-label">опаздывают</span></button>
+  <button class="st-card st-lost" data-filter="state:lost" type="button"><span class="st-num" data-key="lost">–</span><span class="st-label">потеряны</span></button>
+  <button class="st-card st-never" data-filter="state:never" type="button"><span class="st-num" data-key="never">–</span><span class="st-label">не выходили</span></button>
+  <button class="st-card st-alarm" data-filter="level:alarm" type="button"><span class="st-num" data-key="alarm">–</span><span class="st-label">тревога</span></button>
+  <button class="st-card st-warn" data-filter="level:warn" type="button"><span class="st-num" data-key="warn">–</span><span class="st-label">внимание</span></button>
+  <button class="st-card" data-filter="problem:battery_low" type="button"><span class="st-num" data-key="battery_low">–</span><span class="st-label">низкий заряд</span></button>
+  <button class="st-card" data-filter="problem:gnss" type="button"><span class="st-num" data-key="gnss">–</span><span class="st-label">GNSS, время, положение</span></button>
+  <button class="st-card" data-filter="problem:updating" type="button"><span class="st-num" data-key="updating">–</span><span class="st-label">обновляются</span></button>
+</div>
+
+<div class="st-toolbar">
+  <span class="st-status" id="st-status">Загрузка…</span>
+  <span class="st-shown" id="st-shown"></span>
+  <button class="btn btn-sm btn-outline-secondary" id="st-reset" type="button">Сбросить фильтры</button>
+  <button class="btn btn-sm btn-outline-primary" id="st-refresh" type="button">Обновить</button>
+</div>
+
+<div class="table-responsive st-wrap">
+  <table class="table table-sm st-table" id="st-table">
+    <thead>
+      <tr id="st-head"></tr>
+      <tr id="st-filters"></tr>
+    </thead>
+    <tbody id="st-body"></tbody>
+  </table>
+</div>
+<p class="st-empty" id="st-empty" hidden>Ни одна станция не подходит под фильтры.</p>
+
+<script src="/static/js/stations.js"></script>
+{% endblock %}

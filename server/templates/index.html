@@ -3,9 +3,27 @@
 {% block content %}
 <section class="page-header">
   <h1>Мухоед</h1>
-  <p>Локальная офлайн-система анализа акустики БПЛА, классификации и TDOA-локализации.</p>
+  <p>Сервер сети звукоуловительных станций: состояние станций, сопровождение целей, анализ записей, классификация и
+    TDOA-локализация.</p>
 </section>
 
+<h2 class="index-group">Работа с сетью станций</h2>
+<div class="row g-4 action-grid">
+  <div class="col-md-6 col-xl-4">
+    <a class="action-card" href="/stations">
+      <span class="action-title">Станции</span>
+      <span class="action-text">Состояние каждой станции: связь, питание, GNSS, версии, что требует внимания.</span>
+    </a>
+  </div>
+  <div class="col-md-6 col-xl-4">
+    <a class="action-card" href="/replay">
+      <span class="action-title">Сопровождение</span>
+      <span class="action-text">Движение цели по пеленгам станций, треки, зоны неуверенного обнаружения.</span>
+    </a>
+  </div>
+</div>
+
+<h2 class="index-group">Анализ записей</h2>
 <div class="row g-4 action-grid">
   <div class="col-md-6 col-xl-4">
     <a class="action-card" href="/single">

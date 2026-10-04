@@ -17,7 +17,7 @@ TRACK_SPAN_MAX_US = 2 * 900 * 1_000_000   # twice the longest station track (tra
 
 SCHEMA = """
 PRAGMA journal_mode=WAL;
-CREATE TABLE IF NOT EXISTS stations(station_id INTEGER PRIMARY KEY, updated_us INTEGER NOT NULL, payload TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS stations(station_id INTEGER PRIMARY KEY, updated_us INTEGER NOT NULL, payload TEXT NOT NULL, received_us INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS detections(event_id INTEGER NOT NULL, station_id INTEGER NOT NULL, event_time_us INTEGER NOT NULL, class_label TEXT NOT NULL, payload TEXT NOT NULL, system_event_id TEXT, PRIMARY KEY(station_id, event_id));
 CREATE INDEX IF NOT EXISTS idx_det_time ON detections(event_time_us);
 CREATE INDEX IF NOT EXISTS idx_det_station ON detections(station_id, event_time_us);
@@ -58,6 +58,7 @@ class EventStore:
             c.executescript(SCHEMA)
             self._migrate_commands(c)
             self._migrate_audio(c)
+            self._migrate_stations(c)
         self.audio_root=path.parent/'audio'     # assembled segments: {audio_root}/{station}/{event}/{segment}.wav
         try: os.chmod(path, 0o600)
         except OSError: pass
@@ -176,6 +177,12 @@ class EventStore:
             if name not in columns: c.execute(f"ALTER TABLE commands ADD COLUMN {name} {definition}")
         c.execute("UPDATE commands SET expires_us=created_us+? WHERE expires_us=0",(COMMAND_TTL_US,))
         c.execute("CREATE INDEX IF NOT EXISTS idx_cmd_due ON commands(acked,expires_us,last_publish_us,created_us)")
+    def _migrate_stations(self,c):
+        """The server time a heartbeat arrived (received_us; updated_us is the station's own clock, which may be in
+        holdover): the monitoring page measures a station's silence by it.  Rows from before keep 0 and fall back to
+        updated_us."""
+        columns={row['name'] for row in c.execute("PRAGMA table_info(stations)")}
+        if 'received_us' not in columns: c.execute("ALTER TABLE stations ADD COLUMN received_us INTEGER NOT NULL DEFAULT 0")
     def _migrate_audio(self,c):
         columns={row['name'] for row in c.execute("PRAGMA table_info(audio)")}
         for name,definition in {'start_time_us':'INTEGER','sha256':'BLOB','command_id':'TEXT','duration_ms':'INTEGER'}.items():
@@ -193,7 +200,7 @@ class EventStore:
         if existing is not None and existing.station.position_source=='configured_install' and hb.station.position_source!='configured_install':
             hb=hb.model_copy(update={'gnss_observed':hb.station,'station':existing.station})
         payload=hb.model_dump_json()
-        with self.lock,self._conn() as c: c.execute("INSERT OR REPLACE INTO stations VALUES(?,?,?)",(hb.station_id,hb.time_us,payload))
+        with self.lock,self._conn() as c: c.execute("INSERT OR REPLACE INTO stations(station_id,updated_us,payload,received_us) VALUES(?,?,?,?)",(hb.station_id,hb.time_us,payload,int(time.time()*1e6)))
     def note_station_tenant(self,station_id:int,tenant:str):
         """The tenant a station's messages came through (its MQTT bridge, or the HTTP bench): what a tenant-limited
         operator account may see (station/access_scope.py).  Written when it changes, not with every message."""
@@ -257,17 +264,25 @@ class EventStore:
     def get_event(self,event_id:str)->dict[str,Any]|None:
         with self._conn() as c: r=c.execute("SELECT payload FROM system_events WHERE system_event_id=?",(event_id,)).fetchone()
         return json.loads(r['payload']) if r else None
+    @staticmethod
+    def _redact_cellular(payload:dict[str,Any])->dict[str,Any]:
+        """The subscriber identifiers (IMSI, ICCID) never leave the server whole."""
+        cellular=payload.get('cellular')
+        if cellular:
+            imsi=cellular.pop('imsi','')
+            iccid=cellular.pop('iccid','')
+            cellular['imsi_redacted']=f'{imsi[:3]}...{imsi[-4:]}' if len(imsi)>=7 else '***'
+            cellular['iccid_redacted']=f'{iccid[:4]}...{iccid[-4:]}' if len(iccid)>=8 else '***'
+        return payload
     def list_stations(self)->list[dict[str,Any]]:
         with self._conn() as c: rows=c.execute("SELECT payload FROM stations ORDER BY station_id").fetchall()
-        payloads=[json.loads(r['payload']) for r in rows]
-        for payload in payloads:
-            cellular=payload.get('cellular')
-            if cellular:
-                imsi=cellular.pop('imsi','')
-                iccid=cellular.pop('iccid','')
-                cellular['imsi_redacted']=f'{imsi[:3]}...{imsi[-4:]}' if len(imsi)>=7 else '***'
-                cellular['iccid_redacted']=f'{iccid[:4]}...{iccid[-4:]}' if len(iccid)>=8 else '***'
-        return payloads
+        return [self._redact_cellular(json.loads(r['payload'])) for r in rows]
+    def station_health_rows(self)->list[dict[str,Any]]:
+        """Every station's last heartbeat (identifiers redacted) with the station's own time of it (updated_us) and the
+        server time it arrived (received_us; a row from before that column: updated_us), for station/health.py."""
+        with self._conn() as c: rows=c.execute("SELECT station_id,updated_us,received_us,payload FROM stations ORDER BY station_id").fetchall()
+        return [{'station_id':r['station_id'],'updated_us':r['updated_us'],'received_us':r['received_us'] or r['updated_us'],
+                 'heartbeat':self._redact_cellular(json.loads(r['payload']))} for r in rows]
     def _command_from_row(self,row)->StationCommand:
         return StationCommand(command_id=row['command_id'],station_id=row['station_id'],command=row['command'],payload=json.loads(row['payload']),created_time_us=row['created_us'],expires_time_us=row['expires_us'],publish_count=row['publish_count'])
     def create_command(self,station_id:int,command:str,payload:dict,ttl_us:int=COMMAND_TTL_US)->StationCommand:
