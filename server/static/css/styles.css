@@ -107,7 +107,6 @@ body > main {
   color: #fff;
   overflow-wrap: anywhere;
 }
-.app-menu-account span { color: #b7c1d0; font-size: .82rem; }
 .app-menu-logout {
   width: 100%;
   padding: .5rem .65rem;

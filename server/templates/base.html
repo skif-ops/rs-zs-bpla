@@ -49,8 +49,7 @@
               {% endif %}
               {% if request.state.operator %}
               <div class="app-menu-account">
-                <strong>{{ request.state.operator.name }}</strong>
-                <span>{{ request.state.operator.role }}</span>
+                <strong>{{ request.state.operator.name }} ({{ request.state.operator.role }})</strong>
               </div>
               <form action="/logout" method="post">
                 <button class="app-menu-logout" type="submit">Выйти</button>
