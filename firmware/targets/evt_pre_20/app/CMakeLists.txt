@@ -29,7 +29,12 @@ FetchContent_Declare(cmsis_core
 FetchContent_Declare(freertos_kernel
   GIT_REPOSITORY https://github.com/FreeRTOS/FreeRTOS-Kernel
   GIT_TAG V11.1.0
-  GIT_SHALLOW ON)
+  GIT_SHALLOW ON
+  # The application uses the in-tree GCC Cortex-M33 port. FreeRTOS partner
+  # and community port submodules are not build inputs and make a Windows
+  # checkout exceed the legacy MAX_PATH limit in deeply nested worktrees.
+  GIT_SUBMODULES ""
+  GIT_SUBMODULES_RECURSE FALSE)
 FetchContent_MakeAvailable(stm32u5_hal cmsis_device_u5 cmsis_core)
 
 # ---- FreeRTOS kernel (Cortex-M33, TrustZone disabled): the config target must exist before the kernel is added ----

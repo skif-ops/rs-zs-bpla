@@ -1,5 +1,8 @@
 # Build outputs
 firmware/build*/
+android/.gradle/
+android/app/build/
+/outputs/
 **/__pycache__/
 **/.pytest_cache/
 *.pyc
