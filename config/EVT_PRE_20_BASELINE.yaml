@@ -204,7 +204,7 @@ mechanics:
   injection_molding_scope: source_data_and_dfm_only_no_pilot_tooling
 
 software:
-  station_firmware_status: TARGET_PORT_REQUIRED
+  station_firmware_status: ENGINEERING_ARM_TARGET_BUILD_PASS_RELEASE_AND_HARDWARE_VALIDATION_PENDING
   server_name: Mukhoyed
   server_targets: [Windows_11, Ubuntu_24_04]
   android_track: separate

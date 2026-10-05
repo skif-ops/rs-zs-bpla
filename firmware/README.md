@@ -14,7 +14,12 @@ ctest --test-dir firmware/build --output-on-failure
 
 Host PASS не означает готовую прошивку изделия.
 
-## Что отсутствует до target build
+Целевая инженерная сборка `STM32U585VIT6Q` выполнена 05.10.2026 на
+commit `5a6429aac7040736be0019589a834ae0bba8c219`: получены ELF, BIN, HEX и
+map-файл, анализ stack usage прошёл. Это подтверждает компилируемость исходного
+target-порта, но образ собран без release key и не разрешён для прошивки изделий.
+
+## Что остаётся до выпуска и испытаний target
 
 - открытие, проверка и регенерация подготовленного STM32CubeMX `.ioc` версией 6.12.0;
 - production linker с secure boot/A/B и HAL/LL bindings;
@@ -24,7 +29,7 @@ Host PASS не означает готовую прошивку изделия.
 - secure boot, A/B OTA, rollback и подписанный release;
 - измерение памяти, CPU, тока и времени на target.
 
-До закрытия этих пунктов статус firmware: `TARGET_PORT_REQUIRED / OPEN / NOT RUN`. BIN/HEX из host-сборки запрещено маркировать как прошивку станции.
+До закрытия этих пунктов статус firmware: `ENGINEERING ARM TARGET BUILD PASS / RELEASE AND HARDWARE VALIDATION PENDING`. BIN/HEX из host-сборки по-прежнему запрещено маркировать как прошивку станции.
 
 Host-контракт BG95 теперь покрывает автоматическое чтение SIM/оператора,
 выбор APN через ответ сети или разрешённый PLMN-каталог, обязательное чтение
@@ -139,9 +144,9 @@ profiles. Контракт генерируется воспроизводимо
 
 Второй target-инкремент закрепляет STM32CubeU5 v1.9.0 и его CMSIS-U5 commit,
 добавляет официальный GCC startup/system и инженерный linker для 2 MiB flash,
-768 KiB SRAM1-3 и 16 KiB SRAM4. Этот linker предназначен только для первичного
-запуска без TrustZone; он не заменяет production-разметку secure boot/A/B и не
-снимает общий `TARGET_PORT_REQUIRED`.
+768 KiB SRAM1-3 и 16 KiB SRAM4. Инженерная ARM-сборка с этим linker проходит,
+но он предназначен только для первичного запуска без TrustZone, не заменяет
+production-разметку secure boot/A/B и не разрешает выпуск прошивки.
 
 Третий target-инкремент формирует воспроизводимый pinout `.ioc` для
 STM32CubeMX 6.12.0 / DB.6.0.120. В нём сохранены 67 назначений, включая

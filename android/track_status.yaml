@@ -2,6 +2,18 @@ track_id: dioneya_android_commissioning
 status: SOURCE_BASELINE
 source_status: SKELETON_WITH_VALIDATORS_TESTS_AND_POSITION_READBACK_HASH
 apk_status: RELEASE_NOT_BUILT
+local_debug_build:
+  status: PASS
+  date: 2026-10-05
+  source_commit: 5a6429aac7040736be0019589a834ae0bba8c219
+  gradle: 9.6.0
+  android_gradle_plugin: 9.4.0
+  compile_sdk: 36
+  unit_tests: PASS
+  assemble_debug: PASS
+  artifact_sha256: 9bef1139dcca1949475261d739205aac59bd440cdba559932fd928a1988bc5ba
+  artifact_retained: false
+  release_effect: NONE_DEBUG_SIGNING_ONLY
 debug_ci_build:
   status: PASS
   source_commit: 6e561637c03856b6bfb963a5b16a481888925991

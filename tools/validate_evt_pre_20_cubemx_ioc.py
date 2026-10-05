@@ -140,11 +140,11 @@ def main() -> None:
 
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     outputs = {item["path"]: item["sha256"] for item in manifest["generated_outputs"]}
-    ioc_relative = str(IOC.relative_to(ROOT))
+    ioc_relative = IOC.relative_to(ROOT).as_posix()
     require(outputs.get(ioc_relative) == sha256(IOC), "target manifest IOC hash mismatch")
     sources = {item["path"]: item["sha256"] for item in manifest["source_inputs"]}
     for path in (*PIN_SOURCES, CONTRACT, DB_LOCK):
-        relative = str(path.relative_to(ROOT))
+        relative = path.relative_to(ROOT).as_posix()
         require(sources.get(relative) == sha256(path), f"target manifest source hash mismatch: {relative}")
     require(manifest["cubemx"]["status"] == "GENERATED_PINOUT_CANDIDATE_OPEN_REGENERATE_REQUIRED", "manifest overclaims CubeMX validation")
     require(manifest["release_gate"]["status"] == "BLOCKED", "generated IOC removed release block")

@@ -85,8 +85,8 @@ EVT-006,Испытания,Энергетика S0-S4 solar battery,TEMPLATES+SC
 EVT-007,Испытания,Механика IP климат UV,TEMPLATES+SCRIPTS,P0,PLANNED,OPEN,OPEN,Вакуумные корпуса на выбранный лот 4 10 или 20; 3D как утверждённый равный резерв; ТПА только аудит исходных данных
 EVT-008,Испытания,Сводный отчёт и deviation closure,DOCX+XLSX,P0,PLANNED,OPEN,OPEN,Нет незакрытых blocker deviations
 AND-001,Android,Требования и UX flow,DOCX+FIGMA_or_SVG,P0,DRAFT,OPEN,OPEN,Сценарии монтажника и сервис-инженера приняты
-AND-002,Android,Исходный проект Kotlin/Android,KOTLIN+GRADLE,P0,DRAFT,OPEN,OPEN,Reproducible build and tests PASS
-AND-003,Android,BLE configuration client,KOTLIN,P0,PLANNED,OPEN,OPEN,Schema validation and auth PASS
+AND-002,Android,Исходный проект Kotlin/Android,KOTLIN+GRADLE,P0,IMPLEMENTED,PASS,PASS,Gradle 9.6.0 AGP 9.4.0 API 36 unit tests и debug assemble PASS 05.10.2026
+AND-003,Android,BLE configuration client,KOTLIN,P0,IMPLEMENTED_HOST_VALIDATED,PASS,OPEN,Исходный BluetoothGatt transport и контракты PASS; pairing UUID freeze и проверка с nRF52840 остаются после сборки станции
 AND-004,Android,Signed OTA client,KOTLIN,P0,PLANNED,OPEN,OPEN,Power loss resume hash signature rollback PASS
-AND-005,Android,APK arm64 и test APK,APK+SHA256+SIG,P0,PLANNED,OPEN,OPEN,Install Huawei/no GMS smoke PASS
+AND-005,Android,APK arm64 и test APK,APK+SHA256+SIG,P0,DEBUG_APK_BUILT,PASS,OPEN,Debug APK build PASS; release signing SBOM Huawei/no GMS smoke и станционный GATT остаются открыты
 AND-006,Android,SBOM privacy security test,JSON+DOCX,P0,DRAFT,OPEN,OPEN,Нет secrets critical vulnerabilities data leaks

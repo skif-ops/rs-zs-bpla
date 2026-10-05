@@ -10,19 +10,19 @@
   "source_inputs": [
     {
       "path": "hardware/EVT_PRE_20_PIN_MAP_REV_A.csv",
-      "sha256": "8188ad33998bc97ee7b165f0ff47560772346cff71f3dc433aa36211098ba915"
+      "sha256": "3895b2bf0004bcb65ec9d7fca6826c2fcffd86d96b140ffcdf599fc404e78d7f"
     },
     {
       "path": "hardware/AAD_CFG_PIN_ADDENDUM_REV_A.csv",
-      "sha256": "3c8dba68addde20c0e9e9efd8bfddccf6c16464866dc012b32b84f9b68d061fa"
+      "sha256": "3368e427583db49d0f481723b2da398ca4aab162088ac3cca81fcbb00411bd98"
     },
     {
       "path": "hardware/CLOCKING_REV_A.md",
-      "sha256": "2e70506ec12e3117048a4aa8afb240825fd30f696a584a0d7f802bfcfaa25157"
+      "sha256": "1f3470b655efcdf68b8ffc4a4453f1423e04b3962c8c043fba6b22713e13e6a1"
     },
     {
       "path": "firmware/targets/evt_pre_20/target_status.yaml",
-      "sha256": "fe8be36ad2831a8323ec879390141ed45ac2e4bf1f92cc58e615ff508f6997ce"
+      "sha256": "a8809823cfeb0dff4a8d8a771d296fb8a8363c983f00aa44b2d9dae6b44edf14"
     },
     {
       "path": "firmware/targets/evt_pre_20/cubemx_generation_contract.json",

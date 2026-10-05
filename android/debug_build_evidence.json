@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "application": "Dioneya commissioning",
+  "build_date": "2026-10-05",
+  "source_commit": "5a6429aac7040736be0019589a834ae0bba8c219",
+  "toolchain": {
+    "gradle": "9.6.0",
+    "android_gradle_plugin": "9.4.0",
+    "compile_sdk": 36,
+    "build_tools": "36.0.0",
+    "local_jvm": "Android Studio JBR 25.0.2"
+  },
+  "tasks": {
+    "testDebugUnitTest": "PASS",
+    "assembleDebug": "PASS"
+  },
+  "apk": {
+    "variant": "debug",
+    "size_bytes": 3546754,
+    "sha256": "9bef1139dcca1949475261d739205aac59bd440cdba559932fd928a1988bc5ba",
+    "artifact_retained": false,
+    "release_authorized": false
+  },
+  "remaining_gates": [
+    "release signing and SBOM",
+    "BLE UUID and bootstrap protocol freeze",
+    "authenticated pairing and GATT validation with station nRF52840",
+    "signed OTA end-to-end validation",
+    "Huawei no-GMS installation smoke test"
+  ]
+}

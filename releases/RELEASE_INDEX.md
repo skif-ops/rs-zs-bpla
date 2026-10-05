@@ -14,6 +14,8 @@
 - PCB-MIC manufacturing handoff: `PACKET READY / EXTERNAL DFM ACCEPTANCE PENDING`;
 - оставшиеся PCB-MIC panelization/DFM/acoustic/physical-EVT gates: `OPEN`;
 - аппаратный EVT: `NOT RUN`;
+- прошивка STM32U585: `ENGINEERING ARM BUILD PASS / UNSIGNED / HARDWARE VALIDATION PENDING`;
+- приложение монтажника: `UNIT TESTS AND DEBUG APK BUILD PASS / RELEASE SIGNING AND STATION GATT VALIDATION PENDING`;
 - общий статус: `CUSTOMER PROCUREMENT HANDOFF SENT / TECHNICAL FOLLOW-UP OPEN`.
 
 Производственный пакет EVT-PRE-20 Rev_D передан заказчику для закупки. Формальные

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """QG-2 independent audit of the Android/firmware installation hash contract."""
 import hashlib
+import json
 from pathlib import Path
 import struct
 
@@ -50,6 +51,7 @@ def main() -> int:
     android_test = (ROOT / "android/app/src/test/java/ru/dioneya/commissioning/core/InstallationCommissioningContractTest.kt").read_text(encoding="utf-8")
     firmware_test = (ROOT / "firmware/tests/test_installation_commissioning.c").read_text(encoding="utf-8")
     status = (ROOT / "android/track_status.yaml").read_text(encoding="utf-8")
+    build_evidence = json.loads((ROOT / "android/debug_build_evidence.json").read_text(encoding="utf-8"))
     android_ble = (ROOT / "android/app/src/main/java/ru/dioneya/commissioning/ble/AndroidBleTransport.kt").read_text(encoding="utf-8")
     station_picker = (ROOT / "android/app/src/main/java/ru/dioneya/commissioning/ui/StationPickerActivity.kt").read_text(encoding="utf-8")
     installation_ui = (ROOT / "android/app/src/main/java/ru/dioneya/commissioning/ui/InstallationActivity.kt").read_text(encoding="utf-8")
@@ -85,6 +87,11 @@ def main() -> int:
     require("ANDROID_BLE_TRANSPORT_SOURCE_PRESENT_STATION_GATT_HARDWARE_VALIDATION_PENDING" in status and
             "station_gatt_hardware_validation" in status and "RELEASE_NOT_BUILT" in status,
             "Android status must expose source BLE transport while keeping hardware/release gates open")
+    require(build_evidence["tasks"] == {"testDebugUnitTest": "PASS", "assembleDebug": "PASS"},
+            "Android debug build evidence does not record both required tasks as PASS")
+    require(build_evidence["apk"]["release_authorized"] is False and
+            build_evidence["apk"]["artifact_retained"] is False,
+            "Android debug artifact was incorrectly promoted to a release")
     require("class AndroidBleTransport" in android_ble and ": BleTransport" in android_ble and "BluetoothGattCallback" in android_ble,
             "Android BluetoothGatt transport is missing")
     require("AndroidBleTransport(this, device)" in station_picker and "AndroidBleTransport(this, it)" in installation_ui and

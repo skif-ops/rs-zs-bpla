@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "configuration": "EVT-PRE-20",
+  "target": "STM32U585VIT6Q",
+  "build_date": "2026-10-05",
+  "source_commit": "5a6429aac7040736be0019589a834ae0bba8c219",
+  "build_type": "Release",
+  "toolchain": {
+    "arm_gnu": "14.2.Rel1",
+    "cmake": "4.4.3",
+    "ninja": "1.13.2"
+  },
+  "dependencies": {
+    "stm32u5_hal_commit": "2552682ee5a0d6f826a6435750fc9267be65868b",
+    "cmsis_device_u5_commit": "624374fa1e21ca195d6f2102ac0caaa50d0ea4c8",
+    "cmsis_core_tag": "v5.9.0",
+    "freertos_kernel_tag": "V11.1.0"
+  },
+  "result": "PASS",
+  "link_memory": {
+    "flash_used_bytes": 247216,
+    "flash_capacity_bytes": 1040384,
+    "flash_used_percent": 23.76,
+    "ram123_used_bytes": 713896,
+    "ram123_capacity_bytes": 786432,
+    "ram123_used_percent": 90.78,
+    "sram4_used_bytes": 0,
+    "sram4_capacity_bytes": 16384
+  },
+  "stack_usage": {
+    "status": "PASS",
+    "policy_default_limit_bytes": 2560,
+    "ed25519_exception_limit_bytes": 2600,
+    "largest_frame_bytes": 2304,
+    "largest_frame_function": "zs_ed25519_verify"
+  },
+  "outputs": {
+    "elf": {
+      "size_bytes": 383016,
+      "sha256": "6a00770a990d567a6659ceb39982141854de97e18da6f5f679373bb02b6cd701"
+    },
+    "bin": {
+      "size_bytes": 247216,
+      "sha256": "a8c8b8252561bfd63d42f8278f37b6ec0a4d39150d1de9c97d5e272df807e73b"
+    },
+    "hex": {
+      "size_bytes": 694160,
+      "sha256": "5bba57f6dc4b7966e7bf2fd2bb151c81217f262cda70b3f0eefaeb796a44b331"
+    },
+    "map": {
+      "size_bytes": 695931,
+      "sha256": "b4d3b8ca15e8ec65ce39e083d1e61927b760485a6c5dbc32c79c317da405f6d6"
+    }
+  },
+  "release_key_count": 0,
+  "artifact_retained": false,
+  "release_authorized": false,
+  "remaining_gates": [
+    "production secure boot and A/B memory layout",
+    "release key injection and signed production manifest",
+    "target flashing and boot validation",
+    "peripheral and communications validation on assembled PCB-MAIN",
+    "environmental and power validation"
+  ]
+}

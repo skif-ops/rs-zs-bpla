@@ -1,5 +1,13 @@
-# Preserve byte-exact upstream CMSIS snapshots, including upstream whitespace.
-/firmware/targets/evt_pre_20/vendor/cmsis_device_u5/** -whitespace
+# Preserve byte-exact STM32 target inputs and generated outputs on Windows.
+/firmware/targets/evt_pre_20/vendor/** text eol=lf
+/firmware/targets/evt_pre_20/vendor/cmsis_device_u5/** text eol=lf -whitespace
+/firmware/targets/evt_pre_20/ld/STM32U585VITXQ_ENGINEERING_FLASH.ld text eol=lf
+/firmware/targets/evt_pre_20/stm32_memory_contract.json text eol=lf
+/firmware/targets/evt_pre_20/cubemx_generation_contract.json text eol=lf
+/firmware/targets/evt_pre_20/dioneya_evt_pre_20_rev_a.ioc text eol=lf
+/firmware/targets/evt_pre_20/include/evt_pre_20_board_pins.h text eol=lf
+/firmware/targets/evt_pre_20/include/evt_pre_20_clock_policy.h text eol=lf
+/firmware/targets/evt_pre_20/target_contract_manifest.json text eol=lf
 
 # server/BUILD_ID: git archive writes the commit and its date of the archived tree here (utils/build_info.py shows
 # them in the footer of every page and in /api/v1/health); a working copy keeps the placeholder and asks git.

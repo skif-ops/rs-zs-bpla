@@ -242,6 +242,18 @@ required_target_files:
   secure_boot: MISSING_BLOCKER
   ota_ab: MISSING_BLOCKER
   production_build_manifest: MISSING_BLOCKER
+engineering_build:
+  status: PASS_UNSIGNED_LOCAL_NOT_FOR_DEVICE_RELEASE
+  evidence: firmware/targets/evt_pre_20/engineering_build_evidence.json
+  source_commit: 5a6429aac7040736be0019589a834ae0bba8c219
+  toolchain: ARM_GNU_14_2_REL1_CMAKE_4_4_3_NINJA_1_13_2
+  stack_usage: PASS_ALL_FRAMES_WITHIN_POLICY
+  flash_used_bytes: 247216
+  flash_used_percent: 23.76
+  ram123_used_bytes: 713896
+  ram123_used_percent: 90.78
+  release_key_count: 0
+  release_effect: NONE_UNSIGNED_ENGINEERING_BUILD_ONLY
 release_outputs:
   elf: NOT_BUILT
   map: NOT_BUILT
