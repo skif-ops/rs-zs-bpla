@@ -1,6 +1,6 @@
 # EVT-PRE-20 hardware production release gate — Rev.A
 
-Status: `ACTIVE / BLOCKING`
+Status: `ACTIVE / CUSTOMER PROCUREMENT HANDOFF SENT / TECHNICAL FOLLOW-UP OPEN`
 
 This gate is the release authority for the physical station hardware and its
 procurement BOM. It intentionally excludes application firmware, server and
@@ -24,9 +24,11 @@ may remain blank and do not block this engineering gate.
 The controlled lot is `EVT-20` for 20 stations. The current program contains two
 such lots plus one bench station, 41 stations total, with two independent EVT-20
 reserve pools and no third reserve pool for the bench unit. Actual purchase
-execution is owned by the customer. PCB/PCBA,
-harness and housing manufacture remains prohibited while technical design,
-job-specific DFM or manufacturing-release evidence is blocked.
+execution is owned by the customer. As of 2026-10-05 the customer released the
+Rev_D package for full-program procurement without a first-article pause.
+Unresolved job-specific DFM, stackup, via, assembly and housing evidence is now
+tracked as post-order follow-up and controlled ECO work after supplier feedback,
+not as a stop on the customer-owned purchase.
 
 The eight selected OTS system identities `RB40`, `SLP080S-12M`,
 `SCC075010060R`, `SBS050150200`, `G30.B.108111`, `AA.166.A.301111`,
@@ -46,15 +48,17 @@ quotation and commercial order remain open by design. Standard-process technical
 baselines are accepted; routing, checkout DFM, CAM, Review B, mechanics and
 physical evidence remain blocking here.
 
-The production interlock is implemented by:
+The formal engineering-release interlock is implemented by:
 
 ```bash
 python tools/audit_evt_pre_20_hardware_release.py --strict
 ```
 
-Default mode records the same blockers without failing engineering CI. A PASS
-must not be inferred from source completeness, BOM QG-1, placement or partial
-routing subgates, or successful software tests.
+Default mode reports the customer procurement handoff state and records open
+follow-up items without failing engineering CI. `--strict` still fails until
+formal engineering-release evidence is complete. A PASS must not be inferred
+from source completeness, BOM QG-1, placement or partial routing subgates, or
+successful software tests.
 
 PCB-MAIN has passed its bounded 2D placement-clearance subgate: the controlled
 225-reference repack gives all 227 fitted assembly footprints an explicit

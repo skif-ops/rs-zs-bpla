@@ -19,6 +19,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+BASELINE = ROOT / "config/EVT_PRE_20_BASELINE.yaml"
+HANDOFF_RECORD = ROOT / "docs/EVT_PRE_20_CUSTOMER_PROCUREMENT_HANDOFF_2026-10-05.md"
 LOT_SIZES = (4, 10, 20)
 BOARD_FILES = {
     board: {
@@ -99,6 +101,41 @@ def run_json_audit(script_name: str) -> dict[str, object]:
         return json.loads(output.read_text(encoding="utf-8"))
 
 
+def baseline_value(text: str, key: str) -> str:
+    prefix = f"{key}:"
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith(prefix):
+            return stripped.split(":", 1)[1].strip().strip('"')
+    return ""
+
+
+def customer_procurement_handoff_from_baseline(text: str) -> dict[str, object]:
+    status = baseline_value(text, "customer_procurement_handoff_status")
+    revision = baseline_value(text, "customer_procurement_handoff_revision")
+    scope = baseline_value(text, "customer_procurement_handoff_scope")
+    policy = baseline_value(text, "customer_procurement_order_policy")
+    followup = baseline_value(text, "engineering_release_gate_after_customer_handoff")
+    sent = all(
+        (
+            status == "SENT_TO_CUSTOMER_FOR_ORDER",
+            revision == "EVT-PRE-20 Rev_D",
+            scope == "FULL_PROGRAM_2X20_PLUS_1",
+            policy == "ORDER_ALL_AT_ONCE_NO_FIRST_ARTICLE_PAUSE",
+            followup == "TRACK_OPEN_ITEMS_AS_FOLLOWUP_NOT_PROCUREMENT_BLOCKERS",
+            HANDOFF_RECORD.is_file(),
+        )
+    )
+    return {
+        "sent": sent,
+        "status": status or "MISSING",
+        "revision": revision or "MISSING",
+        "scope": scope or "MISSING",
+        "order_policy": policy or "MISSING",
+        "handoff_record": str(HANDOFF_RECORD.relative_to(ROOT)),
+    }
+
+
 def audit() -> dict[str, object]:
     checks: list[dict[str, object]] = []
     design_blockers: list[str] = []
@@ -127,7 +164,9 @@ def audit() -> dict[str, object]:
         if not passed and purchase:
             purchase_blockers.append(blocker)
 
-    baseline = (ROOT / "config/EVT_PRE_20_BASELINE.yaml").read_text(encoding="utf-8")
+    baseline = BASELINE.read_text(encoding="utf-8")
+    handoff = customer_procurement_handoff_from_baseline(baseline)
+    handoff_sent = bool(handoff["sent"])
     lot_options_ok = (
         "supported_procurement_quantities: [4, 10, 20]" in baseline
         and "maximum_station_quantity: 20" in baseline
@@ -165,11 +204,22 @@ def audit() -> dict[str, object]:
     bom_qg2 = run_bom_qg2()
     qg2_ok = bom_qg2.get("production_bom_complete") is True
     qg2_blockers = [str(item) for item in bom_qg2.get("blockers", [])]
+    qg2_detail = (
+        "production BOM QG-2 PASS" if qg2_ok
+        else f"production BOM QG-2 OPEN FOLLOW-UP ({len(qg2_blockers)} findings; customer handoff sent)"
+        if handoff_sent
+        else f"production BOM QG-2 BLOCKED ({len(qg2_blockers)} findings)"
+    )
+    qg2_blocker = (
+        "production BOM QG-2 follow-up remains open after customer handoff: "
+        if handoff_sent
+        else "production BOM QG-2 remains BLOCKED: "
+    ) + " | ".join(qg2_blockers)
     check(
         "production_bom_qg2",
         qg2_ok,
-        "production BOM QG-2 PASS" if qg2_ok else f"production BOM QG-2 BLOCKED ({len(qg2_blockers)} findings)",
-        "production BOM QG-2 remains BLOCKED: " + " | ".join(qg2_blockers),
+        qg2_detail,
+        qg2_blocker,
     )
 
     system_ots_identity = run_json_audit(
@@ -1190,7 +1240,12 @@ def audit() -> dict[str, object]:
     )
 
     design_ready = not design_blockers
-    purchase_ready = design_ready and not purchase_blockers
+    formal_purchase_ready = design_ready and not purchase_blockers
+    purchase_status = (
+        "PASS" if formal_purchase_ready
+        else "CUSTOMER_PROCUREMENT_HANDOFF_SENT_OPEN_FOLLOWUP" if handoff_sent
+        else "BLOCKED"
+    )
     return {
         "schema": "dioneya-hardware-production-release-audit-v1",
         "configuration": "EVT-PRE-20 Rev.A",
@@ -1216,14 +1271,20 @@ def audit() -> dict[str, object]:
             "blockers": design_blockers,
         },
         "purchase_release": {
-            "ready": purchase_ready,
-            "status": "PASS" if purchase_ready else "BLOCKED",
-            "meaning": "engineering handoff for customer-owned procurement; not an executed purchase order",
+            "ready": formal_purchase_ready,
+            "status": purchase_status,
+            "formal_engineering_ready": formal_purchase_ready,
+            "customer_procurement_handoff": handoff,
+            "meaning": (
+                "formal engineering evidence closure is tracked separately from the "
+                "customer-owned procurement handoff; supplier feedback is processed as controlled follow-up/ECO"
+            ),
             "owner": "CUSTOMER",
             "commercial_quote_or_availability_required": False,
             "job_specific_technical_manufacturing_responses_required": False,
             "selected_station_quantity": selected_quantity,
             "blockers": purchase_blockers,
+            "open_followup_items": purchase_blockers if handoff_sent and not formal_purchase_ready else [],
         },
         "boards": board_results,
         "bom_qg2": bom_qg2,
@@ -1245,7 +1306,7 @@ def main() -> int:
     parser.add_argument(
         "--strict",
         action="store_true",
-        help="return non-zero until the hardware design and customer procurement handoff are ready",
+        help="return non-zero until formal hardware and procurement evidence is closed",
     )
     parser.add_argument("--output", default="artifacts/evt_pre_20_hardware_release_audit.json")
     args = parser.parse_args()
@@ -1259,14 +1320,18 @@ def main() -> int:
 
     design = result["hardware_design_release"]
     purchase = result["purchase_release"]
+    handoff = purchase["customer_procurement_handoff"]
     print(f"EVT-PRE-20 hardware-only production audit: {purchase['status']}")
+    if handoff["sent"]:
+        print(f"- customer procurement handoff: {handoff['status']} ({handoff['revision']})")
     print(f"- hardware design release: {design['status']}")
+    label = "open follow-up" if handoff["sent"] and not purchase["ready"] else "blocker"
     for blocker in design["blockers"]:
-        print(f"  - {blocker}")
-    print(f"- customer procurement handoff: {purchase['status']}")
+        print(f"  - {label}: {blocker}")
+    print(f"- formal procurement evidence closure: {'PASS' if purchase['ready'] else 'OPEN_FOLLOWUP'}")
     for blocker in purchase["blockers"]:
         if blocker not in design["blockers"]:
-            print(f"  - {blocker}")
+            print(f"  - {label}: {blocker}")
     print("- software scope: excluded unless an explicit hardware dependency requires it")
     try:
         display_output = output.relative_to(ROOT)

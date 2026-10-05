@@ -2,8 +2,8 @@
 """QG-2 independent technical completeness audit of the Rev.A BOM.
 
 Default mode records blockers without failing engineering CI. --strict is the actual
-production-BOM release gate and must remain non-zero until the schematic-derived BOM,
-exact system SKUs and verification evidence are complete.
+formal production-BOM release gate and must remain non-zero until the
+schematic-derived BOM, exact system SKUs and verification evidence are complete.
 """
 from __future__ import annotations
 
@@ -20,6 +20,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BOM = ROOT / "hardware/EVT_PRE_20_BOM_REV_A.csv"
 PROCUREMENT_BOM = ROOT / "hardware/EVT_PRE_20_BOM_PROCUREMENT_REV_A.csv"
+BASELINE = ROOT / "config/EVT_PRE_20_BASELINE.yaml"
+HANDOFF_RECORD = ROOT / "docs/EVT_PRE_20_CUSTOMER_PROCUREMENT_HANDOFF_2026-10-05.md"
 LOT_SIZES = (4, 10, 20)
 
 
@@ -49,6 +51,42 @@ def run_json_audit(script_name: str) -> dict[str, object]:
                 "error": process.stderr.strip() or process.stdout.strip() or f"exit {process.returncode}",
             }
         return json.loads(output.read_text(encoding="utf-8"))
+
+
+def baseline_value(text: str, key: str) -> str:
+    prefix = f"{key}:"
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith(prefix):
+            return stripped.split(":", 1)[1].strip().strip('"')
+    return ""
+
+
+def customer_procurement_handoff() -> dict[str, object]:
+    text = BASELINE.read_text(encoding="utf-8") if BASELINE.is_file() else ""
+    status = baseline_value(text, "customer_procurement_handoff_status")
+    revision = baseline_value(text, "customer_procurement_handoff_revision")
+    scope = baseline_value(text, "customer_procurement_handoff_scope")
+    policy = baseline_value(text, "customer_procurement_order_policy")
+    followup = baseline_value(text, "engineering_release_gate_after_customer_handoff")
+    sent = all(
+        (
+            status == "SENT_TO_CUSTOMER_FOR_ORDER",
+            revision == "EVT-PRE-20 Rev_D",
+            scope == "FULL_PROGRAM_2X20_PLUS_1",
+            policy == "ORDER_ALL_AT_ONCE_NO_FIRST_ARTICLE_PAUSE",
+            followup == "TRACK_OPEN_ITEMS_AS_FOLLOWUP_NOT_PROCUREMENT_BLOCKERS",
+            HANDOFF_RECORD.is_file(),
+        )
+    )
+    return {
+        "sent": sent,
+        "status": status or "MISSING",
+        "revision": revision or "MISSING",
+        "scope": scope or "MISSING",
+        "order_policy": policy or "MISSING",
+        "handoff_record": str(HANDOFF_RECORD.relative_to(ROOT)),
+    }
 
 
 def main() -> int:
@@ -619,20 +657,32 @@ def main() -> int:
           "system/mechanical article identities not controlled: " + ", ".join(system_open)
           if system_open else "system SKUs and build-to-print article identities are controlled")
 
+    handoff = customer_procurement_handoff()
+    status = (
+        "PASS" if not blockers
+        else "CUSTOMER_PROCUREMENT_HANDOFF_SENT_OPEN_FOLLOWUP" if handoff["sent"]
+        else "BLOCKED"
+    )
     result = {
         "gate": "QG-2",
-        "status": "PASS" if not blockers else "BLOCKED",
+        "status": status,
         "production_bom_complete": not blockers,
+        "formal_production_bom_complete": not blockers,
+        "customer_procurement_handoff": handoff,
         "checks": checks,
         "blockers": blockers,
+        "open_followup_items": blockers if handoff["sent"] and blockers else [],
         "system_ots_procurement_identity": system_ots_identity,
     }
     output = ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"EVT-PRE-20 production BOM QG-2 technical gate: {result['status']}")
+    if handoff["sent"] and blockers:
+        print(f"customer procurement handoff: {handoff['status']} ({handoff['revision']})")
+    label = "open follow-up" if handoff["sent"] and blockers else "blocker"
     for blocker in blockers:
-        print(f"- {blocker}")
+        print(f"- {label}: {blocker}")
     print(f"report: {output.relative_to(ROOT) if output.is_relative_to(ROOT) else output}")
     return 1 if args.strict and blockers else 0
 

@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Audit the EVT-PRE-20 EVT build release (hardware/EVT_BUILD_RELEASE_GATE_REV_A.md).
 
-EVT build release = design-complete handoff of the 2x20+1 EVT program to PCB/PCBA
-fabrication, housing manufacture and station assembly. Physical EVT evidence is
-collected on the built lot and feeds the serial revision.
+EVT build release = formal design-complete handoff of the 2x20+1 EVT program to
+PCB/PCBA fabrication, housing manufacture and station assembly. Customer
+procurement handoff is tracked separately; physical EVT evidence is collected on
+the built lot and feeds the serial revision.
 
-The audit reuses tools/audit_evt_pre_20_hardware_release.py unchanged:
+The audit reuses tools/audit_evt_pre_20_hardware_release.py:
 - every failing design-release check blocks the EVT build unless it is listed in
   EVT_PHYSICAL_SCOPE;
 - checks whose base interlock pins a historical PCB-PWR trace count are
@@ -31,6 +32,8 @@ sys.path.insert(0, str(ROOT / "tools"))
 import audit_evt_pre_20_hardware_release as base  # noqa: E402
 
 GATE = "hardware/EVT_BUILD_RELEASE_GATE_REV_A.md"
+BASELINE = "config/EVT_PRE_20_BASELINE.yaml"
+PROCUREMENT_HANDOFF_RECORD = "docs/EVT_PRE_20_CUSTOMER_PROCUREMENT_HANDOFF_2026-10-05.md"
 BOARDS = ("PCB-MAIN", "PCB-PWR", "PCB-MIC")
 
 # Physical evidence collected on the built EVT lot, not an input of this gate.
@@ -115,6 +118,23 @@ EVT_PAPER_CLOSABLE_BOM_STATUSES = frozenset(
 
 def native_board(board: str) -> Path:
     return ROOT / f"hardware/kicad/native/{board}/{board}.kicad_pcb"
+
+
+def customer_procurement_handoff() -> dict[str, object]:
+    baseline = (ROOT / BASELINE).read_text(encoding="utf-8")
+    status_match = re.search(r"^\s*customer_procurement_handoff_status:\s*(\S+)\s*$", baseline, re.M)
+    revision_match = re.search(r"^\s*customer_procurement_handoff_revision:\s*(.+?)\s*$", baseline, re.M)
+    policy_match = re.search(r"^\s*post_order_factory_feedback_policy:\s*(.+?)\s*$", baseline, re.M)
+    status = status_match.group(1) if status_match else "NOT_RECORDED"
+    record_present = (ROOT / PROCUREMENT_HANDOFF_RECORD).is_file()
+    sent = status == "SENT_TO_CUSTOMER_FOR_ORDER" and record_present
+    return {
+        "sent": sent,
+        "status": status,
+        "revision": revision_match.group(1) if revision_match else "",
+        "post_order_factory_feedback_policy": policy_match.group(1) if policy_match else "",
+        "record": PROCUREMENT_HANDOFF_RECORD if record_present else "",
+    }
 
 
 def pads_outside_outline(path: Path) -> list[str]:
@@ -392,20 +412,29 @@ def audit() -> dict[str, object]:
         "evt-build",
     )
 
-    ready = not blockers
+    formal_ready = not blockers
+    handoff = customer_procurement_handoff()
+    status = (
+        "PASS" if formal_ready
+        else "CUSTOMER_PROCUREMENT_HANDOFF_SENT_OPEN_FOLLOWUP" if handoff["sent"]
+        else "BLOCKED"
+    )
     return {
         "schema": "dioneya-evt-build-release-audit-v1",
         "configuration": "EVT-PRE-20 Rev.A",
         "program": "2 x EVT-20 + 1 bench station",
         "gate": GATE,
         "evt_build_release": {
-            "ready": ready,
-            "status": "PASS" if ready else "BLOCKED",
+            "ready": formal_ready,
+            "status": status,
+            "formal_engineering_ready": formal_ready,
+            "customer_procurement_handoff": handoff,
             "meaning": (
-                "design-complete handoff to PCB/PCBA fabrication, housing manufacture and "
-                "station assembly; physical EVT evidence is collected on the built lot"
+                "customer procurement handoff is separate from formal engineering evidence closure; "
+                "supplier feedback is processed as controlled follow-up/ECO after order placement"
             ),
             "blockers": blockers,
+            "open_followup_items": blockers if handoff["sent"] and not formal_ready else [],
         },
         "moved_to_evt_physical_scope": moved,
         "base_hardware_design_release": base_result["hardware_design_release"]["status"],
@@ -428,9 +457,13 @@ def main() -> int:
     output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     release = result["evt_build_release"]
-    print(f"EVT-PRE-20 EVT build release (fab/assembly/housing handoff): {release['status']}")
+    handoff = release["customer_procurement_handoff"]
+    print(f"EVT-PRE-20 customer procurement handoff: {handoff['status']} ({handoff['revision']})")
+    print(f"EVT-PRE-20 formal engineering evidence closure: {'PASS' if release['ready'] else 'OPEN_FOLLOWUP'}")
+    print(f"EVT-PRE-20 audit status: {release['status']}")
+    label = "open follow-up" if handoff["sent"] and not release["ready"] else "blocker"
     for blocker in release["blockers"]:
-        print(f"  - {blocker}")
+        print(f"  - {label}: {blocker}")
     print("moved to EVT physical scope: " + ", ".join(result["moved_to_evt_physical_scope"]))
     try:
         display_output = output.relative_to(ROOT)

@@ -19,7 +19,7 @@ authority_sync:
   native_pcb_main: PRESENT_SCHEMATIC_ERC_PASS_REVIEW_A_PASS_LAYOUT_CANDIDATE_UNROUTED
   review_a: PASS_SIGNED_COMMIT_35C9ED91
   review_b: OPEN_ROUTING_DRC_CAM_DFM_AND_EVIDENCE_PENDING
-  production_bom: BLOCKED
+  production_bom: CUSTOMER_PROCUREMENT_HANDOFF_SENT_TECHNICAL_FOLLOWUP_OPEN
 
 lot:
   maximum_station_quantity: 20
@@ -38,8 +38,15 @@ lot:
   selection_required_before_purchase_release: true
   selection_status: LOCKED_CURRENT_CUSTOMER_EVT_20
   commercial_procurement_owner: CUSTOMER
+  customer_procurement_handoff_status: SENT_TO_CUSTOMER_FOR_ORDER
+  customer_procurement_handoff_date: 2026-10-05
+  customer_procurement_handoff_revision: EVT-PRE-20 Rev_D
+  customer_procurement_handoff_scope: FULL_PROGRAM_2X20_PLUS_1
+  customer_procurement_order_policy: ORDER_ALL_AT_ONCE_NO_FIRST_ARTICLE_PAUSE
+  post_order_factory_feedback_policy: PROCESS_DFM_STACKUP_VIA_ASSEMBLY_AND_HOUSING_COMMENTS_AS_CONTROLLED_ECO_AFTER_ORDER
   supplier_stock_price_moq_and_delivery_gate: NON_BLOCKING_CUSTOMER_ACTION
   engineering_procurement_handoff_requires_quote_fields: false
+  engineering_release_gate_after_customer_handoff: TRACK_OPEN_ITEMS_AS_FOLLOWUP_NOT_PROCUREMENT_BLOCKERS
   exact_mpn_and_no_substitution_required: true
   job_specific_manufacturing_technical_responses_required: false
   evt_public_engineering_baseline_authorized: true
