@@ -16,7 +16,7 @@ roles: [installer, service_engineer]
 implemented_host_contracts:
   - POSITION_HASH_READBACK_QG1_QG2_PASS
   - POSITION_POLICY_ROLE_AND_VERSION_VALIDATION_PASS
-ble_transport_status: BLE_TRANSPORT_NOT_IMPLEMENTED
+ble_transport_status: ANDROID_BLE_TRANSPORT_SOURCE_PRESENT_STATION_GATT_HARDWARE_VALIDATION_PENDING
 candidate_os_support:
   minimum_android: Android_9
   release_target_sdk: API_36
@@ -32,10 +32,10 @@ required_features:
   - ab_status_and_rollback_report
   - redacted_log_export
 open_blockers:
-  - ble_service_characteristic_uuids
+  - ble_service_characteristic_uuids_freeze
   - qr_bootstrap_and_pairing_protocol
   - ota_manifest_canonicalization_and_signature_algorithm
-  - station_gatt_prototype
+  - station_gatt_hardware_validation
   - release_signing_and_sbom
 security:
   product_signing_private_key_in_app: false

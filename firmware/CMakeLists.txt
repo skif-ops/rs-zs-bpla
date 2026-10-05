@@ -7,6 +7,10 @@ add_subdirectory(targets/evt_pre_20)
 if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif()
+if(MSVC)
+  add_compile_options("/FI${CMAKE_CURRENT_SOURCE_DIR}/include/zs_compiler_compat.h")
+  add_library(m INTERFACE)
+endif()
 
 add_library(zs_core
   src/zs_sha256.c
@@ -264,10 +268,12 @@ target_include_directories(app_comms_sim_tests PRIVATE tests/host_sim targets/ev
 target_link_libraries(app_comms_sim_tests PRIVATE evt_pre_20_dual_sim_gpio)
 
 # station digital twin: portable stack + real comms task on the host against a scene, a scripted BG95 and the server twin
-add_executable(zs_station_twin twin/station_twin.c twin/scene.c twin/array_render.c targets/evt_pre_20/app/app_comms.c)
-target_include_directories(zs_station_twin PRIVATE twin tests/host_sim targets/evt_pre_20/app)
-target_link_libraries(zs_station_twin PRIVATE evt_pre_20_dual_sim_gpio m)
-target_compile_options(zs_station_twin PRIVATE -UNDEBUG)
+if(NOT MSVC)
+  add_executable(zs_station_twin twin/station_twin.c twin/scene.c twin/array_render.c targets/evt_pre_20/app/app_comms.c)
+  target_include_directories(zs_station_twin PRIVATE twin tests/host_sim targets/evt_pre_20/app)
+  target_link_libraries(zs_station_twin PRIVATE evt_pre_20_dual_sim_gpio m)
+  target_compile_options(zs_station_twin PRIVATE -UNDEBUG)
+endif()
 
 # Release configuration defines NDEBUG globally. Tests must keep assert() active,
 # otherwise validation expressions disappear and can hide both test failures and warnings.
@@ -425,13 +431,15 @@ add_test(NAME evt_pre_20_sim_orchestrator COMMAND evt_pre_20_sim_orchestrator_te
 add_test(NAME app_comms_sim COMMAND app_comms_sim_tests)
 # station twin smoke: a drone fly-by must produce at least one detection event (no server: the comms side is
 # covered by app_comms_sim; the closed loop with server/twin/twin_server.py runs in the server CI job)
-add_test(NAME station_twin_smoke COMMAND zs_station_twin --scene drone --seconds 70 --seed 3 --expect-events 1)
-# closed loop with the Python server twin (needs server/requirements-protocol.lock.txt installed, as ci/firmware.sh does)
-add_test(NAME station_twin_e2e COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/../server/tools/test_station_twin_e2e.py)
-set_tests_properties(station_twin_e2e PROPERTIES ENVIRONMENT "ZS_STATION_TWIN=$<TARGET_FILE:zs_station_twin>" SKIP_RETURN_CODE 77)
-# three twins in one field through the real server path (needs server/requirements.lock.txt, as ci/twin_field.sh does)
-add_test(NAME station_twin_field COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/../server/tools/test_twin_field_e2e.py)
-set_tests_properties(station_twin_field PROPERTIES ENVIRONMENT "ZS_STATION_TWIN=$<TARGET_FILE:zs_station_twin>" SKIP_RETURN_CODE 77)
+if(TARGET zs_station_twin)
+  add_test(NAME station_twin_smoke COMMAND zs_station_twin --scene drone --seconds 70 --seed 3 --expect-events 1)
+  # closed loop with the Python server twin (needs server/requirements-protocol.lock.txt installed, as ci/firmware.sh does)
+  add_test(NAME station_twin_e2e COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/../server/tools/test_station_twin_e2e.py)
+  set_tests_properties(station_twin_e2e PROPERTIES ENVIRONMENT "ZS_STATION_TWIN=$<TARGET_FILE:zs_station_twin>" SKIP_RETURN_CODE 77)
+  # three twins in one field through the real server path (needs server/requirements.lock.txt, as ci/twin_field.sh does)
+  add_test(NAME station_twin_field COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/../server/tools/test_twin_field_e2e.py)
+  set_tests_properties(station_twin_field PROPERTIES ENVIRONMENT "ZS_STATION_TWIN=$<TARGET_FILE:zs_station_twin>" SKIP_RETURN_CODE 77)
+endif()
 
 add_executable(zs_emit_detection tools/emit_detection.c)
 target_link_libraries(zs_emit_detection PRIVATE zs_core m)

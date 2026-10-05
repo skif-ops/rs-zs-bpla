@@ -13,15 +13,20 @@
 - поддерживает resume, A/B status и rollback report;
 - USB-C используется как отдельный сервисный recovery path.
 
-Статус: `SOURCE_BASELINE / POSITION_HASH_READBACK_HOST_PASS / BLE_NOT_IMPLEMENTED / RELEASE_APK_NOT_BUILT`.
+Статус: `SOURCE_BASELINE / POSITION_HASH_READBACK_HOST_PASS / ANDROID_BLE_TRANSPORT_SOURCE_PRESENT / RELEASE_APK_NOT_BUILT`.
 
-В каталоге `app` находится минимальный Kotlin/Android проект с unit tests, но он не является commissioning APK: BLE UUID, authenticated pairing и формат OTA signature ещё не заморожены.
+В каталоге `app` находится Kotlin/Android проект с unit tests и Android
+`BluetoothGatt` transport, подключённым к экранам выбора станции, установки и
+настройки сервера. Он ещё не является production commissioning APK: BLE UUID
+freeze, authenticated pairing на реальной станции, station GATT hardware
+validation, формат OTA signature и release signing/SBOM остаются открытыми.
 
 Domain-слой installation commissioning независимо воспроизводит станционный
 58-byte SHA-256 contract, контролирует installer/service-engineer policy,
 monotonic recommission version и принимает read-back только при совпадении
 полей, hash, storage generation и `auditCommitted`. Он не передаёт hash как
-источник доверия станции и не реализует BLE transport.
+источник доверия станции. Android BLE transport в исходниках есть; закрытие
+готовности требует проверки на nRF52840 GATT реальной станции.
 
 Debug source baseline успешно собран CI на commit `6e561637c03856b6bfb963a5b16a481888925991`, workflow run `34240158982`. APK не публиковался и не разрешён к установке на производстве.
 

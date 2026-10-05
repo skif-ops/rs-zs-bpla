@@ -50,6 +50,10 @@ def main() -> int:
     android_test = (ROOT / "android/app/src/test/java/ru/dioneya/commissioning/core/InstallationCommissioningContractTest.kt").read_text(encoding="utf-8")
     firmware_test = (ROOT / "firmware/tests/test_installation_commissioning.c").read_text(encoding="utf-8")
     status = (ROOT / "android/track_status.yaml").read_text(encoding="utf-8")
+    android_ble = (ROOT / "android/app/src/main/java/ru/dioneya/commissioning/ble/AndroidBleTransport.kt").read_text(encoding="utf-8")
+    station_picker = (ROOT / "android/app/src/main/java/ru/dioneya/commissioning/ui/StationPickerActivity.kt").read_text(encoding="utf-8")
+    installation_ui = (ROOT / "android/app/src/main/java/ru/dioneya/commissioning/ui/InstallationActivity.kt").read_text(encoding="utf-8")
+    server_ui = (ROOT / "android/app/src/main/java/ru/dioneya/commissioning/ui/ServerActivity.kt").read_text(encoding="utf-8")
 
     require(independent_hash() == EXPECTED_HASH, "independent known-answer hash drift")
     require(EXPECTED_HASH in android_test and EXPECTED_HASH in firmware_test,
@@ -78,8 +82,14 @@ def main() -> int:
             "Android does not compare station read-back against its independent digest")
     require("if (!readback.auditCommitted)" in kotlin,
             "Android can accept a read-back without committed audit")
-    require("BLE_TRANSPORT_NOT_IMPLEMENTED" in status and "station_gatt_prototype" in status,
-            "Android status overclaims target BLE readiness")
+    require("ANDROID_BLE_TRANSPORT_SOURCE_PRESENT_STATION_GATT_HARDWARE_VALIDATION_PENDING" in status and
+            "station_gatt_hardware_validation" in status and "RELEASE_NOT_BUILT" in status,
+            "Android status must expose source BLE transport while keeping hardware/release gates open")
+    require("class AndroidBleTransport" in android_ble and ": BleTransport" in android_ble and "BluetoothGattCallback" in android_ble,
+            "Android BluetoothGatt transport is missing")
+    require("AndroidBleTransport(this, device)" in station_picker and "AndroidBleTransport(this, it)" in installation_ui and
+            "AndroidBleTransport(this, it)" in server_ui,
+            "Android UI does not wire the source BLE transport into commissioning screens")
 
     print("Android installation commissioning QG-2 independent technical audit: PASS")
     print("58-byte field order and firmware/Android SHA-256 known-answer agreement verified")
