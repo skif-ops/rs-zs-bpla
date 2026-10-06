@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+"""Verify one EVT station certificate, local key and Dioneya CA chain."""
+
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import hashlib
+from pathlib import Path
+import re
+
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
+
+
+SERIAL_RE = re.compile(r"^DIO-EVT-(0[0-3][0-9]|040|B01)$")
+
+
+def expected_lot(serial: str) -> str:
+    if serial == "DIO-EVT-B01":
+        return "BENCH"
+    match = SERIAL_RE.fullmatch(serial)
+    if match is None or not match.group(1).isdigit():
+        raise ValueError("serial must be DIO-EVT-001..040 or DIO-EVT-B01")
+    number = int(match.group(1))
+    if number == 0:
+        raise ValueError("DIO-EVT-000 is reserved")
+    return "EVT-LOT-1" if number <= 20 else "EVT-LOT-2"
+
+
+def one_name(cert: x509.Certificate, oid: x509.ObjectIdentifier, label: str) -> str:
+    values = cert.subject.get_attributes_for_oid(oid)
+    if len(values) != 1:
+        raise ValueError(f"certificate must contain exactly one {label}")
+    return values[0].value
+
+
+def check_time(cert: x509.Certificate, label: str, now: dt.datetime) -> None:
+    if not (cert.not_valid_before_utc <= now <= cert.not_valid_after_utc):
+        raise ValueError(f"{label} is outside its validity period")
+
+
+def verify(serial: str, key_path: Path, cert_path: Path, chain_path: Path) -> dict[str, str]:
+    lot = expected_lot(serial)
+    key = serialization.load_pem_private_key(key_path.read_bytes(), password=None)
+    if not isinstance(key, ec.EllipticCurvePrivateKey) or not isinstance(key.curve, ec.SECP256R1):
+        raise ValueError("station key must be ECDSA P-256")
+    cert = x509.load_pem_x509_certificate(cert_path.read_bytes())
+    chain = x509.load_pem_x509_certificates(chain_path.read_bytes())
+    if len(chain) != 2:
+        raise ValueError("CA chain must contain exactly issuing and root certificates")
+    roots = [candidate for candidate in chain if candidate.subject == candidate.issuer]
+    if len(roots) != 1:
+        raise ValueError("CA chain must contain exactly one self-issued root certificate")
+    root = roots[0]
+    issuing = next(candidate for candidate in chain if candidate is not root)
+
+    if cert.public_key().public_numbers() != key.public_key().public_numbers():
+        raise ValueError("station certificate does not match the local private key")
+    if one_name(cert, NameOID.COMMON_NAME, "CN") != serial:
+        raise ValueError("certificate CN does not match station serial")
+    if one_name(cert, NameOID.ORGANIZATIONAL_UNIT_NAME, "OU") != lot:
+        raise ValueError("certificate OU does not match station lot")
+    if cert.issuer != issuing.subject or issuing.issuer != root.subject:
+        raise ValueError("certificate issuer names do not form the required chain")
+    cert.verify_directly_issued_by(issuing)
+    issuing.verify_directly_issued_by(root)
+    root.verify_directly_issued_by(root)
+    now = dt.datetime.now(dt.timezone.utc)
+    for item, label in ((cert, "station certificate"), (issuing, "issuing CA"), (root, "root CA")):
+        check_time(item, label, now)
+    for ca, label in ((issuing, "issuing CA"), (root, "root CA")):
+        if not ca.extensions.get_extension_for_class(x509.BasicConstraints).value.ca:
+            raise ValueError(f"{label} is not a CA certificate")
+    eku = cert.extensions.get_extension_for_class(x509.ExtendedKeyUsage).value
+    if ExtendedKeyUsageOID.CLIENT_AUTH not in eku:
+        raise ValueError("station certificate is missing clientAuth EKU")
+
+    fingerprint = hashlib.sha256(cert.public_bytes(serialization.Encoding.DER)).hexdigest()
+    return {
+        "serial": serial,
+        "lot": lot,
+        "certificate_sha256": fingerprint,
+        "not_before_utc": cert.not_valid_before_utc.isoformat(),
+        "not_after_utc": cert.not_valid_after_utc.isoformat(),
+        "issuing_cn": one_name(issuing, NameOID.COMMON_NAME, "issuing CN"),
+        "root_cn": one_name(root, NameOID.COMMON_NAME, "root CN"),
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Verify an EVT station certificate against its key and CA chain")
+    parser.add_argument("serial")
+    parser.add_argument("--key", required=True, type=Path)
+    parser.add_argument("--cert", required=True, type=Path)
+    parser.add_argument("--ca-chain", required=True, type=Path)
+    args = parser.parse_args()
+    serial = args.serial.strip().upper()
+    result = verify(serial, args.key, args.cert, args.ca_chain)
+    print("EVT station certificate verification: PASS")
+    for name, value in result.items():
+        print(f"{name}: {value}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

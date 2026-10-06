@@ -114,8 +114,9 @@ def package_readme() -> str:
 3. Прошить `01_STM32/dioneya_evt_pre_20_2026100601.hex` через SWD и проверить read-back.
 4. Прошить `02_NRF52840/merged.hex` через отдельный nRF SWD и проверить read-back.
 5. Установить `03_ANDROID/dioneya-commissioning-0.1.0-bench.20261005.apk` на выделенный Android-телефон.
-6. Выполнить руководство `04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_B.docx`.
+6. Выполнить руководство `04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.docx`.
 7. Сохранить все журналы и хеши в паспорт `DIO-EVT-B01`.
+8. Для полевых станций создавать CSR и проверять сертификат только средствами из `05_EOL_TOOLS` по разделу 16.4.1 руководства.
 
 Архив не содержит закрытых ключей, паролей, keystore или производственных секретов. `release_manifest.json` и `SHA256SUMS.txt` связывают все файлы. `HARDWARE_PENDING.json` перечисляет только проверки, которым нужен физический образец или оснастка.
 
@@ -206,13 +207,18 @@ def main() -> int:
     }
     documentation_files = {
         ROOT / "firmware/targets/evt_pre_20/release/BENCH_RELEASE_PROFILE_REV_B.md": output / "04_ДОКУМЕНТАЦИЯ/BENCH_RELEASE_PROFILE_REV_B.md",
-        ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_B.docx": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_B.docx",
-        ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_B.md": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_B.md",
+        ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.docx": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.docx",
+        ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.md": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.md",
         ROOT / "manufacturing/PROVISIONING_AND_KEYS.md": output / "04_ДОКУМЕНТАЦИЯ/PROVISIONING_AND_KEYS.md",
         ROOT / "manufacturing/EOL_TEST_SPEC.md": output / "04_ДОКУМЕНТАЦИЯ/EOL_TEST_SPEC.md",
         ROOT / "manufacturing/EOL_SOFTWARE_LIMITS_REV_A.json": output / "04_ДОКУМЕНТАЦИЯ/EOL_SOFTWARE_LIMITS_REV_A.json",
     }
-    for mapping in (stm_files, nrf_files, android_files, documentation_files):
+    eol_tool_files = {
+        ROOT / "tools/generate_evt_station_csr.py": output / "05_EOL_TOOLS/generate_evt_station_csr.py",
+        ROOT / "tools/verify_evt_station_certificate.py": output / "05_EOL_TOOLS/verify_evt_station_certificate.py",
+        ROOT / "tools/requirements-eol-pki.txt": output / "05_EOL_TOOLS/requirements-eol-pki.txt",
+    }
+    for mapping in (stm_files, nrf_files, android_files, documentation_files, eol_tool_files):
         for source, destination in mapping.items():
             copy_file(source, destination)
 

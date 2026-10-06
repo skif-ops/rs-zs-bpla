@@ -54,13 +54,13 @@ ICCID и IMSI являются идентификаторами, а не клю�
 ## Регистрация DIO-EVT-001 - DIO-EVT-040
 
 1. Один раз инициализировать реестр `station-add --all-lots`, если записей еще нет.
-2. На станции или EOL fixture сгенерировать уникальный ECDSA P-256 private key и CSR с CN, равным serial.
+2. На станции или EOL fixture сгенерировать уникальный ECDSA P-256 private key и CSR с CN, равным serial, штатным `05_EOL_TOOLS/generate_evt_station_csr.py`.
 3. Передать на сервер только CSR и выполнить `station-sign <SERIAL> --csr <CSR>`.
-4. Проверить CN, fingerprint, срок и chain.
+4. Проверить CN, lot, fingerprint, срок, `clientAuth`, chain и соответствие private key инструментом `05_EOL_TOOLS/verify_evt_station_certificate.py`.
 5. Выпустить station package и этикетку. Station package не содержит station private key, но содержит pairing secret и engineer key, поэтому защищается как секретный EOL-материал.
 6. На EOL-рабочем месте объединить certificate, CA chain и локальный private key.
 7. Через TEST_UART выполнить `factoryid <SERIAL> <pairing_secret_hex>`, холодный перезапуск и read-back только признаков serial/pairing.
-8. Сформировать station secrets с `/run/tls/command-signing.key`, обновить ACL и выполнить commissioning по инструкции Rev B.
+8. Сформировать station secrets с `/run/tls/command-signing.key`, обновить ACL и выполнить commissioning по инструкции Rev C.
 
 ## BG95
 
@@ -76,4 +76,4 @@ ICCID и IMSI являются идентификаторами, а не клю�
 
 Provisioning receipt содержит serial, station ID, tenant, публичные идентификаторы, маскированные ICCID references, certificate fingerprint, key generation mode, firmware release, tool versions, операторов, timestamps, ACL revision и результаты connection tests. Временные файлы с секретами удаляются. Старые сертификаты при ротации отзываются, CRL и ACL обновляются, Mosquitto перезапускается.
 
-Полная пошаговая процедура приведена в `docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_B.md`.
+Полная пошаговая процедура приведена в `docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.md`.
