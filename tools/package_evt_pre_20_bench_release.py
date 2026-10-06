@@ -15,7 +15,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT_PATH = ROOT / "firmware/targets/evt_pre_20/release/bench_release_contract.json"
-RELEASE_ID = "EVT_PRE_20_BENCH_RELEASE_2026100501"
+RELEASE_ID = "EVT_PRE_20_BENCH_RELEASE_2026100601"
 
 
 def sha256(path: Path) -> str:
@@ -101,7 +101,7 @@ def android_sbom() -> dict[str, object]:
 
 
 def package_readme() -> str:
-    return """# EVT-PRE-20 bench software release 2026100501
+    return """# EVT-PRE-20 bench software release 2026100601
 
 ## Русский
 
@@ -111,10 +111,10 @@ def package_readme() -> str:
 
 1. Сохранить полный снимок option bytes STM32.
 2. Применить только поля из `01_STM32/option_bytes_bench_rev_a.json`.
-3. Прошить `01_STM32/dioneya_evt_pre_20_2026100501.hex` через SWD и проверить read-back.
+3. Прошить `01_STM32/dioneya_evt_pre_20_2026100601.hex` через SWD и проверить read-back.
 4. Прошить `02_NRF52840/merged.hex` через отдельный nRF SWD и проверить read-back.
 5. Установить `03_ANDROID/dioneya-commissioning-0.1.0-bench.20261005.apk` на выделенный Android-телефон.
-6. Выполнить руководство `04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_A.docx`.
+6. Выполнить руководство `04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_B.docx`.
 7. Сохранить все журналы и хеши в паспорт `DIO-EVT-B01`.
 
 Архив не содержит закрытых ключей, паролей, keystore или производственных секретов. `release_manifest.json` и `SHA256SUMS.txt` связывают все файлы. `HARDWARE_PENDING.json` перечисляет только проверки, которым нужен физический образец или оснастка.
@@ -138,6 +138,8 @@ def hardware_pending() -> dict[str, object]:
             {"id": "HW-NRF-01", "test": "nRF SWD, signed boot, BLE advertising and authenticated pairing"},
             {"id": "HW-NRF-02", "test": "STM32 to nRF UART IPC, serial recovery and image rollback"},
             {"id": "HW-APP-01", "test": "APK installation, QR, BLE configuration read-back and signed OTA on DIO-EVT-B01"},
+            {"id": "HW-PKI-01", "test": "factoryid serial/pairing write, station certificate, secrets and unique identity provisioning on DIO-EVT-B01"},
+            {"id": "HW-NET-01", "test": "BG95 CA/certificate/key upload, mutual TLS and MQTT end-to-end with dioneya.ru"},
             {"id": "HW-IO-01", "test": "QSPI, microSD, GNSS/PPS, BG95 dual SIM, LoRa, sensors and four microphone channels"},
             {"id": "HW-EOL-01", "test": "rail, current, audio, timing, RF, leak, temperature and power-cycle limits"},
         ],
@@ -146,8 +148,8 @@ def hardware_pending() -> dict[str, object]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--stm-build", type=Path, default=ROOT / "outputs/b_stm_bench_2026100501")
-    parser.add_argument("--stm-release", type=Path, default=ROOT / "outputs/bench-release-stm32")
+    parser.add_argument("--stm-build", type=Path, default=ROOT / "outputs/b_stm_bench_2026100601")
+    parser.add_argument("--stm-release", type=Path, default=ROOT / "outputs/bench-release-stm32-2026100601")
     parser.add_argument("--nrf-build", type=Path, default=Path("C:/dio_b_nrf_2026100501v3"))
     parser.add_argument("--apk", type=Path, default=ROOT / "android/app/build/outputs/apk/release/app-release.apk")
     parser.add_argument(
@@ -173,12 +175,12 @@ def main() -> int:
     output.mkdir(parents=True)
 
     stm_files = {
-        args.stm_release / "2026100501.bin": output / "01_STM32/dioneya_evt_pre_20_2026100501.signed.bin",
-        args.stm_release / "2026100501.manifest.cbor": output / "01_STM32/2026100501.manifest.cbor",
-        args.stm_release / "2026100501.sig": output / "01_STM32/2026100501.sig",
-        args.stm_build / "dioneya_evt_pre_20.elf": output / "01_STM32/dioneya_evt_pre_20_2026100501.elf",
-        args.stm_build / "dioneya_evt_pre_20.map": output / "01_STM32/dioneya_evt_pre_20_2026100501.map",
-        args.stm_build / "dioneya_evt_pre_20.hex": output / "01_STM32/dioneya_evt_pre_20_2026100501.hex",
+        args.stm_release / "2026100601.bin": output / "01_STM32/dioneya_evt_pre_20_2026100601.signed.bin",
+        args.stm_release / "2026100601.manifest.cbor": output / "01_STM32/2026100601.manifest.cbor",
+        args.stm_release / "2026100601.sig": output / "01_STM32/2026100601.sig",
+        args.stm_build / "dioneya_evt_pre_20.elf": output / "01_STM32/dioneya_evt_pre_20_2026100601.elf",
+        args.stm_build / "dioneya_evt_pre_20.map": output / "01_STM32/dioneya_evt_pre_20_2026100601.map",
+        args.stm_build / "dioneya_evt_pre_20.hex": output / "01_STM32/dioneya_evt_pre_20_2026100601.hex",
         ROOT / "firmware/targets/evt_pre_20/release/option_bytes_bench_rev_a.json": output / "01_STM32/option_bytes_bench_rev_a.json",
     }
     nrf_files = {
@@ -203,9 +205,10 @@ def main() -> int:
         args.android_cert: output / "03_ANDROID/android_bench_release_certificate.pem",
     }
     documentation_files = {
-        ROOT / "firmware/targets/evt_pre_20/release/BENCH_RELEASE_PROFILE_REV_A.md": output / "04_ДОКУМЕНТАЦИЯ/BENCH_RELEASE_PROFILE_REV_A.md",
-        ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_A.docx": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_A.docx",
-        ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_A.md": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_A.md",
+        ROOT / "firmware/targets/evt_pre_20/release/BENCH_RELEASE_PROFILE_REV_B.md": output / "04_ДОКУМЕНТАЦИЯ/BENCH_RELEASE_PROFILE_REV_B.md",
+        ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_B.docx": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_B.docx",
+        ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_B.md": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_B.md",
+        ROOT / "manufacturing/PROVISIONING_AND_KEYS.md": output / "04_ДОКУМЕНТАЦИЯ/PROVISIONING_AND_KEYS.md",
         ROOT / "manufacturing/EOL_TEST_SPEC.md": output / "04_ДОКУМЕНТАЦИЯ/EOL_TEST_SPEC.md",
         ROOT / "manufacturing/EOL_SOFTWARE_LIMITS_REV_A.json": output / "04_ДОКУМЕНТАЦИЯ/EOL_SOFTWARE_LIMITS_REV_A.json",
     }
@@ -225,7 +228,7 @@ def main() -> int:
     (output / "README_RU_EN.md").write_text(package_readme(), encoding="utf-8")
 
     expected = {
-        "01_STM32/dioneya_evt_pre_20_2026100501.signed.bin": contract["stm32"]["expected_image_sha256"],
+        "01_STM32/dioneya_evt_pre_20_2026100601.signed.bin": contract["stm32"]["expected_image_sha256"],
         "02_NRF52840/nrf52840_ble_0.1.0+2026100501.signed.bin": contract["nrf52840"]["expected_signed_image_sha256"],
         "02_NRF52840/merged.hex": contract["nrf52840"]["expected_merged_hex_sha256"],
     }
@@ -249,7 +252,7 @@ def main() -> int:
         "status": "READY_TO_FLASH_HARDWARE_VALIDATION_PENDING",
         "contract": contract,
         "build_evidence": {
-            "stm32": {"flash_bytes": 247248, "ram123_bytes": 713896, "max_stack_bytes": 2304},
+            "stm32": {"flash_bytes": 249024, "ram123_bytes": 714008, "max_stack_bytes": 2304},
             "nrf52840_application": {"flash_bytes": 207564, "ram_bytes": 68480},
             "nrf52840_mcuboot": {"flash_bytes": 35470, "ram_bytes": 22080},
             "android": {"unit_tests": "PASS", "apk_signature_scheme_v2": "PASS"},

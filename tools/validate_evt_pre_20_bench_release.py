@@ -12,7 +12,7 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_PACKAGE = ROOT / "outputs/EVT_PRE_20_BENCH_RELEASE_2026100501"
+DEFAULT_PACKAGE = ROOT / "outputs/EVT_PRE_20_BENCH_RELEASE_2026100601"
 PRIVATE_NAME = re.compile(r"(^|[._-])(private|password|secret|keystore)([._-]|$)", re.IGNORECASE)
 FORBIDDEN_SUFFIXES = {".key", ".p12", ".pfx", ".jks", ".keystore"}
 FORBIDDEN_BYTES = (
@@ -47,7 +47,7 @@ def main() -> int:
     if not manifest_path.is_file() or not sums_path.is_file():
         fail("release_manifest.json and SHA256SUMS.txt are required")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if manifest.get("release_id") != "EVT_PRE_20_BENCH_RELEASE_2026100501":
+    if manifest.get("release_id") != "EVT_PRE_20_BENCH_RELEASE_2026100601":
         fail("wrong release id")
     if manifest.get("status") != "READY_TO_FLASH_HARDWARE_VALIDATION_PENDING":
         fail("wrong release status")
@@ -92,22 +92,22 @@ def main() -> int:
     from station import firmware_codec  # pylint: disable=import-outside-toplevel
 
     contract = manifest["contract"]
-    image = (package / "01_STM32/dioneya_evt_pre_20_2026100501.signed.bin").read_bytes()
-    manifest_bytes = (package / "01_STM32/2026100501.manifest.cbor").read_bytes()
-    signature_file = (package / "01_STM32/2026100501.sig").read_bytes()
+    image = (package / "01_STM32/dioneya_evt_pre_20_2026100601.signed.bin").read_bytes()
+    manifest_bytes = (package / "01_STM32/2026100601.manifest.cbor").read_bytes()
+    signature_file = (package / "01_STM32/2026100601.sig").read_bytes()
     if len(signature_file) != 72:
         fail("STM32 signature file must contain 8-byte key id and 64-byte signature")
     public_raw = bytes.fromhex(contract["stm32"]["public_key_hex"])
     decoded = firmware_codec.verify_release(
         manifest_bytes, signature_file[:8], signature_file[8:], [public_raw]
     )
-    if decoded.target != firmware_codec.TARGET_STM32_APP or decoded.version != 2026100501:
+    if decoded.target != firmware_codec.TARGET_STM32_APP or decoded.version != 2026100601:
         fail("STM32 manifest target or version mismatch")
-    if decoded.size != len(image) or decoded.sha256.hex() != sha256(package / "01_STM32/dioneya_evt_pre_20_2026100501.signed.bin"):
+    if decoded.size != len(image) or decoded.sha256.hex() != sha256(package / "01_STM32/dioneya_evt_pre_20_2026100601.signed.bin"):
         fail("STM32 image does not match its signed manifest")
 
     fixed_hashes = {
-        "01_STM32/dioneya_evt_pre_20_2026100501.signed.bin": contract["stm32"]["expected_image_sha256"],
+        "01_STM32/dioneya_evt_pre_20_2026100601.signed.bin": contract["stm32"]["expected_image_sha256"],
         "02_NRF52840/nrf52840_ble_0.1.0+2026100501.signed.bin": contract["nrf52840"]["expected_signed_image_sha256"],
         "02_NRF52840/merged.hex": contract["nrf52840"]["expected_merged_hex_sha256"],
     }

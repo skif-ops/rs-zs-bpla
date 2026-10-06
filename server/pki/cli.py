@@ -249,7 +249,8 @@ def cmd_bundle(a):
 
 
 def cmd_station_package(a):
-    """Everything the EOL fixture loads into one station's BG95: cert, chain, endpoint data."""
+    """Controlled EOL material: cert, chain, endpoint data and factory secrets; never a public package."""
+    from .label import secret_bytes
     d = Path(a.pki)
     reg = _registry(d)
     r = reg.get(a.serial)
@@ -260,16 +261,18 @@ def cmd_station_package(a):
     out.mkdir(parents=True, exist_ok=True)
     (out / "station.crt.pem").write_bytes((d / "stations" / a.serial / f"{a.serial}.crt.pem").read_bytes())
     (out / "ca-chain.pem").write_bytes((d / "bundle" / "ca-chain.pem").read_bytes())
+    pairing_secret = reg.ensure_pairing_secret(a.serial)
     (out / "station.json").write_text(json.dumps({
         "serial": r.serial, "station_id": r.station_id, "lot": r.lot, "tenant": r.tenant,
         "mqtt_host": bundle["mqtt_host"], "mqtt_port": bundle["mqtt_port"],
         "server_fingerprint_sha256": bundle["server_fingerprint_sha256"],
         "ca_reference": bundle["ca_reference"], "topic_prefix": "zs/v1",
         "cert_not_after": r.cert_not_after,
-        "pairing_secret_b32": reg.ensure_pairing_secret(a.serial),
+        "pairing_secret_b32": pairing_secret,
+        "pairing_secret_hex": secret_bytes(pairing_secret).hex(),
         "engineer_key_hex": reg.ensure_engineer_key(a.serial),
     }, indent=2))
-    print(f"station package for {a.serial} written to {out} (private key is NOT included by design)")
+    print(f"protected station package for {a.serial} written to {out} (station private key is NOT included)")
 
 
 def _label(reg: Registry, serial: str):
@@ -293,7 +296,7 @@ def cmd_label_qr(a):
             qrcode.make(lab.encode(), error_correction=qrcode.constants.ERROR_CORRECT_M).save(out / f"{a.serial}.png")
         except ImportError:
             print("PNG skipped: Pillow is not installed (SVG written)")
-    print(f"label for {a.serial} written to {out} ({lab.encode()})")
+    print(f"protected label files for {a.serial} written to {out}; QR payload is not echoed")
 
 
 def cmd_label_sheet(a):
@@ -523,7 +526,7 @@ def main(argv=None):
     s.add_argument("--cert-dir", default="/mosquitto/certs"); s.add_argument("--out")
     s = add("bundle", cmd_bundle, help="export ca-chain, server fingerprint and bundle.json for app/QR/EOL")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("--mqtt-host", required=True); s.add_argument("--mqtt-port", type=int, default=8883); s.add_argument("--out")
-    s = add("station-package", cmd_station_package, help="export one station's cert+chain+endpoint for the EOL fixture")
+    s = add("station-package", cmd_station_package, help="export protected cert+chain+endpoint+factory secrets for the EOL fixture")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--out", required=True)
     s = add("label-qr", cmd_label_qr, help="render the enclosure label QR (SVG/PNG) for one station")
     s.add_argument("--pki", default=str(DEFAULT_DIR)); s.add_argument("serial"); s.add_argument("--out", required=True); s.add_argument("--png", action="store_true")

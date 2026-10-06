@@ -68,8 +68,11 @@ does not claim low-power retention until PWR configuration is measured.
 
 The signed bench image is built and ready for `DIO-EVT-B01`; its contract and
 safe recovery-oriented option-byte profile are in `release/`. The build embeds
-one Ed25519 release key, carries firmware version `2026100501`, passes the stack
+one Ed25519 release key, carries firmware version `2026100601`, passes the stack
 budget and produces ELF, MAP, HEX, BIN, canonical CBOR manifest and signature.
+The image persists the factory serial and pairing secret through the isolated
+TEST_UART `factoryid` command before the first BLE session, then passes the
+pairing secret to the nRF52840 during BLE service initialisation.
 Physical read-back, clock measurements, peripheral checks and A/B power-loss
 tests remain mandatory.
 

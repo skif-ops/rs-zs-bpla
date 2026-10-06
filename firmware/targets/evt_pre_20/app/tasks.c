@@ -609,10 +609,9 @@ static bool ble_service_mode(void *ctx, uint32_t *started) { (void)ctx; *started
 static zs_commissioning_role_t ble_peer_role(void *ctx) { (void)ctx; return ZS_COMMISSIONING_ROLE_INSTALLER; }   /* base role by pairing (B.7) */
 static bool ble_peer_secure(void *ctx) { (void)ctx; return ipc.link_state == 2u; }
 static bool ble_random(void *ctx, uint8_t *out, size_t n) { (void)ctx; return bsp_rng_fill(out, n); }
-/* Station secrets (B3 NOR record, zs_station_secrets): the B.9 engineer key and the expected ICCIDs of both SIM
-   slots.  Loaded at boot and applied to the BLE service (engineer role) and the comms task (dual SIM); the bench
-   provisions them with "engkey <64 hex>" / "simiccid <1|2> <iccid>", which commit to NOR.  Without a valid record
-   ipc_port.engineer_key stays NULL (elevation refused) and comms keeps the single-SIM path. */
+/* Station secrets (B3 NOR record, zs_station_secrets): factory serial, pairing secret, B.9 engineer key, expected
+   ICCIDs and command public keys.  Factory serial + pairing are written through the isolated TEST_UART before the
+   first BLE session; the remaining fields arrive through authenticated BLE 0x0206. */
 static uint8_t engineer_key[32];
 static zs_station_secrets_io_t secrets_io;
 static zs_station_secrets_t secrets;
@@ -621,7 +620,7 @@ static bool secrets_on_nor, secrets_loaded;
 static zs_station_config_io_t cfg_io = {cfg_slots, ram_read, ram_erase, ram_write};
 static zs_installation_store_io_t pos_io = {pos_slots, ram_read, ram_erase, ram_write};
 static const zs_commissioning_audit_io_t audit_io = {NULL, ble_audit};
-static const zs_ipc_identity_t identity = {APP_STATION_SERIAL, APP_STATION_HW_REV, APP_STATION_FW_VERSION, APP_STATION_BL_VERSION, APP_STATION_ID, ZS_STATION_CONFIG_REGION_RU868};
+static zs_ipc_identity_t identity = {APP_STATION_SERIAL, APP_STATION_HW_REV, APP_STATION_FW_VERSION, APP_STATION_BL_VERSION, APP_STATION_ID, ZS_STATION_CONFIG_REGION_RU868};
 /* v0.3 station_secrets over BLE: the service commits to the NOR record and hands the new record here to apply. */
 static void ble_secrets_changed(void *ctx, const zs_station_secrets_t *rec);
 static zs_ipc_service_port_t ipc_port = {NULL, ble_uart_send, ble_now_ms, ble_service_mode, ble_peer_role, ble_peer_secure,
@@ -722,17 +721,24 @@ static void secrets_apply(void);   /* defined after ipc_port */
 
 /* Pushes the loaded/edited secrets into their consumers; values are never printed. */
 static void secrets_apply(void) {
+  uint32_t station_id;
+  if (secrets.factory_serial_set && zs_station_factory_serial_valid(secrets.factory_serial, &station_id)) {
+    strcpy(identity.serial, secrets.factory_serial);
+    identity.station_id = station_id;
+    pipeline_port.station_id = station_id;
+  }
   if (secrets.engineer_key_set) { memcpy(engineer_key, secrets.engineer_key, sizeof(engineer_key)); ipc_port.engineer_key = engineer_key; }
   else ipc_port.engineer_key = NULL;
   for (unsigned i = 0u; i < 2u; i++) if (secrets.iccid[i][0]) (void)app_comms_set_sim_iccid(i + 1u, secrets.iccid[i]);
   { zs_command_trust_key_t keys[2]; const size_t n = zs_command_keys_trust_set(&secrets, keys); app_comms_set_command_keys(keys, n); }
-  if (stores_on_nor) app_lora_bind(&nor_outbox_io, APP_STATION_ID, secrets.engineer_key_set ? secrets.engineer_key : NULL, console_printf);
+  if (stores_on_nor) app_lora_bind(&nor_outbox_io, identity.station_id, secrets.engineer_key_set ? secrets.engineer_key : NULL, console_printf);
 }
 
 static void ble_secrets_changed(void *ctx, const zs_station_secrets_t *rec) {
   (void)ctx;
   secrets = *rec;
-  secrets_loaded = rec->engineer_key_set || rec->iccid[0][0] || rec->iccid[1][0] || rec->command_key_set;
+  secrets_loaded = rec->engineer_key_set || rec->iccid[0][0] || rec->iccid[1][0] || rec->command_key_set ||
+                   rec->pairing_secret_set || rec->factory_serial_set;
   if (!rec->engineer_key_set) memset(engineer_key, 0, sizeof(engineer_key));
   secrets_apply();
   console_printf("secrets: provisioned over ble (v%lu) engineer key %s, iccid1 %s, iccid2 %s, command key %s\r\n", (unsigned long)rec->version,
@@ -821,7 +827,7 @@ static void bind_record_stores(void) {
     if (app_audio_rec_bind(&nor_archive_storage, nor_bindings.layout.archive.base_address, nor_bindings.layout.archive.prehistory_ring_bytes,
                            &audio_ring, pl_sample_time, console_printf))
       app_comms_set_audio_source(app_audio_rec_source());                 /* CMD_REQUEST_AUDIO can now be served */
-    app_lora_bind(&nor_outbox_io, APP_STATION_ID, secrets.engineer_key_set ? secrets.engineer_key : NULL, console_printf);
+    app_lora_bind(&nor_outbox_io, identity.station_id, secrets.engineer_key_set ? secrets.engineer_key : NULL, console_printf);
     { uint16_t pending = 0u; if (zs_event_outbox_pending_count(&nor_outbox_io, &pending) == ZS_EVENT_OUTBOX_OK && pending > 0u) { console_printf("outbox: %u events pending from before the reboot\r\n", pending); mode_event(ZS_MODE_EV_OUTBOX_PENDING); } }
     /* B3 boot counter: one erase block before the nRF image; every power cycle gets a new boot_id so event ids never repeat */
     if (zs_boot_counter_open(&boot_counter, &nor, nor_bindings.layout.boot_counter_base_address, nor_bindings.layout.erase_block_bytes) &&
@@ -841,8 +847,10 @@ static void bind_record_stores(void) {
       app_commands_bind_keys(&secrets_io, command_keys_changed);
       if (r == ZS_STATION_SECRETS_OK) { secrets_loaded = true; secrets_apply(); }
       else if (r != ZS_STATION_SECRETS_NOT_FOUND) console_printf("secrets: read error %d\r\n", (int)r);
-      console_printf("secrets: %s (v%lu) engineer key %s, iccid1 %s, iccid2 %s\r\n", secrets_loaded ? "loaded" : "none",
-                     (unsigned long)secrets.version, secrets.engineer_key_set ? "set" : "-", secrets.iccid[0][0] ? "set" : "-", secrets.iccid[1][0] ? "set" : "-");
+      console_printf("secrets: %s (v%lu) factory %s pairing %s engineer %s iccid1 %s iccid2 %s\r\n", secrets_loaded ? "loaded" : "none",
+                     (unsigned long)secrets.version, secrets.factory_serial_set ? secrets.factory_serial : "-",
+                     secrets.pairing_secret_set ? "set" : "-", secrets.engineer_key_set ? "set" : "-",
+                     secrets.iccid[0][0] ? "set" : "-", secrets.iccid[1][0] ? "set" : "-");
     } else {
       console_printf("secrets: store not bound\r\n");
     }
@@ -890,6 +898,12 @@ static void ble_enter_recovery(void) {
   console_printf("ble: recovery requested (BLE_DFU_REQ held through reset release)\r\n");
 }
 
+static void ble_service_init(void) {
+  (void)zs_ipc_service_init(&ipc, &ipc_port);
+  if (secrets.pairing_secret_set) (void)zs_ipc_service_set_pairing_secret(&ipc, secrets.pairing_secret);
+  (void)zs_ipc_service_ping(&ipc);
+}
+
 static void ble_task_fn(void *arg) {
   bool window_open = false;
   uint32_t last_ping = 0u;
@@ -900,8 +914,7 @@ static void ble_task_fn(void *arg) {
   if (!bsp_rng_init()) console_printf("rng: init failed, engineer role elevation disabled\r\n");
   bsp_gpio_ble_enable(true);
   vTaskDelay(pdMS_TO_TICKS(200));                  /* nRF boot */
-  (void)zs_ipc_service_init(&ipc, &ipc_port);
-  (void)zs_ipc_service_ping(&ipc);
+  ble_service_init();
   if (ipc.config_loaded) app_comms_set_config(&ipc.config, boot_id);
   for (;;) {
     uint8_t buf[64];
@@ -915,8 +928,8 @@ static void ble_task_fn(void *arg) {
     }
     { static uint32_t seen_version; if (ipc.config_loaded && ipc.config.version != seen_version) { seen_version = ipc.config.version; app_comms_set_config(&ipc.config, boot_id); } }
     while ((n = bsp_uart_read(BSP_UART_BLE, buf, sizeof(buf))) > 0u) zs_ipc_service_on_uart_rx(&ipc, buf, n);
-    if (ble_recovery_request) { ble_recovery_request = false; ble_enter_recovery(); (void)zs_ipc_service_init(&ipc, &ipc_port); }
-    if (app_nrf_update_pending()) { app_watchdog_hold(APP_WD_BLE, APP_NRF_UPDATE_HOLD_MS); app_nrf_update_run(); (void)zs_ipc_service_init(&ipc, &ipc_port); (void)zs_ipc_service_ping(&ipc); }
+    if (ble_recovery_request) { ble_recovery_request = false; ble_enter_recovery(); ble_service_init(); }
+    if (app_nrf_update_pending()) { app_watchdog_hold(APP_WD_BLE, APP_NRF_UPDATE_HOLD_MS); app_nrf_update_run(); ble_service_init(); }
     /* until the bridge has answered once, repeat the link check every 2 s (nRF boot / re-flash on the bench) */
     if (ipc.pongs_seen == 0u && (uint32_t)(xTaskGetTickCount() - last_ping) >= 2000u) { last_ping = xTaskGetTickCount(); (void)zs_ipc_service_ping(&ipc); }
     const bool want = modes.mode == ZS_MODE_S4_SERVICE;
@@ -924,6 +937,17 @@ static void ble_task_fn(void *arg) {
     else if (!want && window_open) (void)zs_ipc_service_set_window(&ipc, false, 0u);
     window_open = want;
   }
+}
+
+static bool parse_hex(const char *text, uint8_t *out, size_t bytes) {
+  if (!text || strlen(text) != bytes * 2u) return false;
+  for (size_t i = 0u; i < bytes; i++) {
+    unsigned value;
+    char pair[3] = {text[2u * i], text[2u * i + 1u], 0};
+    if (sscanf(pair, "%2x", &value) != 1) { memset(out, 0, bytes); return false; }
+    out[i] = (uint8_t)value;
+  }
+  return true;
 }
 
 static void console_exec(const char *cmd) {
@@ -989,6 +1013,47 @@ static void console_exec(const char *cmd) {
     (void)zs_ipc_service_ping(&ipc);
   } else if (strcmp(cmd, "bledfu") == 0) {
     ble_recovery_request = true;
+  } else if (strncmp(cmd, "factoryid ", 10u) == 0) {
+    const char *serial = cmd + 10u;
+    const char *space = strchr(serial, ' ');
+    zs_station_secrets_t candidate = secrets;
+    char serial_copy[ZS_STATION_FACTORY_SERIAL_CAPACITY];
+    uint32_t station_id;
+    bool ok = space && (size_t)(space - serial) < sizeof(serial_copy);
+    memset(serial_copy, 0, sizeof(serial_copy));
+    if (ok) memcpy(serial_copy, serial, (size_t)(space - serial));
+    ok = ok && zs_station_factory_serial_valid(serial_copy, &station_id) && parse_hex(space + 1u, candidate.pairing_secret, sizeof(candidate.pairing_secret));
+    if (ok && candidate.factory_serial_set && strcmp(candidate.factory_serial, serial_copy) != 0) ok = false;
+    if (ok && candidate.factory_serial_set) {
+      console_printf("factoryid: identity already set; use pairsec only for an approved pairing-secret rotation\r\n");
+    } else if (ok && secrets_on_nor) {
+      strcpy(candidate.factory_serial, serial_copy);
+      candidate.factory_serial_set = true;
+      candidate.pairing_secret_set = true;
+      if (zs_station_secrets_commit(&secrets_io, &candidate) == ZS_STATION_SECRETS_OK) {
+        secrets = candidate; secrets_loaded = true; secrets_apply();
+        console_printf("factoryid: %s id %lu stored; pairing set; cold reboot required\r\n", identity.serial, (unsigned long)station_id);
+      } else console_printf("factoryid: NOR commit failed\r\n");
+    } else {
+      console_printf("factoryid <DIO-EVT-001..040|DIO-EVT-B01> <32 hex>: rejected\r\n");
+    }
+    memset(&candidate, 0, sizeof(candidate)); memset(serial_copy, 0, sizeof(serial_copy));
+  } else if (strncmp(cmd, "pairsec ", 8u) == 0) {
+    zs_station_secrets_t candidate = secrets;
+    if (!candidate.factory_serial_set) {
+      console_printf("pairsec: factory identity is not set\r\n");
+    } else if (!parse_hex(cmd + 8u, candidate.pairing_secret, sizeof(candidate.pairing_secret))) {
+      console_printf("pairsec <32 hex>: rejected\r\n");
+    } else {
+      candidate.pairing_secret_set = true;
+      if (!secrets_on_nor || zs_station_secrets_commit(&secrets_io, &candidate) != ZS_STATION_SECRETS_OK) {
+      console_printf("pairsec: NOR commit failed\r\n");
+      } else {
+        secrets = candidate; secrets_loaded = true;
+        console_printf("pairsec: rotated and stored; reprint the matching label and cold reboot\r\n");
+      }
+    }
+    memset(&candidate, 0, sizeof(candidate));
   } else if (strncmp(cmd, "engkey", 6u) == 0) {
     const char *h = cmd + 6;
     while (*h == ' ') h++;
@@ -1042,8 +1107,10 @@ static void console_exec(const char *cmd) {
       console_printf(secrets_persist() ? "simiccid: slot %u set, stored in nor (v%lu)\r\n" : "simiccid: slot %u set for this session only (nor v%lu)\r\n", slot, (unsigned long)secrets.version);
     } else console_printf("simiccid <1|2> <18..22 digits>: slot %u not set\r\n", slot);
   } else if (strcmp(cmd, "secrets") == 0) {
-    console_printf("secrets %s (%s, v%lu): engineer key %s, iccid1 %s, iccid2 %s, command key %s%s\r\n", secrets_loaded ? "loaded" : "none",
-                   secrets_on_nor ? "nor" : "ram", (unsigned long)secrets.version, secrets.engineer_key_set ? "set" : "-",
+    console_printf("secrets %s (%s, v%lu): factory %s/id %lu, pairing %s, engineer %s, iccid1 %s, iccid2 %s, command key %s%s\r\n", secrets_loaded ? "loaded" : "none",
+                   secrets_on_nor ? "nor" : "ram", (unsigned long)secrets.version,
+                   secrets.factory_serial_set ? secrets.factory_serial : "-", (unsigned long)identity.station_id,
+                   secrets.pairing_secret_set ? "set" : "-", secrets.engineer_key_set ? "set" : "-",
                    secrets.iccid[0][0] ? "set" : "-", secrets.iccid[1][0] ? "set" : "-", secrets.command_key_set ? "set" : "-",
                    secrets.command_next_key_set ? " + next (rotation in flight)" : "");
   } else if (strcmp(cmd, "secrets clear") == 0) {
@@ -1051,7 +1118,7 @@ static void console_exec(const char *cmd) {
     memset(engineer_key, 0, sizeof(engineer_key));
     secrets_loaded = false;
     secrets_apply();
-    console_printf((!secrets_on_nor || zs_station_secrets_clear(&secrets_io) == ZS_STATION_SECRETS_OK) ? "secrets: cleared (sim iccids apply after reboot)\r\n" : "secrets: nor clear failed\r\n");
+    console_printf((!secrets_on_nor || zs_station_secrets_clear(&secrets_io) == ZS_STATION_SECRETS_OK) ? "secrets: factory and operational data cleared; cold reboot required\r\n" : "secrets: nor clear failed\r\n");
   } else if (strcmp(cmd, "power") == 0) {
     app_power_status(console_printf);
   } else if (strcmp(cmd, "rec") == 0) {
@@ -1076,7 +1143,7 @@ static void console_exec(const char *cmd) {
   } else if (strcmp(cmd, "heap") == 0) {
     console_printf("heap free %u min %u\r\n", (unsigned)xPortGetFreeHeapSize(), (unsigned)xPortGetMinimumEverFreeHeapSize());
   } else if (cmd[0] != '\0') {
-    console_printf("commands: st lag pos pps audio dsp svc modes ble ping bledfu engkey simiccid secrets [clear]\r\n");   /* one line: 160 B */
+    console_printf("commands: st lag pos pps audio dsp svc modes ble ping bledfu factoryid pairsec engkey simiccid secrets [clear]\r\n");
     console_printf("          nrfimg nrfupd comms [on|off] power lora [on|off] clock cmds rec wd wdtest heap\r\n");
   }
 }

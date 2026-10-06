@@ -1,17 +1,17 @@
 {
   "schema": 1,
-  "release_id": "EVT_PRE_20_BENCH_RELEASE_2026100501",
-  "station_release_code": 2026100501,
+  "release_id": "EVT_PRE_20_BENCH_RELEASE_2026100601",
+  "station_release_code": 2026100601,
   "status": "READY_TO_FLASH_HARDWARE_VALIDATION_PENDING",
   "stm32": {
     "target": "STM32U585VIT6Q",
-    "version": 2026100501,
+    "version": 2026100601,
     "signature": "Ed25519 over DIO-FW-V1 plus canonical CBOR manifest",
     "public_key_hex": "a2eceac6f48b20f540a441aa57c07747be369664afa607261d18b63d870b26f9",
     "key_id_hex": "04b418857c5001b2",
-    "expected_image_sha256": "f6fcb96cb1deff5cbe1324cfc27d21da5b8d1ce2b81085b446cd645c9b5001a9",
+    "expected_image_sha256": "27a4e2ba3de7f3e6b9720cb1d1a1b25da62a5164cd6362349a99e3d48f884ef5",
     "option_byte_profile": "option_bytes_bench_rev_a.json",
-    "security_scope": "signed application image with A/B rollback; bench recovery retained"
+    "security_scope": "signed application image with A/B rollback; bench recovery retained; factory serial and pairing secret stored in NOR before first BLE session"
   },
   "nrf52840": {
     "target": "Raytac MDBT50Q-P1MV2 / nRF52840",

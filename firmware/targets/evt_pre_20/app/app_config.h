@@ -24,10 +24,10 @@
 #define APP_UART_GNSS_BAUD           9600u     /* USART2 PA2/PA3 */
 #define APP_UART_BLE_BAUD            115200u   /* USART3 PB10/PB11 (nRF52840 bridge, IPC link addendum C) */
 #define APP_BLE_SERVICE_WINDOW_S     600u      /* advertising window opened with S4 SERVICE */
-#define APP_STATION_SERIAL           "DIO-EVT-B01"   /* B1 bench identity until provisioning lands the label data */
+#define APP_STATION_SERIAL           "DIO-EVT-B01"   /* safe fallback until EOL factoryid is loaded from NOR */
 #define APP_STATION_ID               901u
 #define APP_STATION_HW_REV           "Rev.A"
-#define APP_STATION_FW_VERSION       "0.1.0-bench.20261005"
+#define APP_STATION_FW_VERSION       "0.1.0-bench.20261006"
 #define APP_STATION_BL_VERSION       "0.1.0"
 #define APP_UART_CONSOLE_BAUD        115200u   /* LPUART1 PC0/PC1 diagnostic console */
 #define APP_UART_RX_RING             512u
