@@ -1,7 +1,14 @@
 track_id: dioneya_android_commissioning
-status: SOURCE_BASELINE
-source_status: SKELETON_WITH_VALIDATORS_TESTS_AND_POSITION_READBACK_HASH
-apk_status: RELEASE_NOT_BUILT
+status: BENCH_RELEASE_SIGNED_HARDWARE_VALIDATION_PENDING
+source_status: IMPLEMENTED_WITH_VALIDATORS_TESTS_BLE_TRANSPORT_AND_POSITION_READBACK_HASH
+apk_status: BENCH_RELEASE_SIGNED
+release_build:
+  status: PASS
+  evidence: android/release_build_evidence.json
+  version_code: 2026100501
+  version_name: 0.1.0-bench.20261005
+  signature_scheme: APK_V2
+  private_material_in_repository: false
 local_debug_build:
   status: PASS
   date: 2026-10-05
@@ -29,6 +36,8 @@ implemented_host_contracts:
   - POSITION_HASH_READBACK_QG1_QG2_PASS
   - POSITION_POLICY_ROLE_AND_VERSION_VALIDATION_PASS
 ble_transport_status: ANDROID_BLE_TRANSPORT_SOURCE_PRESENT_STATION_GATT_HARDWARE_VALIDATION_PENDING
+ble_service_characteristic_uuids: SOURCE_BOUND_HARDWARE_READBACK_PENDING
+station_gatt_prototype: SOURCE_PRESENT_HARDWARE_VALIDATION_PENDING
 candidate_os_support:
   minimum_android: Android_9
   release_target_sdk: API_36
@@ -43,12 +52,16 @@ required_features:
   - signed_resumable_ota
   - ab_status_and_rollback_report
   - redacted_log_export
-open_blockers:
-  - ble_service_characteristic_uuids_freeze
-  - qr_bootstrap_and_pairing_protocol
-  - ota_manifest_canonicalization_and_signature_algorithm
+software_release_items:
+  - ble_service_characteristic_uuids_source_bound
+  - qr_decoder_and_identity_validation_implemented
+  - ota_manifest_and_signature_contract_implemented
+  - release_signing_pass
+  - cyclonedx_1_6_sbom_generated
+hardware_validation_pending:
   - station_gatt_hardware_validation
-  - release_signing_and_sbom
+  - printed_qr_and_pairing_on_DIO_EVT_B01
+  - signed_ota_and_rollback_end_to_end
 security:
   product_signing_private_key_in_app: false
   station_private_key_in_app: false

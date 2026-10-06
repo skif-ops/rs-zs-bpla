@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "release_id": "EVT_PRE_20_BENCH_RELEASE_2026100501",
+  "station_release_code": 2026100501,
+  "status": "READY_TO_FLASH_HARDWARE_VALIDATION_PENDING",
+  "stm32": {
+    "target": "STM32U585VIT6Q",
+    "version": 2026100501,
+    "signature": "Ed25519 over DIO-FW-V1 plus canonical CBOR manifest",
+    "public_key_hex": "a2eceac6f48b20f540a441aa57c07747be369664afa607261d18b63d870b26f9",
+    "key_id_hex": "04b418857c5001b2",
+    "expected_image_sha256": "f6fcb96cb1deff5cbe1324cfc27d21da5b8d1ce2b81085b446cd645c9b5001a9",
+    "option_byte_profile": "option_bytes_bench_rev_a.json",
+    "security_scope": "signed application image with A/B rollback; bench recovery retained"
+  },
+  "nrf52840": {
+    "target": "Raytac MDBT50Q-P1MV2 / nRF52840",
+    "version": "0.1.0+2026100501",
+    "signature": "MCUboot ECDSA P-256",
+    "public_key_fingerprint_sha256": "12fe7ff5b51a3482942024c2345b38928e8681da957382d7a4c10ae7bb96140d",
+    "expected_signed_image_sha256": "27a9e76b969ba6197de9b77874786a304dc0c04efe2f8994307fdc35560dd89b",
+    "expected_merged_hex_sha256": "7528e8a474283776162c9ac49d3de5082aa86a9a0d0f98d66603fdb2132a0f7f",
+    "sdk": "nRF Connect SDK v2.7.0",
+    "bootloader": "MCUboot, serial recovery, swap without scratch"
+  },
+  "android": {
+    "application_id": "ru.dioneya.commissioning",
+    "version_code": 2026100501,
+    "version_name": "0.1.0-bench.20261005",
+    "signer_certificate_sha256": "64b9b31cc6e64bdbc09457254501812634872a8e05de1a95e7d8c638dbfed90a",
+    "min_sdk": 28,
+    "target_sdk": 36,
+    "release_signing_required": true
+  },
+  "private_material_allowed_in_package": false,
+  "hardware_validation_required": true
+}

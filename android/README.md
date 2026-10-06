@@ -13,13 +13,15 @@
 - поддерживает resume, A/B status и rollback report;
 - USB-C используется как отдельный сервисный recovery path.
 
-Статус: `SOURCE_BASELINE / UNIT_TESTS PASS / DEBUG APK BUILD PASS / ANDROID_BLE_TRANSPORT SOURCE PRESENT / RELEASE APK NOT BUILT`.
+Статус: `BENCH RELEASE APK SIGNED / UNIT TESTS PASS / HARDWARE VALIDATION PENDING`.
 
 В каталоге `app` находится Kotlin/Android проект с unit tests и Android
 `BluetoothGatt` transport, подключённым к экранам выбора станции, установки и
-настройки сервера. Он ещё не является production commissioning APK: BLE UUID
-freeze, authenticated pairing на реальной станции, station GATT hardware
-validation, формат OTA signature и release signing/SBOM остаются открытыми.
+настройки сервера. Стендовый release APK `0.1.0-bench.20261005`
+(`versionCode 2026100501`) собран с обязательной внешней конфигурацией подписи.
+Формат подписанного OTA, release signing и CycloneDX SBOM закрыты стендовым
+релизным пакетом. BLE UUID, authenticated pairing, station GATT и OTA end-to-end
+проверяются на физическом стендовом изделии `DIO-EVT-B01`.
 
 Domain-слой installation commissioning независимо воспроизводит станционный
 58-byte SHA-256 contract, контролирует installer/service-engineer policy,
@@ -28,7 +30,9 @@ monotonic recommission version и принимает read-back только пр
 источник доверия станции. Android BLE transport в исходниках есть; закрытие
 готовности требует проверки на nRF52840 GATT реальной станции.
 
-Debug source baseline успешно собран CI на commit `6e561637c03856b6bfb963a5b16a481888925991`, workflow run `34240158982`. Локальная повторная сборка на commit `5a6429aac7040736be0019589a834ae0bba8c219` с Gradle 9.6.0, AGP 9.4.0 и API 36 также прошла вместе с unit tests. Debug APK подписан только отладочным ключом, не публиковался и не разрешён к установке на производстве.
+Debug source baseline успешно собран CI на commit `6e561637c03856b6bfb963a5b16a481888925991`, workflow run `34240158982`. Стендовый release APK собран с Gradle 9.6.0, AGP 9.4.0, JDK 21 и API 36 после unit tests. APK Signature Scheme v2 и fingerprint сертификата фиксируются в `firmware/targets/evt_pre_20/release/bench_release_contract.json`. Закрытый ключ и пароль находятся только во внешнем локальном хранилище и в Git не попадают.
+
+Gradle wrapper 9.6.0 закреплён официальной SHA-256 суммой. Для release-задач обязательны переменные `DIONEA_ANDROID_KEYSTORE`, `DIONEA_ANDROID_STORE_PASSWORD`, `DIONEA_ANDROID_KEY_ALIAS` и `DIONEA_ANDROID_KEY_PASSWORD`; без них сборка прекращается.
 
 Документы:
 

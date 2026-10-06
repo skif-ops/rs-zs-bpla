@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "profile_id": "EVT_PRE_20_STM32U585_BENCH_OPTION_BYTES_REV_A",
+  "target": "STM32U585VIT6Q",
+  "package": "LQFP100",
+  "scope": "bench and first hardware bring-up only",
+  "status": "APPROVED_FOR_CONTROLLED_BENCH_PROGRAMMING",
+  "irreversible_changes_allowed": false,
+  "controls": {
+    "readout_protection": {
+      "field": "RDP",
+      "value": "0xAA",
+      "meaning": "Level 0, recovery and SWD retained"
+    },
+    "trustzone": {
+      "field": "TZEN",
+      "value": "disabled",
+      "meaning": "matches the current non-TrustZone bench image"
+    },
+    "boot_lock": {
+      "field": "BOOT_LOCK",
+      "value": "disabled",
+      "meaning": "system-memory recovery remains available"
+    },
+    "bank_swap_initial": {
+      "field": "SWAP_BANK",
+      "value": "disabled",
+      "meaning": "initial program starts from bank 1; application A/B logic may change this later"
+    },
+    "boot0_source": {
+      "field": "nSWBOOT0",
+      "value": "BOOT0 pin",
+      "meaning": "fixture BOOT0 recovery is retained"
+    },
+    "boot0_default": {
+      "field": "nBOOT0",
+      "value": "set",
+      "meaning": "normal reset boots user flash while the fixture may assert BOOT0"
+    },
+    "write_protection": {
+      "fields": ["WRP1A", "WRP1B", "WRP2A", "WRP2B"],
+      "value": "disabled",
+      "meaning": "bench rework and A/B testing remain possible"
+    },
+    "proprietary_code_readout_protection": {
+      "fields": ["PCROP1A", "PCROP1B", "PCROP2A", "PCROP2B"],
+      "value": "disabled",
+      "meaning": "no irreversible bench protection"
+    }
+  },
+  "preserve_unlisted_fields": true,
+  "preserve_fields_note": "BOR, watchdog, SRAM and all unlisted option bytes must be read first and preserved unless a separately approved profile changes them.",
+  "procedure": [
+    "Read and save the complete option-byte snapshot before programming.",
+    "Check the exact device identity STM32U585VIT6Q and stop on mismatch.",
+    "Apply only the listed controlled fields.",
+    "Reset the device, read all option bytes back and compare with the requested profile.",
+    "Attach the before and after snapshots, programmer version and probe serial to the unit record."
+  ],
+  "acceptance": [
+    "SWD reconnect succeeds after reset.",
+    "BOOT0 fixture recovery succeeds.",
+    "The signed bench image starts from bank 1.",
+    "No Level 1 or Level 2 RDP transition occurred.",
+    "No WRP, PCROP, TZEN or BOOT_LOCK protection was enabled."
+  ],
+  "production_note": "The production secure-root profile is a separate release decision. This bench profile does not claim immutable secure boot."
+}

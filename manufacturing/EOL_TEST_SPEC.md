@@ -1,8 +1,10 @@
 # EOL test specification EVT-PRE-20
 
-Статус: `DRAFT / LIMITS PARTLY OPEN / NOT RUN`
+Статус: `SOFTWARE LIMITS FROZEN / HARDWARE LIMITS OPEN / NOT RUN`
 
 EOL выполняется для 20 из 20 изделий после полного provisioning. Один machine-readable bundle содержит `serial`, hardware revisions, firmware hashes, tool versions, калибровки, raw values, limits, итог и ссылки на бинарные evidence.
+
+Программные критерии зафиксированы в `EOL_SOFTWARE_LIMITS_REV_A.json`. Они применяются без изменения к изделиям `DIO-EVT-001..040` и стендовому образцу `DIO-EVT-B01`. Численные пределы питания, токов, акустики, PPS, RF и герметичности утверждаются только по измерениям исправного физического образца и аттестованной оснастки.
 
 ## Обязательные группы
 
@@ -11,7 +13,7 @@ EOL выполняется для 20 из 20 изделий после полн�
 | EOL-ID-01 | Серийный номер и состав | Все ID уникальны и совпадают с traveller, QR и register |
 | EOL-PWR-01 | Полярность, защиты и rails | Нет защитного события; rail limits будут заморожены после power validation |
 | EOL-PWR-02 | S0-S4 токи | Измерены и сохранены во всех режимах; PASS limits OPEN до golden-unit characterization |
-| EOL-FW-01 | Boot, signature, rollback counter | Только подписанный образ; версия и anti-rollback совпадают с manifest |
+| EOL-FW-01 | Boot, signature, rollback counter | STM32 2026100501 и nRF 0.1.0+2026100501; подписи, SHA-256, target, size и rollback evidence совпадают с release manifest |
 | EOL-STO-01 | QSPI и microSD | ID, read/write/verify, fault recovery и свободный объём проходят |
 | EOL-AUD-01 | 4 канала | Все каналы присутствуют, без clipping/dropout; gain/phase limits OPEN до fixture MSA |
 | EOL-AUD-02 | Геометрия и calibration | MIC1-MIC3/MIC4 mapping однозначен; calibration hash совпадает |
@@ -27,7 +29,13 @@ EOL выполняется для 20 из 20 изделий после полн�
 | EOL-SEN-01 | Temperature and motion | ID, plausible values and self-test проходят |
 | EOL-MECH-01 | Labels, ports, torque, seals | Визуальный контроль и torque records полны |
 | EOL-IP-01 | Leak | Кривая соответствует отдельно замороженному limit данного корпуса |
-| EOL-REC-01 | Record completeness | Нет пустого обязательного поля; все evidence hashes разрешаются |
+| EOL-REC-01 | Record completeness | Нет пустого обязательного поля; все evidence hashes разрешаются; обязательные поля не содержат OPEN или NOT_RUN |
+
+## Пределы, закрытые до получения железа
+
+Полностью определены проверки идентичности релиза, подписей, хешей, отката, целостности storage, правил двух SIM и APN, MQTT/TLS, store-and-forward, LoRa framing, BLE authorization и полноты отчётной записи. Машинные формулировки являются нормативными и находятся в `EOL_SOFTWARE_LIMITS_REV_A.json`.
+
+До физического образца открыты только измеряемые значения: напряжения и токи, акустические gain/phase/noise, точность PPS и holdover, RF параметры, герметичность, температура и устойчивость к циклам питания.
 
 ## Fail policy
 

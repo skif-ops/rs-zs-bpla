@@ -142,11 +142,27 @@ def main() -> None:
     require("LINKER_SCRIPT_MISSING" not in manifest["release_gate"]["blockers"], "engineering linker is incorrectly marked missing")
 
     status = (ROOT / "firmware/targets/evt_pre_20/target_status.yaml").read_text(encoding="utf-8")
-    require("status: TARGET_PORT_REQUIRED" in status, "target status prematurely claims completion")
+    require(
+        "status: TARGET_PORT_REQUIRED" in status
+        or "status: BENCH_RELEASE_BUILT_HARDWARE_VALIDATION_PENDING" in status,
+        "target status is neither an open port nor a hardware-gated bench release",
+    )
     require("do_not_release: true" in status, "target release block is missing")
+    if "status: BENCH_RELEASE_BUILT_HARDWARE_VALIDATION_PENDING" in status:
+        require(
+            "status: READY_TO_FLASH_HARDWARE_VALIDATION_PENDING" in status,
+            "bench release lacks the explicit hardware-validation gate",
+        )
+        require(
+            "production_secure_root: SEPARATE_DECISION_AFTER_HARDWARE_BRINGUP" in status,
+            "bench release incorrectly claims the production secure root",
+        )
     require("target_contract_manifest.json" in status, "target status does not reference contract manifest")
     require("status: GENERATED_SOURCE_CONTRACT_QG1_QG2_PASS" in status, "target contract gate status mismatch")
-    require("board_pins: GENERATED_EXACT_REV_A_CONTRACT_QG1_QG2_PASS_CUBEMX_OPEN_PENDING" in status, "board-pin gate status mismatch")
+    require(
+        "board_pins: GENERATED_EXACT_REV_A_CONTRACT_TARGET_BUILD_PASS_HARDWARE_READBACK_PENDING" in status,
+        "board-pin gate status mismatch",
+    )
 
     print("EVT-PRE-20 target contract QG-1 completeness/traceability: PASS")
     print(f"- 67/67 source assignments represented; {len(manifest_sources)} inputs hash-bound")

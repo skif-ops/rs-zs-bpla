@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "profile_id": "EVT_PRE_20_EOL_SOFTWARE_LIMITS_REV_A",
+  "status": "FROZEN_FOR_BENCH_AND_EVT",
+  "release_code": 2026100501,
+  "criteria": [
+    {"id": "EOL-ID-01", "pass": "serial is unique, DIO-EVT-001..040 or DIO-EVT-B01, and all traveller identifiers match"},
+    {"id": "EOL-FW-01", "pass": "STM32 manifest signature, image SHA-256, target, size and version 2026100501 pass; nRF MCUboot signature and version 0.1.0+2026100501 pass; rollback evidence is complete"},
+    {"id": "EOL-STO-01-SW", "pass": "read, write, SHA-256 verify, interrupted-write recovery and free-space reporting return PASS with no unhandled error"},
+    {"id": "EOL-AUD-02-SW", "pass": "MIC1..MIC4 mapping is unambiguous and the active calibration SHA-256 equals the released record"},
+    {"id": "EOL-CELL-01-SW", "pass": "IMEI and both full ICCID values are read, slot mapping is exact, and only the selected slot is active"},
+    {"id": "EOL-CELL-02-SW", "pass": "CA and hostname verification are enabled; publish, application receipt and reconnect all pass"},
+    {"id": "EOL-CELL-03", "pass": "an offline event is durable and is delivered once at application level after reconnect; duplicate transport delivery never duplicates the stored event"},
+    {"id": "EOL-CELL-04-SW", "pass": "only one SIM slot is enabled; approved public APN switching passes; a private or unknown APN fails closed"},
+    {"id": "EOL-LORA-02-SW", "pass": "framing, authentication, monotonic counter, deduplication and bounded retry pass against the test peer"},
+    {"id": "EOL-BLE-01-SW", "pass": "service mode requires the physical window and authenticated BLE; unauthorized read and write are rejected"},
+    {"id": "EOL-BLE-02-SW", "pass": "released APK reads identity, writes and reads back configuration, and accepts only a signed OTA package"},
+    {"id": "EOL-REC-01", "pass": "all required record fields are populated, every evidence path resolves, every SHA-256 matches and overall status contains no OPEN or NOT_RUN mandatory item"}
+  ],
+  "hardware_limits_open": [
+    "rail voltage and current limits",
+    "S0 through S4 current limits",
+    "microphone gain, phase, noise and clipping limits after fixture MSA",
+    "measured GNSS PPS accuracy and holdover limit",
+    "RF power, sensitivity, antenna and enclosure limits",
+    "leak curve and enclosure pressure-decay limit",
+    "temperature and power-cycle margins"
+  ]
+}

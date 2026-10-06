@@ -98,8 +98,17 @@ def main() -> None:
     require(evidence_data["stack_usage"]["status"] == "PASS", "target stack-usage gate not passed")
 
     status = (TARGET / "target_status.yaml").read_text(encoding="utf-8")
-    require("status: TARGET_PORT_REQUIRED" in status, "target prematurely claims completion")
+    require(
+        "status: TARGET_PORT_REQUIRED" in status
+        or "status: BENCH_RELEASE_BUILT_HARDWARE_VALIDATION_PENDING" in status,
+        "target status is neither an open port nor a hardware-gated bench release",
+    )
     require("do_not_release: true" in status, "target release block missing")
+    if "status: BENCH_RELEASE_BUILT_HARDWARE_VALIDATION_PENDING" in status:
+        require(
+            "hardware_validation: REQUIRED" in status,
+            "bench build is missing its hardware-validation gate",
+        )
     require("stm32_scaffold_manifest.json" in status, "target status does not reference STM32 scaffold")
 
     print("EVT-PRE-20 STM32 scaffold QG-1 completeness/provenance: PASS")

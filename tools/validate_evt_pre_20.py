@@ -30,14 +30,19 @@ def require(condition: bool, message: str) -> None:
 
 def validate_csv_shapes() -> None:
     for path in sorted(ROOT.rglob("*.csv")):
+        relative = path.relative_to(ROOT)
+        if relative.parts[0] in {".git", "outputs"} or any(
+            part.startswith("build") for part in relative.parts
+        ):
+            continue
         with path.open(encoding="utf-8-sig", newline="") as source:
             rows = list(csv.reader(source))
-        require(bool(rows), f"empty CSV: {path.relative_to(ROOT)}")
+        require(bool(rows), f"empty CSV: {relative}")
         width = len(rows[0])
         for line_number, row in enumerate(rows[1:], start=2):
             require(
                 len(row) == width,
-                f"CSV width mismatch: {path.relative_to(ROOT)}:{line_number}",
+                f"CSV width mismatch: {relative}:{line_number}",
             )
 
 

@@ -1,6 +1,7 @@
 # Build outputs
 firmware/build*/
 android/.gradle/
+android/build/
 android/app/build/
 /outputs/
 **/__pycache__/

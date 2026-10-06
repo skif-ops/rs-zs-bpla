@@ -66,11 +66,17 @@ the contiguous 768 KiB SRAM1-3 and the separate 16 KiB SRAM4 retained section,
 but is restricted to TrustZone-disabled engineering bring-up. SRAM4 placement
 does not claim low-power retention until PWR configuration is measured.
 
-The target remains non-releasable. The generated `.ioc` must still be opened,
-reviewed and regenerated with STM32CubeMX 6.12.0. Clock-tree, internal MCU power
-supply mode and peripheral runtime parameters are deliberately not released by
-the pinout generator. HAL/LL integration, measured clocks, secure boot, A/B OTA,
-production target build and hardware evidence remain blockers.
+The signed bench image is built and ready for `DIO-EVT-B01`; its contract and
+safe recovery-oriented option-byte profile are in `release/`. The build embeds
+one Ed25519 release key, carries firmware version `2026100501`, passes the stack
+budget and produces ELF, MAP, HEX, BIN, canonical CBOR manifest and signature.
+Physical read-back, clock measurements, peripheral checks and A/B power-loss
+tests remain mandatory.
+
+The production security profile remains non-releasable. The generated `.ioc`
+still requires hardware review with STM32CubeMX 6.12.0. Immutable production
+root of trust, protection option bytes and measured target evidence are separate
+production gates and are not claimed by the recovery-capable bench profile.
 
 The FreeRTOS application (`app/`) links with `ld/STM32U585VITXQ_APP_BANK.ld`
 (MQTT ICD addendum F): the image lives in the 1 MiB bank mapped at 0x08000000,

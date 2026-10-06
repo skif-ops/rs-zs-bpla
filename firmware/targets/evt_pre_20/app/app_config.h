@@ -27,7 +27,7 @@
 #define APP_STATION_SERIAL           "DIO-EVT-B01"   /* B1 bench identity until provisioning lands the label data */
 #define APP_STATION_ID               901u
 #define APP_STATION_HW_REV           "Rev.A"
-#define APP_STATION_FW_VERSION       "0.1.0-b1"
+#define APP_STATION_FW_VERSION       "0.1.0-bench.20261005"
 #define APP_STATION_BL_VERSION       "0.1.0"
 #define APP_UART_CONSOLE_BAUD        115200u   /* LPUART1 PC0/PC1 diagnostic console */
 #define APP_UART_RX_RING             512u

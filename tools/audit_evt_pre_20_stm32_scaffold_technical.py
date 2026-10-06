@@ -132,7 +132,18 @@ def main() -> None:
 
     status = (TARGET / "target_status.yaml").read_text(encoding="utf-8")
     require("do_not_release: true" in status, "engineering scaffold is not release-blocked")
-    require("secure_boot: MISSING_BLOCKER" in status and "ota_ab: MISSING_BLOCKER" in status, "production partition blockers missing")
+    require(
+        (
+            "secure_boot: MISSING_BLOCKER" in status
+            and "ota_ab: MISSING_BLOCKER" in status
+        )
+        or (
+            "secure_boot: BENCH_SIGNED_APPLICATION_ED25519_PASS_PRODUCTION_IMMUTABLE_ROOT_SEPARATE_DECISION" in status
+            and "ota_ab: TARGET_APP_AB_BUILD_PASS_POWER_LOSS_AND_BANK_SWAP_HARDWARE_VALIDATION_PENDING" in status
+            and "production_secure_root: SEPARATE_DECISION_AFTER_HARDWARE_BRINGUP" in status
+        ),
+        "bench A/B status or production secure-root gate is missing",
+    )
 
     identity_text = linker + json.dumps(memory) + json.dumps(cubemx)
     for forbidden in ("STM32U585CIU6", "STM32U585ZIT6Q", "UFQFPN48", "LQFP144"):
