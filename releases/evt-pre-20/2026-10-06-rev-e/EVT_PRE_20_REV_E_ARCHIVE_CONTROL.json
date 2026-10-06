@@ -1,0 +1,23 @@
+[
+  {
+    "file": "EVT_PRE_20_ПОЛНЫЙ_КОМПЛЕКТ_20261006_REV_E.zip",
+    "bytes": 75922114,
+    "sha256": "1d20d749902c46fe716b8e32943b1cc90f91c504cd7c2fa5e3e6bfc6ce132a48",
+    "entries": 226,
+    "xlsx": 6
+  },
+  {
+    "file": "EVT_PRE_20_ПРОГРАММА_МЕТОДИКИ_ОТЧЕТЫ_И_ДООБУЧЕНИЕ_20261006_REV_E.zip",
+    "bytes": 316340,
+    "sha256": "3043f3c4f516c1753b5c593a9bc24794f2c0812170c052632d2b4803ef7133c2",
+    "entries": 29,
+    "xlsx": 1
+  },
+  {
+    "file": "EVT_PRE_20_BENCH_RELEASE_2026100601.zip",
+    "bytes": 3805720,
+    "sha256": "e574bde3895d0e0c02ed6094d3861e2ab52723e223c0101c859451f3efc05d43",
+    "entries": 39,
+    "xlsx": 0
+  }
+]
