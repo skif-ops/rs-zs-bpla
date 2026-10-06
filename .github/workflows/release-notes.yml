@@ -1,0 +1,44 @@
+name: Release notes gate
+
+on:
+  pull_request:
+    paths:
+      - "server/**"
+      - "firmware/**"
+      - "releases/**"
+      - "docs/release-notes/**"
+      - "tools/check_release_notes.py"
+  push:
+    branches:
+      - main
+      - develop
+      - audit/evt-pre-20-firmware-installer
+    paths:
+      - "server/**"
+      - "firmware/**"
+      - "releases/**"
+      - "docs/release-notes/**"
+      - "tools/check_release_notes.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-notes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate content
+        run: python tools/check_release_notes.py --validate-only
+      - name: Require notes for pull request changes
+        if: github.event_name == 'pull_request'
+        run: python tools/check_release_notes.py --base "${{ github.event.pull_request.base.sha }}" --head "${{ github.event.pull_request.head.sha }}"
+      - name: Require notes for pushed changes
+        if: github.event_name == 'push'
+        run: python tools/check_release_notes.py --base "${{ github.event.before }}" --head "${{ github.sha }}"

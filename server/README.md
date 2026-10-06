@@ -1,5 +1,7 @@
 # Мухоед
 
+Текущий выпуск: `1.2.0-evt-pre-20.1`, station-server protocol `1.5`. История выпусков, совместимость, проверки и порядок отката ведутся в [`RELEASE_NOTES.md`](RELEASE_NOTES.md). Фактическое состояние production и bench фиксируется в [`docs/release-notes/DEPLOYMENT_STATUS.md`](../docs/release-notes/DEPLOYMENT_STATUS.md).
+
 Мухоед is an offline FastAPI application for acoustic UAV analysis. It analyzes WAV and MP3 recordings, extracts DSP features, classifies the most likely UAV profile with a transparent expert system, builds an acoustic passport, and estimates source position and trajectory from multiple microphones with GCC-PHAT/TDOA.
 
 The first version intentionally does not use a neural network. The classifier is rule-based and easy to extend with new acoustic profiles or replace later with an ML model.

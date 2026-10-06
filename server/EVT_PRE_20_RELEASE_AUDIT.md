@@ -1,5 +1,7 @@
 # «Мухоед» - аудит исходной версии для EVT-PRE-20
 
+> Это исторический аудит состояния на 08.09.2026. Его запреты и открытые пункты не следует читать как текущий статус. Актуальные сведения находятся в [`RELEASE_NOTES.md`](RELEASE_NOTES.md) и [`docs/release-notes/DEPLOYMENT_STATUS.md`](../docs/release-notes/DEPLOYMENT_STATUS.md).
+
 Дата: 2026-09-08
 Статус: `SOURCE_BASELINE_IDENTIFIED / RELEASE_GATE_OPEN`
 

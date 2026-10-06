@@ -4,6 +4,8 @@
 
 Целевой контроллер предсерии: `STM32U585VIT6Q`, LQFP100. Упоминания STM32U585ZI и платы WeAct относятся к предыдущим этапам и не являются target EVT-PRE-20.
 
+Текущий подписанный комплект: `EVT_PRE_20_BENCH_RELEASE_2026100601`. Версия STM32: `2026100601`; версия nRF52840: `0.1.0+2026100501`. Статус: `READY TO FLASH / HARDWARE VALIDATION PENDING`. Полная история и хеши образов находятся в [`RELEASE_NOTES.md`](RELEASE_NOTES.md).
+
 ## Что уже проверяется
 
 ```sh
@@ -12,24 +14,18 @@ cmake --build firmware/build --parallel
 ctest --test-dir firmware/build --output-on-failure
 ```
 
-Host PASS не означает готовую прошивку изделия.
+Host PASS подтверждает переносимое ядро, но не заменяет аппаратную проверку. Выпускной архив содержит подписанные образы STM32 и nRF52840, манифесты и контрольные суммы. Для прошивки используется только образ из выпущенного архива; произвольный BIN/HEX из каталога сборки применять нельзя.
 
-Целевая инженерная сборка `STM32U585VIT6Q` выполнена 05.10.2026 на
-commit `5a6429aac7040736be0019589a834ae0bba8c219`: получены ELF, BIN, HEX и
-map-файл, анализ stack usage прошёл. Это подтверждает компилируемость исходного
-target-порта, но образ собран без release key и не разрешён для прошивки изделий.
+## Что остаётся до завершения аппаратных испытаний
 
-## Что остаётся до выпуска и испытаний target
+- SWD, BOOT0, system-memory recovery и read-back option bytes;
+- A/B swap, trial confirmation и rollback с прерыванием питания;
+- четыре канала T5838 на фактической PCB-MIC и STM32 MDF/PDM;
+- BG95 mutual TLS/MQTT, dual SIM и provisioning на собранной станции;
+- nRF52840 BLE, LESC pairing, IPC и serial recovery;
+- QSPI, microSD, GNSS/PPS, LoRa, датчики, ток, температура и EOL-пределы.
 
-- открытие, проверка и регенерация подготовленного STM32CubeMX `.ioc` версией 6.12.0;
-- production linker с secure boot/A/B и HAL/LL bindings;
-- драйвер PDM/MDF для четырёх T5838 на фактической плате;
-- аппаратное и end-to-end подтверждение BG95 TLS/MQTT, защищённый downstream и provisioning;
-- два валидированных региональных LoRa-профиля;
-- secure boot, A/B OTA, rollback и подписанный release;
-- измерение памяти, CPU, тока и времени на target.
-
-До закрытия этих пунктов статус firmware: `ENGINEERING ARM TARGET BUILD PASS / RELEASE AND HARDWARE VALIDATION PENDING`. BIN/HEX из host-сборки по-прежнему запрещено маркировать как прошивку станции.
+Текущий статус firmware: `READY TO FLASH / HARDWARE VALIDATION PENDING`.
 
 Host-контракт BG95 теперь покрывает автоматическое чтение SIM/оператора,
 выбор APN через ответ сети или разрешённый PLMN-каталог, обязательное чтение

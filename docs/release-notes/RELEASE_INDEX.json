@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "updated": "2026-10-06",
+  "server": {
+    "product": "Мухоед",
+    "current_version": "1.2.0-evt-pre-20.1",
+    "protocol": "1.5",
+    "source_commit": "446701596673c54fd35d502e13935d6cfa8665a9",
+    "status": "RELEASED_AND_DEPLOYED",
+    "release_notes": "server/RELEASE_NOTES.md",
+    "deployments": [
+      {
+        "environment": "production",
+        "endpoint": "https://dioneya.ru",
+        "build": "44670159",
+        "verified": "2026-10-06",
+        "status": "HEALTHY"
+      },
+      {
+        "environment": "bench",
+        "endpoint": "dioneya-bench",
+        "build": "44670159",
+        "verified": "2026-10-06",
+        "status": "HEALTHY"
+      }
+    ]
+  },
+  "station_firmware": {
+    "release_id": "EVT_PRE_20_BENCH_RELEASE_2026100601",
+    "release_code": 2026100601,
+    "source_commit": "446701596673c54fd35d502e13935d6cfa8665a9",
+    "status": "READY_TO_FLASH_HARDWARE_VALIDATION_PENDING",
+    "release_notes": "firmware/RELEASE_NOTES.md",
+    "archive": "releases/evt-pre-20/2026-10-06-rev-e/EVT_PRE_20_BENCH_RELEASE_2026100601.zip",
+    "archive_sha256": "e574bde3895d0e0c02ed6094d3861e2ab52723e223c0101c859451f3efc05d43",
+    "stm32": {
+      "target": "STM32U585VIT6Q",
+      "version": 2026100601,
+      "image_sha256": "27a4e2ba3de7f3e6b9720cb1d1a1b25da62a5164cd6362349a99e3d48f884ef5"
+    },
+    "nrf52840": {
+      "target": "Raytac MDBT50Q-P1MV2 / nRF52840",
+      "version": "0.1.0+2026100501",
+      "signed_image_sha256": "27a9e76b969ba6197de9b77874786a304dc0c04efe2f8994307fdc35560dd89b",
+      "merged_hex_sha256": "7528e8a474283776162c9ac49d3de5082aa86a9a0d0f98d66603fdb2132a0f7f"
+    }
+  }
+}
