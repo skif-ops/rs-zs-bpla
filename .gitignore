@@ -46,6 +46,7 @@ artifacts/evt_pre_20_bom_workbook_audit.json
 artifacts/evt_pre_20_hardware_release_audit.json
 artifacts/pcb_layer_count_authority_rev_a.json
 artifacts/harness_manufacturing_rev_a.json
+artifacts/evt-pre-20-current/
 
 # OS/editor
 .DS_Store

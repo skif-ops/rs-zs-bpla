@@ -120,6 +120,8 @@ def package_readme() -> str:
 
 Блокировка прошивки этим выпуском запрещена. RDP Level 0, SWD и BOOT0 recovery должны сохраняться, а BOOT_LOCK, TrustZone, WRP и PCROP должны оставаться отключенными. Отдельный production-профиль допускается только после полного аппаратного PASS и полной регрессии. Каждая станция блокируется только после собственного EOL PASS. Подробные ворота приведены в `04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.docx`.
 
+Квалификацию DIO-EVT-B01 оформляют в `04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx` и заполняемой XLSX-форме. Исходный статус формы `NOT_RUN`, а блокировка имеет `DENIED`.
+
 Архив не содержит закрытых ключей, паролей, keystore или производственных секретов. `release_manifest.json` и `SHA256SUMS.txt` связывают все файлы. `HARDWARE_PENDING.json` перечисляет только проверки, которым нужен физический образец или оснастка.
 
 ## English
@@ -213,6 +215,10 @@ def main() -> int:
         ROOT / "firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json": output / "04_ДОКУМЕНТАЦИЯ/firmware_lock_interlock_rev_a.json",
         ROOT / "docs/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.docx": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.docx",
         ROOT / "docs/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.md": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.md",
+        ROOT / "docs/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx",
+        ROOT / "docs/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.md": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.md",
+        ROOT / "manufacturing/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx",
+        ROOT / "manufacturing/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json",
         ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.docx": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.docx",
         ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.md": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.md",
         ROOT / "manufacturing/PROVISIONING_AND_KEYS.md": output / "04_ДОКУМЕНТАЦИЯ/PROVISIONING_AND_KEYS.md",
@@ -222,6 +228,7 @@ def main() -> int:
     eol_tool_files = {
         ROOT / "tools/generate_evt_station_csr.py": output / "05_EOL_TOOLS/generate_evt_station_csr.py",
         ROOT / "tools/verify_evt_station_certificate.py": output / "05_EOL_TOOLS/verify_evt_station_certificate.py",
+        ROOT / "tools/validate_evt_pre_20_b01_hardware_qualification.py": output / "05_EOL_TOOLS/validate_evt_pre_20_b01_hardware_qualification.py",
         ROOT / "tools/requirements-eol-pki.txt": output / "05_EOL_TOOLS/requirements-eol-pki.txt",
     }
     for mapping in (stm_files, nrf_files, android_files, documentation_files, eol_tool_files):

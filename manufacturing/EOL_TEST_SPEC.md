@@ -46,6 +46,8 @@ EOL выполняется для 20 из 20 изделий после полн�
 
 EOL текущего стендового выпуска выполняется без производственной блокировки. До полного аппаратного PASS таргета запрещены повышение RDP, BOOT_LOCK, TrustZone, WRP, PCROP, ограничение SWD и отключение BOOT0 recovery. После квалификации требуется отдельный production release и профиль защиты. Применение этого профиля к каждой станции допускается только после ее EOL PASS. После блокировки повторяются read-back доступного состояния, cold boot, проверка версии, heartbeat, тестовое событие и application receipt. Нормативная политика: `firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json`.
 
+Квалификацию стендового образца оформляют по `docs/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx`. Заполняемая форма находится в `manufacturing/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx`, а машинная запись и fail-closed проверка находятся в одноименном JSON и `tools/validate_evt_pre_20_b01_hardware_qualification.py`. Исходный шаблон имеет `NOT_RUN` и `DENIED` и не является доказательством прохождения испытаний.
+
 ## Fixture gate
 
 До запуска партии EOL fixture проходит MSA на golden unit и known-fault samples: перепутанный MIC, отсутствующая антенная нагрузка, неверный регион, повреждённый storage, недействительная TLS chain и рассинхронизация serial. CAD, schematic, wiring и software fixture входят в MFG-004.

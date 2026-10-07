@@ -144,6 +144,9 @@ def build_main(server_archive: Path, commit: str) -> None:
         skip_prefixes=("Основной_пакет/07_Отдельные_архивы/",),
     )
     package.add_zip("03_ПО_станции_и_приложение", FIRMWARE)
+    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx", ROOT / "docs" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx")
+    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx", ROOT / "manufacturing" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx")
+    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json", ROOT / "manufacturing" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json")
     package.add_file("04_Сертификаты_и_реестры/Выпуск_сертификатов_и_регистрация_станций.docx", DOCS / "05_Выпуск_сертификатов_и_регистрация_станций.docx")
     for name in ("muhoed-pki.exe", "dioneya-root-offline.exe", "SHA256SUMS.txt"):
         package.add_file(f"04_Сертификаты_и_реестры/Приложение_Windows/{name}", PKI_APP / name)
@@ -189,6 +192,9 @@ def build_tests(commit: str) -> None:
     package.add_file("03_Прошивка_и_EOL/Инструкция_по_прошивке_настройке_и_испытаниям_Rev_C.docx", ROOT / "docs" / "EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.docx")
     package.add_file("03_Прошивка_и_EOL/Порядок_разрешения_блокировки_прошивки_Rev_A.docx", ROOT / "docs" / "EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.docx")
     package.add_file("03_Прошивка_и_EOL/firmware_lock_interlock_rev_a.json", ROOT / "firmware" / "targets" / "evt_pre_20" / "release" / "firmware_lock_interlock_rev_a.json")
+    package.add_file("03_Прошивка_и_EOL/Протокол_квалификации_DIO_EVT_B01_Rev_A.docx", ROOT / "docs" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx")
+    package.add_file("03_Прошивка_и_EOL/Форма_квалификации_DIO_EVT_B01_Rev_A.xlsx", ROOT / "manufacturing" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx")
+    package.add_file("03_Прошивка_и_EOL/qualification_DIO_EVT_B01_Rev_A.json", ROOT / "manufacturing" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json")
     for candidate in (
         OUTPUT / "ctest_final.txt",
         OUTPUT / "server_regression_summary_20261006.txt",

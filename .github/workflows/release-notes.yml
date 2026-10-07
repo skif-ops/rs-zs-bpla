@@ -9,7 +9,10 @@ on:
       - "docs/release-notes/**"
       - "tools/check_release_notes.py"
       - "tools/validate_firmware_lock_interlock.py"
+      - "tools/validate_evt_pre_20_b01_hardware_qualification.py"
       - "docs/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.*"
+      - "docs/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.*"
+      - "manufacturing/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.*"
       - "manufacturing/EOL_TEST_SPEC.md"
       - ".github/workflows/release-notes.yml"
   push:
@@ -24,7 +27,10 @@ on:
       - "docs/release-notes/**"
       - "tools/check_release_notes.py"
       - "tools/validate_firmware_lock_interlock.py"
+      - "tools/validate_evt_pre_20_b01_hardware_qualification.py"
       - "docs/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.*"
+      - "docs/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.*"
+      - "manufacturing/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.*"
       - "manufacturing/EOL_TEST_SPEC.md"
       - ".github/workflows/release-notes.yml"
   workflow_dispatch:
@@ -46,6 +52,8 @@ jobs:
         run: python tools/check_release_notes.py --validate-only
       - name: Validate firmware lock interlock
         run: python tools/validate_firmware_lock_interlock.py
+      - name: Validate B01 qualification template
+        run: python tools/validate_evt_pre_20_b01_hardware_qualification.py
       - name: Require notes for pull request changes
         if: github.event_name == 'pull_request'
         run: python tools/check_release_notes.py --base "${{ github.event.pull_request.base.sha }}" --head "${{ github.event.pull_request.head.sha }}"

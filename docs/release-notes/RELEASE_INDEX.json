@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-06",
+  "updated": "2026-10-07",
   "server": {
     "product": "Мухоед",
     "current_version": "1.2.0-evt-pre-20.1",
@@ -33,6 +33,13 @@
     "protection_state": "LOCK_FORBIDDEN_HARDWARE_VALIDATION_PENDING",
     "lock_interlock": "firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json",
     "release_notes": "firmware/RELEASE_NOTES.md",
+    "hardware_qualification": {
+      "unit": "DIO-EVT-B01",
+      "protocol": "docs/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx",
+      "record": "manufacturing/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json",
+      "status": "NOT_RUN",
+      "lock_authorization": "DENIED"
+    },
     "archive": "releases/evt-pre-20/2026-10-06-rev-e/EVT_PRE_20_BENCH_RELEASE_2026100601.zip",
     "archive_sha256": "e574bde3895d0e0c02ed6094d3861e2ab52723e223c0101c859451f3efc05d43",
     "stm32": {
