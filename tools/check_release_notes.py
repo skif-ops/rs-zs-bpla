@@ -91,6 +91,15 @@ def validate_content() -> None:
         fail("nRF52840 image hash differs from bench release contract")
     if firmware_index["release_id"] not in firmware_notes:
         fail("current station release is absent from firmware release notes")
+    lock_gate = contract.get("firmware_lock_interlock", {})
+    if firmware_index.get("protection_state") != lock_gate.get("status"):
+        fail("firmware protection state differs between release index and bench contract")
+    lock_path = firmware_index.get("lock_interlock")
+    if not lock_path or Path(lock_path).name != lock_gate.get("policy"):
+        fail("firmware lock interlock differs between release index and bench contract")
+    lock_policy = json.loads(read(Path(lock_path)))
+    if lock_policy.get("status") != firmware_index.get("protection_state"):
+        fail("firmware lock interlock status differs from release index")
 
     archive = ROOT / RELEASE_ARCHIVE
     if not archive.is_file():

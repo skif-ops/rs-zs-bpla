@@ -33,5 +33,12 @@
     "release_signing_required": true
   },
   "private_material_allowed_in_package": false,
-  "hardware_validation_required": true
+  "hardware_validation_required": true,
+  "firmware_lock_interlock": {
+    "status": "LOCK_FORBIDDEN_HARDWARE_VALIDATION_PENDING",
+    "locking_enabled_in_release": false,
+    "policy": "firmware_lock_interlock_rev_a.json",
+    "production_lock_requires_separate_release": true,
+    "per_station_eol_pass_required": true
+  }
 }

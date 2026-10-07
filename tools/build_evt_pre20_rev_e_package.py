@@ -176,7 +176,7 @@ def build_main(server_archive: Path, commit: str) -> None:
         "bench_quantity": 1,
         "procurement_bom_quantity": 41,
         "contains_private_keys": False,
-        "hardware_only_pending": ["option bytes and secure boot on target", "A/B rollback on target", "EOL electrical limits", "factory DFM", "mechanical and acoustic validation"],
+        "hardware_only_pending": ["full target qualification before any firmware lock", "A/B rollback on target", "EOL electrical limits", "factory DFM", "mechanical and acoustic validation"],
     }
     package.write(MAIN_ZIP, status)
 
@@ -187,6 +187,8 @@ def build_tests(commit: str) -> None:
     package.add_zip("01_Программа_методики_и_формы_Rev_D5", D5_TESTS)
     package.add_file("02_Методика_дополнительного_дообучения/Методика_дополнительного_дообучения_Мухоед.docx", DOCS / "07_Методика_дополнительного_дообучения_Мухоед.docx")
     package.add_file("03_Прошивка_и_EOL/Инструкция_по_прошивке_настройке_и_испытаниям_Rev_C.docx", ROOT / "docs" / "EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.docx")
+    package.add_file("03_Прошивка_и_EOL/Порядок_разрешения_блокировки_прошивки_Rev_A.docx", ROOT / "docs" / "EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.docx")
+    package.add_file("03_Прошивка_и_EOL/firmware_lock_interlock_rev_a.json", ROOT / "firmware" / "targets" / "evt_pre_20" / "release" / "firmware_lock_interlock_rev_a.json")
     for candidate in (
         OUTPUT / "ctest_final.txt",
         OUTPUT / "server_regression_summary_20261006.txt",

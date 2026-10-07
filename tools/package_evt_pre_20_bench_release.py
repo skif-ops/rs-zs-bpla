@@ -118,13 +118,15 @@ def package_readme() -> str:
 7. Сохранить все журналы и хеши в паспорт `DIO-EVT-B01`.
 8. Для полевых станций создавать CSR и проверять сертификат только средствами из `05_EOL_TOOLS` по разделу 16.4.1 руководства.
 
+Блокировка прошивки этим выпуском запрещена. RDP Level 0, SWD и BOOT0 recovery должны сохраняться, а BOOT_LOCK, TrustZone, WRP и PCROP должны оставаться отключенными. Отдельный production-профиль допускается только после полного аппаратного PASS и полной регрессии. Каждая станция блокируется только после собственного EOL PASS. Подробные ворота приведены в `04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.docx`.
+
 Архив не содержит закрытых ключей, паролей, keystore или производственных секретов. `release_manifest.json` и `SHA256SUMS.txt` связывают все файлы. `HARDWARE_PENDING.json` перечисляет только проверки, которым нужен физический образец или оснастка.
 
 ## English
 
 Status: ready to flash the bench unit; hardware validation is mandatory.
 
-Save the STM32 option-byte snapshot, apply only the controlled bench profile, flash both MCUs through their separate SWD ports, install the signed Android APK, and execute the supplied commissioning and test manual. Keep all read-back logs and hashes in the `DIO-EVT-B01` unit record. The archive contains no private key, password or keystore.
+Save the STM32 option-byte snapshot, apply only the controlled bench profile, flash both MCUs through their separate SWD ports, install the signed Android APK, and execute the supplied commissioning and test manual. Keep all read-back logs and hashes in the `DIO-EVT-B01` unit record. Firmware locking is forbidden for this release. A separate production protection release requires complete hardware qualification, full regression and a per-station EOL PASS. The archive contains no private key, password or keystore.
 """
 
 
@@ -143,6 +145,7 @@ def hardware_pending() -> dict[str, object]:
             {"id": "HW-NET-01", "test": "BG95 CA/certificate/key upload, mutual TLS and MQTT end-to-end with dioneya.ru"},
             {"id": "HW-IO-01", "test": "QSPI, microSD, GNSS/PPS, BG95 dual SIM, LoRa, sensors and four microphone channels"},
             {"id": "HW-EOL-01", "test": "rail, current, audio, timing, RF, leak, temperature and power-cycle limits"},
+            {"id": "HW-SEC-01", "test": "complete target qualification and full regression before any production firmware-lock profile is released"},
         ],
     }
 
@@ -207,6 +210,9 @@ def main() -> int:
     }
     documentation_files = {
         ROOT / "firmware/targets/evt_pre_20/release/BENCH_RELEASE_PROFILE_REV_B.md": output / "04_ДОКУМЕНТАЦИЯ/BENCH_RELEASE_PROFILE_REV_B.md",
+        ROOT / "firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json": output / "04_ДОКУМЕНТАЦИЯ/firmware_lock_interlock_rev_a.json",
+        ROOT / "docs/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.docx": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.docx",
+        ROOT / "docs/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.md": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.md",
         ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.docx": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.docx",
         ROOT / "docs/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.md": output / "04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_FIRMWARE_COMMISSIONING_TEST_MANUAL_REV_C.md",
         ROOT / "manufacturing/PROVISIONING_AND_KEYS.md": output / "04_ДОКУМЕНТАЦИЯ/PROVISIONING_AND_KEYS.md",

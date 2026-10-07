@@ -242,6 +242,7 @@ required_target_files:
   secure_boot: BENCH_SIGNED_APPLICATION_ED25519_PASS_PRODUCTION_IMMUTABLE_ROOT_SEPARATE_DECISION
   ota_ab: TARGET_APP_AB_BUILD_PASS_POWER_LOSS_AND_BANK_SWAP_HARDWARE_VALIDATION_PENDING
   production_build_manifest: BENCH_RELEASE_MANIFEST_AND_SHA256_PASS_PRODUCTION_SECURITY_PROFILE_PENDING
+  firmware_lock: FORBIDDEN_UNTIL_HARDWARE_QUALIFICATION_FULL_REGRESSION_AND_PER_STATION_EOL_PASS
 engineering_build:
   status: PASS_UNSIGNED_LOCAL_NOT_FOR_DEVICE_RELEASE
   evidence: firmware/targets/evt_pre_20/engineering_build_evidence.json
@@ -255,9 +256,10 @@ engineering_build:
   release_key_count: 0
   release_effect: NONE_UNSIGNED_ENGINEERING_BUILD_ONLY
 release_outputs:
-  bench_release: EVT_PRE_20_BENCH_RELEASE_2026100501
+  bench_release: EVT_PRE_20_BENCH_RELEASE_2026100601
   contract: firmware/targets/evt_pre_20/release/bench_release_contract.json
   option_bytes: firmware/targets/evt_pre_20/release/option_bytes_bench_rev_a.json
+  lock_interlock: firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json
   elf: BUILT_LOCAL_PACKAGE
   map: BUILT_LOCAL_PACKAGE
   bin: SIGNED_LOCAL_PACKAGE
@@ -267,8 +269,8 @@ release_outputs:
   hardware_validation: REQUIRED
 bench_release:
   status: READY_TO_FLASH_HARDWARE_VALIDATION_PENDING
-  station_release_code: 2026100501
-  stm32_signed_image_sha256: f6fcb96cb1deff5cbe1324cfc27d21da5b8d1ce2b81085b446cd645c9b5001a9
+  station_release_code: 2026100601
+  stm32_signed_image_sha256: 27a4e2ba3de7f3e6b9720cb1d1a1b25da62a5164cd6362349a99e3d48f884ef5
   stm32_release_key_id: 04b418857c5001b2
   nrf52840_version: 0.1.0+2026100501
   nrf52840_signed_image_sha256: 27a9e76b969ba6197de9b77874786a304dc0c04efe2f8994307fdc35560dd89b
@@ -276,4 +278,5 @@ bench_release:
   android_version_code: 2026100501
   private_keys_in_package: false
   production_secure_root: SEPARATE_DECISION_AFTER_HARDWARE_BRINGUP
+  firmware_lock: FORBIDDEN_HARDWARE_VALIDATION_PENDING
 do_not_release: true

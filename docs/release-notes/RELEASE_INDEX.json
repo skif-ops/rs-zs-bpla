@@ -30,6 +30,8 @@
     "release_code": 2026100601,
     "source_commit": "446701596673c54fd35d502e13935d6cfa8665a9",
     "status": "READY_TO_FLASH_HARDWARE_VALIDATION_PENDING",
+    "protection_state": "LOCK_FORBIDDEN_HARDWARE_VALIDATION_PENDING",
+    "lock_interlock": "firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json",
     "release_notes": "firmware/RELEASE_NOTES.md",
     "archive": "releases/evt-pre-20/2026-10-06-rev-e/EVT_PRE_20_BENCH_RELEASE_2026100601.zip",
     "archive_sha256": "e574bde3895d0e0c02ed6094d3861e2ab52723e223c0101c859451f3efc05d43",

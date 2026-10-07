@@ -13,7 +13,8 @@ EOL выполняется для 20 из 20 изделий после полн�
 | EOL-ID-01 | Серийный номер и состав | Все ID уникальны и совпадают с traveller, QR и register |
 | EOL-PWR-01 | Полярность, защиты и rails | Нет защитного события; rail limits будут заморожены после power validation |
 | EOL-PWR-02 | S0-S4 токи | Измерены и сохранены во всех режимах; PASS limits OPEN до golden-unit characterization |
-| EOL-FW-01 | Boot, signature, rollback counter | STM32 2026100501 и nRF 0.1.0+2026100501; подписи, SHA-256, target, size и rollback evidence совпадают с release manifest |
+| EOL-FW-01 | Boot, signature, rollback counter | STM32 2026100601 и nRF 0.1.0+2026100501; подписи, SHA-256, target, size и rollback evidence совпадают с release manifest |
+| EOL-SEC-01 | Состояние защиты до квалификации | RDP Level 0; SWD и BOOT0 recovery доступны; BOOT_LOCK, TrustZone, WRP и PCROP отключены; профиль совпадает с `option_bytes_bench_rev_a.json` |
 | EOL-STO-01 | QSPI и microSD | ID, read/write/verify, fault recovery и свободный объём проходят |
 | EOL-AUD-01 | 4 канала | Все каналы присутствуют, без clipping/dropout; gain/phase limits OPEN до fixture MSA |
 | EOL-AUD-02 | Геометрия и calibration | MIC1-MIC3/MIC4 mapping однозначен; calibration hash совпадает |
@@ -40,6 +41,10 @@ EOL выполняется для 20 из 20 изделий после полн�
 ## Fail policy
 
 Любой обязательный FAIL блокирует изделие. После ремонта повторяется затронутая проверка и полный регрессионный EOL. Старый FAIL не удаляется, создаётся новая attempt с ссылкой на NCR/rework. Изделие не может получить PASS при неопределённом обязательном лимите.
+
+## Firmware lock gate
+
+EOL текущего стендового выпуска выполняется без производственной блокировки. До полного аппаратного PASS таргета запрещены повышение RDP, BOOT_LOCK, TrustZone, WRP, PCROP, ограничение SWD и отключение BOOT0 recovery. После квалификации требуется отдельный production release и профиль защиты. Применение этого профиля к каждой станции допускается только после ее EOL PASS. После блокировки повторяются read-back доступного состояния, cold boot, проверка версии, heartbeat, тестовое событие и application receipt. Нормативная политика: `firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json`.
 
 ## Fixture gate
 

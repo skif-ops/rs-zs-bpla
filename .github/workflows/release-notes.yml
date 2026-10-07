@@ -8,6 +8,10 @@ on:
       - "releases/**"
       - "docs/release-notes/**"
       - "tools/check_release_notes.py"
+      - "tools/validate_firmware_lock_interlock.py"
+      - "docs/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.*"
+      - "manufacturing/EOL_TEST_SPEC.md"
+      - ".github/workflows/release-notes.yml"
   push:
     branches:
       - main
@@ -19,6 +23,10 @@ on:
       - "releases/**"
       - "docs/release-notes/**"
       - "tools/check_release_notes.py"
+      - "tools/validate_firmware_lock_interlock.py"
+      - "docs/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.*"
+      - "manufacturing/EOL_TEST_SPEC.md"
+      - ".github/workflows/release-notes.yml"
   workflow_dispatch:
 
 permissions:
@@ -36,6 +44,8 @@ jobs:
           python-version: "3.12"
       - name: Validate content
         run: python tools/check_release_notes.py --validate-only
+      - name: Validate firmware lock interlock
+        run: python tools/validate_firmware_lock_interlock.py
       - name: Require notes for pull request changes
         if: github.event_name == 'pull_request'
         run: python tools/check_release_notes.py --base "${{ github.event.pull_request.base.sha }}" --head "${{ github.event.pull_request.head.sha }}"

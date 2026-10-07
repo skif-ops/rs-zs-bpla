@@ -17,6 +17,8 @@
 
 Документ не разрешает программирование необратимых option bytes, включение RDP Level 2, окончательную блокировку отладки, загрузку закрытых ключей в Git, передачу производственных секретов контрактному сборщику и радиопередачу LoRa вне согласованного стенда до выпуска утвержденного профиля RU868.
 
+Обязательный порядок допуска к блокировке установлен документом `EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A`. До полного аппаратного PASS таргета действует состояние `LOCK_FORBIDDEN_HARDWARE_VALIDATION_PENDING`. Подписанный образ, успешная сборка и host-тесты не дают разрешения на изменение защиты. После квалификации необходимы отдельный release ID и отдельный production-профиль, а каждая станция блокируется только после собственного EOL PASS.
+
 
 ### 1.1. Обязательная сквозная последовательность
 
@@ -255,7 +257,7 @@ Host PASS подтверждает переносимую логику, но н�
 5. Проверить отсутствие закрытых ключей, паролей и keystore в каталоге результата.
 6. Сохранить build evidence и полный журнал подписи.
 
-Текущий комплект является стендовым. Производственная блокировка отладки, неизменяемый root of trust и окончательная карта защиты выпускаются отдельным решением после аппаратного EVT.
+Текущий комплект является стендовым. Производственная блокировка отладки, неизменяемый root of trust и окончательная карта защиты выпускаются отдельным решением после полного аппаратного EVT. До этого момента профиль должен оставаться в состоянии RDP Level 0 с доступными SWD и BOOT0 recovery. Точные ворота и состав доказательств определены в `EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A`.
 
 ## 11. Прошивка STM32 через SWD
 
@@ -293,7 +295,7 @@ STM32_Programmer_CLI.exe -c port=SWD mode=UR freq=1000 -w 01_STM32/dioneya_evt_p
 
 ### 11.5. Ошибки
 
-При несовпадении MCU, option bytes, SHA-256 или verify работа прекращается. Повторную запись допускается выполнить один раз после проверки питания и контактов. Второй FAIL переводит изделие в HOLD. Не применять mass erase, RDP Level 2 или блокировку recovery без отдельного утвержденного профиля.
+При несовпадении MCU, option bytes, SHA-256 или verify работа прекращается. Повторную запись допускается выполнить один раз после проверки питания и контактов. Второй FAIL переводит изделие в HOLD. Не применять mass erase, повышение RDP, RDP Level 2, BOOT_LOCK, TrustZone, WRP, PCROP или блокировку recovery. Отдельный production-профиль разрешается выпустить только после полного аппаратного PASS и полной регрессии, а применить к станции только после ее EOL PASS.
 
 ## 12. Восстановление STM32
 
@@ -1079,6 +1081,7 @@ DIO-EVT-NNN/
 | Стендовый release contract | `firmware/targets/evt_pre_20/release/bench_release_contract.json` |
 | Профиль стендового выпуска | `firmware/targets/evt_pre_20/release/BENCH_RELEASE_PROFILE_REV_B.md` |
 | Option bytes | `firmware/targets/evt_pre_20/release/option_bytes_bench_rev_a.json` |
+| Межблокировка защиты | `firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json` и `docs/EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A.md` |
 | Target status | `firmware/targets/evt_pre_20/target_status.yaml` |
 | nRF52840 target | `firmware/targets/nrf52840_ble/README.md` |
 | Android release evidence | `android/release_build_evidence.json` |
@@ -1121,7 +1124,7 @@ DIO-EVT-NNN/
 5. Attach, DNS, network time, MQTT, heartbeat, event, receipt, command ACK и SIM failover с реальными SIM.
 6. A/B power-cut и rollback STM32 и nRF.
 7. Замер токов, питания, микрофонов, GNSS/PPS, памяти, RF, температуры и герметичности.
-8. Выбор production immutable root of trust, RDP/WRP/PCROP и политики восстановления.
+8. Полный аппаратный PASS таргета, утверждение численных EOL-пределов и выпуск отдельного production-профиля root of trust, RDP/WRP/PCROP и восстановления по `EVT_PRE_20_FIRMWARE_LOCK_INTERLOCK_REV_A`.
 9. Выпуск числовых production limits по результатам golden unit и EVT.
 
 Если один из перечисленных шагов не выполнен, это фиксируется как HARDWARE VALIDATION PENDING или HOLD, а не как программная недоработка без анализа причины. Любое изменение ключей, endpoint, topic schema, BLE ICD, partition map или option bytes требует нового release manifest и регрессионного прогона.
