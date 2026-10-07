@@ -35,6 +35,13 @@ def load_builder():
     return module
 
 
+def remove_paragraph_border(element) -> None:
+    properties = element.get_or_add_pPr()
+    border = properties.find(qn("w:pBdr"))
+    if border is not None:
+        properties.remove(border)
+
+
 def build() -> None:
     text = SOURCE.read_text(encoding="utf-8")
     forbidden = {"\u2014": "em dash", "\u2013": "en dash", "\u2011": "non-breaking hyphen"}
@@ -47,6 +54,28 @@ def build() -> None:
     builder.build_docx(text)
 
     doc = Document(OUTPUT)
+    remove_paragraph_border(doc.styles["Title"]._element)
+    code_lines = {
+        "firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json",
+        "tools/validate_firmware_lock_interlock.py",
+        "LOCK_FORBIDDEN_HARDWARE_VALIDATION_PENDING",
+    }
+    for paragraph in doc.paragraphs:
+        style = paragraph.style.name if paragraph.style else ""
+        if style == "Title":
+            remove_paragraph_border(paragraph._element)
+        if style.startswith("Heading"):
+            paragraph.paragraph_format.keep_with_next = True
+            paragraph.paragraph_format.space_before = Pt(4)
+        if paragraph.text in code_lines:
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            paragraph.paragraph_format.first_line_indent = None
+            paragraph.paragraph_format.left_indent = None
+        if paragraph.text == "До прохождения всех ворот запрещены:":
+            paragraph.paragraph_format.space_after = Pt(3)
+        if paragraph.text.startswith("• "):
+            paragraph.paragraph_format.space_before = Pt(0)
+            paragraph.paragraph_format.space_after = Pt(2)
     footer = doc.sections[0].footer.paragraphs[0]
     footer.clear()
     footer.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -76,6 +105,13 @@ def audit() -> None:
                 errors.append(f"heading-not-bold:{index}")
         elif re.match(r"^(?:\d+\. |• )", paragraph.text):
             pass
+        elif paragraph.text in {
+            "firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json",
+            "tools/validate_firmware_lock_interlock.py",
+            "LOCK_FORBIDDEN_HARDWARE_VALIDATION_PENDING",
+        }:
+            if paragraph.alignment != WD_ALIGN_PARAGRAPH.LEFT:
+                errors.append(f"code-alignment:{index}")
         else:
             indent = paragraph.paragraph_format.first_line_indent
             if indent is None or abs(indent.cm - 1.25) > 0.01:

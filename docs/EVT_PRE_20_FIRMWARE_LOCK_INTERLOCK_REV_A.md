@@ -17,7 +17,7 @@
 
 ### 2.1. Квалификация таргета на железе
 
-На собранной станции должен быть завершен полный аппаратный и программный цикл. В протоколе должны иметь статус PASS:
+На собранной станции должен быть завершен полный аппаратный и программный цикл. Численные аппаратные пределы должны быть утверждены. В протоколе должны иметь статус PASS:
 
 1. прошивка STM32 и nRF52840 через раздельные SWD, read-back, verify и холодный запуск;
 2. восстановление STM32 через SWD, BOOT0 и system memory;
@@ -30,11 +30,9 @@
 9. питание, ток, температура, защиты и циклы включения по утвержденным численным пределам;
 10. полный EOL без обязательных пунктов со статусом OPEN, NOT_RUN, FAIL или HOLD.
 
-До утверждения численных аппаратных пределов квалификация не считается завершенной.
-
 ### 2.2. Отдельное решение о защищенном выпуске
 
-После квалификации выпускается отдельный production release ID и отдельный профиль option bytes. Стендовый профиль нельзя редактировать и превращать в профиль блокировки. Решение должно содержать:
+После квалификации выпускается отдельный профиль защиты. Он получает  новый production release ID и собственный набор option bytes. Стендовый профиль  нельзя редактировать и превращать в профиль блокировки. Решение должно  содержать:
 
 - точные значения всех изменяемых option bytes и порядок их записи;
 - идентификаторы и хэши образов STM32 и nRF52840;
@@ -44,13 +42,15 @@
 - протокол полной регрессии на реальной станции;
 - подписи ответственного за выпуск и контролера качества.
 
-RDP Level 2 остается запрещенным, пока он не будет отдельно утвержден как необратимое продуктовое решение. Его нельзя включать общим разрешением на производственную защиту.
+RDP Level 2 остается запрещенным. Разрешить его можно только отдельным решением, которое прямо фиксирует необратимость операции. Общее разрешение на производственную защиту не позволяет включать RDP Level 2.
 
 ### 2.3. Разрешение для каждой станции
 
-Даже после выпуска production-профиля блокировка конкретной станции допускается только после ее собственного EOL PASS. До блокировки должны совпасть serial, station ID, ревизии плат, хэши прошивок, сертификат, SIM и traveller. Не допускаются открытые NCR, незавершенные проверки и временные параметры.
+После выпуска production-профиля каждая станция проходит собственный EOL. Блокировка конкретной станции допускается только при результате EOL PASS.
 
-После применения защиты оператор обязан считать доступное состояние защиты, выполнить холодный запуск, проверку версии, heartbeat, тестовое событие и подтверждение приема сервером. Результат и логи прикладываются к traveller станции.
+До блокировки сверяют serial, station ID и ревизии плат. Отдельно сверяют хэши прошивок, сертификат, SIM и traveller. Открытые NCR,  незавершенные проверки и временные параметры не допускаются.
+
+После применения защиты оператор считывает доступное состояние защиты и выполняет холодный запуск. Затем оператор проверяет версию и heartbeat. После этого станция отправляет тестовое событие и получает  подтверждение сервера. Результат и логи прикладываются к traveller станции.
 
 ## 3. Запрещенные действия до разрешения
 
@@ -68,12 +68,32 @@ RDP Level 2 остается запрещенным, пока он не буде
 
 ## 4. Машинный контроль
 
-Нормативная машиночитаемая политика находится в `firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json`. Проверка `tools/validate_firmware_lock_interlock.py` контролирует безопасное состояние стендового профиля, наличие трех ворот и соответствие release contract. CI должен завершиться ошибкой, если стендовый профиль допускает необратимые изменения или если release contract объявляет блокировку допустимой до аппаратной квалификации.
+Нормативная машиночитаемая политика хранится в файле:
+
+`firmware/targets/evt_pre_20/release/firmware_lock_interlock_rev_a.json`
+
+Проверку выполняет программа:
+
+`tools/validate_firmware_lock_interlock.py`
+
+Она контролирует безопасное состояние стендового профиля, наличие трех ворот и соответствие release contract. CI завершается ошибкой, если стендовый профиль допускает необратимые изменения. Ошибка также формируется, если release contract разрешает блокировку до аппаратной квалификации.
 
 ## 5. Запись решения
 
-До аппаратных испытаний применяется состояние `LOCK_FORBIDDEN_HARDWARE_VALIDATION_PENDING`. После полного PASS выпускается новый документ и новый production release. Изменение статуса в одном файле, ручная правка option bytes или устное разрешение не заменяют выпускной комплект и подписанный протокол.
+До аппаратных испытаний действует состояние:
+
+`LOCK_FORBIDDEN_HARDWARE_VALIDATION_PENDING`
+
+После полного PASS выпускаются новый документ и новый production release. Статус нельзя изменить отдельной правкой файла, ручной записью option bytes или устным разрешением. Основанием служат только выпускной комплект и подписанный протокол.
 
 ## 6. English summary
 
-Firmware locking is forbidden for the current bench release. The bench option-byte profile must keep RDP Level 0, SWD and BOOT0 recovery, and must not enable TrustZone, BOOT_LOCK, WRP or PCROP. A separate production protection release may be issued only after complete target validation on real hardware, full regression with approved numeric limits, and two-person release approval. Each station may be locked only after its own EOL PASS and identity verification. Post-lock boot, version, heartbeat and server event receipt checks are mandatory. RDP Level 2 requires a separate explicit irreversible-product decision.
+Firmware locking is forbidden for the current bench release.
+
+The bench option-byte profile must keep RDP Level 0, SWD and BOOT0 recovery. It must not enable TrustZone, BOOT_LOCK, WRP or PCROP.
+
+A production protection release may be issued only after complete target validation on real hardware. Full regression, approved numeric limits and two-person approval are mandatory.
+
+Each station may be locked only after its own EOL PASS and identity verification. Post-lock boot, version, heartbeat and server event receipt checks are mandatory.
+
+RDP Level 2 requires a separate explicit irreversible-product decision.
