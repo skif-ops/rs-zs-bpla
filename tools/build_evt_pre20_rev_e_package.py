@@ -19,6 +19,7 @@ D5_RELEASE = ROOT.parent / "repo_pcbmain" / "releases" / "evt-pre-20" / "2026-10
 D5_FULL = D5_RELEASE / "EVT_PRE_20_ПОЛНЫЙ_ПАКЕТ_20261002_REV_D5.zip"
 D5_TESTS = D5_RELEASE / "EVT_PRE_20_ПРОГРАММА_И_МУХОЕД_20261002_REV_D5.zip"
 FIRMWARE = OUTPUT / "EVT_PRE_20_BENCH_RELEASE_2026100601.zip"
+EOL_B01 = OUTPUT / "EVT_PRE_20_DIO_EVT_B01_И_EOL_ОСНАСТКА_20261009_REV_A.zip"
 PKI_APP = OUTPUT / "PKI_WINDOWS_APP"
 DEPLOY_PUBLIC = Path(r"F:\Проекты\muhoed-deploy\pki\bundle")
 
@@ -143,10 +144,20 @@ def build_main(server_archive: Path, commit: str) -> None:
         D5_FULL,
         skip_prefixes=("Основной_пакет/07_Отдельные_архивы/",),
     )
+    for name in (
+        "MFG_004_EOL_FIXTURE_DRILL_TEMPLATE_REV_A.pdf",
+        "MFG_004_EOL_FIXTURE_DRILL_TEMPLATE_REV_A.dxf",
+        "MFG_004_EOL_FIXTURE_CONTACT_MAP_REV_A.csv",
+        "MFG_004_DIO_EVT_B01_EOL_PROGRAM_REV_A.json",
+    ):
+        package.add_file(f"02_Закупка_производство_сборка/EOL_оснастка_MFG_004/{name}", ROOT / "manufacturing" / name)
     package.add_zip("03_ПО_станции_и_приложение", FIRMWARE)
     package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx", ROOT / "docs" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx")
     package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx", ROOT / "manufacturing" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx")
     package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json", ROOT / "manufacturing" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json")
+    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_A.docx", ROOT / "docs" / "EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_A.docx")
+    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.xlsx", ROOT / "manufacturing" / "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.xlsx")
+    package.add_file("03_ПО_станции_и_приложение/04_ДОКУМЕНТАЦИЯ/MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.csv", ROOT / "manufacturing" / "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.csv")
     package.add_file("04_Сертификаты_и_реестры/Выпуск_сертификатов_и_регистрация_станций.docx", DOCS / "05_Выпуск_сертификатов_и_регистрация_станций.docx")
     for name in ("muhoed-pki.exe", "dioneya-root-offline.exe", "SHA256SUMS.txt"):
         package.add_file(f"04_Сертификаты_и_реестры/Приложение_Windows/{name}", PKI_APP / name)
@@ -169,6 +180,7 @@ def build_main(server_archive: Path, commit: str) -> None:
     for name in separate_hardware:
         package.add_file(f"07_Отдельные_архивы/{name}", D5_RELEASE / name)
     package.add_file(f"07_Отдельные_архивы/{FIRMWARE.name}", FIRMWARE)
+    package.add_file(f"07_Отдельные_архивы/{EOL_B01.name}", EOL_B01)
     package.add_file(f"07_Отдельные_архивы/{server_archive.name}", server_archive)
     status = {
         "release": "EVT-PRE-20 Rev E",
@@ -196,6 +208,9 @@ def build_tests(commit: str) -> None:
     package.add_file("03_Прошивка_и_EOL/Протокол_квалификации_DIO_EVT_B01_Rev_A.docx", ROOT / "docs" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_PROTOCOL_REV_A.docx")
     package.add_file("03_Прошивка_и_EOL/Форма_квалификации_DIO_EVT_B01_Rev_A.xlsx", ROOT / "manufacturing" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.xlsx")
     package.add_file("03_Прошивка_и_EOL/qualification_DIO_EVT_B01_Rev_A.json", ROOT / "manufacturing" / "EVT_PRE_20_B01_HARDWARE_QUALIFICATION_REV_A.json")
+    package.add_file("03_Прошивка_и_EOL/Физическая_программа_DIO_EVT_B01_и_MFG_004_Rev_A.docx", ROOT / "docs" / "EVT_PRE_20_DIO_EVT_B01_PHYSICAL_EOL_PROGRAM_REV_A.docx")
+    package.add_file("03_Прошивка_и_EOL/Реестр_измерений_DIO_EVT_B01_MFG_004_Rev_A.xlsx", ROOT / "manufacturing" / "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.xlsx")
+    package.add_file("03_Прошивка_и_EOL/Реестр_измерений_DIO_EVT_B01_MFG_004_Rev_A.csv", ROOT / "manufacturing" / "MFG_004_DIO_EVT_B01_EOL_MEASUREMENT_REGISTER_REV_A.csv")
     for candidate in (
         OUTPUT / "ctest_final.txt",
         OUTPUT / "server_regression_summary_20261006.txt",
@@ -241,7 +256,7 @@ def validate(path: Path) -> dict:
 
 
 def main() -> None:
-    required = [DOCS, D5_FULL, D5_TESTS, FIRMWARE, PKI_APP / "muhoed-pki.exe", DEPLOY_PUBLIC / "bundle.json"]
+    required = [DOCS, D5_FULL, D5_TESTS, FIRMWARE, EOL_B01, PKI_APP / "muhoed-pki.exe", DEPLOY_PUBLIC / "bundle.json"]
     missing = [str(path) for path in required if not path.exists()]
     if missing:
         raise FileNotFoundError(missing)
