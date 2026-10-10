@@ -53,6 +53,10 @@ DOCUMENTS = {
         "Проверка настроенного сервера dioneya.ru",
         "Боевой контур и изолированный bench на 06.10.2026",
     ),
+    "09_Пошаговая_инструкция_сборщика_EVT_PRE_20": (
+        "Пошаговая инструкция сборщика станции Дионея EVT-PRE-20",
+        "Комплектность, механическая сборка, платы, жгуты, антенны, питание, контроль и передача на EOL",
+    ),
 }
 
 
@@ -71,6 +75,12 @@ def normalize(text: str) -> str:
 
 def set_footer_and_metadata(path: Path, title: str, subject: str) -> None:
     doc = Document(path)
+    if path.stem == "09_Пошаговая_инструкция_сборщика_EVT_PRE_20":
+        for paragraph in doc.paragraphs:
+            if paragraph.text.startswith("28. Финальный контрольный лист сборщика"):
+                paragraph.paragraph_format.page_break_before = True
+            if paragraph.text.startswith("29. Передача следующей операции"):
+                paragraph.paragraph_format.page_break_before = True
     for section in doc.sections:
         footer = section.footer.paragraphs[0]
         footer.clear()
