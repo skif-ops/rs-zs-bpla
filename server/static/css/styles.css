@@ -18,7 +18,10 @@ body > main {
   display: flex;
   align-items: center;
   gap: clamp(.75rem, 2vw, 1.5rem);
+  max-width: 1720px;
   min-height: 3.65rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 .app-brand {
   display: flex;
@@ -32,13 +35,13 @@ body > main {
 }
 .app-brand:hover, .app-brand:focus { color: #fff; }
 .app-brand-name {
-  font-size: 1.2rem;
+  font-size: 1.35rem;
   font-weight: 700;
 }
 .app-brand-description {
   margin-top: .16rem;
   color: #d0d5dd;
-  font-size: .68rem;
+  font-size: .72rem;
   font-weight: 500;
   letter-spacing: .01em;
 }
@@ -140,6 +143,8 @@ body > main {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: .35rem .75rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     padding-top: .55rem;
     padding-bottom: .55rem;
   }
