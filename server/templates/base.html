@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Мухоед{% endblock %}</title>
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css?v={{ build.commit or build.version }}">
+    <link rel="stylesheet" href="/static/css/styles.css?v={{ build.commit or build.version }}">
   </head>
   <body{% if request.state.operator %} data-operator-name="{{ request.state.operator.name }}"{% endif %}>
     {% set path = request.url.path %}
@@ -69,7 +69,7 @@
     <footer class="app-footer">
       <div class="container">Мухоед {{ build.label }}</div>
     </footer>
-    <script src="/static/js/app.js"></script>
-    {% if request.state.operator %}<script src="/static/js/alert-watch.js"></script>{% endif %}
+    <script src="/static/js/app.js?v={{ build.commit or build.version }}"></script>
+    {% if request.state.operator %}<script src="/static/js/alert-watch.js?v={{ build.commit or build.version }}"></script>{% endif %}
   </body>
 </html>
