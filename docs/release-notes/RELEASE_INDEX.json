@@ -18,7 +18,7 @@
       },
       {
         "environment": "bench",
-        "endpoint": "https://nginx3777.hostkey.in",
+        "endpoint": "https://bench.dioneya.ru",
         "build": "7a75b357",
         "verified": "2026-10-12",
         "status": "HEALTHY"
