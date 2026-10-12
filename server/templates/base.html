@@ -16,7 +16,10 @@
     {%- endmacro %}
     <header class="app-header">
       <div class="container app-header-inner">
-        <a class="app-brand" href="/">Мухоед</a>
+        <a class="app-brand" href="/" aria-label="Мухоед, сервер акустической системы Дионея">
+          <span class="app-brand-name">Мухоед</span>
+          <span class="app-brand-description">сервер акустической системы Дионея</span>
+        </a>
         <nav class="app-primary" aria-label="Оперативные экраны">
           {{ item("/", "Обзор") }}
           {{ item("/stations", "Станции") }}

@@ -21,13 +21,27 @@ body > main {
   min-height: 3.65rem;
 }
 .app-brand {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  justify-content: center;
   color: #fff;
-  font-size: 1.2rem;
-  font-weight: 700;
+  line-height: 1.1;
   text-decoration: none;
   white-space: nowrap;
 }
 .app-brand:hover, .app-brand:focus { color: #fff; }
+.app-brand-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.app-brand-description {
+  margin-top: .16rem;
+  color: #d0d5dd;
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .01em;
+}
 .app-primary { display: flex; align-items: center; gap: .2rem; min-width: 0; }
 .app-nav-link {
   display: block;
@@ -130,6 +144,8 @@ body > main {
     padding-bottom: .55rem;
   }
   .app-brand { grid-column: 1; grid-row: 1; }
+  .app-brand-name { font-size: 1.1rem; }
+  .app-brand-description { font-size: clamp(.56rem, 2.6vw, .66rem); }
   .app-header-actions { display: contents; }
   .app-nav-menu { grid-column: 2; grid-row: 1; justify-self: end; }
   .app-nav-panel { top: calc(100% + 2.75rem); }
