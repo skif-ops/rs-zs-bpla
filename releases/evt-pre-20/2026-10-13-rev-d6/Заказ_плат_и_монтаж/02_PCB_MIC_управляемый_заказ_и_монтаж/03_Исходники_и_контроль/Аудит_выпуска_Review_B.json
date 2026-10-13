@@ -1,0 +1,55 @@
+{
+  "schema": "dioneya-pcb-mic-review-b-release-v2",
+  "status": "PASS_REVIEW_B_CONTROLLED_FIRST_ARTICLE_RELEASE",
+  "configuration": "EVT-PRE-20",
+  "assembly": "PCB-MIC",
+  "checks": {
+    "approval": {
+      "status": "PASS_SIGNED",
+      "reviewer": "Скиф",
+      "date": "2026-09-30",
+      "decision": "ACCEPT_CONTROLLED_FIRST_ARTICLE",
+      "reviewed_design_commit_sha": "8d2e6229e453b186b10f2978e29c6df458c87b32",
+      "release_evidence_commit_sha": "07e3d66633ad4aa6763255346437af508112b817",
+      "native_board_sha256": "c57cebbb3886247166551fd242fa51350bc9be7fee6299e63e7eaac60518d518",
+      "parity_items_disposed": 55
+    },
+    "cli": {
+      "status": "PASS",
+      "kicad_drc_version": "10.0.6",
+      "kicad_erc_version": "10.0.6",
+      "drc_violations": 0,
+      "unrouted_items": 0,
+      "erc_violations": 0
+    },
+    "cam_source": {
+      "status": "PASS_BYTE_IDENTICAL",
+      "sha256": "c57cebbb3886247166551fd242fa51350bc9be7fee6299e63e7eaac60518d518"
+    },
+    "gerber": {
+      "status": "PASS",
+      "files": 9,
+      "drill_guide_flashes": 0,
+      "paste_flashes_at_npth": 0,
+      "t5838_paste_segments": 4,
+      "finish": "ENIG"
+    },
+    "drill": {
+      "status": "PASS_SEPARATE_PTH_NPTH",
+      "pth_hits": 5,
+      "npth_hits": 3
+    },
+    "bom": {
+      "status": "PASS_EXACT_MPN",
+      "fitted_references": [
+        "C1",
+        "J1",
+        "MK1",
+        "R1"
+      ]
+    }
+  },
+  "physical_evt": "REQUIRED_AFTER_ASSEMBLY",
+  "fabrication_authorized": true,
+  "scope": "CONTROLLED_FIRST_ARTICLE_THEN_REMAINDER_AFTER_INSPECTION"
+}

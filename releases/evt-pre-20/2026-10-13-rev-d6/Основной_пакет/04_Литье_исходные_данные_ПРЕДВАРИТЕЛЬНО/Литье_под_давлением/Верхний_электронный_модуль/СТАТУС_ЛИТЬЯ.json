@@ -1,0 +1,22 @@
+{
+  "status": "APPEARANCE_CONCEPT_ONLY_NOT_TOOLING_RELEASED",
+  "process": "INJECTION_MOLDING",
+  "source_printed_case_id": "DIO-3DP-UP-001B",
+  "approved_appearance": "Рисунок1.png",
+  "source_pcb_main_sha256": "f828fc6b30afbd64ed67afbee9ed7a5f5cdb9c47c1112722c5a0fe315268665f",
+  "approved_relief_logo_sha256": "62ac484ed28325afb5d534464f1d833b48974dcfd998072db4ca76b7bce45733",
+  "model_shas": {
+    "DIO-3DP-UP-001B_body.step": "a608511af6a5142b22bf8d265ee99e77ba003cf3831c8cec3453c604b0aecc4e",
+    "DIO-3DP-UP-001B_fit_assembly.step": "533b56e16e2f4deef2476e0dc7c4f1a02f7f3bc39ea64dd94e7cef643e50aa98",
+    "DIO-3DP-UP-001B_lid.step": "b86cdb4bb6783221712558653b8419cdb632a88fb50b31115f46b2fc7d010ce5",
+    "DIONEYA_LOGO_STACKED_MONO_RELIEF_REV_A.svg": "62ac484ed28325afb5d534464f1d833b48974dcfd998072db4ca76b7bce45733",
+    "DIONEYA_LOGO_STACKED_REV_A.svg": "0ced4c4d5f1c608224b5d688d07636d8bbb13e847713e836bb2f7e87d9890dba"
+  },
+  "open_tooling_items": [
+    "draft and parting line",
+    "material and shrinkage",
+    "insert bosses and fastener length",
+    "gasket and ingress protection",
+    "physical PCB/connector/antenna/bracket fit"
+  ]
+}

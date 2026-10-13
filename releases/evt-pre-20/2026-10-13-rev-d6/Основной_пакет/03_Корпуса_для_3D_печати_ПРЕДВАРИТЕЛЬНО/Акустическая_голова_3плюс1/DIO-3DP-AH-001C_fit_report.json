@@ -1,0 +1,136 @@
+{
+  "schema": "dioneya-acoustic-head-trial-v3",
+  "status": "PRELIMINARY_PHYSICAL_VALIDATION_REQUIRED",
+  "appearance_basis": "Рисунок11.png and Рисунок1.png",
+  "source_board_sha256": "c57cebbb3886247166551fd242fa51350bc9be7fee6299e63e7eaac60518d518",
+  "coordinate_authority": "mechanics/common/ACOUSTIC_GEOMETRY.csv",
+  "dome_rise_mm": 65,
+  "previous_dome_rise_mm": 55,
+  "head_outer_diameter_mm": 216,
+  "head_height_with_hatch_mm": 296,
+  "dome_inner_apex_z_mm": 290,
+  "clearance_above_mic4_acoustic_centre_mm": 80,
+  "foam_nominal_thickness_mm": 10,
+  "foam_max_requested_mm": 15,
+  "foam_radial_slot_mm": 10.4,
+  "foam_envelope_outer_diameter_mm": 212.6,
+  "foam_envelope_height_mm": 202,
+  "foam_lower_post_notch_count": 3,
+  "plate_pair_count": 4,
+  "upper_ring_and_eight_plates_integral": true,
+  "lower_floor_thickness_mm": 6,
+  "lower_floor_open_center_hatch_diameter_mm": 52,
+  "split_hatch_seal": "MANDATORY_ELASTOMER_PERIMETER_SEAM_AND_FOUR_CABLE_GROOVES",
+  "cable_groove_diameter_mm": 4.4,
+  "cable_bundle_od": "MEASURE_ON_FIRST_HARNESS",
+  "condensate_pocket_count": 4,
+  "condensate_pocket_angles_deg": [
+    10,
+    100,
+    190,
+    280
+  ],
+  "pocket_diameter_mm": 9,
+  "pocket_depth_mm": 3.5,
+  "outward_drain_diameter_mm": 2.2,
+  "acoustic_centres_world_mm": {
+    "MIC1": [
+      0.0,
+      69.282032,
+      60.0
+    ],
+    "MIC2": [
+      -60.0,
+      -34.641016,
+      60.0
+    ],
+    "MIC3": [
+      60.0,
+      -34.641016,
+      60.0
+    ],
+    "MIC4": [
+      0.0,
+      0.0,
+      210.0
+    ]
+  },
+  "print_parts_per_station": {
+    "sealed_floor_carrier": 1,
+    "cable_hatch_north": 1,
+    "cable_hatch_south": 1,
+    "central_mast": 1,
+    "upper_carrier": 1,
+    "integral_upper_cage": 1,
+    "dome": 1,
+    "mic_pod_body": 4,
+    "mic_pod_lid": 4
+  },
+  "source_for_foam_trial": "https://acoustics.asn.au/conference_proceedings/INTERNOISE2014/papers/p844.pdf",
+  "source_scope": "10 mm open-cell foam is a design analogue, not verified attenuation for this device",
+  "part_bounding_boxes_mm": {
+    "sealed_floor_carrier": [
+      216.0,
+      216.0,
+      36.0
+    ],
+    "cable_hatch_north": [
+      61.999,
+      30.8,
+      15.0
+    ],
+    "cable_hatch_south": [
+      61.999,
+      30.8,
+      15.0
+    ],
+    "central_mast": [
+      16.0,
+      16.0,
+      150.0
+    ],
+    "upper_carrier": [
+      36.0,
+      36.0,
+      6.0
+    ],
+    "integral_upper_cage": [
+      216.0,
+      216.0,
+      214.0
+    ],
+    "dome": [
+      216.0,
+      216.0,
+      69.0
+    ]
+  },
+  "physical_checks_open": [
+    "foam MPN, porosity and acoustic transfer function",
+    "wind attenuation, dome-height acoustic effect and underside leakage of 3+1 head",
+    "wet foam and rain/drain test",
+    "fit with actual PCBA, J1 and preterminated H-MIC looms",
+    "measure loom outside diameter and qualify hatch elastomer seal",
+    "minimum 230 mm print bed with brim; orientation, warping and shrinkage",
+    "one-piece cage strength, dome inserts and torque",
+    "mast mount and cable routes"
+  ],
+  "files": {
+    "DIO-3DP-AH-001C_cable_hatch_north.step": "536470ea5b93797f4a7bed02f3c6af9656cd6a7269b8d42468ed136d92940e3a",
+    "DIO-3DP-AH-001C_cable_hatch_north.stl": "5fe2ff9fbaf9b459759c854ba06450853cb2b320ac603cc100d7feb39b265e2a",
+    "DIO-3DP-AH-001C_cable_hatch_south.step": "19bf9048dd5b0d3ce6ddc372d87d412e6f71e16be6021130d6982d0b3c420d57",
+    "DIO-3DP-AH-001C_cable_hatch_south.stl": "b81271bbf55923ab6578c80d7e683380f81b0dc5d0c744c010add8848a6bf8f5",
+    "DIO-3DP-AH-001C_central_mast.step": "56e926d8c97b3590e8e0c00c001043b4ab185201f69bac99107edac5f2d06b09",
+    "DIO-3DP-AH-001C_central_mast.stl": "79cb42a703732cdaa57d7e010159298a0aad231fc8933e8d34980ad1025956d8",
+    "DIO-3DP-AH-001C_dome.step": "3ee43d4014a6a86fb9cb3f50b3f9f742c886e24678d5cb611c0a103100efba81",
+    "DIO-3DP-AH-001C_dome.stl": "bf308d0f2d143024cb3337331d622cf13bc6621e61240412ab0eb015dfe0d046",
+    "DIO-3DP-AH-001C_foam_cut_envelope_NOT_PRINT.step": "640368056fea38e1dc03921bcd3222956b39841f1c969d5efdcd927013e0ce54",
+    "DIO-3DP-AH-001C_full_fit_assembly.step": "ee575b64c796c9de81d581ee22d8d965bc11eb5aeed79ff2ba5a14a657bab0cf",
+    "DIO-3DP-AH-001C_integral_upper_cage.step": "c587fd78e5443787b7d3faa3ad59c73b6530dae593d117b84745404823a3a1b8",
+    "DIO-3DP-AH-001C_integral_upper_cage.stl": "1a6b17a3309fc55fc31523ff4714ed5a4a36fbdbc6d9c130ac20de664dab2b4e",
+    "DIO-3DP-AH-001C_sealed_floor_carrier.step": "8c555feeb5d7bffa12199bcf18abd3924bbe8db1a403dec7cafb3933fbd22c61",
+    "DIO-3DP-AH-001C_sealed_floor_carrier.stl": "c7c63f0f38103610e5a9a90d166710f16ba376ade84c5b3519640be41b11ddd6",
+    "DIO-3DP-AH-001C_upper_carrier.step": "9a199a0c6121aa05209f3b123a1eca69810da712012891c3cefe9fa3d046f6d6",
+    "DIO-3DP-AH-001C_upper_carrier.stl": "4ba98dc135db82b08b988b3653e1be471e983440bd92b17fdc3bf70801dbfd61"
+  }
+}

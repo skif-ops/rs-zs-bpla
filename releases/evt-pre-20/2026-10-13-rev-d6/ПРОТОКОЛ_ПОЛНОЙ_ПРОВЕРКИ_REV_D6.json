@@ -1,0 +1,1562 @@
+{
+  "schema": "dioneya-evt-pre-20-deep-package-audit-v1",
+  "release": "EVT-PRE-20 Rev D6",
+  "date": "2026-10-13",
+  "result": "PASS",
+  "scope": "unpacked delivery folders and all release archives",
+  "files_by_extension": {
+    ".blend": 4,
+    ".csv": 48,
+    ".d356": 2,
+    ".docx": 31,
+    ".drl": 7,
+    ".g1": 2,
+    ".g2": 2,
+    ".g3": 1,
+    ".g4": 1,
+    ".g5": 1,
+    ".g6": 1,
+    ".gba": 1,
+    ".gbl": 2,
+    ".gbo": 2,
+    ".gbp": 2,
+    ".gbr": 31,
+    ".gbrjob": 4,
+    ".gbs": 2,
+    ".gm1": 2,
+    ".gta": 1,
+    ".gtl": 2,
+    ".gto": 2,
+    ".gtp": 2,
+    ".gts": 2,
+    ".ipc": 1,
+    ".json": 78,
+    ".kicad_dru": 3,
+    ".kicad_mod": 42,
+    ".kicad_pcb": 4,
+    ".kicad_pro": 4,
+    ".kicad_sch": 17,
+    ".kicad_sym": 4,
+    ".lib": 2,
+    ".log": 1,
+    ".pdf": 32,
+    ".png": 20,
+    ".py": 2,
+    ".rpt": 3,
+    ".step": 97,
+    ".stl": 48,
+    ".svg": 16,
+    ".txt": 1,
+    ".xlsx": 16,
+    "<none>": 8
+  },
+  "docx_summary": {
+    "files": 31,
+    "open_pass": true,
+    "em_dash_count": 0,
+    "explicit_wrong_font_runs": 0,
+    "explicit_wrong_size_runs": 0,
+    "body_alignment_flags": 0,
+    "body_spacing_flags": 0,
+    "heading_not_bold_flags": 0
+  },
+  "xlsx_summary": {
+    "files": 16,
+    "formula_errors": 0
+  },
+  "pdf_summary": {
+    "files": 32,
+    "pages": 66,
+    "bilingual_failures": []
+  },
+  "procurement_required_terms": {
+    "result": "PASS",
+    "hits": {
+      "аккумуля": [
+        "Сводка закупки!A6=Энергосистема в сводке: аккумулятор RB40 - PR-097, MPPT - PR-099, солнечная панель SLP080S-12M - PR-101; количества первого лота 21/21/21 с резервом.",
+        "Цены v02!C50=LiFePO4 аккумулятор 12,8 В, 40–60 А·ч, BMS"
+      ],
+      "солнеч": [
+        "Сводка закупки!A6=Энергосистема в сводке: аккумулятор RB40 - PR-097, MPPT - PR-099, солнечная панель SLP080S-12M - PR-101; количества первого лота 21/21/21 с резервом.",
+        "Цены v02!C55=Солнечная панель наружного исполнения 60–80 Вт"
+      ],
+      "антенн": [
+        "Цены v02!C41=RF-разъём сотовой антенны",
+        "Цены v02!C42=RF-разъём GNSS-антенны",
+        "Цены v02!C43=RF-разъём LoRa-антенны",
+        "Цены v02!C47=Наружная антенна сотовой связи с кабелем",
+        "Цены v02!C48=Активная наружная GNSS-антенна с кабелем",
+        "Цены v02!C49=Наружная антенна LoRa 868 МГц с кабелем"
+      ],
+      "rf": [
+        "Сводка закупки!C28=RF-PIGTAIL",
+        "Сводка закупки!E28=RF cable",
+        "Сводка закупки!R36=SELECTED_PENDING_CASTELLATED_OPTION_RF_REGULATORY",
+        "Сводка закупки!R83=SELECTED_PENDING_GNSS_RF_TIMING_SAMPLE",
+        "Сводка закупки!H84=nRF52840_SMD_10.5x15.5_61P_PCB_antenna",
+        "Сводка закупки!R84=SELECTED_PENDING_ENCLOSURE_RF",
+        "Сводка закупки!E89=RF_ESD",
+        "Сводка закупки!E108=RF_ESD",
+        "Сводка закупки!C113=J-RF-CELL | J-RF-GNSS",
+        "Сводка закупки!E113=RF connector",
+        "Сводка закупки!R113=LAYOUT_ZONE_FROZEN_PENDING_RF_VALIDATION",
+        "Сводка закупки!C114=J-RF-LORA",
+        "Сводка закупки!E114=RF connector",
+        "Сводка закупки!R114=LAYOUT_ZONE_FROZEN_PENDING_RF_VALIDATION",
+        "Цены v02!C20=BLE/OTA сопроцессор nRF52840",
+        "Цены v02!B41=J-RF-CELL",
+        "Цены v02!C41=RF-разъём сотовой антенны",
+        "Цены v02!B42=J-RF-GNSS",
+        "Цены v02!C42=RF-разъём GNSS-антенны",
+        "Цены v02!B43=J-RF-LORA"
+      ],
+      "кабел": [
+        "Цены v02!A37=Кабели и разъёмы",
+        "Цены v02!C37=Комплект маркированных кабельных жгутов станции",
+        "Цены v02!A38=Кабели и разъёмы",
+        "Цены v02!A39=Кабели и разъёмы",
+        "Цены v02!A40=Кабели и разъёмы",
+        "Цены v02!A41=Кабели и разъёмы",
+        "Цены v02!A42=Кабели и разъёмы",
+        "Цены v02!A43=Кабели и разъёмы",
+        "Цены v02!A44=Кабели и разъёмы",
+        "Цены v02!A45=Кабели и разъёмы",
+        "Цены v02!A46=Кабели и разъёмы",
+        "Цены v02!C47=Наружная антенна сотовой связи с кабелем",
+        "Цены v02!C48=Активная наружная GNSS-антенна с кабелем",
+        "Цены v02!C49=Наружная антенна LoRa 868 МГц с кабелем"
+      ]
+    },
+    "missing": []
+  },
+  "archives": {
+    "EVT_PRE_20_PCB_MIC_REVIEW_B_20261013_REV_D6.zip": {
+      "entries": 43,
+      "crc_pass": true,
+      "duplicate_paths": 0
+    },
+    "EVT_PRE_20_ЖГУТЫ_И_КАБЕЛИ_20261013_REV_D6.zip": {
+      "entries": 9,
+      "crc_pass": true,
+      "duplicate_paths": 0
+    },
+    "EVT_PRE_20_ПЛАТЫ_ЗАКАЗ_И_МОНТАЖ_20261013_REV_D6.zip": {
+      "entries": 222,
+      "crc_pass": true,
+      "duplicate_paths": 0
+    },
+    "EVT_PRE_20_ПОЛНЫЙ_ПАКЕТ_20261013_REV_D6.zip": {
+      "entries": 147,
+      "crc_pass": true,
+      "duplicate_paths": 0
+    },
+    "EVT_PRE_20_ПРОГРАММА_И_МУХОЕД_20261013_REV_D6.zip": {
+      "entries": 15,
+      "crc_pass": true,
+      "duplicate_paths": 0
+    },
+    "EVT_PRE_20_СБОРКА_И_КОРПУСА_20261013_REV_D6.zip": {
+      "entries": 122,
+      "crc_pass": true,
+      "duplicate_paths": 0
+    }
+  },
+  "errors": [],
+  "critical": [],
+  "documents": {
+    "Основной_пакет/00_Опись_и_статус/ИЗВЕЩЕНИЕ_ПО_ЕДИНОЙ_ПАРТИИ_RU_EN.docx": {
+      "paragraphs": 10,
+      "tables": 0,
+      "text_runs": 10,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Основной_пакет/00_Опись_и_статус/Контроль_финального_выпуска.docx": {
+      "paragraphs": 12,
+      "tables": 0,
+      "text_runs": 12,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Основной_пакет/00_Опись_и_статус/Опись_и_статус_комплекта.docx": {
+      "paragraphs": 14,
+      "tables": 0,
+      "text_runs": 14,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Основной_пакет/00_Опись_и_статус/Ответ_на_замечания_проверки_Rev_D.docx": {
+      "paragraphs": 14,
+      "tables": 0,
+      "text_runs": 14,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Основной_пакет/02_Сборка_станций/Заявка_на_сборку_станций_и_корпусов.docx": {
+      "paragraphs": 18,
+      "tables": 0,
+      "text_runs": 18,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Основной_пакет/02_Сборка_станций/Инструкция_сборки_акустической_головы_и_станции.docx": {
+      "paragraphs": 27,
+      "tables": 0,
+      "text_runs": 27,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Основной_пакет/02_Сборка_станций/Корпус_PCB_MAIN_Rev_B_инструкция.docx": {
+      "paragraphs": 15,
+      "tables": 0,
+      "text_runs": 14,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Основной_пакет/03_Корпуса_для_3D_печати_ПРЕДВАРИТЕЛЬНО/Корпуса_и_крепления_первый_лот.docx": {
+      "paragraphs": 14,
+      "tables": 0,
+      "text_runs": 15,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Основной_пакет/05_Заказ_жгутов_и_кабелей/Заказ_антенн_и_RF_кабелей.docx": {
+      "paragraphs": 14,
+      "tables": 0,
+      "text_runs": 14,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Основной_пакет/05_Заказ_жгутов_и_кабелей/Заказ_на_изготовление_жгутов_и_кабелей.docx": {
+      "paragraphs": 20,
+      "tables": 0,
+      "text_runs": 20,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Основной_пакет/06_Технический_проект/Технический_проект_EVT_PRE_20.docx": {
+      "paragraphs": 23,
+      "tables": 0,
+      "text_runs": 23,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Заказ_плат_и_монтаж/00_Условия_передачи/Задание_на_изготовление_и_монтаж_плат.docx": {
+      "paragraphs": 12,
+      "tables": 0,
+      "text_runs": 12,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Заказ_плат_и_монтаж/00_Условия_передачи/ИЗВЕЩЕНИЕ_ПО_ЕДИНОЙ_ПАРТИИ_RU_EN.docx": {
+      "paragraphs": 10,
+      "tables": 0,
+      "text_runs": 10,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Заказ_плат_и_монтаж/00_Условия_передачи/Опись_и_статус_комплекта.docx": {
+      "paragraphs": 14,
+      "tables": 0,
+      "text_runs": 14,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Заказ_плат_и_монтаж/01_PCB_PWR_заводская_проверка_и_заказ/00_Задание_PCB-PWR_на_изготовление_и_монтаж.docx": {
+      "paragraphs": 12,
+      "tables": 0,
+      "text_runs": 12,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Заказ_плат_и_монтаж/01_PCB_PWR_заводская_проверка_и_заказ/03_Исходники_и_контроль/PCB-PWR_parity_disposition.docx": {
+      "paragraphs": 14,
+      "tables": 0,
+      "text_runs": 14,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Заказ_плат_и_монтаж/02_PCB_MIC_управляемый_заказ_и_монтаж/00_Задание_PCB-MIC_на_изготовление_и_монтаж.docx": {
+      "paragraphs": 16,
+      "tables": 0,
+      "text_runs": 16,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/00_Задание_PCB-MAIN_на_изготовление_и_монтаж.docx": {
+      "paragraphs": 12,
+      "tables": 0,
+      "text_runs": 12,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/01_Изготовление_платы/PCB-MAIN_Официальная_проверка_JLCPCB_RU_EN.docx": {
+      "paragraphs": 17,
+      "tables": 0,
+      "text_runs": 19,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Заказ_жгутов_и_кабелей/Заказ_антенн_и_RF_кабелей.docx": {
+      "paragraphs": 14,
+      "tables": 0,
+      "text_runs": 14,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Заказ_жгутов_и_кабелей/Заказ_на_изготовление_жгутов_и_кабелей.docx": {
+      "paragraphs": 20,
+      "tables": 0,
+      "text_runs": 20,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Сборка_и_корпуса/02_Сборка_станций/Заявка_на_сборку_станций_и_корпусов.docx": {
+      "paragraphs": 18,
+      "tables": 0,
+      "text_runs": 18,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Сборка_и_корпуса/02_Сборка_станций/Инструкция_сборки_акустической_головы_и_станции.docx": {
+      "paragraphs": 27,
+      "tables": 0,
+      "text_runs": 27,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Сборка_и_корпуса/02_Сборка_станций/Корпус_PCB_MAIN_Rev_B_инструкция.docx": {
+      "paragraphs": 15,
+      "tables": 0,
+      "text_runs": 14,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Сборка_и_корпуса/03_Корпуса_для_3D_печати_ПРЕДВАРИТЕЛЬНО/Корпуса_и_крепления_первый_лот.docx": {
+      "paragraphs": 14,
+      "tables": 0,
+      "text_runs": 15,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Программа_EVT_и_Мухоед/01_Программы_и_формы/Методики_испытаний_EVT_PRE_20.docx": {
+      "paragraphs": 25,
+      "tables": 0,
+      "text_runs": 25,
+      "normal_font": null,
+      "normal_size_pt": null,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Программа_EVT_и_Мухоед/01_Программы_и_формы/Программа_дообучения_Мухоеда.docx": {
+      "paragraphs": 14,
+      "tables": 0,
+      "text_runs": 14,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Программа_EVT_и_Мухоед/01_Программы_и_формы/Программа_и_методики_EVT_PRE_20.docx": {
+      "paragraphs": 15,
+      "tables": 0,
+      "text_runs": 15,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Программа_EVT_и_Мухоед/01_Программы_и_формы/Форма_сводного_отчета_EVT.docx": {
+      "paragraphs": 12,
+      "tables": 0,
+      "text_runs": 12,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Ревью_PCB_MIC_отдельно/01_Решение_Review_B/PCB-MIC_заключение_Review_B_ПОДПИСАНО.docx": {
+      "paragraphs": 16,
+      "tables": 0,
+      "text_runs": 16,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    },
+    "Ревью_PCB_MIC_отдельно/01_Решение_Review_B/ИЗВЕЩЕНИЕ_ПО_ЕДИНОЙ_ПАРТИИ_RU_EN.docx": {
+      "paragraphs": 10,
+      "tables": 0,
+      "text_runs": 10,
+      "normal_font": "Times New Roman",
+      "normal_size_pt": 14.0,
+      "em_dash_count": 0,
+      "explicit_wrong_font_runs": 0,
+      "explicit_wrong_size_runs": 0,
+      "body_alignment_flags": 0,
+      "body_spacing_flags": 0,
+      "heading_not_bold_flags": 0
+    }
+  },
+  "workbooks": {
+    "Основной_пакет/01_Закупка/Закупочная ведомость_BOM_EVT_PRE_20_оценочные_цены.xlsx": {
+      "sheets": [
+        "Сводка закупки",
+        "Цены v02",
+        "DNP"
+      ],
+      "nonempty_cells": 2325,
+      "formula_errors": [],
+      "keyword_hits": {
+        "аккумуля": [
+          "Сводка закупки!A6=Энергосистема в сводке: аккумулятор RB40 - PR-097, MPPT - PR-099, солнечная панель SLP080S-12M - PR-101; количества первого лота 21/21/21 с резервом.",
+          "Цены v02!C50=LiFePO4 аккумулятор 12,8 В, 40–60 А·ч, BMS"
+        ],
+        "солнеч": [
+          "Сводка закупки!A6=Энергосистема в сводке: аккумулятор RB40 - PR-097, MPPT - PR-099, солнечная панель SLP080S-12M - PR-101; количества первого лота 21/21/21 с резервом.",
+          "Цены v02!C55=Солнечная панель наружного исполнения 60–80 Вт"
+        ],
+        "антенн": [
+          "Цены v02!C41=RF-разъём сотовой антенны",
+          "Цены v02!C42=RF-разъём GNSS-антенны",
+          "Цены v02!C43=RF-разъём LoRa-антенны",
+          "Цены v02!C47=Наружная антенна сотовой связи с кабелем",
+          "Цены v02!C48=Активная наружная GNSS-антенна с кабелем",
+          "Цены v02!C49=Наружная антенна LoRa 868 МГц с кабелем"
+        ],
+        "rf": [
+          "Сводка закупки!C28=RF-PIGTAIL",
+          "Сводка закупки!E28=RF cable",
+          "Сводка закупки!R36=SELECTED_PENDING_CASTELLATED_OPTION_RF_REGULATORY",
+          "Сводка закупки!R83=SELECTED_PENDING_GNSS_RF_TIMING_SAMPLE",
+          "Сводка закупки!H84=nRF52840_SMD_10.5x15.5_61P_PCB_antenna",
+          "Сводка закупки!R84=SELECTED_PENDING_ENCLOSURE_RF",
+          "Сводка закупки!E89=RF_ESD",
+          "Сводка закупки!E108=RF_ESD",
+          "Сводка закупки!C113=J-RF-CELL | J-RF-GNSS",
+          "Сводка закупки!E113=RF connector",
+          "Сводка закупки!R113=LAYOUT_ZONE_FROZEN_PENDING_RF_VALIDATION",
+          "Сводка закупки!C114=J-RF-LORA",
+          "Сводка закупки!E114=RF connector",
+          "Сводка закупки!R114=LAYOUT_ZONE_FROZEN_PENDING_RF_VALIDATION",
+          "Цены v02!C20=BLE/OTA сопроцессор nRF52840",
+          "Цены v02!B41=J-RF-CELL",
+          "Цены v02!C41=RF-разъём сотовой антенны",
+          "Цены v02!B42=J-RF-GNSS",
+          "Цены v02!C42=RF-разъём GNSS-антенны",
+          "Цены v02!B43=J-RF-LORA"
+        ],
+        "кабел": [
+          "Цены v02!A37=Кабели и разъёмы",
+          "Цены v02!C37=Комплект маркированных кабельных жгутов станции",
+          "Цены v02!A38=Кабели и разъёмы",
+          "Цены v02!A39=Кабели и разъёмы",
+          "Цены v02!A40=Кабели и разъёмы",
+          "Цены v02!A41=Кабели и разъёмы",
+          "Цены v02!A42=Кабели и разъёмы",
+          "Цены v02!A43=Кабели и разъёмы",
+          "Цены v02!A44=Кабели и разъёмы",
+          "Цены v02!A45=Кабели и разъёмы",
+          "Цены v02!A46=Кабели и разъёмы",
+          "Цены v02!C47=Наружная антенна сотовой связи с кабелем",
+          "Цены v02!C48=Активная наружная GNSS-антенна с кабелем",
+          "Цены v02!C49=Наружная антенна LoRa 868 МГц с кабелем"
+        ]
+      }
+    },
+    "Основной_пакет/01_Закупка/Исходная_ведомость_цен_v02.xlsx": {
+      "sheets": [
+        "Цены_КНР",
+        "Сводка",
+        "BOM_заказчику",
+        "BOM_полный",
+        "Комплектация",
+        "Кабели_разъемы",
+        "Статусы_и_источники",
+        "Сводная_стоимость",
+        "Источники_цен"
+      ],
+      "nonempty_cells": 3103,
+      "formula_errors": [],
+      "keyword_hits": {
+        "аккумуля": [
+          "Цены_КНР!C51=LiFePO4 аккумулятор 12,8 В, 40–60 А·ч, BMS",
+          "BOM_заказчику!C44=Аккумулятор",
+          "BOM_заказчику!F44=LiFePO4 аккумулятор 12,8 В, 40–60 А·ч, BMS",
+          "Комплектация!B8=Аккумулятор",
+          "Сводная_стоимость!A14=Аккумулятор LiFePO4"
+        ],
+        "солнеч": [
+          "Цены_КНР!C56=Солнечная панель наружного исполнения 60–80 Вт",
+          "BOM_заказчику!C45=Солнечная панель",
+          "BOM_заказчику!F45=Солнечная панель наружного исполнения 60–80 Вт",
+          "Комплектация!B9=Солнечная панель",
+          "Сводная_стоимость!A15=Солнечная панель"
+        ],
+        "антенн": [
+          "Цены_КНР!C42=RF-разъём сотовой антенны",
+          "Цены_КНР!C43=RF-разъём GNSS-антенны",
+          "Цены_КНР!C44=RF-разъём LoRa-антенны",
+          "Цены_КНР!C48=Наружная антенна сотовой связи с кабелем",
+          "Цены_КНР!C49=Активная наружная GNSS-антенна с кабелем",
+          "Цены_КНР!C50=Наружная антенна LoRa 868 МГц с кабелем",
+          "BOM_заказчику!F23=RF-разъём сотовой антенны",
+          "BOM_заказчику!F24=RF-разъём GNSS-антенны",
+          "BOM_заказчику!F25=RF-разъём LoRa-антенны",
+          "BOM_заказчику!C47=Антенна",
+          "BOM_заказчику!F47=Наружная антенна сотовой связи с кабелем",
+          "BOM_заказчику!C48=Антенна",
+          "BOM_заказчику!F48=Активная наружная GNSS-антенна с кабелем",
+          "BOM_заказчику!C49=Антенна",
+          "BOM_заказчику!F49=Наружная антенна LoRa 868 МГц с кабелем",
+          "Комплектация!B11=Антенна LTE",
+          "Комплектация!B12=Антенна GNSS",
+          "Комплектация!B13=Антенна LoRa",
+          "Сводная_стоимость!A17=Антенны LTE/GNSS/LoRa",
+          "Сводная_стоимость!B17=Наружные антенны и кабели трёх радиоканалов"
+        ],
+        "rf": [
+          "Цены_КНР!C21=BLE/OTA сопроцессор nRF52840",
+          "Цены_КНР!B42=J-RF-CELL",
+          "Цены_КНР!C42=RF-разъём сотовой антенны",
+          "Цены_КНР!B43=J-RF-GNSS",
+          "Цены_КНР!C43=RF-разъём GNSS-антенны",
+          "Цены_КНР!B44=J-RF-LORA",
+          "Цены_КНР!C44=RF-разъём LoRa-антенны",
+          "Сводка!J6=RFQ / выбор поставщика",
+          "Сводка!A12=Назначение файла: показать заказчику инженерный состав EVT-PRE-20 до завершения производственного BOM. Позиции TBD / OPEN / RFQ сохранены как есть и не заменены",
+          "BOM_заказчику!A3=Снимок ветки evt-pre-20 @ c678a728501b · инженерный документ · цены заполняются после RFQ",
+          "BOM_заказчику!N5=RFQ / выбор поставщика",
+          "BOM_заказчику!O5=RFQ_REQUIRED",
+          "BOM_заказчику!N6=RFQ / выбор поставщика",
+          "BOM_заказчику!O6=RFQ_REQUIRED",
+          "BOM_заказчику!O18=SELECTED_PENDING_RF_REGULATORY",
+          "BOM_заказчику!F19=BLE/OTA сопроцессор nRF52840",
+          "BOM_заказчику!I19=nRF52840 SMD module with integrated PCB antenna 10.5x15.5 mm",
+          "BOM_заказчику!O19=SELECTED_PENDING_SAMPLE_RF",
+          "BOM_заказчику!P19=ESP32-C3 superseded; integrated antenna requires PCB edge keepout and validation inside final housing; u.FL family variant only by RF fallback decision",
+          "BOM_заказчику!N20=RFQ / выбор поставщика"
+        ],
+        "кабел": [
+          "Цены_КНР!A38=Кабели и разъёмы",
+          "Цены_КНР!C38=Комплект маркированных кабельных жгутов станции",
+          "Цены_КНР!A39=Кабели и разъёмы",
+          "Цены_КНР!A40=Кабели и разъёмы",
+          "Цены_КНР!A41=Кабели и разъёмы",
+          "Цены_КНР!A42=Кабели и разъёмы",
+          "Цены_КНР!A43=Кабели и разъёмы",
+          "Цены_КНР!A44=Кабели и разъёмы",
+          "Цены_КНР!A45=Кабели и разъёмы",
+          "Цены_КНР!A46=Кабели и разъёмы",
+          "Цены_КНР!A47=Кабели и разъёмы",
+          "Цены_КНР!C48=Наружная антенна сотовой связи с кабелем",
+          "Цены_КНР!C49=Активная наружная GNSS-антенна с кабелем",
+          "Цены_КНР!C50=Наружная антенна LoRa 868 МГц с кабелем",
+          "Сводка!A27=Обновление v0.2: добавлены плановые цены закупки из КНР и лист «Сводная_стоимость». Для представления заказчику производство всех плат сведено в одну статью, ка",
+          "BOM_заказчику!F47=Наружная антенна сотовой связи с кабелем",
+          "BOM_заказчику!F48=Активная наружная GNSS-антенна с кабелем",
+          "BOM_заказчику!F49=Наружная антенна LoRa 868 МГц с кабелем",
+          "BOM_заказчику!F50=Комплект маркированных кабельных жгутов станции",
+          "Кабели_разъемы!A1=Кабели и разъёмы · количественные нормы из BOM Policy Rev.A"
+        ]
+      }
+    },
+    "Основной_пакет/02_Сборка_станций/Сборка_соединения_контроль.xlsx": {
+      "sheets": [
+        "Распайка жгутов",
+        "Соединения",
+        "Маршрут сборки",
+        "Входной контроль",
+        "План корпусов",
+        "PCB-MAIN Rev B DFM",
+        "Серийные 1 лот",
+        "Серийные 2 лот"
+      ],
+      "nonempty_cells": 1877,
+      "formula_errors": [],
+      "keyword_hits": {
+        "rf": [
+          "Распайка жгутов!A4=Interface",
+          "Соединения!K5=SELECTED_EVT_CANDIDATES_PHYSICAL_INTERFACE_OPEN",
+          "Соединения!K6=SELECTED_EVT_CANDIDATES_PHYSICAL_INTERFACE_OPEN",
+          "Соединения!J13=Level translation bulk decoupling ESD and RF keepout",
+          "Соединения!F14=RF_CELL",
+          "Соединения!K14=SELECTED_EVT_CANDIDATE_RF_LAYOUT_OPEN",
+          "Соединения!J15=Backup supply filtering ESD and RF keepout",
+          "Соединения!F16=RF_GNSS_BIASED",
+          "Соединения!K16=SELECTED_EVT_CANDIDATE_RF_LAYOUT_OPEN",
+          "Соединения!F18=RF_LORA",
+          "Соединения!K18=SELECTED_EVT_CANDIDATE_RF_LAYOUT_OPEN",
+          "Соединения!L19=Authenticated pairing GATT OTA sleep current enclosure RF and separate nRF SWD recovery",
+          "Соединения!J26=Low-capacitance TVS local bypass RF filtering and service-cover access",
+          "Соединения!J27=Low-capacitance TVS local bypass RF filtering and service-cover access",
+          "Соединения!F34=RF_CELL",
+          "Соединения!K34=SELECTED_EVT_CANDIDATE_INSTALLED_RF_OPEN",
+          "Соединения!F35=RF_GNSS_BIASED",
+          "Соединения!K35=SELECTED_EVT_CANDIDATE_INSTALLED_RF_OPEN",
+          "Соединения!F36=RF_LORA",
+          "Соединения!K36=SELECTED_EVT_CANDIDATE_INSTALLED_RF_OPEN"
+        ]
+      }
+    },
+    "Основной_пакет/03_Корпуса_для_3D_печати_ПРЕДВАРИТЕЛЬНО/Ведомость_печатных_деталей_акустической_головы.xlsx": {
+      "sheets": [
+        "Детали головы"
+      ],
+      "nonempty_cells": 79,
+      "formula_errors": [],
+      "keyword_hits": {
+        "кабел": [
+          "Детали головы!F10=Первая половина кабельного лючка / cable hatch half A",
+          "Детали головы!F11=Вторая половина кабельного лючка / cable hatch half B"
+        ]
+      }
+    },
+    "Основной_пакет/03_Корпуса_для_3D_печати_ПРЕДВАРИТЕЛЬНО/Верхний_электронный_модуль/Ведомость_корпуса_PCB_MAIN_Rev_B.xlsx": {
+      "sheets": [
+        "Корпус MAIN"
+      ],
+      "nonempty_cells": 49,
+      "formula_errors": [],
+      "keyword_hits": {}
+    },
+    "Основной_пакет/05_Заказ_жгутов_и_кабелей/Заказ_и_распайка_жгутов.xlsx": {
+      "sheets": [
+        "Сводка заказа",
+        "Распайка 38 цепей",
+        "Материалы",
+        "Контроль",
+        "Антенны и RF"
+      ],
+      "nonempty_cells": 666,
+      "formula_errors": [],
+      "keyword_hits": {
+        "антенн": [
+          "Антенны и RF!A1=EVT-PRE-20 Rev D — антенны и RF-кабели / Antennas and RF cables",
+          "Антенны и RF!H2=Антенна",
+          "Антенны и RF!I2=Антенна, описание",
+          "Антенны и RF!K2=Заказ антенн"
+        ],
+        "rf": [
+          "Антенны и RF!A1=EVT-PRE-20 Rev D — антенны и RF-кабели / Antennas and RF cables",
+          "Антенны и RF!A3=RF-CELL",
+          "Антенны и RF!A4=RF-GNSS",
+          "Антенны и RF!A5=RF-RU868"
+        ],
+        "кабел": [
+          "Антенны и RF!A1=EVT-PRE-20 Rev D — антенны и RF-кабели / Antennas and RF cables"
+        ]
+      }
+    },
+    "Заказ_плат_и_монтаж/00_Условия_передачи/BOM_плат_для_монтажа.xlsx": {
+      "sheets": [
+        "PCB-PWR BOM",
+        "PCB-PWR DNP",
+        "PCB-MIC BOM",
+        "PCB-MAIN BOM",
+        "Сводка"
+      ],
+      "nonempty_cells": 2076,
+      "formula_errors": [],
+      "keyword_hits": {
+        "rf": [
+          "PCB-MAIN BOM!D73=5 V bidirectional 0.2 pF RF ESD",
+          "PCB-MAIN BOM!D74=5.5 V unidirectional 0.5 pF RF ESD",
+          "PCB-MAIN BOM!D75=5 V bidirectional 0.2 pF RF ESD"
+        ]
+      }
+    },
+    "Заказ_плат_и_монтаж/02_PCB_MIC_управляемый_заказ_и_монтаж/02_Монтаж_платы/PCB-MIC_производственный_BOM.xlsx": {
+      "sheets": [
+        "Производственный BOM",
+        "Контроль заказа"
+      ],
+      "nonempty_cells": 90,
+      "formula_errors": [],
+      "keyword_hits": {}
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/01_Изготовление_платы/PCB-MAIN_ИМПЕДАНС_ТРАССЫ_REV_D.xlsx": {
+      "sheets": [
+        "Трассы RF и USB"
+      ],
+      "nonempty_cells": 171,
+      "formula_errors": [],
+      "keyword_hits": {
+        "rf": [
+          "Трассы RF и USB!A3=RF",
+          "Трассы RF и USB!B3=CELL_RF",
+          "Трассы RF и USB!A4=RF",
+          "Трассы RF и USB!B4=CELL_RF_ANT",
+          "Трассы RF и USB!A5=RF",
+          "Трассы RF и USB!B5=GNSS_RF_ANT_BIASED",
+          "Трассы RF и USB!A6=RF",
+          "Трассы RF и USB!B6=GNSS_RF_DC_BLOCK",
+          "Трассы RF и USB!A7=RF",
+          "Трассы RF и USB!B7=GNSS_RF_FILTERED",
+          "Трассы RF и USB!A8=RF",
+          "Трассы RF и USB!B8=LORA_RF_ANT",
+          "Трассы RF и USB!A9=RF",
+          "Трассы RF и USB!B9=LORA_RF_MODULE"
+        ]
+      }
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/02_Монтаж_платы/PCB-MAIN_PLACEMENT_INDEX.xlsx": {
+      "sheets": [
+        "Размещение",
+        "Условия"
+      ],
+      "nonempty_cells": 1497,
+      "formula_errors": [],
+      "keyword_hits": {}
+    },
+    "Заказ_жгутов_и_кабелей/Заказ_и_распайка_жгутов.xlsx": {
+      "sheets": [
+        "Сводка заказа",
+        "Распайка 38 цепей",
+        "Материалы",
+        "Контроль",
+        "Антенны и RF"
+      ],
+      "nonempty_cells": 666,
+      "formula_errors": [],
+      "keyword_hits": {
+        "антенн": [
+          "Антенны и RF!A1=EVT-PRE-20 Rev D — антенны и RF-кабели / Antennas and RF cables",
+          "Антенны и RF!H2=Антенна",
+          "Антенны и RF!I2=Антенна, описание",
+          "Антенны и RF!K2=Заказ антенн"
+        ],
+        "rf": [
+          "Антенны и RF!A1=EVT-PRE-20 Rev D — антенны и RF-кабели / Antennas and RF cables",
+          "Антенны и RF!A3=RF-CELL",
+          "Антенны и RF!A4=RF-GNSS",
+          "Антенны и RF!A5=RF-RU868"
+        ],
+        "кабел": [
+          "Антенны и RF!A1=EVT-PRE-20 Rev D — антенны и RF-кабели / Antennas and RF cables"
+        ]
+      }
+    },
+    "Сборка_и_корпуса/02_Сборка_станций/Сборка_соединения_контроль.xlsx": {
+      "sheets": [
+        "Распайка жгутов",
+        "Соединения",
+        "Маршрут сборки",
+        "Входной контроль",
+        "План корпусов",
+        "PCB-MAIN Rev B DFM",
+        "Серийные 1 лот",
+        "Серийные 2 лот"
+      ],
+      "nonempty_cells": 1877,
+      "formula_errors": [],
+      "keyword_hits": {
+        "rf": [
+          "Распайка жгутов!A4=Interface",
+          "Соединения!K5=SELECTED_EVT_CANDIDATES_PHYSICAL_INTERFACE_OPEN",
+          "Соединения!K6=SELECTED_EVT_CANDIDATES_PHYSICAL_INTERFACE_OPEN",
+          "Соединения!J13=Level translation bulk decoupling ESD and RF keepout",
+          "Соединения!F14=RF_CELL",
+          "Соединения!K14=SELECTED_EVT_CANDIDATE_RF_LAYOUT_OPEN",
+          "Соединения!J15=Backup supply filtering ESD and RF keepout",
+          "Соединения!F16=RF_GNSS_BIASED",
+          "Соединения!K16=SELECTED_EVT_CANDIDATE_RF_LAYOUT_OPEN",
+          "Соединения!F18=RF_LORA",
+          "Соединения!K18=SELECTED_EVT_CANDIDATE_RF_LAYOUT_OPEN",
+          "Соединения!L19=Authenticated pairing GATT OTA sleep current enclosure RF and separate nRF SWD recovery",
+          "Соединения!J26=Low-capacitance TVS local bypass RF filtering and service-cover access",
+          "Соединения!J27=Low-capacitance TVS local bypass RF filtering and service-cover access",
+          "Соединения!F34=RF_CELL",
+          "Соединения!K34=SELECTED_EVT_CANDIDATE_INSTALLED_RF_OPEN",
+          "Соединения!F35=RF_GNSS_BIASED",
+          "Соединения!K35=SELECTED_EVT_CANDIDATE_INSTALLED_RF_OPEN",
+          "Соединения!F36=RF_LORA",
+          "Соединения!K36=SELECTED_EVT_CANDIDATE_INSTALLED_RF_OPEN"
+        ]
+      }
+    },
+    "Сборка_и_корпуса/03_Корпуса_для_3D_печати_ПРЕДВАРИТЕЛЬНО/Ведомость_печатных_деталей_акустической_головы.xlsx": {
+      "sheets": [
+        "Детали головы"
+      ],
+      "nonempty_cells": 79,
+      "formula_errors": [],
+      "keyword_hits": {
+        "кабел": [
+          "Детали головы!F10=Первая половина кабельного лючка / cable hatch half A",
+          "Детали головы!F11=Вторая половина кабельного лючка / cable hatch half B"
+        ]
+      }
+    },
+    "Сборка_и_корпуса/03_Корпуса_для_3D_печати_ПРЕДВАРИТЕЛЬНО/Верхний_электронный_модуль/Ведомость_корпуса_PCB_MAIN_Rev_B.xlsx": {
+      "sheets": [
+        "Корпус MAIN"
+      ],
+      "nonempty_cells": 49,
+      "formula_errors": [],
+      "keyword_hits": {}
+    },
+    "Программа_EVT_и_Мухоед/02_Таблицы_испытаний_и_отчетов/EVT_матрица_и_отчеты.xlsx": {
+      "sheets": [
+        "Матрица EVT",
+        "Реестр EOL",
+        "Отклонения",
+        "Трассировка",
+        "Открытые входы"
+      ],
+      "nonempty_cells": 932,
+      "formula_errors": [],
+      "keyword_hits": {
+        "rf": [
+          "Матрица EVT!F7=Rail undershoot recovery stability harness drop and RF path resistance",
+          "Матрица EVT!G7=All U8 VBAT pads remain >=3.3 V; RF path <=100 mOhm at 25 C; no unintended current limit oscillation or brownout",
+          "Матрица EVT!B9=PCB-PWR RF coexistence",
+          "Матрица EVT!G9=Frozen RF coexistence limits met with no destructive or persistent service loss",
+          "Матрица EVT!H9=After buck layout frequency filter antenna enclosure or RF profile change",
+          "Матрица EVT!I9=Near-field maps RF logs spectrum captures and synchronized power traces",
+          "Матрица EVT!F15=Startup success rail margins oscillator/PPS behavior audio integrity RF service operation",
+          "Матрица EVT!I15=Chamber log scope captures current traces station logs audio RF evidence",
+          "Матрица EVT!F16=Component/PCB temperatures brownout errors RF/audio degradation watchdog resets",
+          "Матрица EVT!I16=Thermocouple/IR data current traces logs RF/audio evidence",
+          "Матрица EVT!G17=No intermittent connector/solder failure; no permanent functional degradation; acoustic/RF/timing deltas within frozen EVT limits",
+          "Матрица EVT!D21=GNSS RF setup",
+          "Матрица EVT!G26=Approved regional and RF specification",
+          "Матрица EVT!H26=After RF or profile change",
+          "Матрица EVT!F32=Dimensions damage seal acoustic and RF delta",
+          "Матрица EVT!I32=Print lot/material log FAI serial photos fit torque acoustic RF and ingress reports",
+          "Матрица EVT!F33=Dimensions warp seal acoustic and RF delta",
+          "Матрица EVT!A38=EVT-MAIN-RF-01",
+          "Матрица EVT!B38=As-routed PCB-MAIN RF validation",
+          "Матрица EVT!E38=VNA path response and installed cellular GNSS LoRa sensitivity/coexistence on two samples; basic RF function on every station"
+        ]
+      }
+    },
+    "Ревью_PCB_MIC_отдельно/01_Решение_Review_B/PCB-MIC_матрица_Review_B.xlsx": {
+      "sheets": [
+        "Review B",
+        "Parity 55"
+      ],
+      "nonempty_cells": 401,
+      "formula_errors": [],
+      "keyword_hits": {}
+    }
+  },
+  "pdfs": {
+    "Основной_пакет/00_Опись_и_статус/ИЗВЕЩЕНИЕ_ПО_ЕДИНОЙ_ПАРТИИ_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 2649,
+      "cyrillic_characters": 1079,
+      "latin_characters": 990,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Основной_пакет/02_Сборка_станций/Корпус_PCB_MAIN_Rev_B_сборка_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 1955,
+      "cyrillic_characters": 677,
+      "latin_characters": 827,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Основной_пакет/02_Сборка_станций/Полная_схема_сборки_акустической_головы_и_станции_RU_EN.pdf": {
+      "pages": 5,
+      "text_characters": 6869,
+      "cyrillic_characters": 2491,
+      "latin_characters": 2540,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Основной_пакет/02_Сборка_станций/Схема_межблочных_соединений_RU_EN.pdf": {
+      "pages": 3,
+      "text_characters": 3856,
+      "cyrillic_characters": 540,
+      "latin_characters": 2180,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Основной_пакет/05_Заказ_жгутов_и_кабелей/Антенные_тракты_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 939,
+      "cyrillic_characters": 208,
+      "latin_characters": 366,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Основной_пакет/05_Заказ_жгутов_и_кабелей/Чертеж_и_распайка_жгутов_RU_EN.pdf": {
+      "pages": 3,
+      "text_characters": 8055,
+      "cyrillic_characters": 816,
+      "latin_characters": 3051,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/00_Условия_передачи/ИЗВЕЩЕНИЕ_ПО_ЕДИНОЙ_ПАРТИИ_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 2649,
+      "cyrillic_characters": 1079,
+      "latin_characters": 990,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/01_PCB_PWR_заводская_проверка_и_заказ/01_Изготовление_платы/PCB-PWR_copper_layers.pdf": {
+      "pages": 4,
+      "text_characters": 3,
+      "cyrillic_characters": 0,
+      "latin_characters": 0,
+      "bilingual_expected": false,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/01_PCB_PWR_заводская_проверка_и_заказ/01_Изготовление_платы/Сверловка_Excellon/PCB-PWR-drl_map.pdf": {
+      "pages": 1,
+      "text_characters": 161,
+      "cyrillic_characters": 0,
+      "latin_characters": 70,
+      "bilingual_expected": false,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/01_PCB_PWR_заводская_проверка_и_заказ/02_Монтаж_платы/PCB-PWR_assembly_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 1878,
+      "cyrillic_characters": 611,
+      "latin_characters": 731,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/01_PCB_PWR_заводская_проверка_и_заказ/02_Монтаж_платы/PCB-PWR_schematic_RU_EN.pdf": {
+      "pages": 5,
+      "text_characters": 7310,
+      "cyrillic_characters": 533,
+      "latin_characters": 4193,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/01_PCB_PWR_заводская_проверка_и_заказ/ИЗВЕЩЕНИЕ_ПО_ЕДИНОЙ_ПАРТИИ_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 2649,
+      "cyrillic_characters": 1079,
+      "latin_characters": 990,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/02_PCB_MIC_управляемый_заказ_и_монтаж/01_Изготовление_платы/Сверловка_Excellon/PCB-MIC-NPTH-drl_map.pdf": {
+      "pages": 1,
+      "text_characters": 89,
+      "cyrillic_characters": 0,
+      "latin_characters": 39,
+      "bilingual_expected": false,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/02_PCB_MIC_управляемый_заказ_и_монтаж/01_Изготовление_платы/Сверловка_Excellon/PCB-MIC-PTH-drl_map.pdf": {
+      "pages": 1,
+      "text_characters": 37,
+      "cyrillic_characters": 0,
+      "latin_characters": 15,
+      "bilingual_expected": false,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/02_PCB_MIC_управляемый_заказ_и_монтаж/02_Монтаж_платы/PCB-MIC_schematic_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 553,
+      "cyrillic_characters": 33,
+      "latin_characters": 309,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/02_PCB_MIC_управляемый_заказ_и_монтаж/02_Монтаж_платы/PCB-MIC_сборка_и_акустический_контроль_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 1383,
+      "cyrillic_characters": 365,
+      "latin_characters": 559,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/02_PCB_MIC_управляемый_заказ_и_монтаж/ИЗВЕЩЕНИЕ_ПО_ЕДИНОЙ_ПАРТИИ_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 2649,
+      "cyrillic_characters": 1079,
+      "latin_characters": 990,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/01_Изготовление_платы/VIA_FILL_CAP_76_MAP_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 993,
+      "cyrillic_characters": 259,
+      "latin_characters": 343,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/01_Изготовление_платы/Сверловка_Excellon/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-NPTH-drl_map.pdf": {
+      "pages": 1,
+      "text_characters": 171,
+      "cyrillic_characters": 0,
+      "latin_characters": 72,
+      "bilingual_expected": false,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/01_Изготовление_платы/Сверловка_Excellon/PCB-MAIN_8L_COMPLETE_105_CANDIDATE_REV_B-PTH-drl_map.pdf": {
+      "pages": 1,
+      "text_characters": 133,
+      "cyrillic_characters": 0,
+      "latin_characters": 41,
+      "bilingual_expected": false,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/02_Монтаж_платы/PCB-MAIN_SCHEMATIC_RU_EN.pdf": {
+      "pages": 10,
+      "text_characters": 31527,
+      "cyrillic_characters": 859,
+      "latin_characters": 18881,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/02_Монтаж_платы/PCB-MAIN_Сборка_и_DFM_RU_EN.pdf": {
+      "pages": 3,
+      "text_characters": 3649,
+      "cyrillic_characters": 969,
+      "latin_characters": 1520,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/ИЗВЕЩЕНИЕ_ПО_ЕДИНОЙ_ПАРТИИ_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 2649,
+      "cyrillic_characters": 1079,
+      "latin_characters": 990,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_жгутов_и_кабелей/Антенные_тракты_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 939,
+      "cyrillic_characters": 208,
+      "latin_characters": 366,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Заказ_жгутов_и_кабелей/Чертеж_и_распайка_жгутов_RU_EN.pdf": {
+      "pages": 3,
+      "text_characters": 8055,
+      "cyrillic_characters": 816,
+      "latin_characters": 3051,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Сборка_и_корпуса/02_Сборка_станций/Корпус_PCB_MAIN_Rev_B_сборка_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 1955,
+      "cyrillic_characters": 677,
+      "latin_characters": 827,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Сборка_и_корпуса/02_Сборка_станций/Полная_схема_сборки_акустической_головы_и_станции_RU_EN.pdf": {
+      "pages": 5,
+      "text_characters": 6869,
+      "cyrillic_characters": 2491,
+      "latin_characters": 2540,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Сборка_и_корпуса/02_Сборка_станций/Схема_межблочных_соединений_RU_EN.pdf": {
+      "pages": 3,
+      "text_characters": 3856,
+      "cyrillic_characters": 540,
+      "latin_characters": 2180,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Ревью_PCB_MIC_отдельно/01_Решение_Review_B/ИЗВЕЩЕНИЕ_ПО_ЕДИНОЙ_ПАРТИИ_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 2649,
+      "cyrillic_characters": 1079,
+      "latin_characters": 990,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Ревью_PCB_MIC_отдельно/03_Исправленный_CAM/PCB-MIC_сборка_и_акустический_контроль_RU_EN.pdf": {
+      "pages": 1,
+      "text_characters": 1383,
+      "cyrillic_characters": 365,
+      "latin_characters": 559,
+      "bilingual_expected": true,
+      "bilingual_pass": true
+    },
+    "Ревью_PCB_MIC_отдельно/03_Исправленный_CAM/Сверловка_Excellon/PCB-MIC-NPTH-drl_map.pdf": {
+      "pages": 1,
+      "text_characters": 89,
+      "cyrillic_characters": 0,
+      "latin_characters": 39,
+      "bilingual_expected": false,
+      "bilingual_pass": true
+    },
+    "Ревью_PCB_MIC_отдельно/03_Исправленный_CAM/Сверловка_Excellon/PCB-MIC-PTH-drl_map.pdf": {
+      "pages": 1,
+      "text_characters": 37,
+      "cyrillic_characters": 0,
+      "latin_characters": 15,
+      "bilingual_expected": false,
+      "bilingual_pass": true
+    }
+  },
+  "csvs": {
+    "Основной_пакет/01_Закупка/BOM_закупка_EVT_PRE_20_первый_лот_3D.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 112,
+      "max_columns": 25
+    },
+    "Основной_пакет/01_Закупка/План_корпусов_первый_лот_3D.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 21,
+      "max_columns": 8
+    },
+    "Основной_пакет/02_Сборка_станций/Машинные_таблицы/ASSEMBLY_ROUTE.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 27,
+      "max_columns": 10
+    },
+    "Основной_пакет/02_Сборка_станций/Машинные_таблицы/EVT_PRE_20_INTERCONNECT_DRAFT.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 33,
+      "max_columns": 12
+    },
+    "Основной_пакет/02_Сборка_станций/Машинные_таблицы/HARNESS_LOGICAL_PINOUT_REV_A.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 44,
+      "max_columns": 12
+    },
+    "Основной_пакет/03_Корпуса_для_3D_печати_ПРЕДВАРИТЕЛЬНО/Ведомость_печатных_деталей_акустической_головы.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 12,
+      "max_columns": 7
+    },
+    "Основной_пакет/03_Корпуса_для_3D_печати_ПРЕДВАРИТЕЛЬНО/Верхний_электронный_модуль/Ведомость_корпуса_PCB_MAIN_Rev_B.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 6,
+      "max_columns": 8
+    },
+    "Основной_пакет/05_Заказ_жгутов_и_кабелей/Антенны_и_RF_кабели.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 4,
+      "max_columns": 11
+    },
+    "Основной_пакет/05_Заказ_жгутов_и_кабелей/Длины_и_состав_жгутов.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 7,
+      "max_columns": 14
+    },
+    "Основной_пакет/05_Заказ_жгутов_и_кабелей/Распайка_жгутов_38_цепей.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 39,
+      "max_columns": 22
+    },
+    "Основной_пакет/МАНИФЕСТ_SHA256.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 144,
+      "max_columns": 2
+    },
+    "Заказ_плат_и_монтаж/00_Условия_передачи/BOM_плат_без_цен_RevB.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 112,
+      "max_columns": 21
+    },
+    "Заказ_плат_и_монтаж/01_PCB_PWR_заводская_проверка_и_заказ/02_Монтаж_платы/PCB-PWR_BOM_PCBA.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 24,
+      "max_columns": 8
+    },
+    "Заказ_плат_и_монтаж/01_PCB_PWR_заводская_проверка_и_заказ/02_Монтаж_платы/PCB-PWR_DNP_И_ОСОБЫЕ_ПОЗИЦИИ.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 5,
+      "max_columns": 6
+    },
+    "Заказ_плат_и_монтаж/01_PCB_PWR_заводская_проверка_и_заказ/02_Монтаж_платы/PCB-PWR_pos.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 45,
+      "max_columns": 7
+    },
+    "Заказ_плат_и_монтаж/01_PCB_PWR_заводская_проверка_и_заказ/03_Исходники_и_контроль/PCB-PWR_parity_disposition.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 190,
+      "max_columns": 9
+    },
+    "Заказ_плат_и_монтаж/02_PCB_MIC_управляемый_заказ_и_монтаж/02_Монтаж_платы/PCB-MIC_kicad_bom.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 5,
+      "max_columns": 4
+    },
+    "Заказ_плат_и_монтаж/02_PCB_MIC_управляемый_заказ_и_монтаж/02_Монтаж_платы/PCB-MIC_manufacturing_bom.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 5,
+      "max_columns": 12
+    },
+    "Заказ_плат_и_монтаж/02_PCB_MIC_управляемый_заказ_и_монтаж/02_Монтаж_платы/PCB-MIC_pos.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 5,
+      "max_columns": 7
+    },
+    "Заказ_плат_и_монтаж/02_PCB_MIC_управляемый_заказ_и_монтаж/03_Исходники_и_контроль/PCB-MIC_диспозиция_синхронизации.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 56,
+      "max_columns": 7
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/01_Изготовление_платы/PCB-MAIN_ИМПЕДАНС_ТРАССЫ_REV_D.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 24,
+      "max_columns": 9
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/01_Изготовление_платы/VIA_FILL_CAP_76_ORDER_REV_D.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 77,
+      "max_columns": 8
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/02_Монтаж_платы/PCB-MAIN_BOM_PCBA.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 228,
+      "max_columns": 9
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/02_Монтаж_платы/PCB-MAIN_BOM_SCHEMATIC.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 249,
+      "max_columns": 5
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/02_Монтаж_платы/PCB-MAIN_DNP.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 16,
+      "max_columns": 5
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/02_Монтаж_платы/PCB-MAIN_OFFBOARD_STATION.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 2,
+      "max_columns": 5
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/02_Монтаж_платы/PCB-MAIN_POS_BOTTOM_ALL.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 6,
+      "max_columns": 7
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/02_Монтаж_платы/PCB-MAIN_POS_TOP_ALL.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 232,
+      "max_columns": 7
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/02_Монтаж_платы/PCB-MAIN_POS_TOP_PCBA.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 228,
+      "max_columns": 7
+    },
+    "Заказ_плат_и_монтаж/03_PCB_MAIN_заказ_с_DFM/02_Монтаж_платы/PCB-MAIN_POS_TOP_SMD.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 58,
+      "max_columns": 7
+    },
+    "Заказ_плат_и_монтаж/МАНИФЕСТ_SHA256.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 215,
+      "max_columns": 2
+    },
+    "Заказ_жгутов_и_кабелей/Антенны_и_RF_кабели.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 4,
+      "max_columns": 11
+    },
+    "Заказ_жгутов_и_кабелей/Длины_и_состав_жгутов.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 7,
+      "max_columns": 14
+    },
+    "Заказ_жгутов_и_кабелей/МАНИФЕСТ_SHA256.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 9,
+      "max_columns": 2
+    },
+    "Заказ_жгутов_и_кабелей/Распайка_жгутов_38_цепей.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 39,
+      "max_columns": 22
+    },
+    "Сборка_и_корпуса/02_Сборка_станций/Машинные_таблицы/ASSEMBLY_ROUTE.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 27,
+      "max_columns": 10
+    },
+    "Сборка_и_корпуса/02_Сборка_станций/Машинные_таблицы/EVT_PRE_20_INTERCONNECT_DRAFT.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 33,
+      "max_columns": 12
+    },
+    "Сборка_и_корпуса/02_Сборка_станций/Машинные_таблицы/HARNESS_LOGICAL_PINOUT_REV_A.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 44,
+      "max_columns": 12
+    },
+    "Сборка_и_корпуса/03_Корпуса_для_3D_печати_ПРЕДВАРИТЕЛЬНО/Ведомость_печатных_деталей_акустической_головы.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 12,
+      "max_columns": 7
+    },
+    "Сборка_и_корпуса/03_Корпуса_для_3D_печати_ПРЕДВАРИТЕЛЬНО/Верхний_электронный_модуль/Ведомость_корпуса_PCB_MAIN_Rev_B.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 6,
+      "max_columns": 8
+    },
+    "Сборка_и_корпуса/МАНИФЕСТ_SHA256.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 122,
+      "max_columns": 2
+    },
+    "Программа_EVT_и_Мухоед/03_Машинные_реестры/DEVIATION_LOG.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 2,
+      "max_columns": 15
+    },
+    "Программа_EVT_и_Мухоед/03_Машинные_реестры/EOL_RESULT_REGISTER.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 21,
+      "max_columns": 21
+    },
+    "Программа_EVT_и_Мухоед/03_Машинные_реестры/EVT_MATRIX.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 36,
+      "max_columns": 10
+    },
+    "Программа_EVT_и_Мухоед/03_Машинные_реестры/REQUIREMENTS_TRACEABILITY.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 37,
+      "max_columns": 8
+    },
+    "Программа_EVT_и_Мухоед/МАНИФЕСТ_SHA256.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 15,
+      "max_columns": 2
+    },
+    "Ревью_PCB_MIC_отдельно/02_Доказательства/PCB_MIC_PARITY_DISPOSITION_REV_B.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 56,
+      "max_columns": 7
+    },
+    "Ревью_PCB_MIC_отдельно/МАНИФЕСТ_SHA256.csv": {
+      "encoding": "utf-8-sig",
+      "delimiter": ",",
+      "rows": 43,
+      "max_columns": 2
+    }
+  }
+}

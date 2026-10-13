@@ -1,0 +1,11 @@
+{
+  "status": "PRELIMINARY_SHAPE_ONLY_NOT_TOOLING_READY",
+  "head_or_body_id": "DIO-3DP-UP-001B",
+  "approved_appearance": "Рисунок1.png",
+  "outer_mm": [
+    200.0,
+    145.0,
+    59.0
+  ],
+  "draft_parting_shrinkage_inserts_gasket_and_first_fit": "PENDING"
+}

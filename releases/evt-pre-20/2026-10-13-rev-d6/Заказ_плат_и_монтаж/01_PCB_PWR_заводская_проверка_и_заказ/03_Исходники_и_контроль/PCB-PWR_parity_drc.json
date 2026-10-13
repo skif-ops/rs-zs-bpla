@@ -1,0 +1,2987 @@
+{
+    "$schema": "https://schemas.kicad.org/drc.v1.json",
+    "coordinate_units": "mm",
+    "date": "2026-09-29T09:29:05+0000",
+    "included_severities": [
+        "error",
+        "warning",
+        "exclusion"
+    ],
+    "kicad_version": "9.0.9",
+    "schematic_parity": [
+        {
+            "description": "Pad net (LM74700_VCAP) doesn't match net given by schematic (/Input protection and monitor/LM74700_VCAP).",
+            "items": [
+                {
+                    "description": "Pad 1 [LM74700_VCAP] of C1 on F.Cu",
+                    "pos": {
+                        "x": 19.52,
+                        "y": 26.0
+                    },
+                    "uuid": "fa7a43f8-d69b-412c-bf29-e203e71b8c02"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
+            "items": [
+                {
+                    "description": "Pad 2 [VBAT_FUSED] of C1 on F.Cu",
+                    "pos": {
+                        "x": 20.48,
+                        "y": 26.0
+                    },
+                    "uuid": "5845e557-4d9d-4a40-a30b-6e9e129de21c"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V3_DIGITAL] of C2 on F.Cu",
+                    "pos": {
+                        "x": 48.02,
+                        "y": 22.0
+                    },
+                    "uuid": "27599666-a8cc-4c43-ad02-f8bb5756534e"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C2 on F.Cu",
+                    "pos": {
+                        "x": 48.98,
+                        "y": 22.0
+                    },
+                    "uuid": "d0462d4d-ab13-41e1-99d2-05dd358d9af6"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_FUSED] of C9 on F.Cu",
+                    "pos": {
+                        "x": 15.225,
+                        "y": 26.75
+                    },
+                    "uuid": "a0d419ea-616d-416d-b1f0-4a8ddebf3668"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C9 on F.Cu",
+                    "pos": {
+                        "x": 16.775,
+                        "y": 26.75
+                    },
+                    "uuid": "92aef4de-55f3-4cb8-80c5-d917aed74236"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_PROTECTED] of C10 on F.Cu",
+                    "pos": {
+                        "x": 32.525,
+                        "y": 26.0
+                    },
+                    "uuid": "89f0cff0-07a1-4845-958f-71fd83dc6fdb"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C10 on F.Cu",
+                    "pos": {
+                        "x": 35.475,
+                        "y": 26.0
+                    },
+                    "uuid": "d8625eb5-bff9-435f-bbd8-35f060e3ba72"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_SYS] of C13 on F.Cu",
+                    "pos": {
+                        "x": 44.3,
+                        "y": 32.0
+                    },
+                    "uuid": "ad8eb2b9-f19f-406a-851b-63d3bd693c22"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C13 on F.Cu",
+                    "pos": {
+                        "x": 49.7,
+                        "y": 32.0
+                    },
+                    "uuid": "48384fe8-01d2-405c-ba95-538f20cb735b"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Value (D1) doesn't match symbol value (SMBJ18A CANDIDATE).",
+            "items": [
+                {
+                    "description": "Footprint D1",
+                    "pos": {
+                        "x": 14.5,
+                        "y": 34.0
+                    },
+                    "uuid": "c41ed018-0a4a-4830-b1f2-54bfc384205d"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_FUSED] of D1 on F.Cu",
+                    "pos": {
+                        "x": 14.5,
+                        "y": 36.15
+                    },
+                    "uuid": "689d32a0-c4a8-4487-a634-f0590c3c385b"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of D1 on F.Cu",
+                    "pos": {
+                        "x": 14.5,
+                        "y": 31.85
+                    },
+                    "uuid": "285d7d11-a76d-4ea4-bf71-82c157826c4b"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_RAW) doesn't match net given by schematic (/Input protection and monitor/VBAT_RAW).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_RAW] of F1 on F.Cu",
+                    "pos": {
+                        "x": 11.6,
+                        "y": 29.0
+                    },
+                    "uuid": "91e5607c-ca23-40e2-bd4e-e395ac9e01fc"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
+            "items": [
+                {
+                    "description": "Pad 2 [VBAT_FUSED] of F1 on F.Cu",
+                    "pos": {
+                        "x": 14.4,
+                        "y": 29.0
+                    },
+                    "uuid": "e3f512f2-6972-40cd-af4e-25455ffe9372"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Value (J1) doesn't match symbol value (43045-0213).",
+            "items": [
+                {
+                    "description": "Footprint J1",
+                    "pos": {
+                        "x": 6.0,
+                        "y": 28.0
+                    },
+                    "uuid": "595f6fca-c8b1-418d-b4c0-2a4b526dc6a2"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (VBAT_RAW) doesn't match net given by schematic (/Input protection and monitor/VBAT_RAW).",
+            "items": [
+                {
+                    "description": "PTH pad 1 [VBAT_RAW] of J1",
+                    "pos": {
+                        "x": 6.0,
+                        "y": 31.0
+                    },
+                    "uuid": "cf9c2f33-caf1-49ea-9c3b-06baaef20da6"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "PTH pad 2 [GND_PWR] of J1",
+                    "pos": {
+                        "x": 6.0,
+                        "y": 28.0
+                    },
+                    "uuid": "d13b0cf3-e430-4c80-ac4f-739e964df56b"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_FUSED] of Q1 on F.Cu",
+                    "pos": {
+                        "x": 29.77,
+                        "y": 31.905
+                    },
+                    "uuid": "fc17ffb3-dbd9-4d4e-acb2-78688c2eac9d"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
+            "items": [
+                {
+                    "description": "Pad 2 [VBAT_FUSED] of Q1 on F.Cu",
+                    "pos": {
+                        "x": 29.77,
+                        "y": 30.635
+                    },
+                    "uuid": "aab166bd-3369-498c-8b32-a06a322838e9"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
+            "items": [
+                {
+                    "description": "Pad 3 [VBAT_FUSED] of Q1 on F.Cu",
+                    "pos": {
+                        "x": 29.77,
+                        "y": 29.365
+                    },
+                    "uuid": "79fdcdc2-c310-49d1-a46e-e2138e8465ce"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (REV_GATE) doesn't match net given by schematic (/Input protection and monitor/REV_GATE).",
+            "items": [
+                {
+                    "description": "Pad 4 [REV_GATE] of Q1 on F.Cu",
+                    "pos": {
+                        "x": 29.77,
+                        "y": 28.095
+                    },
+                    "uuid": "560ac090-a895-4baa-9f2f-090c84668a6e"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
+            "items": [
+                {
+                    "description": "Pad 5 [VBAT_PROTECTED] of Q1 on F.Cu",
+                    "pos": {
+                        "x": 25.764,
+                        "y": 28.095
+                    },
+                    "uuid": "b6be0a7c-8b76-4559-9efd-9b419f725b5a"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
+            "items": [
+                {
+                    "description": "Pad 5 [VBAT_PROTECTED] of Q1 on F.Cu",
+                    "pos": {
+                        "x": 26.059,
+                        "y": 28.73
+                    },
+                    "uuid": "8e1b550f-e7d2-4139-9f3e-b4290fe3582f"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
+            "items": [
+                {
+                    "description": "Pad 5 [VBAT_PROTECTED] of Q1 on F.Cu",
+                    "pos": {
+                        "x": 26.059,
+                        "y": 30.0
+                    },
+                    "uuid": "e7efc729-06b7-4fb5-92ef-0fa8d30346ad"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
+            "items": [
+                {
+                    "description": "Pad 5 [VBAT_PROTECTED] of Q1 on F.Cu",
+                    "pos": {
+                        "x": 26.059,
+                        "y": 31.27
+                    },
+                    "uuid": "dce80b54-89dc-4b88-9b3c-bdf44b1f3737"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
+            "items": [
+                {
+                    "description": "Pad 6 [VBAT_PROTECTED] of Q1 on F.Cu",
+                    "pos": {
+                        "x": 25.764,
+                        "y": 29.365
+                    },
+                    "uuid": "a3dd2e7a-3509-43a2-a735-85300bb187b4"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
+            "items": [
+                {
+                    "description": "Pad 7 [VBAT_PROTECTED] of Q1 on F.Cu",
+                    "pos": {
+                        "x": 25.764,
+                        "y": 30.635
+                    },
+                    "uuid": "8cc2bb7b-e161-4125-a33b-a5a0d3b0ae23"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
+            "items": [
+                {
+                    "description": "Pad 8 [VBAT_PROTECTED] of Q1 on F.Cu",
+                    "pos": {
+                        "x": 25.764,
+                        "y": 31.905
+                    },
+                    "uuid": "23e98392-adcf-4bc6-927f-9063c94079ac"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Value (RSH1) doesn't match symbol value (WSK2512R0100FEA).",
+            "items": [
+                {
+                    "description": "Footprint RSH1",
+                    "pos": {
+                        "x": 36.5,
+                        "y": 31.0
+                    },
+                    "uuid": "7ccbcef5-ad08-44d6-aa03-7260ae68fd3f"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_PROTECTED] of RSH1 on F.Cu",
+                    "pos": {
+                        "x": 33.515,
+                        "y": 30.365
+                    },
+                    "uuid": "0118ca51-ae57-49c8-925f-253f173c6063"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
+            "items": [
+                {
+                    "description": "Pad 2 [VBAT_SYS] of RSH1 on F.Cu",
+                    "pos": {
+                        "x": 39.485,
+                        "y": 31.635
+                    },
+                    "uuid": "fb73400a-a92d-4748-89a0-1b8f6e7729c3"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (SHUNT_SOURCE_SENSE) doesn't match net given by schematic (/Input protection and monitor/SHUNT_SOURCE_SENSE).",
+            "items": [
+                {
+                    "description": "Pad 3 [SHUNT_SOURCE_SENSE] of RSH1 on F.Cu",
+                    "pos": {
+                        "x": 33.22,
+                        "y": 32.27
+                    },
+                    "uuid": "cca10d00-d868-4d90-b3fe-1753d2589414"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (SHUNT_LOAD_SENSE) doesn't match net given by schematic (/Input protection and monitor/SHUNT_LOAD_SENSE).",
+            "items": [
+                {
+                    "description": "Pad 4 [SHUNT_LOAD_SENSE] of RSH1 on F.Cu",
+                    "pos": {
+                        "x": 39.78,
+                        "y": 29.73
+                    },
+                    "uuid": "af8161dd-f532-4512-a08e-26fffdfe8680"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_PROTECTED] of TP1 on F.Cu",
+                    "pos": {
+                        "x": 25.0,
+                        "y": 56.0
+                    },
+                    "uuid": "0f26b012-9dc9-4ded-b4a3-660f055234be"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (SHUNT_SOURCE_SENSE) doesn't match net given by schematic (/Input protection and monitor/SHUNT_SOURCE_SENSE).",
+            "items": [
+                {
+                    "description": "Pad 1 [SHUNT_SOURCE_SENSE] of TP2 on F.Cu",
+                    "pos": {
+                        "x": 27.54,
+                        "y": 56.0
+                    },
+                    "uuid": "57389900-769c-4e3e-bc68-80f6bb1d4432"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (SHUNT_LOAD_SENSE) doesn't match net given by schematic (/Input protection and monitor/SHUNT_LOAD_SENSE).",
+            "items": [
+                {
+                    "description": "Pad 1 [SHUNT_LOAD_SENSE] of TP3 on F.Cu",
+                    "pos": {
+                        "x": 30.08,
+                        "y": 56.0
+                    },
+                    "uuid": "bd743c30-26da-44c9-9f2f-cc3e682f138f"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (FAULT) doesn't match net given by schematic (/FAULT).",
+            "items": [
+                {
+                    "description": "Pad 1 [FAULT] of TP8 on F.Cu",
+                    "pos": {
+                        "x": 42.78,
+                        "y": 56.0
+                    },
+                    "uuid": "3482a7f1-0d52-4dbb-83f8-ed51c9c6237e"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (I2C2_SCL) doesn't match net given by schematic (/I2C2_SCL).",
+            "items": [
+                {
+                    "description": "Pad 1 [I2C2_SCL] of TP9 on F.Cu",
+                    "pos": {
+                        "x": 45.32,
+                        "y": 56.0
+                    },
+                    "uuid": "80698f64-d3ff-4cf5-8d1d-8ccf8371062b"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (I2C2_SDA) doesn't match net given by schematic (/I2C2_SDA).",
+            "items": [
+                {
+                    "description": "Pad 1 [I2C2_SDA] of TP10 on F.Cu",
+                    "pos": {
+                        "x": 47.86,
+                        "y": 56.0
+                    },
+                    "uuid": "2f15a26a-6e21-492e-b1f8-1ffab16cf345"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (LM74700_VCAP) doesn't match net given by schematic (/Input protection and monitor/LM74700_VCAP).",
+            "items": [
+                {
+                    "description": "Pad 1 [LM74700_VCAP] of U1 on F.Cu",
+                    "pos": {
+                        "x": 18.7,
+                        "y": 29.05
+                    },
+                    "uuid": "2f2fa89e-92ee-4109-9c26-10a5505c0e14"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of U1 on F.Cu",
+                    "pos": {
+                        "x": 18.7,
+                        "y": 30.0
+                    },
+                    "uuid": "3de18827-f46d-4b7c-99f4-4dfbd1b5a3df"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
+            "items": [
+                {
+                    "description": "Pad 3 [VBAT_FUSED] of U1 on F.Cu",
+                    "pos": {
+                        "x": 18.7,
+                        "y": 30.95
+                    },
+                    "uuid": "534df239-2b8f-4dbd-9f0b-475bf10cfeb9"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_PROTECTED) doesn't match net given by schematic (/Input protection and monitor/VBAT_PROTECTED).",
+            "items": [
+                {
+                    "description": "Pad 4 [VBAT_PROTECTED] of U1 on F.Cu",
+                    "pos": {
+                        "x": 21.3,
+                        "y": 30.95
+                    },
+                    "uuid": "371a18da-a729-4919-bdc5-7ea45095de84"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (REV_GATE) doesn't match net given by schematic (/Input protection and monitor/REV_GATE).",
+            "items": [
+                {
+                    "description": "Pad 5 [REV_GATE] of U1 on F.Cu",
+                    "pos": {
+                        "x": 21.3,
+                        "y": 30.0
+                    },
+                    "uuid": "773ac078-2670-4a57-ad2c-303ed9589d14"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_FUSED) doesn't match net given by schematic (/Input protection and monitor/VBAT_FUSED).",
+            "items": [
+                {
+                    "description": "Pad 6 [VBAT_FUSED] of U1 on F.Cu",
+                    "pos": {
+                        "x": 21.3,
+                        "y": 29.05
+                    },
+                    "uuid": "3379e070-d35e-4525-a93d-f31828ffd92d"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 1 [GND_PWR] of U2 on F.Cu",
+                    "pos": {
+                        "x": 41.8,
+                        "y": 22.0
+                    },
+                    "uuid": "ecee993b-f763-450b-8ebb-dcde5c69826c"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of U2 on F.Cu",
+                    "pos": {
+                        "x": 41.8,
+                        "y": 22.5
+                    },
+                    "uuid": "fe39a7f4-0649-4496-956f-e074f9bed6d8"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (FAULT) doesn't match net given by schematic (/FAULT).",
+            "items": [
+                {
+                    "description": "Pad 3 [FAULT] of U2 on F.Cu",
+                    "pos": {
+                        "x": 41.8,
+                        "y": 23.0
+                    },
+                    "uuid": "64924e9b-a6ad-41ca-bcc2-5a642c6ea22f"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (I2C2_SDA) doesn't match net given by schematic (/I2C2_SDA).",
+            "items": [
+                {
+                    "description": "Pad 4 [I2C2_SDA] of U2 on F.Cu",
+                    "pos": {
+                        "x": 41.8,
+                        "y": 23.5
+                    },
+                    "uuid": "8e327695-e934-43e2-ba6d-d692a2860a90"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (I2C2_SCL) doesn't match net given by schematic (/I2C2_SCL).",
+            "items": [
+                {
+                    "description": "Pad 5 [I2C2_SCL] of U2 on F.Cu",
+                    "pos": {
+                        "x": 41.8,
+                        "y": 24.0
+                    },
+                    "uuid": "85324c57-7ef0-45b1-a7d7-86d87cf8e384"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 6 [3V3_DIGITAL] of U2 on F.Cu",
+                    "pos": {
+                        "x": 46.2,
+                        "y": 24.0
+                    },
+                    "uuid": "8128b771-7aa2-46a7-a7ce-4c815c6956a7"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 7 [GND_PWR] of U2 on F.Cu",
+                    "pos": {
+                        "x": 46.2,
+                        "y": 23.5
+                    },
+                    "uuid": "defaa163-27a5-4621-a6a2-afb32bb6784b"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
+            "items": [
+                {
+                    "description": "Pad 8 [VBAT_SYS] of U2 on F.Cu",
+                    "pos": {
+                        "x": 46.2,
+                        "y": 23.0
+                    },
+                    "uuid": "1b2c19cf-2c84-414b-9ea1-cea603deecff"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (SHUNT_LOAD_SENSE) doesn't match net given by schematic (/Input protection and monitor/SHUNT_LOAD_SENSE).",
+            "items": [
+                {
+                    "description": "Pad 9 [SHUNT_LOAD_SENSE] of U2 on F.Cu",
+                    "pos": {
+                        "x": 46.2,
+                        "y": 22.5
+                    },
+                    "uuid": "bd799a3b-625b-4683-a960-dd687973e783"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (SHUNT_SOURCE_SENSE) doesn't match net given by schematic (/Input protection and monitor/SHUNT_SOURCE_SENSE).",
+            "items": [
+                {
+                    "description": "Pad 10 [SHUNT_SOURCE_SENSE] of U2 on F.Cu",
+                    "pos": {
+                        "x": 46.2,
+                        "y": 22.0
+                    },
+                    "uuid": "62b19fd5-3ac7-4322-816e-e43b777b9de9"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V8_MODEM] of C3 on F.Cu",
+                    "pos": {
+                        "x": 67.525,
+                        "y": 10.0
+                    },
+                    "uuid": "e085ac15-e76b-4892-b65c-3c784b8dd3b4"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C3 on F.Cu",
+                    "pos": {
+                        "x": 70.475,
+                        "y": 10.0
+                    },
+                    "uuid": "8ebfca15-6cb9-46de-b1dd-83a043eeae25"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (BOOT_3V8) doesn't match net given by schematic (/3V8 modem rail/BOOT_3V8).",
+            "items": [
+                {
+                    "description": "Pad 1 [BOOT_3V8] of C4 on F.Cu",
+                    "pos": {
+                        "x": 57.8,
+                        "y": 13.55
+                    },
+                    "uuid": "38c29d3d-2529-4d0b-be7c-3fc0366ce491"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (SW_3V8) doesn't match net given by schematic (/3V8 modem rail/SW_3V8).",
+            "items": [
+                {
+                    "description": "Pad 2 [SW_3V8] of C4 on F.Cu",
+                    "pos": {
+                        "x": 57.8,
+                        "y": 14.51
+                    },
+                    "uuid": "1bda650f-6f48-4455-bb86-711fc2b4e7e2"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_SYS] of C11 on F.Cu",
+                    "pos": {
+                        "x": 47.525,
+                        "y": 14.0
+                    },
+                    "uuid": "6854e91c-80da-427c-8749-8e23fe1a9472"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C11 on F.Cu",
+                    "pos": {
+                        "x": 50.475,
+                        "y": 14.0
+                    },
+                    "uuid": "b3e52dad-2fce-4e37-bcb7-31e800774e21"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V8_MODEM] of C14 on F.Cu",
+                    "pos": {
+                        "x": 72.525,
+                        "y": 10.0
+                    },
+                    "uuid": "8c466954-01f2-476c-9098-3124d7bf4777"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C14 on F.Cu",
+                    "pos": {
+                        "x": 75.475,
+                        "y": 10.0
+                    },
+                    "uuid": "636a7db9-1f00-4c3d-8643-b263f10df371"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V8_MODEM] of C15 on F.Cu",
+                    "pos": {
+                        "x": 67.525,
+                        "y": 17.0
+                    },
+                    "uuid": "b380c6e3-d759-4327-a8d7-2701f343e977"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C15 on F.Cu",
+                    "pos": {
+                        "x": 70.475,
+                        "y": 17.0
+                    },
+                    "uuid": "f0c13791-7bb1-4215-b8a8-3d25dbf31d43"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V8_MODEM] of C16 on F.Cu",
+                    "pos": {
+                        "x": 72.525,
+                        "y": 17.0
+                    },
+                    "uuid": "f01edb5c-4e20-41ee-9d3c-20e7930d60fb"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C16 on F.Cu",
+                    "pos": {
+                        "x": 75.475,
+                        "y": 17.0
+                    },
+                    "uuid": "2053cad8-7a31-4ae5-b4f2-13ce9ac38b70"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_SYS] of C20 on F.Cu",
+                    "pos": {
+                        "x": 52.35,
+                        "y": 14.775
+                    },
+                    "uuid": "df824dec-b123-4c5d-bc7b-0b9c1a03404d"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C20 on F.Cu",
+                    "pos": {
+                        "x": 52.35,
+                        "y": 13.225
+                    },
+                    "uuid": "70d012f4-b25e-4b65-b8da-6d84201a4da6"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Value (L1) doesn't match symbol value (XAL7030-472MEC).",
+            "items": [
+                {
+                    "description": "Footprint L1",
+                    "pos": {
+                        "x": 62.5,
+                        "y": 14.0
+                    },
+                    "uuid": "e721b151-6673-4d74-872b-8c9bd0080d80"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (SW_3V8) doesn't match net given by schematic (/3V8 modem rail/SW_3V8).",
+            "items": [
+                {
+                    "description": "Pad 1 [SW_3V8] of L1 on F.Cu",
+                    "pos": {
+                        "x": 60.24,
+                        "y": 14.0
+                    },
+                    "uuid": "c58eb890-75cb-4999-8f0b-6ade6bf1dc41"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
+            "items": [
+                {
+                    "description": "Pad 2 [3V8_MODEM] of L1 on F.Cu",
+                    "pos": {
+                        "x": 64.76,
+                        "y": 14.0
+                    },
+                    "uuid": "638b1e7c-7a56-41ee-9123-46447b370223"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V8_MODEM] of R1 on F.Cu",
+                    "pos": {
+                        "x": 55.49,
+                        "y": 19.0
+                    },
+                    "uuid": "7dcf1036-1dbf-476a-87ce-63bf69ad3059"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (FB_3V8) doesn't match net given by schematic (/3V8 modem rail/FB_3V8).",
+            "items": [
+                {
+                    "description": "Pad 2 [FB_3V8] of R1 on F.Cu",
+                    "pos": {
+                        "x": 56.51,
+                        "y": 19.0
+                    },
+                    "uuid": "38eeef89-7c9a-4982-af87-ba1ebf76acec"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (FB_3V8) doesn't match net given by schematic (/3V8 modem rail/FB_3V8).",
+            "items": [
+                {
+                    "description": "Pad 1 [FB_3V8] of R2 on F.Cu",
+                    "pos": {
+                        "x": 57.99,
+                        "y": 19.0
+                    },
+                    "uuid": "a95e6058-7ef3-4da0-a330-44667ef2a9d7"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of R2 on F.Cu",
+                    "pos": {
+                        "x": 59.01,
+                        "y": 19.0
+                    },
+                    "uuid": "883ad0c8-6936-49ad-a8f2-0333a2d461ae"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (RT_3V8) doesn't match net given by schematic (/3V8 modem rail/RT_3V8).",
+            "items": [
+                {
+                    "description": "Pad 1 [RT_3V8] of R3 on F.Cu",
+                    "pos": {
+                        "x": 49.99,
+                        "y": 19.0
+                    },
+                    "uuid": "1d2e3c19-ee44-4eab-839a-4c4f5b4dd94e"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of R3 on F.Cu",
+                    "pos": {
+                        "x": 51.01,
+                        "y": 19.0
+                    },
+                    "uuid": "4234f79f-231d-4776-8343-e9041aef34fa"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (MODE_3V8) doesn't match net given by schematic (/3V8 modem rail/MODE_3V8).",
+            "items": [
+                {
+                    "description": "Pad 1 [MODE_3V8] of R4 on F.Cu",
+                    "pos": {
+                        "x": 52.49,
+                        "y": 21.0
+                    },
+                    "uuid": "5fbd454c-f129-44fb-8dbe-d33002583069"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of R4 on F.Cu",
+                    "pos": {
+                        "x": 53.51,
+                        "y": 21.0
+                    },
+                    "uuid": "1b23ea16-33d3-4247-af32-739a481aa5ee"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
+            "items": [
+                {
+                    "description": "Footprint R5",
+                    "pos": {
+                        "x": 55.5,
+                        "y": 21.0
+                    },
+                    "uuid": "dd1b4d5b-7b1f-46f1-b1a6-eccc98d790e3"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (MODE_3V8) doesn't match net given by schematic (/3V8 modem rail/MODE_3V8).",
+            "items": [
+                {
+                    "description": "Pad 1 [MODE_3V8] of R5 on F.Cu",
+                    "pos": {
+                        "x": 54.99,
+                        "y": 21.0
+                    },
+                    "uuid": "ef077b73-6b1c-4ec0-ba9a-0a4ef98bdbe8"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (RT_3V8) doesn't match net given by schematic (/3V8 modem rail/RT_3V8).",
+            "items": [
+                {
+                    "description": "Pad 2 [RT_3V8] of R5 on F.Cu",
+                    "pos": {
+                        "x": 56.01,
+                        "y": 21.0
+                    },
+                    "uuid": "19534324-6866-44c5-a530-e8e0b715fc09"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (EN_MODEM) doesn't match net given by schematic (/EN_MODEM).",
+            "items": [
+                {
+                    "description": "Pad 1 [EN_MODEM] of R6 on F.Cu",
+                    "pos": {
+                        "x": 47.49,
+                        "y": 18.5
+                    },
+                    "uuid": "feea33e9-af1b-4dd8-bdf6-69846d51bf2c"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of R6 on F.Cu",
+                    "pos": {
+                        "x": 48.51,
+                        "y": 18.5
+                    },
+                    "uuid": "725a7580-5aae-4115-90fa-50fd6b2c8a03"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
+            "items": [
+                {
+                    "description": "Footprint R15",
+                    "pos": {
+                        "x": 61.0,
+                        "y": 20.5
+                    },
+                    "uuid": "bef662b3-c2c9-460a-bf1b-d14e8df16b09"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (PG_3V8) doesn't match net given by schematic (/3V8 modem rail/PG_3V8).",
+            "items": [
+                {
+                    "description": "Pad 1 [PG_3V8] of R15 on F.Cu",
+                    "pos": {
+                        "x": 60.49,
+                        "y": 20.5
+                    },
+                    "uuid": "5d7ad86d-749a-4d3a-98ec-01da8a66ca80"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 2 [3V3_DIGITAL] of R15 on F.Cu",
+                    "pos": {
+                        "x": 61.51,
+                        "y": 20.5
+                    },
+                    "uuid": "72daec73-f82a-4f9e-a181-378266ac5f9b"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V8_MODEM] of TP4 on F.Cu",
+                    "pos": {
+                        "x": 32.62,
+                        "y": 56.0
+                    },
+                    "uuid": "e283238f-09a1-41ad-a18e-862bd60f03b9"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (PG_3V8) doesn't match net given by schematic (/3V8 modem rail/PG_3V8).",
+            "items": [
+                {
+                    "description": "Pad 1 [PG_3V8] of TP5 on F.Cu",
+                    "pos": {
+                        "x": 35.16,
+                        "y": 56.0
+                    },
+                    "uuid": "8e83e556-a196-4624-876f-1384af99ece2"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Value (U3) doesn't match symbol value (LMR604403SRAKR).",
+            "items": [
+                {
+                    "description": "Footprint U3",
+                    "pos": {
+                        "x": 55.0,
+                        "y": 14.0
+                    },
+                    "uuid": "9653d464-afad-4ea9-99e6-4b474376ac18"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_SYS] of U3 on F.Cu",
+                    "pos": {
+                        "x": 54.0725,
+                        "y": 14.9
+                    },
+                    "uuid": "fe882a30-cc3a-4d95-bdbf-5ab2c7a501bc"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_SYS] of U3 on F.Cu",
+                    "pos": {
+                        "x": 53.8975,
+                        "y": 14.725
+                    },
+                    "uuid": "641dafa3-6db4-4b93-bfb3-cce129b6da73"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of U3 on F.Cu",
+                    "pos": {
+                        "x": 55.0,
+                        "y": 14.0
+                    },
+                    "uuid": "f2aad849-63d5-4370-a9d8-64ea5c0299fc"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (SW_3V8) doesn't match net given by schematic (/3V8 modem rail/SW_3V8).",
+            "items": [
+                {
+                    "description": "Pad 3 [SW_3V8] of U3 on F.Cu",
+                    "pos": {
+                        "x": 55.9275,
+                        "y": 14.9
+                    },
+                    "uuid": "fafc47df-6c73-435a-8738-1dd0f90daf23"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (SW_3V8) doesn't match net given by schematic (/3V8 modem rail/SW_3V8).",
+            "items": [
+                {
+                    "description": "Pad 3 [SW_3V8] of U3 on F.Cu",
+                    "pos": {
+                        "x": 56.1025,
+                        "y": 14.725
+                    },
+                    "uuid": "11195e50-78ea-45c3-8aa5-6464c276f6be"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (BOOT_3V8) doesn't match net given by schematic (/3V8 modem rail/BOOT_3V8).",
+            "items": [
+                {
+                    "description": "Pad 4 [BOOT_3V8] of U3 on F.Cu",
+                    "pos": {
+                        "x": 56.125,
+                        "y": 14.075
+                    },
+                    "uuid": "a6d9c252-a88d-4f26-887b-98b0019b0c97"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (PG_3V8) doesn't match net given by schematic (/3V8 modem rail/PG_3V8).",
+            "items": [
+                {
+                    "description": "Pad 5 [PG_3V8] of U3 on F.Cu",
+                    "pos": {
+                        "x": 56.175,
+                        "y": 13.3
+                    },
+                    "uuid": "55acc4ab-aa52-4e79-96d2-effcd3ebf913"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (PG_3V8) doesn't match net given by schematic (/3V8 modem rail/PG_3V8).",
+            "items": [
+                {
+                    "description": "Pad 5 [PG_3V8] of U3 on F.Cu",
+                    "pos": {
+                        "x": 56.0,
+                        "y": 13.1
+                    },
+                    "uuid": "3f430b56-cd39-4a29-9faa-e9fb35912428"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (FB_3V8) doesn't match net given by schematic (/3V8 modem rail/FB_3V8).",
+            "items": [
+                {
+                    "description": "Pad 6 [FB_3V8] of U3 on F.Cu",
+                    "pos": {
+                        "x": 55.525,
+                        "y": 13.125
+                    },
+                    "uuid": "bbe4acb5-3c94-42de-9bd8-12c9885842c5"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (MODE_3V8) doesn't match net given by schematic (/3V8 modem rail/MODE_3V8).",
+            "items": [
+                {
+                    "description": "Pad 7 [MODE_3V8] of U3 on F.Cu",
+                    "pos": {
+                        "x": 54.475,
+                        "y": 13.125
+                    },
+                    "uuid": "472638c7-8ff6-4509-9510-32221f75894f"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (RT_3V8) doesn't match net given by schematic (/3V8 modem rail/RT_3V8).",
+            "items": [
+                {
+                    "description": "Pad 8 [RT_3V8] of U3 on F.Cu",
+                    "pos": {
+                        "x": 53.825,
+                        "y": 13.3
+                    },
+                    "uuid": "b2bb6280-78a6-4a40-acfe-6401c437d284"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (RT_3V8) doesn't match net given by schematic (/3V8 modem rail/RT_3V8).",
+            "items": [
+                {
+                    "description": "Pad 8 [RT_3V8] of U3 on F.Cu",
+                    "pos": {
+                        "x": 54.0,
+                        "y": 13.1
+                    },
+                    "uuid": "17912ba5-c200-43e6-8047-2f77ab39fa1b"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (EN_MODEM) doesn't match net given by schematic (/EN_MODEM).",
+            "items": [
+                {
+                    "description": "Pad 9 [EN_MODEM] of U3 on F.Cu",
+                    "pos": {
+                        "x": 53.875,
+                        "y": 14.075
+                    },
+                    "uuid": "34563f8f-9f8b-4fc1-a6c6-b7367d64784f"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V3_DIGITAL] of C5 on F.Cu",
+                    "pos": {
+                        "x": 67.525,
+                        "y": 38.0
+                    },
+                    "uuid": "7cc79e36-a123-4395-9778-2089b8935135"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C5 on F.Cu",
+                    "pos": {
+                        "x": 70.475,
+                        "y": 38.0
+                    },
+                    "uuid": "178a11b7-b1f0-4afa-9b54-315402a1252b"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (BOOT_3V3) doesn't match net given by schematic (/3V3 digital rail/BOOT_3V3).",
+            "items": [
+                {
+                    "description": "Pad 1 [BOOT_3V3] of C6 on F.Cu",
+                    "pos": {
+                        "x": 57.8,
+                        "y": 41.55
+                    },
+                    "uuid": "9bc6bbe7-1dea-4cc2-982d-5a8129db563e"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (SW_3V3) doesn't match net given by schematic (/3V3 digital rail/SW_3V3).",
+            "items": [
+                {
+                    "description": "Pad 2 [SW_3V3] of C6 on F.Cu",
+                    "pos": {
+                        "x": 57.8,
+                        "y": 42.51
+                    },
+                    "uuid": "12deb87d-a2f8-4efd-9a1f-7533afab9da1"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_SYS] of C12 on F.Cu",
+                    "pos": {
+                        "x": 47.525,
+                        "y": 42.0
+                    },
+                    "uuid": "a1810328-3b19-4839-8be5-d0b3a7ed9a85"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C12 on F.Cu",
+                    "pos": {
+                        "x": 50.475,
+                        "y": 42.0
+                    },
+                    "uuid": "1eb2ef6b-8f2d-45f2-87f9-31d19607a783"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V3_DIGITAL] of C17 on F.Cu",
+                    "pos": {
+                        "x": 72.525,
+                        "y": 38.0
+                    },
+                    "uuid": "9caa0bbe-dfec-45c3-b4aa-033373fbd7d5"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C17 on F.Cu",
+                    "pos": {
+                        "x": 75.475,
+                        "y": 38.0
+                    },
+                    "uuid": "94e49141-85c5-4ea3-a634-3d9ee4569160"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V3_DIGITAL] of C18 on F.Cu",
+                    "pos": {
+                        "x": 67.525,
+                        "y": 45.0
+                    },
+                    "uuid": "cbb5ea53-f38c-4709-9674-4bf62916131c"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C18 on F.Cu",
+                    "pos": {
+                        "x": 70.475,
+                        "y": 45.0
+                    },
+                    "uuid": "be0ca70c-d22a-49c1-945f-e84a60982743"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V3_DIGITAL] of C19 on F.Cu",
+                    "pos": {
+                        "x": 72.525,
+                        "y": 42.25
+                    },
+                    "uuid": "9a90a617-d0ab-46f3-a59a-0ca6117a64d4"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C19 on F.Cu",
+                    "pos": {
+                        "x": 75.475,
+                        "y": 42.25
+                    },
+                    "uuid": "ec2d6ba2-0776-45e1-a8f2-c12ca58eb966"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_SYS] of C21 on F.Cu",
+                    "pos": {
+                        "x": 52.35,
+                        "y": 42.775
+                    },
+                    "uuid": "a6b02cbb-93c5-4ef2-a544-fdeb52b97828"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C21 on F.Cu",
+                    "pos": {
+                        "x": 52.35,
+                        "y": 41.225
+                    },
+                    "uuid": "cda5b693-53f1-4f93-92d0-d463a338917c"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Value (L2) doesn't match symbol value (XAL7030-472MEC).",
+            "items": [
+                {
+                    "description": "Footprint L2",
+                    "pos": {
+                        "x": 62.5,
+                        "y": 42.0
+                    },
+                    "uuid": "9dfb95c2-e64e-4d3e-a05d-d46c0f740220"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (SW_3V3) doesn't match net given by schematic (/3V3 digital rail/SW_3V3).",
+            "items": [
+                {
+                    "description": "Pad 1 [SW_3V3] of L2 on F.Cu",
+                    "pos": {
+                        "x": 60.24,
+                        "y": 42.0
+                    },
+                    "uuid": "e54b3038-2972-4b7c-ade8-9540d5529d88"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 2 [3V3_DIGITAL] of L2 on F.Cu",
+                    "pos": {
+                        "x": 64.76,
+                        "y": 42.0
+                    },
+                    "uuid": "f5a41d08-65bf-450f-b695-0aa560833f3b"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (RT_3V3) doesn't match net given by schematic (/3V3 digital rail/RT_3V3).",
+            "items": [
+                {
+                    "description": "Pad 1 [RT_3V3] of R7 on F.Cu",
+                    "pos": {
+                        "x": 49.49,
+                        "y": 47.0
+                    },
+                    "uuid": "e9496d3d-2ccb-49d9-8b53-8ce80a8b7707"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of R7 on F.Cu",
+                    "pos": {
+                        "x": 50.51,
+                        "y": 47.0
+                    },
+                    "uuid": "2c4a7462-e9be-4899-a1f7-7e785f214b64"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (MODE_3V3) doesn't match net given by schematic (/3V3 digital rail/MODE_3V3).",
+            "items": [
+                {
+                    "description": "Pad 1 [MODE_3V3] of R8 on F.Cu",
+                    "pos": {
+                        "x": 51.99,
+                        "y": 49.0
+                    },
+                    "uuid": "5d6a1c85-6739-4581-b676-78212227df12"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of R8 on F.Cu",
+                    "pos": {
+                        "x": 53.01,
+                        "y": 49.0
+                    },
+                    "uuid": "088e515f-16a0-44a2-88ea-b1361b8d3b26"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
+            "items": [
+                {
+                    "description": "Footprint R9",
+                    "pos": {
+                        "x": 55.0,
+                        "y": 49.0
+                    },
+                    "uuid": "a6918d6a-ed2c-45b1-b14f-664ea484cd2d"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (MODE_3V3) doesn't match net given by schematic (/3V3 digital rail/MODE_3V3).",
+            "items": [
+                {
+                    "description": "Pad 1 [MODE_3V3] of R9 on F.Cu",
+                    "pos": {
+                        "x": 54.49,
+                        "y": 49.0
+                    },
+                    "uuid": "ae127c05-b354-4c64-8919-8cf20cee9cac"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (RT_3V3) doesn't match net given by schematic (/3V3 digital rail/RT_3V3).",
+            "items": [
+                {
+                    "description": "Pad 2 [RT_3V3] of R9 on F.Cu",
+                    "pos": {
+                        "x": 55.51,
+                        "y": 49.0
+                    },
+                    "uuid": "96500bca-34a6-40bb-b2a9-5b2af55f80d7"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V3_DIGITAL] of R10 on F.Cu",
+                    "pos": {
+                        "x": 57.49,
+                        "y": 47.0
+                    },
+                    "uuid": "82430a18-b6f1-45df-ac9c-85d621bff0d9"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (PWR_GOOD) doesn't match net given by schematic (/PWR_GOOD).",
+            "items": [
+                {
+                    "description": "Pad 2 [PWR_GOOD] of R10 on F.Cu",
+                    "pos": {
+                        "x": 58.51,
+                        "y": 47.0
+                    },
+                    "uuid": "363ef5e5-8469-4574-ad9e-6cef2128eebd"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V3_DIGITAL] of R12 on F.Cu",
+                    "pos": {
+                        "x": 67.99,
+                        "y": 49.0
+                    },
+                    "uuid": "252c1ddb-83ac-4f2b-85df-7c64536cdd59"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (FAULT) doesn't match net given by schematic (/FAULT).",
+            "items": [
+                {
+                    "description": "Pad 2 [FAULT] of R12 on F.Cu",
+                    "pos": {
+                        "x": 69.01,
+                        "y": 49.0
+                    },
+                    "uuid": "f6c578fe-ed7d-4cd5-8e9e-d2c71ef1f403"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
+            "items": [
+                {
+                    "description": "Footprint R13",
+                    "pos": {
+                        "x": 74.6,
+                        "y": 56.5
+                    },
+                    "uuid": "7e1b1de6-a763-4d61-99b4-9c5700fa9f7b"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V3_DIGITAL] of R13 on F.Cu",
+                    "pos": {
+                        "x": 74.09,
+                        "y": 56.5
+                    },
+                    "uuid": "bffc6082-d936-46c1-a996-14d9b8c7bd3d"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (I2C2_SCL) doesn't match net given by schematic (/I2C2_SCL).",
+            "items": [
+                {
+                    "description": "Pad 2 [I2C2_SCL] of R13 on F.Cu",
+                    "pos": {
+                        "x": 75.11,
+                        "y": 56.5
+                    },
+                    "uuid": "07e81134-5372-4169-8f46-f72483c5deea"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
+            "items": [
+                {
+                    "description": "Footprint R14",
+                    "pos": {
+                        "x": 74.6,
+                        "y": 58.0
+                    },
+                    "uuid": "a302bc45-d7b7-4cab-91a6-4de269a209df"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V3_DIGITAL] of R14 on F.Cu",
+                    "pos": {
+                        "x": 74.09,
+                        "y": 58.0
+                    },
+                    "uuid": "f19dc8a1-713d-47d9-bc40-f0cd1e5261bc"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (I2C2_SDA) doesn't match net given by schematic (/I2C2_SDA).",
+            "items": [
+                {
+                    "description": "Pad 2 [I2C2_SDA] of R14 on F.Cu",
+                    "pos": {
+                        "x": 75.11,
+                        "y": 58.0
+                    },
+                    "uuid": "9178d4b2-5ac9-46fc-8bd7-8817a3d3a33e"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (PWR_GOOD) doesn't match net given by schematic (/PWR_GOOD).",
+            "items": [
+                {
+                    "description": "Pad 1 [PWR_GOOD] of TP6 on F.Cu",
+                    "pos": {
+                        "x": 37.7,
+                        "y": 56.0
+                    },
+                    "uuid": "457b5fc4-40a9-4393-a51e-4c21183f14c5"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Value (U4) doesn't match symbol value (LMR604403SRAKR).",
+            "items": [
+                {
+                    "description": "Footprint U4",
+                    "pos": {
+                        "x": 55.0,
+                        "y": 42.0
+                    },
+                    "uuid": "dbe4a6d0-1689-4791-8559-b9258a62c949"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_SYS] of U4 on F.Cu",
+                    "pos": {
+                        "x": 54.0725,
+                        "y": 42.9
+                    },
+                    "uuid": "2d21a7ad-52a8-4b5e-b7c9-835c9d4f68e0"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
+            "items": [
+                {
+                    "description": "Pad 1 [VBAT_SYS] of U4 on F.Cu",
+                    "pos": {
+                        "x": 53.8975,
+                        "y": 42.725
+                    },
+                    "uuid": "66050095-dd2a-420f-b9a6-9ec12152b2a1"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of U4 on F.Cu",
+                    "pos": {
+                        "x": 55.0,
+                        "y": 42.0
+                    },
+                    "uuid": "d9e5e7e1-ec08-4139-9183-60358e117561"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (SW_3V3) doesn't match net given by schematic (/3V3 digital rail/SW_3V3).",
+            "items": [
+                {
+                    "description": "Pad 3 [SW_3V3] of U4 on F.Cu",
+                    "pos": {
+                        "x": 55.9275,
+                        "y": 42.9
+                    },
+                    "uuid": "f891be6a-8f19-4b28-9fe1-1d720b9e40a6"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (SW_3V3) doesn't match net given by schematic (/3V3 digital rail/SW_3V3).",
+            "items": [
+                {
+                    "description": "Pad 3 [SW_3V3] of U4 on F.Cu",
+                    "pos": {
+                        "x": 56.1025,
+                        "y": 42.725
+                    },
+                    "uuid": "aa10afa4-8be4-4530-bd8d-942e988aa934"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (BOOT_3V3) doesn't match net given by schematic (/3V3 digital rail/BOOT_3V3).",
+            "items": [
+                {
+                    "description": "Pad 4 [BOOT_3V3] of U4 on F.Cu",
+                    "pos": {
+                        "x": 56.125,
+                        "y": 42.075
+                    },
+                    "uuid": "24b4f83e-3694-4f7b-b3b8-7d6be37ac5c9"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (PWR_GOOD) doesn't match net given by schematic (/PWR_GOOD).",
+            "items": [
+                {
+                    "description": "Pad 5 [PWR_GOOD] of U4 on F.Cu",
+                    "pos": {
+                        "x": 56.175,
+                        "y": 41.3
+                    },
+                    "uuid": "ad310be6-9584-4fc5-8ecb-c082e80d9fc3"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (PWR_GOOD) doesn't match net given by schematic (/PWR_GOOD).",
+            "items": [
+                {
+                    "description": "Pad 5 [PWR_GOOD] of U4 on F.Cu",
+                    "pos": {
+                        "x": 56.0,
+                        "y": 41.1
+                    },
+                    "uuid": "1f260d9e-1e01-4981-9c20-5ea47664a8b8"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 6 [3V3_DIGITAL] of U4 on F.Cu",
+                    "pos": {
+                        "x": 55.525,
+                        "y": 41.125
+                    },
+                    "uuid": "97ea272b-96c8-470d-a2b7-56d41ad9971b"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (MODE_3V3) doesn't match net given by schematic (/3V3 digital rail/MODE_3V3).",
+            "items": [
+                {
+                    "description": "Pad 7 [MODE_3V3] of U4 on F.Cu",
+                    "pos": {
+                        "x": 54.475,
+                        "y": 41.125
+                    },
+                    "uuid": "f39ce87d-433c-468c-b5a0-362bbd0d12d4"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (RT_3V3) doesn't match net given by schematic (/3V3 digital rail/RT_3V3).",
+            "items": [
+                {
+                    "description": "Pad 8 [RT_3V3] of U4 on F.Cu",
+                    "pos": {
+                        "x": 53.825,
+                        "y": 41.3
+                    },
+                    "uuid": "c4361d3b-31ee-4a76-939a-a72bd14f7164"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (RT_3V3) doesn't match net given by schematic (/3V3 digital rail/RT_3V3).",
+            "items": [
+                {
+                    "description": "Pad 8 [RT_3V3] of U4 on F.Cu",
+                    "pos": {
+                        "x": 54.0,
+                        "y": 41.1
+                    },
+                    "uuid": "2a08eb38-194a-45bb-b511-fe774e8184f9"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (VBAT_SYS) doesn't match net given by schematic (/VBAT_SYS).",
+            "items": [
+                {
+                    "description": "Pad 9 [VBAT_SYS] of U4 on F.Cu",
+                    "pos": {
+                        "x": 53.875,
+                        "y": 42.075
+                    },
+                    "uuid": "d8fa8eca-406d-4c5d-b5b9-6e0e355db895"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V3_DIGITAL] of C7 on F.Cu",
+                    "pos": {
+                        "x": 73.625,
+                        "y": 50.0
+                    },
+                    "uuid": "b5eda095-7cfc-4f70-8cfb-375a8a68b251"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C7 on F.Cu",
+                    "pos": {
+                        "x": 75.175,
+                        "y": 50.0
+                    },
+                    "uuid": "b63e0082-c46f-4508-a26b-293e8c99679c"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (1V8_MIC) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/1V8_MIC).",
+            "items": [
+                {
+                    "description": "Pad 1 [1V8_MIC] of C8 on F.Cu",
+                    "pos": {
+                        "x": 74.125,
+                        "y": 54.0
+                    },
+                    "uuid": "bb5e49b6-c563-444b-b855-bda3482878d0"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of C8 on F.Cu",
+                    "pos": {
+                        "x": 75.675,
+                        "y": 54.0
+                    },
+                    "uuid": "fea8c53a-a047-4a75-af9d-f3fde85dfe52"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Value (J2) doesn't match symbol value (43045-1202).",
+            "items": [
+                {
+                    "description": "Footprint J2",
+                    "pos": {
+                        "x": 81.08,
+                        "y": 40.0
+                    },
+                    "uuid": "db670c91-fe1f-476a-9652-f0a72fb11b44"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (3V8_MODEM) doesn't match net given by schematic (/3V8_MODEM).",
+            "items": [
+                {
+                    "description": "PTH pad 1 [3V8_MODEM] of J2",
+                    "pos": {
+                        "x": 81.08,
+                        "y": 40.0
+                    },
+                    "uuid": "5d811d54-4d98-4316-b7d8-e7d23099ffb8"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_MODEM) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/GND_MODEM).",
+            "items": [
+                {
+                    "description": "PTH pad 2 [GND_MODEM] of J2",
+                    "pos": {
+                        "x": 81.08,
+                        "y": 43.0
+                    },
+                    "uuid": "cc9c01ad-5517-41f4-af74-5beb1e67d114"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "PTH pad 3 [3V3_DIGITAL] of J2",
+                    "pos": {
+                        "x": 81.08,
+                        "y": 46.0
+                    },
+                    "uuid": "861841f1-1b0e-4ce8-84bf-9d7ead92abc2"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_DIGITAL) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/GND_DIGITAL).",
+            "items": [
+                {
+                    "description": "PTH pad 4 [GND_DIGITAL] of J2",
+                    "pos": {
+                        "x": 81.08,
+                        "y": 49.0
+                    },
+                    "uuid": "b185f5ae-6108-4029-a67c-62f77bdb5ce4"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (1V8_MIC) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/1V8_MIC).",
+            "items": [
+                {
+                    "description": "PTH pad 5 [1V8_MIC] of J2",
+                    "pos": {
+                        "x": 81.08,
+                        "y": 52.0
+                    },
+                    "uuid": "9312f9ab-ab1f-4780-b9a4-47eac6809c5b"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_MIC) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/GND_MIC).",
+            "items": [
+                {
+                    "description": "PTH pad 6 [GND_MIC] of J2",
+                    "pos": {
+                        "x": 81.08,
+                        "y": 55.0
+                    },
+                    "uuid": "88daa285-21c6-41e8-ac39-bd60695130d3"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (PWR_GOOD) doesn't match net given by schematic (/PWR_GOOD).",
+            "items": [
+                {
+                    "description": "PTH pad 7 [PWR_GOOD] of J2",
+                    "pos": {
+                        "x": 78.08,
+                        "y": 40.0
+                    },
+                    "uuid": "b455033d-753e-499f-81ff-1025e66eff00"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (FAULT) doesn't match net given by schematic (/FAULT).",
+            "items": [
+                {
+                    "description": "PTH pad 8 [FAULT] of J2",
+                    "pos": {
+                        "x": 78.08,
+                        "y": 43.0
+                    },
+                    "uuid": "6de1a3fb-6634-4238-8949-af2ae7813b6c"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (EN_MODEM) doesn't match net given by schematic (/EN_MODEM).",
+            "items": [
+                {
+                    "description": "PTH pad 9 [EN_MODEM] of J2",
+                    "pos": {
+                        "x": 78.08,
+                        "y": 46.0
+                    },
+                    "uuid": "a30a0324-792b-4321-99f9-8bd3b53f2004"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (EN_AUX) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/EN_AUX).",
+            "items": [
+                {
+                    "description": "PTH pad 10 [EN_AUX] of J2",
+                    "pos": {
+                        "x": 78.08,
+                        "y": 49.0
+                    },
+                    "uuid": "63b8fbb2-51cf-4756-a4cd-99c65c9f6c8c"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (I2C2_SCL) doesn't match net given by schematic (/I2C2_SCL).",
+            "items": [
+                {
+                    "description": "PTH pad 11 [I2C2_SCL] of J2",
+                    "pos": {
+                        "x": 78.08,
+                        "y": 52.0
+                    },
+                    "uuid": "400496b6-0ec5-4aee-88e6-71b3aae32d86"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (I2C2_SDA) doesn't match net given by schematic (/I2C2_SDA).",
+            "items": [
+                {
+                    "description": "PTH pad 12 [I2C2_SDA] of J2",
+                    "pos": {
+                        "x": 78.08,
+                        "y": 55.0
+                    },
+                    "uuid": "8d510ba5-5749-4022-a221-4d61f6eb1a7d"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
+            "items": [
+                {
+                    "description": "Footprint NT1",
+                    "pos": {
+                        "x": 75.6,
+                        "y": 40.12
+                    },
+                    "uuid": "612c7b75-60b8-4291-8192-0ff7a121a763"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (GND_MODEM) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/GND_MODEM).",
+            "items": [
+                {
+                    "description": "Pad 1 [GND_MODEM] of NT1 on F.Cu",
+                    "pos": {
+                        "x": 75.1,
+                        "y": 40.12
+                    },
+                    "uuid": "a88c3f1e-9a00-4370-8bc4-f3a22c623f97"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of NT1 on F.Cu",
+                    "pos": {
+                        "x": 76.1,
+                        "y": 40.12
+                    },
+                    "uuid": "3b0d07e5-963e-42a2-8206-a8a6e06703dc"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
+            "items": [
+                {
+                    "description": "Footprint NT2",
+                    "pos": {
+                        "x": 75.6,
+                        "y": 48.52
+                    },
+                    "uuid": "779ac120-69ec-4d9e-836c-2d843c01d38c"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (GND_DIGITAL) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/GND_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 1 [GND_DIGITAL] of NT2 on F.Cu",
+                    "pos": {
+                        "x": 76.1,
+                        "y": 48.52
+                    },
+                    "uuid": "4fa88c5b-a878-427b-940d-d26c71605e3f"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of NT2 on F.Cu",
+                    "pos": {
+                        "x": 75.1,
+                        "y": 48.52
+                    },
+                    "uuid": "89875ff2-2bef-465d-a41c-b10a7c55e266"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Footprint attributes don't match symbol: 'Exclude from bill of materials' settings differ.",
+            "items": [
+                {
+                    "description": "Footprint NT3",
+                    "pos": {
+                        "x": 75.6,
+                        "y": 52.0
+                    },
+                    "uuid": "dd68637e-9b46-479b-b11f-38c7f1ebd288"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (GND_MIC) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/GND_MIC).",
+            "items": [
+                {
+                    "description": "Pad 1 [GND_MIC] of NT3 on F.Cu",
+                    "pos": {
+                        "x": 75.1,
+                        "y": 52.0
+                    },
+                    "uuid": "7d944e34-6c8b-4e86-8fe9-73ece4a82da2"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of NT3 on F.Cu",
+                    "pos": {
+                        "x": 76.1,
+                        "y": 52.0
+                    },
+                    "uuid": "b3d02399-7a8b-4ebc-8e0c-cbb408c9a0cf"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (EN_AUX) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/EN_AUX).",
+            "items": [
+                {
+                    "description": "Pad 1 [EN_AUX] of R11 on F.Cu",
+                    "pos": {
+                        "x": 65.49,
+                        "y": 49.0
+                    },
+                    "uuid": "8955f5ad-d9fc-417f-890f-0bc2235f0daa"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of R11 on F.Cu",
+                    "pos": {
+                        "x": 66.51,
+                        "y": 49.0
+                    },
+                    "uuid": "75e4dbf3-30fa-4142-ac59-a26cf4780205"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (1V8_MIC) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/1V8_MIC).",
+            "items": [
+                {
+                    "description": "Pad 1 [1V8_MIC] of TP7 on F.Cu",
+                    "pos": {
+                        "x": 40.24,
+                        "y": 56.0
+                    },
+                    "uuid": "cd4baf4f-c825-4bf3-a07a-3498cd7228c7"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Value (U5) doesn't match symbol value (TPS7A2018PDBVR).",
+            "items": [
+                {
+                    "description": "Footprint U5",
+                    "pos": {
+                        "x": 74.4,
+                        "y": 46.0
+                    },
+                    "uuid": "fa11ca58-2f1a-421c-85da-0024c8b3351a"
+                }
+            ],
+            "severity": "warning",
+            "type": "footprint_symbol_mismatch"
+        },
+        {
+            "description": "Pad net (3V3_DIGITAL) doesn't match net given by schematic (/3V3_DIGITAL).",
+            "items": [
+                {
+                    "description": "Pad 1 [3V3_DIGITAL] of U5 on F.Cu",
+                    "pos": {
+                        "x": 73.1,
+                        "y": 45.05
+                    },
+                    "uuid": "ccec6917-e7b4-41b5-8a77-a7f1d9050e07"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (GND_PWR) doesn't match net given by schematic (/GND_PWR).",
+            "items": [
+                {
+                    "description": "Pad 2 [GND_PWR] of U5 on F.Cu",
+                    "pos": {
+                        "x": 73.1,
+                        "y": 46.0
+                    },
+                    "uuid": "5b6152c9-7768-4047-9a59-a094e5098e44"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (EN_AUX) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/EN_AUX).",
+            "items": [
+                {
+                    "description": "Pad 3 [EN_AUX] of U5 on F.Cu",
+                    "pos": {
+                        "x": 73.1,
+                        "y": 46.95
+                    },
+                    "uuid": "85f619a9-eb7d-45c6-b2d7-4832dc45c6ae"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad missing net given by schematic (unconnected-(U5-NC-Pad4)).",
+            "items": [
+                {
+                    "description": "Pad 4 [<no net>] of U5 on F.Cu",
+                    "pos": {
+                        "x": 75.7,
+                        "y": 46.95
+                    },
+                    "uuid": "513b39d9-3ecd-448c-b7f5-9f5c15544f04"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        },
+        {
+            "description": "Pad net (1V8_MIC) doesn't match net given by schematic (/1V8 auxiliary and MAIN harness/1V8_MIC).",
+            "items": [
+                {
+                    "description": "Pad 5 [1V8_MIC] of U5 on F.Cu",
+                    "pos": {
+                        "x": 75.7,
+                        "y": 45.05
+                    },
+                    "uuid": "4a30bd35-d621-4ad0-834e-7c280ea38869"
+                }
+            ],
+            "severity": "warning",
+            "type": "net_conflict"
+        }
+    ],
+    "source": "PCB-PWR.kicad_pcb",
+    "unconnected_items": [],
+    "violations": [
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Polygon of U1 on F.Silkscreen",
+                    "pos": {
+                        "x": 18.52,
+                        "y": 28.92
+                    },
+                    "uuid": "00022571-99ac-4c67-afa2-3332d20da20b"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Polygon of Q1 on F.Silkscreen",
+                    "pos": {
+                        "x": 29.62,
+                        "y": 32.62
+                    },
+                    "uuid": "b61229d5-5ac8-4d38-b1c4-6b7384244ccf"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Polygon of RSH1 on F.Silkscreen",
+                    "pos": {
+                        "x": 33.0,
+                        "y": 29.25
+                    },
+                    "uuid": "85cbe586-efc6-4128-8ce2-9fe5042efc5a"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Segment of U3 on F.Silkscreen",
+                    "pos": {
+                        "x": 53.52,
+                        "y": 14.9
+                    },
+                    "uuid": "d9c2280a-dc29-4789-87e6-05c555463c83"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Segment of U3 on F.Silkscreen",
+                    "pos": {
+                        "x": 53.62,
+                        "y": 15.0
+                    },
+                    "uuid": "69614ddc-2fcc-42f6-aa46-0f555a57ba4c"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Polygon of U2 on F.Silkscreen",
+                    "pos": {
+                        "x": 41.7,
+                        "y": 21.82
+                    },
+                    "uuid": "76e9aeaf-a669-4e04-9e1e-50d8acb3cdab"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Segment of U4 on F.Silkscreen",
+                    "pos": {
+                        "x": 53.52,
+                        "y": 42.9
+                    },
+                    "uuid": "afa89bfa-3d7c-4781-8869-0189476140c2"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Segment of U4 on F.Silkscreen",
+                    "pos": {
+                        "x": 53.62,
+                        "y": 43.0
+                    },
+                    "uuid": "603ef7ce-165b-47ba-bb48-4ad8b9675146"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        },
+        {
+            "description": "Silkscreen clipped by solder mask",
+            "items": [
+                {
+                    "description": "Polygon of U5 on F.Silkscreen",
+                    "pos": {
+                        "x": 72.92,
+                        "y": 44.92
+                    },
+                    "uuid": "771a0eba-4602-43b4-ac93-d103311df001"
+                }
+            ],
+            "severity": "warning",
+            "type": "silk_over_copper"
+        }
+    ]
+}

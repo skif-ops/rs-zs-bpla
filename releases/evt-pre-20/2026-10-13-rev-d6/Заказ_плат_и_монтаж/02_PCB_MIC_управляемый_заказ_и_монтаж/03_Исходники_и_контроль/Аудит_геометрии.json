@@ -1,0 +1,692 @@
+{
+  "status": "PASS_GEOMETRY_EVIDENCE_REVIEW_B_CONTROLLED_FIRST_ARTICLE",
+  "configuration": "EVT-PRE-20 Rev.A",
+  "assembly": "PCB-MIC",
+  "phase": "LOCAL_OR_UNSPECIFIED",
+  "commit_binding": {
+    "commit_sha": "07e3d66633ad4aa6763255346437af508112b817",
+    "controlled_sources_match_commit": true,
+    "audit_control_matches_commit": true,
+    "controlled_sources_match_signed_review_commit": true,
+    "signed_review_source_match_required": false,
+    "require_clean_source": true
+  },
+  "source_files": [
+    {
+      "path": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
+      "sha256": "c57cebbb3886247166551fd242fa51350bc9be7fee6299e63e7eaac60518d518",
+      "bytes": 37085
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_sch",
+      "sha256": "a45c77329b6aaa96b0e25e90508f15afb552c7e155aba4111e973c340c192f59",
+      "bytes": 15670
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MIC/libs/Dioneya.pretty/T5838_RevA.kicad_mod",
+      "sha256": "b5878b6dd462cc52a8deee90eb00f6b6efd4a85ccfc967507363eca808d1c04d",
+      "bytes": 8085
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MIC/libs/Dioneya.pretty/Molex_5040500691.kicad_mod",
+      "sha256": "870738109e4b9499bbd6c8d26fd095e49c5a4da638ea674c616b2e62938dd7f0",
+      "bytes": 10041
+    },
+    {
+      "path": "hardware/kicad/native/PCB-MIC/fabrication_metadata.json",
+      "sha256": "29203635ed0e1d4c5de4625ba2a1dd04717005f660de8ba230fbdce9f19cc44c",
+      "bytes": 507
+    }
+  ],
+  "audit_control_files": [
+    {
+      "path": "tools/audit_pcb_mic_review_a_geometry_rev_a.py",
+      "sha256": "61c98760f73937fbec6608931e283d99a356241e422a5f8e4e8df28413c5d150",
+      "bytes": 36483
+    },
+    {
+      "path": ".github/workflows/pcb-native.yml",
+      "sha256": "fe9c55742946ec3c1ef0d60df9b8100f4709f266fce45c90e5d5a957b148f67e",
+      "bytes": 156776
+    },
+    {
+      "path": "hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json",
+      "sha256": "28606764bf84482d69957a11c73511f4edf604d70acae0da6bee95e8721ad133",
+      "bytes": 11452
+    },
+    {
+      "path": "tools/generate_pcb_mic_clean_rev_a.py",
+      "sha256": "c0ed0a57f56a23abb75699851a560ef62cc7564d8bb866f346b956616d1977ea",
+      "bytes": 12433
+    }
+  ],
+  "review_a_signature": {
+    "reviewer": "\u0421\u043a\u0438\u0444",
+    "date": "2026-09-14",
+    "reviewed_commit_sha": "e17a86bc78ba979f74c5549b378e94f7f3447fe4",
+    "role": "HISTORICAL_BASELINE"
+  },
+  "superseded_review_a_signature": null,
+  "checks": {
+    "native_board_t5838": {
+      "status": "PASS",
+      "pad_count": 39,
+      "signal_pads": {
+        "1": {
+          "local_xy_mm": [
+            -0.63,
+            -1.42
+          ],
+          "copper_and_mask_mm": [
+            0.522,
+            0.725
+          ],
+          "paste_margin_mm": -0.05,
+          "paste_aperture_mm": [
+            0.422,
+            0.625
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": "PDM_DATA_MIC"
+        },
+        "2": {
+          "local_xy_mm": [
+            -0.63,
+            -0.6
+          ],
+          "copper_and_mask_mm": [
+            0.522,
+            0.725
+          ],
+          "paste_margin_mm": -0.05,
+          "paste_aperture_mm": [
+            0.422,
+            0.625
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": "GND"
+        },
+        "4": {
+          "local_xy_mm": [
+            -1.07,
+            1.42
+          ],
+          "copper_and_mask_mm": [
+            0.3,
+            0.3
+          ],
+          "paste_margin_mm": -0.015,
+          "paste_aperture_mm": [
+            0.27,
+            0.27
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": "MIC_WAKE"
+        },
+        "5": {
+          "local_xy_mm": [
+            1.07,
+            1.42
+          ],
+          "copper_and_mask_mm": [
+            0.3,
+            0.3
+          ],
+          "paste_margin_mm": -0.015,
+          "paste_aperture_mm": [
+            0.27,
+            0.27
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": "AAD_CFG"
+        },
+        "6": {
+          "local_xy_mm": [
+            0.63,
+            -0.6
+          ],
+          "copper_and_mask_mm": [
+            0.522,
+            0.725
+          ],
+          "paste_margin_mm": -0.05,
+          "paste_aperture_mm": [
+            0.422,
+            0.625
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": "PDM_CLK"
+        },
+        "7": {
+          "local_xy_mm": [
+            0.63,
+            -1.42
+          ],
+          "copper_and_mask_mm": [
+            0.522,
+            0.725
+          ],
+          "paste_margin_mm": -0.05,
+          "paste_aperture_mm": [
+            0.422,
+            0.625
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": "1V8_MIC"
+        }
+      },
+      "ground_annulus": {
+        "segments": 32,
+        "copper_and_mask_od_mm": 1.625,
+        "copper_and_mask_id_mm": 1.025,
+        "center_radius_mm": 0.6625,
+        "segment_tangential_width_mm": 0.145691,
+        "segment_radial_height_mm": 0.3,
+        "paste_excluded_from_segments": true
+      },
+      "acoustic_port": {
+        "type": "np_thru_hole",
+        "local_xy_mm": [
+          0.0,
+          0.649999
+        ],
+        "size_mm": [
+          0.8,
+          0.8
+        ],
+        "drill_mm": 0.8,
+        "layers": [
+          "*.Cu",
+          "*.Mask"
+        ]
+      }
+    },
+    "project_library_t5838": {
+      "status": "PASS",
+      "pad_count": 39,
+      "signal_pads": {
+        "1": {
+          "local_xy_mm": [
+            -0.63,
+            -1.42
+          ],
+          "copper_and_mask_mm": [
+            0.522,
+            0.725
+          ],
+          "paste_margin_mm": -0.05,
+          "paste_aperture_mm": [
+            0.422,
+            0.625
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": null
+        },
+        "2": {
+          "local_xy_mm": [
+            -0.63,
+            -0.6
+          ],
+          "copper_and_mask_mm": [
+            0.522,
+            0.725
+          ],
+          "paste_margin_mm": -0.05,
+          "paste_aperture_mm": [
+            0.422,
+            0.625
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": null
+        },
+        "4": {
+          "local_xy_mm": [
+            -1.07,
+            1.42
+          ],
+          "copper_and_mask_mm": [
+            0.3,
+            0.3
+          ],
+          "paste_margin_mm": -0.015,
+          "paste_aperture_mm": [
+            0.27,
+            0.27
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": null
+        },
+        "5": {
+          "local_xy_mm": [
+            1.07,
+            1.42
+          ],
+          "copper_and_mask_mm": [
+            0.3,
+            0.3
+          ],
+          "paste_margin_mm": -0.015,
+          "paste_aperture_mm": [
+            0.27,
+            0.27
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": null
+        },
+        "6": {
+          "local_xy_mm": [
+            0.63,
+            -0.6
+          ],
+          "copper_and_mask_mm": [
+            0.522,
+            0.725
+          ],
+          "paste_margin_mm": -0.05,
+          "paste_aperture_mm": [
+            0.422,
+            0.625
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": null
+        },
+        "7": {
+          "local_xy_mm": [
+            0.63,
+            -1.42
+          ],
+          "copper_and_mask_mm": [
+            0.522,
+            0.725
+          ],
+          "paste_margin_mm": -0.05,
+          "paste_aperture_mm": [
+            0.422,
+            0.625
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": null
+        }
+      },
+      "ground_annulus": {
+        "segments": 32,
+        "copper_and_mask_od_mm": 1.625,
+        "copper_and_mask_id_mm": 1.025,
+        "center_radius_mm": 0.6625,
+        "segment_tangential_width_mm": 0.145691,
+        "segment_radial_height_mm": 0.3,
+        "paste_excluded_from_segments": true
+      },
+      "acoustic_port": {
+        "type": "np_thru_hole",
+        "local_xy_mm": [
+          0.0,
+          0.649999
+        ],
+        "size_mm": [
+          0.8,
+          0.8
+        ],
+        "drill_mm": 0.8,
+        "layers": [
+          "*.Cu",
+          "*.Mask"
+        ]
+      }
+    },
+    "native_board_molex_5040500691": {
+      "status": "PASS",
+      "pad_count": 8,
+      "signal_pads": {
+        "1": {
+          "local_xy_mm": [
+            -3.75,
+            -2.59
+          ],
+          "copper_mask_paste_mm": [
+            0.6,
+            1.0
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": "1V8_MIC"
+        },
+        "2": {
+          "local_xy_mm": [
+            -2.25,
+            -2.59
+          ],
+          "copper_mask_paste_mm": [
+            0.6,
+            1.0
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": "GND"
+        },
+        "3": {
+          "local_xy_mm": [
+            -0.75,
+            -2.59
+          ],
+          "copper_mask_paste_mm": [
+            0.6,
+            1.0
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": "PDM_CLK"
+        },
+        "4": {
+          "local_xy_mm": [
+            0.75,
+            -2.59
+          ],
+          "copper_mask_paste_mm": [
+            0.6,
+            1.0
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": "PDM_DATA"
+        },
+        "5": {
+          "local_xy_mm": [
+            2.25,
+            -2.59
+          ],
+          "copper_mask_paste_mm": [
+            0.6,
+            1.0
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": "MIC_WAKE"
+        },
+        "6": {
+          "local_xy_mm": [
+            3.75,
+            -2.59
+          ],
+          "copper_mask_paste_mm": [
+            0.6,
+            1.0
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": "AAD_CFG"
+        }
+      },
+      "signal_pitch_mm": 1.5,
+      "signal_span_b_mm": 7.5,
+      "mechanical_nails": {
+        "count": 2,
+        "local_xy_mm": [
+          [
+            -6.35,
+            2.59
+          ],
+          [
+            6.35,
+            2.59
+          ]
+        ],
+        "copper_mask_paste_mm": [
+          1.25,
+          1.8
+        ],
+        "signal_to_nail_copper_row_gap_mm": 3.78
+      },
+      "drilled_features": 0
+    },
+    "project_library_molex_5040500691": {
+      "status": "PASS",
+      "pad_count": 8,
+      "signal_pads": {
+        "1": {
+          "local_xy_mm": [
+            -3.75,
+            -2.59
+          ],
+          "copper_mask_paste_mm": [
+            0.6,
+            1.0
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": null
+        },
+        "2": {
+          "local_xy_mm": [
+            -2.25,
+            -2.59
+          ],
+          "copper_mask_paste_mm": [
+            0.6,
+            1.0
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": null
+        },
+        "3": {
+          "local_xy_mm": [
+            -0.75,
+            -2.59
+          ],
+          "copper_mask_paste_mm": [
+            0.6,
+            1.0
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": null
+        },
+        "4": {
+          "local_xy_mm": [
+            0.75,
+            -2.59
+          ],
+          "copper_mask_paste_mm": [
+            0.6,
+            1.0
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": null
+        },
+        "5": {
+          "local_xy_mm": [
+            2.25,
+            -2.59
+          ],
+          "copper_mask_paste_mm": [
+            0.6,
+            1.0
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": null
+        },
+        "6": {
+          "local_xy_mm": [
+            3.75,
+            -2.59
+          ],
+          "copper_mask_paste_mm": [
+            0.6,
+            1.0
+          ],
+          "layers": [
+            "F.Cu",
+            "F.Mask",
+            "F.Paste"
+          ],
+          "net": null
+        }
+      },
+      "signal_pitch_mm": 1.5,
+      "signal_span_b_mm": 7.5,
+      "mechanical_nails": {
+        "count": 2,
+        "local_xy_mm": [
+          [
+            -6.35,
+            2.59
+          ],
+          [
+            6.35,
+            2.59
+          ]
+        ],
+        "copper_mask_paste_mm": [
+          1.25,
+          1.8
+        ],
+        "signal_to_nail_copper_row_gap_mm": 3.78
+      },
+      "drilled_features": 0
+    },
+    "t5838_stencil_ring": {
+      "status": "PASS_TDK_FIGURE_33_FOUR_GAP_STENCIL",
+      "layer": "F.Paste",
+      "center_xy_mm": [
+        12.000000000000007,
+        16.649999000000047
+      ],
+      "center_radius_mm": 0.637497289283627,
+      "stroke_width_mm": 0.25,
+      "outer_diameter_mm": 1.524994578567254,
+      "inner_diameter_mm": 1.024994578567254,
+      "cardinal_gaps_mm": [
+        0.09999960464924569,
+        0.09999960464924851,
+        0.09999960464925077,
+        0.09999960464926079
+      ],
+      "source_form": "four_gr_arc"
+    },
+    "mechanical_and_fabrication_metadata": {
+      "status": "PASS",
+      "outline_mm": [
+        24.0,
+        22.0
+      ],
+      "thickness_mm": 1.0,
+      "mounting_holes": {
+        "H1": {
+          "xy_mm": [
+            4.0,
+            16.65
+          ],
+          "drill_mm": 2.2
+        },
+        "H2": {
+          "xy_mm": [
+            20.0,
+            16.65
+          ],
+          "drill_mm": 2.2
+        }
+      },
+      "fabrication_metadata": {
+        "board": "PCB-MIC",
+        "revision": "B",
+        "material": "FR-4",
+        "surface_finish": "ENIG",
+        "board_thickness_mm": 1.0,
+        "copper_layers": 2,
+        "status": "CONTROLLED_FIRST_ARTICLE",
+        "authority": "hardware/kicad/REV_A_CAPTURE_ADDENDUM_003_PCB_MIC_MECH.md"
+      }
+    }
+  },
+  "remaining_review_a_evidence": [],
+  "remaining_release_evidence": [
+    "independent Review B and CAM/DFM closure",
+    "panelization and acoustic membrane/cavity stack",
+    "physical calibration and acoustic EVT"
+  ],
+  "release_effect": "CONTROLLED_FIRST_ARTICLE_FABRICATION_AND_PCBA"
+}

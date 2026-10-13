@@ -1,0 +1,6 @@
+﻿"Part_ID","Qty_per_station","Qty_20","Qty_40","Qty_41","Type_RU_EN","Description_RU_EN","Status"
+"DIO-3DP-UP-001B_body","1","20","40","41","3D-печать / 3D print","Корпус PCB-MAIN с фасочными углами / faceted body","PRELIMINARY_FIT_AND_MATERIAL_PENDING"
+"DIO-3DP-UP-001B_lid","1","20","40","41","3D-печать / 3D print","Крышка с рельефом логотипа / logo relief lid","PRELIMINARY_FIT_AND_MATERIAL_PENDING"
+"M3-COVER-FASTENER-TRIAL","4","80","160","164","Крепёж / hardware","Крепёж крышки; длина и вставка после примерки / cover fasteners","PRELIMINARY_FIT_AND_MATERIAL_PENDING"
+"COVER-GASKET-TRIAL","1","20","40","41","Уплотнение / seal","Непрерывная сменная прокладка; материал после IP-теста / gasket","PRELIMINARY_FIT_AND_MATERIAL_PENDING"
+"DIONEYA-STACKED-COLOUR-MARK-OPTION","1","20","40","41","Операция / operation","Цветная стойкая маркировка по утверждённому SVG, если требуется / colour mark","PRELIMINARY_FIT_AND_MATERIAL_PENDING"
