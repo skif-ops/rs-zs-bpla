@@ -96,4 +96,6 @@ def test_replay_api_and_page(fused, monkeypatch):
     page = client.get("/replay")
     assert page.status_code == 200
     assert 'id="replay-canvas"' in page.text and "/static/js/replay.js" in page.text and 'href="/replay"' in page.text
+    assert '<option value="1" selected>×1</option>' in page.text
+    assert 'id="replay-geometry" checked' in page.text
     assert client.get("/static/js/replay.js").status_code == 200

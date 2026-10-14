@@ -40,8 +40,16 @@
     const until = Date.now() * 1000;
     const since = Math.max(Math.min(liveSince - 15e6, until - 1e6), until - 29 * 60 * 1e6);
     const q = new URLSearchParams({ since_us: String(Math.round(since)), until_us: String(Math.round(until)) });
-    if (liveStations) q.set("station_ids", liveStations);
+    // The account scope already limits the operator to the bench tenant.  Do
+    // not freeze the request to the stations present in alert.start: more
+    // stations and tracks may join the same alert episode later.
     return q.toString();
+  }
+
+  function liveDefaults() {
+    $("replay-speed").value = "1";
+    $("replay-follow").checked = true;
+    $("replay-geometry").checked = true;
   }
 
   async function loadSources() {
@@ -76,6 +84,7 @@
       sel.innerHTML = '<option value="">не удалось загрузить список</option>';
     }
     if (liveActive) {
+      liveDefaults();
       const o = document.createElement("option");
       o.value = "live"; o.textContent = "Текущая тревога" + (liveTenant ? " · " + liveTenant : "");
       sel.prepend(o); sel.value = "live";
@@ -499,7 +508,7 @@
   // ---- input ---------------------------------------------------------------------------------------------------
   $("replay-source").addEventListener("change", (e) => {
     liveActive = e.target.value === "live";
-    if (liveActive) { liveFollowing = true; $("replay-live-state").hidden = false; $("replay-now").hidden = false; load(liveQuery()); }
+    if (liveActive) { liveDefaults(); liveFollowing = true; $("replay-live-state").hidden = false; $("replay-now").hidden = false; load(liveQuery()); }
     else { $("replay-live-state").hidden = true; $("replay-now").hidden = true; load(e.target.value); }
   });
   $("replay-play").addEventListener("click", () => { if (liveActive) liveFollowing = false; playing ? stop() : play(); });

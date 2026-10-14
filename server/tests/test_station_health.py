@@ -169,3 +169,23 @@ def test_the_page_data_follows_the_account(field, tmp_path, monkeypatch):
     page = logged_in(app, "north").get("/stations")
     assert page.status_code == 200 and 'id="st-table"' in page.text and "/static/js/stations.js" in page.text
     assert 'href="/stations"' in page.text and 'aria-current="page"' in page.text   # the menu marks the open page
+
+
+def test_tenant_viewer_sees_registered_station_before_first_heartbeat(field, tmp_path, monkeypatch):
+    from pki.registry import Registry
+    from station import pki_registry
+
+    accounts, _store, app = field
+    monkeypatch.setenv(pki_registry.PKI_DIR_ENV, str(tmp_path / "pki"))
+    monkeypatch.setenv(pki_registry.PKI_TENANTS_ENV, "bench")
+    monkeypatch.setenv(pki_registry.PKI_INCLUDE_TWINS_ENV, "1")
+    registry = Registry(tmp_path / "pki" / "registry.sqlite3")
+    registry.add("DIO-TWIN-001")
+    accounts.add_user("bench_viewer", "viewer", PASSWORD)
+    accounts.set_scope("bench_viewer", ["bench"], [])
+
+    data = logged_in(app, "bench_viewer").get("/api/v1/stations/health").json()
+    assert data["summary"]["total"] == 1
+    assert data["summary"]["never"] == 1
+    assert data["stations"][0]["station_id"] == 9001
+    assert data["stations"][0]["state"] == "never"

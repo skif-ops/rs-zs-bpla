@@ -26,9 +26,9 @@
       <button class="btn btn-outline-primary replay-btn" id="replay-now" type="button" hidden>К текущему</button>
       <label for="replay-speed" class="replay-speed-label">Скорость</label>
       <select class="form-control replay-select replay-speed" id="replay-speed" aria-label="Скорость">
-        <option value="1">×1</option>
+        <option value="1" selected>×1</option>
         <option value="2">×2</option>
-        <option value="5" selected>×5</option>
+        <option value="5">×5</option>
         <option value="10">×10</option>
       </select>
     </div>
@@ -64,9 +64,9 @@
       <ul class="replay-bearings" id="ro-bearings"><li class="text-muted">—</li></ul>
       <p class="replay-note">Лучи показывают, откуда станции слышали звук. Точка общего трека учитывает время распространения звука. Круг вокруг точки показывает погрешность.</p>
 
-      <details class="replay-advanced"><summary>Зоны слышимости и настройки</summary>
-        <label class="replay-check"><input type="checkbox" id="replay-geometry"> Показать зоны и слепые направления</label>
-        <div id="replay-geometry-opts" hidden>
+      <details class="replay-advanced" open><summary>Зоны слышимости и настройки</summary>
+        <label class="replay-check"><input type="checkbox" id="replay-geometry" checked> Показать зоны и слепые направления</label>
+        <div id="replay-geometry-opts">
         <label class="form-label" for="replay-geo-range">Дальность слышимости, м</label>
         <input class="form-control replay-select" id="replay-geo-range" type="number" min="100" max="5000" step="100" value="2000">
         <label class="form-label" for="replay-geo-height">Высота цели над станциями, м</label>
