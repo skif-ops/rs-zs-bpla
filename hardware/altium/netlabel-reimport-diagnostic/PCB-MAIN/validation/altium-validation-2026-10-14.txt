@@ -1,0 +1,40 @@
+PCB-MAIN Altium validation record
+Date: 2026-10-14
+Tool: Altium Designer 26.10.1 Trial
+Live project: F:\Проекты\Codex\altium-netlabel-reimport-test\PCB-MAIN\Imported PCB-MAIN\PCB-MAIN.PrjPcb
+
+Net Identifier Scope test
+
+1. Hierarchical (Sheet entry <-> port connections, power ports global), HierarchyMode=2
+   Validation time: 19:30:05
+   Result: 12 errors.
+   Errors observed:
+   - Duplicate Net Names Wire 1V8_MIC: 2
+   - Duplicate Net Names Wire 3V3_DIGITAL: 7
+   - Net 1V8_MIC contains multiple Output Pins (U7-18, U7-19, U7-20, U7-21, U18-4): 1
+   - Net 3V3_DIGITAL contains multiple Output Pins (J12-CD, U3-12): 1
+   - Net 3V3_DIGITAL contains multiple Output Pins (U10-13, U10-14): 1
+
+2. Strict Hierarchical (Sheet entry <-> port connections, power ports local), HierarchyMode=4
+   Validation time: 19:43:27
+   Result: Compile successful, no errors found.
+   Warnings: 146.
+   Last message number: 147 (compile-success information row).
+
+The remaining messages are warning-level imported-object diagnostics. Visible categories include electrical pin versus unspecified port checks, IO/output compatibility checks, missing footprint model links, and nets reported without a driving source. They have not been suppressed.
+
+Post-validation Protel2 netlist generation
+Time: 19:46:37
+Output: validation\PCB-MAIN-Protel2.NET
+
+Exact comparison against both the tracked KiCad source export and prepared-import KiCad export:
+- Physical pin universe: equal (905/905)
+- Physical net partitions: equal (186/186)
+- Physical net names: equal (186/186)
+- Missing physical pins: 0
+- Extra physical pins: 0
+- Missing physical groups: 0
+- Extra physical groups: 0
+- Name mismatches: 0
+
+This record verifies compiled physical connectivity only. It is not an ERC waiver and does not establish manufacturing readiness.
