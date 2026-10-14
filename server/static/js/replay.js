@@ -10,6 +10,7 @@
   const RAY_M = 6000;              // rays drawn this long (beyond the 5 km fusion range)
   const RAY_HOLD_US = 1500000;     // a bearing is shown for this long after it was heard
   const LIVE_TRACK_HOLD_US = 3000000; // concurrently updated targets can differ by a few fusion ticks
+  const LIVE_ACTIVITY_HOLD_MS = 4000; // same current-alert window as the station status page
   const LIVE_EPISODE_GAP_US = 7000000; // a quiet interval separates adjacent controlled or real flight episodes
   const GRID_STEPS = [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000];
 
@@ -29,6 +30,8 @@
   let liveSince = Number(pageQuery.get("since")) || Date.now() * 1000 - 5 * 60 * 1e6;
   let livePrerollUs = pageQuery.get("segment") === "1" ? 2e6 : 15e6;
   let liveLastTrackUs = 0;
+  const liveTrackUntil = new Map();       // track_id -> local receipt-time expiry
+  const liveTrackLastPoint = new Map();   // track_id -> newest point already observed by this page
   let liveStations = pageQuery.get("stations") || "";
   let liveTenant = pageQuery.get("tenant") || "";
 
@@ -134,6 +137,20 @@
     const hadPositions = !!(data && (data.stations.length || data.tracks.length));
     data = await res.json();
     if (liveActive) $("replay-live-state").textContent = "● Тревога · обновляется";
+    if (liveActive) {
+      const newest = Number(data.window.target_last_us) || 0;
+      const now = Date.now();
+      for (const track of data.tracks) {
+        const pointUs = Number(track.points[track.points.length - 1]?.t_us) || 0;
+        const previous = liveTrackLastPoint.get(track.track_id) || 0;
+        // Several targets are fused on neighbouring ticks.  Only the tracks at the live edge of the window are
+        // current; older tracks remain in the response for history and must not reappear as active.
+        if (pointUs && pointUs >= newest - LIVE_TRACK_HOLD_US && pointUs > previous) {
+          liveTrackUntil.set(track.track_id, now + LIVE_ACTIVITY_HOLD_MS);
+        }
+        if (pointUs > previous) liveTrackLastPoint.set(track.track_id, pointUs);
+      }
+    }
     byStation = new Map();
     for (const b of data.bearings) {
       if (!byStation.has(b.station_id)) byStation.set(b.station_id, []);
@@ -312,7 +329,9 @@
   // ---- drawing -------------------------------------------------------------------------------------------------
   function draw() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
-    const active = data ? data.tracks.map((tr, index) => ({ tr, index, point: pointAt(tr, t) })).filter((x) => x.point) : [];
+    const now = Date.now();
+    const active = data ? data.tracks.map((tr, index) => ({ tr, index, point: pointAt(tr, t) }))
+      .filter((x) => x.point && (!liveActive || (liveTrackUntil.get(x.tr.track_id) || 0) > now)) : [];
     if (active.length && $("replay-follow").checked) focusActiveTargets(active);
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = "#f8fafc";
@@ -320,7 +339,7 @@
     if (data) drawCoverage();
     drawGrid(w, h);
     if (!data) return;
-    drawBearings();
+    drawBearings(active);
     drawStations();
     const current = drawTracks(active);
     drawNorth(w);
@@ -375,7 +394,10 @@
     }
   }
 
-  function drawBearings() {
+  function drawBearings(active) {
+    // The replay response deliberately retains history.  In live mode rays must disappear with the current targets,
+    // using the same four-second receipt-time window that clears the station alarm badges.
+    if (liveActive && !active.length) return;
     for (const s of data.stations) {
       for (const b of bearingsAt(byStation.get(s.station_id) || [], t)) {
         const a = (b.azimuth_deg * Math.PI) / 180, sg = (Math.max(b.sigma_deg, 0.5) * Math.PI) / 180;
@@ -456,9 +478,14 @@
   // ---- panel ---------------------------------------------------------------------------------------------------
   function updatePanel(active) {
     if (liveActive) {
-      const targetText = active.length ? ` · целей сейчас: ${active.length}` : " · ожидание цели";
-      $("replay-live-state").textContent = "● Тревога" + targetText + " · обновляется";
-      $("replay-selection-title").textContent = "Тревога · " + (liveTenant || "участок") + targetText;
+      if (active.length) {
+        const targetText = ` · целей сейчас: ${active.length}`;
+        $("replay-live-state").textContent = "● Тревога" + targetText + " · обновляется";
+        $("replay-selection-title").textContent = "Тревога · " + (liveTenant || "участок") + targetText;
+      } else {
+        $("replay-live-state").textContent = "● Сопровождение завершено · ожидание новой цели";
+        $("replay-selection-title").textContent = "Сопровождение · " + (liveTenant || "участок") + " · целей сейчас: 0";
+      }
     }
     $("ro-utc").textContent = fmtUtc(t);
     $("replay-current-time").textContent = fmtUtc(t) + " UTC";
@@ -497,7 +524,7 @@
     const ul = $("ro-bearings");
     ul.innerHTML = "";
     for (const s of data.stations) {
-      const current = bearingsAt(byStation.get(s.station_id) || [], t);
+      const current = liveActive && !active.length ? [] : bearingsAt(byStation.get(s.station_id) || [], t);
       if (!current.length) {
         const li = document.createElement("li");
         li.textContent = `ст. ${s.station_id}: не слышит`;
@@ -607,9 +634,14 @@
     const msg = event.detail;
     if (!liveActive || msg.alert_id !== liveAlertId) return;
     if (msg.type === "alert.end") {
+      liveTrackUntil.clear(); liveTrackLastPoint.clear();
       liveActive = false;
       $("replay-live-state").textContent = "● Тревога завершилась";
       $("replay-now").hidden = true;
+      data = null; byStation = new Map(); coverage = null;
+      $("replay-empty").textContent = "Тревога завершилась.";
+      $("replay-empty").hidden = false;
+      draw();
       return;
     }
     if (msg.type === "track.update") {
@@ -618,12 +650,20 @@
         liveSince = pointUs;
         livePrerollUs = 2e6;
         liveFollowing = true;
+        liveTrackUntil.clear(); liveTrackLastPoint.clear();
         data = null; byStation = new Map(); coverage = null;
         $("replay-empty").textContent = "Начинается новый эпизод…";
         $("replay-empty").hidden = false;
         draw();
       }
-      if (Number.isFinite(pointUs)) liveLastTrackUs = Math.max(liveLastTrackUs, pointUs);
+      if (Number.isFinite(pointUs)) {
+        liveLastTrackUs = Math.max(liveLastTrackUs, pointUs);
+        liveTrackLastPoint.set(msg.track.track_id, Math.max(liveTrackLastPoint.get(msg.track.track_id) || 0, pointUs));
+        liveTrackUntil.set(msg.track.track_id, Date.now() + LIVE_ACTIVITY_HOLD_MS);
+      }
+    } else if (msg.type === "track.end" && msg.track?.track_id) {
+      liveTrackUntil.delete(msg.track.track_id);
+      draw();
     }
     if (msg.alert?.stations?.length) liveStations = msg.alert.stations.map((s) => s.station_id).join(",");
     if (msg.type === "alert.update" || msg.type === "track.update" || msg.type === "bearing") refreshLive();
@@ -632,6 +672,16 @@
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden && liveActive) refreshLive();
   });
+
+  setInterval(() => {
+    if (!liveActive || !data) return;
+    const now = Date.now();
+    let expired = false;
+    for (const [trackId, until] of liveTrackUntil) {
+      if (until <= now) { liveTrackUntil.delete(trackId); expired = true; }
+    }
+    if (expired) draw();
+  }, 500);
 
   loadSources();
 })();

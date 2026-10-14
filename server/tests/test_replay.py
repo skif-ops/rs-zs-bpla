@@ -111,4 +111,8 @@ def test_replay_api_and_page(fused, monkeypatch):
     assert script.status_code == 200
     assert "function bearingsAt" in script.text and "for (const b of bearingsAt" in script.text
     assert "LIVE_EPISODE_GAP_US = 7000000" in script.text
+    assert "LIVE_ACTIVITY_HOLD_MS = 4000" in script.text
+    assert "liveTrackUntil.set(msg.track.track_id, Date.now() + LIVE_ACTIVITY_HOLD_MS)" in script.text
+    assert "if (liveActive && !active.length) return" in script.text
+    assert "Сопровождение завершено · ожидание новой цели" in script.text
     assert "const visible = liveActive ? active" in script.text
