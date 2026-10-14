@@ -25,4 +25,24 @@ The root SchDoc sheet symbols, sheet entries, net labels, and wires are identica
 
 ## PCB geometry
 
-Independent comparisons in this directory found 575/575 routed segments, 267/267 vias, 66/66 component origins, 210/210 pads, 31/31 PCB net names, and 4/4 board outline segments matching the original KiCad PCB within the limitations in each JSON report. Pad shape, rotation, solder-mask expansion, keepouts, zone geometry, stackup, DRC and manufacturing outputs are not validated. The imported PCB must not be released for fabrication or assembly.
+Independent comparisons in this directory found 575/575 routed segments, 267/267 vias, 66/66 component origins, 210/210 pads, 31/31 PCB net names, and 4/4 board outline segments matching the original KiCad PCB within the limitations in each JSON report. Pad shape, rotation, solder-mask expansion, keepouts, zone geometry, stackup and manufacturing outputs are not fully validated.
+
+## Altium PCB DRC, 2026-10-14
+
+`validation/PCB-PWR-Altium-DRC-2026-10-14.drc` is the Altium 26.10.1 report generated after repouring all polygons. The checked PCB uses the documented EVT rules: width minimum 0.20 mm, preferred 0.25 mm, maximum 10 mm; hole diameter minimum 0.025 mm and maximum 3.40 mm. The result is **3 rule violations and 0 warnings**:
+
+- Short-Circuit Constraint: 0
+- Width Constraint: 0
+- Hole Size Constraint: 0
+- Clearance Constraint: 0
+- Un-Routed Net Constraint: 3
+
+The three remaining unrouted connections are:
+
+- `GND_DIGITAL`: `NT2-1` to `J2-4`
+- `GND_MODEM`: via `(73.85 mm, 17.85 mm)` to `NT1-1`
+- `GND_PWR`: via `(74.35 mm, 11.85 mm)` to `NT2-2`
+
+The KiCad source uses `NetTie-2_SMD_Pad0.5mm` with two pads plus an F.Cu `fp_poly` copper bridge. The initial Altium import created NT1-NT3 with only the two pads. A separate KiCad-footprint import produced `NetTie.PcbLib` with the expected two pads plus one copper region, and that library is included here with the project. Altium matched exactly NT1-NT3 during the update ECO, but the PCB instances still contain only two primitives and the three unrouted reports remain. NT1-NT3 are set to component type `Net Tie`; L1 and L2 are confirmed as `Standard`. No board-level track was substituted for the missing footprint region because that creates genuine short-circuit and clearance violations.
+
+The repeat project validation at 21:42:47 reported `Compile successful, no errors found` with 28 retained warnings. See `validation/altium-validation-2026-10-14.txt` for the verification record and the exact DRC paths. The imported PCB must not be released for fabrication or assembly while these three connections and the remaining conversion gates are open.

@@ -1,0 +1,47 @@
+PCB-PWR Altium conversion verification
+Date: 2026-10-14
+Tool: Altium Designer 26.10.1 Trial
+Status: NOT FOR MANUFACTURE
+
+Project validation
+------------------
+Time: 21:42:47 Europe/Moscow
+Result: Compile successful, no errors found.
+Retained warnings: 28
+Warning classes: electrical pin/port type checks, no-driving-source checks, and missing footprints for virtual #FLG ERC symbols.
+
+PCB DRC
+-------
+Time: 21:41:05 Europe/Moscow
+Report: PCB-PWR-Altium-DRC-2026-10-14.drc
+Total rule violations: 3
+Warnings: 0
+
+Short-Circuit Constraint: 0
+Un-Routed Net Constraint: 3
+Width Constraint: 0
+Hole Size Constraint: 0
+Clearance Constraint: 0
+
+Width rule: minimum 0.20 mm, preferred 0.25 mm, maximum 10 mm.
+Hole size rule: minimum 0.025 mm, maximum 3.40 mm.
+
+Remaining unrouted connections
+------------------------------
+1. GND_DIGITAL: Pad NT2-1 (76.1 mm, 11.48 mm) on F.Cu to Pad J2-4 (81.08 mm, 11 mm) on Multi-Layer.
+2. GND_MODEM: Via (73.85 mm, 17.85 mm) F.Cu-B.Cu to Pad NT1-1 (75.1 mm, 19.88 mm) on F.Cu.
+3. GND_PWR: Via (74.35 mm, 11.85 mm) F.Cu-B.Cu to Pad NT2-2 (75.1 mm, 11.48 mm) on F.Cu.
+
+NetTie conversion finding
+-------------------------
+The KiCad footprint contains pads 1 and 2 plus a filled F.Cu fp_poly bridge and net_tie_pad_groups "1, 2". The initial Altium board import retained only the two pads in each NT1-NT3 component instance. A separate import produced NetTie.PcbLib with two pads plus one copper region. Altium matched only NT1-NT3 in an update ECO, but the board instances remained two-primitive components and the three unrouted reports remained. NT1-NT3 are component type Net Tie. L1 and L2 are component type Standard.
+
+A test board-level track between the two differently named nets produced short-circuit and clearance violations and was undone. No equivalence claim or manufacturing release is made.
+
+References
+----------
+Altium, Creating Circuit Connectivity:
+https://www.altium.com/documentation/altium-designer/schematic/creating-circuit-connectivity
+
+Altium KB, Short two different nets intentionally:
+https://www.altium.com/documentation/knowledge-base/altium-designer/short-two-different-nets-intentionally
