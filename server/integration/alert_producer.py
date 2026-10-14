@@ -21,7 +21,6 @@ import time
 
 from integration import dioneya_alert as msg
 from station import target_match, track_segments
-from station.track_hypotheses import station_segments
 
 TRUSTED_TIME = ("GNSS_TIME_TRUSTED", "HOLDOVER")
 BEARING_PERIOD_US = 1_000_000
@@ -38,7 +37,19 @@ class AlertProducer:
         self.tenant = tenant
         self.clock = clock
         self._last_bearing: dict[tuple[int, int, int], int] = {}   # (station, track, segment) -> time of the last line
+        self._segments_cache: dict[tuple[int, int], list[track_segments.Segment]] = {}
+        self._segment_states: dict[tuple[int, int], track_segments.SplitState] = {}
         self._last_sweep = 0
+
+    def _segments(self, station_id: int, track_event_id: int) -> list[track_segments.Segment]:
+        key = (station_id, track_event_id)
+        if key not in self._segments_cache:
+            rows = [r for r in self.store.list_bearings(station_id=station_id, track_event_id=track_event_id, limit=50000)
+                    if r["time_trust"] in TRUSTED_TIME]
+            segments, state = track_segments.split_incremental(rows, self._segment_states.get(key))
+            self._segments_cache[key] = segments
+            self._segment_states[key] = state
+        return self._segments_cache[key]
 
     def now_us(self) -> int:
         return int(self.clock() * 1e6)
@@ -118,12 +129,13 @@ class AlertProducer:
         now = self.now_us()
         self.sweep(now)
         key = (batch.station_id, batch.track_event_id)
+        self._segments_cache.pop(key, None)
         # the newest bearing of every source in the batch (one when the station hears one target; with several at
         # once a bearing per source, bearing batch schema 2), each a line of its own segment
         newest: dict[float | None, object] = {}
         for sample in batch.samples:
             newest[sample.f0_hz] = sample
-        segments = station_segments(self.store, *key)
+        segments = self._segments(*key)
         for sample in sorted(newest.values(), key=lambda x: (x.time_us, x.f0_hz or 0.0)):
             # the segment of the station track this bearing belongs to (station/track_segments.py); an outlier or a
             # bearing still waiting for its segment draws no line
@@ -175,7 +187,7 @@ class AlertProducer:
         members = self.store.track_members(track_id)
         signatures = []
         for station_id, track_event_id, segment_us in members:
-            segment = track_segments.by_key(station_segments(self.store, station_id, track_event_id), segment_us)
+            segment = track_segments.by_key(self._segments(station_id, track_event_id), segment_us)
             signatures.append(target_match.station_track_signature(self.store, station_id, track_event_id, segment))
         return target_match.merge(signatures).as_class()
 

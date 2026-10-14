@@ -254,6 +254,7 @@ class HypothesisTrackFusion:
     def __init__(self, store):
         self.store = store
         self._segments_cache: dict[tuple[int, int], list[track_segments.Segment]] = {}
+        self._segment_states: dict[tuple[int, int], track_segments.SplitState] = {}
         self._fix_cache: dict[tuple, object] = {}
         self._signature_cache: dict[tuple, target_match.Signature] = {}
         self._course_cache: dict[Member, dict] = {}
@@ -264,7 +265,11 @@ class HypothesisTrackFusion:
     def _segments(self, station_id: int, track_event_id: int) -> list[track_segments.Segment]:
         key = (station_id, track_event_id)
         if key not in self._segments_cache:
-            self._segments_cache[key] = station_segments(self.store, station_id, track_event_id)
+            rows = [r for r in self.store.list_bearings(station_id=station_id, track_event_id=track_event_id, limit=50000)
+                    if r["time_trust"] in TRUSTED_TIME]
+            segments, state = track_segments.split_incremental(rows, self._segment_states.get(key))
+            self._segments_cache[key] = segments
+            self._segment_states[key] = state
         return self._segments_cache[key]
 
     def _frame(self, position) -> EnuFrame:

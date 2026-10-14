@@ -97,6 +97,19 @@ class Segment:
         return None
 
 
+@dataclass
+class SplitState:
+    """In-process continuation of :func:`split` for an append-only station track.
+
+    MQTT normally adds bearings in time order.  Keeping the already decided segments and the short waiting queue
+    avoids replaying the complete track for every new batch.  ``split_incremental`` detects an insertion or a changed
+    earlier row and rebuilds, so delayed and corrected input keeps the exact behaviour of ``split``.
+    """
+    fingerprints: list[tuple] = field(default_factory=list)
+    segments: list[Segment] = field(default_factory=list)
+    waiting: list[dict] = field(default_factory=list)
+
+
 def _line(rows: list[dict]) -> tuple[float, float, float]:
     """(reference time s, azimuth at it, slope deg/s): a robust line through the bearings (Theil-Sen slope, median
     intercept), the azimuths unwrapped around their median, so one outlier does not tilt it."""
@@ -149,17 +162,16 @@ def _agree(rows: list[dict]) -> bool:
                for r in rows)
 
 
-def split(rows: list[dict]) -> list[Segment]:
-    """The segments of one station track's bearings (any order; sorted by time here).  Up to MAX_ACTIVE segments
-    run at once (a station whose bearing alternates between two targets): a bearing joins the active segment that
-    predicts it best."""
-    rows = sorted((r for r in rows if r["sigma_deg"] <= MAX_SIGMA_DEG and r.get("confidence", 1.0) >= MIN_CONFIDENCE),
+def _eligible(rows: list[dict]) -> list[dict]:
+    return sorted((r for r in rows if r["sigma_deg"] <= MAX_SIGMA_DEG and r.get("confidence", 1.0) >= MIN_CONFIDENCE),
                   key=lambda r: (r["time_us"], r.get("f0_hz") or 0.0))
-    if not rows:
-        return []
-    segments = [Segment(FIRST_SEGMENT, [rows[0]])]
-    waiting: list[dict] = []
-    for row in rows[1:]:
+
+
+def _fingerprint(row: dict) -> tuple:
+    return (row["time_us"], row["azimuth_deg"], row["sigma_deg"], row.get("confidence", 1.0), row.get("f0_hz"))
+
+
+def _append(segments: list[Segment], waiting: list[dict], row: dict) -> list[dict]:
         best = None
         for seg in segments:
             gap_s = (row["time_us"] - seg.last_us) * 1e-6
@@ -171,7 +183,7 @@ def split(rows: list[dict]) -> list[Segment]:
         waiting = [w for w in waiting if row["time_us"] - w["time_us"] <= WAIT_S * 1e6]
         if best is not None:
             best[1].rows.append(row)
-            continue
+            return waiting
         waiting.append(row)
         # the waiting bearings of this bearing's source (all of them when the bearings name none)
         group = [w for w in waiting if _f0_close(w.get("f0_hz"), row.get("f0_hz"), (row["time_us"] - w["time_us"]) * 1e-6)
@@ -184,7 +196,36 @@ def split(rows: list[dict]) -> list[Segment]:
                 key += 1                                         # several sources start at the same time
             segments.append(Segment(key, group, formed_us=row["time_us"]))
             waiting = [w for w in waiting if not any(w is g for g in group)]
-    return segments
+        return waiting
+
+
+def split_incremental(rows: list[dict], state: SplitState | None = None) -> tuple[list[Segment], SplitState]:
+    """Split a complete row snapshot, reusing ``state`` when the snapshot only gained a sorted suffix."""
+    rows = _eligible(rows)
+    fingerprints = [_fingerprint(r) for r in rows]
+    prefix = len(state.fingerprints) if state is not None else 0
+    if state is None or len(rows) < prefix or fingerprints[:prefix] != state.fingerprints:
+        state = SplitState()
+        prefix = 0
+    if not rows:
+        state.fingerprints = []
+        state.segments = []
+        state.waiting = []
+        return state.segments, state
+    if not state.segments:
+        state.segments = [Segment(FIRST_SEGMENT, [rows[0]])]
+        prefix = 1
+    for row in rows[prefix:]:
+        state.waiting = _append(state.segments, state.waiting, row)
+    state.fingerprints = fingerprints
+    return state.segments, state
+
+
+def split(rows: list[dict]) -> list[Segment]:
+    """The segments of one station track's bearings (any order; sorted by time here).  Up to MAX_ACTIVE segments
+    run at once (a station whose bearing alternates between two targets): a bearing joins the active segment that
+    predicts it best."""
+    return split_incremental(rows)[0]
 
 
 def segment_at(segments: list[Segment], time_us: int, f0_hz: float | None = None) -> Segment | None:
