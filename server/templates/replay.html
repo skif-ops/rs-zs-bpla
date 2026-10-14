@@ -33,6 +33,15 @@
       </select>
     </div>
     <div class="replay-timeline"><span id="replay-time-start">—</span><input class="replay-slider" id="replay-slider" type="range" min="0" max="1" step="100" value="0" disabled aria-label="Время на шкале сопровождения"><span id="replay-time-end">—</span></div>
+    <section class="replay-targets" aria-labelledby="replay-targets-title">
+      <h2 id="replay-targets-title">Цели в текущий момент</h2>
+      <div class="table-responsive">
+        <table class="replay-target-table">
+          <thead><tr><th>Цель</th><th>Высота</th><th>Скорость</th><th>Курс</th><th>Погрешность</th><th>Станции</th><th>Угол лучей</th></tr></thead>
+          <tbody id="replay-target-body" aria-live="polite"><tr><td colspan="7" class="text-muted">Активных целей в текущий момент нет</td></tr></tbody>
+        </table>
+      </div>
+    </section>
     <p class="replay-hint">Колесо мыши — масштаб; перетаскивание — сдвиг; двойной щелчок — показать всё; пробел — пуск/пауза; стрелки — шаг 1 с.</p>
   </div>
 
@@ -48,16 +57,6 @@
       <dl class="replay-readout" id="replay-time">
         <dt>UTC</dt><dd id="ro-utc">—</dd>
         <dt>От начала</dt><dd id="ro-rel">—</dd>
-      </dl>
-
-      <h2 class="replay-subtitle">Цель</h2>
-      <dl class="replay-readout" id="replay-target">
-        <dt>Высота</dt><dd id="ro-alt">—</dd>
-        <dt>Скорость</dt><dd id="ro-speed">—</dd>
-        <dt>Курс</dt><dd id="ro-course">—</dd>
-        <dt>Погрешность</dt><dd id="ro-err">—</dd>
-        <dt>Станции</dt><dd id="ro-stations">—</dd>
-        <dt>Угол лучей</dt><dd id="ro-crossing">—</dd>
       </dl>
 
       <h2 class="replay-subtitle">Пеленги станций</h2>

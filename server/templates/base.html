@@ -12,6 +12,7 @@
     {% set p = request.state.operator.permissions if request.state.operator else [] %}
     {% macro item(href, label) -%}
       <a class="app-nav-link{% if path == href or path.startswith(href + '/') %} active{% endif %}" href="{{ href }}"
+         {% if href == "/replay" %}data-live-replay-link{% endif %}
          {% if path == href or path.startswith(href + '/') %}aria-current="page"{% endif %}>{{ label }}</a>
     {%- endmacro %}
     <header class="app-header">

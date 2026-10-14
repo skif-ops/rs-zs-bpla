@@ -6,6 +6,7 @@
 (function () {
   "use strict";
   const REFRESH_MS = 60000;
+  const ACTIVE_ALERT_HOLD_MS = 4000;
   const STATE_TEXT = { online: "на связи", late: "опаздывает", lost: "потеряна", never: "не выходила" };
   const LEVEL_RANK = { ok: 0, info: 1, warn: 2, alarm: 3 };
   const STATE_RANK = { online: 0, never: 1, late: 2, lost: 3 };
@@ -95,13 +96,16 @@
     for (const [track, state] of liveTracks) if (state.until <= now) liveTracks.delete(track);
     const active = new Set(apiAlertUntil.keys());
     for (const state of liveTracks.values()) for (const sid of state.stations) active.add(sid);
+    let changed = false;
     for (const r of data.stations) {
       const isActive = active.has(r.station_id);
+      changed = changed || Boolean(r.active_alert) !== isActive;
       r.active_alert = isActive;
       r.level = isActive ? "alarm" : (r.health_level || r.level);
       r.problems = (r._healthProblems || r.problems || []).slice();
       if (isActive) r.problems.unshift({ code: "active_alert", level: "alarm", text: "участвует в активной тревоге" });
     }
+    return changed;
   }
 
   function quickMatch(r) {
@@ -201,7 +205,7 @@
     const overview = $("st-overview");
     overview.replaceChildren();
     rows.forEach((r) => {
-      const card = el("button", "st-station-card st-level-" + r.level);
+      const card = el("button", "st-station-card st-level-" + r.level + " st-state-" + r.state + (r.active_alert ? " st-active-alert" : ""));
       card.type = "button";
       card.setAttribute("aria-label", stationName(r) + ", ID " + r.station_id + ", " + (STATE_TEXT[r.state] || r.state) + ". Открыть подробности");
       const top = el("span", "st-station-top");
@@ -247,7 +251,7 @@
     const rows = visible();
     renderOverview(rows);
     rows.forEach((r) => {
-      const tr = el("tr", "st-row st-level-" + r.level);
+      const tr = el("tr", "st-row st-level-" + r.level + " st-state-" + r.state + (r.active_alert ? " st-active-alert" : ""));
       tr.dataset.id = r.station_id;
       columns.forEach((c) => {
         const td = el("td", (c.num ? "st-num-col" : "") + (c.wrap ? " st-wrap-cell" : ""));
@@ -292,7 +296,7 @@
       data = await res.json(); receivedAt = Date.now();
       for (const r of data.stations) {
         r._healthProblems = (r.problems || []).filter((p) => p.code !== "active_alert");
-        if (r.active_alert) apiAlertUntil.set(r.station_id, Date.now() + 8000);
+        if (r.active_alert) apiAlertUntil.set(r.station_id, Date.now() + ACTIVE_ALERT_HOLD_MS);
       }
       applyActiveAlerts();
       const tenantSelect = $("st-tenant");
@@ -324,7 +328,7 @@
     if (msg.type === "track.update" && msg.track?.track_id) {
       liveTracks.set(msg.track.track_id, {
         stations: (msg.track.stations || []).map(Number).filter(Number.isSafeInteger),
-        until: Date.now() + 8000,
+        until: Date.now() + ACTIVE_ALERT_HOLD_MS,
       });
     } else if (msg.type === "track.end" && msg.track?.track_id) {
       liveTracks.delete(msg.track.track_id);
@@ -339,6 +343,6 @@
   renderHead();
   setView("cards");
   load();
-  setInterval(() => { applyActiveAlerts(); renderSummary(); renderBody(); }, 5000);
+  setInterval(() => { if (applyActiveAlerts()) { renderSummary(); renderBody(); } }, 1000);
   setInterval(() => { if (!document.hidden) load(); else renderBody(); }, REFRESH_MS);
 })();

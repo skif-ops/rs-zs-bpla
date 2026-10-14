@@ -105,6 +105,10 @@ def test_replay_api_and_page(fused, monkeypatch):
     assert 'id="replay-canvas"' in page.text and "/static/js/replay.js" in page.text and 'href="/replay"' in page.text
     assert '<option value="1" selected>×1</option>' in page.text
     assert 'id="replay-geometry" checked' in page.text
+    assert 'id="replay-target-body"' in page.text and "Цели в текущий момент" in page.text
+    assert 'id="ro-alt"' not in page.text
     script = client.get("/static/js/replay.js")
     assert script.status_code == 200
     assert "function bearingsAt" in script.text and "for (const b of bearingsAt" in script.text
+    assert "LIVE_EPISODE_GAP_US = 7000000" in script.text
+    assert "const visible = liveActive ? active" in script.text

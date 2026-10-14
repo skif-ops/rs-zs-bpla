@@ -29,7 +29,7 @@ BATTERY_LOW_ENV = "ZS_STATION_BATTERY_LOW_PCT"
 DEFAULT_LATE_S = 7 * 3600
 DEFAULT_LOST_S = 13 * 3600
 DEFAULT_BATTERY_LOW_PCT = 20
-ACTIVE_ALERT_US = 8_000_000
+ACTIVE_ALERT_US = 4_000_000
 TEMPERATURE_MIN_C, TEMPERATURE_MAX_C = -30.0, 60.0      # EVT hardware operating range
 STATES = ("online", "late", "lost", "never")
 LEVELS = ("ok", "info", "warn", "alarm")                   # worst last
@@ -218,8 +218,8 @@ def active_alert_stations(store, tenants: set[str], now_us: int) -> set[int]:
 
     An alert episode deliberately remains open for two minutes, while the station
     page needs the stations of tracks that are active now. Use the fusion wall
-    clock and an eight second window: live tracks update once a second and the
-    controlled scenarios have a ten second gap. An alert that has not formed a
+    clock and a four second window: live tracks update once a second and the
+    operator screen keeps a current target for three seconds. An alert that has not formed a
     fused track yet falls back to its recent stations.
     """
     active: set[int] = set()

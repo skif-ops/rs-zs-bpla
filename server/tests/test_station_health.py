@@ -103,6 +103,8 @@ def test_row_and_summary():
 
 
 def test_active_alert_stations_uses_only_fresh_open_tracks():
+    assert health.ACTIVE_ALERT_US == 4_000_000
+
     class AlertStore:
         def open_episode(self, tenant):
             return {"alert_id": "A-" + tenant, "level": "alert", "last_activity_us": NOW,
@@ -169,6 +171,9 @@ def test_the_page_data_follows_the_account(field, tmp_path, monkeypatch):
     page = logged_in(app, "north").get("/stations")
     assert page.status_code == 200 and 'id="st-table"' in page.text and "/static/js/stations.js" in page.text
     assert 'href="/stations"' in page.text and 'aria-current="page"' in page.text   # the menu marks the open page
+    assert 'data-live-replay-link' in page.text
+    script = logged_in(app, "north").get("/static/js/stations.js").text
+    assert "ACTIVE_ALERT_HOLD_MS = 4000" in script and "st-active-alert" in script and "st-state-" in script
 
 
 def test_tenant_viewer_sees_registered_station_before_first_heartbeat(field, tmp_path, monkeypatch):

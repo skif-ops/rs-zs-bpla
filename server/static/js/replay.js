@@ -10,6 +10,7 @@
   const RAY_M = 6000;              // rays drawn this long (beyond the 5 km fusion range)
   const RAY_HOLD_US = 1500000;     // a bearing is shown for this long after it was heard
   const LIVE_TRACK_HOLD_US = 3000000; // concurrently updated targets can differ by a few fusion ticks
+  const LIVE_EPISODE_GAP_US = 7000000; // a quiet interval separates adjacent controlled or real flight episodes
   const GRID_STEPS = [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000];
 
   let data = null;
@@ -26,6 +27,8 @@
   let liveFollowing = liveActive;
   let liveLoading = false;
   let liveSince = Number(pageQuery.get("since")) || Date.now() * 1000 - 5 * 60 * 1e6;
+  let livePrerollUs = pageQuery.get("segment") === "1" ? 2e6 : 15e6;
+  let liveLastTrackUs = 0;
   let liveStations = pageQuery.get("stations") || "";
   let liveTenant = pageQuery.get("tenant") || "";
 
@@ -39,7 +42,7 @@
 
   function liveQuery() {
     const until = Date.now() * 1000;
-    const since = Math.max(Math.min(liveSince - 15e6, until - 1e6), until - 29 * 60 * 1e6);
+    const since = Math.max(Math.min(liveSince - livePrerollUs, until - 1e6), until - 29 * 60 * 1e6);
     const q = new URLSearchParams({ since_us: String(Math.round(since)), until_us: String(Math.round(until)) });
     // The account scope already limits the operator to the bench tenant.  Do
     // not freeze the request to the stations present in alert.start: more
@@ -393,7 +396,9 @@
   }
 
   function drawTracks(active) {
-    for (const [index, tr] of data.tracks.entries()) {
+    const visible = liveActive ? active : data.tracks.map((tr, index) => ({ tr, index, point: pointAt(tr, t) }));
+    for (const item of visible) {
+      const { index, tr } = item;
       const color = TARGET_COLORS[index % TARGET_COLORS.length];
       const past = tr.points.filter((p) => p.t_us <= t);
       // the whole track faint, the part already flown solid
@@ -403,7 +408,7 @@
       polyline(past);
       ctx.fillStyle = color;
       for (const p of past) { ctx.beginPath(); ctx.arc(sx(p.e), sy(p.n), 1.8, 0, 2 * Math.PI); ctx.fill(); }
-      const p = pointAt(tr, t);
+      const p = item.point;
       if (!p) continue;
       const x = sx(p.e), y = sy(p.n);
       ctx.globalAlpha = 0.10; ctx.fillStyle = color;
@@ -450,7 +455,6 @@
 
   // ---- panel ---------------------------------------------------------------------------------------------------
   function updatePanel(active) {
-    const p = active.length ? active[0].point : null;
     if (liveActive) {
       const targetText = active.length ? ` · целей сейчас: ${active.length}` : " · ожидание цели";
       $("replay-live-state").textContent = "● Тревога" + targetText + " · обновляется";
@@ -459,17 +463,37 @@
     $("ro-utc").textContent = fmtUtc(t);
     $("replay-current-time").textContent = fmtUtc(t) + " UTC";
     $("ro-rel").textContent = ((t - data.window.first_us) / 1e6).toFixed(1) + " с";
-    const set = (id, v) => { $(id).textContent = v; };
-    if (p) {
-      set("ro-alt", `${Math.round(p.u)} м ±${Math.round(p.v_err_m)} над станциями (${Math.round(p.alt_msl_m)} м над морем)`);
-      set("ro-speed", `${p.speed_mps.toFixed(1)} м/с · ${Math.round(p.speed_mps * 3.6)} км/ч`);
-      set("ro-course", p.speed_mps > 0.5 ? `${Math.round(p.course_deg)}°` : "—");
-      set("ro-err", `±${Math.round(p.h_err_m)} м`);
-      set("ro-stations", p.stations.join(", "));
-      set("ro-crossing", `${Math.round(p.crossing_deg)}°`);
-    } else {
-      for (const id of ["ro-alt", "ro-speed", "ro-course", "ro-err", "ro-stations", "ro-crossing"]) set(id, "—");
+    const targetBody = $("replay-target-body");
+    targetBody.replaceChildren();
+    if (!active.length) {
+      const row = document.createElement("tr");
+      const cell = document.createElement("td");
+      cell.colSpan = 7; cell.className = "text-muted"; cell.textContent = "Активных целей в текущий момент нет";
+      row.appendChild(cell); targetBody.appendChild(row);
     }
+    active.forEach((item, position) => {
+      const p = item.point;
+      const row = document.createElement("tr");
+      const target = document.createElement("th");
+      target.scope = "row";
+      const dot = document.createElement("span");
+      dot.className = "replay-dot"; dot.style.background = TARGET_COLORS[item.index % TARGET_COLORS.length];
+      target.appendChild(dot);
+      target.appendChild(document.createTextNode(` Цель ${position + 1}`));
+      row.appendChild(target);
+      const values = [
+        `${Math.round(p.u)} м ±${Math.round(p.v_err_m)}`,
+        `${p.speed_mps.toFixed(1)} м/с · ${Math.round(p.speed_mps * 3.6)} км/ч`,
+        p.speed_mps > 0.5 ? `${Math.round(p.course_deg)}°` : "—",
+        `±${Math.round(p.h_err_m)} м`,
+        p.stations.join(", "),
+        `${Math.round(p.crossing_deg)}°`,
+      ];
+      for (const value of values) {
+        const cell = document.createElement("td"); cell.textContent = value; row.appendChild(cell);
+      }
+      targetBody.appendChild(row);
+    });
     const ul = $("ro-bearings");
     ul.innerHTML = "";
     for (const s of data.stations) {
@@ -588,8 +612,25 @@
       $("replay-now").hidden = true;
       return;
     }
+    if (msg.type === "track.update") {
+      const pointUs = Date.parse(msg.time) * 1000;
+      if (Number.isFinite(pointUs) && liveLastTrackUs && pointUs - liveLastTrackUs > LIVE_EPISODE_GAP_US) {
+        liveSince = pointUs;
+        livePrerollUs = 2e6;
+        liveFollowing = true;
+        data = null; byStation = new Map(); coverage = null;
+        $("replay-empty").textContent = "Начинается новый эпизод…";
+        $("replay-empty").hidden = false;
+        draw();
+      }
+      if (Number.isFinite(pointUs)) liveLastTrackUs = Math.max(liveLastTrackUs, pointUs);
+    }
     if (msg.alert?.stations?.length) liveStations = msg.alert.stations.map((s) => s.station_id).join(",");
     if (msg.type === "alert.update" || msg.type === "track.update" || msg.type === "bearing") refreshLive();
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && liveActive) refreshLive();
   });
 
   loadSources();

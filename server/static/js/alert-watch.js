@@ -5,6 +5,8 @@
   const key = "muhoed-alert-cursor:" + name;
   const seenKey = "muhoed-opened-alerts:" + name;
   const seenTracksKey = "muhoed-opened-alert-tracks:" + name;
+  const liveKey = "muhoed-current-live:" + name;
+  const EPISODE_GAP_US = 7000000;
   let hasBaseline = sessionStorage.getItem(key) !== null;
   let cursor = Number(sessionStorage.getItem(key)) || 0;
   let opened;
@@ -13,6 +15,9 @@
   let openedTracks;
   try { openedTracks = JSON.parse(sessionStorage.getItem(seenTracksKey) || "[]"); } catch { openedTracks = []; }
   if (!Array.isArray(openedTracks)) openedTracks = [];
+  let liveState;
+  try { liveState = JSON.parse(sessionStorage.getItem(liveKey) || "null"); } catch { liveState = null; }
+  if (!liveState || !liveState.alertId) liveState = null;
   let retries = 0, socket = null, retryTimer = null, pollBusy = false, lastFrameAt = 0;
   const badge = document.getElementById("alert-channel-status");
   function status(text, kind = "") {
@@ -21,10 +26,43 @@
     badge.className = "alert-channel-status" + (kind ? " is-" + kind : "");
   }
 
+  function liveTarget() {
+    if (!liveState) return "/replay";
+    const params = new URLSearchParams({ live: "1", alert: liveState.alertId, tenant: liveState.tenant || "" });
+    if (liveState.track) params.set("track", liveState.track);
+    if (liveState.sinceUs) params.set("since", String(liveState.sinceUs));
+    if (liveState.stations?.length) params.set("stations", liveState.stations.join(","));
+    if (liveState.segmented) params.set("segment", "1");
+    return "/replay?" + params;
+  }
+
+  function saveLiveState() {
+    if (liveState) sessionStorage.setItem(liveKey, JSON.stringify(liveState));
+    else sessionStorage.removeItem(liveKey);
+    const target = liveTarget();
+    document.querySelectorAll("[data-live-replay-link]").forEach((link) => { link.href = target; });
+  }
+
   function onMessage(msg) {
     if (msg.schema !== "dioneya.alert/1") return;
     if (Number.isSafeInteger(msg.seq) && msg.seq > cursor) {
       cursor = msg.seq; hasBaseline = true; sessionStorage.setItem(key, String(cursor));
+    }
+    if (msg.type === "alert.end" && liveState?.alertId === msg.alert_id) {
+      liveState = null;
+      saveLiveState();
+    } else if (msg.type === "track.update" && msg.track?.track_id && liveState?.alertId === msg.alert_id) {
+      const pointUs = Date.parse(msg.time) * 1000;
+      if (Number.isFinite(pointUs)) {
+        if (liveState.lastTrackUs && pointUs - liveState.lastTrackUs > EPISODE_GAP_US) {
+          liveState.sinceUs = pointUs;
+          liveState.segmented = true;
+          liveState.track = msg.track.track_id;
+          liveState.stations = (msg.track.stations || []).map(Number).filter(Number.isSafeInteger);
+        }
+        liveState.lastTrackUs = Math.max(liveState.lastTrackUs || 0, pointUs);
+        saveLiveState();
+      }
     }
     window.dispatchEvent(new CustomEvent("muhoed:alert-message", { detail: msg }));
     if (!((msg.type === "alert.start" || msg.type === "alert.update") && msg.alert?.level === "alert" && msg.alert_id)) return;
@@ -43,14 +81,26 @@
     // One long alert episode may receive a new target much later. Treat every new
     // fused track as fresh operator attention, even though alert_id has not changed.
     if (!firstAlert && !freshTracks.length) return;
-    const params = new URLSearchParams({ live: "1", alert: msg.alert_id, tenant: msg.tenant || "" });
     const track = freshTracks[0] || tracks[0];
-    if (track) params.set("track", track);
     const started = Date.parse(msg.alert.started || msg.time);
-    if (Number.isFinite(started)) params.set("since", String(started * 1000));
     const stations = (msg.alert.stations || []).map((s) => Number(s.station_id)).filter(Number.isSafeInteger);
-    if (stations.length) params.set("stations", stations.join(","));
-    const target = "/replay?" + params;
+    if (!liveState || liveState.alertId !== msg.alert_id) {
+      liveState = {
+        alertId: msg.alert_id,
+        tenant: msg.tenant || "",
+        sinceUs: Number.isFinite(started) ? started * 1000 : 0,
+        stations,
+        track: track || "",
+        lastTrackUs: 0,
+        segmented: false,
+      };
+    } else {
+      liveState.tenant = msg.tenant || liveState.tenant;
+      if (stations.length) liveState.stations = stations;
+      if (track) liveState.track = track;
+    }
+    saveLiveState();
+    const target = liveTarget();
     if (location.pathname !== "/replay" || new URLSearchParams(location.search).get("alert") !== msg.alert_id)
       location.assign(target);
   }
@@ -108,5 +158,6 @@
   setInterval(() => {
     if (socket && socket.readyState === 1 && Date.now() - lastFrameAt > 30000) socket.close();
   }, 5000);
+  saveLiveState();
   start();
 })();

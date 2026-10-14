@@ -554,6 +554,13 @@ body > main {
 .replay-select { padding: .45rem .6rem; font-size: 1rem; }
 .replay-timeline { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .65rem; margin-top: .75rem; color: #344054; font-size: .95rem; font-variant-numeric: tabular-nums; }
 .replay-slider { width: 100%; min-width: 80px; accent-color: #175cd3; }
+.replay-targets { margin-top: .9rem; border: 1px solid #d0d7de; border-radius: 10px; background: #fff; overflow: hidden; }
+.replay-targets h2 { margin: 0; padding: .65rem .8rem; border-bottom: 1px solid #e4e7ec; font-size: 1.05rem; }
+.replay-target-table { width: 100%; border-collapse: collapse; font-size: .88rem; font-variant-numeric: tabular-nums; }
+.replay-target-table th, .replay-target-table td { padding: .48rem .6rem; border-bottom: 1px solid #e4e7ec; text-align: left; white-space: nowrap; }
+.replay-target-table thead th { color: #475467; background: #f8fafc; font-size: .78rem; text-transform: uppercase; letter-spacing: .02em; }
+.replay-target-table tbody tr:last-child th, .replay-target-table tbody tr:last-child td { border-bottom: 0; }
+.replay-target-table tbody th { color: #101828; }
 .replay-check { display: flex; align-items: center; gap: .55rem; margin: .8rem 0; font-size: 1rem; }
 .replay-check input { width: 1.1rem; height: 1.1rem; }
 .replay-hint { color: #667085; font-size: .88rem; margin: .65rem 0 0; }
@@ -652,6 +659,10 @@ body > main {
 .st-station-card.st-level-alarm { border-left-color: #d92d20; }
 .st-station-card.st-level-warn { border-left-color: #f79009; }
 .st-station-card.st-level-info { border-left-color: #2e90fa; }
+.st-station-card.st-state-late { border-left-color: #f79009; background: #fffcf5; }
+.st-station-card.st-state-lost { border-left-color: #475467; background: #f2f4f7; }
+.st-station-card.st-state-never { border-left-color: #98a2b3; background: #f8fafc; }
+.st-station-card.st-active-alert { border-left-color: #d92d20; background: #fff1f0; box-shadow: inset 0 0 0 1px #fda29b; }
 .st-station-top, .st-station-metrics { display: flex; align-items: center; justify-content: space-between; gap: .4rem; }
 .st-station-top strong { font-size: 1.1rem; }
 .st-station-tenant { color: #667085; font-size: .77rem; }
@@ -687,6 +698,10 @@ body > main {
 .st-row.st-level-warn td:first-child { box-shadow: inset 4px 0 0 #f79009; }
 .st-row.st-level-ok td:first-child { box-shadow: inset 4px 0 0 #12b76a; }
 .st-row.st-level-info td:first-child { box-shadow: inset 4px 0 0 #2e90fa; }
+.st-row.st-state-lost td, .st-row.st-state-never td { background: #f2f4f7; }
+.st-row.st-state-lost td:first-child, .st-row.st-state-never td:first-child { box-shadow: inset 4px 0 0 #667085; }
+.st-row.st-active-alert td { background: #fff1f0; }
+.st-row.st-active-alert td:first-child { box-shadow: inset 4px 0 0 #d92d20; }
 .st-badge { display: inline-block; padding: .1rem .5rem; border-radius: 999px; font-size: .78rem; font-weight: 600; white-space: nowrap; }
 .st-badge.st-online { background: #ecfdf3; color: #067647; }
 .st-badge.st-late { background: #fffaeb; color: #b54708; }
