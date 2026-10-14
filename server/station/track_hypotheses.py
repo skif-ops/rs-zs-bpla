@@ -10,7 +10,7 @@ the server keeps every explanation open and decides on a moving window:
    have sent their bearings (stations more than LAG_S behind those two do not hold the steps back).  A step uses only
    the bearings up to its time, and a segment only from the bearing that made it a segment, so the decisions do not
    depend on the order in which the stations' batches arrive.
-2. Hypotheses.  Every combination of active segments (a bearing within track_segments.ACTIVE_S) of two to four
+2. Hypotheses.  Every combination of active segments (a bearing within track_segments.ACTIVE_S) of two to five
    stations that may hear one target (target_match) is a hypothesis.  Its rays are intersected on the 1 s grid of
    emission times of the last WINDOW_S seconds (fusion/bearing_fusion.py: each station's bearing at emission +
    range / c); bearings off their segment's own course (own_course) are left out.  A point counts for the hypothesis
@@ -64,7 +64,7 @@ STEP_US = 1_000_000
 WINDOW_S = 20.0                  # the evidence of a hypothesis: emission times of the last 20 s (+ range / c)
 LAG_S = 5.0                      # a station this far behind the second latest one does not hold the steps back
 CATCH_UP_STEPS = 120             # steps one batch may advance (a gap in the stream is jumped)
-MAX_STATIONS = 4                 # hypotheses of up to four stations
+MAX_STATIONS = 5                 # five simultaneous hearers must remain one target, not a disjoint 3+2 explanation
 MAX_UNITS_PER_STATION = 4        # the latest segments of a station taken into account
 MAX_CANDIDATES = 64              # the best hypotheses competing in the global choice
 MIN_FIXES = 3                    # a hypothesis needs this many points in its window

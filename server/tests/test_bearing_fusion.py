@@ -18,7 +18,8 @@ from station.store import EventStore
 FRAME = EnuFrame(55.0, 37.0, 150.0)
 C = 343.0
 T0 = 1_800_000_000.0                       # wall seconds of the scene start
-STATIONS = {1: (0.0, 0.0, 0.0), 2: (900.0, 0.0, 0.0), 3: (450.0, 700.0, 0.0)}
+STATIONS = {1: (0.0, 0.0, 0.0), 2: (900.0, 0.0, 0.0), 3: (450.0, 700.0, 0.0),
+            4: (-500.0, 900.0, 0.0), 5: (1400.0, 900.0, 0.0)}
 
 
 def truth(te: float) -> np.ndarray:
@@ -149,6 +150,17 @@ def test_bridge_forms_one_fused_track_from_two_stations(bridge):
     assert track["system_event_id"] and track["system_event_id"].startswith("AIR_")   # the stations' detections
     live = [m for m in (q.get_nowait() for _ in range(q.qsize())) if isinstance(m, dict) and m.get("type") == "track"]
     assert live and live[-1]["track_id"] == summary["track_id"] and live[-1]["last"]["time_us"] == summary["last_time_us"]
+
+
+def test_five_stations_hearing_one_target_form_one_track(bridge):
+    """A fifth compatible ray must strengthen one hypothesis instead of letting the global choice publish 3+2 tracks."""
+    store, service = bridge
+    feed(store, service, (1, 2, 3, 4, 5))
+    (summary,) = store.list_tracks()
+    track = store.get_track(summary["track_id"])
+    assert summary["stations"] == [1, 2, 3, 4, 5]
+    assert {member["station_id"] for member in track["members"]} == {1, 2, 3, 4, 5}
+    assert summary["points"] >= 40
 
 
 def test_arrival_order_and_redelivery_do_not_change_the_track(bridge, tmp_path):
