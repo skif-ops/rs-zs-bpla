@@ -102,6 +102,22 @@ def test_row_and_summary():
                                     "battery_low": 1, "gnss": 1, "updating": 1}
 
 
+def test_active_alert_stations_uses_only_fresh_open_tracks():
+    class AlertStore:
+        def open_episode(self, tenant):
+            return {"alert_id": "A-" + tenant, "level": "alert", "last_activity_us": NOW,
+                    "stations": [17, 18, 19]}
+
+        def open_alert_tracks(self, alert_id):
+            return [{"track_id": "fresh", "updated_us": NOW - 1_000_000},
+                    {"track_id": "stale", "updated_us": NOW - health.ACTIVE_ALERT_US - 1}]
+
+        def get_track(self, track_id):
+            return {"stations": [17, 18] if track_id == "fresh" else [19]}
+
+    assert health.active_alert_stations(AlertStore(), {"north"}, NOW) == {17, 18}
+
+
 def test_received_time_is_the_server_clock_and_old_rows_fall_back(tmp_path: Path):
     store = EventStore(tmp_path / "zs.sqlite3")
     before = int(time.time() * 1e6)

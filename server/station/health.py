@@ -29,6 +29,7 @@ BATTERY_LOW_ENV = "ZS_STATION_BATTERY_LOW_PCT"
 DEFAULT_LATE_S = 7 * 3600
 DEFAULT_LOST_S = 13 * 3600
 DEFAULT_BATTERY_LOW_PCT = 20
+ACTIVE_ALERT_US = 30_000_000
 TEMPERATURE_MIN_C, TEMPERATURE_MAX_C = -30.0, 60.0      # EVT hardware operating range
 STATES = ("online", "late", "lost", "never")
 LEVELS = ("ok", "info", "warn", "alarm")                   # worst last
@@ -212,6 +213,33 @@ def summary(rows: list[Mapping[str, Any]]) -> dict[str, int]:
     return out
 
 
+def active_alert_stations(store, tenants: set[str], now_us: int) -> set[int]:
+    """Stations contributing to a current alert.
+
+    An alert episode deliberately remains open for two minutes, while the station
+    page needs the stations of tracks that are active now.  Use the fusion wall
+    clock and the same 30 second order of magnitude as track loss detection.  An
+    alert that has not formed a fused track yet falls back to its recent stations.
+    """
+    active: set[int] = set()
+    cutoff = now_us - ACTIVE_ALERT_US
+    for tenant in tenants:
+        episode = store.open_episode(tenant)
+        if episode is None or episode.get("level") != "alert":
+            continue
+        tenant_active: set[int] = set()
+        for state in store.open_alert_tracks(episode["alert_id"]):
+            if int(state.get("updated_us") or 0) < cutoff:
+                continue
+            track = store.get_track(state["track_id"])
+            if track:
+                tenant_active.update(int(s) for s in track.get("stations") or [])
+        if not tenant_active and int(episode.get("last_activity_us") or 0) >= cutoff:
+            tenant_active.update(int(s) for s in episode.get("stations") or [])
+        active.update(tenant_active)
+    return active
+
+
 def report(store, scope, registry_rows: list[Mapping[str, Any]], now_us: int | None = None,
            t: Thresholds | None = None) -> dict[str, Any]:
     """The page's data for one account: its stations (reported, or registered and never seen), the summary, the
@@ -228,4 +256,11 @@ def report(store, scope, registry_rows: list[Mapping[str, Any]], now_us: int | N
         hb = seen.get(sid)
         rows.append(row(sid, hb["heartbeat"] if hb else None, hb["received_us"] if hb else None,
                         hb["updated_us"] if hb else None, registry.get(sid), tenants.get(sid), now_us, t))
+    active = active_alert_stations(store, {str(r["tenant"]) for r in rows if r.get("tenant")}, now_us)
+    for item in rows:
+        item["health_level"] = item["level"]
+        item["active_alert"] = item["station_id"] in active
+        if item["active_alert"]:
+            item["level"] = "alarm"
+            item["problems"].insert(0, _problem("active_alert", "alarm", "участвует в активной тревоге"))
     return {"now_us": now_us, "thresholds": t.as_dict(), "summary": summary(rows), "stations": rows}

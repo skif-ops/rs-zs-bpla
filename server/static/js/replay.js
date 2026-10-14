@@ -6,7 +6,7 @@
   const canvas = $("replay-canvas");
   const ctx = canvas.getContext("2d");
   const COLORS = ["#2563eb", "#d97706", "#059669", "#db2777", "#7c3aed", "#0891b2", "#65a30d", "#dc2626"];
-  const TRACK_COLOR = "#111827";
+  const TARGET_COLORS = ["#dc2626", "#7c3aed", "#059669", "#d97706", "#0891b2", "#db2777"];
   const RAY_M = 6000;              // rays drawn this long (beyond the 5 km fusion range)
   const RAY_HOLD_US = 1500000;     // a bearing is shown for this long after it was heard
   const GRID_STEPS = [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000];
@@ -284,6 +284,8 @@
   // ---- drawing -------------------------------------------------------------------------------------------------
   function draw() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
+    const active = data ? data.tracks.map((tr, index) => ({ tr, index, point: pointAt(tr, t) })).filter((x) => x.point) : [];
+    if (active.length && $("replay-follow").checked) focusActiveTargets(active);
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = "#f8fafc";
     ctx.fillRect(0, 0, w, h);
@@ -292,7 +294,7 @@
     if (!data) return;
     drawBearings();
     drawStations();
-    const current = drawTracks();
+    const current = drawTracks(active);
     drawNorth(w);
     updatePanel(current);
   }
@@ -365,34 +367,53 @@
     }
   }
 
-  function drawTracks() {
-    let current = null;
-    for (const tr of data.tracks) {
+  function drawTracks(active) {
+    for (const [index, tr] of data.tracks.entries()) {
+      const color = TARGET_COLORS[index % TARGET_COLORS.length];
       const past = tr.points.filter((p) => p.t_us <= t);
       // the whole track faint, the part already flown solid
-      ctx.strokeStyle = "rgba(17,24,39,.18)"; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+      ctx.globalAlpha = 0.25; ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
       polyline(tr.points); ctx.setLineDash([]);
-      ctx.strokeStyle = TRACK_COLOR; ctx.lineWidth = 2;
+      ctx.globalAlpha = 1; ctx.strokeStyle = color; ctx.lineWidth = 2;
       polyline(past);
-      ctx.fillStyle = TRACK_COLOR;
+      ctx.fillStyle = color;
       for (const p of past) { ctx.beginPath(); ctx.arc(sx(p.e), sy(p.n), 1.8, 0, 2 * Math.PI); ctx.fill(); }
       const p = pointAt(tr, t);
       if (!p) continue;
       const x = sx(p.e), y = sy(p.n);
-      ctx.strokeStyle = "rgba(220,38,38,.55)"; ctx.fillStyle = "rgba(220,38,38,.10)"; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.arc(x, y, Math.max(p.h_err_m * view.s, 3), 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
-      ctx.strokeStyle = "#dc2626"; ctx.lineWidth = 2;          // where it will be in 10 s
+      ctx.globalAlpha = 0.10; ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(x, y, Math.max(p.h_err_m * view.s, 3), 0, 2 * Math.PI); ctx.fill();
+      ctx.globalAlpha = 0.55; ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.stroke();
+      ctx.globalAlpha = 1; ctx.strokeStyle = color; ctx.lineWidth = 2;          // where it will be in 10 s
       ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + p.ve * 10 * view.s, y - p.vn * 10 * view.s); ctx.stroke();
-      ctx.fillStyle = "#dc2626";
+      ctx.fillStyle = color;
       ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI); ctx.fill();
       ctx.fillStyle = "#0f172a"; ctx.font = "12px system-ui, sans-serif";
-      const tag = `${Math.round(p.u)} м · ${Math.round(p.speed_mps * 3.6)} км/ч`;
+      const prefix = active.length > 1 ? `цель ${active.findIndex((x) => x.tr.track_id === tr.track_id) + 1} · ` : "";
+      const tag = `${prefix}${Math.round(p.u)} м · ${Math.round(p.speed_mps * 3.6)} км/ч`;
       const tw = ctx.measureText(tag).width;
       ctx.fillText(tag, x + 9 + tw > canvas.clientWidth - 4 ? x - 9 - tw : x + 9, y - 8);
-      if (!current) current = p;
     }
-    if (current && $("replay-follow").checked) { view.cx = current.e; view.cy = current.n; }
-    return current;
+    return active;
+  }
+
+  function focusActiveTargets(active) {
+    if (active.length === 1) {
+      view.cx = active[0].point.e;
+      view.cy = active[0].point.n;
+      return;
+    }
+    const stationIds = new Set(active.flatMap((item) => item.point.stations || []));
+    const xs = active.map((item) => item.point.e);
+    const ys = active.map((item) => item.point.n);
+    for (const station of data.stations) {
+      if (stationIds.has(station.station_id)) { xs.push(station.e); ys.push(station.n); }
+    }
+    const minx = Math.min(...xs), maxx = Math.max(...xs), miny = Math.min(...ys), maxy = Math.max(...ys);
+    const spanx = Math.max(maxx - minx, 600), spany = Math.max(maxy - miny, 600);
+    view.cx = (minx + maxx) / 2;
+    view.cy = (miny + maxy) / 2;
+    view.s = 0.72 * Math.min(canvas.clientWidth / spanx, canvas.clientHeight / spany);
   }
 
   function polyline(pts) {
@@ -403,7 +424,13 @@
   }
 
   // ---- panel ---------------------------------------------------------------------------------------------------
-  function updatePanel(p) {
+  function updatePanel(active) {
+    const p = active.length ? active[0].point : null;
+    if (liveActive) {
+      const targetText = active.length ? ` · целей сейчас: ${active.length}` : " · ожидание цели";
+      $("replay-live-state").textContent = "● Тревога" + targetText + " · обновляется";
+      $("replay-selection-title").textContent = "Тревога · " + (liveTenant || "участок") + targetText;
+    }
     $("ro-utc").textContent = fmtUtc(t);
     $("replay-current-time").textContent = fmtUtc(t) + " UTC";
     $("ro-rel").textContent = ((t - data.window.first_us) / 1e6).toFixed(1) + " с";

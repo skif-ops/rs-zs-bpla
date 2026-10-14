@@ -4,11 +4,15 @@
   const name = document.body.dataset.operatorName || "operator";
   const key = "muhoed-alert-cursor:" + name;
   const seenKey = "muhoed-opened-alerts:" + name;
+  const seenTracksKey = "muhoed-opened-alert-tracks:" + name;
   let hasBaseline = sessionStorage.getItem(key) !== null;
   let cursor = Number(sessionStorage.getItem(key)) || 0;
   let opened;
   try { opened = JSON.parse(sessionStorage.getItem(seenKey) || "[]"); } catch { opened = []; }
   if (!Array.isArray(opened)) opened = [];
+  let openedTracks;
+  try { openedTracks = JSON.parse(sessionStorage.getItem(seenTracksKey) || "[]"); } catch { openedTracks = []; }
+  if (!Array.isArray(openedTracks)) openedTracks = [];
   let retries = 0, socket = null, retryTimer = null, pollBusy = false, lastFrameAt = 0;
   const badge = document.getElementById("alert-channel-status");
   function status(text, kind = "") {
@@ -26,11 +30,21 @@
     if (!((msg.type === "alert.start" || msg.type === "alert.update") && msg.alert?.level === "alert" && msg.alert_id)) return;
     const created = Date.parse(msg.created);
     if (!Number.isFinite(created) || Math.abs(Date.now() - created) > 150000) return;
-    if (opened.includes(msg.alert_id)) return;
-    opened.push(msg.alert_id); opened = opened.slice(-30);
-    sessionStorage.setItem(seenKey, JSON.stringify(opened));
+    const firstAlert = !opened.includes(msg.alert_id);
+    const tracks = Array.isArray(msg.alert.tracks) ? msg.alert.tracks : [];
+    const freshTracks = tracks.filter((track) => !openedTracks.includes(msg.alert_id + ":" + track));
+    for (const track of freshTracks) openedTracks.push(msg.alert_id + ":" + track);
+    openedTracks = openedTracks.slice(-120);
+    sessionStorage.setItem(seenTracksKey, JSON.stringify(openedTracks));
+    if (firstAlert) {
+      opened.push(msg.alert_id); opened = opened.slice(-30);
+      sessionStorage.setItem(seenKey, JSON.stringify(opened));
+    }
+    // One long alert episode may receive a new target much later. Treat every new
+    // fused track as fresh operator attention, even though alert_id has not changed.
+    if (!firstAlert && !freshTracks.length) return;
     const params = new URLSearchParams({ live: "1", alert: msg.alert_id, tenant: msg.tenant || "" });
-    const track = msg.alert.tracks?.[0];
+    const track = freshTracks[0] || tracks[0];
     if (track) params.set("track", track);
     const started = Date.parse(msg.alert.started || msg.time);
     if (Number.isFinite(started)) params.set("since", String(started * 1000));

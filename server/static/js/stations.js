@@ -86,6 +86,22 @@
   let selectedTenant = "";
   let viewMode = "cards";
   const open = new Set();                // station ids with the details row open
+  const liveTracks = new Map();          // track_id -> station ids, updated by dioneya.alert/1
+  const apiAlertUntil = new Map();        // active state received with the health snapshot
+
+  function applyActiveAlerts() {
+    const now = Date.now();
+    for (const [sid, until] of apiAlertUntil) if (until <= now) apiAlertUntil.delete(sid);
+    const active = new Set(apiAlertUntil.keys());
+    for (const stations of liveTracks.values()) for (const sid of stations) active.add(sid);
+    for (const r of data.stations) {
+      const isActive = active.has(r.station_id);
+      r.active_alert = isActive;
+      r.level = isActive ? "alarm" : (r.health_level || r.level);
+      r.problems = (r._healthProblems || r.problems || []).slice();
+      if (isActive) r.problems.unshift({ code: "active_alert", level: "alarm", text: "участвует в активной тревоге" });
+    }
+  }
 
   function quickMatch(r) {
     if (!quick) return true;
@@ -248,7 +264,7 @@
 
   function renderSummary() {
     const pool = selectedTenant ? data.stations.filter((r) => r.tenant === selectedTenant) : data.stations;
-    const s = selectedTenant ? {
+    const s = {
       total: pool.length,
       online: pool.filter((r) => r.state === "online").length,
       late: pool.filter((r) => r.state === "late").length,
@@ -259,7 +275,7 @@
       battery_low: pool.filter((r) => r.problems.some((p) => p.code === "battery_low")).length,
       gnss: pool.filter((r) => r.problems.some((p) => /^(gnss_|position_|time_)/.test(p.code))).length,
       updating: pool.filter((r) => r.problems.some((p) => p.code === "fw_update" || p.code === "net_trial")).length,
-    } : (data.summary || {});
+    };
     document.querySelectorAll("#st-summary .st-num").forEach((n) => { n.textContent = s[n.dataset.key] ?? "–"; });
     document.querySelectorAll("#st-summary .st-card").forEach((b) => b.classList.toggle("st-active", b.dataset.filter === quick));
     const hours = (v) => v ? (v / 3600).toLocaleString("ru-RU", { maximumFractionDigits: 1 }) + " ч" : "";
@@ -273,6 +289,11 @@
       const res = await fetch("/api/v1/stations/health", { headers: { accept: "application/json" }, cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       data = await res.json(); receivedAt = Date.now();
+      for (const r of data.stations) {
+        r._healthProblems = (r.problems || []).filter((p) => p.code !== "active_alert");
+        if (r.active_alert) apiAlertUntil.set(r.station_id, Date.now() + 30000);
+      }
+      applyActiveAlerts();
       const tenantSelect = $("st-tenant");
       const tenants = [...new Set(data.stations.map((r) => r.tenant).filter(Boolean))].sort();
       tenantSelect.replaceChildren(new Option("Все доступные", ""));
@@ -297,9 +318,23 @@
   $("st-view-table").addEventListener("click", () => setView("table"));
   $("st-refresh").addEventListener("click", load);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
+  window.addEventListener("muhoed:alert-message", (event) => {
+    const msg = event.detail || {};
+    if (msg.type === "track.update" && msg.track?.track_id) {
+      liveTracks.set(msg.track.track_id, (msg.track.stations || []).map(Number).filter(Number.isSafeInteger));
+    } else if (msg.type === "track.end" && msg.track?.track_id) {
+      liveTracks.delete(msg.track.track_id);
+    } else if (msg.type === "alert.end") {
+      liveTracks.clear(); apiAlertUntil.clear();
+    } else {
+      return;
+    }
+    applyActiveAlerts(); renderSummary(); renderBody();
+  });
 
   renderHead();
   setView("cards");
   load();
+  setInterval(() => { applyActiveAlerts(); renderSummary(); renderBody(); }, 5000);
   setInterval(() => { if (!document.hidden) load(); else renderBody(); }, REFRESH_MS);
 })();
