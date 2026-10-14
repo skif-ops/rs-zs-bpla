@@ -3,8 +3,10 @@
 
 The controlled sequence uses a different station group for every scenario:
 9001..9003 for one UAV, 9004..9006 for two UAVs and 9007..9009 for three
-UAVs.  The tool is hard-bound to the ``bench`` tenant and QoS 1.  Omitting
-``--execute`` validates the PKI and prints the plan without sending traffic.
+UAVs.  The wide-hearing scenario uses stations 9010..9014 around one flight
+corridor so five stations hear one target at the same time.  The tool is
+hard-bound to the ``bench`` tenant and QoS 1.  Omitting ``--execute`` validates
+the PKI and prints the plan without sending traffic.
 """
 from __future__ import annotations
 
@@ -32,6 +34,16 @@ TARGETS = (
     ((-900.0, 800.0, 220.0), (50.0, 0.0, 0.0), 185.0),
     ((2100.0, -100.0, 180.0), (-50.0, 0.0, 0.0), 120.0),
     ((100.0, 1900.0, 260.0), (0.0, -50.0, 0.0), 290.0),
+)
+WIDE_STATION_POSITIONS = (
+    (-400.0, 0.0, 0.0),
+    (800.0, 0.0, 0.0),
+    (1400.0, 800.0, 0.0),
+    (800.0, 1400.0, 0.0),
+    (-400.0, 1200.0, 0.0),
+)
+WIDE_TARGETS = (
+    ((-300.0, 700.0, 220.0), (50.0, 0.0, 0.0), 210.0),
 )
 HEAR_RANGE_M = 2200.0
 
@@ -78,9 +90,9 @@ class StationClient:
             self.client.loop_stop()
 
 
-def make_passes(count: int, start_us: int, duration_s: int) -> list[Pass]:
+def make_passes(count: int, start_us: int, duration_s: int, targets=TARGETS) -> list[Pass]:
     out = []
-    for index, (origin, velocity, f0_hz) in enumerate(TARGETS[:count], 1):
+    for index, (origin, velocity, f0_hz) in enumerate(targets[:count], 1):
         out.append(Pass(index, start_us, origin, velocity, float(duration_s), f0_hz, 3))
     return out
 
@@ -97,7 +109,14 @@ def stations_for_scenario(scenario: int) -> tuple[Station, ...]:
     )
 
 
-def plan(scenarios: list[tuple[int, tuple[Station, ...]]], duration_s: int, gap_s: int) -> dict:
+def wide_stations() -> tuple[Station, ...]:
+    return tuple(
+        Station(9010 + index, TENANT, position)
+        for index, position in enumerate(WIDE_STATION_POSITIONS)
+    )
+
+
+def plan(scenarios: list[tuple[int, tuple[Station, ...], tuple]], duration_s: int, gap_s: int) -> dict:
     return {
         "tenant": TENANT,
         "gap_s": gap_s,
@@ -108,18 +127,18 @@ def plan(scenarios: list[tuple[int, tuple[Station, ...]]], duration_s: int, gap_
                 "station_ids": [station.station_id for station in stations],
                 "targets": [
                     {"origin_enu_m": list(origin), "velocity_m_s": list(velocity), "f0_hz": f0}
-                    for origin, velocity, f0 in TARGETS[:uavs]
+                    for origin, velocity, f0 in targets[:uavs]
                 ],
             }
-            for uavs, stations in scenarios
+            for uavs, stations, targets in scenarios
         ],
     }
 
 
 def run_scenario(count: int, stations: tuple[Station, ...], duration_s: int,
-                 clients: dict[int, StationClient], boot_id: int, seed: int) -> dict:
+                 clients: dict[int, StationClient], boot_id: int, seed: int, targets=TARGETS) -> dict:
     started_us = time.time_ns() // 1000
-    flights = make_passes(count, started_us, duration_s)
+    flights = make_passes(count, started_us, duration_s, targets)
     rng = random.Random(seed + count)
     seq_no = {station.station_id: count * 1000 for station in stations}
     track_event: dict[tuple[int, int], int] = {}
@@ -193,6 +212,8 @@ def main(argv: list[str] | None = None) -> int:
                       help="validate or run one scenario using its assigned station group")
     mode.add_argument("--sequence", action="store_true",
                       help="run 1, 2 and 3 UAV scenarios in order with different station groups")
+    mode.add_argument("--wide-hearing", action="store_true",
+                      help="run one UAV heard simultaneously by stations 9010..9014")
     parser.add_argument("--duration", type=int, default=45)
     parser.add_argument("--gap", type=int, default=10, help="pause between scenarios in sequence, seconds")
     parser.add_argument("--timeout", type=float, default=10.0)
@@ -202,11 +223,13 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if not args.ca.is_file() or not 10 <= args.duration <= 180 or not 0 <= args.gap <= 120:
         parser.error("CA must exist; duration 10..180 s; gap 0..120 s")
-    scenarios = (
-        [(count, stations_for_scenario(count)) for count in (1, 2, 3)]
-        if args.sequence else [(args.uavs, stations_for_scenario(args.uavs))]
-    )
-    expected_ids = [station.station_id for _, group in scenarios for station in group]
+    if args.sequence:
+        scenarios = [(count, stations_for_scenario(count), TARGETS) for count in (1, 2, 3)]
+    elif args.wide_hearing:
+        scenarios = [(1, wide_stations(), WIDE_TARGETS)]
+    else:
+        scenarios = [(args.uavs, stations_for_scenario(args.uavs), TARGETS)]
+    expected_ids = [station.station_id for _, group, _targets in scenarios for station in group]
     identity_rows = [row for row in identities(20, args.credentials) if row[0] in expected_ids]
     if [row[0] for row in identity_rows] != expected_ids:
         raise RuntimeError("bench identity map differs from the controlled scenario plan")
@@ -221,8 +244,10 @@ def main(argv: list[str] | None = None) -> int:
                     station_id, args.host, args.port, args.ca, cert, key, args.timeout,
                 )
             boot_id = int(time.time()) & 0xFFFFFFFF
-            for index, (uavs, stations) in enumerate(scenarios):
-                outcome["runs"].append(run_scenario(uavs, stations, args.duration, clients, boot_id, args.seed))
+            for index, (uavs, stations, targets) in enumerate(scenarios):
+                outcome["runs"].append(run_scenario(
+                    uavs, stations, args.duration, clients, boot_id, args.seed, targets,
+                ))
                 if index + 1 < len(scenarios) and args.gap:
                     time.sleep(args.gap)
             outcome["status"] = "published"

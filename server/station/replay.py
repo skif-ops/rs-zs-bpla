@@ -106,14 +106,38 @@ def build_replay(store, *, track_id: str | None = None, system_event_id: str | N
                            "crossing_deg": p["crossing_deg"], "stations": p["stations"]})
         out_tracks.append({"track_id": t["track_id"], "system_event_id": t["system_event_id"], "stations": t["stations"],
                            "points": points})
-    out_bearings = [{"station_id": b["station_id"], "track_event_id": b["track_event_id"], "t_us": b["time_us"],
-                     "azimuth_deg": b["azimuth_deg"], "elevation_deg": b["elevation_deg"], "sigma_deg": b["sigma_deg"],
+    # Relate every station source to its fused target.  IDs are carried as strings as the station's uint64 event ID
+    # is wider than JavaScript's exact integer range.  A source can acquire another fused segment later; select the
+    # latest segment that had begun at the bearing time.
+    member_tracks: dict[tuple[int, int], list[tuple[int, str]]] = {}
+    for track in tracks:
+        for member in track["members"]:
+            member_tracks.setdefault((member["station_id"], member["track_event_id"]), []).append(
+                (member.get("segment_us", 0), track["track_id"]),
+            )
+    for candidates in member_tracks.values():
+        candidates.sort()
+
+    def bearing_track(bearing):
+        candidates = member_tracks.get((bearing["station_id"], bearing["track_event_id"]), [])
+        eligible = [track_id for segment_us, track_id in candidates if segment_us <= bearing["time_us"]]
+        return eligible[-1] if eligible else None
+
+    out_bearings = [{"station_id": b["station_id"], "track_event_id": str(b["track_event_id"]),
+                     "bearing_key": f'{b["station_id"]}:{b["track_event_id"]}', "track_id": bearing_track(b),
+                     "t_us": b["time_us"], "azimuth_deg": b["azimuth_deg"],
+                     "elevation_deg": b["elevation_deg"], "sigma_deg": b["sigma_deg"],
                      "time_trust": b["time_trust"]}
                     for b in bearings if b["station_id"] in positions]
-    times = [b["t_us"] for b in out_bearings] + [p["t_us"] for t in out_tracks for p in t["points"]]
+    target_times = [p["t_us"] for t in out_tracks for p in t["points"]]
+    times = [b["t_us"] for b in out_bearings] + target_times
     return {
         "window": {"since_us": t0, "until_us": t1,
-                   "first_us": min(times) if times else t0, "last_us": max(times) if times else t1},
+                   "first_us": min(times) if times else t0, "last_us": max(times) if times else t1,
+                   # Bearing time is when sound reached a station and can be several seconds later than the
+                   # target's emission-time track point.  The live UI must follow this value, otherwise its
+                   # cursor runs past the track and the target disappears while bearings still arrive.
+                   "target_last_us": max(target_times) if target_times else None},
         "origin": {"lat": lat0, "lon": lon0, "alt_msl_m": alt0},
         "stations": stations,
         "tracks": out_tracks,

@@ -9,6 +9,7 @@
   const TARGET_COLORS = ["#dc2626", "#7c3aed", "#059669", "#d97706", "#0891b2", "#db2777"];
   const RAY_M = 6000;              // rays drawn this long (beyond the 5 km fusion range)
   const RAY_HOLD_US = 1500000;     // a bearing is shown for this long after it was heard
+  const LIVE_TRACK_HOLD_US = 3000000; // concurrently updated targets can differ by a few fusion ticks
   const GRID_STEPS = [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000];
 
   let data = null;
@@ -146,7 +147,8 @@
     slider.min = first;
     slider.max = last;
     slider.step = 100000;
-    t = liveActive && liveFollowing ? last : updating ? Math.min(Math.max(t, first), last) : first;
+    t = liveActive && liveFollowing ? (data.window.target_last_us ?? last)
+      : updating ? Math.min(Math.max(t, first), last) : first;
     slider.value = t;
     $("replay-time-start").textContent = fmtUtc(first).slice(11, 19);
     $("replay-time-end").textContent = fmtUtc(last).slice(11, 19);
@@ -267,19 +269,33 @@
   const sy = (n) => canvas.clientHeight / 2 - (n - view.cy) * view.s;
 
   // ---- state at time t -----------------------------------------------------------------------------------------
-  function bearingAt(list, time) {
-    let lo = 0, hi = list.length - 1, best = -1;
-    while (lo <= hi) {
-      const mid = (lo + hi) >> 1;
-      if (list[mid].t_us <= time) { best = mid; lo = mid + 1; } else hi = mid - 1;
+  function bearingsAt(list, time) {
+    // One station can report one bearing stream per target.  Keep the newest sample from every stream instead of
+    // keeping only the station's newest sample, which hid all but one target.
+    const latest = new Map();
+    for (const b of list) {
+      if (b.t_us > time) break;
+      if (time - b.t_us <= RAY_HOLD_US) latest.set(b.bearing_key || String(b.track_event_id), b);
     }
-    if (best < 0 || time - list[best].t_us > RAY_HOLD_US) return null;
-    return list[best];
+    return [...latest.values()];
+  }
+
+  function bearingTargetIndex(bearing) {
+    return bearing.track_id ? data.tracks.findIndex((track) => track.track_id === bearing.track_id) : -1;
+  }
+
+  function bearingColor(bearing) {
+    const index = bearingTargetIndex(bearing);
+    return index >= 0 ? TARGET_COLORS[index % TARGET_COLORS.length] : colorOf(bearing.station_id);
   }
 
   function pointAt(tr, time) {
     const pts = tr.points;
-    if (!pts.length || time < pts[0].t_us || time > pts[pts.length - 1].t_us) return null;
+    if (!pts.length || time < pts[0].t_us) return null;
+    // In live mode the newest targets are fused in separate ticks.  Keep a target on its latest point for a
+    // short interval so all simultaneous targets remain visible at one common target-time cursor.
+    if (time > pts[pts.length - 1].t_us)
+      return liveActive && time - pts[pts.length - 1].t_us <= LIVE_TRACK_HOLD_US ? pts[pts.length - 1] : null;
     let i = 1;
     while (i < pts.length && pts[i].t_us < time) i++;
     if (i >= pts.length) return pts[pts.length - 1];
@@ -358,21 +374,21 @@
 
   function drawBearings() {
     for (const s of data.stations) {
-      const b = bearingAt(byStation.get(s.station_id) || [], t);
-      if (!b) continue;
-      const a = (b.azimuth_deg * Math.PI) / 180, sg = (Math.max(b.sigma_deg, 0.5) * Math.PI) / 180;
-      const x = sx(s.e), y = sy(s.n), r = RAY_M * view.s;
-      const col = colorOf(s.station_id);
-      ctx.globalAlpha = 0.13;
-      ctx.fillStyle = col;
-      ctx.beginPath(); ctx.moveTo(x, y);
-      ctx.lineTo(x + r * Math.sin(a - sg), y - r * Math.cos(a - sg));
-      ctx.lineTo(x + r * Math.sin(a + sg), y - r * Math.cos(a + sg));
-      ctx.closePath(); ctx.fill();
-      ctx.globalAlpha = 0.9;
-      ctx.strokeStyle = col; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + r * Math.sin(a), y - r * Math.cos(a)); ctx.stroke();
-      ctx.globalAlpha = 1;
+      for (const b of bearingsAt(byStation.get(s.station_id) || [], t)) {
+        const a = (b.azimuth_deg * Math.PI) / 180, sg = (Math.max(b.sigma_deg, 0.5) * Math.PI) / 180;
+        const x = sx(s.e), y = sy(s.n), r = RAY_M * view.s;
+        const col = bearingColor(b);
+        ctx.globalAlpha = 0.13;
+        ctx.fillStyle = col;
+        ctx.beginPath(); ctx.moveTo(x, y);
+        ctx.lineTo(x + r * Math.sin(a - sg), y - r * Math.cos(a - sg));
+        ctx.lineTo(x + r * Math.sin(a + sg), y - r * Math.cos(a + sg));
+        ctx.closePath(); ctx.fill();
+        ctx.globalAlpha = 0.9;
+        ctx.strokeStyle = col; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + r * Math.sin(a), y - r * Math.cos(a)); ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
     }
   }
 
@@ -457,15 +473,25 @@
     const ul = $("ro-bearings");
     ul.innerHTML = "";
     for (const s of data.stations) {
-      const b = bearingAt(byStation.get(s.station_id) || [], t);
-      const li = document.createElement("li");
-      const dot = document.createElement("span");
-      dot.className = "replay-dot"; dot.style.background = colorOf(s.station_id);
-      li.appendChild(dot);
-      li.appendChild(document.createTextNode(b
-        ? ` ст. ${s.station_id}: ${b.azimuth_deg.toFixed(1)}° (±${b.sigma_deg.toFixed(1)}), угол места ${b.elevation_deg.toFixed(1)}°`
-        : ` ст. ${s.station_id}: не слышит`));
-      ul.appendChild(li);
+      const current = bearingsAt(byStation.get(s.station_id) || [], t);
+      if (!current.length) {
+        const li = document.createElement("li");
+        li.textContent = `ст. ${s.station_id}: не слышит`;
+        ul.appendChild(li);
+        continue;
+      }
+      for (const b of current) {
+        const target = bearingTargetIndex(b);
+        const li = document.createElement("li");
+        const dot = document.createElement("span");
+        dot.className = "replay-dot"; dot.style.background = bearingColor(b);
+        li.appendChild(dot);
+        li.appendChild(document.createTextNode(
+          ` ст. ${s.station_id}${target >= 0 ? ` → цель ${target + 1}` : ""}: ` +
+          `${b.azimuth_deg.toFixed(1)}° (±${b.sigma_deg.toFixed(1)}), угол места ${b.elevation_deg.toFixed(1)}°`,
+        ));
+        ul.appendChild(li);
+      }
     }
     if (!data.stations.length) ul.innerHTML = '<li class="text-muted">—</li>';
   }
@@ -515,7 +541,11 @@
   $("replay-back").addEventListener("click", () => userSetTime(t - 1e6));
   $("replay-fwd").addEventListener("click", () => userSetTime(t + 1e6));
   $("replay-slider").addEventListener("input", (e) => userSetTime(Number(e.target.value)));
-  $("replay-now").addEventListener("click", () => { liveFollowing = true; stop(); if (data) setTime(data.window.last_us); refreshLive(); });
+  $("replay-now").addEventListener("click", () => {
+    liveFollowing = true; stop();
+    if (data) setTime(data.window.target_last_us ?? data.window.last_us);
+    refreshLive();
+  });
   $("replay-follow").addEventListener("change", draw);
   $("replay-geometry").addEventListener("change", loadCoverage);
   $("replay-geo-range").addEventListener("change", loadCoverage);
