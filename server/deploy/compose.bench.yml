@@ -51,7 +51,9 @@ services:
   mqtt_bridge_bench:
     image: dioneya-bench-server:local
     restart: unless-stopped
-    cpus: 0.5
+    # Bearing fusion is single threaded.  Half a core makes the controlled five-station/two-target
+    # episode accumulate work faster than real time and then replay stale tracks to the operator.
+    cpus: 1.0
     mem_limit: 256m
     command: ["python", "-m", "station.mqtt_bridge", "--host", "mqtt", "--port", "8883", "--tenant", "bench", "--ca", "/run/tls/ca-chain.pem", "--cert", "/run/tls/bridge-bench.crt.pem", "--key", "/run/tls/bridge-bench.key.pem"]
     environment:

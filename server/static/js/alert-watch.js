@@ -7,6 +7,11 @@
   const seenTracksKey = "muhoed-opened-alert-tracks:" + name;
   const liveKey = "muhoed-current-live:" + name;
   const EPISODE_GAP_US = 7000000;
+  // msg.time is the acoustic emission time, while msg.created is the time at which fusion emitted the result.
+  // At the 5 km design boundary sound needs up to 14.6 s.  A result older than 17 s is a calculation backlog,
+  // not a current target; keep it in history but never use it to reopen live accompaniment or station alarms.
+  const LIVE_MAX_PIPELINE_MS = 17000;
+  const LIVE_MAX_RECEIPT_MS = 15000;
   let hasBaseline = sessionStorage.getItem(key) !== null;
   let cursor = Number(sessionStorage.getItem(key)) || 0;
   let opened;
@@ -45,13 +50,20 @@
 
   function onMessage(msg) {
     if (msg.schema !== "dioneya.alert/1") return;
+    if (msg.type === "track.update") {
+      const eventAt = Date.parse(msg.time);
+      const createdAt = Date.parse(msg.created);
+      msg.live_current = Number.isFinite(eventAt) && Number.isFinite(createdAt)
+        && createdAt >= eventAt && createdAt - eventAt <= LIVE_MAX_PIPELINE_MS
+        && Math.abs(Date.now() - createdAt) <= LIVE_MAX_RECEIPT_MS;
+    }
     if (Number.isSafeInteger(msg.seq) && msg.seq > cursor) {
       cursor = msg.seq; hasBaseline = true; sessionStorage.setItem(key, String(cursor));
     }
     if (msg.type === "alert.end" && liveState?.alertId === msg.alert_id) {
       liveState = null;
       saveLiveState();
-    } else if (msg.type === "track.update" && msg.track?.track_id && liveState?.alertId === msg.alert_id) {
+    } else if (msg.type === "track.update" && msg.live_current && msg.track?.track_id && liveState?.alertId === msg.alert_id) {
       const pointUs = Date.parse(msg.time) * 1000;
       if (Number.isFinite(pointUs)) {
         if (liveState.lastTrackUs && pointUs - liveState.lastTrackUs > EPISODE_GAP_US) {

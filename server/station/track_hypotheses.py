@@ -84,6 +84,8 @@ GATE_MIN_M = 30.0
 REGATE_POINTS = 3                # three points of the track's own segments in a row off the prediction restart the filter
 BACKFILL_S = 15.0                # a new track shows the points of its last 15 s (+ range / c)
 RANGE_GUESS_M = 2000.0           # first range of the iteration on the sound delay
+RANGE_ITERATIONS = 3             # fixed-point contraction v/c leaves < 40 m at 5 km even at 80 m/s
+RANGE_CONVERGENCE_M = 8.0        # 23 ms of sound travel and < 2 m target motion at EVT speeds
 TRACK_IDLE_S = 20.0              # a track without a new point this long is over (the output API ends it a little later:
                                  # integration/alert_producer.TRACK_END_US); a later hypothesis of its segments is a new track
 KALMAN_ACCEL = 6.0
@@ -202,7 +204,7 @@ def _solve(units, t: float, now: float, heard: list | None = None):
     arrival time) of every sample: the result is final once the bearings around them are in."""
     ranges = [RANGE_GUESS_M] * len(units)
     solved = None
-    for k in range(5):
+    for k in range(RANGE_ITERATIONS):
         az, el, sg = [], [], []
         for u, r in zip(units, ranges):
             ta = t + r / C
@@ -224,7 +226,7 @@ def _solve(units, t: float, now: float, heard: list | None = None):
         new = [float(np.linalg.norm(solved[0][:2] - o[:2])) for o in origins]
         if max(new) > MAX_RANGE_M:
             return "refuted"
-        converged = k > 0 and max(abs(a - b) for a, b in zip(new, ranges)) < 2.0
+        converged = k > 0 and max(abs(a - b) for a, b in zip(new, ranges)) < RANGE_CONVERGENCE_M
         ranges = new
         if converged:
             break
@@ -372,6 +374,7 @@ class HypothesisTrackFusion:
         near = {(a, b) for a in stations for b in stations if a < b
                 and float(np.linalg.norm(by_station[a][0].origin[:2] - by_station[b][0].origin[:2])) <= 2.0 * MAX_RANGE_M}
         crossing: set[tuple[Member, Member]] = set()           # pairs whose rays gave fixes: a larger hypothesis builds on them
+        strong_triples: set[frozenset[Member]] = set()         # confirmed three-ray cores used to extend to four/five stations
         out = []
         for k in range(2, min(MAX_STATIONS, len(stations)) + 1):
             for chosen in itertools.combinations(stations, k):
@@ -382,6 +385,14 @@ class HypothesisTrackFusion:
                         continue
                     if k > 2 and any(not any((a.member, b.member) in crossing for b in combo if b is not a) for a in combo):
                         continue                                 # every ray must cross another one of the hypothesis
+                    if k > 3 and strong_triples:
+                        members = {u.member for u in combo}
+                        # With several targets per station, enumerating every 4/5-ray Cartesian product grows
+                        # exponentially.  A real larger hypothesis must extend well-conditioned three-ray evidence:
+                        # every added ray has to belong to at least one such core inside this combination.
+                        cores = [core for core in strong_triples if core <= members]
+                        if not cores or any(not any(u.member in core for core in cores) for u in combo):
+                            continue
                     lo = max(max(u.first_s for u in combo), now - WINDOW_S) - MAX_RANGE_M / C
                     hi = min(u.last_s for u in combo)
                     if hi - lo < MIN_FIXES:
@@ -420,6 +431,8 @@ class HypothesisTrackFusion:
                         h = Hypothesis(tuple(combo), fixes, score, ambiguous)
                         if k >= 3 and weak and not h.strong():
                             continue                             # ...that meet its ray well
+                        if k == 3 and h.strong():
+                            strong_triples.add(frozenset(h.members))
                         out.append(h)
         out.sort(key=lambda h: (-h.score, h.members))
         return out[:MAX_CANDIDATES]

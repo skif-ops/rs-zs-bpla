@@ -325,7 +325,7 @@
   document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
   window.addEventListener("muhoed:alert-message", (event) => {
     const msg = event.detail || {};
-    if (msg.type === "track.update" && msg.track?.track_id) {
+    if (msg.type === "track.update" && msg.live_current === true && msg.track?.track_id) {
       liveTracks.set(msg.track.track_id, {
         stations: (msg.track.stations || []).map(Number).filter(Number.isSafeInteger),
         until: Date.now() + ACTIVE_ALERT_HOLD_MS,
