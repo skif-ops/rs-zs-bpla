@@ -45,3 +45,15 @@ Git blob IDs основных исходников на контрольном c
 ## Текущее состояние gate
 
 Согласно `hardware/PCB_MAIN_CAPTURE_STATUS_REV_A.json`, `hardware/PCB_PWR_CAPTURE_STATUS_REV_A.json` и `hardware/PCB_MIC_CAPTURE_STATUS_REV_A.json`, `manufacturing_release=false` для всех трёх плат. У MAIN и PWR остаются трассировка/DRC и Review B; у MIC Review B и физико-технологические пункты открыты. Эти статусы прочитаны из репозитория, а не повторно измерены CAD-инструментом в этом сеансе. Эквивалентность KiCad ↔ Altium и готовность к производству **не подтверждены**.
+
+## Требуемый итоговый архив EVT-PRE-20
+
+После завершения конверсии и release gate выдать один ZIP-архив, например `EVT-PRE-20_RevA_Altium_Production_<commit>.zip`, и записать его SHA-256. В архиве предусмотреть по отдельному каталогу для PCB-MAIN, PCB-PWR и PCB-MIC:
+
+- `altium/`: проверенные `.PrjPcb`, все `.SchDoc`, `.PcbDoc`, локальные `.SchLib`/`.PcbLib`, рабочий `.OutJob` и import/compile logs;
+- `fabrication/`: Gerber, plated/non-plated NC Drill, IPC-D-356, stackup/impedance, fabrication drawing/notes, board-only STEP и CAM comparison;
+- `assembly/`: BOM/AVL с MPN и DNP, pick-and-place, TOP/BOTTOM assembly drawings, paste/stencil data, варианты сборки и специальные монтажные указания;
+- `verification/`: KiCad↔Altium pin-net/footprint/geometry comparison, ERC/DRC, RF/power review, Review A/B, DFM, решения по всем расхождениям;
+- `kicad_source/`: неизменённая копия каждого исходного проекта и его локальных библиотек из зафиксированного source commit, с указанием исходных путей.
+
+В корне архива: `README.md` со статусом разрешения к производству, списком трёх плат и ревизий, commit исходников и Altium-проекта, перечнем версий CAD/импортера, `SHA256SUMS` для всех файлов и контрольной суммой самого ZIP вне архива. Историю изменений сохранять в Git: архив является поставочным снимком, не заменяет репозиторий. Собирать или маркировать архив как производственный до закрытия всех gate нельзя.
