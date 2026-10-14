@@ -11,6 +11,7 @@
   const RAY_HOLD_US = 1500000;     // a bearing is shown for this long after it was heard
   const LIVE_TRACK_HOLD_US = 3000000; // concurrently updated targets can differ by a few fusion ticks
   const LIVE_ACTIVITY_HOLD_MS = 4000; // same current-alert window as the station status page
+  const LIVE_VISUAL_FADE_MS = 1500;   // a silent target fades instead of leaving one frozen final frame
   const LIVE_MAX_PIPELINE_MS = 15000; // acoustic travel at 5 km plus bounded fusion time
   const LIVE_EPISODE_GAP_US = 7000000; // a quiet interval separates adjacent controlled or real flight episodes
   const GRID_STEPS = [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000];
@@ -333,8 +334,12 @@
   function draw() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     const now = Date.now();
-    const active = data ? data.tracks.map((tr, index) => ({ tr, index, point: pointAt(tr, t) }))
-      .filter((x) => x.point && (!liveActive || (liveTrackUntil.get(x.tr.track_id) || 0) > now)) : [];
+    const active = data ? data.tracks.map((tr, index) => {
+      const until = liveTrackUntil.get(tr.track_id) || 0;
+      const freshness = !liveActive ? 1 : Math.max(0, Math.min(1,
+        (until - now) / Math.max(LIVE_ACTIVITY_HOLD_MS - LIVE_VISUAL_FADE_MS, 1)));
+      return { tr, index, point: pointAt(tr, t), freshness };
+    }).filter((x) => x.point && (!liveActive || (liveTrackUntil.get(x.tr.track_id) || 0) > now)) : [];
     if (active.length && $("replay-follow").checked) focusActiveTargets(active);
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = "#f8fafc";
@@ -406,13 +411,17 @@
         const a = (b.azimuth_deg * Math.PI) / 180, sg = (Math.max(b.sigma_deg, 0.5) * Math.PI) / 180;
         const x = sx(s.e), y = sy(s.n), r = RAY_M * view.s;
         const col = bearingColor(b);
-        ctx.globalAlpha = 0.13;
+        const targetIndex = bearingTargetIndex(b);
+        const freshness = liveActive && targetIndex >= 0
+          ? (active.find((item) => item.index === targetIndex)?.freshness || 0)
+          : Math.max(0, ...active.map((item) => item.freshness));
+        ctx.globalAlpha = 0.13 * freshness;
         ctx.fillStyle = col;
         ctx.beginPath(); ctx.moveTo(x, y);
         ctx.lineTo(x + r * Math.sin(a - sg), y - r * Math.cos(a - sg));
         ctx.lineTo(x + r * Math.sin(a + sg), y - r * Math.cos(a + sg));
         ctx.closePath(); ctx.fill();
-        ctx.globalAlpha = 0.9;
+        ctx.globalAlpha = 0.9 * freshness;
         ctx.strokeStyle = col; ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + r * Math.sin(a), y - r * Math.cos(a)); ctx.stroke();
         ctx.globalAlpha = 1;
@@ -426,20 +435,21 @@
       const { index, tr } = item;
       const color = TARGET_COLORS[index % TARGET_COLORS.length];
       const past = tr.points.filter((p) => p.t_us <= t);
+      const opacity = item.freshness ?? 1;
       // the whole track faint, the part already flown solid
-      ctx.globalAlpha = 0.25; ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+      ctx.globalAlpha = 0.25 * opacity; ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
       polyline(tr.points); ctx.setLineDash([]);
-      ctx.globalAlpha = 1; ctx.strokeStyle = color; ctx.lineWidth = 2;
+      ctx.globalAlpha = opacity; ctx.strokeStyle = color; ctx.lineWidth = 2;
       polyline(past);
       ctx.fillStyle = color;
       for (const p of past) { ctx.beginPath(); ctx.arc(sx(p.e), sy(p.n), 1.8, 0, 2 * Math.PI); ctx.fill(); }
       const p = item.point;
       if (!p) continue;
       const x = sx(p.e), y = sy(p.n);
-      ctx.globalAlpha = 0.10; ctx.fillStyle = color;
+      ctx.globalAlpha = 0.10 * opacity; ctx.fillStyle = color;
       ctx.beginPath(); ctx.arc(x, y, Math.max(p.h_err_m * view.s, 3), 0, 2 * Math.PI); ctx.fill();
-      ctx.globalAlpha = 0.55; ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.stroke();
-      ctx.globalAlpha = 1; ctx.strokeStyle = color; ctx.lineWidth = 2;          // where it will be in 10 s
+      ctx.globalAlpha = 0.55 * opacity; ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.stroke();
+      ctx.globalAlpha = opacity; ctx.strokeStyle = color; ctx.lineWidth = 2;          // where it will be in 10 s
       ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + p.ve * 10 * view.s, y - p.vn * 10 * view.s); ctx.stroke();
       ctx.fillStyle = color;
       ctx.beginPath(); ctx.arc(x, y, 5, 0, 2 * Math.PI); ctx.fill();
@@ -448,6 +458,7 @@
       const tag = `${prefix}${Math.round(p.u)} м · ${Math.round(p.speed_mps * 3.6)} км/ч`;
       const tw = ctx.measureText(tag).width;
       ctx.fillText(tag, x + 9 + tw > canvas.clientWidth - 4 ? x - 9 - tw : x + 9, y - 8);
+      ctx.globalAlpha = 1;
     }
     return active;
   }
@@ -679,11 +690,12 @@
   setInterval(() => {
     if (!liveActive || !data) return;
     const now = Date.now();
-    let expired = false;
+    let expired = false, fading = false;
     for (const [trackId, until] of liveTrackUntil) {
       if (until <= now) { liveTrackUntil.delete(trackId); expired = true; }
+      else if (until - now < LIVE_ACTIVITY_HOLD_MS - LIVE_VISUAL_FADE_MS) fading = true;
     }
-    if (expired) draw();
+    if (expired || fading) draw();
   }, 500);
 
   loadSources();

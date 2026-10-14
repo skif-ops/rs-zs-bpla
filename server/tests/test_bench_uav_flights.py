@@ -60,6 +60,34 @@ def test_both_targets_in_final_episode_are_heard_by_all_five_stations():
             assert sum(heard(station, flight, float(second)) for station in stations) == 5
 
 
+def test_strong_three_station_target_is_published_by_seventh_step(tmp_path):
+    store = EventStore(tmp_path / "strong-first-track.sqlite3")
+    service = StationFusionService(store)
+    stations = stations_for_scenario(1)
+    (flight,) = make_passes(1, 1_800_000_000_000_000, 10, TARGETS)
+    boot_id = 76
+    rng = random.Random(20261014)
+    events = {}
+
+    for station in stations:
+        event_id = (boot_id << 32) | (station.station_id * 10 + flight.index)
+        events[station.station_id] = event_id
+        payload = detection_payload(station, flight, 0.0, seq_no=event_id & 0xFFFFFFFF,
+                                    boot_id=boot_id, event_id=event_id, rng=rng)
+        assert process_message(f"zs/v1/bench/{station.station_id}/up", payload, "bench", True,
+                               event_store=store, fusion_service=service) == "stored"
+
+    for second in range(8):
+        for station in stations:
+            payload = bearing_payload(station, flight, float(second), boot_id=boot_id,
+                                      track_event_id=events[station.station_id], rng=rng)
+            assert process_message(f"zs/v1/bench/{station.station_id}/bearing", payload, "bench", True,
+                                   event_store=store, fusion_service=service) == "stored"
+
+    tracks = store.list_tracks(limit=10)
+    assert len(tracks) == 1 and tracks[0]["stations"] == [9001, 9002, 9003]
+
+
 def test_final_episode_fuses_two_distinct_tracks_with_all_five_stations(tmp_path):
     """Regression for the fourth episode: two sources at every station must not create a Cartesian backlog or ghosts."""
     store = EventStore(tmp_path / "five-by-two.sqlite3")

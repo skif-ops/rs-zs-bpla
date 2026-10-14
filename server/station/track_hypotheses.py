@@ -28,8 +28,10 @@ the server keeps every explanation open and decides on a moving window:
    explanation of the step.
 5. Deferred decision and continuity.  A hypothesis continues the track whose current segments it shares most (one to
    one), when its new points pass the gate of that track's prediction (constant-velocity Kalman filter); otherwise it
-   is dropped.  A new hypothesis becomes a track only after it has been the choice for PUBLISH_STEPS steps in a row
-   (WEAK_PUBLISH_STEPS when a station gives one of its segments little confidence; such a segment takes part only
+   is dropped.  A new hypothesis becomes a track only after it has been the choice for PUBLISH_STEPS steps in a row;
+   a well-conditioned three-to-five-station hypothesis already contains STRONG_FIXES independent geometric fixes and
+   therefore needs only STRONG_PUBLISH_STEPS consecutive choices.  WEAK_PUBLISH_STEPS applies when a station gives
+   one of its segments little confidence; such a segment takes part only
    in a well conditioned hypothesis with two other stations' sure segments, or in an unambiguous pair continuing a
    track of its segments).  Three or more stations make a new track when they are well conditioned
    (STRONG_FIXES points meeting with a horizontal error up to STRONG_ERROR_M); far away the rays of three stations meet
@@ -73,7 +75,8 @@ CHI2_PER_DOF = 9.0               # ...and three or more rays meet within 3 sigma
 KINEMATIC_LIMIT = 3.0            # rms miss of a quadratic path, in the points' horizontal errors
 RIVAL_MIN_S = 5.0                # a rival segment counts when it overlaps the pair this long
 RIVAL_REFUTED = 0.5              # a rival pairing is refuted when its rays cross behind a station or out of range this often
-PUBLISH_STEPS = 5                # a new track: the choice of five steps in a row...
+PUBLISH_STEPS = 5                # a new two-ray track: the choice of five steps in a row...
+STRONG_PUBLISH_STEPS = 2         # a well-conditioned 3..5-station fix already carries five geometric confirmations
 WEAK_CONFIDENCE = 0.5            # ...or, when a station gives one of its segments less confidence than this (median of
 WEAK_PUBLISH_STEPS = 12          # its recent bearings: its bins or comb pairs barely agree), of twelve steps
 STRONG_FIXES = 5                 # ...with three or more stations, this many meeting points...
@@ -708,7 +711,9 @@ class HypothesisTrackFusion:
                 key = repr(h.members)
                 waiting[key] = waiting.get(key, 0) + 1
                 seen.add(key)
-                if waiting[key] < (WEAK_PUBLISH_STEPS if h.weak() else PUBLISH_STEPS):
+                required = (WEAK_PUBLISH_STEPS if h.weak() else
+                            STRONG_PUBLISH_STEPS if len(h.units) >= 3 and h.strong() else PUBLISH_STEPS)
+                if waiting[key] < required:
                     continue
                 track_id = self._new_track_id(h.members)
                 tracks[track_id] = {"cur": [], "last_s": now - BACKFILL_S - MAX_RANGE_M / C, "kf": None, "confirmed": False,
