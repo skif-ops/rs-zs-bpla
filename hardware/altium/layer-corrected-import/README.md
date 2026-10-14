@@ -24,6 +24,8 @@
 
 [verify_board_outline.py](../verify_board_outline.py) сопоставляет линии и дуги исходного `Edge.Cuts` с основным контуром `Board6` Altium, включая центры и радиусы дуг, с округлением координат до 0,001 мм. Совпали все 8/8 сегментов MAIN, 4/4 PWR и 4/4 MIC. Отчёты: [MAIN](PCB-MAIN/outline-verification.json), [PWR](PCB-PWR/outline-verification.json), [MIC](PCB-MIC/outline-verification.json). Это не проверяет механические слои, отверстия, запретные области и заливку меди.
 
+Для PCB-MIC владелец проекта запустил Altium Validate PCB Project: `Compile successful, no errors found`. Первый batch DRC на импортированных правилах дал 66 нарушений и 2 PCB Health Issues. Исходные файлы отчёта и разбор причин сохранены в [PCB-MIC/validation](PCB-MIC/validation/README.md). Большая часть нарушений связана с неподходящими правилами по умолчанию, но исходная геометрия акустического отверстия также имеет подтверждённые отклонения; статус выпуска не меняется.
+
 ## Что остаётся открытым
 
 - Журналы импортера содержат `KiCadLib.PCB.PCBLine` errors: MAIN 873, PWR 703, MIC 73. Все трассы с назначенными сетями перенесены, но прочая графика, контуры и специальные объекты не проверены поэлементно. Предупреждения MAIN 891, PWR 2117, MIC 275 требуют разбора.
