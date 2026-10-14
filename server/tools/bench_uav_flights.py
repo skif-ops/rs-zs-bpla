@@ -3,10 +3,10 @@
 
 The controlled sequence uses a different station group for every scenario:
 9001..9003 for one UAV, 9004..9006 for two UAVs and 9007..9009 for three
-UAVs.  The wide-hearing scenario uses stations 9010..9014 around one flight
-corridor so five stations hear one target at the same time.  The tool is
-hard-bound to the ``bench`` tenant and QoS 1.  Omitting ``--execute`` validates
-the PKI and prints the plan without sending traffic.
+UAVs.  The fourth EVT-PRE-20 scenario uses stations 9010..9014 around two
+flight corridors so five stations hear both targets at the same time.  The
+tool is hard-bound to the ``bench`` tenant and QoS 1.  Omitting ``--execute``
+validates the PKI and prints the plan without sending traffic.
 """
 from __future__ import annotations
 
@@ -44,6 +44,10 @@ WIDE_STATION_POSITIONS = (
 )
 WIDE_TARGETS = (
     ((-300.0, 700.0, 220.0), (50.0, 0.0, 0.0), 210.0),
+)
+FIVE_STATION_TWO_TARGETS = (
+    ((-200.0, 450.0, 220.0), (40.0, 0.0, 0.0), 210.0),
+    ((1400.0, 950.0, 260.0), (-40.0, 0.0, 0.0), 275.0),
 )
 HEAR_RANGE_M = 2200.0
 
@@ -212,9 +216,11 @@ def main(argv: list[str] | None = None) -> int:
                       help="validate or run one scenario using its assigned station group")
     mode.add_argument("--sequence", action="store_true",
                       help="run 1, 2 and 3 UAV scenarios in order with different station groups")
+    mode.add_argument("--evt-pre-20-sequence", action="store_true",
+                      help="run the four EVT-PRE-20 episodes: 1, 2, 3 UAVs, then 2 UAVs heard by five stations")
     mode.add_argument("--wide-hearing", action="store_true",
                       help="run one UAV heard simultaneously by stations 9010..9014")
-    parser.add_argument("--duration", type=int, default=45)
+    parser.add_argument("--duration", type=int, default=40)
     parser.add_argument("--gap", type=int, default=10, help="pause between scenarios in sequence, seconds")
     parser.add_argument("--timeout", type=float, default=10.0)
     parser.add_argument("--seed", type=int, default=20261014)
@@ -223,7 +229,12 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if not args.ca.is_file() or not 10 <= args.duration <= 180 or not 0 <= args.gap <= 120:
         parser.error("CA must exist; duration 10..180 s; gap 0..120 s")
-    if args.sequence:
+    if args.evt_pre_20_sequence:
+        scenarios = [
+            *((count, stations_for_scenario(count), TARGETS) for count in (1, 2, 3)),
+            (2, wide_stations(), FIVE_STATION_TWO_TARGETS),
+        ]
+    elif args.sequence:
         scenarios = [(count, stations_for_scenario(count), TARGETS) for count in (1, 2, 3)]
     elif args.wide_hearing:
         scenarios = [(1, wide_stations(), WIDE_TARGETS)]
