@@ -39,7 +39,17 @@
     },
     "net_name_sets_equal": true,
     "source_net_count": 186,
-    "imported_net_count": 186
+    "imported_net_count": 186,
+    "vias": {
+      "source_via_count": 304,
+      "imported_via_count": 304,
+      "position_diameter_drill_net_matches": 304,
+      "correct_layer_span": 304,
+      "incorrect_layer_span": 0,
+      "imported_layer_spans": {
+        "1-32": 304
+      }
+    }
   },
   "PCB-PWR": {
     "source_route_count": 575,
@@ -85,7 +95,17 @@
     },
     "net_name_sets_equal": true,
     "source_net_count": 31,
-    "imported_net_count": 31
+    "imported_net_count": 31,
+    "vias": {
+      "source_via_count": 267,
+      "imported_via_count": 267,
+      "position_diameter_drill_net_matches": 267,
+      "correct_layer_span": 0,
+      "incorrect_layer_span": 267,
+      "imported_layer_spans": {
+        "1-3": 267
+      }
+    }
   },
   "PCB-MIC": {
     "source_route_count": 27,
@@ -131,6 +151,16 @@
     },
     "net_name_sets_equal": true,
     "source_net_count": 7,
-    "imported_net_count": 7
+    "imported_net_count": 7,
+    "vias": {
+      "source_via_count": 5,
+      "imported_via_count": 5,
+      "position_diameter_drill_net_matches": 5,
+      "correct_layer_span": 0,
+      "incorrect_layer_span": 5,
+      "imported_layer_spans": {
+        "1-3": 5
+      }
+    }
   }
 }

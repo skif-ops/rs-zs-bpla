@@ -38,6 +38,13 @@ SEGMENT = re.compile(
     r'\(layer\s+"([^"]+)"\)\s+\(net\s+(\d+)\)',
     re.S,
 )
+VIA = re.compile(
+    r'\(via\s+\(at\s+([-\d.]+)\s+([-\d.]+)\)\s+'
+    r'\(size\s+([-\d.]+)\)\s+\(drill\s+([-\d.]+)\)\s+'
+    r'\(layers\s+"([^"]+)"\s+"([^"]+)"\)\s+'
+    r'(?:\(locked\s+yes\)\s+)?\(net\s+(\d+)\)',
+    re.S,
+)
 
 
 def count_header(doc: olefile.OleFileIO, stream: str) -> int:
@@ -76,13 +83,19 @@ def source_routes(board: Path, dx: float, y_sum: float):
         routes[(key, layer)] += 1
     if sum(routes.values()) != source.count("(segment"):
         raise ValueError(f"Only parsed {sum(routes.values())}/{source.count('(segment')} source segments")
+    vias = Counter()
+    for x, y, size, drill, start_layer, end_layer, index in VIA.findall(source):
+        key = (round(float(x) + dx, 4), round(y_sum - float(y), 4), round(float(size), 4), round(float(drill), 4), names[int(index)])
+        vias[(key, start_layer, end_layer)] += 1
+    if sum(vias.values()) != len(re.findall(r"\(via\s+\(at", source)):
+        raise ValueError("Some source vias were not parsed")
     counts = {
         "components": len(re.findall(r'(?m)^\s*\(footprint\b', source)),
         "pads": len(re.findall(r'(?m)^\s*\(pad\b', source)),
         "vias": len(re.findall(r'(?m)^\s*\(via\b', source)),
         "zones": len(re.findall(r'(?m)^\s*\(zone\b', source)),
     }
-    return routes, set(names.values()) - {""}, counts
+    return routes, vias, set(names.values()) - {""}, counts
 
 
 def imported_routes(doc: olefile.OleFileIO, names: list[str]):
@@ -102,6 +115,47 @@ def imported_routes(doc: olefile.OleFileIO, names: list[str]):
         x1, y1, x2, y2, width = (struct.unpack_from("<i", record, i)[0] / ALTIUM_UNITS_PER_MM for i in (18, 22, 26, 30, 34))
         routes[(route_key(x1, y1, x2, y2, width, names[net]), record[5])] += 1
     return routes
+
+
+def imported_vias(doc: olefile.OleFileIO, names: list[str]):
+    data = doc.openstream(["Vias6", "Data"]).read()
+    vias = Counter()
+    offset = 0
+    while offset < len(data):
+        if data[offset] != 3:
+            raise ValueError("Unexpected Altium via record type")
+        length = struct.unpack_from("<I", data, offset + 1)[0]
+        record = data[offset : offset + 5 + length]
+        if len(record) != 5 + length:
+            raise ValueError("Truncated Altium via record")
+        net = struct.unpack_from("<H", record, 8)[0]
+        if net == 65535 or net >= len(names):
+            raise ValueError(f"Via references invalid net {net}")
+        x, y, diameter, drill = (round(struct.unpack_from("<i", record, i)[0] / ALTIUM_UNITS_PER_MM, 4) for i in (18, 22, 26, 30))
+        vias[((x, y, diameter, drill, names[net]), record[34], record[35])] += 1
+        offset += 5 + length
+    if sum(vias.values()) != count_header(doc, "Vias6"):
+        raise ValueError("Altium via stream count mismatch")
+    return vias
+
+
+def summarize_vias(source: Counter, imported: Counter):
+    source_any = Counter()
+    imported_any = Counter()
+    expected = Counter()
+    for (key, start_layer, end_layer), count in source.items():
+        source_any[key] += count
+        expected[(key, EXPECTED_LAYER[start_layer], EXPECTED_LAYER[end_layer])] += count
+    for (key, start_layer, end_layer), count in imported.items():
+        imported_any[key] += count
+    return {
+        "source_via_count": sum(source.values()),
+        "imported_via_count": sum(imported.values()),
+        "position_diameter_drill_net_matches": sum((source_any & imported_any).values()),
+        "correct_layer_span": sum((expected & imported).values()),
+        "incorrect_layer_span": sum((expected - imported).values()),
+        "imported_layer_spans": {f"{start}-{end}": sum(count for (key, a, b), count in imported.items() if (a, b) == (start, end)) for key, start, end in imported},
+    }
 
 
 def summarize(source: Counter, imported: Counter, limit=5):
@@ -133,11 +187,12 @@ def summarize(source: Counter, imported: Counter, limit=5):
 
 def check_board(root: Path, board: str, pcb_dir: Path):
     dx, y_sum = BOARD_TRANSFORMS[board]
-    routes, nets, counts = source_routes(root / "hardware/kicad/native" / board / f"{board}.kicad_pcb", dx, y_sum)
+    routes, source_vias, nets, counts = source_routes(root / "hardware/kicad/native" / board / f"{board}.kicad_pcb", dx, y_sum)
     path = pcb_dir / board / f"{board}.PcbDoc"
     with olefile.OleFileIO(str(path)) as doc:
         imported_names = altium_nets(doc)
         imported = imported_routes(doc, imported_names)
+        vias = imported_vias(doc, imported_names)
         result = summarize(routes, imported)
         result.update({
             "source_board": str(Path("hardware/kicad/native") / board / f"{board}.kicad_pcb").replace("\\", "/"),
@@ -148,6 +203,7 @@ def check_board(root: Path, board: str, pcb_dir: Path):
             "net_name_sets_equal": nets == set(imported_names),
             "source_net_count": len(nets),
             "imported_net_count": len(imported_names),
+            "vias": summarize_vias(source_vias, vias),
         })
     return result
 
