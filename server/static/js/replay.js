@@ -11,7 +11,7 @@
   const RAY_HOLD_US = 1500000;     // a bearing is shown for this long after it was heard
   const LIVE_TRACK_HOLD_US = 3000000; // concurrently updated targets can differ by a few fusion ticks
   const LIVE_ACTIVITY_HOLD_MS = 4000; // same current-alert window as the station status page
-  const LIVE_MAX_PIPELINE_MS = 17000; // acoustic travel at 5 km plus bounded fusion time
+  const LIVE_MAX_PIPELINE_MS = 15000; // acoustic travel at 5 km plus bounded fusion time
   const LIVE_EPISODE_GAP_US = 7000000; // a quiet interval separates adjacent controlled or real flight episodes
   const GRID_STEPS = [25, 50, 100, 200, 500, 1000, 2000, 5000, 10000];
 

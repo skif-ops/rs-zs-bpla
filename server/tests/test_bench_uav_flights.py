@@ -66,7 +66,7 @@ def test_final_episode_fuses_two_distinct_tracks_with_all_five_stations(tmp_path
     service = StationFusionService(store)
     stations = wide_stations()
     start_us = 1_800_000_000_000_000
-    flights = make_passes(2, start_us, 15, FIVE_STATION_TWO_TARGETS)
+    flights = make_passes(2, start_us, 40, FIVE_STATION_TWO_TARGETS)
     boot_id = 77
     rng = random.Random(20261014)
     events = {}
@@ -80,7 +80,7 @@ def test_final_episode_fuses_two_distinct_tracks_with_all_five_stations(tmp_path
             assert process_message(f"zs/v1/bench/{station.station_id}/up", payload, "bench", True,
                                    event_store=store, fusion_service=service) == "stored"
 
-    for second in range(16):
+    for second in range(41):
         for flight in flights:
             for station in stations:
                 payload = bearing_payload(station, flight, float(second), boot_id=boot_id,
@@ -92,3 +92,5 @@ def test_final_episode_fuses_two_distinct_tracks_with_all_five_stations(tmp_path
     assert len(tracks) == 2
     assert all(track["stations"] == [9010, 9011, 9012, 9013, 9014] for track in tracks)
     assert all(track["points"] >= 7 for track in tracks)
+    assert service.tracks.direct_path_steps > 0
+    assert service.tracks.fast_path_steps > 0

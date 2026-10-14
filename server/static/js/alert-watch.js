@@ -8,9 +8,9 @@
   const liveKey = "muhoed-current-live:" + name;
   const EPISODE_GAP_US = 7000000;
   // msg.time is the acoustic emission time, while msg.created is the time at which fusion emitted the result.
-  // At the 5 km design boundary sound needs up to 14.6 s.  A result older than 17 s is a calculation backlog,
+  // At the 5 km design boundary sound needs up to 14.6 s.  A result older than 15 s is a calculation backlog,
   // not a current target; keep it in history but never use it to reopen live accompaniment or station alarms.
-  const LIVE_MAX_PIPELINE_MS = 17000;
+  const LIVE_MAX_PIPELINE_MS = 15000;
   const LIVE_MAX_RECEIPT_MS = 15000;
   let hasBaseline = sessionStorage.getItem(key) !== null;
   let cursor = Number(sessionStorage.getItem(key)) || 0;

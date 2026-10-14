@@ -86,6 +86,7 @@ BACKFILL_S = 15.0                # a new track shows the points of its last 15 s
 RANGE_GUESS_M = 2000.0           # first range of the iteration on the sound delay
 RANGE_ITERATIONS = 3             # fixed-point contraction v/c leaves < 40 m at 5 km even at 80 m/s
 RANGE_CONVERGENCE_M = 8.0        # 23 ms of sound travel and < 2 m target motion at EVT speeds
+FAST_CONTINUE_WINDOW_S = 6.0     # recent fixes retained for a confirmed association (at least STRONG_FIXES)
 TRACK_IDLE_S = 20.0              # a track without a new point this long is over (the output API ends it a little later:
                                  # integration/alert_producer.TRACK_END_US); a later hypothesis of its segments is a new track
 KALMAN_ACCEL = 6.0
@@ -261,6 +262,9 @@ class HypothesisTrackFusion:
         self._signature_cache: dict[tuple, target_match.Signature] = {}
         self._course_cache: dict[Member, dict] = {}
         self._complete: dict[int, float] = {}
+        self._established_fixes: dict[tuple[Member, ...], list[tuple[float, Fix]]] = {}
+        self.fast_path_steps = 0
+        self.direct_path_steps = 0
         self._state = store.fusion_state(STATE) or {"step": None, "frame": None, "tracks": {}, "waiting": {}}
 
     # ---- inputs ---------------------------------------------------------------------------------------------------
@@ -365,11 +369,163 @@ class HypothesisTrackFusion:
                    and (not confirmed or (tr["confirmed"] and now - tr["confirmed_s"] <= CONTINUE_S))
                    for tr in self._state["tracks"].values())
 
+    def _established(self, units: list[Unit], by_station: dict[int, list[Unit]], now: float) -> list[Hypothesis] | None:
+        """Continue a complete, already confirmed association without rebuilding its Cartesian search.
+
+        Five stations hearing two sources produce ten active segments.  Re-enumerating every pair, triple, four-ray
+        and five-ray explanation for every new second is useful only until the two tracks are associated.  Once the
+        active segments are covered exactly by confirmed tracks, their recent well-conditioned fixes are sufficient
+        to continue them.  Any new, missing, weak or incompatible segment returns to the full search immediately.
+        """
+        if not self._state["tracks"]:
+            return None
+        by_member = {u.member: u for u in units}
+        active = set(by_member)
+        used: set[Member] = set()
+        out: list[Hypothesis] = []
+        for tr in self._state["tracks"].values():
+            members = tuple(tuple(m) for m in tr.get("cur", ()))
+            if len(members) < 3 or not tr.get("confirmed") or any(m not in by_member for m in members):
+                continue
+            combo = tuple(by_member[m] for m in members)
+            if set(members) & used or any(not target_match.compatible(a.signature, b.signature)
+                                          for a, b in itertools.combinations(combo, 2)):
+                return None
+            if any(_weak_unit(u) for u in combo):
+                return None
+            key = tuple(sorted(members))
+            fixes = list(self._established_fixes.get(key, ()))
+            hi = min(u.last_s for u in combo)
+            if fixes:
+                start = math.floor(fixes[-1][0]) + 1
+            else:
+                lo = max(max(u.first_s for u in combo), now - FAST_CONTINUE_WINDOW_S) - MAX_RANGE_M / C
+                start = math.floor(lo)
+            for t in np.arange(start, hi, 1.0):
+                fix = self._cached("fix", combo, float(t), now)
+                if fix is None:
+                    break                       # later emission times need still later acoustic arrivals as well
+                if not fix.consistent:
+                    self._established_fixes.pop(key, None)
+                    return None                 # changed geometry: rebuild all competing associations
+                fixes.append((float(t), fix))
+            fixes = fixes[-max(STRONG_FIXES, int(FAST_CONTINUE_WINDOW_S)):]
+            if len(fixes) < STRONG_FIXES:
+                return None
+            good = sum(f.rays - 1 for _, f in fixes if f.consistent)
+            bad = sum(f.rays - 1 for _, f in fixes if not f.consistent)
+            score = float(good - bad)
+            times = np.array([t for t, _ in fixes])
+            xy = np.array([f.xyz[:2] for _, f in fixes])
+            error = float(np.median([f.horizontal_error_m for _, f in fixes]))
+            tt = times - times.mean()
+            design = np.vstack([np.ones_like(tt), tt, tt ** 2]).T
+            miss = xy - design @ np.linalg.lstsq(design, xy, rcond=None)[0]
+            kinematic = float(np.sqrt(np.mean(np.sum(miss ** 2, axis=1)))) / max(error, 15.0)
+            if kinematic > KINEMATIC_LIMIT:
+                score -= (kinematic - KINEMATIC_LIMIT) * len(fixes)
+            hypothesis = Hypothesis(combo, fixes, score, False)
+            if score <= 0 or not hypothesis.strong():
+                return None
+            self._established_fixes[key] = fixes
+            used.update(members)
+            out.append(hypothesis)
+        if not out or used != active:
+            return None
+        self.fast_path_steps += 1
+        return sorted(out, key=lambda h: (-h.score, h.members))
+
+    def _separable(self, units: list[Unit], now: float) -> list[Hypothesis] | None:
+        """Build maximal hypotheses directly when acoustic signatures split the active segments unambiguously.
+
+        Distinct fundamental frequencies give one compatible segment per station and target.  In that case all
+        smaller pair/triple/four-station subsets contain no additional association information; evaluating the
+        maximal component preserves the five-station fix while avoiding the Cartesian search.  If a component has
+        two segments of one station, the sources are acoustically ambiguous and the full hypothesis search remains
+        authoritative.
+        """
+        if len(units) < 3:
+            return None
+        # A station that reports several simultaneous sources gives their fundamentals on the bearing segments.  A
+        # gap larger than OTHER_SOURCE_RATIO is therefore stronger evidence than the deliberately broad interstation
+        # Doppler compatibility (F0_RATIO_MAX): use it when every resulting band has one segment per station.
+        components: list[list[Unit]] = []
+        if all(u.signature.f0_hz is not None for u in units):
+            for unit in sorted(units, key=lambda u: u.signature.f0_hz):
+                if (not components or
+                        unit.signature.f0_hz / components[-1][-1].signature.f0_hz > target_match.OTHER_SOURCE_RATIO):
+                    components.append([])
+                components[-1].append(unit)
+            if any(len(c) < 3 or len({u.station for u in c}) != len(c) for c in components):
+                components = []
+        if not components:
+            links = [set() for _ in units]
+            for i, a in enumerate(units):
+                for j in range(i + 1, len(units)):
+                    b = units[j]
+                    if a.station != b.station and target_match.compatible(a.signature, b.signature):
+                        links[i].add(j)
+                        links[j].add(i)
+            remaining = set(range(len(units)))
+            while remaining:
+                todo = [remaining.pop()]
+                indexes = []
+                while todo:
+                    i = todo.pop()
+                    indexes.append(i)
+                    neighbours = links[i] & remaining
+                    remaining.difference_update(neighbours)
+                    todo.extend(neighbours)
+                combo = [units[i] for i in indexes]
+                stations = [u.station for u in combo]
+                if len(combo) < 3 or len(stations) != len(set(stations)):
+                    return None
+                components.append(combo)
+
+        out = []
+        for component in components:
+            combo = tuple(sorted(component, key=lambda u: u.member))
+            lo = max(max(u.first_s for u in combo), now - WINDOW_S) - MAX_RANGE_M / C
+            hi = min(u.last_s for u in combo)
+            if hi - lo < MIN_FIXES:
+                return None
+            fixes = []
+            for t in np.arange(math.floor(lo), hi, 1.0):
+                fix = self._cached("fix", combo, float(t), now)
+                if fix is not None:
+                    fixes.append((float(t), fix))
+            if len(fixes) < MIN_FIXES:
+                return None
+            good = sum(f.rays - 1 for _, f in fixes if f.consistent)
+            bad = sum(f.rays - 1 for _, f in fixes if not f.consistent)
+            score = float(good - bad)
+            times = np.array([t for t, _ in fixes])
+            xy = np.array([f.xyz[:2] for _, f in fixes])
+            error = float(np.median([f.horizontal_error_m for _, f in fixes]))
+            tt = times - times.mean()
+            design = np.vstack([np.ones_like(tt), tt, tt ** 2]).T
+            miss = xy - design @ np.linalg.lstsq(design, xy, rcond=None)[0]
+            kinematic = float(np.sqrt(np.mean(np.sum(miss ** 2, axis=1)))) / max(error, 15.0)
+            if kinematic > KINEMATIC_LIMIT:
+                score -= (kinematic - KINEMATIC_LIMIT) * len(fixes)
+            hypothesis = Hypothesis(combo, fixes, score, False)
+            if score <= 0 or not hypothesis.strong():
+                return None
+            out.append(hypothesis)
+        self.direct_path_steps += 1
+        return sorted(out, key=lambda h: (-h.score, h.members))
+
     def _hypotheses(self, units: list[Unit], now: float) -> list[Hypothesis]:
         by_station: dict[int, list[Unit]] = {}
         for u in units:
             by_station.setdefault(u.station, []).append(u)
         self._by_station = by_station
+        established = self._established(units, by_station, now)
+        if established is not None:
+            return established
+        separable = self._separable(units, now)
+        if separable is not None:
+            return separable
         stations = sorted(by_station)
         near = {(a, b) for a in stations for b in stations if a < b
                 and float(np.linalg.norm(by_station[a][0].origin[:2] - by_station[b][0].origin[:2])) <= 2.0 * MAX_RANGE_M}

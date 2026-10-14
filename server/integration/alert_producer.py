@@ -140,8 +140,10 @@ class AlertProducer:
             # the segment of the station track this bearing belongs to (station/track_segments.py); an outlier or a
             # bearing still waiting for its segment draws no line
             segment = track_segments.segment_at(segments, sample.time_us, sample.f0_hz)
-            if segment is None or self.store.track_of_member(*key, segment.key) is not None:   # a fused track carries it
+            if segment is None:
                 self._touch(now, sample.time_us, stations=[batch.station_id], level="warning", klass=None)
+                continue
+            if self.store.track_of_member(*key, segment.key) is not None:   # a fused track carries and refreshes it
                 continue
             signature = target_match.station_track_signature(self.store, *key, segment).as_class()
             episode = self._touch(now, sample.time_us, stations=[batch.station_id], level="warning", klass=signature)
