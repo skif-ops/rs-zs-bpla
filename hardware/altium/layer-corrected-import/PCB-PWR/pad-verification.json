@@ -1,0 +1,17 @@
+{
+  "PCB-PWR": {
+    "source_pad_count": 210,
+    "imported_pad_count": 210,
+    "position_size_drill_net_and_named_pad_number_matches": 210,
+    "unnumbered_source_pads_matched_without_number_check": 38,
+    "position_size_drill_tolerance_mm": 0.00025,
+    "missing_count": 0,
+    "extra_count": 0,
+    "missing_examples": [],
+    "extra_examples": [],
+    "scope_limitations": [
+      "component reference and schematic pin mapping not verified",
+      "pad shape, rotation, copper/mask layers, and solder mask expansion not verified"
+    ]
+  }
+}
