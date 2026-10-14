@@ -185,10 +185,10 @@ def summarize(source: Counter, imported: Counter, limit=5):
     }
 
 
-def check_board(root: Path, board: str, pcb_dir: Path):
+def check_board(root: Path, board: str, pcb_dir: Path, pcb_file: Path | None = None):
     dx, y_sum = BOARD_TRANSFORMS[board]
     routes, source_vias, nets, counts = source_routes(root / "hardware/kicad/native" / board / f"{board}.kicad_pcb", dx, y_sum)
-    path = pcb_dir / board / f"{board}.PcbDoc"
+    path = pcb_file or pcb_dir / board / f"{board}.PcbDoc"
     with olefile.OleFileIO(str(path)) as doc:
         imported_names = altium_nets(doc)
         imported = imported_routes(doc, imported_names)
@@ -212,11 +212,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--pcb-dir", type=Path)
+    parser.add_argument("--board", choices=BOARD_TRANSFORMS)
+    parser.add_argument("--pcb-file", type=Path, help="An alternate PcbDoc for one selected board")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     root = args.root.resolve()
     pcb_dir = args.pcb_dir or root / "hardware/altium/diagnostic-import"
-    report = {board: check_board(root, board, pcb_dir) for board in BOARD_TRANSFORMS}
+    if args.pcb_file and not args.board:
+        parser.error("--pcb-file requires --board")
+    boards = (args.board,) if args.board else BOARD_TRANSFORMS
+    report = {board: check_board(root, board, pcb_dir, args.pcb_file) for board in boards}
     payload = json.dumps(report, indent=2, ensure_ascii=False) + "\n"
     if args.output:
         args.output.write_text(payload, encoding="utf-8")

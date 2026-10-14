@@ -1,0 +1,52 @@
+{
+  "PCB-PWR": {
+    "source_route_count": 575,
+    "imported_route_count": 575,
+    "geometry_width_net_matches": 575,
+    "source_routes_missing": 0,
+    "imported_routes_extra": 0,
+    "correct_copper_layer": 575,
+    "incorrect_copper_layer": 0,
+    "source_layers": {
+      "B.Cu": 135,
+      "F.Cu": 440
+    },
+    "imported_layers": {
+      "1": 440,
+      "32": 135
+    },
+    "missing_examples": [],
+    "wrong_layer_examples": [],
+    "source_board": "hardware/kicad/native/PCB-PWR/PCB-PWR.kicad_pcb",
+    "imported_board": "hardware/altium/layer-corrected-import/PCB-PWR/PCB-PWR.PcbDoc",
+    "transform": {
+      "x_offset_mm": 0.0,
+      "y_reflection_sum_mm": 60.0
+    },
+    "source_counts": {
+      "components": 66,
+      "pads": 210,
+      "vias": 267,
+      "zones": 33
+    },
+    "imported_counts": {
+      "components": 66,
+      "pads": 210,
+      "vias": 267,
+      "polygons": 28
+    },
+    "net_name_sets_equal": true,
+    "source_net_count": 31,
+    "imported_net_count": 31,
+    "vias": {
+      "source_via_count": 267,
+      "imported_via_count": 267,
+      "position_diameter_drill_net_matches": 267,
+      "correct_layer_span": 267,
+      "incorrect_layer_span": 0,
+      "imported_layer_spans": {
+        "1-32": 267
+      }
+    }
+  }
+}

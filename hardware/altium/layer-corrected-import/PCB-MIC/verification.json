@@ -1,0 +1,52 @@
+{
+  "PCB-MIC": {
+    "source_route_count": 27,
+    "imported_route_count": 27,
+    "geometry_width_net_matches": 27,
+    "source_routes_missing": 0,
+    "imported_routes_extra": 0,
+    "correct_copper_layer": 27,
+    "incorrect_copper_layer": 0,
+    "source_layers": {
+      "B.Cu": 8,
+      "F.Cu": 19
+    },
+    "imported_layers": {
+      "1": 19,
+      "32": 8
+    },
+    "missing_examples": [],
+    "wrong_layer_examples": [],
+    "source_board": "hardware/kicad/native/PCB-MIC/PCB-MIC.kicad_pcb",
+    "imported_board": "hardware/altium/layer-corrected-import/PCB-MIC/PCB-MIC.PcbDoc",
+    "transform": {
+      "x_offset_mm": 0.0,
+      "y_reflection_sum_mm": 22.0
+    },
+    "source_counts": {
+      "components": 6,
+      "pads": 53,
+      "vias": 5,
+      "zones": 0
+    },
+    "imported_counts": {
+      "components": 6,
+      "pads": 53,
+      "vias": 5,
+      "polygons": 0
+    },
+    "net_name_sets_equal": true,
+    "source_net_count": 7,
+    "imported_net_count": 7,
+    "vias": {
+      "source_via_count": 5,
+      "imported_via_count": 5,
+      "position_diameter_drill_net_matches": 5,
+      "correct_layer_span": 5,
+      "incorrect_layer_span": 0,
+      "imported_layer_spans": {
+        "1-32": 5
+      }
+    }
+  }
+}

@@ -1,0 +1,90 @@
+Importer Log Report
+Document: F:\Проекты\Codex\altium-layer-map-test-complete\PCB-PWR\PCB-PWR.kicad_sch
+    Section : Loading Schematic - F:\Проекты\Codex\altium-layer-map-test-complete\PCB-PWR\PCB-PWR.kicad_sch
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Event: Loading sub-sheet: PCB-PWR_01_INPUT_PROTECTION.kicad_sch of PCB-PWR.kicad_sch.
+    EndSection
+    Section : Loading Schematic - F:\Проекты\Codex\altium-layer-map-test-complete\PCB-PWR\PCB-PWR_01_INPUT_PROTECTION.kicad_sch
+        Event: Successfully load sub-sheet: PCB-PWR_01_INPUT_PROTECTION.kicad_sch of PCB-PWR.kicad_sch.
+        Event: Loading sub-sheet: PCB-PWR_02_3V8_MODEM.kicad_sch of PCB-PWR.kicad_sch.
+    EndSection
+    Section : Loading Schematic - F:\Проекты\Codex\altium-layer-map-test-complete\PCB-PWR\PCB-PWR_02_3V8_MODEM.kicad_sch
+        Event: Successfully load sub-sheet: PCB-PWR_02_3V8_MODEM.kicad_sch of PCB-PWR.kicad_sch.
+        Event: Loading sub-sheet: PCB-PWR_03_3V3_DIGITAL.kicad_sch of PCB-PWR.kicad_sch.
+    EndSection
+    Section : Loading Schematic - F:\Проекты\Codex\altium-layer-map-test-complete\PCB-PWR\PCB-PWR_03_3V3_DIGITAL.kicad_sch
+        Event: Successfully load sub-sheet: PCB-PWR_03_3V3_DIGITAL.kicad_sch of PCB-PWR.kicad_sch.
+        Event: Loading sub-sheet: PCB-PWR_04_AUX_HARNESS.kicad_sch of PCB-PWR.kicad_sch.
+    EndSection
+    Section : Loading Schematic - F:\Проекты\Codex\altium-layer-map-test-complete\PCB-PWR\PCB-PWR_04_AUX_HARNESS.kicad_sch
+        Event: Successfully load sub-sheet: PCB-PWR_04_AUX_HARNESS.kicad_sch of PCB-PWR.kicad_sch.
+    EndSection
+    Section : Loading Schematic - F:\Проекты\Codex\altium-layer-map-test-complete\PCB-PWR\PCB-PWR.kicad_sch
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Warning: Unknown child uuid of pin.
+        Event: Loading sub-sheet: PCB-PWR_01_INPUT_PROTECTION.kicad_sch of PCB-PWR.kicad_sch.
+    EndSection
+    Section : Loading Schematic - F:\Проекты\Codex\altium-layer-map-test-complete\PCB-PWR\PCB-PWR_01_INPUT_PROTECTION.kicad_sch
+        Event: Successfully load sub-sheet: PCB-PWR_01_INPUT_PROTECTION.kicad_sch of PCB-PWR.kicad_sch.
+        Event: Loading sub-sheet: PCB-PWR_02_3V8_MODEM.kicad_sch of PCB-PWR.kicad_sch.
+    EndSection
+    Section : Loading Schematic - F:\Проекты\Codex\altium-layer-map-test-complete\PCB-PWR\PCB-PWR_02_3V8_MODEM.kicad_sch
+        Event: Successfully load sub-sheet: PCB-PWR_02_3V8_MODEM.kicad_sch of PCB-PWR.kicad_sch.
+        Event: Loading sub-sheet: PCB-PWR_03_3V3_DIGITAL.kicad_sch of PCB-PWR.kicad_sch.
+    EndSection
+    Section : Loading Schematic - F:\Проекты\Codex\altium-layer-map-test-complete\PCB-PWR\PCB-PWR_03_3V3_DIGITAL.kicad_sch
+        Event: Successfully load sub-sheet: PCB-PWR_03_3V3_DIGITAL.kicad_sch of PCB-PWR.kicad_sch.
+        Event: Loading sub-sheet: PCB-PWR_04_AUX_HARNESS.kicad_sch of PCB-PWR.kicad_sch.
+    EndSection
+    Section : Loading Schematic - F:\Проекты\Codex\altium-layer-map-test-complete\PCB-PWR\PCB-PWR_04_AUX_HARNESS.kicad_sch
+        Event: Successfully load sub-sheet: PCB-PWR_04_AUX_HARNESS.kicad_sch of PCB-PWR.kicad_sch.
+    EndSection
