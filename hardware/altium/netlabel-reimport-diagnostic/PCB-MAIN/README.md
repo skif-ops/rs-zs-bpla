@@ -53,12 +53,23 @@ These normalized limits are diagnostic settings, not approved fabrication constr
 
 KiCad already reports 499 unconnected items, so Altium's 421 ratsnest violations do not by themselves prove a conversion loss. A direct diagnostic comparison found 208 exact endpoint pairs shared by the 419 unique Altium pad-to-pad pairs and the 248 parseable KiCad pad-to-pad pairs. Another 251 KiCad entries involve track or via endpoints and cannot be compared as pad pairs; both tools also choose different spanning-tree edges for the same incomplete net. See `validation/PCB-MAIN-unrouted-comparison-2026-10-14.json`. Routing completion and native polygon/plane connectivity review are still required.
 
+## Diagnostic Output Job, 2026-10-15
+
+`EVT-PRE-20_PCB-MAIN.OutJob` was opened successfully in Altium Designer 26.10.1 Trial. It defines portable, local outputs with no absolute workstation path:
+
+- folder output: Gerber X2, NC Drill, CSV and IPC-D-356A fabrication testpoint reports, Pick&Place, BOM, DRC report, and STEP;
+- PDF output: board stack, drill drawing, assembly drawing, all schematic sheets, and PCB prints;
+- fabrication testpoint report: top and bottom layers, metric units, relative origin, CSV and IPC-D-356A enabled;
+- release-managed output: disabled.
+
+This is a verified configuration only. Its outputs were not generated and no manufacturing archive was released because the blockers documented below remain open. Running it now would create diagnostic data, not an approved production package.
+
 ## Release blockers
 
 - Complete and verify the 421 Altium unrouted connections against the 499 KiCad unconnected items.
 - Resolve the 667 KiCad rule violations and 601 schematic-parity issues rather than suppressing them.
 - Replace the broad diagnostic width and hole-size limits with reviewed net-class and mechanical-hole rules.
 - Validate stackup materials and controlled impedance, RF return paths, differential pairs, power integrity, filled copper and keepouts.
-- Complete schematic-to-PCB synchronization, BOM and Pick&Place validation, native Altium DRC/CAM review, and the production OutJob outputs.
+- Complete schematic-to-PCB synchronization, BOM and Pick&Place validation, native Altium DRC/CAM review, then generate and inspect the configured outputs.
 
 This import must not be released for fabrication or assembly.

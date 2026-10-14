@@ -52,4 +52,15 @@ The controlled manufacturing handoff distinguishes 0.125 mm copper clearance aro
 
 The native KiCad rule file uses a broader MK1 footprint condition and currently reports zero DRC violations, while the controlled manufacturing handoff limits the exception to the manufacturer ground land around the acoustic bore. The Altium violations above are therefore retained as unresolved engineering findings rather than waived.
 
-No `OutJob` or manufacturing archive is released from this diagnostic copy. The two ordinary-track clearances, the eight acoustic-land points, final MK1 rule implementation, remaining footprint/mask/keepout/CAM checks, and Review B must be closed before fabrication or assembly release.
+## Diagnostic Output Job, 2026-10-15
+
+`EVT-PRE-20_PCB-MIC.OutJob` was opened successfully in Altium Designer 26.10.1 Trial. It defines portable, local outputs with no absolute workstation path:
+
+- folder output: Gerber X2, NC Drill, CSV and IPC-D-356A fabrication testpoint reports, Pick&Place, BOM, DRC report, and STEP;
+- PDF output: board stack, drill drawing, assembly drawing, all schematic sheets, and PCB prints;
+- fabrication testpoint report: top and bottom layers, metric units, relative origin, CSV and IPC-D-356A enabled;
+- release-managed output: disabled.
+
+This is a verified configuration only. Its outputs were not generated and no manufacturing archive was released because the blockers documented below remain open. Running it now would create diagnostic data, not an approved production package.
+
+The two ordinary-track clearances, the eight acoustic-land points, final MK1 rule implementation, remaining footprint/mask/keepout/CAM checks, and Review B must be closed before fabrication or assembly release.

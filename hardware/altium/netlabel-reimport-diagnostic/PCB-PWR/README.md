@@ -46,3 +46,14 @@ The three remaining unrouted connections are:
 The KiCad source uses `NetTie-2_SMD_Pad0.5mm` with two pads plus an F.Cu `fp_poly` copper bridge. The initial Altium import created NT1-NT3 with only the two pads. A separate KiCad-footprint import produced `NetTie.PcbLib` with the expected two pads plus one copper region, and that library is included here with the project. Altium matched exactly NT1-NT3 during the update ECO, but the PCB instances still contain only two primitives and the three unrouted reports remain. NT1-NT3 are set to component type `Net Tie`; L1 and L2 are confirmed as `Standard`. No board-level track was substituted for the missing footprint region because that creates genuine short-circuit and clearance violations.
 
 The repeat project validation at 21:42:47 reported `Compile successful, no errors found` with 28 retained warnings. See `validation/altium-validation-2026-10-14.txt` for the verification record and the exact DRC paths. The imported PCB must not be released for fabrication or assembly while these three connections and the remaining conversion gates are open.
+
+## Diagnostic Output Job, 2026-10-15
+
+`EVT-PRE-20_PCB-PWR.OutJob` was opened successfully in Altium Designer 26.10.1 Trial. It defines portable, local outputs with no absolute workstation path:
+
+- folder output: Gerber X2, NC Drill, CSV and IPC-D-356A fabrication testpoint reports, Pick&Place, BOM, DRC report, and STEP;
+- PDF output: board stack, drill drawing, assembly drawing, all schematic sheets, and PCB prints;
+- fabrication testpoint report: top and bottom layers, metric units, relative origin, CSV and IPC-D-356A enabled;
+- release-managed output: disabled.
+
+This is a verified configuration only. Its outputs were not generated and no manufacturing archive was released because the blockers documented below remain open. Running it now would create diagnostic data, not an approved production package.
