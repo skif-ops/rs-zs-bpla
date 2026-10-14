@@ -26,8 +26,8 @@ The original KiCad instances of `#FLG01`, `#FLG02`, and `#FLG03` each have `(in_
 
 ## Repair and release gate
 
-1. Pilot: add a second `I2C2_SCL` Net Label directly to the wire attached to the `I2C2_SCL` Port on `PCB-PWR_01_INPUT_PROTECTION.SchDoc`; keep the label by `U2-5`. Revalidate and record whether both related errors disappear. Do not assume this alone restores the full design.
-2. Repair the remaining affected port/label connections only after confirming the pilot. Preserve the intended sheet hierarchy; avoid changing global net-identifier scope or disabling error reporting merely to clear messages.
+1. Pilot completed: a second `I2C2_SCL` Net Label was placed at Altium schematic coordinate `(165, 230)` on the Port wire; the existing `U2-5` label remains. Altium validation at 16:45:36 removed both related errors. Total errors fell from 21 to 19, with the three footprint warnings unchanged. This demonstrates the repair for one net only.
+2. The reproducible KiCad import-copy preparation in `../../../NETLABEL_REIMPORT_PREPARATION.md` adds the remaining affected port-wire labels before a new import. Preserve the intended sheet hierarchy; avoid changing global net-identifier scope or disabling error reporting merely to clear messages.
 3. Export a compiled Altium schematic netlist and compare the complete pin-to-net mapping against KiCad. Recheck schematic-to-PCB parity, DRC, RF/power rules, and assembly outputs before any manufacturing release.
 
 References: [Altium connectivity](https://www.altium.com/documentation/altium-designer/schematic/creating-circuit-connectivity), [Altium validation diagnostics](https://www.altium.com/documentation/altium-designer/schematic/design-validation).
