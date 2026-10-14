@@ -2,7 +2,7 @@
   "PCB-MAIN": {
     "source_pad_count": 1143,
     "imported_pad_count": 1143,
-    "position_size_drill_net_and_named_pad_number_matches": 1143,
+    "refdes_position_size_drill_net_and_named_pad_number_matches": 1143,
     "unnumbered_source_pads_matched_without_number_check": 66,
     "position_size_drill_tolerance_mm": 0.00025,
     "missing_count": 0,
@@ -10,8 +10,9 @@
     "missing_examples": [],
     "extra_examples": [],
     "scope_limitations": [
-      "component reference and schematic pin mapping not verified",
+      "schematic pin/net mapping not verified",
       "pad shape, rotation, copper/mask layers, and solder mask expansion not verified"
-    ]
+    ],
+    "component_origin_matches": 251
   }
 }

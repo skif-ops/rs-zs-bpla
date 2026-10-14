@@ -12,7 +12,7 @@
 
 Независимая сверка [verify_diagnostic_pcb.py](../verify_diagnostic_pcb.py) читает `Tracks6`, `Vias6`, `Nets6` и заголовки других потоков `PcbDoc`. Результаты: [PCB-MAIN/verification.json](PCB-MAIN/verification.json), [PCB-PWR/verification.json](PCB-PWR/verification.json), [PCB-MIC/verification.json](PCB-MIC/verification.json).
 
-Дополнительно [verify_pad_geometry.py](../verify_pad_geometry.py) сравнивает площадки через KiCad 10 `pcbnew` и поток Altium `Pads6`: абсолютные координаты, размеры, обе оси сверления, сеть и номер вывода для нумерованных площадок. Допуск координат и размеров — 0,00025 мм. Результаты: [PCB-MAIN/pad-verification.json](PCB-MAIN/pad-verification.json), [PCB-PWR/pad-verification.json](PCB-PWR/pad-verification.json), [PCB-MIC/pad-verification.json](PCB-MIC/pad-verification.json). Совпали все 1143/1143 площадки MAIN, 210/210 PWR и 53/53 MIC. Для 66 ненумерованных площадок MAIN, 38 PWR и 5 MIC номер не сравнивался: Altium автоматически присвоил им имена `Un*`.
+Дополнительно [verify_pad_geometry.py](../verify_pad_geometry.py) сопоставляет компоненты по уникальным координатам, затем сравнивает площадки через KiCad 10 `pcbnew` и потоки Altium `Components6`/`Pads6`: `refdes`, абсолютные координаты, размеры, обе оси сверления, сеть и номер вывода для нумерованных площадок. Допуск координат и размеров — 0,00025 мм. Результаты: [PCB-MAIN/pad-verification.json](PCB-MAIN/pad-verification.json), [PCB-PWR/pad-verification.json](PCB-PWR/pad-verification.json), [PCB-MIC/pad-verification.json](PCB-MIC/pad-verification.json). Совпали все 251/251 компоненты и 1143/1143 площадки MAIN, 66/66 и 210/210 PWR, 6/6 и 53/53 MIC. Для 66 ненумерованных площадок MAIN, 38 PWR и 5 MIC номер не сравнивался: Altium автоматически присвоил им имена `Un*`.
 
 | Плата | Трассы: геометрия, ширина, сеть и слой | Via: координаты, диаметр, сверло, сеть и диапазон слоёв | Совпало по количеству компонентов / площадок | Совпали имена сетей |
 | --- | ---: | ---: | --- | --- |
@@ -25,7 +25,7 @@
 ## Что остаётся открытым
 
 - Журналы импортера содержат `KiCadLib.PCB.PCBLine` errors: MAIN 873, PWR 703, MIC 73. Все трассы с назначенными сетями перенесены, но прочая графика, контуры и специальные объекты не проверены поэлементно. Предупреждения MAIN 891, PWR 2117, MIC 275 требуют разбора.
-- Сверка площадок подтверждает координаты, размер, сверление и сеть, но не доказывает `refdes–pin–net`, форму и поворот площадок, назначение слоёв или раскрытие маски. `PcbLib` создана, но её соответствие установленным компонентам платы не подтверждено.
+- На уровне **PCB** сверены `refdes–pin–net`, координаты, размер и сверление, но эквивалентность со **схемой** ещё не доказана. Форма и поворот площадок, назначение слоёв и раскрытие маски не сверены. `PcbLib` создана, но её соответствие установленным компонентам платы не подтверждено.
 - Контуры и свойства медных зон, запретные области, поля стеков, RF/power, контролируемый импеданс, DRC/compile Altium, варианты сборки и производственные выходы не проверены.
 - Исходная база KiCad уже имеет нарушения DRC и schematic parity, перечисленные в [аудите](../EVT_PRE_20_KICAD_BASELINE_AUDIT_2026-10-14.md). `manufacturing_release=false` остаётся в силе.
 
