@@ -117,6 +117,12 @@ def test_active_alert_stations_uses_only_fresh_open_tracks():
 
     assert health.active_alert_stations(AlertStore(), {"north"}, NOW) == {17, 18}
 
+    class StaleStore(AlertStore):
+        def open_alert_tracks(self, alert_id):
+            return [{"track_id": "stale", "updated_us": NOW - health.ACTIVE_ALERT_US - 1}]
+
+    assert health.active_alert_stations(StaleStore(), {"north"}, NOW) == set()
+
 
 def test_received_time_is_the_server_clock_and_old_rows_fall_back(tmp_path: Path):
     store = EventStore(tmp_path / "zs.sqlite3")

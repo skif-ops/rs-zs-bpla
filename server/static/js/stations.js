@@ -86,14 +86,15 @@
   let selectedTenant = "";
   let viewMode = "cards";
   const open = new Set();                // station ids with the details row open
-  const liveTracks = new Map();          // track_id -> station ids, updated by dioneya.alert/1
+  const liveTracks = new Map();          // track_id -> { stations, until }, updated by dioneya.alert/1
   const apiAlertUntil = new Map();        // active state received with the health snapshot
 
   function applyActiveAlerts() {
     const now = Date.now();
     for (const [sid, until] of apiAlertUntil) if (until <= now) apiAlertUntil.delete(sid);
+    for (const [track, state] of liveTracks) if (state.until <= now) liveTracks.delete(track);
     const active = new Set(apiAlertUntil.keys());
-    for (const stations of liveTracks.values()) for (const sid of stations) active.add(sid);
+    for (const state of liveTracks.values()) for (const sid of state.stations) active.add(sid);
     for (const r of data.stations) {
       const isActive = active.has(r.station_id);
       r.active_alert = isActive;
@@ -291,7 +292,7 @@
       data = await res.json(); receivedAt = Date.now();
       for (const r of data.stations) {
         r._healthProblems = (r.problems || []).filter((p) => p.code !== "active_alert");
-        if (r.active_alert) apiAlertUntil.set(r.station_id, Date.now() + 30000);
+        if (r.active_alert) apiAlertUntil.set(r.station_id, Date.now() + 8000);
       }
       applyActiveAlerts();
       const tenantSelect = $("st-tenant");
@@ -321,7 +322,10 @@
   window.addEventListener("muhoed:alert-message", (event) => {
     const msg = event.detail || {};
     if (msg.type === "track.update" && msg.track?.track_id) {
-      liveTracks.set(msg.track.track_id, (msg.track.stations || []).map(Number).filter(Number.isSafeInteger));
+      liveTracks.set(msg.track.track_id, {
+        stations: (msg.track.stations || []).map(Number).filter(Number.isSafeInteger),
+        until: Date.now() + 8000,
+      });
     } else if (msg.type === "track.end" && msg.track?.track_id) {
       liveTracks.delete(msg.track.track_id);
     } else if (msg.type === "alert.end") {

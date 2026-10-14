@@ -29,7 +29,7 @@ BATTERY_LOW_ENV = "ZS_STATION_BATTERY_LOW_PCT"
 DEFAULT_LATE_S = 7 * 3600
 DEFAULT_LOST_S = 13 * 3600
 DEFAULT_BATTERY_LOW_PCT = 20
-ACTIVE_ALERT_US = 30_000_000
+ACTIVE_ALERT_US = 8_000_000
 TEMPERATURE_MIN_C, TEMPERATURE_MAX_C = -30.0, 60.0      # EVT hardware operating range
 STATES = ("online", "late", "lost", "never")
 LEVELS = ("ok", "info", "warn", "alarm")                   # worst last
@@ -217,9 +217,10 @@ def active_alert_stations(store, tenants: set[str], now_us: int) -> set[int]:
     """Stations contributing to a current alert.
 
     An alert episode deliberately remains open for two minutes, while the station
-    page needs the stations of tracks that are active now.  Use the fusion wall
-    clock and the same 30 second order of magnitude as track loss detection.  An
-    alert that has not formed a fused track yet falls back to its recent stations.
+    page needs the stations of tracks that are active now. Use the fusion wall
+    clock and an eight second window: live tracks update once a second and the
+    controlled scenarios have a ten second gap. An alert that has not formed a
+    fused track yet falls back to its recent stations.
     """
     active: set[int] = set()
     cutoff = now_us - ACTIVE_ALERT_US
@@ -228,13 +229,14 @@ def active_alert_stations(store, tenants: set[str], now_us: int) -> set[int]:
         if episode is None or episode.get("level") != "alert":
             continue
         tenant_active: set[int] = set()
-        for state in store.open_alert_tracks(episode["alert_id"]):
+        track_states = store.open_alert_tracks(episode["alert_id"])
+        for state in track_states:
             if int(state.get("updated_us") or 0) < cutoff:
                 continue
             track = store.get_track(state["track_id"])
             if track:
                 tenant_active.update(int(s) for s in track.get("stations") or [])
-        if not tenant_active and int(episode.get("last_activity_us") or 0) >= cutoff:
+        if not tenant_active and not track_states and int(episode.get("last_activity_us") or 0) >= cutoff:
             tenant_active.update(int(s) for s in episode.get("stations") or [])
         active.update(tenant_active)
     return active
