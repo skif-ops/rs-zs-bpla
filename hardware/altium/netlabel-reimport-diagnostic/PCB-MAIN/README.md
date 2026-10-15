@@ -22,6 +22,10 @@ KiCad printed its existing annotation-error warning while exporting the tracked 
 
 The remaining 146 Altium messages are warnings, including imported port/pin electrical-type checks, nets without a driving source, and missing schematic footprint-model links. They are not suppressed and still require per-net and per-component review. A concise validation record is in `validation/altium-validation-2026-10-14.txt`.
 
+A fresh explicit compile and current-source comparison was run on 2026-10-15. Altium again compiled with **zero errors and 146 warnings**: 64 missing-component-model warnings, 43 no-driving-source warnings and 39 possible-connection warnings. Bridge-level compiled connectivity includes the generated singleton nets and reports 1074/1074 physical pins, 186/186 multi-pin nets and 169/169 single-pin physical memberships, with zero pin or multi-pin-net mismatches. KiCad and Altium use different generated names for the 169 singleton nets, so those nets are compared by their unique ref/pin member. See `validation/PCB-MAIN-KiCad-Altium-connectivity-2026-10-15.json`, `validation/PCB-MAIN-validation-summary-2026-10-15.json` and `validation/altium-validation-2026-10-15.txt`.
+
+KiCad 10.0.6 ERC on the current native hierarchy reports zero violations. The full PCB DRC/parity rerun reproduces the existing open state: 667 rule violations, 499 unconnected items and 601 schematic-parity items. This confirms schematic transfer while leaving routing and PCB release blocked.
+
 ## PCB geometry
 
 Independent comparisons found:
